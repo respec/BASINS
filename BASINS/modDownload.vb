@@ -1363,7 +1363,7 @@ StartOver:
 
                 'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
                 If LCase(aFilename).IndexOf("\landuse" & g_PathChar) > 0 Then
-                    SetLandUseColors(MWlay, shpFile)
+                    'SetLandUseColors(MWlay, shpFile)
                 ElseIf LCase(aFilename).IndexOf("\nhd" & g_PathChar) > 0 Then
                     If InStr(IO.Path.GetFileNameWithoutExtension(shpFile.Filename), "NHD") > 0 Then
                         MWlay.Name = IO.Path.GetFileNameWithoutExtension(shpFile.Filename)
@@ -1371,7 +1371,7 @@ StartOver:
                         MWlay.Name &= " " & IO.Path.GetFileNameWithoutExtension(shpFile.Filename)
                     End If
                 ElseIf LCase(aFilename).IndexOf("\census" & g_PathChar) > 0 Then
-                    SetCensusColors(MWlay, shpFile)
+                    'SetCensusColors(MWlay, shpFile)
                 ElseIf LCase(aFilename).IndexOf("\dem" & g_PathChar) > 0 Then
                     SetDemColors(MWlay, shpFile)
                 ElseIf LCase(aFilename).EndsWith("cat.shp") Then
@@ -1380,7 +1380,6 @@ StartOver:
                 If Group.Length > 0 Then
                     AddLayerToGroup(MWlay, Group)
                 End If
-
                 If MWlay.Visible Then
                     g_MapWin.View.Redraw()
                     DoEvents()
@@ -1434,9 +1433,11 @@ StartOver:
                     Case Else : Visible = False
                 End Select
                 If LayerName = "" Then LayerName = IO.Path.GetFileNameWithoutExtension(aFilename)
-                If LayerName = "National Elevation Dataset" OrElse LayerName = "DEM Elevation Model" Then
-                    LayerName &= " (" & IO.Path.GetFileNameWithoutExtension(aFilename) & ")"
-                End If
+                Select Case LayerName
+                    Case "National Elevation Dataset", "DEM Elevation Model", "Digital Elevation Model"
+                        LayerName &= " (" & IO.Path.GetFileNameWithoutExtension(aFilename) & ")"
+                End Select
+
                 g = New MapWinGIS.Grid
                 g.Open(aFilename)
                 'TODO: ensure correct Nodata value is set in NLCD grids
@@ -1458,15 +1459,14 @@ StartOver:
                 MWlay.UseTransparentColor = True
 
                 'TODO: replace hard-coded SetElevationGridColors with full renderer from defaults
-                If LCase(aFilename).IndexOf("\demg" & g_PathChar) > 0 Then
+                If aFilename.ToLower.EndsWith("demg.tif") > 0 Then
                     SetElevationGridColors(MWlay, g)
-                ElseIf LCase(aFilename).IndexOf("\ned" & g_PathChar) > 0 Then
+                ElseIf aFilename.ToLower.IndexOf(g_PathChar & "ned" & g_PathChar) > 0 Then
                     SetElevationGridColors(MWlay, g)
                 End If
             End If
 
-
-            If Not Group Is Nothing AndAlso Group.Length > 0 Then AddLayerToGroup(MWlay, Group)
+            If Not String.IsNullOrEmpty(Group) Then AddLayerToGroup(MWlay, Group)
 
             If MWlay.Visible Then
                 g_MapWin.View.Redraw()
@@ -1526,200 +1526,228 @@ StartOver:
         End Select
     End Sub
 
-    Private Sub SetLandUseColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
-        Dim colorBreak As MapWinGIS.ShapefileColorBreak
-        Dim colorScheme As MapWinGIS.ShapefileColorScheme
+    'Private Sub SetLandUseColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
+    '    Dim colorBreak As MapWinGIS.ShapefileColorBreak
+    '    Dim colorScheme As MapWinGIS.ShapefileColorScheme
 
-        MWlay.Name &= " " & IO.Path.GetFileNameWithoutExtension(shpFile.Filename).Substring(2)
-        colorScheme = New MapWinGIS.ShapefileColorScheme
-        colorScheme.FieldIndex = ShpFieldNumFromName(shpFile, "lucode")
-        If colorScheme.FieldIndex > 0 Then
-            colorBreak = New MapWinGIS.ShapefileColorBreak
-            colorBreak.Caption = "Urban or Built-up Land"
-            colorBreak.StartValue = 1
-            colorBreak.EndValue = 19
-            colorBreak.StartColor = System.Convert.ToUInt32(RGB(120, 120, 120))
-            colorBreak.EndColor = colorBreak.StartColor
-            colorScheme.Add(colorBreak)
+    '    MWlay.Name &= " " & IO.Path.GetFileNameWithoutExtension(shpFile.Filename).Substring(2)
+    '    colorScheme = New MapWinGIS.ShapefileColorScheme
+    '    colorScheme.FieldIndex = ShpFieldNumFromName(shpFile, "lucode")
+    '    If colorScheme.FieldIndex > 0 Then
+    '        colorBreak = New MapWinGIS.ShapefileColorBreak
+    '        colorBreak.Caption = "Urban or Built-up Land"
+    '        colorBreak.StartValue = 1
+    '        colorBreak.EndValue = 19
+    '        colorBreak.StartColor = System.Convert.ToUInt32(RGB(120, 120, 120))
+    '        colorBreak.EndColor = colorBreak.StartColor
+    '        colorScheme.Add(colorBreak)
 
-            colorBreak = New MapWinGIS.ShapefileColorBreak
-            colorBreak.Caption = "Agricultural Land"
-            colorBreak.StartValue = 20
-            colorBreak.EndValue = 29
-            colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 255, 0))
-            colorBreak.EndColor = colorBreak.StartColor
-            colorScheme.Add(colorBreak)
+    '        colorBreak = New MapWinGIS.ShapefileColorBreak
+    '        colorBreak.Caption = "Agricultural Land"
+    '        colorBreak.StartValue = 20
+    '        colorBreak.EndValue = 29
+    '        colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 255, 0))
+    '        colorBreak.EndColor = colorBreak.StartColor
+    '        colorScheme.Add(colorBreak)
 
-            colorBreak = New MapWinGIS.ShapefileColorBreak
-            colorBreak.Caption = "Rangeland"
-            colorBreak.StartValue = 30
-            colorBreak.EndValue = 39
-            colorBreak.StartColor = System.Convert.ToUInt32(RGB(146, 174, 47))
-            colorBreak.EndColor = colorBreak.StartColor
-            colorScheme.Add(colorBreak)
+    '        colorBreak = New MapWinGIS.ShapefileColorBreak
+    '        colorBreak.Caption = "Rangeland"
+    '        colorBreak.StartValue = 30
+    '        colorBreak.EndValue = 39
+    '        colorBreak.StartColor = System.Convert.ToUInt32(RGB(146, 174, 47))
+    '        colorBreak.EndColor = colorBreak.StartColor
+    '        colorScheme.Add(colorBreak)
 
-            colorBreak = New MapWinGIS.ShapefileColorBreak
-            colorBreak.Caption = "Forest Land"
-            colorBreak.StartValue = 40
-            colorBreak.EndValue = 49
-            colorBreak.StartColor = System.Convert.ToUInt32(RGB(161, 102, 50))
-            colorBreak.EndColor = colorBreak.StartColor
-            colorScheme.Add(colorBreak)
+    '        colorBreak = New MapWinGIS.ShapefileColorBreak
+    '        colorBreak.Caption = "Forest Land"
+    '        colorBreak.StartValue = 40
+    '        colorBreak.EndValue = 49
+    '        colorBreak.StartColor = System.Convert.ToUInt32(RGB(161, 102, 50))
+    '        colorBreak.EndColor = colorBreak.StartColor
+    '        colorScheme.Add(colorBreak)
 
-            colorBreak = New MapWinGIS.ShapefileColorBreak
-            colorBreak.Caption = "Water"
-            colorBreak.StartValue = 50
-            colorBreak.EndValue = 59
-            colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 0, 255))
-            colorBreak.EndColor = colorBreak.StartColor
-            colorScheme.Add(colorBreak)
+    '        colorBreak = New MapWinGIS.ShapefileColorBreak
+    '        colorBreak.Caption = "Water"
+    '        colorBreak.StartValue = 50
+    '        colorBreak.EndValue = 59
+    '        colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 0, 255))
+    '        colorBreak.EndColor = colorBreak.StartColor
+    '        colorScheme.Add(colorBreak)
 
-            colorBreak = New MapWinGIS.ShapefileColorBreak
-            colorBreak.Caption = "Wetland"
-            colorBreak.StartValue = 60
-            colorBreak.EndValue = 69
-            colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 209, 220))
-            colorBreak.EndColor = colorBreak.StartColor
-            colorScheme.Add(colorBreak)
+    '        colorBreak = New MapWinGIS.ShapefileColorBreak
+    '        colorBreak.Caption = "Wetland"
+    '        colorBreak.StartValue = 60
+    '        colorBreak.EndValue = 69
+    '        colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 209, 220))
+    '        colorBreak.EndColor = colorBreak.StartColor
+    '        colorScheme.Add(colorBreak)
 
-            colorBreak = New MapWinGIS.ShapefileColorBreak
-            colorBreak.Caption = "Barren Land"
-            colorBreak.StartValue = 70
-            colorBreak.EndValue = 79
-            colorBreak.StartColor = System.Convert.ToUInt32(RGB(255, 255, 0))
-            colorBreak.EndColor = colorBreak.StartColor
-            colorScheme.Add(colorBreak)
+    '        colorBreak = New MapWinGIS.ShapefileColorBreak
+    '        colorBreak.Caption = "Barren Land"
+    '        colorBreak.StartValue = 70
+    '        colorBreak.EndValue = 79
+    '        colorBreak.StartColor = System.Convert.ToUInt32(RGB(255, 255, 0))
+    '        colorBreak.EndColor = colorBreak.StartColor
+    '        colorScheme.Add(colorBreak)
 
-            colorBreak = New MapWinGIS.ShapefileColorBreak
-            colorBreak.Caption = "Tundra"
-            colorBreak.StartValue = 80
-            colorBreak.EndValue = 89
-            colorBreak.StartColor = System.Convert.ToUInt32(RGB(60, 105, 0))
-            colorBreak.EndColor = colorBreak.StartColor
-            colorScheme.Add(colorBreak)
+    '        colorBreak = New MapWinGIS.ShapefileColorBreak
+    '        colorBreak.Caption = "Tundra"
+    '        colorBreak.StartValue = 80
+    '        colorBreak.EndValue = 89
+    '        colorBreak.StartColor = System.Convert.ToUInt32(RGB(60, 105, 0))
+    '        colorBreak.EndColor = colorBreak.StartColor
+    '        colorScheme.Add(colorBreak)
 
-            colorBreak = New MapWinGIS.ShapefileColorBreak
-            colorBreak.Caption = "Perennial Snow or Ice"
-            colorBreak.StartValue = 90
-            colorBreak.EndValue = 99
-            colorBreak.StartColor = System.Convert.ToUInt32(RGB(210, 210, 210))
-            colorBreak.EndColor = colorBreak.StartColor
-            colorScheme.Add(colorBreak)
+    '        colorBreak = New MapWinGIS.ShapefileColorBreak
+    '        colorBreak.Caption = "Perennial Snow or Ice"
+    '        colorBreak.StartValue = 90
+    '        colorBreak.EndValue = 99
+    '        colorBreak.StartColor = System.Convert.ToUInt32(RGB(210, 210, 210))
+    '        colorBreak.EndColor = colorBreak.StartColor
+    '        colorScheme.Add(colorBreak)
 
-            MWlay.ColoringScheme = colorScheme
-            MWlay.DrawFill = True
-            MWlay.LineOrPointSize = 0
-            MWlay.OutlineColor = System.Drawing.Color.Black
-        End If
-    End Sub
+    '        MWlay.ColoringScheme = colorScheme
+    '        MWlay.DrawFill = True
+    '        MWlay.LineOrPointSize = 0
+    '        MWlay.OutlineColor = System.Drawing.Color.Black
+    '    End If
+    'End Sub
 
+    'Private Sub SetDemColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
+    '    Dim colorBreak As MapWinGIS.ShapefileColorBreak
+    '    Dim colorScheme As MapWinGIS.ShapefileColorScheme
+    '    Dim minelev As Single
+    '    Dim maxelev As Single
+    '    Dim inc As Single
+    '    Dim i As Integer
+
+    '    colorScheme = New MapWinGIS.ShapefileColorScheme
+    '    colorScheme.FieldIndex = ShpFieldNumFromName(shpFile, "elev_m")
+    '    'determine min and max elevations
+    '    minelev = 9999999
+    '    maxelev = -9999999
+    '    For i = 1 To shpFile.NumShapes
+    '        If shpFile.CellValue(colorScheme.FieldIndex, i) > maxelev Then
+    '            maxelev = shpFile.CellValue(colorScheme.FieldIndex, i)
+    '        End If
+    '        If shpFile.CellValue(colorScheme.FieldIndex, i) < minelev Then
+    '            minelev = shpFile.CellValue(colorScheme.FieldIndex, i)
+    '        End If
+    '    Next i
+    '    inc = (maxelev - minelev) / 10
+
+    '    colorBreak = New MapWinGIS.ShapefileColorBreak
+    '    colorBreak.Caption = CStr(minelev) & " - " & CStr(minelev + inc)
+    '    colorBreak.StartValue = minelev
+    '    colorBreak.EndValue = minelev + inc
+    '    colorBreak.StartColor = System.Convert.ToUInt32(32768)
+    '    colorBreak.EndColor = colorBreak.StartColor
+    '    colorScheme.Add(colorBreak)
+
+    '    colorBreak = New MapWinGIS.ShapefileColorBreak
+    '    colorBreak.Caption = CStr(minelev + inc) & " - " & CStr(minelev + (2 * inc))
+    '    colorBreak.StartValue = minelev + inc
+    '    colorBreak.EndValue = minelev + (2 * inc)
+    '    colorBreak.StartColor = System.Convert.ToUInt32(888090)
+    '    colorBreak.EndColor = colorBreak.StartColor
+    '    colorScheme.Add(colorBreak)
+
+    '    colorBreak = New MapWinGIS.ShapefileColorBreak
+    '    colorBreak.Caption = CStr(minelev + (2 * inc)) & " - " & CStr(minelev + (3 * inc))
+    '    colorBreak.StartValue = minelev + (2 * inc)
+    '    colorBreak.EndValue = minelev + (3 * inc)
+    '    colorBreak.StartColor = System.Convert.ToUInt32(1743412)
+    '    colorBreak.EndColor = colorBreak.StartColor
+    '    colorScheme.Add(colorBreak)
+
+    '    colorBreak = New MapWinGIS.ShapefileColorBreak
+    '    colorBreak.Caption = CStr(minelev + (3 * inc)) & " - " & CStr(minelev + (4 * inc))
+    '    colorBreak.StartValue = minelev + (3 * inc)
+    '    colorBreak.EndValue = minelev + (4 * inc)
+    '    colorBreak.StartColor = System.Convert.ToUInt32(2598734)
+    '    colorBreak.EndColor = colorBreak.StartColor
+    '    colorScheme.Add(colorBreak)
+
+    '    colorBreak = New MapWinGIS.ShapefileColorBreak
+    '    colorBreak.Caption = CStr(minelev + (4 * inc)) & " - " & CStr(minelev + (5 * inc))
+    '    colorBreak.StartValue = minelev + (4 * inc)
+    '    colorBreak.EndValue = minelev + (5 * inc)
+    '    colorBreak.StartColor = System.Convert.ToUInt32(3454056)
+    '    colorBreak.EndColor = colorBreak.StartColor
+    '    colorScheme.Add(colorBreak)
+
+    '    colorBreak = New MapWinGIS.ShapefileColorBreak
+    '    colorBreak.Caption = CStr(minelev + (5 * inc)) & " - " & CStr(minelev + (6 * inc))
+    '    colorBreak.StartValue = minelev + (5 * inc)
+    '    colorBreak.EndValue = minelev + (6 * inc)
+    '    colorBreak.StartColor = System.Convert.ToUInt32(4309378)
+    '    colorBreak.EndColor = colorBreak.StartColor
+    '    colorScheme.Add(colorBreak)
+
+    '    colorBreak = New MapWinGIS.ShapefileColorBreak
+    '    colorBreak.Caption = CStr(minelev + (6 * inc)) & " - " & CStr(minelev + (7 * inc))
+    '    colorBreak.StartValue = minelev + (6 * inc)
+    '    colorBreak.EndValue = minelev + (7 * inc)
+    '    colorBreak.StartColor = System.Convert.ToUInt32(5164700)
+    '    colorBreak.EndColor = colorBreak.StartColor
+    '    colorScheme.Add(colorBreak)
+
+    '    colorBreak = New MapWinGIS.ShapefileColorBreak
+    '    colorBreak.Caption = CStr(minelev + (7 * inc)) & " - " & CStr(minelev + (8 * inc))
+    '    colorBreak.StartValue = minelev + (7 * inc)
+    '    colorBreak.EndValue = minelev + (8 * inc)
+    '    colorBreak.StartColor = System.Convert.ToUInt32(6020022)
+    '    colorBreak.EndColor = colorBreak.StartColor
+    '    colorScheme.Add(colorBreak)
+
+    '    colorBreak = New MapWinGIS.ShapefileColorBreak
+    '    colorBreak.Caption = CStr(minelev + (8 * inc)) & " - " & CStr(minelev + (9 * inc))
+    '    colorBreak.StartValue = minelev + (8 * inc)
+    '    colorBreak.EndValue = minelev + (9 * inc)
+    '    colorBreak.StartColor = System.Convert.ToUInt32(6875344)
+    '    colorBreak.EndColor = colorBreak.StartColor
+    '    colorScheme.Add(colorBreak)
+
+    '    colorBreak = New MapWinGIS.ShapefileColorBreak
+    '    colorBreak.Caption = CStr(minelev + (9 * inc)) & " - " & CStr(minelev + (10 * inc))
+    '    colorBreak.StartValue = minelev + (9 * inc)
+    '    colorBreak.EndValue = minelev + (10 * inc)
+    '    colorBreak.StartColor = System.Convert.ToUInt32(7730666)
+    '    colorBreak.EndColor = colorBreak.StartColor
+    '    colorScheme.Add(colorBreak)
+
+    '    MWlay.ColoringScheme = colorScheme
+    '    MWlay.DrawFill = True
+    '    MWlay.LineOrPointSize = 0
+    '    MWlay.OutlineColor = System.Drawing.Color.Black
+    'End Sub
+
+    ''' <summary>
+    ''' Set colors for DEM as Shapefile
+    ''' </summary>
+    ''' <remarks>New MW 4.8 symbology</remarks>
     Private Sub SetDemColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
-        Dim colorBreak As MapWinGIS.ShapefileColorBreak
-        Dim colorScheme As MapWinGIS.ShapefileColorScheme
-        Dim minelev As Single
-        Dim maxelev As Single
-        Dim inc As Single
-        Dim i As Integer
+        Dim options As MapWinGIS.ShapeDrawingOptions = shpFile.DefaultDrawingOptions
+        options.FillVisible = True
+        options.LineVisible = False
+        options.LineColor = 0
+        options.FillColor = Convert.ToUInt32(32768)
 
-        colorScheme = New MapWinGIS.ShapefileColorScheme
-        colorScheme.FieldIndex = ShpFieldNumFromName(shpFile, "elev_m")
-        'determine min and max elevations
-        minelev = 9999999
-        maxelev = -9999999
-        For i = 1 To shpFile.NumShapes
-            If shpFile.CellValue(colorScheme.FieldIndex, i) > maxelev Then
-                maxelev = shpFile.CellValue(colorScheme.FieldIndex, i)
-            End If
-            If shpFile.CellValue(colorScheme.FieldIndex, i) < minelev Then
-                minelev = shpFile.CellValue(colorScheme.FieldIndex, i)
-            End If
-        Next i
-        inc = (maxelev - minelev) / 10
+        Dim lFieldIndex As Integer = ShpFieldNumFromName(shpFile, "elev_m")
 
-        colorBreak = New MapWinGIS.ShapefileColorBreak
-        colorBreak.Caption = CStr(minelev) & " - " & CStr(minelev + inc)
-        colorBreak.StartValue = minelev
-        colorBreak.EndValue = minelev + inc
-        colorBreak.StartColor = System.Convert.ToUInt32(32768)
-        colorBreak.EndColor = colorBreak.StartColor
-        colorScheme.Add(colorBreak)
+        shpFile.Categories.Generate(lFieldIndex, MapWinGIS.tkClassificationType.ctEqualIntervals, 10) ', minelev, maxelev)
+        shpFile.Categories.ApplyExpressions()
 
-        colorBreak = New MapWinGIS.ShapefileColorBreak
-        colorBreak.Caption = CStr(minelev + inc) & " - " & CStr(minelev + (2 * inc))
-        colorBreak.StartValue = minelev + inc
-        colorBreak.EndValue = minelev + (2 * inc)
-        colorBreak.StartColor = System.Convert.ToUInt32(888090)
-        colorBreak.EndColor = colorBreak.StartColor
-        colorScheme.Add(colorBreak)
-
-        colorBreak = New MapWinGIS.ShapefileColorBreak
-        colorBreak.Caption = CStr(minelev + (2 * inc)) & " - " & CStr(minelev + (3 * inc))
-        colorBreak.StartValue = minelev + (2 * inc)
-        colorBreak.EndValue = minelev + (3 * inc)
-        colorBreak.StartColor = System.Convert.ToUInt32(1743412)
-        colorBreak.EndColor = colorBreak.StartColor
-        colorScheme.Add(colorBreak)
-
-        colorBreak = New MapWinGIS.ShapefileColorBreak
-        colorBreak.Caption = CStr(minelev + (3 * inc)) & " - " & CStr(minelev + (4 * inc))
-        colorBreak.StartValue = minelev + (3 * inc)
-        colorBreak.EndValue = minelev + (4 * inc)
-        colorBreak.StartColor = System.Convert.ToUInt32(2598734)
-        colorBreak.EndColor = colorBreak.StartColor
-        colorScheme.Add(colorBreak)
-
-        colorBreak = New MapWinGIS.ShapefileColorBreak
-        colorBreak.Caption = CStr(minelev + (4 * inc)) & " - " & CStr(minelev + (5 * inc))
-        colorBreak.StartValue = minelev + (4 * inc)
-        colorBreak.EndValue = minelev + (5 * inc)
-        colorBreak.StartColor = System.Convert.ToUInt32(3454056)
-        colorBreak.EndColor = colorBreak.StartColor
-        colorScheme.Add(colorBreak)
-
-        colorBreak = New MapWinGIS.ShapefileColorBreak
-        colorBreak.Caption = CStr(minelev + (5 * inc)) & " - " & CStr(minelev + (6 * inc))
-        colorBreak.StartValue = minelev + (5 * inc)
-        colorBreak.EndValue = minelev + (6 * inc)
-        colorBreak.StartColor = System.Convert.ToUInt32(4309378)
-        colorBreak.EndColor = colorBreak.StartColor
-        colorScheme.Add(colorBreak)
-
-        colorBreak = New MapWinGIS.ShapefileColorBreak
-        colorBreak.Caption = CStr(minelev + (6 * inc)) & " - " & CStr(minelev + (7 * inc))
-        colorBreak.StartValue = minelev + (6 * inc)
-        colorBreak.EndValue = minelev + (7 * inc)
-        colorBreak.StartColor = System.Convert.ToUInt32(5164700)
-        colorBreak.EndColor = colorBreak.StartColor
-        colorScheme.Add(colorBreak)
-
-        colorBreak = New MapWinGIS.ShapefileColorBreak
-        colorBreak.Caption = CStr(minelev + (7 * inc)) & " - " & CStr(minelev + (8 * inc))
-        colorBreak.StartValue = minelev + (7 * inc)
-        colorBreak.EndValue = minelev + (8 * inc)
-        colorBreak.StartColor = System.Convert.ToUInt32(6020022)
-        colorBreak.EndColor = colorBreak.StartColor
-        colorScheme.Add(colorBreak)
-
-        colorBreak = New MapWinGIS.ShapefileColorBreak
-        colorBreak.Caption = CStr(minelev + (8 * inc)) & " - " & CStr(minelev + (9 * inc))
-        colorBreak.StartValue = minelev + (8 * inc)
-        colorBreak.EndValue = minelev + (9 * inc)
-        colorBreak.StartColor = System.Convert.ToUInt32(6875344)
-        colorBreak.EndColor = colorBreak.StartColor
-        colorScheme.Add(colorBreak)
-
-        colorBreak = New MapWinGIS.ShapefileColorBreak
-        colorBreak.Caption = CStr(minelev + (9 * inc)) & " - " & CStr(minelev + (10 * inc))
-        colorBreak.StartValue = minelev + (9 * inc)
-        colorBreak.EndValue = minelev + (10 * inc)
-        colorBreak.StartColor = System.Convert.ToUInt32(7730666)
-        colorBreak.EndColor = colorBreak.StartColor
-        colorScheme.Add(colorBreak)
-
-        MWlay.ColoringScheme = colorScheme
-        MWlay.DrawFill = True
-        MWlay.LineOrPointSize = 0
-        MWlay.OutlineColor = System.Drawing.Color.Black
+        shpFile.Categories.Item(0).DrawingOptions.FillColor = System.Convert.ToUInt32(32768)
+        shpFile.Categories.Item(1).DrawingOptions.FillColor = System.Convert.ToUInt32(888090)
+        shpFile.Categories.Item(2).DrawingOptions.FillColor = System.Convert.ToUInt32(1743412)
+        shpFile.Categories.Item(3).DrawingOptions.FillColor = System.Convert.ToUInt32(2598734)
+        shpFile.Categories.Item(4).DrawingOptions.FillColor = System.Convert.ToUInt32(3454056)
+        shpFile.Categories.Item(5).DrawingOptions.FillColor = System.Convert.ToUInt32(4309378)
+        shpFile.Categories.Item(6).DrawingOptions.FillColor = System.Convert.ToUInt32(5164700)
+        shpFile.Categories.Item(7).DrawingOptions.FillColor = System.Convert.ToUInt32(6020022)
+        shpFile.Categories.Item(8).DrawingOptions.FillColor = System.Convert.ToUInt32(6875344)
+        shpFile.Categories.Item(9).DrawingOptions.FillColor = System.Convert.ToUInt32(7730666)
     End Sub
 
     Private Sub SetElevationGridColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)
@@ -1730,104 +1758,104 @@ StartOver:
         MWlay.ColoringScheme = colorScheme
     End Sub
 
-    Friend Sub SetCensusRenderer(ByVal MWlay As MapWindow.Interfaces.Layer, Optional ByVal shpFile As MapWinGIS.Shapefile = Nothing)
-        If shpFile Is Nothing Then shpFile = MWlay.GetObject
+    'Friend Sub SetCensusRenderer(ByVal MWlay As MapWindow.Interfaces.Layer, Optional ByVal shpFile As MapWinGIS.Shapefile = Nothing)
+    '    If shpFile Is Nothing Then shpFile = MWlay.GetObject
 
-        g_MapWin.View.LockMap() 'keep the map from updating during the loop.
+    '    g_MapWin.View.LockMap() 'keep the map from updating during the loop.
 
-        'NOTE: using atcTableDBF - with 80K records - processing reduced from 3.5 to 2.5 seconds
-        Dim lShapeDbf As New atcTableDBF
-        lShapeDbf.OpenFile(IO.Path.ChangeExtension(shpFile.Filename, ".dbf"))
-        Dim lFieldCFCC As Integer = lShapeDbf.FieldNumber("CFCC")
-        'Dim lFieldCFCC As Integer = ShpFieldNumFromName(shpFile, "CFCC")
+    '    'NOTE: using atcTableDBF - with 80K records - processing reduced from 3.5 to 2.5 seconds
+    '    Dim lShapeDbf As New atcTableDBF
+    '    lShapeDbf.OpenFile(IO.Path.ChangeExtension(shpFile.Filename, ".dbf"))
+    '    Dim lFieldCFCC As Integer = lShapeDbf.FieldNumber("CFCC")
+    '    'Dim lFieldCFCC As Integer = ShpFieldNumFromName(shpFile, "CFCC")
 
-        Dim lCurrentCFCC As Integer
-        Dim lLastShapeIndex As Integer = shpFile.NumShapes - 1
-        For iShape As Integer = 0 To lLastShapeIndex
-            'lCurrentCFCC = shpFile.CellValue(lFieldCFCC, iShape).ToString.Substring(1)
-            lCurrentCFCC = lShapeDbf.Value(lFieldCFCC).Substring(1)
-            lShapeDbf.MoveNext()
-            Select Case lCurrentCFCC
-                Case 4, 41 To 48, 63, 64 'most likely
-                Case 1 To 3, 11 To 38
-                    MWlay.Shapes(iShape).LineOrPointSize = 2
-                Case 2, 21 To 28
-                    MWlay.Shapes(iShape).LineOrPointSize = 2
-                Case 3, 31 To 38
-                    MWlay.Shapes(iShape).LineOrPointSize = 2
-                Case Else 'A5, A51, A52, A53, A6, A60, A61, A62, A65, A7, A70, A71, A72, A73, A74
-                    MWlay.Shapes(iShape).LineStipple = MapWinGIS.tkLineStipple.lsDotted
-            End Select
-        Next
+    '    Dim lCurrentCFCC As Integer
+    '    Dim lLastShapeIndex As Integer = shpFile.NumShapes - 1
+    '    For iShape As Integer = 0 To lLastShapeIndex
+    '        'lCurrentCFCC = shpFile.CellValue(lFieldCFCC, iShape).ToString.Substring(1)
+    '        lCurrentCFCC = lShapeDbf.Value(lFieldCFCC).Substring(1)
+    '        lShapeDbf.MoveNext()
+    '        Select Case lCurrentCFCC
+    '            Case 4, 41 To 48, 63, 64 'most likely
+    '            Case 1 To 3, 11 To 38
+    '                MWlay.Shapes(iShape).LineOrPointSize = 2
+    '            Case 2, 21 To 28
+    '                MWlay.Shapes(iShape).LineOrPointSize = 2
+    '            Case 3, 31 To 38
+    '                MWlay.Shapes(iShape).LineOrPointSize = 2
+    '            Case Else 'A5, A51, A52, A53, A6, A60, A61, A62, A65, A7, A70, A71, A72, A73, A74
+    '                MWlay.Shapes(iShape).LineStipple = MapWinGIS.tkLineStipple.lsDotted
+    '        End Select
+    '    Next
 
-        g_MapWin.View.UnlockMap() 'let the map redraw again
-    End Sub
+    '    g_MapWin.View.UnlockMap() 'let the map redraw again
+    'End Sub
 
-    Private Sub SetCensusColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
-        Dim colorBreak As MapWinGIS.ShapefileColorBreak
-        Dim colorScheme As MapWinGIS.ShapefileColorScheme
-        Dim prefix As String = (MWlay.FileName.ToUpper.Chars(MWlay.FileName.Length - 5))
+    'Private Sub SetCensusColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
+    '    Dim colorBreak As MapWinGIS.ShapefileColorBreak
+    '    Dim colorScheme As MapWinGIS.ShapefileColorScheme
+    '    Dim prefix As String = (MWlay.FileName.ToUpper.Chars(MWlay.FileName.Length - 5))
 
-        MWlay.Name &= " " & Left(IO.Path.GetFileNameWithoutExtension(shpFile.Filename), 8)
+    '    MWlay.Name &= " " & Left(IO.Path.GetFileNameWithoutExtension(shpFile.Filename), 8)
 
-        If MWlay.FileName.ToLower.EndsWith("_tgr_a.shp") OrElse _
-           MWlay.FileName.ToLower.EndsWith("_tgr_p.shp") Then
-            'Color the roads
-            colorScheme = New MapWinGIS.ShapefileColorScheme
-            colorScheme.FieldIndex = ShpFieldNumFromName(shpFile, "CFCC")
-            If colorScheme.FieldIndex > 0 Then
-                colorBreak = New MapWinGIS.ShapefileColorBreak
-                colorBreak.Caption = "Primary limited access"
-                colorBreak.StartValue = prefix & "1"
-                colorBreak.EndValue = prefix & "18"
-                colorBreak.StartColor = System.Convert.ToUInt32(RGB(132, 0, 0))
-                colorBreak.EndColor = colorBreak.StartColor
-                'TODO: renderer should be able to change line width: LineWidth = 2
-                colorScheme.Add(colorBreak)
+    '    If MWlay.FileName.ToLower.EndsWith("_tgr_a.shp") OrElse _
+    '       MWlay.FileName.ToLower.EndsWith("_tgr_p.shp") Then
+    '        'Color the roads
+    '        colorScheme = New MapWinGIS.ShapefileColorScheme
+    '        colorScheme.FieldIndex = ShpFieldNumFromName(shpFile, "CFCC")
+    '        If colorScheme.FieldIndex > 0 Then
+    '            colorBreak = New MapWinGIS.ShapefileColorBreak
+    '            colorBreak.Caption = "Primary limited access"
+    '            colorBreak.StartValue = prefix & "1"
+    '            colorBreak.EndValue = prefix & "18"
+    '            colorBreak.StartColor = System.Convert.ToUInt32(RGB(132, 0, 0))
+    '            colorBreak.EndColor = colorBreak.StartColor
+    '            'TODO: renderer should be able to change line width: LineWidth = 2
+    '            colorScheme.Add(colorBreak)
 
-                colorBreak = New MapWinGIS.ShapefileColorBreak
-                colorBreak.Caption = "Primary non-limited access"
-                colorBreak.StartValue = prefix & "2"
-                colorBreak.EndValue = prefix & "28"
-                colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 0, 0))
-                colorBreak.EndColor = colorBreak.StartColor
-                'TODO: renderer should be able to change line width: LineWidth = 2
-                colorScheme.Add(colorBreak)
+    '            colorBreak = New MapWinGIS.ShapefileColorBreak
+    '            colorBreak.Caption = "Primary non-limited access"
+    '            colorBreak.StartValue = prefix & "2"
+    '            colorBreak.EndValue = prefix & "28"
+    '            colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 0, 0))
+    '            colorBreak.EndColor = colorBreak.StartColor
+    '            'TODO: renderer should be able to change line width: LineWidth = 2
+    '            colorScheme.Add(colorBreak)
 
-                colorBreak = New MapWinGIS.ShapefileColorBreak
-                colorBreak.Caption = "Secondary"
-                colorBreak.StartValue = prefix & "3"
-                colorBreak.EndValue = prefix & "38"
-                colorBreak.StartColor = System.Convert.ToUInt32(RGB(122, 122, 122))
-                'TODO: renderer should be able to change line width: LineWidth = 2
-                colorBreak.EndColor = colorBreak.StartColor
-                colorScheme.Add(colorBreak)
+    '            colorBreak = New MapWinGIS.ShapefileColorBreak
+    '            colorBreak.Caption = "Secondary"
+    '            colorBreak.StartValue = prefix & "3"
+    '            colorBreak.EndValue = prefix & "38"
+    '            colorBreak.StartColor = System.Convert.ToUInt32(RGB(122, 122, 122))
+    '            'TODO: renderer should be able to change line width: LineWidth = 2
+    '            colorBreak.EndColor = colorBreak.StartColor
+    '            colorScheme.Add(colorBreak)
 
-                colorBreak = New MapWinGIS.ShapefileColorBreak
-                colorBreak.Caption = "Local"
-                colorBreak.StartValue = prefix & "4" 'TODO: A4, A41, A42, A43, A44, A45, A46, A47, A48, A63, A64
-                colorBreak.EndValue = prefix & "48"
-                colorBreak.StartColor = System.Convert.ToUInt32(RGB(166, 166, 166))
-                colorBreak.EndColor = colorBreak.StartColor
-                colorScheme.Add(colorBreak)
+    '            colorBreak = New MapWinGIS.ShapefileColorBreak
+    '            colorBreak.Caption = "Local"
+    '            colorBreak.StartValue = prefix & "4" 'TODO: A4, A41, A42, A43, A44, A45, A46, A47, A48, A63, A64
+    '            colorBreak.EndValue = prefix & "48"
+    '            colorBreak.StartColor = System.Convert.ToUInt32(RGB(166, 166, 166))
+    '            colorBreak.EndColor = colorBreak.StartColor
+    '            colorScheme.Add(colorBreak)
 
-                colorBreak = New MapWinGIS.ShapefileColorBreak
-                colorBreak.Caption = "Other"
-                colorBreak.StartValue = prefix & "5" 'TODO: A5, A51, A52, A53, A6, A60, A61, A62, A65, A7, A70, A71, A72, A73, A74
-                colorBreak.EndValue = "Z"
-                colorBreak.StartColor = System.Convert.ToUInt32(RGB(200, 200, 200))
-                'TODO: renderer should be able to change line style: LineStyle = Dashed
-                colorBreak.EndColor = colorBreak.StartColor
-                colorScheme.Add(colorBreak)
+    '            colorBreak = New MapWinGIS.ShapefileColorBreak
+    '            colorBreak.Caption = "Other"
+    '            colorBreak.StartValue = prefix & "5" 'TODO: A5, A51, A52, A53, A6, A60, A61, A62, A65, A7, A70, A71, A72, A73, A74
+    '            colorBreak.EndValue = "Z"
+    '            colorBreak.StartColor = System.Convert.ToUInt32(RGB(200, 200, 200))
+    '            'TODO: renderer should be able to change line style: LineStyle = Dashed
+    '            colorBreak.EndColor = colorBreak.StartColor
+    '            colorScheme.Add(colorBreak)
 
-                MWlay.ColoringScheme = colorScheme
-                MWlay.LineOrPointSize = 1
-                MWlay.OutlineColor = System.Drawing.Color.Black
+    '            MWlay.ColoringScheme = colorScheme
+    '            MWlay.LineOrPointSize = 1
+    '            MWlay.OutlineColor = System.Drawing.Color.Black
 
-                SetCensusRenderer(MWlay, shpFile)
-            End If
-        End If
-    End Sub
+    '            SetCensusRenderer(MWlay, shpFile)
+    '        End If
+    '    End If
+    'End Sub
 
     Private Function ShpFieldNumFromName(ByVal aShpFile As MapWinGIS.Shapefile, ByVal aFieldName As String) As Integer
         Dim lFieldName As String = LCase(aFieldName)
