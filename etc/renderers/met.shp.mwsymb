@@ -1,0 +1,64 @@
+<MapWinGIS OcxVersion="4.8" FileType="LayerFile" FileVersion="0" Description="">
+  <Layer LayerType="Shapefile" LayerName="Weather Station Sites 2006" LayerVisible="1" LayerKey="" Filename="">
+    <ShapefileClass CollisionMode="0">
+      <DefaultDrawingOptions FillBgColor="0" FillColor="16711935" LineColor="9868950" PointShapeRatio="0.100000" PointSize="11.000000" Rotation="45.000000">
+        <Picture Key="" SetToGrey="0" TransparencyColor="0" TransparencyColor2="0" UseTransparencyColor="0" TransparencyPercent="1.000000" DownsamplingMode="5" UpsamplingMode="3">
+          <ImageBuffer GdiPlusBitmap="0" Width="0" Height="0"></ImageBuffer>
+        </Picture>
+      </DefaultDrawingOptions>
+      <ShapefileCategoriesClass ClassificationField="5" FieldType="0">
+        <ShapefileCategoryClass Name="ATEM" Expression="[CONSTITUEN] = &quot;ATEM&quot;" Value="ATEM">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16711935" LineColor="9868950" PointSize="20.000000" PointSymbolType="2">
+            <Picture Key="" SetToGrey="0" TransparencyColor="15726501" TransparencyColor2="15726501" UseTransparencyColor="-1" TransparencyPercent="1.000000" DownsamplingMode="5" UpsamplingMode="3">
+              <ImageBuffer GdiPlusBitmap="1">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAFXRFWHRDcmVhdGlvbiBUaW1lAAfXBxIVGAYvS3q0AAAAB3RJTUUH1wcSFhku1KK+JgAAAAlwSFlzAAALEgAACxIB0t1+/AAAAA9QTFRFpffv/////4D//yEQAAAAMqhHpQAAAAF0Uk5TAEDm2GYAAAA9SURBVHjaY2AYBQMOGIEAXYwJCiAKmJkxFbCApFnwKQCqYMGrACTNQpEVJCgAymOqIKyAUDgQDMlRQAEAAB1wARFhOB2vAAAAAElFTkSuQmCC</ImageBuffer>
+            </Picture>
+          </ShapeDrawingOptionsClass>
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="CLOU" Expression="[CONSTITUEN] = &quot;CLOU&quot;" Value="CLOU">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16711935" LineColor="9868950" PointSize="5.000000" PointSymbolType="2">
+            <Picture Key="" SetToGrey="0" TransparencyColor="15726501" TransparencyColor2="15726501" UseTransparencyColor="-1" TransparencyPercent="1.000000" DownsamplingMode="5" UpsamplingMode="3">
+              <ImageBuffer GdiPlusBitmap="1">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAFXRFWHRDcmVhdGlvbiBUaW1lAAfXBxIVGAYvS3q0AAAAB3RJTUUH1wcSFhcfG/+TkgAAAAlwSFlzAAALEgAACxIB0t1+/AAAAA9QTFRFpffv/4D/AAAAhISE////PI6fNAAAAAF0Uk5TAEDm2GYAAABNSURBVHja7ZBBCgAgCARt7f9vrpWubkHYqaHbDJiawQNYAn3voqCPpwNyF+gR8cl0C/eDNZWfRWCPaIs8ADVUMAvIgBpXI+qD3R0+lQxnDwFjdG3KVgAAAABJRU5ErkJggg==</ImageBuffer>
+            </Picture>
+          </ShapeDrawingOptionsClass>
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="DEWP" Expression="[CONSTITUEN] = &quot;DEWP&quot;" Value="DEWP">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16711935" LineColor="9868950" PointSize="5.000000" PointSymbolType="2">
+            <Picture Key="" SetToGrey="0" TransparencyColor="15726501" TransparencyColor2="15726501" UseTransparencyColor="-1" TransparencyPercent="1.000000" DownsamplingMode="5" UpsamplingMode="3">
+              <ImageBuffer GdiPlusBitmap="1">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAFXRFWHRDcmVhdGlvbiBUaW1lAAfXBxIVGAYvS3q0AAAAB3RJTUUH1wcSFhkK6KFa9wAAAAlwSFlzAAALEgAACxIB0t1+/AAAAAxQTFRFpffvAAAAAP///4D/D9VS2wAAAAF0Uk5TAEDm2GYAAABJSURBVHja7ZBBDgAQEMSU///ZLq5miUgc1LFNMCl9nqQM5gGuUYEVyMA1R1fcD6Id9sCQPhsEXhTuQRTN2TkMiB6x8A09RB+qArJ7AS1tjTixAAAAAElFTkSuQmCC</ImageBuffer>
+            </Picture>
+          </ShapeDrawingOptionsClass>
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="PEVT" Expression="[CONSTITUEN] = &quot;PEVT&quot;" Value="PEVT">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16711935" LineColor="9868950" PointSize="5.000000" PointSymbolType="2">
+            <Picture Key="" SetToGrey="0" TransparencyColor="15726501" TransparencyColor2="15726501" UseTransparencyColor="-1" TransparencyPercent="1.000000" DownsamplingMode="5" UpsamplingMode="3">
+              <ImageBuffer GdiPlusBitmap="1">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAFXRFWHRDcmVhdGlvbiBUaW1lAAfXBxIVGAYvS3q0AAAAB3RJTUUH1wcSFhsLrZAI4wAAAAlwSFlzAAALEgAACxIB0t1+/AAAAA9QTFRFpffv/4D/AAAAAAD/////Qff4NQAAAAF0Uk5TAEDm2GYAAABSSURBVHja7ZAxDsAwCAOpzf/fHKhYOtQeomy51ScbEfEBJEJQuTTeXBiTqw5mQXEDswukkE6wDX7CHEnT4HiGfwEdQwllQAodY2vivOD+cDnJApLbATIILCiWAAAAAElFTkSuQmCC</ImageBuffer>
+            </Picture>
+          </ShapeDrawingOptionsClass>
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="PREC" Expression="[CONSTITUEN] = &quot;PREC&quot;" Value="PREC">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16711935" LineColor="9868950" PointSize="20.000000" PointSymbolType="2">
+            <Picture Key="" SetToGrey="0" TransparencyColor="15726501" TransparencyColor2="15726501" UseTransparencyColor="-1" TransparencyPercent="1.000000" DownsamplingMode="5" UpsamplingMode="3">
+              <ImageBuffer GdiPlusBitmap="1">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAFXRFWHRDcmVhdGlvbiBUaW1lAAfXBxIVGAYvS3q0AAAAB3RJTUUH1wcSFhglWmtW7wAAAAlwSFlzAAALEgAACxIB0t1+/AAAAA9QTFRFpffvAAAAAAD//////4D/9XkokgAAAAF0Uk5TAEDm2GYAAABMSURBVHja7dDBCgAgCANQp/3/N6fhKVADCTo0vO3BQKKfJzM8MYDVyIAKpMBqtCbug+oPxCvJK1lECsB6PXAw0QFgDwoR9i6Sfomtn0FBAXvAh4hcAAAAAElFTkSuQmCC</ImageBuffer>
+            </Picture>
+          </ShapeDrawingOptionsClass>
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="SOLR" Expression="[CONSTITUEN] = &quot;SOLR&quot;" Value="SOLR">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16711935" LineColor="9868950" PointSize="5.000000" PointSymbolType="2">
+            <Picture Key="" SetToGrey="0" TransparencyColor="15726501" TransparencyColor2="15726501" UseTransparencyColor="-1" TransparencyPercent="1.000000" DownsamplingMode="5" UpsamplingMode="3">
+              <ImageBuffer GdiPlusBitmap="1">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAFXRFWHRDcmVhdGlvbiBUaW1lAAfXBxIVGAYvS3q0AAAAB3RJTUUH1wcSFhoxcofgEAAAAAlwSFlzAAALEgAACxIB0t1+/AAAAAxQTFRFpffv/4D/AAAA/95CAh7v7AAAAAF0Uk5TAEDm2GYAAABTSURBVHja7dBBCoAwDETR8ff+d64JghR0ZiHd+RfZ5JFCpacYHTBkQE9ZQQB1REZgLtw3lISSkBME0EQhElg7rt4BtcaBU2BBrfn0xH6Q/uFvZxPEzAE3ddvcpAAAAABJRU5ErkJggg==</ImageBuffer>
+            </Picture>
+          </ShapeDrawingOptionsClass>
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="WIND" Expression="[CONSTITUEN] = &quot;WIND&quot;" Value="WIND">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16711935" LineColor="9868950" PointSize="5.000000" PointSymbolType="2">
+            <Picture Key="" SetToGrey="0" TransparencyColor="15726501" TransparencyColor2="15726501" UseTransparencyColor="-1" TransparencyPercent="1.000000" DownsamplingMode="5" UpsamplingMode="3">
+              <ImageBuffer GdiPlusBitmap="1">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAFXRFWHRDcmVhdGlvbiBUaW1lAAfXBxIVGAYvS3q0AAAAB3RJTUUH1wcSFhgFYQV2JwAAAAlwSFlzAAALEgAACxIB0t1+/AAAAAxQTFRFpffvAAAA/////4D/6xH5FwAAAAF0Uk5TAEDm2GYAAABRSURBVHja7ZBJCgAgDMQ67f//bBc9aJVexJMBQUhciT4vAQrPHBPpZM8wSGAakn2ggRZYAl8fw3ZQvQTsEiPIR2AUp2C+wy4oX1H/Q/2Tnxs0eWkBOkiq0LYAAAAASUVORK5CYII=</ImageBuffer>
+            </Picture>
+          </ShapeDrawingOptionsClass>
+        </ShapefileCategoryClass>
+      </ShapefileCategoriesClass>
+      <LabelsClass Alignment="5" Generated="0" AvoidCollisions="0" Positioning="0" TextRenderingHint="5" />
+      <ChartsClass />
+    </ShapefileClass>
+  </Layer>
+</MapWinGIS>

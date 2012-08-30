@@ -1374,6 +1374,8 @@ StartOver:
                     'SetCensusColors(MWlay, shpFile)
                 ElseIf LCase(aFilename).IndexOf("\dem" & g_PathChar) > 0 Then
                     SetDemColors(MWlay, shpFile)
+                    'ElseIf IO.Path.GetFileName(aFilename).ToLower = "met.shp" Then
+                    '    SetMetIcons(MWlay, shpFile)
                 ElseIf LCase(aFilename).EndsWith("cat.shp") Then
                     MWlay.ZoomTo()
                 End If
@@ -1749,6 +1751,38 @@ StartOver:
         shpFile.Categories.Item(8).DrawingOptions.FillColor = System.Convert.ToUInt32(6875344)
         shpFile.Categories.Item(9).DrawingOptions.FillColor = System.Convert.ToUInt32(7730666)
     End Sub
+
+    '''' <summary>
+    '''' Set icons for met stations
+    '''' </summary>
+    '''' <remarks>New MW 4.8 symbology</remarks>
+    'Friend Sub SetMetIcons(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
+    '    Dim lRenderersPath As String = IO.Path.Combine(PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)), "etc") & g_PathChar & "renderers" & g_PathChar
+    '    shpFile.Categories.Generate(5, MapWinGIS.tkClassificationType.ctUniqueValues, 7)
+    '    shpFile.Categories.ApplyExpressions()
+    '    shpFile.CollisionMode = tkCollisionMode.AllowCollisions
+    '    For iShape As Integer = 0 To 6
+    '        With shpFile.Categories.Item(iShape)
+    '            Dim lConstituent As String = .Expression.Split("""")(1)
+    '            Dim lIconFilename As String = IO.Path.Combine(lRenderersPath, "met-" & lConstituent & ".png")
+    '            If IO.File.Exists(lIconFilename) Then
+    '                Logger.Dbg("Set met station icon for " & lConstituent)
+    '                .DrawingOptions.PointType = tkPointSymbolType.ptSymbolPicture
+
+    '                Dim img As New MapWinGIS.Image
+    '                img.Open(lIconFilename)
+    '                .DrawingOptions.Picture = img
+    '                .DrawingOptions.FillBgTransparent = True                    
+    '            Else
+    '                Logger.Dbg("Icon not found for met station at " & lIconFilename)
+    '                .DrawingOptions.PointType = tkPointSymbolType.ptSymbolStandard
+    '                .DrawingOptions.PointShape = tkPointShapeType.ptShapeCircle
+    '                .DrawingOptions.PointSize = 10
+    '            End If
+    '        End With
+    '    Next
+    '    shpFile.Save()
+    'End Sub
 
     Private Sub SetElevationGridColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)
         Dim colorScheme As MapWinGIS.GridColorScheme
