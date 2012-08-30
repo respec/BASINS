@@ -1346,19 +1346,22 @@ StartOver:
             '    End Select
             'End If
 
-            If Not MWlay Is Nothing Then
-                If lRendererName.Length > 0 Then
-                    MWlay.LoadShapeLayerProps(lRendererName)
-                    Dim lRendererXML As New Xml.XmlDocument
-                    lRendererXML.Load(lRendererName)
-                    Dim lLayerXML As Xml.XmlNode = lRendererXML.GetElementsByTagName("SFRendering")(0).ChildNodes(0)
-                    If lLayerXML.Attributes("GroupName") IsNot Nothing Then
-                        Group = lLayerXML.Attributes("GroupName").InnerText
+            If MWlay IsNot Nothing Then
+                Try 'Try to get Group and Visible from renderer
+                    If lRendererName.Length > 0 Then
+                        MWlay.LoadShapeLayerProps(lRendererName)
+                        Dim lRendererXML As New Xml.XmlDocument
+                        lRendererXML.Load(lRendererName)
+                        Dim lLayerXML As Xml.XmlNode = lRendererXML.GetElementsByTagName("SFRendering")(0).ChildNodes(0)
+                        If lLayerXML.Attributes("GroupName") IsNot Nothing Then
+                            Group = lLayerXML.Attributes("GroupName").InnerText
+                        End If
+                        If lLayerXML.Attributes("Visible") IsNot Nothing Then
+                            Visible = CBool(lLayerXML.Attributes("Visible").InnerText)
+                        End If
                     End If
-                    If lLayerXML.Attributes("Visible") IsNot Nothing Then
-                        Visible = CBool(lLayerXML.Attributes("Visible").InnerText)
-                    End If
-                End If
+                Catch
+                End Try
                 MWlay.Visible = Visible
 
                 'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
