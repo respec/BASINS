@@ -9,14 +9,14 @@
         </LinePatternClass>
       </DefaultDrawingOptions>
       <ShapefileCategoriesClass>
-        <ShapefileCategoryClass Name="Primary limited access" Expression="[CFCC] = &quot;A11&quot; OR [CFCC] = &quot;A15&quot;">
-          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="132" />
+        <ShapefileCategoryClass Name="Primary limited access" Expression="[CFCC] = &quot;A11&quot; OR [CFCC] = &quot;A15&quot; OR [CFCC] = &quot;A18&quot;">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="132" LineWidth="2" />
         </ShapefileCategoryClass>
-        <ShapefileCategoryClass Name="Primary non-limited access" Expression="[CFCC] = &quot;A21&quot; OR [CFCC] = &quot;A25&quot;">
-          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="0" />
+        <ShapefileCategoryClass Name="Primary non-limited access" Expression="[CFCC] = &quot;A21&quot; OR [CFCC] = &quot;A25&quot; OR [CFCC] = &quot;A28&quot;">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="0" LineWidth="2" />
         </ShapefileCategoryClass>
-        <ShapefileCategoryClass Name="Secondary" Expression="[CFCC] = &quot;A31&quot; OR [CFCC] = &quot;A35&quot;">
-          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="8026746" />
+        <ShapefileCategoryClass Name="Secondary" Expression="[CFCC] = &quot;A31&quot; OR [CFCC] = &quot;A35&quot; OR [CFCC] = &quot;A38&quot;">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="8026746" LineWidth="2" />
         </ShapefileCategoryClass>
         <ShapefileCategoryClass Name="Local" Expression="[CFCC] = &quot;A41&quot; OR [CFCC] = &quot;A42&quot; OR [CFCC] = &quot;A45&quot;">
           <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="10921638" />
