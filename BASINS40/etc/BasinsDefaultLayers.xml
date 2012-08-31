@@ -43,7 +43,7 @@
 <Layer Filename="mad.shp" Name="Managed Area Database" Group="Soil, Land Use/Cover" />
 <Layer Filename="met_stat.shp" Name="Weather Station Area" Group="Observed Data Stations" />
 <Layer Filename="metpt.shp" Name="Weather Station Sites" Group="Observed Data Stations" />
-<Layer Filename="met.shp" Name="Weather Station Sites 2005" Group="Observed Data Stations" Visible="yes" />
+<Layer Filename="met.shp" Name="Weather Station Sites 2009" Group="Observed Data Stations" Visible="yes" />
 <Layer Filename="nawqa.shp" Name="NAWQA Study Area Unit Boundaries" Group="Observed Data Stations" />
 <Layer Filename="nsi.shp" Name="National Sediment Inventory Stations" Group="Observed Data Stations" />
 <Layer Filename="pappl.shp" Name="Place Names - Pa" Group="Political" />
