@@ -477,12 +477,15 @@ FoundDir:
 
     <CLSCompliant(False)> _
     Public Sub LayersAdded(ByVal Layers() As MapWindow.Interfaces.Layer) Implements MapWindow.Interfaces.IPlugin.LayersAdded
-        'For Each MWlay As MapWindow.Interfaces.Layer In Layers
-        '    If MWlay.FileName.ToLower.EndsWith("_tgr_a.shp") Or _
-        '       MWlay.FileName.ToLower.EndsWith("_tgr_p.shp") Then
-        '        SetCensusRenderer(MWlay)
-        '    End If
-        'Next
+        For Each MWlay As MapWindow.Interfaces.Layer In Layers
+            'If MWlay.FileName.ToLower.EndsWith("_tgr_a.shp") Or _
+            '   MWlay.FileName.ToLower.EndsWith("_tgr_p.shp") Then
+            '    SetCensusRenderer(MWlay)
+            'End If
+            If IO.Path.GetFileName(MWlay.FileName).ToLower = "met.shp" Then
+                modDownload.SetMetIcons(MWlay, MWlay.GetObject)
+            End If
+        Next
         Logger.Progress(0, 0)
     End Sub
 
