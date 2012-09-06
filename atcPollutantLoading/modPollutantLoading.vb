@@ -476,7 +476,12 @@ Public Module PollutantLoading
                         lOutputShapefileName = ""
                         GisUtil.SaveSelectedFeatures(lSubbasinLayerIndex, lSelectedAreaIndexes, _
                                                      lOutputShapefileName)
-                        'TODO:need a prj file!
+                        'need a prj file
+                        Dim lSubbasinFileName As String = GisUtil.LayerFileName(lSubbasinLayerIndex)
+                        Dim lInputProjectionFileName As String = FilenameSetExt(lSubbasinFileName, "prj")
+                        If FileExists(lInputProjectionFileName) Then
+                            FileCopy(lInputProjectionFileName, FilenameSetExt(lOutputShapefileName, "prj"))
+                        End If
 
                         'add the output shapefile to the map
                         If Mid(lConsNames(j), 1, 5) = "FECAL" Or Mid(lConsNames(j), 1, 9) = "PATHOGENS" Or Mid(lConsNames(j), 1, 8) = "BACTERIA" Then
@@ -566,7 +571,8 @@ Public Module PollutantLoading
 
                         'set renderer for this layer
                         'TODO: should this be a color ramp?
-                        GisUtil.SetLayerRendererUniqueValues(lLayerDesc, lFieldIndex)
+
+                        GisUtil.UniqueValuesRenderer(lOutputLayerIndex, lFieldIndex)
                     End If
                 Next k
             End If

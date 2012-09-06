@@ -3717,7 +3717,7 @@ Public Class GisUtil
 
     Public Shared Sub SetLayerRendererWithRanges(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, ByVal aColors As Collection, _
                                                  ByVal aCaptions As Collection, ByVal aLowRange As Collection, ByVal aHighRange As Collection)
-        'create a unique values renderer for the given layer and field,
+        'create a renderer for the given layer and field,
         'adapted from MapWindow SFColoringSchemeForm.vb
 
         Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
@@ -4121,10 +4121,12 @@ Public Class GisUtil
 
         ' apply colors automatically
         Dim scheme As New MapWinGIS.ColorScheme
-        scheme.SetColors(System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))),
+        scheme.SetColors(System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))), _
                          System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))))
         lSf.Categories.ApplyColorScheme(MapWinGIS.tkColorSchemeType.ctSchemeRandom, scheme)
-
+        lSf.Categories.ApplyExpressions()
+        GetMappingObject.View.Redraw()
+        GetMappingObject.View.LegendControl.Refresh()
         'lMWlayer.DrawFill = True
 
         ''Get unique values
