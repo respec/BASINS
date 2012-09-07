@@ -3342,7 +3342,7 @@ Public Class GisUtil
                         'see if these have common start/end 
                         If lEndX = lShape2.Point(0).x And lEndY = lShape2.Point(0).y Then
                             'end of shape 1 is start of shape2
-                            For k As Integer = 1 To lShape2.numPoints
+                            For k As Integer = 1 To lShape2.numPoints - 1
                                 lRetc = lShape1.InsertPoint(lShape2.Point(k), lShape1.numPoints)
                             Next k
                             'remove shape2
@@ -3720,6 +3720,8 @@ Public Class GisUtil
         'create a renderer for the given layer and field,
         'adapted from MapWindow SFColoringSchemeForm.vb
 
+        'ToDo: This sub may not work with the new MapWindow, should be updated to be like the Sub UniqueValuesRenderer
+
         Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
 
         Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
@@ -3750,6 +3752,8 @@ Public Class GisUtil
                                                    Optional ByVal aCaptions As Collection = Nothing)
         'create a unique values renderer for the given layer and field,
         'adapted from MapWindow SFColoringSchemeForm.vb
+
+        'ToDo: This sub may not work with the new MapWindow, the Sub UniqueValuesRenderer should be called instead.
 
         Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
 
@@ -4104,11 +4108,11 @@ Public Class GisUtil
     ''' </summary>
     ''' <param name="aLayerIndex">Index of desired layer</param>
     ''' <param name="aFieldIndex">Index of desired field</param>
-    Public Shared Sub UniqueValuesRenderer(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer)
+    Public Shared Sub UniqueValuesRenderer(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, Optional ByVal aColors As Collection = Nothing, _
+                                                   Optional ByVal aCaptions As Collection = Nothing)
         'build a unique values renderer from a given layer and field
 
         Dim lMWlayer As MapWindow.Interfaces.Layer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
-
 
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
@@ -4125,6 +4129,22 @@ Public Class GisUtil
                          System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))))
         lSf.Categories.ApplyColorScheme(MapWinGIS.tkColorSchemeType.ctSchemeRandom, scheme)
         lSf.Categories.ApplyExpressions()
+
+        If aColors IsNot Nothing And aCaptions IsNot Nothing Then
+            'insert code here to set the captions and colors as desired
+            'If Not aColors Is Nothing Then
+            '    If aColors.Count > i Then
+            '        lBrk.StartColor = aColors(i + 1)
+            '        lBrk.EndColor = lBrk.StartColor
+            '    End If
+            'End If
+            'If Not aCaptions Is Nothing Then
+            '    If aCaptions.Count > i Then
+            '        lBrk.Caption = aCaptions(i + 1)
+            '    End If
+            'End If
+        End If
+
         GetMappingObject.View.Redraw()
         GetMappingObject.View.LegendControl.Refresh()
         'lMWlayer.DrawFill = True
