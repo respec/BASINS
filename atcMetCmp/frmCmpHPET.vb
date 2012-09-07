@@ -571,6 +571,9 @@ BadCoeff:
         If lTSGroup.Count > 0 Then
             pTMinTS = lTSGroup(0)
             txtTMin.Text = pTMinTS.ToString
+            If String.IsNullOrEmpty(txtLatitude.Text) AndAlso pTMinTS.Attributes.ContainsAttribute("Latitude") Then
+                txtLatitude.Text = pTMinTS.Attributes.GetFormattedValue("Latitude")
+            End If
         End If
     End Sub
 
@@ -579,6 +582,9 @@ BadCoeff:
         If lTSGroup.Count > 0 Then
             pTMaxTS = lTSGroup(0)
             txtTMax.Text = pTMaxTS.ToString
+            If String.IsNullOrEmpty(txtLatitude.Text) AndAlso pTMaxTS.Attributes.ContainsAttribute("Latitude") Then
+                txtLatitude.Text = pTMaxTS.Attributes.GetFormattedValue("Latitude")
+            End If
         End If
     End Sub
 

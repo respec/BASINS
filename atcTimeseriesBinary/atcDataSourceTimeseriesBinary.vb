@@ -121,7 +121,7 @@ Public Class atcDataSourceTimeseriesBinary
         Return True
     End Function
 
-    Public Overrides Function AddDatasets(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
+    Public Overrides Function AddDatasets(ByVal aDataGroup As atcDataGroup) As Boolean
         Dim lLastIndex As Integer = aDataGroup.Count
         Logger.Status("Writing " & Format(lLastIndex, "#,##0") & " datasets to " & IO.Path.GetFileName(Specification), True)
         Dim lWriter As IO.BinaryWriter = OpenFileToWrite()
