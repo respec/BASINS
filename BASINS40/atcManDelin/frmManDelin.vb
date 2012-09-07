@@ -721,6 +721,10 @@ Public Class frmManDelin
         If GisUtil.IsLayer("Outlets") Then
             GisUtil.RemoveLayer(GisUtil.LayerIndex("Outlets"))
         End If
+        Dim lInputProjectionFileName As String = FilenameSetExt(GisUtil.LayerFileName(lSubbasinLayerIndex), "prj")
+        If FileExists(lInputProjectionFileName) Then
+            FileCopy(lInputProjectionFileName, FilenameSetExt(lOutletShapeFileName, "prj"))
+        End If
         Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lOutletShapeFileName, "Outlets")
         If lLayer IsNot Nothing Then
             With lLayer
@@ -843,6 +847,9 @@ Public Class frmManDelin
                 'add output layer to the view
                 Dim lOperatingShapeFile As New MapWinGIS.Shapefile
                 lOperatingShapeFile.Open(lOutputFileName)
+                If FileExists(lInputProjectionFileName) Then
+                    FileCopy(lInputProjectionFileName, FilenameSetExt(lOutputFileName, "prj"))
+                End If
                 Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lOperatingShapeFile, "Subbasins")
                 If lLayer IsNot Nothing Then
                     With lLayer

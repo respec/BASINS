@@ -300,6 +300,10 @@ Public Class ManDelinPlugIn
             lSubbasinLayerIndex = GisUtil.LayerIndex(aSubbasinThemeName)
             lReachLayerIndex = GisUtil.LayerIndex(aReachThemeName)
         End If
+        Dim lInputProjectionFileName As String = FilenameSetExt(GisUtil.LayerFileName(lReachLayerIndex), "prj")
+        If FileExists(lInputProjectionFileName) Then
+            FileCopy(lInputProjectionFileName, FilenameSetExt(lOutputReachShapefileName, "prj"))
+        End If
         GisUtil.AddLayer(lOutputReachShapefileName, "Streams")
         Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex("Streams")
         GisUtil.LayerVisible(lStreamsLayerIndex) = True
@@ -436,7 +440,7 @@ Public Class ManDelinPlugIn
         'add points to the shapefile
         Dim lShapefile As New MapWinGIS.Shapefile
         success = lShapefile.CreateNew(aOutletThemeName, MapWinGIS.ShpfileType.SHP_POINT)
-        Dim lInputProjectionFileName As String = FilenameSetExt(GisUtil.LayerFileName(lStreamsLayerIndex), "prj")
+        lInputProjectionFileName = FilenameSetExt(GisUtil.LayerFileName(lStreamsLayerIndex), "prj")
         If FileExists(lInputProjectionFileName) Then
             FileCopy(lInputProjectionFileName, FilenameSetExt(aOutletThemeName, "prj"))
         End If
