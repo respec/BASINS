@@ -12,7 +12,7 @@ Public Class atcTimeseriesSource
         End Get
     End Property
 
-    Public Overridable Shadows Function AddDatasets(ByVal aTimeseriesGroup As atcTimeseriesGroup) As Boolean
-        Return MyBase.AddDataSets(aTimeseriesGroup)
-    End Function
+    'Public Overridable Shadows Function AddDatasets(ByVal aTimeseriesGroup As atcTimeseriesGroup) As Boolean
+    '    Return MyBase.AddDataSets(aTimeseriesGroup)
+    'End Function
 End Class

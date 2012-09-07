@@ -99,7 +99,7 @@ Public Class atcDataSourceWDM
         End Select
     End Function
 
-    Public Overrides Function AddDatasets(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
+    Public Overrides Function AddDatasets(ByVal aDataGroup As atcDataGroup) As Boolean
         Dim lNumSaved As Integer = 0
         Dim lDSN As Integer
         Dim lLowestDSN As Integer = Integer.MaxValue

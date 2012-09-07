@@ -103,12 +103,15 @@ TestFileName:
             'Logger.Dbg("atcWdmHandle:OpenAft:Unit:Retcod:" & pUnit & ":" & lRetcod)
 
             If lRetcod <> 0 Then
-                If lRetcod = 159 Then
-                    Logger.Msg("WDM file " & lFileName & " is in use by another application, retcod 159", "atcWdmHandle")
-                Else
-                    Logger.Msg("WDM file " & lFileName & " open failed, retcod " & lRetcod, "atcWdmHandle")
-                End If
                 pUnit = 0
+                Select Case lRetcod
+                    Case 136
+                        Logger.Msg("Could not open WDM file " & lFileName & vbCrLf & "File is not writable (code 136)", "atcWdmHandle")
+                    Case 159
+                        Logger.Msg("Could not open WDM file " & lFileName & vbCrLf & "File is in use (code 159)", "atcWdmHandle")
+                    Case Else
+                        Logger.Msg("Could not open WDM file " & lFileName & vbCrLf & "(code " & lRetcod & ")", "atcWdmHandle")
+                End Select
             End If
         End If
         Dim lMsg As String = "atcWdmHandle:New:" & pUnit & ":" & lRetcod & ":" & lFileName

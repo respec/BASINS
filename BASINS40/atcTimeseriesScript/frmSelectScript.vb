@@ -11,16 +11,20 @@ Friend Class frmSelectScript
     Public ButtonPressed As String
     Private pDataFilename As String
     Private pCurrentRow As Integer = 1
-    Private CanReadBackColor As Drawing.Color = Drawing.Color.FromArgb(11861940) 'RGB(180, 255, 180)
+    Private CanReadBackColor As Drawing.Color = Drawing.Color.LightGreen 'Drawing.Color.FromArgb(11861940) 'RGB(180, 255, 180)
     Private NotReadableBackColor As Drawing.Color = Drawing.Color.Red
 
     Private Sub agdScripts_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdScripts.MouseDownCell
+        SetSelectedRow(aRow)
+    End Sub
+
+    Private Sub SetSelectedRow(ByVal aRow As Integer)
         pCurrentRow = aRow
         SelectedScript = agdScripts.Source.CellValue(aRow, 1)
         Dim lLastRow As Integer = agdScripts.Source.Rows - 1
         Dim lLastColumn As Integer = agdScripts.Source.Columns - 1
         For lRow As Integer = 1 To lLastRow
-            For lColumn As Integer = 0 To lLastColumn
+            For lColumn As Integer = 1 To lLastColumn
                 If lRow = aRow Then
                     agdScripts.Source.CellSelected(lRow, lColumn) = True
                 Else
@@ -56,22 +60,28 @@ Friend Class frmSelectScript
                 ScriptDescription = Script.SubExpression(0).Printable
                 Script = Nothing
                 SaveSetting("ATCTimeseriesImport", "Scripts", ScriptFilename, ScriptDescription)
-                bgColor = TestScriptColor(ScriptFilename) 'TODO: debug this later
+                bgColor = TestScriptColor(ScriptFilename)
             End If
             With agdScripts.Source
-                Dim lCurRow As Integer = .Rows
+                Dim lCurRow As Integer
+
+                For lCurRow = 0 To .Rows - 1
+                    If .CellValue(lCurRow, 1) = ScriptFilename Then
+                        'Already have this script in the grid, skip adding new row
+                        GoTo SetProperties
+                    End If
+                Next
+                lCurRow = .Rows
                 .Rows = .Rows + 1
+SetProperties:
                 .CellValue(lCurRow, 0) = ScriptDescription
                 .CellColor(lCurRow, 0) = bgColor
                 .CellValue(lCurRow, 1) = ScriptFilename
-                .CellColor(lCurRow, 1) = bgColor
                 'TODO: scroll down so this row is visible, translate from old grid code below:
                 'While Not .get_RowIsVisible(agdScripts.rows)
                 '    .TopRow = .TopRow + 1
                 'End While
-                '.set_Selected(.Rows, 0, True)
-                .CellSelected(lCurRow, 0) = True ' had to add this to make the text be visible
-                agdScripts.Refresh()
+                SetSelectedRow(lCurRow)
             End With
             EnableButtons()
         End If
@@ -146,7 +156,7 @@ Friend Class frmSelectScript
                         .CellValue(lRow, 0) = MySettings(intSettings, 1).Trim("""")
 
                         'Set background of cell based on whether this script can read data file
-                        'bgColor = TestScriptColor(MySettings(intSettings, 0)) 'TODO: debug this one later
+                        bgColor = TestScriptColor(MySettings(intSettings, 0))
                         .CellColor(lRow, 1) = bgColor
                         .CellColor(lRow, 0) = bgColor
 
@@ -160,7 +170,7 @@ Friend Class frmSelectScript
 
             If CanReadRow > 0 Then
                 pCurrentRow = CanReadRow
-                .CellSelected(CanReadRow, 0) = True
+                .CellSelected(CanReadRow, 1) = True
                 '.row = CanReadRow
                 '.set_Selected(CanReadRow, 0, True)
                 'If Not .get_RowIsVisible(CanReadRow) Then .TopRow = CanReadRow
@@ -176,33 +186,32 @@ Friend Class frmSelectScript
     Private Function TestScriptColor(ByRef ScriptFilename As String) As Drawing.Color
         Dim Script As clsATCscriptExpression
         Dim TestResult As String
-        Dim filename, ScriptString As String
-
-        On Error GoTo ErrExit
-        With agdScripts
-            TestScriptColor = .CellBackColor
-            If pDataFilename <> "" Then
-                If IO.File.Exists(ScriptFilename) Then
-                    ScriptString = WholeFileString(ScriptFilename)
-                    If InStr(ScriptString, "(Test ") > 0 Then
-                        Script = ScriptFromString(ScriptString)
-                        If Script Is Nothing Then
-                            GoTo ErrExit
-                        Else
-                            TestResult = ScriptTest(Script, pDataFilename)
-                            Select Case TestResult
-                                Case "0" : TestScriptColor = NotReadableBackColor ' No, this script can not read this data file
-                                Case "1" : TestScriptColor = CanReadBackColor ' Yes, this script can read this data file
-                                Case Else : MsgBox("Script '" & ScriptFilename & "' test says: " & vbCr & TestResult & vbCr & "(Expected 0 or 1)", MsgBoxStyle.OkOnly, "Script Test")
-                            End Select
+        Dim ScriptString As String
+        Dim lColor As Drawing.Color = NotReadableBackColor
+        Try
+            With agdScripts
+                lColor = .CellBackColor
+                If pDataFilename <> "" Then
+                    If IO.File.Exists(ScriptFilename) Then
+                        ScriptString = WholeFileString(ScriptFilename)
+                        If InStr(ScriptString, "(Test ") > 0 Then
+                            Script = ScriptFromString(ScriptString)
+                            If Script IsNot Nothing Then
+                                TestResult = ScriptTest(Script, pDataFilename)
+                                Select Case TestResult
+                                    Case "0" : lColor = NotReadableBackColor ' No, this script can not read this data file
+                                    Case "1" : lColor = CanReadBackColor ' Yes, this script can read this data file
+                                    Case Else : MsgBox("Script '" & ScriptFilename & "' test says: " & vbCr _
+                                                      & TestResult & vbCr & "(Expected 0 or 1)", MsgBoxStyle.OkOnly, "Script Test")
+                                End Select
+                            End If
                         End If
                     End If
                 End If
-            End If
-        End With
-        Exit Function
-ErrExit:
-        TestScriptColor = NotReadableBackColor
+            End With
+        Catch
+        End Try
+        Return lColor
     End Function
 
     Private Sub frmSelectScript_Resize(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Resize
