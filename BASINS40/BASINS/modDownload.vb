@@ -379,6 +379,7 @@ Public Module modDownload
             If pExistingMapWindowProjectName.Length = 0 Then
                 'This is the normal case for building a new project,
                 'Save national project as the user has zoomed it
+                g_MapWin.View.ClearSelectedShapes()
                 g_Project.Save(g_Project.FileName)
                 lProjectName = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
             Else

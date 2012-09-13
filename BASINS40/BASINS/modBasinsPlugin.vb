@@ -174,9 +174,9 @@ Public Module modBasinsPlugin
                 Next
             End If
             If FileExists(lFileName) Then  'load national project
-
                 g_Project.Load(lFileName)
-
+                g_MapWin.View.ClearSelectedShapes()
+                g_Project.Modified = False
                 'See if we need to also process and load place names
                 Dim lInstructions As String = D4EMDataManager.SpatialOperations.CheckPlaceNames(IO.Path.GetDirectoryName(lFileName), g_Project.ProjectProjection)
                 If lInstructions.Length > 0 Then
