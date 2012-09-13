@@ -97,8 +97,6 @@ SetProperties:
                 DeleteSetting("ATCTimeseriesImport", "Scripts", agdScripts.Source.CellValue(pCurrentRow, 1))
                 LoadGrid(pDataFilename) 'This is inefficient, but easier than copying all the .textmatrix and .cellbackcolor
                 agdScripts.Refresh()
-                'agdScripts.TextMatrix(pCurrentRow, 0) = ""
-                'agdScripts.TextMatrix(pCurrentRow, 1) = ""
             End If
         End If
         EnableButtons()
@@ -161,26 +159,20 @@ SetProperties:
                         .CellColor(lRow, 0) = bgColor
 
                         If bgColor = CanReadBackColor Then CanReadRow = lRow
-                        RowsFilled = RowsFilled + 1
+                        RowsFilled += 1
                     End If
                 Next intSettings
             End If
             .Rows = RowsFilled + 1 'only retain non-missing scripts
             .FixedRows = 1
-
-            If CanReadRow > 0 Then
-                pCurrentRow = CanReadRow
-                .CellSelected(CanReadRow, 1) = True
-                '.row = CanReadRow
-                '.set_Selected(CanReadRow, 0, True)
-                'If Not .get_RowIsVisible(CanReadRow) Then .TopRow = CanReadRow
-            End If
         End With
         agdScripts.Initialize(lSource)
         agdScripts.SizeColumnToContents(0)
         agdScripts.ColumnWidth(1) = agdScripts.ClientSize.Width - agdScripts.ColumnWidth(0) - 15
+        If CanReadRow > 0 Then
+            SetSelectedRow(CanReadRow)
+        End If
         EnableButtons()
-
     End Sub
 
     Private Function TestScriptColor(ByRef ScriptFilename As String) As Drawing.Color

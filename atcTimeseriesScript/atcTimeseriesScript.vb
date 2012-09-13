@@ -103,18 +103,24 @@ ShowSelect:
     End Function
 
     Public Function RunSelectedScript(ByVal aDefinitionFilename As String, ByVal aDataFilename As String) As Boolean
-        Dim Script As clsATCscriptExpression
+        If String.IsNullOrEmpty(aDefinitionFilename) Then
+            Logger.Msg("No script file selected", vbExclamation, "Run Script")
+            Return False
+        End If
+        If Not IO.File.Exists(aDefinitionFilename) Then
+            Logger.Msg("Could not find script file '" & aDefinitionFilename & "'", vbExclamation, "Run Script")
+            Return False
+        End If
 
-        Script = ScriptFromString(WholeFileString(aDefinitionFilename))
+        Dim Script As clsATCscriptExpression = ScriptFromString(WholeFileString(aDefinitionFilename))
         If Script Is Nothing Then
-            Logger.Msg("Could not load script " & aDefinitionFilename & vbCr & Err.Description, vbExclamation, "Run Script")
+            Logger.Msg("Could not load script '" & aDefinitionFilename & "'" & vbCr & Err.Description, vbExclamation, "Run Script")
             Return False
         Else
             MsgBox(ScriptRun(Script, aDataFilename, Me) & vbCrLf & "Dataset Count = " & DataSets.Count, vbOKOnly, "Ran Import Data Script")
             Return (Me.DataSets.Count > 0)
         End If
     End Function
-
 
     'Private Function ScriptFileNames() As String(,)
     '    Dim lScriptsToShow As String(,) = GetAllSettings("atcTimeseriesScript", "Scripts")

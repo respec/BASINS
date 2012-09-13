@@ -313,7 +313,7 @@ Public Class atcMetCmpPlugin
     End Sub
 
     Public Overrides Function ToString() As String
-        Return Name.Substring(23) 'Skip first part of Name which is "Timeseries::Seasonal - "
+        Return Name.Replace("Timeseries::", "").Replace("Seasonal - ", "")
     End Function
 
     Public Overrides ReadOnly Property AvailableOperations() As atcDataAttributes
