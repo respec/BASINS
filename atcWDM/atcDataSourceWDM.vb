@@ -128,7 +128,7 @@ Public Class atcDataSourceWDM
                 lHighestNewDSN += 1
             End If
 
-            Dim lClone As atcTimeseries = lDataSet.Clone
+            Dim lClone As atcTimeseries = lDataSet.Clone(Me)
             lClone.Attributes.SetValue("New DSN", lHighestNewDSN)
             lCloneTsGroup.Add(lClone)
         Next
@@ -289,9 +289,10 @@ CaseExistRenumber:
                     'F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
                     F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat, lNvals, CInt(1), CInt(0), lTu, lV, lRet)
                 End If
-                If lTimserConst IsNot Nothing Then
-                    lTimserConst.Clear() 'TODO: maybe just part?
-                End If
+                'Clearing means we can't use it for graphing, listing, etc. after
+                'If lTimserConst IsNot Nothing Then
+                '    lTimserConst.Clear() 'TODO: maybe just part?
+                'End If
                 If lRet <> 0 Then
                     Throw New ApplicationException("WDTPUT:call:" & _
                                 lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
@@ -578,6 +579,7 @@ CaseExistRenumber:
             Dim lMsg As atcWdmHandle = pMsg.MsgHandle
             Dim lMsgUnit As Integer = lMsg.Unit
             For lAttributeIndex As Integer = 0 To .Count - 1
+                'Debug.WriteLine(aTs.Attributes.ItemByIndex(lAttributeIndex).ToString)
                 If Not DsnWriteAttribute(aFileUnit, lMsgUnit, lDsn, .ItemByIndex(lAttributeIndex)) Then
                     DsnWriteAttributes = False
                     Exit For
