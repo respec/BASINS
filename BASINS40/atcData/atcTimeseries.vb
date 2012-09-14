@@ -330,6 +330,7 @@ Public Class atcTimeseries
         Return lClone
     End Function
 
+    ''' <summary>Make a clone of the current dataset that refers to a different data source</summary>
     Public Overloads Function Clone(ByVal aDataSource As atcTimeseriesSource) As atcDataSet
         Dim lClone As atcTimeseries = Me.Clone
         lClone.pDataSource = aDataSource

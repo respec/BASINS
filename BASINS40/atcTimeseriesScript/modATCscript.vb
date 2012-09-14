@@ -71,7 +71,7 @@ Friend Module modATCscript
             With ts
                 .Attributes.SetValue("Description", pDataFilename)
                 .Attributes.SetValue("Scenario", DefaultScenario)
-                .Attributes.SetValue("FileImported", pDataFilename)
+                .Attributes.AddHistory("Read From " & pDataFilename)
                 .Dates = New atcData.atcTimeseries(pTserFile)
             End With
         End Sub
@@ -479,6 +479,9 @@ Friend Module modATCscript
                             pTserFile.AddDataSet(.ts, atcDataSource.EnumExistAction.ExistRenumber)
                             With .ts
                                 .Attributes.SetValue("ID", pTserFile.DataSets.Count)
+                                If Not .Attributes.ContainsAttribute("History 1") Then
+                                    .Attributes.AddHistory("Read From " & DataFilename)
+                                End If
                                 'Set missing values to NaN
                                 Dim lNaN As Double = GetNaN()
                                 For iVal As Integer = 1 To .numValues
