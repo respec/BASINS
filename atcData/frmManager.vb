@@ -301,6 +301,7 @@ Friend Class frmManager
                 lCount += 1
             Next
             treeFiles.ExpandAll()
+            treeFiles.Refresh()
         End If
     End Sub
 
@@ -320,9 +321,10 @@ Friend Class frmManager
             End If
 
             If lSaveIn IsNot Nothing AndAlso lSaveIn.Specification.Length > 0 Then
-                lSaveIn.AddDatasets(lSaveGroup)
-                lSaveIn.Save(lSaveIn.Specification)
-                Populate(-1)
+                If lSaveIn.AddDataSets(lSaveGroup) Then
+                    lSaveIn.Save(lSaveIn.Specification)
+                    Populate(-1)
+                End If
             End If
         End If
     End Sub
@@ -416,6 +418,7 @@ Friend Class frmManager
                 Case "Close"
                     atcDataManager.RemoveDataSource(aDataSource)
                     pSelectedNodes.Clear()
+                    Populate(-1)
                 Case "View"
                     .View()
                 Case "ShowFolder"
@@ -475,10 +478,6 @@ Friend Class frmManager
 
     Private Sub ChangedData(ByVal aDataSource As atcTimeseriesSource)
         Edit(atcDataManager.DataSources.Count - 1)
-    End Sub
-
-    Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-        Debug.Write("Closing frmManager")
     End Sub
 
     Private Sub Form_DragEnter( _
@@ -800,7 +799,7 @@ Friend Class frmManager
                 ' end if m_bShift
             Else
                 ' in the case of a simple click, just add this item
-                If Not (pSelectedNodes Is Nothing) And pSelectedNodes.Count > 0 Then
+                If pSelectedNodes IsNot Nothing AndAlso pSelectedNodes.Count > 0 Then
                     removePaintFromNodes()
                     pSelectedNodes.Clear()
                 End If
