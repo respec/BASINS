@@ -1,5 +1,5 @@
 <MapWinGIS OcxVersion="4.8" FileType="LayerFile" FileVersion="0" Description="">
-  <Layer LayerType="Shapefile" LayerName="Land Use baltmd" LayerVisible="1" LayerKey="" Filename="">
+  <Layer LayerType="Shapefile" LayerName="Land Use" LayerVisible="1" LayerKey="" Filename="">
     <ShapefileClass>
       <DefaultDrawingOptions FillColor="14996692" LineWidth="0.000000" />
       <ShapefileCategoriesClass>

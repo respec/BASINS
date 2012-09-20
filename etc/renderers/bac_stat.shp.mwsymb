@@ -1,0 +1,10 @@
+<MapWinGIS OcxVersion="4.8" FileType="LayerFile" FileVersion="0" Description="">
+  <Layer LayerType="Shapefile" LayerName="Bacteria" LayerVisible="0" LayerKey="" Filename="">
+    <ShapefileClass>
+      <DefaultDrawingOptions FillBgColor="0" FillColor="25600" LineColor="9868950" PointSize="4.000000" />
+      <ShapefileCategoriesClass />
+      <LabelsClass Alignment="5" Generated="0" AutoOffset="0" AvoidCollisions="0" Positioning="0" TextRenderingHint="5" />
+      <ChartsClass ValuesFontName="" />
+    </ShapefileClass>
+  </Layer>
+</MapWinGIS>
