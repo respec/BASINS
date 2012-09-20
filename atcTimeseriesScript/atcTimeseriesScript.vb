@@ -71,6 +71,8 @@ ShowSelect:
                     Dim lDefinitionFilename As String = .SelectedScript
                     Select Case .ButtonPressed
                         Case .cmdCancel.Text
+                            Logger.Dbg("Cancelled")
+                            Logger.LastDbgText = "" 'Avoid displaying an error message
                             Return False
                         Case .cmdRun.Text
                             Return RunSelectedScript(lDefinitionFilename, aFileName)

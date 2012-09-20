@@ -320,7 +320,7 @@ Public Module modDownload
                     RefreshView()
                     Logger.Dbg("CopyFeaturesWithinExtent:" & GisUtil.LayerName(iLayer))
 
-                    If InStr(GisUtil.LayerFileName(iLayer), aOldFolder) > 0 Then
+                    If GisUtil.LayerFileName(iLayer).Contains(aOldFolder) Then
                         'this layer is in our project folder
 
                         lNewName = ReplaceString(GisUtil.LayerFileName(iLayer), aOldFolder, aNewFolder)
@@ -737,7 +737,7 @@ StartOver:
             For Each lProjectorNode In lInstructionsNode.ChildNodes
                 Logger.Dbg("Processing XML: " & lProjectorNode.OuterXml)
                 If lProjectorNode.Name <> "message" Then Logger.Status(ReadableFromXML(lProjectorNode.OuterXml))
-                Select Case LCase(lProjectorNode.Name.ToLower)
+                Select Case lProjectorNode.Name.ToLower
                     Case "add_data"
                         Dim lDataType As String = lProjectorNode.Attributes.GetNamedItem("type").InnerText
                         lOutputFileName = lProjectorNode.InnerText
@@ -829,7 +829,7 @@ StartOver:
                         lPoint5.x = lSf.Extents.xMin
                         lPoint5.y = lSf.Extents.yMin
                         lSuccess = lShape.InsertPoint(lPoint5, 0)
-                        If InStr(lOutputFileName, "\nlcd" & g_PathChar) > 0 Then
+                        If lOutputFileName.Contains(g_PathChar & "nlcd" & g_PathChar) Then
                             'project the extents into the albers projection for nlcd
                             MkDirPath(lProjectDir & "nlcd")
                             TryDeleteShapefile(lProjectDir & "nlcd\catextent.shp")
@@ -1020,7 +1020,7 @@ StartOver:
             aProjString = Mid(aProjString, lPos + 2)
         Loop
         lFirst = True
-        Do While InStr(aProjString, vbCrLf) > 0
+        Do While aProjString.Contains(vbCrLf)
             'strip out unneeded stuff
             lPos = InStr(aProjString, vbCrLf)
             If lFirst Then
@@ -1046,7 +1046,7 @@ StartOver:
         Else
             aProjString = "<none>"
         End If
-        CleanUpUserProjString = aProjString
+        Return aProjString
     End Function
 
     Public Function CreateDefaultNewProjectFileName(ByVal aDataPath As String, ByVal aDefDirName As String) As String
@@ -1369,21 +1369,23 @@ StartOver:
                 MWlay.Visible = Visible
 
                 'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
-                If LCase(aFilename).IndexOf("\landuse" & g_PathChar) > 0 Then
+                If aFilename.ToLower.Contains(g_PathChar & "landuse" & g_PathChar) Then
                     'SetLandUseColors(MWlay, shpFile)
-                ElseIf LCase(aFilename).IndexOf("\nhd" & g_PathChar) > 0 Then
-                    If InStr(IO.Path.GetFileNameWithoutExtension(shpFile.Filename), "NHD") > 0 Then
+                ElseIf aFilename.ToLower.Contains(g_PathChar & "nhd" & g_PathChar) Then
+                    If IO.Path.GetFileNameWithoutExtension(shpFile.Filename).ToUpper.Contains("NHD") Then
                         MWlay.Name = IO.Path.GetFileNameWithoutExtension(shpFile.Filename)
                     Else
                         MWlay.Name &= " " & IO.Path.GetFileNameWithoutExtension(shpFile.Filename)
                     End If
-                ElseIf LCase(aFilename).IndexOf("\census" & g_PathChar) > 0 Then
+                    MWlay.Color = Drawing.Color.Navy
+                    MWlay.SaveShapeLayerProps()
+                    'ElseIf aFilename.ToLower.Contains(g_PathChar & "census" & g_PathChar) Then
                     'SetCensusColors(MWlay, shpFile)
-                ElseIf LCase(aFilename).IndexOf("\dem" & g_PathChar) > 0 Then
+                ElseIf aFilename.ToLower.Contains(g_PathChar & "dem" & g_PathChar) Then
                     SetDemColors(MWlay, shpFile)
                 ElseIf IO.Path.GetFileName(aFilename).ToLower = "met.shp" Then
                     SetMetIcons(MWlay, shpFile)
-                ElseIf LCase(aFilename).EndsWith("cat.shp") Then
+                ElseIf IO.Path.GetFileName(aFilename).ToLower = "cat.shp" Then
                     MWlay.ZoomTo()
                 End If
                 If Group.Length > 0 Then
@@ -1468,9 +1470,9 @@ StartOver:
                 MWlay.UseTransparentColor = True
 
                 'TODO: replace hard-coded SetElevationGridColors with full renderer from defaults
-                If aFilename.ToLower.EndsWith("demg.tif") > 0 Then
+                If aFilename.ToLower.EndsWith("demg.tif") Then
                     SetElevationGridColors(MWlay, g)
-                ElseIf aFilename.ToLower.IndexOf(g_PathChar & "ned" & g_PathChar) > 0 Then
+                ElseIf aFilename.ToLower.Contains(g_PathChar & "ned" & g_PathChar) Then
                     SetElevationGridColors(MWlay, g)
                 End If
             End If
@@ -1903,10 +1905,10 @@ NoIcon:                 Logger.Dbg("Icon not found for met station at " & lIconF
     'End Sub
 
     Private Function ShpFieldNumFromName(ByVal aShpFile As MapWinGIS.Shapefile, ByVal aFieldName As String) As Integer
-        Dim lFieldName As String = LCase(aFieldName)
+        Dim lFieldName As String = aFieldName.ToLower
         Dim iField As Integer
         For iField = 0 To aShpFile.NumFields
-            If LCase(aShpFile.Field(iField).Name) = lFieldName Then Return iField
+            If aShpFile.Field(iField).Name.ToLower = lFieldName Then Return iField
         Next
         Return 0
     End Function
