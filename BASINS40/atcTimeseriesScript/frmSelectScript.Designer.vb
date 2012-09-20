@@ -32,6 +32,7 @@
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectScript))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.fraButtons = New System.Windows.Forms.Panel
+        Me.btnHelp = New System.Windows.Forms.Button
         Me.cmdRun = New System.Windows.Forms.Button
         Me.cmdWizard = New System.Windows.Forms.Button
         Me.cmdCancel = New System.Windows.Forms.Button
@@ -46,6 +47,7 @@
         '
         Me.fraButtons.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fraButtons.BackColor = System.Drawing.SystemColors.Control
+        Me.fraButtons.Controls.Add(Me.btnHelp)
         Me.fraButtons.Controls.Add(Me.cmdRun)
         Me.fraButtons.Controls.Add(Me.cmdWizard)
         Me.fraButtons.Controls.Add(Me.cmdCancel)
@@ -57,9 +59,24 @@
         Me.fraButtons.Location = New System.Drawing.Point(560, 8)
         Me.fraButtons.Name = "fraButtons"
         Me.fraButtons.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.fraButtons.Size = New System.Drawing.Size(89, 171)
+        Me.fraButtons.Size = New System.Drawing.Size(89, 180)
         Me.fraButtons.TabIndex = 7
         Me.fraButtons.Text = "Frame1"
+        '
+        'btnHelp
+        '
+        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnHelp.BackColor = System.Drawing.SystemColors.Control
+        Me.btnHelp.Cursor = System.Windows.Forms.Cursors.Default
+        Me.btnHelp.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnHelp.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.btnHelp.Location = New System.Drawing.Point(0, 124)
+        Me.btnHelp.Name = "btnHelp"
+        Me.btnHelp.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.btnHelp.Size = New System.Drawing.Size(89, 25)
+        Me.btnHelp.TabIndex = 7
+        Me.btnHelp.Text = "&Help"
+        Me.btnHelp.UseVisualStyleBackColor = False
         '
         'cmdRun
         '
@@ -99,7 +116,7 @@
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdCancel.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdCancel.Location = New System.Drawing.Point(0, 124)
+        Me.cmdCancel.Location = New System.Drawing.Point(0, 155)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdCancel.Size = New System.Drawing.Size(89, 25)
@@ -166,6 +183,7 @@
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.Location = New System.Drawing.Point(3, 18)
         Me.Name = "frmSelectScript"
         Me.RightToLeft = System.Windows.Forms.RightToLeft.No
@@ -175,5 +193,6 @@
 
     End Sub
     Public WithEvents agdScripts As atcControls.atcGrid
+    Public WithEvents btnHelp As System.Windows.Forms.Button
 #End Region
 End Class

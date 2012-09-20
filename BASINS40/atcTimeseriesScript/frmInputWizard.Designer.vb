@@ -109,6 +109,7 @@
         Me.tabTop = New System.Windows.Forms.TabControl
         Me.tabFileProperty = New System.Windows.Forms.TabPage
         Me.tabDataMapping = New System.Windows.Forms.TabPage
+        Me.btnHelp = New System.Windows.Forms.Button
         Me.fraHeader.SuspendLayout()
         Me.fraLineEnd.SuspendLayout()
         Me.fraColumns.SuspendLayout()
@@ -241,7 +242,7 @@
         Me.cmdSaveScript.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdSaveScript.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdSaveScript.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdSaveScript.Location = New System.Drawing.Point(198, 461)
+        Me.cmdSaveScript.Location = New System.Drawing.Point(107, 461)
         Me.cmdSaveScript.Name = "cmdSaveScript"
         Me.cmdSaveScript.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdSaveScript.Size = New System.Drawing.Size(89, 25)
@@ -264,6 +265,7 @@
         Me.agdDataMapping.Location = New System.Drawing.Point(3, 3)
         Me.agdDataMapping.Name = "agdDataMapping"
         Me.agdDataMapping.Size = New System.Drawing.Size(495, 192)
+        Me.agdDataMapping.Source = Nothing
         Me.agdDataMapping.TabIndex = 23
         '
         'txtScriptDesc
@@ -605,7 +607,7 @@
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdCancel.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdCancel.Location = New System.Drawing.Point(293, 461)
+        Me.cmdCancel.Location = New System.Drawing.Point(297, 461)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdCancel.Size = New System.Drawing.Size(89, 25)
@@ -620,7 +622,7 @@
         Me.cmdReadData.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdReadData.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdReadData.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdReadData.Location = New System.Drawing.Point(103, 461)
+        Me.cmdReadData.Location = New System.Drawing.Point(12, 461)
         Me.cmdReadData.Name = "cmdReadData"
         Me.cmdReadData.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdReadData.Size = New System.Drawing.Size(89, 25)
@@ -830,6 +832,22 @@
         Me.tabDataMapping.TabIndex = 1
         Me.tabDataMapping.Text = "Data Mapping  "
         '
+        'btnHelp
+        '
+        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnHelp.BackColor = System.Drawing.SystemColors.Control
+        Me.btnHelp.Cursor = System.Windows.Forms.Cursors.Default
+        Me.btnHelp.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnHelp.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.btnHelp.Location = New System.Drawing.Point(202, 461)
+        Me.btnHelp.Name = "btnHelp"
+        Me.btnHelp.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.btnHelp.Size = New System.Drawing.Size(89, 25)
+        Me.btnHelp.TabIndex = 41
+        Me.btnHelp.Text = "&Help"
+        Me.ToolTip1.SetToolTip(Me.btnHelp, "Save selections and data mapping information to a data descriptor file.")
+        Me.btnHelp.UseVisualStyleBackColor = False
+        '
         'frmInputWizard
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 17.0!)
@@ -837,6 +855,7 @@
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.CancelButton = Me.cmdCancel
         Me.ClientSize = New System.Drawing.Size(537, 498)
+        Me.Controls.Add(Me.btnHelp)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdSaveScript)
         Me.Controls.Add(Me.cmdReadData)
@@ -846,6 +865,7 @@
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Font = New System.Drawing.Font("Courier New", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.Location = New System.Drawing.Point(4, 23)
         Me.Name = "frmInputWizard"
         Me.RightToLeft = System.Windows.Forms.RightToLeft.No
@@ -870,5 +890,6 @@
     Friend WithEvents tabTop As System.Windows.Forms.TabControl
     Friend WithEvents tabDataMapping As System.Windows.Forms.TabPage
     Friend WithEvents tabFileProperty As System.Windows.Forms.TabPage
+    Public WithEvents btnHelp As System.Windows.Forms.Button
 #End Region
 End Class

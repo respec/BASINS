@@ -36,7 +36,7 @@ Public Class frmDownload
             End If
         End If
 
-        Dim lRegionTypeName As String = GetSetting("DataDownload", "Defaults", "RegionTypeName", pRegionViewRectangle)
+        Dim lRegionTypeName As String = GetSetting("DataDownload", "Defaults", "RegionTypeName", pRegionHydrologicUnit)
         If lRegionTypeName.StartsWith(pRegionHydrologicUnit) Then
             lRegionTypeName = pRegionHydrologicUnit
         End If

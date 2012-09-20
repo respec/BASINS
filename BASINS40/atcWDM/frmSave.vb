@@ -7,18 +7,44 @@ Public Class frmSave
 
     Private pDataGroup As atcTimeseriesGroup
     Private pHighestDSN As Integer
+    Private pGridSource As WDMGridSource
 
     Public Function AskUser(ByVal aDataGroup As atcTimeseriesGroup, ByVal aLabel As String, ByVal aHighestDSN As Integer) As atcTimeseriesGroup
         pDataGroup = aDataGroup
         Me.lblStatus.Text = aLabel
         pHighestDSN = aHighestDSN
-        agdData.Initialize(New WDMGridSource(aDataGroup))
+        pGridSource = New WDMGridSource(aDataGroup)
+        agdData.Initialize(pGridSource)
         Me.ShowDialog()
-        Return pDataGroup
+        If Me.DialogResult = Windows.Forms.DialogResult.OK Then
+            Return pDataGroup
+        Else
+            Return Nothing
+        End If
     End Function
 
     Private Sub btnSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelectAttributes.Click
-        Logger.Msg("Attribute selection on WDM save form not yet implemented")
+        Dim lst As New atcControls.atcSelectList
+        Dim lAvailable As New Generic.List(Of String)
+        For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+            Select Case lAttrDef.TypeString.ToLower
+                Case "double", "integer", "boolean", "string", "atctimeunit"
+                    Select Case lAttrDef.Name.ToLower
+                        Case "", "attributes", "bins", "cligen out", "cligen parm", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "include daily", "include hourly", _
+                             "kendall tau", "n-day high value", "n-day low value", "n-day high attribute", "n-day low attribute", "number", "num years", "return period", "summary file", "vbtime", "%*", "%sum*"
+                            'Skip displaying some things in the list
+                        Case Else
+                            If pGridSource.DisplayAttributes.Contains(lAttrDef.Name) OrElse Not lAttrDef.Calculated Then
+                                lAvailable.Add(lAttrDef.Name)
+                            End If
+                    End Select
+            End Select
+        Next
+        lAvailable.Sort()
+        If lst.AskUser(lAvailable, pGridSource.DisplayAttributes) Then
+            pGridSource.Columns = pGridSource.DisplayAttributes.Count
+            agdData.Refresh()
+        End If
     End Sub
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
@@ -27,14 +53,18 @@ Public Class frmSave
     End Sub
 
     Private Sub btnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSave.Click
+        Me.DialogResult = Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
 
     Private Sub frmSave_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
-            'TODO: link to documentation
-            'atcUtility.ShowHelp("BASINS Details\?.html")
+            btnHelp_Click(Nothing, Nothing)
         End If
+    End Sub
+
+    Private Sub btnHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnHelp.Click
+        atcUtility.ShowHelp("BASINS Details/Plug-ins/Time-Series Plug-ins/Read Data with Script.html")
     End Sub
 End Class
 
@@ -43,15 +73,16 @@ Friend Class WDMGridSource
 
     Private pDataGroup As atcTimeseriesGroup
     'Private pSelected As atcCollection
-    Private pDisplayAttributes As ArrayList
+    Private pDisplayAttributes As Generic.List(Of String)
 
     ''' <summary>Names of attributes used for listing of data in UI</summary>
-    Public Property DisplayAttributes() As ArrayList
+    Public Property DisplayAttributes() As Generic.List(Of String)
         Get
             Return pDisplayAttributes
         End Get
-        Set(ByVal newValue As ArrayList)
+        Set(ByVal newValue As Generic.List(Of String))
             pDisplayAttributes = newValue
+            Columns = pDisplayAttributes.Count
         End Set
     End Property
 
@@ -66,7 +97,7 @@ Friend Class WDMGridSource
 
     Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup)
         pDataGroup = aDataGroup
-        pDisplayAttributes = New ArrayList
+        pDisplayAttributes = New Generic.List(Of String)
         With pDisplayAttributes
             .Add("ID")
             .Add("New DSN")
@@ -75,6 +106,9 @@ Friend Class WDMGridSource
             .Add("Constituent")
             .Add("History 1")
         End With
+        FixedRows = 1
+        Rows = pDataGroup.Count + FixedRows
+        Columns = pDisplayAttributes.Count
     End Sub
 
     Overrides Property Columns() As Integer
@@ -82,14 +116,7 @@ Friend Class WDMGridSource
             Return pDisplayAttributes.Count
         End Get
         Set(ByVal Value As Integer)
-        End Set
-    End Property
-
-    Public Overrides Property FixedRows() As Integer
-        Get
-            Return 1
-        End Get
-        Set(ByVal value As Integer)
+            MyBase.Columns = pDisplayAttributes.Count
         End Set
     End Property
 
@@ -98,6 +125,7 @@ Friend Class WDMGridSource
             Return pDataGroup.Count + FixedRows
         End Get
         Set(ByVal Value As Integer)
+            MyBase.Rows = pDataGroup.Count + FixedRows
         End Set
     End Property
 

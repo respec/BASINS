@@ -48,6 +48,16 @@ Friend Class frmInputWizard
     Private pDataMappingCol As Integer = -1
     Private pDataMappingRow As Integer = -1
 
+    Private Sub frmKeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            btnHelp_Click(Nothing, Nothing)
+        End If
+    End Sub
+
+    Private Sub btnHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnHelp.Click
+        atcUtility.ShowHelp("BASINS Details/Plug-ins/Time-Series Plug-ins/Read Data with Script.html")
+    End Sub
+
     Public WriteOnly Property TserFile() As atcData.atcTimeseriesSource
         Set(ByVal Value As atcData.atcTimeseriesSource)
             pTserFile = Value
@@ -79,7 +89,7 @@ Friend Class frmInputWizard
     End Sub
 
     Private Sub frmInputWizard_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-        Logger.Dbg() 'Avoid unhelpful error message when closing form instead of reading data
+        Logger.LastDbgText = "" 'Avoid unhelpful error message when closing form instead of reading data
     End Sub
 
     'Displays the Input Wizard form and initializes
@@ -257,20 +267,17 @@ Friend Class frmInputWizard
     End Function
 
     Private Function FixedColRight(ByRef index As Integer) As Integer
-        'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-        Dim str_Renamed As String
-        Dim pos As Integer
-        str_Renamed = Trim(MappingSource.CellValue(index, ColMappingCol))
-        pos = InStr(str_Renamed, "-")
+        Dim cellContents As String = Trim(MappingSource.CellValue(index, ColMappingCol))
+        Dim pos As Integer = InStr(cellContents, "-")
 
         If pos > 0 Then
-            FixedColRight = CInt(Mid(str_Renamed, pos + 1))
+            FixedColRight = CInt(Mid(cellContents, pos + 1))
         Else
-            pos = InStr(str_Renamed, "+")
+            pos = InStr(cellContents, "+")
             If pos > 0 Then
-                FixedColRight = CInt(Mid(str_Renamed, pos + 1))
-            ElseIf IsNumeric(str_Renamed) Then
-                FixedColRight = CInt(str_Renamed)
+                FixedColRight = CInt(Mid(cellContents, pos + 1))
+            ElseIf IsNumeric(cellContents) Then
+                FixedColRight = CInt(cellContents)
             Else
                 FixedColRight = 0
             End If
@@ -805,7 +812,6 @@ ParseFixedDef:
         indent = indent + Len("(While ")
 
         'Have to make sure this datum goes into the right dataset
-        'UPGRADE_ISSUE: GoSub statement is not supported. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="C5A1A479-AB8B-4D40-AAF4-DB19A2E5E77F"'
         If SomeAttribVaries And Not SomeAttribVariesRepeat Then
             SelectDataset(ScriptBuilder, indent)
         End If
@@ -815,7 +821,6 @@ ParseFixedDef:
             '    str = str & printeol & Space(indent) & "(While (Not EOL)"
             '    indent = indent + Len("(While ")
             '    str = str & printeol & Space(indent) & "(Increment Repeat)"
-            'UPGRADE_WARNING: Couldn't resolve default property of object ConstOrCol(Repeats). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
             ScriptBuilder.Append(PrintEOL & Space(indent) & "(For Repeat = 1 to " & ConstOrCol("Repeats"))
             indent = indent + Len("(For ")
         End If
@@ -865,7 +870,6 @@ ParseFixedDef:
         End If
 
         'Have to make sure this datum goes into the right dataset
-        'UPGRADE_ISSUE: GoSub statement is not supported. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="C5A1A479-AB8B-4D40-AAF4-DB19A2E5E77F"'
         If SomeAttribVariesRepeat Then
             SelectDataset(ScriptBuilder, indent)
         End If
@@ -962,8 +966,7 @@ ParseFixedDef:
                 End If
             End If
         End If
-        'UPGRADE_WARNING: Couldn't resolve default property of object ConstOrCol. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-        ConstOrCol = retval
+        Return retval
     End Function
 
     ' Subroutine ===============================================
@@ -1043,6 +1046,8 @@ ParseFixedDef:
 
     ''' <summary>Responds to press of "Cancel" button</summary>
     Private Sub cmdCancel_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdCancel.Click
+        Logger.Dbg("Cancelled")
+        Logger.LastDbgText = "" 'Avoid displaying an error message
         Me.Close()
     End Sub
 
@@ -1305,7 +1310,6 @@ ParseFixedDef:
     ' Name:     optDelimiter_Click (1 argument)
     ' Purpose:  Responds to press of a "Delimiter-option" button
     '
-    'UPGRADE_WARNING: Event optDelimiter.CheckedChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub optDelimiter_CheckedChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles optDelimiterNone.CheckedChanged, optDelimiterSpace.CheckedChanged, optDelimiterTab.CheckedChanged, optDelimiterChar.CheckedChanged
         If eventSender.Checked Then
 
@@ -1359,25 +1363,21 @@ ParseFixedDef:
 
     End Sub
 
-    'UPGRADE_WARNING: Event txtHeaderLines.TextChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub txtHeaderLines_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtHeaderLines.TextChanged
         optHeaderLines.Checked = True
         PopulateSample()
     End Sub
 
-    'UPGRADE_WARNING: Event txtHeaderStart.TextChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub txtHeaderStart_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtHeaderStart.TextChanged
         optHeaderStartsWith.Checked = True
         PopulateSample()
     End Sub
 
-    'UPGRADE_WARNING: Event txtLineEndChar.TextChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub txtLineEndChar_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtLineEndChar.TextChanged
         optLineEndASCII.Checked = True
         PopulateSample()
     End Sub
 
-    'UPGRADE_WARNING: Event txtLineLen.TextChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub txtLineLen_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtLineLen.TextChanged
         optLineEndLength.Checked = True
         PopulateSample()

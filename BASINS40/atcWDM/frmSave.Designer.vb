@@ -29,6 +29,7 @@ Partial Class frmSave
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnSelectAttributes = New System.Windows.Forms.Button
         Me.lblStatus = New System.Windows.Forms.Label
+        Me.btnHelp = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'agdData
@@ -80,14 +81,12 @@ Partial Class frmSave
         'btnSelectAttributes
         '
         Me.btnSelectAttributes.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSelectAttributes.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnSelectAttributes.Location = New System.Drawing.Point(254, 238)
+        Me.btnSelectAttributes.Location = New System.Drawing.Point(173, 238)
         Me.btnSelectAttributes.Name = "btnSelectAttributes"
         Me.btnSelectAttributes.Size = New System.Drawing.Size(105, 23)
         Me.btnSelectAttributes.TabIndex = 4
         Me.btnSelectAttributes.Text = "Select Attributes"
         Me.btnSelectAttributes.UseVisualStyleBackColor = True
-        Me.btnSelectAttributes.Visible = False
         '
         'lblStatus
         '
@@ -97,6 +96,16 @@ Partial Class frmSave
         Me.lblStatus.Size = New System.Drawing.Size(0, 13)
         Me.lblStatus.TabIndex = 5
         '
+        'btnHelp
+        '
+        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnHelp.Location = New System.Drawing.Point(284, 238)
+        Me.btnHelp.Name = "btnHelp"
+        Me.btnHelp.Size = New System.Drawing.Size(75, 23)
+        Me.btnHelp.TabIndex = 6
+        Me.btnHelp.Text = "Help"
+        Me.btnHelp.UseVisualStyleBackColor = True
+        '
         'frmSave
         '
         Me.AcceptButton = Me.btnSave
@@ -104,6 +113,7 @@ Partial Class frmSave
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(533, 273)
+        Me.Controls.Add(Me.btnHelp)
         Me.Controls.Add(Me.lblStatus)
         Me.Controls.Add(Me.btnSelectAttributes)
         Me.Controls.Add(Me.btnCancel)
@@ -111,6 +121,7 @@ Partial Class frmSave
         Me.Controls.Add(Me.lblInstructions)
         Me.Controls.Add(Me.agdData)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.Name = "frmSave"
         Me.Text = "Save to WDM"
         Me.ResumeLayout(False)
@@ -123,4 +134,5 @@ Partial Class frmSave
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnSelectAttributes As System.Windows.Forms.Button
     Friend WithEvents lblStatus As System.Windows.Forms.Label
+    Friend WithEvents btnHelp As System.Windows.Forms.Button
 End Class
