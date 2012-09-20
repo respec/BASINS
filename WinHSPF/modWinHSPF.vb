@@ -451,10 +451,10 @@ Public Module WinHSPF
             Dim lWinHSPFBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
             Dim lMapWindowBinLoc As String = lWinHSPFBinLoc & "\..\..\..\bin\"
             Dim lMapWindowProjectName As String = FilenameSetExt(pUCIFullFileName, "mwprj")
-            Dim lMapWindowExeName As String = lMapWindowBinLoc & "MapWindow.exe"
+            Dim lMapWindowExeName As String = lMapWindowBinLoc & "BASINS.exe"
 
             If Not FileExists(lMapWindowExeName) Then
-                lMapWindowExeName = FindFile("Please locate MapWindow.exe", "MapWindow.exe")
+                lMapWindowExeName = FindFile("Please locate BASINS.exe", "BASINS.exe")
             End If
 
             If Not FileExists(lMapWindowProjectName) Then
