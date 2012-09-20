@@ -1,0 +1,10 @@
+<MapWinGIS OcxVersion="4.8" FileType="LayerFile" FileVersion="0" Description="">
+  <Layer LayerType="Shapefile" LayerName="State Soil" LayerVisible="0" LayerKey="" Filename="">
+    <ShapefileClass>
+      <DefaultDrawingOptions FillBgColor="0" FillColor="16777215" FillVisible="0" LineColor="128" />
+      <ShapefileCategoriesClass />
+      <LabelsClass Generated="0" AutoOffset="0" AvoidCollisions="0" Positioning="1" TextRenderingHint="5" />
+      <ChartsClass ValuesFontName="" />
+    </ShapefileClass>
+  </Layer>
+</MapWinGIS>
