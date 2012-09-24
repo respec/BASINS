@@ -60,4 +60,14 @@
     </StartURL>
     <StartWithIE>false</StartWithIE>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <StartProgram>S:\dev\BASINS40\Bin\atcStatusMonitorTester.exe</StartProgram>
+    <StartArguments>/log base.uci</StartArguments>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <StartProgram>S:\dev\BASINS40\Bin\atcStatusMonitorTester.exe</StartProgram>
+    <StartArguments>/log base.uci</StartArguments>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
 </Project>
