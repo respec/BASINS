@@ -251,6 +251,14 @@ Public Class Metadata
     ''' </summary>
     ''' <param name="aXML">New metadata XML string to use instead of current metadata</param>
     Public Sub FromString(ByVal aXML As String)
+
+        'Remove DOCTYPE from the XML to prevent downloading of DTD
+        Dim lDoctypeStart As Integer = aXML.IndexOf("<!DOCTYPE ")
+        If lDoctypeStart >= 0 Then
+            Dim lDoctypeEnd As Integer = aXML.IndexOf(">", lDoctypeStart)
+            aXML = aXML.Remove(lDoctypeStart, lDoctypeEnd - lDoctypeStart + 1)
+        End If
+
         If aXML.Contains(DTD_URL) Then
             If HaveDTDFile() Then
                 aXML = aXML.Replace(DTD_URL, "file://" & DTD_Filename.Replace("\", "/"))
@@ -259,8 +267,8 @@ Public Class Metadata
 
         Dim lStream As New System.IO.StringReader(aXML)
         Dim lSettings As New XmlReaderSettings
-        lSettings.ProhibitDtd = False
-        lSettings.ValidationType = ValidationType.DTD 'Change to .None to disable validation while reading
+        lSettings.ValidationFlags = Schema.XmlSchemaValidationFlags.None
+        lSettings.ValidationType = ValidationType.None
         AddHandler lSettings.ValidationEventHandler, AddressOf ValidationEventHandler
 
         Dim lXMLReader As XmlReader = XmlReader.Create(lStream, lSettings)

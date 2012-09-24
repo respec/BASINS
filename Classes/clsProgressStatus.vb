@@ -138,7 +138,12 @@ Public Class MonitorProgressStatus
             Windows.Forms.Application.DoEvents()
             Threading.Thread.Sleep(50)
         End While
-        If InnerProgressStatus IsNot Nothing Then InnerProgressStatus.Progress(aCurrentPosition, aLastPosition)
+        If InnerProgressStatus IsNot Nothing Then
+            Try
+                InnerProgressStatus.Progress(aCurrentPosition, aLastPosition)
+            Catch
+            End Try
+        End If
         WriteStatus("PROGRESS " & aCurrentPosition & " of " & aLastPosition)
     End Sub
 
@@ -187,7 +192,7 @@ Public Class MonitorProgressStatus
 
         If aStatusMessage.Length > 0 Then
             Logger.Dbg(aStatusMessage)
-            pMonitorProcess.StandardInput.WriteLine(aStatusMessage)
+            pMonitorProcess.StandardInput.WriteLine(aStatusMessage) 'TODO: make sure we do not hang here too long on full pipe
             pMonitorProcess.StandardInput.Flush()
         End If
         Return True
