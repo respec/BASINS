@@ -186,7 +186,8 @@ Public Module modFile
     End Function
 
     ''' <summary>
-    ''' Return a new file name in the IO.Path.GetTempPath folder with a given base file name and extension.
+    ''' Return a new file name with a given base file name and extension.
+    ''' If aBaseName is not a full path, the IO.Path.GetTempPath folder will be used
     ''' An integer is inserted between the base file name and extension if needed to avoid conflict with an existing file.
     ''' If aBaseName.aExtension already exists (as a file or folder), 
     '''    aBaseName_1.aExtension is tried, then 
