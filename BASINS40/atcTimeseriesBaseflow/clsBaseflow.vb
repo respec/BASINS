@@ -11,6 +11,8 @@ Public Enum BFMethods
     HySEPLocMin = 2
     HySEPSlide = 3
     PART = 4
+    BFIStandard = 5
+    BFIModified = 6
 End Enum
 
 Public Interface IclsBaseflow

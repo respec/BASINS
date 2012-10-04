@@ -31,6 +31,11 @@ Public Class frmUSGSBaseflow
     Private pMethodLastDone As String = ""
     'Private pMethodsLastDone As ArrayList = Nothing
     Private pDALastUsed As Double = 0.0
+    Private pBFINDay As Integer = 0
+    Private pBFIFrac As Double = 0
+    Private pBFIK1Day As Double = 0
+    Private pBFIUseSymbol As Boolean = False
+
     Private WithEvents pDataGroup As atcTimeseriesGroup
     Private WithEvents pfrmStations As frmStations
 
@@ -161,9 +166,14 @@ Public Class frmUSGSBaseflow
                     Try
                         lTs = SubsetByDate(lTs, lSDate, lEDate, Nothing)
                         If lTs.Attributes.GetValue("Count missing") > 0 Then
-                            lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
-                            lTs.Clear()
-                            Exit For
+                            If chkMethodHySEPFixed.Checked OrElse _
+                               chkMethodHySEPLocMin.Checked OrElse _
+                               chkMethodHySEPSlide.Checked OrElse _
+                               chkMethodPART.Checked Then
+                                lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
+                                lTs.Clear()
+                                Exit For
+                            End If
                         Else
                             lTs.Clear()
                         End If
@@ -178,9 +188,32 @@ Public Class frmUSGSBaseflow
         If pMethods.Count = 0 Then lErrMsg = "- Method not set" & vbCrLf
         Dim lDA As Double = 0.0
         If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then
-            lErrMsg &= "- Drainage Area not set" & vbCrLf
+            If chkMethodHySEPFixed.Checked OrElse _
+               chkMethodHySEPLocMin.Checked OrElse _
+               chkMethodHySEPSlide.Checked OrElse _
+               chkMethodPART.Checked Then
+                lErrMsg &= "- Drainage Area not set" & vbCrLf
+            End If
         ElseIf lDA <= 0 Then
             lErrMsg &= "- Drainage Area must be greater than zero" & vbCrLf
+        End If
+        Dim lNDay As Integer
+        If chkMethodBFI.Checked Then
+            If Not Integer.TryParse(txtN.Text.Trim(), lNDay) Then
+                lErrMsg &= "- BFI method needs a valid screening duration (N)" & vbCrLf
+            End If
+        End If
+        Dim lFrac As Double
+        If chkMethodBFI.Checked AndAlso chkMethodBFIStandard.Checked Then
+            If Not Double.TryParse(txtF.Text.Trim(), lFrac) Then
+                lErrMsg &= "- BFI standard method needs a valid turning point fraction (F)" & vbCrLf
+            End If
+        End If
+        Dim lK1Day As Double
+        If chkMethodBFI.Checked AndAlso chkMethodBFIModified.Checked Then
+            If Not Double.TryParse(txtK.Text.Trim(), lK1Day) Then
+                lErrMsg &= "- BFI modified method needs a valid recession constant (K)" & vbCrLf
+            End If
         End If
 
         If lErrMsg.Length = 0 Then
@@ -197,6 +230,16 @@ Public Class frmUSGSBaseflow
             Args.SetValue("EnglishUnit", True)
             'Set station.txt
             'Args.SetValue("Station File", atcUSGSStations.StationInfoFile)
+            If pMethods.Contains(BFMethods.BFIStandard) Then
+                Args.SetValue("BFIFrac", lFrac)
+            End If
+            If pMethods.Contains(BFMethods.BFIModified) Then
+                Args.SetValue("BFIK1Day", lK1Day)
+            End If
+            If pMethods.Contains(BFMethods.BFIStandard) OrElse pMethods.Contains(BFMethods.BFIModified) Then
+                Args.SetValue("BFINDay", lNDay)
+                Args.SetValue("BFIUseSymbol", (chkBFISymbols.Checked))
+            End If
         End If
         Return lErrMsg
     End Function
@@ -367,6 +410,19 @@ Public Class frmUSGSBaseflow
             'pMethodLastDone = lArgs.GetValue("Method")
             MethodsLastDone = lArgs.GetValue("Methods")
             pDALastUsed = lArgs.GetValue("Drainage Area")
+            Dim lBFIchosen As Boolean = False
+            If MethodsLastDone.Contains(BFMethods.BFIStandard) Then
+                lBFIchosen = True
+                pBFIFrac = lArgs.GetValue("BFIFrac")
+            End If
+            If MethodsLastDone.Contains(BFMethods.BFIModified) Then
+                lBFIchosen = True
+                pBFIK1Day = lArgs.GetValue("BFIK1Day")
+            End If
+            If lBFIchosen Then
+                pBFINDay = lArgs.GetValue("BFINDay")
+                pBFIUseSymbol = lArgs.GetValue("BFIUseSymbol")
+            End If
             pDidBFSeparation = True
         Catch ex As Exception
             Logger.Msg("Baseflow separation failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Baseflow separation")
@@ -403,6 +459,10 @@ Public Class frmUSGSBaseflow
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", chkMethodHySEPFixed.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", chkMethodHySEPLocMin.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFI", chkMethodBFI.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIStandard", chkMethodBFIStandard.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", chkMethodBFIModified.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
 
         OutputDir = txtOutputDir.Text.Trim()
         ASCIICommon(pDataGroup(0))
@@ -453,6 +513,8 @@ Public Class frmUSGSBaseflow
         Dim lTsGroupFixed As atcCollection = ConstructGraphTsGroup(lTsDailyStreamflow, BFMethods.HySEPFixed, lStart, lEnd, lDA)
         Dim lTsGroupLocMin As atcCollection = ConstructGraphTsGroup(lTsDailyStreamflow, BFMethods.HySEPLocMin, lStart, lEnd, lDA)
         Dim lTsGroupSlide As atcCollection = ConstructGraphTsGroup(lTsDailyStreamflow, BFMethods.HySEPSlide, lStart, lEnd, lDA)
+        Dim lTsGroupBFIStandard As atcCollection = ConstructGraphTsGroup(lTsDailyStreamflow, BFMethods.BFIStandard, lStart, lEnd, lDA)
+        Dim lTsGroupBFIModified As atcCollection = ConstructGraphTsGroup(lTsDailyStreamflow, BFMethods.BFIModified, lStart, lEnd, lDA)
 
         Dim lYAxisTitleText As String = "FLOW, IN CUBIC FEET PER SECOND"
         If aPerUnitArea Then lYAxisTitleText &= " (per unit square mile)"
@@ -519,6 +581,29 @@ Public Class frmUSGSBaseflow
                     DisplayCDistGraph(lDataGroup)
                 End If
             End If
+
+            If lTsGroupBFIStandard.Count > 0 Then
+                lArgs.SetValue("Method", "BFIStandard")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupBFIStandard, lArgs)
+                If aGraphType = "Timeseries" Then
+                    DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    DisplayCDistGraph(lDataGroup)
+                End If
+            End If
+            If lTsGroupBFIModified.Count > 0 Then
+                lArgs.SetValue("Method", "BFIModified")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupBFIModified, lArgs)
+                If aGraphType = "Timeseries" Then
+                    DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    DisplayCDistGraph(lDataGroup)
+                End If
+            End If
         Else
             lTsGraphAll = New atcTimeseriesGroup
 
@@ -526,6 +611,8 @@ Public Class frmUSGSBaseflow
             Dim lTsGroupFixed1 As atcTimeseriesGroup = Nothing
             Dim lTsGroupLocMin1 As atcTimeseriesGroup = Nothing
             Dim lTsGroupSlide1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupBFIStandard1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupBFIModified1 As atcTimeseriesGroup = Nothing
             Dim lTsGroupStock As New atcTimeseriesGroup
             If lTsGroupPart.Count > 0 Then
                 lArgs.SetValue("Method", "Part")
@@ -563,6 +650,16 @@ Public Class frmUSGSBaseflow
                 lArgs.SetValue("Method", "Slide")
                 lTsGroupSlide1 = SetupGraphTsGroup(lTsGroupSlide, lArgs)
                 lTsGroupStock.AddRange(lTsGroupSlide1)
+            End If
+            If lTsGroupBFIStandard.Count > 0 Then
+                lArgs.SetValue("Method", "BFIStandard")
+                lTsGroupBFIStandard1 = SetupGraphTsGroup(lTsGroupBFIStandard, lArgs)
+                lTsGroupStock.AddRange(lTsGroupBFIStandard1)
+            End If
+            If lTsGroupBFIModified.Count > 0 Then
+                lArgs.SetValue("Method", "BFIModified")
+                lTsGroupBFIModified1 = SetupGraphTsGroup(lTsGroupBFIModified, lArgs)
+                lTsGroupStock.AddRange(lTsGroupBFIModified1)
             End If
 
             If aGraphType = "CDist" Then
@@ -603,6 +700,8 @@ Public Class frmUSGSBaseflow
             Case "fixed" : lMethodAtt = BFMethods.HySEPFixed
             Case "locmin" : lMethodAtt = BFMethods.HySEPLocMin
             Case "slide" : lMethodAtt = BFMethods.HySEPSlide
+            Case "bfistandard" : lMethodAtt = BFMethods.BFIStandard
+            Case "bfimodified" : lMethodAtt = BFMethods.BFIModified
         End Select
         Dim lTsBF4Graph As atcTimeseries = aTsCollection.ItemByKey("RateDaily").Clone()
         lDA = lTsBF4Graph.Attributes.GetValue("Drainage Area")
@@ -691,7 +790,7 @@ Public Class frmUSGSBaseflow
         lGraphForm.Grapher = lGraphTS
         With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
             .YAxis.Type = AxisType.Log
-            Dim lScaleMin As Double = 10
+            Dim lScaleMin As Double = 1
             .YAxis.Scale.Min = lScaleMin
             .AxisChange()
             .CurveList.Item(0).Color = Drawing.Color.Red
@@ -754,6 +853,18 @@ Public Class frmUSGSBaseflow
                     Return Drawing.Color.Maroon
                 ElseIf lCons.StartsWith("runoff") Then
                     Return Drawing.Color.Magenta
+                End If
+            Case BFMethods.BFIStandard
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkCyan
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.Cyan
+                End If
+            Case BFMethods.BFIModified
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.Yellow
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.YellowGreen
                 End If
         End Select
     End Function
@@ -852,6 +963,18 @@ Public Class frmUSGSBaseflow
         End If
         If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", "False") = "True" Then
             chkMethodHySEPSlide.Checked = True
+        End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFI", "False") = "True" Then
+            chkMethodBFI.Checked = True
+            If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFIStandard", "False") = "True" Then
+                chkMethodBFIStandard.Checked = True
+            End If
+            If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", "False") = "True" Then
+                chkMethodBFIModified.Checked = True
+            End If
+            If GetSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", "False") = "True" Then
+                chkBFISymbols.Checked = True
+            End If
         End If
     End Sub
 
@@ -986,7 +1109,10 @@ Public Class frmUSGSBaseflow
     Private Sub BFMethods_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMethodHySEPFixed.CheckedChanged, _
                                                                                                              chkMethodHySEPLocMin.CheckedChanged, _
                                                                                                              chkMethodHySEPSlide.CheckedChanged, _
-                                                                                                             chkMethodPART.CheckedChanged
+                                                                                                             chkMethodPART.CheckedChanged, _
+                                                                                                             chkMethodBFI.CheckedChanged, _
+                                                                                                             chkMethodBFIStandard.CheckedChanged, _
+                                                                                                             chkMethodBFIModified.CheckedChanged
         pDidBFSeparation = False
         pMethods.Clear()
         If Opened Then
@@ -994,6 +1120,10 @@ Public Class frmUSGSBaseflow
             If chkMethodHySEPFixed.Checked Then pMethods.Add(BFMethods.HySEPFixed)
             If chkMethodHySEPLocMin.Checked Then pMethods.Add(BFMethods.HySEPLocMin)
             If chkMethodHySEPSlide.Checked Then pMethods.Add(BFMethods.HySEPSlide)
+            If chkMethodBFI.Checked Then
+                If chkMethodBFIStandard.Checked Then pMethods.Add(BFMethods.BFIStandard)
+                If chkMethodBFIModified.Checked Then pMethods.Add(BFMethods.BFIModified)
+            End If
         End If
     End Sub
 
@@ -1004,5 +1134,54 @@ Public Class frmUSGSBaseflow
     Private Sub txtAny_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
             Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged
         pDidBFSeparation = False
+    End Sub
+
+    Private Sub chkMethodBFIMethodsCheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMethodBFIStandard.CheckedChanged, chkMethodBFIModified.CheckedChanged
+        Dim lBFIChosen As Boolean = False
+        If chkMethodBFIStandard.Checked And chkMethodBFIModified.Checked Then
+            lblF.Visible = True
+            txtF.Visible = True
+            lblK.Visible = True
+            txtK.Visible = True
+            lBFIChosen = True
+            If Not pMethods.Contains(BFMethods.BFIStandard) Then
+                pMethods.Add(BFMethods.BFIStandard)
+            End If
+            If Not pMethods.Contains(BFMethods.BFIModified) Then
+                pMethods.Add(BFMethods.BFIModified)
+            End If
+        ElseIf chkMethodBFIStandard.Checked Then
+            lblF.Visible = True
+            txtF.Visible = True
+            lblK.Visible = False
+            txtK.Visible = False
+            lBFIChosen = True
+            If Not pMethods.Contains(BFMethods.BFIStandard) Then
+                pMethods.Add(BFMethods.BFIStandard)
+            End If
+        ElseIf chkMethodBFIModified.Checked Then
+            lblF.Visible = False
+            txtF.Visible = False
+            lblK.Visible = True
+            txtK.Visible = True
+            lBFIChosen = True
+            If Not pMethods.Contains(BFMethods.BFIModified) Then
+                pMethods.Add(BFMethods.BFIModified)
+            End If
+        Else 'none is checked
+            lblF.Visible = False
+            txtF.Visible = False
+            lblK.Visible = False
+            txtK.Visible = False
+            If pMethods.Contains(BFMethods.BFIStandard) Then
+                pMethods.Remove(BFMethods.BFIStandard)
+            End If
+            If pMethods.Contains(BFMethods.BFIModified) Then
+                pMethods.Remove(BFMethods.BFIModified)
+            End If
+        End If
+        If lBFIChosen Then
+            chkMethodBFI.Checked = True
+        End If
     End Sub
 End Class

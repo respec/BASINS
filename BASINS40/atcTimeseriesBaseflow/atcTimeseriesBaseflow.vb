@@ -143,6 +143,10 @@ Public Class atcTimeseriesBaseflow
         Dim lMethod As String = ""
         Dim lMethods As ArrayList = Nothing
         Dim lDrainageArea As Double = 0
+        Dim lBFINDay As Integer = 0
+        Dim lBFIFrac As Double
+        Dim lBFIK1Day As Double
+        Dim lBFIUseSymbol As Boolean = False
         Dim lStationFile As String = ""
 
         Dim lAttributeDef As atcAttributeDefinition = Nothing
@@ -163,6 +167,26 @@ Public Class atcTimeseriesBaseflow
             lMethod = aArgs.GetValue("Method")
             lMethods = aArgs.GetValue("Methods")
             lDrainageArea = aArgs.GetValue("Drainage Area")
+            'If lMethods.Contains(BFMethods.HySEPFixed) OrElse _
+            '   lMethods.Contains(BFMethods.HySEPLocMin) OrElse _
+            '   lMethods.Contains(BFMethods.HySEPSlide) OrElse _
+            '   lMethods.Contains(BFMethods.PART) Then
+
+            'End If
+            Dim lBFIChosen As Boolean = False
+            If lMethods.Contains(BFMethods.BFIStandard) Then
+                lBFIFrac = aArgs.GetValue("BFIFrac")
+                lBFIChosen = True
+            End If
+            If lMethods.Contains(BFMethods.BFIModified) Then
+                lBFIK1Day = aArgs.GetValue("BFIK1Day")
+                lBFIChosen = True
+            End If
+            If lBFIChosen Then
+                lBFINDay = aArgs.GetValue("BFINDay")
+                lBFIUseSymbol = aArgs.GetValue("BFIUseSymbol")
+            End If
+
             lStationFile = aArgs.GetValue("Station File")
 
             'If aArgs.ContainsAttribute("BoundaryMonth") Then
@@ -201,9 +225,28 @@ Public Class atcTimeseriesBaseflow
                     CType(ClsBaseFlow, clsBaseflowHySep).Method = BFMethods.HySEPSlide
                 Case BFMethods.PART
                     ClsBaseFlow = New clsBaseflowPart()
+                Case BFMethods.BFIStandard
+                    ClsBaseFlow = New clsBaseflowBFI()
+                    CType(ClsBaseFlow, clsBaseflowBFI).Method = BFMethods.BFIStandard
+                Case BFMethods.BFIModified
+                    ClsBaseFlow = New clsBaseflowBFI()
+                    CType(ClsBaseFlow, clsBaseflowBFI).Method = BFMethods.BFIModified
                 Case Else
             End Select
             With ClsBaseFlow
+
+                If lMethod = BFMethods.BFIStandard Or lMethod = BFMethods.BFIModified Then
+                    CType(ClsBaseFlow, clsBaseflowBFI).PartitionLengthInDays = lBFINDay
+                    CType(ClsBaseFlow, clsBaseflowBFI).UseSymbols = lBFIUseSymbol
+                    If lMethod = BFMethods.BFIStandard Then
+                        CType(ClsBaseFlow, clsBaseflowBFI).TPTestFraction = lBFIFrac
+                    ElseIf lMethod = BFMethods.BFIModified Then
+                        CType(ClsBaseFlow, clsBaseflowBFI).OneDayRecessConstant = lBFIK1Day
+                    End If
+                End If
+
+                'even though BFI doesn't need it, but set it nonetheless, won't hurt
+                'later on reporting and graphing need it too
                 .DrainageArea = lDrainageArea
                 .TargetTS = lTsStreamflow
                 .StartDate = lStartDate
@@ -219,8 +262,6 @@ Public Class atcTimeseriesBaseflow
                 lBFDataGroupFinal.AddRange(lBFDatagroup)
             End If
         Next
-
-
 
         'If Me.DataSets.Count > 0 Then
         If lBFDataGroupFinal IsNot Nothing AndAlso lBFDataGroupFinal.Count > 0 Then
