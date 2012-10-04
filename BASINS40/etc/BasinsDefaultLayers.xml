@@ -26,6 +26,8 @@
 <Layer Filename="NLCD_LandCover_2001.tif" Name="NLCD 2001 Landcover" Group="Soil, Land Use/Cover" Visible="yes" />
 <Layer Filename="NLCD_Impervious_2001.tif" Name="NLCD 2001 Impervious" Group="Soil, Land Use/Cover" Visible="yes" />
 <Layer Filename="NLCD_Canopy_2001.tif" Name="NLCD 2001 Canopy" Group="Soil, Land Use/Cover" Visible="yes" />
+<Layer Filename="NLCD_LandCover_2006.tif" Name="NLCD 2006 Landcover" Group="Soil, Land Use/Cover" Visible="yes" />
+<Layer Filename="NLCD_Impervious_2006.tif" Name="NLCD 2006 Impervious" Group="Soil, Land Use/Cover" Visible="yes" />
 
 <Layer Filename="acc.shp" Name="Accounting Unit Boundaries" Group="Hydrology" />
 <Layer Filename="bac_stat.shp" Name="Bacteria" Group="Observed Data Stations" />
