@@ -94,6 +94,7 @@
     </Compile>
     <Compile Include="atcTimeseriesBaseflow.vb" />
     <Compile Include="clsBaseflow.vb" />
+    <Compile Include="clsBaseflowBFI.vb" />
     <Compile Include="clsBaseflowHySep.vb" />
     <Compile Include="clsBaseflowPart.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

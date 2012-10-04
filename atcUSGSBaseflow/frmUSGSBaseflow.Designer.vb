@@ -37,6 +37,9 @@ Partial Class frmUSGSBaseflow
         Me.lblDataEnd = New System.Windows.Forms.Label
         Me.lblDataStart = New System.Windows.Forms.Label
         Me.toolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.chkMethodBFI = New System.Windows.Forms.CheckBox
+        Me.chkMethodBFIStandard = New System.Windows.Forms.CheckBox
+        Me.chkMethodBFIModified = New System.Windows.Forms.CheckBox
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem
@@ -65,29 +68,38 @@ Partial Class frmUSGSBaseflow
         Me.chkMethodHySEPLocMin = New System.Windows.Forms.CheckBox
         Me.chkMethodHySEPFixed = New System.Windows.Forms.CheckBox
         Me.gbGraph = New System.Windows.Forms.GroupBox
-        Me.gbDrainageArea = New System.Windows.Forms.GroupBox
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.gbBFI = New System.Windows.Forms.GroupBox
+        Me.txtK = New System.Windows.Forms.TextBox
+        Me.txtF = New System.Windows.Forms.TextBox
+        Me.txtN = New System.Windows.Forms.TextBox
+        Me.lblK = New System.Windows.Forms.Label
+        Me.lblF = New System.Windows.Forms.Label
+        Me.lblN = New System.Windows.Forms.Label
+        Me.chkBFISymbols = New System.Windows.Forms.CheckBox
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
         Me.gbBFMethods.SuspendLayout()
         Me.gbGraph.SuspendLayout()
-        Me.gbDrainageArea.SuspendLayout()
+        Me.gbBFI.SuspendLayout()
         Me.SuspendLayout()
         '
         'txtDrainageArea
         '
         Me.txtDrainageArea.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDrainageArea.Location = New System.Drawing.Point(23, 29)
+        Me.txtDrainageArea.Location = New System.Drawing.Point(211, 27)
         Me.txtDrainageArea.Name = "txtDrainageArea"
-        Me.txtDrainageArea.Size = New System.Drawing.Size(107, 20)
+        Me.txtDrainageArea.Size = New System.Drawing.Size(124, 20)
         Me.txtDrainageArea.TabIndex = 6
+        Me.txtDrainageArea.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'lblDrainageAreaUnits
         '
         Me.lblDrainageAreaUnits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblDrainageAreaUnits.AutoSize = True
-        Me.lblDrainageAreaUnits.Location = New System.Drawing.Point(136, 32)
+        Me.lblDrainageAreaUnits.Location = New System.Drawing.Point(341, 30)
         Me.lblDrainageAreaUnits.Name = "lblDrainageAreaUnits"
         Me.lblDrainageAreaUnits.Size = New System.Drawing.Size(31, 13)
         Me.lblDrainageAreaUnits.TabIndex = 4
@@ -116,9 +128,9 @@ Partial Class frmUSGSBaseflow
         Me.gbDates.Controls.Add(Me.txtDataStart)
         Me.gbDates.Controls.Add(Me.lblDataEnd)
         Me.gbDates.Controls.Add(Me.lblDataStart)
-        Me.gbDates.Location = New System.Drawing.Point(12, 159)
+        Me.gbDates.Location = New System.Drawing.Point(12, 174)
         Me.gbDates.Name = "gbDates"
-        Me.gbDates.Size = New System.Drawing.Size(344, 114)
+        Me.gbDates.Size = New System.Drawing.Size(361, 114)
         Me.gbDates.TabIndex = 7
         Me.gbDates.TabStop = False
         Me.gbDates.Text = "Define Analysis Dates"
@@ -147,7 +159,7 @@ Partial Class frmUSGSBaseflow
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtEndDateUser.Location = New System.Drawing.Point(194, 58)
         Me.txtEndDateUser.Name = "txtEndDateUser"
-        Me.txtEndDateUser.Size = New System.Drawing.Size(144, 20)
+        Me.txtEndDateUser.Size = New System.Drawing.Size(161, 20)
         Me.txtEndDateUser.TabIndex = 9
         Me.toolTip1.SetToolTip(Me.txtEndDateUser, "User-specified ending date: yyyy/mm/dd")
         '
@@ -157,7 +169,7 @@ Partial Class frmUSGSBaseflow
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtStartDateUser.Location = New System.Drawing.Point(194, 31)
         Me.txtStartDateUser.Name = "txtStartDateUser"
-        Me.txtStartDateUser.Size = New System.Drawing.Size(144, 20)
+        Me.txtStartDateUser.Size = New System.Drawing.Size(161, 20)
         Me.txtStartDateUser.TabIndex = 8
         Me.toolTip1.SetToolTip(Me.txtStartDateUser, "User-specified starting date: yyyy/mm/dd")
         '
@@ -199,13 +211,46 @@ Partial Class frmUSGSBaseflow
         Me.lblDataStart.TabIndex = 0
         Me.lblDataStart.Text = "Data Start"
         '
+        'chkMethodBFI
+        '
+        Me.chkMethodBFI.AutoSize = True
+        Me.chkMethodBFI.Location = New System.Drawing.Point(6, 112)
+        Me.chkMethodBFI.Name = "chkMethodBFI"
+        Me.chkMethodBFI.Size = New System.Drawing.Size(42, 17)
+        Me.chkMethodBFI.TabIndex = 5
+        Me.chkMethodBFI.Text = "BFI"
+        Me.toolTip1.SetToolTip(Me.chkMethodBFI, "Annual baseflow index")
+        Me.chkMethodBFI.UseVisualStyleBackColor = True
+        '
+        'chkMethodBFIStandard
+        '
+        Me.chkMethodBFIStandard.AutoSize = True
+        Me.chkMethodBFIStandard.Location = New System.Drawing.Point(7, 20)
+        Me.chkMethodBFIStandard.Name = "chkMethodBFIStandard"
+        Me.chkMethodBFIStandard.Size = New System.Drawing.Size(69, 17)
+        Me.chkMethodBFIStandard.TabIndex = 6
+        Me.chkMethodBFIStandard.Text = "Standard"
+        Me.toolTip1.SetToolTip(Me.chkMethodBFIStandard, "Institute of Hydrology Method (Standard)")
+        Me.chkMethodBFIStandard.UseVisualStyleBackColor = True
+        '
+        'chkMethodBFIModified
+        '
+        Me.chkMethodBFIModified.AutoSize = True
+        Me.chkMethodBFIModified.Location = New System.Drawing.Point(82, 20)
+        Me.chkMethodBFIModified.Name = "chkMethodBFIModified"
+        Me.chkMethodBFIModified.Size = New System.Drawing.Size(66, 17)
+        Me.chkMethodBFIModified.TabIndex = 7
+        Me.chkMethodBFIModified.Text = "Modified"
+        Me.toolTip1.SetToolTip(Me.chkMethodBFIModified, "Modified Method")
+        Me.chkMethodBFIModified.UseVisualStyleBackColor = True
+        '
         'MenuStrip1
         '
         Me.MenuStrip1.BackColor = System.Drawing.SystemColors.Window
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(368, 27)
+        Me.MenuStrip1.Size = New System.Drawing.Size(385, 24)
         Me.MenuStrip1.TabIndex = 28
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -213,63 +258,63 @@ Partial Class frmUSGSBaseflow
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData, Me.mnuOutput, Me.mnuGraphBF})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(45, 23)
+        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(172, 24)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuOutput
         '
         Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
         Me.mnuOutput.Name = "mnuOutput"
-        Me.mnuOutput.Size = New System.Drawing.Size(172, 24)
+        Me.mnuOutput.Size = New System.Drawing.Size(140, 22)
         Me.mnuOutput.Text = "Output"
         '
         'mnuOutputASCII
         '
         Me.mnuOutputASCII.Name = "mnuOutputASCII"
-        Me.mnuOutputASCII.Size = New System.Drawing.Size(136, 24)
+        Me.mnuOutputASCII.Size = New System.Drawing.Size(113, 22)
         Me.mnuOutputASCII.Text = "ASCII"
         '
         'mnuGraphBF
         '
         Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphDuration, Me.mnuGraphCDistPlot})
         Me.mnuGraphBF.Name = "mnuGraphBF"
-        Me.mnuGraphBF.Size = New System.Drawing.Size(172, 24)
+        Me.mnuGraphBF.Size = New System.Drawing.Size(140, 22)
         Me.mnuGraphBF.Text = "Graph"
         '
         'mnuGraphTimeseries
         '
         Me.mnuGraphTimeseries.Name = "mnuGraphTimeseries"
-        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(187, 24)
+        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(146, 22)
         Me.mnuGraphTimeseries.Text = "TimeSeries"
         '
         'mnuGraphDuration
         '
         Me.mnuGraphDuration.Name = "mnuGraphDuration"
-        Me.mnuGraphDuration.Size = New System.Drawing.Size(187, 24)
+        Me.mnuGraphDuration.Size = New System.Drawing.Size(146, 22)
         Me.mnuGraphDuration.Text = "Duration"
         '
         'mnuGraphCDistPlot
         '
         Me.mnuGraphCDistPlot.Name = "mnuGraphCDistPlot"
-        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(187, 24)
+        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(146, 22)
         Me.mnuGraphCDistPlot.Text = "Cummulative"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(79, 23)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(58, 20)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(53, 23)
+        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
         Me.mnuHelp.Text = "Help"
         '
         'txtOutputRootName
@@ -298,9 +343,9 @@ Partial Class frmUSGSBaseflow
         Me.gbTextOutput.Controls.Add(Me.lblOutputDir)
         Me.gbTextOutput.Controls.Add(Me.txtOutputRootName)
         Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
-        Me.gbTextOutput.Location = New System.Drawing.Point(12, 274)
+        Me.gbTextOutput.Location = New System.Drawing.Point(12, 294)
         Me.gbTextOutput.Name = "gbTextOutput"
-        Me.gbTextOutput.Size = New System.Drawing.Size(344, 111)
+        Me.gbTextOutput.Size = New System.Drawing.Size(361, 111)
         Me.gbTextOutput.TabIndex = 11
         Me.gbTextOutput.TabStop = False
         Me.gbTextOutput.Text = "Text Output"
@@ -308,7 +353,7 @@ Partial Class frmUSGSBaseflow
         'btnWriteASCIIOutput
         '
         Me.btnWriteASCIIOutput.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnWriteASCIIOutput.Location = New System.Drawing.Point(210, 82)
+        Me.btnWriteASCIIOutput.Location = New System.Drawing.Point(227, 82)
         Me.btnWriteASCIIOutput.Name = "btnWriteASCIIOutput"
         Me.btnWriteASCIIOutput.Size = New System.Drawing.Size(128, 23)
         Me.btnWriteASCIIOutput.TabIndex = 15
@@ -319,7 +364,7 @@ Partial Class frmUSGSBaseflow
         '
         Me.chkTabDelimited.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkTabDelimited.AutoSize = True
-        Me.chkTabDelimited.Location = New System.Drawing.Point(113, 86)
+        Me.chkTabDelimited.Location = New System.Drawing.Point(130, 86)
         Me.chkTabDelimited.Name = "chkTabDelimited"
         Me.chkTabDelimited.Size = New System.Drawing.Size(91, 17)
         Me.chkTabDelimited.TabIndex = 14
@@ -333,7 +378,7 @@ Partial Class frmUSGSBaseflow
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOutputDir.Location = New System.Drawing.Point(78, 20)
         Me.txtOutputDir.Name = "txtOutputDir"
-        Me.txtOutputDir.Size = New System.Drawing.Size(260, 20)
+        Me.txtOutputDir.Size = New System.Drawing.Size(277, 20)
         Me.txtOutputDir.TabIndex = 12
         '
         'lblOutputDir
@@ -383,21 +428,22 @@ Partial Class frmUSGSBaseflow
         '
         'gbBFMethods
         '
+        Me.gbBFMethods.Controls.Add(Me.chkMethodBFI)
         Me.gbBFMethods.Controls.Add(Me.chkMethodPART)
         Me.gbBFMethods.Controls.Add(Me.chkMethodHySEPSlide)
         Me.gbBFMethods.Controls.Add(Me.chkMethodHySEPLocMin)
         Me.gbBFMethods.Controls.Add(Me.chkMethodHySEPFixed)
         Me.gbBFMethods.Location = New System.Drawing.Point(12, 30)
         Me.gbBFMethods.Name = "gbBFMethods"
-        Me.gbBFMethods.Size = New System.Drawing.Size(165, 123)
+        Me.gbBFMethods.Size = New System.Drawing.Size(112, 138)
         Me.gbBFMethods.TabIndex = 0
         Me.gbBFMethods.TabStop = False
-        Me.gbBFMethods.Text = "Separation Methods To Use"
+        Me.gbBFMethods.Text = "Select Method(s)"
         '
         'chkMethodPART
         '
         Me.chkMethodPART.AutoSize = True
-        Me.chkMethodPART.Location = New System.Drawing.Point(6, 91)
+        Me.chkMethodPART.Location = New System.Drawing.Point(6, 89)
         Me.chkMethodPART.Name = "chkMethodPART"
         Me.chkMethodPART.Size = New System.Drawing.Size(55, 17)
         Me.chkMethodPART.TabIndex = 4
@@ -407,7 +453,7 @@ Partial Class frmUSGSBaseflow
         'chkMethodHySEPSlide
         '
         Me.chkMethodHySEPSlide.AutoSize = True
-        Me.chkMethodHySEPSlide.Location = New System.Drawing.Point(7, 68)
+        Me.chkMethodHySEPSlide.Location = New System.Drawing.Point(6, 66)
         Me.chkMethodHySEPSlide.Name = "chkMethodHySEPSlide"
         Me.chkMethodHySEPSlide.Size = New System.Drawing.Size(86, 17)
         Me.chkMethodHySEPSlide.TabIndex = 3
@@ -417,7 +463,7 @@ Partial Class frmUSGSBaseflow
         'chkMethodHySEPLocMin
         '
         Me.chkMethodHySEPLocMin.AutoSize = True
-        Me.chkMethodHySEPLocMin.Location = New System.Drawing.Point(7, 44)
+        Me.chkMethodHySEPLocMin.Location = New System.Drawing.Point(6, 43)
         Me.chkMethodHySEPLocMin.Name = "chkMethodHySEPLocMin"
         Me.chkMethodHySEPLocMin.Size = New System.Drawing.Size(98, 17)
         Me.chkMethodHySEPLocMin.TabIndex = 2
@@ -427,7 +473,7 @@ Partial Class frmUSGSBaseflow
         'chkMethodHySEPFixed
         '
         Me.chkMethodHySEPFixed.AutoSize = True
-        Me.chkMethodHySEPFixed.Location = New System.Drawing.Point(7, 20)
+        Me.chkMethodHySEPFixed.Location = New System.Drawing.Point(6, 20)
         Me.chkMethodHySEPFixed.Name = "chkMethodHySEPFixed"
         Me.chkMethodHySEPFixed.Size = New System.Drawing.Size(88, 17)
         Me.chkMethodHySEPFixed.TabIndex = 1
@@ -442,32 +488,122 @@ Partial Class frmUSGSBaseflow
         Me.gbGraph.Controls.Add(Me.btnGraphCDist)
         Me.gbGraph.Controls.Add(Me.btnGraphTimeseries)
         Me.gbGraph.Controls.Add(Me.btnGraphDuration)
-        Me.gbGraph.Location = New System.Drawing.Point(12, 391)
+        Me.gbGraph.Location = New System.Drawing.Point(12, 411)
         Me.gbGraph.Name = "gbGraph"
-        Me.gbGraph.Size = New System.Drawing.Size(344, 90)
+        Me.gbGraph.Size = New System.Drawing.Size(361, 90)
         Me.gbGraph.TabIndex = 16
         Me.gbGraph.TabStop = False
         Me.gbGraph.Text = "Display Graph"
         '
-        'gbDrainageArea
+        'Label1
         '
-        Me.gbDrainageArea.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(130, 30)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(75, 13)
+        Me.Label1.TabIndex = 29
+        Me.Label1.Text = "Drainage Area"
+        '
+        'gbBFI
+        '
+        Me.gbBFI.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.gbDrainageArea.Controls.Add(Me.txtDrainageArea)
-        Me.gbDrainageArea.Controls.Add(Me.lblDrainageAreaUnits)
-        Me.gbDrainageArea.Location = New System.Drawing.Point(183, 30)
-        Me.gbDrainageArea.Name = "gbDrainageArea"
-        Me.gbDrainageArea.Size = New System.Drawing.Size(173, 123)
-        Me.gbDrainageArea.TabIndex = 5
-        Me.gbDrainageArea.TabStop = False
-        Me.gbDrainageArea.Text = "Drainage Area"
+        Me.gbBFI.Controls.Add(Me.chkBFISymbols)
+        Me.gbBFI.Controls.Add(Me.chkMethodBFIModified)
+        Me.gbBFI.Controls.Add(Me.chkMethodBFIStandard)
+        Me.gbBFI.Controls.Add(Me.txtK)
+        Me.gbBFI.Controls.Add(Me.txtF)
+        Me.gbBFI.Controls.Add(Me.txtN)
+        Me.gbBFI.Controls.Add(Me.lblK)
+        Me.gbBFI.Controls.Add(Me.lblF)
+        Me.gbBFI.Controls.Add(Me.lblN)
+        Me.gbBFI.Location = New System.Drawing.Point(133, 53)
+        Me.gbBFI.Name = "gbBFI"
+        Me.gbBFI.Size = New System.Drawing.Size(240, 115)
+        Me.gbBFI.TabIndex = 30
+        Me.gbBFI.TabStop = False
+        Me.gbBFI.Text = "BFI"
+        '
+        'txtK
+        '
+        Me.txtK.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtK.Location = New System.Drawing.Point(169, 89)
+        Me.txtK.Name = "txtK"
+        Me.txtK.Size = New System.Drawing.Size(65, 20)
+        Me.txtK.TabIndex = 5
+        Me.txtK.Text = "0.97915"
+        Me.txtK.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'txtF
+        '
+        Me.txtF.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtF.Location = New System.Drawing.Point(169, 63)
+        Me.txtF.Name = "txtF"
+        Me.txtF.Size = New System.Drawing.Size(65, 20)
+        Me.txtF.TabIndex = 4
+        Me.txtF.Text = "0.9"
+        Me.txtF.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'txtN
+        '
+        Me.txtN.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtN.Location = New System.Drawing.Point(169, 37)
+        Me.txtN.Name = "txtN"
+        Me.txtN.Size = New System.Drawing.Size(65, 20)
+        Me.txtN.TabIndex = 3
+        Me.txtN.Text = "5"
+        Me.txtN.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'lblK
+        '
+        Me.lblK.AutoSize = True
+        Me.lblK.Location = New System.Drawing.Point(6, 92)
+        Me.lblK.Name = "lblK"
+        Me.lblK.Size = New System.Drawing.Size(160, 13)
+        Me.lblK.TabIndex = 2
+        Me.lblK.Text = "One-Day Recession Constant(K)"
+        '
+        'lblF
+        '
+        Me.lblF.AutoSize = True
+        Me.lblF.Location = New System.Drawing.Point(24, 67)
+        Me.lblF.Name = "lblF"
+        Me.lblF.Size = New System.Drawing.Size(139, 13)
+        Me.lblF.TabIndex = 1
+        Me.lblF.Text = "Turning Point Test Factor(F)"
+        '
+        'lblN
+        '
+        Me.lblN.AutoSize = True
+        Me.lblN.Location = New System.Drawing.Point(37, 40)
+        Me.lblN.Name = "lblN"
+        Me.lblN.Size = New System.Drawing.Size(126, 13)
+        Me.lblN.TabIndex = 0
+        Me.lblN.Text = "Partition Length (N, days)"
+        '
+        'chkBFISymbols
+        '
+        Me.chkBFISymbols.AutoSize = True
+        Me.chkBFISymbols.Location = New System.Drawing.Point(169, 20)
+        Me.chkBFISymbols.Name = "chkBFISymbols"
+        Me.chkBFISymbols.Size = New System.Drawing.Size(65, 17)
+        Me.chkBFISymbols.TabIndex = 8
+        Me.chkBFISymbols.Text = "Symbols"
+        Me.toolTip1.SetToolTip(Me.chkBFISymbols, "Use symbols in output file")
+        Me.chkBFISymbols.UseVisualStyleBackColor = True
         '
         'frmUSGSBaseflow
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(368, 494)
-        Me.Controls.Add(Me.gbDrainageArea)
+        Me.ClientSize = New System.Drawing.Size(385, 508)
+        Me.Controls.Add(Me.gbBFI)
+        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.lblDrainageAreaUnits)
+        Me.Controls.Add(Me.txtDrainageArea)
         Me.Controls.Add(Me.gbGraph)
         Me.Controls.Add(Me.gbBFMethods)
         Me.Controls.Add(Me.gbDates)
@@ -486,8 +622,8 @@ Partial Class frmUSGSBaseflow
         Me.gbBFMethods.ResumeLayout(False)
         Me.gbBFMethods.PerformLayout()
         Me.gbGraph.ResumeLayout(False)
-        Me.gbDrainageArea.ResumeLayout(False)
-        Me.gbDrainageArea.PerformLayout()
+        Me.gbBFI.ResumeLayout(False)
+        Me.gbBFI.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -531,7 +667,18 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents chkMethodHySEPFixed As System.Windows.Forms.CheckBox
     Friend WithEvents chkMethodPART As System.Windows.Forms.CheckBox
     Friend WithEvents gbGraph As System.Windows.Forms.GroupBox
-    Friend WithEvents gbDrainageArea As System.Windows.Forms.GroupBox
     Friend WithEvents lblPeriodOfRecord As System.Windows.Forms.Label
     Friend WithEvents lblAnalysisDates As System.Windows.Forms.Label
+    Friend WithEvents chkMethodBFI As System.Windows.Forms.CheckBox
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents gbBFI As System.Windows.Forms.GroupBox
+    Friend WithEvents lblF As System.Windows.Forms.Label
+    Friend WithEvents lblN As System.Windows.Forms.Label
+    Friend WithEvents txtK As System.Windows.Forms.TextBox
+    Friend WithEvents txtF As System.Windows.Forms.TextBox
+    Friend WithEvents txtN As System.Windows.Forms.TextBox
+    Friend WithEvents lblK As System.Windows.Forms.Label
+    Friend WithEvents chkMethodBFIModified As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMethodBFIStandard As System.Windows.Forms.CheckBox
+    Friend WithEvents chkBFISymbols As System.Windows.Forms.CheckBox
 End Class
