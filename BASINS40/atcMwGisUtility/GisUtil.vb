@@ -4108,79 +4108,56 @@ Public Class GisUtil
     ''' </summary>
     ''' <param name="aLayerIndex">Index of desired layer</param>
     ''' <param name="aFieldIndex">Index of desired field</param>
-    Public Shared Sub UniqueValuesRenderer(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, Optional ByVal aColors As Collection = Nothing, _
-                                                   Optional ByVal aCaptions As Collection = Nothing)
-        'build a unique values renderer from a given layer and field
+    Public Shared Sub UniqueValuesRenderer(ByVal aLayerIndex As Integer, _
+                                           ByVal aFieldIndex As Integer, _
+                                  Optional ByVal aColors As Collection = Nothing, _
+                                  Optional ByVal aCaptions As Collection = Nothing)
 
         Dim lMWlayer As MapWindow.Interfaces.Layer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
-
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
-        Dim options As MapWinGIS.ShapeDrawingOptions = lSf.DefaultDrawingOptions
-        options.FillVisible = True
+        'following causes .dbf file to be locked due to bug in MW4.8
 
-        ' set different colors by region ([Region] field is expected in attribute table)
-        lSf.Categories.Generate(aFieldIndex, MapWinGIS.tkClassificationType.ctUniqueValues, 0)
-        lSf.Categories.ApplyExpressions()
+        'lSf.Categories.Generate(aFieldIndex, MapWinGIS.tkClassificationType.ctUniqueValues, 0)
+        'lSf.Categories.ApplyExpressions()
+        '' apply colors automatically
+        'Dim scheme As New MapWinGIS.ColorScheme
+        'scheme.SetColors(System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))), _
+        '                 System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))))
+        'lSf.Categories.ApplyColorScheme(MapWinGIS.tkColorSchemeType.ctSchemeRandom, scheme)
+        'lSf.Categories.ApplyExpressions()
+        'work-around by LCW: manually add the categories and assign to shapes
+        'form dictionary of unique values associated with lists of associated layers
 
-        ' apply colors automatically
-        Dim scheme As New MapWinGIS.ColorScheme
-        scheme.SetColors(System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))), _
-                         System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))))
-        lSf.Categories.ApplyColorScheme(MapWinGIS.tkColorSchemeType.ctSchemeRandom, scheme)
-        lSf.Categories.ApplyExpressions()
+        Dim lUniqueValues As New Generic.Dictionary(Of String, Generic.List(Of Integer))
+        For shpIndex As Integer = 0 To lSf.NumShapes - 1
+            Dim shpValue As String = GisUtil.FieldValue(aLayerIndex, shpIndex, aFieldIndex)
+            If Not lUniqueValues.ContainsKey(shpValue) Then
+                Dim lst As New Generic.List(Of Integer)
+                lUniqueValues.Add(shpValue, lst)
+            End If
+            lUniqueValues(shpValue).Add(shpIndex)
+        Next
 
-        If aColors IsNot Nothing And aCaptions IsNot Nothing Then
-            'insert code here to set the captions and colors as desired
-            'If Not aColors Is Nothing Then
-            '    If aColors.Count > i Then
-            '        lBrk.StartColor = aColors(i + 1)
-            '        lBrk.EndColor = lBrk.StartColor
-            '    End If
-            'End If
-            'If Not aCaptions Is Nothing Then
-            '    If aCaptions.Count > i Then
-            '        lBrk.Caption = aCaptions(i + 1)
-            '    End If
-            'End If
-        End If
-
-        GetMappingObject.View.Redraw()
-        GetMappingObject.View.LegendControl.Refresh()
-        'lMWlayer.DrawFill = True
-
-        ''Get unique values
-        'Dim lValuesHt As New Hashtable
-        'Dim lIndex As Integer
-        'Dim lValue As Object
-        'For lIndex = 0 To lSf.NumShapes - 1
-        '    lValue = lSf.CellValue(aFieldIndex, lIndex)
-        '    If lValuesHt.ContainsKey(lValue) = False Then
-        '        lValuesHt.Add(lValue, lValue)
-        '    End If
-        'Next
-
-        ''Create sorted array
-        'Dim lValuesArray() As Object
-        'ReDim lValuesArray(lValuesHt.Count - 1)
-        'lValuesHt.Values().CopyTo(lValuesArray, 0)
-        'Array.Sort(lValuesArray)
-
-        'Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
-        'lColorScheme.FieldIndex = aFieldIndex
-
-        ''Create color for each unique value
-        'For lIndex = 0 To lValuesArray.Length - 1
-        '    Dim lBreak As New MapWinGIS.ShapefileColorBreak
-        '    lBreak.StartColor = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
-        '    lBreak.EndColor = lBreak.StartColor
-        '    lBreak.StartValue = lValuesArray(lIndex)
-        '    lBreak.EndValue = lValuesArray(lIndex)
-        '    lBreak.Caption = lValuesArray(lIndex)
-        '    lColorScheme.Add(lBreak)
-        'Next
-        'lMWlayer.ColoringScheme = lColorScheme
-
+        'create list of unique colors to we make sure none are repeated
+        Dim lstUniqueColors As New Generic.List(Of Integer)
+        lSf.Categories.Clear()
+        For Each shpValue As String In lUniqueValues.Keys
+            With lSf.Categories.Add(shpValue)
+                With .DrawingOptions
+                    Dim color As Integer = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
+                    Do Until Not lstUniqueColors.Contains(color)
+                        color = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
+                    Loop
+                    lstUniqueColors.Add(color)
+                    .LineColor = color
+                    .FillColor = color
+                End With
+            End With
+            For Each shpIndex As Integer In lUniqueValues(shpValue)
+                lSf.ShapeCategory(shpIndex) = lSf.Categories.Count - 1
+            Next
+        Next
     End Sub
 
     Public Shared Sub BufferLayer(ByVal aInputShapefileFilename As String, ByVal aResultShapefileFilename As String, _
