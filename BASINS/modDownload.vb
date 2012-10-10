@@ -83,10 +83,11 @@ Public Module modDownload
                                 For Each lFilename As String In lFilenames
                                     If Not FileExt(lFilename) = "mwprj" And Not FileExt(lFilename) = "bmp" Then
                                         lTarget = lNewDataDir & Mid(lFilename, Len(PathNameOnly(GisUtil.ProjectFileName)) + 2)
-                                        If Not FileExists(lTarget) Then
+                                        If (Not FileExists(lTarget)) Or (FileExt(lFilename) = "prj") Then
                                             g_StatusBar(1).Text = "Copying " & FilenameNoPath(lFilename.ToString)
                                             RefreshView()
-                                            IO.File.Copy(lFilename, lTarget, False)
+                                            MkDirPath(PathNameOnly(lTarget))
+                                            IO.File.Copy(lFilename, lTarget, True)
                                         End If
                                     End If
                                 Next
@@ -1767,34 +1768,36 @@ StartOver:
     ''' <remarks>New MW 4.8 symbology</remarks>
     Friend Sub SetMetIcons(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
         Dim lRenderersPath As String = IO.Path.Combine(PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)), "etc") & g_PathChar & "renderers" & g_PathChar
-        shpFile.Categories.Generate(5, MapWinGIS.tkClassificationType.ctUniqueValues, 7)
-        shpFile.Categories.ApplyExpressions()
-        shpFile.CollisionMode = tkCollisionMode.AllowCollisions
-        For iShape As Integer = 0 To 6
-            With shpFile.Categories.Item(iShape)
-                Dim lConstituent As String = .Expression.Split("""")(1)
-                Dim lIconFilename As String = IO.Path.Combine(lRenderersPath, "met-" & lConstituent & ".png")
-                With .DrawingOptions
-                    If IO.File.Exists(lIconFilename) Then
-                        Logger.Dbg("Set met station icon for " & lConstituent)
-                        Dim img As New MapWinGIS.Image
-                        If Not img.Open(lIconFilename) Then GoTo NoIcon
-                        .PointType = tkPointSymbolType.ptSymbolPicture
-                        .PointRotation = 0
-                        .Picture = img
-                        .FillBgTransparent = True
-                    Else
-NoIcon:                 Logger.Dbg("Icon not found for met station at " & lIconFilename)
-                        .PointType = tkPointSymbolType.ptSymbolStandard
-                        .PointRotation = 45
-                        .PointShape = tkPointShapeType.ptShapeRegular
-                        .PointSidesCount = 4
-                        .PointSize = 10
-                    End If
+        If shpFile.Field(5).Name = "CONSTITUEN" Then
+            shpFile.Categories.Generate(5, MapWinGIS.tkClassificationType.ctUniqueValues, 7)
+            shpFile.Categories.ApplyExpressions()
+            shpFile.CollisionMode = tkCollisionMode.AllowCollisions
+            For iShape As Integer = 0 To 6
+                With shpFile.Categories.Item(iShape)
+                    Dim lConstituent As String = .Expression.Split("""")(1)
+                    Dim lIconFilename As String = IO.Path.Combine(lRenderersPath, "met-" & lConstituent & ".png")
+                    With .DrawingOptions
+                        If IO.File.Exists(lIconFilename) Then
+                            Logger.Dbg("Set met station icon for " & lConstituent)
+                            Dim img As New MapWinGIS.Image
+                            If Not img.Open(lIconFilename) Then GoTo NoIcon
+                            .PointType = tkPointSymbolType.ptSymbolPicture
+                            .PointRotation = 0
+                            .Picture = img
+                            .FillBgTransparent = True
+                        Else
+NoIcon:                     Logger.Dbg("Icon not found for met station at " & lIconFilename)
+                            .PointType = tkPointSymbolType.ptSymbolStandard
+                            .PointRotation = 45
+                            .PointShape = tkPointShapeType.ptShapeRegular
+                            .PointSidesCount = 4
+                            .PointSize = 10
+                        End If
+                    End With
                 End With
-            End With
-        Next
-        shpFile.Save()
+            Next
+            shpFile.Save()
+        End If
     End Sub
 
     Private Sub SetElevationGridColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)
