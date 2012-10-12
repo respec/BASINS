@@ -21,7 +21,8 @@ Public Module modGeoSFM
     Friend pOutputPath As String
     Friend pProjectName As String
 
-    Friend Function Terrain(ByVal aDEMLayerName As String, ByVal aSubbasinLayerName As String, ByVal aStreamLayerName As String, ByVal aThresh As Integer) As Boolean
+    Friend Function Terrain(ByVal aDEMLayerName As String, ByVal aSubbasinLayerName As String, ByVal aStreamLayerName As String, ByVal aThresh As Integer, _
+                            Optional ByVal aUEBWatershedFileName As String = "", Optional ByVal aUEBWaterShedVarName As String = "") As Boolean
 
         ' ***********************************************************************************************
         ' ***********************************************************************************************
@@ -312,6 +313,12 @@ Public Module modGeoSFM
             End If
             GisUtil.AddLayer(lDownstreamGridFileName, lDownstreamGridLayerName)
             GisUtil.SaveProject(GisUtil.ProjectFileName)
+        End If
+
+        'UEB Grid generation
+        If aUEBWatershedFileName.Length > 0 And aUEBWaterShedVarName.Length > 0 Then
+            'generate UEB Watershed grid and slope/aspect grids
+
         End If
 
         Logger.Progress(100, 100)

@@ -21,6 +21,7 @@ Public Class frmGeoSFM
         InitializeComponent()
 
         'Add any initialization after the InitializeComponent() call
+        tpgUEBGrid.Enabled = False
     End Sub
 
     'Form overrides dispose to clean up the component list.
@@ -231,6 +232,16 @@ Public Class frmGeoSFM
     Friend WithEvents LabelModel As System.Windows.Forms.Label
     Friend WithEvents atxModel As atcControls.atcText
     Friend WithEvents gbxShapefiles As System.Windows.Forms.GroupBox
+    Friend WithEvents gbxUEBGrid As System.Windows.Forms.GroupBox
+    Friend WithEvents lblUEBWatershedFile As System.Windows.Forms.Label
+    Friend WithEvents lblUEBWatershedVariable As System.Windows.Forms.Label
+    Friend WithEvents atxUEBWatershedFile As atcControls.atcText
+    Friend WithEvents atxUEBWatershedVariable As atcControls.atcText
+    Friend WithEvents lblUEBGridInstruction As System.Windows.Forms.Label
+    Friend WithEvents tpgUEBGrid As System.Windows.Forms.TabPage
+    Friend WithEvents cmdUEBGridNext As System.Windows.Forms.Button
+    Friend WithEvents cmdDefineUEBGrid As System.Windows.Forms.Button
+    Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -239,6 +250,12 @@ Public Class frmGeoSFM
         Me.cmdAbout = New System.Windows.Forms.Button
         Me.tabMain = New System.Windows.Forms.TabControl
         Me.tpgTerrain = New System.Windows.Forms.TabPage
+        Me.gbxUEBGrid = New System.Windows.Forms.GroupBox
+        Me.lblUEBGridInstruction = New System.Windows.Forms.Label
+        Me.atxUEBWatershedVariable = New atcControls.atcText
+        Me.atxUEBWatershedFile = New atcControls.atcText
+        Me.lblUEBWatershedFile = New System.Windows.Forms.Label
+        Me.lblUEBWatershedVariable = New System.Windows.Forms.Label
         Me.gbxShapefiles = New System.Windows.Forms.GroupBox
         Me.cboReach = New System.Windows.Forms.ComboBox
         Me.Label50 = New System.Windows.Forms.Label
@@ -295,6 +312,7 @@ Public Class frmGeoSFM
         Me.rbnNonUniformUser = New System.Windows.Forms.RadioButton
         Me.rbnNonUniformUSGS = New System.Windows.Forms.RadioButton
         Me.lblMethod = New System.Windows.Forms.Label
+        Me.tpgUEBGrid = New System.Windows.Forms.TabPage
         Me.tpgRain = New System.Windows.Forms.TabPage
         Me.AtcGridPrec = New atcControls.atcGrid
         Me.cmdRainEvapNext = New System.Windows.Forms.Button
@@ -427,11 +445,16 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.cmdDefineUEBGrid = New System.Windows.Forms.Button
+        Me.cmdUEBGridNext = New System.Windows.Forms.Button
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
+        Me.gbxUEBGrid.SuspendLayout()
         Me.gbxShapefiles.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
         Me.tpgResponse.SuspendLayout()
+        Me.tpgUEBGrid.SuspendLayout()
         Me.tpgRain.SuspendLayout()
         Me.gbxSimulationDates.SuspendLayout()
         Me.tpgSoil.SuspendLayout()
@@ -493,6 +516,7 @@ Public Class frmGeoSFM
         Me.tabMain.Controls.Add(Me.tpgTerrain)
         Me.tabMain.Controls.Add(Me.tpgBasin)
         Me.tabMain.Controls.Add(Me.tpgResponse)
+        Me.tabMain.Controls.Add(Me.tpgUEBGrid)
         Me.tabMain.Controls.Add(Me.tpgRain)
         Me.tabMain.Controls.Add(Me.tpgSoil)
         Me.tabMain.Controls.Add(Me.tpgFlow)
@@ -511,6 +535,7 @@ Public Class frmGeoSFM
         '
         'tpgTerrain
         '
+        Me.tpgTerrain.Controls.Add(Me.gbxUEBGrid)
         Me.tpgTerrain.Controls.Add(Me.gbxShapefiles)
         Me.tpgTerrain.Controls.Add(Me.LabelModel)
         Me.tpgTerrain.Controls.Add(Me.atxModel)
@@ -526,6 +551,102 @@ Public Class frmGeoSFM
         Me.tpgTerrain.Text = "Terrain Analysis"
         Me.tpgTerrain.UseVisualStyleBackColor = True
         '
+        'gbxUEBGrid
+        '
+        Me.gbxUEBGrid.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxUEBGrid.Controls.Add(Me.lblUEBGridInstruction)
+        Me.gbxUEBGrid.Controls.Add(Me.atxUEBWatershedVariable)
+        Me.gbxUEBGrid.Controls.Add(Me.atxUEBWatershedFile)
+        Me.gbxUEBGrid.Controls.Add(Me.lblUEBWatershedFile)
+        Me.gbxUEBGrid.Controls.Add(Me.lblUEBWatershedVariable)
+        Me.gbxUEBGrid.Location = New System.Drawing.Point(39, 256)
+        Me.gbxUEBGrid.Name = "gbxUEBGrid"
+        Me.gbxUEBGrid.Size = New System.Drawing.Size(488, 113)
+        Me.gbxUEBGrid.TabIndex = 43
+        Me.gbxUEBGrid.TabStop = False
+        Me.gbxUEBGrid.Text = "Optional UEBGrid Files"
+        '
+        'lblUEBGridInstruction
+        '
+        Me.lblUEBGridInstruction.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblUEBGridInstruction.Location = New System.Drawing.Point(13, 17)
+        Me.lblUEBGridInstruction.Name = "lblUEBGridInstruction"
+        Me.lblUEBGridInstruction.Size = New System.Drawing.Size(469, 35)
+        Me.lblUEBGridInstruction.TabIndex = 43
+        Me.lblUEBGridInstruction.Text = "If connecting to UEBGrid , enter name of netCDF watershed grid file to be generat" & _
+            "ed and variable name for watershed IDs"
+        Me.lblUEBGridInstruction.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'atxUEBWatershedVariable
+        '
+        Me.atxUEBWatershedVariable.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxUEBWatershedVariable.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.atxUEBWatershedVariable.DefaultValue = ""
+        Me.atxUEBWatershedVariable.HardMax = -999
+        Me.atxUEBWatershedVariable.HardMin = -999
+        Me.atxUEBWatershedVariable.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxUEBWatershedVariable.Location = New System.Drawing.Point(101, 87)
+        Me.atxUEBWatershedVariable.MaxWidth = 20
+        Me.atxUEBWatershedVariable.Name = "atxUEBWatershedVariable"
+        Me.atxUEBWatershedVariable.NumericFormat = "0"
+        Me.atxUEBWatershedVariable.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxUEBWatershedVariable.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxUEBWatershedVariable.SelLength = 0
+        Me.atxUEBWatershedVariable.SelStart = 0
+        Me.atxUEBWatershedVariable.Size = New System.Drawing.Size(127, 21)
+        Me.atxUEBWatershedVariable.SoftMax = -999
+        Me.atxUEBWatershedVariable.SoftMin = -999
+        Me.atxUEBWatershedVariable.TabIndex = 42
+        Me.atxUEBWatershedVariable.ValueDouble = 0
+        Me.atxUEBWatershedVariable.ValueInteger = 0
+        '
+        'atxUEBWatershedFile
+        '
+        Me.atxUEBWatershedFile.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxUEBWatershedFile.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.atxUEBWatershedFile.DefaultValue = ""
+        Me.atxUEBWatershedFile.HardMax = -999
+        Me.atxUEBWatershedFile.HardMin = -999
+        Me.atxUEBWatershedFile.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxUEBWatershedFile.Location = New System.Drawing.Point(101, 60)
+        Me.atxUEBWatershedFile.MaxWidth = 20
+        Me.atxUEBWatershedFile.Name = "atxUEBWatershedFile"
+        Me.atxUEBWatershedFile.NumericFormat = "0"
+        Me.atxUEBWatershedFile.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxUEBWatershedFile.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxUEBWatershedFile.SelLength = 0
+        Me.atxUEBWatershedFile.SelStart = 0
+        Me.atxUEBWatershedFile.Size = New System.Drawing.Size(381, 21)
+        Me.atxUEBWatershedFile.SoftMax = -999
+        Me.atxUEBWatershedFile.SoftMin = -999
+        Me.atxUEBWatershedFile.TabIndex = 41
+        Me.atxUEBWatershedFile.ValueDouble = 0
+        Me.atxUEBWatershedFile.ValueInteger = 0
+        '
+        'lblUEBWatershedFile
+        '
+        Me.lblUEBWatershedFile.AutoSize = True
+        Me.lblUEBWatershedFile.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblUEBWatershedFile.Location = New System.Drawing.Point(13, 60)
+        Me.lblUEBWatershedFile.Name = "lblUEBWatershedFile"
+        Me.lblUEBWatershedFile.Size = New System.Drawing.Size(81, 13)
+        Me.lblUEBWatershedFile.TabIndex = 28
+        Me.lblUEBWatershedFile.Text = "Watershed File:"
+        Me.lblUEBWatershedFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblUEBWatershedVariable
+        '
+        Me.lblUEBWatershedVariable.AutoSize = True
+        Me.lblUEBWatershedVariable.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblUEBWatershedVariable.Location = New System.Drawing.Point(13, 87)
+        Me.lblUEBWatershedVariable.Name = "lblUEBWatershedVariable"
+        Me.lblUEBWatershedVariable.Size = New System.Drawing.Size(79, 13)
+        Me.lblUEBWatershedVariable.TabIndex = 30
+        Me.lblUEBWatershedVariable.Text = "Variable Name:"
+        Me.lblUEBWatershedVariable.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
         'gbxShapefiles
         '
         Me.gbxShapefiles.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -535,9 +656,9 @@ Public Class frmGeoSFM
         Me.gbxShapefiles.Controls.Add(Me.Label50)
         Me.gbxShapefiles.Controls.Add(Me.cboSubbasin)
         Me.gbxShapefiles.Controls.Add(Me.Label52)
-        Me.gbxShapefiles.Location = New System.Drawing.Point(39, 173)
+        Me.gbxShapefiles.Location = New System.Drawing.Point(39, 151)
         Me.gbxShapefiles.Name = "gbxShapefiles"
-        Me.gbxShapefiles.Size = New System.Drawing.Size(488, 103)
+        Me.gbxShapefiles.Size = New System.Drawing.Size(488, 89)
         Me.gbxShapefiles.TabIndex = 42
         Me.gbxShapefiles.TabStop = False
         Me.gbxShapefiles.Text = "Optional Shapefiles"
@@ -589,7 +710,7 @@ Public Class frmGeoSFM
         'LabelModel
         '
         Me.LabelModel.AutoSize = True
-        Me.LabelModel.Location = New System.Drawing.Point(36, 30)
+        Me.LabelModel.Location = New System.Drawing.Point(36, 24)
         Me.LabelModel.Name = "LabelModel"
         Me.LabelModel.Size = New System.Drawing.Size(119, 13)
         Me.LabelModel.TabIndex = 41
@@ -603,7 +724,7 @@ Public Class frmGeoSFM
         Me.atxModel.HardMax = -999
         Me.atxModel.HardMin = -999
         Me.atxModel.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxModel.Location = New System.Drawing.Point(161, 27)
+        Me.atxModel.Location = New System.Drawing.Point(161, 21)
         Me.atxModel.MaxWidth = 20
         Me.atxModel.Name = "atxModel"
         Me.atxModel.NumericFormat = "0"
@@ -632,7 +753,7 @@ Public Class frmGeoSFM
         'Label53
         '
         Me.Label53.AutoSize = True
-        Me.Label53.Location = New System.Drawing.Point(37, 126)
+        Me.Label53.Location = New System.Drawing.Point(37, 110)
         Me.Label53.Name = "Label53"
         Me.Label53.Size = New System.Drawing.Size(149, 13)
         Me.Label53.TabIndex = 38
@@ -646,7 +767,7 @@ Public Class frmGeoSFM
         Me.atxThresh.HardMax = 100000
         Me.atxThresh.HardMin = 0
         Me.atxThresh.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxThresh.Location = New System.Drawing.Point(192, 126)
+        Me.atxThresh.Location = New System.Drawing.Point(192, 110)
         Me.atxThresh.MaxWidth = 20
         Me.atxThresh.Name = "atxThresh"
         Me.atxThresh.NumericFormat = "0"
@@ -665,7 +786,7 @@ Public Class frmGeoSFM
         '
         Me.Label51.AutoSize = True
         Me.Label51.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label51.Location = New System.Drawing.Point(36, 90)
+        Me.Label51.Location = New System.Drawing.Point(36, 74)
         Me.Label51.Name = "Label51"
         Me.Label51.Size = New System.Drawing.Size(56, 13)
         Me.Label51.TabIndex = 26
@@ -678,7 +799,7 @@ Public Class frmGeoSFM
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboDEM.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboDEM.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboDEM.Location = New System.Drawing.Point(124, 87)
+        Me.cboDEM.Location = New System.Drawing.Point(124, 71)
         Me.cboDEM.Name = "cboDEM"
         Me.cboDEM.Size = New System.Drawing.Size(403, 21)
         Me.cboDEM.TabIndex = 27
@@ -1232,6 +1353,18 @@ Public Class frmGeoSFM
         Me.lblMethod.Size = New System.Drawing.Size(231, 13)
         Me.lblMethod.TabIndex = 0
         Me.lblMethod.Text = "Method of Overland Flow Velocity Computation:"
+        '
+        'tpgUEBGrid
+        '
+        Me.tpgUEBGrid.Controls.Add(Me.cmdUEBGridNext)
+        Me.tpgUEBGrid.Controls.Add(Me.cmdDefineUEBGrid)
+        Me.tpgUEBGrid.Controls.Add(Me.Label1)
+        Me.tpgUEBGrid.Location = New System.Drawing.Point(4, 46)
+        Me.tpgUEBGrid.Name = "tpgUEBGrid"
+        Me.tpgUEBGrid.Size = New System.Drawing.Size(647, 387)
+        Me.tpgUEBGrid.TabIndex = 17
+        Me.tpgUEBGrid.Text = "UEBGrid"
+        Me.tpgUEBGrid.UseVisualStyleBackColor = True
         '
         'tpgRain
         '
@@ -2846,6 +2979,38 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
+        'Label1
+        '
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(85, 73)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(469, 74)
+        Me.Label1.TabIndex = 44
+        Me.Label1.Text = resources.GetString("Label1.Text")
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cmdDefineUEBGrid
+        '
+        Me.cmdDefineUEBGrid.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdDefineUEBGrid.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdDefineUEBGrid.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdDefineUEBGrid.Location = New System.Drawing.Point(256, 179)
+        Me.cmdDefineUEBGrid.Name = "cmdDefineUEBGrid"
+        Me.cmdDefineUEBGrid.Size = New System.Drawing.Size(136, 28)
+        Me.cmdDefineUEBGrid.TabIndex = 45
+        Me.cmdDefineUEBGrid.Text = "Define UEBGrid Model"
+        '
+        'cmdUEBGridNext
+        '
+        Me.cmdUEBGridNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdUEBGridNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdUEBGridNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdUEBGridNext.Location = New System.Drawing.Point(555, 341)
+        Me.cmdUEBGridNext.Name = "cmdUEBGridNext"
+        Me.cmdUEBGridNext.Size = New System.Drawing.Size(73, 28)
+        Me.cmdUEBGridNext.TabIndex = 52
+        Me.cmdUEBGridNext.Text = "Next >"
+        '
         'frmGeoSFM
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -2863,12 +3028,15 @@ Public Class frmGeoSFM
         Me.tabMain.ResumeLayout(False)
         Me.tpgTerrain.ResumeLayout(False)
         Me.tpgTerrain.PerformLayout()
+        Me.gbxUEBGrid.ResumeLayout(False)
+        Me.gbxUEBGrid.PerformLayout()
         Me.gbxShapefiles.ResumeLayout(False)
         Me.gbxShapefiles.PerformLayout()
         Me.tpgBasin.ResumeLayout(False)
         Me.tpgBasin.PerformLayout()
         Me.tpgResponse.ResumeLayout(False)
         Me.tpgResponse.PerformLayout()
+        Me.tpgUEBGrid.ResumeLayout(False)
         Me.tpgRain.ResumeLayout(False)
         Me.gbxSimulationDates.ResumeLayout(False)
         Me.gbxSimulationDates.PerformLayout()
@@ -2912,6 +3080,7 @@ Public Class frmGeoSFM
     Friend pPrecStations As atcCollection
     Friend pMetStations As atcCollection
     Friend pFlowStations As atcCollection
+    Friend pLinkToUEBGrid As Boolean
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
@@ -3183,6 +3352,8 @@ Public Class frmGeoSFM
     Private Sub cmdTerrainNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTerrainNext.Click
         SetOutputPath(atxModel.Text)
 
+        Dim lTerrainComplete As Boolean = False
+
         If cboDEM.SelectedIndex = -1 Then
             Logger.Msg("No DEM has been selected." & vbCrLf & "Select a DEM to proceed.", "Geospatial Stream Flow Model")
             Exit Sub
@@ -3191,13 +3362,27 @@ Public Class frmGeoSFM
         Dim lSubbasinLayerName As String = cboSubbasin.Items(cboSubbasin.SelectedIndex)
         Dim lStreamLayerName As String = cboReach.Items(cboReach.SelectedIndex)
         Dim lThresh As Integer = atxThresh.ValueInteger
+        Dim lUEBWatershedFileName As String = atxUEBWatershedFile.Text
+        Dim lUEBVariableName As String = atxUEBWatershedVariable.Text
         EnableControls(False)
         lblStatus.Text = "Performing Terrain Analysis ..."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
         'call what was the avenue script 'terrain'
-        If Terrain(lDEMLayerName, lSubbasinLayerName, lStreamLayerName, lThresh) Then
+        If lUEBWatershedFileName.Length > 0 And lUEBVariableName.Length > 0 Then
+            lTerrainComplete = Terrain(lDEMLayerName, lSubbasinLayerName, lStreamLayerName, lThresh, lUEBWatershedFileName, lUEBVariableName)
+            pLinkToUEBGrid = True
+        Else
+            lTerrainComplete = Terrain(lDEMLayerName, lSubbasinLayerName, lStreamLayerName, lThresh)
+            pLinkToUEBGrid = False
+        End If
+        If lTerrainComplete Then
+            If pLinkToUEBGrid Then
+                tabMain.TabPages.Item(3).Enabled = True
+            Else
+                tabMain.TabPages.Item(3).Enabled = False
+            End If
             tabMain.SelectedIndex = 1
         End If
 
