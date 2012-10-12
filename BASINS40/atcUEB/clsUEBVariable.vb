@@ -38,15 +38,15 @@ Public Class clsUEBVariable
         Dim lUEBVar As New clsUEBVariable
         Dim lSpaceVaryingFlag As Integer
 
-        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "")
-        lSpaceVaryingFlag = Integer.Parse(StrSplit(aFileContents, vbCrLf, ""))
+        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "'")
+        lSpaceVaryingFlag = Integer.Parse(StrSplit(aFileContents, vbCrLf, "'"))
         If lSpaceVaryingFlag = 0 Then 'constant value
             lUEBVar.SpaceVarying = False
-            lUEBVar.Value = Double.Parse(StrSplit(aFileContents, vbCrLf, ""))
+            lUEBVar.Value = Double.Parse(StrSplit(aFileContents, vbCrLf, "'"))
         Else
             lUEBVar.SpaceVarying = True
-            lUEBVar.GridFileName = StrSplit(aFileContents, vbCrLf, "")
-            lUEBVar.GridVariableName = StrSplit(aFileContents, vbCrLf, "")
+            lUEBVar.GridFileName = StrSplit(aFileContents, vbCrLf, "'")
+            lUEBVar.GridVariableName = StrSplit(aFileContents, vbCrLf, "'")
         End If
         Return lUEBVar
     End Function
@@ -66,21 +66,21 @@ Public Class clsUEBVariable
         Dim lUEBVar As New clsUEBVariable
         Dim lVaryingFlag As Integer
 
-        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "")
-        lVaryingFlag = Integer.Parse(StrSplit(aFileContents, vbCrLf, ""))
+        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "'")
+        lVaryingFlag = Integer.Parse(StrSplit(aFileContents, vbCrLf, "'"))
         If lVaryingFlag = 0 Then 'constant spatial timeseries
             lUEBVar.TimeVarying = True
             lUEBVar.SpaceVarying = False
-            lUEBVar.TimeFileName = StrSplit(aFileContents, vbCrLf, "")
+            lUEBVar.TimeFileName = StrSplit(aFileContents, vbCrLf, "'")
         ElseIf lVaryingFlag = 1 Then 'varying in space/time
             lUEBVar.TimeVarying = True
             lUEBVar.SpaceVarying = True
-            lUEBVar.GridFileName = StrSplit(aFileContents, vbCrLf, "")
-            lUEBVar.GridVariableName = StrSplit(aFileContents, vbCrLf, "")
+            lUEBVar.GridFileName = StrSplit(aFileContents, vbCrLf, "'")
+            lUEBVar.GridVariableName = StrSplit(aFileContents, vbCrLf, "'")
         Else 'constant space/time
             lUEBVar.TimeVarying = False
             lUEBVar.SpaceVarying = False
-            lUEBVar.Value = Double.Parse(StrSplit(aFileContents, vbCrLf, ""))
+            lUEBVar.Value = Double.Parse(StrSplit(aFileContents, vbCrLf, "'"))
         End If
         Return lUEBVar
 

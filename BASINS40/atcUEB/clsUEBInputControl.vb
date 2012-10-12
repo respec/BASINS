@@ -24,7 +24,7 @@ Public Class clsUEBInputControl
     Public SDate(4) As Integer
     Public EDate(4) As Integer
     Public TimeStep As Integer
-    Public UTCOffset As Integer
+    Public UTCOffset As Double
 
     Public FileName As String
 
@@ -34,14 +34,15 @@ Public Class clsUEBInputControl
         Dim lStr As String
         Dim lChrSep() As String = {" ", ".", vbTab}
         Dim lStrArray() As String
+        Dim lAlreadyRead As Boolean = False
+        Dim lUEBVariable As clsUEBVariable
 
         FileName = aFilename
         Dim lFileContents As String
-        If IO.File.Exists(FileName) Then
-            lFileContents = WholeFileString(FileName)
-        Else
-            lFileContents = GetEmbeddedFileAsString("InputControl.dat")
-        End If
+        lFileContents = GetEmbeddedFileAsString("InputControl.dat")
+        Variables = New Generic.List(Of clsUEBVariable)
+ReadFile:
+
         'read header line in file
         Header = StrSplit(lFileContents, vbCrLf, "")
         'read start/end dates
@@ -61,13 +62,42 @@ Public Class clsUEBInputControl
         lStr = StrSplit(lFileContents, vbCrLf, "")
         TimeStep = CInt(StrSplit(lStr, " ", ""))
         lStr = StrSplit(lFileContents, vbCrLf, "")
-        UTCOffset = CInt(StrSplit(lStr, " ", ""))
+        UTCOffset = CDbl(StrSplit(lStr, " ", ""))
 
-        Variables = New Generic.List(Of clsUEBVariable)
         While lFileContents.Length > 0
-            Variables.Add(clsUEBVariable.FromInputVariableString(lFileContents))
+            lUEBVariable = clsUEBVariable.FromInputVariableString(lFileContents)
+            Dim lExistingVariable As clsUEBVariable = VariableFromDescription(lUEBVariable.Description)
+            If lExistingVariable IsNot Nothing Then
+                Variables.Insert(Variables.IndexOf(lExistingVariable), lUEBVariable)
+                Variables.Remove(lExistingVariable)
+            Else
+                Variables.Add(lUEBVariable)
+            End If
         End While
+
+        If Not lAlreadyRead AndAlso IO.File.Exists(FileName) Then
+            lFileContents = WholeFileString(FileName)
+            lAlreadyRead = True
+            GoTo ReadFile
+        End If
     End Sub
+
+    Private Function VariableFromDescription(ByVal aDescription As String) As clsUEBVariable
+        For Each lUEBVariable As clsUEBVariable In Variables
+            If lUEBVariable.Description = aDescription Then
+                Return lUEBVariable
+            End If
+        Next
+        Return Nothing
+    End Function
+
+    Private Function ReplaceRepeats(ByVal aSource As String, ByVal aReplace As String) As String
+        Dim lRepeat As String = aReplace & aReplace
+        While aSource.Contains(lRepeat)
+            aSource = aSource.Replace(lRepeat, aReplace)
+        End While
+        Return aSource
+    End Function
 
     Public Function WriteInputControlFile() As Boolean
 
