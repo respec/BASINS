@@ -918,17 +918,19 @@ ParseFixedDef:
         Dim lAppendedAny As Boolean = False
 
         For r = 1 To MappingSource.Rows
-            Dim tmpstr As String = MappingSource.CellValue(r, ColMappingAttr).Trim.ToLower
-            If tmpstr.StartsWith("y") Then
-                Dim tmpstr2 As String = MappingSource.CellValue(r, ColMappingName).Trim
-                tmpstr = ConstOrCol(tmpstr2)
-                If Not String.IsNullOrEmpty(tmpstr) Then
-                    If lAppendedAny Then
-                        ScriptBuilder.Append(PrintEOL & lIndent)
-                    Else
-                        lAppendedAny = True
+            Dim tmpstr As String = MappingSource.CellValue(r, ColMappingAttr)
+            If tmpstr IsNot Nothing Then
+                If tmpstr.Trim.ToLower.StartsWith("y") Then
+                    Dim tmpstr2 As String = MappingSource.CellValue(r, ColMappingName).Trim
+                    tmpstr = ConstOrCol(tmpstr2)
+                    If Not String.IsNullOrEmpty(tmpstr) Then
+                        If lAppendedAny Then
+                            ScriptBuilder.Append(PrintEOL & lIndent)
+                        Else
+                            lAppendedAny = True
+                        End If
+                        ScriptBuilder.Append(tmpstr2 & " " & tmpstr)
                     End If
-                    ScriptBuilder.Append(tmpstr2 & " " & tmpstr)
                 End If
             End If
         Next
