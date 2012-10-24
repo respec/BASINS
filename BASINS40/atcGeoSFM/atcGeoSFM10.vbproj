@@ -84,6 +84,7 @@
     </Reference>
     <Reference Include="MapWinInterfaces">
       <HintPath>..\local\x86Debug\MapWinInterfaces.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -104,6 +105,7 @@
     <Compile Include="frmGeoSFM.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="modGeoSFM.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

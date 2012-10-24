@@ -4187,7 +4187,7 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
         Dim lAppEx As ApplicationException
-        If tabMain.SelectedIndex = 3 Then
+        If tabMain.SelectedIndex = 4 Then
             If pStationsRead = False Then
                 lblStatus.Text = "Reading Precipitation Data ..."
                 Me.Refresh()
