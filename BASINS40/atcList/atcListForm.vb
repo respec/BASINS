@@ -582,10 +582,10 @@ Public Class atcListForm
     End Sub
 
     Private Sub mnuSaveChanges_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveChanges.Click
-        Dim lNotSaved As New atcDataGroup
+        Dim lNotSaved As New atcTimeseriesGroup
         For Each lTs As atcTimeseries In pEditedGroup
             Dim lSaved As Boolean = False
-            Dim lSource As atcDataSource = lTs.Attributes.GetValue("Data Source")
+            Dim lSource As atcDataSource = atcDataManager.DataSourceBySpecification(lTs.Attributes.GetValue("Data Source"))
             If lSource IsNot Nothing AndAlso lSource.CanSave Then
                 lSaved = lSource.AddDataSet(lTs, atcDataSource.EnumExistAction.ExistReplace)
             End If
