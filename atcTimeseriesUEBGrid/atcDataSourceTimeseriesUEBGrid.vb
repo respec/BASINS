@@ -85,7 +85,9 @@ Public Class atcDataSourceTimeseriesUEBGrid
                             .SetValue("Scenario", FilenameNoExt(FilenameNoPath(Specification)))
                             .SetValue("Location", lWatershedID)
                             .SetValue("Constituent", lVarName)
-                            .SetValue("Description", "UEB Aggregated Output")
+                            .SetValue("Stanam", "UEBGrid:" & lVarName)
+                            .SetValue("Description", "UEBGrid Aggregated Output")
+                            .SetValue("Units", "meters")
                             .AddHistory("Read from " & Specification)
                         End If
                     End With
