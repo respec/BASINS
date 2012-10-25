@@ -3383,7 +3383,7 @@ Public Class frmGeoSFM
             Else
                 tabMain.TabPages.Item(3).Enabled = False
             End If
-            tabMain.SelectedIndex = 1
+            tabMain.SelectedIndex += 1 '= 1
         End If
 
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
@@ -3527,7 +3527,7 @@ Public Class frmGeoSFM
         If Basin(lZonegname, lDemgname, lFacgname, lHlengname, lRcngname, lWhcgname, _
               lDepthgname, lTexturegname, lDraingname, lFlowlengname, _
               lRivlinkgname, lDowngname, lMaxcovergname) Then
-            tabMain.SelectedIndex = 2
+            tabMain.SelectedIndex += 1 '= 2
         End If
 
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
@@ -3610,7 +3610,7 @@ Public Class frmGeoSFM
 
         If Response(lVelMethod, lZonegname, lFlowlengname, lOutletGridName, lDemgname, lFacgname, lFlowDirGridName, _
                  lUSGSLandcoverGridName, lOverlandFlowVelocity, lInstreamFlowVelocity, lManningsFactors) Then
-            tabMain.SelectedIndex = 3
+            tabMain.SelectedIndex += 1 '= 3
             SetPrecipStationGrid()
         End If
 
@@ -3841,7 +3841,7 @@ Public Class frmGeoSFM
         Me.Refresh()
 
         If RainEvap(lPrecGageNamesBySubbasin, lEvapGageNamesBySubbasin, lSJDate, lEJDate) Then
-            tabMain.SelectedIndex = 4
+            tabMain.SelectedIndex += 1 ' = 4
         End If
 
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
@@ -3883,7 +3883,7 @@ Public Class frmGeoSFM
         Me.Refresh()
 
         If Balance(lIniFract, lDformat, lInimode, lRunmode, lBalType, lSJDate) Then
-            tabMain.SelectedIndex = 5
+            tabMain.SelectedIndex += 1 '= 5
         End If
 
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
@@ -3924,7 +3924,7 @@ Public Class frmGeoSFM
         Me.Refresh()
 
         If Route(lForecast, lRunmode, lDformat, lRouteMethod, lSJDate) Then
-            tabMain.SelectedIndex = 6
+            tabMain.SelectedIndex += 1 '= 6
         End If
 
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
@@ -3961,7 +3961,7 @@ Public Class frmGeoSFM
         Me.Refresh()
 
         If Sensitivity(cboReachSensitivity.SelectedIndex, lBalType, lRouteMethod, lParameterRanges) Then
-            tabMain.SelectedIndex = 7
+            tabMain.SelectedIndex += 1 '= 7
         End If
 
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
@@ -4078,7 +4078,7 @@ Public Class frmGeoSFM
         Me.Refresh()
 
         If Calibrate(lFlowGageNames, lCalibParms, lstMax.SelectedItems(0), lObjFunction, lSJDate, lEJDate) Then
-            tabMain.SelectedIndex = 8
+            tabMain.SelectedIndex += 1 ' = 8
             lblStatus.Text = "Update specifications if desired, then click one of the 'Generate' buttons to view output."
         Else
             lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
@@ -4208,7 +4208,7 @@ Public Class frmGeoSFM
                 pStationsRead = True
             End If
         End If
-        If tabMain.SelectedIndex = 6 Or tabMain.SelectedIndex = 7 Then
+        If tabMain.SelectedIndex = 7 Or tabMain.SelectedIndex = 8 Then
             'read reaches for sensitivity analysis or calibration 
             lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
@@ -4236,7 +4236,7 @@ Public Class frmGeoSFM
             End If
             cboReachSensitivity.SelectedIndex = 0
         End If
-        If tabMain.SelectedIndex = 7 Then
+        If tabMain.SelectedIndex = 8 Then
             'set up calibration tab
             AtcConnectFlows.lstSource.Items.Clear()
             pFlowStations.Clear()
@@ -4303,7 +4303,7 @@ Public Class frmGeoSFM
             lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
             Me.Refresh()
-        ElseIf tabMain.SelectedIndex = 8 Then
+        ElseIf tabMain.SelectedIndex = 9 Then
             'output tab
             atxMapYear.Text = atxSYear.Text
             AtxMapMonth.Text = atxSMonth.Text
