@@ -4348,6 +4348,97 @@ Public Class GisUtil
         End Get
     End Property
 
+    Public Shared Sub SlopeAspectTarbottonMethod(ByVal aElevationGridFileName As String, ByVal aSlopeGridFileName As String, ByVal aAspectGridFileName As String)
+        'new sub to compute slope and aspect of an elevation grid, using tarbotton method, needed for ueb model
+        '  slope is in degrees
+        '  aspect is degrees from N clockwise
+
+        'prepare the output grids
+        If FileExists(aSlopeGridFileName) Then
+            IO.File.Delete(aSlopeGridFileName)
+        End If
+        IO.File.Copy(aElevationGridFileName, aSlopeGridFileName)
+        If FileExists(aAspectGridFileName) Then
+            IO.File.Delete(aAspectGridFileName)
+        End If
+        IO.File.Copy(aElevationGridFileName, aAspectGridFileName)
+
+        Dim lOutputSlopeGrid As New MapWinGIS.Grid
+        lOutputSlopeGrid.Open(aSlopeGridFileName)
+        Dim lOutputAspectGrid As New MapWinGIS.Grid
+        lOutputAspectGrid.Open(aAspectGridFileName)
+
+        'initialize the new grids
+        Dim lNoData As Double = lOutputSlopeGrid.Header.NodataValue
+        For lRow As Integer = 0 To lOutputSlopeGrid.Header.NumberRows - 1
+            For lCol As Integer = 0 To lOutputSlopeGrid.Header.NumberCols - 1
+                lOutputSlopeGrid.Value(lCol, lRow) = lNoData
+                lOutputAspectGrid.Value(lCol, lRow) = lNoData
+            Next
+        Next
+
+        'prepare the elevation grid
+        Dim lElevationGrid As New MapWinGIS.Grid
+        lElevationGrid.Open(aElevationGridFileName)
+
+        Dim lStartRow As Integer = 1   'no need to do edge cells, can't compute slope and aspect for those 
+        Dim lStartCol As Integer = 1
+        Dim lEndRow As Integer = lOutputSlopeGrid.Header.NumberRows - 2
+        Dim lEndCol As Integer = lOutputSlopeGrid.Header.NumberCols - 2
+        Dim lX As Double = lOutputSlopeGrid.Header.dX
+        Dim lY As Double = lOutputSlopeGrid.Header.dY
+
+        Dim lA As Double = 0.0   'A B C
+        Dim lB As Double = 0.0   'D   F
+        Dim lC As Double = 0.0   'G H I
+        Dim lD As Double = 0.0
+        Dim lF As Double = 0.0
+        Dim lG As Double = 0.0
+        Dim lH As Double = 0.0
+        Dim lI As Double = 0.0
+
+        Dim lDzDx As Double = 0.0
+        Dim lDzDy As Double = 0.0
+        Dim lSlope As Double = 0.0
+        Dim lSlopeDeg As Double = 0.0
+        Dim lAspect As Double = 0.0
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lA = lElevationGrid.Value(lCol - 1, lRow - 1)
+                lB = lElevationGrid.Value(lCol, lRow - 1)
+                lC = lElevationGrid.Value(lCol + 1, lRow - 1)
+                lD = lElevationGrid.Value(lCol - 1, lRow)
+                lF = lElevationGrid.Value(lCol + 1, lRow)
+                lG = lElevationGrid.Value(lCol - 1, lRow + 1)
+                lH = lElevationGrid.Value(lCol, lRow + 1)
+                lI = lElevationGrid.Value(lCol + 1, lRow + 1)
+                If lA <> lNoData And lB <> lNoData And lB <> lNoData And lC <> lNoData And lD <> lNoData And lF <> lNoData And lG <> lNoData And lH <> lNoData And lI <> lNoData Then
+                    lDzDx = ((lA + (2 * lD) + lG) - (lC + (2 * lF) + lI)) / (8 * lX)
+                    lDzDy = ((lG + (2 * lH) + lI) - (lA + (2 * lB) + lC)) / (8 * lY)
+                    lSlope = Math.Sqrt((lDzDx ^ 2) + (lDzDy ^ 2))
+                    lSlopeDeg = (Math.Atan(lSlope)) * 180.0 / Math.PI
+                    If lDzDx <> 0.0 Then
+                        lAspect = ((Math.Atan(lDzDx / lDzDy)) * 180.0 / Math.PI) + 180.0
+                    Else
+                        lAspect = -999.0
+                    End If
+                    lOutputSlopeGrid.Value(lCol, lRow) = lSlopeDeg
+                    lOutputAspectGrid.Value(lCol, lRow) = lAspect
+                End If
+            Next
+        Next
+
+        lOutputSlopeGrid.Save()
+        lOutputSlopeGrid = Nothing
+
+        lOutputAspectGrid.Save()
+        lOutputAspectGrid = Nothing
+
+        lElevationGrid.Close()
+        lElevationGrid = Nothing
+    End Sub
+
 #Region "Added by Chris Wilson during Sediment/Mercury WCS project"
 
     ''' <summary>
