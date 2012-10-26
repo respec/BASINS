@@ -4416,20 +4416,15 @@ Public Class GisUtil
                     lDzDy = ((lG + (2 * lH) + lI) - (lA + (2 * lB) + lC)) / (8 * lY)
                     lSlope = Math.Sqrt((lDzDx ^ 2) + (lDzDy ^ 2))
                     lSlopeDeg = (Math.Atan(lSlope)) * 180.0 / Math.PI
-                    If lDzDx <> 0.0 Then
-                        lAspect = ((Math.Atan(lDzDx / lDzDy)) * 180.0 / Math.PI)
-                        'now adjust so that aspect is degrees from north
-                        If lDzDx > 0 And lDzDy > 0 Then
-                            lAspect = 90.0 - lAspect    'right
-                        ElseIf lDzDx < 0 And lDzDy < 0 Then
-                            lAspect = 270.0 - lAspect
-                        ElseIf lDzDx < 0 And lDzDy > 0 Then
-                            lAspect = 270.0 - lAspect
-                        ElseIf lDzDx > 0 And lDzDy < 0 Then
-                            lAspect = lAspect + 180.0   'right according to dave
-                        End If
+                    If lDzDy = 0.0 And lDzDx = 0.0 Then
+                        lAspect = -999
                     Else
-                        lAspect = -999.0
+                        lAspect = ((Math.Atan2(lDzDy, lDzDx)) * 180.0 / Math.PI)
+                        'now adjust so that aspect is degrees from north
+                        lAspect = 90.0 - lAspect
+                        If lAspect < 0 Then
+                            lAspect = 360 + lAspect
+                        End If
                     End If
                     lOutputSlopeGrid.Value(lCol, lRow) = lSlopeDeg
                     lOutputAspectGrid.Value(lCol, lRow) = lAspect
