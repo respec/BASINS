@@ -6,7 +6,6 @@ Imports atcData
 Imports System.Drawing
 Imports System
 Imports System.Windows.Forms
-Imports atc
 
 Public Class frmUEB
     Inherits System.Windows.Forms.Form
@@ -2693,6 +2692,26 @@ Public Class frmUEB
             Return aDescription.ToUpper
         End If
     End Function
+
+    Public Property WatershedGridFileName()
+        Get
+            WatershedGridFileName = pWatershedGridFileName
+        End Get
+        Set(ByVal value)
+            pWatershedGridFileName = value
+            txtWatershedFile.Text = pWatershedGridFileName
+        End Set
+    End Property
+
+    Public Property WatershedVariableName()
+        Get
+            WatershedVariableName = pWatershedGridVariableName
+        End Get
+        Set(ByVal value)
+            pWatershedGridVariableName = value
+            txtWatershedVariable.Text = pWatershedGridVariableName
+        End Set
+    End Property
 
     Private Sub cboRadiationInput_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboRadiationInput.SelectedIndexChanged
         pParmData.Variables(0).Value = cboRadiationInput.SelectedIndex
