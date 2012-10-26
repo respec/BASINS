@@ -145,10 +145,6 @@
       <Name>atcData</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcGeoSFM\atcGeoSFM.vbproj">
-      <Project>{7862AD75-FC13-43FE-B1FF-316799321DB6}</Project>
-      <Name>atcGeoSFM</Name>
-    </ProjectReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
       <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
       <Name>atcMwGisUtility</Name>
