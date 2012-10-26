@@ -159,6 +159,11 @@
       <Name>atcMwGisUtility</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcUEB\atcUEB.vbproj">
+      <Project>{167C77DA-0DB1-4126-A20F-1E2931952930}</Project>
+      <Name>atcUEB</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility</Name>

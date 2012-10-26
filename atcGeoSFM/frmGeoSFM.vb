@@ -7,6 +7,7 @@ Imports System
 Imports System.Windows.Forms
 Imports System.Text
 Imports System.IO
+Imports atcUEB
 
 Public Class frmGeoSFM
     Inherits System.Windows.Forms.Form
@@ -4431,5 +4432,12 @@ Public Class frmGeoSFM
         If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
             aGrid.Source.CellColor(aRow, aColumn) = lNewColor
         End If
+    End Sub
+
+    Private Sub cmdDefineUEBGrid_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdDefineUEBGrid.Click
+        Dim lUEBForm As New atcUEB.frmUEB
+        lUEBForm.WatershedGridFileName = atxUEBWatershedFile.Text
+        lUEBForm.WatershedVariableName = atxUEBWatershedVariable.Text
+        lUEBForm.Show()
     End Sub
 End Class
