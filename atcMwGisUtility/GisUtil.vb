@@ -4353,20 +4353,22 @@ Public Class GisUtil
         '  slope is in degrees
         '  aspect is degrees from N clockwise
 
+        'prepare the elevation grid
+        Dim lElevationGrid As New MapWinGIS.Grid
+        lElevationGrid.Open(aElevationGridFileName)
+
         'prepare the output grids
         If FileExists(aSlopeGridFileName) Then
             IO.File.Delete(aSlopeGridFileName)
         End If
-        IO.File.Copy(aElevationGridFileName, aSlopeGridFileName)
         If FileExists(aAspectGridFileName) Then
             IO.File.Delete(aAspectGridFileName)
         End If
-        IO.File.Copy(aElevationGridFileName, aAspectGridFileName)
 
         Dim lOutputSlopeGrid As New MapWinGIS.Grid
-        lOutputSlopeGrid.Open(aSlopeGridFileName)
+        lOutputSlopeGrid.CreateNew(aSlopeGridFileName, lElevationGrid.Header, MapWinGIS.GridDataType.FloatDataType, 0.0)
         Dim lOutputAspectGrid As New MapWinGIS.Grid
-        lOutputAspectGrid.Open(aAspectGridFileName)
+        lOutputAspectGrid.CreateNew(aAspectGridFileName, lElevationGrid.Header, MapWinGIS.GridDataType.FloatDataType, 0.0)
 
         'initialize the new grids
         Dim lNoData As Double = lOutputSlopeGrid.Header.NodataValue
@@ -4376,10 +4378,6 @@ Public Class GisUtil
                 lOutputAspectGrid.Value(lCol, lRow) = lNoData
             Next
         Next
-
-        'prepare the elevation grid
-        Dim lElevationGrid As New MapWinGIS.Grid
-        lElevationGrid.Open(aElevationGridFileName)
 
         Dim lStartRow As Integer = 1   'no need to do edge cells, can't compute slope and aspect for those 
         Dim lStartCol As Integer = 1
@@ -4419,7 +4417,17 @@ Public Class GisUtil
                     lSlope = Math.Sqrt((lDzDx ^ 2) + (lDzDy ^ 2))
                     lSlopeDeg = (Math.Atan(lSlope)) * 180.0 / Math.PI
                     If lDzDx <> 0.0 Then
-                        lAspect = ((Math.Atan(lDzDx / lDzDy)) * 180.0 / Math.PI) + 180.0
+                        lAspect = ((Math.Atan(lDzDx / lDzDy)) * 180.0 / Math.PI)
+                        'now adjust so that aspect is degrees from north
+                        If lDzDx > 0 And lDzDy > 0 Then
+                            lAspect = 90.0 - lAspect    'right
+                        ElseIf lDzDx < 0 And lDzDy < 0 Then
+                            lAspect = 270.0 - lAspect
+                        ElseIf lDzDx < 0 And lDzDy > 0 Then
+                            lAspect = 270.0 - lAspect
+                        ElseIf lDzDx > 0 And lDzDy < 0 Then
+                            lAspect = lAspect + 180.0   'right according to dave
+                        End If
                     Else
                         lAspect = -999.0
                     End If
