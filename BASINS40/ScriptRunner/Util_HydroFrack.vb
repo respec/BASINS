@@ -19,7 +19,7 @@ Imports Microsoft.Office.Interop
 
 Module Util_HydroFrack
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        Dim lTask As Integer = 113
+        Dim lTask As Integer = 16
         Select Case lTask
             Case 1 : ConstructHuc8BasedWaterUseFile() ''Task1. get huc8 based water use
             Case 2 : ClassifyWaterYearsForGraph()
@@ -32,6 +32,7 @@ Module Util_HydroFrack
             Case 82 : SumGCRPHspfSubbasinWateruse() 'Step2 of getting subbasin based water use
             Case 83 : BuildGCRPHspfSubbasinWaterUseTimeseries() 'Step3 of getting subbasin based wateruse into WDM
             Case 9 : ExtractUserSpecifiedConstituents()
+            Case 91 : ExtractAllWaterUseSumAnnualCfsFromUCI()
             Case 10 : BuildHydroFrackingTimeseriesMonthlyFixedValues()
             Case 101 : SRBCSumupOSup2010QuaterData()
             Case 102 : SRBCOSup2010WholeYear()
@@ -41,6 +42,13 @@ Module Util_HydroFrack
 
             Case 112 : HydroFrackingDailyValueSumup()
             Case 113 : HydroFrackingDailyValueCompleteYear()
+
+            Case 12 : TwoCountiesOSup2010DailyWUDataToGCRPDailyTimeseries()
+            Case 13 : ProjectionPWSCopyToUSGSWaterUseFiles()
+            Case 14 : CreateReachFlowOutputDatasetPlaceHoldersInWDM1s()
+
+            Case 15 : RemoveFrackingDataFrom2025ScenarioWDMs()
+            Case 16 : AddNewFrackingDataTo2025ScenarioWDMs()
         End Select
     End Sub
 
@@ -415,6 +423,158 @@ ThisWDMDir:
         lTs = Nothing
         lTsGCRPDates.Clear()
         lTsGCRPDates = Nothing
+    End Sub
+
+    Private Sub TwoCountiesOSup2010DailyWUDataToGCRPDailyTimeseries()
+        'put 2010 two counties (Bradford and Susq counties in PA, 42) data into 2005 run
+        'only replace the Rch 39 in 020501 GCRP subbasin
+        'Dim lGCRPWU2005ParmsWDMDir As String = "G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\WDMsWithSRBCWUTsers\"
+        Dim lGCRPWU2005ParmsWDMDir As String = "G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\"
+        Dim lDataFile As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\Susq_Withdraw_Xtab&source_2010(noPWS_Frac)withSubbasin.xls"
+
+        Dim lDateStart As Double = Date2J(1985, 1, 1, 0, 0, 0)
+        Dim lDateEnd As Double = Date2J(2005, 12, 31, 24, 0, 0)
+        Dim lTs As atcTimeseries = Nothing
+        Dim lTsGCRPDates As New atcTimeseries(Nothing)
+        lTsGCRPDates.Values = NewDates(lDateStart, lDateEnd, atcTimeUnit.TUDay, 1)
+
+        Dim lSusqWDM01 As New atcWDM.atcDataSourceWDM
+        If Not lSusqWDM01.Open(lGCRPWU2005ParmsWDMDir & "SusqTrans01.wdm") Then Exit Sub
+
+        'Dim lSusqWDM02 As New atcWDM.atcDataSourceWDM
+        'If Not lSusqWDM02.Open(lGCRPWU2005ParmsWDMDir & "SusqTrans02.wdm") Then Exit Sub
+        'Dim lSusqWDM03 As New atcWDM.atcDataSourceWDM
+        'If Not lSusqWDM03.Open(lGCRPWU2005ParmsWDMDir & "SusqTrans03.wdm") Then Exit Sub
+
+        Dim lxlApp As New Excel.Application
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+        lxlWorkbook = lxlApp.Workbooks.Open(lDataFile)
+        lxlSheet = lxlWorkbook.Worksheets("Rearrange")
+        With lxlSheet
+            Dim lNumDailyValuesInYear2010 As Integer = 365
+            'Dim lDailyDates(lNumDailyValuesInYear2010 - 1) As String 'zero-based
+            Dim lIndexFeb28 As Integer
+            Dim lIndexMar1 As Integer
+            Dim lSubbasinID As Integer
+            Dim lFacility As String
+            Dim lSource As String
+            Dim lLat As Double
+            Dim lLong As Double
+            Dim lIndustry As String
+            Dim mPatternDate As String = "\s*([0-9]+)/([0-9]+)/([0-9]+)$"
+            Dim lCellValue As String = ""
+            Dim lDataRowStartIndex As Integer = 7
+            For lRow As Integer = 1 To .UsedRange.Rows.Count 'first row is header row
+                lCellValue = .Cells(lRow, 1).Value
+                Dim lMatchDate As Match = Regex.Match(lCellValue, mPatternDate, RegexOptions.IgnoreCase)
+                If lMatchDate.Success Then
+                    If lMatchDate.Groups(1).Value = "2" AndAlso lMatchDate.Groups(2).Value = "28" Then
+                        lIndexFeb28 = lRow - lDataRowStartIndex
+                        lIndexMar1 = lIndexFeb28 + 1
+                        Exit For
+                    End If
+                ElseIf lCellValue.ToLower.Contains("subbasin") Then
+                    lSubbasinID = .Cells(lRow, 2).Value
+                ElseIf lCellValue.ToLower.Contains("facility") Then
+                    lFacility = .Cells(lRow, 2).Value
+                ElseIf lCellValue.ToLower.Contains("source") Then
+                    lSource = .Cells(lRow, 2).Value
+                ElseIf lCellValue.ToLower.Contains("lat_") Then
+                    lLat = Double.Parse(.Cells(lRow, 2).Value)
+                ElseIf lCellValue.ToLower.Contains("long_") Then
+                    lLong = Double.Parse(.Cells(lRow, 2).Value)
+                ElseIf lCellValue.ToLower.Contains("industry") Then
+                    lIndustry = .Cells(lRow, 2).Value
+                End If
+            Next
+            'ReDim lDailyDates(0)
+
+            Dim lGCRPDailyValues As New List(Of Double)
+            Dim lTwoCounties2010DailyValues() As Double
+            For lCol As Integer = .UsedRange.Columns.Count To .UsedRange.Columns.Count
+                Dim lBName As String = "020501"
+                'Dim lSBId As String = .Cells(1, lCol).Value.ToString.Split("-")(1)
+
+                'transfer into 1-d array, zero-based, also convert from original gallons per day to cfs
+                ReDim lTwoCounties2010DailyValues(lNumDailyValuesInYear2010 - 1)
+                For lRow As Integer = lDataRowStartIndex To .UsedRange.Rows.Count
+                    lTwoCounties2010DailyValues(lRow - lDataRowStartIndex) = Double.Parse(.Cells(lRow, lCol).Value) * 0.133680556 / 86400 '1 US gallon = 0.133680556 cubic feet
+                Next
+
+                lGCRPDailyValues.Clear() 'start fresh
+                lGCRPDailyValues.Add(Double.NaN)
+                For lYear As Integer = 1985 To 2005
+                    If Date.IsLeapYear(lYear) Then
+                        Dim lArrPart1(lIndexFeb28) As Double
+                        Array.Copy(lTwoCounties2010DailyValues, 0, lArrPart1, 0, 31 + 28)
+                        lGCRPDailyValues.AddRange(lArrPart1)
+
+                        lGCRPDailyValues.Add((lTwoCounties2010DailyValues(lIndexFeb28) + lTwoCounties2010DailyValues(lIndexMar1)) / 2.0)
+
+                        Dim lArrPart2(UBound(lTwoCounties2010DailyValues, 1) - lIndexMar1) As Double
+                        For I As Integer = lIndexMar1 To UBound(lTwoCounties2010DailyValues, 1)
+                            lArrPart2(I - lIndexMar1) = lTwoCounties2010DailyValues(I)
+                        Next
+
+                        lGCRPDailyValues.AddRange(lArrPart2)
+
+                        ReDim lArrPart1(0)
+                        ReDim lArrPart2(0)
+
+                    Else
+                        lGCRPDailyValues.AddRange(lTwoCounties2010DailyValues)
+                    End If
+                Next 'lYear
+
+                'Create a Timeserie
+                lTs = New atcTimeseries(Nothing)
+                With lTs
+                    .Dates = lTsGCRPDates
+                    .SetInterval(atcTimeUnit.TUDay, 1)
+                    '.numValues = lTsGCRPDates.numValues
+                    .Values = lGCRPDailyValues.ToArray()
+                    .Attributes.SetValue("ID", 5000 + CInt(lSubbasinID))
+                    .Attributes.SetValue("Constituent", "TOSUP")
+                    .Attributes.SetValue("TSTYP", "TOSUP")
+                    .Attributes.SetValue("Location", "R:" & lSubbasinID)
+                    .Attributes.SetValue("Scenario", "TWOCO")
+                End With
+
+                'Write to WDM
+                Select Case lBName
+                    Case "020501"
+                        If Not lSusqWDM01.AddDataset(lTs, atcDataSource.EnumExistAction.ExistReplace) Then
+                            Logger.Dbg("Writing " & lBName & "-" & lSubbasinID & " dataset failed in SusqTrans01.wdm")
+                        End If
+                        'Case "020502"
+                        '    If Not lSusqWDM02.AddDataset(lTs, atcDataSource.EnumExistAction.ExistReplace) Then
+                        '        Logger.Dbg("Writing " & lBName & "-" & lSBId & " dataset failed in SusqTrans02.wdm")
+                        '    End If
+                        'Case "020503"
+                        '    If Not lSusqWDM03.AddDataset(lTs, atcDataSource.EnumExistAction.ExistReplace) Then
+                        '        Logger.Dbg("Writing " & lBName & "-" & lSBId & " dataset failed in SusqTrans03.wdm")
+                        '    End If
+                End Select
+            Next 'lCol
+        End With
+
+        lxlWorkbook.Close()
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlWorkbook = Nothing
+        lxlApp = Nothing
+
+        lSusqWDM01.Clear()
+        'lSusqWDM02.Clear()
+        'lSusqWDM03.Clear()
+        lSusqWDM01 = Nothing
+        'lSusqWDM02 = Nothing
+        'lSusqWDM03 = Nothing
     End Sub
 
     Private Sub SBRCOSup2010DailyWUDataToGCRPDailyTimeseries()
@@ -882,6 +1042,53 @@ ThisWDMDir:
         System.GC.Collect()
     End Sub
 
+    Private Sub ExtractAllWaterUseSumAnnualCfsFromUCI()
+        'Go through the 3 UCIs and go through each timeseries in 
+        'the EXT SOURCES block to create SumAnnual CFS output
+
+        Dim lRunPath As String = "G:\Admin\GCRPSusq\RunsWithResvWU2005\"
+        Dim lRunBasins() As String = {"020501", "020502", "020503"}
+
+        Dim lExtSourcesLogFile As String = lRunPath & "ExtSources_WSWFr.txt"
+        Dim lSW As New StreamWriter(lExtSourcesLogFile, False)
+
+        For Each lRunBasin As String In lRunBasins
+            'Dim lUCIFile As String = lRunPath & "Susq" & lRunBasin & ".uci"
+
+            Dim lInputSourceFile As String = lRunPath & "parms\" & "SusqTrans" & lRunBasin.Substring(4, 2) & ".wdm"
+            Dim lWDM As New atcWDM.atcDataSourceWDM
+            If Not lWDM.Open(lInputSourceFile) Then Continue For
+
+            For Each lTs As atcTimeseries In lWDM.DataSets
+                With lTs.Attributes
+                    Dim lid As Integer = .GetValue("ID")
+                    If lid > 4000 Then
+                        Dim lMax As Double = .GetValue("Max")
+                        Dim lMin As Double = .GetValue("Min")
+                        Dim lMean As Double = .GetValue("Mean")
+                        Dim lSum As Double = .GetValue("Sum")
+                        Dim lSumAnnual As Double = .GetValue("SumAnnual")
+                        Dim lLocation As String = .GetValue("Location")
+                        Dim lCons As String = .GetValue("Constituent")
+                        Dim lTimeUnit As String = "<unknown>"
+                        Select Case .GetValue("tu")
+                            Case atcTimeUnit.TUDay : lTimeUnit = "Daily"
+                            Case atcTimeUnit.TUMonth : lTimeUnit = "Monthly"
+                        End Select
+                        lSW.WriteLine(lRunBasin & vbTab & lLocation & vbTab & lid & vbTab & lCons & vbTab & DoubleToString(lSumAnnual) & vbTab & lSum & vbTab & lMax & vbTab & lMin & vbTab & lMean & vbTab & lTimeUnit)
+                    End If
+                End With
+            Next 'lTs
+            lSW.WriteLine(" ")
+            lSW.Flush()
+            lWDM.Clear()
+            lWDM = Nothing
+        Next 'lRunBasin
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+    End Sub
+
     Private Sub ExtractUserSpecifiedConstituents()
         'read the constituents from a user-defined configuration file
         'to retrieve from a HSPF simulation
@@ -896,7 +1103,7 @@ ThisWDMDir:
         Dim lStartFolder As String = lConfigXML.DocumentElement("StartFolder").InnerText
         Dim lContributingAreas As XmlElement = lConfigXML.DocumentElement("ContributingAreas")
 
-        Dim lSW As New StreamWriter(IO.Path.Combine(lStartFolder, "ReportUserSpecifiedOutput.txt"), False)
+        Dim lSW As New StreamWriter(IO.Path.Combine(lStartFolder, "ReportUserSpecifiedOutput_WSWFr.txt"), False)
 
         Dim lSimulations As XmlNodeList = lConfigXML.GetElementsByTagName("Simulation")
         For Each lSimulation As XmlElement In lSimulations
@@ -1039,8 +1246,9 @@ ThisWDMDir:
     End Function
 
     Private Sub BuildGCRPHspfSubbasinWaterUseTimeseries()
-        'This routine is to be run after task 82 (SumGCRPHspfSubbasinWateruse) whose output is like, GCRP020503SubbasinWaterUse2000.txt
-        'that file is a comma-delimited subbasin and its water use in cfs listing, e.g. GCRP020501SubbasinWaterUse20002005PSW_OSup.xls
+        'This routine is to be run after task 82 (SumGCRPHspfSubbasinWateruse) whose output is like, GCRP020503SubbasinWaterUse2000_WSWFr.txt
+        'that file is a comma-delimited subbasin and its water use in cfs listing, e.g. GCRP020501SubbasinWaterUse20002005PSW_OSup_WSWFr.xls
+        'the PSW_OSup_WSWFr file is constructed by hand by summing up other withdrawal categories of water use besides PS category
         'there are 3 files, one for each of the GCRP runs. In Each file, there are two sheets, 'WaterUse' and 'Note'. Use the WaterUse sheet
 
         'In this routine, we will build two timeseries for each subbasin, one for PS, the other for the rest
@@ -1057,7 +1265,22 @@ ThisWDMDir:
         '4118 -> PWSup 2005
         '5118 -> OSup 2005
 
+        'the last action was to rewrite the 2005 wateruse since PA, Bradford and Susq counties's OSUP are zeros
+        'this step should have been done in step 81
+
+        'For the projected PWS scenario, use output from task 82, eg GCRP020503SubbasinWaterUse2005_WSWFr_BAU.txt
+
         Dim lDirGCRPHspfSubbasinWaterUse As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\"
+
+        Dim lWUCategory As String = "_WSWFr"
+        Dim lProjectionScenario As String = "" '<--This is for running projected WU scenario, if not scenario run, then use empty string
+        lProjectionScenario = "_BAU"
+        lProjectionScenario = "_EP"
+        lProjectionScenario = "_GT"
+
+        Dim lProjectionYear As String = "" '<--This is the projection year, if not scenario run, then use empty string
+        lProjectionYear = "2040"
+        lProjectionYear = "2025"
 
         Dim lDateStart As Double = Date2J(1985, 1, 1, 0, 0, 0)
         Dim lDateEnd As Double = Date2J(2005, 12, 31, 24, 0, 0)
@@ -1074,12 +1297,17 @@ ThisWDMDir:
         Dim lTsOSup2005 As atcTimeseries
 
         For Each lGCRPRun As String In lGCRPRunNames
-
-            Dim lSusqTransWDMFilename As String = "G:\Admin\GCRPSusq\RunsWithResvWU2000\parms\SusqTrans" & lGCRPRun.Substring(4) & ".wdm"
+            Dim lProjectedScenFoldername As String = lProjectionScenario & lProjectionYear
+            If lProjectedScenFoldername.StartsWith("_") Then
+                lProjectedScenFoldername = lProjectedScenFoldername.Substring(1) & "\"
+            Else
+                lProjectedScenFoldername = ""
+            End If
+            Dim lSusqTransWDMFilename As String = "G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\" & lProjectedScenFoldername & "SusqTrans" & lGCRPRun.Substring(4) & ".wdm"
             Dim lSusqTransWDM As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM()
             If Not lSusqTransWDM.Open(lSusqTransWDMFilename) Then Continue For
 
-            Dim lFileWU As String = lDirGCRPHspfSubbasinWaterUse & "GCRP" & lGCRPRun & "SubbasinWaterUse20002005PSW_OSup.xls"
+            Dim lFileWU As String = lDirGCRPHspfSubbasinWaterUse & "GCRP" & lGCRPRun & "SubbasinWaterUse20002005PSW_OSup" & lWUCategory & lProjectionScenario & lProjectionYear & ".xls"
             lxlWorkbook = lxlApp.Workbooks.Open(lFileWU)
             lxlSheet = lxlWorkbook.Worksheets("WaterUse")
             With lxlSheet 'there are only five columns, subbasinid, ps2000, osup2000, ps2005, osup2005 withdrawal in cfs
@@ -1090,25 +1318,52 @@ ThisWDMDir:
                     Dim lWUPWSup2005 As Double = .Cells(lRow, 4).Value
                     Dim lWUOSup2005 As Double = .Cells(lRow, 5).Value
 
-                    lTsPWSup2000 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "PWSUP", 2000 + lSubbasinId, lWUPWSup2000, lDateStart, lDateEnd)
-                    lTsOSup2000 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "OSUP", 3000 + lSubbasinId, lWUOSup2000, lDateStart, lDateEnd)
-                    lTsPWSup2005 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "PWSUP", 4000 + lSubbasinId, lWUPWSup2005, lDateStart, lDateEnd)
-                    lTsOSup2005 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "OSUP", 5000 + lSubbasinId, lWUOSup2005, lDateStart, lDateEnd)
+                    'If lWUPWSup2000 > 0 Then
+                    '    lTsPWSup2000 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "PWSUP", 2000 + lSubbasinId, lWUPWSup2000, lDateStart, lDateEnd, "R:" & lSubbasinId, "USGS0")
+                    'Else
+                    '    lTsPWSup2000 = Nothing
+                    'End If
+                    'If lWUOSup2000 > 0 Then
+                    '    lTsOSup2000 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "OSUP", 3000 + lSubbasinId, lWUOSup2000, lDateStart, lDateEnd, "R:" & lSubbasinId, "USGS0")
+                    'Else
+                    '    lTsOSup2000 = Nothing
+                    'End If
+                    If lWUPWSup2005 > 0 Then
+                        lTsPWSup2005 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "PWSUP", 4000 + lSubbasinId, lWUPWSup2005, lDateStart, lDateEnd, "R:" & lSubbasinId, "USGS5")
+                    Else
+                        lTsPWSup2005 = Nothing
+                    End If
+                    'If lWUOSup2005 > 0 Then
+                    '    lTsOSup2005 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "OSUP", 5000 + lSubbasinId, lWUOSup2005, lDateStart, lDateEnd, "R:" & lSubbasinId, "USGS5")
+                    'Else
+                    '    lTsOSup2005 = Nothing
+                    'End If
 
                     With lSusqTransWDM
                         'Write WU timeseries into this WDM
-                        If Not .AddDataset(lTsPWSup2000, atcDataSource.EnumExistAction.ExistReplace) Then
-                            Logger.Dbg("Add lTsPWSup2000 failed.")
-                        End If
-                        If Not .AddDataset(lTsOSup2000, atcDataSource.EnumExistAction.ExistReplace) Then
-                            Logger.Dbg("Add lTsOSup2000 failed.")
-                        End If
-                        If Not .AddDataset(lTsPWSup2005, atcDataSource.EnumExistAction.ExistReplace) Then
+                        'If lTsPWSup2000 Is Nothing Then
+                        '    Logger.Dbg("PWSup2000=zero, " & lFileWU)
+                        'ElseIf Not .AddDataset(lTsPWSup2000, atcDataSource.EnumExistAction.ExistReplace) Then
+                        '    Logger.Dbg("Add lTsPWSup2000 failed.")
+                        'End If
+
+                        'If lTsOSup2000 Is Nothing Then
+                        '    Logger.Dbg("OSup2000=zero, " & lFileWU)
+                        'ElseIf Not .AddDataset(lTsOSup2000, atcDataSource.EnumExistAction.ExistReplace) Then
+                        '    Logger.Dbg("Add lTsOSup2000 failed.")
+                        'End If
+
+                        If lTsPWSup2005 Is Nothing Then
+                            Logger.Dbg("PWSup2005=zero, " & lFileWU)
+                        ElseIf Not .AddDataset(lTsPWSup2005, atcDataSource.EnumExistAction.ExistReplace) Then
                             Logger.Dbg("Add lTsPWSup2005 failed.")
                         End If
-                        If Not .AddDataset(lTsOSup2005, atcDataSource.EnumExistAction.ExistReplace) Then
-                            Logger.Dbg("Add lTsOSup2005 failed.")
-                        End If
+
+                        'If lTsOSup2005 Is Nothing Then
+                        '    Logger.Dbg("OSup2005=zero, " & lFileWU)
+                        'ElseIf Not .AddDataset(lTsOSup2005, atcDataSource.EnumExistAction.ExistReplace) Then
+                        '    Logger.Dbg("Add lTsOSup2005 failed.")
+                        'End If
                     End With
 
                 Next 'lxlSheet lRow
@@ -1133,15 +1388,26 @@ ThisWDMDir:
     End Sub
 
     Private Sub SumGCRPHspfSubbasinWateruse()
-        'This routine is to be run after task task 81 (whose output file is white-space delimited, e.g. GCRP020501byCountyWaterUse2000.txt)
+        'This routine is to be run after task task 81 (whose output file is white-space delimited, e.g. GCRP020501byCountyWaterUse2000_WSWFr.txt)
         'basically, to sum up the various categories of wateruse for each subbasin
         'the output file is comma-delimited (e.g. GCRP020501SubbasinWaterUse2000.txt), unit is cfs (converted from task 8 output in Mgd)
         'water use categories and column order are the same as those in the excel files used in
         'task 8 (ConstructGCRPHspfSubbasinBasedWaterUseFile)
 
+        Dim lWUCat As String = "_WSWFr" '<-- need to take care of this, eg WFrTo or WSWFr or ... depending on the first step script
+        Dim lProjectionScenario As String = "" '<--this is the projected WU scenario, if not a scenario run, then use empty string
+        lProjectionScenario = "_BAU"
+        lProjectionScenario = "_EP"
+        lProjectionScenario = "_GT"
+        'For scenario run, take task 81's output eg GCRP020501byCountyWaterUse2000_WSWFr_BAU.txt
+
+        Dim lProjectionYear As String = "" '<-- projection year, if no scenario, then use empty string
+        lProjectionYear = "2040"
+        lProjectionYear = "2025"
 
         Dim lDirGCRPHspfSubbasinWaterUse As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\"
-        Dim lYears() As Integer = {2000, 2005}
+        'Dim lYears() As Integer = {2000, 2005}
+        Dim lYears() As Integer = {2005} 'For the scenario run, only done for year 2005
         Dim lGCRPRunNames() As String = {"020501", "020502", "020503"}
         '1 million (US gallons per day) = 1.54722865 (cubic foot) per second
         Dim lMgdToCfsFactor As Double = 1.54722865
@@ -1150,8 +1416,11 @@ ThisWDMDir:
         For Each lYearToProcess As Integer In lYears
             For Each lGCRPRunName As String In lGCRPRunNames
                 Dim lGCRPRun As New GCRPRun()
-                Dim lFileSBbyCountyWU As String = lDirGCRPHspfSubbasinWaterUse & "GCRP" & lGCRPRunName & "byCountyWaterUse" & lYearToProcess & ".txt"
-                Dim lFileSBWU As String = lDirGCRPHspfSubbasinWaterUse & "GCRP" & lGCRPRunName & "SubbasinWaterUse" & lYearToProcess & ".txt"
+                Dim lFileSBbyCountyWU As String = lDirGCRPHspfSubbasinWaterUse & "GCRP" & lGCRPRunName & "byCountyWaterUse" & lYearToProcess & lWUCat & lProjectionScenario & lProjectionYear & ".txt"
+                Dim lFileSBWU As String = lDirGCRPHspfSubbasinWaterUse & "GCRP" & lGCRPRunName & "SubbasinWaterUse" & lYearToProcess & lWUCat & lProjectionScenario & lProjectionYear & ".txt"
+
+                If Not IO.File.Exists(lFileSBbyCountyWU) Then Continue For
+
                 lSR = New StreamReader(lFileSBbyCountyWU)
                 Dim line As String
                 Dim lArr() As String
@@ -1215,14 +1484,35 @@ ThisWDMDir:
         'The wateruse excel files are the source of raw water use data
         'they MUST have the SAME set of wateruse categories in the SAME COLUMN ORDER
         'this same set in the same order is going to be used by task 82 (SumGCRPHspfSubbasinWateruse)
-        'mdco2000SelectedWU.xls 'selected original wateruse data 
-        'mdco2005SelectedWU.xls
+        'mdco2000SelectedWU_WSWFr.xls 'selected original wateruse data 
+        'mdco2005SelectedWU_WSWFr.xls
 
-        Dim lApplyConsumptivePct As Boolean = False
+        '!!!SPECIAL ACTION:!!!
+        'Need to zero out all OSup categories in PA's Bradford(015) and Susq (115) counties before proceed!!!
+
+        'Two conditions:
+        '1. lApplyConsumptivePct: set to true if want to apply consumptive percentages; set to false if not (meaning using the original numbers)
+        '2. lDataYear, need to set to one of the years in that list
+        '3. WUCat, the category of wateruse data to be distributed, right now, either WSWFr (surface fresh), or WFrTo (total fresh)
+
+        'Latest controls added
+        '- ProjectionScenario: BAU, EP, GT
+        '- ProjectionYear: 2025, 2040
+
+        Dim lApplyConsumptivePct As Boolean = True '<--- set this
         Dim lAuxFlag As String = ""
         If Not lApplyConsumptivePct Then
             lAuxFlag = "Full"
         End If
+
+        Dim lProjectionScenario As String = "" '<--this is for distributing WU data that are projected in scenario study, if no scenario, then use empty string
+        lProjectionScenario = "_BAU"
+        lProjectionScenario = "_EP"
+        lProjectionScenario = "_GT"
+
+        Dim lProjectionYear As String = "" '<--this is the year of projected water use for public supply
+        lProjectionYear = "2040"
+        lProjectionYear = "2025"
 
         Dim lFipsFieldIndexExcel As Integer = 4
         Dim lWUStartColIndexExcel As Integer = 5
@@ -1285,38 +1575,14 @@ ThisWDMDir:
 
         Dim lLinebuilder As New Text.StringBuilder
         Dim lCountyList As New atcCollection()
-        Dim lSRCounty As New StreamReader(File2)
-        While Not lSRCounty.EndOfStream
-            lOneLine = lSRCounty.ReadLine()
-            lArrCounty = Regex.Split(lOneLine, "\s+")
-            Dim lState As WUState = lStates.ItemByKey(lArrCounty(5).Substring(0, 2))
-            If lState Is Nothing Then
-                lState = New WUState
-                With lState
-                    .Code = lArrCounty(5).Substring(0, 2)
-                    .Abbreviation = lArrCounty(6)
-                End With
-                lStates.Add(lState.Code, lState)
-            End If
-            If Not lState.Counties.Keys.Contains(lArrCounty(5)) Then
-                Dim lCounty As New WUCounty
-                With lCounty
-                    .Fips = lArrCounty(5)
-                    .Code = lArrCounty(5).Substring(2) 'the remaining 3 digits
-                    .Area = Double.Parse(lArrCounty(13))
-                    .State = lState
-                End With
-                lState.Counties.Add(lCounty.Fips, lCounty)
-            End If
-
-        End While
-        lSRCounty.Close()
-        lSRCounty = Nothing
+        ConstructStateCountyList(File2, lStates)
 
         'open the three Consumptive percentage files
         'these are preformatted to have the same column headings
         'please note that in 1995, LA means livestock animal specialty, but in 2000 and on, it means aquaculture!!!
         'in 2000 and on, LS = 1995's LV
+
+        Dim lWUCat As String = "_WSWFr" '<--this is to differentiate between total fresh water use (WToFr) vs only surface freshwater use (WSWFr)
         For Each lState As WUState In lStates
             Dim lCuPctFilename As String = lAwudsDataDirectory & lState.Abbreviation.ToLower & lAreaType & "95_CUPct.csv"
             Dim lCuPctTable As New atcTableDelimited
@@ -1360,24 +1626,24 @@ ThisWDMDir:
         Next 'lState
 
         'Set cross-reference of data dictionary for the chosen categories
-        Dim lDDTableFilename As String = lAwudsDataDirectory & "DataDictionaryCompare.txt"
+        Dim lDDTableFilename As String = lAwudsDataDirectory & "DataDictionaryCompare" & lWUCat & ".txt"
         Dim lDD As New DataDictionaries(lDDTableFilename)
 
-        Dim lYearToProcess As Integer = lDataYear(0) 'pick a year to do
+        Dim lYearToProcess As Integer = lDataYear(1) '<-- Set this, pick a year to do
         Dim lFile As String = ""
 
         lxlApp = New Excel.Application()
-        lAwudsDataFile = lAwudsDataDirectory & "mdco" & lYearToProcess & "SelectedWU.xls"
+        lAwudsDataFile = lAwudsDataDirectory & "mdco" & lYearToProcess & "SelectedWU" & lWUCat & lProjectionScenario & lProjectionYear & ".xls"
         lxlWorkbookMD = lxlApp.Workbooks.Open(lAwudsDataFile)
-        lAwudsDataFile = lAwudsDataDirectory & "paco" & lYearToProcess & "SelectedWU.xls"
+        lAwudsDataFile = lAwudsDataDirectory & "paco" & lYearToProcess & "SelectedWU" & lWUCat & lProjectionScenario & lProjectionYear & ".xls"
         lxlWorkbookPA = lxlApp.Workbooks.Open(lAwudsDataFile)
-        lAwudsDataFile = lAwudsDataDirectory & "nyco" & lYearToProcess & "SelectedWU.xls"
+        lAwudsDataFile = lAwudsDataDirectory & "nyco" & lYearToProcess & "SelectedWU" & lWUCat & lProjectionScenario & lProjectionYear & ".xls"
         lxlWorkbookNY = lxlApp.Workbooks.Open(lAwudsDataFile)
 
         Dim lNeedToSetHeader As Boolean = True
         For Each lGCRPRun As String In lSubbasinByCountyFiles.Keys
             File1 = lSubbasinByCountyFiles.ItemByKey(lGCRPRun)
-            lFile = IO.Path.Combine(IO.Path.GetDirectoryName(File1), "GCRP" & lGCRPRun & "byCountyWaterUse" & lYearToProcess & lAuxFlag & ".txt")
+            lFile = IO.Path.Combine(IO.Path.GetDirectoryName(File1), "GCRP" & lGCRPRun & "byCountyWaterUse" & lYearToProcess & lWUCat & lAuxFlag & lProjectionScenario & lProjectionYear & ".txt")
 
             lOneLine = ""
             ReDim lArrCounty(0)
@@ -1474,8 +1740,8 @@ ThisWDMDir:
                         End If
                         If lHeaderArraylist IsNot Nothing Then
                             Dim lHeaderLine As String = ""
-                            For Each lWUCat As String In lHeaderArraylist
-                                lHeaderLine &= lWUCat & " "
+                            For Each lWUCategory As String In lHeaderArraylist
+                                lHeaderLine &= lWUCategory & " "
                             Next
                             lSWGCRPSubbasinByCountyData.WriteLine(lHeaderLine.Trim())
                         End If
@@ -1591,10 +1857,10 @@ ThisWDMDir:
         'the simulation total runoff results are from the Expert output file,
         'NOT from the multi-basin balance output file!!!
 
-        Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\Reports\")
+        'Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\Reports\")
         'Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\ReportsWithReservoirs\")
         'Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\ReportsWithReservoirsWithWU2000\")
-        'Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\ReportsWithReservoirsWithWU2005\")
+        Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\ReportsWithReservoirsWithWU2005_WSWFr\")
 
         Dim lFiles As FileInfo() = lRoot.GetFiles("*.*")
         Dim lDirs As DirectoryInfo() = lRoot.GetDirectories("*.*")
@@ -3381,6 +3647,357 @@ ThisWDMDir:
             lZgc.SaveIn(aSaveIn)
             lZgc.Dispose()
         End If
+    End Sub
+
+    ''' <summary>
+    ''' The Overall Goal:
+    ''' This routine is for creating 3 scenarios of public water supply water use (PWS)
+    ''' ie Business-As-Usual, Energy Plus, and Green Technology in the Susq simulations for different years, 2040, 2025 etc
+    ''' The provided projection PWS file is: G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\PWS_Well_Projection\PWS_SBR_projections2040.xls, 
+    ''' which contains water use that is 100% consumptive and all from surface fresh water source for the year of 2040; 
+    ''' this means no need for adjustment for the goal of this study of focusing only on surface fresh water source for consumptive use
+    ''' 
+    ''' The idea is to create 3 versions of the following 3 WDMs, one for each of the 3 scenarios above:
+    ''' G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\SusqTrans01.wdm
+    ''' G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\SusqTrans02.wdm
+    ''' G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\SusqTrans03.wdm
+    ''' 
+    ''' They will be saved in the following folders respectively (for future use):
+    ''' G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\BAU2040\ 'business-as-usual
+    ''' G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\EP2040\  'energy plus
+    ''' G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\GT2040\  'green technology
+    ''' 
+    ''' In keeping with past effort of distributing USGS water use data, these scenarios' water use will be 
+    ''' constructed for the duration of 1985-01-01 ~ 2005-12-31 at monthly timestep and
+    ''' converted from the original MGD to CFS
+    ''' 
+    ''' Specific Action:
+    ''' update county's projected PWS water use data in corresponding state water use files, ie
+    '''mdco2005SelectedWU_WSWFr_BAU2040.xls (24)
+    '''mdco2005SelectedWU_WSWFr_EP2040.xls
+    '''mdco2005SelectedWU_WSWFr_GT2040.xls
+    '''nyco2005SelectedWU_WSWFr_BAU2040.xls (36)
+    '''nyco2005SelectedWU_WSWFr_EP2040.xls
+    '''nyco2005SelectedWU_WSWFr_GT2040.xls
+    '''paco2005SelectedWU_WSWFr_BAU2040.xls (42)
+    '''paco2005SelectedWU_WSWFr_EP2040.xls
+    '''paco2005SelectedWU_WSWFr_GT2040.xls
+    ''' in the fifth column: PS-WSWFr
+    ''' 
+    ''' Then, these projected water use data files will be used by steps 81, 82, and 83 to write into WDMs
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub ProjectionPWSCopyToUSGSWaterUseFiles()
+
+        Dim lWaterUseDataDirectory As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\"
+        Dim lProjectionYear As String = "2040"
+        lProjectionYear = "2025"
+
+        Dim lProjectionPWSFilename As String = lWaterUseDataDirectory & "PWS_Well_Projection\PWS_SRB_projections" & lProjectionYear & ".xls"
+
+        Dim lScenario As String = "BAU"
+        lScenario = "EP"
+        lScenario = "GT"
+
+        Dim lxlApp As Excel.Application = Nothing
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+
+        Dim lxlWorkbookMd As Excel.Workbook = Nothing
+        Dim lxlWorkbookNy As Excel.Workbook = Nothing
+        Dim lxlWorkbookPa As Excel.Workbook = Nothing
+
+        Dim lxlSheetMd As Excel.Worksheet = Nothing
+        Dim lxlSheetNy As Excel.Worksheet = Nothing
+        Dim lxlSheetPa As Excel.Worksheet = Nothing
+
+        Dim lxlSheetTemp As Excel.Worksheet = Nothing
+
+        lxlApp = New Excel.Application()
+        lxlWorkbook = lxlApp.Workbooks.Open(lProjectionPWSFilename)
+        lxlSheet = lxlWorkbook.Worksheets("Susquehanna Projections")
+
+        lxlWorkbookMd = lxlApp.Workbooks.Open(lWaterUseDataDirectory & "mdco2005SelectedWU_WSWFr_" & lScenario & lProjectionYear & ".xls")
+        lxlSheetMd = lxlWorkbookMd.Worksheets("County")
+
+        lxlWorkbookNy = lxlApp.Workbooks.Open(lWaterUseDataDirectory & "nyco2005SelectedWU_WSWFr_" & lScenario & lProjectionYear & ".xls")
+        lxlSheetNy = lxlWorkbookNy.Worksheets("County")
+
+        lxlWorkbookPa = lxlApp.Workbooks.Open(lWaterUseDataDirectory & "paco2005SelectedWU_WSWFr_" & lScenario & lProjectionYear & ".xls")
+        lxlSheetPa = lxlWorkbookPa.Worksheets("County")
+
+        With lxlSheet
+            Dim lProjectionColumn As Integer = 7
+            Select Case lScenario
+                Case "BAU" : lProjectionColumn = 7
+                Case "EP" : lProjectionColumn = 9
+                Case "GT" : lProjectionColumn = 11
+            End Select
+            For lRow As Integer = 3 To .UsedRange.Rows.Count
+                Dim lFips As String = .Cells(lRow, 1).Value
+                Dim lWUPWSup2005Projected As Double = .Cells(lRow, lProjectionColumn).Value
+
+                Select Case lFips.Substring(0, 2)
+                    Case "24"
+                        lxlSheetTemp = lxlSheetMd
+                    Case "36"
+                        lxlSheetTemp = lxlSheetNy
+                    Case "42"
+                        lxlSheetTemp = lxlSheetPa
+                End Select
+
+                For lRowC As Integer = 2 To lxlSheetTemp.UsedRange.Rows.Count
+                    If lFips = lxlSheetTemp.Cells(lRowC, 4).Value Then
+                        lxlSheetTemp.Cells(lRowC, 5).Value = Math.Round(lWUPWSup2005Projected, 2)
+                        Exit For
+                    End If
+                Next
+            Next 'lRow in projection Excel file
+        End With 'lxlsheet in projection Excel file
+
+        lxlWorkbook.Close(False)
+        lxlWorkbookMd.Close(True)
+        lxlWorkbookNy.Close(True)
+        lxlWorkbookPa.Close(True)
+
+        'clean up
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheetMd)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbookMd)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheetNy)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbookNy)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheetPa)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbookPa)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheetTemp)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlSheetMd = Nothing
+        lxlSheetNy = Nothing
+        lxlSheetPa = Nothing
+        lxlSheetTemp = Nothing
+        lxlWorkbook = Nothing
+        lxlWorkbookMd = Nothing
+        lxlWorkbookNy = Nothing
+        lxlWorkbookPa = Nothing
+        lxlApp = Nothing
+    End Sub
+
+    Private Sub ConstructStateCountyList(ByVal aCountyFile As String, ByRef aCollection As atcCollection)
+        '*** 
+        Dim lFilename As String = aCountyFile
+        'construct county fips-area (sq meter) dictionary
+        Dim lOneLine As String
+        Dim lArrCounty() As String
+        Dim lFips As String = ""
+        Dim lStateAbbrev As String = ""
+
+        Dim lLinebuilder As New Text.StringBuilder
+        Dim lCountyList As New atcCollection()
+        Dim lSRCounty As New StreamReader(lFilename)
+        While Not lSRCounty.EndOfStream
+            lOneLine = lSRCounty.ReadLine()
+            lArrCounty = Regex.Split(lOneLine, "\s+")
+            Dim lState As WUState = aCollection.ItemByKey(lArrCounty(5).Substring(0, 2))
+            If lState Is Nothing Then
+                lState = New WUState
+                With lState
+                    .Code = lArrCounty(5).Substring(0, 2)
+                    .Abbreviation = lArrCounty(6)
+                End With
+                aCollection.Add(lState.Code, lState)
+            End If
+            If Not lState.Counties.Keys.Contains(lArrCounty(5)) Then
+                Dim lCounty As New WUCounty
+                With lCounty
+                    .Fips = lArrCounty(5)
+                    .Code = lArrCounty(5).Substring(2) 'the remaining 3 digits
+                    .Area = Double.Parse(lArrCounty(13))
+                    .State = lState
+                End With
+                lState.Counties.Add(lCounty.Fips, lCounty)
+            End If
+
+        End While
+        lSRCounty.Close()
+        lSRCounty = Nothing
+    End Sub
+
+    ''' <summary>
+    ''' This routine is to create dataset place holders in various WDM1 files
+    ''' to hold the flow output from every reach in the UCIs for both year 2000 and 2005
+    ''' Corresponding output lines are added to various UCIs' EXT TARGETS blocks
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub CreateReachFlowOutputDatasetPlaceHoldersInWDM1s()
+        Dim lBaseFolder As String = "G:\Admin\GCRPSusq\RunsWithResvWU"
+        Dim lYears() As Integer = {2000, 2005}
+        Dim lSusqWDMs() As String = {"Susq020501.wdm", "Susq020502.wdm", "Susq020503.wdm"}
+        Dim lSusqRchres() As Integer = {118, 67, 93}
+        Dim lBaseID As Integer = 9000
+        Dim lCopyFromIDs() As Integer = {101, 102, 101}
+
+        Dim lWDMFilename As String
+        Dim lWDMHandle As atcWDM.atcDataSourceWDM
+
+        For Each lYear As Integer In lYears
+            For I As Integer = 0 To lSusqWDMs.Length - 1
+                lWDMFilename = lBaseFolder & lYear & "\" & lSusqWDMs(I)
+                lWDMHandle = New atcWDM.atcDataSourceWDM()
+                If lWDMHandle.Open(lWDMFilename) Then
+                    'For Debug
+                    'Dim lSW As New StreamWriter("C:\Temp\z.txt", False)
+                    'For Each lTs As atcTimeseries In lWDMHandle.DataSets
+                    '    lSW.WriteLine(lTs.Attributes.GetValue("ID") & vbTab & lTs.Attributes.GetValue("Constituent"))
+                    'Next
+                    'lSW.Flush()
+                    'lSW.Close()
+                    'lSW = Nothing
+
+                    Dim lTsCopyFrom As atcTimeseries = lWDMHandle.DataSets.FindData("ID", lCopyFromIDs(I))(0)
+                    For J As Integer = 1 To lSusqRchres(I)
+                        Dim lTsCopyTo As atcTimeseries = lTsCopyFrom.Clone()
+                        lTsCopyTo.Attributes.SetValue("ID", lBaseID + J)
+                        lTsCopyTo.Attributes.SetValue("Location", "R:" & J)
+                        lTsCopyTo.Attributes.SetValue("Constituent", "FLOW")
+                        If Not lWDMHandle.AddDataset(lTsCopyTo, atcDataSource.EnumExistAction.ExistReplace) Then
+                            Logger.Dbg("Failed copying: " & lWDMFilename & " R:" & J)
+                        End If
+                    Next
+                    lWDMHandle.Clear()
+                    lWDMHandle = Nothing
+                End If
+            Next 'Susq WDM
+        Next 'Next Year
+        Logger.Dbg("Done copying.")
+    End Sub
+
+    ''' <summary>
+    ''' This routine is to remove the previously added HFRAC data so that
+    ''' new HFRAC data can be added. These are having dataset ids in the 6000 range
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub RemoveFrackingDataFrom2025ScenarioWDMs()
+        Dim lTargetWDMFolder As String = "G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\"
+        Dim lProjectionScenario() As String = {"BAU", "EP", "GT"}
+
+        Dim lProjectionYear As String = "2040"
+        lProjectionYear = "2025"
+
+        Dim lWDMs() As String = {"SusqTrans01.wdm", "SusqTrans02.wdm", "SusqTrans03.wdm"}
+        Dim lWDMHandle As atcWDM.atcDataSourceWDM = Nothing
+        For Each lScen As String In lProjectionScenario
+            For Each lWDM As String In lWDMs
+                Dim lWDMFilename As String = lTargetWDMFolder & lScen & lProjectionYear & "\" & lWDM
+                lWDMHandle = New atcWDM.atcDataSourceWDM()
+                If lWDMHandle.Open(lWDMFilename) Then
+                    Dim lHFRACdatasets As atcTimeseriesGroup = lWDMHandle.DataSets.FindData("Constituent", "HFRAC")
+                    For Each lTs As atcDataSet In lHFRACdatasets
+                        lWDMHandle.RemoveDataset(lTs)
+                    Next
+                    lWDMHandle.Clear()
+                    lWDMHandle = Nothing
+                End If
+            Next
+        Next
+
+    End Sub
+
+    Private Sub AddNewFrackingDataTo2025ScenarioWDMs()
+        Dim lBaseFolder As String = "G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\"
+        'Dim lYears() As Integer = {2000, 2005}
+        Dim lProjectionYears() As Integer = {2025}
+
+        Dim lWDMs() As String = {"SusqTrans01.wdm", "SusqTrans02.wdm", "SusqTrans03.wdm"}
+        Dim lSusqRuns() As String = {"020501", "020502", "020503"}
+        Dim lSusqRchres() As Integer = {118, 67, 93}
+        Dim lBaseID As Integer = 6000
+
+        Dim lMgY2Cfs As Double = 0.00423617166 '1 million us gallons per year = cubic foot per second
+
+        Dim lDateStart As Double = Date2J(1985, 1, 1, 0, 0, 0)
+        Dim lDateEnd As Double = Date2J(2005, 12, 31, 24, 0, 0)
+
+        Dim lNewProjectionFrackingDataFile As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\PWS_Well_Projection\FutureFrackingWU_SRB.xls"
+        Dim lScenariosWorksheets() As String = {"Business_As_Usual", "Energy_Plus", "Green_Technology"}
+
+        Dim lScenariosFolders() As String = {"BAU", "EP", "GT"}
+
+        Dim lWDMFilename As String
+        Dim lWDMHandle As atcWDM.atcDataSourceWDM
+
+
+        Dim lxlApp As Excel.Application = Nothing
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+
+        lxlApp = New Excel.Application()
+        lxlWorkbook = lxlApp.Workbooks.Open(lNewProjectionFrackingDataFile)
+
+        For Each lProjectionYear As Integer In lProjectionYears
+            For Each lScen As String In lScenariosFolders
+                Dim lWorkSheetName As String = ""
+                Select Case lScen
+                    Case "BAU" : lWorkSheetName = "Business_As_Usual"
+                    Case "EP" : lWorkSheetName = "Energy_Plus"
+                    Case "GT" : lWorkSheetName = "Green_Technology"
+                End Select
+                lxlSheet = lxlWorkbook.Worksheets(lWorkSheetName)
+
+                For I As Integer = 0 To lSusqRuns.Length - 1
+                    lWDMFilename = lBaseFolder & lScen & lProjectionYear & "\" & "SusqTrans" & lSusqRuns(I).Substring(4) & ".wdm"
+                    lWDMHandle = New atcWDM.atcDataSourceWDM()
+                    If lWDMHandle.Open(lWDMFilename) Then
+                        For S As Integer = 1 To lSusqRchres(I)
+
+                            Dim lProj As String = ""
+                            Dim lSub As String = ""
+                            Dim lHFVal As String = ""
+
+                            For lRow As Integer = 2 To lxlSheet.UsedRange.Rows.Count
+                                lProj = lxlSheet.Cells(lRow, 7).Value
+                                lSub = lxlSheet.Cells(lRow, 6).Value
+                                If lProj = lSusqRuns(I) AndAlso Integer.Parse(lSub) = S Then
+                                    lHFVal = lxlSheet.Cells(lRow, 5).Value
+                                    Exit For
+                                End If
+                            Next 'lRow
+                            If lHFVal = "" Then
+                                lHFVal = "0.0"
+                            End If
+
+                            Dim lHFValDouble As Double = Double.Parse(lHFVal) 'Millions Gallon per year
+                            Dim lHFValCfs As Double = lHFValDouble * lMgY2Cfs
+                            Dim lTsHFrac2025 As atcTimeseries = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUYear, "HFRAC", lBaseID + Integer.Parse(lSub), lHFValCfs, lDateStart, lDateEnd, "R:" & lSub, lScen)
+
+                            If Not lWDMHandle.AddDataset(lTsHFrac2025, atcDataSource.EnumExistAction.ExistReplace) Then
+                                Logger.Dbg("Failed writing 2025 HydroFracking for " & lScen & lProjectionYear & ":" & lHFValDouble)
+                            End If
+
+                        Next 'subbasin S
+
+                        lWDMHandle.Clear()
+                        lWDMHandle = Nothing
+                    End If
+                Next 'SusqRun
+
+            Next 'lScen
+        Next 'lprojectionYear
+
+        lxlWorkbook.Close(False)
+
+        'clean up
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlWorkbook = Nothing
+        lxlApp = Nothing
+        Logger.Dbg("Done writing 2025 HFRAC.")
     End Sub
 
 #Region "UtilityClasses"
