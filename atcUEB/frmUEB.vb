@@ -2169,10 +2169,11 @@ Public Class frmUEB
             ChDriveDir(IO.Path.GetDirectoryName(txtMasterFile.Text))
             lMsg = ""
             If pParmData.FileName.Length > 0 Then 'check parameter file inputs
-                For i = 1 To pParmData.Variables.Count
+                'skip first to ParmData elements as they are flags set from Input Control tab
+                For i = 1 To pParmData.Variables.Count - 2
                     lValue = AtcGridModelParms.Source.CellValue(i, 1)
                     If IsNumeric(lValue) Then
-                        pParmData.Variables(i - 1).Value = lValue
+                        pParmData.Variables(i + 1).Value = lValue
                     Else 'problem with a parameter value
                         lMsg = "Problem processing value on Model Parameters tab in row " & i
                         Exit For
@@ -2189,18 +2190,18 @@ Public Class frmUEB
             If pSiteData.FileName.Length > 0 Then 'check site variable inputs
                 For i = 1 To pSiteData.Variables.Count
                     With AtcGridSiteVars.Source
-                        If FileExists(.CellValue(i, 1)) Then 'valid NetCDF file entered
-                            pSiteData.Variables(i - 1).GridFileName = .CellValue(i, 1)
+                        If FileExists(.CellValue(i, 2)) Then 'valid NetCDF file entered
+                            pSiteData.Variables(i - 1).GridFileName = .CellValue(i, 2)
                             If .CellValue(i, 2).Length > 0 Then
                                 'TODO: check validity of Grid Variable name
-                                pSiteData.Variables(i - 1).GridVariableName = .CellValue(i, 2)
+                                pSiteData.Variables(i - 1).GridVariableName = .CellValue(i, 3)
                                 pSiteData.Variables(i - 1).SpaceVarying = True
                             Else
                                 lMsg = "No grid variable specified in row " & i
                                 Exit For
                             End If
-                        ElseIf IsNumeric(.CellValue(i, 3)) Then
-                            pSiteData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 3))
+                        ElseIf IsNumeric(.CellValue(i, 4)) Then
+                            pSiteData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 4))
                             pSiteData.Variables(i - 1).SpaceVarying = False
                         Else 'problem with a site value
                             lMsg = "Problem processing value on Site Variables tab in row " & i
@@ -2241,23 +2242,23 @@ Public Class frmUEB
                 If lMsg.Length = 0 Then
                     For i = 1 To pInputControlData.Variables.Count
                         With AtcGridInputControl.Source
-                            If FileExists(.CellValue(i, 1)) Then 'valid NetCDF file entered
-                                pInputControlData.Variables(i - 1).GridFileName = .CellValue(i, 1)
-                                If .CellValue(i, 2).Length > 0 Then
+                            If FileExists(.CellValue(i, 2)) Then 'valid NetCDF file entered
+                                pInputControlData.Variables(i - 1).GridFileName = .CellValue(i, 2)
+                                If .CellValue(i, 3).Length > 0 Then
                                     'TODO: check validity of Grid Variable name
-                                    pInputControlData.Variables(i - 1).GridVariableName = .CellValue(i, 2)
+                                    pInputControlData.Variables(i - 1).GridVariableName = .CellValue(i, 3)
                                     pInputControlData.Variables(i - 1).SpaceVarying = True
                                     pInputControlData.Variables(i - 1).TimeVarying = True
                                 Else
                                     lMsg = "No grid variable specified in row " & i
                                     Exit For
                                 End If
-                            ElseIf FileExists(.CellValue(i, 3)) Then 'valid timeseries file entered
-                                pInputControlData.Variables(i - 1).TimeFileName = .CellValue(i, 3)
+                            ElseIf FileExists(.CellValue(i, 4)) Then 'valid timeseries file entered
+                                pInputControlData.Variables(i - 1).TimeFileName = .CellValue(i, 4)
                                 pInputControlData.Variables(i - 1).TimeVarying = True
                                 pInputControlData.Variables(i - 1).SpaceVarying = False
-                            ElseIf IsNumeric(.CellValue(i, 4)) Then
-                                pInputControlData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 4))
+                            ElseIf IsNumeric(.CellValue(i, 5)) Then
+                                pInputControlData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 5))
                                 pInputControlData.Variables(i - 1).SpaceVarying = False
                                 pInputControlData.Variables(i - 1).TimeVarying = False
                             Else 'problem with a site value
