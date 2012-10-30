@@ -15,7 +15,7 @@ Public Class clsUEBVariable
     End Function
 
     Public Function ParameterString() As String
-        Return Description & vbCrLf & DoubleToString(Value) & vbCrLf
+        Return Description & vbCrLf & DoubleToString(Value, , "###0.#######") & vbCrLf
     End Function
 
     Public Shared Function FromParameterString(ByRef aFileContents As String) As clsUEBVariable
