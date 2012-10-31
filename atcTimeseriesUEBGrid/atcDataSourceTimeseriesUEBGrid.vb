@@ -61,8 +61,8 @@ Public Class atcDataSourceTimeseriesUEBGrid
             Dim lScenario As String = FilenameNoExt(FilenameNoPath(Specification))
 
             Try
-                For Each lRec In LinesInFile(aFileName)
-                    lRec = ReplaceRepeats(lRec, " ")
+                For Each lRec In LinesInFile(Specification)
+                    lRec = ReplaceRepeats(lRec, " ").Trim
                     lStrArray = lRec.Split(lChrSepVals, StringSplitOptions.None)
                     If Integer.TryParse(lStrArray(0), lYear) AndAlso _
                        Integer.TryParse(lStrArray(1), lMonth) AndAlso _
@@ -75,7 +75,7 @@ Public Class atcDataSourceTimeseriesUEBGrid
                             Integer.TryParse(lStrArray(3), lHour)
                             lMinute = 0
                         End If
-                        lVarName = lStrArray(4)
+                        lVarName = lStrArray(4).ToUpper
                         Integer.TryParse(lStrArray(5), lWatershedID)
                         Double.TryParse(lStrArray(6), lVal)
                         lJDate = Jday(lYear, lMonth, lDay, lHour, lMinute, 0)
