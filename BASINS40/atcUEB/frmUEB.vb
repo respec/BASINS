@@ -2150,12 +2150,56 @@ Public Class frmUEB
 
         UpdateInputFiles()
         Dim lExeFileName = FindFile("UEBGrid Executable", "UEBGrid.exe")
-        LaunchProgram(lExeFileName, PathNameOnly(txtMasterFile.Text), FilenameNoPath(txtMasterFile.Text))
+        Dim lWorkingDirectory As String = PathNameOnly(txtMasterFile.Text)
+        Dim lArguments As String = FilenameNoPath(txtMasterFile.Text)
+        'LaunchProgram(lExeFileName, PathNameOnly(txtMasterFile.Text), FilenameNoPath(txtMasterFile.Text))
+
+        Logger.Dbg("LaunchProgram " & lExeFileName & " in " & lWorkingDirectory)
+        Dim lExitCode As Integer = 0
+        Try
+            Dim lProcess As New System.Diagnostics.Process
+            With lProcess.StartInfo
+                .FileName = lExeFileName
+                .WorkingDirectory = lWorkingDirectory
+                .CreateNoWindow = False
+                .UseShellExecute = False
+                If Not String.IsNullOrEmpty(lArguments) Then .Arguments = lArguments
+                .RedirectStandardOutput = False
+                AddHandler lProcess.OutputDataReceived, AddressOf MessageHandler
+                .RedirectStandardError = False
+                AddHandler lProcess.ErrorDataReceived, AddressOf MessageHandler
+            End With
+            lProcess.Start()
+            'lProcess.BeginErrorReadLine()
+            'lProcess.BeginOutputReadLine()
+            'If aWait Then
+KeepWaiting:
+            Try
+                lProcess.WaitForExit()
+                lExitCode = lProcess.ExitCode
+            Catch lWaitError As Exception
+                Logger.Dbg(lWaitError.Message)
+            End Try
+            If Not lProcess.HasExited Then GoTo KeepWaiting
+            Logger.Dbg("LaunchProgram: " & lExeFileName & ": Exit code " & lExitCode)
+            'End If
+        Catch lEx As ApplicationException
+            Logger.Dbg("LaunchProgram: " & lExeFileName & ": Exception: " & lEx.Message)
+            lExitCode = -1
+        End Try
+
         If FileExists(pAggOutputFileName) Then
             Dim lUEBTimeseries As New atcTimeseriesUEBGrid.atcDataSourceTimeseriesUEBGrid
             atcDataManager.OpenDataSource(lUEBTimeseries, pAggOutputFileName, Nothing)
         End If
 
+    End Sub
+
+    Private Sub MessageHandler(ByVal aSendingProcess As Object, _
+                           ByVal aOutLine As DataReceivedEventArgs)
+        If Not String.IsNullOrEmpty(aOutLine.Data) Then
+            Logger.Dbg(aOutLine.Data.ToString)
+        End If
     End Sub
 
     Private Sub UpdateInputFiles()
