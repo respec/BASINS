@@ -2148,49 +2148,47 @@ Public Class frmUEB
 
     Private Sub cmdSimulate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdSimulate.Click
 
-        UpdateInputFiles()
-        Dim lExeFileName = FindFile("UEBGrid Executable", "UEBGrid.exe")
-        Dim lWorkingDirectory As String = PathNameOnly(txtMasterFile.Text)
-        Dim lArguments As String = FilenameNoPath(txtMasterFile.Text)
-        'LaunchProgram(lExeFileName, PathNameOnly(txtMasterFile.Text), FilenameNoPath(txtMasterFile.Text))
+        If UpdateInputFiles() Then
+            Dim lExeFileName = FindFile("UEBGrid Executable", "UEBGrid.exe")
+            Dim lWorkingDirectory As String = PathNameOnly(txtMasterFile.Text)
+            Dim lArguments As String = FilenameNoPath(txtMasterFile.Text)
 
-        Logger.Dbg("LaunchProgram " & lExeFileName & " in " & lWorkingDirectory)
-        Dim lExitCode As Integer = 0
-        Try
-            Dim lProcess As New System.Diagnostics.Process
-            With lProcess.StartInfo
-                .FileName = lExeFileName
-                .WorkingDirectory = lWorkingDirectory
-                .CreateNoWindow = False
-                .UseShellExecute = False
-                If Not String.IsNullOrEmpty(lArguments) Then .Arguments = lArguments
-                .RedirectStandardOutput = False
-                AddHandler lProcess.OutputDataReceived, AddressOf MessageHandler
-                .RedirectStandardError = False
-                AddHandler lProcess.ErrorDataReceived, AddressOf MessageHandler
-            End With
-            lProcess.Start()
-            'lProcess.BeginErrorReadLine()
-            'lProcess.BeginOutputReadLine()
-            'If aWait Then
-KeepWaiting:
+            'LaunchProgram(lExeFileName, PathNameOnly(txtMasterFile.Text), FilenameNoPath(txtMasterFile.Text))
+            'use local cousin of LaunchProgram to allow DOS Window showing UEBGrid status
+            Logger.Dbg("LaunchProgram " & lExeFileName & " in " & lWorkingDirectory)
+            Dim lExitCode As Integer = 0
             Try
-                lProcess.WaitForExit()
-                lExitCode = lProcess.ExitCode
-            Catch lWaitError As Exception
-                Logger.Dbg(lWaitError.Message)
+                Dim lProcess As New System.Diagnostics.Process
+                With lProcess.StartInfo
+                    .FileName = lExeFileName
+                    .WorkingDirectory = lWorkingDirectory
+                    .CreateNoWindow = False
+                    .UseShellExecute = False
+                    If Not String.IsNullOrEmpty(lArguments) Then .Arguments = lArguments
+                    .RedirectStandardOutput = False
+                    AddHandler lProcess.OutputDataReceived, AddressOf MessageHandler
+                    .RedirectStandardError = False
+                    AddHandler lProcess.ErrorDataReceived, AddressOf MessageHandler
+                End With
+                lProcess.Start()
+KeepWaiting:
+                Try
+                    lProcess.WaitForExit()
+                    lExitCode = lProcess.ExitCode
+                Catch lWaitError As Exception
+                    Logger.Dbg(lWaitError.Message)
+                End Try
+                If Not lProcess.HasExited Then GoTo KeepWaiting
+                Logger.Dbg("LaunchProgram: " & lExeFileName & ": Exit code " & lExitCode)
+            Catch lEx As ApplicationException
+                Logger.Dbg("LaunchProgram: " & lExeFileName & ": Exception: " & lEx.Message)
+                lExitCode = -1
             End Try
-            If Not lProcess.HasExited Then GoTo KeepWaiting
-            Logger.Dbg("LaunchProgram: " & lExeFileName & ": Exit code " & lExitCode)
-            'End If
-        Catch lEx As ApplicationException
-            Logger.Dbg("LaunchProgram: " & lExeFileName & ": Exception: " & lEx.Message)
-            lExitCode = -1
-        End Try
 
-        If FileExists(pAggOutputFileName) Then
-            Dim lUEBTimeseries As New atcTimeseriesUEBGrid.atcDataSourceTimeseriesUEBGrid
-            atcDataManager.OpenDataSource(lUEBTimeseries, pAggOutputFileName, Nothing)
+            If FileExists(pAggOutputFileName) Then
+                Dim lUEBTimeseries As New atcTimeseriesUEBGrid.atcDataSourceTimeseriesUEBGrid
+                atcDataManager.OpenDataSource(lUEBTimeseries, pAggOutputFileName, Nothing)
+            End If
         End If
 
     End Sub
@@ -2202,7 +2200,7 @@ KeepWaiting:
         End If
     End Sub
 
-    Private Sub UpdateInputFiles()
+    Private Function UpdateInputFiles() As Boolean
         Dim i As Integer
         Dim lMsg As String
         Dim lValue As String
@@ -2227,6 +2225,7 @@ KeepWaiting:
                     pParmData.WriteParameterFile()
                 Else
                     MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
+                    Return False
                 End If
             End If
 
@@ -2257,6 +2256,7 @@ KeepWaiting:
                     pSiteData.WriteSiteFile()
                 Else
                     MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
+                    Return False
                 End If
             End If
 
@@ -2316,6 +2316,7 @@ KeepWaiting:
                     pInputControlData.WriteInputControlFile()
                 Else
                     MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
+                    Return False
                 End If
             End If
 
@@ -2372,9 +2373,14 @@ KeepWaiting:
                     MsgBox("No variables selected for output to " & pAggOutputControlData.FileName, MsgBoxStyle.Information, "UEB Write")
                 End If
             End If
+            Return True
+        Else
+            MsgBox("One or more elements of the master control data file are not defined." & vbCrLf & _
+                   "These include the Watershed File, Site and Parameter Files, and Input and Output Control Files.", MsgBoxStyle.Information, "UEB Write")
+            Return False
         End If
 
-    End Sub
+    End Function
 
     Private Sub SetParmGrid()
 
