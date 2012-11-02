@@ -318,7 +318,10 @@ Public Module modGeoSFM
         'UEB Grid generation
         If aUEBWatershedFileName.Length > 0 And aUEBWaterShedVarName.Length > 0 Then
             'generate UEB Watershed grid and slope/aspect grids
-
+            Logger.Status("Step 12 of 12: Computing UEB Slope and Aspect Grids")
+            Dim lUEBSlopeGridFileName As String = FilenameNoExt(lDEMFileName) & "UEBSlope.tif"
+            Dim lAspectGridFileName As String = FilenameNoExt(lDEMFileName) & "Aspect.tif"
+            GisUtil.SlopeAspectTarbottonMethod(lDEMFileName, lUEBSlopeGridFileName, lAspectGridFileName)
         End If
 
         Logger.Progress(100, 100)
