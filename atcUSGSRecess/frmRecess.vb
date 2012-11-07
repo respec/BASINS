@@ -22,6 +22,7 @@ Public Class frmRecess
     Private pGraphRecessDatagroup As atcTimeseriesGroup
 
     Private pRecess As clsRecess
+    Private pFall As clsFall
 
     Private pDateFormat As atcDateFormat
     Private pYearStartMonth As Integer = 0
@@ -50,7 +51,10 @@ Public Class frmRecess
 
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
                       Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
-                      Optional ByVal aShowForm As Boolean = True)
+                      Optional ByVal aShowForm As Boolean = True, _
+                      Optional ByVal aRecess As clsRecess = Nothing, _
+                      Optional ByVal aFall As clsFall = Nothing, _
+                      Optional ByVal aModal As Boolean = False)
         If aBasicAttributes Is Nothing Then
             pBasicAttributes = atcDataManager.DisplayAttributes
         Else
@@ -60,11 +64,26 @@ Public Class frmRecess
         pGraphRecessDatagroup = New atcTimeseriesGroup()
         pLastRunConfigs = New atcDataAttributes()
         pLastSelectedRecessions = New atcCollection()
+
         If pRecess IsNot Nothing Then
             pRecess.Clear()
             pRecess = Nothing
         End If
         pRecess = New clsRecess()
+
+        '...FALL...
+        If aFall IsNot Nothing Then
+            pFall = aFall
+            pFall.Clear()
+        Else
+            If pFall IsNot Nothing Then
+                pFall.Clear()
+                pFall = Nothing
+            End If
+            pFall = New clsFall()
+        End If
+        '...FALL...
+
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         InitMasterPane()
         lstRecessSegments.Items.Clear()
@@ -73,7 +92,11 @@ Public Class frmRecess
         txtAnalysisResults.Visible = False
         PopulateForm()
         chkSaveInterimToFile.Checked = True
-        Me.Show()
+        If aModal Then
+            Me.ShowDialog()
+        Else
+            Me.Show()
+        End If
     End Sub
 
     Public Property Grapher() As clsGraphBase
@@ -172,6 +195,46 @@ Public Class frmRecess
 
         txtOutputDir.Text = pOutputDir
         txtMinRecessionDays.Text = pMinRecessLength
+
+        '...FALL...
+        If pDataGroup IsNot Nothing AndAlso pDataGroup.Count > 0 Then
+            Dim lParmCd As String = pDataGroup(0).Attributes.GetValue("parm_cd")
+            Dim lDescription As String = pDataGroup(0).Attributes.GetValue("Description")
+            Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
+            Dim lDataTypeStr As String = ""
+            If lParmCd IsNot Nothing Then
+                lDataTypeStr &= "Parameter Code: " & lParmCd & vbCrLf & vbCrLf
+            End If
+            If lDescription IsNot Nothing Then
+                lDataTypeStr &= "Description:" & vbCrLf & lDescription
+            End If
+            txtDataInfo.Text = lDataTypeStr
+            If lCons = "GW LEVEL" Then
+                SwitchSeasonControls(False)
+                panelRiseFall.Visible = True
+            ElseIf lCons = "FLOW" Then
+                SwitchSeasonControls(True)
+                panelRiseFall.Visible = False
+            End If
+        End If
+        '...FALL...
+    End Sub
+
+    Public Sub SetFindingRises(ByVal aRise As Boolean)
+        If aRise Then
+            rdoGWRise.Checked = True
+        Else
+            rdoGWFall.Checked = True
+        End If
+    End Sub
+
+    Private Sub SwitchSeasonControls(ByVal aOn As Boolean)
+        rdoSpring.Enabled = aOn
+        rdoSummer.Enabled = aOn
+        rdoFall.Enabled = aOn
+        rdoWinter.Enabled = aOn
+        rdoNoSeason.Enabled = aOn
+        btnCurv.Enabled = aOn
     End Sub
 
     Public Sub Recess()
@@ -1061,8 +1124,10 @@ Public Class frmRecess
         If pGrapher IsNot Nothing Then
             With pGrapher.ZedGraphCtrl.GraphPane
                 .YAxis.Title.Text = ""
+                .XAxis.Title.Text = ""
             End With
             pGrapher = Nothing
+            RefreshGraph()
         End If
         pGrapher = New clsGraphTime(aDataGroup, pZgc)
         'Dim lDataMin As Double = aDataGroup(0).Dates.Value(0)
@@ -1080,6 +1145,49 @@ Public Class frmRecess
             .AxisChange()
         End With
         pZgc.Refresh()
+    End Sub
+
+    Public Sub GraphFallCurves()
+
+        ' get a reference to the GraphPane
+        If pZgc IsNot Nothing Then
+            With pZgc.GraphPane
+                .CurveList.Clear()
+                .XAxis.Type = AxisType.Linear
+                .XAxis.Scale.MinAuto = False
+                .XAxis.Scale.Min = 1
+                .XAxis.Scale.MaxAuto = True
+                .YAxis.Title.Text = ""
+                .XAxis.Title.Text = ""
+            End With
+            'pGrapher = Nothing
+        End If
+
+        ' Make up data arrays from GWL data
+        Dim listPP As PointPairList = Nothing
+        Dim lSeqCtr As Integer = 1
+        For Each lSeg As clsRecessionSegment In pFall.listOfSegments
+            'If lSeg.IsExcluded Then Continue For
+
+            listPP = New PointPairList()
+            If lSeg.NeedtoReadData Then lSeg.GetData()
+            For I As Integer = 1 To lSeg.Flow.Length - 1
+                listPP.Add(I, lSeg.Flow(I))
+            Next
+            Dim lCurve As LineItem = pZgc.GraphPane.AddCurve("Seq #" & lSeqCtr, listPP, System.Drawing.Color.Black, SymbolType.None)
+            lSeqCtr += 1
+        Next
+
+        ' Set the Titles
+        pZgc.GraphPane.XAxis.Title.Text = "Day"
+        pZgc.GraphPane.YAxis.Title.Text = "GWL (ft)"
+        pZgc.GraphPane.Legend.IsVisible = False
+
+        ' Tell ZedGraph to refigure the axes since the data have changed
+        pZgc.GraphPane.AxisChange()
+        pZgc.AxisChange()
+        pZgc.Refresh()
+
     End Sub
 
     ' -----THIS SUBROUTINE PERFORMS LEAST-SQUARES REGRESSION TO FIND BEST-FIT ---
@@ -1194,48 +1302,106 @@ Public Class frmRecess
 
     Private Sub frmUSGSStreamFlowAnalysis_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
         If pDataGroup IsNot Nothing Then
-            pDataGroup.Clear()
-            pDataGroup = Nothing
+            'pDataGroup.Clear()
+            'pDataGroup = Nothing
         End If
     End Sub
 
     Private Sub btnGetAllSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGetAllSegments.Click
+        Dim lConfigurationGood As Boolean = False
         If ConfigurationChanged() Then
-            'Dim lArgs As New atcDataAttributes
-            'Reset all listing/graphs when redo
-            txtAnalysisResults.Text = ""
-            lstTable.Items.Clear()
-            pGraphRecessDatagroup.Clear()
-            RefreshGraphRecess(pGraphRecessDatagroup)
-
-            Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
-            If lFormCheckMsg.Length > 0 Then
-                Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
-                Exit Sub
-            End If
-
-            If pRecess IsNot Nothing Then
-                pRecess.Clear()
-                'pRecess = Nothing
-            End If
-            'pRecess = New clsRecess()
-            pRecess.Initialize(pDataGroup(0), pLastRunConfigs)
-            pRecess.RecessGetAllSegments()
-            lstRecessSegments.Items.Clear()
-            For Each lPeakDate As String In pRecess.listOfSegments.Keys
-                lstRecessSegments.Items.Add(lPeakDate)
-            Next
-
-            If lstRecessSegments.Items.Count = 0 Then
+            If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+                'Dim lArgs As New atcDataAttributes
+                'Reset all listing/graphs when redo
                 txtAnalysisResults.Text = ""
                 lstTable.Items.Clear()
                 pGraphRecessDatagroup.Clear()
                 RefreshGraphRecess(pGraphRecessDatagroup)
+
+                Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
+                If lFormCheckMsg.Length > 0 Then
+                    Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
+                    Exit Sub
+                End If
+
+                If pRecess IsNot Nothing Then
+                    pRecess.Clear()
+                    'pRecess = Nothing
+                End If
+                'pRecess = New clsRecess()
+                pRecess.Initialize(pDataGroup(0), pLastRunConfigs)
+                pRecess.RecessGetAllSegments()
+                lstRecessSegments.Items.Clear()
+                For Each lPeakDate As String In pRecess.listOfSegments.Keys
+                    lstRecessSegments.Items.Add(lPeakDate)
+                Next
+
+                If lstRecessSegments.Items.Count = 0 Then
+                    txtAnalysisResults.Text = ""
+                    lstTable.Items.Clear()
+                    pGraphRecessDatagroup.Clear()
+                    RefreshGraphRecess(pGraphRecessDatagroup)
+                End If
+                lConfigurationGood = True
+            ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+                lConfigurationGood = GetAllSegmentsGW()
             End If
         End If
-        panelConfiguration.Visible = False
-        panelAnalysis.Visible = True
+
+        If lConfigurationGood Then
+            panelConfiguration.Visible = False
+            panelAnalysis.Visible = True
+        End If
     End Sub
+
+    Private Function GetAllSegmentsGW() As Boolean
+        'Dim lArgs As New atcDataAttributes
+        'Reset all listing/graphs when redo
+        txtAnalysisResults.Text = ""
+        lstTable.Items.Clear()
+        pGraphRecessDatagroup.Clear()
+        RefreshGraphRecess(pGraphRecessDatagroup)
+
+        Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
+        If lFormCheckMsg.Length > 0 Then
+            Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
+            Return False
+        End If
+
+        If pFall IsNot Nothing Then
+            pFall.Clear()
+            'pRecess = Nothing
+        End If
+        'pRecess = New clsRecess()
+        'only apply a datum for GWL data
+
+        If pDataGroup(0).Attributes.GetValue("parm_cd") = "72019" OrElse pDataGroup(0).Attributes.GetValue("parm_cd") = "61055" Then
+            pFall.DataType = 1
+            Dim lElev As Double = pDataGroup(0).Attributes.GetValue("Elevation", 1000.0) 'this is the ground elevation at the well
+            'pLastRunConfigs.Add("ApplyDatum", True) 'only apply datum for depth to water GWL
+            'pLastRunConfigs.Add("Datum", lElev)
+            pFall.ApplyDatum = True
+            pFall.Datum = lElev
+        Else
+            pFall.DataType = 2
+        End If
+        pFall.Initialize(pDataGroup(0), pLastRunConfigs)
+
+        pFall.RecessGetAllSegments(pLastRunConfigs.GetValue("GWFall", True))
+        lstRecessSegments.Items.Clear()
+        For Each lPeakDate As String In pFall.listOfSegments.Keys
+            lstRecessSegments.Items.Add(lPeakDate)
+        Next
+
+        If lstRecessSegments.Items.Count = 0 Then
+            txtAnalysisResults.Text = ""
+            lstTable.Items.Clear()
+            pGraphRecessDatagroup.Clear()
+            RefreshGraphRecess(pGraphRecessDatagroup)
+        End If
+
+        Return True
+    End Function
 
     Private Function AttributesFromForm(ByRef Args As atcDataAttributes) As String
         'check validity of inputs
@@ -1253,6 +1419,7 @@ Public Class frmRecess
                 Dim lTs As atcTimeseries = Nothing
                 For Each lTs In pDataGroup
                     Try
+                        If lTs.Attributes.GetValue("Constituent") = "GW LEVEL" Then Continue For
                         lTs = SubsetByDate(lTs, lSDate, lEDate, Nothing)
                         If lTs.Attributes.GetValue("Count missing") > 0 Then
                             lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
@@ -1293,6 +1460,17 @@ Public Class frmRecess
             Args.SetValue("MinSegmentLength", lMinRecLength)
             Args.SetValue("SelectedMonths", lMonths)
             Args.SetValue("Season", lSeason)
+
+            '...FALL...
+            If pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+                If rdoGWFall.Checked Then
+                    Args.SetValue("GWFall", True)
+                ElseIf rdoGWRise.Checked Then
+                    Args.SetValue("GWFall", False)
+                End If
+            End If
+            '...FALL...
+
             'set duration
             Args.SetValue("Start Date", lSDate)
             Args.SetValue("End Date", lEDate)
@@ -1404,7 +1582,12 @@ Public Class frmRecess
             'run for the first time
             'record the selection
             For Each lItem As String In lstRecessSegments.CheckedItems
-                lSeg = pRecess.listOfSegments.ItemByKey(lItem)
+                If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+                    lSeg = pRecess.listOfSegments.ItemByKey(lItem)
+                ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+                    lSeg = pFall.listOfSegments.ItemByKey(lItem)
+                End If
+
                 pLastSelectedRecessions.Add(lItem, lSeg.MinDayOrdinal.ToString & "-" & lSeg.MaxDayOrdinal.ToString)
             Next
             Return True
@@ -1413,7 +1596,12 @@ Public Class frmRecess
             If lstRecessSegments.CheckedItems.Count = pLastSelectedRecessions.Count Then
                 For Each lItem As String In lstRecessSegments.CheckedItems
                     If pLastSelectedRecessions.Keys.Contains(lItem) Then
-                        lSeg = pRecess.listOfSegments.ItemByKey(lItem)
+                        If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+                            lSeg = pRecess.listOfSegments.ItemByKey(lItem)
+                        ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+                            lSeg = pFall.listOfSegments.ItemByKey(lItem)
+                        End If
+
                         Dim lCurrentDuration As String = lSeg.MinDayOrdinal.ToString & "-" & lSeg.MaxDayOrdinal.ToString
                         If pLastSelectedRecessions.ItemByKey(lItem) <> lCurrentDuration Then
                             lIsSelectionChanged = True
@@ -1562,20 +1750,34 @@ Public Class frmRecess
         Else
             Exit Sub
         End If
-        pRecess.DoOperation(lOperation, lstRecessSegments.Items(e.Index).ToString)
+
+        If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+            pRecess.DoOperation(lOperation, lstRecessSegments.Items(e.Index).ToString)
+        ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+            pFall.DoOperation(lOperation, lstRecessSegments.Items(e.Index).ToString)
+        End If
     End Sub
 
     Private Sub lstRecessSegments_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstRecessSegments.SelectedIndexChanged
         If txtAnalysisResults.Visible Then txtAnalysisResults.Visible = False
-        pRecess.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
-        'txtDisplayText.Text = pRecess.Table
         lstTable.Items.Clear()
-        Dim lSegs() As String = pRecess.Table.Split(vbCrLf)
+        pGraphRecessDatagroup.Clear()
+        Dim lSegs() As String = Nothing
+
+        If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+            pRecess.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
+            lSegs = pRecess.Table.Split(vbCrLf)
+            pGraphRecessDatagroup.Add(pRecess.GraphTs)
+        ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+            pFall.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
+            lSegs = pFall.Table.Split(vbCrLf)
+            pGraphRecessDatagroup.Add(pFall.GraphTs)
+        End If
+
+        'txtDisplayText.Text = pRecess.Table
         For Each lSeg As String In lSegs
             If lSeg.Trim() <> "" Then lstTable.Items.Add(lSeg.Trim(vbCr, vbLf))
         Next
-        pGraphRecessDatagroup.Clear()
-        pGraphRecessDatagroup.Add(pRecess.GraphTs)
         RefreshGraphRecess(pGraphRecessDatagroup)
     End Sub
 
@@ -1637,8 +1839,13 @@ Public Class frmRecess
 
         Dim lTargetPeakDate As String = lstRecessSegments.SelectedItem.ToString
         Try
-            pRecess.DoOperation("r", lTargetPeakDate)
-            txtAnalysisResults.Text = pRecess.Bulletin
+            If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+                pRecess.DoOperation("r", lTargetPeakDate)
+                txtAnalysisResults.Text = pRecess.Bulletin
+            ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+                pFall.DoOperation("r", lTargetPeakDate)
+                txtAnalysisResults.Text = pFall.Bulletin
+            End If
             txtAnalysisResults.Visible = True
         Catch ex As Exception
             Logger.Msg("Regression Analysis for " & lTargetPeakDate & " failed." & vbCrLf & "Error: " & vbCrLf & ex.Message, MsgBoxStyle.Exclamation, "Recess Analysis")
@@ -1685,24 +1892,34 @@ Public Class frmRecess
         If lstRecessSegments.Items.Count = 0 OrElse lstRecessSegments.CheckedItems.Count = 0 Then
             Exit Sub
         End If
-        If Not (RecessionSelectionChanged() OrElse ConfigurationChanged()) Then
-            If pRecess.SaveInterimResults Then pRecess.SaveInterimResults = False
-        Else
-            If chkSaveInterimToFile.Checked Then pRecess.SaveInterimResults = True
-            If pRecess.FileOut1Created Then pRecess.FileOut1Created = False
+
+        If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+            DoSummary(pRecess)
+        ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+            DoSummary(pFall)
         End If
-        pRecess.DoOperation("summary", "")
+
+    End Sub
+
+    Private Sub DoSummary(ByVal aRecess As clsRecess)
+        If Not (RecessionSelectionChanged() OrElse ConfigurationChanged()) Then
+            If aRecess.SaveInterimResults Then aRecess.SaveInterimResults = False
+        Else
+            If chkSaveInterimToFile.Checked Then aRecess.SaveInterimResults = True
+            If aRecess.FileOut1Created Then aRecess.FileOut1Created = False
+        End If
+        aRecess.DoOperation("summary", "")
         With pDataGroup(0).Attributes
-            .SetValue("RORAKMed", pRecess.RecessionIndex)
+            .SetValue("RORAKMed", aRecess.RecessionIndex)
             .SetValue("RORASJD", pLastRunConfigs.GetValue("Start Date"))
             .SetValue("RORAEJD", pLastRunConfigs.GetValue("End Date"))
         End With
-        txtAnalysisResults.Text = pRecess.Bulletin
+        txtAnalysisResults.Text = aRecess.Bulletin
         txtAnalysisResults.Visible = True
 
         pGraphRecessDatagroup.Clear()
-        If pRecess.GraphTs.numValues > 1 Then
-            pGraphRecessDatagroup.Add(pRecess.GraphTs)
+        If aRecess.GraphTs.numValues > 1 Then
+            pGraphRecessDatagroup.Add(aRecess.GraphTs)
             RefreshGraphRecess(pGraphRecessDatagroup)
         End If
     End Sub
@@ -1761,5 +1978,31 @@ Public Class frmRecess
     Private Sub frmRecess_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         panelConfiguration.Dock = DockStyle.Fill
         panelAnalysis.Dock = DockStyle.Fill
+    End Sub
+
+    Private Sub btnFallPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFallPlot.Click
+        If txtAnalysisResults.Visible Then txtAnalysisResults.Visible = False
+        'pRecess.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
+        ''txtDisplayText.Text = pRecess.Table
+        'lstTable.Items.Clear()
+        'Dim lSegs() As String = pRecess.Table.Split(vbCrLf)
+        'For Each lSeg As String In lSegs
+        '    If lSeg.Trim() <> "" Then lstTable.Items.Add(lSeg.Trim(vbCr, vbLf))
+        'Next
+        'pGraphRecessDatagroup.Clear()
+        'pGraphRecessDatagroup.Add(pRecess.GraphTs)
+        GraphFallCurves()
+    End Sub
+
+    Private Sub rdoGWRise_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoGWRise.CheckedChanged, rdoGWFall.CheckedChanged
+        If rdoGWRise.Checked Then
+            btnAnalyse.Enabled = False
+            btnSummary.Enabled = False
+            'btnCurv.Enabled = False 'disabled for GWL data
+        ElseIf rdoGWFall.Checked Then
+            btnAnalyse.Enabled = True
+            btnSummary.Enabled = True
+            'btnCurv.Enabled = True 'disabled for GWL data
+        End If
     End Sub
 End Class

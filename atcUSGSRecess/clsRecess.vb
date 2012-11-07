@@ -62,7 +62,7 @@ Public Class clsRecess
     Public RecessionSegment As clsRecessionSegment = Nothing
 
 #Region "IOManagement"
-    Private pHasWritePermission As Boolean = False
+    Friend fHasWritePermission As Boolean = False
     Private pOutputPath As String
     Public Property OutputPath() As String
         Get
@@ -77,16 +77,16 @@ Public Class clsRecess
                     lSW.Close()
                     lSW = Nothing
                     pOutputPath = value
-                    pHasWritePermission = True
+                    fHasWritePermission = True
                 Catch ex As Exception
                     If lSW IsNot Nothing Then
                         lSW.Close()
                         lSW = Nothing
                     End If
-                    pHasWritePermission = False
+                    fHasWritePermission = False
                 End Try
             Else
-                pHasWritePermission = False
+                fHasWritePermission = False
             End If
         End Set
     End Property
@@ -102,12 +102,12 @@ Public Class clsRecess
     Private pHeaderIndexFile As String = ""
     Private pHeaderRecSumFile As String = ""
 
-    Private pFileOut1 As String = ""
-    Private pFileOut2 As String = ""
+    Protected pFileOut1 As String = ""
+    Protected pFileOut2 As String = ""
     Public FileOut1Created As Boolean = False
     Public FileOut2Created As Boolean = False
 
-    Private Sub SetOutputFiles()
+    Public Overridable Sub SetOutputFiles()
         pFileRecSum = IO.Path.Combine(OutputPath, pFileRecSum)
         pFileRecData = IO.Path.Combine(OutputPath, pFileRecData)
         pFileIndex = IO.Path.Combine(OutputPath, pFileIndex)
@@ -224,7 +224,23 @@ Public Class clsRecess
     'internal use
     Private pCountDay As Integer = 0
     Private pCountRecession As Integer = 0 'originally NMRECES
+    Public Property CountRecession() As Integer
+        Get
+            Return pCountRecession
+        End Get
+        Set(ByVal value As Integer)
+            pCountRecession = value
+        End Set
+    End Property
     Private pIndexPeakDay As Integer = 0
+    Public Property IndexPeakDay() As Integer
+        Get
+            Return pIndexPeakDay
+        End Get
+        Set(ByVal value As Integer)
+            pIndexPeakDay = value
+        End Set
+    End Property
 
     'user interaction
     'FIRST DAY OF THE SEGMENT (a NUMBER)
@@ -316,7 +332,7 @@ Public Class clsRecess
         pDataFilename = IO.Path.GetFileName(lInputfile)
         If SaveInterimResults Then
             SetOutputFiles()
-            If pHasWritePermission Then
+            If fHasWritePermission Then
                 Dim lSW As StreamWriter = Nothing
                 lSW = New StreamWriter(pFileOut1, False)
                 lSW.Close() : lSW = Nothing
@@ -421,6 +437,7 @@ Public Class clsRecess
         pIndexPeakDay = 0
         clsRecessionSegment.StreamFlowTS = FlowData
         clsRecessionSegment.RecessionCount = 0
+
         'Tables = New atcCollection()
         'Graphs = New atcCollection()
         If listOfSegments IsNot Nothing AndAlso listOfSegments.Count > 0 Then
@@ -566,7 +583,7 @@ Public Class clsRecess
                 End If
 
                 'Whole bunch of user prompts
-                If pHasWritePermission Then
+                If fHasWritePermission Then
                     lSW = New IO.StreamWriter(lFileRecData, True) 'keep appending to the file
                     lSW.WriteLine(1 + RecessionSegment.MaxDayOrdinal - RecessionSegment.MinDayOrdinal)
                     For I As Integer = RecessionSegment.MinDayOrdinal To RecessionSegment.MaxDayOrdinal 'loop 231
@@ -715,7 +732,7 @@ Public Class clsRecess
         Return Nothing
     End Function
 
-    Public Sub RecessGetAllSegments()
+    Public Overridable Sub RecessGetAllSegments(Optional ByVal aFall As Boolean = True)
         Dim lDate(5) As Integer
 
         ' ------------- LOCATE a PEAK ---------------------
@@ -801,7 +818,7 @@ Public Class clsRecess
         Next 'original loop 200
     End Sub
 
-    Public Function DoOperation(ByVal aOperation As String, ByVal aRecessKey As String) As Boolean
+    Public Overridable Function DoOperation(ByVal aOperation As String, ByVal aRecessKey As String) As Boolean
         If aRecessKey <> "" Then
             RecessionSegment = listOfSegments.ItemByKey(aRecessKey)
             If RecessionSegment.NeedtoReadData Then
@@ -874,8 +891,14 @@ Public Class clsRecess
         End With
     End Sub
 
-    Private Function RecessAnalyse(ByVal aSegment As clsRecessionSegment) As String
+    Protected Function RecessAnalyse(ByVal aSegment As clsRecessionSegment, Optional ByVal aConstituent As String = "FLOW") As String
         Dim lMsg As New Text.StringBuilder
+        Dim lMaxSegmentLengthInDays As Integer
+        If aConstituent = "FLOW" Then
+            lMaxSegmentLengthInDays = clsRecessionSegment.MaxSegmentLengthInDays
+        ElseIf aConstituent = "GW LEVEL" Then
+            lMaxSegmentLengthInDays = clsRecessionSegment.MaxSegmentLengthInDaysGW
+        End If
         With aSegment
             If .QLog(.MinDayOrdinal) = .QLog(.MaxDayOrdinal) Then
                 lMsg.AppendLine("Recession period flow did not change. Skipped")
@@ -883,8 +906,8 @@ Public Class clsRecess
                 Return lMsg.ToString
             End If
             'If liMax - liMin > 49 Then
-            If .MaxDayOrdinal - .MinDayOrdinal > clsRecessionSegment.MaxSegmentLengthInDays Then
-                lMsg.AppendLine("Recession period is too long (> " & clsRecessionSegment.MaxSegmentLengthInDays & " days). Skipped.")
+            If .MaxDayOrdinal - .MinDayOrdinal > lMaxSegmentLengthInDays Then
+                lMsg.AppendLine("Recession period is too long (> " & lMaxSegmentLengthInDays & " days). Skipped.")
                 'Go To 230 marker to display again
                 Return lMsg.ToString
             End If
@@ -915,7 +938,7 @@ Public Class clsRecess
             lMsg.AppendLine(" DAYS/LOG CYCLE= " & String.Format("{0:0.000000}", -1 * .Coefficient1))
             lMsg.AppendLine(" MEAN LOG Q = " & String.Format("{0:0.000000}", .MeanLogQ))
 
-            If SaveInterimResults AndAlso pHasWritePermission AndAlso aSegment.NeedToAnalyse Then
+            If SaveInterimResults AndAlso fHasWritePermission AndAlso aSegment.NeedToAnalyse Then
                 Dim lSW As IO.StreamWriter = New IO.StreamWriter(pFileOut1, FileOut1Created)
                 Dim lDate(5) As Integer
                 lSW.WriteLine(pHeaderOutFile1)
@@ -1001,7 +1024,7 @@ Public Class clsRecess
             End With
         Next
 
-        If SaveInterimResults And pHasWritePermission Then
+        If SaveInterimResults And fHasWritePermission Then
             lSW = New IO.StreamWriter(pFileOut1, FileOut1Created)
             lSW.WriteLine("TOTAL NUMBER OF DAILY VALUES OF STREAMFLOW THAT WERE USED, FOR ALL RECESSION")
             lSW.WriteLine("PERIODS INITIALLY SELECTED = " & liiDV)
@@ -1056,7 +1079,7 @@ Public Class clsRecess
         lMsg.AppendLine("MINIMUM LOG Q FOR ALL CHOSEN RECESSIONS= " & String.Format("{0:0.00000}", lMeanQLogMinC).PadLeft(8, " "))
 
         Dim lAskUserNumRecToBeEliminated As Integer = listOfSegments.Count - lListOfChosenSegments.Count
-        If SaveInterimResults And pHasWritePermission Then
+        If SaveInterimResults And fHasWritePermission Then
             lSW = New IO.StreamWriter(pFileOut1, FileOut1Created)
             lSW.WriteLine("NUMBER OF RECESSION PERIODS INITIALLY SELECTED=" & lListOfChosenSegments.Count)
             lSW.WriteLine("MAXIMUM LOG Q FOR ALL RECESSIONS=" & XLogQMax)
@@ -1165,7 +1188,7 @@ Public Class clsRecess
         Dim lCoeffC As Double = -0.5 * lCoeffA * lMeanQLogMaxC ^ 2 - lCoeffB * lMeanQLogMaxC
 
         '--------------- SHOW ORDERED DATA, AFTER ELIMINATION:  --------------
-        If SaveInterimResults And pHasWritePermission Then
+        If SaveInterimResults And fHasWritePermission Then
             lSW = New IO.StreamWriter(pFileOut1, FileOut1Created)
             lSW.WriteLine(" ")
             lSW.WriteLine("-----------------------------------------------------------------------")
@@ -1321,7 +1344,7 @@ Public Class clsRecess
         End With
 
         ''------------------- WRITE RAW RECESSION DATA TO "y-file"  ----------------
-        If pHasWritePermission And SaveInterimResults Then
+        If fHasWritePermission And SaveInterimResults Then
             lSW = New IO.StreamWriter(pFileOut2, True)
             lSW.WriteLine("----------------------------------------------------------------------")
             lSW.WriteLine("     Tpeak            Tmrc          LogQ           Q               Seq#  ")

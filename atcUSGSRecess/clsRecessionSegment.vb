@@ -7,6 +7,16 @@ Public Class clsRecessionSegment
     Public Shared RecessionCount As Integer
     Public Shared StreamFlowTS As atcTimeseries
     Public Shared MaxSegmentLengthInDays As Integer = 60
+
+    '...FALL...
+    Public Shared MaxSegmentLengthInDaysGW As Integer = 300
+    Public HzeroDayIndex As Integer
+    Public HzeroDayDate As Double
+    Public HzeroDayValue As Double
+    Public Recharges As atcCollection
+    Public AntecedentGWLs As atcCollection 'This is a collection in the form of ant.Method vs H2
+    '...FALL...
+
     Public PeakDayIndex As Integer
     Public PeakDayDate As Double
     Public SegmentLength As Integer
@@ -86,6 +96,14 @@ Public Class clsRecessionSegment
         End Get
     End Property
 
+    Public ReadOnly Property HzeroDayDateToString() As String
+        Get
+            Dim lDate(5) As Integer
+            J2Date(HzeroDayDate, lDate)
+            Return lDate(0).ToString & "/" & lDate(1).ToString.PadLeft(2, " ") & "/" & lDate(2).ToString.PadLeft(2, " ")
+        End Get
+    End Property
+
     Public Flow() As Double
     Public QLog() As Double
     Public Dates() As Double
@@ -94,6 +112,8 @@ Public Class clsRecessionSegment
         'ReDim Flow(MaxSegmentLengthInDays)
         'ReDim QLog(MaxSegmentLengthInDays)
         'ReDim Dates(MaxSegmentLengthInDays)
+        AntecedentGWLs = New atcCollection() 'FALL
+        Recharges = New atcCollection() 'FALL
     End Sub
 
     Public Sub GetData()
@@ -105,12 +125,17 @@ Public Class clsRecessionSegment
             Flow(I) = 0.0
             QLog(I) = -99.9
         Next 'loop 215
+
         For I As Integer = 1 To SegmentLength 'loop 220
             Flow(I) = StreamFlowTS.Value(I + PeakDayIndex)
             If Flow(I) = 0.0 Then
                 QLog(I) = -88.8
             Else
-                QLog(I) = Math.Log10(Flow(I))
+                If Flow(I) > 0 Then
+                    QLog(I) = Math.Log10(Flow(I))
+                Else
+                    QLog(I) = Math.Log10(Flow(I) * -1) 'Actually, might need to raise objection in the interface for this
+                End If
             End If
             Dates(I) = StreamFlowTS.Dates.Value(I + PeakDayIndex - 1)
         Next 'loop 220

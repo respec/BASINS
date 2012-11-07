@@ -592,7 +592,11 @@ Module modBaseflowUtil
                     lBFDepth = aTsGroupPart.ItemByKey("Depth" & ATStep).Value(I)
                     lRO = lTsFlow.Value(I) - lBF
                     lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                    lBFPct = lBF / lTsFlow.Value(I) * 100
+                    If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
+                        lBFPct = lBF / lTsFlow.Value(I) * 100
+                    Else
+                        lBFPct = 0.0
+                    End If
                     .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
                     .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
                     .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
@@ -605,7 +609,11 @@ Module modBaseflowUtil
                     lBFDepth = aTsGroupFixed.ItemByKey("Depth" & ATStep).Value(I)
                     lRO = lTsFlow.Value(I) - lBF
                     lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                    lBFPct = lBF / lTsFlow.Value(I) * 100
+                    If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
+                        lBFPct = lBF / lTsFlow.Value(I) * 100
+                    Else
+                        lBFPct = 0.0
+                    End If
                     .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
                     .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
                     .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
@@ -618,7 +626,11 @@ Module modBaseflowUtil
                     lBFDepth = aTsGroupLocMin.ItemByKey("Depth" & ATStep).Value(I)
                     lRO = lTsFlow.Value(I) - lBF
                     lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                    lBFPct = lBF / lTsFlow.Value(I) * 100
+                    If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
+                        lBFPct = lBF / lTsFlow.Value(I) * 100
+                    Else
+                        lBFPct = 0
+                    End If
                     .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
                     .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
                     .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
@@ -631,7 +643,11 @@ Module modBaseflowUtil
                     lBFDepth = aTsGroupSlide.ItemByKey("Depth" & ATStep).Value(I)
                     lRO = lTsFlow.Value(I) - lBF
                     lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                    lBFPct = lBF / lTsFlow.Value(I) * 100
+                    If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
+                        lBFPct = lBF / lTsFlow.Value(I) * 100
+                    Else
+                        lBFPct = 0
+                    End If
                     .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
                     .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
                     .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
@@ -645,7 +661,11 @@ Module modBaseflowUtil
                     lBFDepth = aTsGroupBFIStandard.ItemByKey("Depth" & ATStep).Value(I)
                     lRO = lTsFlow.Value(I) - lBF
                     lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                    lBFPct = lBF / lTsFlow.Value(I) * 100
+                    If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
+                        lBFPct = lBF / lTsFlow.Value(I) * 100
+                    Else
+                        lBFPct = 0
+                    End If
                     .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
                     .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
                     .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
@@ -658,7 +678,11 @@ Module modBaseflowUtil
                     lBFDepth = aTsGroupBFIModified.ItemByKey("Depth" & ATStep).Value(I)
                     lRO = lTsFlow.Value(I) - lBF
                     lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                    lBFPct = lBF / lTsFlow.Value(I) * 100
+                    If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
+                        lBFPct = lBF / lTsFlow.Value(I) * 100
+                    Else
+                        lBFPct = 0
+                    End If
                     .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
                     .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
                     .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
@@ -1570,9 +1594,9 @@ Module modBaseflowUtil
         Dim lSW As New IO.StreamWriter(aFilename, False)
 
         Dim lDate(5) As Integer
-        J2Date(aTS.Dates.Value(0), lDate)
+        J2Date(lstart + JulianHour * 24, lDate)
         Dim lStartingYear As String = lDate(0).ToString
-        J2Date(aTS.Dates.Value(aTS.numValues - 1), lDate)
+        J2Date(lend - JulianHour * 24, lDate)
         Dim lEndingYear As String = lDate(0).ToString
 
         'Monthly stream flow in cfs, then, turn into inches
@@ -1580,11 +1604,11 @@ Module modBaseflowUtil
         Dim lTsMonthlyFlowDepth As atcTimeseries = Nothing
         If lTsMonthlyFlowDepth Is Nothing Then
             lTsMonthlyFlowDepth = Aggregate(lTsFlow, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame, Nothing)
-            For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
-                If lTsMonthlyFlowDepth.Value(M) = 0 Then
-                    lTsMonthlyFlowDepth.Value(M) = -99.99
-                End If
-            Next
+            'For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
+            '    If lTsMonthlyFlowDepth.Value(M) = 0 Then
+            '        lTsMonthlyFlowDepth.Value(M) = -99.99
+            '    End If
+            'Next
 
             'Monthly stream flow in inches and flag as -99.99 if month is incomplete
             'Also determine total of monthly amounts
@@ -1761,22 +1785,22 @@ Module modBaseflowUtil
         Dim lTsMonthlyFlowDepth As atcTimeseries = Nothing
         If lTsMonthlyFlowDepth Is Nothing Then
             lTsMonthlyFlowDepth = Aggregate(lTsFlow, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame, Nothing)
-            For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
-                If lTsMonthlyFlowDepth.Value(M) = 0 Then
-                    lTsMonthlyFlowDepth.Value(M) = -99.99
-                End If
-            Next
+            'For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
+            '    If lTsMonthlyFlowDepth.Value(M) = 0 Then
+            '        lTsMonthlyFlowDepth.Value(M) = -99.99
+            '    End If
+            'Next
 
             'Monthly stream flow in inches and flag as -99.99 if month is incomplete
             'Also determine total of monthly amounts
             For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
                 J2Date(lTsMonthlyFlowDepth.Dates.Value(M - 1), lDate)
-                If lMissingDataMonth.Keys.Contains(lDate(0).ToString & "_" & lDate(1).ToString.PadLeft(2, "0")) Then
-                    lTsMonthlyFlowDepth.Value(M) = -99.99
-                Else
-                    lTsMonthlyFlowDepth.Value(M) *= DayMon(lDate(0), lDate(1)) / (26.888889 * lDrainageArea)
-                    lTotXX += lTsMonthlyFlowDepth.Value(M)
-                End If
+                'If lMissingDataMonth.Keys.Contains(lDate(0).ToString & "_" & lDate(1).ToString.PadLeft(2, "0")) Then
+                '    lTsMonthlyFlowDepth.Value(M) = -99.99
+                'Else
+                lTsMonthlyFlowDepth.Value(M) *= DayMon(lDate(0), lDate(1)) / (26.888889 * lDrainageArea)
+                lTotXX += lTsMonthlyFlowDepth.Value(M)
+                'End If
             Next
         End If
 
@@ -1859,11 +1883,11 @@ Module modBaseflowUtil
         Dim lTotXX As Double = 0.0
         If lTsMonthlyFlowDepth Is Nothing Then
             lTsMonthlyFlowDepth = Aggregate(lTsFlow, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame, Nothing)
-            For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
-                If lTsMonthlyFlowDepth.Value(M) = 0 Then
-                    lTsMonthlyFlowDepth.Value(M) = -99.99
-                End If
-            Next
+            'For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
+            '    If lTsMonthlyFlowDepth.Value(M) = 0 Then
+            '        lTsMonthlyFlowDepth.Value(M) = -99.99
+            '    End If
+            'Next
             'Monthly stream flow in inches and flag as -99.99 if month is incomplete
             'Also determine total of monthly amounts
             For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
@@ -2118,21 +2142,21 @@ Module modBaseflowUtil
         Dim lTotXX As Double = 0.0
         If lTsMonthlyFlowDepth Is Nothing Then
             lTsMonthlyFlowDepth = Aggregate(lTsFlow, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame, Nothing)
-            For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
-                If lTsMonthlyFlowDepth.Value(M) = 0 Then
-                    lTsMonthlyFlowDepth.Value(M) = -99.99
-                End If
-            Next
+            'For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
+            '    If lTsMonthlyFlowDepth.Value(M) = 0 Then
+            '        lTsMonthlyFlowDepth.Value(M) = -99.99
+            '    End If
+            'Next
             'Monthly stream flow in inches and flag as -99.99 if month is incomplete
             'Also determine total of monthly amounts
             For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
                 J2Date(lTsMonthlyFlowDepth.Dates.Value(M - 1), lDate)
-                If lMissingDataMonth.Keys.Contains(lDate(0).ToString & "_" & lDate(1).ToString.PadLeft(2, "0")) Then
-                    lTsMonthlyFlowDepth.Value(M) = -99.99
-                Else
-                    lTsMonthlyFlowDepth.Value(M) *= DayMon(lDate(0), lDate(1)) / (26.888889 * lDrainageArea)
-                    lTotXX += lTsMonthlyFlowDepth.Value(M)
-                End If
+                'If lMissingDataMonth.Keys.Contains(lDate(0).ToString & "_" & lDate(1).ToString.PadLeft(2, "0")) Then
+                '    lTsMonthlyFlowDepth.Value(M) = -99.99
+                'Else
+                lTsMonthlyFlowDepth.Value(M) *= DayMon(lDate(0), lDate(1)) / (26.888889 * lDrainageArea)
+                lTotXX += lTsMonthlyFlowDepth.Value(M)
+                'End If
             Next
         End If
 
@@ -2372,10 +2396,14 @@ Module modBaseflowUtil
             lSW.WriteLine("--------------------------------------------------------------------")
         End If
 
+        Dim lFieldWidthFilename As Integer = 11
         Dim lDataFilename As String = IO.Path.GetFileName(aTsSF.Attributes.GetValue("History 1"))
-        If lDataFilename.Length > 10 Then lDataFilename = lDataFilename.Substring(0, 10)
-        Dim lPadWidth As Integer = 19 - lDataFilename.Trim().Length
-        Dim lDrainageAreaStr As String = String.Format("{0:0.00}", lDrainageArea).PadLeft(lPadWidth, " ")
+        If lDataFilename.Length > 10 Then lDataFilename = lDataFilename.Substring(0, lFieldWidthFilename - 1)
+        lDataFilename = lDataFilename.PadRight(lFieldWidthFilename, " ")
+
+        Dim lPadWidth As Integer = 19 - lFieldWidthFilename
+        Dim lDrainageAreaStr As String = String.Format("{0:0.00}", lDrainageArea)
+        lDrainageAreaStr = lDrainageAreaStr.PadLeft(lPadWidth, " ")
         Dim lSFMean As Double = aTsSF.Attributes.GetValue("Mean")
         Dim lBFMean1 As Double = lTsBaseflow1.Attributes.GetValue("Mean")
         Dim lBFMean2 As Double = lTsBaseflow2.Attributes.GetValue("Mean")
@@ -2397,11 +2425,13 @@ Module modBaseflowUtil
         '   LINEAR INTERPOLATION BETWEEN RESULTS FOR THE FIRST AND SECOND VALUES
         '   OF THE REQUIREMENT OF ANTECEDENT RECESSION.....
         'Dim lBFLine As Double = lBFMean1 + (lX - 1) * (lBFMean2 - lBFMean1)
-        J2Date(aTsSF.Dates.Value(0), lDate)
+        J2Date(lstart + JulianHour * 24, lDate)
         Dim lYearStart As Integer = lDate(0)
-        J2Date(aTsSF.Dates.Value(aTsSF.numValues - 1), lDate)
+        J2Date(lend - JulianHour * 24, lDate)
         Dim lYearEnd As Integer = lDate(0)
-        Dim lDurationString As String = (lYearStart.ToString & "-" & lYearEnd.ToString).PadLeft(11, " ")
+        Dim lDurationString As String = lYearStart.ToString & "-" & lYearEnd.ToString
+        lDurationString = lDurationString.PadLeft(11, " ")
+
         If aTsSF.Attributes.GetValue("Count Missing") > 1 Then
             lMsg = " ******** record incomplete ********"
         Else
@@ -2415,7 +2445,7 @@ Module modBaseflowUtil
 
         Dim lBFIndex As String = String.Format("{0:0.00}", 100 * lBFInterpolatedCFS / lSFMean).PadLeft(8, " ")
 
-        lSW.Write(lDataFilename & lDrainageArea & lDurationString)
+        lSW.Write(lDataFilename & lDrainageAreaStr & lDurationString)
         If lMsg.Length = 0 Then
             lSW.WriteLine(lSFMeanCfs & lSFMeanInch & lBFMeanCfs & lBFMeanInch & lBFIndex)
         Else

@@ -491,11 +491,11 @@ Public Class clsBaseflowPart
         pTsBaseflow1Monthly = Aggregate(pTsBaseflow1, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
         pTsBaseflow2Monthly = Aggregate(pTsBaseflow2, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
         pTsBaseflow3Monthly = Aggregate(pTsBaseflow3, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
-        For I = 1 To pTsBaseflow1Monthly.numValues
-            If pTsBaseflow1Monthly.Value(I) = 0 Then pTsBaseflow1Monthly.Value(I) = -99.99
-            If pTsBaseflow2Monthly.Value(I) = 0 Then pTsBaseflow2Monthly.Value(I) = -99.99
-            If pTsBaseflow3Monthly.Value(I) = 0 Then pTsBaseflow3Monthly.Value(I) = -99.99
-        Next
+        'For I = 1 To pTsBaseflow1Monthly.numValues
+        '    If pTsBaseflow1Monthly.Value(I) = 0 Then pTsBaseflow1Monthly.Value(I) = -99.99
+        '    If pTsBaseflow2Monthly.Value(I) = 0 Then pTsBaseflow2Monthly.Value(I) = -99.99
+        '    If pTsBaseflow3Monthly.Value(I) = 0 Then pTsBaseflow3Monthly.Value(I) = -99.99
+        'Next
 
         '  DETERMINE MONTHLY BASE FLOW (IN CFS) BY INTERPOLATION BETWEEN
         '  BASE FLOW FOR TWO DIFFERENT REQUIREMENTS OF ANT. RECESSION:
