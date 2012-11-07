@@ -36,6 +36,8 @@ Partial Class frmRecess
         Me.rdoSpring = New System.Windows.Forms.RadioButton
         Me.lstMonths = New System.Windows.Forms.ListBox
         Me.gbDates = New System.Windows.Forms.GroupBox
+        Me.lblAnalysisDates = New System.Windows.Forms.Label
+        Me.lblPeriodOfRecord = New System.Windows.Forms.Label
         Me.txtEndDateUser = New System.Windows.Forms.TextBox
         Me.txtStartDateUser = New System.Windows.Forms.TextBox
         Me.btnExamineData = New System.Windows.Forms.Button
@@ -56,16 +58,22 @@ Partial Class frmRecess
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
         Me.panelConfiguration = New System.Windows.Forms.Panel
+        Me.panelRiseFall = New System.Windows.Forms.Panel
+        Me.rdoGWRise = New System.Windows.Forms.RadioButton
+        Me.rdoGWFall = New System.Windows.Forms.RadioButton
+        Me.gbDataType = New System.Windows.Forms.GroupBox
+        Me.txtDataInfo = New System.Windows.Forms.TextBox
         Me.panelAnalysis = New System.Windows.Forms.Panel
+        Me.btnFallPlot = New System.Windows.Forms.Button
         Me.btnConfiguration = New System.Windows.Forms.Button
-        Me.lblAnalysisDates = New System.Windows.Forms.Label
-        Me.lblPeriodOfRecord = New System.Windows.Forms.Label
         Me.gbMonthSeason.SuspendLayout()
         Me.gbDates.SuspendLayout()
         Me.scDisplay.Panel1.SuspendLayout()
         Me.scDisplay.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.panelConfiguration.SuspendLayout()
+        Me.panelRiseFall.SuspendLayout()
+        Me.gbDataType.SuspendLayout()
         Me.panelAnalysis.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -214,6 +222,24 @@ Partial Class frmRecess
         Me.gbDates.TabIndex = 42
         Me.gbDates.TabStop = False
         Me.gbDates.Text = "Streamflow Analysis Dates"
+        '
+        'lblAnalysisDates
+        '
+        Me.lblAnalysisDates.AutoSize = True
+        Me.lblAnalysisDates.Location = New System.Drawing.Point(184, 22)
+        Me.lblAnalysisDates.Name = "lblAnalysisDates"
+        Me.lblAnalysisDates.Size = New System.Drawing.Size(76, 13)
+        Me.lblAnalysisDates.TabIndex = 16
+        Me.lblAnalysisDates.Text = "Analysis Dates"
+        '
+        'lblPeriodOfRecord
+        '
+        Me.lblPeriodOfRecord.AutoSize = True
+        Me.lblPeriodOfRecord.Location = New System.Drawing.Point(68, 22)
+        Me.lblPeriodOfRecord.Name = "lblPeriodOfRecord"
+        Me.lblPeriodOfRecord.Size = New System.Drawing.Size(87, 13)
+        Me.lblPeriodOfRecord.TabIndex = 15
+        Me.lblPeriodOfRecord.Text = "Period of Record"
         '
         'txtEndDateUser
         '
@@ -388,7 +414,7 @@ Partial Class frmRecess
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(789, 27)
+        Me.MenuStrip1.Size = New System.Drawing.Size(789, 24)
         Me.MenuStrip1.TabIndex = 30
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -396,23 +422,25 @@ Partial Class frmRecess
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(45, 23)
+        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(172, 24)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(53, 23)
+        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
         Me.mnuHelp.Text = "Help"
         '
         'panelConfiguration
         '
+        Me.panelConfiguration.Controls.Add(Me.panelRiseFall)
+        Me.panelConfiguration.Controls.Add(Me.gbDataType)
         Me.panelConfiguration.Controls.Add(Me.chkSaveInterimToFile)
         Me.panelConfiguration.Controls.Add(Me.gbDates)
         Me.panelConfiguration.Controls.Add(Me.txtOutputDir)
@@ -426,8 +454,63 @@ Partial Class frmRecess
         Me.panelConfiguration.Size = New System.Drawing.Size(777, 273)
         Me.panelConfiguration.TabIndex = 31
         '
+        'panelRiseFall
+        '
+        Me.panelRiseFall.Controls.Add(Me.rdoGWRise)
+        Me.panelRiseFall.Controls.Add(Me.rdoGWFall)
+        Me.panelRiseFall.Location = New System.Drawing.Point(601, 132)
+        Me.panelRiseFall.Name = "panelRiseFall"
+        Me.panelRiseFall.Size = New System.Drawing.Size(172, 46)
+        Me.panelRiseFall.TabIndex = 47
+        Me.panelRiseFall.Visible = False
+        '
+        'rdoGWRise
+        '
+        Me.rdoGWRise.AutoSize = True
+        Me.rdoGWRise.Location = New System.Drawing.Point(4, 24)
+        Me.rdoGWRise.Name = "rdoGWRise"
+        Me.rdoGWRise.Size = New System.Drawing.Size(146, 17)
+        Me.rdoGWRise.TabIndex = 1
+        Me.rdoGWRise.Text = "Find Rising Limbs in GWL"
+        Me.rdoGWRise.UseVisualStyleBackColor = True
+        '
+        'rdoGWFall
+        '
+        Me.rdoGWFall.AutoSize = True
+        Me.rdoGWFall.Checked = True
+        Me.rdoGWFall.Location = New System.Drawing.Point(4, 4)
+        Me.rdoGWFall.Name = "rdoGWFall"
+        Me.rdoGWFall.Size = New System.Drawing.Size(147, 17)
+        Me.rdoGWFall.TabIndex = 0
+        Me.rdoGWFall.TabStop = True
+        Me.rdoGWFall.Text = "Find Falling Limbs in GWL"
+        Me.rdoGWFall.UseVisualStyleBackColor = True
+        '
+        'gbDataType
+        '
+        Me.gbDataType.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbDataType.Controls.Add(Me.txtDataInfo)
+        Me.gbDataType.Location = New System.Drawing.Point(601, 3)
+        Me.gbDataType.Name = "gbDataType"
+        Me.gbDataType.Size = New System.Drawing.Size(172, 123)
+        Me.gbDataType.TabIndex = 46
+        Me.gbDataType.TabStop = False
+        Me.gbDataType.Text = "Data Info."
+        '
+        'txtDataInfo
+        '
+        Me.txtDataInfo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtDataInfo.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtDataInfo.Location = New System.Drawing.Point(3, 16)
+        Me.txtDataInfo.Multiline = True
+        Me.txtDataInfo.Name = "txtDataInfo"
+        Me.txtDataInfo.ReadOnly = True
+        Me.txtDataInfo.Size = New System.Drawing.Size(166, 104)
+        Me.txtDataInfo.TabIndex = 0
+        '
         'panelAnalysis
         '
+        Me.panelAnalysis.Controls.Add(Me.btnFallPlot)
         Me.panelAnalysis.Controls.Add(Me.btnConfiguration)
         Me.panelAnalysis.Controls.Add(Me.btnCurv)
         Me.panelAnalysis.Controls.Add(Me.lstRecessSegments)
@@ -440,6 +523,16 @@ Partial Class frmRecess
         Me.panelAnalysis.TabIndex = 32
         Me.panelAnalysis.Visible = False
         '
+        'btnFallPlot
+        '
+        Me.btnFallPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnFallPlot.Location = New System.Drawing.Point(380, 215)
+        Me.btnFallPlot.Name = "btnFallPlot"
+        Me.btnFallPlot.Size = New System.Drawing.Size(75, 23)
+        Me.btnFallPlot.TabIndex = 20
+        Me.btnFallPlot.Text = "FALL Plot"
+        Me.btnFallPlot.UseVisualStyleBackColor = True
+        '
         'btnConfiguration
         '
         Me.btnConfiguration.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -450,24 +543,6 @@ Partial Class frmRecess
         Me.btnConfiguration.TabIndex = 16
         Me.btnConfiguration.Text = "< Back to Configuration"
         Me.btnConfiguration.UseVisualStyleBackColor = True
-        '
-        'lblAnalysisDates
-        '
-        Me.lblAnalysisDates.AutoSize = True
-        Me.lblAnalysisDates.Location = New System.Drawing.Point(184, 22)
-        Me.lblAnalysisDates.Name = "lblAnalysisDates"
-        Me.lblAnalysisDates.Size = New System.Drawing.Size(76, 13)
-        Me.lblAnalysisDates.TabIndex = 16
-        Me.lblAnalysisDates.Text = "Analysis Dates"
-        '
-        'lblPeriodOfRecord
-        '
-        Me.lblPeriodOfRecord.AutoSize = True
-        Me.lblPeriodOfRecord.Location = New System.Drawing.Point(68, 22)
-        Me.lblPeriodOfRecord.Name = "lblPeriodOfRecord"
-        Me.lblPeriodOfRecord.Size = New System.Drawing.Size(87, 13)
-        Me.lblPeriodOfRecord.TabIndex = 15
-        Me.lblPeriodOfRecord.Text = "Period of Record"
         '
         'frmRecess
         '
@@ -491,6 +566,10 @@ Partial Class frmRecess
         Me.MenuStrip1.PerformLayout()
         Me.panelConfiguration.ResumeLayout(False)
         Me.panelConfiguration.PerformLayout()
+        Me.panelRiseFall.ResumeLayout(False)
+        Me.panelRiseFall.PerformLayout()
+        Me.gbDataType.ResumeLayout(False)
+        Me.gbDataType.PerformLayout()
         Me.panelAnalysis.ResumeLayout(False)
         Me.panelAnalysis.PerformLayout()
         Me.ResumeLayout(False)
@@ -534,4 +613,10 @@ Partial Class frmRecess
     Friend WithEvents btnConfiguration As System.Windows.Forms.Button
     Friend WithEvents lblAnalysisDates As System.Windows.Forms.Label
     Friend WithEvents lblPeriodOfRecord As System.Windows.Forms.Label
+    Friend WithEvents btnFallPlot As System.Windows.Forms.Button
+    Friend WithEvents gbDataType As System.Windows.Forms.GroupBox
+    Friend WithEvents txtDataInfo As System.Windows.Forms.TextBox
+    Friend WithEvents panelRiseFall As System.Windows.Forms.Panel
+    Friend WithEvents rdoGWFall As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoGWRise As System.Windows.Forms.RadioButton
 End Class
