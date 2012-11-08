@@ -88,4 +88,11 @@ Public Class clsWTFLinear
         Next
         Return True
     End Function
+
+    Public Overrides Sub Clear()
+        MyBase.Clear()
+        LinearSlope = 0
+        LinearIntercept = 0
+        ParametersSet = False
+    End Sub
 End Class

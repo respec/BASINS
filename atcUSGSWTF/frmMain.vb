@@ -48,7 +48,13 @@ Public Class frmMain
     Private Sub btnAntMethodSpecifyParm_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAntMethodSpecifyParm.Click
         Dim lResponse As MsgBoxResult = MsgBox("User Specify Parameters?", MsgBoxStyle.YesNoCancel, "Parameters for Estimating Ant. GWL")
         If rdoAntMethodFall.Checked Then
-            pWTF = New clsWTFFall()
+            If pWTF Is Nothing Then
+                pWTF = New clsWTFFall()
+            ElseIf Not pWTF.GetType.FullName.ToLower.Contains("fall") Then
+                pWTF.Clear()
+                pWTF = Nothing
+                pWTF = New clsWTFFall()
+            End If
             If lResponse = MsgBoxResult.Yes Then
                 If FfrmParam Is Nothing OrElse FfrmParam.IsDisposed Then
                     FfrmParam = New frmParams()
@@ -62,7 +68,13 @@ Public Class frmMain
                 lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj) 'here you have to write it on a piece of paper
             End If
         ElseIf rdoAntMethodLinear.Checked Then
-            If pWTF Is Nothing Then pWTF = New clsWTFLinear()
+            If pWTF Is Nothing Then
+                pWTF = New clsWTFLinear()
+            ElseIf Not pWTF.GetType.FullName.ToLower.Contains("linear") Then
+                pWTF.Clear()
+                pWTF = Nothing
+                pWTF = New clsWTFLinear()
+            End If
             If lResponse = MsgBoxResult.Yes Then
                 If FfrmParam Is Nothing OrElse FfrmParam.IsDisposed Then
                     FfrmParam = New frmParams()
@@ -76,7 +88,13 @@ Public Class frmMain
                 pWTF.EstimateParameters(FallObj)
             End If
         ElseIf rdoAntMethodPower.Checked Then
-            pWTF = New clsWTFPower()
+            If pWTF Is Nothing Then
+                pWTF = New clsWTFPower()
+            ElseIf Not pWTF.GetType.FullName.ToLower.Contains("power") Then
+                pWTF.Clear()
+                pWTF = Nothing
+                pWTF = New clsWTFPower()
+            End If
             If lResponse = MsgBoxResult.Yes Then
                 If FfrmParam Is Nothing OrElse FfrmParam.IsDisposed Then
                     FfrmParam = New frmParams()

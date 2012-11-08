@@ -66,4 +66,11 @@ Public Class clsWTFFall
         Next
         Return True
     End Function
+
+    Public Overrides Sub Clear()
+        MyBase.Clear()
+        GWLAsymptote = 0
+        KGWL = 0
+        ParametersSet = False
+    End Sub
 End Class
