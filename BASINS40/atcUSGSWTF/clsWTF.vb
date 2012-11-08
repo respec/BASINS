@@ -18,6 +18,10 @@ Public Class clsWTF
     Public Overridable Function Recharge(ByVal aRiseObj As clsFall) As Boolean
     End Function
 
+    Public Overridable Sub Clear()
+        SpecificYield = 0
+    End Sub
+
 End Class
 
 Public Enum AntecedentGWLMethod

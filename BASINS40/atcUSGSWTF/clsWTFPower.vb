@@ -58,4 +58,13 @@ Public Class clsWTFPower
         Next
         Return True
     End Function
+
+    Public Overrides Sub Clear()
+        MyBase.Clear()
+        ParamCIntercept = 0
+        ParamDMultiplier = 0
+        ParamEDatum = 0
+        ParamFExp = 0
+        ParametersSet = False
+    End Sub
 End Class
