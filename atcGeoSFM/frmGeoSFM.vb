@@ -314,6 +314,9 @@ Public Class frmGeoSFM
         Me.rbnNonUniformUSGS = New System.Windows.Forms.RadioButton
         Me.lblMethod = New System.Windows.Forms.Label
         Me.tpgUEBGrid = New System.Windows.Forms.TabPage
+        Me.cmdUEBGridNext = New System.Windows.Forms.Button
+        Me.cmdDefineUEBGrid = New System.Windows.Forms.Button
+        Me.Label1 = New System.Windows.Forms.Label
         Me.tpgRain = New System.Windows.Forms.TabPage
         Me.AtcGridPrec = New atcControls.atcGrid
         Me.cmdRainEvapNext = New System.Windows.Forms.Button
@@ -446,9 +449,6 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.cmdDefineUEBGrid = New System.Windows.Forms.Button
-        Me.cmdUEBGridNext = New System.Windows.Forms.Button
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.gbxUEBGrid.SuspendLayout()
@@ -1366,6 +1366,38 @@ Public Class frmGeoSFM
         Me.tpgUEBGrid.TabIndex = 17
         Me.tpgUEBGrid.Text = "UEBGrid"
         Me.tpgUEBGrid.UseVisualStyleBackColor = True
+        '
+        'cmdUEBGridNext
+        '
+        Me.cmdUEBGridNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdUEBGridNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdUEBGridNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdUEBGridNext.Location = New System.Drawing.Point(555, 341)
+        Me.cmdUEBGridNext.Name = "cmdUEBGridNext"
+        Me.cmdUEBGridNext.Size = New System.Drawing.Size(73, 28)
+        Me.cmdUEBGridNext.TabIndex = 52
+        Me.cmdUEBGridNext.Text = "Next >"
+        '
+        'cmdDefineUEBGrid
+        '
+        Me.cmdDefineUEBGrid.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdDefineUEBGrid.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdDefineUEBGrid.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdDefineUEBGrid.Location = New System.Drawing.Point(244, 179)
+        Me.cmdDefineUEBGrid.Name = "cmdDefineUEBGrid"
+        Me.cmdDefineUEBGrid.Size = New System.Drawing.Size(159, 28)
+        Me.cmdDefineUEBGrid.TabIndex = 45
+        Me.cmdDefineUEBGrid.Text = "Define/Run UEBGrid Model"
+        '
+        'Label1
+        '
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(85, 73)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(469, 74)
+        Me.Label1.TabIndex = 44
+        Me.Label1.Text = resources.GetString("Label1.Text")
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'tpgRain
         '
@@ -2980,38 +3012,6 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'Label1
-        '
-        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(85, 73)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(469, 74)
-        Me.Label1.TabIndex = 44
-        Me.Label1.Text = resources.GetString("Label1.Text")
-        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'cmdDefineUEBGrid
-        '
-        Me.cmdDefineUEBGrid.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdDefineUEBGrid.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdDefineUEBGrid.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdDefineUEBGrid.Location = New System.Drawing.Point(256, 179)
-        Me.cmdDefineUEBGrid.Name = "cmdDefineUEBGrid"
-        Me.cmdDefineUEBGrid.Size = New System.Drawing.Size(136, 28)
-        Me.cmdDefineUEBGrid.TabIndex = 45
-        Me.cmdDefineUEBGrid.Text = "Define UEBGrid Model"
-        '
-        'cmdUEBGridNext
-        '
-        Me.cmdUEBGridNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdUEBGridNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdUEBGridNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdUEBGridNext.Location = New System.Drawing.Point(555, 341)
-        Me.cmdUEBGridNext.Name = "cmdUEBGridNext"
-        Me.cmdUEBGridNext.Size = New System.Drawing.Size(73, 28)
-        Me.cmdUEBGridNext.TabIndex = 52
-        Me.cmdUEBGridNext.Text = "Next >"
-        '
         'frmGeoSFM
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -3630,6 +3630,7 @@ Public Class frmGeoSFM
             Dim OrderFileName As String = pOutputPath & "order.txt"
 
             Dim lSubbasins As New atcCollection
+            Dim lPrecStation As StationDetails
 
             If FileExists(OrderFileName) Then
                 Try
@@ -3670,7 +3671,18 @@ Public Class frmGeoSFM
                     .CellValue(lIndex, 0) = lSubbasins(lIndex - 1)
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     If pPrecStations.Count > 0 Then
-                        .CellValue(lIndex, 1) = pPrecStations(0).Description
+                        For Each lPrecStation In pPrecStations
+                            If lPrecStation.Description.Contains("SWIT") Then
+                                'find subwatershed ID for this aggregate melt from UEB
+                                If lSubbasins(lIndex - 1).ToString = lPrecStation.Name Then
+                                    .CellValue(lIndex, 1) = lPrecStation.Description
+                                    Exit For
+                                End If
+                            End If
+                        Next
+                        If .CellValue(lIndex, 1) Is Nothing Then
+                            .CellValue(lIndex, 1) = pPrecStations(0).Description
+                        End If
                         .CellEditable(lIndex, 1) = True
                     End If
                     If pMetStations.Count > 0 Then
@@ -3682,7 +3694,7 @@ Public Class frmGeoSFM
 
             Logger.Dbg("SetValidValues")
             Dim lValidValues As New atcCollection
-            For Each lPrecStation As StationDetails In pPrecStations
+            For Each lPrecStation In pPrecStations
                 lValidValues.Add(lPrecStation.Description)
             Next
             AtcGridPrec.ValidValues = lValidValues
@@ -4195,7 +4207,7 @@ Public Class frmGeoSFM
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
                 EnableControls(False)
                 pPrecStations.Clear()
-                BuildListofValidStationNames("Melt", pPrecStations)
+                BuildListofValidStationNames("SWIT", pPrecStations)
                 BuildListofValidStationNames("PREC", pPrecStations)
                 lblStatus.Text = "Reading Evap Data ..."
                 Me.Refresh()
@@ -4436,8 +4448,27 @@ Public Class frmGeoSFM
 
     Private Sub cmdDefineUEBGrid_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdDefineUEBGrid.Click
         Dim lUEBForm As New atcUEB.frmUEB
+        Dim lPlugIn As New atcUEB.PlugIn
+        lUEBForm.InitializeUI(lPlugIn)
         lUEBForm.WatershedGridFileName = atxUEBWatershedFile.Text
         lUEBForm.WatershedVariableName = atxUEBWatershedVariable.Text
         lUEBForm.Show()
+    End Sub
+
+    Private Sub cmdUEBGridNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdUEBGridNext.Click
+        Dim lFoundUEBOutput As Boolean = False
+        For Each lDS As atcDataSource In atcDataManager.DataSources
+            If lDS.Name.Contains("UEBGrid Output") Then
+                lFoundUEBOutput = True
+            End If
+        Next
+        If lFoundUEBOutput Then
+            tabMain.SelectedIndex += 1
+        Else
+            MsgBox("No UEBGrid output is available for input to GeoSFM." & vbCrLf & _
+                   "To link the UEBGrid and GeoSFM models it is necessary to define and run the UEBGrid model that will provide water input to GeoSFM." & vbCrLf & _
+                   "To do this, click the 'Define/Run UEBGrid Model' button." & vbCrLf & _
+                   "If you do not wish to link the two models, click the Rain/Evap Data tab where you will need to provide precipitation data as input to GeoSFM.")
+        End If
     End Sub
 End Class
