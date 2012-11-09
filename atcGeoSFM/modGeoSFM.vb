@@ -320,12 +320,31 @@ Public Module modGeoSFM
             'generate UEB Watershed grid and slope/aspect grids
             Logger.Status("Step 12 of 12: Computing UEB Slope and Aspect Grids")
             Dim lUEBSlopeGridFileName As String = FilenameNoExt(lDEMFileName) & "UEBSlope.tif"
-            Dim lAspectGridFileName As String = FilenameNoExt(lDEMFileName) & "Aspect.tif"
+            Dim lAspectGridFileName As String = FilenameNoExt(lDEMFileName) & "UEBAspect.tif"
             GisUtil.SlopeAspectTarbottonMethod(lDEMFileName, lUEBSlopeGridFileName, lAspectGridFileName)
+            'convert Tif files to NetCDF for use by UEBGrid
+            ConvertTifToNetCDF(lUEBSlopeGridFileName, "Slope")
+            ConvertTifToNetCDF(lAspectGridFileName, "Aspect")
+            ConvertTifToNetCDF(lSubbasinGridFileName, "SubID")
         End If
 
         Logger.Progress(100, 100)
         Return True
+    End Function
+
+    Private Function ConvertTifToNetCDF(ByRef aTifFileName As String, ByVal aVarName As String) As String
+        Try
+            Dim lFileContents As String = GetEmbeddedFileAsString("ConvertTif.bat")
+
+            lFileContents &= vbCrLf & "gdal_translate -of netCDF -mo netcdf_varname=" & aVarName & " " & aTifFileName & " " & FilenameNoExt(aTifFileName) & ".nc"
+            Dim lBatchFile As String = PathNameOnly(aTifFileName) & "\ConvertTif.bat"
+            SaveFileString(lBatchFile, lFileContents)
+            LaunchProgram(lBatchFile, PathNameOnly(aTifFileName))
+            Return FilenameNoExt(aTifFileName) & ".nc"
+        Catch ex As Exception
+            Return ""
+        End Try
+
     End Function
 
     Friend Function Basin(ByVal aZoneGname As String, ByVal aDemGname As String, ByVal aFacGname As String, ByVal aHlenGname As String, ByVal aRcnGname As String, _
