@@ -448,7 +448,11 @@ Public Class frmDownload
 
             If cboRegion.SelectedItem = pRegionStationIDs Then
                 lRegion = Nothing
-                lStationsXML = StationsXML(frmSpecifyStations.AskUser(Me.Icon, StationsFromMap))
+                Dim lStations As Generic.List(Of String) = frmSpecifyStations.AskUser(Me.Icon, StationsFromMap)
+                If lStations Is Nothing OrElse lStations.Count = 0 Then
+                    Return ""
+                End If
+                lStationsXML = StationsXML(lStations)
             Else
                 lRegion = Me.SelectedRegion
                 lStationsXML = StationsXML(StationsFromMap)

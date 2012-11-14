@@ -48,8 +48,12 @@
 
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 Dim lStations As New Generic.List(Of String)
-                lStations.AddRange(lForm.txtStations.Text.Replace(vbCr, vbLf).Replace(vbLf & vbLf, vbLf).Split(vbLf))
-
+                Dim lArray As String() = lForm.txtStations.Text.Replace(vbCr, vbLf).Replace(vbLf & vbLf, vbLf).Split(vbLf)
+                For Each lStation As String In lArray
+                    If lStation.Trim.Length > 0 Then
+                        lStations.Add(lStation.Trim)
+                    End If
+                Next
                 SaveSetting(pAppName, "Defaults", "SpecifyStations", .txtStations.Text)
                 Return lStations
             End If
