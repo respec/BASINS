@@ -20,9 +20,15 @@ Public Module modGeoSFM
 
     Friend pOutputPath As String
     Friend pProjectName As String
+    Friend pUEBSlopeGridFilename As String
+    Friend pUEBSlopeGridVarname As String
+    Friend pUEBAspectGridFilename As String
+    Friend pUEBAspectGridVarname As String
+    Friend pUEBWatershedGridFilename As String
+    Friend pUEBWatershedGridVarname As String
 
     Friend Function Terrain(ByVal aDEMLayerName As String, ByVal aSubbasinLayerName As String, ByVal aStreamLayerName As String, ByVal aThresh As Integer, _
-                            Optional ByVal aUEBWatershedFileName As String = "", Optional ByVal aUEBWaterShedVarName As String = "") As Boolean
+                            Optional ByVal aConnectUEB As Boolean = False) As Boolean
 
         ' ***********************************************************************************************
         ' ***********************************************************************************************
@@ -316,16 +322,33 @@ Public Module modGeoSFM
         End If
 
         'UEB Grid generation
-        If aUEBWatershedFileName.Length > 0 And aUEBWaterShedVarName.Length > 0 Then
+        If aConnectUEB Then
+            Dim lUEBSlopeGridLayerName As String = "UEBGrid Slope Grid"
+            Dim lUEBAspectGridLayerName As String = "UEBGrid Aspect Grid"
+            Dim lLayerIndex As Integer
+            If GisUtil.IsLayer(lUEBSlopeGridLayerName) Then
+                lLayerIndex = GisUtil.LayerIndex(lUEBSlopeGridLayerName)
+                GisUtil.RemoveLayer(lLayerIndex)
+            End If
+            If GisUtil.IsLayer(lUEBAspectGridLayerName) Then
+                lLayerIndex = GisUtil.LayerIndex(lUEBAspectGridLayerName)
+                GisUtil.RemoveLayer(lLayerIndex)
+            End If
             'generate UEB Watershed grid and slope/aspect grids
             Logger.Status("Step 12 of 12: Computing UEB Slope and Aspect Grids")
             Dim lUEBSlopeGridFileName As String = FilenameNoExt(lDEMFileName) & "UEBSlope.tif"
-            Dim lAspectGridFileName As String = FilenameNoExt(lDEMFileName) & "UEBAspect.tif"
-            GisUtil.SlopeAspectTarbottonMethod(lDEMFileName, lUEBSlopeGridFileName, lAspectGridFileName)
+            Dim lUEBAspectGridFileName As String = FilenameNoExt(lDEMFileName) & "UEBAspect.tif"
+            GisUtil.SlopeAspectTarbottonMethod(lDEMFileName, lUEBSlopeGridFileName, lUEBAspectGridFileName)
             'convert Tif files to NetCDF for use by UEBGrid
-            ConvertTifToNetCDF(lUEBSlopeGridFileName, "Slope")
-            ConvertTifToNetCDF(lAspectGridFileName, "Aspect")
-            ConvertTifToNetCDF(lSubbasinGridFileName, "SubID")
+            pUEBSlopeGridFilename = ConvertTifToNetCDF(lUEBSlopeGridFileName, "Slope")
+            pUEBSlopeGridVarname = "Band1"
+            pUEBAspectGridFilename = ConvertTifToNetCDF(lUEBAspectGridFileName, "Aspect")
+            pUEBAspectGridVarname = "Band1"
+            pUEBWatershedGridFilename = ConvertTifToNetCDF(lSubbasinGridFileName, "SubID")
+            pUEBWatershedGridVarname = "Band1"
+            GisUtil.AddLayer(lUEBSlopeGridFileName, lUEBSlopeGridLayerName)
+            GisUtil.AddLayer(lUEBAspectGridFileName, lUEBAspectGridLayerName)
+            GisUtil.SaveProject(GisUtil.ProjectFileName)
         End If
 
         Logger.Progress(100, 100)
