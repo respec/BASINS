@@ -17,6 +17,10 @@ Public Class frmUEB
     Friend pOutputControlData As clsUEBOutputControl
     Friend pWatershedGridFileName As String
     Friend pWatershedGridVariableName As String
+    Friend pSlopeGridFilename As String
+    Friend pSlopeGridVariableName As String
+    Friend pAspectGridFilename As String
+    Friend pAspectGridVariableName As String
     Friend pAggOutputControlData As clsUEBAggOutputControl
     Friend pAggOutputFileName As String
 
@@ -2761,6 +2765,70 @@ KeepWaiting:
         Set(ByVal value)
             pWatershedGridVariableName = value
             txtWatershedVariable.Text = pWatershedGridVariableName
+        End Set
+    End Property
+
+    Public Property SlopeGridFileName()
+        Get
+            SlopeGridFileName = pSlopeGridFilename
+        End Get
+        Set(ByVal value)
+            pSlopeGridFilename = value
+            With AtcGridSiteVars.Source
+                For i As Integer = 1 To .Rows
+                    If .CellValue(i, 0).ToLower.Contains("slope") Then
+                        .CellValue(i, 2) = pSlopeGridFilename
+                    End If
+                Next
+            End With
+        End Set
+    End Property
+
+    Public Property SlopeGridVariableName()
+        Get
+            SlopeGridVariableName = pSlopeGridVariableName
+        End Get
+        Set(ByVal value)
+            pSlopeGridVariableName = value
+            With AtcGridSiteVars.Source
+                For i As Integer = 1 To .Rows
+                    If .CellValue(i, 0).ToLower.Contains("slope") Then
+                        .CellValue(i, 3) = pSlopeGridVariableName
+                    End If
+                Next
+            End With
+        End Set
+    End Property
+
+    Public Property AspectGridFileName()
+        Get
+            AspectGridFileName = pAspectGridFilename
+        End Get
+        Set(ByVal value)
+            pAspectGridFilename = value
+            With AtcGridSiteVars.Source
+                For i As Integer = 1 To .Rows
+                    If .CellValue(i, 0).ToLower.Contains("aspect") Then
+                        .CellValue(i, 2) = pAspectGridFilename
+                    End If
+                Next
+            End With
+        End Set
+    End Property
+
+    Public Property AspectGridVariableName()
+        Get
+            AspectGridVariableName = pAspectGridVariableName
+        End Get
+        Set(ByVal value)
+            pAspectGridVariableName = value
+            With AtcGridSiteVars.Source
+                For i As Integer = 1 To .Rows
+                    If .CellValue(i, 0).ToLower.Contains("aspect") Then
+                        .CellValue(i, 3) = pAspectGridVariableName
+                    End If
+                Next
+            End With
         End Set
     End Property
 
