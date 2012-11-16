@@ -3432,31 +3432,31 @@ Public Class frmGeoSFM
                 If lLayerName = "Hill Length Grid" Then
                     cboBC4.SelectedIndex = cboBC4.Items.Count - 1
                 End If
-                If lLayerName = "Runoff Curve Number Grid" Or lLayerName = "rcn" Then
+                If lLayerName = "Runoff Curve Number Grid" Or lLayerName.ToLower.StartsWith("rcn") Then
                     cboBC5.SelectedIndex = cboBC5.Items.Count - 1
                 End If
-                If lLayerName = "Water Holding Capacity" Or lLayerName = "whc" Then
+                If lLayerName = "Water Holding Capacity" Or lLayerName.ToLower.StartsWith("whc") Then
                     cboBC6.SelectedIndex = cboBC6.Items.Count - 1
                 End If
-                If lLayerName = "Soil Depth Grid" Or lLayerName.Contains("soildepth") Then
+                If lLayerName = "Soil Depth Grid" Or lLayerName.ToLower.Contains("soildepth") Then
                     cboBC7.SelectedIndex = cboBC7.Items.Count - 1
                 End If
-                If lLayerName = "Soil Texture Grid" Or lLayerName.Contains("texture") Then
+                If lLayerName = "Soil Texture Grid" Or lLayerName.ToLower.Contains("texture") Then
                     cboBC8.SelectedIndex = cboBC8.Items.Count - 1
                 End If
-                If lLayerName = "Hydraulic Conductivity Grid" Or lLayerName = "ks" Then
+                If lLayerName = "Hydraulic Conductivity Grid" Or lLayerName.ToLower.StartsWith("ks") Then
                     cboBC9.SelectedIndex = cboBC9.Items.Count - 1
                 End If
-                If lLayerName = "Downstream Flow Length Grid" Or lLayerName = "Downstream Flow Length" Then
+                If lLayerName.ToLower.StartsWith("downstream flow length") Then
                     cboBC10.SelectedIndex = cboBC10.Items.Count - 1
                 End If
-                If lLayerName = "Stream Link Grid" Then
+                If lLayerName.ToLower.Contains("stream link grid") Then
                     cboBC11.SelectedIndex = cboBC11.Items.Count - 1
                 End If
                 If lLayerName = "Downstream Basin id Grid" Or lLayerName = "Downstream Subbasin Grid" Then
                     cboBC12.SelectedIndex = cboBC12.Items.Count - 1
                 End If
-                If lLayerName = "Max Impervious Cover Grid" Or lLayerName = "maxcover" Then
+                If lLayerName = "Max Impervious Cover Grid" Or lLayerName.ToLower.Contains("maxcover") Then
                     cboBC13.SelectedIndex = cboBC13.Items.Count - 1
                 End If
             End If
