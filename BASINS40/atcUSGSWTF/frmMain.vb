@@ -539,7 +539,8 @@ Public Class frmMain
                 .CurveList.Item(1).Color = Drawing.Color.DarkBlue
                 CType(.CurveList.Item(1), LineItem).Line.Width = 2
             End If
-
+            .YAxis.Scale.MaxAuto = True
+            .YAxis.Scale.MinAuto = True
             .AxisChange()
         End With
         lGraphForm.Show()

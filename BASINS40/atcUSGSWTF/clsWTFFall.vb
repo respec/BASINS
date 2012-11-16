@@ -56,6 +56,7 @@ Public Class clsWTFFall
                 End If
 
                 Dim lDeltaH As Double = .Flow(.Flow.Length - 1) - lAntGWL
+                If lDeltaH < 0 Then lDeltaH = 0
                 Dim lRecharge As Double = SpecificYield * lDeltaH / (.Flow.Length - 1)
                 If .Recharges.Keys.Contains(AntecedentGWLMethod.FALL) Then
                     .Recharges.ItemByKey(AntecedentGWLMethod.FALL) = lRecharge

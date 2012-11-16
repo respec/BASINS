@@ -1126,12 +1126,22 @@ Public Class frmRecess
                 .YAxis.Title.Text = ""
                 .XAxis.Title.Text = ""
             End With
-            pGrapher = Nothing
-            RefreshGraph()
+            'pGrapher = Nothing
+            'RefreshGraph()
         End If
-        pGrapher = New clsGraphTime(aDataGroup, pZgc)
-        'Dim lDataMin As Double = aDataGroup(0).Dates.Value(0)
-        'Dim lDataMax As Double = aDataGroup(0).Dates.Value(aDataGroup(0).numValues)
+        Dim lYmin As Double
+        Dim lYmax As Double
+        If aDataGroup IsNot Nothing AndAlso aDataGroup.Count > 0 Then
+            lYmin = aDataGroup(0).Attributes.GetValue("Min")
+            lYmax = aDataGroup(0).Attributes.GetValue("Max")
+        End If
+        If pGrapher Is Nothing Then
+            pGrapher = New clsGraphTime(aDataGroup, pZgc)
+        Else
+            'pGrapher.Datasets = aDataGroup
+        End If
+        'Dim lDateMin As Double = aDataGroup(0).Dates.Value(0)
+        'Dim lDateMax As Double = aDataGroup(0).Dates.Value(aDataGroup(0).numValues)
         'Dim lLogFlag As Boolean = False
         With pGrapher.ZedGraphCtrl.GraphPane
             If aDataGroup.Count > 0 Then
@@ -1142,13 +1152,17 @@ Public Class frmRecess
                 'CType(.CurveList.Item(1), LineItem).Line.Width = 2
             End If
             'Scalit(lDataMin, lDataMax, lLogFlag, .XAxis.Scale.Min, .XAxis.Scale.Max)
+
+            '.YAxis.Scale.Max = Math.Ceiling(lYmax)
+            '.YAxis.Scale.Min = Math.Floor(lYmin)
+            .YAxis.Scale.MaxAuto = True
+            .YAxis.Scale.MinAuto = True
             .AxisChange()
         End With
         pZgc.Refresh()
     End Sub
 
     Public Sub GraphFallCurves()
-
         ' get a reference to the GraphPane
         If pZgc IsNot Nothing Then
             With pZgc.GraphPane
@@ -1184,6 +1198,8 @@ Public Class frmRecess
         pZgc.GraphPane.Legend.IsVisible = False
 
         ' Tell ZedGraph to refigure the axes since the data have changed
+        pZgc.GraphPane.YAxis.Scale.MaxAuto = True
+        pZgc.GraphPane.YAxis.Scale.MinAuto = True
         pZgc.GraphPane.AxisChange()
         pZgc.AxisChange()
         pZgc.Refresh()
@@ -1764,6 +1780,7 @@ Public Class frmRecess
         pGraphRecessDatagroup.Clear()
         Dim lSegs() As String = Nothing
 
+        pZgc.Visible = False
         If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
             pRecess.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
             lSegs = pRecess.Table.Split(vbCrLf)
@@ -1779,6 +1796,7 @@ Public Class frmRecess
             If lSeg.Trim() <> "" Then lstTable.Items.Add(lSeg.Trim(vbCr, vbLf))
         Next
         RefreshGraphRecess(pGraphRecessDatagroup)
+        pZgc.Visible = True
     End Sub
 
     Private Sub lstTable_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstTable.SelectedIndexChanged
