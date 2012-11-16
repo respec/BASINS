@@ -70,6 +70,8 @@ Partial Class frmDownload
         Me.chkNWISStations_discharge_GW = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISPeriodicGW_GW = New System.Windows.Forms.CheckBox
         Me.chkNWISStations_gw_periodic = New System.Windows.Forms.CheckBox
+        Me.txtMinCount_GW = New System.Windows.Forms.TextBox
+        Me.chkNWISStations_precipitation_GW = New System.Windows.Forms.CheckBox
         Me.btnDownload = New System.Windows.Forms.Button
         Me.cboRegion = New System.Windows.Forms.ComboBox
         Me.lblRegion = New System.Windows.Forms.Label
@@ -81,14 +83,14 @@ Partial Class frmDownload
         Me.chkCacheOnly = New System.Windows.Forms.CheckBox
         Me.grpNLDAS = New System.Windows.Forms.GroupBox
         Me.grpNWISStations_GW = New System.Windows.Forms.GroupBox
+        Me.lblMinCount = New System.Windows.Forms.Label
         Me.grpNWIS_GW = New System.Windows.Forms.GroupBox
         Me.chkNWIS_GetNWISDailyDischarge_GW = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISIdaDischarge_GW = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISDailyGW_GW = New System.Windows.Forms.CheckBox
         Me.panelNWISnoStations_GW = New System.Windows.Forms.Panel
+        Me.chkNWIS_GetNWISPrecipitation_GW = New System.Windows.Forms.CheckBox
         Me.lblNWISnoStations_GW = New System.Windows.Forms.Label
-        Me.txtMinCount_GW = New System.Windows.Forms.TextBox
-        Me.lblMinCount = New System.Windows.Forms.Label
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.panelNWISnoStations.SuspendLayout()
@@ -624,6 +626,27 @@ Partial Class frmDownload
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_gw_periodic, "Periodic Groundwater Station Point Layer")
         Me.chkNWISStations_gw_periodic.UseVisualStyleBackColor = True
         '
+        'txtMinCount_GW
+        '
+        Me.txtMinCount_GW.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtMinCount_GW.Location = New System.Drawing.Point(429, 16)
+        Me.txtMinCount_GW.Name = "txtMinCount_GW"
+        Me.txtMinCount_GW.Size = New System.Drawing.Size(25, 20)
+        Me.txtMinCount_GW.TabIndex = 26
+        Me.txtMinCount_GW.Text = "10"
+        Me.ToolTip1.SetToolTip(Me.txtMinCount_GW, "Minimum number of values - omit stations with fewer")
+        '
+        'chkNWISStations_precipitation_GW
+        '
+        Me.chkNWISStations_precipitation_GW.AutoSize = True
+        Me.chkNWISStations_precipitation_GW.Location = New System.Drawing.Point(12, 42)
+        Me.chkNWISStations_precipitation_GW.Name = "chkNWISStations_precipitation_GW"
+        Me.chkNWISStations_precipitation_GW.Size = New System.Drawing.Size(84, 17)
+        Me.chkNWISStations_precipitation_GW.TabIndex = 28
+        Me.chkNWISStations_precipitation_GW.Text = "Precipitation"
+        Me.ToolTip1.SetToolTip(Me.chkNWISStations_precipitation_GW, "Precipitation Station Point Layer")
+        Me.chkNWISStations_precipitation_GW.UseVisualStyleBackColor = True
+        '
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -748,28 +771,40 @@ Partial Class frmDownload
         Me.grpNWISStations_GW.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNWISStations_GW.Controls.Add(Me.lblMinCount)
+        Me.grpNWISStations_GW.Controls.Add(Me.chkNWISStations_precipitation_GW)
         Me.grpNWISStations_GW.Controls.Add(Me.txtMinCount_GW)
         Me.grpNWISStations_GW.Controls.Add(Me.chkNWISStations_gw_daily_GW)
         Me.grpNWISStations_GW.Controls.Add(Me.chkNWISStations_gw_periodic_GW)
         Me.grpNWISStations_GW.Controls.Add(Me.chkNWISStations_discharge_GW)
         Me.grpNWISStations_GW.Location = New System.Drawing.Point(12, 39)
         Me.grpNWISStations_GW.Name = "grpNWISStations_GW"
-        Me.grpNWISStations_GW.Size = New System.Drawing.Size(460, 42)
+        Me.grpNWISStations_GW.Size = New System.Drawing.Size(460, 69)
         Me.grpNWISStations_GW.TabIndex = 48
         Me.grpNWISStations_GW.TabStop = False
         Me.grpNWISStations_GW.Text = "Station Locations from US Geological Survey National Water Information System"
         Me.grpNWISStations_GW.Visible = False
         '
+        'lblMinCount
+        '
+        Me.lblMinCount.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblMinCount.AutoSize = True
+        Me.lblMinCount.Location = New System.Drawing.Point(369, 20)
+        Me.lblMinCount.Name = "lblMinCount"
+        Me.lblMinCount.Size = New System.Drawing.Size(55, 13)
+        Me.lblMinCount.TabIndex = 27
+        Me.lblMinCount.Text = "Min Count"
+        '
         'grpNWIS_GW
         '
         Me.grpNWIS_GW.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpNWIS_GW.Controls.Add(Me.chkNWIS_GetNWISPrecipitation_GW)
         Me.grpNWIS_GW.Controls.Add(Me.chkNWIS_GetNWISDailyDischarge_GW)
         Me.grpNWIS_GW.Controls.Add(Me.chkNWIS_GetNWISIdaDischarge_GW)
         Me.grpNWIS_GW.Controls.Add(Me.chkNWIS_GetNWISDailyGW_GW)
         Me.grpNWIS_GW.Controls.Add(Me.chkNWIS_GetNWISPeriodicGW_GW)
         Me.grpNWIS_GW.Controls.Add(Me.panelNWISnoStations_GW)
-        Me.grpNWIS_GW.Location = New System.Drawing.Point(11, 87)
+        Me.grpNWIS_GW.Location = New System.Drawing.Point(11, 98)
         Me.grpNWIS_GW.Name = "grpNWIS_GW"
         Me.grpNWIS_GW.Size = New System.Drawing.Size(460, 65)
         Me.grpNWIS_GW.TabIndex = 32
@@ -815,11 +850,21 @@ Partial Class frmDownload
         Me.panelNWISnoStations_GW.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.panelNWISnoStations_GW.Controls.Add(Me.lblNWISnoStations_GW)
-        Me.panelNWISnoStations_GW.Location = New System.Drawing.Point(7, 16)
+        Me.panelNWISnoStations_GW.Location = New System.Drawing.Point(6, 16)
         Me.panelNWISnoStations_GW.Name = "panelNWISnoStations_GW"
         Me.panelNWISnoStations_GW.Size = New System.Drawing.Size(448, 43)
         Me.panelNWISnoStations_GW.TabIndex = 28
         Me.panelNWISnoStations_GW.Visible = False
+        '
+        'chkNWIS_GetNWISPrecipitation_GW
+        '
+        Me.chkNWIS_GetNWISPrecipitation_GW.AutoSize = True
+        Me.chkNWIS_GetNWISPrecipitation_GW.Location = New System.Drawing.Point(13, 39)
+        Me.chkNWIS_GetNWISPrecipitation_GW.Name = "chkNWIS_GetNWISPrecipitation_GW"
+        Me.chkNWIS_GetNWISPrecipitation_GW.Size = New System.Drawing.Size(84, 17)
+        Me.chkNWIS_GetNWISPrecipitation_GW.TabIndex = 1
+        Me.chkNWIS_GetNWISPrecipitation_GW.Text = "Precipitation"
+        Me.chkNWIS_GetNWISPrecipitation_GW.UseVisualStyleBackColor = True
         '
         'lblNWISnoStations_GW
         '
@@ -830,26 +875,6 @@ Partial Class frmDownload
         Me.lblNWISnoStations_GW.TabIndex = 0
         Me.lblNWISnoStations_GW.Text = "Station Locations must be selected on the map before data value download"
         '
-        'txtMinCount
-        '
-        Me.txtMinCount_GW.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMinCount_GW.Location = New System.Drawing.Point(429, 16)
-        Me.txtMinCount_GW.Name = "txtMinCount"
-        Me.txtMinCount_GW.Size = New System.Drawing.Size(25, 20)
-        Me.txtMinCount_GW.TabIndex = 26
-        Me.txtMinCount_GW.Text = "10"
-        Me.ToolTip1.SetToolTip(Me.txtMinCount_GW, "Minimum number of values - omit stations with fewer")
-        '
-        'lblMinCount
-        '
-        Me.lblMinCount.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblMinCount.AutoSize = True
-        Me.lblMinCount.Location = New System.Drawing.Point(369, 20)
-        Me.lblMinCount.Name = "lblMinCount"
-        Me.lblMinCount.Size = New System.Drawing.Size(55, 13)
-        Me.lblMinCount.TabIndex = 27
-        Me.lblMinCount.Text = "Min Count"
-        '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
@@ -857,8 +882,8 @@ Partial Class frmDownload
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(484, 611)
-        Me.Controls.Add(Me.grpNWIS_GW)
         Me.Controls.Add(Me.grpNWISStations_GW)
+        Me.Controls.Add(Me.grpNWIS_GW)
         Me.Controls.Add(Me.grpNLDAS)
         Me.Controls.Add(Me.grpNWISStations)
         Me.Controls.Add(Me.grpNLCD2001)
@@ -971,4 +996,6 @@ Partial Class frmDownload
     Friend WithEvents chkNWIS_GetNWISPeriodicGW As System.Windows.Forms.CheckBox
     Friend WithEvents lblMinCount As System.Windows.Forms.Label
     Friend WithEvents txtMinCount_GW As System.Windows.Forms.TextBox
+    Friend WithEvents chkNWISStations_precipitation_GW As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNWIS_GetNWISPrecipitation_GW As System.Windows.Forms.CheckBox
 End Class
