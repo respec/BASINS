@@ -2842,4 +2842,17 @@ KeepWaiting:
         SetInputControl()
     End Sub
 
+    Private Sub txtAggOutputFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputFile.Click
+        Dim cdlg As New Windows.Forms.OpenFileDialog
+        cdlg.Title = "Open UEB Aggregated Output Data File"
+        cdlg.Filter = "UEB Aggregated Output Data files (*.out)|*.out|All Files (*.*)|*.*"
+        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+            txtAggOutputFile.Text = cdlg.FileName
+        End If
+
+    End Sub
+
+    Private Sub txtAggOutputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputFile.TextChanged
+        pAggOutputFileName = txtAggOutputControlFile.Text
+    End Sub
 End Class
