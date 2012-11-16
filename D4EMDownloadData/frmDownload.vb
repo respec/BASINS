@@ -270,11 +270,13 @@ Public Class frmDownload
                 chkNWIS_GetNWISIdaDischarge_GW.Visible = True
                 chkNWIS_GetNWISDailyGW_GW.Visible = True
                 chkNWIS_GetNWISPeriodicGW_GW.Visible = True
+                chkNWIS_GetNWISPrecipitation_GW.Visible = True
 
                 chkNWIS_GetNWISDailyDischarge_GW.Enabled = lStationsRegion
                 chkNWIS_GetNWISIdaDischarge_GW.Enabled = lStationsRegion
                 chkNWIS_GetNWISDailyGW_GW.Enabled = lStationsRegion
                 chkNWIS_GetNWISPeriodicGW_GW.Enabled = lStationsRegion
+                chkNWIS_GetNWISPrecipitation_GW.Enabled = lStationsRegion
             Case Else
                 chkNWIS_GetNWISDailyDischarge.Visible = True
                 chkNWIS_GetNWISIdaDischarge.Visible = True
@@ -310,6 +312,9 @@ Public Class frmDownload
                             Case "nwis_stations_gw_periodic"
                                 chkNWIS_GetNWISPeriodicGW_GW.Enabled = True
                                 chkNWIS_GetNWISPeriodicGW_GW.Checked = True
+                            Case "nwis_stations_precipitation"
+                                chkNWIS_GetNWISPrecipitation_GW.Enabled = True
+                                chkNWIS_GetNWISPrecipitation_GW.Checked = True
                             Case Else
                                 If lFilename.StartsWith("met") Then
                                     chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
@@ -359,7 +364,8 @@ Public Class frmDownload
                 If Not chkNWIS_GetNWISDailyDischarge_GW.Enabled AndAlso _
                    Not chkNWIS_GetNWISIdaDischarge_GW.Enabled AndAlso _
                    Not chkNWIS_GetNWISDailyGW_GW.Enabled AndAlso _
-                   Not chkNWIS_GetNWISPeriodicGW_GW.Enabled Then
+                   Not chkNWIS_GetNWISPeriodicGW_GW.Enabled AndAlso _
+                   Not chkNWIS_GetNWISPrecipitation_GW.Enabled Then
                     panelNWISnoStations_GW.Visible = True
                     panelNWISnoStations_GW.BringToFront()
 
@@ -367,6 +373,7 @@ Public Class frmDownload
                     chkNWIS_GetNWISIdaDischarge_GW.Visible = False
                     chkNWIS_GetNWISDailyGW_GW.Visible = False
                     chkNWIS_GetNWISPeriodicGW_GW.Visible = False
+                    chkNWIS_GetNWISPrecipitation_GW.Visible = False
                 End If
             Case Else
                 If Not chkNWIS_GetNWISDailyDischarge.Enabled AndAlso _
@@ -541,6 +548,11 @@ Public Class frmDownload
                                     lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDASPrecipitation", IO.Path.Combine(lSaveFolderOnly, "nldas"), _
                                                               "NLDAS Precipitation Processing Options")
                                 End If
+                                'If lChild Is chkNWIS_GetNWISPrecipitation Then
+                                '    Dim lWDMfrm As New frmWDM
+                                '    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Precipitation", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
+                                '                              lChild.Text & " Processing Options")
+                                'End If
                                 If lWDMxml IsNot Nothing Then
                                     lXML &= "<function name='" & lChildName & "'>" & vbCrLf _
                                          & "<arguments>" & vbCrLf _

@@ -21,6 +21,8 @@ Public Class atcTimeseriesRDB
     Private Shared pFilter As String = "USGS RDB Files (*.rdb, *.txt)|*.rdb;*.txt|All Files (*.*)|*.*"
     Private pJulianInterval As Double = 1 'Add one day for daily values to record date at end of interval
 
+    Public QualificationCodes As String = "A"
+
     Public Overrides ReadOnly Property Description() As String
         Get
             Return "USGS RDB File"
@@ -545,9 +547,9 @@ Public Class atcTimeseriesRDB
                         lCurValue = .Value(lField).Trim
                         If lCurValue.Length = 0 Then
                             'Skip blank values
-                            'If next field is code for this field, then make sure its code starts with "A" for Approved
+                            'If next field is code for this field, then make sure its code is in the allowed codes, QualificationCodes
                         ElseIf .FieldName(lField + 1) <> .FieldName(lField) & "_cd" OrElse _
-                               .Value(lField + 1).StartsWith("A") Then
+                               QualificationCodes.Contains(.Value(lField + 1).Trim().Substring(0, 1)) Then
                             lConstituentDescription = lValueConstituentDescriptions.ItemByKey(lField)
 
                             Dim lDataKey As String = lLocation & ":" & lConstituentDescription
@@ -593,14 +595,14 @@ Public Class atcTimeseriesRDB
                                 lData.Dates.Value(0) = lDate - pJulianInterval
                                 lData.Value(0) = GetNaN()
                             End If
-                                lTSIndex = lData.Attributes.GetValue("Count") + 1
-                                lData.Value(lTSIndex) = lCurValue
-                                lData.Dates.Value(lTSIndex) = lDate
-                                If .FieldName(lField + 1) = .FieldName(lField) & "_cd" AndAlso _
-                                   .Value(lField + 1).Contains("e") Then
-                                    lData.ValueAttributes(lTSIndex).Add("Estimated", True)
-                                End If
-                                lData.Attributes.SetValue("Count", lTSIndex)
+                            lTSIndex = lData.Attributes.GetValue("Count") + 1
+                            lData.Value(lTSIndex) = lCurValue
+                            lData.Dates.Value(lTSIndex) = lDate
+                            If .FieldName(lField + 1) = .FieldName(lField) & "_cd" AndAlso _
+                               .Value(lField + 1).Contains("e") Then
+                                lData.ValueAttributes(lTSIndex).Add("Estimated", True)
+                            End If
+                            lData.Attributes.SetValue("Count", lTSIndex)
                         End If
                     Next
                 End If
