@@ -7,12 +7,13 @@ Module netCDFViewer
 
     Sub main()
         If IO.File.Exists("netcdf.dll") Then IO.File.Delete("netcdf.dll")
-        'IO.File.Copy("netcdf4.2.1.1.dll", "netcdf.dll")
-        IO.File.Copy("netcdf3.6.dll", "netcdf.dll")
+        IO.File.Copy("netcdf4.2.1.1.dll", "netcdf.dll")
+        'IO.File.Copy("netcdf3.6.dll", "netcdf.dll")
 
         Dim lReport As New System.Text.StringBuilder
 
-        lReport.AppendLine(NetCDF.nc_inq_libvers)
+        Dim lNetCDF_Version As String = NetCDF.nc_inq_libvers
+        lReport.AppendLine(lNetCDF_Version)
         Dim lPathName As String = "..\..\..\..\Data\"
         Dim lFileName As String = lPathName & "watershed.nc"
         lReport.AppendLine("File '" & lFileName & "'")
@@ -141,7 +142,7 @@ Module netCDFViewer
             Next
             lResult = NetCDF.nc_close(lNCId)
         End If
-        IO.File.WriteAllText(IO.Path.ChangeExtension(lFileName, ".dump.log"), lReport.ToString)
+        IO.File.WriteAllText(IO.Path.ChangeExtension(lFileName, lNetCDF_Version.Substring(0, 3) & ".dump.log"), lReport.ToString)
     End Sub
 
     Function AttsToString(ByVal aNcid As Int32, ByVal aVarId As Int32) As String
