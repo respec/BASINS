@@ -10,10 +10,13 @@ Friend Module modATCscript
 
     Friend DebugScriptForm As frmDebugScript
     Public ScriptState As atcCollection 'of variable names (as keys) and values
-    Public WholeDataFile As String 'Contains entire contents of data file
-    Public LenDataFile As Integer
-    Public NextLineStart As Integer 'One-based index in WholeDataFile of first character of next line to be read
-    Public LastPercent As Integer 'For updating status messages
+
+    Private DataFileHandle As System.IO.StreamReader = Nothing
+    Private DataFileBuffer() As Char = Nothing 'Only used when InputLineLen is set (for fixed-length lines)
+    Private WholeDataFile As String 'Contains entire contents of data file
+    Public LenDataFile As Long
+    Public NextLineStart As Long 'One-based index in WholeDataFile of first character of next line to be read
+    Private LastPercent As Integer 'For updating status messages
     Public CurrentLine As String 'Current line of data file being parsed
     Public LenCurrentLine As Integer
     Public CurrentRepeat As Integer 'Current repeating part within CurrentLine (>=1)
@@ -89,6 +92,10 @@ Friend Module modATCscript
         AddNewTserAndBuffer()
 
         ScriptState = New atcCollection
+        If DataFileHandle IsNot Nothing Then
+            DataFileHandle.Close()
+            DataFileHandle = Nothing
+        End If
         WholeDataFile = ""
         LenDataFile = 0
         NextLineStart = 1
@@ -132,8 +139,7 @@ Friend Module modATCscript
     End Function
 
     Public Sub ScriptNextLine()
-        Dim percent As Integer
-        Dim EOLPos As Integer
+        Dim percent As Integer = LastPercent
         Do
             If NextLineStart > LenDataFile Then
                 CurrentLine = ""
@@ -141,36 +147,77 @@ Friend Module modATCscript
                 Exit Sub
             End If
             If InputLineLen > 0 Then 'All lines are same length
-                CurrentLine = Mid(WholeDataFile, NextLineStart, LenCurrentLine)
+                If DataFileHandle IsNot Nothing Then
+                    If DataFileBuffer Is Nothing Then ReDim DataFileBuffer(3000)
+                    DataFileHandle.ReadBlock(DataFileBuffer, 0, InputLineLen)
+                    CurrentLine = New String(DataFileBuffer, 0, InputLineLen)
+                Else
+                    CurrentLine = Mid(WholeDataFile, NextLineStart, InputLineLen)
+                End If
                 LenCurrentLine = Len(CurrentLine)
                 NextLineStart = NextLineStart + LenCurrentLine
             Else
-                If (InputEOL = vbCr OrElse InputEOL = vbLf) Then
-                    EOLPos = FirstStringPos(NextLineStart, WholeDataFile, vbCr, vbLf)
+                If DataFileHandle IsNot Nothing Then
+                    Dim sb As New Text.StringBuilder
+                    Dim ch As Char
+                    Try
+                        If (InputEOL = vbCr OrElse InputEOL = vbLf) Then
+                            Do
+                                ch = Convert.ToChar(DataFileHandle.Read()) : NextLineStart += 1
+                                Select Case ch
+                                    Case vbLf : Exit Do
+                                    Case vbCr
+                                        If DataFileHandle.Peek() = 10 Then
+                                            DataFileHandle.Read() : NextLineStart += 1 'Skip LF after CR
+                                        End If
+                                        Exit Do
+                                End Select
+                                sb.Append(ch)
+                            Loop
+                        ElseIf LenInputEOL = 1 Then
+                            Do
+                                ch = Convert.ToChar(DataFileHandle.Read()) : NextLineStart += 1
+                                If ch = InputEOL Then Exit Do
+                                sb.Append(ch)
+                            Loop
+                        Else
+                            Do
+                                sb.Append(Convert.ToChar(DataFileHandle.Read())) : NextLineStart += 1
+                            Loop Until sb.ToString.EndsWith(InputEOL)
+                            sb.Remove(sb.Length - LenInputEOL, LenInputEOL)
+                        End If
+                    Catch 'Ignore error when we try to read past end of file
+                    End Try
+                    CurrentLine = sb.ToString
+                    LenCurrentLine = Len(CurrentLine)
+                    percent = NextLineStart / (LenDataFile / 100)
                 Else
-                    EOLPos = InStr(NextLineStart, WholeDataFile, InputEOL)
-                End If
-                If EOLPos = 0 Then EOLPos = LenDataFile + 1
-                LenCurrentLine = EOLPos - NextLineStart
-                CurrentLine = Mid(WholeDataFile, NextLineStart, LenCurrentLine)
-                NextLineStart = NextLineStart + LenCurrentLine + LenInputEOL
-                If (NextLineStart < LenDataFile) Then 'Skip LF after CR
-                    If Mid(WholeDataFile, EOLPos, 1) = vbCr Then
-                        If Mid(WholeDataFile, NextLineStart, 1) = vbLf Then
-                            NextLineStart = NextLineStart + 1
+                    Dim EOLPos As Long
+                    If (InputEOL = vbCr OrElse InputEOL = vbLf) Then
+                        EOLPos = FirstStringPos(NextLineStart, WholeDataFile, vbCr, vbLf)
+                    Else
+                        EOLPos = InStr(CInt(NextLineStart), WholeDataFile, InputEOL)
+                    End If
+                    If EOLPos = 0 Then EOLPos = LenDataFile + 1
+                    LenCurrentLine = EOLPos - NextLineStart
+                    CurrentLine = Mid(WholeDataFile, NextLineStart, LenCurrentLine)
+                    NextLineStart = NextLineStart + LenCurrentLine + LenInputEOL
+                    If (NextLineStart < LenDataFile) Then 'Skip LF after CR
+                        If Mid(WholeDataFile, EOLPos, 1) = vbCr Then
+                            If Mid(WholeDataFile, NextLineStart, 1) = vbLf Then
+                                NextLineStart += 1
+                            End If
                         End If
                     End If
+                    percent = 100 * NextLineStart / LenDataFile
                 End If
             End If
             CurrentLineNum += 1
         Loop While Len(Trim(CurrentLine)) = 0
 
-
-        percent = 100 * NextLineStart / LenDataFile 'Loc = 128 * bytes read for sequential file
-        If percent <> LastPercent Then
+        If percent <> LastPercent AndAlso Not TestingFile Then
             Logger.Dbg("(MSG1 " & Left(CurrentLine, 100) & ")")
-            Logger.Dbg("(MSG3 " & CStr(percent) & "%)")
-            Logger.Dbg("(PROGRESS " & CStr(percent) & ")")
+            Logger.Progress(percent, 100)
             LastPercent = percent
             System.Windows.Forms.Application.DoEvents()
         End If
@@ -396,9 +443,14 @@ Friend Module modATCscript
     Public Function ScriptOpenDataFile(ByVal aDataFilename As String) As String
         If IO.File.Exists(aDataFilename) Then
             Try
-                WholeDataFile = IO.File.ReadAllText(aDataFilename)
-                LenDataFile = WholeDataFile.Length
-                CurrentLine = Left(WholeDataFile, 1000)
+                LenDataFile = FileLen(aDataFilename)
+                If LenDataFile < 100000 Then
+                    WholeDataFile = IO.File.ReadAllText(aDataFilename)
+                    LenDataFile = WholeDataFile.Length
+                    CurrentLine = Left(WholeDataFile, 1000)
+                Else
+                    DataFileHandle = New System.IO.StreamReader(aDataFilename)
+                End If
                 LenCurrentLine = 0
                 NextLineStart = 1
                 Return "OK"
@@ -414,7 +466,7 @@ Friend Module modATCscript
         Dim msg As String
         TestingFile = True
         ScriptInit()
-        If pDataFilename = DataFilename And LenDataFile > 0 Then
+        If pDataFilename = DataFilename AndAlso LenDataFile > 0 Then
             NextLineStart = 1
             LastPercent = 0
             CurrentLine = ""
@@ -434,66 +486,71 @@ Friend Module modATCscript
     End Function
 
     Public Function ScriptRun(ByRef Script As clsATCscriptExpression, ByRef DataFilename As String, ByRef TserFile As atcTimeseriesSource) As String
-        Dim msg As String
-        Dim tmpData As atcTimeseries
-        pDataFilename = DataFilename
-        pTserFile = TserFile
+        Try
+            Dim msg As String
+            pDataFilename = DataFilename
+            pTserFile = TserFile
 
-        ScriptInit()
-        msg = ScriptOpenDataFile(DataFilename)
-        If msg <> "OK" Then
-            Logger.Msg(msg, MsgBoxStyle.OkOnly, "Data Import")
-            ScriptRun = msg
-        Else
-            Logger.Dbg("(MSG1 Reading)")
-            Logger.Dbg("(MSG2 0)")
-            Logger.Dbg("(MSG3 0)")
-            Logger.Dbg("(MSG4 100)")
-            On Error GoTo 0
+            ScriptInit()
+            msg = ScriptOpenDataFile(DataFilename)
+            If msg <> "OK" Then
+                Logger.Msg(msg, MsgBoxStyle.OkOnly, "Data Import")
+                ScriptRun = msg
+            Else
+                Logger.Dbg("(MSG1 Reading)")
+                Logger.Dbg("(MSG2 0)")
+                Logger.Dbg("(MSG3 0)")
+                Logger.Dbg("(MSG4 100)")
 
-            If DebuggingScript Then
-                DebugScriptForm = New frmDebugScript
-                DebugScriptForm.ShowScript(Script)
-            End If
-            TestingFile = False
-            ScriptRun = Script.Evaluate
+                If DebuggingScript Then
+                    DebugScriptForm = New frmDebugScript
+                    DebugScriptForm.ShowScript(Script)
+                End If
+                TestingFile = False
+                ScriptRun = Script.Evaluate
 
-            If Not AbortScript Then
-                For Each lBuffer As InputBuffer In InBuf
-                    With lBuffer
-                        If .DateCount > 0 Then
-                            If .DateDim > .DateCount Then
-                                ReDim Preserve .DateArray(.DateCount)
-                                ReDim Preserve .ValueArray(.DateCount)
-                                ReDim Preserve .FlagArray(.DateCount)
-                            End If
-                            .ts.Values = .ValueArray
-                            'TODO: import flags if any as ValueAttributes: pTserData.Item(CurBuf).flags = .FlagArray
-                            .ts.Dates.Values = .DateArray
-                            .ts.Attributes.SetValue("tu", FillTU)
-
-                            If FillTS > 0 Then
-                                .ts = FillValues(.ts, FillTU, FillTS, FillVal, FillMissing, FillAccum)
-                            End If
-
-                            pTserFile.AddDataSet(.ts, atcDataSource.EnumExistAction.ExistRenumber)
-                            With .ts
-                                .Attributes.SetValue("ID", pTserFile.DataSets.Count)
-                                If Not .Attributes.ContainsAttribute("History 1") Then
-                                    .Attributes.AddHistory("Read From " & DataFilename)
+                If Not AbortScript Then
+                    For Each lBuffer As InputBuffer In InBuf
+                        With lBuffer
+                            If .DateCount > 0 Then
+                                If .DateDim > .DateCount Then
+                                    ReDim Preserve .DateArray(.DateCount)
+                                    ReDim Preserve .ValueArray(.DateCount)
+                                    ReDim Preserve .FlagArray(.DateCount)
                                 End If
-                                'Set missing values to NaN
-                                Dim lNaN As Double = GetNaN()
-                                For iVal As Integer = 1 To .numValues
-                                    If Math.Abs((.Value(iVal) - FillMissing)) < 1.0E-20 Then
-                                        .Value(iVal) = lNaN
+                                .ts.Values = .ValueArray
+                                'TODO: import flags if any as ValueAttributes: pTserData.Item(CurBuf).flags = .FlagArray
+                                .ts.Dates.Values = .DateArray
+                                .ts.Attributes.SetValue("tu", FillTU)
+
+                                If FillTS > 0 Then
+                                    .ts = FillValues(.ts, FillTU, FillTS, FillVal, FillMissing, FillAccum)
+                                End If
+
+                                pTserFile.AddDataSet(.ts, atcDataSource.EnumExistAction.ExistRenumber)
+                                With .ts
+                                    .Attributes.SetValue("ID", pTserFile.DataSets.Count)
+                                    If Not .Attributes.ContainsAttribute("History 1") Then
+                                        .Attributes.AddHistory("Read From " & DataFilename)
                                     End If
-                                Next
-                            End With
-                        End If
-                    End With
-                Next
+                                    'Set missing values to NaN
+                                    Dim lNaN As Double = GetNaN()
+                                    For iVal As Integer = 1 To .numValues
+                                        If Math.Abs((.Value(iVal) - FillMissing)) < 1.0E-20 Then
+                                            .Value(iVal) = lNaN
+                                        End If
+                                    Next
+                                End With
+                            End If
+                        End With
+                    Next
+                End If
             End If
-        End If
+        Finally
+            If DataFileHandle IsNot Nothing Then
+                DataFileHandle.Close()
+                DataFileHandle = Nothing
+            End If
+        End Try
     End Function
 End Module
