@@ -7,13 +7,13 @@ Module netCDFViewer
 
     Sub main()
         If IO.File.Exists("netcdf.dll") Then IO.File.Delete("netcdf.dll")
-        IO.File.Copy("netcdf4.2.1.1.dll", "netcdf.dll")
-        'IO.File.Copy("netcdf3.6.dll", "netcdf.dll")
+        'IO.File.Copy("netcdf4.2.1.1.dll", "netcdf.dll")
+        IO.File.Copy("netcdf3.6.dll", "netcdf.dll")
 
         Dim lReport As New System.Text.StringBuilder
 
         lReport.AppendLine(NetCDF.nc_inq_libvers)
-        Dim lPathName As String = "G:\netCDF Data\"
+        Dim lPathName As String = "..\..\..\..\Data\"
         Dim lFileName As String = lPathName & "watershed.nc"
         lReport.AppendLine("File '" & lFileName & "'")
 
@@ -24,6 +24,7 @@ Module netCDFViewer
         If lResult <> 0 Then
             lReport.AppendLine("Open Problem " & NetCDF.nc_strerror(lResult))
         Else
+            lReport.AppendLine("Open OK, ID: " & lNCId)
             Dim lNDims As Int32
             Dim lNVars As Int32
             Dim lNGatts As Int32
