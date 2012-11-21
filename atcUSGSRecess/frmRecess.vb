@@ -212,9 +212,11 @@ Public Class frmRecess
             If lCons = "GW LEVEL" Then
                 SwitchSeasonControls(False)
                 panelRiseFall.Visible = True
+                btnFallPlot.Visible = True
             ElseIf lCons = "FLOW" Then
                 SwitchSeasonControls(True)
                 panelRiseFall.Visible = False
+                btnFallPlot.Visible = False
             End If
         End If
         '...FALL...
@@ -1123,11 +1125,14 @@ Public Class frmRecess
     Public Sub RefreshGraphRecess(ByVal aDataGroup As atcTimeseriesGroup)
         If pGrapher IsNot Nothing Then
             With pGrapher.ZedGraphCtrl.GraphPane
-                .YAxis.Title.Text = ""
-                .XAxis.Title.Text = ""
+                'To see if need to refresh the axis
+                If aDataGroup IsNot Nothing AndAlso aDataGroup.Count > 0 AndAlso Not .YAxis.Title.Text = aDataGroup(0).Attributes.GetValue("Units") Then
+                    .YAxis.Title.Text = ""
+                    '.XAxis.Title.Text = ""
+                    pGrapher = Nothing
+                    'RefreshGraph()
+                End If
             End With
-            'pGrapher = Nothing
-            'RefreshGraph()
         End If
         Dim lYmin As Double
         Dim lYmax As Double
