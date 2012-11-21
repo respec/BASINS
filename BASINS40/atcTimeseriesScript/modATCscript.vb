@@ -41,10 +41,10 @@ Friend Module modATCscript
     Public InputLineLen As Integer
 
     Public FillTU As atcTimeUnit
-    Public FillTS As Integer
-    Public FillVal As Single
-    Public FillMissing As Single
-    Public FillAccum As Single
+    Public FillTS As Integer = 0
+    Public FillVal As Double = 0
+    Public FillMissing As Double = -999
+    Public FillAccum As Double = -998
 
     ''' <summary>
     ''' Array of token names
@@ -62,20 +62,21 @@ Friend Module modATCscript
         Public DateDim As Integer = 0
         Public DateArray() As Double
         Public ValueArray() As Double
-        Public FlagArray() As Integer
+        'Public FlagArray() As Integer
         Public ts As atcTimeseries
 
         Public Sub New()
             ReDim DateArray(0)
             ReDim ValueArray(0)
-            ReDim FlagArray(0)
+            'ReDim FlagArray(0)
+            DateArray(0) = GetNaN()
+            ValueArray(0) = GetNaN()
 
             ts = New atcData.atcTimeseries(pTserFile)
             With ts
                 .Attributes.SetValue("Description", pDataFilename)
                 .Attributes.SetValue("Scenario", DefaultScenario)
                 .Attributes.AddHistory("Read From " & pDataFilename)
-                .Dates = New atcData.atcTimeseries(pTserFile)
             End With
         End Sub
     End Class
@@ -232,7 +233,7 @@ Friend Module modATCscript
                 .DateDim = .DateCount * 2
                 ReDim Preserve .DateArray(.DateDim)
                 ReDim Preserve .ValueArray(.DateDim)
-                ReDim Preserve .FlagArray(.DateDim)
+                'ReDim Preserve .FlagArray(.DateDim)
             End If
             .DateArray(.DateCount) = jdy
             If DebuggingScript Then DebugScriptForm.NewDate(.DateCount, jdy)
@@ -249,9 +250,9 @@ Friend Module modATCscript
     End Function
 
     Public Function ScriptSetFlag(ByRef newValue As Integer) As Integer
-        CurBuf.FlagArray(CurBuf.DateCount) = newValue
+        'CurBuf.FlagArray(CurBuf.DateCount) = newValue
         ScriptSetFlag = newValue
-        'Debug.Print " Flag " & pDateCount & "=" & newValue
+        Logger.Dbg("ScriptSetFlag: no action taken (" & newValue & ")")
     End Function
 
     Public Function ScriptSetVariable(ByRef VarName As String, ByRef newValue As String) As String
@@ -516,16 +517,38 @@ Friend Module modATCscript
                                 If .DateDim > .DateCount Then
                                     ReDim Preserve .DateArray(.DateCount)
                                     ReDim Preserve .ValueArray(.DateCount)
-                                    ReDim Preserve .FlagArray(.DateCount)
+                                    'ReDim Preserve .FlagArray(.DateCount)
                                 End If
                                 .ts.Values = .ValueArray
                                 'TODO: import flags if any as ValueAttributes: pTserData.Item(CurBuf).flags = .FlagArray
+                                .ts.Dates = New atcTimeseries(pTserFile)
                                 .ts.Dates.Values = .DateArray
-                                .ts.Attributes.SetValue("tu", FillTU)
 
                                 If FillTS > 0 Then
-                                    .ts = FillValues(.ts, FillTU, FillTS, FillVal, FillMissing, FillAccum)
+                                    Dim lFilledTS As atcTimeseries = FillValues(.ts, FillTU, FillTS, FillVal, FillMissing, FillAccum)
+                                    .ts.Dates.Clear()
+                                    .ts.Clear()
+                                    .ts = lFilledTS
                                 End If
+
+                                For Each lExistingTS As atcTimeseries In pTserFile.DataSets
+                                    If lExistingTS.Dates.numValues = 0 Then Stop
+                                    If .ts.Dates.numValues = lExistingTS.Dates.numValues Then
+                                        Dim lMatch As Boolean = True
+                                        For lIndex As Long = 1 To lExistingTS.Dates.numValues
+                                            If .ts.Dates.Value(lIndex) <> lExistingTS.Dates.Value(lIndex) Then
+                                                lMatch = False
+                                                Exit For
+                                            End If
+                                        Next
+                                        If lMatch Then
+                                            Dim lDisposingDates As atcTimeseries = .ts.Dates
+                                            .ts.Dates = lExistingTS.Dates
+                                            lDisposingDates.Clear()
+                                            Exit For
+                                        End If
+                                    End If
+                                Next
 
                                 pTserFile.AddDataSet(.ts, atcDataSource.EnumExistAction.ExistRenumber)
                                 With .ts
@@ -535,7 +558,7 @@ Friend Module modATCscript
                                     End If
                                     'Set missing values to NaN
                                     Dim lNaN As Double = GetNaN()
-                                    For iVal As Integer = 1 To .numValues
+                                    For iVal As Long = 1 To .numValues
                                         If Math.Abs((.Value(iVal) - FillMissing)) < 1.0E-20 Then
                                             .Value(iVal) = lNaN
                                         End If
