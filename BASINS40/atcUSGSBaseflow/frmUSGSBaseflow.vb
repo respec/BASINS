@@ -1120,9 +1120,14 @@ Public Class frmUSGSBaseflow
             If chkMethodHySEPFixed.Checked Then pMethods.Add(BFMethods.HySEPFixed)
             If chkMethodHySEPLocMin.Checked Then pMethods.Add(BFMethods.HySEPLocMin)
             If chkMethodHySEPSlide.Checked Then pMethods.Add(BFMethods.HySEPSlide)
-            If chkMethodBFI.Checked Then
-                If chkMethodBFIStandard.Checked Then pMethods.Add(BFMethods.BFIStandard)
-                If chkMethodBFIModified.Checked Then pMethods.Add(BFMethods.BFIModified)
+            If chkMethodBFIStandard.Checked Then pMethods.Add(BFMethods.BFIStandard)
+            If chkMethodBFIModified.Checked Then pMethods.Add(BFMethods.BFIModified)
+            If chkMethodBFIModified.Checked OrElse chkMethodBFIStandard.Checked Then
+                If chkMethodBFI.CheckState = CheckState.Unchecked Then
+                    chkMethodBFI.CheckState = CheckState.Checked
+                End If
+            Else
+                chkMethodBFI.CheckState = CheckState.Unchecked
             End If
         End If
     End Sub
