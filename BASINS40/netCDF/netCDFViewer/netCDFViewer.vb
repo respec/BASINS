@@ -1,4 +1,6 @@
 Module netCDFViewer
+    Const pMaxDataWrite As Integer = 5000
+
     Sub main()
         Dim lDebug As Boolean = False
 
@@ -13,7 +15,7 @@ Module netCDFViewer
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
         If Not IO.Directory.Exists(lOutFolder) Then IO.Directory.CreateDirectory(lOutFolder)
 
-        Dim lBaseNames() As String = {"aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Ta1", "Watershed"}
+        Dim lBaseNames() As String = {"Ta1", "CumMelt", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
         For Each lBaseName As String In lBaseNames
             If lDebug Then lReport.AppendLine(lNetCDF_Version)
             Dim lFileName As String = lPathName & lBaseName & ".nc"
@@ -90,6 +92,8 @@ Module netCDFViewer
                                             lResult = NetCDF.nc_get_vara_float(lNCId, lVarId, lBase, lCount, lValuesFloat)
                                         Case NetCDF.nc_type.NC_INT
                                             lResult = NetCDF.nc_get_vara_int(lNCId, lVarId, lBase, lCount, lValuesInt)
+                                        Case Else
+                                            lResult = "<unknown type " & lXtype & ">"
                                     End Select
                                     If lResult <> 0 Then
                                         lReport.AppendLine(ErrorString(lResult, lNCId, lVarId))
@@ -109,6 +113,10 @@ Module netCDFViewer
                                                 lFormatDimIndex(lDimIndex) = "0"
                                             End If
                                         Next
+
+                                        Dim lMissingCount As Integer = 0
+                                        Dim lZeroCount As Integer = 0
+                                        Dim lGoodCount As Integer = 0
                                         For lValueIndex As Integer = 0 To lArraySize - 1
                                             Dim lString As String = "    (" & Format(lValueIndex, lFormatValueIndex) & "-"
                                             For lDimIndex As Integer = 0 To lNDims - 1
@@ -120,8 +128,32 @@ Module netCDFViewer
                                                 Case NetCDF.nc_type.NC_DOUBLE
                                                     lReport.AppendLine(lString & lValuesDouble(lValueIndex))
                                                 Case NetCDF.nc_type.NC_FLOAT
-                                                    Dim lValue As Double = lValuesFloat(lValueIndex) * 10800 'sec/3hr TODO: make generic!
-                                                    lReport.AppendLine(lString & Format(lValue, "##0.000"))
+                                                    Dim lValue As Double = lValuesFloat(lValueIndex) ' * 10800 'sec/3hr TODO: make generic!
+                                                    If lValue = -9999 Then
+                                                        If lZeroCount > 0 Then
+                                                            lReport.AppendLine("    ... " & lZeroCount & " zero values skipped")
+                                                            lZeroCount = 0
+                                                        End If
+                                                        lMissingCount += 1
+                                                    Else
+                                                        If lMissingCount > 0 Then
+                                                            lReport.AppendLine("    ... " & lMissingCount & " missing values skipped")
+                                                            lMissingCount = 0
+                                                        End If
+                                                        If lBaseName <> "CumMelt" OrElse lValue <> 0 Then
+                                                            If lZeroCount > 0 Then
+                                                                lReport.AppendLine("    ... " & lZeroCount & " zero values skipped")
+                                                                lZeroCount = 0
+                                                            End If
+                                                            lGoodCount += 1
+                                                            lReport.AppendLine(lString & Format(lValue, "##0.000"))
+                                                        Else
+                                                            lZeroCount += 1
+                                                        End If
+                                                    End If
+                                                Case Else
+                                                        lReport.AppendLine(lString & "    <unknown type " & lXtype & ">")
+                                                        Exit For
                                             End Select
                                             Dim lOutIndex As Integer = lNDims - 1
                                             lOutputPosition(lOutIndex) += 1
@@ -130,6 +162,10 @@ Module netCDFViewer
                                                 lOutputPosition(lOutIndex) = 0
                                                 lOutIndex -= 1
                                             End While
+                                            If lGoodCount >= pMaxDataWrite Then
+                                                lReport.AppendLine("    ... " & lArraySize - lValueIndex & " values skipped")
+                                                Exit For
+                                            End If
                                         Next
                                     End If
                                 End If
