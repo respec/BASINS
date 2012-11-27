@@ -1,12 +1,12 @@
 Module netCDFViewer
-    Const pMaxDataWrite As Integer = 5000
+    Const pMaxDataWrite As Integer = 20000
 
     Sub main()
         Dim lDebug As Boolean = False
 
         If IO.File.Exists("netcdf.dll") Then IO.File.Delete("netcdf.dll")
-        'IO.File.Copy("netcdf4.2.1.1.dll", "netcdf.dll")
-        IO.File.Copy("netcdf3.6.dll", "netcdf.dll")
+        IO.File.Copy("netcdf4.2.1.1.dll", "netcdf.dll")
+        'IO.File.Copy("netcdf3.6.dll", "netcdf.dll")
 
         Dim lReport As New System.Text.StringBuilder
 
@@ -15,7 +15,7 @@ Module netCDFViewer
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
         If Not IO.Directory.Exists(lOutFolder) Then IO.Directory.CreateDirectory(lOutFolder)
 
-        Dim lBaseNames() As String = {"Ta1", "CumMelt", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
+        Dim lBaseNames() As String = {"swit", "Ta1", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
         For Each lBaseName As String In lBaseNames
             If lDebug Then lReport.AppendLine(lNetCDF_Version)
             Dim lFileName As String = lPathName & lBaseName & ".nc"
@@ -140,20 +140,24 @@ Module netCDFViewer
                                                             lReport.AppendLine("    ... " & lMissingCount & " missing values skipped")
                                                             lMissingCount = 0
                                                         End If
-                                                        If lBaseName <> "CumMelt" OrElse lValue <> 0 Then
+                                                        If lBaseName <> "swit" OrElse lValue <> 0 Then
                                                             If lZeroCount > 0 Then
                                                                 lReport.AppendLine("    ... " & lZeroCount & " zero values skipped")
                                                                 lZeroCount = 0
                                                             End If
                                                             lGoodCount += 1
-                                                            lReport.AppendLine(lString & Format(lValue, "##0.000"))
+                                                            If Math.Abs(lValue) > 0.001 Then
+                                                                lReport.AppendLine(lString & Format(lValue, "##0.000"))
+                                                            Else
+                                                                lReport.AppendLine(lString & lValue)
+                                                            End If
                                                         Else
                                                             lZeroCount += 1
                                                         End If
-                                                    End If
+                                                        End If
                                                 Case Else
-                                                        lReport.AppendLine(lString & "    <unknown type " & lXtype & ">")
-                                                        Exit For
+                                                    lReport.AppendLine(lString & "    <unknown type " & lXtype & ">")
+                                                    Exit For
                                             End Select
                                             Dim lOutIndex As Integer = lNDims - 1
                                             lOutputPosition(lOutIndex) += 1
