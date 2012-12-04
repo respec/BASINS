@@ -81,7 +81,7 @@ Public Module ConstituentBalance
                                     lConstituentKey = lConstituentKey.Remove(0, 2)
                                     Dim lConstituentDataGroup As atcTimeseriesGroup = lLocationDataGroup.FindData("Constituent", lConstituentKey)
                                     If lConstituentDataGroup.Count > 0 Then
-                                        Dim lTempDataSet As atcDataSet = lConstituentDataGroup.Item(0)
+                                        Dim lTempDataSet As atcDataSet = SubsetByDate(lConstituentDataGroup.Item(0), aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ, Nothing)
                                         Dim lSeasons As atcSeasonBase
                                         If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
                                             lSeasons = New atcSeasonsWaterYear
