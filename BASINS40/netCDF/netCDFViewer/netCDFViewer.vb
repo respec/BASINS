@@ -1,3 +1,5 @@
+Imports atcTimeseriesNetCDF
+
 Module netCDFViewer
     Const pMaxDataWrite As Integer = 20000
 
@@ -20,6 +22,10 @@ Module netCDFViewer
             If lDebug Then lReport.AppendLine(lNetCDF_Version)
             Dim lFileName As String = lPathName & lBaseName & ".nc"
             lReport.AppendLine("File '" & lFileName & "'")
+
+            Dim lNetCDFFile As New atcTimeseriesNetCDF.atcTimeseriesNetCDF
+            lNetCDFFile.Debug = True
+            lNetCDFFile.Open(lFileName)
 
             Dim lNCId As Int32
             Dim lResult As Int32 = NetCDF.nc_open(lFileName, _
@@ -154,7 +160,7 @@ Module netCDFViewer
                                                         Else
                                                             lZeroCount += 1
                                                         End If
-                                                        End If
+                                                    End If
                                                 Case Else
                                                     lReport.AppendLine(lString & "    <unknown type " & lXtype & ">")
                                                     Exit For
