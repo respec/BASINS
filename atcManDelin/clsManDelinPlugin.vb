@@ -172,6 +172,10 @@ Public Class ManDelinPlugIn
                     ElseIf aElevUnits = "Feet" Then
                         lSlope = lSlope * 100 / 3.281
                     End If
+                    'convert units if the GIS layer units are feet instead of meters
+                    If GisUtil.MapUnits.ToUpper = "FEET" Then
+                        lSlope = lSlope * 3.281
+                    End If
                     GisUtil.SetFeatureValue(lSubbasinLayerIndex, lSlopeFieldIndex, lSubbasinIndex - 1, lSlope)
                 Next lSubbasinIndex
             Else 'grid
@@ -188,6 +192,10 @@ Public Class ManDelinPlugIn
                             lSlope = lSlope * 100 / 3.281
                         Else
                             'If slope is in Centimeters, no need to adjust
+                        End If
+                        'convert units if the GIS layer units are feet instead of meters
+                        If GisUtil.MapUnits.ToUpper = "FEET" Then
+                            lSlope = lSlope * 3.281
                         End If
                         GisUtil.SetFeatureValue(lSubbasinLayerIndex, lSlopeFieldIndex, lSubbasinIndex - 1, lSlope)
                     End If
@@ -247,6 +255,10 @@ Public Class ManDelinPlugIn
             End If
             For lSubbasinsIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
                 Dim lArea As Double = GisUtil.FeatureArea(lSubbasinLayerIndex, lSubbasinsIndex - 1)
+                'convert units if the GIS layer units are feet instead of meters
+                If GisUtil.MapUnits.ToUpper = "FEET" Then
+                    lArea = lArea / (3.2808 * 3.2808)
+                End If
                 GisUtil.SetFeatureValue(lSubbasinLayerIndex, lAreaAcresFieldIndex, lSubbasinsIndex - 1, lArea / 4046.86)
                 GisUtil.SetFeatureValue(lSubbasinLayerIndex, lAreaMi2FieldIndex, lSubbasinsIndex - 1, lArea / 2589988)
             Next lSubbasinsIndex
@@ -664,6 +676,10 @@ Public Class ManDelinPlugIn
         Dim i As Integer
         For i = 1 To lNumStreams
             r = GisUtil.FeatureLength(lStreamsLayerIndex, i - 1)
+            'convert units if the GIS layer units are feet instead of meters
+            If GisUtil.MapUnits.ToUpper = "FEET" Then
+                r = r / 3.281
+            End If
             GisUtil.SetFeatureValue(lStreamsLayerIndex, lLengthFieldIndex, i - 1, r)
         Next i
 
@@ -678,6 +694,9 @@ Public Class ManDelinPlugIn
                 dval = GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex - 1, lSubbasinFieldIndex)
                 If dval = rval Then
                     r = GisUtil.FeatureArea(lSubbasinLayerIndex, lSubbasinIndex - 1)
+                    If GisUtil.MapUnits.ToUpper = "FEET" Then
+                        r = r / (3.2808 * 3.2808)
+                    End If
                     GisUtil.SetFeatureValue(lStreamsLayerIndex, AreaFieldIndex, i - 1, r)
                     Exit For
                 End If

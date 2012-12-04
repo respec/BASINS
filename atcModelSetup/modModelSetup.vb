@@ -162,6 +162,15 @@ Public Module modModelSetup
 
         End If
 
+        'convert units if the GIS layer units are feet instead of meters
+        Dim lDistFactor As Double = 1.0
+        If GisUtil.MapUnits.ToUpper = "FEET" Then
+            lDistFactor = 3.2808
+            For Each lRec As LandUseSubbasinOverlayRecord In lLandUseSubbasinOverlayRecords
+                lRec.Area = lRec.Area / (lDistFactor * lDistFactor)
+            Next
+        End If
+
         'special code to always include certain land uses
         Dim lSub As Integer
         Dim lFoundLU As Boolean = False
@@ -1814,18 +1823,91 @@ Public Module modModelSetup
                        "SolrWdmId SolrDsn SolrTstype SolrMFactPI SolrMFactR " & _
                        "ClouWdmId ClouDsn ClouTstype ClouMFactPI ClouMFactR " & _
                        "PevtWdmId PevtDsn PevtTstype PevtMFactPI PevtMFactR")
+
         For lIndex As Integer = 0 To aMetSegIds.Count - 1
             Dim lBaseDsn As Integer = aMetBaseDsns(lIndex)
             Dim lWdmId As String = aMetWdmIds(lIndex)
+
+            'find the data source and location associated with this WdmId
+            Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
+            Dim lPrecLoc As String = ""
+            For Each lDataSourceGeneric As atcDataSource In atcDataManager.DataSources
+                If lDataSourceGeneric IsNot Nothing AndAlso lDataSourceGeneric.Name = "Timeseries::WDM" Then
+                    Dim lDataSourceWDM As atcWDM.atcDataSourceWDM = lDataSourceGeneric
+                    Dim lPrecFound As Boolean = False
+                    For Each lDataSet As atcTimeseries In lDataSourceWDM.DataSets
+                        If lDataSet.Attributes.GetValue("ID") = lBaseDsn Then
+                            If lDataSet.Attributes.GetValue("TSTYPE") = "PREC" Then
+                                lPrecFound = True
+                                lPrecLoc = lDataSet.Attributes.GetValue("LOCATION")
+                                lDataSource = lDataSourceWDM
+                                Exit For
+                            End If
+                        End If
+                    Next
+                    If lPrecFound Then
+                        Exit For
+                    End If
+                End If
+            Next
+
+            Dim lATEMdsn As Integer = lBaseDsn + 2
+            FindMatchingDSNatThisLocation(lDataSource, lPrecLoc, "ATEM", lATEMdsn)
+
+            Dim lDEWPdsn As Integer = lBaseDsn + 6
+            FindMatchingDSNatThisLocation(lDataSource, lPrecLoc, "DEWP", lDEWPdsn)
+
+            Dim lWINDdsn As Integer = lBaseDsn + 3
+            FindMatchingDSNatThisLocation(lDataSource, lPrecLoc, "WIND", lWINDdsn)
+
+            Dim lSOLRdsn As Integer = lBaseDsn + 4
+            FindMatchingDSNatThisLocation(lDataSource, lPrecLoc, "SOLR", lSOLRdsn)
+
+            Dim lCLOUdsn As Integer = lBaseDsn + 7
+            FindMatchingDSNatThisLocation(lDataSource, lPrecLoc, "CLOU", lCLOUdsn)
+
+            Dim lPEVTdsn As Integer = lBaseDsn + 5
+            FindMatchingDSNatThisLocation(lDataSource, lPrecLoc, "PEVT", lPEVTdsn)
+
             lSB.AppendLine(CStr(aMetSegIds(lIndex)) & " " & lWdmId & " " & lBaseDsn.ToString & " PREC 1 1" & _
-                                                      " " & lWdmId & " " & (lBaseDsn + 2).ToString & " ATEM 1 1" & _
-                                                      " " & lWdmId & " " & (lBaseDsn + 6).ToString & " DEWP 1 1" & _
-                                                      " " & lWdmId & " " & (lBaseDsn + 3).ToString & " WIND 1 1" & _
-                                                      " " & lWdmId & " " & (lBaseDsn + 4).ToString & " SOLR 1 1" & _
-                                                      " " & lWdmId & " " & (lBaseDsn + 7).ToString & " CLOU 0 1" & _
-                                                      " " & lWdmId & " " & (lBaseDsn + 5).ToString & " PEVT 1 1")
+                                                      " " & lWdmId & " " & lATEMdsn.ToString & " ATEM 1 1" & _
+                                                      " " & lWdmId & " " & lDEWPdsn.ToString & " DEWP 1 1" & _
+                                                      " " & lWdmId & " " & lWINDdsn.ToString & " WIND 1 1" & _
+                                                      " " & lWdmId & " " & lSOLRdsn.ToString & " SOLR 1 1" & _
+                                                      " " & lWdmId & " " & lCLOUdsn.ToString & " CLOU 0 1" & _
+                                                      " " & lWdmId & " " & lPEVTdsn.ToString & " PEVT 1 1")
         Next
-        SaveFileString(aSegFileName, lSB.ToString)
+            SaveFileString(aSegFileName, lSB.ToString)
+    End Sub
+
+    Private Sub FindMatchingDSNatThisLocation(ByVal aDataSource As atcWDM.atcDataSourceWDM, ByVal aPrecLoc As String, ByVal aConstituent As String, ByRef aMatchingDsn As Integer)
+        'given a location with a precip dataset, find the corresponding dsn of another consitituent 
+
+        'first try the default position
+        Dim lDefaultPositionOK As Boolean = False
+        For Each lDataSet As atcTimeseries In aDataSource.DataSets
+            If lDataSet.Attributes.GetValue("ID") = aMatchingDsn Then
+                If lDataSet.Attributes.GetValue("LOCATION") = aPrecLoc AndAlso lDataSet.Attributes.GetValue("TSTYPE") = aConstituent Then
+                    lDefaultPositionOK = True
+                Else
+                    'that data set number exists but is the wrong constituent or location
+                    aMatchingDsn = 0
+                    lDefaultPositionOK = False
+                End If
+                Exit For
+            End If
+        Next
+
+        'if the default position doesn't exist or doesn't match, search for another 
+        If lDefaultPositionOK = False Then
+            For Each lDataSet As atcTimeseries In aDataSource.DataSets
+                If lDataSet.Attributes.GetValue("LOCATION") = aPrecLoc AndAlso lDataSet.Attributes.GetValue("TSTYPE") = aConstituent Then
+                    'this looks like a better pick
+                    aMatchingDsn = lDataSet.Attributes.GetValue("ID")
+                    Exit For
+                End If
+            Next
+        End If
     End Sub
 
     Public Sub WriteMAPFile(ByVal aMapFileName As String)
