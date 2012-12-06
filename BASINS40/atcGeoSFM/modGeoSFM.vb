@@ -4394,6 +4394,7 @@ Public Module modGeoSFM
         lEDate(0) = CInt(lEndYear)
         lEDate(1) = 1
         lEDate(2) = 1
+        lEDate(3) = 24
         Dim lEJDate As Double = Date2J(lEDate) + lEndDay - 1
         Dim lNvals As Double = lEJDate - lSJDate
         Dim lDates(lNvals) As Double
@@ -4439,10 +4440,10 @@ Public Module modGeoSFM
             Dim lValues(lNvals) As Double
             Dim lCurDate As Double
             lCurDate = lSJDate
-            Dim lDayCounter As Integer = 0
+            Dim lDayCounter As Integer = 1
             Dim lValueCounter As Integer = 1
             Do While lCurDate <= lEJDate 'loop through each day
-                lValues(lDayCounter) = lResultVals(lDayCounter, lTsIndex)
+                lValues(lDayCounter - 1) = lResultVals(lDayCounter, lTsIndex)
                 lDayCounter = lDayCounter + 1
                 lCurDate = lCurDate + 1
             Loop
