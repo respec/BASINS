@@ -41,7 +41,7 @@ Public Module Graph
             .YAxis.Scale.Min = 1
             '.YAxis.Scale.Max = 10000
             .XAxis.Scale.MinAuto = True
-            .YAxis.Scale.MaxAuto = True
+            '.YAxis.Scale.MaxAuto = True
             '.XAxis.Scale.Min = 0.001
             .XAxis.Scale.MaxAuto = True
             '.XAxis.Scale.Max = 0.9998
@@ -52,11 +52,12 @@ Public Module Graph
             .YAxis.Title.Text = "Flow (cfs)"
             .XAxis.Scale.FontSpec.Size += 1
             .XAxis.Title.FontSpec.Size += 1
-            .XAxis.Title.Text = "Percent chance daily flow exceeded (cfs)"
+            .XAxis.Title.Text = "Percent Chance Daily Flow Exceeded" ' at McBride Bridge"
             .YAxis.Scale.FontSpec.IsBold = True
             .YAxis.Scale.FontSpec.Size += 1
-            .CurveList(0).Label.Text = "Observed Flow"
-            .CurveList(1).Label.Text = "Simulated Flow"
+            '.CurveList(0).Label.Text = "Observed Flow"
+            '.CurveList(1).Label.Text = "Simulated Flow"
+            .Title.Text = lOutFileBase
 
         End With
 
@@ -65,58 +66,64 @@ Public Module Graph
         lZgc.SaveIn(lOutFileBase & "_dur" & aGraphSaveFormat)
         lGraphDur.Dispose()
         lZgc.Dispose()
-
-        'cummulative difference
-        lZgc = CreateZgc()
-        lZgc.Width = aGraphSaveWidth
-        lZgc.Height = aGraphSaveHeight
-        Dim lGraphCum As New clsGraphCumulativeDifference(lDataGroup, lZgc)
-        'TODO: add title 
-        lZgc.SaveIn(lOutFileBase & "_cumDif" & aGraphSaveFormat)
-        lGraphCum.Dispose()
-        lZgc.Dispose()
-
-        'scatter
-        lZgc = CreateZgc()
-        lZgc.Width = aGraphSaveWidth
-        lZgc.Height = aGraphSaveHeight
-        Dim lGraphScatter As New clsGraphScatter(lDataGroup, lZgc)
-        lGraphScatter.AddFitLine()
-
-        lZgc.SaveIn(lOutFileBase & "_scatDay" & aGraphSaveFormat)
-        With lZgc.MasterPane.PaneList(0)
-            .YAxis.Type = AxisType.Log
-            .XAxis.Type = AxisType.Log
-        End With
-        lZgc.SaveIn(lOutFileBase & "_scatDay_log" & aGraphSaveFormat)
-        lGraphScatter.Dispose()
-        lZgc.Dispose()
-
-        If aTimeSeries.Keys.Contains("LZS") Then 'scatter - LZS vs Error(cfs)
+        Dim ExtraGraphs As Boolean = False
+        If ExtraGraphs Then
+            'cummulative difference
             lZgc = CreateZgc()
             lZgc.Width = aGraphSaveWidth
             lZgc.Height = aGraphSaveHeight
-            If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("LZS"), "LZS (in)") Then
-                lZgc.SaveIn(lOutFileBase & "_Error_LZS" & aGraphSaveFormat)
-            End If
-        End If
+            Dim lGraphCum As New clsGraphCumulativeDifference(lDataGroup, lZgc)
+            'TODO: add title 
+            lZgc.GraphPane.Title.Text = lOutFileBase
 
-        If aTimeSeries.Keys.Contains("UZS") Then 'scatter - UZS vs Error(cfs)
+            lZgc.SaveIn(lOutFileBase & "_cumDif" & aGraphSaveFormat)
+            lGraphCum.Dispose()
+            lZgc.Dispose()
+
+            'scatter
             lZgc = CreateZgc()
             lZgc.Width = aGraphSaveWidth
             lZgc.Height = aGraphSaveHeight
-            If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("UZS"), "UZS (in)") Then
-                lZgc.SaveIn(lOutFileBase & "_Error_UZS" & aGraphSaveFormat)
+            Dim lGraphScatter As New clsGraphScatter(lDataGroup, lZgc)
+            lGraphScatter.AddFitLine()
+
+            lZgc.SaveIn(lOutFileBase & "_scatDay" & aGraphSaveFormat)
+            With lZgc.MasterPane.PaneList(0)
+                .YAxis.Type = AxisType.Log
+                .XAxis.Type = AxisType.Log
+                .Title.Text = lOutFileBase
+            End With
+            lZgc.SaveIn(lOutFileBase & "_scatDay_log" & aGraphSaveFormat)
+            lGraphScatter.Dispose()
+            lZgc.Dispose()
+
+            If aTimeSeries.Keys.Contains("LZS") Then 'scatter - LZS vs Error(cfs)
+                lZgc = CreateZgc()
+                lZgc.Width = aGraphSaveWidth
+                lZgc.Height = aGraphSaveHeight
+                If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("LZS"), "LZS (in)") Then
+                    lZgc.SaveIn(lOutFileBase & "_Error_LZS" & aGraphSaveFormat)
+                End If
+            End If
+
+            If aTimeSeries.Keys.Contains("UZS") Then 'scatter - UZS vs Error(cfs)
+                lZgc = CreateZgc()
+                lZgc.Width = aGraphSaveWidth
+                lZgc.Height = aGraphSaveHeight
+                If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("UZS"), "UZS (in)") Then
+                    lZgc.SaveIn(lOutFileBase & "_Error_UZS" & aGraphSaveFormat)
+                End If
+            End If
+
+            'scatter - Observed vs Error(cfs)    
+            lZgc = CreateZgc()
+            lZgc.Width = aGraphSaveWidth
+            lZgc.Height = aGraphSaveHeight
+            If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("Observed"), "Observed (cfs)", AxisType.Log) Then
+                lZgc.SaveIn(lOutFileBase & "_Error_ObsFlow" & aGraphSaveFormat)
             End If
         End If
 
-        'scatter - Observed vs Error(cfs)    
-        lZgc = CreateZgc()
-        lZgc.Width = aGraphSaveWidth
-        lZgc.Height = aGraphSaveHeight
-        If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("Observed"), "Observed (cfs)", AxisType.Log) Then
-            lZgc.SaveIn(lOutFileBase & "_Error_ObsFlow" & aGraphSaveFormat)
-        End If
 
         'add precip to aux axis
         Dim lPaneCount As Integer = 1
@@ -291,12 +298,12 @@ Public Module Graph
             lZgc.MasterPane.PaneList(0).YAxis.Title.FontSpec.Size += 2
             lZgc.MasterPane.PaneList(0).YAxis.Scale.FontSpec.IsBold = True
             lZgc.MasterPane.PaneList(0).YAxis.Scale.FontSpec.Size += 1
-            lZgc.MasterPane.PaneList(0).YAxis.Scale.Max *= 1.1
+            lZgc.MasterPane.PaneList(0).YAxis.Scale.Max *= 1.0
 
             lZgc.MasterPane.PaneList(1).YAxis.Title.Text = "Flow (cfs)"
             lZgc.MasterPane.PaneList(1).YAxis.Title.FontSpec.IsBold = True
             lZgc.MasterPane.PaneList(1).YAxis.Title.FontSpec.Size += 2
-            lZgc.MasterPane.PaneList(1).YAxis.Scale.Max *= 1.1
+            lZgc.MasterPane.PaneList(1).YAxis.Scale.Max *= 1.0
 
             lZgc.MasterPane.PaneList(1).YAxis.Scale.FontSpec.Size += 1
             lZgc.MasterPane.PaneList(1).YAxis.Scale.FontSpec.IsBold = True
@@ -304,25 +311,12 @@ Public Module Graph
             lZgc.MasterPane.PaneList(1).XAxis.Scale.FontSpec.IsBold = True
             lZgc.MasterPane.PaneList(1).XAxis.Scale.FontSpec.Size += 1
 
+            lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = "Daily Weighted Precipitation"
+            lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text = "Daily Observed Flow"
+            lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text = "Daily Simulated Flow"
 
-            'If lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text.Contains(" Weighted Average ") Then
-            '    lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = lXlabel & "Observed Precipitation at Upatoi Crk, MCB Bridge (RCH46)"
-            '    lZgc.MasterPane.PaneList(0).CurveList(0).Label.FontSpec = lBoldFont
-            'End If
-
-            'If lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text.Contains("OBSERVED FLOW at RCH46 ") Then
-            '    lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text = lXlabel & "Observed Flow at Upatoi Crk, MCB Bridge (RCH46)"
-            '    lZgc.MasterPane.PaneList(1).CurveList(0).Label.FontSpec = lBoldFont
-            '    lZgc.MasterPane.PaneList(1).XAxis.Title.Text = ""
-            'End If
-
-            'If lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text.Contains("SIMULATE") Then
-            '    lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text = lXlabel & "Simulated Flow at Upatoi Crk, MCB Bridge (RCH46)"
-            '    lZgc.MasterPane.PaneList(1).CurveList(1).Label.FontSpec = lBoldFont
-            '    lZgc.MasterPane.PaneList(1).XAxis.Title.Text = ""
-            'End If
         End If
-        
+        lZgc.GraphPane.Title.Text = aOutFileBase
         lZgc.SaveIn(aOutFileBase & aGraphSaveFormat)
         'timeseries - log
         With lZgc.MasterPane.PaneList(aPaneCount - 1)
@@ -345,6 +339,7 @@ Public Module Graph
         Else
             lOutFileName = aOutFileBase & "_log" & aGraphSaveFormat
         End If
+        lZgc.GraphPane.Title.Text = lOutFileName
         lZgc.SaveIn(lOutFileName)
         lGrapher.Dispose()
         lZgc.Dispose()
