@@ -56,7 +56,6 @@ Public Class atcTimeseriesNetCDF
         End Set
     End Property
 
-
     Public Overrides Function Open(ByVal aFileName As String, _
                           Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
@@ -115,12 +114,17 @@ Public Class atcTimeseriesNetCDF
                         Dim lNumValues As Integer = lTimeVariable.Dimensions(0).Length
                         ReDim lDates.Values(lNumValues)
                         lDates.Values(0) = lDateBase.ToOADate
-                        For lTimeIndex As Integer = 1 To lNumValues
-                            lDates.Values(lTimeIndex) = lDates.Values(0) + lTimeVariable.Values(lTimeIndex - 1)
+                        For lTimeIndex As Integer = 1 To lNumValues - 1
+                            lDates.Values(lTimeIndex) = lDates.Values(0) + lTimeVariable.Values(lTimeIndex)
                         Next
+                        'kludge in last value
+                        lDates.Values(lNumValues) = lDates.Values(lNumValues - 1) + lTimeVariable.Values(1)
+
                         Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
                         For lTimeseriesIndex As Integer = 0 To lTimeseriesCount - 1
                             Dim lTimeseries As New atcTimeseries(Me)
+                            lTimeseries.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(lFileName))
+                            lTimeseries.Attributes.SetValue("ID", lTimeseriesIndex + 1)
                             lTimeseries.Dates = lDates
                             ReDim lTimeseries.Values(lNumValues)
                             For lTimeIndex As Integer = 0 To lNumValues - 1
