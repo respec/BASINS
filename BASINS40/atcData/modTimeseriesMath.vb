@@ -1019,7 +1019,7 @@ NextOldVal:
             aMaxBinSize = lNumValues / 100 'Default to max of 1% of values in each bin
             If aMaxBinSize < 10 Then aMaxBinSize = 10
         End If
-        Logger.Progress("Sorting values from " & aTS.ToString & " into bins. ", 0, lNumValues)
+        'Logger.Progress("Sorting values from " & aTS.ToString & " into bins. ", 0, lNumValues)
         For lOldIndex As Integer = 1 To lNumValues
             lCurValue = aTS.Value(lOldIndex)
             If Not Double.IsNaN(lCurValue) Then
@@ -1038,11 +1038,11 @@ NextOldVal:
                     SplitBin(lBins, lCurBin, lBinIndex)
                     '  lCurBin = lBins.Item(lBinIndex)
                     '  lCurBinMax = lBins.Keys.Item(lBinIndex)
-                    Logger.Progress("Sorting values into " & lBins.Count & " bins", lOldIndex, lNumValues)
+                    'Logger.Progress("Sorting values into " & lBins.Count & " bins", lOldIndex, lNumValues)
                 End If
             End If
         Next
-        Logger.Progress("Sorted values into " & lBins.Count & " bins", lNumValues, lNumValues)
+        Logger.Dbg("Sorted values into " & lBins.Count & " bins", lNumValues, lNumValues)
         'For lBinIndex = 0 To lBins.Count - 1
         '  lCurBin = lBins.Item(lBinIndex)
         '  Logger.Dbg("Bin " & lBinIndex & " (" & lBins.Keys(lBinIndex) & ") contains " & lCurBin.Count)

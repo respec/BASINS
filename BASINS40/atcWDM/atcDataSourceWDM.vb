@@ -173,9 +173,9 @@ Public Class atcDataSourceWDM
             Dim lTimser As atcTimeseries = aDataSet
             Dim lTs As Integer = lTimser.Attributes.GetValue("ts", 0)
             Dim lTu As atcTimeUnit = lTimser.Attributes.GetValue("tu", atcTimeUnit.TUUnknown)
-            Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
-            Dim lTGroup As Integer = aDataSet.Attributes.GetValue("tgroup", 6)
-            'Dim lTSBYr As Integer = aDataSet.Attributes.GetValue("tsbyr", 1900)
+            Dim lDsn As Integer = lTimser.Attributes.GetValue("id", 1)
+            Dim lTGroup As Integer = lTimser.Attributes.GetValue("tgroup", 6)
+            'Dim lTSBYr As Integer = lTimser.Attributes.GetValue("tsbyr", 1900)
             Dim lTimserConst As atcTimeseries = Nothing
 
             If lTs = 0 OrElse lTu = atcTimeUnit.TUUnknown Then ' sparse dataset - fill in dummy values for write
@@ -206,7 +206,7 @@ Public Class atcDataSourceWDM
                 'Change asking user into what the user already chose for all
                 If aExistAction = ExistAskUser Then aExistAction = pExistAskUserAction
                 Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
-                If lExistTimser.Serial = aDataSet.Serial Then
+                If lExistTimser.Serial = lTimser.Serial Then
                     Logger.Dbg("Adding a dataset that already exists in WDM: replacing old version in WDM, DSN=" & lDsn)
                     aExistAction = ExistReplace
                 End If
@@ -253,7 +253,7 @@ CaseExistReplace:
 CaseExistRenumber:
                         lDsn = findNextDsn(lDsn)
                         'Logger.Dbg("atcDataSourceWdm:AddNew:" & lWdmHandle.Unit & ":" & lDsn)
-                        aDataSet.Attributes.SetValue("Id", lDsn)
+                        lTimser.Attributes.SetValue("Id", lDsn)
                 End Select
             Else
                 'Logger.Dbg("atcDataSourceWdm:AddDataset:NewDataSet:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)

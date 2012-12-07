@@ -649,6 +649,7 @@ ParseFixedDef:
                     optHeaderLines.Checked = True
                     txtHeaderLines.Text = scr.SubExpression(0).Printable
                 End If
+            Case clsATCscriptExpression.ATCsToken.tok_Save
             Case clsATCscriptExpression.ATCsToken.tok_Set
             Case clsATCscriptExpression.ATCsToken.tok_Value
             Case clsATCscriptExpression.ATCsToken.tok_Variable
