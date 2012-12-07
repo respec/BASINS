@@ -51,10 +51,11 @@ Friend Module modATCscript
     ''' Be sure to synchronize with Private Enum ATCsToken in clsATCscriptExpression
     ''' </summary>
     ''' <remarks></remarks>
-    Public TokenString As String() = {"Unknown", "And", "ATCScript", "Attribute", "ColumnFormat", "Comment", "Dataset", "Date", "FatalError", "Fill", "Flag", "For", "If", "In", "Increment", "Instr", "IsNumeric", "LineEnd", "Literal", "+", "/", "*", "^", "-", "Mid", "NextLine", "Not", "Or", "Set", "Test", "Trim", "Unset", "Value", "Variable", "Warn", "While", ">", ">=", "<", "<=", "<>", "=", "Last"}
+    Public TokenString As String() = {"Unknown", "And", "ATCScript", "Attribute", "ColumnFormat", "Comment", "Dataset", "Date", "FatalError", "Fill", "Flag", "For", "If", "In", "Increment", "Instr", "IsNumeric", "LineEnd", "Literal", "+", "/", "*", "^", "-", "Mid", "NextLine", "Not", "Or", "Save", "Set", "Test", "Trim", "Unset", "Value", "Variable", "Warn", "While", ">", ">=", "<", "<=", "<>", "=", "Last"}
 
     Private Const DefaultScenario As String = "ScriptRead"
     Private pTserFile As atcTimeseriesSource
+    Private pSaveIn As atcTimeseriesSource
     Private pDataFilename As String
 
     Private Class InputBuffer
@@ -487,16 +488,15 @@ Friend Module modATCscript
     End Function
 
     Public Function ScriptRun(ByRef Script As clsATCscriptExpression, ByRef DataFilename As String, ByRef TserFile As atcTimeseriesSource) As String
+        Dim lReturnValue As String = Nothing
         Try
-            Dim msg As String
             pDataFilename = DataFilename
             pTserFile = TserFile
 
             ScriptInit()
-            msg = ScriptOpenDataFile(DataFilename)
-            If msg <> "OK" Then
-                Logger.Msg(msg, MsgBoxStyle.OkOnly, "Data Import")
-                ScriptRun = msg
+            lReturnValue = ScriptOpenDataFile(DataFilename)
+            If lReturnValue <> "OK" Then
+                Logger.Msg(lReturnValue, MsgBoxStyle.OkOnly, "Data Import")
             Else
                 Logger.Dbg("(MSG1 Reading)")
                 Logger.Dbg("(MSG2 0)")
@@ -508,7 +508,7 @@ Friend Module modATCscript
                     DebugScriptForm.ShowScript(Script)
                 End If
                 TestingFile = False
-                ScriptRun = Script.Evaluate
+                lReturnValue = Script.Evaluate
 
                 If Not AbortScript Then
                     For Each lBuffer As InputBuffer In InBuf
@@ -531,9 +531,23 @@ Friend Module modATCscript
                                     .ts = lFilledTS
                                 End If
 
+                                With .ts
+                                    .Attributes.SetValueIfMissing("ID", pTserFile.DataSets.Count + 1)
+                                    If Not .Attributes.ContainsAttribute("History 1") Then
+                                        .Attributes.AddHistory("Read From " & DataFilename)
+                                    End If
+                                    'Set missing values to NaN
+                                    Dim lNaN As Double = GetNaN()
+                                    For iVal As Long = 1 To .numValues
+                                        If Math.Abs((.Value(iVal) - FillMissing)) < 1.0E-20 Then
+                                            .Value(iVal) = lNaN
+                                        End If
+                                    Next
+                                End With
+
+                                'Re-use existing dates if this TS has same dates as another
                                 For Each lExistingTS As atcTimeseries In pTserFile.DataSets
-                                    If lExistingTS.Dates.numValues = 0 Then Stop
-                                    If .ts.Dates.numValues = lExistingTS.Dates.numValues Then
+                                    If Not lExistingTS.ValuesNeedToBeRead AndAlso Not lExistingTS.Dates.ValuesNeedToBeRead AndAlso lExistingTS.Dates.numValues = .ts.Dates.numValues Then
                                         Dim lMatch As Boolean = True
                                         For lIndex As Long = 1 To lExistingTS.Dates.numValues
                                             If .ts.Dates.Value(lIndex) <> lExistingTS.Dates.Value(lIndex) Then
@@ -551,19 +565,9 @@ Friend Module modATCscript
                                 Next
 
                                 pTserFile.AddDataSet(.ts, atcDataSource.EnumExistAction.ExistRenumber)
-                                With .ts
-                                    .Attributes.SetValue("ID", pTserFile.DataSets.Count)
-                                    If Not .Attributes.ContainsAttribute("History 1") Then
-                                        .Attributes.AddHistory("Read From " & DataFilename)
-                                    End If
-                                    'Set missing values to NaN
-                                    Dim lNaN As Double = GetNaN()
-                                    For iVal As Long = 1 To .numValues
-                                        If Math.Abs((.Value(iVal) - FillMissing)) < 1.0E-20 Then
-                                            .Value(iVal) = lNaN
-                                        End If
-                                    Next
-                                End With
+                                If pTserFile.CanSave Then 'Free memory now that data has been saved
+                                    .ts.ValuesNeedToBeRead = True
+                                End If
                             End If
                         End With
                     Next
@@ -575,5 +579,23 @@ Friend Module modATCscript
                 DataFileHandle = Nothing
             End If
         End Try
+        Return lReturnValue
     End Function
+
+    Friend Sub SaveIn(ByVal aFileName As String)
+        Dim lSaveIn As atcDataSource = atcDataManager.DataSourceBySpecification(aFileName)
+        If pTserFile Is Nothing Then
+            If atcDataManager.OpenDataSource(aFileName) Then
+                lSaveIn = atcDataManager.DataSourceBySpecification(aFileName)
+            End If
+        End If
+        If lSaveIn Is Nothing Then
+            Logger.Msg("Could not open '" & aFileName & "' so opening in BASINS", "Script Import")
+        ElseIf Not lSaveIn.CanSave Then
+            Logger.Msg("Could not save in '" & aFileName & "' so opening in BASINS", "Script Import")
+        Else
+            pTserFile = lSaveIn
+        End If
+    End Sub
+
 End Module

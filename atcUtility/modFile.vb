@@ -748,6 +748,7 @@ ErrorWriting:
 
         Dim lDir As String = CurDir()
         Dim lFileName As String = aDefaultFileName.Trim
+        Logger.Dbg("Finding file: " & lFileName)
         Dim lBaseFileName As String = IO.Path.GetFileName(lFileName).ToLower 'file name (not path) of file we are looking for
         Dim lExePath As String
         Dim lDLLpath As String
@@ -830,7 +831,7 @@ ErrorWriting:
                 End If
             End If
 
-            If Not FileExists(lFileName) AndAlso (aFileDialogTitle Is Nothing OrElse aFileDialogTitle.Length = 0) Then
+            If Not FileExists(lFileName) AndAlso (String.IsNullOrEmpty(aFileDialogTitle)) Then
                 lFileName = "" 'If we don't have a dialog title, return a blank filename instead of asking the user
             ElseIf aUserVerifyFileName OrElse Not FileExists(lFileName) Then 'ask the user
                 Logger.Dbg("Asking user to find " & aDefaultFileName, aFileDialogTitle)
@@ -865,7 +866,7 @@ ErrorWriting:
             ElseIf Not lDir.Equals(CurDir) Then 'Change back to dir where we started
                 ChDriveDir(lDir)
             End If
-
+            Logger.Dbg("Found file: " & lFileName)
             Return lFileName
         End If
     End Function

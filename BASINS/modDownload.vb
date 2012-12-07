@@ -81,9 +81,10 @@ Public Module modDownload
                                 Dim lFilenames As New NameValueCollection
                                 AddFilesInDir(lFilenames, PathNameOnly(GisUtil.ProjectFileName), True)
                                 For Each lFilename As String In lFilenames
-                                    If Not FileExt(lFilename) = "mwprj" And Not FileExt(lFilename) = "bmp" Then
+                                    Dim lExtension As String = FileExt(lFilename)
+                                    If lExtension <> "mwprj" AndAlso lExtension <> "bmp" Then
                                         lTarget = lNewDataDir & Mid(lFilename, Len(PathNameOnly(GisUtil.ProjectFileName)) + 2)
-                                        If (Not FileExists(lTarget)) Or (FileExt(lFilename) = "prj") Then
+                                        If (lExtension = "prj") OrElse (Not FileExists(lTarget)) Then
                                             g_StatusBar(1).Text = "Copying " & FilenameNoPath(lFilename.ToString)
                                             RefreshView()
                                             MkDirPath(PathNameOnly(lTarget))

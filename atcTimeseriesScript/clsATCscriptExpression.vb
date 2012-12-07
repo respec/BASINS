@@ -52,6 +52,7 @@ Imports MapWinUtility
         tok_NextLine
         tok_Not
         tok_Or
+        tok_Save
         tok_Set
         tok_Test
         tok_Trim
@@ -526,14 +527,13 @@ ParseFixedDef:
 
     Private Function ParseDate() As String
         Dim Min, da, yr, cnt, mo, hr, sec As Integer
-        Dim str_Renamed As String
         cnt = MySubExpressions.Count()
         If cnt < 1 Then
             MsgBox("No values specified for date" & vbCr & Printable())
         Else
-            str_Renamed = MySubExpressions.Item(0).Evaluate
-            If IsNumeric(str_Renamed) Then
-                yr = CInt(str_Renamed)
+            Dim lYearString As String = MySubExpressions.Item(0).Evaluate
+            If IsNumeric(lYearString) Then
+                yr = CInt(lYearString)
             Else
                 Return ""
             End If
@@ -821,6 +821,8 @@ ParseFixedDef:
                     ScriptNextLine()
                 Next
                 retval = CurrentLine
+            Case ATCsToken.tok_Save
+                modATCscript.SaveIn(MySubExpressions.Item(0).Evaluate)
             Case ATCsToken.tok_Set 'MySubExpressions(1) is variable name, (2) is new value
                 If MySubExpressions.Item(0).Token = ATCsToken.tok_Variable Then
                     tmpval = MySubExpressions.Item(0).Printable

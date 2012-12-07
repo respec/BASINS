@@ -434,7 +434,14 @@ FoundMatch:
         Dim lPaneAux As GraphPane = Nothing
         If aMasterPane.PaneList.Count > 1 Then lPaneAux = aMasterPane.PaneList(0)
         Dim lDummyForm As New Windows.Forms.Form
-        Dim lGraphics As Graphics = lDummyForm.CreateGraphics()
+        Dim lGraphics As Graphics
+        Try
+            lGraphics = lDummyForm.CreateGraphics()
+        Catch ex As Exception
+            lDummyForm.Show()
+            lDummyForm.Hide()
+            lGraphics = lDummyForm.CreateGraphics()
+        End Try
         aMasterPane.PaneList.Clear()
         If aEnable Then
             ' Main pane already exists, just needs to be shifted
@@ -488,6 +495,7 @@ FoundMatch:
         End If
         aMasterPane.AxisChange()
         lGraphics.Dispose()
+        lDummyForm.Dispose()
         Return lPaneAux
     End Function
 
@@ -498,9 +506,11 @@ FoundMatch:
         If Not aZgc Is Nothing AndAlso Not aZgc.IsDisposed Then
             aZgc.Dispose()
         End If
-
-        aZgc = New ZedGraphControl
-
+        Try
+            aZgc = New ZedGraphControl
+        Catch e As Exception
+            Throw New ApplicationException("modGraph: Could not create ZedGraphControl", e)
+        End Try
         Dim lPaneMain As New GraphPane
         FormatPaneWithDefaults(lPaneMain)
 
