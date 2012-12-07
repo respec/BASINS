@@ -12,6 +12,10 @@ Module netCDFViewer
 
         Dim lReport As New System.Text.StringBuilder
 
+        'learn how to calc statistics
+        Dim lStatistics As New atcTimeseriesStatistics.atcTimeseriesStatistics
+        lStatistics.Initialize()
+
         Dim lNetCDF_Version As String = NetCDF.nc_inq_libvers
         Dim lPathName As String = "..\..\..\..\Data\"
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
@@ -26,6 +30,12 @@ Module netCDFViewer
             Dim lNetCDFFile As New atcTimeseriesNetCDF.atcTimeseriesNetCDF
             lNetCDFFile.Debug = True
             lNetCDFFile.Open(lFileName)
+            For Each lTimeseries As atcData.atcTimeseries In lNetCDFFile.DataSets
+                lTimeseries.Attributes.CalculateAll()
+                Dim lDataTree As New atcDataTree.atcDataTreePlugin
+                Dim lDataTreeFileName As String = IO.Path.ChangeExtension(lFileName.Replace(".nc", "#.nc"), "list")
+                lDataTree.Save(New atcData.atcTimeseriesGroup(lTimeseries), lDataTreeFileName.Replace("#", lTimeseries.Attributes.GetValue("ID")), "Display 50")
+            Next
 
             Dim lNCId As Int32
             Dim lResult As Int32 = NetCDF.nc_open(lFileName, _
