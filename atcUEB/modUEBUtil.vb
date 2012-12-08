@@ -34,7 +34,12 @@ Module modUEBUtil
                               ByRef aAggOutputControlFileName As String, ByRef aAggOutputFileName As String) As Boolean
 
         Dim lStr As String
-        Dim lPath As String = PathNameOnly(aFilename)
+        Dim lFilename As String = aFilename
+        Dim lPath As String = PathNameOnly(lFilename)
+        If lPath.Length = 0 Then
+            lPath = CurDir()
+            lFilename = lPath & "\" & lFilename
+        End If
 
         If aParameterFileName.Length > 0 AndAlso aSiteFileName.Length > 0 AndAlso _
            aInputControlFileName.Length > 0 AndAlso aOutputControlFileName.Length > 0 AndAlso _
@@ -48,7 +53,7 @@ Module modUEBUtil
                        RelativeFilename(aWatershedFileName, lPath) & vbCrLf & aWatershedVariableName & vbCrLf & _
                        RelativeFilename(aAggOutputControlFileName, lPath) & vbCrLf & _
                        RelativeFilename(aAggOutputFileName, lPath)
-                SaveFileString(aFilename, lStr)
+                SaveFileString(lFilename, lStr)
                 Return True
             Catch ex As Exception
                 Return False

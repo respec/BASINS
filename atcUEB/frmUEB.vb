@@ -2029,25 +2029,27 @@ Public Class frmUEB
     'End Sub
 
     Private Sub txtMasterFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMasterFile.Click
-        Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open UEB master file containing all model data files"
-        cdlg.Filter = "Master Input files (*.dat)|*.dat|All Files (*.*)|*.*"
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            Dim lFilename As String = cdlg.FileName
-            ChDriveDir(IO.Path.GetDirectoryName(lFilename))
-            txtMasterFile.Text = lFilename
-            OpenMasterFile(lFilename, pProjectDescription, pParmData.FileName, pSiteData.FileName, _
-                           pInputControlData.FileName, pOutputControlData.FileName, pWatershedGridFileName, _
-                           pWatershedGridVariableName, pAggOutputControlData.FileName, pAggOutputFileName)
-            txtProjectName.Text = pProjectDescription
-            txtParameterFile.Text = pParmData.FileName
-            txtSiteFile.Text = pSiteData.FileName
-            txtInputFile.Text = pInputControlData.FileName
-            txtWatershedFile.Text = pWatershedGridFileName
-            txtWatershedVariable.Text = pWatershedGridVariableName
-            txtOutputFile.Text = pOutputControlData.FileName
-            txtAggOutputControlFile.Text = pAggOutputControlData.FileName
-            txtAggOutputFile.Text = pAggOutputFileName
+        If chkFilePrompt.Checked Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            cdlg.Title = "Open UEB master file containing all model data files"
+            cdlg.Filter = "Master Input files (*.dat)|*.dat|All Files (*.*)|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                Dim lFilename As String = cdlg.FileName
+                ChDriveDir(IO.Path.GetDirectoryName(lFilename))
+                txtMasterFile.Text = lFilename
+                OpenMasterFile(lFilename, pProjectDescription, pParmData.FileName, pSiteData.FileName, _
+                               pInputControlData.FileName, pOutputControlData.FileName, pWatershedGridFileName, _
+                               pWatershedGridVariableName, pAggOutputControlData.FileName, pAggOutputFileName)
+                txtProjectName.Text = pProjectDescription
+                txtParameterFile.Text = pParmData.FileName
+                txtSiteFile.Text = pSiteData.FileName
+                txtInputFile.Text = pInputControlData.FileName
+                txtWatershedFile.Text = pWatershedGridFileName
+                txtWatershedVariable.Text = pWatershedGridVariableName
+                txtOutputFile.Text = pOutputControlData.FileName
+                txtAggOutputControlFile.Text = pAggOutputControlData.FileName
+                txtAggOutputFile.Text = pAggOutputFileName
+            End If
         End If
     End Sub
 
@@ -2056,13 +2058,14 @@ Public Class frmUEB
     End Sub
 
     Private Sub txtParameterFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.Click
-        Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open UEB Parameter File"
-        cdlg.Filter = "UEB Parameter files (*.dat)|*.dat|All Files (*.*)|*.*"
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            txtParameterFile.Text = cdlg.FileName
+        If chkFilePrompt.Checked Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            cdlg.Title = "Open UEB Parameter File"
+            cdlg.Filter = "UEB Parameter files (*.dat)|*.dat|All Files (*.*)|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                txtParameterFile.Text = cdlg.FileName
+            End If
         End If
-
     End Sub
 
     Private Sub txtParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.TextChanged
@@ -2075,13 +2078,14 @@ Public Class frmUEB
     End Sub
 
     Private Sub txtSiteFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtSiteFile.Click
-        Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open UEB Site File"
-        cdlg.Filter = "UEB Site files (*.dat)|*.dat|All Files (*.*)|*.*"
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            txtSiteFile.Text = cdlg.FileName
+        If chkFilePrompt.Checked Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            cdlg.Title = "Open UEB Site File"
+            cdlg.Filter = "UEB Site files (*.dat)|*.dat|All Files (*.*)|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                txtSiteFile.Text = cdlg.FileName
+            End If
         End If
-
     End Sub
 
     Private Sub txtSiteFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtSiteFile.TextChanged
@@ -2094,13 +2098,14 @@ Public Class frmUEB
     End Sub
 
     Private Sub txtInputFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtInputFile.Click
-        Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open UEB Input Control File"
-        cdlg.Filter = "UEB Input Control files (*.dat)|*.dat|All Files (*.*)|*.*"
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            txtInputFile.Text = cdlg.FileName
+        If chkFilePrompt.Checked Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            cdlg.Title = "Open UEB Input Control File"
+            cdlg.Filter = "UEB Input Control files (*.dat)|*.dat|All Files (*.*)|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                txtInputFile.Text = cdlg.FileName
+            End If
         End If
-
     End Sub
 
     Private Sub txtInputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtInputFile.TextChanged
@@ -2113,13 +2118,14 @@ Public Class frmUEB
     End Sub
 
     Private Sub txtOutputFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputFile.Click
-        Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open UEB Output Control File"
-        cdlg.Filter = "UEB Output Control files (*.dat)|*.dat|All Files (*.*)|*.*"
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            txtOutputFile.Text = cdlg.FileName
+        If chkFilePrompt.Checked Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            cdlg.Title = "Open UEB Output Control File"
+            cdlg.Filter = "UEB Output Control files (*.dat)|*.dat|All Files (*.*)|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                txtOutputFile.Text = cdlg.FileName
+            End If
         End If
-
     End Sub
 
     Private Sub txtOutputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputFile.TextChanged
@@ -2132,13 +2138,14 @@ Public Class frmUEB
     End Sub
 
     Private Sub txtAggOutputControlFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputControlFile.Click
-        Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open UEB Aggregated Output Control File"
-        cdlg.Filter = "UEB Aggregated Output Control files (*.dat)|*.dat|All Files (*.*)|*.*"
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            txtAggOutputControlFile.Text = cdlg.FileName
+        If chkFilePrompt.Checked Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            cdlg.Title = "Open UEB Aggregated Output Control File"
+            cdlg.Filter = "UEB Aggregated Output Control files (*.dat)|*.dat|All Files (*.*)|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                txtAggOutputControlFile.Text = cdlg.FileName
+            End If
         End If
-
     End Sub
 
     Private Sub txtAggOutputControlFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputControlFile.TextChanged
@@ -2153,45 +2160,47 @@ Public Class frmUEB
     Private Sub cmdSimulate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdSimulate.Click
 
         If UpdateInputFiles() Then
-            Dim lExeFileName = FindFile("UEBGrid Executable", "UEBGrid.exe")
-            Dim lWorkingDirectory As String = PathNameOnly(txtMasterFile.Text)
-            Dim lArguments As String = FilenameNoPath(txtMasterFile.Text)
+            Dim lExeFileName As String = FindFile("UEBGrid Executable", "UEBGrid.exe")
+            If lExeFileName.Length > 0 Then
+                Dim lWorkingDirectory As String = PathNameOnly(txtMasterFile.Text)
+                Dim lArguments As String = FilenameNoPath(txtMasterFile.Text)
 
-            'LaunchProgram(lExeFileName, PathNameOnly(txtMasterFile.Text), FilenameNoPath(txtMasterFile.Text))
-            'use local cousin of LaunchProgram to allow DOS Window showing UEBGrid status
-            Logger.Dbg("LaunchProgram " & lExeFileName & " in " & lWorkingDirectory)
-            Dim lExitCode As Integer = 0
-            Try
-                Dim lProcess As New System.Diagnostics.Process
-                With lProcess.StartInfo
-                    .FileName = lExeFileName
-                    .WorkingDirectory = lWorkingDirectory
-                    .CreateNoWindow = False
-                    .UseShellExecute = False
-                    If Not String.IsNullOrEmpty(lArguments) Then .Arguments = lArguments
-                    .RedirectStandardOutput = False
-                    AddHandler lProcess.OutputDataReceived, AddressOf MessageHandler
-                    .RedirectStandardError = False
-                    AddHandler lProcess.ErrorDataReceived, AddressOf MessageHandler
-                End With
-                lProcess.Start()
-KeepWaiting:
+                'LaunchProgram(lExeFileName, PathNameOnly(txtMasterFile.Text), FilenameNoPath(txtMasterFile.Text))
+                'use local cousin of LaunchProgram to allow DOS Window showing UEBGrid status
+                Logger.Dbg("LaunchProgram " & lExeFileName & " in " & lWorkingDirectory)
+                Dim lExitCode As Integer = 0
                 Try
-                    lProcess.WaitForExit()
-                    lExitCode = lProcess.ExitCode
-                Catch lWaitError As Exception
-                    Logger.Dbg(lWaitError.Message)
+                    Dim lProcess As New System.Diagnostics.Process
+                    With lProcess.StartInfo
+                        .FileName = lExeFileName
+                        .WorkingDirectory = lWorkingDirectory
+                        .CreateNoWindow = False
+                        .UseShellExecute = False
+                        If Not String.IsNullOrEmpty(lArguments) Then .Arguments = lArguments
+                        .RedirectStandardOutput = False
+                        AddHandler lProcess.OutputDataReceived, AddressOf MessageHandler
+                        .RedirectStandardError = False
+                        AddHandler lProcess.ErrorDataReceived, AddressOf MessageHandler
+                    End With
+                    lProcess.Start()
+KeepWaiting:
+                    Try
+                        lProcess.WaitForExit()
+                        lExitCode = lProcess.ExitCode
+                    Catch lWaitError As Exception
+                        Logger.Dbg(lWaitError.Message)
+                    End Try
+                    If Not lProcess.HasExited Then GoTo KeepWaiting
+                    Logger.Dbg("LaunchProgram: " & lExeFileName & ": Exit code " & lExitCode)
+                Catch lEx As ApplicationException
+                    Logger.Dbg("LaunchProgram: " & lExeFileName & ": Exception: " & lEx.Message)
+                    lExitCode = -1
                 End Try
-                If Not lProcess.HasExited Then GoTo KeepWaiting
-                Logger.Dbg("LaunchProgram: " & lExeFileName & ": Exit code " & lExitCode)
-            Catch lEx As ApplicationException
-                Logger.Dbg("LaunchProgram: " & lExeFileName & ": Exception: " & lEx.Message)
-                lExitCode = -1
-            End Try
 
-            If FileExists(pAggOutputFileName) Then
-                Dim lUEBTimeseries As New atcTimeseriesUEBGrid.atcDataSourceTimeseriesUEBGrid
-                atcDataManager.OpenDataSource(lUEBTimeseries, pAggOutputFileName, Nothing)
+                If FileExists(pAggOutputFileName) Then
+                    Dim lUEBTimeseries As New atcTimeseriesUEBGrid.atcDataSourceTimeseriesUEBGrid
+                    atcDataManager.OpenDataSource(lUEBTimeseries, pAggOutputFileName, Nothing)
+                End If
             End If
         End If
 
@@ -2330,7 +2339,7 @@ KeepWaiting:
                 pOutputControlData.Variables.Clear()
                 For i = 1 To AvailableOutputs.Count
                     With AtcGridGridOutput.Source
-                        If FileExists(.CellValue(i, 1)) Then 'valid NetCDF file entered
+                        If .CellValue(i, 1) IsNot Nothing AndAlso .CellValue(i, 1).Length > 0 Then 'assume a valid NetCDF file entered
                             lUEBVar = New clsUEBVariable
                             lUEBVar.Description = .CellValue(i, 0)
                             lUEBVar.GridFileName = .CellValue(i, 1)
@@ -2338,11 +2347,6 @@ KeepWaiting:
                         End If
                     End With
                 Next
-                If pOutputControlData.Variables.Count > 0 Then
-                    pOutputControlData.WriteOutputControlFile()
-                Else
-                    MsgBox("No variables selected for output to " & pOutputControlData.FileName, MsgBoxStyle.Information, "UEB Write")
-                End If
                 With AtcGridPointOutput.Source
                     pOutputControlData.PointDetails.Clear()
                     pOutputControlData.PointFileNames.Clear()
@@ -2357,6 +2361,14 @@ KeepWaiting:
                         End If
                     Next
                 End With
+                If pOutputControlData.Variables.Count > 0 Then
+                    If IO.Path.GetDirectoryName(pOutputControlData.FileName).Length = 0 Then
+                        pOutputControlData.FileName = CurDir() & "\" & pOutputControlData.FileName
+                    End If
+                    pOutputControlData.WriteOutputControlFile()
+                Else
+                    MsgBox("No variables selected for output to " & pOutputControlData.FileName, MsgBoxStyle.Information, "UEB Write")
+                End If
             End If
             If pAggOutputControlData.FileName.Length > 0 Then
                 'build aggregated output list based on grid entries
@@ -2372,6 +2384,9 @@ KeepWaiting:
                     End With
                 Next
                 If pAggOutputControlData.Variables.Count > 0 Then
+                    If IO.Path.GetDirectoryName(pAggOutputControlData.FileName).Length = 0 Then
+                        pAggOutputControlData.FileName = CurDir() & "\" & pAggOutputControlData.FileName
+                    End If
                     pAggOutputControlData.WriteAggOutputControlFile()
                 Else
                     MsgBox("No variables selected for output to " & pAggOutputControlData.FileName, MsgBoxStyle.Information, "UEB Write")
@@ -2582,9 +2597,13 @@ KeepWaiting:
         AtcGridPointOutput.Clear()
         With AtcGridPointOutput.Source
             .FixedRows = 1
+            .Rows = 2
             .CellValue(0, 0) = "Grid Point Row"
             .CellValue(0, 1) = "Grid Point Column"
             .CellValue(0, 2) = "Grid Point File Name"
+            .CellEditable(1, 0) = True
+            .CellEditable(1, 1) = True
+            .CellEditable(1, 2) = True
             For i = 1 To pOutputControlData.PointDetails.Count
                 .CellValue(i, 0) = pOutputControlData.PointDetails(i - 1).X
                 .CellEditable(i, 0) = True
@@ -2626,7 +2645,7 @@ KeepWaiting:
                 lUniqueValues.Add("Varying in Space")
                 lUniqueValues.Add("Constant in Space")
             ElseIf aColumn = 2 AndAlso chkFilePrompt.Checked Then
-                GetGridFileName(aGrid, aRow, aColumn, False, False)
+                GetGridFileName(aGrid, aRow, aColumn, False, True)
             End If
             aGrid.ValidValues = lUniqueValues
         End If
@@ -2693,16 +2712,36 @@ KeepWaiting:
     End Sub
 
     Private Sub AtcGridGridOutput_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridGridOutput.MouseDownCell
-        If aColumn = 0 Then
-            'AtcGridGridOutput.ValidValues = pOutputControlData.AvailableOutputs
-        ElseIf aColumn = 1 AndAlso chkFilePrompt.Checked Then
-            GetGridFileName(aGrid, aRow, aColumn, True, False)
-        ElseIf aColumn = 2 Then
+        If aGrid.Source.CellEditable(aRow, aColumn) Then
             Dim lUniqueValues As New ArrayList
-            lUniqueValues.Add("No")
-            lUniqueValues.Add("Yes")
+            If aColumn = 1 AndAlso chkFilePrompt.Checked Then
+                GetGridFileName(aGrid, aRow, aColumn, True, False)
+            ElseIf aColumn = 2 Then
+                lUniqueValues.Add("No")
+                lUniqueValues.Add("Yes")
+            End If
             AtcGridGridOutput.ValidValues = lUniqueValues
         End If
+    End Sub
+
+    Private Sub AtcGridPointOutput_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridPointOutput.CellEdited
+        'see if whole row is complete and add a new one if so
+        With aGrid.Source
+            For lCol As Integer = 0 To 2
+                If .CellValue(aRow, lCol) Is Nothing Then
+                    Exit Sub
+                ElseIf .CellValue(aRow, lCol).Length = 0 Then
+                    Exit Sub
+                End If
+            Next
+            Dim lRow As Integer = aRow + 1
+            If lRow > .Rows - .FixedRows Then
+                'need a new row
+                .CellEditable(lRow, 0) = True
+                .CellEditable(lRow, 1) = True
+                .CellEditable(lRow, 2) = True
+            End If
+        End With
     End Sub
 
     Private Sub AtcGridPointOutput_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridPointOutput.MouseDownCell
@@ -2843,16 +2882,42 @@ KeepWaiting:
     End Sub
 
     Private Sub txtAggOutputFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputFile.Click
-        Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open UEB Aggregated Output Data File"
-        cdlg.Filter = "UEB Aggregated Output Data files (*.out)|*.out|All Files (*.*)|*.*"
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            txtAggOutputFile.Text = cdlg.FileName
+        If chkFilePrompt.Checked Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            cdlg.Title = "Open UEB Aggregated Output Data File"
+            cdlg.Filter = "UEB Aggregated Output Data files (*.out)|*.out|All Files (*.*)|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                txtAggOutputFile.Text = cdlg.FileName
+            End If
         End If
-
     End Sub
 
     Private Sub txtAggOutputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputFile.TextChanged
         pAggOutputFileName = txtAggOutputControlFile.Text
+    End Sub
+
+    Private Sub txtWatershedFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWatershedFile.Click
+        If chkFilePrompt.Checked Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            cdlg.Title = "Open UEB Watershed NetCDF Grid file"
+            cdlg.Filter = "Watershed NetCDF Grid files (*.nc)|*.nc|All Files (*.*)|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                Dim lFilename As String = cdlg.FileName
+                ChDriveDir(IO.Path.GetDirectoryName(lFilename))
+                txtWatershedFile.Text = lFilename
+            End If
+        End If
+    End Sub
+
+    Private Sub txtWatershedFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWatershedFile.TextChanged
+        pWatershedGridFileName = txtWatershedFile.Text
+    End Sub
+
+    Private Sub txtWatershedVariable_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWatershedVariable.TextChanged
+        pWatershedGridVariableName = txtWatershedVariable.Text
+    End Sub
+
+    Private Sub txtOutputHeader_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputHeader.TextChanged
+        pOutputControlData.Header = txtOutputHeader.Text
     End Sub
 End Class
