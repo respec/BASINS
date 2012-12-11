@@ -21,7 +21,7 @@ Module netCDFViewer
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
         If Not IO.Directory.Exists(lOutFolder) Then IO.Directory.CreateDirectory(lOutFolder)
 
-        Dim lBaseNames() As String = {"swit", "Ta1", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
+        Dim lBaseNames() As String = {"Ta1", "swit", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
         For Each lBaseName As String In lBaseNames
             If lDebug Then lReport.AppendLine(lNetCDF_Version)
             Dim lFileName As String = lPathName & lBaseName & ".nc"
@@ -34,7 +34,7 @@ Module netCDFViewer
                 lTimeseries.Attributes.CalculateAll()
                 Dim lDataTree As New atcDataTree.atcDataTreePlugin
                 Dim lDataTreeFileName As String = IO.Path.ChangeExtension(lFileName.Replace(".nc", "#.nc"), "list")
-                lDataTree.Save(New atcData.atcTimeseriesGroup(lTimeseries), lDataTreeFileName.Replace("#", lTimeseries.Attributes.GetValue("ID")), "Display 50")
+                lDataTree.Save(New atcData.atcTimeseriesGroup(lTimeseries), lDataTreeFileName.Replace("#", lTimeseries.Attributes.GetValue("ID")), "Display 25")
             Next
 
             Dim lNCId As Int32
@@ -162,8 +162,8 @@ Module netCDFViewer
                                                                 lZeroCount = 0
                                                             End If
                                                             lGoodCount += 1
-                                                            If Math.Abs(lValue) > 0.001 Then
-                                                                lReport.AppendLine(lString & Format(lValue, "##0.000"))
+                                                            If Math.Abs(lValue) > 0.000001 Then
+                                                                lReport.AppendLine(lString & Format(lValue, "##0.000000"))
                                                             Else
                                                                 lReport.AppendLine(lString & lValue)
                                                             End If

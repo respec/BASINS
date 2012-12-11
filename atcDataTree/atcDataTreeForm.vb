@@ -342,7 +342,7 @@ Friend Class atcDataTreeForm
                     For lIndexMiddle As Integer = 0 To .GetNodeCount(False) - 1
                         With .Nodes(lIndexMiddle)
                             lSB.Append(vbTab & .Text)
-                            If Not .IsExpanded And .GetNodeCount(False) > 0 Then
+                            If pNumValuesShow <= pNumValuesShowDefault AndAlso Not .IsExpanded And .GetNodeCount(False) > 0 Then
                                 lSB.AppendLine(" ...")
                             Else
                                 lSB.AppendLine()

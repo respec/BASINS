@@ -77,7 +77,7 @@ Public Class atcTimeseriesNetCDF
                 aFileName = String.Join(";", .FileNames)
             End With
         End If
-        Me.Specification = aFileName
+        Me.Specification = IO.Path.GetFullPath(aFileName)
         For Each lFileName As String In aFileName.Split(";")
             If Not FileExists(lFileName) Then
                 pErrorDescription = "File '" & lFileName & "' not found"
@@ -111,6 +111,8 @@ Public Class atcTimeseriesNetCDF
                         Dim lTimeUnits As String = lTimeVariable.Attributes.GetValue("Units").ToString.Replace("days since ", "")
                         Dim lDateBase As Date = lTimeUnits.Substring(0, 10)
                         Dim lDates As New atcTimeseries(Me)
+
+                        'TODO: check to see that dates and values are put in the correct spot in the array
                         Dim lNumValues As Integer = lTimeVariable.Dimensions(0).Length
                         ReDim lDates.Values(lNumValues)
                         lDates.Values(0) = lDateBase.ToOADate
@@ -121,10 +123,33 @@ Public Class atcTimeseriesNetCDF
                         lDates.Values(lNumValues) = lDates.Values(lNumValues - 1) + lTimeVariable.Values(1)
 
                         Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
+                        Dim lYIndex As Integer = 0
+                        Dim lXIndex As Integer = 0
                         For lTimeseriesIndex As Integer = 0 To lTimeseriesCount - 1
                             Dim lTimeseries As New atcTimeseries(Me)
                             lTimeseries.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(lFileName))
                             lTimeseries.Attributes.SetValue("ID", lTimeseriesIndex + 1)
+                            Dim lLocation As String = ""
+                            If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
+                                Dim lYValue As String = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex)
+                                lTimeseries.Attributes.SetValue("Y", lYValue)
+                                lLocation &= "Y:" & lYValue
+                            ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension Is Nothing Then
+                                Dim lXValue As String = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex)
+                                lTimeseries.Attributes.SetValue("X", lXValue)
+                                lLocation &= "X:" & lXValue
+                            ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
+                                Dim lXValue As String = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex)
+                                lTimeseries.Attributes.SetValue("X", lXValue)
+                                lLocation &= "X:" & lXValue
+                                Dim lYValue As String = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex)
+                                lTimeseries.Attributes.SetValue("Y", lYValue)
+                                lLocation &= " Y:" & lYValue
+                            End If
+                            lTimeseries.Attributes.SetValue("Location", lLocation)
+                            For Each lDataAttribute As atcDefinedValue In lDataVariable.Attributes
+                                lTimeseries.Attributes.SetValue(lDataAttribute.Definition.Name, lDataAttribute.Value)
+                            Next
                             lTimeseries.Dates = lDates
                             ReDim lTimeseries.Values(lNumValues)
                             For lTimeIndex As Integer = 0 To lNumValues - 1
