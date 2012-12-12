@@ -116,6 +116,7 @@ Module modFreq
 
         Dim lNonLogTS As atcTimeseries = aTs.Attributes.GetValue("NDayTimeseries", aTs)
         Dim lPositiveTS As atcTimeseries = PositiveOnlyTimeseries(lNonLogTS)
+        lPositiveTS.SetInterval(lNonLogTS.Attributes.GetValue("Tu"), lNonLogTS.Attributes.GetValue("Ts"))
         Dim lPositiveLogTs As atcTimeseries
         If aLogFg Then
             Dim lArgsMath As New atcDataAttributes
@@ -133,7 +134,7 @@ Module modFreq
         Dim lStd As Double = lPositiveLogTs.Attributes.GetValue("Standard Deviation")
         Dim lSkew As Double = lPositiveLogTs.Attributes.GetValue("Skew")
 
-        If lN = 0 OrElse Double.IsNaN(lMean) Then ' <= 0 Then 'no data or problem data
+        If lN = 0 OrElse Double.IsNaN(lMean) OrElse Double.IsNaN(lStd) Then ' <= 0 Then 'no data or problem data
             Throw New ApplicationException("Count = 0 or Mean = NaN")
         Else
             Dim lNumons As Integer = 1
