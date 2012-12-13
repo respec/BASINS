@@ -42,10 +42,6 @@ Public Class frmUEB
     Friend WithEvents AtcTextEMinute As atcControls.atcText
     Friend WithEvents Label9 As System.Windows.Forms.Label
     Friend WithEvents AtcTextSMinute As atcControls.atcText
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
-    Friend WithEvents AtcGridGridOutput As atcControls.atcGrid
-    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
-    Friend WithEvents AtcGridPointOutput As atcControls.atcGrid
     Friend WithEvents chkFilePrompt As System.Windows.Forms.CheckBox
     Friend WithEvents Label10 As System.Windows.Forms.Label
     Friend WithEvents txtWatershedVariable As System.Windows.Forms.TextBox
@@ -70,6 +66,13 @@ Public Class frmUEB
     Friend WithEvents cboRadiationInput As System.Windows.Forms.ComboBox
     Friend WithEvents cboAlbedoInput As System.Windows.Forms.ComboBox
     Friend WithEvents lblAlbedoInput As System.Windows.Forms.Label
+    Friend WithEvents SplitContainerOutputControl As System.Windows.Forms.SplitContainer
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents AtcGridPointOutput As atcControls.atcGrid
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents AtcGridGridOutput As atcControls.atcGrid
+    Friend WithEvents txtAggOutputHeader As System.Windows.Forms.TextBox
+    Friend WithEvents Label13 As System.Windows.Forms.Label
     Friend WithEvents Label17 As System.Windows.Forms.Label
 
 #Region " Windows Form Designer generated code "
@@ -249,20 +252,23 @@ Public Class frmUEB
         Me.txtParameterFile = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
         Me.TabPage8 = New System.Windows.Forms.TabPage
+        Me.SplitContainerOutputControl = New System.Windows.Forms.SplitContainer
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.AtcGridGridOutput = New atcControls.atcGrid
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.AtcGridPointOutput = New atcControls.atcGrid
         Me.GroupBox5 = New System.Windows.Forms.GroupBox
         Me.txtOutputHeader = New System.Windows.Forms.TextBox
         Me.Label14 = New System.Windows.Forms.Label
         Me.Label6 = New System.Windows.Forms.Label
         Me.txtOutputFile = New System.Windows.Forms.TextBox
         Me.GroupBox4 = New System.Windows.Forms.GroupBox
+        Me.txtAggOutputHeader = New System.Windows.Forms.TextBox
+        Me.Label13 = New System.Windows.Forms.Label
         Me.txtAggOutputControlFile = New System.Windows.Forms.TextBox
         Me.Label12 = New System.Windows.Forms.Label
         Me.Label11 = New System.Windows.Forms.Label
         Me.txtAggOutputFile = New System.Windows.Forms.TextBox
-        Me.GroupBox3 = New System.Windows.Forms.GroupBox
-        Me.AtcGridPointOutput = New atcControls.atcGrid
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.AtcGridGridOutput = New atcControls.atcGrid
         Me.Label20 = New System.Windows.Forms.Label
         Me.ComboBox14 = New System.Windows.Forms.ComboBox
         Me.Label21 = New System.Windows.Forms.Label
@@ -325,10 +331,13 @@ Public Class frmUEB
         Me.TabPage7.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage8.SuspendLayout()
+        Me.SplitContainerOutputControl.Panel1.SuspendLayout()
+        Me.SplitContainerOutputControl.Panel2.SuspendLayout()
+        Me.SplitContainerOutputControl.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
         Me.GroupBox5.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
-        Me.GroupBox3.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -686,7 +695,7 @@ Public Class frmUEB
         Me.AtcTextUTCOffset.Location = New System.Drawing.Point(450, 64)
         Me.AtcTextUTCOffset.MaxWidth = 20
         Me.AtcTextUTCOffset.Name = "AtcTextUTCOffset"
-        Me.AtcTextUTCOffset.NumericFormat = "0"
+        Me.AtcTextUTCOffset.NumericFormat = "0.##"
         Me.AtcTextUTCOffset.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.AtcTextUTCOffset.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
         Me.AtcTextUTCOffset.SelLength = 0
@@ -1105,16 +1114,89 @@ Public Class frmUEB
         '
         'TabPage8
         '
+        Me.TabPage8.Controls.Add(Me.SplitContainerOutputControl)
         Me.TabPage8.Controls.Add(Me.GroupBox5)
         Me.TabPage8.Controls.Add(Me.GroupBox4)
-        Me.TabPage8.Controls.Add(Me.GroupBox3)
-        Me.TabPage8.Controls.Add(Me.GroupBox1)
         Me.TabPage8.Location = New System.Drawing.Point(4, 25)
         Me.TabPage8.Name = "TabPage8"
         Me.TabPage8.Size = New System.Drawing.Size(807, 445)
         Me.TabPage8.TabIndex = 9
         Me.TabPage8.Text = "Output Control"
         Me.TabPage8.UseVisualStyleBackColor = True
+        '
+        'SplitContainerOutputControl
+        '
+        Me.SplitContainerOutputControl.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.SplitContainerOutputControl.Location = New System.Drawing.Point(7, 102)
+        Me.SplitContainerOutputControl.Name = "SplitContainerOutputControl"
+        Me.SplitContainerOutputControl.Orientation = System.Windows.Forms.Orientation.Horizontal
+        '
+        'SplitContainerOutputControl.Panel1
+        '
+        Me.SplitContainerOutputControl.Panel1.Controls.Add(Me.GroupBox1)
+        '
+        'SplitContainerOutputControl.Panel2
+        '
+        Me.SplitContainerOutputControl.Panel2.Controls.Add(Me.GroupBox3)
+        Me.SplitContainerOutputControl.Size = New System.Drawing.Size(793, 340)
+        Me.SplitContainerOutputControl.SplitterDistance = 202
+        Me.SplitContainerOutputControl.TabIndex = 69
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.AtcGridGridOutput)
+        Me.GroupBox1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GroupBox1.Location = New System.Drawing.Point(0, 0)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(793, 202)
+        Me.GroupBox1.TabIndex = 64
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Grid Output"
+        '
+        'AtcGridGridOutput
+        '
+        Me.AtcGridGridOutput.AllowHorizontalScrolling = True
+        Me.AtcGridGridOutput.AllowNewValidValues = False
+        Me.AtcGridGridOutput.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridGridOutput.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.AtcGridGridOutput.Fixed3D = False
+        Me.AtcGridGridOutput.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridGridOutput.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridGridOutput.LineWidth = 0.0!
+        Me.AtcGridGridOutput.Location = New System.Drawing.Point(3, 16)
+        Me.AtcGridGridOutput.Name = "AtcGridGridOutput"
+        Me.AtcGridGridOutput.Size = New System.Drawing.Size(787, 183)
+        Me.AtcGridGridOutput.Source = Nothing
+        Me.AtcGridGridOutput.TabIndex = 64
+        '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.AtcGridPointOutput)
+        Me.GroupBox3.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GroupBox3.Location = New System.Drawing.Point(0, 0)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(793, 134)
+        Me.GroupBox3.TabIndex = 65
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Point Detail Output"
+        '
+        'AtcGridPointOutput
+        '
+        Me.AtcGridPointOutput.AllowHorizontalScrolling = True
+        Me.AtcGridPointOutput.AllowNewValidValues = False
+        Me.AtcGridPointOutput.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridPointOutput.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.AtcGridPointOutput.Fixed3D = False
+        Me.AtcGridPointOutput.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridPointOutput.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridPointOutput.LineWidth = 0.0!
+        Me.AtcGridPointOutput.Location = New System.Drawing.Point(3, 16)
+        Me.AtcGridPointOutput.Name = "AtcGridPointOutput"
+        Me.AtcGridPointOutput.Size = New System.Drawing.Size(787, 115)
+        Me.AtcGridPointOutput.Source = Nothing
+        Me.AtcGridPointOutput.TabIndex = 65
         '
         'GroupBox5
         '
@@ -1163,16 +1245,34 @@ Public Class frmUEB
         '
         'GroupBox4
         '
+        Me.GroupBox4.Controls.Add(Me.txtAggOutputHeader)
+        Me.GroupBox4.Controls.Add(Me.Label13)
         Me.GroupBox4.Controls.Add(Me.txtAggOutputControlFile)
         Me.GroupBox4.Controls.Add(Me.Label12)
         Me.GroupBox4.Controls.Add(Me.Label11)
         Me.GroupBox4.Controls.Add(Me.txtAggOutputFile)
         Me.GroupBox4.Location = New System.Drawing.Point(413, 11)
         Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(387, 65)
+        Me.GroupBox4.Size = New System.Drawing.Size(387, 85)
         Me.GroupBox4.TabIndex = 67
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "Aggregated Output"
+        '
+        'txtAggOutputHeader
+        '
+        Me.txtAggOutputHeader.Location = New System.Drawing.Point(58, 41)
+        Me.txtAggOutputHeader.Name = "txtAggOutputHeader"
+        Me.txtAggOutputHeader.Size = New System.Drawing.Size(323, 20)
+        Me.txtAggOutputHeader.TabIndex = 74
+        '
+        'Label13
+        '
+        Me.Label13.AutoSize = True
+        Me.Label13.Location = New System.Drawing.Point(0, 42)
+        Me.Label13.Name = "Label13"
+        Me.Label13.Size = New System.Drawing.Size(45, 13)
+        Me.Label13.TabIndex = 73
+        Me.Label13.Text = "Header:"
         '
         'txtAggOutputControlFile
         '
@@ -1193,7 +1293,7 @@ Public Class frmUEB
         'Label11
         '
         Me.Label11.AutoSize = True
-        Me.Label11.Location = New System.Drawing.Point(0, 42)
+        Me.Label11.Location = New System.Drawing.Point(0, 66)
         Me.Label11.Name = "Label11"
         Me.Label11.Size = New System.Drawing.Size(52, 13)
         Me.Label11.TabIndex = 68
@@ -1201,67 +1301,10 @@ Public Class frmUEB
         '
         'txtAggOutputFile
         '
-        Me.txtAggOutputFile.Location = New System.Drawing.Point(58, 39)
+        Me.txtAggOutputFile.Location = New System.Drawing.Point(58, 64)
         Me.txtAggOutputFile.Name = "txtAggOutputFile"
         Me.txtAggOutputFile.Size = New System.Drawing.Size(323, 20)
         Me.txtAggOutputFile.TabIndex = 67
-        '
-        'GroupBox3
-        '
-        Me.GroupBox3.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox3.Controls.Add(Me.AtcGridPointOutput)
-        Me.GroupBox3.Location = New System.Drawing.Point(3, 314)
-        Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(801, 117)
-        Me.GroupBox3.TabIndex = 64
-        Me.GroupBox3.TabStop = False
-        Me.GroupBox3.Text = "Point Detail Output"
-        '
-        'AtcGridPointOutput
-        '
-        Me.AtcGridPointOutput.AllowHorizontalScrolling = True
-        Me.AtcGridPointOutput.AllowNewValidValues = False
-        Me.AtcGridPointOutput.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridPointOutput.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.AtcGridPointOutput.Fixed3D = False
-        Me.AtcGridPointOutput.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridPointOutput.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridPointOutput.LineWidth = 0.0!
-        Me.AtcGridPointOutput.Location = New System.Drawing.Point(3, 16)
-        Me.AtcGridPointOutput.Name = "AtcGridPointOutput"
-        Me.AtcGridPointOutput.Size = New System.Drawing.Size(795, 98)
-        Me.AtcGridPointOutput.Source = Nothing
-        Me.AtcGridPointOutput.TabIndex = 65
-        '
-        'GroupBox1
-        '
-        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox1.Controls.Add(Me.AtcGridGridOutput)
-        Me.GroupBox1.Location = New System.Drawing.Point(3, 82)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(801, 226)
-        Me.GroupBox1.TabIndex = 63
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Grid Output"
-        '
-        'AtcGridGridOutput
-        '
-        Me.AtcGridGridOutput.AllowHorizontalScrolling = True
-        Me.AtcGridGridOutput.AllowNewValidValues = False
-        Me.AtcGridGridOutput.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridGridOutput.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.AtcGridGridOutput.Fixed3D = False
-        Me.AtcGridGridOutput.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridGridOutput.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridGridOutput.LineWidth = 0.0!
-        Me.AtcGridGridOutput.Location = New System.Drawing.Point(3, 16)
-        Me.AtcGridGridOutput.Name = "AtcGridGridOutput"
-        Me.AtcGridGridOutput.Size = New System.Drawing.Size(795, 207)
-        Me.AtcGridGridOutput.Source = Nothing
-        Me.AtcGridGridOutput.TabIndex = 64
         '
         'Label20
         '
@@ -1888,12 +1931,15 @@ Public Class frmUEB
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
         Me.TabPage8.ResumeLayout(False)
+        Me.SplitContainerOutputControl.Panel1.ResumeLayout(False)
+        Me.SplitContainerOutputControl.Panel2.ResumeLayout(False)
+        Me.SplitContainerOutputControl.ResumeLayout(False)
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox5.ResumeLayout(False)
         Me.GroupBox5.PerformLayout()
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
-        Me.GroupBox3.ResumeLayout(False)
-        Me.GroupBox1.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -2235,6 +2281,9 @@ KeepWaiting:
                     End If
                 Next
                 If lMsg.Length = 0 Then
+                    If IO.Path.GetDirectoryName(pParmData.FileName).Length = 0 Then
+                        pParmData.FileName = CurDir() & "\" & pParmData.FileName
+                    End If
                     pParmData.WriteParameterFile()
                 Else
                     MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
@@ -2266,6 +2315,9 @@ KeepWaiting:
                     End With
                 Next
                 If lMsg.Length = 0 Then
+                    If IO.Path.GetDirectoryName(pSiteData.FileName).Length = 0 Then
+                        pSiteData.FileName = CurDir() & "\" & pSiteData.FileName
+                    End If
                     pSiteData.WriteSiteFile()
                 Else
                     MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
@@ -2326,7 +2378,10 @@ KeepWaiting:
                     Next
                 End If
                 If lMsg.Length = 0 Then
-                    pInputControlData.WriteInputControlFile()
+                    If IO.Path.GetDirectoryName(pInputControlData.FileName).Length = 0 Then
+                        pInputControlData.FileName = CurDir() & "\" & pInputControlData.FileName
+                    End If
+                    pInputControlData.WriteInputControlFile(CInt(pParmData.Variables(0).Value), CInt(pParmData.Variables(1).Value))
                 Else
                     MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
                     Return False
@@ -2419,9 +2474,11 @@ KeepWaiting:
                 .CellEditable(i, 1) = True
                 .CellValue(i, 1) = pParmData.Variables(i + 1).Value
             Next
+            'AtcGridModelParms.SizeColumnToString(0, .CellValue(1, 0))
+            'AtcGridModelParms.SizeColumnToString(1, .CellValue(0, 1) & "     ")
         End With
-        AtcGridModelParms.SizeAllColumnsToContents()
-        AtcGridModelParms.ColumnWidth(0) = 600
+        'AtcGridModelParms.SizeAllColumnsToContents()
+        'AtcGridModelParms.ColumnWidth(0) = 600
         AtcGridModelParms.Refresh()
 
     End Sub
@@ -2470,6 +2527,7 @@ KeepWaiting:
                 End If
             Next
         End With
+        AtcGridSiteVars.Refresh()
 
     End Sub
 
@@ -2566,6 +2624,7 @@ KeepWaiting:
         Dim lVarName As String
 
         txtOutputHeader.Text = pOutputControlData.Header
+        txtAggOutputHeader.Text = pAggOutputControlData.Header
         AtcGridGridOutput.Clear()
         With AtcGridGridOutput.Source
             .FixedRows = 1
@@ -2593,6 +2652,7 @@ KeepWaiting:
                 End If
             Next
         End With
+        AtcGridGridOutput.Refresh()
 
         AtcGridPointOutput.Clear()
         With AtcGridPointOutput.Source
@@ -2613,6 +2673,7 @@ KeepWaiting:
                 .CellEditable(i, 2) = True
             Next
         End With
+        AtcGridPointOutput.Refresh()
     End Sub
 
     Private Sub AtcGridSiteVars_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridSiteVars.CellEdited
@@ -2697,7 +2758,7 @@ KeepWaiting:
                 lUniqueValues.Add("Constant Space/Time")
             Else
                 If aColumn = 2 AndAlso chkFilePrompt.Checked Then
-                    GetGridFileName(aGrid, aRow, aColumn, False, True)
+                    GetGridFileName(aGrid, aRow, aColumn, False, False)
                 ElseIf aColumn = 4 AndAlso chkFilePrompt.Checked Then
                     Dim cdlg As New Windows.Forms.OpenFileDialog
                     cdlg.Title = "Open Timeseries Data File for " & aGrid.Source.CellValue(aRow, 0)
@@ -2893,7 +2954,7 @@ KeepWaiting:
     End Sub
 
     Private Sub txtAggOutputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputFile.TextChanged
-        pAggOutputFileName = txtAggOutputControlFile.Text
+        pAggOutputFileName = txtAggOutputFile.Text
     End Sub
 
     Private Sub txtWatershedFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWatershedFile.Click
@@ -2919,5 +2980,9 @@ KeepWaiting:
 
     Private Sub txtOutputHeader_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputHeader.TextChanged
         pOutputControlData.Header = txtOutputHeader.Text
+    End Sub
+
+    Private Sub txtAggOutputHeader_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputHeader.TextChanged
+        pAggOutputControlData.Header = txtAggOutputHeader.Text
     End Sub
 End Class
