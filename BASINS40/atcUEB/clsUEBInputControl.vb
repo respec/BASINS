@@ -84,7 +84,7 @@ ReadFile:
 
     Private Function VariableFromDescription(ByVal aDescription As String) As clsUEBVariable
         For Each lUEBVariable As clsUEBVariable In Variables
-            If lUEBVariable.Description = aDescription Then
+            If lUEBVariable.Description.ToUpper = aDescription.ToUpper Then
                 Return lUEBVariable
             End If
         Next
@@ -99,7 +99,7 @@ ReadFile:
         Return aSource
     End Function
 
-    Public Function WriteInputControlFile() As Boolean
+    Public Function WriteInputControlFile(ByVal aIRad As Integer, ByVal aIReadAlb As Integer) As Boolean
 
         Dim lStr As String = Header & vbCrLf
 
@@ -109,7 +109,14 @@ ReadFile:
                 lStr &= EDate(0) & " " & EDate(1) & " " & EDate(2) & " " & EDate(3) & "." & EDate(4) & vbCrLf
                 lStr &= TimeStep & vbCrLf & UTCOffset & vbCrLf
                 For Each lUEBParm As clsUEBVariable In Variables
-                    lStr &= lUEBParm.InputVariableString
+                    If (lUEBParm.Description.ToLower.Contains("qsi") AndAlso (aIRad < 1 Or aIRad > 2)) OrElse _
+                        (lUEBParm.Description.ToLower.Contains("qli") AndAlso aIRad <> 2) OrElse _
+                        (lUEBParm.Description.ToLower.Contains("qnet") AndAlso aIRad <> 3) OrElse _
+                        (lUEBParm.Description.ToLower.Contains("snowalb") AndAlso aIReadAlb <> 1) Then
+                        'Radiation or Albedo input flag set such that this Input Variable not needed
+                    Else
+                        lStr &= lUEBParm.InputVariableString
+                    End If
                 Next
                 SaveFileString(FileName, lStr)
                 Return True

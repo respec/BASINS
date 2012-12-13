@@ -2,7 +2,7 @@
 USic:  Surface Snow Energy content initial condition (kg m-3)
 0
 0
-WSic:  Surface Snow water equivalent initial condition (m)
+WSis:  Surface Snow water equivalent initial condition (m)
 0
 1.2
 Tic:  Snow surface dimensionless age initial condition 
