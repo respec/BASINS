@@ -150,9 +150,13 @@ Public Class atcTimeseriesNetCDF
                             For Each lDataAttribute As atcDefinedValue In lDataVariable.Attributes
                                 lTimeseries.Attributes.SetValue(lDataAttribute.Definition.Name, lDataAttribute.Value)
                             Next
+
+                            'TODO: set attributes for BASE and INCREMENT array positions within NetCDF data array
+
                             lTimeseries.Dates = lDates
                             ReDim lTimeseries.Values(lNumValues)
                             For lTimeIndex As Integer = 0 To lNumValues - 1
+                                'TODO: use BASE and INCREMENT values here
                                 Dim lValueIndex As Integer = (lTimeseriesCount * lTimeIndex) + lTimeseriesIndex
                                 lTimeseries.Values(lTimeIndex + 1) = lDataVariable.Values(lValueIndex)
                             Next
