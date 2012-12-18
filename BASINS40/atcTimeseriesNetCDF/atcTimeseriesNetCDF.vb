@@ -133,33 +133,57 @@ Public Class atcTimeseriesNetCDF
                             If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
                                 Dim lYValue As String = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex)
                                 lTimeseries.Attributes.SetValue("Y", lYValue)
+                                lTimeseries.Attributes.SetValue("Y index", lYIndex)
                                 lLocation &= "Y:" & lYValue
+                                lYIndex += 1
                             ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension Is Nothing Then
                                 Dim lXValue As String = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex)
                                 lTimeseries.Attributes.SetValue("X", lXValue)
+                                lTimeseries.Attributes.SetValue("X index", lXIndex)
                                 lLocation &= "X:" & lXValue
+                                lXIndex += 1
                             ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
                                 Dim lXValue As String = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex)
                                 lTimeseries.Attributes.SetValue("X", lXValue)
                                 lLocation &= "X:" & lXValue
+                                lTimeseries.Attributes.SetValue("X index", lXIndex)
                                 Dim lYValue As String = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex)
                                 lTimeseries.Attributes.SetValue("Y", lYValue)
+                                lTimeseries.Attributes.SetValue("Y index", lYIndex)
                                 lLocation &= " Y:" & lYValue
+                                If lNetCDFFile.EastWestDimension.ID = 0 OrElse (lNetCDFFile.TimeDimension.ID = 0 AndAlso lNetCDFFile.EastWestDimension.ID = 1) Then
+                                    lXIndex += 1
+                                    If lXIndex = lNetCDFFile.EastWestDimension.Length Then
+                                        lXIndex = 0
+                                        lYIndex += 1
+                                    End If
+                                Else
+                                    lYIndex += 1
+                                    If lYIndex = lNetCDFFile.NorthSouthDimension.Length Then
+                                        lYIndex = 0
+                                        lXIndex += 1
+                                    End If
+                                End If
                             End If
                             lTimeseries.Attributes.SetValue("Location", lLocation)
                             For Each lDataAttribute As atcDefinedValue In lDataVariable.Attributes
                                 lTimeseries.Attributes.SetValue(lDataAttribute.Definition.Name, lDataAttribute.Value)
                             Next
 
-                            'TODO: set attributes for BASE and INCREMENT array positions within NetCDF data array
+                            lTimeseries.Attributes.SetValue("NetCDFValues", lDataVariable)
+
+                            If lTimeVariable.ID > 0 Then
+                                lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex)
+                                lTimeseries.Attributes.SetValue("Increment", lTimeseriesCount)
+                            Else
+                                lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex * lNumValues)
+                                lTimeseries.Attributes.SetValue("Increment", 1)
+                            End If
+
+                            lTimeseries.ValuesNeedToBeRead = True
 
                             lTimeseries.Dates = lDates
-                            ReDim lTimeseries.Values(lNumValues)
-                            For lTimeIndex As Integer = 0 To lNumValues - 1
-                                'TODO: use BASE and INCREMENT values here
-                                Dim lValueIndex As Integer = (lTimeseriesCount * lTimeIndex) + lTimeseriesIndex
-                                lTimeseries.Values(lTimeIndex + 1) = lDataVariable.Values(lValueIndex)
-                            Next
+
                             Me.DataSets.Add(lTimeseries)
                         Next
                         Logger.Dbg("TimeseriesBuilt")
@@ -181,4 +205,16 @@ Public Class atcTimeseriesNetCDF
         Filter = pFilter
     End Sub
 
+    Public Overrides Sub ReadData(ByVal aData As atcData.atcDataSet)
+        Dim lTimeseries As atcTimeseries = aData
+        Dim lNumValues As Integer = lTimeseries.Dates.numValues
+        Dim lBase As Integer = lTimeseries.Attributes.GetValue("Base")
+        Dim lIncrement As Integer = lTimeseries.Attributes.GetValue("Increment")
+        Dim lDataVariable As atcNetCDFVariable = lTimeseries.Attributes.GetValue("NetCDFValues")
+        ReDim lTimeseries.Values(lNumValues)
+        For lTimeIndex As Integer = 0 To lNumValues - 1
+            Dim lValueIndex As Integer = (lIncrement * lTimeIndex) + lBase
+            lTimeseries.Values(lTimeIndex + 1) = lDataVariable.Values(lValueIndex)
+        Next
+    End Sub
 End Class
