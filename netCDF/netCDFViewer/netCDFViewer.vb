@@ -21,7 +21,7 @@ Module netCDFViewer
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
         If Not IO.Directory.Exists(lOutFolder) Then IO.Directory.CreateDirectory(lOutFolder)
 
-        Dim lBaseNames() As String = {"Ta1", "swit", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
+        Dim lBaseNames() As String = {"Ta1", "swit", "merra.prod.assim.20061230", "merra.prod.rad.20061231", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
         For Each lBaseName As String In lBaseNames
             If lDebug Then lReport.AppendLine(lNetCDF_Version)
             Dim lFileName As String = lPathName & lBaseName & ".nc"
@@ -34,7 +34,8 @@ Module netCDFViewer
                 lTimeseries.Attributes.CalculateAll()
                 Dim lDataTree As New atcDataTree.atcDataTreePlugin
                 Dim lDataTreeFileName As String = IO.Path.ChangeExtension(lFileName.Replace(".nc", "#.nc"), "list")
-                lDataTree.Save(New atcData.atcTimeseriesGroup(lTimeseries), lDataTreeFileName.Replace("#", lTimeseries.Attributes.GetValue("ID")), "Display 25")
+                Dim lXYString As String = "_Y" & (1 + lTimeseries.Attributes.GetValue("Y Index")) & "_X" & (1 + lTimeseries.Attributes.GetValue("X Index"))
+                lDataTree.Save(New atcData.atcTimeseriesGroup(lTimeseries), lDataTreeFileName.Replace("#", lXYString), "Display 25")
             Next
 
             Dim lNCId As Int32
@@ -134,10 +135,10 @@ Module netCDFViewer
                                         Dim lZeroCount As Integer = 0
                                         Dim lGoodCount As Integer = 0
                                         For lValueIndex As Integer = 0 To lArraySize - 1
-                                            Dim lString As String = "    (" & Format(lValueIndex, lFormatValueIndex) & "-"
+                                            Dim lString As String = "    (" & Format(lValueIndex, lFormatValueIndex) & ":"
                                             For lDimIndex As Integer = 0 To lNDims - 1
                                                 Dim lDimPos As Integer = lBase(lDimIndex) + lOutputPosition(lDimIndex)
-                                                lString &= Format(lDimPos, lFormatDimIndex(lDimIndex)) & ":"
+                                                lString &= Format(lDimPos, lFormatDimIndex(lDimIndex)) & ","
                                             Next
                                             lString = lString.Remove(lString.Length - 1) & ") "
                                             Select Case lXtype
