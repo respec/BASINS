@@ -328,6 +328,9 @@ Public Module modModelSetup
                         .Elev = ((lMaxEl + lMinEl) / 2)
                         .DeltH = lMaxEl - lMinEl
                         .SegmentId = aSubbasinsModelSegmentIds.ItemByKey(lSubbasinId)
+                        If .Length < 0.00001 Then
+                            .Length = 0.1
+                        End If
                     End With
                     If Not lReaches.Contains(lReach.Id) Then
                         lReaches.Add(lReach)

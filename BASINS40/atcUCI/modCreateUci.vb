@@ -61,6 +61,30 @@ Module modCreateUci
         Dim lEndDate(6) As Integer
         J2Date(lSJDate, lStartDate)
         J2Date(lEJDate, lEndDate)
+        'hspf is unhappy with a non-zero start hour, adjust
+        If lStartDate(3) > 0 Then
+            If lEndDate(0) - lStartDate(0) > 5 Then
+                'normal case, just start at the beginning of a year
+                lStartDate(0) += 1
+                lStartDate(1) = 1
+                lStartDate(2) = 1
+                lStartDate(3) = 0
+                lStartDate(4) = 0
+                lStartDate(5) = 0
+                lStartDate(6) = 0
+            Else
+                'short period of record, start at beginning of next day
+                lStartDate(2) += 1
+                lStartDate(3) = 0
+                lStartDate(4) = 0
+                lStartDate(5) = 0
+                lStartDate(6) = 0
+            End If
+        End If
+        'default start year to no earlier than 1940
+        If lStartDate(0) < 1940 And lEndDate(0) > 1940 Then
+            lStartDate(0) = 1940
+        End If
         With aUci.GlobalBlock  'update start and end date from met data
             For lDateIndex As Integer = 0 To 5
                 .SDate(lDateIndex) = lStartDate(lDateIndex)
