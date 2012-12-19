@@ -1681,6 +1681,7 @@ Public Class frmModelSetup
         cboUnits.Items.Add("Feet")
         cboUnits.Items.Add("Meters")
         cboUnits.Items.Add("Centimeters")
+        cboUnits.SelectedIndex = 1
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
             Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
             If GisUtil.LayerType(lLayerIndex) = 3 Then 'PolygonShapefile 
