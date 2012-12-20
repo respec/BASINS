@@ -540,6 +540,7 @@ Public Class atcSWMMProject
                 Case "[MAP]"
                     'lSW.WriteLine(Map.ToString)
                     lSW.WriteLine(lBlock.ToString)
+                    lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
                 Case "[COORDINATES]"
                     If lBlock.ToString.Trim = lBlock.Name Then
                         lSW.WriteLine(Nodes.CoordinatesToString)

@@ -126,6 +126,7 @@ Public Class atcSWMMEvaporation
             If lTS IsNot Nothing Then
                 Timeseries = lTS
             End If
+            Timeseries = atcData.modTimeseriesMath.Aggregate(Timeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
             Dim lFileName As String = PathNameOnly(Me.pSWMMProject.Specification) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "E.DAT"
             Dim lSB As New StringBuilder
             lSB.Append(Me.pSWMMProject.TimeSeriesToString(Timeseries, Timeseries.Attributes.GetValue("Location") & ":E", "PEVT"))
