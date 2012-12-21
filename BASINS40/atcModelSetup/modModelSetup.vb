@@ -1515,7 +1515,7 @@ Public Module modModelSetup
                        " 0 0 0 0 0 0 0 0 0 0 0 0 0 " & .SegmentId)
                 If (2 * .Depth) > .Width Then 'problem
                     Logger.Msg("The depth and width values specified for Reach " & lReach.Id & ", coupled with the trapezoidal" & vbCrLf & _
-                           "cross section assumptions of WinHSPF, indicate a physical imposibility." & vbCrLf & _
+                           "cross section assumptions of WinHSPF, indicate a physical impossibility." & vbCrLf & _
                            "(Given 1:1 side slopes, the depth of the channel cannot be more than half the width.)" & vbCrLf & vbCrLf & _
                            "This problem can be corrected in WinHSPF by revising the FTABLE or by " & vbCrLf & _
                            "importing the ptf with modifications to the width and depth values." & vbCrLf & _
