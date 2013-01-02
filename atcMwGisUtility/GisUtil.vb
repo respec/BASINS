@@ -3501,7 +3501,13 @@ Public Class GisUtil
             If lSelectedShapeIndexes.Count = 0 Then Return False
 
             'copy source file to temp file
-            Dim tempfile As String = My.Computer.FileSystem.SpecialDirectories.Temp & "\tempfile.shp"
+            Dim tempfile As String
+            Try
+                tempfile = My.Computer.FileSystem.SpecialDirectories.Temp
+            Catch ex As Exception
+                tempfile = IO.Path.GetTempPath
+            End Try
+            tempfile = IO.Path.Combine(tempfile, "tempfile.shp")
 
             If Not MapWinGeoProc.DataManagement.CopyShapefile(LayerFileName(aLayerIndexSource), tempfile) Then Return False
 
