@@ -6,7 +6,7 @@ Public Class PluginManagementTools
             If System.IO.Directory.Exists(PluginFolder) Then
                 ' Plugin folder exists
                 For Each filename As String In IO.Directory.GetFiles(PluginFolder, "*.dll", IO.SearchOption.AllDirectories)
-                    If Not filename.Contains("Interop") Then
+                    If Not filename.Contains("Interop.") And Not filename.Contains(".resources.") Then
                         finallist.Add(filename)
                     End If
                 Next

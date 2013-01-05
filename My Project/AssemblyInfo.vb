@@ -12,8 +12,8 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("A set of utilities that's not strictly MapWindow but which are helpful when writing plugins")> 
 <Assembly: AssemblyCompany("MapWindow OSS Team - www.mapwindow.org")> 
 <Assembly: AssemblyProduct("MapWindow GIS - MapWinUtility")> 
-<Assembly: AssemblyCopyright("Copyright © 1998-2012 MapWindow OSS Team")> 
-<Assembly: AssemblyTrademark("MapWindow GIS is a trademark of Daniel P. Ames, 2005-2012")> 
+<Assembly: AssemblyCopyright("Copyright © 1998-2013 MapWindow OSS Team")> 
+<Assembly: AssemblyTrademark("MapWindow GIS is a trademark of Daniel P. Ames, 2005-2013")> 
 
 <Assembly: ComVisible(False)> 
 
@@ -31,4 +31,4 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 
 <Assembly: AssemblyVersion("4.8.7.*")> 
-<Assembly: AssemblyFileVersion("4.8.7.0")> 
+<Assembly: AssemblyFileVersion("4.8.7.5")> 
