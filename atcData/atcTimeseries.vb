@@ -322,7 +322,7 @@ Public Class atcTimeseries
             If Not pValueAttributes Is Nothing Then
                 For lValueAttIndex As Integer = 0 To pNumValues
                     If Not pValueAttributes(lValueAttIndex) Is Nothing Then
-                        .ValueAttributes(lValueAttIndex) = pValueAttributes(lValueAttIndex).Clone
+                        .ValueAttributes(lValueAttIndex) = pValueAttributes(lValueAttIndex).Copy
                     End If
                 Next
             End If

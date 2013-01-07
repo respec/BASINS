@@ -159,81 +159,81 @@ Public Class frmSpecifyComputation
             Case "Name" : lblName.Text = aDefVal.Value
             Case "Description" : lblDescription.Text = aDefVal.Value
             Case Else
-                If aDefVal.Definition.Editable Then
-                    Dim g As System.Drawing.Graphics = Me.CreateGraphics
-                    Dim iArg As Integer = pArgLabel.GetUpperBound(0)
-                    iArg += 1
+                'If aDefVal.Definition.Editable Then
+                Dim g As System.Drawing.Graphics = Me.CreateGraphics
+                Dim iArg As Integer = pArgLabel.GetUpperBound(0)
+                iArg += 1
 
-                    ReDim Preserve pArgDefVal(iArg)
-                    pArgDefVal(iArg) = aDefVal
+                ReDim Preserve pArgDefVal(iArg)
+                pArgDefVal(iArg) = aDefVal
 
-                    ReDim Preserve pArgLabel(iArg)
-                    pArgLabel(iArg) = New Windows.Forms.Label
-                    With pArgLabel(iArg)
-                        If iArg = 0 Then
-                            .Top = lblDescription.Top + lblDescription.Height * 1.5
-                        Else
-                            .Top = pArgLabel(iArg - 1).Top + pArgLabel(iArg - 1).Height * 1.5
-                        End If
-                        .Left = lblDescription.Left
-                        .Text = aDefVal.Definition.Name
-                        .Width = Math.Max(.Width, g.MeasureString(.Text, .Font).Width + 10)
-                    End With
-                    Controls.Add(pArgLabel(iArg))
+                ReDim Preserve pArgLabel(iArg)
+                pArgLabel(iArg) = New Windows.Forms.Label
+                With pArgLabel(iArg)
+                    If iArg = 0 Then
+                        .Top = lblDescription.Top + lblDescription.Height * 1.5
+                    Else
+                        .Top = pArgLabel(iArg - 1).Top + pArgLabel(iArg - 1).Height * 1.5
+                    End If
+                    .Left = lblDescription.Left
+                    .Text = aDefVal.Definition.Name
+                    .Width = Math.Max(.Width, g.MeasureString(.Text, .Font).Width + 10)
+                End With
+                Controls.Add(pArgLabel(iArg))
 
-                    ReDim Preserve pArgText(iArg)
-                    pArgText(iArg) = New Windows.Forms.TextBox
-                    With pArgText(iArg)
-                        .Top = pArgLabel(iArg).Top
-                        .Left = pArgLabel(iArg).Left + pArgLabel(iArg).Width + LAYOUT_PADDING
-                        .Width = ClientRectangle.Width - pArgText(iArg).Left - ARG_BUTTON_WIDTH - LAYOUT_PADDING * 2
-                        .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Top
+                ReDim Preserve pArgText(iArg)
+                pArgText(iArg) = New Windows.Forms.TextBox
+                With pArgText(iArg)
+                    .Top = pArgLabel(iArg).Top
+                    .Left = pArgLabel(iArg).Left + pArgLabel(iArg).Width + LAYOUT_PADDING
+                    .Width = ClientRectangle.Width - pArgText(iArg).Left - ARG_BUTTON_WIDTH - LAYOUT_PADDING * 2
+                    .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Top
 
-                        .Tag = iArg
-                        .Text = ""
-                        If Not aDefVal.Value Is Nothing Then
-                            Select Case aDefVal.Definition.TypeString
-                                Case "atcDataGroup", "atcTimeseriesGroup", "atcTimeseries"
-                                    Try
-                                        Dim lSelected As atcDataGroup = aDefVal.Value
-                                        If lSelected.Count = 1 Then
-                                            .Text = lSelected.Item(0).ToString
-                                        ElseIf lSelected.Count > 1 Then
-                                            .Text = lSelected.Count & " data sets"
-                                        End If
-                                    Catch
-                                        .Text = CType(aDefVal.Value, atcTimeseries).ToString
-                                    End Try
-                                    .Enabled = False
-                                Case Else
-                                    .Text = aDefVal.Value.ToString
-                            End Select
-                        End If
-
-                        AddHandler pArgText(iArg).TextChanged, AddressOf ArgText_TextChanged
-                    End With
-                    Controls.Add(pArgText(iArg))
-
-                    ReDim Preserve pArgButton(iArg)
-                    pArgButton(iArg) = New Windows.Forms.Button
-                    With pArgButton(iArg)
-                        .Top = pArgLabel(iArg).Top
-                        .Width = ARG_BUTTON_WIDTH
-                        .Left = ClientRectangle.Width - pArgButton(iArg).Width - LAYOUT_PADDING
-
-                        .Tag = iArg
-                        .Text = "Select"
-                        .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Top
-
+                    .Tag = iArg
+                    .Text = ""
+                    If Not aDefVal.Value Is Nothing Then
                         Select Case aDefVal.Definition.TypeString
-                            Case "atcDataGroup", "atcTimeseriesGroup" : .Visible = True
-                            Case "atcTimeseries" : .Visible = True
-                            Case Else : .Visible = False
+                            Case "atcDataGroup", "atcTimeseriesGroup", "atcTimeseries"
+                                Try
+                                    Dim lSelected As atcDataGroup = aDefVal.Value
+                                    If lSelected.Count = 1 Then
+                                        .Text = lSelected.Item(0).ToString
+                                    ElseIf lSelected.Count > 1 Then
+                                        .Text = lSelected.Count & " data sets"
+                                    End If
+                                Catch
+                                    .Text = CType(aDefVal.Value, atcTimeseries).ToString
+                                End Try
+                                .Enabled = False
+                            Case Else
+                                .Text = aDefVal.Value.ToString
                         End Select
-                        AddHandler pArgButton(iArg).Click, AddressOf ArgButton_Click
-                    End With
-                    Controls.Add(pArgButton(iArg))
-                End If
+                    End If
+
+                    AddHandler pArgText(iArg).TextChanged, AddressOf ArgText_TextChanged
+                End With
+                Controls.Add(pArgText(iArg))
+
+                ReDim Preserve pArgButton(iArg)
+                pArgButton(iArg) = New Windows.Forms.Button
+                With pArgButton(iArg)
+                    .Top = pArgLabel(iArg).Top
+                    .Width = ARG_BUTTON_WIDTH
+                    .Left = ClientRectangle.Width - pArgButton(iArg).Width - LAYOUT_PADDING
+
+                    .Tag = iArg
+                    .Text = "Select"
+                    .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Top
+
+                    Select Case aDefVal.Definition.TypeString
+                        Case "atcDataGroup", "atcTimeseriesGroup" : .Visible = True
+                        Case "atcTimeseries" : .Visible = True
+                        Case Else : .Visible = False
+                    End Select
+                    AddHandler pArgButton(iArg).Click, AddressOf ArgButton_Click
+                End With
+                Controls.Add(pArgButton(iArg))
+                'End If
         End Select
     End Sub
 
