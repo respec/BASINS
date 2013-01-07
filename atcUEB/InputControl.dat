@@ -3,34 +3,34 @@
 2011 03 23 12.00 yyyy mm dd hh.hh (ending Date)
 3.00 (dt=increment in two consecutive time step in hours)
 6.00 UTC time offset
-Ta: Air temperature  (always required)
+Ta: Air temperature : Air temperature : "˚C" 
 1   
 ' '
-ps
-Prec: Precipitation  (always required)
+Ta
+Prec: Precipitation : Precipitation that is the sum of both rain and snowfall expressed as water equivalent : "m/hr"
 1   
 ' '
-qv2m
-v: Wind speed   (always required)
+Prec
+V: Wind speed : Wind Speed at a point z m above the snow surface or top of canopy if present : "m/s"
 1
 ' '
 wind
-RH: Relative Humidity   (always required)
+RH: Relative Humidity : Relative humidity at a point z m above the snow surface or top of canopy if present : " "
 1
 ' '
-t2m
-Qsi: Incoming shortwave(kJ/m2/hr)   (only required if irad=1 or 2)
+RH
+Qsi: Shortwave radiation : Incoming shortwave radiation measured or that would be measured on a horizontal surface above the snow and canopy if present : "kJ/m2/hr"
 0
 ' '
-Qli: Long wave radiation(kJ/m2/hr)  (only required if irad=2)
+Qli: Longwave radiation : Incoming longwave radiation that would be measured above the snow and canopy if present : "kJ/m2/hr"
 0
 ' '
-Qnet: Net radiation(kJ/m2/hr)   (only required if irad=3)
+Qnet: Net radiation : Net radiation that would be measured on a horizontal surface above the snow and canopy if present.  This is only required if irad=3. : "kJ/m2/hr"
 0  
 ' '
-Snowalb: Snow albedo (0-1).  (only required if ireadalb=1) The albedo of the snow surface to be used when the internal albedo calculations are to be overridden
+Snowalb: Snow albedo : The fraction of incident solar radiation reflected by the snow surface (in the range 0 to 1).  This is only required as an input if ireadalb=1.  For other values of ireadalb, the snow albedo is calculated internally based on snow surface age. : " "
 0
 ' '
-Qg: Ground heat flux   (kJ/m2/hr)        
+Qg: Ground heat flux : Ground heat flux : "kJ/m2/hr"
 2               
 0

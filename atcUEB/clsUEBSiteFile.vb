@@ -4,26 +4,6 @@ Imports System.IO
 
 Public Class clsUEBSiteFile
 
-    'Public Shared VariableName() As String = { _
-    '        "Uic: Energy content initial condition, kg m-3", _
-    '        "Wic: Snow water equivalent initial condition, m", _
-    '        "Tic: snow surface dimensionless age initial condition, m", _
-    '        "df: Drift factor multiplier", _
-    '        "apr: Average atmospheric pressure, Pa", _
-    '        "Aep: Albedo extinction coefficient", _
-    '        "cc: Canopy coverage fraction", _
-    '        "hcan: Canopy height", _
-    '        "lai: Leaf area index", _
-    '        "Sbar: Maximum snow load held per unit branch area", _
-    '        "yeage: Forest age flag for wind speed profile parameterization", _
-    '        "slope: A 2-D grid that contains the slope at each grid point", _
-    '        "aspect: A 2-D grid that contains the aspect at each grid point", _
-    '        "latitude: A 2-D grid that contains the latitude at each grid point", _
-    '        "longitude: A 2-D grid that contains the longitude at each grid point", _
-    '        "subalb: Albedo (fraction 0-1) of the substrate beneath the snow (ground or glacier)", _
-    '        "subtype: Type of beneath snow substrate (0-Ground, 1-Clean ice, 2-Debris ice, 3-Glacier/snow zone", _
-    '        "gsurf: The fraction of surface melt that runs off (e.g. from a glacier)"}
-
     'Public Shared NumVariables As Integer = VariableName.Length
     Public Variables As Generic.List(Of clsUEBVariable)
     Public Header As String
@@ -31,21 +11,45 @@ Public Class clsUEBSiteFile
     Public FileName As String
 
     Public Sub New(ByVal aFilename As String)
+        Dim lAlreadyRead As Boolean = False
+        Dim lUEBVariable As clsUEBVariable
 
         FileName = aFilename
         Dim lFileContents As String
-        If IO.File.Exists(FileName) Then
-            lFileContents = WholeFileString(FileName)
-        Else
-            lFileContents = GetEmbeddedFileAsString("SiteInit.dat")
-        End If
+        lFileContents = GetEmbeddedFileAsString("SiteInit.dat")
+        Variables = New Generic.List(Of clsUEBVariable)
+ReadFile:
+
         'read header line in file
         Header = StrSplit(lFileContents, vbCrLf, "")
         Variables = New Generic.List(Of clsUEBVariable)
         While lFileContents.Length > 0
-            Variables.Add(clsUEBVariable.FromSiteVariableString(lFileContents))
+            lUEBVariable = clsUEBVariable.FromSiteVariableString(lFileContents)
+            Dim lExistingVariable As clsUEBVariable = VariableFromCode(lUEBVariable.Code)
+            If lExistingVariable IsNot Nothing Then
+                Variables.Insert(Variables.IndexOf(lExistingVariable), lUEBVariable)
+                Variables.Remove(lExistingVariable)
+            Else
+                Variables.Add(lUEBVariable)
+            End If
         End While
+
+        If Not lAlreadyRead AndAlso IO.File.Exists(FileName) Then
+            lFileContents = WholeFileString(FileName)
+            lAlreadyRead = True
+            GoTo ReadFile
+        End If
+
     End Sub
+
+    Private Function VariableFromCode(ByVal aCode As String) As clsUEBVariable
+        For Each lUEBVariable As clsUEBVariable In Variables
+            If lUEBVariable.Code.ToUpper = aCode.ToUpper Then
+                Return lUEBVariable
+            End If
+        Next
+        Return Nothing
+    End Function
 
     Public Function WriteSiteFile() As Boolean
 

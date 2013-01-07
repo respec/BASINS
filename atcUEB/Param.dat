@@ -1,65 +1,65 @@
 ﻿Model Parameters
-irad:  Radiation control flag (0=from ta, 1= input qsi, 2= input qsi, qli 3= input qnet)
+irad:  Radiation control flag : This is an integer value that controls how the program calculates radiation. Values of 0, 1, 2 or 3 are valid and should be used as follows. 0:  No radiation inputs are used.  The model calculates radiation based on air temperature diurnal range. 1: Shortwave radiation is input. 2: Both longwave and shortwave radiation data is input. 3: Net radiation is input. : " "
 0   
-ireadalb:  Albedo reading control flag (0=albedo is computed internally, 1 albedo is read)
+ireadalb:  Albedo reading control flag : This is an integer that controls whether snow surface albedo is to be input or computed internally.  Values of 0 or 1 are valid and should be used as follows:  0: Model computes albedo. 1: Albedo is input. : " "
 0
-tr: Temperature above which all is rain (3 ˚C)
+tr: Rain threshold temperature : Temperature above which all precipitation occurs in form of rain 
 3   
-ts: Temperature below which all is snow (-1 ˚C)
+ts: Snow threshold temperature : Temperature below which all precipitation occurs in form of snow : "˚C"
 -1        
-ems: Emissivity of snow (nominally 0.99)
+ems: Emissivity of snow : Snow emissivity quantifies the emission of longwave radiation energy from the snow surface relative to black body radiation. : " "
 0.99  
-cg:  Ground heat capacity (nominally 2.09 KJ/kg/˚C)
+cg:  Ground heat capacity : Ground heat capacity is the amount of heat required to change one kilogram of ground beneath the snow by 1˚ C.  This applies to ground in the thermally interacting layer beneath the snow. : "KJ/kg/˚C"
 2.09          
-z: Nominal meas. heights for air temp. and humidity (2m)
+z: Air measurement height : This is the height above the top of the canopy where air temperature, humidity and wind speed were measured or assumed to be effective.  If no canopy, z is height above the ground or snow surface. : "m"
 2 
-zo:  Surface aerodynamic roughness (m)
-0.10     
-rho: Snow Density (Nominally 450 kg/m^3)
-337 
-rhog:  Soil Density (nominally 1700 kg/m^3)
+zo:  Roughness length : Surface aerodynamic roughness length in logarithmic boundary layer wind profile : "m"
+0.01     
+rho: Snow Density : Density of snow is its mass per unit volume. : "kg/m^3"
+450
+rhog:  Soil Density : Density of soil is its mass per unit volume. "kg/m^3"
 1700 
-lc: Liquid holding capacity of snow (0.05)
+lc: Liquid holding capacity : The liquid retention capacity of the snowpack as a fraction of snow in ice (solid) phase.  This quantifies the amount of liquid water that the snow can hold by capillary forces that has to be filled prior to melt outflow from the base of the snowpack.  : " "
 0.05     
-ks:  Snow Saturated hydraulic conductivity (20 m/hr)
+ks:  Snow saturated hydraulic conductivity : Hydraulic conductivity parameter used in computing snow melt outflow as function of liquid relative saturation in excess of liquid holding capacity : "m/hr"
 20
-de:  Thermally active depth of soil (0.1 m)
+de:  Thermally active soil depth : The depth of substrate (ground/ice) beneath the modeled snow layer included in energy conservation calculations.  This substrate depth is assumed to interact thermally and have the same average temperature as the snowpack. : "m"
 0.1   
-avo:  Visual new snow albedo (0.95)
-0.85 
-anir0: NIR new snow albedo (0.65)
+avo:  Visual new snow albedo : The fraction of the visual part of shortwave radiation (380nm-750nm) reflected by a new snow surface. : " "
+0.95 
+anir0: NIR new snow albedo : The fraction of the near infrared radiation (NIR) part of solar radiation (800 nm to 2500 nm) reflected by a new snow surface. : " "
 0.65 
-lans: The thermal conductivity of fresh (dry) snow
+lans: Thermal conductivity of surface snow : Parameter that quantifies the rate of conduction of energy into the snow as a function of the temperature gradient. : "kJ/m/˚C/hr"
 1.0   
-lang: the thermal conductivity of soil
+lang: Thermal conductivity of soil : Parameter that quantifies the rate of conduction of energy into the substrate as a function of the temperature gradient. : "kJ/m/˚C/hr"
 4.0   
-wlf:  Low frequency fluctuation in deep snow/soil layer 
+wlf:  Low frequency surface temperature parameter : Frequency of slow time scale air temperature fluctuation used in modeling surface temperature.  (0.0654 = 2 pi rad/96 hr for 4 day cycles).  This is intended to quantify time scales longer than a day. : "rad/hr"
 0.0654      
-rd1: Amplitude correction coefficient of heat conduction (1)
+rd1: Damping depth adjustment parameter : Parameter used to adjust the dampening depth for the amplitude of diurnal fluctuations in surface temperature parameterization. : " "
 1 
-dnews:  The threshold depth of for new snow (0.001 m)
+dnews:  New snow threshold depth : New snow depth (expressed as water equivalent) required for albedo to be reset to the albedo of fresh snow.  For new snow depths less than this the age of the snow surface is proportionally reduced. : "m"
 0.001  
-emc:  Emissivity of canopy
-0.5   
-alpha: Scattering coefficient for solar radiation
-0.0   
-alphal:  Scattering coefficient for long wave radiation
-0.5   
-g: leaf orientation with respect to zenith angle
-0.004626286    
-uc:  Unloading rate coefficient (Per hour) (Hedstrom and Pomeroy, 1998)
-0.25  
-as:  Fraction of extraterrestrial radiation on cloudy day, Shuttleworth (1993)  
-0.5    
-Bs:  (as+bs):Fraction of extraterrestrial radiation on clear day, Shuttleworth 
-0.857143      
-lambda: Ratio of direct atm radiation to diffuse, worked out from Dingman 
-1993
-rimax:  Maximum value of Richardson number for stability correction
+emc:  Canopy emissivity : Canopy emissivity quantifies the emission of longwave radiation energy from the canopy surface relative to black body radiation. : " "
+0.98   
+alpha: Shortwave leaf scattering coefficient : Scattering coefficient for shortwave radiation passing through the canopy. : " "
+0.5
+alphal:  Scattering coefficient for long wave radiation : Scattering coefficient for longwave radiation passing through the canopy. : " "
+0.0
+g: Leaf orientation geometry factor : Geometry factor quantifying the fraction of leaf area that intersects a light beam penetrating the canopy.  The model takes this to be constant, neglecting changes with solar incidence angle.  0.5 assumes random leaf orientation. : " "
+0.5
+uc:  Unloading rate coefficient : Parameter used in determining the rate of unloading of intercepted snow.  Unloading rate is this coefficient times water equivalent of intercepted snow. : "1/hr"
+0.00463
+as: Cloudy atmospheric transmissivity : Fraction of extraterrestrial radiation incident at surface on cloudy day, Shuttleworth (1993) : " "
+0.25    
+Bs: Clear sky atmospheric transmissivity increment : Additional fraction of extraterrestrial radiation received at surface on clear day.  The total radiation received at the surface on a clear day is as+bs, Shuttleworth (1993) : " "
+0.5
+lambda: Clear sky direct radiation fraction : The fraction of incident radiation at the surface that is taken as direct radiation in clear sky conditions used to partition radiation into direct and diffuse fractions : " "
+0.857
+rimax: Richardson number upper bound : Maximum value of Richardson number used in atmospheric stability correction. : " "
 0.16
-wcoeff: Wind decay coefficient for the forest
+wcoeff: Forest wind decay coefficient : Parameter quantifying decay of wind speed through forest canopy.  Within canopy wind speed is represented as u = uh exp(-n(1-z/h)) where z is height above surface, h canopy height, uh wind speed at the top of the canopy and n=wcoeff * LAI where LAI is leaf area index. : " "
+0.5
+a: Transmissivity parameter : Parameter A in Bristow-Campbell formula for atmospheric transmissivity : " "
 0.8      
-a: A in Bristow-Campbell formula for atmospheric transmittance
-0.8      
-c: C in Bristow-Campbell formula for atmospheric transmittance
+c: Transmissivity exponent : Parameter C in Bristow-Campbell formula for atmospheric transmissivity : " "
 2.4      
