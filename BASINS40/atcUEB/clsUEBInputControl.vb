@@ -66,7 +66,7 @@ ReadFile:
 
         While lFileContents.Length > 0
             lUEBVariable = clsUEBVariable.FromInputVariableString(lFileContents)
-            Dim lExistingVariable As clsUEBVariable = VariableFromDescription(lUEBVariable.Description)
+            Dim lExistingVariable As clsUEBVariable = VariableFromCode(lUEBVariable.Code)
             If lExistingVariable IsNot Nothing Then
                 Variables.Insert(Variables.IndexOf(lExistingVariable), lUEBVariable)
                 Variables.Remove(lExistingVariable)
@@ -82,9 +82,9 @@ ReadFile:
         End If
     End Sub
 
-    Private Function VariableFromDescription(ByVal aDescription As String) As clsUEBVariable
+    Private Function VariableFromCode(ByVal aCode As String) As clsUEBVariable
         For Each lUEBVariable As clsUEBVariable In Variables
-            If lUEBVariable.Description.ToUpper = aDescription.ToUpper Then
+            If lUEBVariable.Code.ToUpper = aCode.ToUpper Then
                 Return lUEBVariable
             End If
         Next

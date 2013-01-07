@@ -2,7 +2,10 @@
 Imports MapWinUtility.Strings
 
 Public Class clsUEBVariable
+    Public Code As String
+    Public LongName As String
     Public Description As String
+    Public Units As String
     Public SpaceVarying As Boolean
     Public TimeVarying As Boolean
     Public Value As Double
@@ -15,21 +18,25 @@ Public Class clsUEBVariable
     End Function
 
     Public Function ParameterString() As String
-        Return Description & vbCrLf & DoubleToString(Value, , "###0.#######") & vbCrLf
+        Dim lVariableDescription As String = Code & " : " & LongName
+        If Units.Trim.Length > 0 Then lVariableDescription = lVariableDescription & "(" & Units.Trim & ")"
+        Return lVariableDescription & vbCrLf & DoubleToString(Value, , "###0.#######") & vbCrLf
     End Function
 
     Public Shared Function FromParameterString(ByRef aFileContents As String) As clsUEBVariable
         Dim lUEBVar As New clsUEBVariable
-        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "")
+        ParseVariableDescription(lUEBVar, aFileContents)
         lUEBVar.Value = Double.Parse(StrSplit(aFileContents, vbCrLf, ""))
         Return lUEBVar
     End Function
 
     Public Function SiteVariableString() As String
+        Dim lVariableDescription As String = Code & " : " & LongName
+        If Units.Trim.Length > 0 Then lVariableDescription = lVariableDescription & "(" & Units.Trim & ")"
         If SpaceVarying Then
-            Return Description & vbCrLf & "1" & vbCrLf & GridFileName & vbCrLf & GridVariableName & vbCrLf
+            Return lVariableDescription & vbCrLf & "1" & vbCrLf & GridFileName & vbCrLf & GridVariableName & vbCrLf
         Else
-            Return Description & vbCrLf & "0" & vbCrLf & Value & vbCrLf
+            Return lVariableDescription & vbCrLf & "0" & vbCrLf & Value & vbCrLf
         End If
 
     End Function
@@ -38,7 +45,7 @@ Public Class clsUEBVariable
         Dim lUEBVar As New clsUEBVariable
         Dim lSpaceVaryingFlag As Integer
 
-        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "'")
+        ParseVariableDescription(lUEBVar, aFileContents)
         lSpaceVaryingFlag = Integer.Parse(StrSplit(aFileContents, vbCrLf, "'"))
         If lSpaceVaryingFlag = 0 Then 'constant value
             lUEBVar.SpaceVarying = False
@@ -52,12 +59,14 @@ Public Class clsUEBVariable
     End Function
 
     Public Function InputVariableString() As String
+        Dim lVariableDescription As String = Code & " : " & LongName
+        If Units.Trim.Length > 0 Then lVariableDescription = lVariableDescription & "(" & Units.Trim & ")"
         If SpaceVarying And TimeVarying Then
-            Return Description & vbCrLf & "1" & vbCrLf & GridFileName & vbCrLf & GridVariableName & vbCrLf
+            Return lVariableDescription & vbCrLf & "1" & vbCrLf & GridFileName & vbCrLf & GridVariableName & vbCrLf
         ElseIf TimeVarying Then
-            Return Description & vbCrLf & "0" & vbCrLf & TimeFileName & vbCrLf
+            Return lVariableDescription & vbCrLf & "0" & vbCrLf & TimeFileName & vbCrLf
         Else
-            Return Description & vbCrLf & "2" & vbCrLf & Value & vbCrLf
+            Return lVariableDescription & vbCrLf & "2" & vbCrLf & Value & vbCrLf
         End If
 
     End Function
@@ -66,7 +75,7 @@ Public Class clsUEBVariable
         Dim lUEBVar As New clsUEBVariable
         Dim lVaryingFlag As Integer
 
-        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "'")
+        ParseVariableDescription(lUEBVar, aFileContents)
         lVaryingFlag = Integer.Parse(StrSplit(aFileContents, vbCrLf, "'"))
         If lVaryingFlag = 0 Then 'constant spatial timeseries
             lUEBVar.TimeVarying = True
@@ -87,13 +96,15 @@ Public Class clsUEBVariable
     End Function
 
     Public Function OutputVariableString() As String
-        Return Description & vbCrLf & GridFileName & vbCrLf
+        Dim lVariableDescription As String = Code & " : " & LongName
+        If Units.Trim.Length > 0 Then lVariableDescription = lVariableDescription & "(" & Units.Trim & ")"
+        Return lVariableDescription & vbCrLf & GridFileName & vbCrLf
     End Function
 
     Public Shared Function FromOutputVariableString(ByRef aFileContents As String) As clsUEBVariable
         Dim lUEBVar As New clsUEBVariable
 
-        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "")
+        ParseVariableDescription(lUEBVar, aFileContents)
         lUEBVar.GridFileName = StrSplit(aFileContents, vbCrLf, "")
         Return lUEBVar
     End Function
@@ -101,7 +112,21 @@ Public Class clsUEBVariable
     Public Shared Function FromAggOutputVariableString(ByRef aFileContents As String) As clsUEBVariable
         Dim lUEBVar As New clsUEBVariable
 
-        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "")
+        ParseVariableDescription(lUEBVar, aFileContents)
         Return lUEBVar
     End Function
+
+    Public Shared Sub ParseVariableDescription(ByRef aUEBVar As clsUEBVariable, ByRef aFileContents As String)
+        Dim lRec As String = StrSplit(aFileContents, vbCrLf, "")
+        aUEBVar.Code = StrSplit(lRec, ":", "")
+        aUEBVar.LongName = StrSplit(lRec, ":", "")
+        aUEBVar.Description = lRec
+        If aUEBVar.Description.EndsWith("""") Then 'parse units string at end of description
+            Dim lPos As Integer = aUEBVar.Description.LastIndexOf(":")
+            If lPos > 0 Then
+                aUEBVar.Units = StrFindBlock(aUEBVar.Description, """", """", lPos)
+                aUEBVar.Description = aUEBVar.Description.Substring(0, lPos)
+            End If
+        End If
+    End Sub
 End Class

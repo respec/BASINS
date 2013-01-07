@@ -1979,11 +1979,15 @@ Public Class frmUEB
 
         'read in available output variables
         Dim lFileContents As String = GetEmbeddedFileAsString("OutputVariables.dat")
+        Dim lCode As String
         Dim lVarDescription As String
+        Dim lRec As String
         AvailableOutputs = New atcCollection
         While lFileContents.Length > 0
-            lVarDescription = StrSplit(lFileContents, vbCrLf, "")
-            AvailableOutputs.Add(VarName(lVarDescription), lVarDescription)
+            lRec = StrSplit(lFileContents, vbCrLf, "")
+            lCode = StrSplit(lRec, ":", "").ToUpper
+            lVarDescription = lCode & ": " & StrSplit(lRec, ":", "")
+            AvailableOutputs.Add(lCode, lVarDescription)
         End While
 
         pParmData = New clsUEBParameterFile("")
@@ -2469,7 +2473,7 @@ KeepWaiting:
             .CellValue(0, 0) = "Model Parameter"
             .CellValue(0, 1) = "Value"
             For i As Integer = 1 To pParmData.Variables.Count - 2
-                .CellValue(i, 0) = pParmData.Variables(i + 1).Description
+                .CellValue(i, 0) = pParmData.Variables(i + 1).Code & ": " & pParmData.Variables(i + 1).LongName
                 .CellColor(i, 0) = SystemColors.ControlDark
                 .CellEditable(i, 1) = True
                 .CellValue(i, 1) = pParmData.Variables(i + 1).Value
@@ -2502,7 +2506,7 @@ KeepWaiting:
             lRow = 0
             For Each lUEBVar As clsUEBVariable In pSiteData.Variables
                 lRow += 1
-                .CellValue(lRow, 0) = lUEBVar.Description
+                .CellValue(lRow, 0) = lUEBVar.Code & ": " & lUEBVar.LongName
                 .CellColor(lRow, 0) = SystemColors.ControlDark
                 .CellEditable(lRow, 1) = True
                 .CellValue(lRow, 2) = lUEBVar.GridFileName
@@ -2564,7 +2568,7 @@ KeepWaiting:
             lRow = 0
             For Each lUEBVar As clsUEBVariable In pInputControlData.Variables
                 lRow += 1
-                .CellValue(lRow, 0) = lUEBVar.Description
+                .CellValue(lRow, 0) = lUEBVar.Code & ": " & lUEBVar.LongName
                 .CellColor(lRow, 0) = SystemColors.ControlDark
                 .CellValue(lRow, 2) = lUEBVar.GridFileName
                 .CellValue(lRow, 3) = lUEBVar.GridVariableName
@@ -2640,13 +2644,13 @@ KeepWaiting:
                 .CellEditable(i, 2) = True
             Next
             For i = 0 To pOutputControlData.Variables.Count - 1
-                lVarName = VarName(pOutputControlData.Variables(i).Description)
+                lVarName = pOutputControlData.Variables(i).Code.ToUpper
                 If AvailableOutputs.Keys.Contains(lVarName) Then
                     .CellValue(AvailableOutputs.IndexFromKey(lVarName) + 1, 1) = pOutputControlData.Variables(i).GridFileName
                 End If
             Next
             For i = 0 To pAggOutputControlData.Variables.Count - 1
-                lVarName = VarName(pAggOutputControlData.Variables(i).Description)
+                lVarName = pAggOutputControlData.Variables(i).Code.ToUpper
                 If AvailableOutputs.Keys.Contains(lVarName) Then
                     .CellValue(AvailableOutputs.IndexFromKey(lVarName) + 1, 2) = "Yes"
                 End If

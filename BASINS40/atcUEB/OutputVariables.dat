@@ -1,65 +1,64 @@
-﻿ATF-BC: Atmospheric transmission factor
-HRI: Radiation index
-Eacl: Clear sky emissivity
-Ema: Atmospheric emissivity
-Ta: Air temperature(C)
-P: Precipitation (m/hr)
-V: Wind speed (m/s)
-RH: Relative humidity
-Qsi: Incoming solar radiation (kJ/m2/hr)
-Qli: Incoming longwave radiation (kJ/m2/hr)
-Qnet: Input net radiation (kJ/m2/hr)
-Os: Cos of solar zenith angle (Zen)
-Ub: Energy content (kJ/m2)
-SWE: Surface snow water equivalent (m)
-tausn: Dimensionless age of the snow surface
-Prain: Precipitation in the form of rain (m/hr)
-Psnow: Precipitation in the form of snow (m/hr)
-Qh: Surface Sensible heat flux (kJ/m2/hr)
-Qe: Surface Latent heat flux (kJ/m2/hr)
-E: Surface sublimation (m)
-SWIT: Total outflow (m/hr)
-SWIGM:  Glacier melt outflow (m/hr)
-SWIR:  Rainfall outflow (m/hr)
-SWISM:  Snow melt outflow (m/hr)
-Qm: Surface melt energy (kJ/m2/hr)
-Q: Net surface energy exchange (kJ/m2/hr)
-dMdt: Net surface mass exchange (m/h)
-Tave: Average snow temperature (C)
-Ts: Surface snow temperature (C)
-CumP: Cumulative precipitation (m)
-CumE: Cumulative surface sublimation (m)
-CumMelt: Cumulative surface melt (m)
-NetRads: Modeled surface net radiation (kJ/m2/hr)
-Smelt: Melt generated at surface (m/hr)
-refDep: Depth of penetration of top refreezing (m)
-totRefDep: Total depth of refreezing (m)
-Cf: Cloudiness fraction
-Taufb: Direct solar radiation fraction
-Taufd: Diffuse solar radiation fraction
-Qsib: Direct solar radiation
-Qsid: Diffuse solar radiation
-Taub: Direct solar radiation canopy transmission fraction
-Taud: Diffuse solar radiation canopy transmission fraction
-Qsns: Solar radiation absorbed at surface (kJ/m2/hr)
-Qsnc: Solar radiation absorbed in canopy (kJ/m2/hr)
-Qlns: Longwave radiation absorbed a tsurface (kJ/m2/hr)
-Qlnc: Longwave radiation absorbed in canopy (kJ/m2/hr)
-Vz: Modeled wind beneath canopy (m/s)
-Rkinsc: Was canopy aerodynamic resistance -not used presently
-Rkinc: Aerodynamic resistance of surface (below canopy)
-Inmax: Canopy snow interception capacity (m)
-int: Canopy snow interception (m/hr)
-ieff: Fraction of precipitation intercepted (m/hr)
-Ur: Canopy mass unloading (m/hr)
-SWEc: Canopy snow water equivalent (m)
-Tc: Canopy temperature(C)
-Tac: Air temperature within canopy (C)
-QHc: Canopy sensible heat flux (kJ/m2/hr)
-QEc: Canopy latent heat flux (kJ/m2/hr)
-Ec: Canopy sublimation (m/hr)
-Qpc: Precipitation energy advected to canopy (kJ/m2/hr)
-Qmc: Canopy melt energy (kJ/m2/hr)
-Mc: Melt from canopy (m/hr)
-FMc: Net canopy energy exchange (m/hr)
-MassError: Mass balance closure error (m)
+﻿ATF-BC: Atmospheric transmission factor : The fraction of radiation at the top of the atmosphere that reaches the top of the canopy or in its absence, the snow surface. : " "
+HRI: Radiation index : Integration of solar radiation incident angle cosine over time step. When radiation data is not input, IRAD flag (in param.dat file) set to 0, incoming solar radiation is calculated as Tf * HRI * Solar constant. : " "
+Eacl: Clear sky emissivity : Clear sky emissivity quantifies the emission of longwave radiation energy from a cloud free atmosphere towards the surface relative to black body radiation at the air temperature. : " "
+Ema: Atmospheric emissivity : Atmospheric emissivity quantifies the emission of longwave radiation energy from the atmosphere towards the surface relative to black body radiation at the air temperature.  The emission from clouds is included. : " "
+Ta: Air temperature : Air temperature at a point z m above the snow surface or top of canopy if present : "˚C"
+P: Precipitation : Precipitation that is the sum of both rain and snowfall expressed as water equivalent. : "m/hr"
+V: Wind speed : Wind speed at a point z m above the snow surface or top of canopy if present. : "m/s"
+RH: Relative humidity : Relative humidity at a point z m above the snow surface or top of canopy if present. : " "
+Qsi: Shortwave radiation : Modeled incoming shortwave radiation accounting for slope and aspect of the surface.  This may be different from input Qsi for sloping surfaces. : "kJ/m2/hr"
+Qli: Longwave radiation : Modeled incoming longwave radiation. : "kJ/m2/hr"
+Qnet: Observed net radiation : Observed net radiation that was input to the model. : "kJ/m2/hr"
+Os: Cosine of illumination angle : Cosine of solar illumination angle (accounts for slope) : "Degree"
+Ub: Energy content : State variable that gives the energy content of the snow pack plus thermally active soil per unit of horizontal area defined with respect to solid (ice) phase snow at 0 ˚C. : "kJ/m2"
+SWE: Surface snow water equivalent : State variable that gives the Snow Water Equivalent (SWE) of snow on the surface.  It can be considered as the depth of water that would theoretically result if the whole snow pack instantaneously melts.  This tracks snow accumulation and ablation on top of a substrate layer which may be ground or glacier.  In the case that the substrate is glacier this does not track the quantity of glacier ice. : "m"
+tausn: Dimensionless snow surface age : Dimensionless age of the snow surface state variable to account for aging of the snow surface dependent on snow surface temperature and snowfall : " "
+Prain: Precipitation in the form of rain : Amount of precipitation that occurred in the form of rain at any time step. : "m/hr"
+Psnow: Precipitation in the form of snow : Amount of precipitation that occurred in the form of snow at any time step expressed as water equivalent. : "m/hr"
+Albedo: Snow surface albedo : The fraction of shortwave radiation reflected by the snow surface. : " "
+Qh: Surface Sensible heat flux : Surface sensible heat flux is the flux of energy transferred from the snow surface to the atmosphere by air movement (wind and turbulence). : "kJ/m2/hr"
+Qe: Surface Latent heat flux : Surface latent heat flux is the flux of energy transferred from the snow surface to the atmosphere by water vapor carried in air movement (wind and turbulence). : "kJ/m2/hr"
+E: Surface sublimation : Amount of water removed from the snow surface by sublimation : "m"
+SWIT: Total outflow : Total outflow from the base of the snowpack (and glacier). This includes rainfall, melt from seasonal snow and melt from glaciated surface. : "m/hr"
+Qm: Outflow energy flux : Energy removed from the snowpack by total outflow. : "kJ/m2/hr"
+Q: Net surface energy exchange : The net sum of all surface layer (snow plus thermally interacting substrate) energy fluxes. : "kJ/m2/hr"
+dM/dt: Net surface mass exchange : The net sum of all surface layer mass fluxes. : "m/h"
+Tave: Average snow temperature : Average temperature of the snow and thermally interacting substrate. : "˚C"
+Ts: Surface snow temperature : Temperature at the surface of the snow : "˚C"
+CumP: Cumulative precipitation : Cumulative precipitation from beginning of model run. : "m"
+CumE: Cumulative surface sublimation : Cumulative sublimation from beginning of model run   : "m"
+CumMelt: Cumulative surface melt : Cumulative melt outflow from beginning of model run. : "m"
+NetRads: Surface net radiation : Modeled net radiation exchange between the snow surface and atmosphere above and canopy above if present. : "kJ/m2/hr"
+Smelt: Melt generated at surface : Amount of melt generated at the snow surface due to rain, snowmelt or glacier melt. Smelt does not include snow melt from the canopy.  Smelt also does not equate to melt outflow since it infiltrates into the snow and is subject to refreezing or liquid retention depending on the thermal state of the snow. : "m/hr"
+RefDepAct: Active refreezing front depth : The depth of a refreezing front that is active in impacting surface temperature.  This quantifies the depth that refreezing has propagated into the snowpack where liquid water is present.  This is reset to 0 when it exceeds the depth to which diurnal temperature fluctuations propagate and refreezing becomes inactive in snow surface temperature and energy exchange. : "m"
+RefDep: Refreezing front depth : The depth the refreezing front has propagated into the snowpack where liquid water is present.  This is physically the same as RefDepAct but is not set to 0 when it exceeds the depth to which diurnal temperature fluctuations propagate, so records refreezing depth whenever there has been refreezing and there is still liquid water present. : "m"
+Cf: Cloudiness fraction : The fraction (between 0 and 1) of the sky occupied by clouds. : " "
+Taufb: Direct solar radiation atmospheric transmissivity : The part of the atmospheric transmissivity that quantifies direct solar radiation, defined as the ratio of top of atmosphere radiation to direct solar radiation at the surface or top of canopy if present. : " "
+Taufd: Diffuse solar radiation atmospheric transmissivity : The part of the atmospheric transmissivity that quantifies diffuse solar radiation, defined as the ratio of top of atmosphere radiation to diffuse solar radiation at the surface or top of canopy if present. : " "
+Qsib: Direct solar radiation : The incident solar radiation received at the surface or top of canopy if present as direct solar radiation. : "kJ/m2/hr"
+Qsid: Diffuse solar radiation : The incident solar radiation received at the surface or top of canopy if present as diffuse solar radiation. : "kJ/m2/hr"
+Taub: Direct solar radiation canopy transmission fraction : The fraction of direct solar radiation incident at the top of the canopy that is transmitted through the canopy as direct solar radiation without being scattered or absorbed. : " "
+Taud: Diffuse solar radiation canopy transmission fraction : The fraction of diffuse solar radiation incident at the top of the canopy that is transmitted through the canopy without being scattered or absorbed. : " "
+Qsns: Surface shortwave absorption : Amount of solar radiation absorbed at snow surface. : "kJ/m2/hr"
+Qsnc: Canopy shortwave absorption : Amount of solar radiation absorbed in canopy. : "kJ/m2/hr"
+Qlns: Surface longwave absorption : Amount of longwave radiation absorbed at snow surface. : "kJ/m2/hr"
+Qlnc: Canopy longwave absorption : Amount of longwave radiation absorbed in canopy. : "kJ/m2/hr"
+Vz: Wind speed beneath canopy : Modeled wind speed beneath canopy at height z above the surface : "m/s"
+Inmax: Interception capacity : Maximum amount of snow that a canopy can hold during a snowfall.  This is a function of maximum snow load per unit leaf area, leaf area index and the density of fresh snow. : "m"
+int: Interception flux : The flux if precipitation that is intercepted by the canopy.  This is a function of the interception capacity and intercepted snow state variable. : "m/hr"
+ieff: Interception efficiency : Fraction of precipitation intercepted by the canopy : "m/hr"
+Ur: Canopy unloading rate : The flux of snow unloaded from the canopy.  Unloading rate is the intercepted snow state variable times the unloading rate coefficient and represents the transfer of snow from the canopy to the surface.  It quantifies snow water equivalent removed from the canopy and added to the surface snow water equivalent. : "m/hr"
+SWEc: Canopy snow water equivalent : Intercepted snow state variable giving the water equivalent of snow held as interception in the canopy. : "m"
+Tc: Canopy temperature : Temperature of the leaves and branches within the canopy.  This is used in the calculation of energy fluxes between the canopy and within canopy air. : "˚C"
+Tac: Air temperature within canopy : Temperature of air within the canopy.  This is used in the calculation of energy fluxes between the canopy and within canopy air, and in the calculation of energy fluxes between within canopy air and the atmosphere above, and snow surface below. : "˚C"
+QHc: Canopy sensible heat flux : Energy flux from the air within the canopy to the canopy.  This is positive towards the canopy and is calculated based on temperature gradient and bulk leaf boundary layer resistance. : "kJ/m2/hr"
+Qec: Canopy latent heat flux : Latent energy flux from the air within the canopy to the canopy.  This is positive towards the canopy and is calculated based on the vapor pressure gradient and bulk leaf boundary layer resistance.  It represents the energy flux associated with the phase change due to sublimation (removal) or condensation/deposition (addition) of canopy intercepted snow from water vapor in the air. : "kJ/m2/hr"
+Ec: Canopy sublimation : The flux, expressed as snow water equivalent, of removal of snow from canopy interception by sublimation.  This is positive away from the canopy. : "m/hr"
+Qpc: Precipitation energy flux to canopy : The flux of energy added to the canopy by interception.  This represents the flux due to the energy difference between the phase and temperature of precipitation and the reference condition of 0 ˚C solid phase. : "kJ/m2/hr"
+Qmc: Canopy melt energy : The flux of energy removed from the canopy due to melt.  This represents the energy flux due to the latent heat of fusion energy difference between melt water and the reference condition of 0 C solid phase.  This is subtracted from the canopy and added to the surface snow energy content. : "kJ/m2/hr"
+Mc: Melt from canopy : The flux, expressed as snow water equivalent, of removal of snow from canopy interception by melting.  This is subtracted from the intercepted snow and added to surface snow. : "m/hr"
+FMc: Net canopy mass exchange : The net sum of all canopy mass fluxes. : "m/hr"
+MassError: Mass balance closure error : A running total of the sum of all inputs to and outputs from the model.  Theoretically this should be 0, but practically differs from 0 due to numerical precision and rounding errors in the computation.  It is included as a check on the functioning of the model and if significantly different from 0 is indicative of a problem. : "m"
+SWIGM:  Glacier melt outflow : The part of outflow from the base of the snowpack and glacier that is generated from glacier melting. SWIGM includes melt originating from glacial ice, as well as outflow that may occur due to rain on a glacier, as any precipitation that falls on the snow or glacier surface is first added to the snow/glacier to account for its energy in the total energy content then melt outflow occurs if the energy content results in liquid water in excess of the liquid holding capacity. : "m/hr"
+SWIR:  Rainfall outflow : The part of outflow that is due to rain or snow that immediately melts.  This only occurs on a non-glacier surface and when the surface snow water equivalent is 0.  Precipitation that is rain, or that is snow that immediately melts due to a high temperature of the thermally active ground layer comprises this outflow. : "m/hr"
+SWISM:  Snowmelt outflow : The part of outflow that is due to the melting of the seasonal snow pack.  SWISM includes melt originating from the seasonal snow as well as outflow that may occur due to rain on a snowpack, as any precipitation that falls on the snow or glacier surface is first added to the snow/glacier to account for its energy in the total energy content then melt outflow occurs if the energy content results in liquid water in excess of the liquid holding capacity.  If surface snow is present then melt outflow is generated from the surface snow.  Glacier melt outflow is only generated when the surface snow water equivalent ablates to 0 and the substrate is glacier. : "m/hr"
