@@ -411,6 +411,10 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         End If
     End Sub
 
+    ''' <summary>
+    ''' Discard existing attributes and add the ones in aNewItems instead
+    ''' </summary>
+    ''' <param name="aNewItems"></param>
     Public Shadows Sub ChangeTo(ByVal aNewItems As atcDataAttributes)
         Clear()
         For Each lAdv As atcDefinedValue In aNewItems
@@ -418,7 +422,21 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Next
     End Sub
 
+    ''' <summary>
+    ''' Create a copy containing all attributes even if Definition.CopiesInherit = False
+    ''' </summary>
     Public Shadows Function Clone() As atcDataAttributes
+        Dim newClone As New atcDataAttributes
+        For Each lAdv As atcDefinedValue In Me
+            newClone.SetValue(lAdv.Definition, lAdv.Value, lAdv.Arguments)
+        Next
+        Return newClone
+    End Function
+
+    ''' <summary>
+    ''' Create a copy containing the attributes whose Definition.CopiesInherit = True
+    ''' </summary>
+    Public Function Copy() As atcDataAttributes
         Dim newClone As New atcDataAttributes
         For Each lAdv As atcDefinedValue In Me
             If lAdv.Definition.CopiesInherit Then
@@ -428,7 +446,9 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Return newClone
     End Function
 
-    'Calculate all the known attributes that can be calculated with no additional arguments
+    ''' <summary>
+    ''' Calculate all the known attributes that can be calculated with no additional arguments
+    ''' </summary>
     Public Sub CalculateAll()
         Dim lCalculateThese As New Generic.List(Of String)
         For Each lDef As atcAttributeDefinition In pAllDefinitions 'For each kind of attribute we know about

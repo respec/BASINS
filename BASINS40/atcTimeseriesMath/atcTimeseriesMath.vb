@@ -218,27 +218,28 @@ Public Class atcTimeseriesMath
     'Args are each usually either Double or atcTimeseries
     Public Overrides Function Open(ByVal aOperationName As String, _
                           Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-        Me.DataSets.Clear() 'assume we don't want any old datasets (maybe add arg to define this???)
+        Me.DataSets.Clear() 'clear out any old datasets from previous computations
 
-        If aOperationName Is Nothing OrElse aOperationName.Length = 0 Then
+        If String.IsNullOrEmpty(aOperationName) Then
             'TODO: ask user which operation to perform
             aOperationName = "Add"
         End If
         Specification = aOperationName
 
         Dim lNeedToAsk As Boolean = False
-        Dim lOperation As atcDefinedValue = AvailableOperations.GetDefinedValue(aOperationName)
-        If Not lOperation Is Nothing Then
-            If aArgs Is Nothing Then
-                lNeedToAsk = True
-                aArgs = lOperation.Arguments.Clone
+        Dim lArgs As New atcDataAttributes
+        If aArgs Is Nothing Then
+            Dim lOperation As atcDefinedValue = AvailableOperations.GetDefinedValue(aOperationName)
+            If lOperation Is Nothing Then
+                Throw New ApplicationException("Unknown operation and no arguments for " & aOperationName)
             Else
-                For Each lArg As atcDefinedValue In aArgs
-                    lOperation.Arguments.SetValue(lArg.Definition.Name, lArg.Value)
-                Next
-                aArgs = lOperation.Arguments
+                lNeedToAsk = True
+                lArgs = lOperation.Arguments.Clone
             End If
+        Else
+            lArgs = aArgs.Clone
         End If
+
 
         'This loop checks to see if any arguments are missing, but this does not take into account optional arguments so it is commented out
         'For Each lArg As atcDefinedValue In aArgs
@@ -255,14 +256,14 @@ Public Class atcTimeseriesMath
 #Else
             Dim lSpecify As New frmSpecifyComputation
             lSpecify.Text = Me.Category & ": " & aOperationName
-            If Not lSpecify.AskUser(aArgs) Then
+            If Not lSpecify.AskUser(lArgs) Then
                 Return False 'User cancelled
             End If
 #End If
         End If
 
         Try
-            Dim lNewTS As atcTimeseries = DoMath(aOperationName, aArgs)
+            Dim lNewTS As atcTimeseries = DoMath(aOperationName, lArgs)
             If lNewTS IsNot Nothing Then
                 AddDataSet(lNewTS)
                 Return True
