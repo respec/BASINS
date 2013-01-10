@@ -176,22 +176,27 @@ Public Module modModelSetup
         Dim lFoundLU As Boolean = False
         Dim lInd As Integer
         For Each lLU As Integer In aLUInclude
-            lSub = lLandUseSubbasinOverlayRecords(1).SubbasinId
+            Dim lTempRec1 As New LandUseSubbasinOverlayRecord
+            Dim lTempRecInd As New LandUseSubbasinOverlayRecord
+            lTempRec1 = lLandUseSubbasinOverlayRecords(1)
+            lSub = lTempRec1.SubbasinId
             lInd = 1
             While lInd <= lLandUseSubbasinOverlayRecords.Count
-                If lLandUseSubbasinOverlayRecords(lInd).LuCode = lLU Then lFoundLU = True
-                If lLandUseSubbasinOverlayRecords(lInd).SubbasinId <> lSub OrElse lInd = lLandUseSubbasinOverlayRecords.Count Then
+                lTempRecInd = lLandUseSubbasinOverlayRecords(lInd)
+                If lTempRecInd.LuCode = lLU Then lFoundLU = True
+                If lTempRecInd.SubbasinId <> lSub OrElse lInd = lLandUseSubbasinOverlayRecords.Count Then
                     'new subbasin, if LU not found, need to add it
                     If Not lFoundLU Then
                         Dim lRec As New LandUseSubbasinOverlayRecord
                         lRec.LuCode = lLU
                         lRec.SubbasinId = lSub
                         lRec.Area = 0.001
-                        lRec.MeanLatitude = lLandUseSubbasinOverlayRecords(1).MeanLatitude
-                        lRec.MeanElevation = lLandUseSubbasinOverlayRecords(1).MeanElevation
+                        lRec.MeanLatitude = lTempRec1.MeanLatitude
+                        lRec.MeanElevation = lTempRec1.MeanElevation
                         lLandUseSubbasinOverlayRecords.Add(lRec, , lInd)
                         lInd += 1
-                        lSub = lLandUseSubbasinOverlayRecords(lInd).SubbasinId
+                        lTempRecInd = lLandUseSubbasinOverlayRecords(lInd)
+                        lSub = lTempRecInd.SubbasinId
                     End If
                     lFoundLU = False
                 End If

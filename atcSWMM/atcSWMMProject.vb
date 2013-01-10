@@ -693,7 +693,7 @@ Public Class atcSWMMProject
                 LaunchProgram(lSWMMexe, IO.Path.GetDirectoryName(aInputFileName), "/f " & aInputFileName, False)
                 Logger.Dbg("SWMM launched with input " & aInputFileName)
             Else
-                Logger.Msg("Cannot find the EPA SWMM 5.0 Executable", MsgBoxStyle.Critical, "BASINS SWMM Problem")
+                Logger.Msg("Cannot find the EPA SWMM 5.0 Executable to open " & aInputFileName, MsgBoxStyle.Critical, "BASINS SWMM Problem")
             End If
         Else
             Logger.Msg("Cannot find SWMM 5.0 Input File " & aInputFileName)
