@@ -320,7 +320,7 @@ Public Module modDownload
                     'want to keep met pts
                     g_StatusBar(1).Text = "Selecting " & GisUtil.LayerName(iLayer)
                     RefreshView()
-                    Logger.Dbg("CopyFeaturesWithinExtent:" & GisUtil.LayerName(iLayer))
+                    Logger.Status("Copy Features Within Extent:" & GisUtil.LayerName(iLayer))
 
                     If GisUtil.LayerFileName(iLayer).Contains(aOldFolder) Then
                         'this layer is in our project folder
@@ -334,25 +334,27 @@ Public Module modDownload
                             lCurrentSf = New MapWinGIS.Shapefile
                             lResultSf = New MapWinGIS.Shapefile
                             If lCurrentSf.Open(GisUtil.LayerFileName(iLayer)) Then
-                                If lResultSf.CreateNew(lNewName, lCurrentSf.ShapefileType) Then
-                                    rslt = False
-                                    If lLayerType = 1 Then
-                                        Logger.Dbg("  SelectingPoints")
-                                        rslt = MapWinGeoProc.Selection.SelectPointsWithPolygon(lCurrentSf, lExtentShape, lResultSf)
-                                        Logger.Dbg("  FinishedSelectingPoints")
-                                    ElseIf lLayerType = 3 Then
-                                        Logger.Dbg("  SelectingPolygons")
-                                        rslt = MapWinGeoProc.Selection.SelectPolygonsWithPolygon(lCurrentSf, lExtentShape, lResultSf)
-                                        Logger.Dbg("  FinishedSelectingPolygons")
-                                    ElseIf lLayerType = 2 Then
-                                        Logger.Dbg("  SelectingLines")
-                                        rslt = MapWinGeoProc.Selection.SelectLinesWithPolygon(lCurrentSf, lExtentShape, lResultSf)
-                                        Logger.Dbg("  FinishedSelectingLines")
+                                If lCurrentSf.NumShapes < 10000 Then  'arbitrary limit to avoid out of memory error
+                                    If lResultSf.CreateNew(lNewName, lCurrentSf.ShapefileType) Then
+                                        rslt = False
+                                        If lLayerType = 1 Then
+                                            Logger.Dbg("  SelectingPoints")
+                                            rslt = MapWinGeoProc.Selection.SelectPointsWithPolygon(lCurrentSf, lExtentShape, lResultSf)
+                                            Logger.Dbg("  FinishedSelectingPoints")
+                                        ElseIf lLayerType = 3 Then
+                                            Logger.Dbg("  SelectingPolygons")
+                                            rslt = MapWinGeoProc.Selection.SelectPolygonsWithPolygon(lCurrentSf, lExtentShape, lResultSf)
+                                            Logger.Dbg("  FinishedSelectingPolygons")
+                                        ElseIf lLayerType = 2 Then
+                                            Logger.Dbg("  SelectingLines")
+                                            rslt = MapWinGeoProc.Selection.SelectLinesWithPolygon(lCurrentSf, lExtentShape, lResultSf)
+                                            Logger.Dbg("  FinishedSelectingLines")
+                                        End If
+                                        If rslt Then
+                                            lResultSf.SaveAs(lNewName)
+                                        End If
+                                        lResultSf.Close()
                                     End If
-                                    If rslt Then
-                                        lResultSf.SaveAs(lNewName)
-                                    End If
-                                    lResultSf.Close()
                                 End If
                                 lCurrentSf.Close()
                             End If
