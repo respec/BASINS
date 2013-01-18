@@ -21,7 +21,8 @@ Module netCDFViewer
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
         If Not IO.Directory.Exists(lOutFolder) Then IO.Directory.CreateDirectory(lOutFolder)
 
-        Dim lBaseNames() As String = {"Ta1", "swit", "merra.prod.assim.20061230", "merra.prod.rad.20061231", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
+        Dim lBaseNames() As String = {"LangtangKholaWatershed", "srtm_54_07_LangtangFill_LambertWatershed", "srtm_54_07_LangtangFill_LambertUEBAspect", "srtm_54_07_LangtangFill_LambertUEBSlope"}
+        '{"Ta1", "swit", "merra.prod.assim.20061230", "merra.prod.rad.20061231", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
         For Each lBaseName As String In lBaseNames
             If lDebug Then lReport.AppendLine(lNetCDF_Version)
             Dim lFileName As String = lPathName & lBaseName & ".nc"
@@ -144,9 +145,14 @@ Module netCDFViewer
                                             Select Case lXtype
                                                 Case NetCDF.nc_type.NC_DOUBLE
                                                     lReport.AppendLine(lString & lValuesDouble(lValueIndex))
-                                                Case NetCDF.nc_type.NC_FLOAT
-                                                    Dim lValue As Double = lValuesFloat(lValueIndex) ' * 10800 'sec/3hr TODO: make generic!
-                                                    If lValue = -9999 Then
+                                                Case NetCDF.nc_type.NC_FLOAT, NetCDF.nc_type.NC_INT
+                                                    Dim lValue As Double
+                                                    If lXtype = NetCDF.nc_type.NC_INT Then
+                                                        lValue = lValuesInt(lValueIndex)
+                                                    Else
+                                                        lValue = lValuesFloat(lValueIndex) ' * 10800 'sec/3hr TODO: make generic!
+                                                    End If
+                                                    If lValue = -9999 OrElse lValue < -2000000000.0 Then 'missing
                                                         If lZeroCount > 0 Then
                                                             lReport.AppendLine("    ... " & lZeroCount & " zero values skipped")
                                                             lZeroCount = 0
