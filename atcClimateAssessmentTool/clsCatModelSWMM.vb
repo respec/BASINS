@@ -206,9 +206,9 @@ Public Class clsCatModelSWMM
                 Dim lPrevCurDir As String = CurDir() 'save the base model folder
                 ChDriveDir(IO.Path.GetDirectoryName(lNewINPfilename)) 'change curdir to modified model folder
                 AppendFileString(lNewFolder & "SWMM5Error.Log", "Start log for " & lNewBaseFilename & vbCrLf)
-                Dim lArgs As String = lNewINPfilename
-                lArgs &= " " & IO.Path.ChangeExtension(lNewINPfilename, "rpt")
-                lArgs &= " " & IO.Path.ChangeExtension(lNewINPfilename, "out")
+                Dim lArgs As String = """" & lNewINPfilename & """"
+                lArgs &= " " & """" & IO.Path.ChangeExtension(lNewINPfilename, "rpt") & """"
+                lArgs &= " " & """" & IO.Path.ChangeExtension(lNewINPfilename, "out") & """"
                 Logger.Dbg("Start " & lSWMMExeName & " with Arguments '" & lArgs & "'")
                 Dim lSWMMProcess As New Diagnostics.Process
                 With lSWMMProcess.StartInfo

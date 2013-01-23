@@ -59,7 +59,8 @@ Public Class atcSWMMRainGages
         For I As Integer = 1 To lLines.Length - 1
             If Not lLines(I).Trim().StartsWith(";") And lLines(I).Trim().Length > 0 Then
 
-                Dim lItems() As String = Regex.Split(lLines(I).Trim(), "\s+")
+                Dim lItems As Generic.List(Of String) = atcSWMMProject.SplitSpaceDelimitedWithQuotes(lLines(I))
+
                 Dim lRainGage As atcSWMMRainGage = Nothing
                 If Me.Contains(lItems(0)) Then
                     lRainGage = Me(lItems(0))
@@ -68,49 +69,40 @@ Public Class atcSWMMRainGages
                 End If
 
                 With lRainGage
-                    For J As Integer = 0 To lItems.Length - 1
-                        Select Case J
-                            Case 0 : .Name = lItems(J).Trim
-                            Case 1
-                                If lSectionName = "[RAINGAGES]" Then
-                                    .Form = [Enum].Parse(GetType(SWMM_RainGage_DataFormat), lItems(J).Trim)
-                                ElseIf lSectionName = "[SYMBOLS]" Then
-                                    .XPos = Double.Parse(lItems(J))
-                                End If
-                            Case 2
-                                If lSectionName = "[RAINGAGES]" Then
-                                    .Interval = lItems(J).Trim()
-                                ElseIf lSectionName = "[SYMBOLS]" Then
-                                    .YPos = Double.Parse(lItems(J))
-                                End If
-                            Case 3 : .SnowCatchFactor = Double.Parse(lItems(J))
-                            Case 4 : .Type = lItems(J).Trim
-                            Case 5
-                                .TimeSeries = New atcData.atcTimeseries(pSWMMProject)
-                                .TimeSeries.Attributes.SetValue("Location", .Name.Trim()) ' raingage location label
-                                .TimeSeries.Attributes.SetValue("Constituent", "PREC")
-                                Dim lItem As String = lItems(J).Trim()
-                                'lItem = pSWMMProject.FilterFileName(lItem)
-                                lItem = lItem.Trim("""")
-                                .TimeSeries.Attributes.SetValue("Scenario", lItem) ' raingage timeseries label
-                                .TimeSeries.Attributes.SetValue("Source", "") ' actual TS source file full path
-                                .TimeSeries.Attributes.AddHistory("Read from " & pSWMMProject.Specification)
-                                .TimeSeries.Attributes.SetValue("ID", Me.pSWMMProject.DatasetId(True))
-                                .TimeSeries.Attributes.SetValue("interval", .IntervalJulian())
-                                .TimeSeries.ValuesNeedToBeRead = True
+                    .Name = lItems(0).Trim
 
-                                If .Type.ToLower() = "file" Then
-                                    pSWMMProject.IsFileData = True
-                                    Dim lpath As String = FindFile("Rain Gage Data File", lItem, lItem.Substring(lItem.LastIndexOf(".")))
-                                    TimeseriesFromFile(lpath, .TimeSeries)
-                                ElseIf .Type.ToLower() = "timeseries" Then
-                                    UseBlockText = True
-                                    ' read in data in the TIMESERIES block
-                                End If
-                            Case Else
-                                .AuxiParms &= lItems(J) & "  " 'some leftover text not sure what, but save it here
-                        End Select
-                    Next
+                    If lSectionName = "[RAINGAGES]" Then
+                        .Form = [Enum].Parse(GetType(SWMM_RainGage_DataFormat), lItems(1).Trim)
+                        .Interval = lItems(2).Trim()
+                        .SnowCatchFactor = Double.Parse(lItems(3))
+                        .Type = lItems(4).Trim
+
+                        .TimeSeries = New atcData.atcTimeseries(pSWMMProject)
+                        .TimeSeries.Attributes.SetValue("Location", .Name.Trim()) ' raingage location label
+                        .TimeSeries.Attributes.SetValue("Constituent", "PREC")
+                        Dim lItem As String = lItems(5).Trim().Trim("""")
+                        .TimeSeries.Attributes.SetValue("Scenario", lItem) ' raingage timeseries label
+                        .TimeSeries.Attributes.SetValue("Source", "") ' actual TS source file full path
+                        .TimeSeries.Attributes.AddHistory("Read from " & pSWMMProject.Specification)
+                        .TimeSeries.Attributes.SetValue("ID", Me.pSWMMProject.DatasetId(True))
+                        .TimeSeries.Attributes.SetValue("interval", .IntervalJulian())
+                        .TimeSeries.ValuesNeedToBeRead = True
+
+                        If .Type.ToLower() = "file" Then
+                            pSWMMProject.IsFileData = True
+                            Dim lpath As String = FindFile("Rain Gage Data File", lItem, lItem.Substring(lItem.LastIndexOf(".")))
+                            TimeseriesFromFile(lpath, .TimeSeries)
+                        ElseIf .Type.ToLower() = "timeseries" Then
+                            UseBlockText = True
+                            ' read in data in the TIMESERIES block
+                        End If
+                        For lItemIndex As Integer = 6 To lItems.Count - 1
+                            .AuxiParms &= lItems(lItemIndex) & "  " 'some leftover text not sure what, but save it here
+                        Next
+                    ElseIf lSectionName = "[SYMBOLS]" Then
+                        .XPos = Double.Parse(lItems(1))
+                        .YPos = Double.Parse(lItems(2))
+                    End If
                 End With
                 If Not Me.Contains(lItems(0).Trim) Then
                     Me.Add(lRainGage)
@@ -153,7 +145,7 @@ Public Class atcSWMMRainGages
             Exit Sub
         End If
 
-        Dim lItems() As String = Regex.Split(aLine.Trim(), "\s+")
+        Dim lItems As Generic.List(Of String) = atcSWMMProject.SplitSpaceDelimitedWithQuotes(aLine.Trim())
         Dim lScenario As String = lItems(0).Trim()
         Dim ldatePart As String = aLine.Substring(17, 10).Trim()
         Dim ltimePart As String = aLine.Substring(28, 10).Trim()
@@ -197,7 +189,7 @@ Public Class atcSWMMRainGages
         Dim lTimeStep As Double = aTS.Attributes.GetValue("interval")
         While Not lSR.EndOfStream
             Dim line As String = lSR.ReadLine()
-            Dim lItems() As String = Regex.Split(line.Trim(), "\s+")
+            Dim lItems As Generic.List(Of String) = atcSWMMProject.SplitSpaceDelimitedWithQuotes(line.Trim())
             'There should be 7 columns
             'Stn Y M D H M Value
             If lItems(0) <> lStn Then
@@ -214,7 +206,7 @@ Public Class atcSWMMRainGages
             'store each value at end of interval
             ldate += lTimeStep
             lDates.Add(ldate)
-            lValues.Add(Double.Parse(lItems(lItems.Length - 1)))
+            lValues.Add(Double.Parse(lItems(lItems.Count - 1)))
 
             lLineCtr += 1
         End While

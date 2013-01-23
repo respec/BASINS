@@ -41,12 +41,12 @@ Public Class atcSWMMConduits
         Dim lLines() As String = aContents.Split(vbCrLf)
         For I As Integer = 1 To lLines.Length - 1
             If Not lLines(I).StartsWith(";") And lLines(I).Length > 2 Then
-                Dim lItems() As String = Regex.Split(lLines(I).Trim(), "\s+")
+                Dim lItems As Generic.List(Of String) = atcSWMMProject.SplitSpaceDelimitedWithQuotes(lLines(I).Trim())
                 Dim lConduit As atcSWMMConduit = Me(lItems(0))
                 If lConduit Is Nothing Then
                     lConduit = New atcSWMMConduit
                 End If
-                For J As Integer = 0 To lItems.Length - 1
+                For J As Integer = 0 To lItems.Count - 1
                     Select Case J
                         Case 0 : lConduit.Name = lItems(J)
                         Case 1

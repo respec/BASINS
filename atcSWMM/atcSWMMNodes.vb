@@ -39,13 +39,13 @@ Public Class atcSWMMNodes
         For I As Integer = 1 To lLines.Length - 1
             If Not lLines(I).StartsWith(";") And lLines(I).Length > 2 Then
                 lLines(I) = lLines(I).TrimStart(" ")
-                Dim lItems() As String = Regex.Split(lLines(I).Trim(), "\s+")
+                Dim lItems As Generic.List(Of String) = atcSWMMProject.SplitSpaceDelimitedWithQuotes(lLines(I).Trim())
                 Dim lNode As atcSWMMNode = Me(lItems(0))
                 If lNode Is Nothing Then
                     lNode = New atcSWMMNode
                 End If
                 lNode.Type = lType
-                For J As Integer = 0 To lItems.Length - 1
+                For J As Integer = 0 To lItems.Count - 1
                     Select Case J
                         Case 0 : lNode.Name = lItems(J)
                         Case 1

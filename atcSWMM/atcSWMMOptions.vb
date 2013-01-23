@@ -53,8 +53,8 @@ Public Class atcSWMMOptions
 
         For Each lLine As String In aContents.Split(vbCrLf)
             lLine = lLine.Trim()
-            Dim lItems() As String = Regex.Split(lLine, "\s+")
-            If lItems.GetUpperBound(0) = 1 Then
+            Dim lItems As Generic.List(Of String) = atcSWMMProject.SplitSpaceDelimitedWithQuotes(lLine)
+            If lItems.Count = 2 Then
                 Dim lOption As String = lItems(0).ToUpper.PadRight(19)
                 Dim lValue As String = lItems(1)
                 Select Case lOption

@@ -152,7 +152,7 @@ Public Class atcSWMMEvaporation
         Dim lTimeStep As Double = aTS.Attributes.GetValue("interval")
         While Not lSR.EndOfStream
             Dim line As String = lSR.ReadLine()
-            Dim lItems() As String = Regex.Split(line.Trim(), "\s+")
+            Dim lItems As Generic.List(Of String) = atcSWMMProject.SplitSpaceDelimitedWithQuotes(line.Trim())
             Dim lDateParts() As String = lItems(0).Split("/")
             Dim lTimeParts() As String = lItems(1).Split(":")
 
@@ -164,7 +164,7 @@ Public Class atcSWMMEvaporation
             'SWMM5 denote a day has 0 hour to 23 hour, but atcTimeseries denote a day as 1 ~ 24 hour
             ldate += lTimeStep
             lDates.Add(ldate)
-            lValues.Add(Double.Parse(lItems(lItems.Length - 1)))
+            lValues.Add(Double.Parse(lItems(lItems.Count - 1)))
 
             lLineCtr += 1
         End While
