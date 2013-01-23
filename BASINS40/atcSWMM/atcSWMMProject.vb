@@ -264,14 +264,14 @@ Public Class atcSWMMProject
                         Dim lScenarioPrev As String = String.Empty
                         For I As Integer = 0 To lLines.Length - 1
                             If Not lLines(I).Trim().StartsWith(";") And lLines(I).Trim().Length > 0 Then
-                                lScenarioPrev = Regex.Split(lLines(I).Trim(), "\s+")(0).Trim()
+                                lScenarioPrev = atcSWMMProject.SplitSpaceDelimitedWithQuotes(lLines(I).Trim())(0).Trim()
                                 Exit For
                             End If
                         Next
                         For I As Integer = 0 To lLines.Length - 1
                             If Not lLines(I).Trim().StartsWith(";") And lLines(I).Trim().Length > 0 Then
 
-                                Dim lItems() As String = Regex.Split(lLines(I).Trim(), "\s+")
+                                Dim lItems As Generic.List(Of String) = atcSWMMProject.SplitSpaceDelimitedWithQuotes(lLines(I).Trim())
                                 Dim lScenario As String = lItems(0).Trim()
                                 Dim lBlockWithTS As Object = Nothing
                                 Dim lRainGageName As String = String.Empty
@@ -379,12 +379,12 @@ Public Class atcSWMMProject
                 For Each lParamKey As String In Temperature.AuxiParms.Keys
                     If lParamKey = "SNOWMELT" Then
                         Dim lParams As String = Temperature.AuxiParms.Item(lParamKey).Trim()
-                        Dim lItems() As String = Regex.Split(lParams, "\s+")
+                        Dim lItems As Generic.List(Of String) = atcSWMMProject.SplitSpaceDelimitedWithQuotes(lParams)
                         Dim lLatDeg As Double = "40.0"
                         If Double.TryParse(lItems(4), lLatDeg) Then
                             Evaporation.Timeseries.Attributes.SetValue("LatDeg", lLatDeg)
                         End If
-                        ReDim lItems(0)
+                        lItems.Clear()
                         Exit For
                     End If
                 Next
@@ -716,5 +716,35 @@ Public Class atcSWMMProject
             End If
         Next
         Return lNewName
+    End Function
+
+    Public Shared Function SplitSpaceDelimitedWithQuotes(ByVal aSplitThis As String) As Generic.List(Of String)
+        Dim lItems As New Generic.List(Of String) ' = Regex.Split(lLines(I).Trim(), "\s+")
+        Dim lCurrItem As String = ""
+        For lCharIndex As Integer = 0 To aSplitThis.Length - 1
+            Dim lChar As String = aSplitThis.Substring(lCharIndex, 1)
+            Select Case lChar
+                Case " ", vbTab
+                    If lCurrItem.Length > 0 Then
+                        lItems.Add(lCurrItem)
+                        lCurrItem = ""
+                    End If
+                Case """"
+                    Dim lEndQuote As Integer = aSplitThis.IndexOf("""", lCharIndex + 1)
+                    If lEndQuote > lCharIndex Then
+                        lCurrItem = aSplitThis.Substring(lCharIndex + 1, lEndQuote - lCharIndex - 1)
+                        lCharIndex = lEndQuote
+                    Else
+                        lCurrItem &= lChar
+                    End If
+                Case Else
+                    lCurrItem &= lChar
+            End Select
+        Next
+        If lCurrItem.Length > 0 Then
+            lItems.Add(lCurrItem)
+            lCurrItem = ""
+        End If
+        Return lItems
     End Function
 End Class

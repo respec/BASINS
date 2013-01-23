@@ -42,12 +42,12 @@ Public Class atcSWMMCatchments
         Dim lSectionName As String = lLines(0)
         For I As Integer = 1 To lLines.Length - 1
             If Not lLines(I).StartsWith(";") And lLines(I).Length > 2 Then
-                Dim lItems() As String = Regex.Split(lLines(I).Trim(), "\s+")
+                Dim lItems As Generic.List(Of String) = atcSWMMProject.SplitSpaceDelimitedWithQuotes(lLines(I).Trim())
                 Dim lSub As atcSWMMCatchment = Me(lItems(0))
                 If lSub Is Nothing Then
                     lSub = New atcSWMMCatchment
                 End If
-                For J As Integer = 0 To lItems.Length - 1
+                For J As Integer = 0 To lItems.Count - 1
                     Select Case J
                         Case 0 : lSub.Name = lItems(J)
                         Case 1
