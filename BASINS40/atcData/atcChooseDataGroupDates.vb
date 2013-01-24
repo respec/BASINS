@@ -7,7 +7,8 @@ Public Class atcChooseDataGroupDates
 
     Private WithEvents pDataGroup As atcTimeseriesGroup
 
-    Private pDateFormat As atcDateFormat
+    Private pDateFormatStart As atcDateFormat
+    Private pDateFormatEnd As atcDateFormat
 
     Private pFirstStart As Double = GetNaN()
     Private pLastEnd As Double = GetNaN()
@@ -32,7 +33,7 @@ Public Class atcChooseDataGroupDates
             Return lJdate
         End Get
         Set(ByVal aJdate As Double)
-            If Math.Abs(aJdate) > 5 Then txtOmitBefore.Text = pDateFormat.JDateToString(aJdate)
+            If Math.Abs(aJdate) > 5 Then txtOmitBefore.Text = pDateFormatStart.JDateToString(aJdate)
         End Set
     End Property
 
@@ -45,7 +46,7 @@ Public Class atcChooseDataGroupDates
             Return lJdate
         End Get
         Set(ByVal aJdate As Double)
-            If Math.Abs(aJdate) > 5 Then txtOmitAfter.Text = pDateFormat.JDateToString(aJdate)
+            If Math.Abs(aJdate) > 5 Then txtOmitAfter.Text = pDateFormatEnd.JDateToString(aJdate)
         End Set
     End Property
 
@@ -117,9 +118,19 @@ Public Class atcChooseDataGroupDates
     ''' Set all the controls to default values from current DataGroup
     ''' </summary>
     Public Sub Reset()
-        If pDateFormat Is Nothing Then
-            pDateFormat = New atcDateFormat
-            With pDateFormat
+        If pDateFormatStart Is Nothing Then
+            pDateFormatStart = New atcDateFormat
+            With pDateFormatStart
+                .IncludeHours = False
+                .IncludeMinutes = False
+                .IncludeSeconds = False
+                .Midnight24 = False
+            End With
+        End If
+
+        If pDateFormatEnd Is Nothing Then
+            pDateFormatEnd = New atcDateFormat
+            With pDateFormatEnd
                 .IncludeHours = False
                 .IncludeMinutes = False
                 .IncludeSeconds = False
@@ -127,8 +138,8 @@ Public Class atcChooseDataGroupDates
         End If
 
         If CommonDates(pDataGroup, pFirstStart, pLastEnd, pCommonStart, pCommonEnd) Then
-            lblCommonStart.Text = pDateFormat.JDateToString(pCommonStart)
-            lblCommonEnd.Text = pDateFormat.JDateToString(pCommonEnd)
+            lblCommonStart.Text = pDateFormatStart.JDateToString(pCommonStart)
+            lblCommonEnd.Text = pDateFormatEnd.JDateToString(pCommonEnd)
             btnCommon.Enabled = True
         Else
             lblCommonStart.Text = pNoDatesInCommon
@@ -137,8 +148,8 @@ Public Class atcChooseDataGroupDates
         End If
 
         If pFirstStart <= pLastEnd Then
-            lblDataStart.Text = pDateFormat.JDateToString(pFirstStart)
-            lblDataEnd.Text = pDateFormat.JDateToString(pLastEnd)
+            lblDataStart.Text = pDateFormatStart.JDateToString(pFirstStart)
+            lblDataEnd.Text = pDateFormatEnd.JDateToString(pLastEnd)
             btnAll.Enabled = True
             btnAll_Click(Nothing, Nothing)
         Else
