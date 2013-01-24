@@ -1089,12 +1089,12 @@ Public Class frmCAT
     End Sub
 
     Private Sub SetCatProperties()
-        If chkClearResults.Checked OrElse pCat.ResultsGrid Is Nothing Then
-            pCat.InitResultsGrid()
-        End If
         pCat.SaveAll = radioSaveAll.Checked
         pCat.ShowEachRunProgress = chkShowEachRunProgress.Checked
         pCat.ModifiedModelName = txtModifiedModelName.Text
+        If chkClearResults.Checked OrElse pCat.ResultsGrid Is Nothing Then
+            pCat.InitResultsGrid()
+        End If
     End Sub
 
     Private Sub StartOrRefresh(ByVal aRunModel As Boolean)
@@ -2144,10 +2144,15 @@ Public Class frmCAT
     Private Sub myTabs_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles myTabs.SelectedIndexChanged
         If Not g_Running AndAlso myTabs.SelectedTab Is tabResults AndAlso pCat IsNot Nothing Then
             Try
-                If Not pResultsSet Then
-                    pCat.InitResultsGrid()
+                If pCat IsNot Nothing Then
+                    If Not pResultsSet Then
+                        pCat.SaveAll = radioSaveAll.Checked
+                        pCat.ShowEachRunProgress = chkShowEachRunProgress.Checked
+                        pCat.ModifiedModelName = txtModifiedModelName.Text
+                        pCat.InitResultsGrid()
+                    End If
+                    PopulateResultsGrid(pCat.ResultsGrid)
                 End If
-                PopulateResultsGrid(pCat.ResultsGrid)
             Catch ex As Exception
                 Logger.Dbg("Could not populate results grid from pCat: " & ex.ToString)
             End Try
