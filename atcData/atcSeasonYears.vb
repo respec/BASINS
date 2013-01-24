@@ -7,7 +7,9 @@ Public Class atcSeasonYears
     Private WithEvents pDataGroup As atcTimeseriesGroup
 
     Private pShowBoundaries As Boolean = True
-    Private pDateFormat As atcDateFormat
+
+    Private pDateFormatStart As atcDateFormat
+    Private pDateFormatEnd As atcDateFormat
 
     Private pFirstDate As Double = GetMaxValue()
     Private pLastDate As Double = GetMinValue()
@@ -127,12 +129,24 @@ Public Class atcSeasonYears
     ''' Set all the controls to default values from current DataGroup
     ''' </summary>
     Public Sub Reset()
-        pDateFormat = New atcDateFormat
-        With pDateFormat
-            .IncludeHours = False
-            .IncludeMinutes = False
-            .IncludeSeconds = False
-        End With
+        If pDateFormatStart Is Nothing Then
+            pDateFormatStart = New atcDateFormat
+            With pDateFormatStart
+                .IncludeHours = False
+                .IncludeMinutes = False
+                .IncludeSeconds = False
+                .Midnight24 = False
+            End With
+        End If
+
+        If pDateFormatEnd Is Nothing Then
+            pDateFormatEnd = New atcDateFormat
+            With pDateFormatEnd
+                .IncludeHours = False
+                .IncludeMinutes = False
+                .IncludeSeconds = False
+            End With
+        End If
 
         pCommonStart = GetMinValue()
         pCommonEnd = GetMaxValue()
@@ -148,8 +162,8 @@ Public Class atcSeasonYears
             End If
         Next
         If pFirstDate < pLastDate Then
-            lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(pFirstDate)
-            lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(pLastDate)
+            lblDataStart.Text = lblDataStart.Tag & " " & pDateFormatStart.JDateToString(pFirstDate)
+            lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormatEnd.JDateToString(pLastDate)
             btnAll.Enabled = True
         Else
             btnAll.Enabled = False
