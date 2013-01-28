@@ -12,9 +12,83 @@ Imports System.Collections.Specialized
 Module ScriptImportPCStoWDM
     Private pDebug As Boolean = False
 
+    Public Function Write(ByVal aWDMfilename As String, ByVal Scenario As String, ByVal StationID As String, ByVal PCode As String, ByVal DateTimes() As DateTime, ByVal Values() As Double) As Boolean
+        Try
+            Dim lTS As New atcTimeseries(Nothing)
+            lTS.Dates = New atcTimeseries(Nothing)
+            lTS.numValues = Values.Length
+            Dim tu As atcUtility.atcTimeUnit
+            With lTS.Attributes
+                .SetValue("Scenario", Scenario)
+                .SetValue("Description", "Created Using WRDB")
+                .SetValue("Location", StationID)
+                .SetValue("Constituent", PCode)
+                .SetValue("Time Step", 1)
+                Dim lDateSpan As TimeSpan = DateTimes(1).Subtract(DateTimes(0))
+                If lDateSpan.TotalSeconds = 1 Then
+                    tu = atcUtility.atcTimeUnit.TUSecond
+                ElseIf lDateSpan.TotalMinutes = 1 Then
+                    tu = atcUtility.atcTimeUnit.TUMinute
+                ElseIf lDateSpan.TotalHours = 1 Then
+                    tu = atcUtility.atcTimeUnit.TUHour
+                ElseIf lDateSpan.TotalDays = 1 Then
+                    tu = atcUtility.atcTimeUnit.TUDay
+                ElseIf lDateSpan.TotalDays = 30 Then
+                    tu = atcUtility.atcTimeUnit.TUMonth
+                ElseIf lDateSpan.TotalDays = 365 Then
+                    tu = atcUtility.atcTimeUnit.TUYear
+                ElseIf lDateSpan.TotalDays = 3650 Then
+                    tu = atcUtility.atcTimeUnit.TUCentury
+                End If
+                .SetValue("tu", tu)
+                .SetValue("SJDay", DateTimes(0).ToOADate)
+                .SetValue("EJDay", DateTimes(lTS.numValues - 1).ToOADate)
+            End With
+            lTS.Value(0) = GetNaN()
+            For i As Integer = 1 To lTS.numValues
+                lTS.Dates.Value(i - 1) = DateTimes(i - 1).ToOADate
+                lTS.Value(i) = Values(i - 1)
+            Next
+            lTS.Dates.Value(lTS.numValues) = TimAddJ(lTS.Dates.Value(lTS.numValues - 1), tu, 1, 1)
+
+            Dim Wdm As New atcWDM.atcDataSourceWDM
+            If Wdm.Open(aWDMfilename) Then
+                For Each ds As atcData.atcDataSet In Wdm.DataSets
+                    If ds.Attributes.GetValue("Scenario", "") = Scenario And ds.Attributes.GetValue("Location", "") = StationID And ds.Attributes.GetValue("Constituent", "") = PCode Then
+                        Wdm.RemoveDataset(ds)
+                        Exit For
+                    End If
+                Next
+
+                Dim dsn As Integer = 0
+                dsn += 1
+                lTS.Attributes.SetValue("ID", dsn)
+                If Not Wdm.AddDataset(lTS, atcData.atcDataSource.EnumExistAction.ExistRenumber) Then Return False
+            Else
+                'WarningMsgFmt("Unable to open WDM file '{0}' for writing.", mFilename)
+                Return False
+            End If
+            Return True
+        Catch ex As Exception
+            'ErrorMsg(, ex)
+            Return False
+        End Try
+    End Function
+
+
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        ChDriveDir("C:\test")
-        Logger.StartToFile("ScriptImportPCStoWDM.log", , , True)
+        'Dim dates(5) As DateTime
+        'Dim values(5) As Double
+        'dates(0) = New Date(2000, 1, 1, 0, 0, 0)
+        'For i As Integer = 1 To 5
+        '    dates(i) = dates(0).AddDays(i)
+        '    values(i) = i
+        'Next
+        'Write("c:\test\cwtest.wdm", "Scen", "Loc", "Pcod", dates, values)
+        'Exit Sub
+
+        'ChDriveDir("C:\test")
+        'Logger.StartToFile("ScriptImportPCStoWDM.log", , , True)
 
         Dim lTextFilename As String = "qryWDMoutput.txt"
         Dim lWdmName As String = "PCS.wdm"
@@ -74,7 +148,7 @@ Module ScriptImportPCStoWDM
             Dim lCSV As New atcTableDelimited
             With lCSV
                 .Delimiter = ","c
-                Logger.Dbg("Opening " & lTextFilename )
+                Logger.Dbg("Opening " & lTextFilename)
                 If .OpenFile(lTextFilename) Then
                     Logger.Dbg("Reading " & lTextFilename & " with " & .NumRecords & " records")
                     For lRecord As Integer = 1 To .NumRecords
