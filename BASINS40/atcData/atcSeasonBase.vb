@@ -46,12 +46,13 @@ Public Class atcSeasonBase
         Dim lNewTS As atcTimeseries
         Dim lNewTSvalueIndex As Integer
         Dim lPoint As Boolean = aTS.Attributes.GetValue("point", False)
+        Dim lNumValuesOriginal As Integer = aTS.numValues
 
-        For iValue As Integer = 1 To aTS.numValues
+        For iValue As Integer = 1 To lNumValuesOriginal
             lPrevSeasonIndex = lSeasonIndex
             If lPoint Then
                 lSeasonIndex = SeasonIndex(aTS.Dates.Value(iValue))
-            Else '
+            Else
                 lSeasonIndex = SeasonIndex(aTS.Dates.Value(iValue - 1))
             End If
             lNewTS = lNewGroup.ItemByKey(lSeasonIndex)
@@ -59,8 +60,8 @@ Public Class atcSeasonBase
                 lNewTS = New atcTimeseries(aSource)
                 CopyBaseAttributes(aTS, lNewTS)
                 lNewTS.Dates = New atcTimeseries(aSource)
-                lNewTS.numValues = aTS.numValues
-                lNewTS.Dates.numValues = aTS.numValues
+                'lNewTS.numValues = lNumValuesOriginal
+                'lNewTS.Dates.numValues = lNumValuesOriginal
                 lNewTS.Attributes.AddHistory("Split by " & ToString() & " " & SeasonName(lSeasonIndex))
                 lNewTS.Attributes.Add("SeasonDefinition", Me)
                 lNewTS.Attributes.Add("SeasonIndex", lSeasonIndex)
@@ -74,17 +75,19 @@ Public Class atcSeasonBase
                 lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1)
             Else
                 lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 0)
-                If aTS.ValueAttributesExist(lNewTSvalueIndex) Then 'TODO:finish this!
-                    'lnewts.ValueAttributes(lnewtsvalueindex).SetRange(
-                End If
+                'If aTS.ValueAttributesExist(lNewTSvalueIndex) Then 'TODO:finish this!
+                '    lnewts.ValueAttributes(lnewtsvalueindex).SetRange(
+                'End If
                 If lPrevSeasonIndex <> lSeasonIndex Then
                     'Insert dummy value for start of interval after skipping dates outside season
+                    If lNewTS.numValues <= lNewTSvalueIndex Then lNewTS.numValues += Math.Min(lNewTSvalueIndex, lNumValuesOriginal - lNewTS.numValues)
                     lNewTS.Value(lNewTSvalueIndex) = pNaN
                     lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue - 1)
                     lNewTS.ValueAttributes(lNewTSvalueIndex).SetValue("Inserted", True)
                     lNewTSvalueIndex += 1
                 End If
             End If
+            If lNewTS.numValues < lNewTSvalueIndex Then lNewTS.numValues += Math.Min(lNewTSvalueIndex, lNumValuesOriginal - lNewTS.numValues)
             lNewTS.Value(lNewTSvalueIndex) = aTS.Value(iValue)
             lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue)
             lNewTS.Attributes.SetValue("NextIndex", lNewTSvalueIndex + 1)
@@ -93,7 +96,6 @@ Public Class atcSeasonBase
         For Each lNewTS In lNewGroup
             lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1) - 1
             lNewTS.numValues = lNewTSvalueIndex
-            lNewTS.Dates.numValues = lNewTSvalueIndex
             lNewTS.Attributes.RemoveByKey("nextindex")
         Next
         Return lNewGroup
