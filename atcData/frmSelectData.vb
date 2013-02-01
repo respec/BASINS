@@ -502,51 +502,6 @@ Friend Class frmSelectData
                 Threading.Thread.Sleep(10)
             End While
             If pSelectedOK Then
-                If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
-                    pSelectedGroup.ChangeTo(atcSelectedDates.CreateSelectedDataGroupSubset)
-                End If
-                If chkTimeStep.Checked Then
-
-                    Dim lAggregatedGroup As New atcTimeseriesGroup
-
-                    Dim lTimeStep As Integer
-
-                    Dim lTU As atcTimeUnit = atcTimeUnit.TUUnknown
-                    For Each lTimeUnit As atcTimeUnit In [Enum].GetValues(lTU.GetType)
-                        If [Enum].GetName(lTU.GetType, lTimeUnit) = "TU" & cboTimeUnits.Text Then
-                            lTU = lTimeUnit
-                        End If
-                    Next
-
-                    Dim lTran As atcTran = atcTran.TranNative
-                    Select Case cboAggregate.Text
-                        Case pTranSumDivLabel : lTran = atcTran.TranSumDiv
-                        Case pTranAverSameLabel : lTran = atcTran.TranAverSame
-                        Case pTranMaxLabel : lTran = atcTran.TranMax
-                        Case pTranMinLabel : lTran = atcTran.TranMin
-                        Case pTranCountMissingLabel : lTran = atcTran.TranCountMissing
-                        Case Else : lTran = atcTran.TranNative
-                    End Select
-
-                    If Not Integer.TryParse(txtTimeStep.Text, lTimeStep) Then
-                        Logger.Msg("Time step must be specified as an integer.", "Time Step Not Specified")
-                    ElseIf lTimeStep < 1 Then
-                        Logger.Msg("Time step must be >= 1.", "Time Step Less Than One")
-                    ElseIf lTU = atcTimeUnit.TUUnknown Then
-                        Logger.Msg("Time Units must be selected to change time step.", "Time Units Not Selected")
-                    ElseIf lTran = atcTran.TranNative Then
-                        Logger.Msg("Aggregation type must be selected to change time step.", "Type of Aggregation Not Selected")
-                    Else
-                        For Each lTimeseries As atcTimeseries In pSelectedGroup
-                            lAggregatedGroup.Add(Aggregate(lTimeseries, lTU, lTimeStep, lTran))
-                        Next
-                        SaveSetting("BASINS", "Select Data", "TimeUnits", cboTimeUnits.Text)
-                        SaveSetting("BASINS", "Select Data", "TimeStep", lTimeStep)
-                        SaveSetting("BASINS", "Select Data", "Transformation", cboAggregate.Text)
-                    End If
-
-                    pSelectedGroup.ChangeTo(lAggregatedGroup)
-                End If
 
             Else 'User clicked Cancel or closed dialog
                 If Not pRevertedToSaved Then pSelectedGroup.ChangeTo(pSaveGroup)
@@ -1106,6 +1061,51 @@ NextName:
             pSelectedGroup.ChangeTo(pMatchingGroup)
         End If
         pSelectedOK = True
+
+        If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
+            pSelectedGroup.ChangeTo(atcSelectedDates.CreateSelectedDataGroupSubset)
+        End If
+        If chkTimeStep.Checked Then
+            Dim lAggregatedGroup As New atcTimeseriesGroup
+            Dim lTimeStep As Integer
+
+            Dim lTU As atcTimeUnit = atcTimeUnit.TUUnknown
+            For Each lTimeUnit As atcTimeUnit In [Enum].GetValues(lTU.GetType)
+                If [Enum].GetName(lTU.GetType, lTimeUnit) = "TU" & cboTimeUnits.Text Then
+                    lTU = lTimeUnit
+                End If
+            Next
+
+            Dim lTran As atcTran = atcTran.TranNative
+            Select Case cboAggregate.Text
+                Case pTranSumDivLabel : lTran = atcTran.TranSumDiv
+                Case pTranAverSameLabel : lTran = atcTran.TranAverSame
+                Case pTranMaxLabel : lTran = atcTran.TranMax
+                Case pTranMinLabel : lTran = atcTran.TranMin
+                Case pTranCountMissingLabel : lTran = atcTran.TranCountMissing
+                Case Else : lTran = atcTran.TranNative
+            End Select
+
+            If Not Integer.TryParse(txtTimeStep.Text, lTimeStep) Then
+                Logger.Msg("Time step must be specified as an integer.", "Time Step Not Specified")
+            ElseIf lTimeStep < 1 Then
+                Logger.Msg("Time step must be >= 1.", "Time Step Less Than One")
+            ElseIf lTU = atcTimeUnit.TUUnknown Then
+                Logger.Msg("Time Units must be selected to change time step.", "Time Units Not Selected")
+            ElseIf lTran = atcTran.TranNative Then
+                Logger.Msg("Aggregation type must be selected to change time step.", "Type of Aggregation Not Selected")
+            Else
+                For Each lTimeseries As atcTimeseries In pSelectedGroup
+                    lAggregatedGroup.Add(Aggregate(lTimeseries, lTU, lTimeStep, lTran))
+                Next
+                SaveSetting("BASINS", "Select Data", "TimeUnits", cboTimeUnits.Text)
+                SaveSetting("BASINS", "Select Data", "TimeStep", lTimeStep)
+                SaveSetting("BASINS", "Select Data", "Transformation", cboAggregate.Text)
+            End If
+
+            pSelectedGroup.ChangeTo(lAggregatedGroup)
+        End If
+
         Me.Visible = False
     End Sub
 
