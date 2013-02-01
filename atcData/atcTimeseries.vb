@@ -363,17 +363,19 @@ Public Class atcTimeseries
         Set(ByVal newValue As Long)
             Try
                 If pNumValues <> newValue Then
+                    ReDim Preserve pValues(newValue)
                     pNumValues = newValue
-                    ReDim Preserve pValues(pNumValues)
                 End If
-                If Not pDates Is Nothing AndAlso pDates.numValues <> newValue Then
+                If pDates IsNot Nothing AndAlso pDates.numValues <> newValue Then
                     pDates.numValues = newValue
                 End If
-                If Not pValueAttributes Is Nothing AndAlso pValueAttributes.GetUpperBound(0) <> newValue Then
+                If pValueAttributes IsNot Nothing AndAlso pValueAttributes.GetUpperBound(0) <> newValue Then
                     ReDim Preserve pValueAttributes(pNumValues)
                 End If
             Catch ex As Exception
-                MapWinUtility.Logger.Msg("Cannot allocate " & newValue & vbCrLf & ex.Message, "Timeseries numValues")
+                Dim lMessage As String = "Timeseries exception changing numValues from " & pNumValues & " to " & newValue & " for " & Me.ToString & vbCrLf & ex.Message & vbCrLf & MemUsage()
+                MapWinUtility.Logger.Dbg(lMessage)
+                Throw New ApplicationException(lMessage)
             End Try
         End Set
     End Property
