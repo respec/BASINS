@@ -99,7 +99,7 @@ Public Class PlugIn
             'now run script
             'Return ListedSegmentsTable.ScriptMain(lArgs(0), lArgs(1), lArgs(2), lArgs(3))
             'Dim lDllFileName As String = atcUtility.GetTemporaryFileName(IO.Path.Combine(PathNameOnly(System.Reflection.Assembly.GetExecutingAssembly.Location), "RemoveMe"), ".dll")
-            Dim lAssembly As System.Reflection.Assembly = Scripting.PrepareScript("vb", Nothing, Reports(aReportIndex), lProblem, IO.Path.Combine(pMapWin.Plugins.PluginFolder, "BASINS"))
+            Dim lAssembly As System.Reflection.Assembly = Scripting.PrepareScript("vb", atcUtility.modFile.GetTemporaryFileName(IO.Path.Combine(pMapWin.Plugins.PluginFolder, "BASINS\RemoveMe-Script"), ".dll"), Reports(aReportIndex), lProblem, IO.Path.Combine(pMapWin.Plugins.PluginFolder, "BASINS"))
             If lProblem.Length = 0 Then
                 BuildReport = Scripting.Run(lAssembly, lProblem, lArgs)
             End If
