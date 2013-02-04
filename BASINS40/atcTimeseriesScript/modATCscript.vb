@@ -188,7 +188,8 @@ Friend Module modATCscript
                             Loop Until sb.ToString.EndsWith(InputEOL)
                             sb.Remove(sb.Length - LenInputEOL, LenInputEOL)
                         End If
-                    Catch 'Ignore error when we try to read past end of file
+                    Catch 'when we try to read past end of file, make sure Do Loop exits
+                        NextLineStart = LenDataFile + 1
                     End Try
                     CurrentLine = sb.ToString
                     LenCurrentLine = Len(CurrentLine)
