@@ -167,7 +167,7 @@ Public Class atcDataSourceWDM
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction _
                                                              = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean
-        Logger.Dbg("atcDataSourceWdm:AddDataset:EntryWithAction:" & aExistAction & ":" & MemUsage())
+        'Logger.Dbg("atcDataSourceWdm:AddDataset:EntryWithAction:" & aExistAction & ":" & MemUsage())
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Try
             Dim lTimser As atcTimeseries = aDataSet
@@ -551,23 +551,25 @@ CaseExistRenumber:
             End If
             .SetValueIfMissing("VBTIME", lIVal)
 
-            If lTu < atcTimeUnit.TUYear Then
-                Dim lCSDat(6) As Integer
-                If aTs.Dates Is Nothing OrElse aTs.Dates.numValues = 0 Then 'no dates in timeseries
-                    lCSDat(0) = 1950
-                Else
-                    J2Date(aTs.Dates.Value(0), lCSDat)
-                End If
+            If Not .ContainsAttribute("TSBYR") Then
+                If lTu < atcTimeUnit.TUYear Then
+                    Dim lCSDat(6) As Integer
+                    If aTs.Dates Is Nothing OrElse aTs.Dates.numValues = 0 Then 'no dates in timeseries
+                        lCSDat(0) = 1950
+                    Else
+                        J2Date(aTs.Dates.Value(0), lCSDat)
+                    End If
 
-                Dim lDecade As Integer = lCSDat(0) Mod 10
-                If lDecade > 0 Then 'subtract back to start of this decade
-                    lIVal = lCSDat(0) - lDecade
-                Else 'back to start of previous decade
-                    lIVal = lCSDat(0) - 10
+                    Dim lDecade As Integer = lCSDat(0) Mod 10
+                    If lDecade > 0 Then 'subtract back to start of this decade
+                        lIVal = lCSDat(0) - lDecade
+                    Else 'back to start of previous decade
+                        lIVal = lCSDat(0) - 10
+                    End If
+                    .SetValue("TSBYR", lIVal)
+                Else
+                    .SetValueIfMissing("TSBYR", 1700)
                 End If
-                .SetValue("TSBYR", lIVal)
-            Else
-                .SetValueIfMissing("TSBYR", 1700)
             End If
 
             .SetValueIfMissing("scen", "")
@@ -736,7 +738,7 @@ CaseExistRenumber:
             'Logger.Dbg("Data Attribute to WDM: Attribute:" & lName & ", Value:" & lValue & ", Retcod:" & lRetcod)
             If lRetcod <> 0 Then
                 If Math.Abs(lRetcod) = 104 Then 'cant update if data already present
-                    Logger.Dbg("Skip:" & lName & ", data present")
+                    'Logger.Dbg("Skip:" & lName & ", data present")
                 Else
                     Logger.Dbg("Unable to Write Data Attribute to WDM" & vbCrLf & _
                                "Attribute:" & lName & ", Value:" & lValue & ", Retcod:" & lRetcod)
