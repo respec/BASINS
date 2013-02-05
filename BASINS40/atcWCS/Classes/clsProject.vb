@@ -1072,7 +1072,7 @@ Friend Class clsProject
             Dim dictData As New Generic.SortedDictionary(Of String, clsData)
 
             For Each dsName As String In lstDatasets
-                For Each ds As atcData.atcDataSource In atcData.atcDataManager.DataSources
+                For Each ds As atcData.atcTimeseriesSource In atcData.atcDataManager.DataSources
                     Dim dataSource As String = ds.Name.Split(":")(2) & ": " & ds.Specification
                     If dsName = dataSource Then
                         For i As Integer = 0 To ds.DataSets.Count - 1
@@ -1094,6 +1094,7 @@ Friend Class clsProject
                                 If Not Double.IsNaN(EndDateDbl) Then EndDate = Date.FromOADate(EndDateDbl)
                                 dictData(StaID & PCode).Update(.GetValue("Count"), .GetValue("Min"), .GetValue("Max"), .GetValue("Mean"), StartDate, EndDate)
                             End With
+                            ds.DataSets(i).ValuesNeedToBeRead = True
                             If Not WCSForm.UpdateProgress("Summarizing data...", i, ds.DataSets.Count - 1) Then Exit Sub
                         Next
                     End If
