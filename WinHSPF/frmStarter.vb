@@ -77,7 +77,7 @@ Public Class frmStarter
     Private Sub cmdStarter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdStarter.Click
 
         OpenFileDialog1.InitialDirectory = System.Reflection.Assembly.GetEntryAssembly.Location
-        OpenFileDialog1.Filter = "HSPF User Control Input Files (*.uci)"
+        OpenFileDialog1.Filter = "HSPF User Control Input Files (*.uci)|*.uci"
         OpenFileDialog1.FileName = "*.uci"
         OpenFileDialog1.Title = "Select Starter UCI File"
 
