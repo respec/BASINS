@@ -30,7 +30,7 @@ Public Class atcCligen
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::Cligen"
+            Return "Timeseries::Cligen"
         End Get
     End Property
 
@@ -222,6 +222,7 @@ Public Class atcCligen
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         Dim lAvlOps As atcDataAttributes = AvailableOperations()
+        MyBase.Initialize(aMapWin, aParentHandle)
     End Sub
 
 
