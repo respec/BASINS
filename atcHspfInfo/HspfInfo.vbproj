@@ -148,9 +148,6 @@
     <EmbeddedResource Include="frmDebug.resX">
       <DependentUpon>frmDebug.vb</DependentUpon>
     </EmbeddedResource>
-    <None Include="_UpgradeReport.htm">
-      <SubType>Preview</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">

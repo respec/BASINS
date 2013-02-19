@@ -35,7 +35,7 @@ Module modDebug
 		
 		Dim q As Boolean
 		Dim l As Integer
-		Dim DT As dbuff
+        Dim DT As New dbuff
 		
 		On Error GoTo lpt
 		l = level

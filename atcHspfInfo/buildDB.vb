@@ -4,8 +4,7 @@ Module buildDB
 	Public myDb As DAO.Database
 	Public myTabDef As DAO.TableDef
 	Public myIndx As DAO.Index
-	'UPGRADE_WARNING: Arrays in structure myRec may need to be initialized before they can be used. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="814DF224-76BD-4BB4-BFFB-EA359CB9FC48"'
-	Public myRec As DAO.Recordset
+    Public myRec As DAO.Recordset
 	Public mySQL As String
 	Public myQuery As DAO.QueryDef
 	
