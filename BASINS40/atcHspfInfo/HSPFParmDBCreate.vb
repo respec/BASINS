@@ -280,14 +280,14 @@ Module HSPFParmDBCreate
 	
 	Sub BuildHSPFTable()
 		
-		Dim isect, offset, retid, kflg, Init, id, contfg, opnid, estflg, irept As Integer
-		Dim kwd As String
+        Dim isect, offset, retid, kflg, Init, contfg, opnid, estflg, irept As Integer
+        Dim kwd As String = ""
 		Dim tabno, omcode, uunits As Integer
 		'Retrieved in a call to F90_XTINFO to get column info for grid
 		Dim lnflds As Integer
 		Dim lscol(30) As Integer
 		Dim lflen(30) As Integer
-		Dim lftyp As String
+        Dim lftyp As String = ""
 		Dim lapos(30) As Integer
 		Dim limin(30) As Integer
 		Dim limax(30) As Integer
@@ -305,18 +305,17 @@ Module HSPFParmDBCreate
 		Dim hdrbuf(10) As String
 		Dim lfdnam(30) As String
 		Dim ParmTableID, ParmTableType As Integer
-		Dim Assoc, snam, crit As String
+        Dim Assoc As String = ""
+        Dim snam, crit As String
 		Dim i, AssocID As Integer
 		
 		Dim olen, gnum, initfg, cont As Integer
-		Dim obuff As String
+        Dim obuff As String = ""
 		Dim Occur As Integer
-		Dim SubsKeyName, AppearName, name, IDVarName, OName As String
+        Dim OName As String
 		
-		'UPGRADE_WARNING: Arrays in structure myParmDefn may need to be initialized before they can be used. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="814DF224-76BD-4BB4-BFFB-EA359CB9FC48"'
-		Dim myParmDefn As DAO.Recordset
-		'UPGRADE_WARNING: Arrays in structure myParmTableDefn may need to be initialized before they can be used. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="814DF224-76BD-4BB4-BFFB-EA359CB9FC48"'
-		Dim myParmTableDefn As DAO.Recordset
+        Dim myParmDefn As DAO.Recordset
+        Dim myParmTableDefn As DAO.Recordset
 		myParmDefn = myDb.OpenRecordset("ParmDefn", DAO.RecordsetTypeEnum.dbOpenDynaset)
 		myParmTableDefn = myDb.OpenRecordset("ParmTableDefn", DAO.RecordsetTypeEnum.dbOpenDynaset)
 		
@@ -406,8 +405,7 @@ Module HSPFParmDBCreate
 		myParmTableDefn.Close()
 		
 		myRec = myDb.OpenRecordset("ParmDefn", DAO.RecordsetTypeEnum.dbOpenDynaset)
-		'UPGRADE_WARNING: Arrays in structure myTableAliasDefn may need to be initialized before they can be used. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="814DF224-76BD-4BB4-BFFB-EA359CB9FC48"'
-		Dim myTableAliasDefn As DAO.Recordset
+        Dim myTableAliasDefn As DAO.Recordset
 		myTableAliasDefn = myDb.OpenRecordset("TableAliasDefn", DAO.RecordsetTypeEnum.dbOpenDynaset)
 		With myTableAliasDefn
 			gnum = 10

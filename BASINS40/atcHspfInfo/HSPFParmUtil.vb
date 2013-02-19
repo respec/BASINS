@@ -54,7 +54,7 @@ Module HSPFParmUtil
 	
 	Sub GetScenInfo(ByRef scnID As Integer)
 		Dim Ind, contfg, id, Init, kflg, retid, i As Integer
-		Dim kwd As String
+        Dim kwd As String = ""
 		
 		'look for perlnd, implnd, rchres operation types
 		Init = 1
@@ -79,7 +79,8 @@ Module HSPFParmUtil
 	
 	Sub GetOperInfo(ByRef OpLoc As OperDetails, ByRef scnID As Integer) 'from frmgenscnact (cousin)
 		'find information about hspf operation type
-		Dim cbuff, crit As String
+        Dim cbuff As String = ""
+        Dim crit As String = ""
 		Dim retcod, omcode, Init, retkey As Integer
 		Dim i As Short
 		'UPGRADE_WARNING: Arrays in structure mySeg may need to be initialized before they can be used. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="814DF224-76BD-4BB4-BFFB-EA359CB9FC48"'
@@ -118,9 +119,9 @@ Module HSPFParmUtil
 	
 	Sub GetTableDetails(ByRef i As Integer)
 		Dim retid, kflg, Init, contfg, Ind As Integer
-		Dim kwd As String
+        Dim kwd As String = ""
 		Dim retcod, initb, tabno, uunits, retkey, Occur As Integer
-		Dim cbuff As String
+        Dim cbuff As String = ""
 		Dim k, opL, opF, j, s As Integer
 		Dim tmp As String
 		Dim crit As String
