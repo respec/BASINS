@@ -150,6 +150,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
+      <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
+      <Name>atcUCI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility</Name>
