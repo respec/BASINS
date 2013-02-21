@@ -16,4 +16,5 @@ Public Class HspfTSGroupDef
     Public Id As Integer
     Public MemberDefs As Collection(Of HspfTSMemberDef)
     Public Name As String
+    Public GroupBase As Integer
 End Class
