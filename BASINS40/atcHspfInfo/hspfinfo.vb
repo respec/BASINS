@@ -1,6 +1,7 @@
 Option Strict Off
 Option Explicit On
 Imports MapWinUtility
+Imports System.Collections.ObjectModel
 Imports atcUtility
 Imports atcUCI
 
@@ -676,6 +677,8 @@ Module HSPFmsg
     End Function
 
     Public Sub OpenMsgFromWDM(ByVal aFilename As String)
+        Logger.Dbg("HSPFMsg:Open Msg From WDM")
+
         Dim lMsg As New atcUCI.HspfMsg
 
         If aFilename.Length = 0 Then
@@ -692,33 +695,8 @@ Module HSPFmsg
         Call F90_W99OPN() 'open error file
         Call F90_WDBFIN() 'initialize WDM record buffer
         Call F90_PUTOLV(10)
-        Dim i As Integer = 1
-        Dim fmsg As Integer = F90_WDBOPN(i, aFilename, Len(aFilename))
-        Call F90_MSGUNIT(fmsg)
-
-        'Dim lTable As HspfTableDef
-        'Dim lBlkTableDefs As New HspfTableDefs
-
-        'Dim lTabTable As DataTable = lMsgMDb.GetTable("TableDefns")
-        'Dim lTableFieldSectionID As Integer = lTabTable.Columns.IndexOf("SectionID")
-        'Dim lTableDefs As HspfTableDefs
-        'Dim lParms As New HspfParmDefs
-
-        'Dim lParmTable As DataTable = lMsgMDb.GetTable("ParmDefns")
-        'Dim lParmFieldTableID As Integer = lParmTable.Columns.IndexOf("TableID")
-        'Dim lParm As HSPFParmDef
-        'Dim lTyp As String
-
-        'Dim lTSGroupTable As DataTable = lMsgMDb.GetTable("TSGroupDefns")
-        'Dim lTSGroup As HspfTSGroupDef
-        'Dim lTSMembers As Collection(Of HspfTSMemberDef)
-        'Dim lTSMemberTable As DataTable = lMsgMDb.GetTable("TSMemberDefns")
-        'Dim lMemberFieldTSGroupID As Integer = lTSMemberTable.Columns.IndexOf("TSGroupID")
-        'Dim lTSMember As HspfTSMemberDef
-
-        'Dim lNumeric As Boolean
-
-        'Dim lBlkCount As Integer = lBlkTable.Rows.Count
+        Dim lFmsg As Integer = F90_WDBOPN(1, aFilename, Len(aFilename))
+        Call F90_MSGUNIT(lFmsg)
 
         Dim lBlockInitFg As Integer = 1
         Dim lBlockCont As Integer = 1
@@ -731,14 +709,13 @@ Module HSPFmsg
         Dim lBlockTabnam As String
         Dim lBlockOmcode As Integer
         Dim lBlkNow As Integer = 0
-        'Dim lCriticalSection As String
 
         Dim lBlockDefs As New HspfBlockDefs
         Do While lBlockCont <> 0
             'get each block and its id number
             lBlockRetid = 0
             lBlockOlen = 80
-            Call F90_WMSGTT(fmsg, lBlockSCLU, lBlockSGRP, lBlockInitFg, lBlockOlen, lBlockCont, lBlockObuff)
+            Call F90_WMSGTT(lFmsg, lBlockSCLU, lBlockSGRP, lBlockInitFg, lBlockOlen, lBlockCont, lBlockObuff)
             lBlockTabnam = Mid(lBlockObuff, 1, 12)
             lBlockOmcode = CInt(Mid(lBlockObuff, 18, 3))
             If lBlockOmcode = 100 Then
@@ -756,9 +733,6 @@ Module HSPFmsg
         For Each lBlock As HspfBlockDef In lBlockDefs
 
             Dim lSections As New HspfSectionDefs
-            'Dim lBlkTableDefs As New HspfTableDefs
-            'lCriticalSection = "BlockID = " & CStr(lBlock.Id)
-
             Dim lSectionName As String = ""
             Dim lSectionBlockID As Integer = 0
             Dim lSectionID As Integer = 0
@@ -775,7 +749,7 @@ Module HSPFmsg
                     'get each section and its id number
                     lSectionRetid = 0
                     lSectionOlen = 80
-                    Call F90_WMSGTT(fmsg, lSectionSCLU, lSectionSGRP, lSectionInitFg, lSectionOlen, lSectionCont, lSectionObuff)
+                    Call F90_WMSGTT(lFmsg, lSectionSCLU, lSectionSGRP, lSectionInitFg, lSectionOlen, lSectionCont, lSectionObuff)
                     'add each block name to the block definition table
                     'If Trim(Mid(obuff, 1, 6)) <> "ACIDPH" Then
                     lSectionName = Trim(Mid(lSectionObuff, 1, 8))
@@ -825,25 +799,25 @@ Module HSPFmsg
         Dim lrmetmax(30) As Single
         Dim lrmetdef(30) As Single
         Dim lnmhdr As Integer
-        Dim hdrbuf(10) As String
+        Dim lhdrbuf(10) As String
         Dim lfdnam(30) As String
         Dim lTableRetid As Integer = 0
-        Dim tabno As Integer = 1
-        Dim uunits As Integer = 1
-        Dim Assoc As String = ""
-        Dim gptr As Integer
-        Dim fptr(64) As Integer
-        Dim isect As Integer
-        Dim irept As Integer
+        Dim ltabno As Integer = 1
+        Dim luunits As Integer = 1
+        Dim lAssoc As String = ""
+        Dim lgptr As Integer
+        Dim lfptr(64) As Integer
+        Dim lisect As Integer
+        Dim lirept As Integer
         Dim lheader As String
-        Dim contfg As Integer
-        Dim Init As Integer
-        Dim kflg As Integer
-        Dim kwd As String = ""
-        Dim tabret As Integer
-        Dim adjLen As Integer
+        Dim lcontfg As Integer
+        Dim lInit As Integer
+        Dim lkflg As Integer
+        Dim lkwd As String = ""
+        Dim ltabret As Integer
+        Dim ladjLen As Integer
         Dim lnmhdrM As Integer
-        Dim hdrbufM(10) As String
+        Dim lhdrbufM(10) As String
         Dim ltyp As String = ""
         Dim lTableRecCount As Integer = 0
         Dim lParmRecCount As Integer = 0
@@ -858,10 +832,10 @@ Module HSPFmsg
                     'cant do for global block, get details about all others
                     If lBlock.Id < 100 Then
                         'uci block (files,ext targs, etc)
-                        Call F90_XTINFO(lBlock.Id, tabno, 2, 0, lnflds, lscol, lflen, lftyp, lapos, limetmin, limetmax, limetdef, lrmetmin, lrmetmax, lrmetdef, lnmhdr, hdrbuf, lfdnam, isect, irept, lTableRetid)
-                        Call F90_XTINFO(lBlock.Id, tabno, uunits, 0, lnflds, lscol, lflen, lftyp, lapos, limin, limax, lidef, lrmin, lrmax, lrdef, lnmhdr, hdrbuf, lfdnam, isect, irept, lTableRetid)
-                        Call F90_WMSGTW(CInt(1), Assoc)
-                        Call F90_WMSGTH(gptr, fptr(0))
+                        Call F90_XTINFO(lBlock.Id, ltabno, 2, 0, lnflds, lscol, lflen, lftyp, lapos, limetmin, limetmax, limetdef, lrmetmin, lrmetmax, lrmetdef, lnmhdr, lhdrbuf, lfdnam, lisect, lirept, lTableRetid)
+                        Call F90_XTINFO(lBlock.Id, ltabno, luunits, 0, lnflds, lscol, lflen, lftyp, lapos, limin, limax, lidef, lrmin, lrmax, lrdef, lnmhdr, lhdrbuf, lfdnam, lisect, lirept, lTableRetid)
+                        Call F90_WMSGTW(CInt(1), lAssoc)
+                        Call F90_WMSGTH(lgptr, lfptr(0))
                         If lTableRetid = 0 Then
                             lTableRecCount += 1
                             'got some info about this block
@@ -869,11 +843,11 @@ Module HSPFmsg
                             '!Name = Trim(tabnam(i - 1))
                             lTable.Name = "<NONE>"
                             lTable.Id = lTableRecCount + 1
-                            lTable.NumOccur = irept
+                            lTable.NumOccur = lirept
                             lTable.SGRP = 1
-                            lheader = addComment(RTrim(hdrbuf(0)), 0)
+                            lheader = addComment(RTrim(lhdrbuf(0)), 0)
                             For j As Integer = 2 To lnmhdr
-                                lheader = lheader & vbCrLf & addComment(RTrim(hdrbuf(j - 1)), 0)
+                                lheader = lheader & vbCrLf & addComment(RTrim(lhdrbuf(j - 1)), 0)
                             Next j
                             lTable.HeaderE = lheader
                             lTable.HeaderM = lheader
@@ -930,49 +904,49 @@ Module HSPFmsg
                     Else
                         'this is an operation type table
                         lTableRecCount += 1
-                        Init = 1
+                        lInit = 1
                         Do While lTableRetid > -1
                             'loop through each operation table (perlnd, mutsin, etc)
-                            Call F90_GTNXKW(Init, lBlock.Id, kwd, kflg, contfg, tabret)
-                            Init = 0
+                            Call F90_GTNXKW(lInit, lBlock.Id, lkwd, lkflg, lcontfg, ltabret)
+                            lInit = 0
                             'do for metric table, then english
-                            Call F90_XTINFO(lBlock.Id, tabno, 2, 0, lnflds, lscol, lflen, lftyp, lapos, limetmin, limetmax, limetdef, lrmetmin, lrmetmax, lrmetdef, lnmhdrM, hdrbufM, lfdnam, isect, irept, lTableRetid)
-                            Call F90_XTINFO(lBlock.Id, tabno, uunits, 0, lnflds, lscol, lflen, lftyp, lapos, limin, limax, lidef, lrmin, lrmax, lrdef, lnmhdr, hdrbuf, lfdnam, isect, irept, lTableRetid)
-                            Call F90_WMSGTW(CInt(1), Assoc)
+                            Call F90_XTINFO(lBlock.Id, ltabno, 2, 0, lnflds, lscol, lflen, lftyp, lapos, limetmin, limetmax, limetdef, lrmetmin, lrmetmax, lrmetdef, lnmhdrM, lhdrbufM, lfdnam, lisect, lirept, lTableRetid)
+                            Call F90_XTINFO(lBlock.Id, ltabno, luunits, 0, lnflds, lscol, lflen, lftyp, lapos, limin, limax, lidef, lrmin, lrmax, lrdef, lnmhdr, lhdrbuf, lfdnam, lisect, lirept, lTableRetid)
+                            Call F90_WMSGTW(CInt(1), lAssoc)
                             If lTableRetid = 0 Then
                                 'got a table
                                 Dim lTable As New HspfTableDef
                                 If lflen(0) = 8 Then
                                     'need to add 2 characters to starting pos
-                                    adjLen = 2
+                                    ladjLen = 2
                                 Else
-                                    adjLen = 0
+                                    ladjLen = 0
                                 End If
                                 'If Mid(kwd, 1, 5) <> "ACID-" Then
                                 'need to update some table names that were truncated
                                 'kwd = AddChar2Keyword(kwd)
-                                lTable.Name = Trim(kwd)
+                                lTable.Name = Trim(lkwd)
                                 lTable.Id = lTableRecCount
                                 lTable.Parent = lSection
-                                If isect = 0 Then
+                                If lisect = 0 Then
                                     lTable.OccurGroup = 0
-                                ElseIf isect > 20 Then
+                                ElseIf lisect > 20 Then
                                     'a group of repeating tables is denoted by this
                                     'strip off the last digit of isect
-                                    lTable.OccurGroup = isect - (Int(isect / 10) * 10)
+                                    lTable.OccurGroup = lisect - (Int(lisect / 10) * 10)
                                 Else
                                     lTable.OccurGroup = 0
                                 End If
-                                lTable.NumOccur = irept
-                                lTable.SGRP = tabno
-                                lheader = addComment(RTrim(hdrbuf(0)), adjLen)
+                                lTable.NumOccur = lirept
+                                lTable.SGRP = ltabno
+                                lheader = addComment(RTrim(lhdrbuf(0)), ladjLen)
                                 For j As Integer = 2 To lnmhdr
-                                    lheader = lheader & vbCrLf & addComment(RTrim(hdrbuf(j - 1)), adjLen)
+                                    lheader = lheader & vbCrLf & addComment(RTrim(lhdrbuf(j - 1)), ladjLen)
                                 Next j
                                 lTable.HeaderE = lheader
-                                lheader = addComment(RTrim(hdrbufM(0)), adjLen)
+                                lheader = addComment(RTrim(lhdrbufM(0)), ladjLen)
                                 For j As Integer = 2 To lnmhdrM
-                                    lheader = lheader & vbCrLf & addComment(RTrim(hdrbufM(j - 1)), adjLen)
+                                    lheader = lheader & vbCrLf & addComment(RTrim(lhdrbufM(j - 1)), ladjLen)
                                 Next j
                                 lTable.HeaderM = lheader
 
@@ -994,7 +968,7 @@ Module HSPFmsg
                                             Case "C" : lParm.Typ = 0 ' ATCoTxt
                                             Case Else : lParm.Typ = -999
                                         End Select
-                                        lParm.StartCol = lscol(j - 1) + adjLen
+                                        lParm.StartCol = lscol(j - 1) + ladjLen
                                         lParm.Length = lflen(j - 1)
                                         If lParm.Typ = 1 Then
                                             lParm.Min = limin(lapos(j - 1) - 1)
@@ -1015,7 +989,7 @@ Module HSPFmsg
                                             If lflen(j - 1) = 4 Then
                                                 If (Left(Trim(lfdnam(j - 1)), 4) = "CTAG" Or Left(Trim(lfdnam(j - 1)), 5) = "CFVOL" Or Trim(lfdnam(j - 1)) = "CEVAP" Or Trim(lfdnam(j - 1)) = "CPREC" Or Trim(lfdnam(j - 1)) = "ICAT") Then
                                                     lParm.Length = 2
-                                                    lParm.StartCol = lscol(j - 1) + adjLen + 2
+                                                    lParm.StartCol = lscol(j - 1) + ladjLen + 2
                                                 End If
                                             End If
                                         End If
@@ -1027,7 +1001,7 @@ Module HSPFmsg
                                 lTableDefs.Add(lTable)
                                 lBlockTableDefs.Add(lTable)
                             End If
-                            tabno = tabno + 1
+                            ltabno = ltabno + 1
                         Loop
                     End If
                 End If
@@ -1036,91 +1010,126 @@ Module HSPFmsg
             lBlock.TableDefs = lBlockTableDefs
         Next
 
-        'lMsg.BlockDefs = lBlockDefs
+        'fill table of timeseries groups/member names for each operation
+        Dim lTSInitfg As Integer = 1
+        Dim lTSCont As Integer = 1
+        Dim lTSSgrp As Integer = 1
+        Dim lTSIgroup As Integer = 0
+        Dim lTSRetid As Integer = 0
+        Dim lTSOlen As Integer = 0
+        Dim lTSObuff As String = ""
+        Dim lTSNgroup As Integer = 0
+        Dim lTSGroups As New HspfTSGroupDefs
+        For Each lBlock As HspfBlockDef In lBlockDefs
+            If lBlock.Id > 100 Then
+                lTSInitfg = 1
+                lTSCont = 1
+                lTSSgrp = 1
+                lTSIgroup = 0
+                Do While lTSCont <> 0
+                    'get each group name
+                    lTSRetid = 0
+                    lTSOlen = 10
+                    Call F90_WMSGTT(lFmsg, lBlock.Id + 20, lTSSgrp, lTSInitfg, lTSOlen, lTSCont, lTSObuff)
+                    Dim lTSGroup As New HspfTSGroupDef
+                    lTSGroup.Name = Trim(Mid(lTSObuff, 1, 6))
+                    lTSGroup.BlockID = lBlock.Id
+                    lTSIgroup = lTSIgroup + 1
+                    lTSGroup.Id = ((lBlock.Id - 120) * 100) + lTSIgroup
+                    'save base number for associated sgrp
+                    lTSGroup.GroupBase = CShort(Mid(lTSObuff, 8, 3))
+                    lTSInitfg = 0
+                    lTSGroups.Add(lTSGroup)
+                Loop
+            End If
+        Next
 
-        ''now read TS group and member info
-        'pTSGroupDefs = Nothing
-        'pTSGroupDefs = New HspfTSGroupDefs
-        'Dim lTSGroupFieldID As Integer = lTSGroupTable.Columns.IndexOf("ID")
-        'Dim lTSGroupFieldName As Integer = lTSGroupTable.Columns.IndexOf("Name")
-        'Dim lTSGroupFieldBlockID As Integer = lTSGroupTable.Columns.IndexOf("BlockID")
+        Dim lTSMembers As New Collection(Of HspfTSMemberDef)
+        lTSIgroup = 0
+        Dim lPrevGroup As Integer = 0
+        Dim lPrevBlock As Integer = 0
+        For Each lGroup As HspfTSGroupDef In lTSGroups
+            'now populate member names
+            If lGroup.BlockID <> lPrevBlock Then
+                lTSIgroup = 0
+            End If
+            If lGroup.Id <> lPrevGroup Then
+                lTSIgroup += 1
+            End If
+            lTSInitfg = 1
+            lTSCont = 1
+            lTSSgrp = 1 + lTSIgroup
+            lTSNgroup = 1
+            Do While lTSCont <> 0
+                'get each member name
+                lTSRetid = 0
+                lTSOlen = 8
+                Call F90_WMSGTT(lFmsg, lGroup.BlockID + 20, lTSSgrp, lTSInitfg, lTSOlen, lTSCont, lTSObuff)
+                Dim lTSMember As New HspfTSMemberDef
+                lTSMember.Name = Trim(Mid(lTSObuff, 1, 6))
+                lTSMember.TSGroupID = ((lGroup.BlockID - 120) * 100) + lTSIgroup
+                lTSMember.Id = lTSMembers.Count + 1
+                lTSMember.SCLU = lGroup.BlockID + 20
+                lTSMember.SGRP = lGroup.GroupBase + lTSNgroup
+                lTSNgroup = lTSNgroup + 1
+                lTSInitfg = 0
+                lTSMembers.Add(lTSMember)
+                lPrevGroup = lTSMember.TSGroupID
+                lPrevBlock = lGroup.BlockID
+            Loop
+        Next
 
-        'Dim lTSMemberFieldID As Integer = lTSMemberTable.Columns.IndexOf("ID")
-        'Dim lTSMemberFieldName As Integer = lTSMemberTable.Columns.IndexOf("Name")
-        'Dim lTSMemberFieldTSGroupID As Integer = lTSMemberTable.Columns.IndexOf("TSGroupID")
-        'Dim lTSMemberFieldSCLU As Integer = lTSMemberTable.Columns.IndexOf("SCLU")
-        'Dim lTSMemberFieldSGRP As Integer = lTSMemberTable.Columns.IndexOf("SGRP")
-        'Dim lTSMemberFieldmdim1 As Integer = lTSMemberTable.Columns.IndexOf("mdim1")
-        'Dim lTSMemberFieldmdim2 As Integer = lTSMemberTable.Columns.IndexOf("mdim2")
-        'Dim lTSMemberFieldmaxsb1 As Integer = lTSMemberTable.Columns.IndexOf("maxsb1")
-        'Dim lTSMemberFieldmaxsb2 As Integer = lTSMemberTable.Columns.IndexOf("maxsb2")
-        'Dim lTSMemberFieldmkind As Integer = lTSMemberTable.Columns.IndexOf("mkind")
-        'Dim lTSMemberFieldsptrn As Integer = lTSMemberTable.Columns.IndexOf("sptrn")
-        'Dim lTSMemberFieldmsect As Integer = lTSMemberTable.Columns.IndexOf("msect")
-        'Dim lTSMemberFieldmio As Integer = lTSMemberTable.Columns.IndexOf("mio")
-        'Dim lTSMemberFieldosvbas As Integer = lTSMemberTable.Columns.IndexOf("osvbas")
-        'Dim lTSMemberFieldosvoff As Integer = lTSMemberTable.Columns.IndexOf("osvoff")
-        'Dim lTSMemberFieldeunits As Integer = lTSMemberTable.Columns.IndexOf("eunits")
-        'Dim lTSMemberFieldltval1 As Integer = lTSMemberTable.Columns.IndexOf("ltval1")
-        'Dim lTSMemberFieldltval2 As Integer = lTSMemberTable.Columns.IndexOf("ltval2")
-        'Dim lTSMemberFieldltval3 As Integer = lTSMemberTable.Columns.IndexOf("ltval3")
-        'Dim lTSMemberFieldltval4 As Integer = lTSMemberTable.Columns.IndexOf("ltval4")
-        'Dim lTSMemberFielddefn As Integer = lTSMemberTable.Columns.IndexOf("defn")
-        'Dim lTSMemberFieldmunits As Integer = lTSMemberTable.Columns.IndexOf("munits")
-        'Dim lTSMemberFieldltval5 As Integer = lTSMemberTable.Columns.IndexOf("ltval5")
-        'Dim lTSMemberFieldltval6 As Integer = lTSMemberTable.Columns.IndexOf("ltval6")
-        'Dim lTSMemberFieldltval7 As Integer = lTSMemberTable.Columns.IndexOf("ltval7")
-        'Dim lTSMemberFieldltval8 As Integer = lTSMemberTable.Columns.IndexOf("ltval8")
+        ''now populate member details
+        For Each lTSMember As HspfTSMemberDef In lTSMembers
+            'get first line of details
+            lTSInitfg = 1
+            lTSOlen = 80
+            lTSCont = 1
+            lTSObuff = ""
+            Dim lSclu As Integer = lTSMember.SCLU
+            Dim lSgrp As Integer = lTSMember.SGRP
+            Call F90_WMSGTT(lFmsg, lSclu, lSgrp, lTSInitfg, lTSOlen, lTSCont, lTSObuff)
+            lTSMember.MDim1 = CShort(Mid(lTSObuff, 7, 3))
+            lTSMember.MDim2 = CShort(Mid(lTSObuff, 10, 3))
+            lTSMember.Maxsb1 = CShort(Mid(lTSObuff, 13, 6))
+            lTSMember.Maxsb2 = CShort(Mid(lTSObuff, 19, 6))
+            lTSMember.MKind = CShort(Mid(lTSObuff, 25, 2))
+            Dim lSptrn As String = Mid(lTSObuff, 27, 2)
+            If lSptrn.Trim.Length > 0 Then
+                lTSMember.Sptrn = CShort(lSptrn)
+            End If
+            lTSMember.Msect = CShort(Mid(lTSObuff, 29, 2))
+            Dim lMio As String = Mid(lTSObuff, 31, 2)
+            If lMio.Trim.Length > 0 Then
+                lTSMember.Mio = CShort(lMio)
+            End If
+            lTSMember.OsvBas = CShort(Mid(lTSObuff, 33, 5))
+            lTSMember.OsvOff = CShort(Mid(lTSObuff, 38, 6))
+            If Len(Trim(Mid(lTSObuff, 49, 8))) > 0 Then
+                lTSMember.EUnits = Trim(Mid(lTSObuff, 49, 8))
+            Else
+                lTSMember.EUnits = " "
+            End If
+            lTSMember.Ltval1 = CSng(Mid(lTSObuff, 57, 4))
+            lTSMember.Ltval2 = CSng(Mid(lTSObuff, 61, 8))
+            lTSMember.Ltval3 = CSng(Mid(lTSObuff, 69, 4))
+            lTSMember.Ltval4 = CSng(Mid(lTSObuff, 73, 8))
+            'now get second line of details
+            lTSInitfg = 0
+            lTSOlen = 80
+            Call F90_WMSGTT(lFmsg, lSclu, lSgrp, lTSInitfg, lTSOlen, lTSCont, lTSObuff)
+            lTSMember.Defn = Trim(Mid(lTSObuff, 1, 43))
+            If Len(Trim(Mid(lTSObuff, 49, 8))) > 0 Then
+                lTSMember.MUnits = Trim(Mid(lTSObuff, 49, 8))
+            Else
+                lTSMember.MUnits = " "
+            End If
+            lTSMember.Ltval5 = CSng(Mid(lTSObuff, 57, 4))
+            lTSMember.Ltval6 = CSng(Mid(lTSObuff, 61, 8))
+            lTSMember.Ltval7 = CSng(Mid(lTSObuff, 69, 4))
+            lTSMember.Ltval8 = CSng(Mid(lTSObuff, 73, 8))
+        Next
 
-        'For Each lTSGroupRow As DataRow In lTSGroupTable.Rows
-        '    lTSGroup = New HspfTSGroupDef
-        '    lTSGroup.Id = lTSGroupRow.Item(lTSGroupFieldID)
-        '    lTSGroup.Name = lTSGroupRow.Item(lTSGroupFieldName)
-        '    'If IPCset Then
-        '    '    s = "(MSG3 Reading about Timeseries Groups and Members for " & lTSGroup.Name & ")"
-        '    '    'IPC.SendMonitorMessage s
-        '    'End If
-        '    lTSGroup.BlockID = lTSGroupRow.Item(lTSGroupFieldBlockID)
-        '    lTSMembers = Nothing
-        '    lTSMembers = New Collection(Of HspfTSMemberDef)
-        '    'lTSMemberTable = myDb.GetTable("TSMemberDefns WHERE TSGroupID = " & CStr(lTSGroup.Id))
-
-        '    For Each lTSMemberRow As DataRow In lTSMemberTable.Rows
-        '        If lTSMemberRow.Item(lMemberFieldTSGroupID) = lTSGroup.Id Then
-        '            lTSMember = New HspfTSMemberDef
-        '            lTSMember.Id = lTSMemberRow.Item(lTSMemberFieldID)
-        '            lTSMember.Name = lTSMemberRow.Item(lTSMemberFieldName)
-        '            lTSMember.TSGroupID = lTSMemberRow.Item(lTSMemberFieldTSGroupID)
-        '            lTSMember.Parent = lTSGroup
-        '            lTSMember.SCLU = lTSMemberRow.Item(lTSMemberFieldSCLU)
-        '            lTSMember.SGRP = lTSMemberRow.Item(lTSMemberFieldSGRP)
-        '            lTSMember.MDim1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmdim1))
-        '            lTSMember.MDim2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmdim2))
-        '            lTSMember.Maxsb1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmaxsb1))
-        '            lTSMember.Maxsb2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmaxsb2))
-        '            lTSMember.MKind = FilterNull(lTSMemberRow.Item(lTSMemberFieldmkind))
-        '            lTSMember.Sptrn = FilterNull(lTSMemberRow.Item(lTSMemberFieldsptrn))
-        '            lTSMember.Msect = FilterNull(lTSMemberRow.Item(lTSMemberFieldmsect))
-        '            lTSMember.Mio = FilterNull(lTSMemberRow.Item(lTSMemberFieldmio))
-        '            lTSMember.OsvBas = FilterNull(lTSMemberRow.Item(lTSMemberFieldosvbas))
-        '            lTSMember.OsvOff = FilterNull(lTSMemberRow.Item(lTSMemberFieldosvoff))
-        '            lTSMember.EUnits = FilterNull(lTSMemberRow.Item(lTSMemberFieldeunits), " ")
-        '            lTSMember.Ltval1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval1))
-        '            lTSMember.Ltval2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval2))
-        '            lTSMember.Ltval3 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval3))
-        '            lTSMember.Ltval4 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval4))
-        '            lTSMember.Defn = FilterNull(lTSMemberRow.Item(lTSMemberFielddefn), " ")
-        '            lTSMember.MUnits = FilterNull(lTSMemberRow.Item(lTSMemberFieldmunits), " ")
-        '            lTSMember.Ltval5 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval5))
-        '            lTSMember.Ltval6 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval6))
-        '            lTSMember.Ltval7 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval7))
-        '            lTSMember.Ltval8 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval8))
-        '            lTSMembers.Add(lTSMember)
-        '        End If
-        '    Next
-        '    lTSGroup.MemberDefs = lTSMembers
-        '    pTSGroupDefs.Add(lTSGroup)
-        'Next
         Logger.Dbg("HSPFMsg:Open Finished")
     End Sub
 End Module
