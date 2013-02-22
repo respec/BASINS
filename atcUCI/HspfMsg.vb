@@ -390,8 +390,10 @@ Public Class HspfMsg
                     lSectionID = lBlock.Id
 
                     Dim lSection As New HspfSectionDef
+                    Dim lTables As New HspfTableDefs
                     lSection.Id = lSectionID
                     lSection.Name = lSectionName
+                    lSection.TableDefs = lTables
                     lSections.Add(lSection)
                 End If
             End If
@@ -515,12 +517,19 @@ Public Class HspfMsg
                         lTable.ParmDefs = lParms
                         lTableDefs.Add(lTable)
                         lBlockTableDefs.Add(lTable)
+                        For Each lSection As HspfSectionDef In lBlock.SectionDefs
+                            If lSection.Id = lBlock.Id Then
+                                lSection.TableDefs.Add(lTable)
+                                lTable.Parent = lSection
+                            End If
+                        Next
                         'UpdateParmsMultLines((lBlock.Name), lTable)
                     End If
                 Else
                     'this is an operation type table
-                    lTableRecCount += 1
                     lInit = 1
+                    lTableRetid = 0
+                    ltabno = 1
                     Do While lTableRetid > -1
                         'loop through each operation table (perlnd, mutsin, etc)
                         Call F90_GTNXKW(lInit, lBlock.Id, lkwd, lkflg, lcontfg, ltabret)
@@ -531,6 +540,7 @@ Public Class HspfMsg
                         Call F90_WMSGTW(CInt(1), lAssoc)
                         If lTableRetid = 0 Then
                             'got a table
+                            lTableRecCount += 1
                             Dim lTable As New HspfTableDef
                             If lflen(0) = 8 Then
                                 'need to add 2 characters to starting pos
@@ -540,7 +550,7 @@ Public Class HspfMsg
                             End If
                             'If Mid(kwd, 1, 5) <> "ACID-" Then
                             'need to update some table names that were truncated
-                            'kwd = AddChar2Keyword(kwd)
+                            lkwd = AddChar2Keyword(lkwd)
                             lTable.Name = Trim(lkwd)
                             lTable.Id = lTableRecCount
                             Dim lSectionID As Integer = 0
@@ -622,6 +632,7 @@ Public Class HspfMsg
                             For Each lSection As HspfSectionDef In lBlock.SectionDefs
                                 If lSection.Id = lSectionID Then
                                     lSection.TableDefs.Add(lTable)
+                                    lTable.Parent = lSection
                                 End If
                             Next
                         End If
@@ -643,6 +654,7 @@ Public Class HspfMsg
         Dim lTSOlen As Integer = 0
         Dim lTSObuff As String = ""
         Dim lTSNgroup As Integer = 0
+        Dim lTSMembers As New Collection(Of HspfTSMemberDef)
         For Each lBlock As HspfBlockDef In pBlockDefs
             If lBlock.Id > 100 Then
                 lTSInitfg = 1
@@ -662,16 +674,19 @@ Public Class HspfMsg
                     'save base number for associated sgrp
                     lTSGroup.GroupBase = CShort(Mid(lTSObuff, 8, 3))
                     lTSInitfg = 0
+                    lTSMembers = New Collection(Of HspfTSMemberDef)
+                    lTSGroup.MemberDefs = lTSMembers
                     pTSGroupDefs.Add(lTSGroup)
                 Loop
             End If
         Next
 
-        Dim lTSMembers As New Collection(Of HspfTSMemberDef)
+        lTSMembers = New Collection(Of HspfTSMemberDef)
         lTSIgroup = 0
         Dim lPrevGroup As Integer = 0
         Dim lPrevBlock As Integer = 0
         For Each lGroup As HspfTSGroupDef In pTSGroupDefs
+            'lGroup.MemberDefs = lTSMembers
             'now populate member names
             If lGroup.BlockID <> lPrevBlock Then
                 lTSIgroup = 0
@@ -751,6 +766,12 @@ Public Class HspfMsg
             lTSMember.Ltval6 = CSng(Mid(lTSObuff, 61, 8))
             lTSMember.Ltval7 = CSng(Mid(lTSObuff, 69, 4))
             lTSMember.Ltval8 = CSng(Mid(lTSObuff, 73, 8))
+            For Each lGroup As HspfTSGroupDef In pTSGroupDefs
+                If lGroup.Id = lTSMember.TSGroupID Then
+                    lGroup.MemberDefs.Add(lTSMember)
+                    lTSMember.Parent = lGroup
+                End If
+            Next
         Next
 
         Logger.Dbg("HSPFMsg:Open Finished")
@@ -1266,7 +1287,16 @@ Public Class HspfMsg
                 s = s & "  " & lSection.Id & " " & lSection.Name & vbCrLf
                 If lSection.TableDefs IsNot Nothing Then
                     For Each lTable As HspfTableDef In lSection.TableDefs
-                        s = s & "    " & lTable.Id & " " & lTable.Name & vbCrLf
+                        s = s & "    " & lTable.Id & " " & lTable.Name & " " & lTable.HeaderE & " " & lTable.HeaderM & " " & _
+                            lTable.NumOccur & " " & lTable.OccurGroup & " " & lTable.Parent.Name & " " & lTable.SGRP & vbCrLf
+                        For Each lParm As HSPFParmDef In lTable.ParmDefs
+                            s = s & "      " & lParm.Name & " " & lParm.Length & " " & lParm.Min & " " & lParm.Max & " " & lParm.DefaultValue & _
+                            " " & lParm.MetricMin & lParm.MetricMax & " " & lParm.MetricDefault & " " & lParm.Define & _
+                            " " & lParm.Other & " " & lParm.SoftMax & " " & lParm.SoftMin & " " & lParm.StartCol & lParm.Typ & vbCrLf
+                            If lParm.Parent IsNot Nothing Then
+                                s = s & "      " & lParm.Parent.name
+                            End If
+                        Next
                     Next
                 End If
             Next
@@ -1276,6 +1306,37 @@ Public Class HspfMsg
                 s = s & "    " & lTable.Id & " " & lTable.Name & vbCrLf
             Next
         Next
+        For Each lGroup As HspfTSGroupDef In pTSGroupDefs
+            s = s & lGroup.Id & " " & lGroup.Name & " " & lGroup.BlockID & " " & vbCrLf
+            For Each lMember As HspfTSMemberDef In lGroup.MemberDefs
+                s = s & "  " & lMember.Id & " " & lMember.Name & " " & lMember.Defn & " " & lMember.EUnits & " " & lMember.MUnits & _
+                    " " & lMember.Ltval1 & " " & lMember.Ltval2 & " " & lMember.Ltval3 & " " & lMember.Ltval4 & _
+                    " " & lMember.Ltval5 & " " & lMember.Ltval6 & " " & lMember.Ltval7 & " " & lMember.Ltval8 & _
+                    " " & lMember.Maxsb1 & " " & lMember.Maxsb2 & " " & lMember.MDim1 & " " & lMember.MDim2 & _
+                    " " & lMember.Mio & " " & lMember.MKind & " " & lMember.Msect & " " & lMember.OsvBas & _
+                    " " & lMember.OsvOff & " " & lMember.SCLU & " " & lMember.SGRP & " " & lMember.Sptrn & " " & lMember.TSGroupID & vbCrLf
+                If lMember.Parent IsNot Nothing Then
+                    s = s & "      " & lMember.Parent.Name
+                End If
+            Next
+        Next
         Return s
+    End Function
+
+    Private Function AddChar2Keyword(ByRef aKeyword As String) As String
+        Dim lKeyword As String = aKeyword
+
+        Select Case lKeyword
+            Case "MON-IFLW-CON" : lKeyword &= "C"
+            Case "MON-GRND-CON" : lKeyword &= "C"
+            Case "PEST-AD-FLAG" : lKeyword &= "S"
+            Case "PHOS-AD-FLAG" : lKeyword &= "S"
+            Case "TRAC-AD-FLAG" : lKeyword &= "S"
+            Case "PLNK-AD-FLAG" : lKeyword &= "S"
+            Case "HYDR-CATEGOR" : lKeyword &= "Y"
+            Case Else
+        End Select
+
+        Return lKeyword
     End Function
 End Class
