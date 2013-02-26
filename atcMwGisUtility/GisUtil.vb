@@ -2068,7 +2068,7 @@ Public Class GisUtil
         For lRow As Integer = lStartRow To lEndRow
             For lCol As Integer = lStartCol To lEndCol
                 lStreamVal = lStreamGrid.Value(lCol, lRow)
-                If lStreamVal > 0 Then
+                If lStreamVal > -1 Then
                     'this is a stream segment 
                     lFlowAccVal = lFlowAccGrid.Value(lCol, lRow)
                     If Not lMaxAccums.Keys.Contains(lStreamVal) Then
@@ -2086,7 +2086,7 @@ Public Class GisUtil
         For lRow As Integer = lStartRow To lEndRow
             For lCol As Integer = lStartCol To lEndCol
                 lStreamVal = lStreamGrid.Value(lCol, lRow)
-                If lStreamVal > 0 Then
+                If lStreamVal > -1 Then
                     'this is a stream segment 
                     lFlowAccVal = lFlowAccGrid.Value(lCol, lRow)
                     If lMaxAccums.ItemByKey(lStreamVal) <> lFlowAccVal Then
@@ -2629,7 +2629,7 @@ Public Class GisUtil
         For lRow As Integer = lStartRow To lEndRow
             For lCol As Integer = lStartCol To lEndCol
                 lOutletVal = lOutletGrid.Value(lCol, lRow)
-                If lOutletVal > 0 Then
+                If lOutletVal > -1 Then
                     If lOutletVal = 217 Then
                         Logger.Dbg("at outlet")
                     End If
@@ -2679,7 +2679,7 @@ Public Class GisUtil
         For lRow As Integer = lStartRow To lEndRow
             For lCol As Integer = lStartCol To lEndCol
                 lTempVal = lOutputGrid.Value(lCol, lRow)
-                If lTempVal > 0 Then
+                If lTempVal > -1 Then
                     'change this cell from loutletval to ldownstreamval
                     lOutputGrid.Value(lCol, lRow) = lDownstreamIDs.ItemByKey(lTempVal)
                 End If
