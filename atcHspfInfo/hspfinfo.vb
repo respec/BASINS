@@ -640,7 +640,8 @@ Module HSPFmsg
 
         'for testing, compare the object built from the mdb to that built from the wdm
         Dim lMsgMDB As New atcUCI.HspfMsg
-        lMsgMDB.Open("D:\BASINS41\models\WinHSPF30\bin\HspfMsg.mdb")
+        'lMsgMDB.Open("D:\BASINS41\models\WinHSPF30\bin\HspfMsg.mdb")
+        lMsgMDB.Open("HspfMsg.mdb")
         Dim lMDBstring As String = lMsgMDB.ToString
         IO.File.WriteAllText("mdb.txt", lMDBstring)
 
