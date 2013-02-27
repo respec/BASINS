@@ -499,17 +499,20 @@ Public Class HspfMsg
                                 If lParm.Typ = 1 Then
                                     lParm.Min = limin(lapos(j - 1) - 1)
                                     lParm.Max = limax(lapos(j - 1) - 1)
-                                    lParm.DefaultValue = lidef(lapos(j - 1) - 1)
+                                    lParm.DefaultValue = lidef(lapos(j - 1) - 1) & " "
                                     lParm.MetricMin = limetmin(lapos(j - 1) - 1)
                                     lParm.MetricMax = limetmax(lapos(j - 1) - 1)
-                                    lParm.MetricDefault = limetdef(lapos(j - 1) - 1)
+                                    lParm.MetricDefault = limetdef(lapos(j - 1) - 1) & " "
                                 ElseIf lParm.Typ = 2 Then
                                     lParm.Min = lrmin(lapos(j - 1) - 1)
                                     lParm.Max = lrmax(lapos(j - 1) - 1)
-                                    lParm.DefaultValue = lrdef(lapos(j - 1) - 1)
+                                    lParm.DefaultValue = lrdef(lapos(j - 1) - 1) & " "
                                     lParm.MetricMin = lrmetmin(lapos(j - 1) - 1)
                                     lParm.MetricMax = lrmetmax(lapos(j - 1) - 1)
-                                    lParm.MetricDefault = lrmetdef(lapos(j - 1) - 1)
+                                    lParm.MetricDefault = lrmetdef(lapos(j - 1) - 1) & " "
+                                Else
+                                    lParm.DefaultValue = " "
+                                    lParm.MetricDefault = " "
                                 End If
                                 lParms.Add(lParm)
                             End If
@@ -523,7 +526,6 @@ Public Class HspfMsg
                                 lTable.Parent = lSection
                             End If
                         Next
-                        'UpdateParmsMultLines((lBlock.Name), lTable)
                     End If
                 Else
                     'this is an operation type table
@@ -602,17 +604,17 @@ Public Class HspfMsg
                                     If lParm.Typ = 1 Then
                                         lParm.Min = limin(lapos(j - 1) - 1)
                                         lParm.Max = limax(lapos(j - 1) - 1)
-                                        lParm.DefaultValue = lidef(lapos(j - 1) - 1)
+                                        lParm.DefaultValue = lidef(lapos(j - 1) - 1) & " "
                                         lParm.MetricMin = limetmin(lapos(j - 1) - 1)
                                         lParm.MetricMax = limetmax(lapos(j - 1) - 1)
-                                        lParm.MetricDefault = limetdef(lapos(j - 1) - 1)
+                                        lParm.MetricDefault = limetdef(lapos(j - 1) - 1) & " "
                                     ElseIf lParm.Typ = 2 Then
                                         lParm.Min = lrmin(lapos(j - 1) - 1)
                                         lParm.Max = lrmax(lapos(j - 1) - 1)
-                                        lParm.DefaultValue = lrdef(lapos(j - 1) - 1)
+                                        lParm.DefaultValue = lrdef(lapos(j - 1) - 1) & " "
                                         lParm.MetricMin = lrmetmin(lapos(j - 1) - 1)
                                         lParm.MetricMax = lrmetmax(lapos(j - 1) - 1)
-                                        lParm.MetricDefault = lrmetdef(lapos(j - 1) - 1)
+                                        lParm.MetricDefault = lrmetdef(lapos(j - 1) - 1) & " "
                                     ElseIf lParm.Typ = 0 Then
                                         'special case for some 4character category parms
                                         If lflen(j - 1) = 4 Then
@@ -621,12 +623,15 @@ Public Class HspfMsg
                                                 lParm.StartCol = lscol(j - 1) + ladjLen + 2
                                             End If
                                         End If
+                                        lParm.DefaultValue = " "
+                                        lParm.MetricDefault = " "
                                     End If
                                     lParms.Add(lParm)
                                 End If
                             Next j
                             'End If
                             lTable.ParmDefs = lParms
+                            UpdateParmsMultLines(lBlock.Name, lTable)
                             lTableDefs.Add(lTable)
                             lBlockTableDefs.Add(lTable)
                             For Each lSection As HspfSectionDef In lBlock.SectionDefs
@@ -641,6 +646,85 @@ Public Class HspfMsg
                 End If
             End If
             lBlock.TableDefs = lBlockTableDefs
+        Next
+
+        'get help information for each table
+        Dim lHhdrbuf(10) As String
+        Dim lHolen As Integer
+        Dim lHinitfg As Integer
+        Dim lHcont As Integer
+        Dim lHobuff As String
+        Dim lHTempbuff As String
+        Dim lHSclu As Integer
+        Dim lHgptr As Integer
+        Dim lHisect As Integer
+        Dim lHirept As Integer
+        Dim lHRetid As Integer
+        Dim lHFptr(64) As Integer
+        For Each lBlock As HspfBlockDef In pBlockDefs
+            For Each lSection As HspfSectionDef In lBlock.SectionDefs
+                For Each lTable As HspfTableDef In lSection.TableDefs
+                    Call F90_XTINFO(lBlock.Id, lTable.SGRP, 1, 0, lnflds, lscol, lflen, lftyp, lapos, limin, limax, lidef, lrmin, lrmax, lrdef, lnmhdr, lHhdrbuf, lfdnam, lHisect, lHirept, lHRetid)
+                    lHinitfg = 1
+                    lHolen = 80
+                    lHcont = 1
+                    lHobuff = ""
+                    lHTempbuff = ""
+                    lHSclu = -1
+                    Call F90_WMSGTH(lHgptr, lHFptr(0))
+                    Do While lHcont = 1
+                        If lHgptr > 0 Then
+                            lHolen = 80
+                            Call F90_WMSGTT(lFmsg, lHSclu, lHgptr, lHinitfg, lHolen, lHcont, lHobuff)
+                            If Len(lHTempbuff) = 0 Then
+                                lHTempbuff = Trim(lHobuff)
+                            Else
+                                lHTempbuff = lHTempbuff & " " & Trim(lHobuff)
+                            End If
+                            lHSclu = 0
+                        Else
+                            lHcont = 0
+                        End If
+                    Loop
+                    If lHTempbuff.Length > 0 Then
+                        lTable.Define = Trim(lHTempbuff)
+                    Else
+                        lTable.Define = " "
+                    End If
+                    'now fill parameter help
+                    Dim lHistart As Integer = 2
+                    If lBlock.Id = 4 Then
+                        'special case for ftables
+                        lHistart = 1
+                    End If
+                    For lFieldIndex As Integer = lHistart To lnflds
+                        If Len(Trim(lfdnam(lFieldIndex - 1))) > 0 Then
+                            'dont add help for fields without field names
+                            If lHFptr(lFieldIndex - 1) > 0 Then
+                                lHinitfg = 1
+                                lHolen = 80
+                                lHcont = 1
+                                lHobuff = ""
+                                lHTempbuff = ""
+                                lHSclu = -1
+                                Do While lHcont = 1
+                                    lHolen = 80
+                                    Call F90_WMSGTT(lFmsg, lHSclu, lHFptr(lFieldIndex - 1), lHinitfg, lHolen, lHcont, lHobuff)
+                                    If Len(lHTempbuff) = 0 Then
+                                        lHTempbuff = Trim(lHobuff)
+                                    Else
+                                        lHTempbuff = lHTempbuff & " " & Trim(lHobuff)
+                                    End If
+                                    lHSclu = 0
+                                Loop
+                                lTable.ParmDefs(lFieldIndex - lHistart).Define = Trim(lHTempbuff) & " "
+                            Else
+                                lTable.ParmDefs(lFieldIndex - lHistart).Define = " "
+                            End If
+                        End If
+                    Next lFieldIndex
+                Next
+            Next
         Next
 
         'fill table of timeseries groups/member names for each operation
@@ -1287,8 +1371,11 @@ Public Class HspfMsg
                 s = s & "  " & lSection.Id & " " & lSection.Name & vbCrLf
                 If lSection.TableDefs IsNot Nothing Then
                     For Each lTable As HspfTableDef In lSection.TableDefs
+                        If lTable.Name = "MON-MELT-FAC" Then
+                            Logger.Dbg(lBlock.Name)
+                        End If
                         s = s & "    " & lTable.Id & " " & lTable.Name & " " & lTable.HeaderE & " " & lTable.HeaderM & " " & _
-                            lTable.NumOccur & " " & lTable.OccurGroup & " " & lTable.Parent.Name & " " & lTable.SGRP & vbCrLf
+                            lTable.NumOccur & " " & lTable.OccurGroup & " " & lTable.Parent.Name & " " & lTable.SGRP & " " & lTable.Define & vbCrLf
                         For Each lParm As HSPFParmDef In lTable.ParmDefs
                             s = s & "      " & lParm.Name & " " & lParm.Length & " " & lParm.Min & " " & lParm.Max & " " & lParm.DefaultValue & _
                             " " & lParm.MetricMin & lParm.MetricMax & " " & lParm.MetricDefault & " " & lParm.Define & _
