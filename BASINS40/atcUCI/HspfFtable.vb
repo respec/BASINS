@@ -29,6 +29,7 @@ Public Class HspfFtable
     Private pOutflow5AsRead() As String
     Private pOperation As HspfOperation
     Private pComment As String = ""
+    Private pExtendedFlag As Boolean = False
 
     Public Property Depth(ByVal aRow As Integer) As Double
         Get
@@ -183,6 +184,15 @@ Public Class HspfFtable
         End Set
     End Property
 
+    Public Property ExtendedFlag() As Boolean
+        Get
+            Return pExtendedFlag
+        End Get
+        Set(ByVal Value As Boolean)
+            pExtendedFlag = Value
+        End Set
+    End Property
+
     Public Property Id() As Integer
         Get
             Return pId
@@ -268,7 +278,13 @@ Public Class HspfFtable
             lSB.AppendLine("  FTABLE    " & myFormatI(lOpn.FTable.Id, 3))
             With lOpn.FTable
                 lSB.AppendLine(" rows cols" & Space((.Ncols - 1) * 10) & " ***")
-                lSB.AppendLine(myFormatI(lOpn.FTable.Nrows, 5) & myFormatI(lOpn.FTable.Ncols, 5))
+                Dim lSpacing As Integer = 10
+                If .ExtendedFlag Then
+                    lSB.AppendLine(myFormatI(lOpn.FTable.Nrows, 5) & myFormatI(lOpn.FTable.Ncols, 5) & "    Extended")
+                    lSpacing = 15
+                Else
+                    lSB.AppendLine(myFormatI(lOpn.FTable.Nrows, 5) & myFormatI(lOpn.FTable.Ncols, 5))
+                End If
                 If Not (.Comment Is Nothing) AndAlso .Comment.Length > 0 Then
                     lSB.AppendLine(.Comment)
                 Else
@@ -282,18 +298,18 @@ Public Class HspfFtable
                     If NumericallyTheSame(.DepthAsRead(lRow), .Depth(lRow)) Then
                         s = .DepthAsRead(lRow)
                     Else
-                        s = Format(.Depth(lRow), lFmt).PadLeft(10)
+                        s = Format(.Depth(lRow), lFmt).PadLeft(lSpacing)
                     End If
                     If NumericallyTheSame(.AreaAsRead(lRow), .Area(lRow)) Then
                         t = .AreaAsRead(lRow)
                     Else
-                        t = Format(.Area(lRow), lFmt).PadLeft(10)
+                        t = Format(.Area(lRow), lFmt).PadLeft(lSpacing)
                     End If
                     s &= t
                     If NumericallyTheSame(.VolumeAsRead(lRow), .Volume(lRow)) Then
                         t = .VolumeAsRead(lRow)
                     Else
-                        t = Format(.Volume(lRow), lFmt).PadLeft(10)
+                        t = Format(.Volume(lRow), lFmt).PadLeft(lSpacing)
                     End If
                     s &= t
                     For lOutflowIndex As Integer = 1 To .Ncols - 3
@@ -301,34 +317,34 @@ Public Class HspfFtable
                             If NumericallyTheSame(.Outflow1AsRead(lRow), .Outflow1(lRow)) Then
                                 t = .Outflow1AsRead(lRow)
                             Else
-                                t = Format(.Outflow1(lRow), lFmt).PadLeft(10)
-                                If t.Length > 10 Then 'too many digits in the number
-                                    t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow1(lRow)), 10).PadLeft(10)
+                                t = Format(.Outflow1(lRow), lFmt).PadLeft(lSpacing)
+                                If t.Length > lSpacing Then 'too many digits in the number
+                                    t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow1(lRow)), lSpacing).PadLeft(lSpacing)
                                 End If
                             End If
                         ElseIf lOutflowIndex = 2 Then
                             If NumericallyTheSame(.Outflow2AsRead(lRow), .Outflow2(lRow)) Then
                                 t = .Outflow2AsRead(lRow)
                             Else
-                                t = Format(.Outflow2(lRow), lFmt).PadLeft(10)
+                                t = Format(.Outflow2(lRow), lFmt).PadLeft(lSpacing)
                             End If
                         ElseIf lOutflowIndex = 3 Then
                             If NumericallyTheSame(.Outflow3AsRead(lRow), .Outflow3(lRow)) Then
                                 t = .Outflow3AsRead(lRow)
                             Else
-                                t = Format(.Outflow3(lRow), lFmt).PadLeft(10)
+                                t = Format(.Outflow3(lRow), lFmt).PadLeft(lSpacing)
                             End If
                         ElseIf lOutflowIndex = 4 Then
                             If NumericallyTheSame(.Outflow4AsRead(lRow), .Outflow4(lRow)) Then
                                 t = .Outflow4AsRead(lRow)
                             Else
-                                t = Format(.Outflow4(lRow), lFmt).PadLeft(10)
+                                t = Format(.Outflow4(lRow), lFmt).PadLeft(lSpacing)
                             End If
                         ElseIf lOutflowIndex = 5 Then
                             If NumericallyTheSame(.Outflow5AsRead(lRow), .Outflow5(lRow)) Then
                                 t = .Outflow5AsRead(lRow)
                             Else
-                                t = Format(.Outflow5(lRow), lFmt).PadLeft(10)
+                                t = Format(.Outflow5(lRow), lFmt).PadLeft(lSpacing)
                             End If
                         End If
                         s &= t

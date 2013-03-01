@@ -78,8 +78,8 @@ Public Module WinHSPF
 
         'open hspf message mdb
         pMsg = New HspfMsg
-        pMsg.Open("hspfmsg.mdb")
-        Logger.Dbg("WinHSPF:Opened:hspfmsg.mdb")
+        pMsg.Open("hspfmsg.wdm")
+        Logger.Dbg("WinHSPF:Opened:hspfmsg.wdm")
 
         'get starter uci ready
         Dim lStarterUciName As String = "starter.uci"
