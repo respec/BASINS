@@ -2101,6 +2101,7 @@ Public Module modGeoSFM
                     lRivList.Add(lCurrentRecord)
                 End If
             Loop
+            lStreamReader.Close()
         Catch e As ApplicationException
             Logger.Msg("Problem reading the river file " & lRiverFN & ".", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
             Return False
@@ -2119,6 +2120,7 @@ Public Module modGeoSFM
                     lResponseList.Add(lCurrentRecord)
                 End If
             Loop
+            lStreamReader.Close()
         Catch e As ApplicationException
             Logger.Msg("Problem reading the response file " & lResponseFN & ".", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
             Return False
@@ -2145,6 +2147,7 @@ Public Module modGeoSFM
                     lRunoffList.Add(lCurrentRecord)
                 End If
             Loop
+            lStreamReader.Close()
         Catch e As ApplicationException
             Logger.Msg("Problem reading the runoff file " & lRunoffFN & ".", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
             Return False
@@ -2236,6 +2239,7 @@ Public Module modGeoSFM
                                 lReservoirList.Add(lResvid, lCurrentRecord)
                             End If
                         Loop
+                        lStreamReader.Close()
                     Catch e As ApplicationException
                         Logger.Msg("Could not open reservoir characteristics file," & vbCrLf & lReservoirFN, MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
                         Exit Function
@@ -2289,6 +2293,7 @@ Public Module modGeoSFM
                                 lOpList.Add(lCurrentRecord)
                             End If
                         Loop
+                        lStreamReader.Close()
                     Catch e As ApplicationException
                         Logger.Msg("Problem reading reservoir operations file," & vbCrLf & lOperateFN, MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
                         Return False
@@ -2336,6 +2341,11 @@ Public Module modGeoSFM
 
         Next
 
+        If Not FileExists(lDamlinkFN) Then
+            Dim lDamLinkFile As New StringBuilder
+            SaveFileString(lDamlinkFN, lDamLinkFile.ToString)
+        End If
+
         Dim lBalstr As String = ""
         Dim lRoutstr As String = ""
         Dim lBalanceType As String = ""
@@ -2356,6 +2366,7 @@ Public Module modGeoSFM
                         lBigList.Add(lCurrentRecord)
                     End If
                 Loop
+                lStreamReader.Close()
             Catch e As ApplicationException
                 Logger.Msg("Could not open whichModel.txt file" & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
                 Return False
