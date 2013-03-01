@@ -2491,6 +2491,16 @@ x:
                         Else
                             .Ncols = 0
                         End If
+
+                        .ExtendedFlag = False
+                        If lBuff.Length > 10 Then
+                            'this could be the extended format
+                            lString = lBuff.Substring(14, 1)
+                            If lString = "E" Then
+                                .ExtendedFlag = True
+                            End If
+                        End If
+
                         Dim lRow As Integer = 1
                         Do While lRow <= .Nrows
                             GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
@@ -2501,7 +2511,7 @@ x:
                                 Else
                                     .Comment &= vbCrLf & lBuff
                                 End If
-                            Else 'this is a regular record
+                            ElseIf .ExtendedFlag = False Then 'this is a regular record
                                 .Depth(lRow) = CDbl(Left(lBuff, 10))
                                 .DepthAsRead(lRow) = Left(lBuff, 10)
                                 .Area(lRow) = CDbl(Mid(lBuff, 11, 10))
@@ -2528,6 +2538,23 @@ x:
                                 If lExit > 4 Then
                                     .Outflow5(lRow) = CDbl(Mid(lBuff, 71, 10))
                                     .Outflow5AsRead(lRow) = Mid(lBuff, 71, 10)
+                                End If
+                                lRow += 1
+                            ElseIf .ExtendedFlag Then  'this is the extended format ftable
+                                .Depth(lRow) = CDbl(Left(lBuff, 15))
+                                .DepthAsRead(lRow) = Left(lBuff, 15)
+                                .Area(lRow) = CDbl(Mid(lBuff, 16, 15))
+                                .AreaAsRead(lRow) = Mid(lBuff, 16, 15)
+                                .Volume(lRow) = CDbl(Mid(lBuff, 31, 15))
+                                .VolumeAsRead(lRow) = Mid(lBuff, 31, 15)
+                                Dim lExit As Integer = .Ncols - 3
+                                If lExit > 0 Then
+                                    .Outflow1(lRow) = CDbl(Mid(lBuff, 46, 15))
+                                    .Outflow1AsRead(lRow) = Mid(lBuff, 46, 15)
+                                End If
+                                If lExit > 1 Then
+                                    .Outflow2(lRow) = CDbl(Mid(lBuff, 61, 15))
+                                    .Outflow2AsRead(lRow) = Mid(lBuff, 61, 15)
                                 End If
                                 lRow += 1
                             End If
