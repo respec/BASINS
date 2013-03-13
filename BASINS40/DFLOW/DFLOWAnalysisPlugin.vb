@@ -77,7 +77,7 @@ Public Class DFLOWAnalysisPlugin
         If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup
 
         If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
-            lTimeseriesGroup.AddRange(atcDataManager.UserSelectData("Select Data For DFLOW Analysis", lTimeseriesGroup, Nothing, True))
+            atcDataManager.UserSelectData("Select Data For DFLOW Analysis", lTimeseriesGroup, Nothing, True)
         End If
 
         If lTimeseriesGroup.Count > 0 Then

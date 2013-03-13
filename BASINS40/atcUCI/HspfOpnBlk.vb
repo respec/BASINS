@@ -196,7 +196,11 @@ Public Class HspfOpnBlk
                                     lTable.Comment = lComment(lStringIndex)
                                 End If
                                 If lOccurCount > 1 And lOccurNum > 1 Then
-                                    lOperation.Tables.Add(lTable)
+                                    If Not lOperation.Tables.Contains(lTable.Name & ":" & lOccurNum) Then
+                                        lOperation.Tables.Add(lTable)
+                                    Else
+                                        Logger.Dbg("TableProblem:" & lTable.Name & ":" & lOccurNum & " for " & lOperation.Name & " " & lOperation.Id)
+                                    End If
                                     If Not TableExists(lTable.Name & ":" & lOccurNum) Then
                                         pTables.Add(lTable)
                                     End If
