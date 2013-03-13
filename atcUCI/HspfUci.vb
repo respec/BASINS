@@ -1940,7 +1940,9 @@ x:
                         lConn.MassLink = aImplndMasslink
                     End If
                     pConnections.Add(lConn)
-                    lSourceConnection.Source.Opn.Targets.Add(lConn)
+                    If OperationExists(lSourceConnection.Source.Opn.Name, lSourceConnection.Source.Opn.Id) Then
+                        lSourceConnection.Source.Opn.Targets.Add(lConn)
+                    End If
                     lCopyOpn = pOpnBlks.Item("COPY").OperFromID(aCopyId)
                     lCopyOpn.Sources.Add(lConn)
                 End If
