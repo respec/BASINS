@@ -4148,22 +4148,36 @@ Public Class GisUtil
         'create list of unique colors to we make sure none are repeated
         Dim lstUniqueColors As New Generic.List(Of Integer)
         lSf.Categories.Clear()
+        Dim i As Integer = 1
         For Each shpValue As String In lUniqueValues.Keys
             With lSf.Categories.Add(shpValue)
                 With .DrawingOptions
-                    Dim color As Integer = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
-                    Do Until Not lstUniqueColors.Contains(color)
-                        color = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
-                    Loop
-                    lstUniqueColors.Add(color)
-                    .LineColor = color
-                    .FillColor = color
+                    If aColors Is Nothing Then
+                        Dim color As Integer = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
+                        Do Until Not lstUniqueColors.Contains(color)
+                            color = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
+                        Loop
+                        lstUniqueColors.Add(color)
+                        .LineColor = color
+                        .FillColor = color
+                    Else
+                        lstUniqueColors.Add(aColors(i))
+                        .LineColor = aColors(i)
+                        .FillColor = aColors(i)
+                    End If
                 End With
+                If Not aCaptions Is Nothing Then
+                    .Name = aCaptions(i)
+                End If
+                i += 1
             End With
             For Each shpIndex As Integer In lUniqueValues(shpValue)
                 lSf.ShapeCategory(shpIndex) = lSf.Categories.Count - 1
             Next
         Next
+        lMWlayer.Visible = False
+        lMWlayer.Visible = True
+        pMapWin.Refresh()
     End Sub
 
     Public Shared Sub BufferLayer(ByVal aInputShapefileFilename As String, ByVal aResultShapefileFilename As String, _
