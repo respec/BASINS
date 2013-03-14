@@ -248,6 +248,7 @@ Public Class frmGeoSFM
         Me.cmdAbout = New System.Windows.Forms.Button
         Me.tabMain = New System.Windows.Forms.TabControl
         Me.tpgTerrain = New System.Windows.Forms.TabPage
+        Me.chkConnectUEB = New System.Windows.Forms.CheckBox
         Me.gbxShapefiles = New System.Windows.Forms.GroupBox
         Me.cboReach = New System.Windows.Forms.ComboBox
         Me.Label50 = New System.Windows.Forms.Label
@@ -305,6 +306,8 @@ Public Class frmGeoSFM
         Me.rbnNonUniformUSGS = New System.Windows.Forms.RadioButton
         Me.lblMethod = New System.Windows.Forms.Label
         Me.tpgUEBGrid = New System.Windows.Forms.TabPage
+        Me.AtcGridNetCDFGridsForUEB = New atcControls.atcGrid
+        Me.lblDefineUEBGrid = New System.Windows.Forms.Label
         Me.cmdUEBGridNext = New System.Windows.Forms.Button
         Me.cmdDefineUEBGrid = New System.Windows.Forms.Button
         Me.lblNetCDFGridsForUEB = New System.Windows.Forms.Label
@@ -440,9 +443,6 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.chkConnectUEB = New System.Windows.Forms.CheckBox
-        Me.lblDefineUEBGrid = New System.Windows.Forms.Label
-        Me.AtcGridNetCDFGridsForUEB = New atcControls.atcGrid
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.gbxShapefiles.SuspendLayout()
@@ -544,6 +544,16 @@ Public Class frmGeoSFM
         Me.tpgTerrain.TabIndex = 10
         Me.tpgTerrain.Text = "Terrain Analysis"
         Me.tpgTerrain.UseVisualStyleBackColor = True
+        '
+        'chkConnectUEB
+        '
+        Me.chkConnectUEB.AutoSize = True
+        Me.chkConnectUEB.Location = New System.Drawing.Point(39, 62)
+        Me.chkConnectUEB.Name = "chkConnectUEB"
+        Me.chkConnectUEB.Size = New System.Drawing.Size(252, 17)
+        Me.chkConnectUEB.TabIndex = 43
+        Me.chkConnectUEB.Text = "Connect UEBGrid model to this GeoSFM project"
+        Me.chkConnectUEB.UseVisualStyleBackColor = True
         '
         'gbxShapefiles
         '
@@ -1265,6 +1275,34 @@ Public Class frmGeoSFM
         Me.tpgUEBGrid.TabIndex = 17
         Me.tpgUEBGrid.Text = "UEBGrid"
         Me.tpgUEBGrid.UseVisualStyleBackColor = True
+        '
+        'AtcGridNetCDFGridsForUEB
+        '
+        Me.AtcGridNetCDFGridsForUEB.AllowHorizontalScrolling = True
+        Me.AtcGridNetCDFGridsForUEB.AllowNewValidValues = False
+        Me.AtcGridNetCDFGridsForUEB.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridNetCDFGridsForUEB.CellBackColor = System.Drawing.SystemColors.Window
+        Me.AtcGridNetCDFGridsForUEB.Fixed3D = False
+        Me.AtcGridNetCDFGridsForUEB.LineColor = System.Drawing.SystemColors.Control
+        Me.AtcGridNetCDFGridsForUEB.LineWidth = 1.0!
+        Me.AtcGridNetCDFGridsForUEB.Location = New System.Drawing.Point(31, 99)
+        Me.AtcGridNetCDFGridsForUEB.Name = "AtcGridNetCDFGridsForUEB"
+        Me.AtcGridNetCDFGridsForUEB.Size = New System.Drawing.Size(583, 87)
+        Me.AtcGridNetCDFGridsForUEB.Source = Nothing
+        Me.AtcGridNetCDFGridsForUEB.TabIndex = 54
+        '
+        'lblDefineUEBGrid
+        '
+        Me.lblDefineUEBGrid.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblDefineUEBGrid.Location = New System.Drawing.Point(89, 203)
+        Me.lblDefineUEBGrid.Name = "lblDefineUEBGrid"
+        Me.lblDefineUEBGrid.Size = New System.Drawing.Size(469, 44)
+        Me.lblDefineUEBGrid.TabIndex = 53
+        Me.lblDefineUEBGrid.Text = "The UEBGrid model must be defined and run before proceeding to the Rain/Evap Data" & _
+            " tab. Click the Define UEBGrid Model button to implement the UEBGrid user interf" & _
+            "ace."
+        Me.lblDefineUEBGrid.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cmdUEBGridNext
         '
@@ -2911,42 +2949,6 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'chkConnectUEB
-        '
-        Me.chkConnectUEB.AutoSize = True
-        Me.chkConnectUEB.Location = New System.Drawing.Point(39, 62)
-        Me.chkConnectUEB.Name = "chkConnectUEB"
-        Me.chkConnectUEB.Size = New System.Drawing.Size(252, 17)
-        Me.chkConnectUEB.TabIndex = 43
-        Me.chkConnectUEB.Text = "Connect UEBGrid model to this GeoSFM project"
-        Me.chkConnectUEB.UseVisualStyleBackColor = True
-        '
-        'lblDefineUEBGrid
-        '
-        Me.lblDefineUEBGrid.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblDefineUEBGrid.Location = New System.Drawing.Point(89, 203)
-        Me.lblDefineUEBGrid.Name = "lblDefineUEBGrid"
-        Me.lblDefineUEBGrid.Size = New System.Drawing.Size(469, 44)
-        Me.lblDefineUEBGrid.TabIndex = 53
-        Me.lblDefineUEBGrid.Text = "The UEBGrid model must be defined and run before proceeding to the Rain/Evap Data" & _
-            " tab. Click the Define UEBGrid Model button to implement the UEBGrid user interf" & _
-            "ace."
-        Me.lblDefineUEBGrid.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'AtcGridNetCDFGridsForUEB
-        '
-        Me.AtcGridNetCDFGridsForUEB.AllowHorizontalScrolling = True
-        Me.AtcGridNetCDFGridsForUEB.AllowNewValidValues = False
-        Me.AtcGridNetCDFGridsForUEB.CellBackColor = System.Drawing.SystemColors.Window
-        Me.AtcGridNetCDFGridsForUEB.Fixed3D = False
-        Me.AtcGridNetCDFGridsForUEB.LineColor = System.Drawing.SystemColors.Control
-        Me.AtcGridNetCDFGridsForUEB.LineWidth = 1.0!
-        Me.AtcGridNetCDFGridsForUEB.Location = New System.Drawing.Point(31, 99)
-        Me.AtcGridNetCDFGridsForUEB.Name = "AtcGridNetCDFGridsForUEB"
-        Me.AtcGridNetCDFGridsForUEB.Size = New System.Drawing.Size(583, 87)
-        Me.AtcGridNetCDFGridsForUEB.Source = Nothing
-        Me.AtcGridNetCDFGridsForUEB.TabIndex = 54
-        '
         'frmGeoSFM
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -4451,4 +4453,13 @@ Public Class frmGeoSFM
                    "If you do not wish to link the two models, click the Rain/Evap Data tab where you will need to provide precipitation data as input to GeoSFM.")
         End If
     End Sub
+
+    Private Sub tpgTerrain_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles tpgTerrain.Leave
+        If chkConnectUEB.Checked Then
+            pLinkToUEBGrid = True
+        Else
+            pLinkToUEBGrid = False
+        End If
+    End Sub
+
 End Class
