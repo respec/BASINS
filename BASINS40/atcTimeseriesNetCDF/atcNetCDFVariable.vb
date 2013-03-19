@@ -138,7 +138,7 @@ Public Class atcNetCDFVariable
         End Select
         If lReturnValues IsNot Nothing Then
             Dim lValueDumpCount As Integer = Math.Min(pValueDumpMax, aDimensionLength - 1)
-            For lValueIndex = 0 To lValueDumpCount
+            For lValueIndex = 0 To lValueDumpCount - 1
                 Logger.Dbg("value (" & lValueIndex & ") = " & Str(lReturnValues(lValueIndex)))
             Next
         End If
