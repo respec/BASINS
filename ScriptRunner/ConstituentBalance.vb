@@ -73,7 +73,7 @@ Public Module ConstituentBalanceScript
             'call main constituent balances routine
             Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
             Dim lMsg As New atcUCI.HspfMsg
-            lMsg.Open("hspfmsg.mdb")
+            lMsg.Open("hspfmsg.wdm")
             Dim lHspfUci As New atcUCI.HspfUci
             lHspfUci.FastReadUciForStarter(lMsg, lScenario & ".uci")
             ConstituentBalance.ReportsToFiles(lHspfUci, lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lHspfBinFileInfo.LastWriteTime)

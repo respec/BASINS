@@ -10,7 +10,7 @@ Module ExpertSystemStatistics
         ChDriveDir(pTestPath)
         'open uci file
         Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb")
+        lMsg.Open("hspfmsg.wdm")
         Dim lHspfUci As New atcUCI.HspfUci
         lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
 

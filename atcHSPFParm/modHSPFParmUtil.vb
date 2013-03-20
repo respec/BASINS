@@ -674,7 +674,7 @@ Module modHSPFParmUtil
         If FileExists(aScn.UCIFilename) Then
             lUci = New HspfUci()
             Dim pMsg As New HspfMsg
-            pMsg.Open("hspfmsg.mdb")
+            pMsg.Open("hspfmsg.wdm")
 
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
             Logger.Status("SHOW")

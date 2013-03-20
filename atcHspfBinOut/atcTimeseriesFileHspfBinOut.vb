@@ -231,7 +231,7 @@ Public Class atcTimeseriesFileHspfBinOut
                 If pHspfMsgUnits.Count = 0 Then
                     If pHspfMsg Is Nothing Then 'might need the message file for units
                         pHspfMsg = New HspfMsg
-                        pHspfMsg.Open("hspfmsg.mdb")
+                        pHspfMsg.Open("hspfmsg.wdm")
                     End If
                     For lTsGroupIndex As Integer = 0 To pHspfMsg.TSGroupDefs.Count - 1
                         Dim lTsGroup As atcUCI.HspfTSGroupDef = pHspfMsg.TSGroupDefs(lTsGroupIndex)

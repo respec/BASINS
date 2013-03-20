@@ -148,7 +148,7 @@ Public Class frmAddScenario
             pUci = New HspfUci
 
             Dim pMsg As New HspfMsg
-            pMsg.Open("hspfmsg.mdb")
+            pMsg.Open("hspfmsg.wdm")
 
             txtUCIName.Text = cdUCI.FileName
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor

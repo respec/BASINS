@@ -68,7 +68,7 @@ Public Module WatershedSummaryInteractive
 
                 'make uci available 
                 Dim lMsg As New atcUCI.HspfMsg
-                lMsg.Open("hspfmsg.mdb")
+                lMsg.Open("hspfmsg.wdm")
                 Dim lHspfUci As New atcUCI.HspfUci
                 lHspfUci.FastReadUciForStarter(lMsg, lScenario & ".uci")
 

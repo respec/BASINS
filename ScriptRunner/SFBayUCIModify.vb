@@ -11,7 +11,7 @@ Module SFBayUCIModify
         ChDriveDir(lNewFolder)
 
         Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb")
+        lMsg.Open("hspfmsg.wdm")
 
         'build collection of folders/names
         Dim lUciNames As ReadOnlyCollection(Of String) = My.Computer.FileSystem.GetDirectories(lOrigFolder)

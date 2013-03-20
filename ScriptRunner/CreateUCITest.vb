@@ -11,7 +11,7 @@ Module CreateUCITest
         ChDriveDir(lFolder)
 
         Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb")
+        lMsg.Open("hspfmsg.wdm")
 
         Dim lDataSources As New Collection(Of atcData.atcTimeseriesSource)
         Dim lDataSource As New atcWDM.atcDataSourceWDM
