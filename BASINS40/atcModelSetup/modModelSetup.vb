@@ -802,7 +802,7 @@ Public Module modModelSetup
                               Optional ByVal aSnowOption As Integer = 0) As Boolean
         ChDriveDir(PathNameOnly(aUciName))
         'get message file ready
-        Dim lMsg As New atcUCI.HspfMsg("hspfmsg.mdb")
+        Dim lMsg As New atcUCI.HspfMsg("hspfmsg.wdm")
 
         'get starter uci ready
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)

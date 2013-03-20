@@ -41,7 +41,8 @@ Module HSPFOutputReports
         pGraphSaveWidth = 1024
         pGraphSaveHeight = 768
 
-        Dim lTestName As String = "upatoi"
+        Dim lTestName As String = "kalamazoo"
+        'Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "mono"
         'Dim lTestName As String = "Susq_020501"
         'Dim lTestName As String = "tinley"
@@ -60,13 +61,19 @@ Module HSPFOutputReports
         pConstituents.Add("Water")
         'pConstituents.Add("FColi")
         'pConstituents.Add("Sediment")
-        pConstituents.Add("N-PQUAL")
-        pConstituents.Add("P-PQUAL")
-        pConstituents.Add("BOD-PQUAL")
-        pConstituents.Add("TotalN")
-        pConstituents.Add("TotalP")
+        'pConstituents.Add("N-PQUAL")
+        'pConstituents.Add("P-PQUAL")
+        'pConstituents.Add("BOD-PQUAL")
+        'pConstituents.Add("TotalN")
+        'pConstituents.Add("TotalP")
 
         Select Case lTestName
+            Case "kalamazoo"
+                pTestPath = "D:\BASINS\modelout\kalamazoo"
+                pBaseName = "kal7"
+                pOutputLocations.Add("R:1")
+                pIdsPerSeg = 9
+                pWaterYears = True
             Case "tutorial"
                 pTestPath = "C:\Program Files\FramesV2\MEERT\Data\HSPF\WestBranch"
                 pBaseName = "bact_2"
@@ -221,7 +228,7 @@ Module HSPFOutputReports
 
         'open uci file
         Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb")
+        lMsg.Open("hspfmsg.wdm")
         Dim lHspfUci As New atcUCI.HspfUci
         lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
         Logger.Dbg("ReadUCI " & lHspfUci.Name)

@@ -60,7 +60,7 @@ Module HSPFWatershedSummaryWQReport
         ChDriveDir(pTestPath)
 
         'open uci file
-        Dim lMsg As New atcUCI.HspfMsg("hspfmsg.mdb")
+        Dim lMsg As New atcUCI.HspfMsg("hspfmsg.wdm")
         Dim lHspfUci As New atcUCI.HspfUci
         lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
 
