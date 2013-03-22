@@ -108,8 +108,19 @@ Public Class atcTimeseriesNetCDF
 
                         'get the timeseries
                         Dim lTimeVariable As atcNetCDFVariable = lNetCDFFile.Variables(lNetCDFFile.TimeDimension.ID)
-                        Dim lTimeUnits As String = lTimeVariable.Attributes.GetValue("Units").ToString.Replace("days since ", "")
-                        Dim lDateBase As Date = lTimeUnits.Substring(0, 10)
+                        Dim lUnits As String = lTimeVariable.Attributes.GetValue("Units").ToString
+                        Dim lTimeUnit As atcTimeUnit = atcTimeUnit.TUUnknown
+                        Dim lTimeStepMultiplier As Double = 1.0
+                        If lUnits.StartsWith("hour") Then
+                            lTimeUnit = atcTimeUnit.TUHour
+                            lTimeStepMultiplier = lTimeStepMultiplier / 24.0
+                        ElseIf lUnits.StartsWith("day") Then
+                            lTimeUnit = atcTimeUnit.TUDay
+                        Else
+                            Throw New Exception("unknown time units '" & lUnits & "'")
+                        End If
+                        Dim lDateBase As Date = lUnits.Remove(0, lUnits.IndexOf("since") + 6).Substring(0, 10)
+
                         Dim lDates As New atcTimeseries(Me)
 
                         'TODO: check to see that dates and values are put in the correct spot in the array
@@ -117,7 +128,7 @@ Public Class atcTimeseriesNetCDF
                         ReDim lDates.Values(lNumValues)
                         lDates.Values(0) = lDateBase.ToOADate
                         For lTimeIndex As Integer = 1 To lNumValues - 1
-                            lDates.Values(lTimeIndex) = lDates.Values(0) + lTimeVariable.Values(lTimeIndex)
+                            lDates.Values(lTimeIndex) = lDates.Values(0) + (lTimeStepMultiplier * lTimeVariable.Values(lTimeIndex))
                         Next
                         'kludge in last value
                         lDates.Values(lNumValues) = lDates.Values(lNumValues - 1) + lTimeVariable.Values(1)
@@ -127,6 +138,7 @@ Public Class atcTimeseriesNetCDF
                         Dim lXIndex As Integer = 0
                         For lTimeseriesIndex As Integer = 0 To lTimeseriesCount - 1
                             Dim lTimeseries As New atcTimeseries(Me)
+                            lTimeseries.SetInterval(lTimeUnit, 1)
                             lTimeseries.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(lFileName))
                             lTimeseries.Attributes.SetValue("ID", lTimeseriesIndex + 1)
                             Dim lLocation As String = ""
@@ -186,7 +198,7 @@ Public Class atcTimeseriesNetCDF
 
                             Me.DataSets.Add(lTimeseries)
                         Next
-                        Logger.Dbg("TimeseriesBuilt")
+                        Logger.Dbg("TimeseriesBuilt:Count " & Me.DataSets.Count & " Length " & lNumValues)
                     End If
                 Catch e As Exception
                     Logger.Dbg("Exception reading '" & aFileName & "': " & e.Message, e.StackTrace)
