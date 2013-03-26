@@ -96,6 +96,7 @@ Public Class atcTimeseriesNetCDF
                         Logger.StartToFile(IO.Path.ChangeExtension(lFileName, ".log"), , False, True)
                     End If
 
+                    'TODO: check to see if this file is open for another timeseries group, need the collection of open timeseries files
                     Dim lNetCDFFile As New atcNetCDFFile(lFileName)
                     If lNetCDFFile.TimeDimension Is Nothing Then
                         pErrorDescription = "No timeseries found in " & lFileName
