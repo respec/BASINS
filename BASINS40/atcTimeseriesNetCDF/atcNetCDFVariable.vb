@@ -20,7 +20,7 @@ Public Class atcNetCDFVariable
     'Public DimensionNames() As String
 
     Public Values As Array
-    Private Shared pValueDumpMax As Integer = 10
+    Private Shared pValueDumpMax As Integer = 200
 
     Public Sub New(ByVal ncid As Int32, ByVal aVariableID As Int32, ByVal aFileDimensions As List(Of atcNetCDFDimension))
         ID = aVariableID
