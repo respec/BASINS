@@ -21,8 +21,8 @@ Module netCDFViewer
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
         If Not IO.Directory.Exists(lOutFolder) Then IO.Directory.CreateDirectory(lOutFolder)
 
-        Dim lBaseNames() As String = {"LangtangKholaWatershed", "srtm_54_07_LangtangFill_LambertWatershed", "srtm_54_07_LangtangFill_LambertUEBAspect", "srtm_54_07_LangtangFill_LambertUEBSlope"}
-        '{"Ta1", "swit", "merra.prod.assim.20061230", "merra.prod.rad.20061231", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
+        Dim lBaseNames() As String = {"swit", "Ta1", "LangtangKholaWatershed", "srtm_54_07_LangtangFill_LambertWatershed", "srtm_54_07_LangtangFill_LambertUEBAspect", "srtm_54_07_LangtangFill_LambertUEBSlope"}
+        '{ "swit", "merra.prod.assim.20061230", "merra.prod.rad.20061231", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
         For Each lBaseName As String In lBaseNames
             If lDebug Then lReport.AppendLine(lNetCDF_Version)
             Dim lFileName As String = lPathName & lBaseName & ".nc"
@@ -30,12 +30,17 @@ Module netCDFViewer
 
             Dim lNetCDFFile As New atcTimeseriesNetCDF.atcTimeseriesNetCDF
             lNetCDFFile.Debug = True
-            lNetCDFFile.Open(lFileName)
+            If Not lNetCDFFile.Open(lFileName) Then
+                Dim lAttributes As New atcData.atcDataAttributes
+                lAttributes.Add("XIndex", 245) 'col
+                lAttributes.Add("YIndex", 99) 'row
+                lNetCDFFile.Open(lFileName, lAttributes)
+            End If
             For Each lTimeseries As atcData.atcTimeseries In lNetCDFFile.DataSets
                 lTimeseries.Attributes.CalculateAll()
                 Dim lDataTree As New atcDataTree.atcDataTreePlugin
                 Dim lDataTreeFileName As String = IO.Path.ChangeExtension(lFileName.Replace(".nc", "#.nc"), "list")
-                Dim lXYString As String = "_Y" & (1 + lTimeseries.Attributes.GetValue("Y Index")) & "_X" & (1 + lTimeseries.Attributes.GetValue("X Index"))
+                Dim lXYString As String = "_Y" & (lTimeseries.Attributes.GetValue("Y Index")) & "_X" & (lTimeseries.Attributes.GetValue("X Index"))
                 lDataTree.Save(New atcData.atcTimeseriesGroup(lTimeseries), lDataTreeFileName.Replace("#", lXYString), "Display 25")
             Next
 

@@ -59,10 +59,7 @@ Public Class atcTimeseriesNetCDF
     Public Overrides Function Open(ByVal aFileName As String, _
                           Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
-            'aFileName = FindFile("Select " & Name & " file to open", , , Filter, True, , 1)
-
-            Dim cdlg As New Windows.Forms.OpenFileDialog
-            With cdlg
+            With New Windows.Forms.OpenFileDialog
                 .Title = "Select " & Name & " file(s) to open"
                 .Filter = pFilter
                 .FilterIndex = 1
@@ -78,6 +75,16 @@ Public Class atcTimeseriesNetCDF
             End With
         End If
         Me.Specification = IO.Path.GetFullPath(aFileName)
+
+        Dim lXIndexToget As Integer = -1
+        Dim lYIndexToget As Integer = -1
+        Dim lGetOnlyOneTimseries As Boolean = False
+        If aAttributes IsNot Nothing Then
+            lXIndexToget = aAttributes.GetValue("XIndex", lXIndexToget)
+            lYIndexToget = aAttributes.GetValue("YIndex", lYIndexToget)
+            If lXIndexToget >= 0 AndAlso lYIndexToget >= 0 Then lGetOnlyOneTimseries = True
+        End If
+
         For Each lFileName As String In aFileName.Split(";")
             If Not FileExists(lFileName) Then
                 pErrorDescription = "File '" & lFileName & "' not found"
@@ -106,6 +113,12 @@ Public Class atcTimeseriesNetCDF
                         End If
                         Logger.Dbg("TimeseriesCount:" & lTimeseriesCount)
 
+                        If lTimeseriesCount > 1000 AndAlso Not lGetOnlyOneTimseries Then
+                            'TODO: too many timeseries, ask user which one(s)
+                            Logger.Dbg("Too Many Timeseries!")
+                            Return False
+                        End If
+
                         'get the timeseries
                         Dim lTimeVariable As atcNetCDFVariable = lNetCDFFile.Variables(lNetCDFFile.TimeDimension.ID)
                         Dim lUnits As String = lTimeVariable.Attributes.GetValue("Units").ToString
@@ -125,44 +138,72 @@ Public Class atcTimeseriesNetCDF
 
                         'TODO: check to see that dates and values are put in the correct spot in the array
                         Dim lNumValues As Integer = lTimeVariable.Dimensions(0).Length
-                        ReDim lDates.Values(lNumValues)
+                        ReDim lDates.Values(lNumValues + 1)
                         lDates.Values(0) = lDateBase.ToOADate
-                        For lTimeIndex As Integer = 1 To lNumValues - 1
-                            lDates.Values(lTimeIndex) = lDates.Values(0) + (lTimeStepMultiplier * lTimeVariable.Values(lTimeIndex))
+                        For lTimeIndex As Integer = 0 To lNumValues - 1
+                            lDates.Values(lTimeIndex + 1) = lDateBase.ToOADate + (lTimeStepMultiplier * lTimeVariable.Values(lTimeIndex))
                         Next
-                        'kludge in last value
-                        lDates.Values(lNumValues) = lDates.Values(lNumValues - 1) + lTimeVariable.Values(1)
 
-                        Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
                         Dim lYIndex As Integer = 0
+                        Dim lYValue As String = ""
                         Dim lXIndex As Integer = 0
+                        Dim lXValue As String = ""
                         For lTimeseriesIndex As Integer = 0 To lTimeseriesCount - 1
-                            Dim lTimeseries As New atcTimeseries(Me)
-                            lTimeseries.SetInterval(lTimeUnit, 1)
-                            lTimeseries.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(lFileName))
-                            lTimeseries.Attributes.SetValue("ID", lTimeseriesIndex + 1)
                             Dim lLocation As String = ""
                             If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
-                                Dim lYValue As String = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex)
-                                lTimeseries.Attributes.SetValue("Y", lYValue)
-                                lTimeseries.Attributes.SetValue("Y index", lYIndex)
+                                lYValue = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex)
                                 lLocation &= "Y:" & lYValue
+                            ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension Is Nothing Then
+                                lXValue = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex)
+                                lLocation &= "X:" & lXValue
+                            ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
+                                lXValue = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex)
+                                lLocation &= "X:" & lXValue
+                                lYValue = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex)
+                                lLocation &= " Y:" & lYValue
+                            End If
+
+                            If Not lGetOnlyOneTimseries OrElse (lYIndex = lYIndexToget AndAlso lXIndex = lXIndexToget) Then
+                                Dim lTimeseries As New atcTimeseries(Me)
+                                Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
+
+                                For Each lDataAttribute As atcDefinedValue In lDataVariable.Attributes
+                                    lTimeseries.Attributes.SetValue(lDataAttribute.Definition.Name, lDataAttribute.Value)
+                                Next
+                                lTimeseries.Attributes.SetValue("NetCDFValues", lDataVariable)
+
+                                lTimeseries.SetInterval(lTimeUnit, 1)
+                                lTimeseries.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(lFileName))
+                                lTimeseries.Attributes.SetValue("ID", lTimeseriesIndex + 1)
+                                If lNetCDFFile.NorthSouthDimension IsNot Nothing Then
+                                    lTimeseries.Attributes.SetValue("Y", lYValue)
+                                    lTimeseries.Attributes.SetValue("Y index", lYIndex)
+                                End If
+                                If lNetCDFFile.EastWestDimension IsNot Nothing Then
+                                    lTimeseries.Attributes.SetValue("X", lXValue)
+                                    lTimeseries.Attributes.SetValue("X index", lXIndex)
+                                End If
+                                lTimeseries.Attributes.SetValue("Location", lLocation)
+
+                                If lTimeVariable.ID > 0 Then
+                                    lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex)
+                                    lTimeseries.Attributes.SetValue("Increment", lTimeseriesCount)
+                                Else
+                                    lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex * lNumValues)
+                                    lTimeseries.Attributes.SetValue("Increment", 1)
+                                End If
+
+                                lTimeseries.ValuesNeedToBeRead = True
+                                lTimeseries.Dates = lDates
+
+                                Me.DataSets.Add(lTimeseries)
+                            End If
+
+                            If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
                                 lYIndex += 1
                             ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension Is Nothing Then
-                                Dim lXValue As String = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex)
-                                lTimeseries.Attributes.SetValue("X", lXValue)
-                                lTimeseries.Attributes.SetValue("X index", lXIndex)
-                                lLocation &= "X:" & lXValue
                                 lXIndex += 1
                             ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
-                                Dim lXValue As String = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex)
-                                lTimeseries.Attributes.SetValue("X", lXValue)
-                                lLocation &= "X:" & lXValue
-                                lTimeseries.Attributes.SetValue("X index", lXIndex)
-                                Dim lYValue As String = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex)
-                                lTimeseries.Attributes.SetValue("Y", lYValue)
-                                lTimeseries.Attributes.SetValue("Y index", lYIndex)
-                                lLocation &= " Y:" & lYValue
                                 If lNetCDFFile.EastWestDimension.ID = 0 OrElse (lNetCDFFile.TimeDimension.ID = 0 AndAlso lNetCDFFile.EastWestDimension.ID = 1) Then
                                     lXIndex += 1
                                     If lXIndex = lNetCDFFile.EastWestDimension.Length Then
@@ -177,26 +218,6 @@ Public Class atcTimeseriesNetCDF
                                     End If
                                 End If
                             End If
-                            lTimeseries.Attributes.SetValue("Location", lLocation)
-                            For Each lDataAttribute As atcDefinedValue In lDataVariable.Attributes
-                                lTimeseries.Attributes.SetValue(lDataAttribute.Definition.Name, lDataAttribute.Value)
-                            Next
-
-                            lTimeseries.Attributes.SetValue("NetCDFValues", lDataVariable)
-
-                            If lTimeVariable.ID > 0 Then
-                                lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex)
-                                lTimeseries.Attributes.SetValue("Increment", lTimeseriesCount)
-                            Else
-                                lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex * lNumValues)
-                                lTimeseries.Attributes.SetValue("Increment", 1)
-                            End If
-
-                            lTimeseries.ValuesNeedToBeRead = True
-
-                            lTimeseries.Dates = lDates
-
-                            Me.DataSets.Add(lTimeseries)
                         Next
                         Logger.Dbg("TimeseriesBuilt:Count " & Me.DataSets.Count & " Length " & lNumValues)
                     End If
