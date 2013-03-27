@@ -306,11 +306,16 @@ Public Class HspfMsg
         Logger.Dbg("HSPFMsg:Open Msg From WDM")
         Name = aFilename
 
-        Call F90_W99OPN() 'open error file
-        Call F90_WDBFIN() 'initialize WDM record buffer
-        Call F90_PUTOLV(10)
-        Dim lFmsg As Integer = F90_WDBOPN(1, aFilename, Len(aFilename))
-        Call F90_MSGUNIT(lFmsg)
+        Dim lFmsg As Integer = F90_INQNAM(aFilename, Len(aFilename))
+        Dim lNeedtoClose As Boolean = False
+        If lFmsg = 0 Then
+            lFmsg = F90_WDBOPN(1, aFilename, Len(aFilename))
+            Call F90_MSGUNIT(lFmsg)
+            lNeedtoClose = True
+        End If
+        'Call F90_W99OPN() 'open error file
+        'Call F90_WDBFIN() 'initialize WDM record buffer
+        'Call F90_PUTOLV(10)
 
         Dim lBlockInitFg As Integer = 1
         Dim lBlockCont As Integer = 1
@@ -858,6 +863,9 @@ Public Class HspfMsg
             Next
         Next
 
+        If lNeedtoClose AndAlso lFmsg > 0 Then
+            Dim lRetcod As Integer = F90_WDFLCL(lFmsg)
+        End If
         Logger.Dbg("HSPFMsg:Open Finished")
     End Sub
 
