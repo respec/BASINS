@@ -17,6 +17,8 @@ Public Class frmUEB
     Friend pOutputControlData As clsUEBOutputControl
     Friend pWatershedGridFileName As String
     Friend pWatershedGridVariableName As String
+    Friend pWatershedGridXVarName As String
+    Friend pWatershedGridYVarName As String
     Friend pSlopeGridFilename As String
     Friend pSlopeGridVariableName As String
     Friend pAspectGridFilename As String
@@ -73,6 +75,10 @@ Public Class frmUEB
     Friend WithEvents AtcGridGridOutput As atcControls.atcGrid
     Friend WithEvents txtAggOutputHeader As System.Windows.Forms.TextBox
     Friend WithEvents Label13 As System.Windows.Forms.Label
+    Friend WithEvents txtYVarName As System.Windows.Forms.TextBox
+    Friend WithEvents Label19 As System.Windows.Forms.Label
+    Friend WithEvents txtXVarName As System.Windows.Forms.TextBox
+    Friend WithEvents Label18 As System.Windows.Forms.Label
     Friend WithEvents Label17 As System.Windows.Forms.Label
 
 #Region " Windows Form Designer generated code "
@@ -323,6 +329,10 @@ Public Class frmUEB
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
         Me.cmdSimulate = New System.Windows.Forms.Button
         Me.chkFilePrompt = New System.Windows.Forms.CheckBox
+        Me.Label18 = New System.Windows.Forms.Label
+        Me.txtXVarName = New System.Windows.Forms.TextBox
+        Me.Label19 = New System.Windows.Forms.Label
+        Me.txtYVarName = New System.Windows.Forms.TextBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
@@ -393,6 +403,10 @@ Public Class frmUEB
         '
         'TabPage2
         '
+        Me.TabPage2.Controls.Add(Me.txtYVarName)
+        Me.TabPage2.Controls.Add(Me.Label19)
+        Me.TabPage2.Controls.Add(Me.txtXVarName)
+        Me.TabPage2.Controls.Add(Me.Label18)
         Me.TabPage2.Controls.Add(Me.txtWatershedVariable)
         Me.TabPage2.Controls.Add(Me.Label10)
         Me.TabPage2.Controls.Add(Me.txtWatershedFile)
@@ -413,7 +427,7 @@ Public Class frmUEB
         '
         Me.txtWatershedVariable.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtWatershedVariable.Location = New System.Drawing.Point(152, 301)
+        Me.txtWatershedVariable.Location = New System.Drawing.Point(167, 301)
         Me.txtWatershedVariable.Name = "txtWatershedVariable"
         Me.txtWatershedVariable.Size = New System.Drawing.Size(637, 20)
         Me.txtWatershedVariable.TabIndex = 50
@@ -431,7 +445,7 @@ Public Class frmUEB
         '
         Me.txtWatershedFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtWatershedFile.Location = New System.Drawing.Point(152, 266)
+        Me.txtWatershedFile.Location = New System.Drawing.Point(167, 266)
         Me.txtWatershedFile.Name = "txtWatershedFile"
         Me.txtWatershedFile.Size = New System.Drawing.Size(637, 20)
         Me.txtWatershedFile.TabIndex = 48
@@ -449,7 +463,7 @@ Public Class frmUEB
         '
         Me.txtProjectName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtProjectName.Location = New System.Drawing.Point(152, 159)
+        Me.txtProjectName.Location = New System.Drawing.Point(167, 159)
         Me.txtProjectName.Name = "txtProjectName"
         Me.txtProjectName.Size = New System.Drawing.Size(637, 20)
         Me.txtProjectName.TabIndex = 46
@@ -458,7 +472,7 @@ Public Class frmUEB
         '
         Me.txtMasterFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMasterFile.Location = New System.Drawing.Point(152, 124)
+        Me.txtMasterFile.Location = New System.Drawing.Point(167, 124)
         Me.txtMasterFile.Name = "txtMasterFile"
         Me.txtMasterFile.Size = New System.Drawing.Size(637, 20)
         Me.txtMasterFile.TabIndex = 45
@@ -1910,6 +1924,42 @@ Public Class frmUEB
         Me.chkFilePrompt.Text = "Prompt for File Name"
         Me.chkFilePrompt.UseVisualStyleBackColor = True
         '
+        'Label18
+        '
+        Me.Label18.AutoSize = True
+        Me.Label18.Location = New System.Drawing.Point(18, 338)
+        Me.Label18.Name = "Label18"
+        Me.Label18.Size = New System.Drawing.Size(142, 13)
+        Me.Label18.TabIndex = 51
+        Me.Label18.Text = "X-coordinate Variable Name:"
+        '
+        'txtXVarName
+        '
+        Me.txtXVarName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtXVarName.Location = New System.Drawing.Point(167, 335)
+        Me.txtXVarName.Name = "txtXVarName"
+        Me.txtXVarName.Size = New System.Drawing.Size(637, 20)
+        Me.txtXVarName.TabIndex = 52
+        '
+        'Label19
+        '
+        Me.Label19.AutoSize = True
+        Me.Label19.Location = New System.Drawing.Point(18, 372)
+        Me.Label19.Name = "Label19"
+        Me.Label19.Size = New System.Drawing.Size(142, 13)
+        Me.Label19.TabIndex = 53
+        Me.Label19.Text = "Y-coordinate Variable Name:"
+        '
+        'txtYVarName
+        '
+        Me.txtYVarName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtYVarName.Location = New System.Drawing.Point(166, 369)
+        Me.txtYVarName.Name = "txtYVarName"
+        Me.txtYVarName.Size = New System.Drawing.Size(637, 20)
+        Me.txtYVarName.TabIndex = 54
+        '
         'frmUEB
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -2096,12 +2146,15 @@ Public Class frmUEB
                 txtMasterFile.Text = lFilename
                 OpenMasterFile(lFilename, pProjectDescription, pParmData.FileName, pSiteData.FileName, _
                                pInputControlData.FileName, pOutputControlData.FileName, pWatershedGridFileName, _
-                               pWatershedGridVariableName, pAggOutputControlData.FileName, pAggOutputFileName)
+                               pWatershedGridXVarName, pWatershedGridYVarName, pWatershedGridVariableName, _
+                               pAggOutputControlData.FileName, pAggOutputFileName)
                 txtProjectName.Text = pProjectDescription
                 txtParameterFile.Text = pParmData.FileName
                 txtSiteFile.Text = pSiteData.FileName
                 txtInputFile.Text = pInputControlData.FileName
                 txtWatershedFile.Text = pWatershedGridFileName
+                txtXVarName.Text = pWatershedGridXVarName
+                txtYVarName.Text = pWatershedGridYVarName
                 txtWatershedVariable.Text = pWatershedGridVariableName
                 txtOutputFile.Text = pOutputControlData.FileName
                 txtAggOutputControlFile.Text = pAggOutputControlData.FileName
@@ -2276,7 +2329,8 @@ KeepWaiting:
         Dim lValue As String
 
         If WriteMasterFile(txtMasterFile.Text, pProjectDescription, pParmData.FileName, pSiteData.FileName, _
-                           pInputControlData.FileName, pOutputControlData.FileName, pWatershedGridFileName, pWatershedGridVariableName, _
+                           pInputControlData.FileName, pOutputControlData.FileName, pWatershedGridFileName, _
+                           pWatershedGridXVarName, pWatershedGridYVarName, pWatershedGridVariableName, _
                            pAggOutputControlData.FileName, pAggOutputFileName) Then
             ChDriveDir(IO.Path.GetDirectoryName(txtMasterFile.Text))
             lMsg = ""
