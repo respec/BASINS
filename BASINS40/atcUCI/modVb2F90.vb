@@ -12,6 +12,8 @@ Module HassLibs
     Declare Sub F90_XTINFO_XX Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef r As Single, ByRef r As Single, ByRef r As Single, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
     Declare Sub F90_PUTOLV Lib "hass_ent.dll" (ByRef l As Integer)
     Declare Sub F90_MSGUNIT Lib "hass_ent.dll" (ByRef l As Integer)
+    Declare Function F90_WDFLCL Lib "hass_ent.dll" (ByRef aWdmUnit As Integer) As Integer
+    Declare Function F90_INQNAM Lib "hass_ent.dll" (ByVal aName As String, ByVal aNameLen As Short) As Integer
 
     Public Sub F90_GTNXKW(ByRef Init As Integer, ByRef id As Integer, ByRef ckwd As String, ByRef kwdfg As Integer, ByRef contfg As Integer, ByRef retid As Integer)
         Dim ikwd(12) As Integer
