@@ -68,8 +68,19 @@ ReadFile:
             lUEBVariable = clsUEBVariable.FromInputVariableString(lFileContents)
             Dim lExistingVariable As clsUEBVariable = VariableFromCode(lUEBVariable.Code)
             If lExistingVariable IsNot Nothing Then
-                Variables.Insert(Variables.IndexOf(lExistingVariable), lUEBVariable)
-                Variables.Remove(lExistingVariable)
+                'just update value, but preserve embedded file Code, LongName, Description, Units
+                lExistingVariable.Value = lUEBVariable.Value
+                lExistingVariable.SpaceVarying = lUEBVariable.SpaceVarying
+                lExistingVariable.GridFileName = lUEBVariable.GridFileName
+                lExistingVariable.GridVariableName = lUEBVariable.GridVariableName
+                lExistingVariable.GridXVarName = lUEBVariable.GridXVarName
+                lExistingVariable.GridYVarName = lUEBVariable.GridYVarName
+                lExistingVariable.GridDataRangeMin = lUEBVariable.GridDataRangeMin
+                lExistingVariable.GridDataRangeMax = lUEBVariable.GridDataRangeMax
+                lExistingVariable.TimeVarying = lUEBVariable.TimeVarying
+                lExistingVariable.TimeFileName = lUEBVariable.TimeFileName
+                'Variables.Insert(Variables.IndexOf(lExistingVariable), lUEBVariable)
+                'Variables.Remove(lExistingVariable)
             Else
                 Variables.Add(lUEBVariable)
             End If
@@ -109,13 +120,13 @@ ReadFile:
                 lStr &= EDate(0) & " " & EDate(1) & " " & EDate(2) & " " & EDate(3) & "." & EDate(4) & vbCrLf
                 lStr &= TimeStep & vbCrLf & UTCOffset & vbCrLf
                 For Each lUEBParm As clsUEBVariable In Variables
-                    If (lUEBParm.Description.ToLower.Contains("qsi") AndAlso (aIRad < 1 Or aIRad > 2)) OrElse _
-                        (lUEBParm.Description.ToLower.Contains("qli") AndAlso aIRad <> 2) OrElse _
-                        (lUEBParm.Description.ToLower.Contains("qnet") AndAlso aIRad <> 3) OrElse _
-                        (lUEBParm.Description.ToLower.Contains("snowalb") AndAlso aIReadAlb <> 1) Then
+                    If (lUEBParm.Code.ToLower.Contains("qsi") AndAlso (aIRad < 1 Or aIRad > 2)) OrElse _
+                        (lUEBParm.Code.ToLower.Contains("qli") AndAlso aIRad <> 2) OrElse _
+                        (lUEBParm.Code.ToLower.Contains("qnet") AndAlso aIRad <> 3) OrElse _
+                        (lUEBParm.Code.ToLower.Contains("snowalb") AndAlso aIReadAlb <> 1) Then
                         'Radiation or Albedo input flag set such that this Input Variable not needed
                     Else
-                        lStr &= lUEBParm.InputVariableString
+                        lStr &= lUEBParm.InputVariableString(IO.Path.GetDirectoryName(FileName))
                     End If
                 Next
                 SaveFileString(FileName, lStr)

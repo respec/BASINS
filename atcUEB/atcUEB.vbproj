@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{167C77DA-0DB1-4126-A20F-1E2931952930}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -148,6 +148,11 @@
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
       <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
       <Name>atcMwGisUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesNetCDF\atcTimeseriesNetCDF.vbproj">
+      <Project>{6467E135-0CB5-4292-87AD-E05FD22A068A}</Project>
+      <Name>atcTimeseriesNetCDF</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesUEBGrid\atcTimeseriesUEBGrid.vbproj">

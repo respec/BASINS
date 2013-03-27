@@ -32,7 +32,7 @@ Public Class clsUEBAggOutputControl
         If FileName.Length > 0 Then
             Try
                 For Each lUEBParm As clsUEBVariable In Variables
-                    lStr &= lUEBParm.Description & vbCrLf
+                    lStr &= lUEBParm.AggOutputVariableString & vbCrLf
                 Next
                 SaveFileString(FileName, lStr)
                 Return True
