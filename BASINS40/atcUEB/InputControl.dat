@@ -6,19 +6,15 @@
 Ta: Air temperature : Air temperature : "˚C" 
 1   
 ' '
-Ta
 Prec: Precipitation : Precipitation that is the sum of both rain and snowfall expressed as water equivalent : "m/hr"
 1   
 ' '
-Prec
 V: Wind speed : Wind Speed at a point z m above the snow surface or top of canopy if present : "m/s"
 1
 ' '
-wind
 RH: Relative Humidity : Relative humidity at a point z m above the snow surface or top of canopy if present : " "
 1
 ' '
-RH
 Qsi: Shortwave radiation : Incoming shortwave radiation measured or that would be measured on a horizontal surface above the snow and canopy if present : "kJ/m2/hr"
 0
 ' '
