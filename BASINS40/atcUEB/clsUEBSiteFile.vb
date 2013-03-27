@@ -22,13 +22,18 @@ ReadFile:
 
         'read header line in file
         Header = StrSplit(lFileContents, vbCrLf, "")
-        Variables = New Generic.List(Of clsUEBVariable)
+        'Variables = New Generic.List(Of clsUEBVariable)
         While lFileContents.Length > 0
             lUEBVariable = clsUEBVariable.FromSiteVariableString(lFileContents)
             Dim lExistingVariable As clsUEBVariable = VariableFromCode(lUEBVariable.Code)
             If lExistingVariable IsNot Nothing Then
-                Variables.Insert(Variables.IndexOf(lExistingVariable), lUEBVariable)
-                Variables.Remove(lExistingVariable)
+                'just update values, but preserve embedded file Code, LongName, Description, Units
+                lExistingVariable.Value = lUEBVariable.Value
+                lExistingVariable.SpaceVarying = lUEBVariable.SpaceVarying
+                lExistingVariable.GridFileName = lUEBVariable.GridFileName
+                lExistingVariable.GridVariableName = lUEBVariable.GridVariableName
+                lExistingVariable.GridXVarName = lUEBVariable.GridXVarName
+                lExistingVariable.GridYVarName = lUEBVariable.GridYVarName
             Else
                 Variables.Add(lUEBVariable)
             End If
@@ -58,7 +63,7 @@ ReadFile:
         If FileName.Length > 0 Then
             Try
                 For Each lUEBParm As clsUEBVariable In Variables
-                    lStr &= lUEBParm.SiteVariableString
+                    lStr &= lUEBParm.SiteVariableString(IO.Path.GetDirectoryName(FileName))
                 Next
                 SaveFileString(FileName, lStr)
                 Return True

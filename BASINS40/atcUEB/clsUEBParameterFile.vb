@@ -27,8 +27,10 @@ ReadFile:
             lUEBVariable = clsUEBVariable.FromParameterString(lFileContents)
             Dim lExistingVariable As clsUEBVariable = VariableFromCode(lUEBVariable.Code)
             If lExistingVariable IsNot Nothing Then
-                Variables.Insert(Variables.IndexOf(lExistingVariable), lUEBVariable)
-                Variables.Remove(lExistingVariable)
+                'just update value, but preserve embedded file Code, LongName, Description, Units
+                lExistingVariable.Value = lUEBVariable.Value
+                'Variables.Insert(Variables.IndexOf(lExistingVariable), lUEBVariable)
+                'Variables.Remove(lExistingVariable)
             Else
                 Variables.Add(lUEBVariable)
             End If
