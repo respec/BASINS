@@ -5,7 +5,7 @@ USic: Snow energy content : Initial value of energy content state variable givin
 WSis: Snow water equivalent : Initial value of the snow water equivalent state variable giving the water equivalent of snow on the surface (ground or glacier). : "m"
 0
 0
-Tic: Age of snow surface : Initial value of the dimensionless age of the snow surface state variable used in albedo calculation.
+Tic: Age of snow surface : Initial value of the dimensionless age of the snow surface state variable used in albedo calculation. : " "
 0
 0
 WCic:  Canopy snow water equivalent : Initial value of intercepted snow state variable giving the water equivalent of snow held as interception in the canopy : "m"
@@ -114,3 +114,6 @@ b12: December mean diurnal temperature range : Monthly mean of daily temperature
 1
 ' '
 b12
+ts_last: Snow surface temp prior to start : Snow surface temperature one day prior to the model starting time. : "˚C"
+0
+-9999

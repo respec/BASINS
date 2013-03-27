@@ -3,7 +3,7 @@ irad:  Radiation control flag : This is an integer value that controls how the p
 0   
 ireadalb:  Albedo reading control flag : This is an integer that controls whether snow surface albedo is to be input or computed internally.  Values of 0 or 1 are valid and should be used as follows:  0: Model computes albedo. 1: Albedo is input. : " "
 0
-tr: Rain threshold temperature : Temperature above which all precipitation occurs in form of rain 
+tr: Rain threshold temperature : Temperature above which all precipitation occurs in form of rain : "˚C"
 3   
 ts: Snow threshold temperature : Temperature below which all precipitation occurs in form of snow : "˚C"
 -1        
@@ -17,7 +17,7 @@ zo:  Roughness length : Surface aerodynamic roughness length in logarithmic boun
 0.01     
 rho: Snow Density : Density of snow is its mass per unit volume. : "kg/m^3"
 450
-rhog:  Soil Density : Density of soil is its mass per unit volume. "kg/m^3"
+rhog:  Soil Density : Density of soil is its mass per unit volume. : "kg/m^3"
 1700 
 lc: Liquid holding capacity : The liquid retention capacity of the snowpack as a fraction of snow in ice (solid) phase.  This quantifies the amount of liquid water that the snow can hold by capillary forces that has to be filled prior to melt outflow from the base of the snowpack.  : " "
 0.05     
