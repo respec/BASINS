@@ -23,97 +23,75 @@ Aep: Albedo extinction coefficient : Depth threshold used to interpolate albedo 
 cc: Canopy coverage fraction : The fraction of ground area covered by the vertical projection of tree crown : " "        
 1  
 ' '
-cc
 hcan: Canopy height : Height of canopy. : "m"         
 1     
 ' '
-hcan
 lai: Leaf area index : Leaf area index (LAI) is defined as one half the total leaf area per unit of horizontally projected surface area : " "
 1        
 ' '
-LAI
 Sbar: Interception capacity : Maximum snow load held per unit leaf area : "kg/m^2"
 0               
 6.6
 ycage: Forest canopy structure flag : A parameter required for wind speed profile parameterization.  Valid values are 1, 2 or 3 reflecting canopy structure; 1: young coniferous, 2: deciduous, 3: mature coniferous (based on Paw U and Meyers, 1987). : " "
 1             
 ' '
-ycage
 Slope: Slope : The slope angle measured from horizontal. : "Degrees"
 1          
 ' '
-slope
 Aspect: Aspect : Aspect is the direction the slope faces measured clockwise from North. : "Degrees"
 1        
 ' '
-aspect
 Latitude: Latitude : Geographic Latitude in decimal degrees : "Degrees"
 1             
 ' '
-latitude
 Longitude: Longitude : Geographic Longitude in decimal degrees (West is negative) : "Degrees"
 1             
 ' '
-longitude
 subalb: Substrate Albedo : The fraction of shortwave radiation (fraction 0-1) reflected by the substrate beneath the snow (ground or glacier) : " "
 1
 ' '
-subalb
 subtype: Snow substrate type : Type of beneath snow substrate encoded as: 0 = Ground/Non Glacier, 1=Clean Ice/glacier, 2= Debris covered ice/glacier, 3= Excluded area.  Excluded area may include the glacier accumulation zone or any other area such as lakes where the snowmelt model is not run.  No output is produced over excluded area. : " "
 1
 ' '
-subtype
 gsurf: Fraction of surface melt : The fraction of surface melt that runs directly off without infiltrating the snowpack (e.g. from a glacier) : " "
 0
 0.0
 b01: January mean diurnal temperature range : Monthly mean of daily temperature range for January used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b01
 b02: February mean diurnal temperature range : Monthly mean of daily temperature range for February used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b02
 b03: March mean diurnal temperature range : Monthly mean of daily temperature range for March used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b03
 b04: April mean diurnal temperature range : Monthly mean of daily temperature range for April used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b04
 b05: May mean diurnal temperature range : Monthly mean of daily temperature range for May used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b05
 b06: June mean diurnal temperature range : Monthly mean of daily temperature range for June used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b06
 b07: July mean diurnal temperature range : Monthly mean of daily temperature range for July used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b07
 b08: August mean diurnal temperature range : Monthly mean of daily temperature range for August used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b08
 b09: September mean diurnal temperature range : Monthly mean of daily temperature range for September used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b09
 b10: October mean diurnal temperature range : Monthly mean of daily temperature range for October used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b10
 b11: November mean diurnal temperature range : Monthly mean of daily temperature range for November used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b11
 b12: December mean diurnal temperature range : Monthly mean of daily temperature range for Deember used in Bristow Campbell formulas for atmospheric transmissivity : "˚C"
 1
 ' '
-b12
 ts_last: Snow surface temp prior to start : Snow surface temperature one day prior to the model starting time. : "˚C"
 0
 -9999

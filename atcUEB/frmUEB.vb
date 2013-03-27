@@ -24,7 +24,7 @@ Public Class frmUEB
     Friend pAggOutputControlData As clsUEBAggOutputControl
     Friend pAggOutputFileName As String
 
-    Friend AvailableOutputs As atcCollection
+    Friend AvailableOutputs As Generic.List(Of clsUEBVariable)
 
     Friend pBCParameterFileName As String
     Friend pBCDataArray(37) As Double
@@ -411,9 +411,11 @@ Public Class frmUEB
         '
         'txtWatershedVariable
         '
+        Me.txtWatershedVariable.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtWatershedVariable.Location = New System.Drawing.Point(152, 301)
         Me.txtWatershedVariable.Name = "txtWatershedVariable"
-        Me.txtWatershedVariable.Size = New System.Drawing.Size(380, 20)
+        Me.txtWatershedVariable.Size = New System.Drawing.Size(637, 20)
         Me.txtWatershedVariable.TabIndex = 50
         '
         'Label10
@@ -427,9 +429,11 @@ Public Class frmUEB
         '
         'txtWatershedFile
         '
+        Me.txtWatershedFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtWatershedFile.Location = New System.Drawing.Point(152, 266)
         Me.txtWatershedFile.Name = "txtWatershedFile"
-        Me.txtWatershedFile.Size = New System.Drawing.Size(380, 20)
+        Me.txtWatershedFile.Size = New System.Drawing.Size(637, 20)
         Me.txtWatershedFile.TabIndex = 48
         '
         'Label7
@@ -443,16 +447,20 @@ Public Class frmUEB
         '
         'txtProjectName
         '
+        Me.txtProjectName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtProjectName.Location = New System.Drawing.Point(152, 159)
         Me.txtProjectName.Name = "txtProjectName"
-        Me.txtProjectName.Size = New System.Drawing.Size(380, 20)
+        Me.txtProjectName.Size = New System.Drawing.Size(637, 20)
         Me.txtProjectName.TabIndex = 46
         '
         'txtMasterFile
         '
+        Me.txtMasterFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtMasterFile.Location = New System.Drawing.Point(152, 124)
         Me.txtMasterFile.Name = "txtMasterFile"
-        Me.txtMasterFile.Size = New System.Drawing.Size(380, 20)
+        Me.txtMasterFile.Size = New System.Drawing.Size(637, 20)
         Me.txtMasterFile.TabIndex = 45
         '
         'lblInstructions
@@ -518,7 +526,7 @@ Public Class frmUEB
         Me.cboAlbedoInput.Location = New System.Drawing.Point(482, 18)
         Me.cboAlbedoInput.Name = "cboAlbedoInput"
         Me.cboAlbedoInput.Size = New System.Drawing.Size(281, 21)
-        Me.cboAlbedoInput.TabIndex = 3
+        Me.cboAlbedoInput.TabIndex = 16
         '
         'lblAlbedoInput
         '
@@ -537,7 +545,7 @@ Public Class frmUEB
         Me.cboRadiationInput.Location = New System.Drawing.Point(97, 18)
         Me.cboRadiationInput.Name = "cboRadiationInput"
         Me.cboRadiationInput.Size = New System.Drawing.Size(281, 21)
-        Me.cboRadiationInput.TabIndex = 1
+        Me.cboRadiationInput.TabIndex = 15
         '
         'lblRadiationInput
         '
@@ -553,7 +561,7 @@ Public Class frmUEB
         Me.txtInputHeader.Location = New System.Drawing.Point(112, 38)
         Me.txtInputHeader.Name = "txtInputHeader"
         Me.txtInputHeader.Size = New System.Drawing.Size(410, 20)
-        Me.txtInputHeader.TabIndex = 66
+        Me.txtInputHeader.TabIndex = 2
         '
         'Label15
         '
@@ -579,14 +587,14 @@ Public Class frmUEB
         Me.AtcGridInputControl.Name = "AtcGridInputControl"
         Me.AtcGridInputControl.Size = New System.Drawing.Size(801, 218)
         Me.AtcGridInputControl.Source = Nothing
-        Me.AtcGridInputControl.TabIndex = 64
+        Me.AtcGridInputControl.TabIndex = 17
         '
         'txtInputFile
         '
         Me.txtInputFile.Location = New System.Drawing.Point(112, 12)
         Me.txtInputFile.Name = "txtInputFile"
         Me.txtInputFile.Size = New System.Drawing.Size(410, 20)
-        Me.txtInputFile.TabIndex = 44
+        Me.txtInputFile.TabIndex = 1
         '
         'Label3
         '
@@ -648,7 +656,7 @@ Public Class frmUEB
         Me.AtcTextEMinute.Size = New System.Drawing.Size(44, 21)
         Me.AtcTextEMinute.SoftMax = -999
         Me.AtcTextEMinute.SoftMin = -999
-        Me.AtcTextEMinute.TabIndex = 47
+        Me.AtcTextEMinute.TabIndex = 12
         Me.AtcTextEMinute.ValueDouble = 0
         Me.AtcTextEMinute.ValueInteger = 0
         '
@@ -680,7 +688,7 @@ Public Class frmUEB
         Me.AtcTextSMinute.Size = New System.Drawing.Size(44, 21)
         Me.AtcTextSMinute.SoftMax = -999
         Me.AtcTextSMinute.SoftMin = -999
-        Me.AtcTextSMinute.TabIndex = 45
+        Me.AtcTextSMinute.TabIndex = 7
         Me.AtcTextSMinute.ValueDouble = 0
         Me.AtcTextSMinute.ValueInteger = 0
         '
@@ -703,7 +711,7 @@ Public Class frmUEB
         Me.AtcTextUTCOffset.Size = New System.Drawing.Size(35, 21)
         Me.AtcTextUTCOffset.SoftMax = -999
         Me.AtcTextUTCOffset.SoftMin = -999
-        Me.AtcTextUTCOffset.TabIndex = 44
+        Me.AtcTextUTCOffset.TabIndex = 14
         Me.AtcTextUTCOffset.ValueDouble = 1
         Me.AtcTextUTCOffset.ValueInteger = 1
         '
@@ -744,7 +752,7 @@ Public Class frmUEB
         Me.AtcTextTimeStep.Size = New System.Drawing.Size(35, 21)
         Me.AtcTextTimeStep.SoftMax = -999
         Me.AtcTextTimeStep.SoftMin = -999
-        Me.AtcTextTimeStep.TabIndex = 41
+        Me.AtcTextTimeStep.TabIndex = 13
         Me.AtcTextTimeStep.ValueDouble = 1
         Me.AtcTextTimeStep.ValueInteger = 1
         '
@@ -776,7 +784,7 @@ Public Class frmUEB
         Me.AtcTextEHour.Size = New System.Drawing.Size(44, 21)
         Me.AtcTextEHour.SoftMax = -999
         Me.AtcTextEHour.SoftMin = -999
-        Me.AtcTextEHour.TabIndex = 39
+        Me.AtcTextEHour.TabIndex = 11
         Me.AtcTextEHour.ValueDouble = 0
         Me.AtcTextEHour.ValueInteger = 0
         '
@@ -799,7 +807,7 @@ Public Class frmUEB
         Me.AtcTextSHour.Size = New System.Drawing.Size(44, 21)
         Me.AtcTextSHour.SoftMax = -999
         Me.AtcTextSHour.SoftMin = -999
-        Me.AtcTextSHour.TabIndex = 38
+        Me.AtcTextSHour.TabIndex = 6
         Me.AtcTextSHour.ValueDouble = 0
         Me.AtcTextSHour.ValueInteger = 0
         '
@@ -867,7 +875,7 @@ Public Class frmUEB
         Me.AtcTextEDay.Size = New System.Drawing.Size(44, 21)
         Me.AtcTextEDay.SoftMax = -999
         Me.AtcTextEDay.SoftMin = -999
-        Me.AtcTextEDay.TabIndex = 32
+        Me.AtcTextEDay.TabIndex = 10
         Me.AtcTextEDay.ValueDouble = 31
         Me.AtcTextEDay.ValueInteger = 31
         '
@@ -890,7 +898,7 @@ Public Class frmUEB
         Me.AtcTextSDay.Size = New System.Drawing.Size(44, 21)
         Me.AtcTextSDay.SoftMax = -999
         Me.AtcTextSDay.SoftMin = -999
-        Me.AtcTextSDay.TabIndex = 31
+        Me.AtcTextSDay.TabIndex = 5
         Me.AtcTextSDay.ValueDouble = 1
         Me.AtcTextSDay.ValueInteger = 1
         '
@@ -913,7 +921,7 @@ Public Class frmUEB
         Me.AtcTextSYear.Size = New System.Drawing.Size(64, 21)
         Me.AtcTextSYear.SoftMax = -999
         Me.AtcTextSYear.SoftMin = -999
-        Me.AtcTextSYear.TabIndex = 30
+        Me.AtcTextSYear.TabIndex = 3
         Me.AtcTextSYear.ValueDouble = 2000
         Me.AtcTextSYear.ValueInteger = 2000
         '
@@ -936,7 +944,7 @@ Public Class frmUEB
         Me.AtcTextEMon.Size = New System.Drawing.Size(44, 21)
         Me.AtcTextEMon.SoftMax = -999
         Me.AtcTextEMon.SoftMin = -999
-        Me.AtcTextEMon.TabIndex = 29
+        Me.AtcTextEMon.TabIndex = 9
         Me.AtcTextEMon.ValueDouble = 12
         Me.AtcTextEMon.ValueInteger = 12
         '
@@ -959,7 +967,7 @@ Public Class frmUEB
         Me.AtcTextSMonth.Size = New System.Drawing.Size(44, 21)
         Me.AtcTextSMonth.SoftMax = -999
         Me.AtcTextSMonth.SoftMin = -999
-        Me.AtcTextSMonth.TabIndex = 28
+        Me.AtcTextSMonth.TabIndex = 4
         Me.AtcTextSMonth.ValueDouble = 1
         Me.AtcTextSMonth.ValueInteger = 1
         '
@@ -982,7 +990,7 @@ Public Class frmUEB
         Me.AtcTextEYear.Size = New System.Drawing.Size(64, 21)
         Me.AtcTextEYear.SoftMax = -999
         Me.AtcTextEYear.SoftMin = -999
-        Me.AtcTextEYear.TabIndex = 27
+        Me.AtcTextEYear.TabIndex = 8
         Me.AtcTextEYear.ValueDouble = 2000
         Me.AtcTextEYear.ValueInteger = 2000
         '
@@ -1979,15 +1987,14 @@ Public Class frmUEB
 
         'read in available output variables
         Dim lFileContents As String = GetEmbeddedFileAsString("OutputVariables.dat")
-        Dim lCode As String
-        Dim lVarDescription As String
         Dim lRec As String
-        AvailableOutputs = New atcCollection
+        Dim lUEBVar As clsUEBVariable
+        AvailableOutputs = New Generic.List(Of clsUEBVariable)
         While lFileContents.Length > 0
             lRec = StrSplit(lFileContents, vbCrLf, "")
-            lCode = StrSplit(lRec, ":", "").ToUpper
-            lVarDescription = lCode & ": " & StrSplit(lRec, ":", "")
-            AvailableOutputs.Add(lCode, lVarDescription)
+            lUEBVar = New clsUEBVariable
+            clsUEBVariable.ParseVariableDescription(lUEBVar, lRec)
+            AvailableOutputs.Add(lUEBVar)
         End While
 
         pParmData = New clsUEBParameterFile("")
@@ -2355,7 +2362,7 @@ KeepWaiting:
                 If lMsg.Length = 0 Then
                     For i = 1 To pInputControlData.Variables.Count
                         With AtcGridInputControl.Source
-                            If FileExists(.CellValue(i, 2)) Then 'valid NetCDF file entered
+                            If FileExists(.CellValue(i, 2)) Then 'valid index file of NetCDF files entered
                                 pInputControlData.Variables(i - 1).GridFileName = .CellValue(i, 2)
                                 If .CellValue(i, 3).Length > 0 Then
                                     'TODO: check validity of Grid Variable name
@@ -2394,13 +2401,18 @@ KeepWaiting:
 
             If pOutputControlData.FileName.Length > 0 Then
                 'build main output list based on grid entries
-                Dim lUEBVar As New clsUEBVariable
+                Dim lUEBVar As clsUEBVariable
                 pOutputControlData.Variables.Clear()
-                For i = 1 To AvailableOutputs.Count
+                i = 0
+                For Each lOutput As clsUEBVariable In AvailableOutputs
+                    i += 1
                     With AtcGridGridOutput.Source
                         If .CellValue(i, 1) IsNot Nothing AndAlso .CellValue(i, 1).Length > 0 Then 'assume a valid NetCDF file entered
                             lUEBVar = New clsUEBVariable
-                            lUEBVar.Description = .CellValue(i, 0)
+                            lUEBVar.Code = lOutput.Code
+                            lUEBVar.LongName = lOutput.LongName
+                            lUEBVar.Description = lOutput.Description
+                            lUEBVar.Units = lOutput.Units
                             lUEBVar.GridFileName = .CellValue(i, 1)
                             pOutputControlData.Variables.Add(lUEBVar)
                         End If
@@ -2431,13 +2443,18 @@ KeepWaiting:
             End If
             If pAggOutputControlData.FileName.Length > 0 Then
                 'build aggregated output list based on grid entries
-                Dim lUEBVar As New clsUEBVariable
+                Dim lUEBVar As clsUEBVariable
                 pAggOutputControlData.Variables.Clear()
-                For i = 1 To AvailableOutputs.Count
+                i = 0
+                For Each lOutput As clsUEBVariable In AvailableOutputs
+                    i += 1
                     With AtcGridGridOutput.Source
                         If .CellValue(i, 2) = "Yes" Then
                             lUEBVar = New clsUEBVariable
-                            lUEBVar.Description = .CellValue(i, 0)
+                            lUEBVar.Code = lOutput.Code
+                            lUEBVar.LongName = lOutput.LongName
+                            lUEBVar.Description = lOutput.Description
+                            lUEBVar.Units = lOutput.Units
                             pAggOutputControlData.Variables.Add(lUEBVar)
                         End If
                     End With
@@ -2490,6 +2507,7 @@ KeepWaiting:
     Private Sub SetSiteGrid()
 
         Dim lRow As Integer
+        Dim lCol As Integer
 
         txtSiteHeader.Text = pSiteData.Header
         AtcGridSiteVars.Clear()
@@ -2500,34 +2518,38 @@ KeepWaiting:
             .FixedColumns = 1
             .CellValue(0, 0) = "Site Variable"
             .CellValue(0, 1) = "Spatial Variability"
-            .CellValue(0, 2) = "NetCDF Grid File Name"
-            .CellValue(0, 3) = "Grid Variable Name"
-            .CellValue(0, 4) = "Constant Value"
+            .CellValue(0, 2) = "Constant Value"
+            .CellValue(0, 3) = "NetCDF Grid File Name"
+            .CellValue(0, 4) = "Grid Variable Name"
+            .CellValue(0, 5) = "X-Coordinate Name"
+            .CellValue(0, 6) = "Y-Coordinate Name"
             lRow = 0
             For Each lUEBVar As clsUEBVariable In pSiteData.Variables
                 lRow += 1
                 .CellValue(lRow, 0) = lUEBVar.Code & ": " & lUEBVar.LongName
                 .CellColor(lRow, 0) = SystemColors.ControlDark
                 .CellEditable(lRow, 1) = True
-                .CellValue(lRow, 2) = lUEBVar.GridFileName
-                .CellValue(lRow, 3) = lUEBVar.GridVariableName
-                .CellValue(lRow, 4) = lUEBVar.Value
+                .CellValue(lRow, 2) = lUEBVar.Value
+                .CellValue(lRow, 3) = lUEBVar.GridFileName
+                .CellValue(lRow, 4) = lUEBVar.GridVariableName
+                .CellValue(lRow, 5) = lUEBVar.GridXVarName
+                .CellValue(lRow, 6) = lUEBVar.GridYVarName
                 If lUEBVar.SpaceVarying Then
                     .CellValue(lRow, 1) = "Varying in Space"
                     .CellEditable(lRow, 2) = True
-                    .CellColor(lRow, 2) = Color.White
-                    .CellEditable(lRow, 3) = True
-                    .CellColor(lRow, 3) = Color.White
-                    .CellEditable(lRow, 4) = True
-                    .CellColor(lRow, 4) = SystemColors.ControlDark
+                    .CellColor(lRow, 2) = SystemColors.ControlDark
+                    For lCol = 3 To 6
+                        .CellEditable(lRow, lCol) = True
+                        .CellColor(lRow, lCol) = Color.White
+                    Next
                 Else
                     .CellValue(lRow, 1) = "Constant in Space"
-                    .CellEditable(lRow, 2) = False
-                    .CellColor(lRow, 2) = SystemColors.ControlDark
-                    .CellEditable(lRow, 3) = False
-                    .CellColor(lRow, 3) = SystemColors.ControlDark
-                    .CellEditable(lRow, 4) = True
-                    .CellColor(lRow, 4) = Color.White
+                    .CellEditable(lRow, 2) = True
+                    .CellColor(lRow, 2) = Color.White
+                    For lCol = 3 To 6
+                        .CellEditable(lRow, lCol) = False
+                        .CellColor(lRow, lCol) = SystemColors.ControlDark
+                    Next
                 End If
             Next
         End With
@@ -2537,6 +2559,7 @@ KeepWaiting:
 
     Private Sub SetInputControl()
         Dim lRow As Integer
+        Dim lCol As Integer
         Dim lEditable As Boolean
         Dim lCellColor As System.Drawing.Color
 
@@ -2554,26 +2577,38 @@ KeepWaiting:
         AtcTextTimeStep.Text = pInputControlData.TimeStep
         AtcTextUTCOffset.Text = pInputControlData.UTCOffset
 
+        cboRadiationInput.SelectedIndex = CInt(pParmData.Variables(0).Value)
+        cboAlbedoInput.SelectedIndex = CInt(pParmData.Variables(1).Value)
+
         AtcGridInputControl.Clear()
         With AtcGridInputControl.Source
             .FixedColumns = 1
             .FixedRows = 1
             .CellValue(0, 0) = "Input Variable"
             .CellValue(0, 1) = "Space/Time Variability"
-            .CellValue(0, 2) = "NetCDF File List"
-            .CellValue(0, 3) = "NetCDF Variable Name"
-            .CellValue(0, 4) = "Timeseries File"
-            .CellValue(0, 5) = "Constant Value"
-            'For i As Integer = 1 To pInputControlData.Variables.Count
+            .CellValue(0, 2) = "Constant Value"
+            .CellValue(0, 3) = "Timeseries File"
+            .CellValue(0, 4) = "NetCDF File List"
+            .CellValue(0, 5) = "NetCDF Variable Name"
+            .CellValue(0, 6) = "Time Dimension Name"
+            .CellValue(0, 7) = "X-Coordinate Name"
+            .CellValue(0, 8) = "Y-Coordinate Name"
+            .CellValue(0, 9) = "Minimum Valid Value"
+            .CellValue(0, 10) = "Maximum Valid Value"
             lRow = 0
             For Each lUEBVar As clsUEBVariable In pInputControlData.Variables
                 lRow += 1
                 .CellValue(lRow, 0) = lUEBVar.Code & ": " & lUEBVar.LongName
                 .CellColor(lRow, 0) = SystemColors.ControlDark
-                .CellValue(lRow, 2) = lUEBVar.GridFileName
-                .CellValue(lRow, 3) = lUEBVar.GridVariableName
-                .CellValue(lRow, 4) = lUEBVar.TimeFileName
-                .CellValue(lRow, 5) = lUEBVar.Value
+                .CellValue(lRow, 2) = lUEBVar.Value
+                .CellValue(lRow, 3) = lUEBVar.TimeFileName
+                .CellValue(lRow, 4) = lUEBVar.GridFileName
+                .CellValue(lRow, 5) = lUEBVar.GridVariableName
+                .CellValue(lRow, 6) = lUEBVar.GridTimeVarName
+                .CellValue(lRow, 7) = lUEBVar.GridXVarName
+                .CellValue(lRow, 8) = lUEBVar.GridYVarName
+                .CellValue(lRow, 9) = lUEBVar.GridDataRangeMin
+                .CellValue(lRow, 10) = lUEBVar.GridDataRangeMax
                 If (lRow = 5 AndAlso (pParmData.Variables(0).Value < 1 Or pParmData.Variables(0).Value > 3)) OrElse _
                     (lRow = 6 AndAlso pParmData.Variables(0).Value <> 2) OrElse _
                     (lRow = 7 AndAlso pParmData.Variables(0).Value <> 3) OrElse _
@@ -2589,34 +2624,32 @@ KeepWaiting:
                 .CellColor(lRow, 1) = lCellColor
                 If lUEBVar.SpaceVarying AndAlso lUEBVar.TimeVarying Then
                     .CellValue(lRow, 1) = "Varying Space/Time"
-                    .CellEditable(lRow, 2) = lEditable
-                    .CellColor(lRow, 2) = lCellColor
-                    .CellEditable(lRow, 3) = lEditable
-                    .CellColor(lRow, 3) = lCellColor
-                    .CellEditable(lRow, 4) = False
-                    .CellColor(lRow, 4) = SystemColors.ControlDark
-                    .CellEditable(lRow, 5) = False
-                    .CellColor(lRow, 5) = SystemColors.ControlDark
+                    For lCol = 2 To 3
+                        .CellEditable(lRow, lCol) = False
+                        .CellColor(lRow, lCol) = SystemColors.ControlDark
+                    Next
+                    For lCol = 4 To 10
+                        .CellEditable(lRow, lCol) = lEditable
+                        .CellColor(lRow, lCol) = lCellColor
+                    Next
                 ElseIf lUEBVar.TimeVarying Then
                     .CellValue(lRow, 1) = "Varying Time Only"
                     .CellEditable(lRow, 2) = False
                     .CellColor(lRow, 2) = SystemColors.ControlDark
-                    .CellEditable(lRow, 3) = False
-                    .CellColor(lRow, 3) = SystemColors.ControlDark
-                    .CellEditable(lRow, 4) = lEditable
-                    .CellColor(lRow, 4) = lCellColor
-                    .CellEditable(lRow, 5) = False
-                    .CellColor(lRow, 5) = SystemColors.ControlDark
+                    .CellEditable(lRow, 3) = lEditable
+                    .CellColor(lRow, 3) = lCellColor
+                    For lCol = 4 To 10
+                        .CellEditable(lRow, lCol) = False
+                        .CellColor(lRow, lCol) = SystemColors.ControlDark
+                    Next
                 Else 'space and time constant
                     .CellValue(lRow, 1) = "Constant Space/Time"
-                    .CellEditable(lRow, 2) = False
-                    .CellColor(lRow, 2) = SystemColors.ControlDark
-                    .CellEditable(lRow, 3) = False
-                    .CellColor(lRow, 3) = SystemColors.ControlDark
-                    .CellEditable(lRow, 4) = False
-                    .CellColor(lRow, 4) = SystemColors.ControlDark
-                    .CellEditable(lRow, 5) = lEditable
-                    .CellColor(lRow, 5) = lCellColor
+                    .CellEditable(lRow, 2) = lEditable
+                    .CellColor(lRow, 2) = lCellColor
+                    For lCol = 3 To 10
+                        .CellEditable(lRow, lCol) = False
+                        .CellColor(lRow, lCol) = SystemColors.ControlDark
+                    Next
                 End If
             Next
         End With
@@ -2636,24 +2669,32 @@ KeepWaiting:
             .CellValue(0, 0) = "Output Variable"
             .CellValue(0, 1) = "NetCDF Grid File Name"
             .CellValue(0, 2) = "Aggregate Output"
-            For i = 1 To AvailableOutputs.Count
-                .CellValue(i, 0) = AvailableOutputs(i - 1)
+            i = 0
+            For Each lUEBVar As clsUEBVariable In AvailableOutputs
+                i += 1
+                .CellValue(i, 0) = lUEBVar.Code & ": " & lUEBVar.LongName
                 .CellColor(i, 0) = SystemColors.ControlDark
                 .CellEditable(i, 1) = True
                 .CellValue(i, 2) = "No"
                 .CellEditable(i, 2) = True
             Next
-            For i = 0 To pOutputControlData.Variables.Count - 1
-                lVarName = pOutputControlData.Variables(i).Code.ToUpper
-                If AvailableOutputs.Keys.Contains(lVarName) Then
-                    .CellValue(AvailableOutputs.IndexFromKey(lVarName) + 1, 1) = pOutputControlData.Variables(i).GridFileName
-                End If
+            For Each lUEBVar As clsUEBVariable In pOutputControlData.Variables
+                i = 0
+                While i < AvailableOutputs.Count
+                    If AvailableOutputs(i).Code.ToUpper = lUEBVar.Code.ToUpper Then
+                        .CellValue(i + 1, 1) = lUEBVar.GridFileName
+                    End If
+                    i += 1
+                End While
             Next
-            For i = 0 To pAggOutputControlData.Variables.Count - 1
-                lVarName = pAggOutputControlData.Variables(i).Code.ToUpper
-                If AvailableOutputs.Keys.Contains(lVarName) Then
-                    .CellValue(AvailableOutputs.IndexFromKey(lVarName) + 1, 2) = "Yes"
-                End If
+            For Each lUEBVar As clsUEBVariable In pAggOutputControlData.Variables
+                i = 0
+                While i < AvailableOutputs.Count
+                    If AvailableOutputs(i).Code.ToUpper = lUEBVar.Code.ToUpper Then
+                        .CellValue(i + 1, 2) = "Yes"
+                    End If
+                    i += 1
+                End While
             Next
         End With
         AtcGridGridOutput.Refresh()
@@ -2682,21 +2723,22 @@ KeepWaiting:
 
     Private Sub AtcGridSiteVars_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridSiteVars.CellEdited
         If aColumn = 1 Then 'updated space/time variability option
+            Dim lCol As Integer
             With aGrid.Source
                 If .CellValue(aRow, aColumn) = "Varying in Space" Then
-                    .CellEditable(aRow, 2) = True
-                    .CellColor(aRow, 2) = Color.White
-                    .CellEditable(aRow, 3) = True
-                    .CellColor(aRow, 3) = Color.White
-                    .CellEditable(aRow, 4) = True
-                    .CellColor(aRow, 4) = SystemColors.ControlDark
-                Else
                     .CellEditable(aRow, 2) = False
                     .CellColor(aRow, 2) = SystemColors.ControlDark
-                    .CellEditable(aRow, 3) = False
-                    .CellColor(aRow, 3) = SystemColors.ControlDark
-                    .CellEditable(aRow, 4) = True
-                    .CellColor(aRow, 4) = Color.White
+                    For lCol = 3 To 6
+                        .CellEditable(aRow, lCol) = True
+                        .CellColor(aRow, lCol) = Color.White
+                    Next
+                Else
+                    .CellEditable(aRow, 2) = True
+                    .CellColor(aRow, 2) = Color.White
+                    For lCol = 3 To 6
+                        .CellEditable(aRow, lCol) = False
+                        .CellColor(aRow, lCol) = SystemColors.ControlDark
+                    Next
                 End If
             End With
             aGrid.Refresh()
@@ -2709,8 +2751,35 @@ KeepWaiting:
             If aColumn = 1 Then
                 lUniqueValues.Add("Varying in Space")
                 lUniqueValues.Add("Constant in Space")
-            ElseIf aColumn = 2 AndAlso chkFilePrompt.Checked Then
+            ElseIf aColumn = 3 AndAlso chkFilePrompt.Checked Then
                 GetGridFileName(aGrid, aRow, aColumn, False, True)
+                Dim lNetCDFFileName As String = AbsolutePath(aGrid.Source.CellValue(aRow, 3), PathNameOnly(pSiteData.FileName))
+                If FileExists(lNetCDFFileName) Then
+                    Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
+                    For Each lDim As atcTimeseriesNetCDF.atcNetCDFDimension In lNetCDFFile.Dimensions
+                        If lDim.Name.ToLower.StartsWith("x") Or lDim.Name.ToLower.StartsWith("lon") Then
+                            aGrid.Source.CellValue(aRow, 5) = lDim.Name
+                        ElseIf lDim.Name.ToLower.StartsWith("y") Or lDim.Name.ToLower.StartsWith("lat") Then
+                            aGrid.Source.CellValue(aRow, 6) = lDim.Name
+                        End If
+                    Next
+                End If
+            ElseIf aColumn > 3 Then
+                Dim lNetCDFFileName As String = AbsolutePath(aGrid.Source.CellValue(aRow, 3), PathNameOnly(pSiteData.FileName))
+                If FileExists(lNetCDFFileName) Then
+                    Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
+                    If aColumn = 4 Then 'get valid variable names from netCDF file
+                        For Each lVar As atcTimeseriesNetCDF.atcNetCDFVariable In lNetCDFFile.Variables
+                            If lVar.Dimensions.Count = lNetCDFFile.Dimensions.Count Then 'this is a data variable
+                                lUniqueValues.Add(lVar.ToString)
+                            End If
+                        Next
+                    Else 'get valid dimension names from netCDF file
+                        For Each lDim As atcTimeseriesNetCDF.atcNetCDFDimension In lNetCDFFile.Dimensions
+                            lUniqueValues.Add(lDim.Name)
+                        Next
+                    End If
+                End If
             End If
             aGrid.ValidValues = lUniqueValues
         End If
@@ -2760,16 +2829,29 @@ KeepWaiting:
                 lUniqueValues.Add("Varying Space/Time")
                 lUniqueValues.Add("Varying Time Only")
                 lUniqueValues.Add("Constant Space/Time")
-            Else
-                If aColumn = 2 AndAlso chkFilePrompt.Checked Then
-                    GetGridFileName(aGrid, aRow, aColumn, False, False)
-                ElseIf aColumn = 4 AndAlso chkFilePrompt.Checked Then
-                    Dim cdlg As New Windows.Forms.OpenFileDialog
-                    cdlg.Title = "Open Timeseries Data File for " & aGrid.Source.CellValue(aRow, 0)
-                    cdlg.Filter = "Timeseries Data files (*.dat)|*.dat|All Files (*.*)|*.*"
-                    If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-                        aGrid.Source.CellValue(aRow, aColumn) = cdlg.FileName
+            ElseIf aColumn = 2 AndAlso chkFilePrompt.Checked Then
+                GetGridFileName(aGrid, aRow, aColumn, False, False)
+                AtcGridInputControl_CellEdited(aGrid, aRow, aColumn)
+            ElseIf aColumn = 3 Then
+                If FileExists(aGrid.Source.CellValue(aRow, 2)) Then
+                    Dim lFileStr As String = WholeFileString(aGrid.Source.CellValue(aRow, 2))
+                    Dim lNetCDFFileName As String = StrSplit(lFileStr, vbCrLf, "")
+                    lNetCDFFileName = RelativeFilename(PathNameOnly(aGrid.Source.CellValue(aRow, 2)) & "\" & lNetCDFFileName, CurDir) ' PathNameOnly(.CellValue(aRow, aColumn)))
+                    If FileExists(lNetCDFFileName) Then
+                        Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
+                        For Each lVar As atcTimeseriesNetCDF.atcNetCDFVariable In lNetCDFFile.Variables
+                            If lVar.Dimensions.Count = lNetCDFFile.Dimensions.Count Then 'this is a data variable
+                                lUniqueValues.Add(lVar.ToString)
+                            End If
+                        Next
                     End If
+                End If
+            ElseIf aColumn = 4 AndAlso chkFilePrompt.Checked Then
+                Dim cdlg As New Windows.Forms.OpenFileDialog
+                cdlg.Title = "Open Timeseries Data File for " & aGrid.Source.CellValue(aRow, 0)
+                cdlg.Filter = "Timeseries Data files (*.dat)|*.dat|All Files (*.*)|*.*"
+                If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                    aGrid.Source.CellValue(aRow, aColumn) = cdlg.FileName
                 End If
             End If
             aGrid.ValidValues = lUniqueValues
@@ -2843,14 +2925,6 @@ KeepWaiting:
             aGrid.Source.CellValue(aRow, aColumn) = cdlg.FileName
         End If
     End Sub
-
-    Public Shared Function VarName(ByVal aDescription As String) As String
-        If aDescription.Contains(":") Then
-            Return aDescription.Substring(0, aDescription.IndexOf(":")).ToUpper
-        Else
-            Return aDescription.ToUpper
-        End If
-    End Function
 
     Public Property WatershedGridFileName()
         Get
