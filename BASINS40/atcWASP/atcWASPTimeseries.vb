@@ -4,8 +4,13 @@ Imports MapWinUtility
 Imports atcUtility
 Imports System.Text
 
+''' <summary>
+''' Note: these classes are deprecated in version 2.0
+''' </summary>
+''' <remarks></remarks>
 Public Class atcWASPTimeseriesCollection
     Inherits KeyedCollection(Of String, atcWASPTimeseries)
+
     Protected Overrides Function GetKeyForItem(ByVal aWASPTimeseries As atcWASPTimeseries) As String
         Dim lKey As String = aWASPTimeseries.Type & ":" & aWASPTimeseries.Description
         Return lKey

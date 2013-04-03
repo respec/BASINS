@@ -57,7 +57,7 @@ Public Class frmWASPFieldMapping
 
         'add target properties from introspection on the swmm classes
         AtcConnectFields.lstTarget.Items.Clear()
-        Dim lSegment As New atcWASP.atcWASPSegment
+        Dim lSegment As New atcWASP.atcWASPSegment(pfrmWASPSetup.pPlugIn.WASPProject.WASPConstituents.Count)
         For Each lField As Reflection.FieldInfo In lSegment.GetType.GetFields
             AtcConnectFields.lstTarget.Items.Add("Segment:" & lField.Name)
         Next
@@ -80,4 +80,11 @@ Public Class frmWASPFieldMapping
         ' Add any initialization after the InitializeComponent() call.
     End Sub
 
+    Private Sub frmWASPFieldMapping_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
+        SaveWindowPos(REGAPPNAME, Me)
+    End Sub
+
+    Private Sub frmWASPFieldMapping_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        GetWindowPos(REGAPPNAME, Me)
+    End Sub
 End Class
