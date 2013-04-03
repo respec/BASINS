@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -7,14 +7,14 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{701A6CF3-2347-4DD1-B6A8-589F4B98D26E}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>atcWASPPlugIN</RootNamespace>
-    <AssemblyName>atcWASPPlugIN</AssemblyName>
+    <RootNamespace>atcWASPPlugIn</RootNamespace>
+    <AssemblyName>atcWASPPlugIn</AssemblyName>
     <MyType>Windows</MyType>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <OldToolsVersion>2.0</OldToolsVersion>
+    <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -22,49 +22,84 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcWASPPlugIN.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <OutputPath>..\bin\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcWASPPlugIn.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>None</DebugType>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
-    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcWASPPlugIN.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineDebug>true</DefineDebug>
-    <DefineTrace>true</DefineTrace>
-    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcWASPPlugIN.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DefineTrace>true</DefineTrace>
-    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcWASPPlugIN.xml</DocumentationFile>
-    <Optimize>true</Optimize>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>..\..\BASINS40\bin\Plugins\BASINS\WASP\</OutputPath>
+    <DocumentationFile>atcWASPPlugIn.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <RemoveIntegerChecks>true</RemoveIntegerChecks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinInterfaces, Version=4.3.3034.36587, Culture=neutral">
+    <Reference Include="atcControls, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\..\BASINS40\bin\Plugins\BASINS\atcControls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="atcData, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BASINS40\bin\Plugins\BASINS\atcData.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="atcMwGisUtility, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BASINS40\bin\Plugins\BASINS\atcMwGisUtility.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="atcUtility, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BASINS40\bin\Plugins\BASINS\atcUtility.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MapWinInterfaces">
+      <HintPath>..\..\BASINS40\bin\MapWinInterfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MapWinUtility">
+      <HintPath>..\..\BASINS40\bin\MapWinUtility.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SplitButton, Version=2.0.3053.17713, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\atcWASPRedist\SplitButton.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.66.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <HintPath>..\atcWASPRedist\System.Data.SQLite.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WRDBControls, Version=5.0.4652.12418, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\atcWASPRedist\WRDBControls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="WRDBData, Version=5.0.4652.12641, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\atcWASPRedist\WRDBData.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="WRDBProject, Version=5.0.4652.12418, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\atcWASPRedist\WRDBProject.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="WRDBProviders, Version=5.0.4652.12418, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\atcWASPRedist\WRDBProviders.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -76,6 +111,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsPlugin.vb" />
+    <Compile Include="frmStartup.Designer.vb">
+      <DependentUpon>frmStartup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmStartup.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTableViewer.designer.vb">
+      <DependentUpon>frmTableViewer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTableViewer.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmWASPSelectTimeseries.Designer.vb">
+      <DependentUpon>frmWASPSelectTimeseries.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmWASPSelectTimeseries.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmWASPInitialize.Designer.vb">
       <DependentUpon>frmWASPInitialize.vb</DependentUpon>
     </Compile>
@@ -88,9 +141,13 @@
     <Compile Include="frmWASPFieldMapping.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmWASPSetup.Designer.vb">
+      <DependentUpon>frmWASPSetup.vb</DependentUpon>
+    </Compile>
     <Compile Include="frmWASPSetup.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="modWASP.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -108,6 +165,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmStartup.resx">
+      <DependentUpon>frmStartup.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTableViewer.resx">
+      <DependentUpon>frmTableViewer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmWASPSelectTimeseries.resx">
+      <DependentUpon>frmWASPSelectTimeseries.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmWASPFieldMapping.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmWASPFieldMapping.vb</DependentUpon>
@@ -117,8 +183,8 @@
       <DependentUpon>frmWASPInitialize.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmWASPSetup.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>frmWASPSetup.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -128,6 +194,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="epa.sqlite">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -139,43 +208,81 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj">
-      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
-      <Name>BASINS-MapWinUtility</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcControls\atcControls.vbproj">
-      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
-      <Name>atcControls</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData.vbproj">
-      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
-      <Name>atcData</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
-      <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
-      <Name>atcMwGisUtility</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
-      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Name>atcUtility</Name>
-      <Private>False</Private>
-    </ProjectReference>
+    <None Include="Resources\NewDocumentHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NewCardHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\openHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OpenSelectedItemHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\saveHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SaveAllHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Help.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PlayHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TextboxHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PropertiesHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RefreshDocViewHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ArrangeWindowsHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Combine.png" />
+    <None Include="Resources\deletehs.png" />
+    <Content Include="Resources\Split.png" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\atcWASP\atcWASP.vbproj">
       <Project>{74201F53-B122-40F0-9678-1DCDC45E99BC}</Project>
       <Name>atcWASP</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcWDM\atcWDM.vbproj">
-      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
-      <Name>atcWDM</Name>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="MapWinGIS">
+      <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
+      <VersionMajor>4</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
       <Private>False</Private>
-    </ProjectReference>
+    </COMReference>
+    <COMReference Include="stdole">
+      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>del atcwdm*.*
+del *.pdb
+del *.xml
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,50 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="ArrangeWindowsHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ArrangeWindowsHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <metadata name="HelpProvider1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="chkMapping.HelpString" xml:space="preserve">
+    <value>If unselected, the time series will be created by querying the selected table for records having the specified station ID and PCode; if selected, use the Mappings tab to relate WASP segments to WRDB stations and WASP constituents to WRDB PCodes. If selected you also have the option of applying the selected table and mapping to all cells in the calling form.</value>
   </data>
-  <data name="NewCardHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\NewCardHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <metadata name="Segment.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="Station.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="dgStationMapping.HelpString" xml:space="preserve">
+    <value>Use this grid to associate WRDB station IDs with WASP segments. Note that a single set of mappings is associated with a given WASP Builder project. If you select a WRDB project and check 'Use ... mappings', then you will be able to also select Station IDs from drop-down lists populated with unique values in the WRDB Project's Stations table.</value>
   </data>
-  <data name="openHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\openHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <metadata name="DataGridViewTextBoxColumn1.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="DataGridViewTextBoxColumn2.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="Conversion.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="ScaleFactor.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="dgPCodeMapping.HelpString" xml:space="preserve">
+    <value>Use this grid to associate PCodes with WASP constituents and time functions. Note that a single set of mappings is associated with a given WASP Builder project. If you select a WRDB project and check 'Use ... mappings', then you will be able to also select PCodes from drop-down lists populated with unique values in the WRDB Project's PCode table.</value>
   </data>
-  <data name="saveHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\saveHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="PlayHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\PlayHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="TextboxHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\TextboxHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="NewDocumentHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\NewDocumentHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="OpenSelectedItemHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\OpenSelectedItemHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Split" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Split.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="RefreshDocViewHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\RefreshDocViewHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Combine" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Combine.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Help" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Help.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="PropertiesHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\PropertiesHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="SaveAllHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\SaveAllHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="deletehs" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\deletehs.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
+  <metadata name="ToolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>138, 17</value>
+  </metadata>
 </root>

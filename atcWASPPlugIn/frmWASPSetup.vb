@@ -7,986 +7,115 @@ Imports System
 Imports System.Windows.Forms
 Imports atcWASP
 
+''' <summary>
+''' After the stream segments have been selected, this form is shown to allow you to refine the Wasp segment organization (subdividing and combining NHD segments)
+''' and then assigning input time series to each Wasp Segment. Finally, you can create the Wasp INP file and fire up Wasp 8
+''' </summary>
 Public Class frmWASPSetup
     Inherits System.Windows.Forms.Form
-
-#Region " Windows Form Designer generated code "
-
-    Public Sub New()
-        MyBase.New()
-
-        'This call is required by the Windows Form Designer.
-        InitializeComponent()
-
-        'Add any initialization after the InitializeComponent() call
-    End Sub
-
-    'Form overrides dispose to clean up the component list.
-    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
-        If disposing Then
-            If Not (components Is Nothing) Then
-                components.Dispose()
-            End If
-        End If
-        MyBase.Dispose(disposing)
-    End Sub
-
-    'Required by the Windows Form Designer
-    Private components As System.ComponentModel.IContainer
-
-    'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.  
-    'Do not modify it using the code editor.
-    Friend WithEvents cmdCancel As System.Windows.Forms.Button
-    Friend WithEvents cmdOK As System.Windows.Forms.Button
-    Friend WithEvents cmdExisting As System.Windows.Forms.Button
-    Friend WithEvents cmdHelp As System.Windows.Forms.Button
-    Friend WithEvents cmdAbout As System.Windows.Forms.Button
-    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
-    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
-    Friend WithEvents cboMet As System.Windows.Forms.ComboBox
-    Friend WithEvents Label9 As System.Windows.Forms.Label
-    Friend WithEvents tbxName As System.Windows.Forms.TextBox
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
-    Friend WithEvents TabPage6 As System.Windows.Forms.TabPage
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
-    Friend WithEvents lblStatus As System.Windows.Forms.Label
-    Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
-    Friend WithEvents ofdMetWDM As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents TabPage4 As System.Windows.Forms.TabPage
-    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
-    Friend WithEvents lblEnd As System.Windows.Forms.Label
-    Friend WithEvents lblStart As System.Windows.Forms.Label
-    Friend WithEvents lblDay As System.Windows.Forms.Label
-    Friend WithEvents lblMonth As System.Windows.Forms.Label
-    Friend WithEvents lblYear As System.Windows.Forms.Label
-    Friend WithEvents atxEDay As atcControls.atcText
-    Friend WithEvents atxSDay As atcControls.atcText
-    Friend WithEvents atxSYear As atcControls.atcText
-    Friend WithEvents atxEMonth As atcControls.atcText
-    Friend WithEvents atxSMonth As atcControls.atcText
-    Friend WithEvents atxEYear As atcControls.atcText
-    Friend WithEvents AtcGridFlow As atcControls.atcGrid
-    Friend WithEvents cmdGenerate As System.Windows.Forms.Button
-    Friend WithEvents AtcGridSegmentation As atcControls.atcGrid
-    Friend WithEvents AtcGridLoad As atcControls.atcGrid
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents atxTravelTimeMax As atcControls.atcText
-    Friend WithEvents cmdFieldMapping As System.Windows.Forms.Button
-    Friend WithEvents cmdCreateShapefile As System.Windows.Forms.Button
-    Friend WithEvents Label6 As System.Windows.Forms.Label
-    Friend WithEvents atxTravelTimeMin As atcControls.atcText
-    Friend WithEvents cboModel As System.Windows.Forms.ComboBox
-    Friend WithEvents Label4 As System.Windows.Forms.Label
-    Friend WithEvents TabPage5 As System.Windows.Forms.TabPage
-    Friend WithEvents AtcGridBound As atcControls.atcGrid
-    Friend WithEvents AtcGridTime As atcControls.atcGrid
-    Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
-    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWASPSetup))
-        Me.cmdOK = New System.Windows.Forms.Button
-        Me.cmdExisting = New System.Windows.Forms.Button
-        Me.cmdCancel = New System.Windows.Forms.Button
-        Me.cmdHelp = New System.Windows.Forms.Button
-        Me.cmdAbout = New System.Windows.Forms.Button
-        Me.ofdExisting = New System.Windows.Forms.OpenFileDialog
-        Me.TabControl1 = New System.Windows.Forms.TabControl
-        Me.TabPage1 = New System.Windows.Forms.TabPage
-        Me.cboModel = New System.Windows.Forms.ComboBox
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.GroupBox3 = New System.Windows.Forms.GroupBox
-        Me.lblEnd = New System.Windows.Forms.Label
-        Me.lblStart = New System.Windows.Forms.Label
-        Me.lblDay = New System.Windows.Forms.Label
-        Me.lblMonth = New System.Windows.Forms.Label
-        Me.lblYear = New System.Windows.Forms.Label
-        Me.atxEDay = New atcControls.atcText
-        Me.atxSDay = New atcControls.atcText
-        Me.atxSYear = New atcControls.atcText
-        Me.atxEMonth = New atcControls.atcText
-        Me.atxSMonth = New atcControls.atcText
-        Me.atxEYear = New atcControls.atcText
-        Me.cboMet = New System.Windows.Forms.ComboBox
-        Me.Label9 = New System.Windows.Forms.Label
-        Me.tbxName = New System.Windows.Forms.TextBox
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.TabPage2 = New System.Windows.Forms.TabPage
-        Me.atxTravelTimeMin = New atcControls.atcText
-        Me.Label6 = New System.Windows.Forms.Label
-        Me.cmdCreateShapefile = New System.Windows.Forms.Button
-        Me.cmdFieldMapping = New System.Windows.Forms.Button
-        Me.atxTravelTimeMax = New atcControls.atcText
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.cmdGenerate = New System.Windows.Forms.Button
-        Me.AtcGridSegmentation = New atcControls.atcGrid
-        Me.TabPage3 = New System.Windows.Forms.TabPage
-        Me.AtcGridFlow = New atcControls.atcGrid
-        Me.TabPage5 = New System.Windows.Forms.TabPage
-        Me.AtcGridBound = New atcControls.atcGrid
-        Me.TabPage4 = New System.Windows.Forms.TabPage
-        Me.AtcGridLoad = New atcControls.atcGrid
-        Me.TabPage6 = New System.Windows.Forms.TabPage
-        Me.AtcGridTime = New atcControls.atcGrid
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.lblStatus = New System.Windows.Forms.Label
-        Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
-        Me.TabControl1.SuspendLayout()
-        Me.TabPage1.SuspendLayout()
-        Me.GroupBox3.SuspendLayout()
-        Me.TabPage2.SuspendLayout()
-        Me.TabPage3.SuspendLayout()
-        Me.TabPage5.SuspendLayout()
-        Me.TabPage4.SuspendLayout()
-        Me.TabPage6.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
-        Me.SuspendLayout()
-        '
-        'cmdOK
-        '
-        Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOK.Location = New System.Drawing.Point(16, 523)
-        Me.cmdOK.Name = "cmdOK"
-        Me.cmdOK.Size = New System.Drawing.Size(72, 32)
-        Me.cmdOK.TabIndex = 2
-        Me.cmdOK.Text = "OK"
-        '
-        'cmdExisting
-        '
-        Me.cmdExisting.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdExisting.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdExisting.Location = New System.Drawing.Point(96, 523)
-        Me.cmdExisting.Name = "cmdExisting"
-        Me.cmdExisting.Size = New System.Drawing.Size(120, 32)
-        Me.cmdExisting.TabIndex = 4
-        Me.cmdExisting.Text = "Open Existing"
-        '
-        'cmdCancel
-        '
-        Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(224, 523)
-        Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(88, 32)
-        Me.cmdCancel.TabIndex = 5
-        Me.cmdCancel.Text = "Cancel"
-        '
-        'cmdHelp
-        '
-        Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(752, 523)
-        Me.cmdHelp.Name = "cmdHelp"
-        Me.cmdHelp.Size = New System.Drawing.Size(79, 32)
-        Me.cmdHelp.TabIndex = 6
-        Me.cmdHelp.Text = "Help"
-        '
-        'cmdAbout
-        '
-        Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(840, 523)
-        Me.cmdAbout.Name = "cmdAbout"
-        Me.cmdAbout.Size = New System.Drawing.Size(87, 32)
-        Me.cmdAbout.TabIndex = 7
-        Me.cmdAbout.Text = "About"
-        '
-        'ofdExisting
-        '
-        Me.ofdExisting.DefaultExt = "inp"
-        Me.ofdExisting.Filter = "WASP INP files (*.inp)|*.inp"
-        Me.ofdExisting.InitialDirectory = "/BASINS/modelout/"
-        Me.ofdExisting.Title = "Select WASP inp file"
-        '
-        'TabControl1
-        '
-        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TabControl1.Controls.Add(Me.TabPage1)
-        Me.TabControl1.Controls.Add(Me.TabPage2)
-        Me.TabControl1.Controls.Add(Me.TabPage3)
-        Me.TabControl1.Controls.Add(Me.TabPage5)
-        Me.TabControl1.Controls.Add(Me.TabPage4)
-        Me.TabControl1.Controls.Add(Me.TabPage6)
-        Me.TabControl1.Cursor = System.Windows.Forms.Cursors.Default
-        Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TabControl1.ItemSize = New System.Drawing.Size(60, 21)
-        Me.TabControl1.Location = New System.Drawing.Point(18, 17)
-        Me.TabControl1.Name = "TabControl1"
-        Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(907, 427)
-        Me.TabControl1.TabIndex = 8
-        '
-        'TabPage1
-        '
-        Me.TabPage1.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage1.Controls.Add(Me.cboModel)
-        Me.TabPage1.Controls.Add(Me.Label4)
-        Me.TabPage1.Controls.Add(Me.GroupBox3)
-        Me.TabPage1.Controls.Add(Me.cboMet)
-        Me.TabPage1.Controls.Add(Me.Label9)
-        Me.TabPage1.Controls.Add(Me.tbxName)
-        Me.TabPage1.Controls.Add(Me.Label1)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(899, 398)
-        Me.TabPage1.TabIndex = 0
-        Me.TabPage1.Text = "General"
-        Me.TabPage1.UseVisualStyleBackColor = True
-        '
-        'cboModel
-        '
-        Me.cboModel.AllowDrop = True
-        Me.cboModel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboModel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboModel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboModel.Location = New System.Drawing.Point(167, 79)
-        Me.cboModel.Name = "cboModel"
-        Me.cboModel.Size = New System.Drawing.Size(341, 25)
-        Me.cboModel.TabIndex = 30
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(11, 82)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(94, 17)
-        Me.Label4.TabIndex = 29
-        Me.Label4.Text = "WASP Model:"
-        '
-        'GroupBox3
-        '
-        Me.GroupBox3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox3.Controls.Add(Me.lblEnd)
-        Me.GroupBox3.Controls.Add(Me.lblStart)
-        Me.GroupBox3.Controls.Add(Me.lblDay)
-        Me.GroupBox3.Controls.Add(Me.lblMonth)
-        Me.GroupBox3.Controls.Add(Me.lblYear)
-        Me.GroupBox3.Controls.Add(Me.atxEDay)
-        Me.GroupBox3.Controls.Add(Me.atxSDay)
-        Me.GroupBox3.Controls.Add(Me.atxSYear)
-        Me.GroupBox3.Controls.Add(Me.atxEMonth)
-        Me.GroupBox3.Controls.Add(Me.atxSMonth)
-        Me.GroupBox3.Controls.Add(Me.atxEYear)
-        Me.GroupBox3.Location = New System.Drawing.Point(14, 270)
-        Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(872, 111)
-        Me.GroupBox3.TabIndex = 28
-        Me.GroupBox3.TabStop = False
-        Me.GroupBox3.Text = "Simulation Dates"
-        '
-        'lblEnd
-        '
-        Me.lblEnd.AutoSize = True
-        Me.lblEnd.Location = New System.Drawing.Point(105, 67)
-        Me.lblEnd.Name = "lblEnd"
-        Me.lblEnd.Size = New System.Drawing.Size(33, 17)
-        Me.lblEnd.TabIndex = 37
-        Me.lblEnd.Text = "End"
-        '
-        'lblStart
-        '
-        Me.lblStart.AutoSize = True
-        Me.lblStart.Location = New System.Drawing.Point(100, 37)
-        Me.lblStart.Name = "lblStart"
-        Me.lblStart.Size = New System.Drawing.Size(38, 17)
-        Me.lblStart.TabIndex = 36
-        Me.lblStart.Text = "Start"
-        '
-        'lblDay
-        '
-        Me.lblDay.AutoSize = True
-        Me.lblDay.Location = New System.Drawing.Point(291, 16)
-        Me.lblDay.Name = "lblDay"
-        Me.lblDay.Size = New System.Drawing.Size(33, 17)
-        Me.lblDay.TabIndex = 35
-        Me.lblDay.Text = "Day"
-        '
-        'lblMonth
-        '
-        Me.lblMonth.AutoSize = True
-        Me.lblMonth.Location = New System.Drawing.Point(232, 16)
-        Me.lblMonth.Name = "lblMonth"
-        Me.lblMonth.Size = New System.Drawing.Size(47, 17)
-        Me.lblMonth.TabIndex = 34
-        Me.lblMonth.Text = "Month"
-        '
-        'lblYear
-        '
-        Me.lblYear.AutoSize = True
-        Me.lblYear.Location = New System.Drawing.Point(150, 16)
-        Me.lblYear.Name = "lblYear"
-        Me.lblYear.Size = New System.Drawing.Size(38, 17)
-        Me.lblYear.TabIndex = 33
-        Me.lblYear.Text = "Year"
-        '
-        'atxEDay
-        '
-        Me.atxEDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxEDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxEDay.DefaultValue = ""
-        Me.atxEDay.HardMax = 31
-        Me.atxEDay.HardMin = 1
-        Me.atxEDay.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxEDay.Location = New System.Drawing.Point(294, 67)
-        Me.atxEDay.MaxWidth = 20
-        Me.atxEDay.Name = "atxEDay"
-        Me.atxEDay.NumericFormat = "0"
-        Me.atxEDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxEDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxEDay.SelLength = 2
-        Me.atxEDay.SelStart = 0
-        Me.atxEDay.Size = New System.Drawing.Size(53, 24)
-        Me.atxEDay.SoftMax = -999
-        Me.atxEDay.SoftMin = -999
-        Me.atxEDay.TabIndex = 32
-        Me.atxEDay.ValueDouble = 31
-        Me.atxEDay.ValueInteger = 31
-        '
-        'atxSDay
-        '
-        Me.atxSDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxSDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxSDay.DefaultValue = ""
-        Me.atxSDay.HardMax = 31
-        Me.atxSDay.HardMin = 1
-        Me.atxSDay.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSDay.Location = New System.Drawing.Point(294, 37)
-        Me.atxSDay.MaxWidth = 20
-        Me.atxSDay.Name = "atxSDay"
-        Me.atxSDay.NumericFormat = "0"
-        Me.atxSDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxSDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxSDay.SelLength = 1
-        Me.atxSDay.SelStart = 0
-        Me.atxSDay.Size = New System.Drawing.Size(53, 24)
-        Me.atxSDay.SoftMax = -999
-        Me.atxSDay.SoftMin = -999
-        Me.atxSDay.TabIndex = 31
-        Me.atxSDay.ValueDouble = 1
-        Me.atxSDay.ValueInteger = 1
-        '
-        'atxSYear
-        '
-        Me.atxSYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxSYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxSYear.DefaultValue = ""
-        Me.atxSYear.HardMax = 9999
-        Me.atxSYear.HardMin = 0
-        Me.atxSYear.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSYear.Location = New System.Drawing.Point(153, 37)
-        Me.atxSYear.MaxWidth = 20
-        Me.atxSYear.Name = "atxSYear"
-        Me.atxSYear.NumericFormat = "0"
-        Me.atxSYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxSYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxSYear.SelLength = 4
-        Me.atxSYear.SelStart = 0
-        Me.atxSYear.Size = New System.Drawing.Size(76, 24)
-        Me.atxSYear.SoftMax = -999
-        Me.atxSYear.SoftMin = -999
-        Me.atxSYear.TabIndex = 30
-        Me.atxSYear.ValueDouble = 2000
-        Me.atxSYear.ValueInteger = 2000
-        '
-        'atxEMonth
-        '
-        Me.atxEMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxEMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxEMonth.DefaultValue = ""
-        Me.atxEMonth.HardMax = 12
-        Me.atxEMonth.HardMin = 1
-        Me.atxEMonth.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxEMonth.Location = New System.Drawing.Point(235, 67)
-        Me.atxEMonth.MaxWidth = 20
-        Me.atxEMonth.Name = "atxEMonth"
-        Me.atxEMonth.NumericFormat = "0"
-        Me.atxEMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxEMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxEMonth.SelLength = 2
-        Me.atxEMonth.SelStart = 0
-        Me.atxEMonth.Size = New System.Drawing.Size(53, 24)
-        Me.atxEMonth.SoftMax = -999
-        Me.atxEMonth.SoftMin = -999
-        Me.atxEMonth.TabIndex = 29
-        Me.atxEMonth.ValueDouble = 12
-        Me.atxEMonth.ValueInteger = 12
-        '
-        'atxSMonth
-        '
-        Me.atxSMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxSMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxSMonth.DefaultValue = ""
-        Me.atxSMonth.HardMax = 12
-        Me.atxSMonth.HardMin = 1
-        Me.atxSMonth.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSMonth.Location = New System.Drawing.Point(235, 37)
-        Me.atxSMonth.MaxWidth = 20
-        Me.atxSMonth.Name = "atxSMonth"
-        Me.atxSMonth.NumericFormat = "0"
-        Me.atxSMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxSMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxSMonth.SelLength = 1
-        Me.atxSMonth.SelStart = 0
-        Me.atxSMonth.Size = New System.Drawing.Size(53, 24)
-        Me.atxSMonth.SoftMax = -999
-        Me.atxSMonth.SoftMin = -999
-        Me.atxSMonth.TabIndex = 28
-        Me.atxSMonth.ValueDouble = 1
-        Me.atxSMonth.ValueInteger = 1
-        '
-        'atxEYear
-        '
-        Me.atxEYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxEYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxEYear.DefaultValue = ""
-        Me.atxEYear.HardMax = 9999
-        Me.atxEYear.HardMin = 0
-        Me.atxEYear.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxEYear.Location = New System.Drawing.Point(153, 67)
-        Me.atxEYear.MaxWidth = 20
-        Me.atxEYear.Name = "atxEYear"
-        Me.atxEYear.NumericFormat = "0"
-        Me.atxEYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxEYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxEYear.SelLength = 4
-        Me.atxEYear.SelStart = 0
-        Me.atxEYear.Size = New System.Drawing.Size(76, 24)
-        Me.atxEYear.SoftMax = -999
-        Me.atxEYear.SoftMin = -999
-        Me.atxEYear.TabIndex = 27
-        Me.atxEYear.ValueDouble = 2000
-        Me.atxEYear.ValueInteger = 2000
-        '
-        'cboMet
-        '
-        Me.cboMet.AllowDrop = True
-        Me.cboMet.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboMet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboMet.Location = New System.Drawing.Point(168, 151)
-        Me.cboMet.Name = "cboMet"
-        Me.cboMet.Size = New System.Drawing.Size(719, 25)
-        Me.cboMet.TabIndex = 12
-        '
-        'Label9
-        '
-        Me.Label9.AutoSize = True
-        Me.Label9.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label9.Location = New System.Drawing.Point(11, 154)
-        Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(130, 17)
-        Me.Label9.TabIndex = 11
-        Me.Label9.Text = "Met Stations Layer:"
-        '
-        'tbxName
-        '
-        Me.tbxName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tbxName.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.tbxName.Location = New System.Drawing.Point(168, 40)
-        Me.tbxName.Name = "tbxName"
-        Me.tbxName.Size = New System.Drawing.Size(553, 23)
-        Me.tbxName.TabIndex = 6
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(11, 44)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(141, 17)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "WASP Project Name:"
-        '
-        'TabPage2
-        '
-        Me.TabPage2.Controls.Add(Me.atxTravelTimeMin)
-        Me.TabPage2.Controls.Add(Me.Label6)
-        Me.TabPage2.Controls.Add(Me.cmdCreateShapefile)
-        Me.TabPage2.Controls.Add(Me.cmdFieldMapping)
-        Me.TabPage2.Controls.Add(Me.atxTravelTimeMax)
-        Me.TabPage2.Controls.Add(Me.Label2)
-        Me.TabPage2.Controls.Add(Me.cmdGenerate)
-        Me.TabPage2.Controls.Add(Me.AtcGridSegmentation)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(899, 398)
-        Me.TabPage2.TabIndex = 1
-        Me.TabPage2.Text = "Segmentation"
-        Me.TabPage2.UseVisualStyleBackColor = True
-        '
-        'atxTravelTimeMin
-        '
-        Me.atxTravelTimeMin.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxTravelTimeMin.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxTravelTimeMin.DefaultValue = ""
-        Me.atxTravelTimeMin.HardMax = -999
-        Me.atxTravelTimeMin.HardMin = 0
-        Me.atxTravelTimeMin.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxTravelTimeMin.Location = New System.Drawing.Point(215, 44)
-        Me.atxTravelTimeMin.MaxWidth = 20
-        Me.atxTravelTimeMin.Name = "atxTravelTimeMin"
-        Me.atxTravelTimeMin.NumericFormat = "0.#####"
-        Me.atxTravelTimeMin.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxTravelTimeMin.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxTravelTimeMin.SelLength = 1
-        Me.atxTravelTimeMin.SelStart = 0
-        Me.atxTravelTimeMin.Size = New System.Drawing.Size(48, 24)
-        Me.atxTravelTimeMin.SoftMax = -999
-        Me.atxTravelTimeMin.SoftMin = -999
-        Me.atxTravelTimeMin.TabIndex = 27
-        Me.atxTravelTimeMin.ValueDouble = 0
-        Me.atxTravelTimeMin.ValueInteger = 0
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(20, 47)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(186, 17)
-        Me.Label6.TabIndex = 26
-        Me.Label6.Text = "Minimum Travel Time (days)"
-        '
-        'cmdCreateShapefile
-        '
-        Me.cmdCreateShapefile.Location = New System.Drawing.Point(466, 47)
-        Me.cmdCreateShapefile.Name = "cmdCreateShapefile"
-        Me.cmdCreateShapefile.Size = New System.Drawing.Size(137, 25)
-        Me.cmdCreateShapefile.TabIndex = 8
-        Me.cmdCreateShapefile.Text = "Create Shapefile"
-        Me.cmdCreateShapefile.UseVisualStyleBackColor = True
-        '
-        'cmdFieldMapping
-        '
-        Me.cmdFieldMapping.Location = New System.Drawing.Point(466, 16)
-        Me.cmdFieldMapping.Name = "cmdFieldMapping"
-        Me.cmdFieldMapping.Size = New System.Drawing.Size(137, 25)
-        Me.cmdFieldMapping.TabIndex = 7
-        Me.cmdFieldMapping.Text = "Field Mapping"
-        Me.cmdFieldMapping.UseVisualStyleBackColor = True
-        '
-        'atxTravelTimeMax
-        '
-        Me.atxTravelTimeMax.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxTravelTimeMax.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxTravelTimeMax.DefaultValue = ""
-        Me.atxTravelTimeMax.HardMax = -999
-        Me.atxTravelTimeMax.HardMin = 0
-        Me.atxTravelTimeMax.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxTravelTimeMax.Location = New System.Drawing.Point(215, 16)
-        Me.atxTravelTimeMax.MaxWidth = 20
-        Me.atxTravelTimeMax.Name = "atxTravelTimeMax"
-        Me.atxTravelTimeMax.NumericFormat = "0.#####"
-        Me.atxTravelTimeMax.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxTravelTimeMax.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxTravelTimeMax.SelLength = 1
-        Me.atxTravelTimeMax.SelStart = 0
-        Me.atxTravelTimeMax.Size = New System.Drawing.Size(48, 24)
-        Me.atxTravelTimeMax.SoftMax = -999
-        Me.atxTravelTimeMax.SoftMin = -999
-        Me.atxTravelTimeMax.TabIndex = 6
-        Me.atxTravelTimeMax.ValueDouble = 0
-        Me.atxTravelTimeMax.ValueInteger = 0
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(20, 20)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(189, 17)
-        Me.Label2.TabIndex = 4
-        Me.Label2.Text = "Maximum Travel Time (days)"
-        '
-        'cmdGenerate
-        '
-        Me.cmdGenerate.Location = New System.Drawing.Point(269, 20)
-        Me.cmdGenerate.Name = "cmdGenerate"
-        Me.cmdGenerate.Size = New System.Drawing.Size(126, 44)
-        Me.cmdGenerate.TabIndex = 1
-        Me.cmdGenerate.Text = "Regenerate"
-        Me.cmdGenerate.UseVisualStyleBackColor = True
-        '
-        'AtcGridSegmentation
-        '
-        Me.AtcGridSegmentation.AllowHorizontalScrolling = True
-        Me.AtcGridSegmentation.AllowNewValidValues = False
-        Me.AtcGridSegmentation.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridSegmentation.CellBackColor = System.Drawing.SystemColors.Window
-        Me.AtcGridSegmentation.Fixed3D = False
-        Me.AtcGridSegmentation.LineColor = System.Drawing.SystemColors.Control
-        Me.AtcGridSegmentation.LineWidth = 1.0!
-        Me.AtcGridSegmentation.Location = New System.Drawing.Point(23, 74)
-        Me.AtcGridSegmentation.Name = "AtcGridSegmentation"
-        Me.AtcGridSegmentation.Size = New System.Drawing.Size(854, 307)
-        Me.AtcGridSegmentation.Source = Nothing
-        Me.AtcGridSegmentation.TabIndex = 0
-        '
-        'TabPage3
-        '
-        Me.TabPage3.Controls.Add(Me.AtcGridFlow)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(899, 398)
-        Me.TabPage3.TabIndex = 2
-        Me.TabPage3.Text = "Flows"
-        Me.TabPage3.UseVisualStyleBackColor = True
-        '
-        'AtcGridFlow
-        '
-        Me.AtcGridFlow.AllowHorizontalScrolling = True
-        Me.AtcGridFlow.AllowNewValidValues = False
-        Me.AtcGridFlow.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridFlow.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridFlow.Fixed3D = False
-        Me.AtcGridFlow.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridFlow.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridFlow.LineWidth = 0.0!
-        Me.AtcGridFlow.Location = New System.Drawing.Point(23, 74)
-        Me.AtcGridFlow.Name = "AtcGridFlow"
-        Me.AtcGridFlow.Size = New System.Drawing.Size(854, 307)
-        Me.AtcGridFlow.Source = Nothing
-        Me.AtcGridFlow.TabIndex = 20
-        '
-        'TabPage5
-        '
-        Me.TabPage5.Controls.Add(Me.AtcGridBound)
-        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(899, 398)
-        Me.TabPage5.TabIndex = 7
-        Me.TabPage5.Text = "Boundaries"
-        Me.TabPage5.UseVisualStyleBackColor = True
-        '
-        'AtcGridBound
-        '
-        Me.AtcGridBound.AllowHorizontalScrolling = True
-        Me.AtcGridBound.AllowNewValidValues = False
-        Me.AtcGridBound.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridBound.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridBound.Fixed3D = False
-        Me.AtcGridBound.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridBound.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridBound.LineWidth = 0.0!
-        Me.AtcGridBound.Location = New System.Drawing.Point(23, 74)
-        Me.AtcGridBound.Name = "AtcGridBound"
-        Me.AtcGridBound.Size = New System.Drawing.Size(854, 307)
-        Me.AtcGridBound.Source = Nothing
-        Me.AtcGridBound.TabIndex = 22
-        '
-        'TabPage4
-        '
-        Me.TabPage4.Controls.Add(Me.AtcGridLoad)
-        Me.TabPage4.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(899, 398)
-        Me.TabPage4.TabIndex = 6
-        Me.TabPage4.Text = "Loads"
-        Me.TabPage4.UseVisualStyleBackColor = True
-        '
-        'AtcGridLoad
-        '
-        Me.AtcGridLoad.AllowHorizontalScrolling = True
-        Me.AtcGridLoad.AllowNewValidValues = False
-        Me.AtcGridLoad.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridLoad.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridLoad.Fixed3D = False
-        Me.AtcGridLoad.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridLoad.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridLoad.LineWidth = 0.0!
-        Me.AtcGridLoad.Location = New System.Drawing.Point(23, 74)
-        Me.AtcGridLoad.Name = "AtcGridLoad"
-        Me.AtcGridLoad.Size = New System.Drawing.Size(854, 307)
-        Me.AtcGridLoad.Source = Nothing
-        Me.AtcGridLoad.TabIndex = 21
-        '
-        'TabPage6
-        '
-        Me.TabPage6.Controls.Add(Me.AtcGridTime)
-        Me.TabPage6.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(899, 398)
-        Me.TabPage6.TabIndex = 5
-        Me.TabPage6.Text = "Time Functions"
-        Me.TabPage6.UseVisualStyleBackColor = True
-        '
-        'AtcGridTime
-        '
-        Me.AtcGridTime.AllowHorizontalScrolling = True
-        Me.AtcGridTime.AllowNewValidValues = False
-        Me.AtcGridTime.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridTime.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridTime.Fixed3D = False
-        Me.AtcGridTime.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridTime.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridTime.LineWidth = 0.0!
-        Me.AtcGridTime.Location = New System.Drawing.Point(23, 74)
-        Me.AtcGridTime.Name = "AtcGridTime"
-        Me.AtcGridTime.Size = New System.Drawing.Size(854, 307)
-        Me.AtcGridTime.Source = Nothing
-        Me.AtcGridTime.TabIndex = 29
-        '
-        'GroupBox1
-        '
-        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox1.Controls.Add(Me.lblStatus)
-        Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(18, 451)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(909, 55)
-        Me.GroupBox1.TabIndex = 9
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Status"
-        '
-        'lblStatus
-        '
-        Me.lblStatus.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblStatus.Location = New System.Drawing.Point(16, 24)
-        Me.lblStatus.Name = "lblStatus"
-        Me.lblStatus.Size = New System.Drawing.Size(878, 16)
-        Me.lblStatus.TabIndex = 0
-        Me.lblStatus.Text = "Update specifications if desired, then click OK to proceed."
-        '
-        'ofdMetWDM
-        '
-        Me.ofdMetWDM.DefaultExt = "wdm"
-        Me.ofdMetWDM.Filter = "Met WDM files (*.wdm)|*.wdm"
-        Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
-        Me.ofdMetWDM.Title = "Select Met WDM File"
-        '
-        'frmWASPSetup
-        '
-        Me.AcceptButton = Me.cmdOK
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(944, 568)
-        Me.Controls.Add(Me.GroupBox1)
-        Me.Controls.Add(Me.TabControl1)
-        Me.Controls.Add(Me.cmdAbout)
-        Me.Controls.Add(Me.cmdHelp)
-        Me.Controls.Add(Me.cmdCancel)
-        Me.Controls.Add(Me.cmdExisting)
-        Me.Controls.Add(Me.cmdOK)
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.KeyPreview = True
-        Me.Name = "frmWASPSetup"
-        Me.Text = "BASINS WASP"
-        Me.TabControl1.ResumeLayout(False)
-        Me.TabPage1.ResumeLayout(False)
-        Me.TabPage1.PerformLayout()
-        Me.GroupBox3.ResumeLayout(False)
-        Me.GroupBox3.PerformLayout()
-        Me.TabPage2.ResumeLayout(False)
-        Me.TabPage2.PerformLayout()
-        Me.TabPage3.ResumeLayout(False)
-        Me.TabPage5.ResumeLayout(False)
-        Me.TabPage4.ResumeLayout(False)
-        Me.TabPage6.ResumeLayout(False)
-        Me.GroupBox1.ResumeLayout(False)
-        Me.ResumeLayout(False)
-
-    End Sub
-
-#End Region
 
     Friend pPlugIn As PlugIn
     Friend pSelectedIndexes As atcCollection
     Friend pSegmentLayerIndex As Integer
     Friend pBasinsFolder As String
     Friend pfrmWASPFieldMapping As frmWASPFieldMapping
-    Friend pWASPModelsDB As atcCollection
-    Friend pWASPSystemIdsDB As atcCollection
-    Friend pWASPSystemNamesDB As atcCollection
-    Friend pWASPTimeFunctionModelIdsDB As atcCollection
-    Friend pWASPTimeFunctionIdsDB As atcCollection
-    Friend pWASPTimeFunctionNamesDB As atcCollection
+    Friend pWASPFolder As String
+    Friend IsModified As Boolean = False
 
-    Private pSelectedRow As Integer
-    Private pSelectedColumn As Integer
+    Private Const WASPSegmentLayerName As String = "WASP Segments"
 
-    Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
+    'these are helper classes that enable advanced editing of datagridviews...
+
+    Private WithEvents dgvSegmentation, dgvFlow, dgvLoad, dgvBound, dgvTime As WRDB.Controls.DGVEditor
+
+    Private Sub btnClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnClose.Click
         Me.Close()
     End Sub
 
-    Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
-        Logger.Msg("BASINS WASP for MapWindow" & vbCrLf & vbCrLf & "Version 1.01", MsgBoxStyle.OkOnly, "BASINS WASP")
+    Private Sub mnuHelpAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelpAbout.Click
+        Logger.Msg("BASINS WASP 8 Model Builder for MapWindow" & vbCrLf & vbCrLf & "Version " & My.Application.Info.Version.ToString(2), MsgBoxStyle.OkOnly, "BASINS WASP 8 Model Builder")
     End Sub
 
-    Private Sub cmdExisting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdExisting.Click
-        If ofdExisting.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            Logger.Dbg("Run WASP with " & ofdExisting.FileName)
-            pPlugIn.WASPProject.Run(ofdExisting.FileName)
-        End If
-    End Sub
-
-    Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
+    Private Sub btnHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelpManual.Click, btnHelp.Click
         ShowHelp("BASINS Details\Watershed and Instream Model Setup\WASP.html")
     End Sub
 
-    Private Sub frmWASPSetup_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Watershed and Instream Model Setup\WASP.html")
-        End If
+    Private Sub frmWASPSetup_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
+        SaveWindowPos(REGAPPNAME, Me)
+        'remove WASP Builder layers and group
+        With pPlugIn.MapWin.Layers
+            For i As Integer = 0 To .Groups.Count - 1
+                If .Groups(i).Text = "WASP Builder" Then
+                    pPlugIn.MapWin.Layers.Groups.Remove(.Groups(i).Handle)
+                    Exit For
+                End If
+            Next
+        End With
     End Sub
 
     Friend Sub EnableControls(ByVal aEnabled As Boolean)
-        cmdOK.Enabled = aEnabled
-        cmdExisting.Enabled = aEnabled
-        cmdCancel.Enabled = aEnabled
-        'If Not pInitializing Then
-        cmdHelp.Enabled = aEnabled
-        cmdAbout.Enabled = aEnabled
-        'End If
+        btnNew.Enabled = aEnabled
+        btnOpen.Enabled = aEnabled
+        btnSave.Enabled = aEnabled
+        btnBuild.Enabled = aEnabled
+        btnClose.Enabled = aEnabled
+        btnHelp.Enabled = aEnabled
     End Sub
 
-    Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        Logger.Dbg("Setup WASP input files")
+    Private Sub btnBuild_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBuild.Click
+        Try
+            Logger.Dbg("Setup WASP input files")
 
-        lblStatus.Text = "Preparing to process"
-        Me.Refresh()
-        EnableControls(False)
+            UpdateStatus("Preparing to process...")
 
-        pPlugIn.WASPProject.CreateFlowlineShapeFile(pSegmentLayerIndex, pSelectedIndexes)
+            Dim lName As String = tbxName.Text
 
-        'put contents of segment class back into structure
-        With AtcGridSegmentation.Source
-            For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-                pPlugIn.WASPProject.Segments(lIndex - 1).Length = .CellValue(lIndex, 2)
-                pPlugIn.WASPProject.Segments(lIndex - 1).Width = .CellValue(lIndex, 3)
-                pPlugIn.WASPProject.Segments(lIndex - 1).Depth = .CellValue(lIndex, 4)
-                pPlugIn.WASPProject.Segments(lIndex - 1).Slope = .CellValue(lIndex, 5)
-                pPlugIn.WASPProject.Segments(lIndex - 1).Roughness = .CellValue(lIndex, 6)
-                pPlugIn.WASPProject.Segments(lIndex - 1).DownID = .CellValue(lIndex, 7)
-            Next
-        End With
+            If Not SaveForm() Then Exit Sub
 
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-
-        'check that specified dates are valid
-        Dim lSJDate As Double = 0.0
-        Dim lEJDate As Double = 0.0
-        Dim lSDate(5) As Integer
-        Dim lEDate(5) As Integer
-        lSDate(0) = atxSYear.Text
-        lSDate(1) = atxSMonth.Text
-        lSDate(2) = atxSDay.Text
-        lEDate(0) = atxEYear.Text
-        lEDate(1) = atxEMonth.Text
-        lEDate(2) = atxEDay.Text
-        lSJDate = Date2J(lSDate)
-        lEJDate = Date2J(lEDate)
-        If lSJDate < 1.0 Or lEJDate < 1 Then 'failed date check
-            Logger.Msg("The specified start/end dates are invalid.", vbOKOnly, "BASINS WASP Problem")
-            EnableControls(True)
-            Exit Sub
-        End If
-        If lSJDate > lEJDate Then 'failed date check
-            Logger.Msg("The specified starting date is after the ending date.", vbOKOnly, "BASINS WASP Problem")
-            EnableControls(True)
-            Exit Sub
-        End If
-
-        'check that time series dates have a common period of record, and that the specified start/end dates 
-        'are within that period
-        Dim lSJDateTS As Double = 0.0
-        Dim lEJDateTS As Double = 0.0
-        For Each lTimeseries As atcWASPTimeseries In pPlugIn.WASPProject.InputTimeseriesCollection
-            If lTimeseries.SDate > lSJDateTS Then
-                lSJDateTS = lTimeseries.SDate
-            End If
-            If lEJDateTS = 0.0 Or lTimeseries.EDate < lEJDateTS Then
-                lEJDateTS = lTimeseries.EDate
-            End If
-        Next
-        'If lSJDateTS > lEJDateTS Then 'failed date check
-        '    Logger.Msg("The specified time series do not have a common period of record.", vbOKOnly, "BASINS WASP Problem")
-        '    EnableControls(True)
-        '    Exit Sub
-        'End If
-        'If lSJDateTS > 0 And lEJDateTS > 0 Then
-        '    'compare dates from met data with specified start and end dates, make sure they are valid
-        '    If lSJDate < lSJDateTS Or lEJDateTS < lEJDate Then 'failed date check
-        '        Logger.Msg("The specified start/end dates are not within the dates of the specified time series.", vbOKOnly, "BASINS WASP Problem")
-        '        EnableControls(True)
-        '        Exit Sub
-        '    End If
-        'End If
-
-        Dim lName As String = tbxName.Text
-        'TODO: still use modelout?
-        Dim lWASPProjectFileName As String = pBasinsFolder & "\modelout\" & lName & "\" & lName & ".wnf"
-        Dim lWASPInpFileName As String = pBasinsFolder & "\modelout\" & lName & "\" & lName & ".inp"
-        MkDirPath(PathNameOnly(lWASPProjectFileName))
-
-        If PreProcessChecking(lWASPInpFileName) Then
             With pPlugIn.WASPProject
-                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+                Dim WaspDir As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\Wasp"
+                If Not My.Computer.FileSystem.DirectoryExists(WaspDir) Then My.Computer.FileSystem.CreateDirectory(WaspDir)
+                If String.IsNullOrEmpty(.INPFileName) Then .INPFileName = String.Format("{0}\{1}.inp", WaspDir, .Name)
 
-                'set start and end dates
-                .SJDate = lSJDate
-                .EJDate = lEJDate
+                Using dlg As New SaveFileDialog
+                    dlg.AddExtension = True
+                    dlg.AutoUpgradeEnabled = True
+                    dlg.CheckPathExists = True
+                    dlg.DefaultExt = ".inp"
+                    dlg.AddExtension = True
+                    dlg.FileName = pPlugIn.WASPProject.INPFileName
+                    dlg.Filter = "Wasp Import Files (*.inp)|*.inp|All Files (*.*)|*.*"
+                    dlg.OverwritePrompt = True
+                    If dlg.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                        'save project file and start WASP
+                        UpdateStatus("Saving project...")
+                        .SaveProject(.Filename)
 
-                .Name = lName
+                        'save shapefile in same folder
+                        CreateSegmentShapeFile()
 
-                'save project file and start WASP
-                Logger.Dbg("Save WASP network import file" & lWASPProjectFileName)
-                .Save(lWASPProjectFileName)
-                .WriteINP(lWASPInpFileName)
-                Logger.Dbg("Run WASP")
-                .Run(lWASPInpFileName)
-                Logger.Dbg("BackFromWASP")
+                        UpdateStatus("Writing WASP input file...")
+                        If Not .WriteINP(.INPFileName) Then
+                            WarningMsg("Unable to create WASP input file")
+                        Else
+                            If .WriteErrors <> "" Then WarningMsg(.WriteErrors & vbCr & "Check that the specified table contains data within the indicated model date range for the specified Station ID and PCode (or mapped values, if appropriate).")
+                            Shell("notepad " & .INPFileName, AppWinStyle.NormalFocus)
+                            .Run(.INPFileName)
+                        End If
+                    End If
+                    .INPFileName = dlg.FileName
+                End Using
             End With
-
-            'WriteWASPConstituentNamesToFile(pBasinsFolder & "\etc\WASPConstituents.txt")
-
-            lblStatus.Text = ""
-            Me.Refresh()
-            Me.Dispose()
-            Me.Close()
-            Logger.Dbg("Done")
-        Else
-            Logger.Dbg("Failed PreProcess Check")
-        End If
-        Logger.Flush()
+        Catch ex As Exception
+            Throw
+        Finally
+            UpdateStatus()
+        End Try
     End Sub
-
-    Private Function PreProcessChecking(ByVal aOutputFileName As String) As Boolean
-        Logger.Dbg("PreprocessChecking " & aOutputFileName)
-
-        'see if this file already exists
-        If FileExists(aOutputFileName) Then  'already exists
-            If Logger.Msg("WASP Project '" & FilenameNoPath(aOutputFileName) & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
-                EnableControls(True)
-                Return False
-            End If
-        End If
-
-        Logger.Dbg("PreprocessChecking OK")
-        Return True
-    End Function
 
     Public Sub InitializeUI(ByVal aPlugIn As PlugIn, ByVal aSelectedIndexes As atcCollection, ByVal aSegmentLayerIndex As Integer)
         Logger.Dbg("InitializeUI")
+
         EnableControls(False)
         pPlugIn = aPlugIn
         pSelectedIndexes = aSelectedIndexes
@@ -994,40 +123,27 @@ Public Class frmWASPSetup
 
         pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
-        'ReadWASPConstituentNamesFromFile(pBasinsFolder & "\etc\WASPConstituents.txt")
-        ReadWASPdb(pBasinsFolder & "\etc\")
+        'LCW 11/28/10: determine WASP installation folder so know where to get database from 
 
-        For Each lModel As String In pWASPModelsDB
-            cboModel.Items.Add(lModel)
+        'Note: folder name must NOT end in backslash
+        'Apparently, epa.sqlite file is in parent of this directory (Wasp program dir)
+
+        pWASPFolder = TestNull(My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\USEPA\WASP\8.0", "DatabaseDir", "C:\WASP8"), "C:\WASP8").Trim(New Char() {"\"}) & "\.."
+
+        If Not My.Computer.FileSystem.DirectoryExists(pWASPFolder) Then
+            'Logger.Message("Database directory for the WASP 8 program could not be found: " & pWASPFolder, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning, Windows.Forms.DialogResult.OK)
+            'WASP 8 is not ready to go, so in that case just use the epa.sqlite database being distributed with the plugin
+            pWASPFolder = IO.Path.GetDirectoryName(Reflection.Assembly.GetExecutingAssembly.Location)
+        End If
+
+        cboModel.Items.Clear()
+        For Each mdl As clsWASPModel In pPlugIn.WASPProject.GetWASPModels(pWASPFolder)
+            cboModel.Items.Add(mdl.Description)
         Next
+
         cboModel.SelectedIndex = 0
 
         cboMet.Items.Add("<none>")
-
-        With AtcGridSegmentation
-            .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = False
-        End With
-
-        With AtcGridFlow
-            .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = False
-        End With
-
-        With AtcGridBound
-            .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = True
-        End With
-
-        With AtcGridLoad
-            .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = True
-        End With
-
-        With AtcGridTime
-            .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = False
-        End With
 
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
             Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
@@ -1038,8 +154,6 @@ Public Class frmWASPSetup
             ElseIf GisUtil.LayerType(lLayerIndex) = 1 Then 'PointShapefile
                 cboMet.Items.Add(lLayerName)
                 If lLayerName.ToUpper.IndexOf("WEATHER STATION SITES 20") > -1 Then
-                    'this takes some time, show window and then do this
-                    'cboMet.SelectedIndex = cboMet.Items.Count - 1
                 End If
             ElseIf GisUtil.LayerType(lLayerIndex) = 4 Then 'Grid
 
@@ -1059,98 +173,26 @@ Public Class frmWASPSetup
 
         tbxName.Text = IO.Path.GetFileNameWithoutExtension(GisUtil.ProjectFileName)
 
-        AtcGridSegmentation.Clear()
-        With AtcGridSegmentation.Source
-            .Columns = 9
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellColor(0, 2) = SystemColors.ControlDark
-            .CellColor(0, 3) = SystemColors.ControlDark
-            .CellColor(0, 4) = SystemColors.ControlDark
-            .CellColor(0, 5) = SystemColors.ControlDark
-            .CellColor(0, 6) = SystemColors.ControlDark
-            .CellColor(0, 7) = SystemColors.ControlDark
-            .CellColor(0, 8) = SystemColors.ControlDark
-            .CellColor(0, 9) = SystemColors.ControlDark
-            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-            .CellValue(0, 0) = "Segment"
-            .CellValue(0, 1) = "WASP ID"
-            .CellValue(0, 2) = "Length (km)"
-            .CellValue(0, 3) = "Width (m)"
-            .CellValue(0, 4) = "Depth (m)"
-            .CellValue(0, 5) = "Slope"
-            .CellValue(0, 6) = "Roughness"
-            .CellValue(0, 7) = "DownStream ID"
-            .CellValue(0, 8) = "Velocity (m/s)"
-            .CellValue(0, 9) = "Travel Time (days)"
+        With cboLabelLayer.Items
+            .Clear()
+            .AddRange(New String() {"(None)", "SEGID", "WASPID", "WASPNAME", "NAME", "LENGTH", "MEANFLOW", "SLOPE", "TRAVELTIME"})
+            cboLabelLayer.SelectedIndex = 0
         End With
 
-        AtcGridFlow.Clear()
-        With AtcGridFlow.Source
-            .Columns = 4
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 3
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellColor(0, 2) = SystemColors.ControlDark
-            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-            .CellValue(0, 0) = "Segment"
-            .CellValue(0, 1) = "Cum. Drainage Area (km^2)"
-            .CellValue(0, 2) = "Mean Annual Flow (cms)"
-            .CellValue(0, 3) = "Input Flow Timeseries"
-        End With
-
-        AtcGridBound.Clear()
-        With AtcGridBound.Source
-            .Columns = 2
-            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellValue(0, 0) = "Boundary Segment"
-        End With
-
-        AtcGridLoad.Clear()
-        With AtcGridLoad.Source
-            .Columns = 2
-            .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellValue(0, 0) = "Segment"
-        End With
-
-        AtcGridTime.Clear()
-        With AtcGridTime.Source
-            .Columns = 2
-            .Rows = 1 + pPlugIn.WASPProject.WASPTimeFunctions.Count
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellValue(0, 0) = "Description"
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellValue(0, 1) = "Time Series"
-        End With
-
+        EnableControls(True)
         Logger.Dbg("InitializeUI Complete")
+
+        If Not pPlugIn.StartupAlreadyShown Then
+            pPlugIn.StartupAlreadyShown = True
+            With New frmStartup
+                .ShowDialog(Me)
+            End With
+        End If
     End Sub
 
     Friend Sub InitializeStationLists()
-        'this takes some time, show window and then do this
-        Logger.Dbg("Initializing StationLists")
-        lblStatus.Text = "Reading Timeseries Data..."
-        Me.Refresh()
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-        EnableControls(False)
+        UpdateStatus("Reading Timeseries Data...")
 
-        'TODO: move to atcWASP???
         With pPlugIn.WASPProject
             .BuildListofValidStationNames("FLOW", .FlowStationCandidates)
             .BuildListofValidStationNames("", .AllStationCandidates)
@@ -1164,308 +206,499 @@ Public Class frmWASPSetup
             SetTimeFunctionGrid()
         End With
 
-        lblStatus.Text = "Update specifications if desired, then click OK to proceed."
-        Me.Refresh()
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-        EnableControls(True)
+        UpdateStatus()
     End Sub
 
-    Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
-        Logger.Dbg(lblStatus.Text)
-    End Sub
-
-    Private Sub cmdGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdGenerate.Click
-        Windows.Forms.Cursor.Current = Cursors.WaitCursor
+    Private Sub btnGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGenerate.Click
         GenerateSegments()
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        btnSave.PerformClick() 'so the shape file is recreated
     End Sub
 
     Friend Sub GenerateSegments()
         'this takes some time, show window and then do this
-        Logger.Dbg("Generating Segments")
-        lblStatus.Text = "Reading Segment Data..."
-        Me.Refresh()
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-        EnableControls(False)
 
-        pPlugIn.WASPProject.GenerateSegments(pSegmentLayerIndex, pSelectedIndexes, CDbl(atxTravelTimeMax.Text), CDbl(atxTravelTimeMin.Text))
+        Dim MinTravelTime As Double = atxTravelTimeMin.ValueDouble
 
+        UpdateStatus("Regenerating segments...")
+
+        If Not pPlugIn.WASPProject.GenerateSegments(pSegmentLayerIndex, pSelectedIndexes, CDbl(atxTravelTimeMax.Text), CDbl(atxTravelTimeMin.Text)) Then
+            ErrorMsg("An error occurred while generating WASP segments: " & Logger.LastDbgText)
+        End If
+
+        pPlugIn.WASPProject.ReadWASPdb(pWASPFolder, cboModel.Text)
+
+        UpdateStatus("Refreshing data grids...")
+
+        TabMain.SelectedIndex = 1
         SetSegmentationGrid()
         SetFlowStationGrid()
         SetLoadStationGrid()
         SetBoundaryGrid()
 
-        lblStatus.Text = "Update specifications if desired, then click OK to proceed."
-        Me.Refresh()
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-        EnableControls(True)
+        UpdateStatus()
+
+        'atc's generate routine sometimes doesn't join all the segments; warn the user
+        For Each seg As atcWASPSegment In pPlugIn.WASPProject.Segments
+            If pPlugIn.WASPProject.TravelTime(seg.Length, seg.Velocity) < MinTravelTime + 0.001 Then
+                WarningMsg("One or more segments could not be combined to meet the minimum travel time requirement. Please check your data and manually combine segments if desired.")
+                Exit For
+            End If
+        Next
     End Sub
 
-    Private Sub SetSegmentationGrid()
-        If AtcGridSegmentation.Source Is Nothing Then
-            Logger.Dbg("No atcGridSegmentation")
+    ''' <summary>
+    ''' Display status message on form
+    ''' </summary>
+    ''' <param name="Text">If omitted reverts to standard instructions and cancels wait cursor</param>
+    ''' <remarks></remarks>
+    Private Sub UpdateStatus(Optional ByVal Text As String = "")
+        If Text = "" Then
+            Logger.Dbg("Prior operation complete")
+            Text = "Update specifications if desired, then click 'Build WASP File' to proceed."
+            Me.Cursor = Cursors.Default
+            Me.UseWaitCursor = False
+            EnableControls(True)
         Else
-            Logger.Dbg("Begin")
+            Logger.Dbg(Text)
+            Me.Cursor = Cursors.WaitCursor
+            Me.UseWaitCursor = True
+            EnableControls(False)
+        End If
+        lblStatus.Text = Text
+        lblStatus.Refresh()
+        Application.DoEvents()
+    End Sub
 
-            Dim lMaxTravelTime As Double = 0
-            Dim lMinTravelTime As Double = 1.0E+28
-            With AtcGridSegmentation.Source
-                .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-                For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-                    .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
-                    .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    .CellValue(lIndex, 1) = pPlugIn.WASPProject.Segments(lIndex - 1).WASPID
-                    .CellColor(lIndex, 1) = SystemColors.ControlDark
-                    .CellValue(lIndex, 2) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Length, 3)
-                    .CellEditable(lIndex, 2) = True
-                    .CellValue(lIndex, 3) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Width, 3)
-                    .CellEditable(lIndex, 3) = True
-                    .CellValue(lIndex, 4) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Depth, 3)
-                    .CellEditable(lIndex, 4) = True
-                    .CellValue(lIndex, 5) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Slope, 3)
-                    .CellEditable(lIndex, 5) = True
-                    .CellValue(lIndex, 6) = pPlugIn.WASPProject.Segments(lIndex - 1).Roughness
-                    .CellEditable(lIndex, 6) = True
-                    .CellValue(lIndex, 7) = pPlugIn.WASPProject.Segments(lIndex - 1).DownID
-                    .CellValue(lIndex, 8) = SignificantDigits(pPlugIn.WASPProject.Segments(lIndex - 1).Velocity, 3)
-                    .CellEditable(lIndex, 8) = True
-                    Dim lTravelTime As Double = 0.0
-                    With pPlugIn.WASPProject
-                        Dim lSegment As atcWASPSegment = .Segments(lIndex - 1)
-                        lTravelTime = SignificantDigits(.TravelTime(lSegment.Length, lSegment.Velocity), 3)
-                    End With
-                    .CellValue(lIndex, 9) = lTravelTime
-                    If lTravelTime > lMaxTravelTime Then
-                        lMaxTravelTime = lTravelTime
-                    End If
-                    If lTravelTime < lMinTravelTime Then
-                        lMinTravelTime = lTravelTime
+#Region "Load and Save form and grid contents..."
+
+    ''' <summary>
+    ''' Save contents of all textboxes, grids, etc., to project structure
+    ''' </summary>
+    ''' <returns>True if successful</returns>
+    Private Function SaveForm() As Boolean
+
+        Dim lName As String = tbxName.Text
+
+        'check that specified dates are valid
+        Dim lSDate, lEDate As Date
+        Try
+            lSDate = New Date(atxSYear.Text, atxSMonth.Text, atxSDay.Text)
+            lEDate = New Date(atxEYear.Text, atxEMonth.Text, atxEDay.Text)
+        Catch ex As Exception
+            Logger.Msg("The specified start/end dates are invalid.", vbOKOnly, "BASINS WASP Problem")
+            Return False
+        End Try
+        If lSDate > lEDate Then 'failed date check
+            Logger.Msg("The specified starting date is after the ending date.", vbOKOnly, "BASINS WASP Problem")
+            EnableControls(True)
+            Return False
+        End If
+
+        With pPlugIn.WASPProject
+            .Name = lName
+            For Each mdl As clsWASPModel In .GetWASPModels(pWASPFolder)
+                If mdl.Description = cboModel.Text Then
+                    .ModelType = mdl.ModelID
+                    Exit For
+                End If
+            Next
+            .MetLayer = cboMet.Text
+            'set start and end dates
+            .SDate = lSDate
+            .EDate = lEDate
+            .MinTravelTime = atxTravelTimeMin.Text
+            .MaxTravelTime = atxTravelTimeMax.Text
+        End With
+
+        'put contents of segment class back into structure
+        With dgSegmentation
+            For r As Integer = 0 To .RowCount - 1
+                Dim ID_Name As String = .Item(0, r).Value
+                For Each seg As atcWASPSegment In pPlugIn.WASPProject.Segments
+                    If seg.ID_Name = ID_Name Then
+                        seg.WaspName = .Item(2, r).Value
+                        seg.Length = .Item(3, r).Value
+                        seg.Width = .Item(4, r).Value
+                        seg.Depth = .Item(5, r).Value
+                        seg.Slope = .Item(6, r).Value
+                        seg.Roughness = .Item(7, r).Value
+                        seg.DownID = .Item(8, r).Value
+                        seg.Velocity = .Item(9, r).Value
+                        Exit For
                     End If
                 Next
-            End With
+            Next
+        End With
 
-            AtcGridSegmentation.SizeAllColumnsToContents()
-            AtcGridSegmentation.ColumnWidth(0) = 140
-            AtcGridSegmentation.Refresh()
+        With dgFlow
+            For r As Integer = 0 To .RowCount - 1
+                Dim WaspID As Integer = .Item(0, r).Value
+                Dim ID_Name As String = .Item(1, r).Value
+                Dim DA As String = .Item(2, r).Value
+                Dim Flow As String = .Item(3, r).Value
+                Dim TS As String = .Item(4, r).Value
+                For Each seg As atcWASPSegment In pPlugIn.WASPProject.Segments
+                    If seg.WaspID = WaspID Then
+                        seg.CumulativeDrainageArea = DA
+                        seg.MeanAnnualFlow = Flow
+                        seg.FlowTimeSeries = .Item(4, r).Tag 'contains selection
+                        Exit For
+                    End If
+                Next
+            Next
+        End With
 
-            If atxTravelTimeMax.Text = "0" Then
-                atxTravelTimeMax.Text = lMaxTravelTime
-            End If
-            If atxTravelTimeMin.Text = "0" Then
-                atxTravelTimeMin.Text = lMinTravelTime
-            End If
+        With dgBound
+            For r As Integer = 0 To .RowCount - 1
+                Dim WaspID As Integer = .Item(0, r).Value
+                Dim ID_Name As String = .Item(1, r).Value
+                For Each seg As atcWASPSegment In pPlugIn.WASPProject.Segments
+                    If seg.WaspID = WaspID Then
+                        For c As Integer = 2 To .Columns.Count - 1
+                            seg.BoundTimeSeries(c - 2) = dgBound.Item(c, r).Tag
+                        Next
+                        Exit For
+                    End If
+                Next
+            Next
+        End With
 
-            Logger.Dbg("SegmentationGrid refreshed")
-        End If
+        With dgLoad
+            For r As Integer = 0 To .RowCount - 1
+                For Each seg As atcWASPSegment In pPlugIn.WASPProject.Segments
+                    Dim WaspID As Integer = .Item(0, r).Value
+                    Dim ID_Name As String = .Item(1, r).Value
+                    If seg.WaspID = WaspID Then
+                        For c As Integer = 2 To seg.BoundTimeSeries.Length - 1
+                            seg.LoadTimeSeries(c - 2) = dgLoad.Item(c, r).Tag
+                        Next
+                        Exit For
+                    End If
+                Next
+            Next
+        End With
+
+        ReDim pPlugIn.WASPProject.TimeFunctionSeries(pPlugIn.WASPProject.WASPTimeFunctions.Count - 1)
+        With dgTime
+            For r As Integer = 0 To .RowCount - 1
+                pPlugIn.WASPProject.TimeFunctionSeries(r) = .Item(.ColumnCount - 1, r).Tag
+            Next
+        End With
+
+        Return True
+    End Function
+
+    ''' <summary>
+    ''' Load contents of project structure to all textboxes, grids, etc.
+    ''' </summary>
+    ''' <returns>True if successful</returns>
+    Private Function LoadForm() As Boolean
+
+        With pPlugIn.WASPProject
+            tbxName.Text = .Name
+            For Each mdl As clsWASPModel In .GetWASPModels(pWASPFolder)
+                If mdl.ModelID = .ModelType Then
+                    cboModel.Text = mdl.Description
+                    Exit For
+                End If
+            Next
+            cboMet.Text = .MetLayer
+            atxSYear.Text = .SDate.Year
+            atxSMonth.Text = .SDate.Month
+            atxSDay.Text = .SDate.Day
+            atxEYear.Text = .EDate.Year
+            atxEMonth.Text = .EDate.Month
+            atxEDay.Text = .EDate.Day
+            atxTravelTimeMin.Text = .MinTravelTime
+            atxTravelTimeMax.Text = .MaxTravelTime
+        End With
+
+        RefreshingSelection = True
+        SetSegmentationGrid()
+        SetTimeFunctionGrid()
+        SetFlowStationGrid()
+        SetBoundaryGrid()
+        SetLoadStationGrid()
+        RefreshingSelection = False
+
+        IsModified = False
+
+        Return True
+    End Function
+
+    Private Sub SetSegmentationGrid()
+
+        dgvSegmentation = New WRDB.Controls.DGVEditor(dgSegmentation)
+
+        With dgSegmentation
+            .Visible = False
+            dgvSegmentation.SetHeadings("Segment~WASP ID~Segment|Name~Length|(km)~Width|(m)~Depth|(m)~Slope|(m/m)~Roughness~Downstr|ID~Velocity|(m/s)~Travel Time|(days)", False)
+            dgvSegmentation.AllowRowChange = False
+            .MultiSelect = True
+            .SelectionMode = DataGridViewSelectionMode.CellSelect
+
+            Dim MinTravelTime As Double = Double.MaxValue
+            Dim MaxTravelTime As Double = Double.MinValue
+
+            .SuspendLayout()
+            .Rows.Clear()
+            For s As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+                For Each seg As atcWASPSegment In pPlugIn.WASPProject.Segments
+                    With seg
+                        If .WaspID = s Then
+                            Dim TravelTime As Double = Math.Round(pPlugIn.WASPProject.TravelTime(.Length, .Velocity), 3)
+                            MaxTravelTime = Math.Max(MaxTravelTime, TravelTime)
+                            MinTravelTime = Math.Min(MinTravelTime, TravelTime)
+                            dgvSegmentation.AddRowItems(.ID_Name, .WaspID, .WaspName, .Length, .Width, .Depth, .Slope, .Roughness, .DownID, .Velocity, TravelTime)
+                            Exit For
+                        End If
+                    End With
+                Next
+            Next
+            .ResumeLayout(True)
+
+            For c As Integer = 0 To .Columns.Count - 1
+                With .Columns(c)
+                    Select Case c
+                        Case 0, 1, 2, 8 'string columns
+                            .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+                            .ValueType = GetType(String)
+                        Case 6
+                            .DefaultCellStyle.Format = "0.00000"
+                        Case 3, 7, 10
+                            .DefaultCellStyle.Format = "0.000"
+                        Case Else
+                            .DefaultCellStyle.Format = "0.00"
+                    End Select
+                    Select Case c
+                        Case 0, 1, 8, 10 : dgvSegmentation.ReadOnlyColumn(c) = True
+                    End Select
+                    Select Case c
+                        Case 0, 1
+                            .Frozen = True
+                    End Select
+                End With
+            Next
+            .AutoResizeColumn(0, DataGridViewAutoSizeColumnMode.AllCells)
+            .AutoResizeColumn(1, DataGridViewAutoSizeColumnMode.AllCells)
+            .AutoResizeColumn(2, DataGridViewAutoSizeColumnMode.AllCells)
+            dgvSegmentation.AutoResizeColumnsEqual(3, .Columns.Count - 1, DataGridViewAutoSizeColumnMode.AllCells)
+
+            'don't let slope be zero or negative; average with values before and after
+            For r As Integer = 0 To .RowCount - 1
+                Dim slope As Double = .Item(6, r).Value
+                If slope <= 0 Then
+                    slope = (.Item(6, Math.Max(0, r - 1)).Value + .Item(6, Math.Min(.RowCount - 1, r + 1)).Value) / 2
+                    .Item(6, r).Value = slope
+                    .Item(6, r).Style.ForeColor = Color.Red
+                End If
+            Next
+
+            If Math.Abs(atxTravelTimeMax.ValueDouble - MaxTravelTime) > 0.001 AndAlso MaxTravelTime <> Double.MinValue Then atxTravelTimeMax.Text = MaxTravelTime
+            If Math.Abs(atxTravelTimeMin.ValueDouble - MinTravelTime) > 0.001 AndAlso MinTravelTime <> Double.MaxValue Then atxTravelTimeMin.Text = MinTravelTime
+
+            .ClearSelection()
+            .Visible = True
+        End With
     End Sub
 
     Private Sub SetFlowStationGrid()
-        If AtcGridFlow.Source Is Nothing Then
-            Logger.Dbg("No atcGridFlow")
-        Else
-            Logger.Dbg("Begin")
+        dgFlow.Visible = False
+        dgvFlow = New WRDB.Controls.DGVEditor(dgFlow)
+        With dgvFlow
+            .SetHeadings("WASP|ID~Segment|Name~Cum. Drainage|Area (km^2)~Mean Annual|Flow (cms)~Input Flow Series|(cms)", False)
+            For i As Integer = 0 To 1
+                .ReadOnlyColumn(i) = True
+                With .DataGridView.Columns(i)
+                    .ReadOnly = True
+                    .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+                End With
+            Next i
+            .ReadOnlyColumn(2) = True
+            .ReadOnlyColumn(3) = True
+            .SetColumnFormat(WRDB.Controls.DGVEditor.enumColumnTypes.Link, 4)
+            .AllowRowChange = False
+        End With
 
-            With AtcGridFlow.Source
-                Dim lRow As Integer = 0
-                For Each lSegment As atcWASPSegment In pPlugIn.WASPProject.Segments
-                    If pPlugIn.WASPProject.IsBoundary(lSegment) Then
-                        lRow = lRow + 1
-                        .Rows = lRow
-                        .CellValue(lRow, 0) = lSegment.ID & ":" & lSegment.Name
-                        .CellColor(lRow, 0) = SystemColors.ControlDark
-                        .CellValue(lRow, 1) = lSegment.CumulativeDrainageArea
-                        .CellValue(lRow, 2) = lSegment.MeanAnnualFlow
-                        .CellValue(lRow, 3) = "<none>"
-                        .CellEditable(lRow, 3) = True
-                    End If
-                Next
-            End With
-
-            Logger.Dbg("SetValidValues")
-            Dim lValidValues As New atcCollection
-            lValidValues.Add("<none>")
-            lValidValues.Add("<mean annual flow>")
-            For Each lFlowStation As atcWASPTimeseries In pPlugIn.WASPProject.FlowStationCandidates
-                lValidValues.Add(lFlowStation.Description)
+        With dgFlow
+            .Rows.Clear()
+            For Each seg As atcWASPSegment In pPlugIn.WASPProject.Segments
+                seg.IsBoundary = pPlugIn.WASPProject.IsBoundary(seg)
             Next
-            AtcGridFlow.ValidValues = lValidValues
-            AtcGridFlow.SizeAllColumnsToContents()
-            AtcGridFlow.Refresh()
 
-            Logger.Dbg("FlowStationGrid refreshed")
-        End If
+            For s As Integer = 0 To pPlugIn.WASPProject.Segments.Count
+                For Each seg As atcWASPSegment In pPlugIn.WASPProject.Segments
+                    With seg
+                        If pPlugIn.WASPProject.Segments.Count = 1 OrElse (seg.IsBoundary And Not seg.WaspID = 1) Then 'only upstream boundaries?
+                            If .WaspID = s Then
+                                dgvFlow.AddRowItems(.WaspID, .WaspName, .CumulativeDrainageArea, .MeanAnnualFlow, .FlowTimeSeries.ToString)
+                                dgFlow.Item(dgFlow.ColumnCount - 1, dgFlow.RowCount - 1).Tag = .FlowTimeSeries
+                                Exit For
+                            End If
+                        End If
+                    End With
+                Next
+            Next
+            If .RowCount > 0 Then .CurrentCell = .Item(.ColumnCount - 1, 0)
+            .Visible = True
+        End With
+
+        Logger.Dbg("FlowStationGrid refreshed")
     End Sub
 
     Friend Sub SetLoadStationGrid()
-        If AtcGridLoad.Source Is Nothing Then
-            Logger.Dbg("No atcGridLoad")
-        Else
-            Logger.Dbg("Begin")
+        dgLoad.Visible = False
+        dgvLoad = New WRDB.Controls.DGVEditor(dgLoad)
+        With dgvLoad
+            Dim hdg As String = "WASP|ID~Segment|Name"
+            For Each con As clsWASPConstituent In pPlugIn.WASPProject.WASPConstituents
+                'constituent names contain concentration units; remove these then add back in
+                hdg &= "~" & con.Description.Split("(")(0).Trim & IIf(con.LoadUnits <> "", " (" & con.LoadUnits & ")", "")
+            Next
+            .SetHeadings(hdg, False)
+            .AllowRowChange = False
+            For c As Integer = 0 To .DataGridView.ColumnCount - 1
+                If c <= 1 Then
+                    .ReadOnlyColumn(c) = True
+                Else
+                    .SetColumnFormat(WRDB.Controls.DGVEditor.enumColumnTypes.Link, c)
+                End If
+            Next
+        End With
 
-            With AtcGridLoad.Source
-                .Columns = 1 + pPlugIn.WASPProject.WASPConstituents.Count
-                For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPConstituents.Count
-                    .CellColor(0, lColumn) = SystemColors.ControlDark
-                    .CellValue(0, lColumn) = pPlugIn.WASPProject.WASPConstituents(lColumn - 1)
+        With dgLoad
+            .Rows.Clear()
+            For s As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+                For lRow As Integer = 0 To pPlugIn.WASPProject.Segments.Count - 1
+                    Dim seg As atcWASP.atcWASPSegment = pPlugIn.WASPProject.Segments(lRow)
+                    If seg.WaspID = s Then
+                        .Rows.Add()
+                        .Item(0, .Rows.Count - 1).Value = seg.WaspID
+                        .Item(1, .Rows.Count - 1).Value = seg.WaspName
+                        For lColumn As Integer = 2 To .ColumnCount - 1
+                            With .Item(lColumn, .Rows.Count - 1)
+                                .Tag = seg.LoadTimeSeries(lColumn - 2)
+                                Dim str As String = seg.LoadTimeSeries(lColumn - 2).ToString
+                                .Value = str
+                            End With
+                        Next
+                        Exit For
+                    End If
                 Next
-            End With
+            Next
+            If .RowCount > 0 And .ColumnCount > 1 Then .CurrentCell = .Item(2, 0)
+            .Visible = True
+            For c As Integer = 0 To .ColumnCount - 1
+                With .Columns(c)
+                    .Frozen = c <= 1
+                    .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+                End With
+            Next
+        End With
 
-            With AtcGridLoad.Source
-                .Rows = 1 + pPlugIn.WASPProject.Segments.Count
-                For lIndex As Integer = 1 To pPlugIn.WASPProject.Segments.Count
-                    .CellValue(lIndex, 0) = pPlugIn.WASPProject.Segments(lIndex - 1).ID & ":" & pPlugIn.WASPProject.Segments(lIndex - 1).Name
-                    .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPConstituents.Count
-                        .CellValue(lIndex, lColumn) = "<none>"
-                        .CellEditable(lIndex, lColumn) = True
-                    Next
-                Next
-            End With
-
-            AtcGridLoad.SizeAllColumnsToContents()
-            AtcGridLoad.Refresh()
-
-            Logger.Dbg("LoadStationGrid refreshed")
-        End If
-    End Sub
-
-    Private Sub SetLoadStationValidValues()
-        Logger.Dbg("SetValidValues")
-        Dim lValidValues As New atcCollection
-        lValidValues.Add("<none>")
-        For Each lWQStation As atcWASPTimeseries In pPlugIn.WASPProject.AllStationCandidates
-            lValidValues.Add(lWQStation.Description)
-        Next
-
-        AtcGridLoad.ValidValues = lValidValues
+        Logger.Dbg("LoadStationGrid refreshed")
     End Sub
 
     Friend Sub SetBoundaryGrid()
-        If AtcGridBound.Source Is Nothing Then
-            Logger.Dbg("No atcGridBound")
-        Else
-            Logger.Dbg("Begin")
+        dgBound.Visible = False
+        dgvBound = New WRDB.Controls.DGVEditor(dgBound)
+        With dgvBound
+            Dim hdg As String = "WASP|ID~Segment|Name"
+            For Each con As atcWASP.clsWASPConstituent In pPlugIn.WASPProject.WASPConstituents
+                'constituent names contain concentration units; remove these then add back in
+                hdg &= "~" & con.Description.Split("(")(0).Trim & IIf(con.ConcUnits <> "", " (" & con.ConcUnits & ")", "")
+            Next
+            .SetHeadings(hdg, False)
+            .AllowRowChange = False
+            For c As Integer = 0 To .DataGridView.ColumnCount - 1
+                If c <= 1 Then
+                    .ReadOnlyColumn(c) = True
+                Else
+                    .SetColumnFormat(WRDB.Controls.DGVEditor.enumColumnTypes.Link, c)
+                End If
+            Next
+        End With
 
-            With AtcGridBound.Source
-                .Columns = 1 + pPlugIn.WASPProject.WASPConstituents.Count
-                For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPConstituents.Count
-                    .CellColor(0, lColumn) = SystemColors.ControlDark
-                    .CellValue(0, lColumn) = pPlugIn.WASPProject.WASPConstituents(lColumn - 1)
-                Next
-            End With
-
-            'only load segments that are boundary segments
-            With AtcGridBound.Source
-                Dim lRow As Integer = 0
+        'only load segments that are boundary segments
+        With dgBound
+            .Rows.Clear()
+            For s As Integer = 1 To pPlugIn.WASPProject.Segments.Count
                 For Each lSegment As atcWASPSegment In pPlugIn.WASPProject.Segments
-                    If pPlugIn.WASPProject.IsBoundary(lSegment) Then
-                        lRow = lRow + 1
-                        .Rows = lRow
-                        .CellValue(lRow, 0) = lSegment.ID & ":" & lSegment.Name
-                        .CellColor(lRow, 0) = SystemColors.ControlDark
-                        For lColumn As Integer = 1 To pPlugIn.WASPProject.WASPConstituents.Count
-                            .CellValue(lRow, lColumn) = "<none>"
-                            .CellEditable(lRow, lColumn) = True
+                    If lSegment.WaspID = s AndAlso pPlugIn.WASPProject.IsBoundary(lSegment) Then
+                        .Rows.Add()
+                        .Item(0, .Rows.Count - 1).Value = lSegment.WaspID
+                        .Item(1, .Rows.Count - 1).Value = lSegment.WaspName
+                        For lColumn As Integer = 2 To .ColumnCount - 1
+                            With .Item(lColumn, .Rows.Count - 1)
+                                .Tag = lSegment.BoundTimeSeries(lColumn - 2)
+                                .Value = lSegment.BoundTimeSeries(lColumn - 2).ToString
+                            End With
                         Next
+                        Exit For
                     End If
                 Next
-            End With
+            Next
+            If .RowCount > 0 And .ColumnCount > 1 Then .CurrentCell = .Item(2, 0)
+            For c As Integer = 0 To .ColumnCount - 1
+                With .Columns(c)
+                    .Frozen = c <= 1
+                    .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+                End With
+            Next
+            .Visible = True
+        End With
 
-            AtcGridBound.SizeAllColumnsToContents()
-            AtcGridBound.Refresh()
-
-            Logger.Dbg("BoundaryGrid refreshed")
-        End If
-    End Sub
-
-    Private Sub SetBoundaryValidValues()
-        Logger.Dbg("SetValidValues")
-        Dim lValidValues As New atcCollection
-        lValidValues.Add("<none>")
-        For Each lWQStation As atcWASPTimeseries In pPlugIn.WASPProject.AllStationCandidates
-            lValidValues.Add(lWQStation.Description)
-        Next
-
-        AtcGridBound.ValidValues = lValidValues
+        Logger.Dbg("BoundaryGrid refreshed")
     End Sub
 
     Friend Sub SetTimeFunctionGrid()
-        If AtcGridTime.Source Is Nothing Then
-            Logger.Dbg("No atcGridTime")
-        Else
-            Logger.Dbg("Begin")
+        dgTime.Visible = False
+        dgvTime = New WRDB.Controls.DGVEditor(dgTime)
+        With dgvTime
+            .SetHeadings("Description~Time Series", False)
+            .ReadOnlyColumn(0) = True
+            .AllowRowChange = False
+            For c As Integer = 0 To .DataGridView.ColumnCount - 1
+                If c <= 0 Then
+                    .ReadOnlyColumn(c) = True
+                Else
+                    .SetColumnFormat(WRDB.Controls.DGVEditor.enumColumnTypes.Link, c)
+                End If
+            Next
+        End With
 
-            AtcGridTime.Clear()
-            With AtcGridTime.Source
-                .Columns = 2
-                .Rows = 1 + pPlugIn.WASPProject.WASPTimeFunctions.Count
-                .ColorCells = True
-                .FixedRows = 1
-                .FixedColumns = 1
-                .CellColor(0, 0) = SystemColors.ControlDark
-                .CellValue(0, 0) = "Description"
-                .CellColor(0, 1) = SystemColors.ControlDark
-                .CellValue(0, 1) = "Time Series"
-            End With
+        With dgTime
+            .RowCount = pPlugIn.WASPProject.WASPTimeFunctions.Count
+            For lRow As Integer = 0 To .RowCount - 1
+                .Item(0, lRow).Value = pPlugIn.WASPProject.WASPTimeFunctions(lRow).Description
+                .Item(1, lRow).Tag = pPlugIn.WASPProject.TimeFunctionSeries(lRow)
+                .Item(1, lRow).Value = pPlugIn.WASPProject.TimeFunctionSeries(lRow).ToString
+            Next
+            .CurrentCell = .Item(1, 0)
+            For c As Integer = 0 To .ColumnCount - 1
+                With .Columns(c)
+                    .Frozen = c <= 0
+                    .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+                End With
+            Next
+            .Visible = True
+        End With
 
-            With AtcGridTime.Source
-                For lIndex As Integer = 1 To .Rows - 1
-                    .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    .CellValue(lIndex, 0) = pPlugIn.WASPProject.WASPTimeFunctions(lIndex - 1)
-                    .CellValue(lIndex, 1) = "<none>"
-                    .CellEditable(lIndex, 1) = True
-                Next
-            End With
-
-            AtcGridTime.SizeAllColumnsToContents()
-            AtcGridTime.Refresh()
-
-            'default to closest met stations where appropriate 
-            Dim lAirIndex As Integer
-            Dim lSolarIndex As Integer
-            Dim lWindIndex As Integer
-            pPlugIn.WASPProject.DefaultClosestMetStation(lAirIndex, lSolarIndex, lWindIndex)
-            With AtcGridTime.Source
-                For lIndex As Integer = 1 To .Rows - 1
-                    If InStr(pPlugIn.WASPProject.WASPTimeFunctions(lIndex - 1), "Air Temp") > 0 And lAirIndex > 0 Then
-                        .CellValue(lIndex, 1) = pPlugIn.WASPProject.AllStationCandidates(lAirIndex - 1).Description
-                    End If
-                    If InStr(pPlugIn.WASPProject.WASPTimeFunctions(lIndex - 1), "Solar Radia") > 0 And lSolarIndex > 0 Then
-                        .CellValue(lIndex, 1) = pPlugIn.WASPProject.AllStationCandidates(lSolarIndex - 1).Description
-                    End If
-                    If InStr(pPlugIn.WASPProject.WASPTimeFunctions(lIndex - 1), "Wind Speed") > 0 And lWindIndex > 0 Then
-                        .CellValue(lIndex, 1) = pPlugIn.WASPProject.AllStationCandidates(lWindIndex - 1).Description
-                    End If
-                Next
-            End With
-            pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-            'SetDates()
-
-            Logger.Dbg("TimeFunctionGrid refreshed")
-        End If
+        Logger.Dbg("TimeFunctionGrid refreshed")
     End Sub
 
-    Private Sub SetTimeFunctionValidValues()
-        Logger.Dbg("SetValidValues")
-        Dim lValidValues As New atcCollection
-        lValidValues.Add("<none>")
-        For Each lStation As atcWASPTimeseries In pPlugIn.WASPProject.AllStationCandidates
-            lValidValues.Add(lStation.Description)
-        Next
+#End Region
 
-        AtcGridTime.ValidValues = lValidValues
-    End Sub
-
-    Private Sub cmdFieldMapping_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFieldMapping.Click
+    Private Sub lnkFieldMapping_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lnkFieldMapping.LinkClicked
         If IsNothing(pfrmWASPFieldMapping) Then
             pfrmWASPFieldMapping = New frmWASPFieldMapping
             pfrmWASPFieldMapping.Init(pSegmentLayerIndex, pPlugIn.WASPProject.SegmentFieldMap, Me)
-            pfrmWASPFieldMapping.Show()
+            pfrmWASPFieldMapping.ShowDialog(Me)
         Else
             If pfrmWASPFieldMapping.IsDisposed Then
                 pfrmWASPFieldMapping = New frmWASPFieldMapping
                 pfrmWASPFieldMapping.Init(pSegmentLayerIndex, pPlugIn.WASPProject.SegmentFieldMap, Me)
-                pfrmWASPFieldMapping.Show()
+                pfrmWASPFieldMapping.ShowDialog(Me)
             Else
                 pfrmWASPFieldMapping.WindowState = FormWindowState.Normal
                 pfrmWASPFieldMapping.BringToFront()
@@ -1473,44 +706,37 @@ Public Class frmWASPSetup
         End If
     End Sub
 
-    Private Sub cmdCreateShapefile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCreateShapefile.Click
+    Private Sub lnkCreateShapefile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lnkCreateShapefile.LinkClicked
         Try
-            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+            'only allow this after project has been saved
+            If String.IsNullOrEmpty(pPlugIn.WASPProject.Filename) Then
+                WarningMsg("You cannot create the buffered shape file until you have saved the project.")
+                Exit Sub
+            End If
+            UpdateStatus("Creating buffered shapefile...")
             Dim lWASPSegmentShapefile As String = ""
-            pPlugIn.WASPProject.CreateSegmentShapeFile(pSegmentLayerIndex, lWASPSegmentShapefile)
-            pPlugIn.WASPProject.CreateBufferedSegmentShapeFile(lWASPSegmentShapefile)
-            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-            Logger.Msg("Create Shapefile complete.", MsgBoxStyle.OkOnly, "Create Shapefile")
+            CreateSegmentShapeFile()
+            CreateBufferedSegmentShapeFile()
         Catch lEX As Exception
             Logger.Msg(lEX.Message, MsgBoxStyle.Critical, "Problem Creating Shapefile")
+        Finally
+            UpdateStatus()
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Set dates on the general tab to the last common year of the selected timeseries       
+    ''' </summary>
+    ''' <remarks></remarks>
     Private Sub SetDates()
-        'set dates on the general tab to the last common year of the selected timeseries       
 
         Dim lSJDate As Double = 0.0
         Dim lEJDate As Double = 0.0
-
-        For Each lTimeseries As atcWASPTimeseries In pPlugIn.WASPProject.InputTimeseriesCollection
-            If lTimeseries.SDate > lSJDate Then
-                lSJDate = lTimeseries.SDate
-            End If
-            If lEJDate = 0.0 Or lTimeseries.EDate < lEJDate Then
-                lEJDate = lTimeseries.EDate
-            End If
-        Next
 
         If lEJDate > lSJDate Then
             Dim lEDate(5) As Integer, lSDate(5) As Integer
             J2Date(lEJDate, lEDate)
             J2Date(lSJDate, lSDate)
-
-            'set limits
-            'atxSYear.HardMax = lEDate(0)
-            'atxSYear.HardMin = lSDate(0)
-            'atxEYear.HardMax = lEDate(0)
-            'atxEYear.HardMin = lSDate(0)
 
             'default to last calendar year of data
             lSDate(0) = lEDate(0) - 1
@@ -1528,101 +754,8 @@ Public Class frmWASPSetup
         End If
     End Sub
 
-    Private Sub AtcGridLoad_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridLoad.CellEdited
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        'SetDates()
-    End Sub
-
-    Private Sub AtcGridLoad_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles AtcGridLoad.Leave
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        'SetDates()
-    End Sub
-
-    'Private Sub cmdGenerateTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-    '    Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Generate New Timeseries")
-    'End Sub
-
-    'Private Sub cmdVolumes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-    '    Logger.Msg("Feature not yet implemented.", MsgBoxStyle.OkOnly, "Volumes/Depths")
-    'End Sub
-
-    Private Sub AtcGridLoad_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridLoad.MouseDownCell
-        pSelectedColumn = aColumn
-        pSelectedRow = aRow
-        SetLoadStationValidValues()
-    End Sub
-
-    Private Sub AtcGridBound_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridBound.CellEdited
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        'SetDates()
-    End Sub
-
-    Private Sub AtcGridBound_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles AtcGridBound.Leave
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        'SetDates()
-    End Sub
-
-    Private Sub AtcGridBound_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridBound.MouseDownCell
-        pSelectedColumn = aColumn
-        pSelectedRow = aRow
-        SetBoundaryValidValues()
-    End Sub
-
-    Private Sub AtcGridTime_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridTime.CellEdited
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        'SetDates()
-    End Sub
-
-    Private Sub AtcGridTime_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles AtcGridTime.Leave
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        'SetDates()
-    End Sub
-
-    Private Sub AtcGridTime_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridTime.MouseDownCell
-        pSelectedColumn = aColumn
-        pSelectedRow = aRow
-        SetTimeFunctionValidValues()
-    End Sub
-
     Private Sub cboMet_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboMet.SelectedIndexChanged
         SetStationCoordinates()
-    End Sub
-
-    Private Sub ReadWASPdb(ByVal aPathName As String)
-        Dim lTable As New atcUtility.atcTableDelimited
-
-        'read wasp models database
-        pWASPModelsDB = New atcCollection
-        If lTable.OpenFile(aPathName & "WASPModels.csv") Then
-            For lRow As Integer = 1 To lTable.NumRecords
-                lTable.CurrentRecord = lRow
-                pWASPModelsDB.Add(lTable.Value(1), ReplaceString(lTable.Value(2), """", ""))
-            Next
-        End If
-
-        'read wasp systems database
-        pWASPSystemIdsDB = New atcCollection
-        pWASPSystemNamesDB = New atcCollection
-        If lTable.OpenFile(aPathName & "WASPSystems.csv") Then
-            For lRow As Integer = 1 To lTable.NumRecords
-                lTable.CurrentRecord = lRow
-                pWASPSystemIdsDB.Add(lRow, lTable.Value(3))
-                pWASPSystemNamesDB.Add(lRow, ReplaceString(lTable.Value(4), """", ""))
-            Next
-        End If
-
-        'read wasp time functions database
-        pWASPTimeFunctionModelIdsDB = New atcCollection
-        pWASPTimeFunctionIdsDB = New atcCollection
-        pWASPTimeFunctionNamesDB = New atcCollection
-        If lTable.OpenFile(aPathName & "WASPTimeFunctions.csv") Then
-            For lRow As Integer = 1 To lTable.NumRecords
-                lTable.CurrentRecord = lRow
-                pWASPTimeFunctionModelIdsDB.Add(lRow, lTable.Value(2))
-                pWASPTimeFunctionIdsDB.Add(lRow, lTable.Value(3))
-                pWASPTimeFunctionNamesDB.Add(lRow, ReplaceString(lTable.Value(4), """", ""))
-            Next
-        End If
     End Sub
 
     Private Sub SetStationCoordinates()
@@ -1635,38 +768,893 @@ Public Class frmWASPSetup
     End Sub
 
     Private Sub cboModel_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboModel.SelectedIndexChanged
-        Dim lModelId As String = pWASPModelsDB.Keys(cboModel.SelectedIndex)
-        pPlugIn.WASPProject.ModelType = lModelId
+        Dim lModelName As String = cboModel.Text
+        pPlugIn.WASPProject.ReadWASPdb(pWASPFolder, lModelName)
 
-        'set the load constituents to the wasp system names
-        pPlugIn.WASPProject.WASPConstituents.Clear()
-        For lIndex As Integer = 1 To pWASPSystemIdsDB.Count
-            If pWASPSystemIdsDB(lIndex - 1) = lModelId Then
-                pPlugIn.WASPProject.WASPConstituents.Add(pWASPSystemNamesDB(lIndex - 1))
-            End If
-        Next
+        UpdateStatus("Refreshing data grids...")
+
         SetLoadStationGrid()
         SetBoundaryGrid()
-
-        'set the time functions to the wasp time function names
-        pPlugIn.WASPProject.WASPTimeFunctions.Clear()
-        For lIndex As Integer = 1 To pWASPTimeFunctionModelIdsDB.Count
-            If pWASPTimeFunctionModelIdsDB(lIndex - 1) = lModelId Then
-                pPlugIn.WASPProject.WASPTimeFunctionIds.Add(pWASPTimeFunctionIdsDB(lIndex - 1))
-                pPlugIn.WASPProject.WASPTimeFunctions.Add(pWASPTimeFunctionNamesDB(lIndex - 1))
-            End If
-        Next
         SetTimeFunctionGrid()
 
+        UpdateStatus()
+
     End Sub
 
-    Private Sub AtcGridFlow_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridFlow.CellEdited
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        'SetDates()
+    ''' <summary>
+    ''' Display unhandled error message (for backwards compatibility with error handling macro in VS 2008)
+    ''' </summary>
+    ''' <param name="ErrorText">Specific error text (if missing, will be generic)</param>
+    ''' <param name="ex">Exception</param>
+    Public Sub ErrorMsg(Optional ByVal ErrorText As String = "", Optional ByVal ex As Exception = Nothing)
+        If ErrorText = "" Then ErrorText = "An unexpected error has occurred in the BASINS WASP utility."
+        If ex IsNot Nothing Then ErrorText &= " The detailed error is: " & vbCr & vbCr & ex.ToString
+        Logger.Message(ErrorText, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, DialogResult.OK)
     End Sub
 
-    Private Sub AtcGridFlow_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles AtcGridFlow.Leave
-        pPlugIn.WASPProject.RebuildTimeseriesCollections(AtcGridTime.Source, AtcGridFlow.Source, AtcGridLoad.Source, AtcGridBound.Source)
-        'SetDates()
+    Private Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click, mnuSaveProj.Click
+        If Not SaveForm() Then Exit Sub
+        RefreshingSelection = True
+        With pPlugIn.WASPProject
+            If Not String.IsNullOrEmpty(.Filename) Then
+                UpdateStatus("Saving project...")
+                .SaveProject(.Filename)
+                CreateSegmentShapeFile()
+                Text = "BASINS WASP Model Builder - " & IO.Path.GetFileName(.Filename)
+            Else
+                mnuSaveAs.PerformClick()
+            End If
+        End With
+        UpdateStatus()
+        If dgSegmentation.CurrentRow IsNot Nothing Then HighlightSegment(dgSegmentation.CurrentRow.Cells(1).Value)
+        IsModified = False
+        RefreshingSelection = False
     End Sub
+
+    Private Sub btnSaveAs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveAs.Click
+        With New SaveFileDialog
+            .AddExtension = True
+            .CheckFileExists = False
+            .CheckPathExists = True
+            .DefaultExt = ".WaspBuilder"
+            .Filter = "WASP Builder input files (*.WaspBuilder)|*.WaspBuilder"
+            .FilterIndex = 0
+            .InitialDirectory = IO.Path.GetDirectoryName(pPlugIn.WASPProject.Filename)
+            If String.IsNullOrEmpty(.InitialDirectory) Then .InitialDirectory = IO.Path.GetDirectoryName(pPlugIn.MapWin.Project.FileName) & "\Wasp"
+            If Not My.Computer.FileSystem.DirectoryExists(.InitialDirectory) Then My.Computer.FileSystem.CreateDirectory(.InitialDirectory)
+            .Title = "Save WASP Builder File"
+            .FileName = pPlugIn.WASPProject.Filename
+            If .FileName = "" Then .FileName = pPlugIn.WASPProject.Name & ".WaspBuilder"
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                If Not SaveForm() Then Exit Sub
+                pPlugIn.WASPProject.SaveProject(.FileName)
+                CreateSegmentShapeFile()
+                SaveSetting(REGAPPNAME, "Settings", "LastFilename", .FileName)
+                Text = "BASINS WASP Model Builder - " & IO.Path.GetFileName(.FileName)
+            End If
+            .Dispose()
+        End With
+        IsModified = False
+    End Sub
+
+    Private Sub CheckModified()
+        If IsModified AndAlso MessageBox.Show("You have unsaved changes to this project. Do you want to save your WASP Builder project before continuing?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) = Windows.Forms.DialogResult.Yes Then mnuSaveProj.PerformClick()
+    End Sub
+
+    Private Sub LoadSegmentShapefile()
+        'see if shape file exists; if so, load it
+        Dim WASPShapefileName As String = IO.Path.ChangeExtension(pPlugIn.WASPProject.Filename, ".shp")
+        If My.Computer.FileSystem.FileExists(WASPShapefileName) Then
+
+            'if there is already a layer by this name on the map, remove it
+            If GisUtil.IsLayer(WASPSegmentLayerName) Then
+                GisUtil.RemoveLayer(GisUtil.LayerIndex(WASPSegmentLayerName))
+            End If
+
+            GisUtil.AddGroup("WASP Builder")
+            GisUtil.AddLayerToGroup(WASPShapefileName, WASPSegmentLayerName, "WASP Builder")
+            Logger.Progress(100, 100) 'force it to close (for some reason, was stuck on 0 of 100 down in the bowels of MW or BASINS)
+            Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(WASPShapefileName)
+            GisUtil.LayerVisible(lNewLayerIndex) = True
+            GisUtil.SetLayerLineSize(lNewLayerIndex, 2)
+            'add rendering
+            GisUtil.UniqueValuesRenderer(lNewLayerIndex, GisUtil.FieldIndex(lNewLayerIndex, "WASPID"))
+            GisUtil.LayerVisible(lNewLayerIndex) = False
+            GisUtil.LayerVisible(lNewLayerIndex) = True
+            'pPlugIn.MapWin.Layers(lNewLayerIndex).UpdateLabelInfo()
+        End If
+    End Sub
+
+    Private Sub btnOpen_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOpen.Click, mnuOpenLast.Click
+        CheckModified()
+        Dim LastFileName As String = GetSetting(REGAPPNAME, "Settings", "LastFilename")
+        If LastFileName <> "" AndAlso My.Computer.FileSystem.FileExists(LastFileName) Then
+            EnableControls(False)
+            pPlugIn.WASPProject.LoadProject(LastFileName)
+            LoadSegmentShapefile()
+            LoadForm()
+            EnableControls(True)
+        Else
+            mnuOpenProj.PerformClick()
+        End If
+        IsModified = False
+    End Sub
+
+    Private Sub mnuOpenProj_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenProj.Click
+        CheckModified()
+        Dim InitialDir As String = ""
+        If pPlugIn.WASPProject.Filename = "" Then
+            InitialDir = IO.Path.GetDirectoryName(pPlugIn.MapWin.Project.FileName)
+        Else
+            InitialDir = IO.Path.GetDirectoryName(pPlugIn.WASPProject.Filename)
+        End If
+        Dim FileName As String = OpenFile(InitialDir)
+        If FileName <> "" Then
+            If pPlugIn.WASPProject.LoadProject(FileName) Then
+                LoadSegmentShapefile()
+                EnableControls(False)
+
+                'need to load information from GIS file
+                pSegmentLayerIndex = GisUtil.LayerIndex("WASP Segments")
+                pSelectedIndexes = New atcCollection
+                For lIndex As Integer = 0 To GisUtil.NumFeatures(pSegmentLayerIndex) - 1
+                    pSelectedIndexes.Add(lIndex, lIndex)
+                Next
+                LoadForm()
+                EnableControls(True)
+            End If
+            IsModified = False
+        End If
+    End Sub
+
+    Private Sub btnNew_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuNewProj.Click
+        CheckModified()
+        InitializeUI(pPlugIn, pSelectedIndexes, pSegmentLayerIndex)
+        LoadForm()
+    End Sub
+
+    Private Sub mnuNewSelect_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnNew.Click, mnuNewSelect.Click
+        CheckModified()
+        Close()
+        pPlugIn.WASPInitialize()
+        IsModified = True
+    End Sub
+
+    Private Sub dg_CellContentClick2(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgFlow.CellContentClick, dgBound.CellContentClick, dgLoad.CellContentClick, dgTime.CellContentClick
+        IsModified = True
+    End Sub
+
+    Private Sub dgFlow_CellContentClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgFlow.CellContentClick
+        Dim dg As DataGridView = sender
+        If TypeOf dg.Columns(e.ColumnIndex) Is DataGridViewLinkColumn And e.RowIndex >= 0 Then 'clicked on link
+            Dim sel As clsTimeSeriesSelection = dg.Item(e.ColumnIndex, e.RowIndex).Tag
+            If sel.SelectionType = clsTimeSeriesSelection.enumSelectionType.None Then 'set equal to average flow in prior column so will be default
+                sel = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Constant, , , dg.Item(e.ColumnIndex - 1, e.RowIndex).Value)
+            End If
+            With New frmWASPSelectTimeSeries(pPlugIn, String.Format("for {0} at {1}", dg.Columns(e.ColumnIndex).HeaderText.Replace(vbLf, " "), dg.Item(0, e.RowIndex).Value), sel)
+                Dim res As DialogResult = .ShowDialog(Me)
+                sel = .Selection
+                If sel IsNot Nothing Then
+                    Select Case res
+                        Case Windows.Forms.DialogResult.OK, Windows.Forms.DialogResult.Abort
+                            With dg.Item(e.ColumnIndex, e.RowIndex)
+                                .Value = sel.ToString
+                                .Tag = sel
+                            End With
+                        Case Windows.Forms.DialogResult.Retry
+                            For c As Integer = 0 To dg.ColumnCount - 1
+                                If Not dg.Columns(c).ReadOnly Then
+                                    For r As Integer = 0 To dg.RowCount - 1
+                                        With dg.Item(c, r)
+                                            .Value = sel.ToString
+                                            .Tag = sel
+                                        End With
+                                    Next
+                                End If
+                            Next
+                    End Select
+                End If
+            End With
+        End If
+    End Sub
+
+    Private Sub dg_CellContentClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgBound.CellContentClick, dgLoad.CellContentClick, dgTime.CellContentClick
+        Dim dg As DataGridView = sender
+        If TypeOf dg.Columns(e.ColumnIndex) Is DataGridViewLinkColumn And e.RowIndex >= 0 Then 'clicked on link
+            Dim sel As clsTimeSeriesSelection = dg.Item(e.ColumnIndex, e.RowIndex).Tag
+            Dim AddlTitle As String = ""
+            If sender Is dgTime Then
+                AddlTitle = String.Format("for {0}", dg.Item(0, e.RowIndex).Value)
+            Else
+                AddlTitle = String.Format("for {0} at {1}", dg.Columns(e.ColumnIndex).HeaderText.Replace(vbCr, " "), dg.Item(0, e.RowIndex).Value)
+            End If
+            With New frmWASPSelectTimeSeries(pPlugIn, AddlTitle, dg.Item(e.ColumnIndex, e.RowIndex).Tag)
+                Dim res As DialogResult = .ShowDialog(Me)
+                sel = .Selection
+                If sel IsNot Nothing Then
+                    Select Case res
+                        Case Windows.Forms.DialogResult.OK, Windows.Forms.DialogResult.Abort
+                            With dg.Item(e.ColumnIndex, e.RowIndex)
+                                .Value = sel.ToString
+                                .Tag = sel
+                            End With
+                        Case Windows.Forms.DialogResult.Retry
+                            For c As Integer = 0 To dg.ColumnCount - 1
+                                If Not dg.Columns(c).ReadOnly Then
+                                    For r As Integer = 0 To dg.RowCount - 1
+                                        With dg.Item(c, r)
+                                            .Value = sel.ToString
+                                            .Tag = sel
+                                        End With
+                                    Next
+                                End If
+                            Next
+                    End Select
+                End If
+            End With
+            dg.AutoResizeColumn(e.ColumnIndex)
+        End If
+    End Sub
+
+    Private Sub frmWASPSetup_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        If IsModified Then
+            Select Case MessageBox.Show("You have unsaved changes to this project. Do you want to save your WASP Builder project before closing?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+                Case Windows.Forms.DialogResult.Yes : mnuSaveProj.PerformClick()
+                Case Windows.Forms.DialogResult.No : e.Cancel = False
+                Case Windows.Forms.DialogResult.Cancel : e.Cancel = True
+            End Select
+        End If
+    End Sub
+
+    Private Sub frmWASPSetup_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.Control Then
+            Select Case e.KeyCode
+                Case Keys.N : mnuNewSelect.PerformClick()
+                Case Keys.O : mnuOpenProj.PerformClick()
+                Case Keys.L : mnuOpenLast.PerformClick()
+                Case Keys.S : mnuSaveProj.PerformClick()
+                Case Keys.A : mnuSaveAs.PerformClick()
+            End Select
+        End If
+    End Sub
+
+    Private Sub frmWASPSetup_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        GetWindowPos(REGAPPNAME, Me)
+        Application.EnableVisualStyles()
+        IsModified = False
+    End Sub
+
+    Private Sub frmWASPSetup_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
+        Dim wrdbinifolder As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\WRDB"
+        Dim wrdbinifile As String = wrdbinifolder & "\WRDB.ini"
+        If Not (My.Computer.FileSystem.DirectoryExists(wrdbinifolder) AndAlso My.Computer.FileSystem.FileExists(wrdbinifile)) Then
+            WarningMsg("The WASP Model Builder can be used to import time series data for WASP input using WRDB 5.0. However, it appears that you do not yet have WRDB 5.0 installed. We suggest that you do so by downloading the software from www.wrdb.com.")
+            If Not My.Computer.FileSystem.DirectoryExists(wrdbinifolder) Then My.Computer.FileSystem.CreateDirectory(wrdbinifolder)
+            With IO.File.Create(wrdbinifile)
+                .Close()
+                .Dispose()
+            End With
+        End If
+    End Sub
+
+    Private Sub btnReselect_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnReselect.Click
+        Me.Visible = False
+        pPlugIn.WASPInitialize()
+        IsModified = True
+    End Sub
+
+    Private Sub btnBrowse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowse.Click
+        With New FolderBrowserDialog
+            .Description = "Select Folder for Wasp Files"
+            .RootFolder = Environment.SpecialFolder.MyDocuments
+            .SelectedPath = txtOutputDir.Text
+            .ShowNewFolderButton = True
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                txtOutputDir.Text = .SelectedPath
+            End If
+        End With
+    End Sub
+
+    Private Sub cboModel_SelectionChangeCommitted(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboModel.SelectionChangeCommitted
+        IsModified = True
+    End Sub
+
+    Private Sub dgv_HasBeenModified(ByVal sender As Object, ByVal e As System.EventArgs) Handles dgvFlow.HasBeenModified, dgvBound.HasBeenModified, dgvLoad.HasBeenModified, dgvTime.HasBeenModified
+        IsModified = True
+    End Sub
+
+    Private Sub tbxName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbxName.KeyPress
+        IsModified = True
+    End Sub
+
+    Private Sub atx_Change() Handles atxEDay.Change, atxEMonth.Change, atxEYear.Change, atxSDay.Change, atxSMonth.Change, atxSYear.Change, atxTravelTimeMax.Change, atxTravelTimeMin.Change
+        IsModified = True
+    End Sub
+
+    Private Sub TabMain_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles TabMain.SelectedIndexChanged
+        If TabMain.SelectedIndex > 0 AndAlso pPlugIn.WASPProject.Segments.Count = 0 Then
+            MessageBox.Show("You must either open an existing WASP Builder project (Open button) or build a new one (New button) before continuing.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            TabMain.SelectedIndex = 0
+        End If
+    End Sub
+
+    Private Sub dgSegmentation_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSegmentation.CellEndEdit
+        If e.ColumnIndex = 2 Then
+            'may need to refresh due to segment name getting revised
+            UpdateStatus("Saving Wasp Builder data file and rebuilding shape file...")
+            RefreshingSelection = True 'so creation of grids doesn't intereact with map
+            SaveForm()
+            SetFlowStationGrid()
+            SetBoundaryGrid()
+            SetLoadStationGrid()
+            UpdateStatus()
+            RefreshingSelection = False
+            'UpdateStatus()
+        End If
+    End Sub
+
+    Private Sub dg_RowEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgBound.RowEnter, dgFlow.RowEnter, dgLoad.RowEnter
+        HighlightSegment(CInt(CType(sender, DataGridView).Item(0, e.RowIndex).Value))
+    End Sub
+
+    Private Sub dg_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles dgBound.Leave, dgFlow.Leave, dgLoad.Leave
+        With CType(sender, DataGridView)
+            .ClearSelection()
+            ClearHighlight()
+        End With
+    End Sub
+
+    Private RefreshingSelection As Boolean = False
+
+    ''' <summary>
+    ''' Called when MapWindow shapes are selected
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub RefreshSelectionInfo()
+        RefreshingSelection = True
+        Dim lstIDs As Generic.List(Of Integer) = GetSelectedSegmentIDs()
+        With dgSegmentation
+            Dim FirstRow As Integer = 0
+            .ClearSelection()
+            .CurrentCell = Nothing
+            Dim NumRowsSelected As Integer = 0
+            For r As Integer = 0 To .Rows.Count - 1
+                Dim CellSelected As Boolean = False
+                For c As Integer = 0 To .Columns.Count - 1
+                    If lstIDs.Contains(r + 1) Then .Item(c, r).Selected = True : CellSelected = True
+                Next
+                If CellSelected Then
+                    NumRowsSelected += 1
+                    If FirstRow = 0 Then FirstRow = r
+                End If
+            Next
+            lblNumSelected.Text = String.Format("{0} Segments Selected", NumRowsSelected)
+            If FirstRow <= .RowCount - 1 Then .FirstDisplayedCell = .Item(0, FirstRow)
+            '.Visible = True
+        End With
+
+        Dim lstNames As Generic.List(Of String) = GetSelectedSegmentNames()
+        For i As Integer = 1 To 3
+            Dim FirstRow As Integer = 0
+            With CType(Choose(i, dgBound, dgFlow, dgLoad), DataGridView)
+                .ClearSelection()
+                For r As Integer = 0 To .Rows.Count - 1
+                    Dim CellSelected As Boolean = False
+                    For c As Integer = 0 To .Columns.Count - 1
+                        If lstNames.Contains(.Item(1, r).Value.split(":")(0)) Then .Item(c, r).Selected = True : CellSelected = True
+                    Next
+                    If CellSelected AndAlso FirstRow = 0 Then FirstRow = r
+                Next
+                If FirstRow <= .RowCount - 1 Then .FirstDisplayedCell = .Item(0, FirstRow)
+            End With
+        Next
+        RefreshingSelection = False
+    End Sub
+
+    Private Sub dgSegmentation_SelectionChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles dgSegmentation.SelectionChanged
+        If RefreshingSelection Then Exit Sub
+        RefreshingSelection = True
+        With dgSegmentation
+            If .Visible Then
+                ClearHighlight()
+                For r As Integer = 0 To .Rows.Count - 1
+                    Dim CellSelected As Boolean = False
+                    For c As Integer = 0 To .Columns.Count - 1
+                        If .Item(c, r).Selected Then
+                            CellSelected = True
+                            Exit For
+                        End If
+                    Next
+                    If CellSelected Then HighlightSegment(r + 1)
+                Next
+            End If
+        End With
+        RefreshingSelection = False
+    End Sub
+
+    Private Sub dg_SelectionChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles dgBound.SelectionChanged, dgFlow.SelectionChanged, dgLoad.SelectionChanged
+        If RefreshingSelection Then Exit Sub
+        With CType(sender, DataGridView)
+            If .Visible Then
+                ClearHighlight()
+                For r As Integer = 0 To .Rows.Count - 1
+                    For c As Integer = 0 To .Columns.Count - 1
+                        If .Item(c, r).Selected Then
+                            HighlightSegment(CInt(.Item(0, r).Value))
+                            Exit For
+                        End If
+                    Next
+                Next
+            End If
+        End With
+    End Sub
+
+    Private Sub btnSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCombineSegments.Click, btnDivideSegments.Click, btnDeleteSegments.Click
+        Try
+            'combine all highlighted segments, two at a time
+            With dgSegmentation
+
+                'highlight all selected rows and save
+                Dim lstSelectedSegments As New Generic.List(Of String)
+
+                Dim FirstRow As Integer = -1
+
+                For Each cell As DataGridViewCell In .SelectedCells
+                    Dim ID_Name As String = .Item(0, cell.RowIndex).Value
+                    If Not lstSelectedSegments.Contains(ID_Name) Then lstSelectedSegments.Add(ID_Name)
+                    If FirstRow = -1 Then FirstRow = cell.RowIndex
+                Next
+
+                If FirstRow = -1 Then Exit Sub
+
+                If sender Is btnCombineSegments Then
+
+                    If lstSelectedSegments.Count <= 1 Then
+                        WarningMsg("Please select two or more connected reaches before trying to combine them.")
+                        Exit Sub
+                    End If
+
+                    .Visible = False
+
+                    While True
+
+                        Dim Seg1 As atcWASPSegment = Nothing
+                        Dim Seg2 As atcWASPSegment = Nothing
+
+                        For r As Integer = 0 To .RowCount - 1
+                            Dim ID_Name As String = .Item(0, r).Value
+                            Dim ID As String = ID_Name.Split(":")(0)
+
+                            If lstSelectedSegments.Contains(ID_Name) Then
+                                'highlight entire row 
+                                For c As Integer = 0 To .ColumnCount - 1
+                                    .Item(c, r).Selected = True
+                                Next
+                                If Seg1 Is Nothing Then
+                                    Seg1 = pPlugIn.WASPProject.Segments(ID)
+                                    FirstRow = r
+                                Else
+                                    Seg2 = pPlugIn.WASPProject.Segments(ID)
+                                    If Seg1.DownID <> Seg2.ID And Seg2.DownID <> Seg1.ID Then
+                                        WarningMsg("The selected segments must be logically connected in the system.")
+                                        .Visible = True
+                                        Exit Sub
+                                    Else
+                                        pPlugIn.WASPProject.CombineSegments(Seg1, Seg2, Seg2.DownID = Seg1.ID)
+                                        LoadForm()
+                                    End If
+                                    Exit For
+                                End If
+                            End If
+                        Next
+                        If Seg2 Is Nothing Then Exit While
+                    End While
+                ElseIf sender Is btnDeleteSegments Then
+                    For i As Integer = pPlugIn.WASPProject.Segments.Count - 1 To 0 Step -1
+                        Dim seg As atcWASPSegment = pPlugIn.WASPProject.Segments(i)
+                        'make sure no segments would be orphaned
+                        If pPlugIn.WASPProject.Segments.Contains(seg.DownID) AndAlso lstSelectedSegments.Contains(pPlugIn.WASPProject.Segments(seg.DownID).ID_Name) Then
+                            If WarningMsg("Segment(s) cannot be deleted because one or more other segments would be orphaned. Make sure you delete from upstream to downstream. Do you want to delete anyway?") = Windows.Forms.DialogResult.OK Then
+                                Exit For
+                            Else
+                                .Visible = True
+                                Exit Sub
+                            End If
+                        End If
+                    Next
+                    For i As Integer = pPlugIn.WASPProject.Segments.Count - 1 To 0 Step -1
+                        Dim seg As atcWASPSegment = pPlugIn.WASPProject.Segments(i)
+                        If lstSelectedSegments.Contains(seg.ID_Name) Then
+                            pPlugIn.WASPProject.Segments.RemoveAt(i)
+                        End If
+                    Next
+                    pPlugIn.WASPProject.Segments.AssignWaspIds()
+                    LoadForm()
+                    If .RowCount > 0 Then .CurrentCell = .Item(2, Math.Min(.RowCount - 1, Math.Max(0, FirstRow - 1)))
+                Else
+                    Dim MaxTravelTime As Double = Val(InputBox("What is the maximum travel time you want to use to divide the selected segments?", "Divide Segments", Val(atxTravelTimeMax.Text) / 2 + 0.01))
+                    .Visible = False
+                    If MaxTravelTime > 0 Then
+                        For i As Integer = pPlugIn.WASPProject.Segments.Count - 1 To 0 Step -1
+                            FirstRow = i
+                            Dim seg As atcWASPSegment = pPlugIn.WASPProject.Segments(i)
+                            If lstSelectedSegments.Contains(seg.ID_Name) Then
+                                pPlugIn.WASPProject.DivideSegments(MaxTravelTime, seg)
+                            End If
+                        Next
+                        pPlugIn.WASPProject.Segments.AssignWaspIds()
+                        LoadForm()
+                    End If
+                End If
+                CreateSegmentShapeFile()
+                For c As Integer = 0 To .ColumnCount - 1
+                    If .RowCount > 0 Then .Item(c, Math.Min(.RowCount - 1, Math.Max(0, FirstRow))).Selected = True
+                Next
+                .FirstDisplayedCell = .Item(0, Math.Min(.RowCount - 1, Math.Max(0, FirstRow)))
+                .Visible = True
+            End With
+        Catch ex As Exception
+            ErrorMsg(, ex)
+        Finally
+            dgSegmentation.Visible = True
+        End Try
+    End Sub
+
+#Region "Create Shapefile routines..."
+
+    ''' <summary>
+    ''' Remove all layers referencing a shape file and then delete it and all related files
+    ''' </summary>
+    ''' <param name="Filename">Name of shape file (must have extension .shp)</param>
+    ''' <remarks></remarks>
+    Private Sub DeleteShapeFile(ByVal Filename As String)
+        If GisUtil.IsLayerByFileName(Filename) Then
+            For i As Integer = GisUtil.NumLayers - 1 To 0 Step -1
+                If GisUtil.LayerFileName(i).ToUpper = Filename.ToUpper Then
+                    GisUtil.RemoveLayer(i)
+                End If
+            Next
+        End If
+        For i As Integer = 1 To 4
+            Dim fn As String = IO.Path.ChangeExtension(Filename, Choose(i, ".shp", ".dbf", ".shx", ".prj"))
+            If My.Computer.FileSystem.FileExists(fn) Then
+                My.Computer.FileSystem.DeleteFile(fn)
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Create a new shapefile to be saved with the waspbuilder project file containing line segments for each segment
+    ''' </summary>
+    Public Sub CreateSegmentShapeFile()
+
+        'this cannot be called unless the project has been saved
+        If String.IsNullOrEmpty(pPlugIn.WASPProject.Filename) Then
+            Logger.Msg("The project must be saved before the shapefile can be created.")
+            Exit Sub
+        End If
+
+        'store shape file in same folder as project file and give same name (will overwrite without warning)
+
+        Dim WASPShapefileName As String = IO.Path.ChangeExtension(pPlugIn.WASPProject.Filename, ".shp")
+
+        DeleteShapeFile(WASPShapefileName)
+
+        'create the new empty shapefile and add to group
+        GisUtil.CreateEmptyShapefile(WASPShapefileName, "", "line")
+        GisUtil.AddGroup("WASP Builder")
+        GisUtil.AddLayerToGroup(WASPShapefileName, WASPSegmentLayerName, "WASP Builder")
+        Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(WASPShapefileName)
+        GisUtil.LayerVisible(lNewLayerIndex) = True
+
+        'add an id field to the new shapefile
+        Dim lNewIDFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "SEGID", 0, 20)
+        Dim lNewWASPIDFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "WASPID", 1, 10) 'integer
+        Dim lNewWASPNameFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "WASPNAME", 0, 50)
+        Dim lNewNameFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "NAME", 0, 50)
+        Dim lNewLengthFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "LENGTH", 2, 10)
+        Dim lNewFlowFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "MEANFLOW", 2, 10)
+        Dim lNewSlopeFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "SLOPE", 2, 10)
+        Dim lNewTravelTimeFieldIndex As Integer = GisUtil.AddField(lNewLayerIndex, "TRAVELTIME", 2, 10)
+
+        'add line segments to the shape file (do not use GISUtil.Addline because it is too slow!)
+        Dim lMWLayerIndex As Integer = 0
+        For lindex As Integer = 1 To pPlugIn.MapWin.Layers.NumLayers
+            If pPlugIn.MapWin.Layers(lindex).Name = "WASP Builder" Then
+                lMWLayerIndex = lindex
+            End If
+        Next
+
+        Dim sf As MapWinGIS.Shapefile = pPlugIn.MapWin.Layers(lNewLayerIndex).GetObject
+        Dim Success As Boolean = True
+
+        If sf.StartEditingShapes(True) Then
+            For s As Integer = 1 To pPlugIn.WASPProject.Segments.Count
+                For Each lSegment As atcWASPSegment In pPlugIn.WASPProject.Segments
+                    With lSegment
+                        If .WaspID = s Then
+                            Dim shpLine As New MapWinGIS.Shape
+                            If Not shpLine.Create(MapWinGIS.ShpfileType.SHP_POLYLINE) Then Success = False : Exit For
+                            For i As Integer = 0 To .PtsX.Length - 1
+                                Dim Point As New MapWinGIS.Point
+                                Point.x = .PtsX(i)
+                                Point.y = .PtsY(i)
+                                If Not shpLine.InsertPoint(Point, shpLine.numPoints) Then Success = False : Exit For
+                            Next
+                            If Success AndAlso Not sf.EditInsertShape(shpLine, sf.NumShapes) Then Success = False : Exit For
+                            sf.EditCellValue(lNewIDFieldIndex, sf.NumShapes - 1, .ID)
+                            sf.EditCellValue(lNewWASPIDFieldIndex, sf.NumShapes - 1, .WaspID)
+                            sf.EditCellValue(lNewWASPNameFieldIndex, sf.NumShapes - 1, .WaspName)
+                            sf.EditCellValue(lNewNameFieldIndex, sf.NumShapes - 1, .Name)
+                            sf.EditCellValue(lNewLengthFieldIndex, sf.NumShapes - 1, Math.Round(.Length, 3))
+                            sf.EditCellValue(lNewFlowFieldIndex, sf.NumShapes - 1, Math.Round(.MeanAnnualFlow, 2))
+                            sf.EditCellValue(lNewSlopeFieldIndex, sf.NumShapes - 1, Math.Round(.Slope, 5))
+                            sf.EditCellValue(lNewTravelTimeFieldIndex, sf.NumShapes - 1, Math.Round(pPlugIn.WASPProject.TravelTime(.Length, .Velocity), 3))
+                            Exit For
+                        End If
+                    End With
+                Next
+            Next
+            If Success AndAlso Not sf.StopEditingShapes(True, True) Then Success = False
+        End If
+
+        'add rendering
+        GisUtil.SetLayerLineSize(lNewLayerIndex, 3)
+        'this got broken in MW4.8
+        GisUtil.UniqueValuesRenderer(lNewLayerIndex, GisUtil.FieldIndex(lNewLayerIndex, "WASPID"))
+        GisUtil.LayerVisible(lNewLayerIndex) = False
+        GisUtil.LayerVisible(lNewLayerIndex) = True
+        LabelSegmentLayer()
+        Logger.Progress(100, 100)
+    End Sub
+
+    Private Sub LabelSegmentLayer()
+        'add labeling
+        If String.IsNullOrEmpty(pPlugIn.WASPProject.Filename) Then Exit Sub
+        Dim WASPShapefileName As String = IO.Path.ChangeExtension(pPlugIn.WASPProject.Filename, ".shp")
+        If Not GisUtil.IsLayerByFileName(WASPShapefileName) Then Exit Sub
+        Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(WASPShapefileName)
+        Dim sf As MapWinGIS.Shapefile = pPlugIn.MapWin.Layers(lNewLayerIndex).GetObject
+        With pPlugIn.MapWin.Layers(lNewLayerIndex)
+            .Font("Arial", 7)
+            .ClearLabels()
+            .UseLabelCollision = False
+        End With
+        If cboLabelLayer.Text <> "(None)" Then
+            For i As Integer = 0 To sf.NumShapes - 1
+                Dim fldidx As Integer = GisUtil.FieldIndex(lNewLayerIndex, cboLabelLayer.Text)
+                Dim text As String = GisUtil.FieldValue(lNewLayerIndex, i, fldidx)
+                With sf.Shape(i)
+                    Dim sumX As Double = 0.0, sumY As Double = 0.0
+                    For j As Integer = 0 To sf.Shape(i).numPoints - 1
+                        With .Point(j)
+                            sumX += .x
+                            sumY += .y
+                        End With
+                    Next
+                    pPlugIn.MapWin.Layers(lNewLayerIndex).AddLabel(text, Color.Black, sumX / .numPoints, sumY / .numPoints, MapWinGIS.tkHJustification.hjCenter)
+                    pPlugIn.MapWin.Layers(lNewLayerIndex).LabelsShadow = True
+                End With
+            Next
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' If the segment shapefile is found, highlight the specified segment
+    ''' </summary>
+    ''' <param name="WaspID">ID of segment</param>
+    ''' <remarks></remarks>
+    Public Sub HighlightSegment(ByVal WaspID As Integer)
+        If GisUtil.IsLayer(WASPSegmentLayerName) Then
+            Dim LayerIndex As Integer = GisUtil.LayerIndex(WASPSegmentLayerName)
+            GisUtil.SetSelectedFeature(LayerIndex, WaspID - 1)
+            UpdateSegmentLabel()
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' If the segment shapefile is found, highlight the specified segment
+    ''' </summary>
+    ''' <param name="WaspID">ID of segment</param>
+    ''' <remarks></remarks>
+    Public Sub HighlightSegment(ByVal WaspID As Generic.List(Of Integer))
+        If GisUtil.IsLayer(WASPSegmentLayerName) Then
+            Dim LayerIndex As Integer = GisUtil.LayerIndex(WASPSegmentLayerName)
+            If Not GisUtil.IsField(LayerIndex, "WASPID") Then Exit Sub
+            Dim FieldIndex As Integer = GisUtil.FieldIndex(LayerIndex, "WASPID")
+            For i As Integer = 0 To GisUtil.NumFeatures(LayerIndex) - 1
+                If WaspID.Contains(Val(GisUtil.FieldValue(LayerIndex, i, FieldIndex))) Then
+                    GisUtil.SetSelectedFeature(LayerIndex, i)
+                End If
+            Next
+            UpdateSegmentLabel()
+        End If
+    End Sub
+
+    Public Sub ClearHighlight()
+        If GisUtil.IsLayer(WASPSegmentLayerName) Then
+            Dim LayerIndex As Integer = GisUtil.LayerIndex(WASPSegmentLayerName)
+            GisUtil.ClearSelectedFeatures(LayerIndex)
+            UpdateSegmentLabel()
+        End If
+    End Sub
+
+    Private Sub UpdateSegmentLabel()
+        With dgSegmentation
+            Dim NumRowsSelected As Integer = 0
+            For r As Integer = 0 To .Rows.Count - 1
+                Dim CellSelected As Boolean = False
+                For c As Integer = 0 To .Columns.Count - 1
+                    If .Item(c, r).Selected Then CellSelected = True
+                Next
+                If CellSelected Then NumRowsSelected += 1
+            Next
+            lblNumSelected.Text = String.Format("{0} Segments Selected", NumRowsSelected)
+        End With
+    End Sub
+
+    ''' <summary>
+    ''' If the segment shapefile is found, return IDs of selected segments
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Function GetSelectedSegmentIDs() As Generic.List(Of Integer)
+        Dim lst As New Generic.List(Of Integer)
+        If GisUtil.IsLayer(WASPSegmentLayerName) Then
+            Dim LayerIndex As Integer = GisUtil.LayerIndex(WASPSegmentLayerName)
+            Dim FieldIndex As Integer = GisUtil.FieldIndex(LayerIndex, "WASPID")
+            If FieldIndex <> -1 Then
+                For i As Integer = 0 To GisUtil.NumSelectedFeatures(LayerIndex) - 1
+                    lst.Add(Val(GisUtil.FieldValue(LayerIndex, GisUtil.IndexOfNthSelectedFeatureInLayer(i, LayerIndex), FieldIndex)))
+                Next
+            End If
+        End If
+        Return lst
+    End Function
+
+    ''' <summary>
+    ''' If the segment shapefile is found, return IDs Names selected segments
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Function GetSelectedSegmentNames() As Generic.List(Of String)
+        Dim lst As New Generic.List(Of String)
+        If GisUtil.IsLayer(WASPSegmentLayerName) Then
+            Dim LayerIndex As Integer = GisUtil.LayerIndex(WASPSegmentLayerName)
+            Dim FieldIndex As Integer = GisUtil.FieldIndex(LayerIndex, "WASPNAME")
+            If FieldIndex <> -1 Then
+                For i As Integer = 0 To GisUtil.NumSelectedFeatures(LayerIndex) - 1
+                    lst.Add(Val(GisUtil.FieldValue(LayerIndex, GisUtil.IndexOfNthSelectedFeatureInLayer(i, LayerIndex), FieldIndex)))
+                Next
+            End If
+        End If
+        Return lst
+    End Function
+
+    Public Sub CreateBufferedSegmentShapeFile() '(ByVal aWASPShapefileFilename As String)
+        'this cannot be called unless the project has been saved
+        If String.IsNullOrEmpty(pPlugIn.WASPProject.Filename) Then
+            Logger.Msg("The project must be saved before the shapefile can be created.")
+            Exit Sub
+        End If
+
+        'store shape file in same folder as project file and give same name (will overwrite without warning)
+
+        Dim WASPShapefileName As String = IO.Path.ChangeExtension(pPlugIn.WASPProject.Filename, ".shp")
+        Dim WASPBuffShapefileName As String = WASPShapefileName.Replace(".shp", "-Buffered.shp")
+
+        DeleteShapeFile(WASPBuffShapefileName)
+        GisUtil.BufferLayer(WASPShapefileName, WASPBuffShapefileName, 100)
+
+        If GisUtil.IsLayer(WASPSegmentLayerName & "-Buffered") Then
+            GisUtil.RemoveLayer(GisUtil.LayerIndex(WASPSegmentLayerName & "-Buffered"))
+        End If
+        GisUtil.AddGroup("WASP Builder")
+        GisUtil.AddLayerToGroup(WASPBuffShapefileName, WASPSegmentLayerName & "-Buffered", "WASP Builder")
+        Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(WASPBuffShapefileName)
+        GisUtil.LayerVisible(lNewLayerIndex) = True
+
+        'add rendering
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(WASPBuffShapefileName)
+        GisUtil.UniqueValuesRenderer(lLayerIndex, GisUtil.FieldIndex(lLayerIndex, "WASPID"))
+        GisUtil.LayerVisible(lNewLayerIndex) = False
+        GisUtil.LayerVisible(lNewLayerIndex) = True
+        GisUtil.SetLayerLineSize(lLayerIndex, 0)
+        Logger.Progress(100, 100)
+    End Sub
+
+    ''' <summary>
+    ''' This routine is not used anymore
+    ''' </summary>
+    ''' <param name="aSegmentLayerIndex"></param>
+    ''' <param name="aSelectedIndexes"></param>
+    ''' <remarks></remarks>
+    Public Sub CreateFlowlineShapeFile(ByVal aSegmentLayerIndex As Integer, ByRef aSelectedIndexes As atcCollection)
+        Dim lNewFileName As String = ""
+        Dim lSelectedIndexCollection As New Collection
+        For Each lSelectedIndex As Object In aSelectedIndexes
+            lSelectedIndexCollection.Add(lSelectedIndex)
+        Next
+        GisUtil.SaveSelectedFeatures(aSegmentLayerIndex, lSelectedIndexCollection, lNewFileName, "polylinez")
+        If GisUtil.IsLayer("Flowlines for WASP Project") Then
+            GisUtil.RemoveLayer(GisUtil.LayerIndex("Flowlines for WASP Project"))
+        End If
+        GisUtil.AddLayer(lNewFileName, "Flowlines for WASP Project")
+        Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(lNewFileName)
+        GisUtil.LayerVisible(lNewLayerIndex) = True
+        GisUtil.SetLayerLineSize(lNewLayerIndex, 2)
+    End Sub
+
+#End Region
+
+    Private Sub cboLabelLayer_SelectedIndexChanged(sender As Object, e As System.EventArgs) Handles cboLabelLayer.SelectedIndexChanged
+        LabelSegmentLayer()
+    End Sub
+
+    ''' <summary>
+    ''' Create unique color scheme for shapefile layer (the version in GISUtil had to be replaced because it used a buggy MW4.8 call that locked the .DBF file)
+    ''' </summary>
+    ''' <param name="aLayerIndex">Index of desired layer</param>
+    ''' <param name="aFieldIndex">Index of desired field</param>
+    Public Sub UniqueValuesRenderer(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, Optional ByVal aColors As Collection = Nothing, Optional ByVal aCaptions As Collection = Nothing)
+        'build a unique values renderer from a given layer and field
+
+        Dim lMWlayer As MapWindow.Interfaces.Layer = pPlugIn.MapWin.Layers(pPlugIn.MapWin.Layers.GetHandle(aLayerIndex))
+
+        Dim lSf As MapWinGIS.Shapefile = pPlugIn.MapWin.Layers(aLayerIndex).GetObject
+
+        Dim options As MapWinGIS.ShapeDrawingOptions = lSf.DefaultDrawingOptions
+        options.FillVisible = True
+
+        ' set different colors by region ([Region] field is expected in attribute table)
+
+        'following causes .dbf file to be locked due to bug in MW4.8
+
+        'lSf.Categories.Generate(aFieldIndex, MapWinGIS.tkClassificationType.ctUniqueValues, 0)
+
+        'lSf.Categories.ApplyExpressions()
+
+        '' apply colors automatically
+        'Dim scheme As New MapWinGIS.ColorScheme
+        'scheme.SetColors(System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))), _
+        '                 System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))))
+        'lSf.Categories.ApplyColorScheme(MapWinGIS.tkColorSchemeType.ctSchemeRandom, scheme)
+        'lSf.Categories.ApplyExpressions()
+
+        'work-around by LCW: manually add the categories and assign to shapes
+
+        'form dictionary of unique values associated with lists of associated layers
+        Dim lUniqueValues As New Generic.Dictionary(Of String, Generic.List(Of Integer))
+        For shpIndex As Integer = 0 To lSf.NumShapes - 1
+            Dim shpValue As String = GisUtil.FieldValue(aLayerIndex, shpIndex, aFieldIndex)
+            If Not lUniqueValues.ContainsKey(shpValue) Then
+                Dim lst As New Generic.List(Of Integer)
+                lUniqueValues.Add(shpValue, lst)
+            End If
+            lUniqueValues(shpValue).Add(shpIndex)
+        Next
+
+        'create list of unique colors to we make sure none are repeated
+        Dim lstUniqueColors As New Generic.List(Of Integer)
+        lSf.Categories.Clear()
+
+        For Each shpValue As String In lUniqueValues.Keys
+            With lSf.Categories.Add(shpValue)
+                With .DrawingOptions
+                    Dim color As Integer = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
+                    Do Until Not lstUniqueColors.Contains(color)
+                        color = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
+                    Loop
+                    lstUniqueColors.Add(color)
+                    .LineColor = color
+                    .FillColor = color
+                End With
+            End With
+            For Each shpIndex As Integer In lUniqueValues(shpValue)
+                lSf.ShapeCategory(shpIndex) = lSf.Categories.Count - 1
+            Next
+        Next
+        pPlugIn.MapWin.View.Redraw()
+        pPlugIn.MapWin.View.LegendControl.Refresh()
+
+    End Sub
+
 End Class

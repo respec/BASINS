@@ -4,6 +4,7 @@ Imports atcUtility
 Imports atcData
 
 Module modWaspUtil
+
     Public Function IntegerToAlphabet(ByVal aNumber As Integer) As String
         'given 1 returns 'A'
         'given 26 returns 'Z'
@@ -209,5 +210,26 @@ Module modWaspUtil
         Return lDistance
     End Function
 
+    ''' <summary>
+    ''' Write line to file, substituting TAB character for \t in format string
+    ''' </summary>
+    Friend Sub WriteLine(ByRef sw As IO.StreamWriter, ByVal FormatString As String, ByVal ParamArray Args() As Object)
+        If String.IsNullOrEmpty(FormatString) Then FormatString = ""
+        sw.WriteLine(String.Format(FormatString, Args).Replace("\t", vbTab))
+    End Sub
+
+    ''' <summary>
+    ''' Format string using standard String.Format, except substitute \t and \n with tab and newline characters
+    ''' </summary>
+    Friend Function StringFormat(ByVal Format As String, ByVal ParamArray Args() As Object) As String
+        Return String.Format(Format, Args).Replace("\t", vbTab).Replace("\n", vbNewLine)
+    End Function
+
+    ''' <summary>
+    ''' Test object; if dbnull, nothing or empty string, return default value
+    ''' </summary>
+    Friend Function TestNull(ByVal Value As Object, ByVal DefaultValue As Object) As Object
+        If IsDBNull(Value) OrElse IsNothing(Value) OrElse (TypeOf Value Is String AndAlso Value = "") Then Return DefaultValue Else Return Value
+    End Function
 
 End Module

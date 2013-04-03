@@ -8,17 +8,17 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("atcSWMMPlugIN")> 
-<Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("atcSWMMPlugIN")> 
-<Assembly: AssemblyCopyright("Copyright ©  2008")> 
+<Assembly: AssemblyTitle("atcWASPPlugin")> 
+<Assembly: AssemblyDescription("BASINS plugin allowing the building of WASP INP file")> 
+<Assembly: AssemblyCompany("AquaTerra/Wilson Engineering")> 
+<Assembly: AssemblyProduct("atcWASPPlugin")> 
+<Assembly: AssemblyCopyright("Copyright ©  2012")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("f10645c3-de72-4a11-8062-bbe41fc73336")> 
+<Assembly: Guid("f10645c3-de72-4a11-8062-bbe41fc73337")> 
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
-<Assembly: AssemblyFileVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("1.1.0.1")> 
+<Assembly: AssemblyFileVersion("1.1.0.1")> 

@@ -2,6 +2,11 @@ Imports MapWinUtility
 Imports atcMwGisUtility
 Imports atcUtility
 
+''' <summary>
+''' This form is shown when the plugin is first activated. It allows the user to select one or more stream segments from a NHDPlus flowline layer that will be used to
+''' build a Wasp input file. The form is always shown on top so won't disappear when the MapWindow application is selected. It changes dynamically as segments are selected
+''' and also includes functionality to select upstream segments for you. After accepting this form, the WaspBuilder form is displayed.
+''' </summary>
 Public Class frmWASPInitialize
 
     Friend pPlugIn As PlugIn
@@ -11,9 +16,9 @@ Public Class frmWASPInitialize
     Friend pNumFeatures As Integer
     Friend pSelectedIndexes As atcCollection
 
-    Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        Dim lfrmWASPSetup As New frmWASPSetup
-        With lfrmWASPSetup
+    Private Sub btnContinue_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnContinue.Click
+        pPlugIn.pfrmWASPSetup = New frmWASPSetup
+        With pPlugIn.pfrmWASPSetup
             .InitializeUI(pPlugIn, pSelectedIndexes, pCurrentLayerIndex)
             Logger.Dbg("WASPSetup Initialized")
             .Show()
@@ -21,23 +26,22 @@ Public Class frmWASPInitialize
             Me.Close()
             .GenerateSegments()
             .InitializeStationLists()
+            .btnSave.PerformClick()
             .EnableControls(True)
         End With
     End Sub
 
     Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
         pPlugIn = aPlugIn
-        cboLowest.Items.Add("1")
-        cboLowest.Items.Add("2")
-        cboLowest.Items.Add("3")
-        cboLowest.Items.Add("4")
-        cboLowest.Items.Add("5")
+        cboLowest.Items.AddRange(New String() {"1", "2", "3", "4", "5"})
         cboLowest.SelectedIndex = 0
         RefreshSelectionInfo()
     End Sub
 
-    Private Sub RefreshSelectionInfo()
+    Friend Sub RefreshSelectionInfo()
         pCurrentLayerIndex = GisUtil.CurrentLayer
+        If pCurrentLayerIndex < 0 Then Exit Sub
+
         pCurrentLayerName = GisUtil.LayerName(GisUtil.CurrentLayer)
         If GisUtil.LayerType(pCurrentLayerIndex) = 2 Then
             pNumSelected = GisUtil.NumSelectedFeatures(pCurrentLayerIndex)
@@ -52,7 +56,7 @@ Public Class frmWASPInitialize
 
         'txtInfo.Text = pNumSelected.ToString & " features out of " & pNumFeatures.ToString & " in the '" & _
         '               pCurrentLayerName & "' layer are selected."
-        txtInfo.Text = "Selection Layer: " & pCurrentLayerName & vbCrLf & vbCrLf & _
+        lblInfo.Text = "Selection Layer: " & pCurrentLayerName & vbCrLf & vbCrLf & _
                        "Number of Selected Features: " & pNumSelected.ToString & " of " & pNumFeatures.ToString
 
         'does the current layer look like a nhdplus flowlines layer?
@@ -62,24 +66,28 @@ Public Class frmWASPInitialize
            GisUtil.IsField(pCurrentLayerIndex, "MAVELU") AndAlso _
            GisUtil.IsField(pCurrentLayerIndex, "CUMDRAINAG") Then
             'yes, looks like nhdplus flowlines
-            txtWarning.Text = ""
+            lblWarning.Text = ""
         Else
             'no, problem 
-            txtWarning.Text = "Warning: The current layer does not appear to be a valid NHDPlus Flowline layer!"
+            lblWarning.Text = "Warning: The current layer does not appear to be a valid NHDPlus Flowline layer!"
         End If
+
+        grpSelect.Enabled = pNumSelected > 0
     End Sub
 
     Private Sub cmdCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
     End Sub
 
-    Private Sub cmdRefresh_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdRefresh.Click
+    Private Sub cmdRefresh_Click(ByVal sender As Object, ByVal e As System.EventArgs)
         RefreshSelectionInfo()
     End Sub
 
     Private Sub cmdSelect_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSelect.Click
         'select upstream segments
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        lblWarning.Text = "Selecting upstream segments..."
+        System.Windows.Forms.Application.DoEvents()
         Dim lComids = New atcCollection
         Dim lToComids = New atcCollection
         Dim lStreamOrders = New atcCollection
@@ -134,7 +142,7 @@ Public Class frmWASPInitialize
                     pSelectedIndexes.Add(pSelectedIndexes.Count, lSegIndex)
                     lSegmentIndexesToCheck.Add(lSegIndex)
                 Next
-                txtInfo.Text = "Selection Layer: " & pCurrentLayerName & vbCrLf & vbCrLf & _
+                lblInfo.Text = "Selection Layer: " & pCurrentLayerName & vbCrLf & vbCrLf & _
                                "Number of Selected Features: " & pSelectedIndexes.Count.ToString & " of " & pNumFeatures.ToString
                 Me.Refresh()
             Loop
@@ -148,6 +156,15 @@ Public Class frmWASPInitialize
 
             RefreshSelectionInfo()
         End If
+        lblWarning.Text = ""
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+    End Sub
+
+    Private Sub frmWASPInitialize_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
+        SaveWindowPos(REGAPPNAME, Me)
+    End Sub
+
+    Private Sub frmWASPInitialize_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        GetWindowPos(REGAPPNAME, Me)
     End Sub
 End Class
