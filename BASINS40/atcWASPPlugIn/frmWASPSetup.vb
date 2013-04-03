@@ -1413,7 +1413,13 @@ Public Class frmWASPSetup
         If String.IsNullOrEmpty(pPlugIn.WASPProject.Filename) Then Exit Sub
         Dim WASPShapefileName As String = IO.Path.ChangeExtension(pPlugIn.WASPProject.Filename, ".shp")
         If Not GisUtil.IsLayerByFileName(WASPShapefileName) Then Exit Sub
-        Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(WASPShapefileName)
+        'Dim lNewLayerIndex As Integer = GisUtil.LayerIndex(WASPShapefileName)
+        Dim lNewLayerIndex As Integer = 0
+        For lindex As Integer = 0 To pPlugIn.MapWin.Layers.NumLayers - 1
+            If pPlugIn.MapWin.Layers(lindex).FileName = WASPShapefileName Then
+                lNewLayerIndex = lindex
+            End If
+        Next
         Dim sf As MapWinGIS.Shapefile = pPlugIn.MapWin.Layers(lNewLayerIndex).GetObject
         With pPlugIn.MapWin.Layers(lNewLayerIndex)
             .Font("Arial", 7)
@@ -1587,74 +1593,6 @@ Public Class frmWASPSetup
 
     Private Sub cboLabelLayer_SelectedIndexChanged(sender As Object, e As System.EventArgs) Handles cboLabelLayer.SelectedIndexChanged
         LabelSegmentLayer()
-    End Sub
-
-    ''' <summary>
-    ''' Create unique color scheme for shapefile layer (the version in GISUtil had to be replaced because it used a buggy MW4.8 call that locked the .DBF file)
-    ''' </summary>
-    ''' <param name="aLayerIndex">Index of desired layer</param>
-    ''' <param name="aFieldIndex">Index of desired field</param>
-    Public Sub UniqueValuesRenderer(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, Optional ByVal aColors As Collection = Nothing, Optional ByVal aCaptions As Collection = Nothing)
-        'build a unique values renderer from a given layer and field
-
-        Dim lMWlayer As MapWindow.Interfaces.Layer = pPlugIn.MapWin.Layers(pPlugIn.MapWin.Layers.GetHandle(aLayerIndex))
-
-        Dim lSf As MapWinGIS.Shapefile = pPlugIn.MapWin.Layers(aLayerIndex).GetObject
-
-        Dim options As MapWinGIS.ShapeDrawingOptions = lSf.DefaultDrawingOptions
-        options.FillVisible = True
-
-        ' set different colors by region ([Region] field is expected in attribute table)
-
-        'following causes .dbf file to be locked due to bug in MW4.8
-
-        'lSf.Categories.Generate(aFieldIndex, MapWinGIS.tkClassificationType.ctUniqueValues, 0)
-
-        'lSf.Categories.ApplyExpressions()
-
-        '' apply colors automatically
-        'Dim scheme As New MapWinGIS.ColorScheme
-        'scheme.SetColors(System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))), _
-        '                 System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))))
-        'lSf.Categories.ApplyColorScheme(MapWinGIS.tkColorSchemeType.ctSchemeRandom, scheme)
-        'lSf.Categories.ApplyExpressions()
-
-        'work-around by LCW: manually add the categories and assign to shapes
-
-        'form dictionary of unique values associated with lists of associated layers
-        Dim lUniqueValues As New Generic.Dictionary(Of String, Generic.List(Of Integer))
-        For shpIndex As Integer = 0 To lSf.NumShapes - 1
-            Dim shpValue As String = GisUtil.FieldValue(aLayerIndex, shpIndex, aFieldIndex)
-            If Not lUniqueValues.ContainsKey(shpValue) Then
-                Dim lst As New Generic.List(Of Integer)
-                lUniqueValues.Add(shpValue, lst)
-            End If
-            lUniqueValues(shpValue).Add(shpIndex)
-        Next
-
-        'create list of unique colors to we make sure none are repeated
-        Dim lstUniqueColors As New Generic.List(Of Integer)
-        lSf.Categories.Clear()
-
-        For Each shpValue As String In lUniqueValues.Keys
-            With lSf.Categories.Add(shpValue)
-                With .DrawingOptions
-                    Dim color As Integer = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
-                    Do Until Not lstUniqueColors.Contains(color)
-                        color = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
-                    Loop
-                    lstUniqueColors.Add(color)
-                    .LineColor = color
-                    .FillColor = color
-                End With
-            End With
-            For Each shpIndex As Integer In lUniqueValues(shpValue)
-                lSf.ShapeCategory(shpIndex) = lSf.Categories.Count - 1
-            Next
-        Next
-        pPlugIn.MapWin.View.Redraw()
-        pPlugIn.MapWin.View.LegendControl.Refresh()
-
     End Sub
 
 End Class
