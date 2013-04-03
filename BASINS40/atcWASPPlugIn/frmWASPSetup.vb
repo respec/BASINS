@@ -1359,13 +1359,13 @@ Public Class frmWASPSetup
 
         'add line segments to the shape file (do not use GISUtil.Addline because it is too slow!)
         Dim lMWLayerIndex As Integer = 0
-        For lindex As Integer = 1 To pPlugIn.MapWin.Layers.NumLayers
-            If pPlugIn.MapWin.Layers(lindex).Name = "WASP Builder" Then
+        For lindex As Integer = 0 To pPlugIn.MapWin.Layers.NumLayers - 1
+            If pPlugIn.MapWin.Layers(lindex).Name = "WASP Segments" Then
                 lMWLayerIndex = lindex
             End If
         Next
 
-        Dim sf As MapWinGIS.Shapefile = pPlugIn.MapWin.Layers(lNewLayerIndex).GetObject
+        Dim sf As MapWinGIS.Shapefile = pPlugIn.MapWin.Layers(lMWLayerIndex).GetObject
         Dim Success As Boolean = True
 
         If sf.StartEditingShapes(True) Then
