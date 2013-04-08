@@ -788,20 +788,22 @@ TryOldString:
         Return S
     End Function
 
+    ''' <summary>
+    ''' Divide a string into 2 portions at the position of the first comma or space
+    ''' Returns the portion before the delimiter and removes the first portion and the delimiter from the original string
+    ''' Does not search for comma or space in the part of a string between single quotes, and removes the single quotes
+    ''' Example: StrRetRem("Hello world") = "Hello", and S is reduced to "world"
+    ''' Example: StrRetRem("Hello,world") = "Hello", and S is reduced to "world"
+    ''' Example: StrRetRem("'Hello world',fabulous") = "Hello,world", and S is reduced to "fabulous"
+    ''' Example: StrRetRem("Hello") = "Hello", and S is reduced to an empty string
+    ''' </summary>
+    ''' <param name="S">String to divide</param>
+    ''' <returns>Portion of incoming string from the start until the first comma or space</returns>
+    ''' <remarks>Returns the entire string if no comma or space is found.</remarks>
     Function StrRetRem(ByRef S As String) As String
-        ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of comma or space.
-        ' ##SUMMARY   Example: StrRetRem("This string") = "This", and s is reduced to "string"
-        ' ##SUMMARY   Example: StrRetRem("This,string") = "This", and s is reduced to "string"
-        ' ##PARAM s M String to be analyzed
-        ' ##RETURNS  Returns leading portion of incoming string up to first occurence of delimeter. 
-        '            Returns input parameter without that portion. If no comma or space in string, 
-        '            returns whole string, and input parameter reduced to null string.
-        Dim l As String
-        Dim i As Integer
-        Dim j As Integer
-        ' ##LOCAL l - string to return
-        ' ##LOCAL i - position of blank delimeter
-        ' ##LOCAL j - position of comma delimeter
+        Dim l As String  ' string to return
+        Dim i As Integer ' position of blank delimeter
+        Dim j As Integer ' position of comma delimeter
 
         S = LTrim(S) 'remove leading blanks
 
