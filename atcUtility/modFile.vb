@@ -205,15 +205,16 @@ Public Module modFile
         Else
             lBaseName = IO.Path.Combine(IO.Path.GetTempPath, aBaseName)
         End If
+        lBaseName = lBaseName.TrimEnd(".")
         Dim lName As String = lBaseName
-        If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lName = IO.Path.ChangeExtension(lName, aExtension)
+        If Not String.IsNullOrEmpty(aExtension) Then lName = IO.Path.ChangeExtension(lName, aExtension)
         While FileExists(lName, True)
             'First, see if existing temp file/folder is expired and try deleting it if so.
             'If not expired, or expired but cannot delete, then try next numbered name
             If IO.File.GetCreationTime(lName).ToOADate > lExpirationDate OrElse Not TryDelete(lName) Then
                 lCounter += 1
                 lName = lBaseName & "_" & lCounter
-                If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lName = IO.Path.ChangeExtension(lName, aExtension)
+                If Not String.IsNullOrEmpty(aExtension) Then lName = IO.Path.ChangeExtension(lName, aExtension)
             End If
         End While
         Return lName
@@ -1026,8 +1027,8 @@ ErrorWriting:
 
         Public Sub New(ByVal aFileName As String)
             'NOTE: default buffer size (4096) or larger degrades performance - jlk 10/2008
+            pLength = FileSystem.FileLen(aFileName)
             pStreamReader = New IO.BinaryReader(New IO.BufferedStream(New IO.FileStream(aFileName, IO.FileMode.Open, IO.FileAccess.Read), 1024))
-            Clear()
         End Sub
 
         Public Sub New(ByVal aStreamReader As IO.BinaryReader)
@@ -1084,7 +1085,7 @@ ReadCharacter:
                 If lEndOfStream Then
 AtEndOfStream:
                     Try
-                        Logger.Dbg("Closing Stream")
+                        'Logger.Dbg("Closing Stream")
                         pStreamReader.Close()
                     Catch
                     End Try
@@ -1096,7 +1097,12 @@ AtEndOfStream:
         End Function
 
         Public Sub Reset() Implements IEnumerator.Reset
-            Throw New NotSupportedException
+            If pStreamReader.BaseStream.CanSeek Then
+                pStreamReader.BaseStream.Position = 0
+                pHaveNextChar = False
+            Else
+                Throw New NotSupportedException
+            End If
         End Sub
 
         Public Function GetEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
