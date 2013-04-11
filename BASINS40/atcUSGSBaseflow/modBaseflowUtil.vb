@@ -44,8 +44,9 @@ Module modBaseflowUtil
         Dim lTsFlowMonthlySum As atcTimeseries = Aggregate(lTsFlowDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
         Dim lTsFlowMonthlyDepth As atcTimeseries = lTsFlowMonthlySum * lConversionFactor
 
-        Dim lTsFlowYearly As atcTimeseries = Aggregate(lTsFlowDaily, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-        Dim lTsFlowYearlySum As atcTimeseries = Aggregate(lTsFlowDaily, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        Dim lTsFlowDailyBnd As atcTimeseries = SubsetByDateBoundary(lTsFlowDaily, 1, 1, Nothing)
+        Dim lTsFlowYearly As atcTimeseries = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+        Dim lTsFlowYearlySum As atcTimeseries = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
         Dim lTsFlowYearlyDepth As atcTimeseries = lTsFlowYearlySum * lConversionFactor
 
         Dim lTsGroupStreamFlow As New atcCollection
@@ -655,7 +656,6 @@ Module modBaseflowUtil
                     .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
                     lLastColumn += 5
                 End If
-
                 If aTsGroupBFIStandard.Count > 0 Then
                     lBF = aTsGroupBFIStandard.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupBFIStandard.ItemByKey("Depth" & ATStep).Value(I)
@@ -734,8 +734,9 @@ Module modBaseflowUtil
                 lConversionFactor = pUADepth / lDA
                 Dim lTsBFToReportPartDailyDepth As atcTimeseries = lTsBFToReportPartDaily * lConversionFactor
 
-                Dim lTsBFToReportPartYearly As atcTimeseries = Aggregate(lTsBFToReportPartMonthly, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-                Dim lTsBFToReportPartYearlySum As atcTimeseries = Aggregate(lTsBFToReportPartDaily, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                Dim lTsBFToReportPartDailyBnd As atcTimeseries = SubsetByDateBoundary(lTsBFToReportPartDaily, 1, 1, Nothing)
+                Dim lTsBFToReportPartYearly As atcTimeseries = Aggregate(lTsBFToReportPartDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                Dim lTsBFToReportPartYearlySum As atcTimeseries = Aggregate(lTsBFToReportPartDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
                 Dim lTsBFToReportPartYearlyDepth As atcTimeseries = lTsBFToReportPartYearlySum * lConversionFactor
 
                 'lTsBFToReportPartDaily.Attributes.SetValue(lReportColumnAttributeName, "RateDaily")
@@ -772,6 +773,7 @@ Module modBaseflowUtil
                 Dim lTsYear As atcTimeseries = Nothing
                 Dim lTsYearSum As atcTimeseries = Nothing
                 Dim lTsYearDepth As atcTimeseries = Nothing
+                Dim lTsDailyBnd As atcTimeseries = SubsetByDateBoundary(lTsDaily, 1, 1, Nothing)
 
                 If lDA > 0 Then
                     lConversionFactor = pUADepth / lDA
@@ -779,14 +781,16 @@ Module modBaseflowUtil
                     lTsMon = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
                     lTsMonSum = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                     lTsMonDepth = lTsMonSum * lConversionFactor
-                    lTsYear = Aggregate(lTsDaily, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-                    lTsYearSum = Aggregate(lTsDaily, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+
+                    lTsYear = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                    lTsYearSum = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
                     lTsYearDepth = lTsYearSum * lConversionFactor
                 Else
                     lTsMon = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
                     lTsMonSum = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
-                    lTsYear = Aggregate(lTsDaily, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-                    lTsYearSum = Aggregate(lTsDaily, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+
+                    lTsYear = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                    lTsYearSum = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
                 End If
 
                 'lTsDaily.Attributes.SetValue(lReportColumnAttributeName, "RateDaily")
@@ -2605,7 +2609,7 @@ Module modBaseflowUtil
         Dim lblMethodMod As String = "   "
         Dim lblMethodParm As String = ""
         Dim lBFINDay As Integer = lTsBaseflow.Attributes.GetValue("BFINDay")
-        Dim lStationID As String = lTsBaseflow.Attributes.GetValue("STAID")
+        Dim lStationID As String = lTsBaseflow.Attributes.GetValue("Location")
         If aMethodName.StartsWith("BFIStandard") Then
             lblMethodStd = " * "
             Dim lBFIFrac As Double = lTsBaseflow.Attributes.GetValue("BFIFrac")
@@ -2644,13 +2648,21 @@ Module modBaseflowUtil
         Dim lStrDay As String
         Dim lStrBFFlow As String
         Dim lStrFlow As String
-        For Z As Integer = 0 To lTsBaseflow.numValues - 1
-            J2Date(lTsBaseflow.Dates.Value(Z), lDate)
+        Dim lTpStartIndex As Integer = lTsBaseflow.Attributes.GetValue("TPStart", 1)
+        If lTsFlow.numValues < lTsBaseflow.numValues Then
+            Dim lTsFlowNew As atcTimeseries = NewTimeseries(lTsBaseflow.Dates.Value(0), lTsBaseflow.Dates.Value(lTsBaseflow.numValues), atcTimeUnit.TUDay, 1, Nothing, -99.0)
+            Dim lTsGroup As New atcTimeseriesGroup
+            lTsGroup.Add(lTsFlow)
+            lTsGroup.Add(lTsFlowNew)
+            lTsFlow = MergeTimeseries(lTsGroup)
+        End If
+        For Z As Integer = lTpStartIndex To lTsBaseflow.numValues - 1
+            J2Date(lTsBaseflow.Dates.Value(Z - 1), lDate)
             lStrYear = lDate(0).ToString
             lStrMonth = lDate(1).ToString.PadLeft(6, " ")
             lStrDay = lDate(2).ToString.PadLeft(6, " ")
-            lStrBFFlow = String.Format("{0:0.00}", lTsBaseflow.Value(Z + 1)).PadLeft(10, " ")
-            lStrFlow = String.Format("{0:0.00}", aTS.Value(Z + 1)).PadLeft(12, " ")
+            lStrBFFlow = String.Format("{0:0.00}", lTsBaseflow.Value(Z)).PadLeft(10, " ")
+            lStrFlow = String.Format("{0:0.00}", lTsFlow.Value(Z)).PadLeft(12, " ")
             lSW.WriteLine(lStrYear & lStrMonth & lStrDay & lStrBFFlow & lStrFlow)
         Next
 
@@ -2696,7 +2708,7 @@ Module modBaseflowUtil
         Dim lblMethodMod As String = "   "
         Dim lblMethodParm As String = ""
         Dim lBFINDay As Integer = lTsBaseflow.Attributes.GetValue("BFINDay")
-        Dim lStationID As String = lTsBaseflow.Attributes.GetValue("STAID")
+        Dim lStationID As String = aTS.Attributes.GetValue("Location")
         Dim lFilenameOnly As String = IO.Path.GetFileNameWithoutExtension(aFilename)
         If aMethodName.StartsWith("BFIStandard") Then
             lblMethodStd = " * "
@@ -2792,7 +2804,7 @@ Module modBaseflowUtil
         Dim lblMethodMod As String = "   "
         Dim lblMethodParm As String = ""
         Dim lBFINDay As Integer = lTsBaseflow.Attributes.GetValue("BFINDay")
-        Dim lStationID As String = lTsBaseflow.Attributes.GetValue("STAID")
+        Dim lStationID As String = lTsBaseflow.Attributes.GetValue("Location")
         Dim lFilenameOnly As String = IO.Path.GetFileNameWithoutExtension(aFilename)
         If aMethodName.StartsWith("BFIStandard") Then
             lblMethodStd = " * "
@@ -2823,7 +2835,7 @@ Module modBaseflowUtil
         lSW.WriteLine("===============================================")
         lSW.WriteLine("")
         lSW.WriteLine("Gage " & lStationID)
-        lSW.WriteLine("(^ indicates interpolated turning point)")
+        'lSW.WriteLine("(^ indicates interpolated turning point)")
         lSW.WriteLine("")
         lSW.WriteLine("<-- Calendar -->  Base Flow")
         lSW.WriteLine("Year  Month  Day    (cfs)  ")

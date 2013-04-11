@@ -72,7 +72,9 @@ Public Class clsBaseflowBFI
     End Property
 
     Public Overrides Function DoBaseFlowSeparation() As atcTimeseriesGroup
+        gError = ""
         If TargetTS Is Nothing Then
+            gError = "Empty dataset. No analysis is done."
             Return Nothing
         End If
 
@@ -80,7 +82,6 @@ Public Class clsBaseflowBFI
 
         'Dim lTsDaily As atcTimeseries = SubsetByDate(TargetTS, lTsStart, lTsEnd, Nothing)
         'Dim lTsDaily As atcTimeseries = TargetTS.Clone()
-
         If StartDate = 0 Then StartDate = TargetTS.Attributes.GetValue("SJDay")
         If EndDate = 0 Then EndDate = TargetTS.Attributes.GetValue("EJDay")
         Dim lTsDaily As atcTimeseries = SubsetByDate(TargetTS, StartDate, EndDate, Nothing)
@@ -88,19 +89,64 @@ Public Class clsBaseflowBFI
             lTsDaily = Aggregate(lTsDaily, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
         End If
 
-        'set Year basis, water year vs calendar year
         Dim lDate(5) As Integer
+        Dim fillInStartIsNeeded As Boolean = False
+        Dim IsWaterYear As Boolean
+        'set Year basis, water year vs calendar year
         J2Date(lTsDaily.Dates.Value(0), lDate)
         If lDate(1) = 1 Then
             YearBasis = "Calendar"
+            IsWaterYear = False
         ElseIf lDate(1) = 10 Then
             YearBasis = "Water   "
+            IsWaterYear = True
         Else
             YearBasis = "Arbitrary"
         End If
+        If lDate(2) > 1 Then fillInStartIsNeeded = True
+
         If YearBasis.StartsWith("Arbitrary") Then
+            gError = "Dataset should either be calendar- or water-year based. No analysis is done."
             Return Nothing 'enforce either water year data or calendar year data
         End If
+
+        'checking the end for data completeness
+        Dim fillInEndIsNeeded As Boolean = False
+        J2Date(lTsDaily.Dates.Value(lTsDaily.numValues), lDate)
+        If (YearBasis = "Calendar" AndAlso lDate(1) < 12) Or _
+           (YearBasis = "Water   " AndAlso lDate(1) < 9) Then
+            gError = "Incomplete data at end of dataset. No analysis is done."
+            Return Nothing 'can't have too much missing at the end
+        Else
+            If (lDate(1) = 12 AndAlso lDate(2) < 31) Or _
+               (lDate(1) = 9 AndAlso lDate(2) < 30) Then
+                fillInEndIsNeeded = True
+            End If
+        End If
+        Dim lNewStart As Double = -99
+        Dim lNewEnd As Double = -99
+        If fillInStartIsNeeded And fillInEndIsNeeded Then
+            lDate = GetBoundary(StartDate, True, IsWaterYear)
+            lNewStart = Date2J(lDate)
+            lDate = GetBoundary(EndDate, False, IsWaterYear)
+            lNewEnd = Date2J(lDate)
+        ElseIf fillInStartIsNeeded Then
+            lDate = GetBoundary(StartDate, True, IsWaterYear)
+            lNewStart = Date2J(lDate)
+            lNewEnd = EndDate
+        ElseIf fillInEndIsNeeded Then
+            lNewStart = StartDate
+            lDate = GetBoundary(EndDate, False, IsWaterYear)
+            lNewEnd = Date2J(lDate)
+        End If
+
+        Dim lNewDailyTs As atcTimeseries = NewTimeseries(lNewStart, lNewEnd, atcTimeUnit.TUDay, 1, Nothing, -99.0)
+        Dim lTsGroup As New atcTimeseriesGroup
+        lTsGroup.Add(lTsDaily)
+        lTsGroup.Add(lNewDailyTs)
+        lTsDaily = MergeTimeseries(lTsGroup)
+        StartDate = lNewStart
+        EndDate = lNewEnd
 
         'Find the mins
         Dim lTsQMINS As atcTimeseries = lTsDaily.Clone()
@@ -120,15 +166,43 @@ Public Class clsBaseflowBFI
         Return lTsBFgroup
     End Function
 
+    Private Function GetBoundary(ByVal aTime As Double, ByVal IsStartTime As Boolean, ByVal IsWaterYear As Boolean) As Integer()
+        Dim lDate(5) As Integer
+        J2Date(aTime, lDate)
+
+        If IsStartTime Then
+            Dim lStartMonth As Integer = 1
+            If IsWaterYear Then lStartMonth = 10
+            lDate(1) = lStartMonth
+            lDate(2) = 1
+            lDate(3) = 0
+            lDate(4) = 0
+            lDate(5) = 0
+        Else
+            Dim lEndMonth As Integer = 12
+            Dim lEndDay As Integer = 31
+            If IsWaterYear Then
+                lEndMonth = 9
+                lEndDay = 30
+            End If
+            lDate(1) = lEndMonth
+            lDate(2) = lEndDay
+            lDate(3) = 24
+            lDate(4) = 0
+            lDate(5) = 0
+        End If
+        Return lDate
+    End Function
+
     Public Sub GetMins0(ByVal aTsFlow As atcTimeseries, ByRef lTsQMINS As atcTimeseries, ByRef lTsDAYMIN As atcTimeseries)
         'Dim lTsQMINS As atcTimeseries = aTsFlow.Clone()
         'Dim lTsDAYMIN As atcTimeseries = aTsFlow.Clone()
         Dim lblZEROR As String = " "
         Dim lblZSYM As String = lblZEROR
 
-        For I As Integer = 1 To aTsFlow.numValues
-            lTsQMINS.Value(I) = -1
-            lTsDAYMIN.Value(I) = -1
+        For I As Integer = 0 To aTsFlow.numValues
+            lTsQMINS.Value(I) = -99
+            lTsDAYMIN.Value(I) = -99
         Next
 
         Dim lNumIntervals As Integer = aTsFlow.numValues / PartitionLengthInDays
@@ -204,7 +278,7 @@ Public Class clsBaseflowBFI
         '*---- IF AN INTERPOLATION WAS PERFORMED THE LAST TIME THROUGH, RECALL THE
         '*---- RESULT AS THE FIRST TURNING POINT, AND RETRIEVE THE END-OF-YEAR Q
         '*---- AS THIS YEAR'S START-OF-YEAR Q
-        Dim lTPQ1 As Double = 0 ' interpolated base flow on day 1 of water year (October 1); start out as 0
+        Dim lTPQ1 As Double = -99 ' interpolated base flow on day 1 of water year (October 1); start out as 0
         Dim lTYPEF As String = " " ' holds interpolation marker for year's first turning point
         Dim lSOYQ As Double = -99 'start-of-year Q (instantaneous Q at t=0.5 days)
         Dim lSOYDAY As Double = -99 'start-of-year day (0.5 or -99)
@@ -243,15 +317,16 @@ Public Class clsBaseflowBFI
         Dim lTurnPt As Boolean
         Dim lADDVol As Double 'additional volume accumulated between successive turning points
 
-        aTsQMINS.Value(0) = 0
-        aTsDAYMIN.Value(0) = 0
+        Dim lFirstTpDateIndex As Integer = -99
         Dim lTsDayTp As atcTimeseries = aTsDAYMIN.Clone()
         For I As Integer = 1 To aTsFlow.numValues / PartitionLengthInDays 'loop 80
             lTurnPt = False
             lTurnPt = TestForTurningPoint(aTsQMINS.Value(I - 1), aTsQMINS.Value(I), aTsQMINS.Value(I + 1), _
                                 aTsDAYMIN.Value(I - 1), aTsDAYMIN.Value(I), aTsDAYMIN.Value(I + 1), Method)
-
             If lTurnPt Then
+                If lFirstTpDateIndex < 0 Then
+                    lFirstTpDateIndex = aTsDAYMIN.Value(I)
+                End If
                 lFIRSTTP = Math.Min(lFIRSTTP, aTsDAYMIN.Value(I))
                 lLASTTP = Math.Max(lLASTTP, aTsDAYMIN.Value(I))
                 Dim lDAYOFTP As Integer = aTsDAYMIN.Value(I)
@@ -309,7 +384,7 @@ Public Class clsBaseflowBFI
                 lPREVQ = lQTP
                 lPREVDAY = lDAYOFTP
             Else
-                lTsDayTp.Value(I) = -1
+                lTsDayTp.Value(I) = -99
             End If 'lTurnPt
         Next 'loop 80
 
@@ -333,17 +408,24 @@ Public Class clsBaseflowBFI
         Dim lGroupTsFlow As atcTimeseriesGroup = Nothing
 
         Dim lSeasonYear As Object = Nothing
+        Dim lTsQMINSTpBnd As atcTimeseries = Nothing
+        Dim lTsFlowBnd As atcTimeseries = Nothing
         If YearBasis.StartsWith("Calendar") Then
             lSeasonYear = New atcSeasonsCalendarYear()
+            lTsQMINSTpBnd = SubsetByDateBoundary(lTsQMINSTp, 1, 1, Nothing)
+            lTsFlowBnd = SubsetByDateBoundary(aTsFlow, 1, 1, Nothing)
         ElseIf YearBasis.StartsWith("Water") Then
             lSeasonYear = New atcSeasonsWaterYear()
+            lTsQMINSTpBnd = SubsetByDateBoundary(lTsQMINSTp, 10, 1, Nothing)
+            lTsFlowBnd = SubsetByDateBoundary(aTsFlow, 10, 1, Nothing)
         End If
-        lGroupTsQMin = lSeasonYear.Split(lTsQMINSTp, Nothing)
-        lGroupTsFlow = lSeasonYear.Split(aTsFlow, Nothing)
+        lGroupTsQMin = lSeasonYear.Split(lTsQMINSTpBnd, Nothing)
+        lGroupTsFlow = lSeasonYear.Split(lTsFlowBnd, Nothing)
 
         With lTsBaseflow.Attributes
             .SetValue("YearBasis", YearBasis)
-            .SetValue("TsQMINSTp", lTsQMINSTp)
+            .SetValue("TsQMINSTp", lTsQMINSTpBnd)
+            .SetValue("TPStart", lFirstTpDateIndex)
         End With
 
         Dim lBFISum As Double
@@ -357,36 +439,125 @@ Public Class clsBaseflowBFI
         Dim lBFSqr As Double
 
         'Writing annual results
+        lTPQ1 = -99
         For Yc As Integer = 0 To lGroupTsQMin.Count - 1
+            Dim lTsQMin As atcTimeseries = lGroupTsQMin(Yc)
+            Dim lTsFlow As atcTimeseries = lGroupTsFlow(Yc)
+
+            If lTsFlow.Attributes.GetValue("Count Positive") + lTsFlow.Attributes.GetValue("Count Zero") < lTsFlow.numValues Then
+                J2Date(lTsFlow.Dates.Value(1), lDate)
+                lAnnualSummary.AppendLine(lDate(0).ToString & "     Incomplete year. Base flow cannot be determined.")
+                Continue For
+            End If
             lPREVDAY = -99
             lPREVQ = 0
             lVOLBF = 0
             lFIRSTTP = aTsFlow.numValues
             lLASTTP = 0
+
+            lSOYQ = -99
+            lSOYDAY = -99
+            lSEFLAG = 0
+            lTYPEF = " "
+            If lTPQ1 >= 0 Then
+                lFIRSTTP = 1
+                lPREVDAY = 1
+                lPREVQ = lTPQ1
+                'lFLAG = lISYM
+                'lTYPEF = lISYM
+                lSOYQ = lEOYQ
+                lSOYDAY = 0.5
+            End If
+
             '*---- Determine annual baseflow sum in CFS
-            Dim lTsQMin As atcTimeseries = lGroupTsQMin(Yc)
-            Dim lTsFlow As atcTimeseries = lGroupTsFlow(Yc)
 
             For TPc As Integer = 1 To lTsQMin.numValues
                 Dim lDAYOFTP As Integer = TPc
                 Dim lQTP As Double = lTsQMin.Value(TPc)
-                lFIRSTTP = Math.Min(lFIRSTTP, lDAYOFTP)
-                lLASTTP = Math.Max(lLASTTP, lDAYOFTP)
+
+                If lSOYQ <> -99 Then
+                    lADDVol = BASEFLOW(lSOYDAY, lPREVDAY, lSOYQ, lPREVQ)
+                    lVOLBF += lADDVol
+                    lSEFLAG += 1
+                    lSOYQ = -99
+                End If
                 'If lDAYOFTP > 0 Then
                 '    If lDAYOFTP <> lFIRSTTP And lDAYOFTP <> lPREVDAY Then '???Not sure this is needed???
                 '        lADDVol = BASEFLOW(lPREVDAY, lDAYOFTP, lPREVQ, lQTP)
                 '        lVOLBF += lADDVol
                 '    End If
                 'End If
-                If lPREVDAY >= 0 AndAlso lDAYOFTP <> lPREVDAY AndAlso lPREVQ > 0 AndAlso Not Double.IsNaN(lQTP) Then
-                    lADDVol = BASEFLOW(lPREVDAY, lDAYOFTP, lPREVQ, lQTP)
-                    lVOLBF += lADDVol
-                End If
-                If Not Double.IsNaN(lQTP) Then
+                If Not Double.IsNaN(lQTP) Then 'if this is a tp day
+                    lFIRSTTP = Math.Min(lFIRSTTP, lDAYOFTP)
+                    lLASTTP = Math.Max(lLASTTP, lDAYOFTP)
+                    If lPREVDAY >= 0 AndAlso lDAYOFTP <> lPREVDAY AndAlso lPREVQ > 0 Then
+                        lADDVol = BASEFLOW(lPREVDAY, lDAYOFTP, lPREVQ, lQTP)
+                        lVOLBF += lADDVol
+                    End If
                     lPREVDAY = lDAYOFTP
                     lPREVQ = lQTP
                 End If
             Next
+            Dim lOverallDayIndex As Integer = 0
+            Dim lOverallDayIndexBase As Integer = 0
+            For lYc As Integer = 0 To Yc - 1
+                lOverallDayIndexBase += lGroupTsQMin(lYc).numValues
+            Next
+            Dim lQTPi As Double = 0
+            Dim lEOYDAY As Double = -99
+            lTPQ1 = -99
+            'lTYPEL = " "
+            lEOYQ = -99
+            lEOYDAY = -99
+
+            If Yc + 1 <= lGroupTsQMin.Count - 1 Then
+                '------ SEARCH THROUGH YEAR 2 DATA TO FIND FIRST TURNING POINT
+                For Y2 As Integer = 1 To lGroupTsQMin(Yc + 1).numValues
+                    If Not Double.IsNaN(lGroupTsQMin(Yc + 1).Value(Y2)) Then
+                        'TYPEL = ISYM
+                        '---INTERPOLATE
+                        Dim lDays As Integer = Y2 - (lPREVDAY - lTsQMin.numValues)
+                        Dim lQQ1 As Double = lPREVQ
+                        Dim lQQ3 As Double = lGroupTsQMin(Yc + 1).Value(Y2)
+                        lQTPi = QINTERP(0, lQQ1, lDays, lQQ3, lTsQMin.numValues - lPREVDAY)
+                        lTPQ1 = QINTERP(0, lQQ1, lDays, lQQ3, lTsQMin.numValues + 1 - lPREVDAY)
+                        lEOYQ = QINTERP(0, lQQ1, lDays, lQQ3, lTsQMin.numValues + 0.5 + lPREVDAY)
+                        lEOYDAY = lTsQMin.numValues + 0.5
+                        '---CALCULATE LAST BASE-FLOW INCREMENT FOR YEAR 1 or current year
+                        Dim lDayOfTp As Integer = lTsQMin.numValues
+                        lLASTTP = lTsQMin.numValues
+                        lADDVol = BASEFLOW(lPREVDAY, lEOYDAY, lQQ1, lEOYQ)
+                        lSEFLAG += 1
+                        lVOLBF += lADDVol
+                        'The following section was from original yearly based adjustment at year end
+                        'If lDayOfTp <> lPREVDAY Then 'if the last tp day is not the last day of year
+                        '    'IF (TPFILE.NE.0) WRITE (TPFILE,70) &
+                        '    '&              DATE1YR(DAYOFTP),DATE1MTH(DAYOFTP), &
+                        '    '&              DATE1DAY(DAYOFTP),QTP,TYPEL
+                        '    For II As Integer = lPREVDAY To lDayOfTp - 1
+                        '        lBF2Print = QINTERP(lPREVDAY, lQQ1, lDayOfTp, lQTPi, II)
+                        '        If lBF2Print > lTsFlow.Value(II) Then lBF2Print = lTsFlow.Value(II)
+
+                        '        'original program writes out daily baseflow
+                        '        'we are just saving into a timeseries
+                        '        'WRITE (DAYFILE,77)DATE1YR(II),DATE1MTH(II), &
+                        '        '&                 DATE1DAY(II),BF2PRINT,Q1(II)
+                        '        '77 FORMAT (I4,I6,I6,F10.2,F12.2)
+
+                        '        lOverallDayIndex = lOverallDayIndexBase + II
+                        '        lTsBaseflow.Value(lOverallDayIndex) = lBF2Print
+                        '    Next
+                        'Else
+                        '    'TYPEL=' '
+                        'End If
+                        Exit For
+                    End If
+                Next 'Y2 day of year 2
+            End If
+            '--- PRINT DAILY FLOW VALUES FOR LAST TURNING POINT IN YEAR 1, part of original year end adjustment
+            'lBF2Print = Math.Min(lQTPi, lTsFlow.Value(lLASTTP))
+            'lTsBaseflow.Value(lOverallDayIndex + 1) = lBF2Print
+
             '*---- DETERMINE ANNUAL VOLUME OF TOTAL FLOW BETWEEN FIRST TURNING POINT AND
             '*---- LAST TURNING POINT (FIRSTTP,LASTTP) THIS VOLUME IS IN CFS-DAYS
             lVolQ = 0
@@ -394,7 +565,8 @@ Public Class clsBaseflowBFI
             For lDay As Integer = lFIRSTTP To lLASTTP 'loop 110
                 lValue = lTsFlow.Value(lDay)
                 If Not Double.IsNaN(lValue) AndAlso lValue >= 0 Then
-                    If lDay = lFIRSTTP Or lDay = lLASTTP Then
+                    If (lDay = lFIRSTTP And lSOYDAY = -99) Or _
+                       (lDay = lLASTTP And lEOYDAY = -99) Then
                         lVolQ += lTsFlow.Value(lDay) / 2
                     Else
                         lVolQ += lTsFlow.Value(lDay)
@@ -415,7 +587,7 @@ Public Class clsBaseflowBFI
 
             '*---- COMPUTE VOLUME OF RUNOFF AND BASE FLOW FOR THE FULL YEAR
             Dim lblBFExtrap As String = " "
-            If lTsFlow.Attributes.GetValue("Count Missing") > 0 Then
+            If lTsFlow.Attributes.GetValue("Count Positive") + lTsFlow.Attributes.GetValue("Count Zero") < lTsFlow.numValues Then
                 lblBFExtrap = gXSYM
             End If
             lVolQ = 0
@@ -465,25 +637,32 @@ Public Class clsBaseflowBFI
                 .SetValue("BFMEAN", lBFMean) : .SetValue("BFSDEV", lBFSDEV) : .SetValue("BFCV", lBFCV)
                 .SetValue("QMEAN", lQMean) : .SetValue("QSDEV", lQSDEV) : .SetValue("QCV", lQCV)
             End With
+            With lTsBaseflow.Attributes
+                lAnnualSummary.AppendLine("")
+                lAnnualSummary.AppendLine(" Statistics for " & lNYears.ToString.PadLeft(3, " ") & " " & YearBasis & " years at gage " & lTsBaseflow.Attributes.GetValue("Location"))
+                lAnnualSummary.AppendLine(" --------------------------------------------------")
+                lAnnualSummary.AppendLine("                                         STANDARD       COEFFICIENT")
+                lAnnualSummary.AppendLine("                            MEAN         DEVIATION      OF VARIATION")
+                lAnnualSummary.AppendLine(" ---------------------------------------------------------------------")
+                lAnnualSummary.AppendLine(" BASE FLOW (AC-FT)     " & String.Format("{0:0.0}", .GetValue("BFMEAN")).PadLeft(10, " ") & Space(6) & _
+                                 String.Format("{0:0.0}", .GetValue("BFSDEV")).PadLeft(10, " ") & Space(6) & _
+                                 String.Format("{0:0.000}", .GetValue("BFCV")).PadLeft(10, " "))
+                lAnnualSummary.AppendLine(" TOTAL RUNOFF (AC-FT)  " & String.Format("{0:0.0}", .GetValue("QMEAN")).PadLeft(10, " ") & Space(6) & _
+                                     String.Format("{0:0.0}", .GetValue("QSDEV")).PadLeft(10, " ") & Space(6) & _
+                                     String.Format("{0:0.000}", .GetValue("QCV")).PadLeft(10, " "))
+                lAnnualSummary.AppendLine(" BASE-FLOW INDEX       " & String.Format("{0:0.000}", .GetValue("BFIMEAN")).PadLeft(10, " ") & Space(6) & _
+                                     String.Format("{0:0.000}", .GetValue("BFISDEV")).PadLeft(10, " ") & Space(6) & _
+                                     String.Format("{0:0.000}", .GetValue("BFICV")).PadLeft(10, " "))
+                lAnnualSummary.AppendLine("")
+            End With
+        Else
+            lAnnualSummary.AppendLine("")
+            lAnnualSummary.AppendLine("Less than 5 years of flow data. No statistics are calculated.")
+            lAnnualSummary.AppendLine("")
         End If
 
         With lTsBaseflow.Attributes
-            lAnnualSummary.AppendLine("")
-            lAnnualSummary.AppendLine(" Statistics for " & lNYears.ToString.PadLeft(3, " ") & " " & YearBasis & " years at gage 00055150")
-            lAnnualSummary.AppendLine(" --------------------------------------------------")
-            lAnnualSummary.AppendLine("                                         STANDARD       COEFFICIENT")
-            lAnnualSummary.AppendLine("                            MEAN         DEVIATION      OF VARIATION")
-            lAnnualSummary.AppendLine(" ---------------------------------------------------------------------")
-            lAnnualSummary.AppendLine(" BASE FLOW (AC-FT)     " & String.Format("{0:0.0}", .GetValue("BFMEAN")).PadLeft(10, " ") & Space(6) & _
-                             String.Format("{0:0.0}", .GetValue("BFSDEV")).PadLeft(10, " ") & Space(6) & _
-                             String.Format("{0:0.000}", .GetValue("BFCV")).PadLeft(10, " "))
-            lAnnualSummary.AppendLine(" TOTAL RUNOFF (AC-FT)  " & String.Format("{0:0.0}", .GetValue("QMEAN")).PadLeft(10, " ") & Space(6) & _
-                                 String.Format("{0:0.0}", .GetValue("QSDEV")).PadLeft(10, " ") & Space(6) & _
-                                 String.Format("{0:0.000}", .GetValue("QCV")).PadLeft(10, " "))
-            lAnnualSummary.AppendLine(" BASE-FLOW INDEX       " & String.Format("{0:0.000}", .GetValue("BFIMEAN")).PadLeft(10, " ") & Space(6) & _
-                                 String.Format("{0:0.000}", .GetValue("BFISDEV")).PadLeft(10, " ") & Space(6) & _
-                                 String.Format("{0:0.000}", .GetValue("BFICV")).PadLeft(10, " "))
-            lAnnualSummary.AppendLine("")
+
             lAnnualSummary.AppendLine(" * - Denotes years with one or more zero flow days")
             lAnnualSummary.AppendLine(" ^ - Indicates interpolated turning point")
             lAnnualSummary.AppendLine(" ! - Indicates whole year could not be analyzed, but")

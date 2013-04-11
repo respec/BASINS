@@ -107,9 +107,9 @@ Public Class frmMain
                 FfrmParam.Initialize(AntecedentGWLMethod.Power, pWTFAttributes)
 
             ElseIf lResponse = MsgBoxResult.No Then
-                Dim lfrmFall As New frmRecess()
-                lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj, True)
-                pWTF.EstimateParameters(FallObj)
+                'Dim lfrmFall As New frmRecess()
+                'lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj, True)
+                'pWTF.EstimateParameters(FallObj)
             End If
         End If
     End Sub

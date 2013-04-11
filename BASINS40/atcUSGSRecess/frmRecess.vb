@@ -202,18 +202,42 @@ Public Class frmRecess
             Dim lDescription As String = pDataGroup(0).Attributes.GetValue("Description")
             Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
             Dim lDataTypeStr As String = ""
-            If lParmCd IsNot Nothing Then
-                lDataTypeStr &= "Parameter Code: " & lParmCd & vbCrLf & vbCrLf
-            End If
-            If lDescription IsNot Nothing Then
-                lDataTypeStr &= "Description:" & vbCrLf & lDescription
-            End If
-            txtDataInfo.Text = lDataTypeStr
+            
             If lCons = "GW LEVEL" Then
+                If lParmCd IsNot Nothing Then
+                    lDataTypeStr &= "Parameter Code: " & lParmCd & vbCrLf & vbCrLf
+                End If
+                If lDescription IsNot Nothing Then
+                    lDataTypeStr &= "Description:" & vbCrLf & lDescription
+                End If
+                txtDataInfo.Text = lDataTypeStr
+
                 SwitchSeasonControls(False)
                 panelRiseFall.Visible = True
                 btnFallPlot.Visible = True
             ElseIf lCons = "FLOW" Then
+                Dim lTuStr As String = "Daily"
+                Dim location As String = ""
+                Dim lStaNam As String = ""
+                Dim lStaID As String = ""
+                With pDataGroup(0).Attributes
+                    If .GetValue("Tu") <> atcTimeUnit.TUDay Then
+                        Select Case .GetValue("Tu")
+                            Case atcTimeUnit.TUHour : lTuStr = "Hourly"
+                            Case atcTimeUnit.TUMinute : lTuStr = "Minute"
+                            Case atcTimeUnit.TUMonth : lTuStr = "Monthly"
+                            Case atcTimeUnit.TUYear : lTuStr = "Yearly"
+                            Case atcTimeUnit.TUUnknown : lTuStr = "Unknown timestep"
+                        End Select
+                    End If
+                    location = .GetValue("Location")
+                    lStaNam = .GetValue("StaNam")
+                    lStaID = .GetValue("StaID")
+                End With
+                lDataTypeStr &= lTuStr & " streamflow at " & vbCrLf
+                lDataTypeStr &= lStaNam & " (" & lStaID & ")"
+                txtDataInfo.Text = lDataTypeStr
+
                 SwitchSeasonControls(True)
                 panelRiseFall.Visible = False
                 btnFallPlot.Visible = False
@@ -1330,7 +1354,17 @@ Public Class frmRecess
 
     Private Sub btnGetAllSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGetAllSegments.Click
         Dim lConfigurationGood As Boolean = False
-        If ConfigurationChanged() Then
+
+        'Test if parameters are all set
+        Dim lParametersAreSet As Boolean = False
+        Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
+        If lFormCheckMsg.Length > 0 Then
+            Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
+            Exit Sub
+        Else
+            lParametersAreSet = True
+        End If
+        If ConfigurationChanged() OrElse lParametersAreSet Then
             If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
                 'Dim lArgs As New atcDataAttributes
                 'Reset all listing/graphs when redo
@@ -1339,11 +1373,11 @@ Public Class frmRecess
                 pGraphRecessDatagroup.Clear()
                 RefreshGraphRecess(pGraphRecessDatagroup)
 
-                Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
-                If lFormCheckMsg.Length > 0 Then
-                    Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
-                    Exit Sub
-                End If
+                'Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
+                'If lFormCheckMsg.Length > 0 Then
+                '    Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
+                '    Exit Sub
+                'End If
 
                 If pRecess IsNot Nothing Then
                     pRecess.Clear()
@@ -1726,7 +1760,7 @@ Public Class frmRecess
             ' Select directory on entry.
             .SelectedPath = lDir
             ' Prompt the user with a custom message.
-            .Description = "Specify Baseflow ASCII output directory"
+            .Description = "Specify text output directory"
             If .ShowDialog = DialogResult.OK Then
                 ' Display the selected folder if the user clicked on the OK button.
                 lDir = .SelectedPath
