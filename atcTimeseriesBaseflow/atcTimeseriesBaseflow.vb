@@ -285,6 +285,10 @@ Public Class atcTimeseriesBaseflow
             lTsStreamflow.Attributes.SetValue(lNewDef, lBFDataGroupFinal, Nothing)
             Return True 'todo: error checks
         Else
+            If ClsBaseFlow IsNot Nothing AndAlso ClsBaseFlow.gError <> "" Then
+                Logger.Msg(ClsBaseFlow.gError)
+                ClsBaseFlow.gError = ""
+            End If
             Return False 'no datasets added, not a data source
         End If
     End Function

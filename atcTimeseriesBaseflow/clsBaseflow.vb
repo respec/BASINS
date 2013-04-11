@@ -36,6 +36,8 @@ Public MustInherit Class clsBaseflow
         End Set
     End Property
 
+    Public gError As String
+
     Public Sub New()
     End Sub
 

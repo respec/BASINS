@@ -81,7 +81,7 @@ Public Class frmParams
                 If Double.TryParse(txtPowerDatum.Text, lPowerDatum) Then pArgs.SetValue("PowerEDatum", lPowerDatum)
                 If Double.TryParse(txtPowerExp.Text, lPowerExp) Then pArgs.SetValue("PowerFExp", lPowerExp)
                 If Double.TryParse(txtPowerIntercept.Text, lPowerIntercept) Then pArgs.SetValue("PowerCIntercept", lPowerIntercept)
-                If Double.TryParse(txtPowerMultiplier.Text, lPowerMultiplier) Then pArgs.GetValue("PowerDMultiplier", lPowerMultiplier)
+                If Double.TryParse(txtPowerMultiplier.Text, lPowerMultiplier) Then pArgs.SetValue("PowerDMultiplier", lPowerMultiplier)
         End Select
 
         RaiseEvent ParameterChanged(pArgs)
