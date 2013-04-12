@@ -4,9 +4,11 @@ Imports MapWinUtility
 Imports System.Text
 
 Public Class atcNetCDFVariable
+    Private ParentFile As atcNetCDFFile
 
     Public ID As Int32
     Public Name As String
+    Public TotalLength As Integer
 
     Public Attributes As New atcData.atcDataAttributes
     Public NetCDFType As nc_type
@@ -19,12 +21,13 @@ Public Class atcNetCDFVariable
     'Public DimensionLengths() As Integer
     'Public DimensionNames() As String
 
-    Public Values As Array
-    Private Shared pValueDumpMax As Integer = 200
+    Private pValues As Array = Nothing
+    Private Shared pValueDumpMax As Integer = 400
 
-    Public Sub New(ByVal ncid As Int32, ByVal aVariableID As Int32, ByVal aFileDimensions As List(Of atcNetCDFDimension))
+    Public Sub New(ByVal aFile As atcNetCDFFile, ByVal aVariableID As Int32, ByVal aFileDimensions As List(Of atcNetCDFDimension))
         ID = aVariableID
-        nc(NetCDF.nc_inq_varndims(ncid, aVariableID, NumberOfDimensions))
+        ParentFile = aFile
+        nc(NetCDF.nc_inq_varndims(ParentFile.NcID, aVariableID, NumberOfDimensions))
 
         'ReDim DimensionIDs(NumberOfDimensions)
         'ReDim DimensionLengths(NumberOfDimensions)
@@ -34,7 +37,7 @@ Public Class atcNetCDFVariable
         Dim varname As New StringBuilder(NetCDF.netCDF_limits.NC_MAX_NAME)
 
         Dim DimensionIDs(NumberOfDimensions - 1) As Int32
-        nc(NetCDF.nc_inq_var(ncid, aVariableID, varname, NetCDFType, NumberOfDimensions, DimensionIDs, lNumAttributes))
+        nc(NetCDF.nc_inq_var(ParentFile.NcID, aVariableID, varname, NetCDFType, NumberOfDimensions, DimensionIDs, lNumAttributes))
         Name = varname.ToString
 
         Dim lString As String = "varid: " & Str(aVariableID) & " name: " & Name & " type: " & Str(NetCDFType) & " ndims: " & Str(NumberOfDimensions)
@@ -47,12 +50,17 @@ Public Class atcNetCDFVariable
 
         Logger.Dbg(lString)
 
-        'Read attributes, if any.
+        'Read attributes values, if any.
         For lAttributeIndex As Integer = 0 To lNumAttributes - 1
-            ReadAttribute(ncid, aVariableID, lAttributeIndex, Attributes)
+            ReadAttribute(ParentFile.NcID, aVariableID, lAttributeIndex, Attributes)
         Next
 
-        Values = ReadArray(ncid, aVariableID, NetCDFType, TotalDimensionLength)
+        TotalLength = ComputeDimensionLength()
+        If TotalLength > 10000 Then
+            Logger.Dbg("Too Big '" & Name & "' " & TotalLength)
+        Else
+            pValues = ReadArray(ParentFile.NcID, aVariableID, NetCDFType, TotalLength)
+        End If
     End Sub
 
     Public Overrides Function ToString() As String
@@ -103,8 +111,9 @@ Public Class atcNetCDFVariable
         End Select
     End Function
 
-    Public Shared Function ReadArray(ByVal ncid As Int32, ByVal aVariableID As Int32, ByVal xtype As NetCDF.nc_type, ByVal aDimensionLength As Integer) As Array
+    Private Shared Function ReadArray(ByVal ncid As Int32, ByVal aVariableID As Int32, ByVal xtype As NetCDF.nc_type, ByVal aDimensionLength As Integer) As Array
         Dim lReturnValues As Array = Nothing
+
         Select Case xtype
             Case NetCDF.nc_type.NC_BYTE
                 Dim lValues(aDimensionLength - 1) As Byte
@@ -147,12 +156,65 @@ Public Class atcNetCDFVariable
         Return lReturnValues
     End Function
 
-    Private Function TotalDimensionLength() As Integer
+    Public Function ReadArray(ByVal aDimensionLength As Integer, ByRef aXStart As Integer, ByRef aYStart As Integer) As Array
+        Dim lReturnValues As Array = Nothing
+        Dim lStartP() As Int32 = {aXStart, aYStart, 0}
+        Dim lCount() As Int32 = {1, 1, aDimensionLength}
+
+        Select Case NetCDFType
+            Case NetCDF.nc_type.NC_BYTE
+                Dim lValues(aDimensionLength - 1) As Byte
+                nc(NetCDF.nc_get_vara_uchar(ParentFile.NcID, ID, lStartP, lCount, lValues))
+                lReturnValues = lValues
+
+            Case NetCDF.nc_type.NC_CHAR
+                Dim lValue As New StringBuilder(aDimensionLength - 1)
+                nc(NetCDF.nc_get_vara_text(ParentFile.NcID, ID, lStartP, lCount, lValue))
+                lReturnValues = lValue.ToString.ToCharArray
+
+            Case NetCDF.nc_type.NC_DOUBLE
+                Dim lValues(aDimensionLength - 1) As Double
+                nc(NetCDF.nc_get_vara_double(ParentFile.NcID, ID, lStartP, lCount, lValues))
+                lReturnValues = lValues
+
+            Case NetCDF.nc_type.NC_INT
+                Dim lValues(aDimensionLength - 1) As Integer
+                nc(NetCDF.nc_get_vara_int(ParentFile.NcID, ID, lStartP, lCount, lValues))
+                lReturnValues = lValues
+
+            Case NetCDF.nc_type.NC_FLOAT
+                Dim lValues(aDimensionLength - 1) As Single
+                nc(NetCDF.nc_get_vara_float(ParentFile.NcID, ID, lStartP, lCount, lValues))
+                lReturnValues = lValues
+
+            Case NetCDF.nc_type.NC_SHORT
+                Dim lValues(aDimensionLength - 1) As Short
+                nc(NetCDF.nc_get_vara_short(ParentFile.NcID, ID, lStartP, lCount, lValues))
+                lReturnValues = lValues
+        End Select
+        If lReturnValues IsNot Nothing Then
+            Dim lValueDumpCount As Integer = Math.Min(pValueDumpMax, aDimensionLength - 1)
+            If lValueDumpCount > 0 Then
+                For lValueIndex = 0 To lValueDumpCount
+                    Logger.Dbg("value (" & lValueIndex & ") = " & Str(lReturnValues(lValueIndex)))
+                Next
+            End If
+        End If
+        Return lReturnValues
+    End Function
+
+    Private Function ComputeDimensionLength() As Integer
         Dim lTotal As Integer = 1
         For Each lDimension As atcNetCDFDimension In Dimensions
             If lDimension.Length > 0 Then lTotal *= lDimension.Length
         Next
         Return lTotal
     End Function
+
+    Public ReadOnly Property Values()
+        Get
+            Return pValues
+        End Get
+    End Property
 
 End Class

@@ -32,8 +32,9 @@ Module netCDFViewer
             lNetCDFFile.Debug = True
             If Not lNetCDFFile.Open(lFileName) Then
                 Dim lAttributes As New atcData.atcDataAttributes
-                lAttributes.Add("XIndex", 245) 'col
-                lAttributes.Add("YIndex", 99) 'row
+                'Point C
+                lAttributes.Add("YIndex", 245) 'col, y, latitude 28.18167
+                lAttributes.Add("XIndex", 99) 'row, x, longitude 85.59833
                 lNetCDFFile.Open(lFileName, lAttributes)
             End If
             For Each lTimeseries As atcData.atcTimeseries In lNetCDFFile.DataSets
@@ -105,19 +106,45 @@ Module netCDFViewer
                                     For lDimIndex As Integer = 0 To lNDims - 1
                                         lArraySize *= lCount(lDimIndex)
                                     Next
+                                    Dim lArraySubset As Boolean = False
+                                    Dim lArraySizeMax As Integer = 100000
+                                    If lArraySize > lArraySizeMax Then
+                                        lReport.Append("ArraySize " & lArraySize & " reset to " & lArraySizeMax)
+                                        lArraySize = lArraySizeMax
+                                        lArraySubset = True
+                                    End If
                                     Dim lValuesDouble(lArraySize - 1) As Double
                                     Dim lValuesFloat(lArraySize - 1) As Single
                                     Dim lValuesInt(lArraySize - 1) As Int32
-                                    Select Case lXtype
-                                        Case NetCDF.nc_type.NC_DOUBLE
-                                            lResult = NetCDF.nc_get_vara_double(lNCId, lVarId, lBase, lCount, lValuesDouble)
-                                        Case NetCDF.nc_type.NC_FLOAT
-                                            lResult = NetCDF.nc_get_vara_float(lNCId, lVarId, lBase, lCount, lValuesFloat)
-                                        Case NetCDF.nc_type.NC_INT
-                                            lResult = NetCDF.nc_get_vara_int(lNCId, lVarId, lBase, lCount, lValuesInt)
-                                        Case Else
-                                            lResult = "<unknown type " & lXtype & ">"
-                                    End Select
+                                    If Not lArraySubset Then
+                                        Select Case lXtype
+                                            Case NetCDF.nc_type.NC_DOUBLE
+                                                lResult = NetCDF.nc_get_vara_double(lNCId, lVarId, lBase, lCount, lValuesDouble)
+                                            Case NetCDF.nc_type.NC_FLOAT
+                                                lResult = NetCDF.nc_get_vara_float(lNCId, lVarId, lBase, lCount, lValuesFloat)
+                                            Case NetCDF.nc_type.NC_INT
+                                                lResult = NetCDF.nc_get_vara_int(lNCId, lVarId, lBase, lCount, lValuesInt)
+                                            Case Else
+                                                lResult = "<unknown type " & lXtype & ">"
+                                        End Select
+                                    Else
+                                        'TODO: do something other that first value if a timeseries with X and Y set is available
+                                        For lDimIndex As Integer = 0 To lNDims - 1
+                                            If lDimIndex < lNDims - 1 Then
+                                                lCount(lDimIndex) = 1
+                                            End If
+                                        Next
+                                        Select Case lXtype
+                                            Case NetCDF.nc_type.NC_DOUBLE
+                                                lResult = NetCDF.nc_get_vara_double(lNCId, lVarId, lBase, lCount, lValuesDouble)
+                                            Case NetCDF.nc_type.NC_FLOAT
+                                                lResult = NetCDF.nc_get_vara_float(lNCId, lVarId, lBase, lCount, lValuesFloat)
+                                            Case NetCDF.nc_type.NC_INT
+                                                lResult = NetCDF.nc_get_vara_int(lNCId, lVarId, lBase, lCount, lValuesInt)
+                                            Case Else
+                                                lResult = "<unknown type " & lXtype & ">"
+                                        End Select
+                                    End If
                                     If lResult <> 0 Then
                                         lReport.AppendLine(ErrorString(lResult, lNCId, lVarId))
                                     Else
@@ -201,8 +228,8 @@ Module netCDFViewer
                                         Next
                                     End If
                                 End If
+                                End If
                             End If
-                        End If
                     End If
                 Next
                 lResult = NetCDF.nc_close(lNCId)

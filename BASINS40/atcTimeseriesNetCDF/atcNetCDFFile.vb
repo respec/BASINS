@@ -16,8 +16,10 @@ Public Class atcNetCDFFile
     Public TimeDimension As atcNetCDFDimension = Nothing
     Public ConstituentDimensions As New List(Of atcNetCDFDimension)
 
+    Private pNcID As Int32 = -1
+    Public ReadOnly FileName As String
+
     Public Sub New(ByVal aFileName As String)
-        Dim lNcId As Int32
         Dim lNumAttributes As Int32
         Dim lNumVariables As Int32
         Dim lNumDimensions As Int32
@@ -25,17 +27,18 @@ Public Class atcNetCDFFile
         Dim lDimensionName As New StringBuilder(netCDF_limits.NC_MAX_NAME)
 
         'Open the netcdf file and read it out.
-        Logger.Dbg("openNetCDFFile:" & IO.Path.GetFullPath(aFileName))
-        nc(nc_open(aFileName, cmode.NC_NOWRITE, lNcId))
+        FileName = IO.Path.GetFullPath(aFileName)
+        Logger.Dbg("openNetCDFFile:" & FileName)
         Try
-            nc(nc_inq(lNcId, lNumDimensions, lNumVariables, lNumAttributes, lUnlimitedDimension))
+            pNcID = NcID
+            nc(nc_inq(pNcID, lNumDimensions, lNumVariables, lNumAttributes, lUnlimitedDimension))
 
             Logger.Dbg("Read " & lNumDimensions & " dims, " & lNumVariables & " vars, " & _
                 lNumAttributes & " global atts, and an unlimited dimension of " & lUnlimitedDimension & ".")
 
             'Read dimension metadata.
             For lDimensionIndex = 0 To lNumDimensions - 1
-                Dim lNewDimension As New atcNetCDFDimension(lNcId, lDimensionIndex)
+                Dim lNewDimension As New atcNetCDFDimension(pNcID, lDimensionIndex)
                 Logger.Dbg("dimid: " & lDimensionIndex & " name: " & lNewDimension.Name.ToString & " len: " & lNewDimension.Length)
                 Dimensions.Add(lNewDimension)
                 Select Case lNewDimension.Name.ToString.ToLower
@@ -48,18 +51,26 @@ Public Class atcNetCDFFile
 
             'Read global attributes.
             For lAttributeIndex As Integer = 0 To lNumAttributes - 1
-                ReadAttribute(lNcId, NC_GLOBAL, lAttributeIndex, Me.Attributes)
+                ReadAttribute(pNcID, NC_GLOBAL, lAttributeIndex, Me.Attributes)
             Next
 
             'Read variables, including their attributes.
             For lVariableIndex = 0 To lNumVariables - 1
-                Variables.Add(New atcNetCDFVariable(lNcId, lVariableIndex, Dimensions))
+                Variables.Add(New atcNetCDFVariable(Me, lVariableIndex, Dimensions))
             Next
         Finally
             'Close the netCDF file.
-            nc(nc_close(lNcId))
+            'nc(nc_close(pNcID))
             Logger.Dbg("ClosedNetCDFFile")
         End Try
     End Sub
 
+    Friend ReadOnly Property NcID() As Int32
+        Get
+            If pNcID = -1 Then
+                nc(nc_open(FileName, cmode.NC_NOWRITE, pNcID))
+            End If
+            Return pNcID
+        End Get
+    End Property
 End Class
