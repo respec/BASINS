@@ -139,7 +139,7 @@ Public Class atcTimeseriesNetCDF
 
                         'TODO: check to see that dates and values are put in the correct spot in the array
                         Dim lNumValues As Integer = lTimeVariable.Dimensions(0).Length
-                        ReDim lDates.Values(lNumValues + 1)
+                        ReDim lDates.Values(lNumValues)
                         lDates.Values(0) = lDateBase.ToOADate
                         For lTimeIndex As Integer = 0 To lNumValues - 1
                             lDates.Values(lTimeIndex + 1) = lDateBase.ToOADate + (lTimeStepMultiplier * lTimeVariable.Values(lTimeIndex))
@@ -186,13 +186,13 @@ Public Class atcTimeseriesNetCDF
                                 End If
                                 lTimeseries.Attributes.SetValue("Location", lLocation)
 
-                                If lTimeVariable.ID > 0 Then
-                                    lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex)
-                                    lTimeseries.Attributes.SetValue("Increment", lTimeseriesCount)
-                                Else
-                                    lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex * lNumValues)
-                                    lTimeseries.Attributes.SetValue("Increment", 1)
-                                End If
+                                'If lTimeVariable.ID > 0 Then
+                                '    lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex)
+                                '    lTimeseries.Attributes.SetValue("Increment", lTimeseriesCount)
+                                'Else
+                                '    lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex * lNumValues)
+                                '    lTimeseries.Attributes.SetValue("Increment", 1)
+                                'End If
 
                                 lTimeseries.ValuesNeedToBeRead = True
                                 lTimeseries.Dates = lDates
@@ -242,13 +242,13 @@ Public Class atcTimeseriesNetCDF
     Public Overrides Sub ReadData(ByVal aData As atcData.atcDataSet)
         Dim lTimeseries As atcTimeseries = aData
         Dim lNumValues As Integer = lTimeseries.Dates.numValues
-        Dim lBase As Integer = lTimeseries.Attributes.GetValue("Base")
-        Dim lIncrement As Integer = lTimeseries.Attributes.GetValue("Increment")
         Dim lDataVariable As atcNetCDFVariable = lTimeseries.Attributes.GetValue("NetCDFValues")
+        Dim lXIndex As Integer = lTimeseries.Attributes.GetValue("X index")
+        Dim lYIndex As Integer = lTimeseries.Attributes.GetValue("Y index")
+        Dim lValues = lDataVariable.ReadArray(lNumValues, lXIndex, lYIndex)
         ReDim lTimeseries.Values(lNumValues)
         For lTimeIndex As Integer = 0 To lNumValues - 1
-            Dim lValueIndex As Integer = (lIncrement * lTimeIndex) + lBase
-            lTimeseries.Values(lTimeIndex + 1) = lDataVariable.Values(lValueIndex)
+            lTimeseries.Values(lTimeIndex) = lValues(lTimeIndex)
         Next
     End Sub
 End Class
