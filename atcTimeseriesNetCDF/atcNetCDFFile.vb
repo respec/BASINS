@@ -59,7 +59,7 @@ Public Class atcNetCDFFile
                 Variables.Add(New atcNetCDFVariable(Me, lVariableIndex, Dimensions))
             Next
         Finally
-            'Close the netCDF file.
+            Logger.Dbg("Close netCDF file " & pNcID & " " & FileName)
             nc(nc_close(pNcID))
             pNcID = -1
             Logger.Dbg("ClosedNetCDFFile")

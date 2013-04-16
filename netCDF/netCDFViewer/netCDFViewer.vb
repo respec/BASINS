@@ -33,8 +33,18 @@ Module netCDFViewer
             If Not lNetCDFFile.Open(lFileName) Then
                 Dim lAttributes As New atcData.atcDataAttributes
                 'Point C
-                lAttributes.Add("YIndex", 245) 'col, y, latitude 28.18167
-                lAttributes.Add("XIndex", 99) 'row, x, longitude 85.59833
+                lAttributes.Add("YIndex", 246) 'col, y, latitude 28.18167
+                lAttributes.Add("XIndex", 100) 'row, x, longitude 85.59833
+                lNetCDFFile.Open(lFileName, lAttributes)
+                'Point E
+                lAttributes.Clear()
+                lAttributes.Add("YIndex", 170) 'col, y, latitude 28.24500
+                lAttributes.Add("XIndex", 270) 'row, x, longitude 85.74000
+                lNetCDFFile.Open(lFileName, lAttributes)
+                'Point B
+                lAttributes.Clear()
+                lAttributes.Add("YIndex", 230) 'col, y, latitude 28.19500
+                lAttributes.Add("XIndex", 100) 'row, x, longitude 85.59833
                 lNetCDFFile.Open(lFileName, lAttributes)
             End If
             For Each lTimeseries As atcData.atcTimeseries In lNetCDFFile.DataSets
