@@ -158,8 +158,24 @@ Public Class atcNetCDFVariable
 
     Public Function ReadArray(ByVal aDimensionLength As Integer, ByRef aXStart As Integer, ByRef aYStart As Integer) As Array
         Dim lReturnValues As Array = Nothing
-        Dim lStartP() As Int32 = {aXStart, aYStart, 0}
-        Dim lCount() As Int32 = {1, 1, aDimensionLength}
+        Dim lStartP(2) As Int32
+        Dim lCount(2) As Int32
+
+        Dim lIndex As Integer = 0
+        For Each lDimension As atcNetCDFDimension In Dimensions
+            If lDimension.ID = ParentFile.TimeDimension.ID Then
+                lStartP(lIndex) = 0
+                lCount(lIndex) = aDimensionLength
+            ElseIf lDimension.ID = ParentFile.EastWestDimension.ID Then
+
+                lStartP(lIndex) = aXStart
+                lCount(lIndex) = 1
+            ElseIf lDimension.ID = ParentFile.NorthSouthDimension.ID Then
+                lStartP(lIndex) = aYStart
+                lCount(lIndex) = 1
+            End If
+            lIndex += 1
+        Next
 
         Select Case NetCDFType
             Case NetCDF.nc_type.NC_BYTE

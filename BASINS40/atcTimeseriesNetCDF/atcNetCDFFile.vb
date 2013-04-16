@@ -60,7 +60,8 @@ Public Class atcNetCDFFile
             Next
         Finally
             'Close the netCDF file.
-            'nc(nc_close(pNcID))
+            nc(nc_close(pNcID))
+            pNcID = -1
             Logger.Dbg("ClosedNetCDFFile")
         End Try
     End Sub
