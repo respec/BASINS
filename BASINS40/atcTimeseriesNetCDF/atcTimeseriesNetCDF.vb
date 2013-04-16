@@ -140,27 +140,31 @@ Public Class atcTimeseriesNetCDF
                         'TODO: check to see that dates and values are put in the correct spot in the array
                         Dim lNumValues As Integer = lTimeVariable.Dimensions(0).Length
                         ReDim lDates.Values(lNumValues)
-                        lDates.Values(0) = lDateBase.ToOADate
+                        'lDates.Values(0) = lDateBase.ToOADate
                         For lTimeIndex As Integer = 0 To lNumValues - 1
-                            lDates.Values(lTimeIndex + 1) = lDateBase.ToOADate + (lTimeStepMultiplier * lTimeVariable.Values(lTimeIndex))
+                            lDates.Values(lTimeIndex) = lDateBase.ToOADate + (lTimeStepMultiplier * lTimeVariable.Values(lTimeIndex))
+                            'If lTimeIndex = 1 Then 'deal with base date a long time before first value
+                            '    Dim lTimeInterval As Double = lTimeVariable.Values(lTimeIndex) - lTimeVariable.Values(lTimeIndex - 1)
+                            '    lDates.Values(0) = lDates.Values(1) - lTimeInterval
+                            'End If
                         Next
 
-                        Dim lYIndex As Integer = 0
+                        Dim lYIndex As Integer = 1
                         Dim lYValue As String = ""
-                        Dim lXIndex As Integer = 0
+                        Dim lXIndex As Integer = 1
                         Dim lXValue As String = ""
                         For lTimeseriesIndex As Integer = 0 To lTimeseriesCount - 1
                             Dim lLocation As String = ""
                             If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
-                                lYValue = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex)
+                                lYValue = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex - 1)
                                 lLocation &= "Y:" & lYValue
                             ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension Is Nothing Then
-                                lXValue = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex)
+                                lXValue = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex - 1)
                                 lLocation &= "X:" & lXValue
                             ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
-                                lXValue = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex)
+                                lXValue = lNetCDFFile.Variables(lNetCDFFile.EastWestDimension.ID).Values(lXIndex - 1)
                                 lLocation &= "X:" & lXValue
-                                lYValue = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex)
+                                lYValue = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex - 1)
                                 lLocation &= " Y:" & lYValue
                             End If
 
@@ -207,14 +211,14 @@ Public Class atcTimeseriesNetCDF
                             ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
                                 If lNetCDFFile.EastWestDimension.ID = 0 OrElse (lNetCDFFile.TimeDimension.ID = 0 AndAlso lNetCDFFile.EastWestDimension.ID = 1) Then
                                     lXIndex += 1
-                                    If lXIndex = lNetCDFFile.EastWestDimension.Length Then
-                                        lXIndex = 0
+                                    If lXIndex > lNetCDFFile.EastWestDimension.Length Then
+                                        lXIndex = 1
                                         lYIndex += 1
                                     End If
                                 Else
                                     lYIndex += 1
-                                    If lYIndex = lNetCDFFile.NorthSouthDimension.Length Then
-                                        lYIndex = 0
+                                    If lYIndex > lNetCDFFile.NorthSouthDimension.Length Then
+                                        lYIndex = 1
                                         lXIndex += 1
                                     End If
                                 End If
@@ -245,10 +249,10 @@ Public Class atcTimeseriesNetCDF
         Dim lDataVariable As atcNetCDFVariable = lTimeseries.Attributes.GetValue("NetCDFValues")
         Dim lXIndex As Integer = lTimeseries.Attributes.GetValue("X index")
         Dim lYIndex As Integer = lTimeseries.Attributes.GetValue("Y index")
-        Dim lValues = lDataVariable.ReadArray(lNumValues, lXIndex, lYIndex)
+        Dim lValues = lDataVariable.ReadArray(lNumValues, lXIndex - 1, lYIndex - 1)
         ReDim lTimeseries.Values(lNumValues)
         For lTimeIndex As Integer = 0 To lNumValues - 1
-            lTimeseries.Values(lTimeIndex) = lValues(lTimeIndex)
+            lTimeseries.Values(lTimeIndex + 1) = lValues(lTimeIndex)
         Next
     End Sub
 End Class
