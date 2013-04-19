@@ -113,6 +113,7 @@ Public Class clsBaseflowBFI
         'checking the end for data completeness
         Dim fillInEndIsNeeded As Boolean = False
         J2Date(lTsDaily.Dates.Value(lTsDaily.numValues), lDate)
+        timcnv(lDate)
         If (YearBasis = "Calendar" AndAlso lDate(1) < 12) Or _
            (YearBasis = "Water   " AndAlso lDate(1) < 9) Then
             gError = "Incomplete data at end of dataset. No analysis is done."
@@ -123,8 +124,8 @@ Public Class clsBaseflowBFI
                 fillInEndIsNeeded = True
             End If
         End If
-        Dim lNewStart As Double = -99
-        Dim lNewEnd As Double = -99
+        Dim lNewStart As Double = StartDate
+        Dim lNewEnd As Double = EndDate
         If fillInStartIsNeeded And fillInEndIsNeeded Then
             lDate = GetBoundary(StartDate, True, IsWaterYear)
             lNewStart = Date2J(lDate)
@@ -140,13 +141,15 @@ Public Class clsBaseflowBFI
             lNewEnd = Date2J(lDate)
         End If
 
-        Dim lNewDailyTs As atcTimeseries = NewTimeseries(lNewStart, lNewEnd, atcTimeUnit.TUDay, 1, Nothing, -99.0)
-        Dim lTsGroup As New atcTimeseriesGroup
-        lTsGroup.Add(lTsDaily)
-        lTsGroup.Add(lNewDailyTs)
-        lTsDaily = MergeTimeseries(lTsGroup)
-        StartDate = lNewStart
-        EndDate = lNewEnd
+        If lNewStart <> StartDate OrElse lNewEnd <> EndDate Then
+            Dim lNewDailyTs As atcTimeseries = NewTimeseries(lNewStart, lNewEnd, atcTimeUnit.TUDay, 1, Nothing, -99.0)
+            Dim lTsGroup As New atcTimeseriesGroup
+            lTsGroup.Add(lTsDaily)
+            lTsGroup.Add(lNewDailyTs)
+            lTsDaily = MergeTimeseries(lTsGroup)
+            StartDate = lNewStart
+            EndDate = lNewEnd
+        End If
 
         'Find the mins
         Dim lTsQMINS As atcTimeseries = lTsDaily.Clone()
