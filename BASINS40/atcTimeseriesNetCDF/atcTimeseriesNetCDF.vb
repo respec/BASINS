@@ -115,9 +115,21 @@ Public Class atcTimeseriesNetCDF
                         Logger.Dbg("TimeseriesCount:" & lTimeseriesCount)
 
                         If lTimeseriesCount > 1000 AndAlso Not lGetOnlyOneTimseries Then
-                            'TODO: too many timeseries, ask user which one(s)
-                            Logger.Dbg("Too Many Timeseries!")
-                            Return False
+                            'too many timeseries, ask user which one
+                            Dim lFrmIndex As New frmIndex
+                            With lFrmIndex
+                                .txtXIndex.HardMax = lNetCDFFile.EastWestDimension.Length
+                                .txtYIndex.HardMax = lNetCDFFile.NorthSouthDimension.Length
+                                If .ShowDialog() <> Windows.Forms.DialogResult.Cancel Then
+                                    lXIndexToget = .txtXIndex.Text
+                                    lYIndexToget = .txtYIndex.Text
+                                    lGetOnlyOneTimseries = True
+                                    Logger.Dbg("User Specified X " & lXIndexToget & " Y " & lYIndexToget)
+                                Else
+                                    Logger.Dbg("Too Many Timeseries, user did not specify")
+                                    Return False
+                                End If
+                            End With
                         End If
 
                         'get the timeseries
@@ -148,6 +160,7 @@ Public Class atcTimeseriesNetCDF
                             '    lDates.Values(0) = lDates.Values(1) - lTimeInterval
                             'End If
                         Next
+                        lDates.Values(lNumValues) = lDates.Values(lNumValues - 1) + (lDates.Values(lNumValues - 1) - lDates.Values(lNumValues - 2))
 
                         Dim lYIndex As Integer = 1
                         Dim lYValue As String = ""
@@ -225,7 +238,7 @@ Public Class atcTimeseriesNetCDF
                             End If
                         Next
                         Logger.Dbg("TimeseriesBuilt:Count " & Me.DataSets.Count & " Length " & lNumValues)
-                    End If
+                        End If
                 Catch e As Exception
                     Logger.Dbg("Exception reading '" & aFileName & "': " & e.Message, e.StackTrace)
                     Return False

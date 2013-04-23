@@ -16,11 +16,6 @@ Public Class atcNetCDFVariable
 
     Public Dimensions As New List(Of atcNetCDFDimension)
 
-    'TODO: replace with atcNetCDFDimension class
-    'Public DimensionIDs() As Integer
-    'Public DimensionLengths() As Integer
-    'Public DimensionNames() As String
-
     Private pValues As Array = Nothing
     Private Shared pValueDumpMax As Integer = 400
 
@@ -28,10 +23,6 @@ Public Class atcNetCDFVariable
         ID = aVariableID
         ParentFile = aFile
         nc(NetCDF.nc_inq_varndims(ParentFile.NcID, aVariableID, NumberOfDimensions))
-
-        'ReDim DimensionIDs(NumberOfDimensions)
-        'ReDim DimensionLengths(NumberOfDimensions)
-        'ReDim DimensionNames(NumberOfDimensions)
 
         Dim lNumAttributes As Int32
         Dim varname As New StringBuilder(NetCDF.netCDF_limits.NC_MAX_NAME)
