@@ -626,8 +626,8 @@ Public Class atcExpertSystem
             lStr &= "Site: ".PadLeft(15) & lSite.Name & vbCrLf & vbCrLf
 
             'statistics summary
-            lStr &= StatDetails("Total (" & aUci.GlobalBlock.YearCount & " year run)", lSiteIndex, 1)
-            lStr &= StatDetails("Annual Average", lSiteIndex, aUci.GlobalBlock.YearCount)
+            lStr &= StatDetails("Total (" & YearCount(SDateJ, EDateJ) & " year run)", lSiteIndex, 1)
+            lStr &= StatDetails("Annual Average", lSiteIndex, YearCount(SDateJ, EDateJ))
 
             'Write the error terms
             lStr &= Space(35) & "Error Terms" & vbCrLf & vbCrLf
