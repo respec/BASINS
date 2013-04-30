@@ -21,31 +21,38 @@ Module netCDFViewer
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
         If Not IO.Directory.Exists(lOutFolder) Then IO.Directory.CreateDirectory(lOutFolder)
 
-        Dim lBaseNames() As String = {"swit", "Ta1", "LangtangKholaWatershed", "srtm_54_07_LangtangFill_LambertWatershed", "srtm_54_07_LangtangFill_LambertUEBAspect", "srtm_54_07_LangtangFill_LambertUEBSlope"}
+        Dim lBaseNames() As String = {"LangtangKholaWatershed", "merra.rfe.90m.200301", _
+                                      "swit", "Ta1", "LangtangKholaWatershed", "srtm_54_07_LangtangFill_LambertWatershed", "srtm_54_07_LangtangFill_LambertUEBAspect", "srtm_54_07_LangtangFill_LambertUEBSlope"}
         '{ "swit", "merra.prod.assim.20061230", "merra.prod.rad.20061231", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
         For Each lBaseName As String In lBaseNames
             If lDebug Then lReport.AppendLine(lNetCDF_Version)
             Dim lFileName As String = lPathName & lBaseName & ".nc"
             lReport.AppendLine("File '" & lFileName & "'")
 
+            Dim lAttributes As New atcData.atcDataAttributes
+            If lFileName.Contains("merra") Then
+                lAttributes.Add("AggregateGrid", lPathName & "LangtangKholaWatershed.nc")
+            End If
+
             Dim lNetCDFFile As New atcTimeseriesNetCDF.atcTimeseriesNetCDF
             lNetCDFFile.Debug = True
-            If Not lNetCDFFile.Open(lFileName) Then
-                Dim lAttributes As New atcData.atcDataAttributes
-                'Point C
-                lAttributes.Add("YIndex", 246) 'col, y, latitude 28.18167
-                lAttributes.Add("XIndex", 100) 'row, x, longitude 85.59833
-                lNetCDFFile.Open(lFileName, lAttributes)
-                'Point E
-                lAttributes.Clear()
-                lAttributes.Add("YIndex", 170) 'col, y, latitude 28.24500
-                lAttributes.Add("XIndex", 270) 'row, x, longitude 85.74000
-                lNetCDFFile.Open(lFileName, lAttributes)
-                'Point B
-                lAttributes.Clear()
-                lAttributes.Add("YIndex", 230) 'col, y, latitude 28.19500
-                lAttributes.Add("XIndex", 100) 'row, x, longitude 85.59833
-                lNetCDFFile.Open(lFileName, lAttributes)
+            If Not lNetCDFFile.Open(lFileName, lAttributes) Then
+                If lFileName.Contains("swit") Then
+                    'Point C
+                    lAttributes.Add("YIndex", 246) 'col, y, latitude 28.18167
+                    lAttributes.Add("XIndex", 100) 'row, x, longitude 85.59833
+                    lNetCDFFile.Open(lFileName, lAttributes)
+                    'Point E
+                    lAttributes.Clear()
+                    lAttributes.Add("YIndex", 170) 'col, y, latitude 28.24500
+                    lAttributes.Add("XIndex", 270) 'row, x, longitude 85.74000
+                    lNetCDFFile.Open(lFileName, lAttributes)
+                    'Point B
+                    lAttributes.Clear()
+                    lAttributes.Add("YIndex", 230) 'col, y, latitude 28.19500
+                    lAttributes.Add("XIndex", 100) 'row, x, longitude 85.59833
+                    lNetCDFFile.Open(lFileName, lAttributes)
+                End If
             End If
             For Each lTimeseries As atcData.atcTimeseries In lNetCDFFile.DataSets
                 lTimeseries.Attributes.CalculateAll()
@@ -126,12 +133,15 @@ Module netCDFViewer
                                     Dim lValuesDouble(lArraySize - 1) As Double
                                     Dim lValuesFloat(lArraySize - 1) As Single
                                     Dim lValuesInt(lArraySize - 1) As Int32
+                                    Dim lValuesShort(lArraySize - 1) As Int16
                                     If Not lArraySubset Then
                                         Select Case lXtype
                                             Case NetCDF.nc_type.NC_DOUBLE
                                                 lResult = NetCDF.nc_get_vara_double(lNCId, lVarId, lBase, lCount, lValuesDouble)
                                             Case NetCDF.nc_type.NC_FLOAT
                                                 lResult = NetCDF.nc_get_vara_float(lNCId, lVarId, lBase, lCount, lValuesFloat)
+                                            Case NetCDF.nc_type.NC_SHORT
+                                                lResult = NetCDF.nc_get_vara_short(lNCId, lVarId, lBase, lCount, lValuesShort)
                                             Case NetCDF.nc_type.NC_INT
                                                 lResult = NetCDF.nc_get_vara_int(lNCId, lVarId, lBase, lCount, lValuesInt)
                                             Case Else
@@ -149,6 +159,8 @@ Module netCDFViewer
                                                 lResult = NetCDF.nc_get_vara_double(lNCId, lVarId, lBase, lCount, lValuesDouble)
                                             Case NetCDF.nc_type.NC_FLOAT
                                                 lResult = NetCDF.nc_get_vara_float(lNCId, lVarId, lBase, lCount, lValuesFloat)
+                                            Case NetCDF.nc_type.NC_SHORT
+                                                lResult = NetCDF.nc_get_vara_short(lNCId, lVarId, lBase, lCount, lValuesShort)
                                             Case NetCDF.nc_type.NC_INT
                                                 lResult = NetCDF.nc_get_vara_int(lNCId, lVarId, lBase, lCount, lValuesInt)
                                             Case Else
@@ -187,10 +199,12 @@ Module netCDFViewer
                                             Select Case lXtype
                                                 Case NetCDF.nc_type.NC_DOUBLE
                                                     lReport.AppendLine(lString & lValuesDouble(lValueIndex))
-                                                Case NetCDF.nc_type.NC_FLOAT, NetCDF.nc_type.NC_INT
+                                                Case NetCDF.nc_type.NC_FLOAT, NetCDF.nc_type.NC_INT, NetCDF.nc_type.NC_SHORT
                                                     Dim lValue As Double
                                                     If lXtype = NetCDF.nc_type.NC_INT Then
                                                         lValue = lValuesInt(lValueIndex)
+                                                    ElseIf lXtype = NetCDF.nc_type.NC_SHORT Then
+                                                        lValue = lValuesShort(lValueIndex)
                                                     Else
                                                         lValue = lValuesFloat(lValueIndex) ' * 10800 'sec/3hr TODO: make generic!
                                                     End If
@@ -238,8 +252,8 @@ Module netCDFViewer
                                         Next
                                     End If
                                 End If
-                                End If
                             End If
+                        End If
                     End If
                 Next
                 lResult = NetCDF.nc_close(lNCId)
@@ -290,6 +304,13 @@ Module netCDFViewer
                                     For lIndex As Integer = 0 To lLen - 1
                                         lAttString &= Str(lAttbyte(lIndex))
                                     Next
+                                Case NetCDF.nc_type.NC_SHORT
+                                    Dim lAttint(lLen - 1) As Int16
+                                    NetCDF.nc_get_att_short(aNcid, aVarId, lNameString, lAttint)
+                                    For lindex As Integer = 0 To lLen - 1
+                                        lAttString &= Str(lAttint(lindex)) & ", "
+                                    Next
+                                    lAttString = lAttString.Remove(lAttString.Length - 2)
                                 Case NetCDF.nc_type.NC_INT
                                     Dim lAttint(lLen - 1) As Int32
                                     NetCDF.nc_get_att_int(aNcid, aVarId, lNameString, lAttint)
