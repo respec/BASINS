@@ -147,18 +147,24 @@ Public Class atcNetCDFVariable
         Return lReturnValues
     End Function
 
-    Public Function ReadArray(ByVal aDimensionLength As Integer, ByRef aXStart As Integer, ByRef aYStart As Integer) As Array
+    Public Function ReadArray(ByVal aTimeLength As Integer, ByRef aXStart As Integer, ByRef aYStart As Integer) As Array
         Dim lReturnValues As Array = Nothing
-        Dim lStartP(2) As Int32
-        Dim lCount(2) As Int32
+        Dim lStartP() As Int32
+        Dim lCount() As Int32
+        If aTimeLength = 1 Then
+            ReDim lStartP(1)
+            ReDim lCount(1)
+        Else
+            ReDim lStartP(2)
+            ReDim lCount(2)
+        End If
 
         Dim lIndex As Integer = 0
         For Each lDimension As atcNetCDFDimension In Dimensions
-            If lDimension.ID = ParentFile.TimeDimension.ID Then
+            If aTimeLength > 1 AndAlso lDimension.ID = ParentFile.TimeDimension.ID Then
                 lStartP(lIndex) = 0
-                lCount(lIndex) = aDimensionLength
+                lCount(lIndex) = aTimeLength
             ElseIf lDimension.ID = ParentFile.EastWestDimension.ID Then
-
                 lStartP(lIndex) = aXStart
                 lCount(lIndex) = 1
             ElseIf lDimension.ID = ParentFile.NorthSouthDimension.ID Then
@@ -170,37 +176,37 @@ Public Class atcNetCDFVariable
 
         Select Case NetCDFType
             Case NetCDF.nc_type.NC_BYTE
-                Dim lValues(aDimensionLength - 1) As Byte
+                Dim lValues(aTimeLength - 1) As Byte
                 nc(NetCDF.nc_get_vara_uchar(ParentFile.NcID, ID, lStartP, lCount, lValues))
                 lReturnValues = lValues
 
             Case NetCDF.nc_type.NC_CHAR
-                Dim lValue As New StringBuilder(aDimensionLength - 1)
-                nc(NetCDF.nc_get_vara_text(ParentFile.NcID, ID, lStartP, lCount, lValue))
-                lReturnValues = lValue.ToString.ToCharArray
+                Dim lValues As New StringBuilder(aTimeLength - 1)
+                nc(NetCDF.nc_get_vara_text(ParentFile.NcID, ID, lStartP, lCount, lValues))
+                lReturnValues = lValues.ToString.ToCharArray
 
             Case NetCDF.nc_type.NC_DOUBLE
-                Dim lValues(aDimensionLength - 1) As Double
+                Dim lValues(aTimeLength - 1) As Double
                 nc(NetCDF.nc_get_vara_double(ParentFile.NcID, ID, lStartP, lCount, lValues))
                 lReturnValues = lValues
 
             Case NetCDF.nc_type.NC_INT
-                Dim lValues(aDimensionLength - 1) As Integer
+                Dim lValues(aTimeLength - 1) As Integer
                 nc(NetCDF.nc_get_vara_int(ParentFile.NcID, ID, lStartP, lCount, lValues))
                 lReturnValues = lValues
 
             Case NetCDF.nc_type.NC_FLOAT
-                Dim lValues(aDimensionLength - 1) As Single
+                Dim lValues(aTimeLength - 1) As Single
                 nc(NetCDF.nc_get_vara_float(ParentFile.NcID, ID, lStartP, lCount, lValues))
                 lReturnValues = lValues
 
             Case NetCDF.nc_type.NC_SHORT
-                Dim lValues(aDimensionLength - 1) As Short
+                Dim lValues(aTimeLength - 1) As Short
                 nc(NetCDF.nc_get_vara_short(ParentFile.NcID, ID, lStartP, lCount, lValues))
                 lReturnValues = lValues
         End Select
         If lReturnValues IsNot Nothing Then
-            Dim lValueDumpCount As Integer = Math.Min(pValueDumpMax, aDimensionLength - 1)
+            Dim lValueDumpCount As Integer = Math.Min(pValueDumpMax, aTimeLength - 1)
             If lValueDumpCount > 0 Then
                 For lValueIndex = 0 To lValueDumpCount
                     Logger.Dbg("value (" & lValueIndex & ") = " & Str(lReturnValues(lValueIndex)))

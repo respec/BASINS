@@ -77,11 +77,15 @@ Public Class atcNetCDF
         Select Case lAttributeType
             Case NetCDF.nc_type.NC_CHAR
                 'There's possibly some size limits I should be checking for here?
-                Dim lValue As New StringBuilder(lAttributeArrayLength - 1)
-                nc(NetCDF.nc_get_att_text(ncid, varid, lAttributeName, lValue))
-                Logger.Dbg("text value: " & lValue.ToString)
-                aAttributes.SetValue(lAttributeDef, lValue.ToString)
-
+                If lAttributeArrayLength = 0 Then
+                    Logger.Dbg("problem attribute array length?")
+                    aAttributes.SetValue(lAttributeDef, "")
+                Else
+                    Dim lValue As New StringBuilder(lAttributeArrayLength - 1)
+                    nc(NetCDF.nc_get_att_text(ncid, varid, lAttributeName, lValue))
+                    Logger.Dbg("text value: " & lValue.ToString)
+                    aAttributes.SetValue(lAttributeDef, lValue.ToString)
+                End If
             Case NetCDF.nc_type.NC_BYTE
                 Dim lValues(lAttributeArrayLength - 1) As Byte
                 nc(NetCDF.nc_get_att_uchar(ncid, varid, lAttributeName, lValues))

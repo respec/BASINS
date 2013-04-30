@@ -10,6 +10,7 @@ Imports atcTimeseriesNetCDF.atcNetCDF
 Public Class atcNetCDFFile
     Public Attributes As New atcData.atcDataAttributes
     Public Variables As New List(Of atcNetCDFVariable)
+    Public ConstituentVariables As New List(Of atcNetCDFVariable)
     Public Dimensions As New List(Of atcNetCDFDimension)
     Public EastWestDimension As atcNetCDFDimension = Nothing
     Public NorthSouthDimension As atcNetCDFDimension = Nothing
@@ -42,8 +43,8 @@ Public Class atcNetCDFFile
                 Logger.Dbg("dimid: " & lDimensionIndex & " name: " & lNewDimension.Name.ToString & " len: " & lNewDimension.Length)
                 Dimensions.Add(lNewDimension)
                 Select Case lNewDimension.Name.ToString.ToLower
-                    Case "east-west", "xcoord", "longitude" : EastWestDimension = lNewDimension
-                    Case "north-south", "ycoord", "latitude" : NorthSouthDimension = lNewDimension
+                    Case "east-west", "xcoord", "longitude", "lon" : EastWestDimension = lNewDimension
+                    Case "north-south", "ycoord", "latitude", "lat" : NorthSouthDimension = lNewDimension
                     Case "time" : TimeDimension = lNewDimension
                     Case Else : ConstituentDimensions.Add(lNewDimension)
                 End Select
@@ -56,7 +57,13 @@ Public Class atcNetCDFFile
 
             'Read variables, including their attributes.
             For lVariableIndex = 0 To lNumVariables - 1
-                Variables.Add(New atcNetCDFVariable(Me, lVariableIndex, Dimensions))
+                Dim lNewVariable As New atcNetCDFVariable(Me, lVariableIndex, Dimensions)
+                Variables.Add(lNewVariable)
+                If lNewVariable.ID <> EastWestDimension.ID AndAlso _
+                   lNewVariable.ID <> NorthSouthDimension.ID AndAlso _
+                   (TimeDimension Is Nothing OrElse lNewVariable.ID <> TimeDimension.ID) Then
+                    ConstituentVariables.Add(lNewVariable)
+                End If
             Next
         Finally
             Logger.Dbg("Close netCDF file " & pNcID & " " & FileName)
