@@ -12,9 +12,13 @@ Public Module UtilColor
     Private pColorMatchingRules As New Generic.List(Of Generic.KeyValuePair(Of String, Color))
     Private pColorsUsed As New Generic.List(Of Color)
     Private pMatchingColorsFilename As String = ""
-
-    Public Sub InitMatchingColors(ByVal aFilename As String)
+    Public Sub ClearColors() 'sub added by Becky to clear colors, since I want to only call
+        'InitMatchingColors ONCE for the entire simulation rather than for each graph
         pColorsUsed.Clear()
+    End Sub
+    Public Sub InitMatchingColors(ByVal aFilename As String)
+        'pColorsUsed.Clear() 'commented out by Becky as now there's a new sub to do it
+        ClearColors()
         Try
             If IO.File.Exists(aFilename) Then
                 pColorMatchingRules.Clear()

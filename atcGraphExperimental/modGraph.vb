@@ -501,7 +501,10 @@ FoundMatch:
 
     <CLSCompliant(False)> _
     Public Function CreateZgc(Optional ByVal aZgc As ZedGraphControl = Nothing, Optional ByVal aWidth As Integer = 600, Optional ByVal aHeight As Integer = 500) As ZedGraphControl
-        InitMatchingColors(FindFile("", "GraphColors.txt"))
+        InitMatchingColors(FindFile("", "GraphColors.txt")) 'Becky commented this out because now we're calling
+        'InitMatchingColors ONCE for the entire program in the HSPFSupport version of modGraph.  The only thing
+        'we need from InitMatchingColors is to clear the colors used list
+        'ClearColors() 'added by Becky to clear pColorsUsed since we don't run InitMatchingColors anymore
 
         If Not aZgc Is Nothing AndAlso Not aZgc.IsDisposed Then
             aZgc.Dispose()
