@@ -48,6 +48,9 @@ Public Class atcGraphForm
     End Property
 
     Private Sub InitMasterPane()
+        'InitMatchingColors(FindFile("", "GraphColors.txt")) 'Becky moved this here from atcGraph10/CreateZgc so that
+        'the file is found ONCE instead of a gazillion times and the colors are initialized ONCE rather than a gazillion
+        'times
         pZgc = CreateZgc()
         Me.Controls.Add(pZgc)
         With pZgc

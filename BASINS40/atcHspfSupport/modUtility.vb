@@ -376,6 +376,7 @@ Public Module Utility
                     lOperations.Add(lOperationKey, lOperationArea) 'e.g. R:116 0.0
                     Dim lOperationId As String = lOperation.Id.ToString
                     If lOperationId.Length = 1 Then lOperationId = Format(lOperation.Id Mod 100, "00")
+                    'Becky had a concern about this, but her code seems functionally the same
                     Dim lId As String = lLocationKey.Substring(0, 2) & lOperationId
                     If lLandUsesSortedById.IndexOfKey(lId) = -1 Then
                         lLandUsesSortedById.Add(lId, lLandUse)
@@ -523,9 +524,12 @@ Public Module Utility
         lReport.AppendLine("")
 
         lReport.AppendLine("Location" & vbTab & "TotalArea".PadLeft(12) & vbTab & "LocalArea".PadLeft(12) & vbTab & "UpstreamReaches")
-        Dim lLocation As String = aLocations.Item(aLocations.Count - 1)
-        lReport.AppendLine(AreaReportLocation(aUci, aOperationTypes, lLocation, True, aReportPath, aRunMade))
-
+        'Becky changed the following to cycle through all locations
+        'Dim lLocation As String = aLocations.Item(aLocations.Count - 1)
+        For Each lLocation As String In aLocations 'added by Becky - should force land use reports for ALL relevant reaches 
+            'and also add the total for all relevant reaches to a single overall report
+            lReport.AppendLine(AreaReportLocation(aUci, aOperationTypes, lLocation, True, aReportPath, aRunMade))
+        Next lLocation
         Return lReport
     End Function
 

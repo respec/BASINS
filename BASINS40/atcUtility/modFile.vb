@@ -746,6 +746,9 @@ ErrorWriting:
                     Optional ByVal aUserVerifyFileName As Boolean = False, _
                     Optional ByVal aChangeIntoDir As Boolean = False, _
                     Optional ByRef aFilterIndex As Integer = 1) As String
+        'Becky changed function def above to make aUserVerifyFileName true - this way by default the user is asked
+        'if a file is missing, rather than it just breaking the program silently
+        'Becky has other changes that she thinks would make this more efficient; check with Mark
 
         Dim lDir As String = CurDir()
         Dim lFileName As String = aDefaultFileName.Trim

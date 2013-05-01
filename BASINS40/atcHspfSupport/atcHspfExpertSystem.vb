@@ -74,9 +74,11 @@ Public Class atcExpertSystem
             If lExsRecord.Length = 51 Then
                 SDateJ = pUci.GlobalBlock.SDateJ
                 EDateJ = pUci.GlobalBlock.EdateJ
-            Else
+            Else 'the user could be entering dates on this line if calib period diff from sim period
                 lExsRecord.PadRight(70)
                 Dim lDate(5) As Integer
+                'Becky thinks the numbers 52 to 68 below are one off, and should be 51 to 67. 
+                'maybe a problem in something that writes out the .exs?
                 lDate(0) = lExsRecord.Substring(52, 4)
                 lDate(1) = lExsRecord.Substring(56, 2)
                 lDate(2) = lExsRecord.Substring(58, 2)
@@ -145,7 +147,13 @@ Public Class atcExpertSystem
             lExsRecord = lExsRecords(lRecordIndex)
             lRecordIndex += 1
             For lErrorIndex As Integer = 1 To ErrorCriteria.Count
-                If lExsRecord.Length >= lErrorIndex * 8 Then
+                If lExsRecord.Length >= lErrorIndex * 8 Then 'Becky's note: this makes sure that the error 
+                    'criterion is actually on the line by only reading it if the total line length exceeds 
+                    'that needed for this error to have been included
+                    'Becky's additional note: when ErrorCriteria was defined, the 'New' method automatically
+                    'filled it with the default values - the code below reads the user-defined values if there
+                    'are any.  If the user doesn't supply any and the if-then never trips, then no harm, the
+                    'program just uses the defaults.
                     Dim lErrorCriteriumValue As String = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
                     If lErrorCriteriumValue.Length > 0 Then
                         ErrorCriteria(lErrorIndex).Value = lErrorCriteriumValue
@@ -298,6 +306,111 @@ Public Class atcExpertSystem
         Return lText.ToString
     End Function
 
+    Public Sub CalcAdvice(ByRef aString As String) 'Becky added this method to compute & export advice
+        Try
+            For lSiteIndex As Integer = 1 To Sites.Count
+                Dim lSite As HexSite = Sites(lSiteIndex - 1)
+                Dim lErr As Integer = 1
+                Dim lCriteriaList As New List(Of Double) 'I created these lists so I could pass them other places where the Hex things aren't defined
+                Dim lErrorTermList As New List(Of Double)
+                lCriteriaList.Add(0) 'add blank value for 0th place
+                lErrorTermList.Add(0) 'add blank value for 0th place
+                For i As Integer = 1 To 20
+                    If i = 8 Then 'fix the summer storm volume error to be the seasonal storm error 
+                        lCriteriaList.Add(ErrorCriteria.Criterion(i).Value)
+                        lErrorTermList.Add(lSite.ErrorTerm(i) - lSite.ErrorTerm(5)) 'summer storm minus total storm
+                    ElseIf i = 20 Then
+                        'put the pure summer storm error in slot 20
+                        lCriteriaList.Add(ErrorCriteria.Criterion(8).Value)
+                        lErrorTermList.Add(lSite.ErrorTerm(8))
+                    Else
+                        lCriteriaList.Add(ErrorCriteria.Criterion(i).Value)
+                        lErrorTermList.Add(lSite.ErrorTerm(i))
+                    End If
+                Next i
+                Do Until lCriteriaList(lErr) < Math.Abs(lErrorTermList(lErr))
+                    'do this loop until we find an error outside of the range of the criterion
+                    Select Case lErr
+                        'the actual error terms are held in 1, 2, 3, 4, 5, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20
+                        'this select case steps over the blank terms
+                        Case 20
+                            'if we've gotten this far and no errors, then all criteria are okay
+                            lErr = -1
+                            Exit Do
+                        Case Is < 5
+                            lErr += 1
+                        Case 5
+                            lErr = 7
+                        Case 7
+                            lErr = 8
+                        Case 8
+                            lErr = 12
+                        Case Is > 11
+                            lErr += 1
+                    End Select
+                Loop
+                If lErr > 0 Then 'if -1, have gone through and met all criteria - use method in RWZUtilities to get the appropriate advice
+                    aString &= ErrMessage(lCriteriaList, lErrorTermList, lErr)
+                Else
+                    aString &= "The calibration for site " & lSite.Name & " is successful based on current criteria.  If you wish to refine " & _
+                        "the calibration further, adjust the error criteria in your .exs file."
+                End If
+            Next lSiteIndex
+        Catch ex As Exception
+            aString &= "An error was encountered while attempting to produce advice.  Please consult the statistics file to make an " & _
+                "educated decision about your next step.  Error message: " & ex.Message
+        End Try
+    End Sub
+
+    Private Function ErrMessage(ByVal aCriteria As List(Of Double), ByVal aError As List(Of Double), ByVal aItem As Integer) As String
+        ErrMessage = "Above all else, make sure that you keep track of the changes you make and the effects those changes have." & vbCrLf & _
+            "This advice may take you in loops or get stuck on one point, but if you have a record of educated changes, you can" & vbCrLf & _
+            "make your own informed decisions.  Additionally, you can change the criteria in the .exs file if you would like the" & vbCrLf & _
+            "program to skip over a particular statistic.  The statistics are evaluated in this order: total volume, baseflow" & vbCrLf & _
+            "recession, high and low flows, storm peaks and volumes, and finally seasonal errors.  You cannot move past an item on" & vbCrLf & _
+            "this list and look at the next statistic until you have forced the errors for that item to fall within the relevant criteria." & vbCrLf & vbCrLf & vbCrLf & vbCrLf
+        Select Case aItem
+            Case 1 'total volume
+                ErrMessage &= ExpertAdvice.WaterBalance(aCriteria, aError)
+            Case 2 'baseflow recession
+                ErrMessage &= ExpertAdvice.LowFlowRecession(aCriteria(aItem), aError(aItem))
+            Case 3, 4 'high or low flows
+                ErrMessage &= ExpertAdvice.HighLowFlows(aCriteria, aError, aItem)
+            Case 5, 16 'storm flows
+                ErrMessage &= ExpertAdvice.Stormflows(aCriteria, aError, aItem)
+            Case 7, 8 'seasonal
+                ErrMessage &= ExpertAdvice.SeasonalAdvice(aCriteria, aError, aItem)
+            Case Else 'new errors
+                ErrMessage = "You have met all the traditional error criteria.  If you choose to proceed, the next " & _
+                    "item to consider is the error for " & ErrName(aItem) & ", which has an error of " & aError(aItem) & "%"
+        End Select
+    End Function
+
+    Private Function ErrName(ByVal aItem As Integer) As String
+        Select Case aItem
+            Case 12
+                ErrName = "lowest 10% of flows"
+            Case 13
+                ErrName = "lowest 25% of flows"
+            Case 14
+                ErrName = "highest 25% of flows"
+            Case 15
+                ErrName = "highest 50% of flows"
+            Case 16
+                ErrName = "average storm peaks"
+            Case 17
+                ErrName = "summer volume"
+            Case 18
+                ErrName = "winter volume"
+            Case 19
+                ErrName = "winter storm volume"
+            Case 20
+                ErrName = "summer storm volume"
+            Case Else
+                ErrName = ""
+        End Select
+    End Function
+
     Private Sub CalcStats(ByVal aDataSource As atcTimeseriesSource)
         Dim lDataSetTypes() As String = {"SimTotRunoff", "ObsStreamflow"}
         If Not pFlowOnly Then
@@ -367,7 +480,8 @@ Public Class atcExpertSystem
                 Else  'generate statistics
                     Dim lValues() As Double = lDailyTSer.Values
                     'total volume always needed 
-                    pStats(1, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("Sum").Value
+                    'RWZSetArgs(lDailyTSer) 'Becky's addition Dec 9: this uses atcTimeseriesStatistics to calculate all the sums, bins needed below
+                    pStats(1, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("Sum").Value 'Becky commented this out and used .GetValue instead
                     'others?
                     If (lStatGroup = 1 Or lStatGroup = 2) Then  'full range of pStats desired
                         pStats(2, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum50") '50% low
@@ -443,10 +557,12 @@ Public Class atcExpertSystem
                             lSavDat = lRecessionTimser.Values(lIndex)
                             lRecessionTimser.Values(lIndex - 1) = lRecession
                         Next lIndex
-                        lRecessionTimser.Attributes.DiscardCalculated()
+                        lRecessionTimser.Attributes.DiscardCalculated() 'Becky commented this out, concerned 'calculated' isnt stored properly
                         'lRecessionTimser.Attributes.CalculateAll()
 
                         'new percent of time in base flow term
+                        'RWZRecessionPrep(lRecessionTimser) 'added by Becky to clear out attributes since DiscardCalculated doesn't work
+                        'from lDailyTSer and replace with values appropriate to the new recession timeseries
                         Dim lStr As String = lRecessionTimser.Attributes.GetFormattedValue("%50")
                         If IsNumeric(lStr) Then
                             pStats(6, lStatGroup, lSiteIndex) = lStr
@@ -536,7 +652,7 @@ Public Class atcExpertSystem
                 lSite.ErrorTerm(14) = GetNaN()
             End If
 
-            'volume error in highest 25% flows
+            'volume error in highest 50% flows - Becky corrected this comment, which used to say high 25%
             If (pStats(14, 2, lSiteIndex) > 0.0#) Then
                 lSite.ErrorTerm(15) = 100.0# * ((pStats(14, 1, lSiteIndex) - pStats(14, 2, lSiteIndex)) _
                                            / pStats(14, 2, lSiteIndex))
@@ -600,7 +716,9 @@ Public Class atcExpertSystem
                    Double.IsNaN(lWinterError)) Then 'one term or the other has not been obtained
                 lSite.ErrorTerm(7) = GetNaN()
             Else 'okay to calculate this term
-                lSite.ErrorTerm(7) = Math.Abs(lSummerError - lWinterError)
+                lSite.ErrorTerm(7) = (lSummerError - lWinterError) 'Becky changed this so that it was no longer absolute value
+                'so that we can tell which is the greater error (if negative, winter bigger error than summer and vice-versa)
+                'lSite.ErrorTerm(7) = Math.Abs(lSummerError - lWinterError)
             End If
 
             lSite.ErrorTerm(17) = lSummerError

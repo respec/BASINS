@@ -492,6 +492,7 @@ Public Module modStat
 
         'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
 
+        lStrBuilder.AppendLine("Table 1") 'added by Becky to label Table 1
         lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
         lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
         lStrBuilder.AppendLine()
@@ -645,6 +646,7 @@ Public Module modStat
 
         Dim lEdIndex As Integer
         lStrBuilder.AppendLine("1")
+        lStrBuilder.AppendLine("Table 3") 'added by Becky to label Table 3
         lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
         lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
         lStrBuilder.AppendLine()
@@ -699,8 +701,9 @@ Public Module modStat
         lStrBuilder.AppendLine()
         lStrBuilder.AppendLine()
 
-        'Table 3
+        'Table 4 - Becky corrected 3 to 4 
         lStrBuilder.AppendLine("1")
+        lStrBuilder.AppendLine("Table 4") 'added by Becky to label Table 4
         lStrBuilder.AppendLine(" Percent time value was exceeded")
         lStrBuilder.AppendLine()
         lStrBuilder.AppendLine("     Flow      Flow")
