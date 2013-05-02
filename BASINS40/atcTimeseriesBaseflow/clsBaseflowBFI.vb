@@ -110,38 +110,17 @@ Public Class clsBaseflowBFI
             Return Nothing 'enforce either water year data or calendar year data
         End If
 
-        'checking the end for data completeness
-        Dim fillInEndIsNeeded As Boolean = False
-        J2Date(lTsDaily.Dates.Value(lTsDaily.numValues), lDate)
-        timcnv(lDate)
-        If (YearBasis = "Calendar" AndAlso lDate(1) < 12) Or _
-           (YearBasis = "Water   " AndAlso lDate(1) < 9) Then
-            gError = "Incomplete data at end of dataset. No analysis is done."
-            Return Nothing 'can't have too much missing at the end
-        Else
-            If (lDate(1) = 12 AndAlso lDate(2) < 31) Or _
-               (lDate(1) = 9 AndAlso lDate(2) < 30) Then
-                fillInEndIsNeeded = True
-            End If
-        End If
+        'Only adjust at the beginning of daily streamflow Tser
+        'as where the search starts is more important for BFI method
+        'the end of the daily streamflow Tser is unchanged
         Dim lNewStart As Double = StartDate
         Dim lNewEnd As Double = EndDate
-        If fillInStartIsNeeded And fillInEndIsNeeded Then
+        If fillInStartIsNeeded Then
             lDate = GetBoundary(StartDate, True, IsWaterYear)
             lNewStart = Date2J(lDate)
-            lDate = GetBoundary(EndDate, False, IsWaterYear)
-            lNewEnd = Date2J(lDate)
-        ElseIf fillInStartIsNeeded Then
-            lDate = GetBoundary(StartDate, True, IsWaterYear)
-            lNewStart = Date2J(lDate)
-            lNewEnd = EndDate
-        ElseIf fillInEndIsNeeded Then
-            lNewStart = StartDate
-            lDate = GetBoundary(EndDate, False, IsWaterYear)
-            lNewEnd = Date2J(lDate)
         End If
 
-        If lNewStart <> StartDate OrElse lNewEnd <> EndDate Then
+        If lNewStart <> StartDate Then
             Dim lNewDailyTs As atcTimeseries = NewTimeseries(lNewStart, lNewEnd, atcTimeUnit.TUDay, 1, Nothing, -99.0)
             Dim lTsGroup As New atcTimeseriesGroup
             lTsGroup.Add(lTsDaily)

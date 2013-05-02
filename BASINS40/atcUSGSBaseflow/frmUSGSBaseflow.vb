@@ -198,19 +198,19 @@ Public Class frmUSGSBaseflow
             lErrMsg &= "- Drainage Area must be greater than zero" & vbCrLf
         End If
         Dim lNDay As Integer
-        If chkMethodBFI.Checked Then
+        If chkMethodBFIStandard.Checked OrElse chkMethodBFIModified.Checked Then
             If Not Integer.TryParse(txtN.Text.Trim(), lNDay) Then
                 lErrMsg &= "- BFI method needs a valid screening duration (N)" & vbCrLf
             End If
         End If
         Dim lFrac As Double
-        If chkMethodBFI.Checked AndAlso chkMethodBFIStandard.Checked Then
+        If chkMethodBFIStandard.Checked Then
             If Not Double.TryParse(txtF.Text.Trim(), lFrac) Then
                 lErrMsg &= "- BFI standard method needs a valid turning point fraction (F)" & vbCrLf
             End If
         End If
         Dim lK1Day As Double
-        If chkMethodBFI.Checked AndAlso chkMethodBFIModified.Checked Then
+        If chkMethodBFIModified.Checked Then
             If Not Double.TryParse(txtK.Text.Trim(), lK1Day) Then
                 lErrMsg &= "- BFI modified method needs a valid recession constant (K)" & vbCrLf
             End If
@@ -459,7 +459,6 @@ Public Class frmUSGSBaseflow
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", chkMethodHySEPFixed.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", chkMethodHySEPLocMin.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFI", chkMethodBFI.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIStandard", chkMethodBFIStandard.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", chkMethodBFIModified.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
@@ -964,17 +963,19 @@ Public Class frmUSGSBaseflow
         If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", "False") = "True" Then
             chkMethodHySEPSlide.Checked = True
         End If
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFI", "False") = "True" Then
-            chkMethodBFI.Checked = True
-            If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFIStandard", "False") = "True" Then
-                chkMethodBFIStandard.Checked = True
-            End If
-            If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", "False") = "True" Then
-                chkMethodBFIModified.Checked = True
-            End If
-            If GetSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", "False") = "True" Then
-                chkBFISymbols.Checked = True
-            End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFIStandard", "False") = "True" Then
+            chkMethodBFIStandard.Checked = True
+        End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", "False") = "True" Then
+            chkMethodBFIModified.Checked = True
+        End If
+        'If GetSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", "False") = "True" Then
+        '    chkBFISymbols.Checked = True
+        'End If
+        If chkMethodBFIStandard.Checked OrElse chkMethodBFIModified.Checked Then
+            gbBFI.Enabled = True
+        Else
+            gbBFI.Enabled = False
         End If
     End Sub
 
@@ -1110,7 +1111,6 @@ Public Class frmUSGSBaseflow
                                                                                                              chkMethodHySEPLocMin.CheckedChanged, _
                                                                                                              chkMethodHySEPSlide.CheckedChanged, _
                                                                                                              chkMethodPART.CheckedChanged, _
-                                                                                                             chkMethodBFI.CheckedChanged, _
                                                                                                              chkMethodBFIStandard.CheckedChanged, _
                                                                                                              chkMethodBFIModified.CheckedChanged
         pDidBFSeparation = False
@@ -1122,13 +1122,6 @@ Public Class frmUSGSBaseflow
             If chkMethodHySEPSlide.Checked Then pMethods.Add(BFMethods.HySEPSlide)
             If chkMethodBFIStandard.Checked Then pMethods.Add(BFMethods.BFIStandard)
             If chkMethodBFIModified.Checked Then pMethods.Add(BFMethods.BFIModified)
-            If chkMethodBFIModified.Checked OrElse chkMethodBFIStandard.Checked Then
-                If chkMethodBFI.CheckState = CheckState.Unchecked Then
-                    chkMethodBFI.CheckState = CheckState.Checked
-                End If
-            Else
-                chkMethodBFI.CheckState = CheckState.Unchecked
-            End If
         End If
     End Sub
 
@@ -1137,7 +1130,8 @@ Public Class frmUSGSBaseflow
     End Sub
 
     Private Sub txtAny_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
-            Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged
+            Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged, _
+            txtN.TextChanged, txtF.TextChanged, txtK.TextChanged, txtOutputDir.TextChanged, txtOutputRootName.TextChanged
         pDidBFSeparation = False
     End Sub
 
@@ -1186,7 +1180,9 @@ Public Class frmUSGSBaseflow
             End If
         End If
         If lBFIChosen Then
-            chkMethodBFI.Checked = True
+            gbBFI.Enabled = True
+        Else
+            gbBFI.Enabled = False
         End If
     End Sub
 End Class
