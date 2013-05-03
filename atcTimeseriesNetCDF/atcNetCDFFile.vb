@@ -16,11 +16,12 @@ Public Class atcNetCDFFile
     Public NorthSouthDimension As atcNetCDFDimension = Nothing
     Public TimeDimension As atcNetCDFDimension = Nothing
     Public ConstituentDimensions As New List(Of atcNetCDFDimension)
+    Public Debug As Boolean = False
 
     Private pNcID As Int32 = -1
     Public ReadOnly FileName As String
 
-    Public Sub New(ByVal aFileName As String)
+    Public Sub New(ByVal aFileName As String, Optional ByVal aDebug As Boolean = False)
         Dim lNumAttributes As Int32
         Dim lNumVariables As Int32
         Dim lNumDimensions As Int32

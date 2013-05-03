@@ -288,8 +288,12 @@ Public Class atcTimeseriesNetCDF
         Dim lDataVariable As atcNetCDFVariable = aAggregateGridFile.ConstituentVariables(0)
         For lX As Integer = 0 To aAggregateGridFile.EastWestDimension.Length - 1
             For lY As Integer = 0 To aAggregateGridFile.NorthSouthDimension.Length - 1
-                Dim lDataValues = lDataVariable.ReadArray(1, lX, lY)   
-                lUniqueValues.Increment(lDataValues(0))
+                Dim lDataValues = lDataVariable.ReadArray(1, lX, lY)
+                If Not lUniqueValues.Keys.Contains(lDataValues(0)) Then
+                    lUniqueValues.Add(lDataValues(0), New ArrayList)
+                End If
+                Dim lValueCollection As ArrayList = lUniqueValues.ItemByKey(lDataValues(0))
+                lValueCollection.Add(lX & "," & lY)
             Next
         Next
         Return lUniqueValues
