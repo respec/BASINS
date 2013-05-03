@@ -345,7 +345,7 @@
                 End If
         End Select
     End Function
-    Public Function Stormflows(ByVal aCriteria As List(Of Double), ByVal aError As List(Of Double), ByVal aItem As Integer)
+    Public Function Stormflows(ByVal aCriteria As List(Of Double), ByVal aError As List(Of Double), ByVal aItem As Integer) As String
         'average storm peaks error in aItem 16, total storm volume error in aItem 5
         Stormflows = "Storm Error" & vbCrLf & _
                      "===========" & vbCrLf & vbCrLf

@@ -13,7 +13,6 @@ Imports atcWDM
 Imports atcHspfBinOut
 Imports HspfSupport
 Imports atcUCI
-Imports BeckyUtilities 'added by Becky
 
 'note from Becky: will also need references to atcReport and atcTimeseriesMath projects
 'I also installed the MapWinGIS.ocx ActiveX components from http://mapwingis.codeplex.com/releases but I'm still not sure if I actually needed to
@@ -24,7 +23,7 @@ Imports BeckyUtilities 'added by Becky
 
 Imports MapWinUtility 'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
 Imports atcGraph
-Imports ZedGraph 'this is coming from a DLL as the original project was a C# project and not a VB project
+'Imports ZedGraph 'this is coming from a DLL as the original project was a C# project and not a VB project
 
 Imports MapWindow.Interfaces 'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
 'note that for whatever reason, the MapWindow.Interfaces DLL from that site doesn't
@@ -127,11 +126,16 @@ Module HSPFOutputReports
         'End If
         'If pGraphWQOnly Then Exit Sub ' early end here if just doing it for WQ graphs
 
+        'set up the timeseries attributes for statistics
+        Dim lStat As New atcTimeseriesStatistics.atcTimeseriesStatistics
+        For Each lOperation As atcDefinedValue In lStat.AvailableOperations
+            atcDataAttributes.AddDefinition(lOperation.Definition)
+        Next
 
         'open uci file
-        pProgressBar.txtProgress.Text &= Now & " Attempting to open hspfmsg.mdb" & vbCrLf
+        pProgressBar.txtProgress.Text &= Now & " Attempting to open hspfmsg.wdm" & vbCrLf
         Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb") 'Becky: this can be found at C:\BASINS\models\HSPF\bin if you did the typical BASINS install
+        lMsg.Open("hspfmsg.wdm") 'Becky: this can be found at C:\BASINS\models\HSPF\bin if you did the typical BASINS install
         pProgressBar.txtProgress.Text &= Now & " Reading " & pBaseName & ".uci" & vbCrLf
         pProgressBar.pbProgress.Increment(11)
         Dim lHspfUci As New atcUCI.HspfUci
@@ -141,20 +145,29 @@ Module HSPFOutputReports
         pProgressBar.pbProgress.Increment(10)
         'Becky: removed special cases Lynnwood and mono as they should not be relevant
 
-
         'open HBN file
-        'TODO: need to allow additional binary output files!
-        'Becky: this appears to allow summary tables that aren't too useful for water and selection of run time, comment out
-        'Dim lHspfBinFileName As String = pTestPath & "\" & pBaseName & ".hbn"
-        'Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
-        'lHspfBinDataSource.Open(lHspfBinFileName)
+        pProgressBar.txtProgress.Text &= Now & " Opening " & pBaseName & ".hbn" & vbCrLf
+        Dim lHspfBinFileName As String = pTestPath & pBaseName & ".hbn"
+        Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
+        Dim lHbnExists As Boolean = False
+        If System.IO.File.Exists(lHspfBinFileName) Then
+            lHspfBinDataSource.Open(lHspfBinFileName)
+            lHbnExists = True
+        Else
+            'give message if hbn file does not exist, but continue without it
+            Dim ans As Integer
+            ans = MsgBox("HBN file " & lHspfBinFileName & " does not exist.  Water Balance reports will not be available.")
+        End If
 
         'watershed summary
-        'Becky: next two lines commented out 'cause we didn't read the binary file
-        'Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-        'Dim lRunMade As String = lHspfBinFileInfo.LastWriteTime.ToString
-        'Becky: added new lRunMade below to be dependent on today rather than file creation time
-        Dim lRunMade As String = Now.ToString
+        Dim lRunMade As String = ""
+        If lHbnExists Then
+            Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
+            lRunMade = lHspfBinFileInfo.LastWriteTime.ToString
+        Else
+            'Becky: added new lRunMade below to be dependent on today rather than file creation time
+            lRunMade = Now.ToString
+        End If
         Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") & _
                 Format(Microsoft.VisualBasic.DateAndTime.Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
 
@@ -204,7 +217,7 @@ Module HSPFOutputReports
                 System.IO.File.Copy(pTestPath & pBaseName & ".exs", lNextFolder & lNextName & ".exs")
             End If
         End If
-     
+
         'build collection of operation types to report
         Dim lOperationTypes As New atcCollection
         lOperationTypes.Add("P:", "PERLND")
@@ -526,11 +539,11 @@ Module HSPFOutputReports
                                     lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
                                     lTimeSeries(1).Attributes.SetValue("Units", "cfs")
                                     lTimeSeries(1).Attributes.SetValue("StepType", pCurveStepType)
-                                    GraphStorms(lTimeSeries, 2, lOutFolderName & "Storm", pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem, pMakeLogGraphs)
+                                    GraphStorms(lTimeSeries, 2, lOutFolderName & "Storm" & "_" & lSiteName, pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem, pMakeLogGraphs)
                                     lTimeSeries.Dispose()
                                 End If
                             End If
-                            End If
+                        End If
                     Next
 
                     lExpertSystem = Nothing
@@ -571,14 +584,18 @@ Module HSPFOutputReports
         '    SaveFileString(lOutFileName, lReportCons.ToString)
         '    lReportCons = Nothing
 
-        '    Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
-        '    Logger.Dbg("Summary at " & lLocations.Count & " locations")
-        '    'constituent balance
-        '    lReportCons = HspfSupport.ConstituentBalance.Report _
-        '       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-        '        lHspfBinDataSource, lLocations, lRunMade)
-        '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalance.txt"
-        '    SaveFileString(lOutFileName, lReportCons.ToString)
+        If lHbnExists Then
+            Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
+            Logger.Dbg("Summary at " & lLocations.Count & " locations")
+            'constituent balance
+            Dim lReportCons As New atcReport.ReportText
+            Dim lConstituent As String = "Water"
+            lReportCons = HspfSupport.ConstituentBalance.Report _
+               (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                lHspfBinDataSource, lLocations, lRunMade)
+            Dim lOutWaterBalanceFileName As String = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalance.txt"
+            SaveFileString(lOutWaterBalanceFileName, lReportCons.ToString)
+        End If
 
         '    lReportCons = HspfSupport.ConstituentBalance.Report _
         '       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
@@ -639,444 +656,23 @@ RWZProgramEnding:
         pProgressBar.Focus()
     End Sub
 
-    Private Sub GraphWQDuration()
-        'TODO: make not specifc to Monocacy
-
-        '************  Graphing for WQ duration curve plots ******************
-        ' The WQ results for SED, N, and P are in the *.output.wdm files
-        ' Location: RCHRES 9
-        ' Flow Volume: 911, OVOL, -> ac.ft / hour
-        ' Sed Load: 921 - 923, Sand + Silt + Clay,  -> tons/hour
-        ' Total N: 931-936, N -> lb/hour
-        ' Total P: 941-945, P -> lb/hour
-        ' The above information is obtained from the .uci file, which is the same across scenarios
-        '
-        Dim lWDMNameCollection As New atcCollection
-        Dim lOutputWdmDataSource As New atcDataSourceWDM()
-        Dim lScenName As String = ""
-        'build collection of scenarios (uci base names) to report
-        Dim lOutputWDMNames As New System.Collections.Specialized.NameValueCollection
-
-        Dim lp As String = ""
-        Dim lf As String = "C:\mono_luChange\output\graphWQlog.txt"
-        For Each lBaseFolder As String In pBaseFolders ' loop through all land use scenario folders
-            lp = ""
-            AddFilesInDir(lOutputWDMNames, lBaseFolder, False, "*.output.wdm")
-            'lfld = "C:\mono_luChange\output\lu2030b2"
-            'AddFilesInDir(lOutputWDMs, lfld, False, "b_10_gfdl_f30.base.output.wdm")
-            For Each lOutputWDMName As String In lOutputWDMNames
-                lp = ""
-                'If foundQResult(lOWDM) Then ' found a problematic result, then bypass it
-                '    Continue For
-                'End If
-                lOutputWdmDataSource.Open(lOutputWDMName)
-
-                'Flow rate (911, ac.ft/hour -> liter/s)
-                Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
-                Dim lMathArgs As New atcDataAttributes
-
-                Dim lFlow As atcTimeseries = _
-                  lOutputWdmDataSource.DataSets.ItemByKey(911) * 342.633844 '1 ((acre foot) per hour) = 342.633844 liter per second
-
-                '****** SEDIMENT *****
-
-                ' Sediment loading (921, sand; 922, silt; 923, clay in tons per hour)
-                Dim lLoadSum As atcTimeseries = _
-                   lOutputWdmDataSource.DataSets.ItemByKey(921) + _
-                   lOutputWdmDataSource.DataSets.ItemByKey(922) + _
-                   lOutputWdmDataSource.DataSets.ItemByKey(923)
-                'Double checking: sum Annual
-                'Logger.Msg("Sum Annual Sediment: " & lLoadSum.Attributes.GetFormattedValue("Sum Annual"))
-                '235470 vs 235430    19619.1667 (monthly mean)
-                Dim lLoadSumNewUnit As atcTimeseries = lLoadSum * 0.251995761 '1 (ton per hour) = 0.251995761 kilogram per second
-
-                ' Sediment concentration
-                Dim lConc As atcTimeseries = lLoadSumNewUnit / lFlow ' Intermediate - kg/l
-                Dim lConcNewUnit As atcTimeseries = lConc * (1000 * 1000) 'kg/l to mg/L
-
-                'Rid of Infinitys from TSers
-                For i As Integer = 0 To lFlow.numValues - 1
-                    If Double.IsInfinity(lFlow.Value(i)) Then lFlow.Value(i) = Double.NaN
-                    If Double.IsInfinity(lLoadSumNewUnit.Value(i)) Then lLoadSumNewUnit.Value(i) = Double.NaN
-                    If Double.IsInfinity(lConcNewUnit.Value(i)) Then lConcNewUnit.Value(i) = Double.NaN
-                Next
-
-                Dim lDataGroup As New atcTimeseriesGroup
-                lDataGroup.Clear()
-                lFlow.Attributes.SetValue("Constituent", "FDC")
-                lDataGroup.Add(lFlow)
-                lLoadSumNewUnit.Attributes.SetValue("Constituent", "LDC (Sediment)")
-                lDataGroup.Add(lLoadSumNewUnit)
-                lConcNewUnit.Attributes.SetValue("Constituent", "CDC (Sediment)")
-                lDataGroup.Add(lConcNewUnit)
-
-                'Do the duration graph
-                Dim lscen As String = IO.Path.GetFileNameWithoutExtension(lOutputWDMName)
-                Dim lGraphFilename As String = IO.Path.Combine(lBaseFolder, lscen) & "_dur_sed" & pGraphSaveFormat
-                Dim lZgc As ZedGraphControl
-
-                lZgc = CreateZgc()
-                Dim lGraphSaveWidth As Integer = 1000
-                Dim lGraphSaveHeight As Integer = 600
-                lZgc.Width = lGraphSaveWidth
-                lZgc.Height = lGraphSaveHeight
-                Dim lGraphDur As New clsGraphProbability(lDataGroup, lZgc)
-
-                With lGraphDur.ZedGraphCtrl.GraphPane
-
-                    If lscen.StartsWith("base.") Then
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Sediment : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : base"
-                    Else
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Sediment : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
-                    End If
-                    With .XAxis
-                        .Scale.Min = 0.0000001
-                    End With
-                    With .Y2Axis
-                        .Type = AxisType.Log
-                        .Scale.IsUseTenPower = False
-                        .MajorGrid.IsVisible = False
-                        .MinorGrid.IsVisible = False
-                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec"
-                        '.Scale.MinAuto = True
-                        '.Scale.MaxAuto = True
-
-                        'If .Scale.Min < 1 Then
-                        '    .Scale.Min = 0.000001
-                        'End If
-                        '.Scale.Max = 100000
-                        .IsVisible = True
-                    End With
-                    If .YAxis.Scale.Min < 1 Then
-                        .YAxis.Scale.MinAuto = False
-                        .YAxis.Scale.Min = 1
-                        .YAxis.Scale.Max = 1000000
-                        .YAxis.MajorGrid.IsVisible = False
-                        .YAxis.MinorGrid.IsVisible = False
-                        .YAxis.Title.Text = "Flow Rate (FDC) L/sec"
-                        .AxisChange()
-                    End If
-                    .CurveList("FDC").Color = Drawing.Color.BlueViolet
-                    .CurveList("LDC (Sediment)").Color = Drawing.Color.Brown
-                    .CurveList("CDC (Sediment)").Color = Drawing.Color.BurlyWood
-                    .CurveList("LDC (Sediment)").IsY2Axis = True
-                    .CurveList("CDC (Sediment)").IsY2Axis = True
-                End With
-
-                Try
-                    lZgc.SaveIn(lGraphFilename)
-                Catch ex As Exception
-                    lp = "P:Sediment:"
-                    'Stop
-                End Try
-                lGraphDur.Dispose()
-                lZgc.Dispose()
-
-                '******* NITROGEN *******
-                '******* NITROGEN Begins *******
-                '******* NITROGEN *******
-                ' Nitrogen loading
-                'Get Tot-N
-                ' Need 931 - NUCF9, NO3D
-                ' Need 932 - NUCF9, NH3D
-                ' Need 933 - OSNH4, NH3A
-                ' Need 934 - OSNH4, NH3I
-                ' Need 935 - OSNH4, NH3C
-                ' Need 936 - PKCF2, RORN
-                ' Need OXCF2 - 951 - BODA; multiplier: 0.043580459 (i.e. (14*16*49)/(1200*106*1.98))
-                ' Need PKCF2 - 953 - PHYT; multiplier: 0.086289308 (i.e. (14*16*49)/(1200*106))
-                lLoadSum.Clear()
-                'Exit Sub
-
-                Try
-                    lLoadSum = lOutputWdmDataSource.DataSets.ItemByKey(931) + _
-                    lOutputWdmDataSource.DataSets.ItemByKey(932) + _
-                    lOutputWdmDataSource.DataSets.ItemByKey(933) + _
-                    lOutputWdmDataSource.DataSets.ItemByKey(933) + _
-                    lOutputWdmDataSource.DataSets.ItemByKey(934) + _
-                    lOutputWdmDataSource.DataSets.ItemByKey(935) + _
-                    lOutputWdmDataSource.DataSets.ItemByKey(936) + _
-                    (lOutputWdmDataSource.DataSets.ItemByKey(951) * 0.043580459) + _
-                    (lOutputWdmDataSource.DataSets.ItemByKey(953) * 0.086289308)
-                Catch ex As Exception
-                    Logger.Msg("Adding Nitrogen load problem for: " & lOutputWDMName)
-                    Exit Sub
-                End Try
-
-                lLoadSumNewUnit.Clear()
-                Try
-                    lLoadSumNewUnit = lLoadSum * 0.000125997881 ' coversion: lb/h -> kg/s,  1 (pound per hour) = 0.000125997881 kilogram per second
-                Catch ex As Exception
-                    Logger.Msg("Change Nitrogen load unit problem for: " & lOutputWDMName)
-                    Exit Sub
-                End Try
-
-                lConc.Clear()
-                Try
-                    lConc = lLoadSum / lFlow ' here unit is: number of kg / L /s
-                Catch ex As Exception
-                    Logger.Msg("Calc Nitrogen concentration problem for: " & lOutputWDMName)
-                    Exit Sub
-                End Try
-
-                'Change Nitrogen concentration to mg/L by multiplying 1000 * 1000
-                lConcNewUnit.Clear()
-                Try
-                    lConcNewUnit = lConc * (1000 * 1000)
-                Catch ex As Exception
-                    Logger.Msg("Calc final nitrogen concentration problem for: " & lOutputWDMName)
-                    Exit Sub
-                End Try
-
-                'Rid of Infinitys from TSers
-                For i As Integer = 0 To lFlow.numValues - 1
-                    If Double.IsInfinity(lFlow.Value(i)) Then lFlow.Value(i) = Double.NaN
-                    If Double.IsInfinity(lLoadSumNewUnit.Value(i)) Then lLoadSumNewUnit.Value(i) = Double.NaN
-                    If Double.IsInfinity(lConcNewUnit.Value(i)) Then lConcNewUnit.Value(i) = Double.NaN
-                Next
-
-                lDataGroup.Clear()
-                lFlow.Attributes.SetValue("Constituent", "FDC")
-                lDataGroup.Add(lFlow)
-                lLoadSum.Attributes.SetValue("Constituent", "LDC (Nitrogen)")
-                lDataGroup.Add(lLoadSum)
-                lConcNewUnit.Attributes.SetValue("Constituent", "CDC (Nitrogen)")
-                lDataGroup.Add(lConcNewUnit)
-
-                'Do the duration graph for nitrogen
-                'lscen = IO.Path.GetFileNameWithoutExtension(lOWDM) ' use from above
-                lGraphFilename = IO.Path.Combine(lBaseFolder, lscen) & "_dur_nitro" & pGraphSaveFormat
-
-                InitMatchingColors(FindFile("", "GraphColors.txt")) 'Becky moved this here from atcGraph10/CreateZgc so that
-                'the file is found ONCE instead of a gazillion times and the colors are initialized ONCE rather than a gazillion
-                'times
-
-                lZgc = CreateZgc()
-                lZgc.Width = lGraphSaveWidth
-                lZgc.Height = lGraphSaveHeight
-                lGraphDur = New clsGraphProbability(lDataGroup, lZgc)
-
-                With lGraphDur.ZedGraphCtrl.GraphPane
-                    If lscen.StartsWith("base.") Then
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Nitrogen : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : base"
-                    Else
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Nitrogen : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
-                    End If
-
-                    With .XAxis
-                        .Scale.Min = 0.0000001
-                    End With
-                    With .Y2Axis
-                        .Type = AxisType.Log
-                        .Scale.IsUseTenPower = False
-                        .MajorGrid.IsVisible = False
-                        .MinorGrid.IsVisible = False
-
-                        '.Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec"
-                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) lb/h"
-                        '.Scale.MinAuto = True
-                        '.Scale.MaxAuto = True
-
-                        'If .Scale.Min < 1 Then
-                        '    .Scale.Min = 0.000001
-                        'End If
-                        '.Scale.Max = 100000
-                        .IsVisible = True
-                    End With
-                    If .YAxis.Scale.Min < 1 Then
-                        .YAxis.Scale.MinAuto = False
-                        .YAxis.Scale.Min = 1
-                        '.YAxis.Scale.Max = 1000000
-                        .YAxis.MajorGrid.IsVisible = False
-                        .YAxis.MinorGrid.IsVisible = False
-                        .YAxis.Title.Text = "Flow Rate (FDC) L/sec"
-                        .AxisChange()
-                    End If
-                    .CurveList("FDC").Color = Drawing.Color.BlueViolet
-                    .CurveList("LDC (Nitrogen)").Color = Drawing.Color.DarkKhaki
-                    .CurveList("CDC (Nitrogen)").Color = Drawing.ColorTranslator.FromHtml("#ff0099")
-                    .CurveList("LDC (Nitrogen)").IsY2Axis = True
-                    .CurveList("CDC (Nitrogen)").IsY2Axis = True
-                End With
-
-                Try
-                    lZgc.SaveIn(lGraphFilename)
-                Catch ex As Exception
-                    lp &= "P:Nitrogen:"
-                    'Stop
-                End Try
-                lGraphDur.Dispose()
-                lZgc.Dispose()
-
-                '******* PO4 *******
-                '******* PO4 Begins *******
-                '******* PO4 *******
-                ' Phosphorus loading
-                'Get Tot-P
-                ' Need 941 - 'NUCF9, PO4D
-                ' Need 942 - 'OSPO4, PO4A
-                ' Need 943 - 'OSPO4, PO4I
-                ' Need 944 - 'OSPO4, PO4C
-                ' Need 945 - 'PKCF2, RORP
-                ' Need OXCF2 - 951 - BODA; multiplier: 0.006031224 (i.e. (31*49)/(1200*106)/1.98)
-                ' Need PKCF2 - 953 - PHYT; multiplier: 0.011941824 (i.e. (31*49)/(1200*106))
-                lLoadSum.Clear()
-                Dim lPO4D As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(941)
-                Dim lPO4A As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(942)
-                Dim lPO4I As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(943)
-                Dim lPO4C As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(944)
-                Dim lRORP As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(945)
-                Dim lBODA As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(951) * 0.006031224
-                Dim lPHYT As atcTimeseries = lOutputWdmDataSource.DataSets.ItemByKey(953) * 0.011941824
-                Try
-                    lLoadSum = lPO4D
-                    lLoadSum = lLoadSum + lPO4A
-                    lLoadSum = lLoadSum + lPO4I
-                    lLoadSum = lLoadSum + lPO4C
-                    lLoadSum = lLoadSum + lRORP
-                    lLoadSum = lLoadSum + lBODA
-                    lLoadSum = lLoadSum + lPHYT
-                Catch ex As Exception
-                    Logger.Msg("Adding Phosphorus problem for: " & lOutputWDMName)
-                    Exit Sub
-                End Try
-
-                lLoadSumNewUnit.Clear()
-                Try
-                    lLoadSumNewUnit = lLoadSum * 0.000125997881 ' coversion: lb/h -> kg/s,  1 (pound per hour) = 0.000125997881 kilogram per second
-                Catch ex As Exception
-                    Logger.Msg("Changen unit for Phosphorus load problem for: " & lOutputWDMName)
-                    Exit Sub
-                End Try
-
-                lConc.Clear()
-                Try
-                    lConc = lLoadSumNewUnit / lFlow ' here unit is: number of kg / L
-                Catch ex As Exception
-                    Logger.Msg("Calc Phosphorus concentration problem for: " & lOutputWDMName)
-                    Exit Sub
-                End Try
-
-                lConcNewUnit.Clear()
-                Try
-                    lConcNewUnit = lConc * (1000 * 1000) ' convert unit to mg /L
-                Catch ex As Exception
-                    Logger.Msg("Change Phosphorus concentration unit problem for: " & lOutputWDMName)
-                    Exit Sub
-                End Try
-
-                'Rid of Infinitys from TSers
-                For i As Integer = 0 To lFlow.numValues - 1
-                    If Double.IsInfinity(lFlow.Value(i)) Then lFlow.Value(i) = Double.NaN
-                    If Double.IsInfinity(lLoadSumNewUnit.Value(i)) Then lLoadSumNewUnit.Value(i) = Double.NaN
-                    If Double.IsInfinity(lConcNewUnit.Value(i)) Then lConcNewUnit.Value(i) = Double.NaN
-                Next
-
-                lDataGroup.Clear()
-                lFlow.Attributes.SetValue("Constituent", "FDC")
-                lDataGroup.Add(lFlow)
-                lLoadSum.Attributes.SetValue("Constituent", "LDC (Phosphorus)") ' graph original as converted units are not working for phos
-                lDataGroup.Add(lLoadSum)
-                lConcNewUnit.Attributes.SetValue("Constituent", "CDC (Phosphorus)")
-                lDataGroup.Add(lConcNewUnit)
-
-                'Do the duration graph for nitrogen
-                'lscen = IO.Path.GetFileNameWithoutExtension(lOWDM) ' use from above
-                lGraphFilename = IO.Path.Combine(lBaseFolder, lscen) & "_dur_phos" & pGraphSaveFormat
-
-                lZgc = CreateZgc()
-                lZgc.Width = lGraphSaveWidth
-                lZgc.Height = lGraphSaveHeight
-                lGraphDur = New clsGraphProbability(lDataGroup, lZgc)
-                'Dim lGraphDuro As New clsGraphTime(lDataGroup, lZgc)
-
-                With lGraphDur.ZedGraphCtrl.GraphPane
-                    If lscen.StartsWith("base.") Then
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Phosphorus : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : base"
-                    Else
-                        .XAxis.Title.Text = "Normal Percentile (% greater than): Phosphorus : " & lBaseFolder.Substring(lBaseFolder.LastIndexOf("\") + 1) & " : " & lscen.Substring(0, lscen.Length - lscen.LastIndexOf(".base.output") + 1)
-                    End If
-
-                    With .XAxis
-                        .Scale.Min = 0.0000001
-                    End With
-                    With .Y2Axis
-                        .Type = AxisType.Log
-                        .Scale.IsUseTenPower = False
-                        .MajorGrid.IsVisible = False
-                        .MinorGrid.IsVisible = False
-                        '.Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) kg/sec"
-                        .Title.Text = "Concentration (CDC) mg/L and" & vbCrLf & "Load Rate (LDC) lb/h"
-                        '.Scale.MinAuto = True
-                        '.Scale.MaxAuto = True
-                        'If .Scale.Min < 1 Then
-                        '    .Scale.Min = 0.000001
-                        'End If
-                        '.Scale.Max = 100000
-                        .IsVisible = True
-                    End With
-                    'If .YAxis.Scale.Min < 1 Then
-                    .YAxis.Scale.MinAuto = False
-                    .YAxis.Scale.Min = 0.0000001
-                    '    .YAxis.Scale.Min = 1
-                    '    '.YAxis.Scale.Max = 1000000
-                    '    .YAxis.MajorGrid.IsVisible = False
-                    '    .YAxis.MinorGrid.IsVisible = False
-                    '    .YAxis.Title.Text = "Flow Rate (FDC) L/sec"
-                    '    .AxisChange()
-                    'End If
-                    .CurveList("FDC").Color = Drawing.Color.BlueViolet
-                    .CurveList("LDC (Phosphorus)").Color = Drawing.ColorTranslator.FromHtml("#ff3366")
-                    .CurveList("CDC (Phosphorus)").Color = Drawing.ColorTranslator.FromHtml("#cc9933")
-                    .CurveList("LDC (Phosphorus)").IsY2Axis = True
-                    .CurveList("CDC (Phosphorus)").IsY2Axis = True
-                End With
-
-                Try
-                    lZgc.SaveIn(lGraphFilename)
-                Catch ex As Exception
-                    lp &= "P:Phos:"
-                    'Stop
-                End Try
-                lGraphDur.Dispose()
-                lZgc.Dispose()
-
-                If lp.StartsWith("P:") Then
-                    IO.File.AppendAllText(lf, lp & lGraphFilename & vbCrLf)
-                End If
-
-                If lFlow IsNot Nothing Then lFlow.Clear()
-                If lLoadSum IsNot Nothing Then lLoadSum.Clear()
-                If lLoadSumNewUnit IsNot Nothing Then lLoadSumNewUnit.Clear()
-                If lConc IsNot Nothing Then lConc.Clear()
-                If lConcNewUnit IsNot Nothing Then lConcNewUnit.Clear()
-                If lDataGroup IsNot Nothing Then lDataGroup.Clear()
-                If lOutputWDMName = lOutputWDMNames.Item(lOutputWDMNames.Keys.Count - 1).ToString Then
-                    Logger.Msg("Done processing last output WDM in this folder")
-                End If
-            Next ' lOWDM in lOutputWDMS within a given scen lfld
-            If lOutputWDMNames IsNot Nothing Then lOutputWDMNames.Clear()
-        Next ' lfld in pBaseFolders
+    Public Sub RWZSetArgs(ByVal aTimeseries As atcTimeseries)
+        Dim lTSerStats As New atcTimeseriesStatistics.atcTimeseriesStatistics 'define new statistics object so can access statistics methods
+        Dim lAttrArgs As New atcDataAttributes 'needed argument for open below
+        lAttrArgs = lTSerStats.AvailableOperations 'this sets up all the different calculations with the correct properties (copiesinherit etc.)
+        'this is necessary because otherwise the properties from the main timeseries get copied to the 
+        'aggregated timeseries and the monthly attributes aren't calculated correctly with the seasonal Aggregate and Split functions
+        lAttrArgs.SetValue("timeseries", aTimeseries) 'tie the DataAttributes to the source timeseries
+        With lTSerStats
+            .Open("Sum", lAttrArgs) 'sending anything that doesn't start with "%" or "bins" computes everything in atcTimerseriesStatistics.ComputeStatistics (including Sum)
+            .Open("bins", lAttrArgs) 'set the bins needed for the remaining calculations, add as attribute
+            .Open("%Sum90", lAttrArgs) 'calculate the sum of values for the 90th percentile, add as attribute
+            .Open("%Sum75", lAttrArgs) 'calculate the sum of values for the 75th percentile, add as attribute
+            .Open("%Sum50", lAttrArgs) 'calculate the sum of values for the 50th percentile, add as attribute
+            .Open("%Sum25", lAttrArgs) 'calculate the sum of values for the 25th percentile, add as attribute
+            .Open("%Sum10", lAttrArgs) 'calculate the sum of values for the 10th percentile, add as attribute
+            .Open("%50", lAttrArgs) 'calculate the 50th percentile value, add as attribute
+        End With
     End Sub
 
-    Private Function foundQResult(ByVal aScen As String) As Boolean
-        Dim lqList As New ArrayList
-        lqList.Add("a_10_gfdl_f30.base.output.wdm")
-        lqList.Add("b_10_gfdl_f30.base.output.wdm")
-        lqList.Add("a_70_gfdl_f30.base.output.wdm")
-        lqList.Add("b_70_gfdl_f30.base.output.wdm")
-        lqList.Add("C:\mono_luChange\output\lu2090a2\a_70_cccm_f10.base.output.wdm")
-        lqList.Add("C:\mono_luChange\output\lu2090a2\a_70_ccsr_m.base.output.wdm")
-        lqList.Add("C:\mono_luChange\output\lu2090a2\a_70_csir_m.base.output.wdm")
-        lqList.Add("C:\mono_luChange\output\lu2090a2\a_70_gfdl_f10.base.output")
-
-
-        foundQResult = False
-        For Each ls As String In lqList
-            If aScen.Contains(ls) Then
-                foundQResult = True
-                Exit For
-            End If
-        Next
-    End Function
 End Module
