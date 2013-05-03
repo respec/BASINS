@@ -205,7 +205,7 @@ Public Class atcNetCDFVariable
                 nc(NetCDF.nc_get_vara_short(ParentFile.NcID, ID, lStartP, lCount, lValues))
                 lReturnValues = lValues
         End Select
-        If lReturnValues IsNot Nothing Then
+        If ParentFile.Debug AndAlso lReturnValues IsNot Nothing Then
             Dim lValueDumpCount As Integer = Math.Min(pValueDumpMax, aTimeLength - 1)
             If lValueDumpCount > 0 Then
                 For lValueIndex = 0 To lValueDumpCount
