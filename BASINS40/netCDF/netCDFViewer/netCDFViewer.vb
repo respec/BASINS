@@ -59,6 +59,9 @@ Module netCDFViewer
                 Dim lDataTree As New atcDataTree.atcDataTreePlugin
                 Dim lDataTreeFileName As String = IO.Path.ChangeExtension(lFileName.Replace(".nc", "#.nc"), "list")
                 Dim lXYString As String = "_Y" & (lTimeseries.Attributes.GetValue("Y Index")) & "_X" & (lTimeseries.Attributes.GetValue("X Index"))
+                If lXYString = "_Y_X" Then
+                    lXYString = lTimeseries.Attributes.GetValue("Location")
+                End If
                 lDataTree.Save(New atcData.atcTimeseriesGroup(lTimeseries), lDataTreeFileName.Replace("#", lXYString), "Display 25")
             Next
 

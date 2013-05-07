@@ -111,9 +111,12 @@ Public Class atcTimeseriesNetCDF
                         Return False
                     Else 'how many timeseries?
                         Dim lTimeseriesCount As Integer = 1
+                        Dim lUniqueLocations As New atcCollection
                         If lAggregateGridFile IsNot Nothing Then
                             'aggregating, how many unique values in aggregate file
-                            Dim lUniqueValues As atcCollection = FindUniqueValues(lAggregateGridFile)
+                            lUniqueLocations = FindUniqueValues(lAggregateGridFile)
+                            lTimeseriesCount = lUniqueLocations.Count
+                            Logger.Dbg("UniqueLocations: " & lTimeseriesCount)
                         Else
                             If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
                                 lTimeseriesCount = lNetCDFFile.NorthSouthDimension.Length
@@ -182,7 +185,11 @@ Public Class atcTimeseriesNetCDF
                         Dim lXValue As String = ""
                         For lTimeseriesIndex As Integer = 0 To lTimeseriesCount - 1
                             Dim lLocation As String = ""
-                            If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
+                            If lUniqueLocations.Count > 0 Then
+                                If lUniqueLocations.Keys(lTimeseriesIndex) <> 0 Then
+                                    lLocation = "ID_" & lUniqueLocations.Keys(lTimeseriesIndex)
+                                End If
+                            ElseIf lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
                                 lYValue = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex - 1)
                                 lLocation &= "Y:" & lYValue
                             ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension Is Nothing Then
@@ -195,7 +202,9 @@ Public Class atcTimeseriesNetCDF
                                 lLocation &= " Y:" & lYValue
                             End If
 
-                            If Not lGetOnlyOneTimseries OrElse (lYIndex = lYIndexToget AndAlso lXIndex = lXIndexToget) Then
+                            If Not lGetOnlyOneTimseries OrElse _
+                                (lYIndex = lYIndexToget AndAlso lXIndex = lXIndexToget) OrElse _
+                                lUniqueLocations.Count > 0 AndAlso lLocation.Length > 0 Then
                                 Dim lTimeseries As New atcTimeseries(Me)
                                 Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
 
@@ -203,32 +212,28 @@ Public Class atcTimeseriesNetCDF
                                     lTimeseries.Attributes.SetValue(lDataAttribute.Definition.Name, lDataAttribute.Value)
                                 Next
                                 lTimeseries.Attributes.SetValue("NetCDFValues", lDataVariable)
+                                If lUniqueLocations.Count > 0 AndAlso lLocation.Length > 0 Then
+                                    lTimeseries.Attributes.SetValue("Location Indexes", lUniqueLocations(lTimeseriesIndex))
+                                End If
 
                                 lTimeseries.SetInterval(lTimeUnit, 1)
                                 lTimeseries.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(lFileName))
                                 lTimeseries.Attributes.SetValue("ID", lTimeseriesIndex + 1)
-                                If lNetCDFFile.NorthSouthDimension IsNot Nothing Then
-                                    lTimeseries.Attributes.SetValue("Y", lYValue)
-                                    lTimeseries.Attributes.SetValue("Y index", lYIndex)
-                                End If
-                                If lNetCDFFile.EastWestDimension IsNot Nothing Then
-                                    lTimeseries.Attributes.SetValue("X", lXValue)
-                                    lTimeseries.Attributes.SetValue("X index", lXIndex)
+                                If lUniqueLocations.Count = 0 Then
+                                    If lNetCDFFile.NorthSouthDimension IsNot Nothing Then
+                                        lTimeseries.Attributes.SetValue("Y", lYValue)
+                                        lTimeseries.Attributes.SetValue("Y index", lYIndex)
+                                    End If
+                                    If lNetCDFFile.EastWestDimension IsNot Nothing Then
+                                        lTimeseries.Attributes.SetValue("X", lXValue)
+                                        lTimeseries.Attributes.SetValue("X index", lXIndex)
+                                    End If
                                 End If
                                 lTimeseries.Attributes.SetValue("Location", lLocation)
-
-                                'If lTimeVariable.ID > 0 Then
-                                '    lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex)
-                                '    lTimeseries.Attributes.SetValue("Increment", lTimeseriesCount)
-                                'Else
-                                '    lTimeseries.Attributes.SetValue("Base", lTimeseriesIndex * lNumValues)
-                                '    lTimeseries.Attributes.SetValue("Increment", 1)
-                                'End If
-
                                 lTimeseries.ValuesNeedToBeRead = True
                                 lTimeseries.Dates = lDates
 
-                                Me.DataSets.Add(lTimeseries)
+                                If lLocation.Length > 0 Then Me.DataSets.Add(lTimeseries)
                             End If
 
                             If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
@@ -274,13 +279,33 @@ Public Class atcTimeseriesNetCDF
         Dim lTimeseries As atcTimeseries = aData
         Dim lNumValues As Integer = lTimeseries.Dates.numValues
         Dim lDataVariable As atcNetCDFVariable = lTimeseries.Attributes.GetValue("NetCDFValues")
-        Dim lXIndex As Integer = lTimeseries.Attributes.GetValue("X index")
-        Dim lYIndex As Integer = lTimeseries.Attributes.GetValue("Y index")
-        Dim lValues = lDataVariable.ReadArray(lNumValues, lXIndex - 1, lYIndex - 1)
-        ReDim lTimeseries.Values(lNumValues)
-        For lTimeIndex As Integer = 0 To lNumValues - 1
-            lTimeseries.Values(lTimeIndex + 1) = lValues(lTimeIndex)
-        Next
+        Dim lAggregateLocation As ArrayList = lTimeseries.Attributes.GetValue("Location Indexes")
+        If lAggregateLocation Is Nothing Then
+            Dim lXIndex As Integer = lTimeseries.Attributes.GetValue("X index")
+            Dim lYIndex As Integer = lTimeseries.Attributes.GetValue("Y index")
+            Dim lValues = lDataVariable.ReadArray(lNumValues, lXIndex - 1, lYIndex - 1)
+            ReDim lTimeseries.Values(lNumValues)
+            For lTimeIndex As Integer = 0 To lNumValues - 1
+                lTimeseries.Values(lTimeIndex + 1) = lValues(lTimeIndex)
+            Next
+        Else
+            Logger.Dbg("Aggregating " & lAggregateLocation.Count & " points ")
+            ReDim lTimeseries.Values(lNumValues)
+            Dim lIndex As Integer = 1
+            For Each lXYPair As String In lAggregateLocation
+                Logger.Dbg("  Process " & lIndex & " of " & lAggregateLocation.Count & " at " & lXYPair)
+                Dim lXIndex As Integer = StrRetRem(lXYPair)
+                Dim lYIndex As Integer = lXYPair
+                Dim lValues = lDataVariable.ReadArray(lNumValues, lXIndex, lYIndex)
+                For lTimeIndex As Integer = 0 To lNumValues - 1
+                    lTimeseries.Values(lTimeIndex + 1) += lValues(lTimeIndex)
+                Next
+                lIndex += 1
+            Next
+            For lTimeIndex As Integer = 0 To lNumValues - 1
+                lTimeseries.Values(lTimeIndex + 1) /= lAggregateLocation.Count
+            Next
+        End If
     End Sub
 
     Private Function FindUniqueValues(ByVal aAggregateGridFile As atcNetCDFFile) As atcCollection

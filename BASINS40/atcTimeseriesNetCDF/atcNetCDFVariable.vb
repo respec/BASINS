@@ -102,7 +102,7 @@ Public Class atcNetCDFVariable
         End Select
     End Function
 
-    Private Shared Function ReadArray(ByVal ncid As Int32, ByVal aVariableID As Int32, ByVal xtype As NetCDF.nc_type, ByVal aDimensionLength As Integer) As Array
+    Private Function ReadArray(ByVal ncid As Int32, ByVal aVariableID As Int32, ByVal xtype As NetCDF.nc_type, ByVal aDimensionLength As Integer) As Array
         Dim lReturnValues As Array = Nothing
 
         Select Case xtype
@@ -139,9 +139,14 @@ Public Class atcNetCDFVariable
         If lReturnValues IsNot Nothing Then
             Dim lValueDumpCount As Integer = Math.Min(pValueDumpMax, aDimensionLength - 1)
             If lValueDumpCount > 0 Then
-                For lValueIndex = 0 To lValueDumpCount
-                    Logger.Dbg("value (" & lValueIndex & ") = " & Str(lReturnValues(lValueIndex)))
-                Next
+                If ParentFile.Debug Then
+                    For lValueIndex = 0 To lValueDumpCount
+                        Logger.Dbg("value (" & lValueIndex & ") = " & Str(lReturnValues(lValueIndex)))
+                    Next
+                Else
+                    Logger.Dbg("value (0) = " & Str(lReturnValues(0)))
+                    Logger.Dbg("value (" & lValueDumpCount & ") " & Str(lReturnValues(lValueDumpCount)))
+                End If
             End If
         End If
         Return lReturnValues
