@@ -23,29 +23,29 @@ Partial Class StartUp
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(StartUp))
-        Me.cmdStart = New System.Windows.Forms.Button()
-        Me.cmdBrowse = New System.Windows.Forms.Button()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.txtUCIPath = New System.Windows.Forms.TextBox()
-        Me.lblPrefix = New System.Windows.Forms.Label()
-        Me.lblPrefixWarning = New System.Windows.Forms.Label()
-        Me.txtPrefix = New System.Windows.Forms.TextBox()
-        Me.lblRCH = New System.Windows.Forms.Label()
-        Me.txtRCH = New System.Windows.Forms.TextBox()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.txtRunNo = New System.Windows.Forms.TextBox()
-        Me.lblRunNo = New System.Windows.Forms.Label()
-        Me.lblRunNoInfo = New System.Windows.Forms.Label()
-        Me.txtRootPath = New System.Windows.Forms.TextBox()
-        Me.lblRootDirectory = New System.Windows.Forms.Label()
-        Me.pnlHighlight = New System.Windows.Forms.Panel()
-        Me.lblOutReach2 = New System.Windows.Forms.Label()
-        Me.cmdEnd = New System.Windows.Forms.Button()
-        Me.chkAreaReports = New System.Windows.Forms.CheckBox()
-        Me.chkGraphs = New System.Windows.Forms.CheckBox()
-        Me.chkGraphStandard = New System.Windows.Forms.CheckBox()
-        Me.chkLogGraphs = New System.Windows.Forms.CheckBox()
-        Me.chkSupportingGraphs = New System.Windows.Forms.CheckBox()
+        Me.cmdStart = New System.Windows.Forms.Button
+        Me.cmdBrowse = New System.Windows.Forms.Button
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.txtUCIPath = New System.Windows.Forms.TextBox
+        Me.lblPrefix = New System.Windows.Forms.Label
+        Me.lblPrefixWarning = New System.Windows.Forms.Label
+        Me.txtPrefix = New System.Windows.Forms.TextBox
+        Me.lblRCH = New System.Windows.Forms.Label
+        Me.txtRCH = New System.Windows.Forms.TextBox
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.txtRunNo = New System.Windows.Forms.TextBox
+        Me.lblRunNo = New System.Windows.Forms.Label
+        Me.lblRunNoInfo = New System.Windows.Forms.Label
+        Me.txtRootPath = New System.Windows.Forms.TextBox
+        Me.lblRootDirectory = New System.Windows.Forms.Label
+        Me.pnlHighlight = New System.Windows.Forms.Panel
+        Me.lblOutReach2 = New System.Windows.Forms.Label
+        Me.cmdEnd = New System.Windows.Forms.Button
+        Me.chkAreaReports = New System.Windows.Forms.CheckBox
+        Me.chkGraphs = New System.Windows.Forms.CheckBox
+        Me.chkGraphStandard = New System.Windows.Forms.CheckBox
+        Me.chkLogGraphs = New System.Windows.Forms.CheckBox
+        Me.chkSupportingGraphs = New System.Windows.Forms.CheckBox
         Me.SuspendLayout()
         '
         'cmdStart
@@ -120,11 +120,12 @@ Partial Class StartUp
         '
         Me.lblRCH.AutoSize = True
         Me.lblRCH.Location = New System.Drawing.Point(12, 207)
-        Me.lblRCH.MaximumSize = New System.Drawing.Size(500, 0)
+        Me.lblRCH.MaximumSize = New System.Drawing.Size(190, 0)
         Me.lblRCH.Name = "lblRCH"
-        Me.lblRCH.Size = New System.Drawing.Size(194, 13)
+        Me.lblRCH.Size = New System.Drawing.Size(188, 39)
         Me.lblRCH.TabIndex = 7
-        Me.lblRCH.Text = "What is the number of the outlet reach?"
+        Me.lblRCH.Text = "What is the number of the outlet reach at which you would like area and water bal" & _
+            "ance reports?"
         Me.lblRCH.Visible = False
         '
         'txtRCH

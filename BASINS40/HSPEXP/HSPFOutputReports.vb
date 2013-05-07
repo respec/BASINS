@@ -278,9 +278,12 @@ Module HSPFOutputReports
 
                     'Becky added these to output advice
                     pProgressBar.txtProgress.Text &= Now & " Creating advice to save in " & pBaseName & ".adv" & vbCrLf
-                    Dim lAdviceStr As String = "Advice for Calibration Run " & pBaseName & vbCrLf & Now & vbCrLf & vbCrLf
-                    lExpertSystem.CalcAdvice(lAdviceStr)
-                    SaveFileString(lOutFolderName & pBaseName & ".adv", lAdviceStr)
+                    For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
+                        Dim lAdviceStr As String = "Advice for Calibration Run " & pBaseName & vbCrLf & Now & vbCrLf & vbCrLf
+                        lExpertSystem.CalcAdvice(lAdviceStr, lSiteIndex)
+                        Dim lSiteNam As String = lExpertSystem.Sites(lSiteIndex - 1).Name
+                        SaveFileString(lOutFolderName & pBaseName & "." & lSiteNam & ".adv", lAdviceStr)
+                    Next
 
                     'lStr = lExpertSystem.AsString 'NOTE:just testing
                     'SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
