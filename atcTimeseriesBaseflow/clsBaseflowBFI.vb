@@ -303,8 +303,12 @@ Public Class clsBaseflowBFI
         Dim lTsDayTp As atcTimeseries = aTsDAYMIN.Clone()
         For I As Integer = 1 To aTsFlow.numValues / PartitionLengthInDays 'loop 80
             lTurnPt = False
-            lTurnPt = TestForTurningPoint(aTsQMINS.Value(I - 1), aTsQMINS.Value(I), aTsQMINS.Value(I + 1), _
-                                aTsDAYMIN.Value(I - 1), aTsDAYMIN.Value(I), aTsDAYMIN.Value(I + 1), Method)
+            If I + 1 > aTsQMINS.numValues OrElse I + 1 > aTsDAYMIN.numValues Then
+                'Do nothing if search got past the last streamflow data point
+            Else
+                lTurnPt = TestForTurningPoint(aTsQMINS.Value(I - 1), aTsQMINS.Value(I), aTsQMINS.Value(I + 1), _
+                                    aTsDAYMIN.Value(I - 1), aTsDAYMIN.Value(I), aTsDAYMIN.Value(I + 1), Method)
+            End If
             If lTurnPt Then
                 If lFirstTpDateIndex < 0 Then
                     lFirstTpDateIndex = aTsDAYMIN.Value(I)
