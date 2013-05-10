@@ -6,6 +6,7 @@ Imports ATCutility
 
 Module WDMGlobal
 
+    Friend g_MapWin As MapWindow.Interfaces.IMapWin
     Private pUnitsDef As atcAttributeDefinition
     Private pUnitsDefEditable As atcAttributeDefinition
 
