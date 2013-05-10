@@ -132,9 +132,11 @@ Public Module modBasinsPlugin
             Try
                 With lDriveInfo
                     lCheckDir = .Name & aPathToSearchFor
-                    Logger.Status("Checking for " & lCheckDir, True)
-                    If .IsReady AndAlso .DriveType = IO.DriveType.Fixed OrElse .DriveType = IO.DriveType.Network Then
-                        CheckDataDir(lCheckDir)
+                    If Not g_BasinsDataDirs.Contains(lCheckDir) Then
+                        Logger.Status("Checking for " & lCheckDir, True)
+                        If .IsReady AndAlso .DriveType = IO.DriveType.Fixed OrElse .DriveType = IO.DriveType.Network Then
+                            CheckDataDir(lCheckDir)
+                        End If
                     End If
                 End With
             Catch 'Skip drives that we cannot successfully check
@@ -173,18 +175,21 @@ Public Module modBasinsPlugin
                     End If
                 Next
             End If
+            If Not FileExists(lFileName) Then
+                lFileName = FindFile("Please locate BASINS national project", NationalProjectFilename, , , True)
+            End If
             If FileExists(lFileName) Then  'load national project
                 g_Project.Load(lFileName)
                 g_MapWin.View.ClearSelectedShapes()
                 g_Project.Modified = False
                 'See if we need to also process and load place names
-                Dim lInstructions As String = D4EMDataManager.SpatialOperations.CheckPlaceNames(IO.Path.GetDirectoryName(lFileName), g_Project.ProjectProjection)
-                If lInstructions.Length > 0 Then
-                    Dim lDisplayMessageBoxes As Boolean = Logger.DisplayMessageBoxes
-                    Logger.DisplayMessageBoxes = False 'Don't show a message box after adding these layers
-                    ProcessDownloadResults(lInstructions)
-                    Logger.DisplayMessageBoxes = lDisplayMessageBoxes
-                End If
+                'Dim lInstructions As String = D4EMDataManager.SpatialOperations.CheckPlaceNames(IO.Path.GetDirectoryName(lFileName), g_Project.ProjectProjection)
+                'If lInstructions.Length > 0 Then
+                '    Dim lDisplayMessageBoxes As Boolean = Logger.DisplayMessageBoxes
+                '    Logger.DisplayMessageBoxes = False 'Don't show a message box after adding these layers
+                '    ProcessDownloadResults(lInstructions)
+                '    Logger.DisplayMessageBoxes = lDisplayMessageBoxes
+                'End If
             Else
                 Logger.Msg("Unable to find '" & NationalProjectFilename & "'", "Open National")
                 Exit Sub
@@ -271,7 +276,7 @@ Public Module modBasinsPlugin
                 If IO.Directory.Exists(lDir) Then Return lDir
             Catch
             End Try
-            Return g_PathChar & BasinsDataPath
+            Return IO.Path.GetPathRoot(CurDir) & BasinsDataPath
         End If
     End Function
 

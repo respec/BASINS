@@ -1,0 +1,13 @@
+<SFRendering>
+  <Layer Name="NWIS Periodic Groundwater" GroupName="Observed Data Stations" Type="1" Path="NWIS\NWIS_Stations_gw_periodic.shp" Tag="" LegendPicture="" Visible="False" LabelsVisible="True" Expanded="False">
+    <Image Type="">
+    </Image>
+    <ShapeFileProperties LabelsVisible="True" MapTooltipField="-1" MapTooltipsEnabled="False" VerticesVisible="True" Color="49152" DrawFill="True" TransparencyPercent="1" FillStipple="0" LineOrPointSize="8" LineStipple="0" OutLineColor="0" PointType="2" CustomLineStipple="0" UseTransparency="False" TransparencyColor="0" FillStippleTransparent="False" FillStippleLineColor="-4587520">
+      <CustomPointType>
+        <Image Type="">
+        </Image>
+      </CustomPointType>
+    </ShapeFileProperties>
+    <DynamicVisibility UseDynamicVisibility="False" Scale="0" />
+  </Layer>
+</SFRendering>

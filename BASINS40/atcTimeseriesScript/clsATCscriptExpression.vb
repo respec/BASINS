@@ -4,7 +4,7 @@ Option Explicit On
 Imports atcUtility
 Imports MapWinUtility
 
-<System.Runtime.InteropServices.ProgId("clsATCscriptExpression_NET.clsATCscriptExpression")> Public Class clsATCscriptExpression
+Public Class clsATCscriptExpression
     'Copyright 2002 by AQUA TERRA Consultants
 
     Private MySubExpressions As Generic.List(Of clsATCscriptExpression)
@@ -20,7 +20,7 @@ Imports MapWinUtility
         Dim ColWidth As Integer
     End Structure
 
-    'Be sure to synchronize with TokenString array below
+    'Be sure to synchronize with Public TokenString As String() in modATCscript
     Public Enum ATCsToken
         tok_Unknown = 0
         'tok_Abs
@@ -70,16 +70,12 @@ Imports MapWinUtility
         tok_Last
     End Enum
 
-    'UPGRADE_NOTE: Class_Initialize was upgraded to Class_Initialize_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-    Private Sub Class_Initialize_Renamed()
+    Public Sub New()
+        MyBase.New()
         MySubExpressions = New Generic.List(Of clsATCscriptExpression)
         MyNumSubExpressionsOnSameLine = 9999 'By default put all subexp on same line
         MyLong = 0
         MyString = ""
-    End Sub
-    Public Sub New()
-        MyBase.New()
-        Class_Initialize_Renamed()
     End Sub
 
     Public Property Line() As Integer
@@ -93,7 +89,6 @@ Imports MapWinUtility
 
     Public Property Name() As String
         Get
-            'UPGRADE_WARNING: Couldn't resolve default property of object TokenString(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
             Name = TokenString(MyToken)
         End Get
         Set(ByVal Value As String)
@@ -107,7 +102,6 @@ Imports MapWinUtility
         End Get
         Set(ByVal Value As ATCsToken)
             MyToken = Value
-            'UPGRADE_NOTE: Object MySubExpressions may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
             MySubExpressions = Nothing
             MySubExpressions = New Generic.List(Of clsATCscriptExpression)
             Select Case MyToken
@@ -547,7 +541,7 @@ ParseFixedDef:
         If cnt >= 2 Then
             mo = MySubExpressions.Item(1).Evaluate
             If cnt < 3 Then
-                da = daymon(yr, mo)
+                da = DayMon(yr, mo)
             Else
                 da = MySubExpressions.Item(2).Evaluate
                 If cnt >= 4 Then

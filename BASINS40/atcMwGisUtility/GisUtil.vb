@@ -1441,14 +1441,14 @@ Public Class GisUtil
                         aAreaGridPoly(lGridValue, lInsideId) += lCellArea
                     End If
                     If aMeanLatGridPoly IsNot Nothing Then
-                        If lGridValue > -1 And lGridValue <= aMeanLatGridPoly.GetUpperBound(0) Then
+                        If lGridValue > -1 AndAlso lGridValue <= aMeanLatGridPoly.GetUpperBound(0) Then
                             'store weighted average mean latitude
                             aMeanLatGridPoly(lGridValue, lInsideId) = (lYLat + (aMeanLatGridPoly(lGridValue, lInsideId) * lCountMeanLatLS(lGridValue, lInsideId))) / (lCountMeanLatLS(lGridValue, lInsideId) + 1)
                             lCountMeanLatLS(lGridValue, lInsideId) += 1
                         End If
                     End If
                     If aMeanElevGridPoly IsNot Nothing AndAlso lElevGrid IsNot Nothing Then
-                        If lGridValue > -1 And lGridValue <= aMeanElevGridPoly.GetUpperBound(0) Then
+                        If lGridValue > -1 AndAlso lGridValue <= aMeanElevGridPoly.GetUpperBound(0) Then
                             'find corresponding elevation
                             lInputGrid.CellToProj(lCol, lRow, lXElev, lYElev)
                             lElevGrid.ProjToCell(lXElev, lYElev, lColElev, lRowElev)

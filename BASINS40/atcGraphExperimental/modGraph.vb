@@ -89,7 +89,6 @@ Public Module modGraph
     <CLSCompliant(False)> _
     Sub AddTimeseriesCurves(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl)
         If aZgc.IsDisposed Then Exit Sub
-        Dim lPaneMain As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
         Dim lCommonTimeUnits As Integer = aDataGroup.CommonAttributeValue("Time Unit", -1)
         Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", -1)
 
@@ -163,19 +162,27 @@ FoundMatch:
             lMain = aZgc.MasterPane.PaneList(0)
         End If
 
-        For Each lTimeseries As atcTimeseries In aDataGroup
-            Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYaxisNames.ItemByKey(lTimeseries.Serial))
-            lCurve.Label.Text = TSCurveLabel(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
-        Next
-
-        If lLeftDataSets.Count > 0 Then
-            ScaleAxis(lLeftDataSets, lPaneMain.YAxis)
-        End If
-        If lRightDataSets.Count > 0 Then
-            ScaleAxis(lRightDataSets, lPaneMain.Y2Axis)
-            lMain.Y2Axis.MinSpace = 80
+        Dim lLeftAndRightDataSets As New atcTimeseriesGroup(lLeftDataSets)
+        lLeftAndRightDataSets.AddRange(lRightDataSets)
+        Dim lElevation As Double = GetNaN()
+        If lCommonConstituent = "GW LEVEL" AndAlso Double.TryParse(lLeftAndRightDataSets.CommonAttributeValue("Elevation", Nothing), lElevation) Then
+            MakeDepthAndElevationYAxes(aDataGroup, aZgc, lElevation, lYaxisNames, lCommonTimeUnitName, lCommonScenario, lCommonConstituent)
         Else
-            lMain.Y2Axis.MinSpace = 20
+            For Each lTimeseries As atcTimeseries In aDataGroup
+                Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYaxisNames.ItemByKey(lTimeseries.Serial))
+                lCurve.Label.Text = TSCurveLabel(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
+            Next
+
+            If lLeftDataSets.Count > 0 Then
+                ScaleAxis(lLeftDataSets, lMain.YAxis)
+            End If
+            If lRightDataSets.Count > 0 Then
+                ScaleAxis(lRightDataSets, lMain.Y2Axis)
+                lMain.Y2Axis.MinSpace = 80
+            Else
+                lMain.Y2Axis.MinSpace = 20
+            End If
+            AxisTitlesFromCommonAttributes(lMain, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
         End If
         If lAuxDataSets.Count > 0 Then
             lAux.YAxis.MinSpace = lMain.YAxis.MinSpace
@@ -191,8 +198,67 @@ FoundMatch:
             'lAux.Rect = New RectangleF(lMaxX, lAux.Rect.Y, lMinRight - lMaxX, lAux.Rect.Height)
             'lMain.Rect = New RectangleF(lMaxX, lMain.Rect.Y, lMinRight - lMaxX, lMain.Rect.Height)
         End If
+    End Sub
 
-        AxisTitlesFromCommonAttributes(lPaneMain, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
+    Private Sub MakeDepthAndElevationYAxes(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl, _
+                                           ByVal aElevation As Double, ByVal aYaxisNames As atcCollection, _
+                                           ByVal aCommonTimeUnitName As String, ByVal aCommonScenario As String, ByVal aCommonConstituent As String)
+        Dim lMain As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
+        Dim lMinElev As Double = 1.0E+30
+        Dim lMaxElev As Double = -1.0E+30
+        Dim lLeftAxisTitle As String = Nothing
+        Dim lRightAxisTitle As String = Nothing
+        For Each lTimeseries As atcTimeseries In aDataGroup
+            Dim lYAxisName As String = aYaxisNames.ItemByKey(lTimeseries.Serial)
+            If lYAxisName <> "AUX" Then
+                Select Case lTimeseries.Attributes.GetValue("parm_cd", "").ToString
+                    Case "61055", "72019" 'Data is depth below lElevation
+                        lYAxisName = "LEFT"
+                        lMinElev = Math.Min(lMinElev, aElevation - lTimeseries.Attributes.GetValue("Maximum"))
+                        lMaxElev = Math.Max(lMaxElev, aElevation - lTimeseries.Attributes.GetValue("Minimum"))
+                        lLeftAxisTitle = lTimeseries.Attributes.GetValue("Description")
+                        If lRightAxisTitle Is Nothing AndAlso lTimeseries.Attributes.ContainsAttribute("alt_datum_cd") Then
+                            lRightAxisTitle = "Groundwater elevation, feet, " & lTimeseries.Attributes.GetValue("alt_datum_cd")
+                        End If
+                    Case Else 'Data is specified as Elevation
+                        lYAxisName = "RIGHT"
+                        lMinElev = Math.Min(lMinElev, lTimeseries.Attributes.GetValue("Minimum"))
+                        lMaxElev = Math.Max(lMaxElev, lTimeseries.Attributes.GetValue("Maximum"))
+                        lRightAxisTitle = lTimeseries.Attributes.GetValue("Description")
+                End Select
+            End If
+            Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYAxisName)
+            lCurve.Label.Text = TSCurveLabel(lTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, "", "feet")
+        Next
+        With lMain.YAxis
+            If lLeftAxisTitle Is Nothing Then
+                .Title.Text = "Depth to water level, feet below land surface"
+            Else
+                .Title.Text = lLeftAxisTitle
+            End If
+            .Scale.IsReverse = True
+            .MajorTic.IsOpposite = False
+            .MinorTic.IsOpposite = False
+            Scalit(aElevation - lMaxElev, aElevation - lMinElev, .Scale.IsLog, .Scale.Min, .Scale.Max)
+        End With
+        With lMain.Y2Axis
+            If lRightAxisTitle Is Nothing Then
+                .Title.Text = "Groundwater elevation, feet"
+            Else
+                .Title.Text = lRightAxisTitle
+            End If
+            .MinSpace = 80
+            .IsVisible = True
+            .Scale.IsVisible = True
+            .MajorTic.IsOpposite = False
+            .MinorTic.IsOpposite = False
+            .MajorGrid.IsVisible = False
+            .MinorGrid.IsVisible = False
+            'Scale with elevation Scalit(lMinElev, lMaxElev, .Scale.IsLog, .Scale.Min, .Scale.Max)
+            .Scale.Min = aElevation - lMain.YAxis.Scale.Max
+            .Scale.Max = aElevation - lMain.YAxis.Scale.Min
+            'TODO: make sure Y2Axis stays in sync with YAxis
+        End With
     End Sub
 
     <CLSCompliant(False)> _
@@ -202,13 +268,12 @@ FoundMatch:
                               Optional ByVal aCommonConstituent As String = Nothing, _
                               Optional ByVal aCommonLocation As String = Nothing, _
                               Optional ByVal aCommonUnits As String = Nothing)
-        If Not aCommonTimeUnitName Is Nothing AndAlso aCommonTimeUnitName.Length > 0 _
-           AndAlso aCommonTimeUnitName <> "<unk>" _
+        If Not String.IsNullOrEmpty(aCommonTimeUnitName) AndAlso aCommonTimeUnitName <> "<unk>" _
            AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonTimeUnitName) Then
             aPane.XAxis.Title.Text &= " " & aCommonTimeUnitName
         End If
 
-        If aCommonScenario IsNot Nothing AndAlso aCommonScenario.Length > 0 AndAlso aCommonScenario <> "<unk>" Then
+        If Not String.IsNullOrEmpty(aCommonScenario.Length) AndAlso aCommonScenario <> "<unk>" Then
             If aCommonConstituent.Length > 0 _
                AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonScenario) Then
                 aPane.YAxis.Title.Text &= " " & aCommonScenario
@@ -217,26 +282,27 @@ FoundMatch:
             End If
         End If
 
-        If aCommonConstituent IsNot Nothing AndAlso aCommonConstituent.Length > 0 _
-           AndAlso aCommonConstituent <> "<unk>" _
+        If Not String.IsNullOrEmpty(aCommonConstituent) AndAlso aCommonConstituent <> "<unk>" _
            AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonConstituent) Then
             aPane.YAxis.Title.Text &= " " & aCommonConstituent
         End If
 
-        If aCommonLocation IsNot Nothing AndAlso aCommonLocation.Length > 0 _
-           AndAlso aCommonLocation <> "<unk>" _
+        If Not String.IsNullOrEmpty(aCommonLocation) AndAlso aCommonLocation <> "<unk>" _
            AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonLocation) Then
             If aPane.XAxis.Title.Text.Length > 0 Then aPane.XAxis.Title.Text &= " at "
             aPane.XAxis.Title.Text &= aCommonLocation
         End If
 
-        If aCommonUnits IsNot Nothing AndAlso aCommonUnits.Length > 0 _
-           AndAlso aCommonUnits <> "<unk>" _
-           AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonUnits) Then
-            If aPane.YAxis.Title.Text.Length > 0 Then
-                aPane.YAxis.Title.Text &= " (" & aCommonUnits & ")"
-            Else
-                aPane.YAxis.Title.Text = aCommonUnits
+        If Not String.IsNullOrEmpty(aCommonUnits) AndAlso aCommonUnits <> "<unk>" Then
+            If aPane.YAxis.Title.Text.StartsWith(aCommonUnits) Then
+                aPane.YAxis.Title.Text = aPane.YAxis.Title.Text.Substring(aCommonUnits.Length).Trim
+            End If
+            If Not aPane.YAxis.Title.Text.Contains(aCommonUnits) Then
+                If aPane.YAxis.Title.Text.Length > 0 Then
+                    aPane.YAxis.Title.Text &= ", " & aCommonUnits
+                Else
+                    aPane.YAxis.Title.Text = aCommonUnits
+                End If
             End If
         End If
     End Sub
@@ -285,6 +351,21 @@ FoundMatch:
     End Function
 
     ''' <summary>
+    ''' Test whether aTimeseries contains provisional values by looking for P=True value attribute
+    ''' </summary>
+    Private Function HasProvisionalValues(ByVal aTimeseries As atcTimeseries) As Boolean
+        If aTimeseries.ValueAttributesExist Then
+            For lIndex As Integer = 0 To aTimeseries.numValues
+                If aTimeseries.ValueAttributesGetValue(lIndex, "P", False) Then
+                    Return True
+                End If
+            Next
+        End If
+        Return False
+    End Function
+
+
+    ''' <summary>
     ''' Create a new curve from the given atcTimeseries and add it to the ZedGraphControl
     ''' </summary>
     ''' <param name="aTimeseries">Timeseries data to turn into a curve</param>
@@ -293,11 +374,38 @@ FoundMatch:
     ''' <remarks></remarks>
     <CLSCompliant(False)> _
     Function AddTimeseriesCurve(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aYAxisName As String, _
-                        Optional ByVal aCommonTimeUnitName As String = Nothing, _
-                        Optional ByVal aCommonScenario As String = Nothing, _
-                        Optional ByVal aCommonConstituent As String = Nothing, _
-                        Optional ByVal aCommonLocation As String = Nothing, _
-                        Optional ByVal aCommonUnits As String = Nothing) As CurveItem
+                       Optional ByVal aCommonTimeUnitName As String = Nothing, _
+                       Optional ByVal aCommonScenario As String = Nothing, _
+                       Optional ByVal aCommonConstituent As String = Nothing, _
+                       Optional ByVal aCommonLocation As String = Nothing, _
+                       Optional ByVal aCommonUnits As String = Nothing) As CurveItem
+
+        'Graph provisional data separately
+        Dim lProvisionalTS As atcTimeseries = Nothing
+        Dim lNonProvisionalTS As atcTimeseries = Nothing
+        If HasProvisionalValues(aTimeseries) Then
+            Dim lNonProvisionalBuilder As New atcTimeseriesBuilder(Nothing)
+            Dim lProvisionalBuilder As New atcTimeseriesBuilder(Nothing)
+            For lIndex As Integer = 0 To aTimeseries.numValues
+                If aTimeseries.ValueAttributesGetValue(lIndex, "P", False) Then
+                    lProvisionalBuilder.AddValue(aTimeseries.Dates.Value(lIndex), aTimeseries.Value(lIndex))
+                Else
+                    lNonProvisionalBuilder.AddValue(aTimeseries.Dates.Value(lIndex), aTimeseries.Value(lIndex))
+                End If
+            Next
+            lProvisionalTS = lProvisionalBuilder.CreateTimeseries
+            lNonProvisionalTS = lNonProvisionalBuilder.CreateTimeseries
+
+            If aTimeseries.Attributes.ContainsAttribute("Time Step") AndAlso aTimeseries.Attributes.ContainsAttribute("Time Unit") Then
+                lProvisionalTS = FillValues(lProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
+                lNonProvisionalTS = FillValues(lNonProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
+            End If
+
+            lNonProvisionalTS.Attributes.ChangeTo(aTimeseries.Attributes)
+            lNonProvisionalTS.Attributes.DiscardCalculated()
+            aTimeseries = lNonProvisionalTS
+        End If
+
         Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
         Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
@@ -380,6 +488,18 @@ FoundMatch:
                 End If
             End If
         End With
+
+        If lProvisionalTS IsNot Nothing Then
+            Dim lProvisionalCurve As CurveItem = AddTimeseriesCurve( _
+                lProvisionalTS, aZgc, aYAxisName, _
+                aCommonTimeUnitName, aCommonScenario, aCommonConstituent, _
+                aCommonLocation, aCommonUnits)
+            lProvisionalCurve.Label.Text = "Provisional"
+            lProvisionalCurve.Color = Color.Red
+            lProvisionalTS.Clear()
+        End If
+        If lNonProvisionalTS IsNot Nothing Then lNonProvisionalTS.Clear()
+
         Return lCurve
     End Function
 

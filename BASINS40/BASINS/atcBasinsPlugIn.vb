@@ -593,6 +593,7 @@ FoundDir:
                 Logger.Dbg("Unable to load project settings string from '" & aProjectFile & "': " & e.Message)
             End Try
         End If
+        g_MapWin.ApplicationInfo.ApplicationName = g_AppNameLong
     End Sub
 
     Public Sub ProjectSaving(ByVal aProjectFile As String, ByRef aSettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving

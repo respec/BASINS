@@ -94,6 +94,7 @@ Friend Module modATCscript
         AddNewTserAndBuffer()
 
         ScriptState = New atcCollection
+        ScriptState.Add("Filename", pDataFilename)
         If DataFileHandle IsNot Nothing Then
             DataFileHandle.Close()
             DataFileHandle = Nothing
@@ -566,6 +567,20 @@ Friend Module modATCscript
                                 Next
 
                                 pTserFile.AddDataSet(.ts, atcDataSource.EnumExistAction.ExistRenumber)
+
+                                'If requested, compute Hamon PET from .ts which is assumed to be sub-daily temperature
+                                If .ts.Attributes.ContainsAttribute("Hamon") AndAlso .ts.Attributes.ContainsAttribute("Latitude") Then
+                                    Dim lCTS() As Double = {0, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055}
+                                    For lCTSindex As Integer = 1 To 12 'Look for any specified coefficients in attributes, e.g. HamonCTS1 = January coefficient
+                                        lCTS(lCTSindex) = .ts.Attributes.GetValue("HamonCTS" & lCTSindex, lCTS(lCTSindex))
+                                    Next
+                                    Dim lHamonTS As atcTimeseries = atcMetCmp.PanEvaporationTimeseriesComputedByHamonX( _
+                                        .ts, pTserFile, _
+                                        (.ts.Attributes.GetValue("Units", "TF") = "TF" OrElse .ts.Attributes.GetValue("Hamon", "F") = "F"), _
+                                        .ts.Attributes.GetValue("Latitude"), lCTS)
+                                    pTserFile.AddDataSet(lHamonTS, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+                                End If
+
                                 If pTserFile.CanSave Then 'Free memory now that data has been saved
                                     .ts.ValuesNeedToBeRead = True
                                 End If

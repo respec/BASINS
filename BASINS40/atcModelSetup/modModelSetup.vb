@@ -33,7 +33,7 @@ Public Module modModelSetup
     End Sub
 
     'aLUType - Land use layer type (0 - USGS GIRAS Shape, 1 - NLCD grid, 2 - Other shape, 3 - Other grid)
-    Public Function SetupHSPF(ByVal aGridPervious As Object, _
+    Public Function SetupHSPF(ByVal aGridPervious As atcControls.atcGrid, _
                               ByVal aMetBaseDsns As atcCollection, ByVal aMetWdmIds As atcCollection, _
                               ByVal aUniqueModelSegmentNames As atcCollection, _
                               ByVal aUniqueModelSegmentIds As atcCollection, _
@@ -271,7 +271,7 @@ Public Module modModelSetup
     End Function
 
     Public Function CreateReachSegments(ByVal aSubbasinsSelected As atcCollection, ByVal aSubbasinsModelSegmentIds As atcCollection, _
-                                         ByVal aStreamLayerName As String, ByVal aStreamFields() As String) As Object
+                                        ByVal aStreamLayerName As String, ByVal aStreamFields() As String) As Reaches
 
         'for reaches in selected subbasins, populate reach class from dbf
         Dim lReaches As New Reaches
@@ -367,17 +367,18 @@ Public Module modModelSetup
 
         'figure out which land use tiles to overlay
         Dim lLandUseTiles As New atcCollection
-        For i As Integer = 1 To GisUtil.NumFeatures(lLanduseLayerIndex)
+        Dim lLastFeature As Integer = GisUtil.NumFeatures(lLanduseLayerIndex) - 1
+        For lFeatureIndex As Integer = 0 To lLastFeature
             'loop thru each shape of land use index shapefile
-            For j As Integer = 0 To aSubbasinsSelected.Count - 1
+            For lSubbasinIndex As Integer = 0 To aSubbasinsSelected.Count - 1
                 'loop thru each selected subbasin (or all if none selected)
-                Dim lShapeIndex As Long = aSubbasinsSelected.Keys(j)
-                If GisUtil.OverlappingPolygons(lLanduseLayerIndex, i - 1, lSubbasinLayerIndex, lShapeIndex) Then
+                Dim lShapeIndex As Long = aSubbasinsSelected.Keys(lSubbasinIndex)
+                If GisUtil.OverlappingPolygons(lLanduseLayerIndex, lFeatureIndex, lSubbasinLayerIndex, lShapeIndex) Then
                     'add this to collection of tiles we'll need
-                    lLandUseTiles.Add(GisUtil.FieldValue(lLanduseLayerIndex, i - 1, lLandUseFieldIndex))
+                    lLandUseTiles.Add(GisUtil.FieldValue(lLanduseLayerIndex, lFeatureIndex, lLandUseFieldIndex))
                 End If
-            Next j
-        Next i
+            Next lSubbasinIndex
+        Next lFeatureIndex
 
         'add tiles if not already on map
         'figure out how many polygons to overlay, for status message
@@ -573,7 +574,7 @@ Public Module modModelSetup
 
     End Sub
 
-    Public Function CreateStreamChannels(ByVal aReaches As Object) As Object
+    Public Function CreateStreamChannels(ByVal aReaches As Reaches) As Channels
 
         'for reaches in selected subbasins, populate channel class from dbf
         Dim lChannels As New Channels
@@ -610,7 +611,7 @@ Public Module modModelSetup
     End Function
 
     Public Function CreateLanduses(ByVal aSubbasinsSlopes As atcCollection, _
-                                   ByVal aLandUseSubbasinOverlayRecords As Collection, ByVal aReaches As Object) As Object
+                                   ByVal aLandUseSubbasinOverlayRecords As Collection, ByVal aReaches As Reaches) As LandUses
 
         Dim lLandUses As New LandUses
         For lIndex As Integer = 1 To aLandUseSubbasinOverlayRecords.Count
@@ -882,7 +883,7 @@ Public Module modModelSetup
         Return lCreateUCI
     End Function
 
-    Public Sub SetMetSegmentGrid(ByVal aGridMet As Object, _
+    Public Sub SetMetSegmentGrid(ByVal aGridMet As atcControls.atcGrid, _
                                  ByVal aMetStations As atcCollection, _
                                  ByRef aUniqueModelSegmentNames As atcCollection, _
                                  ByRef aUniqueModelSegmentIds As atcCollection, _
@@ -1213,7 +1214,7 @@ Public Module modModelSetup
 
     Public Function ReclassifyLandUses(ByVal aReclassifyFile As String, _
                                        ByVal aGridPervious As atcControls.atcGrid, _
-                                       ByVal aLandUses As Object) As Object
+                                       ByVal aLandUses As LandUses) As LandUses
         Dim lReclassifyLandUses As New LandUses
         'if simple reclassifyfile exists, read it in
         Dim lRcode As New atcCollection
@@ -1435,7 +1436,7 @@ Public Module modModelSetup
     End Function
 
     Public Sub WriteWSDFile(ByVal aWsdFileName As String, _
-                            ByVal aLandUses As Object, _
+                            ByVal aLandUses As LandUses, _
                             Optional ByVal aSnowOption As Integer = 0)
 
         Dim lSB As New StringBuilder
@@ -1494,7 +1495,7 @@ Public Module modModelSetup
     End Sub
 
     Public Sub WriteRCHFile(ByVal aRchFileName As String, _
-                            ByVal aReaches As Object)
+                            ByVal aReaches As Reaches)
 
         Dim lSBRch As New StringBuilder
 
@@ -1533,7 +1534,7 @@ Public Module modModelSetup
     End Sub
 
     Public Sub WritePTFFile(ByVal aPtfFileName As String, _
-                            ByVal aChannels As Object)
+                            ByVal aChannels As Channels)
         Dim lSBPtf As New StringBuilder
 
         lSBPtf.AppendLine("""Reach Number""" & "," & """Length(ft)""" & "," & _
