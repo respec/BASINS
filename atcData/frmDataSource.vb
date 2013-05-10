@@ -141,7 +141,7 @@ Friend Class frmDataSource
                        ByRef aNeedToSave As Boolean, _
               Optional ByVal aCategories As ArrayList = Nothing)
         pSelectedSource = aSelectedSource
-        If Not aSelectedSource Is Nothing Then pSpecification = aSelectedSource.Specification
+        If aSelectedSource IsNot Nothing Then pSpecification = aSelectedSource.Specification
         pCategories = aCategories
         'PopulateDisplays()
         Populate(aNeedToOpen, aNeedToSave)
@@ -153,7 +153,7 @@ Friend Class frmDataSource
         End If
 
         aSelectedSource = pSelectedSource
-        If Not aSelectedSource Is Nothing Then
+        If aSelectedSource IsNot Nothing Then
             aSelectedSource.Specification = pSpecification
         End If
         pCategories = Nothing

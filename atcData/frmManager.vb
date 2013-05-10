@@ -604,7 +604,7 @@ Friend Class frmManager
         Dim lFilesOnly As New ArrayList(1)
         lFilesOnly.Add("File")
         Dim lNewSource As atcTimeseriesSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", False, True)
-        If Not lNewSource Is Nothing Then 'user did not cancel
+        If lNewSource IsNot Nothing Then 'user did not cancel
             If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
                 If Logger.LastDbgText.Length > 0 Then
                     Logger.Msg(Logger.LastDbgText, "Data New Problem")

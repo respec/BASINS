@@ -17,6 +17,7 @@ Public Class atcTimeseriesScriptPlugin
     Inherits atcTimeseriesSource
 
     Private Shared pFilter As String = "Any Data File (*.*)|*.*"
+    Private Const pWizardTag As String = "Wizard:"
     Private pErrorDescription As String
 
     Public Sub New()
@@ -58,50 +59,59 @@ Public Class atcTimeseriesScriptPlugin
         Else
             Me.Specification = aFileName
             Try
-                Dim lSelectForm As New frmSelectScript
-                With lSelectForm
-                    .Width = GetSetting("BASINS41", "Window Positions", "SelectScriptWidth", .Width)
-                    .Height = GetSetting("BASINS41", "Window Positions", "SelectScriptHeight", .Height)
-                    .Text = "Script Selection for importing " & aFileName
-                    .LoadGrid(aFileName)
-ShowSelect:
-                    .ShowDialog()
-                    SaveSetting("BASINS41", "Window Positions", "SelectScriptWidth", .Width)
-                    SaveSetting("BASINS41", "Window Positions", "SelectScriptHeight", .Height)
-                    Dim lDefinitionFilename As String = .SelectedScript
-                    Select Case .ButtonPressed
-                        Case .cmdCancel.Text
-                            Logger.Dbg("Cancelled")
-                            Logger.LastDbgText = "" 'Avoid displaying an error message
-                            Return False
-                        Case .cmdRun.Text
-                            Return RunSelectedScript(lDefinitionFilename, aFileName)
-                            'Case .cmdTest.Text
-                            '    DebuggingScript = True
-                            '    RunSelectedScript(lDefinitionFilename, aFileName)
-                            '    DebuggingScript = False
-                            '    GoTo ShowSelect
-                        Case .cmdWizard.Text
-                            Dim lCountBefore As Integer = Me.DataSets.Count
-                            Dim lfrmInputwizard As New frmInputWizard
-                            With lfrmInputwizard
-                                If .txtSample.Count = 0 Then
-                                    .txtSample.Add(._txtSample_0)
-                                End If
-                                .TserFile = Me
-                                .txtDataFile.Text = aFileName
-                                .txtScriptFile.Text = lDefinitionFilename
-                                .ReadScript()
-                                .ShowDialog()
-                            End With
-                            Return (Me.DataSets.Count > lCountBefore)
-                    End Select
-                End With
+                Dim lDefinitionFilename As String = SelectScript(aFileName, "Script Selection for importing " & aFileName, True)
+                If IO.File.Exists(lDefinitionFilename) Then
+                    Return RunSelectedScript(lDefinitionFilename, aFileName)
+                ElseIf lDefinitionFilename.StartsWith(pWizardTag) Then
+                    Dim lCountBefore As Integer = Me.DataSets.Count
+                    Dim lfrmInputwizard As New frmInputWizard
+                    With lfrmInputwizard
+                        If .txtSample.Count = 0 Then
+                            .txtSample.Add(._txtSample_0)
+                        End If
+                        .TserFile = Me
+                        .txtDataFile.Text = aFileName
+                        .txtScriptFile.Text = lDefinitionFilename.Substring(pWizardTag.Length)
+                        .ReadScript()
+                        .ShowDialog()
+                    End With
+                    Return (Me.DataSets.Count > lCountBefore)
+                End If
             Catch e As Exception
                 Logger.Dbg("Exception reading '" & aFileName & "': " & e.ToString)
                 Return False
             End Try
         End If
+    End Function
+
+    Public Shared Function SelectScript(ByVal aDataFileName As String, ByVal aTitle As String, ByVal aWizardButtonVisible As Boolean) As String
+        Try
+            Dim lSelectForm As New frmSelectScript
+            With lSelectForm
+                .Width = GetSetting("BASINS41", "Window Positions", "SelectScriptWidth", .Width)
+                .Height = GetSetting("BASINS41", "Window Positions", "SelectScriptHeight", .Height)
+                .cmdWizard.Visible = aWizardButtonVisible
+                .Text = aTitle
+                .LoadGrid(aDataFileName)
+ShowSelect:
+                .ShowDialog()
+                SaveSetting("BASINS41", "Window Positions", "SelectScriptWidth", .Width)
+                SaveSetting("BASINS41", "Window Positions", "SelectScriptHeight", .Height)
+                Dim lDefinitionFilename As String = .SelectedScript
+                Select Case .ButtonPressed
+                    Case .cmdCancel.Text
+                        Logger.Dbg("Cancelled")
+                        Logger.LastDbgText = "" 'Avoid displaying an error message
+                    Case .cmdRun.Text
+                        Return .SelectedScript
+                    Case .cmdWizard.Text
+                        Return pWizardTag & .SelectedScript
+                End Select
+            End With
+        Catch e As Exception
+            Logger.Dbg("Exception selecting script for '" & aDataFileName & "': " & e.ToString)
+        End Try
+        Return ""
     End Function
 
     Public Function RunSelectedScript(ByVal aDefinitionFilename As String, ByVal aDataFilename As String) As Boolean
@@ -119,7 +129,8 @@ ShowSelect:
             Logger.Msg("Could not load script '" & aDefinitionFilename & "'" & vbCr & Err.Description, vbExclamation, "Run Script")
             Return False
         Else
-            MsgBox(ScriptRun(Script, aDataFilename, Me) & vbCrLf & "Dataset Count = " & DataSets.Count, vbOKOnly, "Ran Import Data Script")
+            Dim lMessage As String = ScriptRun(Script, aDataFilename, Me)
+            Logger.Msg(lMessage & vbCrLf & "Dataset Count = " & DataSets.Count, vbOKOnly, "Ran Import Data Script")
             Return (Me.DataSets.Count > 0)
         End If
     End Function

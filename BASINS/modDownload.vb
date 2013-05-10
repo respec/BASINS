@@ -558,6 +558,7 @@ StartOver:
         Dim lBasinsDataTypes As String = "<DataType>core31</DataType>"
         If g_AppNameShort = "USGS-GW" Then
             lBasinsDataTypes &= "<DataType>nhd</DataType>"
+            atcDataManager.LoadPlugin("D4EM Data Download::NWIS")
         End If
 
         lQuery = "<function name='GetBASINS'>" _
@@ -1277,7 +1278,7 @@ StartOver:
             g_StatusBar.Item(1).Text = "Opening " & aFilename
             shpFile = New MapWinGIS.Shapefile
             shpFile.Open(aFilename)
-
+            shpFile.CollisionMode = tkCollisionMode.AllowCollisions
             Select Case shpFile.ShapefileType
                 Case MapWinGIS.ShpfileType.SHP_POINT, _
                         MapWinGIS.ShpfileType.SHP_POINTM, _
@@ -1770,37 +1771,47 @@ StartOver:
     ''' </summary>
     ''' <remarks>New MW 4.8 symbology</remarks>
     Friend Sub SetMetIcons(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
-        Dim lRenderersPath As String = IO.Path.Combine(PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)), "etc") & g_PathChar & "renderers" & g_PathChar
-        If shpFile.Field(5).Name = "CONSTITUEN" Then
-            shpFile.Categories.Generate(5, MapWinGIS.tkClassificationType.ctUniqueValues, 7)
-            shpFile.Categories.ApplyExpressions()
-            shpFile.CollisionMode = tkCollisionMode.AllowCollisions
-            For iShape As Integer = 0 To 6
-                With shpFile.Categories.Item(iShape)
-                    Dim lConstituent As String = .Expression.Split("""")(1)
-                    Dim lIconFilename As String = IO.Path.Combine(lRenderersPath, "met-" & lConstituent & ".png")
-                    With .DrawingOptions
-                        If IO.File.Exists(lIconFilename) Then
-                            Logger.Dbg("Set met station icon for " & lConstituent)
-                            Dim img As New MapWinGIS.Image
-                            If Not img.Open(lIconFilename) Then GoTo NoIcon
-                            .PointType = tkPointSymbolType.ptSymbolPicture
-                            .PointRotation = 0
-                            .Picture = img
-                            .FillBgTransparent = True
-                        Else
-NoIcon:                     Logger.Dbg("Icon not found for met station at " & lIconFilename)
-                            .PointType = tkPointSymbolType.ptSymbolStandard
-                            .PointRotation = 45
-                            .PointShape = tkPointShapeType.ptShapeRegular
-                            .PointSidesCount = 4
-                            .PointSize = 10
-                        End If
-                    End With
-                End With
-            Next
-            shpFile.Save()
-        End If
+        Try
+            Dim lRenderersPath As String = IO.Path.Combine(PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)), "etc") & g_PathChar & "renderers" & g_PathChar
+            If shpFile.Field(5).Name = "CONSTITUEN" Then
+                shpFile.Categories.Generate(5, MapWinGIS.tkClassificationType.ctUniqueValues, 7)
+                shpFile.Categories.ApplyExpressions()
+                Dim lLastShape As Integer = Math.Min(6, shpFile.Categories.Count - 1)
+                For iShape As Integer = 0 To lLastShape
+                    Try
+                        With shpFile.Categories.Item(iShape)
+                            Logger.Dbg("Met Station Category: " & .Expression)
+                            Dim lConstituent As String = .Expression.Split("""")(1)
+                            Dim lIconFilename As String = IO.Path.Combine(lRenderersPath, "met-" & lConstituent & ".png")
+                            With .DrawingOptions
+                                If IO.File.Exists(lIconFilename) Then
+                                    Logger.Dbg("Set met station icon for " & lConstituent)
+                                    Dim img As New MapWinGIS.Image
+                                    If Not img.Open(lIconFilename) Then GoTo NoIcon
+                                    .PointType = tkPointSymbolType.ptSymbolPicture
+                                    .PointRotation = 0
+                                    .Picture = img
+                                    .FillBgTransparent = True
+                                Else
+NoIcon:                             Logger.Dbg("Icon not found for met station at " & lIconFilename)
+                                    .PointType = tkPointSymbolType.ptSymbolStandard
+                                    .PointRotation = 45
+                                    .PointShape = tkPointShapeType.ptShapeRegular
+                                    .PointSidesCount = 4
+                                    .PointSize = 10
+                                End If
+                            End With
+                        End With
+                    Catch e As Exception
+                        Logger.Dbg("Set Met Icon " & iShape & ": " & e.ToString)
+                    End Try
+                Next
+                shpFile.Save()
+                shpFile.CollisionMode = tkCollisionMode.AllowCollisions
+            End If
+        Catch e2 As Exception
+            Logger.Dbg("SetMetIcons: " & e2.ToString)
+        End Try
     End Sub
 
     Private Sub SetElevationGridColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)
