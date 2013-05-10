@@ -175,6 +175,12 @@
     <Compile Include="frmDefaultTimeInterval.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmImport.Designer.vb">
+      <DependentUpon>frmImport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmImport.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmSave.Designer.vb">
       <DependentUpon>frmSave.vb</DependentUpon>
     </Compile>
@@ -187,6 +193,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\MW4.8.6\MapWindow4Dev\MapWinInterfaces\MapWinInterfaces10.csproj">
+      <Project>{E880AAB1-98B5-45B8-A3B8-CB3D0DB8B317}</Project>
+      <Name>MapWinInterfaces10</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls10.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls10</Name>
@@ -195,6 +205,11 @@
     <ProjectReference Include="..\atcData\atcData10.vbproj">
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
       <Name>atcData10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesScript\atcTimeseriesScript10.vbproj">
+      <Project>{40DE1F29-3531-4BC2-9D7E-324DC92689DF}</Project>
+      <Name>atcTimeseriesScript10</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility10.vbproj">
@@ -208,6 +223,9 @@
     <EmbeddedResource Include="frmDefaultTimeInterval.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmDefaultTimeInterval.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmImport.resx">
+      <DependentUpon>frmImport.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSave.resx">
       <SubType>Designer</SubType>

@@ -3,6 +3,7 @@ Option Strict Off
 Option Explicit On
 
 Imports atcData
+Imports atcData.atcDataManager
 Imports atcData.atcDataSource.EnumExistAction
 Imports atcUtility
 Imports MapWinUtility
@@ -10,7 +11,6 @@ Imports System.Collections.Specialized
 
 Public Class atcDataSourceWDM
     Inherits atcData.atcTimeseriesSource
-
     Private Shared pFilter As String = "WDM Files (*.wdm)|*.wdm"
     Private pDates As Generic.List(Of atcTimeseries)
     Private pQuick As Boolean = False
@@ -23,6 +23,23 @@ Public Class atcDataSourceWDM
 #If BatchMode Then
 #Else
     Private pAskAboutMissingTuTs As Boolean = True
+    Public Const ImportMenuName As String = "BasinsImportToWDM"
+    Public Const ImportMenuString As String = "Import to WDM"
+
+    <CLSCompliant(False)> _
+    Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
+        g_MapWin = aMapWin
+        MyBase.Initialize(aMapWin, aParentHandle)
+        AddMenuIfMissing(ImportMenuName, FileMenuName, ImportMenuString, ManageDataMenuName)
+    End Sub
+
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        If aItemName = ImportMenuName Then
+            Dim lFormImport As New frmImport
+            lFormImport.Show()
+            aHandled = True
+        End If
+    End Sub
 #End If
 
     'Can be set by user to avoid asking user each time
