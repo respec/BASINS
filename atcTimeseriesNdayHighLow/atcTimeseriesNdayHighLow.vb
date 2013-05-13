@@ -325,8 +325,6 @@ Public Class atcTimeseriesNdayHighLow
                             .SetValue("Date Created", lDateNow)
                             .SetValue("Date Modified", lDateNow)
                             .SetValue("Parent Timeseries", aTimeseries)
-                            .SetValue("Tu", atcTimeUnit.TUYear)
-                            .SetValue("Ts", 1)
                             .SetValue("HighFlag", aHigh)
                             .SetValue("NDay", lNDayNow)
 
@@ -339,6 +337,7 @@ Public Class atcTimeseriesNdayHighLow
                             .AddHistory(lDescription)
                             .SetValue("LDIST", "LP")
                         End With
+                        newTS.SetInterval(atcTimeUnit.TUYear, 1)
 
                         Dim lKenTauAttributes As New atcDataAttributes
                         ComputeTau(newTS, lNDayNow, aHigh, lKenTauAttributes)
