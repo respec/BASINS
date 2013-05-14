@@ -21,7 +21,7 @@ Module netCDFViewer
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
         If Not IO.Directory.Exists(lOutFolder) Then IO.Directory.CreateDirectory(lOutFolder)
 
-        Dim lBaseNames() As String = {"LangtangKholaWatershed", "merra.rfe.90m.200301", _
+        Dim lBaseNames() As String = {"rfe90m200309", "LangtangKholaWatershed", "merra.rfe.90m.200301", _
                                       "swit", "Ta1", "LangtangKholaWatershed", "srtm_54_07_LangtangFill_LambertWatershed", "srtm_54_07_LangtangFill_LambertUEBAspect", "srtm_54_07_LangtangFill_LambertUEBSlope"}
         '{ "swit", "merra.prod.assim.20061230", "merra.prod.rad.20061231", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
         For Each lBaseName As String In lBaseNames
@@ -30,7 +30,7 @@ Module netCDFViewer
             lReport.AppendLine("File '" & lFileName & "'")
 
             Dim lAttributes As New atcData.atcDataAttributes
-            If lFileName.Contains("merra") Then
+            If lFileName.Contains("merra") OrElse lFileName.Contains("rfe90m") Then
                 lAttributes.Add("AggregateGrid", lPathName & "LangtangKholaWatershed.nc")
             End If
 

@@ -206,7 +206,7 @@ Public Class atcTimeseriesNetCDF
                                 (lYIndex = lYIndexToget AndAlso lXIndex = lXIndexToget) OrElse _
                                 lUniqueLocations.Count > 0 AndAlso lLocation.Length > 0 Then
                                 Dim lTimeseries As New atcTimeseries(Me)
-                                Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
+                                Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.ConstituentVariables(0) 'lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
 
                                 For Each lDataAttribute As atcDefinedValue In lDataVariable.Attributes
                                     lTimeseries.Attributes.SetValue(lDataAttribute.Definition.Name, lDataAttribute.Value)
@@ -289,7 +289,7 @@ Public Class atcTimeseriesNetCDF
                 lTimeseries.Values(lTimeIndex + 1) = lValues(lTimeIndex)
             Next
         Else
-            Logger.Dbg("Aggregating " & lAggregateLocation.Count & " points ")
+            Logger.Dbg("Aggregating " & lAggregateLocation.Count & " points at " & lTimeseries.Attributes.GetValue("Location"))
             ReDim lTimeseries.Values(lNumValues)
             Dim lIndex As Integer = 1
             For Each lXYPair As String In lAggregateLocation

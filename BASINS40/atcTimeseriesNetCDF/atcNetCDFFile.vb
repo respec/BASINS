@@ -60,10 +60,11 @@ Public Class atcNetCDFFile
             For lVariableIndex = 0 To lNumVariables - 1
                 Dim lNewVariable As New atcNetCDFVariable(Me, lVariableIndex, Dimensions)
                 Variables.Add(lNewVariable)
-                If lNewVariable.ID <> EastWestDimension.ID AndAlso _
-                   lNewVariable.ID <> NorthSouthDimension.ID AndAlso _
-                   (TimeDimension Is Nothing OrElse lNewVariable.ID <> TimeDimension.ID) Then
+                If lNewVariable.Dimensions.Count > 1 Then
                     ConstituentVariables.Add(lNewVariable)
+                ElseIf lNewVariable.Name = "time" AndAlso TimeDimension.ID <> lVariableIndex Then
+                    Logger.Dbg("TimeDimensionID Changed From " & TimeDimension.ID & " to " & lVariableIndex)
+                    TimeDimension.ID = lVariableIndex
                 End If
             Next
         Finally
