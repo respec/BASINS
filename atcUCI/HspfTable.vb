@@ -291,6 +291,15 @@ Public Class HspfTable
                                 ElseIf lTableName = "REPORT-SRC" Then 'special case for this table
                                     Dim lNSrc As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NSRC")
                                     lOutPend = Mid(lOutPend, 1, 10 + (lNSrc * 70))
+                                ElseIf lTableName = "CONDUIT-PARM" Then 'special case for this table
+                                    Dim lCond As Integer = Me.Opn.Tables.Item("DYNAMIC-WAVE").ParmValue("NCOND")
+                                    lOutPend = Mid(lOutPend, 1, 10 + (lCond * 70))
+                                ElseIf lTableName = "CONDUIT-XS" Then 'special case for this table
+                                    Dim lCond As Integer = Me.Opn.Tables.Item("DYNAMIC-WAVE").ParmValue("NCOND")
+                                    lOutPend = Mid(lOutPend, 1, 10 + (lCond * 70))
+                                ElseIf lTableName = "NODE-PARM" Then 'special case for this table
+                                    Dim lCond As Integer = Me.Opn.Tables.Item("DYNAMIC-WAVE").ParmValue("NNODE")
+                                    lOutPend = Mid(lOutPend, 1, 10 + (lCond * 70))
                                 End If
                                 PrintMultiLine(lSB, lOutPend)
                             Else
@@ -327,6 +336,15 @@ Public Class HspfTable
                         ElseIf lTableName = "REPORT-SRC" Then 'special case for this table
                             Dim lNSrc As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NSRC")
                             lOutPend = Mid(lOutPend, 1, 10 + (lNSrc * 70))
+                        ElseIf lTableName = "CONDUIT-PARM" Then 'special case for this table
+                            Dim lCond As Integer = Me.Opn.Tables.Item("DYNAMIC-WAVE").ParmValue("NCOND")
+                            lOutPend = Mid(lOutPend, 1, 10 + (lCond * 70))
+                        ElseIf lTableName = "CONDUIT-XS" Then 'special case for this table
+                            Dim lCond As Integer = Me.Opn.Tables.Item("DYNAMIC-WAVE").ParmValue("NCOND")
+                            lOutPend = Mid(lOutPend, 1, 10 + (lCond * 70))
+                        ElseIf lTableName = "NODE-PARM" Then 'special case for this table
+                            Dim lCond As Integer = Me.Opn.Tables.Item("DYNAMIC-WAVE").ParmValue("NNODE")
+                            lOutPend = Mid(lOutPend, 1, 10 + (lCond * 70))
                         End If
                         PrintMultiLine(lSB, lOutPend)
                     Else
@@ -345,6 +363,15 @@ notMissingTableForThisOper:
                     ElseIf lTableName = "REPORT-SRC" Then 'special case for this table
                         Dim lNSrc As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NSRC")
                         lOutPend = Mid(lOutPend, 1, 10 + (lNSrc * 70))
+                    ElseIf lTableName = "CONDUIT-PARM" Then 'special case for this table
+                        Dim lCond As Integer = Me.Opn.Tables.Item("DYNAMIC-WAVE").ParmValue("NCOND")
+                        lOutPend = Mid(lOutPend, 1, 10 + (lCond * 70))
+                    ElseIf lTableName = "CONDUIT-XS" Then 'special case for this table
+                        Dim lCond As Integer = Me.Opn.Tables.Item("DYNAMIC-WAVE").ParmValue("NCOND")
+                        lOutPend = Mid(lOutPend, 1, 10 + (lCond * 70))
+                    ElseIf lTableName = "NODE-PARM" Then 'special case for this table
+                        Dim lCond As Integer = Me.Opn.Tables.Item("DYNAMIC-WAVE").ParmValue("NNODE")
+                        lOutPend = Mid(lOutPend, 1, 10 + (lCond * 70))
                     End If
                     PrintMultiLine(lSB, lOutPend)
                 Else
