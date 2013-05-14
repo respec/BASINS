@@ -196,80 +196,186 @@ Public Class ctlEditTable
         Dim more, skip As Boolean
         Dim i, j, lchkDescInteger As Integer
         Dim lStartEditCol, lCol As Integer
+        Dim lParmIndex As Integer = -1
 
-        With grdTable.Source
-            .Columns = pHspfTable.Parms.Count + 1
-            .CellValue(0, 0) = "OpNum"
-            If chkDesc.Checked = True Then
-                .CellValue(0, 1) = "Description"
-                lchkDescInteger = 1
-            Else
-                lchkDescInteger = 0
-            End If
-
-            For i = 0 To pHspfTable.Parms.Count - 1
-                lParm = pHspfTable.Parms(i)
-                .CellValue(0, i + lchkDescInteger + 1) = lParm.Name
-            Next i
-
-            'may need index here
-            tname = pHspfTable.Name
-            If pHspfTable.OccurCount > 1 Then
-                If cboOccur.SelectedIndex > 0 Then
-                    tname = tname & ":" & cboOccur.SelectedIndex + 1
-                End If
-            End If
-
-            more = True
-            .Rows = 1
-            j = 1
-            Do While more = True
-                If pHspfTable.EditAllSimilar = True Then
-                    If pHspfTable.Opn.OpnBlk.NthOper(j).TableExists(tname) Then
-                        ltable = pHspfTable.Opn.OpnBlk.NthOper(j).Tables(tname)
-                        skip = False
-                    Else
-                        skip = True
-                    End If
-                    j = j + 1
-                    If j > pHspfTable.Opn.OpnBlk.Ids.Count Then
-                        more = False
-                    End If
-                ElseIf pHspfTable.OccurCount > 1 Then
-                    ltable = pHspfTable.Opn.OpnBlk.OperFromID(pHspfTable.Opn.Id).Tables(tname)
-                    skip = False
-                    more = False
+        If pHspfTable.Name = "CONDUIT-PARM" Then
+            'special case 
+            With grdTable.Source
+                .Columns = 8
+                .CellValue(0, 0) = "OpNum"
+                If chkDesc.Checked = True Then
+                    .CellValue(0, 1) = "Description"
+                    lchkDescInteger = 1
                 Else
-                    ltable = pHspfTable
-                    skip = False
-                    more = False
+                    lchkDescInteger = 0
                 End If
-
-                If skip = False Then
+                For i = 0 To 6
+                    lParm = pHspfTable.Parms(i)
+                    .CellValue(0, i + lchkDescInteger + 1) = lParm.Name
+                Next i
+                tname = pHspfTable.Name
+                ltable = pHspfTable
+                Dim nRows As Integer = 100
+                If ltable.Opn.TableExists("DYNAMIC-WAVE") Then
+                    nRows = ltable.Opn.Tables("DYNAMIC-WAVE").ParmValue("NCOND")
+                End If
+                .Rows = 1
+                For j = 1 To nRows
                     .Rows = .Rows + 1
                     .CellValue(.Rows - 1, 0) = ltable.Opn.Id
                     If chkDesc.Checked = True Then
                         .CellValue(.Rows - 1, 1) = ltable.Opn.Description
                     End If
-                    For i = 0 To pHspfTable.Parms.Count - 1
-                        .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(i).Value
+                    For i = 0 To 6
+                        lParmIndex += 1
+                        .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(lParmIndex).Value
                     Next i
+                Next j
+            End With
+        ElseIf pHspfTable.Name = "CONDUIT-XS" Then
+            'special case 
+            With grdTable.Source
+                .Columns = 5
+                .CellValue(0, 0) = "OpNum"
+                If chkDesc.Checked = True Then
+                    .CellValue(0, 1) = "Description"
+                    lchkDescInteger = 1
+                Else
+                    lchkDescInteger = 0
                 End If
-            Loop
+                For i = 0 To 4
+                    lParm = pHspfTable.Parms(i)
+                    .CellValue(0, i + lchkDescInteger + 1) = lParm.Name
+                Next i
+                tname = pHspfTable.Name
+                ltable = pHspfTable
+                Dim nRows As Integer = 100
+                If ltable.Opn.TableExists("DYNAMIC-WAVE") Then
+                    nRows = ltable.Opn.Tables("DYNAMIC-WAVE").ParmValue("NCOND")
+                End If
+                .Rows = 1
+                For j = 1 To nRows
+                    .Rows = .Rows + 1
+                    .CellValue(.Rows - 1, 0) = ltable.Opn.Id
+                    If chkDesc.Checked = True Then
+                        .CellValue(.Rows - 1, 1) = ltable.Opn.Description
+                    End If
+                    For i = 0 To 4
+                        lParmIndex += 1
+                        .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(lParmIndex).Value
+                    Next i
+                Next j
+            End With
+        ElseIf pHspfTable.Name = "NODE-PARM" Then
+            'special case 
+            With grdTable.Source
+                .Columns = 5
+                .CellValue(0, 0) = "OpNum"
+                If chkDesc.Checked = True Then
+                    .CellValue(0, 1) = "Description"
+                    lchkDescInteger = 1
+                Else
+                    lchkDescInteger = 0
+                End If
+                For i = 0 To 4
+                    lParm = pHspfTable.Parms(i)
+                    .CellValue(0, i + lchkDescInteger + 1) = lParm.Name
+                Next i
+                tname = pHspfTable.Name
+                ltable = pHspfTable
+                Dim nRows As Integer = 100
+                If ltable.Opn.TableExists("DYNAMIC-WAVE") Then
+                    nRows = ltable.Opn.Tables("DYNAMIC-WAVE").ParmValue("NNODE")
+                End If
+                .Rows = 1
+                For j = 1 To nRows
+                    .Rows = .Rows + 1
+                    .CellValue(.Rows - 1, 0) = ltable.Opn.Id
+                    If chkDesc.Checked = True Then
+                        .CellValue(.Rows - 1, 1) = ltable.Opn.Description
+                    End If
+                    For i = 0 To 4
+                        lParmIndex += 1
+                        .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(lParmIndex).Value
+                    Next i
+                Next j
+            End With
+        Else
+            'normal case
+            With grdTable.Source
+                .Columns = pHspfTable.Parms.Count + 1
+                .CellValue(0, 0) = "OpNum"
+                If chkDesc.Checked = True Then
+                    .CellValue(0, 1) = "Description"
+                    lchkDescInteger = 1
+                Else
+                    lchkDescInteger = 0
+                End If
 
-            If chkDesc.Checked = True Then
-                lStartEditCol = 2
-            Else
-                lStartEditCol = 1
-            End If
+                For i = 0 To pHspfTable.Parms.Count - 1
+                    lParm = pHspfTable.Parms(i)
+                    .CellValue(0, i + lchkDescInteger + 1) = lParm.Name
+                Next i
 
-            For lCol = lStartEditCol To .Columns - 1
-                For lRow As Integer = 1 To .Rows - 1
-                    .CellEditable(lRow, lCol) = True
-                Next
+                'may need index here
+                tname = pHspfTable.Name
+                If pHspfTable.OccurCount > 1 Then
+                    If cboOccur.SelectedIndex > 0 Then
+                        tname = tname & ":" & cboOccur.SelectedIndex + 1
+                    End If
+                End If
+
+                more = True
+                .Rows = 1
+                j = 1
+                Do While more = True
+                    If pHspfTable.EditAllSimilar = True Then
+                        If pHspfTable.Opn.OpnBlk.NthOper(j).TableExists(tname) Then
+                            ltable = pHspfTable.Opn.OpnBlk.NthOper(j).Tables(tname)
+                            skip = False
+                        Else
+                            skip = True
+                        End If
+                        j = j + 1
+                        If j > pHspfTable.Opn.OpnBlk.Ids.Count Then
+                            more = False
+                        End If
+                    ElseIf pHspfTable.OccurCount > 1 Then
+                        ltable = pHspfTable.Opn.OpnBlk.OperFromID(pHspfTable.Opn.Id).Tables(tname)
+                        skip = False
+                        more = False
+                    Else
+                        ltable = pHspfTable
+                        skip = False
+                        more = False
+                    End If
+
+                    If skip = False Then
+                        .Rows = .Rows + 1
+                        .CellValue(.Rows - 1, 0) = ltable.Opn.Id
+                        If chkDesc.Checked = True Then
+                            .CellValue(.Rows - 1, 1) = ltable.Opn.Description
+                        End If
+                        For i = 0 To pHspfTable.Parms.Count - 1
+                            .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(i).Value
+                        Next i
+                    End If
+                Loop
+
+            End With
+        End If
+
+        If chkDesc.Checked = True Then
+            lStartEditCol = 2
+        Else
+            lStartEditCol = 1
+        End If
+
+        For lCol = lStartEditCol To grdTable.Source.Columns - 1
+            For lRow As Integer = 1 To grdTable.Source.Rows - 1
+                grdTable.Source.CellEditable(lRow, lCol) = True
             Next
-
-        End With
+        Next
 
         grdTable.SizeAllColumnsToContents(grdTable.Width, True)
         grdTable.Refresh()
@@ -289,6 +395,8 @@ Public Class ctlEditTable
         Dim lParm As HspfParm
         Dim lTable As HspfTable
         Dim lTname As String
+        Dim lnRows As Integer = 0
+        Dim lParmIndex As Integer = -1
 
         lTname = pHspfTable.Name
         If pHspfTable.OccurCount > 1 Then
@@ -298,31 +406,79 @@ Public Class ctlEditTable
         End If
 
         With grdTable.Source
-            For lRow = 1 To .Rows - 1
-                If .Rows = 1 Then
-                    lTable = Nothing
-                    lTable = pHspfTable.Opn.Tables(lTname)
-                Else
-                    'Set ltable = pTable.Opn.OpnBlk.Ids(j).Tables(tname) 'changed for sort
-                    lTable = Nothing
-                    If Len(.CellValue(lRow, 0)) > 0 Then
-                        If Not pHspfTable.Opn.OpnBlk.OperFromID(.CellValue(lRow, 0)) Is Nothing Then
-                            'make sure there is an operation by this number
-                            lTable = pHspfTable.Opn.OpnBlk.OperFromID(.CellValue(lRow, 0)).Tables(lTname)
+            If pHspfTable.Name = "CONDUIT-PARM" Then
+                'special case 
+                lRow = 1
+                lTable = pHspfTable
+                lnRows = 100
+                If lTable.Opn.TableExists("DYNAMIC-WAVE") Then
+                    lnRows = lTable.Opn.Tables("DYNAMIC-WAVE").ParmValue("NCOND")
+                End If
+                For lRow = 1 To lnRows
+                    For lCol = 0 To 6
+                        lParmIndex += 1
+                        lParm = lTable.Parms(lParmIndex)
+                        lParm.Value = .CellValue(lRow, lCol + chkDesc.CheckState + 1)
+                    Next
+                Next
+            ElseIf pHspfTable.Name = "CONDUIT-XS" Then
+                'special case 
+                lRow = 1
+                lTable = pHspfTable
+                lnRows = 100
+                If lTable.Opn.TableExists("DYNAMIC-WAVE") Then
+                    lnRows = lTable.Opn.Tables("DYNAMIC-WAVE").ParmValue("NCOND")
+                End If
+                For lRow = 1 To lnRows
+                    For lCol = 0 To 4
+                        lParmIndex += 1
+                        lParm = lTable.Parms(lParmIndex)
+                        lParm.Value = .CellValue(lRow, lCol + chkDesc.CheckState + 1)
+                    Next
+                Next
+            ElseIf pHspfTable.Name = "NODE-PARM" Then
+                'special case 
+                lRow = 1
+                lTable = pHspfTable
+                lnRows = 100
+                If lTable.Opn.TableExists("DYNAMIC-WAVE") Then
+                    lnRows = lTable.Opn.Tables("DYNAMIC-WAVE").ParmValue("NNODE")
+                End If
+                For lRow = 1 To lnRows
+                    For lCol = 0 To 4
+                        lParmIndex += 1
+                        lParm = lTable.Parms(lParmIndex)
+                        lParm.Value = .CellValue(lRow, lCol + chkDesc.CheckState + 1)
+                    Next
+                Next
+            Else
+                'normal case
+                For lRow = 1 To .Rows - 1
+                    If .Rows = 1 Then
+                        lTable = Nothing
+                        lTable = pHspfTable.Opn.Tables(lTname)
+                    Else
+                        'Set ltable = pTable.Opn.OpnBlk.Ids(j).Tables(tname) 'changed for sort
+                        lTable = Nothing
+                        If Len(.CellValue(lRow, 0)) > 0 Then
+                            If Not pHspfTable.Opn.OpnBlk.OperFromID(.CellValue(lRow, 0)) Is Nothing Then
+                                'make sure there is an operation by this number
+                                lTable = pHspfTable.Opn.OpnBlk.OperFromID(.CellValue(lRow, 0)).Tables(lTname)
+                            End If
                         End If
                     End If
-                End If
-                If Not lTable Is Nothing Then
-                    For lCol = 0 To lTable.Parms.Count - 1
-                        lParm = lTable.Parms(lCol)
-                        lParm.Value = .CellValue(lRow, lCol + chkDesc.CheckState + 1)
-                        If lTable.Name = "GEN-INFO" And lCol = 1 Then
-                            lTable.Opn.Description = lParm.Value
-                        End If
-                    Next
+                    If Not lTable Is Nothing Then
+                        For lCol = 0 To lTable.Parms.Count - 1
+                            lParm = lTable.Parms(lCol)
+                            lParm.Value = .CellValue(lRow, lCol + chkDesc.CheckState + 1)
+                            If lTable.Name = "GEN-INFO" And lCol = 1 Then
+                                lTable.Opn.Description = lParm.Value
+                            End If
+                        Next
+                    End If
                     lTable.Edited = True
-                End If
-            Next
+                Next
+            End If
         End With
 
         pChanged = False

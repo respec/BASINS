@@ -1291,6 +1291,106 @@ Public Class HspfMsg
                         .ParmDefs.Add(lParmDef)
                     Next j
                 Next i
+            ElseIf aBlockName = "RCHRES" And .Name = "CONDUIT-PARM" Then
+                For i As Integer = 2 To 100 'up to 100 rows possible
+                    For j As Integer = 0 To 6
+                        Dim lParmDef As New HSPFParmDef
+                        lParmDef.Name = .ParmDefs(j).Name & CStr(i) 'Name
+                        lParmDef.Typ = .ParmDefs(j).Typ
+                        If j = 0 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 12
+                        ElseIf j = 1 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 17
+                        ElseIf j = 2 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 21
+                        ElseIf j = 3 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 31
+                        ElseIf j = 4 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 41
+                        ElseIf j = 5 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 51
+                        ElseIf j = 6 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 61
+                        End If
+                        lParmDef.Length = .ParmDefs(j).Length
+                        lParmDef.DefaultValue = .ParmDefs(j).DefaultValue
+                        lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                        lParmDef.Define = .ParmDefs(j).Define
+                        lParmDef.Max = .ParmDefs(j).Max
+                        lParmDef.MetricDefault = .ParmDefs(j).MetricDefault
+                        lParmDef.MetricMax = .ParmDefs(j).MetricMax
+                        lParmDef.MetricMin = .ParmDefs(j).MetricMin
+                        lParmDef.Min = .ParmDefs(j).Min
+                        lParmDef.Parent = .ParmDefs(j).Parent
+                        lParmDef.SoftMax = .ParmDefs(j).SoftMax
+                        lParmDef.SoftMin = .ParmDefs(j).SoftMin
+                        .ParmDefs.Add(lParmDef)
+                    Next
+                Next i
+            ElseIf aBlockName = "RCHRES" And .Name = "CONDUIT-XS" Then
+                For i As Integer = 2 To 100 'up to 100 rows possible
+                    For j As Integer = 0 To 4
+                        Dim lParmDef As New HSPFParmDef
+                        lParmDef.Name = .ParmDefs(j).Name & CStr(i) 'Name
+                        lParmDef.Typ = .ParmDefs(j).Typ
+                        If j = 0 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 11
+                        ElseIf j = 1 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 31
+                        ElseIf j = 2 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 41
+                        ElseIf j = 3 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 51
+                        ElseIf j = 4 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 61
+                        End If
+                        lParmDef.Length = .ParmDefs(j).Length
+                        lParmDef.DefaultValue = .ParmDefs(j).DefaultValue
+                        lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                        lParmDef.Define = .ParmDefs(j).Define
+                        lParmDef.Max = .ParmDefs(j).Max
+                        lParmDef.MetricDefault = .ParmDefs(j).MetricDefault
+                        lParmDef.MetricMax = .ParmDefs(j).MetricMax
+                        lParmDef.MetricMin = .ParmDefs(j).MetricMin
+                        lParmDef.Min = .ParmDefs(j).Min
+                        lParmDef.Parent = .ParmDefs(j).Parent
+                        lParmDef.SoftMax = .ParmDefs(j).SoftMax
+                        lParmDef.SoftMin = .ParmDefs(j).SoftMin
+                        .ParmDefs.Add(lParmDef)
+                    Next
+                Next i
+            ElseIf aBlockName = "RCHRES" And .Name = "NODE-PARM" Then
+                For i As Integer = 2 To 100 'up to 100 rows possible
+                    For j As Integer = 0 To 4
+                        Dim lParmDef As New HSPFParmDef
+                        lParmDef.Name = .ParmDefs(j).Name & CStr(i) 'Name
+                        lParmDef.Typ = .ParmDefs(j).Typ
+                        If j = 0 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 17
+                        ElseIf j = 1 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 21
+                        ElseIf j = 2 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 31
+                        ElseIf j = 3 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 41
+                        ElseIf j = 4 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 51
+                        End If
+                        lParmDef.Length = .ParmDefs(j).Length
+                        lParmDef.DefaultValue = .ParmDefs(j).DefaultValue
+                        lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                        lParmDef.Define = .ParmDefs(j).Define
+                        lParmDef.Max = .ParmDefs(j).Max
+                        lParmDef.MetricDefault = .ParmDefs(j).MetricDefault
+                        lParmDef.MetricMax = .ParmDefs(j).MetricMax
+                        lParmDef.MetricMin = .ParmDefs(j).MetricMin
+                        lParmDef.Min = .ParmDefs(j).Min
+                        lParmDef.Parent = .ParmDefs(j).Parent
+                        lParmDef.SoftMax = .ParmDefs(j).SoftMax
+                        lParmDef.SoftMin = .ParmDefs(j).SoftMin
+                        .ParmDefs.Add(lParmDef)
+                    Next
+                Next i
             ElseIf aBlockName = "REPORT" And .Name = "REPORT-SRC" Then
                 For i As Integer = 2 To 25 'up to 25 rows possible
                     Dim lParmDef As New HSPFParmDef
