@@ -2576,7 +2576,7 @@ Module modBaseflowUtil
         Dim lPadWidth As Integer = 19 - lFieldWidthFilename
         Dim lDrainageAreaStr As String = String.Format("{0:0.00}", lDrainageArea)
         lDrainageAreaStr = lDrainageAreaStr.PadLeft(lPadWidth, " ")
-        Dim lSFMean As Double = aTsSF.Attributes.GetValue("Mean")
+        Dim lSFMean As Double = lTsFlow.Attributes.GetValue("Mean")
         Dim lBFMean1 As Double = lTsBaseflow1.Attributes.GetValue("Mean")
         Dim lBFMean2 As Double = lTsBaseflow2.Attributes.GetValue("Mean")
         Dim lBFMean3 As Double = lTsBaseflow3.Attributes.GetValue("Mean")

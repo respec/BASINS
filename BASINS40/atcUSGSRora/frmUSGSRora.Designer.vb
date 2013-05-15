@@ -24,6 +24,8 @@ Partial Class frmUSGSRora
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmUSGSRora))
         Me.gbDates = New System.Windows.Forms.GroupBox
+        Me.lblAnalysisDates = New System.Windows.Forms.Label
+        Me.lblPeriodOfRecord = New System.Windows.Forms.Label
         Me.txtEndDateUser = New System.Windows.Forms.TextBox
         Me.txtStartDateUser = New System.Windows.Forms.TextBox
         Me.btnExamineData = New System.Windows.Forms.Button
@@ -54,8 +56,9 @@ Partial Class frmUSGSRora
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuAnalysis = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
-        Me.lblAnalysisDates = New System.Windows.Forms.Label
-        Me.lblPeriodOfRecord = New System.Windows.Forms.Label
+        Me.lblNewMinFlow = New System.Windows.Forms.Label
+        Me.txtNewMinFlow = New System.Windows.Forms.TextBox
+        Me.lblUnit4 = New System.Windows.Forms.Label
         Me.gbDates.SuspendLayout()
         Me.gbOutputFileSpecs.SuspendLayout()
         Me.gbParameters.SuspendLayout()
@@ -75,37 +78,62 @@ Partial Class frmUSGSRora
         Me.gbDates.Controls.Add(Me.txtDataStart)
         Me.gbDates.Controls.Add(Me.lblDataEnd)
         Me.gbDates.Controls.Add(Me.lblDataStart)
-        Me.gbDates.Location = New System.Drawing.Point(12, 27)
+        Me.gbDates.Location = New System.Drawing.Point(16, 33)
+        Me.gbDates.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.gbDates.Name = "gbDates"
-        Me.gbDates.Size = New System.Drawing.Size(344, 114)
+        Me.gbDates.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.gbDates.Size = New System.Drawing.Size(459, 140)
         Me.gbDates.TabIndex = 8
         Me.gbDates.TabStop = False
         Me.gbDates.Text = "Analysis Dates"
+        '
+        'lblAnalysisDates
+        '
+        Me.lblAnalysisDates.AutoSize = True
+        Me.lblAnalysisDates.Location = New System.Drawing.Point(254, 18)
+        Me.lblAnalysisDates.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblAnalysisDates.Name = "lblAnalysisDates"
+        Me.lblAnalysisDates.Size = New System.Drawing.Size(101, 17)
+        Me.lblAnalysisDates.TabIndex = 14
+        Me.lblAnalysisDates.Text = "Analysis Dates"
+        '
+        'lblPeriodOfRecord
+        '
+        Me.lblPeriodOfRecord.AutoSize = True
+        Me.lblPeriodOfRecord.Location = New System.Drawing.Point(87, 20)
+        Me.lblPeriodOfRecord.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblPeriodOfRecord.Name = "lblPeriodOfRecord"
+        Me.lblPeriodOfRecord.Size = New System.Drawing.Size(115, 17)
+        Me.lblPeriodOfRecord.TabIndex = 13
+        Me.lblPeriodOfRecord.Text = "Period of Record"
         '
         'txtEndDateUser
         '
         Me.txtEndDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtEndDateUser.Location = New System.Drawing.Point(194, 58)
+        Me.txtEndDateUser.Location = New System.Drawing.Point(257, 73)
+        Me.txtEndDateUser.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtEndDateUser.Name = "txtEndDateUser"
-        Me.txtEndDateUser.Size = New System.Drawing.Size(144, 20)
+        Me.txtEndDateUser.Size = New System.Drawing.Size(191, 22)
         Me.txtEndDateUser.TabIndex = 2
         '
         'txtStartDateUser
         '
         Me.txtStartDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtStartDateUser.Location = New System.Drawing.Point(194, 31)
+        Me.txtStartDateUser.Location = New System.Drawing.Point(257, 39)
+        Me.txtStartDateUser.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtStartDateUser.Name = "txtStartDateUser"
-        Me.txtStartDateUser.Size = New System.Drawing.Size(144, 20)
+        Me.txtStartDateUser.Size = New System.Drawing.Size(191, 22)
         Me.txtStartDateUser.TabIndex = 1
         '
         'btnExamineData
         '
         Me.btnExamineData.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnExamineData.Location = New System.Drawing.Point(68, 85)
+        Me.btnExamineData.Location = New System.Drawing.Point(91, 105)
+        Me.btnExamineData.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnExamineData.Name = "btnExamineData"
-        Me.btnExamineData.Size = New System.Drawing.Size(94, 23)
+        Me.btnExamineData.Size = New System.Drawing.Size(125, 28)
         Me.btnExamineData.TabIndex = 3
         Me.btnExamineData.Text = "Examine Data"
         Me.btnExamineData.UseVisualStyleBackColor = True
@@ -113,27 +141,30 @@ Partial Class frmUSGSRora
         'txtDataEnd
         '
         Me.txtDataEnd.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtDataEnd.Location = New System.Drawing.Point(68, 59)
+        Me.txtDataEnd.Location = New System.Drawing.Point(91, 73)
+        Me.txtDataEnd.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtDataEnd.Name = "txtDataEnd"
         Me.txtDataEnd.ReadOnly = True
-        Me.txtDataEnd.Size = New System.Drawing.Size(119, 20)
+        Me.txtDataEnd.Size = New System.Drawing.Size(158, 22)
         Me.txtDataEnd.TabIndex = 12
         '
         'txtDataStart
         '
         Me.txtDataStart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtDataStart.Location = New System.Drawing.Point(68, 32)
+        Me.txtDataStart.Location = New System.Drawing.Point(91, 39)
+        Me.txtDataStart.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtDataStart.Name = "txtDataStart"
         Me.txtDataStart.ReadOnly = True
-        Me.txtDataStart.Size = New System.Drawing.Size(119, 20)
+        Me.txtDataStart.Size = New System.Drawing.Size(158, 22)
         Me.txtDataStart.TabIndex = 11
         '
         'lblDataEnd
         '
         Me.lblDataEnd.AutoSize = True
-        Me.lblDataEnd.Location = New System.Drawing.Point(6, 58)
+        Me.lblDataEnd.Location = New System.Drawing.Point(8, 71)
+        Me.lblDataEnd.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblDataEnd.Name = "lblDataEnd"
-        Me.lblDataEnd.Size = New System.Drawing.Size(52, 13)
+        Me.lblDataEnd.Size = New System.Drawing.Size(67, 17)
         Me.lblDataEnd.TabIndex = 1
         Me.lblDataEnd.Text = "Data End"
         '
@@ -142,9 +173,10 @@ Partial Class frmUSGSRora
         Me.lblDataStart.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblDataStart.AutoSize = True
-        Me.lblDataStart.Location = New System.Drawing.Point(6, 32)
+        Me.lblDataStart.Location = New System.Drawing.Point(8, 39)
+        Me.lblDataStart.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblDataStart.Name = "lblDataStart"
-        Me.lblDataStart.Size = New System.Drawing.Size(55, 13)
+        Me.lblDataStart.Size = New System.Drawing.Size(72, 17)
         Me.lblDataStart.TabIndex = 0
         Me.lblDataStart.Text = "Data Start"
         '
@@ -158,9 +190,11 @@ Partial Class frmUSGSRora
         Me.gbOutputFileSpecs.Controls.Add(Me.lblOutputDir)
         Me.gbOutputFileSpecs.Controls.Add(Me.txtOutputRootName)
         Me.gbOutputFileSpecs.Controls.Add(Me.lblBaseFilename)
-        Me.gbOutputFileSpecs.Location = New System.Drawing.Point(12, 291)
+        Me.gbOutputFileSpecs.Location = New System.Drawing.Point(16, 397)
+        Me.gbOutputFileSpecs.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.gbOutputFileSpecs.Name = "gbOutputFileSpecs"
-        Me.gbOutputFileSpecs.Size = New System.Drawing.Size(344, 111)
+        Me.gbOutputFileSpecs.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.gbOutputFileSpecs.Size = New System.Drawing.Size(459, 137)
         Me.gbOutputFileSpecs.TabIndex = 12
         Me.gbOutputFileSpecs.TabStop = False
         Me.gbOutputFileSpecs.Text = "Text Output"
@@ -168,9 +202,10 @@ Partial Class frmUSGSRora
         'btnGraphRecharge
         '
         Me.btnGraphRecharge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnGraphRecharge.Location = New System.Drawing.Point(78, 82)
+        Me.btnGraphRecharge.Location = New System.Drawing.Point(104, 101)
+        Me.btnGraphRecharge.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnGraphRecharge.Name = "btnGraphRecharge"
-        Me.btnGraphRecharge.Size = New System.Drawing.Size(126, 23)
+        Me.btnGraphRecharge.Size = New System.Drawing.Size(168, 28)
         Me.btnGraphRecharge.TabIndex = 32
         Me.btnGraphRecharge.Text = "Plot Monthly Recharge"
         Me.btnGraphRecharge.UseVisualStyleBackColor = True
@@ -178,9 +213,10 @@ Partial Class frmUSGSRora
         'btnWriteASCIIOutput
         '
         Me.btnWriteASCIIOutput.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnWriteASCIIOutput.Location = New System.Drawing.Point(210, 82)
+        Me.btnWriteASCIIOutput.Location = New System.Drawing.Point(280, 101)
+        Me.btnWriteASCIIOutput.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnWriteASCIIOutput.Name = "btnWriteASCIIOutput"
-        Me.btnWriteASCIIOutput.Size = New System.Drawing.Size(128, 23)
+        Me.btnWriteASCIIOutput.Size = New System.Drawing.Size(171, 28)
         Me.btnWriteASCIIOutput.TabIndex = 10
         Me.btnWriteASCIIOutput.Text = "Write ASCII Outputs"
         Me.btnWriteASCIIOutput.UseVisualStyleBackColor = True
@@ -189,33 +225,37 @@ Partial Class frmUSGSRora
         '
         Me.txtOutputDir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtOutputDir.Location = New System.Drawing.Point(78, 20)
+        Me.txtOutputDir.Location = New System.Drawing.Point(104, 25)
+        Me.txtOutputDir.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtOutputDir.Name = "txtOutputDir"
-        Me.txtOutputDir.Size = New System.Drawing.Size(260, 20)
+        Me.txtOutputDir.Size = New System.Drawing.Size(345, 22)
         Me.txtOutputDir.TabIndex = 8
         '
         'lblOutputDir
         '
         Me.lblOutputDir.AutoSize = True
-        Me.lblOutputDir.Location = New System.Drawing.Point(8, 23)
+        Me.lblOutputDir.Location = New System.Drawing.Point(11, 28)
+        Me.lblOutputDir.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblOutputDir.Name = "lblOutputDir"
-        Me.lblOutputDir.Size = New System.Drawing.Size(68, 13)
+        Me.lblOutputDir.Size = New System.Drawing.Size(91, 17)
         Me.lblOutputDir.TabIndex = 31
         Me.lblOutputDir.Text = "Output folder"
         '
         'txtOutputRootName
         '
-        Me.txtOutputRootName.Location = New System.Drawing.Point(114, 49)
+        Me.txtOutputRootName.Location = New System.Drawing.Point(152, 60)
+        Me.txtOutputRootName.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtOutputRootName.Name = "txtOutputRootName"
-        Me.txtOutputRootName.Size = New System.Drawing.Size(121, 20)
+        Me.txtOutputRootName.Size = New System.Drawing.Size(160, 22)
         Me.txtOutputRootName.TabIndex = 9
         '
         'lblBaseFilename
         '
         Me.lblBaseFilename.AutoSize = True
-        Me.lblBaseFilename.Location = New System.Drawing.Point(6, 52)
+        Me.lblBaseFilename.Location = New System.Drawing.Point(8, 64)
+        Me.lblBaseFilename.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblBaseFilename.Name = "lblBaseFilename"
-        Me.lblBaseFilename.Size = New System.Drawing.Size(106, 13)
+        Me.lblBaseFilename.Size = New System.Drawing.Size(141, 17)
         Me.lblBaseFilename.TabIndex = 30
         Me.lblBaseFilename.Text = "Base output filename"
         '
@@ -223,6 +263,9 @@ Partial Class frmUSGSRora
         '
         Me.gbParameters.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbParameters.Controls.Add(Me.lblUnit4)
+        Me.gbParameters.Controls.Add(Me.txtNewMinFlow)
+        Me.gbParameters.Controls.Add(Me.lblNewMinFlow)
         Me.gbParameters.Controls.Add(Me.cboAnteRecess)
         Me.gbParameters.Controls.Add(Me.btnRecessionIndex)
         Me.gbParameters.Controls.Add(Me.lblUnit3)
@@ -233,9 +276,11 @@ Partial Class frmUSGSRora
         Me.gbParameters.Controls.Add(Me.lblDrainageArea)
         Me.gbParameters.Controls.Add(Me.txtDrainageArea)
         Me.gbParameters.Controls.Add(Me.lblDrainageAreaUnits)
-        Me.gbParameters.Location = New System.Drawing.Point(12, 147)
+        Me.gbParameters.Location = New System.Drawing.Point(16, 181)
+        Me.gbParameters.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.gbParameters.Name = "gbParameters"
-        Me.gbParameters.Size = New System.Drawing.Size(344, 138)
+        Me.gbParameters.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.gbParameters.Size = New System.Drawing.Size(459, 208)
         Me.gbParameters.TabIndex = 13
         Me.gbParameters.TabStop = False
         Me.gbParameters.Text = "Parameters"
@@ -243,16 +288,18 @@ Partial Class frmUSGSRora
         'cboAnteRecess
         '
         Me.cboAnteRecess.FormattingEnabled = True
-        Me.cboAnteRecess.Location = New System.Drawing.Point(129, 106)
+        Me.cboAnteRecess.Location = New System.Drawing.Point(172, 127)
+        Me.cboAnteRecess.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cboAnteRecess.Name = "cboAnteRecess"
-        Me.cboAnteRecess.Size = New System.Drawing.Size(86, 21)
+        Me.cboAnteRecess.Size = New System.Drawing.Size(120, 24)
         Me.cboAnteRecess.TabIndex = 7
         '
         'btnRecessionIndex
         '
-        Me.btnRecessionIndex.Location = New System.Drawing.Point(126, 69)
+        Me.btnRecessionIndex.Location = New System.Drawing.Point(172, 87)
+        Me.btnRecessionIndex.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnRecessionIndex.Name = "btnRecessionIndex"
-        Me.btnRecessionIndex.Size = New System.Drawing.Size(171, 23)
+        Me.btnRecessionIndex.Size = New System.Drawing.Size(228, 28)
         Me.btnRecessionIndex.TabIndex = 6
         Me.btnRecessionIndex.Text = "Browse Recession Index"
         Me.btnRecessionIndex.UseVisualStyleBackColor = True
@@ -260,71 +307,76 @@ Partial Class frmUSGSRora
         'lblUnit3
         '
         Me.lblUnit3.AutoSize = True
-        Me.lblUnit3.Location = New System.Drawing.Point(221, 109)
+        Me.lblUnit3.Location = New System.Drawing.Point(300, 130)
+        Me.lblUnit3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblUnit3.Name = "lblUnit3"
-        Me.lblUnit3.Size = New System.Drawing.Size(29, 13)
+        Me.lblUnit3.Size = New System.Drawing.Size(38, 17)
         Me.lblUnit3.TabIndex = 12
         Me.lblUnit3.Text = "days"
         '
         'lblUnit2
         '
         Me.lblUnit2.AutoSize = True
-        Me.lblUnit2.Location = New System.Drawing.Point(221, 46)
+        Me.lblUnit2.Location = New System.Drawing.Point(300, 60)
+        Me.lblUnit2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblUnit2.Name = "lblUnit2"
-        Me.lblUnit2.Size = New System.Drawing.Size(84, 13)
+        Me.lblUnit2.Size = New System.Drawing.Size(108, 17)
         Me.lblUnit2.TabIndex = 11
         Me.lblUnit2.Text = "days/logQ cycle"
         '
         'lblAnteRecess
         '
         Me.lblAnteRecess.AutoSize = True
-        Me.lblAnteRecess.Location = New System.Drawing.Point(7, 102)
+        Me.lblAnteRecess.Location = New System.Drawing.Point(8, 117)
+        Me.lblAnteRecess.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblAnteRecess.Name = "lblAnteRecess"
-        Me.lblAnteRecess.Size = New System.Drawing.Size(115, 26)
+        Me.lblAnteRecess.Size = New System.Drawing.Size(150, 34)
         Me.lblAnteRecess.TabIndex = 10
         Me.lblAnteRecess.Text = "Requirement of" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Antecedent Recession"
         '
         'txtRecessionIndex
         '
-        Me.txtRecessionIndex.Location = New System.Drawing.Point(126, 43)
+        Me.txtRecessionIndex.Location = New System.Drawing.Point(172, 57)
+        Me.txtRecessionIndex.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtRecessionIndex.Name = "txtRecessionIndex"
-        Me.txtRecessionIndex.Size = New System.Drawing.Size(89, 20)
+        Me.txtRecessionIndex.Size = New System.Drawing.Size(120, 22)
         Me.txtRecessionIndex.TabIndex = 5
         '
         'lblRecessionIndex
         '
         Me.lblRecessionIndex.AutoSize = True
-        Me.lblRecessionIndex.Location = New System.Drawing.Point(7, 46)
+        Me.lblRecessionIndex.Location = New System.Drawing.Point(8, 57)
+        Me.lblRecessionIndex.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblRecessionIndex.Name = "lblRecessionIndex"
-        Me.lblRecessionIndex.Size = New System.Drawing.Size(86, 13)
+        Me.lblRecessionIndex.Size = New System.Drawing.Size(111, 17)
         Me.lblRecessionIndex.TabIndex = 8
         Me.lblRecessionIndex.Text = "Recession Index"
         '
         'lblDrainageArea
         '
         Me.lblDrainageArea.AutoSize = True
-        Me.lblDrainageArea.Location = New System.Drawing.Point(7, 20)
+        Me.lblDrainageArea.Location = New System.Drawing.Point(8, 26)
+        Me.lblDrainageArea.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblDrainageArea.Name = "lblDrainageArea"
-        Me.lblDrainageArea.Size = New System.Drawing.Size(75, 13)
+        Me.lblDrainageArea.Size = New System.Drawing.Size(100, 17)
         Me.lblDrainageArea.TabIndex = 7
         Me.lblDrainageArea.Text = "Drainage Area"
         '
         'txtDrainageArea
         '
-        Me.txtDrainageArea.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDrainageArea.Location = New System.Drawing.Point(126, 17)
+        Me.txtDrainageArea.Location = New System.Drawing.Point(172, 27)
+        Me.txtDrainageArea.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtDrainageArea.Name = "txtDrainageArea"
-        Me.txtDrainageArea.Size = New System.Drawing.Size(89, 20)
+        Me.txtDrainageArea.Size = New System.Drawing.Size(120, 22)
         Me.txtDrainageArea.TabIndex = 4
         '
         'lblDrainageAreaUnits
         '
-        Me.lblDrainageAreaUnits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblDrainageAreaUnits.AutoSize = True
-        Me.lblDrainageAreaUnits.Location = New System.Drawing.Point(221, 20)
+        Me.lblDrainageAreaUnits.Location = New System.Drawing.Point(300, 30)
+        Me.lblDrainageAreaUnits.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblDrainageAreaUnits.Name = "lblDrainageAreaUnits"
-        Me.lblDrainageAreaUnits.Size = New System.Drawing.Size(31, 13)
+        Me.lblDrainageAreaUnits.Size = New System.Drawing.Size(41, 17)
         Me.lblDrainageAreaUnits.TabIndex = 4
         Me.lblDrainageAreaUnits.Text = "sq mi"
         '
@@ -333,7 +385,8 @@ Partial Class frmUSGSRora
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(367, 27)
+        Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(8, 2, 0, 2)
+        Me.MenuStrip1.Size = New System.Drawing.Size(489, 28)
         Me.MenuStrip1.TabIndex = 14
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -341,56 +394,65 @@ Partial Class frmUSGSRora
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(45, 23)
+        Me.mnuFile.Size = New System.Drawing.Size(44, 24)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(172, 24)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(154, 24)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(79, 23)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(74, 24)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(53, 23)
+        Me.mnuHelp.Size = New System.Drawing.Size(53, 24)
         Me.mnuHelp.Text = "Help"
         '
-        'lblAnalysisDates
+        'lblNewMinFlow
         '
-        Me.lblAnalysisDates.AutoSize = True
-        Me.lblAnalysisDates.Location = New System.Drawing.Point(191, 16)
-        Me.lblAnalysisDates.Name = "lblAnalysisDates"
-        Me.lblAnalysisDates.Size = New System.Drawing.Size(76, 13)
-        Me.lblAnalysisDates.TabIndex = 14
-        Me.lblAnalysisDates.Text = "Analysis Dates"
+        Me.lblNewMinFlow.AutoSize = True
+        Me.lblNewMinFlow.Location = New System.Drawing.Point(8, 171)
+        Me.lblNewMinFlow.Name = "lblNewMinFlow"
+        Me.lblNewMinFlow.Size = New System.Drawing.Size(158, 17)
+        Me.lblNewMinFlow.TabIndex = 13
+        Me.lblNewMinFlow.Text = "Replace Zero Flow With"
         '
-        'lblPeriodOfRecord
+        'txtNewMinFlow
         '
-        Me.lblPeriodOfRecord.AutoSize = True
-        Me.lblPeriodOfRecord.Location = New System.Drawing.Point(65, 16)
-        Me.lblPeriodOfRecord.Name = "lblPeriodOfRecord"
-        Me.lblPeriodOfRecord.Size = New System.Drawing.Size(87, 13)
-        Me.lblPeriodOfRecord.TabIndex = 13
-        Me.lblPeriodOfRecord.Text = "Period of Record"
+        Me.txtNewMinFlow.Location = New System.Drawing.Point(172, 168)
+        Me.txtNewMinFlow.Name = "txtNewMinFlow"
+        Me.txtNewMinFlow.Size = New System.Drawing.Size(120, 22)
+        Me.txtNewMinFlow.TabIndex = 14
+        Me.txtNewMinFlow.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'lblUnit4
+        '
+        Me.lblUnit4.AutoSize = True
+        Me.lblUnit4.Location = New System.Drawing.Point(298, 171)
+        Me.lblUnit4.Name = "lblUnit4"
+        Me.lblUnit4.Size = New System.Drawing.Size(26, 17)
+        Me.lblUnit4.TabIndex = 15
+        Me.lblUnit4.Text = "cfs"
         '
         'frmUSGSRora
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(367, 411)
+        Me.ClientSize = New System.Drawing.Size(489, 547)
         Me.Controls.Add(Me.gbParameters)
         Me.Controls.Add(Me.gbOutputFileSpecs)
         Me.Controls.Add(Me.gbDates)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Name = "frmUSGSRora"
         Me.Text = "USGS RORA"
         Me.gbDates.ResumeLayout(False)
@@ -438,4 +500,7 @@ Partial Class frmUSGSRora
     Friend WithEvents btnGraphRecharge As System.Windows.Forms.Button
     Friend WithEvents lblAnalysisDates As System.Windows.Forms.Label
     Friend WithEvents lblPeriodOfRecord As System.Windows.Forms.Label
+    Friend WithEvents txtNewMinFlow As System.Windows.Forms.TextBox
+    Friend WithEvents lblNewMinFlow As System.Windows.Forms.Label
+    Friend WithEvents lblUnit4 As System.Windows.Forms.Label
 End Class

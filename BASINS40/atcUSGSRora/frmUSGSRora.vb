@@ -156,6 +156,8 @@ Public Class frmUSGSRora
 
         txtOutputDir.Text = pOutputDir
         txtOutputRootName.Text = pRoraAnalysis.OutputFilenameRoot
+
+        txtNewMinFlow.Text = "0.01" 'Must specify a small positive flow value for days with zero flow
     End Sub
 
     Public Function AskUser(ByVal aName As String, _
@@ -211,7 +213,10 @@ Public Class frmUSGSRora
         End If
 
         Dim lIndex As Double = 0.0
-        If Not Double.TryParse(txtRecessionIndex.Text.Trim, lIndex) Then lErrMsg &= "- Recession Index not set" & vbCrLf
+        If Not Double.TryParse(txtRecessionIndex.Text.Trim, lIndex) Then
+            lErrMsg &= "- Recession Index not set" & vbCrLf
+            GoTo Notify
+        End If
 
         Dim lAnteRecession As Integer = 0
         If cboAnteRecess.SelectedItem Is Nothing Then
@@ -222,6 +227,12 @@ Public Class frmUSGSRora
             If lAnteRecession <= 0 Then
                 lErrMsg &= "- Antecedent Recession Days invalid" & vbCrLf
             End If
+        End If
+
+        Dim lNewMinFlow As Double = 0.01
+        If Not Double.TryParse(txtNewMinFlow.Text.Trim(), lNewMinFlow) OrElse lNewMinFlow < 0 Then
+            lErrMsg &= "- Must specify a small positive value for days of zero flow" & vbCrLf
+            GoTo Notify
         End If
 
         If lErrMsg.Length = 0 Then
@@ -244,6 +255,7 @@ Public Class frmUSGSRora
             Args.SetValue("EnglishUnit", True)
             'Set station.txt
             'Args.SetValue("Station File", atcUSGSStations.StationInfoFile)
+            Args.SetValue("NewMinFlow", lNewMinFlow)
         End If
 
 Notify:
@@ -381,6 +393,8 @@ Notify:
                     lIsConfigChanged = True
                 ElseIf .GetValue("Output Path", "") <> txtOutputDir.Text Then
                     lIsConfigChanged = True
+                ElseIf .GetValue("NewMinFlow", 0.01).ToString() <> txtNewMinFlow.Text.Trim() Then
+                    lIsConfigChanged = True
                 ElseIf lLastConstituent <> lCurrentConstituent OrElse lLastHistory1 <> lCurrentHistory1 OrElse lLastStartDate <> lCurrentStartDate OrElse lLastEndDate <> lCurrentEndDate Then
                     lIsConfigChanged = True
                 Else
@@ -431,12 +445,12 @@ Notify:
         Next
     End Sub
 
-    Private Sub ComputeRora()
+    Private Function ComputeRora() As Boolean
         Dim lArgs As New atcDataAttributes
         Dim lFormCheckMsg As String = AttributesFromForm(lArgs)
         If lFormCheckMsg.Length > 0 Then
             Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
-            Exit Sub
+            Return False
         End If
         ClearAttributes()
         Try
@@ -445,13 +459,15 @@ Notify:
             pRecessIndexLastUsed = lArgs.GetValue("Recession Index")
             pRoraAnalysis.PARAMAnteRecessDays = lArgs.GetValue("Antecedent Recession")
             pDidRora = True
+            Return True
         Catch ex As Exception
             Logger.Msg("RORA failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "RORA")
+            Return False
         End Try
         'If pDidBFSeparation Then
         '    Logger.Msg("Baseflow separation is successful.", MsgBoxStyle.OkOnly, "Baseflow Separation")
         'End If
-    End Sub
+    End Function
 
     Private Sub txtOutputRootName_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtOutputRootName.TextChanged
         pRoraAnalysis.OutputFilenameRoot = txtOutputRootName.Text.Trim()
@@ -529,13 +545,16 @@ Notify:
         End If
 
         If Not pDidRora Then
-            ComputeRora()
-            Dim lResult As String = WriteRoraASCIIOutput()
-            If lResult.StartsWith("Failed") Then
-                Logger.Msg(lResult, "Writing RORA ASCII output failed")
-                pDidRora = False
+            If ComputeRora() Then
+                Dim lResult As String = WriteRoraASCIIOutput()
+                If lResult.StartsWith("Failed") Then
+                    Logger.Msg(lResult, "Writing RORA ASCII output failed")
+                    pDidRora = False
+                End If
+                If Not pDidRora Then Exit Sub
+            Else
+                Exit Sub
             End If
-            If Not pDidRora Then Exit Sub
         End If
 
 ViewOutput:
@@ -719,13 +738,16 @@ ViewOutput:
         End If
 
         If Not pDidRora Then
-            ComputeRora()
-            Dim lResult As String = WriteRoraASCIIOutput()
-            If lResult.StartsWith("Failed") Then
-                Logger.Msg(lResult, "Writing RORA ASCII output failed")
-                pDidRora = False
+            If ComputeRora() Then
+                Dim lResult As String = WriteRoraASCIIOutput()
+                If lResult.StartsWith("Failed") Then
+                    Logger.Msg(lResult, "Writing RORA ASCII output failed")
+                    pDidRora = False
+                End If
+                If Not pDidRora Then Exit Sub
+            Else
+                Exit Sub
             End If
-            If Not pDidRora Then Exit Sub
         End If
 
         Dim lSpecification As String = ""
