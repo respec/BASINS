@@ -273,7 +273,7 @@ FoundMatch:
             aPane.XAxis.Title.Text &= " " & aCommonTimeUnitName
         End If
 
-        If Not String.IsNullOrEmpty(aCommonScenario.Length) AndAlso aCommonScenario <> "<unk>" Then
+        If Not String.IsNullOrEmpty(aCommonScenario) AndAlso aCommonScenario <> "<unk>" Then
             If aCommonConstituent.Length > 0 _
                AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonScenario) Then
                 aPane.YAxis.Title.Text &= " " & aCommonScenario
