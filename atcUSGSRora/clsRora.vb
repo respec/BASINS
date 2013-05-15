@@ -5,6 +5,7 @@ Public Class clsRora
     
     Public PARAMAnteRecessDaysMin As Integer ' originally ITBASE
     Public PARAMAnteRecessDays As Integer
+    Public NewMinFlow As Double
     Public FatalError As Boolean = False
     Public RangeOfAnteRecessionDays As ArrayList
     Public OutputFilenameRoot As String
@@ -235,7 +236,7 @@ Public Class clsRora
             If lMonthComplete Then
                 lYearByMonthRecharge(lSeg.PeakDayYear - lYearStart + 1, lSeg.PeakDayMonth) += lSeg.Recharge
             Else
-                lYearByMonthRecharge(lSeg.PeakDayYear - lYearStart + 1, lSeg.PeakDayMonth) = 0
+                lYearByMonthRecharge(lSeg.PeakDayYear - lYearStart + 1, lSeg.PeakDayMonth) = -99.99
             End If
         Next
 
@@ -253,7 +254,7 @@ Public Class clsRora
             Dim liMonth As Integer
             For liMonth = 1 To 12
                 lSumYear += lYearByMonthRecharge(liYear, liMonth)
-                If lYearByMonthRecharge(liYear, liMonth) = 0 Then
+                If lYearByMonthRecharge(liYear, liMonth) < -90.0 Then
                     liMiss = 1
                 Else
                     lTotXX += lYearByMonthRecharge(liYear, liMonth)
@@ -269,7 +270,7 @@ Public Class clsRora
             Dim lMonthlyRechargeValue As Double
             For liMonth = 1 To 12
                 lMonthlyRechargeValue = lYearByMonthRecharge(liYear, liMonth)
-                If lMonthlyRechargeValue = 0 Then lMonthlyRechargeValue = -99.99
+                If lMonthlyRechargeValue < -90.0 Then lMonthlyRechargeValue = -99.99
                 lTextMonthly.Append(String.Format("{0:0.00}", lMonthlyRechargeValue).PadLeft(6, " "))
 
                 lTextMonCSV.AppendLine(lMonthCount & "," & liMonth & "-" & liYear + lYearStart - 1 & "," & String.Format("{0:0.00}", lMonthlyRechargeValue))
@@ -278,35 +279,37 @@ Public Class clsRora
             lTextMonthly.AppendLine(String.Format("{0:0.00}", lSumYear).PadLeft(6, " "))
 
             lAA = lYearByMonthRecharge(liYear, 1) + lYearByMonthRecharge(liYear, 2) + lYearByMonthRecharge(liYear, 3)
-            If lYearByMonthRecharge(liYear, 1) = 0 OrElse _
-               lYearByMonthRecharge(liYear, 2) = 0 OrElse _
-               lYearByMonthRecharge(liYear, 3) = 0 Then
+            If lYearByMonthRecharge(liYear, 1) < -90.0 OrElse _
+               lYearByMonthRecharge(liYear, 2) < -90.0 OrElse _
+               lYearByMonthRecharge(liYear, 3) < -90.0 Then
                 lAA = -99.99
             End If
             lBB = lYearByMonthRecharge(liYear, 4) + lYearByMonthRecharge(liYear, 5) + lYearByMonthRecharge(liYear, 6)
-            If lYearByMonthRecharge(liYear, 4) = 0 OrElse _
-               lYearByMonthRecharge(liYear, 5) = 0 OrElse _
-               lYearByMonthRecharge(liYear, 6) = 0 Then
+            If lYearByMonthRecharge(liYear, 4) < -90.0 OrElse _
+               lYearByMonthRecharge(liYear, 5) < -90.0 OrElse _
+               lYearByMonthRecharge(liYear, 6) < -90.0 Then
                 lBB = -99.99
             End If
             lCC = lYearByMonthRecharge(liYear, 7) + lYearByMonthRecharge(liYear, 8) + lYearByMonthRecharge(liYear, 9)
-            If lYearByMonthRecharge(liYear, 7) = 0 OrElse _
-               lYearByMonthRecharge(liYear, 8) = 0 OrElse _
-               lYearByMonthRecharge(liYear, 9) = 0 Then
+            If lYearByMonthRecharge(liYear, 7) < -90.0 OrElse _
+               lYearByMonthRecharge(liYear, 8) < -90.0 OrElse _
+               lYearByMonthRecharge(liYear, 9) < -90.0 Then
                 lCC = -99.99
             End If
 
             If liYear > 1 Then
                 Dim lWY As Double = lDD + lAA + lBB + lCC
-                If lAA < 0 OrElse lBB < 0 OrElse lCC < 0 OrElse lDD < 0 Then lWY = -99.99
+                If lAA < -99 OrElse lBB < -99 OrElse lCC < -99 OrElse lDD < -99 Then
+                    lWY = -99.99
+                End If
                 '945 format ('Oct ',1i4,' to Sept ',1i4,3x,5f8.2)
                 lTextWY.AppendLine("Oct " & lYearStart + liYear - 2 & " to Sept " & lYearStart + liYear - 1 & String.Format("{0:0.00}", lWY).PadLeft(11, " "))
             End If
 
             lDD = lYearByMonthRecharge(liYear, 10) + lYearByMonthRecharge(liYear, 11) + lYearByMonthRecharge(liYear, 12)
-            If lYearByMonthRecharge(liYear, 10) = 0 OrElse _
-               lYearByMonthRecharge(liYear, 11) = 0 OrElse _
-               lYearByMonthRecharge(liYear, 12) = 0 Then
+            If lYearByMonthRecharge(liYear, 10) < -90.0 OrElse _
+               lYearByMonthRecharge(liYear, 11) < -90.0 OrElse _
+               lYearByMonthRecharge(liYear, 12) < -90.0 Then
                 lDD = -99.99
             End If
             '944 FORMAT (1I6, 5F8.2) Qrt15
@@ -440,6 +443,7 @@ Public Class clsRora
         pDrainageArea = Args.GetValue("Drainage Area")
         PARAMRecessIndex = Args.GetValue("Recession Index")
         PARAMAnteRecessDays = Args.GetValue("Antecedent Recession")
+        NewMinFlow = Args.GetValue("NewMinFlow", 0.01)
         Dim lStart As Double = Args.GetValue("Start Date")
         Dim lEnd As Double = Args.GetValue("End Date")
         TsStreamFlow = Args.GetValue("Streamflow")(0)
@@ -448,6 +452,11 @@ Public Class clsRora
             lTsStreamFlow = SubsetByDate(TsStreamFlow, lStart, lEnd, Nothing)
             pStartDate = lStart
             pEndDate = lEnd
+
+            'Replace zero flow with a small positive number, 0.01 cfs by default
+            For I As Integer = 1 To lTsStreamFlow.numValues
+                If lTsStreamFlow.Value(I) = 0 Then lTsStreamFlow.Value(I) = NewMinFlow
+            Next
         Else
             Exit Sub
         End If
@@ -585,11 +594,11 @@ Public Class clsRora
 
         'remove the last segment
         Dim lNPeaks As Integer = piPeak - 1
-        RecessionSegment = listOfSegments(listOfSegments.Count - 1)
-        Dim lEndDateofLastSegTE As Double = TimAddJ(RecessionSegment.PeakDayDate, atcTimeUnit.TUDay, 1, RecessionSegment.TE - RecessionSegment.TS + 1)
-        If lEndDateofLastSegTE > pEndDate Then
-            listOfSegments.RemoveAt(listOfSegments.Count - 1)
-        End If
+        'RecessionSegment = listOfSegments(listOfSegments.Count - 1)
+        'Dim lEndDateofLastSegTE As Double = TimAddJ(RecessionSegment.PeakDayDate, atcTimeUnit.TUDay, 1, RecessionSegment.TE - RecessionSegment.TS + 1)
+        'If lEndDateofLastSegTE > pEndDate Then
+        listOfSegments.RemoveAt(listOfSegments.Count - 1)
+        'End If
 
         Bulletin = "Number of Peaks=" & listOfSegments.Count
 
