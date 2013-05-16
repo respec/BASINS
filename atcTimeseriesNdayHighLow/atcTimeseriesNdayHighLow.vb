@@ -94,7 +94,7 @@ Public Class atcTimeseriesNdayHighLow
                 End With
 
                 Dim defAttribute As New atcAttributeDefinition
-                With defHigh
+                With defAttribute
                     .Name = "Attribute"
                     .Description = "Attribute of n-day timeseries"
                     .Editable = True
