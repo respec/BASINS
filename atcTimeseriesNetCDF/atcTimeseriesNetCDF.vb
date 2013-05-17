@@ -186,9 +186,7 @@ Public Class atcTimeseriesNetCDF
                         For lTimeseriesIndex As Integer = 0 To lTimeseriesCount - 1
                             Dim lLocation As String = ""
                             If lUniqueLocations.Count > 0 Then
-                                If lUniqueLocations.Keys(lTimeseriesIndex) <> 0 Then
-                                    lLocation = "ID_" & lUniqueLocations.Keys(lTimeseriesIndex)
-                                End If
+                                lLocation = "ID_" & lUniqueLocations.Keys(lTimeseriesIndex)
                             ElseIf lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
                                 lYValue = lNetCDFFile.Variables(lNetCDFFile.NorthSouthDimension.ID).Values(lYIndex - 1)
                                 lLocation &= "Y:" & lYValue
@@ -203,8 +201,8 @@ Public Class atcTimeseriesNetCDF
                             End If
 
                             If Not lGetOnlyOneTimseries OrElse _
-                                (lYIndex = lYIndexToget AndAlso lXIndex = lXIndexToget) OrElse _
-                                lUniqueLocations.Count > 0 AndAlso lLocation.Length > 0 Then
+                                  (lYIndex = lYIndexToget AndAlso lXIndex = lXIndexToget) OrElse _
+                                  lUniqueLocations.Count > 0 AndAlso lLocation.Length > 0 Then
                                 Dim lTimeseries As New atcTimeseries(Me)
                                 Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.ConstituentVariables(0) 'lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
 
@@ -293,7 +291,9 @@ Public Class atcTimeseriesNetCDF
             ReDim lTimeseries.Values(lNumValues)
             Dim lIndex As Integer = 1
             For Each lXYPair As String In lAggregateLocation
-                Logger.Dbg("  Process " & lIndex & " of " & lAggregateLocation.Count & " at " & lXYPair)
+                If lIndex = 1 OrElse lIndex Mod 1000 = 0 Then
+                    Logger.Dbg("  Process " & lIndex & " of " & lAggregateLocation.Count & " at " & lXYPair)
+                End If
                 Dim lXIndex As Integer = StrRetRem(lXYPair)
                 Dim lYIndex As Integer = lXYPair
                 Dim lValues = lDataVariable.ReadArray(lNumValues, lXIndex, lYIndex)

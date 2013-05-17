@@ -21,7 +21,7 @@ Module netCDFViewer
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
         If Not IO.Directory.Exists(lOutFolder) Then IO.Directory.CreateDirectory(lOutFolder)
 
-        Dim lBaseNames() As String = {"rfe90m200309", "LangtangKholaWatershed", "merra.rfe.90m.200301", _
+        Dim lBaseNames() As String = {"rfe90m200309", "SUBWatersheds_LangtangKhola", "merra.rfe.90m.200301", _
                                       "swit", "Ta1", "LangtangKholaWatershed", "srtm_54_07_LangtangFill_LambertWatershed", "srtm_54_07_LangtangFill_LambertUEBAspect", "srtm_54_07_LangtangFill_LambertUEBSlope"}
         '{ "swit", "merra.prod.assim.20061230", "merra.prod.rad.20061231", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
         For Each lBaseName As String In lBaseNames
@@ -31,7 +31,7 @@ Module netCDFViewer
 
             Dim lAttributes As New atcData.atcDataAttributes
             If lFileName.Contains("merra") OrElse lFileName.Contains("rfe90m") Then
-                lAttributes.Add("AggregateGrid", lPathName & "LangtangKholaWatershed.nc")
+                lAttributes.Add("AggregateGrid", lPathName & "SUBWatersheds_LangtangKhola.nc")
             End If
 
             Dim lNetCDFFile As New atcTimeseriesNetCDF.atcTimeseriesNetCDF
@@ -137,6 +137,7 @@ Module netCDFViewer
                                     Dim lValuesFloat(lArraySize - 1) As Single
                                     Dim lValuesInt(lArraySize - 1) As Int32
                                     Dim lValuesShort(lArraySize - 1) As Int16
+                                    Dim lValuesByte(lArraySize - 1) As Byte
                                     If Not lArraySubset Then
                                         Select Case lXtype
                                             Case NetCDF.nc_type.NC_DOUBLE
@@ -166,6 +167,8 @@ Module netCDFViewer
                                                 lResult = NetCDF.nc_get_vara_short(lNCId, lVarId, lBase, lCount, lValuesShort)
                                             Case NetCDF.nc_type.NC_INT
                                                 lResult = NetCDF.nc_get_vara_int(lNCId, lVarId, lBase, lCount, lValuesInt)
+                                            Case NetCDF.nc_type.NC_BYTE
+                                                lResult = NetCDF.nc_get_vara_uchar(lNCId, lVarId, lBase, lCount, lValuesByte)
                                             Case Else
                                                 lResult = "<unknown type " & lXtype & ">"
                                         End Select
