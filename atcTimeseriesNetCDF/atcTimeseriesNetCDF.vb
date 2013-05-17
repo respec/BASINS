@@ -211,7 +211,9 @@ Public Class atcTimeseriesNetCDF
                                 Next
                                 lTimeseries.Attributes.SetValue("NetCDFValues", lDataVariable)
                                 If lUniqueLocations.Count > 0 AndAlso lLocation.Length > 0 Then
-                                    lTimeseries.Attributes.SetValue("Location Indexes", lUniqueLocations(lTimeseriesIndex))
+                                    Dim lCellLocations As ArrayList = lUniqueLocations(lTimeseriesIndex)
+                                    lTimeseries.Attributes.SetValue("Location Indexes", lCellLocations)
+                                    lTimeseries.Attributes.SetValue("CellCount", lCellLocations.Count)
                                 End If
 
                                 lTimeseries.SetInterval(lTimeUnit, 1)
