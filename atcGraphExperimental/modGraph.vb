@@ -400,10 +400,11 @@ FoundMatch:
                 lProvisionalTS = FillValues(lProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
                 lNonProvisionalTS = FillValues(lNonProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
             End If
-
-            lNonProvisionalTS.Attributes.ChangeTo(aTimeseries.Attributes)
-            lNonProvisionalTS.Attributes.DiscardCalculated()
-            aTimeseries = lNonProvisionalTS
+            If lNonProvisionalTS IsNot Nothing Then
+                lNonProvisionalTS.Attributes.ChangeTo(aTimeseries.Attributes)
+                lNonProvisionalTS.Attributes.DiscardCalculated()
+                aTimeseries = lNonProvisionalTS
+            End If
         End If
 
         Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")

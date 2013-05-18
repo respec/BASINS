@@ -539,7 +539,7 @@ Public Module modTimeseriesMath
                                Optional ByVal aAccumVal As Double = -999, _
                                Optional ByVal aDataSource As atcTimeseriesSource = Nothing) As atcTimeseries
 
-        If aOldTSer.numValues > 0 Then
+        If aOldTSer IsNot Nothing AndAlso aOldTSer.numValues > 0 Then
             Dim lDate(5) As Integer
             Dim lNewNumVals As Integer
             Dim lNewInd As Integer
@@ -622,7 +622,12 @@ Public Module modTimeseriesMath
                 Return Nothing
             End If
         Else
-            Logger.Dbg("No data values in Timeseries " & aOldTSer.ToString & ".")
+            If aOldTSer Is Nothing Then
+                Logger.Dbg("OldTSer is nothing.")
+            Else
+                Logger.Dbg("No data values in Timeseries " & aOldTSer.ToString & ".")
+            End If
+
             Return Nothing
         End If
     End Function
