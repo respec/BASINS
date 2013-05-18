@@ -891,10 +891,10 @@ Public Class clsRecess
         End With
     End Sub
 
-    Protected Function RecessAnalyse(ByVal aSegment As clsRecessionSegment, Optional ByVal aConstituent As String = "FLOW") As String
+    Protected Function RecessAnalyse(ByVal aSegment As clsRecessionSegment, Optional ByVal aConstituent As String = "Streamflow") As String
         Dim lMsg As New Text.StringBuilder
         Dim lMaxSegmentLengthInDays As Integer
-        If aConstituent = "FLOW" Then
+        If aConstituent = "Streamflow" OrElse aConstituent = "FLOW" Then
             lMaxSegmentLengthInDays = clsRecessionSegment.MaxSegmentLengthInDays
         ElseIf aConstituent = "GW LEVEL" Then
             lMaxSegmentLengthInDays = clsRecessionSegment.MaxSegmentLengthInDaysGW

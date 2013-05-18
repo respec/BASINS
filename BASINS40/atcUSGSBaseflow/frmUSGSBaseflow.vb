@@ -603,7 +603,7 @@ Public Class frmUSGSBaseflow
                     DisplayCDistGraph(lDataGroup)
                 End If
             End If
-        Else
+        Else 'all in one graph
             lTsGraphAll = New atcTimeseriesGroup
 
             Dim lTsGroupPart1 As atcTimeseriesGroup = Nothing
@@ -661,12 +661,19 @@ Public Class frmUSGSBaseflow
                 lTsGroupStock.AddRange(lTsGroupBFIModified1)
             End If
 
-            If aGraphType = "CDist" Then
-                lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "FLOW")(0))
-            Else
-                'lTsGraphAll.Add(lTsFlow)
+            'Originally thought would treat CDist graph differently from other type of graphs
+            'If aGraphType = "CDist" Then
+            '    lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "Streamflow")(0))
+            'Else
+            '    'lTsGraphAll.Add(lTsFlow)
+            '    lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "Streamflow")(0))
+            'End If
+
+            lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "Streamflow")(0))
+            If lTsGraphAll.Count = 0 Then 'didn't find Streamflow, then try finding 'FLOW'
                 lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "FLOW")(0))
             End If
+
             Dim lTsGroupBf As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Baseflow")
             lTsGraphAll.AddRange(lTsGroupBf)
             If aGraphType = "Timeseries" Then
@@ -746,7 +753,7 @@ Public Class frmUSGSBaseflow
 
             Dim lGraphTsFlowIn As atcTimeseries = lGraphTsFlow * lConversionFactor
             With lGraphTsFlowIn.Attributes
-                '.SetValue("Constituent", "FLOW")
+                '.SetValue("Constituent", "Streamflow")
                 '.SetValue("Scenario", "Observed")
                 .SetValue("Units", lYAxisTitleText)
                 .SetValue("YAxis", "LEFT")

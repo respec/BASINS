@@ -215,7 +215,7 @@ Public Class frmRecess
                 SwitchSeasonControls(False)
                 panelRiseFall.Visible = True
                 btnFallPlot.Visible = True
-            ElseIf lCons = "FLOW" Then
+            ElseIf lCons = "Streamflow" OrElse lCons = "FLOW" Then
                 Dim lTuStr As String = "Daily"
                 Dim location As String = ""
                 Dim lStaNam As String = ""
@@ -1365,7 +1365,8 @@ Public Class frmRecess
             lParametersAreSet = True
         End If
         If ConfigurationChanged() OrElse lParametersAreSet Then
-            If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+            Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
+            If lCons = "Streamflow" OrElse lCons = "FLOW" Then
                 'Dim lArgs As New atcDataAttributes
                 'Reset all listing/graphs when redo
                 txtAnalysisResults.Text = ""
@@ -1633,13 +1634,14 @@ Public Class frmRecess
     Private Function RecessionSelectionChanged() As Boolean
         Dim lIsSelectionChanged As Boolean = False
         Dim lSeg As clsRecessionSegment = Nothing
+        Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
         If pLastSelectedRecessions.Count = 0 Then
             'run for the first time
             'record the selection
             For Each lItem As String In lstRecessSegments.CheckedItems
-                If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+                If lCons = "Streamflow" OrElse lCons = "FLOW" Then
                     lSeg = pRecess.listOfSegments.ItemByKey(lItem)
-                ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+                ElseIf lCons = "GW LEVEL" Then
                     lSeg = pFall.listOfSegments.ItemByKey(lItem)
                 End If
 
@@ -1651,9 +1653,9 @@ Public Class frmRecess
             If lstRecessSegments.CheckedItems.Count = pLastSelectedRecessions.Count Then
                 For Each lItem As String In lstRecessSegments.CheckedItems
                     If pLastSelectedRecessions.Keys.Contains(lItem) Then
-                        If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+                        If lCons = "Streamflow" OrElse lCons = "FLOW" Then
                             lSeg = pRecess.listOfSegments.ItemByKey(lItem)
-                        ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+                        ElseIf lCons = "GW LEVEL" Then
                             lSeg = pFall.listOfSegments.ItemByKey(lItem)
                         End If
 
@@ -1805,10 +1807,10 @@ Public Class frmRecess
         Else
             Exit Sub
         End If
-
-        If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+        Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
+        If lCons = "Streamflow" OrElse lCons = "FLOW" Then
             pRecess.DoOperation(lOperation, lstRecessSegments.Items(e.Index).ToString)
-        ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+        ElseIf lCons = "GW LEVEL" Then
             pFall.DoOperation(lOperation, lstRecessSegments.Items(e.Index).ToString)
         End If
     End Sub
@@ -1820,11 +1822,12 @@ Public Class frmRecess
         Dim lSegs() As String = Nothing
 
         pZgc.Visible = False
-        If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+        Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
+        If lCons = "Streamflow" OrElse lCons = "FLOW" Then
             pRecess.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
             lSegs = pRecess.Table.Split(vbCrLf)
             pGraphRecessDatagroup.Add(pRecess.GraphTs)
-        ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+        ElseIf lCons = "GW LEVEL" Then
             pFall.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
             lSegs = pFall.Table.Split(vbCrLf)
             pGraphRecessDatagroup.Add(pFall.GraphTs)
@@ -1895,11 +1898,12 @@ Public Class frmRecess
         End If
 
         Dim lTargetPeakDate As String = lstRecessSegments.SelectedItem.ToString
+        Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
         Try
-            If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+            If lCons = "Streamflow" OrElse lCons = "FLOW" Then
                 pRecess.DoOperation("r", lTargetPeakDate)
                 txtAnalysisResults.Text = pRecess.Bulletin
-            ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+            ElseIf lCons = "GW LEVEL" Then
                 pFall.DoOperation("r", lTargetPeakDate)
                 txtAnalysisResults.Text = pFall.Bulletin
             End If
@@ -1950,9 +1954,10 @@ Public Class frmRecess
             Exit Sub
         End If
 
-        If pDataGroup(0).Attributes.GetValue("Constituent") = "FLOW" Then
+        Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
+        If lCons = "Streamflow" OrElse lCons = "FLOW" Then
             DoSummary(pRecess)
-        ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+        ElseIf lCons = "GW LEVEL" Then
             DoSummary(pFall)
         End If
 
