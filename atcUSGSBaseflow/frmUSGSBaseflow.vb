@@ -789,6 +789,10 @@ Public Class frmUSGSBaseflow
     End Function
 
     Private Sub DisplayTsGraph(ByVal aDataGroup As atcTimeseriesGroup)
+        'Make sure graph can't find provisional attribute
+        For Each lTs As atcTimeseries In aDataGroup
+            lTs.Attributes.SetValue("ProvisionalValueAttribute", "X" & lTs.Attributes.GetValue("ProvisionalValueAttribute", ""))
+        Next
         Dim lGraphForm As New atcGraph.atcGraphForm()
         lGraphForm.Icon = Me.Icon
         Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
@@ -811,6 +815,10 @@ Public Class frmUSGSBaseflow
             End If
         End With
         lGraphForm.Show()
+        'Restore provisional attribute after graphing
+        For Each lTs As atcTimeseries In aDataGroup
+            lTs.Attributes.SetValue("ProvisionalValueAttribute", lTs.Attributes.GetValue("ProvisionalValueAttribute", "").ToString.Substring(1))
+        Next
     End Sub
 
     Private Sub mnuGraphDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphDuration.Click
