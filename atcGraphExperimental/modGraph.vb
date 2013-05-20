@@ -355,8 +355,9 @@ FoundMatch:
     ''' </summary>
     Private Function HasProvisionalValues(ByVal aTimeseries As atcTimeseries) As Boolean
         If aTimeseries.ValueAttributesExist Then
+            Dim lProvisionalAttribute As String = aTimeseries.Attributes.GetValue("ProvisionalValueAttribute", "P")
             For lIndex As Integer = 0 To aTimeseries.numValues
-                If aTimeseries.ValueAttributesGetValue(lIndex, "P", False) Then
+                If aTimeseries.ValueAttributesGetValue(lIndex, lProvisionalAttribute, False) Then
                     Return True
                 End If
             Next
@@ -384,10 +385,11 @@ FoundMatch:
         Dim lProvisionalTS As atcTimeseries = Nothing
         Dim lNonProvisionalTS As atcTimeseries = Nothing
         If HasProvisionalValues(aTimeseries) Then
+            Dim lProvisionalAttribute As String = aTimeseries.Attributes.GetValue("ProvisionalValueAttribute", "P")
             Dim lNonProvisionalBuilder As New atcTimeseriesBuilder(Nothing)
             Dim lProvisionalBuilder As New atcTimeseriesBuilder(Nothing)
             For lIndex As Integer = 0 To aTimeseries.numValues
-                If aTimeseries.ValueAttributesGetValue(lIndex, "P", False) Then
+                If aTimeseries.ValueAttributesGetValue(lIndex, lProvisionalAttribute, False) Then
                     lProvisionalBuilder.AddValue(aTimeseries.Dates.Value(lIndex), aTimeseries.Value(lIndex))
                 Else
                     lNonProvisionalBuilder.AddValue(aTimeseries.Dates.Value(lIndex), aTimeseries.Value(lIndex))
