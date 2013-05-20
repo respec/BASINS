@@ -400,7 +400,17 @@ FoundMatch:
                 lProvisionalTS = FillValues(lProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
                 lNonProvisionalTS = FillValues(lNonProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
             End If
-            If lNonProvisionalTS IsNot Nothing Then
+            If lNonProvisionalTS Is Nothing Then
+                'If aTimeseries.Attributes.ContainsAttribute("Units") Then
+                '    If Not aTimeseries.Attributes.GetValue("Units", "").ToString.Contains("Provisional") Then
+                '        aTimeseries.Attributes.SetValue("Units", aTimeseries.Attributes.GetValue("Units", "") & ", Provisional")
+                '    End If
+                'Else
+                '    aTimeseries.Attributes.SetValue("Units", "Provisional")
+                'End If
+                aTimeseries = lProvisionalTS
+                lProvisionalTS = Nothing
+            Else
                 lNonProvisionalTS.Attributes.ChangeTo(aTimeseries.Attributes)
                 lNonProvisionalTS.Attributes.DiscardCalculated()
                 aTimeseries = lNonProvisionalTS
@@ -513,7 +523,7 @@ FoundMatch:
         With aTimeseries.Attributes
             Dim lCurveLabel As String = ""
 
-            If (aCommonTimeUnitName Is Nothing OrElse aCommonTimeUnitName.Length = 0) _
+            If String.IsNullOrEmpty(aCommonTimeUnitName) _
               AndAlso aTimeseries.Attributes.ContainsAttribute("Time Unit") Then
                 lCurveLabel &= TimeUnitName(aTimeseries.Attributes.GetValue("Time Unit"), _
                                             aTimeseries.Attributes.GetValue("Time Step", 1)) & " "
@@ -521,17 +531,17 @@ FoundMatch:
                 lCurveLabel &= aCommonTimeUnitName & " "
             End If
 
-            If aCommonScenario Is Nothing OrElse aCommonScenario.Length = 0 Then
+            If String.IsNullOrEmpty(aCommonScenario) Then
                 lCurveLabel &= .GetValue("Scenario", "") & " "
             ElseIf Not aCommonScenario.ToLower.Contains("<unk>") Then
                 lCurveLabel &= aCommonScenario & " "
             End If
-            If aCommonConstituent Is Nothing OrElse aCommonConstituent.Length = 0 Then
+            If String.IsNullOrEmpty(aCommonConstituent) Then
                 lCurveLabel &= .GetValue("Constituent", "") & " "
             Else
                 lCurveLabel &= aCommonConstituent & " "
             End If
-            If aCommonLocation Is Nothing OrElse aCommonLocation.Length = 0 OrElse aCommonLocation.ToLower.Contains("<unk>") Then
+            If String.IsNullOrEmpty(aCommonLocation) OrElse aCommonLocation.ToLower.Contains("<unk>") Then
                 Dim lLocation As String = .GetValue("Location", "")
                 If lLocation.Length = 0 OrElse lLocation = "<unk>" Then
                     lLocation = .GetValue("STAID", "")
@@ -541,7 +551,7 @@ FoundMatch:
                     lCurveLabel &= lLocation
                 End If
             End If
-            If (aCommonUnits Is Nothing OrElse aCommonUnits.Length = 0) AndAlso .ContainsAttribute("Units") Then
+            If String.IsNullOrEmpty(aCommonUnits) AndAlso .ContainsAttribute("Units") Then
                 lCurveLabel &= " (" & .GetValue("Units", "") & ")"
             End If
 
