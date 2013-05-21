@@ -402,7 +402,7 @@ FoundMatch:
                 lProvisionalTS = FillValues(lProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
                 lNonProvisionalTS = FillValues(lNonProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
             End If
-            If lNonProvisionalTS Is Nothing Then
+            If lNonProvisionalTS Is Nothing Then 'aTimeseries contains only provisional data
                 'If aTimeseries.Attributes.ContainsAttribute("Units") Then
                 '    If Not aTimeseries.Attributes.GetValue("Units", "").ToString.Contains("Provisional") Then
                 '        aTimeseries.Attributes.SetValue("Units", aTimeseries.Attributes.GetValue("Units", "") & ", Provisional")
@@ -410,9 +410,13 @@ FoundMatch:
                 'Else
                 '    aTimeseries.Attributes.SetValue("Units", "Provisional")
                 'End If
-                aTimeseries = lProvisionalTS
+                'aTimeseries = lProvisionalTS
+                Try
+                    lProvisionalTS.Clear()
+                Catch
+                End Try
                 lProvisionalTS = Nothing
-            Else
+            Else 'Graphing both approved and provisional data
                 lNonProvisionalTS.Attributes.ChangeTo(aTimeseries.Attributes)
                 lNonProvisionalTS.Attributes.DiscardCalculated()
                 aTimeseries = lNonProvisionalTS
@@ -509,9 +513,17 @@ FoundMatch:
                 aCommonLocation, aCommonUnits)
             lProvisionalCurve.Label.Text = "Provisional"
             lProvisionalCurve.Color = Color.Red
-            lProvisionalTS.Clear()
+            If Not lProvisionalTS.Attributes.GetValue("point", False) AndAlso lProvisionalTS.Attributes.GetValue("Count") <> lProvisionalTS.numValues Then
+                'atcTimeseriesPointList has its own copy of the values, discard the temporary timeseries
+                lProvisionalTS.Clear()
+            End If
         End If
-        If lNonProvisionalTS IsNot Nothing Then lNonProvisionalTS.Clear()
+        If lNonProvisionalTS IsNot Nothing Then
+            If Not lNonProvisionalTS.Attributes.GetValue("point", False) AndAlso lNonProvisionalTS.Attributes.GetValue("Count") <> lNonProvisionalTS.numValues Then
+                'atcTimeseriesPointList has its own copy of the values, discard the temporary timeseries
+                lNonProvisionalTS.Clear()
+            End If
+        End If
 
         Return lCurve
     End Function
