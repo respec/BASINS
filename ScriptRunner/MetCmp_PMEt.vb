@@ -19,6 +19,10 @@ Module MetCmp_PMEt
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("MetCmp_PMEt Start")
 
+        'Set the directory where all of the BASINS's met WDM files are located
+        pWdmDataPath = "G:\Data\BasinsMet\ATest\" 'WdmFinal
+
+        'Get a list of all met WDM file names for processing
         Dim lFileNames As New NameValueCollection
         Dim lSingleStationWDMFilename As String = "AK509739.wdm" '<<<change this to your filename if you want to do just a single WDM
         If pSingleStation Then
@@ -29,6 +33,7 @@ Module MetCmp_PMEt
         End If
         Logger.Dbg("MetCmp_PMEt: Found " & lFileNames.Count & " WDM data files")
 
+        'Create a log file
         Dim lSW As IO.StreamWriter
         Dim lLogFilename As String = pWdmDataPath & "zMetCmp_PMEt_Log.txt"
         If FileExists(lLogFilename) Then
@@ -44,6 +49,7 @@ Module MetCmp_PMEt
             lSW = Nothing
         End Try
 
+        'Looping through all met WDM found to calculate PMET and write it back into the WDM files
         Dim lCount As Integer = 0
         Dim lSwatWeatherStations As New SwatWeatherStations
         Try
@@ -53,16 +59,37 @@ Module MetCmp_PMEt
                 Logger.Dbg("Process " & lMetStation & "(" & lCount & " of " & lFileNames.Count & ")")
                 Dim lWDMFile As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM
                 If lWDMFile.Open(lFileName) AndAlso lWDMFile.DataSets.Count > 0 Then
+
+                    'Need to find the correct PREC and ATEM datasets, ie Scenario=OBSERVED
                     Dim lTsPrecGroup As atcTimeseriesGroup = lWDMFile.DataSets.FindData("Constituent", "PREC")
                     Dim lTsAtemGroup As atcTimeseriesGroup = lWDMFile.DataSets.FindData("Constituent", "ATEM")
                     Dim lTsPrec As atcTimeseries = Nothing
                     Dim lTsAtem As atcTimeseries = Nothing
-
                     Dim lThisLocation As String = ""
+
+                    If lTsPrecGroup.Count = 0 OrElse lTsAtemGroup.Count = 0 Then GoTo CLEANUP
+
+                    Dim lFoundPrecObserved As Boolean = False
+                    Dim lFoundPrecComputed As Boolean = False
                     For Each lTsPrec In lTsPrecGroup
+                        Dim lScen As String = lTsPrec.Attributes.GetValue("Scenario").ToString().ToUpper()
+                        If lScen = "OBSERVED" Then
+                            lFoundPrecObserved = True
+                        ElseIf lScen = "COMPUTED" Then
+                            lFoundPrecComputed = True
+                        End If
+                    Next
+                    If Not lFoundPrecObserved And Not lFoundPrecComputed Then GoTo CLEANUP
+
+                    Dim lDonePMET As Boolean = False
+                    For Each lTsPrec In lTsPrecGroup
+                        If lDonePMET Then GoTo CLEANUP 'Only do one PMET for one set of PREC-ATEM data pair per WDM file
+                        If lFoundPrecObserved Then
+                            If lTsPrec.Attributes.GetValue("Scenario").ToString.ToUpper() <> "OBSERVED" Then Continue For
+                        End If
                         lThisLocation = lTsPrec.Attributes.GetValue("Location", "")
                         lTsAtem = Nothing
-                        lTsAtem = lTsAtemGroup.FindData("Location", lThisLocation).Item(0)
+                        lTsAtem = lTsAtemGroup.FindData("Location", lThisLocation).Item(0) 'This assume the first ATEM is the desired dataset
                         If lTsAtem IsNot Nothing Then
                             Dim lDate(5) As Integer
                             Dim lSJD As Double = Math.Max(lTsPrec.Attributes.GetValue("SJDay"), _
@@ -101,11 +128,12 @@ Module MetCmp_PMEt
                                 'TODO: get actual elevation of location rather than using station elveation
                                 Dim lElevation As Double = lNearestStation.Elev / 0.3048
                                 Dim lPanEvapTimeseries As atcTimeseries = _
-                                    PanEvaporationTimeseriesComputedByPenmanMonteith(lElevation, lTsPrec, lTsAtem, Nothing, lNearestStation, 49.0, , , pDebug)
+                                    PanEvaporationTimeseriesComputedByPenmanMonteith(lElevation, lTsPrec, lTsAtem, Nothing, lNearestStation, 0.0, , , pDebug, )
                                 lPanEvapTimeseries.SetInterval(atcTimeUnit.TUDay, 1)
-                                lPanEvapTimeseries.Attributes.SetValue("ID", lTsAtem.Attributes.GetValue("ID") + 1000)
+                                lPanEvapTimeseries.Attributes.SetValue("ID", 9) 'lTsAtem.Attributes.GetValue("ID") + 1000) 'hard code ID9 for PMET
                                 lPanEvapTimeseries.Attributes.SetValue("TU", atcTimeUnit.TUDay)
                                 lPanEvapTimeseries.Attributes.SetValue("description", "SWAT PM ET inches")
+                                lDonePMET = True
 
                                 'Disaggragate the daily PMET timeseries into hourly timeseries
                                 Dim lID As Integer = lPanEvapTimeseries.Attributes.GetValue("ID")
@@ -136,7 +164,9 @@ Module MetCmp_PMEt
                                 ltsPMETHour = Nothing
                             End If
                         End If
-                    Next
+                    Next 'lTsPrec In lTsPrecGroup
+
+CLEANUP:
                     lTsPrecGroup.Clear()
                     lTsAtemGroup.Clear()
                     lTsPrecGroup = Nothing
@@ -145,7 +175,7 @@ Module MetCmp_PMEt
                     lWDMFile = Nothing
                 End If
                 If lSW IsNot Nothing Then lSW.Flush()
-            Next
+            Next 'lFileName In lFileNames
         Catch ex As Exception
             If lSW IsNot Nothing Then lSW.WriteLine("Failure: " & ex.Message)
             Logger.Dbg("MetCmp_PMEt Failure: " & ex.Message)
