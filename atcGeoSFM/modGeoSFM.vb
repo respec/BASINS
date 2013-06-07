@@ -3,6 +3,7 @@ Imports atcMwGisUtility
 Imports MapWinUtility
 Imports MapWinUtility.Strings
 Imports atcData
+Imports atcMetCmp
 Imports System.Drawing
 Imports System
 Imports System.IO
@@ -108,7 +109,7 @@ Public Module modGeoSFM
             Logger.Status("Step 2 of 11: Computing Flow Direction")
             lFlowDirGridFileName = FilenameNoExt(lDEMFileName) & "FlowDir.tif"
             lSlopeGridFileName = FilenameNoExt(lDEMFileName) & "Slope.tif"
-            Dim lRet As Integer = MapWinGeoProc.Hydrology.D8(lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, 8, True, Nothing)
+            Dim lRet As Integer = MapWinGeoProc.Hydrology.D8(lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, 8, False, Nothing)
             If Not GisUtil.IsLayer(lFlowDirGridLayerName) Then
                 GisUtil.AddLayer(lFlowDirGridFileName, lFlowDirGridLayerName)
             End If
@@ -128,7 +129,7 @@ Public Module modGeoSFM
         Else
             Logger.Status("Step 3 of 11: Computing Flow Accumulation")
             lFlowAccGridFileName = FilenameNoExt(lDEMFileName) & "FlowAcc.tif"
-            Dim lRet As Integer = MapWinGeoProc.Hydrology.AreaD8(lFlowDirGridFileName, "", lFlowAccGridFileName, False, False, 8, True, Nothing)
+            Dim lRet As Integer = MapWinGeoProc.Hydrology.AreaD8(lFlowDirGridFileName, "", lFlowAccGridFileName, False, False, 8, False, Nothing)
             GisUtil.AddLayer(lFlowAccGridFileName, lFlowAccGridLayerName)
             GisUtil.SaveProject(GisUtil.ProjectFileName)
         End If
@@ -201,7 +202,7 @@ Public Module modGeoSFM
             lStreamGridFileName = FilenameNoExt(lDEMFileName) & "Stream.tif"
             lSubbasinGridFileName = FilenameNoExt(lDEMFileName) & "Watershed.tif"
 
-            MapWinGeoProc.Hydrology.DelinStreamGrids(lDEMFileName, lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, lFlowAccGridFileName, "", lStrahlOrdResultGridFileName, lLongUpslopeResultGridFileName, lTotalUpslopeResultGridFileName, lStreamGridFileName, lStreamOrderResultGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, lStreamShapeResultFileName, lSubbasinGridFileName, aThresh, False, False, 8, True, Nothing)
+            MapWinGeoProc.Hydrology.DelinStreamGrids(lDEMFileName, lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, lFlowAccGridFileName, "", lStrahlOrdResultGridFileName, lLongUpslopeResultGridFileName, lTotalUpslopeResultGridFileName, lStreamGridFileName, lStreamOrderResultGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, lStreamShapeResultFileName, lSubbasinGridFileName, aThresh, False, False, 8, False, Nothing)
             'MapWinGeoProc.Hydrology.DelinStreamsAndSubBasins(lFlowDirGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, lStreamShapeResultFileName, lSubbasinGridFileName, Nothing)
             MapWinGeoProc.Hydrology.SubbasinsToShape(lFlowDirGridFileName, lSubbasinGridFileName, lSubbasinShapeResultFileName, Nothing)
 
@@ -1525,7 +1526,7 @@ Public Module modGeoSFM
         Return True
     End Function
 
-    Friend Function RainEvap(ByVal aPrecGageNamesBySubbasin As Collection, ByVal aEvapGageNamesBySubbasin As Collection, ByVal aSJDate As Double, ByVal aEJDate As Double) As Boolean
+    Friend Function RainEvap(ByVal aPrecGageNamesBySubbasin As Collection, ByVal aEvapGageNamesBySubbasin As Collection, ByVal aSJDate As Double, ByVal aEJDate As Double, Optional ByVal aGenPET As Boolean = False) As Boolean
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -1615,9 +1616,18 @@ Public Module modGeoSFM
             If lEvapGageName <> lEvapGageNamePrev Then
                 For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
                     For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
-                        If (lDataSet.Attributes.GetValue("Constituent") = "PEVT" And _
-                            lDataSet.Attributes.GetValue("Location") = lEvapGageName) Then
-                            lEvapTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                        If aGenPET Then
+                            If ((lDataSet.Attributes.GetValue("Constituent") = "TEMP" Or lDataSet.Attributes.GetValue("Constituent") = "ATEM") And _
+                                lDataSet.Attributes.GetValue("Location") = lEvapGageName) Then 'generate PET from supplied Temp
+                                Dim lLatitude As Double = lDataSet.Attributes.GetValue("Latitude", 30)
+                                Dim lCTS() As Double = {0, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055}
+                                lEvapTimeseries = PanEvaporationTimeseriesComputedByHamonX(lDataSet, Nothing, False, lLatitude, lCTS)
+                            End If
+                        Else
+                            If ((lDataSet.Attributes.GetValue("Constituent") = "PEVT" Or lDataSet.Attributes.GetValue("Constituent") = "PET") And _
+                                lDataSet.Attributes.GetValue("Location") = lEvapGageName) Then
+                                lEvapTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                            End If
                         End If
                     Next
                 Next
@@ -4481,6 +4491,11 @@ Public Module modGeoSFM
                 If lDataSet.Attributes.GetValue("Constituent") = aMetConstituent Then
                     Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
                     Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
+                    If lStanam Is Nothing Then 'try constituent instead
+                        lStanam = lDataSet.Attributes.GetValue("Constituent")
+                    Else 'add constituent name also
+                        lStanam &= ":" & lDataSet.Attributes.GetValue("Constituent")
+                    End If
                     Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
                     Dim lSJDay As Double
                     Dim lEJDay As Double
