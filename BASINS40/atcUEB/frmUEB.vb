@@ -2360,18 +2360,20 @@ KeepWaiting:
             If pSiteData.FileName.Length > 0 Then 'check site variable inputs
                 For i = 1 To pSiteData.Variables.Count
                     With AtcGridSiteVars.Source
-                        If FileExists(.CellValue(i, 2)) Then 'valid NetCDF file entered
-                            pSiteData.Variables(i - 1).GridFileName = .CellValue(i, 2)
-                            If .CellValue(i, 2).Length > 0 Then
+                        If .CellEditable(i, 3) AndAlso FileExists(.CellValue(i, 3)) Then 'valid NetCDF file entered
+                            pSiteData.Variables(i - 1).GridFileName = .CellValue(i, 3)
+                            If .CellValue(i, 4).Length > 0 AndAlso .CellValue(i, 5).Length > 0 AndAlso .CellValue(i, 6).Length > 0 Then
                                 'TODO: check validity of Grid Variable name
-                                pSiteData.Variables(i - 1).GridVariableName = .CellValue(i, 3)
+                                pSiteData.Variables(i - 1).GridVariableName = .CellValue(i, 4)
+                                pSiteData.Variables(i - 1).GridXVarName = .CellValue(i, 5)
+                                pSiteData.Variables(i - 1).GridYVarName = .CellValue(i, 6)
                                 pSiteData.Variables(i - 1).SpaceVarying = True
                             Else
-                                lMsg = "No grid variable specified in row " & i
+                                lMsg = "Missing Site Variables grid specifications (variable/dimension names) in row " & i
                                 Exit For
                             End If
-                        ElseIf IsNumeric(.CellValue(i, 4)) Then
-                            pSiteData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 4))
+                        ElseIf IsNumeric(.CellValue(i, 2)) Then
+                            pSiteData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 2))
                             pSiteData.Variables(i - 1).SpaceVarying = False
                         Else 'problem with a site value
                             lMsg = "Problem processing value on Site Variables tab in row " & i
@@ -2416,27 +2418,35 @@ KeepWaiting:
                 If lMsg.Length = 0 Then
                     For i = 1 To pInputControlData.Variables.Count
                         With AtcGridInputControl.Source
-                            If FileExists(.CellValue(i, 2)) Then 'valid index file of NetCDF files entered
-                                pInputControlData.Variables(i - 1).GridFileName = .CellValue(i, 2)
-                                If .CellValue(i, 3).Length > 0 Then
+                            If FileExists(.CellValue(i, 4)) Then 'valid index file of NetCDF files entered
+                                pInputControlData.Variables(i - 1).GridFileName = .CellValue(i, 4)
+                                If .CellValue(i, 5).Length > 0 AndAlso .CellValue(i, 6).Length > 0 AndAlso _
+                                   .CellValue(i, 7).Length > 0 AndAlso .CellValue(i, 8).Length > 0 Then
                                     'TODO: check validity of Grid Variable name
-                                    pInputControlData.Variables(i - 1).GridVariableName = .CellValue(i, 3)
+                                    pInputControlData.Variables(i - 1).GridVariableName = .CellValue(i, 5)
+                                    pInputControlData.Variables(i - 1).GridTimeVarName = .CellValue(i, 6)
+                                    pInputControlData.Variables(i - 1).GridXVarName = .CellValue(i, 7)
+                                    pInputControlData.Variables(i - 1).GridYVarName = .CellValue(i, 8)
+                                    If IsNumeric(.CellValue(i, 9)) AndAlso IsNumeric(.CellValue(i, 10)) Then
+                                        pInputControlData.Variables(i - 1).GridDataRangeMin = .CellValue(i, 9)
+                                        pInputControlData.Variables(i - 1).GridDataRangeMax = .CellValue(i, 10)
+                                    End If
                                     pInputControlData.Variables(i - 1).SpaceVarying = True
                                     pInputControlData.Variables(i - 1).TimeVarying = True
                                 Else
                                     lMsg = "No grid variable specified in row " & i
                                     Exit For
                                 End If
-                            ElseIf FileExists(.CellValue(i, 4)) Then 'valid timeseries file entered
-                                pInputControlData.Variables(i - 1).TimeFileName = .CellValue(i, 4)
+                            ElseIf FileExists(.CellValue(i, 3)) Then 'valid timeseries file entered
+                                pInputControlData.Variables(i - 1).TimeFileName = .CellValue(i, 3)
                                 pInputControlData.Variables(i - 1).TimeVarying = True
                                 pInputControlData.Variables(i - 1).SpaceVarying = False
-                            ElseIf IsNumeric(.CellValue(i, 5)) Then
-                                pInputControlData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 5))
+                            ElseIf IsNumeric(.CellValue(i, 2)) Then
+                                pInputControlData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 2))
                                 pInputControlData.Variables(i - 1).SpaceVarying = False
                                 pInputControlData.Variables(i - 1).TimeVarying = False
                             Else 'problem with a site value
-                                lMsg = "Problem processing value on Site Variables tab in row " & i
+                                lMsg = "Problem processing value on Input Variables tab in row " & i
                                 Exit For
                             End If
                         End With
@@ -2841,35 +2851,34 @@ KeepWaiting:
 
     Private Sub AtcGridInputControl_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridInputControl.CellEdited
         If aColumn = 1 Then 'updated space/time variability option
+            Dim lCol As Integer
             With aGrid.Source
                 If .CellValue(aRow, aColumn) = "Varying Space/Time" Then
-                    .CellEditable(aRow, 2) = True
-                    .CellColor(aRow, 2) = Color.White
-                    .CellEditable(aRow, 3) = True
-                    .CellColor(aRow, 3) = Color.White
-                    .CellEditable(aRow, 4) = False
-                    .CellColor(aRow, 4) = SystemColors.ControlDark
-                    .CellEditable(aRow, 5) = False
-                    .CellColor(aRow, 5) = SystemColors.ControlDark
+                    For lCol = 2 To 3
+                        .CellEditable(aRow, lCol) = False
+                        .CellColor(aRow, lCol) = SystemColors.ControlDark
+                    Next
+                    For lCol = 4 To 10
+                        .CellEditable(aRow, lCol) = True
+                        .CellColor(aRow, lCol) = Color.White
+                    Next
                 ElseIf AtcGridInputControl.Source.CellValue(aRow, aColumn) = "Varying Time Only" Then
                     .CellEditable(aRow, 2) = False
                     .CellColor(aRow, 2) = SystemColors.ControlDark
-                    .CellEditable(aRow, 3) = False
-                    .CellColor(aRow, 3) = SystemColors.ControlDark
-                    .CellEditable(aRow, 4) = True
-                    .CellColor(aRow, 4) = Color.White
-                    .CellEditable(aRow, 5) = False
-                    .CellColor(aRow, 5) = SystemColors.ControlDark
+                    .CellEditable(aRow, 3) = True
+                    .CellColor(aRow, 3) = Color.White
+                    For lCol = 4 To 10
+                        .CellEditable(aRow, lCol) = False
+                        .CellColor(aRow, lCol) = SystemColors.ControlDark
+                    Next
                 Else
                     .CellValue(aRow, 1) = "Constant Space/Time"
-                    .CellEditable(aRow, 2) = False
-                    .CellColor(aRow, 2) = SystemColors.ControlDark
-                    .CellEditable(aRow, 3) = False
-                    .CellColor(aRow, 3) = SystemColors.ControlDark
-                    .CellEditable(aRow, 4) = False
-                    .CellColor(aRow, 4) = SystemColors.ControlDark
-                    .CellEditable(aRow, 5) = True
-                    .CellColor(aRow, 5) = Color.White
+                    .CellEditable(aRow, 2) = True
+                    .CellColor(aRow, 2) = Color.White
+                    For lCol = 3 To 10
+                        .CellEditable(aRow, lCol) = False
+                        .CellColor(aRow, lCol) = SystemColors.ControlDark
+                    Next
                 End If
             End With
             aGrid.Refresh()
@@ -2883,29 +2892,35 @@ KeepWaiting:
                 lUniqueValues.Add("Varying Space/Time")
                 lUniqueValues.Add("Varying Time Only")
                 lUniqueValues.Add("Constant Space/Time")
-            ElseIf aColumn = 2 AndAlso chkFilePrompt.Checked Then
-                GetGridFileName(aGrid, aRow, aColumn, False, False)
-                AtcGridInputControl_CellEdited(aGrid, aRow, aColumn)
-            ElseIf aColumn = 3 Then
-                If FileExists(aGrid.Source.CellValue(aRow, 2)) Then
-                    Dim lFileStr As String = WholeFileString(aGrid.Source.CellValue(aRow, 2))
-                    Dim lNetCDFFileName As String = StrSplit(lFileStr, vbCrLf, "")
-                    lNetCDFFileName = RelativeFilename(PathNameOnly(aGrid.Source.CellValue(aRow, 2)) & "\" & lNetCDFFileName, CurDir) ' PathNameOnly(.CellValue(aRow, aColumn)))
-                    If FileExists(lNetCDFFileName) Then
-                        Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
-                        For Each lVar As atcTimeseriesNetCDF.atcNetCDFVariable In lNetCDFFile.Variables
-                            If lVar.Dimensions.Count = lNetCDFFile.Dimensions.Count Then 'this is a data variable
-                                lUniqueValues.Add(lVar.ToString)
-                            End If
-                        Next
-                    End If
-                End If
-            ElseIf aColumn = 4 AndAlso chkFilePrompt.Checked Then
+            ElseIf aColumn = 3 AndAlso chkFilePrompt.Checked Then
                 Dim cdlg As New Windows.Forms.OpenFileDialog
                 cdlg.Title = "Open Timeseries Data File for " & aGrid.Source.CellValue(aRow, 0)
                 cdlg.Filter = "Timeseries Data files (*.dat)|*.dat|All Files (*.*)|*.*"
                 If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
                     aGrid.Source.CellValue(aRow, aColumn) = cdlg.FileName
+                End If
+            ElseIf aColumn = 4 AndAlso chkFilePrompt.Checked Then
+                GetGridFileName(aGrid, aRow, aColumn, False, False)
+                AtcGridInputControl_CellEdited(aGrid, aRow, aColumn)
+            ElseIf aColumn > 4 AndAlso aColumn < 9 Then
+                If FileExists(aGrid.Source.CellValue(aRow, 4)) Then
+                    Dim lFileStr As String = WholeFileString(aGrid.Source.CellValue(aRow, 4))
+                    Dim lNetCDFFileName As String = StrSplit(lFileStr, vbCrLf, "")
+                    lNetCDFFileName = AbsolutePath(lNetCDFFileName, PathNameOnly(pInputControlData.FileName)) ' PathNameOnly(.CellValue(aRow, aColumn)))
+                    If FileExists(lNetCDFFileName) Then
+                        Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
+                        If aColumn = 5 Then 'get valid variable names from netCDF file
+                            For Each lVar As atcTimeseriesNetCDF.atcNetCDFVariable In lNetCDFFile.Variables
+                                If lVar.Dimensions.Count = lNetCDFFile.Dimensions.Count Then 'this is a data variable
+                                    lUniqueValues.Add(lVar.ToString)
+                                End If
+                            Next
+                        Else 'get valid dimension names from netCDF file
+                            For Each lDim As atcTimeseriesNetCDF.atcNetCDFDimension In lNetCDFFile.Dimensions
+                                lUniqueValues.Add(lDim.Name)
+                            Next
+                        End If
+                    End If
                 End If
             End If
             aGrid.ValidValues = lUniqueValues

@@ -75,6 +75,7 @@ ReadFile:
                 lExistingVariable.GridVariableName = lUEBVariable.GridVariableName
                 lExistingVariable.GridXVarName = lUEBVariable.GridXVarName
                 lExistingVariable.GridYVarName = lUEBVariable.GridYVarName
+                lExistingVariable.GridTimeVarName = lUEBVariable.GridTimeVarName
                 lExistingVariable.GridDataRangeMin = lUEBVariable.GridDataRangeMin
                 lExistingVariable.GridDataRangeMax = lUEBVariable.GridDataRangeMax
                 lExistingVariable.TimeVarying = lUEBVariable.TimeVarying
