@@ -240,6 +240,9 @@ Public Class frmGeoSFM
     Friend WithEvents chkConnectUEB As System.Windows.Forms.CheckBox
     Friend WithEvents lblDefineUEBGrid As System.Windows.Forms.Label
     Friend WithEvents AtcGridNetCDFGridsForUEB As atcControls.atcGrid
+    Friend WithEvents gbxETOption As System.Windows.Forms.GroupBox
+    Friend WithEvents rdoPETFromTemp As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoPETDirect As System.Windows.Forms.RadioButton
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -312,6 +315,9 @@ Public Class frmGeoSFM
         Me.cmdDefineUEBGrid = New System.Windows.Forms.Button
         Me.lblNetCDFGridsForUEB = New System.Windows.Forms.Label
         Me.tpgRain = New System.Windows.Forms.TabPage
+        Me.gbxETOption = New System.Windows.Forms.GroupBox
+        Me.rdoPETFromTemp = New System.Windows.Forms.RadioButton
+        Me.rdoPETDirect = New System.Windows.Forms.RadioButton
         Me.AtcGridPrec = New atcControls.atcGrid
         Me.cmdRainEvapNext = New System.Windows.Forms.Button
         Me.gbxSimulationDates = New System.Windows.Forms.GroupBox
@@ -450,6 +456,7 @@ Public Class frmGeoSFM
         Me.tpgResponse.SuspendLayout()
         Me.tpgUEBGrid.SuspendLayout()
         Me.tpgRain.SuspendLayout()
+        Me.gbxETOption.SuspendLayout()
         Me.gbxSimulationDates.SuspendLayout()
         Me.tpgSoil.SuspendLayout()
         Me.gbxFlow.SuspendLayout()
@@ -1338,6 +1345,7 @@ Public Class frmGeoSFM
         '
         'tpgRain
         '
+        Me.tpgRain.Controls.Add(Me.gbxETOption)
         Me.tpgRain.Controls.Add(Me.AtcGridPrec)
         Me.tpgRain.Controls.Add(Me.cmdRainEvapNext)
         Me.tpgRain.Controls.Add(Me.gbxSimulationDates)
@@ -1347,6 +1355,40 @@ Public Class frmGeoSFM
         Me.tpgRain.TabIndex = 2
         Me.tpgRain.Text = "Rain/Evap Data"
         Me.tpgRain.UseVisualStyleBackColor = True
+        '
+        'gbxETOption
+        '
+        Me.gbxETOption.Controls.Add(Me.rdoPETFromTemp)
+        Me.gbxETOption.Controls.Add(Me.rdoPETDirect)
+        Me.gbxETOption.Location = New System.Drawing.Point(269, 19)
+        Me.gbxETOption.Name = "gbxETOption"
+        Me.gbxETOption.Size = New System.Drawing.Size(266, 95)
+        Me.gbxETOption.TabIndex = 42
+        Me.gbxETOption.TabStop = False
+        Me.gbxETOption.Text = "Potential ET Input Option"
+        '
+        'rdoPETFromTemp
+        '
+        Me.rdoPETFromTemp.AutoSize = True
+        Me.rdoPETFromTemp.Location = New System.Drawing.Point(15, 60)
+        Me.rdoPETFromTemp.Name = "rdoPETFromTemp"
+        Me.rdoPETFromTemp.Size = New System.Drawing.Size(173, 17)
+        Me.rdoPETFromTemp.TabIndex = 1
+        Me.rdoPETFromTemp.TabStop = True
+        Me.rdoPETFromTemp.Text = "Compute PET from temperature"
+        Me.rdoPETFromTemp.UseVisualStyleBackColor = True
+        '
+        'rdoPETDirect
+        '
+        Me.rdoPETDirect.AutoSize = True
+        Me.rdoPETDirect.Checked = True
+        Me.rdoPETDirect.Location = New System.Drawing.Point(15, 32)
+        Me.rdoPETDirect.Name = "rdoPETDirect"
+        Me.rdoPETDirect.Size = New System.Drawing.Size(109, 17)
+        Me.rdoPETDirect.TabIndex = 0
+        Me.rdoPETDirect.TabStop = True
+        Me.rdoPETDirect.Text = "Input PET directly"
+        Me.rdoPETDirect.UseVisualStyleBackColor = True
         '
         'AtcGridPrec
         '
@@ -1394,7 +1436,7 @@ Public Class frmGeoSFM
         Me.gbxSimulationDates.Controls.Add(Me.atxEYear)
         Me.gbxSimulationDates.Location = New System.Drawing.Point(19, 18)
         Me.gbxSimulationDates.Name = "gbxSimulationDates"
-        Me.gbxSimulationDates.Size = New System.Drawing.Size(516, 96)
+        Me.gbxSimulationDates.Size = New System.Drawing.Size(243, 96)
         Me.gbxSimulationDates.TabIndex = 29
         Me.gbxSimulationDates.TabStop = False
         Me.gbxSimulationDates.Text = "Simulation Dates"
@@ -1402,7 +1444,7 @@ Public Class frmGeoSFM
         'Label54
         '
         Me.Label54.AutoSize = True
-        Me.Label54.Location = New System.Drawing.Point(87, 58)
+        Me.Label54.Location = New System.Drawing.Point(18, 60)
         Me.Label54.Name = "Label54"
         Me.Label54.Size = New System.Drawing.Size(26, 13)
         Me.Label54.TabIndex = 37
@@ -1411,7 +1453,7 @@ Public Class frmGeoSFM
         'Label55
         '
         Me.Label55.AutoSize = True
-        Me.Label55.Location = New System.Drawing.Point(83, 32)
+        Me.Label55.Location = New System.Drawing.Point(14, 34)
         Me.Label55.Name = "Label55"
         Me.Label55.Size = New System.Drawing.Size(29, 13)
         Me.Label55.TabIndex = 36
@@ -1420,7 +1462,7 @@ Public Class frmGeoSFM
         'Label56
         '
         Me.Label56.AutoSize = True
-        Me.Label56.Location = New System.Drawing.Point(242, 14)
+        Me.Label56.Location = New System.Drawing.Point(173, 16)
         Me.Label56.Name = "Label56"
         Me.Label56.Size = New System.Drawing.Size(26, 13)
         Me.Label56.TabIndex = 35
@@ -1429,7 +1471,7 @@ Public Class frmGeoSFM
         'Label57
         '
         Me.Label57.AutoSize = True
-        Me.Label57.Location = New System.Drawing.Point(193, 14)
+        Me.Label57.Location = New System.Drawing.Point(124, 16)
         Me.Label57.Name = "Label57"
         Me.Label57.Size = New System.Drawing.Size(37, 13)
         Me.Label57.TabIndex = 34
@@ -1438,7 +1480,7 @@ Public Class frmGeoSFM
         'Label58
         '
         Me.Label58.AutoSize = True
-        Me.Label58.Location = New System.Drawing.Point(125, 14)
+        Me.Label58.Location = New System.Drawing.Point(56, 16)
         Me.Label58.Name = "Label58"
         Me.Label58.Size = New System.Drawing.Size(29, 13)
         Me.Label58.TabIndex = 33
@@ -1452,7 +1494,7 @@ Public Class frmGeoSFM
         Me.atxEDay.HardMax = 31
         Me.atxEDay.HardMin = 1
         Me.atxEDay.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxEDay.Location = New System.Drawing.Point(245, 58)
+        Me.atxEDay.Location = New System.Drawing.Point(176, 60)
         Me.atxEDay.MaxWidth = 20
         Me.atxEDay.Name = "atxEDay"
         Me.atxEDay.NumericFormat = "0"
@@ -1475,7 +1517,7 @@ Public Class frmGeoSFM
         Me.atxSDay.HardMax = 31
         Me.atxSDay.HardMin = 1
         Me.atxSDay.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSDay.Location = New System.Drawing.Point(245, 32)
+        Me.atxSDay.Location = New System.Drawing.Point(176, 34)
         Me.atxSDay.MaxWidth = 20
         Me.atxSDay.Name = "atxSDay"
         Me.atxSDay.NumericFormat = "0"
@@ -1498,7 +1540,7 @@ Public Class frmGeoSFM
         Me.atxSYear.HardMax = 9999
         Me.atxSYear.HardMin = 0
         Me.atxSYear.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSYear.Location = New System.Drawing.Point(127, 32)
+        Me.atxSYear.Location = New System.Drawing.Point(58, 34)
         Me.atxSYear.MaxWidth = 20
         Me.atxSYear.Name = "atxSYear"
         Me.atxSYear.NumericFormat = "0"
@@ -1521,7 +1563,7 @@ Public Class frmGeoSFM
         Me.atxEMonth.HardMax = 12
         Me.atxEMonth.HardMin = 1
         Me.atxEMonth.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxEMonth.Location = New System.Drawing.Point(196, 58)
+        Me.atxEMonth.Location = New System.Drawing.Point(127, 60)
         Me.atxEMonth.MaxWidth = 20
         Me.atxEMonth.Name = "atxEMonth"
         Me.atxEMonth.NumericFormat = "0"
@@ -1544,7 +1586,7 @@ Public Class frmGeoSFM
         Me.atxSMonth.HardMax = 12
         Me.atxSMonth.HardMin = 1
         Me.atxSMonth.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSMonth.Location = New System.Drawing.Point(196, 32)
+        Me.atxSMonth.Location = New System.Drawing.Point(127, 34)
         Me.atxSMonth.MaxWidth = 20
         Me.atxSMonth.Name = "atxSMonth"
         Me.atxSMonth.NumericFormat = "0"
@@ -1567,7 +1609,7 @@ Public Class frmGeoSFM
         Me.atxEYear.HardMax = 9999
         Me.atxEYear.HardMin = 0
         Me.atxEYear.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxEYear.Location = New System.Drawing.Point(127, 58)
+        Me.atxEYear.Location = New System.Drawing.Point(58, 60)
         Me.atxEYear.MaxWidth = 20
         Me.atxEYear.Name = "atxEYear"
         Me.atxEYear.NumericFormat = "0"
@@ -2974,6 +3016,8 @@ Public Class frmGeoSFM
         Me.tpgResponse.PerformLayout()
         Me.tpgUEBGrid.ResumeLayout(False)
         Me.tpgRain.ResumeLayout(False)
+        Me.gbxETOption.ResumeLayout(False)
+        Me.gbxETOption.PerformLayout()
         Me.gbxSimulationDates.ResumeLayout(False)
         Me.gbxSimulationDates.PerformLayout()
         Me.tpgSoil.ResumeLayout(False)
@@ -3702,25 +3746,29 @@ Public Class frmGeoSFM
 
         'set dates from prec dsn
         For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
-            lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
-            'set dates
-            If lSelectedStation.StartJDate > lSJDate Then
-                lSJDate = lSelectedStation.StartJDate
-            End If
-            If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
-                lEJDate = lSelectedStation.EndJDate
+            If pPrecStations.Count > 0 Then
+                lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
+                'set dates
+                If lSelectedStation.StartJDate > lSJDate Then
+                    lSJDate = lSelectedStation.StartJDate
+                End If
+                If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                    lEJDate = lSelectedStation.EndJDate
+                End If
             End If
         Next
 
         'change dates to reflect met dsns if different
         For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
-            lSelectedStation = pMetStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 2))
-            'set dates
-            If lSelectedStation.StartJDate > lSJDate Then
-                lSJDate = lSelectedStation.StartJDate
-            End If
-            If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
-                lEJDate = lSelectedStation.EndJDate
+            If pMetStations.Count > 0 Then
+                lSelectedStation = pMetStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 2))
+                'set dates
+                If lSelectedStation.StartJDate > lSJDate Then
+                    lSJDate = lSelectedStation.StartJDate
+                End If
+                If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                    lEJDate = lSelectedStation.EndJDate
+                End If
             End If
         Next
 
@@ -3824,7 +3872,8 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        If RainEvap(lPrecGageNamesBySubbasin, lEvapGageNamesBySubbasin, lSJDate, lEJDate) Then
+        Dim lGenPET As Boolean = rdoPETFromTemp.Checked
+        If RainEvap(lPrecGageNamesBySubbasin, lEvapGageNamesBySubbasin, lSJDate, lEJDate, lGenPET) Then
             tabMain.SelectedIndex += 1 ' = 4
         End If
 
@@ -4190,7 +4239,13 @@ Public Class frmGeoSFM
                 lblStatus.Text = "Reading Evap Data ..."
                 Me.Refresh()
                 pMetStations.Clear()
-                BuildListofValidStationNames("PEVT", pMetStations)
+                If rdoPETDirect.Checked Then
+                    BuildListofValidStationNames("PET", pMetStations)
+                    BuildListofValidStationNames("PEVT", pMetStations)
+                Else
+                    BuildListofValidStationNames("TEMP", pMetStations)
+                    BuildListofValidStationNames("ATEM", pMetStations)
+                End If
                 SetPrecipStationGrid()
                 lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
@@ -4198,141 +4253,141 @@ Public Class frmGeoSFM
                 EnableControls(True)
                 pStationsRead = True
             End If
-        End If
-        If tabMain.SelectedIndex = 7 Or tabMain.SelectedIndex = 8 Then
-            'read reaches for sensitivity analysis or calibration 
-            lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
-            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-            Me.Refresh()
-            cboReachSensitivity.Items.Clear()
-            AtcConnectFlows.lstTarget.Items.Clear()
-            Dim orderfilename As String = pOutputPath & "order.txt"
-            If FileExists(orderfilename) Then
-                Dim lCurrentRecord As String
-                Dim lStreamReader As New StreamReader(orderfilename)
-                Do
-                    lCurrentRecord = lStreamReader.ReadLine
-                    If lCurrentRecord Is Nothing Then
-                        Exit Do
-                    Else
-                        If IsNumeric(lCurrentRecord) Then
-                            cboReachSensitivity.Items.Add(lCurrentRecord)
-                            AtcConnectFlows.lstTarget.Items.Add(lCurrentRecord)
-                        End If
-                    End If
-                Loop
-            Else
-                'Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Basin Characteristics' to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                Exit Sub
             End If
-            cboReachSensitivity.SelectedIndex = 0
-        End If
-        If tabMain.SelectedIndex = 8 Then
-            'set up calibration tab
-            AtcConnectFlows.lstSource.Items.Clear()
-            pFlowStations.Clear()
-            For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                Dim lTotalCount As Integer = lDataSource.DataSets.Count
-                Dim lCounter As Integer = 0
-                For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
-                    lCounter += 1
-                    Logger.Progress("Building list of valid calibration station names...", lCounter, lDataSource.DataSets.Count)
-                    If lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And lDataSet.Attributes.GetValue("Constituent") = "FLOW" Then
-                        Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
-                        Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
-                        Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
-                        Dim lSJDay As Double
-                        Dim lEJDay As Double
-                        lSJDay = lDataSet.Attributes.GetValue("Start Date", 0)
-                        lEJDay = lDataSet.Attributes.GetValue("End Date", 0)
-                        If lSJDay = 0 Then
-                            lSJDay = lDataSet.Dates.Value(0)
-                        End If
-                        If lEJDay = 0 Then
-                            lEJDay = lDataSet.Dates.Value(lDataSet.Dates.numValues)
-                        End If
-                        Dim lSdate(6) As Integer
-                        Dim lEdate(6) As Integer
-                        J2Date(lSJDay, lSdate)
-                        J2Date(lEJDay, lEdate)
-                        Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
-                        AtcConnectFlows.lstSource.Items.Add(lLoc & ":" & lDateString)
-                        Dim lStationDetails As New StationDetails
-                        lStationDetails.Name = lLoc
-                        lStationDetails.StartJDate = lSJDay
-                        lStationDetails.EndJDate = lEJDay
-                        lStationDetails.Description = lLoc & ":" & lDateString
-                        pFlowStations.Add(lStationDetails.Description, lStationDetails)
-                    End If
-                    'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
-                    lDataSet.ValuesNeedToBeRead = True
-                Next
-            Next
-            If lstCalib.Items.Count = 0 Then
-                lstCalib.Items.Clear()
-                lstCalib.Items.Add("SoilWhc")
-                lstCalib.Items.Add("Depth")
-                lstCalib.Items.Add("Texture")
-                lstCalib.Items.Add("Ks")
-                lstCalib.Items.Add("Interflow")
-                lstCalib.Items.Add("HSlope")
-                lstCalib.Items.Add("Baseflow")
-                lstCalib.Items.Add("CurveNum")
-                lstCalib.Items.Add("MaxCover")
-                lstCalib.Items.Add("BasinLoss")
-                lstCalib.Items.Add("PanCoeff")
-                lstCalib.Items.Add("TopSoil")
-                lstCalib.Items.Add("RainCalc")
-                lstCalib.Items.Add("RivRough")
-                lstCalib.Items.Add("RivSlope")
-                lstCalib.Items.Add("RivWidth")
-                lstCalib.Items.Add("RivLoss")
-                lstCalib.Items.Add("RivFPLoss")
-                lstCalib.Items.Add("Celerity")
-                lstCalib.Items.Add("Diffusion")
-            End If
-            lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
-            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-            Me.Refresh()
-        ElseIf tabMain.SelectedIndex = 9 Then
-            'output tab
-            atxMapYear.Text = atxSYear.Text
-            AtxMapMonth.Text = atxSMonth.Text
-            AtxMapDay.Text = atxSDay.Text
-            'read reaches for hydrograph plot 
-            cboRchHydro.Items.Clear()
-            Dim lFlowFileName As String = pOutputPath & "streamflow.txt"
-            If FileExists(lFlowFileName) Then
-                Try
+            If tabMain.SelectedIndex = 7 Or tabMain.SelectedIndex = 8 Then
+                'read reaches for sensitivity analysis or calibration 
+                lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+                Me.Refresh()
+                cboReachSensitivity.Items.Clear()
+                AtcConnectFlows.lstTarget.Items.Clear()
+                Dim orderfilename As String = pOutputPath & "order.txt"
+                If FileExists(orderfilename) Then
                     Dim lCurrentRecord As String
-                    Dim lStreamReader As New StreamReader(lFlowFileName)
+                    Dim lStreamReader As New StreamReader(orderfilename)
                     Do
                         lCurrentRecord = lStreamReader.ReadLine
                         If lCurrentRecord Is Nothing Then
                             Exit Do
                         Else
-                            Dim lstr As String = lCurrentRecord
-                            Dim lstr1 As String = ""
-                            Do While lstr.Length > 0
-                                lstr1 = StrRetRem(lstr)
-                                If IsNumeric(lstr1) Then
-                                    cboRchHydro.Items.Add(lstr1)
-                                End If
-                            Loop
-                            Exit Do
+                            If IsNumeric(lCurrentRecord) Then
+                                cboReachSensitivity.Items.Add(lCurrentRecord)
+                                AtcConnectFlows.lstTarget.Items.Add(lCurrentRecord)
+                            End If
                         End If
                     Loop
-                Catch lAppEx
+                Else
+                    'Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Basin Characteristics' to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
                     Exit Sub
-                End Try
-            Else
-                Exit Sub
+                End If
+                cboReachSensitivity.SelectedIndex = 0
             End If
-            cboRchHydro.SelectedIndex = 0
-            lblStatus.Text = "Update specifications if desired, then click one of the 'Generate' buttons to view output."
-            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-            Me.Refresh()
-        End If
+            If tabMain.SelectedIndex = 8 Then
+                'set up calibration tab
+                AtcConnectFlows.lstSource.Items.Clear()
+                pFlowStations.Clear()
+                For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+                    Dim lTotalCount As Integer = lDataSource.DataSets.Count
+                    Dim lCounter As Integer = 0
+                    For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+                        lCounter += 1
+                        Logger.Progress("Building list of valid calibration station names...", lCounter, lDataSource.DataSets.Count)
+                        If lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And lDataSet.Attributes.GetValue("Constituent") = "FLOW" Then
+                            Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
+                            Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
+                            Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
+                            Dim lSJDay As Double
+                            Dim lEJDay As Double
+                            lSJDay = lDataSet.Attributes.GetValue("Start Date", 0)
+                            lEJDay = lDataSet.Attributes.GetValue("End Date", 0)
+                            If lSJDay = 0 Then
+                                lSJDay = lDataSet.Dates.Value(0)
+                            End If
+                            If lEJDay = 0 Then
+                                lEJDay = lDataSet.Dates.Value(lDataSet.Dates.numValues)
+                            End If
+                            Dim lSdate(6) As Integer
+                            Dim lEdate(6) As Integer
+                            J2Date(lSJDay, lSdate)
+                            J2Date(lEJDay, lEdate)
+                            Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
+                            AtcConnectFlows.lstSource.Items.Add(lLoc & ":" & lDateString)
+                            Dim lStationDetails As New StationDetails
+                            lStationDetails.Name = lLoc
+                            lStationDetails.StartJDate = lSJDay
+                            lStationDetails.EndJDate = lEJDay
+                            lStationDetails.Description = lLoc & ":" & lDateString
+                            pFlowStations.Add(lStationDetails.Description, lStationDetails)
+                        End If
+                        'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
+                        lDataSet.ValuesNeedToBeRead = True
+                    Next
+                Next
+                If lstCalib.Items.Count = 0 Then
+                    lstCalib.Items.Clear()
+                    lstCalib.Items.Add("SoilWhc")
+                    lstCalib.Items.Add("Depth")
+                    lstCalib.Items.Add("Texture")
+                    lstCalib.Items.Add("Ks")
+                    lstCalib.Items.Add("Interflow")
+                    lstCalib.Items.Add("HSlope")
+                    lstCalib.Items.Add("Baseflow")
+                    lstCalib.Items.Add("CurveNum")
+                    lstCalib.Items.Add("MaxCover")
+                    lstCalib.Items.Add("BasinLoss")
+                    lstCalib.Items.Add("PanCoeff")
+                    lstCalib.Items.Add("TopSoil")
+                    lstCalib.Items.Add("RainCalc")
+                    lstCalib.Items.Add("RivRough")
+                    lstCalib.Items.Add("RivSlope")
+                    lstCalib.Items.Add("RivWidth")
+                    lstCalib.Items.Add("RivLoss")
+                    lstCalib.Items.Add("RivFPLoss")
+                    lstCalib.Items.Add("Celerity")
+                    lstCalib.Items.Add("Diffusion")
+                End If
+                lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+                Me.Refresh()
+            ElseIf tabMain.SelectedIndex = 9 Then
+                'output tab
+                atxMapYear.Text = atxSYear.Text
+                AtxMapMonth.Text = atxSMonth.Text
+                AtxMapDay.Text = atxSDay.Text
+                'read reaches for hydrograph plot 
+                cboRchHydro.Items.Clear()
+                Dim lFlowFileName As String = pOutputPath & "streamflow.txt"
+                If FileExists(lFlowFileName) Then
+                    Try
+                        Dim lCurrentRecord As String
+                        Dim lStreamReader As New StreamReader(lFlowFileName)
+                        Do
+                            lCurrentRecord = lStreamReader.ReadLine
+                            If lCurrentRecord Is Nothing Then
+                                Exit Do
+                            Else
+                                Dim lstr As String = lCurrentRecord
+                                Dim lstr1 As String = ""
+                                Do While lstr.Length > 0
+                                    lstr1 = StrRetRem(lstr)
+                                    If IsNumeric(lstr1) Then
+                                        cboRchHydro.Items.Add(lstr1)
+                                    End If
+                                Loop
+                                Exit Do
+                            End If
+                        Loop
+                    Catch lAppEx
+                        Exit Sub
+                    End Try
+                Else
+                    Exit Sub
+                End If
+                cboRchHydro.SelectedIndex = 0
+                lblStatus.Text = "Update specifications if desired, then click one of the 'Generate' buttons to view output."
+                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+                Me.Refresh()
+            End If
     End Sub
 
     Private Sub AtcGridSensitivity_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridSensitivity.CellEdited
@@ -4462,4 +4517,23 @@ Public Class frmGeoSFM
         End If
     End Sub
 
+    Private Sub rdoPETDirect_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoPETDirect.CheckedChanged
+        If rdoPETDirect.Checked AndAlso Not AtcGridPrec.Source Is Nothing Then
+            AtcGridPrec.Source.CellValue(0, 2) = "Evap Station"
+            pMetStations.Clear()
+            BuildListofValidStationNames("PET", pMetStations)
+            BuildListofValidStationNames("PEVT", pMetStations)
+            SetPrecipStationGrid()
+        End If
+    End Sub
+
+    Private Sub rdoPETFromTemp_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoPETFromTemp.CheckedChanged
+        If rdoPETFromTemp.Checked AndAlso Not AtcGridPrec.Source Is Nothing Then
+            AtcGridPrec.Source.CellValue(0, 2) = "Temp Station"
+            pMetStations.Clear()
+            BuildListofValidStationNames("TEMP", pMetStations)
+            BuildListofValidStationNames("ATEM", pMetStations)
+            SetPrecipStationGrid()
+        End If
+    End Sub
 End Class

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7862AD75-FC13-43FE-B1FF-316799321DB6}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -153,6 +153,11 @@
     <ProjectReference Include="..\atcGraphExperimental\atcGraph.vbproj">
       <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
       <Name>atcGraph</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMetCmp\atcMetCmp.vbproj">
+      <Project>{72264BDC-23F5-4A55-B53D-0752099CB263}</Project>
+      <Name>atcMetCmp</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
