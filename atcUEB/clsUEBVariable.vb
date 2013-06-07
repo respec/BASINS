@@ -40,7 +40,7 @@ Public Class clsUEBVariable
         If Units.Trim.Length > 0 Then lVariableDescription = lVariableDescription & " (" & Units.Trim & ")"
         If SpaceVarying Then
             Return lVariableDescription & vbCrLf & "1" & vbCrLf & RelativeFilename(GridFileName, aPathName) & _
-                   ";X:" & GridXVarName & ";Y:" & GridYVarName & ";D:" & GridVariableName
+                   ";X:" & GridXVarName & ";Y:" & GridYVarName & ";D:" & GridVariableName & vbCrLf
         Else
             Return lVariableDescription & vbCrLf & "0" & vbCrLf & Value & vbCrLf
         End If
@@ -77,13 +77,14 @@ Public Class clsUEBVariable
         Dim lVariableDescription As String = Code & ": " & LongName
         If Units.Trim.Length > 0 Then lVariableDescription = lVariableDescription & " (" & Units.Trim & ")"
         If SpaceVarying And TimeVarying Then
-            Return lVariableDescription & vbCrLf & "1" & vbCrLf & RelativeFilename(GridFileName, aPathName) & _
+            lVariableDescription &= lVariableDescription & vbCrLf & "1" & vbCrLf & RelativeFilename(GridFileName, aPathName) & _
                    ";X:" & GridXVarName & ";Y:" & GridYVarName & ";time:" & GridTimeVarName & ";D:" & GridVariableName
             If GridDataRangeMax > GridDataRangeMin Then
                 lVariableDescription &= ";range:" & GridDataRangeMin & "," & GridDataRangeMax & vbCrLf
             Else
                 lVariableDescription &= vbCrLf
             End If
+            Return lVariableDescription
         ElseIf TimeVarying Then
             Return lVariableDescription & vbCrLf & "0" & vbCrLf & RelativeFilename(TimeFileName, aPathName) & vbCrLf
         Else
@@ -116,7 +117,7 @@ Public Class clsUEBVariable
                     Case "TIME" : lUEBVar.GridTimeVarName = StrSplit(lRec, ";", "")
                     Case "D" : lUEBVar.GridVariableName = StrSplit(lRec, ";", "")
                     Case "RANGE"
-                        lUEBVar.GridDataRangeMin = Double.Parse(StrSplit(lRec, "&", ""))
+                        lUEBVar.GridDataRangeMin = Double.Parse(StrSplit(lRec, ",", ""))
                         lUEBVar.GridDataRangeMax = Double.Parse(StrSplit(lRec, ";", ""))
                 End Select
             End While
