@@ -5,8 +5,11 @@ Imports atcData
 Imports ATCutility
 
 Module WDMGlobal
-
+#If BatchMode Then
+#Else
     Friend g_MapWin As MapWindow.Interfaces.IMapWin
+#End If
+
     Private pUnitsDef As atcAttributeDefinition
     Private pUnitsDefEditable As atcAttributeDefinition
 
