@@ -156,6 +156,11 @@
       <Name>atcData</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcMetCmp\atcMetCmp.vbproj">
+      <Project>{72264BDC-23F5-4A55-B53D-0752099CB263}</Project>
+      <Name>atcMetCmp</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility</Name>
