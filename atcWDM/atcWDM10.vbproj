@@ -142,6 +142,10 @@
       <Name>BASINS-MapWinUtility10</Name>
       <Private>False</Private>
     </ProjectReference>
+    <Reference Include="MapWinInterfaces">
+      <HintPath>..\local\x86Debug\MapWinInterfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -193,10 +197,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MW4.8.6\MapWindow4Dev\MapWinInterfaces\MapWinInterfaces10.csproj">
-      <Project>{E880AAB1-98B5-45B8-A3B8-CB3D0DB8B317}</Project>
-      <Name>MapWinInterfaces10</Name>
-    </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls10.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls10</Name>
