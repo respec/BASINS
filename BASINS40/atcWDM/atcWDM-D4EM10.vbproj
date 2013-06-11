@@ -92,8 +92,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\D4EM\Bin4.0\</OutputPath>
-    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
+    <OutputPath>..\bin-D4EM10\x86Debug\</OutputPath>
+    <DefineConstants>GISProvider="DotSpatial",BatchMode=True</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcWDM.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
@@ -120,11 +120,6 @@
     <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinInterfaces, Version=4.2.2424.18924, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>

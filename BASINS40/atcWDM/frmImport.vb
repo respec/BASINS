@@ -1,6 +1,8 @@
 ﻿Imports atcData
 Imports MapWinUtility
 
+#If BatchMode Then
+#Else
 Public Class frmImport
 
     Private pSaveFolderSame As String = "(same folder as text file)"
@@ -258,5 +260,5 @@ Public Class frmImport
         txtSaveFolder.Text = GetSetting("BASINS", "WDMImport", "SaveFolder", pSaveFolderSame)
         txtSaveIn.Text = GetSetting("BASINS", "WDMImport", "SaveIn", "")
     End Sub
-
 End Class
+#End If
