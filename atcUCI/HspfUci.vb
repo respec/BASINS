@@ -207,6 +207,7 @@ Public Class HspfUci
             lSB.AppendLine(Comment)
         End If
         lSB.AppendLine("RUN")
+        lSB.AppendLine("")
 
         For Each lBlock As String In pOrder
             Dim lStr As String = ""

@@ -494,7 +494,7 @@ Public Class HspfOpnBlk
             Dim lTableDef As HspfTableDef = lBlockDef.TableDefs(lTableDefIndex - 1)
             'TODO: check to see if the 'Not lInGroup' is really needed
             If lTableDef.OccurGroup = 0 AndAlso _
-               (Not lInGroup Or lTableDef.Name = "GQ-VALUES") Then 'the basic case
+               (Not lInGroup) Then ' Or lTableDef.Name = "GQ-VALUES") Then 'the basic case
                 For Each lOperation As HspfOperation In pIds
                     If lOperation.TableExists(lTableDef.Name) Then
                         Dim lTable As HspfTable = lOperation.Tables.Item(lTableDef.Name)
@@ -563,7 +563,13 @@ Public Class HspfOpnBlk
                                     End If
                                 End If
                                 If lTable.OccurIndex = 0 Then 'write out just this occurence
-                                    lSB.AppendLine(lTable.ToStringByIndex(lGroupIndex))
+                                    Dim lName As String = lTable.Name
+                                    If lGroupIndex > 1 Then
+                                        lName = lName & ":" & lGroupIndex
+                                    End If
+                                    If lOperation.OpnBlk.TableExists(lName) Then
+                                        lSB.AppendLine(lTable.ToStringByIndex(lGroupIndex))
+                                    End If
                                 Else
                                     'special case for some p/i/gqual tables
                                     Dim j As Integer = 0
