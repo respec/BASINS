@@ -233,7 +233,7 @@ Module modUCIRecords
                     If lComment.Length = 0 Then
                         lComment = " "
                     Else
-                        lComment = vbCrLf & lComment
+                        'lComment = vbCrLf & lComment
                     End If
                 ElseIf pUciRec(lRecordIndex).IndexOf("***") = -1 Then
                     'something on this line and its not a comment

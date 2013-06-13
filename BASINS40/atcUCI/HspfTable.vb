@@ -229,7 +229,7 @@ Public Class HspfTable
                 End If
                 lTableName = Def.Name & ":" & lOccur
             End If
-            lSB.AppendLine("  " & Def.Name)
+            If Opn.OpnBlk.TableExists(lTableName) Then lSB.AppendLine("  " & Def.Name)
 
             Dim lPendingFlag As Boolean = False
             Dim lFirstOpn As Boolean = True
@@ -378,7 +378,7 @@ notMissingTableForThisOper:
                     lSB.AppendLine(lOutPend.TrimEnd)
                 End If
             End If
-            lSB.AppendLine("  END " & Def.Name)
+            If Opn.OpnBlk.TableExists(lTableName) Then lSB.AppendLine("  END " & Def.Name)
         Next lOccur
         Return lSB.ToString
     End Function
@@ -438,15 +438,15 @@ notMissingTableForThisOper:
             Case "MON-SEDCONC" : lT = "GQ-QALFG" : lParm = "QALFG3"
             Case "MON-PHYTO" : lT = "GQ-QALFG" : lParm = "QALFG3"
                 'Case "GQ-DAUGHTER": lT = "GQ-QALFG": lParm = QALFG1
-            Case "MON-SQOLIM" : lT = "QUAL-PROPS" : lParm = "VQOFG" 'perlnd
+                'Case "MON-SQOLIM" : lT = "QUAL-PROPS" : lParm = "VQOFG" 'perlnd
             Case "MON-POTFW" : lT = "QUAL-PROPS" : lParm = "VPFWFG"
             Case "MON-POTFS" : lT = "QUAL-PROPS" : lParm = "VPFSFG"
-            Case "MON-ACCUM" : lT = "QUAL-PROPS" : lParm = "VQOFG"
-            Case "MON-IFLW-CONC" : lT = "QUAL-PROPS" : lParm = "VIQCFG"
-            Case "MON-GRND-CONC" : lT = "QUAL-PROPS" : lParm = "VAQCFG"
-            Case "MON-SQOLIM" : lT = "QUAL-PROPS" : lParm = "VQOFG" 'implnd
+                'Case "MON-ACCUM" : lT = "QUAL-PROPS" : lParm = "VQOFG"
+                'Case "MON-IFLW-CONC" : lT = "QUAL-PROPS" : lParm = "VIQCFG"
+                'Case "MON-GRND-CONC" : lT = "QUAL-PROPS" : lParm = "VAQCFG"
+                'Case "MON-SQOLIM" : lT = "QUAL-PROPS" : lParm = "VQOFG" 'implnd
             Case "MON-POTFW" : lT = "QUAL-PROPS" : lParm = "VPFWFG"
-            Case "MON-ACCUM" : lT = "QUAL-PROPS" : lParm = "VQOFG"
+                'Case "MON-ACCUM" : lT = "QUAL-PROPS" : lParm = "VQOFG"
         End Select
 
         If lT.Length > 0 Then
@@ -473,7 +473,6 @@ notMissingTableForThisOper:
         If Def.Name = "QUAL-INPUT" Or _
            Def.Name = "GQ-QALFG" Or _
            Def.Name = "GQ-FLG2" Or _
-           Def.Name = "GQ-VALUES" Or _
            Def.Name = "QUAL-PROPS" Or _
            Def.Name = "GQ-QALDATA" Then
             Return True
