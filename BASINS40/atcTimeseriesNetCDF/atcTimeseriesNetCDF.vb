@@ -296,9 +296,15 @@ Public Class atcTimeseriesNetCDF
                 If lIndex = 1 OrElse lIndex Mod 1000 = 0 Then
                     Logger.Dbg("  Process " & lIndex & " of " & lAggregateLocation.Count & " at " & lXYPair)
                 End If
+                If lAggregateLocation.Count = 26 Then 'debug at ID_10
+                    Logger.Dbg("  Process " & lXYPair)
+                End If
                 Dim lXIndex As Integer = StrRetRem(lXYPair)
                 Dim lYIndex As Integer = lXYPair
                 Dim lValues = lDataVariable.ReadArray(lNumValues, lXIndex, lYIndex)
+                If lAggregateLocation.Count = 26 Then 'debug at ID_10
+                    Logger.Dbg("     Value " & lValues(0))
+                End If
                 For lTimeIndex As Integer = 0 To lNumValues - 1
                     lTimeseries.Values(lTimeIndex + 1) += lValues(lTimeIndex)
                 Next
@@ -320,7 +326,10 @@ Public Class atcTimeseriesNetCDF
                     lUniqueValues.Add(lDataValues(0), New ArrayList)
                 End If
                 Dim lValueCollection As ArrayList = lUniqueValues.ItemByKey(lDataValues(0))
-                lValueCollection.Add(lX & "," & lY)
+                'todo: is the top/bottome change y index a special case for merra data?
+                'Dim lValueToAdd As String = lX & "," & lY 
+                Dim lValueToAdd As String = lX & "," & aAggregateGridFile.NorthSouthDimension.Length - lY - 1
+                lValueCollection.Add(lValueToAdd)
             Next
         Next
         Return lUniqueValues
