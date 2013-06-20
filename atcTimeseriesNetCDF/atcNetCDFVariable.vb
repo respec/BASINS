@@ -204,6 +204,13 @@ Public Class atcNetCDFVariable
                 Dim lValues(aTimeLength - 1) As Single
                 nc(NetCDF.nc_get_vara_float(ParentFile.NcID, ID, lStartP, lCount, lValues))
                 lReturnValues = lValues
+                If (Math.Abs(lValues(0) - 0.00042657) < 0.00000001) OrElse _
+                   (Math.Abs(lValues(0) - 0.000429675) < 0.00000001) OrElse _
+                   (Math.Abs(lValues(0) - 0.000432803) < 0.00000001) OrElse _
+                   (Math.Abs(lValues(0) - 0.000436116) < 0.00000001) OrElse _
+                   (Math.Abs(lValues(0) - 0.000435955) < 0.00000001) Then
+                    Logger.Dbg("Match at " & lStartP(2) & ":" & lStartP(1) & " with " & lValues(0))
+                End If
 
             Case NetCDF.nc_type.NC_SHORT
                 Dim lValues(aTimeLength - 1) As Short
