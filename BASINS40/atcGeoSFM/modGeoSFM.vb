@@ -13,7 +13,7 @@ Imports System.Text
 Public Module modGeoSFM
 
     Declare Sub ONELAYERBALANCE Lib "geosfm.dll" (ByVal aFileName As String)
-    Declare Sub TWOLAYERBALANCE Lib "geosfm.dll" (ByVal aFileName As String)
+    Declare Sub twolayerbalance Lib "geosfm.dll" (ByVal aFileName As String)
     Declare Sub LAGROUTE Lib "geosfm.dll" (ByVal aFileName As String)
     Declare Sub DIFFROUTE Lib "geosfm.dll" (ByVal aFileName As String)
     Declare Sub cungeroute Lib "geosfm.dll" (ByVal aFileName As String)
@@ -1639,8 +1639,10 @@ Public Module modGeoSFM
                 End If
                 Dim lEndIndex As Integer = lPrecTimeseries.Dates.IndexOfValue(aEJDate, True)
                 For lIndex As Integer = lStartIndex To lEndIndex - 1
-                    'The rain.txt file created from this process contains an average rainfall value in millimeters for each subbasin per day. 
-                    lPrecArray(lSubbasin, lIndex - lStartIndex) = lPrecTimeseries.Values(lIndex + 1) * 25.4   'mm/inch 
+                    'The rain.txt file created from this process contains an average rainfall/water-supply value 
+                    'in millimeters for each subbasin per day. All inputs, whether Precip or UEBGrid's SWIT term
+                    'are assumed to be in meters.
+                    lPrecArray(lSubbasin, lIndex - lStartIndex) = lPrecTimeseries.Values(lIndex + 1) * 1000   'mm/m 
                 Next
             End If
             If Not lEvapTimeseries Is Nothing Then
@@ -1650,8 +1652,14 @@ Public Module modGeoSFM
                 End If
                 Dim lEndIndex As Integer = lEvapTimeseries.Dates.IndexOfValue(aEJDate, True)
                 For lIndex As Integer = lStartIndex To lEndIndex - 1
-                    'The evap.txt file contains a potential evapotranspiration (PET) value in tenths of millimeters for each subbasin per day.
-                    lEvapArray(lSubbasin, lIndex - lStartIndex) = lEvapTimeseries.Values(lIndex + 1) * 254.0   'tenths of mm/inch 
+                    'The evap.txt file contains a potential evapotranspiration (PET) value in tenths of millimeters 
+                    'for each subbasin per day. If PET is provided by user it is assumed to be in tenths of mmm.
+                    'If PET is generated internally from temperature, it needs to be converted from inches to mm.
+                    If aGenPET Then
+                        lEvapArray(lSubbasin, lIndex - lStartIndex) = lEvapTimeseries.Values(lIndex + 1) * 254.0   'tenths of mm/inch 
+                    Else
+                        lEvapArray(lSubbasin, lIndex - lStartIndex) = lEvapTimeseries.Values(lIndex + 1)
+                    End If
                 Next
             End If
             lPrecGageNamePrev = lPrecGageName
@@ -4328,152 +4336,157 @@ Public Module modGeoSFM
     End Function
 
     Friend Sub SetFlowTimeseries(ByVal aFlowFileName As String)
-        'read result file into memory
-        Dim lNnumRecs As Integer = 0
-        Dim lResultRecs As New Collection
-        If FileExists(aFlowFileName) Then
-            Try
-                Dim lCurrentRecord As String
-                Dim lStreamReader As New StreamReader(aFlowFileName)
-                Do
-                    lCurrentRecord = lStreamReader.ReadLine
-                    If lCurrentRecord Is Nothing Then
-                        Exit Do
-                    Else
-                        lNnumRecs = lNnumRecs + 1
-                        lResultRecs.Add(lCurrentRecord)
-                    End If
-                Loop
-                lStreamReader = Nothing
-            Catch e As ApplicationException
-                Logger.Msg("Cannot read output file, " & aFlowFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                Exit Sub
-            End Try
-        Else
-            Logger.Msg("Cannot open output file, " & aFlowFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
-        End If
+        ''read result file into memory
+        'Dim lNnumRecs As Integer = 0
+        'Dim lResultRecs As New Collection
+        'If FileExists(aFlowFileName) Then
+        '    Try
+        '        Dim lCurrentRecord As String
+        '        Dim lStreamReader As New StreamReader(aFlowFileName)
+        '        Do
+        '            lCurrentRecord = lStreamReader.ReadLine
+        '            If lCurrentRecord Is Nothing Then
+        '                Exit Do
+        '            Else
+        '                lNnumRecs = lNnumRecs + 1
+        '                lResultRecs.Add(lCurrentRecord)
+        '            End If
+        '        Loop
+        '        lStreamReader = Nothing
+        '    Catch e As ApplicationException
+        '        Logger.Msg("Cannot read output file, " & aFlowFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+        '        Exit Sub
+        '    End Try
+        'Else
+        '    Logger.Msg("Cannot open output file, " & aFlowFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        If lResultRecs.Count = 0 Then
-            Exit Sub
-        End If
+        'If lResultRecs.Count = 0 Then
+        '    Exit Sub
+        'End If
 
-        Dim lNumFlds As Integer = 0
-        Dim lstr As String = lResultRecs(1)
-        Dim lstr1 As String = ""
-        Do While lstr.Length > 0
-            lstr1 = StrRetRem(lstr)
-            lNumFlds += 1
-        Loop
+        'Dim lNumFlds As Integer = 0
+        'Dim lstr As String = lResultRecs(1)
+        'Dim lstr1 As String = ""
+        'Do While lstr.Length > 0
+        '    lstr1 = StrRetRem(lstr)
+        '    lNumFlds += 1
+        'Loop
 
-        'read results into local array
-        Dim lResultVals(lNnumRecs, lNumFlds) As Single
-        Dim lIrec As Integer = 0
-        For Each lRec As String In lResultRecs
-            lIrec += 1
-            Dim lIfield As Integer = -1
-            Do While lRec.Length > 0
-                lstr1 = StrRetRem(lRec)
-                lIfield += 1
-                If IsNumeric(lstr1) Then
-                    lResultVals(lIrec, lIfield) = lstr1
-                End If
-            Loop
-        Next
+        ''read results into local array
+        'Dim lResultVals(lNnumRecs, lNumFlds) As Single
+        'Dim lIrec As Integer = 0
+        'For Each lRec As String In lResultRecs
+        '    lIrec += 1
+        '    Dim lIfield As Integer = -1
+        '    Do While lRec.Length > 0
+        '        lstr1 = StrRetRem(lRec)
+        '        lIfield += 1
+        '        If IsNumeric(lstr1) Then
+        '            lResultVals(lIrec, lIfield) = lstr1
+        '        End If
+        '    Loop
+        'Next
 
-        'set the start/end dates
-        Dim lStartYear As String = ""
-        Dim lStartDay As String = ""
-        lStartYear = Left(lResultVals(2, 0), 4)
-        If Not IsNumeric(lStartYear) Then
-            Logger.Msg("Problem reading streamflow file:  Start year must be a 4 digit number", "GeoSFM Utilities")
-            Exit Sub
-        End If
-        lStartDay = Right(lResultVals(2, 0), 3)
-        If Not IsNumeric(lStartDay) Then
-            Logger.Msg("Problem reading streamflow file:  Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
-            Exit Sub
-        End If
-        Dim lEndYear As String = ""
-        Dim lEndDay As String = ""
-        lEndYear = Left(lResultVals(lNnumRecs, 0), 4)
-        If Not IsNumeric(lEndYear) Then
-            Logger.Msg("End year must be a 4 digit number", "GeoSFM Utilities")
-            Exit Sub
-        End If
-        lEndDay = Right(lResultVals(lNnumRecs, 0), 3)
-        If Not IsNumeric(lEndDay) Then
-            Logger.Msg("End day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
-            Exit Sub
-        End If
-        Dim lSDate(5) As Integer
-        lSDate(0) = CInt(lStartYear)
-        lSDate(1) = 1
-        lSDate(2) = 1
-        Dim lSJDate As Double = Date2J(lSDate) + lStartDay - 1
-        Dim lEDate(5) As Integer
-        lEDate(0) = CInt(lEndYear)
-        lEDate(1) = 1
-        lEDate(2) = 1
-        lEDate(3) = 24
-        Dim lEJDate As Double = Date2J(lEDate) + lEndDay - 1
-        Dim lNvals As Double = lEJDate - lSJDate
-        Dim lDates(lNvals) As Double
-        For lDateIndex As Integer = 0 To lNvals
-            lDates(lDateIndex) = lSJDate + lDateIndex
-        Next
+        ''set the start/end dates
+        'Dim lStartYear As String = ""
+        'Dim lStartDay As String = ""
+        'lStartYear = Left(lResultVals(2, 0), 4)
+        'If Not IsNumeric(lStartYear) Then
+        '    Logger.Msg("Problem reading streamflow file:  Start year must be a 4 digit number", "GeoSFM Utilities")
+        '    Exit Sub
+        'End If
+        'lStartDay = Right(lResultVals(2, 0), 3)
+        'If Not IsNumeric(lStartDay) Then
+        '    Logger.Msg("Problem reading streamflow file:  Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+        '    Exit Sub
+        'End If
+        'Dim lEndYear As String = ""
+        'Dim lEndDay As String = ""
+        'lEndYear = Left(lResultVals(lNnumRecs, 0), 4)
+        'If Not IsNumeric(lEndYear) Then
+        '    Logger.Msg("End year must be a 4 digit number", "GeoSFM Utilities")
+        '    Exit Sub
+        'End If
+        'lEndDay = Right(lResultVals(lNnumRecs, 0), 3)
+        'If Not IsNumeric(lEndDay) Then
+        '    Logger.Msg("End day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+        '    Exit Sub
+        'End If
+        'Dim lSDate(5) As Integer
+        'lSDate(0) = CInt(lStartYear)
+        'lSDate(1) = 1
+        'lSDate(2) = 1
+        'Dim lSJDate As Double = Date2J(lSDate) + lStartDay - 1
+        'Dim lEDate(5) As Integer
+        'lEDate(0) = CInt(lEndYear)
+        'lEDate(1) = 1
+        'lEDate(2) = 1
+        'lEDate(3) = 24
+        'Dim lEJDate As Double = Date2J(lEDate) + lEndDay - 1
+        'Dim lNvals As Double = lEJDate - lSJDate
+        'Dim lDates(lNvals) As Double
+        'For lDateIndex As Integer = 0 To lNvals
+        '    lDates(lDateIndex) = lSJDate + lDateIndex
+        'Next
 
         'does this type of data source already exist?
         For lDSIndex As Integer = 0 To atcDataManager.DataSources.Count - 1
             Dim lDS As atcDataSource = atcDataManager.DataSources(lDSIndex)
-            If lDS.Name = "" And lDS.Description = "" Then
+            'If lDS.Name = "" And lDS.Description = "" Then
+            If lDS.Attributes.ContainsAttribute("TempOutput") Then
                 atcDataManager.RemoveDataSource(lDSIndex)
             End If
         Next
 
         'create new data source to receive the data
-        Dim lDataSource As New atcTimeseriesSource
+        Dim lDataSource As New atcTimeseriesGeoSFMOutput.atcTimeseriesGeoSFMOutput
+        If atcDataManager.OpenDataSource(lDataSource, aFlowFileName, Nothing) Then
+            lDataSource.Attributes.SetValue("TempOutput", "GeoSFMFlow")
+        End If
 
-        For lTsIndex As Integer = 1 To lNumFlds - 1
-            'now convert the local array into atcTimeseries
-            Dim lDsn As Integer = lTsIndex
-            Dim lRchId As String = CInt(lResultVals(1, lTsIndex)).ToString
-            Dim lGenericTs As New atcData.atcTimeseries(Nothing)
-            With lGenericTs.Attributes
-                .SetValue("ID", lDsn)
-                .SetValue("Scenario", pProjectName)
-                .SetValue("Constituent", "Flow")
-                .SetValue("Location", "Reach " & lRchId)
-                .SetValue("Description", "Simulated flow from GeoSFM")
-                .SetValue("STANAM", "GeoSFM Reach " & lRchId)
-                .SetValue("TU", 4)  'assume daily
-                .SetValue("TS", 1)
-                .SetValue("TSTYPE", "FLOW")
-                .SetValue("Data Source", aFlowFileName)
-                .SetValue("Units", "cms")
-            End With
+        'lDataSource.Specification = aFlowFileName
+        'For lTsIndex As Integer = 1 To lNumFlds - 1
+        '    'now convert the local array into atcTimeseries
+        '    Dim lDsn As Integer = lTsIndex
+        '    Dim lRchId As String = CInt(lResultVals(1, lTsIndex)).ToString
+        '    Dim lGenericTs As New atcData.atcTimeseries(lDataSource)
+        '    With lGenericTs.Attributes
+        '        .SetValue("ID", lDsn)
+        '        .SetValue("Scenario", pProjectName)
+        '        .SetValue("Constituent", "Flow")
+        '        .SetValue("Location", "Reach " & lRchId)
+        '        .SetValue("Description", "Simulated flow from GeoSFM")
+        '        .SetValue("STANAM", "GeoSFM Reach " & lRchId)
+        '        .SetValue("TU", 4)  'assume daily
+        '        .SetValue("TS", 1)
+        '        .SetValue("TSTYPE", "FLOW")
+        '        .SetValue("Data Source", aFlowFileName)
+        '        .SetValue("Units", "cms")
+        '    End With
 
-            Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
-            lTsDate.Values = lDates
-            lGenericTs.Dates = lTsDate
+        '    Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
+        '    lTsDate.Values = lDates
+        '    lGenericTs.Dates = lTsDate
 
-            'now fill in the values
-            Dim lValues(lNvals) As Double
-            Dim lCurDate As Double
-            lCurDate = lSJDate
-            Dim lDayCounter As Integer = 1
-            Dim lValueCounter As Integer = 1
-            Do While lCurDate <= lEJDate 'loop through each day
-                lValues(lDayCounter - 1) = lResultVals(lDayCounter, lTsIndex)
-                lDayCounter = lDayCounter + 1
-                lCurDate = lCurDate + 1
-            Loop
+        '    'now fill in the values
+        '    Dim lValues(lNvals) As Double
+        '    Dim lCurDate As Double
+        '    lCurDate = lSJDate
+        '    Dim lDayCounter As Integer = 1
+        '    Dim lValueCounter As Integer = 1
+        '    Do While lCurDate <= lEJDate 'loop through each day
+        '        lValues(lDayCounter - 1) = lResultVals(lDayCounter, lTsIndex)
+        '        lDayCounter = lDayCounter + 1
+        '        lCurDate = lCurDate + 1
+        '    Loop
 
-            lGenericTs.Values = lValues
-            lDataSource.DataSets.Add(lDsn, lGenericTs)
-        Next
+        '    lGenericTs.Values = lValues
+        '    lDataSource.DataSets.Add(lDsn, lGenericTs)
+        'Next
 
-        atcDataManager.DataSources.Add(lDataSource)
+        'atcDataManager.DataSources.Add(lDataSource)
     End Sub
 
     Friend Sub BuildListofValidStationNames(ByRef aMetConstituent As String, _

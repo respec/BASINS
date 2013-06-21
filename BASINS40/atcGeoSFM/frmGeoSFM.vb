@@ -4410,25 +4410,29 @@ Public Class frmGeoSFM
 
     Private Sub lstCalib_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lstCalib.SelectedIndexChanged
         Dim lccount As Integer = lstCalib.SelectedItems.Count
-        Dim lncomplex As Integer = 2
-        Dim lnsamples As Integer = 2 * lncomplex * lccount
-        Dim lnummult As Integer = 0
-        If (lnsamples < 10) Then
-            lnummult = (10 / (lncomplex * lccount)) + 0.5
-            lnsamples = lnummult * lncomplex * lccount
-        ElseIf (lnsamples > 200) Then
-            lnummult = (100 / (lncomplex * lccount))
-            lnsamples = lnummult * lncomplex * lccount
+        If lccount > 0 Then
+            Dim lncomplex As Integer = 2
+            Dim lnsamples As Integer = 2 * lncomplex * lccount
+            Dim lnummult As Integer = 0
+            If (lnsamples < 10) Then
+                lnummult = (10 / (lncomplex * lccount)) + 0.5
+                lnsamples = lnummult * lncomplex * lccount
+            ElseIf (lnsamples > 200) Then
+                lnummult = (100 / (lncomplex * lccount))
+                lnsamples = lnummult * lncomplex * lccount
+            End If
+            lstMax.Items.Clear()
+            lstMax.Items.Add(lnsamples * lccount * 10)
+            lstMax.Items.Add(lnsamples * lccount * 4)
+            lstMax.Items.Add(lnsamples * lccount * 8)
+            lstMax.Items.Add(lnsamples * lccount * 16)
+            lstMax.Items.Add(lnsamples * lccount * 32)
+            lstMax.Items.Add(lnsamples * lccount * 64)
+            lstMax.Items.Add(lnsamples * lccount * 128)
+            lstMax.SelectedItem = 1
+        Else
+            lstMax.Items.Clear()
         End If
-        lstMax.Items.Clear()
-        lstMax.Items.Add(lnsamples * lccount * 10)
-        lstMax.Items.Add(lnsamples * lccount * 4)
-        lstMax.Items.Add(lnsamples * lccount * 8)
-        lstMax.Items.Add(lnsamples * lccount * 16)
-        lstMax.Items.Add(lnsamples * lccount * 32)
-        lstMax.Items.Add(lnsamples * lccount * 64)
-        lstMax.Items.Add(lnsamples * lccount * 128)
-        lstMax.SelectedItem = 1
     End Sub
 
     Private Sub cmdReadStreamflow_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReadStreamflow.Click
@@ -4440,10 +4444,12 @@ Public Class frmGeoSFM
         Dim lGroup As New atcTimeseriesGroup
         For lDSIndex As Integer = 0 To atcDataManager.DataSources.Count - 1
             Dim lDS As atcDataSource = atcDataManager.DataSources(lDSIndex)
-            If lDS.Name = "" And lDS.Description = "" Then
+            'If lDS.Name = "" And lDS.Description = "" Then
+            If lDS.Attributes.ContainsAttribute("TempOutput") Then
                 'assume this is the right source
                 For Each lts As atcDataSet In lDS.DataSets
-                    If lts.Attributes.GetDefinedValue("Location").Value = "Reach " & cboRchHydro.SelectedItem.ToString Then
+                    'If lts.Attributes.GetDefinedValue("Location").Value = "Reach " & cboRchHydro.SelectedItem.ToString Then
+                    If lts.Attributes.GetDefinedValue("Location").Value = cboRchHydro.SelectedItem.ToString Then
                         lGroup.Add(lts)
                     End If
                 Next
