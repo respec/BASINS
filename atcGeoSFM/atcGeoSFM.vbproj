@@ -165,6 +165,11 @@
       <Name>atcMwGisUtility</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesGeoSFMOutput\atcTimeseriesGeoSFMOutput.vbproj">
+      <Project>{623148A8-E2BC-4C58-B8CD-7DB45D27E8C6}</Project>
+      <Name>atcTimeseriesGeoSFMOutput</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcUEB\atcUEB.vbproj">
       <Project>{167C77DA-0DB1-4126-A20F-1E2931952930}</Project>
       <Name>atcUEB</Name>
