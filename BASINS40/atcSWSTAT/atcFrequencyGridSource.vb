@@ -19,6 +19,10 @@ Public Class atcFrequencyGridSource
     Private pCalculatedNdays As New ArrayList
     Private pCalculatedRecurrence As New ArrayList
 
+    Public Shared SWStatDisclaimer As String = "SWSTAT version 5.0" & vbCrLf & _
+        "USGS has conducted limited testing and review of this program." & _
+        "Final review and approval is pending." & vbCrLf & vbCrLf
+
     ''' <summary>
     ''' Create grid source for displaying N-Day/Return Interval values
     ''' </summary>
@@ -451,7 +455,7 @@ Public Class atcFrequencyGridSource
                             Next ' for each lRecurrenceKey As String In pRecurrence.Keys
                             lExpTab.CurrentRecord += 1
                         Else
-                            lRept.AppendLine()
+                            lRept.Append(SWStatDisclaimer) 'Add Message Here
                             lRept.AppendLine()
                             lRept.AppendLine("Program SWStat             U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
                             lRept.AppendLine("Ver. 5.0          Log-Pearson & Pearson Type III Statistics   Run Date / Time")
@@ -573,7 +577,7 @@ Public Class atcFrequencyGridSource
                             lExpTab.Value(14) = DoubleToString(lLogNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000") '"   StDev"
                             lExpTab.Value(15) = DoubleToString(lLogNdayTs.Attributes.GetValue("Skew", 0), , "0.000") '"                   Skw"
                         Else
-                            lRept.AppendLine()
+                            lRept.Append(SWStatDisclaimer) 'Add Message Here
                             lRept.AppendLine()
                             lRept.AppendLine("Program SWStat             U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
                             lRept.AppendLine("Ver. 5.0          Log-Pearson & Pearson Type III Statistics   Run Date / Time")
@@ -756,6 +760,7 @@ Public Class atcFrequencyGridSource
                                 lRept.AppendLine(" Note -- Conditional Probability Adjustment applied because of zero flow(s),")
                                 lRept.AppendLine("         Adjusted parameter values (column 3) correspond with non-exceedence")
                                 lRept.AppendLine("         probabilities (column 1) and recurrence intervals (column 2).")
+                                'Or, could Add Message Here, like another Note entry
                             End If
                             lRept.AppendLine()
                             'lRept.AppendLine("    7 statistics were added as attributes to data set   163:")
