@@ -4,6 +4,10 @@ Imports MapWinUtility
 Imports System.Text
 
 Public Module modStat
+    Friend SWStatDisclaimer As String = "SWSTAT version 5.0" & vbCrLf & _
+        "USGS has conducted limited testing and review of this program." & _
+        "Final review and approval is pending." & vbCrLf & vbCrLf
+
     Public Function IntervalReport(ByVal aSite As String, ByVal aTimeUnit As atcTimeUnit, _
                                    ByVal aTser1 As atcTimeseries, _
                                    ByVal aTSer2 As atcTimeseries, _
@@ -19,7 +23,7 @@ Public Module modStat
         Dim lTran As atcTran = atcTran.TranAverSame
         If lUnits.Contains("inches") Then lTran = atcTran.TranSumDiv
 
-        Dim lStr As String = ""
+        Dim lStr As String = SWStatDisclaimer 'Add Message Here
         lStr &= aSite & ":" & lInterval.PadLeft(16) & vbCrLf
 
         Dim lPadLength As Integer = 36
@@ -153,7 +157,7 @@ Public Module modStat
 
         'The duration curve table, which is a shortened version of Table 2 in CompareStats
         'TODO: don't have Flow hard coded - use constituent attibute instead
-        Dim lStr As String = ""
+        Dim lStr As String = SWStatDisclaimer 'Add Message Here
         lStr &= "                Flow duration curve" & vbCrLf
         lStr &= "                  " & TimeserIdString(aTimeseries) & vbCrLf & vbCrLf
 
@@ -477,6 +481,7 @@ Public Module modStat
             lNashSutcliffe = lNashSutcliffeNumerator / lNashSutcliffe
         End If
 
+        lStrBuilder.Append(SWStatDisclaimer) 'Add Message Here
         lStrBuilder.AppendLine("1")
         lStrBuilder.AppendLine("Note: TS, Time Series")
         lStrBuilder.AppendLine()
@@ -569,7 +574,7 @@ Public Module modStat
 
         'Table nubmer 2
 
-        lStrBuilder.AppendLine("1")
+        lStrBuilder.AppendLine("1") 'Add Message Here, perhaps no need as disclaimer is added for table 1 above
         lStrBuilder.AppendLine("Table 2")
         lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
         lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
@@ -645,7 +650,7 @@ Public Module modStat
         'Table Number 3
 
         Dim lEdIndex As Integer
-        lStrBuilder.AppendLine("1")
+        lStrBuilder.AppendLine("1") 'Add Message Here, perhaps no need as disclaimer is added for table 1 above
         lStrBuilder.AppendLine("Table 3") 'added by Becky to label Table 3
         lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
         lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
@@ -702,7 +707,7 @@ Public Module modStat
         lStrBuilder.AppendLine()
 
         'Table 4 - Becky corrected 3 to 4 
-        lStrBuilder.AppendLine("1")
+        lStrBuilder.AppendLine("1") 'Add Message Here, perhaps no need as disclaimer is added for table 1 above
         lStrBuilder.AppendLine("Table 4") 'added by Becky to label Table 4
         lStrBuilder.AppendLine(" Percent time value was exceeded")
         lStrBuilder.AppendLine()
@@ -894,7 +899,8 @@ Public Module modStat
         Dim lStartDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("Start Date"))
         Dim lEndDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("End Date"))
 
-        Dim lHeaderLines As String = "1" & vbCrLf
+        Dim lHeaderLines As String = SWStatDisclaimer 'Add Message Here
+        lHeaderLines &= "1" & vbCrLf
         lHeaderLines &= Space(10) & "Duration hydrograph for " & aTS.Attributes.GetValue("STANAM", "") & vbCrLf
         lHeaderLines &= Space(30) & "Station id  " & aTS.Attributes.GetValue("ISTAID", "") & vbCrLf
         lHeaderLines &= Space(22) & "For period " & lStartDate & " to " & lEndDate & vbCrLf & vbCrLf
