@@ -1526,7 +1526,7 @@ Public Module modGeoSFM
         Return True
     End Function
 
-    Friend Function RainEvap(ByVal aPrecGageNamesBySubbasin As Collection, ByVal aEvapGageNamesBySubbasin As Collection, ByVal aSJDate As Double, ByVal aEJDate As Double, Optional ByVal aGenPET As Boolean = False) As Boolean
+    Friend Function RainEvap(ByVal aPrecStationsBySubbasin As Collection, ByVal aEvapStationsBySubbasin As Collection, ByVal aSJDate As Double, ByVal aEJDate As Double, Optional ByVal aGenPET As Boolean = False) As Boolean
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -1597,35 +1597,34 @@ Public Module modGeoSFM
         Dim lPrecTimeseries As atcTimeseries = Nothing
         Dim lEvapTimeseries As atcTimeseries = Nothing
 
-        Dim lPrecGageNamePrev As String = ""
-        Dim lEvapGageNamePrev As String = ""
+        Dim lPrecStationDescPrev As String = ""
+        Dim lEvapStationDescPrev As String = ""
+
+        Dim lDesc As String = ""
 
         For lSubbasin As Integer = 0 To lSubbasins.Count - 1
-            Dim lPrecGageName As String = aPrecGageNamesBySubbasin(lSubbasin + 1)
-            Dim lEvapGageName As String = aEvapGageNamesBySubbasin(lSubbasin + 1)
-            If lPrecGageName <> lPrecGageNamePrev Then
+            Dim lPrecStation As StationDetails = aPrecStationsBySubbasin(lSubbasin + 1)
+            Dim lEvapStation As StationDetails = aEvapStationsBySubbasin(lSubbasin + 1)
+            If lPrecStation.Description <> lPrecStationDescPrev Then
                 For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
                     For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
-                        If (lDataSet.Attributes.GetValue("Constituent") = "PREC" And _
-                            lDataSet.Attributes.GetValue("Location") = lPrecGageName) Then
+                        lDesc = BuildStationDescription(lDataSet)
+                        If (lDesc = lPrecStation.Description) Then
                             lPrecTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
                         End If
                     Next
                 Next
             End If
-            If lEvapGageName <> lEvapGageNamePrev Then
+            If lEvapStation.Description <> lEvapStationDescPrev Then
                 For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
                     For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
-                        If aGenPET Then
-                            If ((lDataSet.Attributes.GetValue("Constituent") = "TEMP" Or lDataSet.Attributes.GetValue("Constituent") = "ATEM") And _
-                                lDataSet.Attributes.GetValue("Location") = lEvapGageName) Then 'generate PET from supplied Temp
+                        lDesc = BuildStationDescription(lDataSet)
+                        If (lDesc = lEvapStation.Description) Then 'generate PET from supplied Temp
+                            If aGenPET Then
                                 Dim lLatitude As Double = lDataSet.Attributes.GetValue("Latitude", 30)
                                 Dim lCTS() As Double = {0, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055}
                                 lEvapTimeseries = PanEvaporationTimeseriesComputedByHamonX(lDataSet, Nothing, False, lLatitude, lCTS)
-                            End If
-                        Else
-                            If ((lDataSet.Attributes.GetValue("Constituent") = "PEVT" Or lDataSet.Attributes.GetValue("Constituent") = "PET") And _
-                                lDataSet.Attributes.GetValue("Location") = lEvapGageName) Then
+                            Else
                                 lEvapTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
                             End If
                         End If
@@ -1662,8 +1661,8 @@ Public Module modGeoSFM
                     End If
                 Next
             End If
-            lPrecGageNamePrev = lPrecGageName
-            lEvapGageNamePrev = lEvapGageName
+            lPrecStationDescPrev = lPrecStation.Description
+            lEvapStationDescPrev = lEvapStation.Description
         Next
 
         'write record for each date
@@ -4503,12 +4502,6 @@ Public Module modGeoSFM
 
                 If lDataSet.Attributes.GetValue("Constituent") = aMetConstituent Then
                     Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
-                    Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
-                    If lStanam Is Nothing Then 'try constituent instead
-                        lStanam = lDataSet.Attributes.GetValue("Constituent")
-                    Else 'add constituent name also
-                        lStanam &= ":" & lDataSet.Attributes.GetValue("Constituent")
-                    End If
                     Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
                     Dim lSJDay As Double
                     Dim lEJDay As Double
@@ -4539,12 +4532,11 @@ Public Module modGeoSFM
                         Dim lEdate(6) As Integer
                         J2Date(lSJDay, lSdate)
                         J2Date(lEJDay, lEdate)
-                        Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
                         Dim lStationDetails As New StationDetails
                         lStationDetails.Name = lLoc
                         lStationDetails.StartJDate = lSJDay
                         lStationDetails.EndJDate = lEJDay
-                        lStationDetails.Description = lStanam & " " & ":" & lLoc & " " & lDateString
+                        lStationDetails.Description = BuildStationDescription(lDataSet) ' lStanam & " " & ":" & lLoc & " " & lDateString
                         If Not aStations.Keys.Contains(lStationDetails.Description) Then
                             aStations.Add(lStationDetails.Description, lStationDetails)
                         End If
@@ -4558,6 +4550,28 @@ Public Module modGeoSFM
 
         Logger.Dbg("Found " & aStations.Count & " Stations")
     End Sub
+
+    Public Function BuildStationDescription(ByVal aDataset As atcTimeseries) As String
+        Dim lDesc As String
+        Dim lSJDay As Double
+        Dim lEJDay As Double
+        lSJDay = aDataset.Attributes.GetValue("Start Date", 0)
+        lEJDay = aDataset.Attributes.GetValue("End Date", 0)
+        Dim lSdate(6) As Integer
+        Dim lEdate(6) As Integer
+        J2Date(lSJDay, lSdate)
+        J2Date(lEJDay, lEdate)
+        Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
+        Dim lLoc As String = aDataset.Attributes.GetValue("Location")
+        Dim lStanam As String = aDataset.Attributes.GetValue("Stanam")
+        If aDataset.Attributes.ContainsAttribute("Stanam") Then 'add constituent name also
+            lStanam &= ":" & aDataset.Attributes.GetValue("Constituent")
+        Else 'try constituent instead
+            lStanam = aDataset.Attributes.GetValue("Constituent")
+        End If
+        lDesc = lStanam & " " & ":" & lLoc & " " & lDateString
+        Return lDesc
+    End Function
 
     Friend Sub SetOutputPath(ByVal aProjectName As String)
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
