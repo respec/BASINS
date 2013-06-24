@@ -1528,7 +1528,7 @@ Public Class frmGeoSFM
         Me.atxSDay.Size = New System.Drawing.Size(44, 21)
         Me.atxSDay.SoftMax = -999
         Me.atxSDay.SoftMin = -999
-        Me.atxSDay.TabIndex = 31
+        Me.atxSDay.TabIndex = 29
         Me.atxSDay.ValueDouble = 1
         Me.atxSDay.ValueInteger = 1
         '
@@ -1551,7 +1551,7 @@ Public Class frmGeoSFM
         Me.atxSYear.Size = New System.Drawing.Size(64, 21)
         Me.atxSYear.SoftMax = -999
         Me.atxSYear.SoftMin = -999
-        Me.atxSYear.TabIndex = 30
+        Me.atxSYear.TabIndex = 27
         Me.atxSYear.ValueDouble = 2000
         Me.atxSYear.ValueInteger = 2000
         '
@@ -1574,7 +1574,7 @@ Public Class frmGeoSFM
         Me.atxEMonth.Size = New System.Drawing.Size(44, 21)
         Me.atxEMonth.SoftMax = -999
         Me.atxEMonth.SoftMin = -999
-        Me.atxEMonth.TabIndex = 29
+        Me.atxEMonth.TabIndex = 31
         Me.atxEMonth.ValueDouble = 12
         Me.atxEMonth.ValueInteger = 12
         '
@@ -1620,7 +1620,7 @@ Public Class frmGeoSFM
         Me.atxEYear.Size = New System.Drawing.Size(64, 21)
         Me.atxEYear.SoftMax = -999
         Me.atxEYear.SoftMin = -999
-        Me.atxEYear.TabIndex = 27
+        Me.atxEYear.TabIndex = 30
         Me.atxEYear.ValueDouble = 2000
         Me.atxEYear.ValueInteger = 2000
         '
@@ -3384,6 +3384,7 @@ Public Class frmGeoSFM
         'call what was the avenue script 'terrain'
         If chkConnectUEB.Checked Then
             lTerrainComplete = Terrain(lDEMLayerName, lSubbasinLayerName, lStreamLayerName, lThresh, True)
+            rdoPETFromTemp.Checked = True
             pLinkToUEBGrid = True
         Else
             lTerrainComplete = Terrain(lDEMLayerName, lSubbasinLayerName, lStreamLayerName, lThresh)
@@ -3800,8 +3801,8 @@ Public Class frmGeoSFM
     Private Sub cmdRainEvapNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRainEvapNext.Click
         SetOutputPath(atxModel.Text)
 
-        Dim lPrecGageNamesBySubbasin As New Collection
-        Dim lEvapGageNamesBySubbasin As New Collection
+        Dim lPrecStationsBySubbasin As New Collection
+        Dim lEvapStationsBySubbasin As New Collection
         Dim lSelectedStation As StationDetails
         Dim lSJMetDate As Double = 0.0
         Dim lEJMetDate As Double = 0.0
@@ -3816,7 +3817,7 @@ Public Class frmGeoSFM
                 lEJMetDate = lSelectedStation.EndJDate
             End If
             'remember which precip gage goes with each catchment
-            lPrecGageNamesBySubbasin.Add(lSelectedStation.Name)
+            lPrecStationsBySubbasin.Add(lSelectedStation)
         Next
         'set evap stations
         For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
@@ -3829,7 +3830,7 @@ Public Class frmGeoSFM
                 lEJMetDate = lSelectedStation.EndJDate
             End If
             'remember which precip gage goes with each catchment
-            lEvapGageNamesBySubbasin.Add(lSelectedStation.Name)
+            lEvapStationsBySubbasin.Add(lSelectedStation)
         Next
 
         Dim lSJDate As Double = 0.0
@@ -3873,7 +3874,7 @@ Public Class frmGeoSFM
         Me.Refresh()
 
         Dim lGenPET As Boolean = rdoPETFromTemp.Checked
-        If RainEvap(lPrecGageNamesBySubbasin, lEvapGageNamesBySubbasin, lSJDate, lEJDate, lGenPET) Then
+        If RainEvap(lPrecStationsBySubbasin, lEvapStationsBySubbasin, lSJDate, lEJDate, lGenPET) Then
             tabMain.SelectedIndex += 1 ' = 4
         End If
 
