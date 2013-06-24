@@ -87,7 +87,7 @@ Public Class atcDataSourceTimeseriesUEBGrid
                                     .SetValue("Scenario", lScenario)
                                     .SetValue("Location", lWatershedID)
                                     .SetValue("Constituent", lVarName)
-                                    .SetValue("Stanam", "UEBGrid:" & lVarName)
+                                    .SetValue("Stanam", "UEBGrid") ' & lVarName)
                                     .SetValue("Description", "UEBGrid Aggregated Output")
                                     .SetValue("Units", "meters")
                                     .AddHistory("Read from " & Specification)
