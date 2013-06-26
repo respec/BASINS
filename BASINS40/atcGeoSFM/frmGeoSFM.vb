@@ -1254,10 +1254,10 @@ Public Class frmGeoSFM
         Me.rbnNonUniformUSGS.Checked = True
         Me.rbnNonUniformUSGS.Location = New System.Drawing.Point(48, 57)
         Me.rbnNonUniformUSGS.Name = "rbnNonUniformUSGS"
-        Me.rbnNonUniformUSGS.Size = New System.Drawing.Size(220, 17)
+        Me.rbnNonUniformUSGS.Size = New System.Drawing.Size(187, 17)
         Me.rbnNonUniformUSGS.TabIndex = 1
         Me.rbnNonUniformUSGS.TabStop = True
-        Me.rbnNonUniformUSGS.Text = "Non-Uniform from USGS Land Cover Grid"
+        Me.rbnNonUniformUSGS.Text = "Non-Uniform from Land Cover Grid"
         Me.rbnNonUniformUSGS.UseVisualStyleBackColor = True
         '
         'lblMethod
@@ -4254,141 +4254,141 @@ Public Class frmGeoSFM
                 EnableControls(True)
                 pStationsRead = True
             End If
+        End If
+        If tabMain.SelectedIndex = 7 Or tabMain.SelectedIndex = 8 Then
+            'read reaches for sensitivity analysis or calibration 
+            lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+            Me.Refresh()
+            cboReachSensitivity.Items.Clear()
+            AtcConnectFlows.lstTarget.Items.Clear()
+            Dim orderfilename As String = pOutputPath & "order.txt"
+            If FileExists(orderfilename) Then
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(orderfilename)
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        If IsNumeric(lCurrentRecord) Then
+                            cboReachSensitivity.Items.Add(lCurrentRecord)
+                            AtcConnectFlows.lstTarget.Items.Add(lCurrentRecord)
+                        End If
+                    End If
+                Loop
+            Else
+                'Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Basin Characteristics' to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Exit Sub
             End If
-            If tabMain.SelectedIndex = 7 Or tabMain.SelectedIndex = 8 Then
-                'read reaches for sensitivity analysis or calibration 
-                lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
-                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-                Me.Refresh()
-                cboReachSensitivity.Items.Clear()
-                AtcConnectFlows.lstTarget.Items.Clear()
-                Dim orderfilename As String = pOutputPath & "order.txt"
-                If FileExists(orderfilename) Then
+            cboReachSensitivity.SelectedIndex = 0
+        End If
+        If tabMain.SelectedIndex = 8 Then
+            'set up calibration tab
+            AtcConnectFlows.lstSource.Items.Clear()
+            pFlowStations.Clear()
+            For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+                Dim lTotalCount As Integer = lDataSource.DataSets.Count
+                Dim lCounter As Integer = 0
+                For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+                    lCounter += 1
+                    Logger.Progress("Building list of valid calibration station names...", lCounter, lDataSource.DataSets.Count)
+                    If lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And lDataSet.Attributes.GetValue("Constituent") = "FLOW" Then
+                        Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
+                        Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
+                        Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
+                        Dim lSJDay As Double
+                        Dim lEJDay As Double
+                        lSJDay = lDataSet.Attributes.GetValue("Start Date", 0)
+                        lEJDay = lDataSet.Attributes.GetValue("End Date", 0)
+                        If lSJDay = 0 Then
+                            lSJDay = lDataSet.Dates.Value(0)
+                        End If
+                        If lEJDay = 0 Then
+                            lEJDay = lDataSet.Dates.Value(lDataSet.Dates.numValues)
+                        End If
+                        Dim lSdate(6) As Integer
+                        Dim lEdate(6) As Integer
+                        J2Date(lSJDay, lSdate)
+                        J2Date(lEJDay, lEdate)
+                        Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
+                        AtcConnectFlows.lstSource.Items.Add(lLoc & ":" & lDateString)
+                        Dim lStationDetails As New StationDetails
+                        lStationDetails.Name = lLoc
+                        lStationDetails.StartJDate = lSJDay
+                        lStationDetails.EndJDate = lEJDay
+                        lStationDetails.Description = lLoc & ":" & lDateString
+                        pFlowStations.Add(lStationDetails.Description, lStationDetails)
+                    End If
+                    'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
+                    lDataSet.ValuesNeedToBeRead = True
+                Next
+            Next
+            If lstCalib.Items.Count = 0 Then
+                lstCalib.Items.Clear()
+                lstCalib.Items.Add("SoilWhc")
+                lstCalib.Items.Add("Depth")
+                lstCalib.Items.Add("Texture")
+                lstCalib.Items.Add("Ks")
+                lstCalib.Items.Add("Interflow")
+                lstCalib.Items.Add("HSlope")
+                lstCalib.Items.Add("Baseflow")
+                lstCalib.Items.Add("CurveNum")
+                lstCalib.Items.Add("MaxCover")
+                lstCalib.Items.Add("BasinLoss")
+                lstCalib.Items.Add("PanCoeff")
+                lstCalib.Items.Add("TopSoil")
+                lstCalib.Items.Add("RainCalc")
+                lstCalib.Items.Add("RivRough")
+                lstCalib.Items.Add("RivSlope")
+                lstCalib.Items.Add("RivWidth")
+                lstCalib.Items.Add("RivLoss")
+                lstCalib.Items.Add("RivFPLoss")
+                lstCalib.Items.Add("Celerity")
+                lstCalib.Items.Add("Diffusion")
+            End If
+            lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+            Me.Refresh()
+        ElseIf tabMain.SelectedIndex = 9 Then
+            'output tab
+            atxMapYear.Text = atxSYear.Text
+            AtxMapMonth.Text = atxSMonth.Text
+            AtxMapDay.Text = atxSDay.Text
+            'read reaches for hydrograph plot 
+            cboRchHydro.Items.Clear()
+            Dim lFlowFileName As String = pOutputPath & "streamflow.txt"
+            If FileExists(lFlowFileName) Then
+                Try
                     Dim lCurrentRecord As String
-                    Dim lStreamReader As New StreamReader(orderfilename)
+                    Dim lStreamReader As New StreamReader(lFlowFileName)
                     Do
                         lCurrentRecord = lStreamReader.ReadLine
                         If lCurrentRecord Is Nothing Then
                             Exit Do
                         Else
-                            If IsNumeric(lCurrentRecord) Then
-                                cboReachSensitivity.Items.Add(lCurrentRecord)
-                                AtcConnectFlows.lstTarget.Items.Add(lCurrentRecord)
-                            End If
+                            Dim lstr As String = lCurrentRecord
+                            Dim lstr1 As String = ""
+                            Do While lstr.Length > 0
+                                lstr1 = StrRetRem(lstr)
+                                If IsNumeric(lstr1) Then
+                                    cboRchHydro.Items.Add(lstr1)
+                                End If
+                            Loop
+                            Exit Do
                         End If
                     Loop
-                Else
-                    'Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Basin Characteristics' to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Catch lAppEx
                     Exit Sub
-                End If
-                cboReachSensitivity.SelectedIndex = 0
+                End Try
+            Else
+                Exit Sub
             End If
-            If tabMain.SelectedIndex = 8 Then
-                'set up calibration tab
-                AtcConnectFlows.lstSource.Items.Clear()
-                pFlowStations.Clear()
-                For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                    Dim lTotalCount As Integer = lDataSource.DataSets.Count
-                    Dim lCounter As Integer = 0
-                    For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
-                        lCounter += 1
-                        Logger.Progress("Building list of valid calibration station names...", lCounter, lDataSource.DataSets.Count)
-                        If lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And lDataSet.Attributes.GetValue("Constituent") = "FLOW" Then
-                            Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
-                            Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
-                            Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
-                            Dim lSJDay As Double
-                            Dim lEJDay As Double
-                            lSJDay = lDataSet.Attributes.GetValue("Start Date", 0)
-                            lEJDay = lDataSet.Attributes.GetValue("End Date", 0)
-                            If lSJDay = 0 Then
-                                lSJDay = lDataSet.Dates.Value(0)
-                            End If
-                            If lEJDay = 0 Then
-                                lEJDay = lDataSet.Dates.Value(lDataSet.Dates.numValues)
-                            End If
-                            Dim lSdate(6) As Integer
-                            Dim lEdate(6) As Integer
-                            J2Date(lSJDay, lSdate)
-                            J2Date(lEJDay, lEdate)
-                            Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
-                            AtcConnectFlows.lstSource.Items.Add(lLoc & ":" & lDateString)
-                            Dim lStationDetails As New StationDetails
-                            lStationDetails.Name = lLoc
-                            lStationDetails.StartJDate = lSJDay
-                            lStationDetails.EndJDate = lEJDay
-                            lStationDetails.Description = lLoc & ":" & lDateString
-                            pFlowStations.Add(lStationDetails.Description, lStationDetails)
-                        End If
-                        'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
-                        lDataSet.ValuesNeedToBeRead = True
-                    Next
-                Next
-                If lstCalib.Items.Count = 0 Then
-                    lstCalib.Items.Clear()
-                    lstCalib.Items.Add("SoilWhc")
-                    lstCalib.Items.Add("Depth")
-                    lstCalib.Items.Add("Texture")
-                    lstCalib.Items.Add("Ks")
-                    lstCalib.Items.Add("Interflow")
-                    lstCalib.Items.Add("HSlope")
-                    lstCalib.Items.Add("Baseflow")
-                    lstCalib.Items.Add("CurveNum")
-                    lstCalib.Items.Add("MaxCover")
-                    lstCalib.Items.Add("BasinLoss")
-                    lstCalib.Items.Add("PanCoeff")
-                    lstCalib.Items.Add("TopSoil")
-                    lstCalib.Items.Add("RainCalc")
-                    lstCalib.Items.Add("RivRough")
-                    lstCalib.Items.Add("RivSlope")
-                    lstCalib.Items.Add("RivWidth")
-                    lstCalib.Items.Add("RivLoss")
-                    lstCalib.Items.Add("RivFPLoss")
-                    lstCalib.Items.Add("Celerity")
-                    lstCalib.Items.Add("Diffusion")
-                End If
-                lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
-                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-                Me.Refresh()
-            ElseIf tabMain.SelectedIndex = 9 Then
-                'output tab
-                atxMapYear.Text = atxSYear.Text
-                AtxMapMonth.Text = atxSMonth.Text
-                AtxMapDay.Text = atxSDay.Text
-                'read reaches for hydrograph plot 
-                cboRchHydro.Items.Clear()
-                Dim lFlowFileName As String = pOutputPath & "streamflow.txt"
-                If FileExists(lFlowFileName) Then
-                    Try
-                        Dim lCurrentRecord As String
-                        Dim lStreamReader As New StreamReader(lFlowFileName)
-                        Do
-                            lCurrentRecord = lStreamReader.ReadLine
-                            If lCurrentRecord Is Nothing Then
-                                Exit Do
-                            Else
-                                Dim lstr As String = lCurrentRecord
-                                Dim lstr1 As String = ""
-                                Do While lstr.Length > 0
-                                    lstr1 = StrRetRem(lstr)
-                                    If IsNumeric(lstr1) Then
-                                        cboRchHydro.Items.Add(lstr1)
-                                    End If
-                                Loop
-                                Exit Do
-                            End If
-                        Loop
-                    Catch lAppEx
-                        Exit Sub
-                    End Try
-                Else
-                    Exit Sub
-                End If
-                cboRchHydro.SelectedIndex = 0
-                lblStatus.Text = "Update specifications if desired, then click one of the 'Generate' buttons to view output."
-                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-                Me.Refresh()
-            End If
+            cboRchHydro.SelectedIndex = 0
+            lblStatus.Text = "Update specifications if desired, then click one of the 'Generate' buttons to view output."
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+            Me.Refresh()
+        End If
     End Sub
 
     Private Sub AtcGridSensitivity_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridSensitivity.CellEdited

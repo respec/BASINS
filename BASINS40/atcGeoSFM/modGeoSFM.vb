@@ -1600,6 +1600,7 @@ Public Module modGeoSFM
         Dim lPrecStationDescPrev As String = ""
         Dim lEvapStationDescPrev As String = ""
 
+        Dim lIndex As Integer
         Dim lDesc As String = ""
 
         For lSubbasin As Integer = 0 To lSubbasins.Count - 1
@@ -1610,6 +1611,13 @@ Public Module modGeoSFM
                     For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
                         lDesc = BuildStationDescription(lDataSet)
                         If (lDesc = lPrecStation.Description) Then
+                            'If lDataSet.Attributes.GetValue("Constituent") = "SWIT" Then
+                            '    If lDataSet.Attributes.GetValue("TU") = atcTimeUnit.TUHour Then
+                            '        'need to multiply UEBGrid in/hr units by number of hours in time step
+                            '        Dim lTStep As Long = lDataSet.Attributes.GetValue("TS")
+                            '        lDataSet *= lTStep
+                            '    End If
+                            'End If
                             lPrecTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
                         End If
                     Next
@@ -1637,7 +1645,7 @@ Public Module modGeoSFM
                     lStartIndex = 0
                 End If
                 Dim lEndIndex As Integer = lPrecTimeseries.Dates.IndexOfValue(aEJDate, True)
-                For lIndex As Integer = lStartIndex To lEndIndex - 1
+                For lIndex = lStartIndex To lEndIndex - 1
                     'The rain.txt file created from this process contains an average rainfall/water-supply value 
                     'in millimeters for each subbasin per day. All inputs, whether Precip or UEBGrid's SWIT term
                     'are assumed to be in meters.
@@ -1650,7 +1658,7 @@ Public Module modGeoSFM
                     lStartIndex = 0
                 End If
                 Dim lEndIndex As Integer = lEvapTimeseries.Dates.IndexOfValue(aEJDate, True)
-                For lIndex As Integer = lStartIndex To lEndIndex - 1
+                For lIndex = lStartIndex To lEndIndex - 1
                     'The evap.txt file contains a potential evapotranspiration (PET) value in tenths of millimeters 
                     'for each subbasin per day. If PET is provided by user it is assumed to be in tenths of mmm.
                     'If PET is generated internally from temperature, it needs to be converted from inches to mm.
@@ -1666,7 +1674,7 @@ Public Module modGeoSFM
         Next
 
         'write record for each date
-        For lIndex As Integer = 1 To lNdates
+        For lIndex = 1 To lNdates
             Dim lDate(6) As Integer
             J2Date(aSJDate + lIndex - 1, lDate)
             Dim lYr As Integer = lDate(0)
