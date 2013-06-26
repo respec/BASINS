@@ -954,6 +954,7 @@ NextOldVal:
                 lNewTimeseries.Value(lIndex) = aSetAllValues
             Next
         End Try
+        lNewTimeseries.SetInterval(aTU, aTS)
         Return lNewTimeseries
     End Function
 
