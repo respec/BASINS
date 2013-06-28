@@ -2819,30 +2819,60 @@ KeepWaiting:
                 GetGridFileName(aGrid, aRow, aColumn, False, True)
                 Dim lNetCDFFileName As String = AbsolutePath(aGrid.Source.CellValue(aRow, 3), PathNameOnly(pSiteData.FileName))
                 If FileExists(lNetCDFFileName) Then
-                    Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
-                    For Each lDim As atcTimeseriesNetCDF.atcNetCDFDimension In lNetCDFFile.Dimensions
-                        If lDim.Name.ToLower.StartsWith("x") Or lDim.Name.ToLower.StartsWith("lon") Then
-                            aGrid.Source.CellValue(aRow, 5) = lDim.Name
-                        ElseIf lDim.Name.ToLower.StartsWith("y") Or lDim.Name.ToLower.StartsWith("lat") Then
-                            aGrid.Source.CellValue(aRow, 6) = lDim.Name
-                        End If
-                    Next
+                    'Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
+                    Dim lXVar As String = ""
+                    Dim lYVar As String = ""
+                    Dim lTimeVar As String = ""
+                    Dim lDataVars As Generic.List(Of String) = Nothing
+                    If GetNetCDFVarNames(lNetCDFFileName, lXVar, lYVar, lTimeVar, lDataVars) Then
+                        aGrid.Source.CellValue(aRow, 4) = lDataVars(0) 'use first variable as default
+                        aGrid.Source.CellValue(aRow, 5) = lXVar
+                        aGrid.Source.CellValue(aRow, 6) = lYVar
+                    End If
+                    aGrid.Refresh()
+                    'For Each lDim As atcTimeseriesNetCDF.atcNetCDFDimension In lNetCDFFile.Dimensions
+                    '    If lDim.Name.ToLower.StartsWith("x") Or lDim.Name.ToLower.StartsWith("lon") Then
+                    '        aGrid.Source.CellValue(aRow, 5) = lDim.Name
+                    '    ElseIf lDim.Name.ToLower.StartsWith("y") Or lDim.Name.ToLower.StartsWith("lat") Then
+                    '        aGrid.Source.CellValue(aRow, 6) = lDim.Name
+                    '    End If
+                    'Next
+                    'For Each lVar As atcTimeseriesNetCDF.atcNetCDFVariable In lNetCDFFile.Variables
+                    '    If lVar.Dimensions.Count = lNetCDFFile.Dimensions.Count Then 'assign first variable w/correct #dimensions as default for field
+                    '        aGrid.Source.CellValue(aRow, 4) = lVar.Name
+                    '    End If
+                    'Next
                 End If
             ElseIf aColumn > 3 Then
                 Dim lNetCDFFileName As String = AbsolutePath(aGrid.Source.CellValue(aRow, 3), PathNameOnly(pSiteData.FileName))
                 If FileExists(lNetCDFFileName) Then
-                    Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
-                    If aColumn = 4 Then 'get valid variable names from netCDF file
-                        For Each lVar As atcTimeseriesNetCDF.atcNetCDFVariable In lNetCDFFile.Variables
-                            If lVar.Dimensions.Count = lNetCDFFile.Dimensions.Count Then 'this is a data variable
-                                lUniqueValues.Add(lVar.ToString)
-                            End If
-                        Next
-                    Else 'get valid dimension names from netCDF file
-                        For Each lDim As atcTimeseriesNetCDF.atcNetCDFDimension In lNetCDFFile.Dimensions
-                            lUniqueValues.Add(lDim.Name)
-                        Next
+                    Dim lXVar As String = ""
+                    Dim lYVar As String = ""
+                    Dim lTimeVar As String = ""
+                    Dim lDataVars As Generic.List(Of String) = Nothing
+                    If GetNetCDFVarNames(lNetCDFFileName, lXVar, lYVar, lTimeVar, lDataVars) Then
+                        If aColumn = 4 Then 'make list of data variable names
+                            For Each lVar As String In lDataVars
+                                lUniqueValues.Add(lVar)
+                            Next
+                        Else 'make list of dimension variable names
+                            If lXVar.Length > 0 Then lUniqueValues.Add(lXVar)
+                            If lYVar.Length > 0 Then lUniqueValues.Add(lYVar)
+                            If lTimeVar.Length > 0 Then lUniqueValues.Add(lTimeVar)
+                        End If
                     End If
+                    'Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
+                    'If aColumn = 4 Then 'get valid variable names from netCDF file
+                    '    For Each lVar As atcTimeseriesNetCDF.atcNetCDFVariable In lNetCDFFile.Variables
+                    '        If lVar.Dimensions.Count = lNetCDFFile.Dimensions.Count Then 'this is a data variable
+                    '            lUniqueValues.Add(lVar.ToString)
+                    '        End If
+                    '    Next
+                    'Else 'get valid dimension names from netCDF file
+                    '    For Each lDim As atcTimeseriesNetCDF.atcNetCDFDimension In lNetCDFFile.Dimensions
+                    '        lUniqueValues.Add(lDim.Name)
+                    '    Next
+                    'End If
                 End If
             End If
             aGrid.ValidValues = lUniqueValues
@@ -2902,36 +2932,58 @@ KeepWaiting:
             ElseIf aColumn = 4 AndAlso chkFilePrompt.Checked Then
                 GetGridFileName(aGrid, aRow, aColumn, False, False)
                 AtcGridInputControl_CellEdited(aGrid, aRow, aColumn)
+                Dim lIndexFile As String = aGrid.Source.CellValue(aRow, aColumn)
+                Dim lFileStr As String = WholeFileString(lIndexFile)
+                Dim lNetCDFFileName As String = StrSplit(lFileStr, vbCrLf, "")
+                lNetCDFFileName = AbsolutePath(lNetCDFFileName, PathNameOnly(lIndexFile))
+                If FileExists(lNetCDFFileName) Then
+                    'Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
+                    Dim lXVar As String = ""
+                    Dim lYVar As String = ""
+                    Dim lTimeVar As String = ""
+                    Dim lDataVars As Generic.List(Of String) = Nothing
+                    If GetNetCDFVarNames(lNetCDFFileName, lXVar, lYVar, lTimeVar, lDataVars) Then
+                        aGrid.Source.CellValue(aRow, 5) = lDataVars(0) 'use first variable as default
+                        aGrid.Source.CellValue(aRow, 6) = lTimeVar
+                        aGrid.Source.CellValue(aRow, 7) = lXVar
+                        aGrid.Source.CellValue(aRow, 8) = lYVar
+                    End If
+                    aGrid.Refresh()
+                End If
             ElseIf aColumn > 4 AndAlso aColumn < 9 Then
-                If FileExists(aGrid.Source.CellValue(aRow, 4)) Then
-                    Dim lFileStr As String = WholeFileString(aGrid.Source.CellValue(aRow, 4))
+                Dim lIndexFile As String = aGrid.Source.CellValue(aRow, 4)
+                If FileExists(lIndexFile) Then
+                    Dim lFileStr As String = WholeFileString(lIndexFile)
                     Dim lNetCDFFileName As String = StrSplit(lFileStr, vbCrLf, "")
-                    lNetCDFFileName = AbsolutePath(lNetCDFFileName, PathNameOnly(pInputControlData.FileName)) ' PathNameOnly(.CellValue(aRow, aColumn)))
+                    lNetCDFFileName = AbsolutePath(lNetCDFFileName, PathNameOnly(lIndexFile)) ' PathNameOnly(.CellValue(aRow, aColumn)))
                     If FileExists(lNetCDFFileName) Then
-                        Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lNetCDFFileName)
-                        If aColumn = 5 Then 'get valid variable names from netCDF file
-                            For Each lVar As atcTimeseriesNetCDF.atcNetCDFVariable In lNetCDFFile.Variables
-                                If lVar.Dimensions.Count = lNetCDFFile.Dimensions.Count Then 'this is a data variable
+                        Dim lXVar As String = ""
+                        Dim lYVar As String = ""
+                        Dim lTimeVar As String = ""
+                        Dim lDataVars As Generic.List(Of String) = Nothing
+                        If GetNetCDFVarNames(lNetCDFFileName, lXVar, lYVar, lTimeVar, lDataVars) Then
+                            If aColumn = 5 Then 'add valid data variable names 
+                                For Each lVar As String In lDataVars
                                     lUniqueValues.Add(lVar.ToString)
-                                End If
-                            Next
-                        Else 'get valid dimension names from netCDF file
-                            For Each lDim As atcTimeseriesNetCDF.atcNetCDFDimension In lNetCDFFile.Dimensions
-                                lUniqueValues.Add(lDim.Name)
-                            Next
+                                Next
+                            Else 'add valid dimension names 
+                                If lXVar.Length > 0 Then lUniqueValues.Add(lXVar)
+                                If lYVar.Length > 0 Then lUniqueValues.Add(lYVar)
+                                If lTimeVar.Length > 0 Then lUniqueValues.Add(lTimeVar)
+                            End If
                         End If
                     End If
                 End If
+                End If
+                aGrid.ValidValues = lUniqueValues
             End If
-            aGrid.ValidValues = lUniqueValues
-        End If
     End Sub
 
     Private Sub AtcGridGridOutput_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridGridOutput.MouseDownCell
         If aGrid.Source.CellEditable(aRow, aColumn) Then
             Dim lUniqueValues As New ArrayList
             If aColumn = 1 AndAlso chkFilePrompt.Checked Then
-                GetGridFileName(aGrid, aRow, aColumn, True, False)
+                GetGridFileName(aGrid, aRow, aColumn, True, True)
             ElseIf aColumn = 2 Then
                 lUniqueValues.Add("No")
                 lUniqueValues.Add("Yes")
@@ -3113,6 +3165,16 @@ KeepWaiting:
                 Dim lFilename As String = cdlg.FileName
                 ChDriveDir(IO.Path.GetDirectoryName(lFilename))
                 txtWatershedFile.Text = lFilename
+                Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lFilename)
+                For Each lVar As atcTimeseriesNetCDF.atcNetCDFVariable In lNetCDFFile.Variables
+                    If lVar.Name.ToLower.StartsWith("x") Or lVar.Name.ToLower.StartsWith("lon") Then
+                        txtXVarName.Text = lVar.Name
+                    ElseIf lVar.Name.ToLower.StartsWith("y") Or lVar.Name.ToLower.StartsWith("lat") Then
+                        txtYVarName.Text = lVar.Name
+                    ElseIf lVar.Dimensions.Count = 2 Then 'assume its the watershed grid variable name
+                        txtWatershedVariable.Text = lVar.Name
+                    End If
+                Next
             End If
         End If
     End Sub
