@@ -601,6 +601,7 @@ CaseExistRenumber:
                 'Debug.WriteLine(aTs.Attributes.ItemByIndex(lAttributeIndex).ToString)
                 If Not DsnWriteAttribute(aFileUnit, lMsgUnit, lDsn, .ItemByIndex(lAttributeIndex)) Then
                     DsnWriteAttributes = False
+                    Logger.Dbg("Failed to write Attribute " & .ItemByIndex(lAttributeIndex).ToString)
                     Exit For
                 End If
             Next
