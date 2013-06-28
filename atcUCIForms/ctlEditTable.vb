@@ -269,7 +269,7 @@ Public Class ctlEditTable
         ElseIf pHspfTable.Name = "NODE-PARM" Then
             'special case 
             With grdTable.Source
-                .Columns = 5
+                .Columns = 6
                 .CellValue(0, 0) = "OpNum"
                 If chkDesc.Checked = True Then
                     .CellValue(0, 1) = "Description"
@@ -277,7 +277,7 @@ Public Class ctlEditTable
                 Else
                     lchkDescInteger = 0
                 End If
-                For i = 0 To 4
+                For i = 0 To 5
                     lParm = pHspfTable.Parms(i)
                     .CellValue(0, i + lchkDescInteger + 1) = lParm.Name
                 Next i
@@ -294,7 +294,7 @@ Public Class ctlEditTable
                     If chkDesc.Checked = True Then
                         .CellValue(.Rows - 1, 1) = ltable.Opn.Description
                     End If
-                    For i = 0 To 4
+                    For i = 0 To 5
                         lParmIndex += 1
                         .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(lParmIndex).Value
                     Next i
@@ -445,7 +445,7 @@ Public Class ctlEditTable
                     lnRows = lTable.Opn.Tables("DYNAMIC-WAVE").ParmValue("NNODE")
                 End If
                 For lRow = 1 To lnRows
-                    For lCol = 0 To 4
+                    For lCol = 0 To 5
                         lParmIndex += 1
                         lParm = lTable.Parms(lParmIndex)
                         lParm.Value = .CellValue(lRow, lCol + chkDesc.CheckState + 1)
