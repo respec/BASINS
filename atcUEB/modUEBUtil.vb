@@ -120,7 +120,8 @@ Module modUEBUtil
                 aXVarName = ""
                 aYVarName = ""
                 aTimeVarName = ""
-                For lVarId As Integer = NetCDF.NC_GLOBAL To lNVars - 1
+                'For lVarId As Integer = NetCDF.NC_GLOBAL To lNVars - 1
+                For lVarId As Integer = 0 To lNVars - 1
                     lResult = NetCDF.nc_inq_varndims(lNCId, lVarId, lNDims)
                     If lResult <> 0 Then
                         Return False
@@ -132,20 +133,28 @@ Module modUEBUtil
                         Dim lName As New System.Text.StringBuilder(NetCDF.netCDF_limits.NC_MAX_NAME)
                         NetCDF.nc_inq_var(lNCId, lVarId, lName, lXtype, lVarNDims, lDimIds, lNAtts)
                         If lDimNames.Contains(lName.ToString.ToLower) Then 'this is a dimension variable
-                            Select Case lName.ToString.ToLower
-                                Case "longitude", "x"
-                                    aYVarName = lName.ToString
-                                Case "latitude", "y"
-                                    aXVarName = lName.ToString
-                                Case "time", "t"
-                                    aTimeVarName = lName.ToString
-                            End Select
+                            'Select Case lName.ToString.ToLower.StartsWith
+                            '    Case "longitude", "x"
+                            '        aYVarName = lName.ToString
+                            '    Case "latitude", "y"
+                            '        aXVarName = lName.ToString
+                            '    Case "time", "t"
+                            '        aTimeVarName = lName.ToString
+                            'End Select
+                            If lName.ToString.ToLower.StartsWith("lon") OrElse lName.ToString.ToLower.StartsWith("x") Then
+                                aXVarName = lName.ToString
+                            ElseIf lName.ToString.ToLower.StartsWith("lat") OrElse lName.ToString.ToLower.StartsWith("y") Then
+                                aYVarName = lName.ToString
+                            ElseIf lName.ToString.ToLower.StartsWith("time") OrElse lName.ToString.ToLower = "x" Then
+                                aTimeVarName = lName.ToString
+                            End If
                         ElseIf lVarNDims = lNDims Then 'this is a data variable
                             aDataVarNames.Add(lName.ToString)
                         End If
                     End If
                 Next
                 lResult = NetCDF.nc_close(lNCId)
+                Return True
             End If
         Catch ex As Exception
             Return False
