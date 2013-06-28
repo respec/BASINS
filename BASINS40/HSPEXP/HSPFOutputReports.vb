@@ -41,7 +41,7 @@ Module HSPFOutputReports
     Private pGraphSaveFormat As String
     Private pGraphSaveWidth As Integer
     Private pGraphSaveHeight As Integer
-    Private pGraphAnnual As Boolean = False
+    Private pGraphAnnual As Boolean = True
     Private pCurveStepType As String = "RearwardStep"
     Private pConstituents As New atcCollection
     Private pPerlndSegmentStarts() As Integer

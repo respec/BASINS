@@ -306,56 +306,57 @@ Public Class atcExpertSystem
         Return lText.ToString
     End Function
 
-    Public Sub CalcAdvice(ByRef aString As String) 'Becky added this method to compute & export advice
+    Public Sub CalcAdvice(ByRef aString As String, ByVal aSiteIndex As Integer) 'Becky added this method to compute & export advice
         Try
-            For lSiteIndex As Integer = 1 To Sites.Count
-                Dim lSite As HexSite = Sites(lSiteIndex - 1)
-                Dim lErr As Integer = 1
-                Dim lCriteriaList As New List(Of Double) 'I created these lists so I could pass them other places where the Hex things aren't defined
-                Dim lErrorTermList As New List(Of Double)
-                lCriteriaList.Add(0) 'add blank value for 0th place
-                lErrorTermList.Add(0) 'add blank value for 0th place
-                For i As Integer = 1 To 20
-                    If i = 8 Then 'fix the summer storm volume error to be the seasonal storm error 
-                        lCriteriaList.Add(ErrorCriteria.Criterion(i).Value)
-                        lErrorTermList.Add(lSite.ErrorTerm(i) - lSite.ErrorTerm(5)) 'summer storm minus total storm
-                    ElseIf i = 20 Then
-                        'put the pure summer storm error in slot 20
-                        lCriteriaList.Add(ErrorCriteria.Criterion(8).Value)
-                        lErrorTermList.Add(lSite.ErrorTerm(8))
-                    Else
-                        lCriteriaList.Add(ErrorCriteria.Criterion(i).Value)
-                        lErrorTermList.Add(lSite.ErrorTerm(i))
-                    End If
-                Next i
-                Do Until lCriteriaList(lErr) < Math.Abs(lErrorTermList(lErr))
-                    'do this loop until we find an error outside of the range of the criterion
-                    Select Case lErr
-                        'the actual error terms are held in 1, 2, 3, 4, 5, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20
-                        'this select case steps over the blank terms
-                        Case 20
-                            'if we've gotten this far and no errors, then all criteria are okay
-                            lErr = -1
-                            Exit Do
-                        Case Is < 5
-                            lErr += 1
-                        Case 5
-                            lErr = 7
-                        Case 7
-                            lErr = 8
-                        Case 8
-                            lErr = 12
-                        Case Is > 11
-                            lErr += 1
-                    End Select
-                Loop
-                If lErr > 0 Then 'if -1, have gone through and met all criteria - use method in RWZUtilities to get the appropriate advice
-                    aString &= ErrMessage(lCriteriaList, lErrorTermList, lErr)
+            'For lSiteIndex As Integer = 1 To Sites.Count
+            'aString &= vbCrLf & vbCrLf & "Site " & lSiteIndex.ToString & ":" & vbCrLf & vbCrLf
+            Dim lSite As HexSite = Sites(aSiteIndex - 1)
+            Dim lErr As Integer = 1
+            Dim lCriteriaList As New List(Of Double) 'I created these lists so I could pass them other places where the Hex things aren't defined
+            Dim lErrorTermList As New List(Of Double)
+            lCriteriaList.Add(0) 'add blank value for 0th place
+            lErrorTermList.Add(0) 'add blank value for 0th place
+            For i As Integer = 1 To 20
+                If i = 8 Then 'fix the summer storm volume error to be the seasonal storm error 
+                    lCriteriaList.Add(ErrorCriteria.Criterion(i).Value)
+                    lErrorTermList.Add(lSite.ErrorTerm(i) - lSite.ErrorTerm(5)) 'summer storm minus total storm
+                ElseIf i = 20 Then
+                    'put the pure summer storm error in slot 20
+                    lCriteriaList.Add(ErrorCriteria.Criterion(8).Value)
+                    lErrorTermList.Add(lSite.ErrorTerm(8))
                 Else
-                    aString &= "The calibration for site " & lSite.Name & " is successful based on current criteria.  If you wish to refine " & _
-                        "the calibration further, adjust the error criteria in your .exs file."
+                    lCriteriaList.Add(ErrorCriteria.Criterion(i).Value)
+                    lErrorTermList.Add(lSite.ErrorTerm(i))
                 End If
-            Next lSiteIndex
+            Next i
+            Do Until lCriteriaList(lErr) < Math.Abs(lErrorTermList(lErr))
+                'do this loop until we find an error outside of the range of the criterion
+                Select Case lErr
+                    'the actual error terms are held in 1, 2, 3, 4, 5, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20
+                    'this select case steps over the blank terms
+                    Case 20
+                        'if we've gotten this far and no errors, then all criteria are okay
+                        lErr = -1
+                        Exit Do
+                    Case Is < 5
+                        lErr += 1
+                    Case 5
+                        lErr = 7
+                    Case 7
+                        lErr = 8
+                    Case 8
+                        lErr = 12
+                    Case Is > 11
+                        lErr += 1
+                End Select
+            Loop
+            If lErr > 0 Then 'if -1, have gone through and met all criteria - use method in RWZUtilities to get the appropriate advice
+                aString &= ErrMessage(lCriteriaList, lErrorTermList, lErr)
+            Else
+                aString &= "The calibration for site " & lSite.Name & " is successful based on current criteria.  If you wish to refine " & _
+                    "the calibration further, adjust the error criteria in your .exs file."
+            End If
+            'Next lSiteIndex
         Catch ex As Exception
             aString &= "An error was encountered while attempting to produce advice.  Please consult the statistics file to make an " & _
                 "educated decision about your next step.  Error message: " & ex.Message
@@ -906,8 +907,8 @@ Friend Class HexErrorCriteria
         pErrorCriteria.Add("E9", New HexErrorCriterion("Multiplier on third and fourth error terms", 14, 1.5))
         pErrorCriteria.Add("E10", New HexErrorCriterion("Percent of flows to use in low-flow recession error", 15, 30))
         pErrorCriteria.Add("E11", New HexErrorCriterion("Average storm peak flow error (%)", 12, 15))
-        pErrorCriteria.Add("E12", New HexErrorCriterion("Error in 10% lowest flows (%)", 7, 10))
-        pErrorCriteria.Add("E13", New HexErrorCriterion("Error in 25% lowest flows (%)", 6, 10))
+        pErrorCriteria.Add("E12", New HexErrorCriterion("Error in 10% lowest flows (%)", 7, 20))
+        pErrorCriteria.Add("E13", New HexErrorCriterion("Error in 25% lowest flows (%)", 6, 15))
         pErrorCriteria.Add("E14", New HexErrorCriterion("Error in 25% highest flows (%)", 3, 10))
         pErrorCriteria.Add("E15", New HexErrorCriterion("Error in 50% highest flows (%)", 4, 10))
         pErrorCriteria.Add("E16", New HexErrorCriterion("Error in average storm peak (%)", 13, 15))
