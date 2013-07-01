@@ -359,7 +359,7 @@ Public Module modGeoSFM
     Private Function ConvertTifToNetCDF(ByRef aTifFileName As String, ByVal aVarName As String) As String
         Try
             Dim lFileContents As String = GetEmbeddedFileAsString("ConvertTif.bat")
-
+            lFileContents = lFileContents.Replace("C:\gdal", IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location) & "\gdal")
             lFileContents &= vbCrLf & "gdal_translate -of netCDF -mo netcdf_varname=" & aVarName & " " & aTifFileName & " " & FilenameNoExt(aTifFileName) & ".nc"
             Dim lBatchFile As String = PathNameOnly(aTifFileName) & "\ConvertTif.bat"
             SaveFileString(lBatchFile, lFileContents)
@@ -1611,14 +1611,17 @@ Public Module modGeoSFM
                     For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
                         lDesc = BuildStationDescription(lDataSet)
                         If (lDesc = lPrecStation.Description) Then
-                            'If lDataSet.Attributes.GetValue("Constituent") = "SWIT" Then
-                            '    If lDataSet.Attributes.GetValue("TU") = atcTimeUnit.TUHour Then
-                            '        'need to multiply UEBGrid in/hr units by number of hours in time step
-                            '        Dim lTStep As Long = lDataSet.Attributes.GetValue("TS")
-                            '        lDataSet *= lTStep
-                            '    End If
-                            'End If
-                            lPrecTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                            If lDataSet.Attributes.GetValue("Constituent") = "SWIT" Then
+                                'If lDataSet.Attributes.GetValue("TU") = atcTimeUnit.TUHour Then
+                                '    'need to multiply UEBGrid in/hr units by number of hours in time step
+                                '    Dim lTStep As Long = lDataSet.Attributes.GetValue("TS")
+                                '    lDataSet *= lTStep
+                                'End If
+                                lPrecTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                lPrecTimeseries *= 24 'convert to daily
+                            Else
+                                lPrecTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                            End If
                         End If
                     Next
                 Next
