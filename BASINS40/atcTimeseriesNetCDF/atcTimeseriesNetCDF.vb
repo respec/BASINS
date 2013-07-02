@@ -129,6 +129,9 @@ Public Class atcTimeseriesNetCDF
                         End If
 
                         If lTimeseriesCount > 1000 Then
+
+                            'TODO allow user to specify grid overlay here
+
                             If Not lGetOnlyOneTimseries Then
                                 'too many timeseries, ask user which one
                                 Dim lFrmIndex As New frmIndex
@@ -203,37 +206,43 @@ Public Class atcTimeseriesNetCDF
                             If Not lGetOnlyOneTimseries OrElse _
                                   (lYIndex = lYIndexToget AndAlso lXIndex = lXIndexToget) OrElse _
                                   lUniqueLocations.Count > 0 AndAlso lLocation.Length > 0 Then
-                                Dim lTimeseries As New atcTimeseries(Me)
-                                Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.ConstituentVariables(0) 'lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
 
-                                For Each lDataAttribute As atcDefinedValue In lDataVariable.Attributes
-                                    lTimeseries.Attributes.SetValue(lDataAttribute.Definition.Name, lDataAttribute.Value)
+                                'TODO: if timeseries exists, append rather than create
+
+                                For lConstituentVariableIndex As Integer = 0 To lNetCDFFile.ConstituentVariables.Count - 1
+                                    Dim lTimeseries As New atcTimeseries(Me)
+                                    Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.ConstituentVariables(lConstituentVariableIndex) 'lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
+
+                                    For Each lDataAttribute As atcDefinedValue In lDataVariable.Attributes
+                                        lTimeseries.Attributes.SetValue(lDataAttribute.Definition.Name, lDataAttribute.Value)
+                                    Next
+                                    lTimeseries.Attributes.SetValue("NetCDFValues", lDataVariable)
+                                    Dim lDataVariableName As String = lDataVariable.Name
+                                    If lUniqueLocations.Count > 0 AndAlso lLocation.Length > 0 Then
+                                        Dim lCellLocations As ArrayList = lUniqueLocations(lTimeseriesIndex)
+                                        lTimeseries.Attributes.SetValue("Location Indexes", lCellLocations)
+                                        lTimeseries.Attributes.SetValue("CellCount", lCellLocations.Count)
+                                    End If
+
+                                    lTimeseries.SetInterval(lTimeUnit, 1)
+                                    lTimeseries.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(lFileName) & "_" & lDataVariableName)
+                                    lTimeseries.Attributes.SetValue("ID", lTimeseriesIndex + 1)
+                                    If lUniqueLocations.Count = 0 Then
+                                        If lNetCDFFile.NorthSouthDimension IsNot Nothing Then
+                                            lTimeseries.Attributes.SetValue("Y", lYValue)
+                                            lTimeseries.Attributes.SetValue("Y index", lYIndex)
+                                        End If
+                                        If lNetCDFFile.EastWestDimension IsNot Nothing Then
+                                            lTimeseries.Attributes.SetValue("X", lXValue)
+                                            lTimeseries.Attributes.SetValue("X index", lXIndex)
+                                        End If
+                                    End If
+                                    lTimeseries.Attributes.SetValue("Location", lLocation)
+                                    lTimeseries.ValuesNeedToBeRead = True
+                                    lTimeseries.Dates = lDates
+
+                                    If lLocation.Length > 0 Then Me.DataSets.Add(lTimeseries)
                                 Next
-                                lTimeseries.Attributes.SetValue("NetCDFValues", lDataVariable)
-                                If lUniqueLocations.Count > 0 AndAlso lLocation.Length > 0 Then
-                                    Dim lCellLocations As ArrayList = lUniqueLocations(lTimeseriesIndex)
-                                    lTimeseries.Attributes.SetValue("Location Indexes", lCellLocations)
-                                    lTimeseries.Attributes.SetValue("CellCount", lCellLocations.Count)
-                                End If
-
-                                lTimeseries.SetInterval(lTimeUnit, 1)
-                                lTimeseries.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(lFileName))
-                                lTimeseries.Attributes.SetValue("ID", lTimeseriesIndex + 1)
-                                If lUniqueLocations.Count = 0 Then
-                                    If lNetCDFFile.NorthSouthDimension IsNot Nothing Then
-                                        lTimeseries.Attributes.SetValue("Y", lYValue)
-                                        lTimeseries.Attributes.SetValue("Y index", lYIndex)
-                                    End If
-                                    If lNetCDFFile.EastWestDimension IsNot Nothing Then
-                                        lTimeseries.Attributes.SetValue("X", lXValue)
-                                        lTimeseries.Attributes.SetValue("X index", lXIndex)
-                                    End If
-                                End If
-                                lTimeseries.Attributes.SetValue("Location", lLocation)
-                                lTimeseries.ValuesNeedToBeRead = True
-                                lTimeseries.Dates = lDates
-
-                                If lLocation.Length > 0 Then Me.DataSets.Add(lTimeseries)
                             End If
 
                             If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
