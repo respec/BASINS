@@ -76,6 +76,21 @@ Public Class atcTimeseriesNetCDF
         End If
         Me.Specification = IO.Path.GetFullPath(aFileName)
 
+        Dim lLogfileName As String = Logger.FileName
+        If pDebug Then
+            Logger.StartToFile(IO.Path.ChangeExtension(aFileName, ".log"), , False, True)
+        End If
+
+        Dim lFileNames As String = aFileName
+        If aFileName.EndsWith(".dat") Then
+            lFileNames = ""
+            For Each lFileName As String In LinesInFile(aFileName)
+                lFileNames &= lFileName & ";"
+            Next
+            lFileNames.Remove(lFileNames.LastIndexOf(";"), 1)
+        End If
+        Logger.Dbg("ProcessFile(s) " & lFileNames)
+
         Dim lXIndexToget As Integer = -1
         Dim lYIndexToget As Integer = -1
         Dim lGetOnlyOneTimseries As Boolean = False
@@ -92,17 +107,17 @@ Public Class atcTimeseriesNetCDF
             End If
         End If
 
-        For Each lFileName As String In aFileName.Split(";")
-            If Not FileExists(lFileName) Then
-                pErrorDescription = "File '" & lFileName & "' not found"
-                Me.Specification = ""
-            Else
-                Dim lLogfileName As String = Logger.FileName
-                Try
-                    If pDebug Then
-                        Logger.StartToFile(IO.Path.ChangeExtension(lFileName, ".log"), , False, True)
+        Try
+            For Each lFileName As String In lFileNames.Split(";")
+                If Not FileExists(lFileName) Then
+                    lFileName = PathNameOnly(aFileName) & "\" & lFileName
+                    If Not FileExists(lFileName) Then
+                        pErrorDescription = "File '" & lFileName & "' not found"
+                        Me.Specification = ""
                     End If
+                End If
 
+                If Me.Specification.Length > 0 Then
                     'TODO: check to see if this file is open for another timeseries group, need the collection of open timeseries files
                     Dim lNetCDFFile As New atcNetCDFFile(lFileName)
                     If lNetCDFFile.TimeDimension Is Nothing Then
@@ -225,7 +240,8 @@ Public Class atcTimeseriesNetCDF
                                     End If
 
                                     lTimeseries.SetInterval(lTimeUnit, 1)
-                                    lTimeseries.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(lFileName) & "_" & lDataVariableName)
+                                    'lTimeseries.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(lFileName) & "_" & lDataVariableName)
+                                    lTimeseries.Attributes.SetValue("Constituent", lDataVariableName)
                                     lTimeseries.Attributes.SetValue("ID", lTimeseriesIndex + 1)
                                     If lUniqueLocations.Count = 0 Then
                                         If lNetCDFFile.NorthSouthDimension IsNot Nothing Then
@@ -267,16 +283,19 @@ Public Class atcTimeseriesNetCDF
                         Next
                         Logger.Dbg("TimeseriesBuilt:Count " & Me.DataSets.Count & " Length " & lNumValues)
                     End If
-                Catch e As Exception
-                    Logger.Dbg("Exception reading '" & aFileName & "': " & e.Message, e.StackTrace)
-                    Return False
-                Finally
-                    If pDebug Then
-                        Logger.StartToFile(lLogfileName, True)
-                    End If
-                End Try
+
+                End If
+            Next
+
+        Catch e As Exception
+            Logger.Dbg("Exception reading '" & aFileName & "': " & e.Message, e.StackTrace)
+            Return False
+        Finally
+            If pDebug Then
+                Logger.StartToFile(lLogfileName, True)
             End If
-        Next
+        End Try
+
         Return (pData.Count > 0)
     End Function
 
