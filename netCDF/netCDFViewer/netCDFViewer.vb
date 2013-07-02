@@ -21,7 +21,7 @@ Module netCDFViewer
         Dim lOutFolder As String = lPathName & lNetCDF_Version.Substring(0, 3) & ".dump\"
         If Not IO.Directory.Exists(lOutFolder) Then IO.Directory.CreateDirectory(lOutFolder)
 
-        Dim lBaseNames() As String = {"rfe90m200309", "SUBWatersheds_LangtangKhola", "merra.rfe.90m.200301", _
+        Dim lBaseNames() As String = {"merra.rfe.90m.200301", "rfe90m200309", "SUBWatersheds_LangtangKhola", "merra.rfe.90m.200301", _
                                       "swit", "Ta1", "LangtangKholaWatershed", "srtm_54_07_LangtangFill_LambertWatershed", "srtm_54_07_LangtangFill_LambertUEBAspect", "srtm_54_07_LangtangFill_LambertUEBSlope"}
         '{ "swit", "merra.prod.assim.20061230", "merra.prod.rad.20061231", "aspect", "ccgridfile", "hcanfile", "lafile", "lat", "longitude", "slope", "SubType", "Watershed"}
         For Each lBaseName As String In lBaseNames
@@ -55,14 +55,17 @@ Module netCDFViewer
                 End If
             End If
             For Each lTimeseries As atcData.atcTimeseries In lNetCDFFile.DataSets
-                lTimeseries.Attributes.CalculateAll()
-                Dim lDataTree As New atcDataTree.atcDataTreePlugin
-                Dim lDataTreeFileName As String = IO.Path.ChangeExtension(lFileName.Replace(".nc", "#.nc"), "list")
-                Dim lXYString As String = "_Y" & (lTimeseries.Attributes.GetValue("Y Index")) & "_X" & (lTimeseries.Attributes.GetValue("X Index"))
-                If lXYString = "_Y_X" Then
-                    lXYString = lTimeseries.Attributes.GetValue("Location")
+                If lTimeseries.Attributes.GetValue("Location") <> "ID_128" Then 'skip the no data points
+                    lTimeseries.Attributes.CalculateAll()
+                    Dim lDataTree As New atcDataTree.atcDataTreePlugin
+                    'Dim lDataTreeFileName As String = IO.Path.ChangeExtension(lFileName.Replace(".nc", "#.nc"), "list")
+                    Dim lDataTreeFileName As String = IO.Path.GetDirectoryName(lFileName) & "\" & lTimeseries.Attributes.GetValue("Constituent") & "#.list"
+                    Dim lXYString As String = "_Y" & (lTimeseries.Attributes.GetValue("Y Index")) & "_X" & (lTimeseries.Attributes.GetValue("X Index"))
+                    If lXYString = "_Y_X" Then
+                        lXYString = "_" & lTimeseries.Attributes.GetValue("Location")
+                    End If
+                    lDataTree.Save(New atcData.atcTimeseriesGroup(lTimeseries), lDataTreeFileName.Replace("#", lXYString), "Display 25")
                 End If
-                lDataTree.Save(New atcData.atcTimeseriesGroup(lTimeseries), lDataTreeFileName.Replace("#", lXYString), "Display 25")
             Next
 
             Dim lNCId As Int32
