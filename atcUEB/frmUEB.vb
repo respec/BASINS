@@ -2048,6 +2048,7 @@ Public Class frmUEB
         pParmData = New clsUEBParameterFile("")
         With AtcGridModelParms
             .Source = New atcControls.atcGridSource
+            .SizeAllColumnsToContents()
             '.AllowHorizontalScrolling = False
         End With
         SetParmGrid()
@@ -2055,6 +2056,7 @@ Public Class frmUEB
         pSiteData = New clsUEBSiteFile("")
         With AtcGridSiteVars
             .Source = New atcControls.atcGridSource
+            .SizeAllColumnsToContents()
             '.AllowHorizontalScrolling = False
         End With
         SetSiteGrid()
@@ -2062,6 +2064,7 @@ Public Class frmUEB
         pInputControlData = New clsUEBInputControl("")
         With AtcGridInputControl
             .Source = New atcControls.atcGridSource
+            .SizeAllColumnsToContents()
             '.AllowHorizontalScrolling = False
         End With
         SetInputControl()

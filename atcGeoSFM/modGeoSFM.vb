@@ -1606,11 +1606,6 @@ Public Module modGeoSFM
                         lDesc = BuildStationDescription(lDataSet)
                         If (lDesc = lPrecStation.Description) Then
                             If lDataSet.Attributes.GetValue("Constituent") = "SWIT" Then
-                                'If lDataSet.Attributes.GetValue("TU") = atcTimeUnit.TUHour Then
-                                '    'need to multiply UEBGrid in/hr units by number of hours in time step
-                                '    Dim lTStep As Long = lDataSet.Attributes.GetValue("TS")
-                                '    lDataSet *= lTStep
-                                'End If
                                 lPrecTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                                 lPrecTimeseries *= 24 'convert to daily
                             Else

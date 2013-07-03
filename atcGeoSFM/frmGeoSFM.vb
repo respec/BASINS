@@ -4244,6 +4244,7 @@ Public Class frmGeoSFM
                     BuildListofValidStationNames("PET", pMetStations)
                     BuildListofValidStationNames("PEVT", pMetStations)
                 Else
+                    BuildListofValidStationNames("Ta", pMetStations)
                     BuildListofValidStationNames("TEMP", pMetStations)
                     BuildListofValidStationNames("ATEM", pMetStations)
                 End If
