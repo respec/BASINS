@@ -4491,11 +4491,8 @@ Public Class frmGeoSFM
         Dim lPlugIn As New atcUEB.PlugIn
         lUEBForm.InitializeUI(lPlugIn)
         lUEBForm.WatershedGridFileName = pUEBWatershedGridFilename
-        lUEBForm.WatershedVariableName = pUEBWatershedGridVarname
         lUEBForm.SlopeGridFileName = pUEBSlopeGridFilename
-        lUEBForm.SlopeGridVariableName = pUEBSlopeGridVarname
         lUEBForm.AspectGridFileName = pUEBAspectGridFilename
-        lUEBForm.AspectGridVariableName = pUEBAspectGridVarname
         lUEBForm.Show()
     End Sub
 

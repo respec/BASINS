@@ -22,11 +22,8 @@ Public Module modGeoSFM
     Friend pOutputPath As String
     Friend pProjectName As String
     Friend pUEBSlopeGridFilename As String
-    Friend pUEBSlopeGridVarname As String
     Friend pUEBAspectGridFilename As String
-    Friend pUEBAspectGridVarname As String
     Friend pUEBWatershedGridFilename As String
-    Friend pUEBWatershedGridVarname As String
 
     Friend Function Terrain(ByVal aDEMLayerName As String, ByVal aSubbasinLayerName As String, ByVal aStreamLayerName As String, ByVal aThresh As Integer, _
                             Optional ByVal aConnectUEB As Boolean = False) As Boolean
@@ -342,11 +339,8 @@ Public Module modGeoSFM
             GisUtil.SlopeAspectTarbottonMethod(lDEMFileName, lUEBSlopeGridFileName, lUEBAspectGridFileName)
             'convert Tif files to NetCDF for use by UEBGrid
             pUEBSlopeGridFilename = ConvertTifToNetCDF(lUEBSlopeGridFileName, "Slope")
-            pUEBSlopeGridVarname = "Band1"
             pUEBAspectGridFilename = ConvertTifToNetCDF(lUEBAspectGridFileName, "Aspect")
-            pUEBAspectGridVarname = "Band1"
             pUEBWatershedGridFilename = ConvertTifToNetCDF(lSubbasinGridFileName, "SubID")
-            pUEBWatershedGridVarname = "Band1"
             GisUtil.AddLayer(lUEBSlopeGridFileName, lUEBSlopeGridLayerName)
             GisUtil.AddLayer(lUEBAspectGridFileName, lUEBAspectGridLayerName)
             GisUtil.SaveProject(GisUtil.ProjectFileName)
