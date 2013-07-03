@@ -20,9 +20,7 @@ Public Class frmUEB
     Friend pWatershedGridXVarName As String
     Friend pWatershedGridYVarName As String
     Friend pSlopeGridFilename As String
-    Friend pSlopeGridVariableName As String
     Friend pAspectGridFilename As String
-    Friend pAspectGridVariableName As String
     Friend pAggOutputControlData As clsUEBAggOutputControl
     Friend pAggOutputFileName As String
 
@@ -2307,7 +2305,7 @@ KeepWaiting:
                     lExitCode = -1
                 End Try
 
-                If FileExists(pAggOutputFileName) Then
+                If FileExists(pAggOutputFileName) Then 'add aggregate output to BASINS project for use in GeoSFM
                     Dim lUEBTimeseries As New atcTimeseriesUEBGrid.atcDataSourceTimeseriesUEBGrid
                     atcDataManager.OpenDataSource(lUEBTimeseries, pAggOutputFileName, Nothing)
                 End If
@@ -3054,16 +3052,19 @@ KeepWaiting:
         Set(ByVal value)
             pWatershedGridFileName = value
             txtWatershedFile.Text = pWatershedGridFileName
-        End Set
-    End Property
-
-    Public Property WatershedVariableName()
-        Get
-            WatershedVariableName = pWatershedGridVariableName
-        End Get
-        Set(ByVal value)
-            pWatershedGridVariableName = value
-            txtWatershedVariable.Text = pWatershedGridVariableName
+            'this is a kluge; this is only called from GeoSFM when models are linked
+            'so use this event to make sure SWIT and Air Temp are in Aggregate Output
+            txtAggOutputControlFile.Text = "AggregateOutputControl.dat"
+            txtAggOutputHeader.Text = "List of Aggregated Output Variables"
+            txtAggOutputFile.Text = "Outputs\AggregatedOutput.dat"
+            With AtcGridGridOutput.Source
+                For i As Integer = .FixedRows - 1 To .Rows - .FixedRows
+                    If .CellValue(i, 0).Contains("Air temperature") Or _
+                       .CellValue(i, 0).Contains("Total outflow") Then
+                        .CellValue(i, 2) = "Yes"
+                    End If
+                Next
+            End With
         End Set
     End Property
 
@@ -3076,23 +3077,19 @@ KeepWaiting:
             With AtcGridSiteVars.Source
                 For i As Integer = 1 To .Rows
                     If .CellValue(i, 0).ToLower.Contains("slope") Then
-                        .CellValue(i, 2) = pSlopeGridFilename
-                    End If
-                Next
-            End With
-        End Set
-    End Property
-
-    Public Property SlopeGridVariableName()
-        Get
-            SlopeGridVariableName = pSlopeGridVariableName
-        End Get
-        Set(ByVal value)
-            pSlopeGridVariableName = value
-            With AtcGridSiteVars.Source
-                For i As Integer = 1 To .Rows
-                    If .CellValue(i, 0).ToLower.Contains("slope") Then
-                        .CellValue(i, 3) = pSlopeGridVariableName
+                        .CellValue(i, 3) = pSlopeGridFilename
+                        If FileExists(pSlopeGridFilename) Then
+                            Dim lXVar As String = ""
+                            Dim lYVar As String = ""
+                            Dim lTimeVar As String = ""
+                            Dim lDataVars As Generic.List(Of String) = Nothing
+                            If GetNetCDFVarNames(pSlopeGridFilename, lXVar, lYVar, lTimeVar, lDataVars) Then
+                                .CellValue(i, 4) = lDataVars(0) 'use first variable as default
+                                .CellValue(i, 5) = lXVar
+                                .CellValue(i, 6) = lYVar
+                            End If
+                            AtcGridSiteVars.Refresh()
+                        End If
                     End If
                 Next
             End With
@@ -3108,23 +3105,19 @@ KeepWaiting:
             With AtcGridSiteVars.Source
                 For i As Integer = 1 To .Rows
                     If .CellValue(i, 0).ToLower.Contains("aspect") Then
-                        .CellValue(i, 2) = pAspectGridFilename
-                    End If
-                Next
-            End With
-        End Set
-    End Property
-
-    Public Property AspectGridVariableName()
-        Get
-            AspectGridVariableName = pAspectGridVariableName
-        End Get
-        Set(ByVal value)
-            pAspectGridVariableName = value
-            With AtcGridSiteVars.Source
-                For i As Integer = 1 To .Rows
-                    If .CellValue(i, 0).ToLower.Contains("aspect") Then
-                        .CellValue(i, 3) = pAspectGridVariableName
+                        .CellValue(i, 3) = pAspectGridFilename
+                        If FileExists(pAspectGridFilename) Then
+                            Dim lXVar As String = ""
+                            Dim lYVar As String = ""
+                            Dim lTimeVar As String = ""
+                            Dim lDataVars As Generic.List(Of String) = Nothing
+                            If GetNetCDFVarNames(pAspectGridFilename, lXVar, lYVar, lTimeVar, lDataVars) Then
+                                .CellValue(i, 4) = lDataVars(0) 'use first variable as default
+                                .CellValue(i, 5) = lXVar
+                                .CellValue(i, 6) = lYVar
+                            End If
+                            AtcGridSiteVars.Refresh()
+                        End If
                     End If
                 Next
             End With
@@ -3165,22 +3158,23 @@ KeepWaiting:
                 Dim lFilename As String = cdlg.FileName
                 ChDriveDir(IO.Path.GetDirectoryName(lFilename))
                 txtWatershedFile.Text = lFilename
-                Dim lNetCDFFile As New atcTimeseriesNetCDF.atcNetCDFFile(lFilename)
-                For Each lVar As atcTimeseriesNetCDF.atcNetCDFVariable In lNetCDFFile.Variables
-                    If lVar.Name.ToLower.StartsWith("x") Or lVar.Name.ToLower.StartsWith("lon") Then
-                        txtXVarName.Text = lVar.Name
-                    ElseIf lVar.Name.ToLower.StartsWith("y") Or lVar.Name.ToLower.StartsWith("lat") Then
-                        txtYVarName.Text = lVar.Name
-                    ElseIf lVar.Dimensions.Count = 2 Then 'assume its the watershed grid variable name
-                        txtWatershedVariable.Text = lVar.Name
-                    End If
-                Next
             End If
         End If
     End Sub
 
     Private Sub txtWatershedFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWatershedFile.TextChanged
         pWatershedGridFileName = txtWatershedFile.Text
+        If FileExists(pWatershedGridFileName) Then
+            Dim lXVar As String = ""
+            Dim lYVar As String = ""
+            Dim lTimeVar As String = ""
+            Dim lDataVars As Generic.List(Of String) = Nothing
+            If GetNetCDFVarNames(pWatershedGridFileName, lXVar, lYVar, lTimeVar, lDataVars) Then
+                txtWatershedVariable.Text = lDataVars(0) 'use first variable as default
+                txtXVarName.Text = lXVar
+                txtYVarName.Text = lYVar
+            End If
+        End If
     End Sub
 
     Private Sub txtWatershedVariable_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWatershedVariable.TextChanged
