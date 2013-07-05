@@ -4499,8 +4499,24 @@ Public Module modGeoSFM
             For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
                 lCounter += 1
                 Logger.Progress("Building list of valid " & aMetConstituent & " station names...", lCounter, lDataSource.DataSets.Count)
+                Dim lMatch As Boolean = False
+                Dim lCons As String = lDataSet.Attributes.GetValue("Constituent").ToString.ToUpper
 
-                If lDataSet.Attributes.GetValue("Constituent") = aMetConstituent Then
+                Select Case aMetConstituent.ToUpper
+                    Case "PREC"
+                        If lCons = "PREC" OrElse lCons = "SWIT" OrElse lCons = "RAIN" Then
+                            lMatch = True
+                        End If
+                    Case "TEMP"
+                        If lCons = "TEMP" OrElse lCons = "ATEM" OrElse lCons = "TAIR" OrElse lCons = "TA" Then
+                            lMatch = True
+                        End If
+                    Case "PEVT"
+                        If lCons = "PEVT" OrElse lCons = "PET" OrElse lCons = "ET" OrElse lCons = "EVAP" Then
+                            lMatch = True
+                        End If
+                End Select
+                If lMatch Then
                     Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
                     Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
                     Dim lSJDay As Double
@@ -4516,6 +4532,7 @@ Public Module modGeoSFM
                     Dim lAddIt As Boolean = True
 
                     'if this one is computed and observed also exists at same location, just use observed
+                    'this is typically a BASINS Met Data issue
                     If lDataSet.Attributes.GetValue("Scenario") = "COMPUTED" Then
                         For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
                             If lDataSet2.Attributes.GetValue("Constituent") = aMetConstituent And _
