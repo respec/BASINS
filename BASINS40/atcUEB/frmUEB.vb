@@ -3191,4 +3191,12 @@ KeepWaiting:
     Private Sub txtAggOutputHeader_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputHeader.TextChanged
         pAggOutputControlData.Header = txtAggOutputHeader.Text
     End Sub
+
+    Private Sub txtXVarName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtXVarName.TextChanged
+        pWatershedGridXVarName = txtXVarName.Text
+    End Sub
+
+    Private Sub txtYVarName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtYVarName.TextChanged
+        pWatershedGridYVarName = txtYVarName.Text
+    End Sub
 End Class
