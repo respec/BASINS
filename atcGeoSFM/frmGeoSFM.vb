@@ -3688,13 +3688,13 @@ Public Class frmGeoSFM
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     If pPrecStations.Count > 0 Then
                         For Each lPrecStation In pPrecStations
-                            If lPrecStation.Description.Contains("SWIT") Then
-                                'find subwatershed ID for this aggregate melt from UEB
-                                If lSubbasins(lIndex - 1).ToString = lPrecStation.Name Then
-                                    .CellValue(lIndex, 1) = lPrecStation.Description
-                                    Exit For
-                                End If
+                            'If lPrecStation.Description.Contains("SWIT") Then
+                            'find subwatershed ID for this aggregate melt from UEB
+                            If lPrecStation.Name.Contains(lSubbasins(lIndex - 1).ToString) Then
+                                .CellValue(lIndex, 1) = lPrecStation.Description
+                                Exit For
                             End If
+                            'End If
                         Next
                         If .CellValue(lIndex, 1) Is Nothing Then
                             .CellValue(lIndex, 1) = pPrecStations(0).Description
@@ -4235,18 +4235,18 @@ Public Class frmGeoSFM
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
                 EnableControls(False)
                 pPrecStations.Clear()
-                BuildListofValidStationNames("SWIT", pPrecStations)
+                'BuildListofValidStationNames("SWIT", pPrecStations)
                 BuildListofValidStationNames("PREC", pPrecStations)
                 lblStatus.Text = "Reading Evap Data ..."
                 Me.Refresh()
                 pMetStations.Clear()
                 If rdoPETDirect.Checked Then
-                    BuildListofValidStationNames("PET", pMetStations)
+                    'BuildListofValidStationNames("PET", pMetStations)
                     BuildListofValidStationNames("PEVT", pMetStations)
                 Else
-                    BuildListofValidStationNames("Ta", pMetStations)
+                    'BuildListofValidStationNames("tair", pMetStations)
                     BuildListofValidStationNames("TEMP", pMetStations)
-                    BuildListofValidStationNames("ATEM", pMetStations)
+                    'BuildListofValidStationNames("ATEM", pMetStations)
                 End If
                 SetPrecipStationGrid()
                 lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
@@ -4526,7 +4526,7 @@ Public Class frmGeoSFM
         If rdoPETDirect.Checked AndAlso Not AtcGridPrec.Source Is Nothing Then
             AtcGridPrec.Source.CellValue(0, 2) = "Evap Station"
             pMetStations.Clear()
-            BuildListofValidStationNames("PET", pMetStations)
+            'BuildListofValidStationNames("PET", pMetStations)
             BuildListofValidStationNames("PEVT", pMetStations)
             SetPrecipStationGrid()
         End If
@@ -4537,7 +4537,7 @@ Public Class frmGeoSFM
             AtcGridPrec.Source.CellValue(0, 2) = "Temp Station"
             pMetStations.Clear()
             BuildListofValidStationNames("TEMP", pMetStations)
-            BuildListofValidStationNames("ATEM", pMetStations)
+            'BuildListofValidStationNames("ATEM", pMetStations)
             SetPrecipStationGrid()
         End If
     End Sub
