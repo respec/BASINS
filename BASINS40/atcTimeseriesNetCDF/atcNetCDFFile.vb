@@ -44,8 +44,8 @@ Public Class atcNetCDFFile
                 Logger.Dbg("dimid: " & lDimensionIndex & " name: " & lNewDimension.Name.ToString & " len: " & lNewDimension.Length)
                 Dimensions.Add(lNewDimension)
                 Select Case lNewDimension.Name.ToString.ToLower
-                    Case "east-west", "xcoord", "longitude", "lon" : EastWestDimension = lNewDimension
-                    Case "north-south", "ycoord", "latitude", "lat" : NorthSouthDimension = lNewDimension
+                    Case "east-west", "xcoord", "longitude", "lon", "x" : EastWestDimension = lNewDimension
+                    Case "north-south", "ycoord", "latitude", "lat", "y" : NorthSouthDimension = lNewDimension
                     Case "time" : TimeDimension = lNewDimension
                     Case Else : ConstituentDimensions.Add(lNewDimension)
                 End Select

@@ -82,12 +82,13 @@ Public Class atcTimeseriesNetCDF
         End If
 
         Dim lFileNames As String = aFileName
-        If aFileName.EndsWith(".dat") Then
+        If aFileName.ToLower.EndsWith(".dat") Then
             lFileNames = ""
             For Each lFileName As String In LinesInFile(aFileName)
                 lFileNames &= lFileName & ";"
             Next
-            lFileNames.Remove(lFileNames.LastIndexOf(";"), 1)
+            'lFileNames.Remove(lFileNames.LastIndexOf(";"), 1)
+            lFileNames = lFileNames.Substring(0, lFileNames.LastIndexOf(";"))
         End If
         Logger.Dbg("ProcessFile(s) " & lFileNames)
 
@@ -97,14 +98,39 @@ Public Class atcTimeseriesNetCDF
 
         Dim lAggregateGridFile As atcNetCDFFile = Nothing
 
-        If aAttributes IsNot Nothing Then
+        If aAttributes IsNot Nothing AndAlso aAttributes.Count > 0 Then
             lXIndexToget = aAttributes.GetValue("XIndex", lXIndexToget)
             lYIndexToget = aAttributes.GetValue("YIndex", lYIndexToget)
-            If lXIndexToget >= 0 AndAlso lYIndexToget >= 0 Then lGetOnlyOneTimseries = True
+            If lXIndexToget >= 0 AndAlso lYIndexToget >= 0 Then
+                lGetOnlyOneTimseries = True
+                Me.Attributes.Add("XIndex", lXIndexToget)
+                Me.Attributes.Add("YIndex", lYIndexToget)
+            End If
             Dim lAggregateGridFileName As String = aAttributes.GetValue("AggregateGrid", "")
             If lAggregateGridFileName.Length > 0 Then
                 lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
+                Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
             End If
+        Else 'temporarily prompt for aggregate file
+            With New Windows.Forms.OpenFileDialog
+                .Title = "Select Aggregation Grid file for accessing timeseries in " & Specification
+                .Filter = pFilter
+                .FilterIndex = 1
+                .DefaultExt = ".nc"
+                .Multiselect = False
+                If .ShowDialog() <> Windows.Forms.DialogResult.OK Then
+                    ' user clicked Cancel
+                    Logger.Dbg("User Cancelled File Selection Dialog")
+                    Logger.LastDbgText = "" 'forget about this - user was in control - no additional message box needed
+                    Return False
+                End If
+                Dim lAggregateGridFileName As String = .FileName
+                If lAggregateGridFileName.Length > 0 Then
+                    lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
+                    Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
+                End If
+            End With
+
         End If
 
         Try
@@ -158,6 +184,8 @@ Public Class atcTimeseriesNetCDF
                                         lXIndexToget = .txtXIndex.Text
                                         lYIndexToget = .txtYIndex.Text
                                         lGetOnlyOneTimseries = True
+                                        Me.Attributes.Add("XIndex", lXIndexToget)
+                                        Me.Attributes.Add("YIndex", lYIndexToget)
                                         Logger.Dbg("User Specified X " & lXIndexToget & " Y " & lYIndexToget)
                                     Else
                                         Logger.Dbg("Too Many Timeseries, user did not specify")
@@ -344,26 +372,28 @@ Public Class atcTimeseriesNetCDF
                     lTimeseries.Values(lTimeIndex + lDataVariableStartPosition + 1) = lValues(lTimeIndex)
                 Next
             Else
-                Logger.Dbg("Aggregating " & lAggregateLocation.Count & " points at " & lTimeseries.Attributes.GetValue("Location"))
-                Dim lIndex As Integer = 1
-                For Each lXYPair As String In lAggregateLocation
-                    If lIndex = 1 OrElse lIndex Mod 1000 = 0 Then
-                        Logger.Dbg("  Process " & lIndex & " of " & lAggregateLocation.Count & " at " & lXYPair)
-                    End If
-                    If lAggregateLocation.Count = 26 Then 'debug at ID_10
-                        Logger.Dbg("  Process " & lXYPair)
-                    End If
-                    Dim lXIndex As Integer = StrRetRem(lXYPair)
-                    Dim lYIndex As Integer = lXYPair
-                    Dim lValues = lDataVariable.ReadArray(lDataVariableNumValues, lXIndex, lYIndex)
-                    If lAggregateLocation.Count = 26 Then 'debug at ID_10
-                        Logger.Dbg("     Value " & lValues(0))
-                    End If
-                    For lTimeIndex As Integer = 0 To lDataVariableNumValues - 1
-                        lTimeseries.Values(lTimeIndex + lDataVariableStartPosition + 1) += lValues(lTimeIndex)
+                If Not lTimeseries.Attributes.GetValue("Location").ToString.Contains("128") Then
+                    Logger.Dbg("Aggregating " & lAggregateLocation.Count & " points at " & lTimeseries.Attributes.GetValue("Location"))
+                    Dim lIndex As Integer = 1
+                    For Each lXYPair As String In lAggregateLocation
+                        If lIndex = 1 OrElse lIndex Mod 1000 = 0 Then
+                            Logger.Dbg("  Process " & lIndex & " of " & lAggregateLocation.Count & " at " & lXYPair)
+                        End If
+                        If lAggregateLocation.Count = 26 Then 'debug at ID_10
+                            Logger.Dbg("  Process " & lXYPair)
+                        End If
+                        Dim lXIndex As Integer = StrRetRem(lXYPair)
+                        Dim lYIndex As Integer = lXYPair
+                        Dim lValues = lDataVariable.ReadArray(lDataVariableNumValues, lXIndex, lYIndex)
+                        If lAggregateLocation.Count = 26 Then 'debug at ID_10
+                            Logger.Dbg("     Value " & lValues(0))
+                        End If
+                        For lTimeIndex As Integer = 0 To lDataVariableNumValues - 1
+                            lTimeseries.Values(lTimeIndex + lDataVariableStartPosition + 1) += lValues(lTimeIndex)
+                        Next
+                        lIndex += 1
                     Next
-                    lIndex += 1
-                Next
+                End If
             End If
         Next
         If lAggregateLocation IsNot Nothing Then
