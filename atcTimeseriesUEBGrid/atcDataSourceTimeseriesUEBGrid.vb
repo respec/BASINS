@@ -98,6 +98,11 @@ Public Class atcDataSourceTimeseriesUEBGrid
                     End If
                 Next
                 lGroupBuilder.CreateTimeseriesAddToGroup(DataSets)
+                For Each lTs As atcTimeseries In DataSets
+                    If lTs.numValues > 1 Then
+                        lTs.SetInterval(atcTimeUnit.TUHour, CInt((lTs.Dates.Value(3) - lTs.Dates.Value(2)) * 24))
+                    End If
+                Next
                 Open = True
 
             Catch endEx As Exception
