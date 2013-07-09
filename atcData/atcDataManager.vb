@@ -602,12 +602,9 @@ Public Class atcDataManager
 #End If
 #End Region
 
+    Private Shared pSaveAttributes() As String = {"AggregateGrid"}
+
     ''' <summary>State of data manager in XML format</summary>
-    ''' <value>Chilkat.Xml</value>
-    ''' <requirements>
-    ''' Chilkat Xml from
-    ''' <a href="http://www.xml-parser.com/downloads.htm">http://www.xml-parser.com/downloads.htm</a>
-    ''' </requirements>
     <CLSCompliant(False)> _
     Public Shared Property XML() As String
         Get
@@ -620,7 +617,14 @@ Public Class atcDataManager
             Next
             For Each lSource As atcTimeseriesSource In pDataSources
                 If lSource.Category = "File" Then
-                    lSaveXML.Append("<DataSource Specification='" & lSource.Specification & "'>" & lSource.Name & "</DataSource>")
+                    Dim lAttributeValues As String = ""
+                    For Each lAttributeName As String In pSaveAttributes
+                        Dim lAttributeValue As String = lSource.Attributes.GetValue(lAttributeName, "")
+                        If lAttributeValue.Length > 0 Then
+                            lAttributeValues &= " " & lAttributeName & "='" & lAttributeValue & "'"
+                        End If
+                    Next
+                    lSaveXML.Append("<DataSource Specification='" & lSource.Specification & "'" & lAttributeValues & ">" & lSource.Name & "</DataSource>")
                 End If
             Next
             lSaveXML.Append("</DataManager>")
@@ -651,7 +655,16 @@ Public Class atcDataManager
                                 If Not FileExists(lSpecification) Then
                                     Logger.Dbg("Skipping data file that does not exist: '" & lSpecification & "'")
                                 Else
-                                    OpenDataSource(lNewDataSource, lSpecification, Nothing)
+                                    Dim lAttributes As atcDataAttributes = Nothing
+                                    For Each lAttributeName As String In pSaveAttributes
+                                        Try
+                                            Dim lAttributeValue As String = lChildXML.Attributes.GetNamedItem(lAttributeName).InnerText
+                                            If lAttributes Is Nothing Then lAttributes = New atcDataAttributes
+                                            lAttributes.Add(lAttributeName, lAttributeValue)
+                                        Catch
+                                        End Try
+                                    Next
+                                    OpenDataSource(lNewDataSource, lSpecification, lAttributes)
                                 End If
                             Else
                                 Logger.Dbg("Not yet able to open data source that is not a File: " & lSpecification)
