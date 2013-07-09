@@ -3646,7 +3646,7 @@ Public Class frmGeoSFM
             Dim OrderFileName As String = pOutputPath & "order.txt"
 
             Dim lSubbasins As New atcCollection
-            Dim lPrecStation As StationDetails
+            Dim lMetStation As StationDetails
 
             If FileExists(OrderFileName) Then
                 Try
@@ -3682,16 +3682,15 @@ Public Class frmGeoSFM
                 .Rows = 1 + lSubbasins.Count
                 .CellValue(0, 0) = "Subbasin ID"
                 .CellValue(0, 1) = "Precip Station/Melt Input"
-                .CellValue(0, 2) = "Evap Station"
+                '.CellValue(0, 2) = "Evap Station"
                 For lIndex As Integer = 1 To lSubbasins.Count
                     .CellValue(lIndex, 0) = lSubbasins(lIndex - 1)
                     .CellColor(lIndex, 0) = SystemColors.ControlDark
                     If pPrecStations.Count > 0 Then
-                        For Each lPrecStation In pPrecStations
-                            'If lPrecStation.Description.Contains("SWIT") Then
-                            'find subwatershed ID for this aggregate melt from UEB
-                            If lPrecStation.Name.Contains(lSubbasins(lIndex - 1).ToString) Then
-                                .CellValue(lIndex, 1) = lPrecStation.Description
+                        For Each lMetStation In pPrecStations
+                            'find subwatershed ID for this aggregate melt from UEB or direct Precip source
+                            If lMetStation.Name = lSubbasins(lIndex - 1).ToString Then
+                                .CellValue(lIndex, 1) = lMetStation.Description
                                 Exit For
                             End If
                             'End If
@@ -3702,18 +3701,27 @@ Public Class frmGeoSFM
                         .CellEditable(lIndex, 1) = True
                     End If
                     If pMetStations.Count > 0 Then
-                        .CellValue(lIndex, 2) = pMetStations(0).Description
-                        .CellEditable(lIndex, 2) = True
+                        For Each lMetStation In pMetStations
+                            'find subwatershed ID for this Temp/Evap source
+                            If lMetStation.Name = lSubbasins(lIndex - 1).ToString Then
+                                .CellValue(lIndex, 2) = lMetStation.Description
+                                Exit For
+                            End If
+                            If .CellValue(lIndex, 2) Is Nothing Then
+                                .CellValue(lIndex, 2) = pMetStations(0).Description
+                            End If
+                            .CellEditable(lIndex, 2) = True
+                        Next
                     End If
                 Next
             End With
 
-            Logger.Dbg("SetValidValues")
-            Dim lValidValues As New atcCollection
-            For Each lPrecStation In pPrecStations
-                lValidValues.Add(lPrecStation.Description)
-            Next
-            AtcGridPrec.ValidValues = lValidValues
+            'Logger.Dbg("SetValidValues")
+            'Dim lValidValues As New atcCollection
+            'For Each lMetStation In pPrecStations
+            '    lValidValues.Add(lMetStation.Description)
+            'Next
+            'AtcGridPrec.ValidValues = lValidValues
             AtcGridPrec.SizeAllColumnsToContents()
             AtcGridPrec.Refresh()
             Logger.Dbg("PrecipStationGrid refreshed")
@@ -4235,18 +4243,16 @@ Public Class frmGeoSFM
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
                 EnableControls(False)
                 pPrecStations.Clear()
-                'BuildListofValidStationNames("SWIT", pPrecStations)
                 BuildListofValidStationNames("PREC", pPrecStations)
                 lblStatus.Text = "Reading Evap Data ..."
                 Me.Refresh()
                 pMetStations.Clear()
                 If rdoPETDirect.Checked Then
-                    'BuildListofValidStationNames("PET", pMetStations)
+                    AtcGridPrec.Source.CellValue(0, 2) = "Evap Station"
                     BuildListofValidStationNames("PEVT", pMetStations)
                 Else
-                    'BuildListofValidStationNames("tair", pMetStations)
+                    AtcGridPrec.Source.CellValue(0, 2) = "Temp Station"
                     BuildListofValidStationNames("TEMP", pMetStations)
-                    'BuildListofValidStationNames("ATEM", pMetStations)
                 End If
                 SetPrecipStationGrid()
                 lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
@@ -4322,7 +4328,7 @@ Public Class frmGeoSFM
                         pFlowStations.Add(lStationDetails.Description, lStationDetails)
                     End If
                     'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
-                    lDataSet.ValuesNeedToBeRead = True
+                    'lDataSet.ValuesNeedToBeRead = True
                 Next
             Next
             If lstCalib.Items.Count = 0 Then

@@ -89,6 +89,7 @@ Public Class atcTimeseriesNetCDF
             Next
             'lFileNames.Remove(lFileNames.LastIndexOf(";"), 1)
             lFileNames = lFileNames.Substring(0, lFileNames.LastIndexOf(";"))
+            Logger.Status("Reading netCDF files listed in " & aFileName)
         End If
         Logger.Dbg("ProcessFile(s) " & lFileNames)
 
@@ -134,7 +135,12 @@ Public Class atcTimeseriesNetCDF
         End If
 
         Try
+            Dim lFileindex As Integer = 0
             For Each lFileName As String In lFileNames.Split(";")
+                If lFileNames.Split(";").Count > 0 Then
+                    lFileindex += 1
+                    Logger.Progress(lFileindex, lFileNames.Split(";").Count)
+                End If
                 Dim lDatesUpdated As Boolean = False
                 If Not FileExists(lFileName) Then
                     lFileName = PathNameOnly(aFileName) & "\" & lFileName
@@ -254,11 +260,11 @@ Public Class atcTimeseriesNetCDF
                                     Dim lDataVariable As atcNetCDFVariable = lNetCDFFile.ConstituentVariables(lConstituentVariableIndex) 'lNetCDFFile.Variables(lNetCDFFile.Variables.Count - 1)
                                     Dim lDataVariableName As String = lDataVariable.Name
                                     Dim lMatchingTimeseriesGroup As atcDataGroup = Me.DataSets.FindData("Location", lLocation).FindData("Constituent", lDataVariableName)
-                                    Logger.Dbg("Count of Timeseries Matching " & lDataVariableName & ":" & lLocation & " " & lMatchingTimeseriesGroup.Count)
+                                    'Logger.Dbg("Count of Timeseries Matching " & lDataVariableName & ":" & lLocation & " " & lMatchingTimeseriesGroup.Count)
                                     Dim lTimeseries As atcTimeseries
                                     If lMatchingTimeseriesGroup.Count > 0 Then
                                         lTimeseries = lMatchingTimeseriesGroup.Item(0)
-                                        Logger.Dbg("Add data to " & lTimeseries.ToString)
+                                        'Logger.Dbg("Add data to " & lTimeseries.ToString)
                                         Dim lStartDateIndex As Integer
                                         If Not lDatesUpdated Then
                                             lStartDateIndex = lTimeseries.Dates.numValues
@@ -266,7 +272,7 @@ Public Class atcTimeseriesNetCDF
                                             For lDateIndex As Integer = 1 To lDates.numValues
                                                 lTimeseries.Dates.Values(lDateIndex + lStartDateIndex) = lDates.Values(lDateIndex)
                                             Next
-                                            Logger.Dbg("  Date Count From " & lStartDateIndex & " to " & lTimeseries.Dates.numValues)
+                                            'Logger.Dbg("  Date Count From " & lStartDateIndex & " to " & lTimeseries.Dates.numValues)
                                             lDatesUpdated = True
                                         Else
                                             lStartDateIndex = lTimeseries.Dates.numValues - lDates.numValues
@@ -335,7 +341,7 @@ Public Class atcTimeseriesNetCDF
                 End If
             Next
             For Each lTimeseries As atcTimeseries In Me.DataSets
-                lTimeseries.Attributes.SetValue("End Date", lTimeseries.Dates.Value(lTimeseries.numValues))
+                lTimeseries.Attributes.SetValue("End Date", lTimeseries.Dates.Value(lTimeseries.Dates.numValues))
                 lTimeseries.Attributes.SetValue("Start Date", lTimeseries.Dates.Value(0))
             Next
 
@@ -376,30 +382,31 @@ Public Class atcTimeseriesNetCDF
                     lTimeseries.Values(lTimeIndex + lDataVariableStartPosition + 1) = lValues(lTimeIndex)
                 Next
             Else
-                If Not lTimeseries.Attributes.GetValue("Location").ToString.Contains("128") Then
-                    Logger.Dbg("Aggregating " & lAggregateLocation.Count & " points at " & lTimeseries.Attributes.GetValue("Location"))
-                    Dim lIndex As Integer = 1
-                    For Each lXYPair As String In lAggregateLocation
-                        If lIndex = 1 OrElse lIndex Mod 1000 = 0 Then
-                            Logger.Dbg("  Process " & lIndex & " of " & lAggregateLocation.Count & " at " & lXYPair)
-                        End If
-                        If lAggregateLocation.Count = 26 Then 'debug at ID_10
-                            Logger.Dbg("  Process " & lXYPair)
-                        End If
-                        Dim lXIndex As Integer = StrRetRem(lXYPair)
-                        Dim lYIndex As Integer = lXYPair
-                        Dim lValues = lDataVariable.ReadArray(lDataVariableNumValues, lXIndex, lYIndex)
-                        If lAggregateLocation.Count = 26 Then 'debug at ID_10
-                            Logger.Dbg("     Value " & lValues(0))
-                        End If
-                        For lTimeIndex As Integer = 0 To lDataVariableNumValues - 1
-                            lTimeseries.Values(lTimeIndex + lDataVariableStartPosition + 1) += lValues(lTimeIndex)
-                        Next
-                        lIndex += 1
+                Logger.Dbg("Aggregating " & lAggregateLocation.Count & " points at " & lTimeseries.Attributes.GetValue("Location"))
+                Logger.Status("Aggregating " & lTimeseries.Attributes.GetValue("constituent") & " points at " & lTimeseries.Attributes.GetValue("Location"))
+                Dim lIndex As Integer = 1
+                For Each lXYPair As String In lAggregateLocation
+                    If lIndex = 1 OrElse lIndex Mod 1000 = 0 Then
+                        Logger.Dbg("  Process " & lIndex & " of " & lAggregateLocation.Count & " at " & lXYPair)
+                        Logger.Progress(lIndex, lAggregateLocation.Count)
+                    End If
+                    If lAggregateLocation.Count = 26 Then 'debug at ID_10
+                        Logger.Dbg("  Process " & lXYPair)
+                    End If
+                    Dim lXIndex As Integer = StrRetRem(lXYPair)
+                    Dim lYIndex As Integer = lXYPair
+                    Dim lValues = lDataVariable.ReadArray(lDataVariableNumValues, lXIndex, lYIndex)
+                    If lAggregateLocation.Count = 26 Then 'debug at ID_10
+                        Logger.Dbg("     Value " & lValues(0))
+                    End If
+                    For lTimeIndex As Integer = 0 To lDataVariableNumValues - 1
+                        lTimeseries.Values(lTimeIndex + lDataVariableStartPosition + 1) += lValues(lTimeIndex)
                     Next
-                End If
+                    lIndex += 1
+                Next
             End If
         Next
+        Logger.Progress("", 0, 0)
         If lAggregateLocation IsNot Nothing Then
             For lTimeIndex As Integer = 0 To lNumValues - 1
                 lTimeseries.Values(lTimeIndex + 1) /= lAggregateLocation.Count
@@ -413,14 +420,16 @@ Public Class atcTimeseriesNetCDF
         For lX As Integer = 0 To aAggregateGridFile.EastWestDimension.Length - 1
             For lY As Integer = 0 To aAggregateGridFile.NorthSouthDimension.Length - 1
                 Dim lDataValues = lDataVariable.ReadArray(1, lX, lY)
-                If Not lUniqueValues.Keys.Contains(lDataValues(0)) Then
-                    lUniqueValues.Add(lDataValues(0), New ArrayList)
+                If lDataValues(0) >= 0 AndAlso lDataValues(0) <> 128 Then
+                    If Not lUniqueValues.Keys.Contains(lDataValues(0)) Then
+                        lUniqueValues.Add(lDataValues(0), New ArrayList)
+                    End If
+                    Dim lValueCollection As ArrayList = lUniqueValues.ItemByKey(lDataValues(0))
+                    'todo: is the top/bottome change y index a special case for merra data?
+                    'Dim lValueToAdd As String = lX & "," & lY 
+                    Dim lValueToAdd As String = lX & "," & aAggregateGridFile.NorthSouthDimension.Length - lY - 1
+                    lValueCollection.Add(lValueToAdd)
                 End If
-                Dim lValueCollection As ArrayList = lUniqueValues.ItemByKey(lDataValues(0))
-                'todo: is the top/bottome change y index a special case for merra data?
-                'Dim lValueToAdd As String = lX & "," & lY 
-                Dim lValueToAdd As String = lX & "," & aAggregateGridFile.NorthSouthDimension.Length - lY - 1
-                lValueCollection.Add(lValueToAdd)
             Next
         Next
         Return lUniqueValues

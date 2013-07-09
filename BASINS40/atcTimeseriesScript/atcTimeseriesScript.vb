@@ -59,7 +59,13 @@ Public Class atcTimeseriesScriptPlugin
         Else
             Me.Specification = aFileName
             Try
-                Dim lDefinitionFilename As String = SelectScript(aFileName, "Script Selection for importing " & aFileName, True)
+                Dim lDefinitionFilename As String = ""
+                If aAttributes IsNot Nothing AndAlso aAttributes.ContainsAttribute("ScriptFileName") Then
+                    lDefinitionFilename = aAttributes.GetValue("ScriptFileName")
+                End If
+                If Not IO.File.Exists(lDefinitionFilename) Then
+                    lDefinitionFilename = SelectScript(aFileName, "Script Selection for importing " & aFileName, True)
+                End If
                 If IO.File.Exists(lDefinitionFilename) Then
                     Return RunSelectedScript(lDefinitionFilename, aFileName)
                 ElseIf lDefinitionFilename.StartsWith(pWizardTag) Then
@@ -130,6 +136,7 @@ ShowSelect:
             Return False
         Else
             Dim lMessage As String = ScriptRun(Script, aDataFilename, Me)
+            Attributes.SetValue("ScriptFileName", aDefinitionFilename)
             Logger.Msg(lMessage & vbCrLf & "Dataset Count = " & DataSets.Count, vbOKOnly, "Ran Import Data Script")
             Return (Me.DataSets.Count > 0)
         End If

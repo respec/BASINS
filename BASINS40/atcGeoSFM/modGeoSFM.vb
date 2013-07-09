@@ -2926,7 +2926,7 @@ Public Module modGeoSFM
                 For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
                     If (lDataSet.Attributes.GetValue("Constituent") = "FLOW" And _
                         lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And _
-                        lDataSet.Attributes.GetValue("Location") = lGage) Then
+                        lDataSet.Attributes.GetFormattedValue("Location") = lGage) Then
                         lFlowTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
                     End If
                 Next
@@ -4550,6 +4550,9 @@ Public Module modGeoSFM
                         J2Date(lSJDay, lSdate)
                         J2Date(lEJDay, lEdate)
                         Dim lStationDetails As New StationDetails
+                        If lLoc.StartsWith("ID_") Then
+                            lLoc = lLoc.Substring(3)
+                        End If
                         lStationDetails.Name = lLoc
                         lStationDetails.StartJDate = lSJDay
                         lStationDetails.EndJDate = lEJDay
