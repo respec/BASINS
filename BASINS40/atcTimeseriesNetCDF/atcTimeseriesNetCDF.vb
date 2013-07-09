@@ -334,6 +334,10 @@ Public Class atcTimeseriesNetCDF
                     End If
                 End If
             Next
+            For Each lTimeseries As atcTimeseries In Me.DataSets
+                lTimeseries.Attributes.SetValue("End Date", lTimeseries.Dates.Value(lTimeseries.numValues))
+                lTimeseries.Attributes.SetValue("Start Date", lTimeseries.Dates.Value(0))
+            Next
 
         Catch e As Exception
             Logger.Dbg("Exception reading '" & aFileName & "': " & e.Message, e.StackTrace)
