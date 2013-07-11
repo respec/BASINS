@@ -42,7 +42,7 @@ Module HSPFOutputReports
     Private pGraphSaveWidth As Integer
     Private pGraphSaveHeight As Integer
     Private pGraphAnnual As Boolean = True
-    Private pCurveStepType As String = "RearwardStep"
+    Private pCurveStepType As String = "NonStep"
     Private pConstituents As New atcCollection
     Private pPerlndSegmentStarts() As Integer
     Private pImplndSegmentStarts() As Integer
@@ -52,37 +52,55 @@ Module HSPFOutputReports
     Private pExpertPrec As Boolean = False
     Private pIdsPerSeg As Integer = 50
     'following were added by Becky:
-    Private pProgressBar As New RWZProgress
+    'Private pProgressBar As New RWZProgress
     Private pMakeStdGraphs As Boolean 'flag to indicate user wants standard graphs (monthly, daily, storms, flow duration)
     Private pMakeLogGraphs As Boolean 'flag to indicate user wants logarithmic graphs (all that are logarithmic)
     Private pMakeSupGraphs As Boolean 'flag to indicate user wants supporting graphs (UZS, LZS, ET, cumulative diff)
     Private pMakeAreaReports As Boolean 'flag to indicate user wants subwatershed & land use reports created
+    Private pHSPFExe As String = FindFile("Please locate WinHspfLt.exe", "WinHspfLt.exe")
+    Private pRunUci As Boolean = False 'Anurag added this option if the user wants this program to run the uci as well
 
     Private Sub Initialize()
-        pProgressBar.Show()
-        pProgressBar.txtProgress.Text = Now & " Hydrologic statistics program started" & vbCrLf
+        If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
+            'Start running status monitor to give better progress and status indication during long-running processes
+            Dim pStatusMonitor As New MonitorProgressStatus
+            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
+                                            IO.Directory.GetCurrentDirectory, _
+                                            System.Diagnostics.Process.GetCurrentProcess.Id) Then
+                'put our status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
+                pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
+                Logger.ProgressStatus = pStatusMonitor
+                Logger.Status("LABEL TITLE HSPEXP Status")
+                Logger.Status("PROGRESS TIME OFF") 'Disable time-to-completion estimation
+                Logger.Status("")
+            Else
+                pStatusMonitor.StopMonitor()
+                pStatusMonitor = Nothing
+            End If
+        End If
+
+        Logger.Status("Hydrologic statistics program started", True)
         pOutputLocations.Clear()
 
         pGraphSaveFormat = ".png"
         'pGraphSaveFormat = ".emf"
         pGraphSaveWidth = 1024
-        pGraphSaveHeight = 768
+        pGraphSaveHeight = 868
         pMakeStdGraphs = StartUp.chkGraphStandard.Checked
         pMakeLogGraphs = StartUp.chkLogGraphs.Checked
         pMakeSupGraphs = StartUp.chkSupportingGraphs.Checked
-
+        pRunUci = StartUp.chkRunHSPF.Checked
         pMakeAreaReports = StartUp.chkAreaReports.Checked
 
         Dim lTestName As String = StartUp.txtPrefix.Text
-        pProgressBar.txtProgress.Text &= Now & " Beginning analysis of " & lTestName & vbCrLf
+        Logger.Status("Beginning analysis of " & lTestName, True)
 
         pConstituents.Add("Water")
-        pExpertPrec = True 'Becky: this tells the program to read the DSN from the EXS file
-        'Becky: remove the other constituents, only interested in water
-        'Becky removed all the test cases
+
         'Becky added the following to be dependent upon user input:
         pTestPath = StartUp.txtUCIPath.Text
         pBaseName = lTestName
+
         If IsNumeric(StartUp.txtRunNo.Text) Then
             pRunNo = CInt(StartUp.txtRunNo.Text)
             If Directory.Exists(StartUp.txtRootPath.Text) Then
@@ -93,155 +111,88 @@ Module HSPFOutputReports
         Else
             pRunNo = -1
         End If
+
         'as best I can tell, the output location should include R for reach and the outlet reach number
         'Becky added the following if-then-else to allow multiple output locations
-        Dim ltxtRCH As String
-        ltxtRCH = StartUp.txtRCH.Text
-        If InStr(1, ltxtRCH, ",") > 0 Then
-            'multiple reaches
-            Dim lRCHRES() As String
-            lRCHRES = Split(ltxtRCH, ",")
-            For Each lRCH As String In lRCHRES
+        For Each lRCH As String In StartUp.txtRCH.Text.Split(","c)
+            If IsNumeric(lRCH) Then
                 pOutputLocations.Add("R:" & CInt(lRCH)) ' the Cint should get rid of leading spaces and zeros 
-            Next
-        Else
-            'only one reach
-            pOutputLocations.Add("R:" & CInt(StartUp.txtRCH.Text))
-        End If
+            End If
+        Next
         StartUp.Hide()
         Logger.StartToFile(pTestPath & "LogFile.txt")
-        pProgressBar.txtProgress.Text &= Now & " Run characteristics read" & vbCrLf
+        Logger.Status("Run characteristics read", True)
     End Sub
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Initialize()
         ChDriveDir(pTestPath)
         Logger.Dbg("CurrentFolder " & My.Computer.FileSystem.CurrentDirectory)
-        If IO.File.Exists(pBaseName & "Orig.uci") Then
-            IO.File.Copy(pBaseName & "Orig.uci", pBaseName & ".uci")
-        End If
+        Logger.Status("New HSPEXP Progam is running.")
+        Using lProgress As New ProgressLevel
 
-        'If pGraphWQ Then
-        '    GraphWQDuration()
-        'End If
-        'If pGraphWQOnly Then Exit Sub ' early end here if just doing it for WQ graphs
-
-        'set up the timeseries attributes for statistics
-        Dim lStat As New atcTimeseriesStatistics.atcTimeseriesStatistics
-        For Each lOperation As atcDefinedValue In lStat.AvailableOperations
-            atcDataAttributes.AddDefinition(lOperation.Definition)
-        Next
-
-        'open uci file
-        pProgressBar.txtProgress.Text &= Now & " Attempting to open hspfmsg.wdm" & vbCrLf
-        Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.wdm") 'Becky: this can be found at C:\BASINS\models\HSPF\bin if you did the typical BASINS install
-        pProgressBar.txtProgress.Text &= Now & " Reading " & pBaseName & ".uci" & vbCrLf
-        pProgressBar.pbProgress.Increment(11)
-        Dim lHspfUci As New atcUCI.HspfUci
-        lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
-        Logger.Dbg("ReadUCI " & lHspfUci.Name)
-        pProgressBar.txtProgress.Text &= Now & " Successfully read " & pBaseName & ".uci" & vbCrLf
-        pProgressBar.pbProgress.Increment(10)
-        'Becky: removed special cases Lynnwood and mono as they should not be relevant
-
-        'open HBN file
-        pProgressBar.txtProgress.Text &= Now & " Opening " & pBaseName & ".hbn" & vbCrLf
-        Dim lHspfBinFileName As String = pTestPath & pBaseName & ".hbn"
-        Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
-        Dim lHbnExists As Boolean = False
-        If System.IO.File.Exists(lHspfBinFileName) Then
-            lHspfBinDataSource.Open(lHspfBinFileName)
-            lHbnExists = True
-        Else
-            'give message if hbn file does not exist, but continue without it
-            Dim ans As Integer
-            ans = MsgBox("HBN file " & lHspfBinFileName & " does not exist.  Water Balance reports will not be available.")
-        End If
-
-        'watershed summary
-        Dim lRunMade As String = ""
-        If lHbnExists Then
-            Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-            lRunMade = lHspfBinFileInfo.LastWriteTime.ToString
-        Else
-            'Becky: added new lRunMade below to be dependent on today rather than file creation time
-            lRunMade = Now.ToString
-        End If
-        Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") & _
-                Format(Microsoft.VisualBasic.DateAndTime.Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
-
-        'A folder name is given that has the basename and the time when the run was made.
-        'Becky: change the lOutFolderName to include pTestPath (changing directory several lines above didn't seem to work right)
-        'Dim lOutFolderName As String = pTestPath & "\Reports_" & pBaseName & "_" & lDateString & "\"
-        'Becky - remove copy to new folder to run reports, assume user has already copied files to current folder and reports should be saved there
-        Dim lOutFolderName As String = pTestPath
-        'TryDelete(lOutFolderName) 'Becky removed
-        'IO.Directory.CreateDirectory(lOutFolderName) 'Becky removed
-        'dont change name of uci - make it easier to compare with others, foldername contains info about which run
-        'Becky: change the copy from to include pTestPath (changing directory several lines above didn't seem to work right)
-        'Becky: remove file copy below, replace with a copy to a new folder with a new run number if the user specified run number
-        'System.IO.File.Copy(pTestPath & "\" & pBaseName & ".uci", lOutFolderName & pBaseName & ".uci")
-        'the following if then complex was generated by Becky
-        If pRunNo >= 0 Then 'set to -1 if user didn't enter a run number
-            pProgressBar.txtProgress.Text &= Now & " Incrementing run number and copying files" & vbCrLf
-            Dim lCurRun As String
-            Dim lNextRun As String
-            Dim lNextName As String
-            If pRunNo < 9 Then
-                lNextRun = "0" & CStr(pRunNo + 1)
-                lCurRun = "0" & CStr(pRunNo)
-            ElseIf pRunNo = 9 Then
-                lNextRun = "10"
-                lCurRun = "09"
-            Else
-                lNextRun = CStr(pRunNo + 1)
-                lCurRun = CStr(pRunNo)
+            If pRunUci = True Then
+                Logger.Status(Now & " Running HSPF Simulation of the uci file " & pBaseName & ".uci", True)
+                Dim lExitCode As Integer
+                lExitCode = LaunchProgram(pHSPFExe, pTestPath, pBaseName & ".uci") 'Run HSPF program
+                If lExitCode <> 0 Then
+                    Throw New ApplicationException("WinHSPFLt could not run, Analysis cannot continue")
+                End If
             End If
-            Dim lNextFolder As String = pRootPath & "Run" & lNextRun & "\"
-            If Microsoft.VisualBasic.Strings.Right(pBaseName, Len(lCurRun)) = lCurRun Then
-                'the file name is the XXX##.uci format, where XXX is the watershed abbreviation and ## is the run number
-                lNextName = Microsoft.VisualBasic.Strings.Left(pBaseName, Len(pBaseName) - Len(lCurRun)) & lNextRun
-            Else
-                'the file name is in the XXX.uci or other format, do not change the file name to include the run number
-                lNextName = pBaseName
-            End If
-            TryDelete(lNextFolder)
-            IO.Directory.CreateDirectory(lNextFolder)
-            'the following assumes that the EXS, WDM, and UCI all have the same name
-            System.IO.File.Copy(pTestPath & pBaseName & ".uci", lNextFolder & lNextName & ".uci")
-            If System.IO.File.Exists(pTestPath & pBaseName & ".wdm") Then
-                System.IO.File.Copy(pTestPath & pBaseName & ".wdm", lNextFolder & lNextName & ".wdm")
-            End If
-            If System.IO.File.Exists(pTestPath & pBaseName & ".exs") Then
-                System.IO.File.Copy(pTestPath & pBaseName & ".exs", lNextFolder & lNextName & ".exs")
-            End If
-        End If
 
-        'build collection of operation types to report
-        Dim lOperationTypes As New atcCollection
-        lOperationTypes.Add("P:", "PERLND")
-        lOperationTypes.Add("I:", "IMPLND")
-        lOperationTypes.Add("R:", "RCHRES")
+            'set up the timeseries attributes for statistics
+            Dim lStat As New atcTimeseriesStatistics.atcTimeseriesStatistics
+            For Each lOperation As atcDefinedValue In lStat.AvailableOperations
+                atcDataAttributes.AddDefinition(lOperation.Definition)
+            Next
 
-        Dim lStr As String = ""
+            'open uci file
+            Logger.Dbg(Now & " Attempting to open hspfmsg.wdm")
+            Dim lMsg As New atcUCI.HspfMsg
+            lMsg.Open("hspfmsg.wdm") 'Becky: this can be found at C:\BASINS\models\HSPF\bin if you did the typical BASINS install
+            Logger.Dbg(Now & " Reading " & pBaseName & ".uci")
+            Logger.Progress(10, 100)
+            Dim lHspfUci As New atcUCI.HspfUci
+            lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
+            Logger.Dbg("ReadUCI " & lHspfUci.Name)
+            Logger.Dbg(Now & " Successfully read " & pBaseName & ".uci")
+            Logger.Progress(20, 100)
 
-        'area report
-        'Becky's addition: only do this if user wants it
-        If pMakeAreaReports Then
-            pProgressBar.txtProgress.Text &= Now & " Producing land use and area reports" & vbCrLf
-            'Becky's note: I changed modUtility so this will actually do this for all locations in pOutputLocations
-            Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutFolderName & "\")
-            lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
+            'Becky: change the lOutFolderName to include pTestPath (changing directory several lines above didn't seem to work right)
+            'Dim lOutFolderName As String = pTestPath & "\Reports_" & pBaseName & "_" & lDateString & "\"
+            'Becky - remove copy to new folder to run reports, assume user has already copied files to current folder and reports should be saved there
+            'Anurag did some additional changes and made it conditional so as to follow VT and ATC pattern both.
 
-            SaveFileString(lOutFolderName & "AreaReport.txt", lReport.ToString)
-        End If
-        If pConstituents.Contains("Water") Then
-            'open WDM file
-            pProgressBar.txtProgress.Text &= Now & " Opening " & pBaseName & ".wdm" & vbCrLf
+            'TryDelete(lOutFolderName) 'Becky removed
+            'IO.Directory.CreateDirectory(lOutFolderName) 'Becky removed
+            'dont change name of uci - make it easier to compare with others, foldername contains info about which run
+            'Becky: change the copy from to include pTestPath (changing directory several lines above didn't seem to work right)
+            'Becky: remove file copy below, replace with a copy to a new folder with a new run number if the user specified run number
+            'System.IO.File.Copy(pTestPath & "\" & pBaseName & ".uci", lOutFolderName & pBaseName & ".uci")
+            'the following if then complex was generated by Becky
+
+
+            'build collection of operation types to report
+            Dim lOperationTypes As New atcCollection
+            lOperationTypes.Add("P:", "PERLND")
+            lOperationTypes.Add("I:", "IMPLND")
+            lOperationTypes.Add("R:", "RCHRES")
+
+            Dim lStr As String = ""
+
+            'area report
+            'Becky's addition: only do this if user wants it
+            'Anurag changed some sequences to read the file write time from the wdm file. Anurag wanted to get the most statistics be 
+            'written in output folders before teh program even reads the hbn file. Anything related to hbn file has been moved further down.
+            'Anurag also wants to make water balance reports optional in the future.
+
+            Dim lRunMade As String = ""
             Dim lWdmFileName As String = pTestPath & pBaseName & ".wdm" 'Becky fixed to remove extra "\"
             Dim lWdmDataSource As New atcDataSourceWDM()
             If System.IO.File.Exists(lWdmFileName) Then
+                Dim wdmFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lWdmFileName)
+                lRunMade = wdmFileInfo.LastWriteTime.ToString
+
                 lWdmDataSource.Open(lWdmFileName)
                 'TODO: allow observed flow to come from a different fileEXPE
             Else
@@ -250,14 +201,72 @@ Module HSPFOutputReports
                 ans = MsgBox("WDM file " & lWdmFileName & " does not exist.  This program will end now.")
                 End
             End If
+            Dim lOutFolderName As String = pTestPath
+            If pRunNo >= 0 Then 'set to -1 if user didn't enter a run number
+                Logger.Dbg(Now & " Incrementing run number and copying files")
+                Dim lCurRun As String
+                Dim lNextRun As String
+                Dim lNextName As String
+                If pRunNo < 9 Then
+                    lNextRun = "0" & CStr(pRunNo + 1)
+                    lCurRun = "0" & CStr(pRunNo)
+                ElseIf pRunNo = 9 Then
+                    lNextRun = "10"
+                    lCurRun = "09"
+                Else
+                    lNextRun = CStr(pRunNo + 1)
+                    lCurRun = CStr(pRunNo)
+                End If
+                Dim lNextFolder As String = pRootPath & "Run" & lNextRun & "\"
+                If Microsoft.VisualBasic.Strings.Right(pBaseName, Len(lCurRun)) = lCurRun Then
+                    'the file name is the XXX##.uci format, where XXX is the watershed abbreviation and ## is the run number
+                    lNextName = Microsoft.VisualBasic.Strings.Left(pBaseName, Len(pBaseName) - Len(lCurRun)) & lNextRun
+                Else
+                    'the file name is in the XXX.uci or other format, do not change the file name to include the run number
+                    lNextName = pBaseName
+                End If
+                TryDelete(lNextFolder)
+                IO.Directory.CreateDirectory(lNextFolder)
+                'the following assumes that the EXS, WDM, and UCI all have the same name
+                System.IO.File.Copy(pTestPath & pBaseName & ".uci", lNextFolder & lNextName & ".uci")
+                If System.IO.File.Exists(pTestPath & pBaseName & ".wdm") Then
+                    System.IO.File.Copy(pTestPath & pBaseName & ".wdm", lNextFolder & lNextName & ".wdm")
+                End If
+                If System.IO.File.Exists(pTestPath & pBaseName & ".exs") Then
+                    System.IO.File.Copy(pTestPath & pBaseName & ".exs", lNextFolder & lNextName & ".exs")
+                End If
+            Else
+                Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") & _
+                                Format(Microsoft.VisualBasic.DateAndTime.Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
+                lOutFolderName = pTestPath & "Reports_" & lDateString & "\"
+                System.IO.Directory.CreateDirectory(lOutFolderName)
+                System.IO.File.Copy(pTestPath & pBaseName & ".uci", lOutFolderName & pBaseName & ".uci", overwrite:=True)
+            End If
+
+
+            'A folder name is given that has the basename and the time when the run was made.
+            If pMakeAreaReports Then
+                Logger.Dbg(Now & " Producing land use and area reports")
+                'Becky's note: I changed modUtility so this will actually do this for all locations in pOutputLocations
+                Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutFolderName & "\")
+                lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
+
+                SaveFileString(lOutFolderName & "AreaReport.txt", lReport.ToString)
+            End If
+
+            'open WDM file
+            Logger.Dbg(Now & " Opening " & pBaseName & ".wdm")
+
 
             Dim lExpertSystemFileNames As New NameValueCollection
             AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
             If lExpertSystemFileNames.Count < 1 Then 'Becky added this if-then to warn the user if no EXS files exist
                 'in directory - without an EXS, nothing else will happen (For Each finds nothing), but previously
                 'the user received no notification of this
+                'In future, at this point, user should get an option if they want to make teir own exs file and this program should
+                'help the user do it.
                 MsgBox("No basins specifications file (*.exs) file found in directory " & IO.Directory.GetCurrentDirectory & "!  Statistics, summaries, and graphs cannot be computed.", vbOKOnly, "No Specification File!")
-                pProgressBar.txtProgress.Text &= Now & " No basins specifications file found, no statistics computed" & vbCrLf
+                Logger.Dbg(Now & " No basins specifications file found, no statistics computed")
             End If
             Dim lExpertSystem As HspfSupport.atcExpertSystem
             For Each lExpertSystemFileName As String In lExpertSystemFileNames
@@ -267,7 +276,7 @@ Module HSPFOutputReports
                         'Becky: I believe all this is doing is copying the existing EXS file to one named the same as the UCI file
                         lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
                     End If
-                    pProgressBar.txtProgress.Text &= Now & " Calculating run statistics to save in " & pBaseName & ".sts" & vbCrLf
+                    Logger.Dbg(Now & " Calculating run statistics to save in " & pBaseName & ".sts")
                     lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
                     lStr = lExpertSystem.Report
                     'Becky changed file name to match our typical file structure
@@ -277,16 +286,13 @@ Module HSPFOutputReports
                     'SaveFileString(lOutFolderName & pBaseName & "out.exs", lExpertSystem.AsString) 'Becky added "out" so as not to write over the original
 
                     'Becky added these to output advice
-                    pProgressBar.txtProgress.Text &= Now & " Creating advice to save in " & pBaseName & ".adv" & vbCrLf
+                    Logger.Dbg(Now & " Creating advice to save in " & pBaseName & ".adv")
                     For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
                         Dim lAdviceStr As String = "Advice for Calibration Run " & pBaseName & vbCrLf & Now & vbCrLf & vbCrLf
                         lExpertSystem.CalcAdvice(lAdviceStr, lSiteIndex)
                         Dim lSiteNam As String = lExpertSystem.Sites(lSiteIndex - 1).Name
                         SaveFileString(lOutFolderName & pBaseName & "." & lSiteNam & ".adv", lAdviceStr)
                     Next
-
-                    'lStr = lExpertSystem.AsString 'NOTE:just testing
-                    'SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
 
                     Dim lCons As String = "Flow"
                     For Each lSite As HexSite In lExpertSystem.Sites
@@ -345,7 +351,7 @@ Module HSPFOutputReports
                         If lOperation Is Nothing Then
                             Logger.Dbg("MissingOperationInUCI for " & lRchId(0))
                         Else
-                            pProgressBar.txtProgress.Text &= Now & " Calculating watershed and land use areas from SCHEMATIC" & vbCrLf
+                            Logger.Dbg(Now & " Calculating watershed and land use areas from SCHEMATIC")
                             Dim lAreaOriginal As Double = 0 '=0 added by Becky
                             Dim lAreaOrigTemp As Double = 0 'added by Becky to accumulate the lAreaOriginals generated by WeightedSourceArea
                             Dim lPrecSourceCollection As New atcCollection
@@ -368,111 +374,17 @@ Module HSPFOutputReports
                             End If
 
                             Dim lPrecTser As atcTimeseries = Nothing
-                            If pExpertPrec Then
-                                Dim lPrecDsn As Integer = lSite.DSN(5)
-                                lPrecTser = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lPrecDsn), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                            Else
-                                Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
-                                Dim lMathArgs As New atcDataAttributes
-                                For lSourceIndex As Integer = 0 To lPrecSourceCollection.Count - 1
-                                    Dim lPrecDataGroup As atcTimeseriesGroup = lWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
-                                    If lPrecDataGroup.Count = 0 Then
-                                        'Becky added the content from here to the 'else' for the above if to allow the user to specify
-                                        'a PREC DSN to find in the output WDM if it does not match what is in the UCI file
-                                        Dim lReplaceDSNStr As String
-                                        Dim lReplaceDSNInt As Integer
-                                        lReplaceDSNStr = InputBox("Your UCI calls for a PREC timeseries with DSN " & lPrecSourceCollection.Keys(lSourceIndex) & " but this does not " & _
-                                               "exist in the output WDM " & lWdmFileName & ".  Please enter the DSN for the PREC timeseries held in your " & _
-                                               "output WDM file.   If the PREC timeseries does not exist in your output WDM file or you wish to close this program " & _
-                                               "for any other reason, enter a -1 in the input box.  In this case your graphs will not be created, your annual and " & _
-                                               "monthly statistics will not be calculated, and the program will not compare " & _
-                                               "the total areas in the SCHEMATIC vs. what you specified in the EXS file.", "PREC not found in output WDM.", -1)
-                                        If IsInteger(lReplaceDSNStr) Then
-                                            lReplaceDSNInt = CInt(lReplaceDSNStr)
-                                            If lReplaceDSNInt > 0 Then
-                                                lPrecDataGroup = lWdmDataSource.DataSets.FindData("ID", lReplaceDSNInt)
-                                                If lPrecDataGroup.Count = 0 Then
-                                                    MsgBox("The value you entered does not represent an existing dataset number in the WDM File " & _
-                                                        lWdmDataSource.Name & ".  You were warned.  This program is terminating now.", vbOKOnly, "PREC DSN still not found")
-                                                    Logger.Dbg("Precipitation timeseries with DSN " & lReplaceDSNInt & "not found. Program closing.")
-                                                    GoTo RWZProgramEnding
-                                                Else
-                                                    Logger.Dbg("PrecDataGroupFrom " & lWdmFileName & " " & lPrecDataGroup.Count)
-                                                End If
-                                            Else 'user did not give a new DSN
-                                                Logger.Dbg("Precipitation timeseries with DSN " & lReplaceDSNInt & "not found. Program closing.")
-                                                GoTo RWZProgramEnding
-                                            End If
-                                        Else
-                                            Logger.Dbg("Precipitation timeseries with DSN " & lReplaceDSNInt & "not found. Program closing.")
-                                            GoTo RWZProgramEnding
-                                        End If
-                                        'Becky commented out the next four lines because they don't work as a solution to the problem 
-                                        '(the problem being that the program can't find the EXT SOURCES PREC timeseries in the HSPEXP output WDM - 
-                                        'this would happen if the DSN for PREC in the meteorological WDM doesn't match that in the output WDM
-                                        'used with HSPEXP)
-                                        'Dim lPrecWdmDataSource As New atcDataSourceWDM()
-                                        'lPrecWdmDataSource.Open(pTestPath & "FBMet.wdm") 'Becky fixed to remove extra "\"
-                                        'lPrecDataGroup = lPrecWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
-                                        'Logger.Dbg("PrecDataGroupFrom FBMet.wdm " & lPrecDataGroup.Count)
-                                    Else
-                                        Logger.Dbg("PrecDataGroupFrom " & lWdmFileName & " " & lPrecDataGroup.Count)
-                                    End If
 
-                                    Dim lPrecSubsetDataGroup As New atcTimeseriesGroup
-                                    For lIndex As Integer = 0 To lPrecDataGroup.Count - 1
-                                        lPrecSubsetDataGroup.Add(SubsetByDate(lPrecDataGroup(lIndex), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing))
-                                    Next
-
-                                    lMathArgs.SetValue("Timeseries", lPrecSubsetDataGroup)
-                                    Dim lPrecMultiply As Double = lPrecSourceCollection.Item(lSourceIndex)
-                                    lMathArgs.SetValue("Number", lPrecMultiply)
-                                    If lMath.Open("Multiply", lMathArgs) Then
-                                        Logger.Dbg("SourceIndex " & lSourceIndex & _
-                                                   " DSN " & lPrecSubsetDataGroup.Item(0).Attributes.GetDefinedValue("ID").Value & _
-                                                   " MultBy " & lPrecMultiply)
-                                        If lSourceIndex = 0 Then
-                                            lPrecTser = lMath.DataSets(0).Clone
-                                        Else
-                                            Dim lMathAdd As New atcTimeseriesMath.atcTimeseriesMath
-                                            Dim lMathAddArgs As New atcDataAttributes
-                                            Dim lDataGroup As New atcTimeseriesGroup
-                                            lDataGroup.Add(lPrecTser)
-                                            lDataGroup.Add(lMath.DataSets(0))
-                                            lMathAddArgs.SetValue("Timeseries", lDataGroup)
-                                            If lMathAdd.Open("Add", lMathAddArgs) Then
-                                                lPrecTser = lMathAdd.DataSets(0).Clone
-                                                Logger.Dbg(" AfterAdd " & lPrecTser.Attributes.GetValue("SumAnnual"))
-                                            Else
-                                                Logger.Dbg("ProblemWithAdd")
-                                            End If
-                                        End If
-                                    Else
-                                        Logger.Dbg("ProblemWithMultiply ")
-                                    End If
-                                    lMath.Clear()
-                                    lMathArgs.Clear()
-                                Next
-                                lMathArgs.SetValue("Timeseries", lPrecTser)
-                                If Math.Abs(lSite.Area - lAreaOriginal) > 0.01 Then 'Becky changed < to > as this was actually checking the opposite of what it intended to
-                                    Logger.Dbg("AreaDiscrepancy " & lSite.Area & " " & lAreaOriginal)
-                                End If
-                                lMathArgs.SetValue("Number", lAreaOriginal)
-                                If Not lMath.Open("Divide", lMathArgs) Then
-                                    Logger.Dbg("ProblemWithDivide")
-                                End If
-                                lPrecTser = lMath.DataSets(0)
-                                Logger.Dbg(" AfterDivide " & lPrecTser.Attributes.GetValue("SumAnnual"))
-                                lPrecTser.Attributes.SetValue("Location", "Weighted Average")
-                            End If
+                            Dim lPrecDsn As Integer = lSite.DSN(5)
+                            lPrecTser = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lPrecDsn), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                             lPrecTser.Attributes.SetValue("Units", "inches")
 
                             RWZSetArgs(lSimTSerInches)
                             RWZSetArgs(lObsTSerInches)
                             RWZSetArgs(lPrecTser)
 
-                            pProgressBar.txtProgress.Text &= Now & " Calculating monthly summary" & vbCrLf
-                            pProgressBar.pbProgress.Increment(5)
+                            Logger.Dbg(Now & " Calculating monthly summary")
+                            'pProgressBar.pbProgress.Increment(5)
 
                             lStr = HspfSupport.MonthlyAverageCompareStats.Report(lHspfUci, _
                                                                                  lCons, lSiteName, _
@@ -484,7 +396,7 @@ Module HSPFOutputReports
                             Dim lOutFileName As String = lOutFolderName & "MonthlyAverage" & lCons & "Stats-" & lSiteName & ".txt"
                             SaveFileString(lOutFileName, lStr)
 
-                            pProgressBar.txtProgress.Text &= Now & " Calculating annual summary" & vbCrLf
+                            Logger.Dbg(Now & " Calculating annual summary")
                             lStr = HspfSupport.AnnualCompareStats.Report(lHspfUci, _
                                                                          lCons, lSiteName, _
                                                                          "inches", _
@@ -495,8 +407,8 @@ Module HSPFOutputReports
                             lOutFileName = lOutFolderName & "Annual" & lCons & "Stats-" & lSiteName & ".txt"
                             SaveFileString(lOutFileName, lStr)
 
-                            pProgressBar.txtProgress.Text &= Now & " Calculating daily summary" & vbCrLf
-                            pProgressBar.pbProgress.Increment(6)
+                            Logger.Dbg(Now & " Calculating daily summary")
+                            'pProgressBar.pbProgress.Increment(6)
                             lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
                                                                                lCons, lSiteName, _
                                                                                lSimTSer, lObsTSer, _
@@ -509,7 +421,7 @@ Module HSPFOutputReports
                             'Becky's addition: only make graphs if user wants them. 
                             If pMakeLogGraphs Or pMakeStdGraphs Or pMakeSupGraphs Then
                                 Dim lTimeSeries As New atcTimeseriesGroup
-                                pProgressBar.txtProgress.Text &= Now & " Creating nonstorm graphs" & vbCrLf
+                                Logger.Dbg(Now & " Creating nonstorm graphs")
                                 lTimeSeries.Add("Observed", lObsTSer)
                                 lTimeSeries.Add("Simulated", lSimTSer)
                                 lTimeSeries.Add("Precipitation", lPrecTser)
@@ -532,8 +444,8 @@ Module HSPFOutputReports
                                 lTimeSeries.Clear()
 
                                 If pMakeStdGraphs Then 'Becky added, only make storm graphs (log or normal) if we want standard graphs
-                                    pProgressBar.txtProgress.Text &= Now & " Creating storm graphs" & vbCrLf
-                                    pProgressBar.pbProgress.Increment(29)
+                                    Logger.Dbg(Now & " Creating storm graphs")
+                                    'pProgressBar.pbProgress.Increment(29)
                                     lTimeSeries.Add("Observed", lObsTSer)
                                     lTimeSeries.Add("Simulated", lSimTSer)
                                     lTimeSeries.Add("Prec", lPrecTser)
@@ -557,106 +469,68 @@ Module HSPFOutputReports
                     Logger.Dbg(lEx.Message)
                 End Try
             Next lExpertSystemFileName
-        End If
 
-        'For Each lConstituent As String In pConstituents
-        '    Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
+            Logger.Dbg(Now & " Opening " & pBaseName & ".hbn")
+            Dim lHspfBinFileName As String = pTestPath & pBaseName & ".hbn"
+            Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
+            Dim lHbnExists As Boolean = False
+            If System.IO.File.Exists(lHspfBinFileName) Then
+                lHspfBinDataSource.Open(lHspfBinFileName)
+                lHbnExists = True
+            Else
+                'give message if hbn file does not exist, but continue without it
+                Dim ans As Integer
+                ans = MsgBox("HBN file " & lHspfBinFileName & " does not exist.  Water Balance reports will not be available.")
+            End If
 
-        '    Dim lReportCons As New atcReport.ReportText
-        '    Dim lOutFileName As String = ""
-        '    If lConstituent <> "Sediment" Then
-        '        HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears, pIdsPerSeg).ToString()
-        '        lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverland.txt"
-        '        SaveFileString(lOutFileName, lReportCons.ToString)
-        '        lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True, pWaterYears, pIdsPerSeg)
-        '        lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShortWithMinMax.txt"
-        '        SaveFileString(lOutFileName, lReportCons.ToString)
-        '        lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, False, pWaterYears, pIdsPerSeg)
-        '        lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShort.txt"
-        '        SaveFileString(lOutFileName, lReportCons.ToString)
-        '    End If
+            If lHbnExists Then
+                Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
+                Logger.Dbg("Summary at " & lLocations.Count & " locations")
+                'constituent balance
+                Dim lReportCons As New atcReport.ReportText
+                Dim lConstituent As String = "Water"
+                lReportCons = HspfSupport.ConstituentBalance.Report _
+                   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                    lHspfBinDataSource, lLocations, lRunMade)
+                Dim lOutWaterBalanceFileName As String = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalance.txt"
+                SaveFileString(lOutWaterBalanceFileName, lReportCons.ToString)
 
-        '    lReportCons = Nothing
-        '    lReportCons = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
-        '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_Budget.txt"
-        '    SaveFileString(lOutFileName, lReportCons.ToString)
-        '    lReportCons = Nothing
+                'watershed constituent balance 
+                lReportCons = HspfSupport.WatershedConstituentBalance.Report _
+                   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                    lHspfBinDataSource, lRunMade)
+                Dim lOutFileName As String = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalance.txt"
+                SaveFileString(lOutFileName, lReportCons.ToString)
 
-        '    lReportCons = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lRunMade, lConstituent)
-        '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedSummary.txt"
-        '    SaveFileString(lOutFileName, lReportCons.ToString)
-        '    lReportCons = Nothing
+                If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
+                    HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                        lHspfBinDataSource, pOutputLocations, lRunMade, _
+                        lOutFolderName, True)
+                    'now pivoted version
+                    HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                        lHspfBinDataSource, pOutputLocations, lRunMade, _
+                        lOutFolderName, True, True)
+                End If
 
-        If lHbnExists Then
-            Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
-            Logger.Dbg("Summary at " & lLocations.Count & " locations")
-            'constituent balance
-            Dim lReportCons As New atcReport.ReportText
-            Dim lConstituent As String = "Water"
-            lReportCons = HspfSupport.ConstituentBalance.Report _
-               (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lRunMade)
-            Dim lOutWaterBalanceFileName As String = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalance.txt"
-            SaveFileString(lOutWaterBalanceFileName, lReportCons.ToString)
-        End If
 
-        '    lReportCons = HspfSupport.ConstituentBalance.Report _
-        '       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-        '        lHspfBinDataSource, lLocations, lRunMade, True)
-        '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivot.txt"
-        '    SaveFileString(lOutFileName, lReportCons.ToString)
-
-        '    lReportCons = HspfSupport.ConstituentBalance.Report _
-        '       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-        '        lHspfBinDataSource, lLocations, lRunMade, True, 2, 5, 8)
-        '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivotNarrowTab.txt"
-        '    SaveFileString(lOutFileName, lReportCons.ToString)
-        '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivotNarrowSpace.txt"
-        '    SaveFileString(lOutFileName, lReportCons.ToString.Replace(vbTab, " "))
-
-        '    'watershed constituent balance 
-        '    lReportCons = HspfSupport.WatershedConstituentBalance.Report _
-        '       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-        '        lHspfBinDataSource, lRunMade)
-        '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalance.txt"
-        '    SaveFileString(lOutFileName, lReportCons.ToString)
-
-        '    lReportCons = HspfSupport.WatershedConstituentBalance.Report _
-        '       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-        '        lHspfBinDataSource, lRunMade, , , , True)
-        '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalancePivot.txt"
-        '    SaveFileString(lOutFileName, lReportCons.ToString)
-
-        '    lReportCons = HspfSupport.WatershedConstituentBalance.Report _
-        '       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-        '        lHspfBinDataSource, lRunMade, , , , True, 2, 5, 8)
-        '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalancePivotNarrowTab.txt"
-        '    SaveFileString(lOutFileName, lReportCons.ToString)
-        '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_WatershedConstituentBalancePivotNarrowSpace.txt"
-        '    SaveFileString(lOutFileName, lReportCons.ToString.Replace(vbTab, " "))
-
-        '    If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
-        '        HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-        '           (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-        '            lHspfBinDataSource, pOutputLocations, lRunMade, _
-        '            lOutFolderName, True)
-        '        'now pivoted version
-        '        HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-        '           (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-        '            lHspfBinDataSource, pOutputLocations, lRunMade, _
-        '            lOutFolderName, True, True)
-        '    End If
-        'Next
-        pProgressBar.txtProgress.Text &= Now & " Output Written to " & lOutFolderName & vbCrLf
-        Logger.Dbg("Reports Written in " & lOutFolderName, "HSPFOutputReports")
+            End If
+            Logger.Dbg(Now & " Output Written to " & lOutFolderName)
+            Logger.Dbg("Reports Written in " & lOutFolderName, "HSPFOutputReports")
 RWZProgramEnding:
-        pProgressBar.pbProgress.Increment(39)
-        pProgressBar.txtProgress.Text &= Now & " Statistics Program Complete"
-        pProgressBar.lblProgressTitle.Text = "Program is complete.  Please ignore the timer cursor and click Exit."
-        pProgressBar.txtProgress.DeselectAll()
-        pProgressBar.Cursor = Cursors.Default
-        pProgressBar.cmdExit.Visible = True
-        pProgressBar.Focus()
+            'pProgressBar.pbProgress.Increment(39)
+            Logger.Dbg(Now & " Statistics Program Complete")
+            Logger.Msg("HSPEXP is complete")
+        End Using
+        Logger.Status("")
+        Call Application.Exit()
+
+        'pProgressBar.lblProgressTitle.Text = "Program is complete.  Please ignore the timer cursor and click Exit."
+        'pProgressBar.txtProgress.DeselectAll()
+        'pProgressBar.Cursor = Cursors.Default
+        'pProgressBar.cmdExit.Visible = True
+        'pProgressBar.Focus()
     End Sub
 
     Public Sub RWZSetArgs(ByVal aTimeseries As atcTimeseries)
