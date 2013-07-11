@@ -46,13 +46,14 @@ Partial Class StartUp
         Me.chkGraphStandard = New System.Windows.Forms.CheckBox
         Me.chkLogGraphs = New System.Windows.Forms.CheckBox
         Me.chkSupportingGraphs = New System.Windows.Forms.CheckBox
+        Me.chkRunHSPF = New System.Windows.Forms.CheckBox
         Me.SuspendLayout()
         '
         'cmdStart
         '
         Me.cmdStart.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.cmdStart.Enabled = False
-        Me.cmdStart.Location = New System.Drawing.Point(328, 258)
+        Me.cmdStart.Location = New System.Drawing.Point(327, 300)
         Me.cmdStart.Name = "cmdStart"
         Me.cmdStart.Size = New System.Drawing.Size(75, 23)
         Me.cmdStart.TabIndex = 0
@@ -94,7 +95,6 @@ Partial Class StartUp
         Me.lblPrefix.Size = New System.Drawing.Size(58, 13)
         Me.lblPrefix.TabIndex = 4
         Me.lblPrefix.Text = "File Prefix: "
-        Me.lblPrefix.Visible = False
         '
         'lblPrefixWarning
         '
@@ -106,7 +106,6 @@ Partial Class StartUp
         Me.lblPrefixWarning.TabIndex = 5
         Me.lblPrefixWarning.Text = "Note that this file prefix MUST be used to name your UCI, WDM, and EXS files.  If" & _
             " this is not the case, change your file names NOW before proceeding."
-        Me.lblPrefixWarning.Visible = False
         '
         'txtPrefix
         '
@@ -114,28 +113,25 @@ Partial Class StartUp
         Me.txtPrefix.Name = "txtPrefix"
         Me.txtPrefix.Size = New System.Drawing.Size(100, 20)
         Me.txtPrefix.TabIndex = 6
-        Me.txtPrefix.Visible = False
         '
         'lblRCH
         '
         Me.lblRCH.AutoSize = True
-        Me.lblRCH.Location = New System.Drawing.Point(12, 207)
+        Me.lblRCH.Location = New System.Drawing.Point(11, 249)
         Me.lblRCH.MaximumSize = New System.Drawing.Size(190, 0)
         Me.lblRCH.Name = "lblRCH"
         Me.lblRCH.Size = New System.Drawing.Size(188, 39)
         Me.lblRCH.TabIndex = 7
         Me.lblRCH.Text = "What is the number of the outlet reach at which you would like area and water bal" & _
             "ance reports?"
-        Me.lblRCH.Visible = False
         '
         'txtRCH
         '
         Me.txtRCH.BackColor = System.Drawing.SystemColors.Window
-        Me.txtRCH.Location = New System.Drawing.Point(212, 204)
+        Me.txtRCH.Location = New System.Drawing.Point(211, 246)
         Me.txtRCH.Name = "txtRCH"
         Me.txtRCH.Size = New System.Drawing.Size(47, 20)
         Me.txtRCH.TabIndex = 8
-        Me.txtRCH.Visible = False
         '
         'Label2
         '
@@ -153,7 +149,6 @@ Partial Class StartUp
         Me.txtRunNo.Name = "txtRunNo"
         Me.txtRunNo.Size = New System.Drawing.Size(40, 20)
         Me.txtRunNo.TabIndex = 13
-        Me.txtRunNo.Visible = False
         '
         'lblRunNo
         '
@@ -163,19 +158,17 @@ Partial Class StartUp
         Me.lblRunNo.Size = New System.Drawing.Size(116, 13)
         Me.lblRunNo.TabIndex = 12
         Me.lblRunNo.Text = "Run Number (optional):"
-        Me.lblRunNo.Visible = False
         '
         'lblRunNoInfo
         '
         Me.lblRunNoInfo.AutoSize = True
-        Me.lblRunNoInfo.Location = New System.Drawing.Point(11, 171)
+        Me.lblRunNoInfo.Location = New System.Drawing.Point(10, 213)
         Me.lblRunNoInfo.MaximumSize = New System.Drawing.Size(500, 0)
         Me.lblRunNoInfo.Name = "lblRunNoInfo"
         Me.lblRunNoInfo.Size = New System.Drawing.Size(476, 26)
         Me.lblRunNoInfo.TabIndex = 14
         Me.lblRunNoInfo.Text = "The Run Number and Root Directory are not required, but will facilitate copying o" & _
             "f the files to a new folder for your next run."
-        Me.lblRunNoInfo.Visible = False
         '
         'txtRootPath
         '
@@ -183,7 +176,6 @@ Partial Class StartUp
         Me.txtRootPath.Name = "txtRootPath"
         Me.txtRootPath.Size = New System.Drawing.Size(192, 20)
         Me.txtRootPath.TabIndex = 16
-        Me.txtRootPath.Visible = False
         '
         'lblRootDirectory
         '
@@ -193,12 +185,11 @@ Partial Class StartUp
         Me.lblRootDirectory.Size = New System.Drawing.Size(78, 13)
         Me.lblRootDirectory.TabIndex = 15
         Me.lblRootDirectory.Text = "Root Directory:"
-        Me.lblRootDirectory.Visible = False
         '
         'pnlHighlight
         '
         Me.pnlHighlight.BackColor = System.Drawing.Color.Red
-        Me.pnlHighlight.Location = New System.Drawing.Point(206, 200)
+        Me.pnlHighlight.Location = New System.Drawing.Point(205, 242)
         Me.pnlHighlight.Name = "pnlHighlight"
         Me.pnlHighlight.Size = New System.Drawing.Size(58, 28)
         Me.pnlHighlight.TabIndex = 17
@@ -207,19 +198,18 @@ Partial Class StartUp
         'lblOutReach2
         '
         Me.lblOutReach2.AutoSize = True
-        Me.lblOutReach2.Location = New System.Drawing.Point(270, 207)
+        Me.lblOutReach2.Location = New System.Drawing.Point(269, 249)
         Me.lblOutReach2.MaximumSize = New System.Drawing.Size(250, 0)
         Me.lblOutReach2.Name = "lblOutReach2"
         Me.lblOutReach2.Size = New System.Drawing.Size(248, 39)
         Me.lblOutReach2.TabIndex = 18
         Me.lblOutReach2.Text = "NOTE: If your observation station is at the outlet of multiple reaches, enter all" & _
             " reaches separated by a comma - e.g.: 5, 10"
-        Me.lblOutReach2.Visible = False
         '
         'cmdEnd
         '
         Me.cmdEnd.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdEnd.Location = New System.Drawing.Point(409, 258)
+        Me.cmdEnd.Location = New System.Drawing.Point(408, 300)
         Me.cmdEnd.Name = "cmdEnd"
         Me.cmdEnd.Size = New System.Drawing.Size(75, 23)
         Me.cmdEnd.TabIndex = 19
@@ -229,7 +219,7 @@ Partial Class StartUp
         'chkAreaReports
         '
         Me.chkAreaReports.AutoSize = True
-        Me.chkAreaReports.Location = New System.Drawing.Point(16, 258)
+        Me.chkAreaReports.Location = New System.Drawing.Point(15, 300)
         Me.chkAreaReports.Name = "chkAreaReports"
         Me.chkAreaReports.Size = New System.Drawing.Size(241, 17)
         Me.chkAreaReports.TabIndex = 20
@@ -239,7 +229,7 @@ Partial Class StartUp
         'chkGraphs
         '
         Me.chkGraphs.AutoSize = True
-        Me.chkGraphs.Location = New System.Drawing.Point(16, 281)
+        Me.chkGraphs.Location = New System.Drawing.Point(15, 323)
         Me.chkGraphs.Name = "chkGraphs"
         Me.chkGraphs.Size = New System.Drawing.Size(101, 17)
         Me.chkGraphs.TabIndex = 21
@@ -249,7 +239,7 @@ Partial Class StartUp
         'chkGraphStandard
         '
         Me.chkGraphStandard.AutoSize = True
-        Me.chkGraphStandard.Location = New System.Drawing.Point(29, 297)
+        Me.chkGraphStandard.Location = New System.Drawing.Point(28, 339)
         Me.chkGraphStandard.Name = "chkGraphStandard"
         Me.chkGraphStandard.Size = New System.Drawing.Size(373, 17)
         Me.chkGraphStandard.TabIndex = 22
@@ -260,7 +250,7 @@ Partial Class StartUp
         'chkLogGraphs
         '
         Me.chkLogGraphs.AutoSize = True
-        Me.chkLogGraphs.Location = New System.Drawing.Point(29, 333)
+        Me.chkLogGraphs.Location = New System.Drawing.Point(28, 375)
         Me.chkLogGraphs.Name = "chkLogGraphs"
         Me.chkLogGraphs.Size = New System.Drawing.Size(470, 17)
         Me.chkLogGraphs.TabIndex = 23
@@ -272,7 +262,7 @@ Partial Class StartUp
         'chkSupportingGraphs
         '
         Me.chkSupportingGraphs.AutoSize = True
-        Me.chkSupportingGraphs.Location = New System.Drawing.Point(29, 315)
+        Me.chkSupportingGraphs.Location = New System.Drawing.Point(28, 357)
         Me.chkSupportingGraphs.Name = "chkSupportingGraphs"
         Me.chkSupportingGraphs.Size = New System.Drawing.Size(180, 17)
         Me.chkSupportingGraphs.TabIndex = 24
@@ -280,13 +270,24 @@ Partial Class StartUp
         Me.chkSupportingGraphs.UseVisualStyleBackColor = True
         Me.chkSupportingGraphs.Visible = False
         '
+        'chkRunHSPF
+        '
+        Me.chkRunHSPF.AutoSize = True
+        Me.chkRunHSPF.Location = New System.Drawing.Point(15, 184)
+        Me.chkRunHSPF.Name = "chkRunHSPF"
+        Me.chkRunHSPF.Size = New System.Drawing.Size(253, 17)
+        Me.chkRunHSPF.TabIndex = 25
+        Me.chkRunHSPF.Text = "Run WinHSPFLt before calculating the statistics"
+        Me.chkRunHSPF.UseVisualStyleBackColor = True
+        '
         'StartUp
         '
         Me.AcceptButton = Me.cmdStart
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
-        Me.ClientSize = New System.Drawing.Size(530, 367)
+        Me.ClientSize = New System.Drawing.Size(530, 439)
+        Me.Controls.Add(Me.chkRunHSPF)
         Me.Controls.Add(Me.chkSupportingGraphs)
         Me.Controls.Add(Me.chkLogGraphs)
         Me.Controls.Add(Me.chkGraphStandard)
@@ -340,5 +341,6 @@ Partial Class StartUp
     Friend WithEvents chkGraphStandard As System.Windows.Forms.CheckBox
     Friend WithEvents chkLogGraphs As System.Windows.Forms.CheckBox
     Friend WithEvents chkSupportingGraphs As System.Windows.Forms.CheckBox
+    Friend WithEvents chkRunHSPF As System.Windows.Forms.CheckBox
 
 End Class

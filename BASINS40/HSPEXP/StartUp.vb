@@ -2,7 +2,11 @@
 Public Class StartUp
     Private g_MapWin As IMapWin
     Private Sub cmdStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdStart.Click
+        'Try
         ScriptMain(g_MapWin)
+        'Catch ex As Exception
+        '    MapWinUtility.Logger.Msg(ex.Message)
+        'End Try
     End Sub
 
     Private Sub cmdBrowse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBrowse.Click
@@ -11,6 +15,7 @@ Public Class StartUp
         Dim lPathName As String
         Dim lRunFolder As String
         Dim lPath() As String
+
         With lOpenDialog
             .Title = "Select UCI File from Current Calibration Run"
             .Filter = "UCI files|*.uci"
@@ -43,35 +48,36 @@ Public Class StartUp
                 lblRCH.Visible = True
                 lblOutReach2.Visible = True
                 pnlHighlight.Visible = True
+                cmdStart.Enabled = True
             End If
         End With
         Me.Focus()
     End Sub
 
-    Private Sub txtRCH_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtRCH.TextChanged
-        Dim lOK As Boolean = False
-        cmdStart.Enabled = False
-        If IsNumeric(txtRCH.Text) Then
-            'one reach, entered as numeric
-            lOK = True
-        ElseIf InStr(1, txtRCH.Text, ",") > 0 Then
-            'multiple reaches separated by commas
-            Dim lRCHRES() As String
-            lRCHRES = Split(txtRCH.Text, ",")
-            For Each lRCH As String In lRCHRES
-                lOK = True
-                If Not (IsNumeric(lRCH)) Then
-                    'one or more of the entries is not numeric, do not allow start button
-                    lOK = False
-                    Exit For
-                End If
-            Next
-        Else
-            lOK = False
-            txtRCH.Clear()
-        End If
-        If lOK Then cmdStart.Enabled = True
-    End Sub
+    'Private Sub txtRCH_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtRCH.TextChanged
+    '    Dim lOK As Boolean = False
+    '    cmdStart.Enabled = True
+    '    If IsNumeric(txtRCH.Text) Then
+    '        'one reach, entered as numeric
+    '        lOK = True
+    '    ElseIf InStr(1, txtRCH.Text, ",") > 0 Then
+    '        'multiple reaches separated by commas
+    '        Dim lRCHRES() As String
+    '        lRCHRES = Split(txtRCH.Text, ",")
+    '        For Each lRCH As String In lRCHRES
+    '            lOK = True
+    '            If Not (IsNumeric(lRCH)) Then
+    '                'one or more of the entries is not numeric, do not allow start button
+    '                lOK = False
+    '                Exit For
+    '            End If
+    '        Next
+    '    Else
+    '        lOK = True
+    '        txtRCH.Clear()
+    '    End If
+    '    'If lOK Then cmdStart.Enabled = True
+    'End Sub
 
     Private Sub cmdEnd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEnd.Click
         Me.Close()
@@ -96,6 +102,13 @@ Public Class StartUp
             If Not chkGraphStandard.Checked And Not chkSupportingGraphs.Checked Then
                 chkLogGraphs.Checked = False
             End If
+        End If
+    End Sub
+
+    Private Sub chkRunHSPF_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkRunHSPF.CheckedChanged
+        Dim lRunUci As Boolean = False
+        If chkRunHSPF.Checked Then
+            lrunuci = True
         End If
     End Sub
 End Class
