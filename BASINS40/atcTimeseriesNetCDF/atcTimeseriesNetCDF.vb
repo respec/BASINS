@@ -98,6 +98,7 @@ Public Class atcTimeseriesNetCDF
         Dim lGetOnlyOneTimseries As Boolean = False
 
         Dim lAggregateGridFile As atcNetCDFFile = Nothing
+        Dim lScenario As String = "netCDF"
 
         If aAttributes IsNot Nothing AndAlso aAttributes.Count > 0 Then
             lXIndexToget = aAttributes.GetValue("XIndex", lXIndexToget)
@@ -106,11 +107,13 @@ Public Class atcTimeseriesNetCDF
                 lGetOnlyOneTimseries = True
                 Me.Attributes.Add("XIndex", lXIndexToget)
                 Me.Attributes.Add("YIndex", lYIndexToget)
+                lScenario = "netCDF: X:" & lXIndexToget & " Y:" & lYIndexToget
             End If
             Dim lAggregateGridFileName As String = aAttributes.GetValue("AggregateGrid", "")
             If lAggregateGridFileName.Length > 0 Then
                 lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
                 Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
+                lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
             End If
         Else 'temporarily prompt for aggregate file
             With New Windows.Forms.OpenFileDialog
@@ -129,6 +132,7 @@ Public Class atcTimeseriesNetCDF
                 If lAggregateGridFileName.Length > 0 Then
                     lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
                     Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
+                    lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
                 End If
             End With
 
@@ -308,6 +312,7 @@ Public Class atcTimeseriesNetCDF
                                             End If
                                         End If
                                         lTimeseries.Attributes.SetValue("Location", lLocation)
+                                        lTimeseries.Attributes.SetValue("Scenario", lScenario)
                                         lTimeseries.ValuesNeedToBeRead = True
                                         lTimeseries.Dates = lDates
 

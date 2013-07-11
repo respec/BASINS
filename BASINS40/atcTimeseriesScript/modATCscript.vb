@@ -77,6 +77,7 @@ Friend Module modATCscript
             With ts
                 .Attributes.SetValue("Description", pDataFilename)
                 .Attributes.SetValue("Scenario", DefaultScenario)
+                .Attributes.SetValue("Data Source", pDataFilename)
                 .Attributes.AddHistory("Read From " & pDataFilename)
             End With
         End Sub
@@ -528,6 +529,7 @@ Friend Module modATCscript
 
                                 If FillTS > 0 Then
                                     Dim lFilledTS As atcTimeseries = FillValues(.ts, FillTU, FillTS, FillVal, FillMissing, FillAccum)
+                                    lFilledTS.Attributes.ChangeTo(.ts.Attributes)
                                     .ts.Dates.Clear()
                                     .ts.Clear()
                                     .ts = lFilledTS
@@ -536,6 +538,7 @@ Friend Module modATCscript
                                 With .ts
                                     .Attributes.SetValueIfMissing("ID", pTserFile.DataSets.Count + 1)
                                     If Not .Attributes.ContainsAttribute("History 1") Then
+                                        .Attributes.SetValue("Data Source", pDataFilename)
                                         .Attributes.AddHistory("Read From " & DataFilename)
                                     End If
                                     'Set missing values to NaN

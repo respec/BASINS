@@ -53,7 +53,7 @@ Public Class atcTimeseriesGeoSFMOutput
             pErrorDescription = "File '" & aFileName & "' not found"
             Open = False
         Else
-            Me.Specification = aFileName
+            MyBase.Open(aFileName)
             Dim inStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
             Dim inBuffer As New BufferedStream(inStream)
             Dim inReader As New BinaryReader(inBuffer)
@@ -73,6 +73,7 @@ Public Class atcTimeseriesGeoSFMOutput
             Dim lTStep As Integer = 1
             Dim lStr As String
             Dim lStrArray() As String
+            Dim lCons As String
             Dim i As Integer
 
             While curLine.Length = 0
@@ -102,12 +103,24 @@ Public Class atcTimeseriesGeoSFMOutput
                                 lData.Dates.Value(0) = 0
                                 lData.Attributes.SetValue("Count", 0)
                                 lData.Attributes.SetValue("Scenario", "SIMULATED")
-                                lData.Attributes.SetValue("Constituent", FilenameNoExt(FilenameNoPath(aFileName)))
+                                lCons = FilenameNoExt(FilenameNoPath(aFileName)).ToUpper
+                                If lCons.Contains("STREAMFLOW") Then
+                                    'lCons = "FLOW"
+                                    lData.Attributes.SetValue("Units", "cms")
+                                ElseIf lCons.Contains("BASINRUNOFFYIELD") Then
+                                    lCons = "BASINRUNOFF"
+                                ElseIf lCons.Contains("INTERFLOW") Then
+                                    lCons = "INTERFLOW"
+                                ElseIf lCons.Contains("BASEFLOW") Then
+                                    lCons = "BASEFLOW"
+                                End If
+                                lData.Attributes.SetValue("Constituent", lCons)
                                 lData.Attributes.SetValue("Location", lTSAttributes(i))
                                 lData.Attributes.SetValue("Description", "GeoSFM Output Data")
                                 lData.Attributes.SetValue("tu", 4)
                                 lData.Attributes.SetValue("point", False)
                                 lData.Attributes.SetValue("TSFILL", MissingVal)
+                                lData.Attributes.AddHistory("Read From " & Specification)
                                 DataSets.Add(lTSAttributes(i), lData)
                             End If
                             lTSInd = lData.Attributes.GetValue("Count")
@@ -143,6 +156,7 @@ Public Class atcTimeseriesGeoSFMOutput
                         'lTStep = Math.Round((lData.Dates.Value(2) - lData.Dates.Value(1)) * 24)
                         lDataFilled = FillValues(lData, 4, lTStep, MissingVal, MissingVal, MissingAcc)
                         If Not lDataFilled Is Nothing Then
+                            lDataFilled.Attributes.ChangeTo(lData.Attributes)
                             lDataFilled.ValuesNeedToBeRead = False
                             lDataFilled.Dates.ValuesNeedToBeRead = False
                             lDataSets.Add(lDataFilled)
