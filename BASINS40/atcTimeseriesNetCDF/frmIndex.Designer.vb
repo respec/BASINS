@@ -28,6 +28,9 @@ Partial Class frmIndex
         Me.lblYIndex = New System.Windows.Forms.Label
         Me.btnOK = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
+        Me.rdoAggregationFile = New System.Windows.Forms.RadioButton
+        Me.rdoIndices = New System.Windows.Forms.RadioButton
+        Me.txtGridFileName = New System.Windows.Forms.TextBox
         Me.SuspendLayout()
         '
         'txtXIndex
@@ -38,7 +41,7 @@ Partial Class frmIndex
         Me.txtXIndex.HardMax = -999
         Me.txtXIndex.HardMin = 1
         Me.txtXIndex.InsideLimitsBackground = System.Drawing.Color.White
-        Me.txtXIndex.Location = New System.Drawing.Point(120, 26)
+        Me.txtXIndex.Location = New System.Drawing.Point(142, 92)
         Me.txtXIndex.MaxWidth = 20
         Me.txtXIndex.Name = "txtXIndex"
         Me.txtXIndex.NumericFormat = "0"
@@ -61,7 +64,7 @@ Partial Class frmIndex
         Me.txtYIndex.HardMax = -999
         Me.txtYIndex.HardMin = 1
         Me.txtYIndex.InsideLimitsBackground = System.Drawing.Color.White
-        Me.txtYIndex.Location = New System.Drawing.Point(120, 64)
+        Me.txtYIndex.Location = New System.Drawing.Point(322, 93)
         Me.txtYIndex.MaxWidth = 20
         Me.txtYIndex.Name = "txtYIndex"
         Me.txtYIndex.NumericFormat = "0"
@@ -79,7 +82,7 @@ Partial Class frmIndex
         'lblXIndex
         '
         Me.lblXIndex.AutoSize = True
-        Me.lblXIndex.Location = New System.Drawing.Point(15, 26)
+        Me.lblXIndex.Location = New System.Drawing.Point(34, 92)
         Me.lblXIndex.Name = "lblXIndex"
         Me.lblXIndex.Size = New System.Drawing.Size(102, 13)
         Me.lblXIndex.TabIndex = 2
@@ -88,7 +91,7 @@ Partial Class frmIndex
         'lblYIndex
         '
         Me.lblYIndex.AutoSize = True
-        Me.lblYIndex.Location = New System.Drawing.Point(24, 64)
+        Me.lblYIndex.Location = New System.Drawing.Point(223, 93)
         Me.lblYIndex.Name = "lblYIndex"
         Me.lblYIndex.Size = New System.Drawing.Size(93, 13)
         Me.lblYIndex.TabIndex = 3
@@ -97,7 +100,7 @@ Partial Class frmIndex
         'btnOK
         '
         Me.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.btnOK.Location = New System.Drawing.Point(18, 113)
+        Me.btnOK.Location = New System.Drawing.Point(110, 127)
         Me.btnOK.Name = "btnOK"
         Me.btnOK.Size = New System.Drawing.Size(75, 23)
         Me.btnOK.TabIndex = 4
@@ -107,19 +110,51 @@ Partial Class frmIndex
         'btnCancel
         '
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(120, 113)
+        Me.btnCancel.Location = New System.Drawing.Point(208, 127)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 5
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
+        'rdoAggregationFile
+        '
+        Me.rdoAggregationFile.AutoSize = True
+        Me.rdoAggregationFile.Location = New System.Drawing.Point(23, 13)
+        Me.rdoAggregationFile.Name = "rdoAggregationFile"
+        Me.rdoAggregationFile.Size = New System.Drawing.Size(123, 17)
+        Me.rdoAggregationFile.TabIndex = 6
+        Me.rdoAggregationFile.TabStop = True
+        Me.rdoAggregationFile.Text = "Aggregation Grid File"
+        Me.rdoAggregationFile.UseVisualStyleBackColor = True
+        '
+        'rdoIndices
+        '
+        Me.rdoIndices.AutoSize = True
+        Me.rdoIndices.Location = New System.Drawing.Point(23, 72)
+        Me.rdoIndices.Name = "rdoIndices"
+        Me.rdoIndices.Size = New System.Drawing.Size(95, 17)
+        Me.rdoIndices.TabIndex = 7
+        Me.rdoIndices.TabStop = True
+        Me.rdoIndices.Text = "Subset Indices"
+        Me.rdoIndices.UseVisualStyleBackColor = True
+        '
+        'txtGridFileName
+        '
+        Me.txtGridFileName.Location = New System.Drawing.Point(37, 36)
+        Me.txtGridFileName.Name = "txtGridFileName"
+        Me.txtGridFileName.Size = New System.Drawing.Size(360, 20)
+        Me.txtGridFileName.TabIndex = 8
+        '
         'frmIndex
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(214, 156)
+        Me.ClientSize = New System.Drawing.Size(420, 175)
+        Me.Controls.Add(Me.txtGridFileName)
+        Me.Controls.Add(Me.rdoIndices)
+        Me.Controls.Add(Me.rdoAggregationFile)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.lblYIndex)
@@ -128,7 +163,7 @@ Partial Class frmIndex
         Me.Controls.Add(Me.txtXIndex)
         Me.MaximizeBox = False
         Me.Name = "frmIndex"
-        Me.Text = "Specify Subset"
+        Me.Text = "Specify Aggregation Grid File or Subset Indices"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -139,4 +174,7 @@ Partial Class frmIndex
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Private WithEvents lblXIndex As System.Windows.Forms.Label
     Private WithEvents lblYIndex As System.Windows.Forms.Label
+    Friend WithEvents rdoAggregationFile As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoIndices As System.Windows.Forms.RadioButton
+    Friend WithEvents txtGridFileName As System.Windows.Forms.TextBox
 End Class
