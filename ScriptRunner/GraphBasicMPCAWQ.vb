@@ -376,7 +376,92 @@ Module GraphBasicMPCAWQ
     {"RCH600", "DOX", 2003, 1, 1, 2009, 12, 31, "Gull Lake", "", ""}, _
     {"RCH600", "TP", 2003, 1, 1, 2009, 12, 31, "Gull Lake", "", ""}, _
     {"RCH600", "TSS", 2003, 1, 1, 2009, 12, 31, "Gull Lake", "", ""}, _
-    {"RCH600", "TW", 2003, 1, 1, 2009, 12, 31, "Gull Lake", "", ""} _
+    {"RCH600", "TW", 2003, 1, 1, 2009, 12, 31, "Gull Lake", "", ""}, _
+    {"RCH104", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "West Leaf Lake", "", ""}, _
+    {"RCH106", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "East Leaf Lake", "", ""}, _
+    {"RCH121", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "05244385", "", ""}, _
+    {"RCH122", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "", "", ""}, _
+    {"RCH123", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Wolf Lake", "", ""}, _
+    {"RCH125", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "05244409", "", ""}, _
+    {"RCH131", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "H13058001", "", ""}, _
+    {"RCH133", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "", "", ""}, _
+    {"RCH301", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Andrew Lake", "", ""}, _
+    {"RCH302", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Mary Lake", "", ""}, _
+    {"RCH304", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Lobster Lk East", "Lobster Lake West", ""}, _
+    {"RCH308", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Irene Lake", "", ""}, _
+    {"RCH309", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Miltona Lake", "", ""}, _
+    {"RCH310", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Ida Lake", "", ""}, _
+    {"RCH311", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Latoka Lake", "", ""}, _
+    {"RCH315", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Victoria Lake", "", ""}, _
+    {"RCH316", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Geneva Lake", "", ""}, _
+    {"RCH317", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Winona Lake", "", ""}, _
+    {"RCH318", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Agnes Lake", "", ""}, _
+    {"RCH319", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Henry Lake", "", ""}, _
+    {"RCH320", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Le Homme Dieu L", "", ""}, _
+    {"RCH321", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Carlos Lake, Darling Lake", "", ""}, _
+    {"RCH322", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", "", ""}, _
+    {"RCH324", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "", "", ""}, _
+    {"RCH326", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", "", ""}, _
+    {"RCH327", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "", "", ""}, _
+    {"RCH329", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "LONG PRAIRIE R ON BR AT CR 90", "LONG PRAIRIE R ON BR AT CSAH 14", ""}, _
+    {"RCH331", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "EAGLE CR ON 175TH AVE", "", ""}, _
+    {"RCH332", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "EAGLE CR ON BRG AT CSAH 21", "", ""}, _
+    {"RCH333", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", "", ""}, _
+    {"RCH335", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "", "", ""}, _
+    {"RCH336", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", "", ""}, _
+    {"RCH338", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "MORAN CR ON 464TH ST", "", ""}, _
+    {"RCH339", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "05245295", "MORAN CR ON BR AT 255TH AVE", ""}, _
+    {"RCH341", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", "H14034001", ""}, _
+    {"RCH342", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Shamineau Lake", "", ""}, _
+    {"RCH344", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Alexander Lake", "", ""}, _
+    {"RCH345", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Fish Trap Lake", "", ""}, _
+    {"RCH347", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", "", ""}, _
+    {"RCH400", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", "", ""}, _
+    {"RCH501", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Bad Medicine Lk", "", ""}, _
+    {"RCH502", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Big Basswood Lk", "", ""}, _
+    {"RCH506", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Two Inlets Lake", "", ""}, _
+    {"RCH508", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Island Lake", "", ""}, _
+    {"RCH509", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Eagle Lake", "", ""}, _
+    {"RCH510", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Potato Lake", "", ""}, _
+    {"RCH511", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Portage Lake", "", ""}, _
+    {"RCH512", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Fishhook Lake", "FISHHOOK R AT 3RD ST E IN PARK RAPIDS", ""}, _
+    {"RCH514", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Straight Lake", "", ""}, _
+    {"RCH515", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "STRAIGHT R AT US HWY 71", "Straight River nr USGS gage", ""}, _
+    {"RCH516", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Straight R downstream of USGS gage", "", ""}, _
+    {"RCH517", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Long Lake", "", ""}, _
+    {"RCH518", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "FISHHOOK R AT MN-87", "Fishhook River above Long Lake", ""}, _
+    {"RCH520", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Shell Lake", "", ""}, _
+    {"RCH521", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "05243200", "Shell R at inlet to Blueberry Lake", "Shell R at US-71"}, _
+    {"RCH522", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Blueberry R at 384th", "", ""}, _
+    {"RCH523", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Kettle R at CR-156", "", ""}, _
+    {"RCH524", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Blueberry R at US-71", "Blueberry R at inlet to Blueberry Lake", "Blueberry 2 blocks W of US-71"}, _
+    {"RCH525", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Blueberry Lake", "Shell R at Blueberry Br Rd", ""}, _
+    {"RCH526", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Fishhook River below Long Lake", "Shell R at CSAH 21", ""}, _
+    {"RCH527", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Lower Twin Lake", "", ""}, _
+    {"RCH529", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Stocking Lake", "", ""}, _
+    {"RCH530", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Shell R at CR 13", "Shell R at CSAH 23", "Shell R at CSAH 24"}, _
+    {"RCH531", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Mantrap Lk East", "Mantrap Lk Mid", ""}, _
+    {"RCH532", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Lower Bottle Lk", "", ""}, _
+    {"RCH533", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Big Sand Lake", "", ""}, _
+    {"RCH534", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Little Sand Lk", "", ""}, _
+    {"RCH535", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Belle Taine Lk", "", ""}, _
+    {"RCH536", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "11th Crow Wing", "", ""}, _
+    {"RCH537", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "9th Crow Wing", "", ""}, _
+    {"RCH538", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "", "", ""}, _
+    {"RCH544", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "3rd Crow Wing", "4th Crow Wing", ""}, _
+    {"RCH546", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "1st Crow Wing", "", ""}, _
+    {"RCH557", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "", "", ""}, _
+    {"RCH582", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Placid Lake", "", ""}, _
+    {"RCH588", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Margaret Lk", "", ""}, _
+    {"RCH591", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Sibley Lake", "", ""}, _
+    {"RCH592", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Lower Cullen Lk", "", ""}, _
+    {"RCH593", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Hubert Lake", "", ""}, _
+    {"RCH596", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Upper Gull Lk", "", ""}, _
+    {"RCH597", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Edward Lake", "", ""}, _
+    {"RCH598", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "North Long Lake", "", ""}, _
+    {"RCH599", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Round Lake", "", ""}, _
+    {"RCH600", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "Gull Lake", "", ""}, _
+    {"RCH700", "CHLOROA", 2003, 1, 1, 2009, 12, 31, "", "", ""} _
     }
 
     Private pGraphs_MPCAWQ_Val(,) As Object = { _
@@ -597,7 +682,7 @@ Module GraphBasicMPCAWQ
     '{"RCH530", "STAGE", 2003, 1, 1, 2009, 12, 31, "Shell R at CSAH 23"}, _
 
     Private Sub Initialize()
-        Dim lTestName As String = "MPCAValWQ"
+        Dim lTestName As String = "MPCAWQ"
         Select Case lTestName
             Case "MPCAWQ"
                 pWorkingDirectory = "M:\modelout\"
@@ -654,6 +739,8 @@ Module GraphBasicMPCAWQ
                         Case "TW"
                             pLeftYAxisLabel = "Water Temperature (" & ChrW(186) & "F)"
                             'AxisUpper = 100
+                        Case "CHLOROA"
+                            pLeftYAxisLabel = "Phytoplankton as Chlorophyll A (" & ChrW(181) & "g/l)"
                         Case "DOX"
                             pLeftYAxisLabel = "Dissolved Oxygen (mg/l)"
                             'AxisUpper = 18
@@ -754,20 +841,8 @@ Module GraphBasicMPCAWQ
 
                         'Observed constituent data
                         lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 8)). _
-                                                FindData("Constituent", pWQGraphSpecification(lGraphIndex, 1))(0)
-                        lTser1.Attributes.SetValue("YAxis", "Left")
-                        lTser1.Attributes.SetValue("Point", "True")
-                        If lTser1.Attributes.Count > 60 Then
-                            lTser1 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-                        End If
-                        lTser1 = SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing)
-                        If lTser1.numValues < 1 Then Continue For
-                        lTimeseriesGroup.Add(lTser1)
-                        lTser1 = Nothing
-
-                        If (pWQGraphSpecification(lGraphIndex, 9) <> "") Then
-                            lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 9)). _
-                                                FindData("Constituent", pWQGraphSpecification(lGraphIndex, 1))(0)
+                                                    FindData("Constituent", pWQGraphSpecification(lGraphIndex, 1))(0)
+                        If lTser1 IsNot Nothing Then
                             lTser1.Attributes.SetValue("YAxis", "Left")
                             lTser1.Attributes.SetValue("Point", "True")
                             If lTser1.Attributes.Count > 60 Then
@@ -777,10 +852,12 @@ Module GraphBasicMPCAWQ
                             If lTser1.numValues < 1 Then Continue For
                             lTimeseriesGroup.Add(lTser1)
                             lTser1 = Nothing
+                        End If
 
-                            If (pWQGraphSpecification(lGraphIndex, 10) <> "") Then
-                                lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 10)). _
-                                FindData("Constituent", pWQGraphSpecification(lGraphIndex, 1))(0)
+                        If (pWQGraphSpecification(lGraphIndex, 9) <> "") Then
+                            lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 9)). _
+                                                FindData("Constituent", pWQGraphSpecification(lGraphIndex, 1))(0)
+                            If lTser1 IsNot Nothing Then
                                 lTser1.Attributes.SetValue("YAxis", "Left")
                                 lTser1.Attributes.SetValue("Point", "True")
                                 If lTser1.Attributes.Count > 60 Then
@@ -790,6 +867,22 @@ Module GraphBasicMPCAWQ
                                 If lTser1.numValues < 1 Then Continue For
                                 lTimeseriesGroup.Add(lTser1)
                                 lTser1 = Nothing
+                            End If
+
+                            If (pWQGraphSpecification(lGraphIndex, 10) <> "") Then
+                                lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 10)). _
+                                FindData("Constituent", pWQGraphSpecification(lGraphIndex, 1))(0)
+                                If lTser1 IsNot Nothing Then
+                                    lTser1.Attributes.SetValue("YAxis", "Left")
+                                    lTser1.Attributes.SetValue("Point", "True")
+                                    If lTser1.Attributes.Count > 60 Then
+                                        lTser1 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                    End If
+                                    lTser1 = SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing)
+                                    If lTser1.numValues < 1 Then Continue For
+                                    lTimeseriesGroup.Add(lTser1)
+                                    lTser1 = Nothing
+                                End If
                             End If
 
                         End If
@@ -834,6 +927,8 @@ Module GraphBasicMPCAWQ
                         Case "TW"
                             pLeftYAxisLabel = "Water Temperature (" & ChrW(186) & "F)"
                             AxisUpper = 100
+                        Case "CHLOROA"
+                            pLeftYAxisLabel = "Phytoplankton as Chlorophyll A (" & ChrW(181) & "g/l)"
                         Case "DOX"
                             pLeftYAxisLabel = "Dissolved Oxygen (mg/l)"
                             AxisUpper = 18
@@ -1234,24 +1329,26 @@ Module GraphBasicMPCAWQ
         'lCurveMain.Line.StepType = StepType.NonStep
         lCurveMain.Line.Width = 2
 
-        lCurveMain = lPaneMain.CurveList.Item(1) 'lCurveMain is observed data
-        lCurveMain.Color = Drawing.Color.Blue
-        lCurveMain.Symbol.Type = SymbolType.Circle
-        lCurveMain.Symbol.Fill.IsVisible = True
-        lCurveMain.Symbol.Size = 7
-
-        If lPaneMain.CurveList.Count > 2 Then
-            lCurveMain = lPaneMain.CurveList.Item(2) 'lCurveMain is observed data at second station
-            lCurveMain.Color = Drawing.Color.Green
+        If lPaneMain.CurveList.Count > 1 Then
+            lCurveMain = lPaneMain.CurveList.Item(1) 'lCurveMain is observed data
+            lCurveMain.Color = Drawing.Color.Blue
             lCurveMain.Symbol.Type = SymbolType.Circle
             lCurveMain.Symbol.Fill.IsVisible = True
             lCurveMain.Symbol.Size = 7
-            If lPaneMain.CurveList.Count > 3 Then
-                lCurveMain = lPaneMain.CurveList.Item(3) 'lCurveMain is observed data at third station
-                lCurveMain.Color = Drawing.Color.Purple
+
+            If lPaneMain.CurveList.Count > 2 Then
+                lCurveMain = lPaneMain.CurveList.Item(2) 'lCurveMain is observed data at second station
+                lCurveMain.Color = Drawing.Color.Green
                 lCurveMain.Symbol.Type = SymbolType.Circle
                 lCurveMain.Symbol.Fill.IsVisible = True
                 lCurveMain.Symbol.Size = 7
+                If lPaneMain.CurveList.Count > 3 Then
+                    lCurveMain = lPaneMain.CurveList.Item(3) 'lCurveMain is observed data at third station
+                    lCurveMain.Color = Drawing.Color.Purple
+                    lCurveMain.Symbol.Type = SymbolType.Circle
+                    lCurveMain.Symbol.Fill.IsVisible = True
+                    lCurveMain.Symbol.Size = 7
+                End If
             End If
         End If
 
