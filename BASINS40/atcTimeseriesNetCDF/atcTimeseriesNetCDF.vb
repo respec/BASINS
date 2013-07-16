@@ -100,43 +100,43 @@ Public Class atcTimeseriesNetCDF
         Dim lAggregateGridFile As atcNetCDFFile = Nothing
         Dim lScenario As String = "netCDF"
 
-        If aAttributes IsNot Nothing AndAlso aAttributes.Count > 0 Then
-            lXIndexToget = aAttributes.GetValue("XIndex", lXIndexToget)
-            lYIndexToget = aAttributes.GetValue("YIndex", lYIndexToget)
-            If lXIndexToget >= 0 AndAlso lYIndexToget >= 0 Then
-                lGetOnlyOneTimseries = True
-                Me.Attributes.Add("XIndex", lXIndexToget)
-                Me.Attributes.Add("YIndex", lYIndexToget)
-                lScenario = "netCDF: X:" & lXIndexToget & " Y:" & lYIndexToget
-            End If
-            Dim lAggregateGridFileName As String = aAttributes.GetValue("AggregateGrid", "")
-            If lAggregateGridFileName.Length > 0 Then
-                lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
-                Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
-                lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
-            End If
-        Else 'temporarily prompt for aggregate file
-            With New Windows.Forms.OpenFileDialog
-                .Title = "Select Aggregation Grid file for accessing timeseries in " & Specification
-                .Filter = pFilter
-                .FilterIndex = 1
-                .DefaultExt = ".nc"
-                .Multiselect = False
-                If .ShowDialog() <> Windows.Forms.DialogResult.OK Then
-                    ' user clicked Cancel
-                    Logger.Dbg("User Cancelled File Selection Dialog")
-                    Logger.LastDbgText = "" 'forget about this - user was in control - no additional message box needed
-                    Return False
-                End If
-                Dim lAggregateGridFileName As String = .FileName
-                If lAggregateGridFileName.Length > 0 Then
-                    lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
-                    Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
-                    lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
-                End If
-            End With
+        'If aAttributes IsNot Nothing AndAlso aAttributes.Count > 0 Then
+        '    lXIndexToget = aAttributes.GetValue("XIndex", lXIndexToget)
+        '    lYIndexToget = aAttributes.GetValue("YIndex", lYIndexToget)
+        '    If lXIndexToget >= 0 AndAlso lYIndexToget >= 0 Then
+        '        lGetOnlyOneTimseries = True
+        '        Me.Attributes.Add("XIndex", lXIndexToget)
+        '        Me.Attributes.Add("YIndex", lYIndexToget)
+        '        lScenario = "netCDF: X:" & lXIndexToget & " Y:" & lYIndexToget
+        '    End If
+        '    Dim lAggregateGridFileName As String = aAttributes.GetValue("AggregateGrid", "")
+        '    If lAggregateGridFileName.Length > 0 Then
+        '        lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
+        '        Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
+        '        lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
+        '    End If
+        'Else 'temporarily prompt for aggregate file
+        '    With New Windows.Forms.OpenFileDialog
+        '        .Title = "Select Aggregation Grid file for accessing timeseries in " & Specification
+        '        .Filter = pFilter
+        '        .FilterIndex = 1
+        '        .DefaultExt = ".nc"
+        '        .Multiselect = False
+        '        If .ShowDialog() <> Windows.Forms.DialogResult.OK Then
+        '            ' user clicked Cancel
+        '            Logger.Dbg("User Cancelled File Selection Dialog")
+        '            Logger.LastDbgText = "" 'forget about this - user was in control - no additional message box needed
+        '            Return False
+        '        End If
+        '        Dim lAggregateGridFileName As String = .FileName
+        '        If lAggregateGridFileName.Length > 0 Then
+        '            lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
+        '            Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
+        '            lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
+        '        End If
+        '    End With
 
-        End If
+        'End If
 
         Try
             Dim lFileindex As Integer = 0
@@ -248,6 +248,10 @@ Public Class atcTimeseriesNetCDF
                         Dim lYValue As String = ""
                         Dim lXIndex As Integer = 1
                         Dim lXValue As String = ""
+                        If lGetOnlyOneTimseries Then
+                            lYIndex = lYIndexToget
+                            lXIndex = lXIndexToget
+                        End If
                         For lTimeseriesIndex As Integer = 0 To lTimeseriesCount - 1
                             Dim lLocation As String = ""
                             If lUniqueLocations.Count > 0 Then
