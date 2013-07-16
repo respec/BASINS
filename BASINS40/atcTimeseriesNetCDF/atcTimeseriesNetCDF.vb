@@ -162,48 +162,56 @@ Public Class atcTimeseriesNetCDF
                         Logger.Dbg(pErrorDescription)
                         Return False
                     Else 'how many timeseries?
-                        Dim lTimeseriesCount As Integer = 1
                         Dim lUniqueLocations As New atcCollection
-                        If lAggregateGridFile IsNot Nothing Then
-                            'aggregating, how many unique values in aggregate file
-                            lUniqueLocations = FindUniqueValues(lAggregateGridFile)
-                            lTimeseriesCount = lUniqueLocations.Count
-                            Logger.Dbg("UniqueLocations: " & lTimeseriesCount)
-                        Else
-                            If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
-                                lTimeseriesCount = lNetCDFFile.NorthSouthDimension.Length
-                            ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension Is Nothing Then
-                                lTimeseriesCount = lNetCDFFile.NorthSouthDimension.Length
-                            ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
-                                lTimeseriesCount = lNetCDFFile.EastWestDimension.Length * lNetCDFFile.NorthSouthDimension.Length
+                        Dim lTimeseriesCount As Integer = -1
+                        While lTimeseriesCount = -1 OrElse lTimeseriesCount > 1000
+                            If lAggregateGridFile IsNot Nothing Then
+                                'aggregating, how many unique values in aggregate file
+                                lUniqueLocations = FindUniqueValues(lAggregateGridFile)
+                                lTimeseriesCount = lUniqueLocations.Count
+                                Logger.Dbg("UniqueLocations: " & lTimeseriesCount)
+                            Else
+                                If lNetCDFFile.EastWestDimension Is Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
+                                    lTimeseriesCount = lNetCDFFile.NorthSouthDimension.Length
+                                ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension Is Nothing Then
+                                    lTimeseriesCount = lNetCDFFile.NorthSouthDimension.Length
+                                ElseIf lNetCDFFile.EastWestDimension IsNot Nothing AndAlso lNetCDFFile.NorthSouthDimension IsNot Nothing Then
+                                    lTimeseriesCount = lNetCDFFile.EastWestDimension.Length * lNetCDFFile.NorthSouthDimension.Length
+                                End If
+                                Logger.Dbg("TimeseriesCount:" & lTimeseriesCount)
                             End If
-                            Logger.Dbg("TimeseriesCount:" & lTimeseriesCount)
-                        End If
 
-                        If lTimeseriesCount > 1000 Then
-
-                            'TODO allow user to specify grid overlay here
-
-                            If Not lGetOnlyOneTimseries Then
-                                'too many timeseries, ask user which one
-                                Dim lFrmIndex As New frmIndex
-                                With lFrmIndex
-                                    .txtXIndex.HardMax = lNetCDFFile.EastWestDimension.Length
-                                    .txtYIndex.HardMax = lNetCDFFile.NorthSouthDimension.Length
-                                    If .ShowDialog() <> Windows.Forms.DialogResult.Cancel Then
-                                        lXIndexToget = .txtXIndex.Text
-                                        lYIndexToget = .txtYIndex.Text
-                                        lGetOnlyOneTimseries = True
-                                        Me.Attributes.Add("XIndex", lXIndexToget)
-                                        Me.Attributes.Add("YIndex", lYIndexToget)
-                                        Logger.Dbg("User Specified X " & lXIndexToget & " Y " & lYIndexToget)
-                                    Else
-                                        Logger.Dbg("Too Many Timeseries, user did not specify")
-                                        Return False
-                                    End If
-                                End With
+                            If lTimeseriesCount > 1000 Then
+                                If Not lGetOnlyOneTimseries Then
+                                    'too many timeseries, ask user which one or for aggregate grid
+                                    Dim lFrmIndex As New frmIndex
+                                    With lFrmIndex
+                                        .txtXIndex.HardMax = lNetCDFFile.EastWestDimension.Length
+                                        .txtYIndex.HardMax = lNetCDFFile.NorthSouthDimension.Length
+                                        If .ShowDialog() <> Windows.Forms.DialogResult.Cancel Then
+                                            If .rdoAggregationFile.Checked Then
+                                                Dim lAggregateGridFileName As String = .txtGridFileName.Text
+                                                If lAggregateGridFileName.Length > 0 Then
+                                                    lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
+                                                    Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
+                                                    lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
+                                                End If
+                                            Else
+                                                lXIndexToget = .txtXIndex.Text
+                                                lYIndexToget = .txtYIndex.Text
+                                                lGetOnlyOneTimseries = True
+                                                Me.Attributes.Add("XIndex", lXIndexToget)
+                                                Me.Attributes.Add("YIndex", lYIndexToget)
+                                                Logger.Dbg("User Specified X " & lXIndexToget & " Y " & lYIndexToget)
+                                            End If
+                                        Else
+                                            Logger.Dbg("Too Many Timeseries, user did not specify")
+                                            Return False
+                                        End If
+                                    End With
+                                End If
                             End If
-                        End If
+                        End While
 
                         'get the dates for the timeseries
                         Dim lTimeVariable As atcNetCDFVariable = lNetCDFFile.Variables(lNetCDFFile.TimeDimension.ID)
