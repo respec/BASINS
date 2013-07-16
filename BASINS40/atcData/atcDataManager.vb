@@ -602,7 +602,7 @@ Public Class atcDataManager
 #End If
 #End Region
 
-    Private Shared pSaveAttributes() As String = {"AggregateGrid", "ScriptFileName"}
+    Private Shared pSaveAttributes() As String = {"AggregateGrid", "ScriptFileName", "XIndex", "YIndex"}
 
     ''' <summary>State of data manager in XML format</summary>
     <CLSCompliant(False)> _
