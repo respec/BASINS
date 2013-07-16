@@ -96,25 +96,29 @@ Public Class atcTimeseriesNetCDF
         Dim lXIndexToget As Integer = -1
         Dim lYIndexToget As Integer = -1
         Dim lGetOnlyOneTimseries As Boolean = False
+        Dim lTimeseriesCount As Integer = -1
+        Dim lUniqueLocations As New atcCollection
 
         Dim lAggregateGridFile As atcNetCDFFile = Nothing
         Dim lScenario As String = "netCDF"
 
-        'If aAttributes IsNot Nothing AndAlso aAttributes.Count > 0 Then
-        '    lXIndexToget = aAttributes.GetValue("XIndex", lXIndexToget)
-        '    lYIndexToget = aAttributes.GetValue("YIndex", lYIndexToget)
-        '    If lXIndexToget >= 0 AndAlso lYIndexToget >= 0 Then
-        '        lGetOnlyOneTimseries = True
-        '        Me.Attributes.Add("XIndex", lXIndexToget)
-        '        Me.Attributes.Add("YIndex", lYIndexToget)
-        '        lScenario = "netCDF: X:" & lXIndexToget & " Y:" & lYIndexToget
-        '    End If
-        '    Dim lAggregateGridFileName As String = aAttributes.GetValue("AggregateGrid", "")
-        '    If lAggregateGridFileName.Length > 0 Then
-        '        lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
-        '        Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
-        '        lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
-        '    End If
+        If aAttributes IsNot Nothing AndAlso aAttributes.Count > 0 Then
+            lXIndexToget = aAttributes.GetValue("XIndex", lXIndexToget)
+            lYIndexToget = aAttributes.GetValue("YIndex", lYIndexToget)
+            If lXIndexToget >= 0 AndAlso lYIndexToget >= 0 Then
+                lGetOnlyOneTimseries = True
+                Me.Attributes.Add("XIndex", lXIndexToget)
+                Me.Attributes.Add("YIndex", lYIndexToget)
+                lScenario = "netCDF: X:" & lXIndexToget & " Y:" & lYIndexToget
+                lTimeseriesCount = 1
+            End If
+            Dim lAggregateGridFileName As String = aAttributes.GetValue("AggregateGrid", "")
+            If lAggregateGridFileName.Length > 0 Then
+                lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
+                Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
+                lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
+            End If
+        End If
         'Else 'temporarily prompt for aggregate file
         '    With New Windows.Forms.OpenFileDialog
         '        .Title = "Select Aggregation Grid file for accessing timeseries in " & Specification
@@ -162,8 +166,6 @@ Public Class atcTimeseriesNetCDF
                         Logger.Dbg(pErrorDescription)
                         Return False
                     Else 'how many timeseries?
-                        Dim lUniqueLocations As New atcCollection
-                        Dim lTimeseriesCount As Integer = -1
                         While lTimeseriesCount = -1 OrElse lTimeseriesCount > 1000
                             If lAggregateGridFile IsNot Nothing Then
                                 'aggregating, how many unique values in aggregate file
@@ -195,6 +197,7 @@ Public Class atcTimeseriesNetCDF
                                                     lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
                                                     Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
                                                     lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
+                                                    lTimeseriesCount = lUniqueLocations.Count
                                                 End If
                                             Else
                                                 lXIndexToget = .txtXIndex.Text
@@ -203,6 +206,7 @@ Public Class atcTimeseriesNetCDF
                                                 Me.Attributes.Add("XIndex", lXIndexToget)
                                                 Me.Attributes.Add("YIndex", lYIndexToget)
                                                 Logger.Dbg("User Specified X " & lXIndexToget & " Y " & lYIndexToget)
+                                                lTimeseriesCount = 1
                                             End If
                                         Else
                                             Logger.Dbg("Too Many Timeseries, user did not specify")
