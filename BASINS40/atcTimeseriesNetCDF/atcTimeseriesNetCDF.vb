@@ -197,6 +197,7 @@ Public Class atcTimeseriesNetCDF
                                                     lAggregateGridFile = New atcNetCDFFile(lAggregateGridFileName)
                                                     Me.Attributes.Add("AggregateGrid", lAggregateGridFileName)
                                                     lScenario = "netCDF: Aggregate:" & FilenameNoPath(lAggregateGridFileName)
+                                                    lUniqueLocations = FindUniqueValues(lAggregateGridFile)
                                                     lTimeseriesCount = lUniqueLocations.Count
                                                 End If
                                             Else
