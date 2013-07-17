@@ -1937,9 +1937,9 @@ Public Module modGeoSFM
         lWhichFile.AppendLine(lRouteType & " //routing model:  1=diffusion 2=Muskingum-Cunge 3=lag")
         SaveFileString(lWhichModelFN, lWhichFile.ToString)
 
-        'If FileExists(surpfilename) Then
-        '    IO.File.Delete(surpfilename)
-        'End If
+        If FileExists(lSurpFileName) Then
+            IO.File.Delete(lSurpFileName)
+        End If
 
         If aBalanceType = 1 Then    '"Linear Soil Model"
             ONELAYERBALANCE(lBalFileName)

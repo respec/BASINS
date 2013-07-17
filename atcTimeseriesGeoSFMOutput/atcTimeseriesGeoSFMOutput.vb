@@ -105,14 +105,18 @@ Public Class atcTimeseriesGeoSFMOutput
                                 lData.Attributes.SetValue("Scenario", "SIMULATED")
                                 lCons = FilenameNoExt(FilenameNoPath(aFileName)).ToUpper
                                 If lCons.Contains("STREAMFLOW") Then
-                                    'lCons = "FLOW"
                                     lData.Attributes.SetValue("Units", "cms")
-                                ElseIf lCons.Contains("BASINRUNOFFYIELD") Then
-                                    lCons = "BASINRUNOFF"
-                                ElseIf lCons.Contains("INTERFLOW") Then
-                                    lCons = "INTERFLOW"
-                                ElseIf lCons.Contains("BASEFLOW") Then
-                                    lCons = "BASEFLOW"
+                                ElseIf lCons.StartsWith("EVAP") Then
+                                    lData.Attributes.SetValue("Units", "0.1 mm")
+                                Else 'most other GeoSFM outputs are in mm
+                                    lData.Attributes.SetValue("Units", "mm")
+                                    If lCons.Contains("BASINRUNOFFYIELD") Then
+                                        lCons = "BASINRUNOFF"
+                                    ElseIf lCons.Contains("INTERFLOW") Then
+                                        lCons = "INTERFLOW"
+                                    ElseIf lCons.Contains("BASEFLOW") Then
+                                        lCons = "BASEFLOW"
+                                    End If
                                 End If
                                 lData.Attributes.SetValue("Constituent", lCons)
                                 lData.Attributes.SetValue("Location", lTSAttributes(i))
