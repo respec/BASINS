@@ -88,6 +88,7 @@ Friend Class clsFtnUnfFile
             With lUnfRec
                 .StartPosition = Seek(pFileNum)
                 .Length = FtnUnfSeqRecLen(pFileNum, aFirst)
+                Logger.Progress(.StartPosition, pBytesInFile)
                 'Debug.Print .StartPos, .Len
                 If .Length > 0 Then 'fill in the data
                     ReDim .Record(.Length - 1)
