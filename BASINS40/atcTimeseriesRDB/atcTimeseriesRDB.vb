@@ -583,8 +583,18 @@ Public Class atcTimeseriesRDB
                                 Dim lConstituent As String = lParmCd
                                 Dim lUnits As String = Nothing
                                 Select Case lConstituent
-                                    Case "00045" : lConstituent = "Precipitation" : lUnits = "inches"
-                                    Case "00060" : lConstituent = "Streamflow" : lUnits = "cubic feet per second"
+                                    Case "00045"
+                                        If System.Reflection.Assembly.GetEntryAssembly.Location.Contains("USGSToolbox") Then
+                                            lConstituent = "Precipitation" : lUnits = "inches"
+                                        Else
+                                            lConstituent = "PREC" : lUnits = "in"
+                                        End If
+                                    Case "00060"
+                                        If System.Reflection.Assembly.GetEntryAssembly.Location.Contains("USGSToolbox") Then
+                                            lConstituent = "Streamflow" : lUnits = "cubic feet per second"
+                                        Else
+                                            lConstituent = "FLOW" : lUnits = "cfs"
+                                        End If
                                     Case "61055" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Water level, depth below measuring point, feet 
                                     Case "62611" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Groundwater level above NAVD 1988, feet 
                                     Case "72019" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Depth to water level, feet below land surface 
@@ -596,12 +606,28 @@ Public Class atcTimeseriesRDB
                                 lData.Attributes.SetValue("parm_cd", lParmCd)
                                 lData.Attributes.SetValue("Constituent", lConstituent)
                                 lData.Attributes.SetValue("Description", lConstituentDescription)
+
+                                If lUnits Is Nothing Then
+                                    If lConstituentDescription.ToLower.Contains("cubic feet per second") Then
+                                        lUnits = "cubic feet per second"
+                                    ElseIf lConstituentDescription.Contains("feet") Then
+                                        lUnits = "feet"
+                                    End If
+                                End If
+
                                 If lUnits IsNot Nothing Then
+                                    If System.Reflection.Assembly.GetEntryAssembly.Location.Contains("USGSToolbox") Then
+                                        Select Case lUnits
+                                            Case "ft" : lUnits = "feet"
+                                            Case "cfs" : lUnits = "cubic feet per second"
+                                        End Select
+                                    Else
+                                        Select Case lUnits
+                                            Case "feet" : lUnits = "ft"
+                                            Case "cubic feet per second" : lUnits = "cfs"
+                                        End Select
+                                    End If
                                     lData.Attributes.SetValue("Units", lUnits)
-                                ElseIf lConstituentDescription.ToLower.Contains("cubic feet per second") Then
-                                    lData.Attributes.SetValue("Units", "cubic feet per second")
-                                ElseIf lConstituentDescription.Contains("feet") Then
-                                    lData.Attributes.SetValue("Units", "feet")
                                 End If
 
                                 lStatisticCode = SafeSubstring(.FieldName(lField), 9, 5)
@@ -622,18 +648,18 @@ Public Class atcTimeseriesRDB
                                 lRawDataSets.Add(lDataKey, lData)
                                 lData.Dates.Value(0) = lDate - pJulianInterval
                                 lData.Value(0) = GetNaN()
-                            End If
-                            lTSIndex = lData.Attributes.GetValue("Count") + 1
-                            lData.Value(lTSIndex) = lCurValue
-                            lData.Dates.Value(lTSIndex) = lDate
-                            For Each lCodeChar As String In lQualificationCode
-                                lData.ValueAttributes(lTSIndex).Add(lCodeChar, True)
-                                Dim lAttributeName As String = "ValueAttributeDescription_" & lCodeChar
-                                If Not lData.Attributes.ContainsAttribute(lAttributeName) AndAlso lQualificationCodes.Keys.Contains(lCodeChar) Then
-                                    lData.Attributes.SetValue(lAttributeName, lQualificationCodes.ItemByKey(lCodeChar))
                                 End If
-                            Next
-                            lData.Attributes.SetValue("Count", lTSIndex)
+                                lTSIndex = lData.Attributes.GetValue("Count") + 1
+                                lData.Value(lTSIndex) = lCurValue
+                                lData.Dates.Value(lTSIndex) = lDate
+                                For Each lCodeChar As String In lQualificationCode
+                                    lData.ValueAttributes(lTSIndex).Add(lCodeChar, True)
+                                    Dim lAttributeName As String = "ValueAttributeDescription_" & lCodeChar
+                                    If Not lData.Attributes.ContainsAttribute(lAttributeName) AndAlso lQualificationCodes.Keys.Contains(lCodeChar) Then
+                                        lData.Attributes.SetValue(lAttributeName, lQualificationCodes.ItemByKey(lCodeChar))
+                                    End If
+                                Next
+                                lData.Attributes.SetValue("Count", lTSIndex)
                         End If
                     Next
                 End If

@@ -88,5 +88,6 @@
 <Layer Filename="_a.shp" Name="303d List - Areas" Group="Regulatory" />
 
 <Layer Filename="huc12.shp" Name="12-digit Cataloging Unit Boundaries" Group="Hydrology" Visible="yes" />
+<Layer Filename="SSURGO.shp" Name="SSURGO Soils" Group="Soil, Land Use/Cover" Visible="yes" />
 
 </BasinsDefaultLayers>

@@ -41,14 +41,13 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\..\D4EM\Bin\</OutputPath>
+    <OutputPath>..\..\D4EM\Bin4.0\</OutputPath>
     <DocumentationFile>atcUCI.xml</DocumentationFile>
     <DebugSymbols>True</DebugSymbols>
     <DefineDebug>True</DefineDebug>
     <DefineTrace>True</DefineTrace>
-    <DefineConstants>
-    </DefineConstants>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <UseVSHostingProcess>true</UseVSHostingProcess>
@@ -66,11 +65,35 @@
     <DebugType>none</DebugType>
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\bin-D4EM10\x86Debug\</OutputPath>
+    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
+    <DocumentationFile>atcUCI.xml</DocumentationFile>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>atcUCI.xml</DocumentationFile>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
-    <Reference Include="System.Data" />
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
@@ -82,14 +105,12 @@
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Data" />
-    <Import Include="System.Data.Odbc" />
     <Import Include="System.Diagnostics" />
     <Import Include="System.Drawing" />
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.vb" />
-    <Compile Include="atcMDB.vb" />
     <Compile Include="HspfAddChar2Keyword.vb">
       <SubType>Code</SubType>
     </Compile>
@@ -234,6 +255,7 @@
     <Compile Include="modUciRead.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="modVb2F90.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM10.vbproj">

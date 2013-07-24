@@ -3,6 +3,7 @@ Imports System.IO
 Imports MapWinUtility
 Imports MapWinUtility.Strings
 
+<CLSCompliant(True)> _
 Public Class Channels
     Inherits KeyedCollection(Of String, Channel)
     Private pWatershed As Watershed
@@ -61,6 +62,7 @@ Public Class Channels
     End Function
 End Class
 
+<CLSCompliant(True)> _
 Public Class Channel
     Public Reach As Reach    'reach id
     Public Length As Single    'length

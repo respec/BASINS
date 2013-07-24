@@ -18,13 +18,14 @@ Public Class frmWDM
             RadioAddExisting.Checked = True
         Else
             txtFilenameNew.Text = lFilename
-            Dim lExistingWdmFiles() As String = IO.Directory.GetFiles(aSaveFolder, "*.wdm")
-            If lExistingWdmFiles.Length > 0 Then
-                txtFilenameExisting.Text = lExistingWdmFiles(0)
-                RadioAddExisting.Checked = True
-            Else
-                txtFilenameExisting.Text = ""
-                RadioAddNew.Checked = True
+            txtFilenameExisting.Text = ""
+            RadioAddNew.Checked = True
+            If IO.Directory.Exists(aSaveFolder) Then
+                Dim lExistingWdmFiles() As String = IO.Directory.GetFiles(aSaveFolder, "*.wdm")
+                If lExistingWdmFiles.Length > 0 Then
+                    txtFilenameExisting.Text = lExistingWdmFiles(0)
+                    RadioAddExisting.Checked = True
+                End If
             End If
         End If
 

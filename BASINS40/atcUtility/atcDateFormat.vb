@@ -7,133 +7,82 @@ Public Class atcDateFormat
         JulianDate
     End Enum
 
-    Private pDateOrder As DateOrderEnum = DateOrderEnum.YearMonthDay
-    Private pDateSeparator As String = "/"
-    Private pTimeSeparator As String = ":"
-    Private pIncludeYears As Boolean = True
-    Private pIncludeMonths As Boolean = True
-    Private pIncludeDays As Boolean = True
-    Private pIncludeHours As Boolean = True
-    Private pIncludeMinutes As Boolean = True
-    Private pIncludeSeconds As Boolean = False
-    Private pTwoDigitYears As Boolean = False
-    Private pMonthNames As Boolean = False
+    Public DateOrder As DateOrderEnum = DateOrderEnum.YearMonthDay
+    Public DateSeparator As String = "/"
+    Public DateTimeSeparator As String = " "
+    Public TimeSeparator As String = ":"
+    Public IncludeYears As Boolean = True
+    Public IncludeMonths As Boolean = True
+    Public IncludeDays As Boolean = True
+    Public IncludeHours As Boolean = True
+    Public IncludeMinutes As Boolean = True
+    Public IncludeSeconds As Boolean = False
+    Public TwoDigitYears As Boolean = False
+    Public MonthNames As Boolean = False
     'Private pDateEndInterval As Boolean = True
-    Private pMidnight24 As Boolean = True
-
-    Public Property DateOrder() As DateOrderEnum
-        Get
-            Return pDateOrder
-        End Get
-        Set(ByVal newValue As DateOrderEnum)
-            pDateOrder = newValue
-        End Set
-    End Property
-
-    Public Property DateSeparator() As String
-        Get
-            Return pDateSeparator
-        End Get
-        Set(ByVal newValue As String)
-            pDateSeparator = newValue
-        End Set
-    End Property
-
-    Public Property TimeSeparator() As String
-        Get
-            Return pTimeSeparator
-        End Get
-        Set(ByVal newValue As String)
-            pTimeSeparator = newValue
-        End Set
-    End Property
-
-    Public Property IncludeYears() As Boolean
-        Get
-            Return pIncludeYears
-        End Get
-        Set(ByVal newValue As Boolean)
-            pIncludeYears = newValue
-        End Set
-    End Property
-
-    Public Property IncludeMonths() As Boolean
-        Get
-            Return pIncludeMonths
-        End Get
-        Set(ByVal newValue As Boolean)
-            pIncludeMonths = newValue
-        End Set
-    End Property
-
-    Public Property IncludeDays() As Boolean
-        Get
-            Return pIncludeDays
-        End Get
-        Set(ByVal newValue As Boolean)
-            pIncludeDays = newValue
-        End Set
-    End Property
-
-    Public Property IncludeHours() As Boolean
-        Get
-            Return pIncludeHours
-        End Get
-        Set(ByVal newValue As Boolean)
-            pIncludeHours = newValue
-        End Set
-    End Property
-
-    Public Property IncludeMinutes() As Boolean
-        Get
-            Return pIncludeMinutes
-        End Get
-        Set(ByVal newValue As Boolean)
-            pIncludeMinutes = newValue
-        End Set
-    End Property
-
-    Public Property IncludeSeconds() As Boolean
-        Get
-            Return pIncludeSeconds
-        End Get
-        Set(ByVal newValue As Boolean)
-            pIncludeSeconds = newValue
-        End Set
-    End Property
-
-    Public Property TwoDigitYears() As Boolean
-        Get
-            Return pTwoDigitYears
-        End Get
-        Set(ByVal newValue As Boolean)
-            pTwoDigitYears = newValue
-        End Set
-    End Property
 
     ''' <summary>
     ''' Midnight will be formatted as 24:00 on the previous day if true, will be formatted as 00:00 on the next day if false
     ''' </summary>
-    ''' <value>True to format midnight as 24:00, false to format midnight as 00:00</value>
-    ''' <returns>current setting</returns>
     ''' <remarks>default = True</remarks>
-    Public Property Midnight24() As Boolean
-        Get
-            Return pMidnight24
-        End Get
-        Set(ByVal newValue As Boolean)
-            pMidnight24 = newValue
-        End Set
-    End Property
+    Public Midnight24 As Boolean = True
 
-    Public Property MonthNames() As Boolean
-        Get
-            Return pMonthNames
-        End Get
-        Set(ByVal newValue As Boolean)
-            pMonthNames = newValue
-        End Set
-    End Property
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal aFormat As String)
+        Me.FromString(aFormat)
+    End Sub
+
+    Public Overrides Function ToString() As String
+        Dim lStr As New System.Text.StringBuilder
+        lStr.Append("DateOrder=" & DateOrder.ToString & vbLf)
+        lStr.Append("DateSeparator=" & DateSeparator & vbLf)
+        lStr.Append("DateTimeSeparator=" & DateTimeSeparator & vbLf)
+        lStr.Append("TimeSeparator=" & TimeSeparator & vbLf)
+        lStr.Append("IncludeYears=" & IncludeYears & vbLf)
+        lStr.Append("IncludeMonths=" & IncludeMonths & vbLf)
+        lStr.Append("IncludeDays=" & IncludeDays & vbLf)
+        lStr.Append("IncludeHours=" & IncludeHours & vbLf)
+        lStr.Append("IncludeMinutes=" & IncludeMinutes & vbLf)
+        lStr.Append("IncludeSeconds=" & IncludeSeconds & vbLf)
+        lStr.Append("TwoDigitYears=" & TwoDigitYears & vbLf)
+        lStr.Append("MonthNames=" & MonthNames & vbLf)
+        lStr.Append("Midnight24=" & Midnight24 & vbLf)
+        Return lStr.ToString
+    End Function
+
+    Public Sub FromString(ByVal aDateFormat As String)
+        If Not String.IsNullOrEmpty(aDateFormat) Then
+            Dim lParts() As String = aDateFormat.Split(vbLf)
+            For Each lPart As String In lParts
+                Try
+                    Dim lNameValue() As String = lPart.Split("=")
+                    If lNameValue.Length = 2 Then
+                        Select Case lNameValue(0)
+                            Case "DateOrder" : DateOrder = [Enum].Parse(DateOrder.GetType, lNameValue(1))
+                            Case "DateSeparator" : DateSeparator = lNameValue(1)
+                            Case "DateTimeSeparator" : DateTimeSeparator = lNameValue(1)
+                            Case "TimeSeparator" : TimeSeparator = lNameValue(1)
+                            Case "IncludeYears" : Boolean.TryParse(lNameValue(1), IncludeYears)
+                            Case "IncludeMonths" : Boolean.TryParse(lNameValue(1), IncludeMonths)
+                            Case "IncludeDays" : Boolean.TryParse(lNameValue(1), IncludeDays)
+                            Case "IncludeHours" : Boolean.TryParse(lNameValue(1), IncludeHours)
+                            Case "IncludeMinutes" : Boolean.TryParse(lNameValue(1), IncludeMinutes)
+                            Case "IncludeSeconds" : Boolean.TryParse(lNameValue(1), IncludeSeconds)
+                            Case "TwoDigitYears" : Boolean.TryParse(lNameValue(1), TwoDigitYears)
+                            Case "MonthNames" : Boolean.TryParse(lNameValue(1), MonthNames)
+                            Case "Midnight24" : Boolean.TryParse(lNameValue(1), Midnight24)
+                            Case Else
+                                MapWinUtility.Logger.Dbg("Date format part not known '" & lPart & "'")
+                        End Select
+                    End If
+                Catch
+                    MapWinUtility.Logger.Dbg("Could not parse date format part '" & lPart & "'")
+                End Try
+            Next
+        End If
+    End Sub
 
     Public Function JDateToString(ByVal aJulianDate As Double) As String
         Dim lRetval As String = ""
@@ -148,73 +97,73 @@ Public Class atcDateFormat
                 lCurDate(3) = 0
             End If
 
-            If pMidnight24 Then 'convert to 24th hour previous day
+            If Midnight24 Then 'convert to 24th hour previous day
                 timcnv(lCurDate)
             End If
 
-            Select Case pDateOrder
+            Select Case DateOrder
                 Case DateOrderEnum.YearMonthDay
-                    If pIncludeYears Then
+                    If IncludeYears Then
                         lRetval = YearString(lCurDate)
                     End If
-                    If pIncludeMonths Then
-                        If pIncludeYears Then
-                            lRetval &= pDateSeparator
+                    If IncludeMonths Then
+                        If IncludeYears Then
+                            lRetval &= DateSeparator
                         End If
                         lRetval &= MonthString(lCurDate)
                     End If
-                    If pIncludeDays Then
-                        If pIncludeYears OrElse pIncludeMonths Then
-                            lRetval &= pDateSeparator
+                    If IncludeDays Then
+                        If IncludeYears OrElse IncludeMonths Then
+                            lRetval &= DateSeparator
                         End If
                         lRetval &= Format(lCurDate(2), "00")
                     End If
                 Case DateOrderEnum.MonthDayYear
-                    If pIncludeMonths Then
+                    If IncludeMonths Then
                         lRetval &= MonthString(lCurDate)
                     End If
-                    If pIncludeDays Then
-                        If pIncludeMonths Then
-                            lRetval &= pDateSeparator
+                    If IncludeDays Then
+                        If IncludeMonths Then
+                            lRetval &= DateSeparator
                         End If
                         lRetval &= Format(lCurDate(2), "00")
                     End If
-                    If pIncludeYears Then
-                        If pIncludeDays OrElse pIncludeMonths Then
-                            lRetval &= pDateSeparator
+                    If IncludeYears Then
+                        If IncludeDays OrElse IncludeMonths Then
+                            lRetval &= DateSeparator
                         End If
                         lRetval &= YearString(lCurDate)
                     End If
                 Case DateOrderEnum.DayMonthYear
-                    If pIncludeDays Then
+                    If IncludeDays Then
                         lRetval &= Format(lCurDate(2), "00")
                     End If
-                    If pIncludeMonths Then
-                        If pIncludeDays Then
-                            lRetval &= pDateSeparator
+                    If IncludeMonths Then
+                        If IncludeDays Then
+                            lRetval &= DateSeparator
                         End If
                         lRetval &= MonthString(lCurDate)
                     End If
-                    If pIncludeYears Then
-                        If pIncludeDays OrElse pIncludeMonths Then
-                            lRetval &= pDateSeparator
+                    If IncludeYears Then
+                        If IncludeDays OrElse IncludeMonths Then
+                            lRetval &= DateSeparator
                         End If
                         lRetval &= YearString(lCurDate)
                     End If
                 Case DateOrderEnum.JulianDate
                     lRetval = StrPad(DoubleToString(aJulianDate, 9, "00,000.000", , , 8), 10)
             End Select
-            If pIncludeHours OrElse pIncludeMinutes OrElse pIncludeSeconds Then
-                lRetval &= " "
+            If IncludeHours OrElse IncludeMinutes OrElse IncludeSeconds AndAlso lRetval.Length > 0 Then
+                lRetval &= DateTimeSeparator
             End If
-            If pIncludeHours Then
+            If IncludeHours Then
                 lRetval &= Format(lCurDate(3), "00")
             End If
-            If pIncludeMinutes Then
-                lRetval &= pTimeSeparator & Format(lCurDate(4), "00")
+            If IncludeMinutes Then
+                lRetval &= TimeSeparator & Format(lCurDate(4), "00")
             End If
-            If pIncludeSeconds Then
-                lRetval &= pTimeSeparator & Format(lCurDate(5), "00")
+            If IncludeSeconds Then
+                lRetval &= TimeSeparator & Format(lCurDate(5), "00")
             End If
         End If
 
@@ -222,7 +171,7 @@ Public Class atcDateFormat
     End Function
 
     Private Function YearString(ByVal aDate() As Integer) As String
-        If pTwoDigitYears Then
+        If TwoDigitYears Then
             Return Right(CStr(aDate(0)), 2)
         Else
             Return Format(aDate(0), "0000")
@@ -230,7 +179,7 @@ Public Class atcDateFormat
     End Function
 
     Private Function MonthString(ByVal aDate() As Integer) As String
-        If pMonthNames Then
+        If MonthNames Then
             Return MonthName3(aDate(1))
         Else
             Return Format(aDate(1), "00")
