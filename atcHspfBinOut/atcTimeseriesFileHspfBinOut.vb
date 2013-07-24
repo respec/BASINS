@@ -18,6 +18,7 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Private pFilter As String = "HSPF Binary Output Files (*.hbn)|*.hbn"
     Private pName As String = "Timeseries::HSPF Binary Output"
+    Private Shared pNaN As Double = GetNaN()
 
     Private pBinFile As HspfBinary
 
@@ -75,101 +76,106 @@ Public Class atcTimeseriesFileHspfBinOut
         pBinFile.Filename = Specification
 
         Try
+            Dim lNumBinHeaders As Integer = pBinFile.Headers.Count
             If DebugLevel > 0 Then
-                Logger.Dbg("Parse " & pBinFile.Headers.Count & " Headers")
+                Logger.Dbg("Parse " & lNumBinHeaders & " Headers")
             End If
+            Dim lFileAttributes As New atcDataAttributes
+            With lFileAttributes
+                .SetValue("CIntvl", True)
+                .SetValue("History 1", "Read from " & pBinFile.Filename)
+                Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(pBinFile.Filename)
+                .SetValue("Date Created", lFileDetails.CreationTime)
+                .SetValue("Date Modified", lFileDetails.LastWriteTime)
+                .SetValue("IDSCEN", IO.Path.GetFileNameWithoutExtension(Specification))
+            End With
             Dim lHeaderIndex As Integer = 0
-            Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
+            'Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
             For Each lBinHeader As HspfBinaryHeader In pBinFile.Headers
                 With lBinHeader
                     Dim lData As HspfBinaryDatum = .Data.Item(0)
-                    lSJDate = Date2J(lData.DateArray)
-                    lOutLev = lData.OutLev
+                    Dim lDates As New atcTimeseries(Me)
+                    lDates.Attributes.SetValue("Shared", True)
+                    'lSJDate = lData.JDate
+                    'lOutLev = lData.OutLev
                     Dim lDataIndex As Integer
-                    If .Data.Count = 1 Then
-                        lDataIndex = 1 'force daily
-                    Else
-                        lDataIndex = 1
-                        While lOutLev <> .Data.Item(lDataIndex).OutLev And lHeaderIndex < .Data.Count 'looking for same outlev
-                            lDataIndex += 1
-                        End While
-                    End If
-                    If lDataIndex < .Data.Count Then
-                        lData = .Data.Item(lDataIndex)
-                        lEJDate = Date2J(lData.DateArray)
-                    Else 'only one value dont know what interval is, assume day
-                        lEJDate = lSJDate + 1
-                    End If
+                    'If .Data.Count = 1 Then
+                    '    lDataIndex = 1 'force daily
+                    'Else
+                    '    lDataIndex = 1
+                    '    While lOutLev <> .Data.Item(lDataIndex).OutLev And lHeaderIndex < .Data.Count 'looking for same outlev
+                    '        lDataIndex += 1
+                    '    End While
+                    'End If
+                    'If lDataIndex < .Data.Count Then
+                    '    lData = .Data.Item(lDataIndex)
+                    '    lEJDate = lData.JDate
+                    'Else 'only one value dont know what interval is, assume day
+                    '    lEJDate = lSJDate + 1
+                    'End If
 
                     'attributes related to dates common to all in ts in a header 
-                    Dim lTu As Integer, lTs As Integer, lIntvl As Integer
+                    'Dim lTu As Integer, lTs As Integer, lIntvl As Integer
                     Dim lBaseAttributes As atcDataAttributes = New atcDataAttributes
                     With lBaseAttributes
-                        .SetValue("CIntvl", True)
-                        .SetValue("History 1", "Read from " & pBinFile.Filename)
-                        Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(pBinFile.Filename)
-                        .SetValue("Date Created", lFileDetails.CreationTime)
-                        .SetValue("Date Modified", lFileDetails.LastWriteTime)
-                        If lEJDate - lSJDate >= 1 Then 'daily or longer interval
-                            lTs = 1
-                            lTu = lBinHeader.Data.Item(0).OutLev + 1
-                            lIntvl = 1
-                            'If lTu = ATCTimeUnit.TUDay Then
-                            'Else 'undefined for monthly or annual
-                            'End If
-                        Else 'use minute
-                            lTu = atcTimeUnit.TUMinute
-                            lTs = timdifJ(lSJDate, lEJDate, atcTimeUnit.TUMinute, 1)
-                            lIntvl = lTs / 1440
-                        End If
-                        If lTs < 1 Then
-                            Logger.Dbg("TimestepProblem:" & lSJDate & ":" & lEJDate & ":" & lTu & ":" & lTs & ":" & _
-                                       lBinHeader.Id.OperationName & ":" & _
-                                       lBinHeader.Id.OperationNumber & ":" & _
-                                       lBinHeader.Id.SectionName)
-                            lTs = 1
-                        End If
-                        .SetValue("Ts", lTs)
-                        .SetValue("Tu", lTu)
-                        .SetValue("Intvl", lIntvl)
-                        Dim lTDate() As Integer = lBinHeader.Data.Item(0).DateArray
-                        lSJDate = TimAddJ(Date2J(lTDate), lTu, lTs, -lIntvl)
-                        .SetValue("SJDay", lSJDate)
-                        lTDate = lBinHeader.Data.Item(lBinHeader.Data.Count - 1).DateArray
-                        lEJDate = Date2J(lTDate)
-                        .SetValue("EJDay", lEJDate)
+                        'If lEJDate - lSJDate >= 1 Then 'daily or longer interval
+                        '    lTs = 1
+                        '    lTu = lBinHeader.Data.Item(0).OutLev + 1
+                        '    lIntvl = 1
+                        '    'If lTu = ATCTimeUnit.TUDay Then
+                        '    'Else 'undefined for monthly or annual
+                        '    'End If
+                        'Else 'use minute
+                        '    lTu = atcTimeUnit.TUMinute
+                        '    lTs = timdifJ(lSJDate, lEJDate, atcTimeUnit.TUMinute, 1)
+                        '    lIntvl = lTs / 1440
+                        'End If
+                        'If lTs < 1 Then
+                        '    Logger.Dbg("TimestepProblem:" & lSJDate & ":" & lEJDate & ":" & lTu & ":" & lTs & ":" & _
+                        '               lBinHeader.Id.OperationName & ":" & _
+                        '               lBinHeader.Id.OperationNumber & ":" & _
+                        '               lBinHeader.Id.SectionName)
+                        '    lTs = 1
+                        'End If
+                        '.SetValue("Ts", lTs)
+                        '.SetValue("Tu", lTu)
+                        '.SetValue("Intvl", lIntvl)
+                        'lSJDate = TimAddJ(lBinHeader.Data.Item(0).JDate, lTu, lTs, -lIntvl)
+                        .ChangeTo(lFileAttributes)
+                        .SetValue("SJDay", lBinHeader.Data.Item(0).JDate)
+                        .SetValue("EJDay", lBinHeader.Data.Item(lBinHeader.Data.Count - 1).JDate)
+                        .SetValue("Operation+Section", lBinHeader.Id.AsKey)
+                        .SetValue("IDLOCN", Left(lBinHeader.Id.OperationName, 1) & ":" & (lBinHeader.Id.OperationNumber))
                     End With
-
-                    For lDataIndex = 0 To .VarNames.Count - 1
+                    Dim lLastVarNameIndex As Integer = .VarNames.Count - 1
+                    For lDataIndex = 0 To lLastVarNameIndex
                         Dim lTSer As atcTimeseries = New atcTimeseries(Me)
-                        For Each lAttributeName As DictionaryEntry In lBaseAttributes.ValuesSortedByName
-                            With lBaseAttributes
-                                lTSer.Attributes.SetValue(atcDataAttributes.GetDefinition(lAttributeName.Key), lAttributeName.Value)
-                            End With
-                        Next
+                        lTSer.Attributes.SetValue("SharedAttributes", lBaseAttributes)
+                        'For Each lFileAttribute As atcDefinedValue In lFileAttributes
+                        '    lTSer.Attributes.Add(lFileAttribute)
+                        'Next
+                        'For Each lBaseAttribute As atcDefinedValue In lBaseAttributes
+                        '    lTSer.Attributes.Add(lBaseAttribute)
+                        'Next
                         With lTSer
-                            .Attributes.SetValue("Operation", lBinHeader.Id.OperationName)
-                            .Attributes.SetValue("Section", lBinHeader.Id.SectionName)
-                            .Attributes.SetValue("IDSCEN", IO.Path.GetFileNameWithoutExtension(Specification))
-                            .Attributes.SetValue("IDLOCN", Left(lBinHeader.Id.OperationName, 1) & ":" & (lBinHeader.Id.OperationNumber))
-                            Dim lConstituent As String = lBinHeader.VarNames.ItemByIndex(lDataIndex)
+                            Dim lConstituent As String = lBinHeader.VarNames.Item(lDataIndex)
                             .Attributes.SetValue("IDCONS", lConstituent)
                             Dim lUnitSystem As atcUnitSystem = CType(CType(lBinHeader.Data(0), HspfBinaryDatum).UnitFlag, atcUnitSystem)
                             .Attributes.SetValue("UNITS", GetUnits(lConstituent, lUnitSystem))
                             .Attributes.SetValue("ID", Me.DataSets.Count)
-                            If lBinHeader.VarNames.ItemByIndex(lDataIndex) = "LZS" Then 'TODO: need better check here
+                            If lConstituent = "LZS" Then 'TODO: need better check here
                                 .Attributes.SetValue("Point", True)
                             End If
                             .ValuesNeedToBeRead = True
-                            .Dates = New atcTimeseries(Me)
-                            .SetInterval(lTu, lTs)
+                            '.SetInterval(lTu, lTs)
+                            .Dates = lDates
                             AddDataSet(lTSer)
                         End With
                     Next lDataIndex
                 End With
                 lHeaderIndex += 1
                 'Logger.Dbg("Loop " & i)
-                Logger.Progress(pBinFile.Headers.Count + lHeaderIndex, pBinFile.Headers.Count * 2)
+                Logger.Progress(lNumBinHeaders / 2 + lHeaderIndex / 2, lNumBinHeaders)
             Next
         Catch ex As ApplicationException
             Logger.Dbg(ex.Message)
@@ -281,32 +287,51 @@ Public Class atcTimeseriesFileHspfBinOut
     End Function
 
     Public Overrides Sub ReadData(ByVal aDataSet As atcDataSet)
-        Dim lValues As New Generic.List(Of Double)
-        Dim lJDates As New Generic.List(Of Double)
-
         Dim lTimeseries As atcTimeseries = aDataSet
         lTimeseries.ValuesNeedToBeRead = False
-        Dim lKey As String = lTimeseries.Attributes.GetValue("Operation") & ":" & _
-                             Mid(lTimeseries.Attributes.GetValue("IDLOCN"), 3) & ":" & _
-                             lTimeseries.Attributes.GetValue("Section")
-
+        Dim lKey As String = lTimeseries.Attributes.GetValue("Operation+Section", "unk")
+        Dim lNeedToClose As Boolean = pBinFile.Open(False)
+        Dim lNeedDates As Boolean = lTimeseries.Dates.numValues < 1
+        Dim lValues As New Generic.List(Of Double)
+        Dim lJDates As Generic.List(Of Double) = Nothing
+        If lNeedDates Then lJDates = New Generic.List(Of Double)
+        Dim lTimeUnit As atcTimeUnit = atcTimeUnit.TUUnknown
+        Dim lTimeStep As Integer = 1
         Try
             Dim lBinHeader As HspfBinaryHeader = pBinFile.Headers(lKey)
             With lBinHeader
-                Dim lVariableIndex As Integer = .VarNames.IndexFromKey(lTimeseries.Attributes.GetValue("IDCONS"))
+                Dim lVariableIndex As Integer = .VarNames.IndexOf(lTimeseries.Attributes.GetValue("IDCONS"))
                 If lVariableIndex >= 0 Then
-                    Dim lSJday As Integer = lTimeseries.Attributes.GetValue("SJDay")
-                    Dim lEJday As Integer = lTimeseries.Attributes.GetValue("EJDay")
+                    Dim lSJday As Double = lTimeseries.Attributes.GetValue("SJDay")
+                    Dim lEJday As Double = lTimeseries.Attributes.GetValue("EJDay")
                     Dim lOutLev As Integer = .Data.Item(0).OutLev
-                    lJDates.Add(lSJday)
-                    lValues.Add(GetNaN)
+                    Dim lShared As atcDataAttributes = Nothing
+                    If lNeedDates Then lJDates.Add(lSJday)
+                    lValues.Add(pNaN)
                     For Each lHspfBinaryDatum As HspfBinaryDatum In .Data
-                        Dim lCurJday As Double = Date2J(lHspfBinaryDatum.DateArray)
+                        Dim lCurJday As Double = lHspfBinaryDatum.JDate
                         If lCurJday >= lSJday Then
                             If lCurJday > lEJday Then Exit For
                             If lHspfBinaryDatum.OutLev = lOutLev Then
-                                lValues.Add(lHspfBinaryDatum.Value(lVariableIndex))
-                                lJDates.Add(lCurJday)
+                                lValues.Add(pBinFile.ReadValue(lHspfBinaryDatum.ValuesStartPosition, lVariableIndex))
+                                If lNeedDates Then
+                                    lJDates.Add(lCurJday)
+                                    If lJDates.Count = 3 Then 'Compute beginning of first interval
+                                        CalcTimeUnitStep(lJDates(1), lJDates(2), lTimeUnit, lTimeStep)
+                                        lJDates(0) = TimAddJ(lJDates(1), lTimeUnit, lTimeStep, -1)
+                                        lTimeseries.SetInterval(lTimeUnit, lTimeStep)
+                                        If lTimeUnit <> atcTimeUnit.TUUnknown Then
+                                            lShared = lTimeseries.Attributes.GetValue("SharedAttributes")
+                                            If lShared IsNot Nothing Then
+                                                lShared.SetValue("Time Step", lTimeStep)
+                                                lShared.SetValue("Time Unit", lTimeUnit)
+                                                If lTimeseries.Attributes.ContainsAttribute("Interval") Then
+                                                    lShared.SetValue("Interval", lTimeseries.Attributes.GetValue("Interval"))
+                                                End If
+                                            End If
+                                        End If
+                                    End If
+                                End If
                             End If
                         End If
                     Next
@@ -316,13 +341,72 @@ Public Class atcTimeseriesFileHspfBinOut
             End With
         Catch ex As Exception
             Logger.Dbg("Could not retrieve data values for HSPF Binary TSER" & "Key = " & lKey & vbCrLf & _
-                       "Message:" & ex.Message)
+                       "Message:" & ex.ToString)
+        Finally
+            If lNeedToClose Then pBinFile.Close(False)
         End Try
         With lTimeseries
-            .Dates.Values = lJDates.ToArray
+            If lNeedDates Then
+                Dim lNumValues As Integer = lJDates.Count - 1
+                Dim lMatchingDates As atcTimeseries = Nothing
+                'Search for existing Dates that exactly match these so we can share that one and save memory
+                For Each lOtherTimeseries As atcTimeseries In DataSets
+                    If Not lOtherTimeseries.ValuesNeedToBeRead Then
+                        Dim lOtherDates As atcTimeseries = lOtherTimeseries.Dates
+                        If lOtherDates.Serial <> .Dates.Serial AndAlso lOtherDates.numValues = lNumValues Then
+                            lMatchingDates = lOtherDates
+                            For lDateIndex As Integer = lNumValues To 1 Step -1
+                                If lOtherDates.Value(lDateIndex) <> lJDates(lDateIndex) Then
+                                    lMatchingDates = Nothing
+                                    Exit For
+                                End If
+                            Next
+                            If lMatchingDates IsNot Nothing Then Exit For
+                        End If
+                    End If
+                Next
+                If lMatchingDates Is Nothing Then
+                    'Found a new set of dates, use them
+                    .Dates.Values = lJDates.ToArray
+                Else 'Already have these Dates, re-use them for all timeseries sharing this header
+                    Dim lDisposingDates As atcTimeseries = .Dates
+                    For Each lOtherTimeseries As atcTimeseries In DataSets
+                        If lOtherTimeseries.Attributes.GetValue("Operation+Section", "") = lKey Then
+                            lOtherTimeseries.Dates = lMatchingDates
+                            If lTimeUnit <> atcTimeUnit.TUUnknown Then
+                                Dim lShared As atcDataAttributes = lOtherTimeseries.Attributes.GetValue("SharedAttributes")
+                                If lShared Is Nothing Then
+                                    lOtherTimeseries.SetInterval(lTimeUnit, lTimeStep)
+                                Else
+                                    lShared.SetValue("Time Step", lTimeStep)
+                                    lShared.SetValue("Time Unit", lTimeUnit)
+                                    If lTimeseries.Attributes.ContainsAttribute("Interval") Then
+                                        lShared.SetValue("Interval", lTimeseries.Attributes.GetValue("Interval"))
+                                    End If
+                                End If
+                            End If
+                        End If
+                    Next
+                    lDisposingDates.Clear()
+                End If
+            End If
+
+            'Setting .Values below will clear calculated attributes, but we want to preserve them.
+            Dim lPreserveCalculated As New Generic.List(Of atcDefinedValue)
+            For Each lAttribute As atcDefinedValue In .Attributes
+                If lAttribute.Definition.Calculated Then
+                    lPreserveCalculated.Add(lAttribute)
+                End If
+            Next
+
             .Values = lValues.ToArray
+
+            For Each lAttribute As atcDefinedValue In lPreserveCalculated
+                .Attributes.Add(lAttribute)
+            Next
+
             If (.Attributes.GetValue("Point", False)) Then
-                .Values(0) = GetNaN()
+                .Values(0) = pNaN
             Else
                 .Values(0) = lValues(1)
             End If
@@ -335,21 +419,15 @@ Public Class atcTimeseriesFileHspfBinOut
     End Sub
 
     Public Function RemoveTimSer(ByVal aTimeseries As atcTimeseries) As Boolean
-        Logger.Dbg("Unable to Remove Time Series " & aTimeseries.ToString & vbCrLf & _
-                   "From:" & Specification)
-        Return False
+        Throw New ApplicationException("Unable to Remove Time Series " & aTimeseries.ToString & vbCrLf & "From:" & Specification)
     End Function
 
     Public Function RewriteTimSer(ByVal aTimeseries As atcTimeseries) As Boolean
-        Logger.Dbg("Unable to Rewrite Time Series " & aTimeseries.ToString & vbCrLf & _
-                   "From:" & Specification)
-        Return False
+        Throw New ApplicationException("Unable to Rewrite Time Series " & aTimeseries.ToString & vbCrLf & "From:" & Specification)
     End Function
 
     Public Function SaveAs(ByVal aFilename As String) As Boolean
-        Logger.Dbg("Unable to SaveAs " & aFilename & vbCrLf & _
-                   "From:" & Specification)
-        Return False
+        Throw New ApplicationException("Unable to SaveAs " & aFilename & vbCrLf & "From:" & Specification)
     End Function
 
     Public Overrides ReadOnly Property Name() As String

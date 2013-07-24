@@ -12,23 +12,40 @@ Public Class atcDataAttributes
     Inherits atcCollection
 
     Private pOwner As Object 'atcTimeseries
-    Private Shared pAllAliases As atcCollection     'of String, so more than one AttributeName can map to the same attribute
-    Private Shared pAllDefinitions As atcCollection 'of atcAttributeDefinition
+
+    ''' <summary>Attribute Name Aliases</summary>
+    Private Shared pAllAliases As Generic.SortedList(Of String, String) = InitAliases()
+
+    ''' <summary>All of the atcAttributeDefinitions in use</summary>
+    Private Shared pAllDefinitions As atcCollection = InitDefinitions()
+
+    ''' <summary>Format to use for dates in GetFormattedValue</summary>
     Private Shared pDateFormat As New atcDateFormat
 
-    'Returns preferred alias of the given attribute name, or returns given attribute name unchanged if there is no preferred alias
+    ''' <summary>Get the preferred alias of the given attribute name</summary>
+    ''' <param name="aAttributeName">name to search for an alias of</param>
+    ''' <returns>preferred alias</returns>
+    ''' <remarks>returns given attribute name unchanged if there is no preferred alias</remarks>
     Public Shared Function PreferredName(ByRef aAttributeName As String) As String
-        Dim lAlias As String = pAllAliases.ItemByKey(aAttributeName.ToLower)
-        If lAlias IsNot Nothing Then 'We have a preferred alias for this name
+        If String.IsNullOrEmpty(aAttributeName) Then
+            aAttributeName = "Nothing"
+        End If
+        Dim lNameLower As String = aAttributeName.ToLower
+        Dim lAlias As String = Nothing
+        If pAllAliases.TryGetValue(lNameLower, lAlias) Then 'We have a preferred alias for this name
             aAttributeName = lAlias
-        ElseIf aAttributeName.Length = 6 _
-            AndAlso (aAttributeName.Substring(0, 1).ToUpper = "H" OrElse aAttributeName.Substring(0, 1).ToUpper = "L") _
-            AndAlso IsNumeric(aAttributeName.Substring(1)) Then
-            If aAttributeName.Substring(0, 1).ToUpper = "L" Then                
-                aAttributeName = CInt(aAttributeName.Substring(1, 2)) & "Low" & CInt(aAttributeName.Substring(3))
-                If aAttributeName = "7Low10" Then aAttributeName = "7Q10"
-            Else
-                aAttributeName = CInt(aAttributeName.Substring(1, 2)) & "High" & CInt(aAttributeName.Substring(3))
+        Else
+            If aAttributeName.Length = 6 Then 'Check for high/low attribute names
+                Dim lFirstChar As String = aAttributeName.Substring(0, 1).ToUpper
+                If (lFirstChar = "H" OrElse lFirstChar = "L") _
+                   AndAlso IsNumeric(aAttributeName.Substring(1)) Then
+                    If lFirstChar = "L" Then
+                        aAttributeName = CInt(aAttributeName.Substring(1, 2)) & "Low" & CInt(aAttributeName.Substring(3))
+                        If aAttributeName = "7Low10" Then aAttributeName = "7Q10"
+                    Else
+                        aAttributeName = CInt(aAttributeName.Substring(1, 2)) & "High" & CInt(aAttributeName.Substring(3))
+                    End If
+                End If
             End If
         End If
         Return aAttributeName
@@ -45,20 +62,19 @@ Public Class atcDataAttributes
     End Function
 
     Public Shared Function AddDefinition(ByVal aDefinition As atcAttributeDefinition) As atcAttributeDefinition
-        Dim lKey As String = AttributeNameToKey(aDefinition.Name)
-        If lKey.Length = 0 Then
-            Logger.Dbg("WhyNoKey?")
-        End If
-        Dim lAddDefinition As atcAttributeDefinition
-        If Not pAllDefinitions.Keys.Contains(lKey) Then
-            aDefinition.Name = PreferredName(aDefinition.Name)
-            pAllDefinitions.Add(lKey, aDefinition)
-            lAddDefinition = aDefinition
-        ElseIf aDefinition.Calculated Then
-            pAllDefinitions.ItemByKey(lKey) = aDefinition
-            lAddDefinition = aDefinition
-        Else
-            lAddDefinition = pAllDefinitions.ItemByKey(lKey)
+        Dim lAddDefinition As atcAttributeDefinition = Nothing
+        If aDefinition IsNot Nothing Then
+            Dim lKey As String = AttributeNameToKey(aDefinition.Name)
+            If Not pAllDefinitions.Keys.Contains(lKey) Then
+                aDefinition.Name = PreferredName(aDefinition.Name)
+                pAllDefinitions.Add(lKey, aDefinition)
+                lAddDefinition = aDefinition
+            ElseIf aDefinition.Calculated Then
+                pAllDefinitions.ItemByKey(lKey) = aDefinition
+                lAddDefinition = aDefinition
+            Else
+                lAddDefinition = pAllDefinitions.ItemByKey(lKey)
+            End If
         End If
         Return lAddDefinition
     End Function
@@ -136,18 +152,38 @@ Public Class atcDataAttributes
         End Set
     End Property
 
-    'Returns the names (as keys) and values of all attributes that are set. (sorted by name)
+    ''' <summary>
+    ''' The names (as keys) and values of all attributes that are set. (sorted by name)
+    ''' </summary>
     Public Function ValuesSortedByName() As SortedList
         Dim lSortedList As New SortedList(New CaseInsensitiveComparer)
         For Each lAdv As atcDefinedValue In Me
-            lSortedList.Add(lAdv.Definition.Name, lAdv.Value)
+            If lAdv.Definition.Name <> "SharedAttributes" Then
+                lSortedList.Add(lAdv.Definition.Name, lAdv.Value)
+            End If
         Next
+        Dim lShared As atcDataAttributes = GetValue("SharedAttributes")
+        If lShared IsNot Nothing Then
+            For Each lSharedAtt As atcDefinedValue In lShared
+                If Not lSortedList.ContainsKey(lSharedAtt.Definition.Name) Then
+                    lSortedList.Add(lSharedAtt.Definition.Name, lSharedAtt.Value)
+                End If
+            Next
+        End If
         Return lSortedList
     End Function
 
     'True if aAttributeName has been set
     Public Function ContainsAttribute(ByVal aAttributeName As String) As Boolean
-        Return Keys.Contains(AttributeNameToKey(aAttributeName))
+        Dim lKey As String = AttributeNameToKey(aAttributeName)
+        If Keys.Contains(lKey) Then
+            Return True
+        End If
+        Dim lSharedAttributes As atcDataAttributes = GetValue("SharedAttributes")
+        If lSharedAttributes IsNot Nothing Then
+            Return lSharedAttributes.Keys.Contains(lKey)
+        End If
+        Return False
     End Function
 
     Public Function GetFormattedValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As String
@@ -225,14 +261,11 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
     'Retrieve or calculate the value for aAttributeName
     'returns aDefault if attribute has not been set and cannot be calculated
     Public Function GetValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = Nothing) As Object
-        Dim lDefinedValue As atcDefinedValue
+        Dim lDefinedValue As atcDefinedValue = Nothing
         Try
             lDefinedValue = GetDefinedValue(aAttributeName)
         Catch  'Could not find 
-
-            'TODO: Try to calculate attribute?
-
-            Return aDefault 'Not found and could not calculate
+            Return aDefault
         End Try
 
         If lDefinedValue Is Nothing Then
@@ -310,105 +343,129 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         End If
     End Function
 
+    Private Shared Function InitDefinitions() As atcCollection
+        Dim lDefinitions As New atcCollection
+        Dim lDef As New atcAttributeDefinition
+        lDef.Name = "Units"
+        lDef.TypeString = "String"
+        lDef.CopiesInherit = True
+        lDef.Editable = True
+        'lUnitsDef.ValidList = GetAllUnitsInCategory("all")
+        lDefinitions.Add(lDef.Name.ToLower, lDef)
+
+        lDef = New atcAttributeDefinition
+        lDef.Name = "ID"
+        lDef.TypeString = "Integer"
+        lDef.CopiesInherit = True
+        lDef.Editable = False
+        lDefinitions.Add(lDef.Name.ToLower, lDef)
+
+        lDef = New atcAttributeDefinition
+        lDef.Name = "Time Unit"
+        lDef.TypeString = "atcTimeUnit"
+        lDef.CopiesInherit = True
+        lDef.Editable = False
+        lDefinitions.Add(lDef.Name.ToLower, lDef)
+
+        lDef = New atcAttributeDefinition
+        lDef.Name = "Time Step"
+        lDef.TypeString = "Integer"
+        lDef.CopiesInherit = True
+        lDef.Editable = False
+        lDefinitions.Add(lDef.Name.ToLower, lDef)
+
+        lDef = New atcAttributeDefinition
+        lDef.Name = "Data Source"
+        lDef.TypeString = "String"
+        lDef.CopiesInherit = False
+        lDef.Editable = False
+        lDefinitions.Add(lDef.Name.ToLower, lDef)
+
+        Return lDefinitions
+    End Function
+
+    Private Shared Function InitAliases() As Generic.SortedList(Of String, String)
+        Dim lAliases As New Generic.SortedList(Of String, String) 'of alias and internal name
+        With lAliases
+            .Add("sen", "Scenario")
+            .Add("scen", "Scenario")
+            .Add("idscen", "Scenario")
+
+            .Add("loc", "Location")
+            .Add("locn", "Location")
+            .Add("idlocn", "Location")
+
+            .Add("con", "Constituent")
+            .Add("cons", "Constituent")
+            .Add("idcons", "Constituent")
+
+            .Add("desc", "Description")
+            .Add("descrp", "Description")
+
+            '.Add("stanam", "Station Name")  'Add this when WDM code can handle it - mhg
+
+            .Add("long filename", "FileName")
+            .Add("path", "FileName")
+
+            .Add("ts", "Time Step")
+            .Add("timestep", "Time Step")
+            .Add("timesteps", "Time Step")
+            .Add("time steps", "Time Step")
+
+            .Add("tu", "Time Unit")
+            .Add("timeunit", "Time Unit")
+            .Add("timeunits", "Time Unit")
+            .Add("time units", "Time Unit")
+
+            .Add("dsn", "ID")
+
+            .Add("datcre", "Date Created")
+            .Add("datmod", "Date Modified")
+
+            .Add("sjday", "Start Date")
+            .Add("ejday", "End Date")
+
+            .Add("latdeg", "Latitude")
+            .Add("lngdeg", "Longitude")
+            .Add("dec_lat_va", "Latitude")
+            .Add("dec_long_va", "Longitude")
+            .Add("elev", "Elevation")
+            .Add("alt_va", "Elevation")
+
+            .Add("skewcf", "Skew")
+            .Add("stddev", "Standard Deviation")
+            .Add("meanvl", "Mean")
+            .Add("minval", "Min")
+            .Add("minimum", "Min")
+            .Add("maxval", "Max")
+            .Add("maximum", "Max")
+            .Add("nonzro", "Count Positive")
+            .Add("numzro", "Count Zero")
+
+            .Add("7low10", "7Q10")
+            .Add("datasource", "Data Source")
+            .Add("darea", "Drainage Area")
+            .Add("drain_area_va", "Drainage Area")
+
+            'Also add lowercase version of all preferred names as keys
+            Dim lAllPreferredNames As New Generic.SortedList(Of String, String)
+            For Each lPreferredName As String In lAliases.Values
+                Dim lLowerName As String = lPreferredName.ToLower
+                If Not lAllPreferredNames.ContainsKey(lLowerName) Then
+                    lAllPreferredNames.Add(lLowerName, lPreferredName)
+                End If
+            Next
+            For Each lPreferredKey As String In lAllPreferredNames.Keys
+                If Not .ContainsKey(lPreferredKey) Then
+                    .Add(lPreferredKey, lAllPreferredNames.Item(lPreferredKey))
+                End If
+            Next
+        End With
+        Return lAliases
+    End Function
+
     Public Sub New() 'ByVal aTimeseries As atcTimeseries)
         MyBase.Clear()
-
-        If pAllDefinitions Is Nothing Then
-            pAllDefinitions = New atcCollection
-            Dim lDef As New atcAttributeDefinition
-            lDef.Name = "Units"
-            lDef.TypeString = "String"
-            lDef.CopiesInherit = True
-            lDef.Editable = True
-            'lUnitsDef.ValidList = GetAllUnitsInCategory("all")
-            pAllDefinitions.Add(lDef.Name.ToLower, lDef)
-
-            lDef = New atcAttributeDefinition
-            lDef.Name = "ID"
-            lDef.TypeString = "Integer"
-            lDef.CopiesInherit = True
-            lDef.Editable = False
-            pAllDefinitions.Add(lDef.Name.ToLower, lDef)
-
-            lDef = New atcAttributeDefinition
-            lDef.Name = "Time Unit"
-            lDef.TypeString = "atcTimeUnit"
-            lDef.CopiesInherit = True
-            lDef.Editable = False
-            pAllDefinitions.Add(lDef.Name.ToLower, lDef)
-
-            lDef = New atcAttributeDefinition
-            lDef.Name = "Data Source"
-            lDef.TypeString = "String"
-            lDef.CopiesInherit = False
-            lDef.Editable = False
-            pAllDefinitions.Add(lDef.Name.ToLower, lDef)
-        End If
-
-        If pAllAliases Is Nothing Then
-            pAllAliases = New atcCollection 'of alias and internal name
-            With pAllAliases
-                .Add("sen", "Scenario")
-                .Add("scen", "Scenario")
-                .Add("idscen", "Scenario")
-
-                .Add("loc", "Location")
-                .Add("locn", "Location")
-                .Add("idlocn", "Location")
-
-                .Add("con", "Constituent")
-                .Add("cons", "Constituent")
-                .Add("idcons", "Constituent")
-
-                .Add("desc", "Description")
-                .Add("descrp", "Description")
-
-                '.Add("stanam", "Station Name")  'Add this when WDM code can handle it - mhg
-
-                .Add("long filename", "FileName")
-                .Add("path", "FileName")
-
-                .Add("ts", "Time Step")
-                .Add("timestep", "Time Step")
-                .Add("timesteps", "Time Step")
-                .Add("time steps", "Time Step")
-
-                .Add("tu", "Time Unit")
-                .Add("timeunit", "Time Unit")
-                .Add("timeunits", "Time Unit")
-                .Add("time units", "Time Unit")
-
-                .Add("dsn", "ID")
-
-                .Add("datcre", "Date Created")
-                .Add("datmod", "Date Modified")
-
-                .Add("sjday", "Start Date")
-                .Add("ejday", "End Date")
-
-                .Add("latdeg", "Latitude")
-                .Add("lngdeg", "Longitude")
-                .Add("dec_lat_va", "Latitude")
-                .Add("dec_long_va", "Longitude")
-                .Add("elev", "Elevation")
-                .Add("alt_va", "Elevation")
-
-                .Add("skewcf", "Skew")
-                .Add("stddev", "Standard Deviation")
-                .Add("meanvl", "Mean")
-                .Add("minval", "Min")
-                .Add("minimum", "Min")
-                .Add("maxval", "Max")
-                .Add("maximum", "Max")
-                .Add("nonzro", "Count Positive")
-                .Add("numzro", "Count Zero")
-
-                .Add("7low10", "7Q10")
-                .Add("datasource", "Data Source")
-                .Add("darea", "Drainage Area")
-                .Add("drain_area_va", "Drainage Area")
-            End With
-        End If
     End Sub
 
     ''' <summary>
@@ -453,9 +510,8 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Dim lCalculateThese As New Generic.List(Of String)
         For Each lDef As atcAttributeDefinition In pAllDefinitions 'For each kind of attribute we know about
             If lDef.Calculated Then                                  'This attribute can be calculated
-                Dim key As String = AttributeNameToKey((lDef.Name))
-                If ItemByKey(key) Is Nothing Then                      'We do not yet have a value for this attribute
-                    lCalculateThese.Add(key)
+                If Not ContainsAttribute(lDef.Name) Then               'We do not yet have a value for this attribute
+                    lCalculateThese.Add(lDef.Name)
                 End If
             End If
         Next
@@ -483,32 +539,40 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
             lAttribute = ItemByKey(lKey)
 
             If lAttribute Is Nothing Then  'Did not find the named attribute
-                If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
-                    Try
-                        Dim lDef As atcAttributeDefinition = GetDefinition(aAttributeName)
-                        If Not lDef Is Nothing Then
-                            Dim lOperation As atcDefinedValue = Nothing
-                            If lDef.Calculated Then
-                                If lDef.Calculator.Name.Contains("n-day") Then
-                                    lOperation = lDef.Calculator.AvailableOperations.ItemByKey(lDef.Name)
-                                    Dim lArgs As New atcDataAttributes
-                                    lArgs.SetValue("Timeseries", New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
-                                    lDef.Calculator.Open(lKey, lArgs)
-                                    lAttribute = ItemByKey(lKey)
-                                ElseIf IsSimple(lDef, lKey, lOperation) Then
-                                    Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
-                                    Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
-                                    lArgs.SetValue(lArg.Definition, New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
-                                    lDef.Calculator.Open(lKey, lArgs)
-                                    lAttribute = ItemByKey(lKey)
+                If lKey <> "sharedattributes" Then
+                    Dim lSharedAttributes As atcDataAttributes = GetValue("SharedAttributes")
+                    If lSharedAttributes IsNot Nothing Then
+                        lAttribute = lSharedAttributes.ItemByKey(lKey)
+                    End If
+                End If
+                If lAttribute Is Nothing Then  'Did not find the attribute as shared either
+                    If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
+                        Try
+                            Dim lDef As atcAttributeDefinition = GetDefinition(aAttributeName)
+                            If Not lDef Is Nothing Then
+                                Dim lOperation As atcDefinedValue = Nothing
+                                If lDef.Calculated Then
+                                    If lDef.Calculator.Name.Contains("n-day") Then
+                                        lOperation = lDef.Calculator.AvailableOperations.ItemByKey(lDef.Name)
+                                        Dim lArgs As New atcDataAttributes
+                                        lArgs.SetValue("Timeseries", New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
+                                        lDef.Calculator.Open(lKey, lArgs)
+                                        lAttribute = ItemByKey(lKey)
+                                    ElseIf IsSimple(lDef, lKey, lOperation) Then
+                                        Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
+                                        Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
+                                        lArgs.SetValue(lArg.Definition, New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
+                                        lDef.Calculator.Open(lKey, lArgs)
+                                        lAttribute = ItemByKey(lKey)
+                                    End If
                                 End If
                             End If
-                        End If
-                    Catch NullExcep As NullReferenceException
-                        'Ignore these
-                    Catch CalcExcep As Exception
-                        Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
-                    End Try
+                        Catch NullExcep As NullReferenceException
+                            'Ignore these
+                        Catch CalcExcep As Exception
+                            Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
+                        End Try
+                    End If
                 End If
             End If
         Catch e As Exception
