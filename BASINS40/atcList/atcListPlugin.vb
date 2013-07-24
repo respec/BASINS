@@ -29,11 +29,12 @@ Public Class atcListPlugin
 
             Dim lSpecifiedFormat As Boolean = False
 
-            Dim lMaxWidth As Integer = 10
-            Dim lFormat As String = "#,##0.########"
-            Dim lExpFormat As String = "#.#e#"
-            Dim lCantFit As String = "#"
-            Dim lSignificantDigits As Integer = 5
+            Dim lMaxWidth As Integer = GetSetting("BASINS", "List", "MaxWidth", 10)
+            Dim lFormat As String = GetSetting("BASINS", "List", "Format", "#,##0.########")
+            Dim lExpFormat As String = GetSetting("BASINS", "List", "ExpFormat", "#.#e#")
+            Dim lCantFit As String = GetSetting("BASINS", "List", "CantFit", "#")
+            Dim lSignificantDigits As Integer = GetSetting("BASINS", "List", "SignificantDigits", 5)
+            lForm.DateFormat.FromString(GetSetting("BASINS", "List", "DateFormat", ""))
 
             Dim lDisplayAttributes As Generic.List(Of String) = Nothing
 

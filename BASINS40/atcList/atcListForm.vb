@@ -11,6 +11,13 @@ Public Class atcListForm
     Public Sub New()
         MyBase.New()
         InitializeComponent() 'required by Windows Form Designer
+
+        Integer.TryParse(GetSetting("BASINS", "List", "MaxWidth", pMaxWidth), pMaxWidth)
+        pFormat = GetSetting("BASINS", "List", "Format", pFormat)
+        pExpFormat = GetSetting("BASINS", "List", "ExpFormat", pExpFormat)
+        pCantFit = GetSetting("BASINS", "List", "CantFit", pCantFit)
+        Integer.TryParse(GetSetting("BASINS", "List", "SignificantDigits", pSignificantDigits), pSignificantDigits)
+
     End Sub
 
     'Form overrides dispose to clean up the component list.
@@ -224,12 +231,12 @@ Public Class atcListForm
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcTimeseriesGroup
 
-    Private pDateFormat As New atcDateFormat
+    Private pDateFormat As New atcDateFormat(GetSetting("BASINS", "List", "DateFormat"))
 
     'Value formatting options, can be overridden by timeseries attributes
     Private pMaxWidth As Integer = 10
     Private pFormat As String = "#,##0.########"
-    Private pExpFormat As String = ""
+    Private pExpFormat As String = "#.#e#"
     Private pCantFit As String = "#"
     Private pSignificantDigits As Integer = 5
 
@@ -562,6 +569,13 @@ Public Class atcListForm
                 Integer.TryParse(.txtMaxWidth.Text, pMaxWidth)
                 pCantFit = .txtCantFit.Text
                 PopulateGrid()
+
+                SaveSetting("BASINS", "List", "DateFormat", pDateFormat.ToString)
+                SaveSetting("BASINS", "List", "MaxWidth", pMaxWidth)
+                SaveSetting("BASINS", "List", "Format", pFormat)
+                SaveSetting("BASINS", "List", "ExpFormat", pExpFormat)
+                SaveSetting("BASINS", "List", "CantFit", pCantFit)
+                SaveSetting("BASINS", "List", "SignificantDigits", pSignificantDigits)
             End With
         End If
     End Sub
