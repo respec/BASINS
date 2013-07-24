@@ -370,6 +370,7 @@ Friend Class frmSelectData
     Private pInitializing As Boolean = True
     Private pPopulatingMatching As Boolean = False
     Private pRestartPopulatingMatching As Boolean = False
+    Private pAbortMatching As Boolean = False
 
     Private pSelectedOK As Boolean = False
     Private pRevertedToSaved As Boolean = False
@@ -688,6 +689,7 @@ Friend Class frmSelectData
         Else
             Dim lSaveCursor As Cursor = Me.Cursor
             pPopulatingMatching = True
+            pAbortMatching = False
             Dim lAllDatasets As atcDataGroup = AvailableData
             pTotalTS = lAllDatasets.Count
             Logger.Status("Matching " & Format(pTotalTS, "#,###") & " timeseries")
@@ -746,20 +748,22 @@ NextTS:
                         Logger.Dbg("Restarting PopulateMatching")
                         GoTo Restart
                     End If
+                    If pAbortMatching Then
+                        Exit Sub
+                    End If
                 Next
-                Logger.Progress("", pTotalTS, pTotalTS)
                 lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
                 pMatchingGrid.Refresh()
                 pSelectedGrid.Refresh()
                 'Logger.Dbg("PopulateMatching " & (Date.Now - lTimeStart).TotalSeconds)
             Catch ex As Exception 'Catch anything so we are sure to clear pPopulatingMatching and restore cursor
-                Me.Cursor = lSaveCursor
-                pPopulatingMatching = False
                 'Throw New ApplicationException("Exception while populating matching: " & ex.Message, ex)
                 Logger.Dbg("Exception while populating matching: " & ex.Message & vbCrLf & ex.StackTrace)
+            Finally
+                Me.Cursor = lSaveCursor
+                pPopulatingMatching = False
+                Logger.Progress("", 0, 0)
             End Try
-            Me.Cursor = lSaveCursor
-            pPopulatingMatching = False
         End If
     End Sub
 
@@ -1053,6 +1057,7 @@ NextName:
     End Property
 
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
+        pAbortMatching = True
         'If user didn't select anything, 
         ' but either narrowed the matching group or there are not more than 10 datasets,
         ' assume they meant to select all the matching datasets
@@ -1110,6 +1115,7 @@ NextName:
     End Sub
 
     Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+        pAbortMatching = True
         pSelectedOK = False
         pRevertedToSaved = True
         pSelectedGroup.ChangeTo(pSaveGroup)
@@ -1247,6 +1253,10 @@ NextName:
     Private Sub mnuSelectAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAll.Click
         pSelectedGroup.Clear()
         pSelectedGroup.Add(AvailableData)
+    End Sub
+
+    Private Sub frmSelectData_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        pAbortMatching = True
     End Sub
 
     Private Sub frmSelectData_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown

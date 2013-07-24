@@ -203,10 +203,10 @@ Public Class atcTimeseries
         Set(ByVal newValues() As Double)
             pValues = newValues
             pNumValues = newValues.GetUpperBound(0)
-            If Not pDates Is Nothing AndAlso pDates.numValues <> pNumValues Then
+            If pDates IsNot Nothing AndAlso pDates.numValues <> pNumValues Then
                 pDates.numValues = pNumValues
             End If
-            If Not pValueAttributes Is Nothing AndAlso pValueAttributes.GetUpperBound(0) <> pNumValues Then
+            If pValueAttributes IsNot Nothing AndAlso pValueAttributes.GetUpperBound(0) <> pNumValues Then
                 ReDim Preserve pValueAttributes(pNumValues)
             End If
             Attributes.DiscardCalculated()
@@ -304,9 +304,8 @@ Public Class atcTimeseries
     ''' <summary>Clear all values and attributes, but not dates.</summary>
     Public Overrides Sub Clear()
         MyBase.Clear()
-        ReDim pValues(0)
         numValues = 0
-        If Not pValueAttributes Is Nothing Then
+        If pValueAttributes IsNot Nothing Then
             ReDim pValueAttributes(pNumValues)
         End If
     End Sub
@@ -317,9 +316,9 @@ Public Class atcTimeseries
         Dim lClone As New atcTimeseries(pDataSource)
         With lClone
             .Attributes.ChangeTo(Attributes)
-            If Not pDates Is Nothing Then .Dates = pDates.Clone
-            If Not pValues Is Nothing Then .Values = pValues.Clone
-            If Not pValueAttributes Is Nothing Then
+            If pDates IsNot Nothing Then .Dates = pDates.Clone
+            If pValues IsNot Nothing Then .Values = pValues.Clone
+            If pValueAttributes IsNot Nothing Then
                 For lValueAttIndex As Integer = 0 To pNumValues
                     If Not pValueAttributes(lValueAttIndex) Is Nothing Then
                         .ValueAttributes(lValueAttIndex) = pValueAttributes(lValueAttIndex).Copy
@@ -363,11 +362,18 @@ Public Class atcTimeseries
         Set(ByVal newValue As Long)
             Try
                 If pNumValues <> newValue Then
-                    ReDim Preserve pValues(newValue)
-                    pNumValues = newValue
+                    If newValue < 1 Then
+                        ReDim pValues(-1)
+                        pNumValues = 0
+                    Else
+                        ReDim Preserve pValues(newValue)
+                        pNumValues = newValue
+                    End If
                 End If
                 If pDates IsNot Nothing AndAlso pDates.numValues <> newValue Then
-                    pDates.numValues = newValue
+                    If newValue > 0 OrElse Not pDates.Attributes.ContainsAttribute("Shared") Then
+                        pDates.numValues = newValue
+                    End If
                 End If
                 If pValueAttributes IsNot Nothing AndAlso pValueAttributes.GetUpperBound(0) <> newValue Then
                     ReDim Preserve pValueAttributes(pNumValues)
@@ -407,7 +413,7 @@ Public Class atcTimeseries
                 End If
             End If
             pValuesNeedToBeRead = newValue
-            If pDates IsNot Nothing Then
+            If pDates IsNot Nothing AndAlso Not pDates.Attributes.ContainsAttribute("Shared") Then
                 pDates.ValuesNeedToBeRead = newValue
             End If
         End Set
@@ -454,12 +460,12 @@ Public Class atcTimeseries
     ''' <summary>Set Interval attribute of timeseries based on time unit and time step attributes</summary>
     ''' <remarks>Unknown time units leads to removal of Interval attribute</remarks>
     Public Sub SetInterval()
-        Dim lTu As atcTimeUnit = Attributes.GetValue("time unit", atcTimeUnit.TUUnknown)
+        Dim lTu As atcTimeUnit = Attributes.GetValue("Time Unit", atcTimeUnit.TUUnknown)
         If lTu = atcTimeUnit.TUUnknown Then
             Dim lTCode As Integer = Attributes.GetValue("TCode", 0)
             lTu = lTCode
         End If
-        Dim lTs As Integer = Attributes.GetValue("time step", 1)
+        Dim lTs As Integer = Attributes.GetValue("Time Step", 1)
         SetInterval(lTu, lTs)
      End Sub
 
@@ -469,19 +475,19 @@ Public Class atcTimeseries
     ''' <remarks>Unknown time units leads to removal of Interval attribute</remarks>
     Public Sub SetInterval(ByVal aTimeUnit As atcTimeUnit, ByVal aTimeStep As Integer)
         With Attributes
-            .SetValue("time unit", aTimeUnit)
-            .SetValue("time step", aTimeStep)
+            .SetValue("Time Unit", aTimeUnit)
+            .SetValue("Time Step", aTimeStep)
             Select Case aTimeUnit
                 Case atcTimeUnit.TUDay
-                    .SetValue("interval", aTimeStep)
+                    .SetValue("Interval", aTimeStep)
                 Case atcTimeUnit.TUHour
-                    .SetValue("interval", aTimeStep / CDbl(24))
+                    .SetValue("Interval", aTimeStep / CDbl(24))
                 Case atcTimeUnit.TUMinute
-                    .SetValue("interval", aTimeStep / CDbl(1440))
+                    .SetValue("Interval", aTimeStep / CDbl(1440))
                 Case atcTimeUnit.TUSecond
-                    .SetValue("interval", aTimeStep / CDbl(1440 * 60))
+                    .SetValue("Interval", aTimeStep / CDbl(1440 * 60))
                 Case Else
-                    .RemoveByKey("interval")
+                    .RemoveByKey("Interval")
             End Select
         End With
     End Sub
