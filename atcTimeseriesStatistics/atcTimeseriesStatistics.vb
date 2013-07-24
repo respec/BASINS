@@ -7,7 +7,7 @@ Imports System.Windows.Forms
 ''' <summary>Computes statistics of a timeseries</summary>
 Public Class atcTimeseriesStatistics
     Inherits atcTimeseriesSource
-    Private pAvailableOperations As atcDataAttributes ' atcDataGroup
+    Private Shared pAvailableOperations As atcDataAttributes ' atcDataGroup
     Private Shared pNaN As Double = GetNaN()
     Private Shared pMinValue As Double = GetMinValue()
     Private Shared pMaxValue As Double = GetMaxValue()
@@ -34,12 +34,32 @@ Public Class atcTimeseriesStatistics
     End Property
 
 #If GISProvider = "DotSpatial" Then
+
+    ''' <summary>
+    ''' Add operations to atcDataAttributes so they can be computed as needed
+    ''' </summary>
+    ''' <remarks>
+    ''' Same effect as InitializeShared
+    ''' </remarks>
     Public Sub Initialize()
         For Each lOperation As atcDefinedValue In AvailableOperations
             atcDataAttributes.AddDefinition(lOperation.Definition)
         Next
     End Sub
+
+    ''' <summary>
+    ''' Add operations to atcDataAttributes so they can be computed as needed
+    ''' </summary>
+    ''' <remarks>
+    ''' Same effect as the non-shared Initialize
+    ''' </remarks>
+    Public Shared Sub InitializeShared()
+        Dim lTemp As New atcTimeseriesStatistics
+        lTemp.Initialize()
+    End Sub
+
 #Else
+
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
@@ -47,6 +67,7 @@ Public Class atcTimeseriesStatistics
             atcDataAttributes.AddDefinition(lOperation.Definition)
         Next
     End Sub
+
 #End If
 
     ''' <summary>Definitions of statistics supported by this class.</summary>
@@ -65,9 +86,9 @@ Public Class atcTimeseriesStatistics
                     .TypeString = "atcTimeseries"
                 End With
 
-                AddOperation("Date Created", "Date Timeseries Created", defTimeSeriesOne, lCategory, "Double", pNaN)
+                AddOperation("Date Created", "Date Timeseries Created", defTimeSeriesOne, lCategory, "Date", #1/1/1900#)
 
-                AddOperation("Date Modified", "Date Timeseries Last Modified", defTimeSeriesOne, lCategory, "Double", pNaN)
+                AddOperation("Date Modified", "Date Timeseries Last Modified", defTimeSeriesOne, lCategory, "Date", #1/1/1900#)
 
                 AddOperation("Count", "Count of non missing values", defTimeSeriesOne, lCategory, "Integer", 0)
 

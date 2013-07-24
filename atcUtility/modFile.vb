@@ -16,7 +16,7 @@ Public Module modFile
 
     Public g_PathChar As String = IO.Path.DirectorySeparatorChar
     Public ShapeExtensions() As String = {".shp", ".shx", ".dbf", ".prj", ".spx", ".sbn", ".sbx", ".xml", ".shp.xml", ".mwsr"}
-    Public TifExtensions() As String = {".tif", ".prj", ".tfw", ".xml", ".tif.xml", ".mwsr", ".mwleg"}
+    Public TifExtensions() As String = {".tif", ".prj", ".tfw", ".xml", ".tif.xml", ".mwsr", ".mwleg", ".proj4"}
 
     Public Function TryMove(ByVal aFromFilename As String, ByVal aToPath As String) As Boolean
         Return TryMove(aFromFilename, aToPath, False)
@@ -205,16 +205,19 @@ Public Module modFile
         Else
             lBaseName = IO.Path.Combine(IO.Path.GetTempPath, aBaseName)
         End If
+        If String.IsNullOrEmpty(aExtension) Then
+            aExtension = ""
+        ElseIf Not aExtension.StartsWith(".") Then
+            aExtension = "." & aExtension
+        End If
         lBaseName = lBaseName.TrimEnd(".")
-        Dim lName As String = lBaseName
-        If Not String.IsNullOrEmpty(aExtension) Then lName = IO.Path.ChangeExtension(lName, aExtension)
+        Dim lName As String = lBaseName & aExtension
         While FileExists(lName, True)
             'First, see if existing temp file/folder is expired and try deleting it if so.
             'If not expired, or expired but cannot delete, then try next numbered name
             If IO.File.GetCreationTime(lName).ToOADate > lExpirationDate OrElse Not TryDelete(lName) Then
                 lCounter += 1
-                lName = lBaseName & "_" & lCounter
-                If Not String.IsNullOrEmpty(aExtension) Then lName = IO.Path.ChangeExtension(lName, aExtension)
+                lName = lBaseName & "_" & lCounter & aExtension
             End If
         End While
         Return lName
@@ -300,7 +303,7 @@ Public Module modFile
 
             If Not aHelpTopic.Equals("CLOSE") Then
                 If Not IO.File.Exists(lHelpFilename) Then
-                    lHelpFilename = FindFile("Please locate BASINS 4.1 help file", "Basins4.1.chm")
+                    lHelpFilename = FindFile("Please locate BASINS help file", "Basins4.2.chm")
                 End If
 
                 If IO.File.Exists(lHelpFilename) Then
@@ -1080,7 +1083,9 @@ ReadCharacter:
                             GoTo ReadCharacter
                     End Select
                     pCurrentLine = lSb.ToString
-                    Logger.Progress(Math.Floor(pStreamReader.BaseStream.Position / pStreamReader.BaseStream.Length * 1000), 1000)
+                    If pStreamReader.BaseStream.Length > 20000 AndAlso pStreamReader.BaseStream.Position < pStreamReader.BaseStream.Length Then
+                        Logger.Progress(Math.Floor(pStreamReader.BaseStream.Position / pStreamReader.BaseStream.Length * 1000), 1000)
+                    End If
                     Return True
                 Catch lEndOfStreamException As IO.EndOfStreamException
                     lEndOfStream = True

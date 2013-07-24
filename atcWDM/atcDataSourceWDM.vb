@@ -12,10 +12,12 @@ Imports System.Collections.Specialized
 Public Class atcDataSourceWDM
     Inherits atcData.atcTimeseriesSource
     Private Shared pFilter As String = "WDM Files (*.wdm)|*.wdm"
+    Private Shared pShowViewMessage As Boolean = True
     Private pDates As Generic.List(Of atcTimeseries)
     Private pQuick As Boolean = False
-    Private pNan As Double
-    'Private pEpsilon As Double
+    Private Shared pNan As Double = GetNaN()
+
+    'Private pEpsilon As Double = System.Double.Epsilon
     Private Shared pMsg As atcMsgWDM
     Private pTu As atcTimeUnit = 0 'default time units, default 2-minutes
     Private pTs As Integer = 0 'default timestep, default 1 
@@ -59,11 +61,6 @@ Public Class atcDataSourceWDM
     Public Sub New()
         MyBase.New()
         Filter = pFilter
-
-        'kludge to force loading of system.double, removal may cause program to exit without message!
-        pNan = GetNaN()
-        'pEpsilon = System.Double.Epsilon
-
         If pMsg Is Nothing Then
             pMsg = New atcMsgWDM
             F90_MSG("WRITE", 5) 'turn on very detailed debugging of fortran to error.fil
@@ -1125,17 +1122,25 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
     End Function
 
     Public Overrides Sub View()
-        Logger.Msg("No Viewer available for WDM files", "View")
+        If pShowViewMessage Then
+            Select Case Logger.MsgCustom(Specification & vbCrLf & "No text viewer available for WDM files", "View", _
+                                         "Ok", "Show File Folder", "Stop showing this message")
+                Case "Show File Folder"
+                    OpenFile(IO.Path.GetDirectoryName(Specification))
+                Case "Stop showing this message"
+                    pShowViewMessage = False
+            End Select
+        End If
     End Sub
 
     Protected Overrides Sub Finalize()
         MyBase.Finalize()
     End Sub
 
-    Private Function MemUsage() As String
-        System.GC.WaitForPendingFinalizers()
-        Return "MemoryUsage(MB):" & Process.GetCurrentProcess.PrivateMemorySize64 / (2 ^ 20) & _
-                    " Local(MB):" & System.GC.GetTotalMemory(True) / (2 ^ 20)
-    End Function
+    'Private Function MemUsage() As String
+    '    System.GC.WaitForPendingFinalizers()
+    '    Return "MemoryUsage(MB):" & Process.GetCurrentProcess.PrivateMemorySize64 / (2 ^ 20) & _
+    '                " Local(MB):" & System.GC.GetTotalMemory(True) / (2 ^ 20)
+    'End Function
 
 End Class

@@ -4,6 +4,7 @@ Imports MapWinUtility
 Imports MapWinUtility.Strings
 Imports atcUtility
 
+<CLSCompliant(True)> _
 Public Class LandUses
     Inherits KeyedCollection(Of String, LandUse)
     Private pWatershed As Watershed
@@ -107,6 +108,7 @@ Public Class LandUses
     End Function
 End Class
 
+<CLSCompliant(True)> _
 Public Class LandUse
     Public Description As String  'Description like Urban, Forest, etc.
     Public Code As String         'could be integer version of description, or just description

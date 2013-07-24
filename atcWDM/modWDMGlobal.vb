@@ -6,6 +6,7 @@ Imports ATCutility
 
 Module WDMGlobal
 #If BatchMode Then
+    Friend g_MapWin As Object = Nothing
 #Else
     Friend g_MapWin As MapWindow.Interfaces.IMapWin
 #End If

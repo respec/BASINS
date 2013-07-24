@@ -24,7 +24,7 @@
     </StartArguments>
     <StartPage>
     </StartPage>
-    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartProgram>\dev\BASINS40\Bin\BASINS.exe</StartProgram>
     <StartURL>
     </StartURL>
     <StartWorkingDirectory>
@@ -44,7 +44,7 @@
     </StartArguments>
     <StartPage>
     </StartPage>
-    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartProgram>\dev\BASINS40\Bin\BASINS.exe</StartProgram>
     <StartURL>
     </StartURL>
     <StartWorkingDirectory>
@@ -52,11 +52,11 @@
     <StartWithIE>false</StartWithIE>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartProgram>\dev\BASINS40\Bin\BASINS.exe</StartProgram>
     <StartAction>Program</StartAction>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartProgram>\dev\BASINS40\Bin\BASINS.exe</StartProgram>
     <StartAction>Program</StartAction>
   </PropertyGroup>
 </Project>

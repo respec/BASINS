@@ -8,7 +8,7 @@ Option Explicit On
 ''' Copyright 2010 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 ''' </remarks>
 Public Module modString
-
+    Private pNaN As Double = GetNaN()
     ''' <summary>
     ''' Assign expression to result and return result
     ''' </summary>
@@ -238,7 +238,7 @@ Public Module modString
             End Select
         End If
 
-        Dim lStrToDbl As Double = GetNaN()
+        Dim lStrToDbl As Double = pNaN
         Try 'If formatted string cannot be parsed, skip to exponential format
             If Not Double.TryParse(lString, lStrToDbl) Then
                 GoTo TryExpFormat
@@ -252,10 +252,10 @@ Public Module modString
                 lOldString = lString
                 GoTo TryExpFormat
             Else
-                lStrToDbl = GetNaN()
+                lStrToDbl = pNaN
             End If
         Catch
-            lStrToDbl = GetNaN()
+            lStrToDbl = pNaN
             GoTo TryExpFormat
         End Try
 
@@ -763,29 +763,30 @@ TryOldString:
     '    Return System.BitConverter.ToSingle(Byt, Ind)
     'End Function
 
+    ''' <summary>
+    ''' Convert ASCII bytes in an array into a string
+    ''' </summary>
+    ''' <param name="Byt">Array of bytes</param>
+    ''' <param name="StartAt">Index in Byt of first character of string</param>
+    ''' <param name="Length">Length of string (number of bytes to read)</param>
+    ''' <returns>String containing .Net two-byte version of each one-byte character</returns>
+    ''' <remarks>Byte2String({83, 101, 101}, 0, 3) = "See"</remarks>
     Public Function Byte2String(ByRef Byt() As Byte, ByRef StartAt As Integer, ByRef Length As Integer) As String
-        ' ##SUMMARY Converts sequence of members in Byte array to string of _
-        'corresponding ascii characters.
-        ' ##SUMMARY   Example: Byte2String(Byt, 1, 3) = "See" _
-        'where Byt(1) = 83, Byt(2) = 101, Byt(3) = 101
-        ' ##PARAM Byt() I Array containing byte values to be converted
-        ' ##PARAM StartAt I Index of first element in Byt() to be analyzed
-        ' ##PARAM Length I Number of members in Byt array to be sequentially analyzed
-        ' ##RETURNS String of Length populated from Byt
-        Dim S As String
-        Dim iByt As Integer
+        'Return System.Text.ASCIIEncoding.ASCII.GetString(Byt, StartAt, Length)
+        Dim S As New System.Text.StringBuilder
         Dim c As Integer
-        ' ##LOCAL s - string antecedent to Byte2String
-        ' ##LOCAL i - long counter as index to Byt array
-        ' ##LOCAL c - string set to each incremental character from Byt array
 
-        S = ""
-        For iByt = 0 To Length - 1
-            c = Byt(StartAt + iByt)
-            If c = 0 Then c = 32 'space
-            S = S & Chr(c)
+        Dim lLast As Integer = StartAt + Length - 1
+        For lIndex As Integer = StartAt To lLast
+            c = Byt(lIndex)
+            If c = 0 Then 'Interpret ASCII zero as a space
+                S.Append(" "c)
+            Else
+                S.Append(Chr(c))
+            End If
         Next
-        Return S
+        Return S.ToString()
+
     End Function
 
     ''' <summary>
@@ -794,43 +795,41 @@ TryOldString:
     ''' Does not search for comma or space in the part of a string between single quotes, and removes the single quotes
     ''' Example: StrRetRem("Hello world") = "Hello", and S is reduced to "world"
     ''' Example: StrRetRem("Hello,world") = "Hello", and S is reduced to "world"
-    ''' Example: StrRetRem("'Hello world',fabulous") = "Hello,world", and S is reduced to "fabulous"
+    ''' Example: StrRetRem("'Hello,world',fabulous") = "Hello,world", and S is reduced to "fabulous"
     ''' Example: StrRetRem("Hello") = "Hello", and S is reduced to an empty string
     ''' </summary>
     ''' <param name="S">String to divide</param>
     ''' <returns>Portion of incoming string from the start until the first comma or space</returns>
     ''' <remarks>Returns the entire string if no comma or space is found.</remarks>
     Function StrRetRem(ByRef S As String) As String
-        Dim l As String  ' string to return
-        Dim i As Integer ' position of blank delimeter
-        Dim j As Integer ' position of comma delimeter
+        Static lDelimiters() As Char = {" ", ","}
+        Dim lReturn As String  ' string to return
+        Dim i As Integer ' position of delimeter
 
-        S = LTrim(S) 'remove leading blanks
+        S = S.TrimStart 'remove leading blanks
 
-        i = InStr(S, "'")
-        If i = 1 Then 'string beginning
-            S = Mid(S, 2)
-            i = InStr(S, "'") 'string end
+        i = S.IndexOf("'")
+        If i = 0 Then 'string beginning
+            S = S.Substring(1)
+            i = S.IndexOf("'") 'string end
         Else
-            i = InStr(S, " ") 'blank delimeter
-            j = InStr(S, ",") 'comma delimeter
-            If j > 0 Then 'comma found
-                If i = 0 OrElse j < i Then
-                    i = j
-                End If
-            End If
+            i = S.IndexOfAny(lDelimiters)
         End If
 
-        If i > 0 Then 'found delimeter
-            l = Left(S, i - 1) 'string to return
-            S = LTrim(Mid(S, i + 1)) 'string remaining
-            If InStr(Left(S, 1), ",") = 1 And i <> j Then S = Mid(S, 2)
+        If i >= 0 Then 'found delimeter
+            lReturn = S.Substring(0, i - 1) 'string to return
+            'Also skip comma if we ended on a quote or space
+            If S.Substring(i + 1, 1) = "," AndAlso S.Substring(i, 1) <> "," Then
+                S = S.Substring(i + 2)
+            Else
+                S = S.Substring(i + 1)
+            End If
         Else 'take it all
-            l = S
+            lReturn = S
             S = "" 'nothing left
         End If
 
-        StrRetRem = l
+        Return lReturn
 
     End Function
 

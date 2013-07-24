@@ -4,6 +4,7 @@ Imports MapWinUtility
 Imports MapWinUtility.Strings
 Imports atcUtility
 
+<CLSCompliant(True)> _
 Public Class Reaches
     Inherits KeyedCollection(Of String, Reach)
     Private pWatershed As Watershed
@@ -80,6 +81,7 @@ Public Class Reaches
     End Function
 End Class
 
+<CLSCompliant(True)> _
 Public Class Reach
     Public Id As String        'Reach id
     Public Name As String      'Reach name (ie Peachtree Creek)
