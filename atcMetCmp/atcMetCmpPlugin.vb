@@ -7,8 +7,8 @@ Imports System.Reflection
 Public Class atcMetCmpPlugin
     Inherits atcData.atcTimeseriesSource
 
-    Private pAvailableOperations As atcDataAttributes ' atcDataGroup
-    Private pName As String = "Timeseries::Meteorologic Generation"
+    Private Shared pAvailableOperations As atcDataAttributes = Nothing
+    Private Shared pName As String = "Timeseries::Meteorologic Generation"
  
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -211,12 +211,14 @@ Public Class atcMetCmpPlugin
                     Dim lForm As New frmDisTemp
                     lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lObsTime)
                     'build obs time TSer with constant value from aObsTime argument
-                    lObsTimeTSer = lTMinTSer.Clone
-                    For i As Integer = 1 To lObsTimeTSer.numValues
-                        lObsTimeTSer.Values(i) = lObsTime
-                    Next
-                    lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
-                    lObsTimeTSer.Attributes.SetValue("Constituent", lTMinTSer.Attributes.GetValue("Constituent") & "-OBS")
+                    If lOk Then
+                        lObsTimeTSer = lTMinTSer.Clone
+                        For i As Integer = 1 To lObsTimeTSer.numValues
+                            lObsTimeTSer.Values(i) = lObsTime
+                        Next
+                        lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
+                        lObsTimeTSer.Attributes.SetValue("Constituent", lTMinTSer.Attributes.GetValue("Constituent") & "-OBS")
+                    End If
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
                     lTMaxTSer = aArgs.GetValue("TMAX")
@@ -258,13 +260,15 @@ Public Class atcMetCmpPlugin
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisPrec
                     lOk = lForm.AskUser(lDlyTSer, lHrTSers, lObsTime, lTol, lSummFile)
-                    'build obs time TSer with constant value from aObsTime argument
-                    lObsTimeTSer = lDlyTSer.Clone
-                    For i As Integer = 1 To lObsTimeTSer.numValues
-                        lObsTimeTSer.Values(i) = lObsTime
-                    Next
-                    lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
-                    lObsTimeTSer.Attributes.SetValue("Constituent", lDlyTSer.Attributes.GetValue("Constituent") & "-OBS")
+                    If lOk Then
+                        'build obs time TSer with constant value from aObsTime argument
+                        lObsTimeTSer = lDlyTSer.Clone
+                        For i As Integer = 1 To lObsTimeTSer.numValues
+                            lObsTimeTSer.Values(i) = lObsTime
+                        Next
+                        lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
+                        lObsTimeTSer.Attributes.SetValue("Constituent", lDlyTSer.Attributes.GetValue("Constituent") & "-OBS")
+                    End If
                 Else
                     lDlyTSer = aArgs.GetValue("DPRC")
                     lHrTSers = aArgs.GetValue("HPCP")
@@ -305,12 +309,19 @@ Public Class atcMetCmpPlugin
         End If
     End Function
 
+#If GISProvider = "DotSpatial" Then
+    <CLSCompliant(False)> _
+    Public Sub Initialize()
+        Dim lAvlOps As atcDataAttributes = AvailableOperations()
+    End Sub
+#Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                                     ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
         Dim lAvlOps As atcDataAttributes = AvailableOperations()
     End Sub
+#End If
 
     Public Overrides Function ToString() As String
         Return Name.Replace("Timeseries::", "").Replace("Seasonal - ", "")
@@ -318,11 +329,8 @@ Public Class atcMetCmpPlugin
 
     Public Overrides ReadOnly Property AvailableOperations() As atcDataAttributes
         Get
-            Dim lOperations As atcDataAttributes
-            If Not pAvailableOperations Is Nothing Then
-                lOperations = pAvailableOperations
-            Else
-                lOperations = New atcDataAttributes
+            If pAvailableOperations Is Nothing Then
+                pAvailableOperations = New atcDataAttributes
                 Dim lArguments As atcDataAttributes
                 Dim defTimeSeriesOne As New atcAttributeDefinition
                 With defTimeSeriesOne
@@ -360,7 +368,7 @@ Public Class atcMetCmpPlugin
                 lArguments.SetValue(defTimeSeriesOne.Clone("DCLD", "Daily Cloud Cover (values = 0 - 10)"), Nothing)
                 lArguments.SetValue(defLat, Nothing)
 
-                lOperations.SetValue(lSolar, Nothing, lArguments)
+                pAvailableOperations.SetValue(lSolar, Nothing, lArguments)
 
                 Dim lCloud As New atcAttributeDefinition
                 With lCloud
@@ -379,7 +387,7 @@ Public Class atcMetCmpPlugin
                 lArguments.SetValue(defSRadTS, Nothing)
                 lArguments.SetValue(defLat, Nothing)
 
-                lOperations.SetValue(lCloud, Nothing, lArguments)
+                pAvailableOperations.SetValue(lCloud, Nothing, lArguments)
 
                 Dim defDegF As New atcAttributeDefinition
                 With defDegF
@@ -418,7 +426,7 @@ Public Class atcMetCmpPlugin
                 lArguments.SetValue(defLat, Nothing)
                 lArguments.SetValue(defHMonCoeff, Nothing)
 
-                lOperations.SetValue(lHamon, Nothing, lArguments)
+                pAvailableOperations.SetValue(lHamon, Nothing, lArguments)
 
                 Dim defJMonCoeff As New atcAttributeDefinition
                 With defJMonCoeff
@@ -460,7 +468,7 @@ Public Class atcMetCmpPlugin
                 lArguments.SetValue(defJMonCoeff, Nothing)
                 lArguments.SetValue(defConstCoeff, Nothing)
 
-                lOperations.SetValue(lJensen, Nothing, lArguments)
+                pAvailableOperations.SetValue(lJensen, Nothing, lArguments)
 
                 Dim lPenman As New atcAttributeDefinition
                 With lPenman
@@ -484,7 +492,7 @@ Public Class atcMetCmpPlugin
                 lArguments.SetValue(defDewPTS, Nothing)
                 lArguments.SetValue(defTWindTS, Nothing)
 
-                lOperations.SetValue(lPenman, Nothing, lArguments)
+                pAvailableOperations.SetValue(lPenman, Nothing, lArguments)
 
                 Dim lWind As New atcAttributeDefinition
                 With lWind
@@ -501,7 +509,7 @@ Public Class atcMetCmpPlugin
 
                 lArguments = New atcDataAttributes
                 lArguments.SetValue(defWindTS, Nothing)
-                lOperations.SetValue(lWind, Nothing, lArguments)
+                pAvailableOperations.SetValue(lWind, Nothing, lArguments)
 
                 Dim lCldCov As New atcAttributeDefinition
                 With lCldCov
@@ -518,7 +526,7 @@ Public Class atcMetCmpPlugin
 
                 lArguments = New atcDataAttributes
                 lArguments.SetValue(defPSunTS, Nothing)
-                lOperations.SetValue(lCldCov, Nothing, lArguments)
+                pAvailableOperations.SetValue(lCldCov, Nothing, lArguments)
 
                 Dim lDisSolar As New atcAttributeDefinition
                 With lDisSolar
@@ -533,7 +541,7 @@ Public Class atcMetCmpPlugin
                 lArguments = New atcDataAttributes
                 lArguments.SetValue(defSRadTS, Nothing)
                 lArguments.SetValue(defLat, Nothing)
-                lOperations.SetValue(lDisSolar, Nothing, lArguments)
+                pAvailableOperations.SetValue(lDisSolar, Nothing, lArguments)
 
                 Dim lDisEvap As New atcAttributeDefinition
                 With lDisEvap
@@ -551,7 +559,7 @@ Public Class atcMetCmpPlugin
                 lArguments = New atcDataAttributes
                 lArguments.SetValue(defEvapTS, Nothing)
                 lArguments.SetValue(defLat, Nothing)
-                lOperations.SetValue(lDisEvap, Nothing, lArguments)
+                pAvailableOperations.SetValue(lDisEvap, Nothing, lArguments)
 
                 Dim defObsTimeTS As New atcAttributeDefinition
                 defObsTimeTS = defTimeSeriesOne.Clone("Observation Hour Timeseries", "Timeseries of Daily Observation times (1-24)")
@@ -581,7 +589,7 @@ Public Class atcMetCmpPlugin
                 lArguments.SetValue(defTMinTS, Nothing)
                 lArguments.SetValue(defTMaxTS, Nothing)
                 lArguments.SetValue(defObsTimeTS, Nothing)
-                lOperations.SetValue(lDisTemp, Nothing, lArguments)
+                pAvailableOperations.SetValue(lDisTemp, Nothing, lArguments)
 
                 Dim lDisWind As New atcAttributeDefinition
                 With lDisWind
@@ -607,7 +615,7 @@ Public Class atcMetCmpPlugin
                 lArguments = New atcDataAttributes
                 lArguments.SetValue(defTWindTS, Nothing)
                 lArguments.SetValue(defHrDist, Nothing)
-                lOperations.SetValue(lDisWind, Nothing, lArguments)
+                pAvailableOperations.SetValue(lDisWind, Nothing, lArguments)
 
                 Dim lDisPrec As New atcAttributeDefinition
                 With lDisPrec
@@ -656,7 +664,7 @@ Public Class atcMetCmpPlugin
                 lArguments.SetValue(defObsTimeTS, Nothing)
                 lArguments.SetValue(defTolerance, Nothing)
                 lArguments.SetValue(defSummFile, Nothing)
-                lOperations.SetValue(lDisPrec, Nothing, lArguments)
+                pAvailableOperations.SetValue(lDisPrec, Nothing, lArguments)
 
                 Dim lDisDewPoint As New atcAttributeDefinition
                 With lDisDewPoint
@@ -674,10 +682,10 @@ Public Class atcMetCmpPlugin
                 lArguments = New atcDataAttributes
                 lArguments.SetValue(defDewPTS, Nothing)
                 lArguments.SetValue(defATmpTS, Nothing)
-                lOperations.SetValue(lDisDewPoint, Nothing, lArguments)
+                pAvailableOperations.SetValue(lDisDewPoint, Nothing, lArguments)
             End If
 
-            Return lOperations
+            Return pAvailableOperations
         End Get
     End Property
 
