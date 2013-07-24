@@ -81,6 +81,7 @@ Public Class frmButtons
                             ByVal aMessage As String, _
                             ByVal aButtonLabels As IEnumerable) As String
         Dim lButtonLeft As Integer = pMargin
+        Dim lButtonTop As Integer = pMargin
         Dim lChkAlways As CheckBox = Nothing
 
         If RegistryAppName.Length > 0 AndAlso RegistrySection.Length > 0 AndAlso RegistryKey.Length > 0 Then
@@ -96,13 +97,28 @@ Public Class frmButtons
         End If
 
         Text = aTitle
-        lblMessage.Text = aMessage
+        Dim lButtonAnchor As System.Windows.Forms.AnchorStyles = AnchorStyles.Bottom + AnchorStyles.Left
+        Dim lHorizontal As Boolean = True
+        If aMessage.StartsWith("VERTICAL") Then
+            aMessage = aMessage.Substring(8)
+            lHorizontal = False
+            lButtonAnchor = AnchorStyles.Top + AnchorStyles.Left
+        End If
+
+        Dim lNoMessage As Boolean = String.IsNullOrEmpty(aMessage)
+        If lNoMessage Then
+            lblMessage.Text = ""
+        Else
+            lblMessage.Text = aMessage
+        End If
+
         Dim lButtons As New Generic.List(Of Windows.Forms.Button)
         Dim lSetHeight As Boolean = False
+        Dim lMaxButtonWidth As Integer = 0
 
         For Each curLabel As String In aButtonLabels
             Dim btn As Windows.Forms.Button = New Windows.Forms.Button
-            btn.Anchor = AnchorStyles.Bottom + AnchorStyles.Left
+            btn.Anchor = lButtonAnchor
             btn.AutoSize = True
             btn.Left = lButtonLeft
 
@@ -123,34 +139,53 @@ Public Class frmButtons
             btn.Text = lLabel
 
             If Not lSetHeight Then
-                Me.Height = lblMessage.Top + lblMessage.Height + pMargin + btn.Height + pMargin + Me.Height - Me.ClientSize.Height
+                If lNoMessage Then
+                    Me.Height = lblMessage.Top + btn.Height + pMargin + Me.Height - Me.ClientSize.Height
+                Else
+                    Me.Height = lblMessage.Top + lblMessage.Height + pMargin + btn.Height + pMargin + Me.Height - Me.ClientSize.Height
+                End If
                 If lChkAlways IsNot Nothing Then
                     Me.Height += lChkAlways.Height + pMargin
                     lChkAlways.Top = Me.ClientSize.Height - btn.Height - pMargin - lChkAlways.Height - pMargin
                     lChkAlways.Anchor = AnchorStyles.Bottom + AnchorStyles.Left
                 End If
                 lSetHeight = True
+                lButtonTop = Me.ClientSize.Height - btn.Height - pMargin
             End If
 
-            btn.Top = Me.ClientSize.Height - btn.Height - pMargin
+            btn.Top = lButtonTop
 
             lButtons.Add(btn)
             Me.Controls.Add(btn)
-            lButtonLeft += btn.Width + pMargin
+            If lHorizontal Then
+                lButtonLeft += btn.Width + pMargin
+            Else
+                Me.Height += btn.Height + pMargin
+                lButtonTop += btn.Height + pMargin
+                If btn.Width > lMaxButtonWidth Then lMaxButtonWidth = btn.Width
+            End If
 
             AddHandler btn.Click, AddressOf btnClick
 
         Next
+        If lHorizontal Then
+            Dim lMoveButtons As Integer = (lblMessage.Left + lblMessage.Width + pMargin - lButtonLeft) / 2
+            If lMoveButtons < 0 Then
+                Me.Width = lButtonLeft
+            Else
+                Me.Width = lblMessage.Left + lblMessage.Width + pMargin
 
-        Dim lMoveButtons As Integer = (lblMessage.Left + lblMessage.Width + pMargin - lButtonLeft) / 2
-        If lMoveButtons < 0 Then
-            Me.Width = lButtonLeft
+                For Each lButton As Windows.Forms.Button In lButtons
+                    lButton.Left += lMoveButtons
+                Next
+            End If
         Else
-            Me.Width = lblMessage.Left + lblMessage.Width + pMargin
-
             For Each lButton As Windows.Forms.Button In lButtons
-                lButton.Left += lMoveButtons
+                lButton.Width = lMaxButtonWidth
             Next
+            If lblMessage.Width > lMaxButtonWidth Then lMaxButtonWidth = lblMessage.Width
+            lMaxButtonWidth += pMargin * 2
+            If lMaxButtonWidth > Me.Width Then Me.Width = lMaxButtonWidth
         End If
 
         Me.Show()
