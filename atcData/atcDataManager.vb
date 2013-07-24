@@ -7,6 +7,7 @@ Imports System.Reflection
 ''' </summary>
 Public Class atcDataManager
 #If GISProvider = "DotSpatial" Then
+    Public Shared DataPlugins As New Generic.List(Of atcDataPlugin)
 #Else
     Private Shared pMapWin As MapWindow.Interfaces.IMapWin
     ''' <summary>Pointer to the root interface for MapWindow 4</summary>
@@ -159,7 +160,8 @@ Public Class atcDataManager
     '''          Defaults Datasources, Selection Attributes and Display Attributes.
     ''' </summary>
     Public Shared Sub Clear()
-        If pDataSources IsNot Nothing Then
+        Dim lClose As Boolean = pDataSources IsNot Nothing AndAlso pDataSources.Count > 0
+        If lClose Then
             For Each lDataSource As atcTimeseriesSource In pDataSources
                 lDataSource.Clear()
             Next
@@ -170,6 +172,11 @@ Public Class atcDataManager
         'repopulate attribute lists with defaults
         SelectionAttributesSet(Nothing)
         DisplayAttributesSet(Nothing)
+
+        Try 'Let listeners know that we closed something
+            If lClose Then RaiseEvent ClosedData(Nothing)
+        Catch 'We did not say what was closed, so catch any exception
+        End Try
     End Sub
 
     ''' <summary>Set of atcTimeseriesSource objects representing currently open DataSources</summary>
@@ -246,6 +253,11 @@ Public Class atcDataManager
     Public Shared Function GetPlugins(ByVal aBaseType As Type) As atcCollection
         Dim lMatchingPlugIns As New atcCollection
 #If GISProvider = "DotSpatial" Then
+        For Each lCurPlugin As atcDataPlugin In DataPlugins
+            If CType(lCurPlugin, Object).GetType().IsSubclassOf(aBaseType) Then
+                lMatchingPlugIns.Add(lCurPlugin.Name, lCurPlugin)
+            End If
+        Next
 #Else
         If Not pMapWin Is Nothing Then
             Dim lLastPlugIn As Integer = pMapWin.Plugins.Count() - 1

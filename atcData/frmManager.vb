@@ -26,14 +26,17 @@ Friend Class frmManager
 
     'Form overrides dispose to clean up the component list.
     Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
-        If disposing Then
-            RemoveHandler atcDataManager.OpenedData, AddressOf ChangedData
-            RemoveHandler atcDataManager.ClosedData, AddressOf ChangedData
-            If Not (components Is Nothing) Then
-                components.Dispose()
+        Try
+            If disposing Then
+                RemoveHandler atcDataManager.OpenedData, AddressOf ChangedData
+                RemoveHandler atcDataManager.ClosedData, AddressOf ChangedData
+                If components IsNot Nothing Then
+                    components.Dispose()
+                End If
             End If
-        End If
-        MyBase.Dispose(disposing)
+        Finally
+            MyBase.Dispose(disposing)
+        End Try
     End Sub
 
     'Required by the Windows Form Designer
