@@ -817,7 +817,7 @@ TryOldString:
         End If
 
         If i >= 0 Then 'found delimeter
-            lReturn = S.Substring(0, i - 1) 'string to return
+            lReturn = S.Substring(0, i) 'string to return
             'Also skip comma if we ended on a quote or space
             If S.Substring(i + 1, 1) = "," AndAlso S.Substring(i, 1) <> "," Then
                 S = S.Substring(i + 2)
