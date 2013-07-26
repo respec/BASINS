@@ -78,6 +78,7 @@ Public Class atcTimeseriesFileHspfBinOut
         Try
             Dim lNumBinHeaders As Integer = pBinFile.Headers.Count
             If DebugLevel > 0 Then
+                Logger.Dbg(MemUsage)
                 Logger.Dbg("Parse " & lNumBinHeaders & " Headers")
             End If
             Dim lFileAttributes As New atcDataAttributes
@@ -91,14 +92,32 @@ Public Class atcTimeseriesFileHspfBinOut
             End With
             Dim lHeaderIndex As Integer = 0
             'Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
+
+            'Dim lCountVariables As New atcCollection
+            'Dim lNumVariables As Integer = 0
+            'Dim lCountData As Integer = 0
+            'For Each lBinHeader As HspfBinaryHeader In pBinFile.Headers
+            '    lNumVariables += lBinHeader.VarNames.Count
+            '    For Each lConstituent As String In lBinHeader.VarNames
+            '        lCountVariables.Increment(lConstituent)
+            '    Next
+            '    lCountData += lBinHeader.Data.Count
+            'Next
+            'Logger.Dbg(lCountData & " total Header.Data")
+            'Logger.Dbg(lNumVariables & " total Variables")
+            'For Each lVariable As String In lCountVariables.Keys
+            '    Logger.Dbg(lCountVariables.ItemByKey(lVariable) & "  " & lVariable)
+            'Next
+
             For Each lBinHeader As HspfBinaryHeader In pBinFile.Headers
                 With lBinHeader
-                    Dim lData As HspfBinaryDatum = .Data.Item(0)
+                    Dim lFirstBinDatum As HspfBinaryDatum = .Data.Item(0)
                     Dim lDates As New atcTimeseries(Me)
                     lDates.Attributes.SetValue("Shared", True)
+
                     'lSJDate = lData.JDate
                     'lOutLev = lData.OutLev
-                    Dim lDataIndex As Integer
+                    'Dim lDataIndex As Integer
                     'If .Data.Count = 1 Then
                     '    lDataIndex = 1 'force daily
                     'Else
@@ -120,7 +139,7 @@ Public Class atcTimeseriesFileHspfBinOut
                     With lBaseAttributes
                         'If lEJDate - lSJDate >= 1 Then 'daily or longer interval
                         '    lTs = 1
-                        '    lTu = lBinHeader.Data.Item(0).OutLev + 1
+                        '    lTu = lFirstBinDatum.OutLev + 1
                         '    lIntvl = 1
                         '    'If lTu = ATCTimeUnit.TUDay Then
                         '    'Else 'undefined for monthly or annual
@@ -142,26 +161,17 @@ Public Class atcTimeseriesFileHspfBinOut
                         '.SetValue("Intvl", lIntvl)
                         'lSJDate = TimAddJ(lBinHeader.Data.Item(0).JDate, lTu, lTs, -lIntvl)
                         .ChangeTo(lFileAttributes)
-                        .SetValue("SJDay", lBinHeader.Data.Item(0).JDate)
+                        .SetValue("SJDay", lFirstBinDatum.JDate) 'Is end of first interval correct for SJDay?
                         .SetValue("EJDay", lBinHeader.Data.Item(lBinHeader.Data.Count - 1).JDate)
                         .SetValue("Operation+Section", lBinHeader.Id.AsKey)
                         .SetValue("IDLOCN", Left(lBinHeader.Id.OperationName, 1) & ":" & (lBinHeader.Id.OperationNumber))
                     End With
-                    Dim lLastVarNameIndex As Integer = .VarNames.Count - 1
-                    For lDataIndex = 0 To lLastVarNameIndex
+                    For Each lConstituent As String In lBinHeader.VarNames
                         Dim lTSer As atcTimeseries = New atcTimeseries(Me)
                         lTSer.Attributes.SetValue("SharedAttributes", lBaseAttributes)
-                        'For Each lFileAttribute As atcDefinedValue In lFileAttributes
-                        '    lTSer.Attributes.Add(lFileAttribute)
-                        'Next
-                        'For Each lBaseAttribute As atcDefinedValue In lBaseAttributes
-                        '    lTSer.Attributes.Add(lBaseAttribute)
-                        'Next
                         With lTSer
-                            Dim lConstituent As String = lBinHeader.VarNames.Item(lDataIndex)
                             .Attributes.SetValue("IDCONS", lConstituent)
-                            Dim lUnitSystem As atcUnitSystem = CType(CType(lBinHeader.Data(0), HspfBinaryDatum).UnitFlag, atcUnitSystem)
-                            .Attributes.SetValue("UNITS", GetUnits(lConstituent, lUnitSystem))
+                            .Attributes.SetValue("UNITS", GetUnits(lConstituent, pBinFile.UnitSystem))
                             .Attributes.SetValue("ID", Me.DataSets.Count)
                             If lConstituent = "LZS" Then 'TODO: need better check here
                                 .Attributes.SetValue("Point", True)
@@ -171,7 +181,7 @@ Public Class atcTimeseriesFileHspfBinOut
                             .Dates = lDates
                             AddDataSet(lTSer)
                         End With
-                    Next lDataIndex
+                    Next
                 End With
                 lHeaderIndex += 1
                 'Logger.Dbg("Loop " & i)
@@ -304,30 +314,32 @@ Public Class atcTimeseriesFileHspfBinOut
                 If lVariableIndex >= 0 Then
                     Dim lSJday As Double = lTimeseries.Attributes.GetValue("SJDay")
                     Dim lEJday As Double = lTimeseries.Attributes.GetValue("EJDay")
-                    Dim lOutLev As Integer = .Data.Item(0).OutLev
                     Dim lShared As atcDataAttributes = Nothing
                     If lNeedDates Then lJDates.Add(lSJday)
                     lValues.Add(pNaN)
                     For Each lHspfBinaryDatum As HspfBinaryDatum In .Data
                         Dim lCurJday As Double = lHspfBinaryDatum.JDate
                         If lCurJday >= lSJday Then
-                            If lCurJday > lEJday Then Exit For
-                            If lHspfBinaryDatum.OutLev = lOutLev Then
-                                lValues.Add(pBinFile.ReadValue(lHspfBinaryDatum.ValuesStartPosition, lVariableIndex))
-                                If lNeedDates Then
-                                    lJDates.Add(lCurJday)
-                                    If lJDates.Count = 3 Then 'Compute beginning of first interval
-                                        CalcTimeUnitStep(lJDates(1), lJDates(2), lTimeUnit, lTimeStep)
-                                        lJDates(0) = TimAddJ(lJDates(1), lTimeUnit, lTimeStep, -1)
-                                        lTimeseries.SetInterval(lTimeUnit, lTimeStep)
-                                        If lTimeUnit <> atcTimeUnit.TUUnknown Then
-                                            lShared = lTimeseries.Attributes.GetValue("SharedAttributes")
-                                            If lShared IsNot Nothing Then
-                                                lShared.SetValue("Time Step", lTimeStep)
-                                                lShared.SetValue("Time Unit", lTimeUnit)
-                                                If lTimeseries.Attributes.ContainsAttribute("Interval") Then
-                                                    lShared.SetValue("Interval", lTimeseries.Attributes.GetValue("Interval"))
-                                                End If
+                            'If lCurJday = lEJday Then
+                            '    Stop
+                            'End If
+                            If lCurJday > lEJday Then
+                                Exit For
+                            End If
+                            lValues.Add(pBinFile.ReadValue(lHspfBinaryDatum.ValuesStartPosition, lVariableIndex))
+                            If lNeedDates Then
+                                lJDates.Add(lCurJday)
+                                If lJDates.Count = 3 Then 'Compute beginning of first interval
+                                    CalcTimeUnitStep(lJDates(1), lJDates(2), lTimeUnit, lTimeStep)
+                                    lJDates(0) = TimAddJ(lJDates(1), lTimeUnit, lTimeStep, -1)
+                                    lTimeseries.SetInterval(lTimeUnit, lTimeStep)
+                                    If lTimeUnit <> atcTimeUnit.TUUnknown Then
+                                        lShared = lTimeseries.Attributes.GetValue("SharedAttributes")
+                                        If lShared IsNot Nothing Then
+                                            lShared.SetValue("Time Step", lTimeStep)
+                                            lShared.SetValue("Time Unit", lTimeUnit)
+                                            If lTimeseries.Attributes.ContainsAttribute("Interval") Then
+                                                lShared.SetValue("Interval", lTimeseries.Attributes.GetValue("Interval"))
                                             End If
                                         End If
                                     End If
