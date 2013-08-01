@@ -276,6 +276,7 @@ TryExpFormat:
                 End Select
                 aExpFormat = "0." & StrDup(lDecimalCount, "#") & "e0"
             Else
+                If aExpFormat.EndsWith("#") Then aExpFormat = aExpFormat.Substring(0, aExpFormat.Length - 1) & "0"
                 Dim lDecimalPos As Integer = aExpFormat.IndexOf(".")
                 If lDecimalPos >= 0 Then
                     lExpPos = aExpFormat.IndexOf("e", lDecimalPos + 1)
