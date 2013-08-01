@@ -148,9 +148,6 @@
     <Compile Include="atcTimeseriesFileHspfBinOut.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="clsFtnUnfFile.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="clsHspfBinary.vb">
       <SubType>Code</SubType>
     </Compile>

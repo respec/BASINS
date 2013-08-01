@@ -351,11 +351,7 @@ Friend Class HspfBinary
                                         DateArray(4) = 0 'otherwise jdate is first hour in next day
                                     End If
                                     .JDate = Date2J(DateArray)
-                                    'If .JDate = 40452.041666666664 Then Stop
-                                    'lLog.AppendLine(lHspfBinaryHeader.Id.AsKey & " " & .UnitFlag & " " & .OutLev & " " & .JDate & DumpDate(.JDate))
-                                    'If lHspfBinaryHeader.VarNames.Count * 4 + .ValuesStartPosition > pBytesInFile Then
-                                    '    Stop
-                                    'End If
+                                    'We used to read all the values here, now we wait and read them in atcTimeseriesFileHspfBinOut.ReadData
                                     'Dim lVariableCount As Integer = lHspfBinaryHeader.VarNames.Count
                                     'Dim lValues(lVariableCount - 1) As Double
                                     'For lVariableIndex As Integer = 0 To lVariableCount - 1
