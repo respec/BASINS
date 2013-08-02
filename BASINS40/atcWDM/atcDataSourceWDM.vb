@@ -118,7 +118,6 @@ Public Class atcDataSourceWDM
         Dim lDSN As Integer
         Dim lLowestDSN As Integer = Integer.MaxValue
         Dim lHighestDSN As Integer = 0
-        Dim lHighestNewDSN As Integer = 0
         Dim lLabel As String = FilenameNoPath(Specification) & " contains " & DataSets.Count & " datasets"
 
         If DataSets.Count > 0 Then
@@ -132,8 +131,18 @@ Public Class atcDataSourceWDM
             lLabel &= " numbered " & lLowestDSN & " to " & lHighestDSN
         End If
 
+        Dim lHaveDSNconflict As Boolean = False
+        For Each lDataSet As atcTimeseries In aDataGroup
+            lDSN = lDataSet.Attributes.GetValue("dsn", 0)
+            If DataSets.Keys.Contains(lDSN) Then
+                lHaveDSNconflict = True
+            End If
+        Next
+
+        Dim lHighestNewDSN As Integer = 0
+        If lHaveDSNconflict Then lHighestNewDSN = lHighestDSN
+
         Dim lCloneTsGroup As New atcTimeseriesGroup
-        lHighestNewDSN = lHighestDSN
         For Each lDataSet As atcTimeseries In aDataGroup
             lDSN = lDataSet.Attributes.GetValue("dsn", 0)
             If lDSN > lHighestNewDSN AndAlso lDSN < 9999 Then
@@ -214,8 +223,8 @@ Public Class atcDataSourceWDM
 
             'Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
 
-            Dim lDsnExists As Integer = F90_WDCKDT(lWdmHandle.Unit, lDsn)
-            If lDsnExists > 0 Then 'dataset exists, what do we do?
+            Dim lDsnExists As Boolean = DataSets.Keys.Contains(lDsn) ' Integer = F90_WDCKDT(lWdmHandle.Unit, lDsn)
+            If lDsnExists Then ' lDsnExists > 0 Then 'dataset exists, what do we do?
                 'Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
                 'Change asking user into what the user already chose for all
                 If aExistAction = ExistAskUser Then aExistAction = pExistAskUserAction
@@ -274,7 +283,7 @@ CaseExistRenumber:
             End If
 
             Dim lWriteIt As Boolean = False
-            If lDsnExists > 0 AndAlso aExistAction = ExistAppend Then 'just write appended data
+            If lDsnExists AndAlso aExistAction = ExistAppend Then 'just write appended data
                 lWriteIt = True
             ElseIf DsnBld(lWdmHandle.Unit, lTimser) Then
                 DataSets.Add(lDsn, lTimser)

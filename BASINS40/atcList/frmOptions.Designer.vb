@@ -23,38 +23,38 @@ Partial Class frmOptions
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmOptions))
-        Me.grpboxDateFormat = New System.Windows.Forms.GroupBox
-        Me.radioOrderJulian = New System.Windows.Forms.RadioButton
-        Me.radioOrderDMY = New System.Windows.Forms.RadioButton
-        Me.radioOrderMDY = New System.Windows.Forms.RadioButton
-        Me.radioOrderYMD = New System.Windows.Forms.RadioButton
-        Me.chkMidnight24 = New System.Windows.Forms.CheckBox
-        Me.chkMonthNames = New System.Windows.Forms.CheckBox
-        Me.chk2digitYears = New System.Windows.Forms.CheckBox
-        Me.chkSeconds = New System.Windows.Forms.CheckBox
-        Me.chkMinutes = New System.Windows.Forms.CheckBox
-        Me.chkHours = New System.Windows.Forms.CheckBox
-        Me.chkDays = New System.Windows.Forms.CheckBox
-        Me.chkMonths = New System.Windows.Forms.CheckBox
-        Me.chkYears = New System.Windows.Forms.CheckBox
-        Me.lblTimeSeparator = New System.Windows.Forms.Label
-        Me.txtTimeSeparator = New System.Windows.Forms.TextBox
-        Me.lblDateSeparator = New System.Windows.Forms.Label
-        Me.txtDateSeparator = New System.Windows.Forms.TextBox
-        Me.btnCancel = New System.Windows.Forms.Button
-        Me.grpboxNumberFormat = New System.Windows.Forms.GroupBox
-        Me.lblFormat = New System.Windows.Forms.Label
-        Me.txtExpFormat = New System.Windows.Forms.TextBox
-        Me.lblExpFormat = New System.Windows.Forms.Label
-        Me.lblCantFit = New System.Windows.Forms.Label
-        Me.txtCantFit = New System.Windows.Forms.TextBox
-        Me.txtMaxWidth = New System.Windows.Forms.TextBox
-        Me.lblMaxWidth = New System.Windows.Forms.Label
-        Me.txtSignificantDigits = New System.Windows.Forms.TextBox
-        Me.txtFormat = New System.Windows.Forms.TextBox
-        Me.lblSigDig = New System.Windows.Forms.Label
-        Me.btnApply = New System.Windows.Forms.Button
-        Me.btnOk = New System.Windows.Forms.Button
+        Me.grpboxDateFormat = New System.Windows.Forms.GroupBox()
+        Me.radioOrderJulian = New System.Windows.Forms.RadioButton()
+        Me.radioOrderDMY = New System.Windows.Forms.RadioButton()
+        Me.radioOrderMDY = New System.Windows.Forms.RadioButton()
+        Me.radioOrderYMD = New System.Windows.Forms.RadioButton()
+        Me.chkMidnight24 = New System.Windows.Forms.CheckBox()
+        Me.chkMonthNames = New System.Windows.Forms.CheckBox()
+        Me.chk2digitYears = New System.Windows.Forms.CheckBox()
+        Me.chkSeconds = New System.Windows.Forms.CheckBox()
+        Me.chkMinutes = New System.Windows.Forms.CheckBox()
+        Me.chkHours = New System.Windows.Forms.CheckBox()
+        Me.chkDays = New System.Windows.Forms.CheckBox()
+        Me.chkMonths = New System.Windows.Forms.CheckBox()
+        Me.chkYears = New System.Windows.Forms.CheckBox()
+        Me.lblTimeSeparator = New System.Windows.Forms.Label()
+        Me.txtTimeSeparator = New System.Windows.Forms.TextBox()
+        Me.lblDateSeparator = New System.Windows.Forms.Label()
+        Me.txtDateSeparator = New System.Windows.Forms.TextBox()
+        Me.btnCancel = New System.Windows.Forms.Button()
+        Me.grpboxNumberFormat = New System.Windows.Forms.GroupBox()
+        Me.lblFormat = New System.Windows.Forms.Label()
+        Me.txtExpFormat = New System.Windows.Forms.TextBox()
+        Me.lblExpFormat = New System.Windows.Forms.Label()
+        Me.lblCantFit = New System.Windows.Forms.Label()
+        Me.txtCantFit = New System.Windows.Forms.TextBox()
+        Me.txtMaxWidth = New System.Windows.Forms.TextBox()
+        Me.lblMaxWidth = New System.Windows.Forms.Label()
+        Me.txtSignificantDigits = New System.Windows.Forms.TextBox()
+        Me.txtFormat = New System.Windows.Forms.TextBox()
+        Me.lblSigDig = New System.Windows.Forms.Label()
+        Me.btnApply = New System.Windows.Forms.Button()
+        Me.btnOk = New System.Windows.Forms.Button()
         Me.grpboxDateFormat.SuspendLayout()
         Me.grpboxNumberFormat.SuspendLayout()
         Me.SuspendLayout()
@@ -356,9 +356,9 @@ Partial Class frmOptions
         Me.lblMaxWidth.Location = New System.Drawing.Point(4, 99)
         Me.lblMaxWidth.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblMaxWidth.Name = "lblMaxWidth"
-        Me.lblMaxWidth.Size = New System.Drawing.Size(101, 13)
+        Me.lblMaxWidth.Size = New System.Drawing.Size(87, 13)
         Me.lblMaxWidth.TabIndex = 5
-        Me.lblMaxWidth.Text = "Maximim Characters"
+        Me.lblMaxWidth.Text = "Maximum Length"
         Me.lblMaxWidth.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtSignificantDigits
@@ -374,9 +374,9 @@ Partial Class frmOptions
         '
         Me.txtFormat.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtFormat.Location = New System.Drawing.Point(104, 18)
+        Me.txtFormat.Location = New System.Drawing.Point(94, 18)
         Me.txtFormat.Name = "txtFormat"
-        Me.txtFormat.Size = New System.Drawing.Size(105, 20)
+        Me.txtFormat.Size = New System.Drawing.Size(115, 20)
         Me.txtFormat.TabIndex = 3
         '
         'lblSigDig
