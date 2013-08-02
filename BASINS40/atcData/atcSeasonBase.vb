@@ -80,14 +80,18 @@ Public Class atcSeasonBase
                 'End If
                 If lPrevSeasonIndex <> lSeasonIndex Then
                     'Insert dummy value for start of interval after skipping dates outside season
-                    If lNewTS.numValues <= lNewTSvalueIndex Then lNewTS.numValues += Math.Min(lNewTSvalueIndex, lNumValuesOriginal - lNewTS.numValues)
+                    If lNewTS.numValues <= lNewTSvalueIndex Then
+                        lNewTS.numValues += Math.Max(10, lNewTSvalueIndex + 1)
+                    End If
                     lNewTS.Value(lNewTSvalueIndex) = pNaN
                     lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue - 1)
                     lNewTS.ValueAttributes(lNewTSvalueIndex).SetValue("Inserted", True)
                     lNewTSvalueIndex += 1
                 End If
             End If
-            If lNewTS.numValues < lNewTSvalueIndex Then lNewTS.numValues += Math.Min(lNewTSvalueIndex, lNumValuesOriginal - lNewTS.numValues)
+            If lNewTS.numValues <= lNewTSvalueIndex Then
+                lNewTS.numValues += Math.Max(10, lNewTSvalueIndex + 1)
+            End If
             lNewTS.Value(lNewTSvalueIndex) = aTS.Value(iValue)
             lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue)
             lNewTS.Attributes.SetValue("NextIndex", lNewTSvalueIndex + 1)

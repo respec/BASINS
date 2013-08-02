@@ -53,6 +53,37 @@ Public Class atcDataPlugin
         End Get
     End Property
 
+    Public Overridable Function ComputeClicked(ByVal aItemName As String) As atcDataSource
+        Dim ds As atcDataSource = Me
+        Dim lItemName As String = aItemName '.Replace(" ", "")
+        lItemName = lItemName.Substring(atcDataManager.ComputeMenuName.Length + 1, lItemName.Length - atcDataManager.ComputeMenuName.Length - Name.Length - 2)
+        If lItemName.StartsWith(ds.Category & "_") Then
+            Dim lNewSource As atcDataSource = Nothing
+            lItemName = lItemName.Substring(ds.Category.Length + 1)
+            Dim lOperation As atcDefinedValue = ds.AvailableOperations.ItemByKey(lItemName.ToLower)
+            Dim lUnderscorePos As Integer = lItemName.IndexOf("_"c)
+            While lUnderscorePos >= 0 AndAlso lOperation Is Nothing
+                lOperation = ds.AvailableOperations.ItemByKey(lItemName.Substring(lUnderscorePos + 1).ToLower)
+                lUnderscorePos = lItemName.IndexOf("_"c, lUnderscorePos + 1)
+            End While
+
+            If Not lOperation Is Nothing Then
+                lNewSource = ds.NewOne
+                lNewSource.Specification = lOperation.Definition.Name
+            ElseIf lItemName.Equals(ds.Description) Then
+                lNewSource = ds.NewOne
+            End If
+            If lNewSource IsNot Nothing Then
+                If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                    If lNewSource.DataSets.Count > 0 Then
+                        Return lNewSource
+                    End If
+                End If
+            End If
+        End If
+        Return Nothing
+    End Function
+
 #If GISProvider = "DotSpatial" Then
     ''' <summary></summary>
     ''' <remarks></remarks>
@@ -298,45 +329,21 @@ Public Class atcDataPlugin
                 atcDataManager.UserManage()
                 aHandled = True
             Case Else
-                Dim lName As String = Name
                 If aItemName.StartsWith(atcDataManager.SaveDataMenuName & "_") Then
                     aHandled = True
                     atcDataManager.UserSaveData(aItemName.Substring(atcDataManager.SaveDataMenuName.Length + 1))
-                ElseIf aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & lName) Then
+                ElseIf aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & Name) Then
                     aHandled = True
                     Dim lNewObject As atcDataTool = Me.NewOne
                     lNewObject.Initialize(pMapWin, pMapWinWindowHandle)
                     lNewObject.Show()
-                ElseIf aItemName.StartsWith(atcDataManager.ComputeMenuName & "_") AndAlso aItemName.EndsWith(lName) Then
+                ElseIf aItemName.StartsWith(atcDataManager.ComputeMenuName & "_") AndAlso aItemName.EndsWith(Name) Then
                     aHandled = True
                     Try
-                        Dim ds As atcDataSource = Me
-                        Dim lItemName As String = aItemName '.Replace(" ", "")
-                        lItemName = lItemName.Substring(atcDataManager.ComputeMenuName.Length + 1, lItemName.Length - atcDataManager.ComputeMenuName.Length - lName.Length - 2)
-                        If lItemName.StartsWith(ds.Category & "_") Then
-                            Dim lNewSource As atcDataSource = Nothing
-                            lItemName = lItemName.Substring(ds.Category.Length + 1)
-                            Dim lOperation As atcDefinedValue = ds.AvailableOperations.ItemByKey(lItemName.ToLower)
-                            Dim lUnderscorePos As Integer = lItemName.IndexOf("_"c)
-                            While lUnderscorePos >= 0 AndAlso lOperation Is Nothing
-                                lOperation = ds.AvailableOperations.ItemByKey(lItemName.Substring(lUnderscorePos + 1).ToLower)
-                                lUnderscorePos = lItemName.IndexOf("_"c, lUnderscorePos + 1)
-                            End While
-
-                            If Not lOperation Is Nothing Then
-                                lNewSource = ds.NewOne
-                                lNewSource.Specification = lOperation.Definition.Name
-                            ElseIf lItemName.Equals(ds.Description) Then
-                                lNewSource = ds.NewOne
-                            End If
-                            If Not lNewSource Is Nothing Then
-                                If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
-                                    If lNewSource.DataSets.Count > 0 Then
-                                        Dim lTitle As String = lNewSource.ToString
-                                        atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
-                                    End If
-                                End If
-                            End If
+                        Dim lNewSource As atcDataSource = ComputeClicked(aItemName)
+                        If lNewSource IsNot Nothing AndAlso lNewSource.DataSets.Count > 0 Then
+                            Dim lTitle As String = lNewSource.ToString
+                            atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
                         End If
                     Catch
                     End Try
