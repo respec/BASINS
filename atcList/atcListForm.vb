@@ -568,7 +568,14 @@ Public Class atcListForm
                 Integer.TryParse(.txtSignificantDigits.Text, pSignificantDigits)
                 Integer.TryParse(.txtMaxWidth.Text, pMaxWidth)
                 pCantFit = .txtCantFit.Text
-                PopulateGrid()
+                'PopulateGrid()
+                With pSource
+                    .DateFormat = pDateFormat
+                    .ValueFormat(pMaxWidth, pFormat, pExpFormat, pCantFit, pSignificantDigits)
+                End With
+                agdMain.SizeAllColumnsToContents()
+                SizeToGrid()
+                agdMain.Refresh()
 
                 SaveSetting("BASINS", "List", "DateFormat", pDateFormat.ToString)
                 SaveSetting("BASINS", "List", "MaxWidth", pMaxWidth)
