@@ -374,6 +374,8 @@ Friend Class frmSelectData
 
     Private pSelectedOK As Boolean = False
     Private pRevertedToSaved As Boolean = False
+    Private pAsking As Boolean = False
+    Private pOkCloses As Boolean = True
 
     Private pTotalTS As Integer = 0
 
@@ -468,9 +470,10 @@ Friend Class frmSelectData
 
         Me.Show()
         Populate()
+        pAsking = True
 
         Dim lCriteriaIndex As Integer = 0
-        While Me.Visible AndAlso lCriteriaIndex < pcboCriteria(0).Items.Count
+        While pAsking AndAlso lCriteriaIndex < pcboCriteria(0).Items.Count
             Dim lAttributeName As String = pcboCriteria(0).Items(lCriteriaIndex)
             Select Case lAttributeName
                 Case BLANK_LABEL, CALCULATED_LABEL
@@ -498,7 +501,7 @@ Friend Class frmSelectData
         End While
 
         If aModal Then
-            While Me.Visible
+            While pAsking
                 Application.DoEvents()
                 Threading.Thread.Sleep(10)
             End While
@@ -507,10 +510,12 @@ Friend Class frmSelectData
             Else 'User clicked Cancel or closed dialog
                 If Not pRevertedToSaved Then pSelectedGroup.ChangeTo(pSaveGroup)
             End If
-            Try
-                Me.Close()
-            Catch
-            End Try
+            If pOkCloses Then
+                Try
+                    Me.Close()
+                Catch
+                End Try
+            End If
             Return pSelectedGroup
         Else
             Return Nothing
@@ -687,6 +692,7 @@ Friend Class frmSelectData
             'Already have a thread doing this, tell it to start over
             pRestartPopulatingMatching = True
         Else
+            pLastMatchingGridClickRow = -1
             Dim lSaveCursor As Cursor = Me.Cursor
             pPopulatingMatching = True
             pAbortMatching = False
@@ -763,6 +769,7 @@ NextTS:
                 Me.Cursor = lSaveCursor
                 pPopulatingMatching = False
                 Logger.Progress("", 0, 0)
+                pLastMatchingGridClickRow = -1
             End Try
         End If
     End Sub
@@ -1058,6 +1065,12 @@ NextName:
 
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
         pAbortMatching = True
+        If My.Computer.Keyboard.ShiftKeyDown Then
+            'If e IsNot Nothing AndAlso e.GetType.Name = "MouseEventArgs" Then
+            '    If CType(e, System.Windows.Forms.MouseEventArgs).Button = Windows.Forms.MouseButtons.Right Then
+            pOkCloses = False
+            'End If
+        End If
         'If user didn't select anything, 
         ' but either narrowed the matching group or there are not more than 10 datasets,
         ' assume they meant to select all the matching datasets
@@ -1110,8 +1123,8 @@ NextName:
 
             pSelectedGroup.ChangeTo(lAggregatedGroup)
         End If
-
-        Me.Visible = False
+        If pOkCloses Then Me.Visible = False
+        pAsking = False
     End Sub
 
     Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
@@ -1120,6 +1133,7 @@ NextName:
         pRevertedToSaved = True
         pSelectedGroup.ChangeTo(pSaveGroup)
         Me.Visible = False
+        pAsking = False
     End Sub
 
     'Update SelectionAttributes from current set of pcboCriteria
@@ -1144,22 +1158,57 @@ NextName:
         End If
     End Sub
 
+    Private pLastMatchingGridClickRow As Integer = -1
+
     Private Sub pMatchingGrid_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles pMatchingGrid.MouseDownCell
-        If IsNumeric(pMatchingSource.CellValue(aRow, 0)) Then 'clicked a row containing a serial number
-            Dim lSerial As Integer = CInt(pMatchingSource.CellValue(aRow, 0)) 'Serial number in clicked row
-            Dim iTS As Integer = pSelectedGroup.IndexOfSerial(lSerial)
-            If iTS >= 0 Then 'Already selected, unselect
-                pSelectedGroup.RemoveAt(iTS)
-                SelectMatchingRow(aRow, False)
-            Else 'Not already selected, select it now
-                iTS = pMatchingGroup.IndexOfSerial(lSerial)
-                If iTS >= 0 Then 'Found matching serial number in pMatchingGroup
-                    Dim selTS As atcData.atcDataSet = pMatchingGroup(iTS)
-                    pSelectedGroup.Add(selTS)
-                    SelectMatchingRow(aRow, True)
+        Dim lStartRow As Integer = aRow
+        Dim lStep As Integer = 1
+
+        If My.Computer.Keyboard.ShiftKeyDown _
+            AndAlso pLastMatchingGridClickRow >= 0 _
+            AndAlso pLastMatchingGridClickRow <> aRow Then
+            If aRow < pLastMatchingGridClickRow Then
+                lStartRow = pLastMatchingGridClickRow - 1
+                lStep = -1
+            ElseIf aRow > pLastMatchingGridClickRow Then
+                lStartRow = pLastMatchingGridClickRow + 1
+            End If
+        Else
+            pLastMatchingGridClickRow = aRow
+        End If
+
+        Dim lRemoveThese As New atcCollection
+        Dim lAddThese As New atcCollection
+        For lRow As Integer = lStartRow To aRow Step lStep
+            Dim lSerial As Integer 'Serial number in clicked row
+            If Integer.TryParse(pMatchingSource.CellValue(lRow, 0), lSerial) Then 'clicked a row containing a serial number
+                Dim iTS As Integer = pSelectedGroup.IndexOfSerial(lSerial)
+                If iTS >= 0 Then 'Already selected
+                    If lStartRow = aRow Then 'Only un-select if this is the only row clicked
+                        lRemoveThese.Add(pSelectedGroup(iTS)) ' pSelectedGroup.RemoveAt(iTS)
+                        SelectMatchingRow(lRow, False)
+                    End If
+                Else 'Not already selected, select it now
+                    iTS = pMatchingGroup.IndexOfSerial(lSerial)
+                    If iTS >= 0 Then 'Found matching serial number in pMatchingGroup
+                        lAddThese.Add(pMatchingGroup(iTS))
+                        SelectMatchingRow(lRow, True)
+                    End If
                 End If
             End If
+        Next
+
+        If lRemoveThese.Count > 0 Then
+            If lRemoveThese.Count = pSelectedGroup.Count Then
+                pSelectedGroup.Clear()
+            Else
+                pSelectedGroup.Remove(lRemoveThese)
+            End If
         End If
+        If lAddThese.Count > 0 Then
+            pSelectedGroup.Add(lAddThese)
+        End If
+
     End Sub
 
     Private Sub pSelectedGrid_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles pSelectedGrid.MouseDownCell
