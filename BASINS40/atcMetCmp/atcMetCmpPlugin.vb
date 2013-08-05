@@ -98,18 +98,20 @@ Public Class atcMetCmpPlugin
                     lCTS = aArgs.GetValue("Jensen Monthly Coefficients")
                     lOk = True
                 End If
-                lAttDef = atcDataAttributes.GetDefinition("Jensen Monthly Coefficients")
-                For i As Integer = 1 To 12
-                    If lCTS(i) > lAttDef.Max Or lCTS(i) < lAttDef.Min Then
-                        lOk = False
-                        Exit For
+                If lOk Then
+                    lAttDef = atcDataAttributes.GetDefinition("Jensen Monthly Coefficients")
+                    For i As Integer = 1 To 12
+                        If lCTS(i) > lAttDef.Max Or lCTS(i) < lAttDef.Min Then
+                            lOk = False
+                            Exit For
+                        End If
+                    Next
+                    lAttDef = atcDataAttributes.GetDefinition("Constant Coefficient")
+                    If lOk AndAlso lTMinTSer IsNot Nothing AndAlso lTMaxTSer IsNot Nothing AndAlso _
+                                   lSRadTSer IsNot Nothing AndAlso lCTX >= lAttDef.Min AndAlso lCTX <= lAttDef.Max Then
+                        Dim lMetCmpTS As atcTimeseries = CmpJen(lTMinTSer, lTMaxTSer, lSRadTSer, Me, lDegF, lCTX, lCTS)
+                        MyBase.DataSets.Add(lMetCmpTS)
                     End If
-                Next
-                lAttDef = atcDataAttributes.GetDefinition("Constant Coefficient")
-                If lOk AndAlso lTMinTSer IsNot Nothing AndAlso lTMaxTSer IsNot Nothing AndAlso _
-                               lSRadTSer IsNot Nothing AndAlso lCTX >= lAttDef.Min AndAlso lCTX <= lAttDef.Max Then
-                    Dim lMetCmpTS As atcTimeseries = CmpJen(lTMinTSer, lTMaxTSer, lSRadTSer, Me, lDegF, lCTX, lCTS)
-                    MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Hamon PET"
                 If aArgs Is Nothing Then
@@ -123,17 +125,19 @@ Public Class atcMetCmpPlugin
                     lCTS = aArgs.GetValue("Hamon Monthly Coefficients")
                     lOk = True
                 End If
-                lAttDef = atcDataAttributes.GetDefinition("Hamon Monthly Coefficients")
-                For i As Integer = 1 To 12
-                    If lCTS(i) > lAttDef.Max Or lCTS(i) < lAttDef.Min Then
-                        lOk = False
-                        Exit For
+                If lOk Then
+                    lAttDef = atcDataAttributes.GetDefinition("Hamon Monthly Coefficients")
+                    For i As Integer = 1 To 12
+                        If lCTS(i) > lAttDef.Max Or lCTS(i) < lAttDef.Min Then
+                            lOk = False
+                            Exit For
+                        End If
+                    Next
+                    If lOk AndAlso lTMaxTSer IsNot Nothing AndAlso lTMinTSer IsNot Nothing AndAlso _
+                       lLatitude >= MetComputeLatitudeMin AndAlso lLatitude <= MetComputeLatitudeMax Then
+                        Dim lMetCmpTS As atcTimeseries = PanEvaporationTimeseriesComputedByHamon(lTMinTSer, lTMaxTSer, Me, lDegF, lLatitude, lCTS)
+                        MyBase.DataSets.Add(lMetCmpTS)
                     End If
-                Next
-                If lOk AndAlso lTMaxTSer IsNot Nothing AndAlso lTMinTSer IsNot Nothing AndAlso _
-                   lLatitude >= MetComputeLatitudeMin AndAlso lLatitude <= MetComputeLatitudeMax Then
-                    Dim lMetCmpTS As atcTimeseries = PanEvaporationTimeseriesComputedByHamon(lTMinTSer, lTMaxTSer, Me, lDegF, lLatitude, lCTS)
-                    MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Penman Pan Evaporation"
                 Dim lDewPTSer As atcTimeseries = Nothing
@@ -240,18 +244,20 @@ Public Class atcMetCmpPlugin
                     lHrDist = aArgs.GetValue("Hourly Distribution")
                     lOk = True
                 End If
-                lAttDef = atcDataAttributes.GetDefinition("Hourly Distribution")
-                For i As Integer = 1 To 24
-                    If lHrDist(i) > lAttDef.Max Or lHrDist(i) < lAttDef.Min Then
-                        lOk = False
-                        Exit For
-                    Else
-                        lHrSum += lHrDist(i)
+                If lOk Then
+                    lAttDef = atcDataAttributes.GetDefinition("Hourly Distribution")
+                    For i As Integer = 1 To 24
+                        If lHrDist(i) > lAttDef.Max Or lHrDist(i) < lAttDef.Min Then
+                            lOk = False
+                            Exit For
+                        Else
+                            lHrSum += lHrDist(i)
+                        End If
+                    Next
+                    If lOk AndAlso lWindTSer IsNot Nothing AndAlso Math.Abs(lHrSum - 1) < 0.001 Then
+                        Dim lMetCmpTS As atcTimeseries = DisWnd(lWindTSer, Me, lHrDist)
+                        MyBase.DataSets.Add(lMetCmpTS)
                     End If
-                Next
-                If lOk AndAlso lWindTSer IsNot Nothing AndAlso Math.Abs(lHrSum - 1) < 0.001 Then
-                    Dim lMetCmpTS As atcTimeseries = DisWnd(lWindTSer, Me, lHrDist)
-                    MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Precipitation"
                 Dim lHrTSers As atcTimeseriesGroup = Nothing
@@ -278,8 +284,8 @@ Public Class atcMetCmpPlugin
                     lOk = True
                 End If
                 lAttDef = atcDataAttributes.GetDefinition("Data Tolerance")
-                If lOk AndAlso lHrTSers IsNot Nothing AndAlso lObsTimeTSer IsNot Nothing And _
-                       lTol >= lAttDef.Min And lTol <= lAttDef.Max Then
+                If lOk AndAlso lHrTSers IsNot Nothing AndAlso lObsTimeTSer IsNot Nothing AndAlso _
+                       lTol >= lAttDef.Min AndAlso lTol <= lAttDef.Max Then
                     Dim lMetCmpTS As atcTimeseries = DisaggPrecip(lDlyTSer, Me, lHrTSers, lObsTimeTSer, lTol, lSummFile)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If

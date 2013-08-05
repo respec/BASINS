@@ -212,30 +212,39 @@ Public Module modString
 
         If aFormat Is Nothing OrElse aFormat.Length = 0 Then
             If aMaxWidth < 3 Then
-                aFormat = "#.#"
+                aFormat = "0.#"
             Else
                 aFormat = "#,##0." & StrDup(aMaxWidth - 2, "#")
             End If
         End If
 
-        Dim lString As String = Format(lValue, aFormat)
+        Dim lString As String
+        Try
+            lString = Format(lValue, aFormat)
+        Catch ex As Exception
+            lString = aCantFit
+        End Try
         Dim lOldString As String = ""
 
         If lString.Length > aMaxWidth Then 'Too long, need to shorten
-            'First try leaving out commas to shorten
+            Dim lCommaPos As Integer = lString.IndexOf(",")
             Dim lDecimalPos As Integer = lString.IndexOf(".")
-            Select Case lDecimalPos
-                Case -1 'string does not contain a decimal, can't shorten by formatting with fewer decimal places
-                    GoTo TryExpFormat
-                Case aMaxWidth, aMaxWidth - 1 'string contains decimal point at end of max width, format without decimal places
-                    lString = Format(lValue, "0")
-                Case Is < aMaxWidth 'string contains a decimal before max width, format with fewer decimal places
-                    If lValue >= 0 Then
-                        lString = Format(lValue, "0." & StrDup(aMaxWidth - lDecimalPos, "#"))
-                    Else
-                        lString = Format(lValue, "0." & StrDup(aMaxWidth - lDecimalPos - 1, "#"))
-                    End If
-            End Select
+            'First try leaving out commas to shorten
+            If lCommaPos > -1 AndAlso lCommaPos < lDecimalPos Then
+                lString = lString.Replace(",", "")
+            End If
+            If lString.Length > aMaxWidth Then
+                If lDecimalPos < 0 OrElse lDecimalPos > aMaxWidth Then 'string does not contain a decimal or digits before decimal already make it too wide
+                    GoTo TryExpFormat ' can't shorten enough by formatting with fewer decimal places
+                End If
+                Try
+                    For lTrimThisMuch As Integer = 1 To aFormat.Length - 1
+                        lString = Format(lValue, aFormat.Substring(0, aFormat.Length - lTrimThisMuch))
+                        If lString.Length <= aMaxWidth Then Exit For
+                    Next
+                Catch
+                End Try
+            End If
         End If
 
         Dim lStrToDbl As Double = pNaN
@@ -249,6 +258,7 @@ Public Module modString
             If lAbs > 1.0E-30 _
                 AndAlso (lAbs < 0.01 OrElse lAbs > 99999) _
                 AndAlso (Math.Abs((aValue - lStrToDbl) / aValue) > (1 / 10 ^ (aSignificantDigits - 2))) Then
+                'Save this formatting in case it turns out to be better than exponential
                 lOldString = lString
                 GoTo TryExpFormat
             Else
@@ -263,33 +273,32 @@ Public Module modString
 TryExpFormat:
             Dim lExpPos As Integer
             Dim lDecimalCount As Integer = 0
-            If aExpFormat Is Nothing OrElse aExpFormat.Length = 0 Then
-                Select Case aMaxWidth
-                    Case Is < 3
-                        lString = aCantFit
-                        lDecimalCount = -1
-                        GoTo TryOldString
-                    Case 3, 4
-                        lDecimalCount = 0
-                    Case Else
-                        lDecimalCount = aMaxWidth - 4
-                End Select
-                aExpFormat = "0." & StrDup(lDecimalCount, "#") & "e0"
+            Dim lE As String = "e" 'Capital or small E for exponent format
+            If String.IsNullOrEmpty(aExpFormat) Then
+                lString = aCantFit
+                GoTo TryOldString
             Else
-                If aExpFormat.EndsWith("#") Then aExpFormat = aExpFormat.Substring(0, aExpFormat.Length - 1) & "0"
+                If aExpFormat.Contains("E") Then lE = "E"
+                aExpFormat = aExpFormat.Replace(lE & "#", lE & "0")
                 Dim lDecimalPos As Integer = aExpFormat.IndexOf(".")
                 If lDecimalPos >= 0 Then
-                    lExpPos = aExpFormat.IndexOf("e", lDecimalPos + 1)
+                    lExpPos = aExpFormat.IndexOf(lE, lDecimalPos + 1)
                     lDecimalCount = lExpPos - lDecimalPos - 1
                 End If
             End If
 
 ReFormatExp:
-            lString = Format(lValue, aExpFormat).TrimEnd("e")
+
+            Try
+                lString = Format(lValue, aExpFormat).TrimEnd(lE)
+            Catch ex As Exception
+                lString = aCantFit
+            End Try
+
             If lString.Length > aMaxWidth Then
                 If lDecimalCount > 0 Then 'Try again with fewer decimal places
                     lDecimalCount -= 1
-                    aExpFormat = "0." & StrDup(lDecimalCount, "#") & "e0"
+                    aExpFormat = "0." & StrDup(lDecimalCount, "#") & lE & "0"
                     GoTo ReFormatExp
                 Else 'Ran out of decimal places to remove, just can't fit
                     lString = aCantFit
