@@ -810,23 +810,24 @@ Module modCreateUci
 
     Private Sub CreateDefaultOutput(ByRef aUci As HspfUci)
         Dim lOutletId As Integer = 0
-        For Each lConnection As HspfConnection In aUci.Connections
-            If lConnection.Typ = 3 Then 'schematic record
-                If lConnection.Source.VolName = "RCHRES" And _
-                   lConnection.Target.VolName = "RCHRES" Then
-                    lOutletId = lConnection.Target.VolId
-                End If
+
+        'may have only 1 rchres, just set outlet id to last rchres
+        If aUci.OpnBlks.Contains("RCHRES") Then
+            Dim lOpnBlk As HspfOpnBlk = aUci.OpnBlks.Item("RCHRES")
+            If lOpnBlk.Count > 0 Then
+                lOutletId = lOpnBlk.Ids.Item(lOpnBlk.Ids.Count - 1).Id
             End If
-        Next lConnection
+        End If
 
         If lOutletId = 0 Then
-            'may have only 1 rchres, just set outlet id to last rchres
-            If aUci.OpnBlks.Contains("RCHRES") Then
-                Dim lOpnBlk As HspfOpnBlk = aUci.OpnBlks.Item("RCHRES")
-                If lOpnBlk.Count > 0 Then
-                    lOutletId = lOpnBlk.Ids.Item(lOpnBlk.Ids.Count - 1).Id
+            For Each lConnection As HspfConnection In aUci.Connections
+                If lConnection.Typ = 3 Then 'schematic record
+                    If lConnection.Source.VolName = "RCHRES" And _
+                       lConnection.Target.VolName = "RCHRES" Then
+                        lOutletId = lConnection.Target.VolId
+                    End If
                 End If
-            End If
+            Next lConnection
         End If
 
         If lOutletId > 0 Then 'found watershed outlet
