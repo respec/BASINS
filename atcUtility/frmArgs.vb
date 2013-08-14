@@ -30,17 +30,16 @@ Public Class frmArgs
                             Case "T" 'Label and text box
                                 Dim lLabel As Windows.Forms.Label = AddLabel(lKey.Substring(2), "lbl" & lArgIndex)
                                 If lLabel.Width > pLeftColumnWidth Then pLeftColumnWidth = lLabel.Width
-                                lArgIndex += 1
-                                AddTextbox(aArgs(lArgIndex).ToString, "txt" & lArgIndex)
+                                AddTextbox(aArgs.ItemByIndex(lArgIndex).ToString, "txt" & lArgIndex)
                             Case "C" 'Label and checkbox
                                 Dim lLabel As Windows.Forms.Label = AddLabel(lKey.Substring(2), "lbl" & lArgIndex)
                                 If lLabel.Width > pLeftColumnWidth Then pLeftColumnWidth = lLabel.Width
-                                lArgIndex += 1
-                                AddCheckbox(CBool(aArgs(lArgIndex)), "chk" & lArgIndex)
+                                AddCheckbox(CBool(aArgs.ItemByIndex(lArgIndex)), "chk" & lArgIndex)
                             Case Else
-                                Stop
+                                GoTo AutoChooseControl
                         End Select
                     Else
+AutoChooseControl:
                         Dim lLabel As Windows.Forms.Label = AddLabel(lKey, "lbl" & lArgIndex)
                         If lLabel.Width > pLeftColumnWidth Then pLeftColumnWidth = lLabel.Width
                         Select Case aArgs.ItemByIndex(lArgIndex).GetType.Name
