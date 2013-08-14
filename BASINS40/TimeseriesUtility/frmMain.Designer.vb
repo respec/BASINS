@@ -45,6 +45,7 @@ Partial Class frmMain
         Me.btnGenerateMet = New System.Windows.Forms.Button()
         Me.grpGenerate = New System.Windows.Forms.GroupBox()
         Me.btnGenerateMath = New System.Windows.Forms.Button()
+        Me.btnHelp = New System.Windows.Forms.Button()
         Me.grpView.SuspendLayout()
         Me.grpSave.SuspendLayout()
         Me.grpGenerate.SuspendLayout()
@@ -138,7 +139,7 @@ Partial Class frmMain
         'btnDump
         '
         Me.btnDump.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDump.Location = New System.Drawing.Point(657, 134)
+        Me.btnDump.Location = New System.Drawing.Point(377, 104)
         Me.btnDump.Name = "btnDump"
         Me.btnDump.Size = New System.Drawing.Size(119, 23)
         Me.btnDump.TabIndex = 9
@@ -148,7 +149,7 @@ Partial Class frmMain
         'btnCompare
         '
         Me.btnCompare.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnCompare.Location = New System.Drawing.Point(657, 163)
+        Me.btnCompare.Location = New System.Drawing.Point(377, 133)
         Me.btnCompare.Name = "btnCompare"
         Me.btnCompare.Size = New System.Drawing.Size(119, 23)
         Me.btnCompare.TabIndex = 10
@@ -231,12 +232,23 @@ Partial Class frmMain
         Me.btnGenerateMath.Text = "Math"
         Me.btnGenerateMath.UseVisualStyleBackColor = True
         '
+        'btnHelp
+        '
+        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnHelp.Location = New System.Drawing.Point(377, 162)
+        Me.btnHelp.Name = "btnHelp"
+        Me.btnHelp.Size = New System.Drawing.Size(70, 23)
+        Me.btnHelp.TabIndex = 17
+        Me.btnHelp.Text = "Help"
+        Me.btnHelp.UseVisualStyleBackColor = True
+        '
         'frmMain
         '
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(510, 203)
+        Me.ClientSize = New System.Drawing.Size(500, 203)
+        Me.Controls.Add(Me.btnHelp)
         Me.Controls.Add(Me.grpGenerate)
         Me.Controls.Add(Me.grpSave)
         Me.Controls.Add(Me.grpView)
@@ -248,6 +260,7 @@ Partial Class frmMain
         Me.Controls.Add(Me.btnManageFiles)
         Me.Controls.Add(Me.lblFile)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.Name = "frmMain"
         Me.Text = "SARA Timeseries Utility"
         Me.grpView.ResumeLayout(False)
@@ -275,5 +288,6 @@ Partial Class frmMain
     Friend WithEvents btnGenerateMet As System.Windows.Forms.Button
     Friend WithEvents grpGenerate As System.Windows.Forms.GroupBox
     Friend WithEvents btnGenerateMath As System.Windows.Forms.Button
+    Friend WithEvents btnHelp As System.Windows.Forms.Button
 
 End Class
