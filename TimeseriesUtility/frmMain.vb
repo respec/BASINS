@@ -22,6 +22,8 @@ Public Class frmMain
         If g_ProgramDir.EndsWith("bin") Then g_ProgramDir = PathNameOnly(g_ProgramDir)
         g_ProgramDir &= g_PathChar
 
+        ShowHelp(g_ProgramDir & "TimeseriesUtility.chm")
+
         Dim lLogFolder As String = g_ProgramDir & "cache"
         If IO.Directory.Exists(lLogFolder) Then
             lLogFolder = lLogFolder & g_PathChar & "log" & g_PathChar
@@ -64,6 +66,12 @@ Public Class frmMain
         atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
         AddHandler (atcDataManager.OpenedData), (AddressOf FileOpenedOrClosed)
         AddHandler (atcDataManager.ClosedData), (AddressOf FileOpenedOrClosed)
+    End Sub
+
+    Private Sub frm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("Cover.html")
+        End If
     End Sub
 
     Private Sub FileOpenedOrClosed(ByVal aDataSource As atcTimeseriesSource)
@@ -129,35 +137,27 @@ Public Class frmMain
     End Sub
 
     Private Sub btnSelectData_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSelectData.Click
+        SelectData()
+    End Sub
+
+    Private Sub SelectData()
         SelectedData = atcDataManager.UserSelectData("Select Timeseries", SelectedData)
         UpdateSelectedDataLabel()
     End Sub
 
     Private Sub btnList_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnList.Click
-        'If SelectedData.Count < 1 Then
-        '    Logger.Msg("Select Timeseries First")
-        'Else
         Dim lList As New atcList.atcListPlugin
         lList.Show(SelectedData)
-        'End If
     End Sub
 
     Private Sub btnGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraph.Click
-        'If SelectedData.Count < 1 Then
-        '    Logger.Msg("Select Timeseries First")
-        'Else
         Dim lGraph As New atcGraph.atcGraphPlugin
         lGraph.Show(SelectedData)
-        'End If
     End Sub
 
     Private Sub btnTree_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTree.Click
-        'If SelectedData.Count < 1 Then
-        '    Logger.Msg("Select Timeseries First")
-        'Else
         Dim lTree As New atcDataTree.atcDataTreePlugin
         lTree.Show(SelectedData)
-        'End If
     End Sub
 
     Private Sub Form_DragEnter( _
@@ -186,6 +186,10 @@ Public Class frmMain
     End Sub
 
     Private Sub btnSaveWDM_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSaveWDM.Click
+        If SelectedData.Count < 1 Then
+            SelectData()
+        End If
+
         If SelectedData.Count > 0 Then
             Dim lFormSave As New frmSaveData
             Dim lSaveSource As atcDataSource = lFormSave.AskUser(SelectedData)
@@ -276,7 +280,7 @@ Public Class frmMain
         Next
         'todo: write value attributes (if any)
 
-        'If lNeededToBeRead Then lTimeseries.ValuesNeedToBeRead = True
+        If lNeededToBeRead Then lTimeseries.ValuesNeedToBeRead = True
     End Sub
 
     Private Sub btnCompare_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCompare.Click
@@ -336,8 +340,10 @@ Compare12:
 
     Private Sub btnSaveList_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSaveList.Click
         If SelectedData.Count < 1 Then
-            Logger.Msg("Select Timeseries First")
-        Else
+            SelectData()
+        End If
+
+        If SelectedData.Count > 0 Then
             Dim lSaveDialog As New Windows.Forms.SaveFileDialog
             With lSaveDialog
                 .Title = "Save as..."
@@ -353,13 +359,13 @@ Compare12:
     End Sub
 
     Private Sub btnGenerateMet_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGenerateMet.Click
-        'ChooseGenerate()
         Dim lButtonForm As New frmSelectMet
         lButtonForm.ShowDialog(Me)
         Dim lComputationName As String = lButtonForm.Choice ' lButtonForm.AskUser("Select Computation", "VERTICAL", lButtonNames)
         If Not String.IsNullOrEmpty(lComputationName) Then ' <> lButtonForm.LabelCancel Then
             Dim lDataSource As New atcMetCmp.atcMetCmpPlugin
             lDataSource.Specification = lComputationName
+            'TODO: use selected data as argument
             If atcDataManager.OpenDataSource(lDataSource, lDataSource.Specification, Nothing) Then
                 If lDataSource.DataSets.Count > 0 Then
                     SelectedData.ChangeTo(lDataSource.DataSets)
@@ -376,7 +382,6 @@ Compare12:
     End Sub
 
     Sub ChooseGenerate(ByVal aDataSource As atcDataSource)
-        'Try
         Dim lButtonNames As New Generic.List(Of String)
         If aDataSource.Category <> "File" Then
             Dim lCategoryMenuName As String = atcDataManager.ComputeMenuName & "_" & aDataSource.Category
@@ -385,33 +390,13 @@ Compare12:
                 For Each lOperation As atcDefinedValue In lOperations
                     Select Case lOperation.Definition.TypeString
                         Case "atcTimeseries", "atcDataGroup", "atcTimeseriesGroup"
-                            Select Case lOperation.Definition.Name
-                                Case "Cloud Cover from Solar", "Dewpoint"
-                                    'No UI implemented for computing these
-                                Case Else
-                                    lButtonNames.Add(lOperation.Definition.Name)
-                                    Logger.Dbg(lOperation.Definition.Name & " - " & lOperation.Definition.Category)
-                            End Select
-                            'atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
-                            'pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName, atcDataManager.ComputeMenuName, lDataSource.Category, , , True))
-                            ''Operations might have categories to further divide them
-                            'If lOperation.Definition.Category.Length > 0 Then
-                            '    Dim lSubCategoryName As String = lCategoryMenuName & "_" & lOperation.Definition.Category
-                            '    atcDataManager.AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category, , , True)
-                            '    atcDataManager.AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name & "_" & Name, lSubCategoryName, lOperation.Definition.Name, , , True)
-                            'Else
-                            '    atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name & "_" & Name, lCategoryMenuName, lOperation.Definition.Name, , , True)
-                            'End If
+                            lButtonNames.Add(lOperation.Definition.Name)
+                            Logger.Dbg(lOperation.Definition.Name & " - " & lOperation.Definition.Category)
                     End Select
                 Next
-            Else
-                'atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
-                'pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & Name, lCategoryMenuName, lDataSource.Description, , , True))
             End If
         End If
-        'Catch
-        '    'Could not add to menu, probably wasn't an atcDataSource
-        'End Try
+
         If lButtonNames.Count > 0 Then
             Dim lButtonForm As New atcControls.frmButtons()
             Dim lComputationName As String = lButtonForm.AskUser("Select Computation", "VERTICAL", lButtonNames)
@@ -428,4 +413,7 @@ Compare12:
         End If
     End Sub
 
+    Private Sub btnHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnHelp.Click
+        ShowHelp("Tutorial.html")
+    End Sub
 End Class

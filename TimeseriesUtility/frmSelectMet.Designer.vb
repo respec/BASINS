@@ -22,13 +22,14 @@ Partial Class frmSelectMet
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectMet))
         Me.grpComputations = New System.Windows.Forms.GroupBox()
-        Me.Button1 = New System.Windows.Forms.Button()
-        Me.Button2 = New System.Windows.Forms.Button()
-        Me.Button3 = New System.Windows.Forms.Button()
-        Me.Button4 = New System.Windows.Forms.Button()
-        Me.Button5 = New System.Windows.Forms.Button()
         Me.Button6 = New System.Windows.Forms.Button()
+        Me.Button5 = New System.Windows.Forms.Button()
+        Me.Button4 = New System.Windows.Forms.Button()
+        Me.Button3 = New System.Windows.Forms.Button()
+        Me.Button2 = New System.Windows.Forms.Button()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.grpDisaggregations = New System.Windows.Forms.GroupBox()
         Me.Button7 = New System.Windows.Forms.Button()
         Me.Button8 = New System.Windows.Forms.Button()
@@ -56,49 +57,16 @@ Partial Class frmSelectMet
         Me.grpComputations.TabStop = False
         Me.grpComputations.Text = "Computations"
         '
-        'Button1
+        'Button6
         '
-        Me.Button1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.Button6.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.Location = New System.Drawing.Point(6, 19)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(181, 23)
-        Me.Button1.TabIndex = 0
-        Me.Button1.Text = "Solar Radiation"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
-        'Button2
-        '
-        Me.Button2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button2.Location = New System.Drawing.Point(6, 48)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(181, 23)
-        Me.Button2.TabIndex = 1
-        Me.Button2.Text = "Hamon PET"
-        Me.Button2.UseVisualStyleBackColor = True
-        '
-        'Button3
-        '
-        Me.Button3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button3.Location = New System.Drawing.Point(6, 77)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(181, 23)
-        Me.Button3.TabIndex = 2
-        Me.Button3.Text = "Jensen PET"
-        Me.Button3.UseVisualStyleBackColor = True
-        '
-        'Button4
-        '
-        Me.Button4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button4.Location = New System.Drawing.Point(6, 106)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(181, 23)
-        Me.Button4.TabIndex = 3
-        Me.Button4.Text = "Penman Pan Evaporation"
-        Me.Button4.UseVisualStyleBackColor = True
+        Me.Button6.Location = New System.Drawing.Point(6, 164)
+        Me.Button6.Name = "Button6"
+        Me.Button6.Size = New System.Drawing.Size(181, 23)
+        Me.Button6.TabIndex = 5
+        Me.Button6.Text = "Cloud Cover"
+        Me.Button6.UseVisualStyleBackColor = True
         '
         'Button5
         '
@@ -111,16 +79,49 @@ Partial Class frmSelectMet
         Me.Button5.Text = "Wind Travel"
         Me.Button5.UseVisualStyleBackColor = True
         '
-        'Button6
+        'Button4
         '
-        Me.Button6.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.Button4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button6.Location = New System.Drawing.Point(6, 164)
-        Me.Button6.Name = "Button6"
-        Me.Button6.Size = New System.Drawing.Size(181, 23)
-        Me.Button6.TabIndex = 5
-        Me.Button6.Text = "Cloud Cover"
-        Me.Button6.UseVisualStyleBackColor = True
+        Me.Button4.Location = New System.Drawing.Point(6, 106)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(181, 23)
+        Me.Button4.TabIndex = 3
+        Me.Button4.Text = "Penman Pan Evaporation"
+        Me.Button4.UseVisualStyleBackColor = True
+        '
+        'Button3
+        '
+        Me.Button3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button3.Location = New System.Drawing.Point(6, 77)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(181, 23)
+        Me.Button3.TabIndex = 2
+        Me.Button3.Text = "Jensen PET"
+        Me.Button3.UseVisualStyleBackColor = True
+        '
+        'Button2
+        '
+        Me.Button2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button2.Location = New System.Drawing.Point(6, 48)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(181, 23)
+        Me.Button2.TabIndex = 1
+        Me.Button2.Text = "Hamon PET"
+        Me.Button2.UseVisualStyleBackColor = True
+        '
+        'Button1
+        '
+        Me.Button1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button1.Location = New System.Drawing.Point(6, 19)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(181, 23)
+        Me.Button1.TabIndex = 0
+        Me.Button1.Text = "Solar Radiation"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'grpDisaggregations
         '
@@ -202,6 +203,8 @@ Partial Class frmSelectMet
         Me.ClientSize = New System.Drawing.Size(416, 218)
         Me.Controls.Add(Me.grpDisaggregations)
         Me.Controls.Add(Me.grpComputations)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.Name = "frmSelectMet"
         Me.Text = "Select Meteorologic Operation"
         Me.grpComputations.ResumeLayout(False)
