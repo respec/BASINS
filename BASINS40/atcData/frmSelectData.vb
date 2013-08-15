@@ -669,7 +669,11 @@ Friend Class frmSelectData
                 lSortedItems = New atcCollection
             Else
                 aList.Visible = False
-                lSortedItems = AvailableData.SortedAttributeValues(aAttributeName, NOTHING_VALUE)
+                Try
+                    lSortedItems = AvailableData.SortedAttributeValues(aAttributeName, NOTHING_VALUE)
+                Catch
+                    lSortedItems.Add("Unable to compute")
+                End Try
             End If
         End If
 
