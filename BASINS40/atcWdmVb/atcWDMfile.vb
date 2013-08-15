@@ -310,7 +310,7 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
                 lCurrentDateJ = lGroupDateJ
                 Dim lEndDateJ As Double = TimAddJ(lGroupDateJ, lTgroup, 1, 1)
                 Dim lBlockCount As Int32 = 0
-                While (lEndDateJ - lCurrentDateJ) > JulianSecond
+                While (lEndDateJ - lCurrentDateJ) >= JulianSecond
                     Dim lBlockStartDateJ As Double = lCurrentDateJ
                     Dim lBlockControlWord As UInt32 = aWdm.ReadUInt32
                     lBlockCount += 1
@@ -330,7 +330,7 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
                             lDate.Add(lCurrentDateJ)
                             lCurrentDateJ = TimAddJ(lBlockStartDateJ, lBlockTimeUnits, lBlockTimeStep, lPos)
                             lDataCurrent = CDbl(aWdm.ReadSingle())
-                            If Math.Abs(lDataCurrent - lTsFill) < Double.Epsilon Then
+                            If Math.Abs(lDataCurrent - lTsFill) < pEpsilon Then
                                 lDataCurrent = pNan
                             End If
                             lData.Add(lDataCurrent)
