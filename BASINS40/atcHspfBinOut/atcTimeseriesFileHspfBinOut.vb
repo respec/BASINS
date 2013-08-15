@@ -307,9 +307,7 @@ Public Class atcTimeseriesFileHspfBinOut
 
         Dim lTimeseries As atcTimeseries = aDataSet
         lTimeseries.ValuesNeedToBeRead = False
-        Dim lKey As String = lTimeseries.Attributes.GetValue("Operation", "unk") & ":" _
-                           & lTimeseries.Attributes.GetValue("IDLOCN", "u:unk").ToString.Substring(2) & ":" _
-                           & lTimeseries.Attributes.GetValue("Section", "unk")
+        Dim lKey As String = KeyFromAttributes(lTimeseries.Attributes)
         Dim lNeedToClose As Boolean = pBinFile.Open(False)
         Dim lNeedDates As Boolean = lTimeseries.Dates.numValues < 1
         Dim lValues As New Generic.List(Of Double)
@@ -390,7 +388,7 @@ Public Class atcTimeseriesFileHspfBinOut
                 Else 'Already have these Dates, re-use them for all timeseries sharing this header
                     Dim lDisposingDates As atcTimeseries = .Dates
                     For Each lOtherTimeseries As atcTimeseries In DataSets
-                        If lOtherTimeseries.Attributes.GetValue("Operation+Section", "") = lKey Then
+                        If KeyFromAttributes(lOtherTimeseries.Attributes) = lKey Then
                             lOtherTimeseries.Dates = lMatchingDates
                             If lTimeUnit <> atcTimeUnit.TUUnknown Then
                                 Dim lShared As atcDataAttributes = lOtherTimeseries.Attributes.GetValue("SharedAttributes")
@@ -431,7 +429,14 @@ Public Class atcTimeseriesFileHspfBinOut
             End If
             .ValuesNeedToBeRead = False
         End With
+        'atcDataManager.AddDiscardableTimeseries(lTimeseries)
     End Sub
+
+    Private Function KeyFromAttributes(ByVal aAttributes As atcDataAttributes) As String
+        Return aAttributes.GetValue("Operation", "unk") & ":" _
+             & aAttributes.GetValue("IDLOCN", "u:unk").ToString.Substring(2) & ":" _
+             & aAttributes.GetValue("Section", "unk")
+    End Function
 
     Public Sub Refresh()
         pBinFile.ReadNewRecords()
@@ -496,6 +501,19 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Public Sub New()
         Filter = pFilter
+    End Sub
+
+    Private Shared pShowViewMessage As Boolean = True
+    Public Overrides Sub View()
+        If pShowViewMessage Then
+            Select Case Logger.MsgCustom(Specification & vbCrLf & "No text viewer available for this file", "View", _
+                                         "Ok", "Show File Folder", "Stop showing this message")
+                Case "Show File Folder"
+                    OpenFile(IO.Path.GetDirectoryName(Specification))
+                Case "Stop showing this message"
+                    pShowViewMessage = False
+            End Select
+        End If
     End Sub
 
     Protected Overrides Sub Finalize()
