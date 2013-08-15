@@ -13,11 +13,11 @@ Public Class atcDataSourceWDM
     Inherits atcData.atcTimeseriesSource
     Private Shared pFilter As String = "WDM Files (*.wdm)|*.wdm"
     Private Shared pShowViewMessage As Boolean = True
-    Private pDates As Generic.List(Of atcTimeseries)
+    Private pDates As New Generic.List(Of atcTimeseries)
     Private pQuick As Boolean = False
     Private Shared pNan As Double = GetNaN()
 
-    'Private pEpsilon As Double = System.Double.Epsilon
+    Private Const pEpsilon As Double = 1.0E-20 ' tolerance for detecting missing value, System.Double.Epsilon is too small
     Private Shared pMsg As atcMsgWDM
     Private pTu As atcTimeUnit = 0 'default time units, default 2-minutes
     Private pTs As Integer = 0 'default timestep, default 1 
@@ -50,11 +50,7 @@ Public Class atcDataSourceWDM
     Public Overrides Sub Clear()
         MyBase.Clear()
         pQuick = False
-        If pDates Is Nothing Then
-            pDates = New Generic.List(Of atcTimeseries)
-        Else
-            pDates.Clear()
-        End If
+        pDates.Clear()
         SaveSetting("WDM", "AddDataset", "ExistAskUserAction", "")
     End Sub
 
@@ -191,150 +187,148 @@ Public Class atcDataSourceWDM
                                                              = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean
         'Logger.Dbg("atcDataSourceWdm:AddDataset:EntryWithAction:" & aExistAction & ":" & MemUsage())
-        Dim lWdmHandle As New atcWdmHandle(0, Specification)
-        Try
-            Dim lTimser As atcTimeseries = aDataSet
-            Dim lTs As Integer = lTimser.Attributes.GetValue("ts", 0)
-            Dim lTu As atcTimeUnit = lTimser.Attributes.GetValue("tu", atcTimeUnit.TUUnknown)
-            Dim lDsn As Integer = lTimser.Attributes.GetValue("id", 1)
-            Dim lTGroup As Integer = lTimser.Attributes.GetValue("tgroup", 6)
-            'Dim lTSBYr As Integer = lTimser.Attributes.GetValue("tsbyr", 1900)
-            Dim lTimserConst As atcTimeseries = Nothing
+        Using lWdmHandle As New atcWdmHandle(0, Specification)
+            Try
+                Dim lTimser As atcTimeseries = aDataSet
+                Dim lTs As Integer = lTimser.Attributes.GetValue("ts", 0)
+                Dim lTu As atcTimeUnit = lTimser.Attributes.GetValue("tu", atcTimeUnit.TUUnknown)
+                Dim lDsn As Integer = lTimser.Attributes.GetValue("id", 1)
+                Dim lTGroup As Integer = lTimser.Attributes.GetValue("tgroup", 6)
+                'Dim lTSBYr As Integer = lTimser.Attributes.GetValue("tsbyr", 1900)
+                Dim lTimserConst As atcTimeseries = Nothing
 
-            If lTs = 0 OrElse lTu = atcTimeUnit.TUUnknown Then ' sparse dataset - fill in dummy values for write
-                lTimserConst = Me.FillSparseTS(lTimser, lTs, lTu, lDsn)
-            End If
-
-            Dim lNvals As Integer = lTimser.numValues
-            Dim lSJDay As Double = lTimser.Attributes.GetValue("SJDay", 0)
-            Dim lSDat(5) As Integer
-            J2Date(lSJDay, lSDat)
-            Dim lEJDay As Double = lTimser.Attributes.GetValue("EJDay", 0)
-            Dim lEDat(5) As Integer
-            J2Date(lEJDay, lEDat)
-            Dim lNValsExpected As Integer
-            TimDif(lSDat, lEDat, lTu, lTs, lNValsExpected)
-            If lNvals < lNValsExpected Then
-                'TODO:  make writing data smarter to deal with big gaps of missing, etc
-                Throw New ApplicationException("NVals:" & lNvals & ":" & lNValsExpected & vbCrLf & _
-                                               "in " & Specification & vbCrLf & _
-                                               "dsn " & lTimser.Attributes.GetValue("ID", 0))
-            End If
-
-            'Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
-
-            Dim lDsnExists As Boolean = DataSets.Keys.Contains(lDsn) ' Integer = F90_WDCKDT(lWdmHandle.Unit, lDsn)
-            If lDsnExists Then ' lDsnExists > 0 Then 'dataset exists, what do we do?
-                'Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
-                'Change asking user into what the user already chose for all
-                If aExistAction = ExistAskUser Then aExistAction = pExistAskUserAction
-                Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
-                If lExistTimser.Serial = lTimser.Serial Then
-                    Logger.Dbg("Adding a dataset that already exists in WDM: replacing old version in WDM, DSN=" & lDsn)
-                    aExistAction = ExistReplace
+                If lTs = 0 OrElse lTu = atcTimeUnit.TUUnknown Then ' sparse dataset - fill in dummy values for write
+                    lTimserConst = Me.FillSparseTS(lTimser, lTs, lTu, lDsn)
                 End If
-                Select Case aExistAction
-                    Case ExistNoAction
-                        'Don't add, take no action
-                        Logger.Dbg("DSN conflict:ExistNoAction:not added")
-                        Return True
-                    Case ExistAskUser
-                        Select Case Logger.MsgCustomCheckbox("Existing dataset '" & lExistTimser.ToString & "'" & vbCrLf _
-                                                           & "has same data set number as" & vbCrLf _
-                                                           & "new dataset '" & lTimser.ToString & "'", _
-                                                             "Dataset Number Conflict", _
-                                                             "Use this answer for all datasets", "WDM", "AddDataset", "ExistAskUserAction", _
-                                                             "Replace Existing", "Renumber New", "Discard New") ', "Append new to Existing")
-                            Case "Replace Existing" : GoTo CaseExistReplace
-                            Case "Renumber New" : GoTo CaseExistRenumber
-                            Case "Discard New"
-                                Logger.Dbg("Asked user to resolve DSN conflict, chose not to replace or renumber, not added")
-                                Return False
-                        End Select
-                    Case ExistReplace
+
+                Dim lNvals As Integer = lTimser.numValues
+                Dim lSJDay As Double = lTimser.Attributes.GetValue("SJDay", 0)
+                Dim lSDat(5) As Integer
+                J2Date(lSJDay, lSDat)
+                Dim lEJDay As Double = lTimser.Attributes.GetValue("EJDay", 0)
+                Dim lEDat(5) As Integer
+                J2Date(lEJDay, lEDat)
+                Dim lNValsExpected As Integer
+                TimDif(lSDat, lEDat, lTu, lTs, lNValsExpected)
+                If lNvals < lNValsExpected Then
+                    'TODO:  make writing data smarter to deal with big gaps of missing, etc
+                    Throw New ApplicationException("NVals:" & lNvals & ":" & lNValsExpected & vbCrLf & _
+                                                   "in " & Specification & vbCrLf & _
+                                                   "dsn " & lTimser.Attributes.GetValue("ID", 0))
+                End If
+
+                'Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
+
+                Dim lDsnExists As Boolean = DataSets.Keys.Contains(lDsn) ' Integer = F90_WDCKDT(lWdmHandle.Unit, lDsn)
+                If lDsnExists Then ' lDsnExists > 0 Then 'dataset exists, what do we do?
+                    'Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
+                    'Change asking user into what the user already chose for all
+                    If aExistAction = ExistAskUser Then aExistAction = pExistAskUserAction
+                    Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
+                    If lExistTimser.Serial = lTimser.Serial Then
+                        Logger.Dbg("Adding a dataset that already exists in WDM: replacing old version in WDM, DSN=" & lDsn)
+                        aExistAction = ExistReplace
+                    End If
+                    Select Case aExistAction
+                        Case ExistNoAction
+                            'Don't add, take no action
+                            Logger.Dbg("DSN conflict:ExistNoAction:not added")
+                            Return True
+                        Case ExistAskUser
+                            Select Case Logger.MsgCustomCheckbox("Existing dataset '" & lExistTimser.ToString & "'" & vbCrLf _
+                                                               & "has same data set number as" & vbCrLf _
+                                                               & "new dataset '" & lTimser.ToString & "'", _
+                                                                 "Dataset Number Conflict", _
+                                                                 "Use this answer for all datasets", "WDM", "AddDataset", "ExistAskUserAction", _
+                                                                 "Replace Existing", "Renumber New", "Discard New") ', "Append new to Existing")
+                                Case "Replace Existing" : GoTo CaseExistReplace
+                                Case "Renumber New" : GoTo CaseExistRenumber
+                                Case "Discard New"
+                                    Logger.Dbg("Asked user to resolve DSN conflict, chose not to replace or renumber, not added")
+                                    Return False
+                            End Select
+                        Case ExistReplace
 CaseExistReplace:
-                        'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistReplace:")
-                        Dim lRet As Integer
-                        F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
-                        'Logger.Dbg("atcDataSourceWdm:AddDataset:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
-                        If lExistTimser IsNot Nothing Then
-                            DataSets.Remove(lExistTimser)
-                        End If
-                    Case ExistAppend  'find dataset and try to append to it
-                        'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
-                        If lTimser.numValues > 0 AndAlso _
-                           lExistTimser.numValues > 0 AndAlso _
-                           lTimser.Dates.Value(1) <= lExistTimser.Dates.Value(lExistTimser.numValues) Then
-                            Throw New ApplicationException("atcDataSourceWDM:AddDataset: Unable to append new TSer " & _
-                                                lTimser.ToString & " to existing TSer " & _
-                                                lExistTimser.ToString & vbCrLf & _
-                                                "New TSer start date (" & lTimser.Dates.Value(1) & _
-                                                ") preceeds exising TSer end date (" & _
-                                                lExistTimser.Dates.Value(lExistTimser.numValues) & ")")
-                        End If
-                    Case ExistRenumber 'use next available number
+                            'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistReplace:")
+                            Dim lRet As Integer
+                            F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
+                            'Logger.Dbg("atcDataSourceWdm:AddDataset:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
+                            If lExistTimser IsNot Nothing Then
+                                DataSets.Remove(lExistTimser)
+                            End If
+                        Case ExistAppend  'find dataset and try to append to it
+                            'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
+                            If lTimser.numValues > 0 AndAlso _
+                               lExistTimser.numValues > 0 AndAlso _
+                               lTimser.Dates.Value(1) <= lExistTimser.Dates.Value(lExistTimser.numValues) Then
+                                Throw New ApplicationException("atcDataSourceWDM:AddDataset: Unable to append new TSer " & _
+                                                    lTimser.ToString & " to existing TSer " & _
+                                                    lExistTimser.ToString & vbCrLf & _
+                                                    "New TSer start date (" & lTimser.Dates.Value(1) & _
+                                                    ") preceeds exising TSer end date (" & _
+                                                    lExistTimser.Dates.Value(lExistTimser.numValues) & ")")
+                            End If
+                        Case ExistRenumber 'use next available number
 CaseExistRenumber:
-                        lDsn = findNextDsn(lDsn)
-                        'Logger.Dbg("atcDataSourceWdm:AddNew:" & lWdmHandle.Unit & ":" & lDsn)
-                        lTimser.Attributes.SetValue("Id", lDsn)
-                End Select
-            Else
-                'Logger.Dbg("atcDataSourceWdm:AddDataset:NewDataSet:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
-            End If
-
-            Dim lWriteIt As Boolean = False
-            If lDsnExists AndAlso aExistAction = ExistAppend Then 'just write appended data
-                lWriteIt = True
-            ElseIf DsnBld(lWdmHandle.Unit, lTimser) Then
-                DataSets.Add(lDsn, lTimser)
-                lWriteIt = True
-            End If
-
-            If lWriteIt AndAlso lNvals > 0 Then
-                Dim lTSFill As Double = lTimser.Attributes.GetValue("tsfill", -999)
-                If Double.IsNaN(lTSFill) Then lTSFill = -999
-                Dim lValue As Double
-                Dim lV(lNvals) As Single
-                Dim lRet As Integer
-                For i As Integer = 1 To lNvals
-                    lValue = lTimser.Value(i)
-                    If Double.IsNaN(lValue) Then lValue = lTSFill
-                    lV(i - 1) = lValue
-                Next
-
-                'J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
-                J2DateRounddown(lTimser.Dates.Value(0), lTu, lSDat)
-
-                'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _
-                '            lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
-                '            lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
-                If lNvals > 0 Then
-                    'F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
-                    F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat, lNvals, CInt(1), CInt(0), lTu, lV, lRet)
+                            lDsn = findNextDsn(lDsn)
+                            'Logger.Dbg("atcDataSourceWdm:AddNew:" & lWdmHandle.Unit & ":" & lDsn)
+                            lTimser.Attributes.SetValue("Id", lDsn)
+                    End Select
+                Else
+                    'Logger.Dbg("atcDataSourceWdm:AddDataset:NewDataSet:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
                 End If
-                'Clearing means we can't use it for graphing, listing, etc. after
-                'If lTimserConst IsNot Nothing Then
-                '    lTimserConst.Clear() 'TODO: maybe just part?
-                'End If
-                If lRet <> 0 Then
-                    Throw New ApplicationException("WDTPUT:call:" & _
-                                lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
-                                lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
-                    'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:back:" & _
-                    '            lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
+
+                Dim lWriteIt As Boolean = False
+                If lDsnExists AndAlso aExistAction = ExistAppend Then 'just write appended data
+                    lWriteIt = True
+                ElseIf DsnBld(lWdmHandle.Unit, lTimser) Then
+                    DataSets.Add(lDsn, lTimser)
+                    lWriteIt = True
                 End If
-                lWdmHandle.Dispose()
-                Return True
-            Else
-                lWdmHandle.Dispose()
+
+                If lWriteIt AndAlso lNvals > 0 Then
+                    Dim lTSFill As Double = lTimser.Attributes.GetValue("tsfill", -999)
+                    If Double.IsNaN(lTSFill) Then lTSFill = -999
+                    Dim lValue As Double
+                    Dim lV(lNvals) As Single
+                    Dim lRet As Integer
+                    For i As Integer = 1 To lNvals
+                        lValue = lTimser.Value(i)
+                        If Double.IsNaN(lValue) Then lValue = lTSFill
+                        lV(i - 1) = lValue
+                    Next
+
+                    'J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
+                    J2DateRounddown(lTimser.Dates.Value(0), lTu, lSDat)
+
+                    'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _
+                    '            lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
+                    '            lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
+                    If lNvals > 0 Then
+                        'F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
+                        F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat, lNvals, CInt(1), CInt(0), lTu, lV, lRet)
+                    End If
+                    'Clearing means we can't use it for graphing, listing, etc. after
+                    'If lTimserConst IsNot Nothing Then
+                    '    lTimserConst.Clear() 'TODO: maybe just part?
+                    'End If
+                    If lRet <> 0 Then
+                        Throw New ApplicationException("WDTPUT:call:" & _
+                                    lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
+                                    lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
+                        'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:back:" & _
+                        '            lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
+                    End If
+                    Return True
+                Else
+                    Return False
+                End If
+
+            Catch ex As Exception
+                Logger.Dbg("atcDataSourceWdm:AddDataSet:" & ex.ToString)
                 Return False
-            End If
-
-        Catch ex As Exception
-            Logger.Dbg("atcDataSourceWdm:AddDataSet:" & ex.ToString)
-            lWdmHandle.Dispose()
-            Return False
-        End Try
+            End Try
+        End Using
     End Function
 
     Private Function FillSparseTS(ByRef lTimser As atcTimeseries, ByRef lTs As Integer, ByRef lTu As atcTimeUnit, ByRef lDSN As Integer) As atcTimeseries
@@ -426,9 +420,9 @@ CaseExistRenumber:
 
     Public Function WriteAttributes(ByVal aDataSet As atcData.atcDataSet) As Boolean
         'Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
-        Dim lWdmHandle As New atcWdmHandle(0, Specification)
-        WriteAttributes = DsnWriteAttributes(lWdmHandle.Unit, aDataSet)
-        lWdmHandle.Dispose()
+        Using lWdmHandle As New atcWdmHandle(0, Specification)
+            WriteAttributes = DsnWriteAttributes(lWdmHandle.Unit, aDataSet)
+        End Using
         'Logger.Dbg("atcDataSourceWdm:WriteAttributes:end")
     End Function
 
@@ -444,18 +438,16 @@ CaseExistRenumber:
                                    ByVal aAttribute As atcDefinedValue, _
                                    Optional ByVal aNewValue As Object = Nothing) As Boolean
         'Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
-        Dim lWdmHandle As New atcWdmHandle(0, Specification)
-        Dim lMsg As atcWdmHandle = pMsg.MsgHandle
-        Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
+        Using lWdmHandle As New atcWdmHandle(0, Specification), lMsg As atcWdmHandle = pMsg.MsgHandle
+            Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
 
-        If Not aNewValue Is Nothing Then
-            aAttribute.Value = aNewValue
-        End If
+            If Not aNewValue Is Nothing Then
+                aAttribute.Value = aNewValue
+            End If
 
-        WriteAttribute = DsnWriteAttribute(lWdmHandle.Unit, lMsg.Unit, lDsn, aAttribute)
+            WriteAttribute = DsnWriteAttribute(lWdmHandle.Unit, lMsg.Unit, lDsn, aAttribute)
 
-        lMsg.Dispose()
-        lWdmHandle.Dispose()
+        End Using
         'Logger.Dbg("atcDataSourceWdm:WriteAttributes:end")
     End Function
 
@@ -471,9 +463,9 @@ CaseExistRenumber:
         Dim lRemoveDataset As Boolean = False
 
         Dim lRetcod As Integer
-        Dim lWdmHandle As New atcWdmHandle(0, Specification)
-        Call F90_WDDSDL(lWdmHandle.Unit, (aDataSet.Attributes.GetValue("id", 1)), lRetcod)
-        lWdmHandle.Dispose()
+        Using lWdmHandle As New atcWdmHandle(0, Specification)
+            Call F90_WDDSDL(lWdmHandle.Unit, (aDataSet.Attributes.GetValue("id", 1)), lRetcod)
+        End Using
 
         If lRetcod = 0 Then
             lRemoveDataset = True
@@ -601,17 +593,17 @@ CaseExistRenumber:
             .SetValueIfMissing("desc", "")
 
             DsnWriteAttributes = True
-            Dim lMsg As atcWdmHandle = pMsg.MsgHandle
-            Dim lMsgUnit As Integer = lMsg.Unit
-            For lAttributeIndex As Integer = 0 To .Count - 1
-                'Debug.WriteLine(aTs.Attributes.ItemByIndex(lAttributeIndex).ToString)
-                If Not DsnWriteAttribute(aFileUnit, lMsgUnit, lDsn, .ItemByIndex(lAttributeIndex)) Then
-                    DsnWriteAttributes = False
-                    Logger.Dbg("Failed to write Attribute " & .ItemByIndex(lAttributeIndex).ToString)
-                    Exit For
-                End If
-            Next
-            lMsg.Dispose()
+            Using lMsg As atcWdmHandle = pMsg.MsgHandle
+                Dim lMsgUnit As Integer = lMsg.Unit
+                For lAttributeIndex As Integer = 0 To .Count - 1
+                    'Debug.WriteLine(aTs.Attributes.ItemByIndex(lAttributeIndex).ToString)
+                    If Not DsnWriteAttribute(aFileUnit, lMsgUnit, lDsn, .ItemByIndex(lAttributeIndex)) Then
+                        DsnWriteAttributes = False
+                        Logger.Dbg("Failed to write Attribute " & .ItemByIndex(lAttributeIndex).ToString)
+                        Exit For
+                    End If
+                Next
+            End Using
         End With
     End Function
 
@@ -809,35 +801,33 @@ CaseExistRenumber:
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, _
-                          Optional ByVal aAttributes As atcDataAttributes = Nothing) _
-                                   As Boolean
+                          Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
 
         If MyBase.Open(aFileName, aAttributes) Then
-            Dim lWdmHandle As atcWdmHandle
-            If FileExists(Specification) Then
-                lWdmHandle = New atcWdmHandle(0, Specification)
-            ElseIf IO.Path.GetFileName(Specification).Length > 0 Then
-                Logger.Dbg("atcDataSourceWDM:Open:WDM file " & Specification & " does not exist - it will be created")
-                MkDirPath(PathNameOnly(Specification))
-                lWdmHandle = New atcWdmHandle(2, Specification)
-            Else
-                Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & Specification & "'")
-                Return False
+            Dim lRWCFlg As Integer = 0
+            If Not FileExists(Specification) Then
+                If IO.Path.GetFileName(Specification).Length > 0 Then
+                    Logger.Dbg("atcDataSourceWDM:Open:WDM file " & Specification & " does not exist - it will be created")
+                    MkDirPath(PathNameOnly(Specification))
+                    lRWCFlg = 2
+                Else
+                    Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & Specification & "'")
+                    Return False
+                End If
             End If
 
-            If Not lWdmHandle Is Nothing AndAlso lWdmHandle.Unit > 0 Then
-                pQuick = True
-                Refresh(lWdmHandle.Unit)
-                pQuick = False
-                lWdmHandle.Dispose()
-                Return True 'Successfully opened
-            Else
-                Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & Specification & "'")
-                Return False
-            End If
-        Else
-            Return False
+            Using lWdmHandle As New atcWdmHandle(lRWCFlg, Specification)
+                If lWdmHandle.Unit > 0 Then
+                    pQuick = True
+                    Refresh(lWdmHandle.Unit)
+                    pQuick = False
+                    Return True 'Successfully opened
+                Else
+                    Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & Specification & "'")
+                End If
+            End Using
         End If
+        Return False
     End Function
 
     Public Overrides Sub ReadData(ByVal aReadMe As atcDataSet)
@@ -845,105 +835,98 @@ CaseExistRenumber:
             Logger.Dbg("WDM cannot read dataset with details:" & aReadMe.ToString & vbCrLf & _
                        "Specification:'" & Specification & "'")
         Else
-            Dim lV() As Single 'array of data values
             Dim lVd() As Double 'array of double data values
             Dim lJd() As Double 'array of julian dates
             Dim lRetcod As Integer
             Dim lSdat(6) As Integer 'starting date
             Dim lSdatSeasonOffset(6) As Integer 'starting date with seasonal offset
             Dim lEdat(6) As Integer 'ending (or current) date
-            Dim lTsFill As Double
             Dim lReadTS As atcTimeseries = aReadMe
 
             lReadTS.ValuesNeedToBeRead = False
             'Logger.dbg("WDM read data " & aReadMe.Attributes.GetValue("Location"))
-            Dim lWdmHandle As New atcWdmHandle(0, Specification)
-            If lWdmHandle.Unit > 0 Then
-                With aReadMe.Attributes
-                    If Not CBool(.GetValue("HeaderComplete", False)) Then
-                        DsnReadGeneral(lWdmHandle.Unit, lReadTS)
-                    End If
-
-                    If Not CBool(.GetValue("HeaderOnly", False)) Then
-                        lReadTS.ValuesNeedToBeRead = False
-
-                        Dim lSJDay As Double = .GetValue("SJDay", 0)
-                        J2Date(lSJDay, lSdat) 'saved starting date as array for wdtget
-                        If .GetValue("TU") = atcUtility.atcTimeUnit.TUYear Then
-                            Dim lStartMonth As Integer = .GetValue("SEASBG", 1)
-                            Dim lStartDay As Integer = .GetValue("SEADBG", 1)
-                            If lStartMonth > 1 OrElse lStartDay > 1 Then
-                                lSJDay = TimAddJ(lSJDay, atcTimeUnit.TUMonth, 1, lStartMonth - 1) + lStartDay - 1
-                            End If
+            Using lWdmHandle As New atcWdmHandle(0, Specification)
+                If lWdmHandle.Unit > 0 Then
+                    With aReadMe.Attributes
+                        If Not CBool(.GetValue("HeaderComplete", False)) Then
+                            DsnReadGeneral(lWdmHandle.Unit, lReadTS)
                         End If
-                        J2Date(lSJDay, lSdatSeasonOffset)
-                        Dim nVals As Integer = lReadTS.numValues
-                        If nVals = 0 Then 'constant inverval???
-                            Dim lEJDay As Double = .GetValue("EJDay", 0)
-                            J2Date(lEJDay, lEdat)
-                            TimDif(lSdat, lEdat, .GetValue("tu", 0), .GetValue("ts", 0), nVals)
-                            lReadTS.numValues = nVals
-                        End If
-                        If nVals > 0 Then
-                            ReDim lV(nVals)
-                            Dim lDsn As Integer = CInt(.GetValue("id", 1))
-                            Dim lTimeStep As Integer = CInt(.GetValue("ts", 0))
-                            Dim lTimeUnits As Integer = CInt(.GetValue("tu", 0))
-                            Dim lTran As Integer = 0 'transformation = aver,same
-                            Dim lQual As Integer = 31 'allowed quality code
-                            'F90_WDTGET(lWdmHandle.Unit, lDsn, lTimeStep, lSdat(0), nVals, _
-                            '           lTran, lQual, lTimeUnits, lV(1), lRetcod)
-                            F90_WDTGET(lWdmHandle.Unit, lDsn, lTimeStep, lSdat, nVals, _
-                                       lTran, lQual, lTimeUnits, lV, lRetcod)
-                            If lRetcod <> 0 Then
-                                Logger.Dbg("FailedToReadDataFor " & lDsn & " with code " & lRetcod)
-                            End If
 
-                            ReDim lJd(nVals)
-                            lJd(0) = lSJDay
-                            ReDim lVd(nVals)
-                            lVd(0) = pNan
+                        If Not CBool(.GetValue("HeaderOnly", False)) Then
+                            lReadTS.ValuesNeedToBeRead = False
 
-                            lTsFill = .GetValue("TSFill", -999)
-                            If lTsFill >= 0 Then 'WDM convention - fill value, not undefined,
-                                lTsFill = pNan
-                            End If
-
-                            Dim lInterval As Double = .GetValue("interval", 0)
-                            Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
-                            For iVal As Integer = 1 To nVals
-                                If Math.Abs((lV(iVal - 1) - lTsFill)) < 1.0E-20 Then 'pEpsilon Then
-                                    lVd(iVal) = pNan
-                                Else
-                                    lVd(iVal) = lV(iVal - 1) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
+                            Dim lSJDay As Double = .GetValue("SJDay", 0)
+                            J2Date(lSJDay, lSdat) 'saved starting date as array for wdtget
+                            If .GetValue("TU") = atcUtility.atcTimeUnit.TUYear Then
+                                Dim lStartMonth As Integer = .GetValue("SEASBG", 1)
+                                Dim lStartDay As Integer = .GetValue("SEADBG", 1)
+                                If lStartMonth > 1 OrElse lStartDay > 1 Then
+                                    lSJDay = TimAddJ(lSJDay, atcTimeUnit.TUMonth, 1, lStartMonth - 1) + lStartDay - 1
                                 End If
-                                If lConstInterval Then
-                                    lJd(iVal) = lSJDay + iVal * lInterval
-                                Else
-                                    TIMADD(lSdatSeasonOffset, lTimeUnits, lTimeStep, iVal, lEdat)
-                                    lJd(iVal) = Date2J(lEdat)
+                            End If
+                            J2Date(lSJDay, lSdatSeasonOffset)
+                            Dim nVals As Integer = lReadTS.numValues
+                            If nVals = 0 Then 'constant inverval?
+                                Dim lEJDay As Double = .GetValue("EJDay", 0)
+                                J2Date(lEJDay, lEdat)
+                                TimDif(lSdat, lEdat, .GetValue("tu", 0), .GetValue("ts", 0), nVals)
+                                lReadTS.numValues = nVals
+                            End If
+                            If nVals > 0 Then
+                                Dim lDsn As Integer = CInt(.GetValue("id", 1))
+                                Dim lTimeStep As Integer = CInt(.GetValue("ts", 0))
+                                Dim lTimeUnits As Integer = CInt(.GetValue("tu", 0))
+                                Dim lTran As Integer = 0 'transformation = aver,same
+                                Dim lQual As Integer = 31 'allowed quality code
+                                Dim lV(nVals) As Single 'data values come from WDM as Single
+                                F90_WDTGET(lWdmHandle.Unit, lDsn, lTimeStep, lSdat, nVals, _
+                                           lTran, lQual, lTimeUnits, lV, lRetcod)
+                                If lRetcod <> 0 Then
+                                    Throw New ApplicationException("ReadData Failed For " & lDsn & " with code " & lRetcod)
                                 End If
-                            Next
-                        Else
-                            ReDim lV(0)
-                            ReDim lVd(0)
-                            ReDim lJd(0)
+
+                                ReDim lJd(nVals)
+                                lJd(0) = lSJDay
+                                ReDim lVd(nVals)
+                                lVd(0) = pNan
+
+                                Dim lTsFill As Double = .GetValue("TSFill", -999)
+                                If lTsFill >= 0 Then 'WDM convention - fill value, not undefined,
+                                    lTsFill = pNan
+                                End If
+
+                                Dim lInterval As Double = .GetValue("interval", 0)
+                                Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
+                                For iVal As Integer = 1 To nVals
+                                    If Math.Abs((lV(iVal - 1) - lTsFill)) < pEpsilon Then
+                                        lVd(iVal) = pNan
+                                    Else
+                                        lVd(iVal) = lV(iVal - 1) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
+                                    End If
+                                    If lConstInterval Then
+                                        lJd(iVal) = lSJDay + iVal * lInterval
+                                    Else
+                                        TIMADD(lSdatSeasonOffset, lTimeUnits, lTimeStep, iVal, lEdat)
+                                        lJd(iVal) = Date2J(lEdat)
+                                    End If
+                                Next
+                            Else
+                                ReDim lVd(0)
+                                ReDim lJd(0)
+                            End If
+                            lReadTS.Values = lVd
+                            lReadTS.Dates.Values = lJd
                         End If
-                        lReadTS.Values = lVd
-                        lReadTS.Dates.Values = lJd
-                    End If
-                End With
-                lWdmHandle.Dispose()
-            End If
+                    End With                    
+                End If
+            End Using
         End If
     End Sub
 
     Private Sub RefreshDsn(ByVal aFileUnit As Integer, ByVal aDsn As Integer)
-        Dim lDates As New atcTimeseries(Nothing)
-        pDates.Add(lDates)
-
         Dim lData As New atcTimeseries(Me)
-        lData.Dates = lDates
+        lData.Dates = New atcTimeseries(Me)
+        pDates.Add(lData.Dates)
         lData.Attributes.SetValue("id", aDsn)
         lData.Attributes.AddHistory("Read from " & Specification)
 
@@ -953,10 +936,10 @@ CaseExistRenumber:
             Try
                 DsnReadGeneral(aFileUnit, lData)
             Catch lEx As Exception
-                Logger.Dbg("Problem")
+                Logger.Dbg("RefreshDsn: " & lEx.ToString)
             End Try
         Else
-            Logger.Dbg("Problem")
+            Throw New ApplicationException("RefreshDsn: aFileUnit=" & aFileUnit & ", lData=" & (lData IsNot Nothing))
         End If
 
         Dim lInit As Integer = 1
@@ -1035,13 +1018,13 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
         Dim lDsn As Integer = aDataset.Attributes.GetValue("id", 1)
 
         lSaLen = 1
-        lSaInd = 33 'time step
+        lSaInd = 33 'time step (TSSTEP)
         F90_WDBSGI(aFileUnit, lDsn, lSaInd, lSaLen, lTs, lRetcod)
         If (lRetcod <> 0) Then ' set time step to default of 1
             lTs = 1
         End If
  
-        lSaInd = 17 'time unit
+        lSaInd = 17 'time unit (TCODE)
         Dim lTuInt As Integer
         F90_WDBSGI(aFileUnit, lDsn, lSaInd, lSaLen, lTuInt, lRetcod)
         If (lRetcod <> 0) Then 'set to default of daily time units

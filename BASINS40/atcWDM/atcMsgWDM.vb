@@ -39,54 +39,54 @@ Friend Class atcMsgWDM
 
         'F90_MSG("WRITE", 5) 'turn on very detailed debugging of fortran to error.fil
 
-        Dim lMsgHandle As atcWdmHandle = MsgHandle()
-        Dim lMsgUnit As Integer = lMsgHandle.Unit
+        Using lMsgHandle As atcWdmHandle = MsgHandle()
+            Dim lMsgUnit As Integer = lMsgHandle.Unit
 
-        If lMsgUnit > 0 Then
-            For lIndex = 1 To 500 'loop thru all possible attributes 
-                'get info about attribute from message file
-                Dim lAttr As New atcData.atcAttributeDefinition
-                lAttr.Category = "WDM"
-                Call F90_WDSAGY(lMsgUnit, lIndex, lLen, lType, lRMin, lRMax, lRDef, lHlpLen, lHlpRec, lHlpPos, lValidLen, lName, lDesc, lValid)
-                If lLen = 0 Then 'dummy
-                    lAttr.Name = "Dummy" & lIndex
-                    lAttr.ID = lIndex
-                    pAttributes.Add("K" & lIndex, lAttr)
-                Else
-                    lAttr.Name = lName
-                    lAttr.ID = lIndex
-                    lAttr.Description = lDesc
-                    lAttr.ValidList = New ArrayList(lValid.Split(","c))
-                    If InStr("-TGROUP-TSFORM-VBTIME-COMPFG-TSFILL-TSBYR-TSBMO-TSBDY-TSBHR-TSPREC-TSSTEP-TCODE-Time Units-Time Step-", "-" & lName & "-") > 0 Then
-                        lAttr.Editable = False
+            If lMsgUnit > 0 Then
+                For lIndex = 1 To 500 'loop thru all possible attributes 
+                    'get info about attribute from message file
+                    Dim lAttr As New atcData.atcAttributeDefinition
+                    lAttr.Category = "WDM"
+                    Call F90_WDSAGY(lMsgUnit, lIndex, lLen, lType, lRMin, lRMax, lRDef, lHlpLen, lHlpRec, lHlpPos, lValidLen, lName, lDesc, lValid)
+                    If lLen = 0 Then 'dummy
+                        lAttr.Name = "Dummy" & lIndex
+                        lAttr.ID = lIndex
+                        pAttributes.Add("K" & lIndex, lAttr)
                     Else
-                        lAttr.Editable = True
+                        lAttr.Name = lName
+                        lAttr.ID = lIndex
+                        lAttr.Description = lDesc
+                        lAttr.ValidList = New ArrayList(lValid.Split(","c))
+                        If InStr("-TGROUP-TSFORM-VBTIME-COMPFG-TSFILL-TSBYR-TSBMO-TSBDY-TSBHR-TSPREC-TSSTEP-TCODE-Time Units-Time Step-", "-" & lName & "-") > 0 Then
+                            lAttr.Editable = False
+                        Else
+                            lAttr.Editable = True
+                        End If
+
+                        Select Case lType
+                            Case 1 : lAttr.TypeString = "Integer"
+                            Case 2 : lAttr.TypeString = "Single"
+                            Case 3
+                                lAttr.TypeString = "String"
+                                lAttr.Max = lLen 'max length of string
+                        End Select
+
+                        If lAttr.TypeString <> "String" Then 'numeric, save valid range
+                            lAttr.Min = lRMin
+                            lAttr.Max = lRMax
+                        End If
+
+                        lAttr.DefaultValue = lRDef
+
+                        'use hlen, hrec, hpos to get myAttr.help 
+                        '(missing entry point to WDGCVL in hass_ent?)
+                        lAttr.Help = ""
+
+                        pAttributes.Add(lName.ToLower, lAttr)
                     End If
-
-                    Select Case lType
-                        Case 1 : lAttr.TypeString = "Integer"
-                        Case 2 : lAttr.TypeString = "Single"
-                        Case 3
-                            lAttr.TypeString = "String"
-                            lAttr.Max = lLen 'max length of string
-                    End Select
-
-                    If lAttr.TypeString <> "String" Then 'numeric, save valid range
-                        lAttr.Min = lRMin
-                        lAttr.Max = lRMax
-                    End If
-
-                    lAttr.DefaultValue = lRDef
-
-                    'use hlen, hrec, hpos to get myAttr.help 
-                    '(missing entry point to WDGCVL in hass_ent?)
-                    lAttr.Help = ""
-
-                    pAttributes.Add(lName.ToLower, lAttr)
-                End If
-            Next lIndex
-        End If
-        lMsgHandle.Dispose()
+                Next lIndex
+            End If
+        End Using
     End Sub
 
     Public Function MsgHandle() As atcWdmHandle
