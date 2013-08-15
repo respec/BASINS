@@ -139,11 +139,11 @@ Friend Class atcWdmFileHandle
     End Function
 
     Public Function ReadString(ByVal aNumWords As Integer) As String 'aNumWords = number of 32-bit words
-        ReadString = ""
+        Dim lReadString As New Text.StringBuilder
         For lChrIndex As Integer = 1 To aNumwords
-            ReadString &= Long2String(pBr.ReadInt32)
+            lReadString.Append(Long2String(pBr.ReadInt32))
         Next
-        ReadString = Trim(ReadString)
+        Return lReadString.ToString.Trim
     End Function
 
     Public Sub Seek(ByVal aRec As Int32, ByVal aOff As Int32)
