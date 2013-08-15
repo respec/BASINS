@@ -28,26 +28,29 @@ Public Module modDate
         TranCountMissing = 5
     End Enum
 
-    ''' <summary>one hour as fraction of a day</summary>
-    Public Const JulianHour As Double = 1 / 24
-
-    ''' <summary>one minute as fraction of a day</summary>
-    Public Const JulianMinute As Double = 1 / 1440
-
-    ''' <summary>one second as fraction of a day</summary>
-    Public Const JulianSecond As Double = 1 / 86400
-
-    ''' <summary>cound of seconds in a day</summary>
+    ''' <summary>Number of seconds in a day</summary>
     Public Const SecondsPerDay As Integer = 86400
 
-    ''' <summary>one millisecond as fraction of a day</summary>
+    ''' <summary>One hour as fraction of a day</summary>
+    Public Const JulianHour As Double = 1 / 24
+
+    ''' <summary>One minute as fraction of a day</summary>
+    Public Const JulianMinute As Double = 1 / 1440
+
+    ''' <summary>One second as fraction of a day</summary>
+    Public Const JulianSecond As Double = 1 / SecondsPerDay
+
+    ''' <summary>Half a second as fraction of a day</summary>
+    Public Const JulianHalfSecond As Double = 1 / (SecondsPerDay * 2)
+
+    ''' <summary>One millisecond as fraction of a day</summary>
     Public Const JulianMillisecond As Double = 1 / 86400000
 
-    ''' <summary>estimate of month as number of days</summary>
+    ''' <summary>Average length of a month as number of days</summary>
     ''' <remarks>When doing math on months and years, it is more accurate to use subroutines Timdif, Timadd, TimAddJ</remarks>
     Public Const JulianMonth As Double = 30.44
 
-    ''' <summary>estimate of year as number of days</summary>
+    ''' <summary>Average length of a year as a number of days</summary>
     ''' <remarks>When doing math on months and years, it is more accurate to use subroutines Timdif, Timadd, TimAddJ</remarks>
     Public Const JulianYear As Double = 365.25
 
@@ -57,8 +60,7 @@ Public Module modDate
     'This is the offset we actually use
     Public Const JulianModification As Integer = JulianModification1899
 
-    ''' <summary>Three character month names</summary>
-    ''' <remarks>TODO: make this international</remarks>
+    ''' <summary>Three-letter month names</summary>
     Public ReadOnly MonthName3 As String() = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 
     '''' <summary>convert a VB date to a modfied Julian date(MJD)</summary>
@@ -173,12 +175,16 @@ Public Module modDate
         If Double.IsNaN(aJd) Then
             lJd = 0
         Else
-            lJd = Fix(aJd)
+            lJd = Fix(aJd + JulianHalfSecond) 'round up if Julian date is within rounding error of midnight
         End If
 
         Call INVMJD(lJd, aDate(0), aDate(1), aDate(2))
         lJhms = aJd - lJd
-        Call J2HMS(lJhms, aDate(3), aDate(4), aDate(5), lFrac)
+        If lJhms < JulianHalfSecond Then
+            aDate(3) = 0 : aDate(4) = 0 : aDate(5) = 0
+        Else
+            Call J2HMS(lJhms, aDate(3), aDate(4), aDate(5), lFrac)
+        End If
     End Sub
 
     ''' <summary>
