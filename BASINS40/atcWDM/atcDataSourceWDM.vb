@@ -70,9 +70,7 @@ Public Class atcDataSourceWDM
         Dim lProgPrev As Integer
 
         DataSets.Clear()
-
-        pDates = Nothing
-        pDates = New Generic.List(Of atcTimeseries)
+        pDates.Clear()
 
         lDsn = 1
         While lDsn > 0
@@ -835,8 +833,7 @@ CaseExistRenumber:
             Logger.Dbg("WDM cannot read dataset with details:" & aReadMe.ToString & vbCrLf & _
                        "Specification:'" & Specification & "'")
         Else
-            Dim lVd() As Double 'array of double data values
-            Dim lJd() As Double 'array of julian dates
+            Dim lVd(0) As Double 'array of double data values
             Dim lRetcod As Integer
             Dim lSdat(6) As Integer 'starting date
             Dim lSdatSeasonOffset(6) As Integer 'starting date with seasonal offset
@@ -853,11 +850,11 @@ CaseExistRenumber:
                         End If
 
                         If Not CBool(.GetValue("HeaderOnly", False)) Then
-                            lReadTS.ValuesNeedToBeRead = False
-
+                            Dim lTu As atcTimeUnit = .GetValue("Time Unit", atcTimeUnit.TUUnknown)
+                            Dim lTs As atcTimeUnit = .GetValue("Time Step", 1)
                             Dim lSJDay As Double = .GetValue("SJDay", 0)
                             J2Date(lSJDay, lSdat) 'saved starting date as array for wdtget
-                            If .GetValue("TU") = atcUtility.atcTimeUnit.TUYear Then
+                            If lTu = atcUtility.atcTimeUnit.TUYear Then
                                 Dim lStartMonth As Integer = .GetValue("SEASBG", 1)
                                 Dim lStartDay As Integer = .GetValue("SEADBG", 1)
                                 If lStartMonth > 1 OrElse lStartDay > 1 Then
@@ -865,12 +862,13 @@ CaseExistRenumber:
                                 End If
                             End If
                             J2Date(lSJDay, lSdatSeasonOffset)
+
                             Dim nVals As Integer = lReadTS.numValues
-                            If nVals = 0 Then 'constant inverval?
+                            If nVals = 0 Then
                                 Dim lEJDay As Double = .GetValue("EJDay", 0)
                                 J2Date(lEJDay, lEdat)
-                                TimDif(lSdat, lEdat, .GetValue("tu", 0), .GetValue("ts", 0), nVals)
-                                lReadTS.numValues = nVals
+                                TimDif(lSdat, lEdat, .GetValue("tu", 0), lTs, nVals)
+                                'lReadTS.numValues = nVals
                             End If
                             If nVals > 0 Then
                                 Dim lDsn As Integer = CInt(.GetValue("id", 1))
@@ -885,8 +883,13 @@ CaseExistRenumber:
                                     Throw New ApplicationException("ReadData Failed For " & lDsn & " with code " & lRetcod)
                                 End If
 
-                                ReDim lJd(nVals)
+                                'Dim lNeedDates As Boolean = (lReadTS.Dates.numValues <> nVals)
+                                Dim lJd(nVals) As Double 'array of julian dates
+                                'If lNeedDates Then
+                                'ReDim lJd(nVals)
                                 lJd(0) = lSJDay
+                                'End If
+
                                 ReDim lVd(nVals)
                                 lVd(0) = pNan
 
@@ -903,21 +906,48 @@ CaseExistRenumber:
                                     Else
                                         lVd(iVal) = lV(iVal - 1) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
                                     End If
+                                    'If lNeedDates Then
                                     If lConstInterval Then
                                         lJd(iVal) = lSJDay + iVal * lInterval
                                     Else
                                         TIMADD(lSdatSeasonOffset, lTimeUnits, lTimeStep, iVal, lEdat)
                                         lJd(iVal) = Date2J(lEdat)
                                     End If
+                                    'End If
                                 Next
-                            Else
-                                ReDim lVd(0)
-                                ReDim lJd(0)
+
+                                'If lNeedDates Then
+                                Dim lMatchingDates As atcTimeseries = Nothing
+                                'Search for existing Dates that exactly match these so we can share that one and save memory
+                                For Each lOtherDates As atcTimeseries In pDates
+                                    If lOtherDates.Serial <> lReadTS.Dates.Serial Then
+                                        If lOtherDates.numValues = nVals Then
+                                            lMatchingDates = lOtherDates
+                                            For lDateIndex As Integer = nVals To 0 Step -1
+                                                If lOtherDates.Value(lDateIndex) <> lJd(lDateIndex) Then
+                                                    lMatchingDates = Nothing
+                                                    Exit For
+                                                End If
+                                            Next
+                                            If lMatchingDates IsNot Nothing Then Exit For
+                                        End If
+                                    End If
+                                Next
+                                If lMatchingDates Is Nothing Then
+                                    lReadTS.Dates.Values = lJd
+                                    pDates.Add(lReadTS.Dates)
+                                Else
+                                    lReadTS.Dates.Clear()
+                                    lReadTS.Dates = lMatchingDates
+                                    lMatchingDates.Attributes.SetValue("Shared", True)
+                                End If
+                                'End If
                             End If
+
                             lReadTS.Values = lVd
-                            lReadTS.Dates.Values = lJd
                         End If
                     End With                    
+                'atcDataManager.AddDiscardableTimeseries(lReadTS)
                 End If
             End Using
         End If
@@ -925,8 +955,7 @@ CaseExistRenumber:
 
     Private Sub RefreshDsn(ByVal aFileUnit As Integer, ByVal aDsn As Integer)
         Dim lData As New atcTimeseries(Me)
-        lData.Dates = New atcTimeseries(Me)
-        pDates.Add(lData.Dates)
+        lData.Dates = New atcTimeseries(Nothing) 'Using Nothing instead of Me here because we only read dates while doing ReadData for values
         lData.Attributes.SetValue("id", aDsn)
         lData.Attributes.AddHistory("Read from " & Specification)
 
@@ -1011,7 +1040,6 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
         Dim lSaInd, lSaLen, lRetcod As Integer
         Dim lTu As atcTimeUnit
         Dim lTs As Integer
-        Dim lNvals As Integer
         Dim lStr As String = ""
         Dim lSdat(6) As Integer
         Dim lEdat(6) As Integer
@@ -1034,24 +1062,14 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
         End If
 
         aDataset.SetInterval(lTu, lTs)
-        'TODO: set constant interval/interval length attribute(s) in aDataset.Dates
-        'lDateSum.CIntvl = True
 
         If Not pQuick Then 'get start and end dates for each data set
             Dim lGpFlg As Integer = 1
             Dim lDsfrc As Integer
             F90_WTFNDT(aFileUnit, lDsn, lGpFlg, lDsfrc, lSdat, lEdat, lRetcod)
             If lSdat(0) > 0 Then
-                Dim lDates As atcTimeseries = aDataset.Dates
-                Dim lSJDay As Double = Date2J(lSdat)
-                Dim lEJDay As Double = Date2J(lEdat)
-                aDataset.Attributes.SetValue("SJDay", lSJDay)
-                aDataset.Attributes.SetValue("EJDay", lEJDay)
-                lDates.Attributes.SetValue("SJDay", lSJDay)
-                lDates.Attributes.SetValue("EJDay", lEJDay)
-                TimDif(lSdat, lEdat, lTu, lTs, lNvals)
-                aDataset.numValues = lNvals
-                lDates.numValues = lNvals
+                aDataset.Attributes.SetValue("SJDay", Date2J(lSdat))
+                aDataset.Attributes.SetValue("EJDay", Date2J(lEdat))
             End If
             aDataset.Attributes.SetValue("HeaderComplete", True)
         End If
