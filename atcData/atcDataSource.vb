@@ -103,8 +103,7 @@ Public Class atcDataSource
         'assume the best
         Open = True
 
-        If aSpecification Is Nothing OrElse _
-           aSpecification.Length = 0 OrElse _
+        If String.IsNullOrEmpty(aSpecification) OrElse _
            (Not CanSave AndAlso Not (FileExists(aSpecification))) Then
             Dim lString As String = Description
             If lString.Length = 0 Then lString = Name
