@@ -11,6 +11,8 @@ Imports atcWdmVb.atcWdmFileHandle
 Public Class atcWDMfile
     Inherits atcTimeseriesSource
 
+    Private Shared pNan As Double = GetNaN()
+    Private Const pEpsilon As Double = 1.0E-20 ' tolerance for detecting missing value, System.Double.Epsilon is too small
     Shared pMsgWdm As New atcMsgWDMvb
     Private Const pFileFilter As String = "WDM Files (*.wdm)|*.wdm"
 
@@ -44,69 +46,75 @@ Public Class atcWDMfile
         End Get
     End Property
 
-    Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
+    Public Overrides Function Open(ByVal aFileName As String, _
+                          Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
         Open = False
-        If aFileName Is Nothing OrElse aFileName.Length = 0 Then
-            Dim cdlg As New Windows.Forms.OpenFileDialog
-            With cdlg
-                .Title = "Select WDM file to open"
-                .FileName = aFileName
-                .Filter = pFileFilter
-                .CheckFileExists = False
-                If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-                    aFileName = AbsolutePath(.FileName, CurDir)
-                Else 'cancel
-                    Logger.Dbg("atcWDMfile:Open:User Cancelled File Dialogue for Open WDM file")
-                    Exit Function
-                End If
-            End With
-        End If
+        'If String.IsNullOrEmpty(aFileName) Then
+        '    Dim cdlg As New Windows.Forms.OpenFileDialog
+        '    With cdlg
+        '        .Title = "Select WDM file to open"
+        '        .FileName = aFileName
+        '        .Filter = pFileFilter
+        '        .CheckFileExists = False
+        '        If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+        '            aFileName = AbsolutePath(.FileName, CurDir)
+        '        Else 'cancel
+        '            Logger.Dbg("atcWDMfile:Open:User Cancelled File Dialogue for Open WDM file")
+        '            Exit Function
+        '        End If
+        '    End With
+        'End If
 
-        Dim lWdm As atcWdmFileHandle = Nothing
-        If FileExists(aFileName) Then
-            lWdm = New atcWdmFileHandle(0, aFileName)
-        ElseIf FilenameNoPath(aFileName).Length > 0 Then
-            Logger.Dbg("atcWDMfile:Open:WDM file " & aFileName & " does not exist - it will be created")
-            MkDirPath(PathNameOnly(aFileName))
-            lWdm = New atcWdmFileHandle(2, aFileName)
-        Else
-            Logger.Dbg("atcWDMfile:Open:File does not exist and cannot create '" & aFileName & "'")
-        End If
-
-        If Not lWdm Is Nothing Then
-            Try
-                Specification = aFileName
-                Open = True 'assume the best
-                'do some basic checks
-                Dim lVal As Int32 = lWdm.ReadInt32(Wdm_Fields.PPRBKR)
-                If lVal <> -998 Then
-                    Logger.Dbg("atcWDMfile:Open:PrimaryBackwardRecordPointer for FileDefinitionRecord:" & lVal & " should be -998")
-                    Open = False
+        If MyBase.Open(aFileName, aAttributes) Then
+            Dim lRWCFlg As Integer = 0
+            If Not FileExists(Specification) Then
+                If IO.Path.GetFileName(Specification).Length > 0 Then
+                    Logger.Dbg("atcWDMfile:Open:WDM file " & Specification & " does not exist - it will be created")
+                    MkDirPath(PathNameOnly(Specification))
+                    lRWCFlg = 2
+                Else
+                    Logger.Dbg("atcWDMfile:Open:File does not exist and cannot create '" & Specification & "'")
+                    Return False
                 End If
-                Refresh(lWdm)
-                Open = True 'Successfully opened
-            Catch ex As Exception
-                Logger.Dbg("atcWDMfile:Open:Exception:" & ex.Message & vbCrLf & ex.StackTrace)
-                Open = False
-            End Try
-            lWdm.Dispose()
+            End If
+
+            Using lWdmHandle As New atcWdmFileHandle(lRWCFlg, Specification)
+                Try
+                    'do some basic checks
+                    Dim lVal As Int32 = lWdmHandle.ReadInt32(Wdm_Fields.PPRBKR)
+                    If lVal <> -998 Then
+                        Logger.Dbg("atcWDMfile:Open:PrimaryBackwardRecordPointer for FileDefinitionRecord:" & lVal & " should be -998")
+                    Else
+                        Refresh(lWdmHandle)
+                        Return True 'Successfully opened
+                    End If
+                Catch ex As Exception
+                    Logger.Dbg("atcWDMfile:Open:Exception:" & ex.Message & vbCrLf & ex.StackTrace)
+                End Try
+            End Using
         End If
+        Return False
     End Function
 
     Public Overrides Sub ReadData(ByVal aData As atcData.atcDataSet)
         Dim lDsn As Int32 = aData.Attributes.GetValue("ID", 0)
         If lDsn > 0 Then
-            Dim lWdm As New atcWdmFileHandle(0, Specification)
-            Try
-                Dim lRec As Int32 = lWdm.FirstRecordNumberFromDsn(lDsn)
-                TimeseriesDataFromWdm(lWdm, aData, lRec)
-                Dim lTimeseries As atcData.atcTimeseries = aData
-                lTimeseries.ValuesNeedToBeRead = False
-            Catch ex As Exception
-                Logger.Dbg("atcWDMfile:ReadData:Exception:" & ex.Message & vbCrLf & ex.StackTrace)
-            End Try
-            lWdm.Dispose()
+            Using lWdm As New atcWdmFileHandle(0, Specification)
+                Try
+                    Dim lRec As Int32 = lWdm.FirstRecordNumberFromDsn(lDsn)
+                    TimeseriesDataFromWdm(lWdm, aData, lRec)
+                    Dim lTimeseries As atcData.atcTimeseries = aData
+                    lTimeseries.ValuesNeedToBeRead = False
+                Catch ex As Exception
+                    Logger.Dbg("atcWDMfile:ReadData:Exception:" & ex.Message & vbCrLf & ex.StackTrace)
+                End Try
+            End Using
         End If
+    End Sub
+
+    Public Sub New()
+        MyBase.New()
+        Filter = pFileFilter
     End Sub
 
     ''' <summary>
@@ -115,9 +123,6 @@ Public Class atcWDMfile
     ''' <param name="aWdm">handle of open WDM file to read from</param>
     ''' <remarks>All static attributes are read, but data is not read here to save time and space</remarks>
     Private Sub Refresh(ByVal aWdm As atcWdmFileHandle)
-        'Dim lProg As Integer = 0
-        'Dim lProgPrev As Integer
-
         DataSets.Clear()
 
         Dim lDsn As Int32 = aWdm.ReadInt32(Wdm_Fields.DSFST_Timeseries)
@@ -130,14 +135,8 @@ Public Class atcWDMfile
             Logger.Dbg("Dsn: " & lDsn & " Rec: " & lRec)
             DataSets.Add(lDsn, DataSetFromWdm(aWdm, lDsn))
             lDsn = aWdm.ReadInt32(lRec, 2)
-            'If lDsn = 0 Then
-            '    'Logger.Progress("WDM Refresh Complete", 100, 100)
-            'Else 'try the next dsn
-            '    lProgPrev = lProg
-            '    lProg = (100 * lDsn) / 32000 'TODO: use actual number of datasets read and total to read
-            '    'Logger.Progress("WDM Refresh", lProg, lProgPrev)
-            'End If
         End While
+        DataSets.Sort() 'Sort by DSN
     End Sub
 
     ''' <summary>
@@ -151,7 +150,7 @@ Public Class atcWDMfile
         Dim lDsn As Int32 = aWdm.ReadInt32(lRec, 5)
 
         If lDsn <> aDsn Then
-            Throw New Exception("DataSetFromWdm:ExpectedDsn: " & aDsn & " FoundDsn: " & lDsn)
+            Throw New ApplicationException("DataSetFromWdm:ExpectedDsn: " & aDsn & " FoundDsn: " & lDsn)
         End If
 
         Dim lDataSet As New atcTimeseries(Me)
@@ -197,12 +196,20 @@ Public Class atcWDMfile
                 Select Case .TypeString
                     Case "Integer"
                         aDataSet.Attributes.SetValue(lAttributeDefinition, aWdm.ReadInt32)
+                        If lSaind(lind) = 84 Then ' TSFORM: 1 = Mean, 2 = Sum, 3 = Point, 4 = Minimum, 5 = Maximum
+                            Dim lIsPoint As Boolean = (aDataSet.Attributes.GetValue(lAttributeDefinition.Name) = 3)
+                            aDataSet.Attributes.SetValue("Point", lIsPoint)
+                        End If
+                        'TODO: set units attribute from DCODE
+                        'Case "DCODE"
+                        ' lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
                     Case "Single"
                         aDataSet.Attributes.SetValue(lAttributeDefinition, aWdm.ReadSingle)
                     Case "String"
                         Dim lS As String = aWdm.ReadString(.Max / 4)
-                        Select Case UCase(.Name)
+                        Select Case .Name.ToUpper
                             Case "DATCRE", "DATMOD", "DATE CREATED", "DATE MODIFIED"
+                                Dim lFoundDate As Boolean = False
                                 If IsNumeric(lS.Substring(0, 4)) Then
                                     Try 'Dates should be formatted YYYYMMDDhhmmss
                                         lDate = New Date(CInt(lS.Substring(0, 4)), _
@@ -211,6 +218,7 @@ Public Class atcWDMfile
                                                          CInt(lS.Substring(8, 2)), _
                                                          CInt(lS.Substring(10, 2)), _
                                                          CInt(lS.Substring(12, 2)))
+                                        lFoundDate = True
                                     Catch ex As Exception
                                         GoTo ParseDate
                                     End Try
@@ -223,15 +231,17 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
                                         lS = lS.Substring(1)
                                         Dim lYear As Integer = StrFirstInt(lS)
                                         lDate = New Date(lYear, lMonth, lDay, 12, 0, 0)
-                                        Logger.Dbg(.Name & "parsed as '" & lDate.ToString & "' rounded to noon")
+                                        lFoundDate = True
+                                        Logger.Dbg(.Name & " parsed as '" & lDate.ToString & "' rounded to noon")
                                     Catch ex As Exception
-                                        Logger.Dbg(.Name & " failedToParse, defaulted to Now")
-                                        lDate = Now
+                                        Logger.Dbg(.Name & " failedToParse")
                                     End Try
                                 End If
-                                'TODO: set units attribute from DCODE
-                                'Case "DCODE"
-                                ' lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
+                                If lFoundDate Then
+                                    aDataSet.Attributes.SetValue(lAttributeDefinition, lDate)
+                                ElseIf Not String.IsNullOrEmpty(lS) Then
+                                    aDataSet.Attributes.SetValue(lAttributeDefinition.Name & "AsText", lS)
+                                End If
                             Case Else
                                 aDataSet.Attributes.SetValue(lAttributeDefinition, lS)
                         End Select
@@ -276,10 +286,11 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
         'Logger.Dbg(ls.TrimEnd(",", " "))
         'Logger.Dbg("  DataPointersInUse:" & lInUse & ":" & lDataPointerInUseCount)
 
-        Dim lData As New ArrayList
-        lData.Add(GetNaN)
-        Dim lDate As New ArrayList
+        Dim lData As New List(Of Double)
+        lData.Add(pNan)
+        Dim lDate As New List(Of Double)
         Dim lCurrentDateJ As Double
+        Dim lDataCurrent As Double
 
         For lInd As Int32 = 1 To lDataPointerCount
             Dim lDataPointerGroup As UInt32 = lDataPointerGroups(lInd)
@@ -293,7 +304,7 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
                 Dim lGroupDateJ As Double = WdmTimserGroupDate2JDate(lGroupDate)
                 Dim lGroupDateJCalc As Double = TimAddJ(lBaseDateJ, lTgroup, 1, lInd - 1)
                 If lGroupDateJ <> lGroupDateJCalc Then
-                    Logger.Dbg("  Problem with group dates:" & lGroupDateJ & ":" & lGroupDateJCalc)
+                    Logger.Dbg("  GroupDate: " & lGroupDateJ & " <> calculated: " & lGroupDateJCalc)
                 End If
                 'Logger.Dbg("  Group:Date:" & DumpDate(lGroupDateJ) & ":" & lGroupDateJ)
                 lCurrentDateJ = lGroupDateJ
@@ -318,9 +329,9 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
                         For lPos As Int32 = 1 To lBlockNumVals
                             lDate.Add(lCurrentDateJ)
                             lCurrentDateJ = TimAddJ(lBlockStartDateJ, lBlockTimeUnits, lBlockTimeStep, lPos)
-                            Dim lDataCurrent As Double = CDbl(aWdm.ReadSingle())
+                            lDataCurrent = CDbl(aWdm.ReadSingle())
                             If Math.Abs(lDataCurrent - lTsFill) < Double.Epsilon Then
-                                lDataCurrent = GetNaN()
+                                lDataCurrent = pNan
                             End If
                             lData.Add(lDataCurrent)
                         Next
@@ -328,8 +339,8 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
                     Else
                         Dim lDataComp As Double = CDbl(aWdm.ReadSingle())
                         Dim lSkipNaN As Boolean = False
-                        If Math.Abs(lDataComp - lTsFill) < Double.Epsilon Then
-                            lDataComp = GetNaN()
+                        If Math.Abs(lDataComp - lTsFill) < pEpsilon Then
+                            lDataComp = pNan
                             If lDate.Count = 0 Then
                                 lSkipNaN = True
                             End If
@@ -366,18 +377,17 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
         Next
         lDate.Add(lCurrentDateJ)
         'remove trailing missing data
-        While Double.IsNaN(lData.Item(lData.Count - 1))
-            lData.RemoveAt(lData.Count - 1)
-            lDate.RemoveAt(lDate.Count - 1)
+        Dim lLastIndex As Integer = lData.Count - 1
+        While Double.IsNaN(lData.Item(lLastIndex))
+            lLastIndex -= 1
         End While
+        If lLastIndex < lData.Count - 1 Then
+            lData.RemoveRange(lLastIndex + 1, lData.Count - lLastIndex)
+            lDate.RemoveRange(lLastIndex + 1, lData.Count - lLastIndex)
+        End If
         'Logger.Dbg("Done Dsn:DataCount:" & aDataSet.Attributes.GetValue("ID") & ":" & lData.Count)
-        Dim lDataD(lData.Count - 1) As Double
-        lData.CopyTo(lDataD)
-        aDataSet.Values = lDataD
-        Dim lDateD(lData.Count - 1) As Double
-        lDate.CopyTo(lDateD)
-        aDataSet.Dates.Values = lDateD
-        aDataSet.numValues = lDataD.GetUpperBound(0)
+        aDataSet.Dates.Values = lDate.ToArray() 'Set Dates.Values before Values since setting Values automatically allocates empty Dates.Values
+        aDataSet.Values = lData.ToArray()
     End Sub
 
     Private Function WdmTimserGroupDate2JDate(ByVal aGroupDate As UInt32) As Double
@@ -406,8 +416,8 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
     End Function
 
     Friend Function Check(ByVal aVerbose As Boolean) As String
-        Dim lWdm As New atcWdmFileHandle(1, Specification)
-        Check = lWdm.Check(aVerbose)
-        lWdm.Dispose()
+        Using lWdm As New atcWdmFileHandle(1, Specification)
+            Check = lWdm.Check(aVerbose)
+        End Using
     End Function
 End Class
