@@ -70,7 +70,7 @@ Module HSPFOutputReports
                 'put our status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
                 pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
                 Logger.ProgressStatus = pStatusMonitor
-                Logger.Status("LABEL TITLE HSPEXP Status")
+                Logger.Status("LABEL TITLE HSPEXP+")
                 Logger.Status("PROGRESS TIME OFF") 'Disable time-to-completion estimation
                 Logger.Status("")
             Else
@@ -79,7 +79,7 @@ Module HSPFOutputReports
             End If
         End If
 
-        Logger.Status("Hydrologic statistics program started", True)
+        Logger.Status("HSPEXP+ started", True)
         pOutputLocations.Clear()
 
         pGraphSaveFormat = ".png"
@@ -128,24 +128,25 @@ Module HSPFOutputReports
         Initialize()
         ChDriveDir(pTestPath)
         Logger.Dbg("CurrentFolder " & My.Computer.FileSystem.CurrentDirectory)
-        Logger.Status("New HSPEXP Progam is running.")
+        Logger.Status("HSPEXP+ is running.")
         Using lProgress As New ProgressLevel
 
             If pRunUci = True Then
-                Logger.Status(Now & " Running HSPF Simulation of the uci file " & pBaseName & ".uci", True)
+                Logger.Status(Now & " Running HSPF Simulation of " & pBaseName & ".uci", True)
                 Dim lExitCode As Integer
                 lExitCode = LaunchProgram(pHSPFExe, pTestPath, pBaseName & ".uci") 'Run HSPF program
                 If lExitCode <> 0 Then
                     Throw New ApplicationException("WinHSPFLt could not run, Analysis cannot continue")
                 End If
             End If
-
+            Logger.Status(Now & " HSPF Simulation of " & pBaseName & ".uci" & " finished.", True)
             'set up the timeseries attributes for statistics
             Dim lStat As New atcTimeseriesStatistics.atcTimeseriesStatistics
             For Each lOperation As atcDefinedValue In lStat.AvailableOperations
                 atcDataAttributes.AddDefinition(lOperation.Definition)
             Next
 
+            Logger.Status(Now & " Opening " & pBaseName & ".uci", True)
             'open uci file
             Logger.Dbg(Now & " Attempting to open hspfmsg.wdm")
             Dim lMsg As New atcUCI.HspfMsg
@@ -188,6 +189,7 @@ Module HSPFOutputReports
 
             Dim lRunMade As String = ""
             Dim lWdmFileName As String = pTestPath & pBaseName & ".wdm" 'Becky fixed to remove extra "\"
+            Logger.Status(Now & " Opening " & pBaseName & ".wdm", True)
             Dim lWdmDataSource As New atcDataSourceWDM()
             If System.IO.File.Exists(lWdmFileName) Then
                 Dim wdmFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lWdmFileName)
@@ -246,6 +248,7 @@ Module HSPFOutputReports
 
             'A folder name is given that has the basename and the time when the run was made.
             If pMakeAreaReports Then
+                Logger.Status(Now & " Producing Area Reports.", True)
                 Logger.Dbg(Now & " Producing land use and area reports")
                 'Becky's note: I changed modUtility so this will actually do this for all locations in pOutputLocations
                 Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutFolderName & "\")
@@ -270,6 +273,7 @@ Module HSPFOutputReports
             End If
             Dim lExpertSystem As HspfSupport.atcExpertSystem
             For Each lExpertSystemFileName As String In lExpertSystemFileNames
+                Logger.Status(Now & " Calculating Expert Statistics for the file " & lExpertSystemFileName, True)
                 Try
                     Dim lFileCopied As Boolean = False
                     If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
@@ -420,6 +424,7 @@ Module HSPFOutputReports
 
                             'Becky's addition: only make graphs if user wants them. 
                             If pMakeLogGraphs Or pMakeStdGraphs Or pMakeSupGraphs Then
+                                Logger.Status(Now & " Preparing Graphs", True)
                                 Dim lTimeSeries As New atcTimeseriesGroup
                                 Logger.Dbg(Now & " Creating nonstorm graphs")
                                 lTimeSeries.Add("Observed", lObsTSer)
@@ -466,9 +471,14 @@ Module HSPFOutputReports
                         IO.File.Delete(pBaseName & ".exs")
                     End If
                 Catch lEx As ApplicationException
+                    If lEx.Message.Contains("rogram will quit!") Then
+                        Logger.Msg(lEx.Message)
+                        End
+                    End If
                     Logger.Dbg(lEx.Message)
                 End Try
             Next lExpertSystemFileName
+
 
             Logger.Dbg(Now & " Opening " & pBaseName & ".hbn")
             Dim lHspfBinFileName As String = pTestPath & pBaseName & ".hbn"
@@ -484,6 +494,7 @@ Module HSPFOutputReports
             End If
 
             If lHbnExists Then
+                Logger.Status(Now & " Opening " & pBaseName & ".hbn and preparing water balance reports.", True)
                 Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
                 Logger.Dbg("Summary at " & lLocations.Count & " locations")
                 'constituent balance
@@ -517,20 +528,16 @@ Module HSPFOutputReports
 
             End If
             Logger.Dbg(Now & " Output Written to " & lOutFolderName)
-            Logger.Dbg("Reports Written in " & lOutFolderName, "HSPFOutputReports")
+            Logger.Dbg("Reports Written in " & lOutFolderName)
 RWZProgramEnding:
             'pProgressBar.pbProgress.Increment(39)
-            Logger.Dbg(Now & " Statistics Program Complete")
-            Logger.Msg("HSPEXP is complete")
+            Logger.Dbg(Now & " HSPEXP+ Complete")
+            Logger.Msg("HSPEXP+ is complete")
+            OpenFile(lOutFolderName)
         End Using
         Logger.Status("")
         Call Application.Exit()
 
-        'pProgressBar.lblProgressTitle.Text = "Program is complete.  Please ignore the timer cursor and click Exit."
-        'pProgressBar.txtProgress.DeselectAll()
-        'pProgressBar.Cursor = Cursors.Default
-        'pProgressBar.cmdExit.Visible = True
-        'pProgressBar.Focus()
     End Sub
 
     Public Sub RWZSetArgs(ByVal aTimeseries As atcTimeseries)
