@@ -321,6 +321,8 @@ CaseExistRenumber:
                         'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:back:" & _
                         '            lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
                     End If
+                    lTimser.Attributes.SetValue("Data Source", Specification)
+                    lTimser.Attributes.AddHistory("Added to " & Specification)
                     Return True
                 Else
                     Return False
@@ -472,18 +474,11 @@ CaseExistRenumber:
         If lRetcod = 0 Then
             lRemoveDataset = True
             DataSets.Remove(aDataSet)
-
-            Dim lRemoveDate As Boolean = True
             Dim lTimser As atcTimeseries = aDataSet
-            Dim lSearchSerial As Integer = lTimser.Dates.Serial
-            For Each lTs As atcTimeseries In DataSets
-                If lTs.Dates.Serial = lSearchSerial Then
-                    lRemoveDate = False
-                    Exit For
+            If Not lTimser.ValuesNeedToBeRead Then
+                If pDates.Contains(lTimser.Dates) AndAlso Not lTimser.Dates.Attributes.ContainsAttribute("Shared") Then
+                    pDates.Remove(lTimser.Dates)
                 End If
-            Next
-            If lRemoveDate Then
-                pDates.Remove(lTimser.Dates)
             End If
         Else
             lRemoveDataset = False
