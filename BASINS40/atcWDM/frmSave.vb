@@ -8,6 +8,7 @@ Public Class frmSave
     Private pDataGroup As atcTimeseriesGroup
     Private pHighestDSN As Integer
     Private pGridSource As WDMGridSource
+    Public OverwriteSelected As Boolean = False
 
     Public Function AskUser(ByVal aDataGroup As atcTimeseriesGroup, ByVal aLabel As String, ByVal aHighestDSN As Integer) As atcTimeseriesGroup
         pDataGroup = aDataGroup
@@ -15,6 +16,11 @@ Public Class frmSave
         pHighestDSN = aHighestDSN
         pGridSource = New WDMGridSource(aDataGroup)
         agdData.Initialize(pGridSource)
+        If aDataGroup.Count > 0 Then
+            If aDataGroup.ItemByIndex(0).Attributes.GetValue("New DSN", 0) <> aDataGroup.ItemByIndex(0).Attributes.GetValue("ID", 0) Then
+                btnOverwrite.Visible = True
+            End If
+        End If
         Me.ShowDialog()
         If Me.DialogResult = Windows.Forms.DialogResult.OK Then
             Return pDataGroup
@@ -66,6 +72,28 @@ Public Class frmSave
     Private Sub btnHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnHelp.Click
         atcUtility.ShowHelp("BASINS Details/Plug-ins/Time-Series Plug-ins/Read Data with Script.html")
     End Sub
+
+    Public Sub New()
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
+    End Sub
+
+    Private Sub btnOverwrite_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOverwrite.Click
+        If Logger.Msg("Use values from ID column as New DSN, overwriting existing data sets?", MsgBoxStyle.OkCancel, "Overwrite") = MsgBoxResult.Ok Then
+            OverwriteSelected = True
+            For Each lDataset As atcTimeseries In pDataGroup
+                Dim lOldDSN As Integer = lDataset.Attributes.GetValue("ID", 0)
+                If lOldDSN > 0 Then
+                    lDataset.Attributes.SetValue("New DSN", lOldDSN)
+                End If
+            Next
+            agdData.Refresh()
+        End If
+    End Sub
 End Class
 
 Friend Class WDMGridSource
@@ -82,6 +110,7 @@ Friend Class WDMGridSource
         End Get
         Set(ByVal newValue As Generic.List(Of String))
             pDisplayAttributes = newValue
+            SaveSetting("BASINS", "WDM", "SaveAttributes", String.Join("+", pDisplayAttributes))
             Columns = pDisplayAttributes.Count
         End Set
     End Property
@@ -98,14 +127,7 @@ Friend Class WDMGridSource
     Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup)
         pDataGroup = aDataGroup
         pDisplayAttributes = New Generic.List(Of String)
-        With pDisplayAttributes
-            .Add("ID")
-            .Add("New DSN")
-            .Add("Scenario")
-            .Add("Location")
-            .Add("Constituent")
-            .Add("History 1")
-        End With
+        pDisplayAttributes.AddRange(GetSetting("BASINS", "WDM", "SaveAttributes", "ID+New DSN+Scenario+Location+Constituent+History 1").Split("+"))
         FixedRows = 1
         Rows = pDataGroup.Count + FixedRows
         Columns = pDisplayAttributes.Count
