@@ -23,13 +23,14 @@ Partial Class frmSave
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSave))
-        Me.agdData = New atcControls.atcGrid
-        Me.lblInstructions = New System.Windows.Forms.Label
-        Me.btnSave = New System.Windows.Forms.Button
-        Me.btnCancel = New System.Windows.Forms.Button
-        Me.btnSelectAttributes = New System.Windows.Forms.Button
-        Me.lblStatus = New System.Windows.Forms.Label
-        Me.btnHelp = New System.Windows.Forms.Button
+        Me.agdData = New atcControls.atcGrid()
+        Me.lblInstructions = New System.Windows.Forms.Label()
+        Me.btnSave = New System.Windows.Forms.Button()
+        Me.btnCancel = New System.Windows.Forms.Button()
+        Me.btnSelectAttributes = New System.Windows.Forms.Button()
+        Me.lblStatus = New System.Windows.Forms.Label()
+        Me.btnHelp = New System.Windows.Forms.Button()
+        Me.btnOverwrite = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'agdData
@@ -40,6 +41,7 @@ Partial Class frmSave
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdData.CellBackColor = System.Drawing.Color.Empty
+        Me.agdData.Fixed3D = False
         Me.agdData.LineColor = System.Drawing.Color.Empty
         Me.agdData.LineWidth = 0.0!
         Me.agdData.Location = New System.Drawing.Point(12, 38)
@@ -106,6 +108,17 @@ Partial Class frmSave
         Me.btnHelp.Text = "Help"
         Me.btnHelp.UseVisualStyleBackColor = True
         '
+        'btnOverwrite
+        '
+        Me.btnOverwrite.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOverwrite.Location = New System.Drawing.Point(62, 238)
+        Me.btnOverwrite.Name = "btnOverwrite"
+        Me.btnOverwrite.Size = New System.Drawing.Size(105, 23)
+        Me.btnOverwrite.TabIndex = 7
+        Me.btnOverwrite.Text = "Overwrite"
+        Me.btnOverwrite.UseVisualStyleBackColor = True
+        Me.btnOverwrite.Visible = False
+        '
         'frmSave
         '
         Me.AcceptButton = Me.btnSave
@@ -113,6 +126,7 @@ Partial Class frmSave
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(533, 273)
+        Me.Controls.Add(Me.btnOverwrite)
         Me.Controls.Add(Me.btnHelp)
         Me.Controls.Add(Me.lblStatus)
         Me.Controls.Add(Me.btnSelectAttributes)
@@ -135,4 +149,5 @@ Partial Class frmSave
     Friend WithEvents btnSelectAttributes As System.Windows.Forms.Button
     Friend WithEvents lblStatus As System.Windows.Forms.Label
     Friend WithEvents btnHelp As System.Windows.Forms.Button
+    Friend WithEvents btnOverwrite As System.Windows.Forms.Button
 End Class

@@ -149,19 +149,23 @@ Public Class atcDataSourceWDM
             lClone.Attributes.SetValue("New DSN", lHighestNewDSN)
             lCloneTsGroup.Add(lClone)
         Next
+        Dim lOverwriteSelected As Boolean = False
 #If BatchMode Then
 #Else
         Dim lfrm As New frmSave
         lCloneTsGroup = lfrm.AskUser(lCloneTsGroup, lLabel, lHighestDSN)
+        lOverwriteSelected = lfrm.OverwriteSelected
 #End If
         If lCloneTsGroup IsNot Nothing AndAlso lCloneTsGroup.Count > 0 Then
+            Dim lExistAction As atcDataSource.EnumExistAction = ExistAskUser
+            If lOverwriteSelected Then lExistAction = ExistReplace
             For Each lDataset As atcTimeseries In lCloneTsGroup
                 Dim lNewDSN As Integer = lDataset.Attributes.GetValue("New DSN", 0)
                 If lNewDSN > 0 Then
                     lDataset.Attributes.SetValue("DSN", lNewDSN)
                     lDataset.Attributes.RemoveByKey("New DSN")
                 End If
-                If AddDataset(lDataset, ExistAskUser) Then lNumSaved += 1
+                If AddDataset(lDataset, lExistAction) Then lNumSaved += 1
             Next
             Dim lMsg As String = "Saved " & lNumSaved & " of " & aDataGroup.Count & " dataset"
             If aDataGroup.Count <> 1 Then lMsg &= "s"
@@ -923,18 +927,18 @@ CaseExistRenumber:
                                     If lOtherDates.Serial <> lReadTS.Dates.Serial Then
                                         If lOtherDates.numValues = nVals Then
                                             lMatchingDates = lOtherDates
-                                            For lDateIndex As Integer = nVals To 0 Step -1
-                                                If lOtherDates.Value(lDateIndex) <> lJd(lDateIndex) Then
-                                                    lMatchingDates = Nothing
-                                                    Exit For
-                                                End If
-                                            Next
-                                            If lMatchingDates IsNot Nothing Then Exit For
+                                                For lDateIndex As Integer = nVals To 0 Step -1
+                                                    If lOtherDates.Value(lDateIndex) <> lJd(lDateIndex) Then
+                                                        lMatchingDates = Nothing
+                                                        Exit For
+                                                    End If
+                                                Next
+                                                If lMatchingDates IsNot Nothing Then Exit For
+                                            End If
                                         End If
-                                    End If
-                                Next
-                                If lMatchingDates Is Nothing Then
-                                    lReadTS.Dates.Values = lJd
+                                    Next
+                                    If lMatchingDates Is Nothing Then
+                                        lReadTS.Dates.Values = lJd
                                     pDates.Add(lReadTS.Dates)
                                 Else
                                     lReadTS.Dates.Clear()
@@ -946,7 +950,7 @@ CaseExistRenumber:
 
                             lReadTS.Values = lVd
                         End If
-                    End With                    
+                    End With
                 'atcDataManager.AddDiscardableTimeseries(lReadTS)
                 End If
             End Using
