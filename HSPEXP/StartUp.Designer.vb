@@ -313,7 +313,7 @@ Partial Class StartUp
         Me.Controls.Add(Me.pnlHighlight)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "StartUp"
-        Me.Text = "Hydrology Statistics Calculator"
+        Me.Text = "HSPEXP+ (Developed by AQUA TERRA Consultants and BSE, VT)"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
