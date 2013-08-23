@@ -365,7 +365,7 @@ Public Module WatershedConstituentBalance
                                                 End If
                                                 Dim lAttribute As atcDefinedValue
                                                 Select Case lConstituentDataName
-                                                    Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
+                                                    Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT", "DETS", "SLDS"
                                                         lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
                                                     Case Else
                                                         lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
