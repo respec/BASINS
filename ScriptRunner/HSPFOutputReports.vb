@@ -29,7 +29,7 @@ Module HSPFOutputReports
     Private pGraphWQ As Boolean = False
     Private pWaterYears As Boolean = False
     Private pExpertPrec As Boolean = True
-    Private RunOffComponents As Boolean = True
+    Private RunOffComponents As Boolean = False
     Private pIdsPerSeg As Integer = 50
     Private pAreaReport As Boolean = False
     Private pRunHSPF As Boolean = False
@@ -46,10 +46,13 @@ Module HSPFOutputReports
         'Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "NonUpatoi"
         'Dim lTestName As String = "IRW"
-        'lTestName = "LPCal03"
+        lTestName = "LPCal03"
+        'lTestName = "LPVal"
         'lTestName = "CWCal03"
+        'lTestName = "CWVal"
         'lTestName = "RECal03"
-        lTestName = "HAT"
+        'lTestName = "REVal"
+        'lTestName = "HAT"
         'lTestName = "mainstm"
         'lTestName = "sbranc"
         'lTestName = "MUST"
@@ -57,9 +60,10 @@ Module HSPFOutputReports
         'lTestName = "Prospect"
         'lTestName = "CRY"
         'lTestName = "WIT"
-        pConstituents.Add("Water")
+        'lTestName = "Thief_R"
+        'pConstituents.Add("Water")
         'pConstituents.Add("FColi")
-        'pConstituents.Add("Sediment")
+        pConstituents.Add("Sediment")
         'pConstituents.Add("N-PQUAL")
         'pConstituents.Add("P-PQUAL")
         'pConstituents.Add("BOD-PQUAL")
@@ -142,7 +146,7 @@ Module HSPFOutputReports
                 pAreaReport = True
 
             Case "Thief_R"
-                pTestPath = "C:\Basins\modelout\Thief"
+                pTestPath = "C:\BASINS\modelout\Thief\Updated_TRW_HSPF_Model\Updated_TRW_HSPF_Model\TRW_updated"
                 pBaseName = "Thief_R"
                 pOutputLocations.Add("R:41")
                 pOutputLocations.Add("R:44")
@@ -150,14 +154,27 @@ Module HSPFOutputReports
                 pOutputLocations.Add("R:64")
                 pCurveStepType = "NonStep" 'Tony's convention
                 pGraphAnnual = True
-                pAreaReport = True
+                'pAreaReport = True
 
             Case "RECal03"
                 pTestPath = "C:\Basins\modelout\RECal03"
                 pBaseName = "RECal03"
+                pOutputLocations.Add("R:121")
+                pOutputLocations.Add("R:131")
                 pOutputLocations.Add("R:133")
                 pCurveStepType = "NonStep" 'Tony's convention
                 pGraphAnnual = True
+                'pRunHSPF = True
+
+            Case "REVal"
+                pTestPath = "C:\Basins\modelout\REVal"
+                pBaseName = "REVal"
+                pOutputLocations.Add("R:121")
+                pOutputLocations.Add("R:131")
+                pOutputLocations.Add("R:133")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                'pRunHSPF = True
 
             Case "LPCal03"
                 pTestPath = "C:\Basins\modelout\LPCal03"
@@ -166,14 +183,36 @@ Module HSPFOutputReports
                 pOutputLocations.Add("R:347")
                 pCurveStepType = "NonStep" 'Tony's convention
                 pGraphAnnual = True
+                'pRunHSPF = True
+                'pAreaReport = True
+            Case "LPVal"
+                pTestPath = "C:\Basins\modelout\LPVal"
+                pBaseName = "LPVal"
+                pOutputLocations.Add("R:400")
+                pOutputLocations.Add("R:347")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
                 pRunHSPF = True
                 'pAreaReport = True
+
+
             Case "CWCal03"
                 pTestPath = "C:\Basins\modelout\CWCal03"
                 pBaseName = "CWCal03"
                 pOutputLocations.Add("R:515")
-                'pOutputLocations.Add("R:557")
-                'pOutputLocations.Add("R:700")
+                pOutputLocations.Add("R:557")
+                pOutputLocations.Add("R:700")
+                pCurveStepType = "NonStep" 'Tony's convention
+                'pRunHSPF = True
+                pGraphAnnual = True
+                'pAreaReport = True
+
+            Case "CWVal"
+                pTestPath = "C:\Basins\modelout\CWVal"
+                pBaseName = "CWVal"
+                pOutputLocations.Add("R:515")
+                pOutputLocations.Add("R:557")
+                pOutputLocations.Add("R:700")
                 pCurveStepType = "NonStep" 'Tony's convention
                 pRunHSPF = True
                 pGraphAnnual = True
@@ -287,6 +326,10 @@ Module HSPFOutputReports
         Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
         lHspfBinDataSource.Open(lHspfBinFileName)
 
+        'For Each lTscheck As atcTimeseries In lHspfBinDataSource.DataSets
+        '    If lTscheck.Dates.Value(1) < 1 Then Stop
+        'Next
+
         'watershed summary
         Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
         Dim lRunMade As String = lHspfBinFileInfo.LastWriteTime.ToString
@@ -296,7 +339,7 @@ Module HSPFOutputReports
         'A folder name is given that has the basename and the time when the run was made.
         Dim lOutFolderName As String = pTestPath & "\Reports_" & pBaseName & "_" & lDateString & "\"
         TryDelete(lOutFolderName)
-        IO.Directory.CreateDirectory(lOutFolderName)
+        If Not IO.Directory.Exists(lOutFolderName) Then IO.Directory.CreateDirectory(lOutFolderName)
         'dont change name of uci - make it easier to compare with others, foldername contains info about which run
         System.IO.File.Copy(pBaseName & ".uci", lOutFolderName & pBaseName & ".uci", True)
         'todo: should other output files be copied too?
@@ -491,46 +534,33 @@ Module HSPFOutputReports
                             lTimeSeries.Clear()
 
                             If RunOffComponents Then
-
                                 Dim IFWO As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(3)), _
                                                                         lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-
                                 Dim SURO As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(2)), _
                                                                          lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                                 Dim AGWO As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(4)), _
                                                                          lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-
-
-
                                 Dim PERO As atcTimeseries = SURO + IFWO + AGWO
                                 Dim SimBaseflow As atcTimeseries = AGWO * lSimTSerInches / PERO
                                 Dim SimRunoff As atcTimeseries = (IFWO + SURO) * lSimTSerInches / PERO
-
                                 lTimeSeries.Add("Simulated Baseflow", SimBaseflow)
                                 lTimeSeries.Add("Simulated Runoff", SimRunoff)
-
-
-                                GraphCumDifBatch(lTimeSeries, lOutFolderName & "RCH_" & lSiteName)
+                                'GraphCumDifBatch(lTimeSeries, lOutFolderName & "RCH_" & lSiteName)
                                 lTimeSeries.Clear()
-
                             End If
 
+                            'If pBaseName = "Upatoi" Then
+                            '    lObsTser.Clear()
+                            '    lSimTSer.Clear()
+                            '    lPrecTser.Clear()
+                            '    lObsTser = lWdmDataSource.DataSets.ItemByKey(5)
+                            '    lSimTSer = lWdmDataSource.DataSets.ItemByKey(3002)
+                            '    lPrecTser = lWdmDataSource.DataSets.ItemByKey(9005)
 
-
-
-                            If pBaseName = "Upatoi" Then
-                                lObsTser.Clear()
-                                lSimTSer.Clear()
-                                lPrecTser.Clear()
-                                lObsTser = lWdmDataSource.DataSets.ItemByKey(5)
-                                lSimTSer = lWdmDataSource.DataSets.ItemByKey(3002)
-                                lPrecTser = lWdmDataSource.DataSets.ItemByKey(9005)
-
-                            End If
+                            'End If
                             lTimeSeries.Add("Observed", lObsTser)
                             lTimeSeries.Add("Simulated", lSimTSer)
                             lTimeSeries.Add("Prec", lPrecTser)
-
                             lTimeSeries(0).Attributes.SetValue("Units", "cfs")
                             lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
                             lTimeSeries(1).Attributes.SetValue("Units", "cfs")
@@ -538,9 +568,6 @@ Module HSPFOutputReports
                             GraphStorms(lTimeSeries, 2, lOutFolderName & "Storm", pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem)
                             lTimeSeries.Dispose()
                         End If
-
-                        
-
                     Next
 
                     lExpertSystem = Nothing
@@ -558,26 +585,28 @@ Module HSPFOutputReports
 
             Dim lReportCons As New atcReport.ReportText
             Dim lOutFileName As String = ""
-            If lConstituent <> "Sediment" Then
-                HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears, pIdsPerSeg).ToString()
-                lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverland.txt"
-                SaveFileString(lOutFileName, lReportCons.ToString)
-                lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True, pWaterYears, pIdsPerSeg)
-                lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShortWithMinMax.txt"
-                SaveFileString(lOutFileName, lReportCons.ToString)
-                lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, False, pWaterYears, pIdsPerSeg)
-                lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShort.txt"
-                SaveFileString(lOutFileName, lReportCons.ToString)
-            End If
+            'If lConstituent <> "Sediment" Then
+            '    HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears, pIdsPerSeg).ToString()
+            '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverland.txt"
+            '    SaveFileString(lOutFileName, lReportCons.ToString)
+            '    lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True, pWaterYears, pIdsPerSeg)
+            '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShortWithMinMax.txt"
+            '    SaveFileString(lOutFileName, lReportCons.ToString)
+            '    lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, False, pWaterYears, pIdsPerSeg)
+            '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShort.txt"
+            '    SaveFileString(lOutFileName, lReportCons.ToString)
+            'End If
 
             lReportCons = Nothing
             lReportCons = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_Budget.txt"
+            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Reach_Annual_Average_Loads.txt"
+            '"All_Budget.txt"
             SaveFileString(lOutFileName, lReportCons.ToString)
             lReportCons = Nothing
 
             lReportCons = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lRunMade, lConstituent)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedSummary.txt"
+            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Oper_Annual_Average_Loads.txt"
+            '"_All_WatershedSummary.txt"
             SaveFileString(lOutFileName, lReportCons.ToString)
             lReportCons = Nothing
 
@@ -587,43 +616,45 @@ Module HSPFOutputReports
             lReportCons = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                 lHspfBinDataSource, lLocations, lRunMade)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalance.txt"
+            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Oper_Annual.txt"
+            '"_Mult_ConstituentBalance.txt"
             SaveFileString(lOutFileName, lReportCons.ToString)
 
-            lReportCons = HspfSupport.ConstituentBalance.Report _
-               (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lRunMade, True)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivot.txt"
-            SaveFileString(lOutFileName, lReportCons.ToString)
+            'lReportCons = HspfSupport.ConstituentBalance.Report _
+            '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+            '    lHspfBinDataSource, lLocations, lRunMade, True)
+            'lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivot.txt"
+            'SaveFileString(lOutFileName, lReportCons.ToString)
 
-            lReportCons = HspfSupport.ConstituentBalance.Report _
-               (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lRunMade, True, 2, 5, 8)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivotNarrowTab.txt"
-            SaveFileString(lOutFileName, lReportCons.ToString)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivotNarrowSpace.txt"
-            SaveFileString(lOutFileName, lReportCons.ToString.Replace(vbTab, " "))
+            'lReportCons = HspfSupport.ConstituentBalance.Report _
+            '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+            '    lHspfBinDataSource, lLocations, lRunMade, True, 2, 5, 8)
+            'lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivotNarrowTab.txt"
+            'SaveFileString(lOutFileName, lReportCons.ToString)
+            'lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivotNarrowSpace.txt"
+            'SaveFileString(lOutFileName, lReportCons.ToString.Replace(vbTab, " "))
 
             'watershed constituent balance 
             lReportCons = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                 lHspfBinDataSource, lRunMade)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalance.txt"
+            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Group_By_OperType_And_LU_Annual_Average.txt"
+            '"_All_WatershedConstituentBalance.txt"
             SaveFileString(lOutFileName, lReportCons.ToString)
 
-            lReportCons = HspfSupport.WatershedConstituentBalance.Report _
-               (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lRunMade, , , , True)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalancePivot.txt"
-            SaveFileString(lOutFileName, lReportCons.ToString)
+            'lReportCons = HspfSupport.WatershedConstituentBalance.Report _
+            '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+            '    lHspfBinDataSource, lRunMade, , , , True)
+            'lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalancePivot.txt"
+            'SaveFileString(lOutFileName, lReportCons.ToString)
 
-            lReportCons = HspfSupport.WatershedConstituentBalance.Report _
-               (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lRunMade, , , , True, 2, 5, 8)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalancePivotNarrowTab.txt"
-            SaveFileString(lOutFileName, lReportCons.ToString)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_WatershedConstituentBalancePivotNarrowSpace.txt"
-            SaveFileString(lOutFileName, lReportCons.ToString.Replace(vbTab, " "))
+            'lReportCons = HspfSupport.WatershedConstituentBalance.Report _
+            '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+            '    lHspfBinDataSource, lRunMade, , , , True, 2, 5, 8)
+            'lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalancePivotNarrowTab.txt"
+            'SaveFileString(lOutFileName, lReportCons.ToString)
+            'lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_WatershedConstituentBalancePivotNarrowSpace.txt"
+            'SaveFileString(lOutFileName, lReportCons.ToString.Replace(vbTab, " "))
 
             If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
                 HspfSupport.WatershedConstituentBalance.ReportsToFiles _
