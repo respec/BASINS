@@ -90,7 +90,7 @@ Public Module ConstituentBalance
                                         End If
                                         Dim lSeasonalAttributes As New atcDataAttributes
                                         Select Case lConstituentKey
-                                            Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
+                                            Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT", "DETS", "SLDS"
                                                 lSeasonalAttributes.SetValue("Last", 0) 'fluxes are last from daily, monthly or annual to annual
                                             Case Else
                                                 lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
@@ -163,7 +163,7 @@ Public Module ConstituentBalance
                                         End Select
 
                                         Select Case lConstituentKey
-                                            Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
+                                            Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT", "DETS", "SLDS"
                                                 lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
                                                 lStateVariable = True
                                             Case Else

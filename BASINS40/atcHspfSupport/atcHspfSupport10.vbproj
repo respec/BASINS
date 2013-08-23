@@ -129,6 +129,7 @@
   <ItemGroup>
     <Compile Include="atcHspfConstituentBalance.vb" />
     <Compile Include="atcHspfDailyMonthlyCompareStats.vb" />
+    <Compile Include="atcHspfExpertAdvice.vb" />
     <Compile Include="atcHspfExpertSystem.vb" />
     <Compile Include="atcHspfConstituentBudget.vb" />
     <Compile Include="atcHspfWatershedConstituentBalance.vb" />
