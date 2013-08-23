@@ -51,7 +51,8 @@ Public Module WatershedConstituentBalance
             If aSegmentRows Then
                 lPivotString = "Pivot"
             End If
-            Dim lOutFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & lOutletLocation & "_Balance" & lPivotString & ".txt")
+            Dim lOutFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & lOutletLocation & "_Group_By_OperType_And_LU_Annual_Average" & lPivotString & ".txt")
+            '_Balance.txt
             Logger.Dbg("  WriteReportTo " & lOutFileName)
             SaveFileString(lOutFileName, lReport.ToString)
         Next lOutletLocation
@@ -63,7 +64,8 @@ Public Module WatershedConstituentBalance
                 Dim lSummaryDetails As atcCollection
                 Dim lSummaryDetail As SummaryDetail
                 For Each lOutletLocation As String In aOutletLocations
-                    Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & lOutletLocation & "_BalanceSummary.txt")
+                    Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & lOutletLocation & "_Overall_Averaged.txt")
+                    'BalanceSummary.txt
                     Dim lSurfaceIndex As Integer = -1
                     Dim lBaseETIndex As Integer = -1
                     Dim lCurrentOperation As String = ""
@@ -170,7 +172,8 @@ Public Module WatershedConstituentBalance
                         lReport.AppendLine()
                     Next
                 Next lGroup
-                SaveFileString(aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_Mult_BalanceBasin.txt"), lReport.ToString)
+                SaveFileString(aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_Overall_Averaged_By_Multiple_Locations.txt"), lReport.ToString)
+                'Mult_BalanceBasin.txt
             Catch lEx As Exception
                 Logger.Dbg("Whoops!")
             End Try
@@ -581,7 +584,7 @@ Public Module WatershedConstituentBalance
                     If aSegmentRows Then
                         lPivotString = "Pivot"
                     End If
-                    Dim lDetailsFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & aOutletLocation & "_BalanceDetails" & lPivotString & ".txt")
+                    Dim lDetailsFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & aOutletLocation & "_LU_AnnualAverages" & lPivotString & ".txt")
                     SaveFileString(lDetailsFileName, lDetailsReport.ToString)
                     lDetailsReport = Nothing
                 Catch lEx As Exception
@@ -722,7 +725,7 @@ Public Module WatershedConstituentBalance
                     Next
                 End If
             Next lOperationType
-            Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & aOutletLocation & "_BalanceSummary.txt")
+            Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & aOutletLocation & "_Overall_Averaged.txt")
             SaveFileString(lSummaryFileName, lSummaryReport.ToString)
             lSummaryReport = Nothing
         End If
