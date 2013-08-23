@@ -1,16 +1,14 @@
 Imports System
 Imports atcUtility
 Imports atcData
+Imports atcUCI
 Imports atcTimeseriesStatistics
 Imports atcWDM
 Imports atcHspfBinOut
 Imports HspfSupport
-Imports atcUCI
-
 Imports MapWinUtility
 Imports atcGraph
 Imports ZedGraph
-
 Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 
@@ -30,34 +28,35 @@ Module HSPFOutputReports
     Private pGraphWQOnly As Boolean = False
     Private pGraphWQ As Boolean = False
     Private pWaterYears As Boolean = False
-    Private pExpertPrec As Boolean = False
+    Private pExpertPrec As Boolean = True
+    Private RunOffComponents As Boolean = True
     Private pIdsPerSeg As Integer = 50
+    Private pAreaReport As Boolean = False
+    Private pRunHSPF As Boolean = False
+    Private pHSPFExe As String = "C:\Basins41\models\HSPF\bin\WinHspfLt.exe"
 
     Private Sub Initialize()
         pOutputLocations.Clear()
-
+        Dim lTestName As String
         pGraphSaveFormat = ".png"
         'pGraphSaveFormat = ".emf"
-        pGraphSaveWidth = 1024
+        pGraphSaveWidth = 1300
         pGraphSaveHeight = 768
 
-        Dim lTestName As String = "kalamazoo"
         'Dim lTestName As String = "upatoi"
-        'Dim lTestName As String = "mono"
-        'Dim lTestName As String = "Susq_020501"
-        'Dim lTestName As String = "tinley"
-        'Dim lTestName As String = "hspf"
-        'Dim lTestName As String = "hyd_man"
-        'Dim lTestName As String = "shena"
-        'Dim lTestName As String = "mono_lu2030a2_base"
-        'Dim lTestName As String = "upatoi"
-        'Dim lTestName As String = "housatonic"
-        'Dim lTestName As String = "beaver"
-        'Dim lTestName As String = "calleguas_cat"
-        'Dim lTestName As String = "calleguas_nocat"
-        'Dim lTestName As String = "SantaClara"
         'Dim lTestName As String = "NonUpatoi"
-
+        'Dim lTestName As String = "IRW"
+        'lTestName = "LPCal03"
+        'lTestName = "CWCal03"
+        'lTestName = "RECal03"
+        lTestName = "HAT"
+        'lTestName = "mainstm"
+        'lTestName = "sbranc"
+        'lTestName = "MUST"
+        'lTestName = "RAB"
+        'lTestName = "Prospect"
+        'lTestName = "CRY"
+        'lTestName = "WIT"
         pConstituents.Add("Water")
         'pConstituents.Add("FColi")
         'pConstituents.Add("Sediment")
@@ -68,156 +67,206 @@ Module HSPFOutputReports
         'pConstituents.Add("TotalP")
 
         Select Case lTestName
-            Case "kalamazoo"
-                pTestPath = "D:\BASINS\modelout\kalamazoo"
-                pBaseName = "kal7"
-                pOutputLocations.Add("R:1")
-                pIdsPerSeg = 9
-                pWaterYears = True
-            Case "tutorial"
-                pTestPath = "C:\Program Files\FramesV2\MEERT\Data\HSPF\WestBranch"
-                pBaseName = "bact_2"
-                pOutputLocations.Add("R:5")
-                pIdsPerSeg = 5
-                pWaterYears = True
-            Case "Susq_020501"
-                pTestPath = "G:\Projects\TT_GCRP\ProjectsTT\Susq\parms"
-                pBaseName = "Susq_020501"
-                pOutputLocations.Add("R:69")
-                pExpertPrec = True
-                pIdsPerSeg = 25
-            Case "mono"
-                pTestPath = "D:\mono_Tong\lu2090b2_base_bmp"
-                pBaseName = "base"
-                pOutputLocations.Add("R:9")
-                'Add scenario directories
-                'pBaseFolders.Clear()
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030a2")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030a2bmp")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2030b2bmp")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090a2bmp")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\lu2090b2bmp")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono_10")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono10bmp")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono_70")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono70bmp")
-                'pBaseFolders.Add(pBaseDrive & "\mono_luChange\output\Mono70bmpDbg")
-            Case "mono_lu2030a2_base"
-                pTestPath = "D:\mono_luChange\output\lu2030a2"
-                pBaseName = "base"
-                pOutputLocations.Add("R:9")
-            Case "mono_lu2030a2_a_10_cccm_F10"
-                pTestPath = "D:\mono_luChange\output\lu2030a2"
-                pBaseName = "a_10_cccm_F10.base"
-                pOutputLocations.Add("R:9")
-            Case "housatonic"
-                pTestPath = "d:\projects\housatonic\jackBin"
-                pBaseName = "base"
-                pOutputLocations.Add("R:9")
-                'pOutputLocations.Add("R:110")
-                'pOutputLocations.Add("R:400")
-                'pOutputLocations.Add("R:820")
-                'pOutputLocations.Add("R:540")
-                'pOutputLocations.Add("R:600")
-                'pOutputLocations.Add("R:900")
-            Case "beaver"
-                pTestPath = "g:\projects\beaver\tds"
-                pBaseName = "beaver-TDS-Run01"
-                pOutputLocations.Add("R:360")
-                pCurveStepType = "NonStep"
-                If Not pConstituents.Contains("Sediment") Then
-                    pConstituents.Add("Sediment")
-                End If
-            Case "shena"
-                pTestPath = "c:\test\genscn"
-                pBaseName = "base"
-                pOutputLocations.Add("Lynnwood")
+            Case "CRY"
+                pTestPath = "C:\BASINS\modelout\CRY"
+                pBaseName = "CRY"
+                pOutputLocations.Add("R:40")
+                pOutputLocations.Add("R:72")
+                pOutputLocations.Add("R:80")
+                pOutputLocations.Add("R:108")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pAreaReport = True
+                'pRunHSPF = True
+
+            Case "Prospect"
+                pTestPath = "C:\BASINS\modelout\Prospect"
+                pBaseName = "RCH45"
+                pOutputLocations.Add("R:45")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pAreaReport = True
+                pRunHSPF = True
+
+            Case "RAB"
+                pTestPath = "C:\BASINS\modelout\BoisdeSioux\BdSPhase2"
+                pBaseName = "RAB"
+                pOutputLocations.Add("R:205")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pAreaReport = True
+                'pRunHSPF = True
+            Case "sbranc"
+                pTestPath = "C:\BASINS\modelout\Buffalo\BuffaloPhase2"
+                pBaseName = "sbranc"
+                pOutputLocations.Add("R:127")
+                pOutputLocations.Add("R:89")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pAreaReport = True
+                'pRunHSPF = True
+            Case "WIT"
+                pTestPath = "C:\BASINS\modelout\WIT"
+                pBaseName = "WIT"
+                pOutputLocations.Add("R:40")
+                pOutputLocations.Add("R:60")
+                pOutputLocations.Add("R:100")
+                pOutputLocations.Add("R:102")
+                pOutputLocations.Add("R:104")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pAreaReport = True
+                'pRunHSPF = True
+            Case "HAT"
+                pTestPath = "C:\BASINS\modelout\HAT"
+                pBaseName = "HAT"
+                pOutputLocations.Add("R:32")
+                pOutputLocations.Add("R:32")
+                pOutputLocations.Add("R:80")
+                pOutputLocations.Add("R:314")
+                pOutputLocations.Add("R:140")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pAreaReport = True
+                RunOffComponents = True
+                'pRunHSPF = True
+
+            Case "mainstm"
+                pTestPath = "C:\BASINS\modelout\Buffalo\BuffaloPhase2"
+                pBaseName = "mainstm"
+                pOutputLocations.Add("R:107")
+                pOutputLocations.Add("R:104")
+                pOutputLocations.Add("R:109")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pAreaReport = True
+
+            Case "Thief_R"
+                pTestPath = "C:\Basins\modelout\Thief"
+                pBaseName = "Thief_R"
+                pOutputLocations.Add("R:41")
+                pOutputLocations.Add("R:44")
+                pOutputLocations.Add("R:75")
+                pOutputLocations.Add("R:64")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pAreaReport = True
+
+            Case "RECal03"
+                pTestPath = "C:\Basins\modelout\RECal03"
+                pBaseName = "RECal03"
+                pOutputLocations.Add("R:133")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+
+            Case "LPCal03"
+                pTestPath = "C:\Basins\modelout\LPCal03"
+                pBaseName = "LPCal03"
+                pOutputLocations.Add("R:400")
+                pOutputLocations.Add("R:347")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pRunHSPF = True
+                'pAreaReport = True
+            Case "CWCal03"
+                pTestPath = "C:\Basins\modelout\CWCal03"
+                pBaseName = "CWCal03"
+                pOutputLocations.Add("R:515")
+                'pOutputLocations.Add("R:557")
+                'pOutputLocations.Add("R:700")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pRunHSPF = True
+                pGraphAnnual = True
+                pAreaReport = True
+
+            Case "IRW"
+                pTestPath = "C:\Basins\modelout\IRW"
+                pBaseName = "IRW"
+                pOutputLocations.Add("R:150")
+                pOutputLocations.Add("R:523")
+                pOutputLocations.Add("R:630")
+                'pOutputLocations.Add("R:640")
+                pOutputLocations.Add("R:706")
+                'pOutputLocations.Add("R:746")
+                'pOutputLocations.Add("R:870")
+                'pOutputLocations.Add("R:912")
+                'pOutputLocations.Add("R:316")
+                pOutputLocations.Add("R:516")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pRunHSPF = True
             Case "upatoi"
-                'pTestPath = "D:\Basins\modelout\Upatoi"
-                'pTestPath = "C:\Basins\data\20710\PollutantModeling\calibration\hydrology"
-                'pTestPath = "C:\Basins\data\20710-01\Upatoi"
-                pTestPath = "G:\Projects\SERDP\TestCase"
+                'pTestPath = "H:\canopy"
+                pTestPath = "H:\EB"
+                'pTestPath = "H:\EXTRUN"
+                'pTestPath = "H:\FTABLEComp\"
+                'pTestPath = "H:\AltB\"
                 pBaseName = "Upatoi"
                 'pOutputLocations.Add("R:639")
-                'pOutputLocations.Add("R:614")
+                pOutputLocations.Add("R:614")
                 'pOutputLocations.Add("R:626")
                 'pOutputLocations.Add("R:30")
                 'pOutputLocations.Add("R:33")
+                'pOutputLocations.Add("R:34")
                 'pOutputLocations.Add("R:36")
-                'pOutputLocations.Add("R:35")
                 'pOutputLocations.Add("R:662")
-                'pOutputLocations.Add("R:666")
+                'pOutputLocations.Add("R:45")
                 'pOutputLocations.Add("R:46")
                 'pOutputLocations.Add("R:74")
                 'pOutputLocations.Add("R:2")
-                'pOutputLocations.Add("R:3")
-                pOutputLocations.Add("R:614")
-                pGraphAnnual = True
+                'pGraphAnnual = True
                 pCurveStepType = "NonStep" 'Tony's convention 
                 Dim pUpatoiPerlndSegmentStarts() As Integer = {101} ', 201, 301, 401, 501, 601, 701, 801, 901, 951}
                 pPerlndSegmentStarts = pUpatoiPerlndSegmentStarts
                 Dim pUpatoiImplndSegmentStarts() As Integer = {102} ', 202, 302, 402, 502, 602, 702, 802, 902, 952}
                 pImplndSegmentStarts = pUpatoiImplndSegmentStarts
                 pWaterYears = True 'TODO: figure this out from run
-            Case "tinley"
-                pTestPath = "c:\test\tinley"
-                pBaseName = "tinley"
-                pOutputLocations.Add("R:850")
-            Case "calleguas_cat"
-                pTestPath = "D:\MountainViewData\Calleguas\cat"
-                pBaseName = "Calleg"
-                pOutputLocations.Add("R:408")
-                pOutputLocations.Add("R:10")
-                pOutputLocations.Add("R:307")
-            Case "calleguas_nocat"
-                pTestPath = "D:\MountainViewData\Calleguas\nocat"
-                pBaseName = "Calleg"
-                pOutputLocations.Add("R:408")
-                pOutputLocations.Add("R:10")
-                pOutputLocations.Add("R:307")
-            Case "hyd_man"
-                pTestPath = "C:\test\EXP_CAL\hyd_man.net"
-                pBaseName = "hyd_man"
-                pOutputLocations.Add("R:5")
-                pOutputLocations.Add("R:4")
+                'pRunHSPF = True
             Case "hspf"
                 pTestPath = "C:\test\HSPF"
                 pBaseName = "test10"
-            Case "SantaClara"
-                pTestPath = "D:\MountainViewData\SantaClara\nocat"
-                pBaseName = "SCR10"
-                pOutputLocations.Add("R:70")
-                pOutputLocations.Add("R:180")
-                pOutputLocations.Add("R:320")
-                pOutputLocations.Add("R:410")
-                pOutputLocations.Add("R:880")
             Case "NonUpatoi"
-                pTestPath = "H:"
+                'pTestPath = "H:\EXTRUN\"
+                'pTestPath = "H:\AltB_BMP\"
+                pTestPath = "H:\GHMTA_BMP_95\"
+                'pTestPath = "H:\EB"
                 pBaseName = "NonUpatoi"
-                pOutputLocations.Add("R:109")
+                pOutputLocations.Add("R:202")
+                pOutputLocations.Add("R:203")
+                pOutputLocations.Add("R:204")
+                pOutputLocations.Add("R:205")
                 pOutputLocations.Add("R:206")
-                pOutputLocations.Add("R:311")
+                pOutputLocations.Add("R:301")
+                pOutputLocations.Add("R:302")
+                pOutputLocations.Add("R:303")
                 pOutputLocations.Add("R:509")
                 pOutputLocations.Add("R:402")
+                pOutputLocations.Add("R:901")
+                pOutputLocations.Add("R:902")
                 pGraphAnnual = True
+                pAreaReport = True
                 Dim pUpatoiPerlndSegmentStarts() As Integer = {101, 201, 301, 401, 501, 601, 701}
                 pPerlndSegmentStarts = pUpatoiPerlndSegmentStarts
                 Dim pUpatoiImplndSegmentStarts() As Integer = {102, 202, 302, 402, 502, 602, 702}
                 pImplndSegmentStarts = pUpatoiImplndSegmentStarts
                 pCurveStepType = "NonStep" 'Tony's convention 
                 pWaterYears = True 'TODO: figure this out from run
+                'pRunHSPF = True
         End Select
     End Sub
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Initialize()
         ChDriveDir(pTestPath)
+
         Logger.Dbg("CurrentFolder " & My.Computer.FileSystem.CurrentDirectory)
-        If IO.File.Exists(pBaseName & "Orig.uci") Then
-            IO.File.Copy(pBaseName & "Orig.uci", pBaseName & ".uci")
+
+        If pRunHSPF Then
+            Dim lUCIName As String = pBaseName & ".uci"
+            Logger.Dbg("Launching " & IO.Path.GetFileName(pHSPFExe) & " in " & pTestPath & " for " & lUCIName)
+            Logger.Flush()
+            LaunchProgram(pHSPFExe, pTestPath, lUCIName)
+            Logger.Dbg("HSPFRun Finished")
         End If
 
         If pGraphWQ Then
@@ -225,35 +274,12 @@ Module HSPFOutputReports
         End If
         If pGraphWQOnly Then Exit Sub ' early end here if just doing it for WQ graphs
 
-
         'open uci file
         Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.wdm")
+        lMsg.Open("hspfmsg.mdb")
         Dim lHspfUci As New atcUCI.HspfUci
         lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
         Logger.Dbg("ReadUCI " & lHspfUci.Name)
-        If pOutputLocations.Contains("Lynnwood") Then 'special case to check GenScn examples
-            With lHspfUci.GlobalBlock
-                .SDate(0) = 1986
-                .SDate(1) = 10
-                .SDate(2) = 1
-                .EDate(0) = 1987
-                .EDate(1) = 10
-                .EDate(2) = 1
-            End With
-        ElseIf pTestPath.Contains("mono") Then
-            'CBP - adjust description to remove segment id
-            Dim lOperationsNames() As String = {"PERLND", "IMPLND"}
-            For Each lOperationName As String In lOperationsNames
-                Dim lOperations As HspfOperations = lHspfUci.OpnBlks(lOperationName).Ids
-                For Each lOperation As HspfOperation In lOperations
-                    With lOperation
-                        .Description = .Description.Substring(.Description.LastIndexOf(" ") + 1)
-                    End With
-                Next
-            Next
-        End If
-        'lHspfUci.Save()
 
         'open HBN file
         'TODO: need to allow additional binary output files!
@@ -264,15 +290,15 @@ Module HSPFOutputReports
         'watershed summary
         Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
         Dim lRunMade As String = lHspfBinFileInfo.LastWriteTime.ToString
-        Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") & _
-                Format(Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
+        Dim lDateString As String = Format(Year(lRunMade), "00") & "_" & Format(Month(lRunMade), "00") & _
+                "_" & Format(Day(lRunMade), "00") & "_" & Format(Hour(lRunMade), "00") & "_" & Format(Minute(lRunMade), "00")
 
         'A folder name is given that has the basename and the time when the run was made.
-        Dim lOutFolderName As String = "Reports_" & pBaseName & "_" & lDateString & "\"
+        Dim lOutFolderName As String = pTestPath & "\Reports_" & pBaseName & "_" & lDateString & "\"
         TryDelete(lOutFolderName)
         IO.Directory.CreateDirectory(lOutFolderName)
         'dont change name of uci - make it easier to compare with others, foldername contains info about which run
-        System.IO.File.Copy(pBaseName & ".uci", lOutFolderName & pBaseName & ".uci")
+        System.IO.File.Copy(pBaseName & ".uci", lOutFolderName & pBaseName & ".uci", True)
         'todo: should other output files be copied too?
 
         'build collection of operation types to report
@@ -284,11 +310,11 @@ Module HSPFOutputReports
         Dim lStr As String = ""
 
         'area report
-
-        Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutFolderName & "\")
-        lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
-
-        SaveFileString(lOutFolderName & "AreaReport.txt", lReport.ToString)
+        If pAreaReport Then
+            Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutFolderName & "\")
+            lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
+            SaveFileString(lOutFolderName & "AreaReport.txt", lReport.ToString)
+        End If
 
         If pConstituents.Contains("Water") Then
             'open WDM file
@@ -307,29 +333,29 @@ Module HSPFOutputReports
                         lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
                     End If
                     lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
-                    lStr = lExpertSystem.Report
+                    lStr = pTestPath & vbCrLf & lExpertSystem.Report
                     SaveFileString(lOutFolderName & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
-                    SaveFileString(lOutFolderName & pBaseName & ".exs", lExpertSystem.AsString)
-
-                    'lStr = lExpertSystem.AsString 'NOTE:just testing
-                    'SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
+                    'SaveFileString(lOutFolderName & pBaseName & ".exs", lExpertSystem.AsString)
 
                     Dim lCons As String = "Flow"
                     For Each lSite As HexSite In lExpertSystem.Sites
                         Dim lSiteName As String = lSite.Name
                         Dim lArea As Double = lSite.Area
-                        Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(0)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                        'Getting the observed flow data
+                        Dim lObsTser As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lSite.DSN(1))
+                        lObsTser = SubsetByDate(lObsTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                        lObsTser.Attributes.SetValue("Units", "Flow (cfs)")
+                        lObsTser.Attributes.SetValue("YAxis", "Left")
+                        lObsTser.Attributes.SetValue("StepType", pCurveStepType)
+                        Dim lObsTSerInches As atcTimeseries = CfsToInches(lObsTser, lArea)
+                        lObsTSerInches.Attributes.SetValue("Units", "Flow (inches)")
+                        'Getting the simulated flow data
+                        Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                         lSimTSerInches.Attributes.SetValue("Units", "Flow (inches)")
                         Dim lSimTSer As atcTimeseries = InchesToCfs(lSimTSerInches, lArea)
                         lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
                         lSimTSer.Attributes.SetValue("YAxis", "Left")
                         lSimTSer.Attributes.SetValue("StepType", pCurveStepType)
-                        Dim lObsTSer As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(1)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                        lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
-                        lObsTSer.Attributes.SetValue("YAxis", "Left")
-                        lObsTSer.Attributes.SetValue("StepType", pCurveStepType)
-                        Dim lObsTSerInches As atcTimeseries = CfsToInches(lObsTSer, lArea)
-                        lObsTSerInches.Attributes.SetValue("Units", "Flow (inches)")
 
                         Dim lRchId As Integer
                         If lSite.Name.StartsWith("RCH") Then
@@ -415,7 +441,7 @@ Module HSPFOutputReports
                             End If
                             lPrecTser.Attributes.SetValue("Units", "inches")
 
-                            lStr = HspfSupport.MonthlyAverageCompareStats.Report(lHspfUci, _
+                            lStr = pTestPath & vbCrLf & HspfSupport.MonthlyAverageCompareStats.Report(lHspfUci, _
                                                                                  lCons, lSiteName, _
                                                                                  "inches", _
                                                                                  lSimTSerInches, lObsTSerInches, _
@@ -425,7 +451,7 @@ Module HSPFOutputReports
                             Dim lOutFileName As String = lOutFolderName & "MonthlyAverage" & lCons & "Stats-" & lSiteName & ".txt"
                             SaveFileString(lOutFileName, lStr)
 
-                            lStr = HspfSupport.AnnualCompareStats.Report(lHspfUci, _
+                            lStr = pTestPath & vbCrLf & HspfSupport.AnnualCompareStats.Report(lHspfUci, _
                                                                          lCons, lSiteName, _
                                                                          "inches", _
                                                                          lPrecTser, lSimTSerInches, lObsTSerInches, _
@@ -435,9 +461,9 @@ Module HSPFOutputReports
                             lOutFileName = lOutFolderName & "Annual" & lCons & "Stats-" & lSiteName & ".txt"
                             SaveFileString(lOutFileName, lStr)
 
-                            lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
+                            lStr = pTestPath & vbCrLf & HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
                                                                                lCons, lSiteName, _
-                                                                               lSimTSer, lObsTSer, _
+                                                                               lSimTSer, lObsTser, _
                                                                                lRunMade, _
                                                                                lExpertSystem.SDateJ, _
                                                                                lExpertSystem.EDateJ)
@@ -445,7 +471,7 @@ Module HSPFOutputReports
                             SaveFileString(lOutFileName, lStr)
 
                             Dim lTimeSeries As New atcTimeseriesGroup
-                            lTimeSeries.Add("Observed", lObsTSer)
+                            lTimeSeries.Add("Observed", lObsTser)
                             lTimeSeries.Add("Simulated", lSimTSer)
                             lTimeSeries.Add("Precipitation", lPrecTser)
                             lTimeSeries.Add("LZS", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(9)))
@@ -464,7 +490,44 @@ Module HSPFOutputReports
                                      pGraphAnnual, lOutFolderName)
                             lTimeSeries.Clear()
 
-                            lTimeSeries.Add("Observed", lObsTSer)
+                            If RunOffComponents Then
+
+                                Dim IFWO As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(3)), _
+                                                                        lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+
+                                Dim SURO As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(2)), _
+                                                                         lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                                Dim AGWO As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(4)), _
+                                                                         lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+
+
+
+                                Dim PERO As atcTimeseries = SURO + IFWO + AGWO
+                                Dim SimBaseflow As atcTimeseries = AGWO * lSimTSerInches / PERO
+                                Dim SimRunoff As atcTimeseries = (IFWO + SURO) * lSimTSerInches / PERO
+
+                                lTimeSeries.Add("Simulated Baseflow", SimBaseflow)
+                                lTimeSeries.Add("Simulated Runoff", SimRunoff)
+
+
+                                GraphCumDifBatch(lTimeSeries, lOutFolderName & "RCH_" & lSiteName)
+                                lTimeSeries.Clear()
+
+                            End If
+
+
+
+
+                            If pBaseName = "Upatoi" Then
+                                lObsTser.Clear()
+                                lSimTSer.Clear()
+                                lPrecTser.Clear()
+                                lObsTser = lWdmDataSource.DataSets.ItemByKey(5)
+                                lSimTSer = lWdmDataSource.DataSets.ItemByKey(3002)
+                                lPrecTser = lWdmDataSource.DataSets.ItemByKey(9005)
+
+                            End If
+                            lTimeSeries.Add("Observed", lObsTser)
                             lTimeSeries.Add("Simulated", lSimTSer)
                             lTimeSeries.Add("Prec", lPrecTser)
 
@@ -475,6 +538,9 @@ Module HSPFOutputReports
                             GraphStorms(lTimeSeries, 2, lOutFolderName & "Storm", pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem)
                             lTimeSeries.Dispose()
                         End If
+
+                        
+
                     Next
 
                     lExpertSystem = Nothing
