@@ -54,61 +54,46 @@ Public Class StartUp
         Me.Focus()
     End Sub
 
-    'Private Sub txtRCH_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtRCH.TextChanged
-    '    Dim lOK As Boolean = False
-    '    cmdStart.Enabled = True
-    '    If IsNumeric(txtRCH.Text) Then
-    '        'one reach, entered as numeric
-    '        lOK = True
-    '    ElseIf InStr(1, txtRCH.Text, ",") > 0 Then
-    '        'multiple reaches separated by commas
-    '        Dim lRCHRES() As String
-    '        lRCHRES = Split(txtRCH.Text, ",")
-    '        For Each lRCH As String In lRCHRES
-    '            lOK = True
-    '            If Not (IsNumeric(lRCH)) Then
-    '                'one or more of the entries is not numeric, do not allow start button
-    '                lOK = False
-    '                Exit For
-    '            End If
-    '        Next
-    '    Else
-    '        lOK = True
-    '        txtRCH.Clear()
-    '    End If
-    '    'If lOK Then cmdStart.Enabled = True
-    'End Sub
-
     Private Sub cmdEnd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEnd.Click
         Me.Close()
     End Sub
 
-    Private Sub chkGraphs_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkGraphs.CheckedChanged
-        If chkGraphs.Checked Then
-            chkGraphStandard.Checked = True
-            chkGraphStandard.Visible = True
-            chkLogGraphs.Visible = True
-            chkSupportingGraphs.Checked = True
-            chkSupportingGraphs.Visible = True
-        Else 'user unchecked
-            chkGraphStandard.Checked = False
-            chkLogGraphs.Checked = False
-            chkSupportingGraphs.Checked = False
-        End If
+    Private Sub chkRunHSPF_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkRunHSPF.CheckedChanged
+        
     End Sub
- 
-    Private Sub chkLogGraphs_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkLogGraphs.CheckedChanged
-        If chkLogGraphs.Checked Then
-            If Not chkGraphStandard.Checked And Not chkSupportingGraphs.Checked Then
-                chkLogGraphs.Checked = False
-            End If
+
+    Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged
+        If chkWaterBalance.Checked OrElse chkSedimentBalance.Checked OrElse chkNitrogenBalance.Checked Then
+            lblRCH.Enabled = True
+            lblOutReach2.Enabled = True
+            txtRCH.Enabled = True
+            pnlHighlight.Enabled = True
+        Else
+            lblRCH.Enabled = False
+            lblOutReach2.Enabled = False
+            txtRCH.Enabled = False
+            pnlHighlight.Enabled = False
+        End If
+
+    End Sub
+
+    Private Sub chkSupportingGraphs_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkGraphStandard.CheckedChanged, chkSupportingGraphs.CheckedChanged
+        chkLogGraphs.Enabled = chkSupportingGraphs.Checked OrElse chkGraphStandard.Checked
+        If Not chkLogGraphs.Enabled Then
+            chkLogGraphs.Checked = False
         End If
     End Sub
 
-    Private Sub chkRunHSPF_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkRunHSPF.CheckedChanged
-        Dim lRunUci As Boolean = False
-        If chkRunHSPF.Checked Then
-            lrunuci = True
+    Private Sub chkExpertStats_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkExpertStats.CheckedChanged
+        If chkExpertStats.Checked Then
+            chkAreaReports.Enabled = True
+            grpGraphs.Enabled = True
+        Else
+            chkAreaReports.Enabled = False
+            grpGraphs.Enabled = False
+            chkAreaReports.Checked = False
+            chkGraphStandard.Checked = False
+            chkSupportingGraphs.Checked = False
         End If
     End Sub
 End Class
