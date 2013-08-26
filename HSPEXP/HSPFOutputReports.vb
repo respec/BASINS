@@ -95,7 +95,12 @@ Module HSPFOutputReports
         Dim lTestName As String = StartUp.txtPrefix.Text
         Logger.Status("Beginning analysis of " & lTestName, True)
 
-        pConstituents.Add("Water")
+        If StartUp.chkWaterBalance.Checked Then
+            pConstituents.Add("Water")
+        End If
+        If StartUp.chkSedimentBalance.Checked Then
+            pConstituents.Add("Sediment")
+        End If
 
         'Becky added the following to be dependent upon user input:
         pTestPath = StartUp.txtUCIPath.Text
@@ -181,12 +186,6 @@ Module HSPFOutputReports
 
             Dim lStr As String = ""
 
-            'area report
-            'Becky's addition: only do this if user wants it
-            'Anurag changed some sequences to read the file write time from the wdm file. Anurag wanted to get the most statistics be 
-            'written in output folders before teh program even reads the hbn file. Anything related to hbn file has been moved further down.
-            'Anurag also wants to make water balance reports optional in the future.
-
             Dim lRunMade As String = ""
             Dim lWdmFileName As String = pTestPath & pBaseName & ".wdm" 'Becky fixed to remove extra "\"
             Logger.Status(Now & " Opening " & pBaseName & ".wdm", True)
@@ -260,273 +259,290 @@ Module HSPFOutputReports
             'open WDM file
             Logger.Dbg(Now & " Opening " & pBaseName & ".wdm")
 
+            If StartUp.chkExpertStats.Checked = True Then
 
-            Dim lExpertSystemFileNames As New NameValueCollection
-            AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
-            If lExpertSystemFileNames.Count < 1 Then 'Becky added this if-then to warn the user if no EXS files exist
-                'in directory - without an EXS, nothing else will happen (For Each finds nothing), but previously
-                'the user received no notification of this
-                'In future, at this point, user should get an option if they want to make teir own exs file and this program should
-                'help the user do it.
-                MsgBox("No basins specifications file (*.exs) file found in directory " & IO.Directory.GetCurrentDirectory & "!  Statistics, summaries, and graphs cannot be computed.", vbOKOnly, "No Specification File!")
-                Logger.Dbg(Now & " No basins specifications file found, no statistics computed")
-            End If
-            Dim lExpertSystem As HspfSupport.atcExpertSystem
-            For Each lExpertSystemFileName As String In lExpertSystemFileNames
-                Logger.Status(Now & " Calculating Expert Statistics for the file " & lExpertSystemFileName, True)
-                Try
-                    Dim lFileCopied As Boolean = False
-                    If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
-                        'Becky: I believe all this is doing is copying the existing EXS file to one named the same as the UCI file
-                        lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
-                    End If
-                    Logger.Dbg(Now & " Calculating run statistics to save in " & pBaseName & ".sts")
-                    lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
-                    lStr = lExpertSystem.Report
-                    'Becky changed file name to match our typical file structure
-                    'SaveFileString(lOutFolderName & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
-                    SaveFileString(lOutFolderName & pBaseName & ".sts", lStr)
-                    'Becky commented the following out - no need to exactly reproduce the EXS file we already have
-                    'SaveFileString(lOutFolderName & pBaseName & "out.exs", lExpertSystem.AsString) 'Becky added "out" so as not to write over the original
-
-                    'Becky added these to output advice
-                    Logger.Dbg(Now & " Creating advice to save in " & pBaseName & ".adv")
-                    For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
-                        Dim lAdviceStr As String = "Advice for Calibration Run " & pBaseName & vbCrLf & Now & vbCrLf & vbCrLf
-                        lExpertSystem.CalcAdvice(lAdviceStr, lSiteIndex)
-                        Dim lSiteNam As String = lExpertSystem.Sites(lSiteIndex - 1).Name
-                        SaveFileString(lOutFolderName & pBaseName & "." & lSiteNam & ".adv", lAdviceStr)
-                    Next
-
-                    Dim lCons As String = "Flow"
-                    For Each lSite As HexSite In lExpertSystem.Sites
-                        Dim lSiteName As String = lSite.Name
-                        Dim lArea As Double = lSite.Area
-                        Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                        lSimTSerInches.Attributes.SetValue("Units", "Flow (inches)")
-                        Dim lSimTSer As atcTimeseries = InchesToCfs(lSimTSerInches, lArea)
-                        lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
-                        lSimTSer.Attributes.SetValue("YAxis", "Left")
-                        lSimTSer.Attributes.SetValue("StepType", pCurveStepType)
-                        Dim lObsTSer As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(1)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                        lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
-                        lObsTSer.Attributes.SetValue("YAxis", "Left")
-                        lObsTSer.Attributes.SetValue("StepType", pCurveStepType)
-                        Dim lObsTSerInches As atcTimeseries = CfsToInches(lObsTSer, lArea)
-                        lObsTSerInches.Attributes.SetValue("Units", "Flow (inches)")
-
-                        'Becky: as best I understand it, this is saying that the site name in the EXS file should
-                        '       read RCH# where # is the reach number of the reach with its outlet at the gaging
-                        '       station.  Then the code appears to calculate the area from the SCHEMATIC block and
-                        '       compare it to the area reported in the EXS file, throwing a warning if they're 
-                        '       different.
-                        Dim lRchId() As Integer 'Becky changed this to an array to hold multiple reaches
-                        Dim lRchIdStr() As String 'Becky added to receive information from the split function
-                        'Becky modified this if-then-else to allow multiple reaches to contribute to a station
-                        If lSite.Name.StartsWith("RCH") Then
-                            Dim lRchText As String 'Becky added to hold substring of site name
-                            lRchText = lSiteName.Substring(3)
-                            If InStr(lRchText, ",") > 0 Then
-                                lRchIdStr = Split(lRchText, ",")
-                                ReDim lRchId(lRchIdStr.GetUpperBound(0))
-                                For i As Integer = 0 To lRchIdStr.GetUpperBound(0)
-                                    lRchId(i) = CInt(lRchIdStr(i))
-                                Next i
-                            Else
-                                ReDim lRchId(0)
-                                lRchId(0) = lRchText
-                            End If
-                        Else
-                            Dim ans As Integer 'Becky added the following if-then to allow a clean stop if the user didn't input RCH01 etc.
-                            'I don't know why the AquaTerra code defaults to just taking the information as is, but I continue to allow that
-                            'just in case...
-                            ans = MsgBox("The site name on line 2 of your basins specification file is not in the format RCH##, where ## is the " & _
-                                "RCHRES number of the outlet reach.  It is likely that the program will abort shortly.  Your *.adv and *.sts files " & _
-                                "have already been created.  Click Abort now to avoid an unhandled error.", MsgBoxStyle.AbortRetryIgnore + MsgBoxStyle.Critical, _
-                                "Site Name Invalid")
-                            If ans = vbAbort Then
-                                GoTo RWZProgramEnding
-                            End If
-                            ReDim lRchId(0)
-                            lRchId(0) = lSite.Name
+                Dim lExpertSystemFileNames As New NameValueCollection
+                AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
+                If lExpertSystemFileNames.Count < 1 Then 'Becky added this if-then to warn the user if no EXS files exist
+                    'in directory - without an EXS, nothing else will happen (For Each finds nothing), but previously
+                    'the user received no notification of this
+                    'In future, at this point, user should get an option if they want to make teir own exs file and this program should
+                    'help the user do it.
+                    MsgBox("No basins specifications file (*.exs) file found in directory " & IO.Directory.GetCurrentDirectory & "!  Statistics, summaries, and graphs cannot be computed.", vbOKOnly, "No Specification File!")
+                    Logger.Dbg(Now & " No basins specifications file found, no statistics computed")
+                End If
+                Dim lExpertSystem As HspfSupport.atcExpertSystem
+                For Each lExpertSystemFileName As String In lExpertSystemFileNames
+                    Logger.Status(Now & " Calculating Expert Statistics for the file " & lExpertSystemFileName, True)
+                    Try
+                        Dim lFileCopied As Boolean = False
+                        If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
+                            'Becky: I believe all this is doing is copying the existing EXS file to one named the same as the UCI file
+                            lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
                         End If
-                        'Becky modified lRchId to read the first array value
-                        Dim lOperation As atcUCI.HspfOperation = lHspfUci.OpnBlks("RCHRES").OperFromID(lRchId(0))
-                        If lOperation Is Nothing Then
-                            Logger.Dbg("MissingOperationInUCI for " & lRchId(0))
-                        Else
-                            Logger.Dbg(Now & " Calculating watershed and land use areas from SCHEMATIC")
-                            Dim lAreaOriginal As Double = 0 '=0 added by Becky
-                            Dim lAreaOrigTemp As Double = 0 'added by Becky to accumulate the lAreaOriginals generated by WeightedSourceArea
-                            Dim lPrecSourceCollection As New atcCollection
-                            'Becky's note: all that the following does is calculate the total area from the SCHEMATIC
-                            'block contributing to each RCHRES above the outlet and compare it to a calculation
-                            'of these same areas multiplied by any multiplication factors in the PREC input in the
-                            'EXT SOURCES block.  I'm really not sure why this is done. However, lAreaOriginal is
-                            'used later on to compare to the area in the EXS file (though this was originally implemented wrong).
-                            Dim lAreaFromWeight As Double = 0 'shortened this to = 0 so that I could accumulate later
-                            For Each lRch As Integer In lRchId
-                                lOperation = lHspfUci.OpnBlks("RCHRES").OperFromID(lRch) 'Becky changed to use the argument in the new loop
-                                lAreaFromWeight += lHspfUci.WeightedSourceArea(lOperation, "PREC", lPrecSourceCollection, lAreaOrigTemp)
-                                'Becky (above) changed lAreaOriginal to lAreaOrigTemp so I can accumulate; also set to lAreaWeighted instead of doing it on the dim line
-                                lAreaOriginal += lAreaOrigTemp
-                                lAreaOrigTemp = 0
-                            Next lRch
-                            Logger.Dbg("AreaFromWeight " & lAreaFromWeight & " AreaOriginal " & lAreaOriginal)
-                            If (lAreaFromWeight - lAreaOriginal) > 1 Then
-                                Logger.Dbg("**** AREA PROBLEM ****")
+                        Logger.Dbg(Now & " Calculating run statistics to save in " & pBaseName & ".sts")
+                        lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
+                        lStr = lExpertSystem.Report
+                        'Becky changed file name to match our typical file structure
+                        'SaveFileString(lOutFolderName & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
+                        SaveFileString(lOutFolderName & pBaseName & ".sts", lStr)
+                        'Becky commented the following out - no need to exactly reproduce the EXS file we already have
+                        'SaveFileString(lOutFolderName & pBaseName & "out.exs", lExpertSystem.AsString) 'Becky added "out" so as not to write over the original
+
+                        'Becky added these to output advice
+                        Logger.Dbg(Now & " Creating advice to save in " & pBaseName & ".adv")
+                        For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
+                            Dim lAdviceStr As String = "Advice for Calibration Run " & pBaseName & vbCrLf & Now & vbCrLf & vbCrLf
+                            lExpertSystem.CalcAdvice(lAdviceStr, lSiteIndex)
+                            Dim lSiteNam As String = lExpertSystem.Sites(lSiteIndex - 1).Name
+                            SaveFileString(lOutFolderName & pBaseName & "." & lSiteNam & ".adv", lAdviceStr)
+                        Next
+
+                        Dim lCons As String = "Flow"
+                        For Each lSite As HexSite In lExpertSystem.Sites
+                            Dim lSiteName As String = lSite.Name
+                            Dim lArea As Double = lSite.Area
+                            Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                            lSimTSerInches.Attributes.SetValue("Units", "Flow (inches)")
+                            Dim lSimTSer As atcTimeseries = InchesToCfs(lSimTSerInches, lArea)
+                            lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
+                            lSimTSer.Attributes.SetValue("YAxis", "Left")
+                            lSimTSer.Attributes.SetValue("StepType", pCurveStepType)
+                            Dim lObsTSer As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(1)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                            lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
+                            lObsTSer.Attributes.SetValue("YAxis", "Left")
+                            lObsTSer.Attributes.SetValue("StepType", pCurveStepType)
+                            Dim lObsTSerInches As atcTimeseries = CfsToInches(lObsTSer, lArea)
+                            lObsTSerInches.Attributes.SetValue("Units", "Flow (inches)")
+
+                            'Becky: as best I understand it, this is saying that the site name in the EXS file should
+                            '       read RCH# where # is the reach number of the reach with its outlet at the gaging
+                            '       station.  Then the code appears to calculate the area from the SCHEMATIC block and
+                            '       compare it to the area reported in the EXS file, throwing a warning if they're 
+                            '       different.
+                            Dim lRchId() As Integer 'Becky changed this to an array to hold multiple reaches
+                            Dim lRchIdStr() As String 'Becky added to receive information from the split function
+                            'Becky modified this if-then-else to allow multiple reaches to contribute to a station
+                            If lSite.Name.StartsWith("RCH") Then
+                                Dim lRchText As String 'Becky added to hold substring of site name
+                                lRchText = lSiteName.Substring(3)
+                                If InStr(lRchText, ",") > 0 Then
+                                    lRchIdStr = Split(lRchText, ",")
+                                    ReDim lRchId(lRchIdStr.GetUpperBound(0))
+                                    For i As Integer = 0 To lRchIdStr.GetUpperBound(0)
+                                        lRchId(i) = CInt(lRchIdStr(i))
+                                    Next i
+                                Else
+                                    ReDim lRchId(0)
+                                    lRchId(0) = lRchText
+                                End If
+                            Else
+                                Dim ans As Integer 'Becky added the following if-then to allow a clean stop if the user didn't input RCH01 etc.
+                                'I don't know why the AquaTerra code defaults to just taking the information as is, but I continue to allow that
+                                'just in case...
+                                ans = MsgBox("The site name on line 2 of your basins specification file is not in the format RCH##, where ## is the " & _
+                                    "RCHRES number of the outlet reach.  It is likely that the program will abort shortly.  Your *.adv and *.sts files " & _
+                                    "have already been created.  Click Abort now to avoid an unhandled error.", MsgBoxStyle.AbortRetryIgnore + MsgBoxStyle.Critical, _
+                                    "Site Name Invalid")
+                                If ans = vbAbort Then
+                                    GoTo RWZProgramEnding
+                                End If
+                                ReDim lRchId(0)
+                                lRchId(0) = lSite.Name
                             End If
+                            'Becky modified lRchId to read the first array value
+                            Dim lOperation As atcUCI.HspfOperation = lHspfUci.OpnBlks("RCHRES").OperFromID(lRchId(0))
+                            If lOperation Is Nothing Then
+                                Logger.Dbg("MissingOperationInUCI for " & lRchId(0))
+                            Else
+                                Logger.Dbg(Now & " Calculating watershed and land use areas from SCHEMATIC")
+                                Dim lAreaOriginal As Double = 0 '=0 added by Becky
+                                Dim lAreaOrigTemp As Double = 0 'added by Becky to accumulate the lAreaOriginals generated by WeightedSourceArea
+                                Dim lPrecSourceCollection As New atcCollection
+                                'Becky's note: all that the following does is calculate the total area from the SCHEMATIC
+                                'block contributing to each RCHRES above the outlet and compare it to a calculation
+                                'of these same areas multiplied by any multiplication factors in the PREC input in the
+                                'EXT SOURCES block.  I'm really not sure why this is done. However, lAreaOriginal is
+                                'used later on to compare to the area in the EXS file (though this was originally implemented wrong).
+                                Dim lAreaFromWeight As Double = 0 'shortened this to = 0 so that I could accumulate later
+                                For Each lRch As Integer In lRchId
+                                    lOperation = lHspfUci.OpnBlks("RCHRES").OperFromID(lRch) 'Becky changed to use the argument in the new loop
+                                    lAreaFromWeight += lHspfUci.WeightedSourceArea(lOperation, "PREC", lPrecSourceCollection, lAreaOrigTemp)
+                                    'Becky (above) changed lAreaOriginal to lAreaOrigTemp so I can accumulate; also set to lAreaWeighted instead of doing it on the dim line
+                                    lAreaOriginal += lAreaOrigTemp
+                                    lAreaOrigTemp = 0
+                                Next lRch
+                                Logger.Dbg("AreaFromWeight " & lAreaFromWeight & " AreaOriginal " & lAreaOriginal)
+                                If (lAreaFromWeight - lAreaOriginal) > 1 Then
+                                    Logger.Dbg("**** AREA PROBLEM ****")
+                                End If
 
-                            Dim lPrecTser As atcTimeseries = Nothing
+                                Dim lPrecTser As atcTimeseries = Nothing
 
-                            Dim lPrecDsn As Integer = lSite.DSN(5)
-                            lPrecTser = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lPrecDsn), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                            lPrecTser.Attributes.SetValue("Units", "inches")
+                                Dim lPrecDsn As Integer = lSite.DSN(5)
+                                lPrecTser = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lPrecDsn), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                                lPrecTser.Attributes.SetValue("Units", "inches")
 
-                            RWZSetArgs(lSimTSerInches)
-                            RWZSetArgs(lObsTSerInches)
-                            RWZSetArgs(lPrecTser)
+                                RWZSetArgs(lSimTSerInches)
+                                RWZSetArgs(lObsTSerInches)
+                                RWZSetArgs(lPrecTser)
 
-                            Logger.Dbg(Now & " Calculating monthly summary")
-                            'pProgressBar.pbProgress.Increment(5)
+                                Logger.Dbg(Now & " Calculating monthly summary")
+                                'pProgressBar.pbProgress.Increment(5)
 
-                            lStr = HspfSupport.MonthlyAverageCompareStats.Report(lHspfUci, _
-                                                                                 lCons, lSiteName, _
-                                                                                 "inches", _
-                                                                                 lSimTSerInches, lObsTSerInches, _
-                                                                                 lRunMade, _
-                                                                                 lExpertSystem.SDateJ, _
-                                                                                 lExpertSystem.EDateJ)
-                            Dim lOutFileName As String = lOutFolderName & "MonthlyAverage" & lCons & "Stats-" & lSiteName & ".txt"
-                            SaveFileString(lOutFileName, lStr)
+                                lStr = HspfSupport.MonthlyAverageCompareStats.Report(lHspfUci, _
+                                                                                     lCons, lSiteName, _
+                                                                                     "inches", _
+                                                                                     lSimTSerInches, lObsTSerInches, _
+                                                                                     lRunMade, _
+                                                                                     lExpertSystem.SDateJ, _
+                                                                                     lExpertSystem.EDateJ)
+                                Dim lOutFileName As String = lOutFolderName & "MonthlyAverage" & lCons & "Stats-" & lSiteName & ".txt"
+                                SaveFileString(lOutFileName, lStr)
 
-                            Logger.Dbg(Now & " Calculating annual summary")
-                            lStr = HspfSupport.AnnualCompareStats.Report(lHspfUci, _
-                                                                         lCons, lSiteName, _
-                                                                         "inches", _
-                                                                         lPrecTser, lSimTSerInches, lObsTSerInches, _
-                                                                         lRunMade, _
-                                                                         lExpertSystem.SDateJ, _
-                                                                         lExpertSystem.EDateJ)
-                            lOutFileName = lOutFolderName & "Annual" & lCons & "Stats-" & lSiteName & ".txt"
-                            SaveFileString(lOutFileName, lStr)
+                                Logger.Dbg(Now & " Calculating annual summary")
+                                lStr = HspfSupport.AnnualCompareStats.Report(lHspfUci, _
+                                                                             lCons, lSiteName, _
+                                                                             "inches", _
+                                                                             lPrecTser, lSimTSerInches, lObsTSerInches, _
+                                                                             lRunMade, _
+                                                                             lExpertSystem.SDateJ, _
+                                                                             lExpertSystem.EDateJ)
+                                lOutFileName = lOutFolderName & "Annual" & lCons & "Stats-" & lSiteName & ".txt"
+                                SaveFileString(lOutFileName, lStr)
 
-                            Logger.Dbg(Now & " Calculating daily summary")
-                            'pProgressBar.pbProgress.Increment(6)
-                            lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
-                                                                               lCons, lSiteName, _
-                                                                               lSimTSer, lObsTSer, _
-                                                                               lRunMade, _
-                                                                               lExpertSystem.SDateJ, _
-                                                                               lExpertSystem.EDateJ)
-                            lOutFileName = lOutFolderName & "DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
-                            SaveFileString(lOutFileName, lStr)
+                                Logger.Dbg(Now & " Calculating daily summary")
+                                'pProgressBar.pbProgress.Increment(6)
+                                lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
+                                                                                   lCons, lSiteName, _
+                                                                                   lSimTSer, lObsTSer, _
+                                                                                   lRunMade, _
+                                                                                   lExpertSystem.SDateJ, _
+                                                                                   lExpertSystem.EDateJ)
+                                lOutFileName = lOutFolderName & "DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
+                                SaveFileString(lOutFileName, lStr)
 
-                            'Becky's addition: only make graphs if user wants them. 
-                            If pMakeLogGraphs Or pMakeStdGraphs Or pMakeSupGraphs Then
-                                Logger.Status(Now & " Preparing Graphs", True)
-                                Dim lTimeSeries As New atcTimeseriesGroup
-                                Logger.Dbg(Now & " Creating nonstorm graphs")
-                                lTimeSeries.Add("Observed", lObsTSer)
-                                lTimeSeries.Add("Simulated", lSimTSer)
-                                lTimeSeries.Add("Precipitation", lPrecTser)
-                                lTimeSeries.Add("LZS", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(9)))
-                                lTimeSeries.Add("UZS", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(8)))
-                                lTimeSeries.Add("PotET", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(6)))
-                                lTimeSeries.Add("ActET", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(7)))
-                                lTimeSeries.Add("Baseflow", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(4)))
-                                lTimeSeries.Add("Interflow", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(3)))
-                                lTimeSeries.Add("Surface", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(2)))
-                                GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ, _
-                                         lCons, lSiteName, _
-                                         lTimeSeries, _
-                                         pGraphSaveFormat, _
-                                         pGraphSaveWidth, _
-                                         pGraphSaveHeight, _
-                                         pGraphAnnual, lOutFolderName, _
-                                         pMakeStdGraphs, pMakeLogGraphs, _
-                                         pMakeSupGraphs)
-                                lTimeSeries.Clear()
-
-                                If pMakeStdGraphs Then 'Becky added, only make storm graphs (log or normal) if we want standard graphs
-                                    Logger.Dbg(Now & " Creating storm graphs")
-                                    'pProgressBar.pbProgress.Increment(29)
+                                'Becky's addition: only make graphs if user wants them. 
+                                If pMakeLogGraphs Or pMakeStdGraphs Or pMakeSupGraphs Then
+                                    Logger.Status(Now & " Preparing Graphs", True)
+                                    Dim lTimeSeries As New atcTimeseriesGroup
+                                    Logger.Dbg(Now & " Creating nonstorm graphs")
                                     lTimeSeries.Add("Observed", lObsTSer)
                                     lTimeSeries.Add("Simulated", lSimTSer)
-                                    lTimeSeries.Add("Prec", lPrecTser)
+                                    lTimeSeries.Add("Precipitation", lPrecTser)
+                                    lTimeSeries.Add("LZS", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(9)))
+                                    lTimeSeries.Add("UZS", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(8)))
+                                    lTimeSeries.Add("PotET", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(6)))
+                                    lTimeSeries.Add("ActET", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(7)))
+                                    lTimeSeries.Add("Baseflow", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(4)))
+                                    lTimeSeries.Add("Interflow", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(3)))
+                                    lTimeSeries.Add("Surface", lWdmDataSource.DataSets.ItemByKey(lSite.DSN(2)))
+                                    GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ, _
+                                             lCons, lSiteName, _
+                                             lTimeSeries, _
+                                             pGraphSaveFormat, _
+                                             pGraphSaveWidth, _
+                                             pGraphSaveHeight, _
+                                             pGraphAnnual, lOutFolderName, _
+                                             pMakeStdGraphs, pMakeLogGraphs, _
+                                             pMakeSupGraphs)
+                                    lTimeSeries.Clear()
 
-                                    lTimeSeries(0).Attributes.SetValue("Units", "cfs")
-                                    lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
-                                    lTimeSeries(1).Attributes.SetValue("Units", "cfs")
-                                    lTimeSeries(1).Attributes.SetValue("StepType", pCurveStepType)
-                                    GraphStorms(lTimeSeries, 2, lOutFolderName & "Storm" & "_" & lSiteName, pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem, pMakeLogGraphs)
-                                    lTimeSeries.Dispose()
+                                    If pMakeStdGraphs Then 'Becky added, only make storm graphs (log or normal) if we want standard graphs
+                                        Logger.Dbg(Now & " Creating storm graphs")
+                                        'pProgressBar.pbProgress.Increment(29)
+                                        lTimeSeries.Add("Observed", lObsTSer)
+                                        lTimeSeries.Add("Simulated", lSimTSer)
+                                        lTimeSeries.Add("Prec", lPrecTser)
+
+                                        lTimeSeries(0).Attributes.SetValue("Units", "cfs")
+                                        lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
+                                        lTimeSeries(1).Attributes.SetValue("Units", "cfs")
+                                        lTimeSeries(1).Attributes.SetValue("StepType", pCurveStepType)
+                                        GraphStorms(lTimeSeries, 2, lOutFolderName & "Storm" & "_" & lSiteName, pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem, pMakeLogGraphs)
+                                        lTimeSeries.Dispose()
+                                    End If
                                 End If
                             End If
+                        Next
+
+                        lExpertSystem = Nothing
+                        If lFileCopied Then
+                            IO.File.Delete(pBaseName & ".exs")
                         End If
-                    Next
-
-                    lExpertSystem = Nothing
-                    If lFileCopied Then
-                        IO.File.Delete(pBaseName & ".exs")
-                    End If
-                Catch lEx As ApplicationException
-                    If lEx.Message.Contains("rogram will quit!") Then
-                        Logger.Msg(lEx.Message)
-                        End
-                    End If
-                    Logger.Dbg(lEx.Message)
-                End Try
-            Next lExpertSystemFileName
-
+                    Catch lEx As ApplicationException
+                        If lEx.Message.Contains("rogram will quit!") Then
+                            Logger.Msg(lEx.Message)
+                            End
+                        End If
+                        Logger.Dbg(lEx.Message)
+                    End Try
+                Next lExpertSystemFileName
+            End If
 
             Logger.Dbg(Now & " Opening " & pBaseName & ".hbn")
             Dim lHspfBinFileName As String = pTestPath & pBaseName & ".hbn"
             Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
-            Dim lHbnExists As Boolean = False
             If System.IO.File.Exists(lHspfBinFileName) Then
                 lHspfBinDataSource.Open(lHspfBinFileName)
-                lHbnExists = True
+                For Each lConstituent As String In pConstituents
+                    Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
+
+                    Dim lReportCons As New atcReport.ReportText
+                    Dim lOutFileName As String = ""
+
+                    lReportCons = Nothing
+                    lReportCons = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
+                    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Reach_Annual_Average_Loads.txt"
+                    '"All_Budget.txt"
+                    SaveFileString(lOutFileName, lReportCons.ToString)
+                    lReportCons = Nothing
+
+                    lReportCons = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lRunMade, lConstituent)
+                    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Oper_Annual_Average_Loads.txt"
+                    '"_All_WatershedSummary.txt"
+                    SaveFileString(lOutFileName, lReportCons.ToString)
+                    lReportCons = Nothing
+
+                    Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
+                    Logger.Dbg("Summary at " & lLocations.Count & " locations")
+                    'constituent balance
+                    lReportCons = HspfSupport.ConstituentBalance.Report _
+                       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                        lHspfBinDataSource, lLocations, lRunMade)
+                    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Oper_Annual.txt"
+                    '"_Mult_ConstituentBalance.txt"
+                    SaveFileString(lOutFileName, lReportCons.ToString)
+
+
+                    'watershed constituent balance 
+                    lReportCons = HspfSupport.WatershedConstituentBalance.Report _
+                       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                        lHspfBinDataSource, lRunMade)
+                    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Group_By_OperType_And_LU_Annual_Average.txt"
+                    '"_All_WatershedConstituentBalance.txt"
+                    SaveFileString(lOutFileName, lReportCons.ToString)
+
+
+                    If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
+                        HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                           (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                            lHspfBinDataSource, pOutputLocations, lRunMade, _
+                            lOutFolderName, True)
+                        'now pivoted version
+                        HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                           (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                            lHspfBinDataSource, pOutputLocations, lRunMade, _
+                            lOutFolderName, True, True)
+                    End If
+                Next
+
             Else
                 'give message if hbn file does not exist, but continue without it
                 Dim ans As Integer
-                ans = MsgBox("HBN file " & lHspfBinFileName & " does not exist.  Water Balance reports will not be available.")
+                ans = MsgBox("HBN file " & lHspfBinFileName & " does not exist.  Constituent Balance reports will not be generated.")
             End If
 
-            If lHbnExists Then
-                Logger.Status(Now & " Opening " & pBaseName & ".hbn and preparing water balance reports.", True)
-                Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
-                Logger.Dbg("Summary at " & lLocations.Count & " locations")
-                'constituent balance
-                Dim lReportCons As New atcReport.ReportText
-                Dim lConstituent As String = "Water"
-                lReportCons = HspfSupport.ConstituentBalance.Report _
-                   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                    lHspfBinDataSource, lLocations, lRunMade)
-                Dim lOutWaterBalanceFileName As String = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalance.txt"
-                SaveFileString(lOutWaterBalanceFileName, lReportCons.ToString)
-
-                'watershed constituent balance 
-                lReportCons = HspfSupport.WatershedConstituentBalance.Report _
-                   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                    lHspfBinDataSource, lRunMade)
-                Dim lOutFileName As String = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalance.txt"
-                SaveFileString(lOutFileName, lReportCons.ToString)
-
-                If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
-                    HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-                       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                        lHspfBinDataSource, pOutputLocations, lRunMade, _
-                        lOutFolderName, True)
-                    'now pivoted version
-                    HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-                       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                        lHspfBinDataSource, pOutputLocations, lRunMade, _
-                        lOutFolderName, True, True)
-                End If
-
-
-            End If
             Logger.Dbg(Now & " Output Written to " & lOutFolderName)
             Logger.Dbg("Reports Written in " & lOutFolderName)
 RWZProgramEnding:
