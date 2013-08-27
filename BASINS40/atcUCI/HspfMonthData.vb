@@ -100,7 +100,7 @@ Public Class HspfMonthData
                 End If
                 Dim lStr As String = ""
                 For lMonthIndex As Integer = 1 To 12
-                    lStr &= DoubleToString(lMonthDataTable.MonthValue(lMonthIndex), 6).Replace(",", "").PadLeft(6)
+                    lStr &= DoubleToString(lMonthDataTable.MonthValue(lMonthIndex), 6, , "0.#E0").Replace(",", "").PadLeft(6)
                     'lStr &= CStr(lMonthDataTable.MonthValue(lMonthIndex)).PadLeft(6)
                 Next lMonthIndex
                 lSB.AppendLine(lStr)
