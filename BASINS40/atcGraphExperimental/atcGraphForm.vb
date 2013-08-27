@@ -290,7 +290,7 @@ Public Class atcGraphForm
     End Property
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pGrapher.Datasets, , False)
+        atcDataManager.UserSelectData("", pGrapher.Datasets, Nothing, False, True, Me.Icon)
     End Sub
 
     Private Sub mnuFileSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
@@ -380,15 +380,29 @@ Public Class atcGraphForm
         End If
         pEditor = New frmGraphEditor
         pEditor.Text = "Edit " & Me.Text
+        pEditor.Icon = Me.Icon
         pEditor.Edit(pZgc)
     End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        atcDataManager.ShowDisplay(sender.Text, pGrapher.Datasets)
+        atcDataManager.ShowDisplay(sender.Text, pGrapher.Datasets, Me.Icon)
+    End Sub
+
+    Private Sub ShowHelpForGraph()
+        If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
+            ShowHelp("View\Graph.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\Time Series Functions\Graph.html")
+        End If
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details\Analysis\Time Series Functions\Graph.html")
+        ShowHelpForGraph()
+    End Sub
+    Private Sub atcGraphForm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelpForGraph()
+        End If
     End Sub
 
     Private Sub mnuCoordinatesOnMenuBar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCoordinatesOnMenuBar.Click

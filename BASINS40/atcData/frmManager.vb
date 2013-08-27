@@ -63,6 +63,9 @@ Friend Class frmManager
     Friend WithEvents ViewFileAsTextToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator3 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents RemoveDataFromFileToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents RefreshSelectedToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents RefreshAllToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents toolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents treeFiles As System.Windows.Forms.TreeView
     'Friend WithEvents panelOpening As System.Windows.Forms.Panel
     'Friend WithEvents lstDataSourceType As System.Windows.Forms.ListBox
@@ -71,25 +74,28 @@ Friend Class frmManager
     'Friend WithEvents btnCancel As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmManager))
-        Me.txtDetails = New System.Windows.Forms.TextBox
-        Me.treeFiles = New System.Windows.Forms.TreeView
-        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
-        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.NewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.toolStripSeparator = New System.Windows.Forms.ToolStripSeparator
-        Me.ViewFileAsTextToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ShowFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.RemoveDataFromFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator
-        Me.SaveInToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.toolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
-        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.CloseAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.toolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
-        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.AnalysisToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.txtDetails = New System.Windows.Forms.TextBox()
+        Me.treeFiles = New System.Windows.Forms.TreeView()
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
+        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.NewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.toolStripSeparator = New System.Windows.Forms.ToolStripSeparator()
+        Me.ViewFileAsTextToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RemoveDataFromFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
+        Me.SaveInToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.toolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CloseAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.toolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
+        Me.RefreshSelectedToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RefreshAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.toolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AnalysisToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -122,15 +128,15 @@ Friend Class frmManager
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.AnalysisToolStripMenuItem, Me.HelpToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(658, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(658, 27)
         Me.MenuStrip1.TabIndex = 2
         Me.MenuStrip1.Text = "MenuStrip1"
         '
         'FileToolStripMenuItem
         '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripMenuItem, Me.OpenToolStripMenuItem, Me.toolStripSeparator, Me.ViewFileAsTextToolStripMenuItem, Me.ShowFolderToolStripMenuItem, Me.RemoveDataFromFileToolStripMenuItem, Me.ToolStripSeparator3, Me.SaveInToolStripMenuItem, Me.toolStripSeparator1, Me.CloseToolStripMenuItem, Me.CloseAllToolStripMenuItem, Me.toolStripSeparator2, Me.ExitToolStripMenuItem})
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripMenuItem, Me.OpenToolStripMenuItem, Me.toolStripSeparator, Me.ViewFileAsTextToolStripMenuItem, Me.ShowFolderToolStripMenuItem, Me.RemoveDataFromFileToolStripMenuItem, Me.ToolStripSeparator3, Me.SaveInToolStripMenuItem, Me.toolStripSeparator1, Me.CloseToolStripMenuItem, Me.CloseAllToolStripMenuItem, Me.toolStripSeparator2, Me.RefreshSelectedToolStripMenuItem, Me.RefreshAllToolStripMenuItem, Me.toolStripSeparator4, Me.ExitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(45, 23)
         Me.FileToolStripMenuItem.Text = "File"
         '
         'NewToolStripMenuItem
@@ -139,7 +145,7 @@ Friend Class frmManager
         Me.NewToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.NewToolStripMenuItem.Name = "NewToolStripMenuItem"
         Me.NewToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.N), System.Windows.Forms.Keys)
-        Me.NewToolStripMenuItem.Size = New System.Drawing.Size(196, 22)
+        Me.NewToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
         Me.NewToolStripMenuItem.Text = "New"
         '
         'OpenToolStripMenuItem
@@ -148,83 +154,100 @@ Friend Class frmManager
         Me.OpenToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem"
         Me.OpenToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.O), System.Windows.Forms.Keys)
-        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(196, 22)
+        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
         Me.OpenToolStripMenuItem.Text = "Open"
         '
         'toolStripSeparator
         '
         Me.toolStripSeparator.Name = "toolStripSeparator"
-        Me.toolStripSeparator.Size = New System.Drawing.Size(193, 6)
+        Me.toolStripSeparator.Size = New System.Drawing.Size(256, 6)
         '
         'ViewFileAsTextToolStripMenuItem
         '
         Me.ViewFileAsTextToolStripMenuItem.Name = "ViewFileAsTextToolStripMenuItem"
-        Me.ViewFileAsTextToolStripMenuItem.Size = New System.Drawing.Size(196, 22)
+        Me.ViewFileAsTextToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
         Me.ViewFileAsTextToolStripMenuItem.Text = "View File As Text"
         '
         'ShowFolderToolStripMenuItem
         '
         Me.ShowFolderToolStripMenuItem.Name = "ShowFolderToolStripMenuItem"
-        Me.ShowFolderToolStripMenuItem.Size = New System.Drawing.Size(196, 22)
+        Me.ShowFolderToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
         Me.ShowFolderToolStripMenuItem.Text = "Show File Folder"
         '
         'RemoveDataFromFileToolStripMenuItem
         '
         Me.RemoveDataFromFileToolStripMenuItem.Name = "RemoveDataFromFileToolStripMenuItem"
-        Me.RemoveDataFromFileToolStripMenuItem.Size = New System.Drawing.Size(196, 22)
+        Me.RemoveDataFromFileToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
         Me.RemoveDataFromFileToolStripMenuItem.Text = "Remove Data From File"
         '
         'ToolStripSeparator3
         '
         Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(193, 6)
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(256, 6)
         '
         'SaveInToolStripMenuItem
         '
         Me.SaveInToolStripMenuItem.Image = CType(resources.GetObject("SaveInToolStripMenuItem.Image"), System.Drawing.Image)
         Me.SaveInToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.SaveInToolStripMenuItem.Name = "SaveInToolStripMenuItem"
-        Me.SaveInToolStripMenuItem.Size = New System.Drawing.Size(196, 22)
+        Me.SaveInToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
         Me.SaveInToolStripMenuItem.Text = "Save In..."
         '
         'toolStripSeparator1
         '
         Me.toolStripSeparator1.Name = "toolStripSeparator1"
-        Me.toolStripSeparator1.Size = New System.Drawing.Size(193, 6)
+        Me.toolStripSeparator1.Size = New System.Drawing.Size(256, 6)
         '
         'CloseToolStripMenuItem
         '
         Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
-        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(196, 22)
+        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
         Me.CloseToolStripMenuItem.Text = "Close Selected"
         '
         'CloseAllToolStripMenuItem
         '
         Me.CloseAllToolStripMenuItem.Name = "CloseAllToolStripMenuItem"
-        Me.CloseAllToolStripMenuItem.Size = New System.Drawing.Size(196, 22)
+        Me.CloseAllToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
         Me.CloseAllToolStripMenuItem.Text = "Close All"
         '
         'toolStripSeparator2
         '
         Me.toolStripSeparator2.Name = "toolStripSeparator2"
-        Me.toolStripSeparator2.Size = New System.Drawing.Size(193, 6)
+        Me.toolStripSeparator2.Size = New System.Drawing.Size(256, 6)
+        '
+        'RefreshSelectedToolStripMenuItem
+        '
+        Me.RefreshSelectedToolStripMenuItem.Name = "RefreshSelectedToolStripMenuItem"
+        Me.RefreshSelectedToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
+        Me.RefreshSelectedToolStripMenuItem.Text = "Refresh Selected"
+        '
+        'RefreshAllToolStripMenuItem
+        '
+        Me.RefreshAllToolStripMenuItem.Name = "RefreshAllToolStripMenuItem"
+        Me.RefreshAllToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
+        Me.RefreshAllToolStripMenuItem.Text = "Refresh All"
+        '
+        'toolStripSeparator4
+        '
+        Me.toolStripSeparator4.Name = "toolStripSeparator4"
+        Me.toolStripSeparator4.Size = New System.Drawing.Size(256, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(196, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
         Me.ExitToolStripMenuItem.Text = "Exit"
         '
         'AnalysisToolStripMenuItem
         '
         Me.AnalysisToolStripMenuItem.Name = "AnalysisToolStripMenuItem"
-        Me.AnalysisToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
+        Me.AnalysisToolStripMenuItem.Size = New System.Drawing.Size(79, 23)
         Me.AnalysisToolStripMenuItem.Text = "Analysis"
         '
         'HelpToolStripMenuItem
         '
         Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
-        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(53, 23)
         Me.HelpToolStripMenuItem.Text = "Help"
         '
         'frmManager
@@ -311,7 +334,7 @@ Friend Class frmManager
     Private Sub SaveInHandler(ByVal sender As Object, ByVal e As EventArgs)
         Dim lSaveInSpecification As String = sender.Text
         Dim lSaveIn As atcTimeseriesSource = Nothing
-        Dim lSaveGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data to Save", SelectedTimeseries)
+        Dim lSaveGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data to Save", SelectedTimeseries, Nothing, True, True, Me.Icon)
         If lSaveGroup IsNot Nothing AndAlso lSaveGroup.Count > 0 Then
 
             'If we already have specified data source open, skip asking user
@@ -422,6 +445,10 @@ Friend Class frmManager
                     atcDataManager.RemoveDataSource(aDataSource)
                     pSelectedNodes.Clear()
                     Populate(-1)
+                Case "Refresh"
+                    Dim lSpecification As String = aDataSource.Specification
+                    atcDataManager.RemoveDataSource(aDataSource)
+                    atcDataManager.OpenDataSource(lSpecification)
                 Case "View"
                     .View()
                 Case "ShowFolder"
@@ -436,14 +463,14 @@ Friend Class frmManager
                     If Not aMultipleSelected Then
                         lSelected = lSelected.Clone
                     End If
-                    lSelected = atcDataManager.UserSelectData("Select data to " & lActionArgs(1), lSelected, Nothing, True, False)
+                    lSelected = atcDataManager.UserSelectData("Select data to " & lActionArgs(1), lSelected, Nothing, True, False, Me.Icon)
                     If lSelected IsNot Nothing AndAlso lSelected.Count > 0 Then
-                        atcDataManager.ShowDisplay(lActionArgs(1), lSelected)
+                        atcDataManager.ShowDisplay(lActionArgs(1), lSelected, Me.Icon)
                     End If
                 Case "RemoveDatasets"
                     If .CanRemoveDataset Then
                         Dim lDataGroup As atcDataGroup = atcDataManager.UserSelectData( _
-                            "Select Datasets to remove from " & .Specification, , .DataSets.Clone)
+                            "Select Datasets to remove from " & .Specification, Nothing, .DataSets.Clone, True, True, Me.Icon)
                         If lDataGroup.Count > 0 AndAlso _
                             Logger.Msg("Remove " & lDataGroup.Count & " datasets from " & vbCrLf & .Specification & "?", _
                                        MsgBoxStyle.OkCancel, "Confirm Remove") = MsgBoxResult.Ok Then
@@ -455,7 +482,7 @@ Friend Class frmManager
                     End If
                 Case "SaveIn"
                     Dim lDataGroup As atcDataGroup = atcDataManager.UserSelectData( _
-                        "Select Datasets to save " & .Specification, , .DataSets.Clone)
+                        "Select Datasets to save " & .Specification, Nothing, .DataSets.Clone, True, True, Me.Icon)
                     If lDataGroup.Count > 0 Then
                         Dim lFormSave As New frmSaveData
                         Dim lSaveSource As atcDataSource = lFormSave.AskUser(lDataGroup)
@@ -636,6 +663,16 @@ Friend Class frmManager
     Private Sub CloseAllToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CloseAllToolStripMenuItem.Click
         atcDataManager.Clear()
         Populate(-1)
+    End Sub
+
+    Private Sub RefreshSelectedToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RefreshSelectedToolStripMenuItem.Click
+        SelectionAction("Refresh")
+    End Sub
+
+    Private Sub RefreshAllToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RefreshAllToolStripMenuItem.Click
+        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+            DoAction("Refresh", lDataSource, True)
+        Next
     End Sub
 
     Private Sub ExitToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExitToolStripMenuItem.Click

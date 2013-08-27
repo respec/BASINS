@@ -15,7 +15,7 @@ Friend Class atcDataTreeForm
         If aDataGroup Is Nothing Then aDataGroup = New atcTimeseriesGroup
 
         If aDataGroup.Count = 0 Then 'ask user to specify some Data
-            aDataGroup = atcDataManager.UserSelectData(, aDataGroup)
+            aDataGroup = atcDataManager.UserSelectData("", aDataGroup, Nothing, True, True, Me.Icon)
         End If
 
         If aDataGroup.Count > 0 Then
@@ -403,11 +403,11 @@ Friend Class atcDataTreeForm
     End Function
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        atcDataManager.ShowDisplay(sender.Text, pTimeseriesGroup)
+        atcDataManager.ShowDisplay(sender.Text, pTimeseriesGroup, Me.Icon)
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pTimeseriesGroup)
+        atcDataManager.UserSelectData("", pTimeseriesGroup, Nothing, True, True, Me.Icon)
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pTimeseriesGroup.Added
@@ -445,8 +445,21 @@ Friend Class atcDataTreeForm
         pTreeViewMain = Nothing
     End Sub
 
+    Private Sub ShowHelpForTree()
+        If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
+            ShowHelp("View\Tree.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\Time Series Functions\Data Tree.html")
+        End If
+    End Sub
+
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details\Analysis\Time Series Functions\Data Tree.html")
+        ShowHelpForTree()
+    End Sub
+    Private Sub atcGraphForm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelpForTree()
+        End If
     End Sub
 
     Private Sub mnuShowMore_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuShowMore.Click

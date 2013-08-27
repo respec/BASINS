@@ -48,6 +48,8 @@ Public Class frmSave
         Next
         lAvailable.Sort()
         If lst.AskUser(lAvailable, pGridSource.DisplayAttributes) Then
+            pGridSource.DisplayAttributes = pGridSource.DisplayAttributes
+            'TODO: allow editing order of attributes, now they are alphabetized which is not really a good order
             pGridSource.Columns = pGridSource.DisplayAttributes.Count
             agdData.Refresh()
         End If

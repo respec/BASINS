@@ -216,7 +216,7 @@ Public Class frmSelectDisplay
     End Sub
 
     Private Sub btn_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnList.Click, btnGraph.Click, btnTree.Click, btnSeasonal.Click
-        atcDataManager.ShowDisplay(sender.tag, pTimeseriesGroup)
+        atcDataManager.ShowDisplay(sender.tag, pTimeseriesGroup, Me.Icon)
     End Sub
 
     Private Sub btnDiscard_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDiscard.Click
@@ -260,7 +260,7 @@ Public Class frmSelectDisplay
     End Function
 
     Private Sub btnSelect_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelect.Click
-        pTimeseriesGroup = atcDataManager.UserSelectData("Select Data", pTimeseriesGroup)
+        pTimeseriesGroup = atcDataManager.UserSelectData("Select Data", pTimeseriesGroup, Nothing, True, True, Me.Icon)
         FormFromGroup()
     End Sub
 

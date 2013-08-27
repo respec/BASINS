@@ -158,7 +158,6 @@ Public Class frmImport
 
             Dim lFilesImported As Integer = 0
             Dim lDatasetsImported As Integer = 0
-            Dim lTimeseries As atcTimeseries
             Dim lFilenames As New Generic.List(Of String)
             For Each lImportFilename As String In Filenames
                 If IO.File.Exists(lImportFilename) Then
@@ -169,34 +168,26 @@ Public Class frmImport
                 Logger.Progress("Importing " & lImportFilename, lFilesImported, lFilenames.Count)
                 Using lProgress As New ProgressLevel
                     Dim lScript As New atcTimeseriesScript.atcTimeseriesScriptPlugin
-                    lScript.RunSelectedScript(aScriptFilename, lImportFilename)
-                    If lScript.DataSets.Count = 0 Then
-                        Logger.Dbg("Did not read any datasets from " & lImportFilename)
-                    Else
-                        If aEach Then
-                            If lSaveInIsDirectory Then 'Save in WDM folder
-                                lWDMFilename = IO.Path.Combine(aSaveIn, IO.Path.ChangeExtension(IO.Path.GetFileName(lImportFilename), "wdm"))
-                            Else 'Save in same folder with input data
-                                lWDMFilename = IO.Path.ChangeExtension(lImportFilename, "wdm")
-                            End If
-                            lWDM = atcDataManager.DataSourceBySpecification(lWDMFilename)
-                            If lWDM Is Nothing Then
-                                lWDM = New atcWDM.atcDataSourceWDM
-                                lWDM.Open(lWDMFilename)
-                            End If
+
+                    If aEach Then
+                        If lSaveInIsDirectory Then 'Save in WDM folder
+                            lWDMFilename = IO.Path.Combine(aSaveIn, IO.Path.ChangeExtension(IO.Path.GetFileName(lImportFilename), "wdm"))
+                        Else 'Save in same folder with input data
+                            lWDMFilename = IO.Path.ChangeExtension(lImportFilename, "wdm")
                         End If
-
-                        Dim lHaveSharedDates As Boolean = HaveSharedDates(lScript.DataSets)
-                        For Each lTimeseries In lScript.DataSets
-                            lWDM.AddDataset(lTimeseries, atcDataSource.EnumExistAction.ExistRenumber)
-                            If lHaveSharedDates Then lTimeseries.Dates = Nothing 'Avoid clearing dates if they are shared with other datasets
-                            lTimeseries.ValuesNeedToBeRead = True 'Free memory of values that were already written to WDM
-                        Next
-
-                        If aEach Then lWDM = Nothing
-
-                        lDatasetsImported += lScript.DataSets.Count
+                        lWDM = atcDataManager.DataSourceBySpecification(lWDMFilename)
+                        If lWDM Is Nothing Then
+                            lWDM = New atcWDM.atcDataSourceWDM
+                            lWDM.Open(lWDMFilename)
+                        End If
                     End If
+
+                    lScript.RunSelectedScript(aScriptFilename, lImportFilename, lWDM)
+
+                    If aEach Then lWDM = Nothing
+
+                    lDatasetsImported += lScript.DataSets.Count
+
                     lScript.Clear()
                     lFilesImported += 1
                 End Using

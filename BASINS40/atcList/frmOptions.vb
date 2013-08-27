@@ -26,4 +26,22 @@ Public Class frmOptions
     Private Sub btnApply_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnApply.Click
         List.SetOptions(Me)
     End Sub
+
+    Private Sub ShowHelpForListOptions()
+        If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
+            atcUtility.ShowHelp("View\List.html")
+        Else
+            atcUtility.ShowHelp("BASINS Details\Analysis\Time Series Functions\List.html")
+        End If
+    End Sub
+
+    Private Sub btnHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnHelp.Click
+        ShowHelpForListOptions()
+    End Sub
+    Private Sub atcGraphForm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelpForListOptions()
+        End If
+    End Sub
+
 End Class
