@@ -127,6 +127,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="atcHspfAGCHEM.vb" />
     <Compile Include="atcHspfConstituentBalance.vb" />
     <Compile Include="atcHspfDailyMonthlyCompareStats.vb" />
     <Compile Include="atcHspfExpertAdvice.vb" />

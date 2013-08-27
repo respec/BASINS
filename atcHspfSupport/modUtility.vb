@@ -4,6 +4,57 @@ Imports atcData
 Imports atcUCI
 
 Public Module Utility
+
+    Public ConstitientsThatUseLast As New Generic.List(Of String)({"BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT", "DETS", "SLDS", _
+                                                "ABOVE-GROUND PLANT STORAGE", _
+                                                "LITTER STORAGE", _
+                                                "PLANT N - SURFACE LAYER STORAGE", _
+                                                "PLANT N - UPPER PRINCIPAL STORAGE", _
+                                                "PLANT N - LOWER LAYER STORAGE", _
+                                                "PLANT N - ACTIVE GROUNDWATER STORAGE", _
+                                                "PLANT N - TOTAL STORAGE", _
+                                                "TOTAL N - TOTAL STORAGE", _
+                                                "NH4-N SOL - SURFACE LAYER STORAGE", _
+                                                "NH4-N SOL - UPPER PRINCIPAL STORAGE", _
+                                                "NH4-N SOL - UPPER TRANSITORY STORAGE", _
+                                                "NH4-N SOL - LOWER LAYER STORAGE", _
+                                                "NH4-N SOL - ACTIVE GROUNDWATER STORAGE", _
+                                                "NH4-N SOL - TOTAL STORAGE", _
+                                                "NH4-N ADS - SURFACE LAYER STORAGE", _
+                                                "NH4-N ADS - UPPER PRINCIPAL STORAGE", _
+                                                "NH4-N ADS - UPPER TRANSITORY STORAGE", _
+                                                "NH4-N ADS - LOWER LAYER STORAGE", _
+                                                "NH4-N ADS - ACTIVE GROUNDWATER STORAGE", _
+                                                "NH4-N ADS - TOTAL STORAGE", _
+                                                "NO3/2-N - SURFACE LAYER STORAGE", _
+                                                "NO3/2-N - UPPER PRINCIPAL STORAGE", _
+                                                "NO3/2-N - UPPER TRANSITORY STORAGE", _
+                                                "NO3/2-N - LOWER LAYER STORAGE", _
+                                                "NO3/2-N - ACTIVE GROUNDWATER STORAGE", _
+                                                "NO3/2-N - TOTAL STORAGE", _
+                                                "SOL LABIL ORGANIC N - SURFACE LAYER STORAGE", _
+                                                "SOL LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", _
+                                                "SOL LABIL ORGANIC N - UPPER TRANSITORY STORAGE", _
+                                                "SOL LABIL ORGANIC N - LOWER LAYER STORAGE", _
+                                                "SOL LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
+                                                "SOL LABIL ORGANIC N - TOTAL STORAGE", _
+                                                "ADS LABIL ORGANIC N - SURFACE LAYER STORAGE", _
+                                                "ADS LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", _
+                                                "ADS LABIL ORGANIC N - LOWER LAYER STORAGE", _
+                                                "ADS LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
+                                                "ADS LABIL ORGANIC N - TOTAL STORAGE", _
+                                                "SOL REFR ORGANIC N - SURFACE LAYER STORAGE", _
+                                                "SOL REFR ORGANIC N - UPPER PRINCIPAL STORAGE", _
+                                                "SOL REFR ORGANIC N - UPPER TRANSITORY STORAGE", _
+                                                "SOL REFR ORGANIC N - LOWER LAYER STORAGE", _
+                                                "SOL REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
+                                                "SOL REFR ORGANIC N - TOTAL STORAGE", _
+                                                "ADS REFR ORGANIC N - SURFACE LAYER STORAGE", _
+                                                "ADS REFR ORGANIC N - UPPER PRINCIPAL STORAGE", _
+                                                "ADS REFR ORGANIC N - LOWER LAYER STORAGE", _
+                                                "ADS REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
+                                                "ADS REFR ORGANIC N - TOTAL STORAGE"})
+
     Friend Function ConstituentsToOutput(ByVal aType As String, _
                                 Optional ByVal aCategory As Boolean = False) As atcCollection
         Dim lConstituentsToOutput As New atcCollection
