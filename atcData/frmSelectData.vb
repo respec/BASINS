@@ -657,17 +657,13 @@ Friend Class frmSelectData
     Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As atcGrid)
         'Logger.Dbg("Start Populating Criteria List for " & aAttributeName)
         Dim lDefinition As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
-        Dim lSortedItems As atcCollection
+        Dim lSortedItems As New atcCollection
         Dim lNumeric As Boolean = False
-        If lDefinition Is Nothing Then
-            lSortedItems = New atcCollection
-        Else
+        If lDefinition IsNot Nothing Then
             lNumeric = atcDataAttributes.GetDefinition(aAttributeName).IsNumeric
             Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
 
-            If lAttributeDef Is Nothing Then
-                lSortedItems = New atcCollection
-            Else
+            If lAttributeDef IsNot Nothing Then
                 aList.Visible = False
                 Try
                     lSortedItems = AvailableData.SortedAttributeValues(aAttributeName, NOTHING_VALUE)

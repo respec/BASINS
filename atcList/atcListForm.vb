@@ -275,7 +275,7 @@ Public Class atcListForm
         End If
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            pDataGroup = atcDataManager.UserSelectData(, pDataGroup)
+            pDataGroup = atcDataManager.UserSelectData("", pDataGroup, Nothing, True, True, Me.Icon)
         End If
 
         If pDataGroup.Count > 0 Then
@@ -345,7 +345,7 @@ Public Class atcListForm
     End Function
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
+        atcDataManager.ShowDisplay(sender.Text, pDataGroup, Me.Icon)
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
@@ -438,7 +438,7 @@ Public Class atcListForm
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pDataGroup, , False)
+        atcDataManager.UserSelectData("", pDataGroup, Nothing, False, True, Me.Icon)
     End Sub
 
     Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click
@@ -496,17 +496,24 @@ Public Class atcListForm
         Return Me.Text & vbCrLf & agdMain.ToString
     End Function
 
-    Private pHelpLocation As String = "BASINS Details\Analysis\Time Series Functions\List.html"
-    Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp(pHelpLocation)
-    End Sub
-    Private Sub atcListForm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
-            ShowHelp(pHelpLocation)
+    Private Sub ShowHelpForList()
+        If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
+            ShowHelp("View\List.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\Time Series Functions\List.html")
         End If
     End Sub
 
-    Private Sub mnuOptions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuDateValueFormats.Click
+    Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+        ShowHelpForList()
+    End Sub
+    Private Sub atcListForm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelpForList()
+        End If
+    End Sub
+
+    Private Sub mnuDateValueFormats_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuDateValueFormats.Click
         Dim lFrmOptions As New frmOptions
         With lFrmOptions
             .List = Me
@@ -537,6 +544,7 @@ Public Class atcListForm
             .txtCantFit.Text = pCantFit
 
             .SaveState()
+            .Icon = Me.Icon
             .Show(Me)
         End With
     End Sub

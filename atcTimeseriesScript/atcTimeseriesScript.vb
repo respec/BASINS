@@ -121,6 +121,9 @@ ShowSelect:
     End Function
 
     Public Function RunSelectedScript(ByVal aDefinitionFilename As String, ByVal aDataFilename As String) As Boolean
+        Return RunSelectedScript(aDefinitionFilename, aDataFilename, Me)
+    End Function
+    Public Function RunSelectedScript(ByVal aDefinitionFilename As String, ByVal aDataFilename As String, ByVal aSource As atcTimeseriesSource) As Boolean
         If String.IsNullOrEmpty(aDefinitionFilename) Then
             Logger.Msg("No script file selected", vbExclamation, "Run Script")
             Return False
@@ -135,11 +138,21 @@ ShowSelect:
             Logger.Msg("Could not load script '" & aDefinitionFilename & "'" & vbCr & Err.Description, vbExclamation, "Run Script")
             Return False
         Else
-            Dim lMessage As String = ScriptRun(Script, aDataFilename, Me)
-            Attributes.SetValue("ScriptFileName", aDefinitionFilename)
-            Logger.Msg(lMessage & vbCrLf & "Dataset Count = " & DataSets.Count, vbOKOnly, "Ran Import Data Script")
-            Return (Me.DataSets.Count > 0)
-        End If
+            Dim lSourceHadDatasetCount As Integer = aSource.DataSets.Count
+            Dim lMessage As String = ScriptRun(Script, aDataFilename, aSource)
+            aSource.Attributes.SetValue("ScriptFileName", aDefinitionFilename)
+            If aSource.DataSets.Count > lSourceHadDatasetCount Then
+                lMessage &= vbCrLf & "Dataset Count = " & aSource.DataSets.Count
+                If lSourceHadDatasetCount > 0 Then
+                    lMessage &= vbCrLf & "Added " & aSource.DataSets.Count - lSourceHadDatasetCount & " Datasets"
+                End If
+                Logger.Msg(lMessage, vbOKOnly, "Ran Import Script")
+                Return True
+            Else
+                Logger.Msg(lMessage & vbCrLf & "Did not add any datasets", vbOKOnly, "Ran Import Data Script")
+                Return False
+            End If
+            End If
     End Function
 
     'Private Function ScriptFileNames() As String(,)

@@ -46,9 +46,11 @@ Partial Class frmMain
         Me.grpGenerate = New System.Windows.Forms.GroupBox()
         Me.btnGenerateMath = New System.Windows.Forms.Button()
         Me.btnHelp = New System.Windows.Forms.Button()
+        Me.pictureLogo = New System.Windows.Forms.PictureBox()
         Me.grpView.SuspendLayout()
         Me.grpSave.SuspendLayout()
         Me.grpGenerate.SuspendLayout()
+        CType(Me.pictureLogo, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'lblFile
@@ -145,6 +147,7 @@ Partial Class frmMain
         Me.btnDump.TabIndex = 9
         Me.btnDump.Text = "Dump All To Text"
         Me.btnDump.UseVisualStyleBackColor = True
+        Me.btnDump.Visible = False
         '
         'btnCompare
         '
@@ -155,6 +158,7 @@ Partial Class frmMain
         Me.btnCompare.TabIndex = 10
         Me.btnCompare.Text = "Compare Text"
         Me.btnCompare.UseVisualStyleBackColor = True
+        Me.btnCompare.Visible = False
         '
         'btnTree
         '
@@ -218,7 +222,7 @@ Partial Class frmMain
         Me.grpGenerate.Controls.Add(Me.btnGenerateMet)
         Me.grpGenerate.Location = New System.Drawing.Point(248, 86)
         Me.grpGenerate.Name = "grpGenerate"
-        Me.grpGenerate.Size = New System.Drawing.Size(123, 105)
+        Me.grpGenerate.Size = New System.Drawing.Size(123, 79)
         Me.grpGenerate.TabIndex = 16
         Me.grpGenerate.TabStop = False
         Me.grpGenerate.Text = "Compute"
@@ -234,20 +238,31 @@ Partial Class frmMain
         '
         'btnHelp
         '
-        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.Location = New System.Drawing.Point(377, 162)
+        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnHelp.Location = New System.Drawing.Point(424, 168)
         Me.btnHelp.Name = "btnHelp"
         Me.btnHelp.Size = New System.Drawing.Size(70, 23)
         Me.btnHelp.TabIndex = 17
         Me.btnHelp.Text = "Help"
         Me.btnHelp.UseVisualStyleBackColor = True
         '
+        'pictureLogo
+        '
+        Me.pictureLogo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pictureLogo.Image = Global.TimeseriesUtility.My.Resources.Resources._177x121transparent
+        Me.pictureLogo.Location = New System.Drawing.Point(375, 12)
+        Me.pictureLogo.Name = "pictureLogo"
+        Me.pictureLogo.Size = New System.Drawing.Size(119, 81)
+        Me.pictureLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
+        Me.pictureLogo.TabIndex = 18
+        Me.pictureLogo.TabStop = False
+        '
         'frmMain
         '
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(500, 203)
+        Me.ClientSize = New System.Drawing.Size(506, 203)
         Me.Controls.Add(Me.btnHelp)
         Me.Controls.Add(Me.grpGenerate)
         Me.Controls.Add(Me.grpSave)
@@ -259,6 +274,7 @@ Partial Class frmMain
         Me.Controls.Add(Me.lblDatasets)
         Me.Controls.Add(Me.btnManageFiles)
         Me.Controls.Add(Me.lblFile)
+        Me.Controls.Add(Me.pictureLogo)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmMain"
@@ -266,6 +282,7 @@ Partial Class frmMain
         Me.grpView.ResumeLayout(False)
         Me.grpSave.ResumeLayout(False)
         Me.grpGenerate.ResumeLayout(False)
+        CType(Me.pictureLogo, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -289,5 +306,6 @@ Partial Class frmMain
     Friend WithEvents grpGenerate As System.Windows.Forms.GroupBox
     Friend WithEvents btnGenerateMath As System.Windows.Forms.Button
     Friend WithEvents btnHelp As System.Windows.Forms.Button
+    Friend WithEvents pictureLogo As System.Windows.Forms.PictureBox
 
 End Class

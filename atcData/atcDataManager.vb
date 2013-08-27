@@ -283,6 +283,7 @@ Public Class atcDataManager
         Try
 #If GISProvider = "DotSpatial" Then
             Logger.Dbg("Loading plugins not yet supported in DotSpatial, did not load " & aPluginName)
+            Return False
 #Else
             Dim lKey As String = pMapWin.Plugins.GetPluginKey(aPluginName)
             'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
@@ -447,7 +448,9 @@ Public Class atcDataManager
         lSelectDisplay.AskUser(aDataGroup)
     End Sub
 
-    Public Shared Sub ShowDisplay(ByVal aDisplayName As String, ByVal aTimeseriesGroup As atcTimeseriesGroup)
+    Public Shared Sub ShowDisplay(ByVal aDisplayName As String, _
+                                  ByVal aTimeseriesGroup As atcTimeseriesGroup, _
+                         Optional ByVal aIcon As System.Drawing.Icon = Nothing)
         If aDisplayName Is Nothing OrElse aDisplayName.Length = 0 Then
             UserSelectDisplay("", aTimeseriesGroup)
         Else
@@ -461,7 +464,13 @@ Public Class atcDataManager
 #Else
                     lNewDisplay.Initialize(pMapWin, Nothing) 'TODO: do we need the aParentHandle here?
 #End If
-                    lNewDisplay.Show(aTimeseriesGroup)
+                    Dim lForm As Windows.Forms.Form = lNewDisplay.Show(aTimeseriesGroup)
+                    If aIcon IsNot Nothing AndAlso lForm IsNot Nothing Then
+                        Try
+                            lForm.Icon = aIcon
+                        Catch
+                        End Try
+                    End If
                     Exit Sub
                 End If
             Next
@@ -482,12 +491,14 @@ Public Class atcDataManager
     '''     <para>True to only include data sources that can save</para>
     ''' </param>  
     Public Shared Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing, _
-                                         Optional ByVal aTitle As String = "Select a Data Source", _
-                                         Optional ByVal aNeedToOpen As Boolean = True, _
-                                         Optional ByVal aNeedToSave As Boolean = False) As atcTimeseriesSource
+                                                Optional ByVal aTitle As String = "Select a Data Source", _
+                                                Optional ByVal aNeedToOpen As Boolean = True, _
+                                                Optional ByVal aNeedToSave As Boolean = False, _
+                                                Optional ByVal aIcon As System.Drawing.Icon = Nothing) As atcTimeseriesSource
         Dim lForm As New frmDataSource
         Dim lSelectedDataSource As atcTimeseriesSource = Nothing
         lForm.Text = aTitle
+        If aIcon IsNot Nothing Then lForm.Icon = aIcon
         lForm.AskUser(lSelectedDataSource, aNeedToOpen, aNeedToSave, aCategories)
         Return lSelectedDataSource
     End Function
@@ -517,7 +528,8 @@ Public Class atcDataManager
     ''' <param name="aAvailable">group of all data available for selection</param>
     ''' <param name="aModal">modality specification for window</param>
     ''' <param name="aCancelReturnsOriginalSelected">choice of whether Cancel returns an empty group or the aSelected that was passed in</param>
-    ''' <returns></returns>
+    ''' <param name="aIcon">If not nothing, form icon is set to this</param>
+    ''' <returns>aSelected is modified and is also returned if aModal is true</returns>
     ''' <remarks></remarks>
     Public Shared Function UserSelectData(ByVal aTitle As String, _
                                           ByVal aSelected As atcDataGroup, _
@@ -526,9 +538,9 @@ Public Class atcDataManager
                                           ByVal aCancelReturnsOriginalSelected As Boolean, _
                                           ByVal aIcon As System.Drawing.Icon) As atcDataGroup
         Dim lForm As New frmSelectData
-        If aIcon IsNot Nothing Then lForm.Icon = aIcon
         Dim lNonePreSelected As Boolean = (aSelected Is Nothing OrElse aSelected.Count = 0)
-        If aTitle.Length > 0 Then lForm.Text = aTitle
+        If Not String.IsNullOrEmpty(aTitle) Then lForm.Text = aTitle
+        If aIcon IsNot Nothing Then lForm.Icon = aIcon
         If aAvailable IsNot Nothing Then lForm.AvailableData = aAvailable
 
         'Try automatically selecting data based on what is selected on the map
@@ -553,13 +565,16 @@ Public Class atcDataManager
     ''' <param name="aTitle">
     '''     <para>Optional title for dialog window, default is 'Data Sources'</para>
     ''' </param> 
-    Public Shared Sub UserManage(Optional ByVal aTitle As String = "", Optional ByVal aDefaultIndex As Integer = -1)
+    Public Shared Sub UserManage(Optional ByVal aTitle As String = "", _
+                                 Optional ByVal aDefaultIndex As Integer = -1, _
+                                 Optional ByVal aIcon As System.Drawing.Icon = Nothing)
         If pManagerForm Is Nothing OrElse pManagerForm.IsDisposed Then
             pManagerForm = New frmManager
         End If
         pManagerForm.BringToFront()
         pManagerForm.Focus()
         If aTitle.Length > 0 Then pManagerForm.Text = aTitle
+        If aIcon IsNot Nothing Then pManagerForm.Icon = aIcon
         pManagerForm.Edit(aDefaultIndex)
     End Sub
 

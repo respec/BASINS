@@ -241,11 +241,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="177x121transparent.png" />
     <Content Include="SARA.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PostBuildEvent>S:\dev\BASINS40\packages\ilmerge.2.13.0307\ILMerge.exe /t:winexe /out:TimeseriesUtilityMerged.exe TimeseriesUtility.exe atcControls.dll atcData.dll atcDataTree.dll atcGraph.dll atcHspfBinOut.dll atcList.dll atcMetCmp.dll atcSegmentation.dll atcTimeseriesMath.dll atcTimeseriesNCDC.dll atcTimeseriesRDB.dll atcTimeseriesScript.dll atcTimeseriesStatistics.dll atcUCI.dll atcUtility.dll atcWDM.dll MapWinUtility.dll ZedGraph.dll</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

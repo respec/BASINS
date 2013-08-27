@@ -99,7 +99,7 @@ Public Class atcGraphPlugin
                     For Each lGraphTypeName As String In .CheckedItems
                         lAllCheckedItemNames &= lGraphTypeName & ","
                         For Each lGroup As atcTimeseriesGroup In lTimeseriesGroups
-                            Me.Show(lGroup, lGraphTypeName)
+                            Show = Me.Show(lGroup, lGraphTypeName)
                         Next
                     Next
                     SaveSetting("BASINS41", "Graph", "ChooseGraphs", lAllCheckedItemNames)

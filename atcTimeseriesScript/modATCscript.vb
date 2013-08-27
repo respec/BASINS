@@ -10,10 +10,10 @@ Friend Module modATCscript
 
     Friend DebugScriptForm As frmDebugScript
     Public ScriptState As atcCollection 'of variable names (as keys) and values
-
-    Private DataFileHandle As System.IO.StreamReader = Nothing
+    Public MaxFileLenReadAll As Integer = 100000
+    Private DataFileHandle As System.IO.StreamReader = Nothing 'Read file this way if it is longer than MaxFileLenReadAll
     Private DataFileBuffer() As Char = Nothing 'Only used when InputLineLen is set (for fixed-length lines)
-    Private WholeDataFile As String 'Contains entire contents of data file
+    Private WholeDataFile As String 'Contains entire contents of data file if smaller than MaxFileLenReadAll
     Public LenDataFile As Long
     Public NextLineStart As Long 'One-based index in WholeDataFile of first character of next line to be read
     Private LastPercent As Integer 'For updating status messages
@@ -449,7 +449,7 @@ Friend Module modATCscript
         If IO.File.Exists(aDataFilename) Then
             Try
                 LenDataFile = FileLen(aDataFilename)
-                If LenDataFile < 100000 Then
+                If LenDataFile < MaxFileLenReadAll Then
                     WholeDataFile = IO.File.ReadAllText(aDataFilename)
                     LenDataFile = WholeDataFile.Length
                     CurrentLine = Left(WholeDataFile, 1000)
@@ -562,6 +562,7 @@ Friend Module modATCscript
                                         Next
                                         If lMatch Then
                                             Dim lDisposingDates As atcTimeseries = .ts.Dates
+                                            lExistingTS.Dates.Attributes.SetValue("Shared", True)
                                             .ts.Dates = lExistingTS.Dates
                                             lDisposingDates.Clear()
                                             Exit For

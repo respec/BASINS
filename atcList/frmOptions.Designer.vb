@@ -23,7 +23,7 @@ Partial Class frmOptions
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmOptions))
-        Me.grpboxDateFormat = New System.Windows.Forms.GroupBox()
+        Me.grpDateFormat = New System.Windows.Forms.GroupBox()
         Me.radioOrderJulian = New System.Windows.Forms.RadioButton()
         Me.radioOrderDMY = New System.Windows.Forms.RadioButton()
         Me.radioOrderMDY = New System.Windows.Forms.RadioButton()
@@ -42,7 +42,7 @@ Partial Class frmOptions
         Me.lblDateSeparator = New System.Windows.Forms.Label()
         Me.txtDateSeparator = New System.Windows.Forms.TextBox()
         Me.btnCancel = New System.Windows.Forms.Button()
-        Me.grpboxNumberFormat = New System.Windows.Forms.GroupBox()
+        Me.grpValueFormat = New System.Windows.Forms.GroupBox()
         Me.lblFormat = New System.Windows.Forms.Label()
         Me.txtExpFormat = New System.Windows.Forms.TextBox()
         Me.lblExpFormat = New System.Windows.Forms.Label()
@@ -55,37 +55,38 @@ Partial Class frmOptions
         Me.lblSigDig = New System.Windows.Forms.Label()
         Me.btnApply = New System.Windows.Forms.Button()
         Me.btnOk = New System.Windows.Forms.Button()
-        Me.grpboxDateFormat.SuspendLayout()
-        Me.grpboxNumberFormat.SuspendLayout()
+        Me.btnHelp = New System.Windows.Forms.Button()
+        Me.grpDateFormat.SuspendLayout()
+        Me.grpValueFormat.SuspendLayout()
         Me.SuspendLayout()
         '
-        'grpboxDateFormat
+        'grpDateFormat
         '
-        Me.grpboxDateFormat.Controls.Add(Me.radioOrderJulian)
-        Me.grpboxDateFormat.Controls.Add(Me.radioOrderDMY)
-        Me.grpboxDateFormat.Controls.Add(Me.radioOrderMDY)
-        Me.grpboxDateFormat.Controls.Add(Me.radioOrderYMD)
-        Me.grpboxDateFormat.Controls.Add(Me.chkMidnight24)
-        Me.grpboxDateFormat.Controls.Add(Me.chkMonthNames)
-        Me.grpboxDateFormat.Controls.Add(Me.chk2digitYears)
-        Me.grpboxDateFormat.Controls.Add(Me.chkSeconds)
-        Me.grpboxDateFormat.Controls.Add(Me.chkMinutes)
-        Me.grpboxDateFormat.Controls.Add(Me.chkHours)
-        Me.grpboxDateFormat.Controls.Add(Me.chkDays)
-        Me.grpboxDateFormat.Controls.Add(Me.chkMonths)
-        Me.grpboxDateFormat.Controls.Add(Me.chkYears)
-        Me.grpboxDateFormat.Controls.Add(Me.lblTimeSeparator)
-        Me.grpboxDateFormat.Controls.Add(Me.txtTimeSeparator)
-        Me.grpboxDateFormat.Controls.Add(Me.lblDateSeparator)
-        Me.grpboxDateFormat.Controls.Add(Me.txtDateSeparator)
-        Me.grpboxDateFormat.Location = New System.Drawing.Point(9, 11)
-        Me.grpboxDateFormat.Margin = New System.Windows.Forms.Padding(2)
-        Me.grpboxDateFormat.Name = "grpboxDateFormat"
-        Me.grpboxDateFormat.Padding = New System.Windows.Forms.Padding(2)
-        Me.grpboxDateFormat.Size = New System.Drawing.Size(216, 331)
-        Me.grpboxDateFormat.TabIndex = 1
-        Me.grpboxDateFormat.TabStop = False
-        Me.grpboxDateFormat.Text = "Date Format"
+        Me.grpDateFormat.Controls.Add(Me.radioOrderJulian)
+        Me.grpDateFormat.Controls.Add(Me.radioOrderDMY)
+        Me.grpDateFormat.Controls.Add(Me.radioOrderMDY)
+        Me.grpDateFormat.Controls.Add(Me.radioOrderYMD)
+        Me.grpDateFormat.Controls.Add(Me.chkMidnight24)
+        Me.grpDateFormat.Controls.Add(Me.chkMonthNames)
+        Me.grpDateFormat.Controls.Add(Me.chk2digitYears)
+        Me.grpDateFormat.Controls.Add(Me.chkSeconds)
+        Me.grpDateFormat.Controls.Add(Me.chkMinutes)
+        Me.grpDateFormat.Controls.Add(Me.chkHours)
+        Me.grpDateFormat.Controls.Add(Me.chkDays)
+        Me.grpDateFormat.Controls.Add(Me.chkMonths)
+        Me.grpDateFormat.Controls.Add(Me.chkYears)
+        Me.grpDateFormat.Controls.Add(Me.lblTimeSeparator)
+        Me.grpDateFormat.Controls.Add(Me.txtTimeSeparator)
+        Me.grpDateFormat.Controls.Add(Me.lblDateSeparator)
+        Me.grpDateFormat.Controls.Add(Me.txtDateSeparator)
+        Me.grpDateFormat.Location = New System.Drawing.Point(9, 11)
+        Me.grpDateFormat.Margin = New System.Windows.Forms.Padding(2)
+        Me.grpDateFormat.Name = "grpDateFormat"
+        Me.grpDateFormat.Padding = New System.Windows.Forms.Padding(2)
+        Me.grpDateFormat.Size = New System.Drawing.Size(216, 331)
+        Me.grpDateFormat.TabIndex = 0
+        Me.grpDateFormat.TabStop = False
+        Me.grpDateFormat.Text = "Date Format"
         '
         'radioOrderJulian
         '
@@ -93,7 +94,7 @@ Partial Class frmOptions
         Me.radioOrderJulian.Location = New System.Drawing.Point(21, 87)
         Me.radioOrderJulian.Name = "radioOrderJulian"
         Me.radioOrderJulian.Size = New System.Drawing.Size(113, 17)
-        Me.radioOrderJulian.TabIndex = 16
+        Me.radioOrderJulian.TabIndex = 4
         Me.radioOrderJulian.TabStop = True
         Me.radioOrderJulian.Text = "Days starting 1900"
         Me.radioOrderJulian.UseVisualStyleBackColor = True
@@ -104,7 +105,7 @@ Partial Class frmOptions
         Me.radioOrderDMY.Location = New System.Drawing.Point(21, 64)
         Me.radioOrderDMY.Name = "radioOrderDMY"
         Me.radioOrderDMY.Size = New System.Drawing.Size(102, 17)
-        Me.radioOrderDMY.TabIndex = 15
+        Me.radioOrderDMY.TabIndex = 3
         Me.radioOrderDMY.TabStop = True
         Me.radioOrderDMY.Text = "Day Month Year"
         Me.radioOrderDMY.UseVisualStyleBackColor = True
@@ -115,7 +116,7 @@ Partial Class frmOptions
         Me.radioOrderMDY.Location = New System.Drawing.Point(21, 41)
         Me.radioOrderMDY.Name = "radioOrderMDY"
         Me.radioOrderMDY.Size = New System.Drawing.Size(102, 17)
-        Me.radioOrderMDY.TabIndex = 14
+        Me.radioOrderMDY.TabIndex = 2
         Me.radioOrderMDY.TabStop = True
         Me.radioOrderMDY.Text = "Month Day Year"
         Me.radioOrderMDY.UseVisualStyleBackColor = True
@@ -126,7 +127,7 @@ Partial Class frmOptions
         Me.radioOrderYMD.Location = New System.Drawing.Point(21, 18)
         Me.radioOrderYMD.Name = "radioOrderYMD"
         Me.radioOrderYMD.Size = New System.Drawing.Size(102, 17)
-        Me.radioOrderYMD.TabIndex = 13
+        Me.radioOrderYMD.TabIndex = 1
         Me.radioOrderYMD.TabStop = True
         Me.radioOrderYMD.Text = "Year Month Day"
         Me.radioOrderYMD.UseVisualStyleBackColor = True
@@ -137,7 +138,7 @@ Partial Class frmOptions
         Me.chkMidnight24.Location = New System.Drawing.Point(93, 188)
         Me.chkMidnight24.Name = "chkMidnight24"
         Me.chkMidnight24.Size = New System.Drawing.Size(110, 17)
-        Me.chkMidnight24.TabIndex = 12
+        Me.chkMidnight24.TabIndex = 13
         Me.chkMidnight24.Text = "Midnight as 24:00"
         Me.chkMidnight24.UseVisualStyleBackColor = True
         '
@@ -147,7 +148,7 @@ Partial Class frmOptions
         Me.chkMonthNames.Location = New System.Drawing.Point(93, 142)
         Me.chkMonthNames.Name = "chkMonthNames"
         Me.chkMonthNames.Size = New System.Drawing.Size(92, 17)
-        Me.chkMonthNames.TabIndex = 11
+        Me.chkMonthNames.TabIndex = 12
         Me.chkMonthNames.Text = "Month Names"
         Me.chkMonthNames.UseVisualStyleBackColor = True
         '
@@ -157,7 +158,7 @@ Partial Class frmOptions
         Me.chk2digitYears.Location = New System.Drawing.Point(93, 119)
         Me.chk2digitYears.Name = "chk2digitYears"
         Me.chk2digitYears.Size = New System.Drawing.Size(101, 17)
-        Me.chk2digitYears.TabIndex = 10
+        Me.chk2digitYears.TabIndex = 11
         Me.chk2digitYears.Text = "Two Digit Years"
         Me.chk2digitYears.UseVisualStyleBackColor = True
         '
@@ -167,7 +168,7 @@ Partial Class frmOptions
         Me.chkSeconds.Location = New System.Drawing.Point(21, 234)
         Me.chkSeconds.Name = "chkSeconds"
         Me.chkSeconds.Size = New System.Drawing.Size(68, 17)
-        Me.chkSeconds.TabIndex = 9
+        Me.chkSeconds.TabIndex = 10
         Me.chkSeconds.Text = "Seconds"
         Me.chkSeconds.UseVisualStyleBackColor = True
         '
@@ -177,7 +178,7 @@ Partial Class frmOptions
         Me.chkMinutes.Location = New System.Drawing.Point(21, 211)
         Me.chkMinutes.Name = "chkMinutes"
         Me.chkMinutes.Size = New System.Drawing.Size(63, 17)
-        Me.chkMinutes.TabIndex = 8
+        Me.chkMinutes.TabIndex = 9
         Me.chkMinutes.Text = "Minutes"
         Me.chkMinutes.UseVisualStyleBackColor = True
         '
@@ -187,7 +188,7 @@ Partial Class frmOptions
         Me.chkHours.Location = New System.Drawing.Point(21, 188)
         Me.chkHours.Name = "chkHours"
         Me.chkHours.Size = New System.Drawing.Size(54, 17)
-        Me.chkHours.TabIndex = 7
+        Me.chkHours.TabIndex = 8
         Me.chkHours.Text = "Hours"
         Me.chkHours.UseVisualStyleBackColor = True
         '
@@ -197,7 +198,7 @@ Partial Class frmOptions
         Me.chkDays.Location = New System.Drawing.Point(21, 165)
         Me.chkDays.Name = "chkDays"
         Me.chkDays.Size = New System.Drawing.Size(50, 17)
-        Me.chkDays.TabIndex = 6
+        Me.chkDays.TabIndex = 7
         Me.chkDays.Text = "Days"
         Me.chkDays.UseVisualStyleBackColor = True
         '
@@ -207,7 +208,7 @@ Partial Class frmOptions
         Me.chkMonths.Location = New System.Drawing.Point(21, 142)
         Me.chkMonths.Name = "chkMonths"
         Me.chkMonths.Size = New System.Drawing.Size(61, 17)
-        Me.chkMonths.TabIndex = 5
+        Me.chkMonths.TabIndex = 6
         Me.chkMonths.Text = "Months"
         Me.chkMonths.UseVisualStyleBackColor = True
         '
@@ -217,7 +218,7 @@ Partial Class frmOptions
         Me.chkYears.Location = New System.Drawing.Point(21, 119)
         Me.chkYears.Name = "chkYears"
         Me.chkYears.Size = New System.Drawing.Size(53, 17)
-        Me.chkYears.TabIndex = 4
+        Me.chkYears.TabIndex = 5
         Me.chkYears.Text = "Years"
         Me.chkYears.UseVisualStyleBackColor = True
         '
@@ -227,7 +228,7 @@ Partial Class frmOptions
         Me.lblTimeSeparator.Location = New System.Drawing.Point(18, 296)
         Me.lblTimeSeparator.Name = "lblTimeSeparator"
         Me.lblTimeSeparator.Size = New System.Drawing.Size(79, 13)
-        Me.lblTimeSeparator.TabIndex = 3
+        Me.lblTimeSeparator.TabIndex = 16
         Me.lblTimeSeparator.Text = "Time Separator"
         '
         'txtTimeSeparator
@@ -235,7 +236,7 @@ Partial Class frmOptions
         Me.txtTimeSeparator.Location = New System.Drawing.Point(108, 293)
         Me.txtTimeSeparator.Name = "txtTimeSeparator"
         Me.txtTimeSeparator.Size = New System.Drawing.Size(15, 20)
-        Me.txtTimeSeparator.TabIndex = 2
+        Me.txtTimeSeparator.TabIndex = 17
         Me.txtTimeSeparator.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'lblDateSeparator
@@ -244,7 +245,7 @@ Partial Class frmOptions
         Me.lblDateSeparator.Location = New System.Drawing.Point(18, 270)
         Me.lblDateSeparator.Name = "lblDateSeparator"
         Me.lblDateSeparator.Size = New System.Drawing.Size(79, 13)
-        Me.lblDateSeparator.TabIndex = 1
+        Me.lblDateSeparator.TabIndex = 14
         Me.lblDateSeparator.Text = "Date Separator"
         '
         'txtDateSeparator
@@ -252,43 +253,43 @@ Partial Class frmOptions
         Me.txtDateSeparator.Location = New System.Drawing.Point(108, 267)
         Me.txtDateSeparator.Name = "txtDateSeparator"
         Me.txtDateSeparator.Size = New System.Drawing.Size(15, 20)
-        Me.txtDateSeparator.TabIndex = 0
+        Me.txtDateSeparator.TabIndex = 15
         Me.txtDateSeparator.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(229, 355)
+        Me.btnCancel.Location = New System.Drawing.Point(90, 355)
         Me.btnCancel.Margin = New System.Windows.Forms.Padding(2)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
-        Me.btnCancel.TabIndex = 3
+        Me.btnCancel.TabIndex = 30
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
-        'grpboxNumberFormat
+        'grpValueFormat
         '
-        Me.grpboxNumberFormat.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.grpValueFormat.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpboxNumberFormat.Controls.Add(Me.lblFormat)
-        Me.grpboxNumberFormat.Controls.Add(Me.txtExpFormat)
-        Me.grpboxNumberFormat.Controls.Add(Me.lblExpFormat)
-        Me.grpboxNumberFormat.Controls.Add(Me.lblCantFit)
-        Me.grpboxNumberFormat.Controls.Add(Me.txtCantFit)
-        Me.grpboxNumberFormat.Controls.Add(Me.txtMaxWidth)
-        Me.grpboxNumberFormat.Controls.Add(Me.lblMaxWidth)
-        Me.grpboxNumberFormat.Controls.Add(Me.txtSignificantDigits)
-        Me.grpboxNumberFormat.Controls.Add(Me.txtFormat)
-        Me.grpboxNumberFormat.Controls.Add(Me.lblSigDig)
-        Me.grpboxNumberFormat.Location = New System.Drawing.Point(229, 11)
-        Me.grpboxNumberFormat.Margin = New System.Windows.Forms.Padding(2)
-        Me.grpboxNumberFormat.Name = "grpboxNumberFormat"
-        Me.grpboxNumberFormat.Padding = New System.Windows.Forms.Padding(2)
-        Me.grpboxNumberFormat.Size = New System.Drawing.Size(214, 158)
-        Me.grpboxNumberFormat.TabIndex = 4
-        Me.grpboxNumberFormat.TabStop = False
-        Me.grpboxNumberFormat.Text = "Number Format"
+        Me.grpValueFormat.Controls.Add(Me.lblFormat)
+        Me.grpValueFormat.Controls.Add(Me.txtExpFormat)
+        Me.grpValueFormat.Controls.Add(Me.lblExpFormat)
+        Me.grpValueFormat.Controls.Add(Me.lblCantFit)
+        Me.grpValueFormat.Controls.Add(Me.txtCantFit)
+        Me.grpValueFormat.Controls.Add(Me.txtMaxWidth)
+        Me.grpValueFormat.Controls.Add(Me.lblMaxWidth)
+        Me.grpValueFormat.Controls.Add(Me.txtSignificantDigits)
+        Me.grpValueFormat.Controls.Add(Me.txtFormat)
+        Me.grpValueFormat.Controls.Add(Me.lblSigDig)
+        Me.grpValueFormat.Location = New System.Drawing.Point(229, 11)
+        Me.grpValueFormat.Margin = New System.Windows.Forms.Padding(2)
+        Me.grpValueFormat.Name = "grpValueFormat"
+        Me.grpValueFormat.Padding = New System.Windows.Forms.Padding(2)
+        Me.grpValueFormat.Size = New System.Drawing.Size(214, 158)
+        Me.grpValueFormat.TabIndex = 18
+        Me.grpValueFormat.TabStop = False
+        Me.grpValueFormat.Text = "Value Format"
         '
         'lblFormat
         '
@@ -297,7 +298,7 @@ Partial Class frmOptions
         Me.lblFormat.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblFormat.Name = "lblFormat"
         Me.lblFormat.Size = New System.Drawing.Size(85, 13)
-        Me.lblFormat.TabIndex = 11
+        Me.lblFormat.TabIndex = 19
         Me.lblFormat.Text = "Standard Format"
         Me.lblFormat.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
@@ -308,7 +309,7 @@ Partial Class frmOptions
         Me.txtExpFormat.Location = New System.Drawing.Point(150, 44)
         Me.txtExpFormat.Name = "txtExpFormat"
         Me.txtExpFormat.Size = New System.Drawing.Size(59, 20)
-        Me.txtExpFormat.TabIndex = 10
+        Me.txtExpFormat.TabIndex = 22
         '
         'lblExpFormat
         '
@@ -317,7 +318,7 @@ Partial Class frmOptions
         Me.lblExpFormat.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblExpFormat.Name = "lblExpFormat"
         Me.lblExpFormat.Size = New System.Drawing.Size(87, 13)
-        Me.lblExpFormat.TabIndex = 9
+        Me.lblExpFormat.TabIndex = 21
         Me.lblExpFormat.Text = "Exponent Format"
         Me.lblExpFormat.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
@@ -327,9 +328,9 @@ Partial Class frmOptions
         Me.lblCantFit.Location = New System.Drawing.Point(4, 125)
         Me.lblCantFit.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblCantFit.Name = "lblCantFit"
-        Me.lblCantFit.Size = New System.Drawing.Size(104, 13)
-        Me.lblCantFit.TabIndex = 8
-        Me.lblCantFit.Text = "If Number Cannot Fit"
+        Me.lblCantFit.Size = New System.Drawing.Size(94, 13)
+        Me.lblCantFit.TabIndex = 27
+        Me.lblCantFit.Text = "If Value Cannot Fit"
         Me.lblCantFit.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtCantFit
@@ -339,7 +340,7 @@ Partial Class frmOptions
         Me.txtCantFit.Location = New System.Drawing.Point(150, 122)
         Me.txtCantFit.Name = "txtCantFit"
         Me.txtCantFit.Size = New System.Drawing.Size(59, 20)
-        Me.txtCantFit.TabIndex = 7
+        Me.txtCantFit.TabIndex = 28
         '
         'txtMaxWidth
         '
@@ -348,7 +349,7 @@ Partial Class frmOptions
         Me.txtMaxWidth.Location = New System.Drawing.Point(150, 96)
         Me.txtMaxWidth.Name = "txtMaxWidth"
         Me.txtMaxWidth.Size = New System.Drawing.Size(59, 20)
-        Me.txtMaxWidth.TabIndex = 6
+        Me.txtMaxWidth.TabIndex = 26
         '
         'lblMaxWidth
         '
@@ -357,7 +358,7 @@ Partial Class frmOptions
         Me.lblMaxWidth.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblMaxWidth.Name = "lblMaxWidth"
         Me.lblMaxWidth.Size = New System.Drawing.Size(87, 13)
-        Me.lblMaxWidth.TabIndex = 5
+        Me.lblMaxWidth.TabIndex = 25
         Me.lblMaxWidth.Text = "Maximum Length"
         Me.lblMaxWidth.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
@@ -368,7 +369,7 @@ Partial Class frmOptions
         Me.txtSignificantDigits.Location = New System.Drawing.Point(150, 70)
         Me.txtSignificantDigits.Name = "txtSignificantDigits"
         Me.txtSignificantDigits.Size = New System.Drawing.Size(59, 20)
-        Me.txtSignificantDigits.TabIndex = 4
+        Me.txtSignificantDigits.TabIndex = 24
         '
         'txtFormat
         '
@@ -377,7 +378,7 @@ Partial Class frmOptions
         Me.txtFormat.Location = New System.Drawing.Point(94, 18)
         Me.txtFormat.Name = "txtFormat"
         Me.txtFormat.Size = New System.Drawing.Size(115, 20)
-        Me.txtFormat.TabIndex = 3
+        Me.txtFormat.TabIndex = 20
         '
         'lblSigDig
         '
@@ -386,31 +387,42 @@ Partial Class frmOptions
         Me.lblSigDig.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblSigDig.Name = "lblSigDig"
         Me.lblSigDig.Size = New System.Drawing.Size(85, 13)
-        Me.lblSigDig.TabIndex = 2
+        Me.lblSigDig.TabIndex = 23
         Me.lblSigDig.Text = "Significant Digits"
         Me.lblSigDig.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'btnApply
         '
         Me.btnApply.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnApply.Location = New System.Drawing.Point(308, 355)
+        Me.btnApply.Location = New System.Drawing.Point(169, 355)
         Me.btnApply.Margin = New System.Windows.Forms.Padding(2)
         Me.btnApply.Name = "btnApply"
         Me.btnApply.Size = New System.Drawing.Size(75, 23)
-        Me.btnApply.TabIndex = 5
+        Me.btnApply.TabIndex = 31
         Me.btnApply.Text = "Apply"
         Me.btnApply.UseVisualStyleBackColor = True
         '
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(150, 355)
+        Me.btnOk.Location = New System.Drawing.Point(248, 355)
         Me.btnOk.Margin = New System.Windows.Forms.Padding(2)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(75, 23)
-        Me.btnOk.TabIndex = 6
+        Me.btnOk.TabIndex = 32
         Me.btnOk.Text = "Ok"
         Me.btnOk.UseVisualStyleBackColor = True
+        '
+        'btnHelp
+        '
+        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnHelp.Location = New System.Drawing.Point(11, 355)
+        Me.btnHelp.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnHelp.Name = "btnHelp"
+        Me.btnHelp.Size = New System.Drawing.Size(75, 23)
+        Me.btnHelp.TabIndex = 29
+        Me.btnHelp.Text = "Help"
+        Me.btnHelp.UseVisualStyleBackColor = True
         '
         'frmOptions
         '
@@ -419,28 +431,30 @@ Partial Class frmOptions
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(452, 389)
+        Me.Controls.Add(Me.btnHelp)
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.btnApply)
-        Me.Controls.Add(Me.grpboxNumberFormat)
+        Me.Controls.Add(Me.grpValueFormat)
         Me.Controls.Add(Me.btnCancel)
-        Me.Controls.Add(Me.grpboxDateFormat)
+        Me.Controls.Add(Me.grpDateFormat)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(2)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.MinimumSize = New System.Drawing.Size(227, 250)
         Me.Name = "frmOptions"
-        Me.Text = "Formats"
-        Me.grpboxDateFormat.ResumeLayout(False)
-        Me.grpboxDateFormat.PerformLayout()
-        Me.grpboxNumberFormat.ResumeLayout(False)
-        Me.grpboxNumberFormat.PerformLayout()
+        Me.Text = "Date and Value Formats"
+        Me.grpDateFormat.ResumeLayout(False)
+        Me.grpDateFormat.PerformLayout()
+        Me.grpValueFormat.ResumeLayout(False)
+        Me.grpValueFormat.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents grpboxDateFormat As System.Windows.Forms.GroupBox
+    Friend WithEvents grpDateFormat As System.Windows.Forms.GroupBox
     Friend WithEvents btnCancel As System.Windows.Forms.Button
-    Friend WithEvents grpboxNumberFormat As System.Windows.Forms.GroupBox
+    Friend WithEvents grpValueFormat As System.Windows.Forms.GroupBox
     Friend WithEvents lblSigDig As System.Windows.Forms.Label
     Friend WithEvents lblTimeSeparator As System.Windows.Forms.Label
     Friend WithEvents txtTimeSeparator As System.Windows.Forms.TextBox
@@ -470,4 +484,5 @@ Partial Class frmOptions
     Friend WithEvents txtCantFit As System.Windows.Forms.TextBox
     Friend WithEvents btnApply As System.Windows.Forms.Button
     Friend WithEvents btnOk As System.Windows.Forms.Button
+    Friend WithEvents btnHelp As System.Windows.Forms.Button
 End Class

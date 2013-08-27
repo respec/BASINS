@@ -19,6 +19,10 @@ Public Class frmMain
         ' Add any initialization after the InitializeComponent() call.
 
         g_ProgramDir = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)
+        Try
+            Environment.SetEnvironmentVariable("PATH", g_ProgramDir & ";" & Environment.GetEnvironmentVariable("PATH"))
+        Catch eEnv As Exception
+        End Try
         If g_ProgramDir.EndsWith("bin") Then g_ProgramDir = PathNameOnly(g_ProgramDir)
         g_ProgramDir &= g_PathChar
 
@@ -53,6 +57,7 @@ Public Class frmMain
         atcDataManager.Clear()
         With atcDataManager.DataPlugins
             .Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
+            '.Add(New atcWdmVb.atcWDMfile)
             .Add(New atcWDM.atcDataSourceWDM)
             .Add(New atcTimeseriesNCDC.atcTimeseriesNCDC)
             .Add(New atcTimeseriesRDB.atcTimeseriesRDB)
@@ -116,13 +121,14 @@ Public Class frmMain
                     End If
             End Select
         End If
+        HideOrShowLogo()
         Logger.Dbg(lblDatasets.Text)
     End Sub
 
     Private Sub btnOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOpen.Click
         Dim lCollection As New ArrayList
         lCollection.Add("File")
-        Dim lNewSource As atcTimeseriesSource = atcDataManager.UserSelectDataSource(lCollection)
+        Dim lNewSource As atcTimeseriesSource = atcDataManager.UserSelectDataSource(lCollection, "Select type of file to open", True, False, Me.Icon)
         If Not lNewSource Is Nothing Then
             If Not (atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)) Then
                 If Logger.LastDbgText.Length > 0 Then
@@ -133,7 +139,7 @@ Public Class frmMain
     End Sub
 
     Private Sub btnManageFiles_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnManageFiles.Click
-        atcDataManager.UserManage("Manage Files")
+        atcDataManager.UserManage("Manage Files", -1, Me.Icon)
     End Sub
 
     Private Sub btnSelectData_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSelectData.Click
@@ -141,23 +147,26 @@ Public Class frmMain
     End Sub
 
     Private Sub SelectData()
-        SelectedData = atcDataManager.UserSelectData("Select Timeseries", SelectedData)
+        SelectedData = atcDataManager.UserSelectData("Select Timeseries", SelectedData, Nothing, True, True, Me.Icon)
         UpdateSelectedDataLabel()
     End Sub
 
     Private Sub btnList_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnList.Click
         Dim lList As New atcList.atcListPlugin
-        lList.Show(SelectedData)
+        Dim lForm As atcList.atcListForm = lList.Show(SelectedData)
+        If lForm IsNot Nothing Then lForm.Icon = Me.Icon
     End Sub
 
     Private Sub btnGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraph.Click
         Dim lGraph As New atcGraph.atcGraphPlugin
-        lGraph.Show(SelectedData)
+        Dim lForm As atcGraph.atcGraphForm = lGraph.Show(SelectedData)        
+        If lForm IsNot Nothing Then lForm.Icon = Me.Icon
     End Sub
 
     Private Sub btnTree_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTree.Click
-        Dim lTree As New atcDataTree.atcDataTreePlugin
-        lTree.Show(SelectedData)
+        Dim lTree As New atcDataTree.atcDataTreePlugin        
+        Dim lForm As Windows.Forms.Form = lTree.Show(SelectedData)
+        If lForm IsNot Nothing Then lForm.Icon = Me.Icon
     End Sub
 
     Private Sub Form_DragEnter( _
@@ -205,6 +214,23 @@ Public Class frmMain
     End Sub
 
     Private Sub btnDump_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDump.Click
+        'Anurag Mishra: I had to comment out these lines for the script to work
+        'Dim lHspfBinDataSource As atcDataSource = atcData.atcDataManager.DataSources(0)
+        'Dim lNumDataSets As Integer = lHspfBinDataSource.DataSets.Count
+        'Dim lDataSetIndex As Integer = 1
+        'For Each lTscheck As atcTimeseries In lHspfBinDataSource.DataSets
+        '    If lTscheck.Dates.Value(1) < 1 Then Stop
+        '    Logger.Progress(lDataSetIndex, lNumDataSets) : lDataSetIndex += 1
+        '    lTscheck.ValuesNeedToBeRead = True
+        'Next
+
+        'Anurag:  I am working on a script right now
+        ' Sent at 3:41 PM on Wednesday
+        'Anurag:  and it is taking long time at this step
+        'If pAllAliases.TryGetValue(lNameLower, lAlias) Then 'We have a preferred alias for this name
+        'aAttributeName = lAlias
+        'in atcDataSttributes.vb
+
         Dim lSaveDialog As New Windows.Forms.SaveFileDialog
         With lSaveDialog
             .Title = "Save as..."
@@ -280,7 +306,7 @@ Public Class frmMain
         Next
         'todo: write value attributes (if any)
 
-        If lNeededToBeRead Then lTimeseries.ValuesNeedToBeRead = True
+        'If lNeededToBeRead Then lTimeseries.ValuesNeedToBeRead = True
     End Sub
 
     Private Sub btnCompare_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCompare.Click
@@ -414,6 +440,23 @@ Compare12:
     End Sub
 
     Private Sub btnHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnHelp.Click
+        Try
+            If My.Computer.Keyboard.ShiftKeyDown Then
+                btnDump.Visible = Not btnDump.Visible
+                btnCompare.Visible = Not btnCompare.Visible
+                Exit Sub
+            End If
+        Catch
+        End Try
         ShowHelp("Tutorial.html")
     End Sub
+
+    Private Sub HideOrShowLogo()
+        pictureLogo.Visible = (lblFile.Left + lblFile.Width < pictureLogo.Left AndAlso lblDatasets.Left + lblDatasets.Width < pictureLogo.Left)
+    End Sub
+
+    Private Sub frmMain_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        HideOrShowLogo()
+    End Sub
+
 End Class
