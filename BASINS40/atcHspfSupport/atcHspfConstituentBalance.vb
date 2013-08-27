@@ -89,24 +89,22 @@ Public Module ConstituentBalance
                                             lSeasons = New atcSeasonsCalendarYear
                                         End If
                                         Dim lSeasonalAttributes As New atcDataAttributes
-                                        Select Case lConstituentKey
-                                            Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT", "DETS", "SLDS"
-                                                lSeasonalAttributes.SetValue("Last", 0) 'fluxes are last from daily, monthly or annual to annual
-                                            Case Else
-                                                lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
-                                        End Select
+                                        If ConstitientsThatUseLast.Contains(lConstituentKey) Then                                            
+                                            lSeasonalAttributes.SetValue("Last", 0) 'fluxes are last from daily, monthly or annual to annual
+                                        Else
+                                            lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
+                                        End If
                                         Dim lYearlyAttributes As New atcDataAttributes
                                         lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lYearlyAttributes)
 
                                         If lNeedHeader Then  'get operation description for header
                                             Dim lOperName As String = ""
-                                            If lLocation.Substring(0, 1) = "P" Then
-                                                lOperName = "PERLND"
-                                            ElseIf lLocation.Substring(0, 1) = "I" Then
-                                                lOperName = "IMPLND"
-                                            ElseIf lLocation.Substring(0, 1) = "R" Then
-                                                lOperName = "RCHRES"
-                                            End If
+                                            Select Case lLocation.Substring(0, 1)
+                                                Case "P" : lOperName = "PERLND"
+                                                Case "I" : lOperName = "IMPLND"
+                                                Case "R" : lOperName = "RCHRES"
+                                            End Select
+
                                             Dim lDesc As String = ""
                                             If lOperName.Length > 0 Then
                                                 lDesc = aUci.OpnBlks(lOperName).OperFromID(lLocation.Substring(2)).Description
@@ -162,14 +160,13 @@ Public Module ConstituentBalance
                                                 lMult = 1 / 1000000000.0 '10^9
                                         End Select
 
-                                        Select Case lConstituentKey
-                                            Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT", "DETS", "SLDS"
-                                                lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
-                                                lStateVariable = True
-                                            Case Else
-                                                lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
-                                                lStateVariable = False
-                                        End Select
+                                        If ConstitientsThatUseLast.Contains(lConstituentKey) Then
+                                            lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
+                                            lStateVariable = True
+                                        Else
+                                            lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                            lStateVariable = False
+                                        End If
 
                                         .Value(1) = lConstituentName.PadRight(aFieldWidth)
                                         If Not lAttribute Is Nothing Then
@@ -218,7 +215,7 @@ Public Module ConstituentBalance
                                         End If
                                         lPendingOutput &= lConstituentName
                                     End If
-                                End If
+                                    End If
                             Next
                             If lOutputTable.NumFields > 0 Then
                                 If aDateRows Then

@@ -45,8 +45,9 @@ Module HSPFOutputReports
 
         'Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "NonUpatoi"
-        'Dim lTestName As String = "IRW"
-        lTestName = "LPCal03"
+        'lTestName = "IRW"
+        lTestName = "IRW-test-agchem"
+        'lTestName = "LPCal03"
         'lTestName = "LPVal"
         'lTestName = "CWCal03"
         'lTestName = "CWVal"
@@ -63,12 +64,13 @@ Module HSPFOutputReports
         'lTestName = "Thief_R"
         'pConstituents.Add("Water")
         'pConstituents.Add("FColi")
-        pConstituents.Add("Sediment")
+        'pConstituents.Add("Sediment")
         'pConstituents.Add("N-PQUAL")
         'pConstituents.Add("P-PQUAL")
         'pConstituents.Add("BOD-PQUAL")
         'pConstituents.Add("TotalN")
         'pConstituents.Add("TotalP")
+        pConstituents.Add("AGCHEM")
 
         Select Case lTestName
             Case "CRY"
@@ -234,6 +236,14 @@ Module HSPFOutputReports
                 pCurveStepType = "NonStep" 'Tony's convention
                 pGraphAnnual = True
                 pRunHSPF = True
+
+            Case "IRW-test-agchem"
+                pTestPath = "S:\BASINS\data\AGCHEM"
+                pBaseName = "IRW-test-agchem"
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pRunHSPF = False
+
             Case "upatoi"
                 'pTestPath = "H:\canopy"
                 pTestPath = "H:\EB"
@@ -585,8 +595,16 @@ Module HSPFOutputReports
 
             Dim lReportCons As New atcReport.ReportText
             Dim lOutFileName As String = ""
+
+            Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
+            Logger.Dbg("Summary at " & lLocations.Count & " locations")
+
+            lReportCons = HspfSupport.atcHspfAGCHEM.Report(lHspfUci, pBaseName, lHspfBinDataSource, lLocations, lRunMade)
+            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_AGCHEM.txt"
+            SaveFileString(lOutFileName, lReportCons.ToString)
+
             'If lConstituent <> "Sediment" Then
-            '    HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears, pIdsPerSeg).ToString()
+            '    lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears, pIdsPerSeg)
             '    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverland.txt"
             '    SaveFileString(lOutFileName, lReportCons.ToString)
             '    lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True, pWaterYears, pIdsPerSeg)
@@ -610,8 +628,6 @@ Module HSPFOutputReports
             SaveFileString(lOutFileName, lReportCons.ToString)
             lReportCons = Nothing
 
-            Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
-            Logger.Dbg("Summary at " & lLocations.Count & " locations")
             'constituent balance
             lReportCons = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _

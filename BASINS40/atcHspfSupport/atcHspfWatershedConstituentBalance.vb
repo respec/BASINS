@@ -367,12 +367,11 @@ Public Module WatershedConstituentBalance
                                                     lMult = 1 / 1000000000.0 '10^9
                                                 End If
                                                 Dim lAttribute As atcDefinedValue
-                                                Select Case lConstituentDataName
-                                                    Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT", "DETS", "SLDS"
-                                                        lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
-                                                    Case Else
-                                                        lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
-                                                End Select
+                                                If ConstitientsThatUseLast.Contains(lConstituentDataName) Then
+                                                    lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
+                                                Else
+                                                    lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                                End If
                                                 If lAttribute Is Nothing Then
                                                     lValue = GetNaN()
                                                 Else
