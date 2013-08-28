@@ -52,11 +52,21 @@ Public Module modStat
         lStr &= vbCrLf
 
         Dim lTSer1 As atcTimeseries = Aggregate(aTser1, aTimeUnit, 1, lTran)
+        If lTSer1 Is Nothing Then
+            Return lStr & "Could not aggregate" & aTser1.ToString
+        End If
+
         Dim lTSer2 As atcTimeseries = Aggregate(aTSer2, aTimeUnit, 1, lTran)
+        If lTSer2 Is Nothing Then
+            Return lStr & "Could not aggregate " & aTSer2.ToString
+        End If
 
         Dim lTSerOpt As atcTimeseries = Nothing
         If aTserOpt IsNot Nothing Then
             lTSerOpt = Aggregate(aTserOpt, aTimeUnit, 1, lTran)
+            If lTSerOpt Is Nothing Then
+                Return lStr & "Could not aggregate " & lTSerOpt.ToString
+            End If
         End If
 
         If aListIntervalValues Then
