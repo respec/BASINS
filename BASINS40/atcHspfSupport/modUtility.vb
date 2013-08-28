@@ -5,55 +5,63 @@ Imports atcUCI
 
 Public Module Utility
 
-    Public ConstitientsThatUseLast As New Generic.List(Of String)({"BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT", "DETS", "SLDS", _
-                                                "ABOVE-GROUND PLANT STORAGE", _
-                                                "LITTER STORAGE", _
-                                                "PLANT N - SURFACE LAYER STORAGE", _
-                                                "PLANT N - UPPER PRINCIPAL STORAGE", _
-                                                "PLANT N - LOWER LAYER STORAGE", _
-                                                "PLANT N - ACTIVE GROUNDWATER STORAGE", _
-                                                "PLANT N - TOTAL STORAGE", _
-                                                "TOTAL N - TOTAL STORAGE", _
-                                                "NH4-N SOL - SURFACE LAYER STORAGE", _
-                                                "NH4-N SOL - UPPER PRINCIPAL STORAGE", _
-                                                "NH4-N SOL - UPPER TRANSITORY STORAGE", _
-                                                "NH4-N SOL - LOWER LAYER STORAGE", _
-                                                "NH4-N SOL - ACTIVE GROUNDWATER STORAGE", _
-                                                "NH4-N SOL - TOTAL STORAGE", _
-                                                "NH4-N ADS - SURFACE LAYER STORAGE", _
-                                                "NH4-N ADS - UPPER PRINCIPAL STORAGE", _
-                                                "NH4-N ADS - UPPER TRANSITORY STORAGE", _
-                                                "NH4-N ADS - LOWER LAYER STORAGE", _
-                                                "NH4-N ADS - ACTIVE GROUNDWATER STORAGE", _
-                                                "NH4-N ADS - TOTAL STORAGE", _
-                                                "NO3/2-N - SURFACE LAYER STORAGE", _
-                                                "NO3/2-N - UPPER PRINCIPAL STORAGE", _
-                                                "NO3/2-N - UPPER TRANSITORY STORAGE", _
-                                                "NO3/2-N - LOWER LAYER STORAGE", _
-                                                "NO3/2-N - ACTIVE GROUNDWATER STORAGE", _
-                                                "NO3/2-N - TOTAL STORAGE", _
-                                                "SOL LABIL ORGANIC N - SURFACE LAYER STORAGE", _
-                                                "SOL LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", _
-                                                "SOL LABIL ORGANIC N - UPPER TRANSITORY STORAGE", _
-                                                "SOL LABIL ORGANIC N - LOWER LAYER STORAGE", _
-                                                "SOL LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
-                                                "SOL LABIL ORGANIC N - TOTAL STORAGE", _
-                                                "ADS LABIL ORGANIC N - SURFACE LAYER STORAGE", _
-                                                "ADS LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", _
-                                                "ADS LABIL ORGANIC N - LOWER LAYER STORAGE", _
-                                                "ADS LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
-                                                "ADS LABIL ORGANIC N - TOTAL STORAGE", _
-                                                "SOL REFR ORGANIC N - SURFACE LAYER STORAGE", _
-                                                "SOL REFR ORGANIC N - UPPER PRINCIPAL STORAGE", _
-                                                "SOL REFR ORGANIC N - UPPER TRANSITORY STORAGE", _
-                                                "SOL REFR ORGANIC N - LOWER LAYER STORAGE", _
-                                                "SOL REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
-                                                "SOL REFR ORGANIC N - TOTAL STORAGE", _
-                                                "ADS REFR ORGANIC N - SURFACE LAYER STORAGE", _
-                                                "ADS REFR ORGANIC N - UPPER PRINCIPAL STORAGE", _
-                                                "ADS REFR ORGANIC N - LOWER LAYER STORAGE", _
-                                                "ADS REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
-                                                "ADS REFR ORGANIC N - TOTAL STORAGE"})
+    Public Function ConstituentsThatUseLast() As Generic.List(Of String)
+        Static pConstituentsThatUseLast As Generic.List(Of String) = Nothing
+        If pConstituentsThatUseLast Is Nothing Then
+            Dim lConstituentsThatUseLastArray() As String = _
+                {"BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT", "DETS", "SLDS", _
+                "ABOVE-GROUND PLANT STORAGE", _
+                "LITTER STORAGE", _
+                "PLANT N - SURFACE LAYER STORAGE", _
+                "PLANT N - UPPER PRINCIPAL STORAGE", _
+                "PLANT N - LOWER LAYER STORAGE", _
+                "PLANT N - ACTIVE GROUNDWATER STORAGE", _
+                "PLANT N - TOTAL STORAGE", _
+                "TOTAL N - TOTAL STORAGE", _
+                "NH4-N SOL - SURFACE LAYER STORAGE", _
+                "NH4-N SOL - UPPER PRINCIPAL STORAGE", _
+                "NH4-N SOL - UPPER TRANSITORY STORAGE", _
+                "NH4-N SOL - LOWER LAYER STORAGE", _
+                "NH4-N SOL - ACTIVE GROUNDWATER STORAGE", _
+                "NH4-N SOL - TOTAL STORAGE", _
+                "NH4-N ADS - SURFACE LAYER STORAGE", _
+                "NH4-N ADS - UPPER PRINCIPAL STORAGE", _
+                "NH4-N ADS - UPPER TRANSITORY STORAGE", _
+                "NH4-N ADS - LOWER LAYER STORAGE", _
+                "NH4-N ADS - ACTIVE GROUNDWATER STORAGE", _
+                "NH4-N ADS - TOTAL STORAGE", _
+                "NO3/2-N - SURFACE LAYER STORAGE", _
+                "NO3/2-N - UPPER PRINCIPAL STORAGE", _
+                "NO3/2-N - UPPER TRANSITORY STORAGE", _
+                "NO3/2-N - LOWER LAYER STORAGE", _
+                "NO3/2-N - ACTIVE GROUNDWATER STORAGE", _
+                "NO3/2-N - TOTAL STORAGE", _
+                "SOL LABIL ORGANIC N - SURFACE LAYER STORAGE", _
+                "SOL LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", _
+                "SOL LABIL ORGANIC N - UPPER TRANSITORY STORAGE", _
+                "SOL LABIL ORGANIC N - LOWER LAYER STORAGE", _
+                "SOL LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
+                "SOL LABIL ORGANIC N - TOTAL STORAGE", _
+                "ADS LABIL ORGANIC N - SURFACE LAYER STORAGE", _
+                "ADS LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", _
+                "ADS LABIL ORGANIC N - LOWER LAYER STORAGE", _
+                "ADS LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
+                "ADS LABIL ORGANIC N - TOTAL STORAGE", _
+                "SOL REFR ORGANIC N - SURFACE LAYER STORAGE", _
+                "SOL REFR ORGANIC N - UPPER PRINCIPAL STORAGE", _
+                "SOL REFR ORGANIC N - UPPER TRANSITORY STORAGE", _
+                "SOL REFR ORGANIC N - LOWER LAYER STORAGE", _
+                "SOL REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
+                "SOL REFR ORGANIC N - TOTAL STORAGE", _
+                "ADS REFR ORGANIC N - SURFACE LAYER STORAGE", _
+                "ADS REFR ORGANIC N - UPPER PRINCIPAL STORAGE", _
+                "ADS REFR ORGANIC N - LOWER LAYER STORAGE", _
+                "ADS REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
+                "ADS REFR ORGANIC N - TOTAL STORAGE"}
+            pConstituentsThatUseLast = New Generic.List(Of String)(lConstituentsThatUseLastArray)
+        End If
+        Return pConstituentsThatUseLast
+    End Function
 
     Friend Function ConstituentsToOutput(ByVal aType As String, _
                                 Optional ByVal aCategory As Boolean = False) As atcCollection
@@ -389,6 +397,26 @@ Public Module Utility
                 lConstituentsToOutput.Add("R:Header15", "Totals")
                 lConstituentsToOutput.Add("R:P-TOT-IN", "  P-TOT-IN")
                 lConstituentsToOutput.Add("R:P-TOT-OUT", "  P-TOT-OUT")
+            Case ("BOD")
+                lConstituentsToOutput.Add("P:Header1", "BOD")
+                lConstituentsToOutput.Add("P:WASHQS-BOD", "  WASHQS")
+                lConstituentsToOutput.Add("P:SOQUAL-BOD", "  SOQUAL")
+                lConstituentsToOutput.Add("P:IOQUAL-BOD", "  IOQUAL")
+                lConstituentsToOutput.Add("P:AOQUAL-BOD", "  AOQUAL")
+                lConstituentsToOutput.Add("P:POQUAL-BOD", "  POQUAL")
+
+                lConstituentsToOutput.Add("I:Header2", "BOD")
+                lConstituentsToOutput.Add("I:SOQUAL-BOD", "  SOQUAL")
+
+                lConstituentsToOutput.Add("R:Header3", "BOD")
+                lConstituentsToOutput.Add("R:BODIN", "  BODIN")
+                lConstituentsToOutput.Add("R:BODFLUX-BODDEC", "  BODFLUX-BODDEC")
+                lConstituentsToOutput.Add("R:BODFLUX-SINK", "  BODFLUX-SINK")
+                lConstituentsToOutput.Add("R:BODFLUX-BENTHAL", "  BODFLUX-BENTHAL")
+                lConstituentsToOutput.Add("R:BODFLUX-PHYTO", "  BODFLUX-PHYTO")
+                lConstituentsToOutput.Add("R:BODFLUX-ZOO", "  R:BODFLUX-ZOO")
+                lConstituentsToOutput.Add("R:BODFLUX-BENTHIC", "  BODFLUX-BENTHIC")
+                lConstituentsToOutput.Add("R:BODOUTTOT", "  BODOUTTOT")
 
         End Select
         Return lConstituentsToOutput
