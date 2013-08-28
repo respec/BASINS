@@ -202,7 +202,8 @@ Public Module atcHspfAGCHEM
         'aOperationTypes.Add("R:", "RCHRES")
 
         For Each lOperationKey As String In aOperationTypes.Keys
-            For Each lConstituentsToOutput As atcCollection In {AllQuantity(), AllStorages(), AllFluxes()}
+            Dim lConstLists() As atcCollection = {AllQuantity(), AllStorages(), AllFluxes()}
+            For Each lConstituentsToOutput As atcCollection In lConstLists
                 For Each lLocation As String In aLocations
                     If lLocation.StartsWith(lOperationKey) Then
                         'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
@@ -236,7 +237,7 @@ Public Module atcHspfAGCHEM
                                                 lSeasons = New atcSeasonsCalendarYear
                                             End If
                                             Dim lSeasonalAttributes As New atcDataAttributes
-                                            If ConstitientsThatUseLast.Contains(lConstituentKey) Then
+                                            If ConstituentsThatUseLast.Contains(lConstituentKey) Then
                                                 lSeasonalAttributes.SetValue("Last", 0) 'fluxes are last from daily, monthly or annual to annual
                                             Else
                                                 lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
@@ -307,7 +308,7 @@ Public Module atcHspfAGCHEM
                                             '        lMult = 1 / 1000000000.0 '10^9
                                             'End Select
 
-                                            If ConstitientsThatUseLast.Contains(lConstituentKey) Then
+                                            If ConstituentsThatUseLast.Contains(lConstituentKey) Then
                                                 lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
                                                 lStateVariable = True
                                             Else

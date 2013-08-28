@@ -66,6 +66,9 @@ Public Class atcExpertSystem
             Dim lExsRecord As String = lExsRecords(0).PadRight(51)
             pName = lExsRecord.Substring(0, 8)
             Dim lNSites As Integer = lExsRecord.Substring(8, 5)
+            If lNSites = 0 Then
+                Throw New ApplicationException("The number of sites is 0. Program will quit!")
+            End If
             Dim lCurSite As Integer = lExsRecord.Substring(14, 5)
             pLatMin = lExsRecord.Substring(19, 8)
             pLatMax = lExsRecord.Substring(27, 8)
@@ -74,6 +77,7 @@ Public Class atcExpertSystem
             If lExsRecord.Length = 51 Then
                 SDateJ = pUci.GlobalBlock.SDateJ
                 EDateJ = pUci.GlobalBlock.EdateJ
+                Logger.Dbg("The simulation time period from the uci file is used for the calibration!")
             Else 'the user could be entering dates on this line if calib period diff from sim period
                 lExsRecord.PadRight(70)
                 Dim lDate(5) As Integer
@@ -87,20 +91,25 @@ Public Class atcExpertSystem
                 lDate(1) = lExsRecord.Substring(66, 2)
                 lDate(2) = lExsRecord.Substring(68, 2)
                 EDateJ = Date2J(lDate)
+                Logger.Dbg("The simulation time period from the exs file is used for the calibration")
             End If
 
             'Default unspecified lat/integer min/max values to contiguous 48 states
             If ((pLatMin < 0.01) And (pLatMin > -0.01)) Then
                 pLatMin = 24
+                Logger.Dbg("Minimum Latitude was not provided, a value of 24 is being assumed")
             End If
             If ((pLatMax < 0.01) And (pLatMax > -0.01)) Then
                 pLatMax = 50
+                Logger.Dbg("Maximum Latitude was not provided, a value of 50 is being assumed")
             End If
             If ((pLngMin < 0.01) And (pLngMin > -0.01)) Then
                 pLngMin = 66
+                Logger.Dbg("Minimum Longitude was not provided, a value of 66 is being assumed")
             End If
             If ((pLngMax < 0.01) And (pLngMax > -0.01)) Then
                 pLngMax = 125
+                Logger.Dbg("Maximum Longiude was not provided, a value of 125 is being assumed")
             End If
 
             'Read Site block
@@ -109,6 +118,7 @@ Public Class atcExpertSystem
                 Dim lDsn(9) As Integer
                 For lConsIndex As Integer = 0 To 9
                     lDsn(lConsIndex) = lExsRecord.Substring(lConsIndex * 4, 4)
+                    If lDsn(lConsIndex) = 0 Then Throw New ApplicationException(lConsIndex & "DSN is missing for site" & lSiteIndex & ". Program will quit!")
                 Next lConsIndex
                 Dim lStatDN As Integer = lExsRecord.Substring(42, 2)  '0 or 1
                 Dim lName As String = lExsRecord.Substring(45).Replace(vbCr, "").Trim
@@ -450,10 +460,14 @@ Public Class atcExpertSystem
                 End With
                 'Get data - daily values and max values as necessary
                 Dim lTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lDSN))
-                If lTSer Is Nothing Then Stop
+                If lTSer Is Nothing Then
+                    Logger.Msg("Data set Number " & lDSN & " was not found. Program will quit.")
+                    Stop
+                End If
                 'subset by date to simulation period
                 Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, SDateJ, EDateJ, Nothing)
                 If lNewTSer Is Nothing Then Stop
+
                 'don't Clear lTSer as that will clear the original, precluding its future use
                 lTSer = Nothing
 
@@ -475,6 +489,7 @@ Public Class atcExpertSystem
 
                 If lDataProblem Then  'if we weren't able to retrieve the data set
                     'set Stats to undefined
+
                     ZipR(pStatistics.Count, GetNaN, pStats, lStatGroup, lSiteIndex)
                     Logger.Msg("Unable to retrieve DSN " & lDSN & vbCrLf & _
                                "from the file " & aDataSource.Name, "Bad Data Set")
@@ -508,6 +523,8 @@ Public Class atcExpertSystem
                             TIMADD(lTmpDate, lTimeUnit, lTimeStep, lTimeStep, lTmpDate)
                         Next i
                     End If
+                    Logger.Dbg("December, January, and February are winter months!")
+                    Logger.Dbg("JUne, July and August are summer months!")
 
                     If (lStatGroup >= 1 And lStatGroup <= 4) Then  'calc storm info
                         pStats(4, lStatGroup, lSiteIndex) = 0.0# 'initialize storm volume
@@ -533,8 +550,10 @@ Public Class atcExpertSystem
                                         End If
                                         If (lTmpDate(1) = 12 Or lTmpDate(1) = 1 Or lTmpDate(1) = 2) Then 'in the winter
                                             pStats(10, lStatGroup, lSiteIndex) += lValues(i)
+
                                         ElseIf (lTmpDate(1) = 6 Or lTmpDate(1) = 7 Or lTmpDate(1) = 8) Then 'in the summer
                                             pStats(9, lStatGroup, lSiteIndex) += lValues(i)
+
                                         End If
                                         TIMADD(lTmpDate, lTimeUnit, lTimeStep, lTimeStep, lTmpDate)
                                     Next i
@@ -543,7 +562,8 @@ Public Class atcExpertSystem
                             End If
                         Next
                     End If
-
+                    Logger.Dbg("December, January, and February are assumed to be winter months for winnter storm volume!")
+                    Logger.Dbg("June, July and August are assumed to be the summer months for the summer flow volume!")
                     If (lStatGroup = 1 Or lStatGroup = 2) Then 'Change flows to recessions
                         Dim lRecessionTimser As atcTimeseries = lDailyTSer.Clone
                         'save first data value

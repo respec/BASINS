@@ -35,7 +35,7 @@ Public Module WatershedSummary
                 lTotalUnits = "cfs"
                 lRchresConstituents.Add("ROVOL")
                 lRchresConversion = "723.97"
-            Case "BOD"
+            Case "BOD-PQUAL"
                 lPerlndConstituents.Add("POQUAL-BOD")
                 lImplndConstituents.Add("SOQUAL-BOD")
                 lRchresConstituents.Add("BODOUTTOT")
@@ -156,7 +156,9 @@ Public Module WatershedSummary
                     End If
                     If lTempDataGroup.FindData("Constituent", lAgchemConstituent).Count > 0 Then
                         'if you find the agchem constituent, use it
+                        'lTempDataSet = SubsetByDate(lTempDataGroup.FindData("Constituent", lAgchemConstituent).Item(0), aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ, Nothing)
                         lTempDataSet = lTempDataGroup.FindData("Constituent", lAgchemConstituent).Item(0)
+
                         lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
                     Else
                         'normal case -- don't have the agchem constituent
@@ -169,6 +171,7 @@ Public Module WatershedSummary
                         lValue = 0.0
                         For Each lConstituent As String In lConstituents
                             If lTempDataGroup.FindData("Constituent", lConstituent).Count > 0 Then
+                                'lTempDataSet = SubsetByDate(lTempDataGroup.FindData("Constituent", lConstituent).Item(0), aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ, Nothing)
                                 lTempDataSet = lTempDataGroup.FindData("Constituent", lConstituent).Item(0)
                                 Dim lMult As Single = 1.0
                                 If lConstituent = "POQUAL-BOD" Or lConstituent = "SOQUAL-BOD" Then
@@ -218,6 +221,7 @@ Public Module WatershedSummary
                 lValue = 0.0
                 For Each lConstituent As String In lRchresConstituents
                     If lTempDataGroup.FindData("Constituent", lConstituent).Count > 0 Then
+                        'lTempDataSet = SubsetByDate(lTempDataGroup.FindData("Constituent", lConstituent).Item(0), aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ, Nothing)
                         lTempDataSet = lTempDataGroup.FindData("Constituent", lConstituent).Item(0)
                         Dim lMult As Single = 1.0
                         If lConstituent = "BODOUTTOT" Then

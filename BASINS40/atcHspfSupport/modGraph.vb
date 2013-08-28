@@ -35,7 +35,7 @@ Public Module Graph
         Dim lOutFileBase As String = aOutFolderName & aCons & "_" & aSite
         Dim lZgc As ZedGraphControl
 
-        'InitMatchingColors(FindFile("", "GraphColors.txt")) 'Becky moved this here from atcGraph10/CreateZgc so that
+        InitMatchingColors(FindFile("Please locate GraphColors.txt", "GraphColors.txt")) 'Becky moved this here from atcGraph10/CreateZgc so that
         'the file is found ONCE instead of a gazillion times and the colors are initialized ONCE rather than a gazillion
         'times
 
