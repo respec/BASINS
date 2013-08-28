@@ -367,7 +367,7 @@ Public Module WatershedConstituentBalance
                                                     lMult = 1 / 1000000000.0 '10^9
                                                 End If
                                                 Dim lAttribute As atcDefinedValue
-                                                If ConstitientsThatUseLast.Contains(lConstituentDataName) Then
+                                                If ConstituentsThatUseLast.Contains(lConstituentDataName) Then
                                                     lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
                                                 Else
                                                     lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")

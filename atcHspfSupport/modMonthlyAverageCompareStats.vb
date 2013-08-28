@@ -40,13 +40,17 @@ Public Module MonthlyAverageCompareStats
         Dim lSeasonalAttributes As New atcDataAttributes
         lSeasonalAttributes.SetValue("Mean", 0) 'fluxes are summed from daily, monthly or annual to annual
 
-        Dim lNewSimTSerMonth As atcTimeseries = Aggregate(lNewSimTSer, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
         Dim lNewSimTSerMonthCalculatedAttributes As New atcDataAttributes
-        lSeasons.SetSeasonalAttributes(lNewSimTSerMonth, lSeasonalAttributes, lNewSimTSerMonthCalculatedAttributes)
+        Dim lNewSimTSerMonth As atcTimeseries = Aggregate(lNewSimTSer, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+        If lNewSimTSerMonth IsNot Nothing Then
+            lSeasons.SetSeasonalAttributes(lNewSimTSerMonth, lSeasonalAttributes, lNewSimTSerMonthCalculatedAttributes)
+        End If
 
-        Dim lNewObsTSerMonth As atcTimeseries = Aggregate(lNewObsTSer, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
         Dim lNewObsTSerMonthCalculatedAttributes As New atcDataAttributes
-        lSeasons.SetSeasonalAttributes(lNewObsTSerMonth, lSeasonalAttributes, lNewObsTSerMonthCalculatedAttributes)
+        Dim lNewObsTSerMonth As atcTimeseries = Aggregate(lNewObsTSer, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+        If lNewObsTSerMonth IsNot Nothing Then
+            lSeasons.SetSeasonalAttributes(lNewObsTSerMonth, lSeasonalAttributes, lNewObsTSerMonthCalculatedAttributes)
+        End If
 
         lStr &= Space(8) & vbTab & "Average".PadLeft(12) _
                          & vbTab & "Average".PadLeft(12) _

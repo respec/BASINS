@@ -51,7 +51,7 @@ Public Module ConstituentBalance
                 lReport.AppendLine("   (Units:mm)")
             End If
         ElseIf aBalanceType = "Sediment" Then
-            aDecimalPlaces = 1 'TODO: adjust in calling routine?
+            'aDecimalPlaces = 1 'TODO: adjust in calling routine?
         End If
         lReport.AppendLine(vbCrLf)
 
@@ -81,7 +81,7 @@ Public Module ConstituentBalance
                                     lConstituentKey = lConstituentKey.Remove(0, 2)
                                     Dim lConstituentDataGroup As atcTimeseriesGroup = lLocationDataGroup.FindData("Constituent", lConstituentKey)
                                     If lConstituentDataGroup.Count > 0 Then
-                                        Dim lTempDataSet As atcDataSet = SubsetByDate(lConstituentDataGroup.Item(0), aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ, Nothing)
+                                        Dim lTempDataSet As atcDataSet = lConstituentDataGroup.Item(0)
                                         Dim lSeasons As atcSeasonBase
                                         If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
                                             lSeasons = New atcSeasonsWaterYear
@@ -89,7 +89,7 @@ Public Module ConstituentBalance
                                             lSeasons = New atcSeasonsCalendarYear
                                         End If
                                         Dim lSeasonalAttributes As New atcDataAttributes
-                                        If ConstitientsThatUseLast.Contains(lConstituentKey) Then                                            
+                                        If ConstituentsThatUseLast.Contains(lConstituentKey) Then
                                             lSeasonalAttributes.SetValue("Last", 0) 'fluxes are last from daily, monthly or annual to annual
                                         Else
                                             lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
@@ -160,7 +160,7 @@ Public Module ConstituentBalance
                                                 lMult = 1 / 1000000000.0 '10^9
                                         End Select
 
-                                        If ConstitientsThatUseLast.Contains(lConstituentKey) Then
+                                        If ConstituentsThatUseLast.Contains(lConstituentKey) Then
                                             lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
                                             lStateVariable = True
                                         Else

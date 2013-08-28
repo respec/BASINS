@@ -11,7 +11,7 @@ Public Module ConstituentBudget
                            ByVal aScenarioResults As atcTimeseriesSource, _
                            ByVal aRunMade As String) As atcReport.IReport
 
-        Dim lNumberFormat As String = "#,##0.0"
+        Dim lNumberFormat As String = "#,##0.00"
         Dim lUnits As String = ""
         Dim lNonpointData As New atcTimeseriesGroup
 
@@ -66,10 +66,8 @@ Public Module ConstituentBudget
                 Dim lAreas As New atcCollection
                 LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
-                Dim lNonpointTons As Double = TotalForReach(lID, lAreas, lNonpointData)
-
-                'TODO: actually find point tons
-                Dim lPointTons As Double = 0
+                Dim lNonpointTons As Double = TotalForReach(lID, lAreas, lNonpointData) 'This calculation assumes that multiplication factor in
+                'in MASS-LINK Blocks sum to 1. Should be able to get sum of Mult Factors for SSED1, 2 and 3 from the uci.
 
                 Dim lUpstreamIn As Double = 0
                 If lUpstreamInflows.Keys.Contains(lID.Id) Then
@@ -77,7 +75,14 @@ Public Module ConstituentBudget
                 End If
 
                 'TODO: these two formulations are slightly different - WHY?
-                Dim lTotalInflow As Double = lNonpointTons + lPointTons + lUpstreamIn
+
+                'Anurag commentedout following line on July 12, 2012, to account for any mult factor in MASS-LINK block.
+                'Dim lTotalInflow As Double = lNonpointTons + lPointTons + lUpstreamIn
+                'Anurag added following lines
+                Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
+                'lNonpointTons = lTotalInflow - lUpstreamIn
+                'Anurag changes are over
+                Dim lPointTons As Double = lTotalInflow - lNonpointTons - lUpstreamIn
                 'Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData) 'TotalForReach(lID, lAreas, lTotalInflowData)
 
                 Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
@@ -127,21 +132,26 @@ Public Module ConstituentBudget
                                    ByVal aAreas As atcCollection, _
                                    ByVal aNonpointData As atcTimeseriesGroup) As Double
         Dim lTotal As Double = 0
-
+        'Dim lNewTotal As Double = 0
         For lAreaIndex As Integer = 0 To aAreas.Count - 1
             Dim lLocation As String = aAreas.Keys(lAreaIndex)
             Dim lArea As Double = aAreas.ItemByIndex(lAreaIndex)
+            'Logger.Dbg("Area is " & lArea)
+            'Dim lSubTotal As Double = 0
             For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lLocation)
+                'lSubTotal += lTs.Attributes.GetValue("SumAnnual")
                 lTotal += lArea * lTs.Attributes.GetValue("SumAnnual")
             Next
+            'lNewTotal += lArea * lSubTotal
         Next
+        'Logger.Dbg("difference " & lTotal - lNewTotal) '"SumAnnual is " & lTs.Attributes.GetValue("SumAnnual"))
         Return lTotal
     End Function
 
     Private Function ValueForReach(ByVal aReach As HspfOperation, _
                                    ByVal aReachData As atcTimeseriesGroup) As Double
         Dim lReachData As atcTimeseries = aReachData.FindData("Location", "R:" & aReach.Id).Item(0)
-        Dim lOutflow As Double = lReachData.Attributes.GetDefinedValue("SumAnnual").Value
+        Dim lOutflow As Double = lReachData.Attributes.GetValue("SumAnnual")
         Return lOutflow
     End Function
 
