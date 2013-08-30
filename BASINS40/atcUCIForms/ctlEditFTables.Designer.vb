@@ -107,13 +107,14 @@ Partial Class ctlEditFTables
         Me.txtNCols.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.txtNCols.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtNCols.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.txtNCols.DefaultValue = 4
+        Me.txtNCols.DefaultValue = "4"
         Me.txtNCols.HardMax = 8
         Me.txtNCols.HardMin = 4
         Me.txtNCols.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtNCols.Location = New System.Drawing.Point(419, 75)
         Me.txtNCols.MaxWidth = 0
         Me.txtNCols.Name = "txtNCols"
+        Me.txtNCols.NumericFormat = "0.#####"
         Me.txtNCols.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtNCols.OutsideSoftLimitBackground = System.Drawing.Color.Empty
         Me.txtNCols.SelLength = 0
@@ -122,20 +123,22 @@ Partial Class ctlEditFTables
         Me.txtNCols.SoftMax = -999
         Me.txtNCols.SoftMin = -999
         Me.txtNCols.TabIndex = 6
-        Me.txtNCols.ValueInteger = CType(4, Long)
+        Me.txtNCols.ValueDouble = 4
+        Me.txtNCols.ValueInteger = 4
         '
         'txtNRows
         '
         Me.txtNRows.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.txtNRows.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtNRows.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.txtNRows.DefaultValue = 1
-        Me.txtNRows.HardMax = 25
+        Me.txtNRows.DefaultValue = "1"
+        Me.txtNRows.HardMax = 250
         Me.txtNRows.HardMin = 1
         Me.txtNRows.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtNRows.Location = New System.Drawing.Point(419, 46)
         Me.txtNRows.MaxWidth = 0
         Me.txtNRows.Name = "txtNRows"
+        Me.txtNRows.NumericFormat = "0.#####"
         Me.txtNRows.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.txtNRows.OutsideSoftLimitBackground = System.Drawing.Color.Empty
         Me.txtNRows.SelLength = 0
@@ -144,7 +147,8 @@ Partial Class ctlEditFTables
         Me.txtNRows.SoftMax = -999
         Me.txtNRows.SoftMin = -999
         Me.txtNRows.TabIndex = 5
-        Me.txtNRows.ValueInteger = CType(1, Long)
+        Me.txtNRows.ValueDouble = 1
+        Me.txtNRows.ValueInteger = 1
         '
         'grdEdit
         '
@@ -154,6 +158,7 @@ Partial Class ctlEditFTables
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grdEdit.CellBackColor = System.Drawing.Color.Empty
+        Me.grdEdit.Fixed3D = False
         Me.grdEdit.LineColor = System.Drawing.Color.Empty
         Me.grdEdit.LineWidth = 0.0!
         Me.grdEdit.Location = New System.Drawing.Point(12, 46)
