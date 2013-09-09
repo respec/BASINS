@@ -24,7 +24,7 @@ Friend Module modATCscript
     Public FixedColumns As Boolean 'True if columns are fixed width
     Public ColumnDelimiter As String 'character that delimits columns if FixedColumns is False
     Public NumColumnDelimiters As Integer 'ColumnDelimiter may contain more than one delimiter character
-    Public ColDefs() As clsATCscriptExpression.ColDef 'Names of columns (and start/width if FixedColumns) (1..NamesColumns)
+    Public ColDefs() As clsATCscriptExpression.ColDef 'Names of columns (and start/width if FixedColumns) (1..NamedColumns)
     'ColDefs(0) stores info about the first repeating column
     Public NamedColumns As Integer 'Number of cols defined in ColDefs (there may be gaps if delimited)
     Public RepeatStartCol As Integer 'First column that repeats
@@ -529,7 +529,9 @@ Friend Module modATCscript
 
                                 If FillTS > 0 Then
                                     Dim lFilledTS As atcTimeseries = FillValues(.ts, FillTU, FillTS, FillVal, FillMissing, FillAccum)
-                                    lFilledTS.Attributes.ChangeTo(.ts.Attributes)
+                                    For Each lAttribute As atcDefinedValue In .ts.Attributes
+                                        lFilledTS.Attributes.SetValueIfMissing(lAttribute.Definition.Name, lAttribute.Value)
+                                    Next
                                     .ts.Dates.Clear()
                                     .ts.Clear()
                                     .ts = lFilledTS

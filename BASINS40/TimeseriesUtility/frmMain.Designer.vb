@@ -47,6 +47,7 @@ Partial Class frmMain
         Me.btnGenerateMath = New System.Windows.Forms.Button()
         Me.btnHelp = New System.Windows.Forms.Button()
         Me.pictureLogo = New System.Windows.Forms.PictureBox()
+        Me.btnAbout = New System.Windows.Forms.Button()
         Me.grpView.SuspendLayout()
         Me.grpSave.SuspendLayout()
         Me.grpGenerate.SuspendLayout()
@@ -140,10 +141,10 @@ Partial Class frmMain
         '
         'btnDump
         '
-        Me.btnDump.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnDump.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnDump.Location = New System.Drawing.Point(377, 104)
         Me.btnDump.Name = "btnDump"
-        Me.btnDump.Size = New System.Drawing.Size(119, 23)
+        Me.btnDump.Size = New System.Drawing.Size(117, 23)
         Me.btnDump.TabIndex = 9
         Me.btnDump.Text = "Dump All To Text"
         Me.btnDump.UseVisualStyleBackColor = True
@@ -151,10 +152,10 @@ Partial Class frmMain
         '
         'btnCompare
         '
-        Me.btnCompare.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnCompare.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCompare.Location = New System.Drawing.Point(377, 133)
         Me.btnCompare.Name = "btnCompare"
-        Me.btnCompare.Size = New System.Drawing.Size(119, 23)
+        Me.btnCompare.Size = New System.Drawing.Size(117, 23)
         Me.btnCompare.TabIndex = 10
         Me.btnCompare.Text = "Compare Text"
         Me.btnCompare.UseVisualStyleBackColor = True
@@ -249,7 +250,7 @@ Partial Class frmMain
         'pictureLogo
         '
         Me.pictureLogo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.pictureLogo.Image = Global.TimeseriesUtility.My.Resources.Resources._177x121transparent
+        Me.pictureLogo.Image = Global.TimeseriesUtility.My.Resources.Resources.transparent177x121
         Me.pictureLogo.Location = New System.Drawing.Point(375, 12)
         Me.pictureLogo.Name = "pictureLogo"
         Me.pictureLogo.Size = New System.Drawing.Size(119, 81)
@@ -257,13 +258,22 @@ Partial Class frmMain
         Me.pictureLogo.TabIndex = 18
         Me.pictureLogo.TabStop = False
         '
+        'btnAbout
+        '
+        Me.btnAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnAbout.Location = New System.Drawing.Point(348, 168)
+        Me.btnAbout.Name = "btnAbout"
+        Me.btnAbout.Size = New System.Drawing.Size(70, 23)
+        Me.btnAbout.TabIndex = 19
+        Me.btnAbout.Text = "About"
+        Me.btnAbout.UseVisualStyleBackColor = True
+        '
         'frmMain
         '
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(506, 203)
-        Me.Controls.Add(Me.btnHelp)
         Me.Controls.Add(Me.grpGenerate)
         Me.Controls.Add(Me.grpSave)
         Me.Controls.Add(Me.grpView)
@@ -275,6 +285,8 @@ Partial Class frmMain
         Me.Controls.Add(Me.btnManageFiles)
         Me.Controls.Add(Me.lblFile)
         Me.Controls.Add(Me.pictureLogo)
+        Me.Controls.Add(Me.btnAbout)
+        Me.Controls.Add(Me.btnHelp)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmMain"
@@ -307,5 +319,6 @@ Partial Class frmMain
     Friend WithEvents btnGenerateMath As System.Windows.Forms.Button
     Friend WithEvents btnHelp As System.Windows.Forms.Button
     Friend WithEvents pictureLogo As System.Windows.Forms.PictureBox
+    Friend WithEvents btnAbout As System.Windows.Forms.Button
 
 End Class

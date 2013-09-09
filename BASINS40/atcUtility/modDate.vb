@@ -923,6 +923,23 @@ Public Module modDate
         End While
     End Sub
 
+    ''' <summary>
+    ''' Calculate Julian interval represented by the given number of time steps of the given interval
+    ''' </summary>
+    ''' <param name="aTimeUnit">atcTimeUnit other than Day, Hour, Minute, or Second will return NaN.</param>
+    ''' <param name="aTimeStep">Number of time steps. Usually 1 but can for example be 15 for 15-minute data. or 7 for weekly.</param>
+    ''' <returns>Number of days represented by aTimeStep * aTimeUnit</returns>
+    ''' <remarks>Only time units of days or less are constant interval. Months, Years, and Centuries are not all the same length</remarks>
+    Public Function CalcInterval(ByVal aTimeUnit As atcTimeUnit, ByVal aTimeStep As Integer) As Double
+        Select Case aTimeUnit
+            Case atcTimeUnit.TUDay : Return aTimeStep
+            Case atcTimeUnit.TUHour : Return aTimeStep * JulianHour
+            Case atcTimeUnit.TUMinute : Return aTimeStep * JulianMinute
+            Case atcTimeUnit.TUSecond : Return aTimeStep * JulianSecond
+        End Select
+        Return GetNaN()
+    End Function
+
     Public Function StringToJdate(ByVal aText As String, ByVal aIntervalStart As Boolean) As Double
         Try
             Dim lDateArray(6) As Integer

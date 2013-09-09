@@ -221,9 +221,11 @@ Public Class atcGrid
         End Get
         Set(ByVal newValues As ICollection)
             CellComboBox.Items.Clear()
-            For Each lValue As Object In newValues
-                If Not lValue Is Nothing Then CellComboBox.Items.Add(lValue)
-            Next
+            If newValues IsNot Nothing Then
+                For Each lValue As Object In newValues
+                    If lValue IsNot Nothing Then CellComboBox.Items.Add(lValue)
+                Next
+            End If
         End Set
     End Property
 

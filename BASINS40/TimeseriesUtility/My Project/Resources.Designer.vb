@@ -60,9 +60,9 @@ Namespace My.Resources
             End Set
         End Property
         
-        Friend ReadOnly Property _177x121transparent() As System.Drawing.Bitmap
+        Friend ReadOnly Property transparent177x121() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("177x121transparent", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("transparent177x121", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

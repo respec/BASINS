@@ -3,13 +3,22 @@ Imports MapWinUtility
 
 ''' <summary>
 '''     <para>
-'''         Store attributes (and calculate some attributes if given an
-'''         <see cref="atcData.atcTimeseries">atcTimeseries</see>)
+'''         Store attributes (and calculate some attributes if given an <see cref="atcData.atcTimeseries">atcTimeseries</see>)
 '''     </para>
 ''' </summary>
 ''' <remarks>Attributes are stored as a collection of atcDefinedValue</remarks>
 Public Class atcDataAttributes
-    Inherits atcCollection
+    Implements Generic.IEnumerable(Of atcDefinedValue)
+
+    ''' <summary>
+    ''' Optional storage of attributes that are shared with other data sets, Nothing if not in use.
+    ''' </summary>
+    Public SharedAttributes As atcDataAttributes = Nothing
+
+    ''' <summary>
+    ''' Attributes are stored here, keyed by name
+    ''' </summary>
+    Private pAttributes As New atcCollection
 
     Private pOwner As Object 'atcTimeseries
 
@@ -157,14 +166,11 @@ Public Class atcDataAttributes
     ''' </summary>
     Public Function ValuesSortedByName() As SortedList
         Dim lSortedList As New SortedList(New CaseInsensitiveComparer)
-        For Each lAdv As atcDefinedValue In Me
-            If lAdv.Definition.Name <> "SharedAttributes" Then
-                lSortedList.Add(lAdv.Definition.Name, lAdv.Value)
-            End If
+        For Each lAdv As atcDefinedValue In pAttributes
+            lSortedList.Add(lAdv.Definition.Name, lAdv.Value)
         Next
-        Dim lShared As atcDataAttributes = GetValue("SharedAttributes")
-        If lShared IsNot Nothing Then
-            For Each lSharedAtt As atcDefinedValue In lShared
+        If SharedAttributes IsNot Nothing Then
+            For Each lSharedAtt As atcDefinedValue In SharedAttributes
                 If Not lSortedList.ContainsKey(lSharedAtt.Definition.Name) Then
                     lSortedList.Add(lSharedAtt.Definition.Name, lSharedAtt.Value)
                 End If
@@ -176,14 +182,8 @@ Public Class atcDataAttributes
     'True if aAttributeName has been set
     Public Function ContainsAttribute(ByVal aAttributeName As String) As Boolean
         Dim lKey As String = AttributeNameToKey(aAttributeName)
-        If Keys.Contains(lKey) Then
-            Return True
-        End If
-        Dim lSharedAttributes As atcDataAttributes = GetValue("SharedAttributes")
-        If lSharedAttributes IsNot Nothing Then
-            Return lSharedAttributes.Keys.Contains(lKey)
-        End If
-        Return False
+        Return pAttributes.Keys.Contains(lKey) OrElse _
+            SharedAttributes IsNot Nothing AndAlso SharedAttributes.ContainsAttribute(lKey)
     End Function
 
     Public Function GetFormattedValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As String
@@ -288,8 +288,8 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
     Public Function SetValue(ByVal aAttrDefinition As atcAttributeDefinition, ByVal aValue As Object, Optional ByVal aArguments As atcDataAttributes = Nothing) As Integer
         Dim lKey As String = AttributeNameToKey(aAttrDefinition.Name)
         Dim lDefinedValue As atcDefinedValue
-        Dim lIndex As Integer = MyBase.Keys.IndexOf(lKey)
-        If lIndex = -1 Then
+        Dim lIndex As Integer = pAttributes.Keys.IndexOf(lKey)
+        If lIndex = -1 Then 'Only check pAttributes when setting, do not set any SharedAttributes here.
             lDefinedValue = New atcDefinedValue
             lDefinedValue.Value = aValue
             If aArguments Is Nothing Then 'Add definition for attributes without arguments
@@ -302,7 +302,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
                     lDefinedValue.Definition = aAttrDefinition
                 End If
             End If
-            lIndex = MyBase.Add(lKey, lDefinedValue)
+            lIndex = pAttributes.Add(lKey, lDefinedValue)
         Else  'Update existing attribute value
             lDefinedValue = ItemByIndex(lIndex)
             lDefinedValue.Value = aValue
@@ -317,8 +317,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
     End Sub
 
     Public Sub SetValueIfMissing(ByVal aAttributeName As String, ByVal aAttributeValue As Object)
-        If ItemByKey(AttributeNameToKey(aAttributeName)) Is Nothing Then
-            'Did not find the named attribute, add with supplied value
+        If Not ContainsAttribute(aAttributeName) Then
             Add(aAttributeName, aAttributeValue)
         End If
     End Sub
@@ -338,8 +337,8 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
             Return -1
         Else
             Dim lKey As String = AttributeNameToKey(aDefinedValue.Definition.Name)
-            MyBase.RemoveByKey(lKey)
-            Return MyBase.Add(lKey, aDefinedValue)
+            pAttributes.RemoveByKey(lKey)
+            Return pAttributes.Add(lKey, aDefinedValue)
         End If
     End Function
 
@@ -467,7 +466,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
     End Function
 
     Public Sub New() 'ByVal aTimeseries As atcTimeseries)
-        MyBase.Clear()
+        pAttributes.Clear()
     End Sub
 
     ''' <summary>
@@ -479,6 +478,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         For Each lAdv As atcDefinedValue In aNewItems
             SetValue(lAdv.Definition, lAdv.Value, lAdv.Arguments)
         Next
+        SharedAttributes = Nothing
     End Sub
 
     ''' <summary>
@@ -524,12 +524,15 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Next
     End Sub
 
+    ''' <summary>
+    ''' Discard any calculated attributes. Useful after changing values.
+    ''' </summary>
+    ''' <remarks>Does not affect SharedAttributes.</remarks>
     Public Sub DiscardCalculated()
-        'discard any calculated attributes
         'Step in reverse so we can remove by index without high indexes changing before they are removed
-        For iAttribute As Integer = Count - 1 To 0 Step -1
+        For iAttribute As Integer = pAttributes.Count - 1 To 0 Step -1
             If ItemByIndex(iAttribute).Definition.Calculated Then
-                RemoveAt(iAttribute)
+                pAttributes.RemoveAt(iAttribute)
             End If
         Next
     End Sub
@@ -538,14 +541,11 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Dim lAttribute As atcDefinedValue = Nothing
         Try
             Dim lKey As String = AttributeNameToKey(aAttributeName)
-            lAttribute = ItemByKey(lKey)
+            lAttribute = pAttributes.ItemByKey(lKey)
 
             If lAttribute Is Nothing Then  'Did not find the named attribute
-                If lKey <> "sharedattributes" Then
-                    Dim lSharedAttributes As atcDataAttributes = GetValue("SharedAttributes")
-                    If lSharedAttributes IsNot Nothing Then
-                        lAttribute = lSharedAttributes.ItemByKey(lKey)
-                    End If
+                If SharedAttributes IsNot Nothing Then
+                    lAttribute = SharedAttributes.GetDefinedValue(lKey)
                 End If
                 If lAttribute Is Nothing Then  'Did not find the attribute as shared either
                     If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
@@ -555,17 +555,17 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
                                 Dim lOperation As atcDefinedValue = Nothing
                                 If lDef.Calculated Then
                                     If lDef.Calculator.Name.Contains("n-day") Then
-                                        lOperation = lDef.Calculator.AvailableOperations.ItemByKey(lDef.Name)
+                                        lOperation = lDef.Calculator.AvailableOperations.GetDefinedValue(lDef.Name)
                                         Dim lArgs As New atcDataAttributes
                                         lArgs.SetValue("Timeseries", New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
                                         lDef.Calculator.Open(lKey, lArgs)
-                                        lAttribute = ItemByKey(lKey)
+                                        lAttribute = pAttributes.ItemByKey(lKey)
                                     ElseIf IsSimple(lDef, lKey, lOperation) Then
                                         Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
                                         Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
                                         lArgs.SetValue(lArg.Definition, New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
                                         lDef.Calculator.Open(lKey, lArgs)
-                                        lAttribute = ItemByKey(lKey)
+                                        lAttribute = pAttributes.ItemByKey(lKey)
                                     End If
                                 End If
                             End If
@@ -594,10 +594,10 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
             Case "single", "double", "integer", "boolean", "string", "atctimeunit", "atccollection"
                 If aDef.Calculated Then   'Maybe we can go ahead and calculate it now...
                     If aKey Is Nothing Then aKey = AttributeNameToKey((aDef.Name))
-                    aOperation = aDef.Calculator.AvailableOperations.ItemByKey(aKey)
+                    aOperation = aDef.Calculator.AvailableOperations.GetDefinedValue(aKey)
 
                     If aOperation Is Nothing AndAlso aKey.StartsWith("%") Then
-                        aOperation = aDef.Calculator.AvailableOperations.ItemByKey("%*")
+                        aOperation = aDef.Calculator.AvailableOperations.GetDefinedValue("%*")
                     End If
 
                     If Not aOperation Is Nothing AndAlso Not aOperation.Arguments Is Nothing Then
@@ -615,26 +615,31 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Return False
     End Function
 
-    Public Shadows Property ItemByIndex(ByVal index As Integer) As atcDefinedValue
-        Get
-            Return MyBase.Item(index)
-        End Get
-        Set(ByVal newValue As atcDefinedValue)
-            MyBase.Item(index) = newValue
-        End Set
-    End Property
-
-    Default Public Shadows Property Item(ByVal index As Integer) As atcDefinedValue
-        Get
-            If MyBase.Keys.Count > index Then
-                Return MyBase.Item(index)
-            Else
-                Logger.Dbg("Index " & index & " outOfRange (0," & MyBase.Keys.Count - 1 & ")")
-                Return Nothing
+    Public Function ItemByIndex(ByVal aIndex As Integer) As atcDefinedValue
+        If aIndex >= 0 Then
+            If aIndex < pAttributes.Count Then
+                Return pAttributes.ItemByIndex(aIndex)
+            ElseIf SharedAttributes IsNot Nothing Then
+                Return SharedAttributes.ItemByIndex(aIndex - pAttributes.Count)
             End If
+        End If
+        Throw New InvalidOperationException(aIndex & " out of range 0.." & Count() - 1)
+    End Function
+
+    Default Public Shadows Property Item(ByVal aIndex As Integer) As atcDefinedValue
+        Get
+            Return ItemByIndex(aIndex)
         End Get
         Set(ByVal newValue As atcDefinedValue)
-            MyBase.Item(index) = newValue
+            If aIndex < 0 Then
+                Throw New InvalidOperationException(aIndex & " out of range 0.." & Count() - 1)
+            ElseIf aIndex < pAttributes.Count Then
+                pAttributes.Item(aIndex) = newValue
+            ElseIf SharedAttributes IsNot Nothing Then
+                SharedAttributes.Item(aIndex - pAttributes.Count) = newValue
+            Else
+                Throw New InvalidOperationException(aIndex & " out of range 0.." & Count() - 1)
+            End If
         End Set
     End Property
 
@@ -649,6 +654,67 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
     End Function
 
     Public Shadows Sub RemoveByKey(ByVal aAttributeName As Object)
-        MyBase.RemoveByKey(AttributeNameToKey(aAttributeName))
+        pAttributes.RemoveByKey(AttributeNameToKey(aAttributeName))
     End Sub
+
+    Public Sub Clear()
+        SharedAttributes = Nothing
+        pAttributes.Clear()
+    End Sub
+
+    Public Function Count() As Integer
+        If SharedAttributes Is Nothing Then
+            Return pAttributes.Count
+        Else
+            Return pAttributes.Count + SharedAttributes.Count
+        End If
+    End Function
+
+    Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of atcDefinedValue) Implements System.Collections.Generic.IEnumerable(Of atcDefinedValue).GetEnumerator
+        Return New AttributesEnumerator(Me)
+    End Function
+    Private Function GetEnumerator1() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+        Return GetEnumerator()
+    End Function
+
+    Private Class AttributesEnumerator
+        Implements Generic.IEnumerator(Of atcDefinedValue)
+
+        Dim pAttributes As atcDataAttributes
+        Dim pCurrentIndex As Integer = -1
+        Dim pLastIndex As Integer
+
+        Public Sub New(ByVal aAttributes As atcDataAttributes)
+            pAttributes = aAttributes
+            pLastIndex = pAttributes.Count - 1
+        End Sub
+
+        Public ReadOnly Property Current As atcDefinedValue Implements System.Collections.Generic.IEnumerator(Of atcDefinedValue).Current
+            Get
+                Return pAttributes.ItemByIndex(pCurrentIndex)
+            End Get
+        End Property
+        Private ReadOnly Property Current1 As Object Implements System.Collections.IEnumerator.Current
+            Get
+                Return Me.Current            ' Just return the generic property value
+            End Get
+        End Property
+
+        Public Function MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
+            If pCurrentIndex < pLastIndex Then
+                pCurrentIndex += 1
+                Return True
+            Else
+                Return False
+            End If
+        End Function
+
+        Public Sub Reset() Implements System.Collections.IEnumerator.Reset
+            pCurrentIndex = -1
+        End Sub
+
+        Private Sub Dispose() Implements IDisposable.Dispose
+            'We do not need to dispose anything, but need to implement Dispose
+        End Sub
+    End Class
 End Class

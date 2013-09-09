@@ -264,7 +264,7 @@ Public Class atcDataSource
     End Sub
 
     Protected Overrides Sub Finalize()
-        If pAttributes IsNot Nothing Then pAttributes.Dispose()
+        If pAttributes IsNot Nothing Then pAttributes.Clear()
         If pData IsNot Nothing Then pData.Dispose()
         MyBase.Finalize()
     End Sub

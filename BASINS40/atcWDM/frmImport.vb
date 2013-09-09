@@ -181,12 +181,12 @@ Public Class frmImport
                             lWDM.Open(lWDMFilename)
                         End If
                     End If
-
+                    Dim lCountBefore As Integer = lWDM.DataSets.Count
                     lScript.RunSelectedScript(aScriptFilename, lImportFilename, lWDM)
 
                     If aEach Then lWDM = Nothing
 
-                    lDatasetsImported += lScript.DataSets.Count
+                    lDatasetsImported += lWDM.DataSets.Count - lCountBefore
 
                     lScript.Clear()
                     lFilesImported += 1

@@ -459,4 +459,8 @@ Compare12:
         HideOrShowLogo()
     End Sub
 
+    Private Sub btnAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAbout.Click
+        Dim lAbout As New frmAbout
+        lAbout.Show()
+    End Sub
 End Class
