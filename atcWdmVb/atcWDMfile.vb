@@ -382,8 +382,8 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
             lLastIndex -= 1
         End While
         If lLastIndex < lData.Count - 1 Then
-            lData.RemoveRange(lLastIndex + 1, lData.Count - lLastIndex)
-            lDate.RemoveRange(lLastIndex + 1, lData.Count - lLastIndex)
+            lData.RemoveRange(lLastIndex + 1, lData.Count - lLastIndex - 1)
+            lDate.RemoveRange(lLastIndex + 1, lDate.Count - lLastIndex - 1)
         End If
         'Logger.Dbg("Done Dsn:DataCount:" & aDataSet.Attributes.GetValue("ID") & ":" & lData.Count)
         aDataSet.Dates.Values = lDate.ToArray() 'Set Dates.Values before Values since setting Values automatically allocates empty Dates.Values

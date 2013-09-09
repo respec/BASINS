@@ -472,23 +472,17 @@ Public Class atcTimeseries
     ''' <summary>Set Interval attribute of timeseries based on time unit and time step</summary>
     ''' <param name="aTimeUnit">Unit of time (hour, day, month, etc.)</param>
     ''' <param name="aTimeStep">Number of Time Units in one interval</param>
-    ''' <remarks>Unknown time units leads to removal of Interval attribute</remarks>
+    ''' <remarks>Unknown or greater than daily time units leads to removal of Interval attribute</remarks>
     Public Sub SetInterval(ByVal aTimeUnit As atcTimeUnit, ByVal aTimeStep As Integer)
         With Attributes
             .SetValue("Time Unit", aTimeUnit)
             .SetValue("Time Step", aTimeStep)
-            Select Case aTimeUnit
-                Case atcTimeUnit.TUDay
-                    .SetValue("Interval", aTimeStep)
-                Case atcTimeUnit.TUHour
-                    .SetValue("Interval", aTimeStep / CDbl(24))
-                Case atcTimeUnit.TUMinute
-                    .SetValue("Interval", aTimeStep / CDbl(1440))
-                Case atcTimeUnit.TUSecond
-                    .SetValue("Interval", aTimeStep / CDbl(1440 * 60))
-                Case Else
-                    .RemoveByKey("Interval")
-            End Select
+            Dim lInterval As Double = CalcInterval(aTimeUnit, aTimeStep)
+            If Double.IsNaN(lInterval) Then
+                .RemoveByKey("Interval")
+            Else
+                .SetValue("Interval", lInterval)
+            End If
         End With
     End Sub
 End Class

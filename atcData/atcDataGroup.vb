@@ -335,56 +335,65 @@ Public Class atcDataGroup
     ''' <param name="aMissingValue">Optional string to use if a dataset does not have a value for the given attribute</param>
     Public Function SortedAttributeValues(ByVal aAttributeDefinition As atcAttributeDefinition, Optional ByVal aMissingValue As Object = Nothing) As atcCollection
         Dim lSortedValues As New atcCollection
-        If Not aAttributeDefinition Is Nothing Then
-            Dim lAttributeName As String = aAttributeDefinition.Name
-            Dim lAttributeNumeric As Boolean = aAttributeDefinition.IsNumeric
-            Dim lTsIndex As Integer = 0
-            Dim lItemIndex As Integer = 0
-            Logger.Status("Finding Values for " & lAttributeName)
-            Dim lValue As String
-            For Each ts As atcDataSet In Me
-                Try
-                    If lAttributeNumeric Then
-                        Dim lKey As Double = ts.Attributes.GetValue(lAttributeName, pNaN)
-                        If Double.IsNaN(lKey) Then
-                            If Not aMissingValue Is Nothing Then
-                                If lSortedValues.Count = 0 OrElse lSortedValues(0) <> aMissingValue Then
-                                    lSortedValues.Insert(0, GetMinValue, aMissingValue)
+        Try
+            If Not aAttributeDefinition Is Nothing Then
+                Dim lAttributeName As String = aAttributeDefinition.Name
+                Dim lAttributeNumeric As Boolean = aAttributeDefinition.IsNumeric
+                Dim lTsIndex As Integer = 0
+                Dim lItemIndex As Integer = 0
+                Logger.Status("Finding Values for " & lAttributeName)
+                Dim lValue As String
+                For Each ts As atcTimeseries In Me
+                    'Dim lNeededToBeRead As Boolean = ts.ValuesNeedToBeRead
+                    Try
+                        If lAttributeNumeric Then
+                            Dim lKey As Double = ts.Attributes.GetValue(lAttributeName, pNaN)
+                            If Double.IsNaN(lKey) Then
+                                If Not aMissingValue Is Nothing Then
+                                    If lSortedValues.Count = 0 OrElse lSortedValues(0) <> aMissingValue Then
+                                        lSortedValues.Insert(0, GetMinValue, aMissingValue)
+                                    End If
+                                End If
+                            Else
+                                lItemIndex = lSortedValues.BinarySearchForKey(lKey)
+                                ' lItemIndex = lSortedValues.Count means the key was not found and it belongs at the end
+                                ' lKey <> lSortedValues.Keys.Item(lItemIndex) means that the key was not found
+                                If lItemIndex = lSortedValues.Count OrElse _
+                                  (lKey <> lSortedValues.Keys.Item(lItemIndex)) Then
+                                    'Not a duplicate, add to the list
+                                    lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
+                                    If Not lValue Is Nothing Then
+                                        lSortedValues.Insert(lItemIndex, lKey, lValue)
+                                    End If
                                 End If
                             End If
                         Else
-                            lItemIndex = lSortedValues.BinarySearchForKey(lKey)
-                            ' lItemIndex = lSortedValues.Count means the key was not found and it belongs at the end
-                            ' lKey <> lSortedValues.Keys.Item(lItemIndex) means that the key was not found
-                            If lItemIndex = lSortedValues.Count OrElse _
-                              (lKey <> lSortedValues.Keys.Item(lItemIndex)) Then
-                                'Not a duplicate, add to the list
-                                lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
-                                If Not lValue Is Nothing Then
-                                    lSortedValues.Insert(lItemIndex, lKey, lValue)
+                            Dim lKey As String = ts.Attributes.GetValue(lAttributeName, aMissingValue)
+                            If Not lKey Is Nothing Then
+                                lItemIndex = lSortedValues.BinarySearchForKey(lKey)
+                                If lItemIndex = lSortedValues.Count OrElse Not lKey.Equals(lSortedValues.Keys.Item(lItemIndex)) Then
+                                    lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
+                                    If Not lValue Is Nothing Then
+                                        lSortedValues.Insert(lItemIndex, lKey, lValue)
+                                    End If
                                 End If
                             End If
                         End If
-                    Else
-                        Dim lKey As String = ts.Attributes.GetValue(lAttributeName, aMissingValue)
-                        If Not lKey Is Nothing Then
-                            lItemIndex = lSortedValues.BinarySearchForKey(lKey)
-                            If lItemIndex = lSortedValues.Count OrElse Not lKey.Equals(lSortedValues.Keys.Item(lItemIndex)) Then
-                                lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
-                                If Not lValue Is Nothing Then
-                                    lSortedValues.Insert(lItemIndex, lKey, lValue)
-                                End If
-                            End If
-                        End If
-                    End If
-                Catch ex As Exception
-                    Logger.Dbg("Can't display value of " & lAttributeName & ": " & ex.Message)
-                End Try
-                lTsIndex += 1
-                Logger.Progress(lTsIndex, Count)
-            Next
-            Logger.Status("")
-        End If
+                    Catch ex As Exception
+                        Logger.Dbg("Can't display value of " & lAttributeName & ": " & ex.Message)
+                    End Try
+                    'Discard the values if we just had to read them above
+                    'If lNeededToBeRead AndAlso Not ts.ValuesNeedToBeRead AndAlso Me.Count > 100 Then 'TODO: test for whether ts is discardable
+                    '    ts.ValuesNeedToBeRead = True
+                    'End If
+                    lTsIndex += 1
+                    Logger.Progress(lTsIndex, Count)
+                Next
+                Logger.Status("")
+            End If
+        Catch exPC As ProgressCancelException
+            lSortedValues.Add(exPC.Message)
+        End Try
         Return lSortedValues
     End Function
 

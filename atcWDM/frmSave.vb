@@ -112,7 +112,7 @@ Friend Class WDMGridSource
         End Get
         Set(ByVal newValue As Generic.List(Of String))
             pDisplayAttributes = newValue
-            SaveSetting("BASINS", "WDM", "SaveAttributes", String.Join("+", pDisplayAttributes))
+            SaveSetting("BASINS", "WDM", "SaveAttributes", String.Join("+", pDisplayAttributes.ToArray))
             Columns = pDisplayAttributes.Count
         End Set
     End Property

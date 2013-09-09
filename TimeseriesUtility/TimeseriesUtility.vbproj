@@ -93,6 +93,12 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmAbout.Designer.vb">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAbout.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmMain.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -123,6 +129,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmAbout.resx">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.vb</DependentUpon>
     </EmbeddedResource>
@@ -213,6 +222,10 @@
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility-D4EM10</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcWdmVb\atcWdmVb-D4EM10.vbproj">
+      <Project>{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}</Project>
+      <Name>atcWdmVb-D4EM10</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcWDM\atcWDM-D4EM10.vbproj">
       <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
       <Name>atcWDM-D4EM10</Name>
@@ -241,8 +254,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="177x121transparent.png" />
+    <None Include="transparent177x121.png" />
     <Content Include="SARA.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

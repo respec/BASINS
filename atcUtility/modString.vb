@@ -556,28 +556,16 @@ TryOldString:
         Return retval
     End Function
 
-    Public Function CountString(ByRef Source As String, ByRef Find As String) As Integer
-        ' ##SUMMARY Searches for occurences of Find in Source.
-        ' ##SUMMARY   Example: CountString("The lead man was lead-footed", "lead") = 2
-        ' ##PARAM Source I Full string to be searched
-        ' ##PARAM Find I Substring to be searched for
-        ' ##RETURNS  Returns number of occurences of Find in Source.
-        Dim retval As Integer
-        Dim findPos As Integer
-        Dim findlen As Integer
-        ' ##LOCAL retval - string to be returned as CountString
-        ' ##LOCAL findpos - long position of Find in Source
-        ' ##LOCAL findlen - long length of Find
-
-        findlen = Len(Find)
-        If findlen > 0 Then
-            findPos = InStr(Source, Find)
-            While findPos > 0
-                retval = retval + 1
-                findPos = InStr(findPos + findlen, Source, Find)
-            End While
-        End If
-        CountString = retval
+    ''' <summary>
+    ''' Count how many times aFind occurs in aSource
+    ''' </summary>
+    ''' <param name="aSource">String to search through</param>
+    ''' <param name="aFind">String to search for</param>
+    ''' <returns>number of occurences of aFind in aSource</returns>
+    ''' <remarks>Capitalization matters. To count while ignoring capitalization, call with .ToUpper for both arguments.</remarks>
+    Public Function CountString(ByRef aSource As String, ByRef aFind As String) As Integer
+        If String.IsNullOrEmpty(aFind) OrElse String.IsNullOrEmpty(aSource) Then Return 0
+        Return (aSource.Length - aSource.Replace(aFind, String.Empty).Length) / aFind.Length
     End Function
 
     Public Function ReadableFromXML(ByVal aXML As String) As String

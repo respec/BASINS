@@ -60,10 +60,10 @@ Public Class atcDataPlugin
         If lItemName.StartsWith(ds.Category & "_") Then
             Dim lNewSource As atcDataSource = Nothing
             lItemName = lItemName.Substring(ds.Category.Length + 1)
-            Dim lOperation As atcDefinedValue = ds.AvailableOperations.ItemByKey(lItemName.ToLower)
+            Dim lOperation As atcDefinedValue = ds.AvailableOperations.GetDefinedValue(lItemName.ToLower)
             Dim lUnderscorePos As Integer = lItemName.IndexOf("_"c)
             While lUnderscorePos >= 0 AndAlso lOperation Is Nothing
-                lOperation = ds.AvailableOperations.ItemByKey(lItemName.Substring(lUnderscorePos + 1).ToLower)
+                lOperation = ds.AvailableOperations.GetDefinedValue(lItemName.Substring(lUnderscorePos + 1).ToLower)
                 lUnderscorePos = lItemName.IndexOf("_"c, lUnderscorePos + 1)
             End While
 

@@ -13,6 +13,7 @@ Public Class atcDataSourceWDM
     Inherits atcData.atcTimeseriesSource
     Private Shared pFilter As String = "WDM Files (*.wdm)|*.wdm"
     Private Shared pShowViewMessage As Boolean = True
+    Private Shared pAskAboutMissingTuTs As Boolean = True
     Private pDates As New Generic.List(Of atcTimeseries)
     Private pQuick As Boolean = False
     Private Shared pNan As Double = GetNaN()
@@ -22,9 +23,8 @@ Public Class atcDataSourceWDM
     Private pTu As atcTimeUnit = 0 'default time units, default 2-minutes
     Private pTs As Integer = 0 'default timestep, default 1 
 
-#If BatchMode Then
+#If GISProvider = "DotSpatial" Then
 #Else
-    Private pAskAboutMissingTuTs As Boolean = True
     Public Const ImportMenuName As String = "BasinsImportToWDM"
     Public Const ImportMenuString As String = "Import to WDM"
 
@@ -113,6 +113,7 @@ Public Class atcDataSourceWDM
         Dim lLowestDSN As Integer = Integer.MaxValue
         Dim lHighestDSN As Integer = 0
         Dim lLabel As String = FilenameNoPath(Specification) & " contains " & DataSets.Count & " datasets"
+        Dim lHaveDSNconflict As Boolean = False
 
         If DataSets.Count > 0 Then
             For Each lDataSet As atcDataSet In DataSets
@@ -123,22 +124,21 @@ Public Class atcDataSourceWDM
                 End If
             Next
             lLabel &= " numbered " & lLowestDSN & " to " & lHighestDSN
-        End If
 
-        Dim lHaveDSNconflict As Boolean = False
-        For Each lDataSet As atcTimeseries In aDataGroup
-            lDSN = lDataSet.Attributes.GetValue("dsn", 0)
-            If DataSets.Keys.Contains(lDSN) Then
-                lHaveDSNconflict = True
-            End If
-        Next
+            For Each lDataSet As atcTimeseries In aDataGroup
+                lDSN = lDataSet.Attributes.GetValue("dsn", 0)
+                If DataSets.Keys.Contains(lDSN) Then
+                    lHaveDSNconflict = True
+                End If
+            Next
+        End If
 
         Dim lHighestNewDSN As Integer = 0
         If lHaveDSNconflict Then lHighestNewDSN = lHighestDSN
 
         Dim lCloneTsGroup As New atcTimeseriesGroup
         For Each lDataSet As atcTimeseries In aDataGroup
-            lDSN = lDataSet.Attributes.GetValue("dsn", 0)
+            lDSN = lDataSet.Attributes.GetValue("dsn", 1)
             If lDSN > lHighestNewDSN AndAlso lDSN < 9999 Then
                 lHighestNewDSN = lDSN
             Else
@@ -289,26 +289,34 @@ CaseExistRenumber:
                 End If
 
                 If lWriteIt AndAlso lNvals > 0 Then
-                    Dim lTSFill As Double = lTimser.Attributes.GetValue("tsfill", -999)
-                    If Double.IsNaN(lTSFill) Then lTSFill = -999
+                    Dim lTSFillDbl As Double = lTimser.Attributes.GetValue("tsfill", -999)
+                    Dim lTSFillSng As Single
+                    If Double.IsNaN(lTSFillDbl) Then
+                        lTSFillSng = -999
+                    Else
+                        lTSFillSng = CSng(lTSFillDbl)
+                    End If
                     Dim lValue As Double
                     Dim lV(lNvals) As Single
                     Dim lRet As Integer
                     For i As Integer = 1 To lNvals
                         lValue = lTimser.Value(i)
-                        If Double.IsNaN(lValue) Then lValue = lTSFill
-                        lV(i - 1) = lValue
+                        If Double.IsNaN(lValue) Then
+                            lV(i - 1) = lTSFillSng
+                        Else
+                            lV(i - 1) = CSng(lValue)
+                        End If
                     Next
 
-                    'J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
                     J2DateRounddown(lTimser.Dates.Value(0), lTu, lSDat)
 
                     'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _
                     '            lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
                     '            lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
                     If lNvals > 0 Then
-                        'F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
                         F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat, lNvals, CInt(1), CInt(0), lTu, lV, lRet)
+                    Else
+                        Logger.Dbg("Expected number of values greater than zero, but was = " & lNvals)
                     End If
                     'Clearing means we can't use it for graphing, listing, etc. after
                     'If lTimserConst IsNot Nothing Then
@@ -441,7 +449,7 @@ CaseExistRenumber:
     Public Function WriteAttribute(ByVal aDataSet As atcData.atcDataSet, _
                                    ByVal aAttribute As atcDefinedValue, _
                                    Optional ByVal aNewValue As Object = Nothing) As Boolean
-        'Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
+        'Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString & ":" & aAttribute.Definition.Name & "=" & aAttribute.Value)
         Using lWdmHandle As New atcWdmHandle(0, Specification), lMsg As atcWdmHandle = pMsg.MsgHandle
             Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
 
@@ -592,11 +600,11 @@ CaseExistRenumber:
             DsnWriteAttributes = True
             Using lMsg As atcWdmHandle = pMsg.MsgHandle
                 Dim lMsgUnit As Integer = lMsg.Unit
-                For lAttributeIndex As Integer = 0 To .Count - 1
+                For Each lAttribute As atcDefinedValue In aTs.Attributes
                     'Debug.WriteLine(aTs.Attributes.ItemByIndex(lAttributeIndex).ToString)
-                    If Not DsnWriteAttribute(aFileUnit, lMsgUnit, lDsn, .ItemByIndex(lAttributeIndex)) Then
+                    If Not DsnWriteAttribute(aFileUnit, lMsgUnit, lDsn, lAttribute) Then
                         DsnWriteAttributes = False
-                        Logger.Dbg("Failed to write Attribute " & .ItemByIndex(lAttributeIndex).ToString)
+                        Logger.Dbg("Failed to write Attribute " & lAttribute.ToString)
                         Exit For
                     End If
                 Next
@@ -836,7 +844,6 @@ CaseExistRenumber:
             Dim lRetcod As Integer
             Dim lSdat(6) As Integer 'starting date
             Dim lSdatSeasonOffset(6) As Integer 'starting date with seasonal offset
-            Dim lEdat(6) As Integer 'ending (or current) date
             Dim lReadTS As atcTimeseries = aReadMe
 
             lReadTS.ValuesNeedToBeRead = False
@@ -850,7 +857,7 @@ CaseExistRenumber:
 
                         If Not CBool(.GetValue("HeaderOnly", False)) Then
                             Dim lTu As atcTimeUnit = .GetValue("Time Unit", atcTimeUnit.TUUnknown)
-                            Dim lTs As atcTimeUnit = .GetValue("Time Step", 1)
+                            Dim lTs As Integer = .GetValue("Time Step", 1)
                             Dim lSJDay As Double = .GetValue("SJDay", 0)
                             J2Date(lSJDay, lSdat) 'saved starting date as array for wdtget
                             If lTu = atcUtility.atcTimeUnit.TUYear Then
@@ -864,9 +871,9 @@ CaseExistRenumber:
 
                             Dim nVals As Integer = lReadTS.numValues
                             If nVals = 0 Then
-                                Dim lEJDay As Double = .GetValue("EJDay", 0)
-                                J2Date(lEJDay, lEdat)
-                                TimDif(lSdat, lEdat, .GetValue("tu", 0), lTs, nVals)
+                                Dim lEndDat(6) As Integer
+                                J2Date(.GetValue("EJDay", 0), lEndDat)
+                                TimDif(lSdat, lEndDat, .GetValue("tu", 0), lTs, nVals)
                                 'lReadTS.numValues = nVals
                             End If
                             If nVals > 0 Then
@@ -881,13 +888,15 @@ CaseExistRenumber:
                                 If lRetcod <> 0 Then
                                     Throw New ApplicationException("ReadData Failed For " & lDsn & " with code " & lRetcod)
                                 End If
-
-                                'Dim lNeedDates As Boolean = (lReadTS.Dates.numValues <> nVals)
-                                Dim lJd(nVals) As Double 'array of julian dates
-                                'If lNeedDates Then
-                                'ReDim lJd(nVals)
-                                lJd(0) = lSJDay
-                                'End If
+                                Dim lDates As atcTimeseries = lReadTS.Dates
+                                Dim lNeedDates As Boolean = lDates.ValuesNeedToBeRead OrElse (lDates.numValues <> nVals) OrElse lDates.Value(1) < 1
+                                Dim lJd() As Double 'array of julian dates
+                                If lNeedDates Then
+                                    ReDim lJd(nVals)
+                                    lJd(0) = lSJDay
+                                Else
+                                    lJd = Nothing
+                                End If
 
                                 ReDim lVd(nVals)
                                 lVd(0) = pNan
@@ -899,54 +908,63 @@ CaseExistRenumber:
 
                                 Dim lInterval As Double = .GetValue("interval", 0)
                                 Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
+                                Dim lCurDat(6) As Integer 'current date
                                 For iVal As Integer = 1 To nVals
                                     If Math.Abs((lV(iVal - 1) - lTsFill)) < pEpsilon Then
                                         lVd(iVal) = pNan
                                     Else
                                         lVd(iVal) = lV(iVal - 1) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
                                     End If
-                                    'If lNeedDates Then
-                                    If lConstInterval Then
-                                        lJd(iVal) = lSJDay + iVal * lInterval
-                                    Else
-                                        TIMADD(lSdatSeasonOffset, lTimeUnits, lTimeStep, iVal, lEdat)
-                                        lJd(iVal) = Date2J(lEdat)
+                                    If lNeedDates Then
+                                        If lConstInterval Then
+                                            lJd(iVal) = lSJDay + iVal * lInterval
+                                        Else
+                                            TIMADD(lSdatSeasonOffset, lTimeUnits, lTimeStep, iVal, lCurdat)
+                                            lJd(iVal) = Date2J(lCurdat)
+                                        End If
                                     End If
-                                    'End If
                                 Next
 
-                                'If lNeedDates Then
-                                Dim lMatchingDates As atcTimeseries = Nothing
-                                'Search for existing Dates that exactly match these so we can share that one and save memory
-                                For Each lOtherDates As atcTimeseries In pDates
-                                    If lOtherDates.Serial <> lReadTS.Dates.Serial Then
-                                        If lOtherDates.numValues = nVals Then
-                                            lMatchingDates = lOtherDates
+                                If lNeedDates Then
+                                    Dim lMatchingDates As atcTimeseries = Nothing
+                                    'Search for existing Dates that exactly match these so we can share that one and save memory
+                                    For Each lOtherDates As atcTimeseries In pDates
+                                        If lOtherDates.Serial <> lReadTS.Dates.Serial AndAlso _
+                                           lOtherDates.numValues = nVals AndAlso _
+                                           lOtherDates.Value(1) = lJd(1) AndAlso _
+                                           lOtherDates.Value(nVals) = lJd(nVals) Then
+                                            If lConstInterval Then
+                                                If Math.Abs(lInterval - lOtherDates.Attributes.GetValue("Interval", 0)) < pEpsilon Then
+                                                    lMatchingDates = lOtherDates
+                                                End If
+                                            Else
+                                                lMatchingDates = lOtherDates
                                                 For lDateIndex As Integer = nVals To 0 Step -1
                                                     If lOtherDates.Value(lDateIndex) <> lJd(lDateIndex) Then
                                                         lMatchingDates = Nothing
                                                         Exit For
                                                     End If
                                                 Next
-                                                If lMatchingDates IsNot Nothing Then Exit For
                                             End If
+                                            If lMatchingDates IsNot Nothing Then Exit For
                                         End If
                                     Next
                                     If lMatchingDates Is Nothing Then
                                         lReadTS.Dates.Values = lJd
-                                    pDates.Add(lReadTS.Dates)
-                                Else
-                                    lReadTS.Dates.Clear()
-                                    lReadTS.Dates = lMatchingDates
-                                    lMatchingDates.Attributes.SetValue("Shared", True)
+                                        lReadTS.Dates.ValuesNeedToBeRead = False
+                                        pDates.Add(lReadTS.Dates)
+                                    Else
+                                        lReadTS.Dates.Clear()
+                                        lReadTS.Dates = lMatchingDates
+                                        lMatchingDates.Attributes.SetValue("Shared", True)
+                                    End If
                                 End If
-                                'End If
                             End If
 
                             lReadTS.Values = lVd
                         End If
                     End With
-                'atcDataManager.AddDiscardableTimeseries(lReadTS)
+                    'atcDataManager.AddDiscardableTimeseries(lReadTS)
                 End If
             End Using
         End If
@@ -954,7 +972,9 @@ CaseExistRenumber:
 
     Private Sub RefreshDsn(ByVal aFileUnit As Integer, ByVal aDsn As Integer)
         Dim lData As New atcTimeseries(Me)
-        lData.Dates = New atcTimeseries(Nothing) 'Using Nothing instead of Me here because we only read dates while doing ReadData for values
+        Dim lDates As New atcTimeseries(Nothing) 'Using Nothing instead of Me here because we only read dates while doing ReadData for values
+        lDates.ValuesNeedToBeRead = True
+        lData.Dates = lDates
         lData.Attributes.SetValue("id", aDsn)
         lData.Attributes.AddHistory("Read from " & Specification)
 

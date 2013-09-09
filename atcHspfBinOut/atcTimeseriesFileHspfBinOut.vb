@@ -135,7 +135,8 @@ Public Class atcTimeseriesFileHspfBinOut
 
                     'attributes related to dates common to all in ts in a header 
                     'Dim lTu As Integer, lTs As Integer, lIntvl As Integer
-                    Dim lBaseAttributes As atcDataAttributes = New atcDataAttributes
+                    Dim lAllTimeseriesInThisHeader As New Generic.List(Of atcTimeseries)
+                    Dim lBaseAttributes As New atcDataAttributes
                     With lBaseAttributes
                         'If lEJDate - lSJDate >= 1 Then 'daily or longer interval
                         '    lTs = 1
@@ -160,20 +161,21 @@ Public Class atcTimeseriesFileHspfBinOut
                         '.SetValue("Tu", lTu)
                         '.SetValue("Intvl", lIntvl)
                         'lSJDate = TimAddJ(lBinHeader.Data.Item(0).JDate, lTu, lTs, -lIntvl)
-                        .ChangeTo(lFileAttributes)
+                        .SharedAttributes = lFileAttributes
                         .SetValue("SJDay", lFirstBinDatum.JDate) 'Is end of first interval correct for SJDay?
                         .SetValue("EJDay", lBinHeader.Data.Item(lBinHeader.Data.Count - 1).JDate)
                         .SetValue("Operation", lBinHeader.Id.OperationName)
                         .SetValue("Section", lBinHeader.Id.SectionName)
                         .SetValue("IDLOCN", Left(lBinHeader.Id.OperationName, 1) & ":" & (lBinHeader.Id.OperationNumber))
+                        .SetValue("InSameHeader", lAllTimeseriesInThisHeader)
                     End With
                     For Each lConstituent As String In lBinHeader.VarNames
                         Dim lTSer As atcTimeseries = New atcTimeseries(Me)
-                        lTSer.Attributes.SetValue("SharedAttributes", lBaseAttributes)
+                        lTSer.Attributes.SharedAttributes = lBaseAttributes
                         With lTSer
                             .Attributes.SetValue("IDCONS", lConstituent)
                             .Attributes.SetValue("UNITS", GetUnits(lConstituent, pBinFile.UnitSystem))
-                            .Attributes.SetValue("ID", Me.DataSets.Count)
+                            .Attributes.SetValue("ID", Me.DataSets.Count + 1)
                             If lConstituent = "LZS" Then 'TODO: need better check here
                                 .Attributes.SetValue("Point", True)
                             End If
@@ -181,6 +183,7 @@ Public Class atcTimeseriesFileHspfBinOut
                             '.SetInterval(lTu, lTs)
                             .Dates = lDates
                             AddDataSet(lTSer)
+                            lAllTimeseriesInThisHeader.Add(lTSer)
                         End With
                     Next
                 End With
@@ -306,15 +309,20 @@ Public Class atcTimeseriesFileHspfBinOut
     Public Overrides Sub ReadData(ByVal aDataSet As atcDataSet)
 
         Dim lTimeseries As atcTimeseries = aDataSet
+        Dim lShared As atcDataAttributes = lTimeseries.Attributes.SharedAttributes
+        If lShared Is Nothing Then 'Should not happen, all should have SharedAttributes
+            lShared = lTimeseries.Attributes
+        End If
         lTimeseries.ValuesNeedToBeRead = False
         Dim lKey As String = KeyFromAttributes(lTimeseries.Attributes)
         Dim lNeedToClose As Boolean = pBinFile.Open(False)
-        Dim lNeedDates As Boolean = lTimeseries.Dates.numValues < 1
+        Dim lNeedDates As Boolean = lTimeseries.Dates.numValues < 1 'Do not already have Dates assigned to this timeseries
         Dim lValues As New Generic.List(Of Double)
         Dim lJDates As Generic.List(Of Double) = Nothing
         If lNeedDates Then lJDates = New Generic.List(Of Double)
         Dim lTimeUnit As atcTimeUnit = atcTimeUnit.TUUnknown
         Dim lTimeStep As Integer = 1
+        Dim lInterval As Double = pNaN
         Try
             Dim lBinHeader As HspfBinaryHeader = pBinFile.Headers(lKey)
             With lBinHeader
@@ -322,7 +330,6 @@ Public Class atcTimeseriesFileHspfBinOut
                 If lVariableIndex >= 0 Then
                     Dim lSJday As Double = lTimeseries.Attributes.GetValue("SJDay")
                     Dim lEJday As Double = lTimeseries.Attributes.GetValue("EJDay")
-                    Dim lShared As atcDataAttributes = Nothing
                     If lNeedDates Then lJDates.Add(lSJday)
                     lValues.Add(pNaN)
                     For Each lHspfBinaryDatum As HspfBinaryDatum In .Data
@@ -334,18 +341,17 @@ Public Class atcTimeseriesFileHspfBinOut
                             lValues.Add(pBinFile.ReadValue(lHspfBinaryDatum.ValuesStartPosition, lVariableIndex))
                             If lNeedDates Then
                                 lJDates.Add(lCurJday)
-                                If lJDates.Count = 3 Then 'Compute beginning of first interval
+                                If lJDates.Count = 3 Then 'Compute Interval and beginning of first interval
                                     CalcTimeUnitStep(lJDates(1), lJDates(2), lTimeUnit, lTimeStep)
-                                    lJDates(0) = TimAddJ(lJDates(1), lTimeUnit, lTimeStep, -1)
-                                    lTimeseries.SetInterval(lTimeUnit, lTimeStep)
                                     If lTimeUnit <> atcTimeUnit.TUUnknown Then
-                                        lShared = lTimeseries.Attributes.GetValue("SharedAttributes")
-                                        If lShared IsNot Nothing Then
-                                            lShared.SetValue("Time Step", lTimeStep)
-                                            lShared.SetValue("Time Unit", lTimeUnit)
-                                            If lTimeseries.Attributes.ContainsAttribute("Interval") Then
-                                                lShared.SetValue("Interval", lTimeseries.Attributes.GetValue("Interval"))
-                                            End If
+                                        lJDates(0) = TimAddJ(lJDates(1), lTimeUnit, lTimeStep, -1)
+                                        lShared.SetValue("Time Step", lTimeStep)
+                                        lShared.SetValue("Time Unit", lTimeUnit)
+                                        lInterval = CalcInterval(lTimeUnit, lTimeStep)
+                                        If Double.IsNaN(lInterval) Then
+                                            lShared.RemoveByKey("Interval")
+                                        Else
+                                            lShared.SetValue("Interval", lInterval)
                                         End If
                                     End If
                                 End If
@@ -365,8 +371,9 @@ Public Class atcTimeseriesFileHspfBinOut
         With lTimeseries
             If lNeedDates Then
                 Dim lNumValues As Integer = lJDates.Count - 1
-                Dim lMatchingDates As atcTimeseries = Nothing
+
                 'Search for existing Dates that exactly match these so we can share that one and save memory
+                Dim lMatchingDates As atcTimeseries = Nothing
                 For Each lOtherTimeseries As atcTimeseries In DataSets
                     If Not lOtherTimeseries.ValuesNeedToBeRead Then
                         Dim lOtherDates As atcTimeseries = lOtherTimeseries.Dates
@@ -383,27 +390,35 @@ Public Class atcTimeseriesFileHspfBinOut
                     End If
                 Next
                 If lMatchingDates Is Nothing Then
-                    'Found a new set of dates, use them
+                    'Found a new set of dates, use these in .Dates (which is already shared by all timeseries in same Header)
                     .Dates.Values = lJDates.ToArray
-                Else 'Already have these Dates, re-use them for all timeseries sharing this header
+                Else 'Found matching Dates from another header, share them with all timeseries sharing this header
                     Dim lDisposingDates As atcTimeseries = .Dates
-                    For Each lOtherTimeseries As atcTimeseries In DataSets
-                        If KeyFromAttributes(lOtherTimeseries.Attributes) = lKey Then
-                            lOtherTimeseries.Dates = lMatchingDates
-                            If lTimeUnit <> atcTimeUnit.TUUnknown Then
-                                Dim lShared As atcDataAttributes = lOtherTimeseries.Attributes.GetValue("SharedAttributes")
-                                If lShared Is Nothing Then
-                                    lOtherTimeseries.SetInterval(lTimeUnit, lTimeStep)
-                                Else
-                                    lShared.SetValue("Time Step", lTimeStep)
-                                    lShared.SetValue("Time Unit", lTimeUnit)
-                                    If lTimeseries.Attributes.ContainsAttribute("Interval") Then
-                                        lShared.SetValue("Interval", lTimeseries.Attributes.GetValue("Interval"))
-                                    End If
-                                End If
-                            End If
+                    Try
+                        Dim lInSameHeader As Generic.List(Of atcTimeseries) = lTimeseries.Attributes.SharedAttributes.GetValue("InSameHeader")
+                        If lInSameHeader IsNot Nothing Then
+                            For Each lOtherTimeseries As atcTimeseries In lInSameHeader
+                                lOtherTimeseries.Dates = lMatchingDates
+                                'All others in lAll should already have these shared attributes set above
+                                'If lTimeUnit <> atcTimeUnit.TUUnknown Then
+                                '    Dim lShared As atcDataAttributes = lOtherTimeseries.Attributes.SharedAttributes
+                                '    If lShared Is Nothing Then 'Should not happen, all should have SharedAttributes
+                                '        lOtherTimeseries.SetInterval(lTimeUnit, lTimeStep)
+                                '    Else
+                                '        lShared.SetValue("Time Step", lTimeStep)
+                                '        lShared.SetValue("Time Unit", lTimeUnit)
+                                '        If Double.IsNaN(lInterval) Then
+                                '            lShared.RemoveByKey("Interval")
+                                '        Else
+                                '            lShared.SetValue("Interval", lInterval)
+                                '        End If
+                                '    End If
+                                'End If
+                            Next
                         End If
-                    Next
+                    Catch ex As Exception
+                        Logger.Dbg("Exception while trying to share Dates with all in same header: " & ex.ToString)
+                    End Try
                     lDisposingDates.Clear()
                 End If
             End If
