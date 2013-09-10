@@ -583,16 +583,21 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Return lAttribute
     End Function
 
-    'True if the attribute defined by aDef is of a simple type (Double, Integer, Boolean, String)
-    'and is not calculated or can be calculated from just one atcTimeseries
-    'Optional aKey is the attribute key, passing it is allowed for performance
-    'Optional aOperation will be set to the operation definition that calculates the attribute
+    ''' <summary>
+    ''' True if the attribute defined by aDef is of a simple type (Single, Double, Integer, Boolean, String, atcTimeUnit, atcCollection)
+    ''' and is not calculated or can be calculated from just one atcTimeseries
+    ''' </summary>
+    ''' <param name="aDef">Definition to test for simplicity</param>
+    ''' <param name="aKey">Optional aKey is the attribute key, passing it is allowed for performance</param>
+    ''' <param name="aOperation">Optional aOperation will be set to the operation definition that calculates the attribute</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public Shared Function IsSimple(ByVal aDef As atcAttributeDefinition, _
                            Optional ByVal aKey As String = Nothing, _
                            Optional ByRef aOperation As atcDefinedValue = Nothing) As Boolean
         Select Case aDef.TypeString.ToLower
             Case "single", "double", "integer", "boolean", "string", "atctimeunit", "atccollection"
-                If aDef.Calculated Then   'Maybe we can go ahead and calculate it now...
+                If aDef.Calculated Then
                     If aKey Is Nothing Then aKey = AttributeNameToKey((aDef.Name))
                     aOperation = aDef.Calculator.AvailableOperations.GetDefinedValue(aKey)
 
@@ -600,7 +605,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
                         aOperation = aDef.Calculator.AvailableOperations.GetDefinedValue("%*")
                     End If
 
-                    If Not aOperation Is Nothing AndAlso Not aOperation.Arguments Is Nothing Then
+                    If aOperation IsNot Nothing AndAlso aOperation.Arguments IsNot Nothing Then
                         If aOperation.Arguments.Count = 1 Then 'Simple calculation has only one argument
                             Dim lArg As atcDefinedValue = aOperation.Arguments.ItemByIndex(0)
                             If lArg.Definition.TypeString = "atcTimeseries" Then 'Only argument must be atcTimeseries

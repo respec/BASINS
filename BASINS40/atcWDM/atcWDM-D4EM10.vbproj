@@ -93,7 +93,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\bin-D4EM10\x86Debug\</OutputPath>
-    <DefineConstants>GISProvider="DotSpatial",BatchMode=True</DefineConstants>
+    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcWDM.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>

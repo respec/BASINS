@@ -271,13 +271,8 @@ Public Class atcTimeseriesGridSource
                                                 Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
                                             End If
                                         Else
-                                            If lTs.ValueAttributesExist Then
-                                                Dim lValueAttributes As atcDataAttributes = lTs.ValueAttributes(lIndex)
-                                                If lValueAttributes IsNot Nothing AndAlso lValueAttributes.Count > 0 Then
-                                                    Return lTs.ValueAttributes(lIndex).GetFormattedValue(lValueAttDef.Name)
-                                                Else
-                                                    Return Nothing
-                                                End If
+                                            If lTs.ValueAttributesExist(lIndex) Then
+                                                Return lTs.ValueAttributes(lIndex).GetFormattedValue(lValueAttDef.Name)
                                             Else
                                                 Return Nothing
                                             End If
