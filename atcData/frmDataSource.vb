@@ -185,7 +185,6 @@ Friend Class frmDataSource
             For Each ds As atcDataSource In lDataSources
                 If (Not aNeedToOpen OrElse ds.CanOpen) AndAlso _
                    (Not aNeedToSave OrElse ds.CanSave) Then
-                    Dim lOperations As atcDataAttributes = ds.AvailableOperations
                     Dim lCategory As String = ds.Category
                     If lCategory.Length = 0 Then lCategory = ds.Description
                     'If either no category was specified or
@@ -196,7 +195,8 @@ Friend Class frmDataSource
                            GetSetting("BASINS41", "Data Source Categories", lCategory, "Expanded") = "Expanded" Then
                             lCategoryNode.ExpandAll()
                         End If
-                        If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
+                        Dim lOperations As atcDataAttributes = ds.AvailableOperations
+                        If lOperations IsNot Nothing AndAlso lOperations.Count > 0 Then
                             For Each lOperation As atcDefinedValue In lOperations
                                 Select Case lOperation.Definition.TypeString
                                     Case "atcTimeseries", "atcDataGroup", "atcTimeseriesGroup"
