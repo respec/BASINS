@@ -692,8 +692,8 @@ TryOldString:
             ch = Mid(S, i, 1)
             Select Case Asc(ch)
                 Case 0 : Exit For
-                Case 32 To 126 : retval = retval & ch
-                Case Else : retval = retval & ReplaceWith
+                Case 32 To 126 : retval &= ch
+                Case Else : retval &= ReplaceWith
             End Select
         Next
         Return retval
