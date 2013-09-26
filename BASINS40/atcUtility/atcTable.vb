@@ -303,8 +303,8 @@ Public MustInherit Class atcTable
 
         If LCase(aFormat) = "text" Then 'text version
             retval = "    FileName: " & FileName & vbCrLf
-            retval = retval & "    NumFields:  " & NumFields
-            retval = retval & "    NumRecords: " & NumRecords
+            retval &= "    NumFields:  " & NumFields
+            retval &= "    NumRecords: " & NumRecords
         Else 'table version
             retval = "FileName " & vbTab & "NumFields " & vbTab & "NumRecords " & vbCrLf _
                    & pFilename & vbTab & NumFields & vbTab & NumRecords & vbCrLf
@@ -326,44 +326,44 @@ Public MustInherit Class atcTable
 
         If InStr(LCase(aFormat), "text") > 0 Then 'text version
             For iField = 1 To NumFields
-                retval = retval & vbCrLf & "Field " & iField & ": '" & FieldName(iField) & "'"
-                retval = retval & vbCrLf & "    Type: "
+                retval &= vbCrLf & "Field " & iField & ": '" & FieldName(iField) & "'"
+                retval &= vbCrLf & "    Type: "
                 If ExpandType Then
                     Select Case FieldType(iField)
-                        Case "C" : retval = retval & "Character"
-                        Case "D" : retval = retval & "Date     "
-                        Case "N" : retval = retval & "Numeric  "
-                        Case "L" : retval = retval & "Logical  "
-                        Case "M" : retval = retval & "Memo     "
+                        Case "C" : retval &= "Character"
+                        Case "D" : retval &= "Date     "
+                        Case "N" : retval &= "Numeric  "
+                        Case "L" : retval &= "Logical  "
+                        Case "M" : retval &= "Memo     "
                     End Select
                 End If
-                retval = retval & vbCrLf & "    Length: " & FieldLength(iField) & " "
-                retval = retval & vbCrLf
+                retval &= vbCrLf & "    Length: " & FieldLength(iField) & " "
+                retval &= vbCrLf
             Next
         Else 'table version
             If ShowHeaders Then
-                retval = retval & "Field "
-                retval = retval & vbTab & "Name "
-                retval = retval & vbTab & "Type "
-                retval = retval & vbTab & "Length "
+                retval &= "Field "
+                retval &= vbTab & "Name "
+                retval &= vbTab & "Type "
+                retval &= vbTab & "Length "
             End If
-            retval = retval & vbCrLf
+            retval &= vbCrLf
             'now field details
             For iField = 1 To NumFields
-                retval = retval & iField & vbTab & "'" & FieldName(iField) & "' " & vbTab
+                retval &= iField & vbTab & "'" & FieldName(iField) & "' " & vbTab
                 If ExpandType Then
                     Select Case FieldType(iField)
-                        Case "C" : retval = retval & "Character"
-                        Case "D" : retval = retval & "Date     "
-                        Case "N" : retval = retval & "Numeric  "
-                        Case "L" : retval = retval & "Logical  "
-                        Case "M" : retval = retval & "Memo     "
+                        Case "C" : retval &= "Character"
+                        Case "D" : retval &= "Date     "
+                        Case "N" : retval &= "Numeric  "
+                        Case "L" : retval &= "Logical  "
+                        Case "M" : retval &= "Memo     "
                     End Select
                 Else
-                    retval = retval & FieldType(iField)
+                    retval &= FieldType(iField)
                 End If
-                retval = retval & vbTab & FieldLength(iField)
-                retval = retval & vbCrLf
+                retval &= vbTab & FieldLength(iField)
+                retval &= vbCrLf
             Next
         End If
         Return retval

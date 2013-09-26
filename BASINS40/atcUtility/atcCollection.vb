@@ -81,11 +81,19 @@ Public Class atcCollection
         If lKeyIndex = -1 Then 'no key, add it
             pKeys.Add(aKey)
             Return MyBase.Add(aValue)
-        ElseIf aValue = MyBase.Item(lKeyIndex) Then 'key exists and values match, return its index
-            Return lKeyIndex
-        Else 'conflict with values
-            Throw New ApplicationException("Key " & aKey.ToString & " exists, new Value '" & aValue.ToString & "' <> old Value '" & MyBase.Item(lKeyIndex).ToString & "'")
+        Else
+            If ReferenceEquals(MyBase.Item(lKeyIndex), aValue) Then
+                Return lKeyIndex
+            End If
+            Try
+                If aValue = MyBase.Item(lKeyIndex) Then 'key exists and values match, return its index
+                    Return lKeyIndex
+                End If
+            Catch 'Failed to compare, object probably does not implement =
+            End Try
         End If
+        'conflict with values
+        Throw New ApplicationException("Key " & aKey.ToString & " exists, new Value '" & aValue.ToString & "' <> old Value '" & MyBase.Item(lKeyIndex).ToString & "'")
     End Function
 
     Public Function Increment(ByVal aKey As Object) As Double
