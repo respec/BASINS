@@ -101,6 +101,21 @@ Module HSPFOutputReports
         If StartUp.chkSedimentBalance.Checked Then
             pConstituents.Add("Sediment")
         End If
+        If StartUp.chkNitrogenBalance.Checked Then
+            pConstituents.Add("N-PQUAL")
+        End If
+        If StartUp.chkTotalNitrogen.Checked Then
+            pConstituents.Add("TotalN")
+        End If
+        If StartUp.chkPhosphorusBalance.Checked Then
+            pConstituents.Add("P-PQUAL")
+        End If
+        If StartUp.chkTotalPhosphorus.Checked Then
+            pConstituents.Add("TotalP")
+        End If
+        If StartUp.chkBODBalance.Checked Then
+            pConstituents.Add("BOD-PQUAL")
+        End If
 
         'Becky added the following to be dependent upon user input:
         pTestPath = StartUp.txtUCIPath.Text
@@ -257,7 +272,7 @@ Module HSPFOutputReports
             End If
 
             'open WDM file
-            Logger.Dbg(Now & " Opening " & pBaseName & ".wdm")
+
 
             If StartUp.chkExpertStats.Checked = True Then
 
@@ -387,7 +402,7 @@ Module HSPFOutputReports
                                 RWZSetArgs(lObsTSerInches)
                                 RWZSetArgs(lPrecTser)
 
-                                Logger.Dbg(Now & " Calculating monthly summary")
+                                Logger.Dbg(Now & " Calculating monthly summary for " & lSiteName)
                                 'pProgressBar.pbProgress.Increment(5)
 
                                 lStr = HspfSupport.MonthlyAverageCompareStats.Report(lHspfUci, _
@@ -400,7 +415,7 @@ Module HSPFOutputReports
                                 Dim lOutFileName As String = lOutFolderName & "MonthlyAverage" & lCons & "Stats-" & lSiteName & ".txt"
                                 SaveFileString(lOutFileName, lStr)
 
-                                Logger.Dbg(Now & " Calculating annual summary")
+                                Logger.Dbg(Now & " Calculating annual summary for " & lSiteName)
                                 lStr = HspfSupport.AnnualCompareStats.Report(lHspfUci, _
                                                                              lCons, lSiteName, _
                                                                              "inches", _
@@ -411,7 +426,7 @@ Module HSPFOutputReports
                                 lOutFileName = lOutFolderName & "Annual" & lCons & "Stats-" & lSiteName & ".txt"
                                 SaveFileString(lOutFileName, lStr)
 
-                                Logger.Dbg(Now & " Calculating daily summary")
+                                Logger.Dbg(Now & " Calculating daily summary for " & lSiteName)
                                 'pProgressBar.pbProgress.Increment(6)
                                 lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
                                                                                    lCons, lSiteName, _
@@ -485,32 +500,52 @@ Module HSPFOutputReports
             Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
             If System.IO.File.Exists(lHspfBinFileName) Then
                 lHspfBinDataSource.Open(lHspfBinFileName)
+                Dim lConstituentName As String = ""
                 For Each lConstituent As String In pConstituents
                     Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
+                    Select Case lConstituent
+                        Case "Water"
+                            lConstituentName = "WAT"
+                        Case "Sediment"
+                            lConstituentName = "SED"
+                        Case "N-PQUAL"
+                            lConstituentName = "N"
+                        Case "P-PQUAL"
+                            lConstituentName = "P"
+                        Case "TotalN"
+                            lConstituentName = "TN"
+                        Case "TotalP"
+                            lConstituentName = "TP"
+                        Case "BOD-PQUAL"
+                            lConstituentName = "BOD"
+                    End Select
 
                     Dim lReportCons As New atcReport.ReportText
                     Dim lOutFileName As String = ""
 
+                    Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
                     lReportCons = Nothing
                     lReportCons = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
-                    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Reach_Annual_Average_Loads.txt"
+                    lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Lds.txt"
                     '"All_Budget.txt"
                     SaveFileString(lOutFileName, lReportCons.ToString)
                     lReportCons = Nothing
 
+                    Logger.Dbg(Now & " Calculating Watershed Summary Reports for " & lConstituent)
                     lReportCons = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lRunMade, lConstituent)
-                    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Oper_Annual_Average_Loads.txt"
+                    lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Ann_Avg_Lds.txt"
                     '"_All_WatershedSummary.txt"
                     SaveFileString(lOutFileName, lReportCons.ToString)
                     lReportCons = Nothing
 
+                    Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
                     Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
                     Logger.Dbg("Summary at " & lLocations.Count & " locations")
                     'constituent balance
                     lReportCons = HspfSupport.ConstituentBalance.Report _
                        (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                         lHspfBinDataSource, lLocations, lRunMade)
-                    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Oper_Annual.txt"
+                    lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Ann.txt"
                     '"_Mult_ConstituentBalance.txt"
                     SaveFileString(lOutFileName, lReportCons.ToString)
 
@@ -519,21 +554,22 @@ Module HSPFOutputReports
                     lReportCons = HspfSupport.WatershedConstituentBalance.Report _
                        (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                         lHspfBinDataSource, lRunMade)
-                    lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Group_By_OperType_And_LU_Annual_Average.txt"
+                    lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
                     '"_All_WatershedConstituentBalance.txt"
                     SaveFileString(lOutFileName, lReportCons.ToString)
 
 
                     If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
+                        Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent & "at specified locations!")
                         HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                            (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                             lHspfBinDataSource, pOutputLocations, lRunMade, _
                             lOutFolderName, True)
                         'now pivoted version
-                        HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-                           (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                            lHspfBinDataSource, pOutputLocations, lRunMade, _
-                            lOutFolderName, True, True)
+                        'HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                        '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                        '    lHspfBinDataSource, pOutputLocations, lRunMade, _
+                        '    lOutFolderName, True, True)
                     End If
                 Next
 
