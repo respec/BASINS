@@ -683,14 +683,15 @@ Module GraphBasicMPCAWQ
 
     Private Sub Initialize()
         Dim lTestName As String = "MPCAWQ"
+        'Dim lTestName As String = "MPCAValWQ"
         Select Case lTestName
             Case "MPCAWQ"
-                pWorkingDirectory = "M:\modelout\"
+                pWorkingDirectory = "C:\BASINS\modelout\"
                 pbasename = "MPCAWQ"
                 pWQGraphSpecification = pGraphSpecMPCAWQ
                 pObservedWQBaseFileName = "T:\MPCA\WQ_data.dbf"
             Case "MPCAValWQ"
-                pWorkingDirectory = "M:\modelout\"
+                pWorkingDirectory = "C:\BASINS\modelout\"
                 pbasename = "MPCAValWQ"
                 pWQGraphSpecification = pGraphs_MPCAWQ_Val
                 pObservedWQBaseFileName = "T:\MPCA\WQ_data.dbf"
@@ -708,7 +709,7 @@ Module GraphBasicMPCAWQ
         ChDriveDir(pWorkingDirectory)
         Select Case pbasename
             Case "MPCAWQ"
-                Dim lUCIName As String = pWorkingDirectory & "RECal03\RECal03.uci"
+                'Dim lUCIName As String = pWorkingDirectory & "RECal03\RECal03.uci"
                 'Logger.Dbg("Launching " & IO.Path.GetFileName(pHSPFExe) & " in " & lUCIName)
                 'Logger.Flush()
                 'LaunchProgram(pHSPFExe, pWorkingDirectory, lUCIName)
@@ -728,12 +729,31 @@ Module GraphBasicMPCAWQ
 
                 Dim pOutputWDMFileName1 As String = pWorkingDirectory & "CWCal03\CWCal03.wdm"
                 Dim wdmfileinfo As System.IO.FileInfo = New System.IO.FileInfo(pOutputWDMFileName1)
+                Dim LastWriteTime As Date = wdmfileinfo.LastWriteTime
                 Dim lRunmade As String = wdmfileinfo.LastWriteTime.ToString
+                wdmfileinfo = New System.IO.FileInfo(pWorkingDirectory & "LPCal03\LPCal03.wdm")
+                If LastWriteTime < wdmfileinfo.LastWriteTime Then
+                    lRunmade = wdmfileinfo.LastWriteTime.ToString
+                    LastWriteTime = wdmfileinfo.LastWriteTime
+                End If
+
+                wdmfileinfo = New System.IO.FileInfo(pWorkingDirectory & "RECal03\RECal03.wdm")
+                If LastWriteTime < wdmfileinfo.LastWriteTime Then
+                    lRunmade = wdmfileinfo.LastWriteTime.ToString
+                End If
+
                 foldername = pWorkingDirectory & "WQGraphs_" & pbasename & "_" & Format(Year(lRunmade), "00") & "_" & Format(Month(lRunmade), "00") & _
                                           "_" & Format(Day(lRunmade), "00") & "_" & Format(Hour(lRunmade), "00") & "_" & Format(Minute(lRunmade), "00")
+
+                System.IO.Directory.CreateDirectory(foldername)
+                System.IO.File.Copy(pWorkingDirectory & "CWCal03\CWCal03.uci", foldername & "\CWCal03.uci")
+                System.IO.File.Copy(pWorkingDirectory & "LPCal03\LPCal03.uci", foldername & "\LPCal03.uci")
+                System.IO.File.Copy(pWorkingDirectory & "RECal03\RECal03.uci", foldername & "\RECal03.uci")
+
                 Dim lDataSource2 As New atcDataSourceBasinsObsWQ
                 lDataSource2.Open(pObservedWQBaseFileName)
                 For lGraphIndex As Integer = 0 To pLastIndex
+                    pLeftAxisLogScale = False
                     pTimeseriesConstituent = pWQGraphSpecification(lGraphIndex, 1)
                     Select Case pTimeseriesConstituent
                         Case "TW"
@@ -747,6 +767,7 @@ Module GraphBasicMPCAWQ
                         Case "TSS"
                             pLeftYAxisLabel = "Total Suspended Solids (mg/l)"
                             'AxisUpper = 1500
+                            pLeftAxisLogScale = True
                         Case "ORC"
                             pLeftYAxisLabel = "Organic Carbon (mg/l)"
                             'AxisUpper = 10
@@ -772,7 +793,7 @@ Module GraphBasicMPCAWQ
                     Dim lEDate(5) As Integer : lEDate(0) = pWQGraphSpecification(lGraphIndex, 5) : lEDate(1) = _
                                                 pWQGraphSpecification(lGraphIndex, 6) : lEDate(2) = pWQGraphSpecification(lGraphIndex, 7)
                     Dim lEdatej As Double = Date2J(lEDate)
-                    pbasename = pWQGraphSpecification(lGraphIndex, 0) & "_" & pTimeseriesConstituent & "_" & _
+                    pbasename = pTimeseriesConstituent & "_" & pWQGraphSpecification(lGraphIndex, 0) & "_" & _
                                 Format(pWQGraphSpecification(lGraphIndex, 3), "00") & _
                                 Format(pWQGraphSpecification(lGraphIndex, 4), "00") & Right(pWQGraphSpecification(lGraphIndex, 2), 2) & "_to_" & _
                                 Format(pWQGraphSpecification(lGraphIndex, 6), "00") & Format(pWQGraphSpecification(lGraphIndex, 7), "00") & _
@@ -802,14 +823,31 @@ Module GraphBasicMPCAWQ
                                                 FindData("Constituent", "FLOW")(0)
                         lTser1.Attributes.SetValue("YAxis", "Aux")
                         lTser1.Attributes.SetValue("Point", False)
+                        'If Not pTimeseriesConstituent = "TSS" Then
                         lTser1 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                        'End If
                         lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
                         pLeftAuxAxisLabel = "Flow (cfs)"
                         lTser1 = Nothing
 
                         'Observed Flow
+                        
                         lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 8)). _
                                                 FindData("Constituent", "FLOW")(0)
+                        Select Case location
+                            Case "RCH400"
+                                lTser1 = lDataSource1.DataSets.FindData("Location", "05245100"). _
+                                                FindData("Constituent", "FLOW")(0)
+                            Case "RCH515"
+                                lTser1 = lDataSource1.DataSets.FindData("Location", "05243725"). _
+                                                FindData("Constituent", "FLOW")(0)
+                            Case "RCH557"
+                                lTser1 = lDataSource1.DataSets.FindData("Location", "05244000"). _
+                                                FindData("Constituent", "FLOW")(0)
+                            Case "RCH700"
+                                lTser1 = lDataSource1.DataSets.FindData("Location", "05247500"). _
+                                                FindData("Constituent", "FLOW")(0)
+                        End Select
                         If lTser1 IsNot Nothing Then
                             lTser1.Attributes.SetValue("YAxis", "Aux")
                             lTser1.Attributes.SetValue("Point", "True")
@@ -828,6 +866,7 @@ Module GraphBasicMPCAWQ
                         End If
 
                         'Simulated constituent data
+
                         lTser1 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
                                                 FindData("Constituent", pWQGraphSpecification(lGraphIndex, 1))(0)
                         lTser1.Attributes.SetValue("YAxis", "Left")
@@ -835,7 +874,9 @@ Module GraphBasicMPCAWQ
                         'lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
 
                         'Simulated constituent data, aggregated to daily
+                        'If Not pTimeseriesConstituent = "TSS" Then
                         lTser1 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                        'End If
                         lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
                         lTser1 = Nothing
 
@@ -916,12 +957,29 @@ Module GraphBasicMPCAWQ
 
                 Dim pOutputWDMFileName1 As String = pWorkingDirectory & "CWVal\CWVal.wdm"
                 Dim wdmfileinfo As System.IO.FileInfo = New System.IO.FileInfo(pOutputWDMFileName1)
+                Dim LastWriteTime As Date = wdmfileinfo.LastWriteTime
                 Dim lRunmade As String = wdmfileinfo.LastWriteTime.ToString
-                foldername = pWorkingDirectory & "ValWQGraphs_" & pbasename & "_" & Format(Year(lRunmade), "00") & "_" & Format(Month(lRunmade), "00") & _
+                wdmfileinfo = New System.IO.FileInfo(pWorkingDirectory & "LPVal\LPVal.wdm")
+                If LastWriteTime < wdmfileinfo.LastWriteTime Then
+                    lRunmade = wdmfileinfo.LastWriteTime.ToString
+                    LastWriteTime = wdmfileinfo.LastWriteTime
+                End If
+
+                wdmfileinfo = New System.IO.FileInfo(pWorkingDirectory & "REVal\REVal.wdm")
+                If LastWriteTime < wdmfileinfo.LastWriteTime Then
+                    lRunmade = wdmfileinfo.LastWriteTime.ToString
+                End If
+
+                foldername = pWorkingDirectory & "WQGraphs_" & pbasename & "_" & Format(Year(lRunmade), "00") & "_" & Format(Month(lRunmade), "00") & _
                                           "_" & Format(Day(lRunmade), "00") & "_" & Format(Hour(lRunmade), "00") & "_" & Format(Minute(lRunmade), "00")
+                System.IO.Directory.CreateDirectory(foldername)
+                System.IO.File.Copy(pWorkingDirectory & "CWVal\CWVal.uci", foldername & "\CWVal.uci")
+                System.IO.File.Copy(pWorkingDirectory & "LPVal\LPVal.uci", foldername & "\LPVal.uci")
+                System.IO.File.Copy(pWorkingDirectory & "REVal\REVal.uci", foldername & "\REVal.uci")
                 Dim lDataSource2 As New atcDataSourceBasinsObsWQ
                 lDataSource2.Open(pObservedWQBaseFileName)
                 For lGraphIndex As Integer = 0 To pLastIndex
+                    pLeftAxisLogScale = False
                     pTimeseriesConstituent = pWQGraphSpecification(lGraphIndex, 1)
                     Select Case pTimeseriesConstituent
                         Case "TW"
@@ -935,6 +993,7 @@ Module GraphBasicMPCAWQ
                         Case "TSS"
                             pLeftYAxisLabel = "Total Suspended Solids (mg/l)"
                             AxisUpper = 1500
+                            pLeftAxisLogScale = True
                         Case "ORC"
                             pLeftYAxisLabel = "Organic Carbon (mg/l)"
                             AxisUpper = 10
@@ -960,9 +1019,9 @@ Module GraphBasicMPCAWQ
                     Dim lEDate(5) As Integer : lEDate(0) = pWQGraphSpecification(lGraphIndex, 5) : lEDate(1) = _
                                                 pWQGraphSpecification(lGraphIndex, 6) : lEDate(2) = pWQGraphSpecification(lGraphIndex, 7)
                     Dim lEdatej As Double = Date2J(lEDate)
-                    pbasename = pWQGraphSpecification(lGraphIndex, 0) & "_" & pTimeseriesConstituent & "_" & _
-                                Format(pWQGraphSpecification(lGraphIndex, 3), "00") & _
-                                Format(pWQGraphSpecification(lGraphIndex, 4), "00") & Right(pWQGraphSpecification(lGraphIndex, 2), 2) & "_to_" & _
+                    pbasename = pTimeseriesConstituent & "_" & pWQGraphSpecification(lGraphIndex, 0) & "_" & _
+                                Format(pWQGraphSpecification(lGraphIndex, 3), "00") & Format(pWQGraphSpecification(lGraphIndex, 4), "00") & _
+                                Right(pWQGraphSpecification(lGraphIndex, 2), 2) & "_to_" & _
                                 Format(pWQGraphSpecification(lGraphIndex, 6), "00") & Format(pWQGraphSpecification(lGraphIndex, 7), "00") & _
                                 Right(pWQGraphSpecification(lGraphIndex, 5), 2)
                     Dim lTimeseriesGroup As New atcTimeseriesGroup
@@ -990,7 +1049,10 @@ Module GraphBasicMPCAWQ
                                                 FindData("Constituent", "FLOW")(0)
                         lTser1.Attributes.SetValue("YAxis", "Aux")
                         lTser1.Attributes.SetValue("Point", False)
+                        'If Not pTimeseriesConstituent = "TSS" Then
                         lTser1 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                        'End If
+
                         lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
                         pLeftAuxAxisLabel = "Flow (cfs)"
                         lTser1 = Nothing
@@ -1023,7 +1085,10 @@ Module GraphBasicMPCAWQ
                         'lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
 
                         'Simulated constituent data, aggregated to daily
+                        'If Not pTimeseriesConstituent = "TSS" Then
                         lTser1 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                        'End If
+
                         lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
                         lTser1 = Nothing
 
@@ -1292,18 +1357,22 @@ Module GraphBasicMPCAWQ
         lCurveAux = lPaneAux.CurveList.Item(0) 'lCurveAux is simulated data
         lCurveAux.Line.StepType = StepType.NonStep
         lCurveAux.Color = Drawing.Color.Red
-        lCurveAux.Line.Width = 2
+        lCurveAux.Line.Width = 1
         lPaneAux.YAxis.Title.Text = pLeftAuxAxisLabel
 
         If lPaneAux.CurveList.Count > 1 Then
             lCurveAux = lPaneAux.CurveList.Item(1) 'lCurveAux is observed data
             lCurveAux.Color = Drawing.Color.Blue
-            lCurveAux.Symbol.Type = SymbolType.Circle
-            lCurveAux.Symbol.Fill.IsVisible = True
-            If lCurveAux.Points.Count > 60 Then
-                lCurveAux.Symbol.Size = 4
+            If lCurveAux.Points.Count > 200 Then
+                lCurveAux.Line.IsVisible = True
+                lCurveAux.Symbol.Type = SymbolType.None
+                lCurveAux.Line.Width = 1
+                lCurveAux.Line.StepType = StepType.NonStep
             Else
-                lCurveAux.Symbol.Size = 7
+                lCurveAux.Line.IsVisible = False
+                lCurveAux.Symbol.Type = SymbolType.Circle
+                lCurveAux.Symbol.Fill.IsVisible = True
+                lCurveAux.Symbol.Size = 4
             End If
         End If
 
@@ -1327,7 +1396,7 @@ Module GraphBasicMPCAWQ
         lCurveMain = lPaneMain.CurveList.Item(0) ' lCurveMain is the aggregated daily simulated data
         lCurveMain.Color = Drawing.Color.Red
         'lCurveMain.Line.StepType = StepType.NonStep
-        lCurveMain.Line.Width = 2
+        lCurveMain.Line.Width = 1
 
         If lPaneMain.CurveList.Count > 1 Then
             lCurveMain = lPaneMain.CurveList.Item(1) 'lCurveMain is observed data
@@ -1352,9 +1421,20 @@ Module GraphBasicMPCAWQ
             End If
         End If
 
+        lPaneMain.YAxis.Scale.Min = 0
+
+        If pLeftAxisLogScale Then
+            lPaneMain.YAxis.Type = AxisType.Log
+            lPaneMain.YAxis.Scale.Min = 0.1
+        End If
+
         Dim lXlabel As String = lPaneMain.XAxis.Title.Text
         lPaneMain.YAxis.Title.Text = pLeftYAxisLabel
-        lPaneMain.YAxis.Scale.Min = 0
+        If pLeftYAxisLabel.Contains("Total Suspended") AndAlso lPaneMain.YAxis.Scale.Max < 100 Then
+            lPaneMain.YAxis.Scale.Max = 100
+
+        End If
+
         'lPaneMain.YAxis.Scale.Max = AxisUpper
         lPaneMain.AxisChange()
         lPaneAux.YAxis.Scale.Min = 0
@@ -1398,6 +1478,7 @@ Module GraphBasicMPCAWQ
 
         Dim lXlabel As String = lPaneMain.XAxis.Title.Text
         lPaneMain.YAxis.Title.Text = pLeftYAxisLabel
+        
         'lPaneMain.YAxis.Scale.Min = AxisLower
         'lPaneMain.YAxis.Scale.Max = AxisUpper
         lPaneMain.AxisChange()
