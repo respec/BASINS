@@ -62,8 +62,8 @@ Public Class StartUp
         
     End Sub
 
-    Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged
-        If chkWaterBalance.Checked OrElse chkSedimentBalance.Checked OrElse chkNitrogenBalance.Checked Then
+    Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged, chkNitrogenBalance.CheckedChanged, chkPhosphorusBalance.CheckedChanged, chkTotalNitrogen.CheckedChanged, chkTotalPhosphorus.CheckedChanged, chkBODBalance.CheckedChanged
+        If chkWaterBalance.Checked OrElse chkSedimentBalance.Checked OrElse chkNitrogenBalance.Checked OrElse chkTotalNitrogen.Checked OrElse chkPhosphorusBalance.Checked OrElse chkTotalPhosphorus.Checked OrElse chkBODBalance.Checked Then
             lblRCH.Enabled = True
             lblOutReach2.Enabled = True
             txtRCH.Enabled = True
@@ -95,5 +95,9 @@ Public Class StartUp
             chkGraphStandard.Checked = False
             chkSupportingGraphs.Checked = False
         End If
+    End Sub
+
+    Private Sub chkNitrogenBalance_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkNitrogenBalance.CheckedChanged
+
     End Sub
 End Class
