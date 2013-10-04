@@ -658,6 +658,10 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Return lS
     End Function
 
+    Public Sub Remove(ByVal aAttribute As atcDefinedValue)
+        pAttributes.Remove(aAttribute)
+    End Sub
+
     Public Shadows Sub RemoveByKey(ByVal aAttributeName As Object)
         pAttributes.RemoveByKey(AttributeNameToKey(aAttributeName))
     End Sub
