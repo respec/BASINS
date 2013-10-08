@@ -80,6 +80,7 @@ Public Module modBasinsPlugin
 
     Private Const Basins40DataPath As String = "Basins\data\"
     Private Const Basins41DataPath As String = "Basins41\data\"
+    Private Const Basins42DataPath As String = "Basins42\data\"
     Friend BasinsDataPath As String = Basins41DataPath
     Private Const NationalProjectFilename As String = "national.mwprj"
 
@@ -88,36 +89,56 @@ Public Module modBasinsPlugin
     ''' </summary>
     Friend Sub FindBasinsDrives()
         If g_BasinsDataDirs.Count = 0 Then
-            Dim lCheckDir As String = DefaultBasinsDataDir()
-            If FileExists(lCheckDir, True, False) Then g_BasinsDataDirs.Add(lCheckDir)
-
-            AddExistingDirs(BasinsDataPath)
-
-            Try
-                CheckDataDir(IO.Path.Combine(IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location)), "data") & g_PathChar)
-            Catch
-            End Try
-
-            If Not BasinsDataPath.Equals(Basins41DataPath) Then
-                'If this is not BASINS41, also look for a BASINS41 data folder
-                AddExistingDirs(Basins41DataPath)
+            Dim lSavedPaths As String = GetSetting(g_AppNameRegistry, "Folders", "DataPaths")
+            If lSavedPaths.Length > 0 Then
+                For Each lSavedPath As String In lSavedPaths.Split(";")
+                    If FileExists(lSavedPath, True, False) Then
+                        g_BasinsDataDirs.Add(lSavedPath)
+                    Else
+                        Logger.Dbg("Did not find saved path: " & lSavedPath)
+                    End If
+                Next
             End If
 
-            If Not BasinsDataPath.Equals(Basins40DataPath) Then ' g_BasinsDataDirs.Count = 0 Then
-                'look for older BASINS data folders too
-                AddExistingDirs(Basins40DataPath)
-            End If
+            If g_BasinsDataDirs.Count = 0 Then
 
-            Select Case g_BasinsDataDirs.Count
-                Case 0 : Logger.Msg("No " & BasinsDataPath & " folders found on any drives on this computer", "Find Data")
-                Case 1 : Logger.Dbg("Found data path: " & g_BasinsDataDirs(0))
-                Case Is > 1
-                    Dim lAllDirs As String = ""
-                    For Each lDir As String In g_BasinsDataDirs
-                        lAllDirs &= lDir & "  "
-                    Next
-                    Logger.Dbg("Found data paths: " & lAllDirs)
-            End Select
+                Dim lCheckDir As String = DefaultBasinsDataDir()
+                If FileExists(lCheckDir, True, False) Then g_BasinsDataDirs.Add(lCheckDir)
+
+                AddExistingDirs(BasinsDataPath)
+
+                Try
+                    CheckDataDir(IO.Path.Combine(IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location)), "data") & g_PathChar)
+                Catch
+                End Try
+
+                If Not BasinsDataPath.Equals(Basins42DataPath) Then
+                    'If this is not BASINS42, also look for a BASINS42 data folder
+                    AddExistingDirs(Basins42DataPath)
+                End If
+
+                If Not BasinsDataPath.Equals(Basins41DataPath) Then
+                    'If this is not BASINS41, also look for a BASINS41 data folder
+                    AddExistingDirs(Basins41DataPath)
+                End If
+
+                If Not BasinsDataPath.Equals(Basins40DataPath) Then
+                    'look for older BASINS data folders too
+                    AddExistingDirs(Basins40DataPath)
+                End If
+
+                Select Case g_BasinsDataDirs.Count
+                    Case 0 : Logger.Msg("No " & BasinsDataPath & " folders found on any drives on this computer", "Find Data")
+                    Case 1 : Logger.Dbg("Found data path: " & g_BasinsDataDirs(0))
+                    Case Is > 1
+                        Dim lAllDirs As String = ""
+                        For Each lDir As String In g_BasinsDataDirs
+                            lAllDirs &= lDir & "  "
+                        Next
+                        Logger.Dbg("Found data paths: " & lAllDirs)
+                End Select
+                SaveSetting(g_AppNameRegistry, "Folders", "DataPaths", String.Join(";", g_BasinsDataDirs))
+            End If
         End If
     End Sub
 
