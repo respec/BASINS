@@ -33,7 +33,7 @@ Public Class frmCustomMsgBox
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.lblMessage = New System.Windows.Forms.Label
+        Me.lblMessage = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
         'lblMessage
@@ -56,6 +56,7 @@ Public Class frmCustomMsgBox
         Me.Name = "frmCustomMsgBox"
         Me.ShowIcon = False
         Me.Text = "frmCustomMsgBox"
+        Me.TopMost = True
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
