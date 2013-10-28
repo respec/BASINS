@@ -91,11 +91,13 @@ Public Class atcGridSource
             End If
         End Get
         Set(ByVal newValue As Boolean)
-            ExpandRowsColumns(aRow, aColumn)
-            If pSelected Is Nothing Then
-                ReDim pSelected(Rows - 1, Columns - 1)
+            If Not InvalidRowOrColumn(aRow, aColumn) Then
+                ExpandRowsColumns(aRow, aColumn)
+                If pSelected Is Nothing Then
+                    ReDim pSelected(Rows - 1, Columns - 1)
+                End If
+                pSelected(aRow, aColumn) = newValue
             End If
-            pSelected(aRow, aColumn) = newValue
         End Set
     End Property
 
