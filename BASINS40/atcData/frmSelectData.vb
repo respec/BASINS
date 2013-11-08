@@ -1308,12 +1308,6 @@ NextName:
         pAbortMatching = True
     End Sub
 
-    Private Sub frmSelectData_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
-        End If
-    End Sub
-
     Private Sub frmSelectData_VisibleChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.VisibleChanged
         If Visible Then SizeCriteria()
     End Sub
@@ -1326,8 +1320,22 @@ NextName:
         pSelectedSource = Nothing
     End Sub
 
+    Private Sub frmSelectData_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelpForSelect()
+        End If
+    End Sub
+
     Private Sub mnuHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
+        ShowHelpForSelect()
+    End Sub
+
+    Private Sub ShowHelpForSelect()
+        If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
+            ShowHelp("Tutorial.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
+        End If
     End Sub
 
     Private Sub pSelectedGroup_Changed(ByVal aAdded As atcUtility.atcCollection) Handles pSelectedGroup.Added, pSelectedGroup.Removed

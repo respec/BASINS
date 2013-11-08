@@ -575,7 +575,8 @@ Friend Module modATCscript
                                 pTserFile.AddDataSet(.ts, atcDataSource.EnumExistAction.ExistRenumber)
 
                                 'If requested, compute Hamon PET from .ts which is assumed to be sub-daily temperature
-                                If .ts.Attributes.ContainsAttribute("Hamon") AndAlso .ts.Attributes.ContainsAttribute("Latitude") Then
+                                If (.ts.Attributes.ContainsAttribute("Hamon") OrElse .ts.Attributes.ContainsAttribute("HamonDaily")) AndAlso .ts.Attributes.ContainsAttribute("Latitude") Then
+                                    Dim lLatitude As Double = .ts.Attributes.GetValue("Latitude")
                                     Dim lCTS() As Double = {0, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055}
                                     For lCTSindex As Integer = 1 To 12 'Look for any specified coefficients in attributes, e.g. HamonCTS1 = January coefficient
                                         lCTS(lCTSindex) = .ts.Attributes.GetValue("HamonCTS" & lCTSindex, lCTS(lCTSindex))
@@ -583,7 +584,10 @@ Friend Module modATCscript
                                     Dim lHamonTS As atcTimeseries = atcMetCmp.PanEvaporationTimeseriesComputedByHamonX( _
                                         .ts, pTserFile, _
                                         (.ts.Attributes.GetValue("Units", "TF") = "TF" OrElse .ts.Attributes.GetValue("Hamon", "F") = "F"), _
-                                        .ts.Attributes.GetValue("Latitude"), lCTS)
+                                        lLatitude, lCTS)
+                                    If Not .ts.Attributes.ContainsAttribute("HamonDaily") Then
+                                        lHamonTS = atcMetCmp.DisSolPet(lHamonTS, pTserFile, 2, lLatitude)
+                                    End If
                                     pTserFile.AddDataSet(lHamonTS, atcData.atcDataSource.EnumExistAction.ExistRenumber)
                                 End If
 

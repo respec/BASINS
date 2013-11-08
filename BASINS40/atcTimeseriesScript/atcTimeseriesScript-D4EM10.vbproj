@@ -5,10 +5,10 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{92EA3681-9EA9-438A-A598-2531F483A0C6}</ProjectGuid>
+    <ProjectGuid>{40DE1F29-3531-4BC2-9D7E-324DC92689DF}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>atcDurationCompare</RootNamespace>
-    <AssemblyName>atcDurationCompare</AssemblyName>
+    <RootNamespace>atcTimeseriesScript</RootNamespace>
+    <AssemblyName>atcTimeseriesScript</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -42,106 +42,94 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\D4EM\Bin4.0\</OutputPath>
-    <DocumentationFile>atcDurationCompare.xml</DocumentationFile>
+    <OutputPath>..\local\AnyDebug\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
-    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>None</DebugType>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\D4EM\Bin\</OutputPath>
-    <DocumentationFile>atcDurationCompare.xml</DocumentationFile>
+    <OutputPath>..\local\AnyRelease\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x64Debug\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x64Release\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>None</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\D4EM\Bin4.0\</OutputPath>
-    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
-    <DocumentationFile>atcDurationCompare.xml</DocumentationFile>
+    <OutputPath>..\bin-D4EM10\x86Debug\</OutputPath>
+    <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DocumentationFile>atcDurationCompare.xml</DocumentationFile>
+    <OutputPath>..\local\x86Release\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>None</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="ZedGraph, Version=5.1.3.0, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\D4EM\Bin\ZedGraph.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Collections.Generic" />
-    <Import Include="System.Data" />
-    <Import Include="System.Diagnostics" />
-    <Import Include="System.Linq" />
-    <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="atcSeasonsMonthDay.vb" />
-    <Compile Include="clsDurationCompare.vb" />
-    <Compile Include="ctlClassLimits.Designer.vb">
-      <DependentUpon>ctlClassLimits.vb</DependentUpon>
+    <Compile Include="atcTimeseriesScript.vb" />
+    <Compile Include="clsATCscriptExpression.vb" />
+    <Compile Include="frmDebugScript.designer.vb">
+      <DependentUpon>frmDebugScript.vb</DependentUpon>
     </Compile>
-    <Compile Include="ctlClassLimits.vb">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="frmAnalysis.Designer.vb">
-      <DependentUpon>frmAnalysis.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmAnalysis.vb">
+    <Compile Include="frmDebugScript.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmDurationHydrographControl.Designer.vb">
-      <DependentUpon>frmDurationHydrographControl.vb</DependentUpon>
+    <Compile Include="frmInputWizard.Designer.vb">
+      <DependentUpon>frmInputWizard.vb</DependentUpon>
     </Compile>
-    <Compile Include="frmDurationHydrographControl.vb">
+    <Compile Include="frmInputWizard.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmResult.Designer.vb">
-      <DependentUpon>frmResult.vb</DependentUpon>
+    <Compile Include="frmSelectScript.designer.vb">
+      <DependentUpon>frmSelectScript.vb</DependentUpon>
     </Compile>
-    <Compile Include="frmResult.vb">
+    <Compile Include="frmSelectScript.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="modStat.vb" />
+    <Compile Include="modATCscript.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -159,18 +147,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ctlClassLimits.resx">
-      <DependentUpon>ctlClassLimits.vb</DependentUpon>
+    <EmbeddedResource Include="frmDebugScript.resX">
+      <DependentUpon>frmDebugScript.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmAnalysis.resx">
-      <DependentUpon>frmAnalysis.vb</DependentUpon>
-      <SubType>Designer</SubType>
+    <EmbeddedResource Include="frmInputWizard.resX">
+      <DependentUpon>frmInputWizard.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmDurationHydrographControl.resx">
-      <DependentUpon>frmDurationHydrographControl.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmResult.resx">
-      <DependentUpon>frmResult.vb</DependentUpon>
+    <EmbeddedResource Include="frmSelectScript.resX">
+      <DependentUpon>frmSelectScript.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -191,26 +175,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM10.vbproj">
-      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
-      <Name>MapWinUtility-D4EM10</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData-D4EM10.vbproj">
-      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
-      <Name>atcData-D4EM10</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcUtility\atcUtility-D4EM10.vbproj">
-      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Name>atcUtility-D4EM10</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
@@ -226,6 +190,33 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM10.vbproj">
+      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
+      <Name>MapWinUtility-D4EM10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcControls\atcControls-D4EM10.vbproj">
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Name>atcControls-D4EM10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData-D4EM10.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData-D4EM10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMetCmp\atcMetCmp-D4EM10.vbproj">
+      <Project>{72264BDC-23F5-4A55-B53D-0752099CB263}</Project>
+      <Name>atcMetCmp-D4EM10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility-D4EM10.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility-D4EM10</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
