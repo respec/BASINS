@@ -184,9 +184,9 @@ Public Class frmImport
                     Dim lCountBefore As Integer = lWDM.DataSets.Count
                     lScript.RunSelectedScript(aScriptFilename, lImportFilename, lWDM)
 
-                    If aEach Then lWDM = Nothing
-
                     lDatasetsImported += lWDM.DataSets.Count - lCountBefore
+
+                    If aEach Then lWDM = Nothing
 
                     lScript.Clear()
                     lFilesImported += 1

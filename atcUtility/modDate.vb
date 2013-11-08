@@ -616,11 +616,14 @@ Public Module modDate
         End If
     End Sub
 
+    ''' <summary>
+    ''' Convert a date that uses the midnight convention of 00:00
+    ''' to the convention 24:00.  For example, 1982/10/01 00:00:00
+    ''' would be converted to the date 1982/09/30 24:00:00.
+    ''' </summary>
+    ''' <param name="d"></param>
+    ''' <remarks></remarks>
     Public Sub timcnv(ByRef d() As Integer)
-        '     Convert a date that uses the midnight convention of 00:00
-        '     to the convention 24:00.  For example, 1982/10/01 00:00:00
-        '     would be converted to the date 1982/09/30 24:00:00.
-
         If (d(3) = 0) Then
             If (d(4) = 0 AndAlso d(5) = 0) Then
                 '     date using new day boundry convention, convert to old
