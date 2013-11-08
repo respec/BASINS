@@ -62,6 +62,7 @@ Public Class frmMain
             .Add(New atcTimeseriesNCDC.atcTimeseriesNCDC)
             .Add(New atcTimeseriesRDB.atcTimeseriesRDB)
             .Add(New atcTimeseriesScript.atcTimeseriesScriptPlugin)
+            .Add(New atcTimeseriesSUSTAIN.atcTimeseriesSUSTAIN)
 
             .Add(New atcList.atcListPlugin)
             .Add(New atcGraph.atcGraphPlugin)
@@ -425,6 +426,7 @@ Compare12:
 
         If lButtonNames.Count > 0 Then
             Dim lButtonForm As New atcControls.frmButtons()
+            lButtonForm.Icon = Me.Icon
             Dim lComputationName As String = lButtonForm.AskUser("Select Computation", "VERTICAL", lButtonNames)
             If lComputationName <> lButtonForm.LabelCancel Then
                 aDataSource.Specification = lComputationName

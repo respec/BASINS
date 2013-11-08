@@ -214,6 +214,10 @@
       <Project>{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}</Project>
       <Name>atcTimeseriesStatistics-D4EM10</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesSUSTAIN\atcTimeseriesSUSTAIN-D4EM10.vbproj">
+      <Project>{D985BBC0-EF47-461B-B6BE-21463BCD588D}</Project>
+      <Name>atcTimeseriesSUSTAIN-D4EM10</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI-D4EM10.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
       <Name>atcUCI-D4EM10</Name>
