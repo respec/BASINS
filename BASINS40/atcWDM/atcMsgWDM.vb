@@ -90,7 +90,17 @@ Friend Class atcMsgWDM
     End Sub
 
     Public Function MsgHandle() As atcWdmHandle
-        Dim lMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
+        Dim lMsgFileName As String = atcDataSourceWDM.HSPFMsgFilename
+        Dim lUserVerifyFileName As Boolean = False
+        If String.IsNullOrEmpty(lMsgFileName) Then
+USERFINDFILE:
+            lMsgFileName = FindFile("Please locate HSPF message file", "hspfmsg.wdm", aUserVerifyFileName:=lUserVerifyFileName)
+        End If
+        If Not IO.File.Exists(lMsgFileName) OrElse Not lMsgFileName.ToLower().EndsWith("hspfmsg.wdm") Then
+            lUserVerifyFileName = True
+            GoTo USERFINDFILE
+        End If
+        atcDataSourceWDM.HSPFMsgFilename = lMsgFileName
         Return New atcWdmHandle(1, lMsgFileName)
     End Function
 End Class

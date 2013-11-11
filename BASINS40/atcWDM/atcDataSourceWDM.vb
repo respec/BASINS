@@ -11,6 +11,10 @@ Imports System.Collections.Specialized
 
 Public Class atcDataSourceWDM
     Inherits atcData.atcTimeseriesSource
+
+    'Set at beginning of execution if a particular message file is desired
+    Public Shared HSPFMsgFilename As String = Nothing
+
     Private Shared pFilter As String = "WDM Files (*.wdm)|*.wdm"
     Private Shared pShowViewMessage As Boolean = True
     Private Shared pAskAboutMissingTuTs As Boolean = True

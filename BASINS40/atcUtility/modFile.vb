@@ -1326,4 +1326,18 @@ ReadCharacter:
     Private Function GetMinValueInternal(Optional ByVal aMinValue As Double = System.Double.MinValue) As Double
         Return aMinValue
     End Function
+
+    <CLSCompliant(False)> <System.Flags()> _
+    Enum LoadLibraryFlags As UInteger
+        DONT_RESOLVE_DLL_REFERENCES = &H1
+        LOAD_IGNORE_CODE_AUTHZ_LEVEL = &H10
+        LOAD_LIBRARY_AS_DATAFILE = &H2
+        LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE = &H40
+        LOAD_LIBRARY_AS_IMAGE_RESOURCE = &H20
+        LOAD_WITH_ALTERED_SEARCH_PATH = &H8
+    End Enum
+
+    <DllImport("kernel32.dll")> _
+    Public Function LoadLibraryEx(ByVal lpFileName As String, ByVal hReservedNull As IntPtr, ByVal dwFlags As LoadLibraryFlags) As IntPtr
+    End Function
 End Module
