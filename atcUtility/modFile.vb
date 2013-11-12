@@ -1337,7 +1337,7 @@ ReadCharacter:
         LOAD_WITH_ALTERED_SEARCH_PATH = &H8
     End Enum
 
-    <DllImport("kernel32.dll")> _
+    <DllImport("kernel32.dll")> <CLSCompliant(False)> _
     Public Function LoadLibraryEx(ByVal lpFileName As String, ByVal hReservedNull As IntPtr, ByVal dwFlags As LoadLibraryFlags) As IntPtr
     End Function
 End Module
