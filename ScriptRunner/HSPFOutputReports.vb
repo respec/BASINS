@@ -12,6 +12,8 @@ Imports ZedGraph
 Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 
+
+
 Module HSPFOutputReports
     Private pBaseFolders As New ArrayList
     Private pTestPath As String
@@ -34,6 +36,7 @@ Module HSPFOutputReports
     Private pAreaReport As Boolean = False
     Private pRunHSPF As Boolean = False
     Private pHSPFExe As String = "C:\Basins41\models\HSPF\bin\WinHspfLt.exe"
+    Private pExcelWrite As Boolean = False
 
     Private Sub Initialize()
         pOutputLocations.Clear()
@@ -45,8 +48,8 @@ Module HSPFOutputReports
 
         'Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "NonUpatoi"
-        'lTestName = "IRW"
-        lTestName = "IRW-test-agchem"
+        lTestName = "IRW"
+        'lTestName = "IRW-test-agchem"
         'lTestName = "LPCal03"
         'lTestName = "LPVal"
         'lTestName = "CWCal03"
@@ -68,9 +71,9 @@ Module HSPFOutputReports
         'pConstituents.Add("N-PQUAL")
         'pConstituents.Add("P-PQUAL")
         'pConstituents.Add("BOD-PQUAL")
-        'pConstituents.Add("TotalN")
+        pConstituents.Add("TotalN")
         'pConstituents.Add("TotalP")
-        pConstituents.Add("AGCHEM")
+        'pConstituents.Add("AGCHEM")
 
         Select Case lTestName
             Case "CRY"
@@ -235,7 +238,7 @@ Module HSPFOutputReports
                 pOutputLocations.Add("R:516")
                 pCurveStepType = "NonStep" 'Tony's convention
                 pGraphAnnual = True
-                pRunHSPF = True
+                'pRunHSPF = True
 
             Case "IRW-test-agchem"
                 pTestPath = "S:\BASINS\data\AGCHEM"
@@ -589,7 +592,11 @@ Module HSPFOutputReports
                 End Try
             Next lExpertSystemFileName
         End If
+        If pExcelWrite Then
+            Dim ExcelFile = System.IO.File.Create(lOutFolderName & "Report.xlsx")
 
+        End If
+        Dim lConstituentName As String = ""
         For Each lConstituent As String In pConstituents
             Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
 
@@ -598,10 +605,27 @@ Module HSPFOutputReports
 
             Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
             Logger.Dbg("Summary at " & lLocations.Count & " locations")
+            Select Case lConstituent
+                Case "Water"
+                    lConstituentName = "WAT"
+                Case "Sediment"
+                    lConstituentName = "SED"
+                Case "N-PQUAL"
+                    lConstituentName = "N"
+                Case "P-PQUAL"
+                    lConstituentName = "P"
+                Case "TotalN"
+                    lConstituentName = "TN"
+                Case "TotalP"
+                    lConstituentName = "TP"
+                Case "BOD-PQUAL"
+                    lConstituentName = "BOD"
+            End Select
 
-            lReportCons = HspfSupport.atcHspfAGCHEM.Report(lHspfUci, pBaseName, lHspfBinDataSource, lLocations, lRunMade)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_AGCHEM.txt"
-            SaveFileString(lOutFileName, lReportCons.ToString)
+            'lReportCons = HspfSupport.atcHspfAGCHEM.Report(lHspfUci, pBaseName, lHspfBinDataSource, lLocations, lRunMade)
+            'lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_AGCHEM.txt"
+            'SaveFileString(lOutFileName, lReportCons.ToString)
+
 
             'If lConstituent <> "Sediment" Then
             '    lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears, pIdsPerSeg)
@@ -617,13 +641,13 @@ Module HSPFOutputReports
 
             lReportCons = Nothing
             lReportCons = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Reach_Annual_Average_Loads.txt"
+            lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Lds.txt"
             '"All_Budget.txt"
             SaveFileString(lOutFileName, lReportCons.ToString)
             lReportCons = Nothing
 
             lReportCons = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lRunMade, lConstituent)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Oper_Annual_Average_Loads.txt"
+            lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Ann_Avg_Lds.txt"
             '"_All_WatershedSummary.txt"
             SaveFileString(lOutFileName, lReportCons.ToString)
             lReportCons = Nothing
@@ -632,7 +656,7 @@ Module HSPFOutputReports
             lReportCons = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                 lHspfBinDataSource, lLocations, lRunMade)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Per_Oper_Annual.txt"
+            lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Ann.txt"
             '"_Mult_ConstituentBalance.txt"
             SaveFileString(lOutFileName, lReportCons.ToString)
 
@@ -654,7 +678,7 @@ Module HSPFOutputReports
             lReportCons = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                 lHspfBinDataSource, lRunMade)
-            lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Group_By_OperType_And_LU_Annual_Average.txt"
+            lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
             '"_All_WatershedConstituentBalance.txt"
             SaveFileString(lOutFileName, lReportCons.ToString)
 
@@ -678,13 +702,14 @@ Module HSPFOutputReports
                     lHspfBinDataSource, pOutputLocations, lRunMade, _
                     lOutFolderName, True)
                 'now pivoted version
-                HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-                   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                    lHspfBinDataSource, pOutputLocations, lRunMade, _
-                    lOutFolderName, True, True)
+                'HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                '    lHspfBinDataSource, pOutputLocations, lRunMade, _
+                '    lOutFolderName, True, True)
             End If
         Next
         Logger.Dbg("Reports Written in " & lOutFolderName, "HSPFOutputReports")
+        OpenFile(lOutFolderName)
     End Sub
 
     Private Sub GraphWQDuration()
