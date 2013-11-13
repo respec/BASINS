@@ -54,6 +54,7 @@ Public Module ConstituentBalance
             'aDecimalPlaces = 1 'TODO: adjust in calling routine?
         End If
         lReport.AppendLine(vbCrLf)
+        Dim lConstituentKey As String
 
         For Each lOperationKey As String In aOperationTypes.Keys
             For Each lLocation As String In aLocations
@@ -63,12 +64,15 @@ Public Module ConstituentBalance
                     'Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
                     Dim lNeedHeader As Boolean = True
                     Dim lPendingOutput As String = ""
+                    Dim lHaveData As Boolean = False
 
                     Try
                         Dim lOutputTable As New atcTableDelimited
                         lOutputTable.TrimValues = False
                         With lOutputTable
-                            For Each lConstituentKey As String In lConstituentsToOutput.Keys
+                            For k As Integer = 0 To lConstituentsToOutput.Count - 1 'Anurag Changed the way For loop works to enable easy skipping when there are no AgCHEM constituents. Basically if the HBN file has no data for ("P:NO3+NO2-N - SURFACE LAYER OUTFLOW") or ("P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW") the code assumes that there are no AGCHEM constituents for that specific PERLND and looks for the PQUAL constituents
+                                'For Each lConstituentKey In lConstituentsToOutput.Keys
+                                lConstituentKey = lConstituentsToOutput.Keys(k)
                                 If lConstituentKey.StartsWith(lOperationKey) Then
                                     Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
                                     Dim lMultipleIndex As Integer = 0
@@ -81,6 +85,7 @@ Public Module ConstituentBalance
                                     lConstituentKey = lConstituentKey.Remove(0, 2)
                                     Dim lConstituentDataGroup As atcTimeseriesGroup = lLocationDataGroup.FindData("Constituent", lConstituentKey)
                                     If lConstituentDataGroup.Count > 0 Then
+                                        lHaveData = True
                                         Dim lTempDataSet As atcDataSet = lConstituentDataGroup.Item(0)
                                         Dim lSeasons As atcSeasonBase
                                         If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
@@ -141,7 +146,7 @@ Public Module ConstituentBalance
                                         Select Case lConstituentKey
                                             Case "POQUAL-BOD", "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD"
                                                 'might need another multiplier for bod
-                                                If aBalanceType = "BOD" Then
+                                                If aBalanceType = "BOD-PQUAL" Then
                                                     lMult = 0.4
                                                 ElseIf aBalanceType = "OrganicN" Or aBalanceType = "TotalN" Then
                                                     If lMultipleIndex = 1 Then
@@ -214,10 +219,18 @@ Public Module ConstituentBalance
                                             lPendingOutput &= vbCr
                                         End If
                                         lPendingOutput &= lConstituentName
+                                        If k = 2 AndAlso lConstituentKey.Contains("NO3") Then 'At this point the specific data for AGCHEM N constitunet in HBN file is missing and code skips to PQUAL constituents
+                                            k = 123
+                                            lPendingOutput = ""
+                                        End If
+                                        If k = 2 AndAlso lConstituentKey.Contains("PO4") Then 'At this point the specific data for AGCHEM P constitunet in HBN file is missing and code skips to PQUAL constituents
+                                            k = 52
+                                            lPendingOutput = ""
+                                        End If
                                     End If
-                                    End If
+                                End If
                             Next
-                            If lOutputTable.NumFields > 0 Then
+                            If lHaveData AndAlso lOutputTable.NumFields > 0 Then
                                 If aDateRows Then
                                     lReport.Append(.ToStringPivoted)
                                 Else
