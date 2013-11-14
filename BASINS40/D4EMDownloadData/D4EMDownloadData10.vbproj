@@ -96,20 +96,97 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotSpatial.Analysis">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Analysis.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Compatibility">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Compatibility.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Controls">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Data">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Data.Forms">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Data.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Extensions">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Modeling">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Modeling.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Modeling.Forms">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Modeling.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Plugins.Taudem">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Plugins.Taudem.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Plugins.Taudem.Port">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Plugins.Taudem.Port.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Projections">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Projections.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Projections.Forms">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Projections.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Serialization">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Symbology.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology.Forms">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Symbology.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Tools">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\Tools\DotSpatial.Tools.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Topology">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Topology.dll</HintPath>
+    </Reference>
     <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\local\$(Platform)$(Configuration)\Interop.MapWinGIS.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinInterfaces, Version=4.3.2728.11380, Culture=neutral">
-      <HintPath>..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <ProjectReference Include="..\..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager10.vbproj">
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\BASINS\BASINS-D4EM.Data.Source.BASINS.vbproj">
+      <Project>{1A68540D-13CA-46AF-93E6-2C864E6627C7}</Project>
+      <Name>BASINS-D4EM.Data.Source.BASINS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\NHDPlus\BASINS-D4EM.Data.Source.NHDPlus.vbproj">
+      <Project>{6B7283C6-6DDE-41E9-BA00-F3EDD604B38B}</Project>
+      <Name>BASINS-D4EM.Data.Source.NHDPlus</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\NLDAS\BASINS-D4EM.Data.Source.NLDAS.vbproj">
+      <Project>{B8E2D4B9-3AC3-4160-A4B7-6B9D0AE03FE0}</Project>
+      <Name>BASINS-D4EM.Data.Source.NLDAS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\NRCS_Soil\BASINS-D4EM.Data.Source.NRCS_Soil.vbproj">
+      <Project>{7612F73D-72CD-4A3D-861A-401E0E5F72BA}</Project>
+      <Name>BASINS-D4EM.Data.Source.NRCS_Soil</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\NWIS\BASINS-D4EM.Data.Source.NWIS.vbproj">
+      <Project>{E00C40D7-1EB7-44DE-A196-619AC2016689}</Project>
+      <Name>BASINS-D4EM.Data.Source.NWIS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\Storet\BASINS-D4EM.Data.Source.Storet.vbproj">
+      <Project>{B39B85B9-65F1-4FB7-B8E5-7A8559DFA368}</Project>
+      <Name>BASINS-D4EM.Data.Source.Storet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\USGS_Seamless\BASINS-D4EM.Data.Source.USGS_Seamless.vbproj">
+      <Project>{2CF5E4F7-8649-40F7-8481-CEFE720262CF}</Project>
+      <Name>BASINS-D4EM.Data.Source.USGS_Seamless</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data\BASINS-D4EM.Data.vbproj">
       <Project>{06768E3A-87AE-4D46-A45A-C43C6109D43F}</Project>
-      <Name>BASINS-D4EMDataManager10</Name>
-      <Private>False</Private>
+      <Name>BASINS-D4EM.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Geo\BASINS-D4EM.Geo.vbproj">
+      <Project>{573A99FB-08DE-4B28-8628-AC7089348D96}</Project>
+      <Name>BASINS-D4EM.Geo</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
@@ -119,6 +196,11 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
+    <Reference Include="WebDownload, Version=1.3.4559.29757, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\WorldWind\WebDownload.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -128,17 +210,23 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DownloadDataPlugin.vb" />
-    <Compile Include="frmDownload.Designer.vb">
-      <DependentUpon>frmDownload.vb</DependentUpon>
+    <Compile Include="DownloadDataPlugin10.vb" />
+    <Compile Include="frmDownload10.Designer.vb">
+      <DependentUpon>frmDownload10.vb</DependentUpon>
     </Compile>
-    <Compile Include="frmDownload.vb">
+    <Compile Include="frmDownload10.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmSpecifyRegion.Designer.vb">
-      <DependentUpon>frmSpecifyRegion.vb</DependentUpon>
+    <Compile Include="frmSpecifyRegion10.Designer.vb">
+      <DependentUpon>frmSpecifyRegion10.vb</DependentUpon>
     </Compile>
-    <Compile Include="frmSpecifyRegion.vb">
+    <Compile Include="frmSpecifyRegion10.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSpecifyStations.Designer.vb">
+      <DependentUpon>frmSpecifyStations.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSpecifyStations.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmWDM.Designer.vb">
@@ -164,13 +252,16 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmDownload.resx">
-      <DependentUpon>frmDownload.vb</DependentUpon>
+    <EmbeddedResource Include="frmDownload10.resx">
+      <DependentUpon>frmDownload10.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmSpecifyRegion.resx">
+    <EmbeddedResource Include="frmSpecifyRegion10.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>frmSpecifyRegion.vb</DependentUpon>
+      <DependentUpon>frmSpecifyRegion10.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifyStations.resx">
+      <DependentUpon>frmSpecifyStations.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmWDM.resx">
       <SubType>Designer</SubType>
@@ -227,6 +318,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\MW4.8.6\MapWindow4Dev\MapWinInterfaces\MapWinInterfaces10.csproj">
+      <Project>{E880AAB1-98B5-45B8-A3B8-CB3D0DB8B317}</Project>
+      <Name>MapWinInterfaces10</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcData\atcData10.vbproj">
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
       <Name>atcData10</Name>
