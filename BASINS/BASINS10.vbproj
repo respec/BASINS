@@ -140,6 +140,11 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotSpatial.Projections, Version=0.11.9.6, Culture=neutral, PublicKeyToken=272632bddd08a38b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Projections.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Interop.MapWinGIS">
       <Name>Interop.MapWinGIS</Name>
       <HintPath>..\local\$(Platform)$(Configuration)\Interop.MapWinGIS.dll</HintPath>
@@ -155,10 +160,19 @@
       <HintPath>..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <ProjectReference Include="..\..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager10.vbproj">
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\BASINS\BASINS-D4EM.Data.Source.BASINS.vbproj">
+      <Project>{1A68540D-13CA-46AF-93E6-2C864E6627C7}</Project>
+      <Name>BASINS-D4EM.Data.Source.BASINS</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\NWIS\BASINS-D4EM.Data.Source.NWIS.vbproj">
+      <Project>{E00C40D7-1EB7-44DE-A196-619AC2016689}</Project>
+      <Name>BASINS-D4EM.Data.Source.NWIS</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data\BASINS-D4EM.Data.vbproj">
       <Project>{06768E3A-87AE-4D46-A45A-C43C6109D43F}</Project>
-      <Name>BASINS-D4EMDataManager10</Name>
-      <Private>False</Private>
+      <Name>BASINS-D4EM.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
@@ -222,7 +236,7 @@
     <Compile Include="modBasinsPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="modDownload.vb">
+    <Compile Include="modDownload10.vb">
       <SubType>Code</SubType>
     </Compile>
     <EmbeddedResource Include="frmAbout.resx">
