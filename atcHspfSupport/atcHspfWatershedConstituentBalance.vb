@@ -7,6 +7,8 @@ Imports System.Collections.ObjectModel
 ''' Build watershed constituent balance reports
 ''' </summary>
 ''' <remarks></remarks>
+
+
 Public Module WatershedConstituentBalance
     ''' <summary>
     ''' Build watershed constituent balance reports for watershed above specified output locations
@@ -40,6 +42,9 @@ Public Module WatershedConstituentBalance
                      Optional ByVal aSignificantDigits As Integer = 5, _
                      Optional ByVal aFieldWidth As Integer = 12, _
                      Optional ByVal aSkipZeroOrNoValue As Boolean = True)
+
+
+
         For Each lOutletLocation As String In aOutletLocations
             Dim lReport As atcReport.ReportText = Report(aUci, aBalanceType, _
                                                aOperationTypes, _
@@ -47,11 +52,12 @@ Public Module WatershedConstituentBalance
                                                aRunMade, lOutletLocation, _
                                                aOutFilePrefix, True, _
                                                aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth, aSkipZeroOrNoValue)
+
             Dim lPivotString As String = ""
             If aSegmentRows Then
                 lPivotString = "Pivot"
             End If
-            Dim lOutFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & lOutletLocation & "_Group_By_OperType_And_LU_Annual_Average" & lPivotString & ".txt")
+            Dim lOutFileName As String = aOutFilePrefix & SafeFilename(ShortConstituentName(aBalanceType) & "_" & aScenario & "_" & lOutletLocation & "_Grp_By_OPN_LU_Ann_Avg" & lPivotString & ".txt")
             '_Balance.txt
             Logger.Dbg("  WriteReportTo " & lOutFileName)
             SaveFileString(lOutFileName, lReport.ToString)
@@ -64,7 +70,7 @@ Public Module WatershedConstituentBalance
                 Dim lSummaryDetails As atcCollection
                 Dim lSummaryDetail As SummaryDetail
                 For Each lOutletLocation As String In aOutletLocations
-                    Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & lOutletLocation & "_Overall_Averaged.txt")
+                    Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(ShortConstituentName(aBalanceType) & "_" & aScenario & "_" & lOutletLocation & "_Oall_Avgd.txt")
                     'BalanceSummary.txt
                     Dim lSurfaceIndex As Integer = -1
                     Dim lBaseETIndex As Integer = -1
@@ -83,6 +89,10 @@ Public Module WatershedConstituentBalance
                                     lConstituent = "Impervious"
                                 ElseIf lConstituent = "Baseflow" AndAlso lCurrentGroup = "Evaporation" AndAlso lBaseETIndex = -1 Then
                                     lBaseETIndex = lConstituents.Count + 1
+                                End If
+                            ElseIf aBalanceType = "TotalN" Then
+                                If lConstituent = "Surface" Then
+                                    lConstituent &= "-" & lCurrentOperation.Substring(0, 3)
                                 End If
                             End If
 
@@ -108,25 +118,25 @@ Public Module WatershedConstituentBalance
                                 lSummaryDetails = lConstituents.ItemByKey(lConstituent)
                             End If
 
-                            If lSummaryDetails.IndexFromKey(lOutletLocation) = -1 Then
-                                lSummaryDetail = New SummaryDetail
-                                lSummaryDetails.Add(lOutletLocation, lSummaryDetail)
-                            Else
-                                lSummaryDetail = lSummaryDetails.ItemByKey(lOutletLocation)
-                            End If
-                            With lSummaryDetail
-                                .Mass += lFields(2)
-                                If lCurrentOperation = "RCHRES" Then
-                                    .UnitValue += lFields(1)
+                                If lSummaryDetails.IndexFromKey(lOutletLocation) = -1 Then
+                                    lSummaryDetail = New SummaryDetail
+                                    lSummaryDetails.Add(lOutletLocation, lSummaryDetail)
                                 Else
-                                    .UnitValue += lFields(3)
-                                    If lConstituent = "Impervious" OrElse lConstituent = "Surface-IMP" Then
-                                        Dim lSummaryDetailTotal As SummaryDetail = lConstituents.ItemByKey("Total").ItemByKey(lOutletLocation)
-                                        lSummaryDetailTotal.UnitValue += .UnitValue
-                                        lSummaryDetailTotal.Mass += .Mass
-                                    End If
+                                    lSummaryDetail = lSummaryDetails.ItemByKey(lOutletLocation)
                                 End If
-                            End With
+                                With lSummaryDetail
+                                    .Mass += lFields(2)
+                                    If lCurrentOperation = "RCHRES" Then
+                                        .UnitValue += lFields(1)
+                                    Else
+                                        .UnitValue += lFields(3)
+                                        If lConstituent = "Impervious" OrElse lConstituent = "Surface-IMP" Then
+                                            Dim lSummaryDetailTotal As SummaryDetail = lConstituents.ItemByKey("Total").ItemByKey(lOutletLocation)
+                                            lSummaryDetailTotal.UnitValue += .UnitValue
+                                            lSummaryDetailTotal.Mass += .Mass
+                                        End If
+                                    End If
+                                End With
                         ElseIf lString.Trim.Length = 6 AndAlso aOperationTypes.Contains(lString.Trim) Then
                             lCurrentOperation = lString.Trim
                         ElseIf lString.Trim.Length > 0 AndAlso lFields.GetUpperBound(0) = 0 AndAlso lCurrentOperation.Length > 0 Then
@@ -173,13 +183,33 @@ Public Module WatershedConstituentBalance
                         lReport.AppendLine()
                     Next
                 Next lGroup
-                SaveFileString(aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_Overall_Averaged_By_Multiple_Locations.txt"), lReport.ToString)
+                SaveFileString(aOutFilePrefix & SafeFilename(ShortConstituentName(aBalanceType) & "_" & aScenario & "_OvAll_Avg_By_Mult_Locs.txt"), lReport.ToString)
                 'Mult_BalanceBasin.txt
             Catch lEx As Exception
                 Logger.Dbg("Whoops!")
             End Try
         End If
     End Sub
+
+    Private Function ShortConstituentName(ByVal aBalanceType As String) As String
+        Select Case aBalanceType
+            Case "Water"
+                Return "WAT"
+            Case "Sediment"
+                Return "SED"
+            Case "N-PQUAL"
+                Return "N"
+            Case "P-PQUAL"
+                Return "P"
+            Case "TotalN"
+                Return "TN"
+            Case "TotalP"
+                Return "TP"
+            Case "BOD"
+                Return "BOD"
+        End Select
+        Return aBalanceType
+    End Function
 
     Friend Class SummaryDetail
         Friend UnitValue As Double = 0.0
@@ -259,8 +289,9 @@ Public Module WatershedConstituentBalance
         For Each lOperationType As String In aOperationTypes
             Logger.Dbg("ProcessType:" & lOperationType)
             Dim lValueOutlet As Double = 0.0
-
+            Dim lConstituentKey As String
             For Each lLandUse As String In lLandUses.Keys
+               
                 If lOperationType.StartsWith(lLandUse.Substring(0, 1)) Then
                     Try
                         Dim lNeedHeader As Boolean = True
@@ -269,7 +300,10 @@ Public Module WatershedConstituentBalance
                         Dim lLoadTotals As New Loads
                         Dim lLoadUnit() As Double = Nothing
                         With lOutputTable
-                            For Each lConstituentKey As String In lConstituentsToOutput.Keys
+                            'For Each lConstituentKey As String In lConstituentsToOutput.Keys
+                            For lConstituentIndex As Integer = 0 To lConstituentsToOutput.Count - 1 'Anurag Changed the way For loop works to enable easy skipping when there are no AgCHEM constituents. Basically if the HBN file has no data for ("P:NO3+NO2-N - SURFACE LAYER OUTFLOW") or ("P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW") the code assumes that there are no AGCHEM constituents for that specific PERLND and looks for the PQUAL constituents
+                                'For Each lConstituentKey In lConstituentsToOutput.Keys
+                                lConstituentKey = lConstituentsToOutput.Keys(lConstituentIndex)
                                 If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
                                     Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
                                     Dim lConstituentDataName As String = lConstituentKey
@@ -338,11 +372,13 @@ Public Module WatershedConstituentBalance
                                         Dim lWeightAccum As Double = 0.0
                                         Dim lValue As Double = 0.0
                                         lFieldIndex = 1
+                                        Dim lSomeLocationHasData As Boolean = False
 
                                         For Each lLocation As String In lLandUseOperations.Keys
                                             'lLocation e.g. R:69
                                             Dim lLocationDataGroup As atcTimeseriesGroup = lConstituentDataGroup.FindData("Location", lLocation)
                                             If lLocationDataGroup.Count > 0 Then
+                                                lSomeLocationHasData = True
                                                 lTempDataSet = lLocationDataGroup.Item(0)
                                                 Dim lMult As Double = 1.0
                                                 Select Case lConstituentDataName
@@ -380,8 +416,10 @@ Public Module WatershedConstituentBalance
                                                 End If
                                             Else
                                                 lValue = 0.0
+
                                                 'Logger.Dbg("SkipLocation:" & lLocation & ":WithNo:" & lConstituentKey & ":Data")
                                             End If
+                                            
                                             ReDim Preserve lLoadUnit(lFieldIndex - 1)
                                             lLoadUnit(lFieldIndex - 1) = lValue
                                             lFieldIndex += 1
@@ -398,28 +436,58 @@ Public Module WatershedConstituentBalance
                                                 End If
                                             End If
                                         Next lLocation
+                                        'At this place output will have Null values for first constituent 
+                                        'If all of this line is Null then lPendingOutput could be made zero and skipped to k = 123
+                                        If Not lSomeLocationHasData Then
+                                            Dim lSkipTo As String = Nothing
+                                            Select Case lConstituentKey
+                                                Case "NO3+NO2-N - SURFACE LAYER OUTFLOW" : lSkipTo = "NO3 (PQUAL)"
+                                                Case "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW" : lSkipTo = "Ortho P (PQUAL)"
+                                                Case "SOQUAL-Ortho P" : lSkipTo = "Ortho P (IQUAL)"
+                                                Case "SOQUAL-NO3" : lSkipTo = "NO3 (IQUAL)"
+                                            End Select
+                                            If lSkipTo IsNot Nothing Then
+                                                'At this point the specific data for AGCHEM N constitunet
+                                                'in HBN file is missing and code skips to PQUAL constituents                                                
+                                                For lClearFieldIndex As Integer = 1 To .NumFields
+                                                    .Value(lClearFieldIndex) = ""
+                                                Next
+                                                .CurrentRecord -= 1
+                                                .Value(1) = ""
+                                                .CurrentRecord -= 1
 
-                                        If aBalanceType <> "Water" Then
-                                            SumLoads(lLoadTotals, lConstituentName, lLoadUnit, 0, 0)
-                                        End If
-
-                                        If lOutletReport Then
-                                            Dim lConstituentTotalKey As String = lOperationType.Substring(0, 1) & ":" & lConstituentKey
-                                            If lOperationType <> "RCHRES" Then
-                                                lLandUseConstituentTotals.Increment(lConstituentTotalKey & "-" & lLandUse, lWeightAccum)
-                                                lConstituentTotals.Increment(lConstituentTotalKey, lWeightAccum)
-                                                lFieldIndex += 1
-                                                .Value(lFieldIndex) = DecimalAlign(lWeightAccum / lLandUseAreas.ItemByKey(lLandUse), aFieldWidth, aDecimalPlaces, aSignificantDigits)
-                                            ElseIf Math.Abs(lValueOutlet) > 0.00001 Then
-                                                Dim lConstituentTotalKeyIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentTotalKey)
-                                                lConstituentTotals.Increment(lConstituentTotalKey, lValueOutlet)
-                                                lValueOutlet = 0.0
+                                                Dim lSkipToIndex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
+                                                If lSkipToIndex > lConstituentIndex Then
+                                                    lConstituentIndex = lSkipToIndex - 1
+                                                End If
+                                            Else
+                                                lSomeLocationHasData = True
                                             End If
                                         End If
-                                        .CurrentRecord += 1
+                                        If lSomeLocationHasData Then
+                                            If aBalanceType <> "Water" Then
+                                                SumLoads(lLoadTotals, lConstituentName, lLoadUnit, 0, 0)
+                                            End If
+
+                                            If lOutletReport Then
+                                                Dim lConstituentTotalKey As String = lOperationType.Substring(0, 1) & ":" & lConstituentKey
+                                                If lOperationType <> "RCHRES" Then
+                                                    lLandUseConstituentTotals.Increment(lConstituentTotalKey & "-" & lLandUse, lWeightAccum)
+                                                    lConstituentTotals.Increment(lConstituentTotalKey, lWeightAccum)
+                                                    lFieldIndex += 1
+                                                    .Value(lFieldIndex) = DecimalAlign(lWeightAccum / lLandUseAreas.ItemByKey(lLandUse), aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                ElseIf Math.Abs(lValueOutlet) > 0.00001 Then
+                                                    Dim lConstituentTotalKeyIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentTotalKey)
+                                                    lConstituentTotals.Increment(lConstituentTotalKey, lValueOutlet)
+                                                    lValueOutlet = 0.0
+                                                End If
+                                            End If
+                                            .CurrentRecord += 1
+                                        End If
+
                                     ElseIf lConstituentKey.StartsWith("Total") AndAlso _
-                                           lConstituentKey.Length > 5 AndAlso _
-                                           IsNumeric(lConstituentKey.Substring(5)) Then
+                                         lConstituentKey.Length > 5 AndAlso _
+                                         IsNumeric(lConstituentKey.Substring(5)) Then
                                         Dim lTotalCount As Integer = lConstituentKey.Substring(5)
                                         Dim lCurFieldValues(.NumFields) As Double
                                         Dim lCurrentRecordSave As Integer = .CurrentRecord
@@ -444,6 +512,7 @@ Public Module WatershedConstituentBalance
                                             lPendingOutput &= vbCr
                                         End If
                                         lPendingOutput &= lConstituentName
+
                                         If Not lConstituentKey.StartsWith("Header") Then
                                             For lOperationIndex As Integer = 0 To lLandUseOperations.Count - 1
                                                 lPendingOutput &= vbTab & DecimalAlign(0.0, aFieldWidth, aDecimalPlaces, aSignificantDigits)
@@ -452,10 +521,11 @@ Public Module WatershedConstituentBalance
                                                 lPendingOutput &= vbTab & DecimalAlign(0.0, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             End If
                                             lPendingOutput &= vbCr
+
                                         End If
                                     End If
                                 End If
-                            Next lConstituentKey
+                            Next
                             If lOutputTable.NumFields > 0 Then
                                 If aSegmentRows Then
                                     lReport.AppendLine(.ToStringPivoted)
@@ -584,7 +654,7 @@ Public Module WatershedConstituentBalance
                     If aSegmentRows Then
                         lPivotString = "Pivot"
                     End If
-                    Dim lDetailsFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & aOutletLocation & "_LU_AnnualAverages" & lPivotString & ".txt")
+                    Dim lDetailsFileName As String = aOutFilePrefix & SafeFilename(ShortConstituentName(aBalanceType) & "_" & aScenario & "_" & aOutletLocation & "_LU_AnnAvgs" & lPivotString & ".txt")
                     SaveFileString(lDetailsFileName, lDetailsReport.ToString)
                     lDetailsReport = Nothing
                 Catch lEx As Exception
@@ -594,7 +664,7 @@ Public Module WatershedConstituentBalance
 
             ' simple report - PERLND, IMPLND, RCHRES summary
             Dim lSummaryReport As New atcReport.ReportText
-            lSummaryReport.AppendLine(aBalanceType & " Balance for Subbasin " & aOutletLocation)
+            lSummaryReport.AppendLine(Left(aBalanceType, 3) & " Balance for Subbasin " & aOutletLocation)
             lSummaryReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
             lSummaryReport.AppendLine()
             lSummaryReport.AppendLine("Area Summary (acres)")
@@ -725,7 +795,7 @@ Public Module WatershedConstituentBalance
                     Next
                 End If
             Next lOperationType
-            Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & aOutletLocation & "_Overall_Averaged.txt")
+            Dim lSummaryFileName As String = aOutFilePrefix & SafeFilename(ShortConstituentName(aBalanceType) & "_" & aScenario & "_" & aOutletLocation & "_Oall_Avgd.txt")
             SaveFileString(lSummaryFileName, lSummaryReport.ToString)
             lSummaryReport = Nothing
         End If
