@@ -99,6 +99,7 @@ Public Module WatershedSummary
                 lRchresConstituents.Add("NO3-OUTTOT")
                 lRchresConstituents.Add("BODOUTTOT")
             Case "TotalP"
+                lAgchemConstituent = "POPHOS"
                 'Total P is a combination of PO4 and OrganicP
                 lPerlndConstituents.Add("POQUAL-ORTHO P")
                 lPerlndConstituents.Add("POQUAL-BOD")
