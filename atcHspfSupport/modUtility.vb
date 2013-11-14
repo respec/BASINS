@@ -431,7 +431,7 @@ Public Module Utility
                 '.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
             Case "TotalP"
                 With lConstituentsToOutput
-                    .Add("P:Header1", "Phoshprous Loss (lb/ac")
+                    .Add("P:Header1", "Phosphorus Loss (lb/ac")
                     .Add("P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", "    Surface")
                     .Add("P:PO4-P IN SOLUTION - INTERFLOW - OUTFLOW", "    Interflow")
                     .Add("P:PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW", "    Baseflow")
@@ -477,46 +477,46 @@ Public Module Utility
                     .Add("P:Header6b", "  Applications (lb/a)")
                     .Add("P:IPO4", "    PO4-P")
                     .Add("P:IORP", "    ORGP")
-                    .Add("P:Header6c", "  Plant Uptake")
-                    .Add("P:PLANT P - SURFACE LAYER", "    Surface")
-                    .Add("P:PLANT P - UPPER PRINCIPAL", "    Upper")
-                    .Add("P:PLANT P - LOWER LAYER", "    Lower")
-                    .Add("P:PLANT P - ACTIVE GROUNDWATER", "    GW")
-                    .Add("P:PLANT P - TOTALS", "    Total")
+                    '.Add("P:Header6c", "  Plant Uptake")
+                    '.Add("P:PLANT P - SURFACE LAYER", "    Surface")
+                    '.Add("P:PLANT P - UPPER PRINCIPAL", "    Upper")
+                    '.Add("P:PLANT P - LOWER LAYER", "    Lower")
+                    '.Add("P:PLANT P - ACTIVE GROUNDWATER", "    GW")
+                    '.Add("P:PLANT P - TOTALS", "    Total")
                     .Add("P:Header6c", "  Other Fluxes (lb/ac)")
                     .Add("P:TORPMN", "    ORGP Mineralization")
                     .Add("P:TP4IMB", "    PO4-P Immobilization")
                     
-                    .Add("P:Header1", "Ortho P (PQUAL)")
+                    .Add("P:Header7", "Ortho P (PQUAL)")
                     .Add("P:SOQUAL-Ortho P", "  Surface Flow")
                     .Add("P:IOQUAL-Ortho P", "  Interflow")
                     .Add("P:AOQUAL-Ortho P", "  Groundwater Flow")
                     .Add("P:POQUAL-Ortho P", "  Total")
 
-                    .Add("P:Header3", "RefOrgP (PQUAL)")
+                    .Add("P:Header8", "RefOrgP (PQUAL)")
                     .Add("P:WASHQS-BOD1", "  Sediment Attached")
                     .Add("P:SOQUAL-BOD1", "  Surface Flow")    
                     .Add("P:IOQUAL-BOD1", "  Interflow")       
                     .Add("P:AOQUAL-BOD1", "  Groundwater Flow")
                     .Add("P:POQUAL-BOD1", "  Total")           
 
-                    .Add("P:Header4", "LabileOrgP (PQUAL)")
+                    .Add("P:Header9", "LabileOrgP (PQUAL)")
                     .Add("P:WASHQS-BOD2", "  Sediment Attached")
                     .Add("P:SOQUAL-BOD2", "  Surface Flow")     
                     .Add("P:IOQUAL-BOD2", "  Interflow")        
                     .Add("P:AOQUAL-BOD2", "  Groundwater Flow") 
                     .Add("P:POQUAL-BOD2", "  Total")            
 
-                    .Add("I:Header5", "Ortho P (IQUAL)")
+                    .Add("I:Header10", "Ortho P (IQUAL)")
                     .Add("I:SOQUAL-Ortho P", "  Surface Flow")
 
-                    .Add("I:Header7", "RefOrgP (IQUAL)")
+                    .Add("I:Header11", "RefOrgP (IQUAL)")
                     .Add("I:SOQUAL-BOD1", "  Surface Flow")
 
-                    .Add("I:Header8", "LabileOrgP (IQUAL)")
+                    .Add("I:Header12", "LabileOrgP (IQUAL)")
                     .Add("I:SOQUAL-BOD2", "  Surface Flow")
 
-                    .Add("R:Header11", "Total PO4 as P")
+                    .Add("R:Header13", "Total PO4 as P")
                     .Add("R:PO4-INTOT", "  Total PO4 Inflow")
                     .Add("R:PO4-INDIS", "  Dissolved PO4 Inflow")
                     .Add("R:PO4-INPART-TOT", "  Particulate PO4 Inflow")
@@ -525,16 +525,16 @@ Public Module Utility
                     .Add("R:PO4-OUTDIS", "  Dissolved PO4 Outflow")
                     .Add("R:PO4-OUTPART-TOT", "  Particulate PO4 Outflow")
 
-                    .Add("R:Header13", "ORGN-P")
+                    .Add("R:Header14", "ORGN-P")
                     .Add("R:P-TOTORG-IN", "  Total Org-P Inflow")
                     .Add("R:P-TOTORG-OUT", "  Total Org-P Outflow")
 
-                    .Add("R:Header14", "Refractory-P")
+                    .Add("R:Header15", "Refractory-P")
                     .Add("R:P-REFORG-IN", "  Refractory-P Inflow")
                     .Add("R:P-REFORG-TOTPROCFLUX-TOT", "  Refractory-P Process Fluxes")
                     .Add("R:P-REFORG-OUT", "  Refractory-P Outflow")
 
-                    .Add("R:Header15", "Total P")
+                    .Add("R:Header16", "Total P")
                     .Add("R:P-TOT-IN", "  Total P Inflow")
                     .Add("R:P-TOT-OUT", "  Total P Outflow")
                 End With
@@ -576,38 +576,42 @@ Public Module Utility
         Dim lOperations As atcCollection
         For lOperationIndex As Integer = 0 To aUci.OpnSeqBlock.Opns.Count - 1
             Dim lOperation As atcUCI.HspfOperation = aUci.OpnSeqBlock.Opns(lOperationIndex)
-            Dim lLocationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
-            If lLocations.Count = 0 OrElse lLocations.IndexFromKey(lLocationKey) >= 0 Then
-                Dim lLandUse As String = lOperation.Name.Substring(0, 1) & ":"
-                Dim lDecsriptonParts() As String = lOperation.Description.Split(" ")
-                For lIndex As Integer = 0 To lDecsriptonParts.GetUpperBound(0)
-                    If Not IsNumeric(lDecsriptonParts(lIndex)) Then
-                        lLandUse &= lDecsriptonParts(lIndex) & " "
+            If lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND" OrElse lOperation.Name = "RCHRES" Then
+                Dim lLocationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
+                If lLocations.Count = 0 OrElse lLocations.IndexFromKey(lLocationKey) >= 0 Then
+
+                    Dim lLandUse As String = lOperation.Name.Substring(0, 1) & ":"
+                    If lLandUse = "C:" Then Stop
+                    Dim lDecsriptonParts() As String = lOperation.Description.Split(" ")
+                    For lIndex As Integer = 0 To lDecsriptonParts.GetUpperBound(0)
+                        If Not IsNumeric(lDecsriptonParts(lIndex)) Then
+                            lLandUse &= lDecsriptonParts(lIndex) & " "
+                        End If
+                    Next
+                    lLandUse = lLandUse.Trim(" ")
+                    Dim lOperationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
+                    Dim lOperationArea As Double = 0.0
+                    If aOutletLocation.Length > 0 Then
+                        lOperationArea = lLocations.ItemByKey(lLocationKey)
                     End If
-                Next
-                lLandUse = lLandUse.Trim(" ")
-                Dim lOperationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
-                Dim lOperationArea As Double = 0.0
-                If aOutletLocation.Length > 0 Then
-                    lOperationArea = lLocations.ItemByKey(lLocationKey)
-                End If
-                Dim lLandUseKeyIndex As Integer = lLandUses.IndexFromKey(lLandUse)
-                If lLandUseKeyIndex = -1 Then
-                    lOperations = New atcCollection
-                    lOperations.Add(lOperationKey, lOperationArea) 'e.g. R:116 0.0
-                    Dim lOperationId As String = lOperation.Id.ToString
-                    If lOperationId.Length = 1 Then lOperationId = Format(lOperation.Id Mod 100, "00")
-                    'Becky had a concern about this, but her code seems functionally the same
-                    Dim lId As String = lLocationKey.Substring(0, 2) & lOperationId
-                    If lLandUsesSortedById.IndexOfKey(lId) = -1 Then
-                        lLandUsesSortedById.Add(lId, lLandUse)
+                    Dim lLandUseKeyIndex As Integer = lLandUses.IndexFromKey(lLandUse)
+                    If lLandUseKeyIndex = -1 Then
+                        lOperations = New atcCollection
+                        lOperations.Add(lOperationKey, lOperationArea) 'e.g. R:116 0.0
+                        Dim lOperationId As String = lOperation.Id.ToString
+                        If lOperationId.Length = 1 Then lOperationId = Format(lOperation.Id Mod 100, "00")
+                        'Becky had a concern about this, but her code seems functionally the same
+                        Dim lId As String = lLocationKey.Substring(0, 2) & lOperationId
+                        If lLandUsesSortedById.IndexOfKey(lId) = -1 Then
+                            lLandUsesSortedById.Add(lId, lLandUse)
+                        End If
+                        lLandUses.Add(lLandUse, lOperations)
+                    Else
+                        lOperations = lLandUses.Item(lLandUseKeyIndex)
+                        lOperations.Add(lOperationKey, lOperationArea)
+                        'For Debug
+                        'lLandUses.Keys -> lLandUses.ItemByKey(lu).Keys -> "R:69"
                     End If
-                    lLandUses.Add(lLandUse, lOperations)
-                Else
-                    lOperations = lLandUses.Item(lLandUseKeyIndex)
-                    lOperations.Add(lOperationKey, lOperationArea)
-                    'For Debug
-                    'lLandUses.Keys -> lLandUses.ItemByKey(lu).Keys -> "R:69"
                 End If
             End If
         Next
