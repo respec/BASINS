@@ -132,6 +132,7 @@ Public Module WatershedConstituentBalance
                         ElseIf lString.Trim.Length > 0 AndAlso lFields.GetUpperBound(0) = 0 AndAlso lCurrentOperation.Length > 0 Then
                             lCurrentGroup = lString.Trim
                             If lGroups.IndexFromKey(lCurrentGroup) = -1 Then
+                                lSurfaceIndex = -1
                                 lConstituents = New atcCollection ' of Constituents
                                 lGroups.Add(lCurrentGroup, lConstituents)
                             Else
