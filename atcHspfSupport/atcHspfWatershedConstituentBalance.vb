@@ -618,6 +618,7 @@ Public Module WatershedConstituentBalance
                                 .Value(lFieldIndex) = DecimalAlign(lAreaTotal, aFieldWidth, aDecimalPlaces, 8)
 
                                 For Each lConstituentKey As String In lConstituentsToOutput.Keys
+
                                     Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
                                     If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
                                         .CurrentRecord += 1
@@ -732,6 +733,7 @@ Public Module WatershedConstituentBalance
                             lNeedHeader = False
                         End If
                         Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
+
                         If lConstituentName.Length > lRowIdLength Then
                             lConstituentName = lConstituentName.Substring(0, lRowIdLength)
                         End If
@@ -741,6 +743,7 @@ Public Module WatershedConstituentBalance
                             Dim lUnitsAdjust As Double = 1.0
                             If aBalanceType = "Water" Then
                                 lUnitsAdjust = 12
+                                aSkipZeroOrNoValue = False
                             End If
                             If Math.Abs(lValue) > 0.00001 OrElse Not aSkipZeroOrNoValue Then
                                 If lOperationType = "RCHRES" Then
