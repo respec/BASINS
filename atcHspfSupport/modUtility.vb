@@ -87,7 +87,7 @@ Public Module Utility
                       .Add("P:Header2", "GW Inflow")
                       .Add("P:IGWI", "    Deep    ")
                       .Add("P:AGWI", "    Active  ")
-                      .Add("P:Total2", "    Total   ") 'need total of prev 2 rows
+                    '.Add("P:Total2", "    Total   ") 'need total of prev 2 rows
                       .Add("P:AGWLI", "    Pumping")
                       .Add("P:Header3", "Evaporation")
                       .Add("P:PET", "    Potential")
