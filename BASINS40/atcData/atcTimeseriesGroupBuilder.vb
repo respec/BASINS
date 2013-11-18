@@ -54,6 +54,11 @@ Public Class atcTimeseriesGroupBuilder
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function Builder(ByVal aDataSetKey As String) As atcTimeseriesBuilder
+        Dim lIntegerKey As Integer
+        Dim lKeyIsInteger As Boolean = Integer.TryParse(aDataSetKey, lIntegerKey)
+        If lKeyIsInteger Then
+            aDataSetKey = aDataSetKey.PadLeft(10, "0"c)
+        End If
         Dim lBuilder As atcTimeseriesBuilder
         Dim lBuilderIndex As Integer = pBuilders.BinarySearchForKey(aDataSetKey)
         If lBuilderIndex = pBuilders.Count OrElse _
@@ -61,8 +66,8 @@ Public Class atcTimeseriesGroupBuilder
             'Not a duplicate, add to the list
             lBuilder = New atcTimeseriesBuilder(pDataSource)
             pBuilders.Insert(lBuilderIndex, aDataSetKey, lBuilder)
-            If IsNumeric(aDataSetKey) Then 'Use key for ID
-                lBuilder.Attributes.SetValue("ID", CInt(aDataSetKey))
+            If lKeyIsInteger Then 'Use key for ID
+                lBuilder.Attributes.SetValue("ID", lIntegerKey)
             Else 'Default ID is 1 for first dataset, 2 for second
                 lBuilder.Attributes.SetValue("ID", pBuilders.Count)
                 lBuilder.Attributes.SetValue("Key", aDataSetKey)

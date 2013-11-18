@@ -68,6 +68,7 @@ Public Class atcTimeseriesSUSTAIN
             lSpaceSeparator(0) = " "c
             Logger.Dbg("Opening atcTimeseriesSUSTAIN file: " & Specification)
             Dim lGroupBuilder As New atcTimeseriesGroupBuilder(Me)
+            Dim lSkipBlank As Integer = 0
             For Each lLine As String In LinesInFile(Specification)
                 If lInHeader Then
                     If lLine.ToLower.Contains("date/time") Then
@@ -81,7 +82,9 @@ Public Class atcTimeseriesSUSTAIN
                         End If
                     ElseIf lInCurveLabels Then
                         Dim lConstituent As String = SafeSubstring(lLine, lLabelStart, lLabelEnd - lLabelStart + 1).Trim
-                        If lConstituent.Length = 0 OrElse lConstituent.StartsWith("Time series (") Then
+                        If lConstituent.Length = 0 AndAlso lSkipBlank > 0 Then
+                            lSkipBlank -= 1
+                        ElseIf lConstituent.Length = 0 OrElse lConstituent.StartsWith("Time series (") Then
                             lInCurveLabels = False
                         Else
                             Dim lDescription As String = lConstituent
@@ -112,38 +115,55 @@ Public Class atcTimeseriesSUSTAIN
                                 If lTranCode <> atcTran.TranNative Then .Attributes.SetValue("TransformationCode", lTranCode)
                             End With
                         End If
-
+                    ElseIf lLine.Contains("This output file was created at") Then
+                        lInCurveLabels = True
+                        lLabelStart = lLine.IndexOf("This output file was created at")
+                        lLabelEnd = lLabelStart + 15
+                        lDescStart = lLabelEnd + 1
+                        lSkipBlank = 1
                     ElseIf lLine.EndsWith("Label") OrElse lLine.EndsWith("TRANCOD") Then
-                            lInCurveLabels = True
-                            lLabelStart = lLine.IndexOf("Label")
-                            lLabelEnd = lLine.IndexOf("LINTYP")
-                            If lLabelEnd < 0 Then
-                                lLabelEnd = lLabelStart + 8
-                                lDescStart = lLabelEnd + 1
-                            Else
-                                lTRANStart = lLine.IndexOf("TRAN ")
+                        lInCurveLabels = True
+                        lLabelStart = lLine.IndexOf("Label")
+                        lLabelEnd = lLine.IndexOf("LINTYP")
+                        If lLabelEnd < 0 Then
+                            lLabelEnd = lLabelStart + 8
+                            lDescStart = lLabelEnd + 1
+                        Else
+                            lTRANStart = lLine.IndexOf("TRAN ")
                             'lTRANCODStart = lLine.IndexOf("TRANCOD")
-                            End If
+                        End If
                     End If
                 Else
                     Dim lDate As Date
                     Dim lDateDouble As Double
-                    Dim lFieldValues() As String
+                    Dim lFieldValues As New Generic.List(Of String)
                     Try
                         If lLine.Contains(vbTab) Then
-                            lFieldValues = lLine.Split(vbTab)
-                        ElseIf lLine.Length > 22 + (lGroupBuilder.Count - 1) * 13 Then
-                            ReDim lFieldValues(lGroupBuilder.Count + 6)
-                            lFieldValues(1) = lLine.Substring(6, 4) 'Year
-                            lFieldValues(2) = lLine.Substring(11, 2) 'Month
-                            lFieldValues(3) = lLine.Substring(14, 2) 'Day
-                            lFieldValues(4) = lLine.Substring(17, 2) 'Hour
-                            lFieldValues(5) = lLine.Substring(20, 2) 'Minute
-                            For lDatasetIndex As Integer = 0 To lGroupBuilder.Count - 1
-                                lFieldValues(lDatasetIndex + 6) = SafeSubstring(lLine, 22 + 14 * lDatasetIndex, 14)
+                            Dim lCurrentFieldValue As String = ""
+                            For Each lCh In lLine
+                                Select Case lCh
+                                    Case " "
+                                        If lCurrentFieldValue.Length > 0 Then
+                                            lFieldValues.Add(lCurrentFieldValue)
+                                            lCurrentFieldValue = ""
+                                        End If
+                                    Case vbTab
+                                        lFieldValues.Add(lCurrentFieldValue)
+                                        lCurrentFieldValue = ""
+                                    Case Else
+                                        lCurrentFieldValue &= lCh
+                                End Select
                             Next
-                        Else
-                            ReDim lFieldValues(0)
+                            If lCurrentFieldValue.Length > 0 Then lFieldValues.Add(lCurrentFieldValue)
+                        ElseIf lLine.Length > 22 + (lGroupBuilder.Count - 1) * 13 Then
+                            lFieldValues.Add(lLine.Substring(6, 4)) 'Year
+                            lFieldValues.Add(lLine.Substring(11, 2)) 'Month
+                            lFieldValues.Add(lLine.Substring(14, 2)) 'Day
+                            lFieldValues.Add(lLine.Substring(17, 2)) 'Hour
+                            lFieldValues.Add(lLine.Substring(20, 2)) 'Minute
+                            For lDatasetIndex As Integer = 0 To lGroupBuilder.Count - 1
+                                lFieldValues.Add(SafeSubstring(lLine, 22 + 14 * lDatasetIndex, 14))
+                            Next
                         End If
                         If lFieldValues.Count > 6 Then
                             lDateDouble = atcUtility.modDate.Date2J(lFieldValues(1), lFieldValues(2), lFieldValues(3), lFieldValues(4), lFieldValues(5), 0)

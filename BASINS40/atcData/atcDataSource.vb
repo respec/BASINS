@@ -198,8 +198,7 @@ Public Class atcDataSource
             'TODO: follow aExistAction
             Return False 'can't add, already have it
         Else
-            pData.Add(aDs)
-            Return True
+            Return pData.Add(aDs) >= 0
         End If
     End Function
 
