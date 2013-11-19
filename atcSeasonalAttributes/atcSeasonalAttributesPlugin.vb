@@ -11,12 +11,19 @@ Public Class atcSeasonalAttributesPlugin
     End Property
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
+        Dim lIcon As System.Drawing.Icon = Nothing
+        Return Show(aTimeseriesGroup, lIcon)
+    End Function
+
+    Public Overrides Function Show(ByVal aTimeseriesGroup As atcDataGroup, ByVal aIcon As System.Drawing.Icon) As Object
         Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
         If lTimeseriesGroup Is Nothing Then
             lTimeseriesGroup = New atcTimeseriesGroup
         End If
 
-        Dim lForm As New frmDisplaySeasonalAttributes(lTimeseriesGroup)
+        Dim lForm As New frmDisplaySeasonalAttributes()
+        lForm.Initialize(aTimeseriesGroup, aIcon)
+
         If Not (lTimeseriesGroup Is Nothing) AndAlso lTimeseriesGroup.Count > 0 Then
             lForm.Show()
             Return lForm
@@ -29,7 +36,8 @@ Public Class atcSeasonalAttributesPlugin
                               ByVal aFileName As String, _
                               ByVal ParamArray aOptions() As String)
 
-        Dim lForm As New frmDisplaySeasonalAttributes(aTimeseriesGroup)
+        Dim lForm As New frmDisplaySeasonalAttributes()
+        lForm.Initialize(aTimeseriesGroup, Nothing)
 
         For Each lOption As String In aOptions
             Select Case lOption

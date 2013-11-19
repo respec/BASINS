@@ -309,7 +309,7 @@ Friend Class frmDisplayFrequencyGrid
                 MapWinUtility.Logger.Msg("Create frequency graph from main SWSTAT form" & vbCrLf & ex.Message, "Unable to create frequency graph")
             End Try
         Else
-            atcDataManager.ShowDisplay(sender.Text, pDataGroup)
+            atcDataManager.ShowDisplay(sender.Text, pDataGroup, Me.Icon)
         End If
     End Sub
 
