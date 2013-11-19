@@ -154,21 +154,18 @@ Public Class frmMain
 
     Private Sub btnList_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnList.Click
         Dim lList As New atcList.atcListPlugin
-        Dim lForm As atcList.atcListForm = lList.Show(SelectedData)
-        If lForm IsNot Nothing Then lForm.Icon = Me.Icon
-    End Sub
+        Dim lForm As atcList.atcListForm = lList.Show(SelectedData, Me.Icon)
+     End Sub
 
     Private Sub btnGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraph.Click
         Dim lGraph As New atcGraph.atcGraphPlugin
-        Dim lForm As atcGraph.atcGraphForm = lGraph.Show(SelectedData)        
-        If lForm IsNot Nothing Then lForm.Icon = Me.Icon
+        Dim lForm As atcGraph.atcGraphForm = lGraph.Show(SelectedData, Me.Icon)
     End Sub
 
     Private Sub btnTree_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTree.Click
         Dim lTree As New atcDataTree.atcDataTreePlugin        
-        Dim lForm As Windows.Forms.Form = lTree.Show(SelectedData)
-        If lForm IsNot Nothing Then lForm.Icon = Me.Icon
-    End Sub
+        Dim lForm As Windows.Forms.Form = lTree.Show(SelectedData, Me.Icon)
+     End Sub
 
     Private Sub Form_DragEnter( _
         ByVal sender As Object, ByVal e As Windows.Forms.DragEventArgs) _

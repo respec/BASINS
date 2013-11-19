@@ -13,7 +13,13 @@ Public Class atcListPlugin
     End Property
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
+        Dim lIcon As System.Drawing.Icon = Nothing
+        Return Show(aTimeseriesGroup, lIcon)
+    End Function
+
+    Public Overrides Function Show(ByVal aTimeseriesGroup As atcDataGroup, ByVal aIcon As System.Drawing.Icon) As Object
         Dim lForm As New atcListForm
+        If aIcon IsNot Nothing Then lForm.Icon = aIcon
         lForm.Initialize(aTimeseriesGroup)
         Return lForm
     End Function

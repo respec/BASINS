@@ -8,10 +8,14 @@ Friend Class atcDataTreeForm
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(Optional ByRef aDataGroup As atcData.atcTimeseriesGroup = Nothing)
+    Public Sub New()
         MyBase.New()
         InitializeComponent() 'required by Windows Form Designer
+    End Sub
 
+    Public Sub Initialize(Optional ByRef aDataGroup As atcData.atcTimeseriesGroup = Nothing, _
+                          Optional ByVal aIcon As System.Drawing.Icon = Nothing)
+        If aIcon IsNot Nothing Then Me.Icon = aIcon
         If aDataGroup Is Nothing Then aDataGroup = New atcTimeseriesGroup
 
         If aDataGroup.Count = 0 Then 'ask user to specify some Data

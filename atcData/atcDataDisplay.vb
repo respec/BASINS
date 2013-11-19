@@ -15,6 +15,9 @@ Public Class atcDataDisplay
     Public Overridable Overloads Function Show(ByVal aDataGroup As atcDataGroup) As Object
         Return Nothing
     End Function
+    Public Overridable Overloads Function Show(ByVal aDataGroup As atcDataGroup, ByVal aIcon As System.Drawing.Icon) As Object
+        Return Show(aDataGroup)
+    End Function
 
     ''' <summary>Save contents of data display to specified file</summary>
     ''' <remarks>
