@@ -144,7 +144,7 @@ Public Module ConstituentBalance
                                         Dim lStateVariable As Boolean
                                         Dim lMult As Double = 1.0
                                         Select Case lConstituentKey
-                                            Case "POQUAL-BOD", "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD"
+                                            Case "POQUAL-BOD", "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD", "WASHQS-BOD"
                                                 'might need another multiplier for bod
                                                 If aBalanceType = "BOD-PQUAL" Then
                                                     lMult = 0.4
@@ -219,16 +219,12 @@ Public Module ConstituentBalance
                                             lPendingOutput &= vbCr
                                         End If
                                         lPendingOutput &= lConstituentName
-                                        If lConstituentKey.Contains("NO3+NO2-N - SURFACE LAYER OUTFLOW") AndAlso _
-                                            lConstituentsToOutput.Contains("NO3 (PQUAL)") Then 'At this point the specific data for AGCHEM N constitunet in HBN file is missing and code skips to PQUAL constituents
-                                            lConstituentIndex = lConstituentsToOutput.IndexOf("NO3 (PQUAL)") - 1 '124th is PQUAL contituent in ModUtility
-                                            'Instead of using numbers try search for the string in ModUtility
-                                            lPendingOutput = ""
-                                        End If
-                                        If lConstituentKey.Contains("PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW") AndAlso _
-                                            lConstituentsToOutput.Contains("Ortho P (PQUAL)") Then 'At this point the specific data for AGCHEM P constitunet in HBN file is missing and code skips to PQUAL constituents
-                                            lConstituentIndex = lConstituentsToOutput.IndexOf("Ortho P (PQUAL)") - 1 '53rd is the PQUAL constituent in ModUtility
-                                            'Instead of using numbers try search for the string in ModUtility
+                                        Dim lSkipTo As String = FindSkipTo(lConstituentKey)
+                                        If lSkipTo IsNot Nothing Then
+                                            Dim lSkipToIndex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
+                                            If lSkipToIndex > lConstituentIndex Then
+                                                lConstituentIndex = lSkipToIndex - 1
+                                            End If
                                             lPendingOutput = ""
                                         End If
                                     End If
