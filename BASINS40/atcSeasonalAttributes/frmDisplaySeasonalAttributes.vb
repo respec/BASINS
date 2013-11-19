@@ -10,15 +10,20 @@ Friend Class frmDisplaySeasonalAttributes
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(Optional ByVal aDataGroup As atcData.atcTimeseriesGroup = Nothing)
+    Public Sub New()
         MyBase.New()
+        InitializeComponent() 'required by Windows Form Designer
+    End Sub
+
+    Public Sub Initialize(Optional ByRef aDataGroup As atcData.atcTimeseriesGroup = Nothing, _
+                          Optional ByVal aIcon As System.Drawing.Icon = Nothing)
+        If aIcon IsNot Nothing Then Me.Icon = aIcon
         pInitializing = True
         If aDataGroup Is Nothing Then
             pTimeseriesGroup = New atcTimeseriesGroup
         Else
             pTimeseriesGroup = aDataGroup
         End If
-        InitializeComponent() 'required by Windows Form Designer
 
         Dim lDisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
         For Each lDisplayPlugin As atcDataDisplay In lDisplayPlugins
@@ -251,11 +256,11 @@ Friend Class frmDisplaySeasonalAttributes
     End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        atcDataManager.ShowDisplay(sender.Text, pTimeseriesGroup)
+        atcDataManager.ShowDisplay(sender.Text, pTimeseriesGroup, Me.Icon)
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pTimeseriesGroup, , False)
+        atcDataManager.UserSelectData("", pTimeseriesGroup, Nothing, False, True, Me.Icon)
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pTimeseriesGroup.Added
