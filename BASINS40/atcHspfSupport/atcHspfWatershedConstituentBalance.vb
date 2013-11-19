@@ -317,7 +317,9 @@ Public Module WatershedConstituentBalance
                                     lConstituentKey = lConstituentKey.Remove(0, 2)
                                     lConstituentDataName = lConstituentDataName.Remove(0, 2)
                                     lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentDataName)
+                                    Dim lSomeConstituentsHaveData As Boolean = False
                                     If lConstituentDataGroup.Count > 0 Then
+                                        lSomeConstituentsHaveData = True
                                         If lNeedHeader Then
                                             .Delimiter = vbTab
                                             .Header = aBalanceType & " Balance Report For " & lLandUse & vbCrLf & " "
@@ -382,7 +384,7 @@ Public Module WatershedConstituentBalance
                                                 lTempDataSet = lLocationDataGroup.Item(0)
                                                 Dim lMult As Double = 1.0
                                                 Select Case lConstituentDataName
-                                                    Case "POQUAL-BOD", "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD"
+                                                    Case "POQUAL-BOD", "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD", "WASHQS-BOD"
                                                         'might need another multiplier for bod
                                                         If aBalanceType = "BOD" Then
                                                             lMult = 0.4
@@ -419,7 +421,7 @@ Public Module WatershedConstituentBalance
 
                                                 'Logger.Dbg("SkipLocation:" & lLocation & ":WithNo:" & lConstituentKey & ":Data")
                                             End If
-                                            
+
                                             ReDim Preserve lLoadUnit(lFieldIndex - 1)
                                             lLoadUnit(lFieldIndex - 1) = lValue
                                             lFieldIndex += 1
@@ -439,13 +441,7 @@ Public Module WatershedConstituentBalance
                                         'At this place output will have Null values for first constituent 
                                         'If all of this line is Null then lPendingOutput could be made zero and skipped to k = 123
                                         If Not lSomeLocationHasData Then
-                                            Dim lSkipTo As String = Nothing
-                                            Select Case lConstituentKey
-                                                Case "NO3+NO2-N - SURFACE LAYER OUTFLOW" : lSkipTo = "NO3 (PQUAL)"
-                                                Case "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW" : lSkipTo = "Ortho P (PQUAL)"
-                                                Case "SOQUAL-Ortho P" : lSkipTo = "Ortho P (IQUAL)"
-                                                Case "SOQUAL-NO3" : lSkipTo = "NO3 (IQUAL)"
-                                            End Select
+                                            Dim lSkipTo As String = FindSkipTo(lConstituentKey)
                                             If lSkipTo IsNot Nothing Then
                                                 'At this point the specific data for AGCHEM N constitunet
                                                 'in HBN file is missing and code skips to PQUAL constituents                                                
@@ -522,6 +518,25 @@ Public Module WatershedConstituentBalance
                                             End If
                                             lPendingOutput &= vbCr
 
+                                        End If
+                                        If Not lSomeConstituentsHaveData Then
+                                            Dim lSkipTo As String = FindSkipTo(lConstituentKey)
+                                            If lSkipTo IsNot Nothing Then
+                                                'At this point the specific data for AGCHEM N constitunet
+                                                'in HBN file is missing and code skips to PQUAL constituents                                                
+                                                For lClearFieldIndex As Integer = 1 To .NumFields
+                                                    .Value(lClearFieldIndex) = ""
+                                                Next
+                                                '.CurrentRecord -= 1
+                                                '.Value(1) = ""
+                                                '.CurrentRecord -= 1
+
+                                                Dim lSkipToIndex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
+                                                If lSkipToIndex > lConstituentIndex Then
+                                                    lConstituentIndex = lSkipToIndex - 1
+                                                End If
+                                                lPendingOutput = ""
+                                            End If
                                         End If
                                     End If
                                 End If
@@ -617,7 +632,9 @@ Public Module WatershedConstituentBalance
                                 lFieldIndex += 1
                                 .Value(lFieldIndex) = DecimalAlign(lAreaTotal, aFieldWidth, aDecimalPlaces, 8)
 
-                                For Each lConstituentKey As String In lConstituentsToOutput.Keys
+                                For lConstituentIndex As Integer = 0 To lConstituentsToOutput.Count - 1 'Anurag Changed the way For loop works to enable easy skipping when there are no AgCHEM constituents. Basically if the HBN file has no data for ("P:NO3+NO2-N - SURFACE LAYER OUTFLOW") or ("P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW") the code assumes that there are no AGCHEM constituents for that specific PERLND and looks for the PQUAL constituents
+                                    'For Each lConstituentKey In lConstituentsToOutput.Keys
+                                    Dim lConstituentKey As String = lConstituentsToOutput.Keys(lConstituentIndex)
 
                                     Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
                                     If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
@@ -640,9 +657,32 @@ Public Module WatershedConstituentBalance
                                             Next
                                             lFieldIndex += 1
                                             .Value(lFieldIndex) = DecimalAlign(lValueTotal / lAreaTotal, aFieldWidth, aDecimalPlaces, aSignificantDigits)
-                                        End If
+
+                                            If .Value(lFieldIndex) = 0 Then
+                                                Dim lSkipTo As String = FindSkipTo(lConstituentKey)
+                                                If lSkipTo IsNot Nothing Then
+                                                    'At this point the specific data for AGCHEM N constitunet
+                                                    'in HBN file is missing and code skips to PQUAL constituents                                                
+                                                    For lClearFieldIndex As Integer = 1 To .NumFields
+                                                        .Value(lClearFieldIndex) = ""
+                                                    Next
+                                                    .CurrentRecord -= 1
+                                                    .Value(1) = ""
+                                                    .CurrentRecord -= 1
+
+                                                    Dim lSkipToIndex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
+                                                    If lSkipToIndex > lConstituentIndex Then
+                                                        lConstituentIndex = lSkipToIndex - 1
+                                                    End If
+                                                    lPendingOutput = ""
+                                                End If
+                                            End If
+
+                                            End If
                                     End If
-                                Next lConstituentKey
+
+
+                                Next
                                 If aSegmentRows Then
                                     lDetailsReport.AppendLine(.ToStringPivoted)
                                 Else
@@ -706,9 +746,13 @@ Public Module WatershedConstituentBalance
                 Dim lNeedHeader As String = True
                 Dim lOperationTypeArea As Double = lOperationTypeAreas.ItemByKey(lOperationType)
                 Dim lLoadTotals As New Loads
-                For Each lConstituentKey As String In lConstituentsToOutput.Keys
+                Dim lHeaderStart As Integer
+                For lConstituentIndex As Integer = 0 To lConstituentsToOutput.Count - 1 'Anurag Changed the way For loop works to enable easy skipping when there are no AgCHEM constituents. Basically if the HBN file has no data for ("P:NO3+NO2-N - SURFACE LAYER OUTFLOW") or ("P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW") the code assumes that there are no AGCHEM constituents for that specific PERLND and looks for the PQUAL constituents
+                    'For Each lConstituentKey In lConstituentsToOutput.Keys
+                    Dim lConstituentKey As String = lConstituentsToOutput.Keys(lConstituentIndex)
                     If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
                         If lNeedHeader Then
+                            lHeaderStart = lSummaryReport.Body.Length
                             lSummaryReport.AppendLine()
                             If lOperationType = "RCHRES" Then
                                 lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "Reach".PadLeft(12) & _
@@ -768,9 +812,20 @@ Public Module WatershedConstituentBalance
                                 'Logger.Dbg("SkipNoData:" & lConstituentKey)
                             End If
                         ElseIf Not lConstituentKey.Substring(2).StartsWith("Header") Then
-                            lSummaryReport.AppendLine(lConstituentName.PadRight(lRowIdLength) & vbTab & _
-                                               DecimalAlign(0.0) & vbTab & _
-                                               DecimalAlign(0.0))
+                            Dim lSkipTo As String = FindSkipTo(lConstituentKey)
+                            If lSkipTo IsNot Nothing Then
+                                'At this point the specific data for AGCHEM N constitunet
+                                'in HBN file is missing and code skips to PQUAL constituents                                                
+                                Dim lSkipToIndex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
+                                If lSkipToIndex > lConstituentIndex Then
+                                    lConstituentIndex = lSkipToIndex - 1
+                                End If
+                                lSummaryReport.Body.Remove(lHeaderStart, lSummaryReport.Body.Length - lHeaderStart)
+                            Else
+                                lSummaryReport.AppendLine(lConstituentName.PadRight(lRowIdLength) & vbTab & _
+                                                   DecimalAlign(0.0) & vbTab & _
+                                                   DecimalAlign(0.0))
+                            End If
                         Else
                             lSummaryReport.AppendLine()
                             lSummaryReport.AppendLine(lConstituentName.PadRight(lRowIdLength))
@@ -855,5 +910,16 @@ Public Module WatershedConstituentBalance
         lString &= "   " & auci.GlobalBlock.RunInf.Value & vbCrLf
         lString &= "   " & auci.GlobalBlock.RunPeriod
         Return lString
+    End Function
+
+    Public Function FindSkipTo(ByVal aConstituentKey As String) As String
+        Dim lSkipTo As String = Nothing
+        Select Case aConstituentKey
+            Case "P:NO3+NO2-N - SURFACE LAYER OUTFLOW", "NO3+NO2-N - SURFACE LAYER OUTFLOW" : lSkipTo = "NO3 (PQUAL)"
+            Case "P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW" : lSkipTo = "Ortho P (PQUAL)"
+            Case "P:SOQUAL-Ortho P", "SOQUAL-Ortho P" : lSkipTo = "Ortho P (IQUAL)"
+            Case "P:SOQUAL-NO3", "SOQUAL-NO3" : lSkipTo = "NO3 (IQUAL)"
+        End Select
+        Return lSkipTo
     End Function
 End Module
