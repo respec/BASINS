@@ -156,6 +156,7 @@ Public Class atcTimeseriesSUSTAIN
                             Next
                             If lCurrentFieldValue.Length > 0 Then lFieldValues.Add(lCurrentFieldValue)
                         ElseIf lLine.Length > 22 + (lGroupBuilder.Count - 1) * 13 Then
+                            lFieldValues.Add(lLine.Substring(0, 6).Trim) 'Prefix, not used
                             lFieldValues.Add(lLine.Substring(6, 4)) 'Year
                             lFieldValues.Add(lLine.Substring(11, 2)) 'Month
                             lFieldValues.Add(lLine.Substring(14, 2)) 'Day
