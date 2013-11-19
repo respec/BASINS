@@ -4,6 +4,7 @@ Imports MapWinUtility
 
 Public Class atcGraphPlugin
     Inherits atcData.atcDataDisplay
+    Private pIcon As System.Drawing.Icon = Nothing
 
     Private pGraphTypeNames() As String = {"Timeseries", _
                                            "Flow/Duration", _
@@ -31,17 +32,26 @@ Public Class atcGraphPlugin
         End If
     End Sub
 
+
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcDataGroup) As Object
+        Dim lIcon As System.Drawing.Icon = Nothing
+        Return Show(aTimeseriesGroup, lIcon)
+    End Function
+
+    Public Overrides Function Show(ByVal aTimeseriesGroup As atcDataGroup, ByVal aIcon As System.Drawing.Icon) As Object
+        pIcon = aIcon
+
         Show = Nothing
 
         Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
         If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup
         If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
-            lTimeseriesGroup = atcDataManager.UserSelectData("Select Data To Graph", lTimeseriesGroup)
+            lTimeseriesGroup = atcDataManager.UserSelectData("Select Data To Graph", lTimeseriesGroup, Nothing, True, True, pIcon)
         End If
 
         If lTimeseriesGroup.Count > 0 Then
             Dim lChooseForm As New frmChooseGraphs
+            If pIcon IsNot Nothing Then lChooseForm.Icon = aIcon
             With lChooseForm.lstChooseGraphs
                 Dim lItemIndex As Integer
                 '.Items.AddRange(pGraphTypeNames)
@@ -116,6 +126,7 @@ Public Class atcGraphPlugin
             Return Nothing
         Else
             lForm.Grapher = lGrapher
+            If pIcon IsNot Nothing Then lForm.Icon = pIcon
             lForm.Show()
             Return lForm
         End If
