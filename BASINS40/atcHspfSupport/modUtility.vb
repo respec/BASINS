@@ -546,6 +546,7 @@ Public Module Utility
                     .Add("P:IOQUAL-BOD", "  IOQUAL")
                     .Add("P:AOQUAL-BOD", "  AOQUAL")
                     .Add("P:POQUAL-BOD", "  POQUAL")
+                    .Add("P:ORGN - TOTAL OUTFLOW", "  BOD from OrganicN")
                     
                     .Add("I:Header2", "BOD")
                     .Add("I:SOQUAL-BOD", "  SOQUAL")
