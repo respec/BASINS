@@ -36,6 +36,7 @@ Public Module WatershedSummary
                 lRchresConstituents.Add("ROVOL")
                 lRchresConversion = "723.97"
             Case "BOD-PQUAL"
+                lAgchemConstituent = "ORGN - TOTAL OUTFLOW"
                 lPerlndConstituents.Add("POQUAL-BOD")
                 lImplndConstituents.Add("SOQUAL-BOD")
                 lRchresConstituents.Add("BODOUTTOT")
