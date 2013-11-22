@@ -161,6 +161,8 @@ Public Module ConstituentBalance
                                                         lMult = 0.007326
                                                     End If
                                                 End If
+                                            Case "ORGN - TOTAL OUTFLOW"
+                                                lMult = 7.555
                                             Case "POQUAL-F.Coliform", "SOQUAL-F.Coliform"
                                                 lMult = 1 / 1000000000.0 '10^9
                                         End Select
