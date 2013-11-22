@@ -401,6 +401,8 @@ Public Module WatershedConstituentBalance
                                                                 lMult = 0.007326
                                                             End If
                                                         End If
+                                                    Case "P:ORGN - TOTAL OUTFLOW"
+                                                        lMult = 7.555
                                                 End Select
                                                 If aBalanceType = "FColi" Then
                                                     lMult = 1 / 1000000000.0 '10^9
