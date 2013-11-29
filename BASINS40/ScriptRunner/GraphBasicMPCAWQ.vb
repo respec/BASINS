@@ -686,7 +686,7 @@ Module GraphBasicMPCAWQ
         'Dim lTestName As String = "MPCAValWQ"
         Select Case lTestName
             Case "MPCAWQ"
-                pWorkingDirectory = "C:\BASINS\modelout\"
+                pWorkingDirectory = "M:\modelout\"
                 pbasename = "MPCAWQ"
                 pWQGraphSpecification = pGraphSpecMPCAWQ
                 pObservedWQBaseFileName = "T:\MPCA\WQ_data.dbf"
@@ -1341,7 +1341,8 @@ Module GraphBasicMPCAWQ
     End Sub
 
     Sub GraphTimeseriesBatch(ByVal aDataGroup As atcTimeseriesGroup)
-        Dim lOutFileName As String = foldername & "\" & pBaseName
+        'Dim lOutFileName As String = "C:\BASINS41\modelout\MPCA\" & pbasename
+        Dim lOutFileName As String = foldername & "\" & pbasename
         Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
         Dim lPaneMain, lPaneAux As GraphPane
@@ -1439,9 +1440,11 @@ Module GraphBasicMPCAWQ
         lPaneMain.AxisChange()
         lPaneAux.YAxis.Scale.Min = 0
         lPaneAux.AxisChange()
-        System.IO.Directory.CreateDirectory(foldername)
-        lZgc.SaveIn(lOutFileName & ".png")
+        Try
+            lZgc.SaveIn(lOutFileName & ".png")
 
+        Catch ex As Exception
+        End Try
         lZgc.Dispose()
     End Sub
 
