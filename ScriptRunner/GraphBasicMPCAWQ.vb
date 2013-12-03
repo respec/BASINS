@@ -1140,9 +1140,7 @@ Module GraphBasicMPCAWQ
                 Dim smallest As Double = Double.MaxValue
                 Dim ValueUpper As Double
                 Dim ValueLower As Double
-                Dim UpperFirstThreeDigits As String
-                Dim LowerFirstThreeDigits As String
-
+                
                 For lGraphIndex As Integer = 0 To pLastIndex
                     pTimeseriesConstituent = pWQGraphSpecification(lGraphIndex, 1)
                     pLeftYAxisLabel = "Stage (ft)"
@@ -1189,15 +1187,6 @@ Module GraphBasicMPCAWQ
                                                 FindData("Constituent", pWQGraphSpecification(lGraphIndex, 1))(0)
                         lTser1.Attributes.SetValue("YAxis", "Left")
                         lTser1.Attributes.SetValue("Point", "True")
-
-                        'Debug.WriteLine(lTser1)
-                        'Debug.WriteLine("ValueLower =" & ValueLower)
-                        'Debug.WriteLine("ValueUpper =" & ValueUpper)
-
-                        'UpperFirstThreeDigits = ValueUpper.ToString().Substring(0, 3)
-                        'LowerFirstThreeDigits = ValueLower.ToString().Substring(0, 3)
-                        'AxisUpper = Convert.ToInt32(UpperFirstThreeDigits) * 10 + 15
-                        'AxisLower = Convert.ToInt32(LowerFirstThreeDigits) * 10 - 5
 
                         lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
                         lTser1 = Nothing
