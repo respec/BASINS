@@ -176,7 +176,7 @@ Public Class frmDisSol
     End Sub
 
     Private Sub btnSolar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSolar.Click
-        pTSGroup = atcDataManager.UserSelectData("Select Daily Solar Radiation Timeseries")
+        pTSGroup = atcDataManager.UserSelectData("Select Daily Solar Radiation Timeseries", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If pTSGroup.Count > 0 Then
             txtSolar.Text = pTSGroup.ItemByIndex(0).ToString
         End If

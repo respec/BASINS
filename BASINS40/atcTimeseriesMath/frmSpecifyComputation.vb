@@ -251,7 +251,8 @@ Public Class frmSpecifyComputation
         'TODO: ask UserSelectData to only allow one selection if only one is wanted (atcTimeseries rather than atcDataGroup)
         Dim lSelected As atcTimeseriesGroup = atcDataManager.UserSelectData("Select " _
                                                                    & pArgLabel(iArg).Text _
-                                                                   & " for " & lblName.Text)
+                                                                   & " for " & lblName.Text, _
+                                                                    Nothing, Nothing, True, True, atcTimeseriesMath.pIcon)
         pArgDefVal(iArg).Value = lSelected
 
         If lSelected Is Nothing OrElse lSelected.Count = 0 Then

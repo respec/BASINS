@@ -606,7 +606,7 @@ BadCoeff:
     End Sub
 
     Private Sub btnTMin_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTMin.Click
-        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Min Temperature")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Min Temperature", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If lTSGroup.Count > 0 Then
             pTMinTS = lTSGroup(0)
             txtTMin.Text = pTMinTS.ToString
@@ -614,7 +614,7 @@ BadCoeff:
     End Sub
 
     Private Sub btnTMax_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTMax.Click
-        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Max Temperature")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Max Temperature", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If lTSGroup.Count > 0 Then
             pTMaxTS = lTSGroup(0)
             txtTMax.Text = pTMaxTS.ToString
@@ -622,7 +622,7 @@ BadCoeff:
     End Sub
 
     Private Sub btnSRad_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSRad.Click
-        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Solar Radiation")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Solar Radiation", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If lTSGroup.Count > 0 Then
             pSRadTS = lTSGroup(0)
             txtSRad.Text = pSRadTS.ToString
