@@ -179,7 +179,7 @@ Public Class frmCmpSol
     End Sub
 
     Private Sub btnCloudCover_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCloudCover.Click
-        pTSGroup = atcDataManager.UserSelectData("Select data for Cloud Cover")
+        pTSGroup = atcDataManager.UserSelectData("Select data for Cloud Cover", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If pTSGroup.Count > 0 Then
             Dim lTimser As atcTimeseries = pTSGroup.ItemByIndex(0)
             txtCloudCover.Text = lTimser.ToString

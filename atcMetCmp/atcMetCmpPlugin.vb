@@ -9,6 +9,7 @@ Public Class atcMetCmpPlugin
 
     Private Shared pAvailableOperations As atcDataAttributes = Nothing
     Private Shared pName As String = "Timeseries::Meteorologic Generation"
+    Friend Shared pIcon As System.Drawing.Icon = Nothing
  
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -57,6 +58,7 @@ Public Class atcMetCmpPlugin
                 Dim lCldTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
                     Dim lForm As New frmCmpSol
+                    If pIcon IsNot Nothing Then lForm.Icon = pIcon
                     lOk = lForm.AskUser(lCldTSer, lLatitude)
                 Else
                     lCldTSer = aArgs.GetValue("DCLD")
@@ -88,6 +90,7 @@ Public Class atcMetCmpPlugin
                 Dim lCTX As Double
                 If aArgs Is Nothing Then
                     Dim lForm As New frmCmpJPET
+                    If pIcon IsNot Nothing Then lForm.Icon = pIcon
                     lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lSRadTSer, lDegF, lCTX, lCTS)
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
@@ -116,6 +119,7 @@ Public Class atcMetCmpPlugin
             Case "Hamon PET"
                 If aArgs Is Nothing Then
                     Dim lForm As New frmCmpHPET
+                    If pIcon IsNot Nothing Then lForm.Icon = pIcon
                     lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lDegF, lLatitude, lCTS)
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
@@ -143,6 +147,7 @@ Public Class atcMetCmpPlugin
                 Dim lDewPTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
                     Dim lForm As New frmCmpPenman
+                    If pIcon IsNot Nothing Then lForm.Icon = pIcon
                     lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lSRadTSer, lDewPTSer, lWindTSer)
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
@@ -159,7 +164,7 @@ Public Class atcMetCmpPlugin
                 End If
             Case "Wind Travel"
                 If aArgs Is Nothing Then
-                    Dim ltsgroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Wind Speed data for computing " & aOperationName)
+                    Dim ltsgroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Wind Speed data for computing " & aOperationName, Nothing, Nothing, True, True, pIcon)
                     If ltsgroup IsNot Nothing AndAlso ltsgroup.Count > 0 Then lWindTSer = ltsgroup(0)
                 Else
                     lWindTSer = aArgs.GetValue("WIND")
@@ -171,7 +176,7 @@ Public Class atcMetCmpPlugin
             Case "Cloud Cover"
                 Dim lPctSunTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
-                    Dim ltsgroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Percent Sun data for computing " & aOperationName)
+                    Dim ltsgroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Percent Sun data for computing " & aOperationName, Nothing, Nothing, True, True, pIcon)
                     If ltsgroup IsNot Nothing AndAlso ltsgroup.Count > 0 Then lPctSunTSer = ltsgroup(0)
                 Else
                     lPctSunTSer = aArgs.GetValue("PSUN")
@@ -183,6 +188,7 @@ Public Class atcMetCmpPlugin
             Case "Solar Radiation (Disaggregate)"
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisSol
+                    If pIcon IsNot Nothing Then lForm.Icon = pIcon
                     lOk = lForm.AskUser(lDlyTSer, lLatitude)
                 Else
                     lDlyTSer = aArgs.GetValue("SRAD")
@@ -197,6 +203,7 @@ Public Class atcMetCmpPlugin
             Case "Evapotranspiration"
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisSol
+                    If pIcon IsNot Nothing Then lForm.Icon = pIcon
                     lForm.Text = "Disaggregate Evapotranspiration"
                     lForm.lblTSer.Text = "Specify Daily Evapotranspiration Timeseries"
                     lOk = lForm.AskUser(lDlyTSer, lLatitude)
@@ -213,6 +220,7 @@ Public Class atcMetCmpPlugin
             Case "Temperature"
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisTemp
+                    If pIcon IsNot Nothing Then lForm.Icon = pIcon
                     lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lObsTime)
                     'build obs time TSer with constant value from aObsTime argument
                     If lOk Then
@@ -238,6 +246,7 @@ Public Class atcMetCmpPlugin
                 Dim lHrSum As Double = 0
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisWind
+                    If pIcon IsNot Nothing Then lForm.Icon = pIcon
                     lOk = lForm.AskUser(lWindTSer, lHrDist)
                 Else
                     lWindTSer = aArgs.GetValue("TWND")
@@ -265,6 +274,7 @@ Public Class atcMetCmpPlugin
                 Dim lSummFile As String = ""
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisPrec
+                    If pIcon IsNot Nothing Then lForm.Icon = pIcon
                     lOk = lForm.AskUser(lDlyTSer, lHrTSers, lObsTime, lTol, lSummFile)
                     If lOk Then
                         'build obs time TSer with constant value from aObsTime argument
@@ -695,4 +705,9 @@ Public Class atcMetCmpPlugin
         End Get
     End Property
 
+    Public Sub New(Optional ByVal aIcon As System.Drawing.Icon = Nothing)
+        If aIcon IsNot Nothing Then
+            pIcon = aIcon
+        End If
+    End Sub
 End Class

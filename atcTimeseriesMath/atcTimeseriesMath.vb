@@ -7,6 +7,7 @@ Public Class atcTimeseriesMath
     Inherits atcTimeseriesSource
     Private pAvailableOperations As atcDataAttributes
     Private Const pName As String = "Timeseries::Math"
+    Friend Shared pIcon As System.Drawing.Icon = Nothing
 
     Private pControls As Control.ControlCollection
     Private cboTimeseries As System.Windows.Forms.ComboBox
@@ -255,6 +256,7 @@ Public Class atcTimeseriesMath
             Throw New ApplicationException("TimeseriesMath: Arguments not specified to Open")
 #Else
             Dim lSpecify As New frmSpecifyComputation
+            If pIcon IsNot Nothing Then lSpecify.Icon = pIcon
             lSpecify.Text = Me.Category & ": " & aOperationName
             If Not lSpecify.AskUser(lArgs) Then
                 Return False 'User cancelled
@@ -282,4 +284,9 @@ Public Class atcTimeseriesMath
         Return MyBase.AddDataSet(aDataSet, aExistAction)
     End Function
 
+    Public Sub New(Optional ByVal aIcon As System.Drawing.Icon = Nothing)
+        If aIcon IsNot Nothing Then
+            pIcon = aIcon
+        End If
+    End Sub
 End Class

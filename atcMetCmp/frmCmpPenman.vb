@@ -306,7 +306,7 @@ Public Class frmCmpPenman
     End Sub
 
     Private Sub btnTMin_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTMin.Click
-        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Min Temperature")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Min Temperature", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If lTSGroup.Count > 0 Then
             pTMinTS = lTSGroup(0)
             txtTMin.Text = pTMinTS.ToString
@@ -314,7 +314,7 @@ Public Class frmCmpPenman
     End Sub
 
     Private Sub btnTMax_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTMax.Click
-        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Max Temperature")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Max Temperature", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If lTSGroup.Count > 0 Then
             pTMaxTS = lTSGroup(0)
             txtTMax.Text = pTMaxTS.ToString
@@ -322,7 +322,7 @@ Public Class frmCmpPenman
     End Sub
 
     Private Sub btnSRad_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSRad.Click
-        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Solar Radiation")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Solar Radiation", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If lTSGroup.Count > 0 Then
             pSRadTS = lTSGroup(0)
             txtSRad.Text = pSRadTS.ToString
@@ -330,7 +330,7 @@ Public Class frmCmpPenman
     End Sub
 
     Private Sub btnDewP_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDewP.Click
-        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Dewpoint Temperature")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Dewpoint Temperature", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If lTSGroup.Count > 0 Then
             pDewPTS = lTSGroup(0)
             txtDewP.Text = pDewPTS.ToString
@@ -338,7 +338,7 @@ Public Class frmCmpPenman
     End Sub
 
     Private Sub btnWind_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnWind.Click
-        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Wind Movement (miles)")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select data for Daily Wind Movement (miles)", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If lTSGroup.Count > 0 Then
             pWindTS = lTSGroup(0)
             txtWind.Text = pWindTS.ToString

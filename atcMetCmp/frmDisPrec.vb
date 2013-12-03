@@ -296,7 +296,7 @@ Public Class frmDisPrec
     End Sub
 
     Private Sub btnDailyPrec_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDailyPrec.Click
-        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Precipitation Timeseries to Disaggregate")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Precipitation Timeseries to Disaggregate", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If lTSGroup.Count > 0 Then
             pDPrecTS = lTSGroup(0)
             txtDailyPrec.Text = pDPrecTS.ToString
@@ -304,7 +304,7 @@ Public Class frmDisPrec
     End Sub
 
     Private Sub btnAddHourlyPrec_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAddHourlyPrec.Click
-        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Hourly Precipitation Timeseries to use in Disaggregation")
+        Dim lTSGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Hourly Precipitation Timeseries to use in Disaggregation", Nothing, Nothing, True, True, atcMetCmpPlugin.pIcon)
         If lTSGroup.Count > 0 Then
             pHPrecTS = lTSGroup
             lstHourlyPrec.Items.Clear()
