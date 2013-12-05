@@ -705,7 +705,10 @@ Public Class atcMetCmpPlugin
         End Get
     End Property
 
-    Public Sub New(Optional ByVal aIcon As System.Drawing.Icon = Nothing)
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal aIcon As System.Drawing.Icon)
         If aIcon IsNot Nothing Then
             pIcon = aIcon
         End If

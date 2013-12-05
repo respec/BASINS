@@ -137,7 +137,7 @@ Public Module modBasinsPlugin
                         Next
                         Logger.Dbg("Found data paths: " & lAllDirs)
                 End Select
-                SaveSetting(g_AppNameRegistry, "Folders", "DataPaths", String.Join(";", g_BasinsDataDirs))
+                SaveSetting(g_AppNameRegistry, "Folders", "DataPaths", String.Join(";", g_BasinsDataDirs.ToArray))
             End If
         End If
     End Sub
