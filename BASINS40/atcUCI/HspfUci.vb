@@ -411,6 +411,7 @@ Public Class HspfUci
                 Logger.Dbg("SpecialActionBlockRead")
 
                 ProcessFTables()
+                _fpreset()
                 Logger.Dbg("FtableBlockRead")
 
                 pConnections = Nothing
