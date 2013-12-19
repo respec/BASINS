@@ -541,15 +541,15 @@ Public Module Utility
             Case "BOD-PQUAL"
                 With lConstituentsToOutput
                     .Add("P:Header1", "BOD")
-                    .Add("P:WASHQS-BOD", "  WASHQS")
-                    .Add("P:SOQUAL-BOD", "  SOQUAL")
-                    .Add("P:IOQUAL-BOD", "  IOQUAL")
-                    .Add("P:AOQUAL-BOD", "  AOQUAL")
-                    .Add("P:POQUAL-BOD", "  POQUAL")
+                    .Add("P:WASHQS-BOD", "  Sediment Attached")
+                    .Add("P:SOQUAL-BOD", "  Surface Flow")
+                    .Add("P:IOQUAL-BOD", "  Interflow")
+                    .Add("P:AOQUAL-BOD", "  Groundwater Flow")
+                    .Add("P:POQUAL-BOD", "  Total")
                     .Add("P:ORGN - TOTAL OUTFLOW", "  BOD from OrganicN")
                     
                     .Add("I:Header2", "BOD")
-                    .Add("I:SOQUAL-BOD", "  SOQUAL")
+                    .Add("I:SOQUAL-BOD", "  Surface Flow")
                     
                     .Add("R:Header3", "BOD")
                     .Add("R:BODIN", "  BODIN")
