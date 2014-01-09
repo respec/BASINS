@@ -421,8 +421,8 @@ Friend Class frmInputWizard
             If lrule = "fixed" Then
                 FixedColumns = True
             Else
-                If InStr(lrule, "tab") Then ColumnDelimiter = ColumnDelimiter & vbTab
-                If InStr(lrule, "space") Then ColumnDelimiter = ColumnDelimiter & " "
+                If InStr(lrule, "tab") Then ColumnDelimiter &= vbTab
+                If InStr(lrule, "space") Then ColumnDelimiter &= " "
                 For StartCol = 33 To 126
                     Select Case StartCol
                         Case 48 : StartCol = 58
@@ -430,7 +430,7 @@ Friend Class frmInputWizard
                         Case 97 : StartCol = 123
                     End Select
                     If InStr(lrule, Chr(StartCol)) > 0 Then
-                        ColumnDelimiter = ColumnDelimiter & Chr(StartCol)
+                        ColumnDelimiter &= Chr(StartCol)
                     End If
                 Next StartCol
                 NumColumnDelimiters = Len(ColumnDelimiter)
@@ -1093,22 +1093,9 @@ ParseFixedDef:
         Dim parseCol As Integer = 0
         Dim fromCol As Integer = 0
         Dim toCol As Integer
-        If Not FixedColumns Then 'parse delimited text
-            While fromCol < InBuf.Length AndAlso parseCol < UBound(parsed)
-                toCol = FirstCharPos(fromCol, InBuf, ColumnDelimiter)
-                If toCol < fromCol Then toCol = Len(InBuf) + 1
-                parseCol = parseCol + 1
-                parsed(parseCol) = InBuf.Substring(fromCol, toCol - fromCol)
-                fromCol = toCol + 1
-                If ColumnDelimiter = " " Then 'treat multiple contiguous spaces as one delimiter
-                    While fromCol + 1 < InBuf.Length AndAlso InBuf.Substring(fromCol, 1) = ColumnDelimiter
-                        fromCol += 1
-                    End While
-                End If
-            End While
-        Else 'fixed columns
+        If FixedColumns Then
             While parseCol < nFixedCols
-                parseCol = parseCol + 1
+                parseCol += 1
                 toCol = FixedColRight(parseCol)
                 If toCol > 0 Then
                     fromCol = FixedColLeft(parseCol)
@@ -1117,6 +1104,42 @@ ParseFixedDef:
                     parsed(parseCol) = ""
                 End If
             End While
+        Else 'parse delimited text
+            'Based on part of clsATCscriptExpression.FindColumnValue 
+            Dim StartPos As Integer = 1
+            Do
+                parseCol += 1
+                If parseCol > UBound(parsed) Then
+                    ReDim Preserve parsed(parseCol + 10)
+                End If
+                Dim endPos As Integer = FirstDelimPos(StartPos)
+
+                If endPos = 0 Then 'Must be the last col on this line
+                    parsed(parseCol) = Mid(CurrentLine, StartPos)
+                    Exit Do
+                Else
+                    parsed(parseCol) = Mid(CurrentLine, StartPos, endPos - StartPos)
+                End If
+
+                StartPos = FirstDelimPos(StartPos) + 1
+                If StartPos = 1 Then ' the column does not exist on this line
+                    parsed(parseCol) = ""
+                End If
+            Loop
+
+            'While fromCol < InBuf.Length AndAlso parseCol < UBound(parsed)
+            '    toCol = FirstCharPos(fromCol, InBuf, ColumnDelimiter)
+            '    If toCol < fromCol Then toCol = Len(InBuf) + 1
+            '    parseCol = parseCol + 1
+            '    parsed(parseCol) = InBuf.Substring(fromCol, toCol - fromCol)
+            '    fromCol = toCol + 1
+            '    If ColumnDelimiter = " " Then 'treat multiple contiguous spaces as one delimiter
+            '        While fromCol + 1 < InBuf.Length AndAlso InBuf.Substring(fromCol, 1) = ColumnDelimiter
+            '            fromCol += 1
+            '        End While
+            '    End If
+            'End While
+
         End If
         If parseCol > UBound(parsed) Then parseCol = UBound(parsed)
         Return parseCol
@@ -1227,6 +1250,7 @@ ParseFixedDef:
             End With
         End If
         agdSample.Initialize(lNewSource)
+        agdSample.SizeAllColumnsToContents()
         agdSample.Refresh()
     End Sub
 
@@ -1341,6 +1365,13 @@ ParseFixedDef:
     End Sub
 
     Private Sub PopulateSample()
+        If DataFileHandle IsNot Nothing Then
+            Dim msg As String = ScriptOpenDataFile(NameDataFile)
+            If msg <> "OK" Then
+                Logger.Dbg(msg & ": not populating sample")
+                Exit Sub
+            End If
+        End If
         'If fraColSample.Visible Then PopulateGridSample()
         'If fraTextSample.Visible Then PopulateTxtSample()
         PopulateGridSample()
@@ -1535,9 +1566,9 @@ ParseFixedDef:
     Private Sub OpenUnitDataFile()
         Dim msg As String = ScriptOpenDataFile(NameDataFile)
         If msg = "OK" Then
-            'UnitDataFileReader = New IO.StringReader(WholeDataFile)
             txtDataFile.Text = NameDataFile
-            PopulateSample()
+            PopulateGridSample()
+            PopulateTxtSample()
         Else
             Logger.Dbg("Could not open data file: " & msg)
         End If

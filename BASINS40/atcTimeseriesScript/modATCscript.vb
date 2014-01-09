@@ -11,7 +11,7 @@ Friend Module modATCscript
     Friend DebugScriptForm As frmDebugScript
     Public ScriptState As atcCollection 'of variable names (as keys) and values
     Public MaxFileLenReadAll As Integer = 100000
-    Private DataFileHandle As System.IO.StreamReader = Nothing 'Read file this way if it is longer than MaxFileLenReadAll
+    Friend DataFileHandle As System.IO.StreamReader = Nothing 'Read file this way if it is longer than MaxFileLenReadAll
     Private DataFileBuffer() As Char = Nothing 'Only used when InputLineLen is set (for fixed-length lines)
     Private WholeDataFile As String 'Contains entire contents of data file if smaller than MaxFileLenReadAll
     Public LenDataFile As Long
@@ -22,7 +22,7 @@ Friend Module modATCscript
     Public CurrentRepeat As Integer 'Current repeating part within CurrentLine (>=1)
     Public TestingFile As Boolean 'True if we are just testing, False if we are reading data
     Public FixedColumns As Boolean 'True if columns are fixed width
-    Public ColumnDelimiter As String 'character that delimits columns if FixedColumns is False
+    Public ColumnDelimiter As String = "" 'character that delimits columns if FixedColumns is False
     Public NumColumnDelimiters As Integer 'ColumnDelimiter may contain more than one delimiter character
     Public ColDefs() As clsATCscriptExpression.ColDef 'Names of columns (and start/width if FixedColumns) (1..NamedColumns)
     'ColDefs(0) stores info about the first repeating column
@@ -107,8 +107,8 @@ Friend Module modATCscript
         CurrentLine = ""
         LenCurrentLine = 0
         CurrentRepeat = 1
-        ColumnDelimiter = ""
-        NumColumnDelimiters = 0
+        'ColumnDelimiter = ""
+        NumColumnDelimiters = Len(ColumnDelimiter)
         ReDim ColDefs(0)
         NamedColumns = 0
         RepeatStartCol = 0
@@ -138,8 +138,33 @@ Friend Module modATCscript
         End If
     End Function
 
+    'Returns position of next character from chars in str
+    'Returns len(str) + 1 if none were found
+    Friend Function FirstCharPos(ByRef start As Integer, ByRef aString As String, ByRef chars As String) As Integer
+        Dim CharPos, retval, curval, LenChars As Integer
+        retval = Len(aString) + 1
+        LenChars = Len(chars)
+        For CharPos = 1 To LenChars
+            curval = InStr(start, aString, Mid(chars, CharPos, 1))
+            If curval > 0 And curval < retval Then retval = curval
+        Next CharPos
+        Return retval
+    End Function
+
+    'Specialized version of FirstCharPos
+    Friend Function FirstDelimPos(ByRef start As Integer) As Integer
+        Dim curval, retval, CharPos As Integer
+        retval = 9999
+        For CharPos = 1 To NumColumnDelimiters
+            curval = InStr(start, CurrentLine, Mid(ColumnDelimiter, CharPos, 1))
+            If curval > 0 And curval < retval Then retval = curval
+        Next CharPos
+        If retval = 9999 Then retval = 0
+        Return retval
+    End Function
+
     Public Function ScriptEndOfData() As Boolean
-        If NextLineStart >= LenDataFile AndAlso LenCurrentLine = 0 Then ScriptEndOfData = True Else ScriptEndOfData = False
+        Return NextLineStart >= LenDataFile AndAlso LenCurrentLine = 0
     End Function
 
     Public Sub ScriptNextLine()
@@ -167,6 +192,7 @@ Friend Module modATCscript
                     Try
                         If (InputEOL = vbCr OrElse InputEOL = vbLf) Then
                             Do
+                                'Convert.ToChar raises an exception when reading -1 at EOF, this is caught below.
                                 ch = Convert.ToChar(DataFileHandle.Read()) : NextLineStart += 1
                                 Select Case ch
                                     Case vbLf : Exit Do
@@ -453,6 +479,7 @@ Friend Module modATCscript
                     WholeDataFile = IO.File.ReadAllText(aDataFilename)
                     LenDataFile = WholeDataFile.Length
                     CurrentLine = Left(WholeDataFile, 1000)
+                    DataFileHandle = Nothing
                 Else
                     DataFileHandle = New System.IO.StreamReader(aDataFilename)
                 End If

@@ -225,33 +225,6 @@ ExitFun:
         SkipChars = retval
     End Function
 
-    'Returns position of next character from chars in str
-    'Returns len(str) + 1 if none were found
-    'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-    Private Function FirstCharPos(ByRef start As Integer, ByRef str_Renamed As String, ByRef chars As String) As Integer
-        Dim CharPos, retval, curval, LenChars As Integer
-        retval = Len(str_Renamed) + 1
-        LenChars = Len(chars)
-        For CharPos = 1 To LenChars
-            curval = InStr(start, str_Renamed, Mid(chars, CharPos, 1))
-            If curval > 0 And curval < retval Then retval = curval
-        Next CharPos
-        FirstCharPos = retval
-    End Function
-
-    'Specialized version of FirstCharPos
-    Private Function FirstDelimPos(ByRef start As Integer) As Integer
-        Dim curval, retval, CharPos As Integer
-        retval = 9999
-        For CharPos = 1 To NumColumnDelimiters
-            curval = InStr(start, CurrentLine, Mid(ColumnDelimiter, CharPos, 1))
-            If curval > 0 And curval < retval Then retval = curval
-        Next CharPos
-        If retval = 9999 Then retval = 0
-        FirstDelimPos = retval
-    End Function
-
-
     'Parse string expression into this object
     Public Sub ParseExpression(ByRef buf As String)
         'Debug.Print "ParseExpression: " & buf
@@ -323,14 +296,11 @@ SkipString:
         End Select
     End Sub
 
-    Private Function FindColumnValue() As String
+    Private Function FindColumnValue(ByVal colNameNum As String) As String
         Static WarnedAboutCapitalization As Boolean
         Dim colNum As Integer
         Dim tmpstr As String
         Dim endPos, StartPos, curCol As Integer
-        Dim colNameNum As String
-        colNameNum = MyString
-        FindColumnValue = colNameNum
 
         If MyLong > 0 Then
             colNum = MyLong
@@ -377,25 +347,24 @@ SkipString:
                     StartPos = ColDefs(colNum).StartCol 'Non-repeating column
                 Else
                     If RepeatStartCol < 1 Then
-                        FindColumnValue = "Error - Repeating column not defined '" & colNameNum & "'"
-                        GoTo ExitFun
+                        Return "Error - Repeating column not defined '" & colNameNum & "'"
                     End If
                     StartPos = ColDefs(0).StartCol + (CurrentRepeat - 1) * ColDefs(0).ColWidth + (ColDefs(colNum).StartCol - ColDefs(0).StartCol)
                 End If
                 If StartPos > LenCurrentLine Then ' the column does not exist on this line
-                    FindColumnValue = ""
+                    Return ""
                 ElseIf StartPos + ColDefs(colNum).ColWidth > LenCurrentLine Then  'Col narrower than expected
                     If DebuggingScript Then
                         DebugScriptForm.txtCurrentLine.SelectionStart = StartPos - 1
                         DebugScriptForm.txtCurrentLine.SelectionLength = LenCurrentLine - StartPos + 1
                     End If
-                    FindColumnValue = Mid(CurrentLine, StartPos)
+                    Return Mid(CurrentLine, StartPos)
                 Else
                     If DebuggingScript Then
                         DebugScriptForm.txtCurrentLine.SelectionStart = StartPos - 1
                         DebugScriptForm.txtCurrentLine.SelectionLength = ColDefs(colNum).ColWidth
                     End If
-                    FindColumnValue = Mid(CurrentLine, StartPos, ColDefs(colNum).ColWidth)
+                    Return Mid(CurrentLine, StartPos, ColDefs(colNum).ColWidth)
                 End If
             Else 'Delimited columns
                 If colNum >= RepeatStartCol Then
@@ -406,8 +375,7 @@ SkipString:
                 While curCol < colNum
                     StartPos = FirstDelimPos(StartPos) + 1
                     If StartPos = 1 Then ' the column does not exist on this line
-                        FindColumnValue = ""
-                        GoTo ExitFun
+                        Return ""
                     End If
                     curCol = curCol + 1
                 End While
@@ -417,17 +385,17 @@ SkipString:
                         DebugScriptForm.txtCurrentLine.SelectionStart = StartPos - 1
                         DebugScriptForm.txtCurrentLine.SelectionLength = LenCurrentLine - StartPos + 1
                     End If
-                    FindColumnValue = Mid(CurrentLine, StartPos)
+                    Return Mid(CurrentLine, StartPos)
                 Else
                     If DebuggingScript Then
                         DebugScriptForm.txtCurrentLine.SelectionStart = StartPos - 1
                         DebugScriptForm.txtCurrentLine.SelectionLength = endPos - StartPos
                     End If
-                    FindColumnValue = Mid(CurrentLine, StartPos, endPos - StartPos)
+                    Return Mid(CurrentLine, StartPos, endPos - StartPos)
                 End If
             End If
         End If
-ExitFun:
+        Return colNameNum
     End Function
 
     Private Function SetColumnFormat() As String
@@ -453,15 +421,15 @@ ExitFun:
             If lrule = "fixed" Then
                 FixedColumns = True
             Else
-                If InStr(lrule, "tab") Then ColumnDelimiter = ColumnDelimiter & vbTab
-                If InStr(lrule, "space") Then ColumnDelimiter = ColumnDelimiter & " "
+                If InStr(lrule, "tab") Then ColumnDelimiter &= vbTab
+                If InStr(lrule, "space") Then ColumnDelimiter &= " "
                 For StartCol = 33 To 126
                     Select Case StartCol
                         Case 48 : StartCol = 58
                         Case 65 : StartCol = 91
                         Case 97 : StartCol = 123
                     End Select
-                    If InStr(lrule, Chr(StartCol)) > 0 Then ColumnDelimiter = ColumnDelimiter & Chr(StartCol)
+                    If InStr(lrule, Chr(StartCol)) > 0 Then ColumnDelimiter &= Chr(StartCol)
                 Next StartCol
                 NumColumnDelimiters = Len(ColumnDelimiter)
             End If
@@ -935,27 +903,21 @@ ParseFixedDef:
                 If lScriptStateIndex > -1 Then
                     retval = ScriptState.ItemByIndex(lScriptStateIndex)
                 Else
-                    retval = FindColumnValue()
+                    retval = FindColumnValue(MyString)
                 End If
         End Select
         Return retval
     End Function
 
-    'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-    Private Function EvalTruth(ByRef str_Renamed As String) As Boolean
-        Select Case LCase(str_Renamed)
+    Private Function EvalTruth(ByRef aString As String) As Boolean
+        Select Case aString.ToLower
             Case "0", "", "false" : EvalTruth = False
             Case Else : EvalTruth = True
         End Select
     End Function
 
-    'UPGRADE_NOTE: Class_Terminate was upgraded to Class_Terminate_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-    Private Sub Class_Terminate_Renamed()
-        'UPGRADE_NOTE: Object MySubExpressions may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-        MySubExpressions = Nothing
-    End Sub
     Protected Overrides Sub Finalize()
-        Class_Terminate_Renamed()
+        MySubExpressions = Nothing
         MyBase.Finalize()
     End Sub
 End Class
