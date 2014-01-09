@@ -370,15 +370,17 @@ CaseExistRenumber:
             With lTimserConst
                 .Attributes.ChangeTo(lTimser.Attributes)
                 .Dates = New atcTimeseries(Me)
+                Dim lZeroDate As Double
                 Dim lNumValues As Integer
                 If lJulianInterval > 0 Then
-                    .Dates.Value(0) = CInt(lTimser.Dates.Value(1)) - 1 'whole day portion
-                    lNumValues = (lTimser.Dates.Value(lTimser.numValues) - .Dates.Value(0)) / lJulianInterval
+                    lZeroDate = CInt(lTimser.Dates.Value(1)) - 1 'whole day portion
+                    lNumValues = (lTimser.Dates.Value(lTimser.numValues) - lZeroDate) / lJulianInterval
                 Else
-                    .Dates.Value(0) = TimAddJ(lTimser.Dates.Value(1), lTu, lTs, -1) 'for monthly data
+                    lZeroDate = TimAddJ(lTimser.Dates.Value(1), lTu, lTs, -1) 'for monthly data
                     lNumValues = lTimser.numValues
                 End If
                 .numValues = lNumValues
+                .Dates.Value(0) = lZeroDate
                 .SetInterval(lTu, lTs)
                 Dim lIndex As Integer = 1
                 For lIndexConst As Integer = 1 To lNumValues
