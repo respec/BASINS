@@ -159,96 +159,96 @@ Public Class clsGenScnGraphSpec
             Logger.Dbg("Specification file: " & lFileName)
         End If
 
-        On Error GoTo ReadErr
-        fu = FreeFile()
-        FileOpen(fu, lFileName, OpenMode.Input)
-        i = 0
+        Try
+            fu = FreeFile()
+            FileOpen(fu, lFileName, OpenMode.Input)
+            i = 0
 
-        Dim qb As Integer
-        Do While Not EOF(fu)
-            istr = LineInput(fu)
-            rtyp = UCase(StrRetRem(istr))
-            Logger.Dbg("RetrieveSpecs:ReadRecord:" & rtyp & ":" & istr)
+            Dim qb As Integer
+            Do While Not EOF(fu)
+                istr = LineInput(fu)
+                rtyp = UCase(StrRetRem(istr))
+                Logger.Dbg("RetrieveSpecs:ReadRecord:" & rtyp & ":" & istr)
 
-            Select Case rtyp
-                Case ""
-                Case "ALEN" : ALen = CSng(istr)
-                Case "YLAB" : Axis(1).label = StrRetRem(istr)
-                Case "YRLAB" : Axis(2).label = StrRetRem(istr)
-                Case "ALAB" : Axis(3).label = StrRetRem(istr)
-                Case "XLAB" : Axis(4).label = StrRetRem(istr)
-                Case "YTYP" : Axis(1).AType = CInt(StrRetRem(istr))
-                Case "YRTYP" : Axis(2).AType = CInt(StrRetRem(istr))
-                Case "XTYP" : Axis(4).AType = CInt(StrRetRem(istr))
-                Case "XGRD" : Gridx = CInt(StrRetRem(istr))
-                Case "YGRD" : Gridy = CInt(StrRetRem(istr))
-                Case "YRGRD" : rGridy = CInt(StrRetRem(istr))
-                Case "SCALE" : i = CInt(StrRetRem(istr))
-                    Axis(i).minv = CSng(StrRetRem(istr))
-                    Axis(i).maxv = CSng(StrRetRem(istr))
-                    Axis(i).NTic = CInt(StrRetRem(istr))
-                Case "CURVE"
-                    i = CInt(StrRetRem(istr))
-                    With Crv(i)
-                        .CurveType = CInt(StrRetRem(istr))
-                        .LType = CInt(StrRetRem(istr)) - 1
-                        .LThck = CInt(StrRetRem(istr))
-                        .SType = CInt(StrRetRem(istr))
+                Select Case rtyp
+                    Case ""
+                    Case "ALEN" : ALen = CSng(istr)
+                    Case "YLAB" : Axis(1).label = StrRetRem(istr)
+                    Case "YRLAB" : Axis(2).label = StrRetRem(istr)
+                    Case "ALAB" : Axis(3).label = StrRetRem(istr)
+                    Case "XLAB" : Axis(4).label = StrRetRem(istr)
+                    Case "YTYP" : Axis(1).AType = CInt(StrRetRem(istr))
+                    Case "YRTYP" : Axis(2).AType = CInt(StrRetRem(istr))
+                    Case "XTYP" : Axis(4).AType = CInt(StrRetRem(istr))
+                    Case "XGRD" : Gridx = CInt(StrRetRem(istr))
+                    Case "YGRD" : Gridy = CInt(StrRetRem(istr))
+                    Case "YRGRD" : rGridy = CInt(StrRetRem(istr))
+                    Case "SCALE" : i = CInt(StrRetRem(istr))
+                        Axis(i).minv = CSng(StrRetRem(istr))
+                        Axis(i).maxv = CSng(StrRetRem(istr))
+                        Axis(i).NTic = CInt(StrRetRem(istr))
+                    Case "CURVE"
+                        i = CInt(StrRetRem(istr))
+                        With Crv(i)
+                            .CurveType = CInt(StrRetRem(istr))
+                            .LType = CInt(StrRetRem(istr)) - 1
+                            .LThck = CInt(StrRetRem(istr))
+                            .SType = CInt(StrRetRem(istr))
 
-                        .Color = -1
-                        s = StrRetRem(istr)
-                        If IsNumeric(s) Then
-                            qb = CInt(s)
-                            If qb > 0 And qb < 16 Then .Color = QBColor(CInt(s))
-                        End If
-                        If .Color = -1 Then .Color = TextOrNumericColor(s)
+                            .Color = -1
+                            s = StrRetRem(istr)
+                            If IsNumeric(s) Then
+                                qb = CInt(s)
+                                If qb > 0 And qb < 16 Then .Color = QBColor(CInt(s))
+                            End If
+                            If .Color = -1 Then .Color = TextOrNumericColor(s)
 
-                        s = StrRetRem(istr)
-                        If IsNumeric(s) Then
-                            dtype(i) = CInt(s)
-                        Else
-                            istr = s & " " & istr
-                        End If
+                            s = StrRetRem(istr)
+                            If IsNumeric(s) Then
+                                dtype(i) = CInt(s)
+                            Else
+                                istr = s & " " & istr
+                            End If
 
-                        .LegLbl = StrRetRem(istr)
-                    End With
-                Case "VAR"
-                    i = CInt(StrRetRem(istr))
-                    'Var(i).WchAx = CInt(StrRetRem(istr))
-                    'Var(i).Trans = CLng(StrRetRem(istr))
-                    'Var(i).label = StrRetRem(istr)
-                Case "LINE"
-                    If NumLines > 0 And Not lAlreadyAddedLine Then NumLines = 0
-                    Logger.Msg("Adding line " & StrRetRem(istr))
-                    AddLine(CInt(StrRetRem(istr)), CInt(StrRetRem(istr)), CInt(StrRetRem(istr)), CInt(StrRetRem(istr)), TextOrNumericColor(StrRetRem(istr)), StrSplit(istr, " ", "'"), ReplaceString(istr, "'", ""))
-                    lAlreadyAddedLine = True
-                Case "LOCLEGEND"
-                    XLegLoc = CSng(StrRetRem(istr))
-                    YLegLoc = CSng(StrRetRem(istr))
-                Case "ADDTEXT"
-                    XtraText = StrRetRem(istr)
-                    XTxtLoc = CSng(StrRetRem(istr))
-                    YTxtLoc = CSng(StrRetRem(istr))
-                Case "TITLE"
-                    Title = StrRetRem(istr)
-                    'Text = StrRetRem(istr)
-                Case "DATALABELS"
-                    DataLabelPosition = CInt(StrRetRem(istr))
-                Case Else
-                    Logger.Msg("RetrieveSpecs:Unknown directive:" & rtyp & ":" & istr)
-            End Select
-        Loop
-        Logger.Dbg("RetrieveSpecs:EndofMapFile")
+                            .LegLbl = StrRetRem(istr)
+                        End With
+                    Case "VAR"
+                        i = CInt(StrRetRem(istr))
+                        'Var(i).WchAx = CInt(StrRetRem(istr))
+                        'Var(i).Trans = CLng(StrRetRem(istr))
+                        'Var(i).label = StrRetRem(istr)
+                    Case "LINE"
+                        If NumLines > 0 And Not lAlreadyAddedLine Then NumLines = 0
+                        Logger.Msg("Adding line " & StrRetRem(istr))
+                        AddLine(CInt(StrRetRem(istr)), CInt(StrRetRem(istr)), CInt(StrRetRem(istr)), CInt(StrRetRem(istr)), TextOrNumericColor(StrRetRem(istr)), StrSplit(istr, " ", "'"), ReplaceString(istr, "'", ""))
+                        lAlreadyAddedLine = True
+                    Case "LOCLEGEND"
+                        XLegLoc = CSng(StrRetRem(istr))
+                        YLegLoc = CSng(StrRetRem(istr))
+                    Case "ADDTEXT"
+                        XtraText = StrRetRem(istr)
+                        XTxtLoc = CSng(StrRetRem(istr))
+                        YTxtLoc = CSng(StrRetRem(istr))
+                    Case "TITLE"
+                        Title = StrRetRem(istr)
+                        'Text = StrRetRem(istr)
+                    Case "DATALABELS"
+                        DataLabelPosition = CInt(StrRetRem(istr))
+                    Case Else
+                        Logger.Msg("RetrieveSpecs:Unknown directive:" & rtyp & ":" & istr)
+                End Select
+            Loop
+            Logger.Dbg("RetrieveSpecs:EndofMapFile")
 
-        FileClose(fu)
-        'ReDrawGraph(0)
-        Exit Sub 'completed ok
-
-ReadErr:
-        Logger.Msg("A problem occurred reading the graph file " & lFileName & vbCrLf & Err.Description, 48, "Graph Problem")
-        'Logger.Msg("RetrieveSpecs:Error:" & Err.Number & ":" & Err.Description & ":" & istr)
-        FileClose(fu)
-        pSpecsLoaded = False
+            FileClose(fu)
+            'ReDrawGraph(0)
+            Exit Sub 'completed ok
+        Catch ex As Exception
+            Logger.Msg("A problem occurred reading the graph file " & lFileName & vbCrLf & Err.Description, 48, "Graph Problem")
+            'Logger.Msg("RetrieveSpecs:Error:" & Err.Number & ":" & Err.Description & ":" & istr)
+            FileClose(fu)
+            pSpecsLoaded = False
+        End Try
     End Sub
 
     'value must be just a number along WchAx to align line with
