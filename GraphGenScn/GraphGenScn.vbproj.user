@@ -9,9 +9,10 @@
     <ErrorReportUrlHistory />
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
+    <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <StartArguments>S:\BASINS\data\forecast\forecast.sta</StartArguments>
+    <StartArguments>G:\Admin\USGS_DO15_FEQ\AUTOPLOT\forecast\forecast.sta</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <StartArguments>G:\Admin\USGS_DO15_FEQ\AUTOPLOT\forecast\forecast.sta</StartArguments>

@@ -11,7 +11,7 @@ Module GraphGenScn
     Friend DefaultMajorGridColor As Color = Color.FromArgb(255, 225, 225, 225)
     Friend DefaultMinorGridColor As Color = Color.FromArgb(255, 245, 245, 245)
 
-    Private pbasename As String
+    Private pBasename As String
     Private Const pWorkingDirectory As String = "G:\"
     Private Const pTimeseries1Axis As String = "Aux"
     Private Const pTimeseries1IsPoint As Boolean = False
@@ -28,7 +28,8 @@ Module GraphGenScn
     Private Const pTimeseries7Axis As String = "Right"
     Private Const pTimeseries7IsPoint As Boolean = False
 
-    Private pTimeseriesConstituent, pLeftYAxisLabel, pLeftAuxAxisLabel, foldername As String
+    Private pTimeseriesConstituent, pLeftYAxisLabel, pLeftAuxAxisLabel As String
+    Private pOutputDir As String = ""
     'New things
     Private pWDMFileName As String = ""
     Private pSTAFileName As String = ""
@@ -148,6 +149,26 @@ Module GraphGenScn
                             pEJDay = 0.0
                         End If
                     End Try
+                Case "OUTPUTDIR"
+                    pOutputDir = StrRetRem(lOneLine)
+                    'check if output directory exists and try to create it if not, quit preemptively here
+                    Try
+                        If Not IO.Directory.Exists(pOutputDir) Then
+                            IO.Directory.CreateDirectory(pOutputDir)
+                        End If
+                    Catch ex As Exception
+                        MsgBox("Create output directory failed: " & pOutputDir, MsgBoxStyle.Critical)
+                        Exit Sub
+                    End Try
+                    'Try
+                    '    Dim lSW As New IO.StreamWriter(IO.Path.Combine(foldername, "perm.txt"), False)
+                    '    lSW.WriteLine("Has write permission.")
+                    '    lSW.Close()
+                    '    lSW = Nothing
+                    'Catch ex As Exception
+                    '    MsgBox("Output directory doesnot have write permission.", MsgBoxStyle.Critical)
+                    '    Exit Sub
+                    'End Try
             End Select
         End While
 
@@ -383,7 +404,7 @@ Module GraphGenScn
 
     Private Sub Clear()
         pSJDay = 0 : pEJDay = 0 : pSJDayCommon = 0 : pEJDayCommon = 0
-        pTimeseriesConstituent = "" : pLeftYAxisLabel = "" : pLeftAuxAxisLabel = "" : foldername = ""
+        pTimeseriesConstituent = "" : pLeftYAxisLabel = "" : pLeftAuxAxisLabel = "" : pOutputDir = ""
         pGraphTitle = "" : pTSBlockFileName = ""
         If pTSGroup IsNot Nothing Then
             pTSGroup.Clear()
@@ -924,9 +945,11 @@ Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
     End Sub
 
     Sub GraphTimeseriesBatch(ByVal aDataGroup As atcTimeseriesGroup)
-        foldername = IO.Path.GetDirectoryName(pSTAFileName)
-        pbasename = IO.Path.GetFileNameWithoutExtension(pSTAFileName)
-        Dim lOutFileName As String = foldername & "\" & pbasename
+        If Not IO.Directory.Exists(pOutputDir) Then
+            pOutputDir = IO.Path.GetDirectoryName(pSTAFileName)
+        End If
+        pBasename = IO.Path.GetFileNameWithoutExtension(pSTAFileName)
+        Dim lOutFileName As String = IO.Path.Combine(pOutputDir, pBasename)
         Dim lZgc As ZedGraphControl = Nothing
         If pGraphHeight = 0 OrElse pGraphWidth = 0 Then
             pGraphWidth = 640
@@ -1103,7 +1126,13 @@ Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
         lZgc.Invalidate()
         lZgc.Refresh()
 
-        System.IO.Directory.CreateDirectory(foldername)
+        Try
+            System.IO.Directory.CreateDirectory(pOutputDir)
+        Catch ex As Exception
+            Logger.Msg("Problem accessing output directory: " & vbCrLf & pOutputDir)
+            Exit Sub
+        End Try
+
         lZgc.SaveIn(lOutFileName & ".png")
         '.emf does not seem to be saving correctly, so skip it for now: lZgc.SaveIn(lOutFileName & ".emf")
         lZgc.Dispose()
