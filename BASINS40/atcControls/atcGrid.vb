@@ -557,6 +557,7 @@ Public Class atcGrid
                     lVscrollInUse = True
                     If lRow - lFixedRows + 1 < pRowsScrolled Then 'More rows are scrolled than need to be
                         pRowsScrolled = lRow - lFixedRows + 1     'Scroll down past only as many rows as don't fit
+                        If pRowsScrolled < 0 Then pRowsScrolled = 0
                         Me.VScroller.Value = pRowsScrolled
                     End If
                 End If
