@@ -1,7 +1,7 @@
 del /Q package\*.*
 rmdir package
 mkdir package
-"S:\dev\DotSpatial\SupportFiles\ILMerge\ILMerge.exe" /out:package\GraphGenScn.exe GraphGenScn.exe MapWinUtility.dll atcUtility.dll atcData.dll atcTimeseriesFEQ.dll atcTimeseriesStatistics.dll atcWdm.dll ZedGraph.dll
+"C:\Program Files\Microsoft\ILMerge\ILMerge.exe" /out:package\GraphGenScn.exe GraphGenScnDev.exe MapWinUtility.dll atcUtility.dll atcData.dll atcTimeseriesFEQ.dll atcTimeseriesStatistics.dll atcWdm.dll ZedGraph.dll
 del package\GraphGenScn.pdb
 copy ATCoRend.dbf package
 copy feqlib.dll package
