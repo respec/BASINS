@@ -152,13 +152,14 @@ Public Module ConstituentBalance
                                                     If lMultipleIndex = 1 Then
                                                         lMult = 0.048
                                                     ElseIf lMultipleIndex = 2 Then
-                                                        lMult = 0.05294
+                                                        lMult = 0.021176 'obtained by multiplying 0.4 to 0.05294
                                                     End If
                                                 ElseIf aBalanceType = "OrganicP" Or aBalanceType = "TotalP" Then
                                                     If lMultipleIndex = 1 Then
                                                         lMult = 0.0023
                                                     ElseIf lMultipleIndex = 2 Then
-                                                        lMult = 0.007326
+                                                        lMult = 0.0029304
+                                                        'obtained by multiplying 0.4 to 0.007326
                                                     End If
                                                 End If
                                             Case "ORGN - TOTAL OUTFLOW"
