@@ -39,6 +39,30 @@ Public Module Graph
         'the file is found ONCE instead of a gazillion times and the colors are initialized ONCE rather than a gazillion
         'times
 
+        Dim CumulativeGraph As Boolean = True
+
+        If CumulativeGraph Then
+            lZgc = CreateZgc()
+            lZgc.Width = aGraphSaveWidth
+            lZgc.Height = aGraphSaveHeight
+            Dim lGraphDur As New clsGraphRunningSum(lDataGroup, lZgc)
+            With lGraphDur.ZedGraphCtrl.GraphPane
+                .YAxis.Title.FontSpec.Size += 2
+                .YAxis.Title.Text = "Flow (cfs)"
+                .XAxis.Scale.FontSpec.Size += 1
+                .XAxis.Title.FontSpec.Size += 1
+                .XAxis.Title.Text = "Cumulative Flow"
+                .YAxis.Scale.FontSpec.IsBold = True
+                .YAxis.Scale.FontSpec.Size += 1
+                .Title.Text = lOutFileBase
+
+            End With
+            lZgc.SaveIn(lOutFileBase & "_cum" & aGraphSaveFormat)
+            lGraphDur.Dispose()
+            lZgc.Dispose()
+
+        End If
+
         If aMakeStd Then 'Becky added this if-then so duration plot only generates if the user wants standard plots
             'duration plot
             lZgc = CreateZgc()
@@ -278,7 +302,12 @@ Public Module Graph
         For Each lStorm As HexStorm In aExpSystem.Storms
             Dim lDataGroupStorm As New atcTimeseriesGroup
             For Each lTimeseries As atcTimeseries In aDataGroup
-                lDataGroupStorm.Add(SubsetByDate(lTimeseries, lStorm.SDateJ, lStorm.EDateJ, Nothing))
+                Dim lSubset As atcTimeseries = SubsetByDate(lTimeseries, lStorm.SDateJ, lStorm.EDateJ, Nothing)
+                If lSubset.numValues > 0 Then
+                    lDataGroupStorm.Add(lSubset)
+                Else
+                    Logger.Dbg("Skipped graphing dataset with no values in the time of interest")
+                End If
             Next
             Dim lDate(6) As Integer
             J2Date(lStorm.SDateJ, lDate)
