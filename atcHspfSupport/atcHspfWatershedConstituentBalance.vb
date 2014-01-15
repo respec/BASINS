@@ -205,7 +205,7 @@ Public Module WatershedConstituentBalance
                 Return "TN"
             Case "TotalP"
                 Return "TP"
-            Case "BOD"
+            Case "BOD-PQUAL"
                 Return "BOD"
         End Select
         Return aBalanceType
@@ -245,7 +245,7 @@ Public Module WatershedConstituentBalance
                   Optional ByVal aOutFilePrefix As String = "", _
                   Optional ByVal aOutletDetails As Boolean = False, _
                   Optional ByVal aSegmentRows As Boolean = False, _
-                  Optional ByVal aDecimalPlaces As Integer = 3, _
+                  Optional ByVal aDecimalPlaces As Integer = 4, _
                   Optional ByVal aSignificantDigits As Integer = 5, _
                   Optional ByVal aFieldWidth As Integer = 12, _
                   Optional ByVal aSkipZeroOrNoValue As Boolean = True) As atcReport.IReport
@@ -291,7 +291,7 @@ Public Module WatershedConstituentBalance
             Dim lValueOutlet As Double = 0.0
             Dim lConstituentKey As String
             For Each lLandUse As String In lLandUses.Keys
-               
+
                 If lOperationType.StartsWith(lLandUse.Substring(0, 1)) Then
                     Try
                         Dim lNeedHeader As Boolean = True
@@ -392,13 +392,14 @@ Public Module WatershedConstituentBalance
                                                             If lMultipleIndex = 1 Then
                                                                 lMult = 0.048
                                                             ElseIf lMultipleIndex = 2 Then
-                                                                lMult = 0.05294
+                                                                lMult = 0.021176 'obtained by multiplying 0.4 to 0.05294
                                                             End If
                                                         ElseIf aBalanceType = "OrganicP" Or aBalanceType = "TotalP" Then
                                                             If lMultipleIndex = 1 Then
                                                                 lMult = 0.0023
                                                             ElseIf lMultipleIndex = 2 Then
-                                                                lMult = 0.007326
+                                                                lMult = 0.0029304
+                                                                'obtained by multiplying 0.4 to 0.007326
                                                             End If
                                                         End If
                                                     Case "P:ORGN - TOTAL OUTFLOW"
@@ -680,7 +681,7 @@ Public Module WatershedConstituentBalance
                                                 End If
                                             End If
 
-                                            End If
+                                        End If
                                     End If
 
 
