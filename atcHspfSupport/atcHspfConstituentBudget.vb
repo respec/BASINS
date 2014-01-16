@@ -71,6 +71,7 @@ Public Module ConstituentBudget
         lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
 
+        lReport2.AppendLine("")
         lReport2.AppendLine(aScenario & " " & aBalanceType & " Average Annual Totals for Each Land Segment to Individual Reaches " & lUnits)
         lReport2.AppendLine("   Run Made " & aRunMade)
         lReport2.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
@@ -102,6 +103,7 @@ Public Module ConstituentBudget
                     For Each lID As HspfOperation In lRchresOperations
                         .CurrentRecord += 1
                         Dim lAreas As New atcCollection
+                        lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
                         Dim lNonpointTons As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData)
@@ -265,6 +267,7 @@ Public Module ConstituentBudget
                     For Each lID As HspfOperation In lRchresOperations
                         .CurrentRecord += 1
                         Dim lAreas As New atcCollection
+                        lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
                         Dim lNonpointlbs As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData)
@@ -402,9 +405,18 @@ Public Module ConstituentBudget
 
                     End Select
                 End If
-
+                
             Next
-            LoadingByLanduse = LoadingByLanduse & vbCrLf & aReach.Id.ToString & vbTab & lLocation & vbTab & lTotal
+            Select Case lLocation.Substring(0, 1)
+                Case "P"
+                    LoadingByLanduse &= vbCrLf & aReach.Caption.ToString.Substring(10) & vbTab & lLocation & vbTab _
+                        & aReach.Uci.OpnBlks("PERLND").OperFromID(lLocation.Substring(2)).Description & vbTab & lTotal
+                Case "I"
+                    LoadingByLanduse &= vbCrLf & aReach.Caption.ToString.Substring(10) & vbTab & lLocation & vbTab _
+                        & aReach.Uci.OpnBlks("IMPLND").OperFromID(lLocation.Substring(2)).Description & vbTab & lTotal
+
+            End Select
+            
             'lNewTotal += lArea * lSubTotal
         Next
 
