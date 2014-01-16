@@ -65,12 +65,20 @@ Public Module ConstituentBudget
         Dim lCumulativePointNonpointColl As New atcCollection
 
         Dim lReport As New atcReport.ReportText
+        Dim lReport2 As New atcReport.ReportText
         lReport.AppendLine(aScenario & " " & aBalanceType & " Average Annual Totals " & lUnits)
         lReport.AppendLine("   Run Made " & aRunMade)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
 
+        lReport2.AppendLine(aScenario & " " & aBalanceType & " Average Annual Totals for Each Land Segment to Individual Reaches " & lUnits)
+        lReport2.AppendLine("   Run Made " & aRunMade)
+        lReport2.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+        lReport2.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+
+
         Dim lOutputTable As New atcTableDelimited
+        Dim lOutputTable2 As New atcTableDelimited
         Select Case aBalanceType
             Case "Sediment"
 
@@ -165,7 +173,7 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point Source"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Atmospheric Deposition"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Atm. Depo. on Water"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
@@ -174,13 +182,14 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
 
+
                     For Each lID As HspfOperation In lRchresOperations
                         .CurrentRecord += 1
                         Dim lAreas As New atcCollection
                         LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
                         Dim lNonpointlbs As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData)
-
+                        lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         Dim lUpstreamIn As Double = 0
                         If lUpstreamInflows.Keys.Contains(lID.Id) Then
                             lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
@@ -234,6 +243,7 @@ Public Module ConstituentBudget
                     lReport.Append(.ToString)
 
                 End With
+                lReport.Append(lReport2.ToString)
             Case "TotalP"
                 With lOutputTable
                     .Delimiter = vbTab
@@ -359,5 +369,49 @@ Public Module ConstituentBudget
         Dim lOutflow As Double = lReachData.Attributes.GetValue("SumAnnual")
         Return lOutflow
     End Function
+    Private Function ConstituentLoadingByLanduse(ByVal aReach As HspfOperation, _
+                                    ByVal aBalanceType As String, _
+                                    ByVal aAreas As atcCollection, _
+                                   ByVal aNonpointData As atcTimeseriesGroup) As String
+        Dim LoadingByLanduse As String = ""
+        Dim lTotal As Double = 0
+        For lAreaIndex As Integer = 0 To aAreas.Count - 1
+            Dim lLocation As String = aAreas.Keys(lAreaIndex)
+            Dim lArea As Double = aAreas.ItemByIndex(lAreaIndex)
+            'Logger.Dbg("Area is " & lArea)
+            'Dim lSubTotal As Double = 0
+            lTotal = 0
+            For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lLocation)
+                'lSubTotal += lTs.Attributes.GetValue("SumAnnual")
 
+                If Not (Left(lLocation, 2) = "P:" And Left(lTs.Attributes.GetValue("Constituent").ToString, 6) = "SOQUAL") Then
+
+                    Select Case lTs.Attributes.GetValue("Constituent").ToString & "_" & aBalanceType
+                        Case "POQUAL-BOD_TotalN"
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.069176
+                            'Multiplying 0.048 + 0.05294*.4 to BOD to get Organic N
+                        Case "SOQUAL-BOD_TotalN"
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.069176
+                        Case "POQUAL-BOD_TotalP"
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.005234
+                            'Multiplying 0.0023 + 0.007326 to BOD to get Organic N
+                        Case "SOQUAL-BOD_TotalP"
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.005234
+                        Case Else
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual")
+
+                    End Select
+                End If
+
+            Next
+            LoadingByLanduse = LoadingByLanduse & vbCrLf & aReach.Id.ToString & vbTab & lLocation & vbTab & lTotal
+            'lNewTotal += lArea * lSubTotal
+        Next
+
+
+
+
+        Return LoadingByLanduse
+
+    End Function
 End Module
