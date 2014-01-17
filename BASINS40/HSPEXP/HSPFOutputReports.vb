@@ -84,8 +84,8 @@ Module HSPFOutputReports
 
         pGraphSaveFormat = ".png"
         'pGraphSaveFormat = ".emf"
-        pGraphSaveWidth = 1024
-        pGraphSaveHeight = 868
+        pGraphSaveWidth = 1300
+        pGraphSaveHeight = 768
         pMakeStdGraphs = StartUp.chkGraphStandard.Checked
         pMakeLogGraphs = StartUp.chkLogGraphs.Checked
         pMakeSupGraphs = StartUp.chkSupportingGraphs.Checked
@@ -203,13 +203,13 @@ Module HSPFOutputReports
 
             Dim lRunMade As String = ""
             Dim lWdmFileName As String = pTestPath & pBaseName & ".wdm" 'Becky fixed to remove extra "\"
-            Logger.Status(Now & " Opening " & pBaseName & ".wdm", True)
+
             Dim lWdmDataSource As New atcDataSourceWDM()
             If System.IO.File.Exists(lWdmFileName) Then
                 Dim wdmFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lWdmFileName)
                 lRunMade = wdmFileInfo.LastWriteTime.ToString
 
-                lWdmDataSource.Open(lWdmFileName)
+
                 'TODO: allow observed flow to come from a different fileEXPE
             Else
                 'Becky added this if-then-else to catch the case below if the WDM file does not exist
@@ -262,13 +262,15 @@ Module HSPFOutputReports
 
             'A folder name is given that has the basename and the time when the run was made.
             If pMakeAreaReports Then
+                'Logger.Status(Now & " Opening " & pBaseName & ".wdm", True)
+                lWdmDataSource.Open(lWdmFileName)
                 Logger.Status(Now & " Producing Area Reports.", True)
                 Logger.Dbg(Now & " Producing land use and area reports")
                 'Becky's note: I changed modUtility so this will actually do this for all locations in pOutputLocations
-                Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutFolderName & "\")
+                Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutFolderName & "/AreaReports/")
                 lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
 
-                SaveFileString(lOutFolderName & "AreaReport.txt", lReport.ToString)
+                SaveFileString(lOutFolderName & "/AreaReports/AreaReport.txt", lReport.ToString)
             End If
 
             'open WDM file
@@ -300,7 +302,7 @@ Module HSPFOutputReports
                         lStr = lExpertSystem.Report
                         'Becky changed file name to match our typical file structure
                         'SaveFileString(lOutFolderName & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
-                        SaveFileString(lOutFolderName & pBaseName & ".sts", lStr)
+                        SaveFileString(lOutFolderName & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".sts", lStr)
                         'Becky commented the following out - no need to exactly reproduce the EXS file we already have
                         'SaveFileString(lOutFolderName & pBaseName & "out.exs", lExpertSystem.AsString) 'Becky added "out" so as not to write over the original
 
@@ -542,6 +544,7 @@ Module HSPFOutputReports
                     Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
                     Logger.Dbg("Summary at " & lLocations.Count & " locations")
                     'constituent balance
+
                     lReportCons = HspfSupport.ConstituentBalance.Report _
                        (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                         lHspfBinDataSource, lLocations, lRunMade)
@@ -550,17 +553,15 @@ Module HSPFOutputReports
                     SaveFileString(lOutFileName, lReportCons.ToString)
 
 
-                    'watershed constituent balance 
                     lReportCons = HspfSupport.WatershedConstituentBalance.Report _
-                       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                        lHspfBinDataSource, lRunMade)
+                    (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                    lHspfBinDataSource, lRunMade)
                     lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
                     '"_All_WatershedConstituentBalance.txt"
                     SaveFileString(lOutFileName, lReportCons.ToString)
 
 
                     If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
-                        Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent & "at specified locations!")
                         HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                            (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                             lHspfBinDataSource, pOutputLocations, lRunMade, _
