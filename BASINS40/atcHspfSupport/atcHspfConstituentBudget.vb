@@ -91,7 +91,7 @@ Public Module ConstituentBudget
                     Dim lField As Integer = 0
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point Source"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
@@ -106,7 +106,8 @@ Public Module ConstituentBudget
                         lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
-                        Dim lNonpointTons As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData)
+                        Dim lNonpointTons As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData) * 0.999906
+                        'The factor of 0.999906 is to reduce the overestimation of loading from land surfaces and get a more reasonable value of Point sources.
                         'This calculation assumes that multiplication factor in
                         'MASS-LINK Blocks sum to 1. Should be able to get sum of Mult Factors for SSED1, 2 and 3 from the uci.
 
@@ -125,7 +126,11 @@ Public Module ConstituentBudget
                         'Anurag changes are over
                         Dim lPointTons As Double = lTotalInflow - lNonpointTons - lUpstreamIn
                         'Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData) 'TotalForReach(lID, lAreas, lTotalInflowData)
-
+                        If lPointTons < 0.0001 * lNonpointTons Then
+                            lPointTons = 0.0
+                        End If
+                        'A negligible point source value is generated because of rounding errors when no point sources are present. 
+                        'This is to make sure that output looks cleaner
                         Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
                         Dim lDepScour As Double = ValueForReach(lID, lDepScourData) 'TotalForReach(lID, lAreas, lDepScourData)
                         Dim lCumulativePointNonpoint As Double = lNonpointTons + lPointTons
@@ -174,7 +179,7 @@ Public Module ConstituentBudget
                     Dim lField As Integer = 0
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point Source"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Atm. Depo. on Water"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
@@ -190,7 +195,8 @@ Public Module ConstituentBudget
                         Dim lAreas As New atcCollection
                         LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
-                        Dim lNonpointlbs As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData)
+                        Dim lNonpointlbs As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData) * 0.999906
+                        'The factor of 0.999906 is to reduce the overestimation of loading from land surfaces and get a more reasonable value of Point sources.
                         lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         Dim lUpstreamIn As Double = 0
                         If lUpstreamInflows.Keys.Contains(lID.Id) Then
@@ -204,6 +210,12 @@ Public Module ConstituentBudget
                         lTotalAtmDep = ValueForReach(lID, lAtmDepData.FindData("Constituent", "NO3-ATMDEPTOT"))
                         lTotalAtmDep += ValueForReach(lID, lAtmDepData.FindData("Constituent", "TAM-ATMDEPTOT"))
                         lPointlbs = lTotalInflow - lNonpointlbs - lTotalAtmDep - lUpstreamIn
+                        If lPointlbs < (0.0002 * lNonpointlbs) Then
+                            lPointlbs = 0.0
+                        End If
+                        'A negligible point source value is generated because of rounding errors when no point sources are present. 
+                        'This is to make sure that output looks cleaner
+
                         Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
                         Dim lDepScour As Double = lOutflow - lTotalInflow
                         Dim lCumulativePointNonpoint As Double = lNonpointlbs + lPointlbs
@@ -255,7 +267,7 @@ Public Module ConstituentBudget
                     Dim lField As Integer = 0
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point Source"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
@@ -270,7 +282,8 @@ Public Module ConstituentBudget
                         lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
-                        Dim lNonpointlbs As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData)
+                        Dim lNonpointlbs As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData) * 0.999906
+                        'The factor of 0.999906 is to reduce the overestimation of loading from land surfaces and get a more reasonable value of Point sources.
 
                         Dim lUpstreamIn As Double = 0
                         If lUpstreamInflows.Keys.Contains(lID.Id) Then
@@ -288,6 +301,11 @@ Public Module ConstituentBudget
                             lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
                         End If
                         lPointlbs = lTotalInflow - lNonpointlbs - lUpstreamIn
+                        If lPointlbs < 0.0002 * lNonpointlbs Then
+                            lPointlbs = 0.0
+                        End If
+                        'A negligible point source value is generated because of rounding errors when no point sources are present. 
+                        'This is to make sure that output looks cleaner
                         Dim lReachTrappingEfficiency As Double
                         Try
                             lReachTrappingEfficiency = lDepScour / lTotalInflow
@@ -407,6 +425,7 @@ Public Module ConstituentBudget
                 End If
                 
             Next
+            lTotal = lTotal * 0.999906
             Select Case lLocation.Substring(0, 1)
                 Case "P"
                     LoadingByLanduse &= vbCrLf & aReach.Caption.ToString.Substring(10) & vbTab & lLocation & vbTab _
@@ -419,9 +438,6 @@ Public Module ConstituentBudget
             
             'lNewTotal += lArea * lSubTotal
         Next
-
-
-
 
         Return LoadingByLanduse
 
