@@ -1,4 +1,6 @@
 ﻿Imports MapWindow.Interfaces
+Imports System.Windows.Forms.DialogResult
+Imports System.IO
 Public Class StartUp
     Private g_MapWin As IMapWin
     Private Sub cmdStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdStart.Click
@@ -86,18 +88,16 @@ Public Class StartUp
 
     Private Sub chkExpertStats_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkExpertStats.CheckedChanged
         If chkExpertStats.Checked Then
-            chkAreaReports.Enabled = True
+
             grpGraphs.Enabled = True
         Else
             chkAreaReports.Enabled = False
             grpGraphs.Enabled = False
-            chkAreaReports.Checked = False
+
             chkGraphStandard.Checked = False
             chkSupportingGraphs.Checked = False
         End If
     End Sub
 
-    Private Sub chkNitrogenBalance_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkNitrogenBalance.CheckedChanged
 
-    End Sub
 End Class
