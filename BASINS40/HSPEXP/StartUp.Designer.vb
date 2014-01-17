@@ -50,6 +50,11 @@ Partial Class StartUp
         Me.chkSedimentBalance = New System.Windows.Forms.CheckBox
         Me.grpGraphs = New System.Windows.Forms.GroupBox
         Me.grpConstituentBalance = New System.Windows.Forms.GroupBox
+        Me.chkAGCHEM = New System.Windows.Forms.CheckBox
+        Me.chkBODBalance = New System.Windows.Forms.CheckBox
+        Me.chkTotalPhosphorus = New System.Windows.Forms.CheckBox
+        Me.chkPhosphorusBalance = New System.Windows.Forms.CheckBox
+        Me.chkTotalNitrogen = New System.Windows.Forms.CheckBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.chkNitrogenBalance = New System.Windows.Forms.CheckBox
         Me.chkExpertStats = New System.Windows.Forms.CheckBox
@@ -62,7 +67,7 @@ Partial Class StartUp
         Me.cmdStart.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdStart.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.cmdStart.Enabled = False
-        Me.cmdStart.Location = New System.Drawing.Point(364, 638)
+        Me.cmdStart.Location = New System.Drawing.Point(370, 809)
         Me.cmdStart.Name = "cmdStart"
         Me.cmdStart.Size = New System.Drawing.Size(75, 23)
         Me.cmdStart.TabIndex = 15
@@ -91,9 +96,11 @@ Partial Class StartUp
         '
         'txtUCIPath
         '
+        Me.txtUCIPath.AllowDrop = True
         Me.txtUCIPath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtUCIPath.Enabled = False
+        Me.txtUCIPath.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
+        Me.txtUCIPath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.RecentlyUsedList
         Me.txtUCIPath.Location = New System.Drawing.Point(15, 33)
         Me.txtUCIPath.Name = "txtUCIPath"
         Me.txtUCIPath.Size = New System.Drawing.Size(505, 20)
@@ -130,7 +137,7 @@ Partial Class StartUp
         '
         Me.lblRCH.AutoSize = True
         Me.lblRCH.Enabled = False
-        Me.lblRCH.Location = New System.Drawing.Point(0, 169)
+        Me.lblRCH.Location = New System.Drawing.Point(0, 269)
         Me.lblRCH.MaximumSize = New System.Drawing.Size(190, 0)
         Me.lblRCH.Name = "lblRCH"
         Me.lblRCH.Size = New System.Drawing.Size(188, 39)
@@ -142,7 +149,7 @@ Partial Class StartUp
         '
         Me.txtRCH.BackColor = System.Drawing.SystemColors.Window
         Me.txtRCH.Enabled = False
-        Me.txtRCH.Location = New System.Drawing.Point(200, 184)
+        Me.txtRCH.Location = New System.Drawing.Point(200, 284)
         Me.txtRCH.Name = "txtRCH"
         Me.txtRCH.Size = New System.Drawing.Size(47, 20)
         Me.txtRCH.TabIndex = 14
@@ -206,7 +213,7 @@ Partial Class StartUp
         '
         Me.lblOutReach2.AutoSize = True
         Me.lblOutReach2.Enabled = False
-        Me.lblOutReach2.Location = New System.Drawing.Point(258, 182)
+        Me.lblOutReach2.Location = New System.Drawing.Point(258, 282)
         Me.lblOutReach2.MaximumSize = New System.Drawing.Size(250, 0)
         Me.lblOutReach2.Name = "lblOutReach2"
         Me.lblOutReach2.Size = New System.Drawing.Size(245, 26)
@@ -217,7 +224,7 @@ Partial Class StartUp
         '
         Me.cmdEnd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdEnd.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdEnd.Location = New System.Drawing.Point(445, 638)
+        Me.cmdEnd.Location = New System.Drawing.Point(451, 809)
         Me.cmdEnd.Name = "cmdEnd"
         Me.cmdEnd.Size = New System.Drawing.Size(75, 23)
         Me.cmdEnd.TabIndex = 19
@@ -227,7 +234,6 @@ Partial Class StartUp
         'chkAreaReports
         '
         Me.chkAreaReports.AutoSize = True
-        Me.chkAreaReports.Enabled = False
         Me.chkAreaReports.Location = New System.Drawing.Point(15, 275)
         Me.chkAreaReports.Name = "chkAreaReports"
         Me.chkAreaReports.Size = New System.Drawing.Size(500, 17)
@@ -282,7 +288,7 @@ Partial Class StartUp
         '
         Me.pnlHighlight.BackColor = System.Drawing.Color.Red
         Me.pnlHighlight.Enabled = False
-        Me.pnlHighlight.Location = New System.Drawing.Point(194, 180)
+        Me.pnlHighlight.Location = New System.Drawing.Point(194, 280)
         Me.pnlHighlight.Name = "pnlHighlight"
         Me.pnlHighlight.Size = New System.Drawing.Size(58, 28)
         Me.pnlHighlight.TabIndex = 17
@@ -326,6 +332,11 @@ Partial Class StartUp
         '
         Me.grpConstituentBalance.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpConstituentBalance.Controls.Add(Me.chkAGCHEM)
+        Me.grpConstituentBalance.Controls.Add(Me.chkBODBalance)
+        Me.grpConstituentBalance.Controls.Add(Me.chkTotalPhosphorus)
+        Me.grpConstituentBalance.Controls.Add(Me.chkPhosphorusBalance)
+        Me.grpConstituentBalance.Controls.Add(Me.chkTotalNitrogen)
         Me.grpConstituentBalance.Controls.Add(Me.Label3)
         Me.grpConstituentBalance.Controls.Add(Me.chkNitrogenBalance)
         Me.grpConstituentBalance.Controls.Add(Me.chkWaterBalance)
@@ -334,12 +345,63 @@ Partial Class StartUp
         Me.grpConstituentBalance.Controls.Add(Me.txtRCH)
         Me.grpConstituentBalance.Controls.Add(Me.lblOutReach2)
         Me.grpConstituentBalance.Controls.Add(Me.pnlHighlight)
-        Me.grpConstituentBalance.Location = New System.Drawing.Point(12, 399)
+        Me.grpConstituentBalance.Location = New System.Drawing.Point(12, 401)
         Me.grpConstituentBalance.Name = "grpConstituentBalance"
-        Me.grpConstituentBalance.Size = New System.Drawing.Size(508, 225)
+        Me.grpConstituentBalance.Size = New System.Drawing.Size(508, 332)
         Me.grpConstituentBalance.TabIndex = 29
         Me.grpConstituentBalance.TabStop = False
         Me.grpConstituentBalance.Text = "Constituent Balance Reports"
+        '
+        'chkAGCHEM
+        '
+        Me.chkAGCHEM.AutoSize = True
+        Me.chkAGCHEM.Enabled = False
+        Me.chkAGCHEM.Location = New System.Drawing.Point(6, 242)
+        Me.chkAGCHEM.Name = "chkAGCHEM"
+        Me.chkAGCHEM.Size = New System.Drawing.Size(235, 17)
+        Me.chkAGCHEM.TabIndex = 34
+        Me.chkAGCHEM.Text = "Produce AGCHEM Reports (unimplemented)"
+        Me.chkAGCHEM.UseVisualStyleBackColor = True
+        '
+        'chkBODBalance
+        '
+        Me.chkBODBalance.AutoSize = True
+        Me.chkBODBalance.Location = New System.Drawing.Point(6, 218)
+        Me.chkBODBalance.Name = "chkBODBalance"
+        Me.chkBODBalance.Size = New System.Drawing.Size(246, 17)
+        Me.chkBODBalance.TabIndex = 33
+        Me.chkBODBalance.Text = "Produce BOD Reports (Includes BOD-PQUAL)"
+        Me.chkBODBalance.UseVisualStyleBackColor = True
+        '
+        'chkTotalPhosphorus
+        '
+        Me.chkTotalPhosphorus.AutoSize = True
+        Me.chkTotalPhosphorus.Location = New System.Drawing.Point(6, 194)
+        Me.chkTotalPhosphorus.Name = "chkTotalPhosphorus"
+        Me.chkTotalPhosphorus.Size = New System.Drawing.Size(333, 17)
+        Me.chkTotalPhosphorus.TabIndex = 32
+        Me.chkTotalPhosphorus.Text = "Produce Total Phoshporus Balance Reports (Includes Organic P)"
+        Me.chkTotalPhosphorus.UseVisualStyleBackColor = True
+        '
+        'chkPhosphorusBalance
+        '
+        Me.chkPhosphorusBalance.AutoSize = True
+        Me.chkPhosphorusBalance.Location = New System.Drawing.Point(6, 170)
+        Me.chkPhosphorusBalance.Name = "chkPhosphorusBalance"
+        Me.chkPhosphorusBalance.Size = New System.Drawing.Size(262, 17)
+        Me.chkPhosphorusBalance.TabIndex = 31
+        Me.chkPhosphorusBalance.Text = "Produce Phosphorus Balance Reports (P-PQUAL)"
+        Me.chkPhosphorusBalance.UseVisualStyleBackColor = True
+        '
+        'chkTotalNitrogen
+        '
+        Me.chkTotalNitrogen.AutoSize = True
+        Me.chkTotalNitrogen.Location = New System.Drawing.Point(7, 146)
+        Me.chkTotalNitrogen.Name = "chkTotalNitrogen"
+        Me.chkTotalNitrogen.Size = New System.Drawing.Size(276, 17)
+        Me.chkTotalNitrogen.TabIndex = 30
+        Me.chkTotalNitrogen.Text = "Produce Total Nitrogen Reports (Includes Organic N)"
+        Me.chkTotalNitrogen.UseVisualStyleBackColor = True
         '
         'Label3
         '
@@ -355,12 +417,11 @@ Partial Class StartUp
         'chkNitrogenBalance
         '
         Me.chkNitrogenBalance.AutoSize = True
-        Me.chkNitrogenBalance.Enabled = False
         Me.chkNitrogenBalance.Location = New System.Drawing.Point(6, 122)
         Me.chkNitrogenBalance.Name = "chkNitrogenBalance"
-        Me.chkNitrogenBalance.Size = New System.Drawing.Size(273, 17)
+        Me.chkNitrogenBalance.Size = New System.Drawing.Size(247, 17)
         Me.chkNitrogenBalance.TabIndex = 13
-        Me.chkNitrogenBalance.Text = "Produce Nitrogen Balance Reports (Unimplemented)"
+        Me.chkNitrogenBalance.Text = "Produce Nitrogen Balance Reports (N-PQUAL)"
         Me.chkNitrogenBalance.UseVisualStyleBackColor = True
         '
         'chkExpertStats
@@ -379,7 +440,7 @@ Partial Class StartUp
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
-        Me.ClientSize = New System.Drawing.Size(532, 673)
+        Me.ClientSize = New System.Drawing.Size(532, 844)
         Me.Controls.Add(Me.chkExpertStats)
         Me.Controls.Add(Me.grpConstituentBalance)
         Me.Controls.Add(Me.grpGraphs)
@@ -401,6 +462,7 @@ Partial Class StartUp
         Me.Controls.Add(Me.cmdStart)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "StartUp"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "HSPEXP+ (Developed by AQUA TERRA Consultants and BSE, VT)"
         Me.grpGraphs.ResumeLayout(False)
         Me.grpGraphs.PerformLayout()
@@ -440,5 +502,10 @@ Partial Class StartUp
     Friend WithEvents chkNitrogenBalance As System.Windows.Forms.CheckBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents chkExpertStats As System.Windows.Forms.CheckBox
+    Friend WithEvents chkTotalNitrogen As System.Windows.Forms.CheckBox
+    Friend WithEvents chkPhosphorusBalance As System.Windows.Forms.CheckBox
+    Friend WithEvents chkTotalPhosphorus As System.Windows.Forms.CheckBox
+    Friend WithEvents chkBODBalance As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAGCHEM As System.Windows.Forms.CheckBox
 
 End Class
