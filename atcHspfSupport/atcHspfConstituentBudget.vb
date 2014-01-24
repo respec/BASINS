@@ -284,7 +284,7 @@ Public Module ConstituentBudget
 
                         Dim lNonpointlbs As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData) * 0.999906
                         'The factor of 0.999906 is to reduce the overestimation of loading from land surfaces and get a more reasonable value of Point sources.
-
+                        lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         Dim lUpstreamIn As Double = 0
                         If lUpstreamInflows.Keys.Contains(lID.Id) Then
                             lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
@@ -339,7 +339,7 @@ Public Module ConstituentBudget
                     lReport.Append(.ToString)
 
                 End With
-
+                lReport.Append(lReport2.ToString)
         End Select
         Return lReport
     End Function
