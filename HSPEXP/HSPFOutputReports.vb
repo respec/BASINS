@@ -208,8 +208,6 @@ Module HSPFOutputReports
             If System.IO.File.Exists(lWdmFileName) Then
                 Dim wdmFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lWdmFileName)
                 lRunMade = wdmFileInfo.LastWriteTime.ToString
-
-
                 'TODO: allow observed flow to come from a different fileEXPE
             Else
                 'Becky added this if-then-else to catch the case below if the WDM file does not exist
@@ -273,8 +271,6 @@ Module HSPFOutputReports
                 SaveFileString(lOutFolderName & "/AreaReports/AreaReport.txt", lReport.ToString)
             End If
 
-            'open WDM file
-
 
             If StartUp.chkExpertStats.Checked = True Then
 
@@ -289,20 +285,26 @@ Module HSPFOutputReports
                     Logger.Dbg(Now & " No basins specifications file found, no statistics computed")
                 End If
                 Dim lExpertSystem As HspfSupport.atcExpertSystem
+                lWdmDataSource.Open(lWdmFileName) 'Opening the wdm file here, so that it opens only if needed.
                 For Each lExpertSystemFileName As String In lExpertSystemFileNames
                     Logger.Status(Now & " Calculating Expert Statistics for the file " & lExpertSystemFileName, True)
                     Try
                         Dim lFileCopied As Boolean = False
-                        If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
-                            'Becky: I believe all this is doing is copying the existing EXS file to one named the same as the UCI file
-                            lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
-                        End If
+                        'If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
+                        '    'Becky: I believe all this is doing is copying the existing EXS file to one named the same as the UCI file
+                        '    lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
+                        'End If
                         Logger.Dbg(Now & " Calculating run statistics to save in " & pBaseName & ".sts")
-                        lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
+                        lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource, lExpertSystemFileName)
                         lStr = lExpertSystem.Report
                         'Becky changed file name to match our typical file structure
-                        'SaveFileString(lOutFolderName & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
-                        SaveFileString(lOutFolderName & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".sts", lStr)
+                        If pRunNo >= 0 Then
+                            SaveFileString(lOutFolderName & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".sts", lStr)
+                            'Save as *.sts file if using VT format. 
+                        Else
+                            SaveFileString(lOutFolderName & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
+                            'save as text file, if using default format.
+                        End If
                         'Becky commented the following out - no need to exactly reproduce the EXS file we already have
                         'SaveFileString(lOutFolderName & pBaseName & "out.exs", lExpertSystem.AsString) 'Becky added "out" so as not to write over the original
 
