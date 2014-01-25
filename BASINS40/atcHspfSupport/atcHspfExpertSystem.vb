@@ -51,11 +51,13 @@ Public Class atcExpertSystem
     Private Const pNSteps As Integer = 500
 
     Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcTimeseriesSource, _
+                   ByVal lExpertSystemFileName As String, _
                    Optional ByVal aExpertFlowOnly As Boolean = False)
         pFlowOnly = aExpertFlowOnly
         pUci = aUci
         pDataSource = aDataSource
-        Dim lFileName As String = IO.Path.GetFileNameWithoutExtension(aUci.Name) & ".exs"
+        Dim lFileName As String = lExpertSystemFileName
+        'IO.Path.GetFileNameWithoutExtension(aUci.Name) & ".exs"
         If Not FileExists(lFileName) Then
             Throw New ApplicationException("ExpertSystemFile " & lFileName & " not found")
         Else
@@ -246,7 +248,7 @@ Public Class atcExpertSystem
             lStr = ""
             With lSite
                 For lDsnIndex As Integer = 0 To 9
-                    lStr &= .Dsn(lDsnIndex).ToString.PadLeft(4)
+                    lStr &= .DSN(lDsnIndex).ToString.PadLeft(4)
                 Next lDsnIndex
                 lStr &= .StatDN.ToString.PadLeft(3) & "  " & .Name
             End With
