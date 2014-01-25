@@ -48,15 +48,16 @@ Module HSPFOutputReports
 
         'Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "NonUpatoi"
-        lTestName = "IRW"
+        'lTestName = "IRW"
         'lTestName = "IRW-test-agchem"
         'lTestName = "LPCal03"
         'lTestName = "LPVal"
         'lTestName = "CWCal03"
         'lTestName = "CWVal"
-        'lTestName = "RECal03"
+        lTestName = "RECal03"
         'lTestName = "REVal"
         'lTestName = "HAT"
+        'lTestName = "MAN"
         'lTestName = "mainstm"
         'lTestName = "sbranc"
         'lTestName = "MUST"
@@ -71,8 +72,8 @@ Module HSPFOutputReports
         'pConstituents.Add("N-PQUAL")
         'pConstituents.Add("P-PQUAL")
         'pConstituents.Add("BOD-PQUAL")
-        pConstituents.Add("TotalN")
-        'pConstituents.Add("TotalP")
+        'pConstituents.Add("TotalN")
+        pConstituents.Add("TotalP")
         'pConstituents.Add("AGCHEM")
 
         Select Case lTestName
@@ -87,7 +88,20 @@ Module HSPFOutputReports
                 pGraphAnnual = True
                 pAreaReport = True
                 'pRunHSPF = True
-
+            Case "MAN"
+                pTestPath = "C:\BASINS\modelout\MAN"
+                pBaseName = "MAN"
+                pOutputLocations.Add("R:20")
+                pOutputLocations.Add("R:42")
+                pOutputLocations.Add("R:60")
+                pOutputLocations.Add("R:220")
+                pOutputLocations.Add("R:261")
+                pOutputLocations.Add("R:281")
+                pOutputLocations.Add("R:283")
+                pCurveStepType = "NonStep" 'Tony's convention
+                pGraphAnnual = True
+                pAreaReport = True
+                'pRunHSPF = True
             Case "Prospect"
                 pTestPath = "C:\BASINS\modelout\Prospect"
                 pBaseName = "RCH45"
@@ -164,8 +178,8 @@ Module HSPFOutputReports
             Case "RECal03"
                 pTestPath = "C:\Basins\modelout\RECal03"
                 pBaseName = "RECal03"
-                pOutputLocations.Add("R:121")
-                pOutputLocations.Add("R:131")
+                'pOutputLocations.Add("R:121")
+                'pOutputLocations.Add("R:131")
                 pOutputLocations.Add("R:133")
                 pCurveStepType = "NonStep" 'Tony's convention
                 pGraphAnnual = True
@@ -226,9 +240,9 @@ Module HSPFOutputReports
             Case "IRW"
                 pTestPath = "C:\Basins\modelout\IRW"
                 pBaseName = "IRW"
-                pOutputLocations.Add("R:150")
-                pOutputLocations.Add("R:523")
-                pOutputLocations.Add("R:630")
+                'pOutputLocations.Add("R:150")
+                'pOutputLocations.Add("R:523")
+                'pOutputLocations.Add("R:630")
                 'pOutputLocations.Add("R:640")
                 pOutputLocations.Add("R:706")
                 'pOutputLocations.Add("R:746")
@@ -384,11 +398,11 @@ Module HSPFOutputReports
             Dim lExpertSystem As HspfSupport.atcExpertSystem
             For Each lExpertSystemFileName As String In lExpertSystemFileNames
                 Try
-                    Dim lFileCopied As Boolean = False
-                    If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
-                        lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
-                    End If
-                    lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
+                    'Dim lFileCopied As Boolean = False
+                    'If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
+                    '    lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
+                    'End If
+                    lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource, lExpertSystemFileName)
                     lStr = pTestPath & vbCrLf & lExpertSystem.Report
                     SaveFileString(lOutFolderName & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
                     'SaveFileString(lOutFolderName & pBaseName & ".exs", lExpertSystem.AsString)
@@ -584,9 +598,7 @@ Module HSPFOutputReports
                     Next
 
                     lExpertSystem = Nothing
-                    If lFileCopied Then
-                        IO.File.Delete(pBaseName & ".exs")
-                    End If
+                    
                 Catch lEx As ApplicationException
                     Logger.Dbg(lEx.Message)
                 End Try
@@ -639,7 +651,6 @@ Module HSPFOutputReports
             '    SaveFileString(lOutFileName, lReportCons.ToString)
             'End If
 
-            lReportCons = Nothing
             lReportCons = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
             lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Lds.txt"
             '"All_Budget.txt"
