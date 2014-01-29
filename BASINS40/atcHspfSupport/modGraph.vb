@@ -360,6 +360,11 @@ Public Module Graph
             lZgc.MasterPane.PaneList(1).YAxis.Title.FontSpec.Size += 2
             lZgc.MasterPane.PaneList(1).YAxis.Scale.Max *= 1.0
 
+            If lZgc.MasterPane.PaneList(1).YAxis.Scale.Max > 9999 Then
+                lZgc.MasterPane.PaneList(1).YAxis.Scale.IsUseTenPower = True
+            End If
+
+
             lZgc.MasterPane.PaneList(1).YAxis.Scale.FontSpec.Size += 1
             lZgc.MasterPane.PaneList(1).YAxis.Scale.FontSpec.IsBold = True
             lZgc.MasterPane.PaneList(1).YAxis.Scale.Min = 0
@@ -383,6 +388,9 @@ Public Module Graph
                 .YAxis.Scale.MaxAuto = False
                 .YAxis.Scale.Min = 1
                 .YAxis.Scale.IsUseTenPower = False
+                If .YAxis.Scale.Max > 9999 Then
+                    .YAxis.Scale.IsUseTenPower = True
+                End If
             End With
 
             Dim lOutFileName As String = ""
@@ -394,7 +402,7 @@ Public Module Graph
                     lOutFileName = "log_" & aOutFileBase & aGraphSaveFormat
                 End If
             Else
-                lOutFileName = aOutFileBase & "_log" & aGraphSaveFormat
+                lOutFileName = aOutFileBase & "log_" & aGraphSaveFormat
             End If
             lZgc.GraphPane.Title.Text = lOutFileName
             lZgc.SaveIn(lOutFileName)
