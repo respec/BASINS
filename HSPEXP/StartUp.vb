@@ -36,7 +36,9 @@ Public Class StartUp
                     txtRunNo.Text = CInt(Strings.Right(lRunFolder, Len(lRunFolder) - 3))
                     txtRootPath.Text = Strings.Left(lPathName, Strings.Len(lPathName) - Strings.Len(lRunFolder) - 1) 'take off run folder name & "\"
                 End If
-                txtPrefix.Text = Strings.Left(lFileName, Len(lFileName) - 4) 'takes the file name minus the 4 character extension
+                Dim UCIFilePrefix As String = Strings.Left(lFileName, Len(lFileName) - 4)
+                'takes the file name minus the 4 character extension
+                txtPrefix.Text = UCIFilePrefix
                 txtUCIPath.Visible = True
                 txtPrefix.Visible = True
                 txtRunNo.Visible = True
@@ -100,4 +102,10 @@ Public Class StartUp
     End Sub
 
 
+    Private Sub chkMakeEXSFile_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMakeEXSFile.CheckedChanged
+        If chkMakeEXSFile.Checked = True Then
+            MakeEXSFile.Show()
+        End If
+
+    End Sub
 End Class
