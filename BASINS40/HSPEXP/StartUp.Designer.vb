@@ -58,6 +58,7 @@ Partial Class StartUp
         Me.Label3 = New System.Windows.Forms.Label
         Me.chkNitrogenBalance = New System.Windows.Forms.CheckBox
         Me.chkExpertStats = New System.Windows.Forms.CheckBox
+        Me.chkMakeEXSFile = New System.Windows.Forms.CheckBox
         Me.grpGraphs.SuspendLayout()
         Me.grpConstituentBalance.SuspendLayout()
         Me.SuspendLayout()
@@ -434,6 +435,17 @@ Partial Class StartUp
         Me.chkExpertStats.Text = "Calculate Expert Statistics"
         Me.chkExpertStats.UseVisualStyleBackColor = True
         '
+        'chkMakeEXSFile
+        '
+        Me.chkMakeEXSFile.AutoSize = True
+        Me.chkMakeEXSFile.Enabled = False
+        Me.chkMakeEXSFile.Location = New System.Drawing.Point(206, 96)
+        Me.chkMakeEXSFile.Name = "chkMakeEXSFile"
+        Me.chkMakeEXSFile.Size = New System.Drawing.Size(210, 17)
+        Me.chkMakeEXSFile.TabIndex = 31
+        Me.chkMakeEXSFile.Text = "Create Basins Specification (EXS) File?"
+        Me.chkMakeEXSFile.UseVisualStyleBackColor = True
+        '
         'StartUp
         '
         Me.AcceptButton = Me.cmdStart
@@ -441,6 +453,7 @@ Partial Class StartUp
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
         Me.ClientSize = New System.Drawing.Size(532, 844)
+        Me.Controls.Add(Me.chkMakeEXSFile)
         Me.Controls.Add(Me.chkExpertStats)
         Me.Controls.Add(Me.grpConstituentBalance)
         Me.Controls.Add(Me.grpGraphs)
@@ -507,5 +520,6 @@ Partial Class StartUp
     Friend WithEvents chkTotalPhosphorus As System.Windows.Forms.CheckBox
     Friend WithEvents chkBODBalance As System.Windows.Forms.CheckBox
     Friend WithEvents chkAGCHEM As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMakeEXSFile As System.Windows.Forms.CheckBox
 
 End Class
