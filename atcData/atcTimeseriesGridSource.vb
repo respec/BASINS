@@ -258,9 +258,9 @@ Public Class atcTimeseriesGridSource
                                             If lIndex < 0 Then 'Did not find this exact date in this TS
                                                 lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
                                                 'Test two values closest to lDateDisplayed to see if either is within a millisecond
-                                                If lIndex <= lTs.numValues AndAlso Math.Abs(lTs.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
+                                                If lIndex <= lTs.numValues AndAlso Math.Abs(lTs.Dates.Value(lIndex) - lDateDisplayed) < JulianHalfSecond Then
                                                     Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
-                                                ElseIf lIndex > 0 AndAlso Math.Abs(lTs.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
+                                                ElseIf lIndex > 0 AndAlso Math.Abs(lTs.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianHalfSecond Then
                                                     Return DoubleToString(lTs.Value(lIndex - 1), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
                                                 Else 'No value in this TS is close enough to this date
                                                     Return ""
@@ -317,9 +317,9 @@ Public Class atcTimeseriesGridSource
                             If lIndex < 0 Then 'Did not find this exact date in this TS
                                 lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
                                 'Test two values closest to lDateDisplayed to see if either is within a millisecond
-                                If lIndex <= lTs.numValues AndAlso Math.Abs(lTs.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
+                                If lIndex <= lTs.numValues AndAlso Math.Abs(lTs.Dates.Value(lIndex) - lDateDisplayed) < JulianHalfSecond Then
                                     lTs.Value(lIndex) = CDbl(newValue)
-                                ElseIf lIndex > 0 AndAlso Math.Abs(lTs.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
+                                ElseIf lIndex > 0 AndAlso Math.Abs(lTs.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianHalfSecond Then
                                     lTs.Value(lIndex - 1) = CDbl(newValue)
                                 Else
                                     'TODO: exception?

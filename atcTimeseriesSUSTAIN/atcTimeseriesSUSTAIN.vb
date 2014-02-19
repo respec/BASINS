@@ -15,7 +15,7 @@ Public Class atcTimeseriesSUSTAIN
     Public WatershedNumber As Integer
     Public WatershedAcres As Double
     Public Delimiter As String = vbTab
-    Public HeaderLineStart As String = "TT"
+    Public HeaderLineStart As String = "PLOT"
     Public BodyLineStart As String = "WatershedNumber"
 
     Private pFilter As String = "SUSTAIN Timeseries Files (*.txt)|*.txt|PLTGEN Files (*.p*)|*.p*|All Files|*.*"
@@ -238,28 +238,41 @@ Public Class atcTimeseriesSUSTAIN
             Dim lTimeseries As atcTimeseries = Me.DataSets(0)
             Dim lWriter As New System.IO.StreamWriter(aSaveFileName)
             lWriter.WriteLine(HeaderLineStart & "-----------------------------------------------------------------------------------------")
-            lWriter.WriteLine(HeaderLineStart & " LSPC -- Formatted file for use by SUSTAIN")
-            lWriter.WriteLine(HeaderLineStart & " Version 4.1 ")
+            lWriter.WriteLine(HeaderLineStart & " HSPF output formatted for use by SUSTAIN")
             lWriter.WriteLine(HeaderLineStart & "")
-            lWriter.WriteLine(HeaderLineStart & " Designed and maintained by:")
             lWriter.WriteLine(HeaderLineStart & "     AQUA TERRA Consultants")
             lWriter.WriteLine(HeaderLineStart & "     http://aquaterra.com/")
             lWriter.WriteLine(HeaderLineStart & "     Mountain View, CA")
             lWriter.WriteLine(HeaderLineStart & "     (650) 962-1864")
             lWriter.WriteLine(HeaderLineStart & "-----------------------------------------------------------------------------------------")
-            lWriter.WriteLine(HeaderLineStart & " LSPC MODEL OUTPUT FILE")
+            lWriter.WriteLine(HeaderLineStart & " MODEL OUTPUT FILE")
             lWriter.WriteLine(HeaderLineStart & " Time interval: " & lTimeseries.Attributes.GetValue("Interval", JulianHour) / JulianMinute & " min      Output option: timestep")
             lWriter.WriteLine(HeaderLineStart & " Label")
 
-            'lWriter.WriteLine(HeaderLineStart & " SURO     surface outflow volume (in-acre/timestep)")
-            'lWriter.WriteLine(HeaderLineStart & " AGWI     groundwater recharge volume (in-acre/timestep)")
-            'lWriter.WriteLine(HeaderLineStart & " SOSED    sediments load from land (tons/timestep)")
-            'lWriter.WriteLine(HeaderLineStart & " SOQUAL   surface flux of QUAL from the PLS_TP (lb/timestep)")
+            Dim lLastTimeStep As Integer = lTimeseries.Dates.numValues
+            Dim lInterval As Double = lTimeseries.Attributes.GetValue("Interval", JulianHour)
+            Dim lDatasetsToWrite As New atcTimeseriesGroup(lTimeseries)
             For Each lTimeseries In Me.DataSets
+
+                If lTimeseries.Attributes.GetValue("Interval", JulianHour) <> lInterval Then
+                    Logger.Msg("Different interval data cannot be written to same file, skipping " & lTimeseries.ToString & " - " & DoubleToString(lTimeseries.Attributes.GetValue("Interval", JulianHour) * 24) & " hours <> " & DoubleToString(lInterval * 24))
+                ElseIf lTimeseries.Dates.numValues < lLastTimeStep Then
+                    Logger.Msg("Different number of values cannot be written to same file, skipping " & lTimeseries.ToString & " which contains " & lTimeseries.Dates.numValues & " values instead of " & lLastTimeStep)
+                Else
+                    lDatasetsToWrite.Add(lTimeseries)
+                End If
+            Next
+
+            For Each lTimeseries In lDatasetsToWrite
+                Dim lUnits As String = lTimeseries.Attributes.GetValue("Units", "<unknown>")
+                If lUnits = "<unknown>" Then
+                    lUnits = ""
+                Else
+                    lUnits = " (" & lUnits & ")"
+                End If
                 lWriter.WriteLine(HeaderLineStart & " " _
-                                  & lTimeseries.Attributes.GetValue("Constituent").ToString.PadRight(8) & " " _
-                                  & lTimeseries.Attributes.GetValue("Description") & " (" _
-                                  & lTimeseries.Attributes.GetValue("Units") & ")")
+                                & lTimeseries.Attributes.GetValue("Constituent").ToString.PadRight(8) & " " _
+                                & lTimeseries.Attributes.GetValue("Description") & lUnits)
             Next
 
             lWriter.WriteLine(HeaderLineStart)
@@ -267,19 +280,18 @@ Public Class atcTimeseriesSUSTAIN
             lWriter.WriteLine(HeaderLineStart & " Date/time					Values")
             lWriter.WriteLine(HeaderLineStart)
 
-            Dim lLastTimeStep As Integer = Me.DataSets(0).Dates.numValues
             Dim lBodyLineStart As String = BodyLineStart.Replace("WatershedNumber", WatershedNumber)
             For lTimeStep As Integer = 1 To lLastTimeStep
                 lWriter.Write(lBodyLineStart)
                 Dim lDateArray(5) As Integer
-                modDate.J2Date(Me.DataSets(0).Dates.Value(lTimeStep), lDateArray)
+                modDate.J2Date(lDatasetsToWrite(0).Dates.Value(lTimeStep), lDateArray)
                 If Delimiter = " " Then
                     lWriter.Write(lDateArray(0).ToString.PadLeft(6) & _
                                   lDateArray(1).ToString.PadLeft(3) & _
                                   lDateArray(2).ToString.PadLeft(3) & _
                                   lDateArray(3).ToString.PadLeft(3) & _
                                   lDateArray(4).ToString.PadLeft(3))
-                    For Each lTimeseries In Me.DataSets
+                    For Each lTimeseries In lDatasetsToWrite
                         lWriter.Write(Format(lTimeseries.Value(lTimeStep), "0.00000E+00").PadLeft(14))
                     Next
                 Else
@@ -288,7 +300,7 @@ Public Class atcTimeseriesSUSTAIN
                                   Delimiter & lDateArray(2) & _
                                   Delimiter & lDateArray(3) & _
                                   Delimiter & lDateArray(4))
-                    For Each lTimeseries In Me.DataSets
+                    For Each lTimeseries In lDatasetsToWrite
                         lWriter.Write(Delimiter & Format(lTimeseries.Value(lTimeStep), "0.00E+00"))
                     Next
                 End If
