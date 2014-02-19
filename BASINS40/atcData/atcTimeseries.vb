@@ -457,7 +457,10 @@ Public Class atcTimeseries
         Return lFoundParent
     End Function
 
-    ''' <summary>Set Interval attribute of timeseries based on time unit and time step attributes</summary>
+    ''' <summary>
+    ''' Set Interval attribute of timeseries based on time unit and time step attributes.
+    ''' If time unit is not set, search Dates to determine time unit and time step.
+    ''' </summary>
     ''' <remarks>Unknown time units leads to removal of Interval attribute</remarks>
     Public Sub SetInterval()
         Dim lTu As atcTimeUnit = Attributes.GetValue("Time Unit", atcTimeUnit.TUUnknown)
@@ -466,6 +469,32 @@ Public Class atcTimeseries
             lTu = lTCode
         End If
         Dim lTs As Integer = Attributes.GetValue("Time Step", 1)
+
+        If lTu = atcTimeUnit.TUUnknown AndAlso Dates IsNot Nothing AndAlso numValues > 1 Then
+            Dim lInterval As Double = pNaN
+            Dim lConstantInterval As Boolean = True 'Assume it is constant until we find otherwise
+            Dim lDate As Double = pNaN
+
+            For lIndex As Integer = 2 To numValues
+                Try 'for unexpected overflow exception when IsNaN should return True
+                    If lIndex = 2 Then
+                        lInterval = Dates.Value(2) - Dates.Value(1)
+                    Else
+                        If Math.Abs(lInterval - (Dates.Value(lIndex) - Dates.Value(lIndex - 1))) > JulianHalfSecond Then
+                            lConstantInterval = False
+                            Exit For
+                        End If
+                    End If
+                Catch
+                End Try
+            Next
+            If lConstantInterval Then
+                CalcTimeUnitStep(Dates.Value(1), Dates.Value(2), lTu, lTs)
+                If Double.IsNaN(Dates.Value(0)) Then 'Set start of first interval
+                    Dates.Value(0) = TimAddJ(Dates.Value(1), lTu, lTs, -1)
+                End If
+            End If
+        End If
         SetInterval(lTu, lTs)
      End Sub
 

@@ -82,6 +82,8 @@ Friend Class HspfBinary
     Private pFileName As String = ""
     Private pBr As IO.BinaryReader ' pFileNum As Integer = 0
     Private pBytesInFile As Long = 0
+    Private pProgressMax As Integer = 0
+    Private pDivideForProgress As Integer = 1
     Private pSeek As Long
     'Private pRecords As New Generic.List(Of UnformattedRecord)
 
@@ -188,6 +190,10 @@ Friend Class HspfBinary
             pBr = New IO.BinaryReader(lFS) ' pFileNum = FreeFile()
             'FileOpen(pFileNum, pFileName, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
             pBytesInFile = lFS.Length ' LOF(pFileNum)
+            While pBytesInFile / pDivideForProgress > Integer.MaxValue
+                pDivideForProgress += 1
+            End While
+            pProgressMax = pBytesInFile / pDivideForProgress
             If aSeekToLastPosition AndAlso pSeek > 0 Then pBr.BaseStream.Seek(pSeek, IO.SeekOrigin.Begin)
             Return True
         Else
@@ -387,7 +393,7 @@ Friend Class HspfBinary
                         Throw New ApplicationException(lString)
                 End Select
                 lSeek = pBr.BaseStream.Position
-                Logger.Progress(lSeek / 2, pBytesInFile)
+                Logger.Progress(lSeek / 2 / pDivideForProgress, pProgressMax)
                 pFileRecordIndex += 1
             End While
         Catch ex As Exception

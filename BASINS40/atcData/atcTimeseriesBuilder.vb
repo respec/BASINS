@@ -28,9 +28,9 @@ Public Class atcTimeseriesBuilder
     End Function
 
     Public Sub Restart()
-        If Not pValueAttributes Is Nothing Then pValueAttributes.Clear()
-        If Not pValues Is Nothing Then pValues.Clear()
-        If Not pDates Is Nothing Then pDates.Clear()
+        If pValueAttributes IsNot Nothing Then pValueAttributes.Clear()
+        If pValues IsNot Nothing Then pValues.Clear()
+        If pDates IsNot Nothing Then pDates.Clear()
 
         pTS = New atcTimeseries(pDataSource)
         pValueAttributes = New atcUtility.atcCollection
@@ -222,6 +222,9 @@ Public Class atcTimeseriesBuilder
         For lValAttIndex As Integer = 0 To lLastValueAttribute
             pTS.ValueAttributes(pValueAttributes.Keys(lValAttIndex)) = pValueAttributes.ItemByIndex(lValAttIndex)
         Next
+
+        'Compute time units, time step, and interval if not already set
+        pTS.SetInterval()
 
         Return pTS
     End Function
