@@ -191,6 +191,24 @@ Public Class atcTimeseriesSUSTAIN
             Logger.Dbg("Read " & lGroupBuilder.Count & " Timeseries")
             Logger.Status("")
             lGroupBuilder.CreateTimeseriesAddToGroup(Me.DataSets)
+
+            'Shift all dates one time step, set all timeseries to refer to same Dates
+            Dim lDates As atcTimeseries = Me.DataSets(0).Dates
+            Dim lLastInterval As Double = lDates.Value(lDates.numValues) - lDates.Value(lDates.numValues - 1)
+
+            For lIndex As Integer = 0 To lDates.numValues - 1
+                lDates.Value(lIndex) = lDates.Value(lIndex + 1)
+            Next
+            lDates.Value(lDates.numValues) = lDates.Value(lDates.numValues - 1) + lLastInterval
+            lDates.Attributes.DiscardCalculated()
+
+            For Each lTs As atcTimeseries In Me.DataSets
+                If lTs.Dates.Serial <> lDates.Serial Then
+                    lTs.Dates.Clear()
+                    lTs.Dates = lDates
+                End If
+            Next
+
             Return True
         End If
         Return False
@@ -284,7 +302,7 @@ Public Class atcTimeseriesSUSTAIN
             For lTimeStep As Integer = 1 To lLastTimeStep
                 lWriter.Write(lBodyLineStart)
                 Dim lDateArray(5) As Integer
-                modDate.J2Date(lDatasetsToWrite(0).Dates.Value(lTimeStep), lDateArray)
+                modDate.J2Date(lDatasetsToWrite(0).Dates.Value(lTimeStep) - lInterval, lDateArray)
                 If Delimiter = " " Then
                     lWriter.Write(lDateArray(0).ToString.PadLeft(6) & _
                                   lDateArray(1).ToString.PadLeft(3) & _
