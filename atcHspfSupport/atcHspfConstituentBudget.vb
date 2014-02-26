@@ -106,7 +106,7 @@ Public Module ConstituentBudget
                         lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
-                        Dim lNonpointTons As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData) * 0.999906
+                        Dim lNonpointTons As Double = TotalForReach(aUci, lID, aBalanceType, lAreas, lNonpointData) * 0.999906
                         'The factor of 0.999906 is to reduce the overestimation of loading from land surfaces and get a more reasonable value of Point sources.
                         'This calculation assumes that multiplication factor in
                         'MASS-LINK Blocks sum to 1. Should be able to get sum of Mult Factors for SSED1, 2 and 3 from the uci.
@@ -195,7 +195,7 @@ Public Module ConstituentBudget
                         Dim lAreas As New atcCollection
                         LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
-                        Dim lNonpointlbs As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData) * 0.999906
+                        Dim lNonpointlbs As Double = TotalForReach(aUci, lID, aBalanceType, lAreas, lNonpointData) * 0.999906
                         'The factor of 0.999906 is to reduce the overestimation of loading from land surfaces and get a more reasonable value of Point sources.
                         lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         Dim lUpstreamIn As Double = 0
@@ -282,7 +282,7 @@ Public Module ConstituentBudget
                         lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
-                        Dim lNonpointlbs As Double = TotalForReach(lID, aBalanceType, lAreas, lNonpointData) * 0.999906
+                        Dim lNonpointlbs As Double = TotalForReach(aUci, lID, aBalanceType, lAreas, lNonpointData) * 0.999906
                         'The factor of 0.999906 is to reduce the overestimation of loading from land surfaces and get a more reasonable value of Point sources.
                         lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         Dim lUpstreamIn As Double = 0
@@ -344,7 +344,8 @@ Public Module ConstituentBudget
         Return lReport
     End Function
 
-    Private Function TotalForReach(ByVal aReach As HspfOperation, _
+    Private Function TotalForReach(ByVal aUCI As HspfUci, _
+                                    ByVal aReach As HspfOperation, _
                                     ByVal aBalanceType As String, _
                                     ByVal aAreas As atcCollection, _
                                    ByVal aNonpointData As atcTimeseriesGroup) As Double
@@ -353,9 +354,36 @@ Public Module ConstituentBudget
         For lAreaIndex As Integer = 0 To aAreas.Count - 1
             Dim lLocation As String = aAreas.Keys(lAreaIndex)
             Dim lArea As Double = aAreas.ItemByIndex(lAreaIndex)
+            Dim lMassLinkMultFactor As Double = 0
+            Dim lMassLinkID As Integer
             'Logger.Dbg("Area is " & lArea)
             'Dim lSubTotal As Double = 0
             For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lLocation)
+                Dim i As Integer = 0
+
+                For Each lMLBlockConnection As HspfConnection In aUCI.Connections
+                    If aBalanceType = "Sediment" Then
+                        If lMLBlockConnection.Source.VolId = Right(lLocation, lLocation.Length - 2) _
+                        AndAlso Left(lMLBlockConnection.Source.VolName, 1) = Left(lLocation, 1) _
+                        AndAlso lMLBlockConnection.Target.VolName = "RCHRES" _
+                        AndAlso lMLBlockConnection.Target.Opn.Id = aReach.Id Then
+                            lMassLinkID = lMLBlockConnection.MassLink
+                            For Each lMasslink As HspfMassLink In aUCI.MassLinks
+
+                                If lMasslink.MassLinkId = lMassLinkID AndAlso lMasslink.Target.Member.Contains("ISED") _
+                                AndAlso lMasslink.Target.MemSub1 <= 3 Then
+                                    lMassLinkMultFactor += lMasslink.MFact
+                                End If
+                            Next
+                            Exit For
+                        End If
+
+                    Else
+                        lMassLinkMultFactor = 1
+                    End If
+                    i += 1
+                Next lMLBlockConnection
+
                 'lSubTotal += lTs.Attributes.GetValue("SumAnnual")
                 If Not (Left(lLocation, 2) = "P:" And Left(lTs.Attributes.GetValue("Constituent").ToString, 6) = "SOQUAL") Then
 
@@ -371,17 +399,17 @@ Public Module ConstituentBudget
                         Case "SOQUAL-BOD_TotalP"
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.005234
                         Case Else
-                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual")
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkMultFactor
 
                     End Select
                 End If
 
-
+                lMassLinkMultFactor = 0
             Next
             'lNewTotal += lArea * lSubTotal
         Next
-        'Logger.Dbg("difference " & lTotal - lNewTotal) '"SumAnnual is " & lTs.Attributes.GetValue("SumAnnual"))
-        Return lTotal
+            'Logger.Dbg("difference " & lTotal - lNewTotal) '"SumAnnual is " & lTs.Attributes.GetValue("SumAnnual"))
+            Return lTotal
     End Function
 
     Private Function ValueForReach(ByVal aReach As HspfOperation, _
@@ -423,7 +451,7 @@ Public Module ConstituentBudget
 
                     End Select
                 End If
-                
+
             Next
             lTotal = lTotal * 0.999906
             Select Case lLocation.Substring(0, 1)
@@ -435,7 +463,7 @@ Public Module ConstituentBudget
                         & aReach.Uci.OpnBlks("IMPLND").OperFromID(lLocation.Substring(2)).Description & vbTab & lTotal
 
             End Select
-            
+
             'lNewTotal += lArea * lSubTotal
         Next
 
