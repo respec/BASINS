@@ -365,6 +365,7 @@ Public Class atcWASPSegment
     End Sub
 
     Public Function Clone() As atcWASPSegment
+        NumConstituents = Me.LoadTimeSeries.GetUpperBound(0) + 1
         Dim lNewSegment As New atcWASPSegment(NumConstituents)
         lNewSegment.Depth = Me.Depth
         lNewSegment.DownID = Me.DownID
