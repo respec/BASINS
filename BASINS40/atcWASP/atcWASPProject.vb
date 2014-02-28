@@ -1067,8 +1067,10 @@ Public Class atcWASPProject
         Dim lProblem As String = String.Empty
         Dim loutletSegID As String = Segments.DownstreamKey(lProblem)
         Dim loutletSegWASPID As Integer
+        Dim lOutletSegName As String = ""
         If lProblem = String.Empty Then ' getting the outlet seg succeed
             loutletSegWASPID = Segments.Item(loutletSegID).WaspID
+            lOutletSegName = Segments.Item(loutletSegID).Name
         Else
             loutletSegWASPID = 1
         End If
@@ -1077,16 +1079,29 @@ Public Class atcWASPProject
         Dim lnumFlowFunc As Integer = 0
         Dim lnumflowroutes As Integer = 0
         Dim lflowfraction As String = "1.00"
+        Dim lIndexOfTopOfMainFlowpath As Integer = lHeadwatersIndexes(0) - 1
+
+        'need a new algorithm to find the top of the main flowpath -- (Dan river shows the need) 
+        'by longest flowpath?  not necessarily
+        'by largest drainage area?  not necessarily
+        'by greatest number of segments?  not necessarily
+        'by name -- good enough for now
+        For i As Integer = 0 To lHeadwatersIndexes.Count - 1
+            If Segments.Item(lHeadwatersIndexes(i) - 1).Name = lOutletSegName Then
+                lIndexOfTopOfMainFlowpath = lHeadwatersIndexes(i) - 1
+            End If
+        Next i
+
 
         Dim lthisFlowfunction As New System.Text.StringBuilder
-        lthisFlowfunction.AppendLine(Space(2) & Segments.Item(lHeadwatersIndexes(0) - 1).Name)
+        lthisFlowfunction.AppendLine(Space(2) & Segments.Item(lIndexOfTopOfMainFlowpath).Name)
         Dim ltemp As New System.Text.StringBuilder
-        ltemp.AppendLine("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(0) - 1).WaspID.ToString.PadLeft(4) & Space(11) & lflowfraction)
-        ldoneFlowpaths.Add("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(0) - 1).WaspID.ToString.PadLeft(4))
+        ltemp.AppendLine("0".PadLeft(4) & Segments.Item(lIndexOfTopOfMainFlowpath).WaspID.ToString.PadLeft(4) & Space(11) & lflowfraction)
+        ldoneFlowpaths.Add("0".PadLeft(4) & Segments.Item(lIndexOfTopOfMainFlowpath).WaspID.ToString.PadLeft(4))
         lnumflowroutes += 1
 
         Dim lend As Boolean = False
-        Dim lthisSeg As atcWASPSegment = Segments.Item(lHeadwatersIndexes(0) - 1)
+        Dim lthisSeg As atcWASPSegment = Segments.Item(lIndexOfTopOfMainFlowpath)
         Dim lthisPair As String = String.Empty
         While Not lend
             If lthisSeg.ID = loutletSegID Then
@@ -1114,67 +1129,69 @@ Public Class atcWASPProject
             lnumFlowFunc += 1
             lthisFlowfunction.AppendLine(Space(3) & lnumflowroutes.ToString)
             lthisFlowfunction.Append(ltemp.ToString)
-            lflowpaths.Add(lHeadwatersIndexes(0), lthisFlowfunction.ToString)
-            FlowPathList.Add(lHeadwatersIndexes(0) - 1)
+            lflowpaths.Add(lIndexOfTopOfMainFlowpath + 1, lthisFlowfunction.ToString)
+            FlowPathList.Add(lIndexOfTopOfMainFlowpath)
             lnumflowroutes = 0
             ltemp = New System.Text.StringBuilder
         End If
 
         'Do the rest of the headwaters
-        For i As Integer = 1 To lHeadwatersIndexes.Count - 1
-            lend = False
-            lthisSeg = Segments.Item(lHeadwatersIndexes(i) - 1)
-            ltemp.Append("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(i) - 1).WaspID.ToString.PadLeft(4) & Space(11) & lflowfraction)
-            ldoneFlowpaths.Add("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(i) - 1).WaspID.ToString.PadLeft(4))
-            lnumflowroutes += 1
-            lthisFlowfunction = New System.Text.StringBuilder
-            While Not lend
-                If lthisSeg.ID = loutletSegID Then
-                    lthisPair = lthisSeg.WaspID.ToString.PadLeft(4) & "0".PadLeft(4)
-                    If ldoneFlowpaths.Contains(lthisPair) Then
+        For i As Integer = 0 To lHeadwatersIndexes.Count - 1
+            If lHeadwatersIndexes(i) - 1 <> lIndexOfTopOfMainFlowpath Then 'already did this one, do the rest
+                lend = False
+                lthisSeg = Segments.Item(lHeadwatersIndexes(i) - 1)
+                ltemp.Append("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(i) - 1).WaspID.ToString.PadLeft(4) & Space(11) & lflowfraction)
+                ldoneFlowpaths.Add("0".PadLeft(4) & Segments.Item(lHeadwatersIndexes(i) - 1).WaspID.ToString.PadLeft(4))
+                lnumflowroutes += 1
+                lthisFlowfunction = New System.Text.StringBuilder
+                While Not lend
+                    If lthisSeg.ID = loutletSegID Then
+                        lthisPair = lthisSeg.WaspID.ToString.PadLeft(4) & "0".PadLeft(4)
+                        If ldoneFlowpaths.Contains(lthisPair) Then
+                            lend = True
+                            Continue While
+                        Else
+                            ldoneFlowpaths.Add(lthisPair)
+                        End If
+                        ltemp.Append(lthisPair & Space(11) & lflowfraction)
+                        ldoneFlowpaths.Add(lthisSeg.WaspID.ToString.PadLeft(4) & "0".PadLeft(4))
+                        lnumflowroutes += 1
                         lend = True
-                        Continue While
                     Else
-                        ldoneFlowpaths.Add(lthisPair)
+                        Dim ldownID As String = lthisSeg.DownID
+                        lthisPair = lthisSeg.WaspID.ToString.PadLeft(4) & Segments.Item(ldownID).WaspID.ToString.PadLeft(4)
+                        If ldoneFlowpaths.Contains(lthisPair) Then
+                            lend = True
+                            Continue While
+                        Else
+                            ldoneFlowpaths.Add(lthisPair)
+                        End If
+                        ltemp.Append(vbCrLf)
+                        ltemp.Append(lthisSeg.WaspID.ToString.PadLeft(4) & Segments.Item(ldownID).WaspID.ToString.PadLeft(4) & Space(11) & lflowfraction)
+                        lnumflowroutes += 1
+                        lthisSeg = Segments.Item(ldownID)
+                        lend = False
                     End If
-                    ltemp.Append(lthisPair & Space(11) & lflowfraction)
-                    ldoneFlowpaths.Add(lthisSeg.WaspID.ToString.PadLeft(4) & "0".PadLeft(4))
-                    lnumflowroutes += 1
-                    lend = True
-                Else
-                    Dim ldownID As String = lthisSeg.DownID
-                    lthisPair = lthisSeg.WaspID.ToString.PadLeft(4) & Segments.Item(ldownID).WaspID.ToString.PadLeft(4)
-                    If ldoneFlowpaths.Contains(lthisPair) Then
-                        lend = True
-                        Continue While
-                    Else
-                        ldoneFlowpaths.Add(lthisPair)
-                    End If
-                    ltemp.Append(vbCrLf)
-                    ltemp.Append(lthisSeg.WaspID.ToString.PadLeft(4) & Segments.Item(ldownID).WaspID.ToString.PadLeft(4) & Space(11) & lflowfraction)
-                    lnumflowroutes += 1
-                    lthisSeg = Segments.Item(ldownID)
-                    lend = False
-                End If
-            End While
+                End While
 
-            If Not ltemp.ToString = "" OrElse Not lnumflowroutes = 0 Then
-                'Increment the total flow function count
-                'write up routes count and info
-                'clear the ltemp content for subsequent flow functions
-                'Add this flow function to the overall list
-                lnumFlowFunc += 1
-                Dim lPathName As String = Segments.Item(lHeadwatersIndexes(i) - 1).Name
-                If IsNumeric(lPathName) Then
-                    lPathName = "FlowPath " & lnumFlowFunc.ToString
+                If Not ltemp.ToString = "" OrElse Not lnumflowroutes = 0 Then
+                    'Increment the total flow function count
+                    'write up routes count and info
+                    'clear the ltemp content for subsequent flow functions
+                    'Add this flow function to the overall list
+                    lnumFlowFunc += 1
+                    Dim lPathName As String = Segments.Item(lHeadwatersIndexes(i) - 1).Name
+                    If IsNumeric(lPathName) Then
+                        lPathName = "FlowPath " & lnumFlowFunc.ToString
+                    End If
+                    lthisFlowfunction.AppendLine(Space(2) & lPathName)
+                    lthisFlowfunction.AppendLine(Space(3) & lnumflowroutes.ToString)
+                    lthisFlowfunction.Append(ltemp.ToString)
+                    lflowpaths.Add(lHeadwatersIndexes(i), lthisFlowfunction.ToString)
+                    FlowPathList.Add(lHeadwatersIndexes(i) - 1)
+                    lnumflowroutes = 0
+                    ltemp = New System.Text.StringBuilder
                 End If
-                lthisFlowfunction.AppendLine(Space(2) & lPathName)
-                lthisFlowfunction.AppendLine(Space(3) & lnumflowroutes.ToString)
-                lthisFlowfunction.Append(ltemp.ToString)
-                lflowpaths.Add(lHeadwatersIndexes(i), lthisFlowfunction.ToString)
-                FlowPathList.Add(lHeadwatersIndexes(i) - 1)
-                lnumflowroutes = 0
-                ltemp = New System.Text.StringBuilder
             End If
         Next
         NumFlowFunc(0) = lnumFlowFunc ' The first flow field is always for water flow
