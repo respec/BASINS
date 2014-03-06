@@ -36,8 +36,9 @@ Module HSPFOutputReports
     Private pTestPath As String
     Private pRootPath As String 'if the user is using the VT run number folder naming conventions (Run01, Run02, etc.), this is the root path that holds all the run folders
     Private pBaseName As String 'this is the base part of the file name (i.e., without .uci, .wdm, .exs) - it MUST be used to name everything
-    Private pRunNo As Integer 'the current run number - may or may not be provided, if it is then use it to copy to a new folder
+    Private pRunNo As Integer = -1 'the current run number - may or may not be provided, if it is then use it to copy to a new folder
     Private pOutputLocations As New atcCollection
+
     Private pGraphSaveFormat As String
     Private pGraphSaveWidth As Integer
     Private pGraphSaveHeight As Integer
@@ -101,15 +102,11 @@ Module HSPFOutputReports
         If StartUp.chkSedimentBalance.Checked Then
             pConstituents.Add("Sediment")
         End If
-        If StartUp.chkNitrogenBalance.Checked Then
-            pConstituents.Add("N-PQUAL")
-        End If
+       
         If StartUp.chkTotalNitrogen.Checked Then
             pConstituents.Add("TotalN")
         End If
-        If StartUp.chkPhosphorusBalance.Checked Then
-            pConstituents.Add("P-PQUAL")
-        End If
+        
         If StartUp.chkTotalPhosphorus.Checked Then
             pConstituents.Add("TotalP")
         End If
@@ -120,17 +117,6 @@ Module HSPFOutputReports
         'Becky added the following to be dependent upon user input:
         pTestPath = StartUp.txtUCIPath.Text
         pBaseName = lTestName
-
-        If IsNumeric(StartUp.txtRunNo.Text) Then
-            pRunNo = CInt(StartUp.txtRunNo.Text)
-            If Directory.Exists(StartUp.txtRootPath.Text) Then
-                pRootPath = StartUp.txtRootPath.Text
-            Else
-                pRootPath = pTestPath
-            End If
-        Else
-            pRunNo = -1
-        End If
 
         'as best I can tell, the output location should include R for reach and the outlet reach number
         'Becky added the following if-then-else to allow multiple output locations
@@ -173,11 +159,7 @@ Module HSPFOutputReports
             lMsg.Open("hspfmsg.wdm") 'Becky: this can be found at C:\BASINS\models\HSPF\bin if you did the typical BASINS install
             Logger.Dbg(Now & " Reading " & pBaseName & ".uci")
             Logger.Progress(10, 100)
-            Dim lHspfUci As New atcUCI.HspfUci
-            lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
-            Logger.Dbg("ReadUCI " & lHspfUci.Name)
-            Logger.Dbg(Now & " Successfully read " & pBaseName & ".uci")
-            Logger.Progress(20, 100)
+            
 
             'Becky: change the lOutFolderName to include pTestPath (changing directory several lines above didn't seem to work right)
             'Dim lOutFolderName As String = pTestPath & "\Reports_" & pBaseName & "_" & lDateString & "\"
@@ -256,16 +238,24 @@ Module HSPFOutputReports
                 System.IO.Directory.CreateDirectory(lOutFolderName)
                 System.IO.File.Copy(pTestPath & pBaseName & ".uci", lOutFolderName & pBaseName & ".uci", overwrite:=True)
             End If
-
+            Dim lHspfUci As New atcUCI.HspfUci
+            lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
+            Logger.Dbg("ReadUCI " & lHspfUci.Name)
+            Logger.Dbg(Now & " Successfully read " & pBaseName & ".uci")
+            Logger.Progress(20, 100)
 
             'A folder name is given that has the basename and the time when the run was made.
             If pMakeAreaReports Then
-                'Logger.Status(Now & " Opening " & pBaseName & ".wdm", True)
-                lWdmDataSource.Open(lWdmFileName)
+                Dim alocations As New atcCollection
+                For Each lRCHRES As HspfOperation In lHspfUci.OpnSeqBlock.Opns
+                    If lRCHRES.Name = "RCHRES" Then
+                        alocations.Add("R:" & lRCHRES.Id)
+                    End If
+                Next
                 Logger.Status(Now & " Producing Area Reports.", True)
                 Logger.Dbg(Now & " Producing land use and area reports")
-                'Becky's note: I changed modUtility so this will actually do this for all locations in pOutputLocations
-                Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutFolderName & "/AreaReports/")
+                'Now the area repotrs are generated for all the reaches in the UCI file.
+                Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, alocations, True, lOutFolderName & "/AreaReports/")
                 lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
 
                 SaveFileString(lOutFolderName & "/AreaReports/AreaReport.txt", lReport.ToString)
@@ -289,7 +279,7 @@ Module HSPFOutputReports
                 For Each lExpertSystemFileName As String In lExpertSystemFileNames
                     Logger.Status(Now & " Calculating Expert Statistics for the file " & lExpertSystemFileName, True)
                     Try
-                        
+
                         Logger.Dbg(Now & " Calculating run statistics to save in " & pBaseName & ".sts")
                         lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource, lExpertSystemFileName)
                         lStr = lExpertSystem.Report
@@ -467,7 +457,7 @@ Module HSPFOutputReports
                         Next
 
                         lExpertSystem = Nothing
-                       
+
                     Catch lEx As ApplicationException
                         If lEx.Message.Contains("rogram will quit!") Then
                             Logger.Msg(lEx.Message)
@@ -483,78 +473,87 @@ Module HSPFOutputReports
             Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
             If System.IO.File.Exists(lHspfBinFileName) Then
                 lHspfBinDataSource.Open(lHspfBinFileName)
-                Dim lConstituentName As String = ""
-                For Each lConstituent As String In pConstituents
-                    Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
-                    Select Case lConstituent
-                        Case "Water"
-                            lConstituentName = "WAT"
-                        Case "Sediment"
-                            lConstituentName = "SED"
-                        Case "N-PQUAL"
-                            lConstituentName = "N"
-                        Case "P-PQUAL"
-                            lConstituentName = "P"
-                        Case "TotalN"
-                            lConstituentName = "TN"
-                        Case "TotalP"
-                            lConstituentName = "TP"
-                        Case "BOD-PQUAL"
-                            lConstituentName = "BOD"
-                    End Select
+                If lHspfBinDataSource.DataSets.Count > 1 Then
 
-                    Dim lReportCons As New atcReport.ReportText
-                    Dim lOutFileName As String = ""
+                    Dim lConstituentName As String = ""
+                    For Each lConstituent As String In pConstituents
+                        Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
+                        Select Case lConstituent
+                            Case "Water"
+                                lConstituentName = "WAT"
+                            Case "Sediment"
+                                lConstituentName = "SED"
+                            Case "N-PQUAL"
+                                lConstituentName = "N"
+                            Case "P-PQUAL"
+                                lConstituentName = "P"
+                            Case "TotalN"
+                                lConstituentName = "TN"
+                            Case "TotalP"
+                                lConstituentName = "TP"
+                            Case "BOD-PQUAL"
+                                lConstituentName = "BOD"
+                        End Select
 
-                    Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
-                    lReportCons = Nothing
-                    lReportCons = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
-                    lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Lds.txt"
-                    '"All_Budget.txt"
-                    SaveFileString(lOutFileName, lReportCons.ToString)
-                    lReportCons = Nothing
+                        Dim lReportCons As New atcReport.ReportText
+                        Dim lOutFileName As String = ""
+                        Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
 
-                    Logger.Dbg(Now & " Calculating Watershed Summary Reports for " & lConstituent)
-                    lReportCons = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lRunMade, lConstituent)
-                    lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Ann_Avg_Lds.txt"
-                    '"_All_WatershedSummary.txt"
-                    SaveFileString(lOutFileName, lReportCons.ToString)
-                    lReportCons = Nothing
+                        Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
+                        lReportCons = Nothing
+                        lReportCons = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
+                        lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Lds.txt"
+                        '"All_Budget.txt"
+                        SaveFileString(lOutFileName, lReportCons.ToString)
+                        lReportCons = Nothing
 
-                    Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
-                    Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
-                    Logger.Dbg("Summary at " & lLocations.Count & " locations")
-                    'constituent balance
+                        Logger.Dbg(Now & " Calculating Watershed Summary Reports for " & lConstituent)
+                        lReportCons = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lRunMade, lConstituent)
+                        lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Ann_Avg_Lds.txt"
+                        '"_All_WatershedSummary.txt"
+                        SaveFileString(lOutFileName, lReportCons.ToString)
+                        lReportCons = Nothing
 
-                    lReportCons = HspfSupport.ConstituentBalance.Report _
-                       (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                        lHspfBinDataSource, lLocations, lRunMade)
-                    lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Ann.txt"
-                    '"_Mult_ConstituentBalance.txt"
-                    SaveFileString(lOutFileName, lReportCons.ToString)
+                        Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
 
-
-                    lReportCons = HspfSupport.WatershedConstituentBalance.Report _
-                    (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                    lHspfBinDataSource, lRunMade)
-                    lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
-                    '"_All_WatershedConstituentBalance.txt"
-                    SaveFileString(lOutFileName, lReportCons.ToString)
-
-
-                    If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
-                        HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                        lReportCons = HspfSupport.ConstituentBalance.Report _
                            (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                            lHspfBinDataSource, pOutputLocations, lRunMade, _
-                            lOutFolderName, True)
-                        'now pivoted version
-                        'HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-                        '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                        '    lHspfBinDataSource, pOutputLocations, lRunMade, _
-                        '    lOutFolderName, True, True)
-                    End If
-                Next
+                            lHspfBinDataSource, lLocations, lRunMade)
+                        lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Ann.txt"
+                        '"_Mult_ConstituentBalance.txt"
+                        SaveFileString(lOutFileName, lReportCons.ToString)
 
+                        Logger.Dbg("Summary at " & lLocations.Count & " locations")
+                        'constituent balance
+
+
+                        lReportCons = HspfSupport.WatershedConstituentBalance.Report _
+                        (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                        lHspfBinDataSource, lRunMade)
+                        lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
+                        '"_All_WatershedConstituentBalance.txt"
+                        SaveFileString(lOutFileName, lReportCons.ToString)
+
+
+                        If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
+                            HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                               (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                                lHspfBinDataSource, pOutputLocations, lRunMade, _
+                                lOutFolderName, True)
+                            'now pivoted version
+                            'HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                            '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                            '    lHspfBinDataSource, pOutputLocations, lRunMade, _
+                            '    lOutFolderName, True, True)
+                        End If
+                    Next
+                Else
+                    Logger.Dbg("The HBN file didn't have any data and therefore constituent balance reports were not generated. Make sure that HSPF" & _
+                               "run finished last time.")
+                    Dim ans As Integer
+                    ans = MsgBox("HBN file " & lHspfBinFileName & " does not have any data.  Constituent Balance reports will not be generated. " & _
+                                 "Did uci file run properly last time?")
+                End If
             Else
                 'give message if hbn file does not exist, but continue without it
                 Dim ans As Integer
