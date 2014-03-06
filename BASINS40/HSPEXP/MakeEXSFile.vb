@@ -1,6 +1,9 @@
-﻿Public Class MakeEXSFile
+﻿Imports MapWindow.Interfaces
+Imports System.Windows.Forms.DialogResult
+Imports System.IO
+Public Class MakeEXSFile
+    Private g_MapWin As IMapWin
 
-    
     Private Sub cmbNumberOfSites_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbNumberOfSites.SelectedIndexChanged
         cmbNumberOfSites.Items.Add("1")
         cmbNumberOfSites.Items.Add("2")
@@ -25,10 +28,10 @@
 
 
     Private Sub txtUCIFilename_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtUCIFilename.TextChanged
-        
+
     End Sub
 
     Private Sub btnOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOK.Click
-        'WriteEXSFile()
+        WriteEXSFileMain(g_MapWin)
     End Sub
 End Class
