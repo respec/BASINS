@@ -216,16 +216,16 @@ FoundMatch:
                         lYAxisName = "LEFT"
                         lMinElev = Math.Min(lMinElev, aElevation - lTimeseries.Attributes.GetValue("Maximum"))
                         lMaxElev = Math.Max(lMaxElev, aElevation - lTimeseries.Attributes.GetValue("Minimum"))
-                        lLeftAxisTitle = lTimeseries.Attributes.GetValue("Description")
-                        If lRightAxisTitle Is Nothing AndAlso lTimeseries.Attributes.ContainsAttribute("alt_datum_cd") Then
-                            lRightAxisTitle = "Groundwater elevation, feet, " & lTimeseries.Attributes.GetValue("alt_datum_cd")
-                        End If
+                        'lLeftAxisTitle = lTimeseries.Attributes.GetValue("Description")
                     Case Else 'Data is specified as Elevation
                         lYAxisName = "RIGHT"
                         lMinElev = Math.Min(lMinElev, lTimeseries.Attributes.GetValue("Minimum"))
                         lMaxElev = Math.Max(lMaxElev, lTimeseries.Attributes.GetValue("Maximum"))
-                        lRightAxisTitle = lTimeseries.Attributes.GetValue("Description")
+                        'lRightAxisTitle = lTimeseries.Attributes.GetValue("Description")
                 End Select
+                If lRightAxisTitle Is Nothing AndAlso lTimeseries.Attributes.ContainsAttribute("alt_datum_cd") Then
+                    lRightAxisTitle = "Groundwater elevation, feet, " & lTimeseries.Attributes.GetValue("alt_datum_cd")
+                End If
             End If
             Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYAxisName)
             lCurve.Label.Text = TSCurveLabel(lTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, "", "feet")
@@ -806,6 +806,11 @@ FoundMatch:
             lDataMin = 0
         End If
 
+        If lLogFlag AndAlso lDataMin <= 0 Then
+            lLogFlag = False
+            aAxis.Type = AxisType.Linear
+            MapWinUtility.Logger.Dbg("Change axis type from log to linear to fit less than or equal to zero data.")
+        End If
         Scalit(lDataMin, lDataMax, lLogFlag, aAxis.Scale.Min, aAxis.Scale.Max)
     End Sub
 
