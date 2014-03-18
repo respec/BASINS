@@ -72,15 +72,15 @@ Public Module MonthlyAverageCompareStats
             lObsSum += lObsValue
             Dim lResidual As Double = lSimValue - lObsValue
             lResidualSum += lResidual
-            lStr &= lName.Substring(lName.Length - 3).PadLeft(8) & vbTab & DecimalAlign(lSimValue, 12, 2).PadLeft(12) _
-                                                                 & vbTab & DecimalAlign(lObsValue, 12, 2).PadLeft(12) _
-                                                                 & vbTab & DecimalAlign(lResidual, 12, 2).PadLeft(12) _
-                                                                 & vbTab & DecimalAlign(100 * lResidual / lObsValue, 12, 2).PadLeft(12) & vbCrLf
+            lStr &= lName.Substring(lName.Length - 3).PadLeft(8) & vbTab & DecimalAlign(lSimValue, 12, 3).PadLeft(12) _
+                                                                 & vbTab & DecimalAlign(lObsValue, 12, 3).PadLeft(12) _
+                                                                 & vbTab & DecimalAlign(lResidual, 12, 3).PadLeft(12) _
+                                                                 & vbTab & DecimalAlign(100 * lResidual / lObsValue, 12, 1).PadLeft(12) & vbCrLf
         Next
-        lStr &= "Totals".PadLeft(8) & vbTab & DecimalAlign(lSimSum, 12, 2).PadLeft(12) _
-                                    & vbTab & DecimalAlign(lObsSum, 12, 2).PadLeft(12) _
-                                    & vbTab & DecimalAlign(lResidualSum, 12, 2).PadLeft(12) _
-                                    & vbTab & DecimalAlign(100 * lResidualSum / lObsSum, 12, 2).PadLeft(12) & vbCrLf
+        lStr &= "Totals".PadLeft(8) & vbTab & DecimalAlign(lSimSum, 12, 3).PadLeft(12) _
+                                    & vbTab & DecimalAlign(lObsSum, 12, 3).PadLeft(12) _
+                                    & vbTab & DecimalAlign(lResidualSum, 12, 3).PadLeft(12) _
+                                    & vbTab & DecimalAlign(100 * lResidualSum / lObsSum, 12, 1).PadLeft(12) & vbCrLf
         Return lStr
     End Function
 End Module
