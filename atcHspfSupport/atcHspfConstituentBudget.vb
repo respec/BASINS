@@ -11,7 +11,7 @@ Public Module ConstituentBudget
                            ByVal aScenarioResults As atcTimeseriesSource, _
                            ByVal aRunMade As String) As atcReport.IReport
 
-        Dim lNumberFormat As String = "#,##0.00"
+        Dim lNumberFormat As String = "#,##0.###"
         Dim lUnits As String = ""
         Dim lNonpointData As New atcTimeseriesGroup
         Dim lAtmDepData As New atcTimeseriesGroup
@@ -31,7 +31,17 @@ Public Module ConstituentBudget
                 lDepScourData.Add(aScenarioResults.DataSets.FindData("Constituent", "DEPSCOUR-TOT"))
             Case "TotalN"
                 lUnits = "(lbs)"
+                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW"))
+                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW"))
+
+                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "LABILE ORGN - GROUNDWATER OUTFLOW"))
+                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "LABILE ORGN - SURFACE LAYER OUTFLOW"))
+
+                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3+NO2-N - GROUNDWATER OUTFLOW"))
+                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3+NO2-N - SURFACE LAYER OUTFLOW"))
+
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
+
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "POQUAL-NO3"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-NO3"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "POQUAL-NH3+NH4"))
@@ -48,7 +58,14 @@ Public Module ConstituentBudget
 
             Case "TotalP"
                 lUnits = "(lbs)"
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "POPHOS"))
+
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SDP4A")) ' Outflow of sediment-associated PO4
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SDORP")) ' Organic P Outflow (will be multiplied by 0.6)
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "ORGN - TOTAL OUTFLOW")) ' Organic N Outflow (will be multiplied by 0.05534793)
+                'lNonpointData.AddRange((aScenarioResults.DataSets.FindData("Constituent", "POPHOS")))
                 lNonpointData.AddRange((aScenarioResults.DataSets.FindData("Constituent", "POQUAL-Ortho P")))
                 lNonpointData.AddRange((aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-Ortho P")))
                 lNonpointData.AddRange((aScenarioResults.DataSets.FindData("Constituent", "POQUAL-BOD")))
@@ -90,15 +107,15 @@ Public Module ConstituentBudget
                     .CurrentRecord = 1
                     Dim lField As Integer = 0
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Dep(+)/Scour(-)"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Dep(+)/Scour(-)"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
 
                     For Each lID As HspfOperation In lRchresOperations
                         .CurrentRecord += 1
@@ -178,16 +195,16 @@ Public Module ConstituentBudget
                     .CurrentRecord = 1
                     Dim lField As Integer = 0
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Atm. Depo. on Water"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Gain(+)/Loss(-)"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Atm. Depo. on Water"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Gain(+)/Loss(-)"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
 
 
                     For Each lID As HspfOperation In lRchresOperations
@@ -243,14 +260,14 @@ Public Module ConstituentBudget
 
                         lField = 0
                         lField += 1 : .Value(lField) = lID.Name & " " & lID.Id & " - " & lID.Description
-                        lField += 1 : .Value(lField) = DoubleToString(lNonpointlbs, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lPointlbs, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lTotalAtmDep, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lUpstreamIn, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lTotalInflow, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lOutflow, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lDepScour, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lCumulativePointNonpoint, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lNonpointlbs, 15, lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lPointlbs, 15, lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lTotalAtmDep, 15, lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lUpstreamIn, 15, lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lTotalInflow, 15, lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lOutflow, 15, lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lDepScour, 15, lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lCumulativePointNonpoint, 15, lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lCululativeTrappingEfficiency * 100, , lNumberFormat, , , 6)
                         lField += 1 : .Value(lField) = DoubleToString(lReachTrappingEfficiency * 100, , lNumberFormat)
                     Next
@@ -266,15 +283,15 @@ Public Module ConstituentBudget
                     .CurrentRecord = 1
                     Dim lField As Integer = 0
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Gain(+)/Loss(-)"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Gain(+)/Loss(-)"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
 
                     For Each lID As HspfOperation In lRchresOperations
                         .CurrentRecord += 1
@@ -301,7 +318,7 @@ Public Module ConstituentBudget
                             lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
                         End If
                         lPointlbs = lTotalInflow - lNonpointlbs - lUpstreamIn
-                        If lPointlbs < 0.0002 * lNonpointlbs Then
+                        If lPointlbs < 0.00025 * lNonpointlbs Then
                             lPointlbs = 0.0
                         End If
                         'A negligible point source value is generated because of rounding errors when no point sources are present. 
@@ -359,10 +376,9 @@ Public Module ConstituentBudget
             'Logger.Dbg("Area is " & lArea)
             'Dim lSubTotal As Double = 0
             For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lLocation)
-                Dim i As Integer = 0
+                If aBalanceType = "Sediment" Then
 
-                For Each lMLBlockConnection As HspfConnection In aUCI.Connections
-                    If aBalanceType = "Sediment" Then
+                    For Each lMLBlockConnection As HspfConnection In aUCI.Connections
                         If lMLBlockConnection.Source.VolId = Right(lLocation, lLocation.Length - 2) _
                         AndAlso Left(lMLBlockConnection.Source.VolName, 1) = Left(lLocation, 1) _
                         AndAlso lMLBlockConnection.Target.VolName = "RCHRES" _
@@ -377,15 +393,14 @@ Public Module ConstituentBudget
                             Next
                             Exit For
                         End If
+                    Next lMLBlockConnection
+                Else
+                    lMassLinkMultFactor = 1
+                End If
 
-                    Else
-                        lMassLinkMultFactor = 1
-                    End If
-                    i += 1
-                Next lMLBlockConnection
-
-                'lSubTotal += lTs.Attributes.GetValue("SumAnnual")
                 If Not (Left(lLocation, 2) = "P:" And Left(lTs.Attributes.GetValue("Constituent").ToString, 6) = "SOQUAL") Then
+                    'This condition makes sure that surface washoff from PERLND are not added as they are already added in POQUAL.
+                    'Anurag checked this on 3/5/2014
 
                     Select Case lTs.Attributes.GetValue("Constituent").ToString & "_" & aBalanceType
                         Case "POQUAL-BOD_TotalN"
@@ -394,10 +409,14 @@ Public Module ConstituentBudget
                         Case "SOQUAL-BOD_TotalN"
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.069176
                         Case "POQUAL-BOD_TotalP"
-                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.005234
-                            'Multiplying 0.0023 + 0.007326 to BOD to get Organic N
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.0052304
+                            'Multiplying 0.0023 + 0.4*0.007326 to BOD to get Organic P
                         Case "SOQUAL-BOD_TotalP"
-                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.005234
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.0052304
+                        Case "ORGN - TOTAL OUTFLOW_TotalP"
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.05534793
+                        Case "SDORP_TotalP"
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.6
                         Case Else
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkMultFactor
 
@@ -406,9 +425,9 @@ Public Module ConstituentBudget
 
                 lMassLinkMultFactor = 0
             Next
-            'lNewTotal += lArea * lSubTotal
+
         Next
-            'Logger.Dbg("difference " & lTotal - lNewTotal) '"SumAnnual is " & lTs.Attributes.GetValue("SumAnnual"))
+
             Return lTotal
     End Function
 
@@ -442,10 +461,14 @@ Public Module ConstituentBudget
                         Case "SOQUAL-BOD_TotalN"
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.069176
                         Case "POQUAL-BOD_TotalP"
-                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.005234
-                            'Multiplying 0.0023 + 0.007326 to BOD to get Organic N
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.0052304
+                            'Multiplying 0.0023 + 0.4*0.007326 to BOD to get Organic P
                         Case "SOQUAL-BOD_TotalP"
-                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.005234
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.0052304
+                        Case "ORGN - TOTAL OUTFLOW_TotalP"
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.05534793
+                        Case "SDORP_TotalP"
+                            lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.6
                         Case Else
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual")
 
