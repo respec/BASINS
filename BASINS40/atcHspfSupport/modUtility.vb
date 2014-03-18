@@ -57,7 +57,36 @@ Public Module Utility
                 "ADS REFR ORGANIC N - UPPER PRINCIPAL STORAGE", _
                 "ADS REFR ORGANIC N - LOWER LAYER STORAGE", _
                 "ADS REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", _
-                "ADS REFR ORGANIC N - TOTAL STORAGE"}
+                "ADS REFR ORGANIC N - TOTAL STORAGE", _
+                "ABOVE-GROUND PLANT STORAGE", _
+                "LITTER STORAGE", _
+                "PLANT N - SURFACE LAYER STORAGE", _
+                "PLANT N - UPPER PRINCIPAL STORAGE", _
+                "PLANT N - LOWER LAYER STORAGE", _
+                "PLANT N - ACTIVE GROUNDWATER STORAGE", _
+                "PLANT N - TOTAL STORAGE", _
+                "PLANT P - SURFACE LAYER", _
+                "PLANT P - UPPER PRINCIPAL", _
+                "PLANT P - LOWER LAYER", _
+                "PLANT P - ACTIVE GROUNDWATER", _
+                "PLANT P - TOTALS", _
+                "PO4-P SOL - SURFACE LAYER", _
+                "PO4-P SOL - UPPER PRINCIPAL", _
+                "PO4-P SOL - UPPER TRANSITORY", _
+                "PO4-P SOL - LOWER LAYER", _
+                "PO4-P SOL - ACTIVE GROUNDWATER", _
+                "PO4-P SOL - TOTALS", _
+                "PO4-P ADS - SURFACE LAYER", _
+                "PO4-P ADS - UPPER PRINCIPAL", _
+                "PO4-P ADS - LOWER LAYER", _
+                "PO4-P ADS - ACTIVE GROUNDWATER", _
+                "PO4-P ADS - TOTALS", _
+                "ORGANIC P - SURFACE LAYER", _
+                "ORGANIC P - UPPER PRINCIPAL", _
+                "ORGANIC P - LOWER LAYER", _
+                "ORGANIC P - ACTIVE GROUNDWATER", _
+                "ORGANIC P - TOTALS" _
+                }
             pConstituentsThatUseLast = New Generic.List(Of String)(lConstituentsThatUseLastArray)
         End If
         Return pConstituentsThatUseLast
@@ -244,11 +273,14 @@ Public Module Utility
                     .Add("P:LABILE ORGN - UPPER LAYER OUTFLOW", "    Interflow")
                     .Add("P:LABILE ORGN - GROUNDWATER OUTFLOW", "    Baseflow")
                     .Add("P:LABILE ORGN - SEDIMENT ASSOC OUTFLOW", "    Sediment")
+                    .Add("P:ORGN - TOTAL OUTFLOW1", "    Labile N as fraction of TORN")
+
                     .Add("P:Header1d", "  Refractory ORGN Loss")
                     .Add("P:REFRAC ORGN - SURFACE LAYER OUTFLOW", "    Surface")
                     .Add("P:REFRAC ORGN - UPPER LAYER OUTFLOW", "    Interflow")
                     .Add("P:REFRAC ORGN - GROUNDWATER OUTFLOW", "    Baseflow")
                     .Add("P:REFRAC ORGN - SEDIMENT ASSOC OUTFLOW", "    Sediment")
+                    .Add("P:ORGN - TOTAL OUTFLOW2", "    Refractory N as fraction of TORN")
                     .Add("P:ORGN - TOTAL OUTFLOW", "  Total ORGN Loss")
                     .Add("P:NITROGEN - TOTAL OUTFLOW", "  Total N Loss")
 
@@ -267,6 +299,7 @@ Public Module Utility
                     .Add("P:NH4-N ADS - UPPER TRANSITORY STORAGE", "    Interflow")
                     .Add("P:NH4-N ADS - LOWER LAYER STORAGE", "    Lower")
                     .Add("P:NH4-N ADS - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+
                     .Add("P:NH4-N ADS - TOTAL STORAGE", "    Total")
                     .Add("P:Header2c", "  NO3/2-N Storage")
                     .Add("P:NO3/2-N - SURFACE LAYER STORAGE", "    Surface")
@@ -275,6 +308,7 @@ Public Module Utility
                     .Add("P:NO3/2-N - LOWER LAYER STORAGE", "    Lower")
                     .Add("P:NO3/2-N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
                     .Add("P:NO3/2-N - TOTAL STORAGE", "    Total")
+
                     .Add("P:Header2d", "  Labile ORGN Soln")
                     .Add("P:SOL LABIL ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
                     .Add("P:SOL LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
@@ -282,12 +316,14 @@ Public Module Utility
                     .Add("P:SOL LABIL ORGANIC N - LOWER LAYER STORAGE", "    Lower")
                     .Add("P:SOL LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
                     .Add("P:SOL LABIL ORGANIC N - TOTAL STORAGE", "    Total")
+
                     .Add("P:Header2e", "  Labile ORGN Ads")
                     .Add("P:ADS LABIL ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
                     .Add("P:ADS LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
                     .Add("P:ADS LABIL ORGANIC N - LOWER LAYER STORAGE", "    Lower")
                     .Add("P:ADS LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
                     .Add("P:ADS LABIL ORGANIC N - TOTAL STORAGE", "    Total")
+
                     .Add("P:Header2f", "  Refractory ORGN Soln")
                     .Add("P:SOL REFR ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
                     .Add("P:SOL REFR ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
@@ -295,6 +331,7 @@ Public Module Utility
                     .Add("P:SOL REFR ORGANIC N - LOWER LAYER STORAGE", "    Lower")
                     .Add("P:SOL REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
                     .Add("P:SOL REFR ORGANIC N - TOTAL STORAGE", "    Total")
+
                     .Add("P:Header2g", "  Refractory ORGN Ads")
                     .Add("P:ADS REFR ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
                     .Add("P:ADS REFR ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
@@ -303,6 +340,7 @@ Public Module Utility
                     .Add("P:ADS REFR ORGANIC N - TOTAL STORAGE", "    Total")
                     .Add("P:ABOVE-GROUND PLANT STORAGE", "  Above Ground Plant N")
                     .Add("P:LITTER STORAGE", "  Litter N")
+
                     .Add("P:Header2h", "  Below Ground Plant N")
                     .Add("P:PLANT N - SURFACE LAYER STORAGE", "    Surface")
                     .Add("P:PLANT N - UPPER PRINCIPAL STORAGE", "    Upper")
@@ -349,12 +387,56 @@ Public Module Utility
                     .Add("P:URTRBN", "    Upper")
                     .Add("P:LRTRBN", "    Lower")
                     .Add("P:TRTRBN", "    Total")
-                    .Add("P:TREFON", "  Labile/Refractory ORGN Conversion")
-                    .Add("P:TORNMN", "  Labile ORGN Mineralization")
-                    .Add("P:TDENI", "  Denitrification")
-                    .Add("P:TAMNIT", "  NH3 Nitrification")
-                    .Add("P:TAMIMB", "  NH3 Immobilization")
-                    .Add("P:TNIIMB", "  NO3 Immobilization")
+
+                    .Add("P:Header3i", "  Labile/Refractory ORGN Conversion")
+                    .Add("P:SREFON", "    Surface")
+                    .Add("P:UREFON", "    Upper")
+                    .Add("P:LREFON", "    Lower")
+                    .Add("P:AREFON", "    Groundwater")
+                    .Add("P:TREFON", "    Total")
+
+                    .Add("P:Header3j", "  Labile ORGN Mineralization")
+                    .Add("P:SORNMN", "    Surface")
+                    .Add("P:UORNMN", "    Upper")
+                    .Add("P:LORNMN", "    Lower")
+                    .Add("P:AORNMN", "    Groundwater")
+                    .Add("P:TORNMN", "    Total")
+
+                    .Add("P:Header3k", "  Denitrification")
+                    .Add("P:SDENI", "    Surface")
+                    .Add("P:UDENI", "    Upper")
+                    .Add("P:LDENI", "    Lower")
+                    .Add("P:ADENI", "    Groundwater")
+                    .Add("P:TDENI", "    Total")
+
+                    .Add("P:Header3l", "  NH3 Nitrification")
+                    .Add("P:SAMNIT", "    Surface")
+                    .Add("P:UAMNIT", "    Upper")
+                    .Add("P:LAMNIT", "    Lower")
+                    .Add("P:AAMNIT", "    Groundwater")
+                    .Add("P:TAMNIT", "    Total")
+
+                    .Add("P:Header3m", "  NH3 Immobilization")
+                    .Add("P:SAMIMB", "    Surface")
+                    .Add("P:UAMIMB", "    Upper")
+                    .Add("P:LAMIMB", "    Lower")
+                    .Add("P:AAMIMB", "    Groundwater")
+                    .Add("P:TAMIMB", "    Total")
+
+                    .Add("P:Header3n", "  NO3 Immobilization")
+                    .Add("P:SNIIMB", "    Surface")
+                    .Add("P:UNIIMB", "    Upper")
+                    .Add("P:LNIIMB", "    Lower")
+                    .Add("P:ANIIMB", "    Groundwater")
+                    .Add("P:TNIIMB", "    Total")
+
+                    .Add("P:Header3o", "  NH3 Volatilization")
+                    .Add("P:SAMVOL", "    Surface")
+                    .Add("P:UAMVOL", "    Upper")
+                    .Add("P:LAMVOL", "    Lower")
+                    .Add("P:AAMVOL", "    Groundwater")
+                    .Add("P:TAMVOL", "    Total")
+
 
                     .Add("P:Header4", "NO3 (PQUAL)")
                     .Add("P:SOQUAL-NO3", "  Surface Flow")
@@ -437,7 +519,10 @@ Public Module Utility
                     .Add("P:PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW", "    Baseflow")
                     .Add("P:SDP4A", "    Sediment")
                     .Add("P:POPO4", "    Total")
-                    .Add("P:SDORP", "    ORGP Sediment")
+
+                    .Add("P:ORGN - TOTAL OUTFLOW", "    Labile Org P from POORN")
+                    .Add("P:SDORP", "    Refractory Org P from SEDP 1")
+
                     .Add("P:POPHOS", "    Total P Loss")
                  
                     .Add("P:Header2", "Plant P")
@@ -484,9 +569,21 @@ Public Module Utility
                     '.Add("P:PLANT P - ACTIVE GROUNDWATER", "    GW")
                     '.Add("P:PLANT P - TOTALS", "    Total")
                     .Add("P:Header6c", "  Other Fluxes (lb/ac)")
-                    .Add("P:TORPMN", "    ORGP Mineralization")
-                    .Add("P:TP4IMB", "    PO4-P Immobilization")
-                    
+                    .Add("P:Header6d", "    ORGP Mineralization")
+                    .Add("P:SORPMN", "    Surface")
+                    .Add("P:UORPMN", "    Upper")
+                    .Add("P:LORPMN", "    Lower")
+                    .Add("P:AORPMN", "    Groundwater")
+                    .Add("P:TORPMN", "    Total")
+
+                    .Add("P:Header6e", "    PO4-P Immobilization")
+                    .Add("P:SP4IMB", "    Surface")
+                    .Add("P:UP4IMB", "    Upper")
+                    .Add("P:LP4IMB", "    Lower")
+                    .Add("P:AP4IMB", "    Groundwater")
+                    .Add("P:TP4IMB", "    Total")
+
+
                     .Add("P:Header7", "Ortho P (PQUAL)")
                     .Add("P:SOQUAL-Ortho P", "  Surface Flow")
                     .Add("P:IOQUAL-Ortho P", "  Interflow")
@@ -653,7 +750,9 @@ Public Module Utility
                 Dim lLocationKey As String = lSourceVolName.Substring(0, 1) & ":" & lConnection.Source.VolId
                 If lSourceVolName = "PERLND" Or lSourceVolName = "IMPLND" Then
                     If lConnection.MFact > 0 Then
+
                         aLocations.Increment(lLocationKey, lConnection.MFact)
+
                     End If
                 ElseIf lSourceVolName = "RCHRES" Then
                     If aUpstream Then
@@ -752,10 +851,13 @@ Public Module Utility
         lReport.AppendLine("Location" & vbTab & "TotalArea".PadLeft(12) & vbTab & "LocalArea".PadLeft(12) & vbTab & "UpstreamReaches")
         'Becky changed the following to cycle through all locations
         'Dim lLocation As String = aLocations.Item(aLocations.Count - 1)
+        
+
         For Each lLocation As String In aLocations 'added by Becky - should force land use reports for ALL relevant reaches 
             'and also add the total for all relevant reaches to a single overall report
             lReport.AppendLine(AreaReportLocation(aUci, aOperationTypes, lLocation, True, aReportPath, aRunMade))
         Next lLocation
+
         Return lReport
     End Function
 
