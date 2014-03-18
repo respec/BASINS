@@ -76,7 +76,7 @@ Public Module ConstituentBalance
                                 If lConstituentKey.StartsWith(lOperationKey) Then
                                     Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
                                     Dim lMultipleIndex As Integer = 0
-                                    If Not lConstituentKey.ToLower.Contains("header") AndAlso Not lConstituentKey.ToLower.Contains("total") Then
+                                    If Not lConstituentKey.ToLower.Contains("header") Then 'AndAlso Not lConstituentKey.ToLower.Contains("total") Then
                                         If lConstituentKey.EndsWith("1") Or lConstituentKey.EndsWith("2") Then
                                             lMultipleIndex = lConstituentKey.Substring(lConstituentKey.Length - 1)
                                             lConstituentKey = lConstituentKey.Substring(0, lConstituentKey.Length - 1)
@@ -95,7 +95,7 @@ Public Module ConstituentBalance
                                         End If
                                         Dim lSeasonalAttributes As New atcDataAttributes
                                         If ConstituentsThatUseLast.Contains(lConstituentKey) Then
-                                            lSeasonalAttributes.SetValue("Last", 0) 'fluxes are last from daily, monthly or annual to annual
+                                            lSeasonalAttributes.SetValue("Last", 0)
                                         Else
                                             lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
                                         End If
@@ -163,7 +163,40 @@ Public Module ConstituentBalance
                                                     End If
                                                 End If
                                             Case "ORGN - TOTAL OUTFLOW"
-                                                lMult = 7.555
+                                                lMult = 1
+                                                If lConstituentsToOutput(lConstituentIndex).Contains("  BOD from OrganicN") Then
+                                                    lMult = 7.555
+                                                    'When BOD is calculated for the PERLND that have AGCHEM active, the Organic N is used as 
+                                                    'as a surrogate.   The labile Organic N is converted to BOD using CVON and 40% labile fraction (factor
+                                                    ' = 0.4 / CVON = 0.4 / 0.052945)
+                                                    'The BOD calculation for when then AGCHEM is active or not active needs to be more formalized
+                                                End If
+                                                If lConstituentsToOutput(lConstituentIndex).Contains("    Refractory N as fraction of TORN") Then
+                                                    lMult = 0.6
+                                                    'In IRW Project, the refractory Organic N was calculated as a fraction of TORN. 
+                                                End If
+                                                If lConstituentsToOutput(lConstituentIndex).Contains("    Labile N as fraction of TORN") Then
+                                                    lMult = 0.4
+                                                    'In IRW Project, the refractory Organic N was calculated as a fraction of TORN. 
+                                                End If
+                                                If lConstituentsToOutput(lConstituentIndex).Contains("    Labile Org P from POORN") Then
+                                                    lMult = 0.05534793
+                                                    'In IRW Project, this number is calculated as 7.555 * 0.007326
+                                                End If
+
+
+                                            Case "LABILE ORGN - SEDIMENT ASSOC OUTFLOW"
+                                                lMult = 0
+                                                
+                                            Case "SDORP"
+                                                lMult = 1
+                                                
+                                                If lConstituentsToOutput(lConstituentIndex).Contains("    Refractory Org P from SEDP 1") Then
+                                                    lMult = 0.6
+                                                    'In IRW Project, Refractory organic P was calculated as a fraction of TORP
+                                                End If
+
+
                                             Case "POQUAL-F.Coliform", "SOQUAL-F.Coliform"
                                                 lMult = 1 / 1000000000.0 '10^9
                                         End Select
