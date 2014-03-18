@@ -67,15 +67,19 @@ Public Class atcExpertSystem
             'Read first line of file
             Dim lExsRecord As String = lExsRecords(0).PadRight(51)
             pName = lExsRecord.Substring(0, 8)
-            Dim lNSites As Integer = lExsRecord.Substring(8, 5)
+            Dim lNSites As Integer
+            If Not Integer.TryParse(lExsRecord.Substring(8, 5), lNSites) Then
+                Throw New ApplicationException("Number of Sites are not in correct format. Program will quit!")
+            End If
             If lNSites = 0 Then
                 Throw New ApplicationException("The number of sites is 0. Program will quit!")
             End If
             Dim lCurSite As Integer = lExsRecord.Substring(14, 5)
-            pLatMin = lExsRecord.Substring(19, 8)
-            pLatMax = lExsRecord.Substring(27, 8)
-            pLngMin = lExsRecord.Substring(35, 8)
-            pLngMax = lExsRecord.Substring(43, 8)
+            If Not Double.TryParse(lExsRecord.Substring(19, 8), pLatMin) AndAlso Double.TryParse(lExsRecord.Substring(27, 8), pLatMax) _
+            AndAlso Double.TryParse(lExsRecord.Substring(35, 8), pLngMin) AndAlso Double.TryParse(lExsRecord.Substring(43, 8), pLngMax) Then
+                Throw New ApplicationException("Latitude and Longitude of Watershed are not in correct format. Program will quit!")
+            End If
+           
             If lExsRecord.Length = 51 Then
                 SDateJ = pUci.GlobalBlock.SDateJ
                 EDateJ = pUci.GlobalBlock.EdateJ
@@ -85,16 +89,22 @@ Public Class atcExpertSystem
                 Dim lDate(5) As Integer
                 'Becky thinks the numbers 52 to 68 below are one off, and should be 51 to 67. 
                 'maybe a problem in something that writes out the .exs?
-                lDate(0) = lExsRecord.Substring(52, 4)
-                lDate(1) = lExsRecord.Substring(56, 2)
-                lDate(2) = lExsRecord.Substring(58, 2)
+                If Not Integer.TryParse(lExsRecord.Substring(52, 4), lDate(0)) _
+                    AndAlso Integer.TryParse(lExsRecord.Substring(56, 2), lDate(1)) _
+                    AndAlso Integer.TryParse(lExsRecord.Substring(58, 2), lDate(2)) Then
+                    Throw New ApplicationException("The analysis start and end dates in EXS file are not in correct format. Program will quit!")
+                End If
                 SDateJ = Date2J(lDate)
-                lDate(0) = lExsRecord.Substring(62, 4)
-                lDate(1) = lExsRecord.Substring(66, 2)
-                lDate(2) = lExsRecord.Substring(68, 2)
+
+                If Not Integer.TryParse(lExsRecord.Substring(62, 4), lDate(0)) _
+                  AndAlso Integer.TryParse(lExsRecord.Substring(66, 2), lDate(1)) _
+                  AndAlso Integer.TryParse(lExsRecord.Substring(68, 2), lDate(2)) Then
+                    Throw New ApplicationException("The analysis start and end dates in EXS file are not in correct format. Program will quit!")
+                End If
                 EDateJ = Date2J(lDate)
                 Logger.Dbg("The simulation time period from the exs file is used for the calibration")
             End If
+
 
             'Default unspecified lat/integer min/max values to contiguous 48 states
             If ((pLatMin < 0.01) And (pLatMin > -0.01)) Then
@@ -130,28 +140,40 @@ Public Class atcExpertSystem
 
             Dim lRecordIndex As Integer = lNSites + 1
             'Read number of storms
-            Dim lNStorms As Integer = lExsRecords(lRecordIndex).Substring(0, 4)
+            Dim lNStorms As Integer
+            If Not Integer.TryParse(lExsRecords(lRecordIndex).Substring(0, 4), lNStorms) Then
+                Throw New ApplicationException("The number of storms are not in correct format. Program will quit!")
+            End If
 
             'Read storm end/start dates
             Dim lStormSDate(5) As Integer
             Dim lStormEDate(5) As Integer
             For lStormIndex As Integer = 1 To lNStorms
                 lExsRecord = lExsRecords(lRecordIndex + lStormIndex)
-                lStormSDate(0) = lExsRecord.Substring(0, 5) 'Left(textLine, 5)
-                lStormEDate(0) = lExsRecord.Substring(21, 5) 'Mid(textLine, 21, 5)
+                If Not Integer.TryParse(lExsRecord.Substring(0, 5), lStormSDate(0)) _
+                        AndAlso Integer.TryParse(lExsRecord.Substring(21, 5), lStormEDate(0)) Then 'Checking if storm dates are
+                    'are in correct format
+                    Throw New ApplicationException("The dates for storm number " & lStormIndex & " are not in correct format. Program will quit!")
+                End If
+
                 For lTimeIndex As Integer = 0 To 4
-                    lStormSDate(lTimeIndex + 1) = lExsRecord.Substring(6 + 3 * lTimeIndex, 3)
-                    lStormEDate(lTimeIndex + 1) = lExsRecord.Substring(26 + 3 * lTimeIndex, 3)
+                    If Not Integer.TryParse(lExsRecord.Substring(6 + 3 * lTimeIndex, 3), lStormSDate(lTimeIndex + 1)) _
+                    AndAlso Integer.TryParse(lExsRecord.Substring(26 + 3 * lTimeIndex, 3), lStormEDate(lTimeIndex + 1)) Then
+                        Throw New ApplicationException("The dates for storm number " & lStormIndex & " are not in correct format. Program will quit!")
+                    End If
                 Next lTimeIndex
                 'Get the starting and ending storm dates in a 1-D Julian array
                 Storms.Add(New HexStorm(lStormSDate, lStormEDate))
+
             Next lStormIndex
 
             'Read basin area (acres)
             lRecordIndex += lNStorms + 1
             lExsRecord = lExsRecords(lRecordIndex)
             For lSiteIndex As Integer = 0 To lNSites - 1
-                Sites(lSiteIndex).Area = lExsRecord.Substring((lSiteIndex * 8), 8)
+                If Not Double.TryParse(lExsRecord.Substring((lSiteIndex * 8), 8), Sites(lSiteIndex).Area) Then
+                    Throw New ApplicationException("The area for Site " & lSiteIndex & " is not in correct format. Program will quit!")
+                End If   
             Next lSiteIndex
 
             'Read error terms
@@ -166,6 +188,7 @@ Public Class atcExpertSystem
                     'filled it with the default values - the code below reads the user-defined values if there
                     'are any.  If the user doesn't supply any and the if-then never trips, then no harm, the
                     'program just uses the defaults.
+                    
                     Dim lErrorCriteriumValue As String = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
                     If lErrorCriteriumValue.Length > 0 Then
                         ErrorCriteria(lErrorIndex).Value = lErrorCriteriumValue
@@ -181,34 +204,38 @@ Public Class atcExpertSystem
             ReDim pHSPFOutput1(8, Sites.Count)
             ReDim pHSPFOutput2(8, Sites.Count)
             ReDim pHSPFOutput3(6, Sites.Count)
-            For lSiteIndex As Integer = 0 To Sites.Count - 1
-                lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-                lRecordIndex += 1
-                For lIndex As Integer = 0 To 7
-                    pHSPFOutput1(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-                Next lIndex
-                lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-                lRecordIndex += 1
-                For lIndex As Integer = 0 To 7
-                    pHSPFOutput2(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-                Next lIndex
-                lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-                lRecordIndex += 1
-                For lIndex As Integer = 0 To 5
-                    pHSPFOutput3(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-                Next lIndex
-            Next lSiteIndex
 
+            If lExsRecords(lRecordIndex).Length > 0 Then 'If no text is found in lines after the error criteria, HSPEXP can still work.
+                For lSiteIndex As Integer = 0 To Sites.Count - 1
+                    lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                    lRecordIndex += 1
+                    For lIndex As Integer = 0 To 7
+                        pHSPFOutput1(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+                    Next lIndex
+                    lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                    lRecordIndex += 1
+                    For lIndex As Integer = 0 To 7
+                        pHSPFOutput2(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+                    Next lIndex
+                    lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                    lRecordIndex += 1
+                    For lIndex As Integer = 0 To 5
+                        pHSPFOutput3(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+                    Next lIndex
+                Next lSiteIndex
+            End If
             'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
             lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-            For lIndex As Integer = 0 To 19
-                pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
-            Next lIndex
-            lRecordIndex += 1
-            lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-            For lIndex As Integer = 20 To 22
-                pSubjectiveData(lIndex + 1) = lExsRecord.Substring((lIndex - 20) * 4, 4)
-            Next lIndex
+            If lExsRecord.Length > 0 Then
+                For lIndex As Integer = 0 To 19
+                    pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
+                Next lIndex
+                lRecordIndex += 1
+                lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                For lIndex As Integer = 20 To 22
+                    pSubjectiveData(lIndex + 1) = lExsRecord.Substring((lIndex - 20) * 4, 4)
+                Next lIndex
+            End If
             '  'Change subjective data based on other data
             '  If (SISTVO(CURSIT) > OBSTVO(CURSIT)) Then
             '    'Simulated storm runoff volumes higher than obs
