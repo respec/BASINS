@@ -308,7 +308,8 @@ Public Module WatershedConstituentBalance
                                     Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
                                     Dim lConstituentDataName As String = lConstituentKey
                                     Dim lMultipleIndex As Integer = 0
-                                    If Not lConstituentKey.ToLower.Contains("header") AndAlso Not lConstituentKey.ToLower.Contains("total") Then
+                                    If Not lConstituentKey.ToLower.Contains("header") Then ' AndAlso Not lConstituentKey.ToLower.Contains("total") Then
+                                        'Anurag commented out latter part of this condition as it was causing problem in ORGN - TOTAL OUTFLOW
                                         If lConstituentDataName.EndsWith("1") Or lConstituentDataName.EndsWith("2") Then
                                             lMultipleIndex = lConstituentDataName.Substring(lConstituentDataName.Length - 1)
                                             lConstituentDataName = lConstituentDataName.Substring(0, lConstituentDataName.Length - 1)
@@ -402,15 +403,70 @@ Public Module WatershedConstituentBalance
                                                                 'obtained by multiplying 0.4 to 0.007326
                                                             End If
                                                         End If
-                                                    Case "P:ORGN - TOTAL OUTFLOW"
-                                                        lMult = 7.555
+                                                    Case "ORGN - TOTAL OUTFLOW"
+                                                        lMult = 1
+                                                        If lConstituentsToOutput(lConstituentIndex).Contains("  BOD from OrganicN") Then
+                                                            lMult = 7.555
+                                                            'When BOD is calculated for the PERLND that have AGCHEM active, the Organic N is used as 
+                                                            'as a surrogate.   The labile Organic N is converted to BOD using CVON and 40% labile fraction (factor
+                                                            ' = 0.4 / CVON = 0.4 / 0.052945)
+                                                            'The BOD calculation for when then AGCHEM is active or not active needs to be more formalized
+                                                        End If
+                                                        If lConstituentsToOutput(lConstituentIndex).Contains("    Refractory N as fraction of TORN") Then
+                                                            lMult = 0.6
+                                                            'In IRW Project, the refractory Organic N was calculated as a fraction of TORN. 
+                                                        End If
+                                                        If lConstituentsToOutput(lConstituentIndex).Contains("    Labile N as fraction of TORN") Then
+                                                            lMult = 0.4
+                                                            'In IRW Project, the refractory Organic N was calculated as a fraction of TORN. 
+                                                        End If
+                                                        If lConstituentsToOutput(lConstituentIndex).Contains("    Labile Org P from POORN") Then
+                                                            lMult = 0.05534793
+                                                            'In IRW Project, this number is calculated as 7.555 * 0.007326
+                                                        End If
+
+
+                                                    Case "LABILE ORGN - SEDIMENT ASSOC OUTFLOW"
+                                                        lMult = 0
+                                                    Case "SDORP"
+                                                        lMult = 1
+                                                        
+                                                        If lConstituentsToOutput(lConstituentIndex).Contains("    Refractory Org P from SEDP 1") Then
+                                                            lMult = 0.6
+                                                            'In IRW Project, Refractory organic P was calculated as a fraction of TORP
+                                                        End If
+
+
                                                 End Select
+
                                                 If aBalanceType = "FColi" Then
                                                     lMult = 1 / 1000000000.0 '10^9
                                                 End If
-                                                Dim lAttribute As atcDefinedValue
+                                                Dim lAttribute As atcDefinedValue = Nothing
                                                 If ConstituentsThatUseLast.Contains(lConstituentDataName) Then
-                                                    lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
+                                                    'lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
+
+                                                    'Dim lTempDataSet As atcDataSet = lConstituentDataGroup.Item(0)
+                                                    Dim lSeasons As atcSeasonBase
+                                                    If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
+                                                        lSeasons = New atcSeasonsWaterYear
+                                                    Else
+                                                        lSeasons = New atcSeasonsCalendarYear
+                                                    End If
+                                                    Dim lSeasonalAttributes As New atcDataAttributes
+
+                                                    lSeasonalAttributes.SetValue("Last", 0)
+
+                                                    Dim ltest As Double = 0
+                                                    Dim lYearlyAttributes As New atcDataAttributes
+                                                    lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lYearlyAttributes)
+                                                    For Each lseasonalAttribute As atcDefinedValue In lYearlyAttributes
+                                                        ltest += lseasonalAttribute.Value
+                                                    Next
+                                                    lSeasonalAttributes(0).Value = ltest / lYearlyAttributes.Count
+                                                    lAttribute = lSeasonalAttributes(0)
+                                                    'Mark added this option to calculate the average of end of the year values for state variables.
+                                                    'Earlier we were getting end of the simulation period value.
                                                 Else
                                                     lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
                                                 End If
@@ -554,12 +610,17 @@ Public Module WatershedConstituentBalance
                         End With
                         'need totals?
                         Dim lNeedTotal As Boolean = False
-                        For Each lLoad As Load In lLoadTotals
-                            If lLoad.Count > 1 Then
-                                lNeedTotal = True
-                                Exit For
-                            End If
-                        Next
+                        If lLoadTotals.Count < 6 Then
+                            For Each lLoad As Load In lLoadTotals
+                                If lLoad.Count > 1 Then
+                                    'Anurag added this condition on 2/22/2014, so that we do not get sum values for AGCHEM Constituents, as we were 
+                                    'seeing junk values for AGCHEM constituents. There might be a more elegant way to do it, but this 
+                                    'might for now.
+                                    lNeedTotal = True
+                                    Exit For
+                                End If
+                            Next
+                        End If
                         If lNeedTotal Then
                             lReport.Body.Remove(lReport.Body.Length - 2, 2)
                             lReport.AppendLine(aBalanceType)
@@ -573,6 +634,8 @@ Public Module WatershedConstituentBalance
                                 End If
                             Next
                             lReport.AppendLine()
+                        Else
+                            lReport.Body.Remove(lReport.Body.Length - 5, 5)
                         End If
                     Catch lEx As Exception
                         Logger.Dbg(lEx.Message)
@@ -922,6 +985,8 @@ Public Module WatershedConstituentBalance
             Case "P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW" : lSkipTo = "Ortho P (PQUAL)"
             Case "P:SOQUAL-Ortho P", "SOQUAL-Ortho P" : lSkipTo = "Ortho P (IQUAL)"
             Case "P:SOQUAL-NO3", "SOQUAL-NO3" : lSkipTo = "NO3 (IQUAL)"
+            Case "P:WASHQS-BOD", "WASHQS-BOD" : lSkipTo = "  BOD from OrganicN"
+            Case "P:ORGN - TOTAL OUTFLOW", "ORGN - TOTAL OUTFLOW" : lSkipTo = "BOD"
         End Select
         Return lSkipTo
     End Function
