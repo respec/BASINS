@@ -42,10 +42,10 @@ Module modMain
         cmd = Environment.CommandLine
         If Len(cmd) > 0 Then
             Try
-                If Logger.FileName Is Nothing OrElse Logger.FileName.Length = 0 Then
-                    Logger.StartToFile(IO.Path.Combine(IO.Path.GetTempPath, "ShapeUtil.log"))
-                    Logger.TimeStamping = True
-                End If
+                'If Logger.FileName Is Nothing OrElse Logger.FileName.Length = 0 Then
+                '    Logger.StartToFile(IO.Path.Combine(IO.Path.GetTempPath, "ShapeUtil.log"))
+                '    Logger.TimeStamping = True
+                'End If
                 Logger.Dbg("ShapeUtil CommandLine '" & cmd & "'")
 
                 exeFilename = StrSplit(cmd, " ", """")
