@@ -72,18 +72,6 @@ Public Class atcBasinsPlugIn
         'These should match, but now g_AppNameLong is a constant and we do not set it here.
         'g_AppNameLong = aMapWin.ApplicationInfo.ApplicationName
 
-        Dim lHelpFilename As String = String.Empty
-        Select Case g_AppNameLong
-            Case "USGS Surface Water Analysis"
-
-            Case "USGS GW Toolbox"
-                lHelpFilename = FindFile("", g_ProgramDir & "docs\USGSToolbox.chm")
-                BasinsDataPath = "USGS-GWToolbox\data\"
-
-            Case Else '"BASINS 4.1"
-                lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.1.chm")
-        End Select
-
         ProjectsMenuString = "Open " & g_AppNameShort & " Project"
         RegisterMenuString = "Register as a " & g_AppNameShort & " user"
         ProgramWebPageMenuString = g_AppNameShort & " Web Page"
@@ -93,6 +81,18 @@ Public Class atcBasinsPlugIn
         g_MapWin.ApplicationInfo.WelcomePlugin = "plugin" 'tell the main app to Plugins.BroadcastMessage("WELCOME_SCREEN") instead of showing default MW welcome screen
         'Set g_ProgramDir to folder above the Bin folder where the app and plugins live
         g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
+
+        Dim lHelpFilename As String = String.Empty
+        Select Case g_AppNameLong
+            Case "USGS Surface Water Analysis"
+
+            Case "USGS GW Toolbox"
+                lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\USGSToolbox.chm")
+                BasinsDataPath = "USGS-GWToolbox\data\"
+
+            Case Else '"BASINS 4.1"
+                lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.1.chm")
+        End Select
 
         Logger.StartToFile(g_ProgramDir & "cache\log" & g_PathChar _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
