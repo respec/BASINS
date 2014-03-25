@@ -141,6 +141,10 @@ Public Class HspfGlobalBlk
         lRecordIndex = -1
         Me.Comment = GetCommentBeforeBlock("GLOBAL")
         GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+        'Allow room for comments
+        While lRecordType < 0 And lRecordIndex < 100 '(100 is arbitrary to prevent an endless loop)
+            GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+        End While
         If Not lRecord.StartsWith("  START") Then
             pRunInf.Value = lRecord.TrimEnd
             GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)

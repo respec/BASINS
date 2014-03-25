@@ -1361,7 +1361,7 @@ Public Class HspfMsg
                 Next i
             ElseIf aBlockName = "RCHRES" And .Name = "NODE-PARM" Then
                 For i As Integer = 2 To 100 'up to 100 rows possible
-                    For j As Integer = 0 To 5
+                    For j As Integer = 0 To 6
                         Dim lParmDef As New HSPFParmDef
                         lParmDef.Name = .ParmDefs(j).Name & CStr(i) 'Name
                         lParmDef.Typ = .ParmDefs(j).Typ
@@ -1377,6 +1377,8 @@ Public Class HspfMsg
                             lParmDef.StartCol = (70 * (i - 1)) + 51
                         ElseIf j = 5 Then
                             lParmDef.StartCol = (70 * (i - 1)) + 61
+                        ElseIf j = 6 Then
+                            lParmDef.StartCol = (70 * (i - 1)) + 66
                         End If
                         lParmDef.Length = .ParmDefs(j).Length
                         lParmDef.DefaultValue = .ParmDefs(j).DefaultValue
