@@ -627,12 +627,18 @@ Public Module modModelSetup
                 .MeanLatitude = lRec.MeanLatitude
                 '.Distance()
                 '.ImperviousFraction()
-                For Each lReach As Reach In aReaches
-                    If lReach.Id = lRec.SubbasinId Then
-                        .Reach = lReach
-                        Exit For
-                    End If
-                Next
+                If Not aReaches Is Nothing Then
+                    For Each lReach As Reach In aReaches
+                        If lReach.Id = lRec.SubbasinId Then
+                            .Reach = lReach
+                            Exit For
+                        End If
+                    Next
+                Else
+                    Dim lDummyReach As New Reach
+                    lDummyReach.Id = lRec.SubbasinId
+                    .Reach = lDummyReach
+                End If
                 .Type = "COMPOSITE"
             End With
             Dim lExistIndex As Integer = lLandUses.IndexOf(lLandUse)
