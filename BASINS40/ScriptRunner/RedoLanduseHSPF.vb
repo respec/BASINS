@@ -4,6 +4,7 @@ Imports atcMwGisUtility
 Imports atcModelSegmentation
 Imports atcSegmentation
 Imports atcModelSetup
+Imports atcUCI
 Imports MapWindow.Interfaces
 Imports MapWinUtility
 
@@ -31,6 +32,13 @@ Module RedoLanduseHSPF
         ChDriveDir(lOutputPath)  'change to the directory of the uci
         Logger.Dbg(" CurDir:" & CurDir())
 
+        Dim lMsg As New atcUCI.HspfMsg
+        lMsg.Open("hspfmsg.wdm")
+        Dim lHspfUci As New atcUCI.HspfUci
+        'open this uci
+        lHspfUci.FastReadUciForStarter(lMsg, pUCIName)
+        lHspfUci.Msg = lMsg
+
         '  for testing NLCD 2001
         'pLUType = 1
         'pLandUseClassFile = "C:\BASINS\etc\nlcd.dbf"
@@ -45,7 +53,7 @@ Module RedoLanduseHSPF
         End If
 
         Logger.Status("Preparing HSPF Landuse Calculations")
-        If RedoLanduseHSPF(pUCIName, _
+        If RedoLanduseHSPF(lHspfUci, _
                            pSubbasinLayerName, pSubbasinFieldName, _
                            pLUType, pLandUseLayerName, _
                            pLandUseFieldName, pLandUseClassFile) Then
@@ -57,7 +65,7 @@ Module RedoLanduseHSPF
     End Sub
 
     'aLUType - Land use layer type (0 - USGS GIRAS Shape, 1 - NLCD grid, 2 - Other shape, 3 - Other grid)
-    Public Function RedoLanduseHSPF(ByVal aUCIName As String, _
+    Public Function RedoLanduseHSPF(ByVal aUCI As HspfUci, _
                                     ByVal aSubbasinLayerName As String, ByVal aSubbasinFieldName As String, _
                                     ByVal aLUType As Integer, ByVal aLandUseThemeName As String, _
                                     ByVal aLandUseFieldName As String, ByVal aLandUseClassFile As String) As Boolean
@@ -174,12 +182,264 @@ Module RedoLanduseHSPF
         'Create LandUses
         Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLandUseSubbasinOverlayRecords, Nothing)
         Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, lGridPervious, lLandUses)
+
         'update areas
+        For Each lLandUse As LandUse In lReclassifyLanduses
+            Dim lDesc As String = lLandUse.Description
+            If lDesc.Length > 20 Then
+                lDesc = lDesc.Substring(0, 20)
+            End If
+            'update corresponding record in uci, add or delete if needed
+            'pervious
+            Dim lArea As Double = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 4046.8564
+            PutSchematicRecord(aUCI, "PERLND", lDesc, "RCHRES", lLandUse.Reach.Id, lArea)
+            'impervious
+            lArea = lLandUse.Area * (lLandUse.ImperviousFraction) / 4046.8564
+            PutSchematicRecord(aUCI, "IMPLND", lDesc, "RCHRES", lLandUse.Reach.Id, lArea)
+        Next lLandUse
+
+        'do some checking to make sure no area added or lost
+
         'save uci file
+        aUCI.Name = aUCI.Name & "new"
+        aUCI.Save()
 
         Logger.Status("")
         Return True
     End Function
+
+    Private Sub PutSchematicRecord(ByVal aUCI As HspfUci, ByVal aSName As String, ByVal aSDesc As String, _
+                                   ByVal aTName As String, ByVal aTId As Integer, ByVal aMultFact As Double)
+
+        Dim lSId As Integer = 0
+        If aSName = "RCHRES" And aTName = "BMPRAC" Then 'dont do rchres to bmp connections
+        Else
+            If aSName = "RCHRES" And aTName = "RCHRES" Then
+                aMultFact = 1.0#
+            End If
+            Dim lAddIt As Boolean = True
+            Dim lDeleteIt As Boolean = False
+            Dim lDeleteIndex As Integer = 0
+            For lIndex As Integer = 0 To aUCI.Connections.Count - 1
+                Dim lConn As HspfConnection = aUCI.Connections(lIndex)
+                If lConn.Typ = 3 Then 'schematic
+                    If lConn.Target.Opn.Id = aTId And _
+                       lConn.Target.Opn.Name = aTName And _
+                       lConn.Source.Opn.Description = aSDesc And _
+                       lConn.Source.Opn.Name = aSName Then
+                        lAddIt = False
+                        lConn.MFact = aMultFact
+                        If Math.Abs(aMultFact) < 0.00000001 Then
+                            lDeleteIt = True
+                            lDeleteIndex = lIndex
+                            lSId = lConn.Source.Opn.Id
+                        End If
+                    End If
+                End If
+            Next lIndex
+            If lAddIt And Math.Abs(aMultFact) > 0.00000001 Then 'need to add the connection
+                Dim lConn = New HspfConnection
+                Dim lOpnBlk As HspfOpnBlk = aUCI.OpnBlks(aSName)
+                Dim lSourceOpn As New HspfOperation  'figure out which opn this is adding 
+                For Each lTempOpn As HspfOperation In lOpnBlk.Ids
+                    If lTempOpn.Description = aSDesc Then
+                        lSourceOpn = lTempOpn
+                        Exit For
+                    End If
+                Next
+                lConn.Source.Opn = lSourceOpn
+                lConn.Source.volname = lSourceOpn.Name
+                lConn.Source.volid = lSourceOpn.Id
+                lConn.Typ = 3
+                lConn.MFact = aMultFact
+                lOpnBlk = aUCI.OpnBlks(aTName)
+                Dim lOpn As HspfOperation = lOpnBlk.OperFromID(aTId)
+                lConn.Target.Opn = lOpn
+                lConn.Target.volname = lOpn.Name
+                lConn.Target.volid = lOpn.Id
+                Dim lMLId As Integer = 0
+                GetMassLinkID(aUCI, aSName, aTName, lMLId)
+                If lMLId = 0 Then
+                    AddMassLink(aUCI, aSName, aTName, lMLId)
+                End If
+                lConn.MassLink = lMLId
+                lConn.Uci = aUCI
+                'add targets to source opn
+                lSourceOpn.Targets.Add(lConn)
+                lConn.Source.Opn = lSourceOpn
+                'add sources to target opn
+                lOpnBlk = aUCI.OpnBlks(aTName)
+                lOpn = lOpnBlk.OperFromID(aTId)
+                lOpn.Sources.Add(lConn)
+                lConn.Target.Opn = lOpn
+                'add to collection of connections
+                aUCI.Connections.Add(lConn)
+            ElseIf lDeleteIt Then 'need to delete the connection
+                aUCI.Connections.RemoveAt(lDeleteIndex)
+                'remove target from source opn
+                Dim lOpnBlk As HspfOpnBlk = aUCI.OpnBlks(aSName)
+                Dim lOpn As HspfOperation = lOpnBlk.OperFromID(lSId)
+                Dim lIndex As Integer = 1
+                For Each lConn As HspfConnection In lOpn.Targets
+                    If lConn.Target.VolName = aTName And _
+                       lConn.Target.VolId = aTId Then
+                        lOpn.Targets.RemoveAt(lIndex)
+                    Else
+                        lIndex = lIndex + 1
+                    End If
+                Next
+                'remove source from target opn
+                lOpnBlk = aUCI.OpnBlks(aTName)
+                lOpn = lOpnBlk.OperFromID(aTId)
+                lIndex = 1
+                For Each lConn As HspfConnection In lOpn.Sources
+                    If lConn.Source.VolName = aSName And _
+                       lConn.Source.VolId = lSId Then
+                        lOpn.Sources.RemoveAt(lIndex)
+                    Else
+                        lIndex = lIndex + 1
+                    End If
+                Next
+            End If
+        End If
+    End Sub
+
+    Private Sub GetMassLinkID(ByVal aUCI As HspfUci, ByVal aSName As String, ByVal aTName As String, ByRef aMLId As Integer)
+        Dim lConn As HspfConnection
+
+        'determine mass link number
+        aMLId = 0
+        For Each lConn In aUCI.Connections
+            If lConn.Typ = 3 Then
+                If lConn.Source.VolName = aSName And lConn.Target.VolName = aTName Then
+                    aMLId = lConn.MassLink
+                End If
+            End If
+        Next lConn
+    End Sub
+
+    Private Sub AddMassLink(ByVal aUCI As HspfUci, ByVal aSName As String, ByVal aTName As String, ByRef aMLId As Integer)
+        'need to add masslink, find an unused number
+        Dim lFound As Boolean = True
+        aMLId = 1
+        Do Until lFound = False
+            lFound = False
+            For Each lMassLink As HspfMassLink In aUCI.MassLinks
+                If lMassLink.MassLinkId = aMLId Then
+                    aMLId = aMLId + 1
+                    lFound = True
+                    Exit For
+                End If
+            Next lMassLink
+        Loop
+        'find id of masslink to copy
+        Dim lCopyId As Integer = 0
+        If aSName = "BMPRAC" And aTName = "RCHRES" Then
+            'copy from perlnd to rchres masslink
+            GetMassLinkID(aUCI, "PERLND", aTName, lCopyId)
+        ElseIf aSName = "PERLND" And aTName = "BMPRAC" Then
+            'copy from perlnd to rchres masslink
+            GetMassLinkID(aUCI, aSName, "RCHRES", lCopyId)
+        ElseIf aSName = "IMPLND" And aTName = "BMPRAC" Then
+            'copy from implnd to rchres masslink
+            GetMassLinkID(aUCI, aSName, "RCHRES", lCopyId)
+        End If
+        If aMLId > 0 And lCopyId > 0 Then
+            'now copy masslink
+            For lIndex As Integer = 0 To aUCI.MassLinks.Count - 1
+                Dim lcMassLink As HspfMassLink = aUCI.MassLinks(lIndex)
+                If lcMassLink.MassLinkId = lCopyId Then
+                    'copy this record
+                    Dim lMassLink As New HspfMassLink
+                    lMassLink.Uci = aUCI
+                    lMassLink.MassLinkId = aMLId
+                    lMassLink.Source.VolName = aSName
+                    lMassLink.Source.VolId = 0
+                    lMassLink.Source.Group = lcMassLink.Source.Group
+                    lMassLink.Source.Member = lcMassLink.Source.Member
+                    lMassLink.Source.MemSub1 = lcMassLink.Source.MemSub1
+                    lMassLink.Source.MemSub2 = lcMassLink.Source.MemSub2
+                    lMassLink.MFact = lcMassLink.MFact
+                    lMassLink.Tran = lcMassLink.Tran
+                    lMassLink.Target.VolName = aTName
+                    lMassLink.Target.VolId = 0
+                    lMassLink.Target.Group = lcMassLink.Target.Group
+                    lMassLink.Target.Member = lcMassLink.Target.Member
+                    lMassLink.Target.MemSub1 = lcMassLink.Target.MemSub1
+                    lMassLink.Target.MemSub2 = lcMassLink.Target.MemSub2
+
+                    If (aSName = "PERLND" Or aSName = "IMPLND") And _
+                      aTName = "BMPRAC" Then  'special cases
+                        If lcMassLink.Target.Member = "OXIF" Then
+                            lMassLink.Target.Member = "IOX"
+                        ElseIf lcMassLink.Target.Member = "NUIF1" Then
+                            lMassLink.Target.Member = "IDNUT"
+                        ElseIf lcMassLink.Target.Member = "NUIF2" Then
+                            lMassLink.Target.Member = "ISNUT"
+                        ElseIf lcMassLink.Target.Member = "PKIF" Then
+                            lMassLink.Target.Member = "IPLK"
+                        End If
+                    End If
+
+                    If aSName = "BMPRAC" And aTName = "RCHRES" Then
+                        'special cases
+                        lMassLink.Source.Group = "ROFLOW"
+                        lMassLink.MFact = 1.0#
+                        If lcMassLink.Target.Member = "IVOL" Then
+                            lMassLink.Source.Member = "ROVOL"
+                        ElseIf lcMassLink.Target.Member = "CIVOL" Then
+                            lMassLink.Source.Member = "CROVOL"
+                        ElseIf lcMassLink.Target.Member = "ICON" Then
+                            lMassLink.Source.Member = "ROCON"
+                        ElseIf lcMassLink.Target.Member = "IHEAT" Then
+                            lMassLink.Source.Member = "ROHEAT"
+                        ElseIf lcMassLink.Target.Member = "ISED" Then
+                            lMassLink.Source.Member = "ROSED"
+                        ElseIf lcMassLink.Target.Member = "IDQAL" Then
+                            lMassLink.Source.Member = "RODQAL"
+                        ElseIf lcMassLink.Target.Member = "ISQAL" Then
+                            lMassLink.Source.Member = "ROSQAL"
+                        ElseIf lcMassLink.Target.Member = "OXIF" Then
+                            lMassLink.Source.Member = "ROOX"
+                        ElseIf lcMassLink.Target.Member = "NUIF1" Then
+                            lMassLink.Source.Member = "RODNUT"
+                        ElseIf lcMassLink.Target.Member = "NUIF2" Then
+                            lMassLink.Source.Member = "ROSNUT"
+                        ElseIf lcMassLink.Target.Member = "PKIF" Then
+                            lMassLink.Source.Member = "ROPLK"
+                        ElseIf lcMassLink.Target.Member = "PHIF" Then
+                            lMassLink.Source.Member = "ROPH"
+                        End If
+                        lMassLink.Source.MemSub1 = lcMassLink.Target.MemSub1
+                        lMassLink.Source.MemSub2 = lcMassLink.Target.MemSub2
+                    End If
+
+                    Dim lExists As Boolean = False
+                    For Each lML As HspfMassLink In aUCI.MassLinks
+                        If lML.MassLinkId = lMassLink.MassLinkId AndAlso _
+                           lML.MFact = lMassLink.MFact AndAlso _
+                           lML.Source.VolName = lMassLink.Source.VolName AndAlso _
+                           lML.Source.Group = lMassLink.Source.Group AndAlso _
+                           lML.Source.Member = lMassLink.Source.Member AndAlso _
+                           lML.Source.MemSub1 = lMassLink.Source.MemSub1 AndAlso _
+                           lML.Source.MemSub2 = lMassLink.Source.MemSub2 AndAlso _
+                           lML.Target.VolName = lMassLink.Target.VolName AndAlso _
+                           lML.Target.Group = lMassLink.Target.Group AndAlso _
+                           lML.Target.Member = lMassLink.Target.Member AndAlso _
+                           lML.Target.MemSub1 = lMassLink.Target.MemSub1 AndAlso _
+                           lML.Target.MemSub2 = lMassLink.Target.MemSub2 Then
+                            lExists = True
+                        End If
+                    Next
+                    If Not lExists Then
+                        'if this masslink record does not already exist, add it
+                        aUCI.MassLinks.Add(lMassLink)
+                    End If
+                End If
+            Next
+        End If
+
+    End Sub
 
     Friend Class LandUseSubbasinOverlayRecord
         Friend LuCode As String          'land use code
