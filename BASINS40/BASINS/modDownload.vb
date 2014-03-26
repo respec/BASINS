@@ -556,7 +556,7 @@ StartOver:
         End If
 
         Dim lBasinsDataTypes As String = "<DataType>core31</DataType>"
-        If g_AppNameShort = "USGS-GW" Then
+        If g_AppNameShort = "GW Toolbox" Then
             lBasinsDataTypes &= "<DataType>nhd</DataType>"
             atcDataManager.LoadPlugin("D4EM Data Download::NWIS")
         End If
@@ -628,7 +628,7 @@ StartOver:
                     End If
                 End If
 
-                If g_AppNameShort = "USGS-GW" Then 'Also get some more layers
+                If g_AppNameShort = "GW Toolbox" Then 'Also get some more layers
                     Dim lRegion As D4EMDataManager.Region 'Use the view extents to include some stations in a buffer outside the original region
                     With g_MapWin.View.Extents
                         lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)
@@ -697,7 +697,7 @@ StartOver:
         Next
         If lMessage.Length > 2 AndAlso Logger.DisplayMessageBoxes Then
             Logger.Msg(lMessage, "Data Download")
-            If lMessage.Contains(" Data file") AndAlso g_AppNameShort <> "USGS-GW" Then
+            If lMessage.Contains(" Data file") AndAlso g_AppNameShort <> "GW Toolbox" Then
                 atcDataManager.UserManage()
             End If
         End If
