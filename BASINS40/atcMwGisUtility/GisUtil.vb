@@ -2948,6 +2948,7 @@ Public Class GisUtil
         Dim lTotalPolygonCount As Integer = lSf1.NumShapes * lLayer2Selected.Count
         Dim lPolygonCount As Integer = 0
         Dim lNumShapes As Integer = lSf1.NumShapes
+        If pStatusShow Then Logger.Status("Overlay of Layer '" & lLayer1.Name & "' with Layer '" & lLayer2.Name & "'")
         For i As Integer = 1 To lNumShapes 'loop through each shape of the land use layer
             lShape1 = lSf1.Shape(i - 1)
             Dim lSf1Ext As MapWinGIS.Extents = lShape1.Extents
@@ -2988,7 +2989,7 @@ Public Class GisUtil
 
             lSf1Ext = Nothing
             lShape1 = Nothing
-            If pStatusShow Then Logger.Progress("Overlay of Layer '" & lLayer1.Name & "' with Layer '" & lLayer2.Name & "'", lPolygonCount, lTotalPolygonCount)
+            If pStatusShow Then Logger.Progress(lPolygonCount, lTotalPolygonCount)
         Next i
         If pStatusShow Then Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
 
