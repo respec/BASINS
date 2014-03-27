@@ -10,21 +10,37 @@ Imports MapWinUtility
 
 Module RedoLanduseHSPF
 
+    ''General Specs
+    'Private pUCIName As String = "D:\BASINS41\modelout\02060006\02060006.uci"
+
+    ''Subbasin Specs
+    'Private pSubbasinLayerName As String = "D:\BASINS41\Predefined Delineations\West Branch\wb_subs.shp"   'name of layer as displayed on legend, or file name
+    'Private pSubbasinFieldName As String = "SUBBASIN"    'field containing unique integer identifier
+
+    ''Land Use Specs
+    'Private pLUType As Integer = 0   '(0 - USGS GIRAS Shape, 1 - NLCD grid, 2 - Other shape, 3 - Other grid)
+    'Private pLandUseClassFile As String = "D:\BASINS41\etc\giras.dbf"   'name of file that indicates classification scheme
+    ''                                                                    eg 21-25 = urban, 41-45 = cropland, etc
+    'Private pLandUseLayerName As String = ""   'name of land use layer as displayed on legend, or file name,
+    ''                                             does not need to be set for GIRAS land use type
+    'Private pLandUseFieldName As String = ""   'field containing land use classification code,
+    ''                                             only used for 'other shapefile' land use type
+
     'General Specs
-    Private pUCIName As String = "D:\BASINS41\modelout\02060006\02060006.uci"
+    Private pUCIName As String = "D:\Atkins-SARA\LanduseAdjustmentTool\UpperSAR_HSPF10_85test.uci"
 
     'Subbasin Specs
-    Private pSubbasinLayerName As String = "D:\BASINS41\Predefined Delineations\West Branch\wb_subs.shp"   'name of layer as displayed on legend, or file name
-    Private pSubbasinFieldName As String = "SUBBASIN"    'field containing unique integer identifier
+    Private pSubbasinLayerName As String = "D:\Atkins-SARA\LanduseAdjustmentTool\SAR_SubBasin_Project.shp"   'name of layer as displayed on legend, or file name
+    Private pSubbasinFieldName As String = "SubBasinID"    'field containing unique integer identifier
 
     'Land Use Specs
-    Private pLUType As Integer = 0   '(0 - USGS GIRAS Shape, 1 - NLCD grid, 2 - Other shape, 3 - Other grid)
-    Private pLandUseClassFile As String = "D:\BASINS41\etc\giras.dbf"   'name of file that indicates classification scheme
+    Private pLUType As Integer = 2   '(0 - USGS GIRAS Shape, 1 - NLCD grid, 2 - Other shape, 3 - Other grid)
+    Private pLandUseClassFile As String = "D:\Atkins-SARA\LanduseAdjustmentTool\reclass.dbf"   'name of file that indicates classification scheme
     '                                                                    eg 21-25 = urban, 41-45 = cropland, etc
-    Private pLandUseLayerName As String = ""   'name of land use layer as displayed on legend, or file name,
+    Private pLandUseLayerName As String = "D:\Atkins-SARA\LanduseAdjustmentTool\BexarFutureLandUseDFIRM_subset.shp"   'name of land use layer as displayed on legend, or file name,
     '                                             does not need to be set for GIRAS land use type
-    Private pLandUseFieldName As String = ""   'field containing land use classification code,
-    '                                             only used for 'other shapefile' land use type
+    Private pLandUseFieldName As String = "GRIDCODE"   'field containing land use classification code,
+    '                                                   only used for 'other shapefile' land use type
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("Start")
@@ -38,11 +54,6 @@ Module RedoLanduseHSPF
         'open this uci
         lHspfUci.FastReadUciForStarter(lMsg, pUCIName)
         lHspfUci.Msg = lMsg
-
-        '  for testing NLCD 2001
-        'pLUType = 1
-        'pLandUseClassFile = "C:\BASINS\etc\nlcd.dbf"
-        'pLandUseLayerName = "C:\BASINS\data\02060006-16\NLCD\nlcd_landcover_2001.tif"
 
         'add layers if not already on the map
         If Not GisUtil.IsLayerByFileName(pSubbasinLayerName) Then
@@ -172,7 +183,7 @@ Module RedoLanduseHSPF
         Dim lDistFactor As Double = 1.0
         If GisUtil.MapUnits.ToUpper = "FEET" Then
             lDistFactor = 3.2808
-            For Each lRec As LandUseSubbasinOverlayRecord In lLandUseSubbasinOverlayRecords
+            For Each lRec As Object In lLandUseSubbasinOverlayRecords
                 lRec.Area = lRec.Area / (lDistFactor * lDistFactor)
             Next
         End If
@@ -182,10 +193,11 @@ Module RedoLanduseHSPF
         'Create LandUses
         Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLandUseSubbasinOverlayRecords, Nothing)
         Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, lGridPervious, lLandUses)
+        AddZeroAreaLandUses(aUCI, lReclassifyLanduses) 'Add zero area records for land uses not found in overlay operation
 
         'update areas
         For Each lLandUse As LandUse In lReclassifyLanduses
-            Dim lDesc As String = lLandUse.Description
+            Dim lDesc As String = lLandUse.Description.ToUpper
             If lDesc.Length > 20 Then
                 lDesc = lDesc.Substring(0, 20)
             End If
@@ -225,7 +237,7 @@ Module RedoLanduseHSPF
                 If lConn.Typ = 3 Then 'schematic
                     If lConn.Target.Opn.Id = aTId And _
                        lConn.Target.Opn.Name = aTName And _
-                       lConn.Source.Opn.Description = aSDesc And _
+                       lConn.Source.Opn.Description.ToUpper = aSDesc And _
                        lConn.Source.Opn.Name = aSName Then
                         lAddIt = False
                         lConn.MFact = aMultFact
@@ -241,65 +253,73 @@ Module RedoLanduseHSPF
                 Dim lConn = New HspfConnection
                 Dim lOpnBlk As HspfOpnBlk = aUCI.OpnBlks(aSName)
                 Dim lSourceOpn As New HspfOperation  'figure out which opn this is adding 
+                Dim lMatchFound As Boolean = False
                 For Each lTempOpn As HspfOperation In lOpnBlk.Ids
-                    If lTempOpn.Description = aSDesc Then
+                    If lTempOpn.Description.ToUpper = aSDesc Then
                         lSourceOpn = lTempOpn
+                        lMatchFound = True
                         Exit For
                     End If
                 Next
-                lConn.Source.Opn = lSourceOpn
-                lConn.Source.volname = lSourceOpn.Name
-                lConn.Source.volid = lSourceOpn.Id
-                lConn.Typ = 3
-                lConn.MFact = aMultFact
-                lOpnBlk = aUCI.OpnBlks(aTName)
-                Dim lOpn As HspfOperation = lOpnBlk.OperFromID(aTId)
-                lConn.Target.Opn = lOpn
-                lConn.Target.volname = lOpn.Name
-                lConn.Target.volid = lOpn.Id
-                Dim lMLId As Integer = 0
-                GetMassLinkID(aUCI, aSName, aTName, lMLId)
-                If lMLId = 0 Then
-                    AddMassLink(aUCI, aSName, aTName, lMLId)
+                If Not lMatchFound Then
+                    Logger.Msg("Could not find a matching operation for '" & aSDesc & "'")
+                Else
+                    lConn.Source.Opn = lSourceOpn
+                    lConn.Source.volname = lSourceOpn.Name
+                    lConn.Source.volid = lSourceOpn.Id
+                    lConn.Typ = 3
+                    lConn.MFact = aMultFact
+                    lOpnBlk = aUCI.OpnBlks(aTName)
+                    Dim lOpn As HspfOperation = lOpnBlk.OperFromID(aTId)
+                    lConn.Target.Opn = lOpn
+                    lConn.Target.volname = lOpn.Name
+                    lConn.Target.volid = lOpn.Id
+                    Dim lMLId As Integer = 0
+                    GetMassLinkID(aUCI, aSName, aTName, lMLId)
+                    If lMLId = 0 Then
+                        AddMassLink(aUCI, aSName, aTName, lMLId)
+                    End If
+                    lConn.MassLink = lMLId
+                    lConn.Uci = aUCI
+                    'add targets to source opn
+                    lSourceOpn.Targets.Add(lConn)
+                    lConn.Source.Opn = lSourceOpn
+                    'add sources to target opn
+                    lOpnBlk = aUCI.OpnBlks(aTName)
+                    lOpn = lOpnBlk.OperFromID(aTId)
+                    lOpn.Sources.Add(lConn)
+                    lConn.Target.Opn = lOpn
+                    'add to collection of connections
+                    aUCI.Connections.Add(lConn)
                 End If
-                lConn.MassLink = lMLId
-                lConn.Uci = aUCI
-                'add targets to source opn
-                lSourceOpn.Targets.Add(lConn)
-                lConn.Source.Opn = lSourceOpn
-                'add sources to target opn
-                lOpnBlk = aUCI.OpnBlks(aTName)
-                lOpn = lOpnBlk.OperFromID(aTId)
-                lOpn.Sources.Add(lConn)
-                lConn.Target.Opn = lOpn
-                'add to collection of connections
-                aUCI.Connections.Add(lConn)
             ElseIf lDeleteIt Then 'need to delete the connection
                 aUCI.Connections.RemoveAt(lDeleteIndex)
                 'remove target from source opn
                 Dim lOpnBlk As HspfOpnBlk = aUCI.OpnBlks(aSName)
                 Dim lOpn As HspfOperation = lOpnBlk.OperFromID(lSId)
                 Dim lIndex As Integer = 1
-                For Each lConn As HspfConnection In lOpn.Targets
+                Do While lIndex < lOpn.Targets.Count
+                    Dim lConn As HspfConnection = lOpn.Targets(lIndex)
                     If lConn.Target.VolName = aTName And _
-                       lConn.Target.VolId = aTId Then
+                           lConn.Target.VolId = aTId Then
                         lOpn.Targets.RemoveAt(lIndex)
                     Else
                         lIndex = lIndex + 1
                     End If
-                Next
+                Loop
                 'remove source from target opn
                 lOpnBlk = aUCI.OpnBlks(aTName)
                 lOpn = lOpnBlk.OperFromID(aTId)
                 lIndex = 1
-                For Each lConn As HspfConnection In lOpn.Sources
+                Do While lIndex < lOpn.Sources.Count
+                    Dim lConn As HspfConnection = lOpn.Sources(lIndex)
                     If lConn.Source.VolName = aSName And _
                        lConn.Source.VolId = lSId Then
                         lOpn.Sources.RemoveAt(lIndex)
                     Else
                         lIndex = lIndex + 1
                     End If
-                Next
+                Loop
             End If
         End If
     End Sub
@@ -441,11 +461,38 @@ Module RedoLanduseHSPF
 
     End Sub
 
-    Friend Class LandUseSubbasinOverlayRecord
-        Friend LuCode As String          'land use code
-        Friend SubbasinId As String      'subbasin id 
-        Friend Area As Double            'area of this land use within this subbasin
-        Friend MeanElevation As Single   'mean elevation of this land use within this subbasin (used for snow)
-        Friend MeanLatitude As Single    'mean latitude of this land use within this subbasin  (used for snow)
-    End Class
+    Public Sub AddZeroAreaLandUses(ByVal aUci As HspfUci, _
+                                   ByRef aLandUses As LandUses)
+        For Each lPerOper As HspfOperation In aUci.OpnBlks("PERLND").Ids
+            For Each lRchOper As HspfOperation In aUci.OpnBlks("RCHRES").Ids
+                'is this combo in aLanduses?
+                Dim lFound As Boolean = False
+                For Each lLanduse As LandUse In aLandUses
+                    Dim lDesc As String = lLanduse.Description.ToUpper
+                    If lDesc.Length > 20 Then
+                        lDesc = lDesc.Substring(0, 20)
+                    End If
+                    If lDesc = lPerOper.Description.ToUpper And lLanduse.Reach.Id = lRchOper.Id Then
+                        lFound = True
+                    End If
+                Next
+                If Not lFound Then
+                    'this combo is not there, add it
+                    Dim lNewLanduse As New LandUse
+                    Dim lNewReach As New Reach
+                    With lNewLanduse
+                        .Description = lPerOper.Description
+                        .Area = 0.0
+                        .ImperviousFraction = 0.5
+                        .ModelID = 0
+                        .Reach = lNewReach
+                        .Reach.Id = lRchOper.Id
+                        .Type = "COMPOSITE"
+                    End With
+                    aLandUses.Add(lNewLanduse)
+                End If
+            Next
+        Next
+    End Sub
+
 End Module
