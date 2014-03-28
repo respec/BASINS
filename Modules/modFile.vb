@@ -41,22 +41,25 @@ Public Module modFile
     ''' <remarks>An exception will occur if either file cannot be read.</remarks>
     Public Function FilesMatch(ByVal aFilename1 As String, ByVal aFilename2 As String) As Boolean
         Dim lFileLength As Long = New IO.FileInfo(aFilename1).Length
-
         'If files are not the same size, they do not match
         If New IO.FileInfo(aFilename2).Length <> lFileLength Then Return False
 
-        Dim lBinaryReader1 As New IO.BinaryReader(New IO.FileStream(aFilename1, IO.FileMode.Open, IO.FileAccess.Read))
-        Dim lBinaryReader2 As New IO.BinaryReader(New IO.FileStream(aFilename2, IO.FileMode.Open, IO.FileAccess.Read))
-        For lIndex As Long = 1 To lFileLength
-            If lBinaryReader1.ReadByte <> lBinaryReader2.ReadByte Then
-                Return False
-            End If
-        Next
-        lBinaryReader1.Close()
-        lBinaryReader2.Close()
-        Return True 'Reached the end and found no mismatches
+        Dim lBinaryReader1 As IO.BinaryReader = Nothing
+        Dim lBinaryReader2 As IO.BinaryReader = Nothing
+        Try
+            lBinaryReader1 = New IO.BinaryReader(New IO.FileStream(aFilename1, IO.FileMode.Open, IO.FileAccess.Read))
+            lBinaryReader2 = New IO.BinaryReader(New IO.FileStream(aFilename2, IO.FileMode.Open, IO.FileAccess.Read))
+            For lIndex As Long = 1 To lFileLength
+                If lBinaryReader1.ReadByte <> lBinaryReader2.ReadByte Then
+                    Return False
+                End If
+            Next
+            Return True 'Reached the end and found no mismatches
+        Finally
+            If lBinaryReader1 IsNot Nothing Then lBinaryReader1.Close()
+            If lBinaryReader2 IsNot Nothing Then lBinaryReader2.Close()
+        End Try
     End Function
-
 
     ''' <summary>
     ''' Compare two files and return True if contents are identical.
