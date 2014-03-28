@@ -240,6 +240,7 @@ Public Module modDownload
                 Dim lFieldName As String = ""
                 Dim lField As Integer
                 Dim lFieldMatch As Integer = -1
+                Dim lHUC8s As String = ""
                 Dim lCurLayer As MapWinGIS.Shapefile
                 lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
 
@@ -250,9 +251,11 @@ Public Module modDownload
                     Case "cnty"
                         lThemeTag = "county_cd"
                         lFieldName = "FIPS"
+                        lHUC8s = CountyStateToHuc("cnty")
                     Case "st"
                         lThemeTag = "state_abbrev"
                         lFieldName = "ST"
+                        lHUC8s = CountyStateToHuc("st")
                 End Select
 
                 lFieldName = lFieldName.ToLower
@@ -276,6 +279,9 @@ Public Module modDownload
                         lXML &= "  <" & lThemeTag & " status=""set by " & XMLappName & """>" & lCurLayer.CellValue(lFieldMatch, lShapeIndex) & "</" & lThemeTag & ">" & vbCrLf
                     Next
                 End If
+                If lHUC8s.Length > 0 AndAlso Not lHUC8s.StartsWith("Error") Then
+                    lXML &= lHUC8s
+                End If
                 If lXML.Length > 0 Then
                     Return "<region>" & vbCrLf & lXML & "</region>" & vbCrLf
                 End If
@@ -286,6 +292,92 @@ Public Module modDownload
         Return ""
     End Function
 
+    Private Function CountyStateToHuc(ByVal aLayerName As String) As String
+        If g_MapWin Is Nothing Then Return ""
+        If g_MapWin.Layers Is Nothing OrElse g_MapWin.Layers.NumLayers = 0 Then Return ""
+        Dim lHUC8sf As MapWinGIS.Shapefile = Nothing
+        Dim lCntysf As MapWinGIS.Shapefile = Nothing
+        Dim lStsf As MapWinGIS.Shapefile = Nothing
+        Dim lHUC8Tag As String = "HUC8"
+        Dim lHUC8Tag1 As String = "status=""set by BASINS System Application"""
+
+        For Each lLayer As MapWindow.Interfaces.Layer In g_MapWin.Layers
+            Select Case IO.Path.GetFileNameWithoutExtension(lLayer.FileName).ToLower
+                Case "cat", "huc", "huc250d3"
+                    If lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+                        lHUC8sf = lLayer.GetObject
+                    Else
+                        Return "Error: missing HUC8 layer"
+                    End If
+                Case "cnty"
+                    If aLayerName.ToLower() = "cnty" Then
+                        If lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+                            lCntysf = lLayer.GetObject
+                        Else
+                            Return "Error: missing county layer"
+                        End If
+                    End If
+                Case "st"
+                    If aLayerName.ToLower() = "st" Then
+                        If lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+                            lStsf = lLayer.GetObject
+                        Else
+                            Return "Error: missing State layer"
+                        End If
+                    End If
+            End Select
+        Next
+
+        Dim lHUC8Indics As Object = Nothing
+        Dim lHUC8XML As String = ""
+        If lHUC8sf IsNot Nothing Then
+            Dim lFieldMatch As Integer = -99
+            For lField As Integer = 0 To lHUC8sf.NumFields - 1
+                If lHUC8sf.Field(lField).Name.ToLower = "cu" Then
+                    lFieldMatch = lField
+                    Exit For
+                End If
+            Next
+            If aLayerName.ToLower = "cnty" Then
+                If lCntysf IsNot Nothing Then
+                    If lHUC8sf.SelectByShapefile(lCntysf, tkSpatialRelation.srIntersects, True, lHUC8Indics) Then
+                        If lFieldMatch >= 0 Then
+                            For Each lShapeIndex As Integer In lHUC8Indics
+                                lHUC8XML &= "<" & lHUC8Tag & " " & lHUC8Tag1 & ">" & lHUC8sf.CellValue(lFieldMatch, lShapeIndex) & "</" & lHUC8Tag & ">" & vbCrLf
+                            Next
+                        Else
+                            lHUC8XML = "Error: county layer missing 'fips' code column"
+                        End If
+                    Else
+                        lHUC8XML = "None"
+                    End If
+                Else
+                    lHUC8XML = "Error: missing county layer."
+                End If
+            ElseIf aLayerName.ToLower = "st" Then
+                If lStsf IsNot Nothing Then
+                    If lFieldMatch >= 0 Then
+                        If lHUC8sf.SelectByShapefile(lStsf, tkSpatialRelation.srIntersects, True, lHUC8Indics) Then
+                            For Each lShapeIndex As Integer In lHUC8Indics
+                                lHUC8XML &= "<" & lHUC8Tag & " " & lHUC8Tag1 & ">" & lHUC8sf.CellValue(lFieldMatch, lShapeIndex) & "</" & lHUC8Tag & ">" & vbCrLf
+                            Next
+                        Else
+                            lHUC8XML = "None"
+                        End If
+                    Else
+                        lHUC8XML = "Error: state layer missing 'st' code column"
+                    End If
+                Else
+                    lHUC8XML = "Error: missing state layer."
+                End If
+            End If
+        Else
+            lHUC8XML = "Error: missing HUC8 layer"
+        End If
+
+        Return lHUC8XML
+
+    End Function
 
     Private Sub CopyFeaturesWithinExtent(ByVal aOldFolder As String, ByVal aNewFolder As String)
         'copy features that are within selected indexes of selected layer to new folder
@@ -413,6 +505,8 @@ Public Module modDownload
         Dim lNoData As Boolean = False
         Dim lDefDirName As String = "NewProject"
         Dim lMyProjection As String
+        Dim lCountyCodes As String = ""
+        Dim lStateCodes As String = ""
 
 StartOver:
         lDataPath = DefaultBasinsDataDir()
@@ -430,6 +524,10 @@ StartOver:
                             Case "westbc", "left"
                             Case "eastbc", "right"
                             Case "projection", "boxprojection"
+                            Case "county_cd"
+                                lCountyCodes &= lChild.InnerText & "_"
+                            Case "state_abbrev"
+                                lStateCodes &= lChild.InnerText & "_"
                             Case Else
                                 If lDefDirName = "NewProject" Then
                                     lDefDirName = lChild.InnerText
@@ -452,7 +550,13 @@ StartOver:
                 End If
             End If
         End If
-
+        If lCountyCodes.Length > 0 Then
+            Dim lFirstCountyCd As String = lCountyCodes.Substring(0, lCountyCodes.IndexOf("_"))
+            lDefDirName = lFirstCountyCd & "_" & lDefDirName
+        ElseIf lStateCodes.Length > 0 Then
+            Dim lFirstState As String = lStateCodes.Substring(0, lStateCodes.IndexOf("_"))
+            lDefDirName = lFirstState & "_" & lDefDirName
+        End If
         lDefaultProjectFileName = CreateDefaultNewProjectFileName(lDataPath, lDefDirName)
         lDefDirName = PathNameOnly(lDefaultProjectFileName)
         Logger.Dbg("CreateNewProjectDirectory:" & lDefDirName)

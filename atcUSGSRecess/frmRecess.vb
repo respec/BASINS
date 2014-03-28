@@ -1987,13 +1987,13 @@ Public Class frmRecess
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Recess Analysis", pDataGroup)
+        pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", pDataGroup)
         If pDataGroup.Count > 0 Then
             If ConfigurationChanged() Then
                 Me.Initialize(pDataGroup, pBasicAttributes, True)
             End If
         Else
-            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Recess Analysis")
+            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS RECESS Analysis")
         End If
     End Sub
 

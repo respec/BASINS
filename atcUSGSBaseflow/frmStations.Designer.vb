@@ -114,7 +114,7 @@ Partial Class frmStations
         Me.Controls.Add(Me.txtHeader)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmStations"
-        Me.Text = "USGS Baseflow Separation Stations"
+        Me.Text = "USGS Base-Flow Separation Stations"
         CType(Me.dgvStationEntries, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()

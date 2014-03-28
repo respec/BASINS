@@ -11,7 +11,7 @@ Public Class clsUSGSBaseflowPlugin
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::USGS Baseflow Separation"
+            Return "Analysis::USGS Base-Flow Separation"
         End Get
     End Property
 
@@ -28,14 +28,14 @@ Public Class clsUSGSBaseflowPlugin
         Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
         If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup
         If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
-            lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Baseflow Separation", lTimeseriesGroup)
+            lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lTimeseriesGroup)
         End If
         If lTimeseriesGroup.Count > 0 Then
             Dim lForm As New frmUSGSBaseflow
             ShowForm(lTimeseriesGroup, lForm)
             Return lForm
         Else
-            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Baseflow Separation")
+            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Base-Flow Separation")
         End If
     End Function
 

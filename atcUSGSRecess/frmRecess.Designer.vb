@@ -394,7 +394,7 @@ Partial Class frmRecess
         Me.btnAnalyse.Name = "btnAnalyse"
         Me.btnAnalyse.Size = New System.Drawing.Size(75, 23)
         Me.btnAnalyse.TabIndex = 17
-        Me.btnAnalyse.Text = "Analyse"
+        Me.btnAnalyse.Text = "Analyze"
         Me.btnAnalyse.UseVisualStyleBackColor = True
         '
         'btnGetAllSegments

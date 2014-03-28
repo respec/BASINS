@@ -54,6 +54,12 @@ Module modMain
                 While Len(curFilename) > 0
                     If curFilename = "dump" Then
                         dumpFlag = True
+                    ElseIf curFilename.StartsWith("+proj") Then
+                        If Len(projectionDest) = 0 Then
+                            projectionDest = curFilename
+                        Else
+                            projectionSource = curFilename
+                        End If
                     Else
                         If Not IO.File.Exists(curFilename) Then
                             TryShapePointsFromDBF(FilenameNoExt(curFilename) & ".dbf")
@@ -87,7 +93,7 @@ Module modMain
                         'frmShapeUtil.lblStatus.Caption = "Merging into " & newBaseFilename
                         ShapeMerge(GetKeyField(IO.Path.GetFileNameWithoutExtension(newBaseFilename)), newBaseFilename, shpFileNames)
                     ElseIf Len(projectionDest) > 0 Then
-                        shpFileNames(0) = newBaseFilename
+                        shpFileNames.Add(newBaseFilename)
                         'frmShapeUtil.lblStatus.Caption = "Projecting..."
                         ShapeProject(projectionDest, projectionSource, shpFileNames)
                     Else

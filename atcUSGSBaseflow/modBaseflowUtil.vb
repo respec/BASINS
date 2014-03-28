@@ -620,18 +620,33 @@ Module modBaseflowUtil
                 If aTsGroupPart.Count > 0 Then
                     lBF = aTsGroupPart.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupPart.ItemByKey("Depth" & ATStep).Value(I)
-                    lRO = lTsFlow.Value(I) - lBF
-                    lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                    If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
-                        lBFPct = lBF / lTsFlow.Value(I) * 100
+                    If lBF < 0 OrElse lBFDepth < 0 Then
+                        lBF = -99 : lBFDepth = -99
+                        lRO = -99 : lRODepth = -99
+                        lBFPct = -99
                     Else
-                        lBFPct = 0.0
+                        lRO = lTsFlow.Value(I) - lBF
+                        lRODepth = lTsFlowDepth.Value(I) - lBFDepth
+                        If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
+                            lBFPct = lBF / lTsFlow.Value(I) * 100
+                        Else
+                            lBFPct = 0.0
+                        End If
                     End If
-                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
-                    .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                    .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
-                    .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    If ATStep = "Monthly" AndAlso (lBF < 0 OrElse lBFDepth < 0) Then
+                        'For incomplete monthly timesteps, simply put up blank cells
+                        .Value(lLastColumn + 1) = ""
+                        .Value(lLastColumn + 2) = ""
+                        .Value(lLastColumn + 3) = ""
+                        .Value(lLastColumn + 4) = ""
+                        .Value(lLastColumn + 5) = ""
+                    Else
+                        .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
+                        .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
+                        .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
+                        .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
+                        .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    End If
                     lLastColumn += 5
                 End If
                 If aTsGroupFixed.Count > 0 Then
@@ -689,6 +704,7 @@ Module modBaseflowUtil
                     lBF = aTsGroupBFIStandard.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupBFIStandard.ItemByKey("Depth" & ATStep).Value(I)
                     If lBF < 0 OrElse lBFDepth < 0 Then
+                        'For record from incomplete timestep, simply put up blank cells
                         lBF = -99 : lBFDepth = -99
                         lRO = -99 : lRODepth = -99
                         lBFPct = -99
@@ -700,13 +716,22 @@ Module modBaseflowUtil
                         Else
                             lBFPct = 0
                         End If
+                        
                     End If
-
-                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
-                    .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                    .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
-                    .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    If ATStep = "Monthly" AndAlso (lBF < 0 OrElse lBFDepth < 0) Then
+                        'For incomplete Monthly timestep, simply put up blank cells
+                        .Value(lLastColumn + 1) = ""
+                        .Value(lLastColumn + 2) = ""
+                        .Value(lLastColumn + 3) = ""
+                        .Value(lLastColumn + 4) = ""
+                        .Value(lLastColumn + 5) = ""
+                    Else
+                        .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
+                        .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
+                        .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
+                        .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
+                        .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    End If
                     lLastColumn += 5 'second to last column to have this jump
                 End If
                 If aTsGroupBFIModified.Count > 0 Then
@@ -725,11 +750,20 @@ Module modBaseflowUtil
                             lBFPct = 0
                         End If
                     End If
-                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
-                    .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                    .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
-                    .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    If ATStep = "Monthly" AndAlso (lBF < 0 OrElse lBFDepth < 0) Then
+                        'For incomplete Monthly timestep, simply put up blank cells
+                        .Value(lLastColumn + 1) = ""
+                        .Value(lLastColumn + 2) = ""
+                        .Value(lLastColumn + 3) = ""
+                        .Value(lLastColumn + 4) = ""
+                        .Value(lLastColumn + 5) = ""
+                    Else
+                        .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
+                        .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
+                        .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
+                        .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
+                        .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    End If
                 End If
                 .CurrentRecord += 1
             End With
