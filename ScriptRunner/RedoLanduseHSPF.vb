@@ -7,6 +7,7 @@ Imports atcModelSetup
 Imports atcUCI
 Imports MapWindow.Interfaces
 Imports MapWinUtility
+Imports System.Text
 
 Module RedoLanduseHSPF
 
@@ -37,7 +38,7 @@ Module RedoLanduseHSPF
     Private pLUType As Integer = 2   '(0 - USGS GIRAS Shape, 1 - NLCD grid, 2 - Other shape, 3 - Other grid)
     Private pLandUseClassFile As String = "D:\Atkins-SARA\LanduseAdjustmentTool\reclass.dbf"   'name of file that indicates classification scheme
     '                                                                    eg 21-25 = urban, 41-45 = cropland, etc
-    Private pLandUseLayerName As String = "D:\Atkins-SARA\LanduseAdjustmentTool\BexarFutureLandUseDFIRM_subset.shp"   'name of land use layer as displayed on legend, or file name,
+    Private pLandUseLayerName As String = "D:\Atkins-SARA\LanduseAdjustmentTool\BexarFutureLandUseDFIRM.shp"   'name of land use layer as displayed on legend, or file name,
     '                                             does not need to be set for GIRAS land use type
     Private pLandUseFieldName As String = "GRIDCODE"   'field containing land use classification code,
     '                                                   only used for 'other shapefile' land use type
@@ -195,6 +196,9 @@ Module RedoLanduseHSPF
         Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, lGridPervious, lLandUses)
         AddZeroAreaLandUses(aUCI, lReclassifyLanduses) 'Add zero area records for land uses not found in overlay operation
 
+        'do some checking to make sure no area added or lost
+        Dim lAreaBefore As Double = GetContributingArea(aUCI, "30")
+
         'update areas
         For Each lLandUse As LandUse In lReclassifyLanduses
             Dim lDesc As String = lLandUse.Description.ToUpper
@@ -204,24 +208,25 @@ Module RedoLanduseHSPF
             'update corresponding record in uci, add or delete if needed
             'pervious
             Dim lArea As Double = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 4046.8564
-            PutSchematicRecord(aUCI, "PERLND", lDesc, "RCHRES", lLandUse.Reach.Id, lArea)
+            UpdateSchematicRecord(aUCI, "PERLND", lDesc, "RCHRES", lLandUse.Reach.Id, lArea)
             'impervious
             lArea = lLandUse.Area * (lLandUse.ImperviousFraction) / 4046.8564
-            PutSchematicRecord(aUCI, "IMPLND", lDesc, "RCHRES", lLandUse.Reach.Id, lArea)
+            UpdateSchematicRecord(aUCI, "IMPLND", lDesc, "RCHRES", lLandUse.Reach.Id, lArea)
         Next lLandUse
 
         'do some checking to make sure no area added or lost
+        Dim lAreaAfter As Double = GetContributingArea(aUCI, "30")
 
-        'save uci file
-        aUCI.Name = aUCI.Name & "new"
-        aUCI.Save()
+        'save uci with new schematic block -- don't change other stuff
+        Dim lSchem As String = aUCI.Connections.Item(0).SchematicToString()
+        RewriteUCIWithChangedSchematic(aUCI.Name, lSchem, aUCI.Name & "new")
 
         Logger.Status("")
         Return True
     End Function
 
-    Private Sub PutSchematicRecord(ByVal aUCI As HspfUci, ByVal aSName As String, ByVal aSDesc As String, _
-                                   ByVal aTName As String, ByVal aTId As Integer, ByVal aMultFact As Double)
+    Private Sub UpdateSchematicRecord(ByVal aUCI As HspfUci, ByVal aSName As String, ByVal aSDesc As String, _
+                                      ByVal aTName As String, ByVal aTId As Integer, ByVal aMultFact As Double)
 
         Dim lSId As Integer = 0
         If aSName = "RCHRES" And aTName = "BMPRAC" Then 'dont do rchres to bmp connections
@@ -232,6 +237,8 @@ Module RedoLanduseHSPF
             Dim lAddIt As Boolean = True
             Dim lDeleteIt As Boolean = False
             Dim lDeleteIndex As Integer = 0
+            Dim lFirstDigit As String = ""
+            Dim lDefaultML As Integer = 0
             For lIndex As Integer = 0 To aUCI.Connections.Count - 1
                 Dim lConn As HspfConnection = aUCI.Connections(lIndex)
                 If lConn.Typ = 3 Then 'schematic
@@ -247,6 +254,13 @@ Module RedoLanduseHSPF
                             lSId = lConn.Source.Opn.Id
                         End If
                     End If
+                    If lConn.Target.Opn.Id = aTId And _
+                       lConn.Target.Opn.Name = aTName And _
+                       lConn.Source.Opn.Name = aSName Then
+                        'there's some useful info to save here, the first digit and the ml id
+                        lFirstDigit = lConn.Source.Opn.Id.ToString.Substring(0, 1)
+                        lDefaultML = lConn.MassLink
+                    End If
                 End If
             Next lIndex
             If lAddIt And Math.Abs(aMultFact) > 0.00000001 Then 'need to add the connection
@@ -256,9 +270,11 @@ Module RedoLanduseHSPF
                 Dim lMatchFound As Boolean = False
                 For Each lTempOpn As HspfOperation In lOpnBlk.Ids
                     If lTempOpn.Description.ToUpper = aSDesc Then
-                        lSourceOpn = lTempOpn
-                        lMatchFound = True
-                        Exit For
+                        If lTempOpn.Id.ToString.Substring(0, 1) = lFirstDigit Then
+                            'lets assume this is the right model segment
+                            lSourceOpn = lTempOpn
+                            lMatchFound = True
+                        End If
                     End If
                 Next
                 If Not lMatchFound Then
@@ -275,7 +291,11 @@ Module RedoLanduseHSPF
                     lConn.Target.volname = lOpn.Name
                     lConn.Target.volid = lOpn.Id
                     Dim lMLId As Integer = 0
-                    GetMassLinkID(aUCI, aSName, aTName, lMLId)
+                    If lDefaultML > 0 Then
+                        lMLId = lDefaultML
+                    Else
+                        GetMassLinkID(aUCI, aSName, aTName, lMLId)
+                    End If
                     If lMLId = 0 Then
                         AddMassLink(aUCI, aSName, aTName, lMLId)
                     End If
@@ -493,6 +513,51 @@ Module RedoLanduseHSPF
                 End If
             Next
         Next
+    End Sub
+
+    Private Function GetContributingArea(ByVal aUCI As HspfUci, ByVal aRchId As Integer) As Double
+        'return area contributing to this rchres
+        Dim lArea As Double = 0.0
+        Dim lOpnBlk As HspfOpnBlk = aUCI.OpnBlks("RCHRES")
+        Dim lOper As HspfOperation = lOpnBlk.OperFromID(aRchId)
+
+        If Not lOper Is Nothing Then
+            'loop through all connections looking for this oper as target
+            For Each lConn As HspfConnection In aUCI.Connections
+                If lConn.Typ = 3 Then 'schematic
+                    If Not lConn.Target.Opn Is Nothing Then
+                        If lConn.Target.Opn.Id = lOper.Id And _
+                           lConn.Target.Opn.Name = lOper.Name Then
+                            'found a source to this rchres
+                            If lConn.Source.VolName = "PERLND" Or lConn.Source.VolName = "IMPLND" Then
+                                lArea += lConn.MFact
+                            End If
+                        End If
+                    End If
+                End If
+            Next
+        End If
+        Return lArea
+    End Function
+
+    Public Sub RewriteUCIWithChangedSchematic(ByVal aOldFileName As String, ByVal aSchematic As String, ByVal aNewFileName As String)
+        Dim lSB As New StringBuilder
+
+        Dim lInSchematic As Boolean = False
+        For Each lCurrentRecord As String In LinesInFile(aOldFileName)
+            If lCurrentRecord.Trim = "SCHEMATIC" Then
+                lInSchematic = True
+                lSB.Append(aSchematic)
+            End If
+            If Not lInSchematic Then
+                lSB.AppendLine(lCurrentRecord)
+            End If
+            If lCurrentRecord.Trim = "END SCHEMATIC" Then
+                lInSchematic = False
+            End If
+        Next
+
+        IO.File.WriteAllText(aNewFileName, lSB.ToString)
     End Sub
 
 End Module

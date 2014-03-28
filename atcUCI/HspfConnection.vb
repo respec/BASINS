@@ -702,4 +702,80 @@ Public Class HspfConnection
         Next lTypeIndex
         Return lSB.ToString
     End Function
+
+    Public Function SchematicToString() As String
+        'schematic only 
+        Dim lSB As New System.Text.StringBuilder
+        Dim lTypeIndex As Integer = 3
+        Dim lBlockName As String = "SCHEMATIC"
+        Dim lBlockDef As HspfBlockDef = Uci.Msg.BlockDefs.Item(lBlockName)
+        Dim lTableDef As HspfTableDef = lBlockDef.TableDefs.Item(0)
+        'get lengths and starting positions
+        Dim lParmDefIndex As Integer = 0
+        Dim lColumn(15) As Integer
+        Dim lLength(15) As Integer
+        For Each lParmDef As HSPFParmDef In lTableDef.ParmDefs
+            lColumn(lParmDefIndex) = lParmDef.StartCol
+            lLength(lParmDefIndex) = lParmDef.Length
+            lParmDefIndex += 1
+        Next lParmDef
+        lSB.AppendLine(lBlockName)
+        'now start building the records
+        Dim lHeaderPending As Boolean = True
+        For Each lOperation As HspfOperation In Uci.OpnSeqBlock.Opns
+            For Each lConnection As HspfConnection In lOperation.Sources
+                If lConnection.Typ = lTypeIndex Then
+                    If Not lConnection.Comment Is Nothing AndAlso lConnection.Comment.Length > 0 Then
+                        lSB.AppendLine(lConnection.Comment)
+                    ElseIf lHeaderPending Then
+                        lSB.AppendLine("<-Volume->                  <--Area-->     <-Volume->  <ML#> ***       <sb>")
+                        lSB.AppendLine("<Name>   x                  <-factor->     <Name>   x        ***        x x")
+                    End If
+                    lHeaderPending = False
+                    If lConnection.Source.Opn Is Nothing OrElse lConnection.Target.Opn Is Nothing Then
+                        Logger.Dbg("SchematicProblem" & _
+                                   lConnection.Source.VolName & ":" & lConnection.Source.VolId & " to " & _
+                                   lConnection.Target.VolName & ":" & lConnection.Target.VolId)
+                    Else
+                        Dim lStr As New System.Text.StringBuilder
+                        lStr.Append(lConnection.Source.Opn.Name.Trim)
+                        lStr.Append(Space(lColumn(1) - lStr.Length - 1)) 'pad prev field
+                        lStr.Append(CStr(lConnection.Source.Opn.Id).PadLeft(lLength(1)))
+                        lStr.Append(Space(lColumn(2) - lStr.Length - 1))
+                        If NumericallyTheSame((lConnection.MFactAsRead), (lConnection.MFact)) Then
+                            lStr.Append(lConnection.MFactAsRead)
+                        ElseIf lConnection.MFact <> 1 Then
+                            lConnection.MFact = System.Math.Round(lConnection.MFact, 2)
+                            lStr.Append(CStr(lConnection.MFact).PadLeft(lLength(2)))
+                        End If
+                        lStr.Append(Space(lColumn(3) - lStr.Length - 1))
+                        lStr.Append(lConnection.Target.Opn.Name)
+                        lStr.Append(Space(lColumn(4) - lStr.Length - 1))
+                        lStr.Append(CStr(lConnection.Target.Opn.Id).PadLeft(lLength(5)))
+                        lStr.Append(Space(lColumn(5) - lStr.Length - 1))
+                        lStr.Append(CStr(lConnection.MassLink).PadLeft(lLength(5)))
+                        If lConnection.Target.MemSub1 > 0 Then
+                            lStr.Append(Space(lColumn(6) - lStr.Length - 1))
+                            Dim t As String = CStr(lConnection.Target.MemSub1).PadLeft(lLength(6))
+                            If lConnection.Target.VolName = "RCHRES" Then
+                                t = Uci.IntAsCat(lConnection.Target.Member, 1, t)
+                            End If
+                            lStr.Append(t)
+                        End If
+                        If lConnection.Target.MemSub2 > 0 Then
+                            lStr.Append(Space(lColumn(7) - lStr.Length - 1))
+                            Dim t As String = CStr(lConnection.Target.MemSub2).PadLeft(lLength(7))
+                            If lConnection.Target.VolName = "RCHRES" Then
+                                t = Uci.IntAsCat(lConnection.Target.Member, 2, t)
+                            End If
+                            lStr.Append(t)
+                        End If
+                        lSB.AppendLine(lStr.ToString)
+                    End If
+                End If
+            Next lConnection
+        Next lOperation
+        lSB.AppendLine("END " & lBlockName)
+        Return lSB.ToString
+    End Function
 End Class
