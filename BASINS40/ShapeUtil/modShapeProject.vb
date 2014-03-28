@@ -18,110 +18,111 @@ Module modShapeProject
 	Private ConvertToRadians As Boolean
 	
     Public Sub ShapeProject(ByRef projectionDest As String, ByRef projectionSource As String, ByRef shpFileNames As ArrayList)
-        Dim lFilename As String
+        Dim lFilename As String = ""
         Dim shpIn As New CShape_IO
         Dim shpOut As New CShape_IO
         Dim curBaseName As String
         Dim curShpName As String
         Dim projCmdLine As String
-        Dim findPos As Integer
         Dim tmpSHPname As String
         Dim tmpSHXname As String
 
-        On Error GoTo ErrHand
-
-        projCmdLine = projInitFromFile(projectionDest)
-        Logger.Dbg("projectionDest = " & projCmdLine)
-        If InStr(projCmdLine, "proj=dd ") > 0 Or InStr(projCmdLine, "proj=latlong ") > 0 Then
-            Logger.Dbg("not projecting because destination is decimal degrees")
-            Exit Sub
-        End If
-
-        DestPrj = pj_init_plus(projCmdLine)
-        If DestPrj = 0 Then
-            Logger.Msg("Could not initialize proj.dll, aborting projection" & vbCr & projCmdLine, "ShapeProject")
-            Exit Sub
-        End If
-
-        projCmdLine = projInitFromFile(projectionSource)
-
-        If InStr(projCmdLine, "proj=dd ") > 0 Then
-            ConvertToRadians = True
-            projCmdLine = projCmdLine.Replace("proj=dd ", "proj=latlong ")
-        End If
-        Logger.Dbg("projectionSource = " & projCmdLine)
-
-        SrcPrj = pj_init_plus(projCmdLine)
-        If SrcPrj = 0 Then
-            Logger.Msg("Could not initialize proj.dll for output:" & vbCrLf & projCmdLine & vbCrLf & "aborting projection", "ShapeProject")
-            Exit Sub
-        End If
-
-        For Each lFilename In shpFileNames
-            curBaseName = FilenameNoExt(lFilename)
-            curShpName = curBaseName & ".shp"
-            If Len(curBaseName) = 0 Then
-                'skip empty filename
-            ElseIf Not shpIn.ShapeFileOpen(curShpName, CShape_IO.READWRITEFLAG.Readwrite) Then
-                Logger.Dbg("ShapeProject Could not open '" & curShpName & "'")
-            Else
-                Logger.Dbg("ShapeProject Converting " & shpIn.getRecordCount & " shapes in " & curShpName)
-                tmpSHPname = IO.Path.GetDirectoryName(curShpName) & "\projtemp.shp"
-                tmpSHXname = FilenameNoExt(tmpSHPname) & ".shx"
-                If IO.File.Exists(tmpSHPname) Then Kill(tmpSHPname)
-                If IO.File.Exists(tmpSHXname) Then Kill(tmpSHXname)
-                shpOut.CreateNewShape(tmpSHPname, shpIn.getShapeHeader.ShapeType)
-
-                Select Case shpIn.getShapeHeader.ShapeType
-                    Case CShape_IO.FILETYPEENUM.typePoint : ProjectPoints(shpIn, shpOut)
-                        'TODO: typePointZ, typePointM
-                    Case CShape_IO.FILETYPEENUM.typePolyline, CShape_IO.FILETYPEENUM.typePolygon, CShape_IO.FILETYPEENUM.typeMultipoint, CShape_IO.FILETYPEENUM.typePolyLineZ, CShape_IO.FILETYPEENUM.typePolygonZ, CShape_IO.FILETYPEENUM.typeMultiPointZ, CShape_IO.FILETYPEENUM.typePolyLineM, CShape_IO.FILETYPEENUM.typePolygonM, CShape_IO.FILETYPEENUM.typeMultiPointM, CShape_IO.FILETYPEENUM.typeMultiPatch
-                        ProjectPolys(shpIn, shpOut)
-                    Case Else
-                        Logger.Msg("Unsupported shape type " & shpIn.getShapeHeader.ShapeType, "ShapeProject")
-                        Exit Sub
-                End Select
-                shpIn.FileShutDown()
-                shpOut.FileShutDown()
-                shpIn = Nothing
-                shpOut = Nothing
-                Kill(curShpName)
-                Rename(tmpSHPname, curShpName)
-                Kill(curBaseName & ".shx")
-                Rename(tmpSHXname, curBaseName & ".shx")
-                Logger.Dbg("ShapeProject Finished with " & curShpName)
+        Try
+            projCmdLine = projInitFromFile(projectionDest)
+            'Logger.Dbg("projectionDest = " & projCmdLine)
+            If InStr(projCmdLine, "proj=dd ") > 0 Or InStr(projCmdLine, "proj=latlong ") > 0 Then
+                Logger.Dbg("not projecting because destination is decimal degrees")
+                Exit Sub
             End If
-        Next
 
-        pj_free(SrcPrj)
-        pj_free(DestPrj)
+            DestPrj = pj_init_plus(projCmdLine)
+            If DestPrj = 0 Then
+                Logger.Msg("Could not initialize proj.dll, aborting projection" & vbCr & projCmdLine, "ShapeProject")
+                Exit Sub
+            End If
 
-        Exit Sub
+            projCmdLine = projInitFromFile(projectionSource)
 
-ErrHand:
-        If Err.Description = "latitude or longitude exceeded limits" Then
-            Logger.Msg("Could not project '" & lfilename & "'" & vbCr & "Probably it was already projected", "ShapeUtil Projection")
-        Else
-            Logger.Msg(Err.Description & " (" & Err.Source & ", #" & Err.Number & ")", "ShapeUtil Projection")
-        End If
-        If SrcPrj <> 0 Then pj_free(SrcPrj)
-        If DestPrj <> 0 Then pj_free(DestPrj)
-        If Not shpIn Is Nothing Then
-            shpIn.FileShutDown()
-            shpIn = Nothing
-        End If
-        If Not shpOut Is Nothing Then
-            shpOut.FileShutDown()
-            shpOut = Nothing
-        End If
-        If IO.File.Exists(tmpSHPname) Then Kill(tmpSHPname)
-        If IO.File.Exists(tmpSHXname) Then Kill(tmpSHXname)
+            If InStr(projCmdLine, "proj=dd ") > 0 Then
+                ConvertToRadians = True
+                projCmdLine = projCmdLine.Replace("proj=dd ", "proj=latlong ")
+            End If
+            'Logger.Dbg("projectionSource = " & projCmdLine)
+
+            SrcPrj = pj_init_plus(projCmdLine)
+            If SrcPrj = 0 Then
+                Logger.Msg("Could not initialize proj.dll for output:" & vbCrLf & projCmdLine & vbCrLf & "aborting projection", "ShapeProject")
+                Exit Sub
+            End If
+
+            For Each lFilename In shpFileNames
+                curBaseName = FilenameNoExt(lFilename)
+                curShpName = curBaseName & ".shp"
+                If Len(curBaseName) = 0 Then
+                    'skip empty filename
+                ElseIf Not shpIn.ShapeFileOpen(curShpName, CShape_IO.READWRITEFLAG.Readwrite) Then
+                    Logger.Msg("ShapeProject Could not open '" & curShpName & "'", "ShapeUtil")
+                Else
+                    'Logger.Dbg("ShapeProject Converting " & shpIn.getRecordCount & " shapes in " & curShpName)
+                    tmpSHPname = atcUtility.GetTemporaryFileName("projtemp", "shp") ' IO.Path.GetDirectoryName(curShpName) & "\projtemp.shp"
+                    tmpSHXname = FilenameNoExt(tmpSHPname) & ".shx"
+                    'If IO.File.Exists(tmpSHPname) Then Kill(tmpSHPname)
+                    'If IO.File.Exists(tmpSHXname) Then Kill(tmpSHXname)
+                    shpOut.CreateNewShape(tmpSHPname, shpIn.getShapeHeader.ShapeType)
+
+                    Select Case shpIn.getShapeHeader.ShapeType
+                        Case CShape_IO.FILETYPEENUM.typePoint : ProjectPoints(shpIn, shpOut)
+                            'TODO: typePointZ, typePointM
+                        Case CShape_IO.FILETYPEENUM.typePolyline, CShape_IO.FILETYPEENUM.typePolygon, CShape_IO.FILETYPEENUM.typeMultipoint, CShape_IO.FILETYPEENUM.typePolyLineZ, CShape_IO.FILETYPEENUM.typePolygonZ, CShape_IO.FILETYPEENUM.typeMultiPointZ, CShape_IO.FILETYPEENUM.typePolyLineM, CShape_IO.FILETYPEENUM.typePolygonM, CShape_IO.FILETYPEENUM.typeMultiPointM, CShape_IO.FILETYPEENUM.typeMultiPatch
+                            ProjectPolys(shpIn, shpOut)
+                        Case Else
+                            Logger.Msg("Unsupported shape type " & shpIn.getShapeHeader.ShapeType, "ShapeProject")
+                            Exit Sub
+                    End Select
+                    shpIn.FileShutDown()
+                    shpOut.FileShutDown()
+                    shpIn = Nothing
+                    shpOut = Nothing
+                    TryDelete(curShpName)
+                    Rename(tmpSHPname, curShpName)
+                    TryDelete(curBaseName & ".shx")
+                    Rename(tmpSHXname, curBaseName & ".shx")
+                    Logger.Dbg("ShapeProject Finished with " & curShpName)
+                End If
+            Next
+
+        Catch e As Exception
+            If e.Message = "latitude or longitude exceeded limits" Then
+                Logger.Msg("Could not project '" & lFilename & "'" & vbCr & "Probably it was already projected", "ShapeUtil Projection")
+            Else
+                Logger.Msg(Err.Description & " (" & Err.Source & ", #" & Err.Number & ")", "ShapeUtil Projection")
+            End If
+            If SrcPrj <> 0 Then pj_free(SrcPrj)
+            If DestPrj <> 0 Then pj_free(DestPrj)
+            If Not shpIn Is Nothing Then
+                shpIn.FileShutDown()
+                shpIn = Nothing
+            End If
+            If Not shpOut Is Nothing Then
+                shpOut.FileShutDown()
+                shpOut = Nothing
+            End If
+            If IO.File.Exists(tmpSHPname) Then TryDelete(tmpSHPname)
+            If IO.File.Exists(tmpSHXname) Then TryDelete(tmpSHXname)
+        Finally
+            pj_free(SrcPrj)
+            pj_free(DestPrj)
+        End Try
     End Sub
 	
-	Private Function projInitFromFile(ByRef Filename As String) As String
-		Dim init As String
-		Dim startpos As Integer
-		Dim EOLpos As Integer
+    Private Function projInitFromFile(ByRef Filename As String) As String
+        If Filename.StartsWith("+proj") Then
+            Return Filename
+        End If
+
+        Dim init As String
+        Dim startpos As Integer
+        Dim EOLpos As Integer
         If IO.File.Exists(Filename) Then
             init = IO.File.ReadAllText(Filename)
             startpos = InStr(init, "#")
@@ -142,7 +143,7 @@ ErrHand:
         Else
             projInitFromFile = "+proj=dd +ellps=clrk66"
         End If
-	End Function
+    End Function
 	
 	Private Sub ConvertPoint(ByRef x As Double, ByRef y As Double)
 		Dim Z As Double

@@ -68,7 +68,7 @@ Public Class frmUSGSBaseflow
         End If
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow Data for Baseflow Separation", _
+            pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", _
                                                        pDataGroup, Nothing, True, True, Me.Icon)
         End If
 
@@ -466,7 +466,7 @@ Public Class frmUSGSBaseflow
         OutputDir = txtOutputDir.Text.Trim()
         ASCIICommon(pDataGroup(0))
 
-        Logger.MsgCustomOwned("Baseflow output completed.", "USGS Baseflow Separation", Me, New String() {"OK"})
+        Logger.MsgCustomOwned("Baseflow output completed.", "USGS Base-Flow Separation", Me, New String() {"OK"})
     End Sub
 
     Private Sub txtOutputRootName_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtOutputRootName.TextChanged
@@ -498,7 +498,7 @@ Public Class frmUSGSBaseflow
             Case Else
                 lSeparateGraphs = (Logger.MsgCustomCheckbox("Create separate graphs or all on one graph?", _
                                                             MethodsLastDone.Count & " methods selected", _
-                                                            "Do not ask again", "USGS GWToolbox", "Baseflow Separation", "Separate Timeseries Graphs", _
+                                                            "Do not ask again", "USGS GW Toolbox", "Baseflow Separation", "Separate Timeseries Graphs", _
                                                             "Separate", "One Graph") = "Separate")
         End Select
 
@@ -943,7 +943,7 @@ Public Class frmUSGSBaseflow
             ' Select directory on entry.
             .SelectedPath = lDir
             ' Prompt the user with a custom message.
-            .Description = "Specify Baseflow ASCII output directory"
+            .Description = "Specify Base-Flow ASCII output directory"
             If .ShowDialog = DialogResult.OK Then
                 ' Display the selected folder if the user clicked on the OK button.
                 lDir = .SelectedPath
@@ -995,11 +995,11 @@ Public Class frmUSGSBaseflow
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Baseflow Separation", pDataGroup)
+        pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", pDataGroup)
         If pDataGroup.Count > 0 Then
             Me.Initialize(pDataGroup, pBasicAttributes, True)
         Else
-            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Baseflow Separation")
+            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Base-Flow Separation")
         End If
     End Sub
 
@@ -1137,6 +1137,37 @@ Public Class frmUSGSBaseflow
             If chkMethodHySEPSlide.Checked Then pMethods.Add(BFMethods.HySEPSlide)
             If chkMethodBFIStandard.Checked Then pMethods.Add(BFMethods.BFIStandard)
             If chkMethodBFIModified.Checked Then pMethods.Add(BFMethods.BFIModified)
+
+            Dim lBFIChosen As Boolean = False
+            If chkMethodBFIStandard.Checked And chkMethodBFIModified.Checked Then
+                lblF.Visible = True
+                txtF.Visible = True
+                lblK.Visible = True
+                txtK.Visible = True
+                lBFIChosen = True
+            ElseIf chkMethodBFIStandard.Checked Then
+                lblF.Visible = True
+                txtF.Visible = True
+                lblK.Visible = False
+                txtK.Visible = False
+                lBFIChosen = True
+            ElseIf chkMethodBFIModified.Checked Then
+                lblF.Visible = False
+                txtF.Visible = False
+                lblK.Visible = True
+                txtK.Visible = True
+                lBFIChosen = True
+            Else 'none is checked
+                lblF.Visible = False
+                txtF.Visible = False
+                lblK.Visible = False
+                txtK.Visible = False
+            End If
+            If lBFIChosen Then
+                gbBFI.Enabled = True
+            Else
+                gbBFI.Enabled = False
+            End If
         End If
     End Sub
 
@@ -1148,56 +1179,5 @@ Public Class frmUSGSBaseflow
             Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged, _
             txtN.TextChanged, txtF.TextChanged, txtK.TextChanged, txtOutputDir.TextChanged, txtOutputRootName.TextChanged
         pDidBFSeparation = False
-    End Sub
-
-    Private Sub chkMethodBFIMethodsCheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMethodBFIStandard.CheckedChanged, chkMethodBFIModified.CheckedChanged
-        Dim lBFIChosen As Boolean = False
-        If chkMethodBFIStandard.Checked And chkMethodBFIModified.Checked Then
-            lblF.Visible = True
-            txtF.Visible = True
-            lblK.Visible = True
-            txtK.Visible = True
-            lBFIChosen = True
-            If Not pMethods.Contains(BFMethods.BFIStandard) Then
-                pMethods.Add(BFMethods.BFIStandard)
-            End If
-            If Not pMethods.Contains(BFMethods.BFIModified) Then
-                pMethods.Add(BFMethods.BFIModified)
-            End If
-        ElseIf chkMethodBFIStandard.Checked Then
-            lblF.Visible = True
-            txtF.Visible = True
-            lblK.Visible = False
-            txtK.Visible = False
-            lBFIChosen = True
-            If Not pMethods.Contains(BFMethods.BFIStandard) Then
-                pMethods.Add(BFMethods.BFIStandard)
-            End If
-        ElseIf chkMethodBFIModified.Checked Then
-            lblF.Visible = False
-            txtF.Visible = False
-            lblK.Visible = True
-            txtK.Visible = True
-            lBFIChosen = True
-            If Not pMethods.Contains(BFMethods.BFIModified) Then
-                pMethods.Add(BFMethods.BFIModified)
-            End If
-        Else 'none is checked
-            lblF.Visible = False
-            txtF.Visible = False
-            lblK.Visible = False
-            txtK.Visible = False
-            If pMethods.Contains(BFMethods.BFIStandard) Then
-                pMethods.Remove(BFMethods.BFIStandard)
-            End If
-            If pMethods.Contains(BFMethods.BFIModified) Then
-                pMethods.Remove(BFMethods.BFIModified)
-            End If
-        End If
-        If lBFIChosen Then
-            gbBFI.Enabled = True
-        Else
-            gbBFI.Enabled = False
-        End If
     End Sub
 End Class

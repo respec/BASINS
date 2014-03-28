@@ -69,7 +69,7 @@ Public Class frmUSGSRora
         End If
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow Data for RORA", _
+            pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", _
                                                        pDataGroup, Nothing, True, True, Me.Icon)
         End If
 
@@ -514,7 +514,7 @@ Notify:
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for RORA Analysis", pDataGroup)
+        pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", pDataGroup)
         If pDataGroup.Count > 0 Then
             If ConfigurationChanged() Then
                 Me.Initialize(pDataGroup, pBasicAttributes, True)

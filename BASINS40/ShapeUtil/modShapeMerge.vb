@@ -50,6 +50,8 @@ Module modShapeMerge
         ReDim dbfIn(shpFileNames.Count)
         ReDim shpIn(shpFileNames.Count)
 
+        On Error GoTo CleanUp
+
         For curInput = 0 To shpFileNames.Count - 1
             'TODO check to see if sets of files are identical before any compares by record
             baseFileName = FilenameNoExt(shpFileNames(curInput))
@@ -62,7 +64,7 @@ Module modShapeMerge
             ElseIf Not IO.File.Exists(baseFileName & ".shp") Then
                 LogMsg("Could not find " & baseFileName & ".shp, so could not merge")
 
-                'If we are merging an empty file into an existing file, might as well skip then empty file
+                'If we are merging an empty file into an existing file, might as well skip the empty file
             ElseIf FileLen(baseFileName & ".shp") <= 100 And IO.File.Exists(newBaseFilename & ".shp") Then
                 LogDbg("Skipping empty shape file '" & baseFileName & ".shp'")
 
@@ -70,9 +72,10 @@ Module modShapeMerge
                 'If destination shape file does not exist, copy first shape file to merge
 CopyOverNew:
                 LogDbg("Copying " & baseFileName & " to " & newBaseFilename)
-                FileCopy(baseFileName & ".dbf", newBaseFilename & ".dbf")
-                FileCopy(baseFileName & ".shp", newBaseFilename & ".shp")
-                FileCopy(baseFileName & ".shx", newBaseFilename & ".shx")
+                TryCopyShapefile(baseFileName, newBaseFilename & ".shp")
+                'FileCopy(baseFileName & ".dbf", newBaseFilename & ".dbf")
+                'FileCopy(baseFileName & ".shp", newBaseFilename & ".shp")
+                'FileCopy(baseFileName & ".shx", newBaseFilename & ".shx")
                 newBaseCopied = True
             Else
                 If dbfOut Is Nothing Then
@@ -132,7 +135,7 @@ CopyOverNew:
             End If
         Next
 
-        If Not dbfOut Is Nothing Then
+        If dbfOut IsNot Nothing Then
             For curInput = 0 To shpFileNames.Count - 1
                 If Not dbfIn(curInput) Is Nothing And Not shpIn(curInput) Is Nothing Then
                     starttime = Now
@@ -203,22 +206,24 @@ CopyOverNew:
         '		End If
         '		Exit Sub
 
-        'CleanUp: 
+CleanUp:
         On Error Resume Next 'If there is trouble killing files, just leave them
-        If Not shpOut Is Nothing Then shpOut.FileShutDown()
+        If shpOut IsNot Nothing Then shpOut.FileShutDown()
         For curInput = 0 To shpFileNames.Count - 1
             If Not shpIn(curInput) Is Nothing Then shpIn(curInput).FileShutDown()
             shpIn(curInput) = Nothing
             dbfIn(curInput) = Nothing
             baseFileName = FilenameNoExt(shpFileNames(curInput))
-            If IO.File.Exists(baseFileName & ".shp") Then Kill(baseFileName & ".shp")
-            If IO.File.Exists(baseFileName & ".shx") Then Kill(baseFileName & ".shx")
-            If IO.File.Exists(baseFileName & ".dbf") Then Kill(baseFileName & ".dbf")
+            TryDeleteShapefile(baseFileName)
+            'If IO.File.Exists(baseFileName & ".shp") Then Kill(baseFileName & ".shp")
+            'If IO.File.Exists(baseFileName & ".shx") Then Kill(baseFileName & ".shx")
+            'If IO.File.Exists(baseFileName & ".dbf") Then Kill(baseFileName & ".dbf")
         Next
         If Not successful And newBaseCopied Then
-            Kill(newBaseFilename & ".dbf")
-            Kill(newBaseFilename & ".shp")
-            Kill(newBaseFilename & ".shx")
+            TryDeleteShapefile(newBaseFilename)
+            'Kill(newBaseFilename & ".dbf")
+            'Kill(newBaseFilename & ".shp")
+            'Kill(newBaseFilename & ".shx")
         End If
 
     End Sub
