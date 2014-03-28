@@ -2982,6 +2982,7 @@ Public Class GisUtil
                         End If
                         lShapeNew = Nothing
                     End If
+                    If pStatusShow Then Logger.Progress(lPolygonCount, lTotalPolygonCount)
                 Next k
             Else 'quick processing of all polygons in layer2 because outside of extent
                 lPolygonCount += lLayer2Selected.Count
