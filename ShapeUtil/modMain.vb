@@ -75,6 +75,13 @@ Module modMain
                                 shpFileNames.Add(curFilename)
                             End If
                         ElseIf Len(cmd) > 0 Then
+                            If cmd.StartsWith("+proj") Then
+                                If Len(projectionDest) = 0 Then
+                                    projectionDest = curFilename
+                                Else
+                                    projectionSource = curFilename
+                                End If
+                            End If
                             Logger.Dbg("File not found: " & curFilename)
                         End If
                     End If
