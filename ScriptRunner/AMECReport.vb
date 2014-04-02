@@ -3,12 +3,14 @@ Imports atcData
 Imports atcWDM
 Imports atcBasinsObsWQ
 Imports atcSeasons
+Imports atcGraph
+Imports ZedGraph
 
 Imports MapWindow.Interfaces
 Imports MapWinUtility
 
 Public Module AMECReport
-    Private gProjectDir As String = "C:\test\Phenol\"
+    Private gProjectDir As String = "C:\BASINS\modelout\AMEC\"
     Private gOutputDir As String = gProjectDir & "Outfiles\"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -16,10 +18,10 @@ Public Module AMECReport
         Dim lCrLf As String = Microsoft.VisualBasic.vbCrLf ' Chr(13) & Chr(10)
         Dim lDateRange As String = "1/1/1973 - 1/1/2003" 'Edit this to match observed and simulated data, TODO: automatically extract from UCI file
         Dim lLocnArray() As String = {"LOW", "UP"}
-        Dim lSimDsnArray() As String = {"834", "813"}
-        Dim lCurObsCons As String = "Phenols_mg/L"
-        Dim lWdmFileName As String = gProjectDir & "Phenol-Mus85.wdm"
-        Dim lDbfFileName As String = gProjectDir & "Phenol.dbf"
+        Dim lSimDsnArray() As String = {"1101", "1102"}
+        Dim lCurObsCons As String = "Al_mg/L"
+        Dim lWdmFileName As String = gProjectDir & "Beaver-Naph.wdm"
+        Dim lDbfFileName As String = gProjectDir & "Al.dbf"
         Dim lReportFilename As String = gOutputDir & "Seasonal_Phenols_Summary.txt"
 
         Dim lSeasonStartArray() As String = {"11/1", "4/1", "6/1", "9/1", "1/1"}
@@ -81,6 +83,9 @@ Public Module AMECReport
                 Next
 
                 Dim lFieldIndex As Integer = 1
+                Dim lPlotValues() As Double
+                Dim lValuesProbability() As Double
+                Dim XScaleMaxValue As Double
                 For lIndex As Integer = 0 To lLocnArray.GetUpperBound(0)
                     'this will need a better search if obs data contains multiple constituents
                     Dim lObsData As atcTimeseries = lDbfDataSource.DataSets.FindData("LOCN", lLocnArray(lIndex))(0)
@@ -88,17 +93,70 @@ Public Module AMECReport
                     Dim lColumnStart As Integer = lIndex * lSeasonStartArray.Length * 4
                     If lIndex > 0 Then lColumnStart += 1 'TODO: more than 2 locations
                     For lSeasonIndex As Integer = 0 To lSeasonStartArray.GetUpperBound(0)
+                        Dim lZgc As ZedGraphControl = CreateZgc()
+                        Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
+                        With lPane.XAxis
+                            .Type = AxisType.Linear
+                            .Scale.MaxAuto = True
+                            .Title.Text = lCurObsCons
+                        End With
+                        With lPane.YAxis
+                            .Type = AxisType.Linear
+                            .Scale.MaxAuto = True
+                            .Title.Text = "Cumulative Probability"
+                        End With
+
                         PutTimeseriesInGrid(lSimData, lConcentrationsTable, lFieldIndex, _
                                             lSeasonNameArray(lSeasonIndex), _
                                             lSeasonStartArray(lSeasonIndex), _
-                                            lSeasonEndArray(lSeasonIndex))
+                                            lSeasonEndArray(lSeasonIndex), _
+                                            lValuesProbability, _
+                                            lPlotValues)
+                        XScaleMaxValue = lPlotValues(lPlotValues.Length - 1)
                         lFieldIndex += 2
+
+                        'Dim lCurveColor As Color = Color.Blue
+                        Dim lCurve As LineItem = Nothing
+
+                        lCurve = lPane.AddCurve("Simulated Data", lPlotValues, lValuesProbability, _
+                                                Drawing.Color.Red, SymbolType.None)
+
+                        lCurve.Line.IsVisible = True
 
                         PutTimeseriesInGrid(lObsData, lConcentrationsTable, lFieldIndex, _
                                             lSeasonNameArray(lSeasonIndex), _
                                             lSeasonStartArray(lSeasonIndex), _
-                                            lSeasonEndArray(lSeasonIndex))
+                                            lSeasonEndArray(lSeasonIndex), _
+                                            lValuesProbability, _
+                                            lPlotValues)
+                        If lPlotValues(lPlotValues.Length - 1) > XScaleMaxValue Then
+                            XScaleMaxValue = lPlotValues(lPlotValues.Length - 1)
+                        End If
                         lFieldIndex += 2
+                        lCurve = lPane.AddCurve("Observed Data", lPlotValues, lValuesProbability, _
+                                               Drawing.Color.Blue, SymbolType.Triangle)
+                        lCurve.Symbol.Size = 8
+                        lCurve.Symbol.Fill.IsVisible = True
+                        lCurve.Line.IsVisible = False
+
+                        Scalit(0, 1.0, False, lPane.YAxis.Scale.Min, lPane.YAxis.Scale.Max)
+                        'Scalit(0, XScaleMaxValue, False, lPane.XAxis.Scale.Min, lPane.XAxis.Scale.Max)
+                        With lPane.Legend
+                            .IsVisible = True
+                            .Position = LegendPos.Float
+                            .Location = New Location(0.6, 0.8, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
+                            .IsHStack = False
+                            .Border.IsVisible = False
+                            .Fill.IsVisible = False
+                            .FontSpec.Size = 13
+                            .FontSpec.IsBold = True
+                            .FontSpec.Border.IsVisible = False
+                        End With
+
+                        lPane.Title.Text = lCurObsCons & " - " & lLocnArray(lIndex) & " - " & lSeasonNameArray(lSeasonIndex)
+                        lZgc.SaveIn(gOutputDir & lLocnArray(lIndex) & "_" & lSeasonNameArray(lSeasonIndex) & ".png")
+                        lZgc.Dispose()
+
                     Next
                     lFieldIndex += 1
                 Next
@@ -130,8 +188,12 @@ Public Module AMECReport
                                     ByVal aGridColumn As Integer, _
                                     ByVal aSeasonName As String, _
                                     ByVal aSeasonStart As String, _
-                                    ByVal aSeasonEnd As String)
+                                    ByVal aSeasonEnd As String, _
+                                    ByRef lValuesProbability() As Double, _
+                                    ByRef lPlotValues() As Double _
+                                    )
         Dim lValues() As Double
+
         Dim lValueIndex As Integer
         If aSeasonName = "Annual" Then
             lValues = aTimeseries.Values.Clone
@@ -152,6 +214,8 @@ Public Module AMECReport
             End If
         Next
         ReDim Preserve lNonMissingValues(lNumNonMissingValues - 1)
+        ReDim lValuesProbability(lNumNonMissingValues - 1)
+        ReDim lPlotValues(lNumNonMissingValues - 1)
         System.Array.Sort(lNonMissingValues)
         With aGrid
             .CurrentRecord = 1
@@ -162,9 +226,15 @@ Public Module AMECReport
             For lValueIndex = 0 To lNumNonMissingValues - 1
                 .Value(aGridColumn) = DoubleToString(lNonMissingValues(lValueIndex), , "#0.0000")
                 .Value(aGridColumn + 1) = DoubleToString(lNonMissingIndex / lDivideBy, , "#0.0000")
+                lPlotValues(.CurrentRecord - 1) = lNonMissingValues(lValueIndex)
+                lValuesProbability(.CurrentRecord - 1) = lNonMissingIndex / lDivideBy
                 .CurrentRecord += 1
                 lNonMissingIndex += 1
             Next
         End With
+
+
+
     End Sub
+    
 End Module
