@@ -18,8 +18,9 @@ Module HSPFWatershedSummaryWQReport
     Private pOperationTypes As New atcCollection
 
     Private Sub Initialize()
-        Dim lTestName As String = "upatoi"
+        'Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "addtrail"
+        Dim lTestName As String = "bacteria"
         Select Case lTestName
             Case "upatoi"
                 pTestPath = pDrive & "\Basins\data\20710-01\Upatoi"
@@ -27,9 +28,13 @@ Module HSPFWatershedSummaryWQReport
             Case "addtrail"
                 pTestPath = pDrive & "\Basins\modelout\UpatoiScen"
                 pBaseName = "addtrail"
+            Case "bacteria"
+                pTestPath = pDrive & "\Basins\modelout\bacteria"
+                pBaseName = "bact_2_ext"
+                pSummaryType = "FColi"
         End Select
 
-        pSummaryType = "Sediment"
+        'pSummaryType = "Sediment"
         'pSummaryType = "Water"
         'pSummaryType = "BOD"
         'pSummaryType = "DO"
@@ -51,6 +56,10 @@ Module HSPFWatershedSummaryWQReport
                 pOperationTypes.Add("I:", "IMPLND")
                 pOperationTypes.Add("R:", "RCHRES")
             Case "Sediment"
+                pOperationTypes.Add("R:", "RCHRES")
+            Case "FColi"
+                pOperationTypes.Add("P:", "PERLND")
+                pOperationTypes.Add("I:", "IMPLND")
                 pOperationTypes.Add("R:", "RCHRES")
         End Select
     End Sub
