@@ -323,7 +323,26 @@ Public Module WatershedConstituentBalance
                                         lSomeConstituentsHaveData = True
                                         If lNeedHeader Then
                                             .Delimiter = vbTab
-                                            .Header = aBalanceType & " Balance Report For " & lLandUse & vbCrLf & " "
+
+                                            Select Case aBalanceType & "_" & lOperationType
+                                                Case "Water_PERLND", "Water_IMPLND"
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (Inches)" & vbCrLf
+                                                Case "WATER_RCHRES"
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (ac-ft)" & vbCrLf
+                                                Case "Sediment_PERLND", "Sediement_IMPLND"
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (tons/ac)" & vbCrLf
+                                                Case "Sediment_RCHRES"
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (tons)" & vbCrLf
+                                                Case "TotalN_PERLND", "TotalN_IMPLND", "TotalP_PERLND", "TotalP_IMPLND", "BOD-PQUAL_PERLND", "BOD-PQUAL_IMPLND"
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (lbs/ac)" & vbCrLf
+                                                Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-PQUAL_RCHRES"
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (lbs)" & vbCrLf
+                                                Case "FColi_PERLND", "FColi_IMPLND"
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (10^9 org/ac)" & vbCrLf
+                                                Case "FColi_RCHRES"
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (10^9 org)" & vbCrLf
+
+                                            End Select
                                             .NumHeaderRows = 2
                                             If lOutletReport And lOperationType <> "RCHRES" Then
                                                 .NumFields = lLandUseOperations.Count + 2
