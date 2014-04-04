@@ -113,6 +113,9 @@ Module HSPFOutputReports
         If StartUp.chkBODBalance.Checked Then
             pConstituents.Add("BOD-PQUAL")
         End If
+        If StartUp.chkFecalColiform.Checked Then
+            pConstituents.Add("FColi")
+        End If
 
         'Becky added the following to be dependent upon user input:
         pTestPath = StartUp.txtUCIPath.Text
@@ -142,7 +145,10 @@ Module HSPFOutputReports
                 Dim lExitCode As Integer
                 lExitCode = LaunchProgram(pHSPFExe, pTestPath, pBaseName & ".uci") 'Run HSPF program
                 If lExitCode <> 0 Then
-                    Throw New ApplicationException("WinHSPFLt could not run, Analysis cannot continue")
+                    'Throw New ApplicationException("WinHSPFLt could not run, Analysis cannot continue")
+                    Dim ans As Integer
+                    ans = MsgBox("WinHSPFLt could not run, Analysis cannot continue")
+                    End
                 End If
             End If
             Logger.Status(Now & " HSPF Simulation of " & pBaseName & ".uci" & " finished.", True)
@@ -493,6 +499,8 @@ Module HSPFOutputReports
                                 lConstituentName = "TP"
                             Case "BOD-PQUAL"
                                 lConstituentName = "BOD"
+                            Case "FColi"
+                                lConstituentName = "FColi"
                         End Select
 
                         Dim lReportCons As New atcReport.ReportText
@@ -553,11 +561,13 @@ Module HSPFOutputReports
                     Dim ans As Integer
                     ans = MsgBox("HBN file " & lHspfBinFileName & " does not have any data.  Constituent Balance reports will not be generated. " & _
                                  "Did uci file run properly last time?")
+                    End
                 End If
             Else
                 'give message if hbn file does not exist, but continue without it
                 Dim ans As Integer
                 ans = MsgBox("HBN file " & lHspfBinFileName & " does not exist.  Constituent Balance reports will not be generated.")
+                End
             End If
 
             Logger.Dbg(Now & " Output Written to " & lOutFolderName)
