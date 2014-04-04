@@ -115,7 +115,26 @@ Public Module ConstituentBalance
                                                 lDesc = aUci.OpnBlks(lOperName).OperFromID(lLocation.Substring(2)).Description
                                             End If
 
-                                            .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ")" & vbCrLf
+                                            Select Case aBalanceType & "_" & lOperName
+                                                Case "Water_PERLND", "Water_IMPLND"
+                                                    .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (Inches)"
+                                                Case "WATER_RCHRES"
+                                                    .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (ac-ft)"
+                                                Case "Sediment_PERLND", "Sediement_IMPLND"
+                                                    .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons/ac)"
+                                                Case "Sediment_RCHRES"
+                                                    .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons)"
+                                                Case "TotalN_PERLND", "TotalN_IMPLND", "TotalP_PERLND", "TotalP_IMPLND", "BOD-PQUAL_PERLND", "BOD-PQUAL_IMPLND"
+                                                    .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs/ac)"
+                                                Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-PQUAL_RCHRES"
+                                                    .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs)"
+                                                Case "FColi_PERLND", "FColi_IMPLND"
+                                                    .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (10^9 org/ac)"
+                                                Case "FColi_RCHRES"
+                                                    .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (10^9 org)"
+
+                                            End Select
+
                                             .NumHeaderRows = 1
                                             .Delimiter = vbTab
 
@@ -196,10 +215,10 @@ Public Module ConstituentBalance
                                                     'In IRW Project, Refractory organic P was calculated as a fraction of TORP
                                                 End If
 
-
-                                            Case "POQUAL-F.Coliform", "SOQUAL-F.Coliform"
-                                                lMult = 1 / 1000000000.0 '10^9
                                         End Select
+                                        If lConstituentKey.Contains("F.Coliform") Then
+                                            lMult = 1 / 1000000000.0 '10^9
+                                        End If
 
                                         If ConstituentsThatUseLast.Contains(lConstituentKey) Then
                                             lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
