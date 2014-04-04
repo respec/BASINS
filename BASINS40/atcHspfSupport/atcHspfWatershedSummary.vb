@@ -185,7 +185,7 @@ Public Module WatershedSummary
                                     ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TotalP" Then
                                         lMult = 0.0023
                                     End If
-                                ElseIf lConstituent = "POQUAL-F.Coliform" Or lConstituent = "SOQUAL-F.Coliform" Then
+                                ElseIf lConstituent.Contains("F.Coliform") Then
                                     lMult = 1 / 1000000000.0 '10^9
                                 End If
                                 lValue += (lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * lMult)
@@ -235,7 +235,7 @@ Public Module WatershedSummary
                             ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TotalP" Then
                                 lMult = 0.0023
                             End If
-                        ElseIf lConstituent = "F.Coliform-TROQAL" Then
+                        ElseIf lConstituent.Contains("F.Coliform") Then
                             lMult = 1 / 1000000000.0 '10^9
                         End If
                         lValue += (lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * lMult / lRchresConversion)
