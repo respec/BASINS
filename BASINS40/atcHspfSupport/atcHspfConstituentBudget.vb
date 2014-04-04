@@ -411,12 +411,16 @@ Public Module ConstituentBudget
                         Case "POQUAL-BOD_TotalP"
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.0052304
                             'Multiplying 0.0023 + 0.4*0.007326 to BOD to get Organic P
+                            'The factor is 0.0052304 for most watersheds, but it was changed to
+                            '0.0075304 becase PQUAL 4 to PKIF 4 factor was changed from 0.0023 to 0.0046
                         Case "SOQUAL-BOD_TotalP"
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.0052304
                         Case "ORGN - TOTAL OUTFLOW_TotalP"
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.05534793
                         Case "SDORP_TotalP"
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.6
+                            'PERLND     PHOS   SEDP   1     1.20        RCHRES         INFLOW PKIF   4  
+                            'The factor was changed frm 0.6 to 1.20in IRW
                         Case Else
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkMultFactor
 
@@ -465,10 +469,15 @@ Public Module ConstituentBudget
                             'Multiplying 0.0023 + 0.4*0.007326 to BOD to get Organic P
                         Case "SOQUAL-BOD_TotalP"
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.0052304
+                            'Multiplying 0.0023 + 0.4*0.007326 to BOD to get Organic P for IRW
+                            'The factor is 0.0052304 for most watersheds, but it was changed to
+                            '0.0075304 becase PQUAL 4 to PKIF 4 factor was changed from 0.0023 to 0.0046
                         Case "ORGN - TOTAL OUTFLOW_TotalP"
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.05534793
                         Case "SDORP_TotalP"
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * 0.6
+                            'PERLND     PHOS   SEDP   1     1.20        RCHRES         INFLOW PKIF   4  
+                            'The factor was changed frm 0.6 to 1.20in IRW
                         Case Else
                             lTotal += lArea * lTs.Attributes.GetValue("SumAnnual")
 
