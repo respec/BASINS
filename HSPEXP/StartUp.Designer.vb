@@ -50,6 +50,7 @@ Partial Class StartUp
         Me.Label3 = New System.Windows.Forms.Label
         Me.chkExpertStats = New System.Windows.Forms.CheckBox
         Me.chkMakeEXSFile = New System.Windows.Forms.CheckBox
+        Me.chkFecalColiform = New System.Windows.Forms.CheckBox
         Me.grpGraphs.SuspendLayout()
         Me.grpConstituentBalance.SuspendLayout()
         Me.SuspendLayout()
@@ -129,7 +130,7 @@ Partial Class StartUp
         '
         Me.lblRCH.AutoSize = True
         Me.lblRCH.Enabled = False
-        Me.lblRCH.Location = New System.Drawing.Point(3, 199)
+        Me.lblRCH.Location = New System.Drawing.Point(3, 221)
         Me.lblRCH.MaximumSize = New System.Drawing.Size(500, 0)
         Me.lblRCH.Name = "lblRCH"
         Me.lblRCH.Size = New System.Drawing.Size(457, 13)
@@ -141,7 +142,7 @@ Partial Class StartUp
         '
         Me.txtRCH.BackColor = System.Drawing.SystemColors.Window
         Me.txtRCH.Enabled = False
-        Me.txtRCH.Location = New System.Drawing.Point(13, 231)
+        Me.txtRCH.Location = New System.Drawing.Point(13, 253)
         Me.txtRCH.Name = "txtRCH"
         Me.txtRCH.Size = New System.Drawing.Size(47, 20)
         Me.txtRCH.TabIndex = 14
@@ -150,7 +151,7 @@ Partial Class StartUp
         '
         Me.lblOutReach2.AutoSize = True
         Me.lblOutReach2.Enabled = False
-        Me.lblOutReach2.Location = New System.Drawing.Point(71, 229)
+        Me.lblOutReach2.Location = New System.Drawing.Point(71, 251)
         Me.lblOutReach2.MaximumSize = New System.Drawing.Size(250, 0)
         Me.lblOutReach2.Name = "lblOutReach2"
         Me.lblOutReach2.Size = New System.Drawing.Size(245, 26)
@@ -225,7 +226,7 @@ Partial Class StartUp
         '
         Me.pnlHighlight.BackColor = System.Drawing.Color.Red
         Me.pnlHighlight.Enabled = False
-        Me.pnlHighlight.Location = New System.Drawing.Point(7, 227)
+        Me.pnlHighlight.Location = New System.Drawing.Point(7, 249)
         Me.pnlHighlight.Name = "pnlHighlight"
         Me.pnlHighlight.Size = New System.Drawing.Size(58, 28)
         Me.pnlHighlight.TabIndex = 17
@@ -269,6 +270,7 @@ Partial Class StartUp
         '
         Me.grpConstituentBalance.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpConstituentBalance.Controls.Add(Me.chkFecalColiform)
         Me.grpConstituentBalance.Controls.Add(Me.chkBODBalance)
         Me.grpConstituentBalance.Controls.Add(Me.chkTotalPhosphorus)
         Me.grpConstituentBalance.Controls.Add(Me.chkTotalNitrogen)
@@ -340,12 +342,23 @@ Partial Class StartUp
         'chkMakeEXSFile
         '
         Me.chkMakeEXSFile.AutoSize = True
+        Me.chkMakeEXSFile.Enabled = False
         Me.chkMakeEXSFile.Location = New System.Drawing.Point(206, 70)
         Me.chkMakeEXSFile.Name = "chkMakeEXSFile"
         Me.chkMakeEXSFile.Size = New System.Drawing.Size(210, 17)
         Me.chkMakeEXSFile.TabIndex = 31
         Me.chkMakeEXSFile.Text = "Create Basins Specification (EXS) File?"
         Me.chkMakeEXSFile.UseVisualStyleBackColor = True
+        '
+        'chkFecalColiform
+        '
+        Me.chkFecalColiform.AutoSize = True
+        Me.chkFecalColiform.Location = New System.Drawing.Point(7, 187)
+        Me.chkFecalColiform.Name = "chkFecalColiform"
+        Me.chkFecalColiform.Size = New System.Drawing.Size(175, 17)
+        Me.chkFecalColiform.TabIndex = 34
+        Me.chkFecalColiform.Text = "Produce Fecal Coliform Reports"
+        Me.chkFecalColiform.UseVisualStyleBackColor = True
         '
         'StartUp
         '
@@ -407,5 +420,6 @@ Partial Class StartUp
     Friend WithEvents chkTotalPhosphorus As System.Windows.Forms.CheckBox
     Friend WithEvents chkBODBalance As System.Windows.Forms.CheckBox
     Friend WithEvents chkMakeEXSFile As System.Windows.Forms.CheckBox
+    Friend WithEvents chkFecalColiform As System.Windows.Forms.CheckBox
 
 End Class
