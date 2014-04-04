@@ -207,17 +207,17 @@ Public Module Utility
                    End With
             Case "FColi"
             With lConstituentsToOutput
-                      .Add("P:Header1", "Perv Load")
-                      .Add("P:SOQUAL-F.Coliform", "Surface")
-                      .Add("P:IOQUAL-F.Coliform", "Interflow")
-                      .Add("P:AOQUAL-F.Coliform", "Baseflow")
-                      .Add("P:POQUAL-F.Coliform", "Total")
-                      .Add("I:Header2", "Imperv Load")
-                      .Add("I:SOQUAL-F.Coliform", "ImpervSurf")
-                      .Add("R:Header3", "Instream")
-                      .Add("R:F.Coliform-TIQAL", "  Inflow")
-                      .Add("R:F.Coliform-DDQAL-TOT", "  Decay")
-                      .Add("R:F.Coliform-TROQAL", "  Outflow")
+                    .Add("P:Header1", "F.Coliform (10^9 org/ac)")
+                    .Add("P:SOQUAL-F.Coliform", "  Surface")
+                    .Add("P:IOQUAL-F.Coliform", "  Interflow")
+                    .Add("P:AOQUAL-F.Coliform", "  Baseflow")
+                    .Add("P:POQUAL-F.Coliform", "  Total")
+                    .Add("I:Header2", "F.Coliform (10^9 org/ac)")
+                    .Add("I:SOQUAL-F.Coliform", "  ImpervSurf")
+                    .Add("R:Header3", "F.Coliform (10^9 org)")
+                    .Add("R:F.Coliform-TIQAL", "  Inflow")
+                    .Add("R:F.Coliform-DDQAL-TOT", "  Decay")
+                    .Add("R:F.Coliform-TROQAL", "  Outflow")
             End With
             Case "N-PQUAL"
             With lConstituentsToOutput
