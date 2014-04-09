@@ -79,6 +79,9 @@ Public Class Scripting
             End Try
 
             RemoveByteOrderMarker(aCode)
+            If String.IsNullOrEmpty(aDLLfilename) Then
+                aDLLfilename = MakeScriptName(aPluginFolder)
+            End If
             lAssembly = Compile(aLanguage, aCode, aErrors, aDLLfilename)
         End If
 
@@ -141,7 +144,21 @@ Public Class Scripting
                                ByVal aPlugIn As Boolean, _
                                ByRef m_MapWin As Object, _
                                ByVal ParamArray aArgs() As Object) As Object
-        Dim lAssembly As System.Reflection.Assembly = PrepareScript(aLanguage, aDLLfilename, aCode, aErrors, m_MapWin.Plugins.PluginFolder)
+        Dim lFolder As String = Nothing
+        Try
+            If m_MapWin IsNot Nothing Then
+                lFolder = m_MapWin.Plugins.PluginFolder
+            End If
+        Catch
+        End Try
+        If lFolder Is Nothing OrElse Not IO.Directory.Exists(lFolder) Then
+            lFolder = CurDir()
+        End If
+        If IO.Directory.Exists(IO.Path.Combine(lFolder, "BASINS")) Then
+            lFolder = IO.Path.Combine(lFolder, "BASINS")
+        End If
+
+        Dim lAssembly As System.Reflection.Assembly = PrepareScript(aLanguage, aDLLfilename, aCode, aErrors, lFolder)
         Return Run(lAssembly, aErrors, aArgs)
     End Function
 
@@ -149,10 +166,8 @@ Public Class Scripting
         Dim lTryName As String
         Dim lTryCount As Integer = 1
         Dim lScriptName As String = "RemoveMe-Script-"
-
         Do
-            lTryName = aPluginFolder & "\" & _
-                      lScriptName & lTryCount & ".dll"
+            lTryName = IO.Path.Combine(aPluginFolder, lScriptName & lTryCount & ".dll")
             lTryCount += 1
         Loop While System.IO.File.Exists(lTryName)
         Return lTryName

@@ -173,29 +173,34 @@ Public Class MonitorProgressStatus
     End Sub
 
     Private Function WriteStatus(ByVal aStatusMessage As String) As Boolean
-        If pMonitorProcess Is Nothing OrElse pMonitorProcess.HasExited Then
-            Return False  'Process at other end of pipe is dead, stop talking to it
-        End If
+        Try
+            If pMonitorProcess Is Nothing OrElse pMonitorProcess.HasExited Then
+                Return False  'Process at other end of pipe is dead, stop talking to it
+            End If
 
-        If aStatusMessage Is Nothing OrElse aStatusMessage.Length = 0 Then
-            aStatusMessage = "HIDE"
-        ElseIf aStatusMessage.StartsWith("(") AndAlso aStatusMessage.EndsWith(")") Then
-            aStatusMessage = aStatusMessage.Substring(1, aStatusMessage.Length - 2)
-        End If
+            If aStatusMessage Is Nothing OrElse aStatusMessage.Length = 0 Then
+                aStatusMessage = "HIDE"
+            ElseIf aStatusMessage.StartsWith("(") AndAlso aStatusMessage.EndsWith(")") Then
+                aStatusMessage = aStatusMessage.Substring(1, aStatusMessage.Length - 2)
+            End If
 
-        'Escape open and close parens
-        aStatusMessage = aStatusMessage.Replace("(", Chr(6)).Replace(")", Chr(7))
+            'Escape open and close parens
+            aStatusMessage = aStatusMessage.Replace("(", Chr(6)).Replace(")", Chr(7))
 
-        If Asc(Right(aStatusMessage, 1)) > 31 Then
-            aStatusMessage = "(" & aStatusMessage & ")"
-        End If
+            If Asc(Right(aStatusMessage, 1)) > 31 Then
+                aStatusMessage = "(" & aStatusMessage & ")"
+            End If
 
-        If aStatusMessage.Length > 0 Then
-            Logger.Dbg(aStatusMessage)
-            pMonitorProcess.StandardInput.WriteLine(aStatusMessage) 'TODO: make sure we do not hang here too long on full pipe
-            pMonitorProcess.StandardInput.Flush()
-        End If
-        Return True
+            If aStatusMessage.Length > 0 Then
+                Logger.Dbg(aStatusMessage)
+                pMonitorProcess.StandardInput.WriteLine(aStatusMessage) 'TODO: make sure we do not hang here too long on full pipe
+                pMonitorProcess.StandardInput.Flush()
+            End If
+            Return True
+        Catch ex As Exception
+            Console.WriteLine("clsProgressStatus.WriteStatus: " & ex.ToString)
+            Return False
+        End Try
     End Function
 
     ''' <summary>
