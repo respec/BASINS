@@ -12,6 +12,7 @@ Public Class atcTimeseriesNdayHighLow
     Private Shared KENTAUattribute As atcAttributeDefinition
     Private Shared KENPLVattribute As atcAttributeDefinition
     Private Shared KENSLPLattribute As atcAttributeDefinition
+    Public UseVersion_1 As Boolean = False
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -508,7 +509,7 @@ Public Class atcTimeseriesNdayHighLow
                 End If
 
                 Try
-                    PearsonType3(lNdayTs, lRecurOrProbs, aHigh, aLogFg, Me, aAttributesStorage, lNumZero)
+                    PearsonType3(UseVersion_1, lNdayTs, lRecurOrProbs, aHigh, aLogFg, Me, aAttributesStorage, lNumZero)
                 Catch ex As Exception
                     lMsg = "ComputeFreq:Exception:" & ex.ToString & ":"
                     lQ = lNaN
@@ -688,6 +689,15 @@ Public Class atcTimeseriesNdayHighLow
         End If
     End Function
 
+#If GISProvider = "DotSpatial" Then
+    <CLSCompliant(False)> _
+    Public Sub Initialize()
+        'Dim lAvlOps As atcDataAttributes = AvailableOperations()
+        For Each lOperation As atcDefinedValue In AvailableOperations
+            atcDataAttributes.AddDefinition(lOperation.Definition)
+        Next
+    End Sub
+#Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
@@ -695,5 +705,6 @@ Public Class atcTimeseriesNdayHighLow
             atcDataAttributes.AddDefinition(lOperation.Definition)
         Next
     End Sub
+#End If
 
 End Class
