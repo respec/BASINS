@@ -83,7 +83,7 @@ Friend Class HspfBinary
     Private pBr As IO.BinaryReader ' pFileNum As Integer = 0
     Private pBytesInFile As Long = 0
     Private pProgressMax As Integer = 0
-    Private pDivideForProgress As Integer = 1
+    Private pDivideForProgress As Long = 1
     Private pSeek As Long
     'Private pRecords As New Generic.List(Of UnformattedRecord)
 
@@ -190,10 +190,14 @@ Friend Class HspfBinary
             pBr = New IO.BinaryReader(lFS) ' pFileNum = FreeFile()
             'FileOpen(pFileNum, pFileName, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
             pBytesInFile = lFS.Length ' LOF(pFileNum)
-            While pBytesInFile / pDivideForProgress > Integer.MaxValue
-                pDivideForProgress += 1
-            End While
-            pProgressMax = pBytesInFile / pDivideForProgress
+            If pBytesInFile < Integer.MaxValue Then
+                pDivideForProgress = 1
+                pProgressMax = pBytesInFile
+            Else 'Can't display actual progress in bytes using Integer, so use percent
+                pDivideForProgress = pBytesInFile / 100
+                pProgressMax = 100
+            End If
+            pDivideForProgress *= 2 'Progress of reading through file is only first half of progress of opening
             If aSeekToLastPosition AndAlso pSeek > 0 Then pBr.BaseStream.Seek(pSeek, IO.SeekOrigin.Begin)
             Return True
         Else
@@ -393,12 +397,16 @@ Friend Class HspfBinary
                         Throw New ApplicationException(lString)
                 End Select
                 lSeek = pBr.BaseStream.Position
-                Logger.Progress(lSeek / 2 / pDivideForProgress, pProgressMax)
+                Logger.Progress(lSeek / pDivideForProgress, pProgressMax)
                 pFileRecordIndex += 1
             End While
         Catch ex As Exception
             Logger.Progress(0, 0)
-            Logger.Msg(ex.ToString, MsgBoxStyle.Exclamation, "Error reading " & Filename)
+            If ex.Message = "User Canceled" Then
+                Logger.Msg("Canceled reading " & Filename, MsgBoxStyle.Exclamation, "Did not finish reading HSPF Binary File")
+            Else
+                Logger.Msg(Filename & vbCrLf & ex.ToString, MsgBoxStyle.Exclamation, "Did not finish reading HSPF Binary File")
+            End If
             Logger.Dbg(MemUsage)
             Throw ex
         Finally
