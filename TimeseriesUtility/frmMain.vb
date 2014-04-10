@@ -74,6 +74,14 @@ Public Class frmMain
         AddHandler (atcDataManager.ClosedData), (AddressOf FileOpenedOrClosed)
     End Sub
 
+    Private Sub frmMain_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
+        Static Exiting As Boolean = False
+        If Not Exiting Then
+            Exiting = True
+            Application.Exit()
+        End If
+    End Sub
+
     Private Sub frm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
             ShowHelp("Cover.html")
@@ -182,12 +190,20 @@ Public Class frmMain
 
         If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
             Dim lFileNames() As String = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
-            Dim lIndex As Integer = 0
-            For Each lFileName As String In lFileNames
-                lIndex += 1
-                Logger.Progress("Opening " & lFileName, lIndex, lFileNames.Length)
-                atcDataManager.OpenDataSource(lFileName)
-            Next
+
+            If lFileNames.Count = 1 Then
+                atcDataManager.OpenDataSource(lFileNames(0))
+            Else
+                Dim lFileIndex As Integer = 1
+                For Each lFileName As String In lFileNames
+                    Logger.Status("Opening file " & lFileIndex & " of " & lFileNames.Length)
+                    Using lProgressLevel As New ProgressLevel
+                        atcDataManager.OpenDataSource(lFileName)
+                    End Using
+                    lFileIndex += 1
+                Next
+            End If
+
             Logger.Status("")
         End If
     End Sub
@@ -462,4 +478,5 @@ Compare12:
         Dim lAbout As New frmAbout
         lAbout.Show()
     End Sub
+
 End Class
