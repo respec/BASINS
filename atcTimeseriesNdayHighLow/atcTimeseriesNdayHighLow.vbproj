@@ -150,6 +150,7 @@
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Diagnostics" />
+    <Import Include="System.Runtime.InteropServices" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.vb">
