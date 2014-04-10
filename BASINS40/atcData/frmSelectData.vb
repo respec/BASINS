@@ -501,7 +501,7 @@ Friend Class frmSelectData
         End While
 
         If aModal Then
-            While pAsking
+            While pAsking AndAlso Application.OpenForms.Count > 1
                 Application.DoEvents()
                 Threading.Thread.Sleep(10)
             End While

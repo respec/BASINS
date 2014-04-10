@@ -156,39 +156,39 @@ Public Class clsMonitor
     End Sub
 
     Private Shared Sub ChangeLevelUnsafe(ByVal aChange As Integer)
-        If aChange <> 0 Then
-            pLevelsMutex.WaitOne()
-            Dim lHide As Boolean = False
-            If aChange > 0 Then
-                'Inherit labels for Title=0 and Bottom=5 since those labels are shared by all levels
-                Dim lFormerLast As clsLevel = pLevels(pLevels.Count - 1)
-                For lNewLevelIndex As Integer = 1 To aChange
-                    Dim lNewLevel As New clsLevel
-                    lNewLevel.LabelLast(0) = lFormerLast.LabelLast(0)
-                    'lNewLevel.LabelLast(5) = lFormerLast.LabelLast(5)
-                    lNewLevel.LabelLogged(0) = lFormerLast.LabelLogged(0)
-                    'lNewLevel.LabelLogged(5) = lFormerLast.LabelLogged(5)
-                    lNewLevel.LabelText(0) = lFormerLast.LabelText(0)
-                    'lNewLevel.LabelText(5) = lFormerLast.LabelText(5)
-                    pLevels.Add(lNewLevel)
-                Next
-            Else
-                If pLevels.Count + aChange < 1 Then 'Trying to remove only level = hide form
-                    aChange = 1 - pLevels.Count
-                    lHide = True
-                End If
-                'Remember last label set for Title=0 and Bottom=5 in case they need to be changed back
-                Dim lRemovingLast As clsLevel = pLevels(pLevels.Count - 1)
-                Dim lKeepingLast As clsLevel = pLevels(pLevels.Count + aChange - 1)
-                lKeepingLast.LabelLast(0) = lRemovingLast.LabelLast(0)
-                'lKeepingLast.LabelLast(5) = lRemovingLast.LabelLast(5)
-                pLevels.RemoveRange(pLevels.Count + aChange, -aChange)
-                lKeepingLast.LabelNeedsUpdate = True
+        'If aChange <> 0 Then
+        pLevelsMutex.WaitOne()
+        Dim lHide As Boolean = False
+        If aChange > 0 Then
+            'Inherit labels for Title=0 and Bottom=5 since those labels are shared by all levels
+            Dim lFormerLast As clsLevel = pLevels(pLevels.Count - 1)
+            For lNewLevelIndex As Integer = 1 To aChange
+                Dim lNewLevel As New clsLevel
+                lNewLevel.LabelLast(0) = lFormerLast.LabelLast(0)
+                'lNewLevel.LabelLast(5) = lFormerLast.LabelLast(5)
+                lNewLevel.LabelLogged(0) = lFormerLast.LabelLogged(0)
+                'lNewLevel.LabelLogged(5) = lFormerLast.LabelLogged(5)
+                lNewLevel.LabelText(0) = lFormerLast.LabelText(0)
+                'lNewLevel.LabelText(5) = lFormerLast.LabelText(5)
+                pLevels.Add(lNewLevel)
+            Next
+        Else
+            If pLevels.Count + aChange < 1 Then 'Trying to remove only level = hide form
+                aChange = 1 - pLevels.Count
+                lHide = True
             End If
-            pfrmStatus.Level = pLevels.Count
-            pLevelsMutex.ReleaseMutex()
-            If lHide Then HideUnsafe()
+            'Remember last label set for Title=0 and Bottom=5 in case they need to be changed back
+            Dim lRemovingLast As clsLevel = pLevels(pLevels.Count - 1)
+            Dim lKeepingLast As clsLevel = pLevels(pLevels.Count + aChange - 1)
+            lKeepingLast.LabelLast(0) = lRemovingLast.LabelLast(0)
+            'lKeepingLast.LabelLast(5) = lRemovingLast.LabelLast(5)
+            pLevels.RemoveRange(pLevels.Count + aChange, -aChange)
+            lKeepingLast.LabelNeedsUpdate = True
         End If
+        pfrmStatus.Level = pLevels.Count
+        pLevelsMutex.ReleaseMutex()
+        If lHide Then HideUnsafe()
+        'End If
     End Sub
 
     Private Shared Sub Redraw()
@@ -552,7 +552,8 @@ Public Class clsMonitor
                     End If
                 Case "HIDE"
                     If Not pIgnoringWindowCommands AndAlso pfrmStatus IsNot Nothing Then
-                        If pLevels.Count = 1 Then lLevel.ClearLabels()
+                        'If pLevels.Count = 1 Then
+                        lLevel.ClearLabels()
                         'ChangeLevel(-1)
                         'If pfrmStatus IsNot Nothing Then
                         '    lLevel.ClearLabels()
@@ -620,6 +621,8 @@ Public Class clsMonitor
                     LabelText(lLabelIndex) = ""
                     LabelLogged(lLabelIndex) = ""
                 Next
+                ProgressCurrent = 0
+                ProgressFinal = 0
                 LabelNeedsUpdate = True
             End If
         End Sub

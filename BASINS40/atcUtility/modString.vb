@@ -389,10 +389,10 @@ TryOldString:
     ''' Sets values less than 1.0E-19 to 0.0 for the plotting routines for bug in DISSPLA/PR1ME. 
     ''' Otherwise returns values rounded to lower magnitude.
     ''' </summary>
-    ''' <param name="aX">Single-precision value</param>
+    ''' <param name="aX">Value to round</param>
     ''' <returns>Incoming value, rounded to 0.0 if less than 1.0E-19.</returns>
     ''' <remarks>Example: Rndlow(1.0E-20) = 0, Rndlow(11000) = 10000</remarks>
-    Public Function Rndlow(ByRef aX As Double) As Double
+    Public Function Rndlow(ByVal aX As Double) As Double
         Dim lSign As Double = 1.0#
         If aX < 0.0# Then
             lSign = -1.0#
