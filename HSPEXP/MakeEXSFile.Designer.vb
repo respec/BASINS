@@ -22,8 +22,7 @@ Partial Class MakeEXSFile
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.txtUCIFilename = New System.Windows.Forms.TextBox
+        Me.lblUCIFileName = New System.Windows.Forms.Label
         Me.lblLatLeft = New System.Windows.Forms.Label
         Me.txtLat1 = New System.Windows.Forms.TextBox
         Me.txtLat2 = New System.Windows.Forms.TextBox
@@ -32,7 +31,6 @@ Partial Class MakeEXSFile
         Me.lblLong1 = New System.Windows.Forms.Label
         Me.txtLong2 = New System.Windows.Forms.TextBox
         Me.lblLong2 = New System.Windows.Forms.Label
-        Me.lblSimulationPeriod = New System.Windows.Forms.Label
         Me.lblStartDate = New System.Windows.Forms.Label
         Me.lblEndDate = New System.Windows.Forms.Label
         Me.lblNoOfSites = New System.Windows.Forms.Label
@@ -92,9 +90,7 @@ Partial Class MakeEXSFile
         Me.txtNumberOfStorms = New System.Windows.Forms.TextBox
         Me.Panel1 = New System.Windows.Forms.Panel
         Me.VScrollBar2 = New System.Windows.Forms.VScrollBar
-        Me.DTPickerStorm2 = New System.Windows.Forms.DateTimePicker
         Me.Label2 = New System.Windows.Forms.Label
-        Me.DTPickerStartStorm1 = New System.Windows.Forms.DateTimePicker
         Me.lblStartDateStorm = New System.Windows.Forms.Label
         Me.lblStorm1 = New System.Windows.Forms.Label
         Me.lblArea1 = New System.Windows.Forms.Label
@@ -103,27 +99,21 @@ Partial Class MakeEXSFile
         Me.lblSaveEXSAs = New System.Windows.Forms.Label
         Me.txtEXSFileName = New System.Windows.Forms.TextBox
         Me.btnOK = New System.Windows.Forms.Button
+        Me.lblUciFile1 = New System.Windows.Forms.Label
+        Me.chkAnalysisPeriod = New System.Windows.Forms.CheckBox
+        Me.DTStormStart1 = New System.Windows.Forms.DateTimePicker
+        Me.DTStormEnd1 = New System.Windows.Forms.DateTimePicker
         Me.pLocations.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.SuspendLayout()
         '
-        'Label1
+        'lblUCIFileName
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(16, 21)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(103, 13)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Prefix of the UCI File"
-        '
-        'txtUCIFilename
-        '
-        Me.txtUCIFilename.AcceptsTab = True
-        Me.txtUCIFilename.Location = New System.Drawing.Point(125, 18)
-        Me.txtUCIFilename.MaxLength = 8
-        Me.txtUCIFilename.Name = "txtUCIFilename"
-        Me.txtUCIFilename.Size = New System.Drawing.Size(79, 20)
-        Me.txtUCIFilename.TabIndex = 1
+        Me.lblUCIFileName.AutoSize = True
+        Me.lblUCIFileName.Location = New System.Drawing.Point(65, 26)
+        Me.lblUCIFileName.Name = "lblUCIFileName"
+        Me.lblUCIFileName.Size = New System.Drawing.Size(0, 13)
+        Me.lblUCIFileName.TabIndex = 0
         '
         'lblLatLeft
         '
@@ -189,20 +179,10 @@ Partial Class MakeEXSFile
         Me.lblLong2.TabIndex = 8
         Me.lblLong2.Text = "Longitude2"
         '
-        'lblSimulationPeriod
-        '
-        Me.lblSimulationPeriod.AutoSize = True
-        Me.lblSimulationPeriod.Location = New System.Drawing.Point(16, 135)
-        Me.lblSimulationPeriod.Name = "lblSimulationPeriod"
-        Me.lblSimulationPeriod.Size = New System.Drawing.Size(393, 13)
-        Me.lblSimulationPeriod.TabIndex = 10
-        Me.lblSimulationPeriod.Text = "You may specify a different period of analysis than the simulation period of UCI " & _
-            "file."
-        '
         'lblStartDate
         '
         Me.lblStartDate.AutoSize = True
-        Me.lblStartDate.Location = New System.Drawing.Point(16, 167)
+        Me.lblStartDate.Location = New System.Drawing.Point(16, 164)
         Me.lblStartDate.Name = "lblStartDate"
         Me.lblStartDate.Size = New System.Drawing.Size(55, 13)
         Me.lblStartDate.TabIndex = 11
@@ -211,7 +191,7 @@ Partial Class MakeEXSFile
         'lblEndDate
         '
         Me.lblEndDate.AutoSize = True
-        Me.lblEndDate.Location = New System.Drawing.Point(316, 167)
+        Me.lblEndDate.Location = New System.Drawing.Point(187, 164)
         Me.lblEndDate.Name = "lblEndDate"
         Me.lblEndDate.Size = New System.Drawing.Size(52, 13)
         Me.lblEndDate.TabIndex = 13
@@ -220,7 +200,7 @@ Partial Class MakeEXSFile
         'lblNoOfSites
         '
         Me.lblNoOfSites.AutoSize = True
-        Me.lblNoOfSites.Location = New System.Drawing.Point(16, 200)
+        Me.lblNoOfSites.Location = New System.Drawing.Point(16, 209)
         Me.lblNoOfSites.Name = "lblNoOfSites"
         Me.lblNoOfSites.Size = New System.Drawing.Size(62, 13)
         Me.lblNoOfSites.TabIndex = 15
@@ -232,29 +212,39 @@ Partial Class MakeEXSFile
         Me.cmbNumberOfSites.AutoCompleteCustomSource.AddRange(New String() {"1", "2", "3", "4", "5"})
         Me.cmbNumberOfSites.FormatString = "N0"
         Me.cmbNumberOfSites.FormattingEnabled = True
-        Me.cmbNumberOfSites.Location = New System.Drawing.Point(88, 200)
+        Me.cmbNumberOfSites.Location = New System.Drawing.Point(88, 209)
         Me.cmbNumberOfSites.Name = "cmbNumberOfSites"
-        Me.cmbNumberOfSites.Size = New System.Drawing.Size(121, 21)
+        Me.cmbNumberOfSites.Size = New System.Drawing.Size(94, 21)
         Me.cmbNumberOfSites.TabIndex = 16
         '
         'DTStartDate
         '
-        Me.DTStartDate.Location = New System.Drawing.Point(88, 164)
+        Me.DTStartDate.Enabled = False
+        Me.DTStartDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.DTStartDate.Location = New System.Drawing.Point(78, 158)
+        Me.DTStartDate.MaxDate = New Date(2050, 12, 31, 0, 0, 0, 0)
+        Me.DTStartDate.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.DTStartDate.Name = "DTStartDate"
-        Me.DTStartDate.Size = New System.Drawing.Size(200, 20)
+        Me.DTStartDate.Size = New System.Drawing.Size(94, 20)
         Me.DTStartDate.TabIndex = 23
+        Me.DTStartDate.Value = New Date(2000, 1, 1, 0, 0, 0, 0)
         '
         'DTEndDate
         '
-        Me.DTEndDate.Location = New System.Drawing.Point(375, 164)
+        Me.DTEndDate.Enabled = False
+        Me.DTEndDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.DTEndDate.Location = New System.Drawing.Point(262, 158)
+        Me.DTEndDate.MaxDate = New Date(2050, 12, 31, 0, 0, 0, 0)
+        Me.DTEndDate.MinDate = New Date(1940, 12, 31, 0, 0, 0, 0)
         Me.DTEndDate.Name = "DTEndDate"
-        Me.DTEndDate.Size = New System.Drawing.Size(200, 20)
+        Me.DTEndDate.Size = New System.Drawing.Size(90, 20)
         Me.DTEndDate.TabIndex = 24
+        Me.DTEndDate.Value = New Date(2010, 12, 31, 0, 0, 0, 0)
         '
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(16, 235)
+        Me.Label5.Location = New System.Drawing.Point(16, 244)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(293, 13)
         Me.Label5.TabIndex = 25
@@ -496,7 +486,7 @@ Partial Class MakeEXSFile
         Me.pLocations.Controls.Add(Me.lblSAET)
         Me.pLocations.Controls.Add(Me.lblPETX)
         Me.pLocations.Controls.Add(Me.txtPET)
-        Me.pLocations.Location = New System.Drawing.Point(19, 264)
+        Me.pLocations.Location = New System.Drawing.Point(19, 273)
         Me.pLocations.Name = "pLocations"
         Me.pLocations.Size = New System.Drawing.Size(858, 122)
         Me.pLocations.TabIndex = 48
@@ -725,7 +715,7 @@ Partial Class MakeEXSFile
         'lblStormNumber
         '
         Me.lblStormNumber.AutoSize = True
-        Me.lblStormNumber.Location = New System.Drawing.Point(16, 407)
+        Me.lblStormNumber.Location = New System.Drawing.Point(16, 416)
         Me.lblStormNumber.Name = "lblStormNumber"
         Me.lblStormNumber.Size = New System.Drawing.Size(71, 13)
         Me.lblStormNumber.TabIndex = 49
@@ -733,58 +723,44 @@ Partial Class MakeEXSFile
         '
         'txtNumberOfStorms
         '
-        Me.txtNumberOfStorms.Location = New System.Drawing.Point(94, 407)
+        Me.txtNumberOfStorms.Location = New System.Drawing.Point(94, 416)
         Me.txtNumberOfStorms.Name = "txtNumberOfStorms"
         Me.txtNumberOfStorms.Size = New System.Drawing.Size(100, 20)
         Me.txtNumberOfStorms.TabIndex = 50
         '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.DTStormEnd1)
+        Me.Panel1.Controls.Add(Me.DTStormStart1)
         Me.Panel1.Controls.Add(Me.VScrollBar2)
-        Me.Panel1.Controls.Add(Me.DTPickerStorm2)
         Me.Panel1.Controls.Add(Me.Label2)
-        Me.Panel1.Controls.Add(Me.DTPickerStartStorm1)
         Me.Panel1.Controls.Add(Me.lblStartDateStorm)
         Me.Panel1.Controls.Add(Me.lblStorm1)
-        Me.Panel1.Location = New System.Drawing.Point(19, 446)
+        Me.Panel1.Location = New System.Drawing.Point(19, 455)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(611, 100)
+        Me.Panel1.Size = New System.Drawing.Size(381, 100)
         Me.Panel1.TabIndex = 51
         '
         'VScrollBar2
         '
-        Me.VScrollBar2.Location = New System.Drawing.Point(591, 0)
+        Me.VScrollBar2.Location = New System.Drawing.Point(361, 0)
         Me.VScrollBar2.Name = "VScrollBar2"
         Me.VScrollBar2.Size = New System.Drawing.Size(20, 100)
         Me.VScrollBar2.TabIndex = 16
         '
-        'DTPickerStorm2
-        '
-        Me.DTPickerStorm2.Location = New System.Drawing.Point(355, 33)
-        Me.DTPickerStorm2.Name = "DTPickerStorm2"
-        Me.DTPickerStorm2.Size = New System.Drawing.Size(200, 20)
-        Me.DTPickerStorm2.TabIndex = 15
-        '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(405, 13)
+        Me.Label2.Location = New System.Drawing.Point(259, 13)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(52, 13)
         Me.Label2.TabIndex = 14
         Me.Label2.Text = "End Date"
         '
-        'DTPickerStartStorm1
-        '
-        Me.DTPickerStartStorm1.Location = New System.Drawing.Point(69, 33)
-        Me.DTPickerStartStorm1.Name = "DTPickerStartStorm1"
-        Me.DTPickerStartStorm1.Size = New System.Drawing.Size(200, 20)
-        Me.DTPickerStartStorm1.TabIndex = 13
-        '
         'lblStartDateStorm
         '
         Me.lblStartDateStorm.AutoSize = True
-        Me.lblStartDateStorm.Location = New System.Drawing.Point(108, 13)
+        Me.lblStartDateStorm.Location = New System.Drawing.Point(72, 13)
         Me.lblStartDateStorm.Name = "lblStartDateStorm"
         Me.lblStartDateStorm.Size = New System.Drawing.Size(55, 13)
         Me.lblStartDateStorm.TabIndex = 12
@@ -802,7 +778,7 @@ Partial Class MakeEXSFile
         'lblArea1
         '
         Me.lblArea1.AutoSize = True
-        Me.lblArea1.Location = New System.Drawing.Point(19, 566)
+        Me.lblArea1.Location = New System.Drawing.Point(19, 575)
         Me.lblArea1.Name = "lblArea1"
         Me.lblArea1.Size = New System.Drawing.Size(236, 13)
         Me.lblArea1.TabIndex = 52
@@ -810,7 +786,7 @@ Partial Class MakeEXSFile
         '
         'txtArea1
         '
-        Me.txtArea1.Location = New System.Drawing.Point(19, 588)
+        Me.txtArea1.Location = New System.Drawing.Point(19, 597)
         Me.txtArea1.Name = "txtArea1"
         Me.txtArea1.Size = New System.Drawing.Size(100, 20)
         Me.txtArea1.TabIndex = 53
@@ -827,7 +803,7 @@ Partial Class MakeEXSFile
         'lblSaveEXSAs
         '
         Me.lblSaveEXSAs.AutoSize = True
-        Me.lblSaveEXSAs.Location = New System.Drawing.Point(234, 21)
+        Me.lblSaveEXSAs.Location = New System.Drawing.Point(16, 42)
         Me.lblSaveEXSAs.Name = "lblSaveEXSAs"
         Me.lblSaveEXSAs.Size = New System.Drawing.Size(92, 13)
         Me.lblSaveEXSAs.TabIndex = 55
@@ -836,7 +812,7 @@ Partial Class MakeEXSFile
         'txtEXSFileName
         '
         Me.txtEXSFileName.AcceptsTab = True
-        Me.txtEXSFileName.Location = New System.Drawing.Point(339, 18)
+        Me.txtEXSFileName.Location = New System.Drawing.Point(130, 35)
         Me.txtEXSFileName.Name = "txtEXSFileName"
         Me.txtEXSFileName.Size = New System.Drawing.Size(100, 20)
         Me.txtEXSFileName.TabIndex = 56
@@ -850,12 +826,55 @@ Partial Class MakeEXSFile
         Me.btnOK.Text = "OK"
         Me.btnOK.UseVisualStyleBackColor = True
         '
+        'lblUciFile1
+        '
+        Me.lblUciFile1.AutoSize = True
+        Me.lblUciFile1.Location = New System.Drawing.Point(19, 13)
+        Me.lblUciFile1.Name = "lblUciFile1"
+        Me.lblUciFile1.Size = New System.Drawing.Size(47, 13)
+        Me.lblUciFile1.TabIndex = 58
+        Me.lblUciFile1.Text = "UCI File:"
+        '
+        'chkAnalysisPeriod
+        '
+        Me.chkAnalysisPeriod.AutoSize = True
+        Me.chkAnalysisPeriod.Location = New System.Drawing.Point(19, 130)
+        Me.chkAnalysisPeriod.Name = "chkAnalysisPeriod"
+        Me.chkAnalysisPeriod.Size = New System.Drawing.Size(281, 17)
+        Me.chkAnalysisPeriod.TabIndex = 59
+        Me.chkAnalysisPeriod.Text = "Is your analysis period different than simulation period?"
+        Me.chkAnalysisPeriod.UseVisualStyleBackColor = True
+        '
+        'DTStormStart1
+        '
+        Me.DTStormStart1.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.DTStormStart1.Location = New System.Drawing.Point(59, 39)
+        Me.DTStormStart1.MaxDate = New Date(2050, 12, 31, 0, 0, 0, 0)
+        Me.DTStormStart1.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
+        Me.DTStormStart1.Name = "DTStormStart1"
+        Me.DTStormStart1.Size = New System.Drawing.Size(94, 20)
+        Me.DTStormStart1.TabIndex = 24
+        Me.DTStormStart1.Value = New Date(2000, 1, 1, 0, 0, 0, 0)
+        '
+        'DTStormEnd1
+        '
+        Me.DTStormEnd1.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.DTStormEnd1.Location = New System.Drawing.Point(243, 39)
+        Me.DTStormEnd1.MaxDate = New Date(2050, 12, 31, 0, 0, 0, 0)
+        Me.DTStormEnd1.MinDate = New Date(1940, 12, 31, 0, 0, 0, 0)
+        Me.DTStormEnd1.Name = "DTStormEnd1"
+        Me.DTStormEnd1.Size = New System.Drawing.Size(90, 20)
+        Me.DTStormEnd1.TabIndex = 25
+        Me.DTStormEnd1.Value = New Date(2010, 12, 31, 0, 0, 0, 0)
+        '
         'MakeEXSFile
         '
         Me.AcceptButton = Me.btnOK
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(889, 676)
+        Me.Controls.Add(Me.chkAnalysisPeriod)
+        Me.Controls.Add(Me.lblUciFile1)
         Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.txtEXSFileName)
         Me.Controls.Add(Me.lblSaveEXSAs)
@@ -873,7 +892,6 @@ Partial Class MakeEXSFile
         Me.Controls.Add(Me.lblNoOfSites)
         Me.Controls.Add(Me.lblEndDate)
         Me.Controls.Add(Me.lblStartDate)
-        Me.Controls.Add(Me.lblSimulationPeriod)
         Me.Controls.Add(Me.txtLong2)
         Me.Controls.Add(Me.lblLong2)
         Me.Controls.Add(Me.txtLong1)
@@ -882,8 +900,7 @@ Partial Class MakeEXSFile
         Me.Controls.Add(Me.lblLat)
         Me.Controls.Add(Me.txtLat1)
         Me.Controls.Add(Me.lblLatLeft)
-        Me.Controls.Add(Me.txtUCIFilename)
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.lblUCIFileName)
         Me.Name = "MakeEXSFile"
         Me.Text = "Form to make an Basins Specifications (EXS) file for the HSPF project."
         Me.pLocations.ResumeLayout(False)
@@ -894,8 +911,7 @@ Partial Class MakeEXSFile
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents txtUCIFilename As System.Windows.Forms.TextBox
+    Friend WithEvents lblUCIFileName As System.Windows.Forms.Label
     Friend WithEvents lblLatLeft As System.Windows.Forms.Label
     Friend WithEvents txtLat1 As System.Windows.Forms.TextBox
     Friend WithEvents txtLat2 As System.Windows.Forms.TextBox
@@ -904,7 +920,6 @@ Partial Class MakeEXSFile
     Friend WithEvents lblLong1 As System.Windows.Forms.Label
     Friend WithEvents txtLong2 As System.Windows.Forms.TextBox
     Friend WithEvents lblLong2 As System.Windows.Forms.Label
-    Friend WithEvents lblSimulationPeriod As System.Windows.Forms.Label
     Friend WithEvents lblStartDate As System.Windows.Forms.Label
     Friend WithEvents lblEndDate As System.Windows.Forms.Label
     Friend WithEvents lblNoOfSites As System.Windows.Forms.Label
@@ -965,9 +980,7 @@ Partial Class MakeEXSFile
     Friend WithEvents Panel1 As System.Windows.Forms.Panel
     Friend WithEvents lblStorm1 As System.Windows.Forms.Label
     Friend WithEvents VScrollBar2 As System.Windows.Forms.VScrollBar
-    Friend WithEvents DTPickerStorm2 As System.Windows.Forms.DateTimePicker
     Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents DTPickerStartStorm1 As System.Windows.Forms.DateTimePicker
     Friend WithEvents lblStartDateStorm As System.Windows.Forms.Label
     Friend WithEvents lblArea1 As System.Windows.Forms.Label
     Friend WithEvents txtArea1 As System.Windows.Forms.TextBox
@@ -975,4 +988,8 @@ Partial Class MakeEXSFile
     Friend WithEvents lblSaveEXSAs As System.Windows.Forms.Label
     Friend WithEvents txtEXSFileName As System.Windows.Forms.TextBox
     Friend WithEvents btnOK As System.Windows.Forms.Button
+    Friend WithEvents lblUciFile1 As System.Windows.Forms.Label
+    Friend WithEvents chkAnalysisPeriod As System.Windows.Forms.CheckBox
+    Friend WithEvents DTStormEnd1 As System.Windows.Forms.DateTimePicker
+    Friend WithEvents DTStormStart1 As System.Windows.Forms.DateTimePicker
 End Class
