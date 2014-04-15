@@ -27,9 +27,7 @@ Partial Class StartUp
         Me.cmdBrowse = New System.Windows.Forms.Button
         Me.Label1 = New System.Windows.Forms.Label
         Me.txtUCIPath = New System.Windows.Forms.TextBox
-        Me.lblPrefix = New System.Windows.Forms.Label
         Me.lblPrefixWarning = New System.Windows.Forms.Label
-        Me.txtPrefix = New System.Windows.Forms.TextBox
         Me.lblRCH = New System.Windows.Forms.Label
         Me.txtRCH = New System.Windows.Forms.TextBox
         Me.lblOutReach2 = New System.Windows.Forms.Label
@@ -44,13 +42,13 @@ Partial Class StartUp
         Me.chkSedimentBalance = New System.Windows.Forms.CheckBox
         Me.grpGraphs = New System.Windows.Forms.GroupBox
         Me.grpConstituentBalance = New System.Windows.Forms.GroupBox
+        Me.chkFecalColiform = New System.Windows.Forms.CheckBox
         Me.chkBODBalance = New System.Windows.Forms.CheckBox
         Me.chkTotalPhosphorus = New System.Windows.Forms.CheckBox
         Me.chkTotalNitrogen = New System.Windows.Forms.CheckBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.chkExpertStats = New System.Windows.Forms.CheckBox
-        Me.chkMakeEXSFile = New System.Windows.Forms.CheckBox
-        Me.chkFecalColiform = New System.Windows.Forms.CheckBox
+        Me.btnMakeEXSFile = New System.Windows.Forms.Button
         Me.grpGraphs.SuspendLayout()
         Me.grpConstituentBalance.SuspendLayout()
         Me.SuspendLayout()
@@ -70,7 +68,7 @@ Partial Class StartUp
         'cmdBrowse
         '
         Me.cmdBrowse.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdBrowse.Location = New System.Drawing.Point(445, 4)
+        Me.cmdBrowse.Location = New System.Drawing.Point(445, 31)
         Me.cmdBrowse.Name = "cmdBrowse"
         Me.cmdBrowse.Size = New System.Drawing.Size(75, 23)
         Me.cmdBrowse.TabIndex = 1
@@ -82,10 +80,9 @@ Partial Class StartUp
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(12, 9)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(392, 13)
+        Me.Label1.Size = New System.Drawing.Size(164, 13)
         Me.Label1.TabIndex = 2
-        Me.Label1.Text = "Please specify the path to your UCI and WDM files for your current calibration ru" & _
-            "n:"
+        Me.Label1.Text = "UCI file for current calibration run:"
         '
         'txtUCIPath
         '
@@ -96,35 +93,18 @@ Partial Class StartUp
         Me.txtUCIPath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.RecentlyUsedList
         Me.txtUCIPath.Location = New System.Drawing.Point(15, 33)
         Me.txtUCIPath.Name = "txtUCIPath"
-        Me.txtUCIPath.Size = New System.Drawing.Size(505, 20)
+        Me.txtUCIPath.Size = New System.Drawing.Size(424, 20)
         Me.txtUCIPath.TabIndex = 2
-        '
-        'lblPrefix
-        '
-        Me.lblPrefix.AutoSize = True
-        Me.lblPrefix.Location = New System.Drawing.Point(12, 68)
-        Me.lblPrefix.Name = "lblPrefix"
-        Me.lblPrefix.Size = New System.Drawing.Size(58, 13)
-        Me.lblPrefix.TabIndex = 4
-        Me.lblPrefix.Text = "File Prefix: "
         '
         'lblPrefixWarning
         '
         Me.lblPrefixWarning.AutoSize = True
-        Me.lblPrefixWarning.Location = New System.Drawing.Point(12, 90)
+        Me.lblPrefixWarning.Location = New System.Drawing.Point(15, 57)
         Me.lblPrefixWarning.MaximumSize = New System.Drawing.Size(500, 0)
         Me.lblPrefixWarning.Name = "lblPrefixWarning"
-        Me.lblPrefixWarning.Size = New System.Drawing.Size(489, 26)
+        Me.lblPrefixWarning.Size = New System.Drawing.Size(393, 13)
         Me.lblPrefixWarning.TabIndex = 5
-        Me.lblPrefixWarning.Text = "Note that this file prefix MUST be used to name your UCI, WDM, and EXS files.  If" & _
-            " this is not the case, change your file names NOW before proceeding."
-        '
-        'txtPrefix
-        '
-        Me.txtPrefix.Location = New System.Drawing.Point(64, 65)
-        Me.txtPrefix.Name = "txtPrefix"
-        Me.txtPrefix.Size = New System.Drawing.Size(110, 20)
-        Me.txtPrefix.TabIndex = 3
+        Me.lblPrefixWarning.Text = "Note that the output WDM file, HBN file and UCI file name must have same name."
         '
         'lblRCH
         '
@@ -288,6 +268,16 @@ Partial Class StartUp
         Me.grpConstituentBalance.TabStop = False
         Me.grpConstituentBalance.Text = "Constituent Balance Reports"
         '
+        'chkFecalColiform
+        '
+        Me.chkFecalColiform.AutoSize = True
+        Me.chkFecalColiform.Location = New System.Drawing.Point(7, 187)
+        Me.chkFecalColiform.Name = "chkFecalColiform"
+        Me.chkFecalColiform.Size = New System.Drawing.Size(175, 17)
+        Me.chkFecalColiform.TabIndex = 34
+        Me.chkFecalColiform.Text = "Produce Fecal Coliform Reports"
+        Me.chkFecalColiform.UseVisualStyleBackColor = True
+        '
         'chkBODBalance
         '
         Me.chkBODBalance.AutoSize = True
@@ -339,26 +329,15 @@ Partial Class StartUp
         Me.chkExpertStats.Text = "Calculate Expert Statistics"
         Me.chkExpertStats.UseVisualStyleBackColor = True
         '
-        'chkMakeEXSFile
+        'btnMakeEXSFile
         '
-        Me.chkMakeEXSFile.AutoSize = True
-        Me.chkMakeEXSFile.Enabled = False
-        Me.chkMakeEXSFile.Location = New System.Drawing.Point(206, 70)
-        Me.chkMakeEXSFile.Name = "chkMakeEXSFile"
-        Me.chkMakeEXSFile.Size = New System.Drawing.Size(210, 17)
-        Me.chkMakeEXSFile.TabIndex = 31
-        Me.chkMakeEXSFile.Text = "Create Basins Specification (EXS) File?"
-        Me.chkMakeEXSFile.UseVisualStyleBackColor = True
-        '
-        'chkFecalColiform
-        '
-        Me.chkFecalColiform.AutoSize = True
-        Me.chkFecalColiform.Location = New System.Drawing.Point(7, 187)
-        Me.chkFecalColiform.Name = "chkFecalColiform"
-        Me.chkFecalColiform.Size = New System.Drawing.Size(175, 17)
-        Me.chkFecalColiform.TabIndex = 34
-        Me.chkFecalColiform.Text = "Produce Fecal Coliform Reports"
-        Me.chkFecalColiform.UseVisualStyleBackColor = True
+        Me.btnMakeEXSFile.AutoSize = True
+        Me.btnMakeEXSFile.Location = New System.Drawing.Point(15, 86)
+        Me.btnMakeEXSFile.Name = "btnMakeEXSFile"
+        Me.btnMakeEXSFile.Size = New System.Drawing.Size(195, 23)
+        Me.btnMakeEXSFile.TabIndex = 31
+        Me.btnMakeEXSFile.Text = "Create Basins Specification (EXS) File"
+        Me.btnMakeEXSFile.UseVisualStyleBackColor = True
         '
         'StartUp
         '
@@ -367,16 +346,14 @@ Partial Class StartUp
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
         Me.ClientSize = New System.Drawing.Size(532, 649)
-        Me.Controls.Add(Me.chkMakeEXSFile)
+        Me.Controls.Add(Me.btnMakeEXSFile)
         Me.Controls.Add(Me.chkExpertStats)
         Me.Controls.Add(Me.grpConstituentBalance)
         Me.Controls.Add(Me.grpGraphs)
         Me.Controls.Add(Me.chkRunHSPF)
         Me.Controls.Add(Me.chkAreaReports)
         Me.Controls.Add(Me.cmdEnd)
-        Me.Controls.Add(Me.txtPrefix)
         Me.Controls.Add(Me.lblPrefixWarning)
-        Me.Controls.Add(Me.lblPrefix)
         Me.Controls.Add(Me.txtUCIPath)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.cmdBrowse)
@@ -397,9 +374,7 @@ Partial Class StartUp
     Friend WithEvents cmdBrowse As System.Windows.Forms.Button
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents txtUCIPath As System.Windows.Forms.TextBox
-    Friend WithEvents lblPrefix As System.Windows.Forms.Label
     Friend WithEvents lblPrefixWarning As System.Windows.Forms.Label
-    Friend WithEvents txtPrefix As System.Windows.Forms.TextBox
     Friend WithEvents lblRCH As System.Windows.Forms.Label
     Friend WithEvents txtRCH As System.Windows.Forms.TextBox
     Friend WithEvents lblOutReach2 As System.Windows.Forms.Label
@@ -419,7 +394,7 @@ Partial Class StartUp
     Friend WithEvents chkTotalNitrogen As System.Windows.Forms.CheckBox
     Friend WithEvents chkTotalPhosphorus As System.Windows.Forms.CheckBox
     Friend WithEvents chkBODBalance As System.Windows.Forms.CheckBox
-    Friend WithEvents chkMakeEXSFile As System.Windows.Forms.CheckBox
     Friend WithEvents chkFecalColiform As System.Windows.Forms.CheckBox
+    Friend WithEvents btnMakeEXSFile As System.Windows.Forms.Button
 
 End Class
