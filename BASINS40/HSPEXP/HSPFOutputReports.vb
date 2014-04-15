@@ -93,7 +93,7 @@ Module HSPFOutputReports
         pRunUci = StartUp.chkRunHSPF.Checked
         pMakeAreaReports = StartUp.chkAreaReports.Checked
 
-        Dim lTestName As String = StartUp.txtPrefix.Text
+        Dim lTestName As String = IO.Path.GetFileNameWithoutExtension(StartUp.txtUCIPath.Text)
         Logger.Status("Beginning analysis of " & lTestName, True)
 
         If StartUp.chkWaterBalance.Checked Then
@@ -120,6 +120,8 @@ Module HSPFOutputReports
         'Becky added the following to be dependent upon user input:
         pTestPath = StartUp.txtUCIPath.Text
         pBaseName = lTestName
+        pTestPath = Mid(pTestPath, 1, Len(pTestPath) - Len(pBaseName) - 4) & "\"
+
 
         'as best I can tell, the output location should include R for reach and the outlet reach number
         'Becky added the following if-then-else to allow multiple output locations
