@@ -13,10 +13,10 @@ Public Class StartUp
 
     Private Sub cmdBrowse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBrowse.Click
         Dim lOpenDialog As New Windows.Forms.OpenFileDialog
-        Dim lFileName As String
-        Dim lPathName As String
-        Dim lRunFolder As String
-        Dim lPath() As String
+        'Dim lFileName As String
+        'Dim lPathName As String
+        'Dim lRunFolder As String
+        'Dim lPath() As String
 
         With lOpenDialog
             .Title = "Select UCI File from Current Calibration Run"
@@ -24,19 +24,19 @@ Public Class StartUp
             .FilterIndex = 0
             .Multiselect = False
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                lFileName = .SafeFileName 'returns just file name and extension
-                lPathName = Strings.Left(.FileName, Len(.FileName) - Len(lFileName)) 'gets path name from file name, removing file name and extension
-                txtUCIPath.Text = lPathName
+                'lFileName = .SafeFileName 'returns just file name and extension
+                'lPathName = Strings.Left(.FileName, Len(.FileName) - Len(lFileName)) 'gets path name from file name, removing file name and extension
+                txtUCIPath.Text = .FileName ' lPathName
                 'check for run number
-                lPath = Split(lPathName, "\")
-                lRunFolder = lPath(lPath.GetUpperBound(0) - 1) 'for some reason there is a blank in the top dimension
-                Dim UCIFilePrefix As String = Strings.Left(lFileName, Len(lFileName) - 4)
+                'lPath = Split(lPathName, "\")
+                'lRunFolder = lPath(lPath.GetUpperBound(0) - 1) 'for some reason there is a blank in the top dimension
+                'Dim UCIFilePrefix As String = Strings.Left(lFileName, Len(lFileName) - 4)
                 'takes the file name minus the 4 character extension
-                txtPrefix.Text = UCIFilePrefix
+                'txtPrefix.Text = UCIFilePrefix
                 txtUCIPath.Visible = True
-                txtPrefix.Visible = True
+                'txtPrefix.Visible = True
                 txtRCH.Visible = True
-                lblPrefix.Visible = True
+                'lblPrefix.Visible = True
                 lblPrefixWarning.Visible = True
                 lblRCH.Visible = True
                 lblOutReach2.Visible = True
@@ -91,10 +91,10 @@ Public Class StartUp
     End Sub
 
 
-    Private Sub chkMakeEXSFile_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMakeEXSFile.CheckedChanged
-        If chkMakeEXSFile.Checked = True Then
+    Private Sub btnMakeEXSFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMakeEXSFile.Click
+        If txtUCIPath.Text.Length > 0 Then
             MakeEXSFile.Show()
+            MakeEXSFile.lblUCIFileName.Text = txtUCIPath.Text
         End If
-
     End Sub
 End Class
