@@ -3,6 +3,9 @@ Imports System.Windows.Forms.DialogResult
 Imports System.IO
 Public Class MakeEXSFile
     Private g_MapWin As IMapWin
+    Private Sub btnOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOK.Click
+        WriteEXSFileMain(g_MapWin)
+    End Sub
 
     Private Sub cmbNumberOfSites_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbNumberOfSites.SelectedIndexChanged
         cmbNumberOfSites.Items.Add("1")
@@ -17,21 +20,23 @@ Public Class MakeEXSFile
             lblReachNumber2.Visible = True
         End If
 
-
     End Sub
-
 
     Private Sub pLocations_Paint(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles pLocations.Paint
 
 
     End Sub
 
-
-    Private Sub txtUCIFilename_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtUCIFilename.TextChanged
+    Private Sub txtUCIFilename_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
     End Sub
 
-    Private Sub btnOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOK.Click
-        WriteEXSFileMain(g_MapWin)
+    Private Sub chkAnalysisPeriod_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkAnalysisPeriod.CheckedChanged
+        If chkAnalysisPeriod.Checked Then
+            DTStartDate.Enabled = True
+            DTEndDate.Enabled = True
+
+        End If
+
     End Sub
 End Class
