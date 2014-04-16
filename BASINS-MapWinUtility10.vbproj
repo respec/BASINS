@@ -171,6 +171,7 @@
     <Compile Include="Classes\clsScripting.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Classes\clsSerialization.vb" />
     <Compile Include="Classes\clsStrings.vb">
       <SubType>Code</SubType>
     </Compile>
