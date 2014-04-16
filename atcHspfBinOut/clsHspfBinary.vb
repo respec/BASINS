@@ -7,9 +7,10 @@ Imports System.Collections.ObjectModel
 
 Friend Class HspfBinaryId
     Friend AsKey As String
-    'Friend Sub New(ByVal aKey As String)
-    '    AsKey = aKey
-    'End Sub
+
+    Friend Sub New(ByVal aKey As String)
+        AsKey = aKey
+    End Sub
     Friend Sub New(ByVal aOperationName As String, ByVal aOperationNumber As Integer, ByVal aSectionName As String)
         AsKey = aOperationName & ":" & aOperationNumber & ":" & aSectionName
     End Sub
@@ -48,9 +49,93 @@ End Class
 
 Friend Class HspfBinaryHeaders
     Inherits KeyedCollection(Of String, HspfBinaryHeader)
+
+    Private Shared pVersion As Integer = &H48424E31 'HBN1 
+
     Protected Overrides Function GetKeyForItem(ByVal aHspfBinaryHeader As HspfBinaryHeader) As String
         Return aHspfBinaryHeader.Id.AsKey
     End Function
+
+    Public Function Open(ByVal aFileName As String) As Boolean
+        If FileExists(aFileName) Then
+            'Logger.Status("Reading " & IO.Path.GetFileName(aFilename), True)
+            Dim lFileStream As New IO.FileStream(aFileName, IO.FileMode.Open, IO.FileAccess.Read)
+            Dim lReader As New IO.BinaryReader(lFileStream)
+            Dim lVersion As Integer = lReader.ReadInt32
+            If lVersion <> pVersion Then
+                Logger.Dbg("BadMagicNumber for " & aFileName & " (" & Hex(lVersion) & "<>" & Hex(pVersion) & ")")
+                lReader.Close()
+                Return False
+            Else
+                Try
+                    Me.Clear()
+                    Dim lNumHeaders As Integer = lReader.ReadInt32
+                    If lNumHeaders <= 0 Then
+                        Logger.Dbg("Number of headers <= 0 for " & aFileName & " (" & lNumHeaders & ")")
+                        lReader.Close()
+                        Return False
+                    End If
+                    For lHeaderIndex As Integer = 1 To lNumHeaders
+                        Dim lHeader As New HspfBinaryHeader
+                        With lHeader
+                            .Id = New HspfBinaryId(lReader.ReadString)
+                            Dim lNumVars As Integer = lReader.ReadInt32
+                            For lVarIndex As Integer = 1 To lNumVars
+                                .VarNames.Add(lReader.ReadString)
+                            Next
+                            Dim lNumData As Integer = lReader.ReadInt32
+                            For lDataIndex As Integer = 1 To lNumData
+                                Dim lNewDatum As New HspfBinaryDatum()
+                                lNewDatum.JDate = lReader.ReadDouble
+                                lNewDatum.ValuesStartPosition = lReader.ReadInt64
+                                .Data.Add(lNewDatum)
+                            Next
+                        End With
+                        Me.Add(lHeader)
+                    Next
+                Catch ex As Exception
+                    Logger.Dbg("Exception opening " & aFileName & vbCrLf & ex.ToString)
+                    Me.Clear()
+                    Return False
+                Finally
+                    lReader.Close()
+                End Try
+            End If
+        End If
+    End Function
+
+    Public Sub SaveAs(ByVal aFileName As String)
+        'Logger.Status("Reading " & IO.Path.GetFileName(aFilename), True)
+        Dim lWriter As IO.BinaryWriter = Nothing
+        Try
+            Dim lFileStream As New IO.FileStream(aFileName, IO.FileMode.Create)
+            lWriter = New IO.BinaryWriter(lFileStream)
+            lWriter.Write(pVersion)
+            lWriter.Write(Me.Count)
+            For Each lHeader As HspfBinaryHeader In Me
+                With lHeader
+                    lWriter.Write(.Id.AsKey)
+                    lWriter.Write(.VarNames.Count)
+                    For Each lVarName As String In .VarNames
+                        lWriter.Write(lVarName)
+                    Next
+                    lWriter.Write(.Data.Count)
+                    For Each lDatum As HspfBinaryDatum In .Data
+                        lWriter.Write(lDatum.JDate)
+                        lWriter.Write(lDatum.ValuesStartPosition)
+                    Next
+                End With
+            Next
+        Catch ex As Exception
+            Logger.Dbg("Exception Saving " & aFileName & vbCrLf & ex.ToString)
+        Finally
+            Try
+                If lWriter IsNot Nothing Then lWriter.Close()
+            Catch
+            End Try
+        End Try
+    End Sub
+
 End Class
 
 Friend Class HspfBinaryHeader
@@ -269,8 +354,19 @@ Friend Class HspfBinary
             End If
             If pHeaders IsNot Nothing Then pHeaders.Clear()
             pHeaders = New HspfBinaryHeaders
+            Dim lHeaderFileName As String = IO.Path.ChangeExtension(aFileName, ".hbnheader")
+            If IO.File.Exists(lHeaderFileName) Then
+                If IO.File.GetLastWriteTime(lHeaderFileName) < IO.File.GetLastWriteTime(aFileName) Then
+                    TryDelete(lHeaderFileName)
+                Else
+                    pHeaders.Open(lHeaderFileName)
+                End If
+            End If
             pFileRecordIndex = 0
-            ReadNewRecords()
+            If pHeaders.Count = 0 Then
+                ReadNewRecords()
+                pHeaders.SaveAs(lHeaderFileName)
+            End If
             Close(True)
         End Set
     End Property
