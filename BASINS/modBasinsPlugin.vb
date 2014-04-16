@@ -26,14 +26,14 @@ Public Module modBasinsPlugin
     Friend Const g_AppNameLong As String = "USGS GW Toolbox"
     Friend Const g_URL_Home As String = "http://water.usgs.gov/software/lists/groundwater/"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-GW/register.html"
-#ElseIf ProgramName = "USGS Surface Water Analysis" Then
+#ElseIf ProgramName = "USGS SW Toolbox" Then
     Friend Const g_AppNameRegistry As String = "USGS-SW" 'For preferences in registry
-    Friend Const g_AppNameShort As String = "USGS-SW"
-    Friend Const g_AppNameLong As String = "USGS Surface Water Analysis"
+    Friend Const g_AppNameShort As String = "SW Toolbox"
+    Friend Const g_AppNameLong As String = "USGS SW Toolbox"
     Friend Const g_URL_Home As String = "http://water.usgs.gov/software/lists/surface_water/"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-SW/register.html"
 #Else
-    Friend Const g_AppNameRegistry As String = "BASINS4.1" 'For preferences in registry
+    Friend Const g_AppNameRegistry As String = "BASINS" 'For preferences in registry
     Friend Const g_AppNameShort As String = "BASINS"
     Friend Const g_AppNameLong As String = "BASINS 4.1"
     Friend Const g_URL_Home As String = "http://www.epa.gov/waterscience/BASINS/"
