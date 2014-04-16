@@ -660,10 +660,11 @@ StartOver:
         End If
 
         Dim lBasinsDataTypes As String = "<DataType>core31</DataType>"
-        If g_AppNameShort = "GW Toolbox" Then
-            lBasinsDataTypes &= "<DataType>nhd</DataType>"
-            atcDataManager.LoadPlugin("D4EM Data Download::NWIS")
-        End If
+        Select Case g_AppNameShort
+            Case "SW Toolbox", "GW Toolbox"
+                lBasinsDataTypes &= "<DataType>nhd</DataType>"
+                atcDataManager.LoadPlugin("D4EM Data Download::NWIS")
+        End Select
 
         lQuery = "<function name='GetBASINS'>" _
                & "<arguments>" _
@@ -1244,7 +1245,7 @@ StartOver:
     'End Sub
 
     Private Function DataDownload(ByRef aCommandLine As String) As Boolean
-        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameShort, "Base Directory", "C:\" & g_AppNameShort)
+        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameRegistry, "Base Directory", "C:\" & g_AppNameRegistry)
         Dim lDataDownloadExe As String = FindFile("Please locate DataDownload.exe", lProgramFolder & "\etc\DataDownload\DataDownload.exe")
         If lDataDownloadExe.Length > 0 Then
             If Shell(lDataDownloadExe & " " & aCommandLine, AppWinStyle.NormalFocus, True) = 0 Then
@@ -1281,7 +1282,7 @@ StartOver:
     Private Function GetDefaultsXML() As Xml.XmlDocument
         Dim lDefaultsXML As Xml.XmlDocument = Nothing
         Dim lDefaultsPath As String 'full file name of defaults XML
-        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameShort, "Base Directory", "C:\" & g_AppNameShort)
+        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameRegistry, "Base Directory", "C:\" & g_AppNameRegistry)
         lDefaultsPath = FindFile("Please Locate BasinsDefaultLayers.xml", lProgramFolder & "\etc\BasinsDefaultLayers.xml")
         If FileExists(lDefaultsPath) Then
             lDefaultsXML = New Xml.XmlDocument

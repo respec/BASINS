@@ -83,19 +83,21 @@ Public Class atcBasinsPlugIn
         g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
 
         Dim lHelpFilename As String = String.Empty
-        Select Case g_AppNameLong
-            Case "USGS Surface Water Analysis"
-
-            Case "USGS GW Toolbox"
+        Select Case g_AppNameShort
+            Case "SW Toolbox"
                 lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\USGSToolbox.chm")
-                BasinsDataPath = "USGS-GWToolbox\data\"
+                BasinsDataPath = "USGS-SW\data\"
 
-            Case Else '"BASINS 4.1"
+            Case "GW Toolbox"
+                lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\USGSToolbox.chm")
+                BasinsDataPath = "USGS-GW\data\"
+
+            Case Else ' BASINS 
                 lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.1.chm")
         End Select
 
         Logger.StartToFile(g_ProgramDir & "cache\log" & g_PathChar _
-                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
+                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort.Replace(" ", "") & ".log")
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
         If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
             'Start running status monitor to give better progress and status indication during long-running processes
@@ -235,7 +237,7 @@ Public Class atcBasinsPlugIn
     Public Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
         'A menu item or toolbar button was clicked
         Logger.Dbg(aItemName)
-        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameShort, "Base Directory", "C:\" & g_AppNameShort)
+        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameRegistry, "Base Directory", "C:\" & g_AppNameRegistry)
         aHandled = True 'Assume we will handle it
         Select Case aItemName
             Case "mnuNew", "tbbNew"  'Override new project behavior
