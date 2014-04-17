@@ -5,6 +5,7 @@ Public Class MakeEXSFile
     Private g_MapWin As IMapWin
     Private Sub btnOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOK.Click
         WriteEXSFileMain(g_MapWin)
+        Me.Close()
     End Sub
 
     Private Sub cmbNumberOfSites_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbNumberOfSites.SelectedIndexChanged
@@ -37,6 +38,11 @@ Public Class MakeEXSFile
             DTEndDate.Enabled = True
 
         End If
+
+    End Sub
+
+    
+    Private Sub lstBOXWDM_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lstBOXWDM.SelectedIndexChanged
 
     End Sub
 End Class
