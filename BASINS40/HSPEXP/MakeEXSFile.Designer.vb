@@ -39,7 +39,6 @@ Partial Class MakeEXSFile
         Me.DTEndDate = New System.Windows.Forms.DateTimePicker
         Me.Label5 = New System.Windows.Forms.Label
         Me.lblReachNumber = New System.Windows.Forms.Label
-        Me.txtReachNumber = New System.Windows.Forms.TextBox
         Me.txtSIMQ = New System.Windows.Forms.TextBox
         Me.lblSIMQ = New System.Windows.Forms.Label
         Me.lblLZSX = New System.Windows.Forms.Label
@@ -89,6 +88,8 @@ Partial Class MakeEXSFile
         Me.lblStormNumber = New System.Windows.Forms.Label
         Me.txtNumberOfStorms = New System.Windows.Forms.TextBox
         Me.Panel1 = New System.Windows.Forms.Panel
+        Me.DTStormEnd1 = New System.Windows.Forms.DateTimePicker
+        Me.DTStormStart1 = New System.Windows.Forms.DateTimePicker
         Me.VScrollBar2 = New System.Windows.Forms.VScrollBar
         Me.Label2 = New System.Windows.Forms.Label
         Me.lblStartDateStorm = New System.Windows.Forms.Label
@@ -101,8 +102,8 @@ Partial Class MakeEXSFile
         Me.btnOK = New System.Windows.Forms.Button
         Me.lblUciFile1 = New System.Windows.Forms.Label
         Me.chkAnalysisPeriod = New System.Windows.Forms.CheckBox
-        Me.DTStormStart1 = New System.Windows.Forms.DateTimePicker
-        Me.DTStormEnd1 = New System.Windows.Forms.DateTimePicker
+        Me.txtReachNumber = New System.Windows.Forms.TextBox
+        Me.lstBOXWDM = New System.Windows.Forms.ListBox
         Me.pLocations.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.SuspendLayout()
@@ -110,7 +111,7 @@ Partial Class MakeEXSFile
         'lblUCIFileName
         '
         Me.lblUCIFileName.AutoSize = True
-        Me.lblUCIFileName.Location = New System.Drawing.Point(65, 26)
+        Me.lblUCIFileName.Location = New System.Drawing.Point(75, 16)
         Me.lblUCIFileName.Name = "lblUCIFileName"
         Me.lblUCIFileName.Size = New System.Drawing.Size(0, 13)
         Me.lblUCIFileName.TabIndex = 0
@@ -126,6 +127,7 @@ Partial Class MakeEXSFile
         '
         'txtLat1
         '
+        Me.txtLat1.AcceptsTab = True
         Me.txtLat1.Location = New System.Drawing.Point(78, 94)
         Me.txtLat1.Name = "txtLat1"
         Me.txtLat1.Size = New System.Drawing.Size(66, 20)
@@ -133,6 +135,7 @@ Partial Class MakeEXSFile
         '
         'txtLat2
         '
+        Me.txtLat2.AcceptsTab = True
         Me.txtLat2.Location = New System.Drawing.Point(207, 91)
         Me.txtLat2.Name = "txtLat2"
         Me.txtLat2.Size = New System.Drawing.Size(66, 20)
@@ -149,6 +152,7 @@ Partial Class MakeEXSFile
         '
         'txtLong1
         '
+        Me.txtLong1.AcceptsTab = True
         Me.txtLong1.Location = New System.Drawing.Point(335, 91)
         Me.txtLong1.Name = "txtLong1"
         Me.txtLong1.Size = New System.Drawing.Size(65, 20)
@@ -165,6 +169,7 @@ Partial Class MakeEXSFile
         '
         'txtLong2
         '
+        Me.txtLong2.AcceptsTab = True
         Me.txtLong2.Location = New System.Drawing.Point(469, 94)
         Me.txtLong2.Name = "txtLong2"
         Me.txtLong2.Size = New System.Drawing.Size(65, 20)
@@ -259,20 +264,13 @@ Partial Class MakeEXSFile
         Me.lblReachNumber.TabIndex = 26
         Me.lblReachNumber.Text = "Reach Number in UCI File"
         '
-        'txtReachNumber
-        '
-        Me.txtReachNumber.Location = New System.Drawing.Point(120, 25)
-        Me.txtReachNumber.MaxLength = 4
-        Me.txtReachNumber.Name = "txtReachNumber"
-        Me.txtReachNumber.Size = New System.Drawing.Size(100, 20)
-        Me.txtReachNumber.TabIndex = 27
-        '
         'txtSIMQ
         '
+        Me.txtSIMQ.AcceptsTab = True
         Me.txtSIMQ.Location = New System.Drawing.Point(243, 25)
         Me.txtSIMQ.MaxLength = 4
         Me.txtSIMQ.Name = "txtSIMQ"
-        Me.txtSIMQ.Size = New System.Drawing.Size(49, 20)
+        Me.txtSIMQ.Size = New System.Drawing.Size(42, 20)
         Me.txtSIMQ.TabIndex = 28
         '
         'lblSIMQ
@@ -295,6 +293,7 @@ Partial Class MakeEXSFile
         '
         'txtLZSX
         '
+        Me.txtLZSX.AcceptsTab = True
         Me.txtLZSX.Location = New System.Drawing.Point(782, 25)
         Me.txtLZSX.MaxLength = 4
         Me.txtLZSX.Name = "txtLZSX"
@@ -312,6 +311,7 @@ Partial Class MakeEXSFile
         '
         'txtUZSX
         '
+        Me.txtUZSX.AcceptsTab = True
         Me.txtUZSX.Location = New System.Drawing.Point(727, 25)
         Me.txtUZSX.MaxLength = 4
         Me.txtUZSX.Name = "txtUZSX"
@@ -329,6 +329,7 @@ Partial Class MakeEXSFile
         '
         'txtSAET
         '
+        Me.txtSAET.AcceptsTab = True
         Me.txtSAET.Location = New System.Drawing.Point(672, 25)
         Me.txtSAET.MaxLength = 4
         Me.txtSAET.Name = "txtSAET"
@@ -346,6 +347,7 @@ Partial Class MakeEXSFile
         '
         'txtPET
         '
+        Me.txtPET.AcceptsTab = True
         Me.txtPET.Location = New System.Drawing.Point(617, 25)
         Me.txtPET.MaxLength = 4
         Me.txtPET.Name = "txtPET"
@@ -363,6 +365,7 @@ Partial Class MakeEXSFile
         '
         'txtSUPY
         '
+        Me.txtSUPY.AcceptsTab = True
         Me.txtSUPY.Location = New System.Drawing.Point(562, 25)
         Me.txtSUPY.MaxLength = 4
         Me.txtSUPY.Name = "txtSUPY"
@@ -380,6 +383,7 @@ Partial Class MakeEXSFile
         '
         'txtAGWO
         '
+        Me.txtAGWO.AcceptsTab = True
         Me.txtAGWO.Location = New System.Drawing.Point(507, 25)
         Me.txtAGWO.MaxLength = 4
         Me.txtAGWO.Name = "txtAGWO"
@@ -397,6 +401,7 @@ Partial Class MakeEXSFile
         '
         'txtIFWO
         '
+        Me.txtIFWO.AcceptsTab = True
         Me.txtIFWO.Location = New System.Drawing.Point(453, 25)
         Me.txtIFWO.MaxLength = 4
         Me.txtIFWO.Name = "txtIFWO"
@@ -414,6 +419,7 @@ Partial Class MakeEXSFile
         '
         'txtSURO
         '
+        Me.txtSURO.AcceptsTab = True
         Me.txtSURO.Location = New System.Drawing.Point(398, 25)
         Me.txtSURO.MaxLength = 4
         Me.txtSURO.Name = "txtSURO"
@@ -431,6 +437,7 @@ Partial Class MakeEXSFile
         '
         'txtObsFlow
         '
+        Me.txtObsFlow.AcceptsTab = True
         Me.txtObsFlow.Location = New System.Drawing.Point(320, 25)
         Me.txtObsFlow.MaxLength = 4
         Me.txtObsFlow.Name = "txtObsFlow"
@@ -486,7 +493,7 @@ Partial Class MakeEXSFile
         Me.pLocations.Controls.Add(Me.lblSAET)
         Me.pLocations.Controls.Add(Me.lblPETX)
         Me.pLocations.Controls.Add(Me.txtPET)
-        Me.pLocations.Location = New System.Drawing.Point(19, 273)
+        Me.pLocations.Location = New System.Drawing.Point(19, 320)
         Me.pLocations.Name = "pLocations"
         Me.pLocations.Size = New System.Drawing.Size(858, 122)
         Me.pLocations.TabIndex = 48
@@ -523,6 +530,7 @@ Partial Class MakeEXSFile
         '
         'txtObsFlow2
         '
+        Me.txtObsFlow2.AcceptsTab = True
         Me.txtObsFlow2.Location = New System.Drawing.Point(320, 77)
         Me.txtObsFlow2.MaxLength = 4
         Me.txtObsFlow2.Name = "txtObsFlow2"
@@ -532,6 +540,7 @@ Partial Class MakeEXSFile
         '
         'txtReachNumber2
         '
+        Me.txtReachNumber2.AcceptsTab = True
         Me.txtReachNumber2.Location = New System.Drawing.Point(120, 77)
         Me.txtReachNumber2.MaxLength = 4
         Me.txtReachNumber2.Name = "txtReachNumber2"
@@ -551,6 +560,7 @@ Partial Class MakeEXSFile
         '
         'txtSIMQ2
         '
+        Me.txtSIMQ2.AcceptsTab = True
         Me.txtSIMQ2.Location = New System.Drawing.Point(243, 77)
         Me.txtSIMQ2.MaxLength = 4
         Me.txtSIMQ2.Name = "txtSIMQ2"
@@ -560,6 +570,7 @@ Partial Class MakeEXSFile
         '
         'txtSURO2
         '
+        Me.txtSURO2.AcceptsTab = True
         Me.txtSURO2.Location = New System.Drawing.Point(398, 77)
         Me.txtSURO2.MaxLength = 4
         Me.txtSURO2.Name = "txtSURO2"
@@ -587,6 +598,7 @@ Partial Class MakeEXSFile
         '
         'txtLZSX2
         '
+        Me.txtLZSX2.AcceptsTab = True
         Me.txtLZSX2.Location = New System.Drawing.Point(782, 77)
         Me.txtLZSX2.MaxLength = 4
         Me.txtLZSX2.Name = "txtLZSX2"
@@ -595,6 +607,7 @@ Partial Class MakeEXSFile
         '
         'txtIFWO2
         '
+        Me.txtIFWO2.AcceptsTab = True
         Me.txtIFWO2.Location = New System.Drawing.Point(453, 77)
         Me.txtIFWO2.MaxLength = 4
         Me.txtIFWO2.Name = "txtIFWO2"
@@ -621,6 +634,7 @@ Partial Class MakeEXSFile
         '
         'txtUZSX2
         '
+        Me.txtUZSX2.AcceptsTab = True
         Me.txtUZSX2.Location = New System.Drawing.Point(727, 77)
         Me.txtUZSX2.MaxLength = 4
         Me.txtUZSX2.Name = "txtUZSX2"
@@ -629,6 +643,7 @@ Partial Class MakeEXSFile
         '
         'txtAGWO2
         '
+        Me.txtAGWO2.AcceptsTab = True
         Me.txtAGWO2.Location = New System.Drawing.Point(507, 77)
         Me.txtAGWO2.MaxLength = 4
         Me.txtAGWO2.Name = "txtAGWO2"
@@ -655,6 +670,7 @@ Partial Class MakeEXSFile
         '
         'txtSAET2
         '
+        Me.txtSAET2.AcceptsTab = True
         Me.txtSAET2.Location = New System.Drawing.Point(672, 77)
         Me.txtSAET2.MaxLength = 4
         Me.txtSAET2.Name = "txtSAET2"
@@ -663,6 +679,7 @@ Partial Class MakeEXSFile
         '
         'txtSUPY2
         '
+        Me.txtSUPY2.AcceptsTab = True
         Me.txtSUPY2.Location = New System.Drawing.Point(562, 77)
         Me.txtSUPY2.MaxLength = 4
         Me.txtSUPY2.Name = "txtSUPY2"
@@ -689,6 +706,7 @@ Partial Class MakeEXSFile
         '
         'txtPETX2
         '
+        Me.txtPETX2.AcceptsTab = True
         Me.txtPETX2.Location = New System.Drawing.Point(617, 77)
         Me.txtPETX2.MaxLength = 4
         Me.txtPETX2.Name = "txtPETX2"
@@ -715,7 +733,7 @@ Partial Class MakeEXSFile
         'lblStormNumber
         '
         Me.lblStormNumber.AutoSize = True
-        Me.lblStormNumber.Location = New System.Drawing.Point(16, 416)
+        Me.lblStormNumber.Location = New System.Drawing.Point(16, 463)
         Me.lblStormNumber.Name = "lblStormNumber"
         Me.lblStormNumber.Size = New System.Drawing.Size(71, 13)
         Me.lblStormNumber.TabIndex = 49
@@ -723,7 +741,8 @@ Partial Class MakeEXSFile
         '
         'txtNumberOfStorms
         '
-        Me.txtNumberOfStorms.Location = New System.Drawing.Point(94, 416)
+        Me.txtNumberOfStorms.AcceptsTab = True
+        Me.txtNumberOfStorms.Location = New System.Drawing.Point(94, 463)
         Me.txtNumberOfStorms.Name = "txtNumberOfStorms"
         Me.txtNumberOfStorms.Size = New System.Drawing.Size(100, 20)
         Me.txtNumberOfStorms.TabIndex = 50
@@ -736,10 +755,32 @@ Partial Class MakeEXSFile
         Me.Panel1.Controls.Add(Me.Label2)
         Me.Panel1.Controls.Add(Me.lblStartDateStorm)
         Me.Panel1.Controls.Add(Me.lblStorm1)
-        Me.Panel1.Location = New System.Drawing.Point(19, 455)
+        Me.Panel1.Location = New System.Drawing.Point(19, 502)
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(381, 100)
         Me.Panel1.TabIndex = 51
+        '
+        'DTStormEnd1
+        '
+        Me.DTStormEnd1.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.DTStormEnd1.Location = New System.Drawing.Point(243, 39)
+        Me.DTStormEnd1.MaxDate = New Date(2050, 12, 31, 0, 0, 0, 0)
+        Me.DTStormEnd1.MinDate = New Date(1940, 12, 31, 0, 0, 0, 0)
+        Me.DTStormEnd1.Name = "DTStormEnd1"
+        Me.DTStormEnd1.Size = New System.Drawing.Size(90, 20)
+        Me.DTStormEnd1.TabIndex = 25
+        Me.DTStormEnd1.Value = New Date(2010, 12, 31, 0, 0, 0, 0)
+        '
+        'DTStormStart1
+        '
+        Me.DTStormStart1.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.DTStormStart1.Location = New System.Drawing.Point(59, 39)
+        Me.DTStormStart1.MaxDate = New Date(2050, 12, 31, 0, 0, 0, 0)
+        Me.DTStormStart1.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
+        Me.DTStormStart1.Name = "DTStormStart1"
+        Me.DTStormStart1.Size = New System.Drawing.Size(94, 20)
+        Me.DTStormStart1.TabIndex = 24
+        Me.DTStormStart1.Value = New Date(2000, 1, 1, 0, 0, 0, 0)
         '
         'VScrollBar2
         '
@@ -778,7 +819,7 @@ Partial Class MakeEXSFile
         'lblArea1
         '
         Me.lblArea1.AutoSize = True
-        Me.lblArea1.Location = New System.Drawing.Point(19, 575)
+        Me.lblArea1.Location = New System.Drawing.Point(19, 622)
         Me.lblArea1.Name = "lblArea1"
         Me.lblArea1.Size = New System.Drawing.Size(236, 13)
         Me.lblArea1.TabIndex = 52
@@ -786,7 +827,8 @@ Partial Class MakeEXSFile
         '
         'txtArea1
         '
-        Me.txtArea1.Location = New System.Drawing.Point(19, 597)
+        Me.txtArea1.AcceptsTab = True
+        Me.txtArea1.Location = New System.Drawing.Point(19, 644)
         Me.txtArea1.Name = "txtArea1"
         Me.txtArea1.Size = New System.Drawing.Size(100, 20)
         Me.txtArea1.TabIndex = 53
@@ -829,7 +871,7 @@ Partial Class MakeEXSFile
         'lblUciFile1
         '
         Me.lblUciFile1.AutoSize = True
-        Me.lblUciFile1.Location = New System.Drawing.Point(19, 13)
+        Me.lblUciFile1.Location = New System.Drawing.Point(21, 16)
         Me.lblUciFile1.Name = "lblUciFile1"
         Me.lblUciFile1.Size = New System.Drawing.Size(47, 13)
         Me.lblUciFile1.TabIndex = 58
@@ -845,27 +887,23 @@ Partial Class MakeEXSFile
         Me.chkAnalysisPeriod.Text = "Is your analysis period different than simulation period?"
         Me.chkAnalysisPeriod.UseVisualStyleBackColor = True
         '
-        'DTStormStart1
+        'txtReachNumber
         '
-        Me.DTStormStart1.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.DTStormStart1.Location = New System.Drawing.Point(59, 39)
-        Me.DTStormStart1.MaxDate = New Date(2050, 12, 31, 0, 0, 0, 0)
-        Me.DTStormStart1.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
-        Me.DTStormStart1.Name = "DTStormStart1"
-        Me.DTStormStart1.Size = New System.Drawing.Size(94, 20)
-        Me.DTStormStart1.TabIndex = 24
-        Me.DTStormStart1.Value = New Date(2000, 1, 1, 0, 0, 0, 0)
+        Me.txtReachNumber.AcceptsTab = True
+        Me.txtReachNumber.Location = New System.Drawing.Point(120, 25)
+        Me.txtReachNumber.MaxLength = 4
+        Me.txtReachNumber.Name = "txtReachNumber"
+        Me.txtReachNumber.Size = New System.Drawing.Size(100, 20)
+        Me.txtReachNumber.TabIndex = 27
         '
-        'DTStormEnd1
+        'lstBOXWDM
         '
-        Me.DTStormEnd1.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.DTStormEnd1.Location = New System.Drawing.Point(243, 39)
-        Me.DTStormEnd1.MaxDate = New Date(2050, 12, 31, 0, 0, 0, 0)
-        Me.DTStormEnd1.MinDate = New Date(1940, 12, 31, 0, 0, 0, 0)
-        Me.DTStormEnd1.Name = "DTStormEnd1"
-        Me.DTStormEnd1.Size = New System.Drawing.Size(90, 20)
-        Me.DTStormEnd1.TabIndex = 25
-        Me.DTStormEnd1.Value = New Date(2010, 12, 31, 0, 0, 0, 0)
+        Me.lstBOXWDM.FormattingEnabled = True
+        Me.lstBOXWDM.Location = New System.Drawing.Point(19, 271)
+        Me.lstBOXWDM.Name = "lstBOXWDM"
+        Me.lstBOXWDM.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+        Me.lstBOXWDM.Size = New System.Drawing.Size(238, 30)
+        Me.lstBOXWDM.TabIndex = 60
         '
         'MakeEXSFile
         '
@@ -873,6 +911,7 @@ Partial Class MakeEXSFile
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(889, 676)
+        Me.Controls.Add(Me.lstBOXWDM)
         Me.Controls.Add(Me.chkAnalysisPeriod)
         Me.Controls.Add(Me.lblUciFile1)
         Me.Controls.Add(Me.btnOK)
@@ -928,7 +967,6 @@ Partial Class MakeEXSFile
     Friend WithEvents DTEndDate As System.Windows.Forms.DateTimePicker
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents lblReachNumber As System.Windows.Forms.Label
-    Friend WithEvents txtReachNumber As System.Windows.Forms.TextBox
     Friend WithEvents txtSIMQ As System.Windows.Forms.TextBox
     Friend WithEvents lblSIMQ As System.Windows.Forms.Label
     Friend WithEvents lblLZSX As System.Windows.Forms.Label
@@ -992,4 +1030,6 @@ Partial Class MakeEXSFile
     Friend WithEvents chkAnalysisPeriod As System.Windows.Forms.CheckBox
     Friend WithEvents DTStormEnd1 As System.Windows.Forms.DateTimePicker
     Friend WithEvents DTStormStart1 As System.Windows.Forms.DateTimePicker
+    Friend WithEvents txtReachNumber As System.Windows.Forms.TextBox
+    Friend WithEvents lstBOXWDM As System.Windows.Forms.ListBox
 End Class
