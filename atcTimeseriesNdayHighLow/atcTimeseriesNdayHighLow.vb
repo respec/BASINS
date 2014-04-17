@@ -478,7 +478,7 @@ Public Class atcTimeseriesNdayHighLow
         End If
 
         For Each lNdayTs As atcTimeseries In aNdayTsGroup
-            If Not lNdayTs Is Nothing Then
+            If lNdayTs IsNot Nothing AndAlso lNdayTs.Attributes.GetValue("Count Positive", 0) > 0 Then
                 Dim lNumZero As Integer = 0
                 Dim lNonLogTs As atcTimeseries = lNdayTs
                 For lIndex As Integer = 1 To lNonLogTs.numValues
