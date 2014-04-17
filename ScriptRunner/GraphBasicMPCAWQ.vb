@@ -275,12 +275,11 @@ Module GraphBasicMPCAWQ
     {"RCH520", "TP", 2003, 1, 1, 2009, 12, 31, "Shell Lake", "", ""}, _
     {"RCH520", "TSS", 2003, 1, 1, 2009, 12, 31, "Shell Lake", "", ""}, _
     {"RCH520", "TW", 2003, 1, 1, 2009, 12, 31, "Shell Lake", "", ""}, _
-    {"RCH521", "NO3", 2003, 1, 1, 2009, 12, 31, "05243200", "", ""}, _
+    {"RCH521", "NO3", 2003, 1, 1, 2009, 12, 31, "05243200", "Shell R at US-71", ""}, _
     {"RCH521", "ORC", 2003, 1, 1, 2009, 12, 31, "05243200", "", ""}, _
     {"RCH521", "PO4", 2003, 1, 1, 2009, 12, 31, "05243200", "", ""}, _
     {"RCH521", "TORN", 2003, 1, 1, 2009, 12, 31, "05243200", "", ""}, _
     {"RCH521", "DOX", 2003, 1, 1, 2009, 12, 31, "Shell R at US-71", "05243200", "Shell R at inlet to Blueberry Lake"}, _
-    {"RCH521", "NO3", 2003, 1, 1, 2009, 12, 31, "Shell R at US-71", "", ""}, _
     {"RCH521", "TAM", 2003, 1, 1, 2009, 12, 31, "Shell R at US-71", "05243200", ""}, _
     {"RCH521", "TP", 2003, 1, 1, 2009, 12, 31, "Shell R at US-71", "05243200", ""}, _
     {"RCH521", "TSS", 2003, 1, 1, 2009, 12, 31, "Shell R at US-71", "05243200", ""}, _
@@ -465,118 +464,141 @@ Module GraphBasicMPCAWQ
     }
 
     Private pGraphs_MPCAWQ_Val(,) As Object = { _
+    {"RCH104", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "West Leaf Lake", ""}, _
+    {"RCH106", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "East Leaf Lake", ""}, _
+    {"RCH123", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Wolf Lake", ""}, _
+    {"RCH301", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Andrew Lake", ""}, _
+    {"RCH302", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Mary Lake", ""}, _
+    {"RCH304", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Lobster Lk East", ""}, _
+    {"RCH308", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Irene Lake", ""}, _
+    {"RCH309", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Miltona Lake", ""}, _
+    {"RCH310", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Ida Lake", ""}, _
+    {"RCH311", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Latoka Lake", ""}, _
+    {"RCH315", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Victoria Lake", ""}, _
+    {"RCH316", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Geneva Lake", ""}, _
+    {"RCH317", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Winona Lake", ""}, _
+    {"RCH318", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Agnes Lake", ""}, _
+    {"RCH319", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Henry Lake", ""}, _
+    {"RCH320", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Le Homme Dieu L", ""}, _
+    {"RCH321", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Carlos Lake", "Darling Lake"}, _
+    {"RCH326", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
+    {"RCH329", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CSAH 14", "LONG PRAIRIE R ON BR AT CR 90"}, _
+    {"RCH332", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
+    {"RCH336", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH339", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
+    {"RCH341", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
+    {"RCH345", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Fish Trap Lake", ""}, _
+    {"RCH347", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
+    {"RCH400", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
+    {"RCH501", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Bad Medicine Lk", ""}, _
+    {"RCH506", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Two Inlets Lake", ""}, _
+    {"RCH509", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Eagle Lake", ""}, _
+    {"RCH510", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Potato Lake", ""}, _
+    {"RCH511", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Portage Lake", ""}, _
+    {"RCH514", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Straight Lake", ""}, _
+    {"RCH517", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Long Lake", ""}, _
+    {"RCH525", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Blueberry Lake", ""}, _
+    {"RCH527", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Lower Twin Lake", ""}, _
+    {"RCH532", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Lower Bottle Lk", ""}, _
+    {"RCH533", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Big Sand Lake", ""}, _
+    {"RCH582", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Placid Lake", ""}, _
+    {"RCH588", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Margaret Lk", ""}, _
+    {"RCH592", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Lower Cullen Lk", ""}, _
+    {"RCH593", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Hubert Lake", ""}, _
+    {"RCH598", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "North Long Lake", ""}, _
+    {"RCH599", "CHLOROA", 1995, 1, 1, 2002, 12, 31, "Round Lake", ""}, _
+    {"RCH123", "DOX", 1995, 1, 1, 2002, 12, 31, "Wolf Lake", ""}, _
+    {"RCH308", "DOX", 1995, 1, 1, 2002, 12, 31, "Irene Lake", ""}, _
+    {"RCH310", "DOX", 1995, 1, 1, 2002, 12, 31, "Ida Lake", ""}, _
+    {"RCH311", "DOX", 1995, 1, 1, 2002, 12, 31, "Latoka Lake", ""}, _
+    {"RCH315", "DOX", 1995, 1, 1, 2002, 12, 31, "Victoria Lake", ""}, _
+    {"RCH316", "DOX", 1995, 1, 1, 2002, 12, 31, "Geneva Lake", ""}, _
+    {"RCH317", "DOX", 1995, 1, 1, 2002, 12, 31, "Winona Lake", ""}, _
+    {"RCH318", "DOX", 1995, 1, 1, 2002, 12, 31, "Agnes Lake", ""}, _
+    {"RCH319", "DOX", 1995, 1, 1, 2002, 12, 31, "Henry Lake", ""}, _
+    {"RCH320", "DOX", 1995, 1, 1, 2002, 12, 31, "Le Homme Dieu L", ""}, _
+    {"RCH321", "DOX", 1995, 1, 1, 2002, 12, 31, "Carlos Lake", "Darling Lake"}, _
+    {"RCH326", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
+    {"RCH329", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 90", "LONG PRAIRIE R ON BR AT CSAH 14"}, _
+    {"RCH332", "DOX", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
+    {"RCH333", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH336", "DOX", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH339", "DOX", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
+    {"RCH341", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
+    {"RCH345", "DOX", 1995, 1, 1, 2002, 12, 31, "Fish Trap Lake", ""}, _
+    {"RCH347", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
+    {"RCH400", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
+    {"RCH515", "DOX", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
+    {"RCH517", "DOX", 1995, 1, 1, 2002, 12, 31, "Long Lake", ""}, _
+    {"RCH582", "DOX", 1995, 1, 1, 2002, 12, 31, "Placid Lake", ""}, _
+    {"RCH592", "DOX", 1995, 1, 1, 2002, 12, 31, "Lower Cullen Lk", ""}, _
+    {"RCH598", "DOX", 1995, 1, 1, 2002, 12, 31, "North Long Lake", ""}, _
+    {"RCH599", "DOX", 1995, 1, 1, 2002, 12, 31, "Round Lake", ""}, _
+    {"RCH308", "NO3", 1995, 1, 1, 2002, 12, 31, "Irene Lake", ""}, _
+    {"RCH326", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
+    {"RCH329", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CSAH 14", "LONG PRAIRIE R ON BR AT CR 90"}, _
+    {"RCH332", "NO3", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
+    {"RCH333", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH336", "NO3", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH339", "NO3", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
+    {"RCH341", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
+    {"RCH347", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
+    {"RCH400", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
+    {"RCH515", "NO3", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
+    {"RCH517", "NO3", 1995, 1, 1, 2002, 12, 31, "Long Lake", ""}, _
+    {"RCH588", "NO3", 1995, 1, 1, 2002, 12, 31, "Margaret Lk", ""}, _
+    {"RCH599", "NO3", 1995, 1, 1, 2002, 12, 31, "Round Lake", ""}, _
+    {"RCH341", "ORC", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
+    {"RCH326", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
+    {"RCH329", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CSAH 14", "LONG PRAIRIE R ON BR AT CR 90"}, _
+    {"RCH332", "PO4", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
+    {"RCH333", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH336", "PO4", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH339", "PO4", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
+    {"RCH341", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
+    {"RCH347", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
+    {"RCH400", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
+    {"RCH515", "PO4", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
+    {"RCH588", "PO4", 1995, 1, 1, 2002, 12, 31, "Margaret Lk", ""}, _
+    {"RCH598", "PO4", 1995, 1, 1, 2002, 12, 31, "North Long Lake", ""}, _
+    {"RCH326", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
+    {"RCH329", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CSAH 14", "LONG PRAIRIE R ON BR AT CR 90"}, _
+    {"RCH332", "TAM", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
+    {"RCH333", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH336", "TAM", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH339", "TAM", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
+    {"RCH341", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
+    {"RCH347", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
+    {"RCH400", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
+    {"RCH515", "TAM", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
+    {"RCH588", "TAM", 1995, 1, 1, 2002, 12, 31, "Margaret Lk", ""}, _
     {"RCH104", "TP", 1995, 1, 1, 2002, 12, 31, "West Leaf Lake", ""}, _
     {"RCH106", "TP", 1995, 1, 1, 2002, 12, 31, "East Leaf Lake", ""}, _
-    {"RCH123", "DOX", 1995, 1, 1, 2002, 12, 31, "Wolf Lake", ""}, _
     {"RCH123", "TP", 1995, 1, 1, 2002, 12, 31, "Wolf Lake", ""}, _
-    {"RCH123", "TSS", 1995, 1, 1, 2002, 12, 31, "Wolf Lake", ""}, _
-    {"RCH123", "TW", 1995, 1, 1, 2002, 12, 31, "Wolf Lake", ""}, _
     {"RCH301", "TP", 1995, 1, 1, 2002, 12, 31, "Andrew Lake", ""}, _
     {"RCH302", "TP", 1995, 1, 1, 2002, 12, 31, "Mary Lake", ""}, _
     {"RCH304", "TP", 1995, 1, 1, 2002, 12, 31, "Lobster Lk East", ""}, _
-    {"RCH308", "DOX", 1995, 1, 1, 2002, 12, 31, "Irene Lake", ""}, _
-    {"RCH308", "NO3", 1995, 1, 1, 2002, 12, 31, "Irene Lake", ""}, _
     {"RCH308", "TP", 1995, 1, 1, 2002, 12, 31, "Irene Lake", ""}, _
-    {"RCH308", "TSS", 1995, 1, 1, 2002, 12, 31, "Irene Lake", ""}, _
-    {"RCH308", "TW", 1995, 1, 1, 2002, 12, 31, "Irene Lake", ""}, _
     {"RCH309", "TP", 1995, 1, 1, 2002, 12, 31, "Miltona Lake", ""}, _
-    {"RCH310", "DOX", 1995, 1, 1, 2002, 12, 31, "Ida Lake", ""}, _
     {"RCH310", "TP", 1995, 1, 1, 2002, 12, 31, "Ida Lake", ""}, _
-    {"RCH310", "TSS", 1995, 1, 1, 2002, 12, 31, "Ida Lake", ""}, _
-    {"RCH310", "TW", 1995, 1, 1, 2002, 12, 31, "Ida Lake", ""}, _
-    {"RCH311", "DOX", 1995, 1, 1, 2002, 12, 31, "Latoka Lake", ""}, _
     {"RCH311", "TP", 1995, 1, 1, 2002, 12, 31, "Latoka Lake", ""}, _
-    {"RCH311", "TW", 1995, 1, 1, 2002, 12, 31, "Latoka Lake", ""}, _
-    {"RCH315", "DOX", 1995, 1, 1, 2002, 12, 31, "Victoria Lake", ""}, _
     {"RCH315", "TP", 1995, 1, 1, 2002, 12, 31, "Victoria Lake", ""}, _
-    {"RCH315", "TW", 1995, 1, 1, 2002, 12, 31, "Victoria Lake", ""}, _
-    {"RCH316", "DOX", 1995, 1, 1, 2002, 12, 31, "Geneva Lake", ""}, _
     {"RCH316", "TP", 1995, 1, 1, 2002, 12, 31, "Geneva Lake", ""}, _
-    {"RCH316", "TW", 1995, 1, 1, 2002, 12, 31, "Geneva Lake", ""}, _
-    {"RCH317", "DOX", 1995, 1, 1, 2002, 12, 31, "Winona Lake", ""}, _
     {"RCH317", "TP", 1995, 1, 1, 2002, 12, 31, "Winona Lake", ""}, _
-    {"RCH317", "TW", 1995, 1, 1, 2002, 12, 31, "Winona Lake", ""}, _
-    {"RCH318", "DOX", 1995, 1, 1, 2002, 12, 31, "Agnes Lake", ""}, _
     {"RCH318", "TP", 1995, 1, 1, 2002, 12, 31, "Agnes Lake", ""}, _
-    {"RCH318", "TW", 1995, 1, 1, 2002, 12, 31, "Agnes Lake", ""}, _
-    {"RCH319", "DOX", 1995, 1, 1, 2002, 12, 31, "Henry Lake", ""}, _
     {"RCH319", "TP", 1995, 1, 1, 2002, 12, 31, "Henry Lake", ""}, _
-    {"RCH319", "TW", 1995, 1, 1, 2002, 12, 31, "Henry Lake", ""}, _
-    {"RCH320", "DOX", 1995, 1, 1, 2002, 12, 31, "Le Homme Dieu L", ""}, _
     {"RCH320", "TP", 1995, 1, 1, 2002, 12, 31, "Le Homme Dieu L", ""}, _
-    {"RCH320", "TSS", 1995, 1, 1, 2002, 12, 31, "Le Homme Dieu L", ""}, _
-    {"RCH320", "TW", 1995, 1, 1, 2002, 12, 31, "Le Homme Dieu L", ""}, _
-    {"RCH321", "DOX", 1995, 1, 1, 2002, 12, 31, "Carlos Lake", "Darling Lake"}, _
     {"RCH321", "TP", 1995, 1, 1, 2002, 12, 31, "Carlos Lake", "Darling Lake"}, _
-    {"RCH321", "TW", 1995, 1, 1, 2002, 12, 31, "Carlos Lake", "Darling Lake"}, _
-    {"RCH326", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
-    {"RCH326", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
-    {"RCH326", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
-    {"RCH326", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
     {"RCH326", "TP", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
-    {"RCH326", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
-    {"RCH326", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
-    {"RCH329", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 90", "LONG PRAIRIE R ON BR AT CSAH 14"}, _
-    {"RCH329", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 90", "LONG PRAIRIE R ON BR AT CSAH 14"}, _
-    {"RCH329", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 90", "LONG PRAIRIE R ON BR AT CSAH 14"}, _
-    {"RCH329", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 90", "LONG PRAIRIE R ON BR AT CSAH 14"}, _
-    {"RCH329", "TP", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 90", "LONG PRAIRIE R ON BR AT CSAH 14"}, _
-    {"RCH329", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 90", "LONG PRAIRIE R ON BR AT CSAH 14"}, _
-    {"RCH329", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 90", "LONG PRAIRIE R ON BR AT CSAH 14"}, _
-    {"RCH332", "DOX", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
-    {"RCH332", "NO3", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
-    {"RCH332", "PO4", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
-    {"RCH332", "TAM", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
+    {"RCH329", "TP", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CSAH 14", "LONG PRAIRIE R ON BR AT CR 90"}, _
     {"RCH332", "TP", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
-    {"RCH332", "TSS", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
-    {"RCH332", "TW", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
-    {"RCH333", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH333", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH333", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH333", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
     {"RCH333", "TP", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH333", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH333", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH336", "DOX", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH336", "NO3", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH336", "PO4", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH336", "TAM", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
     {"RCH336", "TP", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH336", "TSS", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH336", "TW", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
-    {"RCH339", "DOX", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
-    {"RCH339", "NO3", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
-    {"RCH339", "PO4", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
-    {"RCH339", "TAM", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
     {"RCH339", "TP", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
-    {"RCH339", "TSS", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
-    {"RCH339", "TW", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
-    {"RCH341", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
-    {"RCH341", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
-    {"RCH341", "ORC", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
-    {"RCH341", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
-    {"RCH341", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
     {"RCH341", "TP", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
-    {"RCH341", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
-    {"RCH341", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
-    {"RCH345", "DOX", 1995, 1, 1, 2002, 12, 31, "Fish Trap Lake", ""}, _
     {"RCH345", "TP", 1995, 1, 1, 2002, 12, 31, "Fish Trap Lake", ""}, _
-    {"RCH345", "TSS", 1995, 1, 1, 2002, 12, 31, "Fish Trap Lake", ""}, _
-    {"RCH345", "TW", 1995, 1, 1, 2002, 12, 31, "Fish Trap Lake", ""}, _
-    {"RCH347", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
-    {"RCH347", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
-    {"RCH347", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
-    {"RCH347", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
     {"RCH347", "TP", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
-    {"RCH347", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
-    {"RCH347", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
-    {"RCH400", "DOX", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
-    {"RCH400", "NO3", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
-    {"RCH400", "PO4", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
-    {"RCH400", "TAM", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
     {"RCH400", "TP", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
-    {"RCH400", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
-    {"RCH400", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
     {"RCH501", "TP", 1995, 1, 1, 2002, 12, 31, "Bad Medicine Lk", ""}, _
     {"RCH506", "TP", 1995, 1, 1, 2002, 12, 31, "Two Inlets Lake", ""}, _
     {"RCH509", "TP", 1995, 1, 1, 2002, 12, 31, "Eagle Lake", ""}, _
@@ -584,22 +606,10 @@ Module GraphBasicMPCAWQ
     {"RCH511", "TP", 1995, 1, 1, 2002, 12, 31, "Portage Lake", ""}, _
     {"RCH512", "TP", 1995, 1, 1, 2002, 12, 31, "Fishhook Lake", ""}, _
     {"RCH514", "TP", 1995, 1, 1, 2002, 12, 31, "Straight Lake", ""}, _
-    {"RCH515", "DOX", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
-    {"RCH515", "NO3", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
-    {"RCH515", "PO4", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
-    {"RCH515", "TAM", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
     {"RCH515", "TP", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
-    {"RCH515", "TSS", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
-    {"RCH515", "TW", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
-    {"RCH517", "DOX", 1995, 1, 1, 2002, 12, 31, "Long Lake", ""}, _
-    {"RCH517", "NO3", 1995, 1, 1, 2002, 12, 31, "Long Lake", ""}, _
     {"RCH517", "TP", 1995, 1, 1, 2002, 12, 31, "Long Lake", ""}, _
-    {"RCH517", "TSS", 1995, 1, 1, 2002, 12, 31, "Long Lake", ""}, _
-    {"RCH517", "TW", 1995, 1, 1, 2002, 12, 31, "Long Lake", ""}, _
     {"RCH520", "TP", 1995, 1, 1, 2002, 12, 31, "Shell Lake", ""}, _
-    {"RCH520", "TW", 1995, 1, 1, 2002, 12, 31, "Shell Lake", ""}, _
     {"RCH525", "TP", 1995, 1, 1, 2002, 12, 31, "Blueberry Lake", ""}, _
-    {"RCH526", "TW", 1995, 1, 1, 2002, 12, 31, "Fishhook River below Long Lake", ""}, _
     {"RCH527", "TP", 1995, 1, 1, 2002, 12, 31, "Lower Twin Lake", ""}, _
     {"RCH531", "TP", 1995, 1, 1, 2002, 12, 31, "Mantrap Lk East", ""}, _
     {"RCH532", "TP", 1995, 1, 1, 2002, 12, 31, "Lower Bottle Lk", ""}, _
@@ -609,30 +619,62 @@ Module GraphBasicMPCAWQ
     {"RCH537", "TP", 1995, 1, 1, 2002, 12, 31, "9th Crow Wing", ""}, _
     {"RCH544", "TP", 1995, 1, 1, 2002, 12, 31, "3rd Crow Wing", "4th Crow Wing"}, _
     {"RCH546", "TP", 1995, 1, 1, 2002, 12, 31, "1st Crow Wing", ""}, _
-    {"RCH582", "DOX", 1995, 1, 1, 2002, 12, 31, "Placid Lake", ""}, _
     {"RCH582", "TP", 1995, 1, 1, 2002, 12, 31, "Placid Lake", ""}, _
-    {"RCH582", "TSS", 1995, 1, 1, 2002, 12, 31, "Placid Lake", ""}, _
-    {"RCH582", "TW", 1995, 1, 1, 2002, 12, 31, "Placid Lake", ""}, _
-    {"RCH588", "NO3", 1995, 1, 1, 2002, 12, 31, "Margaret Lk", ""}, _
-    {"RCH588", "PO4", 1995, 1, 1, 2002, 12, 31, "Margaret Lk", ""}, _
-    {"RCH588", "TAM", 1995, 1, 1, 2002, 12, 31, "Margaret Lk", ""}, _
     {"RCH588", "TP", 1995, 1, 1, 2002, 12, 31, "Margaret Lk", ""}, _
-    {"RCH592", "DOX", 1995, 1, 1, 2002, 12, 31, "Lower Cullen Lk", ""}, _
     {"RCH592", "TP", 1995, 1, 1, 2002, 12, 31, "Lower Cullen Lk", ""}, _
-    {"RCH592", "TSS", 1995, 1, 1, 2002, 12, 31, "Lower Cullen Lk", ""}, _
-    {"RCH592", "TW", 1995, 1, 1, 2002, 12, 31, "Lower Cullen Lk", ""}, _
     {"RCH593", "TP", 1995, 1, 1, 2002, 12, 31, "Hubert Lake", ""}, _
-    {"RCH593", "TSS", 1995, 1, 1, 2002, 12, 31, "Hubert Lake", ""}, _
-    {"RCH593", "TW", 1995, 1, 1, 2002, 12, 31, "Hubert Lake", ""}, _
-    {"RCH598", "DOX", 1995, 1, 1, 2002, 12, 31, "North Long Lake", ""}, _
-    {"RCH598", "PO4", 1995, 1, 1, 2002, 12, 31, "North Long Lake", ""}, _
     {"RCH598", "TP", 1995, 1, 1, 2002, 12, 31, "North Long Lake", ""}, _
-    {"RCH598", "TSS", 1995, 1, 1, 2002, 12, 31, "North Long Lake", ""}, _
-    {"RCH598", "TW", 1995, 1, 1, 2002, 12, 31, "North Long Lake", ""}, _
-    {"RCH599", "DOX", 1995, 1, 1, 2002, 12, 31, "Round Lake", ""}, _
-    {"RCH599", "NO3", 1995, 1, 1, 2002, 12, 31, "Round Lake", ""}, _
     {"RCH599", "TP", 1995, 1, 1, 2002, 12, 31, "Round Lake", ""}, _
+    {"RCH123", "TSS", 1995, 1, 1, 2002, 12, 31, "Wolf Lake", ""}, _
+    {"RCH308", "TSS", 1995, 1, 1, 2002, 12, 31, "Irene Lake", ""}, _
+    {"RCH310", "TSS", 1995, 1, 1, 2002, 12, 31, "Ida Lake", ""}, _
+    {"RCH320", "TSS", 1995, 1, 1, 2002, 12, 31, "Le Homme Dieu L", ""}, _
+    {"RCH326", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
+    {"RCH329", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CSAH 14", "LONG PRAIRIE R ON BR AT CR 90"}, _
+    {"RCH332", "TSS", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
+    {"RCH333", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH336", "TSS", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH339", "TSS", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
+    {"RCH341", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
+    {"RCH345", "TSS", 1995, 1, 1, 2002, 12, 31, "Fish Trap Lake", ""}, _
+    {"RCH347", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
+    {"RCH400", "TSS", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
+    {"RCH515", "TSS", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
+    {"RCH517", "TSS", 1995, 1, 1, 2002, 12, 31, "Long Lake", ""}, _
+    {"RCH582", "TSS", 1995, 1, 1, 2002, 12, 31, "Placid Lake", ""}, _
+    {"RCH592", "TSS", 1995, 1, 1, 2002, 12, 31, "Lower Cullen Lk", ""}, _
+    {"RCH593", "TSS", 1995, 1, 1, 2002, 12, 31, "Hubert Lake", ""}, _
+    {"RCH598", "TSS", 1995, 1, 1, 2002, 12, 31, "North Long Lake", ""}, _
     {"RCH599", "TSS", 1995, 1, 1, 2002, 12, 31, "Round Lake", ""}, _
+    {"RCH123", "TW", 1995, 1, 1, 2002, 12, 31, "Wolf Lake", ""}, _
+    {"RCH308", "TW", 1995, 1, 1, 2002, 12, 31, "Irene Lake", ""}, _
+    {"RCH310", "TW", 1995, 1, 1, 2002, 12, 31, "Ida Lake", ""}, _
+    {"RCH311", "TW", 1995, 1, 1, 2002, 12, 31, "Latoka Lake", ""}, _
+    {"RCH315", "TW", 1995, 1, 1, 2002, 12, 31, "Victoria Lake", ""}, _
+    {"RCH316", "TW", 1995, 1, 1, 2002, 12, 31, "Geneva Lake", ""}, _
+    {"RCH317", "TW", 1995, 1, 1, 2002, 12, 31, "Winona Lake", ""}, _
+    {"RCH318", "TW", 1995, 1, 1, 2002, 12, 31, "Agnes Lake", ""}, _
+    {"RCH319", "TW", 1995, 1, 1, 2002, 12, 31, "Henry Lake", ""}, _
+    {"RCH320", "TW", 1995, 1, 1, 2002, 12, 31, "Le Homme Dieu L", ""}, _
+    {"RCH321", "TW", 1995, 1, 1, 2002, 12, 31, "Carlos Lake", "Darling Lake"}, _
+    {"RCH326", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R. W OF LONG PRAIRIE", ""}, _
+    {"RCH329", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CSAH 14", "LONG PRAIRIE R ON BR AT CR 90"}, _
+    {"RCH332", "TW", 1995, 1, 1, 2002, 12, 31, "EAGLE CR ON BRG AT CSAH 21", ""}, _
+    {"RCH333", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH336", "TW", 1995, 1, 1, 2002, 12, 31, "TURTLE CK ON BR AT OAK RIDGE RD", ""}, _
+    {"RCH339", "TW", 1995, 1, 1, 2002, 12, 31, "MORAN CR ON BR AT 255TH AVE", ""}, _
+    {"RCH341", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT CR 65", ""}, _
+    {"RCH345", "TW", 1995, 1, 1, 2002, 12, 31, "Fish Trap Lake", ""}, _
+    {"RCH347", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R BRIDGE ON US-10", ""}, _
+    {"RCH400", "TW", 1995, 1, 1, 2002, 12, 31, "LONG PRAIRIE R ON BR AT RIVERSIDE DR", ""}, _
+    {"RCH515", "TW", 1995, 1, 1, 2002, 12, 31, "STRAIGHT R AT US HWY 71", ""}, _
+    {"RCH517", "TW", 1995, 1, 1, 2002, 12, 31, "Long Lake", ""}, _
+    {"RCH520", "TW", 1995, 1, 1, 2002, 12, 31, "Shell Lake", ""}, _
+    {"RCH526", "TW", 1995, 1, 1, 2002, 12, 31, "Fishhook River below Long Lake", ""}, _
+    {"RCH582", "TW", 1995, 1, 1, 2002, 12, 31, "Placid Lake", ""}, _
+    {"RCH592", "TW", 1995, 1, 1, 2002, 12, 31, "Lower Cullen Lk", ""}, _
+    {"RCH593", "TW", 1995, 1, 1, 2002, 12, 31, "Hubert Lake", ""}, _
+    {"RCH598", "TW", 1995, 1, 1, 2002, 12, 31, "North Long Lake", ""}, _
     {"RCH599", "TW", 1995, 1, 1, 2002, 12, 31, "Round Lake", ""} _
     }
 
@@ -682,7 +724,7 @@ Module GraphBasicMPCAWQ
     '{"RCH530", "STAGE", 2003, 1, 1, 2009, 12, 31, "Shell R at CSAH 23"}, _
 
     Private Sub Initialize()
-        Dim lTestName As String = "MPCAWQ"
+        Dim lTestName As String = "MPCAValWQ"
         'Dim lTestName As String = "MPCAValWQ"
         Select Case lTestName
             Case "MPCAWQ"
@@ -691,7 +733,7 @@ Module GraphBasicMPCAWQ
                 pWQGraphSpecification = pGraphSpecMPCAWQ
                 pObservedWQBaseFileName = "T:\MPCA\WQ_data.dbf"
             Case "MPCAValWQ"
-                pWorkingDirectory = "C:\BASINS\modelout\"
+                pWorkingDirectory = "M:\modelout\"
                 pbasename = "MPCAValWQ"
                 pWQGraphSpecification = pGraphs_MPCAWQ_Val
                 pObservedWQBaseFileName = "T:\MPCA\WQ_data.dbf"
@@ -727,6 +769,7 @@ Module GraphBasicMPCAWQ
                 'LaunchProgram(pHSPFExe, pWorkingDirectory, lUCIName)
                 'Logger.Dbg("HSPFRun Finished")
 
+                'determine date & time of most recent update to WDM files for input to foldername
                 Dim pOutputWDMFileName1 As String = pWorkingDirectory & "CWCal03\CWCal03.wdm"
                 Dim wdmfileinfo As System.IO.FileInfo = New System.IO.FileInfo(pOutputWDMFileName1)
                 Dim LastWriteTime As Date = wdmfileinfo.LastWriteTime
@@ -736,7 +779,6 @@ Module GraphBasicMPCAWQ
                     lRunmade = wdmfileinfo.LastWriteTime.ToString
                     LastWriteTime = wdmfileinfo.LastWriteTime
                 End If
-
                 wdmfileinfo = New System.IO.FileInfo(pWorkingDirectory & "RECal03\RECal03.wdm")
                 If LastWriteTime < wdmfileinfo.LastWriteTime Then
                     lRunmade = wdmfileinfo.LastWriteTime.ToString
@@ -758,34 +800,35 @@ Module GraphBasicMPCAWQ
                     Select Case pTimeseriesConstituent
                         Case "TW"
                             pLeftYAxisLabel = "Water Temperature (" & ChrW(186) & "F)"
-                            'AxisUpper = 100
+                            AxisUpper = 100
                         Case "CHLOROA"
                             pLeftYAxisLabel = "Phytoplankton as Chlorophyll A (" & ChrW(181) & "g/l)"
+                            AxisUpper = 60
                         Case "DOX"
                             pLeftYAxisLabel = "Dissolved Oxygen (mg/l)"
-                            'AxisUpper = 18
+                            AxisUpper = 18
                         Case "TSS"
                             pLeftYAxisLabel = "Total Suspended Solids (mg/l)"
                             'AxisUpper = 1500
                             pLeftAxisLogScale = True
                         Case "ORC"
                             pLeftYAxisLabel = "Organic Carbon (mg/l)"
-                            'AxisUpper = 10
+                            AxisUpper = 10
                         Case "TORN"
                             pLeftYAxisLabel = "Total Organic Nitrogen (mg/l)"
-                            'AxisUpper = 2
+                            AxisUpper = 2
                         Case "TAM"
                             pLeftYAxisLabel = "Ammonia (mg/l as N)"
-                            'AxisUpper = 1
+                            AxisUpper = 1
                         Case "NO3"
                             pLeftYAxisLabel = "Nitrate + Nitrite (mg/l as N)"
-                            'AxisUpper = 10
+                            AxisUpper = 5
                         Case "TP"
                             pLeftYAxisLabel = "Total Phosphorus (mg/l)"
-                            'AxisUpper = 2
+                            AxisUpper = 2
                         Case "PO4"
                             pLeftYAxisLabel = "Orthophosphate (mg/l as P)"
-                            'AxisUpper = 2
+                            AxisUpper = 1
                     End Select
                     Dim lSDate(5) As Integer : lSDate(0) = pWQGraphSpecification(lGraphIndex, 2) : lSDate(1) _
                                                = pWQGraphSpecification(lGraphIndex, 3) : lSDate(2) = pWQGraphSpecification(lGraphIndex, 4)
@@ -794,8 +837,8 @@ Module GraphBasicMPCAWQ
                                                 pWQGraphSpecification(lGraphIndex, 6) : lEDate(2) = pWQGraphSpecification(lGraphIndex, 7)
                     Dim lEdatej As Double = Date2J(lEDate)
                     pbasename = pTimeseriesConstituent & "_" & pWQGraphSpecification(lGraphIndex, 0) & "_" & _
-                                Format(pWQGraphSpecification(lGraphIndex, 3), "00") & _
-                                Format(pWQGraphSpecification(lGraphIndex, 4), "00") & Right(pWQGraphSpecification(lGraphIndex, 2), 2) & "_to_" & _
+                                Format(pWQGraphSpecification(lGraphIndex, 3), "00") & Format(pWQGraphSpecification(lGraphIndex, 4), "00") & _
+                                Right(pWQGraphSpecification(lGraphIndex, 2), 2) & "_to_" & _
                                 Format(pWQGraphSpecification(lGraphIndex, 6), "00") & Format(pWQGraphSpecification(lGraphIndex, 7), "00") & _
                                 Right(pWQGraphSpecification(lGraphIndex, 5), 2)
                     Dim lTimeseriesGroup As New atcTimeseriesGroup
@@ -830,8 +873,7 @@ Module GraphBasicMPCAWQ
                         pLeftAuxAxisLabel = "Flow (cfs)"
                         lTser1 = Nothing
 
-                        'Observed Flow
-                        
+                        'Observed Flow                        
                         lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 8)). _
                                                 FindData("Constituent", "FLOW")(0)
                         Select Case location
@@ -854,6 +896,7 @@ Module GraphBasicMPCAWQ
                             lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
                         End If
                         lTser1 = Nothing
+
                         If (pWQGraphSpecification(lGraphIndex, 9) <> "") Then
                             lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 9)). _
                                                 FindData("Constituent", "FLOW")(0)
@@ -866,7 +909,6 @@ Module GraphBasicMPCAWQ
                         End If
 
                         'Simulated constituent data
-
                         lTser1 = lDataSource1.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 0)). _
                                                 FindData("Constituent", pWQGraphSpecification(lGraphIndex, 1))(0)
                         lTser1.Attributes.SetValue("YAxis", "Left")
@@ -955,6 +997,7 @@ Module GraphBasicMPCAWQ
                 'LaunchProgram(pHSPFExe, pWorkingDirectory, lUCIName)
                 'Logger.Dbg("HSPFRun Finished")
 
+                'determine date & time of most recent update to WDM files for input to foldername
                 Dim pOutputWDMFileName1 As String = pWorkingDirectory & "CWVal\CWVal.wdm"
                 Dim wdmfileinfo As System.IO.FileInfo = New System.IO.FileInfo(pOutputWDMFileName1)
                 Dim LastWriteTime As Date = wdmfileinfo.LastWriteTime
@@ -964,7 +1007,6 @@ Module GraphBasicMPCAWQ
                     lRunmade = wdmfileinfo.LastWriteTime.ToString
                     LastWriteTime = wdmfileinfo.LastWriteTime
                 End If
-
                 wdmfileinfo = New System.IO.FileInfo(pWorkingDirectory & "REVal\REVal.wdm")
                 If LastWriteTime < wdmfileinfo.LastWriteTime Then
                     lRunmade = wdmfileinfo.LastWriteTime.ToString
@@ -987,6 +1029,7 @@ Module GraphBasicMPCAWQ
                             AxisUpper = 100
                         Case "CHLOROA"
                             pLeftYAxisLabel = "Phytoplankton as Chlorophyll A (" & ChrW(181) & "g/l)"
+                            AxisUpper = 60
                         Case "DOX"
                             pLeftYAxisLabel = "Dissolved Oxygen (mg/l)"
                             AxisUpper = 18
@@ -1005,13 +1048,13 @@ Module GraphBasicMPCAWQ
                             AxisUpper = 1
                         Case "NO3"
                             pLeftYAxisLabel = "Nitrate + Nitrite (mg/l as N)"
-                            AxisUpper = 10
+                            AxisUpper = 5
                         Case "TP"
                             pLeftYAxisLabel = "Total Phosphorus (mg/l)"
                             AxisUpper = 2
                         Case "PO4"
                             pLeftYAxisLabel = "Orthophosphate (mg/l as P)"
-                            AxisUpper = 2
+                            AxisUpper = 1
                     End Select
                     Dim lSDate(5) As Integer : lSDate(0) = pWQGraphSpecification(lGraphIndex, 2) : lSDate(1) _
                                                = pWQGraphSpecification(lGraphIndex, 3) : lSDate(2) = pWQGraphSpecification(lGraphIndex, 4)
@@ -1026,6 +1069,7 @@ Module GraphBasicMPCAWQ
                                 Right(pWQGraphSpecification(lGraphIndex, 5), 2)
                     Dim lTimeseriesGroup As New atcTimeseriesGroup
                     Dim ReachNumber As Integer = Mid(pWQGraphSpecification(lGraphIndex, 0), 4, 6)
+
                     'get timeseries 1
                     Dim lDataSource1 As New atcDataSourceWDM
 
@@ -1052,7 +1096,6 @@ Module GraphBasicMPCAWQ
                         'If Not pTimeseriesConstituent = "TSS" Then
                         lTser1 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                         'End If
-
                         lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
                         pLeftAuxAxisLabel = "Flow (cfs)"
                         lTser1 = Nothing
@@ -1060,12 +1103,27 @@ Module GraphBasicMPCAWQ
                         'Observed Flow
                         lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 8)). _
                                                 FindData("Constituent", "FLOW")(0)
+                        Select Case location
+                            Case "RCH400"
+                                lTser1 = lDataSource1.DataSets.FindData("Location", "05245100"). _
+                                                FindData("Constituent", "FLOW")(0)
+                            Case "RCH515"
+                                lTser1 = lDataSource1.DataSets.FindData("Location", "05243725"). _
+                                                FindData("Constituent", "FLOW")(0)
+                            Case "RCH557"
+                                lTser1 = lDataSource1.DataSets.FindData("Location", "05244000"). _
+                                                FindData("Constituent", "FLOW")(0)
+                            Case "RCH700"
+                                lTser1 = lDataSource1.DataSets.FindData("Location", "05247500"). _
+                                                FindData("Constituent", "FLOW")(0)
+                        End Select
                         If lTser1 IsNot Nothing Then
                             lTser1.Attributes.SetValue("YAxis", "Aux")
                             lTser1.Attributes.SetValue("Point", "True")
                             lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
                         End If
                         lTser1 = Nothing
+
                         If (pWQGraphSpecification(lGraphIndex, 9) <> "") Then
                             lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 9)). _
                                                 FindData("Constituent", "FLOW")(0)
@@ -1088,22 +1146,23 @@ Module GraphBasicMPCAWQ
                         'If Not pTimeseriesConstituent = "TSS" Then
                         lTser1 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                         'End If
-
                         lTimeseriesGroup.Add(SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing))
                         lTser1 = Nothing
 
                         'Observed constituent data
                         lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 8)). _
                                                 FindData("Constituent", pWQGraphSpecification(lGraphIndex, 1))(0)
-                        lTser1.Attributes.SetValue("YAxis", "Left")
-                        lTser1.Attributes.SetValue("Point", "True")
-                        If lTser1.Attributes.Count > 60 Then
-                            lTser1 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                        If lTser1 IsNot Nothing Then
+                            lTser1.Attributes.SetValue("YAxis", "Left")
+                            lTser1.Attributes.SetValue("Point", "True")
+                            If lTser1.Attributes.Count > 60 Then
+                                lTser1 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                            End If
+                            lTser1 = SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing)
+                            If lTser1.numValues < 1 Then Continue For
+                            lTimeseriesGroup.Add(lTser1)
+                            lTser1 = Nothing
                         End If
-                        lTser1 = SubsetByDate(lTser1, lSDateJ, lEdatej, Nothing)
-                        If lTser1.numValues < 1 Then Continue For
-                        lTimeseriesGroup.Add(lTser1)
-                        lTser1 = Nothing
 
                         If (pWQGraphSpecification(lGraphIndex, 9) <> "") Then
                             lTser1 = lDataSource2.DataSets.FindData("Location", pWQGraphSpecification(lGraphIndex, 9)). _
@@ -1353,7 +1412,7 @@ Module GraphBasicMPCAWQ
         If lPaneAux.CurveList.Count > 1 Then
             lCurveAux = lPaneAux.CurveList.Item(1) 'lCurveAux is observed data
             lCurveAux.Color = Drawing.Color.Blue
-            If lCurveAux.Points.Count > 200 Then
+            If lCurveAux.Points.Count > 550 Then
                 lCurveAux.Line.IsVisible = True
                 lCurveAux.Symbol.Type = SymbolType.None
                 lCurveAux.Line.Width = 1
@@ -1371,11 +1430,11 @@ Module GraphBasicMPCAWQ
             lCurveAux.Color = Drawing.Color.Green
             lCurveAux.Symbol.Type = SymbolType.Circle
             lCurveAux.Symbol.Fill.IsVisible = True
-            If lCurveAux.Points.Count > 60 Then
-                lCurveAux.Symbol.Size = 4
-            Else
-                lCurveAux.Symbol.Size = 7
-            End If
+            'If lCurveAux.Points.Count > 60 Then
+            lCurveAux.Symbol.Size = 4
+            'Else
+            'lCurveAux.Symbol.Size = 7
+            'End If
         End If
 
         'lCurveMain = lPaneMain.CurveList.Item(0) ' lCurveMain is the hourly simulated data
@@ -1426,6 +1485,9 @@ Module GraphBasicMPCAWQ
         End If
 
         'lPaneMain.YAxis.Scale.Max = AxisUpper
+        If AxisUpper <> 0 And AxisUpper > lPaneMain.YAxis.Scale.Max Then
+            lPaneMain.YAxis.Scale.Max = AxisUpper
+        End If
         lPaneMain.AxisChange()
         lPaneAux.YAxis.Scale.Min = 0
         lPaneAux.AxisChange()
