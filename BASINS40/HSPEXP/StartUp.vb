@@ -95,6 +95,18 @@ Public Class StartUp
         If txtUCIPath.Text.Length > 0 Then
             MakeEXSFile.Show()
             MakeEXSFile.lblUCIFileName.Text = txtUCIPath.Text
+            Dim lWDM As New atcWDM.atcDataSourceWDM
+            atcData.atcDataManager.OpenDataSource(lWDM, IO.Path.ChangeExtension(MakeEXSFile.lblUCIFileName.Text, ".wdm"), Nothing)
+            Dim lSIMQ As atcData.atcTimeseriesGroup = lWDM.DataSets.FindData("Constituent", "SIMQ")
+            With MakeEXSFile.lstBOXWDM
+                For Each lTs As atcData.atcTimeseries In lSIMQ
+                    .Items.Add(lTs.Attributes.GetValue("Location"))
+                Next
+            End With
         End If
+    End Sub
+
+    Private Sub StartUp_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        atcData.atcDataManager.Clear()
     End Sub
 End Class
