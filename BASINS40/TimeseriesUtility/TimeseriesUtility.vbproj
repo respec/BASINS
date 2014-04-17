@@ -226,10 +226,6 @@
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility-D4EM10</Name>
     </ProjectReference>
-    <ProjectReference Include="..\atcWdmVb\atcWdmVb-D4EM10.vbproj">
-      <Project>{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}</Project>
-      <Name>atcWdmVb-D4EM10</Name>
-    </ProjectReference>
     <ProjectReference Include="..\atcWDM\atcWDM-D4EM10.vbproj">
       <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
       <Name>atcWDM-D4EM10</Name>
