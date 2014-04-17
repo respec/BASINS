@@ -1357,6 +1357,9 @@ Finished:
 
         Dim lValueIndex As Integer
         Dim lValueIndexLast As Integer = lTSFirst.numValues
+        If lValueIndexLast < 1 Then
+            Throw New ApplicationException("Cannot compute " & aOperationName & " of empty dataset")
+        End If
         Dim lNewVals() As Double ' If this gets populated, it will be turned into an atcTimeseries at the end
         ReDim lNewVals(lValueIndexLast)
         Array.Copy(lTSFirst.Values, lNewVals, lValueIndexLast + 1) 'copy values from firstTS

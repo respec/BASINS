@@ -92,6 +92,7 @@ Friend Class HspfBinaryHeaders
                             Next
                         End With
                         Me.Add(lHeader)
+                        Logger.Progress(Me.Count / 2, lNumHeaders)
                     Next
                 Catch ex As Exception
                     Logger.Dbg("Exception opening " & aFileName & vbCrLf & ex.ToString)
@@ -105,7 +106,7 @@ Friend Class HspfBinaryHeaders
     End Function
 
     Public Sub SaveAs(ByVal aFileName As String)
-        'Logger.Status("Reading " & IO.Path.GetFileName(aFilename), True)
+        Logger.Dbg("Saving " & aFileName)
         Dim lWriter As IO.BinaryWriter = Nothing
         Try
             Dim lFileStream As New IO.FileStream(aFileName, IO.FileMode.Create)
@@ -126,6 +127,7 @@ Friend Class HspfBinaryHeaders
                     Next
                 End With
             Next
+            Logger.Dbg("Saved " & aFileName)
         Catch ex As Exception
             Logger.Dbg("Exception Saving " & aFileName & vbCrLf & ex.ToString)
         Finally
