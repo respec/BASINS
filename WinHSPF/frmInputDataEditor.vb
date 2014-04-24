@@ -140,7 +140,7 @@ Public Class frmInputDataEditor
                         UCIForms.Edit(Me, lTable, lName, pHSPFManualName)
                         'check for missing tables, add if needed
                         CheckAndAddMissingTables(lOperationName)
-                        CheckAndAddMassLinks()
+                        'CheckAndAddMassLinks()  'should not try this without more smarts 
                         SetMissingValuesToDefaults(pUCI, pDefUCI)
                         BoldActive()
                     End If
