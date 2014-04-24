@@ -7,6 +7,8 @@ Imports System.Collections.ObjectModel
 Friend Class ctlSchematic
 
     Friend WithEvents picTree As PanelDoubleBuffer
+    Dim pHeightNeeded As Integer = 0
+    Dim pWidthNeeded As Integer = 0
 
     Private pDragging As Boolean = False
     Private pDragOffset As Point
@@ -102,47 +104,66 @@ Friend Class ctlSchematic
     End Sub
 
     Private Sub LayoutTree(Optional ByVal aPrinting As Boolean = False)
+        Static lInLayout As Boolean = False
         If pIcons.Count > 0 Then 'okay to do tree
-            pIconsDistantFromOutletPlaced = New atcCollection
-            Dim drawsurface As Control
-            Dim dy As Integer
+            If lInLayout Then Exit Sub
+            lInLayout = True
+            Try
+                pIconsDistantFromOutletPlaced = New atcCollection
+                Dim drawsurface As Control
+                Dim dy As Integer
 
-            'If Printing Then
-            '    ''UPGRADE_ISSUE: Constant vbPixels was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
-            '    ''UPGRADE_ISSUE: Printer property Printer.ScaleMode was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-            '    'Printer.ScaleMode = vbPixels
-            '    ''UPGRADE_ISSUE: Printer property Printer.ScaleWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-            '    'picBuffer.Width = Printer.ScaleWidth / 6
-            '    ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-            '    'picBuffer.Height = Printer.ScaleHeight / 20
-            '    ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-            '    'dy = Printer.ScaleHeight / (maxlayer + 1)
-            '    ''UPGRADE_ISSUE: Printer object was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6B85A2A7-FE9F-4FBE-AA0C-CF11AC86A305"'
-            '    'drawsurface = Printer
-            '    'pic = picBuffer
-            'Else
-            If pMaximumTreeDepth > 1 Then dy = (picTree.Height - pIconHeight * 2) / (pMaximumTreeDepth - 1)
-            If dy < pIconHeight * 1.5 Then
-                dy = pIconHeight * 1.5
-                'TODO: enable vertical scrolling
-            End If
-            drawsurface = picTree
-            picTree.SuspendLayout()
-            'End If 'Printing
+                'If Printing Then
+                '    ''UPGRADE_ISSUE: Constant vbPixels was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
+                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleMode was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                '    'Printer.ScaleMode = vbPixels
+                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleWidth was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                '    'picBuffer.Width = Printer.ScaleWidth / 6
+                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                '    'picBuffer.Height = Printer.ScaleHeight / 20
+                '    ''UPGRADE_ISSUE: Printer property Printer.ScaleHeight was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                '    'dy = Printer.ScaleHeight / (maxlayer + 1)
+                '    ''UPGRADE_ISSUE: Printer object was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6B85A2A7-FE9F-4FBE-AA0C-CF11AC86A305"'
+                '    'drawsurface = Printer
+                '    'pic = picBuffer
+                'Else
+                If pMaximumTreeDepth > 1 Then dy = (picTree.Height - pIconHeight * 2) / (pMaximumTreeDepth - 1)
+                If dy < pIconHeight * 1.5 Then
+                    dy = pIconHeight * 1.5
+                    'TODO: enable vertical scrolling
+                End If
+                drawsurface = picTree
+                picTree.SuspendLayout()
+                'End If 'Printing
 
-            Dim Ybase As Integer = drawsurface.Height - pIconHeight
+                picTree.Size = Me.SplitLegendTree.Panel2.ClientSize
+                Dim Ybase As Integer = drawsurface.Height - pIconHeight
+                pHeightNeeded = 0
+                pWidthNeeded = 0
 
-            For Each lOutlet As clsIcon In pOutlets
-                LayoutFromIcon(lOutlet, Ybase, dy, drawsurface.Width, aPrinting)
-            Next
+                For Each lOutlet As clsIcon In pOutlets
+                    LayoutFromIcon(lOutlet, Ybase, dy, drawsurface.Width, aPrinting)
+                Next
 
-            If aPrinting Then
-                'UPGRADE_ISSUE: Printer method Printer.EndDoc was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
-                'Printer.EndDoc()
-            Else
-                DrawTreeBackground()
-                picTree.ResumeLayout()
-            End If
+                If pHeightNeeded > picTree.Height Then
+                    Dim lMove As Integer = pHeightNeeded - picTree.Height
+                    picTree.Height = pHeightNeeded
+                    For Each lControl As Control In pIcons
+                        lControl.Top += lMove
+                    Next
+                End If
+                If pWidthNeeded > picTree.Width Then picTree.Width = pWidthNeeded
+
+                If aPrinting Then
+                    'UPGRADE_ISSUE: Printer method Printer.EndDoc was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
+                    'Printer.EndDoc()
+                Else
+                    DrawTreeBackground()
+                    picTree.ResumeLayout()
+                End If
+            Finally
+                lInLayout = False
+            End Try
         End If
     End Sub
 
@@ -603,6 +624,7 @@ Friend Class ctlSchematic
         With aIcon
             aIcon.Top = aY - pIconHeight / 2
             Dim lWidthPerItemThisRow As Integer = aWidth / pIconsDistantFromOutlet.ItemByKey(.DistanceFromOutlet)
+            If lWidthPerItemThisRow < aIcon.Width * 1.25 Then lWidthPerItemThisRow = aIcon.Width * 1.25
             aIcon.Left = pIconsDistantFromOutletPlaced.ItemByKey(.DistanceFromOutlet) * lWidthPerItemThisRow + (lWidthPerItemThisRow - pIconWidth) / 2
             pIconsDistantFromOutletPlaced.Increment(.DistanceFromOutlet, 1)
             Dim lNumUpstream As Integer = aIcon.UpstreamIcons.Count
@@ -611,7 +633,11 @@ Friend Class ctlSchematic
                 For Each lUpstreamIcon As clsIcon In aIcon.UpstreamIcons
                     LayoutFromIcon(lUpstreamIcon, aY, aDy, aWidth, aPrinting)
                 Next
-            End If
+            End If            
+            Dim lHeightNeeded = picTree.Height - aY + pIconHeight
+            If lHeightNeeded > pHeightNeeded Then pHeightNeeded = lHeightNeeded
+            Dim lWidthNeeded = aIcon.Left + pIconWidth * 1.5
+            If lWidthNeeded > pWidthNeeded Then pWidthNeeded = lWidthNeeded
         End With
     End Sub
 
@@ -1228,7 +1254,12 @@ Friend Class ctlSchematic
         picTree = New PanelDoubleBuffer
         Me.SplitLegendTree.Panel2.Controls.Add(Me.picTree)
         picTree.BackColor = SystemColors.Window
-        picTree.Dock = DockStyle.Fill
+        'picTree.Dock = DockStyle.Fill
+        picTree.Top = 0
+        picTree.Left = 0
+        picTree.Size = Me.SplitLegendTree.Panel2.ClientSize
+        'picTree.Height = Me.SplitLegendTree.Panel2.Width
+        Me.SplitLegendTree.Panel2.AutoScroll = True
 
         pOperationTypesInDiagram.Add("RCHRES")
         pOperationTypesInDiagram.Add("BMPRAC")
@@ -1475,10 +1506,6 @@ NextLandIcon:
 
     End Sub
 
-    Private Sub picTree_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles picTree.Resize
-        LayoutTree()
-    End Sub
-
     Private Sub pCurrentLegend_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles pCurrentLegend.Resize
         UpdateLegend()
     End Sub
@@ -1492,4 +1519,11 @@ NextLandIcon:
         agdDetails.Refresh()
     End Sub
 
+    Private Sub SplitLegendTree_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles SplitLegendTree.SizeChanged
+        LayoutTree()
+    End Sub
+
+    Private Sub SplitLegendTree_SplitterMoved(ByVal sender As Object, ByVal e As System.Windows.Forms.SplitterEventArgs) Handles SplitLegendTree.SplitterMoved
+        LayoutTree()
+    End Sub
 End Class
