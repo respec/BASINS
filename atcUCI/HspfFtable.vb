@@ -274,7 +274,7 @@ Public Class HspfFtable
 
         lSB.AppendLine("FTABLES")
         For Each lOpn As HspfOperation In pOperation.OpnBlk.Ids
-            lSB.AppendLine(" ")
+            lSB.AppendLine("")
             lSB.AppendLine("  FTABLE    " & myFormatI(lOpn.FTable.Id, 3))
             With lOpn.FTable
                 lSB.AppendLine(" rows cols" & Space((.Ncols - 1) * 10) & " ***")

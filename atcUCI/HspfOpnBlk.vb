@@ -492,7 +492,6 @@ Public Class HspfOpnBlk
             'must look thru all possible tables
             lTableDefIndex += 1
             Dim lTableDef As HspfTableDef = lBlockDef.TableDefs(lTableDefIndex - 1)
-            'TODO: check to see if the 'Not lInGroup' is really needed
             If lTableDef.OccurGroup = 0 AndAlso _
                (Not lInGroup) Then ' Or lTableDef.Name = "GQ-VALUES") Then 'the basic case
                 For Each lOperation As HspfOperation In pIds
@@ -507,7 +506,7 @@ Public Class HspfOpnBlk
                 Next lOperation
             Else 'this is a multiple occurence group (like pqual, iqual, gqual)
                 If lInGroup Then
-                    If lTableDef.OccurGroup <> lCurrentOccurGroup Or lTableDefIndex >= lBlockDef.TableDefs.Count Then
+                    If lTableDef.OccurGroup <> lCurrentOccurGroup Or lTableDefIndex >= lBlockDef.TableDefs.Count Then  'or just >?
                         'we were in a multiple occurence group but have reached end of group
                         lGroupIndex += 1 'look for next occurence
                         If lGroupIndex > lLastGroupIndex Then
@@ -541,27 +540,20 @@ Public Class HspfOpnBlk
                                     'write the comment that applies to this table
                                     Dim lTableKey As String = lTable.Name & ":" & lGroupIndex
                                     Dim lTableIndex As Integer = lGroupIndex
-                                    While Not lOperation.OpnBlk.TableExists(lTableKey)
-                                        lTableIndex -= 1
-                                        If lTableIndex = 0 Then Exit While
-                                        lTableKey = lTable.Name & ":"
-                                    End While
                                     If lTableIndex > 0 Then
-                                        Dim lTableX As HspfTable = lOperation.OpnBlk.Tables(lTableKey)
-                                        If lTableX.TableComment.Length > 0 Then
-                                            lSB.AppendLine(lTableX.TableComment)
+                                        If lOperation.OpnBlk.TableExists(lTableKey) Then
+                                            Dim lTableX As HspfTable = lOperation.OpnBlk.Tables(lTableKey)
+                                            If lTableX.TableComment.Length > 0 Then
+                                                lSB.AppendLine(lTableX.TableComment)
+                                            End If
                                         End If
                                     End If
-                                    'Dim lTableKey As String = lTable.Name & ":" & lGroupIndex
-                                    'Dim lTableX As HspfTable = lOperation.OpnBlk.Tables(lTableKey)
-                                    'If lTableX.TableComment.Length > 0 Then
-                                    '    lSB.AppendLine(lTableX.TableComment)
-                                    'End If
                                 Else
                                     If lTable.TableComment.Length > 0 Then
                                         lSB.AppendLine(lTable.TableComment)
                                     End If
                                 End If
+
                                 If lTable.OccurIndex = 0 Then 'write out just this occurence
                                     Dim lName As String = lTable.Name
                                     If lGroupIndex > 1 Then
