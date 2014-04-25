@@ -486,12 +486,14 @@ Public Class HspfOpnBlk
         Dim lGroupIndex, lFirstInGroup As Integer
         Dim lLastInGroup, lLastGroupIndex, lCurrentOccurGroup As Integer
         Dim lInGroup As Boolean = False
+        Dim lJustEndedInGroup As Boolean = False
         Dim lBlockDef As HspfBlockDef = Uci.Msg.BlockDefs.Item(Me.Name)
         Dim lTableDefIndex As Integer = 0
         Do While lTableDefIndex < lBlockDef.TableDefs.Count
             'must look thru all possible tables
             lTableDefIndex += 1
             Dim lTableDef As HspfTableDef = lBlockDef.TableDefs(lTableDefIndex - 1)
+            lJustEndedInGroup = False
             If lTableDef.OccurGroup = 0 AndAlso _
                (Not lInGroup) Then ' Or lTableDef.Name = "GQ-VALUES") Then 'the basic case
                 For Each lOperation As HspfOperation In pIds
@@ -511,6 +513,8 @@ Public Class HspfOpnBlk
                         lGroupIndex += 1 'look for next occurence
                         If lGroupIndex > lLastGroupIndex Then
                             lInGroup = False 'no more to do
+                            lJustEndedInGroup = True
+                            lGroupIndex = 1
                             If lLastInGroup > 0 Then
                                 lTableDefIndex = lLastInGroup
                             End If
@@ -529,7 +533,7 @@ Public Class HspfOpnBlk
                     lCurrentOccurGroup = lTableDef.OccurGroup
                 End If
 
-                If lInGroup Then
+                If lInGroup Or lJustEndedInGroup Then
                     For Each lOperation As HspfOperation In pIds
                         'If lId.TableExists(lTableDef.Name) Then  'accomodate empty placeholder tables
                         If lOperation.OpnBlk.TableExists((lTableDef.Name)) Then
