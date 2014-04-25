@@ -178,7 +178,7 @@ Public Class HspfMassLink
         lSB.AppendLine(s)
 
         For i As Integer = 1 To lMassLinkCount
-            lSB.AppendLine(" ")
+            lSB.AppendLine("")
             lSB.AppendLine("  MASS-LINK    " & CStr(lMassLinkIds(i - 1)).PadLeft(5))
             'now start building the records
             lSB.AppendLine("<-Volume-> <-Grp> <-Member-><--Mult-->     <-Target vols> <-Grp> <-Member->  ***")

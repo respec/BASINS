@@ -389,7 +389,7 @@ Public Class HspfConnection
                     lParmDefIndex += 1
                 Next lParmDef
                 If lTypeIndex > 1 Then 'don't need another blank line before ext sources
-                    lSB.AppendLine(" ")
+                    lSB.AppendLine("")
                 End If
                 lSB.AppendLine(lBlockName)
                 'now start building the records

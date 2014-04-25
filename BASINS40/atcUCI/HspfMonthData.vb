@@ -92,7 +92,7 @@ Public Class HspfMonthData
                 lSB.AppendLine(pComment)
             End If
             lSB.AppendLine("MONTH-DATA")
-            lSB.AppendLine(" ")
+            lSB.AppendLine("")
             For Each lMonthDataTable As HspfMonthDataTable In pMonthDataTables
                 lSB.AppendLine("  MONTH-DATA     " & myFormatI(lMonthDataTable.Id, 3))
                 If lMonthDataTable.Comment.Length > 0 Then
@@ -105,7 +105,7 @@ Public Class HspfMonthData
                 Next lMonthIndex
                 lSB.AppendLine(lStr)
                 lSB.AppendLine("  END MONTH-DATA " & myFormatI(lMonthDataTable.Id, 3))
-                lSB.AppendLine(" ")
+                lSB.AppendLine("")
             Next lMonthDataTable
             lSB.AppendLine("END MONTH-DATA")
         End If

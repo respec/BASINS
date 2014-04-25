@@ -438,15 +438,15 @@ notMissingTableForThisOper:
             Case "MON-SEDCONC" : lT = "GQ-QALFG" : lParm = "QALFG3"
             Case "MON-PHYTO" : lT = "GQ-QALFG" : lParm = "QALFG3"
                 'Case "GQ-DAUGHTER": lT = "GQ-QALFG": lParm = QALFG1
-                'Case "MON-SQOLIM" : lT = "QUAL-PROPS" : lParm = "VQOFG" 'perlnd
+            Case "MON-SQOLIM" : lT = "QUAL-PROPS" : lParm = "VQOFG" 'perlnd
             Case "MON-POTFW" : lT = "QUAL-PROPS" : lParm = "VPFWFG"
             Case "MON-POTFS" : lT = "QUAL-PROPS" : lParm = "VPFSFG"
-                'Case "MON-ACCUM" : lT = "QUAL-PROPS" : lParm = "VQOFG"
-                'Case "MON-IFLW-CONC" : lT = "QUAL-PROPS" : lParm = "VIQCFG"
-                'Case "MON-GRND-CONC" : lT = "QUAL-PROPS" : lParm = "VAQCFG"
-                'Case "MON-SQOLIM" : lT = "QUAL-PROPS" : lParm = "VQOFG" 'implnd
+            Case "MON-ACCUM" : lT = "QUAL-PROPS" : lParm = "VQOFG"
+            Case "MON-IFLW-CONC" : lT = "QUAL-PROPS" : lParm = "VIQCFG"
+            Case "MON-GRND-CONC" : lT = "QUAL-PROPS" : lParm = "VAQCFG"
+            Case "MON-SQOLIM" : lT = "QUAL-PROPS" : lParm = "VQOFG" 'implnd
             Case "MON-POTFW" : lT = "QUAL-PROPS" : lParm = "VPFWFG"
-                'Case "MON-ACCUM" : lT = "QUAL-PROPS" : lParm = "VQOFG"
+            Case "MON-ACCUM" : lT = "QUAL-PROPS" : lParm = "VQOFG"
         End Select
 
         If lT.Length > 0 Then
@@ -539,9 +539,10 @@ notMissingTableForThisOper:
                     'Set appropriate decimal position
                     Dim lDecimalPlaces As Integer = aMaxWidth - Len(lExpFormat) - 2
                     'If DecimalPlaces < 1 Then DecimalPlaces = 1  'pbd changed to accomodate 1.e-5
-                    If (lDecimalPlaces < 0) Or (lDecimalPlaces = 0 And aRVal > 1.0#) Then
+                    If (lDecimalPlaces = 0 And aRVal > 1.0#) Then
                         lDecimalPlaces = 1
                     End If
+                    If lDecimalPlaces < 0 Then lDecimalPlaces = 0
                     lNumFmtRE = Format(aRVal, "#." & New String("#", lDecimalPlaces) & lExpFormat)
                 End If
             End If
