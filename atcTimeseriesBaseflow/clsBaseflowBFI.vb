@@ -431,7 +431,11 @@ Public Class clsBaseflowBFI
             Dim lTsFlow As atcTimeseries = lGroupTsFlow(Yc)
 
             If lTsFlow.Attributes.GetValue("Count Positive") + lTsFlow.Attributes.GetValue("Count Zero") < lTsFlow.numValues Then
-                J2Date(lTsFlow.Dates.Value(1), lDate)
+                If YearBasis.StartsWith("Calendar") Then
+                    J2Date(lTsFlow.Dates.Value(1), lDate)
+                ElseIf YearBasis.StartsWith("Water") Then
+                    J2Date(lTsFlow.Dates.Value(lTsFlow.Dates.numValues), lDate)
+                End If
                 lAnnualSummary.AppendLine(lDate(0).ToString & "     Incomplete year. Base flow cannot be determined.")
                 Continue For
             End If
@@ -592,7 +596,11 @@ Public Class clsBaseflowBFI
             lBFSum += lVOLBF
             lBFSqr += lVOLBF * lVOLBF
 
-            J2Date(lTsFlow.Dates.Value(1), lDate)
+            If YearBasis.StartsWith("Calendar") Then
+                J2Date(lTsFlow.Dates.Value(1), lDate)
+            ElseIf YearBasis.StartsWith("Water") Then
+                J2Date(lTsFlow.Dates.Value(lTsFlow.Dates.numValues), lDate)
+            End If
             lStrYear = lDate(0).ToString.PadLeft(5, " ")
             If lblBFExtrap = " " Then 'IF (COMP1LETE) THEN
                 Dim lStrBFIndex As String = String.Format("{0:0.000}", lBFIndex).PadLeft(14, " ") & " " & lblBFExtrap
