@@ -120,7 +120,7 @@ Module HSPFOutputReports
         'Becky added the following to be dependent upon user input:
         pTestPath = StartUp.txtUCIPath.Text
         pBaseName = lTestName
-        pTestPath = Mid(pTestPath, 1, Len(pTestPath) - Len(pBaseName) - 4) & "\"
+        pTestPath = Mid(pTestPath, 1, Len(pTestPath) - Len(pBaseName) - 4)
 
 
         'as best I can tell, the output location should include R for reach and the outlet reach number
