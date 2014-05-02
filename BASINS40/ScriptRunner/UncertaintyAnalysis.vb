@@ -32,8 +32,8 @@ Module SensitivityAndUncertaintyAnalysis
     Public pHydrology As Boolean = False
     Public pOutputFromBinary As Boolean = False
     Public Sensitivity(100, 4) As Object
-    Private WQConstituents() As Object = {"TSS", "TW", "TN", "TP"}
-    Private WQSites() As Object = {"RCH630", "RCH870"}
+    Private WQConstituents() As Object = {"TSS", "TW", "TP", "TN"}
+    Private WQSites() As Object = {"RCH630", "RCH870"} ' "RCH916", "RCH922", "RCH936", "RCH938", "RCH890", "RCH752", "RCH912"}
     Public WQConstituent As String
     Private TypeOfAnalysis As String = "Sensitivity"
     'Private TypeOfAnalysis As String = "Uncertainty"
@@ -62,8 +62,6 @@ Module SensitivityAndUncertaintyAnalysis
         Dim lDBF As New atcTableDBF
         Dim lcsv As New atcTableDelimited
 
-        Dim i As Integer
-
         Dim lUci As New atcUCI.HspfUci
         Dim dateTimeOfUciFile As String = System.IO.File.GetLastWriteTime(pBaseName & ".uci")
         dateTimeOfUciFile = Format(Year(dateTimeOfUciFile), "00") & "_" & Format(Month(dateTimeOfUciFile), "00") & _
@@ -81,12 +79,14 @@ Module SensitivityAndUncertaintyAnalysis
         System.IO.File.Copy(pBaseName & ".uci", uciName, True) 'Saving original uci file as temp uci file
         lUci.ReadUci(lMsg, uciName, -1, False, pBaseName & ".ech") ' Reading the temp uci file
         'lUci.SaveAs(pBaseName, pBaseName & "temp", 1, 1)
+        Dim NewuciName As String
 
         YearsofSimulation = lUci.GlobalBlock.YearCount
         pValue = 1
         oTable = "Baseline"
         oParameter = ""
         If pWaterQuality Then
+            Dim i As Integer
             WQOutputLine = "Water Quality" & vbCrLf
             IO.File.WriteAllText(pBaseName & "_WaterQualityOutput.csv", WQOutputLine)
             WQOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, "
@@ -125,13 +125,16 @@ Module SensitivityAndUncertaintyAnalysis
                     MsgBox("The original uci file could not run. Program will exit")
                 End If
                 ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode) 'Baseline simulation and recording the values
+
+                Dim DBFRecords As Integer
+                lUci.Save()
                 lUci = Nothing
                 lDBF.OpenFile(pParameterFile) 'Opening the dbf file that has the parameter values
                 'The parameter table will be read from the dbf file
                 Dim pValue() As Single = {0, 0} 'Multipliers to calculate uncertainty
                 Dim LowerLimit, UpperLimit As Single
-                For i = 1 To lDBF.NumRecords 'Going through the record in the dbf file
-                    lDBF.CurrentRecord = i
+                For DBFRecords = 1 To lDBF.NumRecords 'Going through the record in the dbf file
+                    lDBF.CurrentRecord = DBFRecords
                     pOper = lDBF.Value(lDBF.FieldNumber("OPERATION"))
                     oTable = lDBF.Value(lDBF.FieldNumber("TABLE"))
                     oParameter = lDBF.Value(lDBF.FieldNumber("PARAMETER"))
@@ -142,7 +145,10 @@ Module SensitivityAndUncertaintyAnalysis
                     pValue(1) = lDBF.Value(lDBF.FieldNumber("FACTOR2"))
                     For j = 0 To pValue.GetUpperBound(0) 'This loop goes through all the multipliers defined in the pValue object
                         lUci = New atcUCI.HspfUci
-                        lUci.ReadUci(lMsg, uciName, -1, False, pBaseName & ".ech") ' Reading the uci file
+                        SimID += 1
+                        NewuciName = SimID & "-" & uciName
+                        System.IO.File.Copy(uciName, NewuciName, True) 'Saving original uci file as temp uci file
+                        lUci.ReadUci(lMsg, NewuciName, -1, False, pBaseName & ".ech") ' Reading the uci file
                         Value = pValue(j)
                         Select Case True
                             Case oTable.Contains("EXTNL")
@@ -192,35 +198,23 @@ Module SensitivityAndUncertaintyAnalysis
                                 Next
                             Case oTable.Contains("MASS-LINK")
                                 Dim lMassLinkID As Integer
-                                'If oLandUse = "" Or lOper.Description.Contains(oLandUse) Then
-                                For Each lMLBlockConnection As HspfConnection In lUci.Connections
+                                lMassLinkID = Mid(oTable, 10)
 
-
-                                    If lMLBlockConnection.MassLink > 0 AndAlso (lMLBlockConnection.Source.VolName = "PERLND" _
-                                                                                Or lMLBlockConnection.Source.VolName = "IMPLND") _
-                                                                                AndAlso lMLBlockConnection.Target.VolName = "RCHRES" _
-                                        AndAlso lMLBlockConnection.Source.Opn.Description.Contains(oLandUse) Then
-                                        lMassLinkID = lMLBlockConnection.MassLink
-                                        For Each lMasslink As HspfMassLink In lUci.MassLinks
-                                            If lMasslink.MassLinkId = lMassLinkID AndAlso lMasslink.Source.Group.Contains(oParameter) Then
-                                                lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue(j), 3)
-                                            End If
-                                            If oParameter = "PQUAL" Then
-
-                                            End If
-
-                                            If oParameter = "NITR" Then
-                                                If lMasslink.MassLinkId = lMassLinkID AndAlso lMasslink.Source.Group.Contains("PHOS") Then
-                                                    lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue(j), 3)
-                                                End If
-                                            End If
-
-                                        Next lMasslink
-
+                                For Each lMasslink As HspfMassLink In lUci.MassLinks
+                                    If lMasslink.MassLinkId = lMassLinkID AndAlso lMasslink.Source.Group.Contains(oParameter) Then
+                                        lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue(j), 3)
                                     End If
-                                Next lMLBlockConnection
-                                'End If
-
+                                    If lMassLinkID = 21 Then
+                                        If lMasslink.MassLinkId = 1 AndAlso lMasslink.Source.Group.Contains("IQUAL") Then
+                                            lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue(j), 3)
+                                        End If
+                                    End If
+                                    If oParameter = "NITR" Then
+                                        If lMasslink.MassLinkId = lMassLinkID AndAlso lMasslink.Source.Group.Contains("PHOS") Then
+                                            lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue(j), 3)
+                                        End If
+                                    End If
+                                Next
 
                             Case Else
                                 For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
@@ -233,16 +227,10 @@ Module SensitivityAndUncertaintyAnalysis
                                     End If
                                 Next
                         End Select
-                        
-
                         lUci.Save()
-                        SimID += 1
-                        System.IO.File.Copy(uciName, SimID & "-" & uciName, True)
-                        ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode)
-                        System.IO.File.Copy(pBaseName & ".wdm", SimID & "-" & pBaseName, True)
-                        System.IO.File.Copy(pBaseName & ".uci", uciName, True)
+                        ModelRunandReportAnswers(SimID, lUci, NewuciName, lExitCode)
+                        System.IO.File.Copy(pBaseName & ".wdm", SimID & "-" & pBaseName & ".wdm", True)
                         lUci = Nothing
-
                     Next
                 Next
                 'GraphForSensitivty(Sensitivity)
@@ -320,11 +308,11 @@ Module SensitivityAndUncertaintyAnalysis
 
     Sub ModelRunandReportAnswers(ByVal SimID As Integer, ByVal lUci As atcUCI.HspfUci, ByVal uciName As String, ByVal lExitCode As Integer)
 
-        lExitCode = LaunchProgram(pHSPFExe, pTestpath, "-1 -1 " & uciName) 'Run HSPF program
-        If lExitCode = -1 Then
-            Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
-            Exit Sub
-        End If
+        'lExitCode = LaunchProgram(pHSPFExe, pTestpath, "-1 -1 " & uciName) 'Run HSPF program
+        'If lExitCode = -1 Then
+        '    Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
+        '    Exit Sub
+        'End If
 
         lWdmDataSource = New atcWDM.atcDataSourceWDM()
         lWdmFileName = pBaseName & ".wdm"
@@ -450,8 +438,10 @@ Module SensitivityAndUncertaintyAnalysis
 
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TSS").FindData("Location", WQSites(Site))(0)
                             lyearlyTSGroup = lSeasonsAnnual.Split(lTser, Nothing)
+                            lTenPercentHigh = 0
+                            lFiftyPercentLow = 0
                             For Each lyearTS As atcTimeseries In lyearlyTSGroup
-                                lTenPercentHigh += (lyearTS.Attributes.GetValue("%sum") - lyearTS.Attributes.GetValue("%sum90"))
+                                lTenPercentHigh += (lyearTS.Attributes.GetValue("sum") - lyearTS.Attributes.GetValue("%sum90"))
                                 lFiftyPercentLow += lyearTS.Attributes.GetValue("%sum50")
                             Next
                             lTenPercentHigh = lTenPercentHigh / YearsofSimulation
@@ -474,8 +464,10 @@ Module SensitivityAndUncertaintyAnalysis
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TP").FindData _
                             ("Location", WQSites(Site))(0)
                             lyearlyTSGroup = lSeasonsAnnual.Split(lTser, Nothing)
+                            lTenPercentHigh = 0
+                            lFiftyPercentLow = 0
                             For Each lyearTS As atcTimeseries In lyearlyTSGroup
-                                lTenPercentHigh += (lyearTS.Attributes.GetValue("%sum") - lyearTS.Attributes.GetValue("%sum90"))
+                                lTenPercentHigh += (lyearTS.Attributes.GetValue("sum") - lyearTS.Attributes.GetValue("%sum90"))
                                 lFiftyPercentLow += lyearTS.Attributes.GetValue("%sum50")
                             Next
                             lTenPercentHigh = lTenPercentHigh / YearsofSimulation
@@ -489,8 +481,10 @@ Module SensitivityAndUncertaintyAnalysis
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TP").FindData _
                             ("Location", WQSites(Site))(0)
                             lyearlyTSGroup = lSeasonsAnnual.Split(lTser, Nothing)
+                            lTenPercentHigh = 0
+                            lFiftyPercentLow = 0
                             For Each lyearTS As atcTimeseries In lyearlyTSGroup
-                                lTenPercentHigh += (lyearTS.Attributes.GetValue("%sum") - lyearTS.Attributes.GetValue("%sum90"))
+                                lTenPercentHigh += (lyearTS.Attributes.GetValue("sum") - lyearTS.Attributes.GetValue("%sum90"))
                                 lFiftyPercentLow += lyearTS.Attributes.GetValue("%sum50")
                             Next
                             lTenPercentHigh = lTenPercentHigh / YearsofSimulation
@@ -499,13 +493,12 @@ Module SensitivityAndUncertaintyAnalysis
                     End Select
 
                 Next
-                ExpertStatsOutputLine = ExpertStatsOutputLine & AverageSedimentLoad & "," & _
-                        AverageWaterTemperature & "," & AverageSummerWaterTemperature & "," & AverageTNLoad & "," & AverageTPLoad & vbCrLf
+                ExpertStatsOutputLine &= vbCrLf
                 IO.File.AppendAllText(pBaseName & "_WaterQualityOutput.csv", ExpertStatsOutputLine)
                 ExpertStatsOutputLine = ""
             Next
         End If
-        lWdmDataSource = Nothing
+        lWdmDataSource.Clear()
 
         If pOutputFromBinary Then
             lBinaryDataSource = New atcTimeseriesFileHspfBinOut()
