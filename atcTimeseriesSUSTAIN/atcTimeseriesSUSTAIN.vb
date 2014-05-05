@@ -56,160 +56,165 @@ Public Class atcTimeseriesSUSTAIN
 
     Public Overrides Function Open(ByVal aSpecification As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If MyBase.Open(aSpecification, aAttributes) Then
-            Dim lInHeader As Boolean = True
-            Dim lInCurveLabels As Boolean = False
-            Dim lLabelStart As Integer = 0
-            Dim lLabelEnd As Integer = 0
-            Dim lDescStart As Integer = 0
-            Dim lTRANStart As Integer = 0
-            'Dim lTRANCODStart As Integer = 0
-            Dim lArea As Double = 0
-            Dim lSpaceSeparator(0) As Char
-            lSpaceSeparator(0) = " "c
-            Logger.Dbg("Opening atcTimeseriesSUSTAIN file: " & Specification)
-            Dim lGroupBuilder As New atcTimeseriesGroupBuilder(Me)
-            Dim lSkipBlank As Integer = 0
-            For Each lLine As String In LinesInFile(Specification)
-                If lInHeader Then
-                    If lLine.ToLower.Contains("date/time") Then
-                        lInHeader = False
-                    ElseIf lLine.Contains("Area:") Then
-                        lInCurveLabels = False
-                        Dim lAreaStart As Integer = lLine.IndexOf("Area:") + 5
-                        Dim lAreaEnd As Integer = lLine.IndexOf("(", lAreaStart)
-                        If lAreaEnd > lAreaStart Then
-                            Double.TryParse(lLine.Substring(lAreaStart, lAreaEnd - lAreaStart).Trim, lArea)
-                        End If
-                    ElseIf lInCurveLabels Then
-                        Dim lConstituent As String = SafeSubstring(lLine, lLabelStart, lLabelEnd - lLabelStart + 1).Trim
-                        If lConstituent.Length = 0 AndAlso lSkipBlank > 0 Then
-                            lSkipBlank -= 1
-                        ElseIf lConstituent.Length = 0 OrElse lConstituent.StartsWith("Time series (") Then
+            Try
+                Dim lInHeader As Boolean = True
+                Dim lInCurveLabels As Boolean = False
+                Dim lLabelStart As Integer = 0
+                Dim lLabelEnd As Integer = 0
+                Dim lDescStart As Integer = 0
+                Dim lTRANStart As Integer = 0
+                'Dim lTRANCODStart As Integer = 0
+                Dim lArea As Double = 0
+                Dim lSpaceSeparator(0) As Char
+                lSpaceSeparator(0) = " "c
+                Logger.Dbg("Opening atcTimeseriesSUSTAIN file: " & Specification)
+                Dim lGroupBuilder As New atcTimeseriesGroupBuilder(Me)
+                Dim lSkipBlank As Integer = 0
+                For Each lLine As String In LinesInFile(Specification)
+                    If lInHeader Then
+                        If lLine.ToLower.Contains("date/time") Then
+                            lInHeader = False
+                        ElseIf lLine.Contains("Area:") Then
                             lInCurveLabels = False
-                        Else
-                            Dim lDescription As String = lConstituent
-                            Dim lUnits As String = ""
-                            Dim lTran As String = ""
-                            Dim lTranCode As Integer = atcTran.TranNative
-                            If lDescStart > 0 Then
-                                lDescription = SafeSubstring(lLine, lDescStart).Trim()
-                                Dim lOpenParen As Integer = lDescription.IndexOf("("c)
-                                If lOpenParen > 0 Then
-                                    lUnits = modString.SafeSubstring(lDescription, lOpenParen + 1, lDescription.Length - lOpenParen - 2)
-                                    lDescription = modString.SafeSubstring(lDescription, 0, lDescription.Length - lUnits.Length - 2).TrimEnd
-                                End If
+                            Dim lAreaStart As Integer = lLine.IndexOf("Area:") + 5
+                            Dim lAreaEnd As Integer = lLine.IndexOf("(", lAreaStart)
+                            If lAreaEnd > lAreaStart Then
+                                Double.TryParse(lLine.Substring(lAreaStart, lAreaEnd - lAreaStart).Trim, lArea)
                             End If
-                            If lTRANStart > 0 Then
-                                Dim lTranAndCode() As String = lLine.Substring(lTRANStart).Split(lSpaceSeparator, StringSplitOptions.RemoveEmptyEntries)
-                                lTran = lTranAndCode(0)
-                                If lTranAndCode.Length > 1 Then
-                                    Integer.TryParse(lTranAndCode(1), lTranCode)
+                        ElseIf lInCurveLabels Then
+                            Dim lConstituent As String = SafeSubstring(lLine, lLabelStart, lLabelEnd - lLabelStart + 1).Trim
+                            If lConstituent.Length = 0 AndAlso lSkipBlank > 0 Then
+                                lSkipBlank -= 1
+                            ElseIf lConstituent.Length = 0 OrElse lConstituent.StartsWith("Time series (") Then
+                                lInCurveLabels = False
+                            Else
+                                Dim lDescription As String = lConstituent
+                                Dim lUnits As String = ""
+                                Dim lTran As String = ""
+                                Dim lTranCode As Integer = atcTran.TranNative
+                                If lDescStart > 0 Then
+                                    lDescription = SafeSubstring(lLine, lDescStart).Trim()
+                                    Dim lOpenParen As Integer = lDescription.IndexOf("("c)
+                                    If lOpenParen > 0 Then
+                                        lUnits = modString.SafeSubstring(lDescription, lOpenParen + 1, lDescription.Length - lOpenParen - 2)
+                                        lDescription = modString.SafeSubstring(lDescription, 0, lDescription.Length - lUnits.Length - 2).TrimEnd
+                                    End If
                                 End If
+                                If lTRANStart > 0 Then
+                                    Dim lTranAndCode() As String = lLine.Substring(lTRANStart).Split(lSpaceSeparator, StringSplitOptions.RemoveEmptyEntries)
+                                    lTran = lTranAndCode(0)
+                                    If lTranAndCode.Length > 1 Then
+                                        Integer.TryParse(lTranAndCode(1), lTranCode)
+                                    End If
+                                End If
+                                'Dim lKey As String = lConstituent & "," & lDescription & "," & lUnits & "," & lTranCode
+                                With lGroupBuilder.Builder(lGroupBuilder.Count + 1)
+                                    .Attributes.SetValue("Constituent", lConstituent)
+                                    .Attributes.SetValue("Description", lDescription)
+                                    If Not String.IsNullOrEmpty(lUnits) Then .Attributes.SetValue("Units", lUnits)
+                                    If Not String.IsNullOrEmpty(lTran) Then .Attributes.SetValue("Transformation", lTran)
+                                    If lTranCode <> atcTran.TranNative Then .Attributes.SetValue("TransformationCode", lTranCode)
+                                End With
                             End If
-                            'Dim lKey As String = lConstituent & "," & lDescription & "," & lUnits & "," & lTranCode
-                            With lGroupBuilder.Builder(lGroupBuilder.Count + 1)
-                                .Attributes.SetValue("Constituent", lConstituent)
-                                .Attributes.SetValue("Description", lDescription)
-                                If Not String.IsNullOrEmpty(lUnits) Then .Attributes.SetValue("Units", lUnits)
-                                If Not String.IsNullOrEmpty(lTran) Then .Attributes.SetValue("Transformation", lTran)
-                                If lTranCode <> atcTran.TranNative Then .Attributes.SetValue("TransformationCode", lTranCode)
-                            End With
-                        End If
-                    ElseIf lLine.Contains("This output file was created at") Then
-                        lInCurveLabels = True
-                        lLabelStart = lLine.IndexOf("This output file was created at")
-                        lLabelEnd = lLabelStart + 15
-                        lDescStart = lLabelEnd + 1
-                        lSkipBlank = 1
-                    ElseIf lLine.EndsWith("Label") OrElse lLine.EndsWith("TRANCOD") Then
-                        lInCurveLabels = True
-                        lLabelStart = lLine.IndexOf("Label")
-                        lLabelEnd = lLine.IndexOf("LINTYP")
-                        If lLabelEnd < 0 Then
-                            lLabelEnd = lLabelStart + 8
+                        ElseIf lLine.Contains("This output file was created at") Then
+                            lInCurveLabels = True
+                            lLabelStart = lLine.IndexOf("This output file was created at")
+                            lLabelEnd = lLabelStart + 15
                             lDescStart = lLabelEnd + 1
-                        Else
-                            lTRANStart = lLine.IndexOf("TRAN ")
-                            'lTRANCODStart = lLine.IndexOf("TRANCOD")
+                            lSkipBlank = 1
+                        ElseIf lLine.EndsWith("Label") OrElse lLine.EndsWith("TRANCOD") Then
+                            lInCurveLabels = True
+                            lLabelStart = lLine.IndexOf("Label")
+                            lLabelEnd = lLine.IndexOf("LINTYP")
+                            If lLabelEnd < 0 Then
+                                lLabelEnd = lLabelStart + 8
+                                lDescStart = lLabelEnd + 1
+                            Else
+                                lTRANStart = lLine.IndexOf("TRAN ")
+                                'lTRANCODStart = lLine.IndexOf("TRANCOD")
+                            End If
                         End If
-                    End If
-                Else
-                    Dim lDate As Date
-                    Dim lDateDouble As Double
-                    Dim lFieldValues As New Generic.List(Of String)
-                    Try
-                        If lLine.Contains(vbTab) Then
-                            Dim lCurrentFieldValue As String = ""
-                            For Each lCh In lLine
-                                Select Case lCh
-                                    Case " "
-                                        If lCurrentFieldValue.Length > 0 Then
+                    Else
+                        Dim lDate As Date
+                        Dim lDateDouble As Double
+                        Dim lFieldValues As New Generic.List(Of String)
+                        Try
+                            If lLine.Contains(vbTab) Then
+                                Dim lCurrentFieldValue As String = ""
+                                For Each lCh In lLine
+                                    Select Case lCh
+                                        Case " "
+                                            If lCurrentFieldValue.Length > 0 Then
+                                                lFieldValues.Add(lCurrentFieldValue)
+                                                lCurrentFieldValue = ""
+                                            End If
+                                        Case vbTab
                                             lFieldValues.Add(lCurrentFieldValue)
                                             lCurrentFieldValue = ""
-                                        End If
-                                    Case vbTab
-                                        lFieldValues.Add(lCurrentFieldValue)
-                                        lCurrentFieldValue = ""
-                                    Case Else
-                                        lCurrentFieldValue &= lCh
-                                End Select
-                            Next
-                            If lCurrentFieldValue.Length > 0 Then lFieldValues.Add(lCurrentFieldValue)
-                        ElseIf lLine.Length > 22 + (lGroupBuilder.Count - 1) * 13 Then
-                            lFieldValues.Add(lLine.Substring(0, 6).Trim) 'Prefix, not used
-                            lFieldValues.Add(lLine.Substring(6, 4)) 'Year
-                            lFieldValues.Add(lLine.Substring(11, 2)) 'Month
-                            lFieldValues.Add(lLine.Substring(14, 2)) 'Day
-                            lFieldValues.Add(lLine.Substring(17, 2)) 'Hour
-                            lFieldValues.Add(lLine.Substring(20, 2)) 'Minute
-                            For lDatasetIndex As Integer = 0 To lGroupBuilder.Count - 1
-                                lFieldValues.Add(SafeSubstring(lLine, 22 + 14 * lDatasetIndex, 14))
-                            Next
-                        End If
-                        If lFieldValues.Count > 6 Then
-                            lDateDouble = atcUtility.modDate.Date2J(lFieldValues(1), lFieldValues(2), lFieldValues(3), lFieldValues(4), lFieldValues(5), 0)
-                            lDate = Date.FromOADate(lDateDouble) ' New Date(lFieldValues(1), lFieldValues(2), lFieldValues(3), lFieldValues(4), lFieldValues(5), 0)
-                            Dim lDataValues(lGroupBuilder.Count - 1) As Double
-                            For lDatasetIndex As Integer = 0 To lGroupBuilder.Count - 1
-                                Select Case lFieldValues(lDatasetIndex + 6)
-                                    Case "-1.0000000E+30"
-                                        lDataValues(lDatasetIndex) = pNaN
-                                    Case Else
-                                        If Not Double.TryParse(lFieldValues(lDatasetIndex + 6), lDataValues(lDatasetIndex)) Then
-                                            Logger.Dbg("Unable to parse value in dataset " & lDatasetIndex + 1 & "' value = '" & lFieldValues(lDatasetIndex + 6) & "'" & vbCrLf & " line: '" & lLine & "'")
+                                        Case Else
+                                            lCurrentFieldValue &= lCh
+                                    End Select
+                                Next
+                                If lCurrentFieldValue.Length > 0 Then lFieldValues.Add(lCurrentFieldValue)
+                            ElseIf lLine.Length > 22 + (lGroupBuilder.Count - 1) * 13 Then
+                                lFieldValues.Add(lLine.Substring(0, 6).Trim) 'Prefix, not used
+                                lFieldValues.Add(lLine.Substring(6, 4)) 'Year
+                                lFieldValues.Add(lLine.Substring(11, 2)) 'Month
+                                lFieldValues.Add(lLine.Substring(14, 2)) 'Day
+                                lFieldValues.Add(lLine.Substring(17, 2)) 'Hour
+                                lFieldValues.Add(lLine.Substring(20, 2)) 'Minute
+                                For lDatasetIndex As Integer = 0 To lGroupBuilder.Count - 1
+                                    lFieldValues.Add(SafeSubstring(lLine, 22 + 14 * lDatasetIndex, 14))
+                                Next
+                            End If
+                            If lFieldValues.Count > 6 Then
+                                lDateDouble = atcUtility.modDate.Date2J(lFieldValues(1), lFieldValues(2), lFieldValues(3), lFieldValues(4), lFieldValues(5), 0)
+                                lDate = Date.FromOADate(lDateDouble) ' New Date(lFieldValues(1), lFieldValues(2), lFieldValues(3), lFieldValues(4), lFieldValues(5), 0)
+                                Dim lDataValues(lGroupBuilder.Count - 1) As Double
+                                For lDatasetIndex As Integer = 0 To lGroupBuilder.Count - 1
+                                    Select Case lFieldValues(lDatasetIndex + 6)
+                                        Case "-1.0000000E+30"
                                             lDataValues(lDatasetIndex) = pNaN
-                                        End If
-                                End Select
-                            Next
-                            lGroupBuilder.AddValues(lDate, lDataValues)
-                        End If
-                    Catch exParse As Exception
-                        Logger.Dbg("Unable to find dates/values in line: '" & lLine & "' " & vbCrLf & exParse.Message)
-                    End Try
-                End If
-            Next
-            Logger.Dbg("Read " & lGroupBuilder.Count & " Timeseries")
-            Logger.Status("")
-            lGroupBuilder.CreateTimeseriesAddToGroup(Me.DataSets)
+                                        Case Else
+                                            If Not Double.TryParse(lFieldValues(lDatasetIndex + 6), lDataValues(lDatasetIndex)) Then
+                                                Logger.Dbg("Unable to parse value in dataset " & lDatasetIndex + 1 & "' value = '" & lFieldValues(lDatasetIndex + 6) & "'" & vbCrLf & " line: '" & lLine & "'")
+                                                lDataValues(lDatasetIndex) = pNaN
+                                            End If
+                                    End Select
+                                Next
+                                lGroupBuilder.AddValues(lDate, lDataValues)
+                            End If
+                        Catch exParse As Exception
+                            Logger.Dbg("Unable to find dates/values in line: '" & lLine & "' " & vbCrLf & exParse.Message)
+                        End Try
+                    End If
+                Next
+                Logger.Dbg("Read " & lGroupBuilder.Count & " Timeseries")
+                Logger.Status("")
+                lGroupBuilder.CreateTimeseriesAddToGroup(Me.DataSets)
 
-            'Shift all dates one time step, set all timeseries to refer to same Dates
-            Dim lDates As atcTimeseries = Me.DataSets(0).Dates
-            Dim lLastInterval As Double = lDates.Value(lDates.numValues) - lDates.Value(lDates.numValues - 1)
+                'Shift all dates one time step, set all timeseries to refer to same Dates
+                Dim lDates As atcTimeseries = Me.DataSets(0).Dates
+                Dim lLastInterval As Double = lDates.Value(lDates.numValues) - lDates.Value(lDates.numValues - 1)
 
-            For lIndex As Integer = 0 To lDates.numValues - 1
-                lDates.Value(lIndex) = lDates.Value(lIndex + 1)
-            Next
-            lDates.Value(lDates.numValues) = lDates.Value(lDates.numValues - 1) + lLastInterval
-            lDates.Attributes.DiscardCalculated()
+                For lIndex As Integer = 0 To lDates.numValues - 1
+                    lDates.Value(lIndex) = lDates.Value(lIndex + 1)
+                Next
+                lDates.Value(lDates.numValues) = lDates.Value(lDates.numValues - 1) + lLastInterval
+                lDates.Attributes.DiscardCalculated()
 
-            For Each lTs As atcTimeseries In Me.DataSets
-                If lTs.Dates.Serial <> lDates.Serial Then
-                    lTs.Dates.Clear()
-                    lTs.Dates = lDates
-                End If
-            Next
+                For Each lTs As atcTimeseries In Me.DataSets
+                    If lTs.Dates.Serial <> lDates.Serial Then
+                        lTs.Dates.Clear()
+                        lTs.Dates = lDates
+                    End If
+                Next
 
-            Return True
+                Return True
+            Catch ex As Exception
+                Logger.Dbg("Exception opening atcTimeseriesSUSTAIN " & Specification & vbCrLf & ex.ToString)
+                Throw ex
+            End Try
         End If
         Return False
     End Function
