@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports System.Collections.ObjectModel
 Imports MapWinUtility
+Imports atcUtility
 
 'Copyright 2006-8 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Public Class HspfMsg
@@ -540,6 +541,7 @@ Public Class HspfMsg
                     Do While lTableRetid > -1
                         'loop through each operation table (perlnd, mutsin, etc)
                         Call F90_GTNXKW(lInit, lBlock.Id, lkwd, lkflg, lcontfg, ltabret)
+                        _fpreset()
                         If lkwd.Length > 0 Then
                             lInit = 0
                             'do for metric table, then english
