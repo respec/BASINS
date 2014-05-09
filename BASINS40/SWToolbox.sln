@@ -111,6 +111,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMSTORETDataExtens
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMNLDASDataExtension", "..\D4EM\DataManager\NLDASDataExtension\BASINS-D4EMNLDASDataExtension.vbproj", "{B8E2D4B9-3AC3-4160-A4B7-6B9D0AE03FE0}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesGDS", "atcTimeseriesGDS\atcTimeseriesGDS.vbproj", "{7B904366-AFAB-46FD-9B50-D78D38E3B54B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -625,6 +627,16 @@ Global
 		{B8E2D4B9-3AC3-4160-A4B7-6B9D0AE03FE0}.Release|x64.ActiveCfg = Release|x86
 		{B8E2D4B9-3AC3-4160-A4B7-6B9D0AE03FE0}.Release|x86.ActiveCfg = Release|x86
 		{B8E2D4B9-3AC3-4160-A4B7-6B9D0AE03FE0}.Release|x86.Build.0 = Release|x86
+		{7B904366-AFAB-46FD-9B50-D78D38E3B54B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B904366-AFAB-46FD-9B50-D78D38E3B54B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B904366-AFAB-46FD-9B50-D78D38E3B54B}.Debug|x64.ActiveCfg = Debug|x86
+		{7B904366-AFAB-46FD-9B50-D78D38E3B54B}.Debug|x86.ActiveCfg = Debug|x86
+		{7B904366-AFAB-46FD-9B50-D78D38E3B54B}.Debug|x86.Build.0 = Debug|x86
+		{7B904366-AFAB-46FD-9B50-D78D38E3B54B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B904366-AFAB-46FD-9B50-D78D38E3B54B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B904366-AFAB-46FD-9B50-D78D38E3B54B}.Release|x64.ActiveCfg = Release|x86
+		{7B904366-AFAB-46FD-9B50-D78D38E3B54B}.Release|x86.ActiveCfg = Release|x86
+		{7B904366-AFAB-46FD-9B50-D78D38E3B54B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
