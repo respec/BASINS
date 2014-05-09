@@ -25,7 +25,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSeasons", "atcSeasons\at
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSeasonalAttributes", "atcSeasonalAttributes\atcSeasonalAttributes.vbproj", "{50FEF6BE-F961-4949-8658-2948DE7B777B}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcMwGisUtility", "atcMwGisUtility\atcMwGisUtility.vbproj", "{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcMwGisUtility-GWToolbox", "atcMwGisUtility\atcMwGisUtility-GWToolbox.vbproj", "{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcEvents", "atcEvents\atcEvents.vbproj", "{9F469FD8-4A92-4C1F-901C-93D84D457D8F}"
 EndProject
@@ -51,7 +51,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGisUtiliies", "atcGisUti
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesDbf", "atcTimeseriesDbf\atcTimeseriesDbf.vbproj", "{F05FE01B-E35C-4444-B5A2-47085D073631}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "D4EMDownloadData", "D4EMDownloadData\D4EMDownloadData.vbproj", "{ADD48409-FC1F-4A92-B07C-6B9A9A5BAC72}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "D4EMDownloadData-GWToolbox", "D4EMDownloadData\D4EMDownloadData-GWToolbox.vbproj", "{ADD48409-FC1F-4A92-B07C-6B9A9A5BAC72}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMNHDPlusDataExtension", "..\D4EM\DataManager\NHDPlusDataExtension\BASINS-D4EMNHDPlusDataExtension.vbproj", "{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}"
 EndProject
@@ -102,6 +102,8 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUSGSWTF", "atcUSGSWTF\atcUSGSWTF.vbproj", "{07589CE2-84E4-4591-9E67-027FDA9E16BA}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcStatistics", "atcStatistics\atcStatistics.vbproj", "{855B6C7C-513A-4F2F-905C-F92BF7936689}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MapWindow", "..\MW4.8.6\MapWindow4Dev\MapWindow\MapWindow.vbproj", "{77B53F05-5CEF-408E-886E-A842C66A4266}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -575,6 +577,18 @@ Global
 		{855B6C7C-513A-4F2F-905C-F92BF7936689}.Release|x64.ActiveCfg = Release|x86
 		{855B6C7C-513A-4F2F-905C-F92BF7936689}.Release|x86.ActiveCfg = Release|x86
 		{855B6C7C-513A-4F2F-905C-F92BF7936689}.Release|x86.Build.0 = Release|x86
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Debug|x64.ActiveCfg = Debug|x64
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Debug|x64.Build.0 = Debug|x64
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Debug|x86.ActiveCfg = Debug|x86
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Debug|x86.Build.0 = Debug|x86
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Release|x64.ActiveCfg = Release|x64
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Release|x64.Build.0 = Release|x64
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Release|x86.ActiveCfg = Release|x86
+		{77B53F05-5CEF-408E-886E-A842C66A4266}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
