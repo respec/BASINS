@@ -3931,7 +3931,7 @@ Public Module modGeoSFM
             For lRecIndex As Integer = 2 To lNumRecs
                 lTheValue = lResultVals(lRecIndex, lFieldIndex)
                 If IsNumeric(lTheValue) Then
-                    lRecList.Add(lTheValue)
+                    lRecList.Add(lTheCount, lTheValue)
                     lTheSum = lTheValue + lTheSum
                     lTheCount = lTheCount + 1
                 End If
@@ -4076,7 +4076,12 @@ Public Module modGeoSFM
                         Dim lMyMax As Single = GisUtil.FieldValue(lSubTheme, lPRecs, lMaxfld)
                         Dim lMyMin As Single = GisUtil.FieldValue(lSubTheme, lPRecs, lMinfld)
                         Dim lMyHigh As Single = Math.Sqrt(lMyMean * lMyMax)
-                        Dim lMyLow As Single = Math.Sqrt(lMyMean)
+                        Dim lMyLow As Single
+                        If lMyMean > 1.0 Then
+                            lMyLow = Math.Sqrt(lMyMean)
+                        Else 'if less than 1, use the square of the mean instead of square root
+                            lMyLow = lMyMean ^ 2
+                        End If
                         GisUtil.SetFeatureValueNoStartStop(lSubTheme, lHighflowfld, lPRecs, SignificantDigits(lMyHigh, 4))
                         GisUtil.SetFeatureValueNoStartStop(lSubTheme, lMedflowfld, lPRecs, SignificantDigits(lMyMean, 4))
                         GisUtil.SetFeatureValueNoStartStop(lSubTheme, lLowflowfld, lPRecs, SignificantDigits(lMyLow, 4))
