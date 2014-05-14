@@ -107,7 +107,7 @@ Module modFreq
                          ByRef R_S2_MSE As Double, _
                          ByRef R_G_MSE As Double, _
                          ByVal YP() As Double, _
-                         ByVal CV_YP_SYP(,) As Double, _
+                         ByVal CV_YP_SYP(,,) As Double, _
                          ByVal CIL() As Double, _
                          ByVal CIH() As Double)
     End Sub
@@ -267,7 +267,8 @@ Module modFreq
             Dim lCILowVal2(1) As Double
             Dim lCIHighVal2(1) As Double
             Dim lVarEst(lIntervalMax) As Double
-            Dim lVarEstArray(1, 1) As Double
+            Dim lVarEstArrayOrig(1, 1) As Double
+            Dim lVarEstArray(1, 1, lIntervalMax) As Double
             Dim lCMoms(2) As Double
             Dim lSkewMin As Single = 0.06324555
             Dim lWt As Single
@@ -322,9 +323,9 @@ Module modFreq
                             If aLogFg Then
                                 lCILow(i) = 10 ^ lCILow(i)
                                 lCIHigh(i) = 10 ^ lCIHigh(i)
-                                lVarEst(i) = 10 ^ lVarEstArray(0, 0)
+                                lVarEst(i) = 10 ^ lVarEstArray(0, 0, i)
                             Else
-                                lVarEst(i) = lVarEstArray(0, 0)
+                                lVarEst(i) = lVarEstArray(0, 0, i)
                             End If
                         Next
                     Else
@@ -335,18 +336,18 @@ Module modFreq
                                 lPQ = lP(i)
                             End If
                             If Math.Abs(lCMoms(2)) > lSkewMin Then
-                                VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray) 'CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
-                                CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
+                                VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArrayOrig) 'CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
+                                CI_EMA_M3(lyp, lVarEstArrayOrig, lneps, leps, lCILowVal, lCIHighVal)
                                 lCILow(i) = lCILowVal(0)
                                 lCIHigh(i) = lCIHighVal(0)
                             Else 'for skews close to zero, compute a weighted sum/interpolate values
                                 lCMoms(2) = -lSkewMin
-                                VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
-                                CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
+                                VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArrayOrig)
+                                CI_EMA_M3(lyp, lVarEstArrayOrig, lneps, leps, lCILowVal, lCIHighVal)
 
                                 lCMoms(2) = lSkewMin
-                                VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
-                                CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal2, lCIHighVal2)
+                                VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArrayOrig)
+                                CI_EMA_M3(lyp, lVarEstArrayOrig, lneps, leps, lCILowVal2, lCIHighVal2)
 
                                 lWt = (lSkew + lSkewMin) / (2 * lSkewMin) 'weight to attach to positive skew
                                 lCILow(i) = (1 - lWt) * lCILowVal(0) + lWt * lCILowVal2(0)
@@ -355,9 +356,9 @@ Module modFreq
                             If aLogFg Then
                                 lCILow(i) = 10 ^ lCILow(i)
                                 lCIHigh(i) = 10 ^ lCIHigh(i)
-                                lVarEst(i) = 10 ^ lVarEstArray(0, 0)
+                                lVarEst(i) = 10 ^ lVarEstArrayOrig(0, 0)
                             Else
-                                lVarEst(i) = lVarEstArray(0, 0)
+                                lVarEst(i) = lVarEstArrayOrig(0, 0)
                             End If
                         Next i
                     End If
