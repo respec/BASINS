@@ -61,10 +61,20 @@ Public Class atcExpertSystem
         If Not FileExists(lFileName) Then
             Throw New ApplicationException("ExpertSystemFile " & lFileName & " not found")
         Else
-            Dim lExsFileString As String = WholeFileString(lFileName)
-            Dim lExsRecords() As String = lExsFileString.Split(vbLf)
+            Dim lines() As String = IO.File.ReadAllLines(lFileName)
+            Dim lExsRecords As New ArrayList()
 
+            For Each line As String In lines
+                If Not line.Contains("***") Then
+                    lExsRecords.Add(line)
+                End If
+            Next
+
+            'Dim lExsFileString As String = WholeFileString(lFileName)
+            'Dim lExsRecords() As String = lExsFileString.Split(vbLf)
+            
             'Read first line of file
+
             Dim lExsRecord As String = lExsRecords(0).PadRight(51)
             pName = lExsRecord.Substring(0, 8)
             Dim lNSites As Integer
@@ -89,16 +99,16 @@ Public Class atcExpertSystem
                 Dim lDate(5) As Integer
                 'Becky thinks the numbers 52 to 68 below are one off, and should be 51 to 67. 
                 'maybe a problem in something that writes out the .exs?
-                If Not Integer.TryParse(lExsRecord.Substring(52, 4), lDate(0)) _
+                If Not (Integer.TryParse(lExsRecord.Substring(52, 4), lDate(0)) _
                     AndAlso Integer.TryParse(lExsRecord.Substring(56, 2), lDate(1)) _
-                    AndAlso Integer.TryParse(lExsRecord.Substring(58, 2), lDate(2)) Then
+                    AndAlso Integer.TryParse(lExsRecord.Substring(58, 2), lDate(2))) Then
                     Throw New ApplicationException("The analysis start and end dates in EXS file are not in correct format. Program will quit!")
                 End If
                 SDateJ = Date2J(lDate)
 
-                If Not Integer.TryParse(lExsRecord.Substring(62, 4), lDate(0)) _
+                If Not (Integer.TryParse(lExsRecord.Substring(62, 4), lDate(0)) _
                   AndAlso Integer.TryParse(lExsRecord.Substring(66, 2), lDate(1)) _
-                  AndAlso Integer.TryParse(lExsRecord.Substring(68, 2), lDate(2)) Then
+                  AndAlso Integer.TryParse(lExsRecord.Substring(68, 2), lDate(2))) Then
                     Throw New ApplicationException("The analysis start and end dates in EXS file are not in correct format. Program will quit!")
                 End If
                 EDateJ = Date2J(lDate)
@@ -151,19 +161,20 @@ Public Class atcExpertSystem
             For lStormIndex As Integer = 1 To lNStorms
                 lExsRecord = lExsRecords(lRecordIndex + lStormIndex)
                 If Not Integer.TryParse(lExsRecord.Substring(0, 5), lStormSDate(0)) _
-                        AndAlso Integer.TryParse(lExsRecord.Substring(21, 5), lStormEDate(0)) Then 'Checking if storm dates are
+                        And Integer.TryParse(lExsRecord.Substring(21, 5), lStormEDate(0)) Then 'Checking if storm dates are
                     'are in correct format
                     Throw New ApplicationException("The dates for storm number " & lStormIndex & " are not in correct format. Program will quit!")
                 End If
 
                 For lTimeIndex As Integer = 0 To 4
                     If Not Integer.TryParse(lExsRecord.Substring(6 + 3 * lTimeIndex, 3), lStormSDate(lTimeIndex + 1)) _
-                    AndAlso Integer.TryParse(lExsRecord.Substring(26 + 3 * lTimeIndex, 3), lStormEDate(lTimeIndex + 1)) Then
+                    And Integer.TryParse(lExsRecord.Substring(25 + 3 * lTimeIndex, 3), lStormEDate(lTimeIndex + 1)) Then
                         Throw New ApplicationException("The dates for storm number " & lStormIndex & " are not in correct format. Program will quit!")
                     End If
                 Next lTimeIndex
+               
                 'Get the starting and ending storm dates in a 1-D Julian array
-                Storms.Add(New HexStorm(lStormSDate, lStormEDate))
+                Storms.Add(New HexStorm(lStormIndex, lStormSDate, lStormEDate))
 
             Next lStormIndex
 
@@ -173,7 +184,7 @@ Public Class atcExpertSystem
             For lSiteIndex As Integer = 0 To lNSites - 1
                 If Not Double.TryParse(lExsRecord.Substring((lSiteIndex * 8), 8), Sites(lSiteIndex).Area) Then
                     Throw New ApplicationException("The area for Site " & lSiteIndex & " is not in correct format. Program will quit!")
-                End If   
+                End If
             Next lSiteIndex
 
             'Read error terms
@@ -188,7 +199,7 @@ Public Class atcExpertSystem
                     'filled it with the default values - the code below reads the user-defined values if there
                     'are any.  If the user doesn't supply any and the if-then never trips, then no harm, the
                     'program just uses the defaults.
-                    
+
                     Dim lErrorCriteriumValue As String = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
                     If lErrorCriteriumValue.Length > 0 Then
                         ErrorCriteria(lErrorIndex).Value = lErrorCriteriumValue
@@ -205,7 +216,7 @@ Public Class atcExpertSystem
             ReDim pHSPFOutput2(8, Sites.Count)
             ReDim pHSPFOutput3(6, Sites.Count)
 
-            If lExsRecords(lRecordIndex).Length > 0 Then 'If no text is found in lines after the error criteria, HSPEXP can still work.
+            If lExsRecords(lRecordIndex).Trim <> "" Then 'If no text is found in lines after the error criteria, HSPEXP can still work.
                 For lSiteIndex As Integer = 0 To Sites.Count - 1
                     lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
                     lRecordIndex += 1
@@ -226,7 +237,7 @@ Public Class atcExpertSystem
             End If
             'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
             lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-            If lExsRecord.Length > 0 Then
+            If lExsRecords(lRecordIndex).Trim <> "" Then
                 For lIndex As Integer = 0 To 19
                     pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
                 Next lIndex
@@ -490,16 +501,18 @@ Public Class atcExpertSystem
                 'Get data - daily values and max values as necessary
                 Dim lTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lDSN))
                 If lTSer Is Nothing Then
-                    Logger.Msg("Data set Number " & lDSN & " was not found. Program will quit.")
+                    Throw New ApplicationException("Data set Number " & lDSN & " was not found. Program will quit.")
                     Stop
                 End If
                 'subset by date to simulation period
                 Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, SDateJ, EDateJ, Nothing)
-                If lNewTSer Is Nothing Then Stop
+                If lNewTSer.numValues < 1 Then
+                    Throw New ApplicationException("The data set Number " & lDSN & " has no data in the analysis period. Program will quit.")
+                    Stop
+                End If
 
                 'don't Clear lTSer as that will clear the original, precluding its future use
                 lTSer = Nothing
-
                 Dim lDailyTSer As atcTimeseries
                 If lStatGroup = 2 Then 'observed flow in cfs, want average
                     lDailyTSer = Aggregate(lNewTSer, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
@@ -923,9 +936,12 @@ Public Class HexStorm
     Public ReadOnly SDateJ As Double
     Public ReadOnly EDateJ As Double
 
-    Public Sub New(ByVal aStormSDate() As Integer, ByVal aStormEDate() As Integer)
+    Public Sub New(ByVal stormindex As Integer, ByVal aStormSDate() As Integer, ByVal aStormEDate() As Integer)
         SDateJ = Date2J(aStormSDate)
         EDateJ = Date2J(aStormEDate)
+        If SDateJ > EDateJ Then
+            Throw New ApplicationException("The storm number " & stormindex & " ends before it starts. Please fix the dates. Program will quit!")
+        End If
     End Sub
 End Class
 
