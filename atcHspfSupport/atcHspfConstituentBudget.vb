@@ -31,15 +31,7 @@ Public Module ConstituentBudget
                 lDepScourData.Add(aScenarioResults.DataSets.FindData("Constituent", "DEPSCOUR-TOT"))
             Case "TotalN"
                 lUnits = "(lbs)"
-                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW"))
-                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW"))
-
-                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "LABILE ORGN - GROUNDWATER OUTFLOW"))
-                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "LABILE ORGN - SURFACE LAYER OUTFLOW"))
-
-                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3+NO2-N - GROUNDWATER OUTFLOW"))
-                'lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3+NO2-N - SURFACE LAYER OUTFLOW"))
-
+                
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "POQUAL-NO3"))
@@ -224,8 +216,11 @@ Public Module ConstituentBudget
                         Dim lPointlbs As Double = 0
 
                         Dim lTotalAtmDep As Double = 0
-                        lTotalAtmDep = ValueForReach(lID, lAtmDepData.FindData("Constituent", "NO3-ATMDEPTOT"))
-                        lTotalAtmDep += ValueForReach(lID, lAtmDepData.FindData("Constituent", "TAM-ATMDEPTOT"))
+                        If lAtmDepData.Count > 0 Then
+                            lTotalAtmDep = ValueForReach(lID, lAtmDepData.FindData("Constituent", "NO3-ATMDEPTOT"))
+                            lTotalAtmDep += ValueForReach(lID, lAtmDepData.FindData("Constituent", "TAM-ATMDEPTOT"))
+                        End If
+                        
                         lPointlbs = lTotalInflow - lNonpointlbs - lTotalAtmDep - lUpstreamIn
                         If lPointlbs < (0.0002 * lNonpointlbs) Then
                             lPointlbs = 0.0
