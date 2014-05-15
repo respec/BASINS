@@ -457,7 +457,7 @@ Module HSPFOutputReports
                                     lTimeSeries(1).Attributes.SetValue("StepType", pCurveStepType)
                                     lTimeSeries(2).Attributes.SetValue("YAxis", "Aux")
                                     IO.Directory.CreateDirectory(lOutFolderName & "\Storms\")
-                                    GraphStorms(lTimeSeries, 2, lOutFolderName & "\Storms\" & lSiteName, pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem, pMakeLogGraphs)
+                                    GraphStorms(lTimeSeries, 2, lOutFolderName & "Storms\" & lSiteName, pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem, pMakeLogGraphs)
                                     lTimeSeries.Dispose()
                                 End If
                             End If
@@ -467,7 +467,7 @@ Module HSPFOutputReports
                         lExpertSystem = Nothing
 
                     Catch lEx As ApplicationException
-                        If lEx.Message.Contains("rogram will quit!") Then
+                        If lEx.Message.Contains("rogram will quit") Then
                             Logger.Msg(lEx.Message)
                             End
                         End If
