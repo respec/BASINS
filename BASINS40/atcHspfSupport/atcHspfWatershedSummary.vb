@@ -90,10 +90,10 @@ Public Module WatershedSummary
             Case "TotalN"
                 lAgchemConstituent = "NITROGEN - TOTAL OUTFLOW"
                 'Total N is a combination of NH4, No3, OrganicN
-                lPerlndConstituents.Add("POQUAL-NH4")
+                lPerlndConstituents.Add("POQUAL-NH3+NH4")
                 lPerlndConstituents.Add("POQUAL-NO3")
                 lPerlndConstituents.Add("POQUAL-BOD")
-                lImplndConstituents.Add("SOQUAL-NH4")
+                lImplndConstituents.Add("SOQUAL-NH3+NH4")
                 lImplndConstituents.Add("SOQUAL-NO3")
                 lImplndConstituents.Add("SOQUAL-BOD")
                 lRchresConstituents.Add("TAM-OUTTOT")
@@ -181,9 +181,11 @@ Public Module WatershedSummary
                                     If aSummaryType = "BOD" Then
                                         lMult = 0.4
                                     ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TotalN" Then
-                                        lMult = 0.048
+                                        lMult = 0.069176
+                                        'Multiplying 0.048 + 0.05294*.4 to BOD to get Organic N
                                     ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TotalP" Then
-                                        lMult = 0.0023
+                                        lMult = 0.0052304
+                                        'Multiplying 0.0023 + 0.4*0.007326 to BOD to get Organic P
                                     End If
                                 ElseIf lConstituent.Contains("F.Coliform") Then
                                     lMult = 1 / 1000000000.0 '10^9
@@ -231,9 +233,11 @@ Public Module WatershedSummary
                             If aSummaryType = "BOD" Then
                                 lMult = 0.4
                             ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TotalN" Then
-                                lMult = 0.048
+                                lMult = 0.069176
+                                'Multiplying 0.048 + 0.05294*.4 to BOD to get Organic N
                             ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TotalP" Then
-                                lMult = 0.0023
+                                lMult = 0.0052304
+                                'Multiplying 0.0023 + 0.4*0.007326 to BOD to get Organic P
                             End If
                         ElseIf lConstituent.Contains("F.Coliform") Then
                             lMult = 1 / 1000000000.0 '10^9
