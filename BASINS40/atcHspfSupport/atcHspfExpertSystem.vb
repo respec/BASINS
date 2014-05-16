@@ -4,7 +4,7 @@ Imports MapWinUtility
 Imports MapWinUtility.Strings
 
 Public Class atcExpertSystem
-    Friend ErrorCriteria As New HexErrorCriteria
+    Friend ErrorCriteria As HexErrorCriteria
     Public Storms As New Generic.List(Of HexStorm)
     Public Sites As New Generic.List(Of HexSite)
     Public ReadOnly SDateJ As Double, EDateJ As Double
@@ -191,32 +191,37 @@ Public Class atcExpertSystem
             lRecordIndex += 1 'lNSites
             lExsRecord = lExsRecords(lRecordIndex)
             lRecordIndex += 1
-            For lErrorIndex As Integer = 1 To ErrorCriteria.Count
-                If lExsRecord.Length >= lErrorIndex * 8 Then 'Becky's note: this makes sure that the error 
-                    'criterion is actually on the line by only reading it if the total line length exceeds 
-                    'that needed for this error to have been included
-                    'Becky's additional note: when ErrorCriteria was defined, the 'New' method automatically
-                    'filled it with the default values - the code below reads the user-defined values if there
-                    'are any.  If the user doesn't supply any and the if-then never trips, then no harm, the
-                    'program just uses the defaults.
 
-                    Dim lErrorCriteriumValue As String = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
-                    If lErrorCriteriumValue.Length > 0 Then
-                        ErrorCriteria(lErrorIndex).Value = lErrorCriteriumValue
+            For lSiteIndex As Integer = 0 To Sites.Count - 1
+                For lErrorIndex As Integer = 1 To ErrorCriteria.Count
+                    If lExsRecord.Length >= lErrorIndex * 8 Then 'Becky's note: this makes sure that the error 
+                        'criterion is actually on the line by only reading it if the total line length exceeds 
+                        'that needed for this error to have been included
+                        'Becky's additional note: when ErrorCriteria was defined, the 'New' method automatically
+                        'filled it with the default values - the code below reads the user-defined values if there
+                        'are any.  If the user doesn't supply any and the if-then never trips, then no harm, the
+                        'program just uses the defaults.
+
+                        Dim lErrorCriteriumValue As String = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
+                        If lErrorCriteriumValue.Length > 0 Then
+                            ErrorCriteria(lErrorIndex).Value = lErrorCriteriumValue
+                        End If
                     End If
+                Next lErrorIndex
+                If (ErrorCriteria(10).Value < 0.000001 And ErrorCriteria(10).Value > -0.000001) Then
+                    'percent of time in baseflow read in as zero, change to 30
+                    ErrorCriteria(10).Value = 30.0#
                 End If
-            Next lErrorIndex
-            If (ErrorCriteria(10).Value < 0.000001 And ErrorCriteria(10).Value > -0.000001) Then
-                'percent of time in baseflow read in as zero, change to 30
-                ErrorCriteria(10).Value = 30.0#
-            End If
-
+            Next lSiteIndex
             'Read latest hspf output
             ReDim pHSPFOutput1(8, Sites.Count)
             ReDim pHSPFOutput2(8, Sites.Count)
             ReDim pHSPFOutput3(6, Sites.Count)
 
-            If lExsRecords(lRecordIndex).Trim <> "" Then 'If no text is found in lines after the error criteria, HSPEXP can still work.
+            If Not (lExsRecords(lRecordIndex).Trim = "" Or _
+                    lExsRecords(lRecordIndex).Tolower.contains("seasons") Or _
+                    lExsRecords(lRecordIndex).Tolower.contains("graph")) Then
+                'If no text is found in lines after the error criteria, HSPEXP can still work.
                 For lSiteIndex As Integer = 0 To Sites.Count - 1
                     lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
                     lRecordIndex += 1
@@ -237,7 +242,9 @@ Public Class atcExpertSystem
             End If
             'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
             lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-            If lExsRecords(lRecordIndex).Trim <> "" Then
+            If Not (lExsRecords(lRecordIndex).Trim = "" Or _
+                    lExsRecords(lRecordIndex).Tolower.contains("seasons") Or _
+                    lExsRecords(lRecordIndex).Tolower.contains("graph")) Then
                 For lIndex As Integer = 0 To 19
                     pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
                 Next lIndex
@@ -255,6 +262,14 @@ Public Class atcExpertSystem
             '    'Simulated storm runoff volumes lower than obs
             '    SISROV = 0
             '  End If
+
+            If lExsRecords(lRecordIndex).tolower.contains("seasons") Then
+                Dim SummerMonths(), WinterMonths() As Integer
+                lRecordIndex += 1
+                SummerMonths = lExsRecords(lRecordIndex).strsplit(",")
+                lRecordIndex += 1
+                WinterMonths = lExsRecords(lRecordIndex).strsplit(",")
+            End If
         End If
         'pErrorCriteria.Edit()
     End Sub
