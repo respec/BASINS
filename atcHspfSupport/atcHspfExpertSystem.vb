@@ -4,7 +4,7 @@ Imports MapWinUtility
 Imports MapWinUtility.Strings
 
 Public Class atcExpertSystem
-    Friend ErrorCriteria As HexErrorCriteria
+    'Friend ErrorCriteria As HexErrorCriteria
     Public Storms As New Generic.List(Of HexStorm)
     Public Sites As New Generic.List(Of HexSite)
     Public ReadOnly SDateJ As Double, EDateJ As Double
@@ -133,7 +133,6 @@ Public Class atcExpertSystem
                 pLngMax = 125
                 Logger.Dbg("Maximum Longiude was not provided, a value of 125 is being assumed")
             End If
-
             'Read Site block
             For lSiteIndex As Integer = 1 To lNSites
                 lExsRecord = lExsRecords(lSiteIndex)
@@ -144,9 +143,10 @@ Public Class atcExpertSystem
                 Next lConsIndex
                 Dim lStatDN As Integer = lExsRecord.Substring(42, 2)  '0 or 1
                 Dim lName As String = lExsRecord.Substring(45).Replace(vbCr, "").Trim
-                Dim lSite As New HexSite(Me, lName, lStatDN, lDsn)
+                'Dim lErrorTerms( As Double
+                Dim lSite As New HexSite(Me, lName, lStatDN, lDsn) ', lErrorTerms)
                 Sites.Add(lSite)
-            Next lSiteIndex
+            Next (lSiteIndex)
 
             Dim lRecordIndex As Integer = lNSites + 1
             'Read number of storms
@@ -172,7 +172,7 @@ Public Class atcExpertSystem
                         Throw New ApplicationException("The dates for storm number " & lStormIndex & " are not in correct format. Program will quit!")
                     End If
                 Next lTimeIndex
-               
+
                 'Get the starting and ending storm dates in a 1-D Julian array
                 Storms.Add(New HexStorm(lStormIndex, lStormSDate, lStormEDate))
 
@@ -189,11 +189,11 @@ Public Class atcExpertSystem
 
             'Read error terms
             lRecordIndex += 1 'lNSites
-            lExsRecord = lExsRecords(lRecordIndex)
-            lRecordIndex += 1
+
 
             For lSiteIndex As Integer = 0 To Sites.Count - 1
-                For lErrorIndex As Integer = 1 To ErrorCriteria.Count
+                lExsRecord = lExsRecords(lRecordIndex)
+                For lErrorIndex As Integer = 1 To Sites(lSiteIndex).ErrorCriteria.Count
                     If lExsRecord.Length >= lErrorIndex * 8 Then 'Becky's note: this makes sure that the error 
                         'criterion is actually on the line by only reading it if the total line length exceeds 
                         'that needed for this error to have been included
@@ -204,40 +204,42 @@ Public Class atcExpertSystem
 
                         Dim lErrorCriteriumValue As String = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
                         If lErrorCriteriumValue.Length > 0 Then
-                            ErrorCriteria(lErrorIndex).Value = lErrorCriteriumValue
+                            Sites(lSiteIndex).ErrorCriteria(lErrorIndex).Value = lErrorCriteriumValue
                         End If
                     End If
                 Next lErrorIndex
-                If (ErrorCriteria(10).Value < 0.000001 And ErrorCriteria(10).Value > -0.000001) Then
+                If (Sites(lSiteIndex).ErrorCriteria(10).Value < 0.000001 And Sites(lSiteIndex).ErrorCriteria(10).Value > -0.000001) Then
                     'percent of time in baseflow read in as zero, change to 30
-                    ErrorCriteria(10).Value = 30.0#
+                    Sites(lSiteIndex).ErrorCriteria(10).Value = 30.0#
                 End If
+                lRecordIndex += 1
             Next lSiteIndex
             'Read latest hspf output
             ReDim pHSPFOutput1(8, Sites.Count)
             ReDim pHSPFOutput2(8, Sites.Count)
             ReDim pHSPFOutput3(6, Sites.Count)
 
-            If Not (lExsRecords(lRecordIndex).Trim = "" Or _
-                    lExsRecords(lRecordIndex).Tolower.contains("seasons") Or _
-                    lExsRecords(lRecordIndex).Tolower.contains("graph")) Then
+            If Not (lExsRecords(lRecordIndex + 1).Trim = "" Or _
+                    lExsRecords(lRecordIndex + 1).Tolower.contains("seasons") Or _
+                    lExsRecords(lRecordIndex + 1).Tolower.contains("graph")) Then
                 'If no text is found in lines after the error criteria, HSPEXP can still work.
                 For lSiteIndex As Integer = 0 To Sites.Count - 1
                     lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-                    lRecordIndex += 1
                     For lIndex As Integer = 0 To 7
                         pHSPFOutput1(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
                     Next lIndex
-                    lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
                     lRecordIndex += 1
+                    lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+
                     For lIndex As Integer = 0 To 7
                         pHSPFOutput2(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
                     Next lIndex
-                    lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
                     lRecordIndex += 1
+                    lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
                     For lIndex As Integer = 0 To 5
                         pHSPFOutput3(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
                     Next lIndex
+                    lRecordIndex += 1
                 Next lSiteIndex
             End If
             'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
@@ -245,15 +247,20 @@ Public Class atcExpertSystem
             If Not (lExsRecords(lRecordIndex).Trim = "" Or _
                     lExsRecords(lRecordIndex).Tolower.contains("seasons") Or _
                     lExsRecords(lRecordIndex).Tolower.contains("graph")) Then
-                For lIndex As Integer = 0 To 19
-                    pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
-                Next lIndex
-                lRecordIndex += 1
-                lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-                For lIndex As Integer = 20 To 22
-                    pSubjectiveData(lIndex + 1) = lExsRecord.Substring((lIndex - 20) * 4, 4)
-                Next lIndex
+                lExsRecord = Trim(lExsRecord.Replace(vbCrLf, "")) & "  " & Trim(lExsRecords(lRecordIndex + 1))
+                lExsRecord = lExsRecord.Replace("  ", ",")
+                Dim pSubjectiveDataStr() As String = lExsRecord.Split(",")
+                pSubjectiveData = Array.ConvertAll(pSubjectiveDataStr, Function(str) Int32.Parse(str))
+                'For lIndex As Integer = 0 To 19
+                '    pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
+                'Next lIndex
+                'lRecordIndex += 1
+                'lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                'For lIndex As Integer = 20 To 22
+                '    pSubjectiveData(lIndex + 1) = lExsRecord.Substring((lIndex - 20) * 4, 4)
+                'Next lIndex
             End If
+            lRecordIndex += 2
             '  'Change subjective data based on other data
             '  If (SISTVO(CURSIT) > OBSTVO(CURSIT)) Then
             '    'Simulated storm runoff volumes higher than obs
@@ -264,11 +271,12 @@ Public Class atcExpertSystem
             '  End If
 
             If lExsRecords(lRecordIndex).tolower.contains("seasons") Then
-                Dim SummerMonths(), WinterMonths() As Integer
                 lRecordIndex += 1
-                SummerMonths = lExsRecords(lRecordIndex).strsplit(",")
+                Dim Months() As String = lExsRecords(lRecordIndex).split(",")
+                Dim SummerMonths() As Integer = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
                 lRecordIndex += 1
-                WinterMonths = lExsRecords(lRecordIndex).strsplit(",")
+                Months = lExsRecords(lRecordIndex).split(",")
+                Dim WinterMonths() As Integer = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
             End If
         End If
         'pErrorCriteria.Edit()
@@ -330,14 +338,17 @@ Public Class atcExpertSystem
         lStr = ""
         For Each lSite As HexSite In Sites
             lStr &= lSite.Area.ToString.PadLeft(8)
+            For Each lError As HexErrorCriterion In lSite.ErrorCriteria
+                lStr &= Format(lError.Value, "#####.00").PadLeft(8)
+            Next
         Next
         lText.AppendLine(lStr)
 
-        lStr = ""
-        For Each lError As HexErrorCriterion In ErrorCriteria
-            lStr &= Format(lError.Value, "#####.00").PadLeft(8)
-        Next
-        lText.AppendLine(lStr)
+        'lStr = ""
+        'For Each lError As HexErrorCriterion In ErrorCriteria
+        ' lStr &= Format(lError.Value, "#####.00").PadLeft(8)
+        'Next
+        'lText.AppendLine(lStr)
 
         For lSiteIndex As Integer = 1 To Sites.Count
             lStr = ""
@@ -383,14 +394,14 @@ Public Class atcExpertSystem
             lErrorTermList.Add(0) 'add blank value for 0th place
             For i As Integer = 1 To 20
                 If i = 8 Then 'fix the summer storm volume error to be the seasonal storm error 
-                    lCriteriaList.Add(ErrorCriteria.Criterion(i).Value)
+                    lCriteriaList.Add(lSite.ErrorCriteria.Criterion(i).Value)
                     lErrorTermList.Add(lSite.ErrorTerm(i) - lSite.ErrorTerm(5)) 'summer storm minus total storm
                 ElseIf i = 20 Then
                     'put the pure summer storm error in slot 20
-                    lCriteriaList.Add(ErrorCriteria.Criterion(8).Value)
+                    lCriteriaList.Add(lSite.ErrorCriteria.Criterion(8).Value)
                     lErrorTermList.Add(lSite.ErrorTerm(8))
                 Else
-                    lCriteriaList.Add(ErrorCriteria.Criterion(i).Value)
+                    lCriteriaList.Add(lSite.ErrorCriteria.Criterion(i).Value)
                     lErrorTermList.Add(lSite.ErrorTerm(i))
                 End If
             Next i
@@ -828,16 +839,16 @@ Public Class atcExpertSystem
             'Write the error terms
             lStr &= Space(35) & "Error Terms" & vbCrLf & vbCrLf
             lStr &= Space(35) & "Current".PadLeft(12) & "Criteria".PadLeft(12) & vbCrLf
-            For lErrorPrintIndex As Integer = 1 To ErrorCriteria.Count
-                For lErrorTerm As Integer = 1 To ErrorCriteria.Count
-                    Dim lErrorCriterion As HexErrorCriterion = ErrorCriteria.Criterion(lErrorTerm)
+            For lErrorPrintIndex As Integer = 1 To lSite.ErrorCriteria.Count
+                For lErrorTerm As Integer = 1 To lSite.ErrorCriteria.Count
+                    Dim lErrorCriterion As HexErrorCriterion = lSite.ErrorCriteria.Criterion(lErrorTerm)
                     If lErrorCriterion.PrintPosition = lErrorPrintIndex Then
                         If lSite.ErrorTerm(lErrorTerm) <> 0.0# Then
-                            lStr &= (ErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
+                            lStr &= (lSite.ErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
                                     DecimalAlign(lSite.ErrorTerm(lErrorTerm))
-                            If ErrorCriteria(lErrorTerm).Value > 0 Then
-                                lStr &= DecimalAlign(ErrorCriteria(lErrorTerm).Value)
-                                If Math.Abs(lSite.ErrorTerm(lErrorTerm)) < ErrorCriteria(lErrorTerm).Value Then
+                            If lSite.ErrorCriteria(lErrorTerm).Value > 0 Then
+                                lStr &= DecimalAlign(lSite.ErrorCriteria(lErrorTerm).Value)
+                                If Math.Abs(lSite.ErrorTerm(lErrorTerm)) < lSite.ErrorCriteria(lErrorTerm).Value Then
                                     lStr &= " OK"
                                 Else
                                     lStr &= "    Needs Work"
@@ -937,13 +948,16 @@ Public Class HexSite
     '7 = actual evapotranspiration (in)
     '8 = upper zone storage (in)
     '9 = lower zone storage (in)
-    Public ErrorTerm() As Double
+    Public ErrorTerm(19) As Double
+    Friend ErrorCriteria As HexErrorCriteria
 
-    Public Sub New(ByVal aExpertSystem As atcExpertSystem, ByVal aName As String, ByVal aStatDN As Integer, ByVal aDsn() As Integer)
+    Public Sub New(ByVal aExpertSystem As atcExpertSystem, ByVal aName As String, ByVal aStatDN As Integer, _
+                   ByVal aDsn() As Integer) ', ByVal aErrorTerm As Double)
         Name = aName
         StatDN = aStatDN
         DSN = aDsn
-        ReDim ErrorTerm(aExpertSystem.ErrorCriteria.Count)
+        'ReDim ErrorTerm(aExpertSystem.Sites(0).ErrorCriteria.Count)
+        ErrorCriteria = New HexErrorCriteria
     End Sub
 End Class
 
