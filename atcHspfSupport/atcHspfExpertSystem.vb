@@ -1,6 +1,11 @@
 Imports atcUtility
 Imports atcData
+Imports atcWDM
+Imports atcGraph
+Imports MapWindow.Interfaces
+Imports ZedGraph
 Imports MapWinUtility
+Imports System
 Imports MapWinUtility.Strings
 
 Public Class atcExpertSystem
@@ -12,7 +17,8 @@ Public Class atcExpertSystem
     Private pFlowOnly As Boolean
     Private pStatistics As New HexStatistics
     Private pDatasetTypes As New HexDatasetTypes
-
+    Private pSummerMonths() As Integer
+    Private pWinterMonths() As Integer
     Private pUci As atcUCI.HspfUci
     Private pDataSource As atcTimeseriesSource
 
@@ -76,7 +82,7 @@ Public Class atcExpertSystem
             'Read first line of file
 
             Dim lExsRecord As String = lExsRecords(0).PadRight(51)
-            pName = lExsRecord.Substring(0, 8)
+            pName = Trim(lExsRecord.Substring(0, 8))
             Dim lNSites As Integer
             If Not Integer.TryParse(lExsRecord.Substring(8, 5), lNSites) Then
                 Throw New ApplicationException("Number of Sites are not in correct format. Program will quit!")
@@ -219,9 +225,9 @@ Public Class atcExpertSystem
             ReDim pHSPFOutput2(8, Sites.Count)
             ReDim pHSPFOutput3(6, Sites.Count)
 
-            If Not (lExsRecords(lRecordIndex + 1).Trim = "" Or _
-                    lExsRecords(lRecordIndex + 1).Tolower.contains("seasons") Or _
-                    lExsRecords(lRecordIndex + 1).Tolower.contains("graph")) Then
+            If Not (lExsRecords(lRecordIndex).Trim = "" Or _
+                    lExsRecords(lRecordIndex).Tolower.contains("seasons") Or _
+                    lExsRecords(lRecordIndex).Tolower.contains("graph")) Then
                 'If no text is found in lines after the error criteria, HSPEXP can still work.
                 For lSiteIndex As Integer = 0 To Sites.Count - 1
                     lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
@@ -251,6 +257,7 @@ Public Class atcExpertSystem
                 lExsRecord = lExsRecord.Replace("  ", ",")
                 Dim pSubjectiveDataStr() As String = lExsRecord.Split(",")
                 pSubjectiveData = Array.ConvertAll(pSubjectiveDataStr, Function(str) Int32.Parse(str))
+                lRecordIndex += 2
                 'For lIndex As Integer = 0 To 19
                 '    pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
                 'Next lIndex
@@ -260,7 +267,7 @@ Public Class atcExpertSystem
                 '    pSubjectiveData(lIndex + 1) = lExsRecord.Substring((lIndex - 20) * 4, 4)
                 'Next lIndex
             End If
-            lRecordIndex += 2
+
             '  'Change subjective data based on other data
             '  If (SISTVO(CURSIT) > OBSTVO(CURSIT)) Then
             '    'Simulated storm runoff volumes higher than obs
@@ -273,10 +280,111 @@ Public Class atcExpertSystem
             If lExsRecords(lRecordIndex).tolower.contains("seasons") Then
                 lRecordIndex += 1
                 Dim Months() As String = lExsRecords(lRecordIndex).split(",")
-                Dim SummerMonths() As Integer = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
+                pSummerMonths = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
                 lRecordIndex += 1
                 Months = lExsRecords(lRecordIndex).split(",")
-                Dim WinterMonths() As Integer = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
+                pWinterMonths = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
+            End If
+            lRecordIndex += 1
+            If lExsRecords(lRecordIndex).tolower.contains("graph") Then
+                Dim lDataSource1 As New atcDataSourceWDM
+                lDataSource1.Open(aDataSource.Specification)
+                Dim NumberofOutputGraphs As Integer
+
+                lRecordIndex += 1
+                NumberofOutputGraphs = lExsRecords(lRecordIndex)
+                For GraphNumber As Integer = 1 To NumberofOutputGraphs
+                    Dim lTimeseriesGroup As New atcTimeseriesGroup
+                    lRecordIndex += 1
+                    Dim GraphInit() As String = lExsRecords(lRecordIndex).split(",")
+                    Dim lNumberOfCurves As Integer = GraphInit(2)
+                    Dim lOutFileName As String = IO.Path.GetDirectoryName(aDataSource.Specification) _
+                          & "\" & Trim(GraphInit(1))
+                    'GraphInit has information about number of datasets, their color, symbol etc.
+                    lRecordIndex += 1
+
+                    For CurveNumber As Integer = 1 To lNumberOfCurves
+                        Dim lGraphDataset() As String = lExsRecords(lRecordIndex).split(",")
+                        Dim lTimeSeries As atcTimeseries
+
+                        If Trim(lGraphDataset(1)) = IO.Path.GetFileName(aDataSource.Specification) Then
+                            lTimeSeries = lDataSource1.DataSets.FindData("ID", Trim(lGraphDataset(2)))(0)
+                            lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
+                            Dim plottype As Boolean
+                            If Trim(lGraphDataset(4)).ToLower = "line" Then
+                                plottype = False
+                            Else : plottype = True
+                            End If
+                            lTimeSeries.Attributes.SetValue("Point", plottype)
+                            lTimeSeries.Attributes.SetValue("Color", Trim(lGraphDataset(4)))
+                            If SubsetByDate(lTimeSeries, SDateJ, EDateJ, Nothing).numValues < 1 Then
+                                Throw New ApplicationException("The DSN" & Trim(lGraphDataset(2)) & " does not have any data in the analysis period. Program will quit!")
+                            End If
+                            lTimeseriesGroup.Add(SubsetByDate(lTimeSeries, SDateJ, EDateJ, Nothing))
+                            lRecordIndex += 1
+                        End If
+                    Next CurveNumber
+                    Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+                    Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
+                    lRecordIndex -= lNumberOfCurves
+                    Dim lNumberofAuxPaneCurves As Integer = 0
+                    Dim lNumberOfMainPaneCurves As Integer = 0
+                    Dim lPaneMain, lAuxPane As GraphPane
+                    Dim lCurve As ZedGraph.LineItem
+                    If lZgc.MasterPane.PaneList.Count > 1 Then
+                        lPaneMain = lZgc.MasterPane.PaneList(1)
+                        lAuxPane = lZgc.MasterPane.PaneList(0)
+                        lAuxPane.YAxis.Title.Text = GraphInit(5)
+                    Else
+                        lPaneMain = lZgc.MasterPane.PaneList(0)
+                    End If
+                    lPaneMain.YAxis.Title.Text = GraphInit(3)
+                    lPaneMain.XAxis.Title.Text = GraphInit(4)
+                    lPaneMain.Y2Axis.Title.Text = GraphInit(6)
+                    For CurveNumber As Integer = 1 To lNumberOfCurves
+                        Dim lGraphDataset() As String = lExsRecords(lRecordIndex).split(",")
+                        If Trim(lGraphDataset(1)) = IO.Path.GetFileName(aDataSource.Specification) Then
+                            If Trim(lGraphDataset(0)).ToLower = "aux" Then
+                                lCurve = lAuxPane.CurveList.Item(lNumberofAuxPaneCurves)
+                                lNumberofAuxPaneCurves += 1
+                            ElseIf (Trim(lGraphDataset(0)).ToLower = "left" Or _
+                                        Trim(lGraphDataset(0)).ToLower = "right") Then
+                                lCurve = lPaneMain.CurveList.Item(lNumberOfMainPaneCurves)
+                                lNumberOfMainPaneCurves += 1
+
+                            End If
+                            If Trim(lGraphDataset(5)).ToLower = "nonstep" Then
+                                lCurve.Line.StepType = StepType.NonStep
+                            Else
+                                lCurve.Line.StepType = StepType.ForwardStep
+                            End If
+                            If Trim(lGraphDataset(3)).ToLower = "line" Then
+                                lCurve.Symbol.Type = SymbolType.None
+                                lCurve.Line.IsVisible = True
+                                lCurve.Line.Style = Drawing.Drawing2D.DashStyle.Solid
+                            End If
+                            Select Case Trim(lGraphDataset(4)).ToLower
+                                Case "red"
+                                    lCurve.Color = Drawing.Color.Red
+                                Case "blue"
+                                    lCurve.Color = Drawing.Color.Blue
+                                Case "black"
+                                    lCurve.Color = Drawing.Color.Black
+                                Case "green"
+                                    lCurve.Color = Drawing.Color.Green
+                            End Select
+                            If lGraphDataset.Length > 7 Then
+                                lCurve.Label.Text = lGraphDataset(7)
+                            End If
+
+                        End If
+                        lRecordIndex += 1
+                    Next CurveNumber
+
+                    lZgc.SaveIn(lOutFileName)
+                    lZgc.Dispose()
+                    lRecordIndex -= 1
+                Next GraphNumber
             End If
         End If
         'pErrorCriteria.Edit()
@@ -581,18 +689,31 @@ Public Class atcExpertSystem
                         pStats(7, lStatGroup, lSiteIndex) = 0.0# 'summer volume
                         pStats(8, lStatGroup, lSiteIndex) = 0.0# 'winter volume
                         For i As Integer = 1 To lDailyTSer.numValues
-                            If (lTmpDate(1) = 12 Or lTmpDate(1) = 1 Or lTmpDate(1) = 2) Then
-                                'in the winter
-                                pStats(8, lStatGroup, lSiteIndex) += lValues(i)
-                            ElseIf (lTmpDate(1) = 6 Or lTmpDate(1) = 7 Or lTmpDate(1) = 8) Then
-                                'in the summer
-                                pStats(7, lStatGroup, lSiteIndex) += lValues(i)
+                            If pSummerMonths.Length > 0 Then
+                                For Each SeasonMonth As Integer In pSummerMonths
+                                    If lTmpDate(1) = SeasonMonth Then
+                                        pStats(7, lStatGroup, lSiteIndex) += lValues(i)
+                                    End If
+                                Next
+                                For Each SeasonMonth As Integer In pWinterMonths
+                                    If lTmpDate(1) = SeasonMonth Then
+                                        pStats(8, lStatGroup, lSiteIndex) += lValues(i)
+                                    End If
+                                Next
+
+                            Else
+                                If (lTmpDate(1) = 12 Or lTmpDate(1) = 1 Or lTmpDate(1) = 2) Then
+                                    'in the winter
+                                    pStats(8, lStatGroup, lSiteIndex) += lValues(i)
+                                ElseIf (lTmpDate(1) = 6 Or lTmpDate(1) = 7 Or lTmpDate(1) = 8) Then
+                                    'in the summer
+                                    pStats(7, lStatGroup, lSiteIndex) += lValues(i)
+                                End If
                             End If
                             TIMADD(lTmpDate, lTimeUnit, lTimeStep, lTimeStep, lTmpDate)
                         Next i
                     End If
-                    Logger.Dbg("December, January, and February are winter months!")
-                    Logger.Dbg("JUne, July and August are summer months!")
+                    
 
                     If (lStatGroup >= 1 And lStatGroup <= 4) Then  'calc storm info
                         pStats(4, lStatGroup, lSiteIndex) = 0.0# 'initialize storm volume
@@ -616,22 +737,33 @@ Public Class atcExpertSystem
                                         If (lDailyTSer.Values(i) > lRtmp) Then 'a new peak
                                             lRtmp = lDailyTSer.Values(i)
                                         End If
-                                        If (lTmpDate(1) = 12 Or lTmpDate(1) = 1 Or lTmpDate(1) = 2) Then 'in the winter
-                                            pStats(10, lStatGroup, lSiteIndex) += lValues(i)
+                                        If pSummerMonths.Length > 0 Then
+                                            For Each SeasonMonth As Integer In pSummerMonths
+                                                If lTmpDate(1) = SeasonMonth Then
+                                                    pStats(9, lStatGroup, lSiteIndex) += lValues(i)
+                                                End If
+                                            Next
+                                            For Each SeasonMonth As Integer In pWinterMonths
+                                                If lTmpDate(1) = SeasonMonth Then
+                                                    pStats(10, lStatGroup, lSiteIndex) += lValues(i)
+                                                End If
+                                            Next
 
-                                        ElseIf (lTmpDate(1) = 6 Or lTmpDate(1) = 7 Or lTmpDate(1) = 8) Then 'in the summer
-                                            pStats(9, lStatGroup, lSiteIndex) += lValues(i)
-
+                                        Else
+                                            If (lTmpDate(1) = 12 Or lTmpDate(1) = 1 Or lTmpDate(1) = 2) Then 'in the winter
+                                                pStats(10, lStatGroup, lSiteIndex) += lValues(i)
+                                            ElseIf (lTmpDate(1) = 6 Or lTmpDate(1) = 7 Or lTmpDate(1) = 8) Then 'in the summer
+                                                pStats(9, lStatGroup, lSiteIndex) += lValues(i)
+                                            End If
+                                            TIMADD(lTmpDate, lTimeUnit, lTimeStep, lTimeStep, lTmpDate)
                                         End If
-                                        TIMADD(lTmpDate, lTimeUnit, lTimeStep, lTimeStep, lTmpDate)
                                     Next i
                                     pStats(5, lStatGroup, lSiteIndex) += lRtmp
                                 End If
                             End If
                         Next
                     End If
-                    Logger.Dbg("December, January, and February are assumed to be winter months for winnter storm volume!")
-                    Logger.Dbg("June, July and August are assumed to be the summer months for the summer flow volume!")
+                    
                     If (lStatGroup = 1 Or lStatGroup = 2) Then 'Change flows to recessions
                         Dim lRecessionTimser As atcTimeseries = lDailyTSer.Clone
                         'save first data value
