@@ -399,7 +399,7 @@ SkipString:
     End Function
 
     Private Function SetColumnFormat() As String
-        Dim rule, lrule As String
+        Dim rule As String
         Dim SubExpIndex, ColIndex, SubExpMax As Integer
         Dim tmpstr As String
         Dim StartCol As Integer
@@ -417,7 +417,7 @@ SkipString:
         If IsNumeric(rule) Then
             ColumnDelimiter = Chr(CShort(rule))
         Else
-            lrule = Trim(LCase(rule))
+            Dim lrule As String = rule.Trim.ToLower
             If lrule = "fixed" Then
                 FixedColumns = True
             Else
@@ -481,9 +481,9 @@ ParseFixedDef:
         End While
         ReDim Preserve ColDefs(NamedColumns)
         If FixedColumns Then
-            SetColumnFormat = "Defined " & NamedColumns & " fixed columns"
+            Return "Defined " & NamedColumns & " fixed columns"
         Else
-            SetColumnFormat = "Defined " & NamedColumns & " delimited Columns"
+            Return "Defined " & NamedColumns & " delimited Columns"
         End If
     End Function
 
@@ -682,7 +682,6 @@ ParseFixedDef:
                     'Stop
                 End If
             Case ATCsToken.tok_If
-                'UPGRADE_WARNING: Couldn't resolve default property of object TokenString(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                 retval = TokenString(MyToken) & " " & MySubExpressions.Item(0).Printable
                 If EvalTruth(MySubExpressions.Item(0).Evaluate) Then
                     ForMax = MySubExpressions.Count() - 1
