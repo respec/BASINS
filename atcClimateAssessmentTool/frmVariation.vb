@@ -1111,7 +1111,8 @@ Imports MapWinUtility
                     SaveSetting("BasinsCAT", "Variation", "ScriptFilename", .FileName)
                     Dim lErrors As String = ""
                     Try
-                        Dim lAssembly As System.Reflection.Assembly = Scripting.PrepareScript(FileExt(.FileName), Nothing, .FileName, lErrors, IO.Path.Combine(g_MapWin.Plugins.PluginFolder, "BASINS"))
+                        Dim lAssembly As System.Reflection.Assembly
+                        lAssembly = Scripting.PrepareScript(FileExt(.FileName), Nothing, .FileName, lErrors, ScriptFolder())
                         If lErrors.Length = 0 Then
                             pVariation = Scripting.Run(lAssembly, lErrors, lVariationTemplate)
                         End If

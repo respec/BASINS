@@ -3,8 +3,18 @@ Imports atcUtility
 Imports MapWinUtility
 
 Public Module modCAT
+
+#If GISProvider = "DotSpatial" Then
+    Friend Function ScriptFolder() As String
+        Return IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location)
+    End Function
+#Else
     <CLSCompliant(False)> _
     Friend g_MapWin As MapWindow.Interfaces.IMapWin
+    Friend Function ScriptFolder() As String
+        Return IO.Path.Combine(g_MapWin.Plugins.PluginFolder, "BASINS")
+    End Function
+#End If
     Friend g_Running As Boolean = False
 
     Friend Function ToXML(ByVal aString As String) As String
