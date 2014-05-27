@@ -18,12 +18,16 @@ Public Class atcClimateAssessmentToolPlugin
         Return pForm
     End Function
 
+#If GISProvider = "DotSpatial" Then
+#Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                                     ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
         g_MapWin = aMapWin
     End Sub
+#End If
+
 
     'Public Property XML() As String
     '    Get

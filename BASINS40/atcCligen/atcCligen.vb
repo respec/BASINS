@@ -219,11 +219,16 @@ Public Class atcCligen
 
     End Function
 
+#If GISProvider = "DotSpatial" Then
+    Public Sub Initialize()
+        Dim lAvlOps As atcDataAttributes = AvailableOperations()
+    End Sub
+#Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         Dim lAvlOps As atcDataAttributes = AvailableOperations()
         MyBase.Initialize(aMapWin, aParentHandle)
     End Sub
-
+#End If
 
 End Class
