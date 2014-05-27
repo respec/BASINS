@@ -118,7 +118,7 @@ Public Module ConstituentBalance
                                             Select Case aBalanceType & "_" & lOperName
                                                 Case "Water_PERLND", "Water_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (Inches)"
-                                                Case "WATER_RCHRES"
+                                                Case "Water_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (ac-ft)"
                                                 Case "Sediment_PERLND", "Sediement_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons/ac)"
