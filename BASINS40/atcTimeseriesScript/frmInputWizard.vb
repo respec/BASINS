@@ -1312,14 +1312,16 @@ ParseFixedDef:
                 'Read portion of lines right of horizontal scroll position
                 Dim nChars As Integer = _txtSample_0.Width / CharWidth - 1
                 linecnt = 0
-                While linecnt < txtSample.Count
-                    txtSample(linecnt).Text = Mid(CurrentLine, HScrollSample.Value, nChars)
-                    txtSample(linecnt).SelectionStart = txtRuler1.SelectionStart
-                    txtSample(linecnt).SelectionLength = txtRuler1.SelectionLength
-                    If ScriptEndOfData() Then Exit While
-                    ScriptNextLine()
-                    linecnt += 1
-                End While
+                If nChars > 0 Then
+                    While linecnt < txtSample.Count
+                        txtSample(linecnt).Text = Mid(CurrentLine, HScrollSample.Value, nChars)
+                        txtSample(linecnt).SelectionStart = txtRuler1.SelectionStart
+                        txtSample(linecnt).SelectionLength = txtRuler1.SelectionLength
+                        If ScriptEndOfData() Then Exit While
+                        ScriptNextLine()
+                        linecnt += 1
+                    End While
+                End If
             Catch e As Exception
 
             End Try

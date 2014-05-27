@@ -153,13 +153,13 @@ Friend Module modATCscript
 
     'Specialized version of FirstCharPos
     Friend Function FirstDelimPos(ByRef start As Integer) As Integer
-        Dim curval, retval, CharPos As Integer
-        retval = 9999
-        For CharPos = 1 To NumColumnDelimiters
-            curval = InStr(start, CurrentLine, Mid(ColumnDelimiter, CharPos, 1))
-            If curval > 0 And curval < retval Then retval = curval
-        Next CharPos
-        If retval = 9999 Then retval = 0
+        Dim curval As Integer
+        Dim retval As Integer = Integer.MaxValue
+        For Each lDelimiter As Char In ColumnDelimiter.ToCharArray
+            curval = InStr(start, CurrentLine, lDelimiter)
+            If curval > 0 AndAlso curval < retval Then retval = curval
+        Next
+        If retval = Integer.MaxValue Then retval = 0
         Return retval
     End Function
 
@@ -247,8 +247,7 @@ Friend Module modATCscript
         Loop While Len(Trim(CurrentLine)) = 0
 
         If percent <> LastPercent AndAlso Not TestingFile Then
-            Logger.Dbg("(MSG1 " & Left(CurrentLine, 100) & ")")
-            Logger.Progress(percent, 100)
+            Logger.Progress(Left(CurrentLine, 100), percent, 100)
             LastPercent = percent
             System.Windows.Forms.Application.DoEvents()
         End If
