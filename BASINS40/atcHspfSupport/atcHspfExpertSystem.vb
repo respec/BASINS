@@ -252,8 +252,8 @@ Public Class atcExpertSystem
             'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
             lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
             If Not (lExsRecords(lRecordIndex).Trim = "" Or _
-                    lExsRecords(lRecordIndex).Tolower.contains("seasons") Or _
-                    lExsRecords(lRecordIndex).Tolower.contains("graph")) Then
+                    lExsRecords(lRecordIndex).Tolower.contains("seasons")) Then
+
                 lExsRecord = Trim(lExsRecord.Replace(vbCrLf, "")) & "  " & Trim(lExsRecords(lRecordIndex + 1))
                 lExsRecord = lExsRecord.Replace("  ", ",")
                 Dim pSubjectiveDataStr() As String = lExsRecord.Split(",")
@@ -285,148 +285,16 @@ Public Class atcExpertSystem
                 lRecordIndex += 1
                 Months = lExsRecords(lRecordIndex).split(",")
                 pWinterMonths = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
+            Else
+                pSummerMonths(0) = 5
+                pSummerMonths(1) = 6
+                pSummerMonths(2) = 7
+                pWinterMonths(0) = 12
+                pWinterMonths(1) = 1
+                pWinterMonths(2) = 2
             End If
             lRecordIndex += 1
-            If lExsRecords(lRecordIndex).tolower.contains("graph") Then
-                Dim lDataSource1 As New atcDataSourceWDM
-                lDataSource1.Open(aDataSource.Specification)
-                Dim NumberofOutputGraphs As Integer
 
-                lRecordIndex += 1
-                NumberofOutputGraphs = lExsRecords(lRecordIndex)
-                For GraphNumber As Integer = 1 To NumberofOutputGraphs
-                    Dim lTimeseriesGroup As New atcTimeseriesGroup
-                    lRecordIndex += 1
-                    Dim GraphInit() As String = lExsRecords(lRecordIndex).split(",")
-                    Dim lNumberOfCurves As Integer = Trim(GraphInit(2))
-                    Dim lOutFileName As String = IO.Path.GetDirectoryName(aDataSource.Specification) _
-                          & "\" & Trim(GraphInit(1))
-                    'GraphInit has information about number of datasets, their color, symbol etc.
-                    lRecordIndex += 1
-
-                    For CurveNumber As Integer = 1 To lNumberOfCurves
-                        Dim lGraphDataset() As String = lExsRecords(lRecordIndex).split(",")
-                        Dim lTimeSeries As atcTimeseries
-
-                        If Trim(lGraphDataset(1)) = IO.Path.GetFileName(aDataSource.Specification) Then
-                            lTimeSeries = lDataSource1.DataSets.FindData("ID", Trim(lGraphDataset(2)))(0)
-                            lTimeSeries = SubsetByDate(lTimeSeries, SDateJ, EDateJ, Nothing)
-                            lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
-                            If lTimeSeries = Nothing Or lTimeSeries.numValues < 1 Then
-                                Throw New ApplicationException("No timeseries was available for" & _
-                                                               CurveNumber & "Curve. Program will quit!")
-                            End If
-
-                            lTimeseriesGroup.Add(lTimeSeries)
-                        ElseIf IO.Path.GetExtension(Trim(lGraphDataset(1))) = ".wdm" Then
-                            Dim lDataSource2 As New atcDataSourceWDM
-                            lDataSource2.Open(Trim(lGraphDataset(1)))
-                            lTimeSeries = lDataSource2.DataSets.FindData("ID", Trim(lGraphDataset(2)))(0)
-                            lTimeSeries = SubsetByDate(lTimeSeries, SDateJ, EDateJ, Nothing)
-                            If lTimeSeries = Nothing Or lTimeSeries.numValues < 1 Then
-                                Throw New ApplicationException("No timeseries was available for" & _
-                                                               CurveNumber & "Curve. Program will quit!")
-                            End If
-                            lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
-                            lTimeseriesGroup.Add(lTimeSeries)
-                            lDataSource2.Clear()
-                        ElseIf IO.Path.GetExtension(Trim(lGraphDataset(1))) = ".dbf" Then
-                            Dim lDataSource3 As New atcDataSourceBasinsObsWQ
-                            lDataSource3.Open(Trim(lGraphDataset(1)))
-                            lTimeSeries = lDataSource3.DataSets.FindData("Location", Trim(lGraphDataset(2))). _
-                                        FindData("Constituent", Trim(lGraphDataset(3)))(0)
-                            lTimeSeries = SubsetByDate(lTimeSeries, SDateJ, EDateJ, Nothing)
-                            If lTimeSeries = Nothing Or lTimeSeries.numValues < 1 Then
-                                Throw New ApplicationException("No timeseries was available for" & _
-                                                               CurveNumber & "Curve. Program will quit!")
-                            End If
-                            lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
-                            lTimeseriesGroup.Add(lTimeSeries)
-                            lDataSource3.Clear()
-                        End If
-
-                        lRecordIndex += 1
-
-                    Next CurveNumber
-                    Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
-                    Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
-                    lRecordIndex -= lNumberOfCurves
-                    Dim lNumberofAuxPaneCurves As Integer = 0
-                    Dim lNumberOfMainPaneCurves As Integer = 0
-                    Dim lPaneMain, lAuxPane As GraphPane
-                    Dim lCurve As ZedGraph.LineItem
-                    If lZgc.MasterPane.PaneList.Count > 1 Then
-                        lPaneMain = lZgc.MasterPane.PaneList(1)
-                        lAuxPane = lZgc.MasterPane.PaneList(0)
-                        lAuxPane.YAxis.Title.Text = GraphInit(5)
-                    Else
-                        lPaneMain = lZgc.MasterPane.PaneList(0)
-                    End If
-                    lPaneMain.YAxis.Title.Text = GraphInit(3)
-                    lPaneMain.XAxis.Title.Text = GraphInit(4)
-                    lPaneMain.Y2Axis.Title.Text = GraphInit(6)
-                    For CurveNumber As Integer = 1 To lNumberOfCurves
-                        Dim lGraphDataset() As String = lExsRecords(lRecordIndex).split(",")
-                        'If Trim(lGraphDataset(1)) = IO.Path.GetFileName(aDataSource.Specification) Then
-                        If Trim(lGraphDataset(0)).ToLower = "aux" Then
-                            lCurve = lAuxPane.CurveList.Item(lNumberofAuxPaneCurves)
-                            lNumberofAuxPaneCurves += 1
-                        ElseIf (Trim(lGraphDataset(0)).ToLower = "left" Or _
-                                    Trim(lGraphDataset(0)).ToLower = "right") Then
-                            lCurve = lPaneMain.CurveList.Item(lNumberOfMainPaneCurves)
-                            lNumberOfMainPaneCurves += 1
-
-                        End If
-                        If CurveNumber = 5 Then Stop
-                        If Trim(lGraphDataset(3)).ToLower = "line" Then
-                            lCurve.Symbol.Type = SymbolType.None
-                            lCurve.Line.IsVisible = True
-                            lCurve.Line.Style = Drawing.Drawing2D.DashStyle.Solid
-                            lCurve.Line.Width = Trim(lGraphDataset(7))
-                        Else
-                            lCurve.Line.IsVisible = False
-                            Select Case Trim(lGraphDataset(6)).ToLower
-                                Case "circle"
-                                    lCurve.Symbol.Type = SymbolType.Circle
-                                    lCurve.Symbol.Fill.IsVisible = True
-                                Case "square"
-                                    lCurve.Symbol.Type = SymbolType.Square
-                                    lCurve.Symbol.Fill.IsVisible = True
-                                Case "plus"
-                                    lCurve.Symbol.Type = SymbolType.Plus
-                            End Select
-                            lCurve.Symbol.Size = Trim(lGraphDataset(7))
-                        End If
-
-                        If Trim(lGraphDataset(5)).ToLower = "nonstep" Then
-                            lCurve.Line.StepType = StepType.NonStep
-                        Else
-                            lCurve.Line.StepType = StepType.ForwardStep
-                        End If
-
-                        Select Case Trim(lGraphDataset(4)).ToLower
-                            Case "red"
-                                lCurve.Color = Drawing.Color.Red
-                            Case "blue"
-                                lCurve.Color = Drawing.Color.Blue
-                            Case "black"
-                                lCurve.Color = Drawing.Color.Black
-                            Case "green"
-                                lCurve.Color = Drawing.Color.Green
-                        End Select
-                        If lGraphDataset.Length > 8 Then
-                            lCurve.Label.Text = lGraphDataset(8)
-                        End If
-
-                        'End If
-                        lRecordIndex += 1
-                    Next CurveNumber
-
-                    lZgc.SaveIn(lOutFileName)
-                    lZgc.Dispose()
-                    lRecordIndex -= 1
-                Next GraphNumber
-            End If
         End If
         'pErrorCriteria.Edit()
     End Sub
