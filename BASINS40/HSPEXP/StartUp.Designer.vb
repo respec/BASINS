@@ -57,6 +57,7 @@ Partial Class StartUp
         Me.txtOperation = New System.Windows.Forms.TextBox
         Me.Label5 = New System.Windows.Forms.Label
         Me.txtParameterChange = New System.Windows.Forms.TextBox
+        Me.chkAdditionalgraphs = New System.Windows.Forms.CheckBox
         Me.grpGraphs.SuspendLayout()
         Me.grpConstituentBalance.SuspendLayout()
         Me.SuspendLayout()
@@ -66,7 +67,7 @@ Partial Class StartUp
         Me.cmdStart.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdStart.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.cmdStart.Enabled = False
-        Me.cmdStart.Location = New System.Drawing.Point(370, 687)
+        Me.cmdStart.Location = New System.Drawing.Point(370, 712)
         Me.cmdStart.Name = "cmdStart"
         Me.cmdStart.Size = New System.Drawing.Size(75, 23)
         Me.cmdStart.TabIndex = 15
@@ -150,7 +151,7 @@ Partial Class StartUp
         '
         Me.cmdEnd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdEnd.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdEnd.Location = New System.Drawing.Point(451, 687)
+        Me.cmdEnd.Location = New System.Drawing.Point(451, 712)
         Me.cmdEnd.Name = "cmdEnd"
         Me.cmdEnd.Size = New System.Drawing.Size(75, 23)
         Me.cmdEnd.TabIndex = 19
@@ -160,7 +161,7 @@ Partial Class StartUp
         'chkAreaReports
         '
         Me.chkAreaReports.AutoSize = True
-        Me.chkAreaReports.Location = New System.Drawing.Point(15, 268)
+        Me.chkAreaReports.Location = New System.Drawing.Point(15, 293)
         Me.chkAreaReports.Name = "chkAreaReports"
         Me.chkAreaReports.Size = New System.Drawing.Size(500, 17)
         Me.chkAreaReports.TabIndex = 7
@@ -205,9 +206,9 @@ Partial Class StartUp
         Me.chkRunHSPF.AutoSize = True
         Me.chkRunHSPF.Location = New System.Drawing.Point(15, 222)
         Me.chkRunHSPF.Name = "chkRunHSPF"
-        Me.chkRunHSPF.Size = New System.Drawing.Size(253, 17)
+        Me.chkRunHSPF.Size = New System.Drawing.Size(77, 17)
         Me.chkRunHSPF.TabIndex = 6
-        Me.chkRunHSPF.Text = "Run WinHSPFLt before calculating the statistics"
+        Me.chkRunHSPF.Text = "Run HSPF"
         Me.chkRunHSPF.UseVisualStyleBackColor = True
         '
         'pnlHighlight
@@ -247,7 +248,7 @@ Partial Class StartUp
         Me.grpGraphs.Controls.Add(Me.chkLogGraphs)
         Me.grpGraphs.Controls.Add(Me.chkSupportingGraphs)
         Me.grpGraphs.Enabled = False
-        Me.grpGraphs.Location = New System.Drawing.Point(15, 291)
+        Me.grpGraphs.Location = New System.Drawing.Point(15, 316)
         Me.grpGraphs.Name = "grpGraphs"
         Me.grpGraphs.Size = New System.Drawing.Size(508, 86)
         Me.grpGraphs.TabIndex = 28
@@ -269,7 +270,7 @@ Partial Class StartUp
         Me.grpConstituentBalance.Controls.Add(Me.txtRCH)
         Me.grpConstituentBalance.Controls.Add(Me.lblOutReach2)
         Me.grpConstituentBalance.Controls.Add(Me.pnlHighlight)
-        Me.grpConstituentBalance.Location = New System.Drawing.Point(18, 383)
+        Me.grpConstituentBalance.Location = New System.Drawing.Point(18, 408)
         Me.grpConstituentBalance.Name = "grpConstituentBalance"
         Me.grpConstituentBalance.Size = New System.Drawing.Size(508, 293)
         Me.grpConstituentBalance.TabIndex = 29
@@ -330,7 +331,7 @@ Partial Class StartUp
         'chkExpertStats
         '
         Me.chkExpertStats.AutoSize = True
-        Me.chkExpertStats.Location = New System.Drawing.Point(15, 245)
+        Me.chkExpertStats.Location = New System.Drawing.Point(15, 270)
         Me.chkExpertStats.Name = "chkExpertStats"
         Me.chkExpertStats.Size = New System.Drawing.Size(148, 17)
         Me.chkExpertStats.TabIndex = 30
@@ -424,13 +425,24 @@ Partial Class StartUp
         Me.txtParameterChange.Size = New System.Drawing.Size(100, 20)
         Me.txtParameterChange.TabIndex = 41
         '
+        'chkAdditionalgraphs
+        '
+        Me.chkAdditionalgraphs.AutoSize = True
+        Me.chkAdditionalgraphs.Location = New System.Drawing.Point(15, 245)
+        Me.chkAdditionalgraphs.Name = "chkAdditionalgraphs"
+        Me.chkAdditionalgraphs.Size = New System.Drawing.Size(150, 17)
+        Me.chkAdditionalgraphs.TabIndex = 42
+        Me.chkAdditionalgraphs.Text = "Produce Additional graphs"
+        Me.chkAdditionalgraphs.UseVisualStyleBackColor = True
+        '
         'StartUp
         '
         Me.AcceptButton = Me.cmdStart
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
-        Me.ClientSize = New System.Drawing.Size(532, 722)
+        Me.ClientSize = New System.Drawing.Size(532, 747)
+        Me.Controls.Add(Me.chkAdditionalgraphs)
         Me.Controls.Add(Me.txtParameterChange)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.txtOperation)
@@ -497,5 +509,6 @@ Partial Class StartUp
     Friend WithEvents txtOperation As System.Windows.Forms.TextBox
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents txtParameterChange As System.Windows.Forms.TextBox
+    Friend WithEvents chkAdditionalgraphs As System.Windows.Forms.CheckBox
 
 End Class
