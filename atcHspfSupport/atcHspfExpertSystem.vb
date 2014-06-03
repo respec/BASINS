@@ -18,8 +18,8 @@ Public Class atcExpertSystem
     Private pFlowOnly As Boolean
     Private pStatistics As New HexStatistics
     Private pDatasetTypes As New HexDatasetTypes
-    Private pSummerMonths() As Integer
-    Private pWinterMonths() As Integer
+    Private pSummerMonths() As Integer = {5, 6, 7}
+    Private pWinterMonths() As Integer = {10, 11, 12}
     Private pUci As atcUCI.HspfUci
     Private pDataSource As atcTimeseriesSource
 
@@ -227,8 +227,8 @@ Public Class atcExpertSystem
             ReDim pHSPFOutput3(6, Sites.Count)
 
             If Not (lExsRecords(lRecordIndex).Trim = "" Or _
-                    lExsRecords(lRecordIndex).Tolower.contains("seasons") Or _
-                    lExsRecords(lRecordIndex).Tolower.contains("graph")) Then
+                    lExsRecords(lRecordIndex).Tolower.contains("seasons")) Then
+
                 'If no text is found in lines after the error criteria, HSPEXP can still work.
                 For lSiteIndex As Integer = 0 To Sites.Count - 1
                     lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
@@ -278,20 +278,14 @@ Public Class atcExpertSystem
             '    SISROV = 0
             '  End If
 
-            If lExsRecords(lRecordIndex).tolower.contains("seasons") Then
+            If lExsRecords.Count > lRecordIndex AndAlso lExsRecords(lRecordIndex).tolower.contains("seasons") Then
                 lRecordIndex += 1
                 Dim Months() As String = lExsRecords(lRecordIndex).split(",")
                 pSummerMonths = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
                 lRecordIndex += 1
                 Months = lExsRecords(lRecordIndex).split(",")
                 pWinterMonths = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
-            Else
-                pSummerMonths(0) = 5
-                pSummerMonths(1) = 6
-                pSummerMonths(2) = 7
-                pWinterMonths(0) = 12
-                pWinterMonths(1) = 1
-                pWinterMonths(2) = 2
+
             End If
             lRecordIndex += 1
 
