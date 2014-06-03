@@ -13,19 +13,18 @@ Imports atcWDM
 Imports atcHspfBinOut
 Imports HspfSupport
 Imports atcUCI
-
+Imports atcBasinsObsWQ
 'note from Becky: will also need references to atcReport and atcTimeseriesMath projects
 'I also installed the MapWinGIS.ocx ActiveX components from http://mapwingis.codeplex.com/releases but I'm still not sure if I actually needed to
 'I installed it because I couldn't figure out how to initially initalize the aMapWin variable
 'additionally, if you don't have BASINS installed, you'll need to get hass_ent.dll from C:\Windows\System32 on a computer that does have it installed
 'and move it to your C:\Windows\System32 folder and register it...I wasn't able to get it to work on Windows 7 though
 'you'll also need to get hspfmsg.mdb from C:\BASINS\models\HSPF\bin on a computer that has BASINS installed - this can be anywhere
-
 Imports MapWinUtility 'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
 Imports atcGraph
-'Imports ZedGraph 'this is coming from a DLL as the original project was a C# project and not a VB project
-
-Imports MapWindow.Interfaces 'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
+Imports ZedGraph 'this is coming from a DLL as the original project was a C# project and not a VB project
+Imports MapWindow.Interfaces
+'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
 'note that for whatever reason, the MapWindow.Interfaces DLL from that site doesn't
 'have everything needed (no IMapWin) - if you also add a reference to MapWinInterfaces to the project, it compiles
 Imports System.Collections.Specialized
@@ -60,6 +59,8 @@ Module HSPFOutputReports
     Private pMakeAreaReports As Boolean 'flag to indicate user wants subwatershed & land use reports created
     Private pHSPFExe As String = FindFile("Please locate WinHspfLt.exe", "WinHspfLt.exe")
     Private pRunUci As Boolean = False 'Anurag added this option if the user wants this program to run the uci as well
+    Private SDateJ, EDateJ As Double
+    Private loutfoldername As String
 
     Private Sub Initialize()
         If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
@@ -168,7 +169,7 @@ Module HSPFOutputReports
             Logger.Dbg(Now & " Reading " & pBaseName & ".uci")
             Logger.Progress(10, 100)
             
-
+           
             'Becky: change the lOutFolderName to include pTestPath (changing directory several lines above didn't seem to work right)
             'Dim lOutFolderName As String = pTestPath & "\Reports_" & pBaseName & "_" & lDateString & "\"
             'Becky - remove copy to new folder to run reports, assume user has already copied files to current folder and reports should be saved there
@@ -205,7 +206,7 @@ Module HSPFOutputReports
                 ans = MsgBox("WDM file " & lWdmFileName & " does not exist.  This program will end now.")
                 End
             End If
-            Dim lOutFolderName As String = pTestPath
+            loutfoldername = pTestPath
             If pRunNo >= 0 Then 'set to -1 if user didn't enter a run number
                 Logger.Dbg(Now & " Incrementing run number and copying files")
                 Dim lCurRun As String
@@ -248,9 +249,15 @@ Module HSPFOutputReports
             End If
             Dim lHspfUci As New atcUCI.HspfUci
             lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
+            SDateJ = lHspfUci.GlobalBlock.SDateJ
+            EDateJ = lHspfUci.GlobalBlock.EdateJ
+
             Logger.Dbg("ReadUCI " & lHspfUci.Name)
             Logger.Dbg(Now & " Successfully read " & pBaseName & ".uci")
             Logger.Progress(20, 100)
+            If StartUp.chkAdditionalgraphs.Checked Then
+                MakeAutomatedGraphs()
+            End If
 
             'A folder name is given that has the basename and the time when the run was made.
             If pMakeAreaReports Then
@@ -576,11 +583,18 @@ Module HSPFOutputReports
             Logger.Dbg("Reports Written in " & lOutFolderName)
 RWZProgramEnding:
             'pProgressBar.pbProgress.Increment(39)
+            
+
             Logger.Dbg(Now & " HSPEXP+ Complete")
             Logger.Msg("HSPEXP+ is complete")
             OpenFile(lOutFolderName)
         End Using
         Logger.Status("")
+
+
+       
+
+
         Call Application.Exit()
 
     End Sub
@@ -603,5 +617,226 @@ RWZProgramEnding:
             .Open("%50", lAttrArgs) 'calculate the 50th percentile value, add as attribute
         End With
     End Sub
+    Public Sub MakeAutomatedGraphs()
+
+        'Expect a comma separated file called *.csv
+        Dim lFileName As String = "AutomatedGraphs.csv"
+        Dim lines() As String
+        If System.IO.File.Exists(lFileName) Then
+            lines = IO.File.ReadAllLines(lFileName)
+        Else
+            Throw New ApplicationException("The AutomatedGraphs.csv didn't exist or was blank. Program will quit!")
+        End If
+        
+        Logger.Dbg("AutomatedGraphs.csv was used as the Graph Specification File")
+        Dim lGraphRecords As New ArrayList()
+        Dim lRecordIndex As Integer = 0
+        Dim lGraphStartJ, lGraphEndJ As Double
+
+        For Each line As String In lines
+            If Not line.Contains("***") Then
+                line = line.Replace("deg-", ChrW(186))
+                line = line.Replace("mu-", ChrW(956))
+                lGraphRecords.Add(line)
+            End If
+        Next
+
+        Dim GraphRecord As String = lGraphRecords(0)
+        Dim lWDMDataSource1 As New atcDataSourceWDM
+        Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut
+        Dim lDBFdatasource As New atcDataSourceBasinsObsWQ
+        'lDataSource1.Open(aDataSource.Specification)
+        Dim NumberofOutputGraphs As Integer = GraphRecord.Split(",")(1)
+        If NumberofOutputGraphs < 1 Then
+            Throw New ApplicationException("Number of graphs to make has not been specified. Program will quit!")
+        End If
+        lRecordIndex = 2
+        For GraphNumber As Integer = 1 To NumberofOutputGraphs
+            Dim lTimeseriesGroup As New atcTimeseriesGroup
+            lRecordIndex += 1
+            Dim lGraphInit() As String = lGraphRecords(lRecordIndex).split(",")
+            Dim lNumberOfCurves As Integer = Trim(lGraphInit(2))
+            Dim lOutFileName As String = loutfoldername & Trim(lGraphInit(1))
+            'GraphInit has information about number of datasets, their color, symbol etc.
+            lRecordIndex += 1
+
+            If Not Trim(lGraphInit(7)) = "" Then
+                lGraphStartJ = Trim(lGraphInit(7))
+            Else
+                lGraphStartJ = SDateJ
+            End If
+            If Not Trim(lGraphInit(8)) = "" Then
+                lGraphEndJ = Trim(lGraphInit(8))
+            Else
+                lGraphEndJ = EDateJ
+            End If
+
+            For CurveNumber As Integer = 1 To lNumberOfCurves
+                Dim lGraphDataset() As String = lGraphRecords(lRecordIndex).split(",")
+                Dim lTimeSeries As atcTimeseries
+                Dim lDataSource As String = Trim(lGraphDataset(1))
+                Select Case IO.Path.GetExtension(lDataSource)
+                    Case ".wdm"
+                        lWDMDataSource1.Open(lDataSource)
+                        lTimeSeries = lWDMDataSource1.DataSets.FindData("ID", Trim(lGraphDataset(2)))(0)
+                    Case ".hbn"
+                        lHspfBinDataSource.Open(lDataSource)
+                        lTimeSeries = lHspfBinDataSource.DataSets.FindData("Location", Trim(lGraphDataset(2))).FindData _
+                        ("Constituent", Trim(lGraphDataset(2)))(0)
+                    Case ".dbf"
+                        lDBFdatasource.Open(lDataSource)
+                        lTimeSeries = lDBFdatasource.DataSets.FindData("Location", Trim(lGraphDataset(2))).FindData _
+                        ("Constituent", Trim(lGraphDataset(3)))(0)
+                End Select
+                lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartJ, lGraphEndJ, Nothing)
+                If lTimeSeries = Nothing OrElse lTimeSeries.numValues < 1 Then
+                    Throw New ApplicationException("No timeseries was available for Graph " & _
+                                                   GraphNumber & " and Curve " & CurveNumber & ". Program will quit!")
+                End If
+                lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
+                If Not Trim(lGraphDataset(10)) = "" Then
+                    Select Case Trim(lGraphDataset(10)).ToLower & "_" & Trim(lGraphDataset(11)).ToLower
+                        Case "daily_average"
+                            lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                        Case "daily_min"
+                            lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranMin)
+                        Case "daily_max"
+                            lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranMax)
+                        Case "daily_sum"
+                            lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                        Case "monthly_average"
+                            lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+                        Case "monthly_sum"
+                            lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+                        Case "yearly_average"
+                            lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                        Case "yearly_sum"
+                            lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                    End Select
+
+                End If
+                lTimeseriesGroup.Add(lTimeSeries)
+
+                lRecordIndex += 1
+
+            Next CurveNumber
+            Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+            If lGraphInit(0) = "Timeseries" Then
+                'MakeTimeSeriesGraph(lTimeseriesGroup)
+            End If
+
+            lRecordIndex -= lNumberOfCurves
+            Dim lNumberofAuxPaneCurves As Integer = 0
+            Dim lNumberOfMainPaneCurves As Integer = 0
+            Dim lPaneMain, lAuxPane As GraphPane
+            Dim lCurve As ZedGraph.LineItem
+            Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
+            If lZgc.MasterPane.PaneList.Count > 1 Then
+                lPaneMain = lZgc.MasterPane.PaneList(1)
+                lAuxPane = lZgc.MasterPane.PaneList(0)
+                lAuxPane.YAxis.Title.Text = lGraphInit(5)
+                If Not Trim(lGraphInit(11)) = "" Then
+                    lAuxPane.YAxis.Scale.Min = Trim(lGraphInit(11))
+                End If
+                If Not Trim(lGraphInit(12)) = "" Then
+                    lAuxPane.YAxis.Scale.Max = Trim(lGraphInit(12))
+                End If
+                If Trim(lGraphInit(16)).ToLower = "yes" Then
+                    lAuxPane.YAxis.Type = AxisType.Log
+                End If
+            Else
+                lPaneMain = lZgc.MasterPane.PaneList(0)
+            End If
+            lPaneMain.YAxis.Title.Text = Trim(lGraphInit(3))
+            lPaneMain.XAxis.Title.Text = Trim(lGraphInit(4))
+            lPaneMain.Y2Axis.Title.Text = Trim(lGraphInit(6))
+
+
+            If Not Trim(lGraphInit(9)) = "" Then
+                lPaneMain.YAxis.Scale.Min = Trim(lGraphInit(9))
+            End If
+            If Not Trim(lGraphInit(10)) = "" Then
+                lPaneMain.YAxis.Scale.Max = Trim(lGraphInit(10))
+            End If
+            If Not Trim(lGraphInit(13)) = "" Then
+                lPaneMain.Y2Axis.Scale.Min = Trim(lGraphInit(13))
+            End If
+            If Not Trim(lGraphInit(14)) = "" Then
+                lPaneMain.Y2Axis.Scale.Max = Trim(lGraphInit(14))
+            End If
+            If Trim(lGraphInit(15)) = "yes" Then
+                lPaneMain.YAxis.Type = AxisType.Log
+            End If
+            If Trim(lGraphInit(17)) = "yes" Then
+                lPaneMain.Y2Axis.Type = AxisType.Log
+            End If
+
+            For CurveNumber As Integer = 1 To lNumberOfCurves
+                Dim lGraphDataset() As String = lGraphRecords(lRecordIndex).split(",")
+                If Trim(lGraphDataset(0)).ToLower = "aux" Then
+                    lCurve = lAuxPane.CurveList.Item(lNumberofAuxPaneCurves)
+                    lNumberofAuxPaneCurves += 1
+                ElseIf (Trim(lGraphDataset(0)).ToLower = "left" Or _
+                            Trim(lGraphDataset(0)).ToLower = "right") Then
+                    lCurve = lPaneMain.CurveList.Item(lNumberOfMainPaneCurves)
+                    lNumberOfMainPaneCurves += 1
+                End If
+
+                If Trim(lGraphDataset(4)).ToLower = "line" Then
+                    lCurve.Symbol.Type = SymbolType.None
+                    lCurve.Line.IsVisible = True
+                    lCurve.Line.Style = Drawing.Drawing2D.DashStyle.Solid
+                    lCurve.Line.Width = Trim(lGraphDataset(8))
+                Else
+                    lCurve.Line.IsVisible = False
+                    Select Case Trim(lGraphDataset(7)).ToLower
+                        Case "circle"
+                            lCurve.Symbol.Type = SymbolType.Circle
+                            lCurve.Symbol.Fill.IsVisible = True
+                        Case "square"
+                            lCurve.Symbol.Type = SymbolType.Square
+                            lCurve.Symbol.Fill.IsVisible = True
+                        Case "plus"
+                            lCurve.Symbol.Type = SymbolType.Plus
+                    End Select
+                    lCurve.Symbol.Size = Trim(lGraphDataset(8))
+                End If
+
+                If Trim(lGraphDataset(5)).ToLower = "nonstep" Then
+                    lCurve.Line.StepType = StepType.NonStep
+                Else
+                    lCurve.Line.StepType = StepType.ForwardStep
+                End If
+
+                Select Case Trim(lGraphDataset(5)).ToLower
+                    Case "red"
+                        lCurve.Color = Drawing.Color.Red
+                    Case "blue"
+                        lCurve.Color = Drawing.Color.Blue
+                    Case "black"
+                        lCurve.Color = Drawing.Color.Black
+                    Case "green"
+                        lCurve.Color = Drawing.Color.Green
+                End Select
+                If Not Trim(lGraphDataset(9)) = "" Then
+                    lCurve.Label.Text = Trim(lGraphDataset(9))
+
+
+                End If
+
+                'End If
+                lRecordIndex += 1
+            Next CurveNumber
+            Dim GraphDirectory As String = System.IO.Path.GetDirectoryName(lOutFileName)
+            If Not System.IO.Directory.Exists(GraphDirectory) Then
+                System.IO.Directory.CreateDirectory(GraphDirectory)
+            End If
+            lZgc.SaveIn(lOutFileName)
+            lZgc.Dispose()
+            lRecordIndex -= 1
+        Next GraphNumber
+
+    End Sub
+    
 
 End Module
