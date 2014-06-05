@@ -754,7 +754,7 @@ Public Class ManDelinPlugIn
         If lFieldIndex < aMinField Then aMinField = lFieldIndex
         For i = 1 To lNumStreams
             r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
-            r2 = (1.29) * ((r / 1000000) ^ (0.6))
+            r2 = (1.29) * ((r / 1000000) ^ (0.6)) 'r is Area in Sq. m. r/1000000 is the area in Sq. Km.
             GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, r2)
         Next i
 
