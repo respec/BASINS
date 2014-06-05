@@ -636,7 +636,7 @@ Friend Module modATCscript
 
     Friend Sub SaveIn(ByVal aFileName As String)
         Dim lSaveIn As atcDataSource = atcDataManager.DataSourceBySpecification(aFileName)
-        If pTserFile Is Nothing Then
+        If lSaveIn Is Nothing Then
             If atcDataManager.OpenDataSource(aFileName) Then
                 lSaveIn = atcDataManager.DataSourceBySpecification(aFileName)
             End If
