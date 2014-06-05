@@ -1,4 +1,4 @@
-﻿Imports MapWindow.Interfaces
+﻿'Imports MapWindow.Interfaces
 Imports System.Windows.Forms.DialogResult
 Imports System
 Imports atcUtility
@@ -9,7 +9,7 @@ Imports MapWinUtility
 
 Module WriteEXSFile
 
-    Public Sub WriteEXSFileMain(ByRef aMapWin As IMapWin)
+    Public Sub WriteEXSFileMain()
 
         Dim StartUpForm As New HSPEXP.StartUp
         'Dim EXSFileForm As New HSPEXP.MakeEXSFile
