@@ -109,12 +109,32 @@
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>atcReport.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>atcReport.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <DebugType>Full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinInterfaces, Version=4.8.2.19550, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\D4EM\Bin\MapWinInterfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -139,11 +159,6 @@
       <Name>atcData-D4EM10</Name>
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility-D4EM10.vbproj">
-      <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
-      <Name>atcMwGisUtility-D4EM10</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility-D4EM10.vbproj">
@@ -174,26 +189,6 @@
     </Compile>
     <Compile Include="frmResult.vb">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="scripts\1990 Population and Sewerage by Census Tract Table.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="scripts\2000 Population by Census Tract Table.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="scripts\303d Listed Segments Table.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="scripts\GIRAS Landuse Table in Acres.vb" />
-    <Compile Include="scripts\NLCD Landuse Table in Acres.vb" />
-    <Compile Include="scripts\Permitted Point Source Facilities Table.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="scripts\Point Source Discharge Concentration and Loading Table.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="scripts\Water Quality Observation Stations Table.vb">
-      <SubType>Code</SubType>
     </Compile>
     <EmbeddedResource Include="frmReport.resx">
       <DependentUpon>frmReport.vb</DependentUpon>
