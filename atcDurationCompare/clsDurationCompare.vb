@@ -9,7 +9,8 @@ Public Class clsDurationComparePlugin
             Return "Analysis::USGS Surface Water Statistics (SWSTAT)::Duration/Compare"
         End Get
     End Property
-
+#If GISProvider = "DotSpatial" Then
+#Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                                     ByVal aParentHandle As Integer)
@@ -53,5 +54,5 @@ Public Class clsDurationComparePlugin
             End If
         End If
     End Sub
-
+#End If
 End Class
