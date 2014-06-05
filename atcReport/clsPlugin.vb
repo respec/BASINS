@@ -1,8 +1,14 @@
+
 Imports atcControls
 Imports atcUtility
-Imports atcMwGisUtility
 Imports MapWinUtility
 Imports System.Collections.Specialized
+
+#If GISProvider = "DotSpatial" Then
+#Else
+Imports atcMwGisUtility
+#End If
+
 
 Public Class PlugIn
     Inherits atcData.atcDataTool
@@ -21,7 +27,11 @@ Public Class PlugIn
             Return "An interface for generating watershed characterization reports."
         End Get
     End Property
-
+#If GISProvider = "DotSpatial" Then
+    Public Overrides Function Show() As Object
+        Throw New ApplicationException("Show not implemented for Dot Spatial.")
+    End Function
+#Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
@@ -110,6 +120,21 @@ Public Class PlugIn
 
     End Function
 
+      Public Overrides Function Show() As Object
+        GisUtil.MappingObject = pMapWin
+        Dim lFrmReport As New frmReport
+        lFrmReport.InitializeUI(Me)
+        lFrmReport.Show()
+        Return lFrmReport
+    End Function
+
+    Public Sub Save(ByVal aDataGroup As atcData.atcTimeseriesGroup, ByVal aFileName As String, ByVal ParamArray aOption() As String)
+        Dim lFrmReport As frmReport = Show()
+        SaveFileString(aFileName, lFrmReport.ToString)
+        lFrmReport.Close()
+    End Sub
+#End If
+
     Public ReadOnly Property Reports() As Collection
         Get
             If pReports Is Nothing Then 'fill in first time thru
@@ -135,17 +160,5 @@ Public Class PlugIn
         End Set
     End Property
 
-    Public Overrides Function Show() As Object
-        GisUtil.MappingObject = pMapWin
-        Dim lFrmReport As New frmReport
-        lFrmReport.InitializeUI(Me)
-        lFrmReport.Show()
-        Return lFrmReport
-    End Function
-
-    Public Sub Save(ByVal aDataGroup As atcData.atcTimeseriesGroup, ByVal aFileName As String, ByVal ParamArray aOption() As String)
-        Dim lFrmReport As frmReport = Show()
-        SaveFileString(aFileName, lFrmReport.ToString)
-        lFrmReport.Close()
-    End Sub
+  
 End Class
