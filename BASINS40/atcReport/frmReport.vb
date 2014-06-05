@@ -1,6 +1,6 @@
 Imports atcUtility
 Imports atcControls
-Imports atcMwGisUtility
+'Imports atcMwGisUtility
 Imports MapWinUtility
 
 Public Class frmReport
@@ -223,7 +223,8 @@ Public Class frmReport
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
     End Sub
-
+#If GISProvider = "DotSpatial" Then
+#Else
     Private Sub cboSubbasins_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboAreas.SelectedIndexChanged
         Dim lLayer As Long
         Dim i As Long
@@ -408,4 +409,5 @@ Public Class frmReport
             ShowHelp("BASINS Details\Analysis\Watershed Characterization Reports.html")
         End If
     End Sub
+#End If
 End Class
