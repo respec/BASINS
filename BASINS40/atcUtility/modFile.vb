@@ -757,8 +757,8 @@ ErrorWriting:
         Dim lFileName As String = aDefaultFileName.Trim
         Logger.Dbg("Finding file: " & lFileName)
         Dim lBaseFileName As String = IO.Path.GetFileName(lFileName).ToLower 'file name (not path) of file we are looking for
-        Dim lExePath As String
-        Dim lDLLpath As String
+        Dim lExePath As String = Nothing
+        Dim lDLLpath As String = Nothing
 
         If aDefaultExt Is Nothing OrElse aDefaultExt.Length = 0 Then 'get extension from default name
             aDefaultExt = FileExt(aDefaultFileName)
@@ -811,7 +811,7 @@ ErrorWriting:
                     If Not FileExists(lFileName) Then
                         lExePath = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location).ToLower & g_PathChar
                         lDLLpath = PathNameOnly(Reflection.Assembly.GetExecutingAssembly.Location).ToLower & g_PathChar
-
+TryExePath:
                         'First check in same folder or subfolder containing current .exe or .dll
                         lFileName = FindRecursive(lBaseFileName, lDLLpath, lExePath)
 
@@ -833,6 +833,10 @@ ErrorWriting:
                     If FileExists(lFileName) Then
                         aDefaultFileName = lFileName
                     Else
+                        If lExePath <> "C:\BASINS41\bin\" Then
+                            lExePath = "C:\BASINS41\bin\"
+                            GoTo TryExePath
+                        End If
                         lFileName = ""
                     End If
                 End If
