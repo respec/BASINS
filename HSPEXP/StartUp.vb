@@ -1,11 +1,11 @@
-﻿Imports MapWindow.Interfaces
+﻿'Imports MapWindow.Interfaces
 Imports System.Windows.Forms.DialogResult
 Imports System.IO
 Public Class StartUp
-    Private g_MapWin As IMapWin
+    'Private g_MapWin As IMapWin
     Private Sub cmdStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdStart.Click
         'Try
-        ScriptMain(g_MapWin)
+        ScriptMain(Nothing)
         'Catch ex As Exception
         '    MapWinUtility.Logger.Msg(ex.Message)
         'End Try
@@ -108,6 +108,20 @@ Public Class StartUp
 
     Private Sub StartUp_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         atcData.atcDataManager.Clear()
+        With atcData.atcDataManager.DataPlugins
+            .Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
+            .Add(New atcBasinsObsWQ.atcDataSourceBasinsObsWQ)
+            .Add(New atcWDM.atcDataSourceWDM)
+            '.Add(New atcTimeseriesNCDC.atcTimeseriesNCDC)
+            '.Add(New atcTimeseriesRDB.atcTimeseriesRDB)
+            '.Add(New atcTimeseriesScript.atcTimeseriesScriptPlugin)
+            '.Add(New atcTimeseriesSUSTAIN.atcTimeseriesSUSTAIN)
+
+            '.Add(New atcList.atcListPlugin)
+            .Add(New atcGraph.atcGraphPlugin)
+            '.Add(New atcDataTree.atcDataTreePlugin)
+        End With
+
     End Sub
 
    
