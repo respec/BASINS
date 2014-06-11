@@ -623,7 +623,12 @@ Public Class HspfUci
                                 lPoint.Name = lPoint.Source.VolName & " " & lPoint.Source.VolId
                                 lPoint.Con = ""
                             End If
-                            lPoint.Comment = lConnection.Comment
+                            If lConnection.Comment IsNot Nothing Then 'Anurag added this condition because when there was no 
+                                'Comment for the connection, lConnection.Comment was empty and this condition was causing error 
+                                'at this point.
+                                lPoint.Comment = lConnection.Comment
+                            End If
+
                             For Each lPointExisting As HspfPointSource In pPointSources
                                 If lPointExisting.Name = lPoint.Name Then
                                     lPoint.Id = lPointExisting.Id
@@ -2467,7 +2472,8 @@ x:
             lInit = 0
             If lBuff Is Nothing Then
                 lDone = True
-            ElseIf lBuff.Substring(2, 6) = "FTABLE" Then 'this is a new one
+            ElseIf (Not lBuff.Contains("***") AndAlso lBuff.Substring(2, 6) = "FTABLE") Then 'this is a new FTABLE
+                'Anurag Added the condition to check for the strings for FTABLE only if does not have ***
                 Dim lId As Integer = CShort(lBuff.Substring(11, 4))
                 'find which operation this ftable is associated with
                 Dim lOperation As HspfOperation = Nothing
@@ -2513,7 +2519,7 @@ x:
                                 If .Comment.Length = 0 Then
                                     .Comment = lBuff
                                 Else
-                                    .Comment &= vbCrLf & lBuff
+                                    .Comment &= vbCrLf & lBuff 'So if there are additional comments on the FTABLE, they get added to the depth area volume line
                                 End If
                             ElseIf .ExtendedFlag = False Then 'this is a regular record
                                 .Depth(lRow) = CDbl(Left(lBuff, 10))
