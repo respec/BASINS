@@ -153,6 +153,7 @@ Public Class frmAddExpert
                     'parse operation name and id
                     lId = CInt(Mid(lstOperation.Items(lstOperation.SelectedIndex), lSpacePos, lParenPos - lSpacePos))
                     Dim lOpName As String = Mid(lstOperation.Items(lstOperation.SelectedIndex), 1, lSpacePos - 1)
+                    Dim lSTANAM As String = lstOperation.SelectedItem.ToString
                     If lId > 0 And Len(lOpName) > 0 Then
                         Dim lSub1 As Integer
                         Dim lSub2 As Integer
@@ -198,9 +199,11 @@ Public Class frmAddExpert
                         End If
                         Dim lWDMId As Integer
                         Dim lNewDsn As Integer
-                        pUCI.AddOutputWDMDataSetExt(txtLoc.Text, lTempMem, atxBase.Text, lWDMId, lOutTu, "", lNewDsn)
+                        Dim lDescription As String = ""
+                        OutputDataSetProperties(lTmem, lDescription)
+                        pUCI.AddOutputWDMDataSetExt(txtLoc.Text, lTmem, atxBase.Text, lWDMId, lOutTu, lDescription, lNewDsn, lSTANAM)
                         pUCI.AddExtTarget(lOpName, lId, lGroup, lMem, lSub1, lSub2, 1.0#, lTrans, _
-                             "WDM" & CStr(lWDMId), lNewDsn, lTempMem, 1, "ENGL", "AGGR", "REPL")
+                             "WDM" & CStr(lWDMId), lNewDsn, lTmem, 1, "ENGL", "AGGR", "REPL")
                         pUCI.Edited = True
                     End If
                 End If
@@ -312,6 +315,17 @@ Public Class frmAddExpert
         End If
 
     End Sub
+    Private Function OutputDataSetProperties(ByRef aConstituentName As String, ByRef aDescription As String)
+        Select Case aConstituentName
+            Case "NUTRX:DNUST(1,1)"
+                aConstituentName = "NO3"
+                aDescription = "Nitrate Concentration in mg/l"
+
+        End Select
+
+        Return aDescription
+        Return aConstituentName
+    End Function
 
     Private Sub CheckGQUALs(ByVal aId As Integer, ByVal aGqualFg() As Integer)
 
