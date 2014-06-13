@@ -43,8 +43,8 @@ Public Class frmOutput
 
         If radio1.Checked Then
             txtDesc.Text = "Output will be generated at each 'Hydrology Calibration' output location for " & _
-              "total runoff, surface runoff, interflow, base flow, potential evapotranspiration, actual evapotranspiration, " & _
-              "upper zone storage, and lower zone storage."
+              "simulated flow, surface runoff, interflow, base flow, potential evapotranspiration, actual evapotranspiration, " & _
+              "upper zone storage, lower zone storage, and total moisture supply in default project units at daily interval."
             With agdOutput.Source
                 .Rows = 0
                 .Columns = 2
@@ -129,7 +129,8 @@ Public Class frmOutput
                                 'assume this is a calibration location, skip it
                             ElseIf lHspfConnection.Source.Group = "ROFLOW" And lHspfConnection.Source.Member = "ROVOL" Then
                                 'this is part of the calibration location
-                            ElseIf lHspfConnection.Source.Group = "HYDR" And lHspfConnection.Source.Member = "RO" And IsFlowLocation(lHspfOperation.Name, lHspfOperation.Id) Then
+                            ElseIf lHspfConnection.Source.Group = "HYDR" And lHspfConnection.Source.Member = "RO" _
+                            And IsFlowLocation(lHspfOperation.Name, lHspfOperation.Id) Then
                                 'this is an output flow location
                             Else
                                 lDSNCoutner = lHspfConnection.Target.VolId
