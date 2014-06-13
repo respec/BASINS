@@ -18,8 +18,8 @@ Public Class frmAddExpert
 
         ' Add any initialization after the InitializeComponent() call.
         Me.Icon = pIcon
-        Me.MinimumSize = Me.Size
-        Me.MaximumSize = Me.Size
+        'Me.MinimumSize = Me.Size
+        'Me.MaximumSize = Me.Size
 
         pCheckedRadioIndex = aCheckedRadioIndex
 
@@ -30,6 +30,10 @@ Public Class frmAddExpert
                 txtDescription.Visible = False
                 optH.Visible = False
                 optD.Visible = False
+                lblTimeStep.Visible = False
+                optEnglish.Visible = False
+                optMetric.Visible = False
+                lblUnits.Visible = False
                 lblGroup.Visible = False
             Case 2 'Flow
                 lstOperation.Size = New Size(350, 173)
@@ -106,13 +110,18 @@ Public Class frmAddExpert
         Dim lDialogResult As Windows.Forms.DialogResult = Nothing
 
         Dim lOutTu As Integer
+        Dim lOutputUnits As String = "ENGL"
         If optH.Checked Then
             lOutTu = 3  'hourly
         End If
         If optD.Checked Then
             lOutTu = 4  'daily
         End If
-
+        If optMetric.Checked Then
+            lOutputUnits = "METR"
+        Else
+            lOutputUnits = "ENGL"
+        End If
         Dim lId As Integer
         Dim lOstr(28) As String
         Dim lDsns(28) As Integer
@@ -142,7 +151,7 @@ Public Class frmAddExpert
                 Dim lNewDsn As Integer
                 pUCI.AddOutputWDMDataSetExt(txtLoc.Text, "FLOW", atxBase.Text, lWDMId, lOutTu, "", lNewDsn)
                 pUCI.AddExtTarget("RCHRES", lId, "HYDR", "RO", 1, 1, 1.0#, "AVER", _
-                       "WDM" & CStr(lWDMId), lNewDsn, "FLOW", 1, "ENGL", "AGGR", "REPL")
+                       "WDM" & CStr(lWDMId), lNewDsn, "FLOW", 1, lOutputUnits, "AGGR", "REPL")
                 pUCI.Edited = True
             End If
         ElseIf pCheckedRadioIndex = 4 Then 'add this other output
@@ -203,7 +212,7 @@ Public Class frmAddExpert
                         OutputDataSetProperties(lTmem, lDescription)
                         pUCI.AddOutputWDMDataSetExt(txtLoc.Text, lTmem, atxBase.Text, lWDMId, lOutTu, lDescription, lNewDsn, lSTANAM)
                         pUCI.AddExtTarget(lOpName, lId, lGroup, lMem, lSub1, lSub2, 1.0#, lTrans, _
-                             "WDM" & CStr(lWDMId), lNewDsn, lTmem, 1, "ENGL", "AGGR", "REPL")
+                             "WDM" & CStr(lWDMId), lNewDsn, lTmem, 1, lOutputUnits, "AGGR", "REPL")
                         pUCI.Edited = True
                     End If
                 End If
@@ -320,8 +329,50 @@ Public Class frmAddExpert
             Case "NUTRX:DNUST(1,1)"
                 aConstituentName = "NO3"
                 aDescription = "Nitrate Concentration in mg/l"
-
+            Case "NUTRX:DNUST(2,1)"
+                aConstituentName = "TAM"
+                aDescription = "Total Ammonia Concentration in mg/l"
+            Case "NUTRX:DNUST(3,1)"
+                aConstituentName = "NO2"
+                aDescription = "Nitrite Concentration in mg/l"
+            Case "NUTRX:DNUST(4,1)"
+                aConstituentName = "PO4"
+                aDescription = "Phosphate Concentration in mg/l"
+            Case "NUTRX:DNUST(5,1)"
+                aConstituentName = "NH4+"
+                aDescription = "Ammonium Concentration in mg/l"
+            Case "NUTRX:DNUST(6,1)"
+                aConstituentName = "NH3"
+                aDescription = "Ammonia Concentration in mg/l"
+            Case "PLANK:PKST4(1,1)"
+                aConstituentName = "TN"
+                aDescription = "Total Nitrogen Concentration in mg/l"
+            Case "PLANK:PKST4(2,1)"
+                aConstituentName = "TP"
+                aDescription = "Total Phosphorus Concentration in mg/l"
+            Case "SEDTRN:SSED(1,1)"
+                aConstituentName = "SS1"
+                aDescription = "Suspended Sand Concentration in mg/l"
+            Case "SEDTRN:SSED(2,1)"
+                aConstituentName = "SS2"
+                aDescription = "Suspended Silt Concentration in mg/l"
+            Case "SEDTRN:SSED(3,1)"
+                aConstituentName = "SS3"
+                aDescription = "Suspended Clay Concentration in mg/l"
+            Case "SEDTRN:SSED(4,1)"
+                aConstituentName = "TSS"
+                aDescription = "Total Suspended Solids Concentration in mg/l"
+            Case "OXRX:DOX"
+                aConstituentName = "DO"
+                aDescription = "Dissolved Oxygen Concentration in mg/l"
+            Case "OXRX:BOD"
+                aConstituentName = "BOD5"
+                aDescription = "BOD-5 day Concentration in mg/l"
+            Case "HTRCH:TW"
+                aConstituentName = "TW"
+                aDescription = "Temperature of Water"
         End Select
+
 
         Return aDescription
         Return aConstituentName
