@@ -330,7 +330,8 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
                             lDate.Add(lCurrentDateJ)
                             lCurrentDateJ = TimAddJ(lBlockStartDateJ, lBlockTimeUnits, lBlockTimeStep, lPos)
                             lDataCurrent = CDbl(aWdm.ReadSingle())
-                            If Math.Abs(lDataCurrent - lTsFill) < pEpsilon Then
+                            'If value is a very large negative number (from HSPF unable to compute) or is the fill value, treat it as missing
+                            If lDataCurrent < -1.0E+20 OrElse Math.Abs(lDataCurrent - lTsFill) < pEpsilon Then
                                 lDataCurrent = pNan
                             End If
                             lData.Add(lDataCurrent)
