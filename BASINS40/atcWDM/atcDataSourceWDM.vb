@@ -915,18 +915,22 @@ CaseExistRenumber:
                                 Dim lInterval As Double = .GetValue("interval", 0)
                                 Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
                                 Dim lCurDat(6) As Integer 'current date
+                                Dim lDataCurrent As Double
+
                                 For iVal As Integer = 1 To nVals
-                                    If Math.Abs((lV(iVal - 1) - lTsFill)) < pEpsilon Then
+                                    lDataCurrent = CDbl(lV(iVal - 1))
+                                    'If value is a very large negative number (from HSPF unable to compute) or is the fill value, treat it as missing
+                                    If lDataCurrent < -1.0E+20 OrElse Math.Abs((lDataCurrent - lTsFill)) < pEpsilon Then
                                         lVd(iVal) = pNan
                                     Else
-                                        lVd(iVal) = lV(iVal - 1) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
+                                        lVd(iVal) = lDataCurrent 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
                                     End If
                                     If lNeedDates Then
                                         If lConstInterval Then
                                             lJd(iVal) = lSJDay + iVal * lInterval
                                         Else
-                                            TIMADD(lSdatSeasonOffset, lTimeUnits, lTimeStep, iVal, lCurdat)
-                                            lJd(iVal) = Date2J(lCurdat)
+                                            TIMADD(lSdatSeasonOffset, lTimeUnits, lTimeStep, iVal, lCurDat)
+                                            lJd(iVal) = Date2J(lCurDat)
                                         End If
                                     End If
                                 Next
