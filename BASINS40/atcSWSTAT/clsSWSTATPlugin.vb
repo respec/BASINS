@@ -5,7 +5,7 @@ Imports MapWinUtility
 Public Class clsSWSTATPlugin
     Inherits atcData.atcDataDisplay
 
-    Private pTrendName As String = "Trend"
+    Private Const pTrendName As String = "Trend"
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -21,13 +21,13 @@ Public Class clsSWSTATPlugin
     End Property
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
+        LoadPlugin("Timeseries::n-day high/low")
         Dim lForm As New frmSWSTAT
-        ShowForm(aTimeseriesGroup, lForm)
+        lForm.Initialize(aTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
         Return lForm
     End Function
 
-    Private Sub ShowForm(ByVal aTimeseriesGroup As atcData.atcDataGroup, ByVal aForm As Object)
-        LoadPlugin("Timeseries::n-day high/low")
+    Private Function BasicAttributes() As Generic.List(Of String)
         Dim lBasicAttributes As New Generic.List(Of String)
         With lBasicAttributes
             .Add("ID")
@@ -38,14 +38,20 @@ Public Class clsSWSTATPlugin
             .Add("Count")
             .Add("Count Missing")
         End With
+        Return lBasicAttributes
+    End Function
 
+    Private Function NDayAttributes() As Generic.List(Of String)
         Dim lNDayAttributes As New Generic.List(Of String)
         With lNDayAttributes
             .Add("STAID")
             .Add("STANAM")
             .Add("Constituent")
         End With
+        Return lNDayAttributes
+    End Function
 
+    Private Function TrendAttributes() As Generic.List(Of String)
         Dim lTrendAttributes As New Generic.List(Of String)
         With lTrendAttributes
             .Add("Original ID")
@@ -61,8 +67,9 @@ Public Class clsSWSTATPlugin
             .Add("Constituent")
             .Add("STAID")
         End With
-        aForm.Initialize(aTimeseriesGroup, lBasicAttributes, lNDayAttributes, lTrendAttributes)
-    End Sub
+        Return lTrendAttributes
+    End Function
+
 
     Public Overrides Sub Save(ByVal aTimeseriesGroup As atcData.atcDataGroup, _
                               ByVal aFileName As String, _
@@ -96,14 +103,19 @@ Public Class clsSWSTATPlugin
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         MyBase.ItemClicked(aItemName, aHandled)
-        If Not aHandled AndAlso aItemName.Equals(atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName) Then
-            Dim lTimeseriesGroup As atcTimeseriesGroup = _
-              atcDataManager.UserSelectData("Select Data For Trend Analysis", _
-                                            Nothing, Nothing, True, True, Me.Icon)
-            If lTimeseriesGroup.Count > 0 Then
-                Dim lForm As New frmTrend
-                ShowForm(lTimeseriesGroup, lForm)
-            End If
+        If Not aHandled Then
+            Select Case aItemName
+                Case atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName
+                    Dim lTimeseriesGroup As atcTimeseriesGroup = _
+                      atcDataManager.UserSelectData("Select Data For Trend Analysis", _
+                                                    Nothing, Nothing, True, True, Me.Icon)
+                    If lTimeseriesGroup.Count > 0 Then
+                        LoadPlugin("Timeseries::n-day high/low")
+                        Dim lForm As New frmTrend
+                        lForm.Initialize(lTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
+                    End If
+
+            End Select
         End If
     End Sub
 

@@ -492,10 +492,11 @@ Public Module modTimeseriesMath
             If lAttribute.Definition.CopiesInherit Then
                 Dim lMatch As Boolean = True
                 For Each lData As atcDataSet In aGroup
-                    Try
-                        If lData.Attributes.GetValue(lAttribute.Definition.Name) <> lAttribute.Value Then
+                    Try 'Hard-coded SeasonDefinition to avoid exception (it can't use <>)
+                        If lAttribute.Definition.Name = "SeasonDefinition" OrElse _
+                            lData.Attributes.GetValue(lAttribute.Definition.Name) <> lAttribute.Value Then
                             lMatch = False
-                            Exit For
+                            Exit For 'Skip checking other datasets for this attribute, move on to next attribute
                         End If
                     Catch 'Can't test for equality, don't assign this one a value in aTarget
                         lMatch = False

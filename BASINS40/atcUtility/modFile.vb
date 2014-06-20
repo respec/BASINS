@@ -1021,6 +1021,12 @@ TryExePath:
         Return New clsLinesInFileReadLine(aFileReader)
     End Function
 
+    Public Function FirstLineInFile(aFileName As String) As String
+        Dim lFile As New clsLinesInFile(aFileName)
+        FirstLineInFile = lFile.Current
+        lFile.Dispose()
+    End Function
+
     ''' <summary>
     ''' An enumerable set of lines read from a text file (or other BinaryReader)
     ''' lines in file end with carriage return and/or linefeed

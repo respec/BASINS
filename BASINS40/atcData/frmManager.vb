@@ -465,7 +465,12 @@ Friend Class frmManager
                     End If
                     lSelected = atcDataManager.UserSelectData("Select data to " & lActionArgs(1), lSelected, Nothing, True, False, Me.Icon)
                     If lSelected IsNot Nothing AndAlso lSelected.Count > 0 Then
-                        atcDataManager.ShowDisplay(lActionArgs(1), lSelected, Me.Icon)
+                        Dim lDisplayName As String = lActionArgs(1)
+                        'Re-assemble display name if nested category was disassembled by Split above
+                        For lNextPart As Integer = 2 To lActionArgs.GetUpperBound(0)
+                            lDisplayName &= ":" & lActionArgs(lNextPart)
+                        Next
+                        atcDataManager.ShowDisplay(lDisplayName, lSelected, Me.Icon)
                     End If
                 Case "RemoveDatasets"
                     If .CanRemoveDataset Then
