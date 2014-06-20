@@ -16,7 +16,7 @@ Imports System.Xml
 Public Class atcTimeseriesGSSHA
     Inherits atcData.atcTimeseriesSource
 
-    Private pFilter As String = "GSSHA Timeseries Files (*.ts)|*.ts|All Files|*.*"
+    Private pFilter As String = "GSSHA Timeseries Files (*.ts, *.gag)|*.ts;*.gag|All Files|*.*"
     Private pName As String = "Timeseries::GSSHA"
     Private Shared pNaN As Double = GetNaN()
 
@@ -28,7 +28,7 @@ Public Class atcTimeseriesGSSHA
 
     Private Const EventStart As String = "EVENT" 'description string of the event follows in double quotes
     Private Const EventNRGAG As String = "NRGAG" 'number of rainfall gages
-    Private Const EventNRPDS As String = "NRDPS" 'number of rainfall data points
+    Private Const EventNRPDS As String = "NRPDS" 'number of rainfall data points
     Private Const EventCOORD As String = "COORD" 'coordinate, easting and northing of gage, one card for each gage (NRGAG), must have an identifying string in double quotations
     Private Const EventGAGES As String = "GAGES" 'rainfall accumulation (mm) over the last time period
     Private Const EventRADAR As String = "RADAR" 'rainfall rate (mm×hr-1) for the last time interval
@@ -61,6 +61,9 @@ Public Class atcTimeseriesGSSHA
 
     Public Overrides Function Open(ByVal aSpecification As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If MyBase.Open(aSpecification, aAttributes) Then
+            If Not IO.File.Exists(Specification) Then
+                Return True 'Report success on opening file that does not exist yet to write to
+            End If
             Dim lInCurveLabels As Boolean = False
             Dim lLabelStart As Integer = 0
             Dim lLabelEnd As Integer = 0
@@ -158,20 +161,14 @@ Public Class atcTimeseriesGSSHA
 
     Private Sub ReadEvents()
         Dim lInCurveLabels As Boolean = False
-        Dim lLabelStart As Integer = 0
-        Dim lLabelEnd As Integer = 0
-        Dim lDescStart As Integer = 0
-        Dim lTRANStart As Integer = 0
-        'Dim lTRANCODStart As Integer = 0
-        Dim lArea As Double = 0
-        Dim lSpaceSeparator(0) As Char
-        lSpaceSeparator(0) = " "c
-        Logger.Dbg("Opening atcTimeseriesGSSHA file: " & Specification)
+        Logger.Dbg("Opening atcTimeseriesGSSHA Events from: " & Specification)
         Dim lGroupBuilder As New atcTimeseriesGroupBuilder(Me)
         Dim lTsGB As atcTimeseriesGroupBuilder = Nothing
-        Dim lAttributes As New atcDataAttributes
         Dim lEventDescription As String = ""
-        Dim lKeys As New Generic.List(Of String)
+        Dim lEventCount As Integer = 0
+        Dim lKeys As New List(Of String)
+        Dim lNextTimeseriesID As Integer = 1
+        Dim lNRGAG As Integer = 0
         For Each lLine As String In LinesInFile(Specification)
             Select Case SafeSubstring(lLine, 0, 5)
                 Case EventStart
@@ -179,18 +176,41 @@ Public Class atcTimeseriesGSSHA
                         lTsGB.CreateTimeseriesAddToGroup(Me.DataSets)
                         lTsGB = Nothing
                     End If
-                    lEventDescription = lLine.Substring(EventStart.Length + 2)
+                    lEventCount += 1
+                    lEventDescription = SafeSubstring(lLine, EventStart.Length + 1).Trim("'"c, """"c, " "c, vbTab(0))
+                    If lEventDescription.Length = 0 Then lEventDescription = "Event " & lEventCount
                     lKeys.Clear()
+                    lNRGAG = 0
+                Case EventNRGAG
+                    If Integer.TryParse(SafeSubstring(lLine, 5).Trim, lNRGAG) Then
+                        If lNRGAG < 1 Then
+                            Logger.Dbg("NRGAG < 0 not supported")
+                        End If
+                    End If
                 Case EventCOORD
                     lKeys.Add(SafeSubstring(lLine, 5).Trim)
                 Case EventACCUM, EventGAGES, EventRADAR, EventRATES
-                    If lTsGB Is Nothing Then
-                        lTsGB = New atcTimeseriesGroupBuilder(Me)
-                        If lKeys.Count = 0 Then lKeys.Add("1")
-                        lTsGB.CreateBuilders(lKeys.ToArray)
-                        lTsGB.SetAttributeForAll("Description", lEventDescription)
+                    If lNRGAG > 0 Then
+                        If lTsGB Is Nothing Then
+                            lTsGB = New atcTimeseriesGroupBuilder(Me)
+                            Dim lBuilderIDs(lKeys.Count - 1) As String
+                            Dim lBuilderIndex As Integer = 0
+                            For lBuilderIndex = 0 To lBuilderIDs.GetUpperBound(0)
+                                lBuilderIDs(lBuilderIndex) = lNextTimeseriesID
+                                lNextTimeseriesID += 1
+                            Next
+                            lTsGB.CreateBuilders(lBuilderIDs)
+                            lBuilderIndex = 0
+                            For Each lKey As String In lKeys
+                                lTsGB.Builder(lBuilderIDs(lBuilderIndex)).Attributes.SetValue("Location", lKey)
+                                lBuilderIndex += 1
+                            Next
+                            lTsGB.SetAttributeForAll("Description", lEventDescription)
+                            lTsGB.SetAttributeForAll("Scenario", "GSSHA")
+                            lTsGB.SetAttributeForAll("Constituent", "Precipitation")
+                        End If
+                        AddDateAndValuesFromEventLine(lLine, lTsGB)
                     End If
-                    AddDateAndValuesFromEventLine(lLine, lTsGB)
             End Select
         Next
         If lTsGB IsNot Nothing Then
@@ -214,9 +234,8 @@ Public Class atcTimeseriesGSSHA
         Dim lDate As Date
         Dim lDateDouble As Double
         Dim lValueDouble As Double
-        Dim lFieldValues As New Generic.List(Of String)
         Try
-            Dim lSplit() As String = SplitLine(aLine)
+            Dim lFieldValues() As String = SplitLine(aLine)
             lDateDouble = atcUtility.modDate.Date2J(lFieldValues(0), lFieldValues(1), lFieldValues(2), lFieldValues(3), lFieldValues(4), 0)
             lDate = Date.FromOADate(lDateDouble)
             If Not Double.TryParse(lFieldValues(5), lValueDouble) Then
@@ -232,23 +251,24 @@ Public Class atcTimeseriesGSSHA
     Private Sub AddDateAndValuesFromEventLine(ByVal aLine As String, ByVal aTsGB As atcTimeseriesGroupBuilder)
         Dim lDate As Date
         Dim lDateDouble As Double
-        Dim lFieldValues As New Generic.List(Of String)
         Try
-            Dim lSplit() As String = SplitLine(aLine)
-            Dim lSplitBound As Integer = lSplit.GetUpperBound(0)
+            Dim lFieldValues() As String = SplitLine(aLine)
+            Dim lSplitBound As Integer = lFieldValues.GetUpperBound(0)
             If lSplitBound > 5 Then
                 lDateDouble = atcUtility.modDate.Date2J(lFieldValues(1), lFieldValues(2), lFieldValues(3), lFieldValues(4), lFieldValues(5))
                 lDate = Date.FromOADate(lDateDouble)
 
-                Dim lValues(lSplitBound) As Double
-                For lValueIndex As Integer = 0 To lSplitBound
-                    If Not Double.TryParse(lFieldValues(lValueIndex + 5), lValues(lValueIndex)) Then
-                        Logger.Dbg("Unable to parse value '" & lFieldValues(5) & "'" & vbCrLf & " line: '" & aLine & "'")
+                Dim lLastIndex As Integer = Math.Min(lSplitBound - 6, aTsGB.Count - 1)
+                Dim lValues(lLastIndex) As Double
+                For lValueIndex As Integer = 0 To lLastIndex
+                    If Not Double.TryParse(lFieldValues(lValueIndex + 6), lValues(lValueIndex)) Then
+                        'TODO: non-numeric value may be an ASCII grid file name
+                        Logger.Dbg("Unable to parse value '" & lFieldValues(lValueIndex + 6) & "'" & vbCrLf & " line: '" & aLine & "'")
                         lValues(lValueIndex) = pNaN
                     End If
                 Next
                 aTsGB.AddValues(lDate, lValues)
-                aTsGB.SetAttributeForAll("Measurement", lFieldValues(0))
+                aTsGB.SetAttributeForAll("Event Type", lFieldValues(0))
             End If
         Catch exParse As Exception
             Logger.Dbg("Unable to find date/value in line: '" & aLine & "' " & vbCrLf & exParse.Message)
@@ -311,8 +331,12 @@ Public Class atcTimeseriesGSSHA
                         aSaveFileName = lRenamedFilename
                 End Select
             End If
-            'TODO: check Description attribute, if it starts with two numbers (northing easting) then save as event
-            SaveAsTimeseries(aSaveFileName)
+
+            If Me.DataSets(0).Attributes.ContainsAttribute("Event Type") Then
+                SaveAsEvents(aSaveFileName)
+            Else
+                SaveAsTimeseries(aSaveFileName)
+            End If
             Return True
         Catch e As Exception
             Logger.Msg("Error writing '" & aSaveFileName & "': " & e.ToString, MsgBoxStyle.OkOnly, "Did not write file")
@@ -323,7 +347,6 @@ Public Class atcTimeseriesGSSHA
     Public Sub SaveAsTimeseries(aSaveFileName As String)
         'Dim lTimeseries As atcTimeseries = Me.DataSets(0)
         Dim lWriter As New System.IO.StreamWriter(aSaveFileName)
-        lWriter.WriteLine("-----------------------------------------------------------------------------------------")
 
         Dim lInterval As Double = 0
         'Dim lInterval As Double = lTimeseries.Attributes.GetValue("Interval", JulianHour)
@@ -352,7 +375,7 @@ Public Class atcTimeseriesGSSHA
 
             For lTimeStep As Integer = 1 To lLastTimeStep
                 Dim lDateArray(5) As Integer
-                modDate.J2Date(lDatasetsToWrite(0).Dates.Value(lTimeStep) - lInterval, lDateArray)
+                modDate.J2Date(lTimeseries.Dates.Value(lTimeStep) - lInterval, lDateArray)
 
 
                 lWriter.Write(Format(lDateArray(0), "0000") & _
@@ -365,6 +388,60 @@ Public Class atcTimeseriesGSSHA
                 lWriter.WriteLine()
             Next
             lWriter.WriteLine(TimeseriesEnd)
+        Next
+        lWriter.Close()
+    End Sub
+
+    Public Sub SaveAsEvents(aSaveFileName As String)
+        Dim lWriter As New System.IO.StreamWriter(aSaveFileName)
+
+        Dim lInterval As Double = 0
+        'Dim lInterval As Double = lTimeseries.Attributes.GetValue("Interval", JulianHour)
+        Dim lDatasetsToWrite As atcTimeseriesGroup = Me.DataSets ' New atcTimeseriesGroup(lTimeseries)
+
+        'TODO: figure out which timeseries should be grouped into the same event (matching Description and Dates?)
+        'Currently we write a separate event for each timeseries
+
+        'For Each lTimeseries In Me.DataSets
+        '    If lTimeseries.Attributes.GetValue("Interval", JulianHour) <> lInterval Then
+        '        Logger.Msg("Different interval data cannot be written to same file, skipping " & lTimeseries.ToString & " - " & DoubleToString(lTimeseries.Attributes.GetValue("Interval", JulianHour) * 24) & " hours <> " & DoubleToString(lInterval * 24))
+        '    ElseIf lTimeseries.Dates.numValues < lLastTimeStep Then
+        '        Logger.Msg("Different number of values cannot be written to same file, skipping " & lTimeseries.ToString & " which contains " & lTimeseries.Dates.numValues & " values instead of " & lLastTimeStep)
+        '    Else
+        '        lDatasetsToWrite.Add(lTimeseries)
+        '    End If
+        'Next
+        Dim lDelimiter As String = vbTab
+        Dim lEventCount As Integer = 0
+        For Each lTimeseries As atcTimeseries In lDatasetsToWrite
+            lEventCount += 1
+            Dim lLastTimeStep As Integer = lTimeseries.Dates.numValues
+            'Backdoor way to allow run-time specification of quote character, do not expect to use this
+            Dim lQuote As String = lTimeseries.Attributes.GetValue("Quote Character", """")
+            Dim lEventDescription As String = lTimeseries.Attributes.GetValue("Description", "Event " & lEventCount).Trim
+            If Not lEventDescription.StartsWith(lQuote) Then lEventDescription = lQuote & lEventDescription
+            If Not lEventDescription.EndsWith(lQuote) Then lEventDescription &= lQuote
+            lWriter.WriteLine(EventStart & lDelimiter & lEventDescription)
+            lWriter.WriteLine(EventNRPDS & lDelimiter & lTimeseries.numValues)
+            lWriter.WriteLine(EventNRGAG & lDelimiter & "1")
+            lWriter.WriteLine(EventCOORD & lDelimiter & lTimeseries.Attributes.GetValue("Location", lTimeseries.Attributes.GetValue("ID", "")))
+            Dim lEventType As String = lTimeseries.Attributes.GetValue("Event Type", "GAGES")
+
+            For lTimeStep As Integer = 1 To lLastTimeStep
+                Dim lDateArray(5) As Integer
+                modDate.J2Date(lTimeseries.Dates.Value(lTimeStep) - lInterval, lDateArray)
+
+
+                lWriter.Write(lEventType & _
+                              lDelimiter & Format(lDateArray(0), "0000") & _
+                              lDelimiter & lDateArray(1) & _
+                              lDelimiter & lDateArray(2) & _
+                              lDelimiter & lDateArray(3) & _
+                              lDelimiter & lDateArray(4))
+
+                lWriter.Write(lDelimiter & DoubleToString(lTimeseries.Value(lTimeStep)))
+                lWriter.WriteLine()
+            Next
         Next
         lWriter.Close()
     End Sub
