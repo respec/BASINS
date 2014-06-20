@@ -160,17 +160,17 @@ Module modFreq
         Dim lTau As Single = pNan
         Dim lLevel As Single = pNan
         Dim lSlope As Single = pNan
-        Dim lN As Integer = aTs.numValues
+        Dim lN As Integer = 0 'Number of values we are sending to KENT
 
-        If lN > 0 Then
-            Dim lQ(lN - 1) As Single
+        If aTs.numValues > 0 Then
+            Dim lQ(aTs.numValues - 1) As Single
             For i As Integer = 1 To aTs.numValues
-                If Double.IsNaN(aTs.Values(i)) Then
-                    lQ(i - 1) = 0
-                Else
-                    lQ(i - 1) = aTs.Values(i)
+                If Not Double.IsNaN(aTs.Values(i)) Then
+                    lQ(lN) = aTs.Values(i)
+                    lN += 1
                 End If
             Next
+            If lN < aTs.numValues Then ReDim Preserve lQ(lN - 1)
             Try
                 KENT(lQ, lN, lTau, lLevel, lSlope)
             Catch ex As Exception

@@ -89,10 +89,23 @@ Public Class atcTimeseriesGroupBuilder
         Dim lLastBuilder As Integer = pBuilders.Count - 1
         For lBuilderIndex As Integer = 0 To lLastBuilder
             Dim lDataSet As atcTimeseries = pBuilders.ItemByIndex(lBuilderIndex).CreateTimeseries
-            aGroup.Add(lDataSet.Attributes.GetValue("ID", lBuilderIndex), lDataSet)
+            Dim lKey As Object = lDataSet.Attributes.GetValue("ID", lBuilderIndex)
+            If aGroup.Keys.Contains(lKey) Then
+                aGroup.Add(lDataSet)
+            Else
+                aGroup.Add(lKey, lDataSet)
+            End If
             Logger.Progress(lBuilderIndex, lLastBuilder)
         Next
         Logger.Progress("", 0, 0)
+    End Sub
+
+    Public Sub SetAttributeForAll(aAttributeName As String, aAttributeValue As Object)
+        Dim lLastBuilder As Integer = pBuilders.Count - 1
+        For lBuilderIndex As Integer = 0 To lLastBuilder
+            Dim lBuilder As atcTimeseriesBuilder = pBuilders.ItemByIndex(lBuilderIndex)
+            lBuilder.Attributes.SetValue(aAttributeName, aAttributeValue)
+        Next
     End Sub
 
 End Class

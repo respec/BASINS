@@ -1,6 +1,9 @@
 Imports atcUtility
 Imports atcControls
-'Imports atcMwGisUtility
+#If GISProvider = "DotSpatial" Then
+#Else
+Imports atcMwGisUtility
+#End If
 Imports MapWinUtility
 
 Public Class frmReport

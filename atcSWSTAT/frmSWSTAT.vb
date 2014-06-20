@@ -936,8 +936,10 @@ Friend Class frmSWSTAT
             Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
             For Each lDisp As atcDataDisplay In DisplayPlugins
                 Dim lMenuText As String = lDisp.Name
-                If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
-                mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
+                If lMenuText <> "Analysis::USGS Surface Water Statistics (SWSTAT)::Integrated Frequency Analysis" Then
+                    If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
+                    mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
+                End If
             Next
         End If
 
@@ -1426,40 +1428,22 @@ Friend Class frmSWSTAT
     End Function
 
     Private Sub btnDisplayTrend_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDisplayTrend.Click
-        Dim lList As New atcList.atcListForm
-        lList.Icon = Me.Icon
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-
-        Dim lHiLow As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
-        Dim lArgs As New atcDataAttributes
-        'Dim lOperation As String
-
         Dim lSelectedData As atcTimeseriesGroup = SelectedData()
-
         If lSelectedData.Count > 0 Then
-            lArgs.Add("Timeseries", lSelectedData)
-
             If lstNday.SelectedIndices.Count > 0 Then
-                lArgs.SetValue("NDay", ListToArray(lstNday))
-                If HighOrLowString() = "High" Then
-                    lArgs.SetValue("HighFlag", radioHigh.Checked)
-                    lArgs.SetValue("LowFlag", False)
-                ElseIf HighOrLowString() = "Low" Then
-                    lArgs.SetValue("LowFlag", radioLow.Checked)
-                    lArgs.SetValue("HighFlag", False)
-                End If
-
-                'If lHiLow.Open("n-day high value", lArgs) Then
-                If lHiLow.Open("n-day high timeseries", lArgs) Then
-
-                    With lList.DateFormat
-                        .IncludeDays = False
-                        .IncludeHours = False
-                        .IncludeMinutes = False
-                        .IncludeMonths = False
-                    End With
-                    lList.Text = "Trend of " & HighOrLowString() & " Annual Time Series and Statistics"
-                    For Each lTS As atcTimeseries In lHiLow.DataSets
+                Dim lRankedAnnual As atcTimeseriesGroup = _
+                   clsSWSTATPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=lSelectedData, _
+                                                                 aNDay:=ListToArray(lstNday), _
+                                                                 aHighFlag:=radioHigh.Checked, _
+                                                                 aFirstYear:=pFirstYear, _
+                                                                 aLastYear:=pLastYear, _
+                                                                 aBoundaryMonth:=pYearStartMonth, _
+                                                                 aBoundaryDay:=pYearStartDay, _
+                                                                 aEndMonth:=pYearEndMonth, _
+                                                                 aEndDay:=pYearEndDay)
+                If lRankedAnnual.Count > 0 Then
+                    For Each lTS As atcTimeseries In lRankedAnnual
                         With lTS.Attributes
                             .SetValue("Original ID", lTS.OriginalParent.Attributes.GetValue("ID"))
                             .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(1)))
@@ -1467,18 +1451,28 @@ Friend Class frmSWSTAT
                             .SetValue("Not Used", .GetValue("Count Missing"))
                         End With
                     Next
-                    lList.Initialize(lHiLow.DataSets, pTrendAttributes, False)
-                    lList.SwapRowsColumns = True
+                    Dim lList As New atcList.atcListForm
+                    With lList
+                        With .DateFormat
+                            .IncludeDays = False
+                            .IncludeHours = False
+                            .IncludeMinutes = False
+                            .IncludeMonths = False
+                        End With
+                        .Text = "Trend of " & HighOrLowString() & " Annual Time Series and Statistics"
+                        .Initialize(lRankedAnnual, pTrendAttributes, False)
+                        .SwapRowsColumns = True
+                        .Icon = Me.Icon
+                    End With
                 End If
             Else
-                Logger.Msg("Select at least one number of days from the N-Day List")
+                Logger.Msg("Select at least one number of days")
             End If
         Else
             Logger.Msg("Select at least one time series")
         End If
 
         Me.Cursor = System.Windows.Forms.Cursors.Default
-
     End Sub
 
     Private Sub btnDoFrequencyGrid_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequencyGrid.Click
