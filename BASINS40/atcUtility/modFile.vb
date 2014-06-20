@@ -1023,6 +1023,7 @@ TryExePath:
 
     Public Function FirstLineInFile(aFileName As String) As String
         Dim lFile As New clsLinesInFile(aFileName)
+        lFile.MoveNext()
         FirstLineInFile = lFile.Current
         lFile.Dispose()
     End Function
