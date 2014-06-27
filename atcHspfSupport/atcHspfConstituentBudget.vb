@@ -89,6 +89,7 @@ Public Module ConstituentBudget
 
         Dim lReport As New atcReport.ReportText
         Dim lReport2 As New atcReport.ReportText
+        Dim lReport3 As New atcReport.ReportText
         lReport.AppendLine(aScenario & " " & aBalanceType & " Average Annual Totals " & lUnits)
         lReport.AppendLine("   Run Made " & aRunMade)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
@@ -99,129 +100,41 @@ Public Module ConstituentBudget
         lReport2.AppendLine("   Run Made " & aRunMade)
         lReport2.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         lReport2.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
-        lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Landuse" & vbTab & "Total Load (lbs)" & vbTab & "Rate (lbs/ac)")
+
+
+        lReport3.AppendLine(aScenario & " " & aBalanceType & " Average Annual Totals of Individual Constituents from Each Land Segment to Individual Reaches " & lUnits)
+        lReport3.AppendLine("   Run Made " & aRunMade)
+        lReport3.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+        lReport3.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+
 
         Dim YearsOfSimulation As Double = YearCount(aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ)
         Dim lOutputTable As New atcTableDelimited
         Dim lOutputTable2 As New atcTableDelimited
         Select Case aBalanceType
             Case "Water"
-
+                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Landuse" & vbTab & "Total Load (ac-ft)" & vbTab & "Rate (ft/ac)")
                 With lOutputTable
                     .Delimiter = vbTab
-                    .NumFields = 11
+                    .NumFields = 8
                     .NumRecords = lRchresOperations.Count + 1
                     .CurrentRecord = 1
                     Dim lField As Integer = 0
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Local Drainage"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Inflow from Precipitation"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Loss from Evaporation"
-                    'lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
-                    'lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
-                    'lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Local Drainage"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point Sources"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Inflow from Precipitation"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Loss from Evaporation"
 
                     For Each lID As HspfOperation In lRchresOperations
                         .CurrentRecord += 1
-                        Dim lAreas As New atcCollection
-                        'lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
-                        LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
-
-                        Dim lNonpointTons As Double = TotalForReach(aUci, lID, aBalanceType, lAreas, lNonpointData) * 0.999906
-                        lNonpointTons = lNonpointTons / 12 'Converting ac-in to ac-ft
-                        'The factor of 0.999906 is to reduce the overestimation of loading from land surfaces and get a more reasonable value of Point sources.
-                        'This calculation assumes that multiplication factor in
-                        'MASS-LINK Blocks sum to 1. Should be able to get sum of Mult Factors for SSED1, 2 and 3 from the uci.
-
-                        Dim lUpstreamIn As Double = 0
-                        If lUpstreamInflows.Keys.Contains(lID.Id) Then
-                            lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
-                        End If
-
-                        'Anurag added following lines
-                        Dim lInflowFromPrecip As Double = ValueForReach(lID, lTotalPrecipData)
-                        Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
-                        'lNonpointTons = lTotalInflow - lUpstreamIn
-                        'Anurag changes are over
-                        Dim lPointTons As Double = lTotalInflow - lNonpointTons - lUpstreamIn
-                        'Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData) 'TotalForReach(lID, lAreas, lTotalInflowData)
-                        If lPointTons < 0.0001 * lNonpointTons Then
-                            lPointTons = 0.0
-                        End If
-                        'A negligible point source value is generated because of rounding errors when no point sources are present. 
-                        'This is to make sure that output looks cleaner
-                        Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
-                        Dim lEvapLoss As Double = ValueForReach(lID, lEvapLossData) 'TotalForReach(lID, lAreas, lDepScourData)
-                        Dim lCumulativePointNonpoint As Double = lNonpointTons + lPointTons
-                        If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
-                            lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
-                        End If
-
-                        Dim lReachTrappingEfficiency As Double
-                        Try
-                            lReachTrappingEfficiency = lEvapLoss / lTotalInflow
-                        Catch
-                            lReachTrappingEfficiency = 0
-                        End Try
-
-                        Dim lCululativeTrappingEfficiency As Double = 0
-                        Try
-                            lCululativeTrappingEfficiency = 1 - (lOutflow / lCumulativePointNonpoint)
-                        Catch
-                            lReachTrappingEfficiency = 0
-                        End Try
-
-                        Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
-                        lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                        lCumulativePointNonpointColl.Increment(lDownstreamReachID, lCumulativePointNonpoint)
-
-                        lField = 0
-                        lField += 1 : .Value(lField) = lID.Name & " " & lID.Id & " - " & lID.Description
-                        lField += 1 : .Value(lField) = DoubleToString(lNonpointTons, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lInflowFromPrecip, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lPointTons, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lUpstreamIn, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lTotalInflow, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lOutflow, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lEvapLoss, , lNumberFormat)
-                        'lField += 1 : .Value(lField) = DoubleToString(lCumulativePointNonpoint, , lNumberFormat)
-                        'lField += 1 : .Value(lField) = DoubleToString(lCululativeTrappingEfficiency * 100, , lNumberFormat, , , 6)
-                        'lField += 1 : .Value(lField) = DoubleToString(lReachTrappingEfficiency * 100, , lNumberFormat)
-                    Next
-                    lReport.Append(.ToString)
-                End With
-
-            Case "Sediment"
-                With lOutputTable
-                    .Delimiter = vbTab
-                    .NumFields = 11
-                    .NumRecords = lRchresOperations.Count + 1
-                    .CurrentRecord = 1
-                    Dim lField As Integer = 0
-                    lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Dep(+)/Scour(-)"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources (wdm)"
-                    For Each lID As HspfOperation In lRchresOperations
+                        
                         Dim lPointAlternate As Double = 0.0
-                        .CurrentRecord += 1
-                        Dim lAreas As New atcCollection
-                        'lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
-                        LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
-
                         For Each lSource As HspfPointSource In lID.PointSources
-                            If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
+                            If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "IVOL" Then
                                 Dim VolName As String = lSource.Source.VolName
                                 Dim lDSN As Integer = lSource.Source.VolId
                                 Dim lMfact As Double = lSource.MFact
@@ -248,8 +161,113 @@ Public Module ConstituentBudget
 
                         Next
 
+                        Dim lNonpointVol As Double
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0)
+                            lReport2.Append(.Item1)
+                            lNonpointVol = .Item2
+                        End With
+
+                        Dim lUpstreamIn As Double = 0
+                        If lUpstreamInflows.Keys.Contains(lID.Id) Then
+                            lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
+                        End If
+
+                        Dim lInflowFromPrecip As Double = ValueForReach(lID, lTotalPrecipData)
+                        Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
+                        Dim lPointVol As Double = 0.0
+                        lPointVol = lTotalInflow - lNonpointVol - lUpstreamIn
+                        If lPointVol < 0.0001 * lNonpointVol Then
+                            lPointVol = 0.0
+                        End If
+                        'A negligible point source value is generated because of rounding errors when no point sources are present. 
+                        'This is to make sure that output looks cleaner
+                        Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
+                        Dim lEvapLoss As Double = ValueForReach(lID, lEvapLossData) 'TotalForReach(lID, lAreas, lDepScourData)
+                        Dim lCumulativePointNonpoint As Double = lNonpointVol + lPointVol
+                        If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
+                            lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
+                        End If
+
+                        Dim lReachTrappingEfficiency As Double
+                        Try
+                            lReachTrappingEfficiency = lEvapLoss / lTotalInflow
+                        Catch
+                            lReachTrappingEfficiency = 0
+                        End Try
+
+                        Dim lCululativeTrappingEfficiency As Double = 0
+                        Try
+                            lCululativeTrappingEfficiency = 1 - (lOutflow / lCumulativePointNonpoint)
+                        Catch
+                            lReachTrappingEfficiency = 0
+                        End Try
+
+                        Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
+                        lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                        lCumulativePointNonpointColl.Increment(lDownstreamReachID, lCumulativePointNonpoint)
+
+                        lField = 0
+                        lField += 1 : .Value(lField) = lID.Name & " " & lID.Id & " - " & lID.Description
+                        lField += 1 : .Value(lField) = DoubleToString(lNonpointVol, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lPointAlternate, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lInflowFromPrecip, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lUpstreamIn, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lTotalInflow, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lOutflow, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lEvapLoss, , lNumberFormat)
+                       
+                    Next
+                    lReport.Append(.ToString)
+                End With
+                lReport.Append(lReport2.ToString)
+            Case "Sediment"
+                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Landuse" & vbTab & "Total Load (tons)" & vbTab & "Rate (tons/ac)")
+                With lOutputTable
+                    .Delimiter = vbTab
+                    .NumFields = 11
+                    .NumRecords = lRchresOperations.Count + 1
+                    .CurrentRecord = 1
+                    Dim lField As Integer = 0
+                    lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Dep(+)/Scour(-)"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point & Other Sources (wdm)"
+                    For Each lID As HspfOperation In lRchresOperations
+                        Dim lPointAlternate As Double = 0.0
+                        .CurrentRecord += 1
+
+                        For Each lSource As HspfPointSource In lID.PointSources
+                            If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
+                                Dim VolName As String = lSource.Source.VolName
+                                Dim lDSN As Integer = lSource.Source.VolId
+                                Dim lMfact As Double = lSource.MFact
+                                For i As Integer = 0 To aUci.FilesBlock.Count
+                                    If aUci.FilesBlock.Value(i).Typ = VolName Then
+                                        Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                        If lDataSource Is Nothing Then
+                                            If atcDataManager.OpenDataSource(lFileName) Then
+                                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                            End If
+                                        End If
+                                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                                        ltimeseries = SubsetByDate(ltimeseries, aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ, Nothing)
+                                        lPointAlternate += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
+                                    End If
+                                Next
+
+                            End If
+                        Next
+
                         Dim lNonpointTons As Double
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lAreas, lNonpointData, 0.0)
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0)
                             lReport2.Append(.Item1)
                             lNonpointTons = .Item2
 
@@ -260,16 +278,10 @@ Public Module ConstituentBudget
                             lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
                         End If
 
-                        'TODO: these two formulations are slightly different - WHY?
-
-                        'Anurag commentedout following line on July 12, 2012, to account for any mult factor in MASS-LINK block.
-                        'Dim lTotalInflow As Double = lNonpointTons + lPointTons + lUpstreamIn
-                        'Anurag added following lines
                         Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
-                        'lNonpointTons = lTotalInflow - lUpstreamIn
-                        'Anurag changes are over
+
                         Dim lPointTons As Double = lTotalInflow - lNonpointTons - lUpstreamIn
-                        'Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData) 'TotalForReach(lID, lAreas, lTotalInflowData)
+
                         If lPointTons < 0.0001 * lNonpointTons Then
                             lPointTons = 0.0
                         End If
@@ -315,7 +327,9 @@ Public Module ConstituentBudget
                     Next
                     lReport.Append(.ToString)
                 End With
+                lReport.Append(lReport2.ToString)
             Case "TotalN"
+                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Landuse" & vbTab & "Total Load (lbs)" & vbTab & "Rate (lbs/ac)")
                 With lOutputTable
                     .Delimiter = vbTab
                     .NumFields = 12
@@ -338,7 +352,7 @@ Public Module ConstituentBudget
                     For Each lID As HspfOperation In lRchresOperations
                         Dim lPointAlternate As Double = 0.0
                         .CurrentRecord += 1
-                        Dim lAreas As New atcCollection
+
                         Dim lOperationIndex As Integer = aUci.OpnSeqBlock.Opns.IndexOf(lID)
                         Dim CVBO As Double = aUci.OpnSeqBlock.Opns(lOperationIndex).Tables("CONV-VAL1").Parms("CVBO").Value
                         'conversion from mg biomass to mg oxygen
@@ -352,7 +366,6 @@ Public Module ConstituentBudget
                         'conversion from biomass to N
                         Dim CVON As Double = CVBN / CVBO
                         'conversion from oxygen to N
-                        LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
 
                         For Each lSource As HspfPointSource In lID.PointSources
                             If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) _
@@ -379,21 +392,16 @@ Public Module ConstituentBudget
 
                                     End If
                                 Next
-
-
                             End If
 
-
                         Next
+
                         Dim lNonpointlbs As Double
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lAreas, lNonpointData, CVON)
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON)
                             lReport2.Append(.Item1)
                             lNonpointlbs = .Item2
-
                         End With
 
-                        'Dim lNonpointlbs As Double = TotalForReach(aUci, lID, aBalanceType, lAreas, lNonpointData) * 0.999906
-                        'lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
                         Dim lUpstreamIn As Double = 0
                         If lUpstreamInflows.Keys.Contains(lID.Id) Then
                             lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
@@ -458,6 +466,7 @@ Public Module ConstituentBudget
                 End With
                 lReport.Append(lReport2.ToString)
             Case "TotalP"
+                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Landuse" & vbTab & "Total Load (lbs)" & vbTab & "Rate (lbs/ac)")
                 With lOutputTable
                     .Delimiter = vbTab
                     .NumFields = 11
@@ -478,7 +487,6 @@ Public Module ConstituentBudget
                     For Each lID As HspfOperation In lRchresOperations
                         Dim lPointAlternate As Double = 0.0
                         .CurrentRecord += 1
-                        Dim lAreas As New atcCollection
 
                         Dim lOperationIndex As Integer = aUci.OpnSeqBlock.Opns.IndexOf(lID)
                         Dim CVBO As Double = aUci.OpnSeqBlock.Opns(lOperationIndex).Tables("CONV-VAL1").Parms("CVBO").Value
@@ -493,8 +501,7 @@ Public Module ConstituentBudget
                         'conversion from biomass to P
                         Dim CVOP As Double = CVBP / CVBO
                         'conversion from oxygen to P
-                        LocationAreaCalc(aUci, "R:" & lID.Id, aOperationTypes, lAreas, False)
-                        
+
                         For Each lSource As HspfPointSource In lID.PointSources
                             If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4) _
                                                                        Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 4) _
@@ -519,45 +526,39 @@ Public Module ConstituentBudget
 
                                     End If
                                 Next
-
-
                             End If
-
-
                         Next
                         Dim lNonpointlbs As Double
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lAreas, lNonpointData, CVOP)
+
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVOP)
                             lReport2.Append(.Item1)
                             lNonpointlbs = .Item2
-
                         End With
-                        'lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
-                        'Dim lNonpointlbs As Double = TotalForReach(aUci, lID, aBalanceType, lAreas, lNonpointData) * 0.999906
-                        'The factor of 0.999906 is to reduce the overestimation of loading from land surfaces and get a more reasonable value of Point sources.
-                        ' lReport2.Append(ConstituentLoadingByLanduse(lID, aBalanceType, lAreas, lNonpointData))
+
                         Dim lUpstreamIn As Double = 0
                         If lUpstreamInflows.Keys.Contains(lID.Id) Then
                             lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
                         End If
 
                         Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
-                        Dim lPointlbs As Double = 0
-
-
                         Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
                         Dim lDepScour As Double = lOutflow - lTotalInflow
-                        Dim lCumulativePointNonpoint As Double = lNonpointlbs + lPointlbs
-                        If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
-                            lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
-                        End If
                         Dim lTotalAtmDep As Double = 0
                         If lAtmDepData.Count > 0 Then
                             lTotalAtmDep = ValueForReach(lID, lAtmDepData)
                         End If
+                        Dim lPointlbs As Double = 0
+
                         lPointlbs = lTotalInflow - lNonpointlbs - lUpstreamIn - lTotalAtmDep
                         If lPointlbs < 0.0003 * lNonpointlbs Then
                             lPointlbs = 0.0
                         End If
+                        Dim lCumulativePointNonpoint As Double = lNonpointlbs + lPointlbs
+                        If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
+                            lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
+                        End If
+
+
                         'A negligible point source value is generated because of rounding errors when no point sources are present. 
                         'This is to make sure that output looks cleaner
                         Dim lReachTrappingEfficiency As Double
@@ -659,41 +660,63 @@ Public Module ConstituentBudget
     Private Function ConstituentLoadingByLanduse(ByVal aUCI As HspfUci, _
                                                  ByVal aReach As HspfOperation, _
                                     ByVal aBalanceType As String, _
-                                    ByVal aAreas As atcCollection, _
-                                   ByVal aNonpointData As atcTimeseriesGroup, _
+                                    ByVal aNonpointData As atcTimeseriesGroup, _
                                    ByVal aConversionFactor As Double) As Tuple(Of String, Double)
         Dim LoadingByLanduse As String = ""
         Dim lReachTotal As Double = 0.0
         Dim lTotal As Double = 0
+        Dim lConnectionArea As Double
+        Dim lMassLinkID As Integer
+        Dim lTestLocation As String
+        Dim lConstituentTotal As Double
+        Dim lConstituentRate As Double
+        Dim NewReport As String
+        NewReport = aReach.Name & vbCrLf
 
-        For lAreaIndex As Integer = 0 To aAreas.Count - 1
-            Dim lLocation As String = aAreas.Keys(lAreaIndex)
-            Dim lArea As Double = aAreas.ItemByIndex(lAreaIndex)
-            lTotal = 0
-            For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lLocation)
-                'lSubTotal += lTs.Attributes.GetValue("SumAnnual")
+        For Each lConnection As HspfConnection In aReach.Sources
+            If lConnection.Source.VolName = "PERLND" Then
 
-                Dim lMassLink As HspfMassLink = FindMassLinkObject(aUCI, aReach, lLocation)
-                Dim lMassLinkFactor As Double = FindMassLinkFactor(aUCI, lMassLink, lTs.Attributes.GetValue("Constituent"), aBalanceType, _
-                                                                   lLocation.StartsWith("P:"), aConversionFactor)
-                lTotal += lArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
+                lConnectionArea = lConnection.MFact
+                lMassLinkID = lConnection.MassLink
+                lTestLocation = lConnection.Source.VolName.Substring(0, 1) & ":" & lConnection.Source.VolId
+                NewReport &= vbTab & lTestLocation
+                lTotal = 0
+                For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lTestLocation)
+                    Dim lMassLinkFactor As Double = FindMassLinkFactor(aUCI, lMassLinkID, lTs.Attributes.GetValue("Constituent"), aBalanceType, _
+                                                                   True, aConversionFactor)
+                    lConstituentRate = lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
+                    lConstituentTotal = lConstituentRate * lConnectionArea
 
-            Next
-            lTotal = lTotal * 0.999906
-            'The factor of 0.999906 is to reduce the overestimation of loading from land surfaces and get a more reasonable value of Point sources.
-            Select Case lLocation.Substring(0, 1)
-                Case "P"
-                    LoadingByLanduse &= vbCrLf & aReach.Caption.ToString.Substring(10) & vbTab & lLocation & vbTab _
-                        & aReach.Uci.OpnBlks("PERLND").OperFromID(lLocation.Substring(2)).Description & vbTab & lTotal _
-                        & vbTab & lTotal / lArea
-                Case "I"
-                    LoadingByLanduse &= vbCrLf & aReach.Caption.ToString.Substring(10) & vbTab & lLocation & vbTab _
-                        & aReach.Uci.OpnBlks("IMPLND").OperFromID(lLocation.Substring(2)).Description & vbTab & lTotal _
-                        & vbTab & lTotal / lArea
+                    lTotal += lConnectionArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
+                Next
+                LoadingByLanduse &= vbCrLf & aReach.Caption.ToString.Substring(10) & vbTab & lTestLocation & vbTab _
+                                        & aReach.Uci.OpnBlks("PERLND").OperFromID(lTestLocation.Substring(2)).Description & vbTab & lTotal _
+                                        & vbTab & lTotal / lConnectionArea
+                lReachTotal += lTotal
+            End If
 
-            End Select
+        Next
 
-            lReachTotal += lTotal
+        For Each lConnection As HspfConnection In aReach.Sources
+
+            If lConnection.Source.VolName = "IMPLND" Then
+                lConnectionArea = lConnection.MFact
+                lMassLinkID = lConnection.MassLink
+                lTestLocation = lConnection.Source.VolName.Substring(0, 1) & ":" & lConnection.Source.VolId
+                lTotal = 0
+                For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lTestLocation)
+                    Dim lMassLinkFactor As Double = FindMassLinkFactor(aUCI, lMassLinkID, lTs.Attributes.GetValue("Constituent"), aBalanceType, _
+                                                                   False, aConversionFactor)
+                    lConstituentRate = lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
+                    lConstituentTotal = lConstituentRate * lConnectionArea
+                    lTotal += lConnectionArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
+                Next
+                LoadingByLanduse &= vbCrLf & aReach.Caption.ToString.Substring(10) & vbTab & lTestLocation & vbTab _
+                        & aReach.Uci.OpnBlks("IMPLND").OperFromID(lTestLocation.Substring(2)).Description & vbTab & lTotal _
+                        & vbTab & lTotal / lConnectionArea
+
+                lReachTotal += lTotal
+            End If
 
         Next
 
@@ -727,12 +750,12 @@ Public Module ConstituentBudget
         Return Nothing
     End Function
 
-    Private Function FindMassLinkFactor(ByVal aUCI As HspfUci, ByVal aMassLink As HspfMassLink, ByVal aConstituent As String, _
+    Private Function FindMassLinkFactor(ByVal aUCI As HspfUci, ByVal aMassLink As Integer, ByVal aConstituent As String, _
                                         ByVal aBalanceType As String, ByVal PERLND As Boolean, ByVal aConversionFactor As Double) As Double
         Dim lMassLinkFactor As Double = 0.0
         For Each lMassLink As HspfMassLink In aUCI.MassLinks
 
-            If lMassLink.MassLinkId = aMassLink.MassLinkId Then
+            If lMassLink.MassLinkId = aMassLink Then
 
                 Select Case aBalanceType
                     Case "Sediment"
@@ -740,10 +763,14 @@ Public Module ConstituentBudget
                             lMassLinkFactor += lMassLink.MFact
                         End If
                     Case "Water"
-                        If lMassLink.Target.Member = "IVOL" Then
+                        If aConstituent = "PERO" And lMassLink.Target.Member = "IVOL" And PERLND Then
                             lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        ElseIf aConstituent = "SURO" And lMassLink.Target.Member = "IVOL" And Not PERLND Then
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
                         End If
-                        Return lMassLinkFactor
+
                     Case "TotalN"
 
                         Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
