@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="HSPFftable">
+</Property><Property Name="Solution File" Value="C:\dev\BASINS40\HSPFftable\HSPFftable.sln">
+</Property><Property Name="Date" Value="Wednesday, June 18, 2014">
+</Property><Property Name="Time" Value="12:40:35 PM">
+</Property></Properties><Event ErrorLevel="0" Project="atcFtableBuilderCS-D4EM10" Source="..\atcFtableBuilderCS\atcFtableBuilderCS-D4EM10.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="atcFtableBuilderCS-D4EM10" Source="..\atcFtableBuilderCS\atcFtableBuilderCS-D4EM10.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="atcFtableBuilderCS-D4EM10" Source="..\atcFtableBuilderCS\atcFtableBuilderCS-D4EM10.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>
