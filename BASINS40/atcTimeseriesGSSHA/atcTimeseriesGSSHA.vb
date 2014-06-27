@@ -64,22 +64,7 @@ Public Class atcTimeseriesGSSHA
             If Not IO.File.Exists(Specification) Then
                 Return True 'Report success on opening file that does not exist yet to write to
             End If
-            Dim lInCurveLabels As Boolean = False
-            Dim lLabelStart As Integer = 0
-            Dim lLabelEnd As Integer = 0
-            Dim lDescStart As Integer = 0
-            Dim lTRANStart As Integer = 0
-            'Dim lTRANCODStart As Integer = 0
-            Dim lArea As Double = 0
-            Dim lSpaceSeparator(0) As Char
-            lSpaceSeparator(0) = " "c
             Logger.Dbg("Opening atcTimeseriesGSSHA file: " & Specification)
-            Dim lGroupBuilder As New atcTimeseriesGroupBuilder(Me)
-            Dim lSkipBlank As Integer = 0
-            Dim lIsTimeseriesFile As Boolean = False
-            Dim lIsEventFile As Boolean = False
-            Dim lTsB As atcTimeseriesBuilder = Nothing
-            Dim lTsGB As atcTimeseriesGroupBuilder = Nothing
             Dim lFirstLine As String = FirstLineInFile(Specification)
 
             If lFirstLine.StartsWith(atcTimeseriesGSSHA.TimeseriesStart) Then
@@ -161,20 +146,30 @@ Public Class atcTimeseriesGSSHA
 
     Private Sub ReadEvents()
         Dim lInCurveLabels As Boolean = False
-        Logger.Dbg("Opening atcTimeseriesGSSHA Events from: " & Specification)
-        Dim lGroupBuilder As New atcTimeseriesGroupBuilder(Me)
+        Dim lStatusFilename As String = Specification
+        If lStatusFilename.Length > 40 Then
+            lStatusFilename = IO.Path.GetFileName(Specification)
+        End If
+        Logger.Status("Opening '" & lStatusFilename & "'", True)
         Dim lTsGB As atcTimeseriesGroupBuilder = Nothing
         Dim lEventDescription As String = ""
         Dim lEventCount As Integer = 0
         Dim lKeys As New List(Of String)
         Dim lNextTimeseriesID As Integer = 1
         Dim lNRGAG As Integer = 0
+        Dim lGridDates As List(Of Double) = Nothing
+        Dim lGridFilenames As List(Of String) = Nothing
         For Each lLine As String In LinesInFile(Specification)
-            Select Case SafeSubstring(lLine, 0, 5)
+            Select Case SafeSubstring(lLine, 0, 5).ToUpper
                 Case EventStart
-                    If lTsGB IsNot Nothing Then
-                        lTsGB.CreateTimeseriesAddToGroup(Me.DataSets)
-                        lTsGB = Nothing
+                    If lNRGAG > 0 Then
+                        MakeEventTimeseries(lTsGB, lEventDescription)
+                    Else
+                        If lGridDates IsNot Nothing Then
+                            atcAsciiGridArcInfo.ReadTimeseries(lGridDates, lGridFilenames, Me)
+                            lGridDates.Clear() : lGridDates = Nothing
+                            lGridFilenames.Clear() : lGridFilenames = Nothing
+                        End If
                     End If
                     lEventCount += 1
                     lEventDescription = SafeSubstring(lLine, EventStart.Length + 1).Trim("'"c, """"c, " "c, vbTab(0))
@@ -182,17 +177,18 @@ Public Class atcTimeseriesGSSHA
                     lKeys.Clear()
                     lNRGAG = 0
                 Case EventNRGAG
-                    If Integer.TryParse(SafeSubstring(lLine, 5).Trim, lNRGAG) Then
-                        If lNRGAG < 1 Then
-                            Logger.Dbg("NRGAG < 0 not supported")
-                        End If
-                    End If
+                    Integer.TryParse(SafeSubstring(lLine, 5).Trim, lNRGAG)
+                    'If Integer.TryParse(SafeSubstring(lLine, 5).Trim, lNRGAG) Then
+                    '    If lNRGAG < 1 Then
+                    '        Logger.Dbg("NRGAG < 0 not supported")
+                    '    End If
+                    'End If
                 Case EventCOORD
                     lKeys.Add(SafeSubstring(lLine, 5).Trim)
                 Case EventACCUM, EventGAGES, EventRADAR, EventRATES
-                    If lNRGAG > 0 Then
-                        If lTsGB Is Nothing Then
-                            lTsGB = New atcTimeseriesGroupBuilder(Me)
+                    If lTsGB Is Nothing Then
+                        lTsGB = New atcTimeseriesGroupBuilder(Me)
+                        If lKeys.Count > 0 Then
                             Dim lBuilderIDs(lKeys.Count - 1) As String
                             Dim lBuilderIndex As Integer = 0
                             For lBuilderIndex = 0 To lBuilderIDs.GetUpperBound(0)
@@ -205,17 +201,36 @@ Public Class atcTimeseriesGSSHA
                                 lTsGB.Builder(lBuilderIDs(lBuilderIndex)).Attributes.SetValue("Location", lKey)
                                 lBuilderIndex += 1
                             Next
-                            lTsGB.SetAttributeForAll("Description", lEventDescription)
-                            lTsGB.SetAttributeForAll("Scenario", "GSSHA")
-                            lTsGB.SetAttributeForAll("Constituent", "Precipitation")
                         End If
+                    End If
+                    If lNRGAG > 0 Then
                         AddDateAndValuesFromEventLine(lLine, lTsGB)
+                    Else
+                        Dim lFieldValues() As String = SplitLine(lLine)
+                        If lGridDates Is Nothing Then
+                            lGridDates = New List(Of Double)
+                            lGridFilenames = New List(Of String)
+                        End If
+                        lGridDates.Add(atcUtility.modDate.Date2J(lFieldValues(1), lFieldValues(2), lFieldValues(3), _
+                                                                 lFieldValues(4), lFieldValues(5)))
+                        lGridFilenames.Add(AbsolutePath(lFieldValues(6), IO.Path.GetDirectoryName(Specification)))
                     End If
             End Select
         Next
-        If lTsGB IsNot Nothing Then
-            lTsGB.CreateTimeseriesAddToGroup(Me.DataSets)
-            lTsGB = Nothing
+        If lNRGAG > 0 Then
+            MakeEventTimeseries(lTsGB, lEventDescription)
+        Else
+            atcAsciiGridArcInfo.ReadTimeseries(lGridDates, lGridFilenames, Me)
+        End If
+    End Sub
+
+    Private Sub MakeEventTimeseries(ByRef aTsGB As atcTimeseriesGroupBuilder, aDescription As String)
+        If aTsGB IsNot Nothing AndAlso aTsGB.Count > 0 Then
+            aTsGB.SetAttributeForAll("Description", aDescription)
+            aTsGB.SetAttributeForAll("Scenario", "GSSHA")
+            aTsGB.SetAttributeForAll("Constituent", "Precipitation")
+            aTsGB.CreateTimeseriesAddToGroup(Me.DataSets)
+            aTsGB = Nothing
         End If
     End Sub
 
@@ -249,27 +264,34 @@ Public Class atcTimeseriesGSSHA
     End Sub
 
     Private Sub AddDateAndValuesFromEventLine(ByVal aLine As String, ByVal aTsGB As atcTimeseriesGroupBuilder)
-        Dim lDate As Date
-        Dim lDateDouble As Double
         Try
             Dim lFieldValues() As String = SplitLine(aLine)
             Dim lSplitBound As Integer = lFieldValues.GetUpperBound(0)
             If lSplitBound > 5 Then
-                lDateDouble = atcUtility.modDate.Date2J(lFieldValues(1), lFieldValues(2), lFieldValues(3), lFieldValues(4), lFieldValues(5))
-                lDate = Date.FromOADate(lDateDouble)
-
+                Dim lDateDouble As Double = atcUtility.modDate.Date2J(lFieldValues(1), lFieldValues(2), lFieldValues(3), _
+                                                                      lFieldValues(4), lFieldValues(5))
+                Dim lDate As Date = Date.FromOADate(lDateDouble)
                 Dim lLastIndex As Integer = Math.Min(lSplitBound - 6, aTsGB.Count - 1)
                 Dim lValues(lLastIndex) As Double
+                Dim lFoundValue As Boolean = False
                 For lValueIndex As Integer = 0 To lLastIndex
-                    If Not Double.TryParse(lFieldValues(lValueIndex + 6), lValues(lValueIndex)) Then
-                        'TODO: non-numeric value may be an ASCII grid file name
+                    Dim lValueString As String = lFieldValues(lValueIndex + 6)
+                    If Double.TryParse(lValueString, lValues(lValueIndex)) Then
+                        lFoundValue = True
+                    Else
+                        ''non-numeric value may be an ASCII grid file name
+                        'Dim lFileName As String = AbsolutePath(lValueString, IO.Path.GetDirectoryName(Specification))
+                        'If IO.File.Exists(lFileName) Then
+                        '    atcAsciiGridArcInfo.AddTimeStep(lFileName, lDate, aTsGB)
+                        'Else
                         Logger.Dbg("Unable to parse value '" & lFieldValues(lValueIndex + 6) & "'" & vbCrLf & " line: '" & aLine & "'")
                         lValues(lValueIndex) = pNaN
+                        'End If
                     End If
                 Next
-                aTsGB.AddValues(lDate, lValues)
-                aTsGB.SetAttributeForAll("Event Type", lFieldValues(0))
+                If lFoundValue Then aTsGB.AddValues(lDate, lValues)
             End If
+            aTsGB.SetAttributeForAll("Event Type", lFieldValues(0))
         Catch exParse As Exception
             Logger.Dbg("Unable to find date/value in line: '" & aLine & "' " & vbCrLf & exParse.Message)
         End Try
