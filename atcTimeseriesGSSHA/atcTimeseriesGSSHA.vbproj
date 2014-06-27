@@ -83,6 +83,7 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="atcAsciiGridArcInfo.vb" />
     <Compile Include="atcTimeseriesGSSHA.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
