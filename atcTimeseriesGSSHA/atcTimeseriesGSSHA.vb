@@ -137,6 +137,9 @@ Public Class atcTimeseriesGSSHA
                     If lTsB Is Nothing Then 'Must be the line naming the timeseries
                         lTsB = New atcTimeseriesBuilder(Me)
                         lTsB.Attributes.SetValue("Description", lLine)
+                        lTsB.Attributes.SetValue("Scenario", "GSSHA")
+                        lTsB.Attributes.SetValue("Location", lLine)
+                        lTsB.Attributes.SetValue("Constituent", IO.Path.GetFileNameWithoutExtension(Specification))
                     Else
                         AddDateAndValueFromTsLine(lLine, lTsB)
                     End If
@@ -384,10 +387,12 @@ Public Class atcTimeseriesGSSHA
         'Next
 
         Dim lDelimiter As String = " "
-
+        Dim lIndex As Integer = 0
         For Each lTimeseries As atcTimeseries In lDatasetsToWrite
+            lIndex += 1
             Dim lLastTimeStep As Integer = lTimeseries.Dates.numValues
             lWriter.WriteLine(TimeseriesStart)
+            lWriter.WriteLine(lTimeseries.Attributes.GetValue("Description", "Timeseries " & lIndex))
             If lTimeseries.Dates.Value(1) > JulianYear Then
                 lWriter.WriteLine(TimeseriesAbsolute)
             Else

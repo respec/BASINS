@@ -131,6 +131,7 @@
                                         lSharedAttributes.SetValue("Data Source", aDataSource.Specification)
                                         lSharedAttributes.SetValue("Scenario", "Grid")
                                         lSharedAttributes.SetValue("Constituent", "Precipitation")
+                                        lSharedAttributes.AddHistory("Read from " & aDataSource.Specification)
                                     End If
                                     MapWinUtility.Logger.Status("Reading " & lNCOLS & " x " & lNROWS & " values for " & atcUtility.DumpDate(lDate) & " from " & IO.Path.GetFileName(lGridFileName))
                                     GoTo ProcessValues
