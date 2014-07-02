@@ -27,6 +27,11 @@ namespace atcFtableBuilder
             vectorColNames.Add("outflow1");
         }
 
+        public ArrayList GenerateFTable()
+        {
+            return GenerateFTable(0, 0, 0, 0, 0);
+        }
+
         public ArrayList GenerateFTable(double channelLength, double channelDepth,
                                         double channelWidth, double channelManningsValue,
                                         double channelSlope)

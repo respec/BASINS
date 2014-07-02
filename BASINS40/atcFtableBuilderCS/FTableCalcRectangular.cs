@@ -7,7 +7,7 @@ using System.Text;
 namespace atcFtableBuilder
 {
     //This is the version that actually referenced in the original Java project by ControlDeviceMiddleware.java
-    class FTableCalcRectangular : FTableCalculator, IFTableOperations
+    class FTableCalcRectangular : FTableCalcTrape, IFTableOperations
     {
         public FTableCalcRectangular()
         {
@@ -16,16 +16,79 @@ namespace atcFtableBuilder
             vectorColNames.Add("AREA");
             vectorColNames.Add("VOLUME");
             vectorColNames.Add("OUTFLOW");
-            geoInputNames = new string[]{ "Maximum Channel Depth ", 
+            geomInputLongNames = new string[]{ "Maximum Channel Depth ", 
                                           "Top Channel Width ", 
                                           "Channel Length ", 
                                           "Channel Mannings Value", 
                                           "Longitudinal Slope (ft/ft)", 
                                           "Height Increment" };  //sri 07-23-2012
-    
+            geomInputs = new ChannelGeomInput[]{
+                ChannelGeomInput.MaximumDepth,
+                ChannelGeomInput.TopWidth,
+                ChannelGeomInput.Length,
+                ChannelGeomInput.ManningsN,
+                ChannelGeomInput.LongitudinalSlope,
+                ChannelGeomInput.HeightIncrement
+            };
         }
 
-        public ArrayList GenerateFTable(double channelLength, double Height,
+        public new bool SetInputParameters(Hashtable aInputs)
+        {
+            bool AllInputsFound = true;
+            if (aInputs[ChannelGeomInput.Length] != null)
+                inpChannelLength = (double)aInputs[ChannelGeomInput.Length];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.MaximumDepth] != null)
+                inpChannelMaxDepth = (double)aInputs[ChannelGeomInput.MaximumDepth];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.TopWidth] != null)
+                inpChannelTopWidth = (double)aInputs[ChannelGeomInput.TopWidth];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.ManningsN] != null)
+                inpChannelManningsValue = (double)aInputs[ChannelGeomInput.ManningsN];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.LongitudinalSlope] != null)
+                inpChannelSlope = (double)aInputs[ChannelGeomInput.LongitudinalSlope];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.HeightIncrement] != null)
+                inpHeightIncrement = (double)aInputs[ChannelGeomInput.HeightIncrement];
+            else
+                AllInputsFound = false;
+
+            return AllInputsFound;
+        }
+
+        public new ArrayList GenerateFTable()
+        {
+            return GenerateFTable(inpChannelLength, inpChannelMaxDepth, inpChannelManningsValue, inpChannelSlope, inpChannelTopWidth, inpHeightIncrement);
+        }
+
+        private ArrayList GenerateFTable( //GenerateRectangularFTable(
+            double channelLength,
+            double maxChannelDepth,
+            double channelManningsValue,
+            double longitudalChannelSlope,
+            double topChannelWidth,
+            double Increment) // sri-07-23-2012
+        {
+            double z1 = 0.0;
+            //string Shape = "Rectangle";
+
+            return GenerateFTable(channelLength, maxChannelDepth,
+               channelManningsValue, longitudalChannelSlope, topChannelWidth, z1, Increment); //, Shape); // sri-07-23-2012
+        }
+
+        public ArrayList GenerateFTable_ToBeDiscussed(double channelLength, double Height,
                                         double channelManningsValue, double DischargeCoefficient)
         {
             ArrayList vectorRowData = new ArrayList();
@@ -66,10 +129,10 @@ namespace atcFtableBuilder
 
                 row = new ArrayList();
 
-                sDepth   = String.Format(lFormat, (object)g);
-                sArea    = String.Format(lFormat, (object)acr);
-                sVolume  = String.Format(lFormat, (object)stot);
-                sOutFlow = String.Format(lFormat, (object)QC);
+                sDepth = string.Format(lFormat, (object)g);
+                sArea = string.Format(lFormat, (object)acr);
+                sVolume = string.Format(lFormat, (object)stot);
+                sOutFlow = string.Format(lFormat, (object)QC);
                 row.Add(sDepth);
                 row.Add(sArea);
                 row.Add(sVolume);

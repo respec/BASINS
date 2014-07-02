@@ -15,6 +15,12 @@ namespace atcFtableBuilder
 {
     public class FTableCalcCircle : FTableCalculator, IFTableOperations
     {
+        public double inpChannelLength;
+        public double inpChannelDiameter;
+        public double inpChannelManningsValue;
+        public double inpChannelSlope;
+        public double inpHeightIncrement;
+
         public FTableCalcCircle()
         {
             vectorColNames.Clear();
@@ -24,15 +30,56 @@ namespace atcFtableBuilder
             vectorColNames.Add("volume");
             // sri- 09-11-2012
             //vectorColNames.add("outflow1");
-            geoInputNames = new string[]{"Channel Length", 
+            geomInputLongNames = new string[]{"Channel Length", 
                                          "Channel Diameter", 
                                          "Channel Mannings Value", 
                                          "Longitudinal Slope", 
                                          "Height Increment" };
-
+            geomInputs = new ChannelGeomInput[]{
+                ChannelGeomInput.Length,
+                ChannelGeomInput.Diameter,
+                ChannelGeomInput.ManningsN,
+                ChannelGeomInput.LongitudinalSlope,
+                ChannelGeomInput.HeightIncrement};
         }
 
-        public ArrayList GenerateFTable(double channelLength, double channelDiameter,
+        public bool SetInputParameters(Hashtable aInputs)
+        {
+            bool AllInputsFound = true;
+            if (aInputs[ChannelGeomInput.Length] != null)
+                inpChannelLength = (double)aInputs[ChannelGeomInput.Length];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.Diameter] != null)
+                inpChannelDiameter = (double)aInputs[ChannelGeomInput.Diameter];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.ManningsN] != null)
+                inpChannelManningsValue = (double)aInputs[ChannelGeomInput.ManningsN];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.LongitudinalSlope] != null)
+                inpChannelSlope = (double)aInputs[ChannelGeomInput.LongitudinalSlope];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.HeightIncrement] != null)
+                inpHeightIncrement = (double)aInputs[ChannelGeomInput.HeightIncrement];
+            else
+                AllInputsFound = false;
+
+            return AllInputsFound;
+        }
+
+        public ArrayList GenerateFTable()
+        {
+            return GenerateFTable(inpChannelLength, inpChannelDiameter, inpChannelManningsValue, inpChannelSlope, inpHeightIncrement);
+        }
+
+        private ArrayList GenerateFTable(double channelLength, double channelDiameter,
                                         double channelManningsValue, double averageChannelSlope,
                                         double Increment)  // sri-09-11-2012
         {
@@ -128,7 +175,7 @@ namespace atcFtableBuilder
                 //row.add("2");
                 row.Add(sVolume);
                 //row.add("3");
-                row.Add(sOutFlow);
+                row.Add(sOutFlow); //Tong: this column will be removed if control devices are selected
                 //row.add("4");
 
                 vectorRowData.Add(row);
@@ -137,6 +184,14 @@ namespace atcFtableBuilder
                 // dblDepth += FTableCalculatorConstants.calculatorIncrement;
                 dblDepth += Increment;  // sri-09-11-2012
             }
+
+            //After successful calculation, save the parameters
+            inpChannelLength = channelLength;
+            inpChannelDiameter = channelDiameter;
+            inpChannelManningsValue = channelManningsValue;
+            inpChannelSlope = averageChannelSlope;
+            inpHeightIncrement = Increment;
+
             return vectorRowData;
         }
     }

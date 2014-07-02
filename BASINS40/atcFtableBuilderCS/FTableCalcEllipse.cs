@@ -14,18 +14,81 @@ using System.Collections;
  */
 namespace atcFtableBuilder
 {
-    public class EllipseFTableCalc : FTableCalculator, IFTableOperations
+    public class FTableCalcEllipse : FTableCalculator, IFTableOperations
     {
-        public EllipseFTableCalc()
+        public double inpChannelLength;
+        public double inpChannelWidth;
+        public double inpChannelDepth;
+        public double inpChannelManningsValue;
+        public double inpChannelSlope;
+        public double inpHeightIncrement;
+
+        public FTableCalcEllipse()
         {
             vectorColNames.Clear();
             vectorColNames.Add("depth");
             vectorColNames.Add("area");
             vectorColNames.Add("volume");
             vectorColNames.Add("outflow1");
+            geomInputLongNames = new string[] { 
+                "Channel Length", 
+                "Channel Width", 
+                "Channel Depth", 
+                "Channel Mannings Value", 
+                "Longitudinal Slope", 
+                "Height Increment" };  //sri 07-23-2012};
+            geomInputs = new ChannelGeomInput[] {
+                ChannelGeomInput.Length,
+                ChannelGeomInput.Width,
+                ChannelGeomInput.Depth,
+                ChannelGeomInput.ManningsN,
+                ChannelGeomInput.LongitudinalSlope,
+                ChannelGeomInput.HeightIncrement
+            };
         }
 
-        public ArrayList GenerateFTable(double channelLength, double maxChannelDepth,
+        public bool SetInputParameters(Hashtable aInputs)
+        {
+            bool AllInputsFound = true;
+            if (aInputs[ChannelGeomInput.Length] != null)
+                inpChannelLength = (double)aInputs[ChannelGeomInput.Length];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.Depth] != null)
+                inpChannelDepth = (double)aInputs[ChannelGeomInput.Depth];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.Width] != null)
+                inpChannelWidth = (double)aInputs[ChannelGeomInput.Width];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.ManningsN] != null)
+                inpChannelManningsValue = (double)aInputs[ChannelGeomInput.ManningsN];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.LongitudinalSlope] != null)
+                inpChannelSlope = (double)aInputs[ChannelGeomInput.LongitudinalSlope];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.HeightIncrement] != null)
+                inpHeightIncrement = (double)aInputs[ChannelGeomInput.HeightIncrement];
+            else
+                AllInputsFound = false;
+
+            return AllInputsFound;
+        }
+
+        public ArrayList GenerateFTable()
+        {
+            return GenerateFTable(inpChannelLength, inpChannelDepth, inpChannelManningsValue, inpChannelSlope, inpChannelWidth, inpHeightIncrement);
+        }
+
+        private ArrayList GenerateFTable(double channelLength, double maxChannelDepth,
                 double channelManningsValue, double longitudalChannelSlope, double topChannelWidth, double Increment)
         {
 
@@ -75,9 +138,10 @@ namespace atcFtableBuilder
             string sArea = "";
             string sVolume = "";
             string sOutFlow = "";
+            g = 0;
             do
             {
-                lFormattedVal = string.Format("0.000", g);
+                lFormattedVal = string.Format("{0:0.000}", g);
                 if (double.TryParse(lFormattedVal, out lFormattedg))
                 {
                     if (lFormattedg > TD)

@@ -17,6 +17,14 @@ namespace atcFtableBuilder
 {
     public class FTableCalcTrape : FTableCalculator, IFTableOperations
     {
+        public double inpChannelLength;
+        public double inpChannelMaxDepth;
+        public double inpChannelManningsValue;
+        public double inpChannelTopWidth;
+        public double inpChannelSlope;
+        public double inpChannelSideSlope;
+        public double inpHeightIncrement;
+
         public FTableCalcTrape()
         {
             vectorColNames.Clear();
@@ -24,42 +32,78 @@ namespace atcFtableBuilder
             vectorColNames.Add("area");
             vectorColNames.Add("volume");
             vectorColNames.Add("outflow1");
-            geoInputNames = new string[]{"Maximum Channel Depth",
+            geomInputLongNames = new string[]{"Maximum Channel Depth",
                                          "Top Channel Width",
                                          "Channel Side Slope (H:V)", 
                                          "Channel Length",
                                          "Channel Mannings Value",
                                          "Longitudinal Slope",
                                          "Height Increment"}; // sri-07-23-2012
+            geomInputs = new ChannelGeomInput[]{
+                ChannelGeomInput.MaximumDepth,
+                ChannelGeomInput.TopWidth,
+                ChannelGeomInput.SideSlope,
+                ChannelGeomInput.Length,
+                ChannelGeomInput.ManningsN,
+                ChannelGeomInput.LongitudinalSlope,
+                ChannelGeomInput.HeightIncrement
+            };
         }
 
-        public ArrayList GenerateTriangularFTable(double channelLength, double maxChannelDepth,
-                        double channelManningsValue, double longitudalChannelSlope,
-                        double sideChannelSlope_HorzToVert, double Increment)  // sri-07-23-2012
+        public bool SetInputParameters(Hashtable aInputs)
         {
-            double z1 = sideChannelSlope_HorzToVert;
-            double topChannelWidth = z1 * 2.0 * maxChannelDepth;
-            string Shape = "Triangle";
+            bool AllInputsFound = true;
+            if (aInputs[ChannelGeomInput.Length] != null)
+                inpChannelLength = (double)aInputs[ChannelGeomInput.Length];
+            else
+                AllInputsFound = false;
 
-            return GenerateFTable(channelLength, maxChannelDepth, channelManningsValue,
-                       longitudalChannelSlope, topChannelWidth, z1, Increment, Shape);  // sri-07-23-2012
+            if (aInputs[ChannelGeomInput.MaximumDepth] != null)
+                inpChannelMaxDepth = (double)aInputs[ChannelGeomInput.MaximumDepth];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.TopWidth] != null)
+                inpChannelTopWidth = (double)aInputs[ChannelGeomInput.TopWidth];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.ManningsN] != null)
+                inpChannelManningsValue = (double)aInputs[ChannelGeomInput.ManningsN];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.LongitudinalSlope] != null)
+                inpChannelSlope = (double)aInputs[ChannelGeomInput.LongitudinalSlope];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.SideSlope] != null)
+                inpChannelSideSlope = (double)aInputs[ChannelGeomInput.SideSlope];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.HeightIncrement] != null)
+                inpHeightIncrement = (double)aInputs[ChannelGeomInput.HeightIncrement];
+            else
+                AllInputsFound = false;
+
+            return AllInputsFound;
         }
 
-
-        public ArrayList GenerateRectangularFTable(double channelLength, double maxChannelDepth,
-                     double channelManningsValue, double longitudalChannelSlope,
-                     double topChannelWidth, double Increment) // sri-07-23-2012
+        public ArrayList GenerateFTable()
         {
-            double z1 = 0.0;
-            string Shape = "Rectangle";
-
-            return GenerateFTable(channelLength, maxChannelDepth,
-         channelManningsValue, longitudalChannelSlope, topChannelWidth, z1, Increment, Shape); // sri-07-23-2012
+            return GenerateFTable(inpChannelLength, inpChannelMaxDepth, inpChannelManningsValue, inpChannelSlope, inpChannelTopWidth, inpChannelSideSlope, inpHeightIncrement);
         }
 
-        public ArrayList GenerateFTable(double channelLength, double maxChannelDepth,
-                          double channelManningsValue, double longitudalChannelSlope,
-                          double topChannelWidth, double sideChannelSlope_HorzToVert, double Increment, string Shape) // sri-09-11-2012
+        protected ArrayList GenerateFTable(
+            double channelLength, 
+            double maxChannelDepth,
+            double channelManningsValue, 
+            double longitudalChannelSlope,
+            double topChannelWidth, 
+            double sideChannelSlope_HorzToVert, 
+            double Increment) //,  string Shape) // sri-09-11-2012
         {
             vectorRowData = new ArrayList();
 
@@ -89,12 +133,16 @@ namespace atcFtableBuilder
             double prevStot = 0.0;
             double prevG = 0.0;
 
+            double lEpslon = 0.0000001;
             for (double g = 0.00; g <= TD + 0.01; g += Increment)  // sri-07-23-2012
             {
                 A = BW * g + (z1 * g * g);
                 wd = BW + 2.0 * g * System.Math.Sqrt(1.0 + z1 * z1);
 
-                hr = A / wd;
+                if (System.Math.Abs(wd - 0) < lEpslon)
+                    hr = 0;
+                else
+                    hr = A / wd;
                 w = BW + (2.0 * z1 * g);
 
                 C = (CONS * System.Math.Sqrt(S)) / N;
@@ -126,20 +174,20 @@ namespace atcFtableBuilder
                 string lFormat     = "{0:0.00000}";
                 string lFormatRect = "{0:0.000000}";
 
-                if (Shape.ToLower() == "rectangle")
-                {
-                    sDepth   = string.Format(lFormatRect, (object)g);
-                    sArea    = string.Format(lFormatRect, (object)acr);
-                    sVolume  = string.Format(lFormatRect, (object)stot);
-                    sOutFlow = string.Format(lFormatRect, (object)QC);
-                }
-                else
-                {
+                //if (Shape.ToLower() == "rectangle")
+                //{
+                //    sDepth   = string.Format(lFormatRect, (object)g);
+                //    sArea    = string.Format(lFormatRect, (object)acr);
+                //    sVolume  = string.Format(lFormatRect, (object)stot);
+                //    sOutFlow = string.Format(lFormatRect, (object)QC);
+                //}
+                //else
+                //{
                     sDepth   = string.Format(lFormat, (object)g);
                     sArea    = string.Format(lFormat, (object)acr);
                     sVolume  = string.Format(lFormat, (object)stot);
                     sOutFlow = string.Format(lFormat, (object)QC);
-                }
+                //}
                 row.Add(sDepth);
                 row.Add(sArea);
                 row.Add(sVolume);
