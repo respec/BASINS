@@ -83,6 +83,19 @@
       <DependentUpon>BMPSketch.cs</DependentUpon>
     </Compile>
     <Compile Include="ChannelPoint.cs" />
+    <Compile Include="ControlDeviceMiddleware.cs" />
+    <Compile Include="frmFTableResult.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFTableResult.Designer.cs">
+      <DependentUpon>frmFTableResult.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmImportProfile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmImportProfile.Designer.cs">
+      <DependentUpon>frmImportProfile.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmOutflowControls.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,8 +111,14 @@
     <Compile Include="frmInfiltration.Designer.cs">
       <DependentUpon>frmInfiltration.cs</DependentUpon>
     </Compile>
-    <Compile Include="FTableCalcOCVNotch.cs" />
+    <Compile Include="FTableCalcOCWeirBroad.cs" />
+    <Compile Include="FTableCalcOCWeirTrapeCipolletti.cs" />
+    <Compile Include="FTableCalcOCWeirRectangular.cs" />
+    <Compile Include="FTableCalcOCOrificeRiser.cs" />
+    <Compile Include="FTableCalcOCOrificeUnderflow.cs" />
+    <Compile Include="FTableCalcOCWeirTriVNotch.cs" />
     <Compile Include="FTableCalcRectangular.cs" />
+    <Compile Include="FTableCalcTri.cs" />
     <Compile Include="FTableCalculator.cs" />
     <Compile Include="mainForm.cs">
       <SubType>Form</SubType>
@@ -109,7 +128,6 @@
     </Compile>
     <Compile Include="FTableCalculatorConstants.cs" />
     <Compile Include="Infiltration_Calc.cs" />
-    <Compile Include="FTableCalcNatural0.cs" />
     <Compile Include="FTableCalcNatural.cs" />
     <Compile Include="plotdata.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -150,6 +168,12 @@
   <ItemGroup>
     <EmbeddedResource Include="BMPSketch.resx">
       <DependentUpon>BMPSketch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFTableResult.resx">
+      <DependentUpon>frmFTableResult.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmImportProfile.resx">
+      <DependentUpon>frmImportProfile.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmInfiltration.resx">
       <DependentUpon>frmInfiltration.cs</DependentUpon>

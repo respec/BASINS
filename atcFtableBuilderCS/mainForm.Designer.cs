@@ -52,10 +52,9 @@
             this.gbInputData = new System.Windows.Forms.GroupBox();
             this.frameNaturalXsectGrid = new System.Windows.Forms.Panel();
             this.btnUndoClear = new System.Windows.Forms.Button();
-            this.btnClearGrid = new System.Windows.Forms.Button();
-            this.ImportCSV = new System.Windows.Forms.Button();
-            this.btnImportSpreadsheet = new System.Windows.Forms.Button();
-            this.atcGrid1 = new atcControls.atcGrid();
+            this.btnClearProfile = new System.Windows.Forms.Button();
+            this.btnImportChProfile = new System.Windows.Forms.Button();
+            this.grdChProfile = new atcControls.atcGrid();
             this.gbInputInfil = new System.Windows.Forms.GroupBox();
             this.txtInfilDrainTime = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
@@ -125,22 +124,11 @@
             // 
             this.cboBMPTypes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboBMPTypes.FormattingEnabled = true;
-            this.cboBMPTypes.Items.AddRange(new object[] {
-            "",
-            "Dry Well",
-            "Infiltration Trench",
-            "Infiltration Basin",
-            "Rain Barrel",
-            "Rain garden/Bioretention",
-            "Roof Garden",
-            "Sand Filter",
-            "Storage Tank",
-            "Vegetated Swale",
-            "Wetland"});
             this.cboBMPTypes.Location = new System.Drawing.Point(384, 10);
             this.cboBMPTypes.Name = "cboBMPTypes";
             this.cboBMPTypes.Size = new System.Drawing.Size(147, 21);
             this.cboBMPTypes.TabIndex = 4;
+            this.cboBMPTypes.SelectedIndexChanged += new System.EventHandler(this.cboBMPTypes_SelectedIndexChanged);
             // 
             // lblBMPList
             // 
@@ -246,9 +234,9 @@
             // bmpSketch1
             // 
             this.bmpSketch1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.bmpSketch1.Location = new System.Drawing.Point(3, 46);
+            this.bmpSketch1.Location = new System.Drawing.Point(3, 42);
             this.bmpSketch1.Name = "bmpSketch1";
-            this.bmpSketch1.Size = new System.Drawing.Size(787, 73);
+            this.bmpSketch1.Size = new System.Drawing.Size(787, 77);
             this.bmpSketch1.TabIndex = 6;
             this.bmpSketch1.MouseHover += new System.EventHandler(this.bmpSketch1_MouseHover);
             // 
@@ -341,10 +329,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.frameNaturalXsectGrid.Controls.Add(this.btnUndoClear);
-            this.frameNaturalXsectGrid.Controls.Add(this.btnClearGrid);
-            this.frameNaturalXsectGrid.Controls.Add(this.ImportCSV);
-            this.frameNaturalXsectGrid.Controls.Add(this.btnImportSpreadsheet);
-            this.frameNaturalXsectGrid.Controls.Add(this.atcGrid1);
+            this.frameNaturalXsectGrid.Controls.Add(this.btnClearProfile);
+            this.frameNaturalXsectGrid.Controls.Add(this.btnImportChProfile);
+            this.frameNaturalXsectGrid.Controls.Add(this.grdChProfile);
             this.frameNaturalXsectGrid.Location = new System.Drawing.Point(457, 7);
             this.frameNaturalXsectGrid.Name = "frameNaturalXsectGrid";
             this.frameNaturalXsectGrid.Size = new System.Drawing.Size(330, 287);
@@ -352,57 +339,51 @@
             // 
             // btnUndoClear
             // 
-            this.btnUndoClear.Location = new System.Drawing.Point(85, 33);
+            this.btnUndoClear.Location = new System.Drawing.Point(248, 4);
             this.btnUndoClear.Name = "btnUndoClear";
             this.btnUndoClear.Size = new System.Drawing.Size(75, 23);
             this.btnUndoClear.TabIndex = 9;
             this.btnUndoClear.Text = "Undo Clear";
             this.btnUndoClear.UseVisualStyleBackColor = true;
+            this.btnUndoClear.Click += new System.EventHandler(this.btnUndoClear_Click);
             // 
-            // btnClearGrid
+            // btnClearProfile
             // 
-            this.btnClearGrid.Location = new System.Drawing.Point(4, 33);
-            this.btnClearGrid.Name = "btnClearGrid";
-            this.btnClearGrid.Size = new System.Drawing.Size(75, 23);
-            this.btnClearGrid.TabIndex = 8;
-            this.btnClearGrid.Text = "Clear Table";
-            this.btnClearGrid.UseVisualStyleBackColor = true;
+            this.btnClearProfile.Location = new System.Drawing.Point(167, 4);
+            this.btnClearProfile.Name = "btnClearProfile";
+            this.btnClearProfile.Size = new System.Drawing.Size(75, 23);
+            this.btnClearProfile.TabIndex = 8;
+            this.btnClearProfile.Text = "Clear Profile";
+            this.btnClearProfile.UseVisualStyleBackColor = true;
+            this.btnClearProfile.Click += new System.EventHandler(this.btnClearProfile_Click);
             // 
-            // ImportCSV
+            // btnImportChProfile
             // 
-            this.ImportCSV.Location = new System.Drawing.Point(167, 4);
-            this.ImportCSV.Name = "ImportCSV";
-            this.ImportCSV.Size = new System.Drawing.Size(144, 23);
-            this.ImportCSV.TabIndex = 7;
-            this.ImportCSV.Text = "Import CSV";
-            this.ImportCSV.UseVisualStyleBackColor = true;
+            this.btnImportChProfile.Location = new System.Drawing.Point(4, 4);
+            this.btnImportChProfile.Name = "btnImportChProfile";
+            this.btnImportChProfile.Size = new System.Drawing.Size(157, 23);
+            this.btnImportChProfile.TabIndex = 6;
+            this.btnImportChProfile.Text = "Import Channel Profile";
+            this.btnImportChProfile.UseVisualStyleBackColor = true;
+            this.btnImportChProfile.Click += new System.EventHandler(this.btnImportChProfile_Click);
             // 
-            // btnImportSpreadsheet
+            // grdChProfile
             // 
-            this.btnImportSpreadsheet.Location = new System.Drawing.Point(4, 4);
-            this.btnImportSpreadsheet.Name = "btnImportSpreadsheet";
-            this.btnImportSpreadsheet.Size = new System.Drawing.Size(157, 23);
-            this.btnImportSpreadsheet.TabIndex = 6;
-            this.btnImportSpreadsheet.Text = "Import Spreadsheet";
-            this.btnImportSpreadsheet.UseVisualStyleBackColor = true;
-            // 
-            // atcGrid1
-            // 
-            this.atcGrid1.AllowHorizontalScrolling = true;
-            this.atcGrid1.AllowNewValidValues = false;
-            this.atcGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.grdChProfile.AllowHorizontalScrolling = true;
+            this.grdChProfile.AllowNewValidValues = false;
+            this.grdChProfile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.atcGrid1.CellBackColor = System.Drawing.SystemColors.Window;
-            this.atcGrid1.Fixed3D = false;
-            this.atcGrid1.LineColor = System.Drawing.SystemColors.Control;
-            this.atcGrid1.LineWidth = 1F;
-            this.atcGrid1.Location = new System.Drawing.Point(3, 58);
-            this.atcGrid1.Name = "atcGrid1";
-            this.atcGrid1.Size = new System.Drawing.Size(324, 226);
-            this.atcGrid1.Source = null;
-            this.atcGrid1.TabIndex = 5;
-            this.atcGrid1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.atcGrid1_MouseMove);
+            this.grdChProfile.CellBackColor = System.Drawing.SystemColors.Window;
+            this.grdChProfile.Fixed3D = false;
+            this.grdChProfile.LineColor = System.Drawing.SystemColors.Control;
+            this.grdChProfile.LineWidth = 1F;
+            this.grdChProfile.Location = new System.Drawing.Point(3, 33);
+            this.grdChProfile.Name = "grdChProfile";
+            this.grdChProfile.Size = new System.Drawing.Size(324, 251);
+            this.grdChProfile.Source = null;
+            this.grdChProfile.TabIndex = 5;
+            this.grdChProfile.MouseMove += new System.Windows.Forms.MouseEventHandler(this.atcGrid1_MouseMove);
             // 
             // gbInputInfil
             // 
@@ -788,10 +769,9 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Panel frameNaturalXsectGrid;
         private System.Windows.Forms.Button btnUndoClear;
-        private System.Windows.Forms.Button btnClearGrid;
-        private System.Windows.Forms.Button ImportCSV;
-        private System.Windows.Forms.Button btnImportSpreadsheet;
-        private atcControls.atcGrid atcGrid1;
+        private System.Windows.Forms.Button btnClearProfile;
+        private System.Windows.Forms.Button btnImportChProfile;
+        private atcControls.atcGrid grdChProfile;
         private BMPSketch bmpSketch1;
         private System.Windows.Forms.ToolTip toolTip1;
     }

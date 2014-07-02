@@ -36,7 +36,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Name = "BMPSketch";
             this.Size = new System.Drawing.Size(602, 108);
+            this.Resize += new System.EventHandler(this.BMPSketch_Resize);
             this.ResumeLayout(false);
+
         }
 
         #endregion

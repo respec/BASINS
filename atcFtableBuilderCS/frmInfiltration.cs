@@ -227,6 +227,11 @@ namespace atcFtableBuilder
 
         private void cboSoilMenu_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (cboSoilMenu.SelectedItem == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Must select a soil type first", "Infiltration Calculator");
+                return;
+            }
             if (Calculator == null) Calculator = new Infiltration_Calc();
             string lSoilName = cboSoilMenu.SelectedItem.ToString();
 

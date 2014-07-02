@@ -1,117 +1,156 @@
+using MapWinUtility;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace atcFtableBuilder
 {
-    //this is the version that was actually referenced by the 'mybuild' in the original Java project
+    //This version is the 'NaturalChannelCalc' class in the original Java program
     public class FTableCalcNatural : FTableCalculator, IFTableOperations
     {
-        double[] x = null;
-        double[] y = null;
-        double _totalWidth;
-        double _maxDepth;
-        int MAXSIZE = 1000;
+        public double inpChannelLength;
+        public double inpChannelManningsValue;
+        public double inpChannelSlope;
+        public double inpHeightIncrement;
+        public ArrayList inpChannelProfile = null; //this is an arraylist of XSectionStation(s)
+
+        public double ChannelProfileYMaxDepth = -999; //a holder of the most depth in the x-section profile
 
         public FTableCalcNatural()
         {
-            vectorColNames.Clear();
-            vectorColNames.Add("depth");
-            vectorColNames.Add("area");
-            vectorColNames.Add("volume");
-            vectorColNames.Add("outflow1");
-            geoInputNames = new string[]{"Channel Length", 
-                                         "Mannings Value", 
-                                         "Longitudinal Slope", 
-                                         "Height Increment" };
+            geomInputLongNames = new string[] {"Channel Length","Mannings Value","Longitudinal Slope","Height Increment"};
+            geomInputs = new ChannelGeomInput[]{
+                ChannelGeomInput.Length,
+                ChannelGeomInput.ManningsN,
+                ChannelGeomInput.LongitudinalSlope,
+                ChannelGeomInput.HeightIncrement
+            };
         }
 
-        public ArrayList GenerateFTable(ArrayList channelProfile, double channelLength,
-                                     double channelManningsValue, double channelSlope)
+        public bool SetInputParameters(Hashtable aInputs)
         {
+            bool AllInputsFound = true;
+            if (aInputs[ChannelGeomInput.Length] != null)
+                inpChannelLength = (double)aInputs[ChannelGeomInput.Length];
+            else
+                AllInputsFound = false;
 
-            if (channelProfile == null)
-                return null;
+            if (aInputs[ChannelGeomInput.ManningsN] != null)
+                inpChannelManningsValue = (double)aInputs[ChannelGeomInput.ManningsN];
+            else
+                AllInputsFound = false;
 
-            getParamsFromTable(channelProfile);
+            if (aInputs[ChannelGeomInput.LongitudinalSlope] != null)
+                inpChannelSlope = (double)aInputs[ChannelGeomInput.LongitudinalSlope];
+            else
+                AllInputsFound = false;
 
-            //int count = channelProfile.size();
-            int count = x.Length;
+            if (aInputs[ChannelGeomInput.HeightIncrement] != null)
+                inpHeightIncrement = (double)aInputs[ChannelGeomInput.HeightIncrement];
+            else
+                AllInputsFound = false;
 
-            if (count < 1)
-                return null;
+            if (aInputs[ChannelGeomInput.Profile] != null)
+                inpChannelProfile = (ArrayList)aInputs[ChannelGeomInput.Profile];
+            else
+                AllInputsFound = false;
 
-            //Assign channel length 
-            double ll = channelLength;
-            //Assign channel slope
-            double s = channelSlope;
-            //Assign Mannings N
-            double nN = channelManningsValue;
+            return AllInputsFound;
+        }
 
-            //Will be passed in
-            double Dh = 1.0;  // must accept by the user
+        public ArrayList GenerateFTable()
+        {
+            if (inpChannelProfile == null) return null;
+            return GenerateFTable(inpChannelProfile, inpChannelLength, inpChannelManningsValue, inpChannelSlope, inpHeightIncrement);
+        }
 
-            // TODO code application logic here
+        private ArrayList GenerateFTable(ArrayList channelProfile, double channelLength,
+                double channelManningsValue, double channelSlope, double heightIncrement)
+        {
+            ArrayList resultVector = new ArrayList();
+
+            int i = 0;
             int n = 0;
-            double xmin = 0;
-            double xmax = 0;
+            int j = 0;
+            double ymin = 0.0;
+            double ymax = 0.0;
 
-            double ymin = 0;
-            double ymax = 0;
-            //double [] x = new double[MAXSIZE];   
-            //double [] x = new double[count];        
-            //double [] y = new double[count]; 
-            double[] xx = new double[MAXSIZE];
-            double[] yy = new double[MAXSIZE];
+            //By oversizing the array (the original dimension was 100), an array out of bounds
+            //error is avoided.
 
-            double[] P = new double[MAXSIZE];
-            double[] A = new double[MAXSIZE];
-            double[] R = new double[MAXSIZE];
-            double[] q = new double[MAXSIZE];
-            double[] ac = new double[MAXSIZE];
-            double[] ghl = new double[MAXSIZE];
-            double[] VOLL = new double[MAXSIZE];
-            double[] top = new double[MAXSIZE];
+            int larraySize = 1000;
+            double[] x = new double[larraySize];
+            double[] y = new double[larraySize];
+            double[] xx = new double[larraySize];
+            double[] yy = new double[larraySize];
+            double[] h = new double[larraySize];
+            double[] P = new double[larraySize];
+            double[] A = new double[larraySize];
+            double[] R = new double[larraySize];
+            double[] q = new double[larraySize];
+            double[] ac = new double[larraySize];
+            double[] ghl = new double[larraySize];
+            double[] VOLL = new double[larraySize];
+            double[] top = new double[larraySize];
+            double[] LT1 = new double[larraySize];
+            double[] RT1 = new double[larraySize];
+            double[] ILL = new double[larraySize];
+            double[] IRR = new double[larraySize];
             double CONS = FTableCalculatorConstants.Cunit;
             double ACONS = FTableCalculatorConstants.Aunit;
-            //  int i =0;
+            int counter = 0;
+            int counterxl = 0;
+            int counterxr = 0;
+            double ll = 0.0;
+            double nN = 0.0;
+            double s = 0.0;
 
-            double nh = 0;
+            i = 0;
+            int k = 0;
+            double nh = 0.0;
             int iL = 0;
             int iR = 0;
             int m = 0;
-            double xL = 0;
-            double xR = 0;
-            double yL = 0;
-            double hmin = 0;
-            double hmax = 0;
+            double xL = 0.0;
+            double xR = 0.0;
+            double yL = 0.0;
+            double hmin = 0.0;
+            double hmax = 0.0;
+            double Dh = 0.0; // input
+            ll = channelLength;
+            s = channelSlope;
+            nN = channelManningsValue;
 
-            ymin = 100000000.0;
-            ymax = -999999.0;
-            xmin = ymin;
-            // xmax = -ymin;
+            //x = this.makeDoubleArrayFromVectorArray(channelProfile, 0);
+            //y = this.makeDoubleArrayFromVectorArray(channelProfile, 1);
+            //ymin = 100000000.0;
+            //xmin = ymin;
+            //xmax = -ymin;
+            /*Determine the maximum x and y coordinates*/
+            //xmax = FTableCalculatorConstants.getMaxValueFromVector(0, channelProfile);
+            //xmin = FTableCalculatorConstants.getMinValueFromVector(0, channelProfile);
+            //ymax = FTableCalculatorConstants.getMaxValueFromVector(1, channelProfile);
+            //ymin = FTableCalculatorConstants.getMinValueFromVector(1, channelProfile);
 
-            n = 1;
-            //while(n < 7)
-            for (int idx = 0; idx < count; idx++)
+            ymin = double.MaxValue;
+            ymax = double.MinValue;
+            XSectionStation lStation;
+            for (i = 0; i < channelProfile.Count; i++)
             {
-                if (y[idx] < ymin)
-                    ymin = y[idx];
-
-                if (y[idx] > ymax)
-                    ymax = y[idx];
-
-                if (x[idx] < xmin)
-                    xmin = x[idx];
-
-                if (x[idx] > xmax)
-                    xmax = x[idx];
-                //TODO: System.out.println("      ");  
-                //TODO: System.out.print(ymax); 
+                lStation = (XSectionStation)channelProfile[i];
+                if (lStation.y < ymin) ymin = lStation.y;
+                if (lStation.y > ymax) ymax = lStation.y;
+                x[i + 1] = lStation.x;
+                y[i + 1] = lStation.y;
             }
 
-            n = n - 1;
+            ChannelProfileYMaxDepth = ymax;
 
+            Dh = heightIncrement;  // must accept by the user
+            n = 1;
+
+            ////TODO: System.out.print(xmax);
             //'Calculate minimum and maximum depths
-            hmin = 0;
+            hmin = 0.0;
             hmax = ymax - ymin;
 
             //'Get depth increment and calculate array of depths
@@ -120,172 +159,170 @@ namespace atcFtableBuilder
             //   Dh = Val(InputBox(myMessage))
 
             nh = (hmax / Dh);
-            double[] h = new double[(int)nh];
 
-            for (int idx = 0; idx < nh; idx++)
+            for (i = 0; i < channelProfile.Count; i++)
             {
-                h[idx] = idx * Dh;
+                lStation = (XSectionStation)channelProfile[i];
             }
 
-            //'Calculate cross-sectional properties
-            for (int k = 0; k < nh; k++)
+            for (i = 1; i <= nh; i++)
             {
+                h[i] = i * Dh;
+            }
+
+            while (n <= channelProfile.Count)
+            {
+                n = n + 1;
+            }
+
+
+            n = n - 1;
+
+            for (k = 1; k <= nh; k++)
+            {
+                counterxl = 0;
+                counterxr = 0;
+                counter = 0;
+                P[k] = 0.0;
+                A[k] = 0.0;
+                top[k] = 0.0;
+
                 yL = ymin + h[k];
 
-                //'Obtain points where current depth h(k) intersects x-section
-                for (int i = 0; i < y.Length - 1; i++)
+                // 'Obtain points where current depth h(k) intersects x-section
+                for (i = 1; i <= n - 1; i++)
                 {
                     if ((yL > y[i + 1]) && (yL <= y[i]))
                     {
                         xL = x[i] + (yL - y[i]) * (x[i + 1] - x[i]) / (y[i + 1] - y[i]);
                         iL = i;
+                        counterxl = counterxl + 1;
                     }
                     if ((yL > y[i]) && (yL <= y[i + 1]))
                     {
                         xR = x[i] + (yL - y[i]) * (x[i + 1] - x[i]) / (y[i + 1] - y[i]);
                         iR = i;
+                        counterxr = counterxr + 1;
                     }
+
+                    LT1[counterxl] = xL;
+                    RT1[counterxr] = xR;
+                    ILL[counterxl] = iL;
+                    IRR[counterxr] = iR;
                 }
+
+                if (counterxr >= counterxl)
+                {
+                    counter = counterxr;
+                }
+                else counter = counterxl;
+
+                iL = 0;
+                iR = 0;
+                xR = 0;
+                xL = 0;
 
                 //'Load vectors of x and y included below current depth
-                m = iR - iL;
-                xx[1] = xL;
-                yy[1] = yL;
-                for (int i = 0; i < m; i++)
+                for (j = 1; j <= counter; j++)
                 {
-                    xx[i + 1] = x[iL + i];
-                    yy[i + 1] = y[iL + i];
-                }
-                xx[m + 2] = xR;
-                yy[m + 2] = yL;
-                xx[m + 3] = xx[1];
-                yy[m + 3] = yy[1];
+                    xL = LT1[j];
+                    xR = RT1[j];
+                    iL = (int)ILL[j];
+                    iR = (int)IRR[j];
 
-                // 'Calculate wetted perimeter, area, and hydraulic radius
-                P[k] = 0;
-                A[k] = 0;
-                for (int i = 0; i < m + 1; i++)
-                {
-                    P[k] = P[k] + System.Math.Sqrt(System.Math.Pow(xx[i] - xx[i + 1], 2) + System.Math.Pow(yy[i] - yy[i + 1], 2));
-                    top[k] = top[k] + System.Math.Abs(xx[i] - xx[i + 1]);
-                }
-                for (int i = 0; i < m + 2; i++)
-                {
-                    A[k] = A[k] + xx[i] * yy[i + 1] - xx[i + 1] * yy[i];
+                    m = iR - iL;
+                    xx[1] = xL;
+                    yy[1] = yL;
+                    for (i = 1; i <= m; i++)
+                    {
+                        xx[i + 1] = x[iL + i];
+                        yy[i + 1] = y[iL + i];
+                    }
+                    xx[m + 2] = xR;
+                    yy[m + 2] = yL;
+                    xx[m + 3] = xx[1];
+                    yy[m + 3] = yy[1];
+
+                    // 'Calculate wetted perimeter, area, and hydraulic radius
+                    for (i = 1; i <= m + 1; i++)
+                    {
+                        P[k] = P[k] + System.Math.Sqrt(System.Math.Pow(xx[i] - xx[i + 1], 2) + System.Math.Pow(yy[i] - yy[i + 1], 2));
+                        top[k] = top[k] + System.Math.Abs(xx[i] - xx[i + 1]);
+                    }
+                    for (i = 1; i <= m + 2; i++)
+                    {
+                        A[k] = A[k] + xx[i] * yy[i + 1] - xx[i + 1] * yy[i];
+                    }
                 }
                 A[k] = 0.5 * System.Math.Abs(A[k]);
                 R[k] = A[k] / P[k];
             }
 
-            for (int i = 0; i < nh - 1; i++)
+            for (i = 1; i <= nh; i++)
             {
-                //	top = Math.abs(x[i] - x[i + 1]);
-                q[i] = A[i] * System.Math.Pow(R[i], .677) * (CONS / nN) * System.Math.Sqrt(s);
-                ac[i] = ac[i] + (ll * top[i]) / ACONS;
+                q[i] = A[i] * System.Math.Pow(R[i], .677) * (1.486 / nN) * System.Math.Sqrt(s);
+                ac[i] = (ll * top[i] / ACONS);
+                //ac[i] = ac[i] + (ll * top[i])/43560.0;
             }
+
 
             // ' this section calculates the volume
-            for (int i = 0; i < nh - 1; i++)
+            //for (i=1;i<=m+2;i++)    
+            for (i = 0; i <= nh; i++)
             {
+                q[i] = A[i] * System.Math.Pow(R[i], (2.0 / 3.0)) * (CONS / nN) * System.Math.Sqrt(s);
                 ghl[i] = Dh * ((ac[i] + ac[i + 1])) * 0.5;
                 VOLL[i + 1] = ghl[i] + VOLL[i];
-                //TODO: System.out.print(q[i]);
+                VOLL[0] = 0;
+                //TODO: System.out.print(h[i]);
                 //TODO: System.out.println("      ");  
-                //TODO: System.out.print(P[k]);  
+                //TODO: System.out.print(VOLL[i]); 
+                //TODO: System.out.print(x[i+1]);
             }
-
+            /**CSC added this code to construct the result vector.
+             * It is based on the for loops written above
+             */
+            //ArrayList resultVector = new ArrayList();
             if (FTableCalculatorConstants.programunits == 0)
             {
-                for (int i = 0; i < nh; i++)
+                for (i = 0; i <= nh; i++)
                 {
                     ac[i] = ac[i] / System.Math.Pow(10, 4);
                     VOLL[i] = VOLL[i] / (System.Math.Pow(10, 6));
                 }
             }
-
-            ArrayList results = new ArrayList();
-            ArrayList rowData = null;
-            string sDepth = "";
-            string sArea = "";
-            string sVolume = "";
-            string sOutFlow = "";
-            string lFormat = "{0:0.00000}";
-            for (int i = 0; i < nh; i++)
+            string lFormat = "{0:0.000000}";
+            for (i = 0; i <= nh; i++)
             {
-                rowData = new ArrayList();
-                sDepth   = string.Format(lFormat, (object)h[i]);
-                sArea    = string.Format(lFormat, (object)ac[i]);
-                sVolume  = string.Format(lFormat, (object)VOLL[i]);
-                sOutFlow = string.Format(lFormat, (object)q[i]);
+                ArrayList rowData = new ArrayList();
+                rowData.Add(string.Format(lFormat, (object)h[i]));
+                rowData.Add(string.Format(lFormat, (object)ac[i]));
+                rowData.Add(string.Format(lFormat, (object)VOLL[i]));
+                rowData.Add(string.Format(lFormat, (object)q[i]));
 
-                rowData.Add(sDepth);
-                rowData.Add(sArea);
-                rowData.Add(sVolume);
-                rowData.Add(sOutFlow);
-
-                results.Add(rowData);
+                resultVector.Add(rowData);
             }
-            return results;
-        }
 
-        private void Temp()
-        {
-        }
+            larraySize = 0;
+            x = new double[larraySize];
+            y = new double[larraySize];
+            xx = new double[larraySize];
+            yy = new double[larraySize];
+            h = new double[larraySize];
+            P = new double[larraySize];
+            A = new double[larraySize];
+            R = new double[larraySize];
+            q = new double[larraySize];
+            ac = new double[larraySize];
+            ghl = new double[larraySize];
+            VOLL = new double[larraySize];
+            top = new double[larraySize];
+            LT1 = new double[larraySize];
+            RT1 = new double[larraySize];
+            ILL = new double[larraySize];
+            IRR = new double[larraySize];
 
-        private void getParamsFromTable(ArrayList channelProfile)
-        {
-            ArrayList row;
-
-            double depth = 0.0;
-            double dist = 0.0;
-
-            int numRows = channelProfile.Count;
-
-            x = new double[numRows];
-            y = new double[numRows];
-            string strDist = "";
-            string strDepth = "";
-            int count = 0;
-
-            for (int i = 0; i < numRows; i++)
-            {
-                row = (ArrayList)channelProfile[i];
-
-                strDist = row[0].ToString();
-                strDepth = row[1].ToString();
-                if ((strDist == null) || (strDist == ""))
-                    break;
-
-                if ((strDepth == null) || (strDepth == ""))
-                    break;
-
-                count++;
-                dist = double.Parse(strDist);
-                x[i] = dist;
-
-                depth = double.Parse(strDepth);
-                y[i] = depth;
-
-                if (dist > _totalWidth)
-                    _totalWidth = dist;
-
-                if (depth > _maxDepth)
-                    _maxDepth = depth;
-            }
-            x = resizeArray(x, count);
-            y = resizeArray(y, count);
-        }
-
-        private double[] resizeArray(double[] oldArray, int newSize)
-        {
-            int oldSize = oldArray.Length;
-
-            int preserveLength = System.Math.Min(oldSize, newSize);
-            double[] newArray = new double[preserveLength];
-            if (preserveLength > 0)
-                System.Array.Copy(oldArray, 0, newArray, 0, preserveLength);
-
-            return newArray;
+            return resultVector;
         }
     }
 }

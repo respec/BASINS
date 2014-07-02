@@ -45,15 +45,25 @@ public class FTableCalculatorConstants
     static int choice=0;
     //Tells the program what unit the data is in ;
     static int importunits = 0;
-    //static int programunits = 0;
 
     public static int programunits = 1;  //sri - to make english units default
 
-    static double infiltrationConversion = System.Math.Pow(3600 * 100, -1);
+    public static double infiltrationConversion = System.Math.Pow(3600 * 100, -1);
 
     public static int unitssel = 1;  // sri-to store the int value of the units selected, default eng lish units
 
+    public enum UnitSystem
+    {
+        SI = 0,
+        US = 1
+    }
+    public static string[] UnitSystemNames = {"S.I.Units","U.S.Units"};  //UI dropdown list should be in same order for easy access
 
+    public static string[,] UnitSystemLabels = new string[,]{
+             {"(m)",              "(ft)"},
+             {"(ha.)",            "(acres)"},
+             {"(milllion cu. m)", "(ac-ft)"},
+             {"(cms)",            "(cfs)"}};
     //static double infiltrationConversion = 1.008333;  // // acres * in/hr to cf/s
 
 
