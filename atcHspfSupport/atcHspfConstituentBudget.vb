@@ -25,8 +25,10 @@ Public Module ConstituentBudget
         Select Case aBalanceType
             Case "Water"
                 lUnits = "(ac-ft)"
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PERO"))
+
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SURO"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IFWO"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AGWO"))
 
                 lTotalPrecipData.Add(aScenarioResults.DataSets.FindData("Constituent", "PRSUPY"))
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "IVOL"))
@@ -36,7 +38,8 @@ Public Module ConstituentBudget
 
             Case "Sediment"
                 lUnits = "(tons)"
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOSED"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "WSSD"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SCRSD"))
                 lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "SOSLD")))
 
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ISED-TOT"))
@@ -47,13 +50,16 @@ Public Module ConstituentBudget
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
 
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "POQUAL-NO3"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-NO3"))
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "POQUAL-NH3+NH4"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-NO3"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-NO3"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-NH3+NH4"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-NH3+NH4"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-NH3+NH4"))
 
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "POQUAL-BOD"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-BOD"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-BOD"))
+                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-BOD"))
 
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-IN"))
                 lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
@@ -71,10 +77,12 @@ Public Module ConstituentBudget
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SDORP")) ' Organic P Outflow (will be multiplied by 0.6)
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "ORGN - TOTAL OUTFLOW")) ' Organic N Outflow (will be multiplied by 0.05534793)
                 'lNonpointData.AddRange((aScenarioResults.DataSets.FindData("Constituent", "POPHOS")))
-                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "POQUAL-Ortho P")))
                 lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-Ortho P")))
-                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "POQUAL-BOD")))
+                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-Ortho P")))
+                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-Ortho P")))
                 lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-BOD")))
+                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-BOD")))
+                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-BOD")))
                 lAtmDepData.Add((aScenarioResults.DataSets.FindData("Constituent", "PO4-ATMDEPTOT")))
 
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "P-TOT-IN"))
@@ -682,8 +690,11 @@ Public Module ConstituentBudget
                 NewReport &= vbTab & lTestLocation
                 lTotal = 0
                 For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lTestLocation)
-                    Dim lMassLinkFactor As Double = FindMassLinkFactor(aUCI, lMassLinkID, lTs.Attributes.GetValue("Constituent"), aBalanceType, _
-                                                                   True, aConversionFactor)
+                    Dim lMassLinkFactor As Double = 0.0
+                    If lTs.Attributes.GetValue("SumAnnual") > 0 Then
+                        lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lTs.Attributes.GetValue("Constituent"), aBalanceType, _
+                                                                       True, aConversionFactor)
+                    End If
                     lConstituentRate = lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
                     lConstituentTotal = lConstituentRate * lConnectionArea
 
@@ -705,8 +716,12 @@ Public Module ConstituentBudget
                 lTestLocation = lConnection.Source.VolName.Substring(0, 1) & ":" & lConnection.Source.VolId
                 lTotal = 0
                 For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lTestLocation)
-                    Dim lMassLinkFactor As Double = FindMassLinkFactor(aUCI, lMassLinkID, lTs.Attributes.GetValue("Constituent"), aBalanceType, _
+                    Dim lMassLinkFactor As Double = 0.0
+                    If lTs.Attributes.GetValue("SumAnnual") > 0 Then
+                        lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lTs.Attributes.GetValue("Constituent"), aBalanceType, _
                                                                    False, aConversionFactor)
+                    End If
+                    
                     lConstituentRate = lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
                     lConstituentTotal = lConstituentRate * lConnectionArea
                     lTotal += lConnectionArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
@@ -725,9 +740,12 @@ Public Module ConstituentBudget
 
     End Function
 
-    Private Function BODMFact(ByVal aUCI As HspfUci, ByVal aMassLinkID As Integer) As Double
+    Private Function BODMFact(ByVal aUCI As HspfUci, ByVal aconstituent As String, ByVal aMassLinkID As Integer) As Double
         For Each lMasslink As HspfMassLink In aUCI.MassLinks
-            If lMasslink.MassLinkId = aMassLinkID AndAlso lMasslink.Target.Member = "OXIF" AndAlso lMasslink.Target.MemSub1 = 2 Then
+            If lMasslink.MassLinkId = aMassLinkID AndAlso _
+                (lMasslink.Source.Member.Substring(0, 2) = "PO" Or lMasslink.Source.Member.Substring(0, 2) = aconstituent.Substring(0, 2)) AndAlso _
+                lMasslink.Target.Member = "OXIF" AndAlso _
+                lMasslink.Target.MemSub1 = 2 Then
                 Return lMasslink.MFact
 
             End If
@@ -759,35 +777,49 @@ Public Module ConstituentBudget
 
                 Select Case aBalanceType
                     Case "Sediment"
-                        If lMassLink.Target.Member = "ISED" Then
-                            lMassLinkFactor += lMassLink.MFact
-                        End If
+                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString
+                            Case "WSSD_ISED"
+                                lMassLinkFactor += lMassLink.MFact
+                            Case "SCRSD_ISED"
+                                lMassLinkFactor += lMassLink.MFact
+                            Case "SOSLD_ISED"
+                                lMassLinkFactor += lMassLink.MFact
+                        End Select
+                        
                     Case "Water"
-                        If aConstituent = "PERO" And lMassLink.Target.Member = "IVOL" And PERLND Then
-                            lMassLinkFactor = lMassLink.MFact
-                            Return lMassLinkFactor
-                        ElseIf aConstituent = "SURO" And lMassLink.Target.Member = "IVOL" And Not PERLND Then
-                            lMassLinkFactor = lMassLink.MFact
-                            Return lMassLinkFactor
-                        End If
+                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString
+                            Case "SURO_IVOL"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "IFWO_IVOL"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "AGWO_IVOL"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                        End Select
 
                     Case "TotalN"
 
                         Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
                             "_" & lMassLink.Target.MemSub1
-                            Case "POQUAL-NH3+NH4_NUIF1_2", "POQUAL-NO3_NUIF1_1"
-                                lMassLinkFactor = lMassLink.MFact
-                                Return lMassLinkFactor
                             Case "SOQUAL-NH3+NH4_NUIF1_2", "SOQUAL-NO3_NUIF1_1"
                                 lMassLinkFactor = lMassLink.MFact
-                                If PERLND Then lMassLinkFactor = 0
                                 Return lMassLinkFactor
-                            Case "POQUAL-BOD_PKIF_3"
-                                lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, lMassLink.MassLinkId) * aConversionFactor
+                            Case "IOQUAL-NH3+NH4_NUIF1_2", "IOQUAL-NO3_NUIF1_1"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "AOQUAL-NH3+NH4_NUIF1_2", "AOQUAL-NO3_NUIF1_1"
+                                lMassLinkFactor = lMassLink.MFact
                                 Return lMassLinkFactor
                             Case "SOQUAL-BOD_PKIF_3"
-                                lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, lMassLink.MassLinkId) * aConversionFactor
-                                If PERLND Then lMassLinkFactor = 0
+                                lMassLinkFactor = (lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor)
+                                Return lMassLinkFactor
+                            Case "IOQUAL-BOD_PKIF_3"
+                                lMassLinkFactor = (lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor)
+                                Return lMassLinkFactor
+                            Case "AOQUAL-BOD_PKIF_3"
+                                lMassLinkFactor = (lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor)
                                 Return lMassLinkFactor
                         End Select
                         If aConstituent.Contains("NITROGEN - TOTAL OUTFLOW") Then
@@ -799,19 +831,23 @@ Public Module ConstituentBudget
                     Case "TotalP"
                         Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
                             "_" & lMassLink.Target.MemSub1
-                            Case "POQUAL-ORTHO P_NUIF1_4"
-                                lMassLinkFactor = lMassLink.MFact
-                                Return lMassLinkFactor
                             Case "SOQUAL-ORTHO P_NUIF1_4"
                                 lMassLinkFactor = lMassLink.MFact
-                                If PERLND Then lMassLinkFactor = 0
                                 Return lMassLinkFactor
-                            Case "POQUAL-BOD_PKIF_4"
-                                lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, lMassLink.MassLinkId) * aConversionFactor
+                            Case "IOQUAL-ORTHO P_NUIF1_4"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "AOQUAL-ORTHO P_NUIF1_4"
+                                lMassLinkFactor = lMassLink.MFact
                                 Return lMassLinkFactor
                             Case "SOQUAL-BOD_PKIF_4"
-                                lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, lMassLink.MassLinkId) * aConversionFactor
-                                If PERLND Then lMassLinkFactor = 0
+                                lMassLinkFactor = (lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor)
+                                Return lMassLinkFactor
+                            Case "IOQUAL-BOD_PKIF_4"
+                                lMassLinkFactor = (lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor)
+                                Return lMassLinkFactor
+                            Case "AOQUAL-BOD_PKIF_4"
+                                lMassLinkFactor = (lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor)
                                 Return lMassLinkFactor
                             Case "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW_NUIF1_4"
                                 lMassLinkFactor = lMassLink.MFact
