@@ -152,13 +152,16 @@ Public Module Utility
                      .Add("I:Header0", "Storage(tons/acre)")
                      .Add("I:SLDS", "  All")
                      .Add("I:Header1", "Washoff(tons/acre)")
-                     .Add("I:SOSLD", "  Total")
-                     
+                    .Add("I:SOSLD", "  Total")
+
+
                      .Add("P:Header0", "Storage (tons/acre)")
                      .Add("P:DETS", "  Detached ")
                      .Add("P:Header1", "Washoff (tons/acre)")
-                     .Add("P:SOSED", "  Total")
-                     
+                    .Add("P:WSSD", "  Washoff of Detached Sediment")
+                    .Add("P:SCRSD", "  Scour of Matrix (attached) soil")
+                    .Add("P:Total2", "Total Sediment Loss (tons/ac)")
+
                      .Add("R:BEDDEP", "Bed Depth (ft)")
                      .Add("R:Header0", "Bed Storage (tons)")
                      .Add("R:RSED-BED-SAND", "  Sand")
@@ -261,13 +264,13 @@ Public Module Utility
                     .Add("P:NO3+NO2-N - SURFACE LAYER OUTFLOW", "    Surface")
                     .Add("P:NO3+NO2-N - UPPER LAYER OUTFLOW", "    Interflow")
                     .Add("P:NO3+NO2-N - GROUNDWATER OUTFLOW", "    Baseflow")
-                    .Add("P:NO3-N - TOTAL OUTFLOW", "    Total")
+                    .Add("P:Total3", "    Total")
                     .Add("P:Header1b", "  NH3 Loss")
                     .Add("P:NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW", "    Surface")
                     .Add("P:NH4-N IN SOLUTION - UPPER LAYER OUTFLOW", "    Interflow")
                     .Add("P:NH4-N IN SOLUTION - GROUNDWATER OUTFLOW", "    Baseflow")
                     .Add("P:NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "    Sediment")
-                    .Add("P:NH4-N - TOTAL OUTFLOW", "    Total")
+                    .Add("P:Total4", "    Total")
                     .Add("P:Header1c", "  Labile ORGN Loss")
                     .Add("P:LABILE ORGN - SURFACE LAYER OUTFLOW", "    Surface")
                     .Add("P:LABILE ORGN - UPPER LAYER OUTFLOW", "    Interflow")
@@ -281,6 +284,7 @@ Public Module Utility
                     .Add("P:REFRAC ORGN - GROUNDWATER OUTFLOW", "    Baseflow")
                     .Add("P:REFRAC ORGN - SEDIMENT ASSOC OUTFLOW", "    Sediment")
                     .Add("P:ORGN - TOTAL OUTFLOW2", "    Refractory N as fraction of TORN")
+                    .Add("P:Header1e", "    ")
                     .Add("P:ORGN - TOTAL OUTFLOW", "  Total ORGN Loss")
                     .Add("P:NITROGEN - TOTAL OUTFLOW", "  Total N Loss")
 
@@ -442,13 +446,13 @@ Public Module Utility
                     .Add("P:SOQUAL-NO3", "  Surface Flow")
                     .Add("P:IOQUAL-NO3", "  Interflow")        
                     .Add("P:AOQUAL-NO3", "  Groundwater Flow") 
-                    .Add("P:POQUAL-NO3", "  Total")            
+                    .Add("P:Total3a", "  Total")
 
                     .Add("P:Header5", "NH3+NH4 (PQUAL)")
                     .Add("P:SOQUAL-NH3+NH4", "  Surface Flow")
                     .Add("P:IOQUAL-NH3+NH4", "  Interflow")
                     .Add("P:AOQUAL-NH3+NH4", "  Groundwater Flow")
-                    .Add("P:POQUAL-NH3+NH4", "  Total")
+                    .Add("P:Total3b", "  Total")
 
 
                     .Add("P:Header6", "LabileOrgN(PQUAL)")
@@ -456,14 +460,14 @@ Public Module Utility
                     .Add("P:SOQUAL-BOD2", "  Surface Flow")     
                     .Add("P:IOQUAL-BOD2", "  Interflow")        
                     .Add("P:AOQUAL-BOD2", "  Groundwater Flow") 
-                    .Add("P:POQUAL-BOD2", "  Total")            
+                    .Add("P:Total3c", "  Total")
 
                     .Add("P:Header7", "RefOrgN (PQUAL)")
                     .Add("P:WASHQS-BOD1", "  Sediment Attached")
                     .Add("P:SOQUAL-BOD1", "  Surface Flow")
                     .Add("P:IOQUAL-BOD1", "  Interflow")
                     .Add("P:AOQUAL-BOD1", "  Groundwater Flow")
-                    .Add("P:POQUAL-BOD1", "  Total")
+                    .Add("P:Total3d", "  Total")
 
                     .Add("I:Header8", "NO3 (IQUAL)")
                     .Add("I:SOQUAL-NO3", "  Surface Flow")
@@ -518,12 +522,13 @@ Public Module Utility
                     .Add("P:PO4-P IN SOLUTION - INTERFLOW - OUTFLOW", "    Interflow")
                     .Add("P:PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW", "    Baseflow")
                     .Add("P:SDP4A", "    Sediment")
-                    .Add("P:POPO4", "    Total")
+                    .Add("P:Total4", "    Total")
+
 
                     .Add("P:ORGN - TOTAL OUTFLOW", "    Labile Org P from POORN")
                     .Add("P:SDORP", "    Refractory Org P from SEDP 1")
 
-                    .Add("P:POPHOS", "    Total P Loss")
+                    .Add("P:Total3", "    Total P Loss")
                  
                     .Add("P:Header2", "Plant P")
                     .Add("P:PLANT P - SURFACE LAYER", "    Surface")
@@ -588,21 +593,21 @@ Public Module Utility
                     .Add("P:SOQUAL-Ortho P", "  Surface Flow")
                     .Add("P:IOQUAL-Ortho P", "  Interflow")
                     .Add("P:AOQUAL-Ortho P", "  Groundwater Flow")
-                    .Add("P:POQUAL-Ortho P", "  Total")
+                    .Add("P:Total3a", "  Total")
 
                     .Add("P:Header8", "RefOrgP (PQUAL)")
                     .Add("P:WASHQS-BOD1", "  Sediment Attached")
                     .Add("P:SOQUAL-BOD1", "  Surface Flow")    
                     .Add("P:IOQUAL-BOD1", "  Interflow")       
                     .Add("P:AOQUAL-BOD1", "  Groundwater Flow")
-                    .Add("P:POQUAL-BOD1", "  Total")           
+                    .Add("P:Total3b", "  Total")
 
                     .Add("P:Header9", "LabileOrgP (PQUAL)")
                     .Add("P:WASHQS-BOD2", "  Sediment Attached")
                     .Add("P:SOQUAL-BOD2", "  Surface Flow")     
                     .Add("P:IOQUAL-BOD2", "  Interflow")        
                     .Add("P:AOQUAL-BOD2", "  Groundwater Flow") 
-                    .Add("P:POQUAL-BOD2", "  Total")            
+                    .Add("P:Total3c", "  Total")
 
                     .Add("I:Header10", "Ortho P (IQUAL)")
                     .Add("I:SOQUAL-Ortho P", "  Surface Flow")
@@ -741,6 +746,7 @@ Public Module Utility
                                 ByVal aOperationTypes As atcCollection, _
                                 ByRef aLocations As atcCollection, _
                                 ByVal aUpstream As Boolean)
+
         Dim lOperName As String = aOperationTypes.ItemByKey(aLocation.Substring(0, 2))
         Dim lOperation As HspfOperation = aUci.OpnBlks(lOperName).OperFromID(aLocation.Substring(2))
         If Not lOperation Is Nothing Then
@@ -754,6 +760,8 @@ Public Module Utility
                         aLocations.Increment(lLocationKey, lConnection.MFact)
 
                     End If
+
+
                 ElseIf lSourceVolName = "RCHRES" Then
                     If aUpstream Then
                         If lUpstreamChecked.Contains(lLocationKey) Then
@@ -851,7 +859,7 @@ Public Module Utility
         lReport.AppendLine("Location" & vbTab & "TotalArea".PadLeft(12) & vbTab & "LocalArea".PadLeft(12) & vbTab & "UpstreamReaches")
         'Becky changed the following to cycle through all locations
         'Dim lLocation As String = aLocations.Item(aLocations.Count - 1)
-        
+
 
         For Each lLocation As String In aLocations 'added by Becky - should force land use reports for ALL relevant reaches 
             'and also add the total for all relevant reaches to a single overall report
@@ -890,6 +898,8 @@ Public Module Utility
 
 
                 Dim lLandUseArea As Double = lPervArea + lImprArea
+
+
                 lReport.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab & _
                                DecimalAlign(lPervArea, , 2, 7) & vbTab & _
                                DecimalAlign(lImprArea, , 2, 7) & vbTab & _
