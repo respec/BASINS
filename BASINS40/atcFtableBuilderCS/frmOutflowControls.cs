@@ -237,12 +237,12 @@ namespace atcFtableBuilder
             txtOCOrificeRiserDepth.Text = clsGlobals.gOCOrificeRiser[1];
             txtOCOrificeRiserDisCoeff.Text = clsGlobals.gOCOrificeRiser[2];
 
-            clsGlobals.gOCSelectedWeirTri = chkOCWeirTri.Checked;
-            clsGlobals.gOCSelectedWeirTrape = chkOCWeirTrape.Checked;
-            clsGlobals.gOCSelectedWeirBroad = chkOCWeirBroad.Checked;
-            clsGlobals.gOCSelectedWeirRect = chkOCWeirRect.Checked;
-            clsGlobals.gOCSelectedOrificeUnd = chkOCOrificeUnd.Checked;
-            clsGlobals.gOCSelectedOrificeRiser = chkOCOrificeRiser.Checked;
+            chkOCWeirTri.Checked=      clsGlobals.gOCSelectedWeirTri;
+            chkOCWeirTrape.Checked=    clsGlobals.gOCSelectedWeirTrape;  
+            chkOCWeirBroad.Checked=    clsGlobals.gOCSelectedWeirBroad;
+            chkOCWeirRect.Checked=     clsGlobals.gOCSelectedWeirRect;
+            chkOCOrificeUnd.Checked=   clsGlobals.gOCSelectedOrificeUnd;
+            chkOCOrificeRiser.Checked = clsGlobals.gOCSelectedOrificeRiser;
 
             pLoaded = true;
         }

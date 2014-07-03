@@ -78,12 +78,12 @@ namespace atcFtableBuilder
         public static string[] gOCWeirBroad = { "0", "0", "0" };
         public static string[] gOCWeirRect = { "0", "0", "0" };
 
-        public static bool gOCSelectedWeirTri;
-        public static bool gOCSelectedWeirTrape;
-        public static bool gOCSelectedWeirBroad;
-        public static bool gOCSelectedWeirRect;
-        public static bool gOCSelectedOrificeUnd;
-        public static bool gOCSelectedOrificeRiser;
+        public static bool gOCSelectedWeirTri = false;
+        public static bool gOCSelectedWeirTrape = false;
+        public static bool gOCSelectedWeirBroad = false;
+        public static bool gOCSelectedWeirRect = false;
+        public static bool gOCSelectedOrificeUnd = false;
+        public static bool gOCSelectedOrificeRiser = false;
         #endregion
 
         #region Natural Profile
