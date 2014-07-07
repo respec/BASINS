@@ -23,41 +23,41 @@ Partial Class StartUp
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(StartUp))
-        Me.cmdStart = New System.Windows.Forms.Button
-        Me.cmdBrowse = New System.Windows.Forms.Button
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.txtUCIPath = New System.Windows.Forms.TextBox
-        Me.lblPrefixWarning = New System.Windows.Forms.Label
-        Me.lblRCH = New System.Windows.Forms.Label
-        Me.txtRCH = New System.Windows.Forms.TextBox
-        Me.lblOutReach2 = New System.Windows.Forms.Label
-        Me.cmdEnd = New System.Windows.Forms.Button
-        Me.chkAreaReports = New System.Windows.Forms.CheckBox
-        Me.chkGraphStandard = New System.Windows.Forms.CheckBox
-        Me.chkLogGraphs = New System.Windows.Forms.CheckBox
-        Me.chkSupportingGraphs = New System.Windows.Forms.CheckBox
-        Me.chkRunHSPF = New System.Windows.Forms.CheckBox
-        Me.pnlHighlight = New System.Windows.Forms.Panel
-        Me.chkWaterBalance = New System.Windows.Forms.CheckBox
-        Me.chkSedimentBalance = New System.Windows.Forms.CheckBox
-        Me.grpGraphs = New System.Windows.Forms.GroupBox
-        Me.grpConstituentBalance = New System.Windows.Forms.GroupBox
-        Me.chkFecalColiform = New System.Windows.Forms.CheckBox
-        Me.chkBODBalance = New System.Windows.Forms.CheckBox
-        Me.chkTotalPhosphorus = New System.Windows.Forms.CheckBox
-        Me.chkTotalNitrogen = New System.Windows.Forms.CheckBox
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.chkExpertStats = New System.Windows.Forms.CheckBox
-        Me.btnMakeEXSFile = New System.Windows.Forms.Button
-        Me.btnHelp = New System.Windows.Forms.Button
-        Me.chkChangeModelParameters = New System.Windows.Forms.CheckBox
-        Me.cmbParameterName = New System.Windows.Forms.ComboBox
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.txtOperation = New System.Windows.Forms.TextBox
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.txtParameterChange = New System.Windows.Forms.TextBox
-        Me.chkAdditionalgraphs = New System.Windows.Forms.CheckBox
+        Me.cmdStart = New System.Windows.Forms.Button()
+        Me.cmdBrowse = New System.Windows.Forms.Button()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.txtUCIPath = New System.Windows.Forms.TextBox()
+        Me.lblPrefixWarning = New System.Windows.Forms.Label()
+        Me.lblRCH = New System.Windows.Forms.Label()
+        Me.txtRCH = New System.Windows.Forms.TextBox()
+        Me.lblOutReach2 = New System.Windows.Forms.Label()
+        Me.cmdEnd = New System.Windows.Forms.Button()
+        Me.chkAreaReports = New System.Windows.Forms.CheckBox()
+        Me.chkGraphStandard = New System.Windows.Forms.CheckBox()
+        Me.chkLogGraphs = New System.Windows.Forms.CheckBox()
+        Me.chkSupportingGraphs = New System.Windows.Forms.CheckBox()
+        Me.chkRunHSPF = New System.Windows.Forms.CheckBox()
+        Me.pnlHighlight = New System.Windows.Forms.Panel()
+        Me.chkWaterBalance = New System.Windows.Forms.CheckBox()
+        Me.chkSedimentBalance = New System.Windows.Forms.CheckBox()
+        Me.grpGraphs = New System.Windows.Forms.GroupBox()
+        Me.grpConstituentBalance = New System.Windows.Forms.GroupBox()
+        Me.chkFecalColiform = New System.Windows.Forms.CheckBox()
+        Me.chkBODBalance = New System.Windows.Forms.CheckBox()
+        Me.chkTotalPhosphorus = New System.Windows.Forms.CheckBox()
+        Me.chkTotalNitrogen = New System.Windows.Forms.CheckBox()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.chkExpertStats = New System.Windows.Forms.CheckBox()
+        Me.btnMakeEXSFile = New System.Windows.Forms.Button()
+        Me.btnHelp = New System.Windows.Forms.Button()
+        Me.chkChangeModelParameters = New System.Windows.Forms.CheckBox()
+        Me.cmbParameterName = New System.Windows.Forms.ComboBox()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.txtOperation = New System.Windows.Forms.TextBox()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.txtParameterChange = New System.Windows.Forms.TextBox()
+        Me.chkAdditionalgraphs = New System.Windows.Forms.CheckBox()
         Me.grpGraphs.SuspendLayout()
         Me.grpConstituentBalance.SuspendLayout()
         Me.SuspendLayout()
@@ -304,7 +304,7 @@ Partial Class StartUp
         Me.chkTotalPhosphorus.Name = "chkTotalPhosphorus"
         Me.chkTotalPhosphorus.Size = New System.Drawing.Size(333, 17)
         Me.chkTotalPhosphorus.TabIndex = 32
-        Me.chkTotalPhosphorus.Text = "Produce Total Phoshporus Balance Reports (Includes Organic P)"
+        Me.chkTotalPhosphorus.Text = "Produce Total Phosphorus Balance Reports (Includes Organic P)"
         Me.chkTotalPhosphorus.UseVisualStyleBackColor = True
         '
         'chkTotalNitrogen
