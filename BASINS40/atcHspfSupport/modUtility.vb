@@ -92,6 +92,25 @@ Public Module Utility
         Return pConstituentsThatUseLast
     End Function
 
+    Public Function ConstituentsThatNeedMassLink() As Generic.List(Of String)
+        Static pConstituentsThatNeedMassLink As Generic.List(Of String) = Nothing
+        If pConstituentsThatNeedMassLink Is Nothing Then
+            Dim lConstituentsThatNeedMassLink() As String = _
+                {"WSSD", "SCRSD", "SOSLD", "PERO", "SURO", "IFWO", "AGWO", "NO3+NO2-N - SURFACE LAYER OUTFLOW", _
+                "NO3+NO2-N - UPPER LAYER OUTFLOW", "NO3+NO2-N - GROUNDWATER OUTFLOW", "NO3-N - TOTAL OUTFLOW", "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW", _
+                "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW", "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW", "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", _
+                 "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "POQUAL-NH3+NH4", "SOQUAL-NH3+NH4", _
+                 "IOQUAL-NH3+NH4", "AOQUAL-NH3+NH4", "POQUAL-NO3", "SOQUAL-NO3", "AOQUAL-NO3", "IOQUAL-NO3", "WASHQS-BOD", _
+                 "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD", "POQUAL-BOD", "ORGN - TOTAL OUTFLOW", "NITROGEN - TOTAL OUTFLOW", _
+                "LABILE ORGN - SEDIMENT ASSOC OUTFLOW", "REFRAC ORGN - SEDIMENT ASSOC OUTFLOW", "POQUAL-ORTHO P", "SOQUAL-ORTHO P", _
+                 "IOQUAL-ORTHO P", "AOQUAL-ORTHO P", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", _
+                 "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW", "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW", "SDP4A", _
+                "SDORP" _
+                }
+            pConstituentsThatNeedMassLink = New Generic.List(Of String)(lConstituentsThatNeedMassLink)
+        End If
+        Return pConstituentsThatNeedMassLink
+    End Function
     Friend Function ConstituentsToOutput(ByVal aType As String, _
                                 Optional ByVal aCategory As Boolean = False) As atcCollection
         Dim lConstituentsToOutput As New atcCollection
@@ -112,7 +131,7 @@ Public Module Utility
                       .Add("P:SURO", "    Surface  ")
                       .Add("P:IFWO", "    Interflow")
                       .Add("P:AGWO", "    Baseflow ")
-                      .Add("P:PERO", "    Total    ")
+                    .Add("P:Total3", "    Total    ")
                       .Add("P:Header2", "GW Inflow")
                       .Add("P:IGWI", "    Deep    ")
                       .Add("P:AGWI", "    Active  ")
@@ -214,7 +233,7 @@ Public Module Utility
                     .Add("P:SOQUAL-F.Coliform", "  Surface")
                     .Add("P:IOQUAL-F.Coliform", "  Interflow")
                     .Add("P:AOQUAL-F.Coliform", "  Baseflow")
-                    .Add("P:POQUAL-F.Coliform", "  Total")
+                    .Add("P:Total3", "  Total")
                     .Add("I:Header2", "F.Coliform (10^9 org/ac)")
                     .Add("I:SOQUAL-F.Coliform", "  ImpervSurf")
                     .Add("R:Header3", "F.Coliform (10^9 org)")
@@ -986,5 +1005,197 @@ Public Module Utility
             End If
         Next
         Return lLUCombined
+    End Function
+
+    Public Function FindMassLinkFactor(ByVal aUCI As HspfUci, ByVal aMassLink As Integer, ByVal aConstituent As String, _
+                                               ByVal aBalanceType As String, ByVal aConversionFactor As Double, ByVal aMultipleIndex As Integer) As Double
+        Dim lMassLinkFactor As Double = 0.0
+        For Each lMassLink As HspfMassLink In aUCI.MassLinks
+
+            If lMassLink.MassLinkId = aMassLink Then
+
+                Select Case aBalanceType
+                    Case "Sediment"
+                        Select Case aConstituent & "_" & lMassLink.Source.Member.ToString & "_" & lMassLink.Target.Member.ToString
+                            Case "WSSD_WSSD_ISED", "WSSD_SOSED_ISED", "SCRSD_SCRSD_ISED", "SCRSD_SOSED_ISED", "SOSLD_ISED"
+                                lMassLinkFactor += lMassLink.MFact
+                        End Select
+                    Case "Water"
+                        If (lMassLink.Source.Member = "PERO" Or lMassLink.Source.Member = aConstituent) _
+                            And lMassLink.Target.Member = "IVOL" Then
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        End If
+
+                    Case "TotalN"
+
+                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
+                            "_" & lMassLink.Target.MemSub1
+                            Case "NO3+NO2-N - SURFACE LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - UPPER LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - GROUNDWATER OUTFLOW_NUIF1_1", _
+                                "NO3-N - TOTAL OUTFLOW_NUIF1_1"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW_NUIF1_2", "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW_NUIF1_2", _
+                                "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW_NUIF1_2"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "NH4-N ADS - SEDIMENT ASSOC OUTFLOW_NUIF2_1"
+                                If lMassLink.Target.MemSub2 = 1 Then
+                                    lMassLinkFactor += lMassLink.MFact
+                                End If
+                            Case "NH4-N ADS - SEDIMENT ASSOC OUTFLOW_NUIF2_2"
+                                If lMassLink.Target.MemSub2 = 1 Then
+                                    lMassLinkFactor += lMassLink.MFact
+                                End If
+                            Case "NH4-N ADS - SEDIMENT ASSOC OUTFLOW_NUIF2_3"
+                                If lMassLink.Target.MemSub2 = 1 Then
+                                    lMassLinkFactor += lMassLink.MFact
+                                End If
+
+                            Case "POQUAL-NH3+NH4_NUIF1_2", "SOQUAL-NH3+NH4_NUIF1_2", "AOQUAL-NH3+NH4_NUIF1_2", "IOQUAL-NH3+NH4_NUIF1_2"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                                    lMassLinkFactor = lMassLink.MFact
+                                    Return lMassLinkFactor
+                                End If
+
+                                
+                            Case "POQUAL-NO3_NUIF1_1", "SOQUAL-NO3_NUIF1_1", "IOQUAL-NO3_NUIF1_1", "AOQUAL-NO3_NUIF1_1"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                                    lMassLinkFactor = lMassLink.MFact
+                                    Return lMassLinkFactor
+                                End If
+                            Case "WASHQS-BOD_PKIF_3", "SOQUAL-BOD_PKIF_3", "IOQUAL-BOD_PKIF_3", "AOQUAL-BOD_PKIF_3", "POQUAL-BOD_PKIF_3"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                                    If aMultipleIndex = 1 Then
+                                        lMassLinkFactor = lMassLink.MFact
+                                    ElseIf aMultipleIndex = 2 Then
+                                        lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
+                                    ElseIf aMultipleIndex = 0 Then
+                                        lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
+                                    End If
+                                    Return lMassLinkFactor
+
+                                End If
+
+                            Case "ORGN - TOTAL OUTFLOW_PKIF_3"
+                                If aMultipleIndex = 2 Then
+                                    lMassLinkFactor = lMassLink.MFact
+                                ElseIf aMultipleIndex = 1 Then
+                                    lMassLinkFactor = 1 - lMassLink.MFact
+                                ElseIf aMultipleIndex = 0 Then
+                                    lMassLinkFactor = 1
+                                End If
+                                Return lMassLinkFactor
+                            Case "LABILE ORGN - SEDIMENT ASSOC OUTFLOW_PKIF_3", "REFRAC ORGN - SEDIMENT ASSOC OUTFLOW_PKIF_3"
+                                If aConstituent.Contains("REFRAC") Then
+                                    lMassLinkFactor = 0
+                                Else
+                                    lMassLinkFactor = 0
+                                End If
+                                Return lMassLinkFactor
+                        End Select
+                        If aConstituent.Contains("NITROGEN - TOTAL OUTFLOW") Then
+                            lMassLinkFactor = 1
+                            Return lMassLinkFactor
+
+                        End If
+
+
+                    Case "TotalP"
+                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
+                            "_" & lMassLink.Target.MemSub1
+                            Case "POQUAL-ORTHO P_NUIF1_4", "SOQUAL-ORTHO P_NUIF1_4", "IOQUAL-ORTHO P_NUIF1_4", "AOQUAL-ORTHO P_NUIF1_4"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                                    lMassLinkFactor = lMassLink.MFact
+                                    Return lMassLinkFactor
+                                End If
+
+                            Case "WASHQS-BOD_PKIF_4", "SOQUAL-BOD_PKIF_4", "IOQUAL-BOD_PKIF_4", "AOQUAL-BOD_PKIF_4", "POQUAL-BOD_PKIF_4"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                                    If aMultipleIndex = 1 Then
+                                        lMassLinkFactor = lMassLink.MFact
+                                    ElseIf aMultipleIndex = 2 Then
+                                        lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
+                                    ElseIf aMultipleIndex = 0 Then
+                                        lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
+                                    End If
+                                    Return lMassLinkFactor
+                                End If
+                                
+
+                            Case "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW_NUIF1_4"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW_NUIF1_4"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW_NUIF1_4"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "SDP4A_NUIF2_1", "SDP4A_NUIF2_2", "SDP4A_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_1", _
+                                "SOQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_3"
+                                If lMassLink.Target.MemSub2 = 2 Then
+                                    lMassLinkFactor += lMassLink.MFact
+                                End If
+
+                            Case "SDORP_PKIF_4"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "ORGN - TOTAL OUTFLOW_OXIF_2"
+                                lMassLinkFactor = lMassLink.MFact * aConversionFactor
+                                Return lMassLinkFactor
+                            
+                        End Select
+
+                End Select
+
+
+            End If
+
+        Next
+
+        Return lMassLinkFactor
+
+
+    End Function
+    Public Function BODMFact(ByVal aUCI As HspfUci, ByVal aconstituent As String, ByVal aMassLinkID As Integer) As Double
+        For Each lMasslink As HspfMassLink In aUCI.MassLinks
+            If lMasslink.MassLinkId = aMassLinkID AndAlso _
+                (lMasslink.Source.Member.Substring(0, 2) = "PO" Or lMasslink.Source.Member.Substring(0, 2) = aconstituent.Substring(0, 2)) AndAlso _
+                lMasslink.Target.Member = "OXIF" AndAlso _
+                lMasslink.Target.MemSub1 = 2 Then
+                Return lMasslink.MFact
+
+            End If
+        Next lMasslink
+    End Function
+
+    Public Function ConversionFactorfromOxygen(ByVal aUCI As HspfUci, ByVal aBalanceType As String, ByVal aReach As HspfOperation) As Double
+        Dim aConversionFactorFromOxygen As Double = 0.0
+        Dim lOperationIndex As Integer = aUCI.OpnSeqBlock.Opns.IndexOf(aReach)
+        Dim CVBO As Double = aUCI.OpnSeqBlock.Opns(lOperationIndex).Tables("CONV-VAL1").Parms("CVBO").Value
+        'conversion from mg biomass to mg oxygen
+        Dim CVBPC As Double = aUCI.OpnSeqBlock.Opns(lOperationIndex).Tables("CONV-VAL1").Parms("CVBPC").Value
+        'conversion from biomass expressed as P to C = ratio of moles of C to moles of P in biomass		
+        Dim CVBPN As Double = aUCI.OpnSeqBlock.Opns(lOperationIndex).Tables("CONV-VAL1").Parms("CVBPN").Value
+        'conversion from biomass expressed as P to N = ratio of moles of N to moles of P in biomass		
+        Dim BPCNTC As Double = aUCI.OpnSeqBlock.Opns(lOperationIndex).Tables("CONV-VAL1").Parms("BPCNTC").Value
+        'conversion from biomass expressed as P to N = ratio of moles of N to moles of P in biomass		
+        Dim CVBN As Double = 14 * CVBPN * BPCNTC / 1200 / CVBPC
+        'conversion from biomass to N
+        Dim CVON As Double = CVBN / CVBO
+        'conversion from oxygen to N
+        Dim CVBP As Double = 31 * BPCNTC / 1200 / CVBPC
+        'conversion from biomass to P
+        Dim CVOP As Double = CVBP / CVBO
+        If aBalanceType = "TotalN" Then
+            aConversionFactorFromOxygen = CVON
+        ElseIf aBalanceType = "TotalP" Then
+            aConversionFactorFromOxygen = CVOP
+        End If
+
+        Return aConversionFactorFromOxygen
+
+
     End Function
 End Module
