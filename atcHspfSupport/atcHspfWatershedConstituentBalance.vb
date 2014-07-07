@@ -2,6 +2,7 @@ Imports atcUtility
 Imports atcData
 Imports MapWinUtility
 Imports System.Collections.ObjectModel
+Imports atcUCI
 
 ''' <summary>
 ''' Build watershed constituent balance reports
@@ -396,67 +397,51 @@ Public Module WatershedConstituentBalance
                                         lFieldIndex = 1
                                         Dim lSomeLocationHasData As Boolean = False
 
+                                       
                                         For Each lLocation As String In lLandUseOperations.Keys
                                             'lLocation e.g. R:69
                                             Dim lLocationDataGroup As atcTimeseriesGroup = lConstituentDataGroup.FindData("Location", lLocation)
                                             If lLocationDataGroup.Count > 0 Then
                                                 lSomeLocationHasData = True
                                                 lTempDataSet = lLocationDataGroup.Item(0)
+                                                Dim lOperation As HspfOperation = aUci.OpnBlks(lOperationType).OperFromID(lLocation.Substring(2))
                                                 Dim lMult As Double = 1.0
-                                                Select Case lConstituentDataName
-                                                    Case "POQUAL-BOD", "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD", "WASHQS-BOD"
-                                                        'might need another multiplier for bod
-                                                        If aBalanceType = "BOD" Then
-                                                            lMult = 0.4
-                                                        ElseIf aBalanceType = "OrganicN" Or aBalanceType = "TotalN" Then
-                                                            If lMultipleIndex = 1 Then
-                                                                lMult = 0.048
-                                                            ElseIf lMultipleIndex = 2 Then
-                                                                lMult = 0.021176 'obtained by multiplying 0.4 to 0.05294
+                                                Dim lMassLinkID As Integer = 0
+                                                Dim lMassLinkFactor As Double = 0
+                                                Dim lTotalLoad As Double = 0.0
+                                                Dim lTotalArea As Double = 0.0
+                                                Dim MassLinkExists As Boolean = True
+
+                                                If ConstituentsThatNeedMassLink.Contains(lConstituentKey) Then
+                                                    For Each lConnection As HspfConnection In lOperation.Targets
+
+                                                        If lConnection.Target.VolName = "RCHRES" Then
+                                                            Dim aReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
+                                                            Dim aConversionFactor As Double = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
+                                                            lMassLinkID = lConnection.MassLink
+
+                                                            If Not lMassLinkID = 0 Then
+
+                                                                lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentKey.ToUpper, aBalanceType, _
+                                                                                               aConversionFactor, lMultipleIndex)
+                                                            Else
+                                                                MassLinkExists = False
                                                             End If
-                                                        ElseIf aBalanceType = "OrganicP" Or aBalanceType = "TotalP" Then
-                                                            If lMultipleIndex = 1 Then
-                                                                lMult = 0.0023
-                                                            ElseIf lMultipleIndex = 2 Then
-                                                                lMult = 0.0029304
-                                                                'obtained by multiplying 0.4 to 0.007326
+                                                            Dim lArea As Double = lConnection.MFact
+                                                            If lArea = 0 Then
+                                                                lArea = 0.0000000001
                                                             End If
-                                                        End If
-                                                    Case "ORGN - TOTAL OUTFLOW"
-                                                        lMult = 1
-                                                        If lConstituentsToOutput(lConstituentIndex).Contains("  BOD from OrganicN") Then
-                                                            lMult = 7.555
-                                                            'When BOD is calculated for the PERLND that have AGCHEM active, the Organic N is used as 
-                                                            'as a surrogate.   The labile Organic N is converted to BOD using CVON and 40% labile fraction (factor
-                                                            ' = 0.4 / CVON = 0.4 / 0.052945)
-                                                            'The BOD calculation for when then AGCHEM is active or not active needs to be more formalized
-                                                        End If
-                                                        If lConstituentsToOutput(lConstituentIndex).Contains("    Refractory N as fraction of TORN") Then
-                                                            lMult = 0.6
-                                                            'In IRW Project, the refractory Organic N was calculated as a fraction of TORN. 
-                                                        End If
-                                                        If lConstituentsToOutput(lConstituentIndex).Contains("    Labile N as fraction of TORN") Then
-                                                            lMult = 0.4
-                                                            'In IRW Project, the refractory Organic N was calculated as a fraction of TORN. 
-                                                        End If
-                                                        If lConstituentsToOutput(lConstituentIndex).Contains("    Labile Org P from POORN") Then
-                                                            lMult = 0.05534793
-                                                            'In IRW Project, this number is calculated as 7.555 * 0.007326
+                                                            lTotalLoad += lArea * lMassLinkFactor
+                                                            lTotalArea += lArea
                                                         End If
 
+                                                    Next
 
-                                                    Case "LABILE ORGN - SEDIMENT ASSOC OUTFLOW"
-                                                        lMult = 0
-                                                    Case "SDORP"
-                                                        lMult = 1
-                                                        
-                                                        If lConstituentsToOutput(lConstituentIndex).Contains("    Refractory Org P from SEDP 1") Then
-                                                            lMult = 0.6
-                                                            'In IRW Project, Refractory organic P was calculated as a fraction of TORP
-                                                        End If
+                                                    lMult = lTotalLoad / lTotalArea
 
 
-                                                End Select
+                                                End If
+
 
                                                 If aBalanceType = "FColi" Then
                                                     lMult = 1 / 1000000000.0 '10^9
