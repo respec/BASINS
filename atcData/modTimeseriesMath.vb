@@ -214,6 +214,57 @@ Public Module modTimeseriesMath
 
     ''' <summary>Merge a group of atcTimeseries</summary>
     ''' <param name="aGroup">Group of atcTimeseries to merge</param>
+    ''' <param name="aSkipMissing">True to skip missing values, False to include missing values in result</param>
+    ''' <returns>atcTimeseries containing all unique dates from the group</returns>
+    ''' <remarks>Each atcTimeseries in aGroup is assumed to be in order by date within itself.
+    ''' If duplicate dates exist in aGroup, some values will be left out of result.</remarks>
+    Public Function MergeTimeseries(ByVal aGroup As atcTimeseriesGroup, _
+                                    ByVal aSkipMissing As Boolean, _
+                                    ByVal aAverageAtSameDate As Boolean) As atcTimeseries
+        Dim lNewTS As New atcTimeseries(Nothing) 'will contain new (merged) dates
+        If aGroup IsNot Nothing AndAlso aGroup.Count > 0 Then
+            lNewTS.Dates = MergeDates(aGroup, aSkipMissing)
+            Dim lTotalNumValues As Long = lNewTS.Dates.numValues
+            lNewTS.numValues = lTotalNumValues
+            lNewTS.Value(0) = pNaN
+
+            Dim lOldTS As atcTimeseries 'points to current timeseries from aGroup
+            Dim lMaxGroupIndex As Integer = aGroup.Count - 1
+            Dim lNextIndex() As Integer
+
+            ReDim lNextIndex(aGroup.Count - 1)
+
+            For lIndex As Integer = 0 To lMaxGroupIndex
+                lNextIndex(lIndex) = 1
+            Next
+
+            MergeAttributes(aGroup, lNewTS)
+            Dim lNumToAverage As Integer = 0
+            For lNewIndex As Integer = 1 To lTotalNumValues
+                Dim lCurrentDate As Double = lNewTS.Dates.Value(lNewIndex)
+                lNumToAverage = 0
+                For lIndex As Integer = 0 To lMaxGroupIndex
+                    lOldTS = aGroup.Item(lIndex)
+                    While lOldTS.Dates.Value(lNextIndex(lIndex)) + JulianMillisecond > lCurrentDate
+                        lNumToAverage += 1
+                        If lNumToAverage = 1 OrElse Not aAverageAtSameDate Then
+                            lNewTS.Value(lNewIndex) = lOldTS.Value(lNextIndex(lIndex))
+                        Else
+                            lNewTS.Value(lNewIndex) += lOldTS.Value(lNextIndex(lIndex))
+                        End If
+                        lNextIndex(lIndex) += 1
+                    End While
+                Next
+                If aAverageAtSameDate AndAlso lNumToAverage > 1 Then
+                    lNewTS.Value(lNewIndex) /= lNumToAverage
+                End If
+            Next
+        End If
+        Return lNewTS
+    End Function
+
+    ''' <summary>Merge a group of atcTimeseries</summary>
+    ''' <param name="aGroup">Group of atcTimeseries to merge</param>
     ''' <param name="aFilterNoData">True to skip missing values, False to include missing values in result</param>
     ''' <returns>atcTimeseries containing all unique dates from the group</returns>
     ''' <remarks>Each atcTimeseries in aGroup is assumed to be in order by date within itself.
