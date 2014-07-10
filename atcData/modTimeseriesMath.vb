@@ -245,7 +245,7 @@ Public Module modTimeseriesMath
                 lNumToAverage = 0
                 For lIndex As Integer = 0 To lMaxGroupIndex
                     lOldTS = aGroup.Item(lIndex)
-                    While lOldTS.Dates.Value(lNextIndex(lIndex)) + JulianMillisecond > lCurrentDate
+                    While lNextIndex(lIndex) <= lOldTS.numValues AndAlso lOldTS.Dates.Value(lNextIndex(lIndex)) - JulianMillisecond < lCurrentDate
                         lNumToAverage += 1
                         If lNumToAverage = 1 OrElse Not aAverageAtSameDate Then
                             lNewTS.Value(lNewIndex) = lOldTS.Value(lNextIndex(lIndex))
