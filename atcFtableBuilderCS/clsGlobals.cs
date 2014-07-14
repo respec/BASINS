@@ -8,6 +8,12 @@ namespace atcFtableBuilder
 {
     public class clsGlobals
     {
+        public enum ToolType
+        {
+            Gray, Green
+        }
+
+        public static ToolType gToolType = ToolType.Green;
         public static FTableCalculator gCalculator = null;
 
         //Default values for various channel types
