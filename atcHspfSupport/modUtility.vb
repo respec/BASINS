@@ -1111,7 +1111,7 @@ Public Module Utility
                                 End If
 
                             Case "WASHQS-BOD_PKIF_4", "SOQUAL-BOD_PKIF_4", "IOQUAL-BOD_PKIF_4", "AOQUAL-BOD_PKIF_4", "POQUAL-BOD_PKIF_4"
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                                If (lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL") Then
                                     If aMultipleIndex = 1 Then
                                         lMassLinkFactor = lMassLink.MFact
                                     ElseIf aMultipleIndex = 2 Then
