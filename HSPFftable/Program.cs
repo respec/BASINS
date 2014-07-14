@@ -15,6 +15,7 @@ namespace HSPFftable
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new frmChoice());
             Application.Run(new atcFtableBuilder.mainForm());
         }
     }
