@@ -1,9 +1,9 @@
 Imports atcUtility
 Imports atcData
-Imports atcWDM
+'Imports atcWDM
 Imports atcGraph
-Imports atcBasinsObsWQ
-Imports MapWindow.Interfaces
+'Imports atcBasinsObsWQ
+'Imports MapWindow.Interfaces
 Imports ZedGraph
 Imports MapWinUtility
 Imports System
@@ -73,7 +73,7 @@ Public Class atcExpertSystem
 
             For Each line As String In lines
                 If Not line.Contains("***") Then
-                    lExsRecords.Add(line)
+                    lExsRecords.Add(RTrim(line))
                 End If
             Next
 
@@ -226,69 +226,72 @@ Public Class atcExpertSystem
             ReDim pHSPFOutput2(8, Sites.Count)
             ReDim pHSPFOutput3(6, Sites.Count)
 
-            If Not (lExsRecords(lRecordIndex).Trim = "" Or _
-                    lExsRecords(lRecordIndex).Tolower.contains("seasons")) Then
+            If Not lRecordIndex >= lExsRecords.Count Then
 
-                'If no text is found in lines after the error criteria, HSPEXP can still work.
-                For lSiteIndex As Integer = 0 To Sites.Count - 1
-                    lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-                    For lIndex As Integer = 0 To 7
-                        pHSPFOutput1(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-                    Next lIndex
+                If Not (lRecordIndex >= lExsRecords.Count Or lExsRecords(lRecordIndex).Trim = "" Or _
+                        lExsRecords(lRecordIndex).Tolower.contains("seasons")) Then
+
+                    'If no text is found in lines after the error criteria, HSPEXP can still work.
+                    For lSiteIndex As Integer = 0 To Sites.Count - 1
+                        lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                        For lIndex As Integer = 0 To 7
+                            pHSPFOutput1(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+                        Next lIndex
+                        lRecordIndex += 1
+                        lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+
+                        For lIndex As Integer = 0 To 7
+                            pHSPFOutput2(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+                        Next lIndex
+                        lRecordIndex += 1
+                        lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                        For lIndex As Integer = 0 To 5
+                            pHSPFOutput3(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+                        Next lIndex
+                        lRecordIndex += 1
+                    Next lSiteIndex
+                End If
+                'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
+                lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                If Not (lExsRecords(lRecordIndex).Trim = "" Or _
+                        lExsRecords(lRecordIndex).Tolower.contains("seasons")) Then
+
+                    lExsRecord = Trim(lExsRecord.Replace(vbCrLf, "")) & "  " & Trim(lExsRecords(lRecordIndex + 1))
+                    lExsRecord = lExsRecord.Replace("  ", ",")
+                    Dim pSubjectiveDataStr() As String = lExsRecord.Split(",")
+                    pSubjectiveData = Array.ConvertAll(pSubjectiveDataStr, Function(str) Int32.Parse(str))
+                    lRecordIndex += 2
+                    'For lIndex As Integer = 0 To 19
+                    '    pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
+                    'Next lIndex
+                    'lRecordIndex += 1
+                    'lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                    'For lIndex As Integer = 20 To 22
+                    '    pSubjectiveData(lIndex + 1) = lExsRecord.Substring((lIndex - 20) * 4, 4)
+                    'Next lIndex
+                End If
+
+                '  'Change subjective data based on other data
+                '  If (SISTVO(CURSIT) > OBSTVO(CURSIT)) Then
+                '    'Simulated storm runoff volumes higher than obs
+                '    SISROV = 1
+                '  ElseIf (SISTVO(CURSIT) < OBSTVO(CURSIT)) Then
+                '    'Simulated storm runoff volumes lower than obs
+                '    SISROV = 0
+                '  End If
+
+                If lExsRecords.Count > lRecordIndex AndAlso lExsRecords(lRecordIndex).tolower.contains("seasons") Then
                     lRecordIndex += 1
-                    lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-
-                    For lIndex As Integer = 0 To 7
-                        pHSPFOutput2(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-                    Next lIndex
+                    Dim Months() As String = lExsRecords(lRecordIndex).split(",")
+                    pSummerMonths = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
                     lRecordIndex += 1
-                    lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-                    For lIndex As Integer = 0 To 5
-                        pHSPFOutput3(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-                    Next lIndex
-                    lRecordIndex += 1
-                Next lSiteIndex
-            End If
-            'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
-            lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-            If Not (lExsRecords(lRecordIndex).Trim = "" Or _
-                    lExsRecords(lRecordIndex).Tolower.contains("seasons")) Then
+                    Months = lExsRecords(lRecordIndex).split(",")
+                    pWinterMonths = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
 
-                lExsRecord = Trim(lExsRecord.Replace(vbCrLf, "")) & "  " & Trim(lExsRecords(lRecordIndex + 1))
-                lExsRecord = lExsRecord.Replace("  ", ",")
-                Dim pSubjectiveDataStr() As String = lExsRecord.Split(",")
-                pSubjectiveData = Array.ConvertAll(pSubjectiveDataStr, Function(str) Int32.Parse(str))
-                lRecordIndex += 2
-                'For lIndex As Integer = 0 To 19
-                '    pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
-                'Next lIndex
-                'lRecordIndex += 1
-                'lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-                'For lIndex As Integer = 20 To 22
-                '    pSubjectiveData(lIndex + 1) = lExsRecord.Substring((lIndex - 20) * 4, 4)
-                'Next lIndex
-            End If
-
-            '  'Change subjective data based on other data
-            '  If (SISTVO(CURSIT) > OBSTVO(CURSIT)) Then
-            '    'Simulated storm runoff volumes higher than obs
-            '    SISROV = 1
-            '  ElseIf (SISTVO(CURSIT) < OBSTVO(CURSIT)) Then
-            '    'Simulated storm runoff volumes lower than obs
-            '    SISROV = 0
-            '  End If
-
-            If lExsRecords.Count > lRecordIndex AndAlso lExsRecords(lRecordIndex).tolower.contains("seasons") Then
+                End If
                 lRecordIndex += 1
-                Dim Months() As String = lExsRecords(lRecordIndex).split(",")
-                pSummerMonths = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
-                lRecordIndex += 1
-                Months = lExsRecords(lRecordIndex).split(",")
-                pWinterMonths = Array.ConvertAll(Months, Function(str) Int32.Parse(str))
 
             End If
-            lRecordIndex += 1
-
         End If
         'pErrorCriteria.Edit()
     End Sub
