@@ -412,12 +412,15 @@ Public Module WatershedConstituentBalance
                                                 Dim lTotalArea As Double = 0.0
                                                 Dim MassLinkExists As Boolean = True
 
-                                                If ConstituentsThatNeedMassLink.Contains(lConstituentKey) Then
+                                                If ConstituentsThatNeedMassLink.Contains(lConstituentKey.ToUpper) Then
                                                     For Each lConnection As HspfConnection In lOperation.Targets
 
                                                         If lConnection.Target.VolName = "RCHRES" Then
                                                             Dim aReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
-                                                            Dim aConversionFactor As Double = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
+                                                            Dim aConversionFactor As Double = 0.0
+                                                            If aBalanceType = "TotalN" Or aBalanceType = "TotalN" Then
+                                                                aConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
+                                                            End If
                                                             lMassLinkID = lConnection.MassLink
 
                                                             If Not lMassLinkID = 0 Then
@@ -546,8 +549,8 @@ Public Module WatershedConstituentBalance
 
                                     ElseIf lConstituentKey.StartsWith("Total") AndAlso _
                                          lConstituentKey.Length > 5 AndAlso _
-                                         IsNumeric(lConstituentKey.Substring(5)) Then
-                                        Dim lTotalCount As Integer = lConstituentKey.Substring(5)
+                                         IsNumeric(lConstituentKey.Substring(5, 1)) Then
+                                        Dim lTotalCount As Integer = lConstituentKey.Substring(5, 1)
                                         Dim lCurFieldValues(.NumFields) As Double
                                         Dim lCurrentRecordSave As Integer = .CurrentRecord
                                         For lCount As Integer = 1 To lTotalCount
