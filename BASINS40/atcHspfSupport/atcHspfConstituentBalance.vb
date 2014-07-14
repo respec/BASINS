@@ -176,17 +176,22 @@ Public Module ConstituentBalance
                                         Dim lTotalArea As Double = 0.0
                                         Dim MassLinkExists As Boolean = True
 
-                                        If ConstituentsThatNeedMassLink.Contains(lConstituentDataName) Then
+                                        If ConstituentsThatNeedMassLink.Contains(lConstituentDataName.ToUpper) Then
+
                                             For Each lConnection As HspfConnection In lOperation.Targets
 
                                                 If lConnection.Target.VolName = "RCHRES" Then
                                                     Dim aReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
-                                                    Dim aConversionFactor As Double = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
+                                                    Dim aConversionFactor As Double = 0.0
+                                                    If aBalanceType = "TotalN" Or aBalanceType = "TotalN" Then
+                                                        aConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
+                                                    End If
+
                                                     lMassLinkID = lConnection.MassLink
 
                                                     If Not lMassLinkID = 0 Then
 
-                                                        lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentKey.ToUpper, aBalanceType, _
+                                                        lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentDataName.ToUpper, aBalanceType, _
                                                                                        aConversionFactor, lMultipleIndex)
                                                     Else
                                                         MassLinkExists = False
