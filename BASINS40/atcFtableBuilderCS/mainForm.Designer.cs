@@ -42,7 +42,6 @@
             this.btnCalcFtable = new System.Windows.Forms.Button();
             this.btnHelp = new System.Windows.Forms.Button();
             this.gbChannel = new System.Windows.Forms.GroupBox();
-            this.bmpSketch1 = new atcFtableBuilder.BMPSketch();
             this.rdoChNatural = new System.Windows.Forms.RadioButton();
             this.rdoChPara = new System.Windows.Forms.RadioButton();
             this.rdoChTrape = new System.Windows.Forms.RadioButton();
@@ -89,6 +88,8 @@
             this.lblGeomMannN = new System.Windows.Forms.Label();
             this.lblGeomLength = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.rdoChNaturalFP = new System.Windows.Forms.RadioButton();
+            this.bmpSketch1 = new atcFtableBuilder.BMPSketch();
             this.frameTop.SuspendLayout();
             this.gbChannel.SuspendLayout();
             this.gbInputData.SuspendLayout();
@@ -217,6 +218,7 @@
             // 
             this.gbChannel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbChannel.Controls.Add(this.rdoChNaturalFP);
             this.gbChannel.Controls.Add(this.bmpSketch1);
             this.gbChannel.Controls.Add(this.rdoChNatural);
             this.gbChannel.Controls.Add(this.rdoChPara);
@@ -230,15 +232,6 @@
             this.gbChannel.TabIndex = 3;
             this.gbChannel.TabStop = false;
             this.gbChannel.Text = "Choose Channel Type";
-            // 
-            // bmpSketch1
-            // 
-            this.bmpSketch1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.bmpSketch1.Location = new System.Drawing.Point(3, 42);
-            this.bmpSketch1.Name = "bmpSketch1";
-            this.bmpSketch1.Size = new System.Drawing.Size(787, 77);
-            this.bmpSketch1.TabIndex = 6;
-            this.bmpSketch1.MouseHover += new System.EventHandler(this.bmpSketch1_MouseHover);
             // 
             // rdoChNatural
             // 
@@ -685,6 +678,26 @@
             this.lblGeomLength.TabIndex = 0;
             this.lblGeomLength.Text = "Length:";
             // 
+            // rdoChNaturalFP
+            // 
+            this.rdoChNaturalFP.AutoSize = true;
+            this.rdoChNaturalFP.Location = new System.Drawing.Point(587, 19);
+            this.rdoChNaturalFP.Name = "rdoChNaturalFP";
+            this.rdoChNaturalFP.Size = new System.Drawing.Size(155, 17);
+            this.rdoChNaturalFP.TabIndex = 7;
+            this.rdoChNaturalFP.TabStop = true;
+            this.rdoChNaturalFP.Text = "NATURAL (with flood plain)";
+            this.rdoChNaturalFP.UseVisualStyleBackColor = true;
+            // 
+            // bmpSketch1
+            // 
+            this.bmpSketch1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.bmpSketch1.Location = new System.Drawing.Point(3, 42);
+            this.bmpSketch1.Name = "bmpSketch1";
+            this.bmpSketch1.Size = new System.Drawing.Size(787, 77);
+            this.bmpSketch1.TabIndex = 6;
+            this.bmpSketch1.MouseHover += new System.EventHandler(this.bmpSketch1_MouseHover);
+            // 
             // mainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -774,5 +787,6 @@
         private atcControls.atcGrid grdChProfile;
         private BMPSketch bmpSketch1;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.RadioButton rdoChNaturalFP;
     }
 }

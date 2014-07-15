@@ -111,6 +111,7 @@
     <Compile Include="frmInfiltration.Designer.cs">
       <DependentUpon>frmInfiltration.cs</DependentUpon>
     </Compile>
+    <Compile Include="FTableCalcNaturalFP.cs" />
     <Compile Include="FTableCalcOCWeirBroad.cs" />
     <Compile Include="FTableCalcOCWeirTrapeCipolletti.cs" />
     <Compile Include="FTableCalcOCWeirRectangular.cs" />

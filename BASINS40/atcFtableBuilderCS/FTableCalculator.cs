@@ -97,7 +97,8 @@ namespace atcFtableBuilder
 
         public enum ChannelGeomInput
         {
-            Length, Width, TopWidth, Depth, MaximumDepth, Diameter, LongitudinalSlope, SideSlope, HeightIncrement, ManningsN, Profile
+            Length, Width, TopWidth, Depth, MaximumDepth, Diameter, LongitudinalSlope, SideSlope, HeightIncrement, ManningsN, Profile, 
+            NFP_ChannelLength, NFP_BankLeftLength, NFP_BankRightLength, NFP_ChannelManningsN, NFP_BankLeftManningsN, NFP_BankRightManningsN
         }
 
         //User interface should use these texts as TextBox control's name for easy data retrieval
@@ -111,7 +112,13 @@ namespace atcFtableBuilder
            {ChannelGeomInput.LongitudinalSlope, "Longitudinal Slope (ft/ft),txtGeomLSlope"},
            {ChannelGeomInput.SideSlope,         "Side Slope (H:V),txtGeomSideSlope"},
            {ChannelGeomInput.HeightIncrement,   "Height Increment,txtGeomHInc"},
-           {ChannelGeomInput.ManningsN,         "Manning's N,txtGeomMannN"}
+           {ChannelGeomInput.ManningsN,         "Manning's N,txtGeomMannN"},
+           {ChannelGeomInput.NFP_ChannelManningsN,      "Channel Manning's N,txtGeomNFP_ChMannN"},
+           {ChannelGeomInput.NFP_BankLeftManningsN,      "Left Bank Manning's N,txtGeomNFP_LOBMannN"},
+           {ChannelGeomInput.NFP_BankRightManningsN,     "Right Bank Manning's N,txtGeomNFP_ROBMannN"},
+           {ChannelGeomInput.NFP_ChannelLength,         "Channel Length,txtGeomNFP_ChLength"},
+           {ChannelGeomInput.NFP_BankLeftLength,         "Left Bank Length,txtGeomNFP_LOBLength"},
+           {ChannelGeomInput.NFP_BankRightLength,        "Right Bank Length,txtGeomNFP_ROBLength"}
         };
         public string[] geomInputLongNames;
         public ChannelGeomInput[] geomInputs;
