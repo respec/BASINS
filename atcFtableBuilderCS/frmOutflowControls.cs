@@ -244,6 +244,36 @@ namespace atcFtableBuilder
             chkOCOrificeUnd.Checked=   clsGlobals.gOCSelectedOrificeUnd;
             chkOCOrificeRiser.Checked = clsGlobals.gOCSelectedOrificeRiser;
 
+            if (chkOCWeirTri.Checked)
+                chkOCWeirTri.Parent.BackColor = Color.DarkGray;
+            else
+                chkOCWeirTri.Parent.BackColor = Control.DefaultBackColor;
+
+            if (chkOCWeirTrape.Checked)
+                chkOCWeirTrape.Parent.BackColor = Color.DarkGray;
+            else
+                chkOCWeirTrape.Parent.BackColor = Control.DefaultBackColor;
+
+            if (chkOCWeirBroad.Checked)
+                chkOCWeirBroad.Parent.BackColor = Color.DarkGray;
+            else
+                chkOCWeirBroad.Parent.BackColor = Control.DefaultBackColor;
+
+            if (chkOCWeirRect.Checked)
+                chkOCWeirRect.Parent.BackColor = Color.DarkGray;
+            else
+                chkOCWeirRect.Parent.BackColor = Control.DefaultBackColor;
+
+            if (chkOCOrificeUnd.Checked)
+                chkOCOrificeUnd.Parent.BackColor = Color.DarkGray;
+            else
+                chkOCOrificeUnd.Parent.BackColor = Control.DefaultBackColor;
+
+            if (chkOCOrificeRiser.Checked)
+                chkOCOrificeRiser.Parent.BackColor = Color.DarkGray;
+            else
+                chkOCOrificeRiser.Parent.BackColor = Control.DefaultBackColor;
+
             pLoaded = true;
         }
 

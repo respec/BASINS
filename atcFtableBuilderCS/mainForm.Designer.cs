@@ -173,7 +173,7 @@
             // btnShowOptControls
             // 
             this.btnShowOptControls.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnShowOptControls.Location = new System.Drawing.Point(169, 300);
+            this.btnShowOptControls.Location = new System.Drawing.Point(12, 300);
             this.btnShowOptControls.Name = "btnShowOptControls";
             this.btnShowOptControls.Size = new System.Drawing.Size(165, 23);
             this.btnShowOptControls.TabIndex = 2;
@@ -184,7 +184,7 @@
             // btnShowInfilCalc
             // 
             this.btnShowInfilCalc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnShowInfilCalc.Location = new System.Drawing.Point(5, 300);
+            this.btnShowInfilCalc.Location = new System.Drawing.Point(183, 300);
             this.btnShowInfilCalc.Name = "btnShowInfilCalc";
             this.btnShowInfilCalc.Size = new System.Drawing.Size(151, 23);
             this.btnShowInfilCalc.TabIndex = 1;
