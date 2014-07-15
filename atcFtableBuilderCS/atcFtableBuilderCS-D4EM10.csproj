@@ -129,6 +129,7 @@
     <Compile Include="FTableCalculatorConstants.cs" />
     <Compile Include="Infiltration_Calc.cs" />
     <Compile Include="FTableCalcNatural.cs" />
+    <Compile Include="FTableCalcNatural_Unused.cs" />
     <Compile Include="plotdata.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FTableCalcRec.cs" />

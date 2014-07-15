@@ -313,6 +313,7 @@ namespace atcFtableBuilder
         private void chkBackfill_CheckedChanged(object sender, EventArgs e)
         {
             if (!pLoaded) return;
+            clsGlobals.HasBackfill = chkBackfill.Checked;
             if (chkBackfill.Checked)
             {
                 txtBackfillDepth.Enabled = true;
@@ -550,6 +551,20 @@ namespace atcFtableBuilder
             ArrayList[] finalResults = FTableCalculatorConstants.modifyResultsToAccomodateControlStructures(colNames, lFtableResultChannel);
             colNames = finalResults[0];
             lFtableResultChannel = finalResults[1];
+
+            //Tong: backfill is checked already by this point and check if infiltration is done
+            double infilRate = 0;
+            if (clsGlobals.gToolType == clsGlobals.ToolType.Green && double.TryParse(txtInfilRate.Text, out infilRate))
+            {
+                double backfillDepth = double.Parse(txtBackfillDepth.Text);
+                double backfillPoros = double.Parse(txtBackfillPore.Text);
+                string lMsg;
+                finalResults = clsGlobals.gCalculator.modifyTableForInfiltration(lFtableResultChannel, colNames, backfillDepth, backfillPoros, infilRate, out lMsg);
+                colNames = finalResults[0];
+                lFtableResultChannel = finalResults[1];
+                lFTableGrid.FTableMessage = lMsg;
+            }
+
             if (newResultMessage.Equals(FTableCalculatorConstants.JTableNegativeValueMessage))
             {
                 //jTable.setVisible(false); //hide the jtable if negative results are present
@@ -939,9 +954,12 @@ namespace atcFtableBuilder
                 string lBMPName = FTableCalculator.BMPTypeNames[lBMPType];
                 if (lBMPName == lBMPNameSelected)
                 {
+                    clsGlobals.gBMPType = lBMPType;
                     FTableCalculator.ChannelType lChannelTypeMatch = FTableCalculator.LookupBMPTypeChannel[lBMPType];
                     switch (lChannelTypeMatch)
                     {
+                        case FTableCalculator.ChannelType.NONE:
+                            return;
                         case FTableCalculator.ChannelType.CIRCULAR:
                             rdoChCirc.Checked = true;
                             return;

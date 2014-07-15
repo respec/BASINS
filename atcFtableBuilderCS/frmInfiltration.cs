@@ -178,6 +178,11 @@ namespace atcFtableBuilder
             {
 
             }
+            else
+            {
+                //neither method is checked, problem
+                lInputsAreGood = false;
+            }
 
             if (!lInputsAreGood)
             {
