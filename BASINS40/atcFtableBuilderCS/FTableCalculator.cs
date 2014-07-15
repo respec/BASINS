@@ -32,6 +32,7 @@ namespace atcFtableBuilder
 
         public enum BMPType
         {
+           None,
            DryWell,
            InfiltrationTrench,
            InfiltrationBasin,
@@ -67,6 +68,7 @@ namespace atcFtableBuilder
         //public static string[] RiserOrificeUnits = { "", "", "" };
 
         public static Dictionary<BMPType, string> BMPTypeNames = new Dictionary<BMPType,string>() {
+            {BMPType.None, "None"},
             {BMPType.DryWell, "Dry Well"},
             {BMPType.InfiltrationBasin, "Infiltration Basin"},
             {BMPType.InfiltrationTrench, "Infiltration Trench"},
@@ -80,6 +82,7 @@ namespace atcFtableBuilder
         };
 
         public static Dictionary<BMPType, ChannelType> LookupBMPTypeChannel = new Dictionary<BMPType, ChannelType>() {
+            {BMPType.None, ChannelType.NONE},
             {BMPType.DryWell, ChannelType.RECTANGULAR},
             {BMPType.InfiltrationBasin, ChannelType.PARABOLIC},
             {BMPType.InfiltrationTrench, ChannelType.RECTANGULAR},
@@ -155,7 +158,7 @@ namespace atcFtableBuilder
                 double.TryParse(oldRowVector[0].ToString(), out currentDepth);
 
                 //go over each selected control device and find out if its depth is > the depth of the stream
-                //for (Enumeration e = controlDeviceVectors.keys();e.hasMoreElements();){
+                //for (Enumeration e = controlDeviceVectors.keys();e.hasMoreElements();)
 
                 // FTableCalculatorConstants.DepthCheckFinal=0;
                 foreach (FTableCalculator.ControlDeviceType lOCType in controlDeviceVectors.Keys)
@@ -236,6 +239,195 @@ namespace atcFtableBuilder
             {
                 return -999;
             }
+        }
+
+        //protected Vector[] modifyTableForInfiltration(Vector resultTable, Vector colNames)
+        public ArrayList[] modifyTableForInfiltration(ArrayList resultTable, ArrayList colNames, double aBackfillDepth, double aBackfillPorosity, double aInfiltrationRate, out string aMsg)
+        {
+            aMsg = "";
+            ArrayList[] retval = new ArrayList[2];
+            ArrayList newResultTable = (ArrayList)resultTable.Clone();
+            ArrayList newColNames = (ArrayList)colNames.Clone();
+            Double infiltrationConversion = 0.0;
+            if (FTableCalculatorConstants.programunits == 0)  //sri
+                infiltrationConversion = 1 / 36.0;
+            //infiltrationConversion = Math.pow(3600*100,-1);  //sri
+            // infiltrationConversion = 36*Math.pow(10,4);  //sri
+            if (FTableCalculatorConstants.programunits == 1)  //sri
+                infiltrationConversion = 1.008333;  // // acres * in/hr to cf/s
+
+            // if (resultTable.size()>1) 
+            int outflowIndx = -1;
+            int areaIndx = -1;
+            int volumeIndx = -1;
+            int depthIndx = -1;
+            for (int c = 0; c < colNames.Count; c++)
+            {
+                string name = ((string)colNames[c]).ToLower();
+                if (name.StartsWith("depth"))
+                {
+                    depthIndx = c;
+                }
+                else if (name.StartsWith("area"))
+                {
+                    areaIndx = c;
+                }
+                else if (name.StartsWith("volume"))
+                {
+                    volumeIndx = c;
+                }
+                else if (name.StartsWith("outflow"))
+                {
+                    outflowIndx = c;
+                }
+            }
+            if (resultTable.Count > 1)
+            {
+                // modify volume column if needed
+                if (clsGlobals.HasBackfill) //geoInput.isStructureHasFiltrate())
+                {
+                    double backfillDepth = aBackfillDepth;
+                    double backfillP = aBackfillPorosity;
+
+                    double depth = 0;
+                    double vol = 0;
+                    if (volumeIndx >= 0 && depthIndx >= 0 && backfillDepth > 0d)
+                    {
+                        // first we do the below substrate depths to pick up the max vol
+                        double maxVol = 0d;
+                        IEnumerator rows = newResultTable.GetEnumerator();
+                        while (rows.MoveNext())
+                        {
+                            ArrayList r = (ArrayList)rows.Current;
+                            if (r != null)
+                            {
+                                try
+                                {
+                                    double.TryParse((string)r[depthIndx], out depth);
+                                    if (depth <= backfillDepth)
+                                    {
+                                        // any depth below the filtrate depth gets reduced
+                                        // by the porosity of the filtrate
+                                        //double.TryParse((string)r[volumeIndx], out vol);
+                                        vol = double.Parse((string)r[volumeIndx]);
+                                        if (vol > maxVol)
+                                        {
+                                            maxVol = vol;
+                                        }
+                                        string lInfil = string.Format("{0:0.00000}", (vol * backfillP));
+                                        r[volumeIndx] = lInfil;
+                                    }
+                                }
+                                catch (FormatException nfe)
+                                {
+                                    continue;
+                                }
+                            }
+                        }
+                        // now we iterate again to modify volumes above substrate level
+                        double volSubstrate = maxVol * (1.0 - backfillP);
+                        rows = newResultTable.GetEnumerator();
+                        while (rows.MoveNext())
+                        {
+                            ArrayList r = (ArrayList)rows.Current;
+                            if (r != null)
+                            {
+                                try
+                                {
+                                    depth = double.Parse((string)r[depthIndx]);
+                                    if (depth > backfillDepth)
+                                    {
+                                        // depths above the substrate depth get reduced by the
+                                        // volume of all the substrate
+                                        // the volume of all substrate is capacity at
+                                        // highest substrate depth * (1-porosity)
+                                        double.TryParse((string)r[volumeIndx], out vol);
+                                        string lInfil = string.Format("{0:0.00000}", (vol - volSubstrate));
+                                        r[volumeIndx] = lInfil;
+                                    }
+                                }
+                                catch (FormatException nfe)
+                                {
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+                // now add infiltration column
+                double inRate = aInfiltrationRate; //geoInput.getInfiltrationRate();
+                double area = 0;
+                String[] units = {" (cms)"," (cfs)"};
+                if (inRate != Double.NaN || inRate >= 0)
+                {
+                    newColNames.Add("infiltration" + units[FTableCalculatorConstants.programunits]);
+                    IEnumerator rows = newResultTable.GetEnumerator();
+                    while (rows.MoveNext())
+                    {
+                        ArrayList r = (ArrayList)rows.Current;
+                        if (r != null)
+                        {
+                            try
+                            {
+                                area = double.Parse((string)r[areaIndx]);
+
+                                string lInfil = string.Format("{0:0.00000}", (area * inRate * infiltrationConversion));
+                                r.Add(lInfil);  //sri
+                                //r.add(String.format("%.6f", new Double((area * inRate * infiltrationConversion)/(Math.pow(10, 6)))));  //sri
+                            }
+                            catch (FormatException nfe)
+                            {
+                            }
+                        }
+                    }
+                }
+
+                // get the last row's volume, multiply by conversion, and set label text
+                ArrayList lastR = (ArrayList)newResultTable[newResultTable.Count - 1];
+                string volStr = (string)lastR[volumeIndx];
+                string[] uni = { "m", "ft" };
+                double[] convr = { Math.Pow(10, 6), 43560 };
+                double conv = convr[FTableCalculatorConstants.programunits];//FTableCalculatorConstants.Aunit;
+                try
+                {
+                    double vol = double.Parse(volStr);
+                    double maxVol = vol * conv;
+
+                    //capacitycft.setText(String.format(
+                    //        "<HTML><p>Maximum Storage Capacity: %1$,.0f " + uni[FTableCalculatorConstants.programunits] + "<sup>3</sup></p></HTML>",
+                    //        maxVol));
+
+                    string maxVolstring = string.Format("{0:#,##0}", (object)maxVol);
+                    string unit = FTableCalculatorConstants.UnitSystemLabels[0, FTableCalculatorConstants.programunits];
+                    unit = unit.Trim(new char[] { '(', ')' });
+                    aMsg = "Maximum Storage Capacity: " + maxVolstring + " " + unit + "^3";
+                }
+                catch (FormatException nfe)
+                {
+                }
+            } // if table has data
+
+            // remove outflow column if it's there
+            // we do this last so it doesn't change index numbers we've already
+            // determined
+
+            if (outflowIndx >= 0 && clsGlobals.gBMPType != BMPType.VegetatedSwale) //!currentBMPStr.equalsIgnoreCase("vegetated swale"))
+            {
+                newColNames.RemoveAt(outflowIndx);
+                IEnumerator rows = newResultTable.GetEnumerator();
+                while (rows.MoveNext())
+                {
+                    ArrayList r = (ArrayList)rows.Current;
+                    if (r != null)
+                    {
+                        r.RemoveAt(outflowIndx);
+                    }
+                }
+            }
+
+            retval[0] = newColNames;
+            retval[1] = newResultTable;
+            return retval;
         }
     }
 }

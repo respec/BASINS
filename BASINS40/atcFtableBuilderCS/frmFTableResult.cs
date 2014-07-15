@@ -324,17 +324,25 @@ namespace atcFtableBuilder
             grdFtableResult.SizeAllColumnsToContents();
             grdFtableResult.Refresh();
 
-            lblMessage.Text = "Note: " + FTableMessage;
+            if (string.IsNullOrEmpty(FTableMessage))
+            {
+                lblMessage.Text = "Note: " + FTableMessage;
 
-            //jTableMessageLabel.setText(newResultMessage);
-            //jTable.setVisible(true);
-            //// set the data vector in the jTable.    	   
-            //dfm.setDataVector(lFtableResultChannel, colNames);
+                //jTableMessageLabel.setText(newResultMessage);
+                //jTable.setVisible(true);
+                //// set the data vector in the jTable.    	   
+                //dfm.setDataVector(lFtableResultChannel, colNames);
 
-            string lMsg = "";
-            double lmaxVol = FTableCalculator.CalculateMaxVolume(FTableResults, out lMsg);
-            if (lmaxVol > 0)
-                lblMessage.Text = "Note:\n" + lMsg;
+                string lMsg = "";
+                double lmaxVol = FTableCalculator.CalculateMaxVolume(FTableResults, out lMsg);
+                if (lmaxVol > 0)
+                    lblMessage.Text = "Note:\n" + lMsg;
+            }
+            else
+            {
+                //this is for Green tool that has infiltration influenced maxVol that is preset
+                lblMessage.Text = FTableMessage;
+            }
 
             //modifyTableForInfiltration(data, colNames);
             //sri-09-11-2012

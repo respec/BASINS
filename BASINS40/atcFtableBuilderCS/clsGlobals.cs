@@ -72,9 +72,11 @@ namespace atcFtableBuilder
 			"Silty Clay",
 			"Clay" };
 
-        //Backfill
+        //Backfill for infiltration rate calculation
         public static double BackfillDepth = 0;
         public static double BackfillPorosity = 0.4;
+        public static bool HasBackfill = false;
+        public static FTableCalculator.BMPType gBMPType = FTableCalculator.BMPType.None;
 
         #region Outflow Control
         public static string[] gOCOrificeUnd = { "0", "0", "0" };
