@@ -8,13 +8,17 @@ namespace atcFtableBuilder
 {
     class FTableCalcNaturalFP : FTableCalculator, IFTableOperations
     {
+        public double inpChannelSlope;
         public double inpChannelLength;
         public double inpChannelManningsValue;
-        public double inpHeightIncrement;
+        public double inpBankLeftLength; //left bank downstream length i.e. LOB in original Java interface
+        public double inpBankRightLength; //right bank downstream lengt i.e. ROB in original Java interfaceh
+        public double inpBankLeftManningsValue;
+        public double inpBankRightManningsValue;
+        public double inpHeightIncrement = 0.5; //default to 0.5 in original Java
 
-        public double inpChannelSlope;
-        public double inpBankLeft; //left bank downstream length i.e. LOB in original Java interface
-        public double inpBankRight; //right bank downstream lengt i.e. ROB in original Java interfaceh
+        public double inpBankLeftStartingXCoord = 0;
+        public double inpBankRightEndingXCoord = -99;
 
         public ArrayList inpChannelProfile = null; //this is an arraylist of XSectionStation(s)
 
@@ -22,11 +26,20 @@ namespace atcFtableBuilder
 
         public FTableCalcNaturalFP()
         {
-            geomInputLongNames = new string[] { "Channel Length", "Mannings Value", "Longitudinal Slope", "Height Increment" };
+            geomInputLongNames = new string[] { "Channel Length", "Channel Mannings N", "Channel Longitudinal Slope", 
+                "Left Bank Downstream Length", "Left Bank Mannings N", "Left Bank Start X coord",
+                "Right Bank Downstream Length", "Right Bank Mannings N", "Right Bank End X coord",
+                "Height Increment" };
             geomInputs = new ChannelGeomInput[]{
-                ChannelGeomInput.Length,
-                ChannelGeomInput.ManningsN,
-                ChannelGeomInput.LongitudinalSlope,
+                ChannelGeomInput.NFP_ChannelLength,
+                ChannelGeomInput.NFP_ChannelManningsN,
+                ChannelGeomInput.NFP_ChannelSlope,
+                ChannelGeomInput.NFP_BankLeftLength,
+                ChannelGeomInput.NFP_BankLeftManningsN,
+                ChannelGeomInput.NFP_BankLeftStartX,
+                ChannelGeomInput.NFP_BankRightLength,
+                ChannelGeomInput.NFP_BankRightManningsN,
+                ChannelGeomInput.NFP_BankRightEndX,
                 ChannelGeomInput.HeightIncrement
             };
         }
@@ -34,18 +47,18 @@ namespace atcFtableBuilder
         public bool SetInputParameters(Hashtable aInputs)
         {
             bool AllInputsFound = true;
-            if (aInputs[ChannelGeomInput.Length] != null)
-                inpChannelLength = (double)aInputs[ChannelGeomInput.Length];
+            if (aInputs[ChannelGeomInput.NFP_ChannelLength] != null)
+                inpChannelLength = (double)aInputs[ChannelGeomInput.NFP_ChannelLength];
             else
                 AllInputsFound = false;
 
-            if (aInputs[ChannelGeomInput.ManningsN] != null)
-                inpChannelManningsValue = (double)aInputs[ChannelGeomInput.ManningsN];
+            if (aInputs[ChannelGeomInput.NFP_ChannelManningsN] != null)
+                inpChannelManningsValue = (double)aInputs[ChannelGeomInput.NFP_ChannelManningsN];
             else
                 AllInputsFound = false;
 
-            if (aInputs[ChannelGeomInput.LongitudinalSlope] != null)
-                inpChannelSlope = (double)aInputs[ChannelGeomInput.LongitudinalSlope];
+            if (aInputs[ChannelGeomInput.NFP_ChannelSlope] != null)
+                inpChannelSlope = (double)aInputs[ChannelGeomInput.NFP_ChannelSlope];
             else
                 AllInputsFound = false;
 
@@ -55,7 +68,54 @@ namespace atcFtableBuilder
                 AllInputsFound = false;
 
             if (aInputs[ChannelGeomInput.Profile] != null)
+            {
                 inpChannelProfile = (ArrayList)aInputs[ChannelGeomInput.Profile];
+                if (inpChannelProfile.Count == 0)
+                    AllInputsFound = false;
+            }
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.NFP_BankLeftLength] != null)
+                inpBankLeftLength = (double)aInputs[ChannelGeomInput.NFP_BankLeftLength];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.NFP_BankLeftManningsN] != null)
+                inpBankLeftManningsValue = (double)aInputs[ChannelGeomInput.NFP_BankLeftManningsN];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.NFP_BankLeftStartX] != null)
+            {
+                inpBankLeftStartingXCoord = (double)aInputs[ChannelGeomInput.NFP_BankLeftStartX];
+                if (inpBankLeftStartingXCoord < 0)
+                    AllInputsFound = false;
+            }
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.NFP_BankRightLength] != null)
+                inpBankRightLength = (double)aInputs[ChannelGeomInput.NFP_BankRightLength];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.NFP_BankRightManningsN] != null)
+                inpBankRightManningsValue = (double)aInputs[ChannelGeomInput.NFP_BankRightManningsN];
+            else
+                AllInputsFound = false;
+
+            if (aInputs[ChannelGeomInput.NFP_BankRightEndX] != null)
+            {
+                inpBankRightEndingXCoord = (double)aInputs[ChannelGeomInput.NFP_BankRightEndX];
+                if (inpBankRightEndingXCoord < 0)
+                    AllInputsFound = false;
+                if (AllInputsFound)
+                {
+                    if (((XSectionStation)inpChannelProfile[inpChannelProfile.Count - 1]).x < inpBankRightEndingXCoord)
+                        AllInputsFound = false;
+                }
+            }
             else
                 AllInputsFound = false;
 
@@ -65,7 +125,8 @@ namespace atcFtableBuilder
         public ArrayList GenerateFTable()
         {
             if (inpChannelProfile == null) return null;
-            return null; //GenerateFTable(inpChannelProfile, inpChannelLength, inpChannelManningsValue, inpChannelSlope, inpHeightIncrement);
+            return GenerateFTable(inpChannelProfile, inpBankLeftLength, inpChannelLength, inpBankRightLength, inpBankLeftManningsValue, inpChannelManningsValue, inpBankRightManningsValue,
+                inpHeightIncrement, inpChannelSlope, inpBankLeftStartingXCoord, inpBankRightEndingXCoord);
         }
 
         public ArrayList GenerateFTable(ArrayList channelProfile, double llL, double llC,

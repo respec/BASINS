@@ -57,6 +57,16 @@ namespace atcFtableBuilder
         //public static double GeomNaturalWidth = 36.0;
         public static double GeomNaturalLSlope = 0.025;
         public static double GeomNaturalHInc = 1.0;
+        //NATURAL FP
+        public static double GeomNaturalFPChLength = 4000;
+        public static double GeomNaturalFPLOBLength = 4000;
+        public static double GeomNaturalFPROBLength = 4000;
+        public static double GeomNaturalFPChMannN = 0.05;
+        public static double GeomNaturalFPLOBMannN = 0.05;
+        public static double GeomNaturalFPROBMannN = 0.05;
+        public static double GeomNaturalFPChLSlope = 0.00025;
+        public static double GeomNaturalFPLOBX = 0;
+        public static double GeomNaturalFPROBX = 100;
 
         //Infiltration Calculator Soil Types
         public static string[] soilTypes = {
