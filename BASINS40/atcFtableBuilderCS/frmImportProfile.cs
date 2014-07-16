@@ -204,9 +204,27 @@ namespace atcFtableBuilder
 
         private void btnBrowse_Click(object sender, EventArgs e)
         {
+            string lFullPath = Properties.Settings.Default.ChannelProfileFilename;
+            string lPath = "";
+            string lFilename = "";
+            if (!string.IsNullOrEmpty(lFullPath))
+            {
+                lPath = System.IO.Path.GetDirectoryName(lFullPath);
+                lFilename = System.IO.Path.GetFileName(lFullPath);
+            }
+
             OpenFileDialog lFD = new OpenFileDialog();
             lFD.Title = "Select X-section Profile Data File";
-            lFD.InitialDirectory = "C:";
+            if (System.IO.Directory.Exists(lPath))
+                lFD.InitialDirectory = lPath;
+            else
+                lFD.InitialDirectory = "C:";
+
+            if (!string.IsNullOrEmpty(lFilename))
+                lFD.FileName = lFilename;
+            else
+                lFD.FileName = "ProfileElev.txt";
+
             //lFD.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
             if (rdoImportDataExcel.Checked)
             {
@@ -219,7 +237,11 @@ namespace atcFtableBuilder
                 lFD.Filter = "Comma-Delimited (*.csv)|*.csv|All files (*.*)|*.*";
             }
             if (lFD.ShowDialog() == DialogResult.OK)
+            {
                 txtChProfileDatafile.Text = lFD.FileName;
+                Properties.Settings.Default.ChannelProfileFilename = lFD.FileName;
+                Properties.Settings.Default.Save();
+            }
         }
     }
 
