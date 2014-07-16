@@ -43,6 +43,9 @@ namespace atcFtableBuilder
             txtGeomTopWidth.TextChanged += new EventHandler(txtGeomChanged);
             txtGeomWidth.TextChanged += new EventHandler(txtGeomChanged);
 
+            if (grdChProfile.Source == null)
+                grdChProfile.Source = new atcControls.atcGridSource();
+
             frameNaturalChFP.Visible = false;
             if (clsGlobals.gToolType == clsGlobals.ToolType.Gray)
             {
@@ -59,6 +62,7 @@ namespace atcFtableBuilder
                 rdoChNaturalFP.CheckedChanged += new EventHandler(ChannelSelectionChanged);
 
                 gbInputInfil.Enabled = false;
+                gbInputInfil.Visible = false;
                 btnShowInfilCalc.Visible = false;
                 lblBMPList.Visible = false;
                 lblBMPMsg.Visible = false;
@@ -439,12 +443,6 @@ namespace atcFtableBuilder
             txtInfilRate.Text = e.ResultInfiltrationRate;
             txtInfilDepth.Text = e.ResultInfiltrationDepth;
             txtInfilDrainTime.Text = e.ResultInfiltrationDrainTime;
-        }
-
-        private void atcGrid1_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (!pLoaded) return;
-            if (grdChProfile.Source == null) return;
         }
 
         private void btnCalcFtable_Click(object sender, EventArgs e)

@@ -42,6 +42,7 @@
             this.btnCalcFtable = new System.Windows.Forms.Button();
             this.btnHelp = new System.Windows.Forms.Button();
             this.gbChannel = new System.Windows.Forms.GroupBox();
+            this.rdoChNaturalFP = new System.Windows.Forms.RadioButton();
             this.rdoChNatural = new System.Windows.Forms.RadioButton();
             this.rdoChPara = new System.Windows.Forms.RadioButton();
             this.rdoChTrape = new System.Windows.Forms.RadioButton();
@@ -49,6 +50,24 @@
             this.rdoChRect = new System.Windows.Forms.RadioButton();
             this.rdoChCirc = new System.Windows.Forms.RadioButton();
             this.gbInputData = new System.Windows.Forms.GroupBox();
+            this.frameNaturalChFP = new System.Windows.Forms.Panel();
+            this.txtGeomNFP_LOBX = new System.Windows.Forms.TextBox();
+            this.txtGeomNFP_ROBX = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtGeomNFP_ROBMannN = new System.Windows.Forms.TextBox();
+            this.txtGeomNFP_ChMannN = new System.Windows.Forms.TextBox();
+            this.txtGeomNFP_LOBMannN = new System.Windows.Forms.TextBox();
+            this.txtGeomNFP_ROBLength = new System.Windows.Forms.TextBox();
+            this.txtGeomNFP_ChLength = new System.Windows.Forms.TextBox();
+            this.txtGeomNFP_LOBLength = new System.Windows.Forms.TextBox();
+            this.txtGeomNFP_ChLSlope = new System.Windows.Forms.TextBox();
+            this.lblNFP_ChSlope = new System.Windows.Forms.Label();
             this.frameNaturalXsectGrid = new System.Windows.Forms.Panel();
             this.btnUndoClear = new System.Windows.Forms.Button();
             this.btnClearProfile = new System.Windows.Forms.Button();
@@ -88,33 +107,14 @@
             this.lblGeomMannN = new System.Windows.Forms.Label();
             this.lblGeomLength = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.rdoChNaturalFP = new System.Windows.Forms.RadioButton();
-            this.frameNaturalChFP = new System.Windows.Forms.Panel();
-            this.lblNFP_ChSlope = new System.Windows.Forms.Label();
-            this.txtGeomNFP_ChLSlope = new System.Windows.Forms.TextBox();
-            this.txtGeomNFP_LOBLength = new System.Windows.Forms.TextBox();
-            this.txtGeomNFP_ChLength = new System.Windows.Forms.TextBox();
-            this.txtGeomNFP_ROBLength = new System.Windows.Forms.TextBox();
-            this.txtGeomNFP_ROBMannN = new System.Windows.Forms.TextBox();
-            this.txtGeomNFP_ChMannN = new System.Windows.Forms.TextBox();
-            this.txtGeomNFP_LOBMannN = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.txtGeomNFP_ROBX = new System.Windows.Forms.TextBox();
-            this.txtGeomNFP_LOBX = new System.Windows.Forms.TextBox();
             this.bmpSketch1 = new atcFtableBuilder.BMPSketch();
             this.frameTop.SuspendLayout();
             this.gbChannel.SuspendLayout();
             this.gbInputData.SuspendLayout();
+            this.frameNaturalChFP.SuspendLayout();
             this.frameNaturalXsectGrid.SuspendLayout();
             this.gbInputInfil.SuspendLayout();
             this.gbInputGeometry.SuspendLayout();
-            this.frameNaturalChFP.SuspendLayout();
             this.SuspendLayout();
             // 
             // frameTop
@@ -252,6 +252,17 @@
             this.gbChannel.TabStop = false;
             this.gbChannel.Text = "Choose Channel Type";
             // 
+            // rdoChNaturalFP
+            // 
+            this.rdoChNaturalFP.AutoSize = true;
+            this.rdoChNaturalFP.Location = new System.Drawing.Point(587, 19);
+            this.rdoChNaturalFP.Name = "rdoChNaturalFP";
+            this.rdoChNaturalFP.Size = new System.Drawing.Size(155, 17);
+            this.rdoChNaturalFP.TabIndex = 7;
+            this.rdoChNaturalFP.TabStop = true;
+            this.rdoChNaturalFP.Text = "NATURAL (with flood plain)";
+            this.rdoChNaturalFP.UseVisualStyleBackColor = true;
+            // 
             // rdoChNatural
             // 
             this.rdoChNatural.AutoSize = true;
@@ -336,6 +347,165 @@
             this.gbInputData.TabStop = false;
             this.gbInputData.Text = "Input Data";
             // 
+            // frameNaturalChFP
+            // 
+            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_LOBX);
+            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ROBX);
+            this.frameNaturalChFP.Controls.Add(this.label8);
+            this.frameNaturalChFP.Controls.Add(this.label7);
+            this.frameNaturalChFP.Controls.Add(this.label6);
+            this.frameNaturalChFP.Controls.Add(this.label5);
+            this.frameNaturalChFP.Controls.Add(this.label4);
+            this.frameNaturalChFP.Controls.Add(this.label3);
+            this.frameNaturalChFP.Controls.Add(this.label2);
+            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ROBMannN);
+            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ChMannN);
+            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_LOBMannN);
+            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ROBLength);
+            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ChLength);
+            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_LOBLength);
+            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ChLSlope);
+            this.frameNaturalChFP.Controls.Add(this.lblNFP_ChSlope);
+            this.frameNaturalChFP.Location = new System.Drawing.Point(9, 19);
+            this.frameNaturalChFP.Name = "frameNaturalChFP";
+            this.frameNaturalChFP.Size = new System.Drawing.Size(442, 275);
+            this.frameNaturalChFP.TabIndex = 7;
+            // 
+            // txtGeomNFP_LOBX
+            // 
+            this.txtGeomNFP_LOBX.Location = new System.Drawing.Point(174, 65);
+            this.txtGeomNFP_LOBX.Name = "txtGeomNFP_LOBX";
+            this.txtGeomNFP_LOBX.Size = new System.Drawing.Size(100, 20);
+            this.txtGeomNFP_LOBX.TabIndex = 16;
+            // 
+            // txtGeomNFP_ROBX
+            // 
+            this.txtGeomNFP_ROBX.Location = new System.Drawing.Point(174, 91);
+            this.txtGeomNFP_ROBX.Name = "txtGeomNFP_ROBX";
+            this.txtGeomNFP_ROBX.Size = new System.Drawing.Size(100, 20);
+            this.txtGeomNFP_ROBX.TabIndex = 15;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(8, 94);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(160, 13);
+            this.label8.TabIndex = 14;
+            this.label8.Text = "Right Bank Ending X Coordinate";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(13, 68);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(156, 13);
+            this.label7.TabIndex = 13;
+            this.label7.Text = "Left Bank Starting X Coordinate";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(52, 180);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(66, 13);
+            this.label6.TabIndex = 12;
+            this.label6.Text = "Manning\'s N";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(16, 159);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(102, 13);
+            this.label5.TabIndex = 11;
+            this.label5.Text = "Downstream Length";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(246, 137);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(46, 13);
+            this.label4.TabIndex = 10;
+            this.label4.Text = "Channel";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(334, 137);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(92, 13);
+            this.label3.TabIndex = 9;
+            this.label3.Text = "Right Bank (ROB)";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(139, 137);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(83, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Left Bank (LOB)";
+            // 
+            // txtGeomNFP_ROBMannN
+            // 
+            this.txtGeomNFP_ROBMannN.Location = new System.Drawing.Point(326, 177);
+            this.txtGeomNFP_ROBMannN.Name = "txtGeomNFP_ROBMannN";
+            this.txtGeomNFP_ROBMannN.Size = new System.Drawing.Size(100, 20);
+            this.txtGeomNFP_ROBMannN.TabIndex = 7;
+            // 
+            // txtGeomNFP_ChMannN
+            // 
+            this.txtGeomNFP_ChMannN.Location = new System.Drawing.Point(225, 177);
+            this.txtGeomNFP_ChMannN.Name = "txtGeomNFP_ChMannN";
+            this.txtGeomNFP_ChMannN.Size = new System.Drawing.Size(100, 20);
+            this.txtGeomNFP_ChMannN.TabIndex = 6;
+            // 
+            // txtGeomNFP_LOBMannN
+            // 
+            this.txtGeomNFP_LOBMannN.Location = new System.Drawing.Point(124, 177);
+            this.txtGeomNFP_LOBMannN.Name = "txtGeomNFP_LOBMannN";
+            this.txtGeomNFP_LOBMannN.Size = new System.Drawing.Size(100, 20);
+            this.txtGeomNFP_LOBMannN.TabIndex = 5;
+            // 
+            // txtGeomNFP_ROBLength
+            // 
+            this.txtGeomNFP_ROBLength.Location = new System.Drawing.Point(326, 156);
+            this.txtGeomNFP_ROBLength.Name = "txtGeomNFP_ROBLength";
+            this.txtGeomNFP_ROBLength.Size = new System.Drawing.Size(100, 20);
+            this.txtGeomNFP_ROBLength.TabIndex = 4;
+            // 
+            // txtGeomNFP_ChLength
+            // 
+            this.txtGeomNFP_ChLength.Location = new System.Drawing.Point(225, 156);
+            this.txtGeomNFP_ChLength.Name = "txtGeomNFP_ChLength";
+            this.txtGeomNFP_ChLength.Size = new System.Drawing.Size(100, 20);
+            this.txtGeomNFP_ChLength.TabIndex = 3;
+            // 
+            // txtGeomNFP_LOBLength
+            // 
+            this.txtGeomNFP_LOBLength.Location = new System.Drawing.Point(124, 156);
+            this.txtGeomNFP_LOBLength.Name = "txtGeomNFP_LOBLength";
+            this.txtGeomNFP_LOBLength.Size = new System.Drawing.Size(100, 20);
+            this.txtGeomNFP_LOBLength.TabIndex = 2;
+            // 
+            // txtGeomNFP_ChLSlope
+            // 
+            this.txtGeomNFP_ChLSlope.Location = new System.Drawing.Point(174, 18);
+            this.txtGeomNFP_ChLSlope.Name = "txtGeomNFP_ChLSlope";
+            this.txtGeomNFP_ChLSlope.Size = new System.Drawing.Size(100, 20);
+            this.txtGeomNFP_ChLSlope.TabIndex = 1;
+            // 
+            // lblNFP_ChSlope
+            // 
+            this.lblNFP_ChSlope.AutoSize = true;
+            this.lblNFP_ChSlope.Location = new System.Drawing.Point(35, 21);
+            this.lblNFP_ChSlope.Name = "lblNFP_ChSlope";
+            this.lblNFP_ChSlope.Size = new System.Drawing.Size(136, 13);
+            this.lblNFP_ChSlope.TabIndex = 0;
+            this.lblNFP_ChSlope.Text = "Channel Longitudinal Slope";
+            // 
             // frameNaturalXsectGrid
             // 
             this.frameNaturalXsectGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -396,7 +566,6 @@
             this.grdChProfile.Size = new System.Drawing.Size(324, 251);
             this.grdChProfile.Source = null;
             this.grdChProfile.TabIndex = 5;
-            this.grdChProfile.MouseMove += new System.Windows.Forms.MouseEventHandler(this.atcGrid1_MouseMove);
             // 
             // gbInputInfil
             // 
@@ -698,176 +867,6 @@
             this.lblGeomLength.TabIndex = 0;
             this.lblGeomLength.Text = "Length:";
             // 
-            // rdoChNaturalFP
-            // 
-            this.rdoChNaturalFP.AutoSize = true;
-            this.rdoChNaturalFP.Location = new System.Drawing.Point(587, 19);
-            this.rdoChNaturalFP.Name = "rdoChNaturalFP";
-            this.rdoChNaturalFP.Size = new System.Drawing.Size(155, 17);
-            this.rdoChNaturalFP.TabIndex = 7;
-            this.rdoChNaturalFP.TabStop = true;
-            this.rdoChNaturalFP.Text = "NATURAL (with flood plain)";
-            this.rdoChNaturalFP.UseVisualStyleBackColor = true;
-            // 
-            // frameNaturalChFP
-            // 
-            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_LOBX);
-            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ROBX);
-            this.frameNaturalChFP.Controls.Add(this.label8);
-            this.frameNaturalChFP.Controls.Add(this.label7);
-            this.frameNaturalChFP.Controls.Add(this.label6);
-            this.frameNaturalChFP.Controls.Add(this.label5);
-            this.frameNaturalChFP.Controls.Add(this.label4);
-            this.frameNaturalChFP.Controls.Add(this.label3);
-            this.frameNaturalChFP.Controls.Add(this.label2);
-            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ROBMannN);
-            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ChMannN);
-            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_LOBMannN);
-            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ROBLength);
-            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ChLength);
-            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_LOBLength);
-            this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_ChLSlope);
-            this.frameNaturalChFP.Controls.Add(this.lblNFP_ChSlope);
-            this.frameNaturalChFP.Location = new System.Drawing.Point(9, 19);
-            this.frameNaturalChFP.Name = "frameNaturalChFP";
-            this.frameNaturalChFP.Size = new System.Drawing.Size(442, 275);
-            this.frameNaturalChFP.TabIndex = 7;
-            // 
-            // lblNFP_ChSlope
-            // 
-            this.lblNFP_ChSlope.AutoSize = true;
-            this.lblNFP_ChSlope.Location = new System.Drawing.Point(35, 21);
-            this.lblNFP_ChSlope.Name = "lblNFP_ChSlope";
-            this.lblNFP_ChSlope.Size = new System.Drawing.Size(136, 13);
-            this.lblNFP_ChSlope.TabIndex = 0;
-            this.lblNFP_ChSlope.Text = "Channel Longitudinal Slope";
-            // 
-            // txtGeomNFP_ChLSlope
-            // 
-            this.txtGeomNFP_ChLSlope.Location = new System.Drawing.Point(174, 18);
-            this.txtGeomNFP_ChLSlope.Name = "txtGeomNFP_ChLSlope";
-            this.txtGeomNFP_ChLSlope.Size = new System.Drawing.Size(100, 20);
-            this.txtGeomNFP_ChLSlope.TabIndex = 1;
-            // 
-            // txtGeomNFP_LOBLength
-            // 
-            this.txtGeomNFP_LOBLength.Location = new System.Drawing.Point(124, 156);
-            this.txtGeomNFP_LOBLength.Name = "txtGeomNFP_LOBLength";
-            this.txtGeomNFP_LOBLength.Size = new System.Drawing.Size(100, 20);
-            this.txtGeomNFP_LOBLength.TabIndex = 2;
-            // 
-            // txtGeomNFP_ChLength
-            // 
-            this.txtGeomNFP_ChLength.Location = new System.Drawing.Point(225, 156);
-            this.txtGeomNFP_ChLength.Name = "txtGeomNFP_ChLength";
-            this.txtGeomNFP_ChLength.Size = new System.Drawing.Size(100, 20);
-            this.txtGeomNFP_ChLength.TabIndex = 3;
-            // 
-            // txtGeomNFP_ROBLength
-            // 
-            this.txtGeomNFP_ROBLength.Location = new System.Drawing.Point(326, 156);
-            this.txtGeomNFP_ROBLength.Name = "txtGeomNFP_ROBLength";
-            this.txtGeomNFP_ROBLength.Size = new System.Drawing.Size(100, 20);
-            this.txtGeomNFP_ROBLength.TabIndex = 4;
-            // 
-            // txtGeomNFP_ROBMannN
-            // 
-            this.txtGeomNFP_ROBMannN.Location = new System.Drawing.Point(326, 177);
-            this.txtGeomNFP_ROBMannN.Name = "txtGeomNFP_ROBMannN";
-            this.txtGeomNFP_ROBMannN.Size = new System.Drawing.Size(100, 20);
-            this.txtGeomNFP_ROBMannN.TabIndex = 7;
-            // 
-            // txtGeomNFP_ChMannN
-            // 
-            this.txtGeomNFP_ChMannN.Location = new System.Drawing.Point(225, 177);
-            this.txtGeomNFP_ChMannN.Name = "txtGeomNFP_ChMannN";
-            this.txtGeomNFP_ChMannN.Size = new System.Drawing.Size(100, 20);
-            this.txtGeomNFP_ChMannN.TabIndex = 6;
-            // 
-            // txtGeomNFP_LOBMannN
-            // 
-            this.txtGeomNFP_LOBMannN.Location = new System.Drawing.Point(124, 177);
-            this.txtGeomNFP_LOBMannN.Name = "txtGeomNFP_LOBMannN";
-            this.txtGeomNFP_LOBMannN.Size = new System.Drawing.Size(100, 20);
-            this.txtGeomNFP_LOBMannN.TabIndex = 5;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(139, 137);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(83, 13);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "Left Bank (LOB)";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(334, 137);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(92, 13);
-            this.label3.TabIndex = 9;
-            this.label3.Text = "Right Bank (ROB)";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(246, 137);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(46, 13);
-            this.label4.TabIndex = 10;
-            this.label4.Text = "Channel";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(16, 159);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(102, 13);
-            this.label5.TabIndex = 11;
-            this.label5.Text = "Downstream Length";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(52, 180);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(66, 13);
-            this.label6.TabIndex = 12;
-            this.label6.Text = "Manning\'s N";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(13, 68);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(156, 13);
-            this.label7.TabIndex = 13;
-            this.label7.Text = "Left Bank Starting X Coordinate";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(8, 94);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(160, 13);
-            this.label8.TabIndex = 14;
-            this.label8.Text = "Right Bank Ending X Coordinate";
-            // 
-            // txtGeomNFP_ROBX
-            // 
-            this.txtGeomNFP_ROBX.Location = new System.Drawing.Point(174, 91);
-            this.txtGeomNFP_ROBX.Name = "txtGeomNFP_ROBX";
-            this.txtGeomNFP_ROBX.Size = new System.Drawing.Size(100, 20);
-            this.txtGeomNFP_ROBX.TabIndex = 15;
-            // 
-            // txtGeomNFP_LOBX
-            // 
-            this.txtGeomNFP_LOBX.Location = new System.Drawing.Point(174, 65);
-            this.txtGeomNFP_LOBX.Name = "txtGeomNFP_LOBX";
-            this.txtGeomNFP_LOBX.Size = new System.Drawing.Size(100, 20);
-            this.txtGeomNFP_LOBX.TabIndex = 16;
-            // 
             // bmpSketch1
             // 
             this.bmpSketch1.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -896,13 +895,13 @@
             this.gbChannel.ResumeLayout(false);
             this.gbChannel.PerformLayout();
             this.gbInputData.ResumeLayout(false);
+            this.frameNaturalChFP.ResumeLayout(false);
+            this.frameNaturalChFP.PerformLayout();
             this.frameNaturalXsectGrid.ResumeLayout(false);
             this.gbInputInfil.ResumeLayout(false);
             this.gbInputInfil.PerformLayout();
             this.gbInputGeometry.ResumeLayout(false);
             this.gbInputGeometry.PerformLayout();
-            this.frameNaturalChFP.ResumeLayout(false);
-            this.frameNaturalChFP.PerformLayout();
             this.ResumeLayout(false);
 
         }
