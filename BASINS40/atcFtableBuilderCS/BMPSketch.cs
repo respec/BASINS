@@ -52,6 +52,7 @@ namespace atcFtableBuilder
                     PaintEllipse(g);
                     break;
                 case FTableCalculator.ChannelType.NATURAL:
+                case FTableCalculator.ChannelType.NATURALFP:
                     PaintNatural(g);
                     break;
             }

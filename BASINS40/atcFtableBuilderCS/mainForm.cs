@@ -43,6 +43,24 @@ namespace atcFtableBuilder
             txtGeomTopWidth.TextChanged += new EventHandler(txtGeomChanged);
             txtGeomWidth.TextChanged += new EventHandler(txtGeomChanged);
 
+            frameNaturalChFP.Visible = false;
+            if (clsGlobals.gToolType == clsGlobals.ToolType.Gray)
+            {
+                rdoChNaturalFP.Visible = true;
+                txtGeomNFP_ChLSlope.TextChanged += new EventHandler(txtGeomChanged);
+                txtGeomNFP_ChLength.TextChanged += new EventHandler(txtGeomChanged);
+                txtGeomNFP_ChMannN.TextChanged += new EventHandler(txtGeomChanged);
+                txtGeomNFP_LOBLength.TextChanged += new EventHandler(txtGeomChanged);
+                txtGeomNFP_LOBMannN.TextChanged += new EventHandler(txtGeomChanged);
+                txtGeomNFP_ROBLength.TextChanged += new EventHandler(txtGeomChanged);
+                txtGeomNFP_ROBMannN.TextChanged += new EventHandler(txtGeomChanged);
+                rdoChNaturalFP.CheckedChanged += new EventHandler(ChannelSelectionChanged);
+            }
+            else
+            {
+                rdoChNaturalFP.Visible = false;
+            }
+
             //load BMP types
             cboBMPTypes.Items.Add("");
             foreach (FTableCalculator.BMPType lBMPType in FTableCalculator.BMPTypeNames.Keys)
@@ -128,6 +146,7 @@ namespace atcFtableBuilder
             if (!pLoaded) return;
             clsGlobals.gCalculator = null;
             pChannelGeomInputChangeComplete = false;
+            frameNaturalChFP.Visible = false;
             if (rdoChCirc.Checked)
             {
                 clsGlobals.gCalculator = new FTableCalcCircle();
@@ -226,6 +245,36 @@ namespace atcFtableBuilder
                 pChannelGeomInputChangeComplete = true;
                 txtGeomHInc.Text = clsGlobals.GeomNaturalHInc.ToString();
             }
+            else if (clsGlobals.gToolType == clsGlobals.ToolType.Gray && rdoChNaturalFP.Checked)
+            {
+                clsGlobals.gCalculator = new FTableCalcNaturalFP();
+                clsGlobals.gCalculator.CurrentType = FTableCalculator.ChannelType.NATURALFP;
+                if (grdChProfile.Source == null)
+                {
+                    grdChProfile.Source = new atcControls.atcGridSource();
+                    grdChProfile.Source.Columns = 2;
+                    grdChProfile.Source.FixedRows = 1;
+                    //set header
+                    grdChProfile.Source.set_CellValue(0, 0, "X=Distance From Left Bank");
+                    grdChProfile.Source.set_CellValue(0, 1, "Y=Relative Depth from Thalweg");
+                    grdChProfile.Initialize(grdChProfile.Source);
+                    grdChProfile.SizeAllColumnsToContents();
+                    grdChProfile.Refresh();
+                }
+                bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.NATURALFP;
+                frameNaturalChFP.Visible = true;
+                txtGeomNFP_ChLength.Text = clsGlobals.GeomNaturalFPChLength.ToString();
+                txtGeomNFP_LOBLength.Text = clsGlobals.GeomNaturalFPLOBLength.ToString();
+                txtGeomNFP_ROBLength.Text = clsGlobals.GeomNaturalFPROBLength.ToString();
+                txtGeomNFP_ChMannN.Text = clsGlobals.GeomNaturalFPChMannN.ToString();
+                txtGeomNFP_LOBMannN.Text = clsGlobals.GeomNaturalFPLOBMannN.ToString();
+                txtGeomNFP_ROBMannN.Text = clsGlobals.GeomNaturalFPROBMannN.ToString();
+                txtGeomNFP_LOBX.Text = clsGlobals.GeomNaturalFPLOBX.ToString();
+                txtGeomNFP_ROBX.Text = clsGlobals.GeomNaturalFPROBX.ToString();
+                pChannelGeomInputChangeComplete = true;
+                txtGeomNFP_ChLSlope.Text = clsGlobals.GeomNaturalFPChLSlope.ToString();
+                //txtGeomNFP_HInc.Text = clsGlobals.GeomNaturalFPHInc.ToString();
+            }
             else
             {
                 clsGlobals.gCalculator = null;
@@ -301,7 +350,8 @@ namespace atcFtableBuilder
                 txtGeomDepth.Visible = true;
                 lblGeomDepth.Visible = true;
             }
-            else if (bmpSketch1.CurrentChannelType == FTableCalculator.ChannelType.NATURAL)
+            else if (bmpSketch1.CurrentChannelType == FTableCalculator.ChannelType.NATURAL ||
+                     bmpSketch1.CurrentChannelType == FTableCalculator.ChannelType.NATURALFP)
             {
                 btnImportChProfile.Enabled = true;
                 btnClearProfile.Enabled = true;
@@ -356,6 +406,10 @@ namespace atcFtableBuilder
             else if (bmpSketch1.CurrentChannelType == FTableCalculator.ChannelType.NATURAL)
             {
                 lInputNames = new ArrayList(((FTableCalcNatural)clsGlobals.gCalculator).geomInputs);
+            }
+            else if (bmpSketch1.CurrentChannelType == FTableCalculator.ChannelType.NATURALFP)
+            {
+                lInputNames = new ArrayList(((FTableCalcNaturalFP)clsGlobals.gCalculator).geomInputs);
             }
             InputsAreOk(lInputNames);
         }
@@ -836,12 +890,28 @@ namespace atcFtableBuilder
                                         handleInputAppearance(ltxtField, false);
                                     }
                                     break;
+                                case FTableCalculator.ChannelGeomInput.NFP_BankLeftManningsN:
+                                case FTableCalculator.ChannelGeomInput.NFP_BankRightManningsN:
+                                case FTableCalculator.ChannelGeomInput.NFP_ChannelManningsN:
                                 case FTableCalculator.ChannelGeomInput.ManningsN:
                                     if (lVal == 0)
                                     {
                                         allinputsOK = false;
                                         lOneInputIsOK = false;
                                         handleInputAppearance(ltxtField, false);
+                                    }
+                                    break;
+                                case FTableCalculator.ChannelGeomInput.NFP_BankRightEndX:
+                                    if (clsGlobals.gProfileStations != null && clsGlobals.gProfileStations.Count > 0)
+                                    {
+                                        XSectionStation lastStation = (XSectionStation)clsGlobals.gProfileStations[clsGlobals.gProfileStations.Count - 1];
+                                        double lastStationX = lastStation.x;
+                                        if (lVal > lastStationX)
+                                        {
+                                            allinputsOK = false;
+                                            lOneInputIsOK = false;
+                                            handleInputAppearance(ltxtField, false);
+                                        }
                                     }
                                     break;
                             }

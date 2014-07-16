@@ -23,7 +23,7 @@ namespace atcFtableBuilder
     {
         public enum ChannelType
         {
-            NONE, CIRCULAR, RECTANGULAR, TRIANGULAR, TRAPEZOIDAL, PARABOLIC, NATURAL
+            NONE, CIRCULAR, RECTANGULAR, TRIANGULAR, TRAPEZOIDAL, PARABOLIC, NATURAL, NATURALFP
         };
         public enum ControlDeviceType
         {
@@ -97,8 +97,10 @@ namespace atcFtableBuilder
 
         public enum ChannelGeomInput
         {
-            Length, Width, TopWidth, Depth, MaximumDepth, Diameter, LongitudinalSlope, SideSlope, HeightIncrement, ManningsN, Profile, 
-            NFP_ChannelLength, NFP_BankLeftLength, NFP_BankRightLength, NFP_ChannelManningsN, NFP_BankLeftManningsN, NFP_BankRightManningsN
+            Length, Width, TopWidth, Depth, MaximumDepth, Diameter, LongitudinalSlope, SideSlope, HeightIncrement, ManningsN, Profile,
+            NFP_ChannelSlope, NFP_ChannelLength, NFP_ChannelManningsN,
+            NFP_BankLeftLength, NFP_BankLeftManningsN, NFP_BankLeftStartX,
+            NFP_BankRightLength, NFP_BankRightManningsN, NFP_BankRightEndX
         }
 
         //User interface should use these texts as TextBox control's name for easy data retrieval
@@ -113,12 +115,15 @@ namespace atcFtableBuilder
            {ChannelGeomInput.SideSlope,         "Side Slope (H:V),txtGeomSideSlope"},
            {ChannelGeomInput.HeightIncrement,   "Height Increment,txtGeomHInc"},
            {ChannelGeomInput.ManningsN,         "Manning's N,txtGeomMannN"},
+           {ChannelGeomInput.NFP_ChannelSlope,          "Channel Longitudinal Slope,txtGeomNFP_ChLSlope"},
            {ChannelGeomInput.NFP_ChannelManningsN,      "Channel Manning's N,txtGeomNFP_ChMannN"},
-           {ChannelGeomInput.NFP_BankLeftManningsN,      "Left Bank Manning's N,txtGeomNFP_LOBMannN"},
-           {ChannelGeomInput.NFP_BankRightManningsN,     "Right Bank Manning's N,txtGeomNFP_ROBMannN"},
+           {ChannelGeomInput.NFP_BankLeftManningsN,     "Left Bank Manning's N,txtGeomNFP_LOBMannN"},
+           {ChannelGeomInput.NFP_BankRightManningsN,    "Right Bank Manning's N,txtGeomNFP_ROBMannN"},
            {ChannelGeomInput.NFP_ChannelLength,         "Channel Length,txtGeomNFP_ChLength"},
-           {ChannelGeomInput.NFP_BankLeftLength,         "Left Bank Length,txtGeomNFP_LOBLength"},
-           {ChannelGeomInput.NFP_BankRightLength,        "Right Bank Length,txtGeomNFP_ROBLength"}
+           {ChannelGeomInput.NFP_BankLeftLength,        "Left Bank Length,txtGeomNFP_LOBLength"},
+           {ChannelGeomInput.NFP_BankRightLength,       "Right Bank Length,txtGeomNFP_ROBLength"},
+           {ChannelGeomInput.NFP_BankLeftStartX,        "Left Bank Start X coordinate,txtGeomNFP_LOBX"},
+           {ChannelGeomInput.NFP_BankRightEndX,         "Right Bank End X coordinate,txtGeomNFP_ROBX"}
         };
         public string[] geomInputLongNames;
         public ChannelGeomInput[] geomInputs;
