@@ -620,6 +620,9 @@ Public Class HspfFtable
                     Ncols = 4
                     For i As Integer = 1 To Nrows
                         pDepth(i) = lDepth(i)
+                        If pDepth(i) = 0 Then pArea(i) = 0.0
+                        'Anurag added this condition so that we do not see some finite area at 0 depth.
+                        'That causes excess evaporation at low depths.
                         pArea(i) = lSurfaceArea(i)
                         pVolume(i) = lVolume(i)
                         pOutflow1(i) = lDischarge(i)
