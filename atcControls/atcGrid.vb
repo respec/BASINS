@@ -1048,33 +1048,35 @@ Public Class atcGrid
 
     Protected Overrides Sub OnMouseMove(ByVal e As System.Windows.Forms.MouseEventArgs)
         'Debug.Print(e.X & " " & e.Y)
-        Dim newCursor As Windows.Forms.Cursor = Cursors.Default
-        Select Case e.Button
-            Case Windows.Forms.MouseButtons.None
-                If ColumnEdgeToDrag(e.X) >= 0 Then
-                    newCursor = Cursors.SizeWE
-                ElseIf ColumnDecimalToDrag(e.X, e.Y) >= 0 Then
-                    newCursor = Cursors.SizeWE
-                End If
-                If Not Me.Cursor Is newCursor Then Me.Cursor = newCursor
-            Case Windows.Forms.MouseButtons.Left
-                If pColumnDragging >= 0 Then
-                    ColumnWidth(pColumnDragging) += (e.X - pColumnRight.ItemByKey(pColumnDragging))
-                    If ColumnWidth(pColumnDragging) < DRAG_TOLERANCE * 2 Then 'it got too small
-                        ColumnWidth(pColumnDragging) = DRAG_TOLERANCE * 2       'enforce small minimun size
+        If pSource IsNot Nothing AndAlso pSource.Columns > 0 Then
+            Dim newCursor As Windows.Forms.Cursor = Cursors.Default
+            Select Case e.Button
+                Case Windows.Forms.MouseButtons.None
+                    If ColumnEdgeToDrag(e.X) >= 0 Then
+                        newCursor = Cursors.SizeWE
+                    ElseIf ColumnDecimalToDrag(e.X, e.Y) >= 0 Then
+                        newCursor = Cursors.SizeWE
                     End If
-                    RaiseEvent UserResizedColumn(Me, pColumnDragging, ColumnWidth(pColumnDragging))
-                    Refresh()
-                Else
-                    'drag out selection box
-                    Dim lRow As Integer = 0
-                    Dim lColumn As Integer = 0
-                    ComputeCurrentRowColumn(e, lRow, lColumn)
-                    If pSource.CellEditable(lRow, lColumn) Then
-                        SetEndSelectedRange(lRow, lColumn)
+                    If Not Me.Cursor Is newCursor Then Me.Cursor = newCursor
+                Case Windows.Forms.MouseButtons.Left
+                    If pColumnDragging >= 0 Then
+                        ColumnWidth(pColumnDragging) += (e.X - pColumnRight.ItemByKey(pColumnDragging))
+                        If ColumnWidth(pColumnDragging) < DRAG_TOLERANCE * 2 Then 'it got too small
+                            ColumnWidth(pColumnDragging) = DRAG_TOLERANCE * 2       'enforce small minimun size
+                        End If
+                        RaiseEvent UserResizedColumn(Me, pColumnDragging, ColumnWidth(pColumnDragging))
+                        Refresh()
+                    Else
+                        'drag out selection box
+                        Dim lRow As Integer = 0
+                        Dim lColumn As Integer = 0
+                        ComputeCurrentRowColumn(e, lRow, lColumn)
+                        If pSource.CellEditable(lRow, lColumn) Then
+                            SetEndSelectedRange(lRow, lColumn)
+                        End If
                     End If
-                End If
-        End Select
+            End Select
+        End If
     End Sub
 
     Protected Overrides Sub OnDoubleClick(ByVal e As System.EventArgs)
