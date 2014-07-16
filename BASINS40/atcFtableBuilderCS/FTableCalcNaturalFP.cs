@@ -40,7 +40,7 @@ namespace atcFtableBuilder
                 ChannelGeomInput.NFP_BankRightLength,
                 ChannelGeomInput.NFP_BankRightManningsN,
                 ChannelGeomInput.NFP_BankRightEndX,
-                ChannelGeomInput.HeightIncrement
+                ChannelGeomInput.NFP_HeightIncrement
             };
         }
 
@@ -62,10 +62,10 @@ namespace atcFtableBuilder
             else
                 AllInputsFound = false;
 
-            if (aInputs[ChannelGeomInput.HeightIncrement] != null)
-                inpHeightIncrement = (double)aInputs[ChannelGeomInput.HeightIncrement];
-            else
-                AllInputsFound = false;
+            //if (aInputs[ChannelGeomInput.HeightIncrement] != null)
+            //    inpHeightIncrement = (double)aInputs[ChannelGeomInput.HeightIncrement];
+            //else
+            //    AllInputsFound = false;
 
             if (aInputs[ChannelGeomInput.Profile] != null)
             {
@@ -143,25 +143,27 @@ namespace atcFtableBuilder
             string strY = "";
             double d = 0;
             int i = 0;
-            for (i = 0; i < channelProfile.Count; i++)
-            {
-                strX = (string)((ArrayList)channelProfile[i])[0];
-                strY = (string)((ArrayList)channelProfile[i])[1];
-                if ((strX == "") || (strY == ""))
-                {
-                    profileArraySize = i;
-                    break;
-                }
-                try
-                {
-                    d = double.Parse(strX.Trim());
-                    d = double.Parse(strY.Trim());
-                }
-                catch (FormatException nfe)
-                {
-                    return resultVector;
-                }
-            }
+            //for (i = 0; i < channelProfile.Count; i++)
+            //{
+            //    //strX = (string)((ArrayList)channelProfile[i])[0];
+            //    //strY = (string)((ArrayList)channelProfile[i])[1];
+            //    strX = ((XSectionStation)channelProfile[i]).x.ToString();
+            //    strY = ((XSectionStation)channelProfile[i]).y.ToString();
+            //    if ((strX == "") || (strY == ""))
+            //    {
+            //        profileArraySize = i;
+            //        break;
+            //    }
+            //    try
+            //    {
+            //        d = double.Parse(strX.Trim());
+            //        d = double.Parse(strY.Trim());
+            //    }
+            //    catch (FormatException nfe)
+            //    {
+            //        return resultVector;
+            //    }
+            //}
             int n = 0;
             double j = 0.0;
             double xmin = 0.0;
@@ -195,6 +197,8 @@ namespace atcFtableBuilder
                 x[i + 1] = lStation.x;
                 y[i + 1] = lStation.y;
             }
+
+            ChannelProfileYMaxDepth = ymax;
 
             double[] xx = new double[lSize];
             double[] yy = new double[lSize];
@@ -347,7 +351,7 @@ namespace atcFtableBuilder
                 hh[i] = i * dhh;
             }
 
-            while (n <= profileArraySize)
+            while (n <= channelProfile.Count) //profileArraySize)
             {
                 n = n + 1;
             }

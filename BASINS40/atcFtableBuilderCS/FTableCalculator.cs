@@ -100,7 +100,7 @@ namespace atcFtableBuilder
             Length, Width, TopWidth, Depth, MaximumDepth, Diameter, LongitudinalSlope, SideSlope, HeightIncrement, ManningsN, Profile,
             NFP_ChannelSlope, NFP_ChannelLength, NFP_ChannelManningsN,
             NFP_BankLeftLength, NFP_BankLeftManningsN, NFP_BankLeftStartX,
-            NFP_BankRightLength, NFP_BankRightManningsN, NFP_BankRightEndX
+            NFP_BankRightLength, NFP_BankRightManningsN, NFP_BankRightEndX, NFP_HeightIncrement
         }
 
         //User interface should use these texts as TextBox control's name for easy data retrieval
