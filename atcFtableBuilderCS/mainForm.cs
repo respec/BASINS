@@ -44,7 +44,17 @@ namespace atcFtableBuilder
             txtGeomWidth.TextChanged += new EventHandler(txtGeomChanged);
 
             if (grdChProfile.Source == null)
+            {
                 grdChProfile.Source = new atcControls.atcGridSource();
+                grdChProfile.Source.Columns = 2;
+                grdChProfile.Source.FixedRows = 1;
+                //set header
+                grdChProfile.Source.set_CellValue(0, 0, "X=Distance From Left Bank");
+                grdChProfile.Source.set_CellValue(0, 1, "Y=Relative Depth from Thalweg");
+                grdChProfile.Initialize(grdChProfile.Source);
+                grdChProfile.SizeAllColumnsToContents();
+                grdChProfile.Refresh();
+            }
 
             frameNaturalChFP.Visible = false;
             if (clsGlobals.gToolType == clsGlobals.ToolType.Gray)
@@ -240,18 +250,6 @@ namespace atcFtableBuilder
             {
                 clsGlobals.gCalculator = new FTableCalcNatural();
                 clsGlobals.gCalculator.CurrentType = FTableCalculator.ChannelType.NATURAL;
-                if (grdChProfile.Source == null)
-                {
-                    grdChProfile.Source = new atcControls.atcGridSource();
-                    grdChProfile.Source.Columns = 2;
-                    grdChProfile.Source.FixedRows = 1;
-                    //set header
-                    grdChProfile.Source.set_CellValue(0, 0, "X=Distance From Left Bank");
-                    grdChProfile.Source.set_CellValue(0, 1, "Y=Relative Depth from Thalweg");
-                    grdChProfile.Initialize(grdChProfile.Source);
-                    grdChProfile.SizeAllColumnsToContents();
-                    grdChProfile.Refresh();
-                }
                 bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.NATURAL;
                 txtGeomLength.Text = clsGlobals.GeomNaturalLength.ToString();
                 txtGeomMannN.Text = clsGlobals.GeomManningN.ToString();
@@ -263,18 +261,6 @@ namespace atcFtableBuilder
             {
                 clsGlobals.gCalculator = new FTableCalcNaturalFP();
                 clsGlobals.gCalculator.CurrentType = FTableCalculator.ChannelType.NATURALFP;
-                if (grdChProfile.Source == null)
-                {
-                    grdChProfile.Source = new atcControls.atcGridSource();
-                    grdChProfile.Source.Columns = 2;
-                    grdChProfile.Source.FixedRows = 1;
-                    //set header
-                    grdChProfile.Source.set_CellValue(0, 0, "X=Distance From Left Bank");
-                    grdChProfile.Source.set_CellValue(0, 1, "Y=Relative Depth from Thalweg");
-                    grdChProfile.Initialize(grdChProfile.Source);
-                    grdChProfile.SizeAllColumnsToContents();
-                    grdChProfile.Refresh();
-                }
                 bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.NATURALFP;
                 frameNaturalChFP.Visible = true;
                 txtGeomNFP_ChLength.Text = clsGlobals.GeomNaturalFPChLength.ToString();
