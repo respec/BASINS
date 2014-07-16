@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(mainForm));
             this.frameTop = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblBMPMsg = new System.Windows.Forms.Label();
             this.cboBMPTypes = new System.Windows.Forms.ComboBox();
             this.lblBMPList = new System.Windows.Forms.Label();
             this.rdoUnitSI = new System.Windows.Forms.RadioButton();
@@ -89,7 +89,6 @@
             this.lblGeomLength = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.rdoChNaturalFP = new System.Windows.Forms.RadioButton();
-            this.bmpSketch1 = new atcFtableBuilder.BMPSketch();
             this.frameNaturalChFP = new System.Windows.Forms.Panel();
             this.lblNFP_ChSlope = new System.Windows.Forms.Label();
             this.txtGeomNFP_ChLSlope = new System.Windows.Forms.TextBox();
@@ -108,6 +107,7 @@
             this.label8 = new System.Windows.Forms.Label();
             this.txtGeomNFP_ROBX = new System.Windows.Forms.TextBox();
             this.txtGeomNFP_LOBX = new System.Windows.Forms.TextBox();
+            this.bmpSketch1 = new atcFtableBuilder.BMPSketch();
             this.frameTop.SuspendLayout();
             this.gbChannel.SuspendLayout();
             this.gbInputData.SuspendLayout();
@@ -119,7 +119,7 @@
             // 
             // frameTop
             // 
-            this.frameTop.Controls.Add(this.label1);
+            this.frameTop.Controls.Add(this.lblBMPMsg);
             this.frameTop.Controls.Add(this.cboBMPTypes);
             this.frameTop.Controls.Add(this.lblBMPList);
             this.frameTop.Controls.Add(this.rdoUnitSI);
@@ -131,14 +131,14 @@
             this.frameTop.Size = new System.Drawing.Size(793, 41);
             this.frameTop.TabIndex = 1;
             // 
-            // label1
+            // lblBMPMsg
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(537, 11);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(231, 26);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "A suggested channel geometry will be selected.\r\nYou can change this shape.";
+            this.lblBMPMsg.AutoSize = true;
+            this.lblBMPMsg.Location = new System.Drawing.Point(537, 11);
+            this.lblBMPMsg.Name = "lblBMPMsg";
+            this.lblBMPMsg.Size = new System.Drawing.Size(231, 26);
+            this.lblBMPMsg.TabIndex = 5;
+            this.lblBMPMsg.Text = "A suggested channel geometry will be selected.\r\nYou can change this shape.";
             // 
             // cboBMPTypes
             // 
@@ -709,15 +709,6 @@
             this.rdoChNaturalFP.Text = "NATURAL (with flood plain)";
             this.rdoChNaturalFP.UseVisualStyleBackColor = true;
             // 
-            // bmpSketch1
-            // 
-            this.bmpSketch1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.bmpSketch1.Location = new System.Drawing.Point(3, 42);
-            this.bmpSketch1.Name = "bmpSketch1";
-            this.bmpSketch1.Size = new System.Drawing.Size(787, 77);
-            this.bmpSketch1.TabIndex = 6;
-            this.bmpSketch1.MouseHover += new System.EventHandler(this.bmpSketch1_MouseHover);
-            // 
             // frameNaturalChFP
             // 
             this.frameNaturalChFP.Controls.Add(this.txtGeomNFP_LOBX);
@@ -877,6 +868,15 @@
             this.txtGeomNFP_LOBX.Size = new System.Drawing.Size(100, 20);
             this.txtGeomNFP_LOBX.TabIndex = 16;
             // 
+            // bmpSketch1
+            // 
+            this.bmpSketch1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.bmpSketch1.Location = new System.Drawing.Point(3, 42);
+            this.bmpSketch1.Name = "bmpSketch1";
+            this.bmpSketch1.Size = new System.Drawing.Size(787, 77);
+            this.bmpSketch1.TabIndex = 6;
+            this.bmpSketch1.MouseHover += new System.EventHandler(this.bmpSketch1_MouseHover);
+            // 
             // mainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -915,7 +915,7 @@
         private System.Windows.Forms.RadioButton rdoUnitUS;
         private System.Windows.Forms.ComboBox cboBMPTypes;
         private System.Windows.Forms.Label lblBMPList;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblBMPMsg;
         private System.Windows.Forms.Button btnShowOptControls;
         private System.Windows.Forms.Button btnShowInfilCalc;
         private System.Windows.Forms.Button btnCalcFtable;

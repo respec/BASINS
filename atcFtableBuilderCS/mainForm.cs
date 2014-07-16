@@ -54,26 +54,36 @@ namespace atcFtableBuilder
                 txtGeomNFP_LOBMannN.TextChanged += new EventHandler(txtGeomChanged);
                 txtGeomNFP_ROBLength.TextChanged += new EventHandler(txtGeomChanged);
                 txtGeomNFP_ROBMannN.TextChanged += new EventHandler(txtGeomChanged);
+                txtGeomNFP_LOBX.TextChanged += new EventHandler(txtGeomChanged);
+                txtGeomNFP_ROBX.TextChanged += new EventHandler(txtGeomChanged);
                 rdoChNaturalFP.CheckedChanged += new EventHandler(ChannelSelectionChanged);
+
+                gbInputInfil.Enabled = false;
+                btnShowInfilCalc.Visible = false;
+                lblBMPList.Visible = false;
+                lblBMPMsg.Visible = false;
+                cboBMPTypes.Visible = false;
+
+                this.Text += " - " + clsGlobals.ToolNameGray;
             }
             else
             {
+                //load BMP types
+                cboBMPTypes.Items.Add("");
+                foreach (FTableCalculator.BMPType lBMPType in FTableCalculator.BMPTypeNames.Keys)
+                {
+                    cboBMPTypes.Items.Add(FTableCalculator.BMPTypeNames[lBMPType]);
+                }
+                chkBackfill_CheckedChanged(null, null);
+                txtBackfillDepth.Text = clsGlobals.BackfillDepth.ToString();
+                txtBackfillPore.Text = clsGlobals.BackfillPorosity.ToString();
+ 
                 rdoChNaturalFP.Visible = false;
-            }
-
-            //load BMP types
-            cboBMPTypes.Items.Add("");
-            foreach (FTableCalculator.BMPType lBMPType in FTableCalculator.BMPTypeNames.Keys)
-            {
-                cboBMPTypes.Items.Add(FTableCalculator.BMPTypeNames[lBMPType]);
+                this.Text += " - " + clsGlobals.ToolNameGreen;
             }
 
             pLoaded = true;
-
-            chkBackfill_CheckedChanged(null, null);
-            txtBackfillDepth.Text = clsGlobals.BackfillDepth.ToString();
-            txtBackfillPore.Text = clsGlobals.BackfillPorosity.ToString();
-        }
+       }
 
         private void Unit_CheckedChanged(object sender, EventArgs e)
         {
@@ -584,6 +594,32 @@ namespace atcFtableBuilder
 
                     lFTableGrid.Calc = (FTableCalcNatural)clsGlobals.gCalculator;
                     break;
+                case FTableCalculator.ChannelType.NATURALFP:
+                    if (clsGlobals.gProfileStations == null || clsGlobals.gProfileStations.Count == 0)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Need to import channel cross section profile data first.", "Natural Channel with FP Input");
+                        return;
+                    }
+
+                    if (inputHash.ContainsKey(FTableCalculator.ChannelGeomInput.Profile))
+                        inputHash.Remove(FTableCalculator.ChannelGeomInput.Profile);
+                    inputHash.Add(FTableCalculator.ChannelGeomInput.Profile, clsGlobals.gProfileStations);
+                    if (((FTableCalcNaturalFP)(clsGlobals.gCalculator)).SetInputParameters(inputHash))
+                    {
+                        lFtableResultChannel = ((FTableCalcNaturalFP)(clsGlobals.gCalculator)).GenerateFTable();
+                    }
+
+                    //When finding the total depth for the control device calculators,
+                    //the system must scan the channel profile to get the biggest y-value.
+                    //The following line gets that value.
+                    FTableCalculator.TotalDepth = ((FTableCalcNaturalFP)(clsGlobals.gCalculator)).ChannelProfileYMaxDepth;
+
+                    // storing the user defined increment value to use in ControlDeviceFtableCalculator classes
+                    //FTableCalculatorConstants.calculatorIncrement = (double)inputHash[FTableCalculator.ChannelGeomInput.NFP_HeightIncrement]; //Double.parseDouble(inputHash.get(geoInputNames[4]).toString());  // sri-09-11-1012
+                    FTableCalculatorConstants.calculatorIncrement = ((FTableCalcNaturalFP)(clsGlobals.gCalculator)).inpHeightIncrement;
+
+                    lFTableGrid.Calc = (FTableCalcNaturalFP)clsGlobals.gCalculator;
+                    break;
             }
 
             //The vector, data, represents the flow of the open stream channel.
@@ -650,15 +686,18 @@ namespace atcFtableBuilder
             {
                 try
                 {
-                    string txtFieldName = FTableCalculator.LookupChannelGeomInput[lChannelInputId];
-                    txtFieldName = txtFieldName.Substring(txtFieldName.IndexOf(",") + 1);
-                    lInputTxtField = (TextBox)this.Controls.Find(txtFieldName, true)[0];
-                    if (lInputTxtField != null)
+                    if (FTableCalculator.LookupChannelGeomInput.ContainsKey(lChannelInputId))
                     {
-                        double.TryParse(lInputTxtField.Text, out lVal);
-                        if (!newHash.ContainsKey(lChannelInputId)) newHash.Add(lChannelInputId, lVal);
+                        string txtFieldName = FTableCalculator.LookupChannelGeomInput[lChannelInputId];
+                        txtFieldName = txtFieldName.Substring(txtFieldName.IndexOf(",") + 1);
+                        lInputTxtField = (TextBox)this.Controls.Find(txtFieldName, true)[0];
+                        if (lInputTxtField != null)
+                        {
+                            double.TryParse(lInputTxtField.Text, out lVal);
+                            if (!newHash.ContainsKey(lChannelInputId)) newHash.Add(lChannelInputId, lVal);
+                        }
                     }
-                }
+               }
                 catch (System.InvalidCastException e)
                 {
                     //do nothing for now

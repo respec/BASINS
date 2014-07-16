@@ -116,6 +116,8 @@ namespace atcFtableBuilder
 
         #region Utils
         public static string SettingFilename = "";
+        public static string ToolNameGray = "Sewer and Open Channel Design Tool";
+        public static string ToolNameGreen = "Low Impact Development (LID) Controls Tool";
 
         #endregion
     }
