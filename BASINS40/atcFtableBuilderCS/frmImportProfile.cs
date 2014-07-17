@@ -120,7 +120,7 @@ namespace atcFtableBuilder
                 lArr = lOneLine.Split(new char[] { aDelim }, StringSplitOptions.None);
                 if (lArr.Length < 2)
                 {
-                    System.Windows.Forms.MessageBox.Show("Data File Contains less 2 columns of data:" + Environment.NewLine + ((FileStream)pSR.BaseStream).Name, "Open Import Data File");
+                    System.Windows.Forms.MessageBox.Show("Data File Contains less than 2 columns of data:" + Environment.NewLine + ((FileStream)pSR.BaseStream).Name, "Open Import Data File");
                     break;
                 }
 
