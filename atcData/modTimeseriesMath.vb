@@ -220,7 +220,7 @@ Public Module modTimeseriesMath
     ''' If duplicate dates exist in aGroup, some values will be left out of result.</remarks>
     Public Function MergeTimeseries(ByVal aGroup As atcTimeseriesGroup, _
                                     ByVal aSkipMissing As Boolean, _
-                                    ByVal aAverageAtSameDate As Boolean) As atcTimeseries
+                                    ByVal aTran As atcTran) As atcTimeseries
         Dim lNewTS As New atcTimeseries(Nothing) 'will contain new (merged) dates
         If aGroup IsNot Nothing AndAlso aGroup.Count > 0 Then
             lNewTS.Dates = MergeDates(aGroup, aSkipMissing)
@@ -247,15 +247,30 @@ Public Module modTimeseriesMath
                     lOldTS = aGroup.Item(lIndex)
                     While lNextIndex(lIndex) <= lOldTS.numValues AndAlso lOldTS.Dates.Value(lNextIndex(lIndex)) - JulianMillisecond < lCurrentDate
                         lNumToAverage += 1
-                        If lNumToAverage = 1 OrElse Not aAverageAtSameDate Then
+                        'If Native, always just use latest value.
+                        'OrElse, If this is the first value, use it for all tran except CountMissing (which needs counts not values)
+                        If aTran = atcTran.TranNative OrElse (aTran <> atcTran.TranCountMissing AndAlso lNumToAverage = 1) Then
                             lNewTS.Value(lNewIndex) = lOldTS.Value(lNextIndex(lIndex))
                         Else
-                            lNewTS.Value(lNewIndex) += lOldTS.Value(lNextIndex(lIndex))
+                            Select Case aTran
+                                Case atcTran.TranAverSame, atcTran.TranSumDiv
+                                    lNewTS.Value(lNewIndex) += lOldTS.Value(lNextIndex(lIndex))
+                                Case atcTran.TranCountMissing
+                                    If Double.IsNaN(lOldTS.Value(lNextIndex(lIndex))) Then lNewTS.Value(lNewIndex) += 1
+                                Case atcTran.TranMax
+                                    If lOldTS.Value(lNextIndex(lIndex)) > lNewTS.Value(lNewIndex) Then
+                                        lOldTS.Value(lNextIndex(lIndex)) = lOldTS.Value(lNextIndex(lIndex))
+                                    End If
+                                Case atcTran.TranMin
+                                    If lOldTS.Value(lNextIndex(lIndex)) < lNewTS.Value(lNewIndex) Then
+                                        lOldTS.Value(lNextIndex(lIndex)) = lOldTS.Value(lNextIndex(lIndex))
+                                    End If
+                            End Select
                         End If
                         lNextIndex(lIndex) += 1
                     End While
                 Next
-                If aAverageAtSameDate AndAlso lNumToAverage > 1 Then
+                If aTran = atcTran.TranAverSame AndAlso lNumToAverage > 1 Then
                     lNewTS.Value(lNewIndex) /= lNumToAverage
                 End If
             Next
@@ -399,17 +414,27 @@ Public Module modTimeseriesMath
         aCommonEnd = GetMaxValue()
 
         If aGroup IsNot Nothing Then
-            For Each lTs As atcData.atcTimeseries In aGroup
-                If lTs.Dates.numValues > 0 Then
-                    Dim lThisDate As Double = lTs.Dates.Value(0)
-                    If Double.IsNaN(lThisDate) Then lThisDate = lTs.Dates.Value(1)
-                    If lThisDate < aFirstStart Then aFirstStart = lThisDate
-                    If lThisDate > aCommonStart Then aCommonStart = lThisDate
-                    lThisDate = lTs.Dates.Value(lTs.Dates.numValues)
-                    If lThisDate > aLastEnd Then aLastEnd = lThisDate
-                    If lThisDate < aCommonEnd Then aCommonEnd = lThisDate
-                End If
-            Next
+            Dim lMaxProgress As Long = aGroup.Count
+            Dim lCurrentProgress As Long = 0
+            Dim lShowingProgress As Boolean = lMaxProgress > 50
+            Using lProgressLevel As New ProgressLevel(False, Not lShowingProgress)
+                If lShowingProgress Then Logger.Status("Reading data and finding common dates")
+                For Each lTs As atcData.atcTimeseries In aGroup
+                    If lTs.Dates.numValues > 0 Then
+                        Dim lThisDate As Double = lTs.Dates.Value(0)
+                        If Double.IsNaN(lThisDate) Then lThisDate = lTs.Dates.Value(1)
+                        If lThisDate < aFirstStart Then aFirstStart = lThisDate
+                        If lThisDate > aCommonStart Then aCommonStart = lThisDate
+                        lThisDate = lTs.Dates.Value(lTs.Dates.numValues)
+                        If lThisDate > aLastEnd Then aLastEnd = lThisDate
+                        If lThisDate < aCommonEnd Then aCommonEnd = lThisDate
+                    End If
+                    If lShowingProgress Then
+                        lCurrentProgress += 1
+                        Logger.Progress(lCurrentProgress, lMaxProgress)
+                    End If
+                Next
+            End Using
         End If
 
         Return aCommonStart > GetMinValue() AndAlso aCommonEnd < GetMaxValue() AndAlso aCommonStart < aCommonEnd
