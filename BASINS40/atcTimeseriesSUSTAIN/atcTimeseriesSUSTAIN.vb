@@ -299,7 +299,9 @@ Public Class atcTimeseriesSUSTAIN
             Next
 
             lWriter.WriteLine(HeaderLineStart)
-            lWriter.WriteLine(HeaderLineStart & " WATERSHED_" & WatershedNumber & " Area:    " & Format(WatershedAcres, "0.000") & " (acres)")
+            If WatershedAcres > 0 Then
+                lWriter.WriteLine(HeaderLineStart & " WATERSHED_" & WatershedNumber & " Area:    " & Format(WatershedAcres, "0.000") & " (acres)")
+            End If
             lWriter.WriteLine(HeaderLineStart & " Date/time					Values")
             lWriter.WriteLine(HeaderLineStart)
 
