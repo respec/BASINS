@@ -105,7 +105,13 @@ Public Class atcSeasonBase
         Return lNewGroup
     End Function
 
-    'Divide the data in aTS into a group of TS, one for selected seasons, other for data outside selected seasons
+    ''' <summary>
+    ''' Divide the data in aTS into a group of TS, one for selected seasons, other for data outside selected seasons
+    ''' </summary>
+    ''' <param name="aTS">Timeseries to split</param>
+    ''' <param name="aSource">Source to use when creating the two timeseries returned, can be Nothing</param>
+    ''' <returns>Group of two timeseries: first is values inside season, second is values outside season</returns>
+    ''' <remarks>To return just selected timeseries: SplitBySelected(aTS, Nothing)(0)</remarks>
     Public Overridable Function SplitBySelected(ByVal aTS As atcTimeseries, ByVal aSource As atcTimeseriesSource) As atcTimeseriesGroup
         Dim lNewGroup As New atcTimeseriesGroup
         Dim lSeasonIndex As Integer = -1

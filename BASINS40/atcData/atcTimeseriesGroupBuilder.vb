@@ -6,6 +6,7 @@ Public Class atcTimeseriesGroupBuilder
 
     Private pDataSource As atcTimeseriesSource
     Private pBuilders As atcCollection
+    Private pSharedAttributes As atcDataAttributes
 
     Public Sub New(ByVal aDataSource As atcTimeseriesSource)
         pDataSource = aDataSource
@@ -40,6 +41,11 @@ Public Class atcTimeseriesGroupBuilder
         End If
     End Sub
 
+    ''' <summary>
+    ''' Create all builders and assign a key to each one
+    ''' </summary>
+    ''' <param name="aKeys"></param>
+    ''' <remarks>Call this before using Builder</remarks>
     Public Sub CreateBuilders(ByVal ParamArray aKeys() As String)
         pBuilders.Clear()
         For Each lKey As String In aKeys
@@ -86,6 +92,9 @@ Public Class atcTimeseriesGroupBuilder
 
     Public Sub CreateTimeseriesAddToGroup(ByVal aGroup As atcTimeseriesGroup)
         Logger.Status("Creating Timeseries")
+        If pSharedAttributes IsNot Nothing Then
+            pSharedAttributes.AddHistory("Read from " & pDataSource.Specification)
+        End If
         Dim lLastBuilder As Integer = pBuilders.Count - 1
         For lBuilderIndex As Integer = 0 To lLastBuilder
             Dim lDataSet As atcTimeseries = pBuilders.ItemByIndex(lBuilderIndex).CreateTimeseries
@@ -95,17 +104,20 @@ Public Class atcTimeseriesGroupBuilder
             Else
                 aGroup.Add(lKey, lDataSet)
             End If
+            If pSharedAttributes Is Nothing Then
+                lDataSet.Attributes.AddHistory("Read from " & pDataSource.Specification)
+            Else
+                lDataSet.Attributes.SharedAttributes = pSharedAttributes
+            End If
             Logger.Progress(lBuilderIndex, lLastBuilder)
         Next
+        pSharedAttributes = Nothing
         Logger.Progress("", 0, 0)
     End Sub
 
     Public Sub SetAttributeForAll(aAttributeName As String, aAttributeValue As Object)
-        Dim lLastBuilder As Integer = pBuilders.Count - 1
-        For lBuilderIndex As Integer = 0 To lLastBuilder
-            Dim lBuilder As atcTimeseriesBuilder = pBuilders.ItemByIndex(lBuilderIndex)
-            lBuilder.Attributes.SetValue(aAttributeName, aAttributeValue)
-        Next
+        If pSharedAttributes Is Nothing Then pSharedAttributes = New atcDataAttributes
+        pSharedAttributes.Add(aAttributeName, aAttributeValue)
     End Sub
 
 End Class

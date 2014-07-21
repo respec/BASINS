@@ -71,16 +71,20 @@ Public Class atcDataSet
     ''' <summary>String describing this DataSet</summary>
     Public Overrides Function ToString() As String
         Try
+            Dim lNumHaveValue As Integer = 0
             Dim lLastAttribute As Integer = pStringAttributeNames.GetUpperBound(0)
             Dim lAttrValues(lLastAttribute) As String
             For iArg As Integer = 0 To lLastAttribute
                 lAttrValues(iArg) = pAttributes.GetFormattedValue(pStringAttributeNames(iArg), "")
                 If lAttrValues(iArg) = "<unk>" Then lAttrValues(iArg) = ""
+                If lAttrValues(iArg).Length > 0 Then lNumHaveValue += 1
             Next
-            Return String.Format(pStringFormat, lAttrValues)
+            If lNumHaveValue > 0 Then
+                Return String.Format(pStringFormat, lAttrValues)
+            End If
         Catch ex As Exception
-            Return "# " & Serial
         End Try
+        Return "# " & Serial
     End Function
 
     ''' <summary>Build a default format string with all arguments separated by 
