@@ -412,6 +412,7 @@ Public Class HspfUci
 
                 ProcessFTables()
                 _fpreset()
+
                 Logger.Dbg("FtableBlockRead")
 
                 pConnections = Nothing
@@ -1550,7 +1551,7 @@ Public Class HspfUci
     Public Sub AddOutputWDMDataSetExt(ByRef aLocation As String, ByRef aConstituent As String, _
                                       ByRef aBaseDsn As Integer, ByRef aWdmId As Integer, _
                                       ByRef aTUnit As Integer, ByRef aDescription As String, _
-                                      ByRef aDsn As Integer)
+                                      ByRef aDsn As Integer, Optional ByRef aSTANAM As String = "")
         If aWdmId = 0 Then
             For lWdmIndex As Integer = 1 To 4
                 If Not pWDMObj(lWdmIndex) Is Nothing Then 'use this as the output wdm
@@ -1574,6 +1575,7 @@ Public Class HspfUci
                 .SetValue("TS", 1)
                 .SetValue("TSTYPE", aConstituent.ToUpper)
                 .SetValue("Data Source", pWDMObj(aWdmId).Specification)
+                .SetValue("STANAM", aSTANAM)
             End With
             Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
             lGenericTs.Dates = lTsDate
@@ -2467,6 +2469,8 @@ x:
         Dim lReturnKey As Integer = -1
         Dim lReturnCode As Integer
         Dim lRecordType As Integer
+        'Dim lOperation As HspfOperation = Nothing Anurag wanted to keep the Comments of FTABLE that may occur below the FTABLE
+        'to be part of FTABLE. This change is causing the comments on FTABLE get to the line after "depth area voluem outflow1"
         Do Until lDone
             GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
             lInit = 0
@@ -2512,7 +2516,7 @@ x:
                         End If
 
                         Dim lRow As Integer = 1
-                        Do While lRow <= .Nrows
+                        Do While lRow <= .Nrows 'If there is a comment after the rows end, then it gets deleted -Anurag
                             GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
 
                             If lRecordType = -1 Then 'this is a comment
@@ -2577,6 +2581,11 @@ x:
                 lDone = True
             ElseIf lReturnCode = 10 Then
                 lDone = True
+                'ElseIf lReturnCode = 2 AndAlso lRecordType = -1 Then
+                '    Stop
+                '    lOperation.FTable.Comment &= vbCrLf & lBuff
+                '    'Anurag wanted to keep the Comments of FTABLE that may occur below the FTABLE
+                '    'to be part of FTABLE. This change is causing the comments on FTABLE get to the line after "depth area voluem outflow1"
             End If
         Loop
     End Sub
