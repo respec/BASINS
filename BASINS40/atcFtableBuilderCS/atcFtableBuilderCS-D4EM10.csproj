@@ -151,6 +151,10 @@
       <Name>atcControls</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcUCI\atcUCI-D4EM10.vbproj">
+      <Project>{2fc4314b-792b-40a3-b540-aca05b9ea86b}</Project>
+      <Name>atcUCI-D4EM10</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility-D4EM10.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility-D4EM10</Name>
@@ -195,7 +199,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
