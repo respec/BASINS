@@ -1958,9 +1958,9 @@ Public Module modModelSetup
 End Module
 
 Friend Class LandUseSubbasinOverlayRecord
-    Friend LuCode As String          'land use code
-    Friend SubbasinId As String      'subbasin id 
-    Friend Area As Double            'area of this land use within this subbasin
-    Friend MeanElevation As Single   'mean elevation of this land use within this subbasin (used for snow)
-    Friend MeanLatitude As Single    'mean latitude of this land use within this subbasin  (used for snow)
+    Public LuCode As String          'land use code
+    Public SubbasinId As String      'subbasin id 
+    Public Area As Double            'area of this land use within this subbasin
+    Public MeanElevation As Single   'mean elevation of this land use within this subbasin (used for snow)
+    Public MeanLatitude As Single    'mean latitude of this land use within this subbasin  (used for snow)
 End Class
