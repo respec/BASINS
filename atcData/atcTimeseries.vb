@@ -370,7 +370,7 @@ Public Class atcTimeseries
                         pNumValues = newValue
                     End If
                 End If
-                If pDates IsNot Nothing AndAlso pDates.numValues <> newValue Then
+                If pDates IsNot Nothing AndAlso pDates.pNumValues <> newValue Then
                     If newValue > 0 OrElse Not pDates.Attributes.ContainsAttribute("Shared") Then
                         pDates.numValues = newValue
                     End If
