@@ -240,7 +240,14 @@ namespace atcFtableBuilder
 
             Clipboard.Clear();
             Clipboard.SetText(sbf.ToString(), TextDataFormat.Text);
-            System.Windows.Forms.MessageBox.Show("FTable contents are ready to be pasted into an UCI", "Copy To UCI");
+            if (clsGlobals.pFTable == null)
+            {
+                System.Windows.Forms.MessageBox.Show("FTable contents are ready to be pasted into an UCI", "Copy To UCI");
+            }
+            else
+            {
+                System.Windows.Forms.MessageBox.Show("FTable contents have been copied to the UCI", "Copy To UCI");
+            }
         }
 
         private void CopyToClipboard(bool aCopyAll)

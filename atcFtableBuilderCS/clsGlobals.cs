@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using atcUCI;
 
 namespace atcFtableBuilder
 {
@@ -87,6 +88,8 @@ namespace atcFtableBuilder
         public static double BackfillPorosity = 0.4;
         public static bool HasBackfill = false;
         public static FTableCalculator.BMPType gBMPType = FTableCalculator.BMPType.None;
+
+        public static atcUCI.HspfFtable pFTable;
 
         #region Outflow Control
         public static string[] gOCOrificeUnd = { "0", "0", "0" };
