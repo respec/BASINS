@@ -435,6 +435,9 @@ namespace atcFtableBuilder
         {
             if (clsGlobals.gCalculator == null) return;
             if (!InputsAreOk(new ArrayList(clsGlobals.gCalculator.geomInputs))) return;
+
+            if (!RedrawShapes()) return;
+
             ArrayList colNames = new ArrayList();
             //Get the inputs from the geometric data and put them into a hashtable.
             Hashtable inputHash = getInputValues(clsGlobals.gCalculator.geomInputs);
@@ -651,6 +654,135 @@ namespace atcFtableBuilder
                 lFTableGrid.FTableColumnNames = colNames;
             }
             lFTableGrid.ShowDialog();
+        }
+
+        private bool RedrawShapes()
+        {
+            bool lDimsAreGood = true;
+            if (rdoChCirc.Checked)
+            {
+                bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.CIRCULAR;
+                bmpSketch1._diameter = clsGlobals.GeomCircDiam;
+                double lDiam = 0.0;
+                if (double.TryParse(txtGeomDiam.Text, out lDiam) && lDiam > 0)
+                    bmpSketch1._diameter = lDiam;
+                else
+                    lDimsAreGood = false;
+
+            }
+            else if (rdoChRect.Checked)
+            {
+                bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.RECTANGULAR;
+                bmpSketch1._width = clsGlobals.GeomRectTopWidth;
+                bmpSketch1._depth = clsGlobals.GeomRectMaxDepth;
+                double ltopWidth = 0; double lmaxDepth = 0;
+                if (double.TryParse(txtGeomTopWidth.Text, out ltopWidth) && double.TryParse(txtGeomMaxDepth.Text, out lmaxDepth))
+                {
+                    if (ltopWidth > 0 && lmaxDepth > 0)
+                    {
+                        bmpSketch1._width = ltopWidth;
+                        bmpSketch1._depth = lmaxDepth;
+                    }
+                    else
+                        lDimsAreGood = false;
+                }
+                else
+                    lDimsAreGood = false;
+            }
+            else if (rdoChTri.Checked)
+            {
+                bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.TRIANGULAR;
+                bmpSketch1._sideslope = clsGlobals.GeomTriSideSlope;
+                bmpSketch1._depth = clsGlobals.GeomTriMaxDepth;
+
+                double lmaxDepth = 0; double lsideSlope = 0;
+                if (double.TryParse(txtGeomSideSlope.Text, out lsideSlope) && double.TryParse(txtGeomMaxDepth.Text, out lmaxDepth))
+                {
+                    if (lsideSlope > 0 && lmaxDepth > 0)
+                    {
+                        bmpSketch1._sideslope = lsideSlope;
+                        bmpSketch1._depth = lmaxDepth;
+                    }
+                    else
+                        lDimsAreGood = false;
+                }
+                else
+                    lDimsAreGood = false;
+
+            }
+            else if (rdoChTrape.Checked)
+            {
+                bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.TRAPEZOIDAL;
+                bmpSketch1._sideslope = clsGlobals.GeomTrapeSideSlope;
+                bmpSketch1._depth = clsGlobals.GeomTrapeMaxDepth;
+                bmpSketch1._width = clsGlobals.GeomTrapeTopWidth;
+
+                double lmaxDepth = 0; double ltopWidth = 0; double lsideSlope = 0;
+                if (double.TryParse(txtGeomTopWidth.Text, out ltopWidth) && 
+                    double.TryParse(txtGeomMaxDepth.Text, out lmaxDepth) &&
+                    double.TryParse(txtGeomSideSlope.Text, out lsideSlope))
+                {
+                    if (ltopWidth > 0 && lmaxDepth > 0 && lsideSlope > 0)
+                    {
+                        double lbotWidth = ltopWidth - 2 * (lmaxDepth * lsideSlope);
+                        if (lbotWidth > 0)
+                        {
+                            bmpSketch1._width = ltopWidth;
+                            bmpSketch1._depth = lmaxDepth;
+                            bmpSketch1._sideslope = lsideSlope;
+                        }
+                        else
+                            lDimsAreGood = false;
+                    }
+                    else
+                        lDimsAreGood = false;
+                }
+                else
+                    lDimsAreGood = false;
+ 
+            }
+            else if (rdoChPara.Checked)
+            {
+                bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.PARABOLIC;
+                bmpSketch1._width = clsGlobals.GeomParabWidth;
+                bmpSketch1._depth = clsGlobals.GeomParabDepth;
+
+                double lwidth = 0; double ldepth = 0;
+                if (double.TryParse(txtGeomWidth.Text, out lwidth) && double.TryParse(txtGeomDepth.Text, out ldepth))
+                {
+                    if (lwidth > 0 && ldepth > 0)
+                    {
+                        bmpSketch1._width = lwidth;
+                        bmpSketch1._depth = ldepth;
+                    }
+                    else
+                        lDimsAreGood = false;
+                }
+                else
+                    lDimsAreGood = false;
+ 
+            }
+            else if (rdoChNatural.Checked)
+            {
+                bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.NATURAL;
+            }
+            else if (clsGlobals.gToolType == clsGlobals.ToolType.Gray && rdoChNaturalFP.Checked)
+            {
+                bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.NATURALFP;
+            }
+            else
+            {
+                clsGlobals.gCalculator = null;
+                bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.NONE;
+            }
+
+            if (lDimsAreGood)
+            {
+                bmpSketch1.Invalidate(true);
+                bmpSketch1.Refresh();
+            }
+
+            return lDimsAreGood;
         }
 
         /**
