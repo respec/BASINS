@@ -242,10 +242,34 @@ namespace atcFtableBuilder
             Clipboard.SetText(sbf.ToString(), TextDataFormat.Text);
             if (clsGlobals.pFTable == null)
             {
-                System.Windows.Forms.MessageBox.Show("FTable contents are ready to be pasted into an UCI", "Copy To UCI");
+                System.Windows.Forms.MessageBox.Show("FTable contents are ready to be pasted into a UCI", "Copy To UCI");
             }
             else
             {
+                clsGlobals.pFTable.Ncols = numcols;
+                clsGlobals.pFTable.Nrows = numrows-1;
+
+                for (int i = 0; i < numrows; i++)
+                {
+                    if (i == 0) continue;
+                    for (int j = 0; j < numcols; j++)
+                    {
+                        double newValue = 0.00;
+                        double.TryParse(FTableSource.get_CellValue(i, j).ToString(), out newValue);
+                        if (double.IsNaN(newValue)) newValue = 0.00;
+
+                        if (j == 0) clsGlobals.pFTable.set_Depth(i, newValue);
+                        if (j == 1) clsGlobals.pFTable.set_Area(i, newValue);
+                        if (j == 2) clsGlobals.pFTable.set_Volume(i, newValue);
+                        if (j == 3) clsGlobals.pFTable.set_Outflow1(i, newValue);
+                        if (j == 4) clsGlobals.pFTable.set_Outflow2(i, newValue);
+                        if (j == 5) clsGlobals.pFTable.set_Outflow3(i, newValue);
+                        if (j == 6) clsGlobals.pFTable.set_Outflow4(i, newValue);
+                        if (j == 7) clsGlobals.pFTable.set_Outflow5(i, newValue);
+                        
+                    }
+                }
+
                 System.Windows.Forms.MessageBox.Show("FTable contents have been copied to the UCI", "Copy To UCI");
             }
         }

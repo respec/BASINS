@@ -417,5 +417,27 @@ Public Class ctlEditFTables
         RefreshFtables()
         RefreshGrid()
     End Sub
+
+    Private Sub cmdLID_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdLID.Click
+        atcFtableBuilder.clsGlobals.gToolType = atcFtableBuilder.clsGlobals.ToolType.Green
+        atcFtableBuilder.clsGlobals.pFTable = pHspfFtable
+        Dim lBuilder As New atcFtableBuilder.mainForm
+        lBuilder.ShowDialog()
+        txtNRows.ValueInteger = pHspfFtable.Nrows
+        txtNCols.ValueInteger = pHspfFtable.Ncols
+        RefreshFtables()
+        RefreshGrid()
+    End Sub
+
+    Private Sub cmdOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOpen.Click
+        atcFtableBuilder.clsGlobals.gToolType = atcFtableBuilder.clsGlobals.ToolType.Gray
+        atcFtableBuilder.clsGlobals.pFTable = pHspfFtable
+        Dim lBuilder As New atcFtableBuilder.mainForm
+        lBuilder.ShowDialog()
+        txtNRows.ValueInteger = pHspfFtable.Nrows
+        txtNCols.ValueInteger = pHspfFtable.Ncols
+        RefreshFtables()
+        RefreshGrid()
+    End Sub
 End Class
 
