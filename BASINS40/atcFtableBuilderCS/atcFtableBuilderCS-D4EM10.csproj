@@ -152,8 +152,9 @@
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI-D4EM10.vbproj">
-      <Project>{2fc4314b-792b-40a3-b540-aca05b9ea86b}</Project>
+      <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
       <Name>atcUCI-D4EM10</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility-D4EM10.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
