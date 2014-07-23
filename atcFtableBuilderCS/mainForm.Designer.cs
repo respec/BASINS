@@ -43,6 +43,7 @@
             this.btnHelp = new System.Windows.Forms.Button();
             this.gbChannel = new System.Windows.Forms.GroupBox();
             this.rdoChNaturalFP = new System.Windows.Forms.RadioButton();
+            this.bmpSketch1 = new atcFtableBuilder.BMPSketch();
             this.rdoChNatural = new System.Windows.Forms.RadioButton();
             this.rdoChPara = new System.Windows.Forms.RadioButton();
             this.rdoChTrape = new System.Windows.Forms.RadioButton();
@@ -107,7 +108,6 @@
             this.lblGeomMannN = new System.Windows.Forms.Label();
             this.lblGeomLength = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.bmpSketch1 = new atcFtableBuilder.BMPSketch();
             this.frameTop.SuspendLayout();
             this.gbChannel.SuspendLayout();
             this.gbInputData.SuspendLayout();
@@ -166,13 +166,13 @@
             this.rdoUnitSI.Name = "rdoUnitSI";
             this.rdoUnitSI.Size = new System.Drawing.Size(65, 17);
             this.rdoUnitSI.TabIndex = 2;
-            this.rdoUnitSI.TabStop = true;
             this.rdoUnitSI.Text = "S.I.Units";
             this.rdoUnitSI.UseVisualStyleBackColor = true;
             // 
             // rdoUnitUS
             // 
             this.rdoUnitUS.AutoSize = true;
+            this.rdoUnitUS.Checked = true;
             this.rdoUnitUS.Location = new System.Drawing.Point(86, 11);
             this.rdoUnitUS.Name = "rdoUnitUS";
             this.rdoUnitUS.Size = new System.Drawing.Size(70, 17);
@@ -262,6 +262,15 @@
             this.rdoChNaturalFP.TabStop = true;
             this.rdoChNaturalFP.Text = "NATURAL (with flood plain)";
             this.rdoChNaturalFP.UseVisualStyleBackColor = true;
+            // 
+            // bmpSketch1
+            // 
+            this.bmpSketch1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.bmpSketch1.Location = new System.Drawing.Point(3, 42);
+            this.bmpSketch1.Name = "bmpSketch1";
+            this.bmpSketch1.Size = new System.Drawing.Size(787, 77);
+            this.bmpSketch1.TabIndex = 6;
+            this.bmpSketch1.MouseHover += new System.EventHandler(this.bmpSketch1_MouseHover);
             // 
             // rdoChNatural
             // 
@@ -866,15 +875,6 @@
             this.lblGeomLength.Size = new System.Drawing.Size(43, 13);
             this.lblGeomLength.TabIndex = 0;
             this.lblGeomLength.Text = "Length:";
-            // 
-            // bmpSketch1
-            // 
-            this.bmpSketch1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.bmpSketch1.Location = new System.Drawing.Point(3, 42);
-            this.bmpSketch1.Name = "bmpSketch1";
-            this.bmpSketch1.Size = new System.Drawing.Size(787, 77);
-            this.bmpSketch1.TabIndex = 6;
-            this.bmpSketch1.MouseHover += new System.EventHandler(this.bmpSketch1_MouseHover);
             // 
             // mainForm
             // 
