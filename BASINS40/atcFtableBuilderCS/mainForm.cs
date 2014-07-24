@@ -659,6 +659,7 @@ namespace atcFtableBuilder
         private bool RedrawShapes()
         {
             bool lDimsAreGood = true;
+            string lMsg = "";
             if (rdoChCirc.Checked)
             {
                 bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.CIRCULAR;
@@ -668,6 +669,9 @@ namespace atcFtableBuilder
                     bmpSketch1._diameter = lDiam;
                 else
                     lDimsAreGood = false;
+
+                if (!lDimsAreGood)
+                    lMsg = "CIRCULAR: revise diameter.";
 
             }
             else if (rdoChRect.Checked)
@@ -688,6 +692,9 @@ namespace atcFtableBuilder
                 }
                 else
                     lDimsAreGood = false;
+
+                if (!lDimsAreGood)
+                    lMsg = "RECTANGULAR: revise top width or max. depth";
             }
             else if (rdoChTri.Checked)
             {
@@ -708,6 +715,9 @@ namespace atcFtableBuilder
                 }
                 else
                     lDimsAreGood = false;
+
+                if (!lDimsAreGood)
+                    lMsg = "TRIANGULAR: revise side slope or max. depth";
 
             }
             else if (rdoChTrape.Checked)
@@ -739,6 +749,9 @@ namespace atcFtableBuilder
                 }
                 else
                     lDimsAreGood = false;
+
+                if (!lDimsAreGood)
+                    lMsg = "TRAPEZOIDAL: revise top width, max. depth, or side slope";
  
             }
             else if (rdoChPara.Checked)
@@ -760,7 +773,9 @@ namespace atcFtableBuilder
                 }
                 else
                     lDimsAreGood = false;
- 
+
+                if (!lDimsAreGood)
+                    lMsg = "PARABOLIC: revise width or depth";
             }
             else if (rdoChNatural.Checked)
             {
@@ -781,6 +796,9 @@ namespace atcFtableBuilder
                 bmpSketch1.Invalidate(true);
                 bmpSketch1.Refresh();
             }
+
+            if (!string.IsNullOrEmpty(lMsg))
+                System.Windows.Forms.MessageBox.Show(lMsg, "Problematic Channel Dimension");
 
             return lDimsAreGood;
         }
