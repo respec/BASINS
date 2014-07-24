@@ -280,6 +280,10 @@ namespace atcFtableBuilder
                 clsGlobals.gCalculator = null;
                 bmpSketch1.CurrentChannelType = FTableCalculator.ChannelType.NONE;
             }
+
+            if (clsGlobals.gToolType == clsGlobals.ToolType.Gray)
+                txtGeomLength.Text = clsGlobals.GeomChannelLengthGray.ToString();
+
             bmpSketch1.Invalidate(true);
             bmpSketch1.Refresh();
 
@@ -357,6 +361,17 @@ namespace atcFtableBuilder
                 btnClearProfile.Enabled = true;
                 btnUndoClear.Enabled = true;
                 grdChProfile.Enabled = true;
+            }
+
+            if (clsGlobals.gToolType == clsGlobals.ToolType.Gray)
+            {
+                lblGeomLSlope.Visible = true;
+                txtGeomLSlope.Visible = true;
+                lblGeomMannN.Visible = true;
+                txtGeomMannN.Visible = true;
+            }
+            else
+            {
             }
         }
 

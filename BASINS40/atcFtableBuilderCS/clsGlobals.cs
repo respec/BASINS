@@ -22,6 +22,7 @@ namespace atcFtableBuilder
         public static double InfilBackfillDepth = 0;
         public static double InfilBackfillPore = 0.4;
         public static double GeomManningN = 0.05;
+        public static double GeomChannelLengthGray = 4000;
         //CIRCULAR
         public static double GeomCircLength = 4000;
         public static double GeomCircDiam = 10;
