@@ -398,7 +398,34 @@ Public Class frmMRCControl
         Dim lCoC As Double
         Dim lSeason As String
 
-        Dim lCurvFileName As String = Path.Combine(Path.GetDirectoryName(pFileRecSumFullName), "curvout.txt")
+        Dim lMRCOutputDir As String = GetSetting("atcUSGSRecess", "Defaults", "FileRecSumDir", "")
+        If Not String.IsNullOrEmpty(pFileRecSumFullName) Then
+            lMRCOutputDir = Path.GetDirectoryName(pFileRecSumFullName)
+        End If
+        If Not IO.Directory.Exists(lMRCOutputDir) Then
+            Logger.Msg("Please specify an output directory for MRC curve text table. Suggested paths are:" & vbCrLf & _
+                       "- Directory where 'recsum.txt' is located" & vbCrLf & _
+                       "- Or any other directories" & vbCrLf & vbCrLf & _
+                       "Please note that if no directory is specified, curve text table will not be saved.", MsgBoxStyle.Information, "Plot MRC")
+            Dim FolderBrowserDialog1 As New System.Windows.Forms.FolderBrowserDialog
+            With FolderBrowserDialog1
+                ' Desktop is the root folder in the dialog.
+                .RootFolder = Environment.SpecialFolder.Desktop
+                ' Select directory on entry.
+                .SelectedPath = "C:\"
+                ' Prompt the user with a custom message.
+                .Description = "Specify MRC curve text table output directory"
+                If .ShowDialog = System.Windows.Forms.DialogResult.OK Then
+                    ' Display the selected folder if the user clicked on the OK button.
+                    lMRCOutputDir = .SelectedPath
+                    SaveSetting("atcUSGSRecess", "Defaults", "FileRecSumDir", lMRCOutputDir)
+                End If
+            End With
+        End If
+        Dim lCurvFileName As String = ""
+        If IO.Directory.Exists(lMRCOutputDir) Then
+            lCurvFileName = Path.Combine(lMRCOutputDir, "curvout.txt")
+        End If
         txtMRCTable.Text = clsMRC.CurvOutHeader
         For Each lItem As String In lstEquations.CheckedItems
 
