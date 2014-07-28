@@ -239,6 +239,11 @@ Public Class frmUSGSBaseflow
             If pMethods.Contains(BFMethods.BFIStandard) OrElse pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue("BFINDay", lNDay)
                 Args.SetValue("BFIUseSymbol", (chkBFISymbols.Checked))
+                Dim lBFIYearBasis As String = "Calendar"
+                If rdoBFIReportbyWaterYear.Checked Then
+                    lBFIYearBasis = "Water"
+                End If
+                Args.SetValue("BFIReportby", lBFIYearBasis)
             End If
         End If
         Return lErrMsg
@@ -403,33 +408,24 @@ Public Class frmUSGSBaseflow
             Exit Sub
         End If
         ClearAttributes()
-        Dim lClsBaseFlowCalculator As New atcTimeseriesBaseflow.atcTimeseriesBaseflow
-        Try
-            lClsBaseFlowCalculator.Open("Baseflow", lArgs)
-            lClsBaseFlowCalculator.DataSets.Clear()
-            'pMethodLastDone = lArgs.GetValue("Method")
-            MethodsLastDone = lArgs.GetValue("Methods")
-            pDALastUsed = lArgs.GetValue("Drainage Area")
-            Dim lBFIchosen As Boolean = False
-            If MethodsLastDone.Contains(BFMethods.BFIStandard) Then
-                lBFIchosen = True
-                pBFIFrac = lArgs.GetValue("BFIFrac")
-            End If
-            If MethodsLastDone.Contains(BFMethods.BFIModified) Then
-                lBFIchosen = True
-                pBFIK1Day = lArgs.GetValue("BFIK1Day")
-            End If
-            If lBFIchosen Then
-                pBFINDay = lArgs.GetValue("BFINDay")
-                pBFIUseSymbol = lArgs.GetValue("BFIUseSymbol")
-            End If
-            pDidBFSeparation = True
-        Catch ex As Exception
-            Logger.Msg("Baseflow separation failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Baseflow separation")
-        End Try
-        'If pDidBFSeparation Then
-        '    Logger.Msg("Baseflow separation is successful.", MsgBoxStyle.OkOnly, "Baseflow Separation")
-        'End If
+        modBaseflowUtil.ComputeBaseflow(lArgs)
+        'pMethodLastDone = lArgs.GetValue("Method")
+        MethodsLastDone = lArgs.GetValue("Methods")
+        pDALastUsed = lArgs.GetValue("Drainage Area")
+        Dim lBFIchosen As Boolean = False
+        If MethodsLastDone.Contains(BFMethods.BFIStandard) Then
+            lBFIchosen = True
+            pBFIFrac = lArgs.GetValue("BFIFrac")
+        End If
+        If MethodsLastDone.Contains(BFMethods.BFIModified) Then
+            lBFIchosen = True
+            pBFIK1Day = lArgs.GetValue("BFIK1Day")
+        End If
+        If lBFIchosen Then
+            pBFINDay = lArgs.GetValue("BFINDay")
+            pBFIUseSymbol = lArgs.GetValue("BFIUseSymbol")
+        End If
+        pDidBFSeparation = True
     End Sub
 
     Private Sub mnuOutputASCII_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOutputASCII.Click

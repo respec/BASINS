@@ -76,6 +76,9 @@ Partial Class frmUSGSBaseflow
         Me.lblK = New System.Windows.Forms.Label
         Me.lblF = New System.Windows.Forms.Label
         Me.lblN = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.rdoBFIReportbyCalendarYear = New System.Windows.Forms.RadioButton
+        Me.rdoBFIReportbyWaterYear = New System.Windows.Forms.RadioButton
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
@@ -90,7 +93,7 @@ Partial Class frmUSGSBaseflow
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDrainageArea.Location = New System.Drawing.Point(211, 37)
         Me.txtDrainageArea.Name = "txtDrainageArea"
-        Me.txtDrainageArea.Size = New System.Drawing.Size(124, 20)
+        Me.txtDrainageArea.Size = New System.Drawing.Size(138, 20)
         Me.txtDrainageArea.TabIndex = 6
         Me.txtDrainageArea.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -98,7 +101,7 @@ Partial Class frmUSGSBaseflow
         '
         Me.lblDrainageAreaUnits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblDrainageAreaUnits.AutoSize = True
-        Me.lblDrainageAreaUnits.Location = New System.Drawing.Point(340, 39)
+        Me.lblDrainageAreaUnits.Location = New System.Drawing.Point(354, 39)
         Me.lblDrainageAreaUnits.Name = "lblDrainageAreaUnits"
         Me.lblDrainageAreaUnits.Size = New System.Drawing.Size(31, 13)
         Me.lblDrainageAreaUnits.TabIndex = 4
@@ -129,7 +132,7 @@ Partial Class frmUSGSBaseflow
         Me.gbDates.Controls.Add(Me.lblDataStart)
         Me.gbDates.Location = New System.Drawing.Point(10, 197)
         Me.gbDates.Name = "gbDates"
-        Me.gbDates.Size = New System.Drawing.Size(361, 114)
+        Me.gbDates.Size = New System.Drawing.Size(375, 114)
         Me.gbDates.TabIndex = 7
         Me.gbDates.TabStop = False
         Me.gbDates.Text = "Define Analysis Dates"
@@ -158,7 +161,7 @@ Partial Class frmUSGSBaseflow
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtEndDateUser.Location = New System.Drawing.Point(194, 58)
         Me.txtEndDateUser.Name = "txtEndDateUser"
-        Me.txtEndDateUser.Size = New System.Drawing.Size(161, 20)
+        Me.txtEndDateUser.Size = New System.Drawing.Size(175, 20)
         Me.txtEndDateUser.TabIndex = 9
         Me.toolTip1.SetToolTip(Me.txtEndDateUser, "User-specified ending date: yyyy/mm/dd")
         '
@@ -168,7 +171,7 @@ Partial Class frmUSGSBaseflow
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtStartDateUser.Location = New System.Drawing.Point(194, 31)
         Me.txtStartDateUser.Name = "txtStartDateUser"
-        Me.txtStartDateUser.Size = New System.Drawing.Size(161, 20)
+        Me.txtStartDateUser.Size = New System.Drawing.Size(175, 20)
         Me.txtStartDateUser.TabIndex = 8
         Me.toolTip1.SetToolTip(Me.txtStartDateUser, "User-specified starting date: yyyy/mm/dd")
         '
@@ -235,7 +238,7 @@ Partial Class frmUSGSBaseflow
         'chkBFISymbols
         '
         Me.chkBFISymbols.AutoSize = True
-        Me.chkBFISymbols.Location = New System.Drawing.Point(169, 14)
+        Me.chkBFISymbols.Location = New System.Drawing.Point(6, 105)
         Me.chkBFISymbols.Name = "chkBFISymbols"
         Me.chkBFISymbols.Size = New System.Drawing.Size(65, 17)
         Me.chkBFISymbols.TabIndex = 8
@@ -250,7 +253,7 @@ Partial Class frmUSGSBaseflow
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(385, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(399, 24)
         Me.MenuStrip1.TabIndex = 28
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -345,7 +348,7 @@ Partial Class frmUSGSBaseflow
         Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
         Me.gbTextOutput.Location = New System.Drawing.Point(10, 317)
         Me.gbTextOutput.Name = "gbTextOutput"
-        Me.gbTextOutput.Size = New System.Drawing.Size(361, 111)
+        Me.gbTextOutput.Size = New System.Drawing.Size(375, 111)
         Me.gbTextOutput.TabIndex = 11
         Me.gbTextOutput.TabStop = False
         Me.gbTextOutput.Text = "Text Output"
@@ -353,18 +356,18 @@ Partial Class frmUSGSBaseflow
         'btnWriteASCIIOutput
         '
         Me.btnWriteASCIIOutput.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnWriteASCIIOutput.Location = New System.Drawing.Point(227, 82)
+        Me.btnWriteASCIIOutput.Location = New System.Drawing.Point(161, 82)
         Me.btnWriteASCIIOutput.Name = "btnWriteASCIIOutput"
-        Me.btnWriteASCIIOutput.Size = New System.Drawing.Size(128, 23)
+        Me.btnWriteASCIIOutput.Size = New System.Drawing.Size(208, 23)
         Me.btnWriteASCIIOutput.TabIndex = 15
-        Me.btnWriteASCIIOutput.Text = "Write Text Output"
+        Me.btnWriteASCIIOutput.Text = "Run Base-Flow Separation Program(s)"
         Me.btnWriteASCIIOutput.UseVisualStyleBackColor = True
         '
         'chkTabDelimited
         '
         Me.chkTabDelimited.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkTabDelimited.AutoSize = True
-        Me.chkTabDelimited.Location = New System.Drawing.Point(129, 86)
+        Me.chkTabDelimited.Location = New System.Drawing.Point(22, 88)
         Me.chkTabDelimited.Name = "chkTabDelimited"
         Me.chkTabDelimited.Size = New System.Drawing.Size(91, 17)
         Me.chkTabDelimited.TabIndex = 14
@@ -378,7 +381,7 @@ Partial Class frmUSGSBaseflow
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOutputDir.Location = New System.Drawing.Point(78, 20)
         Me.txtOutputDir.Name = "txtOutputDir"
-        Me.txtOutputDir.Size = New System.Drawing.Size(277, 20)
+        Me.txtOutputDir.Size = New System.Drawing.Size(291, 20)
         Me.txtOutputDir.TabIndex = 12
         '
         'lblOutputDir
@@ -491,7 +494,7 @@ Partial Class frmUSGSBaseflow
         Me.gbGraph.Controls.Add(Me.btnGraphDuration)
         Me.gbGraph.Location = New System.Drawing.Point(10, 435)
         Me.gbGraph.Name = "gbGraph"
-        Me.gbGraph.Size = New System.Drawing.Size(361, 90)
+        Me.gbGraph.Size = New System.Drawing.Size(375, 90)
         Me.gbGraph.TabIndex = 16
         Me.gbGraph.TabStop = False
         Me.gbGraph.Text = "Display Graph"
@@ -509,6 +512,9 @@ Partial Class frmUSGSBaseflow
         '
         Me.gbBFI.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbBFI.Controls.Add(Me.rdoBFIReportbyWaterYear)
+        Me.gbBFI.Controls.Add(Me.rdoBFIReportbyCalendarYear)
+        Me.gbBFI.Controls.Add(Me.Label2)
         Me.gbBFI.Controls.Add(Me.chkBFISymbols)
         Me.gbBFI.Controls.Add(Me.txtK)
         Me.gbBFI.Controls.Add(Me.txtF)
@@ -518,7 +524,7 @@ Partial Class frmUSGSBaseflow
         Me.gbBFI.Controls.Add(Me.lblN)
         Me.gbBFI.Location = New System.Drawing.Point(130, 61)
         Me.gbBFI.Name = "gbBFI"
-        Me.gbBFI.Size = New System.Drawing.Size(240, 129)
+        Me.gbBFI.Size = New System.Drawing.Size(254, 129)
         Me.gbBFI.TabIndex = 30
         Me.gbBFI.TabStop = False
         Me.gbBFI.Text = "BFI Parameters"
@@ -529,7 +535,7 @@ Partial Class frmUSGSBaseflow
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtK.Location = New System.Drawing.Point(170, 86)
         Me.txtK.Name = "txtK"
-        Me.txtK.Size = New System.Drawing.Size(65, 20)
+        Me.txtK.Size = New System.Drawing.Size(79, 20)
         Me.txtK.TabIndex = 5
         Me.txtK.Text = "0.97915"
         Me.txtK.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
@@ -540,7 +546,7 @@ Partial Class frmUSGSBaseflow
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtF.Location = New System.Drawing.Point(170, 62)
         Me.txtF.Name = "txtF"
-        Me.txtF.Size = New System.Drawing.Size(65, 20)
+        Me.txtF.Size = New System.Drawing.Size(79, 20)
         Me.txtF.TabIndex = 4
         Me.txtF.Text = "0.9"
         Me.txtF.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
@@ -551,7 +557,7 @@ Partial Class frmUSGSBaseflow
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtN.Location = New System.Drawing.Point(170, 37)
         Me.txtN.Name = "txtN"
-        Me.txtN.Size = New System.Drawing.Size(65, 20)
+        Me.txtN.Size = New System.Drawing.Size(79, 20)
         Me.txtN.TabIndex = 3
         Me.txtN.Text = "5"
         Me.txtN.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
@@ -583,11 +589,42 @@ Partial Class frmUSGSBaseflow
         Me.lblN.TabIndex = 0
         Me.lblN.Text = "Partition Length (N, days)"
         '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(6, 16)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(56, 13)
+        Me.Label2.TabIndex = 9
+        Me.Label2.Text = "Report by:"
+        '
+        'rdoBFIReportbyCalendarYear
+        '
+        Me.rdoBFIReportbyCalendarYear.AutoSize = True
+        Me.rdoBFIReportbyCalendarYear.Checked = True
+        Me.rdoBFIReportbyCalendarYear.Location = New System.Drawing.Point(71, 16)
+        Me.rdoBFIReportbyCalendarYear.Name = "rdoBFIReportbyCalendarYear"
+        Me.rdoBFIReportbyCalendarYear.Size = New System.Drawing.Size(92, 17)
+        Me.rdoBFIReportbyCalendarYear.TabIndex = 10
+        Me.rdoBFIReportbyCalendarYear.TabStop = True
+        Me.rdoBFIReportbyCalendarYear.Text = "Calendar Year"
+        Me.rdoBFIReportbyCalendarYear.UseVisualStyleBackColor = True
+        '
+        'rdoBFIReportbyWaterYear
+        '
+        Me.rdoBFIReportbyWaterYear.AutoSize = True
+        Me.rdoBFIReportbyWaterYear.Location = New System.Drawing.Point(169, 16)
+        Me.rdoBFIReportbyWaterYear.Name = "rdoBFIReportbyWaterYear"
+        Me.rdoBFIReportbyWaterYear.Size = New System.Drawing.Size(79, 17)
+        Me.rdoBFIReportbyWaterYear.TabIndex = 11
+        Me.rdoBFIReportbyWaterYear.Text = "Water Year"
+        Me.rdoBFIReportbyWaterYear.UseVisualStyleBackColor = True
+        '
         'frmUSGSBaseflow
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(385, 531)
+        Me.ClientSize = New System.Drawing.Size(399, 531)
         Me.Controls.Add(Me.gbBFI)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.lblDrainageAreaUnits)
@@ -668,4 +705,7 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents chkMethodBFIModified As System.Windows.Forms.CheckBox
     Friend WithEvents chkMethodBFIStandard As System.Windows.Forms.CheckBox
     Friend WithEvents chkBFISymbols As System.Windows.Forms.CheckBox
+    Friend WithEvents rdoBFIReportbyWaterYear As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoBFIReportbyCalendarYear As System.Windows.Forms.RadioButton
+    Friend WithEvents Label2 As System.Windows.Forms.Label
 End Class
