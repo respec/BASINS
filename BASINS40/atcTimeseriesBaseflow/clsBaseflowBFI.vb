@@ -94,20 +94,29 @@ Public Class clsBaseflowBFI
         Dim IsWaterYear As Boolean
         'set Year basis, water year vs calendar year
         J2Date(lTsDaily.Dates.Value(0), lDate)
-        If lDate(1) = 1 Then
-            YearBasis = "Calendar"
+
+        'If lDate(1) = 1 Then
+        '    YearBasis = "Calendar"
+        '    IsWaterYear = False
+        'ElseIf lDate(1) = 10 Then
+        '    YearBasis = "Water   "
+        '    IsWaterYear = True
+        'Else
+        '    YearBasis = "Arbitrary"
+        'End If
+        'If lDate(2) > 1 Then fillInStartIsNeeded = True
+        'If YearBasis.StartsWith("Arbitrary") Then
+        '    gError = "Dataset should either be calendar- or water-year based. No analysis is done."
+        '    Return Nothing 'enforce either water year data or calendar year data
+        'End If
+
+        If YearBasis.StartsWith("Calendar") Then
+            If lDate(1) <> 1 OrElse lDate(2) <> 1 Then fillInStartIsNeeded = True
             IsWaterYear = False
-        ElseIf lDate(1) = 10 Then
+        ElseIf YearBasis.StartsWith("Water") Then
+            If lDate(1) <> 10 OrElse lDate(2) <> 1 Then fillInStartIsNeeded = True
             YearBasis = "Water   "
             IsWaterYear = True
-        Else
-            YearBasis = "Arbitrary"
-        End If
-        If lDate(2) > 1 Then fillInStartIsNeeded = True
-
-        If YearBasis.StartsWith("Arbitrary") Then
-            gError = "Dataset should either be calendar- or water-year based. No analysis is done."
-            Return Nothing 'enforce either water year data or calendar year data
         End If
 
         'Only adjust at the beginning of daily streamflow Tser
@@ -116,7 +125,7 @@ Public Class clsBaseflowBFI
         Dim lNewStart As Double = StartDate
         Dim lNewEnd As Double = EndDate
         If fillInStartIsNeeded Then
-            lDate = GetBoundary(StartDate, True, IsWaterYear)
+            lDate = GetBoundaryBackFillFullYear(StartDate, True, IsWaterYear)
             lNewStart = Date2J(lDate)
         End If
 
@@ -141,7 +150,15 @@ Public Class clsBaseflowBFI
 
         'Adjust for pre- and post- duration dates
         lTsBF = SubsetByDate(lTsBF, StartDate, EndDate, Nothing)
-        lTsBF.Attributes.SetValue("Drainage Area", DrainageArea)
+        If lTsBF IsNot Nothing Then
+            With lTsBF.Attributes
+                .SetValue("Drainage Area", DrainageArea)
+                .SetValue("Constituent", "BFBFI")
+                .SetValue("AnalysisStart", StartDate)
+                .SetValue("AnalysisEnd", EndDate)
+            End With
+        End If
+
         Dim lTsBFgroup As New atcTimeseriesGroup
         lTsBFgroup.Add(lTsBF)
 
@@ -166,6 +183,42 @@ Public Class clsBaseflowBFI
             If IsWaterYear Then
                 lEndMonth = 9
                 lEndDay = 30
+            End If
+            lDate(1) = lEndMonth
+            lDate(2) = lEndDay
+            lDate(3) = 24
+            lDate(4) = 0
+            lDate(5) = 0
+        End If
+        Return lDate
+    End Function
+
+    Private Function GetBoundaryBackFillFullYear(ByVal aTime As Double, ByVal IsStartTime As Boolean, ByVal IsWaterYear As Boolean) As Integer()
+        Dim lDate(5) As Integer
+        J2Date(aTime, lDate)
+        If IsStartTime Then
+            Dim lStartMonth As Integer = 1
+            If IsWaterYear Then
+                'Adj year
+                lStartMonth = 10
+                If lDate(1) < 10 Then
+                    lDate(0) -= 1
+                End If
+            End If
+            lDate(1) = lStartMonth
+            lDate(2) = 1
+            lDate(3) = 0
+            lDate(4) = 0
+            lDate(5) = 0
+        Else
+            Dim lEndMonth As Integer = 12
+            Dim lEndDay As Integer = 31
+            If IsWaterYear Then
+                lEndMonth = 9
+                lEndDay = 30
+                If lDate(1) > 9 Then
+                    lDate(0) += 1
+                End If
             End If
             lDate(1) = lEndMonth
             lDate(2) = lEndDay

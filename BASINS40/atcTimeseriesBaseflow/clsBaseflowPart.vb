@@ -110,40 +110,55 @@ Public Class clsBaseflowPart
         End If
 
         Dim lTsBaseflowgroup As New atcTimeseriesGroup
-        With pTsBaseflow1
-            .Attributes.SetValue("Scenario", "PartDaily1")
-            .Attributes.SetValue("Drainage Area", DrainageArea)
-            .Attributes.SetValue("Method", BFMethods.PART)
-            .Attributes.SetValue("TBase", TBase)
+        With pTsBaseflow1.Attributes
+            .SetValue("Scenario", "PartDaily1")
+            .SetValue("Drainage Area", DrainageArea)
+            .SetValue("Method", BFMethods.PART)
+            .SetValue("TBase", TBase)
+            .SetValue("Constituent", "BFPart")
+            .SetValue("AnalysisStart", StartDate)
+            .SetValue("AnalysisEnd", EndDate)
         End With
-        With pTsBaseflow2
-            .Attributes.SetValue("Scenario", "PartDaily2")
-            .Attributes.SetValue("Drainage Area", DrainageArea)
-            .Attributes.SetValue("Method", BFMethods.PART)
-            .Attributes.SetValue("TBase", TBase)
+        With pTsBaseflow2.Attributes
+            .SetValue("Scenario", "PartDaily2")
+            .SetValue("Drainage Area", DrainageArea)
+            .SetValue("Method", BFMethods.PART)
+            .SetValue("TBase", TBase)
+            .SetValue("Constituent", "BFPart")
+            .SetValue("AnalysisStart", StartDate)
+            .SetValue("AnalysisEnd", EndDate)
         End With
         pTsBaseflow3.Attributes.SetValue("Scenario", "PartDaily3")
 
-        With pTsBaseflow1Monthly
-            .Attributes.SetValue("Scenario", "PartMonthly1")
-            .Attributes.SetValue("Method", BFMethods.PART)
-            .Attributes.SetValue("Drainage Area", DrainageArea)
+        With pTsBaseflow1Monthly.Attributes
+            .SetValue("Scenario", "PartMonthly1")
+            .SetValue("Method", BFMethods.PART)
+            .SetValue("Drainage Area", DrainageArea)
+            .SetValue("Constituent", "BFPart")
+            .SetValue("AnalysisStart", StartDate)
+            .SetValue("AnalysisEnd", EndDate)
         End With
         pTsBaseflow2Monthly.Attributes.SetValue("Scenario", "PartMonthly2")
         pTsBaseflow3Monthly.Attributes.SetValue("Scenario", "PartMonthly3")
 
-        With pTsBaseflowMonthly
-            .Attributes.SetValue("Scenario", "PartMonthlyInterpolated")
-            .Attributes.SetValue("Method", BFMethods.PART)
-            .Attributes.SetValue("Drainage Area", DrainageArea)
+        With pTsBaseflowMonthly.Attributes
+            .SetValue("Scenario", "PartMonthlyInterpolated")
+            .SetValue("Method", BFMethods.PART)
+            .SetValue("Drainage Area", DrainageArea)
             'this one has a 'LinearSlope' attribute already
+            .SetValue("Constituent", "BFPart")
+            .SetValue("AnalysisStart", StartDate)
+            .SetValue("AnalysisEnd", EndDate)
         End With
-        With pTsBaseflowMonthlyDepth ' a linear interpolation of the first two bf
-            .Attributes.SetValue("Scenario", "PartMonthlyDepth")
-            .Attributes.SetValue("Method", BFMethods.PART)
-            .Attributes.SetValue("Drainage Area", DrainageArea)
-            .Attributes.SetValue("SumDepth", pTotalBaseflowDepth)
-            .Attributes.SetValue("MissingMonths", pMissingDataMonth)
+        With pTsBaseflowMonthlyDepth.Attributes ' a linear interpolation of the first two bf
+            .SetValue("Scenario", "PartMonthlyDepth")
+            .SetValue("Method", BFMethods.PART)
+            .SetValue("Drainage Area", DrainageArea)
+            .SetValue("SumDepth", pTotalBaseflowDepth)
+            .SetValue("MissingMonths", pMissingDataMonth)
+            .SetValue("Constituent", "BFPart")
+            .SetValue("AnalysisStart", StartDate)
+            .SetValue("AnalysisEnd", EndDate)
         End With
 
         With lTsBaseflowgroup

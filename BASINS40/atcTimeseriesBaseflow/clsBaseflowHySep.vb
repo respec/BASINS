@@ -101,7 +101,14 @@ Public Class clsBaseflowHySep
 
         'Adjust for pre- and post- duration dates
         lTsBF = SubsetByDate(lTsBF, StartDate, EndDate, Nothing)
-        lTsBF.Attributes.SetValue("Drainage Area", DrainageArea)
+        If lTsBF IsNot Nothing Then
+            With lTsBF.Attributes
+                .SetValue("Drainage Area", DrainageArea)
+                .SetValue("Constituent", "BFHySep")
+                .SetValue("AnalysisStart", StartDate)
+                .SetValue("AnalysisEnd", EndDate)
+            End With
+        End If
         Dim lTsBFgroup As New atcTimeseriesGroup
         lTsBFgroup.Add(lTsBF)
 

@@ -147,6 +147,7 @@ Public Class atcTimeseriesBaseflow
         Dim lBFIFrac As Double
         Dim lBFIK1Day As Double
         Dim lBFIUseSymbol As Boolean = False
+        Dim lBFIYearBasis As String = ""
         Dim lStationFile As String = ""
 
         Dim lAttributeDef As atcAttributeDefinition = Nothing
@@ -161,6 +162,7 @@ Public Class atcTimeseriesBaseflow
         Else
             'ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
             lTsStreamflow = aArgs.GetValue("Streamflow")(0)
+            Me.Specification = "Base-Flow-" & lTsStreamflow.Attributes.GetValue("Location")
             lEnglishFlg = aArgs.GetValue("EnglishUnit", lEnglishFlg)
             lStartDate = aArgs.GetValue("Start Date")
             lEndDate = aArgs.GetValue("End Date")
@@ -185,6 +187,7 @@ Public Class atcTimeseriesBaseflow
             If lBFIChosen Then
                 lBFINDay = aArgs.GetValue("BFINDay")
                 lBFIUseSymbol = aArgs.GetValue("BFIUseSymbol")
+                lBFIYearBasis = aArgs.GetValue("BFIReportby")
             End If
 
             lStationFile = aArgs.GetValue("Station File")
@@ -238,6 +241,7 @@ Public Class atcTimeseriesBaseflow
                 If lMethod = BFMethods.BFIStandard Or lMethod = BFMethods.BFIModified Then
                     CType(ClsBaseFlow, clsBaseflowBFI).PartitionLengthInDays = lBFINDay
                     CType(ClsBaseFlow, clsBaseflowBFI).UseSymbols = lBFIUseSymbol
+                    CType(ClsBaseFlow, clsBaseflowBFI).YearBasis = lBFIYearBasis
                     If lMethod = BFMethods.BFIStandard Then
                         CType(ClsBaseFlow, clsBaseflowBFI).TPTestFraction = lBFIFrac
                     ElseIf lMethod = BFMethods.BFIModified Then
@@ -265,6 +269,7 @@ Public Class atcTimeseriesBaseflow
 
         'If Me.DataSets.Count > 0 Then
         If lBFDataGroupFinal IsNot Nothing AndAlso lBFDataGroupFinal.Count > 0 Then
+            Me.DataSets.AddRange(lBFDataGroupFinal)
             Dim lNewDef As atcAttributeDefinition
             Dim lIndex As Integer = atcDataAttributes.AllDefinitions.Keys.IndexOf("Baseflow")
             If lIndex >= 0 Then
