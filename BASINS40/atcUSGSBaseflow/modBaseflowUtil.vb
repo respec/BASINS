@@ -3,11 +3,71 @@ Imports atcUtility
 Imports atcTimeseriesBaseflow
 Imports MapWinUtility
 
-Module modBaseflowUtil
+Public Module modBaseflowUtil
     Public MethodsLastDone As ArrayList
     Public OutputFilenameRoot As String
     Public OutputDir As String
     Private pUADepth As Double = 0.03719
+
+    ''' <summary>
+    '''set methods
+    '''Args.SetValue("Methods", pMethods)
+    '''Set drainage area
+    '''Args.SetValue("Drainage Area", lDA)
+    '''set duration
+    '''Args.SetValue("Start Date", StartDateFromForm)
+    '''Args.SetValue("End Date", EndDateFromForm)
+    '''Set streamflow
+    '''Args.SetValue("Streamflow", pDataGroup)
+    '''Set Unit
+    '''Args.SetValue("EnglishUnit", True)
+    '''Set station.txt
+    '''Args.SetValue("Station File", atcUSGSStations.StationInfoFile)
+    '''        If pMethods.Contains(BFMethods.BFIStandard) Then
+    '''            Args.SetValue("BFIFrac", lFrac)
+    '''        End If
+    '''        If pMethods.Contains(BFMethods.BFIModified) Then
+    '''            Args.SetValue("BFIK1Day", lK1Day)
+    '''        End If
+    '''        If pMethods.Contains(BFMethods.BFIStandard) OrElse pMethods.Contains(BFMethods.BFIModified) Then
+    '''            Args.SetValue("BFINDay", lNDay)
+    '''            Args.SetValue("BFIUseSymbol", (chkBFISymbols.Checked))
+    '''Dim lBFIYearBasis As String = "Calendar"
+    '''            If rdoBFIReportbyWaterYear.Checked Then
+    '''                lBFIYearBasis = "Water"
+    '''            End If
+    '''            Args.SetValue("BFIReportby", lBFIYearBasis)
+    '''        End If
+    ''' </summary>
+    ''' <param name="aArgs"></param>
+    ''' <remarks></remarks>
+    Public Sub ComputeBaseflow(ByVal aArgs As atcDataAttributes)
+        Dim lClsBaseFlowCalculator As New atcTimeseriesBaseflow.atcTimeseriesBaseflow
+        Try
+            lClsBaseFlowCalculator.Open("Baseflow", aArgs)
+            Dim lOldDataSource As atcDataSource = Nothing
+            For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                If lDataSource.Specification = lClsBaseFlowCalculator.Specification Then
+                    lOldDataSource = lDataSource
+                    Exit For
+                End If
+            Next
+            If lOldDataSource IsNot Nothing Then
+                lOldDataSource.Clear()
+                atcDataManager.DataSources.Remove(lOldDataSource)
+            End If
+
+            'lClsBaseFlowCalculator.DataSets.Clear()
+            'Add new results to Datasets
+            atcDataManager.DataSources.Add(lClsBaseFlowCalculator)
+
+        Catch ex As Exception
+            Logger.Msg("Baseflow separation failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Baseflow separation")
+        End Try
+        'If pDidBFSeparation Then
+        '    Logger.Msg("Baseflow separation is successful.", MsgBoxStyle.OkOnly, "Baseflow Separation")
+        'End If
+    End Sub
 
     Public Sub ASCIICommon(ByVal aTs As atcTimeseries)
 
@@ -165,7 +225,7 @@ Module modBaseflowUtil
         lTitleLine1 = lTitleLine1.Replace("daily", "monthly")
         lTitleLine4 = "(CFS: average flow for the month (cubic feet per second); IN: flow per drainage area (inches); BFP: Base-Flow Percentage (ratio of base-flow to streamflow multiplied by 100)"
         lSW.WriteLine(lTitleLine1) : lSW.WriteLine(lTitleLine2) : lSW.WriteLine(lTitleLine3) : lSW.WriteLine(lTitleLine4)
-        lSW.WriteLine(lTableHeader.ToString)
+        lSW.Write(lTableHeader.ToString)
         lSW.WriteLine(lTableToReport.ToString)
         lSW.Flush()
         lSW.Close()
@@ -589,8 +649,6 @@ Module modBaseflowUtil
 
         Dim lBF As Double
         Dim lBFDepth As Double
-        Dim lRO As Double
-        Dim lRODepth As Double
         Dim lBFPct As Double = 0.0
 
         Dim lTsFlow As atcTimeseries = aTsGroupStreamFlow.ItemByKey("Rate" & ATStep)
@@ -604,6 +662,18 @@ Module modBaseflowUtil
             AdjustDates(aTsGroupBFIModified, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate)
         End If
         For I As Integer = 1 To lTsFlow.numValues
+            If ATStep = "Monthly" Then
+                If ASCIICommonTableSkipOneRow(aTsGroupPart, _
+                                 aTsGroupFixed, _
+                                 aTsGroupLocMin, _
+                                 aTsGroupSlide, _
+                                 aTsGroupBFIStandard, _
+                                 aTsGroupBFIModified, _
+                                 ATStep, _
+                                 I) Then
+                    Continue For
+                End If
+            End If
             J2Date(lTsFlow.Dates.Value(I - 1), lDate)
             With lTableBody
                 .Value(1) = I
@@ -620,150 +690,37 @@ Module modBaseflowUtil
                 If aTsGroupPart.Count > 0 Then
                     lBF = aTsGroupPart.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupPart.ItemByKey("Depth" & ATStep).Value(I)
-                    If lBF < 0 OrElse lBFDepth < 0 Then
-                        lBF = -99 : lBFDepth = -99
-                        lRO = -99 : lRODepth = -99
-                        lBFPct = -99
-                    Else
-                        lRO = lTsFlow.Value(I) - lBF
-                        lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                        If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
-                            lBFPct = lBF / lTsFlow.Value(I) * 100
-                        Else
-                            lBFPct = 0.0
-                        End If
-                    End If
-                    If ATStep = "Monthly" AndAlso (lBF < 0 OrElse lBFDepth < 0) Then
-                        'For incomplete monthly timesteps, simply put up blank cells
-                        .Value(lLastColumn + 1) = ""
-                        .Value(lLastColumn + 2) = ""
-                        .Value(lLastColumn + 3) = ""
-                        .Value(lLastColumn + 4) = ""
-                        .Value(lLastColumn + 5) = ""
-                    Else
-                        .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
-                        .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                        .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                        .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
-                        .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
-                    End If
+                    ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                     lLastColumn += 5
                 End If
                 If aTsGroupFixed.Count > 0 Then
                     lBF = aTsGroupFixed.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupFixed.ItemByKey("Depth" & ATStep).Value(I)
-                    lRO = lTsFlow.Value(I) - lBF
-                    lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                    If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
-                        lBFPct = lBF / lTsFlow.Value(I) * 100
-                    Else
-                        lBFPct = 0.0
-                    End If
-                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
-                    .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                    .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
-                    .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                     lLastColumn += 5
                 End If
                 If aTsGroupLocMin.Count > 0 Then
                     lBF = aTsGroupLocMin.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupLocMin.ItemByKey("Depth" & ATStep).Value(I)
-                    lRO = lTsFlow.Value(I) - lBF
-                    lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                    If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
-                        lBFPct = lBF / lTsFlow.Value(I) * 100
-                    Else
-                        lBFPct = 0
-                    End If
-                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
-                    .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                    .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
-                    .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                     lLastColumn += 5
                 End If
                 If aTsGroupSlide.Count > 0 Then
                     lBF = aTsGroupSlide.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupSlide.ItemByKey("Depth" & ATStep).Value(I)
-                    lRO = lTsFlow.Value(I) - lBF
-                    lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                    If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
-                        lBFPct = lBF / lTsFlow.Value(I) * 100
-                    Else
-                        lBFPct = 0
-                    End If
-                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
-                    .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                    .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
-                    .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                     lLastColumn += 5
                 End If
                 If aTsGroupBFIStandard.Count > 0 Then
                     lBF = aTsGroupBFIStandard.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupBFIStandard.ItemByKey("Depth" & ATStep).Value(I)
-                    If lBF < 0 OrElse lBFDepth < 0 Then
-                        'For record from incomplete timestep, simply put up blank cells
-                        lBF = -99 : lBFDepth = -99
-                        lRO = -99 : lRODepth = -99
-                        lBFPct = -99
-                    Else
-                        lRO = lTsFlow.Value(I) - lBF
-                        lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                        If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
-                            lBFPct = lBF / lTsFlow.Value(I) * 100
-                        Else
-                            lBFPct = 0
-                        End If
-                        
-                    End If
-                    If ATStep = "Monthly" AndAlso (lBF < 0 OrElse lBFDepth < 0) Then
-                        'For incomplete Monthly timestep, simply put up blank cells
-                        .Value(lLastColumn + 1) = ""
-                        .Value(lLastColumn + 2) = ""
-                        .Value(lLastColumn + 3) = ""
-                        .Value(lLastColumn + 4) = ""
-                        .Value(lLastColumn + 5) = ""
-                    Else
-                        .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
-                        .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                        .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                        .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
-                        .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
-                    End If
+                    ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                     lLastColumn += 5 'second to last column to have this jump
                 End If
                 If aTsGroupBFIModified.Count > 0 Then
                     lBF = aTsGroupBFIModified.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupBFIModified.ItemByKey("Depth" & ATStep).Value(I)
-                    If lBF < 0 OrElse lBFDepth < 0 Then
-                        lBF = -99 : lBFDepth = -99
-                        lRO = -99 : lRODepth = -99
-                        lBFPct = -99
-                    Else
-                        lRO = lTsFlow.Value(I) - lBF
-                        lRODepth = lTsFlowDepth.Value(I) - lBFDepth
-                        If lBF > 0 AndAlso lTsFlow.Value(I) > 0 Then
-                            lBFPct = lBF / lTsFlow.Value(I) * 100
-                        Else
-                            lBFPct = 0
-                        End If
-                    End If
-                    If ATStep = "Monthly" AndAlso (lBF < 0 OrElse lBFDepth < 0) Then
-                        'For incomplete Monthly timestep, simply put up blank cells
-                        .Value(lLastColumn + 1) = ""
-                        .Value(lLastColumn + 2) = ""
-                        .Value(lLastColumn + 3) = ""
-                        .Value(lLastColumn + 4) = ""
-                        .Value(lLastColumn + 5) = ""
-                    Else
-                        .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
-                        .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                        .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                        .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
-                        .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
-                    End If
+                    ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                 End If
                 .CurrentRecord += 1
             End With
@@ -771,6 +728,88 @@ Module modBaseflowUtil
         Return lTableBody
     End Function
 
+    Private Function ASCIICommonTableSkipOneRow(ByVal aTsGroupPart As atcCollection, _
+                                 ByVal aTsGroupFixed As atcCollection, _
+                                 ByVal aTsGroupLocMin As atcCollection, _
+                                 ByVal aTsGroupSlide As atcCollection, _
+                                 ByVal aTsGroupBFIStandard As atcCollection, _
+                                 ByVal aTsGroupBFIModified As atcCollection, _
+                                 ByVal ATStep As String, _
+                                 ByVal I As Integer) As Boolean
+        Dim lBF, lBFDepth As Double
+        If aTsGroupPart.Count > 0 Then
+            lBF = aTsGroupPart.ItemByKey("Rate" & ATStep).Value(I)
+            lBFDepth = aTsGroupPart.ItemByKey("Depth" & ATStep).Value(I)
+            If lBF < 0 OrElse lBFDepth < 0 Then Return True
+        End If
+        If aTsGroupFixed.Count > 0 Then
+            lBF = aTsGroupFixed.ItemByKey("Rate" & ATStep).Value(I)
+            lBFDepth = aTsGroupFixed.ItemByKey("Depth" & ATStep).Value(I)
+            If lBF < 0 OrElse lBFDepth < 0 Then Return True
+        End If
+        If aTsGroupLocMin.Count > 0 Then
+            lBF = aTsGroupLocMin.ItemByKey("Rate" & ATStep).Value(I)
+            lBFDepth = aTsGroupLocMin.ItemByKey("Depth" & ATStep).Value(I)
+            If lBF < 0 OrElse lBFDepth < 0 Then Return True
+        End If
+        If aTsGroupSlide.Count > 0 Then
+            lBF = aTsGroupSlide.ItemByKey("Rate" & ATStep).Value(I)
+            lBFDepth = aTsGroupSlide.ItemByKey("Depth" & ATStep).Value(I)
+            If lBF < 0 OrElse lBFDepth < 0 Then Return True
+        End If
+        If aTsGroupBFIStandard.Count > 0 Then
+            lBF = aTsGroupBFIStandard.ItemByKey("Rate" & ATStep).Value(I)
+            lBFDepth = aTsGroupBFIStandard.ItemByKey("Depth" & ATStep).Value(I)
+            If lBF < 0 OrElse lBFDepth < 0 Then Return True
+        End If
+        If aTsGroupBFIModified.Count > 0 Then
+            lBF = aTsGroupBFIModified.ItemByKey("Rate" & ATStep).Value(I)
+            lBFDepth = aTsGroupBFIModified.ItemByKey("Depth" & ATStep).Value(I)
+            If lBF < 0 OrElse lBFDepth < 0 Then Return True
+        End If
+        Return False
+    End Function
+
+    Private Sub ASCIICommonTableOneRow(ByVal aTable As atcTableDelimited, _
+                                       ByVal aTSFlow As atcTimeseries, _
+                                       ByVal aTSFlowDepth As atcTimeseries, _
+                                       ByVal aInd As Integer, _
+                                       ByVal ATStep As String, _
+                                       ByVal aBF As Double, _
+                                       ByVal aBFDepth As Double, _
+                                       ByVal aLastColumn As Integer)
+        Dim lRO, lRODepth, lBFPct As Double
+
+        If aBF < 0 OrElse aBFDepth < 0 Then
+            aBF = -99 : aBFDepth = -99
+            lRO = -99 : lRODepth = -99
+            lBFPct = -99
+        Else
+            lRO = aTSFlow.Value(aInd) - aBF
+            lRODepth = aTSFlowDepth.Value(aInd) - aBFDepth
+            If aBF > 0 AndAlso aTSFlow.Value(aInd) > 0 Then
+                lBFPct = aBF / aTSFlow.Value(aInd) * 100
+            Else
+                lBFPct = 0
+            End If
+        End If
+        With aTable
+            If (ATStep = "Monthly" OrElse ATStep = "Yearly") AndAlso (aBF < 0 OrElse aBFDepth < 0) Then
+                'For incomplete Monthly timestep, simply put up blank cells
+                .Value(aLastColumn + 1) = ""
+                .Value(aLastColumn + 2) = ""
+                .Value(aLastColumn + 3) = ""
+                .Value(aLastColumn + 4) = ""
+                .Value(aLastColumn + 5) = ""
+            Else
+                .Value(aLastColumn + 1) = DoubleToString(aBF, , "0.00")
+                .Value(aLastColumn + 2) = DoubleToString(aBFDepth, , "0.00")
+                .Value(aLastColumn + 3) = DoubleToString(lRO, , "0.00")
+                .Value(aLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
+                .Value(aLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+            End If
+        End With
+    End Sub
     ''' <summary>
     ''' This routine is to make date range adjustment to BFI analysis.
     ''' The only adjustment is to make sure the BFI baseflow and depth Tsers
@@ -931,6 +970,48 @@ Module modBaseflowUtil
                 'lTsYear.Attributes.SetValue(lReportColumnAttributeName, "RateYearly")
                 'lTsYearDepth.Attributes.SetValue(lReportColumnAttributeName, "DepthYearly")
 
+                'Process HySep method's monthly values to set incomplete months value to -99.99
+                If aMethod = BFMethods.HySEPFixed OrElse aMethod = BFMethods.HySEPLocMin OrElse aMethod = BFMethods.HySEPSlide Then
+                    Dim lAnalysisStart As Double = lTsDaily.Attributes.GetValue("AnalysisStart", -99)
+                    Dim lAnalysisEnd As Double = lTsDaily.Attributes.GetValue("AnalysisEnd", -99)
+                    If lAnalysisStart > 0 AndAlso lAnalysisEnd > 0 AndAlso lAnalysisEnd > lAnalysisStart Then
+                        Dim lDateStart(5) As Integer
+                        Dim lDateEnd(5) As Integer
+                        Dim lDateMon(5) As Integer
+                        J2Date(lAnalysisStart, lDateStart)
+                        J2Date(lAnalysisEnd, lDateEnd)
+                        Dim lWholeMonthStart As Double = Date2J(lDateStart(0), lDateStart(1), 1, 0, 0, 0)
+                        Dim lWholeMonthEnd As Double = Date2J(lDateEnd(0), lDateEnd(1), 24, 0, 0, 0)
+                        Dim lSkipStartMonth As Boolean = False
+                        Dim lSkipEndMonth As Boolean = False
+                        If lAnalysisStart > lWholeMonthStart Then lSkipStartMonth = True
+                        If lAnalysisEnd < lWholeMonthEnd Then lSkipEndMonth = True
+                        If lSkipStartMonth OrElse lSkipEndMonth Then
+                            Dim lDate As Double
+                            For I As Integer = 1 To lTsMon.numValues
+                                lDate = lTsMon.Dates.Value(I)
+                                If lDate < lWholeMonthStart OrElse lDate > lWholeMonthEnd Then
+                                    lTsMon.Value(I) = -99.99
+                                    lTsMonDepth.Value(I) = -99.99
+                                Else
+                                    J2Date(lDate, lDateMon)
+                                    timcnv(lDateMon)
+                                    If lDateMon(0) = lDateStart(0) AndAlso lDateMon(1) = lDateStart(1) Then
+                                        If lSkipStartMonth Then
+                                            lTsMon.Value(I) = -99.99
+                                            lTsMonDepth.Value(I) = -99.99
+                                        End If
+                                    ElseIf lDateMon(0) = lDateEnd(0) AndAlso lDateMon(1) = lDateEnd(1) Then
+                                        If lSkipEndMonth Then
+                                            lTsMon.Value(I) = -99.99
+                                            lTsMonDepth.Value(I) = -99.99
+                                        End If
+                                    End If
+                                End If
+                            Next
+                        End If
+                    End If
+                End If
                 With lTsGroupToReport
                     .Add("RateDaily", lTsDaily)
                     .Add("DepthDaily", lTsDailyDepth)
@@ -2896,6 +2977,7 @@ Module modBaseflowUtil
         Dim lstart As Double = lTsBaseflow.Attributes.GetValue("SJDay")
         Dim lend As Double = lTsBaseflow.Attributes.GetValue("EJDay")
         Dim lTsFlow As atcTimeseries = SubsetByDate(aTS, lstart, lend, Nothing)
+        Dim lYearBasis As String = lTsBaseflow.Attributes.GetValue("YearBasis", "Calendar")
 
         Dim lSW As New IO.StreamWriter(aFilename, False)
 
@@ -2953,7 +3035,7 @@ Module modBaseflowUtil
         lSW.WriteLine(" =============================================================================")
         lSW.WriteLine(" Base-Flow Index for gage " & lStationID)
         lSW.WriteLine(" agency " & lStationID & " sample data					                                              ")
-        lSW.WriteLine(" Calendar   Base-Flow      Base Flow     Total Runoff | Day of Turning Point |")
+        lSW.WriteLine(" " & lYearBasis & "   Base-Flow      Base Flow     Total Runoff | Day of Turning Point |")
         lSW.WriteLine(" Year         Index        (acre-ft)       (acre-ft)  |  [First]     [Last]  |")
         lSW.WriteLine(" -----------------------------------------------------------------------------")
         lSW.WriteLine(lTsBaseflow.Attributes.GetValue("BFIAnnualSummary"))
