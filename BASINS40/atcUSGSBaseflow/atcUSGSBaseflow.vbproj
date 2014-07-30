@@ -167,6 +167,11 @@
       <Name>atcTimeseriesBaseflow</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB.vbproj">
+      <Project>{EA68C9C7-8A7A-4EDF-8944-413E4E7FA276}</Project>
+      <Name>atcTimeseriesRDB</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcUSGSUtility\atcUSGSUtility.vbproj">
       <Project>{4DBC8159-1072-41FA-9242-933E12A88EE6}</Project>
       <Name>atcUSGSUtility</Name>

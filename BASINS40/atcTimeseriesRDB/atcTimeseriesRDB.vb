@@ -45,6 +45,110 @@ Public Class atcTimeseriesRDB
         End Get
     End Property
 
+    Public Overrides ReadOnly Property CanSave() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
+
+    Public Overrides Function Save(ByVal aSaveFileName As String, Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
+        Try
+            Logger.Dbg("Save " & Me.Name & " in " & aSaveFileName)
+            If IO.File.Exists(aSaveFileName) Then
+                Dim lExtension As String = IO.Path.GetExtension(aSaveFileName)
+                Dim lRenamedFilename As String = GetTemporaryFileName(aSaveFileName.Substring(0, aSaveFileName.Length - lExtension.Length), lExtension)
+                Select Case aExistAction
+                    Case EnumExistAction.ExistAppend
+                        Logger.Dbg("Save: File already exists and aExistAction = ExistAppend, not implemented.")
+                        Throw New ApplicationException("Append not implemented for " & Me.Name)
+                    Case EnumExistAction.ExistAskUser
+                        Select Case Logger.MsgCustom("Attempting to save but file already exists: " & vbCrLf & aSaveFileName, "File already exists", _
+                                                     "Overwrite", "Do not write", "Save as " & IO.Path.GetFileName(lRenamedFilename))
+                            Case "Overwrite"
+                                IO.File.Delete(aSaveFileName)
+                            Case "Do not write"
+                                Return False
+                            Case Else
+                                aSaveFileName = lRenamedFilename
+                        End Select
+                    Case EnumExistAction.ExistNoAction
+                        Logger.Dbg("Save: File already exists and aExistAction = ExistNoAction, not saving " & aSaveFileName)
+                    Case EnumExistAction.ExistReplace
+                        Logger.Dbg("Save: File already exists, deleting old " & aSaveFileName)
+                        IO.File.Delete(aSaveFileName)
+                    Case EnumExistAction.ExistRenumber
+                        Logger.Dbg("Save: File already exists and aExistAction = ExistRenumber, saving as " & lRenamedFilename)
+                        aSaveFileName = lRenamedFilename
+                End Select
+            End If
+
+            Dim lsaveRDB As atcTableRDB = AsTableRDB()
+            lsaveRDB.WriteFile(aSaveFileName)
+
+            Return True
+        Catch e As Exception
+            Logger.Msg("Error writing '" & aSaveFileName & "': " & e.ToString, MsgBoxStyle.OkOnly, "Did not write file")
+            Return False
+        End Try
+    End Function
+
+    Private Function AsTableRDB() As atcTableRDB
+        Dim lsaveRDB As New atcTableRDB()
+        lsaveRDB.NumRecords = 0
+
+        Return lsaveRDB
+    End Function
+
+    Public Sub SaveAsTimeseries(ByVal aSaveFileName As String)
+        'Dim lTimeseries As atcTimeseries = Me.DataSets(0)
+        'Dim lWriter As New System.IO.StreamWriter(aSaveFileName)
+
+        Dim lInterval As Double = 0
+        'Dim lInterval As Double = lTimeseries.Attributes.GetValue("Interval", JulianHour)
+        Dim lDatasetsToWrite As atcTimeseriesGroup = Me.DataSets ' New atcTimeseriesGroup(lTimeseries)
+        'For Each lTimeseries In Me.DataSets
+        '    If lTimeseries.Attributes.GetValue("Interval", JulianHour) <> lInterval Then
+        '        Logger.Msg("Different interval data cannot be written to same file, skipping " & lTimeseries.ToString & " - " & DoubleToString(lTimeseries.Attributes.GetValue("Interval", JulianHour) * 24) & " hours <> " & DoubleToString(lInterval * 24))
+        '    ElseIf lTimeseries.Dates.numValues < lLastTimeStep Then
+        '        Logger.Msg("Different number of values cannot be written to same file, skipping " & lTimeseries.ToString & " which contains " & lTimeseries.Dates.numValues & " values instead of " & lLastTimeStep)
+        '    Else
+        '        lDatasetsToWrite.Add(lTimeseries)
+        '    End If
+        'Next
+
+        'Dim lDelimiter As String = " "
+        'Dim lIndex As Integer = 0
+        'For Each lTimeseries As atcTimeseries In lDatasetsToWrite
+        '    lIndex += 1
+        '    Dim lLastTimeStep As Integer = lTimeseries.Dates.numValues
+        '    lWriter.WriteLine(TimeseriesStart)
+        '    lWriter.WriteLine(lTimeseries.Attributes.GetValue("Description", "Timeseries " & lIndex))
+        '    If lTimeseries.Dates.Value(1) > JulianYear Then
+        '        lWriter.WriteLine(TimeseriesAbsolute)
+        '    Else
+        '        lWriter.WriteLine(TimeseriesRelative)
+        '    End If
+
+
+        '    For lTimeStep As Integer = 1 To lLastTimeStep
+        '        Dim lDateArray(5) As Integer
+        '        modDate.J2Date(lTimeseries.Dates.Value(lTimeStep) - lInterval, lDateArray)
+
+
+        '        lWriter.Write(Format(lDateArray(0), "0000") & _
+        '                      lDelimiter & lDateArray(1) & _
+        '                      lDelimiter & lDateArray(2) & _
+        '                      lDelimiter & lDateArray(3) & _
+        '                      lDelimiter & lDateArray(4))
+
+        '        lWriter.Write(lDelimiter & DoubleToString(lTimeseries.Value(lTimeStep)))
+        '        lWriter.WriteLine()
+        '    Next
+        '    lWriter.WriteLine(TimeseriesEnd)
+        'Next
+        'lWriter.Close()
+    End Sub
+
     Public Overrides Function Open(ByVal aFileName As String, _
                           Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then

@@ -2,6 +2,7 @@
 Imports atcUtility
 Imports atcUSGSUtility
 Imports atcTimeseriesBaseflow
+Imports atcTimeseriesRDB
 Imports atcGraph
 Imports ZedGraph
 Imports MapWinUtility
@@ -461,6 +462,7 @@ Public Class frmUSGSBaseflow
 
         OutputDir = txtOutputDir.Text.Trim()
         ASCIICommon(pDataGroup(0))
+        'Dim lRDBWriter As New atcTimeseriesRDB()
 
         Logger.MsgCustomOwned("Baseflow output completed.", "USGS Base-Flow Separation", Me, New String() {"OK"})
     End Sub
@@ -1175,5 +1177,16 @@ Public Class frmUSGSBaseflow
             Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged, _
             txtN.TextChanged, txtF.TextChanged, txtK.TextChanged, txtOutputDir.TextChanged, txtOutputRootName.TextChanged
         pDidBFSeparation = False
+    End Sub
+
+    Private Sub btnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSave.Click
+        Dim lsaveDataGroup As atcDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", pDataGroup, pDataGroup)
+        If lsaveDataGroup.Count > 0 Then
+            Dim lsaveRDB As New atcTimeseriesRDB.atcTimeseriesRDB()
+            lsaveRDB.DataSets.AddRange(lsaveDataGroup)
+            lsaveRDB.Save("C:\Test\z.RDB", atcDataSource.EnumExistAction.ExistReplace)
+        Else
+            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Base-Flow Separation")
+        End If
     End Sub
 End Class
