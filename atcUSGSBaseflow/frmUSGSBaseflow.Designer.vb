@@ -70,15 +70,16 @@ Partial Class frmUSGSBaseflow
         Me.gbGraph = New System.Windows.Forms.GroupBox
         Me.Label1 = New System.Windows.Forms.Label
         Me.gbBFI = New System.Windows.Forms.GroupBox
+        Me.rdoBFIReportbyWaterYear = New System.Windows.Forms.RadioButton
+        Me.rdoBFIReportbyCalendarYear = New System.Windows.Forms.RadioButton
+        Me.Label2 = New System.Windows.Forms.Label
         Me.txtK = New System.Windows.Forms.TextBox
         Me.txtF = New System.Windows.Forms.TextBox
         Me.txtN = New System.Windows.Forms.TextBox
         Me.lblK = New System.Windows.Forms.Label
         Me.lblF = New System.Windows.Forms.Label
         Me.lblN = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.rdoBFIReportbyCalendarYear = New System.Windows.Forms.RadioButton
-        Me.rdoBFIReportbyWaterYear = New System.Windows.Forms.RadioButton
+        Me.btnSave = New System.Windows.Forms.Button
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
@@ -340,6 +341,7 @@ Partial Class frmUSGSBaseflow
         '
         Me.gbTextOutput.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbTextOutput.Controls.Add(Me.btnSave)
         Me.gbTextOutput.Controls.Add(Me.btnWriteASCIIOutput)
         Me.gbTextOutput.Controls.Add(Me.chkTabDelimited)
         Me.gbTextOutput.Controls.Add(Me.txtOutputDir)
@@ -529,6 +531,37 @@ Partial Class frmUSGSBaseflow
         Me.gbBFI.TabStop = False
         Me.gbBFI.Text = "BFI Parameters"
         '
+        'rdoBFIReportbyWaterYear
+        '
+        Me.rdoBFIReportbyWaterYear.AutoSize = True
+        Me.rdoBFIReportbyWaterYear.Location = New System.Drawing.Point(169, 16)
+        Me.rdoBFIReportbyWaterYear.Name = "rdoBFIReportbyWaterYear"
+        Me.rdoBFIReportbyWaterYear.Size = New System.Drawing.Size(79, 17)
+        Me.rdoBFIReportbyWaterYear.TabIndex = 11
+        Me.rdoBFIReportbyWaterYear.Text = "Water Year"
+        Me.rdoBFIReportbyWaterYear.UseVisualStyleBackColor = True
+        '
+        'rdoBFIReportbyCalendarYear
+        '
+        Me.rdoBFIReportbyCalendarYear.AutoSize = True
+        Me.rdoBFIReportbyCalendarYear.Checked = True
+        Me.rdoBFIReportbyCalendarYear.Location = New System.Drawing.Point(71, 16)
+        Me.rdoBFIReportbyCalendarYear.Name = "rdoBFIReportbyCalendarYear"
+        Me.rdoBFIReportbyCalendarYear.Size = New System.Drawing.Size(92, 17)
+        Me.rdoBFIReportbyCalendarYear.TabIndex = 10
+        Me.rdoBFIReportbyCalendarYear.TabStop = True
+        Me.rdoBFIReportbyCalendarYear.Text = "Calendar Year"
+        Me.rdoBFIReportbyCalendarYear.UseVisualStyleBackColor = True
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(6, 16)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(56, 13)
+        Me.Label2.TabIndex = 9
+        Me.Label2.Text = "Report by:"
+        '
         'txtK
         '
         Me.txtK.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
@@ -589,36 +622,14 @@ Partial Class frmUSGSBaseflow
         Me.lblN.TabIndex = 0
         Me.lblN.Text = "Partition Length (N, days)"
         '
-        'Label2
+        'btnSave
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(6, 16)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(56, 13)
-        Me.Label2.TabIndex = 9
-        Me.Label2.Text = "Report by:"
-        '
-        'rdoBFIReportbyCalendarYear
-        '
-        Me.rdoBFIReportbyCalendarYear.AutoSize = True
-        Me.rdoBFIReportbyCalendarYear.Checked = True
-        Me.rdoBFIReportbyCalendarYear.Location = New System.Drawing.Point(71, 16)
-        Me.rdoBFIReportbyCalendarYear.Name = "rdoBFIReportbyCalendarYear"
-        Me.rdoBFIReportbyCalendarYear.Size = New System.Drawing.Size(92, 17)
-        Me.rdoBFIReportbyCalendarYear.TabIndex = 10
-        Me.rdoBFIReportbyCalendarYear.TabStop = True
-        Me.rdoBFIReportbyCalendarYear.Text = "Calendar Year"
-        Me.rdoBFIReportbyCalendarYear.UseVisualStyleBackColor = True
-        '
-        'rdoBFIReportbyWaterYear
-        '
-        Me.rdoBFIReportbyWaterYear.AutoSize = True
-        Me.rdoBFIReportbyWaterYear.Location = New System.Drawing.Point(169, 16)
-        Me.rdoBFIReportbyWaterYear.Name = "rdoBFIReportbyWaterYear"
-        Me.rdoBFIReportbyWaterYear.Size = New System.Drawing.Size(79, 17)
-        Me.rdoBFIReportbyWaterYear.TabIndex = 11
-        Me.rdoBFIReportbyWaterYear.Text = "Water Year"
-        Me.rdoBFIReportbyWaterYear.UseVisualStyleBackColor = True
+        Me.btnSave.Location = New System.Drawing.Point(241, 47)
+        Me.btnSave.Name = "btnSave"
+        Me.btnSave.Size = New System.Drawing.Size(75, 23)
+        Me.btnSave.TabIndex = 32
+        Me.btnSave.Text = "SaveRDB"
+        Me.btnSave.UseVisualStyleBackColor = True
         '
         'frmUSGSBaseflow
         '
@@ -708,4 +719,5 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents rdoBFIReportbyWaterYear As System.Windows.Forms.RadioButton
     Friend WithEvents rdoBFIReportbyCalendarYear As System.Windows.Forms.RadioButton
     Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents btnSave As System.Windows.Forms.Button
 End Class
