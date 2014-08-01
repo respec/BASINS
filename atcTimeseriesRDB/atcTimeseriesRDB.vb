@@ -52,51 +52,235 @@ Public Class atcTimeseriesRDB
     End Property
 
     Public Overrides Function Save(ByVal aSaveFileName As String, Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
+        Dim lSaveFileName As String = ""
         Try
-            Logger.Dbg("Save " & Me.Name & " in " & aSaveFileName)
-            If IO.File.Exists(aSaveFileName) Then
-                Dim lExtension As String = IO.Path.GetExtension(aSaveFileName)
-                Dim lRenamedFilename As String = GetTemporaryFileName(aSaveFileName.Substring(0, aSaveFileName.Length - lExtension.Length), lExtension)
-                Select Case aExistAction
-                    Case EnumExistAction.ExistAppend
-                        Logger.Dbg("Save: File already exists and aExistAction = ExistAppend, not implemented.")
-                        Throw New ApplicationException("Append not implemented for " & Me.Name)
-                    Case EnumExistAction.ExistAskUser
-                        Select Case Logger.MsgCustom("Attempting to save but file already exists: " & vbCrLf & aSaveFileName, "File already exists", _
-                                                     "Overwrite", "Do not write", "Save as " & IO.Path.GetFileName(lRenamedFilename))
-                            Case "Overwrite"
-                                IO.File.Delete(aSaveFileName)
-                            Case "Do not write"
-                                Return False
-                            Case Else
-                                aSaveFileName = lRenamedFilename
-                        End Select
-                    Case EnumExistAction.ExistNoAction
-                        Logger.Dbg("Save: File already exists and aExistAction = ExistNoAction, not saving " & aSaveFileName)
-                    Case EnumExistAction.ExistReplace
-                        Logger.Dbg("Save: File already exists, deleting old " & aSaveFileName)
-                        IO.File.Delete(aSaveFileName)
-                    Case EnumExistAction.ExistRenumber
-                        Logger.Dbg("Save: File already exists and aExistAction = ExistRenumber, saving as " & lRenamedFilename)
-                        aSaveFileName = lRenamedFilename
-                End Select
-            End If
-
-            Dim lsaveRDB As atcTableRDB = AsTableRDB()
-            lsaveRDB.WriteFile(aSaveFileName)
-
+            Dim lFilenameRoot As String = FilenameNoExt(aSaveFileName)
+            Dim lsaveRDBTables As atcCollection = AsTableRDB()
+            For Each lKeyLoc As String In lsaveRDBTables.Keys
+                Dim lsaveRDBTable As atcTableRDB = lsaveRDBTables.ItemByKey(lKeyLoc)
+                lSaveFileName = lFilenameRoot & "_" & lKeyLoc & ".rdb"
+                Logger.Dbg("Save " & Me.Name & " in " & lSaveFileName)
+                If IO.File.Exists(lSaveFileName) Then
+                    Dim lExtension As String = IO.Path.GetExtension(lSaveFileName)
+                    Dim lRenamedFilename As String = GetTemporaryFileName(lSaveFileName.Substring(0, lSaveFileName.Length - lExtension.Length), lExtension)
+                    Select Case aExistAction
+                        Case EnumExistAction.ExistAppend
+                            Logger.Dbg("Save: File already exists and aExistAction = ExistAppend, not implemented.")
+                            Throw New ApplicationException("Append not implemented for " & Me.Name)
+                        Case EnumExistAction.ExistAskUser
+                            Select Case Logger.MsgCustom("Attempting to save but file already exists: " & vbCrLf & lSaveFileName, "File already exists", _
+                                                         "Overwrite", "Do not write", "Save as " & IO.Path.GetFileName(lRenamedFilename))
+                                Case "Overwrite"
+                                    IO.File.Delete(lSaveFileName)
+                                Case "Do not write"
+                                    Return False
+                                Case Else
+                                    lSaveFileName = lRenamedFilename
+                            End Select
+                        Case EnumExistAction.ExistNoAction
+                            Logger.Dbg("Save: File already exists and aExistAction = ExistNoAction, not saving " & lSaveFileName)
+                        Case EnumExistAction.ExistReplace
+                            Logger.Dbg("Save: File already exists, deleting old " & lSaveFileName)
+                            IO.File.Delete(lSaveFileName)
+                        Case EnumExistAction.ExistRenumber
+                            Logger.Dbg("Save: File already exists and aExistAction = ExistRenumber, saving as " & lRenamedFilename)
+                            lSaveFileName = lRenamedFilename
+                    End Select
+                End If
+                lsaveRDBTable.WriteFile(lSaveFileName)
+            Next
             Return True
         Catch e As Exception
-            Logger.Msg("Error writing '" & aSaveFileName & "': " & e.ToString, MsgBoxStyle.OkOnly, "Did not write file")
+            Logger.Msg("Error writing '" & lSaveFileName & "': " & e.ToString, MsgBoxStyle.OkOnly, "Did not write file")
             Return False
         End Try
     End Function
+    ''' <summary>
+    ''' Break up Datasets into groups of RDB tables, one per location
+    ''' each location table would contain all constituents for that location
+    ''' </summary>
+    ''' <returns>a collection of atcTableRDBs, one per location</returns>
+    ''' <remarks></remarks>
+    Private Function AsTableRDB() As atcCollection 'of atcTableRDB(s)
+        'build headers
+        'set column numbers, column width, column type, and column names
 
-    Private Function AsTableRDB() As atcTableRDB
-        Dim lsaveRDB As New atcTableRDB()
-        lsaveRDB.NumRecords = 0
+        'Step 1. Break into location groups
+        Dim lStationGroups As New atcCollection()
+        Dim lLocation As String = ""
+        Dim lCons As String = ""
+        For Each lDS As atcTimeseries In DataSets
+            lLocation = lDS.Attributes.GetValue("Location", "")
+            lCons = lDS.Attributes.GetValue("Scenario", "") 'Constituent?
+            If Not String.IsNullOrEmpty(lLocation) Then
+                If lStationGroups.Keys.Contains(lLocation) Then
+                    If Not CType(lStationGroups.ItemByKey(lLocation), atcTimeseriesGroup).Keys.Contains(lCons) Then
+                        CType(lStationGroups.ItemByKey(lLocation), atcTimeseriesGroup).Add(lCons, lDS)
+                    Else
+                        'only holds unique constituents for each location
+                        'hence, do nothing here for duplicate constituents
+                    End If
+                Else
+                    Dim lNewSetCons As New atcTimeseriesGroup()
+                    lNewSetCons.Add(lCons, lDS)
+                    lStationGroups.Add(lLocation, lNewSetCons)
+                End If
+            End If
+        Next
 
-        Return lsaveRDB
+        'Step 2. Build one atcTableRDB per location
+        Dim lRDBTables As New atcCollection()
+        Dim lFirstStart, lLastEnd, lCommonStart, lCommonEnd As Double
+        For Each lKeyLoc As String In lStationGroups.Keys
+            Dim lstationTSGroup As atcTimeseriesGroup = lStationGroups.ItemByKey(lKeyLoc)
+            'ToDo: perhaps need to check if the time steps of all of the timeseries in this group are the same
+            '      if not, then need to do something here. Perhaps prompt user to ask if they want to save into
+            '      separate files?
+            If CommonDates(lstationTSGroup, lFirstStart, lLastEnd, lCommonStart, lCommonEnd) Then
+                If lFirstStart <> lCommonStart OrElse lLastEnd <> lCommonEnd Then
+                    'call NewTimeseries, then copy in the timeseries values
+                    'for now, assume all timeseries have the same duration and timestep
+                End If
+                Dim lRDBTable As New atcTableRDB()
+                With lRDBTable
+                    .NumFields = 3 + lstationTSGroup.Count 'USGS Location DateDaily(assume daily for now)
+                    .FieldName(1) = "agency_cd" : .FieldType(1) = "S" : .FieldLength(1) = 5
+                    .FieldName(2) = "site_no" : .FieldType(2) = "S" : .FieldLength(2) = 15
+                    .FieldName(3) = "datetime" : .FieldType(3) = "D" : .FieldLength(3) = 20
+                    Dim lFieldLengthValue As Integer = 14
+                    Dim lFieldInd As Integer = 4
+                    For Each lTS As atcTimeseries In lstationTSGroup
+                        .FieldName(lFieldInd) = lTS.Attributes.GetValue("Scenario") 'constituent?
+                        .FieldType(lFieldInd) = "N" : .FieldLength(lFieldInd) = lFieldLengthValue
+                        lFieldInd += 1
+                    Next
+                    .NumRecords = lstationTSGroup(0).Dates.numValues '(lLastEnd - lFirstStart) / (JulianHour * 24) + 5 'assume daily here
+                    .CurrentRecord = 1
+                    Dim lagency As String = lstationTSGroup(0).Attributes.GetValue("agency", "")
+                    Dim location As String = lstationTSGroup(0).Attributes.GetValue("Location", "00000000")
+                    Dim lDates(5) As Integer
+                    For I As Integer = 0 To .NumRecords - 1
+                        .Value(1) = lagency
+                        .Value(2) = location
+                        J2Date(lstationTSGroup(0).Dates.Value(I), lDates)
+                        Dim ldatetime As String = lDates(0) & "-" & lDates(1).ToString.PadLeft(2, "0") & "-" & lDates(2).ToString.PadLeft(2, "0")
+                        .Value(3) = ldatetime
+                        lFieldInd = 4
+                        For Each lTS As atcTimeseries In lstationTSGroup
+                            .Value(lFieldInd) = DoubleToString(lTS.Value(I + 1), lFieldLengthValue, "0.00")
+                            lFieldInd += 1
+                        Next
+                        .CurrentRecord += 1
+                    Next
+
+                    Dim lHeaderAtts As String = AsRDBHeader(lstationTSGroup)
+                    Dim lOneLineWarning As String = ""
+                    lOneLineWarning = "# File-format description:  http://waterdata.usgs.gov/nwis/?tab_delimited_format_info" & Environment.NewLine
+                    lOneLineWarning &= "# Automated-retrieval info: http://help.waterdata.usgs.gov/faq/automated-retrievals" & Environment.NewLine
+                    lOneLineWarning &= "# " & Environment.NewLine
+                    lOneLineWarning &= "# retrieved: " & lstationTSGroup(0).Attributes.GetValue("retrieved", "") & Environment.NewLine
+                    Dim lOneLineExtra As String
+                    lOneLineExtra = "# Data provided for site " & location & Environment.NewLine
+                    lOneLineExtra &= "#    DD parameter statistic   Description" & Environment.NewLine
+                    lOneLineExtra &= "#    02   00000     00000     As described by the column header below" & Environment.NewLine
+                    lOneLineExtra &= "#" & Environment.NewLine
+                    lOneLineExtra &= "# Data-value qualification codes included in this output: " & Environment.NewLine
+                    Dim lValueAttNamePrefix As String = "ValueAttributeDescription_"
+                    For Each lAtt As atcDefinedValue In lstationTSGroup(0).Attributes
+                        Dim lName As String = lAtt.Definition.Name
+                        If lName.ToLower().StartsWith(lValueAttNamePrefix.ToLower()) Then
+                            lOneLineExtra &= "#     " & lName.ToString.Substring(lValueAttNamePrefix.Length) & "  " & lAtt.Value & Environment.NewLine
+                        End If
+                    Next
+                    lOneLineExtra &= "#" ' & Environment.NewLine
+
+                    'Dim lOneLineColumnHeader As String = ""
+                    'For I As Integer = 1 To .NumFields
+                    '    lOneLineColumnHeader &= .FieldName(I) & vbTab
+                    'Next
+                    'lOneLineColumnHeader = lOneLineColumnHeader.TrimEnd(vbTab) & Environment.NewLine
+                    'For I As Integer = 1 To .NumFields
+                    '    lOneLineColumnHeader &= .FieldLength(I) & .FieldType(I) & vbTab
+                    'Next
+
+                    lHeaderAtts &= lOneLineWarning
+                    lHeaderAtts &= lOneLineExtra
+                    .Header = lHeaderAtts
+                End With
+                lRDBTables.Add(lKeyLoc, lRDBTable)
+            End If
+        Next
+        Return lRDBTables
+    End Function
+
+    Private Function AsRDBHeader(ByVal aTSGroup As atcTimeseriesGroup) As String
+        Dim lAttributes As New atcCollection()
+        Dim lName As String
+        Dim lValue As String
+        For Each lAtt As atcDefinedValue In aTSGroup(0).Attributes
+            If lAtt.Definition.Calculated Then Continue For
+            lName = lAtt.Definition.Name
+            lName = LookupParmName(lName)
+            If lName.ToLower().Contains("timeseries") Then Continue For
+            If Not lAttributes.Keys.Contains(lName) Then
+                lAttributes.Add(lName, lAtt)
+            End If
+        Next
+
+        For Each lTS As atcTimeseries In aTSGroup
+        Next
+
+        Dim lHeaderString As New Text.StringBuilder()
+
+        Dim lOneLineInHeader As String
+        For Each lAttName As String In lAttributes.Keys
+            Dim lAtt As atcDefinedValue = lAttributes.ItemByKey(lAttName)
+            lValue = lAtt.Value.ToString()
+            If lAttName.ToLower.StartsWith("http") OrElse _
+               lAttName.ToLower.StartsWith("url") Then
+                lOneLineInHeader = "# " & lValue
+            ElseIf lAttName.ToLower.StartsWith("download") Then
+                lOneLineInHeader = "# " & lAttName & " " & lValue.Trim()
+            ElseIf lAttName.ToLower.StartsWith("valueattributedescription") Then
+                Continue For
+            Else
+                lOneLineInHeader = "# " & lAttName
+                lOneLineInHeader = lOneLineInHeader.PadRight(50, " ")
+                lOneLineInHeader &= lValue.Trim()
+            End If
+            lHeaderString.AppendLine(lOneLineInHeader)
+        Next
+
+        Return lHeaderString.ToString()
+    End Function
+
+    Private Function LookupParmName(ByVal aName As String) As String
+        Dim lName As String = aName.Trim().ToLower()
+        Dim lLookupTable As New atcCollection()
+        With lLookupTable
+            .Add("agency_cd", "agency")
+            .Add("download_date", "retrieved")
+            .Add("site_no", "location")
+            .Add("station_nm", "stanam")
+            .Add("dec_lat_va", "latitude")
+            .Add("dec_long_va", "longitude")
+            .Add("state_cd", "stfips")
+            .Add("county_cd", "cntyfips")
+            .Add("huc_cd", "hucode")
+            .Add("drain_area_va", "drainage area")
+        End With
+
+        If lLookupTable.Keys.Contains(lName) Then
+            If Not lName = "site_no" Then Return lLookupTable.ItemByKey(lName)
+        Else
+            For Each lKey As String In lLookupTable.Keys
+                If lLookupTable.ItemByKey(lKey) = lName Then
+                    Return lKey
+                End If
+            Next
+        End If
+
+        Return lName
     End Function
 
     Public Sub SaveAsTimeseries(ByVal aSaveFileName As String)
