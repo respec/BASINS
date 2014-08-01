@@ -413,7 +413,7 @@ namespace atcFtableBuilder
                     }
                 }
 
-                if (colcheck == 0)
+                if (colcheck == 0 || cdevice.ToLower().Contains("infiltration"))
                     grdFtableResult.Visible = true;
                 else
                 {

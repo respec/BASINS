@@ -646,8 +646,19 @@ namespace atcFtableBuilder
 
             //Tong: backfill is checked already by this point and check if infiltration is done
             double infilRate = 0;
-            if (clsGlobals.gToolType == clsGlobals.ToolType.Green && double.TryParse(txtInfilRate.Text, out infilRate))
+            if (clsGlobals.gToolType == clsGlobals.ToolType.Green) // && double.TryParse(txtInfilRate.Text, out infilRate))
             {
+                if (string.IsNullOrEmpty(txtInfilRate.Text))
+                {
+                    infilRate = 0;
+                }
+                else
+                {
+                    if (double.TryParse(txtInfilRate.Text, out infilRate))
+                    {
+                        if (infilRate < 0) infilRate = 0;
+                    }
+                }
                 double backfillDepth = double.Parse(txtBackfillDepth.Text);
                 double backfillPoros = double.Parse(txtBackfillPore.Text);
                 string lMsg;
