@@ -68,7 +68,7 @@ TryAgain:
         Try
             System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(aFilename))
 
-            Dim lOutStream As StreamWriter = File.CreateText(aFilename)
+            Dim lOutStream As StreamWriter = New StreamWriter(aFilename) 'File.CreateText(aFilename)
 
             lOutStream.Write(Header)
 
@@ -80,8 +80,11 @@ TryAgain:
             Next
             lOutStream.Write(FieldLength(NumFields) & RDBfieldtype(FieldType(NumFields)) & vbCrLf)
 
-            lOutStream.Write(String.Join(Delimiter, pRecords.ToArray, 1, NumRecords) & vbCrLf)
-
+            For I As Integer = 1 To NumRecords
+                CurrentRecord = I
+                lOutStream.Write(pRecords(I).ToString() & vbCrLf)
+            Next
+            lOutStream.Flush()
             lOutStream.Close()
 
             FileName = aFilename

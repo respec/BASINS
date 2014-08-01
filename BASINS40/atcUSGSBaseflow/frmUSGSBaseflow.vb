@@ -1180,11 +1180,13 @@ Public Class frmUSGSBaseflow
     End Sub
 
     Private Sub btnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSave.Click
-        Dim lsaveDataGroup As atcDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", pDataGroup, pDataGroup)
+        Dim lBFTSGroup As atcTimeseriesGroup = pDataGroup(0).Attributes.GetDefinedValue("Baseflow").Value
+
+        Dim lsaveDataGroup As atcDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lBFTSGroup, lBFTSGroup)
         If lsaveDataGroup.Count > 0 Then
             Dim lsaveRDB As New atcTimeseriesRDB.atcTimeseriesRDB()
             lsaveRDB.DataSets.AddRange(lsaveDataGroup)
-            lsaveRDB.Save("C:\Test\z.RDB", atcDataSource.EnumExistAction.ExistReplace)
+            lsaveRDB.Save("C:\test\z.RDB", atcDataSource.EnumExistAction.ExistReplace)
         Else
             Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Base-Flow Separation")
         End If

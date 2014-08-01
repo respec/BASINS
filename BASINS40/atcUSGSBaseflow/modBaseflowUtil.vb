@@ -876,7 +876,9 @@ Public Module modBaseflowUtil
         Dim lConversionFactor As Double
         Dim lTsGroupToReport = New atcCollection
 
-        Dim lTsBFGroup As atcTimeseriesGroup = aTs.Attributes.GetDefinedValue("Baseflow").Value
+        Dim lObj As Object = aTs.Attributes.GetDefinedValue("Baseflow")
+        If lObj Is Nothing Then Return Nothing
+        Dim lTsBFGroup As atcTimeseriesGroup = lObj.Value
         If lTsBFGroup Is Nothing OrElse lTsBFGroup.Count = 0 Then Return lTsGroupToReport
 
         Dim lMethodConsUnit As String = ""
