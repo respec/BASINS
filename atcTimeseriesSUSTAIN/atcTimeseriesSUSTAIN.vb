@@ -202,7 +202,7 @@ Public Class atcTimeseriesSUSTAIN
                 Next
                 lDates.Value(lDates.numValues) = lDates.Value(lDates.numValues - 1) + lLastInterval
                 lDates.Attributes.DiscardCalculated()
-
+                lDates.Attributes.SetValue("Shared", True)
                 For Each lTs As atcTimeseries In Me.DataSets
                     If lTs.Dates.Serial <> lDates.Serial Then
                         lTs.Dates.Clear()

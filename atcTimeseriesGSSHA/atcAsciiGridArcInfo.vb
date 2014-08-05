@@ -1,4 +1,10 @@
-﻿Public Class atcAsciiGridArcInfo
+﻿''' <summary>
+''' Read both ArcInfo and GRASS ASCII grids into timeseries
+''' </summary>
+''' <remarks></remarks>
+Public Class atcAsciiGridArcInfo
+
+    'ArcInfo Headers
     Private Const Header_NCOLS As String = "NCOLS"
     Private Const Header_NROWS As String = "NROWS"
     Private Const Header_XLLCORNER As String = "XLLCORNER"
@@ -6,6 +12,7 @@
     Private Const Header_CELLSIZE As String = "CELLSIZE"
     Private Const Header_NODATA_VALUE As String = "NODATA_VALUE"
 
+    'GRASS Headers
     Private Const Header_NORTH As String = "NORTH"
     Private Const Header_SOUTH As String = "SOUTH"
     Private Const Header_EAST As String = "EAST"
@@ -188,7 +195,7 @@ ProcessValues:
             Catch ex As MapWinUtility.ProgressCancelException
                 If MapWinUtility.Logger.MsgCustom("Continue with partially read data or abort opening?", "Grid Timeseries", "Continue", "Abort") = "Abort" Then
                     Throw ex
-                Else                    
+                Else
                     Dim lPC As MapWinUtility.IProgressStatusCancel = MapWinUtility.Logger.ProgressStatus
                     lPC.Canceled = False
                 End If
