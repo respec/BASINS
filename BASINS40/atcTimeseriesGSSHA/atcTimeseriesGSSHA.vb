@@ -386,6 +386,12 @@ Public Class atcTimeseriesGSSHA
         '    End If
         'Next
 
+        Dim lTotalValuesWritten As Integer = 0
+        Dim lTotalValuesToWrite As Long = 0
+        For Each lTimeseries As atcTimeseries In lDatasetsToWrite
+            lTotalValuesToWrite += lTimeseries.numValues
+        Next
+
         Dim lDelimiter As String = " "
         Dim lIndex As Integer = 0
         For Each lTimeseries As atcTimeseries In lDatasetsToWrite
@@ -413,6 +419,8 @@ Public Class atcTimeseriesGSSHA
 
                 lWriter.Write(lDelimiter & DoubleToString(lTimeseries.Value(lTimeStep)))
                 lWriter.WriteLine()
+                lTotalValuesWritten += 1
+                Logger.Progress(lTotalValuesWritten, lTotalValuesToWrite)
             Next
             lWriter.WriteLine(TimeseriesEnd)
         Next
@@ -438,6 +446,13 @@ Public Class atcTimeseriesGSSHA
         '        lDatasetsToWrite.Add(lTimeseries)
         '    End If
         'Next
+
+        Dim lTotalValuesWritten As Integer = 0
+        Dim lTotalValuesToWrite As Long = 0
+        For Each lTimeseries As atcTimeseries In lDatasetsToWrite
+            lTotalValuesToWrite += lTimeseries.numValues
+        Next
+
         Dim lDelimiter As String = vbTab
         Dim lEventCount As Integer = 0
         For Each lTimeseries As atcTimeseries In lDatasetsToWrite
@@ -468,6 +483,8 @@ Public Class atcTimeseriesGSSHA
 
                 lWriter.Write(lDelimiter & DoubleToString(lTimeseries.Value(lTimeStep)))
                 lWriter.WriteLine()
+                lTotalValuesWritten += 1
+                Logger.Progress(lTotalValuesWritten, lTotalValuesToWrite)
             Next
         Next
         lWriter.Close()

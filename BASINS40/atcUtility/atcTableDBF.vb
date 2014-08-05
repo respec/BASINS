@@ -859,7 +859,7 @@ NotEqual:
 
     'Returns zero if the named field does not appear in this file
     Public Overrides Function FieldNumber(ByVal aFieldName As String) As Integer
-        aFieldName = aFieldName.ToLower
+        aFieldName = SafeSubstring(aFieldName, 0, 10).ToLower
         For lFieldIndex As Integer = 1 To pNumFields
             If TrimNull(pFields(lFieldIndex).FieldName).ToLower = aFieldName Then
                 Return lFieldIndex
