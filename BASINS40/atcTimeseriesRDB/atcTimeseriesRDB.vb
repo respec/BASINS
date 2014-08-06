@@ -58,7 +58,7 @@ Public Class atcTimeseriesRDB
             Dim lsaveRDBTables As atcCollection = AsTableRDB()
             For Each lKeyLoc As String In lsaveRDBTables.Keys
                 Dim lsaveRDBTable As atcTableRDB = lsaveRDBTables.ItemByKey(lKeyLoc)
-                lSaveFileName = lFilenameRoot & "_" & lKeyLoc & ".rdb"
+                lSaveFileName = lFilenameRoot & "_" & SafeFilename(lKeyLoc, "") & ".rdb"
                 Logger.Dbg("Save " & Me.Name & " in " & lSaveFileName)
                 If IO.File.Exists(lSaveFileName) Then
                     Dim lExtension As String = IO.Path.GetExtension(lSaveFileName)
