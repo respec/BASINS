@@ -15,6 +15,22 @@ Public Enum BFMethods
     BFIModified = 6
 End Enum
 
+Public Enum BFConstituents
+    HySEPFixed = 11110
+    HySEPLocMin
+    HySEPSlide
+    PARTDaily1
+    PARTDaily2
+    PARTDaily3
+    PARTMonthly1
+    PARTMonthly2
+    PARTMonthly3
+    PARTMonthlyInterpolated
+    PARTMonthlyDepth
+    BFIStandard
+    BFIModified
+End Enum
+
 Public Interface IclsBaseflow
     Function DoBaseFlowSeparation() As atcTimeseriesGroup
     Sub Clear()
