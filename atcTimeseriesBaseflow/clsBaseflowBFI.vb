@@ -152,8 +152,14 @@ Public Class clsBaseflowBFI
         lTsBF = SubsetByDate(lTsBF, StartDate, EndDate, Nothing)
         If lTsBF IsNot Nothing Then
             With lTsBF.Attributes
+                Dim lCons As String = .GetValue("Scenario", "")
+                If String.IsNullOrEmpty(lCons) Then
+                    lCons = "BF_BFI"
+                Else
+                    If Not lCons.StartsWith("BF_") Then lCons = "BF_" & lCons
+                End If
                 .SetValue("Drainage Area", DrainageArea)
-                .SetValue("Constituent", "BFBFI")
+                .SetValue("Constituent", lCons)
                 .SetValue("AnalysisStart", StartDate)
                 .SetValue("AnalysisEnd", EndDate)
             End With
