@@ -109,9 +109,26 @@ Public Class atcTimeseriesRDB
         Dim lStationGroups As New atcCollection()
         Dim lLocation As String = ""
         Dim lCons As String = ""
+        Dim lParmCd As String = ""
+        Dim lStatCd As Integer = 0
+        Dim lStatCdStr As String = ""
         For Each lDS As atcTimeseries In DataSets
-            lLocation = lDS.Attributes.GetValue("Location", "")
-            lCons = lDS.Attributes.GetValue("Scenario", "") 'Constituent?
+            Dim lStatCdNeedtoIncrement As Boolean = False
+            With lDS.Attributes
+                lLocation = .GetValue("Location", "")
+                lCons = .GetValue("Constituent", "")
+                If lCons.StartsWith("BF_") Then
+                    'For baseflow timeseries, construct fictious parm_cd and stat_cd
+                    lParmCd = "11111"
+                    lStatCdStr = lStatCd.ToString.PadLeft(5, "0")
+                    lStatCdNeedtoIncrement = True
+                    .SetValue("parm_cd", lParmCd)
+                    .SetValue("statistic", lStatCdStr)
+                Else
+                    lParmCd = .GetValue("parm_cd", "")
+                    lStatCdStr = .GetValue("statistic", "")
+                End If
+            End With
             If Not String.IsNullOrEmpty(lLocation) Then
                 If lStationGroups.Keys.Contains(lLocation) Then
                     If Not CType(lStationGroups.ItemByKey(lLocation), atcTimeseriesGroup).Keys.Contains(lCons) Then
@@ -126,6 +143,7 @@ Public Class atcTimeseriesRDB
                     lStationGroups.Add(lLocation, lNewSetCons)
                 End If
             End If
+            If lStatCdNeedtoIncrement Then lStatCd += 1
         Next
 
         'Step 2. Build one atcTableRDB per location
@@ -142,6 +160,7 @@ Public Class atcTimeseriesRDB
                     'for now, assume all timeseries have the same duration and timestep
                 End If
                 Dim lRDBTable As New atcTableRDB()
+                Dim lDD_cd As String = "02"
                 With lRDBTable
                     .NumFields = 3 + lstationTSGroup.Count 'USGS Location DateDaily(assume daily for now)
                     .FieldName(1) = "agency_cd" : .FieldType(1) = "S" : .FieldLength(1) = 5
@@ -150,7 +169,9 @@ Public Class atcTimeseriesRDB
                     Dim lFieldLengthValue As Integer = 14
                     Dim lFieldInd As Integer = 4
                     For Each lTS As atcTimeseries In lstationTSGroup
-                        .FieldName(lFieldInd) = lTS.Attributes.GetValue("Scenario") 'constituent?
+                        lParmCd = lTS.Attributes.GetValue("parm_cd")
+                        lStatCdStr = lTS.Attributes.GetValue("statistic")
+                        .FieldName(lFieldInd) = lDD_cd & "_" & lParmCd & "_" & lStatCdStr
                         .FieldType(lFieldInd) = "N" : .FieldLength(lFieldInd) = lFieldLengthValue
                         lFieldInd += 1
                     Next
@@ -182,7 +203,18 @@ Public Class atcTimeseriesRDB
                     Dim lOneLineExtra As String
                     lOneLineExtra = "# Data provided for site " & location & Environment.NewLine
                     lOneLineExtra &= "#    DD parameter statistic   Description" & Environment.NewLine
-                    lOneLineExtra &= "#    02   00000     00000     As described by the column header below" & Environment.NewLine
+                    'lOneLineExtra &= "#    02   00000     00000     As described by the column header below" & Environment.NewLine
+                    For Each lTS As atcTimeseries In lstationTSGroup
+                        Dim lOneLineParmStr As String = ""
+                        With lTS.Attributes
+                            lParmCd = .GetValue("parm_cd")
+                            lStatCdStr = .GetValue("statistic")
+                            lCons = .GetValue("Constituent")
+                        End With
+                        lOneLineParmStr = "#" & lDD_cd.PadLeft(6, " ") & lParmCd.PadLeft(8, " ") & lStatCdStr.PadLeft(10, " ") & "     " & lCons
+                        lOneLineParmStr = lOneLineParmStr.PadRight(55, " ") 'has to be more than 50 letters long for reading back
+                        lOneLineExtra &= lOneLineParmStr & Environment.NewLine
+                    Next
                     lOneLineExtra &= "#" & Environment.NewLine
                     lOneLineExtra &= "# Data-value qualification codes included in this output: " & Environment.NewLine
                     Dim lValueAttNamePrefix As String = "ValueAttributeDescription_"
