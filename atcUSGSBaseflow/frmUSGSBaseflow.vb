@@ -1180,13 +1180,31 @@ Public Class frmUSGSBaseflow
     End Sub
 
     Private Sub btnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSave.Click
+        If Not pDidBFSeparation Then Return
         Dim lBFTSGroup As atcTimeseriesGroup = pDataGroup(0).Attributes.GetDefinedValue("Baseflow").Value
 
         Dim lsaveDataGroup As atcDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lBFTSGroup, lBFTSGroup)
         If lsaveDataGroup.Count > 0 Then
+            Dim lTsGroupRemove As New atcTimeseriesGroup()
+            For Each lTS As atcTimeseries In lsaveDataGroup
+                If lTS.Attributes.GetValue("time unit") <> atcTimeUnit.TUDay Then
+                    lTsGroupRemove.Add(lTS)
+                End If
+            Next
+            For Each lTs As atcTimeseries In lTsGroupRemove
+                lsaveDataGroup.Remove(lTs)
+            Next
+            Dim lPath As String = txtOutputDir.Text.Trim()
+            Dim lRootName As String = txtOutputRootName.Text.Trim()
+            Dim lRDBFilenameTemplate As String = IO.Path.Combine(lPath, lRootName & ".rdb")
+            If Not IO.Directory.Exists(lPath) OrElse String.IsNullOrEmpty(lRootName) Then
+                lPath = "C:\"
+                lRDBFilenameTemplate = "C:\z.RDB"
+            End If
             Dim lsaveRDB As New atcTimeseriesRDB.atcTimeseriesRDB()
             lsaveRDB.DataSets.AddRange(lsaveDataGroup)
-            lsaveRDB.Save("C:\test\z.RDB", atcDataSource.EnumExistAction.ExistReplace)
+            lsaveRDB.Save(lRDBFilenameTemplate, atcDataSource.EnumExistAction.ExistReplace)
+            Logger.Msg("Timeseries are saved in RDB format in folder: " & vbCrLf & lPath, "Save Base-Flow Timeseries Data")
         Else
             Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Base-Flow Separation")
         End If
