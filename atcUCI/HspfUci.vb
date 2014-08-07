@@ -1803,6 +1803,52 @@ x:
         Next
     End Function
 
+    Public Sub LookForMissingMetSegRecToFill(ByVal aMetSeg As HspfMetSeg, ByVal aConsToCheck As String)
+        Dim lFound As Boolean = False
+        Dim lWDMId As String = ""
+        Dim lDsn As Integer = 0
+        For Each lMetSegRec As HspfMetSegRecord In aMetSeg.MetSegRecs
+            If lMetSegRec.Name = aConsToCheck Then
+                lFound = True
+                Exit For
+            ElseIf lMetSegRec.Name = "PREC" Then
+                'remember which wdm id
+                lWDMId = lMetSegRec.Source.VolName
+            End If
+        Next
+        If Not lFound And lWDMId.Length > 3 Then
+            'see if wdm file has an acceptable one, if so add it
+            lDsn = Me.LookForAcceptableMetDataSet(aConsToCheck, lWDMId.Substring(3))
+            If lDsn > 0 Then
+                'found a dsn to use
+                Dim lMetSegRecord As New HspfMetSegRecord
+                lMetSegRecord.Name = aConsToCheck
+                lMetSegRecord.Source.VolName = lWDMId
+                lMetSegRecord.Source.VolId = lDsn
+                lMetSegRecord.Source.Member = aConsToCheck
+                lMetSegRecord.MFactP = 1.0
+                lMetSegRecord.MFactR = 1.0
+                lMetSegRecord.Sgapstrg = ""
+                lMetSegRecord.Ssystem = "ENGL"
+                lMetSegRecord.Tran = "SAME"
+                aMetSeg.MetSegRecs.Add(lMetSegRecord)
+            End If
+        End If
+    End Sub
+
+    Private Function LookForAcceptableMetDataSet(ByVal aCons As String, ByVal aWDMId As Integer) As Integer
+        If Not pWDMObj(aWDMId) Is Nothing Then
+            For Each lDataSet As atcData.atcTimeseries In pWDMObj(aWDMId).DataSets
+                If lDataSet.Attributes.GetValue("TSTYPE") = aCons Then
+                    If lDataSet.Attributes.GetValue("SJDAY") <= Me.GlobalBlock.SDateJ And lDataSet.Attributes.GetValue("EJDAY") >= Me.GlobalBlock.EdateJ Then
+                        Return lDataSet.Attributes.GetValue("ID")
+                    End If
+                End If
+            Next
+        End If
+        Return 0
+    End Function
+
     Public Function FindTimser(ByRef aScenario As String, _
                                ByRef aLocation As String, _
                                ByRef aConstituent As String) As Collection
@@ -2478,6 +2524,7 @@ x:
                 lDone = True
             ElseIf (Not lBuff.Contains("***") AndAlso lBuff.Substring(2, 6) = "FTABLE") Then 'this is a new FTABLE
                 'Anurag Added the condition to check for the strings for FTABLE only if does not have ***
+                If Not IsNumeric(lBuff.Substring(11, 4)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                 Dim lId As Integer = CShort(lBuff.Substring(11, 4))
                 'find which operation this ftable is associated with
                 Dim lOperation As HspfOperation = Nothing
@@ -2495,12 +2542,14 @@ x:
                     With lOperation.FTable
                         Dim lString As String = lBuff.Substring(0, 5)
                         If lString.Trim.Length > 0 Then
+                            If Not IsNumeric(lString) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                             .Nrows = CInt(lString)
                         Else
                             .Nrows = 0
                         End If
                         lString = lBuff.Substring(5, 5)
                         If lString.Trim.Length > 0 Then
+                            If Not IsNumeric(lString) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                             .Ncols = CInt(lString)
                         Else
                             .Ncols = 0
@@ -2526,47 +2575,60 @@ x:
                                     .Comment &= vbCrLf & lBuff 'So if there are additional comments on the FTABLE, they get added to the depth area volume line
                                 End If
                             ElseIf .ExtendedFlag = False Then 'this is a regular record
+                                If Not IsNumeric(Left(lBuff, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                 .Depth(lRow) = CDbl(Left(lBuff, 10))
                                 .DepthAsRead(lRow) = Left(lBuff, 10)
+                                If Not IsNumeric(Mid(lBuff, 11, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                 .Area(lRow) = CDbl(Mid(lBuff, 11, 10))
                                 .AreaAsRead(lRow) = Mid(lBuff, 11, 10)
+                                If Not IsNumeric(Mid(lBuff, 21, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                 .Volume(lRow) = CDbl(Mid(lBuff, 21, 10))
                                 .VolumeAsRead(lRow) = Mid(lBuff, 21, 10)
                                 Dim lExit As Integer = .Ncols - 3
                                 If lExit > 0 Then
+                                    If Not IsNumeric(Mid(lBuff, 31, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                     .Outflow1(lRow) = CDbl(Mid(lBuff, 31, 10))
                                     .Outflow1AsRead(lRow) = Mid(lBuff, 31, 10)
                                 End If
                                 If lExit > 1 Then
+                                    If Not IsNumeric(Mid(lBuff, 41, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                     .Outflow2(lRow) = CDbl(Mid(lBuff, 41, 10))
                                     .Outflow2AsRead(lRow) = Mid(lBuff, 41, 10)
                                 End If
                                 If lExit > 2 Then
+                                    If Not IsNumeric(Mid(lBuff, 51, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                     .Outflow3(lRow) = CDbl(Mid(lBuff, 51, 10))
                                     .Outflow3AsRead(lRow) = Mid(lBuff, 51, 10)
                                 End If
                                 If lExit > 3 Then
+                                    If Not IsNumeric(Mid(lBuff, 61, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                     .Outflow4(lRow) = CDbl(Mid(lBuff, 61, 10))
                                     .Outflow4AsRead(lRow) = Mid(lBuff, 61, 10)
                                 End If
                                 If lExit > 4 Then
+                                    If Not IsNumeric(Mid(lBuff, 71, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                     .Outflow5(lRow) = CDbl(Mid(lBuff, 71, 10))
                                     .Outflow5AsRead(lRow) = Mid(lBuff, 71, 10)
                                 End If
                                 lRow += 1
                             ElseIf .ExtendedFlag Then  'this is the extended format ftable
+                                If Not IsNumeric(Left(lBuff, 15)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                 .Depth(lRow) = CDbl(Left(lBuff, 15))
                                 .DepthAsRead(lRow) = Left(lBuff, 15)
+                                If Not IsNumeric(Mid(lBuff, 16, 15)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                 .Area(lRow) = CDbl(Mid(lBuff, 16, 15))
                                 .AreaAsRead(lRow) = Mid(lBuff, 16, 15)
+                                If Not IsNumeric(Mid(lBuff, 31, 15)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                 .Volume(lRow) = CDbl(Mid(lBuff, 31, 15))
                                 .VolumeAsRead(lRow) = Mid(lBuff, 31, 15)
                                 Dim lExit As Integer = .Ncols - 3
                                 If lExit > 0 Then
+                                    If Not IsNumeric(Mid(lBuff, 46, 15)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                     .Outflow1(lRow) = CDbl(Mid(lBuff, 46, 15))
                                     .Outflow1AsRead(lRow) = Mid(lBuff, 46, 15)
                                 End If
                                 If lExit > 1 Then
+                                    If Not IsNumeric(Mid(lBuff, 61, 15)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
                                     .Outflow2(lRow) = CDbl(Mid(lBuff, 61, 15))
                                     .Outflow2AsRead(lRow) = Mid(lBuff, 61, 15)
                                 End If
