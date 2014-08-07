@@ -24,7 +24,12 @@ Public Class clsUSGSBaseflowPlugin
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
         Show = Nothing
-
+        Dim lChoice As String = Logger.MsgCustomOwned("Please choose analysis approach below:", "Base-Flow Separation Analysis", Nothing, New String() {"Batch", "Interactive"})
+        If lChoice = "Batch" Then
+            Dim lfrmBatch As New frmBatch()
+            lfrmBatch.ShowDialog()
+            Return Nothing
+        End If
         Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
         If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup
         If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
