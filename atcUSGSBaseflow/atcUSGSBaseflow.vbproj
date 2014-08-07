@@ -81,7 +81,16 @@
     <Import Include="System.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="clsBatchBF.vb" />
+    <Compile Include="clsBatchBFSpec.vb" />
+    <Compile Include="clsBatchUnitStation.vb" />
     <Compile Include="clsUSGSBaseflowPlugin.vb" />
+    <Compile Include="frmBatch.Designer.vb">
+      <DependentUpon>frmBatch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBatch.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmUSGSBaseflow.Designer.vb">
       <DependentUpon>frmUSGSBaseflow.vb</DependentUpon>
     </Compile>
@@ -112,6 +121,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmBatch.resx">
+      <DependentUpon>frmBatch.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmUSGSBaseflow.resx">
       <DependentUpon>frmUSGSBaseflow.vb</DependentUpon>
     </EmbeddedResource>
