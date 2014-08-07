@@ -121,8 +121,10 @@ Public Class HspfOpnSeqBlk
         GetNextRecordFromBlock("OPN SEQUENCE", lRetkey, lBuff, lRecTyp, lReturnCode)
 
         If lReturnCode >= 0 Then
+            If Not IsNumeric(Mid(lBuff, 31, 2)) Then MapWinUtility.Logger.Msg("Invalid value in Opn Sequence Block:" & vbCrLf & lBuff, "Error in HspfOpnSeqBlk")
             pDelt = CDbl(Mid(lBuff, 31, 2)) * 60
             If lBuff.Length > 33 Then
+                If Not IsNumeric(Mid(lBuff, 34, 2)) Then MapWinUtility.Logger.Msg("Invalid value in Opn Sequence Block:" & vbCrLf & lBuff, "Error in HspfOpnSeqBlk")
                 pDelt = pDelt + CDbl(Mid(lBuff, 34, 2))
             End If
             lInit = 0

@@ -78,10 +78,12 @@ Public Class HspfConnection
                 lConnection.Uci = aUci
                 lConnection.Typ = 1
                 lConnection.Source.VolName = Trim(Left(lBuff, 6))
+                If Not IsNumeric(Mid(lBuff, 7, 4)) Then Logger.Msg("Invalid Value in Ext Sources Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                 lConnection.Source.VolId = CInt(Mid(lBuff, 7, 4))
                 lConnection.Source.Member = Trim(Mid(lBuff, 12, 6))
                 lStr = lBuff.Substring(17, 2).Trim
                 If lStr.Length > 0 Then
+                    If Not IsNumeric(lStr) Then Logger.Msg("Invalid Value in Ext Sources Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                     lConnection.Source.MemSub1 = CInt(lStr)
                 End If
                 lConnection.Ssystem = lBuff.Substring(20, 4)
@@ -90,6 +92,7 @@ Public Class HspfConnection
                 lConnection.MFactAsRead = lBuff.Substring(28, 10)
                 lStr = lBuff.Substring(28, 10).Trim
                 If lStr.Length > 0 Then
+                    If Not IsNumeric(lStr) Then Logger.Msg("Invalid MFact in Ext Sources Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                     lConnection.MFact = CDbl(lStr)
                 End If
                 lStr = lBuff.Substring(38, 4)
@@ -97,9 +100,13 @@ Public Class HspfConnection
                     lConnection.Tran = lStr
                 End If
                 lConnection.Target.VolName = Trim(Mid(lBuff, 44, 6))
+                If Not IsNumeric(Mid(lBuff, 51, 3)) Then Logger.Msg("Invalid Value in Ext Sources Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                 lConnection.Target.VolId = CInt(Mid(lBuff, 51, 3))
                 lStr = lBuff.Substring(54, 3).Trim
-                If lStr.Length > 0 Then lConnection.Target.VolIdL = CInt(lStr)
+                If lStr.Length > 0 Then
+                    If Not IsNumeric(lStr) Then Logger.Msg("Invalid Value in Ext Sources Block:" & vbCrLf & lBuff, "Error in HspfConnection")
+                    lConnection.Target.VolIdL = CInt(lStr)
+                End If
                 lConnection.Target.Group = lBuff.Substring(58, 6).Trim
                 lConnection.Target.Member = lBuff.Substring(65, 6).Trim
                 lStr = lBuff.Substring(71, 2).Trim
@@ -147,6 +154,7 @@ Public Class HspfConnection
                 lConnection.Uci = aUci
                 lConnection.Typ = 2
                 lConnection.Source.VolName = lBuff.Substring(0, 6).Trim
+                If Not IsNumeric(lBuff.Substring(6, 4)) Then Logger.Msg("Invalid Value in Network Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                 lConnection.Source.VolId = CInt(lBuff.Substring(6, 4))
                 lConnection.Source.Group = lBuff.Substring(11, 6).Trim
                 lConnection.Source.Member = lBuff.Substring(18, 6).Trim
@@ -169,13 +177,16 @@ Public Class HspfConnection
                 lConnection.MFactAsRead = lBuff.Substring(28, 10)
                 lStr = lBuff.Substring(28, 10).Trim
                 If lStr.Length > 0 Then
+                    If Not IsNumeric(lStr) Then Logger.Msg("Invalid MFact in Network Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                     lConnection.MFact = CDbl(lStr)
                 End If
                 lConnection.Tran = lBuff.Substring(38, 4).Trim
                 lConnection.Target.VolName = lBuff.Substring(43, 6).Trim
+                If Not IsNumeric(lBuff.Substring(50, 3)) Then Logger.Msg("Invalid Value in Network Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                 lConnection.Target.VolId = CInt(lBuff.Substring(50, 3))
                 lStr = Trim(Mid(lBuff, 55, 3))
                 If lStr.Length > 0 Then
+                    If Not IsNumeric(lStr) Then Logger.Msg("Invalid Value in Network Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                     lConnection.Target.VolIdL = CInt(lStr)
                 End If
                 lConnection.Target.Group = Trim(Mid(lBuff, 59, 6))
@@ -226,12 +237,18 @@ Public Class HspfConnection
                 lConnection.Uci = aUci
                 lConnection.Typ = 3
                 lConnection.Source.VolName = Trim(Left(lBuff, 6))
+                If Not IsNumeric(Mid(lBuff, 7, 4)) Then Logger.Msg("Invalid Value in Schematic Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                 lConnection.Source.VolId = CInt(Mid(lBuff, 7, 4))
                 lStr = Trim(Mid(lBuff, 29, 10))
                 lConnection.MFactAsRead = Mid(lBuff, 29, 10)
-                If lStr.Length > 0 Then lConnection.MFact = CDbl(lStr)
+                If lStr.Length > 0 Then
+                    If Not IsNumeric(lStr) Then Logger.Msg("Invalid MFact in Schematic Block:" & vbCrLf & lBuff, "Error in HspfConnection")
+                    lConnection.MFact = CDbl(lStr)
+                End If
                 lConnection.Target.VolName = Trim(Mid(lBuff, 44, 6))
+                If Not IsNumeric(Mid(lBuff, 50, 4)) Then Logger.Msg("Invalid Value in Schematic Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                 lConnection.Target.VolId = CInt(Mid(lBuff, 50, 4))
+                If Not IsNumeric(Mid(lBuff, 57, 4)) Then Logger.Msg("Missing or invalid Mass-Link ID in Schematic Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                 lConnection.MassLink = CInt(Mid(lBuff, 57, 4))
                 lStr = Trim(Mid(lBuff, 72, 2))
                 If lStr.Length > 0 And IsNumeric(lStr) Then
@@ -249,8 +266,8 @@ Public Class HspfConnection
                 aUci.Connections.Add(lConnection)
                 lComment = ""
             ElseIf lRecTyp = -1 And lRetCod <> 1 _
-                AndAlso Not lBuff.Contains("<-Volume->") _
-                AndAlso Not lBuff.Contains("<Name>") Then 'save comment
+                    AndAlso Not lBuff.Contains("<-Volume->") _
+                    AndAlso Not lBuff.Contains("<Name>") Then 'save comment
                 If lComment.Length = 0 Then
                     lComment = lBuff
                 Else
@@ -273,6 +290,7 @@ Public Class HspfConnection
                 lConnection.Uci = aUci
                 lConnection.Typ = 4
                 lConnection.Source.VolName = Trim(Left(lBuff, 6))
+                If Not IsNumeric(Mid(lBuff, 7, 4)) Then Logger.Msg("Invalid Value in Ext Targets Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                 lConnection.Source.VolId = CInt(Mid(lBuff, 7, 4))
                 lConnection.Source.Group = Trim(Mid(lBuff, 12, 6))
                 lConnection.Source.Member = Trim(Mid(lBuff, 19, 6))
@@ -295,6 +313,7 @@ Public Class HspfConnection
                 lStr = Mid(lBuff, 29, 10).Trim
                 lConnection.MFactAsRead = Mid(lBuff, 29, 10)
                 If lStr.Length > 0 Then
+                    If Not IsNumeric(lStr) Then Logger.Msg("Invalid Mfact in Ext Targets Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                     lConnection.MFact = CDbl(lStr)
                 End If
                 lStr = Trim(Mid(lBuff, 39, 4))
@@ -302,10 +321,12 @@ Public Class HspfConnection
                     lConnection.Tran = lStr
                 End If
                 lConnection.Target.VolName = Trim(Mid(lBuff, 44, 6))
+                If Not IsNumeric(Mid(lBuff, 50, 4)) Then Logger.Msg("Invalid Value in Ext Targets Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                 lConnection.Target.VolId = CInt(Mid(lBuff, 50, 4))
                 lConnection.Target.Member = Trim(Mid(lBuff, 55, 6))
                 lStr = Trim(Mid(lBuff, 61, 2))
                 If lStr.Length > 0 Then
+                    If Not IsNumeric(lStr) Then Logger.Msg("Invalid Value in Ext Targets Block:" & vbCrLf & lBuff, "Error in HspfConnection")
                     lConnection.Target.MemSub1 = CInt(lStr)
                 End If
                 lConnection.Ssystem = Trim(Mid(lBuff, 64, 4))

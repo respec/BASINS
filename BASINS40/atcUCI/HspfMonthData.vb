@@ -49,6 +49,7 @@ Public Class HspfMonthData
                 'skip this
             ElseIf lBuff.Contains("MONTH-DATA") Then  'another one
                 Dim lMonthDataTable As New HspfMonthDataTable
+                If Not IsNumeric(Right(Trim(lBuff), 3)) Then MapWinUtility.Logger.Msg("Invalid value in Month Data Block:" & vbCrLf & lBuff, "Error in HspfMonthData")
                 lMonthDataTable.Id = CInt(Right(Trim(lBuff), 3))
                 lMonthDataTable.Block = Me
                 Dim lComment As String = ""

@@ -104,6 +104,7 @@ Public Class HspfMassLink
                     lStr = Mid(lString, 29, 10).Trim
                     lMassLink.MFactAsRead = Mid(lString, 29, 10)
                     If lStr.Length > 0 Then
+                        If Not IsNumeric(lStr) Then MapWinUtility.Logger.Msg("Invalid MFact in Mass-Link Block:" & vbCrLf & lString, "Error in HspfMassLink")
                         lMassLink.MFact = CDbl(lStr)
                     End If
                     lMassLink.Tran = Trim(Mid(lString, 39, 4))
