@@ -94,9 +94,19 @@ Public Class clsBatchBFSpec
     ''' </summary>
     ''' <remarks></remarks>
     Private Sub MergeSpecs()
-
-
+        For Each lBFOpn As atcCollection In ListBatchBaseflowOpns
+            For Each lStation As clsBatchUnitStation In lBFOpn
+                For Each lgDef As atcDefinedValue In GlobalSettings
+                    With lStation.BFInputs
+                        If .GetValue(lgDef.Definition.Name) Is Nothing Then
+                            .SetValue(lgDef.Definition.Name, lgDef.Value)
+                        End If
+                    End With
+                Next
+            Next
+        Next
     End Sub
+
     ''' <summary>
     ''' This routine save a line of global setting
     ''' differentiate by first keyword on the line
