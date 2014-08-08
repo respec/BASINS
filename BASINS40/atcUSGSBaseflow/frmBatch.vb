@@ -19,5 +19,6 @@ Public Class frmBatch
         Dim lBatchConfig As New clsBatchBFSpec()
         lBatchConfig.SpecFilename = txtSpecFile.Text
         lBatchConfig.PopulateScenarios()
+
     End Sub
 End Class
