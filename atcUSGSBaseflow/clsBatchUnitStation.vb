@@ -4,7 +4,7 @@ Imports atcUtility
 Public Class clsBatchUnitStation
     Public StationID As String
     Public StreamFlowData As atcTimeseries
-    Public BFInputs As atcDataAttributes
+    Public BFInputs As atcDataAttributes = New atcDataAttributes()
     Public CalcBF As atcTimeseriesBaseflow.clsBaseflow
     Public Message As String = ""
     Public NeedToDownloadData As Boolean = True
