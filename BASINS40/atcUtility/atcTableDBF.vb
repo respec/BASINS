@@ -494,6 +494,24 @@ AllKeys:
         End Set
     End Property
 
+    Public Property ValueAsDate(ByVal aFieldNumber As Integer) As Date
+        Get
+            Dim lValue As String = Value(aFieldNumber)
+            If lValue.Length = 8 Then
+                Return New Date(CInt(lValue.Substring(0, 4)), CInt(lValue.Substring(4, 2)), (lValue.Substring(6, 2)))                
+            Else
+                Dim lDate As Date
+                If Date.TryParse(lValue, lDate) Then
+                    Return lDate
+                End If
+                Throw New ApplicationException("Value not formatted as date: " & lValue)
+            End If
+        End Get
+        Set(aNewValue As Date)
+            Value(aFieldNumber) = aNewValue.ToString("YYYYMMDD")
+        End Set
+    End Property
+
     Public Overrides Property Value(ByVal aFieldNumber As Integer) As String
         Get
             If pCurrentRecord < 1 OrElse pCurrentRecord > pHeader.NumRecs Then
@@ -629,7 +647,7 @@ AllKeys:
             Return True
 NotEqual:
             pCurrentRecord += 1
-            pCurrentRecordStart += pHeader.NumBytesRec            
+            pCurrentRecordStart += pHeader.NumBytesRec
         End While
         CurrentRecord = aStartRecord
         Return False

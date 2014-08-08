@@ -1803,37 +1803,44 @@ x:
         Next
     End Function
 
-    Public Sub LookForMissingMetSegRecToFill(ByVal aMetSeg As HspfMetSeg, ByVal aConsToCheck As String)
-        Dim lFound As Boolean = False
-        Dim lWDMId As String = ""
-        Dim lDsn As Integer = 0
-        For Each lMetSegRec As HspfMetSegRecord In aMetSeg.MetSegRecs
-            If lMetSegRec.Name = aConsToCheck Then
-                lFound = True
-                Exit For
-            ElseIf lMetSegRec.Name = "PREC" Then
-                'remember which wdm id
-                lWDMId = lMetSegRec.Source.VolName
+    ''' <summary>
+    ''' Look for met data that is missing from any met segment, add new record pointing to found version
+    ''' </summary>
+    ''' <param name="aConsToCheck">If this constituent is missing, look for it in WDM file</param>
+    ''' <remarks></remarks>
+    Public Sub FillMissingMetSegRecs(ByVal aConsToCheck As String)
+        For Each aMetSeg As HspfMetSeg In Me.MetSegs
+            Dim lFound As Boolean = False
+            Dim lWDMId As String = ""
+            Dim lDsn As Integer = 0
+            For Each lMetSegRec As HspfMetSegRecord In aMetSeg.MetSegRecs
+                If lMetSegRec.Name = aConsToCheck Then
+                    lFound = True
+                    Exit For
+                ElseIf lMetSegRec.Name = "PREC" Then
+                    'remember which wdm id
+                    lWDMId = lMetSegRec.Source.VolName
+                End If
+            Next
+            If Not lFound And lWDMId.Length > 3 Then
+                'see if wdm file has an acceptable one, if so add it
+                lDsn = Me.LookForAcceptableMetDataSet(aConsToCheck, lWDMId.Substring(3))
+                If lDsn > 0 Then
+                    'found a dsn to use
+                    Dim lMetSegRecord As New HspfMetSegRecord
+                    lMetSegRecord.Name = aConsToCheck
+                    lMetSegRecord.Source.VolName = lWDMId
+                    lMetSegRecord.Source.VolId = lDsn
+                    lMetSegRecord.Source.Member = aConsToCheck
+                    lMetSegRecord.MFactP = 1.0
+                    lMetSegRecord.MFactR = 1.0
+                    lMetSegRecord.Sgapstrg = ""
+                    lMetSegRecord.Ssystem = "ENGL"
+                    lMetSegRecord.Tran = "SAME"
+                    aMetSeg.MetSegRecs.Add(lMetSegRecord)
+                End If
             End If
         Next
-        If Not lFound And lWDMId.Length > 3 Then
-            'see if wdm file has an acceptable one, if so add it
-            lDsn = Me.LookForAcceptableMetDataSet(aConsToCheck, lWDMId.Substring(3))
-            If lDsn > 0 Then
-                'found a dsn to use
-                Dim lMetSegRecord As New HspfMetSegRecord
-                lMetSegRecord.Name = aConsToCheck
-                lMetSegRecord.Source.VolName = lWDMId
-                lMetSegRecord.Source.VolId = lDsn
-                lMetSegRecord.Source.Member = aConsToCheck
-                lMetSegRecord.MFactP = 1.0
-                lMetSegRecord.MFactR = 1.0
-                lMetSegRecord.Sgapstrg = ""
-                lMetSegRecord.Ssystem = "ENGL"
-                lMetSegRecord.Tran = "SAME"
-                aMetSeg.MetSegRecs.Add(lMetSegRecord)
-            End If
-        End If
     End Sub
 
     Private Function LookForAcceptableMetDataSet(ByVal aCons As String, ByVal aWDMId As Integer) As Integer
