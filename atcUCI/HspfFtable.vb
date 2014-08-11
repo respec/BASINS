@@ -304,12 +304,18 @@ Public Class HspfFtable
                         t = .AreaAsRead(lRow)
                     Else
                         t = Format(.Area(lRow), lFmt).PadLeft(lSpacing)
+                        If t.Length > lSpacing Or .Area(lRow) < 0.01 Then 'too many digits in the number
+                            t = atcUCI.HspfTable.NumFmtRE(CSng(.Area(lRow)), lSpacing).PadLeft(lSpacing)
+                        End If
                     End If
                     s &= t
                     If NumericallyTheSame(.VolumeAsRead(lRow), .Volume(lRow)) Then
                         t = .VolumeAsRead(lRow)
                     Else
                         t = Format(.Volume(lRow), lFmt).PadLeft(lSpacing)
+                        If t.Length > lSpacing Or .Volume(lRow) < 0.01 Then 'too many digits in the number
+                            t = atcUCI.HspfTable.NumFmtRE(CSng(.Volume(lRow)), lSpacing).PadLeft(lSpacing)
+                        End If
                     End If
                     s &= t
                     For lOutflowIndex As Integer = 1 To .Ncols - 3
@@ -318,7 +324,7 @@ Public Class HspfFtable
                                 t = .Outflow1AsRead(lRow)
                             Else
                                 t = Format(.Outflow1(lRow), lFmt).PadLeft(lSpacing)
-                                If t.Length > lSpacing Then 'too many digits in the number
+                                If t.Length > lSpacing Or .Outflow1(lRow) < 0.01 Then 'too many digits in the number
                                     t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow1(lRow)), lSpacing).PadLeft(lSpacing)
                                 End If
                             End If
@@ -327,24 +333,36 @@ Public Class HspfFtable
                                 t = .Outflow2AsRead(lRow)
                             Else
                                 t = Format(.Outflow2(lRow), lFmt).PadLeft(lSpacing)
+                                If t.Length > lSpacing Or .Outflow2(lRow) < 0.01 Then 'too many digits in the number
+                                    t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow2(lRow)), lSpacing).PadLeft(lSpacing)
+                                End If
                             End If
                         ElseIf lOutflowIndex = 3 Then
                             If NumericallyTheSame(.Outflow3AsRead(lRow), .Outflow3(lRow)) Then
                                 t = .Outflow3AsRead(lRow)
                             Else
                                 t = Format(.Outflow3(lRow), lFmt).PadLeft(lSpacing)
+                                If t.Length > lSpacing Or .Outflow3(lRow) < 0.01 Then 'too many digits in the number
+                                    t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow3(lRow)), lSpacing).PadLeft(lSpacing)
+                                End If
                             End If
                         ElseIf lOutflowIndex = 4 Then
                             If NumericallyTheSame(.Outflow4AsRead(lRow), .Outflow4(lRow)) Then
                                 t = .Outflow4AsRead(lRow)
                             Else
                                 t = Format(.Outflow4(lRow), lFmt).PadLeft(lSpacing)
+                                If t.Length > lSpacing Or .Outflow4(lRow) < 0.01 Then 'too many digits in the number
+                                    t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow4(lRow)), lSpacing).PadLeft(lSpacing)
+                                End If
                             End If
                         ElseIf lOutflowIndex = 5 Then
                             If NumericallyTheSame(.Outflow5AsRead(lRow), .Outflow5(lRow)) Then
                                 t = .Outflow5AsRead(lRow)
                             Else
                                 t = Format(.Outflow5(lRow), lFmt).PadLeft(lSpacing)
+                                If t.Length > lSpacing Or .Outflow5(lRow) < 0.01 Then 'too many digits in the number
+                                    t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow5(lRow)), lSpacing).PadLeft(lSpacing)
+                                End If
                             End If
                         End If
                         s &= t
