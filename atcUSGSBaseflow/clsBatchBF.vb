@@ -9,7 +9,7 @@ Public Class clsBatchBF
     Private Specs As clsBatchBFSpec
     
 
-    Public Sub clsBatchBF(ByVal aSpec As clsBatchBFSpec)
+    Public Sub New(ByVal aSpec As clsBatchBFSpec)
         Specs = aSpec
     End Sub
 

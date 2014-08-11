@@ -1240,7 +1240,15 @@ Public Module modBaseflowUtil
         For Each lTs As atcTimeseries In aTs.Attributes.GetDefinedValue("Baseflow").Value
             If lTs.Attributes.GetValue("Method") = aBFMethod Then
                 lTsBF = lTs
-                lTsFlow = SubsetByDate(aTs, lTs.Dates.Value(0), lTs.Dates.Value(lTs.numValues), Nothing)
+                Dim lStartDate As Double = -99
+                For I As Integer = 0 To lTs.Dates.numValues
+                    If Not Double.IsNaN(lTs.Dates.Value(I)) Then
+                        lStartDate = lTs.Dates.Value(I)
+                        Exit For
+                    End If
+                Next
+                'lTsFlow = SubsetByDate(aTs, lTs.Dates.Value(0), lTs.Dates.Value(lTs.numValues), Nothing)
+                lTsFlow = SubsetByDate(aTs, lStartDate, lTs.Dates.Value(lTs.numValues), Nothing)
                 Exit For
             End If
         Next

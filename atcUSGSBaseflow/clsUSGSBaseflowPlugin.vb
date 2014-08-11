@@ -27,8 +27,8 @@ Public Class clsUSGSBaseflowPlugin
         Dim lChoice As String = Logger.MsgCustomOwned("Please choose analysis approach below:", "Base-Flow Separation Analysis", Nothing, New String() {"Batch", "Interactive"})
         If lChoice = "Batch" Then
             Dim lfrmBatch As New frmBatch()
-            lfrmBatch.ShowDialog()
-            Return Nothing
+            ShowForm(lfrmBatch)
+            Return lfrmBatch
         End If
         Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
         If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup
@@ -43,6 +43,10 @@ Public Class clsUSGSBaseflowPlugin
             Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Base-Flow Separation")
         End If
     End Function
+
+    Private Sub ShowForm(ByVal aForm As frmBatch)
+        aForm.Initialize()
+    End Sub
 
     Private Sub ShowForm(ByVal aTimeseriesGroup As atcData.atcDataGroup, ByVal aForm As Object)
         LoadPlugin(pRequiredHelperPlugin)
