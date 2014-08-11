@@ -2,6 +2,23 @@
 Imports atcUtility
 Imports MapWinUtility
 
+Public Class BFInputNames
+    Public Shared Streamflow As String = "Streamflow"
+    Public Shared EnglishUnit As String = "EnglishUnit"
+    Public Shared StartDate As String = "StartDate"
+    Public Shared EndDate As String = "EndDate"
+    Public Shared BFMethods As String = "BFMethods"
+    Public Shared DrainageArea As String = "DrainageArea"
+    Public Shared BFITurnPtFrac As String = "BFI_TurnPtFrac"
+    Public Shared BFIRecessConst As String = "BFI_RecessConst"
+    Public Shared BFINDayScreen As String = "BFI_NDayScreen"
+    Public Shared BFIUseSymbol As String = "BFIUseSymbol"
+    Public Shared BFIReportby As String = "BFIReportby"
+    Public Shared BFIReportbyCY As String = "Calendar"
+    Public Shared BFIReportbyWY As String = "Water"
+    Public Shared StationFile As String = "StationFile"
+End Class
+
 Public Class atcTimeseriesBaseflow
     Inherits atcData.atcTimeseriesSource
     Private pAvailableOperations As atcDataAttributes
@@ -161,14 +178,14 @@ Public Class atcTimeseriesBaseflow
             'ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
         Else
             'ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
-            lTsStreamflow = aArgs.GetValue("Streamflow")(0)
+            lTsStreamflow = aArgs.GetValue(BFInputNames.Streamflow)(0)
             Me.Specification = "Base-Flow-" & lTsStreamflow.Attributes.GetValue("Location")
-            lEnglishFlg = aArgs.GetValue("EnglishUnit", lEnglishFlg)
-            lStartDate = aArgs.GetValue("Start Date")
-            lEndDate = aArgs.GetValue("End Date")
+            lEnglishFlg = aArgs.GetValue(BFInputNames.EnglishUnit, lEnglishFlg)
+            lStartDate = aArgs.GetValue(BFInputNames.StartDate)
+            lEndDate = aArgs.GetValue(BFInputNames.EndDate)
             lMethod = aArgs.GetValue("Method")
-            lMethods = aArgs.GetValue("Methods")
-            lDrainageArea = aArgs.GetValue("Drainage Area")
+            lMethods = aArgs.GetValue(BFInputNames.BFMethods)
+            lDrainageArea = aArgs.GetValue(BFInputNames.DrainageArea)
             'If lMethods.Contains(BFMethods.HySEPFixed) OrElse _
             '   lMethods.Contains(BFMethods.HySEPLocMin) OrElse _
             '   lMethods.Contains(BFMethods.HySEPSlide) OrElse _
@@ -177,20 +194,20 @@ Public Class atcTimeseriesBaseflow
             'End If
             Dim lBFIChosen As Boolean = False
             If lMethods.Contains(BFMethods.BFIStandard) Then
-                lBFIFrac = aArgs.GetValue("BFIFrac")
+                lBFIFrac = aArgs.GetValue(BFInputNames.BFITurnPtFrac) '"BFIFrac"
                 lBFIChosen = True
             End If
             If lMethods.Contains(BFMethods.BFIModified) Then
-                lBFIK1Day = aArgs.GetValue("BFIK1Day")
+                lBFIK1Day = aArgs.GetValue(BFInputNames.BFIRecessConst) '"BFIK1Day"
                 lBFIChosen = True
             End If
             If lBFIChosen Then
-                lBFINDay = aArgs.GetValue("BFINDay")
-                lBFIUseSymbol = aArgs.GetValue("BFIUseSymbol")
-                lBFIYearBasis = aArgs.GetValue("BFIReportby")
+                lBFINDay = aArgs.GetValue(BFInputNames.BFINDayScreen) '"BFINDay"
+                lBFIUseSymbol = aArgs.GetValue(BFInputNames.BFIUseSymbol) '"BFIUseSymbol"
+                lBFIYearBasis = aArgs.GetValue(BFInputNames.BFIReportby) '"BFIReportby"
             End If
 
-            lStationFile = aArgs.GetValue("Station File")
+            lStationFile = aArgs.GetValue(BFInputNames.StationFile) '"Station File"
 
             'If aArgs.ContainsAttribute("BoundaryMonth") Then
             '    lBoundaryMonth = aArgs.GetValue("BoundaryMonth")

@@ -219,32 +219,32 @@ Public Class frmUSGSBaseflow
 
         If lErrMsg.Length = 0 Then
             'set methods
-            Args.SetValue("Methods", pMethods)
+            Args.SetValue(BFInputNames.BFMethods, pMethods) '"Methods"
             'Set drainage area
-            Args.SetValue("Drainage Area", lDA)
+            Args.SetValue(BFInputNames.DrainageArea, lDA) '"Drainage Area"
             'set duration
-            Args.SetValue("Start Date", StartDateFromForm)
-            Args.SetValue("End Date", EndDateFromForm)
+            Args.SetValue(BFInputNames.StartDate, StartDateFromForm) '"Start Date"
+            Args.SetValue(BFInputNames.EndDate, EndDateFromForm) '"End Date"
             'Set streamflow
-            Args.SetValue("Streamflow", pDataGroup)
+            Args.SetValue(BFInputNames.Streamflow, pDataGroup) '"Streamflow"
             'Set Unit
-            Args.SetValue("EnglishUnit", True)
+            Args.SetValue(BFInputNames.EnglishUnit, True) '"EnglishUnit"
             'Set station.txt
             'Args.SetValue("Station File", atcUSGSStations.StationInfoFile)
             If pMethods.Contains(BFMethods.BFIStandard) Then
-                Args.SetValue("BFIFrac", lFrac)
+                Args.SetValue(BFInputNames.BFITurnPtFrac, lFrac) '"BFIFrac"
             End If
             If pMethods.Contains(BFMethods.BFIModified) Then
-                Args.SetValue("BFIK1Day", lK1Day)
+                Args.SetValue(BFInputNames.BFIRecessConst, lK1Day) '"BFIK1Day"
             End If
             If pMethods.Contains(BFMethods.BFIStandard) OrElse pMethods.Contains(BFMethods.BFIModified) Then
-                Args.SetValue("BFINDay", lNDay)
-                Args.SetValue("BFIUseSymbol", (chkBFISymbols.Checked))
-                Dim lBFIYearBasis As String = "Calendar"
+                Args.SetValue(BFInputNames.BFINDayScreen, lNDay) '"BFINDay"
+                Args.SetValue(BFInputNames.BFIUseSymbol, (chkBFISymbols.Checked)) '"BFIUseSymbol"
+                Dim lBFIYearBasis As String = BFInputNames.BFIReportbyCY '"Calendar"
                 If rdoBFIReportbyWaterYear.Checked Then
-                    lBFIYearBasis = "Water"
+                    lBFIYearBasis = BFInputNames.BFIReportbyWY '"Water"
                 End If
-                Args.SetValue("BFIReportby", lBFIYearBasis)
+                Args.SetValue(BFInputNames.BFIReportby, lBFIYearBasis) '"BFIReportby"
             End If
         End If
         Return lErrMsg
@@ -409,22 +409,22 @@ Public Class frmUSGSBaseflow
             Exit Sub
         End If
         ClearAttributes()
-        modBaseflowUtil.ComputeBaseflow(lArgs)
+        modBaseflowUtil.ComputeBaseflow(lArgs, True)
         'pMethodLastDone = lArgs.GetValue("Method")
-        MethodsLastDone = lArgs.GetValue("Methods")
-        pDALastUsed = lArgs.GetValue("Drainage Area")
+        MethodsLastDone = lArgs.GetValue(BFInputNames.BFMethods)
+        pDALastUsed = lArgs.GetValue(BFInputNames.DrainageArea) '"Drainage Area")
         Dim lBFIchosen As Boolean = False
         If MethodsLastDone.Contains(BFMethods.BFIStandard) Then
             lBFIchosen = True
-            pBFIFrac = lArgs.GetValue("BFIFrac")
+            pBFIFrac = lArgs.GetValue(BFInputNames.BFITurnPtFrac) '"BFIFrac")
         End If
         If MethodsLastDone.Contains(BFMethods.BFIModified) Then
             lBFIchosen = True
-            pBFIK1Day = lArgs.GetValue("BFIK1Day")
+            pBFIK1Day = lArgs.GetValue(BFInputNames.BFIRecessConst) '"BFIK1Day")
         End If
         If lBFIchosen Then
-            pBFINDay = lArgs.GetValue("BFINDay")
-            pBFIUseSymbol = lArgs.GetValue("BFIUseSymbol")
+            pBFINDay = lArgs.GetValue(BFInputNames.BFINDayScreen) '"BFINDay")
+            pBFIUseSymbol = lArgs.GetValue(BFInputNames.BFIUseSymbol) '"BFIUseSymbol")
         End If
         pDidBFSeparation = True
     End Sub
