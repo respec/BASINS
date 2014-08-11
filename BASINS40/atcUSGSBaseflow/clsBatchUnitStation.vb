@@ -40,10 +40,10 @@ Public Class clsBatchUnitStation
         End Set
     End Property
 
-    Public Sub clsBatchUnitStation()
+    Public Sub New()
     End Sub
 
-    Public Sub clsBatchUnitStation(ByVal aArgs As atcDataAttributes)
+    Public Sub New(ByVal aArgs As atcDataAttributes)
         If aArgs IsNot Nothing Then BFInputs = aArgs
     End Sub
 

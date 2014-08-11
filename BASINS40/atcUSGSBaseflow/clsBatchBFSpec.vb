@@ -48,12 +48,19 @@ Public Class clsBatchBFSpec
     Public MessageParameters As String = ""
 
     Public Event StatusUpdate(ByVal aMsg As String)
+    Public gProgressBar As Windows.Forms.ProgressBar = Nothing
+    Public gTextStatus As Windows.Forms.TextBox = Nothing
 
-    Public Sub clsBatchBFSpec()
+    Public Sub New(ByVal aProgressbar As Windows.Forms.ProgressBar, ByVal aTextField As Windows.Forms.TextBox)
+        gProgressBar = aProgressbar
+        gTextStatus = aTextField
     End Sub
 
-    Public Sub clsBatchBFSpec(ByVal aSpecFilename As String)
+    Public Sub New(ByVal aSpecFilename As String)
         SpecFilename = aSpecFilename
+    End Sub
+
+    Public Sub New()
 
     End Sub
 
@@ -155,7 +162,10 @@ Public Class clsBatchBFSpec
         If GlobalSettings Is Nothing Then GlobalSettings = New atcDataAttributes()
         Dim lArr() As String = aSpec.Split(Delimiter)
         If String.IsNullOrEmpty(lArr(1).Trim()) Then Return
-        Select Case lArr(0).Trim().ToLower
+        Dim lAttribName As String = lArr(0).Trim()
+        If GlobalSettings.GetValue(lAttribName) IsNot Nothing Then Return
+
+        Select Case lAttribName.ToLower
             Case atcTimeseriesBaseflow.BFInputNames.StartDate.ToLower
                 Dim lDates(5) As Integer
                 Dim lDate As DateTime
@@ -218,6 +228,13 @@ Public Class clsBatchBFSpec
                     DownloadDataDirectory = lArr(1)
                 End If
                 GlobalSettings.Add(BFBatchInputNames.DataDir, lArr(1))
+            Case atcTimeseriesBaseflow.BFInputNames.BFIReportby.ToLower
+                Dim lReportBySpec As String = lArr(1).Trim().ToUpper()
+                If lReportBySpec = BFBatchInputNames.ReportByWY Then
+                    GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.BFIReportby, atcTimeseriesBaseflow.BFInputNames.BFIReportbyWY)
+                ElseIf lReportBySpec = BFBatchInputNames.ReportByCY Then
+                    GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.BFIReportby, atcTimeseriesBaseflow.BFInputNames.BFIReportbyCY)
+                End If
             Case Else
                 GlobalSettings.Add(lArr(0), lArr(1))
         End Select
@@ -457,7 +474,8 @@ Public Class clsBatchBFSpec
             Try
                 MkDirPath(lOutputDir)
             Catch ex As Exception
-                RaiseEvent StatusUpdate("0,0,Cannot create output directory: " & vbCrLf & lOutputDir)
+                'RaiseEvent StatusUpdate("0,0,Cannot create output directory: " & vbCrLf & lOutputDir)
+                UpdateStatus("Cannot create output directory: " & vbCrLf & lOutputDir, , 0, 0)
                 Return
             End Try
         End If
@@ -483,7 +501,9 @@ Public Class clsBatchBFSpec
         End Try
 
         If Not lOutputDirWritable Then
-            RaiseEvent StatusUpdate("0,0,Can not write to output directory: " & vbCrLf & lOutputDir)
+            'RaiseEvent StatusUpdate("0,0,Can not write to output directory: " & vbCrLf & lOutputDir)
+            'Windows.Forms.Application.DoEvents()
+            UpdateStatus("Can not write to output directory: " & vbCrLf & lOutputDir, , 0, 0)
             Return
         End If
 
@@ -507,19 +527,44 @@ Public Class clsBatchBFSpec
                 Dim lTsFlow As atcTimeseries = GetStationStreamFlowData(lStation)
                 If lTsFlow IsNot Nothing Then
                     lStation.CalcBF = New atcTimeseriesBaseflow.atcTimeseriesBaseflow()
+                    Dim lTsFlowGroup As New atcTimeseriesGroup()
+                    lTsFlowGroup.Add(lTsFlow)
                     With lStation.BFInputs
-                        .SetValue(atcTimeseriesBaseflow.BFInputNames.Streamflow, lTsFlow)
+                        .SetValue(atcTimeseriesBaseflow.BFInputNames.Streamflow, lTsFlowGroup)
+                        Dim lDates() As Integer = .GetValue(atcTimeseriesBaseflow.BFInputNames.StartDate)
+                        .SetValue(atcTimeseriesBaseflow.BFInputNames.StartDate, Date2J(lDates))
+                        lDates = .GetValue(atcTimeseriesBaseflow.BFInputNames.EndDate)
+                        .SetValue(atcTimeseriesBaseflow.BFInputNames.EndDate, Date2J(lDates))
+                        .SetValue(atcTimeseriesBaseflow.BFInputNames.DrainageArea, lStation.StationDrainageArea)
                     End With
                     If lStation.CalcBF.Open("baseflow", lStation.BFInputs) Then
-                        OutputDir = lBFOpnDir
+                        OutputDir = lStationOutDir
+                        OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "BF_")
+                        MethodsLastDone = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
                         ASCIICommon(lTsFlow)
                     End If
                 End If
-                RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
+                'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
+                UpdateStatus("Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True, lBFOpnCount, lTotalBFOpn)
                 lBFOpnCount += 1
             Next
             'If lStationFoundData IsNot Nothing Then Exit For
         Next
+    End Sub
+
+    Private Sub UpdateStatus(ByVal aMsg As String, Optional ByVal aAppend As Boolean = False, Optional ByVal aMin As Integer = 0, Optional ByVal aMax As Integer = 0)
+        If gProgressBar IsNot Nothing Then
+            gProgressBar.Minimum = aMin
+            gProgressBar.Maximum = aMax
+            gProgressBar.PerformStep()
+        End If
+        If gTextStatus IsNot Nothing Then
+            If aAppend Then
+                gTextStatus.Text &= aMsg & vbCrLf
+            Else
+                gTextStatus.Text = aMsg
+            End If
+        End If
     End Sub
 
     Public Sub Clear()

@@ -1,7 +1,12 @@
 ﻿Imports System.Windows.Forms
 
 Public Class frmBatch
-    Public WithEvents pBatchConfig As New clsBatchBFSpec()
+    'Public WithEvents pBatchConfig As New clsBatchBFSpec()
+    Private pBatchConfig As clsBatchBFSpec
+
+    Public Sub Initialize()
+        Me.Show()
+    End Sub
 
     Private Sub btnBrowse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowse.Click
         Dim lFileOpenDiag As New OpenFileDialog()
@@ -29,17 +34,17 @@ Public Class frmBatch
 
     End Sub
 
-    Private Sub StatusUpdateHandle(ByVal aMsg As String) Handles pBatchConfig.StatusUpdate
-        Dim lArr() As String = aMsg.Split(",")
-        Dim lCount As Integer = Integer.Parse(lArr(0))
-        Dim lCountTotal As Integer = Integer.Parse(lArr(1))
-        Dim lMsg As String = lArr(2)
-        ProgressBar1.Step = 1
-        ProgressBar1.Minimum = lCount
-        ProgressBar1.Maximum = lCountTotal
-        ProgressBar1.PerformStep()
-        txtMsg.Text &= lMsg & vbCrLf
-    End Sub
+    'Private Sub StatusUpdateHandle(ByVal aMsg As String) Handles pBatchConfig.StatusUpdate
+    '    Dim lArr() As String = aMsg.Split(",")
+    '    Dim lCount As Integer = Integer.Parse(lArr(0))
+    '    Dim lCountTotal As Integer = Integer.Parse(lArr(1))
+    '    Dim lMsg As String = lArr(2)
+    '    ProgressBar1.Step = 1
+    '    ProgressBar1.Minimum = lCount
+    '    ProgressBar1.Maximum = lCountTotal
+    '    ProgressBar1.PerformStep()
+    '    txtMsg.Text &= lMsg & vbCrLf
+    'End Sub
 
     Private Sub frmBatch_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         'RemoveHandler pBatchConfig.StatusUpdate, AddressOf Me.StatusUpdateHandle
@@ -47,5 +52,6 @@ Public Class frmBatch
 
     Private Sub frmBatch_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         'AddHandler pBatchConfig.StatusUpdate, AddressOf Me.StatusUpdateHandle
+        pBatchConfig = New clsBatchBFSpec(Me.ProgressBar1, Me.txtMsg)
     End Sub
 End Class
