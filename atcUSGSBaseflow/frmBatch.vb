@@ -1,6 +1,7 @@
 ﻿Imports System.Windows.Forms
 
 Public Class frmBatch
+    Public WithEvents pBatchConfig As New clsBatchBFSpec()
 
     Private Sub btnBrowse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowse.Click
         Dim lFileOpenDiag As New OpenFileDialog()
@@ -15,10 +16,36 @@ Public Class frmBatch
     End Sub
 
     Private Sub btnDoBatch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoBatch.Click
-        Dim lBatch As New clsBatchBF()
-        Dim lBatchConfig As New clsBatchBFSpec()
-        lBatchConfig.SpecFilename = txtSpecFile.Text
-        lBatchConfig.PopulateScenarios()
+        Dim lNewSpecs As Boolean = False
+        If Not pBatchConfig.SpecFilename = txtSpecFile.Text AndAlso IO.File.Exists(txtSpecFile.Text) Then
+            pBatchConfig.SpecFilename = txtSpecFile.Text
+            lNewSpecs = True
+        End If
+        If lNewSpecs Then
+            pBatchConfig.Clear()
+            pBatchConfig.PopulateScenarios()
+            pBatchConfig.DoBatch()
+        End If
 
+    End Sub
+
+    Private Sub StatusUpdateHandle(ByVal aMsg As String) Handles pBatchConfig.StatusUpdate
+        Dim lArr() As String = aMsg.Split(",")
+        Dim lCount As Integer = Integer.Parse(lArr(0))
+        Dim lCountTotal As Integer = Integer.Parse(lArr(1))
+        Dim lMsg As String = lArr(2)
+        ProgressBar1.Step = 1
+        ProgressBar1.Minimum = lCount
+        ProgressBar1.Maximum = lCountTotal
+        ProgressBar1.PerformStep()
+        txtMsg.Text &= lMsg & vbCrLf
+    End Sub
+
+    Private Sub frmBatch_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        'RemoveHandler pBatchConfig.StatusUpdate, AddressOf Me.StatusUpdateHandle
+    End Sub
+
+    Private Sub frmBatch_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        'AddHandler pBatchConfig.StatusUpdate, AddressOf Me.StatusUpdateHandle
     End Sub
 End Class

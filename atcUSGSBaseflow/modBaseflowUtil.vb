@@ -41,26 +41,28 @@ Public Module modBaseflowUtil
     ''' </summary>
     ''' <param name="aArgs"></param>
     ''' <remarks></remarks>
-    Public Sub ComputeBaseflow(ByVal aArgs As atcDataAttributes)
+    Public Sub ComputeBaseflow(ByVal aArgs As atcDataAttributes, Optional ByVal aMakeAvailable As Boolean = False)
         Dim lClsBaseFlowCalculator As New atcTimeseriesBaseflow.atcTimeseriesBaseflow
         Try
             lClsBaseFlowCalculator.Open("Baseflow", aArgs)
-            Dim lOldDataSource As atcDataSource = Nothing
-            For Each lDataSource As atcDataSource In atcDataManager.DataSources
-                If lDataSource.Specification = lClsBaseFlowCalculator.Specification Then
-                    lOldDataSource = lDataSource
-                    Exit For
+
+            If aMakeAvailable Then
+                Dim lOldDataSource As atcDataSource = Nothing
+                For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                    If lDataSource.Specification = lClsBaseFlowCalculator.Specification Then
+                        lOldDataSource = lDataSource
+                        Exit For
+                    End If
+                Next
+                If lOldDataSource IsNot Nothing Then
+                    lOldDataSource.Clear()
+                    atcDataManager.DataSources.Remove(lOldDataSource)
                 End If
-            Next
-            If lOldDataSource IsNot Nothing Then
-                lOldDataSource.Clear()
-                atcDataManager.DataSources.Remove(lOldDataSource)
+
+                'lClsBaseFlowCalculator.DataSets.Clear()
+                'Add new results to Datasets
+                atcDataManager.DataSources.Add(lClsBaseFlowCalculator)
             End If
-
-            'lClsBaseFlowCalculator.DataSets.Clear()
-            'Add new results to Datasets
-            atcDataManager.DataSources.Add(lClsBaseFlowCalculator)
-
         Catch ex As Exception
             Logger.Msg("Baseflow separation failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Baseflow separation")
         End Try

@@ -2,6 +2,34 @@
 Imports atcData
 Imports MapWinUtility
 
+Public Class BFBatchInputNames
+    'Public Shared SDATE As String = "SDATE"
+    'Public Shared EDATE As String = "EDATE"
+    'Public Shared STARTDATE As String = "StartDate"
+    'Public Shared ENDDATE As String = "EndDate"
+    Public Shared BFMethod As String = "BFMethod"
+    'Public Shared BFMethods As String = "BFMethods"
+    'Public Shared ReportBy As String = "ReportBy"
+    Public Shared ReportByCY As String = "CY"
+    Public Shared ReportByWY As String = "WY"
+    'Public Shared BFI_NDayScreen As String = "BFI_NDayScreen"
+    'Public Shared BFI_TurnPtFrac As String = "BFI_TurnPtFrac"
+    'Public Shared BFI_RecessConst As String = "BFI_RecessConst"
+    Public Shared DataDir As String = "DataDir"
+    Public Shared OUTPUTDIR As String = "OUTPUTDIR"
+    Public Shared OUTPUTPrefix As String = "OUTPUTPrefix"
+    Public Shared SAVERESULT As String = "SAVERESULT"
+
+    Public Shared BFM_HYFX As String = "HYFX"
+    Public Shared BFM_HYLM As String = "HYLM"
+    Public Shared BFM_HYSL As String = "HYSL"
+    Public Shared BFM_PART As String = "PART"
+    Public Shared BFM_BFIS As String = "BFIS"
+    Public Shared BFM_BFIM As String = "BFIM"
+
+    'Public Shared STREAMFLOW As String = "Streamflow"
+End Class
+
 Public Class clsBatchBFSpec
 
     Public GlobalSettings As atcData.atcDataAttributes
@@ -9,24 +37,34 @@ Public Class clsBatchBFSpec
     Public SpecFilename As String
 
     Public ListBatchBaseflowOpns As atcCollection
-    'Public ListBatchUnits As atcCollection 'of clsBatchUnitBF, station id/location as key
+    Public ListBatchUnitsData As atcCollection 'of clsBatchUnitBF, station id/location as key
 
     Public Delimiter As String = vbTab
 
     Public Message As String
 
     Public DownloadDataDirectory As String = ""
+    Public MessageTimeseries As String = ""
+    Public MessageParameters As String = ""
+
+    Public Event StatusUpdate(ByVal aMsg As String)
 
     Public Sub clsBatchBFSpec()
-
     End Sub
 
     Public Sub clsBatchBFSpec(ByVal aSpecFilename As String)
         SpecFilename = aSpecFilename
+
     End Sub
 
     Public Sub PopulateScenarios()
         If IO.File.Exists(SpecFilename) Then
+            If ListBatchBaseflowOpns Is Nothing Then
+                ListBatchBaseflowOpns = New atcCollection()
+            End If
+            If ListBatchUnitsData Is Nothing Then
+                ListBatchUnitsData = New atcCollection()
+            End If
             Dim lOneLine As String
             Dim lSR As New IO.StreamReader(SpecFilename)
 
@@ -118,7 +156,7 @@ Public Class clsBatchBFSpec
         Dim lArr() As String = aSpec.Split(Delimiter)
         If String.IsNullOrEmpty(lArr(1).Trim()) Then Return
         Select Case lArr(0).Trim().ToLower
-            Case "sdate", "startdate"
+            Case atcTimeseriesBaseflow.BFInputNames.StartDate.ToLower
                 Dim lDates(5) As Integer
                 Dim lDate As DateTime
                 If Date.TryParse(lArr(1), lDate) Then
@@ -128,9 +166,9 @@ Public Class clsBatchBFSpec
                     lDates(3) = 0
                     lDates(4) = 0
                     lDates(5) = 0
-                    GlobalSettings.Add("SDATE", lDates)
+                    GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.StartDate, lDates)
                 End If
-            Case "edate", "enddate"
+            Case atcTimeseriesBaseflow.BFInputNames.EndDate.ToLower
                 Dim lDates(5) As Integer
                 Dim lDate As DateTime
                 If Date.TryParse(lArr(1), lDate) Then
@@ -140,24 +178,24 @@ Public Class clsBatchBFSpec
                     lDates(3) = 24
                     lDates(4) = 0
                     lDates(5) = 0
-                    GlobalSettings.Add("EDATE", lDates)
+                    GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.EndDate, lDates)
                 End If
-            Case "bfmethod"
-                Dim lMethods As atcCollection = GlobalSettings.GetValue("BFMethods")
+            Case BFBatchInputNames.BFMethod.ToLower
+                Dim lMethods As atcCollection = GlobalSettings.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
 
                 Dim lMethod As atcTimeseriesBaseflow.BFMethods = 0
                 Select Case lArr(1).ToUpper()
-                    Case "HYFX"
+                    Case BFBatchInputNames.BFM_HYFX
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPFixed
-                    Case "HYLM"
+                    Case BFBatchInputNames.BFM_HYLM
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPLocMin
-                    Case "HYSL"
+                    Case BFBatchInputNames.BFM_HYSL
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPSlide
-                    Case "PART"
+                    Case BFBatchInputNames.BFM_PART
                         lMethod = atcTimeseriesBaseflow.BFMethods.PART
-                    Case "BFIS"
+                    Case BFBatchInputNames.BFM_BFIS
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIStandard
-                    Case "BFIM"
+                    Case BFBatchInputNames.BFM_BFIM
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIModified
                 End Select
                 If lMethod > 0 Then
@@ -165,7 +203,7 @@ Public Class clsBatchBFSpec
                         lMethods = New atcCollection()
                         'lMethods.Add(lArr(1))
                         lMethods.Add(lMethod)
-                        GlobalSettings.Add("BFMethods", lMethods)
+                        GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.BFMethods, lMethods)
                     Else
                         'If Not lMethods.Contains(lArr(1)) Then
                         '    lMethods.Add(lArr(1))
@@ -175,10 +213,11 @@ Public Class clsBatchBFSpec
                         End If
                     End If
                 End If
-            Case "datadir", "data", "datadirectory"
+            Case BFBatchInputNames.DataDir.ToLower
                 If Not String.IsNullOrEmpty(lArr(1)) AndAlso IO.Directory.Exists(lArr(1)) Then
                     DownloadDataDirectory = lArr(1)
                 End If
+                GlobalSettings.Add(BFBatchInputNames.DataDir, lArr(1))
             Case Else
                 GlobalSettings.Add(lArr(0), lArr(1))
         End Select
@@ -195,9 +234,6 @@ Public Class clsBatchBFSpec
         If lArr.Length < 2 Then Return
         If String.IsNullOrEmpty(lArr(0)) Then Return
 
-        If ListBatchBaseflowOpns Is Nothing Then
-            ListBatchBaseflowOpns = New atcCollection()
-        End If
         Dim lListBatchUnits As atcCollection = ListBatchBaseflowOpns.ItemByKey(aBaseflowOpnCount)
         If lListBatchUnits Is Nothing Then
             lListBatchUnits = New atcCollection()
@@ -211,6 +247,7 @@ Public Class clsBatchBFSpec
                 Dim lStation As clsBatchUnitStation = lListBatchUnits.ItemByKey(lStationId)
                 If lStation Is Nothing Then
                     lStation = New clsBatchUnitStation()
+                    lStation.StationID = lStationId
                     lListBatchUnits.Add(lStationId, lStation)
                 End If
                 If lArrStation.Length >= 2 Then
@@ -224,9 +261,12 @@ Public Class clsBatchBFSpec
                     If Not String.IsNullOrEmpty(lStationDatafilename) AndAlso IO.File.Exists(lStationDatafilename) Then
                         lStation.StationDataFilename = lStationDatafilename
                         lStation.NeedToDownloadData = False
+                        If Not ListBatchUnitsData.Keys.Contains(lStationId) Then
+                            ListBatchUnitsData.Add(lStationId, lStationDatafilename)
+                        End If
                     End If
                 End If
-            Case "sdate", "startdate"
+            Case atcTimeseriesBaseflow.BFInputNames.StartDate.ToLower
                 Dim lDates(5) As Integer
                 Dim lDate As DateTime
                 If Date.TryParse(lArr(1), lDate) Then
@@ -237,9 +277,9 @@ Public Class clsBatchBFSpec
                     lDates(4) = 0
                     lDates(5) = 0
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        Dim lSDate() As Integer = lStation.BFInputs.GetValue("SDATE")
+                        Dim lSDate() As Integer = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.StartDate)
                         If lSDate Is Nothing Then
-                            lStation.BFInputs.Add("SDATE", lDates)
+                            lStation.BFInputs.Add(atcTimeseriesBaseflow.BFInputNames.StartDate, lDates)
                         Else
                             For I = 0 To 5
                                 lSDate(I) = lDates(I)
@@ -247,7 +287,7 @@ Public Class clsBatchBFSpec
                         End If
                     Next
                 End If
-            Case "edate", "enddate"
+            Case atcTimeseriesBaseflow.BFInputNames.EndDate.ToLower
                 Dim lDates(5) As Integer
                 Dim lDate As DateTime
                 If Date.TryParse(lArr(1), lDate) Then
@@ -258,9 +298,9 @@ Public Class clsBatchBFSpec
                     lDates(4) = 0
                     lDates(5) = 0
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        Dim lEDate() As Integer = lStation.BFInputs.GetValue("EDATE")
+                        Dim lEDate() As Integer = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.EndDate)
                         If lEDate Is Nothing Then
-                            lStation.BFInputs.Add("EDATE", lDates)
+                            lStation.BFInputs.Add(atcTimeseriesBaseflow.BFInputNames.EndDate, lDates)
                         Else
                             For I = 0 To 5
                                 lEDate(I) = lDates(I)
@@ -268,29 +308,29 @@ Public Class clsBatchBFSpec
                         End If
                     Next
                 End If
-            Case "bfmethod"
+            Case BFBatchInputNames.BFMethod.ToLower
                 Dim lMethod As atcTimeseriesBaseflow.BFMethods = 0
                 Select Case lArr(1).Trim().ToUpper()
-                    Case "HYFX"
+                    Case BFBatchInputNames.BFM_HYFX
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPFixed
-                    Case "HYLM"
+                    Case BFBatchInputNames.BFM_HYLM
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPLocMin
-                    Case "HYSL"
+                    Case BFBatchInputNames.BFM_HYSL
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPSlide
-                    Case "PART"
+                    Case BFBatchInputNames.BFM_PART
                         lMethod = atcTimeseriesBaseflow.BFMethods.PART
-                    Case "BFIS"
+                    Case BFBatchInputNames.BFM_BFIS
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIStandard
-                    Case "BFIM"
+                    Case BFBatchInputNames.BFM_BFIM
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIModified
                 End Select
                 If lMethod > 0 Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        Dim lMethods As atcCollection = lStation.BFInputs.GetValue("BFMethods")
+                        Dim lMethods As atcCollection = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
                         If lMethods Is Nothing Then
                             lMethods = New atcCollection()
                             lMethods.Add(lMethod)
-                            lStation.BFInputs.Add("BFMethods", lMethods)
+                            lStation.BFInputs.Add(atcTimeseriesBaseflow.BFInputNames.BFMethods, lMethods)
                         Else
                             If Not lMethods.Contains(lMethod) Then
                                 lMethods.Add(lMethod)
@@ -298,53 +338,205 @@ Public Class clsBatchBFSpec
                         End If
                     Next
                 End If
-            Case "reportby"
+            Case atcTimeseriesBaseflow.BFInputNames.BFIReportby.ToLower
                 Dim lReportBySpec As String = lArr(1).Trim().ToUpper()
-                If lReportBySpec = "WY" OrElse lReportBySpec = "CY" Then
+                If lReportBySpec = BFBatchInputNames.ReportByWY Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        lStation.BFInputs.SetValue("ReportBy", lReportBySpec)
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFIReportby, atcTimeseriesBaseflow.BFInputNames.BFIReportbyWY)
+                    Next
+                ElseIf lReportBySpec = BFBatchInputNames.ReportByCY Then
+                    For Each lStation As clsBatchUnitStation In lListBatchUnits
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFIReportby, atcTimeseriesBaseflow.BFInputNames.BFIReportbyCY)
                     Next
                 End If
-            Case "bfi_plength"
+            Case atcTimeseriesBaseflow.BFInputNames.BFINDayScreen.ToLower
                 Dim lplen As Double
                 If Double.TryParse(lArr(1).Trim(), lplen) Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        lStation.BFInputs.SetValue("BFI_PLength", lplen)
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFINDayScreen, lplen)
                     Next
                 End If
-            Case "bfi_turnpt"
+            Case atcTimeseriesBaseflow.BFInputNames.BFITurnPtFrac.ToLower
                 Dim lTurnPt As Double
                 If Double.TryParse(lArr(1).Trim(), lTurnPt) Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        lStation.BFInputs.SetValue("BFI_TurnPt", lTurnPt)
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFITurnPtFrac, lTurnPt)
                     Next
                 End If
-            Case "bfi_recessconst"
+            Case atcTimeseriesBaseflow.BFInputNames.BFIRecessConst.ToLower
                 Dim lReConst As Double
                 If Double.TryParse(lArr(1).Trim(), lReConst) Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        lStation.BFInputs.SetValue("BFI_RecessConst", lReConst)
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFIRecessConst, lReConst)
                     Next
                 End If
-            Case "outputdir"
+            Case BFBatchInputNames.OUTPUTDIR.ToLower
                 Dim lOutputDir As String = lArr(1).Trim()
                 If Not String.IsNullOrEmpty(lOutputDir) AndAlso IO.Directory.Exists(lOutputDir) Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        lStation.BFInputs.SetValue("OutputDir", lOutputDir)
+                        lStation.BFInputs.SetValue(BFBatchInputNames.OUTPUTDIR, lOutputDir)
                     Next
                 End If
-            Case "outputprefix"
+            Case BFBatchInputNames.OUTPUTPrefix.ToLower
                 Dim lOutputPrefix As String = lArr(1).Trim()
                 If Not String.IsNullOrEmpty(lOutputPrefix) AndAlso IO.Directory.Exists(lOutputPrefix) Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        lStation.BFInputs.SetValue("OutputPrefix", lOutputPrefix)
+                        lStation.BFInputs.SetValue(BFBatchInputNames.OUTPUTPrefix, lOutputPrefix)
                     Next
                 End If
         End Select
     End Sub
 
+    ''' <summary>
+    ''' Only call this at time BF is done
+    ''' </summary>
+    ''' <param name="aStation"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation, Optional ByVal aPreserve As Boolean = False) As atcTimeseries
+        Dim lDataFilename As String = ""
+        If ListBatchUnitsData.Keys.Contains(aStation.StationID) Then
+            lDataFilename = ListBatchUnitsData.ItemByKey(aStation.StationID)
+        Else
+            'first download data, the read it
+            Dim lDataDir As String = aStation.BFInputs.GetValue(BFBatchInputNames.DataDir, "")
+            If lDataDir = "" Then
+                lDataDir = GlobalSettings.GetValue(BFBatchInputNames.DataDir, "")
+                If lDataDir = "" Then
+                    Dim lOutDirDiag As New System.Windows.Forms.FolderBrowserDialog()
+                    lOutDirDiag.Description = "Select Directory to Save All Downloaded Streamflow Data"
+                    If lOutDirDiag.ShowDialog = Windows.Forms.DialogResult.OK Then
+                        lDataDir = lOutDirDiag.SelectedPath
+                        GlobalSettings.SetValue(BFBatchInputNames.DataDir, lDataDir)
+                    End If
+                    If String.IsNullOrEmpty(lDataDir) Then
+                        Return Nothing
+                    End If
+                End If
+            End If
+
+            aStation.SiteInfoDir = lDataDir
+            aStation.DownloadData()
+            lDataFilename = aStation.StationDataFilename
+        End If
+
+        Dim lDataReady As Boolean = False
+        If aStation.DataSource Is Nothing Then
+            aStation.DataSource = New atcTimeseriesRDB.atcTimeseriesRDB()
+            If aStation.DataSource.Open(lDataFilename) Then
+                lDataReady = True
+            End If
+        Else
+            If aStation.DataSource.DataSets.Count > 0 Then
+                lDataReady = True
+            End If
+        End If
+        If lDataReady Then
+            Dim lGroup As atcTimeseriesGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
+            If lGroup IsNot Nothing AndAlso lGroup.Count > 0 Then
+                If aPreserve Then
+                    Return lGroup(0)
+                Else
+                    Dim lTsFlow As atcTimeseries = lGroup(0).Clone()
+                    aStation.DataSource.Clear()
+                    aStation.DataSource = Nothing
+                    Return lTsFlow
+                End If
+            End If
+        End If
+
+        Return Nothing
+    End Function
+
+    Public Sub DoBatch()
+
+        Dim lOutputDir As String = GlobalSettings.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+        If Not IO.Directory.Exists(lOutputDir) Then
+            Dim lDirInfo As New IO.DirectoryInfo(lOutputDir)
+            Dim ldSecurity As System.Security.AccessControl.DirectorySecurity = lDirInfo.GetAccessControl()
+            Try
+                MkDirPath(lOutputDir)
+            Catch ex As Exception
+                RaiseEvent StatusUpdate("0,0,Cannot create output directory: " & vbCrLf & lOutputDir)
+                Return
+            End Try
+        End If
+        Dim lOutputDirWritable As Boolean = True
+        Try
+            Dim lSW As IO.StreamWriter = Nothing
+            Try
+                lSW = New IO.StreamWriter(IO.Path.Combine(lOutputDir, "z.txt"), False)
+                lSW.WriteLine("1")
+                lSW.Flush()
+                lSW.Close()
+                lSW = Nothing
+                IO.File.Delete(IO.Path.Combine(lOutputDir, "z.txt"))
+            Catch ex As Exception
+                If lSW IsNot Nothing Then
+                    lSW.Close()
+                    lSW = Nothing
+                End If
+                lOutputDirWritable = False
+            End Try
+        Catch ex As Exception
+            lOutputDirWritable = False
+        End Try
+
+        If Not lOutputDirWritable Then
+            RaiseEvent StatusUpdate("0,0,Can not write to output directory: " & vbCrLf & lOutputDir)
+            Return
+        End If
+
+        Dim lTotalBFOpn As Integer = 0
+        For Each lKey As Integer In ListBatchBaseflowOpns.Keys
+            For Each lstation As clsBatchUnitStation In ListBatchBaseflowOpns.ItemByKey(lKey)
+                lTotalBFOpn += 1
+            Next
+        Next
+        Dim lBFOpnCount As Integer = 1
+        For Each lBFOpnId As Integer In ListBatchBaseflowOpns.Keys
+            Dim lBFOpn As atcCollection = ListBatchBaseflowOpns.ItemByKey(lBFOpnId)
+            Dim lBFOpnDir As String = IO.Path.Combine(lOutputDir, "BF_Opn_" & lBFOpnId)
+            MkDirPath(lBFOpnDir)
+            For Each lStation As clsBatchUnitStation In lBFOpn
+                Dim lOutputPrefix As String = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+                If String.IsNullOrEmpty(lOutputPrefix) Then lOutputPrefix = "BF_" & lStation.StationID
+                'each station has its own directory
+                Dim lStationOutDir As String = IO.Path.Combine(lBFOpnDir, "Station_" & lStation.StationID)
+                MkDirPath(lStationOutDir)
+                Dim lTsFlow As atcTimeseries = GetStationStreamFlowData(lStation)
+                If lTsFlow IsNot Nothing Then
+                    lStation.CalcBF = New atcTimeseriesBaseflow.atcTimeseriesBaseflow()
+                    With lStation.BFInputs
+                        .SetValue(atcTimeseriesBaseflow.BFInputNames.Streamflow, lTsFlow)
+                    End With
+                    If lStation.CalcBF.Open("baseflow", lStation.BFInputs) Then
+                        OutputDir = lBFOpnDir
+                        ASCIICommon(lTsFlow)
+                    End If
+                End If
+                RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
+                lBFOpnCount += 1
+            Next
+            'If lStationFoundData IsNot Nothing Then Exit For
+        Next
+    End Sub
 
     Public Sub Clear()
-        
+        If ListBatchUnitsData IsNot Nothing Then ListBatchUnitsData.Clear()
+        If ListBatchBaseflowOpns IsNot Nothing Then
+            For Each lCollection As atcCollection In ListBatchBaseflowOpns
+                For Each lStation As clsBatchUnitStation In lCollection
+                    If lStation.StreamFlowData IsNot Nothing Then
+                        lStation.StreamFlowData.Clear()
+                        lStation.StreamFlowData = Nothing
+                    End If
+                    lStation = Nothing
+                Next
+                lCollection.Clear()
+                lCollection = Nothing
+            Next
+            ListBatchBaseflowOpns.Clear()
+        End If
     End Sub
 End Class
