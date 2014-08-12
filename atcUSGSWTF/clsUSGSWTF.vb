@@ -6,7 +6,7 @@ Imports System.Drawing
 Public Class clsUSGSWTF
     Inherits atcData.atcDataDisplay
 
-    Private pRequiredHelperPlugin As String = "Timeseries::USGS GroundWater Toolbox" 'atcMetCmp
+    Private pRequiredHelperPlugin As String = "Timeseries::USGS Groundwater Toolbox" 'atcMetCmp
 
     Public Overrides ReadOnly Property Name() As String
         Get
