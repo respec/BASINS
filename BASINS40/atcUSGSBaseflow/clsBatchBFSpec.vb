@@ -396,7 +396,7 @@ Public Class clsBatchBFSpec
                 End If
             Case BFBatchInputNames.OUTPUTPrefix.ToLower
                 Dim lOutputPrefix As String = lArr(1).Trim()
-                If Not String.IsNullOrEmpty(lOutputPrefix) AndAlso IO.Directory.Exists(lOutputPrefix) Then
+                If Not String.IsNullOrEmpty(lOutputPrefix) Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
                         lStation.BFInputs.SetValue(BFBatchInputNames.OUTPUTPrefix, lOutputPrefix)
                     Next
@@ -517,10 +517,30 @@ Public Class clsBatchBFSpec
         gProgressBar.Maximum = lTotalBFOpn
         gProgressBar.Step = 1
         Dim lBFOpnCount As Integer = 1
+        Dim lConfigFile As IO.StreamWriter = Nothing
         For Each lBFOpnId As Integer In ListBatchBaseflowOpns.Keys
             Dim lBFOpn As atcCollection = ListBatchBaseflowOpns.ItemByKey(lBFOpnId)
             Dim lBFOpnDir As String = IO.Path.Combine(lOutputDir, "BF_Opn_" & lBFOpnId)
             MkDirPath(lBFOpnDir)
+
+            lConfigFile = New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "Config.txt"), False)
+            For Each lStation As clsBatchUnitStation In lBFOpn
+                lConfigFile.WriteLine("Station " & lStation.StationID & ", " & lStation.StationDrainageArea & ", " & ListBatchUnitsData.ItemByKey(lStation.StationID))
+            Next
+            For Each lAttrib As atcDefinedValue In CType(lBFOpn.ItemByIndex(0), clsBatchUnitStation).BFInputs
+                Dim lName As String = lAttrib.Definition.Name
+                Select Case lName.ToLower()
+                    Case "startdate", "enddate"
+                        Dim lDates() As Integer = lAttrib.Value
+                        lConfigFile.WriteLine(lName & ", " & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+                    Case Else
+                        lConfigFile.WriteLine(lName & ", " & lAttrib.Value.ToString())
+                End Select
+            Next
+            lConfigFile.Flush()
+            lConfigFile.Close()
+            lConfigFile = Nothing
+            
             For Each lStation As clsBatchUnitStation In lBFOpn
                 Dim lOutputPrefix As String = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
                 If String.IsNullOrEmpty(lOutputPrefix) Then lOutputPrefix = "BF_" & lStation.StationID
@@ -542,7 +562,7 @@ Public Class clsBatchBFSpec
                     End With
                     If lStation.CalcBF.Open("baseflow", lStation.BFInputs) Then
                         OutputDir = lStationOutDir
-                        OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "BF_")
+                        OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "BF")
                         MethodsLastDone = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
                         ASCIICommon(lTsFlow)
                     End If
@@ -553,6 +573,7 @@ Public Class clsBatchBFSpec
             Next
             'If lStationFoundData IsNot Nothing Then Exit For
         Next
+        UpdateStatus("Base-flow Separation Complete for " & lTotalBFOpn & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", True)
     End Sub
 
     Private Sub UpdateStatus(ByVal aMsg As String, Optional ByVal aAppend As Boolean = False, Optional ByVal aResetProgress As Boolean = False)

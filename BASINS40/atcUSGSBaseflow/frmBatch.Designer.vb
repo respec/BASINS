@@ -33,7 +33,7 @@ Partial Class frmBatch
         '
         'txtSpecFile
         '
-        Me.txtSpecFile.Location = New System.Drawing.Point(163, 22)
+        Me.txtSpecFile.Location = New System.Drawing.Point(163, 19)
         Me.txtSpecFile.Name = "txtSpecFile"
         Me.txtSpecFile.Size = New System.Drawing.Size(277, 20)
         Me.txtSpecFile.TabIndex = 0
@@ -49,7 +49,7 @@ Partial Class frmBatch
         '
         'btnBrowse
         '
-        Me.btnBrowse.Location = New System.Drawing.Point(446, 19)
+        Me.btnBrowse.Location = New System.Drawing.Point(446, 17)
         Me.btnBrowse.Name = "btnBrowse"
         Me.btnBrowse.Size = New System.Drawing.Size(75, 23)
         Me.btnBrowse.TabIndex = 2
@@ -67,7 +67,7 @@ Partial Class frmBatch
         '
         'btnDoBatch
         '
-        Me.btnDoBatch.Location = New System.Drawing.Point(528, 19)
+        Me.btnDoBatch.Location = New System.Drawing.Point(527, 17)
         Me.btnDoBatch.Name = "btnDoBatch"
         Me.btnDoBatch.Size = New System.Drawing.Size(90, 23)
         Me.btnDoBatch.TabIndex = 4
@@ -82,14 +82,15 @@ Partial Class frmBatch
         Me.txtMsg.Location = New System.Drawing.Point(12, 87)
         Me.txtMsg.Multiline = True
         Me.txtMsg.Name = "txtMsg"
-        Me.txtMsg.Size = New System.Drawing.Size(603, 90)
+        Me.txtMsg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtMsg.Size = New System.Drawing.Size(603, 110)
         Me.txtMsg.TabIndex = 5
         '
         'frmBatch
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(630, 177)
+        Me.ClientSize = New System.Drawing.Size(630, 197)
         Me.Controls.Add(Me.txtMsg)
         Me.Controls.Add(Me.btnDoBatch)
         Me.Controls.Add(Me.ProgressBar1)
