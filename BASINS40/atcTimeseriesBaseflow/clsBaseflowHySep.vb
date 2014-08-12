@@ -65,8 +65,8 @@ Public Class clsBaseflowHySep
         'that is to do one year at a time
         '
         'Seems key is to have up to 11-day before and after the duration of interest
-        Dim lTsStart As Double = TargetTS.Attributes.GetValue("SJDay")
-        Dim lTsEnd As Double = TargetTS.Attributes.GetValue("EJDay")
+        Dim lTsStart As Double = TargetTS.Dates.Value(0) 'TargetTS.Attributes.GetValue("SJDay")
+        Dim lTsEnd As Double = TargetTS.Dates.Value(TargetTS.Dates.numValues) 'TargetTS.Attributes.GetValue("EJDay")
 
         Dim lDaysPrev As Integer = timdifJ(lTsStart, StartDate, atcTimeUnit.TUDay, 1)
         Dim lDaysPost As Integer = timdifJ(EndDate, lTsEnd, atcTimeUnit.TUDay, 1)

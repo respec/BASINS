@@ -15,7 +15,7 @@ Public Class atcUSGSScreen
         Dim lDate(5) As Integer
         Dim lStrBuilderDataSummary As New System.Text.StringBuilder
         lStrBuilderDataSummary.AppendLine("READING FILE NAMED " & lFileName)
-        J2Date(aTS.Attributes.GetValue("SJDay"), lDate)
+        J2Date(aTS.Dates.Value(0), lDate)
         lStrBuilderDataSummary.AppendLine("FIRST YEAR IN RECORD =  " & lDate(0))
         J2Date(aTS.Dates.Value(aTS.numValues - 1), lDate)
         lStrBuilderDataSummary.AppendLine(" LAST YEAR IN RECORD =  " & lDate(0))

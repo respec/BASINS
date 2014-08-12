@@ -475,7 +475,7 @@ Public Class clsBatchBFSpec
                 MkDirPath(lOutputDir)
             Catch ex As Exception
                 'RaiseEvent StatusUpdate("0,0,Cannot create output directory: " & vbCrLf & lOutputDir)
-                UpdateStatus("Cannot create output directory: " & vbCrLf & lOutputDir, , 0, 0)
+                UpdateStatus("Cannot create output directory: " & vbCrLf & lOutputDir, , True)
                 Return
             End Try
         End If
@@ -503,7 +503,7 @@ Public Class clsBatchBFSpec
         If Not lOutputDirWritable Then
             'RaiseEvent StatusUpdate("0,0,Can not write to output directory: " & vbCrLf & lOutputDir)
             'Windows.Forms.Application.DoEvents()
-            UpdateStatus("Can not write to output directory: " & vbCrLf & lOutputDir, , 0, 0)
+            UpdateStatus("Can not write to output directory: " & vbCrLf & lOutputDir, , True)
             Return
         End If
 
@@ -513,6 +513,9 @@ Public Class clsBatchBFSpec
                 lTotalBFOpn += 1
             Next
         Next
+        gProgressBar.Minimum = 0
+        gProgressBar.Maximum = lTotalBFOpn
+        gProgressBar.Step = 1
         Dim lBFOpnCount As Integer = 1
         For Each lBFOpnId As Integer In ListBatchBaseflowOpns.Keys
             Dim lBFOpn As atcCollection = ListBatchBaseflowOpns.ItemByKey(lBFOpnId)
@@ -545,18 +548,23 @@ Public Class clsBatchBFSpec
                     End If
                 End If
                 'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
-                UpdateStatus("Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True, lBFOpnCount, lTotalBFOpn)
+                UpdateStatus("Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True)
                 lBFOpnCount += 1
             Next
             'If lStationFoundData IsNot Nothing Then Exit For
         Next
     End Sub
 
-    Private Sub UpdateStatus(ByVal aMsg As String, Optional ByVal aAppend As Boolean = False, Optional ByVal aMin As Integer = 0, Optional ByVal aMax As Integer = 0)
+    Private Sub UpdateStatus(ByVal aMsg As String, Optional ByVal aAppend As Boolean = False, Optional ByVal aResetProgress As Boolean = False)
         If gProgressBar IsNot Nothing Then
-            gProgressBar.Minimum = aMin
-            gProgressBar.Maximum = aMax
-            gProgressBar.PerformStep()
+            If aResetProgress Then
+                gProgressBar.Minimum = 0
+                gProgressBar.Maximum = 0
+                gProgressBar.PerformStep()
+                gProgressBar.Refresh()
+            Else
+                gProgressBar.PerformStep()
+            End If
         End If
         If gTextStatus IsNot Nothing Then
             If aAppend Then

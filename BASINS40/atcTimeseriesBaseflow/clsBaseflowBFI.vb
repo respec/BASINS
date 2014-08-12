@@ -82,8 +82,8 @@ Public Class clsBaseflowBFI
 
         'Dim lTsDaily As atcTimeseries = SubsetByDate(TargetTS, lTsStart, lTsEnd, Nothing)
         'Dim lTsDaily As atcTimeseries = TargetTS.Clone()
-        If StartDate = 0 Then StartDate = TargetTS.Attributes.GetValue("SJDay")
-        If EndDate = 0 Then EndDate = TargetTS.Attributes.GetValue("EJDay")
+        If StartDate = 0 Then StartDate = TargetTS.Dates.Value(0) 'TargetTS.Attributes.GetValue("SJDay")
+        If EndDate = 0 Then EndDate = TargetTS.Dates.Value(TargetTS.Dates.numValues) 'TargetTS.Attributes.GetValue("EJDay")
         Dim lTsDaily As atcTimeseries = SubsetByDate(TargetTS, StartDate, EndDate, Nothing)
         If Not lTsDaily.Attributes.GetValue("Tu") = atcTimeUnit.TUDay Then
             lTsDaily = Aggregate(lTsDaily, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
