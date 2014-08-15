@@ -306,7 +306,6 @@ Public Class atcCollection
 
     Public Function IndexFromKey(ByVal akey As Object) As Integer
         Try
-
             Return pKeys.IndexOf(akey)
         Catch e As Exception
             Return -1
