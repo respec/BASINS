@@ -204,6 +204,7 @@ Public Module modString
                    Optional ByVal aCantFit As String = "#", _
                    Optional ByVal aSignificantDigits As Integer = 5) As String
         Dim lValue As Double
+
         If aSignificantDigits > 0 Then
             lValue = SignificantDigits(aValue, aSignificantDigits)
         Else
@@ -227,23 +228,19 @@ Public Module modString
         Dim lOldString As String = ""
 
         If lString.Length > aMaxWidth Then 'Too long, need to shorten
-            Dim lCommaPos As Integer = lString.IndexOf(",")
             Dim lDecimalPos As Integer = lString.IndexOf(".")
-            'First try leaving out commas to shorten
-            If lCommaPos > -1 AndAlso lCommaPos < lDecimalPos Then
-                lString = lString.Replace(",", "")
-            End If
             If lString.Length > aMaxWidth Then
                 If lDecimalPos < 0 OrElse lDecimalPos > aMaxWidth Then 'string does not contain a decimal or digits before decimal already make it too wide
                     GoTo TryExpFormat ' can't shorten enough by formatting with fewer decimal places
+                Else
+                    Try
+                        For lTrimThisMuch As Integer = 1 To aFormat.Length - 1
+                            lString = Format(lValue, aFormat.Substring(0, aFormat.Length - lTrimThisMuch))
+                            If lString.Length <= aMaxWidth Then Exit For
+                        Next
+                    Catch
+                    End Try
                 End If
-                Try
-                    For lTrimThisMuch As Integer = 1 To aFormat.Length - 1
-                        lString = Format(lValue, aFormat.Substring(0, aFormat.Length - lTrimThisMuch))
-                        If lString.Length <= aMaxWidth Then Exit For
-                    Next
-                Catch
-                End Try
             End If
         End If
 
@@ -271,18 +268,28 @@ Public Module modString
 
         If lString.Length > aMaxWidth Then 'String is too long and cannot simply be truncated at or after decimal point
 TryExpFormat:
-            Dim lExpPos As Integer
             Dim lDecimalCount As Integer = 0
             Dim lE As String = "e" 'Capital or small E for exponent format
             If String.IsNullOrEmpty(aExpFormat) Then
+                'Try leaving out commas as a last-ditch way to shorten
+                Dim lCommaPos As Integer = lString.IndexOf(",")
+                Dim lDecimalPos As Integer = lString.IndexOf(".")
+                If lCommaPos > -1 AndAlso (lCommaPos < lDecimalPos OrElse lDecimalPos < 0) Then
+                    lOldString = lString.Replace(",", "")
+                End If
+
                 lString = aCantFit
                 GoTo TryOldString
             Else
                 If aExpFormat.Contains("E") Then lE = "E"
-                aExpFormat = aExpFormat.Replace(lE & "#", lE & "0")
+                Dim lExpPos As Integer = aExpFormat.IndexOf(lE)
+                For lReplaceHash As Integer = aExpFormat.Length - 1 To lExpPos + 1 Step -1
+                    If aExpFormat.Substring(lReplaceHash, 1) = "#" Then
+                        aExpFormat = aExpFormat.Substring(0, lReplaceHash) & "0" & SafeSubstring(aExpFormat, lReplaceHash + 1)
+                    End If
+                Next
                 Dim lDecimalPos As Integer = aExpFormat.IndexOf(".")
                 If lDecimalPos >= 0 Then
-                    lExpPos = aExpFormat.IndexOf(lE, lDecimalPos + 1)
                     lDecimalCount = lExpPos - lDecimalPos - 1
                 End If
             End If
