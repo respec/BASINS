@@ -519,16 +519,20 @@ AllKeys:
             ElseIf aFieldNumber < 1 OrElse aFieldNumber > pNumFields Then
                 Return "Invalid Field Number"
             Else
-                'Dim lFirstByte As Integer = pCurrentRecordStart + pFields(aFieldNumber).DataAddress
-                'Dim lLength As Integer = pFields(aFieldNumber).FieldLength
-                'While lLength > 0 AndAlso pData(lFirstByte + lLength - 1) = 0
-                '    lLength -= 1
-                'End While
-                Return TrimValue(System.Text.Encoding.ASCII.GetString( _
+                Dim lFirstByte As Integer = pCurrentRecordStart + pFields(aFieldNumber).DataAddress
+                Dim lLength As Integer = pFields(aFieldNumber).FieldLength
+                If lFirstByte + lLength > pData.Length Then
+                    lLength = pData.Length - lFirstByte
+                End If
+                If lLength > 0 Then
+                    Return TrimValue(System.Text.Encoding.ASCII.GetString( _
                                        pData, _
-                                       pCurrentRecordStart + pFields(aFieldNumber).DataAddress, _
-                                       pFields(aFieldNumber).FieldLength), _
+                                       lFirstByte, _
+                                       lLength), _
                                  FieldType(aFieldNumber))
+                Else
+                    Return ""
+                End If
             End If
         End Get
         Set(ByVal Value As String)
