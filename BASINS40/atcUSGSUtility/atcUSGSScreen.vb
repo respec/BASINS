@@ -1,7 +1,11 @@
 ﻿Imports atcData
+Imports atcGraph
 Imports atcUtility
+Imports ZedGraph
 
 Public Class atcUSGSScreen
+    Private Shared gRand As Random
+    Private Shared gRandSeed As Integer = 1
     Public Shared Function PrintDataSummary(ByVal aTS As atcTimeseries) As String
         'print out data summary, usgs style
         'If pMissingDataMonth Is Nothing Then
@@ -87,5 +91,71 @@ Public Class atcUSGSScreen
         'lStrBuilderDataSummary.Remove(0, lStrBuilderDataSummary.Length)
 
         Return lStrBuilderDataSummary.ToString()
+    End Function
+
+    ''' <summary>
+    ''' This routine will plot timeseries duration to show case overlap durations
+    ''' This is to facilitate the formation of group of timeseries for batch processing
+    ''' </summary>
+    ''' <param name="aTSGroup">A group of raw timeseries data</param>
+    ''' <returns>% overlap</returns>
+    ''' <remarks></remarks>
+    Public Shared Function GraphDataDuration(ByVal aTSGroup As atcTimeseriesGroup) As Integer
+        'Dim lGraphPlugin As New atcGraph.atcGraphPlugin
+        If aTSGroup Is Nothing OrElse aTSGroup.Count = 0 Then
+            Return -99
+        End If
+
+        Dim lNewTSGroupDuration As New atcTimeseriesGroup()
+        Dim lValue As Double
+        For I As Integer = 1 To aTSGroup.Count
+            Dim lTS As atcTimeseries = aTSGroup(I - 1)
+            Dim location As String = lTS.Attributes.GetValue("location")
+            Dim lTSDur As atcTimeseries = lTS.Clone()
+            For J As Integer = 1 To lTSDur.numValues
+                lValue = lTSDur.Value(J)
+                If Double.IsNaN(lValue) OrElse lValue < 0 Then
+                    lTSDur.Value(J) = atcUtility.GetNaN()
+                Else
+                    lTSDur.Value(J) = 5 * I
+                End If
+            Next
+            lNewTSGroupDuration.Add(lTSDur)
+        Next
+
+        Dim lYAxisTitleText As String = "Timeseries"
+
+        'Make sure graph can't find provisional attribute
+        For Each lTs As atcTimeseries In lNewTSGroupDuration
+            lTs.Attributes.SetValue("ProvisionalValueAttribute", "X" & lTs.Attributes.GetValue("ProvisionalValueAttribute", ""))
+        Next
+        Dim lGraphForm As New atcGraph.atcGraphForm()
+        'lGraphForm.Icon = Me.Icon
+        Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
+        Dim lGraphTS As New clsGraphTime(lNewTSGroupDuration, lZgc)
+        lGraphForm.Grapher = lGraphTS
+        With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
+            Dim lScaleMin As Double = 1
+            .YAxis.Scale.Min = lScaleMin
+            .AxisChange()
+            '.CurveList.Item(0).Color = Drawing.Color.Red
+            For Each lCuv As CurveItem In .CurveList
+                lCuv.Color = RandomColor()
+                CType(lCuv, LineItem).Line.Width = 10
+            Next
+        End With
+        'For Each lTS As atcTimeseries In lNewTSGroupDuration
+        '    lTS.Clear()
+        'Next
+        'lNewTSGroupDuration.Clear()
+        'lNewTSGroupDuration = Nothing
+        lGraphForm.Show()
+    End Function
+
+    Public Shared Function RandomColor() As Drawing.Color
+        If gRandSeed = 5000 Then gRandSeed = 1
+        gRand = New Random(gRandSeed)
+        gRandSeed += 1
+        Return System.Drawing.Color.FromArgb(gRand.Next(0, 256), gRand.Next(0, 256), gRand.Next(0, 256))
     End Function
 End Class
