@@ -23,14 +23,40 @@ Public Class clsUSGSBaseflowPlugin
     End Property
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
+        Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
         Show = Nothing
-        Dim lChoice As String = Logger.MsgCustomOwned("Please choose analysis approach below:", "Base-Flow Separation Analysis", Nothing, New String() {"Batch", "Interactive"})
-        If lChoice = "Batch" Then
+        Dim lChoice As String = Logger.MsgCustomOwned("Please choose analysis approach below:", _
+                                                      "Base-Flow Separation Analysis", _
+                                                      Nothing, _
+                                                      New String() {"Interactive", "Batch File", "Batch Map"})
+        If lChoice = "Batch File" Then
             Dim lfrmBatch As New frmBatch()
             ShowForm(lfrmBatch)
             Return lfrmBatch
+        ElseIf lChoice = "Batch Map" Then
+            Dim lHandled As Boolean = False
+            If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup()
+            lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lTimeseriesGroup)
+            If lTimeseriesGroup.Count > 1 Then
+                atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTimeseriesGroup)
+            End If
+            For Each lMapLayer As MapWindow.Interfaces.Layer In pMapWin.Layers
+                If lMapLayer.Name.ToLower.Contains("nwis daily discharge stations") Then
+                    If lMapLayer.SelectedShapes.NumSelected < 2 Then
+                        Logger.Msg("Please select more than 1 stream gages for batch process." & vbCrLf & vbCrLf & _
+                                   "Layer: " & lMapLayer.Name, "Base-flow Separation Batch")
+                        Return Nothing
+                    End If
+                    lHandled = True
+                End If
+            Next
+            If Not lHandled Then
+                Logger.Msg("Could not find stream gage station layer: NWIS Daily Discharge Stations. No batch.", _
+                           "Base-flow Separation Batch")
+                Return Nothing
+            End If
         End If
-        Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
+
         If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup
         If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
             lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lTimeseriesGroup)

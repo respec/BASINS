@@ -81,7 +81,7 @@ Public Class clsBatchUnitStation
         'Logger.Status("LABEL TITLE BASINS Data Download")
         Dim lXML As String = XML()
         If String.IsNullOrEmpty(lXML) Then
-            Message = "Station is not set, no download."
+            Message = "Error: Station is not set, no download."
             Return
         End If
         Dim lQuery As New XmlDocument
@@ -106,7 +106,7 @@ Public Class clsBatchUnitStation
                 Message = atcUtility.ReadableFromXML(lResult)
             End If
             Dim lBaseFilename As String = "NWIS_discharge_" & StationID & ".rdb"
-            Dim lDataFilename As String = IO.Path.Combine(SiteInfoDir, lBaseFilename)
+            Dim lDataFilename As String = IO.Path.Combine(SiteInfoDir, "NWIS\" & lBaseFilename)
             If IO.File.Exists(lDataFilename) Then
                 StationDataFilename = lDataFilename
             Else
