@@ -55,6 +55,11 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Interop.MapWinGIS, Version=4.8.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.8.1.28373, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
@@ -93,6 +98,12 @@
     <Compile Include="frmBatch.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmBatchMap.Designer.vb">
+      <DependentUpon>frmBatchMap.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBatchMap.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmUSGSBaseflow.Designer.vb">
       <DependentUpon>frmUSGSBaseflow.vb</DependentUpon>
     </Compile>
@@ -103,6 +114,12 @@
       <DependentUpon>frmStations.vb</DependentUpon>
     </Compile>
     <Compile Include="frmStations.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmUSGSBaseflowBatch.Designer.vb">
+      <DependentUpon>frmUSGSBaseflowBatch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmUSGSBaseflowBatch.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="modBaseflowUtil.vb" />
@@ -126,11 +143,17 @@
     <EmbeddedResource Include="frmBatch.resx">
       <DependentUpon>frmBatch.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmBatchMap.resx">
+      <DependentUpon>frmBatchMap.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmUSGSBaseflow.resx">
       <DependentUpon>frmUSGSBaseflow.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmStations.resx">
       <DependentUpon>frmStations.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmUSGSBaseflowBatch.resx">
+      <DependentUpon>frmUSGSBaseflowBatch.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
