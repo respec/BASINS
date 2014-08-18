@@ -37,12 +37,13 @@ Partial Class frmBatchMap
         Me.txtParameters = New System.Windows.Forms.TextBox
         Me.btnDoBatch = New System.Windows.Forms.Button
         Me.btnSaveSpecs = New System.Windows.Forms.Button
-        Me.cmsGroup = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.cmsGroupRemove = New System.Windows.Forms.ToolStripMenuItem
+        Me.cmsNode = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.cmsRemove = New System.Windows.Forms.ToolStripMenuItem
         Me.cmsPlotDur = New System.Windows.Forms.ToolStripMenuItem
-        Me.cmsGroupSetGlobal = New System.Windows.Forms.ToolStripMenuItem
+        Me.cmsGroupSetParm = New System.Windows.Forms.ToolStripMenuItem
+        Me.cmsGlobalSetParm = New System.Windows.Forms.ToolStripMenuItem
         Me.GroupBox1.SuspendLayout()
-        Me.cmsGroup.SuspendLayout()
+        Me.cmsNode.SuspendLayout()
         Me.SuspendLayout()
         '
         'Label1
@@ -165,29 +166,35 @@ Partial Class frmBatchMap
         Me.btnSaveSpecs.Text = "Save Specs"
         Me.btnSaveSpecs.UseVisualStyleBackColor = True
         '
-        'cmsGroup
+        'cmsNode
         '
-        Me.cmsGroup.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.cmsGroupRemove, Me.cmsPlotDur, Me.cmsGroupSetGlobal})
-        Me.cmsGroup.Name = "cmsGroup"
-        Me.cmsGroup.Size = New System.Drawing.Size(181, 92)
+        Me.cmsNode.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.cmsRemove, Me.cmsPlotDur, Me.cmsGroupSetParm, Me.cmsGlobalSetParm})
+        Me.cmsNode.Name = "cmsGroup"
+        Me.cmsNode.Size = New System.Drawing.Size(192, 92)
         '
-        'cmsGroupRemove
+        'cmsRemove
         '
-        Me.cmsGroupRemove.Name = "cmsGroupRemove"
-        Me.cmsGroupRemove.Size = New System.Drawing.Size(180, 22)
-        Me.cmsGroupRemove.Text = "Remove"
+        Me.cmsRemove.Name = "cmsRemove"
+        Me.cmsRemove.Size = New System.Drawing.Size(191, 22)
+        Me.cmsRemove.Text = "Remove"
         '
         'cmsPlotDur
         '
         Me.cmsPlotDur.Name = "cmsPlotDur"
-        Me.cmsPlotDur.Size = New System.Drawing.Size(180, 22)
+        Me.cmsPlotDur.Size = New System.Drawing.Size(191, 22)
         Me.cmsPlotDur.Text = "Plot Duration"
         '
-        'cmsGroupSetGlobal
+        'cmsGroupSetParm
         '
-        Me.cmsGroupSetGlobal.Name = "cmsGroupSetGlobal"
-        Me.cmsGroupSetGlobal.Size = New System.Drawing.Size(180, 22)
-        Me.cmsGroupSetGlobal.Text = "Set Global Parameters"
+        Me.cmsGroupSetParm.Name = "cmsGroupSetParm"
+        Me.cmsGroupSetParm.Size = New System.Drawing.Size(191, 22)
+        Me.cmsGroupSetParm.Text = "Set Group Parameters"
+        '
+        'cmsGlobalSetParm
+        '
+        Me.cmsGlobalSetParm.Name = "cmsGlobalSetParm"
+        Me.cmsGlobalSetParm.Size = New System.Drawing.Size(191, 22)
+        Me.cmsGlobalSetParm.Text = "Set Global Parameters"
         '
         'frmBatchMap
         '
@@ -210,7 +217,7 @@ Partial Class frmBatchMap
         Me.Text = "Base-flow Separation Batch From Map"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
-        Me.cmsGroup.ResumeLayout(False)
+        Me.cmsNode.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -228,8 +235,9 @@ Partial Class frmBatchMap
     Friend WithEvents btnParmForm As System.Windows.Forms.Button
     Friend WithEvents btnDoBatch As System.Windows.Forms.Button
     Friend WithEvents btnSaveSpecs As System.Windows.Forms.Button
-    Friend WithEvents cmsGroup As System.Windows.Forms.ContextMenuStrip
-    Friend WithEvents cmsGroupRemove As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents cmsNode As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents cmsRemove As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmsPlotDur As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents cmsGroupSetGlobal As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents cmsGroupSetParm As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents cmsGlobalSetParm As System.Windows.Forms.ToolStripMenuItem
 End Class
