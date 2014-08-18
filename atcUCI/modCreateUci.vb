@@ -18,10 +18,13 @@ Module modCreateUci
                                    ByRef aUci As HspfUci, _
                                    ByRef aDataSources As Collection(Of atcTimeseriesSource), _
                                    ByRef aStarterUci As HspfUci, _
-                                   Optional ByRef aPollutantListFileName As String = "", _
-                                   Optional ByRef aMetBaseDsn As Integer = 11, _
-                                   Optional ByRef aMetWdmId As String = "WDM2", _
-                                   Optional ByVal aSnowOption As Integer = 0)
+                          Optional ByRef aPollutantListFileName As String = "", _
+                          Optional ByRef aMetBaseDsn As Integer = 11, _
+                          Optional ByRef aMetWdmId As String = "WDM2", _
+                          Optional ByVal aSnowOption As Integer = 0, _
+                          Optional ByVal aFillMissingMetSegRecs As Boolean = False, _
+                          Optional ByVal aSJDate As Double = -1, _
+                          Optional ByVal aEJDate As Double = -1)
         pWatershed = aWatershed
 
         aUci.Name = aWatershed.Name & ".uci"
@@ -55,8 +58,14 @@ Module modCreateUci
         'set start and end dates in global block
         Dim lSJDate As Double = 0
         Dim lEJDate As Double = 0
-        GetStartEndDatesFromMetsegs(aUci, _
-                                    lSJDate, lEJDate)
+
+        If aSJDate > 0 AndAlso aEJDate > 0 Then
+            lSJDate = aSJDate
+            lEJDate = aEJDate
+        Else
+            GetStartEndDatesFromMetsegs(aUci, _
+                                        lSJDate, lEJDate)
+        End If
         Dim lStartDate(6) As Integer
         Dim lEndDate(6) As Integer
         J2Date(lSJDate, lStartDate)
@@ -82,9 +91,10 @@ Module modCreateUci
             End If
         End If
         'default start year to no earlier than 1940
-        If lStartDate(0) < 1940 And lEndDate(0) > 1940 Then
+        If aSJDate <= 0 AndAlso lStartDate(0) < 1940 AndAlso lEndDate(0) > 1940 Then
             lStartDate(0) = 1940
         End If
+
         With aUci.GlobalBlock  'update start and end date from met data
             For lDateIndex As Integer = 0 To 5
                 .SDate(lDateIndex) = lStartDate(lDateIndex)
@@ -139,6 +149,14 @@ Module modCreateUci
         'create masslinks
         CreateMassLinks(aUci)
 
+        If aFillMissingMetSegRecs Then
+            aUci.FillMissingMetSegRecs("ATEM")
+            aUci.FillMissingMetSegRecs("WIND")
+            aUci.FillMissingMetSegRecs("SOLR")
+            aUci.FillMissingMetSegRecs("DEWP")
+            aUci.FillMissingMetSegRecs("CLOU")
+        End If
+
         'set initial values in uci from BASINS values
         SetInitValues(aUci, aSnowOption)
 
@@ -183,13 +201,13 @@ Module modCreateUci
                             lTable.Parms("MELEV").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses), 3)
                             lTable = lOperation.Tables.Item("ATEMP-DAT")
                             Dim lGageElev As Single = 0.0
-                            If lOperation.MetSeg.MetSegRecs("ATEM") IsNot Nothing Then
+                            If lOperation.MetSeg.MetSegRecs.Contains("ATEM") Then
                                 Dim lTmpRec As HspfMetSegRecord = lOperation.MetSeg.MetSegRecs("ATEM")
                                 Dim lVolName As String = lTmpRec.Source.VolName
                                 Dim lVolID As Integer = lTmpRec.Source.VolId
                                 Dim lTimeseries As atcData.atcTimeseries = aUci.GetDataSetFromDsn(WDMInd(lVolName), lVolID)
                                 If lTimeseries IsNot Nothing Then
-                                    If lTimeseries.Attributes.GetValue("ELEV") IsNot Nothing Then
+                                    If lTimeseries.Attributes.ContainsAttribute("ELEV") Then
                                         If IsNumeric(lTimeseries.Attributes.GetValue("ELEV")) Then
                                             lGageElev = CSng(lTimeseries.Attributes.GetValue("ELEV")) * 3.281 'will be in meters
                                         End If
@@ -230,7 +248,7 @@ Module modCreateUci
                             lTable.Parms("MELEV").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses), 3)
                             lTable = lOperation.Tables.Item("ATEMP-DAT")
                             Dim lGageElev As Single = 0.0
-                            If lOperation.MetSeg.MetSegRecs("ATEM") IsNot Nothing Then
+                            If lOperation.MetSeg.MetSegRecs.Contains("ATEM") Then
                                 Dim lTmpRec As HspfMetSegRecord = lOperation.MetSeg.MetSegRecs("ATEM")
                                 Dim lVolName As String = lTmpRec.Source.VolName
                                 Dim lVolID As Integer = lTmpRec.Source.VolId
