@@ -90,7 +90,6 @@
     <Compile Include="clsBatchBF.vb" />
     <Compile Include="clsBatchBFSpec.vb" />
     <Compile Include="clsBatchUnitStation.vb" />
-    <Compile Include="clsBatchUtil.vb" />
     <Compile Include="clsUSGSBaseflowPlugin.vb" />
     <Compile Include="frmBatch.Designer.vb">
       <DependentUpon>frmBatch.vb</DependentUpon>
