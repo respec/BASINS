@@ -150,6 +150,7 @@ Module modCreateUci
         CreateMassLinks(aUci)
 
         If aFillMissingMetSegRecs Then
+            aUci.FillMissingMetSegRecs("PEVT")
             aUci.FillMissingMetSegRecs("ATEM")
             aUci.FillMissingMetSegRecs("WIND")
             aUci.FillMissingMetSegRecs("SOLR")
