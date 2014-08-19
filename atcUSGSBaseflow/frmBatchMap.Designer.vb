@@ -42,6 +42,7 @@ Partial Class frmBatchMap
         Me.cmsPlotDur = New System.Windows.Forms.ToolStripMenuItem
         Me.cmsGroupSetParm = New System.Windows.Forms.ToolStripMenuItem
         Me.cmsGlobalSetParm = New System.Windows.Forms.ToolStripMenuItem
+        Me.btnDownload = New System.Windows.Forms.Button
         Me.GroupBox1.SuspendLayout()
         Me.cmsNode.SuspendLayout()
         Me.SuspendLayout()
@@ -51,22 +52,22 @@ Partial Class frmBatchMap
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(13, 13)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(112, 13)
+        Me.Label1.Size = New System.Drawing.Size(58, 13)
         Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Save Download Data:"
+        Me.Label1.Text = "Data Path:"
         '
         'txtDataDir
         '
-        Me.txtDataDir.Location = New System.Drawing.Point(131, 10)
+        Me.txtDataDir.Location = New System.Drawing.Point(77, 10)
         Me.txtDataDir.Name = "txtDataDir"
-        Me.txtDataDir.Size = New System.Drawing.Size(298, 20)
+        Me.txtDataDir.Size = New System.Drawing.Size(288, 20)
         Me.txtDataDir.TabIndex = 1
         '
         'btnBrowseDataDir
         '
-        Me.btnBrowseDataDir.Location = New System.Drawing.Point(436, 8)
+        Me.btnBrowseDataDir.Location = New System.Drawing.Point(371, 8)
         Me.btnBrowseDataDir.Name = "btnBrowseDataDir"
-        Me.btnBrowseDataDir.Size = New System.Drawing.Size(75, 23)
+        Me.btnBrowseDataDir.Size = New System.Drawing.Size(61, 23)
         Me.btnBrowseDataDir.TabIndex = 2
         Me.btnBrowseDataDir.Text = "Browse"
         Me.btnBrowseDataDir.UseVisualStyleBackColor = True
@@ -170,37 +171,47 @@ Partial Class frmBatchMap
         '
         Me.cmsNode.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.cmsRemove, Me.cmsPlotDur, Me.cmsGroupSetParm, Me.cmsGlobalSetParm})
         Me.cmsNode.Name = "cmsGroup"
-        Me.cmsNode.Size = New System.Drawing.Size(192, 92)
+        Me.cmsNode.Size = New System.Drawing.Size(181, 92)
         '
         'cmsRemove
         '
         Me.cmsRemove.Name = "cmsRemove"
-        Me.cmsRemove.Size = New System.Drawing.Size(191, 22)
+        Me.cmsRemove.Size = New System.Drawing.Size(180, 22)
         Me.cmsRemove.Text = "Remove"
         '
         'cmsPlotDur
         '
         Me.cmsPlotDur.Name = "cmsPlotDur"
-        Me.cmsPlotDur.Size = New System.Drawing.Size(191, 22)
+        Me.cmsPlotDur.Size = New System.Drawing.Size(180, 22)
         Me.cmsPlotDur.Text = "Plot Duration"
         '
         'cmsGroupSetParm
         '
         Me.cmsGroupSetParm.Name = "cmsGroupSetParm"
-        Me.cmsGroupSetParm.Size = New System.Drawing.Size(191, 22)
+        Me.cmsGroupSetParm.Size = New System.Drawing.Size(180, 22)
         Me.cmsGroupSetParm.Text = "Set Group Parameters"
         '
         'cmsGlobalSetParm
         '
         Me.cmsGlobalSetParm.Name = "cmsGlobalSetParm"
-        Me.cmsGlobalSetParm.Size = New System.Drawing.Size(191, 22)
+        Me.cmsGlobalSetParm.Size = New System.Drawing.Size(180, 22)
         Me.cmsGlobalSetParm.Text = "Set Global Parameters"
+        '
+        'btnDownload
+        '
+        Me.btnDownload.Location = New System.Drawing.Point(438, 8)
+        Me.btnDownload.Name = "btnDownload"
+        Me.btnDownload.Size = New System.Drawing.Size(75, 23)
+        Me.btnDownload.TabIndex = 11
+        Me.btnDownload.Text = "Download"
+        Me.btnDownload.UseVisualStyleBackColor = True
         '
         'frmBatchMap
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(521, 423)
+        Me.Controls.Add(Me.btnDownload)
         Me.Controls.Add(Me.btnSaveSpecs)
         Me.Controls.Add(Me.btnDoBatch)
         Me.Controls.Add(Me.GroupBox1)
@@ -209,8 +220,8 @@ Partial Class frmBatchMap
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.treeBFGroups)
         Me.Controls.Add(Me.lstStations)
-        Me.Controls.Add(Me.btnBrowseDataDir)
         Me.Controls.Add(Me.txtDataDir)
+        Me.Controls.Add(Me.btnBrowseDataDir)
         Me.Controls.Add(Me.Label1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmBatchMap"
@@ -240,4 +251,5 @@ Partial Class frmBatchMap
     Friend WithEvents cmsPlotDur As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmsGroupSetParm As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmsGlobalSetParm As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents btnDownload As System.Windows.Forms.Button
 End Class
