@@ -43,6 +43,8 @@ Public Class frmUSGSBaseflowBatch
     Public Opened As Boolean = False
     Private pDidBFSeparation As Boolean = False
 
+    Private pSetGlobal As Boolean = False
+
     Public Event ParametersSet(ByVal aArgs As atcDataAttributes)
 
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
@@ -64,12 +66,16 @@ Public Class frmUSGSBaseflowBatch
             'No need to load any menu items
         End If
 
-        If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
+        Dim loperation As String = pBasicAttributes.GetValue("Operation", "")
+        If loperation.ToLower = "globalsetparm" Then
+            pSetGlobal = True
+        End If
+        If pDataGroup.Count = 0 AndAlso Not pSetGlobal Then 'ask user to specify some timeseries
             pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", _
                                                        pDataGroup, Nothing, True, True, Me.Icon)
         End If
 
-        If pDataGroup.Count > 0 Then
+        If pDataGroup.Count > 0 OrElse pSetGlobal Then
             PopulateForm()
             If aShowForm Then Me.Show()
         Else 'user declined to specify timeseries
@@ -101,9 +107,9 @@ Public Class frmUSGSBaseflowBatch
         pCommonStart = GetMinValue()
         pCommonEnd = GetMaxValue()
         Dim lRow As Integer = 1
-        Dim lOperation As String = pBasicAttributes.GetValue("Operation", "")
 
-        If lOperation = "GroupSetParm" Then
+        If Not pSetGlobal Then
+            Dim lStations As ArrayList = pBasicAttributes.GetValue("StationInfo", Nothing)
             For Each lDataset As atcData.atcTimeseries In pDataGroup
                 If lDataset.Dates.numValues > 0 Then
                     Dim lThisDate As Double = lDataset.Dates.Value(0)
@@ -113,8 +119,23 @@ Public Class frmUSGSBaseflowBatch
                     If lThisDate > lLastDate Then lLastDate = lThisDate
                     If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
                 End If
-                Dim lDA As String = lDataset.Attributes.GetValue("Drainage Area", "")
                 Dim loc As String = lDataset.Attributes.GetValue("Location", "")
+                Dim lDA As String = lDataset.Attributes.GetValue("Drainage Area", "")
+                If lDA = "" Then
+                    For Each lStation As String In lStations
+                        If lStation.Contains(loc) Then
+                            Dim larr() As String = lStation.Split(",")
+                            If larr.Length >= 2 Then
+                                Dim lDAdouble As Double = 0
+                                If Double.TryParse(larr(1), lDAdouble) Then
+                                    lDA = lDAdouble.ToString()
+                                    Exit For
+                                End If
+                            End If
+                        End If
+                    Next
+                End If
+
                 Dim lPath As String = lDataset.Attributes.GetValue("History 1", "").ToString.Substring("History 1 ".Length)
                 With grdStations
                     .Rows.Add(New String() {loc, lDA, lPath})
@@ -147,7 +168,70 @@ Public Class frmUSGSBaseflowBatch
             End If
         End If
 
+        Dim lDates(5) As Integer
+        Dim lStartFromConfig As Double = pBasicAttributes.GetValue(BFInputNames.StartDate, -99)
+        If lStartFromConfig > 0 Then
+            J2Date(lStartFromConfig, lDates)
+            txtStartDateUser.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+        End If
+        Dim lEndFromConfig As Double = pBasicAttributes.GetValue(BFInputNames.EndDate, -99)
+        If lEndFromConfig > 0 AndAlso lEndFromConfig > lStartFromConfig Then
+            J2Date(lEndFromConfig, lDates)
+            timcnv(lDates)
+            txtEndDateUser.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+        End If
+
+        Dim lMethods As ArrayList = pBasicAttributes.GetValue(BFInputNames.BFMethods, Nothing)
+        If lMethods IsNot Nothing Then
+            For Each lMethod As BFMethods In lMethods
+                Select Case lMethod
+                    Case BFMethods.PART
+                        chkMethodPART.Checked = True
+                        pMethods.Add(BFMethods.PART)
+                    Case BFMethods.HySEPFixed
+                        chkMethodHySEPFixed.Checked = True
+                        pMethods.Add(BFMethods.HySEPFixed)
+                    Case BFMethods.HySEPLocMin
+                        chkMethodHySEPLocMin.Checked = True
+                        pMethods.Add(BFMethods.HySEPLocMin)
+                    Case BFMethods.HySEPSlide
+                        chkMethodHySEPSlide.Checked = True
+                        pMethods.Add(BFMethods.HySEPSlide)
+                    Case BFMethods.BFIStandard
+                        chkMethodBFIStandard.Checked = True
+                        pMethods.Add(BFMethods.BFIStandard)
+                    Case BFMethods.BFIModified
+                        chkMethodBFIModified.Checked = True
+                        pMethods.Add(BFMethods.BFIModified)
+                End Select
+            Next
+        End If
+
+        Dim lBFINDayScreen As Double = pBasicAttributes.GetValue(BFInputNames.BFINDayScreen, -99)
+        Dim lBFITurnPtFrac As Double = pBasicAttributes.GetValue(BFInputNames.BFITurnPtFrac, -99)
+        Dim lBFIRecessCont As Double = pBasicAttributes.GetValue(BFInputNames.BFIRecessConst, -99)
+        If lBFINDayScreen > 0 Then
+            txtN.Text = lBFINDayScreen.ToString
+        End If
+        If lBFITurnPtFrac > 0 Then
+            txtF.Text = lBFITurnPtFrac.ToString
+        End If
+        If lBFIRecessCont > 0 Then
+            txtK.Text = lBFIRecessCont.ToString
+        End If
+
+        Dim lBFIReportBy As String = pBasicAttributes.GetValue(BFInputNames.BFIReportby, "")
+        If lBFIReportBy <> "" Then
+            If lBFIReportBy = BFBatchInputNames.ReportByCY OrElse lBFIReportBy = BFInputNames.BFIReportbyCY Then
+                rdoBFIReportbyCalendarYear.Checked = True
+            ElseIf lBFIReportBy = BFBatchInputNames.ReportByWY OrElse lBFIReportBy = BFInputNames.BFIReportbyWY Then
+                rdoBFIReportbyWaterYear.Checked = True
+            End If
+        End If
+
+        pOutputDir = pBasicAttributes.GetValue(BFBatchInputNames.OUTPUTDIR, "")
         txtOutputDir.Text = pOutputDir
+        OutputFilenameRoot = pBasicAttributes.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
         txtOutputRootName.Text = OutputFilenameRoot
 
     End Sub
@@ -166,48 +250,53 @@ Public Class frmUSGSBaseflowBatch
     Private Function AttributesFromForm(ByRef Args As atcDataAttributes) As String
         'check validity of inputs
         Dim lErrMsg As String = ""
+        Dim lSDate As Double = -99
+        Dim lEDate As Double = -99
 
-        If pDataGroup.Count = 0 Then
+        If pDataGroup.Count = 0 AndAlso Not pSetGlobal Then
             lErrMsg &= "- No streamflow data selected" & vbCrLf
         Else
-            Dim lSDate As Double = StartDateFromForm()
-            Dim lEDate As Double = EndDateFromForm()
-            If lSDate < 0 OrElse lEDate < 0 Then
-                lErrMsg &= "- Problematic start and/or end date." & vbCrLf
-            Else
-                Dim lTs As atcTimeseries = Nothing
-                For Each lTs In pDataGroup
-                    Try
-                        lTs = SubsetByDate(lTs, lSDate, lEDate, Nothing)
-                        If lTs.Attributes.GetValue("Count missing") > 0 Then
-                            If chkMethodHySEPFixed.Checked OrElse _
-                               chkMethodHySEPLocMin.Checked OrElse _
-                               chkMethodHySEPSlide.Checked OrElse _
-                               chkMethodPART.Checked Then
-                                lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
+            lSDate = StartDateFromForm()
+            lEDate = EndDateFromForm()
+            If Not pSetGlobal Then
+                If lSDate < 0 OrElse lEDate < 0 Then
+                    lErrMsg &= "- Problematic start and/or end date." & vbCrLf
+                Else
+                    Dim lTs As atcTimeseries = Nothing
+                    For Each lTs In pDataGroup
+                        Try
+                            lTs = SubsetByDate(lTs, lSDate, lEDate, Nothing)
+                            If lTs.Attributes.GetValue("Count missing") > 0 Then
+                                If chkMethodHySEPFixed.Checked OrElse _
+                                   chkMethodHySEPLocMin.Checked OrElse _
+                                   chkMethodHySEPSlide.Checked OrElse _
+                                   chkMethodPART.Checked Then
+                                    lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
+                                    lTs.Clear()
+                                    Exit For
+                                End If
+                            Else
                                 lTs.Clear()
-                                Exit For
                             End If
-                        Else
-                            lTs.Clear()
-                        End If
-                    Catch ex As Exception
-                        lErrMsg &= "- Problematic starting and ending dates." & vbCrLf
-                    End Try
-                Next
+                        Catch ex As Exception
+                            lErrMsg &= "- Problematic starting and ending dates." & vbCrLf
+                        End Try
+                    Next
+                End If
             End If
         End If
 
-        Dim lStationsInfo As New ArrayList()
-        With grdStations
-            For I As Integer = 0 To .Rows.Count - 1
-                If Not String.IsNullOrEmpty(.Item(0, I).Value.ToString()) Then
-                    lStationsInfo.Add("Station" & vbTab & .Item(0, I).Value & "," & .Item(1, I).Value & "," & .Item(2, I).Value)
-                End If
-            Next
-        End With
-
-        Args.SetValue("StationInfo", lStationsInfo)
+        If Not pSetGlobal Then
+            Dim lStationsInfo As New ArrayList()
+            With grdStations
+                For I As Integer = 0 To .Rows.Count - 1
+                    If .Item(0, I).Value IsNot Nothing Then
+                        lStationsInfo.Add("Station" & vbTab & .Item(0, I).Value & "," & .Item(1, I).Value & "," & .Item(2, I).Value)
+                    End If
+                Next
+            End With
+            Args.SetValue("StationInfo", lStationsInfo)
+        End If
 
         If pMethods.Count = 0 Then lErrMsg = "- Method not set" & vbCrLf
 
@@ -256,8 +345,12 @@ Public Class frmUSGSBaseflowBatch
             'Set drainage area
             Args.SetValue(BFInputNames.DrainageArea, lDA) '"Drainage Area"
             'set duration
-            Args.SetValue(BFInputNames.StartDate, StartDateFromForm) '"Start Date"
-            Args.SetValue(BFInputNames.EndDate, EndDateFromForm) '"End Date"
+            If lSDate > 0 Then
+                Args.SetValue(BFInputNames.StartDate, StartDateFromForm) '"Start Date"
+            End If
+            If lEDate > 0 Then
+                Args.SetValue(BFInputNames.EndDate, EndDateFromForm) '"End Date"
+            End If
             'Set streamflow
             Args.SetValue(BFInputNames.Streamflow, pDataGroup) '"Streamflow"
             'Set Unit
@@ -311,6 +404,9 @@ Public Class frmUSGSBaseflowBatch
         If lMatches.Count > 0 Then
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
+            If pSetGlobal Then
+                Return -99
+            End If
             Dim lAskUser As String = _
             Logger.MsgCustomOwned("Invalid starting date. Use dataset start date?", "Start Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
@@ -346,6 +442,9 @@ Public Class frmUSGSBaseflowBatch
         If lMatches.Count > 0 Then
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
+            If pSetGlobal Then
+                Return -99
+            End If
             Dim lAskUser As String = _
             Logger.MsgCustomOwned("Invalid ending date. Use dataset end date?", "End Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
@@ -418,12 +517,11 @@ Public Class frmUSGSBaseflowBatch
             Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
             Exit Sub
         Else
-            Dim lOperation As String = pBasicAttributes.GetValue("Operation", "")
-            If lOperation = "GroupSetParm" Then
+            If pSetGlobal Then
+                Logger.MsgCustomOwned("Parameters are set for Global Defaults", "USGS Base-Flow Separation", Me, New String() {"OK"})
+            Else
                 Dim lGroup As String = pBasicAttributes.GetValue("Group", "")
                 Logger.MsgCustomOwned("Group Parameters are set for " & lGroup, "USGS Base-Flow Separation", Me, New String() {"OK"})
-            Else
-                Logger.MsgCustomOwned("Group Parameters are set for Global Defaults", "USGS Base-Flow Separation", Me, New String() {"OK"})
             End If
         End If
         RaiseEvent ParametersSet(pBasicAttributes)
@@ -431,6 +529,9 @@ Public Class frmUSGSBaseflowBatch
 
     Private Sub mnuOutputASCII_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         SetBaseflowSepParm()
+        If pSetGlobal Then
+            Me.Close()
+        End If
         Dim lSpecification As String = ""
         If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 Then
             Exit Sub

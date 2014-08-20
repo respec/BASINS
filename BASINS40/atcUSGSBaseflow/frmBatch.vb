@@ -4,6 +4,19 @@ Public Class frmBatch
     'Public WithEvents pBatchConfig As New clsBatchBFSpec()
     Private pBatchConfig As clsBatchBFSpec
 
+    Private pBatchSpecFilefullname As String = "'"
+    Public Property BatchSpecFile() As String
+        Get
+            Return pBatchSpecFilefullname
+        End Get
+        Set(ByVal value As String)
+            pBatchSpecFilefullname = value
+            If IO.File.Exists(pBatchSpecFilefullname) Then
+                txtSpecFile.Text = pBatchSpecFilefullname
+            End If
+        End Set
+    End Property
+
     Public Sub Initialize()
         Me.Show()
     End Sub

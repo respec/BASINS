@@ -10,6 +10,7 @@ Public Class frmBatchMap
     Private pBatchGroupCount As Integer = 1
     Private pBFInputsGlobal As atcDataAttributes
     Private pBFInputsGroups As atcCollection
+    Private pBatchSpecFilefullname As String = ""
 
     Private WithEvents pfrmBFParms As frmUSGSBaseflowBatch
 
@@ -181,6 +182,10 @@ Public Class frmBatchMap
                     pfrmBFParms = New frmUSGSBaseflowBatch()
                     pfrmBFParms.Initialize(lTsGroup, lBFInputs)
                 End If
+            Case "cmsGlobalSetParm"
+                pBFInputsGlobal.SetValue("Operation", "GlobalSetParm")
+                pfrmBFParms = New frmUSGSBaseflowBatch()
+                pfrmBFParms.Initialize(Nothing, pBFInputsGlobal)
         End Select
     End Sub
 
@@ -212,21 +217,27 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub ParmetersSet(ByVal aArgs As atcDataAttributes) Handles pfrmBFParms.ParametersSet
-        Dim loperation As String = aArgs.GetValue("Operation", "")
-        Dim lgroupname As String = aArgs.GetValue("Group", "")
-        If loperation.ToLower = "groupsetparm" Then
-            Dim lText As String = ParametersToText(aArgs)
-            If Not String.IsNullOrEmpty(lText) Then
-                Dim lArg As atcDataAttributes = pBFInputsGroups.ItemByKey(lgroupname)
+        Dim lText As String = ParametersToText(aArgs)
+        
+        If String.IsNullOrEmpty(lText) Then
+            txtParameters.Text = ""
+        Else
+            Dim loperation As String = aArgs.GetValue("Operation", "")
+            Dim lgroupname As String = aArgs.GetValue("Group", "")
+            Dim lArg As atcDataAttributes = Nothing
+            If loperation.ToLower = "groupsetparm" Then
+                lArg = pBFInputsGroups.ItemByKey(lgroupname)
                 If lArg Is Nothing Then
                     lArg = New atcDataAttributes()
                     pBFInputsGroups.Add(lgroupname, lArg)
                 End If
-                For Each lDataDef As atcDefinedValue In aArgs
-                    lArg.SetValue(lDataDef.Definition.Name, lDataDef.Value)
-                Next
-                txtParameters.Text = lText.ToString()
+            Else
+                lArg = pBFInputsGlobal
             End If
+            For Each lDataDef As atcDefinedValue In aArgs
+                lArg.SetValue(lDataDef.Definition.Name, lDataDef.Value)
+            Next
+            txtParameters.Text = lText.ToString()
         End If
     End Sub
 
@@ -234,26 +245,31 @@ Public Class frmBatchMap
         If aArgs Is Nothing Then Return ""
         Dim loperation As String = aArgs.GetValue("Operation", "")
         Dim lgroupname As String = aArgs.GetValue("Group", "")
+        Dim lSetGlobal As Boolean = (loperation.ToLower = "globalsetparm")
+
         Dim lText As New Text.StringBuilder()
         If loperation.ToLower = "groupsetparm" Then
             lText.AppendLine("BASE-FLOW")
-
             Dim lStationInfo As ArrayList = aArgs.GetValue("StationInfo")
             If lStationInfo IsNot Nothing Then
                 For Each lstation As String In lStationInfo
                     lText.AppendLine(lstation)
                 Next
             End If
+        ElseIf lSetGlobal Then
+            lText.AppendLine("GLOBAL")
+        End If
 
-            Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate)
-            Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate)
-            Dim lDates(5) As Integer
-            J2Date(lStartDate, lDates)
-            lText.AppendLine("STARTDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
-            J2Date(lEndDate, lDates)
-            timcnv(lDates)
-            lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+        Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate, Date2J(2014, 8, 20, 0, 0, 0))
+        Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate, Date2J(2014, 8, 20, 24, 0, 0))
+        Dim lDates(5) As Integer
+        J2Date(lStartDate, lDates)
+        lText.AppendLine("STARTDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+        J2Date(lEndDate, lDates)
+        timcnv(lDates)
+        lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
 
+        If aArgs.ContainsAttribute(BFInputNames.BFMethods) Then
             Dim lMethods As ArrayList = aArgs.GetValue(BFInputNames.BFMethods)
             For Each lMethod As BFMethods In lMethods
                 Select Case lMethod
@@ -271,20 +287,35 @@ Public Class frmBatchMap
                         lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
                 End Select
             Next
+        ElseIf lSetGlobal Then
+            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
+            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
+            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
+            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
+            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
+            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+        End If
 
-            If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
-                Dim lBFITurnPtFrac As Double = aArgs.GetValue(BFInputNames.BFITurnPtFrac)
-                lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & lBFITurnPtFrac)
-            End If
-            If aArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
-                Dim lBFINDayScreen As Double = aArgs.GetValue(BFInputNames.BFINDayScreen)
-                lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & lBFINDayScreen)
-            End If
-            If aArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
-                Dim lBFIRecessConst As Double = aArgs.GetValue(BFInputNames.BFIRecessConst)
-                lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & lBFIRecessConst)
-            End If
+        If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
+            Dim lBFITurnPtFrac As Double = aArgs.GetValue(BFInputNames.BFITurnPtFrac)
+            lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & lBFITurnPtFrac)
+        ElseIf lSetGlobal Then
+            lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & "0.9")
+        End If
+        If aArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
+            Dim lBFINDayScreen As Double = aArgs.GetValue(BFInputNames.BFINDayScreen)
+            lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & lBFINDayScreen)
+        ElseIf lSetGlobal Then
+            lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & "5")
+        End If
+        If aArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
+            Dim lBFIRecessConst As Double = aArgs.GetValue(BFInputNames.BFIRecessConst)
+            lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & lBFIRecessConst)
+        ElseIf lSetGlobal Then
+            lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & "0.97915")
+        End If
 
+        If aArgs.ContainsAttribute(BFInputNames.BFIReportby) Then
             Dim lBFIReportBy As String = aArgs.GetValue(BFInputNames.BFIReportby, "")
             Select Case lBFIReportBy
                 Case BFInputNames.BFIReportbyCY
@@ -292,13 +323,29 @@ Public Class frmBatchMap
                 Case BFInputNames.BFIReportbyWY
                     lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
             End Select
+        ElseIf lSetGlobal Then
+            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+        End If
 
-            Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
-            Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
-            lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
-            lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
+        If lSetGlobal Then
+            Dim lDatadir As String = aArgs.GetValue(BFBatchInputNames.DataDir, "")
+            If lDatadir = "" Then
+                lDatadir = txtDataDir.Text.Trim()
+                If IO.Directory.Exists(lDatadir) Then
+                    lText.AppendLine(BFBatchInputNames.DataDir & vbTab & lDatadir)
+                End If
+            End If
+        End If
 
+        Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+        Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+        lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
+        lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
+
+        If loperation.ToLower = "groupsetparm" Then
             lText.AppendLine("END BASE-FLOW")
+        ElseIf lSetGlobal Then
+            lText.AppendLine("END GLOBAL")
         End If
         Return lText.ToString()
     End Function
@@ -357,5 +404,40 @@ Public Class frmBatchMap
         If lTsGroup.Count > 0 Then
             atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
         End If
+    End Sub
+
+    Private Sub btnDoBatch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoBatch.Click
+        If Not String.IsNullOrEmpty(pBatchSpecFilefullname) OrElse IO.File.Exists(pBatchSpecFilefullname) Then
+            Dim lfrmBatch As New frmBatch()
+            lfrmBatch.BatchSpecFile = pBatchSpecFilefullname
+            lfrmBatch.ShowDialog()
+        Else
+            Logger.Msg("Need to construct a batch specification file first.", "Batch Base-flow Separation")
+        End If
+    End Sub
+
+    Private Sub btnSaveSpecs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSaveSpecs.Click
+        pBatchSpecFilefullname = IO.Path.Combine(pDataPath, "BatchConfigBase-flowSep_" & SafeFilename(DateTime.Now) & ".txt")
+        Dim lSW As IO.StreamWriter = Nothing
+        Try
+            lSW = New IO.StreamWriter(pBatchSpecFilefullname, False)
+            'write global block first
+            lSW.WriteLine(ParametersToText(pBFInputsGlobal))
+
+            'write each group settings
+            For Each lAttrib As atcDataAttributes In pBFInputsGroups
+                lSW.WriteLine(ParametersToText(lAttrib))
+            Next
+
+            Logger.Msg("Batch file is saved:" & vbCrLf & pBatchSpecFilefullname, "Batch Base-flow Separation")
+        Catch ex As Exception
+            Logger.Msg("Error Writing Spec File:" & vbCrLf & pBatchSpecFilefullname & vbCrLf & vbCrLf & ex.Message, "Batch Base-flow Separation")
+            pBatchSpecFilefullname = ""
+        Finally
+            If lSW IsNot Nothing Then
+                lSW.Close()
+                lSW = Nothing
+            End If
+        End Try
     End Sub
 End Class
