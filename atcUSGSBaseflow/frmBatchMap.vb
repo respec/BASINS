@@ -1,6 +1,7 @@
 ﻿Imports atcUtility
 Imports atcData
 Imports MapWinUtility
+Imports atcTimeseriesBaseflow
 Imports System.Windows.Forms
 
 Public Class frmBatchMap
@@ -84,35 +85,29 @@ Public Class frmBatchMap
         Select Case lcmdName
             Case "cmsRemove"
                 If node.Text.StartsWith(lGroupingName) Then
-                    Dim lGroupNum As Integer = Integer.Parse(node.Text.Substring(lGroupingName.Length + 1))
-                    treeBFGroups.Nodes.Remove(node)
-                    pBatchGroupCount -= 1
-                    For Each lNode As TreeNode In treeBFGroups.Nodes
-                        If lNode.Text.StartsWith(lGroupingName) Then
-                            Dim lGroupNumRemains As Integer = Integer.Parse(lNode.Text.Substring(lGroupingName.Length + 1))
-                            If lGroupNumRemains > lGroupNum Then
-                                lNode.Text = lGroupingName & "_" & (lGroupNumRemains - 1).ToString
-                            End If
-                        End If
-                    Next
+                    RemoveBFGroup(node)
                 Else
                     If node.Parent IsNot Nothing Then
                         If node.Parent.Nodes.Count = 1 Then
-                            'remove the whole group
-                            Dim lParentGroupName As String = node.Parent().Text
-                            Dim lGroupNum As Integer = Integer.Parse(lParentGroupName.Substring(lGroupingName.Length + 1))
-                            treeBFGroups.Nodes.Remove(node.Parent)
-                            pBatchGroupCount -= 1
-                            For Each lNode As TreeNode In treeBFGroups.Nodes
-                                If lNode.Text.StartsWith(lGroupingName) Then
-                                    Dim lGroupNumRemains As Integer = Integer.Parse(lNode.Text.Substring(lGroupingName.Length + 1))
-                                    If lGroupNumRemains > lGroupNum Then
-                                        lNode.Text = lGroupingName & "_" & (lGroupNumRemains - 1).ToString
-                                    End If
-                                End If
-                            Next
+                            RemoveBFGroup(node)
                         Else
+                            Dim lStationID As String = node.Text
                             treeBFGroups.Nodes.Remove(node)
+                            Dim lGroupName As String = node.Parent.Text
+                            Dim lBFGroupAttribs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+                            If lBFGroupAttribs IsNot Nothing Then
+                                Dim lStationInfo As ArrayList = lBFGroupAttribs.GetValue("StationInfo")
+                                Dim lIndexToRemove As Integer = -99
+                                For Each lStation As String In lStationInfo
+                                    If lStation.Contains(lStationID) Then
+                                        lIndexToRemove = lStationInfo.IndexOf(lStation)
+                                        Exit For
+                                    End If
+                                Next
+                                If lIndexToRemove >= 0 Then
+                                    lStationInfo.RemoveAt(lIndexToRemove)
+                                End If
+                            End If
                         End If
                     End If
                 End If
@@ -147,13 +142,13 @@ Public Class frmBatchMap
                 lGroupName = lGroupNode.Text
 
                 Dim lGroupNum As Integer = Integer.Parse(lGroupName.Substring(lGroupingName.Length + 1))
-                Dim lBFInputs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupNum)
+                Dim lBFInputs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
 
                 If lBFInputs Is Nothing Then
                     lBFInputs = New atcDataAttributes()
                     lBFInputs.SetValue("Operation", "GroupSetParm")
                     lBFInputs.SetValue("Group", lGroupName)
-                    pBFInputsGroups.Add(lGroupNum, lBFInputs)
+                    pBFInputsGroups.Add(lGroupName, lBFInputs)
                 End If
 
                 Dim lArgs As New atcDataAttributes()
@@ -189,14 +184,124 @@ Public Class frmBatchMap
         End Select
     End Sub
 
+    ''' <summary>
+    ''' Only call when removing a whole group
+    ''' </summary>
+    ''' <param name="aBFGroupNode"></param>
+    ''' <remarks></remarks>
+    Private Sub RemoveBFGroup(ByVal aBFGroupNode As TreeNode)
+        Dim lGroupingName As String = "BatchGroup"
+        Dim lGroupNum As Integer = Integer.Parse(aBFGroupNode.Text.Substring(lGroupingName.Length + 1))
+        pBFInputsGroups.RemoveByKey(aBFGroupNode.Text)
+        treeBFGroups.Nodes.Remove(aBFGroupNode)
+        pBatchGroupCount -= 1
+        Dim loldNodeText As String = ""
+        Dim loldNodeIndex As Integer
+        For Each lNode As TreeNode In treeBFGroups.Nodes
+            If lNode.Text.StartsWith(lGroupingName) Then
+                loldNodeText = lNode.Text
+                loldNodeIndex = pBFInputsGroups.Keys.IndexOf(loldNodeText)
+                Dim lGroupNumRemains As Integer = Integer.Parse(lNode.Text.Substring(lGroupingName.Length + 1))
+                If lGroupNumRemains > lGroupNum Then
+                    Dim lNewNodeText As String = lGroupingName & "_" & (lGroupNumRemains - 1).ToString
+                    lNode.Text = lNewNodeText
+                    If loldNodeIndex >= 0 Then pBFInputsGroups.Keys.Item(loldNodeIndex) = lNewNodeText
+                End If
+            End If
+        Next
+    End Sub
+
     Private Sub ParmetersSet(ByVal aArgs As atcDataAttributes) Handles pfrmBFParms.ParametersSet
-        If aArgs Is Nothing Then Return
         Dim loperation As String = aArgs.GetValue("Operation", "")
         Dim lgroupname As String = aArgs.GetValue("Group", "")
-        If loperation.ToLower = "GroupSetParm" Then
-
+        If loperation.ToLower = "groupsetparm" Then
+            Dim lText As String = ParametersToText(aArgs)
+            If Not String.IsNullOrEmpty(lText) Then
+                Dim lArg As atcDataAttributes = pBFInputsGroups.ItemByKey(lgroupname)
+                If lArg Is Nothing Then
+                    lArg = New atcDataAttributes()
+                    pBFInputsGroups.Add(lgroupname, lArg)
+                End If
+                For Each lDataDef As atcDefinedValue In aArgs
+                    lArg.SetValue(lDataDef.Definition.Name, lDataDef.Value)
+                Next
+                txtParameters.Text = lText.ToString()
+            End If
         End If
     End Sub
+
+    Private Function ParametersToText(ByVal aArgs As atcDataAttributes) As String
+        If aArgs Is Nothing Then Return ""
+        Dim loperation As String = aArgs.GetValue("Operation", "")
+        Dim lgroupname As String = aArgs.GetValue("Group", "")
+        Dim lText As New Text.StringBuilder()
+        If loperation.ToLower = "groupsetparm" Then
+            lText.AppendLine("BASE-FLOW")
+
+            Dim lStationInfo As ArrayList = aArgs.GetValue("StationInfo")
+            If lStationInfo IsNot Nothing Then
+                For Each lstation As String In lStationInfo
+                    lText.AppendLine(lstation)
+                Next
+            End If
+
+            Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate)
+            Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate)
+            Dim lDates(5) As Integer
+            J2Date(lStartDate, lDates)
+            lText.AppendLine("STARTDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+            J2Date(lEndDate, lDates)
+            timcnv(lDates)
+            lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+
+            Dim lMethods As ArrayList = aArgs.GetValue(BFInputNames.BFMethods)
+            For Each lMethod As BFMethods In lMethods
+                Select Case lMethod
+                    Case BFMethods.PART
+                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
+                    Case BFMethods.HySEPFixed
+                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
+                    Case BFMethods.HySEPLocMin
+                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
+                    Case BFMethods.HySEPSlide
+                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
+                    Case BFMethods.BFIStandard
+                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
+                    Case BFMethods.BFIModified
+                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+                End Select
+            Next
+
+            If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
+                Dim lBFITurnPtFrac As Double = aArgs.GetValue(BFInputNames.BFITurnPtFrac)
+                lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & lBFITurnPtFrac)
+            End If
+            If aArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
+                Dim lBFINDayScreen As Double = aArgs.GetValue(BFInputNames.BFINDayScreen)
+                lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & lBFINDayScreen)
+            End If
+            If aArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
+                Dim lBFIRecessConst As Double = aArgs.GetValue(BFInputNames.BFIRecessConst)
+                lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & lBFIRecessConst)
+            End If
+
+            Dim lBFIReportBy As String = aArgs.GetValue(BFInputNames.BFIReportby, "")
+            Select Case lBFIReportBy
+                Case BFInputNames.BFIReportbyCY
+                    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+                Case BFInputNames.BFIReportbyWY
+                    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
+            End Select
+
+            Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+            Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+            lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
+            lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
+
+            lText.AppendLine("END BASE-FLOW")
+        End If
+        Return lText.ToString()
+    End Function
 
     Private Sub btnBrowseDataDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseDataDir.Click
         Dim lFolder As New System.Windows.Forms.FolderBrowserDialog()

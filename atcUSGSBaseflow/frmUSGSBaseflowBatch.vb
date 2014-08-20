@@ -198,14 +198,16 @@ Public Class frmUSGSBaseflowBatch
             End If
         End If
 
-        Dim lStationsInfo As New Text.StringBuilder()
+        Dim lStationsInfo As New ArrayList()
         With grdStations
             For I As Integer = 0 To .Rows.Count - 1
-                lStationsInfo.AppendLine("Station" & vbTab & .Item(0, I).Value & "," & .Item(1, I).Value & "," & .Item(2, I).Value)
+                If Not String.IsNullOrEmpty(.Item(0, I).Value.ToString()) Then
+                    lStationsInfo.Add("Station" & vbTab & .Item(0, I).Value & "," & .Item(1, I).Value & "," & .Item(2, I).Value)
+                End If
             Next
         End With
 
-        Args.SetValue("StationInfo", lStationsInfo.ToString())
+        Args.SetValue("StationInfo", lStationsInfo)
 
         If pMethods.Count = 0 Then lErrMsg = "- Method not set" & vbCrLf
 
@@ -277,6 +279,7 @@ Public Class frmUSGSBaseflowBatch
                 End If
                 Args.SetValue(BFInputNames.BFIReportby, lBFIYearBasis) '"BFIReportby"
             End If
+            Args.SetValue(BFInputNames.BFMethods, pMethods)
         End If
         Return lErrMsg
     End Function
@@ -454,6 +457,7 @@ Public Class frmUSGSBaseflowBatch
         SaveSetting("atcUSGSBaseflowBatch", "Defaults", "BFISymbols", chkBFISymbols.Checked)
 
         OutputDir = txtOutputDir.Text.Trim()
+        Me.Close()
         'Dim lRDBWriter As New atcTimeseriesRDB()
     End Sub
 
