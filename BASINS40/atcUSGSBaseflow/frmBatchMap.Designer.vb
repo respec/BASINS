@@ -142,10 +142,13 @@ Partial Class frmBatchMap
         '
         'txtParameters
         '
+        Me.txtParameters.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtParameters.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtParameters.Location = New System.Drawing.Point(7, 16)
         Me.txtParameters.Multiline = True
         Me.txtParameters.Name = "txtParameters"
+        Me.txtParameters.ScrollBars = System.Windows.Forms.ScrollBars.Both
         Me.txtParameters.Size = New System.Drawing.Size(336, 138)
         Me.txtParameters.TabIndex = 0
         '
