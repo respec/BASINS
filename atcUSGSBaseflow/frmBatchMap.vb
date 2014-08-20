@@ -10,6 +10,8 @@ Public Class frmBatchMap
     Private pBFInputsGlobal As atcDataAttributes
     Private pBFInputsGroups As atcCollection
 
+    Private WithEvents pfrmBFParms As frmUSGSBaseflowBatch
+
     Private ReadOnly Property GetDataFileFullPath(ByVal aStationId As String) As String
         Get
             If IO.Directory.Exists(pDataPath) Then
@@ -135,8 +137,65 @@ Public Class frmBatchMap
                     Logger.Msg("Need to download data first.", "Batch Map:Plot")
                 End If
             Case "cmsGroupSetParm"
+                Dim lGroupName As String = ""
+                Dim lGroupNode As TreeNode
+                If node.Text.StartsWith(lGroupingName) Then
+                    lGroupNode = node
+                Else
+                    lGroupNode = node.Parent
+                End If
+                lGroupName = lGroupNode.Text
 
+                Dim lGroupNum As Integer = Integer.Parse(lGroupName.Substring(lGroupingName.Length + 1))
+                Dim lBFInputs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupNum)
+
+                If lBFInputs Is Nothing Then
+                    lBFInputs = New atcDataAttributes()
+                    lBFInputs.SetValue("Operation", "GroupSetParm")
+                    lBFInputs.SetValue("Group", lGroupName)
+                    pBFInputsGroups.Add(lGroupNum, lBFInputs)
+                End If
+
+                Dim lArgs As New atcDataAttributes()
+                lArgs.Add("Constituent", "streamflow")
+                Dim lTsGroup As New atcTimeseriesGroup()
+                For Each lStationNode As TreeNode In lGroupNode.Nodes
+                    Dim lstationId As String = lStationNode.Text
+
+                    Dim lDataLoaded As Boolean = False
+                    For Each lDS As atcDataSource In atcDataManager.DataSources
+                        If lDS.Name.ToString.Contains("USGS RDB") Then
+                            For Each lTs As atcTimeseries In lDS.DataSets
+                                If lTs.Attributes.GetValue("Location") = lstationId AndAlso _
+                                   lTs.Attributes.GetValue("Constituent").ToString.ToLower = "streamflow" Then
+                                    lTsGroup.Add(lTs)
+                                    lDataLoaded = True
+                                End If
+                            Next
+                        End If
+                    Next
+                    If Not lDataLoaded Then
+                        Dim lDataPath As String = GetDataFileFullPath(lstationId)
+                        Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+                        If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                            lTsGroup.Add(lTsGroupTemp(0).Clone)
+                        End If
+                    End If
+                Next
+                If lTsGroup.Count > 0 Then
+                    pfrmBFParms = New frmUSGSBaseflowBatch()
+                    pfrmBFParms.Initialize(lTsGroup, lBFInputs)
+                End If
         End Select
+    End Sub
+
+    Private Sub ParmetersSet(ByVal aArgs As atcDataAttributes) Handles pfrmBFParms.ParametersSet
+        If aArgs Is Nothing Then Return
+        Dim loperation As String = aArgs.GetValue("Operation", "")
+        Dim lgroupname As String = aArgs.GetValue("Group", "")
+        If loperation.ToLower = "GroupSetParm" Then
+
+        End If
     End Sub
 
     Private Sub btnBrowseDataDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseDataDir.Click
