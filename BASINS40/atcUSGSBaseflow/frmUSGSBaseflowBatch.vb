@@ -11,7 +11,7 @@ Imports System.Text.RegularExpressions
 
 Public Class frmUSGSBaseflowBatch
     Private pName As String = "Unnamed"
-    Private pBasicAttributes As Generic.List(Of String)
+    Private pBasicAttributes As atcDataAttributes
     Private pDateFormat As atcDateFormat
 
     Private pYearStartMonth As Integer = 0
@@ -43,8 +43,10 @@ Public Class frmUSGSBaseflowBatch
     Public Opened As Boolean = False
     Private pDidBFSeparation As Boolean = False
 
+    Public Event ParametersSet(ByVal aArgs As atcDataAttributes)
+
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
-                      Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
+                      Optional ByVal aBasicAttributes As atcDataAttributes = Nothing, _
                       Optional ByVal aShowForm As Boolean = True)
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcTimeseriesGroup
@@ -52,10 +54,9 @@ Public Class frmUSGSBaseflowBatch
             pDataGroup = aTimeseriesGroup
         End If
 
-        If aBasicAttributes Is Nothing Then
-            pBasicAttributes = atcDataManager.DisplayAttributes
-        Else
-            pBasicAttributes = aBasicAttributes
+        pBasicAttributes = aBasicAttributes
+        If pBasicAttributes Is Nothing Then
+            pBasicAttributes = New atcDataAttributes()
         End If
         pMethods = New ArrayList()
         MethodsLastDone = New ArrayList()
@@ -85,8 +86,8 @@ Public Class frmUSGSBaseflowBatch
             .IncludeSeconds = False
         End With
 
-        pOutputDir = GetSetting("atcUSGSBaseflow", "Defaults", "OutputDir", "")
-        OutputFilenameRoot = GetSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", "")
+        pOutputDir = GetSetting("atcUSGSBaseflowBatch", "Defaults", "OutputDir", "")
+        OutputFilenameRoot = GetSetting("atcUSGSBaseflowBatch", "Defaults", "BaseOutputFilename", "")
 
         'atcUSGSStations.StationInfoFile = GetSetting("atcUSGSBaseflow", "Defaults", "Stations", "Station.txt")
 
@@ -99,21 +100,37 @@ Public Class frmUSGSBaseflowBatch
 
         pCommonStart = GetMinValue()
         pCommonEnd = GetMaxValue()
+        Dim lRow As Integer = 1
+        Dim lOperation As String = pBasicAttributes.GetValue("Operation", "")
 
-        For Each lDataset As atcData.atcTimeseries In pDataGroup
-            If lDataset.Dates.numValues > 0 Then
-                Dim lThisDate As Double = lDataset.Dates.Value(0)
-                If lThisDate < lFirstDate Then lFirstDate = lThisDate
-                If lThisDate > pCommonStart Then pCommonStart = lThisDate
-                lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
-                If lThisDate > lLastDate Then lLastDate = lThisDate
-                If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
-            End If
-            If lDataset.Attributes.ContainsAttribute("Drainage Area") Then
-                txtDrainageArea.Text = DoubleToString(lDataset.Attributes.GetValue("Drainage Area"))
-            End If
-        Next
-
+        If lOperation = "GroupSetParm" Then
+            For Each lDataset As atcData.atcTimeseries In pDataGroup
+                If lDataset.Dates.numValues > 0 Then
+                    Dim lThisDate As Double = lDataset.Dates.Value(0)
+                    If lThisDate < lFirstDate Then lFirstDate = lThisDate
+                    If lThisDate > pCommonStart Then pCommonStart = lThisDate
+                    lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
+                    If lThisDate > lLastDate Then lLastDate = lThisDate
+                    If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
+                End If
+                Dim lDA As String = lDataset.Attributes.GetValue("Drainage Area", "")
+                Dim loc As String = lDataset.Attributes.GetValue("Location", "")
+                Dim lPath As String = lDataset.Attributes.GetValue("History 1", "").ToString.Substring("History 1 ".Length)
+                With grdStations
+                    .Rows.Add(New String() {loc, lDA, lPath})
+                    '.Item(0, lRow).Value = loc
+                    '.Item(1, lRow).Value = lDA
+                    '.Item(2, lRow).Value = lPath
+                End With
+                lRow += 1
+            Next
+            grdStations.Visible = True
+            btnWriteASCIIOutput.Text = "Set Parameters: " & pBasicAttributes.GetValue("Group", "")
+        Else
+            grdStations.Visible = False
+            btnWriteASCIIOutput.Text = "Set Parameters: Global Defaults"
+        End If
+        
         If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
             If txtDataStart.Tag IsNot Nothing AndAlso txtDataEnd.Tag IsNot Nothing Then
                 txtDataStart.Text = txtDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate + 1)
@@ -132,6 +149,7 @@ Public Class frmUSGSBaseflowBatch
 
         txtOutputDir.Text = pOutputDir
         txtOutputRootName.Text = OutputFilenameRoot
+
     End Sub
 
     Public Function AskUser(ByVal aName As String, _
@@ -180,19 +198,37 @@ Public Class frmUSGSBaseflowBatch
             End If
         End If
 
-        'If pMethod = "" Then lErrMsg = "- Method not set" & vbCrLf
+        Dim lStationsInfo As New Text.StringBuilder()
+        With grdStations
+            For I As Integer = 0 To .Rows.Count - 1
+                lStationsInfo.AppendLine("Station" & vbTab & .Item(0, I).Value & "," & .Item(1, I).Value & "," & .Item(2, I).Value)
+            Next
+        End With
+
+        Args.SetValue("StationInfo", lStationsInfo.ToString())
+
         If pMethods.Count = 0 Then lErrMsg = "- Method not set" & vbCrLf
-        Dim lDA As Double = 0.0
-        If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then
-            If chkMethodHySEPFixed.Checked OrElse _
-               chkMethodHySEPLocMin.Checked OrElse _
-               chkMethodHySEPSlide.Checked OrElse _
-               chkMethodPART.Checked Then
-                lErrMsg &= "- Drainage Area not set" & vbCrLf
-            End If
-        ElseIf lDA <= 0 Then
-            lErrMsg &= "- Drainage Area must be greater than zero" & vbCrLf
+
+        If Not IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
+            lErrMsg &= "- Need to specify output directory" & vbCrLf
+        Else
+            Args.SetValue(BFBatchInputNames.OUTPUTDIR, txtOutputDir.Text.Trim())
         End If
+
+        Args.SetValue(BFBatchInputNames.OUTPUTPrefix, txtOutputRootName.Text.Trim())
+
+        Dim lDA As Double = 0.0
+        'If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then
+        '    If chkMethodHySEPFixed.Checked OrElse _
+        '       chkMethodHySEPLocMin.Checked OrElse _
+        '       chkMethodHySEPSlide.Checked OrElse _
+        '       chkMethodPART.Checked Then
+        '        lErrMsg &= "- Drainage Area not set" & vbCrLf
+        '    End If
+        'ElseIf lDA <= 0 Then
+        '    lErrMsg &= "- Drainage Area must be greater than zero" & vbCrLf
+        'End If
+
         Dim lNDay As Integer
         If chkMethodBFIStandard.Checked OrElse chkMethodBFIModified.Checked Then
             If Not Integer.TryParse(txtN.Text.Trim(), lNDay) Then
@@ -358,7 +394,7 @@ Public Class frmUSGSBaseflowBatch
             lDrainageArea = CType(aStationList.Item(aSelectedIndex), atcUSGSStations.USGSGWStation).DrainageArea
             If lDrainageArea < 0 Then lDrainageArea = 0.0
         End If
-        txtDrainageArea.Text = lDrainageArea.ToString
+        'txtDrainageArea.Text = lDrainageArea.ToString
 
         If aIsDataDirty Then
             'atcUSGSStations.SaveStations(aStationList, atcUSGSStations.StationInfoFile)
@@ -373,40 +409,25 @@ Public Class frmUSGSBaseflowBatch
         Next
     End Sub
 
-    Private Sub ComputeBaseflow()
-        Dim lArgs As New atcDataAttributes
-        Dim lFormCheckMsg As String = AttributesFromForm(lArgs)
+    Private Sub SetBaseflowSepParm()
+        Dim lFormCheckMsg As String = AttributesFromForm(pBasicAttributes)
         If lFormCheckMsg.Length > 0 Then
             Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
             Exit Sub
+        Else
+            Dim lOperation As String = pBasicAttributes.GetValue("Operation", "")
+            If lOperation = "GroupSetParm" Then
+                Dim lGroup As String = pBasicAttributes.GetValue("Group", "")
+                Logger.MsgCustomOwned("Group Parameters are set for " & lGroup, "USGS Base-Flow Separation", Me, New String() {"OK"})
+            Else
+                Logger.MsgCustomOwned("Group Parameters are set for Global Defaults", "USGS Base-Flow Separation", Me, New String() {"OK"})
+            End If
         End If
-        ClearAttributes()
-        modBaseflowUtil.ComputeBaseflow(lArgs, True)
-        'pMethodLastDone = lArgs.GetValue("Method")
-        MethodsLastDone = lArgs.GetValue(BFInputNames.BFMethods)
-        pDALastUsed = lArgs.GetValue(BFInputNames.DrainageArea) '"Drainage Area")
-        Dim lBFIchosen As Boolean = False
-        If MethodsLastDone.Contains(BFMethods.BFIStandard) Then
-            lBFIchosen = True
-            pBFIFrac = lArgs.GetValue(BFInputNames.BFITurnPtFrac) '"BFIFrac")
-        End If
-        If MethodsLastDone.Contains(BFMethods.BFIModified) Then
-            lBFIchosen = True
-            pBFIK1Day = lArgs.GetValue(BFInputNames.BFIRecessConst) '"BFIK1Day")
-        End If
-        If lBFIchosen Then
-            pBFINDay = lArgs.GetValue(BFInputNames.BFINDayScreen) '"BFINDay")
-            pBFIUseSymbol = lArgs.GetValue(BFInputNames.BFIUseSymbol) '"BFIUseSymbol")
-        End If
-        pDidBFSeparation = True
+        RaiseEvent ParametersSet(pBasicAttributes)
     End Sub
 
     Private Sub mnuOutputASCII_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        If Not pDidBFSeparation Then
-            ComputeBaseflow()
-            If Not pDidBFSeparation Then Exit Sub
-        End If
-
+        SetBaseflowSepParm()
         Dim lSpecification As String = ""
         If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 Then
             Exit Sub
@@ -424,19 +445,16 @@ Public Class frmUSGSBaseflowBatch
             SaveSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", OutputFilenameRoot)
         End If
         Logger.Dbg("Output ASCII")
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodPART", chkMethodPART.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", chkMethodHySEPFixed.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", chkMethodHySEPLocMin.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIStandard", chkMethodBFIStandard.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", chkMethodBFIModified.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
+        SaveSetting("atcUSGSBaseflowBatch", "Defaults", "MethodPART", chkMethodPART.Checked)
+        SaveSetting("atcUSGSBaseflowBatch", "Defaults", "MethodHySEPFixed", chkMethodHySEPFixed.Checked)
+        SaveSetting("atcUSGSBaseflowBatch", "Defaults", "MethodHySEPLocMin", chkMethodHySEPLocMin.Checked)
+        SaveSetting("atcUSGSBaseflowBatch", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
+        SaveSetting("atcUSGSBaseflowBatch", "Defaults", "MethodBFIStandard", chkMethodBFIStandard.Checked)
+        SaveSetting("atcUSGSBaseflowBatch", "Defaults", "MethodBFIModified", chkMethodBFIModified.Checked)
+        SaveSetting("atcUSGSBaseflowBatch", "Defaults", "BFISymbols", chkBFISymbols.Checked)
 
         OutputDir = txtOutputDir.Text.Trim()
-        ASCIICommon(pDataGroup(0))
         'Dim lRDBWriter As New atcTimeseriesRDB()
-
-        Logger.MsgCustomOwned("Baseflow output completed.", "USGS Base-Flow Separation", Me, New String() {"OK"})
     End Sub
 
     Private Sub txtOutputRootName_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtOutputRootName.TextChanged
@@ -446,7 +464,7 @@ Public Class frmUSGSBaseflowBatch
 
     Private Sub mnuGraphTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         If Not pDidBFSeparation Then
-            ComputeBaseflow()
+            SetBaseflowSepParm()
             If Not pDidBFSeparation Then Exit Sub
         End If
 
@@ -689,8 +707,14 @@ Public Class frmUSGSBaseflowBatch
     End Sub
 
     Private Sub txtAny_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
-            Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged, _
+            Handles txtStartDateUser.TextChanged, txtEndDateUser.TextChanged, _
             txtN.TextChanged, txtF.TextChanged, txtK.TextChanged, txtOutputDir.TextChanged, txtOutputRootName.TextChanged
         pDidBFSeparation = False
+    End Sub
+
+    Private Sub btnPlotDur_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlotDur.Click
+        If pDataGroup.Count > 0 Then
+            atcUSGSUtility.atcUSGSScreen.GraphDataDuration(pDataGroup)
+        End If
     End Sub
 End Class
