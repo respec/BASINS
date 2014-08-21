@@ -109,9 +109,8 @@
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
-      <Name>atcUtility</Name>
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Name>atcUtility</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
@@ -151,6 +150,12 @@
     <Compile Include="atcManagedList.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ATCoSelectListSortByProp.Designer.vb">
+      <DependentUpon>ATCoSelectListSortByProp.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ATCoSelectListSortByProp.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="atcSelectList.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -176,6 +181,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="atcManagedList.resx">
       <DependentUpon>atcManagedList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ATCoSelectListSortByProp.resX">
+      <DependentUpon>ATCoSelectListSortByProp.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="atcSelectList.resx">
       <DependentUpon>atcSelectList.vb</DependentUpon>
