@@ -52,24 +52,24 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub treeBFGroups_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles treeBFGroups.MouseUp
-        ' Show menu only if Right Mouse button is clicked
-        If e.Button = Windows.Forms.MouseButtons.Right Then
-            ' Point where mouse is clicked
-            Dim p As System.Drawing.Point = New System.Drawing.Point(e.X, e.Y)
-            ' Go to the node that the user clicked
-            Dim node As TreeNode = treeBFGroups.GetNodeAt(p)
-            If node IsNot Nothing Then
-                'm_OldSelectNode = treeBFGroups.SelectedNode
-                treeBFGroups.SelectedNode = node
-                'If node.Name.StartsWith("BatchGroup_") Then
-                'Else
-                'End If
+        ' Point where mouse is clicked
+        Dim p As System.Drawing.Point = New System.Drawing.Point(e.X, e.Y)
+        ' Go to the node that the user clicked
+        Dim node As TreeNode = treeBFGroups.GetNodeAt(p)
+        If node IsNot Nothing Then
+            treeBFGroups.SelectedNode = node
+            ' Show menu only if Right Mouse button is clicked
+            If e.Button = Windows.Forms.MouseButtons.Right Then
                 cmsNode.Show(treeBFGroups, p)
-                ' Highlight the selected node
-                'treeBFGroups.SelectedNode = m_OldSelectNode
-                'm_OldSelectNode = Nothing
-            Else
-
+            ElseIf e.Button = Windows.Forms.MouseButtons.Left Then
+                Dim lGroupName As String = node.Text
+                If Not lGroupName.StartsWith("BatchGroup") Then
+                    lGroupName = node.Parent.Text
+                End If
+                Dim lArgs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+                If lArgs IsNot Nothing Then
+                    txtParameters.Text = ParametersToText(lArgs)
+                End If
             End If
         End If
     End Sub
@@ -92,21 +92,24 @@ Public Class frmBatchMap
                         If node.Parent.Nodes.Count = 1 Then
                             RemoveBFGroup(node)
                         Else
+                            Dim lGroupName As String = node.Parent.Text
                             Dim lStationID As String = node.Text
                             treeBFGroups.Nodes.Remove(node)
-                            Dim lGroupName As String = node.Parent.Text
+
                             Dim lBFGroupAttribs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
                             If lBFGroupAttribs IsNot Nothing Then
                                 Dim lStationInfo As ArrayList = lBFGroupAttribs.GetValue("StationInfo")
-                                Dim lIndexToRemove As Integer = -99
-                                For Each lStation As String In lStationInfo
-                                    If lStation.Contains(lStationID) Then
-                                        lIndexToRemove = lStationInfo.IndexOf(lStation)
-                                        Exit For
+                                If lStationInfo IsNot Nothing Then
+                                    Dim lIndexToRemove As Integer = -99
+                                    For Each lStation As String In lStationInfo
+                                        If lStation.Contains(lStationID) Then
+                                            lIndexToRemove = lStationInfo.IndexOf(lStation)
+                                            Exit For
+                                        End If
+                                    Next
+                                    If lIndexToRemove >= 0 Then
+                                        lStationInfo.RemoveAt(lIndexToRemove)
                                     End If
-                                Next
-                                If lIndexToRemove >= 0 Then
-                                    lStationInfo.RemoveAt(lIndexToRemove)
                                 End If
                             End If
                         End If
@@ -407,7 +410,15 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnDoBatch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoBatch.Click
-        If Not String.IsNullOrEmpty(pBatchSpecFilefullname) OrElse IO.File.Exists(pBatchSpecFilefullname) Then
+        If pBFInputsGlobal.Count = 0 Then
+            Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
+            Return
+        End If
+        If pBFInputsGroups.Count = 0 Then
+            Logger.Msg("Need to set up batch run groups.", "Batch Map Base-flow Separation")
+            Return
+        End If
+        If Not String.IsNullOrEmpty(pBatchSpecFilefullname) AndAlso IO.File.Exists(pBatchSpecFilefullname) Then
             Dim lfrmBatch As New frmBatch()
             lfrmBatch.BatchSpecFile = pBatchSpecFilefullname
             lfrmBatch.ShowDialog()
@@ -417,6 +428,14 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnSaveSpecs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSaveSpecs.Click
+        If pBFInputsGlobal.Count = 0 Then
+            Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
+            Return
+        End If
+        If pBFInputsGroups.Count = 0 Then
+            Logger.Msg("Need to set up batch run groups.", "Batch Map Base-flow Separation")
+            Return
+        End If
         pBatchSpecFilefullname = IO.Path.Combine(pDataPath, "BatchConfigBase-flowSep_" & SafeFilename(DateTime.Now) & ".txt")
         Dim lSW As IO.StreamWriter = Nothing
         Try
@@ -439,5 +458,48 @@ Public Class frmBatchMap
                 lSW = Nothing
             End If
         End Try
+    End Sub
+
+    Private Sub btnParmForm_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnParmForm.Click
+        Dim lGroupNode As TreeNode = treeBFGroups.SelectedNode
+        If lGroupNode Is Nothing Then Return
+
+        Dim lGroupName As String = lGroupNode.Text
+        If Not lGroupName.StartsWith("BatchGroup") Then
+            lGroupName = lGroupNode.Parent.Text
+            lGroupNode = lGroupNode.Parent
+        End If
+        Dim lArgs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+        If lArgs IsNot Nothing Then
+            lArgs.SetValue("Constituent", "streamflow")
+            Dim lTsGroup As New atcTimeseriesGroup()
+            For Each lStationNode As TreeNode In lGroupNode.Nodes
+                Dim lstationId As String = lStationNode.Text
+
+                Dim lDataLoaded As Boolean = False
+                For Each lDS As atcDataSource In atcDataManager.DataSources
+                    If lDS.Name.ToString.Contains("USGS RDB") Then
+                        For Each lTs As atcTimeseries In lDS.DataSets
+                            If lTs.Attributes.GetValue("Location") = lstationId AndAlso _
+                               lTs.Attributes.GetValue("Constituent").ToString.ToLower = "streamflow" Then
+                                lTsGroup.Add(lTs)
+                                lDataLoaded = True
+                            End If
+                        Next
+                    End If
+                Next
+                If Not lDataLoaded Then
+                    Dim lDataPath As String = GetDataFileFullPath(lstationId)
+                    Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+                    If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                        lTsGroup.Add(lTsGroupTemp(0).Clone)
+                    End If
+                End If
+            Next
+            If lTsGroup.Count > 0 Then
+                pfrmBFParms = New frmUSGSBaseflowBatch()
+                pfrmBFParms.Initialize(lTsGroup, lArgs)
+            End If
+        End If
     End Sub
 End Class

@@ -136,6 +136,7 @@ Partial Class frmBatchMap
         '
         'btnParmForm
         '
+        Me.btnParmForm.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnParmForm.Location = New System.Drawing.Point(6, 160)
         Me.btnParmForm.Name = "btnParmForm"
         Me.btnParmForm.Size = New System.Drawing.Size(75, 23)
@@ -158,6 +159,7 @@ Partial Class frmBatchMap
         '
         'btnDoBatch
         '
+        Me.btnDoBatch.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnDoBatch.Location = New System.Drawing.Point(434, 390)
         Me.btnDoBatch.Name = "btnDoBatch"
         Me.btnDoBatch.Size = New System.Drawing.Size(75, 23)
@@ -167,6 +169,7 @@ Partial Class frmBatchMap
         '
         'btnSaveSpecs
         '
+        Me.btnSaveSpecs.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnSaveSpecs.Location = New System.Drawing.Point(353, 390)
         Me.btnSaveSpecs.Name = "btnSaveSpecs"
         Me.btnSaveSpecs.Size = New System.Drawing.Size(75, 23)

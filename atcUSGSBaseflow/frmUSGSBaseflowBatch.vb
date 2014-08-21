@@ -92,8 +92,8 @@ Public Class frmUSGSBaseflowBatch
             .IncludeSeconds = False
         End With
 
-        pOutputDir = GetSetting("atcUSGSBaseflowBatch", "Defaults", "OutputDir", "")
-        OutputFilenameRoot = GetSetting("atcUSGSBaseflowBatch", "Defaults", "BaseOutputFilename", "")
+        'pOutputDir = GetSetting("atcUSGSBaseflowBatch", "Defaults", "OutputDir", "")
+        'OutputFilenameRoot = GetSetting("atcUSGSBaseflowBatch", "Defaults", "BaseOutputFilename", "")
 
         'atcUSGSStations.StationInfoFile = GetSetting("atcUSGSBaseflow", "Defaults", "Stations", "Station.txt")
 
@@ -121,7 +121,7 @@ Public Class frmUSGSBaseflowBatch
                 End If
                 Dim loc As String = lDataset.Attributes.GetValue("Location", "")
                 Dim lDA As String = lDataset.Attributes.GetValue("Drainage Area", "")
-                If lDA = "" Then
+                If lDA = "" AndAlso lStations IsNot Nothing Then
                     For Each lStation As String In lStations
                         If lStation.Contains(loc) Then
                             Dim larr() As String = lStation.Split(",")
@@ -181,6 +181,12 @@ Public Class frmUSGSBaseflowBatch
             txtEndDateUser.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
         End If
 
+        chkMethodPART.Checked = False
+        chkMethodHySEPFixed.Checked = False
+        chkMethodHySEPLocMin.Checked = False
+        chkMethodHySEPSlide.Checked = False
+        chkMethodBFIStandard.Checked = False
+        chkMethodBFIModified.Checked = False
         Dim lMethods As ArrayList = pBasicAttributes.GetValue(BFInputNames.BFMethods, Nothing)
         If lMethods IsNot Nothing Then
             For Each lMethod As BFMethods In lMethods
@@ -712,25 +718,24 @@ Public Class frmUSGSBaseflowBatch
     End Sub
 
     Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-        Opened = True
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodPART", "False") = "True" Then
-            chkMethodPART.Checked = True
-        End If
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", "False") = "True" Then
-            chkMethodHySEPFixed.Checked = True
-        End If
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", "False") = "True" Then
-            chkMethodHySEPLocMin.Checked = True
-        End If
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", "False") = "True" Then
-            chkMethodHySEPSlide.Checked = True
-        End If
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFIStandard", "False") = "True" Then
-            chkMethodBFIStandard.Checked = True
-        End If
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", "False") = "True" Then
-            chkMethodBFIModified.Checked = True
-        End If
+        'If GetSetting("atcUSGSBaseflow", "Defaults", "MethodPART", "False") = "True" Then
+        '    chkMethodPART.Checked = True
+        'End If
+        'If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", "False") = "True" Then
+        '    chkMethodHySEPFixed.Checked = True
+        'End If
+        'If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", "False") = "True" Then
+        '    chkMethodHySEPLocMin.Checked = True
+        'End If
+        'If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", "False") = "True" Then
+        '    chkMethodHySEPSlide.Checked = True
+        'End If
+        'If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFIStandard", "False") = "True" Then
+        '    chkMethodBFIStandard.Checked = True
+        'End If
+        'If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", "False") = "True" Then
+        '    chkMethodBFIModified.Checked = True
+        'End If
         'If GetSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", "False") = "True" Then
         '    chkBFISymbols.Checked = True
         'End If
@@ -739,6 +744,7 @@ Public Class frmUSGSBaseflowBatch
         Else
             gbBFI.Enabled = False
         End If
+        Opened = True
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
@@ -764,9 +770,10 @@ Public Class frmUSGSBaseflowBatch
                                                                                                              chkMethodPART.CheckedChanged, _
                                                                                                              chkMethodBFIStandard.CheckedChanged, _
                                                                                                              chkMethodBFIModified.CheckedChanged
-        pDidBFSeparation = False
-        pMethods.Clear()
         If Opened Then
+            pDidBFSeparation = False
+            pMethods.Clear()
+
             If chkMethodPART.Checked Then pMethods.Add(BFMethods.PART)
             If chkMethodHySEPFixed.Checked Then pMethods.Add(BFMethods.HySEPFixed)
             If chkMethodHySEPLocMin.Checked Then pMethods.Add(BFMethods.HySEPLocMin)

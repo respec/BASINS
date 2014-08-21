@@ -36,11 +36,11 @@ Public Class clsUSGSBaseflowPlugin
             Return lfrmBatch
         ElseIf lChoice = "Batch Map" Then
             Dim lHandled As Boolean = False
-            If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup()
-            lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lTimeseriesGroup)
-            If lTimeseriesGroup.Count > 1 Then
-                atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTimeseriesGroup)
-            End If
+            'If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup()
+            'lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lTimeseriesGroup)
+            'If lTimeseriesGroup.Count > 1 Then
+            '    atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTimeseriesGroup)
+            'End If
             Dim lMapLayer As MapWindow.Interfaces.Layer = Nothing
             For Each lMapLayer In pMapWin.Layers
                 If lMapLayer.Name.ToLower.Contains("nwis daily discharge stations") Then
