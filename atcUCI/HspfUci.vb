@@ -116,10 +116,13 @@ Public Class HspfUci
     End Property
 
     Private pSpecialActionBlk As HspfSpecialActionBlk
-    Public ReadOnly Property SpecialActionBlk() As HspfSpecialActionBlk
+    Public Property SpecialActionBlk() As HspfSpecialActionBlk
         Get
             SpecialActionBlk = pSpecialActionBlk
         End Get
+        Set(ByVal Value As HspfSpecialActionBlk)
+            pSpecialActionBlk = Value
+        End Set
     End Property
 
     Private pCategoryBlk As HspfCategoryBlk
