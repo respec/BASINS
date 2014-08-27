@@ -23,12 +23,12 @@ Public Class clsATCscriptExpression
     'Be sure to synchronize with Public TokenString As String() in modATCscript
     Public Enum ATCsToken
         tok_Unknown = 0
-        'tok_Abs
+        tok_Abs
         tok_And
         tok_ATCScript
         tok_Attribute
         tok_ColumnFormat
-        'tok_ColumnValue
+        tok_ColumnValue
         tok_Comment
         tok_Dataset
         tok_Date
@@ -41,6 +41,7 @@ Public Class clsATCscriptExpression
         tok_Increment
         tok_Instr
         tok_IsNumeric
+        tok_Len
         tok_LineEnd
         tok_Literal
         tok_MathAdd
@@ -51,6 +52,7 @@ Public Class clsATCscriptExpression
         tok_Mid
         tok_NextLine
         tok_Not
+        tok_NumColumns
         tok_Or
         tok_Save
         tok_Set
@@ -136,7 +138,9 @@ Public Class clsATCscriptExpression
         While index < ATCsToken.tok_Last And cmpstr <> LCase(TokenString(index))
             index = index + 1
         End While
-        If index = ATCsToken.tok_Last Then index = ATCsToken.tok_Unknown
+        If index = ATCsToken.tok_Last Then
+            index = ATCsToken.tok_Unknown
+        End If
         TokenFromString = index
     End Function
 
@@ -198,15 +202,14 @@ DefaultLoop:
 
             Case Else
                 retval = indent & "(" & TokenString(MyToken)
-                If Len(MyString) > 0 Then retval = retval & " " & MyString
+                If Len(MyString) > 0 Then retval &= " " & MyString
                 GoTo DefaultLoop
         End Select
         Return retval
     End Function
 
-    'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-    Private Sub AddSuffixNoDoubles(ByRef str_Renamed As String, ByRef suffix As String)
-        If Right(str_Renamed, Len(suffix)) <> suffix Then str_Renamed = str_Renamed & suffix
+    Private Sub AddSuffixNoDoubles(ByRef aString As String, ByRef aSuffix As String)
+        If Not aString.EndsWith(aSuffix) Then aString &= aSuffix
     End Sub
 
     'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
@@ -237,7 +240,9 @@ ExitFun:
                 NextPos = FirstCharPos(ParsePos, buf, "() " & vbTab & vbCr & vbLf)
                 Token = TokenFromString(Mid(buf, ParsePos, NextPos - ParsePos))
                 'Remember names of unknown tokens
-                If Token = 0 Then MyString = Mid(buf, ParsePos, NextPos - ParsePos)
+                If Token = ATCsToken.tok_Unknown Then
+                    MyString = Mid(buf, ParsePos, NextPos - ParsePos)
+                End If
                 ParsePos = SkipChars(NextPos, buf, " " & vbTab & vbCr & vbLf)
                 While ParsePos < LenBuf
                     Select Case Mid(buf, ParsePos, 1)
@@ -302,41 +307,38 @@ SkipString:
         Dim tmpstr As String
         Dim endPos, StartPos, curCol As Integer
 
-        If MyLong > 0 Then
+        If IsNumeric(colNameNum) Then
+            colNum = CInt(colNameNum)
+        ElseIf MyLong > 0 Then
             colNum = MyLong
         Else
-            If IsNumeric(colNameNum) Then
-                colNum = CInt(colNameNum)
-                MyLong = colNum
-            Else
+            colNum = 1
+            tmpstr = colNameNum
+            Do Until colNum > NamedColumns
+                If ColDefs(colNum).Name = tmpstr Then Exit Do
+                colNum = colNum + 1
+            Loop
+
+            If colNum > NamedColumns Then 'didn't find column name on first try
                 colNum = 1
-                tmpstr = colNameNum
-                Do Until colNum > NamedColumns
-                    If ColDefs(colNum).Name = tmpstr Then Exit Do
+                tmpstr = LCase(colNameNum)
+                Do Until colNum > NamedColumns 'try again ignoring capitalization
+                    If LCase(ColDefs(colNum).Name) = tmpstr Then Exit Do
                     colNum = colNum + 1
                 Loop
-
-                If colNum > NamedColumns Then 'didn't find column name on first try
-                    colNum = 1
-                    tmpstr = LCase(colNameNum)
-                    Do Until colNum > NamedColumns 'try again ignoring capitalization
-                        If LCase(ColDefs(colNum).Name) = tmpstr Then Exit Do
-                        colNum = colNum + 1
-                    Loop
-                    If colNum <= NamedColumns Then
-                        If Not WarnedAboutCapitalization Then
-                            Logger.Dbg("Warning - wrong capitalization '" & colNameNum & "' vs '" & ColDefs(colNum).Name & "'")
-                            WarnedAboutCapitalization = True
-                        End If
+                If colNum <= NamedColumns Then
+                    If Not WarnedAboutCapitalization Then
+                        Logger.Dbg("Warning - wrong capitalization '" & colNameNum & "' vs '" & ColDefs(colNum).Name & "'")
+                        WarnedAboutCapitalization = True
                     End If
                 End If
-
-                If colNum > NamedColumns Then 'And FixedColumns
-                    colNum = -1 'FindColumnValue = "Error - column '" & colNameNum & "' not defined"
-                End If
-
-                MyLong = colNum
             End If
+
+            If colNum > NamedColumns Then
+                colNum = -1 'FindColumnValue = "Error - column '" & colNameNum & "' not defined"
+            End If
+
+            MyLong = colNum
         End If
 
         If colNum > 0 Then
@@ -367,8 +369,8 @@ SkipString:
                     Return Mid(CurrentLine, StartPos, ColDefs(colNum).ColWidth)
                 End If
             Else 'Delimited columns
-                If colNum >= RepeatStartCol Then
-                    If CurrentRepeat > 1 Then colNum = colNum + (CurrentRepeat - 1) * (NamedColumns - RepeatStartCol + 1)
+                If CurrentRepeat > 1 AndAlso colNum >= RepeatStartCol Then
+                    colNum = colNum + (CurrentRepeat - 1) * (NamedColumns - RepeatStartCol + 1)
                 End If
                 StartPos = 1
                 curCol = 1
@@ -399,47 +401,22 @@ SkipString:
     End Function
 
     Private Function SetColumnFormat() As String
-        Dim rule As String
-        Dim SubExpIndex, ColIndex, SubExpMax As Integer
+        SetDelimiter(MySubExpressions.Item(0).Printable)
+
         Dim tmpstr As String
-        Dim StartCol As Integer
-        'Dim dollarPos, caretPos As Integer
         Dim colonPos As Integer
         ReDim ColDefs(100)
         RepeatStartCol = 0
         '  RepeatEndCol = 0
-        ColIndex = 1 'ZCHECK
-        rule = MySubExpressions.Item(0).Printable
+        Dim ColIndex As Integer = 1 'ZCHECK
 
         NamedColumns = 0
-        FixedColumns = False
-        ColumnDelimiter = ""
-        If IsNumeric(rule) Then
-            ColumnDelimiter = Chr(CShort(rule))
-        Else
-            Dim lrule As String = rule.Trim.ToLower
-            If lrule = "fixed" Then
-                FixedColumns = True
-            Else
-                If InStr(lrule, "tab") Then ColumnDelimiter &= vbTab
-                If InStr(lrule, "space") Then ColumnDelimiter &= " "
-                For StartCol = 33 To 126
-                    Select Case StartCol
-                        Case 48 : StartCol = 58
-                        Case 65 : StartCol = 91
-                        Case 97 : StartCol = 123
-                    End Select
-                    If InStr(lrule, Chr(StartCol)) > 0 Then ColumnDelimiter &= Chr(StartCol)
-                Next StartCol
-                NumColumnDelimiters = Len(ColumnDelimiter)
-            End If
-        End If
 
-        SubExpIndex = 1 'CHANGE: used to be 2
-        SubExpMax = MySubExpressions.Count()
-        While SubExpIndex <= SubExpMax - 1
+        Dim SubExpIndex As Integer = 1
+        Dim SubExpMax As Integer = MySubExpressions.Count() - 1
+        While SubExpIndex <= SubExpMax
             If ColIndex > UBound(ColDefs) Then ReDim Preserve ColDefs(ColIndex + 100)
-            rule = MySubExpressions.Item(SubExpIndex).Printable
+            Dim rule As String = MySubExpressions.Item(SubExpIndex).Printable
             If FixedColumns Then ' start-end:name or start+len:name
 ParseFixedDef:
                 ColDefs(ColIndex).StartCol = ReadIntLeaveRest(rule)
@@ -469,7 +446,7 @@ ParseFixedDef:
                     End If
                 End If
                 If LCase(rule) = "repeating" Then
-                    If RepeatStartCol = 0 Or RepeatStartCol > ColIndex Then RepeatStartCol = ColIndex
+                    If RepeatStartCol = 0 OrElse RepeatStartCol > ColIndex Then RepeatStartCol = ColIndex
                     '        If RepeatEndCol = 0 Or RepeatEndCol < ColIndex Then RepeatEndCol = ColIndex
                 Else
                     ColDefs(ColIndex).Name = rule
@@ -487,43 +464,99 @@ ParseFixedDef:
         End If
     End Function
 
-    Private Function ParseDate() As String
-        Dim Min, da, yr, cnt, mo, hr, sec As Integer
-        cnt = MySubExpressions.Count()
-        If cnt < 1 Then
-            MsgBox("No values specified for date" & vbCr & Printable())
-        Else
-            Dim lYearString As String = MySubExpressions.Item(0).Evaluate
-            If IsNumeric(lYearString) Then
-                yr = CInt(lYearString)
-            Else
-                Return ""
+    Private Function GetNumColumnsThisLine() As Integer
+        Dim lColNum As Integer = 1
+        If FixedColumns Then
+            lColNum = ColDefs.GetUpperBound(0)
+            If LenCurrentLine >= ColDefs(lColNum).StartCol Then
+                'We have all the defined columns, check to see if we have repeats to count
+                If RepeatStartCol > 0 Then
+                    'Dim LenRemaining As Integer = LenCurrentLine - ColDefs(lc
+                    'TODO: compute number of columns with repeat
+                    Throw New ApplicationException("GetNumColumnsThisLine not yet implemented for fixed columns with repeats")
+                End If
+
+            Else 'Don't have last column, see which one we do have
+                While lColNum > 1
+                    If ColDefs(lColNum).StartCol < LenCurrentLine Then
+                        Exit While
+                    End If
+                    lColNum -= 1
+                End While
             End If
+
+        Else 'Delimited columns
+            Dim lDelimPos As Integer = FirstDelimPos(1)
+            While lDelimPos > 0
+                lColNum += 1
+                lDelimPos = FirstDelimPos(lDelimPos + 1)
+            End While
         End If
 
-        mo = 12
-        hr = 24
-        Min = 0
-        sec = 0
+        Return lColNum
+    End Function
 
-        If cnt >= 2 Then
-            mo = MySubExpressions.Item(1).Evaluate
-            If cnt < 3 Then
-                da = DayMon(yr, mo)
+    Private Function ParseDate() As String
+        Static WarnedAboutDateParse As Boolean
+
+        Dim cnt As Integer = MySubExpressions.Count()
+        If cnt < 1 Then
+            Logger.Msg("No date specified" & vbCr & Printable())
+            Return ""
+        Else
+            Dim lDay, lYear As Integer
+            Dim lMonth As Integer = 12
+            Dim lHour As Integer = 24
+            Dim lMinute As Integer = 0
+            Dim lSecond As Integer = 0
+
+            Dim lFirstArg As String = MySubExpressions.Item(0).Evaluate
+
+            If cnt = 1 Then
+                Dim lDate As Date
+                If Date.TryParse(lFirstArg, lDate) Then
+                    With lDate
+                        lYear = .Year
+                        lMonth = .Month
+                        lDay = .Day
+                        lHour = .Hour
+                        lMinute = .Minute
+                        lSecond = .Second
+                    End With
+                    GoTo ReturnDate
+                End If
+            End If
+
+            If IsNumeric(lFirstArg) Then
+                lYear = CInt(lFirstArg)
             Else
-                da = MySubExpressions.Item(2).Evaluate
-                If cnt >= 4 Then
-                    hr = MySubExpressions.Item(3).Evaluate
-                    If cnt < 5 Then
-                        Min = 60
-                    Else
-                        Min = MySubExpressions.Item(4).Evaluate
-                        If cnt >= 6 Then sec = MySubExpressions.Item(5).Evaluate
+                If Not WarnedAboutDateParse Then
+                    WarnedAboutDateParse = True
+                    Logger.Msg("Could not parse first argument of Date as year or as full date: '" & lFirstArg & "'" & vbCr & Printable())
+                    Return ""
+                End If
+            End If
+
+            If cnt >= 2 Then
+                lMonth = MySubExpressions.Item(1).Evaluate
+                If cnt < 3 Then
+                    lDay = DayMon(lYear, lMonth)
+                Else
+                    lDay = MySubExpressions.Item(2).Evaluate
+                    If cnt >= 4 Then
+                        lHour = MySubExpressions.Item(3).Evaluate
+                        If cnt < 5 Then
+                            lMinute = 60
+                        Else
+                            lMinute = MySubExpressions.Item(4).Evaluate
+                            If cnt >= 6 Then lSecond = MySubExpressions.Item(5).Evaluate
+                        End If
                     End If
                 End If
             End If
+ReturnDate:
+            Return TokenString(MyToken) & " " & ScriptSetDate(Jday(lYear, lMonth, lDay, lHour, lMinute, lSecond))
         End If
-        ParseDate = TokenString(MyToken) & " " & ScriptSetDate(Jday(yr, mo, da, hr, Min, sec))
     End Function
 
     Private pAbortResult As String = "Abort"
@@ -541,20 +574,18 @@ ParseFixedDef:
         Dim ForMax As Integer
         Dim num1 As Object = Nothing
         Dim num2 As Object = Nothing
-        'Dim num1 As Single, num2 As Single
         retval = ""
         If DebuggingScript Then DebugScriptForm.EvalExpression(Me)
         'Debug.Print "Evaluate: " & TokenString(MyToken);
         'If MyString = "" Then Debug.Print Else Debug.Print " MyString = " & MyString
         Select Case MyToken
-            '    Case tok_Abs:
-            '      tmpval = MySubExpressions(0).Evaluate
-            '      If IsNumeric(tmpval) Then
-            '        num1 = CSng(tmpval)
-            '        retval = Abs(num1)
-            '      Else
-            '        retval = "0"
-            '      End If
+            Case ATCsToken.tok_Abs
+                tmpval = MySubExpressions(0).Evaluate
+                If IsNumeric(tmpval) Then
+                    retval = CStr(Math.Abs(CDbl(tmpval)))
+                Else
+                    retval = "0"
+                End If
             Case ATCsToken.tok_And
                 retval = "1"
                 ForMax = MySubExpressions.Count() - 1
@@ -577,11 +608,15 @@ ParseFixedDef:
                     If AbortScript Then Return pAbortResult
                 Next
             Case ATCsToken.tok_Attribute
-                retval = MySubExpressions.Item(1).Evaluate 'CHANGE: used to be 2
-                ScriptSetAttribute(MySubExpressions.Item(0).Printable, retval)
+                tmpval = MySubExpressions.Item(0).Printable
+                If tmpval.ToLower = "attname" OrElse tmpval.StartsWith("(") Then
+                    tmpval = MySubExpressions.Item(0).Evaluate
+                End If
+                retval = MySubExpressions.Item(1).Evaluate
+                ScriptSetAttribute(tmpval, retval)
             Case ATCsToken.tok_ColumnFormat : retval = SetColumnFormat()
+            Case ATCsToken.tok_ColumnValue : retval = FindColumnValue(MySubExpressions.Item(0).Evaluate)
             Case ATCsToken.tok_Comment : retval = ""
-                'Case tok_ColumnValue:   retval = FindColumnValue
             Case ATCsToken.tok_Dataset
                 retval = TokenString(MyToken)
                 ForMax = MySubExpressions.Count() - 1
@@ -720,6 +755,8 @@ ParseFixedDef:
                 End If
             Case ATCsToken.tok_IsNumeric
                 If IsNumeric(MySubExpressions.Item(0).Evaluate) Then retval = "1" Else retval = "0"
+            Case ATCsToken.tok_Len
+                Return MySubExpressions.Item(0).Evaluate.Length
             Case ATCsToken.tok_LineEnd
                 InputEOL = vbCr
                 tmpval = UCase(MySubExpressions.Item(0).Printable)
@@ -782,9 +819,11 @@ ParseFixedDef:
                     ScriptNextLine()
                 Next
                 retval = CurrentLine
+            Case ATCsToken.tok_NumColumns
+                retval = GetNumColumnsThisLine()
             Case ATCsToken.tok_Save
                 modATCscript.SaveIn(MySubExpressions.Item(0).Evaluate)
-            Case ATCsToken.tok_Set 'MySubExpressions(1) is variable name, (2) is new value
+            Case ATCsToken.tok_Set 'MySubExpressions(0) is variable name, (1) is new value
                 If MySubExpressions.Item(0).Token = ATCsToken.tok_Variable Then
                     tmpval = MySubExpressions.Item(0).Printable
                 Else
@@ -811,8 +850,12 @@ ParseFixedDef:
                 ScriptUnsetVariable(tmpval)
             Case ATCsToken.tok_Value
                 tmpval = MySubExpressions.Item(0).Evaluate
-                If IsNumeric(tmpval) Then
-                    ScriptSetValue(CSng(tmpval))
+                Dim lDoubleVal As Double
+                'If tmpval = MissingValueString Then
+                '    ScriptSetValue(pNaN)
+                'Else
+                If Double.TryParse(tmpval, lDoubleVal) Then
+                    ScriptSetValue(lDoubleVal)
                 ElseIf Len(tmpval) = 0 Then
                     ScriptSetValue(FillMissing)
                 Else
@@ -888,15 +931,23 @@ ParseFixedDef:
         End If
     End Sub
 
-
+    ''' <summary>
+    ''' Return the value of the variable named by MyString
+    ''' Special cases for "repeat", "eof", "eol"
+    ''' Of no value exists, then assume intent was a string constant instead of a variable name and return MyString.
+    ''' </summary>
     Private Function GetVariable() As String
-        Dim retval As String
-        retval = MyString 'Return variable name if there is no value - this may be confusing
+        Dim retval As String = MyString
         On Error Resume Next
         Select Case LCase(MyString)
             Case "repeat" : retval = CStr(CurrentRepeat)
             Case "eof" : If ScriptEndOfData() Then retval = "1" Else retval = "0"
-            Case "eol" : If ColDefs(0).StartCol + CurrentRepeat * ColDefs(0).ColWidth >= LenCurrentLine Then retval = "1" Else retval = "0"
+            Case "eol"
+                If FixedColumns Then
+                    If ColDefs(0).StartCol + CurrentRepeat * ColDefs(0).ColWidth >= LenCurrentLine Then retval = "1" Else retval = "0"
+                Else
+                    'TODO: implement for delimited
+                End If
             Case Else
                 Dim lScriptStateIndex As Integer = ScriptState.IndexFromKey(MyString)
                 If lScriptStateIndex > -1 Then
