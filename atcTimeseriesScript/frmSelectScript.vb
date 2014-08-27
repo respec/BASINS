@@ -177,7 +177,7 @@ SetProperties:
             .FixedRows = 1
         End With
         agdScripts.Initialize(lSource)
-        agdScripts.SizeColumnToContents(0)
+        agdScripts.SizeAllColumnsToContents(agdScripts.Width)
         agdScripts.ColumnWidth(1) = agdScripts.ClientSize.Width - agdScripts.ColumnWidth(0) - 15
         If CanReadRow > 0 Then
             SetSelectedRow(CanReadRow)

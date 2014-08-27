@@ -114,7 +114,7 @@ Friend Class frmInputWizard
     End Sub
 
     'Resize all controls on the form
-    Sub SizeControls() 'ByRef SashTop As Single)
+    Sub SizeControls()
         Dim SampleHeight As Integer
         Dim EachSampleHeight As Integer
         Dim BottomHeight As Integer
@@ -403,48 +403,21 @@ Friend Class frmInputWizard
         agdDataMapping.SizeAllColumnsToContents(agdDataMapping.Width, False)
     End Sub
 
-    Private Sub SetColumnFormatFromScript(ByRef scr As clsATCscriptExpression)
-        Dim SubExpIndex, ColIndex, SubExpMax As Integer
-        Dim ColName, tmpstr, ColCol As String
-        Dim StartCol, ColWidth As Integer
-        Dim colonPos, r As Integer
-        ColIndex = 1
+    Private Sub SetColumnFormatFromScript(ByRef scr As clsATCscriptExpression) 
+        Dim tmpstr As String
         InitDataMapping()
 
-        Dim rule As String = scr.SubExpression(0).Printable.Trim("""")
-        FixedColumns = False
-        ColumnDelimiter = ""
-        If IsNumeric(rule) Then
-            ColumnDelimiter = Chr(CShort(rule))
-        Else
-            Dim lrule As String = Trim(LCase(rule))
-            If lrule = "fixed" Then
-                FixedColumns = True
-            Else
-                If InStr(lrule, "tab") Then ColumnDelimiter &= vbTab
-                If InStr(lrule, "space") Then ColumnDelimiter &= " "
-                For StartCol = 33 To 126
-                    Select Case StartCol
-                        Case 48 : StartCol = 58
-                        Case 65 : StartCol = 91
-                        Case 97 : StartCol = 123
-                    End Select
-                    If InStr(lrule, Chr(StartCol)) > 0 Then
-                        ColumnDelimiter &= Chr(StartCol)
-                    End If
-                Next StartCol
-                NumColumnDelimiters = Len(ColumnDelimiter)
-            End If
-        End If
+        SetDelimiter(scr.SubExpression(0).Printable.Trim(""""))
 
-        SubExpMax = scr.SubExpressionCount - 1
-        SubExpIndex = 1
+        Dim SubExpMax As Integer = scr.SubExpressionCount - 1
+        Dim SubExpIndex As Integer = 1
         While SubExpIndex <= SubExpMax
-            rule = scr.SubExpression(SubExpIndex).Printable
-            ColCol = ""
+            Dim rule As String = scr.SubExpression(SubExpIndex).Printable
+            Dim ColCol As String = ""
             If FixedColumns Then ' start-end:name or start+len:name
 ParseFixedDef:
-                StartCol = ReadIntLeaveRest(rule)
+                Dim StartCol As Integer = ReadIntLeaveRest(rule)
+                Dim ColWidth As Integer
                 tmpstr = rule.Substring(0, 1)
                 If tmpstr = ":" Then
                     ColWidth = 1
@@ -460,7 +433,7 @@ ParseFixedDef:
                 End If
                 rule = Mid(rule, 2)
             Else 'delimited definition - expect colNum:name or name
-                colonPos = InStr(rule, ":")
+                Dim colonPos As Integer = InStr(rule, ":")
                 If colonPos > 0 Then
                     tmpstr = rule.Substring(0, colonPos - 1)
                     If IsNumeric(tmpstr) Then
@@ -469,8 +442,8 @@ ParseFixedDef:
                     End If
                 End If
             End If
-            ColName = rule
-            r = RowNamed(ColName)
+            Dim ColName As String = rule
+            Dim r As Integer = RowNamed(ColName)
             With agdDataMapping
                 .Source.CellValue(r, ColMappingName) = ColName
                 .Source.CellValue(r, ColMappingCol) = ColCol
@@ -487,7 +460,7 @@ ParseFixedDef:
         ElseIf ColumnDelimiter = vbTab Then
             optDelimiterTab.Checked = True
         Else
-            txtDelimiter.Text = ColumnDelimiter
+            txtDelimiter.Text = GetDelimiterRule()
             optDelimiterChar.Checked = True
         End If
         'agdDataMapping.ColsSizeByContents() 
@@ -747,14 +720,7 @@ ParseFixedDef:
         If FixedColumns Then
             ScriptBuilder.Append("Fixed")
         Else 'delimited
-            For ParsePos = 0 To ColumnDelimiter.Length - 1
-                tmpstr = ColumnDelimiter.Substring(ParsePos, 1)
-                Select Case tmpstr
-                    Case vbTab : ScriptBuilder.Append("tab")
-                    Case " " : ScriptBuilder.Append("space")
-                    Case Else : ScriptBuilder.Append(tmpstr)
-                End Select
-            Next
+            ScriptBuilder.Append(GetDelimiterRule())
         End If
         If optHeaderStartsWith.Checked Then 'Starts With
             ScriptBuilder.Append(PrintEOL & Space(indent) & "1")
@@ -1422,56 +1388,42 @@ ParseFixedDef:
     Private Sub txtRuler1_MouseDown(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles txtRuler1.MouseDown
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
-        'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
-        'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
         If Button = 1 Then txtSampleAnyChange(-1)
     End Sub
 
     Private Sub txtRuler1_MouseMove(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles txtRuler1.MouseMove
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
-        'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
-        'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
         If Button = 1 Then txtSampleAnyChange(-1)
     End Sub
 
     Private Sub txtRuler1_MouseUp(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles txtRuler1.MouseUp
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
-        'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
-        'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
         If Button = 1 Then txtSampleAnyChange(-1)
     End Sub
 
     Private Sub txtRuler2_MouseDown(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles txtRuler2.MouseDown
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
-        'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
-        'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
         If Button = 1 Then txtSampleAnyChange(-2)
     End Sub
 
     Private Sub txtRuler2_MouseMove(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles txtRuler2.MouseMove
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
-        'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
-        'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
         If Button = 1 Then txtSampleAnyChange(-2)
     End Sub
 
     Private Sub txtRuler2_MouseUp(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles txtRuler2.MouseUp
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
-        'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
-        'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
         If Button = 1 Then txtSampleAnyChange(-2)
     End Sub
 
     Private Sub txtSample_MouseDown(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles _txtSample_0.MouseDown
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
-        'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
-        'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
         Dim index As Short = txtSample.IndexOf(eventSender)
         If Button = 1 Then txtSampleAnyChange(index)
     End Sub
@@ -1479,8 +1431,6 @@ ParseFixedDef:
     Private Sub txtSample_MouseMove(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles _txtSample_0.MouseMove
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
-        'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
-        'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
         Dim index As Short = txtSample.IndexOf(eventSender)
         If Button = 1 Then txtSampleAnyChange(index)
     End Sub
@@ -1488,8 +1438,6 @@ ParseFixedDef:
     Private Sub txtSample_MouseUp(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles _txtSample_0.MouseUp
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
-        'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
-        'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
         Dim index As Short = txtSample.IndexOf(eventSender)
         If Button = 1 Then txtSampleAnyChange(index)
     End Sub
@@ -1704,8 +1652,8 @@ ParseFixedDef:
     ''' <summary>Responds to any change in the "txtDelimiter" text box</summary>
     Private Sub txtDelimiter_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtDelimiter.TextChanged
         optDelimiterChar.Checked = True
-        ColumnDelimiter = txtDelimiter.Text
-        If fraColSample.Visible Then PopulateGridSample()
+        SetDelimiter(txtDelimiter.Text)
+        If fraColSample.Visible Then PopulateSample()
     End Sub
 
     ' Subroutine ===============================================

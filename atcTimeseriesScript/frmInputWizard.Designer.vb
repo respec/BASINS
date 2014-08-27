@@ -62,54 +62,54 @@
     'It can be modified using the Windows Form Designer.
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmInputWizard))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.txtHeaderLines = New System.Windows.Forms.TextBox
-        Me.chkSkipHeader = New System.Windows.Forms.CheckBox
-        Me.txtHeaderStart = New System.Windows.Forms.TextBox
-        Me.txtLineLen = New System.Windows.Forms.TextBox
-        Me.txtLineEndChar = New System.Windows.Forms.TextBox
-        Me.txtDelimiter = New System.Windows.Forms.TextBox
-        Me.txtDataFile = New System.Windows.Forms.TextBox
-        Me.cmdSaveScript = New System.Windows.Forms.Button
-        Me.agdDataMapping = New atcControls.atcGrid
-        Me.txtScriptDesc = New System.Windows.Forms.TextBox
-        Me.fraHeader = New System.Windows.Forms.GroupBox
-        Me.optHeaderLines = New System.Windows.Forms.RadioButton
-        Me.optHeaderStartsWith = New System.Windows.Forms.RadioButton
-        Me.optHeaderNone = New System.Windows.Forms.RadioButton
-        Me.fraLineEnd = New System.Windows.Forms.GroupBox
-        Me.optLineEndCRLF = New System.Windows.Forms.RadioButton
-        Me.optLineEndASCII = New System.Windows.Forms.RadioButton
-        Me.optLineEndLF = New System.Windows.Forms.RadioButton
-        Me.optLineEndLength = New System.Windows.Forms.RadioButton
-        Me.fraColumns = New System.Windows.Forms.GroupBox
-        Me.optDelimiterChar = New System.Windows.Forms.RadioButton
-        Me.optDelimiterTab = New System.Windows.Forms.RadioButton
-        Me.optDelimiterSpace = New System.Windows.Forms.RadioButton
-        Me.optDelimiterNone = New System.Windows.Forms.RadioButton
-        Me.cmdBrowseScript = New System.Windows.Forms.Button
-        Me.txtScriptFile = New System.Windows.Forms.TextBox
-        Me.cmdBrowseData = New System.Windows.Forms.Button
-        Me.lblScriptDesc = New System.Windows.Forms.Label
-        Me.lblDataDescFile = New System.Windows.Forms.Label
-        Me.lblDataFile = New System.Windows.Forms.Label
-        Me.cmdCancel = New System.Windows.Forms.Button
-        Me.cmdReadData = New System.Windows.Forms.Button
-        Me.fraTextSample = New System.Windows.Forms.Panel
-        Me.VScrollSample = New System.Windows.Forms.VScrollBar
-        Me.HScrollSample = New System.Windows.Forms.HScrollBar
-        Me.txtRuler2 = New System.Windows.Forms.TextBox
-        Me._txtSample_0 = New System.Windows.Forms.TextBox
-        Me.txtRuler1 = New System.Windows.Forms.TextBox
-        Me.fraColSample = New System.Windows.Forms.Panel
-        Me.agdSample = New atcControls.atcGrid
-        Me.lblInputColumns = New System.Windows.Forms.Label
-        Me.tabTop = New System.Windows.Forms.TabControl
-        Me.tabFileProperty = New System.Windows.Forms.TabPage
-        Me.tabDataMapping = New System.Windows.Forms.TabPage
-        Me.btnHelp = New System.Windows.Forms.Button
+        Me.txtHeaderLines = New System.Windows.Forms.TextBox()
+        Me.chkSkipHeader = New System.Windows.Forms.CheckBox()
+        Me.txtHeaderStart = New System.Windows.Forms.TextBox()
+        Me.txtLineLen = New System.Windows.Forms.TextBox()
+        Me.txtLineEndChar = New System.Windows.Forms.TextBox()
+        Me.txtDelimiter = New System.Windows.Forms.TextBox()
+        Me.txtDataFile = New System.Windows.Forms.TextBox()
+        Me.cmdSaveScript = New System.Windows.Forms.Button()
+        Me.btnHelp = New System.Windows.Forms.Button()
+        Me.agdDataMapping = New atcControls.atcGrid()
+        Me.txtScriptDesc = New System.Windows.Forms.TextBox()
+        Me.fraHeader = New System.Windows.Forms.GroupBox()
+        Me.optHeaderLines = New System.Windows.Forms.RadioButton()
+        Me.optHeaderStartsWith = New System.Windows.Forms.RadioButton()
+        Me.optHeaderNone = New System.Windows.Forms.RadioButton()
+        Me.fraLineEnd = New System.Windows.Forms.GroupBox()
+        Me.optLineEndCRLF = New System.Windows.Forms.RadioButton()
+        Me.optLineEndASCII = New System.Windows.Forms.RadioButton()
+        Me.optLineEndLF = New System.Windows.Forms.RadioButton()
+        Me.optLineEndLength = New System.Windows.Forms.RadioButton()
+        Me.fraColumns = New System.Windows.Forms.GroupBox()
+        Me.optDelimiterChar = New System.Windows.Forms.RadioButton()
+        Me.optDelimiterTab = New System.Windows.Forms.RadioButton()
+        Me.optDelimiterSpace = New System.Windows.Forms.RadioButton()
+        Me.optDelimiterNone = New System.Windows.Forms.RadioButton()
+        Me.cmdBrowseScript = New System.Windows.Forms.Button()
+        Me.txtScriptFile = New System.Windows.Forms.TextBox()
+        Me.cmdBrowseData = New System.Windows.Forms.Button()
+        Me.lblScriptDesc = New System.Windows.Forms.Label()
+        Me.lblDataDescFile = New System.Windows.Forms.Label()
+        Me.lblDataFile = New System.Windows.Forms.Label()
+        Me.cmdCancel = New System.Windows.Forms.Button()
+        Me.cmdReadData = New System.Windows.Forms.Button()
+        Me.fraTextSample = New System.Windows.Forms.Panel()
+        Me.VScrollSample = New System.Windows.Forms.VScrollBar()
+        Me.HScrollSample = New System.Windows.Forms.HScrollBar()
+        Me.txtRuler2 = New System.Windows.Forms.TextBox()
+        Me._txtSample_0 = New System.Windows.Forms.TextBox()
+        Me.txtRuler1 = New System.Windows.Forms.TextBox()
+        Me.fraColSample = New System.Windows.Forms.Panel()
+        Me.agdSample = New atcControls.atcGrid()
+        Me.lblInputColumns = New System.Windows.Forms.Label()
+        Me.tabTop = New System.Windows.Forms.TabControl()
+        Me.tabFileProperty = New System.Windows.Forms.TabPage()
+        Me.tabDataMapping = New System.Windows.Forms.TabPage()
         Me.fraHeader.SuspendLayout()
         Me.fraLineEnd.SuspendLayout()
         Me.fraColumns.SuspendLayout()
@@ -206,13 +206,13 @@
         Me.txtDelimiter.AcceptsReturn = True
         Me.txtDelimiter.BackColor = System.Drawing.SystemColors.Window
         Me.txtDelimiter.Cursor = System.Windows.Forms.Cursors.IBeam
-        Me.txtDelimiter.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtDelimiter.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtDelimiter.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.txtDelimiter.Location = New System.Drawing.Point(108, 68)
+        Me.txtDelimiter.Location = New System.Drawing.Point(90, 69)
         Me.txtDelimiter.MaxLength = 0
         Me.txtDelimiter.Name = "txtDelimiter"
         Me.txtDelimiter.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtDelimiter.Size = New System.Drawing.Size(17, 20)
+        Me.txtDelimiter.Size = New System.Drawing.Size(42, 20)
         Me.txtDelimiter.TabIndex = 16
         Me.txtDelimiter.Text = ","
         Me.ToolTip1.SetToolTip(Me.txtDelimiter, "Single printable character delimiter")
@@ -221,7 +221,7 @@
         '
         Me.txtDataFile.AcceptsReturn = True
         Me.txtDataFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDataFile.BackColor = System.Drawing.SystemColors.Window
         Me.txtDataFile.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtDataFile.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -251,13 +251,29 @@
         Me.ToolTip1.SetToolTip(Me.cmdSaveScript, "Save selections and data mapping information to a data descriptor file.")
         Me.cmdSaveScript.UseVisualStyleBackColor = False
         '
+        'btnHelp
+        '
+        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnHelp.BackColor = System.Drawing.SystemColors.Control
+        Me.btnHelp.Cursor = System.Windows.Forms.Cursors.Default
+        Me.btnHelp.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnHelp.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.btnHelp.Location = New System.Drawing.Point(202, 461)
+        Me.btnHelp.Name = "btnHelp"
+        Me.btnHelp.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.btnHelp.Size = New System.Drawing.Size(89, 25)
+        Me.btnHelp.TabIndex = 41
+        Me.btnHelp.Text = "&Help"
+        Me.ToolTip1.SetToolTip(Me.btnHelp, "Save selections and data mapping information to a data descriptor file.")
+        Me.btnHelp.UseVisualStyleBackColor = False
+        '
         'agdDataMapping
         '
         Me.agdDataMapping.AllowHorizontalScrolling = True
         Me.agdDataMapping.AllowNewValidValues = False
         Me.agdDataMapping.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdDataMapping.CellBackColor = System.Drawing.SystemColors.Window
         Me.agdDataMapping.Fixed3D = False
         Me.agdDataMapping.LineColor = System.Drawing.SystemColors.Control
@@ -272,7 +288,7 @@
         '
         Me.txtScriptDesc.AcceptsReturn = True
         Me.txtScriptDesc.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtScriptDesc.BackColor = System.Drawing.SystemColors.Window
         Me.txtScriptDesc.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtScriptDesc.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -453,6 +469,7 @@
         '
         'optDelimiterChar
         '
+        Me.optDelimiterChar.AutoSize = True
         Me.optDelimiterChar.BackColor = System.Drawing.SystemColors.Control
         Me.optDelimiterChar.Cursor = System.Windows.Forms.Cursors.Default
         Me.optDelimiterChar.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -460,10 +477,10 @@
         Me.optDelimiterChar.Location = New System.Drawing.Point(8, 71)
         Me.optDelimiterChar.Name = "optDelimiterChar"
         Me.optDelimiterChar.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.optDelimiterChar.Size = New System.Drawing.Size(89, 17)
+        Me.optDelimiterChar.Size = New System.Drawing.Size(72, 18)
         Me.optDelimiterChar.TabIndex = 15
         Me.optDelimiterChar.TabStop = True
-        Me.optDelimiterChar.Text = "Character:"
+        Me.optDelimiterChar.Text = "Custom:"
         Me.optDelimiterChar.UseVisualStyleBackColor = False
         '
         'optDelimiterTab
@@ -531,7 +548,7 @@
         '
         Me.txtScriptFile.AcceptsReturn = True
         Me.txtScriptFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtScriptFile.BackColor = System.Drawing.SystemColors.Window
         Me.txtScriptFile.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtScriptFile.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -633,8 +650,8 @@
         'fraTextSample
         '
         Me.fraTextSample.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fraTextSample.BackColor = System.Drawing.SystemColors.Control
         Me.fraTextSample.Controls.Add(Me.VScrollSample)
         Me.fraTextSample.Controls.Add(Me.HScrollSample)
@@ -653,7 +670,7 @@
         'VScrollSample
         '
         Me.VScrollSample.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.VScrollSample.Cursor = System.Windows.Forms.Cursors.Default
         Me.VScrollSample.LargeChange = 5
         Me.VScrollSample.Location = New System.Drawing.Point(492, 32)
@@ -666,7 +683,7 @@
         'HScrollSample
         '
         Me.HScrollSample.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.HScrollSample.Cursor = System.Windows.Forms.Cursors.Default
         Me.HScrollSample.LargeChange = 40
         Me.HScrollSample.Location = New System.Drawing.Point(0, 195)
@@ -683,7 +700,7 @@
         '
         Me.txtRuler2.AcceptsReturn = True
         Me.txtRuler2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtRuler2.BackColor = System.Drawing.SystemColors.Control
         Me.txtRuler2.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.txtRuler2.Cursor = System.Windows.Forms.Cursors.IBeam
@@ -703,7 +720,7 @@
         '
         Me._txtSample_0.AcceptsReturn = True
         Me._txtSample_0.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me._txtSample_0.BackColor = System.Drawing.SystemColors.Window
         Me._txtSample_0.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me._txtSample_0.Cursor = System.Windows.Forms.Cursors.IBeam
@@ -723,7 +740,7 @@
         '
         Me.txtRuler1.AcceptsReturn = True
         Me.txtRuler1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtRuler1.BackColor = System.Drawing.SystemColors.Control
         Me.txtRuler1.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.txtRuler1.Cursor = System.Windows.Forms.Cursors.IBeam
@@ -742,8 +759,8 @@
         'fraColSample
         '
         Me.fraColSample.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fraColSample.BackColor = System.Drawing.SystemColors.Control
         Me.fraColSample.Controls.Add(Me.agdSample)
         Me.fraColSample.Controls.Add(Me.lblInputColumns)
@@ -763,8 +780,8 @@
         Me.agdSample.AllowHorizontalScrolling = True
         Me.agdSample.AllowNewValidValues = False
         Me.agdSample.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdSample.CellBackColor = System.Drawing.SystemColors.Window
         Me.agdSample.Fixed3D = False
         Me.agdSample.LineColor = System.Drawing.SystemColors.Control
@@ -772,6 +789,7 @@
         Me.agdSample.Location = New System.Drawing.Point(0, 16)
         Me.agdSample.Name = "agdSample"
         Me.agdSample.Size = New System.Drawing.Size(509, 192)
+        Me.agdSample.Source = Nothing
         Me.agdSample.TabIndex = 30
         '
         'lblInputColumns
@@ -790,9 +808,10 @@
         'tabTop
         '
         Me.tabTop.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.tabTop.Controls.Add(Me.tabFileProperty)
         Me.tabTop.Controls.Add(Me.tabDataMapping)
+        Me.tabTop.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tabTop.Location = New System.Drawing.Point(12, 13)
         Me.tabTop.Name = "tabTop"
         Me.tabTop.SelectedIndex = 0
@@ -814,10 +833,10 @@
         Me.tabFileProperty.Controls.Add(Me.cmdBrowseData)
         Me.tabFileProperty.Controls.Add(Me.txtScriptFile)
         Me.tabFileProperty.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.tabFileProperty.Location = New System.Drawing.Point(4, 26)
+        Me.tabFileProperty.Location = New System.Drawing.Point(4, 23)
         Me.tabFileProperty.Name = "tabFileProperty"
         Me.tabFileProperty.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabFileProperty.Size = New System.Drawing.Size(501, 198)
+        Me.tabFileProperty.Size = New System.Drawing.Size(501, 201)
         Me.tabFileProperty.TabIndex = 0
         Me.tabFileProperty.Text = "File Properties  "
         '
@@ -831,22 +850,6 @@
         Me.tabDataMapping.Size = New System.Drawing.Size(501, 198)
         Me.tabDataMapping.TabIndex = 1
         Me.tabDataMapping.Text = "Data Mapping  "
-        '
-        'btnHelp
-        '
-        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.BackColor = System.Drawing.SystemColors.Control
-        Me.btnHelp.Cursor = System.Windows.Forms.Cursors.Default
-        Me.btnHelp.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnHelp.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.btnHelp.Location = New System.Drawing.Point(202, 461)
-        Me.btnHelp.Name = "btnHelp"
-        Me.btnHelp.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.btnHelp.Size = New System.Drawing.Size(89, 25)
-        Me.btnHelp.TabIndex = 41
-        Me.btnHelp.Text = "&Help"
-        Me.ToolTip1.SetToolTip(Me.btnHelp, "Save selections and data mapping information to a data descriptor file.")
-        Me.btnHelp.UseVisualStyleBackColor = False
         '
         'frmInputWizard
         '

@@ -23,7 +23,6 @@ Friend Module modATCscript
     Public TestingFile As Boolean 'True if we are just testing, False if we are reading data
     Public FixedColumns As Boolean 'True if columns are fixed width
     Public ColumnDelimiter As String = "" 'character that delimits columns if FixedColumns is False
-    Public NumColumnDelimiters As Integer 'ColumnDelimiter may contain more than one delimiter character
     Public ColDefs() As clsATCscriptExpression.ColDef 'Names of columns (and start/width if FixedColumns) (1..NamedColumns)
     'ColDefs(0) stores info about the first repeating column
     Public NamedColumns As Integer 'Number of cols defined in ColDefs (there may be gaps if delimited)
@@ -46,12 +45,15 @@ Friend Module modATCscript
     Public FillMissing As Double = -999
     Public FillAccum As Double = -998
 
+    Friend pNaN As Double = GetNaN()
+    Public MissingValueString As String = ""
+
     ''' <summary>
     ''' Array of token names
     ''' Be sure to synchronize with Private Enum ATCsToken in clsATCscriptExpression
     ''' </summary>
     ''' <remarks></remarks>
-    Public TokenString As String() = {"Unknown", "And", "ATCScript", "Attribute", "ColumnFormat", "Comment", "Dataset", "Date", "FatalError", "Fill", "Flag", "For", "If", "In", "Increment", "Instr", "IsNumeric", "LineEnd", "Literal", "+", "/", "*", "^", "-", "Mid", "NextLine", "Not", "Or", "Save", "Set", "Test", "Trim", "Unset", "Value", "Variable", "Warn", "While", ">", ">=", "<", "<=", "<>", "=", "Last"}
+    Public TokenString As String() = {"Unknown", "Abs", "And", "ATCScript", "Attribute", "ColumnFormat", "ColumnValue", "Comment", "Dataset", "Date", "FatalError", "Fill", "Flag", "For", "If", "In", "Increment", "Instr", "IsNumeric", "Len", "LineEnd", "Literal", "+", "/", "*", "^", "-", "Mid", "NextLine", "Not", "NumColumns", "Or", "Save", "Set", "Test", "Trim", "Unset", "Value", "Variable", "Warn", "While", ">", ">=", "<", "<=", "<>", "=", "Last"}
 
     Private Const DefaultScenario As String = "ScriptRead"
     Private pTserFile As atcTimeseriesSource
@@ -70,15 +72,15 @@ Friend Module modATCscript
             ReDim DateArray(0)
             ReDim ValueArray(0)
             'ReDim FlagArray(0)
-            DateArray(0) = GetNaN()
-            ValueArray(0) = GetNaN()
+            DateArray(0) = pNaN
+            ValueArray(0) = pNaN
 
             ts = New atcData.atcTimeseries(pTserFile)
-            With ts
-                .Attributes.SetValue("Description", pDataFilename)
-                .Attributes.SetValue("Scenario", DefaultScenario)
-                .Attributes.SetValue("Data Source", pDataFilename)
-                .Attributes.AddHistory("Read From " & pDataFilename)
+            With ts.Attributes
+                .SetValue("Description", pDataFilename)
+                .SetValue("Scenario", DefaultScenario)
+                .SetValue("Data Source", pDataFilename)
+                .AddHistory("Read From " & pDataFilename)
             End With
         End Sub
     End Class
@@ -108,7 +110,6 @@ Friend Module modATCscript
         LenCurrentLine = 0
         CurrentRepeat = 1
         'ColumnDelimiter = ""
-        NumColumnDelimiters = Len(ColumnDelimiter)
         ReDim ColDefs(0)
         NamedColumns = 0
         RepeatStartCol = 0
@@ -118,7 +119,6 @@ Friend Module modATCscript
         AbortScript = False
     End Sub
 
-    'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
     Public Function ReadIntLeaveRest(ByRef str_Renamed As String) As Integer
         Dim chpos, lenStr As Integer
         chpos = 1
@@ -268,14 +268,14 @@ Friend Module modATCscript
             If DebuggingScript Then DebugScriptForm.NewDate(.DateCount, jdy)
             'Debug.Print "Date " & .DateCount & "=" & jdy;
         End With
-        ScriptSetDate = jdy
+        Return jdy
     End Function
 
-    Public Function ScriptSetValue(ByRef newValue As Single) As Single
+    Public Function ScriptSetValue(ByRef newValue As Double) As Double
         CurBuf.ValueArray(CurBuf.DateCount) = newValue
-        ScriptSetValue = newValue
         If DebuggingScript Then DebugScriptForm.NewValue(CurBuf.DateCount, newValue)
         'Debug.Print " Value " & pDateCount & "=" & newValue
+        Return newValue
     End Function
 
     Public Function ScriptSetFlag(ByRef newValue As Integer) As Integer
@@ -287,7 +287,7 @@ Friend Module modATCscript
     Public Function ScriptSetVariable(ByRef VarName As String, ByRef newValue As String) As String
         Static ShowedNumericMessage As Integer
         Static ShowedRangeMessage As Integer
-        Select Case LCase(VarName)
+        Select Case VarName.ToLower
             Case "repeat"
                 If IsNumeric(newValue) Then
                     CurrentRepeat = CInt(newValue)
@@ -303,7 +303,12 @@ Friend Module modATCscript
                         ShowedNumericMessage = ShowedNumericMessage + 1
                     End If
                 End If
-            Case Else : On Error Resume Next
+                'Case "missingvalue"
+                '    MissingValueString = newValue
+                '    GoTo SetVariable
+            Case Else
+SetVariable:
+                On Error Resume Next
                 ScriptState.RemoveByKey(VarName)
                 ScriptState.Add(VarName, newValue)
         End Select
@@ -320,6 +325,7 @@ Friend Module modATCscript
             AddNewTserAndBuffer()
         End While
         CurBuf = InBuf.Item(index - 1)
+        'Logger.Dbg("ScriptSetDataset to " & index & " serial " & CurBuf.ts.Serial & " " & CurBuf.ts.Attributes.ToString)
     End Sub
 
     Private Sub AddNewTserAndBuffer()
@@ -396,7 +402,6 @@ Friend Module modATCscript
         End Select
     End Sub
 
-
     Public Sub ScriptSetAttribute(ByRef AttrName As String, ByRef newValue As String)
         If InBuf.Count = 0 Then
             Exit Sub
@@ -414,6 +419,7 @@ Friend Module modATCscript
                 Case Else
                     .SetValue(AttrName, newValue)
             End Select
+            Logger.Dbg("SetAttribute " & AttrName & " = " & newValue)
         End With
     End Sub
 
@@ -570,10 +576,9 @@ Friend Module modATCscript
                                         .Attributes.AddHistory("Read From " & DataFilename)
                                     End If
                                     'Set missing values to NaN
-                                    Dim lNaN As Double = GetNaN()
                                     For iVal As Long = 1 To .numValues
                                         If Math.Abs((.Value(iVal) - FillMissing)) < 1.0E-20 Then
-                                            .Value(iVal) = lNaN
+                                            .Value(iVal) = pNaN
                                         End If
                                     Next
                                 End With
@@ -649,5 +654,44 @@ Friend Module modATCscript
             pTserFile = lSaveIn
         End If
     End Sub
+
+    Public Sub SetDelimiter(aRule As String)
+        FixedColumns = False
+        ColumnDelimiter = ""
+        If IsNumeric(aRule) AndAlso CInt(aRule) >= 0 AndAlso CInt(aRule) < 255 Then
+            ColumnDelimiter = Chr(CShort(aRule))
+        Else
+            Dim lRule As String = aRule.Trim.ToLower
+            If lRule = "fixed" Then
+                FixedColumns = True
+            Else
+                If InStr(lRule, "tab") Then ColumnDelimiter &= vbTab
+                If InStr(lRule, "space") Then ColumnDelimiter &= " "
+                For lCharacter As Integer = 33 To 126
+                    Select Case lCharacter
+                        Case 48 : lCharacter = 58
+                        Case 65 : lCharacter = 91
+                        Case 97 : lCharacter = 123
+                    End Select
+                    If InStr(lRule, Chr(lCharacter)) > 0 Then ColumnDelimiter &= Chr(lCharacter)
+                Next lCharacter
+            End If
+        End If
+    End Sub
+
+    Public Function GetDelimiterRule() As String        
+        Dim lRule As String = ColumnDelimiter.Replace(vbTab, "tab").Replace(" ", "space")
+
+        For lCharacter As Integer = 33 To 126
+            Select Case lCharacter
+                Case 48 : lCharacter = 58
+                Case 65 : lCharacter = 91
+                Case 97 : lCharacter = 123
+            End Select
+            lRule = lRule.Replace(Chr(lCharacter), lCharacter.ToString)
+        Next lCharacter
+
+        Return lRule
+    End Function
 
 End Module
