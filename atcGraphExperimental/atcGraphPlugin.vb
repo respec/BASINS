@@ -14,6 +14,8 @@ Public Class atcGraphPlugin
                                            "Cumulative Difference", _
                                            "Scatter (TS2 vs TS1)"}
 
+    Private pGraphTypeNameAlias As New atcCollection()
+
     Public Overrides ReadOnly Property Name() As String
         Get
             Return "Analysis::Graph"
@@ -32,7 +34,6 @@ Public Class atcGraphPlugin
         End If
     End Sub
 
-
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcDataGroup) As Object
         Dim lIcon As System.Drawing.Icon = Nothing
         Return Show(aTimeseriesGroup, lIcon)
@@ -43,6 +44,7 @@ Public Class atcGraphPlugin
 
         Show = Nothing
 
+        pGraphTypeNameAlias.Add(pGraphTypeNames(0), "Time-Series")
         Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
         If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup
         If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
@@ -59,7 +61,7 @@ Public Class atcGraphPlugin
                     .Items.Add("No data selected, cannot graph")
                     lChooseForm.btnGenerate.Visible = False
                 Else
-                    .Items.Add(pGraphTypeNames(0))
+                    .Items.Add(pGraphTypeNameAlias.ItemByKey(pGraphTypeNames(0)))
                     .Items.Add(pGraphTypeNames(1))
                     .Items.Add(pGraphTypeNames(2))
                     .Items.Add(pGraphTypeNames(3))
@@ -107,6 +109,10 @@ Public Class atcGraphPlugin
 
                     Dim lAllCheckedItemNames As String = ""
                     For Each lGraphTypeName As String In .CheckedItems
+                        Dim lIndex As Integer = pGraphTypeNameAlias.IndexOf(lGraphTypeName)
+                        If lIndex >= 0 Then
+                            lGraphTypeName = pGraphTypeNameAlias.Keys(lIndex)
+                        End If
                         lAllCheckedItemNames &= lGraphTypeName & ","
                         For Each lGroup As atcTimeseriesGroup In lTimeseriesGroups
                             Show = Me.Show(lGroup, lGraphTypeName)
@@ -137,7 +143,7 @@ Public Class atcGraphPlugin
                                  ByVal aDataGroup As atcTimeseriesGroup, _
                                  ByVal aGraphForm As atcGraphForm) As clsGraphBase
         Select Case aGraphTypeName
-            Case "Timeseries" : aGraphForm.Text = "Timeseries Graph"
+            Case "Timeseries" : aGraphForm.Text = "Time-Series Graph"
                 Return New clsGraphTime(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Flow/Duration" : aGraphForm.Text = "Flow/Duration Graph"
                 Return New clsGraphProbability(aDataGroup, aGraphForm.ZedGraphCtrl)
