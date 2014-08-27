@@ -54,6 +54,7 @@ Partial Class frmUSGSBaseflow
         Me.txtOutputRootName = New System.Windows.Forms.TextBox
         Me.lblBaseFilename = New System.Windows.Forms.Label
         Me.gbTextOutput = New System.Windows.Forms.GroupBox
+        Me.btnSave = New System.Windows.Forms.Button
         Me.btnWriteASCIIOutput = New System.Windows.Forms.Button
         Me.chkTabDelimited = New System.Windows.Forms.CheckBox
         Me.txtOutputDir = New System.Windows.Forms.TextBox
@@ -79,7 +80,6 @@ Partial Class frmUSGSBaseflow
         Me.lblK = New System.Windows.Forms.Label
         Me.lblF = New System.Windows.Forms.Label
         Me.lblN = New System.Windows.Forms.Label
-        Me.btnSave = New System.Windows.Forms.Button
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
@@ -268,45 +268,45 @@ Partial Class frmUSGSBaseflow
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(129, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuOutput
         '
         Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
         Me.mnuOutput.Name = "mnuOutput"
-        Me.mnuOutput.Size = New System.Drawing.Size(140, 22)
+        Me.mnuOutput.Size = New System.Drawing.Size(129, 22)
         Me.mnuOutput.Text = "Output"
         '
         'mnuOutputASCII
         '
         Me.mnuOutputASCII.Name = "mnuOutputASCII"
-        Me.mnuOutputASCII.Size = New System.Drawing.Size(113, 22)
+        Me.mnuOutputASCII.Size = New System.Drawing.Size(102, 22)
         Me.mnuOutputASCII.Text = "ASCII"
         '
         'mnuGraphBF
         '
         Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphDuration, Me.mnuGraphCDistPlot})
         Me.mnuGraphBF.Name = "mnuGraphBF"
-        Me.mnuGraphBF.Size = New System.Drawing.Size(140, 22)
+        Me.mnuGraphBF.Size = New System.Drawing.Size(129, 22)
         Me.mnuGraphBF.Text = "Graph"
         '
         'mnuGraphTimeseries
         '
         Me.mnuGraphTimeseries.Name = "mnuGraphTimeseries"
-        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(146, 22)
+        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(135, 22)
         Me.mnuGraphTimeseries.Text = "TimeSeries"
         '
         'mnuGraphDuration
         '
         Me.mnuGraphDuration.Name = "mnuGraphDuration"
-        Me.mnuGraphDuration.Size = New System.Drawing.Size(146, 22)
+        Me.mnuGraphDuration.Size = New System.Drawing.Size(135, 22)
         Me.mnuGraphDuration.Text = "Duration"
         '
         'mnuGraphCDistPlot
         '
         Me.mnuGraphCDistPlot.Name = "mnuGraphCDistPlot"
-        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(146, 22)
+        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(135, 22)
         Me.mnuGraphCDistPlot.Text = "Cummulative"
         '
         'mnuAnalysis
@@ -354,6 +354,15 @@ Partial Class frmUSGSBaseflow
         Me.gbTextOutput.TabIndex = 11
         Me.gbTextOutput.TabStop = False
         Me.gbTextOutput.Text = "Text Output"
+        '
+        'btnSave
+        '
+        Me.btnSave.Location = New System.Drawing.Point(241, 47)
+        Me.btnSave.Name = "btnSave"
+        Me.btnSave.Size = New System.Drawing.Size(75, 23)
+        Me.btnSave.TabIndex = 32
+        Me.btnSave.Text = "SaveRDB"
+        Me.btnSave.UseVisualStyleBackColor = True
         '
         'btnWriteASCIIOutput
         '
@@ -428,7 +437,7 @@ Partial Class frmUSGSBaseflow
         Me.btnGraphTimeseries.Name = "btnGraphTimeseries"
         Me.btnGraphTimeseries.Size = New System.Drawing.Size(103, 23)
         Me.btnGraphTimeseries.TabIndex = 17
-        Me.btnGraphTimeseries.Text = "Timeseries"
+        Me.btnGraphTimeseries.Text = "Time-Series"
         Me.btnGraphTimeseries.UseVisualStyleBackColor = True
         '
         'gbBFMethods
@@ -598,11 +607,11 @@ Partial Class frmUSGSBaseflow
         'lblK
         '
         Me.lblK.AutoSize = True
-        Me.lblK.Location = New System.Drawing.Point(45, 89)
+        Me.lblK.Location = New System.Drawing.Point(33, 89)
         Me.lblK.Name = "lblK"
-        Me.lblK.Size = New System.Drawing.Size(118, 13)
+        Me.lblK.Size = New System.Drawing.Size(131, 13)
         Me.lblK.TabIndex = 2
-        Me.lblK.Text = "Recession Constant (K)"
+        Me.lblK.Text = "Daily Recession Index (K’)"
         '
         'lblF
         '
@@ -621,15 +630,6 @@ Partial Class frmUSGSBaseflow
         Me.lblN.Size = New System.Drawing.Size(126, 13)
         Me.lblN.TabIndex = 0
         Me.lblN.Text = "Partition Length (N, days)"
-        '
-        'btnSave
-        '
-        Me.btnSave.Location = New System.Drawing.Point(241, 47)
-        Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(75, 23)
-        Me.btnSave.TabIndex = 32
-        Me.btnSave.Text = "SaveRDB"
-        Me.btnSave.UseVisualStyleBackColor = True
         '
         'frmUSGSBaseflow
         '
