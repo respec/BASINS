@@ -848,6 +848,9 @@ FoundMatch:
         If lLogFlag AndAlso lDataMin <= 0 Then
             lLogFlag = False
             aAxis.Type = AxisType.Linear
+            If aAxis.Title.Text.Contains("GW LEVEL") Then
+                aAxis.Scale.IsReverse = True
+            End If
             MapWinUtility.Logger.Dbg("Change axis type from log to linear to fit less than or equal to zero data.")
         End If
         Scalit(lDataMin, lDataMax, lLogFlag, aAxis.Scale.Min, aAxis.Scale.Max)

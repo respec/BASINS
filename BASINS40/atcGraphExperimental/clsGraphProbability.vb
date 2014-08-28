@@ -100,6 +100,9 @@ Public Class clsGraphProbability
                 AddDatasetCurve(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
             Next
             AxisTitlesFromCommonAttributes(pZgc.MasterPane.PaneList(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
+            If lCommonConstituent = "GW LEVEL" Then
+                ScaleAxis(Datasets, pZgc.MasterPane.PaneList(0).YAxis)
+            End If
             pZgc.Refresh()
         End Set
     End Property
