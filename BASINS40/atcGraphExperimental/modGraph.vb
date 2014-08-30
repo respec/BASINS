@@ -174,6 +174,13 @@ FoundMatch:
             Next
 
             If lLeftDataSets.Count > 0 Then
+                If lCommonConstituent = "GW LEVEL" Then
+                    With lMain.YAxis
+                        .Scale.IsReverse = True
+                        .MajorTic.IsOpposite = False
+                        .MinorTic.IsOpposite = False
+                    End With
+                End If
                 ScaleAxis(lLeftDataSets, lMain.YAxis)
             End If
             If lRightDataSets.Count > 0 Then
@@ -416,7 +423,13 @@ FoundMatch:
             Next
             lProvisionalTS = lProvisionalBuilder.CreateTimeseries
             lNonProvisionalTS = lNonProvisionalBuilder.CreateTimeseries
-
+            If Double.IsNaN(lProvisionalTS.Dates.Value(0)) Then
+                Dim lDate1 As Double = lProvisionalTS.Dates.Value(1)
+                Dim lDate2 As Double = lProvisionalTS.Dates.Value(2)
+                Dim lTimeDiff As Double = lDate2 - lDate1
+                Dim lDate0 As Double = lDate1 - lTimeDiff
+                lProvisionalTS.Dates.Value(0) = lDate0
+            End If
             If aTimeseries.Attributes.ContainsAttribute("Time Step") AndAlso aTimeseries.Attributes.ContainsAttribute("Time Unit") Then
                 lProvisionalTS = FillValues(lProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
                 lNonProvisionalTS = FillValues(lNonProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
