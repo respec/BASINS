@@ -98,7 +98,7 @@ Public Class clsUSGSBaseflowPlugin
             lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lTimeseriesGroup)
         End If
         If lTimeseriesGroup.Count > 0 Then
-            Dim lForm As New frmUSGSBaseflowBatch
+            Dim lForm As New frmUSGSBaseflow()
             ShowForm(lTimeseriesGroup, lForm)
             Return lForm
         Else
