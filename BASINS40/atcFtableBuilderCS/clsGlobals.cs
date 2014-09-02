@@ -93,6 +93,7 @@ namespace atcFtableBuilder
         public static atcUCI.HspfFtable pFTable;
 
         #region Outflow Control
+
         public static string[] gOCOrificeUnd = { "0", "0", "0" };
         public static string[] gOCOrificeRiser = { "0", "0", "0" };
         public static string[] gOCWeirTriVnotch = { "0", "0", "0" };
@@ -100,12 +101,56 @@ namespace atcFtableBuilder
         public static string[] gOCWeirBroad = { "0", "0", "0" };
         public static string[] gOCWeirRect = { "0", "0", "0" };
 
+        public static string[] DefaultsOrifice = { "5", "2", "0.6" };  //sri-jul 18 2012
+        public static string[] DefaultsWeir = { "10", "5", "2" };
+        public static string[] DefaultsWeirTriVnotch = { "10", "5", "0.585" };
+        public static string[] DefaultsWeirTrape = { "10", "5", "3.367" };
+        public static string[] DefaultsWeirBroad = { "10", "5", "3.0" };
+        public static string[] DefaultsWeirRect = { "10", "5", "3.33" }; // Need to check this value
+
         public static bool gOCSelectedWeirTri = false;
         public static bool gOCSelectedWeirTrape = false;
         public static bool gOCSelectedWeirBroad = false;
         public static bool gOCSelectedWeirRect = false;
         public static bool gOCSelectedOrificeUnd = false;
         public static bool gOCSelectedOrificeRiser = false;
+
+        //For multiple exit version
+        public enum OCTypes
+        {
+            None, OCWeirTrape, OCWeirTriVnotch, OCWeirBroad, OCWeirRect, OCOrificeUnd, OCOrificeRiser
+        }
+
+        public static Dictionary<OCTypes, String> OCTypeNames = new Dictionary<OCTypes, string>()
+        {
+            {OCTypes.None, "None"},
+            {OCTypes.OCWeirTriVnotch, "Triangular Vnotch Weir"},
+            {OCTypes.OCWeirTrape, "Trapezoidal Weir (Cipoletti)"},
+            {OCTypes.OCWeirRect, "Rectangular Weir"},
+            {OCTypes.OCWeirBroad, "Broad Crested Weir"},
+            {OCTypes.OCOrificeUnd, "Underdrain Orifice"},
+            {OCTypes.OCOrificeRiser, "Riser Orifice"}
+        };
+        public static string[] gOCParmLbl = { "Parameter", "Parameter", "Discharge Coefficient" };
+        public static string[] gOCOrificeUndLbl = { "Orifice Diameter", "Orifice Invert Depth", "Discharge Coefficient" };
+        public static string[] gOCOrificeRiserLbl = { "Orifice Diameter", "Orifice Depth", "Discharge Coefficient" };
+        public static string[] gOCWeirTriVnotchLbl = { "Weir Vertex Angle (deg)", "Weir Invert Depth", "Discharge Coefficient" };
+        public static string[] gOCWeirTrapeLbl = { "Weir Width", "Weir Depth", "Discharge Coefficient" };
+        public static string[] gOCWeirBroadLbl = { "Weir Crest Width", "Weir Invert Depth", "Discharge Coefficient" };
+        public static string[] gOCWeirRectLbl = { "Weir Crest Width", "Weir Invert Depth", "Discharge Coefficient" };
+
+        public struct OutflowControl
+        {
+            public int RchExit;
+            public double Parm0;
+            public double Parm1;
+            public double Parm2;
+            public OCTypes myOCType;
+        }
+
+        //a collection of OutflowControl(s) keyed on exit id (1 - 5)
+        public static atcUtility.atcCollection gExitOCSetup = new atcUtility.atcCollection();
+
         #endregion
 
         #region Natural Profile
