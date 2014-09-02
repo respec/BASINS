@@ -1211,7 +1211,9 @@ namespace atcFtableBuilder
 
         private void btnShowOptControls_Click(object sender, EventArgs e)
         {
-            frmOutflowControls lOutflowControlDialog = new frmOutflowControls();
+            //frmOutflowControls lOutflowControlDialog = new frmOutflowControls();
+            //lOutflowControlDialog.ShowDialog();
+            frmOutflowControlsME lOutflowControlDialog = new frmOutflowControlsME();
             lOutflowControlDialog.ShowDialog();
         }
 
