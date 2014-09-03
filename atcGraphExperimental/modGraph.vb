@@ -291,8 +291,6 @@ FoundMatch:
             aCommonLocation = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(aCommonLocation.ToLower)
             If aCommonLocation = "<Unk>" Then aCommonLocation = "<unk>"
         End If
-        'aCommonUnits = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(aCommonUnits.ToLower)
-        'If aCommonUnits = "<Unk>" Then aCommonUnits = "<unk>"
 
         If Not String.IsNullOrEmpty(aCommonTimeUnitName) AndAlso aCommonTimeUnitName <> "<unk>" _
            AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonTimeUnitName) Then
@@ -566,23 +564,6 @@ FoundMatch:
                         Optional ByVal aCommonConstituent As String = Nothing, _
                         Optional ByVal aCommonLocation As String = Nothing, _
                         Optional ByVal aCommonUnits As String = Nothing) As String
-        If Not String.IsNullOrEmpty(aCommonTimeUnitName) Then
-            aCommonTimeUnitName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(aCommonTimeUnitName.ToLower)
-            If aCommonTimeUnitName = "<Unk>" Then aCommonTimeUnitName = "<unk>"
-        End If
-        If Not String.IsNullOrEmpty(aCommonScenario) Then
-            aCommonScenario = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(aCommonScenario.ToLower)
-            If aCommonScenario = "<Unk>" Then aCommonScenario = "<unk>"
-        End If
-        If Not String.IsNullOrEmpty(aCommonConstituent) Then
-            aCommonConstituent = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(aCommonConstituent.ToLower)
-            If aCommonConstituent = "<Unk>" Then aCommonConstituent = "<unk>"
-        End If
-        If Not String.IsNullOrEmpty(aCommonLocation) Then
-            aCommonLocation = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(aCommonLocation.ToLower)
-            If aCommonLocation = "<Unk>" Then aCommonLocation = "<unk>"
-        End If
-        
         With aTimeseries.Attributes
             Dim lCurveLabel As String = ""
 
