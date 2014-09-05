@@ -1076,7 +1076,7 @@ Public Module Utility
                                     Return lMassLinkFactor
 
                                 End If
-
+                            
                             Case "ORGN - TOTAL OUTFLOW_PKIF_3"
                                 If aMultipleIndex = 2 Then
                                     lMassLinkFactor = lMassLink.MFact
@@ -1146,7 +1146,17 @@ Public Module Utility
                                 Return lMassLinkFactor
                             
                         End Select
+                    Case "BOD-PQUAL"
+                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
+                            "_" & lMassLink.Target.MemSub1
 
+                            Case "WASHQS-BOD_OXIF_2", "SOQUAL-BOD_OXIF_2", "IOQUAL-BOD_OXIF_2", "AOQUAL-BOD_OXIF_2", "POQUAL-BOD_OXIF_2"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                            Case "ORGN - TOTAL OUTFLOW_OXIF_2"
+                                lMassLinkFactor = lMassLink.MFact
+                                Return lMassLinkFactor
+                        End Select
                 End Select
 
 
