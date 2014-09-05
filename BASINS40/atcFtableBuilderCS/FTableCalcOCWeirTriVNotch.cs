@@ -19,7 +19,22 @@ namespace atcFtableBuilder
             get { return pWeirInvert; }
             set { pWeirInvert = value; }
         }
+        int pExit;
+        public int myExit
+        {
+            get { return pExit; }
+            set { pExit = value; }
+        }
         public double DischargeCoefficient = -999;
+        private static string[] gOCWeirTriVnotchLbl = { "Weir Vertex Angle (deg)", "Weir Invert Depth", "Discharge Coefficient" };
+        private static double[] DefaultsWeirTriVnotch = { 10, 5, 0.585 };
+        public new readonly ControlDeviceType ControlDevice
+        {
+            get
+            {
+                return ControlDeviceType.WeirTriVNotch;
+            }
+        }
 
         public FTableCalcOCWeirTriVNotch()
         {
@@ -28,6 +43,26 @@ namespace atcFtableBuilder
             vectorColNames.Add("AREA");
             vectorColNames.Add("VOLUME");
             vectorColNames.Add("OUTFLOW");
+        }
+
+        public static Dictionary<string, double> ParamValueDefaults()
+        {
+            Dictionary<string, double> defaults = new Dictionary<string, double>();
+            for (int i = 0; i <= gOCWeirTriVnotchLbl.Length - 1; i++)
+            {
+                defaults.Add(gOCWeirTriVnotchLbl[i], DefaultsWeirTriVnotch[i]);
+            }
+            return defaults;
+        }
+        public new Dictionary<string, double> ParamValues()
+        {
+            double[] CurrentParamValues = { WeirAngle, WeirInvert, DischargeCoefficient };
+            Dictionary<string, double> defaults = new Dictionary<string, double>();
+            for (int i = 0; i <= gOCWeirTriVnotchLbl.Length - 1; i++)
+            {
+                defaults.Add(gOCWeirTriVnotchLbl[i], CurrentParamValues[i]);
+            }
+            return defaults;
         }
 
         public ArrayList GenerateFTableOC()

@@ -83,6 +83,7 @@
       <DependentUpon>BMPSketch.cs</DependentUpon>
     </Compile>
     <Compile Include="ChannelPoint.cs" />
+    <Compile Include="clsOutflowControl.cs" />
     <Compile Include="ControlDeviceMiddleware.cs" />
     <Compile Include="frmFTableResult.cs">
       <SubType>Form</SubType>
