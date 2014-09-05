@@ -60,6 +60,7 @@ Public Module ConstituentBalance
 
         For Each lOperationKey As String In aOperationTypes.Keys
             For Each lLocation As String In aLocations
+                'If lLocation = "P:641" Then Stop
                 If lLocation.StartsWith(lOperationKey) Then
                     'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
                     Dim lLocationDataGroup As atcTimeseriesGroup = aScenarioResults.DataSets.FindData("Location", lLocation)
@@ -91,7 +92,7 @@ Public Module ConstituentBalance
                                     Dim lConstituentDataGroup As atcTimeseriesGroup = lLocationDataGroup.FindData("Constituent", lConstituentDataName)
                                     If lConstituentDataGroup.Count > 0 Then
                                         lHaveData = True
-                                      
+
 
                                         Dim lTempDataSet As atcDataSet = lConstituentDataGroup.Item(0)
                                         Dim lSeasons As atcSeasonBase
@@ -115,7 +116,7 @@ Public Module ConstituentBalance
                                             Case "R" : lOperName = "RCHRES"
                                         End Select
                                         If lNeedHeader Then  'get operation description for header
-                                           
+
                                             Dim lDesc As String = ""
                                             If lOperName.Length > 0 Then
                                                 lDesc = aUci.OpnBlks(lOperName).OperFromID(lLocation.Substring(2)).Description
@@ -141,7 +142,7 @@ Public Module ConstituentBalance
 
                                             End Select
 
-                                            
+
                                             .NumHeaderRows = 1
                                             .Delimiter = vbTab
 
@@ -182,8 +183,12 @@ Public Module ConstituentBalance
 
                                                 If lConnection.Target.VolName = "RCHRES" Then
                                                     Dim aReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
+                                                    If aReach Is Nothing Then
+                                                        MsgBox("The Reach " & lConnection.Target.VolId & " does not exist.  Constituent Balance reports will not be generated.")
+
+                                                    End If
                                                     Dim aConversionFactor As Double = 0.0
-                                                    If aBalanceType = "TotalN" Or aBalanceType = "TotalN" Then
+                                                    If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Then
                                                         aConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
                                                     End If
 
@@ -193,12 +198,16 @@ Public Module ConstituentBalance
 
                                                         lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentDataName.ToUpper, aBalanceType, _
                                                                                        aConversionFactor, lMultipleIndex)
+
                                                     Else
                                                         MassLinkExists = False
                                                     End If
                                                     Dim lArea As Double = lConnection.MFact
                                                     If lArea = 0 Then
                                                         lArea = 0.0000000001
+                                                    End If
+                                                    If aBalanceType = "Water" Then
+                                                        lMassLinkFactor *= 12
                                                     End If
                                                     lTotalLoad += lArea * lMassLinkFactor
                                                     lTotalArea += lArea
@@ -231,7 +240,7 @@ Public Module ConstituentBalance
                                             If lStateVariable Then 'no value needed for mean column
                                                 .Value(2) = "<NA>".PadLeft(10)
                                             Else
-                                                
+
                                                 .Value(2) = DecimalAlign(lMult * lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             End If
                                             Dim lFieldIndex As Integer = 3
@@ -244,7 +253,7 @@ Public Module ConstituentBalance
                                         End If
                                         .CurrentRecord += 1
                                     ElseIf lConstituentKey.StartsWith("Total") AndAlso _
-                                           lConstituentKey.Length > 5 AndAlso
+                                           lConstituentKey.Length > 5 AndAlso _
                                            IsNumeric(lConstituentKey.Substring(5, 1)) Then
                                         Dim lTotalCount As Integer = lConstituentKey.Substring(5, 1)
                                         Dim lCurFieldValues(.NumFields) As Double
@@ -317,5 +326,5 @@ Public Module ConstituentBalance
 
         Return lReport
     End Function
-    
+
 End Module
