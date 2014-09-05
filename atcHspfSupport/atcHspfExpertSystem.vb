@@ -158,7 +158,7 @@ Public Class atcExpertSystem
             Dim lRecordIndex As Integer = lNSites + 1
             'Read number of storms
             Dim lNStorms As Integer
-            If Not Integer.TryParse(lExsRecords(lRecordIndex).Substring(0, 4), lNStorms) Then
+            If Not Integer.TryParse(lExsRecords(lRecordIndex), lNStorms) Then
                 Throw New ApplicationException("The number of storms are not in correct format. Program will quit!")
             End If
 
