@@ -124,8 +124,11 @@ Public Class StartUp
 
     End Sub
 
-   
-    Private Sub btnHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnHelp.Click
+    Private Sub btn_help_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_help.Click
+        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP+.chm")
+    End Sub
+
+    Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkHydrologySensitivity.CheckedChanged
 
     End Sub
 End Class
