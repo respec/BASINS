@@ -1,10 +1,3 @@
-'this module - originally HSPFOutputReports.vb - was checked out from the BASINS 4 SVN on November 30, 2011
-'it is open source and can be found at http://svn.mapwindow.org/svnroot/BASINS40
-'the accompanying projects imported below are copied as is from the BASINS 4 checkout
-'this particular module was modified by Becky Zeckoski at Virginia Tech beginning December 1, 2011 for the 
-'purposes of developing a replacement for HSPEXP for use by the Center for Watershed Studies at Virginia Tech
-'I deleted lots of things unneeded for our purposes and indicated where I made additions or changes
-
 Imports System
 Imports atcUtility
 Imports atcData
@@ -14,20 +7,10 @@ Imports atcHspfBinOut
 Imports HspfSupport
 Imports atcUCI
 Imports atcBasinsObsWQ
-
-'note from Becky: will also need references to atcReport and atcTimeseriesMath projects
-'I also installed the MapWinGIS.ocx ActiveX components from http://mapwingis.codeplex.com/releases but I'm still not sure if I actually needed to
-'I installed it because I couldn't figure out how to initially initalize the aMapWin variable
-'additionally, if you don't have BASINS installed, you'll need to get hass_ent.dll from C:\Windows\System32 on a computer that does have it installed
-'and move it to your C:\Windows\System32 folder and register it...I wasn't able to get it to work on Windows 7 though
-'you'll also need to get hspfmsg.mdb from C:\BASINS\models\HSPF\bin on a computer that has BASINS installed - this can be anywhere
+Imports atcList
 Imports MapWinUtility 'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
 Imports atcGraph
 Imports ZedGraph 'this is coming from a DLL as the original project was a C# project and not a VB project
-'Imports MapWindow.Interfaces
-'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
-'note that for whatever reason, the MapWindow.Interfaces DLL from that site doesn't
-'have everything needed (no IMapWin) - if you also add a reference to MapWinInterfaces to the project, it compiles
 Imports System.Collections.Specialized
 Imports System.IO 'added by Becky to get directory exists function
 
@@ -62,6 +45,8 @@ Module HSPFOutputReports
     Private pRunUci As Boolean = False 'Anurag added this option if the user wants this program to run the uci as well
     Private SDateJ, EDateJ As Double
     Private loutfoldername As String
+    Private pSensitivity As Boolean = False
+    
 
     Private Sub Initialize()
         If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
@@ -98,17 +83,20 @@ Module HSPFOutputReports
         Dim lTestName As String = IO.Path.GetFileNameWithoutExtension(StartUp.txtUCIPath.Text)
         Logger.Status("Beginning analysis of " & lTestName, True)
 
+        If StartUp.chkHydrologySensitivity.Checked Then
+            pSensitivity = True
+        End If
         If StartUp.chkWaterBalance.Checked Then
             pConstituents.Add("Water")
         End If
         If StartUp.chkSedimentBalance.Checked Then
             pConstituents.Add("Sediment")
         End If
-       
+
         If StartUp.chkTotalNitrogen.Checked Then
             pConstituents.Add("TotalN")
         End If
-        
+
         If StartUp.chkTotalPhosphorus.Checked Then
             pConstituents.Add("TotalP")
         End If
@@ -118,15 +106,14 @@ Module HSPFOutputReports
         If StartUp.chkFecalColiform.Checked Then
             pConstituents.Add("FColi")
         End If
-
-        'Becky added the following to be dependent upon user input:
+        'set up the timeseries attributes for statistics
+        atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
+        
         pTestPath = StartUp.txtUCIPath.Text
         pBaseName = lTestName
         pTestPath = Mid(pTestPath, 1, Len(pTestPath) - Len(pBaseName) - 4)
 
 
-        'as best I can tell, the output location should include R for reach and the outlet reach number
-        'Becky added the following if-then-else to allow multiple output locations
         For Each lRCH As String In StartUp.txtRCH.Text.Split(","c)
             If IsNumeric(lRCH) Then
                 pOutputLocations.Add("R:" & CInt(lRCH)) ' the Cint should get rid of leading spaces and zeros 
@@ -143,24 +130,21 @@ Module HSPFOutputReports
         Logger.Dbg("CurrentFolder " & My.Computer.FileSystem.CurrentDirectory)
         Logger.Status("HSPEXP+ is running.")
         Using lProgress As New ProgressLevel
+            If pSensitivity Then
+                SensitivityAnalysis(pBaseName, pTestPath)
+            End If
 
             If pRunUci = True Then
                 Logger.Status(Now & " Running HSPF Simulation of " & pBaseName & ".uci", True)
                 Dim lExitCode As Integer
-                lExitCode = LaunchProgram(pHSPFExe, pTestPath, pBaseName & ".uci") 'Run HSPF program
-                If lExitCode <> 0 Then
-                    'Throw New ApplicationException("WinHSPFLt could not run, Analysis cannot continue")
-                    Dim ans As Integer
-                    ans = MsgBox("WinHSPFLt could not run, Analysis cannot continue")
-                    End
+                lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & pBaseName & ".uci") 'Run HSPF program
+                If lExitCode = -1 Then
+                    Throw New ApplicationException("WinHSPFLt could not run, Analysis cannot continue")
+                    Exit Sub
                 End If
             End If
             Logger.Status(Now & " HSPF Simulation of " & pBaseName & ".uci" & " finished.", True)
-            'set up the timeseries attributes for statistics
-            Dim lStat As New atcTimeseriesStatistics.atcTimeseriesStatistics
-            For Each lOperation As atcDefinedValue In lStat.AvailableOperations
-                atcDataAttributes.AddDefinition(lOperation.Definition)
-            Next
+            
 
             Logger.Status(Now & " Opening " & pBaseName & ".uci", True)
             'open uci file
@@ -169,21 +153,6 @@ Module HSPFOutputReports
             lMsg.Open("hspfmsg.wdm") 'Becky: this can be found at C:\BASINS\models\HSPF\bin if you did the typical BASINS install
             Logger.Dbg(Now & " Reading " & pBaseName & ".uci")
             Logger.Progress(10, 100)
-
-
-            'Becky: change the lOutFolderName to include pTestPath (changing directory several lines above didn't seem to work right)
-            'Dim lOutFolderName As String = pTestPath & "\Reports_" & pBaseName & "_" & lDateString & "\"
-            'Becky - remove copy to new folder to run reports, assume user has already copied files to current folder and reports should be saved there
-            'Anurag did some additional changes and made it conditional so as to follow VT and ATC pattern both.
-
-            'TryDelete(lOutFolderName) 'Becky removed
-            'IO.Directory.CreateDirectory(lOutFolderName) 'Becky removed
-            'dont change name of uci - make it easier to compare with others, foldername contains info about which run
-            'Becky: change the copy from to include pTestPath (changing directory several lines above didn't seem to work right)
-            'Becky: remove file copy below, replace with a copy to a new folder with a new run number if the user specified run number
-            'System.IO.File.Copy(pTestPath & "\" & pBaseName & ".uci", lOutFolderName & pBaseName & ".uci")
-            'the following if then complex was generated by Becky
-
 
             'build collection of operation types to report
             Dim lOperationTypes As New atcCollection
@@ -545,6 +514,10 @@ Module HSPFOutputReports
                             lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_OPN_Ann_Avg_Lds.txt"
                             SaveFileString(lOutFileName, lReportCons.ToString)
                             lReportCons = Nothing
+                            lReportCons = .Item3
+                            lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadAllocation.txt"
+                            SaveFileString(lOutFileName, lReportCons.ToString)
+                            lReportCons = Nothing
                         End With
 
                         Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
@@ -724,6 +697,10 @@ RWZProgramEnding:
                 lRecordIndex += 1
 
             Next CurveNumber
+
+            
+
+
             Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
             Select Case Trim(lGraphInit(0)).ToLower
                 Case "timeseries"
@@ -742,6 +719,10 @@ RWZProgramEnding:
                 System.IO.Directory.CreateDirectory(GraphDirectory)
             End If
             lZgc.SaveIn(lOutFileName)
+            Dim newlistofattributes() As String = {"Location", "Constituent"}
+            atcData.atcDataManager.DisplayAttributesSet(newlistofattributes)
+            Dim lList As New atcList.atcListPlugin
+            lList.Save(lTimeseriesGroup, lOutFileName.Substring(0, Len(lOutFileName) - 4) & ".txt")
             lZgc.Dispose()
             lRecordIndex -= 1
         Loop While (lRecordIndex + 1) < lGraphRecords.Count
@@ -762,10 +743,18 @@ RWZProgramEnding:
                 Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
             Case "monthly_sum"
                 Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+            Case "monthly_min"
+                Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranMin)
+            Case "monthly_max"
+                Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranMax)
             Case "yearly_average"
                 Return Aggregate(aTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
             Case "yearly_sum"
                 Return Aggregate(aTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+            Case "yearly_min"
+                Return Aggregate(aTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranMin)
+            Case "yearly_max"
+                Return Aggregate(aTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranMax)
         End Select
 
         Return aTimeseries
@@ -848,6 +837,20 @@ RWZProgramEnding:
                         lCurve.Symbol.Fill.IsVisible = True
                     Case "plus"
                         lCurve.Symbol.Type = SymbolType.Plus
+                    Case "diamond"
+                        lCurve.Symbol.Type = SymbolType.Diamond
+                    Case "hdash"
+                        lCurve.Symbol.Type = SymbolType.HDash
+                    Case "triangle"
+                        lCurve.Symbol.Type = SymbolType.Triangle
+                    Case "triangledown"
+                        lCurve.Symbol.Type = SymbolType.TriangleDown
+                    Case "vdash"
+                        lCurve.Symbol.Type = SymbolType.VDash
+                    Case "xcross"
+                        lCurve.Symbol.Type = SymbolType.XCross
+                    Case "star"
+                        lCurve.Symbol.Type = SymbolType.Star
                 End Select
                 lCurve.Symbol.Size = Trim(lGraphDataset(8))
             End If
@@ -990,6 +993,24 @@ RWZProgramEnding:
                     lCurve.Symbol.Fill.IsVisible = True
                 Case "plus"
                     lCurve.Symbol.Type = SymbolType.Plus
+                Case "diamond"
+                    lCurve.Symbol.Type = SymbolType.Diamond
+                    lCurve.Symbol.Fill.IsVisible = True
+                Case "hdash"
+                    lCurve.Symbol.Type = SymbolType.HDash
+                Case "triangle"
+                    lCurve.Symbol.Type = SymbolType.Triangle
+                    lCurve.Symbol.Fill.IsVisible = True
+                Case "triangledown"
+                    lCurve.Symbol.Type = SymbolType.TriangleDown
+                    lCurve.Symbol.Fill.IsVisible = True
+                Case "vdash"
+                    lCurve.Symbol.Type = SymbolType.VDash
+                Case "xcross"
+                    lCurve.Symbol.Type = SymbolType.XCross
+                Case "star"
+                    lCurve.Symbol.Type = SymbolType.Star
+                    lCurve.Symbol.Fill.IsVisible = True
             End Select
             lCurve.Symbol.Size = Trim(lGraphDataset(8))
         End If
@@ -1092,4 +1113,7 @@ RWZProgramEnding:
         Return aZgc
 
     End Function
+   
+
+
 End Module
