@@ -85,11 +85,11 @@ Partial Class frmDownload
         Me.grpNWISStations_GW = New System.Windows.Forms.GroupBox
         Me.lblMinCount = New System.Windows.Forms.Label
         Me.grpNWIS_GW = New System.Windows.Forms.GroupBox
+        Me.chkNWIS_GetNWISPrecipitation_GW = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISDailyDischarge_GW = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISIdaDischarge_GW = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISDailyGW_GW = New System.Windows.Forms.CheckBox
         Me.panelNWISnoStations_GW = New System.Windows.Forms.Panel
-        Me.chkNWIS_GetNWISPrecipitation_GW = New System.Windows.Forms.CheckBox
         Me.lblNWISnoStations_GW = New System.Windows.Forms.Label
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
@@ -120,7 +120,7 @@ Partial Class frmDownload
         Me.grpBASINS.Controls.Add(Me.chkBASINS_Census)
         Me.grpBASINS.Location = New System.Drawing.Point(11, 169)
         Me.grpBASINS.Name = "grpBASINS"
-        Me.grpBASINS.Size = New System.Drawing.Size(460, 65)
+        Me.grpBASINS.Size = New System.Drawing.Size(466, 65)
         Me.grpBASINS.TabIndex = 0
         Me.grpBASINS.TabStop = False
         Me.grpBASINS.Text = "BASINS"
@@ -249,7 +249,7 @@ Partial Class frmDownload
         Me.grpNWIS.Controls.Add(Me.panelNWISnoStations)
         Me.grpNWIS.Location = New System.Drawing.Point(11, 361)
         Me.grpNWIS.Name = "grpNWIS"
-        Me.grpNWIS.Size = New System.Drawing.Size(460, 65)
+        Me.grpNWIS.Size = New System.Drawing.Size(466, 65)
         Me.grpNWIS.TabIndex = 26
         Me.grpNWIS.TabStop = False
         Me.grpNWIS.Text = "Data Values from US Geological Survey National Water Information System"
@@ -329,7 +329,7 @@ Partial Class frmDownload
         Me.panelNWISnoStations.Controls.Add(Me.lblNWISnoStations)
         Me.panelNWISnoStations.Location = New System.Drawing.Point(6, 19)
         Me.panelNWISnoStations.Name = "panelNWISnoStations"
-        Me.panelNWISnoStations.Size = New System.Drawing.Size(448, 43)
+        Me.panelNWISnoStations.Size = New System.Drawing.Size(454, 43)
         Me.panelNWISnoStations.TabIndex = 28
         Me.panelNWISnoStations.Visible = False
         '
@@ -345,7 +345,7 @@ Partial Class frmDownload
         'btnHelp
         '
         Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.Location = New System.Drawing.Point(266, 576)
+        Me.btnHelp.Location = New System.Drawing.Point(272, 576)
         Me.btnHelp.Name = "btnHelp"
         Me.btnHelp.Size = New System.Drawing.Size(59, 23)
         Me.btnHelp.TabIndex = 45
@@ -364,7 +364,7 @@ Partial Class frmDownload
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_LandCover)
         Me.grpNLCD2001.Location = New System.Drawing.Point(11, 432)
         Me.grpNLCD2001.Name = "grpNLCD2001"
-        Me.grpNLCD2001.Size = New System.Drawing.Size(460, 42)
+        Me.grpNLCD2001.Size = New System.Drawing.Size(466, 42)
         Me.grpNLCD2001.TabIndex = 30
         Me.grpNLCD2001.TabStop = False
         Me.grpNLCD2001.Text = "National Land Cover Data 2001"
@@ -431,7 +431,7 @@ Partial Class frmDownload
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_Catchment)
         Me.grpNHDplus.Location = New System.Drawing.Point(11, 240)
         Me.grpNHDplus.Name = "grpNHDplus"
-        Me.grpNHDplus.Size = New System.Drawing.Size(460, 67)
+        Me.grpNHDplus.Size = New System.Drawing.Size(466, 67)
         Me.grpNHDplus.TabIndex = 12
         Me.grpNHDplus.TabStop = False
         Me.grpNHDplus.Text = "National Hydrography Dataset Plus"
@@ -527,7 +527,7 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(124, 580)
+        Me.chkClip.Location = New System.Drawing.Point(123, 580)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 43
@@ -539,7 +539,7 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(18, 580)
+        Me.chkMerge.Location = New System.Drawing.Point(17, 580)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 42
@@ -573,7 +573,7 @@ Partial Class frmDownload
         'chkNWISStations_gw_daily_GW
         '
         Me.chkNWISStations_gw_daily_GW.AutoSize = True
-        Me.chkNWISStations_gw_daily_GW.Location = New System.Drawing.Point(12, 19)
+        Me.chkNWISStations_gw_daily_GW.Location = New System.Drawing.Point(6, 19)
         Me.chkNWISStations_gw_daily_GW.Name = "chkNWISStations_gw_daily_GW"
         Me.chkNWISStations_gw_daily_GW.Size = New System.Drawing.Size(113, 17)
         Me.chkNWISStations_gw_daily_GW.TabIndex = 25
@@ -628,18 +628,19 @@ Partial Class frmDownload
         '
         'txtMinCount_GW
         '
-        Me.txtMinCount_GW.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMinCount_GW.Location = New System.Drawing.Point(429, 16)
+        Me.txtMinCount_GW.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtMinCount_GW.Location = New System.Drawing.Point(420, 18)
         Me.txtMinCount_GW.Name = "txtMinCount_GW"
-        Me.txtMinCount_GW.Size = New System.Drawing.Size(25, 20)
+        Me.txtMinCount_GW.Size = New System.Drawing.Size(40, 20)
         Me.txtMinCount_GW.TabIndex = 26
-        Me.txtMinCount_GW.Text = "10"
+        Me.txtMinCount_GW.Text = "1000"
         Me.ToolTip1.SetToolTip(Me.txtMinCount_GW, "Minimum number of values - omit stations with fewer")
         '
         'chkNWISStations_precipitation_GW
         '
         Me.chkNWISStations_precipitation_GW.AutoSize = True
-        Me.chkNWISStations_precipitation_GW.Location = New System.Drawing.Point(12, 42)
+        Me.chkNWISStations_precipitation_GW.Location = New System.Drawing.Point(6, 42)
         Me.chkNWISStations_precipitation_GW.Name = "chkNWISStations_precipitation_GW"
         Me.chkNWISStations_precipitation_GW.Size = New System.Drawing.Size(84, 17)
         Me.chkNWISStations_precipitation_GW.TabIndex = 28
@@ -650,7 +651,7 @@ Partial Class frmDownload
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(396, 576)
+        Me.btnDownload.Location = New System.Drawing.Point(402, 576)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 47
@@ -665,7 +666,7 @@ Partial Class frmDownload
         Me.cboRegion.FormattingEnabled = True
         Me.cboRegion.Location = New System.Drawing.Point(124, 12)
         Me.cboRegion.Name = "cboRegion"
-        Me.cboRegion.Size = New System.Drawing.Size(348, 21)
+        Me.cboRegion.Size = New System.Drawing.Size(354, 21)
         Me.cboRegion.TabIndex = 0
         '
         'lblRegion
@@ -681,7 +682,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(331, 576)
+        Me.btnCancel.Location = New System.Drawing.Point(337, 576)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(59, 23)
         Me.btnCancel.TabIndex = 46
@@ -696,7 +697,7 @@ Partial Class frmDownload
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Stations)
         Me.grpSTORET.Location = New System.Drawing.Point(11, 480)
         Me.grpSTORET.Name = "grpSTORET"
-        Me.grpSTORET.Size = New System.Drawing.Size(460, 42)
+        Me.grpSTORET.Size = New System.Drawing.Size(466, 42)
         Me.grpSTORET.TabIndex = 36
         Me.grpSTORET.TabStop = False
         Me.grpSTORET.Text = "EPA STORET Water Quality"
@@ -734,7 +735,7 @@ Partial Class frmDownload
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_discharge)
         Me.grpNWISStations.Location = New System.Drawing.Point(11, 313)
         Me.grpNWISStations.Name = "grpNWISStations"
-        Me.grpNWISStations.Size = New System.Drawing.Size(460, 42)
+        Me.grpNWISStations.Size = New System.Drawing.Size(466, 42)
         Me.grpNWISStations.TabIndex = 21
         Me.grpNWISStations.TabStop = False
         Me.grpNWISStations.Text = "Station Locations from US Geological Survey National Water Information System"
@@ -760,7 +761,7 @@ Partial Class frmDownload
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASGrid)
         Me.grpNLDAS.Location = New System.Drawing.Point(11, 528)
         Me.grpNLDAS.Name = "grpNLDAS"
-        Me.grpNLDAS.Size = New System.Drawing.Size(460, 42)
+        Me.grpNLDAS.Size = New System.Drawing.Size(466, 42)
         Me.grpNLDAS.TabIndex = 39
         Me.grpNLDAS.TabStop = False
         Me.grpNLDAS.Text = "North American Land Data Assimilation System"
@@ -776,9 +777,9 @@ Partial Class frmDownload
         Me.grpNWISStations_GW.Controls.Add(Me.chkNWISStations_gw_daily_GW)
         Me.grpNWISStations_GW.Controls.Add(Me.chkNWISStations_gw_periodic_GW)
         Me.grpNWISStations_GW.Controls.Add(Me.chkNWISStations_discharge_GW)
-        Me.grpNWISStations_GW.Location = New System.Drawing.Point(12, 39)
+        Me.grpNWISStations_GW.Location = New System.Drawing.Point(11, 39)
         Me.grpNWISStations_GW.Name = "grpNWISStations_GW"
-        Me.grpNWISStations_GW.Size = New System.Drawing.Size(460, 69)
+        Me.grpNWISStations_GW.Size = New System.Drawing.Size(466, 69)
         Me.grpNWISStations_GW.TabIndex = 48
         Me.grpNWISStations_GW.TabStop = False
         Me.grpNWISStations_GW.Text = "Station Locations from US Geological Survey National Water Information System"
@@ -786,9 +787,8 @@ Partial Class frmDownload
         '
         'lblMinCount
         '
-        Me.lblMinCount.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblMinCount.AutoSize = True
-        Me.lblMinCount.Location = New System.Drawing.Point(369, 20)
+        Me.lblMinCount.Location = New System.Drawing.Point(363, 21)
         Me.lblMinCount.Name = "lblMinCount"
         Me.lblMinCount.Size = New System.Drawing.Size(55, 13)
         Me.lblMinCount.TabIndex = 27
@@ -806,11 +806,21 @@ Partial Class frmDownload
         Me.grpNWIS_GW.Controls.Add(Me.panelNWISnoStations_GW)
         Me.grpNWIS_GW.Location = New System.Drawing.Point(11, 98)
         Me.grpNWIS_GW.Name = "grpNWIS_GW"
-        Me.grpNWIS_GW.Size = New System.Drawing.Size(460, 65)
+        Me.grpNWIS_GW.Size = New System.Drawing.Size(466, 65)
         Me.grpNWIS_GW.TabIndex = 32
         Me.grpNWIS_GW.TabStop = False
         Me.grpNWIS_GW.Text = "Data Values from US Geological Survey National Water Information System"
         Me.grpNWIS_GW.Visible = False
+        '
+        'chkNWIS_GetNWISPrecipitation_GW
+        '
+        Me.chkNWIS_GetNWISPrecipitation_GW.AutoSize = True
+        Me.chkNWIS_GetNWISPrecipitation_GW.Location = New System.Drawing.Point(6, 39)
+        Me.chkNWIS_GetNWISPrecipitation_GW.Name = "chkNWIS_GetNWISPrecipitation_GW"
+        Me.chkNWIS_GetNWISPrecipitation_GW.Size = New System.Drawing.Size(84, 17)
+        Me.chkNWIS_GetNWISPrecipitation_GW.TabIndex = 1
+        Me.chkNWIS_GetNWISPrecipitation_GW.Text = "Precipitation"
+        Me.chkNWIS_GetNWISPrecipitation_GW.UseVisualStyleBackColor = True
         '
         'chkNWIS_GetNWISDailyDischarge_GW
         '
@@ -827,7 +837,7 @@ Partial Class frmDownload
         '
         Me.chkNWIS_GetNWISIdaDischarge_GW.AutoSize = True
         Me.chkNWIS_GetNWISIdaDischarge_GW.Enabled = False
-        Me.chkNWIS_GetNWISIdaDischarge_GW.Location = New System.Drawing.Point(290, 42)
+        Me.chkNWIS_GetNWISIdaDischarge_GW.Location = New System.Drawing.Point(290, 39)
         Me.chkNWIS_GetNWISIdaDischarge_GW.Name = "chkNWIS_GetNWISIdaDischarge_GW"
         Me.chkNWIS_GetNWISIdaDischarge_GW.Size = New System.Drawing.Size(144, 17)
         Me.chkNWIS_GetNWISIdaDischarge_GW.TabIndex = 31
@@ -838,7 +848,7 @@ Partial Class frmDownload
         '
         Me.chkNWIS_GetNWISDailyGW_GW.AutoSize = True
         Me.chkNWIS_GetNWISDailyGW_GW.Enabled = False
-        Me.chkNWIS_GetNWISDailyGW_GW.Location = New System.Drawing.Point(13, 19)
+        Me.chkNWIS_GetNWISDailyGW_GW.Location = New System.Drawing.Point(6, 19)
         Me.chkNWIS_GetNWISDailyGW_GW.Name = "chkNWIS_GetNWISDailyGW_GW"
         Me.chkNWIS_GetNWISDailyGW_GW.Size = New System.Drawing.Size(113, 17)
         Me.chkNWIS_GetNWISDailyGW_GW.TabIndex = 30
@@ -852,19 +862,9 @@ Partial Class frmDownload
         Me.panelNWISnoStations_GW.Controls.Add(Me.lblNWISnoStations_GW)
         Me.panelNWISnoStations_GW.Location = New System.Drawing.Point(6, 16)
         Me.panelNWISnoStations_GW.Name = "panelNWISnoStations_GW"
-        Me.panelNWISnoStations_GW.Size = New System.Drawing.Size(448, 43)
+        Me.panelNWISnoStations_GW.Size = New System.Drawing.Size(454, 43)
         Me.panelNWISnoStations_GW.TabIndex = 28
         Me.panelNWISnoStations_GW.Visible = False
-        '
-        'chkNWIS_GetNWISPrecipitation_GW
-        '
-        Me.chkNWIS_GetNWISPrecipitation_GW.AutoSize = True
-        Me.chkNWIS_GetNWISPrecipitation_GW.Location = New System.Drawing.Point(13, 39)
-        Me.chkNWIS_GetNWISPrecipitation_GW.Name = "chkNWIS_GetNWISPrecipitation_GW"
-        Me.chkNWIS_GetNWISPrecipitation_GW.Size = New System.Drawing.Size(84, 17)
-        Me.chkNWIS_GetNWISPrecipitation_GW.TabIndex = 1
-        Me.chkNWIS_GetNWISPrecipitation_GW.Text = "Precipitation"
-        Me.chkNWIS_GetNWISPrecipitation_GW.UseVisualStyleBackColor = True
         '
         'lblNWISnoStations_GW
         '
@@ -881,7 +881,7 @@ Partial Class frmDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(484, 611)
+        Me.ClientSize = New System.Drawing.Size(490, 611)
         Me.Controls.Add(Me.grpNWISStations_GW)
         Me.Controls.Add(Me.grpNWIS_GW)
         Me.Controls.Add(Me.grpNLDAS)
