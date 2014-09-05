@@ -49,15 +49,10 @@ Partial Class StartUp
         Me.Label3 = New System.Windows.Forms.Label()
         Me.chkExpertStats = New System.Windows.Forms.CheckBox()
         Me.btnMakeEXSFile = New System.Windows.Forms.Button()
-        Me.btnHelp = New System.Windows.Forms.Button()
-        Me.chkChangeModelParameters = New System.Windows.Forms.CheckBox()
-        Me.cmbParameterName = New System.Windows.Forms.ComboBox()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.txtOperation = New System.Windows.Forms.TextBox()
-        Me.Label5 = New System.Windows.Forms.Label()
-        Me.txtParameterChange = New System.Windows.Forms.TextBox()
         Me.chkAdditionalgraphs = New System.Windows.Forms.CheckBox()
+        Me.btn_help = New System.Windows.Forms.Button()
+        Me.chkHydrologySensitivity = New System.Windows.Forms.CheckBox()
+        Me.chkWaterQualitySensitivity = New System.Windows.Forms.CheckBox()
         Me.grpGraphs.SuspendLayout()
         Me.grpConstituentBalance.SuspendLayout()
         Me.SuspendLayout()
@@ -67,7 +62,7 @@ Partial Class StartUp
         Me.cmdStart.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdStart.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.cmdStart.Enabled = False
-        Me.cmdStart.Location = New System.Drawing.Point(370, 712)
+        Me.cmdStart.Location = New System.Drawing.Point(370, 689)
         Me.cmdStart.Name = "cmdStart"
         Me.cmdStart.Size = New System.Drawing.Size(75, 23)
         Me.cmdStart.TabIndex = 15
@@ -151,7 +146,7 @@ Partial Class StartUp
         '
         Me.cmdEnd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdEnd.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdEnd.Location = New System.Drawing.Point(451, 712)
+        Me.cmdEnd.Location = New System.Drawing.Point(451, 689)
         Me.cmdEnd.Name = "cmdEnd"
         Me.cmdEnd.Size = New System.Drawing.Size(75, 23)
         Me.cmdEnd.TabIndex = 19
@@ -161,7 +156,7 @@ Partial Class StartUp
         'chkAreaReports
         '
         Me.chkAreaReports.AutoSize = True
-        Me.chkAreaReports.Location = New System.Drawing.Point(15, 293)
+        Me.chkAreaReports.Location = New System.Drawing.Point(15, 257)
         Me.chkAreaReports.Name = "chkAreaReports"
         Me.chkAreaReports.Size = New System.Drawing.Size(500, 17)
         Me.chkAreaReports.TabIndex = 7
@@ -204,7 +199,7 @@ Partial Class StartUp
         'chkRunHSPF
         '
         Me.chkRunHSPF.AutoSize = True
-        Me.chkRunHSPF.Location = New System.Drawing.Point(15, 222)
+        Me.chkRunHSPF.Location = New System.Drawing.Point(15, 186)
         Me.chkRunHSPF.Name = "chkRunHSPF"
         Me.chkRunHSPF.Size = New System.Drawing.Size(77, 17)
         Me.chkRunHSPF.TabIndex = 6
@@ -248,7 +243,7 @@ Partial Class StartUp
         Me.grpGraphs.Controls.Add(Me.chkLogGraphs)
         Me.grpGraphs.Controls.Add(Me.chkSupportingGraphs)
         Me.grpGraphs.Enabled = False
-        Me.grpGraphs.Location = New System.Drawing.Point(15, 316)
+        Me.grpGraphs.Location = New System.Drawing.Point(15, 280)
         Me.grpGraphs.Name = "grpGraphs"
         Me.grpGraphs.Size = New System.Drawing.Size(508, 86)
         Me.grpGraphs.TabIndex = 28
@@ -270,7 +265,7 @@ Partial Class StartUp
         Me.grpConstituentBalance.Controls.Add(Me.txtRCH)
         Me.grpConstituentBalance.Controls.Add(Me.lblOutReach2)
         Me.grpConstituentBalance.Controls.Add(Me.pnlHighlight)
-        Me.grpConstituentBalance.Location = New System.Drawing.Point(18, 408)
+        Me.grpConstituentBalance.Location = New System.Drawing.Point(15, 372)
         Me.grpConstituentBalance.Name = "grpConstituentBalance"
         Me.grpConstituentBalance.Size = New System.Drawing.Size(508, 293)
         Me.grpConstituentBalance.TabIndex = 29
@@ -331,7 +326,7 @@ Partial Class StartUp
         'chkExpertStats
         '
         Me.chkExpertStats.AutoSize = True
-        Me.chkExpertStats.Location = New System.Drawing.Point(15, 270)
+        Me.chkExpertStats.Location = New System.Drawing.Point(15, 234)
         Me.chkExpertStats.Name = "chkExpertStats"
         Me.chkExpertStats.Size = New System.Drawing.Size(148, 17)
         Me.chkExpertStats.TabIndex = 30
@@ -349,91 +344,45 @@ Partial Class StartUp
         Me.btnMakeEXSFile.Text = "Create Basins Specification (EXS) File"
         Me.btnMakeEXSFile.UseVisualStyleBackColor = True
         '
-        'btnHelp
-        '
-        Me.btnHelp.Enabled = False
-        Me.btnHelp.Location = New System.Drawing.Point(445, 18)
-        Me.btnHelp.Name = "btnHelp"
-        Me.btnHelp.Size = New System.Drawing.Size(75, 23)
-        Me.btnHelp.TabIndex = 32
-        Me.btnHelp.Text = "Help"
-        Me.btnHelp.UseVisualStyleBackColor = True
-        '
-        'chkChangeModelParameters
-        '
-        Me.chkChangeModelParameters.AutoSize = True
-        Me.chkChangeModelParameters.Enabled = False
-        Me.chkChangeModelParameters.Location = New System.Drawing.Point(17, 138)
-        Me.chkChangeModelParameters.Name = "chkChangeModelParameters"
-        Me.chkChangeModelParameters.Size = New System.Drawing.Size(188, 17)
-        Me.chkChangeModelParameters.TabIndex = 34
-        Me.chkChangeModelParameters.Text = "Change HSPF Model Parameters?"
-        Me.chkChangeModelParameters.UseVisualStyleBackColor = True
-        '
-        'cmbParameterName
-        '
-        Me.cmbParameterName.Enabled = False
-        Me.cmbParameterName.FormattingEnabled = True
-        Me.cmbParameterName.Location = New System.Drawing.Point(17, 189)
-        Me.cmbParameterName.Name = "cmbParameterName"
-        Me.cmbParameterName.Size = New System.Drawing.Size(121, 21)
-        Me.cmbParameterName.TabIndex = 35
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Enabled = False
-        Me.Label2.Location = New System.Drawing.Point(20, 167)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(55, 13)
-        Me.Label2.TabIndex = 36
-        Me.Label2.Text = "Parameter"
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Enabled = False
-        Me.Label4.Location = New System.Drawing.Point(151, 167)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(149, 13)
-        Me.Label4.TabIndex = 38
-        Me.Label4.Text = "Operation or Operation Range"
-        '
-        'txtOperation
-        '
-        Me.txtOperation.Enabled = False
-        Me.txtOperation.Location = New System.Drawing.Point(154, 190)
-        Me.txtOperation.Name = "txtOperation"
-        Me.txtOperation.Size = New System.Drawing.Size(146, 20)
-        Me.txtOperation.TabIndex = 39
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Enabled = False
-        Me.Label5.Location = New System.Drawing.Point(331, 167)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(95, 13)
-        Me.Label5.TabIndex = 40
-        Me.Label5.Text = "Change in Percent"
-        '
-        'txtParameterChange
-        '
-        Me.txtParameterChange.Enabled = False
-        Me.txtParameterChange.Location = New System.Drawing.Point(334, 189)
-        Me.txtParameterChange.Name = "txtParameterChange"
-        Me.txtParameterChange.Size = New System.Drawing.Size(100, 20)
-        Me.txtParameterChange.TabIndex = 41
-        '
         'chkAdditionalgraphs
         '
         Me.chkAdditionalgraphs.AutoSize = True
-        Me.chkAdditionalgraphs.Location = New System.Drawing.Point(15, 245)
+        Me.chkAdditionalgraphs.Location = New System.Drawing.Point(15, 209)
         Me.chkAdditionalgraphs.Name = "chkAdditionalgraphs"
         Me.chkAdditionalgraphs.Size = New System.Drawing.Size(150, 17)
         Me.chkAdditionalgraphs.TabIndex = 42
         Me.chkAdditionalgraphs.Text = "Produce Additional graphs"
         Me.chkAdditionalgraphs.UseVisualStyleBackColor = True
+        '
+        'btn_help
+        '
+        Me.btn_help.Location = New System.Drawing.Point(445, 14)
+        Me.btn_help.Name = "btn_help"
+        Me.btn_help.Size = New System.Drawing.Size(75, 23)
+        Me.btn_help.TabIndex = 43
+        Me.btn_help.Text = "Help"
+        Me.btn_help.UseVisualStyleBackColor = True
+        '
+        'chkHydrologySensitivity
+        '
+        Me.chkHydrologySensitivity.AutoSize = True
+        Me.chkHydrologySensitivity.Location = New System.Drawing.Point(15, 135)
+        Me.chkHydrologySensitivity.Name = "chkHydrologySensitivity"
+        Me.chkHydrologySensitivity.Size = New System.Drawing.Size(207, 17)
+        Me.chkHydrologySensitivity.TabIndex = 44
+        Me.chkHydrologySensitivity.Text = "Conduct Hydrology Sensitivity Analysis"
+        Me.chkHydrologySensitivity.UseVisualStyleBackColor = True
+        '
+        'chkWaterQualitySensitivity
+        '
+        Me.chkWaterQualitySensitivity.AutoSize = True
+        Me.chkWaterQualitySensitivity.Enabled = False
+        Me.chkWaterQualitySensitivity.Location = New System.Drawing.Point(15, 160)
+        Me.chkWaterQualitySensitivity.Name = "chkWaterQualitySensitivity"
+        Me.chkWaterQualitySensitivity.Size = New System.Drawing.Size(224, 17)
+        Me.chkWaterQualitySensitivity.TabIndex = 45
+        Me.chkWaterQualitySensitivity.Text = "Conduct Water Quality Sensitivity Analysis"
+        Me.chkWaterQualitySensitivity.UseVisualStyleBackColor = True
         '
         'StartUp
         '
@@ -441,16 +390,11 @@ Partial Class StartUp
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
-        Me.ClientSize = New System.Drawing.Size(532, 747)
+        Me.ClientSize = New System.Drawing.Size(532, 724)
+        Me.Controls.Add(Me.chkWaterQualitySensitivity)
+        Me.Controls.Add(Me.chkHydrologySensitivity)
+        Me.Controls.Add(Me.btn_help)
         Me.Controls.Add(Me.chkAdditionalgraphs)
-        Me.Controls.Add(Me.txtParameterChange)
-        Me.Controls.Add(Me.Label5)
-        Me.Controls.Add(Me.txtOperation)
-        Me.Controls.Add(Me.Label4)
-        Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.cmbParameterName)
-        Me.Controls.Add(Me.chkChangeModelParameters)
-        Me.Controls.Add(Me.btnHelp)
         Me.Controls.Add(Me.btnMakeEXSFile)
         Me.Controls.Add(Me.chkExpertStats)
         Me.Controls.Add(Me.grpConstituentBalance)
@@ -501,14 +445,9 @@ Partial Class StartUp
     Friend WithEvents chkBODBalance As System.Windows.Forms.CheckBox
     Friend WithEvents chkFecalColiform As System.Windows.Forms.CheckBox
     Friend WithEvents btnMakeEXSFile As System.Windows.Forms.Button
-    Friend WithEvents btnHelp As System.Windows.Forms.Button
-    Friend WithEvents chkChangeModelParameters As System.Windows.Forms.CheckBox
-    Friend WithEvents cmbParameterName As System.Windows.Forms.ComboBox
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents Label4 As System.Windows.Forms.Label
-    Friend WithEvents txtOperation As System.Windows.Forms.TextBox
-    Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents txtParameterChange As System.Windows.Forms.TextBox
     Friend WithEvents chkAdditionalgraphs As System.Windows.Forms.CheckBox
+    Friend WithEvents btn_help As System.Windows.Forms.Button
+    Friend WithEvents chkHydrologySensitivity As System.Windows.Forms.CheckBox
+    Friend WithEvents chkWaterQualitySensitivity As System.Windows.Forms.CheckBox
 
 End Class
