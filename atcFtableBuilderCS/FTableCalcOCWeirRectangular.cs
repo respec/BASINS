@@ -16,7 +16,22 @@ namespace atcFtableBuilder
             get { return pWeirInvert; }
             set { pWeirInvert = value; }
         }
+        int pExit;
+        public int myExit
+        {
+            get { return pExit; }
+            set { pExit = value; }
+        }
         public double DischargeCoefficient = -999;
+        private static string[] gOCWeirRectLbl = { "Weir Crest Width", "Weir Invert Depth", "Discharge Coefficient" };
+        private static double[] DefaultsWeirRect = { 10, 5, 3.33 }; // Need to check this value
+        public new readonly ControlDeviceType ControlDevice
+        {
+            get
+            {
+                return ControlDeviceType.WeirRectangular;
+            }
+        }
 
         public FTableCalcOCWeirRectangular()
         {
@@ -25,6 +40,26 @@ namespace atcFtableBuilder
             vectorColNames.Add("AREA");
             vectorColNames.Add("VOLUME");
             vectorColNames.Add("OUTFLOW");
+        }
+
+        public static Dictionary<string, double> ParamValueDefaults()
+        {
+            Dictionary<string, double> defaults = new Dictionary<string, double>();
+            for (int i = 0; i <= gOCWeirRectLbl.Length - 1; i++)
+            {
+                defaults.Add(gOCWeirRectLbl[i], DefaultsWeirRect[i]);
+            }
+            return defaults;
+        }
+        public new Dictionary<string, double> ParamValues()
+        {
+            double[] CurrentParamValues = { WeirWidth, WeirInvert, DischargeCoefficient };
+            Dictionary<string, double> lParams = new Dictionary<string, double>();
+            for (int i = 0; i <= gOCWeirRectLbl.Length - 1; i++)
+            {
+                lParams.Add(gOCWeirRectLbl[i], CurrentParamValues[i]);
+            }
+            return lParams;
         }
 
         public ArrayList GenerateFTableOC()

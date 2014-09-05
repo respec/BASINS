@@ -15,8 +15,21 @@ namespace atcFtableBuilder
             get { return pOrificeDepth; }
             set { pOrificeDepth = value; }
         }
+        int pExit;
+        public int myExit
+        {
+            get { return pExit; }
+            set { pExit = value; }
+        }
         public double OrificeDischargeCoefficient = -999;
-
+        private static string[] gOCOrificeRiserLbl = { "Orifice Diameter", "Orifice Depth", "Discharge Coefficient" };
+        public new readonly ControlDeviceType ControlDevice
+        {
+            get
+            {
+                return ControlDeviceType.OrificeRiser;
+            }
+        }
         public FTableCalcOCOrificeRiser()
         {
             vectorColNames.Clear();
@@ -24,6 +37,27 @@ namespace atcFtableBuilder
             vectorColNames.Add("AREA");
             vectorColNames.Add("VOLUME");
             vectorColNames.Add("OUTFLOW");
+        }
+
+        public static Dictionary<string, double> ParamValueDefaults()
+        {
+            Dictionary<string, double> defaults = new Dictionary<string, double>();
+            for (int i = 0; i <= gOCOrificeRiserLbl.Length - 1; i++)
+            {
+                defaults.Add(gOCOrificeRiserLbl[i], DefaultsOrifice[i]);
+            }
+            return defaults;
+        }
+
+        public new Dictionary<string, double> ParamValues()
+        {
+            double[] CurrentParamValues = { OrificePipeDiameter, OrificeDepth, OrificeDischargeCoefficient };
+            Dictionary<string, double> lParams = new Dictionary<string, double>();
+            for (int i = 0; i <= gOCOrificeRiserLbl.Length - 1; i++)
+            {
+                lParams.Add(gOCOrificeRiserLbl[i], CurrentParamValues[i]);
+            }
+            return lParams;
         }
 
         public ArrayList GenerateFTableOC()

@@ -12,7 +12,10 @@ namespace atcFtableBuilder
     }
     public interface IFTableOperationsOC
     {
+        int myExit { get; set; }
         ArrayList GenerateFTableOC();
+        Dictionary<string, double> ParamValueDefaults();
+        Dictionary<string, double> ParamValues();
     }
     public class XSectionStation
     {
@@ -27,9 +30,26 @@ namespace atcFtableBuilder
         };
         public enum ControlDeviceType
         {
-            WeirTriVNotch, WeirTrapeCipolletti, WeirBroadCrest, WeirRectangular, OrificeUnderdrain, OrificeRiser
+            None, WeirTriVNotch, WeirTrapeCipolletti, WeirBroadCrest, WeirRectangular, OrificeUnderdrain, OrificeRiser
         };
+        public virtual readonly ControlDeviceType ControlDevice
+        {
+            get
+            {
+                return ControlDeviceType.None;
+            }
+        }
 
+        public static Dictionary<ControlDeviceType, String> OCTypeNames = new Dictionary<ControlDeviceType, string>()
+        {
+            {ControlDeviceType.None, "None"},
+            {ControlDeviceType.WeirTriVNotch, "Triangular Vnotch Weir"},
+            {ControlDeviceType.WeirTrapeCipolletti, "Trapezoidal Weir (Cipoletti)"},
+            {ControlDeviceType.WeirRectangular, "Rectangular Weir"},
+            {ControlDeviceType.WeirBroadCrest, "Broad Crested Weir"},
+            {ControlDeviceType.OrificeUnderdrain, "Underdrain Orifice"},
+            {ControlDeviceType.OrificeRiser, "Riser Orifice"}
+        };
         public enum BMPType
         {
            None,
@@ -66,6 +86,14 @@ namespace atcFtableBuilder
 
         //public static string[] RiserOrificeInputs = { "Riser Orifice Diameter", "Riser Orifice Depth", "Discharge Coefficient" };
         //public static string[] RiserOrificeUnits = { "", "", "" };
+
+        public static double[] DefaultsOrifice = { 5, 2, 0.6 };
+        public static double[] DefaultsWeir = { 10, 5, 2 };
+        public static string[] gOCParmLbl = { "Parameter", "Parameter", "Discharge Coefficient" };
+        public virtual Dictionary<string, double> ParamValues()
+        {
+            return null;
+        }
 
         public static Dictionary<BMPType, string> BMPTypeNames = new Dictionary<BMPType,string>() {
             {BMPType.None, "None"},
