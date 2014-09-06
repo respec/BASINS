@@ -38,6 +38,7 @@ namespace atcFtableBuilder
         {
             if (!pLoaded) return;
             string lSelectedOCName = cboOCTypes.SelectedItem.ToString();
+            if (lSelectedOCName == "None") return;
             string lName = "";
             FTableCalculator.ControlDeviceType lSelectedOCType = FTableCalculator.ControlDeviceType.None;
             foreach (FTableCalculator.ControlDeviceType lOCType in FTableCalculator.OCTypeNames.Keys)
@@ -52,27 +53,34 @@ namespace atcFtableBuilder
                 }
             }
 
-           Dictionary<string, double> lDefaults = null;
+            Dictionary<string, double> lDefaults = null;
+            FTableCalculator lCalc = null;
             switch (lSelectedOCType)
             {
                 case FTableCalculator.ControlDeviceType.WeirTriVNotch:
-                    lDefaults = FTableCalcOCWeirTriVNotch.ParamValueDefaults();
+                    lCalc = new FTableCalcOCWeirTriVNotch();
+                    lDefaults = ((FTableCalcOCWeirTriVNotch)lCalc).ParamValueDefaults();
                     break;
                 case FTableCalculator.ControlDeviceType.WeirTrapeCipolletti:
-                    lDefaults = FTableCalcOCWeirTrapeCipolletti.ParamValueDefaults();
-                   break;
+                    lCalc = new FTableCalcOCWeirTrapeCipolletti();
+                    lDefaults = ((FTableCalcOCWeirTrapeCipolletti)lCalc).ParamValueDefaults();
+                    break;
                 case FTableCalculator.ControlDeviceType.WeirRectangular:
-                    lDefaults = FTableCalcOCWeirRectangular.ParamValueDefaults();
-                   break;
+                    lCalc = new FTableCalcOCWeirRectangular();
+                    lDefaults = ((FTableCalcOCWeirRectangular)lCalc).ParamValueDefaults();
+                    break;
                 case FTableCalculator.ControlDeviceType.WeirBroadCrest:
-                    lDefaults = FTableCalcOCWeirBroad.ParamValueDefaults();
-                   break;
+                    lCalc = new FTableCalcOCWeirBroad();
+                    lDefaults = ((FTableCalcOCWeirBroad)lCalc).ParamValueDefaults();
+                    break;
                 case FTableCalculator.ControlDeviceType.OrificeUnderdrain:
-                    lDefaults = FTableCalcOCOrificeUnderflow.ParamValueDefaults();
-                   break;
+                    lCalc = new FTableCalcOCOrificeUnderflow();
+                    lDefaults = ((FTableCalcOCOrificeUnderflow)lCalc).ParamValueDefaults();
+                    break;
                 case FTableCalculator.ControlDeviceType.OrificeRiser:
-                    lDefaults = FTableCalcOCOrificeRiser.ParamValueDefaults();
-                   break;
+                    lCalc = new FTableCalcOCOrificeRiser();
+                    lDefaults = ((FTableCalcOCOrificeRiser)lCalc).ParamValueDefaults();
+                    break;
             };
 
             List<string> lParamLbls = lDefaults.Keys.ToList<string>();
@@ -102,8 +110,8 @@ namespace atcFtableBuilder
             {
                 if (clsGlobals.gExitOCSetup.Keys.Contains(i))
                 { //add exit
-                    TreeNode lExitNode = treeExitControls.Nodes.Add(i.ToString(), "Exit " +i.ToString());
-                    atcUtility.atcCollection lOCs = (atcUtility.atcCollection) clsGlobals.gExitOCSetup.get_ItemByKey(i);
+                    TreeNode lExitNode = treeExitControls.Nodes.Add(i.ToString(), "Exit " + i.ToString());
+                    atcUtility.atcCollection lOCs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(i);
                     foreach (string lKey in lOCs.Keys) //FTableCalculator lOC in lOCs) 
                     { //add OCs
                         //lKey is like OC class name plus an id, eg. FTableOCWeirRectangular_2
@@ -179,15 +187,16 @@ namespace atcFtableBuilder
 
         private void txtOCParamChanged(object sender, EventArgs e)
         {
-            double lParam0 = -99;
-            double lParam1 = -99;
-            double lParamDC = -99;
+            if (!pLoaded) return;
+            if (sender == null) return;
 
-            if (double.TryParse(txtOCParm_0.Text, out lParam0) ||
-                double.TryParse(txtOCParm_1.Text, out lParam1) ||
-                double.TryParse(txtOCDisCoeff.Text, out lParamDC))
+            double lParam0 = -99;
+
+            TextBox lTB = (TextBox)sender;
+
+            if (double.TryParse(lTB.Text, out lParam0))
             {
-                if (lParam0 <= 0 || lParam1 <= 0 || lParamDC <= 0)
+                if (lParam0 <= 0)
                 {
                     System.Windows.Forms.MessageBox.Show("Invalid parameter(s) for control device." + Environment.NewLine +
                         "Parameter(s) value cannot be less than or equal to zero.", "Control Device Setup");
@@ -201,6 +210,105 @@ namespace atcFtableBuilder
             }
         }
 
-        
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            string lErrMsg = ParamsOK();
+            if (!string.IsNullOrEmpty(lErrMsg))
+            {
+                System.Windows.Forms.MessageBox.Show("Please address the following error before proceeding:" + Environment.NewLine + lErrMsg,
+                    "Adding New Control Devices");
+                return;
+            }
+
+            List<FTableCalculator.ControlDeviceType> listOCs = FTableCalculator.OCTypeNames.Keys.ToList<FTableCalculator.ControlDeviceType>();
+            List<string> listOCNames = FTableCalculator.OCTypeNames.Values.ToList<string>();
+            FTableCalculator.ControlDeviceType lSelectedOCType = FTableCalculator.ControlDeviceType.None;
+            for (int i = 0; i < listOCs.Count; i++)
+            {
+                if (cboOCTypes.SelectedItem.ToString() == listOCNames[i])
+                {
+                    lSelectedOCType = listOCs[i];
+                    break;
+                }
+            }
+
+            FTableCalculator lCalc = null;
+            switch (lSelectedOCType)
+            {
+                case FTableCalculator.ControlDeviceType.OrificeRiser:
+                    lCalc = new FTableCalcOCOrificeRiser();
+                    break;
+                case FTableCalculator.ControlDeviceType.OrificeUnderdrain:
+                    lCalc = new FTableCalcOCOrificeUnderflow();
+                    break;
+                case FTableCalculator.ControlDeviceType.WeirBroadCrest:
+                    lCalc = new FTableCalcOCWeirBroad();
+                    break;
+                case FTableCalculator.ControlDeviceType.WeirRectangular:
+                    lCalc = new FTableCalcOCWeirRectangular();
+                    break;
+                case FTableCalculator.ControlDeviceType.WeirTrapeCipolletti:
+                    lCalc = new FTableCalcOCWeirTrapeCipolletti();
+                    break;
+                case FTableCalculator.ControlDeviceType.WeirTriVNotch:
+                    lCalc = new FTableCalcOCWeirTriVNotch();
+                    break;
+            }
+
+            if (rdoExit1.Checked) lCalc.myExit = 1;
+            else if (rdoExit2.Checked) lCalc.myExit = 2;
+            else if (rdoExit3.Checked) lCalc.myExit = 3;
+            else if (rdoExit4.Checked) lCalc.myExit = 4;
+            else if (rdoExit5.Checked) lCalc.myExit = 5;
+
+
+            
+            
+
+        }
+
+        private string ParamsOK()
+        {
+            string lErrMsg = "";
+            if (cboOCTypes.SelectedItem.ToString() == "None") lErrMsg = "Need to select a control device first." + Environment.NewLine;
+
+            double lParam0 = -99;
+            double lParam1 = -99;
+            double lParamDC = -99;
+
+            if (double.TryParse(txtOCParm_0.Text, out lParam0) ||
+                double.TryParse(txtOCParm_1.Text, out lParam1) ||
+                double.TryParse(txtOCDisCoeff.Text, out lParamDC))
+            {
+                if (lParam0 <= 0 || lParam1 <= 0 || lParamDC <= 0)
+                {
+                    lErrMsg += "Parameter(s) value cannot be less than or equal to zero." + Environment.NewLine;
+                }
+            }
+            else
+            {
+                lErrMsg += "Parameter value needs to be numeric." + Environment.NewLine;
+            }
+
+            if (!rdoExit1.Checked && !rdoExit2.Checked && !rdoExit3.Checked && !rdoExit4.Checked && !rdoExit5.Checked)
+                lErrMsg += "Need to select an exit.";
+
+            return lErrMsg;
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            cboOCTypes.SelectedIndex = 0;
+            txtOCParm_0.Text = "";
+            txtOCParm_1.Text = "";
+            txtOCDisCoeff.Text = "";
+        }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
     }
 }

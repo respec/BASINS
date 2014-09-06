@@ -16,14 +16,14 @@ namespace atcFtableBuilder
             set { pOrificeInvertDepth = value; }
         }
         int pExit;
-        public int myExit
+        public new int myExit
         {
             get { return pExit; }
             set { pExit = value; }
         }
         public double OrificeDischargeCoefficient = -999;
-        private static string[] gOCOrificeUndLbl = { "Orifice Diameter", "Orifice Invert Depth", "Discharge Coefficient" };
-        public new readonly ControlDeviceType ControlDevice
+        private string[] gOCOrificeUndLbl = { "Orifice Diameter", "Orifice Invert Depth", "Discharge Coefficient" };
+        public new ControlDeviceType ControlDevice
         {
             get
             {
@@ -39,7 +39,7 @@ namespace atcFtableBuilder
             vectorColNames.Add("OUTFLOW(cfs)");
         }
 
-        public static Dictionary<string, double> ParamValueDefaults()
+        public Dictionary<string, double> ParamValueDefaults()
         {
             Dictionary<string, double> defaults = new Dictionary<string, double>();
             for (int i = 0; i <= gOCOrificeUndLbl.Length - 1; i++)

@@ -17,15 +17,15 @@ namespace atcFtableBuilder
             set { pWeirInvert = value; }
         }
         int pExit;
-        public int myExit
+        public new int myExit
         {
             get { return pExit; }
             set { pExit = value; }
         }
         public double DischargeCoefficient = -999;
-        private static string[] gOCWeirTrapeLbl = { "Weir Width", "Weir Depth", "Discharge Coefficient" };
-        private static double[] DefaultsWeirTrape = { 10, 5, 3.367 };
-        public new readonly ControlDeviceType ControlDevice
+        private string[] gOCWeirTrapeLbl = { "Weir Width", "Weir Depth", "Discharge Coefficient" };
+        private double[] DefaultsWeirTrape = { 10, 5, 3.367 };
+        public new ControlDeviceType ControlDevice
         {
             get
             {
@@ -42,7 +42,7 @@ namespace atcFtableBuilder
             vectorColNames.Add("OUTFLOW(cfs)");
         }
 
-        public static Dictionary<string, double> ParamValueDefaults()
+        public Dictionary<string, double> ParamValueDefaults()
         {
             Dictionary<string, double> defaults = new Dictionary<string, double>();
             for (int i = 0; i <= gOCWeirTrapeLbl.Length - 1; i++)
