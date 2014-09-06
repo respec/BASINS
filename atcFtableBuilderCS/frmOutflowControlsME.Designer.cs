@@ -32,6 +32,7 @@
             this.gbSetup = new System.Windows.Forms.GroupBox();
             this.gbControlParms = new System.Windows.Forms.GroupBox();
             this.btnClear = new System.Windows.Forms.Button();
+            this.btnUpdate = new System.Windows.Forms.Button();
             this.rdoExit5 = new System.Windows.Forms.RadioButton();
             this.rdoExit4 = new System.Windows.Forms.RadioButton();
             this.btnAdd = new System.Windows.Forms.Button();
@@ -48,7 +49,6 @@
             this.lblOCParm1 = new System.Windows.Forms.Label();
             this.txtOCParm_0 = new System.Windows.Forms.TextBox();
             this.treeExitControls = new System.Windows.Forms.TreeView();
-            this.btnEdit = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.gbSetup.SuspendLayout();
             this.gbControlParms.SuspendLayout();
@@ -72,7 +72,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gbControlParms.Controls.Add(this.btnClear);
-            this.gbControlParms.Controls.Add(this.btnEdit);
+            this.gbControlParms.Controls.Add(this.btnUpdate);
             this.gbControlParms.Controls.Add(this.rdoExit5);
             this.gbControlParms.Controls.Add(this.rdoExit4);
             this.gbControlParms.Controls.Add(this.btnAdd);
@@ -104,6 +104,17 @@
             this.btnClear.TabIndex = 15;
             this.btnClear.Text = "Clear";
             this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            // 
+            // btnUpdate
+            // 
+            this.btnUpdate.Location = new System.Drawing.Point(87, 294);
+            this.btnUpdate.Name = "btnUpdate";
+            this.btnUpdate.Size = new System.Drawing.Size(91, 23);
+            this.btnUpdate.TabIndex = 2;
+            this.btnUpdate.Text = "Update";
+            this.btnUpdate.UseVisualStyleBackColor = true;
+            this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
             // 
             // rdoExit5
             // 
@@ -136,6 +147,7 @@
             this.btnAdd.TabIndex = 1;
             this.btnAdd.Text = "Add";
             this.btnAdd.UseVisualStyleBackColor = true;
+            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
             // rdoExit3
             // 
@@ -260,15 +272,6 @@
             this.treeExitControls.Size = new System.Drawing.Size(201, 316);
             this.treeExitControls.TabIndex = 0;
             // 
-            // btnEdit
-            // 
-            this.btnEdit.Location = new System.Drawing.Point(87, 294);
-            this.btnEdit.Name = "btnEdit";
-            this.btnEdit.Size = new System.Drawing.Size(91, 23);
-            this.btnEdit.TabIndex = 2;
-            this.btnEdit.Text = "Update";
-            this.btnEdit.UseVisualStyleBackColor = true;
-            // 
             // btnDelete
             // 
             this.btnDelete.Location = new System.Drawing.Point(6, 348);
@@ -302,7 +305,7 @@
         private System.Windows.Forms.GroupBox gbControlParms;
         private System.Windows.Forms.TreeView treeExitControls;
         private System.Windows.Forms.Button btnAdd;
-        private System.Windows.Forms.Button btnEdit;
+        private System.Windows.Forms.Button btnUpdate;
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cboOCTypes;

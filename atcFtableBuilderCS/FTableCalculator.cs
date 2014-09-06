@@ -32,12 +32,18 @@ namespace atcFtableBuilder
         {
             None, WeirTriVNotch, WeirTrapeCipolletti, WeirBroadCrest, WeirRectangular, OrificeUnderdrain, OrificeRiser
         };
-        public virtual readonly ControlDeviceType ControlDevice
+        public virtual ControlDeviceType ControlDevice
         {
             get
             {
                 return ControlDeviceType.None;
             }
+        }
+        int pExit;
+        public virtual int myExit
+        {
+            get { return pExit; }
+            set { pExit = value; }
         }
 
         public static Dictionary<ControlDeviceType, String> OCTypeNames = new Dictionary<ControlDeviceType, string>()
