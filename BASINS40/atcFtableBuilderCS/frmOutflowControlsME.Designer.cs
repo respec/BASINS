@@ -61,15 +61,14 @@
             this.gbSetup.Dock = System.Windows.Forms.DockStyle.Top;
             this.gbSetup.Location = new System.Drawing.Point(0, 0);
             this.gbSetup.Name = "gbSetup";
-            this.gbSetup.Size = new System.Drawing.Size(485, 342);
+            this.gbSetup.Size = new System.Drawing.Size(516, 342);
             this.gbSetup.TabIndex = 0;
             this.gbSetup.TabStop = false;
             this.gbSetup.Text = "Exit Control Device Setup";
             // 
             // gbControlParms
             // 
-            this.gbControlParms.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.gbControlParms.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gbControlParms.Controls.Add(this.btnClear);
             this.gbControlParms.Controls.Add(this.btnUpdate);
@@ -88,7 +87,7 @@
             this.gbControlParms.Controls.Add(this.lblOCParm0);
             this.gbControlParms.Controls.Add(this.lblOCParm1);
             this.gbControlParms.Controls.Add(this.txtOCParm_0);
-            this.gbControlParms.Location = new System.Drawing.Point(213, 13);
+            this.gbControlParms.Location = new System.Drawing.Point(244, 13);
             this.gbControlParms.Name = "gbControlParms";
             this.gbControlParms.Size = new System.Drawing.Size(266, 323);
             this.gbControlParms.TabIndex = 1;
@@ -108,6 +107,7 @@
             // 
             // btnUpdate
             // 
+            this.btnUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnUpdate.Location = new System.Drawing.Point(87, 294);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(91, 23);
@@ -265,11 +265,12 @@
             // 
             // treeExitControls
             // 
-            this.treeExitControls.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.treeExitControls.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.treeExitControls.Location = new System.Drawing.Point(6, 20);
             this.treeExitControls.Name = "treeExitControls";
-            this.treeExitControls.Size = new System.Drawing.Size(201, 316);
+            this.treeExitControls.Size = new System.Drawing.Size(232, 316);
             this.treeExitControls.TabIndex = 0;
             // 
             // btnDelete
@@ -285,7 +286,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(485, 378);
+            this.ClientSize = new System.Drawing.Size(516, 378);
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.gbSetup);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

@@ -93,14 +93,14 @@ namespace atcFtableBuilder
             txtOCParm_1.Text = lParamVals[1].ToString();
             txtOCDisCoeff.Text = lParamVals[2].ToString();
 
-            if (clsGlobals.gToolType == clsGlobals.ToolType.Gray)
-            {
-                rdoExit2.Checked = true;
-            }
-            else
-            {
-                rdoExit1.Checked = true;
-            }
+            //if (clsGlobals.gToolType == clsGlobals.ToolType.Gray)
+            //{
+            //    rdoExit2.Checked = true;
+            //}
+            //else
+            //{
+            //    rdoExit1.Checked = true;
+            //}
         }
 
         private void PopulateOCTree()
@@ -110,69 +110,65 @@ namespace atcFtableBuilder
             {
                 if (clsGlobals.gExitOCSetup.Keys.Contains(i))
                 { //add exit
-                    TreeNode lExitNode = treeExitControls.Nodes.Add(i.ToString(), "Exit " + i.ToString());
+                    string lExitNodeKey = i.ToString();
+                    string lExitNodeDisplay = "Exit " + i.ToString();
+                    TreeNode lExitNode = null;
+                    if (treeExitControls.Nodes.ContainsKey(lExitNodeKey))
+                        lExitNode = treeExitControls.Nodes[lExitNodeKey];
+                    else  
+                        lExitNode = treeExitControls.Nodes.Add(lExitNodeKey, lExitNodeDisplay);
+
                     atcUtility.atcCollection lOCs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(i);
                     foreach (string lKey in lOCs.Keys) //FTableCalculator lOC in lOCs) 
                     { //add OCs
                         //lKey is like OC class name plus an id, eg. FTableOCWeirRectangular_2
                         FTableCalculator lOC = (FTableCalculator)lOCs.get_ItemByKey(lKey);
-                        FTableCalculator.ControlDeviceType lCDType = lOC.ControlDevice;
-                        switch (lCDType)
-                        {
-                            case FTableCalculator.ControlDeviceType.None:
-                                break;
-                            case FTableCalculator.ControlDeviceType.OrificeRiser:
-                                break;
-                            case FTableCalculator.ControlDeviceType.OrificeUnderdrain:
-                                break;
-                            case FTableCalculator.ControlDeviceType.WeirBroadCrest:
-                                break;
-                            case FTableCalculator.ControlDeviceType.WeirRectangular:
-                                break;
-                            case FTableCalculator.ControlDeviceType.WeirTrapeCipolletti:
-                                break;
-                            case FTableCalculator.ControlDeviceType.WeirTriVNotch:
-                                break;
-                        }
                         string className = lKey.Substring(0, lKey.IndexOf("_"));
                         string Ids = lKey.Substring(lKey.IndexOf("_") + 1);
                         int Id = 0;
                         int.TryParse(Ids, out Id);
                         if (className.StartsWith("FTableCalcOC"))
                         {
+                            Dictionary<string, double> lParamValues = null;
                             if (className.Contains("WeirBroad"))
                             {
                                 FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirBroadCrest, out lOCName);
                                 lOC = (FTableCalcOCWeirBroad)lOCs.get_ItemByKey(lKey);
+                                lParamValues = ((FTableCalcOCWeirBroad)lOC).ParamValues();
                             }
                             else if (className.Contains("WeirRect"))
                             {
                                 FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirRectangular, out lOCName);
                                 lOC = (FTableCalcOCWeirRectangular)lOCs.get_ItemByKey(lKey);
+                                lParamValues = ((FTableCalcOCWeirRectangular)lOC).ParamValues();
                             }
                             else if (className.Contains("WeirTrape"))
                             {
                                 FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirTrapeCipolletti, out lOCName);
                                 lOC = (FTableCalcOCWeirTrapeCipolletti)lOCs.get_ItemByKey(lKey);
+                                lParamValues = ((FTableCalcOCWeirTrapeCipolletti)lOC).ParamValues();
                             }
                             else if (className.Contains("WeirTriVNotch"))
                             {
                                 FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirTriVNotch, out lOCName);
                                 lOC = (FTableCalcOCWeirTriVNotch)lOCs.get_ItemByKey(lKey);
+                                lParamValues = ((FTableCalcOCWeirTriVNotch)lOC).ParamValues();
                             }
                             else if (className.Contains("OrificeRiser"))
                             {
                                 FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.OrificeRiser, out lOCName);
                                 lOC = (FTableCalcOCOrificeRiser)lOCs.get_ItemByKey(lKey);
+                                lParamValues = ((FTableCalcOCOrificeRiser)lOC).ParamValues();
                             }
                             else if (className.Contains("OrificeUnderflow"))
                             {
                                 FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.OrificeUnderdrain, out lOCName);
                                 lOC = (FTableCalcOCOrificeUnderflow)lOCs.get_ItemByKey(lKey);
+                                lParamValues = ((FTableCalcOCOrificeUnderflow)lOC).ParamValues();
                             }
                             TreeNode lOCNode = lExitNode.Nodes.Add(lKey, lOCName + "_" + Id.ToString());
                             //add parameter values
-                            Dictionary<string, double> lParamValues = lOC.ParamValues();
+                            
                             List<string> lParamNames = lParamValues.Keys.ToList<string>();
                             List<double> lParamVals = lParamValues.Values.ToList<double>();
                             for (int z = 0; z < lParamNames.Count; z++)
@@ -232,39 +228,166 @@ namespace atcFtableBuilder
                 }
             }
 
+            int lSelectedExit = 0;
+            if (rdoExit1.Checked) lSelectedExit= 1;
+            else if (rdoExit2.Checked) lSelectedExit= 2;
+            else if (rdoExit3.Checked) lSelectedExit= 3;
+            else if (rdoExit4.Checked) lSelectedExit= 4;
+            else if (rdoExit5.Checked) lSelectedExit= 5;
+
+            double lParam0 = 0;
+            double lParam1 = 0;
+            double lDisCoe = 0;
+
+            double.TryParse(txtOCParm_0.Text, out lParam0);
+            double.TryParse(txtOCParm_1.Text, out lParam1);
+            double.TryParse(txtOCDisCoeff.Text, out lDisCoe);
+
             FTableCalculator lCalc = null;
             switch (lSelectedOCType)
             {
                 case FTableCalculator.ControlDeviceType.OrificeRiser:
                     lCalc = new FTableCalcOCOrificeRiser();
-                    break;
+                    ((FTableCalcOCOrificeRiser)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCOrificeRiser)lCalc).OrificePipeDiameter = lParam0;
+                    ((FTableCalcOCOrificeRiser)lCalc).OrificeDepth = lParam1;
+                    ((FTableCalcOCOrificeRiser)lCalc).OrificeDischargeCoefficient = lDisCoe;
+                   break;
                 case FTableCalculator.ControlDeviceType.OrificeUnderdrain:
                     lCalc = new FTableCalcOCOrificeUnderflow();
+                    ((FTableCalcOCOrificeUnderflow)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCOrificeUnderflow)lCalc).OrificePipeDiameter = lParam0;
+                    ((FTableCalcOCOrificeUnderflow)lCalc).OrificeInvertDepth = lParam1;
+                    ((FTableCalcOCOrificeUnderflow)lCalc).OrificeDischargeCoefficient = lDisCoe;
                     break;
                 case FTableCalculator.ControlDeviceType.WeirBroadCrest:
                     lCalc = new FTableCalcOCWeirBroad();
+                    ((FTableCalcOCWeirBroad)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCWeirBroad)lCalc).WeirWidth = lParam0;
+                    ((FTableCalcOCWeirBroad)lCalc).WeirInvert = lParam1;
+                    ((FTableCalcOCWeirBroad)lCalc).DischargeCoefficient = lDisCoe;
                     break;
                 case FTableCalculator.ControlDeviceType.WeirRectangular:
                     lCalc = new FTableCalcOCWeirRectangular();
+                    ((FTableCalcOCWeirRectangular)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCWeirRectangular)lCalc).WeirWidth = lParam0;
+                    ((FTableCalcOCWeirRectangular)lCalc).WeirInvert = lParam1;
+                    ((FTableCalcOCWeirRectangular)lCalc).DischargeCoefficient = lDisCoe;
                     break;
                 case FTableCalculator.ControlDeviceType.WeirTrapeCipolletti:
                     lCalc = new FTableCalcOCWeirTrapeCipolletti();
+                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).WeirWidth = lParam0;
+                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).WeirInvert = lParam1;
+                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).DischargeCoefficient = lDisCoe;
                     break;
                 case FTableCalculator.ControlDeviceType.WeirTriVNotch:
                     lCalc = new FTableCalcOCWeirTriVNotch();
+                    ((FTableCalcOCWeirTriVNotch)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCWeirTriVNotch)lCalc).WeirAngle = lParam0;
+                    ((FTableCalcOCWeirTriVNotch)lCalc).WeirInvert = lParam1;
+                    ((FTableCalcOCWeirTriVNotch)lCalc).DischargeCoefficient = lDisCoe;
                     break;
             }
 
-            if (rdoExit1.Checked) lCalc.myExit = 1;
-            else if (rdoExit2.Checked) lCalc.myExit = 2;
-            else if (rdoExit3.Checked) lCalc.myExit = 3;
-            else if (rdoExit4.Checked) lCalc.myExit = 4;
-            else if (rdoExit5.Checked) lCalc.myExit = 5;
+            if (clsGlobals.gExitOCSetup == null)
+                clsGlobals.gExitOCSetup = new atcUtility.atcCollection();
+            atcUtility.atcCollection lExitSetup = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lSelectedExit);
 
+            if (lExitSetup == null)
+            {
+                lExitSetup = new atcUtility.atcCollection();
+                clsGlobals.gExitOCSetup.Add(lSelectedExit, lExitSetup);
+            }
 
-            
-            
+            string lOCName = lCalc.GetType().Name;
+            int typeCounter = 0;
+            string lOCNameCtr = lOCName + "_" + typeCounter.ToString();
+            while (lExitSetup.Keys.Contains(lOCNameCtr))
+            {
+                typeCounter++;
+                lOCNameCtr = lOCName + "_" + typeCounter.ToString();
+            }
 
+            lExitSetup.Add(lOCNameCtr, lCalc);
+
+            //Refresh tree
+            AddOCtoTree(lCalc);
+        }
+
+        private bool AddOCtoTree(FTableCalculator aCalc)
+        {
+            bool lCalcAdded = false;
+            string className = aCalc.GetType().Name;
+            //FTableCalculator.ControlDeviceType lCDType = lOC.ControlDevice;
+            int lExit = 0;
+            Dictionary<string, double> lParamValues = null;
+            string lOCDisplayName = "";
+            switch (className)
+            {
+                case "FTableCalculator":
+                    break;
+                case "FTableCalcOCWeirTriVNotch":
+                    lExit = ((FTableCalcOCWeirTriVNotch)aCalc).myExit;
+                    lParamValues = ((FTableCalcOCWeirTriVNotch)aCalc).ParamValues();
+                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirTriVNotch, out lOCDisplayName);
+                    break;
+                case "FTableCalcOCWeirTrapeCipolletti":
+                    lExit = ((FTableCalcOCWeirTrapeCipolletti)aCalc).myExit;
+                    lParamValues = ((FTableCalcOCWeirTrapeCipolletti)aCalc).ParamValues();
+                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirTrapeCipolletti, out lOCDisplayName);
+                    break;
+                case "FTableCalcOCWeirRectangular":
+                    lExit = ((FTableCalcOCWeirRectangular)aCalc).myExit;
+                    lParamValues = ((FTableCalcOCWeirRectangular)aCalc).ParamValues();
+                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirRectangular, out lOCDisplayName);
+                    break;
+                case "FTableCalcOCWeirBroad":
+                    lExit = ((FTableCalcOCWeirBroad)aCalc).myExit;
+                    lParamValues = ((FTableCalcOCWeirBroad)aCalc).ParamValues();
+                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirBroadCrest, out lOCDisplayName);
+                    break;
+                case "FTableCalcOCOrificeUnderflow":
+                    lExit = ((FTableCalcOCOrificeUnderflow)aCalc).myExit;
+                    lParamValues = ((FTableCalcOCOrificeUnderflow)aCalc).ParamValues();
+                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.OrificeUnderdrain, out lOCDisplayName);
+                    break;
+                case "FTableCalcOCOrificeRiser":
+                    lExit = ((FTableCalcOCOrificeRiser)aCalc).myExit;
+                    lParamValues = ((FTableCalcOCOrificeRiser)aCalc).ParamValues();
+                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.OrificeRiser, out lOCDisplayName);
+                    break;
+            }
+
+            TreeNode lExitNode = null;
+            if (treeExitControls.Nodes.ContainsKey(lExit.ToString())) 
+                lExitNode = treeExitControls.Nodes[lExit.ToString()]; //.Add(lKey, lOCName + "_" + Id.ToString());
+            else
+                lExitNode = treeExitControls.Nodes.Add(lExit.ToString(), "Exit " + lExit.ToString());
+
+            //add OC node
+            string lOCNameClass = aCalc.GetType().Name;
+            int Ctr = 0;
+            string lOCNodeName = lOCDisplayName + "_" + Ctr.ToString();
+            string lOCNodeKey = lOCNameClass + "_" + Ctr.ToString();
+            while (lExitNode.Nodes.ContainsKey(lOCNodeKey))
+            {
+                Ctr++;
+                lOCNodeKey = lOCNameClass + "_" + Ctr.ToString();
+                lOCNodeName = lOCDisplayName + "_" + Ctr.ToString();
+            }
+            TreeNode lOCNode = lExitNode.Nodes.Add(lOCNodeKey, lOCNodeName);
+
+            //add parameter value nodes
+            List<string> lParamNames = lParamValues.Keys.ToList<string>();
+            List<double> lParamVals = lParamValues.Values.ToList<double>();
+            for (int z = 0; z < lParamNames.Count; z++)
+            {
+                lOCNode.Nodes.Add(lParamNames[z], lParamNames[z] + "(" + lParamVals[z] + ")");
+            }
+            lCalcAdded = true;
+
+            return lCalcAdded;
         }
 
         private string ParamsOK()
@@ -276,8 +399,8 @@ namespace atcFtableBuilder
             double lParam1 = -99;
             double lParamDC = -99;
 
-            if (double.TryParse(txtOCParm_0.Text, out lParam0) ||
-                double.TryParse(txtOCParm_1.Text, out lParam1) ||
+            if (double.TryParse(txtOCParm_0.Text, out lParam0) &&
+                double.TryParse(txtOCParm_1.Text, out lParam1) &&
                 double.TryParse(txtOCDisCoeff.Text, out lParamDC))
             {
                 if (lParam0 <= 0 || lParam1 <= 0 || lParamDC <= 0)
