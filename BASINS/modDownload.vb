@@ -252,10 +252,12 @@ Public Module modDownload
                         lThemeTag = "county_cd"
                         lFieldName = "FIPS"
                         lHUC8s = CountyStateToHuc("cnty")
+                        Logger.Status("HIDE")
                     Case "st"
                         lThemeTag = "state_abbrev"
                         lFieldName = "ST"
                         lHUC8s = CountyStateToHuc("st")
+                        Logger.Status("HIDE")
                 End Select
 
                 lFieldName = lFieldName.ToLower
