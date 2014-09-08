@@ -468,7 +468,7 @@ Public Class frmPoint
                     End If
                     If Not lTable Is Nothing Then
                         '.net conversion issue: Converted lTable.Parms("GQID") to string with .ToString
-                        DescriptionFromMemberSubs = "dissolved " & Trim(lTable.Parms("GQID").ToString)
+                        DescriptionFromMemberSubs = "dissolved " & Trim(lTable.Parms("GQID").Value)
                     End If
                 End If
             End If
@@ -489,7 +489,7 @@ Public Class frmPoint
                     End If
                     If Not lTable Is Nothing Then
                         '.net conversion issue: Converted lTable.Parms("GQID") to string with .ToString
-                        DescriptionFromMemberSubs = DescriptionFromMemberSubs & Trim(lTable.Parms("GQID").ToString)
+                        DescriptionFromMemberSubs = DescriptionFromMemberSubs & Trim(lTable.Parms("GQID").Value)
                     End If
                 End If
             End If
@@ -629,7 +629,7 @@ Public Class frmPoint
                     lSub2 = 0
                 Case "ICON"
                     If lOper.TableExists("NCONS") Then
-                        lNcons = lOper.Tables("NCONS").Parms("NCONS").ToString
+                        lNcons = lOper.Tables("NCONS").Parms("NCONS").Value
                     Else
                         lNcons = 1
                     End If
@@ -643,7 +643,7 @@ Public Class frmPoint
                     lSub2 = 0
                 Case "IDQAL"
                     If lOper.TableExists("GQ-GENDATA") Then
-                        lNgqual = lOper.Tables("GQ-GENDATA").Parms("NGQUAL").ToString
+                        lNgqual = lOper.Tables("GQ-GENDATA").Parms("NGQUAL").Value
                     Else
                         lNgqual = 1
                     End If
@@ -651,7 +651,7 @@ Public Class frmPoint
                     lSub2 = 0
                 Case "ISQAL"
                     If lOper.TableExists("GQ-GENDATA") Then
-                        lNgqual = lOper.Tables("GQ-GENDATA").Parms("NGQUAL").ToString
+                        lNgqual = lOper.Tables("GQ-GENDATA").Parms("NGQUAL").Value
                     Else
                         lNgqual = 1
                     End If
