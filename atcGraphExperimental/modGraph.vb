@@ -190,6 +190,16 @@ FoundMatch:
                 lMain.Y2Axis.MinSpace = 20
             End If
             AxisTitlesFromCommonAttributes(lMain, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
+            If lLeftDataSets.Count > 0 Then
+                If lCommonConstituent = "GW LEVEL" Then
+                    With lMain.YAxis
+                        Select Case aDataGroup(0).Attributes.GetValue("parm_cd", "").ToString
+                            Case "61055", "72019" 'Data is depth below lElevation
+                                .Title.Text = "Depth to water level, feet below land surface"
+                        End Select
+                    End With
+                End If
+            End If
         End If
         If lAuxDataSets.Count > 0 Then
             lAux.YAxis.MinSpace = lMain.YAxis.MinSpace
