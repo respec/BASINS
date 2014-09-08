@@ -62,6 +62,16 @@ namespace atcFtableBuilder
             return lParams;
         }
 
+        public FTableCalculator Clone()
+        {
+            FTableCalcOCWeirRectangular lClone = new FTableCalcOCWeirRectangular();
+            lClone.myExit = this.myExit;
+            lClone.WeirWidth = this.WeirWidth;
+            lClone.WeirInvert = this.WeirInvert;
+            lClone.DischargeCoefficient = this.DischargeCoefficient;
+            return lClone;
+        }
+
         public ArrayList GenerateFTableOC()
         {
             return GenerateFTable(WeirWidth, Height, WeirInvert, DischargeCoefficient);

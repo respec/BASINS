@@ -25,11 +25,18 @@ namespace atcFtableBuilder
             }
             cboOCTypes.SelectedIndex = 0;
 
+            if (clsGlobals.gToolType == clsGlobals.ToolType.Gray)
+                rdoExit1.Enabled = false;
+            else
+                rdoExit1.Enabled = true;
+
             PopulateOCTree();
 
             txtOCParm_0.TextChanged += new EventHandler(txtOCParamChanged);
             txtOCParm_1.TextChanged += new EventHandler(txtOCParamChanged);
             txtOCDisCoeff.TextChanged += new EventHandler(txtOCParamChanged);
+
+
 
             pLoaded = true;
         }
@@ -108,17 +115,37 @@ namespace atcFtableBuilder
             string lOCName = "";
             for (int i = 1; i <= 5; i++)
             {
-                if (clsGlobals.gExitOCSetup.Keys.Contains(i))
-                { //add exit
-                    string lExitNodeKey = i.ToString();
-                    string lExitNodeDisplay = "Exit " + i.ToString();
-                    TreeNode lExitNode = null;
-                    if (treeExitControls.Nodes.ContainsKey(lExitNodeKey))
-                        lExitNode = treeExitControls.Nodes[lExitNodeKey];
-                    else  
-                        lExitNode = treeExitControls.Nodes.Add(lExitNodeKey, lExitNodeDisplay);
+                //add Exit node
+                string lExitNodeKey = i.ToString();
+                string lExitNodeText = "Exit " + i.ToString();
+                TreeNode lExitNode = null;
+                if (treeExitControls.Nodes.ContainsKey(lExitNodeKey))
+                    lExitNode = treeExitControls.Nodes[lExitNodeKey];
+                else
+                    lExitNode = treeExitControls.Nodes.Add(lExitNodeKey, lExitNodeText);
+
+                if (!clsGlobals.gExitOCSetup.Keys.Contains(i))
+                    clsGlobals.gExitOCSetup.Add(i, new atcUtility.atcCollection());
+
+                //add control device node(s)
+                if (i == 1 && clsGlobals.gToolType == clsGlobals.ToolType.Gray)
+                {
+                    string lOutflowKey = "Outflow1";
+                    TreeNode lOutflowNode = lExitNode.Nodes.Add(lOutflowKey, lOutflowKey);
 
                     atcUtility.atcCollection lOCs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(i);
+                    if (!lOCs.Keys.Contains(lOutflowKey))
+                        lOCs.Add(lOutflowKey, lOutflowKey);
+
+                    continue;
+                }
+
+                if (clsGlobals.gExitOCSetup.Keys.Contains(i))
+                { //add exit
+
+                    atcUtility.atcCollection lOCs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(i);
+                    //lExitNode.Text += " (" + lOCs.Count + " CDs)";
+
                     foreach (string lKey in lOCs.Keys) //FTableCalculator lOC in lOCs) 
                     { //add OCs
                         //lKey is like OC class name plus an id, eg. FTableOCWeirRectangular_2
@@ -168,7 +195,7 @@ namespace atcFtableBuilder
                             }
                             TreeNode lOCNode = lExitNode.Nodes.Add(lKey, lOCName + "_" + Id.ToString());
                             //add parameter values
-                            
+
                             List<string> lParamNames = lParamValues.Keys.ToList<string>();
                             List<double> lParamVals = lParamValues.Values.ToList<double>();
                             for (int z = 0; z < lParamNames.Count; z++)
