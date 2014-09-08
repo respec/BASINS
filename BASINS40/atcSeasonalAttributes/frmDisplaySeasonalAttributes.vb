@@ -39,6 +39,7 @@ Friend Class frmDisplaySeasonalAttributes
         pInitializing = False
         If pTimeseriesGroup.Count > 0 Then
             PopulateGrid()
+            Me.Show()
         Else 'user declined to specify Data
             Me.Close()
         End If
