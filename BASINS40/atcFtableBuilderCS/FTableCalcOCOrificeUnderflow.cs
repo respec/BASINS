@@ -60,6 +60,16 @@ namespace atcFtableBuilder
             return lParams;
         }
 
+        public FTableCalculator Clone()
+        {
+            FTableCalcOCOrificeUnderflow lClone = new FTableCalcOCOrificeUnderflow();
+            lClone.myExit = this.myExit;
+            lClone.OrificePipeDiameter = this.OrificePipeDiameter;
+            lClone.OrificeInvertDepth = this.OrificeInvertDepth;
+            lClone.OrificeDischargeCoefficient = this.OrificeDischargeCoefficient;
+            return lClone;
+        }
+
         public ArrayList GenerateFTableOC()
         {
             return GenerateFTable(OrificePipeDiameter, OrificeInvertDepth, OrificeDischargeCoefficient);

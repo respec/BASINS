@@ -16,6 +16,7 @@ namespace atcFtableBuilder
         ArrayList GenerateFTableOC();
         Dictionary<string, double> ParamValueDefaults();
         Dictionary<string, double> ParamValues();
+        FTableCalculator Clone();
     }
     public class XSectionStation
     {
