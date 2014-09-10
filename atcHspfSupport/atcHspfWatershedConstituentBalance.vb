@@ -59,7 +59,7 @@ Public Module WatershedConstituentBalance
                 lPivotString = "Pivot"
             End If
             Dim lOutFileName As String = aOutFilePrefix & SafeFilename(ShortConstituentName(aBalanceType) & "_" & aScenario & "_" & lOutletLocation & "_Grp_By_OPN_LU_Ann_Avg" & lPivotString & ".txt")
-            '_Balance.txt
+
             Logger.Dbg("  WriteReportTo " & lOutFileName)
             SaveFileString(lOutFileName, lReport.ToString)
         Next lOutletLocation
@@ -265,7 +265,7 @@ Public Module WatershedConstituentBalance
         Logger.Dbg("LandUseCount:" & lLandUses.Count)
 
         Dim lReport As New atcReport.ReportText
-        lReport.AppendLine(aBalanceType & " Watershed Balance Report For " & aScenario)
+        lReport.AppendLine(aScenario & " Annual Average Watershed Balance Report of " & aBalanceType & " For Each PERLND, IMPLND, and RCHRES.")
         lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
         If aBalanceType = "Water" Then
             If aUci.GlobalBlock.EmFg = 1 Then
@@ -320,6 +320,7 @@ Public Module WatershedConstituentBalance
                                     lConstituentDataName = lConstituentDataName.Remove(0, 2)
                                     lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentDataName)
                                     Dim lSomeConstituentsHaveData As Boolean = False
+                                    Dim lWeightAccum As Double = 0.0
                                     If lConstituentDataGroup.Count > 0 Then
                                         lSomeConstituentsHaveData = True
                                         If lNeedHeader Then
@@ -328,7 +329,7 @@ Public Module WatershedConstituentBalance
                                             Select Case aBalanceType & "_" & lOperationType
                                                 Case "Water_PERLND", "Water_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (Inches)" & vbCrLf
-                                                Case "WATER_RCHRES"
+                                                Case "Water_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (ac-ft)" & vbCrLf
                                                 Case "Sediment_PERLND", "Sediement_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (tons/ac)" & vbCrLf
@@ -392,12 +393,12 @@ Public Module WatershedConstituentBalance
                                             lPendingOutput = ""
                                         End If
                                         .Value(1) = lConstituentName.PadRight(12)
-                                        Dim lWeightAccum As Double = 0.0
+
                                         Dim lValue As Double = 0.0
                                         lFieldIndex = 1
                                         Dim lSomeLocationHasData As Boolean = False
 
-                                       
+
                                         For Each lLocation As String In lLandUseOperations.Keys
                                             'lLocation e.g. R:69
                                             Dim lLocationDataGroup As atcTimeseriesGroup = lConstituentDataGroup.FindData("Location", lLocation)
@@ -433,6 +434,10 @@ Public Module WatershedConstituentBalance
                                                             Dim lArea As Double = lConnection.MFact
                                                             If lArea = 0 Then
                                                                 lArea = 0.0000000001
+                                                            End If
+                                                            If aBalanceType = "Water" Then 'Water is simulated in inches and when it goes to RCHRES, it goes as feet. 
+                                                                'This factor takes care of that conversion that happened in MASS-LINK
+                                                                lMassLinkFactor *= 12
                                                             End If
                                                             lTotalLoad += lArea * lMassLinkFactor
                                                             lTotalArea += lArea
@@ -569,6 +574,19 @@ Public Module WatershedConstituentBalance
                                             .Value(lFieldIndex) = DecimalAlign(lCurFieldValues(lFieldIndex), aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                         Next
                                         .CurrentRecord += 1
+                                        'If lOutletReport Then
+                                        '    Dim lConstituentTotalKey As String = lOperationType.Substring(0, 1) & ":" & lConstituentKey
+                                        '    If lOperationType <> "RCHRES" Then
+                                        '        lLandUseConstituentTotals.Increment(lConstituentTotalKey & "-" & lLandUse, lWeightAccum)
+                                        '        lConstituentTotals.Increment(lConstituentTotalKey, lWeightAccum)
+                                        '        lFieldIndex += 1
+                                        '        .Value(lFieldIndex) = DecimalAlign(lWeightAccum / lLandUseAreas.ItemByKey(lLandUse), aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                        '    ElseIf Math.Abs(lValueOutlet) > 0.00001 Then
+                                        '        Dim lConstituentTotalKeyIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentTotalKey)
+                                        '        lConstituentTotals.Increment(lConstituentTotalKey, lValueOutlet)
+                                        '        lValueOutlet = 0.0
+                                        '    End If
+                                        'End If
                                     Else
                                         If lConstituentKey.StartsWith("Header") Then
                                             lPendingOutput &= vbCr
@@ -855,6 +873,7 @@ Public Module WatershedConstituentBalance
                             lConstituentName = lConstituentName.Substring(0, lRowIdLength)
                         End If
                         Dim lConstituentTotalIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentKey)
+                        
                         If lConstituentTotalIndex >= 0 Then
                             Dim lValue As Double = lConstituentTotals.Item(lConstituentTotalIndex)
                             Dim lUnitsAdjust As Double = 1.0
@@ -884,6 +903,7 @@ Public Module WatershedConstituentBalance
                             Else
                                 'Logger.Dbg("SkipNoData:" & lConstituentKey)
                             End If
+
                         ElseIf Not lConstituentKey.Substring(2).StartsWith("Header") Then
                             Dim lSkipTo As String = FindSkipTo(lConstituentKey)
                             If lSkipTo IsNot Nothing Then
@@ -895,10 +915,13 @@ Public Module WatershedConstituentBalance
                                 End If
                                 lSummaryReport.Body.Remove(lHeaderStart, lSummaryReport.Body.Length - lHeaderStart)
                             Else
+                                'Dim lValue As Double = lConstituentTotals.Item(lConstituentTotalIndex)
+                                'Dim lUnitsAdjust As Double = 1.0
                                 lSummaryReport.AppendLine(lConstituentName.PadRight(lRowIdLength) & vbTab & _
                                                    DecimalAlign(0.0) & vbTab & _
                                                    DecimalAlign(0.0))
                             End If
+
                         Else
                             lSummaryReport.AppendLine()
                             lSummaryReport.AppendLine(lConstituentName.PadRight(lRowIdLength))
