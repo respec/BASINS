@@ -42,7 +42,8 @@ Public Module ConstituentBalance
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
 
         Dim lReport As New atcReport.ReportText
-        lReport.AppendLine(aBalanceType & " Balance Report For " & aScenario)
+        lReport.AppendLine(aScenario & " " & "Annual Loading Rates of " & aBalanceType & " For Each PERLND, and IMPLND, and")
+        lReport.AppendLine("Annual Loadings of" & aBalanceType & " For Each Reach.")
         lReport.AppendLine("   Run Made " & aRunMade)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
@@ -60,7 +61,7 @@ Public Module ConstituentBalance
 
         For Each lOperationKey As String In aOperationTypes.Keys
             For Each lLocation As String In aLocations
-                'If lLocation = "P:641" Then Stop
+
                 If lLocation.StartsWith(lOperationKey) Then
                     'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
                     Dim lLocationDataGroup As atcTimeseriesGroup = aScenarioResults.DataSets.FindData("Location", lLocation)
@@ -84,7 +85,6 @@ Public Module ConstituentBalance
                                         If lConstituentKey.EndsWith("1") Or lConstituentKey.EndsWith("2") Then
                                             lMultipleIndex = lConstituentKey.Substring(lConstituentKey.Length - 1)
                                             lConstituentDataName = lConstituentDataName.Substring(0, lConstituentDataName.Length - 1)
-                                            'lConstituentKey = lConstituentKey.Substring(0, lConstituentKey.Length - 1)
                                         End If
                                     End If
                                     lConstituentKey = lConstituentKey.Remove(0, 2)
