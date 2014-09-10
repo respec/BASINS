@@ -60,6 +60,55 @@ namespace atcFtableBuilder
             return lParams;
         }
 
+        public bool SetParamValues(Dictionary<string, double> aParams)
+        {
+            int lUpdateCtr = 0;
+            double lValue = 0;
+            foreach (string lKey in aParams.Keys)
+            {
+                if (lKey == gOCOrificeRiserLbl[0])
+                {
+                    if (aParams.TryGetValue(lKey, out lValue))
+                    {
+                        OrificePipeDiameter = lValue;
+                        lUpdateCtr += 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (lKey == gOCOrificeRiserLbl[1])
+                {
+                    if (aParams.TryGetValue(lKey, out lValue))
+                    {
+                        OrificeDepth = lValue;
+                        lUpdateCtr += 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (lKey == gOCOrificeRiserLbl[2])
+                {
+                    if (aParams.TryGetValue(lKey, out lValue))
+                    {
+                        OrificeDischargeCoefficient = lValue;
+                        lUpdateCtr += 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            if (lUpdateCtr == gOCOrificeRiserLbl.Length)
+                return true;
+            else
+                return false;
+        }
+
         public FTableCalculator Clone()
         {
             FTableCalcOCOrificeRiser lClone = new FTableCalcOCOrificeRiser();
