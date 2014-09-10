@@ -17,7 +17,7 @@ namespace atcFtableBuilder
             set { pWeirInvert = value; }
         }
         int pExit;
-        public new int myExit
+        public override int myExit
         {
             get { return pExit; }
             set { pExit = value; }
@@ -25,7 +25,7 @@ namespace atcFtableBuilder
         public double DischargeCoefficient = -999;
         private string[] gOCWeirTrapeLbl = { "Weir Width", "Weir Depth", "Discharge Coefficient" };
         private double[] DefaultsWeirTrape = { 10, 5, 3.367 };
-        public new ControlDeviceType ControlDevice
+        public override ControlDeviceType ControlDevice
         {
             get
             {
@@ -51,7 +51,7 @@ namespace atcFtableBuilder
             }
             return defaults;
         }
-        public new Dictionary<string, double> ParamValues()
+        public override Dictionary<string, double> ParamValues()
         {
             double[] CurrentParamValues = { WeirWidth, WeirInvert, DischargeCoefficient };
             Dictionary<string, double> defaults = new Dictionary<string, double>();

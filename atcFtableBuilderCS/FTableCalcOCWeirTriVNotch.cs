@@ -20,7 +20,7 @@ namespace atcFtableBuilder
             set { pWeirInvert = value; }
         }
         int pExit;
-        public new int myExit
+        public override int myExit
         {
             get { return pExit; }
             set { pExit = value; }
@@ -28,7 +28,7 @@ namespace atcFtableBuilder
         public double DischargeCoefficient = -999;
         private string[] gOCWeirTriVnotchLbl = { "Weir Vertex Angle (deg)", "Weir Invert Depth", "Discharge Coefficient" };
         private double[] DefaultsWeirTriVnotch = { 10, 5, 0.585 };
-        public new ControlDeviceType ControlDevice
+        public override ControlDeviceType ControlDevice
         {
             get
             {
@@ -54,7 +54,7 @@ namespace atcFtableBuilder
             }
             return defaults;
         }
-        public new Dictionary<string, double> ParamValues()
+        public override Dictionary<string, double> ParamValues()
         {
             double[] CurrentParamValues = { WeirAngle, WeirInvert, DischargeCoefficient };
             Dictionary<string, double> defaults = new Dictionary<string, double>();

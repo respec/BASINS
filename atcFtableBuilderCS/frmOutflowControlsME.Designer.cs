@@ -272,7 +272,6 @@
             this.treeExitControls.Name = "treeExitControls";
             this.treeExitControls.Size = new System.Drawing.Size(232, 316);
             this.treeExitControls.TabIndex = 0;
-            this.treeExitControls.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeExitControls_NodeMouseClick);
             this.treeExitControls.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeExitControls_MouseUp);
             // 
             // btnDelete
