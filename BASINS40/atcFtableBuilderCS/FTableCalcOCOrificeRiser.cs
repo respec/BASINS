@@ -16,14 +16,14 @@ namespace atcFtableBuilder
             set { pOrificeDepth = value; }
         }
         int pExit;
-        public new int myExit
+        public override int myExit
         {
             get { return pExit; }
             set { pExit = value; }
         }
         public double OrificeDischargeCoefficient = -999;
         private string[] gOCOrificeRiserLbl = { "Orifice Diameter", "Orifice Depth", "Discharge Coefficient" };
-        public new ControlDeviceType ControlDevice
+        public override ControlDeviceType ControlDevice
         {
             get
             {
@@ -49,7 +49,7 @@ namespace atcFtableBuilder
             return defaults;
         }
 
-        public new Dictionary<string, double> ParamValues()
+        public override Dictionary<string, double> ParamValues()
         {
             double[] CurrentParamValues = { OrificePipeDiameter, OrificeDepth, OrificeDischargeCoefficient };
             Dictionary<string, double> lParams = new Dictionary<string, double>();

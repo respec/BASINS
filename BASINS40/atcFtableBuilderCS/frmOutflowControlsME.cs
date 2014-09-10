@@ -456,24 +456,113 @@ namespace atcFtableBuilder
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
+            TreeNode lSelectedNode = treeExitControls.SelectedNode;
+            if (lSelectedNode == null || !lSelectedNode.Parent.Text.StartsWith("Exit") || lSelectedNode.Text.StartsWith("Exit") )
+            {
+                System.Windows.Forms.MessageBox.Show("Select a Control Device for update.", "Update Control Device");
+                return;
+            }
+            lSelectedNode.BackColor = Color.Blue;
+            string lSelectedOCAlias = lSelectedNode.Text.Substring(0, lSelectedNode.Text.IndexOf("_"));
+            int lSelectedOCIndex = int.Parse(lSelectedNode.Text.Substring(lSelectedNode.Text.IndexOf("_") + 1));
+            string lParentNodeName = lSelectedNode.Parent.Text;
+            string lExitNo = lParentNodeName.Substring(lParentNodeName.IndexOf(" ") + 1);
+            int lExitNum = int.Parse(lExitNo);
+            atcUtility.atcCollection lExitCDs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lExitNum);
+            string lAlias = "";
+            foreach (string lCDKey in lExitCDs.Keys)
+            {
+                string lCDClassName = lCDKey.Substring(0, lCDKey.IndexOf("_"));
+                int lCDIndex = int.Parse(lCDKey.Substring(lCDKey.IndexOf("_") + 1));
+                FTableCalculator lCD = (FTableCalculator)lExitCDs.get_ItemByKey(lCDKey);
+                FTableCalculator.OCTypeNames.TryGetValue(lCD.ControlDevice, out lAlias);
+                int myExit = lCD.myExit;
+                if (lSelectedOCAlias == lAlias && lSelectedOCIndex == lCDIndex)
+                {
+                    //update starts
+                    //each CD type needs a update params method
+                    
 
+
+                }
+
+            }
+
+
+            lSelectedNode.BackColor = Color.White;
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            if (treeExitControls.SelectedNode == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Select a Control Device to delete.", "Delete Control Device");
+                return;
+            }
 
         }
 
-        private void treeExitControls_MouseUp(object sender, MouseEventArgs e)
+        private void treeExitControls_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
+            // Point where mouse is clicked
+            System.Drawing.Point p = new System.Drawing.Point(e.X, e.Y);
+            // Go to the node that the user clicked
+            TreeNode lSelectedNode = treeExitControls.GetNodeAt(p);
+            if (!(lSelectedNode == null))
+            {
+                treeExitControls.SelectedNode = lSelectedNode;
+                if (lSelectedNode.Text.StartsWith("Exit")) return;
+                if (!lSelectedNode.Parent.Text.StartsWith("Exit")) return;
+
+                string lExitName = lSelectedNode.Parent.Text;
+                string lExitNo = lExitName.Substring(lExitName.IndexOf(" ") + 1);
+
+                int lExitNum = int.Parse(lExitNo);
+                atcUtility.atcCollection lExitCDs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lExitNum);
+                foreach (FTableCalculator lCD in lExitCDs)
+                {
+                    int myExit = lCD.myExit;
+                    string lOCAlias = "";
+                    FTableCalculator.OCTypeNames.TryGetValue(lCD.ControlDevice, out lOCAlias);
+                    if (lSelectedNode.Text.StartsWith(lOCAlias))
+                    {
+                        Dictionary<string, double> lParams = lCD.ParamValues();
+                        List<string> lParamNames = lParams.Keys.ToList<string>();
+                        List<double> lParamValues = lParams.Values.ToList<double>();
+                        lblOCParm0.Text = lParamNames[0];
+                        lblOCParm1.Text = lParamNames[1];
+                        lblOCParm3.Text = lParamNames[2];
+                        txtOCParm_0.Text = lParamValues[0].ToString();
+                        txtOCParm_1.Text = lParamValues[1].ToString();
+                        txtOCDisCoeff.Text = lParamValues[2].ToString();
+                        switch (lExitNo)
+                        {
+                            case "1": rdoExit1.Checked = true; break;
+                            case "2": rdoExit2.Checked = true; break;
+                            case "3": rdoExit3.Checked = true; break;
+                            case "4": rdoExit4.Checked = true; break;
+                            case "5": rdoExit5.Checked = true; break;
+                        }
+
+                        for (int i = 0; i < cboOCTypes.Items.Count; i++)
+                        {
+                            if (lOCAlias == cboOCTypes.Items[i].ToString())
+                            {
+                                this.cboOCTypes.SelectedIndexChanged -= this.cboOCTypes_SelectedIndexChanged;
+                                cboOCTypes.SelectedIndex = i;
+                                this.cboOCTypes.SelectedIndexChanged += new System.EventHandler(this.cboOCTypes_SelectedIndexChanged);
+                                break;
+                            }
+                        }
+
+                    }
+
+
+
+                }
+
+            }
 
         }
-
-        private void treeExitControls_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-
-        }
-
-
     }
 }
