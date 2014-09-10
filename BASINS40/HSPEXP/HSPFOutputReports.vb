@@ -462,10 +462,12 @@ Module HSPFOutputReports
                 Next lExpertSystemFileName
             End If
 
+            Dim lBinaryFileNames As New NameValueCollection
+            AddFilesInDir(lBinaryFileNames, IO.Directory.GetCurrentDirectory, False, "*.hbn")
+
             Logger.Dbg(Now & " Opening " & pBaseName & ".hbn")
             Dim lHspfBinFileName As String = pTestPath & pBaseName & ".hbn"
-            
-            'Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
+
             If System.IO.File.Exists(lHspfBinFileName) Then
                 Dim lHspfBinDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
 
@@ -474,7 +476,7 @@ Module HSPFOutputReports
                         lHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
                     End If
                 End If
-                'lHspfBinDataSource.Open(lHspfBinFileName)
+
                 If lHspfBinDataSource.DataSets.Count > 1 Then
 
                     Dim lConstituentName As String = ""
@@ -507,11 +509,11 @@ Module HSPFOutputReports
                         lReportCons = Nothing
                         With HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
                             lReportCons = .Item1
-                            lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Lds.txt"
+                            lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
                             SaveFileString(lOutFileName, lReportCons.ToString)
                             lReportCons = Nothing
                             lReportCons = .Item2
-                            lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_OPN_Ann_Avg_Lds.txt"
+                            lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
                             SaveFileString(lOutFileName, lReportCons.ToString)
                             lReportCons = Nothing
                             lReportCons = .Item3
@@ -525,8 +527,8 @@ Module HSPFOutputReports
                         lReportCons = HspfSupport.ConstituentBalance.Report _
                            (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                             lHspfBinDataSource, lLocations, lRunMade)
-                        lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_OPN_Ann.txt"
-                        '"_Mult_ConstituentBalance.txt"
+                        lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_OPN_Per_Year.txt"
+
                         SaveFileString(lOutFileName, lReportCons.ToString)
 
                         Logger.Dbg("Summary at " & lLocations.Count & " locations")
@@ -537,7 +539,7 @@ Module HSPFOutputReports
                         (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                         lHspfBinDataSource, lRunMade)
                         lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
-                        '"_All_WatershedConstituentBalance.txt"
+
                         SaveFileString(lOutFileName, lReportCons.ToString)
 
 
