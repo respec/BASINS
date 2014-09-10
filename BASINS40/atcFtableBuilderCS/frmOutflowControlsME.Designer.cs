@@ -272,6 +272,8 @@
             this.treeExitControls.Name = "treeExitControls";
             this.treeExitControls.Size = new System.Drawing.Size(232, 316);
             this.treeExitControls.TabIndex = 0;
+            this.treeExitControls.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeExitControls_NodeMouseClick);
+            this.treeExitControls.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeExitControls_MouseUp);
             // 
             // btnDelete
             // 
@@ -281,6 +283,7 @@
             this.btnDelete.TabIndex = 3;
             this.btnDelete.Text = "Delete Selected";
             this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // frmOutflowControlsME
             // 
