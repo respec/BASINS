@@ -459,6 +459,21 @@ namespace atcFtableBuilder
 
         }
 
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void treeExitControls_MouseUp(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void treeExitControls_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+
+        }
+
 
     }
 }
