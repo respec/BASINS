@@ -46,6 +46,14 @@ namespace atcFtableBuilder
             get { return pExit; }
             set { pExit = value; }
         }
+        public virtual bool SetParamValues(Dictionary<string, double> aParams)
+        {
+            return true;
+        }
+        public virtual FTableCalculator Clone()
+        {
+            return null;
+        }
 
         public static Dictionary<ControlDeviceType, String> OCTypeNames = new Dictionary<ControlDeviceType, string>()
         {

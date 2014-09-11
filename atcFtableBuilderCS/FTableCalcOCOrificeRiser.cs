@@ -60,7 +60,7 @@ namespace atcFtableBuilder
             return lParams;
         }
 
-        public bool SetParamValues(Dictionary<string, double> aParams)
+        public override bool SetParamValues(Dictionary<string, double> aParams)
         {
             int lUpdateCtr = 0;
             double lValue = 0;
@@ -109,7 +109,7 @@ namespace atcFtableBuilder
                 return false;
         }
 
-        public FTableCalculator Clone()
+        public override FTableCalculator Clone()
         {
             FTableCalcOCOrificeRiser lClone = new FTableCalcOCOrificeRiser();
             lClone.myExit = this.myExit;
