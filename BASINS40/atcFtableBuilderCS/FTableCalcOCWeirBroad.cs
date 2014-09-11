@@ -62,7 +62,56 @@ namespace atcFtableBuilder
             return lParams;
         }
 
-        public FTableCalculator Clone()
+        public override bool SetParamValues(Dictionary<string, double> aParams)
+        {
+            int lUpdateCtr = 0;
+            double lValue = 0;
+            foreach (string lKey in aParams.Keys)
+            {
+                if (lKey == gOCWeirBroadLbl[0])
+                {
+                    if (aParams.TryGetValue(lKey, out lValue))
+                    {
+                        WeirWidth = lValue;
+                        lUpdateCtr += 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (lKey == gOCWeirBroadLbl[1])
+                {
+                    if (aParams.TryGetValue(lKey, out lValue))
+                    {
+                        WeirInvert = lValue;
+                        lUpdateCtr += 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (lKey == gOCWeirBroadLbl[2])
+                {
+                    if (aParams.TryGetValue(lKey, out lValue))
+                    {
+                        DischargeCoefficient = lValue;
+                        lUpdateCtr += 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            if (lUpdateCtr == gOCWeirBroadLbl.Length)
+                return true;
+            else
+                return false;
+        }
+ 
+        public override FTableCalculator Clone()
         {
             FTableCalcOCWeirBroad lClone = new FTableCalcOCWeirBroad();
             lClone.myExit = this.myExit;

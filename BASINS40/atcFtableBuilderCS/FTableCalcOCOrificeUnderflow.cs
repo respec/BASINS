@@ -49,6 +49,55 @@ namespace atcFtableBuilder
             return defaults;
         }
 
+        public override bool SetParamValues(Dictionary<string, double> aParams)
+        {
+            int lUpdateCtr = 0;
+            double lValue = 0;
+            foreach (string lKey in aParams.Keys)
+            {
+                if (lKey == gOCOrificeUndLbl[0])
+                {
+                    if (aParams.TryGetValue(lKey, out lValue))
+                    {
+                        OrificePipeDiameter = lValue;
+                        lUpdateCtr += 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (lKey == gOCOrificeUndLbl[1])
+                {
+                    if (aParams.TryGetValue(lKey, out lValue))
+                    {
+                        OrificeInvertDepth = lValue;
+                        lUpdateCtr += 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (lKey == gOCOrificeUndLbl[2])
+                {
+                    if (aParams.TryGetValue(lKey, out lValue))
+                    {
+                        OrificeDischargeCoefficient = lValue;
+                        lUpdateCtr += 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            if (lUpdateCtr == gOCOrificeUndLbl.Length)
+                return true;
+            else
+                return false;
+        }
+
         public override Dictionary<string, double> ParamValues()
         {
             double[] CurrentParamValues = { OrificePipeDiameter, OrificeInvertDepth, OrificeDischargeCoefficient };
@@ -60,7 +109,7 @@ namespace atcFtableBuilder
             return lParams;
         }
 
-        public FTableCalculator Clone()
+        public override FTableCalculator Clone()
         {
             FTableCalcOCOrificeUnderflow lClone = new FTableCalcOCOrificeUnderflow();
             lClone.myExit = this.myExit;
