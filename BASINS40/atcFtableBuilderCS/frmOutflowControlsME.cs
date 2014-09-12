@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace atcFtableBuilder
@@ -35,8 +36,6 @@ namespace atcFtableBuilder
             txtOCParm_0.TextChanged += new EventHandler(txtOCParamChanged);
             txtOCParm_1.TextChanged += new EventHandler(txtOCParamChanged);
             txtOCDisCoeff.TextChanged += new EventHandler(txtOCParamChanged);
-
-
 
             pLoaded = true;
         }
@@ -112,97 +111,41 @@ namespace atcFtableBuilder
 
         private void PopulateOCTree()
         {
-            string lOCName = "";
             for (int i = 1; i <= 5; i++)
             {
                 //add Exit node
                 string lExitNodeKey = i.ToString();
                 string lExitNodeText = "Exit " + i.ToString();
-                TreeNode lExitNode = null;
+                TreeNode lExitNodeUI = null;
                 if (treeExitControls.Nodes.ContainsKey(lExitNodeKey))
-                    lExitNode = treeExitControls.Nodes[lExitNodeKey];
+                    lExitNodeUI = treeExitControls.Nodes[lExitNodeKey];
                 else
-                    lExitNode = treeExitControls.Nodes.Add(lExitNodeKey, lExitNodeText);
-
-                if (!clsGlobals.gExitOCSetup.Keys.Contains(i))
-                    clsGlobals.gExitOCSetup.Add(i, new atcUtility.atcCollection());
+                    lExitNodeUI = treeExitControls.Nodes.Add(lExitNodeKey, lExitNodeText);
 
                 //add control device node(s)
                 if (i == 1 && clsGlobals.gToolType == clsGlobals.ToolType.Gray)
                 {
                     string lOutflowKey = "Outflow1";
-                    TreeNode lOutflowNode = lExitNode.Nodes.Add(lOutflowKey, lOutflowKey);
-
-                    atcUtility.atcCollection lOCs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(i);
-                    if (!lOCs.Keys.Contains(lOutflowKey))
-                        lOCs.Add(lOutflowKey, lOutflowKey);
-
+                    TreeNode lOutflowNode = lExitNodeUI.Nodes.Add(lOutflowKey, lOutflowKey);
                     continue;
                 }
 
-                if (clsGlobals.gExitOCSetup.Keys.Contains(i))
-                { //add exit
+                //add OC nodes
+                TreeNode lExitNodeProg = clsGlobals.gExitOCSetup[i - 1];
+                if (lExitNodeProg == null)
+                    continue;
 
-                    atcUtility.atcCollection lOCs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(i);
-                    //lExitNode.Text += " (" + lOCs.Count + " CDs)";
+                foreach (TreeNode lOCNode in lExitNodeProg.Nodes)
+                {
+                    TreeNode lOCNodeUI = new TreeNode();
+                    lOCNodeUI.Text = lOCNode.Text;
+                    lExitNodeUI.Nodes.Add(lOCNodeUI);
 
-                    foreach (string lKey in lOCs.Keys) //FTableCalculator lOC in lOCs) 
-                    { //add OCs
-                        //lKey is like OC class name plus an id, eg. FTableOCWeirRectangular_2
-                        FTableCalculator lOC = (FTableCalculator)lOCs.get_ItemByKey(lKey);
-                        string className = lKey.Substring(0, lKey.IndexOf("_"));
-                        string Ids = lKey.Substring(lKey.IndexOf("_") + 1);
-                        int Id = 0;
-                        int.TryParse(Ids, out Id);
-                        if (className.StartsWith("FTableCalcOC"))
-                        {
-                            Dictionary<string, double> lParamValues = null;
-                            if (className.Contains("WeirBroad"))
-                            {
-                                FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirBroadCrest, out lOCName);
-                                lOC = (FTableCalcOCWeirBroad)lOCs.get_ItemByKey(lKey);
-                                lParamValues = ((FTableCalcOCWeirBroad)lOC).ParamValues();
-                            }
-                            else if (className.Contains("WeirRect"))
-                            {
-                                FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirRectangular, out lOCName);
-                                lOC = (FTableCalcOCWeirRectangular)lOCs.get_ItemByKey(lKey);
-                                lParamValues = ((FTableCalcOCWeirRectangular)lOC).ParamValues();
-                            }
-                            else if (className.Contains("WeirTrape"))
-                            {
-                                FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirTrapeCipolletti, out lOCName);
-                                lOC = (FTableCalcOCWeirTrapeCipolletti)lOCs.get_ItemByKey(lKey);
-                                lParamValues = ((FTableCalcOCWeirTrapeCipolletti)lOC).ParamValues();
-                            }
-                            else if (className.Contains("WeirTriVNotch"))
-                            {
-                                FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirTriVNotch, out lOCName);
-                                lOC = (FTableCalcOCWeirTriVNotch)lOCs.get_ItemByKey(lKey);
-                                lParamValues = ((FTableCalcOCWeirTriVNotch)lOC).ParamValues();
-                            }
-                            else if (className.Contains("OrificeRiser"))
-                            {
-                                FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.OrificeRiser, out lOCName);
-                                lOC = (FTableCalcOCOrificeRiser)lOCs.get_ItemByKey(lKey);
-                                lParamValues = ((FTableCalcOCOrificeRiser)lOC).ParamValues();
-                            }
-                            else if (className.Contains("OrificeUnderflow"))
-                            {
-                                FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.OrificeUnderdrain, out lOCName);
-                                lOC = (FTableCalcOCOrificeUnderflow)lOCs.get_ItemByKey(lKey);
-                                lParamValues = ((FTableCalcOCOrificeUnderflow)lOC).ParamValues();
-                            }
-                            TreeNode lOCNode = lExitNode.Nodes.Add(lKey, lOCName + "_" + Id.ToString());
-                            //add parameter values
-
-                            List<string> lParamNames = lParamValues.Keys.ToList<string>();
-                            List<double> lParamVals = lParamValues.Values.ToList<double>();
-                            for (int z = 0; z < lParamNames.Count; z++)
-                            {
-                                lOCNode.Nodes.Add(lParamNames[z], lParamNames[z] + "(" + lParamVals[z] + ")");
-                            }
-                        }
+                    foreach (TreeNode lOCParamNode in lOCNode.Nodes)
+                    {
+                        TreeNode lOCParamNodeUI = new TreeNode();
+                        lOCParamNodeUI.Text = lOCParamNode.Text;
+                        lOCNodeUI.Nodes.Add(lOCParamNodeUI);
                     }
                 }
             }
@@ -243,148 +186,83 @@ namespace atcFtableBuilder
                 return;
             }
 
-            List<FTableCalculator.ControlDeviceType> listOCs = FTableCalculator.OCTypeNames.Keys.ToList<FTableCalculator.ControlDeviceType>();
-            List<string> listOCNames = FTableCalculator.OCTypeNames.Values.ToList<string>();
-            FTableCalculator.ControlDeviceType lSelectedOCType = FTableCalculator.ControlDeviceType.None;
-            for (int i = 0; i < listOCs.Count; i++)
+
+            int lSelectedExit = SelectedExit();
+            FTableCalculator lCalc = GetControlDeviceFromForm();
+
+            if (lCalc == null)
             {
-                if (cboOCTypes.SelectedItem.ToString() == listOCNames[i])
+                System.Windows.Forms.MessageBox.Show("Please select a proper control device type.", "Adding New Control Devices");
+                return;
+            }
+
+            //Add OC node
+            string lOCCommonName = FTableCalculator.OCTypeNames[lCalc.ControlDevice];
+            int typeCounter = -99;
+            TreeNode lExitNode = treeExitControls.Nodes[lSelectedExit - 1];
+            foreach (TreeNode lOCNode in lExitNode.Nodes)
+            {
+                string lOCAlias = lOCNode.Text.Substring(0, lOCNode.Text.IndexOf("_"));
+                string lOCId = lOCNode.Text.Substring(lOCNode.Text.IndexOf("_") + 1);
+                int liOCId = int.Parse(lOCId);
+
+                if (lOCAlias == lOCCommonName)
                 {
-                    lSelectedOCType = listOCs[i];
-                    break;
+                    if (typeCounter < liOCId)
+                        typeCounter = liOCId;
                 }
             }
 
-            int lSelectedExit = 0;
-            if (rdoExit1.Checked) lSelectedExit= 1;
-            else if (rdoExit2.Checked) lSelectedExit= 2;
-            else if (rdoExit3.Checked) lSelectedExit= 3;
-            else if (rdoExit4.Checked) lSelectedExit= 4;
-            else if (rdoExit5.Checked) lSelectedExit= 5;
+            if (typeCounter < 0)
+                typeCounter = 0;
+            else
+                typeCounter ++;
 
-            double lParam0 = 0;
-            double lParam1 = 0;
-            double lDisCoe = 0;
+            string lnewOCName = lOCCommonName + "_" + typeCounter.ToString();
 
-            double.TryParse(txtOCParm_0.Text, out lParam0);
-            double.TryParse(txtOCParm_1.Text, out lParam1);
-            double.TryParse(txtOCDisCoeff.Text, out lDisCoe);
+            TreeNode lnewOCNode = lExitNode.Nodes.Add(lnewOCName);
 
-            FTableCalculator lCalc = null;
-            switch (lSelectedOCType)
+            //Add OC's param nodes
+            Dictionary<string, double> lParams = lCalc.ParamValues();
+            List<string> lParamNames = lParams.Keys.ToList<string>();
+            List<double> lParamValues = lParams.Values.ToList<double>();
+            foreach (string lParamName in lParams.Keys)
             {
-                case FTableCalculator.ControlDeviceType.OrificeRiser:
-                    lCalc = new FTableCalcOCOrificeRiser();
-                    ((FTableCalcOCOrificeRiser)lCalc).myExit = lSelectedExit;
-                    ((FTableCalcOCOrificeRiser)lCalc).OrificePipeDiameter = lParam0;
-                    ((FTableCalcOCOrificeRiser)lCalc).OrificeDepth = lParam1;
-                    ((FTableCalcOCOrificeRiser)lCalc).OrificeDischargeCoefficient = lDisCoe;
-                   break;
-                case FTableCalculator.ControlDeviceType.OrificeUnderdrain:
-                    lCalc = new FTableCalcOCOrificeUnderflow();
-                    ((FTableCalcOCOrificeUnderflow)lCalc).myExit = lSelectedExit;
-                    ((FTableCalcOCOrificeUnderflow)lCalc).OrificePipeDiameter = lParam0;
-                    ((FTableCalcOCOrificeUnderflow)lCalc).OrificeInvertDepth = lParam1;
-                    ((FTableCalcOCOrificeUnderflow)lCalc).OrificeDischargeCoefficient = lDisCoe;
-                    break;
-                case FTableCalculator.ControlDeviceType.WeirBroadCrest:
-                    lCalc = new FTableCalcOCWeirBroad();
-                    ((FTableCalcOCWeirBroad)lCalc).myExit = lSelectedExit;
-                    ((FTableCalcOCWeirBroad)lCalc).WeirWidth = lParam0;
-                    ((FTableCalcOCWeirBroad)lCalc).WeirInvert = lParam1;
-                    ((FTableCalcOCWeirBroad)lCalc).DischargeCoefficient = lDisCoe;
-                    break;
-                case FTableCalculator.ControlDeviceType.WeirRectangular:
-                    lCalc = new FTableCalcOCWeirRectangular();
-                    ((FTableCalcOCWeirRectangular)lCalc).myExit = lSelectedExit;
-                    ((FTableCalcOCWeirRectangular)lCalc).WeirWidth = lParam0;
-                    ((FTableCalcOCWeirRectangular)lCalc).WeirInvert = lParam1;
-                    ((FTableCalcOCWeirRectangular)lCalc).DischargeCoefficient = lDisCoe;
-                    break;
-                case FTableCalculator.ControlDeviceType.WeirTrapeCipolletti:
-                    lCalc = new FTableCalcOCWeirTrapeCipolletti();
-                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).myExit = lSelectedExit;
-                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).WeirWidth = lParam0;
-                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).WeirInvert = lParam1;
-                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).DischargeCoefficient = lDisCoe;
-                    break;
-                case FTableCalculator.ControlDeviceType.WeirTriVNotch:
-                    lCalc = new FTableCalcOCWeirTriVNotch();
-                    ((FTableCalcOCWeirTriVNotch)lCalc).myExit = lSelectedExit;
-                    ((FTableCalcOCWeirTriVNotch)lCalc).WeirAngle = lParam0;
-                    ((FTableCalcOCWeirTriVNotch)lCalc).WeirInvert = lParam1;
-                    ((FTableCalcOCWeirTriVNotch)lCalc).DischargeCoefficient = lDisCoe;
-                    break;
+                TreeNode lParamNode = new TreeNode();
+                lParamNode.Text = lParamName + "(" + lParams[lParamName].ToString() + ")";
+                lnewOCNode.Nodes.Add(lParamNode);
             }
-
-            if (clsGlobals.gExitOCSetup == null)
-                clsGlobals.gExitOCSetup = new atcUtility.atcCollection();
-            atcUtility.atcCollection lExitSetup = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lSelectedExit);
-
-            if (lExitSetup == null)
-            {
-                lExitSetup = new atcUtility.atcCollection();
-                clsGlobals.gExitOCSetup.Add(lSelectedExit, lExitSetup);
-            }
-
-            string lOCName = lCalc.GetType().Name;
-            int typeCounter = 0;
-            string lOCNameCtr = lOCName + "_" + typeCounter.ToString();
-            while (lExitSetup.Keys.Contains(lOCNameCtr))
-            {
-                typeCounter++;
-                lOCNameCtr = lOCName + "_" + typeCounter.ToString();
-            }
-
-            lExitSetup.Add(lOCNameCtr, lCalc);
 
             //Refresh tree
-            AddOCtoTree(lCalc);
+            //AddOCtoTree(lCalc);
+            AdjustNodeNames(lExitNode);
+        }
+
+        private void AdjustNodeNames(TreeNode aExitNode)
+        {
+            if (aExitNode == null || !aExitNode.Text.StartsWith("Exit")) return;
+            if (aExitNode.Nodes.Count == 0) return;
+
+            atcUtility.atcCollection lCDTypes = new atcUtility.atcCollection();
+            foreach (TreeNode lCDNode in aExitNode.Nodes)
+            {
+                string lCDName = lCDNode.Text.Substring(0, lCDNode.Text.IndexOf("_"));
+            }
+
+            
+
+ 
         }
 
         private bool AddOCtoTree(FTableCalculator aCalc)
         {
             bool lCalcAdded = false;
-            string className = aCalc.GetType().Name;
-            //FTableCalculator.ControlDeviceType lCDType = lOC.ControlDevice;
-            int lExit = 0;
-            Dictionary<string, double> lParamValues = null;
+
+            FTableCalculator.ControlDeviceType lOCType = aCalc.ControlDevice;
+            int lExit = aCalc.myExit; 
+            Dictionary<string, double> lParamValues = aCalc.ParamValues();
             string lOCDisplayName = "";
-            switch (className)
-            {
-                case "FTableCalculator":
-                    break;
-                case "FTableCalcOCWeirTriVNotch":
-                    lExit = ((FTableCalcOCWeirTriVNotch)aCalc).myExit;
-                    lParamValues = ((FTableCalcOCWeirTriVNotch)aCalc).ParamValues();
-                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirTriVNotch, out lOCDisplayName);
-                    break;
-                case "FTableCalcOCWeirTrapeCipolletti":
-                    lExit = ((FTableCalcOCWeirTrapeCipolletti)aCalc).myExit;
-                    lParamValues = ((FTableCalcOCWeirTrapeCipolletti)aCalc).ParamValues();
-                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirTrapeCipolletti, out lOCDisplayName);
-                    break;
-                case "FTableCalcOCWeirRectangular":
-                    lExit = ((FTableCalcOCWeirRectangular)aCalc).myExit;
-                    lParamValues = ((FTableCalcOCWeirRectangular)aCalc).ParamValues();
-                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirRectangular, out lOCDisplayName);
-                    break;
-                case "FTableCalcOCWeirBroad":
-                    lExit = ((FTableCalcOCWeirBroad)aCalc).myExit;
-                    lParamValues = ((FTableCalcOCWeirBroad)aCalc).ParamValues();
-                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.WeirBroadCrest, out lOCDisplayName);
-                    break;
-                case "FTableCalcOCOrificeUnderflow":
-                    lExit = ((FTableCalcOCOrificeUnderflow)aCalc).myExit;
-                    lParamValues = ((FTableCalcOCOrificeUnderflow)aCalc).ParamValues();
-                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.OrificeUnderdrain, out lOCDisplayName);
-                    break;
-                case "FTableCalcOCOrificeRiser":
-                    lExit = ((FTableCalcOCOrificeRiser)aCalc).myExit;
-                    lParamValues = ((FTableCalcOCOrificeRiser)aCalc).ParamValues();
-                    FTableCalculator.OCTypeNames.TryGetValue(FTableCalculator.ControlDeviceType.OrificeRiser, out lOCDisplayName);
-                    break;
-            }
+            FTableCalculator.OCTypeNames.TryGetValue(aCalc.ControlDevice, out lOCDisplayName);
 
             TreeNode lExitNode = null;
             if (treeExitControls.Nodes.ContainsKey(lExit.ToString())) 
@@ -457,7 +335,7 @@ namespace atcFtableBuilder
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             TreeNode lSelectedNode = treeExitControls.SelectedNode;
-            if (lSelectedNode == null || !lSelectedNode.Parent.Text.StartsWith("Exit") || lSelectedNode.Text.StartsWith("Exit") )
+            if (lSelectedNode == null || lSelectedNode.Text.StartsWith("Exit") || !lSelectedNode.Parent.Text.StartsWith("Exit") )
             {
                 System.Windows.Forms.MessageBox.Show("Select a Control Device for update.", "Update Control Device");
                 return;
@@ -468,80 +346,115 @@ namespace atcFtableBuilder
             string lParentNodeName = lSelectedNode.Parent.Text;
             string lExitNo = lParentNodeName.Substring(lParentNodeName.IndexOf(" ") + 1);
             int lExitNum = int.Parse(lExitNo);
-            atcUtility.atcCollection lExitCDs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lExitNum);
-            string lAlias = "";
-            FTableCalculator lCD = null;
-            atcUtility.atcCollection lExitChanged = new atcUtility.atcCollection();
-            int lSelectedExit = SelectedExit();
-            foreach (string lCDKey in lExitCDs.Keys)
+
+            FTableCalculator lCalc = GetControlDeviceFromForm();
+            if (lSelectedOCAlias == FTableCalculator.OCTypeNames[lCalc.ControlDevice].ToString())
             {
-                string lCDClassName = lCDKey.Substring(0, lCDKey.IndexOf("_"));
-                int lCDIndex = int.Parse(lCDKey.Substring(lCDKey.IndexOf("_") + 1));
-                lCD = (FTableCalculator)lExitCDs.get_ItemByKey(lCDKey);
-                FTableCalculator.OCTypeNames.TryGetValue(lCD.ControlDevice, out lAlias);
-                int myExit = lCD.myExit;
-                if (lSelectedOCAlias == lAlias && lSelectedOCIndex == lCDIndex)
+                Dictionary<string, double> lParams = lCalc.ParamValues();
+                double lVal = 0;
+                foreach (TreeNode lParamNode in lSelectedNode.Nodes)
                 {
-                    //update starts
-                    //each CD type needs a update params method
-                    Dictionary<string, double> lParams = lCD.ParamValues();
-                    double lValue;
-                    foreach (string lKey in lParams.Keys)
-                    {
-                        if (lKey == lblOCParm0.Text && double.TryParse(txtOCParm_0.Text, out lValue))
-                        {
-                            lParams.Remove(lKey);
-                            lParams.Add(lKey, lValue);
-                        }
-                        else if (lKey == lblOCParm1.Text && double.TryParse(txtOCParm_1.Text, out lValue))
-                        {
-                            lParams.Remove(lKey);
-                            lParams.Add(lKey, lValue);
-                        }
-                        else if (lKey == lblOCParm3.Text && double.TryParse(txtOCDisCoeff.Text, out lValue))
-                        {
-                            lParams.Remove(lKey);
-                            lParams.Add(lKey, lValue);
-                        }
-                    }
-                    lCD.SetParamValues(lParams);
-                    break;
-                }
-                else
-                    lCD = null;
-
-                if (!(lCD == null))
-                {
-                    //it's been updated
-                    if (lCD.myExit != lSelectedExit)
-                    {
-                        FTableCalculator lCDNew = lCD.Clone();
-                        lCDNew.myExit = lSelectedExit;
-                        atcUtility.atcCollection lExitCDsNew = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lSelectedExit);
-                        int lOCCtr = -90;
-                        string lCDNewName = "";
-                        foreach (string lzKey in lExitCDsNew.Keys)
-                        {
-                            lCDNewName = lCDNew.GetType().Name;
-                            if (lzKey.StartsWith(lCDNewName))
-                            {
-                                int lOCId = int.Parse(lCDNewName.Substring(lCDNewName.IndexOf("_") + 1));
-                                if (lOCCtr < lOCId)
-                                    lOCCtr = lOCId;
-                            }
-                        }
-                        lCDNewName = lCDNew.GetType().Name + "_" + (lOCCtr + 1).ToString();
-                        lExitCDsNew.Add(lCDNewName, lCDNew);
-
-                        lExitChanged.Add(lCD);
-                    }
-
+                    string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.IndexOf("("));
+                    lVal = lParams[lParamName];
+                    lParamNode.Text = lParamName + "(" + lVal.ToString() + ")";
                 }
             }
-            foreach (FTableCalculator lCDExitChanged in lExitChanged)
+            if (lExitNum != SelectedExit())
             {
-                lExitCDs.Remove(lCDExitChanged);
+                TreeNode lNewNode = new TreeNode();
+                lNewNode.Text = lSelectedNode.Text;
+                foreach (TreeNode lParamNode in lSelectedNode.Nodes)
+                {
+                    TreeNode lnewParamNode = new TreeNode();
+                    lnewParamNode.Text = lParamNode.Text;
+                    lNewNode.Nodes.Add(lnewParamNode);
+                }
+                lSelectedNode.Remove();
+
+                foreach (TreeNode lExitNode in treeExitControls.Nodes)
+                {
+                    if (lExitNode.Text.Contains(SelectedExit().ToString()))
+                    {
+                        lExitNode.Nodes.Add(lNewNode);
+                        break;
+                    }
+                }
             }
+
+            //atcUtility.atcCollection lExitCDs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lExitNum);
+            //string lAlias = "";
+            //FTableCalculator lCD = null;
+            //atcUtility.atcCollection lExitChanged = new atcUtility.atcCollection();
+            //int lSelectedExit = SelectedExit();
+            //foreach (string lCDKey in lExitCDs.Keys)
+            //{
+            //    string lCDClassName = lCDKey.Substring(0, lCDKey.IndexOf("_"));
+            //    int lCDIndex = int.Parse(lCDKey.Substring(lCDKey.IndexOf("_") + 1));
+            //    lCD = (FTableCalculator)lExitCDs.get_ItemByKey(lCDKey);
+            //    FTableCalculator.OCTypeNames.TryGetValue(lCD.ControlDevice, out lAlias);
+            //    int myExit = lCD.myExit;
+            //    if (lSelectedOCAlias == lAlias && lSelectedOCIndex == lCDIndex)
+            //    {
+            //        //update starts
+            //        //each CD type needs a update params method
+            //        Dictionary<string, double> lParams = lCD.ParamValues();
+            //        double lValue;
+            //        foreach (string lKey in lParams.Keys)
+            //        {
+            //            if (lKey == lblOCParm0.Text && double.TryParse(txtOCParm_0.Text, out lValue))
+            //            {
+            //                lParams.Remove(lKey);
+            //                lParams.Add(lKey, lValue);
+            //            }
+            //            else if (lKey == lblOCParm1.Text && double.TryParse(txtOCParm_1.Text, out lValue))
+            //            {
+            //                lParams.Remove(lKey);
+            //                lParams.Add(lKey, lValue);
+            //            }
+            //            else if (lKey == lblOCParm3.Text && double.TryParse(txtOCDisCoeff.Text, out lValue))
+            //            {
+            //                lParams.Remove(lKey);
+            //                lParams.Add(lKey, lValue);
+            //            }
+            //        }
+            //        lCD.SetParamValues(lParams);
+            //        break;
+            //    }
+            //    else
+            //        lCD = null;
+
+            //    if (!(lCD == null))
+            //    {
+            //        //it's been updated
+            //        if (lCD.myExit != lSelectedExit)
+            //        {
+            //            FTableCalculator lCDNew = lCD.Clone();
+            //            lCDNew.myExit = lSelectedExit;
+            //            atcUtility.atcCollection lExitCDsNew = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lSelectedExit);
+            //            int lOCCtr = -90;
+            //            string lCDNewName = "";
+            //            foreach (string lzKey in lExitCDsNew.Keys)
+            //            {
+            //                lCDNewName = lCDNew.GetType().Name;
+            //                if (lzKey.StartsWith(lCDNewName))
+            //                {
+            //                    int lOCId = int.Parse(lCDNewName.Substring(lCDNewName.IndexOf("_") + 1));
+            //                    if (lOCCtr < lOCId)
+            //                        lOCCtr = lOCId;
+            //                }
+            //            }
+            //            lCDNewName = lCDNew.GetType().Name + "_" + (lOCCtr + 1).ToString();
+            //            lExitCDsNew.Add(lCDNewName, lCDNew);
+
+            //            lExitChanged.Add(lCD);
+            //        }
+
+            //    }
+            //}
+            //foreach (FTableCalculator lCDExitChanged in lExitChanged)
+            //{
+            //    lExitCDs.Remove(lCDExitChanged);
+            //}
 
             lSelectedNode.BackColor = Color.White;
         }
@@ -562,14 +475,91 @@ namespace atcFtableBuilder
                 return 0;
         }
 
+        private FTableCalculator GetControlDeviceFromForm()
+        {
+            List<FTableCalculator.ControlDeviceType> listOCTypes = FTableCalculator.OCTypeNames.Keys.ToList<FTableCalculator.ControlDeviceType>();
+            List<string> listOCCommonNames = FTableCalculator.OCTypeNames.Values.ToList<string>();
+            FTableCalculator.ControlDeviceType lSelectedOCType = FTableCalculator.ControlDeviceType.None;
+            for (int i = 0; i < listOCTypes.Count; i++)
+            {
+                if (cboOCTypes.SelectedItem.ToString() == listOCCommonNames[i])
+                {
+                    lSelectedOCType = listOCTypes[i];
+                    break;
+                }
+            }
+
+            int lSelectedExit = SelectedExit();
+
+            double lParam0 = 0;
+            double lParam1 = 0;
+            double lDisCoe = 0;
+
+            double.TryParse(txtOCParm_0.Text, out lParam0);
+            double.TryParse(txtOCParm_1.Text, out lParam1);
+            double.TryParse(txtOCDisCoeff.Text, out lDisCoe);
+
+            FTableCalculator lCalc = null;
+            switch (lSelectedOCType)
+            {
+                case FTableCalculator.ControlDeviceType.OrificeRiser:
+                    lCalc = new FTableCalcOCOrificeRiser();
+                    ((FTableCalcOCOrificeRiser)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCOrificeRiser)lCalc).OrificePipeDiameter = lParam0;
+                    ((FTableCalcOCOrificeRiser)lCalc).OrificeDepth = lParam1;
+                    ((FTableCalcOCOrificeRiser)lCalc).OrificeDischargeCoefficient = lDisCoe;
+                    break;
+                case FTableCalculator.ControlDeviceType.OrificeUnderdrain:
+                    lCalc = new FTableCalcOCOrificeUnderflow();
+                    ((FTableCalcOCOrificeUnderflow)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCOrificeUnderflow)lCalc).OrificePipeDiameter = lParam0;
+                    ((FTableCalcOCOrificeUnderflow)lCalc).OrificeInvertDepth = lParam1;
+                    ((FTableCalcOCOrificeUnderflow)lCalc).OrificeDischargeCoefficient = lDisCoe;
+                    break;
+                case FTableCalculator.ControlDeviceType.WeirBroadCrest:
+                    lCalc = new FTableCalcOCWeirBroad();
+                    ((FTableCalcOCWeirBroad)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCWeirBroad)lCalc).WeirWidth = lParam0;
+                    ((FTableCalcOCWeirBroad)lCalc).WeirInvert = lParam1;
+                    ((FTableCalcOCWeirBroad)lCalc).DischargeCoefficient = lDisCoe;
+                    break;
+                case FTableCalculator.ControlDeviceType.WeirRectangular:
+                    lCalc = new FTableCalcOCWeirRectangular();
+                    ((FTableCalcOCWeirRectangular)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCWeirRectangular)lCalc).WeirWidth = lParam0;
+                    ((FTableCalcOCWeirRectangular)lCalc).WeirInvert = lParam1;
+                    ((FTableCalcOCWeirRectangular)lCalc).DischargeCoefficient = lDisCoe;
+                    break;
+                case FTableCalculator.ControlDeviceType.WeirTrapeCipolletti:
+                    lCalc = new FTableCalcOCWeirTrapeCipolletti();
+                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).WeirWidth = lParam0;
+                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).WeirInvert = lParam1;
+                    ((FTableCalcOCWeirTrapeCipolletti)lCalc).DischargeCoefficient = lDisCoe;
+                    break;
+                case FTableCalculator.ControlDeviceType.WeirTriVNotch:
+                    lCalc = new FTableCalcOCWeirTriVNotch();
+                    ((FTableCalcOCWeirTriVNotch)lCalc).myExit = lSelectedExit;
+                    ((FTableCalcOCWeirTriVNotch)lCalc).WeirAngle = lParam0;
+                    ((FTableCalcOCWeirTriVNotch)lCalc).WeirInvert = lParam1;
+                    ((FTableCalcOCWeirTriVNotch)lCalc).DischargeCoefficient = lDisCoe;
+                    break;
+            }
+            return lCalc;
+        }
+
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (treeExitControls.SelectedNode == null)
+            if (!pLoaded) return;
+
+            TreeNode lSelectedNode = treeExitControls.SelectedNode;
+            if (lSelectedNode == null || lSelectedNode.Text.StartsWith("Exit") || !lSelectedNode.Parent.Text.StartsWith("Exit"))
             {
                 System.Windows.Forms.MessageBox.Show("Select a Control Device to delete.", "Delete Control Device");
                 return;
             }
 
+            lSelectedNode.Remove();
         }
 
         private void treeExitControls_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -578,61 +568,56 @@ namespace atcFtableBuilder
             System.Drawing.Point p = new System.Drawing.Point(e.X, e.Y);
             // Go to the node that the user clicked
             TreeNode lSelectedNode = treeExitControls.GetNodeAt(p);
+
             if (!(lSelectedNode == null))
             {
-                treeExitControls.SelectedNode = lSelectedNode;
                 if (lSelectedNode.Text.StartsWith("Exit")) return;
                 if (!lSelectedNode.Parent.Text.StartsWith("Exit")) return;
+            }
+            else
+                return;
 
-                string lExitName = lSelectedNode.Parent.Text;
-                string lExitNo = lExitName.Substring(lExitName.IndexOf(" ") + 1);
+            treeExitControls.SelectedNode = lSelectedNode;
 
-                int lExitNum = int.Parse(lExitNo);
-                atcUtility.atcCollection lExitCDs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lExitNum);
-                foreach (FTableCalculator lCD in lExitCDs)
-                {
-                    int myExit = lCD.myExit;
-                    string lOCAlias = "";
-                    FTableCalculator.OCTypeNames.TryGetValue(lCD.ControlDevice, out lOCAlias);
-                    if (lSelectedNode.Text.StartsWith(lOCAlias))
-                    {
-                        Dictionary<string, double> lParams = lCD.ParamValues();
-                        List<string> lParamNames = lParams.Keys.ToList<string>();
-                        List<double> lParamValues = lParams.Values.ToList<double>();
-                        lblOCParm0.Text = lParamNames[0];
-                        lblOCParm1.Text = lParamNames[1];
-                        lblOCParm3.Text = lParamNames[2];
-                        txtOCParm_0.Text = lParamValues[0].ToString();
-                        txtOCParm_1.Text = lParamValues[1].ToString();
-                        txtOCDisCoeff.Text = lParamValues[2].ToString();
-                        switch (lExitNo)
-                        {
-                            case "1": rdoExit1.Checked = true; break;
-                            case "2": rdoExit2.Checked = true; break;
-                            case "3": rdoExit3.Checked = true; break;
-                            case "4": rdoExit4.Checked = true; break;
-                            case "5": rdoExit5.Checked = true; break;
-                        }
-
-                        for (int i = 0; i < cboOCTypes.Items.Count; i++)
-                        {
-                            if (lOCAlias == cboOCTypes.Items[i].ToString())
-                            {
-                                this.cboOCTypes.SelectedIndexChanged -= this.cboOCTypes_SelectedIndexChanged;
-                                cboOCTypes.SelectedIndex = i;
-                                this.cboOCTypes.SelectedIndexChanged += new System.EventHandler(this.cboOCTypes_SelectedIndexChanged);
-                                break;
-                            }
-                        }
-
-                    }
-
-
-
-                }
-
+            string lExitNodeName = lSelectedNode.Parent.Text;
+            string lExitNo = lExitNodeName.Substring(lExitNodeName.IndexOf(" ") + 1);
+            switch (lExitNo)
+            {
+                case "1": rdoExit1.Checked = true; break; 
+                case "2": rdoExit2.Checked = true; break; 
+                case "3": rdoExit3.Checked = true; break; 
+                case "4": rdoExit4.Checked = true; break; 
+                case "5": rdoExit5.Checked = true; break; 
             }
 
+            string lCDAlias = lSelectedNode.Text.Substring(0, lSelectedNode.Text.IndexOf("_"));
+            this.cboOCTypes.SelectedIndexChanged -= this.cboOCTypes_SelectedIndexChanged;
+            for (int i = 0; i < cboOCTypes.Items.Count; i++)
+            {
+                if (cboOCTypes.Items[i].ToString() == lCDAlias)
+                {
+                    cboOCTypes.SelectedIndex = i;
+                    break;
+                }
+            }
+            this.cboOCTypes.SelectedIndexChanged += new System.EventHandler(this.cboOCTypes_SelectedIndexChanged);
+
+            Regex lReg = new Regex(@"\(([^\)]*)\)");
+            foreach (TreeNode lParamNode in lSelectedNode.Nodes)
+            {
+                MatchCollection lMatches = lReg.Matches(lParamNode.Text);
+                string lsValue = lMatches[0].Groups[0].Value;
+                lsValue = lsValue.TrimStart(new char[]{'('});
+                lsValue = lsValue.TrimEnd(new char[]{')'});
+
+                string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.IndexOf("("));
+                if (lParamName == lblOCParm0.Text)
+                    txtOCParm_0.Text = lsValue;
+                else if (lParamName == lblOCParm1.Text)
+                    txtOCParm_1.Text = lsValue;
+                else if (lParamName == lblOCParm3.Text)
+                    txtOCDisCoeff.Text = lsValue;
+            }
         }
     }
 }

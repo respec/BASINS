@@ -109,7 +109,8 @@ namespace atcFtableBuilder
         public static bool gOCSelectedOrificeRiser = false;
 
         //a collection of OutflowControl(s) keyed on exit id (1 - 5)
-        public static atcUtility.atcCollection gExitOCSetup = new atcUtility.atcCollection();
+        //public static atcUtility.atcCollection gExitOCSetup = new atcUtility.atcCollection();
+        public static System.Windows.Forms.TreeNode[] gExitOCSetup = new System.Windows.Forms.TreeNode[5];
 
         #endregion
 
