@@ -558,5 +558,11 @@ namespace atcFtableBuilder
                     txtOCDisCoeff.Text = lsValue;
             }
         }
+
+        private void frmOutflowControlsME_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Array.Clear(clsGlobals.gExitOCSetup, 0, clsGlobals.gExitOCSetup.Length);
+            treeExitControls.Nodes.CopyTo(clsGlobals.gExitOCSetup, 0);
+        }
     }
 }
