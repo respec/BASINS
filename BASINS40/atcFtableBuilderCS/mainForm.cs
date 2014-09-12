@@ -1215,6 +1215,22 @@ namespace atcFtableBuilder
             //lOutflowControlDialog.ShowDialog();
             frmOutflowControlsME lOutflowControlDialog = new frmOutflowControlsME();
             lOutflowControlDialog.ShowDialog();
+            int CDCount = 0;
+            for (int i = 0; i < 5; i++)
+            {
+                CDCount += clsGlobals.gExitOCSetup[i].Nodes.Count;
+            }
+            btnShowOptControls.Text = "Show optional control devices";
+            if (CDCount > 0 && !(clsGlobals.gToolType == clsGlobals.ToolType.Gray && CDCount == 1))
+                btnShowOptControls.Text += " (...)"; //" (" + CDCount + " CDs)";
+
+            //using (Graphics cg = this.CreateGraphics())
+            //{
+            //    SizeF size = cg.MeasureString(lnewText, btnShowOptControls.Font);
+            //    btnShowOptControls.Padding = new System.Windows.Forms.Padding(2);
+            //    btnShowOptControls.Width = (int)size.Width;
+            //    btnShowOptControls.Text = lnewText;
+            //}
         }
 
         private void cboBMPTypes_SelectedIndexChanged(object sender, EventArgs e)
