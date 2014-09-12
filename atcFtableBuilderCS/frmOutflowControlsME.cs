@@ -247,11 +247,17 @@ namespace atcFtableBuilder
             foreach (TreeNode lCDNode in aExitNode.Nodes)
             {
                 string lCDName = lCDNode.Text.Substring(0, lCDNode.Text.IndexOf("_"));
+                if (!lCDTypes.Keys.Contains(lCDName)) lCDTypes.Add(lCDName, 0);
             }
-
-            
-
- 
+            foreach (TreeNode lCDNode in aExitNode.Nodes)
+            {
+                string lCDName = lCDNode.Text.Substring(0, lCDNode.Text.IndexOf("_"));
+                int lId = (int)lCDTypes.get_ItemByKey(lCDName);
+                lId++;
+                string lCDNameNew = lCDName + "_" + lId.ToString();
+                lCDNode.Text = lCDNameNew;
+                lCDTypes.set_ItemByKey(lCDName, lId);
+            }
         }
 
         private bool AddOCtoTree(FTableCalculator aCalc)
@@ -340,7 +346,6 @@ namespace atcFtableBuilder
                 System.Windows.Forms.MessageBox.Show("Select a Control Device for update.", "Update Control Device");
                 return;
             }
-            lSelectedNode.BackColor = Color.Blue;
             string lSelectedOCAlias = lSelectedNode.Text.Substring(0, lSelectedNode.Text.IndexOf("_"));
             int lSelectedOCIndex = int.Parse(lSelectedNode.Text.Substring(lSelectedNode.Text.IndexOf("_") + 1));
             string lParentNodeName = lSelectedNode.Parent.Text;
@@ -358,6 +363,11 @@ namespace atcFtableBuilder
                     lVal = lParams[lParamName];
                     lParamNode.Text = lParamName + "(" + lVal.ToString() + ")";
                 }
+                this.treeExitControls.MouseUp -= this.treeExitControls_MouseUp;
+                AdjustNodeNames(lSelectedNode.Parent);
+                lSelectedNode.Expand();
+                treeExitControls.SelectedNode = lSelectedNode;
+                this.treeExitControls.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeExitControls_MouseUp);
             }
             if (lExitNum != SelectedExit())
             {
@@ -379,84 +389,13 @@ namespace atcFtableBuilder
                         break;
                     }
                 }
+
+                this.treeExitControls.MouseUp -= this.treeExitControls_MouseUp;
+                AdjustNodeNames(lNewNode.Parent);
+                lNewNode.Expand();
+                treeExitControls.SelectedNode = lNewNode;
+                this.treeExitControls.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeExitControls_MouseUp);
             }
-
-            //atcUtility.atcCollection lExitCDs = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lExitNum);
-            //string lAlias = "";
-            //FTableCalculator lCD = null;
-            //atcUtility.atcCollection lExitChanged = new atcUtility.atcCollection();
-            //int lSelectedExit = SelectedExit();
-            //foreach (string lCDKey in lExitCDs.Keys)
-            //{
-            //    string lCDClassName = lCDKey.Substring(0, lCDKey.IndexOf("_"));
-            //    int lCDIndex = int.Parse(lCDKey.Substring(lCDKey.IndexOf("_") + 1));
-            //    lCD = (FTableCalculator)lExitCDs.get_ItemByKey(lCDKey);
-            //    FTableCalculator.OCTypeNames.TryGetValue(lCD.ControlDevice, out lAlias);
-            //    int myExit = lCD.myExit;
-            //    if (lSelectedOCAlias == lAlias && lSelectedOCIndex == lCDIndex)
-            //    {
-            //        //update starts
-            //        //each CD type needs a update params method
-            //        Dictionary<string, double> lParams = lCD.ParamValues();
-            //        double lValue;
-            //        foreach (string lKey in lParams.Keys)
-            //        {
-            //            if (lKey == lblOCParm0.Text && double.TryParse(txtOCParm_0.Text, out lValue))
-            //            {
-            //                lParams.Remove(lKey);
-            //                lParams.Add(lKey, lValue);
-            //            }
-            //            else if (lKey == lblOCParm1.Text && double.TryParse(txtOCParm_1.Text, out lValue))
-            //            {
-            //                lParams.Remove(lKey);
-            //                lParams.Add(lKey, lValue);
-            //            }
-            //            else if (lKey == lblOCParm3.Text && double.TryParse(txtOCDisCoeff.Text, out lValue))
-            //            {
-            //                lParams.Remove(lKey);
-            //                lParams.Add(lKey, lValue);
-            //            }
-            //        }
-            //        lCD.SetParamValues(lParams);
-            //        break;
-            //    }
-            //    else
-            //        lCD = null;
-
-            //    if (!(lCD == null))
-            //    {
-            //        //it's been updated
-            //        if (lCD.myExit != lSelectedExit)
-            //        {
-            //            FTableCalculator lCDNew = lCD.Clone();
-            //            lCDNew.myExit = lSelectedExit;
-            //            atcUtility.atcCollection lExitCDsNew = (atcUtility.atcCollection)clsGlobals.gExitOCSetup.get_ItemByKey(lSelectedExit);
-            //            int lOCCtr = -90;
-            //            string lCDNewName = "";
-            //            foreach (string lzKey in lExitCDsNew.Keys)
-            //            {
-            //                lCDNewName = lCDNew.GetType().Name;
-            //                if (lzKey.StartsWith(lCDNewName))
-            //                {
-            //                    int lOCId = int.Parse(lCDNewName.Substring(lCDNewName.IndexOf("_") + 1));
-            //                    if (lOCCtr < lOCId)
-            //                        lOCCtr = lOCId;
-            //                }
-            //            }
-            //            lCDNewName = lCDNew.GetType().Name + "_" + (lOCCtr + 1).ToString();
-            //            lExitCDsNew.Add(lCDNewName, lCDNew);
-
-            //            lExitChanged.Add(lCD);
-            //        }
-
-            //    }
-            //}
-            //foreach (FTableCalculator lCDExitChanged in lExitChanged)
-            //{
-            //    lExitCDs.Remove(lCDExitChanged);
-            //}
-
-            lSelectedNode.BackColor = Color.White;
         }
 
         private int SelectedExit()
