@@ -1006,6 +1006,152 @@ namespace atcFtableBuilder
             */
         }
 
+        protected Dictionary<int, ArrayList> doControlStructureCalculations()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                TreeNode lExitNode = clsGlobals.gExitOCSetup[i];
+                if (lExitNode.Nodes.Count > 0)
+                {
+                    foreach (TreeNode lCDNode in lExitNode.Nodes)
+                    {
+                        Dictionary<string, double> lParamsInClass = null;
+                        FTableCalculator lCalc = null;
+                        string lCDTypeAlias = lCDNode.Text.Substring(0, lCDNode.Text.IndexOf("_"));
+                        if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.OrificeRiser])
+                        {
+                            lCalc = new FTableCalcOCOrificeRiser();
+                        }
+                        else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.OrificeUnderdrain])
+                        {
+                        }
+                        else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirBroadCrest])
+                        {
+                        }
+                        else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirRectangular])
+                        {
+                        }
+                        else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirTrapeCipolletti])
+                        {
+                        }
+                        else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirTriVNotch])
+                        {
+                            lCalc = new FTableCalcOCWeirTriVNotch();
+                            ((FTableCalcOCWeirTriVNotch)lCalc).Height = FTableCalculator.TotalDepth;
+                        }
+
+                        lParamsInClass = lCalc.ParamValues();
+                        foreach (TreeNode lParamNode in lCDNode.Nodes)
+                        {
+                            string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.IndexOf("("));
+                            string lParamValue = lParamNode.Text.Substring(lParamNode.Text.IndexOf("(") + 1).TrimEnd(new char[] { ')' });
+                            lParamsInClass[lParamName] = double.Parse(lParamValue);
+                        }
+                        lCalc.SetParamValues(lParamsInClass);
+                        
+                    }
+                }
+            }
+            Dictionary<FTableCalculator.ControlDeviceType, ArrayList> outputHash = new Dictionary<FTableCalculator.ControlDeviceType, ArrayList>();
+            Hashtable inputHash = new Hashtable();
+            if (clsGlobals.gOCSelectedWeirTri)
+            { //controlCheckBoxes.get(i).getName() == "Triangular Vnotch Weir")
+                FTableCalcOCWeirTriVNotch lWeirTri = new FTableCalcOCWeirTriVNotch();
+                double lInputVal = 0;
+                if (double.TryParse(clsGlobals.gOCWeirTriVnotch[0], out lInputVal))
+                    lWeirTri.WeirAngle = lInputVal;
+                if (double.TryParse(clsGlobals.gOCWeirTriVnotch[1], out lInputVal))
+                    lWeirTri.WeirInvert = lInputVal;
+                if (double.TryParse(clsGlobals.gOCWeirTriVnotch[2], out lInputVal))
+                    lWeirTri.DischargeCoefficient = lInputVal;
+                lWeirTri.Height = FTableCalculator.TotalDepth;
+                ArrayList lFTCResult = lWeirTri.GenerateFTableOC();
+                //One can do some checking before putting it in the outputHash
+                outputHash.Add(FTableCalculator.ControlDeviceType.WeirTriVNotch, lFTCResult);
+            }
+            if (clsGlobals.gOCSelectedWeirTrape)
+            { //controlCheckBoxes.get(i).getName() == "Trapezoidal Weir (Cipoletti)")
+                FTableCalcOCWeirTrapeCipolletti lWeirTrape = new FTableCalcOCWeirTrapeCipolletti();
+                double lInputVal = 0;
+                if (double.TryParse(clsGlobals.gOCWeirTrape[0], out lInputVal))
+                    lWeirTrape.WeirWidth = lInputVal;
+                if (double.TryParse(clsGlobals.gOCWeirTrape[1], out lInputVal))
+                    lWeirTrape.WeirInvert = lInputVal;
+                if (double.TryParse(clsGlobals.gOCWeirTrape[2], out lInputVal))
+                    lWeirTrape.DischargeCoefficient = lInputVal;
+                lWeirTrape.Height = FTableCalculator.TotalDepth;
+                ArrayList lFTCResult = lWeirTrape.GenerateFTableOC();
+                //One can do some checking before putting it in the outputHash
+                outputHash.Add(FTableCalculator.ControlDeviceType.WeirTrapeCipolletti, lFTCResult);
+            }
+            if (clsGlobals.gOCSelectedWeirBroad)
+            { //controlCheckBoxes.get(i).getName() == "Broad Crested Weir")
+                FTableCalcOCWeirBroad lWeirBroad = new FTableCalcOCWeirBroad();
+                double lInputVal = 0;
+                if (double.TryParse(clsGlobals.gOCWeirBroad[0], out lInputVal))
+                    lWeirBroad.WeirWidth = lInputVal;
+                if (double.TryParse(clsGlobals.gOCWeirBroad[1], out lInputVal))
+                    lWeirBroad.WeirInvert = lInputVal;
+                if (double.TryParse(clsGlobals.gOCWeirBroad[2], out lInputVal))
+                    lWeirBroad.DischargeCoefficient = lInputVal;
+                lWeirBroad.Height = FTableCalculator.TotalDepth;
+                ArrayList lFTCResult = lWeirBroad.GenerateFTableOC();
+                //One can do some checking before putting it in the outputHash
+                outputHash.Add(FTableCalculator.ControlDeviceType.WeirBroadCrest, lFTCResult);
+            }
+
+            if (clsGlobals.gOCSelectedWeirRect)
+            { //controlCheckBoxes.get(i).getName() == "Rectangular Weir")
+                FTableCalcOCWeirRectangular lWeirRect = new FTableCalcOCWeirRectangular();
+                double lInputVal = 0;
+                if (double.TryParse(clsGlobals.gOCWeirRect[0], out lInputVal))
+                    lWeirRect.WeirWidth = lInputVal;
+                if (double.TryParse(clsGlobals.gOCWeirRect[1], out lInputVal))
+                    lWeirRect.WeirInvert = lInputVal;
+                if (double.TryParse(clsGlobals.gOCWeirRect[2], out lInputVal))
+                    lWeirRect.DischargeCoefficient = lInputVal;
+                lWeirRect.Height = FTableCalculator.TotalDepth;
+                ArrayList lFTCResult = lWeirRect.GenerateFTableOC();
+                //One can do some checking before putting it in the outputHash
+                outputHash.Add(FTableCalculator.ControlDeviceType.WeirRectangular, lFTCResult);
+            }
+            if (clsGlobals.gOCSelectedOrificeUnd)
+            { //controlCheckBoxes.get(i).getName() == "Underdrain Orifice")
+                FTableCalcOCOrificeUnderflow lOrificeUnd = new FTableCalcOCOrificeUnderflow();
+                double lInputVal = 0;
+                if (double.TryParse(clsGlobals.gOCOrificeUnd[0], out lInputVal))
+                    lOrificeUnd.OrificePipeDiameter = lInputVal;
+                if (double.TryParse(clsGlobals.gOCOrificeUnd[1], out lInputVal))
+                    lOrificeUnd.OrificeInvertDepth = lInputVal;
+                if (double.TryParse(clsGlobals.gOCOrificeUnd[2], out lInputVal))
+                    lOrificeUnd.OrificeDischargeCoefficient = lInputVal;
+                ArrayList lFTCResult = lOrificeUnd.GenerateFTableOC();
+                //One can do some checking before putting it in the outputHash
+                outputHash.Add(FTableCalculator.ControlDeviceType.OrificeUnderdrain, lFTCResult);
+            }
+            if (clsGlobals.gOCSelectedOrificeRiser)
+            { //controlCheckBoxes.get(i).getName() == "Riser Orifice")
+
+                FTableCalcOCOrificeRiser lOrificeRiser = new FTableCalcOCOrificeRiser();
+                double lInputVal = 0;
+                if (double.TryParse(clsGlobals.gOCOrificeRiser[0], out lInputVal))
+                    lOrificeRiser.OrificePipeDiameter = lInputVal;
+                if (double.TryParse(clsGlobals.gOCOrificeRiser[1], out lInputVal))
+                    lOrificeRiser.OrificeDepth = lInputVal;
+                if (double.TryParse(clsGlobals.gOCOrificeRiser[2], out lInputVal))
+                    lOrificeRiser.OrificeDischargeCoefficient = lInputVal;
+                ArrayList lFTCResult = lOrificeRiser.GenerateFTableOC();
+                //One can do some checking before putting it in the outputHash
+                outputHash.Add(FTableCalculator.ControlDeviceType.OrificeRiser, lFTCResult);
+            }
+            return outputHash;
+            /*
+            cdmiddlewr = new ControlDeviceMiddleware(null); //calculator type is irrelevant for this operation
+            cdmiddlewr.setOpenChannelVector(openChannelResult);
+            return cdmiddlewr.mergeCalculators(outputHash);
+            */
+        }
+
         /**
 	 * 
 	 *<P>Returns a vector of column names by appending to the vector of column names from the calculator class.  </P>
