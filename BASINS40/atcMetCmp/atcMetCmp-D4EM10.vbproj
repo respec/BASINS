@@ -50,7 +50,7 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\D4EM10\AnyDebug\</OutputPath>
     <DocumentationFile>atcMetCmp.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -90,7 +90,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\local\x64Debug\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\D4EM\bin\x64Debug\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcMetCmp.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
@@ -98,6 +98,7 @@
     <DebugType>full</DebugType>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <DefineTrace>true</DefineTrace>

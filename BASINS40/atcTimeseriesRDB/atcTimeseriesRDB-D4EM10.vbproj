@@ -37,7 +37,7 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\local\AnyDebug\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\D4EM10\AnyDebug\</OutputPath>
     <DocumentationFile>atcTimeseriesRDB.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
@@ -74,7 +74,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\local\x64Debug\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\D4EM\bin\x64Debug\</OutputPath>
     <DocumentationFile>atcTimeseriesRDB.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
