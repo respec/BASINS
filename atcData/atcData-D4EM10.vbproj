@@ -51,7 +51,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\..\devNotMW\D4EM\Externals\AnyDebug\AquaTerraConsultants\</OutputPath>
+    <OutputPath>..\D4EM10\AnyDebug\</OutputPath>
     <DocumentationFile>atcData.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -91,7 +91,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
-    <OutputPath>..\..\devNotMW\D4EM\Externals\x64Debug\AquaTerraConsultants\</OutputPath>
+    <OutputPath>..\D4EM\bin\x64Debug\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcData.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>

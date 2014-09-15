@@ -42,7 +42,7 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\local\AnyDebug\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\D4EM10\AnyDebug\</OutputPath>
     <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
@@ -59,7 +59,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\local\x64Debug\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\D4EM\bin\x64Debug\</OutputPath>
     <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
@@ -149,6 +149,7 @@
   <ItemGroup>
     <EmbeddedResource Include="frmDebugScript.resX">
       <DependentUpon>frmDebugScript.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmInputWizard.resX">
       <DependentUpon>frmInputWizard.vb</DependentUpon>
