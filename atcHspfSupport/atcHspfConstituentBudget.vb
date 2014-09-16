@@ -12,8 +12,9 @@ Public Module ConstituentBudget
                            ByVal aBalanceType As String, _
                            ByVal aOperationTypes As atcCollection, _
                            ByVal aScenario As String, _
-                           ByVal aScenarioResults As atcTimeseriesSource, _
-                           ByVal aRunMade As String) As Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport)
+                           ByVal aScenarioResults As atcDataSource, _
+                           ByVal aOutputLocations As atcCollection, _
+                           ByVal aRunMade As String) As Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)
 
         Dim lNumberFormat As String = "#,##0.###"
         Dim lUnits As String = ""
@@ -29,6 +30,8 @@ Public Module ConstituentBudget
         Dim lReport2 As New atcReport.ReportText
         Dim lReport3 As New atcReport.ReportText
         Dim lReport4 As New atcReport.ReportText
+        Dim lReport5 As New atcReport.ReportText
+        Dim lReport6 As New atcReport.ReportText
 
         For Each lSource As HspfOperation In aUci.OpnSeqBlock.Opns
             If lSource.Name = "PERLND" AndAlso Not pPERLND.Keys.Contains(lSource.Description) Then
@@ -111,7 +114,9 @@ Public Module ConstituentBudget
                 lReport2.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
                 lReport3.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
                 lReport4.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport)(lReport, lReport2, lReport3)
+                lReport5.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
+                lReport6.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
+                Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)(lReport, lReport2, lReport3, lReport5)
 
         End Select
 
@@ -138,7 +143,17 @@ Public Module ConstituentBudget
         lReport3.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
 
         lReport4.AppendLine("")
-        lReport4.AppendLine(aScenario & " " & " Percent of loadings of " & aBalanceType & " from each individual source to the Reaches (%).")
+        lReport4.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches (%).")
+
+        lReport5.AppendLine(aScenario & " " & " Average Annual Load Allocation of " & aBalanceType & " to Each Source by Reaches of Interest " & lUnits & ".")
+        lReport5.AppendLine("The Losses at Each Reach have been applied to the source, and the Gains are accumulated.")
+        lReport5.AppendLine("   Run Made " & aRunMade)
+        lReport5.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+        lReport5.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+
+        lReport6.AppendLine("")
+        lReport6.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches of Interest(%).")
+
 
         Dim YearsOfSimulation As Double = YearCount(aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ)
         Dim lOutputTable As New atcTableDelimited
@@ -660,65 +675,122 @@ Public Module ConstituentBudget
                 End With
         End Select
 
-        Dim lLandUses As New List(Of String)
-        Dim lReaches As New List(Of String)
-        Dim lLandusesHeader As String = ""
-        For Each Key As String In pRunningTotals.Keys
-            Dim lSpacePlace As Integer = Key.IndexOf(" ")
-            Dim lLanduseDescription As String = Key.Substring(lSpacePlace + 1)
-            If Not lLandUses.Contains(lLanduseDescription) Then
-                lLandUses.Add(lLanduseDescription)
-                lLandusesHeader &= vbTab & lLanduseDescription
+        If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Then
+            Dim lLandUses As New List(Of String)
+            Dim lReaches As New List(Of String)
+            Dim lLandusesHeader As String = ""
+            For Each Key As String In pRunningTotals.Keys
+                Dim lSpacePlace As Integer = Key.IndexOf(" ")
+                Dim lLanduseDescription As String = Key.Substring(lSpacePlace + 1)
+                If Not lLandUses.Contains(lLanduseDescription) Then
+                    lLandUses.Add(lLanduseDescription)
+                    lLandusesHeader &= vbTab & lLanduseDescription
+                End If
+                Dim lReach As String = Key.Substring(0, lSpacePlace)
+                If Not lReaches.Contains(lReach) Then
+                    lReaches.Add(lReach)
+                End If
+            Next
+            lLandusesHeader = lLandusesHeader.Replace("DirectAtmosphericDeposition", "Direct Atmospheric Deposition on the Reach")
+            lLandusesHeader = lLandusesHeader.Replace("Loss", "Cumulative Instream Losses")
+            lLandusesHeader = lLandusesHeader.Replace("Gain", "Cumulative Instream Gains")
+            lLandusesHeader = lLandusesHeader.Replace("AdditionalSources", "Mass Balance Errors/Additional Sources*")
+
+
+            lReport3.AppendLine("Reach" & lLandusesHeader & vbTab & "Total")
+            lReport4.AppendLine("Reach" & lLandusesHeader)
+            If aOutputLocations.Count > 0 Then
+                lReport5.AppendLine("Reach" & lLandusesHeader & vbTab & "Total")
+                lReport6.AppendLine("Reach" & lLandusesHeader)
+            Else
+                lReport5.AppendLine("Load Allocation Report was not requested for specific reaches.  The Load Allocation Report")
+                lReport5.AppendLine("for all the reaches is available as " & aBalanceType & "_" & aScenario & "_" & "LoadAllocation.txt")
             End If
-            Dim lReach As String = Key.Substring(0, lSpacePlace)
-            If Not lReaches.Contains(lReach) Then
-                lReaches.Add(lReach)
-            End If
-        Next
-        lLandusesHeader = lLandusesHeader.Replace("DirectAtmosphericDeposition", "Direct Atmospheric Deposition on the Reach")
-        lLandusesHeader = lLandusesHeader.Replace("Loss", "Cumulative Instream Losses")
-        lLandusesHeader = lLandusesHeader.Replace("Gain", "Cumulative Instream Gains")
-        lLandusesHeader = lLandusesHeader.Replace("AdditionalSources", "Mass Balance Errors/Additional Sources*")
 
 
-        lReport3.AppendLine("Reach" & lLandusesHeader & vbTab & "Total")
-        lReport4.AppendLine("Reach" & lLandusesHeader)
+            For Each lReach As String In lReaches
 
-        For Each lReach As String In lReaches
-            lReport3.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
-            lReport4.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
+                lReport3.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
+                lReport4.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
 
-            Dim lTotal As Double = 0.0
-            For Each lSourceDescription As String In lLandUses
+                If aOutputLocations.Count > 0 Then
+                    For Each lOutputLocation As String In aOutputLocations
+                        If lReach.Substring(5) = lOutputLocation.Substring(2) Then
+                            lReport5.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
+                            lReport6.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
+                        End If
+                    Next
 
-                Dim Key As String = lReach & " " & lSourceDescription
-                Dim lValue As Double = pRunningTotals.ItemByKey(Key)
+                End If
 
-                lReport3.Append(vbTab & FormatNumber(lValue, 2, TriState.True, TriState.False, TriState.False))
-                lTotal += lValue
+                Dim lTotal As Double = 0.0
+                For Each lSourceDescription As String In lLandUses
 
-            Next lSourceDescription
+                    Dim Key As String = lReach & " " & lSourceDescription
+                    Dim lValue As Double = pRunningTotals.ItemByKey(Key)
 
-            lReport3.AppendLine(vbTab & FormatNumber(lTotal, 2, TriState.True, TriState.False, TriState.False))
+                    lReport3.Append(vbTab & FormatNumber(lValue, 2, TriState.True, TriState.False, TriState.False))
+                    If aOutputLocations.Count > 0 Then
+                        For Each lOutputLocation As String In aOutputLocations
+                            If lReach.Substring(5) = lOutputLocation.Substring(2) Then
 
-            For Each lSourceDescription As String In lLandUses
+                                lReport5.Append(vbTab & FormatNumber(lValue, 2, TriState.True, TriState.False, TriState.False))
+                            End If
+                        Next
+                    End If
 
-                Dim Key As String = lReach & " " & lSourceDescription
-                Dim lValue As Double = pRunningTotals.ItemByKey(Key)
+                    lTotal += lValue
 
-                lReport4.Append(vbTab & FormatNumber(lValue * 100 / lTotal, 2, TriState.True, TriState.False, TriState.False))
+                Next lSourceDescription
 
-            Next lSourceDescription
-            lReport4.AppendLine()
+                lReport3.AppendLine(vbTab & FormatNumber(lTotal, 2, TriState.True, TriState.False, TriState.False))
+                If aOutputLocations.Count > 0 Then
+                    For Each lOutputLocation As String In aOutputLocations
+                        If lReach.Substring(5) = lOutputLocation.Substring(2) Then
+                            lReport5.AppendLine(vbTab & FormatNumber(lTotal, 2, TriState.True, TriState.False, TriState.False))
+                        End If
+                    Next
+                End If
 
-        Next
-        lReport3.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
-        lReport4.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+                Dim lPercentTotal As Double = 0.0
+                For Each lSourceDescription As String In lLandUses
+
+                    Dim Key As String = lReach & " " & lSourceDescription
+                    Dim lValue As Double = pRunningTotals.ItemByKey(Key)
+
+                    lReport4.Append(vbTab & FormatNumber(lValue * 100 / lTotal, 2, TriState.True, TriState.False, TriState.False))
+                    If aOutputLocations.Count > 0 Then
+                        For Each lOutputLocation As String In aOutputLocations
+                            If lReach.Substring(5) = lOutputLocation.Substring(2) Then
+                                lReport6.Append(vbTab & FormatNumber(lValue * 100 / lTotal, 2, TriState.True, TriState.False, TriState.False))
+                            End If
+                        Next
+                    End If
+                    lPercentTotal += lValue * 100 / lTotal
+                Next lSourceDescription
+                lReport4.Append(vbTab & FormatNumber(lPercentTotal, 1, TriState.True, TriState.False, TriState.False))
+                lReport4.AppendLine()
+                If aOutputLocations.Count > 0 Then
+                    For Each lOutputLocation As String In aOutputLocations
+                        If lReach.Substring(5) = lOutputLocation.Substring(2) Then
+                            lReport6.Append(vbTab & FormatNumber(lPercentTotal, 1, TriState.True, TriState.False, TriState.False))
+                            lReport6.AppendLine()
+                        End If
+                    Next
+                End If
+            Next
+            lReport3.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+            lReport4.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+
+            lReport3.Append(lReport4.ToString)
+            lReport5.Append(lReport6.ToString)
+        Else
+            lReport3.AppendLine("Load Allocation Report are not produced for " & aBalanceType)
+            lReport5.AppendLine("Load Allocation Report are not produced for " & aBalanceType)
+        End If
         pRunningTotals.Clear()
 
-        lReport3.Append(lReport4.ToString)
-
-        Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport)(lReport, lReport2, lReport3)
+        Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)(lReport, lReport2, lReport3, lReport5)
 
     End Function
 
@@ -820,20 +892,20 @@ Public Module ConstituentBudget
 
             If aConnectionArea > 0 Then
                 aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
-                & lVolPrefix & _
+                & lVolPrefix _
                 & aLandUse & vbTab _
                 & aConnectionArea & vbTab _
                 & DoubleToString(aTotal / aConnectionArea, 15, "#,##0.###") & vbTab & _
                                     DoubleToString(aTotal, 15, "#,##0.###") & vbTab & vbCrLf
             Else
                 aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
-                & lVolPrefix & _
+                & lVolPrefix _
                 & aLandUse & vbTab _
                 & aConnectionArea & vbTab _
                 & DoubleToString(0.0, 15, "#,##0.###") & vbTab & _
                                     DoubleToString(0.0, 15, "#,##0.###") & vbTab & vbCrLf
             End If
-            
+
         Else
             pRunningTotals.Add("Reach" & aReach.Id & " " & lVolPrefix & aLandUse, aTotal)
             aReachTotal += aTotal
