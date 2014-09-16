@@ -9,7 +9,7 @@ Public Module ConstituentBalance
                               ByVal aOperations As atcCollection, _
                               ByVal aBalanceTypes As atcCollection, _
                               ByVal aScenario As String, _
-                              ByVal aScenarioResults As atcTimeseriesSource, _
+                              ByVal aScenarioResults As atcDataSource, _
                               ByVal aLocations As atcCollection, _
                               ByVal aRunMade As String, _
                      Optional ByVal aDateColumns As Boolean = False, _
@@ -32,7 +32,7 @@ Public Module ConstituentBalance
                            ByVal aBalanceType As String, _
                            ByVal aOperationTypes As atcCollection, _
                            ByVal aScenario As String, _
-                           ByVal aScenarioResults As atcTimeseriesSource, _
+                           ByVal aScenarioResults As atcDataSource, _
                            ByVal aLocations As atcCollection, _
                            ByVal aRunMade As String, _
                   Optional ByVal aDateRows As Boolean = False, _
@@ -64,7 +64,8 @@ Public Module ConstituentBalance
 
                 If lLocation.StartsWith(lOperationKey) Then
                     'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
-                    Dim lLocationDataGroup As atcTimeseriesGroup = aScenarioResults.DataSets.FindData("Location", lLocation)
+                    Dim lLocationDataGroup As New atcTimeseriesGroup
+                    lLocationDataGroup.Add(aScenarioResults.DataSets.FindData("Location", lLocation))
                     'Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
                     Dim lNeedHeader As Boolean = True
                     Dim lPendingOutput As String = ""
@@ -89,10 +90,10 @@ Public Module ConstituentBalance
                                     End If
                                     lConstituentKey = lConstituentKey.Remove(0, 2)
                                     lConstituentDataName = lConstituentDataName.Remove(0, 2)
-                                    Dim lConstituentDataGroup As atcTimeseriesGroup = lLocationDataGroup.FindData("Constituent", lConstituentDataName)
+                                    Dim lConstituentDataGroup As New atcTimeseriesGroup
+                                    lLocationDataGroup.Add(aScenarioResults.DataSets.FindData("Constituent", lConstituentDataName))
                                     If lConstituentDataGroup.Count > 0 Then
                                         lHaveData = True
-
 
                                         Dim lTempDataSet As atcDataSet = lConstituentDataGroup.Item(0)
                                         Dim lSeasons As atcSeasonBase
