@@ -71,8 +71,12 @@ Public Module Graph
             Dim lGraphDur As New clsGraphProbability(lDataGroup, lZgc)
             With lGraphDur.ZedGraphCtrl.GraphPane
                 'If .YAxis.Scale.Min < 1 Then
-                .YAxis.Scale.MinAuto = False
-                .YAxis.Scale.Min = 1
+                .YAxis.Scale.MinAuto = True
+                If .YAxis.Scale.Min < 0.01 Then
+                    .YAxis.Scale.MinAuto = False
+                    .YAxis.Scale.Min = 0.1
+                End If
+
                 '.YAxis.Scale.Max = 10000
                 .XAxis.Scale.MinAuto = True
                 '.YAxis.Scale.MaxAuto = True
@@ -189,7 +193,7 @@ Public Module Graph
                     Next
                     J2Date(lSDateJ, lDate)
                     If lDate(1) <> 1 OrElse lDate(2) <> 1 Then lDate(0) += 1 'non calendar years label with ending year
-                    GraphTimeseries(lDataGroupYear, lPaneCount, lOutFileBase & "_" & lDate(0), aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight)
+                    GraphTimeseries(lDataGroupYear, lPaneCount, lOutFileBase & "_" & lDate(0), aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, , aMakeLog)
                     lSDateJ = lEDateJ
                 End While
             End If
@@ -246,7 +250,7 @@ Public Module Graph
                 Next
                 lZgc = CreateZgc()
                 lGrapher = New clsGraphTime(lDataGroup, lZgc)
-                lZgc.Width = aGraphSaveWidth * 2
+                lZgc.Width = aGraphSaveWidth
                 lZgc.Height = aGraphSaveHeight
                 lDualDateScale = lZgc.MasterPane.PaneList(0).XAxis.Scale
                 lDualDateScale.MaxDaysMonthLabeled = 1200
@@ -327,13 +331,7 @@ Public Module Graph
                        Optional ByVal aMakeLog As Boolean = True) 'Becky added MakeLog, default true so as not to break other things, 
         'so user can specify whether or not to print log graphs
 
-        'InitMatchingColors(FindFile("", "GraphColors.txt")) 'Becky moved this here from atcGraph10/CreateZgc so that
-        'the file is found ONCE instead of a gazillion times and the colors are initialized ONCE rather than a gazillion
-        'times
-
-        'timeseries - arith
         Dim lZgc As ZedGraphControl = CreateZgc()
-
         lZgc.Width = aGraphSaveWidth
         lZgc.Height = aGraphSaveHeight
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
@@ -382,15 +380,28 @@ Public Module Graph
         If aMakeLog Then 'Becky added - only do this if user wants to make log charts
             'timeseries - log
             With lZgc.MasterPane.PaneList(aPaneCount - 1)
-                .YAxis.Type = ZedGraph.AxisType.Log
-                ScaleAxis(aDataGroup, .YAxis)
+                .YAxis.Type = AxisType.Log
+                Dim MainPainDataGroup As New atcTimeseriesGroup
+                MainPainDataGroup.Add(aDataGroup.FindData("Constituent", "FLOW"))
+                MainPainDataGroup.Add(aDataGroup.FindData("Constituent", "SIMQ"))
+
+                ScaleAxis(MainPainDataGroup, .YAxis)
+                .YAxis.Type = AxisType.Log
+                MainPainDataGroup.Clear()
                 .YAxis.Scale.Max *= 4 'wag!
                 .YAxis.Scale.MaxAuto = False
-                .YAxis.Scale.Min = 1
+                '.YAxis.Scale.Min = 0.1
+                .YAxis.Scale.MinAuto = True
+                If .YAxis.Scale.Min < 0.01 Then
+                    .YAxis.Scale.MinAuto = False
+                    .YAxis.Scale.Min = 0.01
+                End If
                 .YAxis.Scale.IsUseTenPower = False
+
                 If .YAxis.Scale.Max > 9999 Then
                     .YAxis.Scale.IsUseTenPower = True
                 End If
+                .AxisChange()
             End With
 
             Dim lOutFileName As String = ""
@@ -448,7 +459,7 @@ Public Module Graph
         'times
 
         Dim lZgc As ZedGraphControl = CreateZgc()
-        lZgc.Width = aGraphSaveWidth * 3
+        lZgc.Width = aGraphSaveWidth
         lZgc.Height = aGraphSaveHeight
         Dim lGrapher As New clsGraphTime(lDataGroupOutput, lZgc)
         Dim lDualDateScale As Object = lZgc.MasterPane.PaneList(1).XAxis.Scale
@@ -457,16 +468,16 @@ Public Module Graph
         lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
         lZgc.SaveIn(aOutFileBase & "_Components" & aGraphSaveFormat)
 
-        If aMakeLog Then 'Becky added, only do this if the user wants log graphs
-            With lZgc.MasterPane.PaneList(1) 'main pane, not aux
-                .YAxis.Type = ZedGraph.AxisType.Log
-                .YAxis.Scale.Max = 4
-                .YAxis.Scale.Min = 1
-                .YAxis.Scale.MaxAuto = False
-                .YAxis.Scale.IsUseTenPower = False
-            End With
-            lZgc.SaveIn(aOutFileBase & "_Components_Log" & aGraphSaveFormat)
-        End If
+        'If aMakeLog Then 'Becky added, only do this if the user wants log graphs
+        '    With lZgc.MasterPane.PaneList(1) 'main pane, not aux
+        '        .YAxis.Type = ZedGraph.AxisType.Log
+        '        .YAxis.Scale.Max = 4
+        '        .YAxis.Scale.Min = 1
+        '        .YAxis.Scale.MaxAuto = False
+        '        .YAxis.Scale.IsUseTenPower = False
+        '    End With
+        '    lZgc.SaveIn(aOutFileBase & "_Components_Log" & aGraphSaveFormat)
+        'End If
         lZgc.Dispose()
         lGrapher.Dispose()
 
@@ -480,26 +491,26 @@ Public Module Graph
         lMonthDataGroup.Add(Aggregate(lDataGroupOutput.Item(3), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)) 'prec
         lMonthDataGroup.Add(Aggregate(lMathPrecEtTSer, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)) 'prec -act et
         lZgc = CreateZgc()
-        lZgc.Width = aGraphSaveWidth * 3
+        lZgc.Width = aGraphSaveWidth
         lZgc.Height = aGraphSaveHeight
         lGrapher = New clsGraphTime(lMonthDataGroup, lZgc)
         lDualDateScale = lZgc.MasterPane.PaneList(0).XAxis.Scale
         lDualDateScale.MaxDaysMonthLabeled = 1200
         lZgc.MasterPane.PaneList(0).YAxis.Scale.Max = 10
         lZgc.SaveIn(aOutFileBase & "_Components_month" & aGraphSaveFormat)
-        If aMakeLog Then 'Becky added, only make log graphs if user wants them
-            'monthly timeseries - log
-            lGrapher.Datasets.RemoveAt(4) 'has negative values, looks wierd
-            With lZgc.MasterPane.PaneList(0) 'main pane, not aux
-                'With lZgc.MasterPane.PaneList(1) 'main pane, not aux
-                .YAxis.Type = ZedGraph.AxisType.Log
-                .YAxis.Scale.Max = 10
-                .YAxis.Scale.Min = 0.001
-                .YAxis.Scale.MaxAuto = False
-                .YAxis.Scale.IsUseTenPower = False
-            End With
-            lZgc.SaveIn(aOutFileBase & "_Components_month_log" & aGraphSaveFormat)
-        End If
+        'If aMakeLog Then 'Becky added, only make log graphs if user wants them
+        '    'monthly timeseries - log
+        '    lGrapher.Datasets.RemoveAt(4) 'has negative values, looks wierd
+        '    With lZgc.MasterPane.PaneList(0) 'main pane, not aux
+        '        'With lZgc.MasterPane.PaneList(1) 'main pane, not aux
+        '        .YAxis.Type = ZedGraph.AxisType.Log
+        '        .YAxis.Scale.Max = 10
+        '        .YAxis.Scale.Min = 0.001
+        '        .YAxis.Scale.MaxAuto = False
+        '        .YAxis.Scale.IsUseTenPower = False
+        '    End With
+        '    lZgc.SaveIn(aOutFileBase & "_Components_month_log" & aGraphSaveFormat)
+        'End If
         lZgc.Dispose()
         lGrapher.Dispose()
     End Sub
