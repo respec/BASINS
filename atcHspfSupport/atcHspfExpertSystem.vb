@@ -21,7 +21,7 @@ Public Class atcExpertSystem
     Private pSummerMonths() As Integer = {5, 6, 7}
     Private pWinterMonths() As Integer = {10, 11, 12}
     Private pUci As atcUCI.HspfUci
-    Private pDataSource As atcTimeseriesSource
+    Private pDataSource As atcDataSource
 
     Private pName As String
     Private pSubjectiveData(25) As Integer
@@ -57,12 +57,12 @@ Public Class atcExpertSystem
     Private Const pConvert As Double = 24.0# * 3600.0# * 12.0# / 43560.0#
     Private Const pNSteps As Integer = 500
 
-    Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcTimeseriesSource, _
+    Public Sub New(ByVal aUci As atcUCI.HspfUci, _
                    ByVal lExpertSystemFileName As String, _
                    Optional ByVal aExpertFlowOnly As Boolean = False)
         pFlowOnly = aExpertFlowOnly
         pUci = aUci
-        pDataSource = aDataSource
+
         Dim lFileName As String = lExpertSystemFileName
         'IO.Path.GetFileNameWithoutExtension(aUci.Name) & ".exs"
         If Not FileExists(lFileName) Then
@@ -79,11 +79,18 @@ Public Class atcExpertSystem
 
             'Dim lExsFileString As String = WholeFileString(lFileName)
             'Dim lExsRecords() As String = lExsFileString.Split(vbLf)
-            
+
             'Read first line of file
 
             Dim lExsRecord As String = lExsRecords(0).PadRight(51)
             pName = Trim(lExsRecord.Substring(0, 8))
+            Dim lWdmFilename As String = CurDir() & "\" & pName & ".wdm"
+            'Not sure if CurDir is the best way
+            ' Dim pDatasource As New atcDataSource
+            If atcDataManager.OpenDataSource(lWdmFilename) Then
+                pDatasource = atcDataManager.DataSourceBySpecification(lWdmFilename)
+            End If
+
             Dim lNSites As Integer
             If Not Integer.TryParse(lExsRecord.Substring(8, 5), lNSites) Then
                 Throw New ApplicationException("Number of Sites are not in correct format. Program will quit!")
@@ -96,7 +103,7 @@ Public Class atcExpertSystem
             AndAlso Double.TryParse(lExsRecord.Substring(35, 8), pLngMin) AndAlso Double.TryParse(lExsRecord.Substring(43, 8), pLngMax) Then
                 Throw New ApplicationException("Latitude and Longitude of Watershed are not in correct format. Program will quit!")
             End If
-           
+
             If lExsRecord.Length = 51 Then
                 SDateJ = pUci.GlobalBlock.SDateJ
                 EDateJ = pUci.GlobalBlock.EdateJ
@@ -104,8 +111,6 @@ Public Class atcExpertSystem
             Else 'the user could be entering dates on this line if calib period diff from sim period
                 lExsRecord.PadRight(70)
                 Dim lDate(5) As Integer
-                'Becky thinks the numbers 52 to 68 below are one off, and should be 51 to 67. 
-                'maybe a problem in something that writes out the .exs?
                 If Not (Integer.TryParse(lExsRecord.Substring(52, 4), lDate(0)) _
                     AndAlso Integer.TryParse(lExsRecord.Substring(56, 2), lDate(1)) _
                     AndAlso Integer.TryParse(lExsRecord.Substring(58, 2), lDate(2))) Then
@@ -121,7 +126,6 @@ Public Class atcExpertSystem
                 EDateJ = Date2J(lDate)
                 Logger.Dbg("The simulation time period from the exs file is used for the calibration")
             End If
-
 
             'Default unspecified lat/integer min/max values to contiguous 48 states
             If ((pLatMin < 0.01) And (pLatMin > -0.01)) Then
@@ -292,9 +296,16 @@ Public Class atcExpertSystem
                 lRecordIndex += 1
 
             End If
-        End If
-        'pErrorCriteria.Edit()
+            End If
+            'pErrorCriteria.Edit()
     End Sub
+
+    Public Function ExpertWDMFileName() As String
+        Return pName
+    End Function
+    Public Function ExpertWDMDataSource() As atcDataSource
+        Return pDataSource
+    End Function
 
     Public Function Report() As String
         CalcStats(pDataSource)
@@ -502,7 +513,7 @@ Public Class atcExpertSystem
         End Select
     End Function
 
-    Private Sub CalcStats(ByVal aDataSource As atcTimeseriesSource)
+    Private Sub CalcStats(ByVal aDataSource As atcDataSource)
         Dim lDataSetTypes() As String = {"SimTotRunoff", "ObsStreamflow"}
         If Not pFlowOnly Then
             ReDim Preserve lDataSetTypes(5)
@@ -619,7 +630,7 @@ Public Class atcExpertSystem
                             TIMADD(lTmpDate, lTimeUnit, lTimeStep, lTimeStep, lTmpDate)
                         Next i
                     End If
-                    
+
 
                     If (lStatGroup >= 1 And lStatGroup <= 4) Then  'calc storm info
                         pStats(4, lStatGroup, lSiteIndex) = 0.0# 'initialize storm volume
@@ -669,7 +680,7 @@ Public Class atcExpertSystem
                             End If
                         Next
                     End If
-                    
+
                     If (lStatGroup = 1 Or lStatGroup = 2) Then 'Change flows to recessions
                         Dim lRecessionTimser As atcTimeseries = lDailyTSer.Clone
                         'save first data value
