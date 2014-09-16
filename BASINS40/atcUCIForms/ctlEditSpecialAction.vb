@@ -128,7 +128,7 @@ Public Class ctlEditSpecialAction
                         End If
                         If Len(.CellValue(rowcount, 6)) = 0 Then
                             newText = newText & "   "
-                        ElseIf .CellValue(rowcount, 6) = 0 Then
+                        ElseIf IsNumeric(.CellValue(rowcount, 6)) AndAlso .CellValue(rowcount, 6) = 0 Then
                             newText = newText & "   "
                         Else
                             ctemp = "   "
@@ -137,7 +137,7 @@ Public Class ctlEditSpecialAction
                         End If
                         If Len(.CellValue(rowcount, 7)) = 0 Then
                             newText = newText & "   "
-                        ElseIf .CellValue(rowcount, 7) = 0 Then
+                        ElseIf IsNumeric(.CellValue(rowcount, 7)) AndAlso .CellValue(rowcount, 7) = 0 Then
                             newText = newText & "   "
                         Else
                             ctemp = "   "
@@ -863,7 +863,7 @@ Public Class ctlEditSpecialAction
 
         With pSpecialActionBlk.Records
             Do Until .Count = 0
-                .RemoveAt(1)
+                .RemoveAt(0)
             Loop
             For lOper = 1 To atcgrid0.Source.Rows - 1
                 mySpecialRecord = New HspfSpecialRecord

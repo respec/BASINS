@@ -1811,10 +1811,10 @@ Public Module modModelSetup
                     lDbf.CurrentRecord = j
                     If lNPDESSites(i) = lDbf.Value(1) Then
                         If lDbf.Value(4).ToUpper = "FLOW" Then
-                            lStr = CStr(i - 1) & " Flow " & Format(CStr(lDbf.Value(3)), "0.000000")
+                            lStr = CStr(i - 1) & " Flow " & Format(CSng(lDbf.Value(3)), "0.000000")
                         Else
                             lValue = CSng(lDbf.Value(3)) / 8760 'lbs/hr
-                            lStr = CStr(i - 1) & " " & Chr(34) & Trim(lDbf.Value(4)) & Chr(34) & " " & Format(CStr(lValue), "0.000000")
+                            lStr = CStr(i - 1) & " " & Chr(34) & Trim(lDbf.Value(4)) & Chr(34) & " " & Format(CSng(lValue), "0.000000")
                         End If
                         lSB.AppendLine(lStr)
                     End If
