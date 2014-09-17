@@ -632,20 +632,35 @@ namespace atcFtableBuilder
 
             //Dictionary<FTableCalculator.ControlDeviceType, ArrayList> lFtableResultControlDevice = doControlStructureCalculations();
             //clsGlobals.gCalculator.mergeCalculators(lFtableResultChannel, lFtableResultControlDevice);
-            Dictionary<int, Dictionary<string, ArrayList>> lFtableResultControlDevice = doControlStructureCalculationsME();
-            ArrayList lMergedOutputs = clsGlobals.gCalculator.mergeCalculatorsME(lFtableResultChannel, lFtableResultControlDevice);
-
-            //if there is negative output in the vector, return the negative message
-            //from the FTableCalculatorConstants
             //string newResultMessage = FTableCalculatorConstants.returnMessageIfNegativeValue(lFtableResultChannel);
-            string newResultMessage = FTableCalculatorConstants.returnMessageIfNegativeValue(lMergedOutputs);
+            string newResultMessage = "";
+            int lCDCount = 0;
+            ArrayList[] finalResults = null;
+            for (int c = 1; c <= 4; c++)
+            {
+                TreeNode lExitNode = clsGlobals.gExitOCSetup[c];
+                if (lExitNode != null) lCDCount += lExitNode.Nodes.Count;
+            }
+            if (lCDCount > 0)
+            {
+                Dictionary<int, Dictionary<string, ArrayList>> lFtableResultControlDevice = doControlStructureCalculationsME();
+                ArrayList lMergedOutputs = clsGlobals.gCalculator.mergeCalculatorsME(lFtableResultChannel, lFtableResultControlDevice);
 
-            //this line will modify the data in the vectors if
-            //the control structures are included. (removes the open flow calculation)
-            //(these comments also apply to other shape calculators)
-            ArrayList[] finalResults = FTableCalculatorConstants.modifyResultsToAccomodateControlStructures(colNames, lFtableResultChannel);
-            colNames = finalResults[0];
-            lFtableResultChannel = finalResults[1];
+                //if there is negative output in the vector, return the negative message
+                //from the FTableCalculatorConstants
+                newResultMessage = FTableCalculatorConstants.returnMessageIfNegativeValue(lMergedOutputs);
+
+                //this line will modify the data in the vectors if
+                //the control structures are included. (removes the open flow calculation)
+                //(these comments also apply to other shape calculators)
+                finalResults = FTableCalculatorConstants.modifyResultsToAccomodateControlStructures(colNames, lFtableResultChannel);
+                colNames = finalResults[0];
+                lFtableResultChannel = finalResults[1];
+            }
+            else
+            {
+                newResultMessage = FTableCalculatorConstants.returnMessageIfNegativeValue(lFtableResultChannel);
+            }
 
             //Tong: backfill is checked already by this point and check if infiltration is done
             double infilRate = 0;
@@ -1066,8 +1081,8 @@ namespace atcFtableBuilder
                             lParamsInClass = lCalc.ParamValues();
                             foreach (TreeNode lParamNode in lCDNode.Nodes)
                             {
-                                string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.IndexOf("("));
-                                string lParamValue = lParamNode.Text.Substring(lParamNode.Text.IndexOf("(") + 1).TrimEnd(new char[] { ')' });
+                                string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.LastIndexOf("("));
+                                string lParamValue = lParamNode.Text.Substring(lParamNode.Text.LastIndexOf("(") + 1).TrimEnd(new char[] { ')' });
                                 lParamsInClass[lParamName] = double.Parse(lParamValue);
                             }
                             lCalc.SetParamValues(lParamsInClass);
