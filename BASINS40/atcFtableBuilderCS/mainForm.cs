@@ -78,7 +78,8 @@ namespace atcFtableBuilder
                 lblBMPMsg.Visible = false;
                 cboBMPTypes.Visible = false;
 
-                this.Text += " - " + clsGlobals.ToolNameGray;
+                //this.Text += " - " + clsGlobals.ToolNameGray;
+                this.Text = clsGlobals.ToolNameGray;
             }
             else
             {
@@ -93,7 +94,8 @@ namespace atcFtableBuilder
                 txtBackfillPore.Text = clsGlobals.BackfillPorosity.ToString();
  
                 rdoChNaturalFP.Visible = false;
-                this.Text += " - " + clsGlobals.ToolNameGreen;
+                //this.Text += " - " + clsGlobals.ToolNameGreen;
+                this.Text = clsGlobals.ToolNameGreen;
             }
 
             pLoaded = true;
