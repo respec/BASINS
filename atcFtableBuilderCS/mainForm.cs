@@ -630,12 +630,15 @@ namespace atcFtableBuilder
             //Please see the comments in the doControlStructureCalcualtions for
             //how the merge is accomplished.
 
-            Dictionary<FTableCalculator.ControlDeviceType, ArrayList> lFtableResultControlDevice = doControlStructureCalculations();
-            clsGlobals.gCalculator.mergeCalculators(lFtableResultChannel, lFtableResultControlDevice);
+            //Dictionary<FTableCalculator.ControlDeviceType, ArrayList> lFtableResultControlDevice = doControlStructureCalculations();
+            //clsGlobals.gCalculator.mergeCalculators(lFtableResultChannel, lFtableResultControlDevice);
+            Dictionary<int, Dictionary<string, ArrayList>> lFtableResultControlDevice = doControlStructureCalculationsME();
+            ArrayList lMergedOutputs = clsGlobals.gCalculator.mergeCalculatorsME(lFtableResultChannel, lFtableResultControlDevice);
 
             //if there is negative output in the vector, return the negative message
             //from the FTableCalculatorConstants
-            string newResultMessage = FTableCalculatorConstants.returnMessageIfNegativeValue(lFtableResultChannel);
+            //string newResultMessage = FTableCalculatorConstants.returnMessageIfNegativeValue(lFtableResultChannel);
+            string newResultMessage = FTableCalculatorConstants.returnMessageIfNegativeValue(lMergedOutputs);
 
             //this line will modify the data in the vectors if
             //the control structures are included. (removes the open flow calculation)
@@ -1006,9 +1009,10 @@ namespace atcFtableBuilder
             */
         }
 
-        protected Dictionary<int, ArrayList> doControlStructureCalculations()
+        protected Dictionary<int, Dictionary<string, ArrayList>> doControlStructureCalculationsME()
         {
-            Dictionary<int, ArrayList> outputHash = new Dictionary<int, ArrayList>();
+            Dictionary<int, Dictionary<string, ArrayList>> outputHash = new Dictionary<int, Dictionary<string, ArrayList>>();
+            Dictionary<string, ArrayList> outCDs = null;
             Hashtable inputHash = new Hashtable();
 
             for (int i = 0; i < 5; i++)
@@ -1016,53 +1020,68 @@ namespace atcFtableBuilder
                 TreeNode lExitNode = clsGlobals.gExitOCSetup[i];
                 if (lExitNode.Nodes.Count > 0)
                 {
+                    outCDs = new Dictionary<string, ArrayList>();
                     foreach (TreeNode lCDNode in lExitNode.Nodes)
                     {
                         Dictionary<string, double> lParamsInClass = null;
                         FTableCalculator lCalc = null;
-                        string lCDTypeAlias = lCDNode.Text.Substring(0, lCDNode.Text.IndexOf("_"));
-                        if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.OrificeRiser])
+                        string lCDTypeAlias = lCDNode.Text;
+                        if (lCDTypeAlias.IndexOf("_") >=0)
+                            lCDTypeAlias = lCDTypeAlias.Substring(0, lCDTypeAlias.IndexOf("_"));
+                        if (lCDTypeAlias.ToLower().StartsWith("outflow1"))
                         {
-                            lCalc = new FTableCalcOCOrificeRiser();
+                            outCDs.Add(lCDNode.Text, null); //for Gray tool's Exit 1 outflow1 by default
                         }
-                        else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.OrificeUnderdrain])
+                        else
                         {
-                            lCalc = new FTableCalcOCOrificeUnderflow();
-                        }
-                        else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirBroadCrest])
-                        {
-                            lCalc = new FTableCalcOCWeirBroad();
-                            ((FTableCalcOCWeirBroad)lCalc).Height = FTableCalculator.TotalDepth;
-                        }
-                        else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirRectangular])
-                        {
-                            lCalc = new FTableCalcOCWeirRectangular();
-                            ((FTableCalcOCWeirRectangular)lCalc).Height = FTableCalculator.TotalDepth;
-                        }
-                        else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirTrapeCipolletti])
-                        {
-                            lCalc = new FTableCalcOCWeirTrapeCipolletti();
-                            ((FTableCalcOCWeirTrapeCipolletti)lCalc).Height = FTableCalculator.TotalDepth;
-                        }
-                        else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirTriVNotch])
-                        {
-                            lCalc = new FTableCalcOCWeirTriVNotch();
-                            ((FTableCalcOCWeirTriVNotch)lCalc).Height = FTableCalculator.TotalDepth;
-                        }
+                            if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.OrificeRiser])
+                            {
+                                lCalc = new FTableCalcOCOrificeRiser();
+                            }
+                            else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.OrificeUnderdrain])
+                            {
+                                lCalc = new FTableCalcOCOrificeUnderflow();
+                            }
+                            else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirBroadCrest])
+                            {
+                                lCalc = new FTableCalcOCWeirBroad();
+                                ((FTableCalcOCWeirBroad)lCalc).Height = FTableCalculator.TotalDepth;
+                            }
+                            else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirRectangular])
+                            {
+                                lCalc = new FTableCalcOCWeirRectangular();
+                                ((FTableCalcOCWeirRectangular)lCalc).Height = FTableCalculator.TotalDepth;
+                            }
+                            else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirTrapeCipolletti])
+                            {
+                                lCalc = new FTableCalcOCWeirTrapeCipolletti();
+                                ((FTableCalcOCWeirTrapeCipolletti)lCalc).Height = FTableCalculator.TotalDepth;
+                            }
+                            else if (lCDTypeAlias == FTableCalculator.OCTypeNames[FTableCalculator.ControlDeviceType.WeirTriVNotch])
+                            {
+                                lCalc = new FTableCalcOCWeirTriVNotch();
+                                ((FTableCalcOCWeirTriVNotch)lCalc).Height = FTableCalculator.TotalDepth;
+                            }
 
-                        lParamsInClass = lCalc.ParamValues();
-                        foreach (TreeNode lParamNode in lCDNode.Nodes)
-                        {
-                            string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.IndexOf("("));
-                            string lParamValue = lParamNode.Text.Substring(lParamNode.Text.IndexOf("(") + 1).TrimEnd(new char[] { ')' });
-                            lParamsInClass[lParamName] = double.Parse(lParamValue);
+                            lParamsInClass = lCalc.ParamValues();
+                            foreach (TreeNode lParamNode in lCDNode.Nodes)
+                            {
+                                string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.IndexOf("("));
+                                string lParamValue = lParamNode.Text.Substring(lParamNode.Text.IndexOf("(") + 1).TrimEnd(new char[] { ')' });
+                                lParamsInClass[lParamName] = double.Parse(lParamValue);
+                            }
+                            lCalc.SetParamValues(lParamsInClass);
+                            ArrayList lCDOutput = lCalc.GenerateFTableOC();
+                            outCDs.Add(lCDNode.Text, lCDOutput);
                         }
-                        lCalc.SetParamValues(lParamsInClass);
-                        
                     }
+                    outputHash.Add(i + 1, outCDs);
+                }
+                else
+                {
+                    outputHash.Add(i + 1, null);
                 }
             }
-
             return outputHash;
         }
 

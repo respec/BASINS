@@ -387,11 +387,11 @@ namespace atcFtableBuilder
 
             //sri-09-11-2012
             // if control devices used - column zero values check- depth increment check
-            if (FTableColumnNames.Count > 3)
+            if (FTableColumnNames.Count > 4) // > 3
             {
                 int colcheck = 0;
                 double lEpslon = 0.0000001;
-                for (int col = 3; col < ((ArrayList)FTableResults[0]).Count; col++)
+                for (int col = 4; col < ((ArrayList)FTableResults[0]).Count; col++) //int col = 3
                 {
                     int count = 0;
                     for (int row = 0; row < FTableResults.Count; row++)
@@ -403,13 +403,13 @@ namespace atcFtableBuilder
                             count = count + 1;
                     }
 
-                    if (count == FTableResults.Count)
+                    if (count == FTableResults.Count && clsGlobals.gExitOCSetup[col - 4 + 1].Nodes.Count > 0)
                     {
                         colcheck = colcheck + 1;
                         if (cdevice == null)
                             cdevice = FTableColumnNames[col].ToString().Trim();
                         else
-                            cdevice = cdevice + " , " + FTableColumnNames[col].ToString().Trim(); ;
+                            cdevice = cdevice + " , " + FTableColumnNames[col].ToString().Trim();
                     }
                 }
 

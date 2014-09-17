@@ -120,7 +120,7 @@ namespace atcFtableBuilder
             return lClone;
         }
 
-        public ArrayList GenerateFTableOC()
+        public override ArrayList GenerateFTableOC()
         {
             return GenerateFTable(WeirWidth, Height, WeirInvert, DischargeCoefficient);
         }

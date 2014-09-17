@@ -217,6 +217,16 @@ public class FTableCalculatorConstants
                 v.RemoveAt(FTableCalculatorConstants.outflow_1_index);
             }
         }
+
+        ArrayList lFirstRow = (ArrayList)data[0];
+        if (lFirstRow.Count > 4)
+        {
+            colNames.Add("Exit2");
+            colNames.Add("Exit3");
+            colNames.Add("Exit4");
+            colNames.Add("Exit5");
+        }
+
         ArrayList[] retVector = { colNames, data };
         return retVector;
     }
