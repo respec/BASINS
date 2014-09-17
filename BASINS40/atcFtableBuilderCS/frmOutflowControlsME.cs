@@ -125,18 +125,25 @@ namespace atcFtableBuilder
                     lExitNodeUI = treeExitControls.Nodes.Add(lExitNodeKey, lExitNodeText);
 
                 //add control device node(s)
-                if (i == 1 && clsGlobals.gToolType == clsGlobals.ToolType.Gray)
+
+                if (i == 1)
                 {
                     string lOutflowKey = "Outflow1";
                     TreeNode lOutflowNode = lExitNodeUI.Nodes.Add(lOutflowKey, lOutflowKey);
                     continue;
                 }
-                else if (i == 1 && clsGlobals.gToolType == clsGlobals.ToolType.Green)
-                {
-                    string lOutflowKey = "infiltra";
-                    TreeNode lOutflowNode = lExitNodeUI.Nodes.Add(lOutflowKey, lOutflowKey);
-                    continue;
-                }
+                //if (i == 1 && clsGlobals.gToolType == clsGlobals.ToolType.Gray)
+                //{
+                //    string lOutflowKey = "Outflow1";
+                //    TreeNode lOutflowNode = lExitNodeUI.Nodes.Add(lOutflowKey, lOutflowKey);
+                //    continue;
+                //}
+                //else if (i == 1 && clsGlobals.gToolType == clsGlobals.ToolType.Green)
+                //{
+                //    string lOutflowKey = "infiltration";
+                //    TreeNode lOutflowNode = lExitNodeUI.Nodes.Add(lOutflowKey, lOutflowKey);
+                //    continue;
+                //}
 
                 //add OC nodes
                 TreeNode lExitNodeProg = clsGlobals.gExitOCSetup[i - 1];
@@ -367,7 +374,7 @@ namespace atcFtableBuilder
                 double lVal = 0;
                 foreach (TreeNode lParamNode in lSelectedNode.Nodes)
                 {
-                    string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.IndexOf("("));
+                    string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.LastIndexOf("("));
                     lVal = lParams[lParamName];
                     lParamNode.Text = lParamName + "(" + lVal.ToString() + ")";
                 }
@@ -550,20 +557,32 @@ namespace atcFtableBuilder
             this.cboOCTypes.SelectedIndexChanged += new System.EventHandler(this.cboOCTypes_SelectedIndexChanged);
 
             Regex lReg = new Regex(@"\(([^\)]*)\)");
-            foreach (TreeNode lParamNode in lSelectedNode.Nodes)
+            for (int n = 0; n < lSelectedNode.Nodes.Count; n++)
             {
+                TreeNode lParamNode = lSelectedNode.Nodes[n];
+
                 MatchCollection lMatches = lReg.Matches(lParamNode.Text);
                 string lsValue = lMatches[0].Groups[0].Value;
-                lsValue = lsValue.TrimStart(new char[]{'('});
-                lsValue = lsValue.TrimEnd(new char[]{')'});
+                lsValue = lsValue.TrimStart(new char[] { '(' });
+                lsValue = lsValue.TrimEnd(new char[] { ')' });
 
-                string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.IndexOf("("));
+                string lParamName = lParamNode.Text.Substring(0, lParamNode.Text.LastIndexOf("("));
                 if (lParamName == lblOCParm0.Text)
                     txtOCParm_0.Text = lsValue;
                 else if (lParamName == lblOCParm1.Text)
                     txtOCParm_1.Text = lsValue;
                 else if (lParamName == lblOCParm3.Text)
                     txtOCDisCoeff.Text = lsValue;
+                else if (n == 0)
+                {
+                    lblOCParm0.Text = lParamName;
+                    txtOCParm_0.Text = lsValue;
+                }
+                else if (n == 1)
+                {
+                    lblOCParm1.Text = lParamName;
+                    txtOCParm_1.Text = lsValue;
+                }
             }
         }
 

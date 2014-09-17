@@ -209,7 +209,8 @@ namespace atcFtableBuilder
             for (int i = 0; i < numcols; i++)
             {
                 string colName = FTableSource.get_CellValue(0, i);
-                colName = colName.Substring(0, colName.IndexOf("(")).Trim();
+                if (colName.IndexOf("(") >=0)
+                    colName = colName.Substring(0, colName.IndexOf("(")).Trim();
                 sbf.Append(colName.PadLeft(10));
             }
             sbf.AppendLine(" ***");
@@ -391,8 +392,18 @@ namespace atcFtableBuilder
             {
                 int colcheck = 0;
                 double lEpslon = 0.0000001;
-                for (int col = 4; col < ((ArrayList)FTableResults[0]).Count; col++) //int col = 3
+                for (int col = 3; col < ((ArrayList)FTableResults[0]).Count; col++) //int col = 3
                 {
+                    string lColHeader = FTableColumnNames[col].ToString();
+                    int lExitNum = -1;
+
+                    if (lColHeader.ToLower().StartsWith("outflow1") ||
+                        lColHeader.ToLower().StartsWith("infil"))
+                        continue;
+
+                    if (lColHeader.ToLower().StartsWith("exit"))
+                        int.TryParse(lColHeader.Substring(4, 1), out lExitNum);
+
                     int count = 0;
                     for (int row = 0; row < FTableResults.Count; row++)
                     {
@@ -403,7 +414,7 @@ namespace atcFtableBuilder
                             count = count + 1;
                     }
 
-                    if (count == FTableResults.Count && clsGlobals.gExitOCSetup[col - 4 + 1].Nodes.Count > 0)
+                    if (count == FTableResults.Count && (lExitNum - 1 >= 0 && clsGlobals.gExitOCSetup[lExitNum - 1].Nodes.Count > 0))
                     {
                         colcheck = colcheck + 1;
                         if (cdevice == null)
