@@ -26,10 +26,12 @@ namespace atcFtableBuilder
             }
             cboOCTypes.SelectedIndex = 0;
 
-            if (clsGlobals.gToolType == clsGlobals.ToolType.Gray)
-                rdoExit1.Enabled = false;
-            else
-                rdoExit1.Enabled = true;
+            rdoExit1.Enabled = false;
+
+            //if (clsGlobals.gToolType == clsGlobals.ToolType.Gray)
+            //    rdoExit1.Enabled = false;
+            //else
+            //    rdoExit1.Enabled = true;
 
             PopulateOCTree();
 
@@ -126,6 +128,12 @@ namespace atcFtableBuilder
                 if (i == 1 && clsGlobals.gToolType == clsGlobals.ToolType.Gray)
                 {
                     string lOutflowKey = "Outflow1";
+                    TreeNode lOutflowNode = lExitNodeUI.Nodes.Add(lOutflowKey, lOutflowKey);
+                    continue;
+                }
+                else if (i == 1 && clsGlobals.gToolType == clsGlobals.ToolType.Green)
+                {
+                    string lOutflowKey = "infiltra";
                     TreeNode lOutflowNode = lExitNodeUI.Nodes.Add(lOutflowKey, lOutflowKey);
                     continue;
                 }
