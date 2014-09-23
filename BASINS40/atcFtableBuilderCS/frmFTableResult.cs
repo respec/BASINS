@@ -203,15 +203,44 @@ namespace atcFtableBuilder
             sbf.AppendLine(" rows cols                               ***");
             //the following section requires me to do a calculation to correctly right justify the rows and cols figures. 
 
+            int ftableFieldWidth = 10;
+            string ftableNumFormat = "{0:0.00}";
             int numrows = FTableSource.Rows;
             int numcols = FTableSource.Columns;
+
+            //determine if need to use extended FTable width 15
+            double lsmallestVal = double.MaxValue;
+            for (int i = 0; i < numrows; i++)
+            {
+                if (i == 0) continue;
+                for (int j = 0; j < numcols; j++)
+                {
+                    double newValue = 0;
+                    if (double.TryParse(FTableSource.get_CellValue(i, j).ToString(), out newValue))
+                    {
+                        if (!double.IsNaN(newValue))
+                            if (newValue > 0 && lsmallestVal > newValue)
+                                lsmallestVal = newValue;
+                    }
+                }
+            }
+            txt = string.Format(ftableNumFormat, (object)lsmallestVal);
+            double lsmallValTest = double.Parse(txt);
+            if (lsmallValTest - 0 < 0.000001)
+            {
+                ftableFieldWidth = 15;
+                ftableNumFormat = "{0:0.000000}";
+            }
+            string lzeroStr = ftableNumFormat.Substring(ftableNumFormat.IndexOf(":") + 1).TrimEnd(new char[]{'}'});
+
+
             sbf.AppendLine(numrows.ToString().PadLeft(5) + numcols.ToString().PadLeft(5));
             for (int i = 0; i < numcols; i++)
             {
                 string colName = FTableSource.get_CellValue(0, i);
                 if (colName.IndexOf("(") >=0)
                     colName = colName.Substring(0, colName.IndexOf("(")).Trim();
-                sbf.Append(colName.PadLeft(10));
+                sbf.Append(colName.PadLeft(ftableFieldWidth));
             }
             sbf.AppendLine(" ***");
             for (int i = 0; i < numrows; i++)
@@ -225,14 +254,14 @@ namespace atcFtableBuilder
                     if (double.TryParse(FTableSource.get_CellValue(i, j).ToString(), out newValue))
                     {
                         if (!double.IsNaN(newValue))
-                            txt = string.Format("{0:0.00}", (object)newValue);
+                            txt = string.Format(ftableNumFormat, (object)newValue);
                         else
-                            txt = "0.00";
+                            txt = lzeroStr;
                     }
                     else
-                        txt = "0.00";
+                        txt = lzeroStr;
 
-                    sbf.Append(txt.PadLeft(10));
+                    sbf.Append(txt.PadLeft(ftableFieldWidth));
                     //if (j<numcols-1) sbf.Append("\t");
                 }
                 sbf.AppendLine("");
