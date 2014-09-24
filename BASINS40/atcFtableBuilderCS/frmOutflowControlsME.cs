@@ -562,7 +562,7 @@ namespace atcFtableBuilder
                 TreeNode lParamNode = lSelectedNode.Nodes[n];
 
                 MatchCollection lMatches = lReg.Matches(lParamNode.Text);
-                string lsValue = lMatches[0].Groups[0].Value;
+                string lsValue = lMatches[lMatches.Count - 1].Groups[0].Value;
                 lsValue = lsValue.TrimStart(new char[] { '(' });
                 lsValue = lsValue.TrimEnd(new char[] { ')' });
 
