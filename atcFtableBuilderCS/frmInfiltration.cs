@@ -87,6 +87,8 @@ namespace atcFtableBuilder
             }
 
             pLoaded = true;
+            cboSoilMenu.SelectedIndex = 0;
+            rdoInfilMethodMaryland.Checked = true;
         }
 
         private bool InputsAreOK(Dictionary<Infiltration_Calc.GAMPPARAM, double> aGAVarMap)
