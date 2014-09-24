@@ -50,6 +50,7 @@
             this.txtOCParm_0 = new System.Windows.Forms.TextBox();
             this.treeExitControls = new System.Windows.Forms.TreeView();
             this.btnDelete = new System.Windows.Forms.Button();
+            this.btnDone = new System.Windows.Forms.Button();
             this.gbSetup.SuspendLayout();
             this.gbControlParms.SuspendLayout();
             this.SuspendLayout();
@@ -307,11 +308,23 @@
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
+            // btnDone
+            // 
+            this.btnDone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDone.Location = new System.Drawing.Point(601, 430);
+            this.btnDone.Name = "btnDone";
+            this.btnDone.Size = new System.Drawing.Size(75, 23);
+            this.btnDone.TabIndex = 4;
+            this.btnDone.Text = "Done";
+            this.btnDone.UseVisualStyleBackColor = true;
+            this.btnDone.Click += new System.EventHandler(this.btnDone_Click);
+            // 
             // frmOutflowControlsME
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(688, 465);
+            this.Controls.Add(this.btnDone);
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.gbSetup);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -350,6 +363,7 @@
         private System.Windows.Forms.RadioButton rdoExit1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnClear;
+        private System.Windows.Forms.Button btnDone;
 
     }
 }

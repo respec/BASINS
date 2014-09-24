@@ -591,5 +591,10 @@ namespace atcFtableBuilder
             Array.Clear(clsGlobals.gExitOCSetup, 0, clsGlobals.gExitOCSetup.Length);
             treeExitControls.Nodes.CopyTo(clsGlobals.gExitOCSetup, 0);
         }
+
+        private void btnDone_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }
