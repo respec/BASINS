@@ -19,8 +19,9 @@ Public Class atcFrequencyGridSource
     Private pCalculatedNdays As New ArrayList
     Private pCalculatedRecurrence As New ArrayList
 
-    Public Shared SWStatDisclaimer As String = "SWSTAT version 5.0" & vbCrLf & _
-        "USGS has conducted limited testing and review of this program." & _
+    '"SWSTAT version 5.0" & vbCrLf & _
+    Public Shared SWStatDisclaimer As String = _
+        "USGS has conducted limited testing and review of this program." & vbCrLf & _
         "Final review and approval is pending." & vbCrLf & vbCrLf
 
     ''' <summary>
@@ -457,9 +458,9 @@ Public Class atcFrequencyGridSource
                         Else
                             lRept.Append(SWStatDisclaimer) 'Add Message Here
                             lRept.AppendLine()
-                            lRept.AppendLine("Program SWStat             U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
-                            lRept.AppendLine("Ver. 5.0          Log-Pearson & Pearson Type III Statistics   Run Date / Time")
-                            lRept.AppendLine("10/1/2009                based on USGS Program A193           " & System.DateTime.Now.ToString)
+                            lRept.AppendLine("Program SWStat         U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
+                            lRept.AppendLine("Ver. 5.0      Log-Pearson & Pearson Type III Statistics   Run Date / Time")
+                            lRept.AppendLine("10/1/2009            based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
                             lRept.AppendLine()
                             lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
                             lRept.AppendLine("           preliminary computations. Users are responsible for assessment")
@@ -579,9 +580,9 @@ Public Class atcFrequencyGridSource
                         Else
                             lRept.Append(SWStatDisclaimer) 'Add Message Here
                             lRept.AppendLine()
-                            lRept.AppendLine("Program SWStat             U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
-                            lRept.AppendLine("Ver. 5.0          Log-Pearson & Pearson Type III Statistics   Run Date / Time")
-                            lRept.AppendLine("10/1/2009                based on USGS Program A193           " & System.DateTime.Now.ToString)
+                            lRept.AppendLine("Program SWStat         U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
+                            lRept.AppendLine("Ver. 5.0      Log-Pearson & Pearson Type III Statistics   Run Date / Time")
+                            lRept.AppendLine("10/1/2009            based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
                             lRept.AppendLine()
                             lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
                             lRept.AppendLine("           preliminary computations. Users are responsible for assessment")
