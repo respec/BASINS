@@ -185,6 +185,7 @@ Public Class atcChooseDataGroupDates
                             Dim lEndDateArray(5) As Integer
                             atcUtility.J2Date(lStartDate, lStartDateArray)
                             atcUtility.J2Date(lEndDate, lEndDateArray)
+                            timcnv(lEndDateArray) 'Convert midnight value to hour 24 of previous day (avoid adding extra day)
                             lAddTs = SubsetByDateBoundary(lTs, lStartDateArray(1), lStartDateArray(2), Nothing, lStartDateArray(0), lEndDateArray(0), lEndDateArray(1), lEndDateArray(2))
 
                             Dim lSeasons As New atcSeasonsYearSubset(lStartDateArray(1), lStartDateArray(2), lEndDateArray(1), lEndDateArray(2))
