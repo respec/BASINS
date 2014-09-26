@@ -151,9 +151,23 @@ Public Module modFile
             If FileExists(aPath) Then
                 IO.File.Delete(aPath)
                 If aVerbose Then Logger.Dbg("Deleted file '" & aPath & "'")
+
+                If FileExists(aPath) Then
+                    Dim lTryUntil As Date = Now.AddMilliseconds(2000)
+TryAgainFile:       System.Threading.Thread.Sleep(100)
+                    If Now < lTryUntil AndAlso FileExists(aPath) Then GoTo TryAgainFile
+                End If
+
             ElseIf FileExists(aPath, True, False) Then
                 IO.Directory.Delete(aPath, True)
                 If aVerbose Then Logger.Dbg("Deleted directory '" & aPath & "'")
+
+                If FileExists(aPath, True, False) Then
+                    Dim lTryUntil As Date = Now.AddMilliseconds(2000)
+TryAgainDir:        System.Threading.Thread.Sleep(100)
+                    If Now < lTryUntil AndAlso FileExists(aPath, True, False) Then GoTo TryAgainDir
+                End If
+
             Else
                 If aVerbose Then Logger.Dbg("Path not found, no need to delete '" & aPath & "' (CurDir '" & CurDir() & "')")
             End If
