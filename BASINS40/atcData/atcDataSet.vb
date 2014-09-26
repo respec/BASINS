@@ -20,7 +20,8 @@ Public Class atcDataSet
     Public Overridable Sub Clear()
         If pAttributes Is Nothing Then
             pAttributes = New atcDataAttributes
-        Else
+        ElseIf pAttributes.Count > 0 Then
+            MapWinUtility.Logger.Dbg(pSerial & " Clearing Attributes: " & pAttributes.ToString)
             pAttributes.Clear()
         End If
         pAttributes.Owner = Me

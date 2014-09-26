@@ -218,15 +218,22 @@ Public Class atcDataAttributes
 FormatDouble:           Dim lAttName As String = aAttributeName.ToLower
                         If lAttName.Contains("jday") OrElse lAttName.Contains("date") Then
                             If IsNumeric(lValue) Then
-                                Return pDateFormat.JDateToString(lValue)
-                            Else
-                                Return lValue
+                                Try
+                                    Return pDateFormat.JDateToString(lValue)
+                                Catch
+                                End Try
                             End If
+                            Return lValue
                         Else
                             Return DoubleToString(lValue, 15)
                         End If
                     Case "Integer"
-FormatInteger:          Return Format(CInt(lValue), "#,###;-#,###;0")
+FormatInteger:
+                        Select Case aAttributeName.ToUpper
+                            Case "ID", "TSBYR", "YEAR" 'Do not format as number with comma separating thousands
+                                Return CStr(lValue)
+                        End Select
+                        Return Format(CInt(lValue), "#,###;-#,###;0")
                     Case "atcTimeseries"
                         Return lValue.ToString
                     Case "atcDataGroup", "atcTimeseriesGroup"

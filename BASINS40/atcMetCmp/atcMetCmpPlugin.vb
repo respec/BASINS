@@ -578,7 +578,7 @@ Public Class atcMetCmpPlugin
                 pAvailableOperations.SetValue(lDisEvap, Nothing, lArguments)
 
                 Dim defObsTimeTS As New atcAttributeDefinition
-                defObsTimeTS = defTimeSeriesOne.Clone("Observation Hour Timeseries", "Timeseries of Daily Observation times (1-24)")
+                defObsTimeTS = defTimeSeriesOne.Clone("Observation Hour Time Series", "Time Series of Daily Observation times (1-24)")
 
                 Dim lDisTemp As New atcAttributeDefinition
                 With lDisTemp

@@ -959,13 +959,6 @@ ReturnDate:
         Return retval
     End Function
 
-    Private Function EvalTruth(ByRef aString As String) As Boolean
-        Select Case aString.ToLower
-            Case "0", "", "false" : EvalTruth = False
-            Case Else : EvalTruth = True
-        End Select
-    End Function
-
     Protected Overrides Sub Finalize()
         MySubExpressions = Nothing
         MyBase.Finalize()

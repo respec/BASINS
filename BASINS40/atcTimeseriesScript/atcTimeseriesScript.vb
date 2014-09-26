@@ -152,7 +152,7 @@ ShowSelect:
                 Logger.Msg(lMessage & vbCrLf & "Did not add any datasets", vbOKOnly, "Ran Import Data Script")
                 Return False
             End If
-            End If
+        End If
     End Function
 
     'Private Function ScriptFileNames() As String(,)
