@@ -68,6 +68,7 @@ namespace atcFtableBuilder
             ArrayList labels = new ArrayList();
             if (Calc.CurrentType == FTableCalculator.ChannelType.TRAPEZOIDAL) //"TRAPEZOIDAL")
             {
+                string sChTypeName = "*** Channel Type: Trapezoidal";
                 txt = ((FTableCalcTrape)Calc).inpChannelMaxDepth.ToString();
                 string sChDepth = "*** Channel Depth: " + txt;
                 txt = ((FTableCalcTrape)Calc).inpChannelTopWidth.ToString();
@@ -89,10 +90,11 @@ namespace atcFtableBuilder
                 
                 txt = ((FTableCalcTrape)Calc).inpHeightIncrement.ToString();
                 string sChHInc = "*** Height Increment: " + txt;
-                labels.Add(sChLength); labels.Add(sChWidth); labels.Add(sChDepth); labels.Add(sChSideSlope); labels.Add(sChHInc);
+                labels.Add(sChTypeName);  labels.Add(sChLength); labels.Add(sChWidth); labels.Add(sChDepth); labels.Add(sChSideSlope); labels.Add(sChHInc);
             }
             else if (Calc.CurrentType == FTableCalculator.ChannelType.PARABOLIC) //this.calculatorType == "PARABOLIC")
             {
+                string sChTypeName = "*** Channel Type: Parabolic";
                 txt = ((FTableCalcEllipse)Calc).inpChannelLength.ToString();
                 string sChLength = "*** Channel Length: " + txt;
                 txt = ((FTableCalcEllipse)Calc).inpChannelWidth.ToString();
@@ -108,10 +110,11 @@ namespace atcFtableBuilder
                 //sbf.Append(" *** " + txt + "      ");
                 //outvalue = plotdata.value[3];
                 //sbf.Append(outvalue + "***\n"); */
-                labels.Add(sChLength); labels.Add(sChWidth); labels.Add(sChDepth); labels.Add(sChSlope); labels.Add(sChHInc);
+                labels.Add(sChTypeName); labels.Add(sChLength); labels.Add(sChWidth); labels.Add(sChDepth); labels.Add(sChSlope); labels.Add(sChHInc);
             }
             else if (Calc.CurrentType == FTableCalculator.ChannelType.CIRCULAR) //this.calculatorType == "CIRCULAR")
             {
+                string sChTypeName = "*** Channel Type: Circular";
                 txt = ((FTableCalcCircle)Calc).inpChannelLength.ToString(); //plotdata.circPanel.lblChannelLength.getText();//xyang
                 string sChLength = "*** Channel Length: " + txt; 
                 txt = ((FTableCalcCircle)Calc).inpChannelDiameter.ToString();  //plotdata.circPanel.lblChannelDiameter.getText();//xyang
@@ -129,10 +132,11 @@ namespace atcFtableBuilder
                 txt = ((FTableCalcCircle)Calc).inpHeightIncrement.ToString(); //plotdata.circPanel.lblIncrement.getText();//xyang
                 string sChHInc = "*** Height Increment: " + txt;
 
-                labels.Add(sChLength); labels.Add(sChDiam); labels.Add(sChSlope); labels.Add(sChHInc);
+                labels.Add(sChTypeName); labels.Add(sChLength); labels.Add(sChDiam); labels.Add(sChSlope); labels.Add(sChHInc);
             }
             else if (Calc.CurrentType == FTableCalculator.ChannelType.RECTANGULAR)  //this.calculatorType == "RECTANGULAR")
             {
+                string sChTypeName = "*** Channel Type: Rectangular";
                 txt = ((FTableCalcRectangular)Calc).inpChannelLength.ToString();
                 string sChLength = "*** Channel Length: " + txt;
                 txt = ((FTableCalcRectangular)Calc).inpChannelTopWidth.ToString();
@@ -149,10 +153,11 @@ namespace atcFtableBuilder
                 //outvalue = plotdata.value[3];
                 //sbf.Append(outvalue + "***\n"); */
 
-                labels.Add(sChLength); labels.Add(sChWidth); labels.Add(sChDepth); labels.Add(sChSlope); labels.Add(sChHInc);
+                labels.Add(sChTypeName); labels.Add(sChLength); labels.Add(sChWidth); labels.Add(sChDepth); labels.Add(sChSlope); labels.Add(sChHInc);
             }
             else if (Calc.CurrentType == FTableCalculator.ChannelType.TRIANGULAR) //this.calculatorType == "TRIANGULAR")
             {
+                string sChTypeName = "*** Channel Type: Triangular";
                 txt = ((FTableCalcTri)Calc).inpChannelLength.ToString();
                 string sChLength = "*** Channel Length: " + txt;
                 txt = ((FTableCalcTri)Calc).inpChannelTopWidth.ToString();
@@ -168,10 +173,11 @@ namespace atcFtableBuilder
                 //sbf.Append(" *** " + txt + "      ");
                 //outvalue = plotdata.value[3];
                 //sbf.Append(outvalue + "***\n"); */
-                labels.Add(sChLength); labels.Add(sChWidth); labels.Add(sChDepth); labels.Add(sChSlope); labels.Add(sChHInc);
+                labels.Add(sChTypeName); labels.Add(sChLength); labels.Add(sChWidth); labels.Add(sChDepth); labels.Add(sChSlope); labels.Add(sChHInc);
             }
             else if (Calc.CurrentType == FTableCalculator.ChannelType.NATURAL)
             {
+                string sChTypeName = "*** Channel Type: Natural";
                 txt = ((FTableCalcNatural)Calc).inpChannelLength.ToString();
                 string sChLength = "*** Channel Length: " + txt;
                 txt = ((FTableCalcNatural)Calc).inpChannelSlope.ToString();
@@ -179,7 +185,7 @@ namespace atcFtableBuilder
                 txt = ((FTableCalcNatural)Calc).inpHeightIncrement.ToString();
                 string sChHInc = "*** Height Increment: " + txt;
 
-                labels.Add(sChLength); labels.Add(sChSlope); labels.Add(sChHInc);
+                labels.Add(sChTypeName); labels.Add(sChLength); labels.Add(sChSlope); labels.Add(sChHInc);
             }
 
             SortedList<int, object> lblLens = new SortedList<int, object>();

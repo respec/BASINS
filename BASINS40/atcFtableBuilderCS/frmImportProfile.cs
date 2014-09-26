@@ -223,17 +223,19 @@ namespace atcFtableBuilder
             if (!string.IsNullOrEmpty(lFilename))
                 lFD.FileName = lFilename;
             else
-                lFD.FileName = "ProfileElev.txt";
+                lFD.FileName = "Profile";
 
             //lFD.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
             if (rdoImportDataExcel.Checked)
             {
                 lFD.DefaultExt = "txt";
+                lFD.FileName += ".txt";
                 lFD.Filter = "Tab-Delimited (*.txt)|*.txt|All files (*.*)|*.*";
             }
             else if (rdoImportDataCSV.Checked)
             {
                 lFD.DefaultExt = ".csv";
+                lFD.FileName += ".csv";
                 lFD.Filter = "Comma-Delimited (*.csv)|*.csv|All files (*.*)|*.*";
             }
             if (lFD.ShowDialog() == DialogResult.OK)
