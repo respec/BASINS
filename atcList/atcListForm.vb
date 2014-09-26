@@ -159,7 +159,7 @@ Public Class atcListForm
         '
         Me.mnuViewValues.Checked = True
         Me.mnuViewValues.Index = 4
-        Me.mnuViewValues.Text = "Timeseries Values"
+        Me.mnuViewValues.Text = "Time Series Values"
         '
         'mnuViewValueAttributes
         '
@@ -221,7 +221,7 @@ Public Class atcListForm
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
         Me.Name = "atcListForm"
-        Me.Text = "Timeseries List"
+        Me.Text = "Time Series List"
         Me.ResumeLayout(False)
 
     End Sub

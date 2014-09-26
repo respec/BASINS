@@ -311,7 +311,12 @@ CaseExistRenumber:
                             lV(i - 1) = CSng(lValue)
                         End If
                     Next
-
+                    If Double.IsNaN(lTimser.Dates.Value(0)) Then
+                        If lTimser.numValues > 1 Then
+                            'TODO: should use timadd?
+                            lTimser.Dates.Value(0) = lTimser.Dates.Value(1) - (lTimser.Dates.Value(2) - lTimser.Dates.Value(1))
+                        End If
+                    End If
                     J2DateRounddown(lTimser.Dates.Value(0), lTu, lSDat)
 
                     'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _

@@ -293,6 +293,7 @@ Public Module modTimeseriesMath
             Dim lTotalNumValues As Integer = 0
             Dim lOldTS As atcTimeseries 'points to current timeseries from aGroup
             Dim lMinDate As Double = pMaxValue
+            Dim lDateZero As Double = pNaN
             Dim lMaxGroupIndex As Integer = aGroup.Count - 1
             Dim lIndex As Integer
             Dim lMinIndex As Integer
@@ -313,7 +314,8 @@ Public Module modTimeseriesMath
                     GetNextDateIndex(lOldTS, aFilterNoData, lNextIndex(lIndex), lNextDate(lIndex))
                     'Find minimum starting date and take date before from that TS
                     If lNextDate(lIndex) < lMinDate Then
-                        lMinDate = lOldTS.Dates.Value(lNextIndex(lIndex) - 1)
+                        lMinDate = lNextDate(lIndex)
+                        lDateZero = lOldTS.Dates.Value(lNextIndex(lIndex) - 1)
                     End If
                 Catch 'Can't get dates values from this TS
                     lNextIndex(lIndex) = -1
@@ -324,7 +326,7 @@ Public Module modTimeseriesMath
                 lNewTS.numValues = lTotalNumValues
                 lNewTS.Dates.numValues = lTotalNumValues
                 If lMinDate < pMaxValue Then
-                    lNewTS.Dates.Value(0) = lMinDate
+                    lNewTS.Dates.Value(0) = lDateZero
                 Else
                     lNewTS.Dates.Value(0) = pNaN
                 End If
@@ -1326,7 +1328,7 @@ Finished:
                         aTSerY.ToString & " starts on " & aTSerY.Dates.Value(0).ToString & "." & vbCrLf
         End If
         If lProblem.Length > 0 Then
-            Throw New ApplicationException("Timeseries are not compatible." & vbCrLf & lProblem)
+            Throw New ApplicationException("Time series are not compatible." & vbCrLf & lProblem)
         End If
 
         Dim lNote As String = ""

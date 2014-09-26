@@ -12,6 +12,19 @@ Public Class frmMain
     Private pStatusMonitor As MonitorProgressStatus
 
     Public Sub New()
+        'For Each lDir As String In IO.Directory.EnumerateDirectories("S:\dev\MW4.8.6") '"S:\dev\MW4.8.6\MapWindow4Dev\TableEditor") '"S:\dev\MW4.8.6\MapWindow4Dev") '"S:\dev\MapWindow4Plugins") '"S:\dev\BASINS40")
+        '    For Each lProjectFileName As String In IO.Directory.GetFiles(lDir)
+        '        If lProjectFileName.EndsWith("10.vbproj") Then
+        '            Dim lProjectFileContents As String = IO.File.ReadAllText(lProjectFileName)
+        '            lProjectFileContents = lProjectFileContents.Replace("10.vbproj", "13.vbproj")
+        '            lProjectFileContents = lProjectFileContents.Replace("10""", "13""")
+        '            lProjectFileContents = lProjectFileContents.Replace("10</Name>", "13</Name>")
+        '            lProjectFileName = lProjectFileName.Substring(0, lProjectFileName.Length - 9) & "13.vbproj"
+        '            IO.File.WriteAllText(lProjectFileName, lProjectFileContents)
+        '            Logger.Dbg("Wrote " & lProjectFileName)
+        '        End If
+        '    Next
+        'Next
 
         ' This call is required by the designer.
         InitializeComponent()
@@ -63,6 +76,8 @@ Public Class frmMain
             .Add(New atcTimeseriesRDB.atcTimeseriesRDB)
             .Add(New atcTimeseriesScript.atcTimeseriesScriptPlugin)
             .Add(New atcTimeseriesSUSTAIN.atcTimeseriesSUSTAIN)
+            .Add(New atcTimeseriesGSSHA.atcTimeseriesGSSHA)
+            '.Add(New atcTimeseriesCSV.atcTimeseriesCSV)
 
             .Add(New atcList.atcListPlugin)
             .Add(New atcGraph.atcGraphPlugin)
@@ -72,6 +87,15 @@ Public Class frmMain
         atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
         AddHandler (atcDataManager.OpenedData), (AddressOf FileOpenedOrClosed)
         AddHandler (atcDataManager.ClosedData), (AddressOf FileOpenedOrClosed)
+
+        Try
+            For Each lArg As String In My.Application.CommandLineArgs
+                If IO.File.Exists(lArg) Then
+                    atcDataManager.OpenDataSource(lArg)
+                End If
+            Next
+        Catch
+        End Try
     End Sub
 
     Private Sub frmMain_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
@@ -217,7 +241,9 @@ Public Class frmMain
             Dim lFormSave As New frmSaveData
             Dim lSaveSource As atcDataSource = lFormSave.AskUser(SelectedData)
             If lSaveSource IsNot Nothing AndAlso Not String.IsNullOrEmpty(lSaveSource.Specification) Then
+                Logger.Status("Saving " & lSaveSource.Specification)
                 lSaveSource.AddDataSets(SelectedData)
+                Logger.Status("")
             End If
         End If
     End Sub

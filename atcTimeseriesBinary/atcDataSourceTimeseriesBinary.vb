@@ -14,7 +14,7 @@ Public Class atcDataSourceTimeseriesBinary
 
     Public Overrides ReadOnly Property Description() As String
         Get
-            Return "Timeseries Binary"
+            Return "Time Series Binary"
         End Get
     End Property
 

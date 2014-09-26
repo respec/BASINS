@@ -47,6 +47,7 @@ Friend Module modATCscript
 
     Friend pNaN As Double = GetNaN()
     Public MissingValueString As String = ""
+    Public DatesAllShared As Boolean = False
 
     ''' <summary>
     ''' Array of token names
@@ -256,12 +257,30 @@ Friend Module modATCscript
     End Sub
 
     Public Function ScriptSetDate(ByRef jdy As Double) As Double
-        With CurBuf
-            .DateCount = .DateCount + 1
+        Dim lDateBuf As InputBuffer
+        If DatesAllShared Then
+            lDateBuf = InBuf.Item(0)
+        Else
+            lDateBuf = CurBuf
+        End If
+        With lDateBuf
+            .DateCount += 1
+            If DatesAllShared Then
+                For Each lBuf In InBuf
+                    lBuf.DateCount = .DateCount
+                Next
+            End If
             If .DateCount > .DateDim Then
-                .DateDim = .DateCount * 2
+                .DateDim = .DateCount * 1.5
                 ReDim Preserve .DateArray(.DateDim)
-                ReDim Preserve .ValueArray(.DateDim)
+                If DatesAllShared Then
+                    For Each lBuf In InBuf
+                        lBuf.DateDim = .DateDim
+                        ReDim Preserve lBuf.ValueArray(lBuf.DateDim)
+                    Next
+                Else
+                    ReDim Preserve .ValueArray(.DateDim)
+                End If
                 'ReDim Preserve .FlagArray(.DateDim)
             End If
             .DateArray(.DateCount) = jdy
@@ -303,6 +322,8 @@ Friend Module modATCscript
                         ShowedNumericMessage = ShowedNumericMessage + 1
                     End If
                 End If
+            Case "datesallshared"
+                DatesAllShared = EvalTruth(newValue)
                 'Case "missingvalue"
                 '    MissingValueString = newValue
                 '    GoTo SetVariable
@@ -499,6 +520,14 @@ SetVariable:
         End If
     End Function
 
+    Public Function EvalTruth(ByRef aString As String) As Boolean
+        Select Case aString.ToLower
+            Case "0", "", "false"
+                Return False
+        End Select
+        Return True
+    End Function
+
     Public Function ScriptTest(ByRef Script As clsATCscriptExpression, ByRef DataFilename As String) As String
         Dim msg As String
         TestingFile = True
@@ -546,35 +575,56 @@ SetVariable:
                 lReturnValue = Script.Evaluate
 
                 If Not AbortScript Then
+                    Dim lAllDates As atcTimeseries
+                    Dim lSharedAttributes As New atcDataAttributes
+                    With lSharedAttributes
+                        .SetValue("Data Source", pDataFilename)
+                        .AddHistory("Read From " & DataFilename)
+                    End With
+                    Dim lProgress As Integer = 0
+                    Dim lLastProgress As Integer = InBuf.Count
+                    Logger.Status("Compiling imported data into time series")
                     For Each lBuffer As InputBuffer In InBuf
                         With lBuffer
+                            lProgress += 1
+                            Logger.Progress(lProgress, lLastProgress)
                             If .DateCount > 0 Then
                                 If .DateDim > .DateCount Then
-                                    ReDim Preserve .DateArray(.DateCount)
+                                    If Not DatesAllShared OrElse DatesAllShared AndAlso lAllDates Is Nothing Then
+                                        ReDim Preserve .DateArray(.DateCount)
+                                    End If
                                     ReDim Preserve .ValueArray(.DateCount)
                                     'ReDim Preserve .FlagArray(.DateCount)
                                 End If
                                 .ts.Values = .ValueArray
                                 'TODO: import flags if any as ValueAttributes: pTserData.Item(CurBuf).flags = .FlagArray
-                                .ts.Dates = New atcTimeseries(pTserFile)
-                                .ts.Dates.Values = .DateArray
+                                If DatesAllShared Then
+                                    If lAllDates Is Nothing Then
+                                        lAllDates = New atcTimeseries(pTserFile)
+                                        lAllDates.Values = .DateArray
+                                        lAllDates.Attributes.SetValue("Shared", True)
+                                    End If
+                                    .ts.Dates = lAllDates
+                                Else
+                                    .ts.Dates = New atcTimeseries(pTserFile)
+                                    .ts.Dates.Values = .DateArray
+                                End If
 
                                 If FillTS > 0 Then
                                     Dim lFilledTS As atcTimeseries = FillValues(.ts, FillTU, FillTS, FillVal, FillMissing, FillAccum)
                                     For Each lAttribute As atcDefinedValue In .ts.Attributes
                                         lFilledTS.Attributes.SetValueIfMissing(lAttribute.Definition.Name, lAttribute.Value)
                                     Next
-                                    .ts.Dates.Clear()
+                                    If Not DatesAllShared Then
+                                        .ts.Dates.Clear()
+                                    End If
                                     .ts.Clear()
                                     .ts = lFilledTS
                                 End If
 
                                 With .ts
                                     .Attributes.SetValueIfMissing("ID", pTserFile.DataSets.Count + 1)
-                                    If Not .Attributes.ContainsAttribute("History 1") Then
-                                        .Attributes.SetValue("Data Source", pDataFilename)
-                                        .Attributes.AddHistory("Read From " & DataFilename)
-                                    End If
+                                    .Attributes.SharedAttributes = lSharedAttributes
                                     'Set missing values to NaN
                                     For iVal As Long = 1 To .numValues
                                         If Math.Abs((.Value(iVal) - FillMissing)) < 1.0E-20 Then
@@ -597,7 +647,9 @@ SetVariable:
                                             Dim lDisposingDates As atcTimeseries = .ts.Dates
                                             lExistingTS.Dates.Attributes.SetValue("Shared", True)
                                             .ts.Dates = lExistingTS.Dates
-                                            lDisposingDates.Clear()
+                                            If Not lDisposingDates.Attributes.GetValue("Shared", False) Then
+                                                lDisposingDates.Clear()
+                                            End If
                                             Exit For
                                         End If
                                     End If
@@ -634,6 +686,11 @@ SetVariable:
             If DataFileHandle IsNot Nothing Then
                 DataFileHandle.Close()
                 DataFileHandle = Nothing
+                If pTserFile IsNot Nothing AndAlso pTserFile.GetType.Name <> "atcTimeseriesScriptPlugin" Then
+                    Dim lSpec As String = pTserFile.Specification
+                    atcDataManager.RemoveDataSource(lSpec)
+                    pTserFile.Clear()
+                End If
             End If
         End Try
         Return lReturnValue

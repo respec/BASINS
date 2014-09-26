@@ -344,6 +344,7 @@ Public Class atcDataGroup
                 Dim lItemIndex As Integer = 0
                 Logger.Status("Finding Values for " & lAttributeName)
                 Dim lValue As String
+                Dim lLastStatus As Date = Now
                 For Each ts As atcTimeseries In Me
                     'Dim lNeededToBeRead As Boolean = ts.ValuesNeedToBeRead
                     Try
@@ -363,8 +364,12 @@ Public Class atcDataGroup
                                   (lKey <> lSortedValues.Keys.Item(lItemIndex)) Then
                                     'Not a duplicate, add to the list
                                     lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
-                                    If Not lValue Is Nothing Then
+                                    If lValue IsNot Nothing Then
                                         lSortedValues.Insert(lItemIndex, lKey, lValue)
+                                        If lSortedValues.Count < 100 OrElse Now.Subtract(lLastStatus).TotalSeconds > 1 Then
+                                            Logger.Status("Finding Values for " & lAttributeName & ", found " & lSortedValues.Count & " so far")
+                                            lLastStatus = Now
+                                        End If
                                     End If
                                 End If
                             End If
@@ -374,8 +379,12 @@ Public Class atcDataGroup
                                 lItemIndex = lSortedValues.BinarySearchForKey(lKey)
                                 If lItemIndex = lSortedValues.Count OrElse Not lKey.Equals(lSortedValues.Keys.Item(lItemIndex)) Then
                                     lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
-                                    If Not lValue Is Nothing Then
+                                    If lValue IsNot Nothing Then
                                         lSortedValues.Insert(lItemIndex, lKey, lValue)
+                                        If lSortedValues.Count < 100 OrElse Now.Subtract(lLastStatus).TotalSeconds > 1 Then
+                                            Logger.Status("Finding Values for " & lAttributeName & ", found " & lSortedValues.Count & " so far")
+                                            lLastStatus = Now
+                                        End If
                                     End If
                                 End If
                             End If
@@ -389,6 +398,10 @@ Public Class atcDataGroup
                     'End If
                     lTsIndex += 1
                     Logger.Progress(lTsIndex, Count)
+                    If lSortedValues.Count > 999 Then
+                        Logger.Dbg("Found " & lSortedValues.Count & " values for " & lAttributeName & " in first " & lTsIndex & " datasets, not looking for more")
+                        Exit For
+                    End If
                 Next
                 Logger.Status("")
             End If
@@ -414,6 +427,9 @@ Public Class atcDataGroup
                 End If
             End If
         Next
+        If CommonAttributeValue Is Nothing Then
+            Return aMissingValue
+        End If
     End Function
 
     ''' <summary>Contents of this class expressed as a string.</summary>

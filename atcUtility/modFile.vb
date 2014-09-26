@@ -420,7 +420,7 @@ EndFound:
         ' ##LOCAL slashposFilename - position of slash in filename.
         ' ##LOCAL slashposPath - position of slash in pathname.
 
-        If Mid(aFileName, 2, 1) = ":" Then 'Already have a path that starts with a drive letter
+        If aFileName.Substring(1, 1) = ":" OrElse aFileName.StartsWith("\\") Then 'Already have an absolute path
             Return aFileName
         End If
 

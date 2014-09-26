@@ -172,7 +172,7 @@ Public Class atcTimeseries
             If aIndex >= 0 And aIndex <= pNumValues Then
                 Return pValues(aIndex)
             Else
-                Throw New ApplicationException("Timeseries Value Index " & aIndex & " out of range 0-" & pNumValues)
+                Throw New ApplicationException("Time Series Value Index " & aIndex & " out of range 0-" & pNumValues)
             End If
         End Get
         Set(ByVal newValue As Double)
@@ -379,7 +379,7 @@ Public Class atcTimeseries
                     ReDim Preserve pValueAttributes(pNumValues)
                 End If
             Catch ex As Exception
-                Dim lMessage As String = "Timeseries exception changing numValues from " & pNumValues & " to " & newValue & " for " & Me.ToString & vbCrLf & ex.Message & vbCrLf & MemUsage()
+                Dim lMessage As String = "Time series exception changing numValues from " & pNumValues & " to " & newValue & " for " & Me.ToString & vbCrLf & ex.Message & vbCrLf & MemUsage()
                 MapWinUtility.Logger.Dbg(lMessage)
                 Throw New ApplicationException(lMessage)
             End Try

@@ -73,10 +73,20 @@ Public Class atcSeasonPlugin
             Else
                 Select Case aOperationName.ToLower
                     Case "split"
+                    If pSeasons Is Nothing Then
+
+                        'TODO: use form to ask how to split
+                        'Dim lForm As New frmSpecifySplit
+                        'Return lForm.AskUser(lTimeSeriesGroup, AvailableOperations(False, True), MyBase.DataSets)
+
+                        Logger.Dbg("Could not create season of type '" & lSeasonName & "'")
+                    End If
+                    If pSeasons IsNot Nothing Then
                         For Each lts As atcTimeseries In lTimeSeriesGroup
                             MyBase.DataSets.AddRange(pSeasons.Split(lts, Me))
                         Next
                         If MyBase.DataSets.Count > 0 Then Return True
+                    End If
                     Case "seasonalattributes"
                         Dim lAttributes As atcDataAttributes = aArgs.GetValue("Attributes")
                         Dim lCalculatedAttributes As atcDataAttributes = aArgs.GetValue("CalculatedAttributes")

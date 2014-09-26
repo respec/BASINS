@@ -452,7 +452,7 @@ Public Class clsBaseflowBFI
         'Dim lGroupTsDayMin As atcTimeseriesGroup = lSeasonWaterYear.Split(aTsDAYMIN, Nothing)
         Dim lGroupTsFlow As atcTimeseriesGroup = Nothing
 
-        Dim lSeasonYear As Object = Nothing
+        Dim lSeasonYear As atcSeasonBase = Nothing
         Dim lTsQMINSTpBnd As atcTimeseries = Nothing
         Dim lTsFlowBnd As atcTimeseries = Nothing
         If YearBasis.StartsWith("Calendar") Then
