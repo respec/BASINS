@@ -229,13 +229,13 @@ namespace atcFtableBuilder
             if (rdoImportDataExcel.Checked)
             {
                 lFD.DefaultExt = "txt";
-                lFD.FileName += ".txt";
+                if (!lFD.FileName.ToLower().Contains(".txt")) lFD.FileName += ".txt";
                 lFD.Filter = "Tab-Delimited (*.txt)|*.txt|All files (*.*)|*.*";
             }
             else if (rdoImportDataCSV.Checked)
             {
                 lFD.DefaultExt = ".csv";
-                lFD.FileName += ".csv";
+                if (!lFD.FileName.ToLower().Contains(".csv")) lFD.FileName += ".csv";
                 lFD.Filter = "Comma-Delimited (*.csv)|*.csv|All files (*.*)|*.*";
             }
             if (lFD.ShowDialog() == DialogResult.OK)

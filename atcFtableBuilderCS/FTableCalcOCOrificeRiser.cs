@@ -22,7 +22,7 @@ namespace atcFtableBuilder
             set { pExit = value; }
         }
         public double OrificeDischargeCoefficient = -999;
-        private string[] gOCOrificeRiserLbl = { "Orifice Diameter", "Orifice Depth", "Discharge Coefficient" };
+        private string[] gOCOrificeRiserLbl = { "Orifice Diameter", "Orifice Height", "Discharge Coefficient" };
         public override ControlDeviceType ControlDevice
         {
             get

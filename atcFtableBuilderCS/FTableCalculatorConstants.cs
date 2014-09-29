@@ -208,7 +208,7 @@ namespace atcFtableBuilder
             //if colNames is greater than four, remove the outflow_1 column (open flow)
             //ToDo: for now, see if client like to retain the outflow1 column for the Gray tool
             //      as for infiltration, this column will be removed.
-            if (colNames.Count > FTableCalculatorConstants.outflow_1_index + 1)
+            if (colNames[FTableCalculatorConstants.outflow_1_index].ToString().ToLower().StartsWith("outflow1")) //colNames.Count > FTableCalculatorConstants.outflow_1_index + 1)
             {
                 colNames.RemoveAt(FTableCalculatorConstants.outflow_1_index);
                 //	the data vector is a vector of vectors.

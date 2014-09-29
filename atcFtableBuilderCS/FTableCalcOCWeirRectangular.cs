@@ -23,7 +23,7 @@ namespace atcFtableBuilder
             set { pExit = value; }
         }
         public double DischargeCoefficient = -999;
-        private string[] gOCWeirRectLbl = { "Weir Crest Width", "Weir Invert Depth", "Discharge Coefficient" };
+        private string[] gOCWeirRectLbl = { "Weir Crest Length", "Invert Height above Channel Bottom", "Discharge Coefficient" };
         private double[] DefaultsWeirRect = { 10, 5, 3.33 }; // Need to check this value
         public override ControlDeviceType ControlDevice
         {
