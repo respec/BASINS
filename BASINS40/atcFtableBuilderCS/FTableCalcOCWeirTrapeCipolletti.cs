@@ -23,7 +23,7 @@ namespace atcFtableBuilder
             set { pExit = value; }
         }
         public double DischargeCoefficient = -999;
-        private string[] gOCWeirTrapeLbl = { "Weir Width", "Weir Depth", "Discharge Coefficient" };
+        private string[] gOCWeirTrapeLbl = { "Weir Length", "Weir Depth", "Discharge Coefficient" };
         private double[] DefaultsWeirTrape = { 10, 5, 3.367 };
         public override ControlDeviceType ControlDevice
         {

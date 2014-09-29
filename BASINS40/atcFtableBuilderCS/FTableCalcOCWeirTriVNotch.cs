@@ -26,7 +26,7 @@ namespace atcFtableBuilder
             set { pExit = value; }
         }
         public double DischargeCoefficient = -999;
-        private string[] gOCWeirTriVnotchLbl = { "Weir Vertex Angle (deg)", "Weir Invert Depth", "Discharge Coefficient" };
+        private string[] gOCWeirTriVnotchLbl = { "Weir Vertex Angle (deg)", "Invert Height above Channel Bottom", "Discharge Coefficient" };
         private double[] DefaultsWeirTriVnotch = { 10, 5, 0.585 };
         public override ControlDeviceType ControlDevice
         {

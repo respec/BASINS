@@ -61,10 +61,8 @@
             this.gbSetup.Controls.Add(this.treeExitControls);
             this.gbSetup.Dock = System.Windows.Forms.DockStyle.Top;
             this.gbSetup.Location = new System.Drawing.Point(0, 0);
-            this.gbSetup.Margin = new System.Windows.Forms.Padding(4);
             this.gbSetup.Name = "gbSetup";
-            this.gbSetup.Padding = new System.Windows.Forms.Padding(4);
-            this.gbSetup.Size = new System.Drawing.Size(688, 421);
+            this.gbSetup.Size = new System.Drawing.Size(531, 342);
             this.gbSetup.TabIndex = 0;
             this.gbSetup.TabStop = false;
             this.gbSetup.Text = "Exit Control Device Setup";
@@ -90,11 +88,9 @@
             this.gbControlParms.Controls.Add(this.lblOCParm0);
             this.gbControlParms.Controls.Add(this.lblOCParm1);
             this.gbControlParms.Controls.Add(this.txtOCParm_0);
-            this.gbControlParms.Location = new System.Drawing.Point(325, 16);
-            this.gbControlParms.Margin = new System.Windows.Forms.Padding(4);
+            this.gbControlParms.Location = new System.Drawing.Point(249, 13);
             this.gbControlParms.Name = "gbControlParms";
-            this.gbControlParms.Padding = new System.Windows.Forms.Padding(4);
-            this.gbControlParms.Size = new System.Drawing.Size(355, 398);
+            this.gbControlParms.Size = new System.Drawing.Size(276, 323);
             this.gbControlParms.TabIndex = 1;
             this.gbControlParms.TabStop = false;
             this.gbControlParms.Text = "Control Device Parameters";
@@ -102,10 +98,9 @@
             // btnClear
             // 
             this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClear.Location = new System.Drawing.Point(247, 362);
-            this.btnClear.Margin = new System.Windows.Forms.Padding(4);
+            this.btnClear.Location = new System.Drawing.Point(195, 294);
             this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(100, 28);
+            this.btnClear.Size = new System.Drawing.Size(75, 23);
             this.btnClear.TabIndex = 15;
             this.btnClear.Text = "Clear";
             this.btnClear.UseVisualStyleBackColor = true;
@@ -114,10 +109,9 @@
             // btnUpdate
             // 
             this.btnUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUpdate.Location = new System.Drawing.Point(116, 362);
-            this.btnUpdate.Margin = new System.Windows.Forms.Padding(4);
+            this.btnUpdate.Location = new System.Drawing.Point(97, 294);
             this.btnUpdate.Name = "btnUpdate";
-            this.btnUpdate.Size = new System.Drawing.Size(121, 28);
+            this.btnUpdate.Size = new System.Drawing.Size(91, 23);
             this.btnUpdate.TabIndex = 2;
             this.btnUpdate.Text = "Update";
             this.btnUpdate.UseVisualStyleBackColor = true;
@@ -126,10 +120,9 @@
             // rdoExit5
             // 
             this.rdoExit5.AutoSize = true;
-            this.rdoExit5.Location = new System.Drawing.Point(219, 276);
-            this.rdoExit5.Margin = new System.Windows.Forms.Padding(4);
+            this.rdoExit5.Location = new System.Drawing.Point(164, 224);
             this.rdoExit5.Name = "rdoExit5";
-            this.rdoExit5.Size = new System.Drawing.Size(37, 21);
+            this.rdoExit5.Size = new System.Drawing.Size(31, 17);
             this.rdoExit5.TabIndex = 14;
             this.rdoExit5.TabStop = true;
             this.rdoExit5.Text = "5";
@@ -138,10 +131,9 @@
             // rdoExit4
             // 
             this.rdoExit4.AutoSize = true;
-            this.rdoExit4.Location = new System.Drawing.Point(169, 276);
-            this.rdoExit4.Margin = new System.Windows.Forms.Padding(4);
+            this.rdoExit4.Location = new System.Drawing.Point(127, 224);
             this.rdoExit4.Name = "rdoExit4";
-            this.rdoExit4.Size = new System.Drawing.Size(37, 21);
+            this.rdoExit4.Size = new System.Drawing.Size(31, 17);
             this.rdoExit4.TabIndex = 13;
             this.rdoExit4.TabStop = true;
             this.rdoExit4.Text = "4";
@@ -150,10 +142,9 @@
             // btnAdd
             // 
             this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAdd.Location = new System.Drawing.Point(8, 362);
-            this.btnAdd.Margin = new System.Windows.Forms.Padding(4);
+            this.btnAdd.Location = new System.Drawing.Point(16, 294);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(100, 28);
+            this.btnAdd.Size = new System.Drawing.Size(75, 23);
             this.btnAdd.TabIndex = 1;
             this.btnAdd.Text = "Add";
             this.btnAdd.UseVisualStyleBackColor = true;
@@ -162,10 +153,9 @@
             // rdoExit3
             // 
             this.rdoExit3.AutoSize = true;
-            this.rdoExit3.Location = new System.Drawing.Point(120, 276);
-            this.rdoExit3.Margin = new System.Windows.Forms.Padding(4);
+            this.rdoExit3.Location = new System.Drawing.Point(90, 224);
             this.rdoExit3.Name = "rdoExit3";
-            this.rdoExit3.Size = new System.Drawing.Size(37, 21);
+            this.rdoExit3.Size = new System.Drawing.Size(31, 17);
             this.rdoExit3.TabIndex = 12;
             this.rdoExit3.TabStop = true;
             this.rdoExit3.Text = "3";
@@ -174,10 +164,9 @@
             // rdoExit2
             // 
             this.rdoExit2.AutoSize = true;
-            this.rdoExit2.Location = new System.Drawing.Point(71, 274);
-            this.rdoExit2.Margin = new System.Windows.Forms.Padding(4);
+            this.rdoExit2.Location = new System.Drawing.Point(53, 223);
             this.rdoExit2.Name = "rdoExit2";
-            this.rdoExit2.Size = new System.Drawing.Size(37, 21);
+            this.rdoExit2.Size = new System.Drawing.Size(31, 17);
             this.rdoExit2.TabIndex = 11;
             this.rdoExit2.TabStop = true;
             this.rdoExit2.Text = "2";
@@ -186,10 +175,9 @@
             // rdoExit1
             // 
             this.rdoExit1.AutoSize = true;
-            this.rdoExit1.Location = new System.Drawing.Point(21, 276);
-            this.rdoExit1.Margin = new System.Windows.Forms.Padding(4);
+            this.rdoExit1.Location = new System.Drawing.Point(16, 224);
             this.rdoExit1.Name = "rdoExit1";
-            this.rdoExit1.Size = new System.Drawing.Size(37, 21);
+            this.rdoExit1.Size = new System.Drawing.Size(31, 17);
             this.rdoExit1.TabIndex = 10;
             this.rdoExit1.TabStop = true;
             this.rdoExit1.Text = "1";
@@ -198,20 +186,18 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(17, 255);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(13, 207);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(86, 17);
+            this.label2.Size = new System.Drawing.Size(66, 13);
             this.label2.TabIndex = 9;
             this.label2.Text = "Channel Exit";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 27);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(10, 22);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(136, 17);
+            this.label1.Size = new System.Drawing.Size(104, 13);
             this.label1.TabIndex = 8;
             this.label1.Text = "Control Device Type";
             // 
@@ -221,67 +207,60 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cboOCTypes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboOCTypes.FormattingEnabled = true;
-            this.cboOCTypes.Location = new System.Drawing.Point(160, 23);
-            this.cboOCTypes.Margin = new System.Windows.Forms.Padding(4);
+            this.cboOCTypes.Location = new System.Drawing.Point(120, 19);
             this.cboOCTypes.Name = "cboOCTypes";
-            this.cboOCTypes.Size = new System.Drawing.Size(185, 24);
+            this.cboOCTypes.Size = new System.Drawing.Size(150, 21);
             this.cboOCTypes.TabIndex = 7;
             this.cboOCTypes.SelectedIndexChanged += new System.EventHandler(this.cboOCTypes_SelectedIndexChanged);
             // 
             // txtOCDisCoeff
             // 
-            this.txtOCDisCoeff.Location = new System.Drawing.Point(180, 197);
-            this.txtOCDisCoeff.Margin = new System.Windows.Forms.Padding(4);
+            this.txtOCDisCoeff.Location = new System.Drawing.Point(195, 160);
             this.txtOCDisCoeff.Name = "txtOCDisCoeff";
-            this.txtOCDisCoeff.Size = new System.Drawing.Size(165, 22);
+            this.txtOCDisCoeff.Size = new System.Drawing.Size(75, 20);
             this.txtOCDisCoeff.TabIndex = 6;
             this.txtOCDisCoeff.Tag = "2";
             // 
             // lblOCParm3
             // 
             this.lblOCParm3.AutoSize = true;
-            this.lblOCParm3.Location = new System.Drawing.Point(13, 201);
-            this.lblOCParm3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblOCParm3.Location = new System.Drawing.Point(13, 163);
             this.lblOCParm3.Name = "lblOCParm3";
-            this.lblOCParm3.Size = new System.Drawing.Size(142, 17);
+            this.lblOCParm3.Size = new System.Drawing.Size(108, 13);
             this.lblOCParm3.TabIndex = 5;
             this.lblOCParm3.Text = "Discharge Coefficient";
             // 
             // txtOCParm_1
             // 
-            this.txtOCParm_1.Location = new System.Drawing.Point(180, 165);
-            this.txtOCParm_1.Margin = new System.Windows.Forms.Padding(4);
+            this.txtOCParm_1.Location = new System.Drawing.Point(195, 134);
             this.txtOCParm_1.Name = "txtOCParm_1";
-            this.txtOCParm_1.Size = new System.Drawing.Size(165, 22);
+            this.txtOCParm_1.Size = new System.Drawing.Size(75, 20);
             this.txtOCParm_1.TabIndex = 4;
             this.txtOCParm_1.Tag = "1";
             // 
             // lblOCParm0
             // 
             this.lblOCParm0.AutoSize = true;
-            this.lblOCParm0.Location = new System.Drawing.Point(13, 137);
-            this.lblOCParm0.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblOCParm0.Location = new System.Drawing.Point(13, 111);
             this.lblOCParm0.Name = "lblOCParm0";
-            this.lblOCParm0.Size = new System.Drawing.Size(73, 17);
+            this.lblOCParm0.Size = new System.Drawing.Size(55, 13);
             this.lblOCParm0.TabIndex = 1;
             this.lblOCParm0.Text = "OC Parm0";
             // 
             // lblOCParm1
             // 
             this.lblOCParm1.AutoSize = true;
-            this.lblOCParm1.Location = new System.Drawing.Point(13, 169);
-            this.lblOCParm1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblOCParm1.Location = new System.Drawing.Point(13, 137);
             this.lblOCParm1.Name = "lblOCParm1";
-            this.lblOCParm1.Size = new System.Drawing.Size(81, 17);
+            this.lblOCParm1.Size = new System.Drawing.Size(61, 13);
             this.lblOCParm1.TabIndex = 3;
             this.lblOCParm1.Text = "OC Param1";
             // 
             // txtOCParm_0
             // 
-            this.txtOCParm_0.Location = new System.Drawing.Point(180, 133);
-            this.txtOCParm_0.Margin = new System.Windows.Forms.Padding(4);
+            this.txtOCParm_0.Location = new System.Drawing.Point(195, 108);
             this.txtOCParm_0.Name = "txtOCParm_0";
-            this.txtOCParm_0.Size = new System.Drawing.Size(165, 22);
+            this.txtOCParm_0.Size = new System.Drawing.Size(75, 20);
             this.txtOCParm_0.TabIndex = 2;
             this.txtOCParm_0.Tag = "0";
             // 
@@ -290,19 +269,17 @@
             this.treeExitControls.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeExitControls.Location = new System.Drawing.Point(8, 25);
-            this.treeExitControls.Margin = new System.Windows.Forms.Padding(4);
+            this.treeExitControls.Location = new System.Drawing.Point(6, 20);
             this.treeExitControls.Name = "treeExitControls";
-            this.treeExitControls.Size = new System.Drawing.Size(308, 388);
+            this.treeExitControls.Size = new System.Drawing.Size(237, 316);
             this.treeExitControls.TabIndex = 0;
             this.treeExitControls.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeExitControls_MouseUp);
             // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(8, 428);
-            this.btnDelete.Margin = new System.Windows.Forms.Padding(4);
+            this.btnDelete.Location = new System.Drawing.Point(6, 348);
             this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(123, 28);
+            this.btnDelete.Size = new System.Drawing.Size(92, 23);
             this.btnDelete.TabIndex = 3;
             this.btnDelete.Text = "Delete Selected";
             this.btnDelete.UseVisualStyleBackColor = true;
@@ -311,9 +288,10 @@
             // btnDone
             // 
             this.btnDone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDone.Location = new System.Drawing.Point(601, 430);
+            this.btnDone.Location = new System.Drawing.Point(466, 349);
+            this.btnDone.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnDone.Name = "btnDone";
-            this.btnDone.Size = new System.Drawing.Size(75, 23);
+            this.btnDone.Size = new System.Drawing.Size(56, 19);
             this.btnDone.TabIndex = 4;
             this.btnDone.Text = "Done";
             this.btnDone.UseVisualStyleBackColor = true;
@@ -321,14 +299,13 @@
             // 
             // frmOutflowControlsME
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(688, 465);
+            this.ClientSize = new System.Drawing.Size(531, 378);
             this.Controls.Add(this.btnDone);
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.gbSetup);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmOutflowControlsME";
             this.Text = "Multiple-Exit Control Devices";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmOutflowControlsME_FormClosing);
