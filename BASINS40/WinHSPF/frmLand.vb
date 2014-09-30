@@ -149,7 +149,7 @@ Public Class frmLand
                 lTargetID = lHspfOperator.Name & " " & lHspfOperator.Id
                 lRow = grdLand.Source.Rows
                 With ListSources
-                    If lHspfOperator.Name <> "COPY" AndAlso .Items.Contains(lSourceID) AndAlso .GetItemChecked(.FindStringExact(lSourceID)) AndAlso ListTargets.GetItemChecked(ListTargets.FindStringExact(lTargetID)) Then
+                    If lHspfOperator.Name <> "COPY" AndAlso .Items.Contains(lSourceID) AndAlso .GetItemChecked(.FindStringExact(lSourceID)) AndAlso ListTargets.FindStringExact(lTargetID) > -1 AndAlso ListTargets.GetItemChecked(ListTargets.FindStringExact(lTargetID)) Then
                         grdLand.Source.CellValue(lRow, 0) = lSourceID
                         grdLand.Source.CellValue(lRow, 1) = lHspfConnection.Source.Opn.Description
                         grdLand.Source.CellValue(lRow, 2) = lTargetID

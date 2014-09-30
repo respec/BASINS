@@ -2050,7 +2050,7 @@ x:
     Public Sub AddOperationToOpnSeqBlock(ByVal aOperationName As String, ByVal aOperationId As Integer, ByVal aPosition As Integer)
 
         'add to opn seq block
-        If aPosition < Me.OpnSeqBlock.Opns.Count Then
+        If aPosition > -1 AndAlso aPosition < Me.OpnSeqBlock.Opns.Count Then
             Me.OpnSeqBlock.AddBefore(Me.OpnBlks(aOperationName).OperFromID(aOperationId), aPosition)
         Else
             Me.OpnSeqBlock.Add(Me.OpnBlks(aOperationName).OperFromID(aOperationId))

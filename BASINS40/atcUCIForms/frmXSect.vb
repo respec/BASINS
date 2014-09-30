@@ -1,6 +1,7 @@
 Imports System.Drawing
 Imports MapWinUtility
 Imports atcUCI
+Imports atcUtility
 Imports System.IO
 
 Public Class frmXSect
@@ -13,6 +14,8 @@ Public Class frmXSect
     Dim chanid, ChanL, ChanYm, ChanWm, ChanN, ChanS, ChanM11, ChanM12, ChanYc, ChanM21, ChanM22, ChanYt1, ChanYt2 As New ArrayList
     Dim ChanM31, ChanM32, ChanW11, ChanW12 As New ArrayList
     Dim pPrevSelectedId As Integer
+    Public pHelpManualName As String
+    Public pHelpManualPage As String
 
     Public Sub cboXFile_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboXFile.SelectedIndexChanged
 
@@ -318,6 +321,7 @@ Public Class frmXSect
     End Sub
 
     Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
-        'TODO: Add this Code
+        ShowHelp(pHelpManualName)
+        ShowHelp(pHelpManualPage)
     End Sub
 End Class
