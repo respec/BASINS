@@ -91,6 +91,8 @@ namespace atcFtableBuilder
         public static FTableCalculator.BMPType gBMPType = FTableCalculator.BMPType.None;
 
         public static atcUCI.HspfFtable pFTable;
+        public static string pHelpManualName;
+        public static string pHelpManualPage;
 
         #region Outflow Control
 
