@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using atcUtility;
 
 namespace atcFtableBuilder
 {
@@ -1433,5 +1434,15 @@ namespace atcFtableBuilder
                 return;
             ClearProfileGrid();
         }
+
+        private void btnHelp_Click(object sender, EventArgs e)
+        {
+            //System.Windows.Forms.MessageBox.Show(clsGlobals.pHelpManualName);
+            atcUtility.modFile.ShowHelp(clsGlobals.pHelpManualName);
+            //System.Windows.Forms.MessageBox.Show(clsGlobals.pHelpManualPage);
+            atcUtility.modFile.ShowHelp(clsGlobals.pHelpManualPage);
+            //System.Windows.Forms.MessageBox.Show("Done Help");
+        }
+
     }
 }
