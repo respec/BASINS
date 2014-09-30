@@ -86,9 +86,9 @@ Public Class frmReach
 
     Private Sub FTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles FTables.Click
         If pSelectedRow > 0 Then
-            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(1).FTable, "FTABLES", pHSPFManualName)
+            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(1).FTable, "FTABLES", pHSPFManualName, pWinHSPFManualName)
         Else
-            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(pSelectedRow).FTable, "FTABLES", pHSPFManualName)
+            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(pSelectedRow).FTable, "FTABLES", pHSPFManualName, pWinHSPFManualName)
         End If
     End Sub
 

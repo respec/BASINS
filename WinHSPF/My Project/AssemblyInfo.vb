@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("")> 
 <Assembly: AssemblyProduct("WinHSPF")> 
-<Assembly: AssemblyCopyright("Copyright © 2006-2013")> 
+<Assembly: AssemblyCopyright("Copyright © 2006-2014")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("3.0.1.0")> 
-<Assembly: AssemblyFileVersion("3.0.1.1008")> 
+<Assembly: AssemblyVersion("3.0.2.0")> 
+<Assembly: AssemblyFileVersion("3.0.2.0")> 

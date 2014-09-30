@@ -10,6 +10,7 @@ Public Class ctlEditFTables
     Dim pVScrollColumnOffset As Integer = 16
     Dim pHspfFtable As HspfFtable
     Dim pChanged As Boolean
+    Dim pExtendedHelpFile As String
     Dim pfrmXSect As frmXSect
     Dim pfrmNewFTable As New frmNewFTable
     Dim newFTable As New HspfFtable
@@ -37,6 +38,15 @@ Public Class ctlEditFTables
                 pChanged = aChanged
                 RaiseEvent Change(aChanged)
             End If
+        End Set
+    End Property
+
+    Public Property ExtendedHelpFile() As String
+        Get
+            Return pExtendedHelpFile
+        End Get
+        Set(ByVal aExtendedHelpFile As String)
+            pExtendedHelpFile = aExtendedHelpFile
         End Set
     End Property
 
@@ -298,6 +308,8 @@ Public Class ctlEditFTables
             txtNCols.ValueInteger = pHspfFtable.Ncols
             pfrmXSect.Init(pHspfFtable, Me)
             pfrmXSect.Owner = frmEdit.ActiveForm
+            pfrmXSect.pHelpManualName = pExtendedHelpFile
+            pfrmXSect.pHelpManualPage = "User's Guide\Detailed Functions\Reach Editor\Import From Cross Section.html"
             pfrmXSect.Show()
         Else
             If pfrmXSect.IsDisposed Then
@@ -307,18 +319,18 @@ Public Class ctlEditFTables
                 txtNCols.ValueInteger = pHspfFtable.Ncols
                 pfrmXSect.Init(pHspfFtable, Me)
                 pfrmXSect.Owner = frmEdit.ActiveForm
+                pfrmXSect.pHelpManualName = pExtendedHelpFile
+                pfrmXSect.pHelpManualPage = "User's Guide\Detailed Functions\Reach Editor\Import From Cross Section.html"
                 pfrmXSect.Show()
             Else
                 pfrmXSect.WindowState = FormWindowState.Normal
                 pfrmXSect.BringToFront()
-
             End If
         End If
 
     End Sub
 
     Private Sub cmdCompute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCompute.Click
-
 
         If IsNothing(pfrmXSect) Then
             pfrmNewFTable = New frmNewFTable
@@ -327,6 +339,8 @@ Public Class ctlEditFTables
             pfrmNewFTable.SetCurrentFTable(newFTable, Me)
             pfrmNewFTable.Init()
             pfrmNewFTable.Owner = frmEdit.ActiveForm
+            pfrmNewFTable.pHelpManualName = pExtendedHelpFile
+            pfrmNewFTable.pHelpManualPage = "User's Guide\Detailed Functions\Reach Editor\Compute New.html"
             pfrmNewFTable.Show()
         Else
             If pfrmXSect.IsDisposed Then
@@ -336,14 +350,14 @@ Public Class ctlEditFTables
                 pfrmNewFTable.SetCurrentFTable(newFTable, Me)
                 pfrmNewFTable.Init()
                 pfrmNewFTable.Owner = frmEdit.ActiveForm
+                pfrmNewFTable.pHelpManualName = pExtendedHelpFile
+                pfrmNewFTable.pHelpManualPage = "User's Guide\Detailed Functions\Reach Editor\Compute New.html"
                 pfrmNewFTable.Show()
             Else
                 pfrmNewFTable.WindowState = FormWindowState.Normal
                 pfrmNewFTable.BringToFront()
-
             End If
         End If
-
 
     End Sub
 
@@ -421,6 +435,8 @@ Public Class ctlEditFTables
     Private Sub cmdLID_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdLID.Click
         atcFtableBuilder.clsGlobals.gToolType = atcFtableBuilder.clsGlobals.ToolType.Green
         atcFtableBuilder.clsGlobals.pFTable = pHspfFtable
+        atcFtableBuilder.clsGlobals.pHelpManualName = pExtendedHelpFile
+        atcFtableBuilder.clsGlobals.pHelpManualPage = "User's Guide\Detailed Functions\Reach Editor\LID Controls Tool.html"
         Dim lBuilder As New atcFtableBuilder.mainForm
         lBuilder.ShowDialog()
         txtNRows.ValueInteger = pHspfFtable.Nrows
@@ -432,6 +448,8 @@ Public Class ctlEditFTables
     Private Sub cmdOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOpen.Click
         atcFtableBuilder.clsGlobals.gToolType = atcFtableBuilder.clsGlobals.ToolType.Gray
         atcFtableBuilder.clsGlobals.pFTable = pHspfFtable
+        atcFtableBuilder.clsGlobals.pHelpManualName = pExtendedHelpFile
+        atcFtableBuilder.clsGlobals.pHelpManualPage = "User's Guide\Detailed Functions\Reach Editor\Sewer and Open Channel Tool.html"
         Dim lBuilder As New atcFtableBuilder.mainForm
         lBuilder.ShowDialog()
         txtNRows.ValueInteger = pHspfFtable.Nrows

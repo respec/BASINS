@@ -5,6 +5,9 @@ Public Class frmNewFTable
 
     Dim lFtab As HspfFtable
     Dim pFTableCtl As Object 'the control containing the ftable grid
+    Public pHelpManualName As String
+    Public pHelpManualPage As String
+
     Public Sub SetCurrentFTable(ByVal ftab As HspfFtable, ByVal O As Object)
         lFtab = ftab
         pFTableCtl = O
@@ -755,4 +758,10 @@ LastDepth:
     '    lo = Nothing
     'End Sub
 
+    Private Sub frmNewFTable_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pHelpManualName)
+            ShowHelp(pHelpManualPage)
+        End If
+    End Sub
 End Class

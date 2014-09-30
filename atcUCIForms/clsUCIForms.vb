@@ -10,7 +10,8 @@ Public Class UCIForms
 
     Public Shared Function Edit(ByVal aParent As Windows.Forms.Form, _
                                 ByVal aObject As Object, Optional ByVal aTag As String = "", _
-                                Optional ByVal aUsersManualFileName As String = "") As Boolean
+                                Optional ByVal aUsersManualFileName As String = "", _
+                                Optional ByVal aWinHSPFManualFileName As String = "") As Boolean
         Dim lForm As Windows.Forms.Form = Nothing
         Dim lPage As String = "Users Control Input/FORMAT OF THE USERS CONTROL INPUT/" & aTag & " Block.html"
 
@@ -44,6 +45,7 @@ Public Class UCIForms
             Case "HspfFtable"
                 Dim lFormEdit As New frmEdit(aParent, aUsersManualFileName, lPage)
                 Dim lEditFTables As New ctlEditFTables(aObject, aParent)
+                lEditFTables.ExtendedHelpFile = aWinHSPFManualFileName
                 lFormEdit.Text = lEditFTables.Caption
                 lFormEdit.EditControl = lEditFTables
                 lFormEdit.MinimumSize = lFormEdit.Size
@@ -124,26 +126,26 @@ Public Class UCIForms
                     lForm = lFormEdit
                 End If
             Case "HspfMassLink"
-                    lPage = "Users Control Input/FORMAT OF THE USERS CONTROL INPUT/TIME SERIES LINKAGES/SCHEMATIC and MASS-LINK Blocks/MASS-LINK Block.html"
-                    Dim lFormEdit As New frmEdit(aParent, aUsersManualFileName, lPage)
-                    Dim lEditMassLinks As New ctlEditMassLinks(aObject, aParent, aTag)
-                    lFormEdit.Text = lEditMassLinks.Caption
-                    lFormEdit.MinimumSize = New System.Drawing.Size(650, 428)
-                    lFormEdit.EditControl = lEditMassLinks
-                    lFormEdit.AddRemoveFlag = True
-                    lFormEdit.EditFlag = False
-                    lForm = lFormEdit
+                lPage = "Users Control Input/FORMAT OF THE USERS CONTROL INPUT/TIME SERIES LINKAGES/SCHEMATIC and MASS-LINK Blocks/MASS-LINK Block.html"
+                Dim lFormEdit As New frmEdit(aParent, aUsersManualFileName, lPage)
+                Dim lEditMassLinks As New ctlEditMassLinks(aObject, aParent, aTag)
+                lFormEdit.Text = lEditMassLinks.Caption
+                lFormEdit.MinimumSize = New System.Drawing.Size(650, 428)
+                lFormEdit.EditControl = lEditMassLinks
+                lFormEdit.AddRemoveFlag = True
+                lFormEdit.EditFlag = False
+                lForm = lFormEdit
             Case "HspfMonthData"
-                    Dim lFormEdit As New frmEdit(aParent, aUsersManualFileName, lPage)
-                    Dim lEditMonthData As New ctlEditMonthData(aObject, aParent)
-                    lFormEdit.Text = lEditMonthData.Caption
-                    lFormEdit.EditControl = lEditMonthData
-                    lFormEdit.MinimumSize = lFormEdit.Size
-                    lFormEdit.AddRemoveFlag = True
-                    lFormEdit.EditFlag = False
-                    lForm = lFormEdit
+                Dim lFormEdit As New frmEdit(aParent, aUsersManualFileName, lPage)
+                Dim lEditMonthData As New ctlEditMonthData(aObject, aParent)
+                lFormEdit.Text = lEditMonthData.Caption
+                lFormEdit.EditControl = lEditMonthData
+                lFormEdit.MinimumSize = lFormEdit.Size
+                lFormEdit.AddRemoveFlag = True
+                lFormEdit.EditFlag = False
+                lForm = lFormEdit
             Case Else
-                    lForm = Nothing
+                lForm = Nothing
         End Select
 
         If Not lForm Is Nothing Then

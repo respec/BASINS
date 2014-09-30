@@ -707,7 +707,7 @@ Partial Class frmNewFTable
         Me.AtcText12.NumericFormat = "0.#####"
         Me.AtcText12.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText12.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText12.SelLength = 1
+        Me.AtcText12.SelLength = 0
         Me.AtcText12.SelStart = 0
         Me.AtcText12.Size = New System.Drawing.Size(93, 23)
         Me.AtcText12.SoftMax = 0
@@ -730,7 +730,7 @@ Partial Class frmNewFTable
         Me.AtcText13.NumericFormat = "0.#####"
         Me.AtcText13.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText13.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText13.SelLength = 1
+        Me.AtcText13.SelLength = 0
         Me.AtcText13.SelStart = 0
         Me.AtcText13.Size = New System.Drawing.Size(93, 23)
         Me.AtcText13.SoftMax = 0
@@ -753,7 +753,7 @@ Partial Class frmNewFTable
         Me.AtcText22.NumericFormat = "0.#####"
         Me.AtcText22.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText22.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText22.SelLength = 1
+        Me.AtcText22.SelLength = 0
         Me.AtcText22.SelStart = 0
         Me.AtcText22.Size = New System.Drawing.Size(93, 23)
         Me.AtcText22.SoftMax = 0
@@ -776,7 +776,7 @@ Partial Class frmNewFTable
         Me.AtcText21.NumericFormat = "0.#####"
         Me.AtcText21.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText21.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText21.SelLength = 1
+        Me.AtcText21.SelLength = 0
         Me.AtcText21.SelStart = 0
         Me.AtcText21.Size = New System.Drawing.Size(93, 23)
         Me.AtcText21.SoftMax = 0
@@ -799,7 +799,7 @@ Partial Class frmNewFTable
         Me.AtcText1.NumericFormat = "0.#####"
         Me.AtcText1.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText1.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText1.SelLength = 1
+        Me.AtcText1.SelLength = 0
         Me.AtcText1.SelStart = 0
         Me.AtcText1.Size = New System.Drawing.Size(93, 23)
         Me.AtcText1.SoftMax = 0
@@ -822,7 +822,7 @@ Partial Class frmNewFTable
         Me.AtcText14.NumericFormat = "0.#####"
         Me.AtcText14.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText14.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText14.SelLength = 1
+        Me.AtcText14.SelLength = 0
         Me.AtcText14.SelStart = 0
         Me.AtcText14.Size = New System.Drawing.Size(93, 23)
         Me.AtcText14.SoftMax = 0
@@ -845,7 +845,7 @@ Partial Class frmNewFTable
         Me.AtcText15.NumericFormat = "0.#####"
         Me.AtcText15.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText15.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText15.SelLength = 1
+        Me.AtcText15.SelLength = 0
         Me.AtcText15.SelStart = 0
         Me.AtcText15.Size = New System.Drawing.Size(93, 23)
         Me.AtcText15.SoftMax = 0
@@ -868,7 +868,7 @@ Partial Class frmNewFTable
         Me.AtcText16.NumericFormat = "0.#####"
         Me.AtcText16.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText16.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText16.SelLength = 1
+        Me.AtcText16.SelLength = 0
         Me.AtcText16.SelStart = 0
         Me.AtcText16.Size = New System.Drawing.Size(93, 23)
         Me.AtcText16.SoftMax = 0
@@ -891,7 +891,7 @@ Partial Class frmNewFTable
         Me.AtcText17.NumericFormat = "0.#####"
         Me.AtcText17.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText17.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText17.SelLength = 1
+        Me.AtcText17.SelLength = 0
         Me.AtcText17.SelStart = 0
         Me.AtcText17.Size = New System.Drawing.Size(93, 23)
         Me.AtcText17.SoftMax = 0
@@ -914,7 +914,7 @@ Partial Class frmNewFTable
         Me.AtcText18.NumericFormat = "0.#####"
         Me.AtcText18.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText18.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText18.SelLength = 1
+        Me.AtcText18.SelLength = 0
         Me.AtcText18.SelStart = 0
         Me.AtcText18.Size = New System.Drawing.Size(93, 23)
         Me.AtcText18.SoftMax = 0
@@ -937,7 +937,7 @@ Partial Class frmNewFTable
         Me.AtcText19.NumericFormat = "0.#####"
         Me.AtcText19.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText19.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText19.SelLength = 1
+        Me.AtcText19.SelLength = 0
         Me.AtcText19.SelStart = 0
         Me.AtcText19.Size = New System.Drawing.Size(93, 23)
         Me.AtcText19.SoftMax = 0
@@ -960,7 +960,7 @@ Partial Class frmNewFTable
         Me.AtcText2.NumericFormat = "0.#####"
         Me.AtcText2.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText2.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText2.SelLength = 1
+        Me.AtcText2.SelLength = 0
         Me.AtcText2.SelStart = 0
         Me.AtcText2.Size = New System.Drawing.Size(93, 23)
         Me.AtcText2.SoftMax = 0
@@ -983,7 +983,7 @@ Partial Class frmNewFTable
         Me.AtcText20.NumericFormat = "0.#####"
         Me.AtcText20.OutsideHardLimitBackground = System.Drawing.Color.Empty
         Me.AtcText20.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.AtcText20.SelLength = 1
+        Me.AtcText20.SelLength = 0
         Me.AtcText20.SelStart = 0
         Me.AtcText20.Size = New System.Drawing.Size(93, 23)
         Me.AtcText20.SoftMax = 0
@@ -1006,6 +1006,7 @@ Partial Class frmNewFTable
         Me.Controls.Add(Me.TextLabel3)
         Me.Controls.Add(Me.TextLabel2)
         Me.Controls.Add(Me.TextLabel1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "frmNewFTable"
         Me.Text = "Form1"
