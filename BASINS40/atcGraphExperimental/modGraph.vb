@@ -605,9 +605,14 @@ FoundMatch:
                     lCurveLabel &= lLocation
                 End If
             End If
-            If Not String.IsNullOrEmpty(lCurveLabel) Then
+            If lCurveLabel.Length > 0 Then
                 lCurveLabel = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(lCurveLabel.ToLower())
             End If
+
+            If .ContainsAttribute("SeasonName") Then
+                lCurveLabel &= " " & .GetFormattedValue("SeasonName")
+            End If
+
             If String.IsNullOrEmpty(aCommonUnits) AndAlso .ContainsAttribute("Units") Then
                 lCurveLabel &= " (" & .GetValue("Units", "") & ")"
             End If

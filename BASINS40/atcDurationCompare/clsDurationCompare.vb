@@ -2,7 +2,7 @@ Imports atcData
 Imports atcUtility
 
 Public Class clsDurationComparePlugin
-    Inherits atcDataPlugin
+    Inherits atcDataDisplay
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -54,5 +54,15 @@ Public Class clsDurationComparePlugin
             End If
         End If
     End Sub
+
+    Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
+        If aTimeseriesGroup.Count > 0 Then
+            Dim lFrmAnalysis As frmAnalysis = New frmAnalysis(aTimeseriesGroup)
+            lFrmAnalysis.Show()
+            Return lFrmAnalysis
+        End If
+        Return Nothing
+    End Function
+
 #End If
 End Class
