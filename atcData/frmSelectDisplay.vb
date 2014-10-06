@@ -25,7 +25,7 @@ Public Class frmSelectDisplay
         End If
         MyBase.Dispose(disposing)
     End Sub
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents grpDisplay As System.Windows.Forms.GroupBox
     Friend WithEvents lblDescribeDatasets As System.Windows.Forms.Label
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents btnSave As System.Windows.Forms.Button
@@ -35,6 +35,7 @@ Public Class frmSelectDisplay
     Friend WithEvents btnGraph As System.Windows.Forms.Button
     Friend WithEvents btnList As System.Windows.Forms.Button
     Friend WithEvents btnSelect As System.Windows.Forms.Button
+    Friend WithEvents btnDuration As System.Windows.Forms.Button
 
     'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
@@ -44,7 +45,7 @@ Public Class frmSelectDisplay
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectDisplay))
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.grpDisplay = New System.Windows.Forms.GroupBox
         Me.btnSeasonal = New System.Windows.Forms.Button
         Me.btnTree = New System.Windows.Forms.Button
         Me.btnGraph = New System.Windows.Forms.Button
@@ -54,24 +55,25 @@ Public Class frmSelectDisplay
         Me.btnSave = New System.Windows.Forms.Button
         Me.btnDiscard = New System.Windows.Forms.Button
         Me.btnSelect = New System.Windows.Forms.Button
-        Me.GroupBox1.SuspendLayout()
+        Me.btnDuration = New System.Windows.Forms.Button
+        Me.grpDisplay.SuspendLayout()
         Me.SuspendLayout()
         '
-        'GroupBox1
+        'grpDisplay
         '
-        Me.GroupBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.grpDisplay.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox1.Controls.Add(Me.btnSeasonal)
-        Me.GroupBox1.Controls.Add(Me.btnTree)
-        Me.GroupBox1.Controls.Add(Me.btnGraph)
-        Me.GroupBox1.Controls.Add(Me.btnList)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 144)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(211, 139)
-        Me.GroupBox1.TabIndex = 0
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Display"
+        Me.grpDisplay.Controls.Add(Me.btnSeasonal)
+        Me.grpDisplay.Controls.Add(Me.btnTree)
+        Me.grpDisplay.Controls.Add(Me.btnGraph)
+        Me.grpDisplay.Controls.Add(Me.btnList)
+        Me.grpDisplay.Location = New System.Drawing.Point(12, 144)
+        Me.grpDisplay.Name = "grpDisplay"
+        Me.grpDisplay.Size = New System.Drawing.Size(211, 138)
+        Me.grpDisplay.TabIndex = 0
+        Me.grpDisplay.TabStop = False
+        Me.grpDisplay.Text = "Display"
         '
         'btnSeasonal
         '
@@ -172,21 +174,34 @@ Public Class frmSelectDisplay
         Me.btnSelect.Text = "Re-Select Datasets"
         Me.btnSelect.UseVisualStyleBackColor = True
         '
+        'btnDuration
+        '
+        Me.btnDuration.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnDuration.Location = New System.Drawing.Point(18, 288)
+        Me.btnDuration.Name = "btnDuration"
+        Me.btnDuration.Size = New System.Drawing.Size(197, 23)
+        Me.btnDuration.TabIndex = 8
+        Me.btnDuration.Tag = "Analysis::Duration"
+        Me.btnDuration.Text = "Duration/Compare"
+        Me.btnDuration.UseVisualStyleBackColor = True
+        '
         'frmSelectDisplay
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(235, 295)
+        Me.ClientSize = New System.Drawing.Size(235, 340)
+        Me.Controls.Add(Me.btnDuration)
         Me.Controls.Add(Me.btnSelect)
         Me.Controls.Add(Me.btnDiscard)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.lblDescribeDatasets)
-        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.grpDisplay)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmSelectDisplay"
         Me.Text = "Display Data"
-        Me.GroupBox1.ResumeLayout(False)
+        Me.grpDisplay.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -268,5 +283,9 @@ Public Class frmSelectDisplay
         If e.KeyValue = Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Time-Series Management.html")
         End If
+    End Sub
+
+    Private Sub btnDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDuration.Click
+        atcDataManager.ShowDisplay("Analysis::USGS Surface Water Statistics (SWSTAT)::Duration/Compare", pTimeseriesGroup, Me.Icon)
     End Sub
 End Class

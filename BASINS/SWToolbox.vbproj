@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{FE1EB45F-9146-4B93-ABA2-5C8C562D9823}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -246,8 +246,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>del S:\dev\BASINS40\Bin\Plugins\Basins\basins.dll
-del S:\dev\BASINS40\Bin\Plugins\Basins\GWToolbox.dll</PreBuildEvent>
+    <PreBuildEvent>rem del S:\dev\BASINS40\Bin\Plugins\Basins\basins.dll
+rem del S:\dev\BASINS40\Bin\Plugins\Basins\GWToolbox.dll</PreBuildEvent>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>

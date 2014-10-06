@@ -306,20 +306,23 @@ Public Class clsGraphFrequency
 
             'Only add confidence intervals when we have one dataset and one n-day
             If lOneCurve Then
-                'Dim lCIcolor As Color = Color.FromArgb(80, aCurveColor.R, aCurveColor.G, aCurveColor.B)
-                Dim lCIcolor As Color = Color.Red
-                Dim lHighLowWord As String
-                If lHigh Then
-                    lHighLowWord = "High"
-                Else
-                    lHighLowWord = "Low"
-                End If
+                'Only show confidence intervals if there were no zero values
+                If aTimeseries.Attributes.GetValue("Count Zero", 0) = 0 Then
+                    'Dim lCIcolor As Color = Color.FromArgb(80, aCurveColor.R, aCurveColor.G, aCurveColor.B)
+                    Dim lCIcolor As Color = Color.Red
+                    Dim lHighLowWord As String
+                    If lHigh Then
+                        lHighLowWord = "High"
+                    Else
+                        lHighLowWord = "Low"
+                    End If
 
-                lCurveLegendPrefix = lNdays & lHighLowWord
-                lCurveLegendSuffix = " CI Upper"
-                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lCurveLegendPrefix, lCurveLegendSuffix, Drawing2D.DashStyle.Dash, aMinX, aMaxX)
-                lCurveLegendSuffix = " CI Lower"
-                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lCurveLegendPrefix, lCurveLegendSuffix, Drawing2D.DashStyle.Dot, aMinX, aMaxX)
+                    lCurveLegendPrefix = lNdays & lHighLowWord
+                    lCurveLegendSuffix = " CI Upper"
+                    AddAttributeCurve(aTimeseries, aPane, lCIcolor, lCurveLegendPrefix, lCurveLegendSuffix, Drawing2D.DashStyle.Dash, aMinX, aMaxX)
+                    lCurveLegendSuffix = " CI Lower"
+                    AddAttributeCurve(aTimeseries, aPane, lCIcolor, lCurveLegendPrefix, lCurveLegendSuffix, Drawing2D.DashStyle.Dot, aMinX, aMaxX)
+                End If
             End If
         Next
     End Sub
