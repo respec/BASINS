@@ -126,7 +126,7 @@ Partial Class frmMain
         Me.btnSaveWDM.Name = "btnSaveWDM"
         Me.btnSaveWDM.Size = New System.Drawing.Size(126, 23)
         Me.btnSaveWDM.TabIndex = 7
-        Me.btnSaveWDM.Text = "Save to WDM"
+        Me.btnSaveWDM.Text = "Save As Data"
         Me.btnSaveWDM.UseVisualStyleBackColor = True
         '
         'btnImportWDM
@@ -178,7 +178,7 @@ Partial Class frmMain
         Me.btnSaveList.Name = "btnSaveList"
         Me.btnSaveList.Size = New System.Drawing.Size(126, 23)
         Me.btnSaveList.TabIndex = 12
-        Me.btnSaveList.Text = "Save List As Text"
+        Me.btnSaveList.Text = "Save As Text"
         Me.btnSaveList.UseVisualStyleBackColor = True
         '
         'grpView

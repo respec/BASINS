@@ -69,6 +69,7 @@ Public Class frmMain
 
         atcDataManager.Clear()
         With atcDataManager.DataPlugins
+            .Add(New atcBasinsObsWQ.atcDataSourceBasinsObsWQ)
             .Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
             '.Add(New atcWdmVb.atcWDMfile)
             .Add(New atcWDM.atcDataSourceWDM)
