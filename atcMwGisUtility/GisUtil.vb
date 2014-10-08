@@ -2806,6 +2806,101 @@ Public Class GisUtil
         lLuGrid = Nothing
     End Sub
 
+    Public Shared Sub ComputeToWetlands(ByVal aFlowDirGridFileName As String, ByVal aWetlandsFileName As String, ByVal aStreamsFileName As String, ByVal aToWetlandsGridFileName As String)
+        'Compute ToWetlands grid using the Flow Direction grid, wetlands GIS layer, and stream reach shapefile.  
+
+        'This algorithm uses a pixel-by-pixel approach to determine if each pixel (grid cell)
+        'drains to a wetland or to a stream reach (without first passing through a wetland). 
+
+        'prepare the output grid
+        If FileExists(aToWetlandsGridFileName) Then
+            IO.File.Delete(aToWetlandsGridFileName)
+        End If
+        IO.File.Copy(aFlowDirGridFileName, aToWetlandsGridFileName)
+
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aToWetlandsGridFileName)
+
+        'prepare the wetlands layer   'todo: handle if wetlands is a grid instead of shapefile
+        Dim lWetlandsLayerIndex As Integer = 0
+        Dim lPolygonSf As MapWinGIS.Shapefile = Nothing
+        If GisUtil.IsLayerByFileName(aWetlandsFileName) Then
+            lWetlandsLayerIndex = GisUtil.LayerIndex(aWetlandsFileName)
+            lPolygonSf = PolygonShapeFileFromIndex(lWetlandsLayerIndex)
+        End If
+
+        'initialize the new grid
+        lPolygonSf.BeginPointInShapefile()
+        Dim lXPos As Double = 0.0
+        Dim lYPos As Double = 0.0
+        Dim lCol As Integer = 0
+        Dim lRow As Integer = 0
+        Dim lSubId As Integer = -1
+        Dim lNoData As Double = lOutputGrid.Header.NodataValue
+        For lRow = 0 To lOutputGrid.Header.NumberRows - 1
+            For lCol = 0 To lOutputGrid.Header.NumberCols - 1
+                lOutputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
+                lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
+                If lSubId > -1 Then
+                    lOutputGrid.Value(lCol, lRow) = 99  'this is wetlands
+                End If
+            Next
+            Logger.Progress(lRow, lOutputGrid.Header.NumberRows)
+        Next
+        Logger.Progress(100, 100)
+        lPolygonSf.EndPointInShapefile()
+        lPolygonSf.Close()
+        lPolygonSf = Nothing
+
+        ''rasterize the wetland shapefile   'seems to have some issues, not really faster either
+        'Dim lTmpWetlandsGridFileName As String = FilenameNoExt(aToWetlandsGridFileName) & "Wetlands.tif"
+        'Dim lWetlandsLayerIndex As Integer = 0
+        'If GisUtil.IsLayerByFileName(aWetlandsFileName) Then
+        '    lWetlandsLayerIndex = GisUtil.LayerIndex(aWetlandsFileName)
+        'End If
+        'GridFromShapefile(lWetlandsLayerIndex, 0, aToWetlandsGridFileName, lTmpWetlandsGridFileName)
+        'Dim lWetlandsGrid As New MapWinGIS.Grid
+        'lWetlandsGrid.Open(lTmpWetlandsGridFileName)
+        'For lRow As Integer = 0 To lOutputGrid.Header.NumberRows - 1
+        '    For lCol As Integer = 0 To lOutputGrid.Header.NumberCols - 1
+        '        If lWetlandsGrid.Value(lCol, lRow) > 0 Then
+        '            lOutputGrid.Value(lCol, lRow) = 99  'this is a wetland
+        '        End If
+        '    Next
+        '    Logger.Progress(lRow, lOutputGrid.Header.NumberRows)
+        'Next
+        'lWetlandsGrid.Close()
+        'lWetlandsGrid = Nothing
+        'Logger.Progress(100, 100)
+
+        'mark cells along stream lines
+        Dim lTmpStreamGridFileName As String = FilenameNoExt(aToWetlandsGridFileName) & "Streams.tif"
+        Dim lStreamsLayerIndex As Integer = 0
+        If GisUtil.IsLayerByFileName(aStreamsFileName) Then
+            lStreamsLayerIndex = GisUtil.LayerIndex(aStreamsFileName)
+        End If
+        GridFromShapefile(lStreamsLayerIndex, 0, aToWetlandsGridFileName, lTmpStreamGridFileName)
+        Dim lStreamsGrid As New MapWinGIS.Grid
+        lStreamsGrid.Open(lTmpStreamGridFileName)
+        For lSRow As Integer = 0 To lStreamsGrid.Header.NumberRows - 1
+            For lSCol As Integer = 0 To lStreamsGrid.Header.NumberCols - 1
+                If lStreamsGrid.Value(lSCol, lSRow) > 0 Then
+                    'find corresponding cell in the output grid
+                    lStreamsGrid.CellToProj(lSCol, lSRow, lXPos, lYPos)
+                    lOutputGrid.ProjToCell(lXPos, lYPos, lCol, lRow)
+                    lOutputGrid.Value(lCol, lRow) = 98  'this is a stream
+                End If
+            Next
+            Logger.Progress(lSRow, lStreamsGrid.Header.NumberRows)
+        Next
+        lStreamsGrid.Close()
+        lStreamsGrid = Nothing
+        Logger.Progress(100, 100)
+
+        lOutputGrid.Save()
+        lOutputGrid = Nothing
+    End Sub
+
     Public Shared Function GridGetCellSizeX(ByVal aGridLayerIndex As Integer) As Double
         Dim lGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
         Return lGrid.Header.dX
