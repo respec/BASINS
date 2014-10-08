@@ -162,6 +162,10 @@
       <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
       <Name>MapWinUtility-D4EM10</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcBasinsObsWQ\atcBasinsObsWQ-D4EM10.vbproj">
+      <Project>{7DCB47A0-7B03-4B7C-BC42-B8D920D46604}</Project>
+      <Name>atcBasinsObsWQ-D4EM10</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls-D4EM10.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls-D4EM10</Name>
@@ -193,6 +197,10 @@
     <ProjectReference Include="..\atcSegmentation\atcSegmentation-D4EM10.vbproj">
       <Project>{813E3F46-36CA-4320-BB05-325EEC553D3D}</Project>
       <Name>atcSegmentation-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesGSSHA\atcTimeseriesGSSHA.vbproj">
+      <Project>{CA09C348-000B-443B-AE64-539504F7567A}</Project>
+      <Name>atcTimeseriesGSSHA</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath-D4EM10.vbproj">
       <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
