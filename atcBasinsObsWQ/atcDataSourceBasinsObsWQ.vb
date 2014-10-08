@@ -41,16 +41,19 @@ Public Class atcDataSourceBasinsObsWQ
 
     Public Overrides ReadOnly Property CanSave() As Boolean
         Get
-            Return False 'no saving yet, but could implement if needed 
+            Return True 'Open new or existing file, then use .AddDatasets to save new data to file
         End Get
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
-
         If MyBase.Open(aFileName, aAttributes) Then
+            If Not IO.File.Exists(Specification) Then
+                Logger.Dbg("Opening new file " & Specification)
+                Return True
+            End If
             Dim lData As atcTimeseries
             Try
-                Dim lDBF As IatcTable
+                Dim lDBF As New atcTableDBF
                 Dim lDateCol As Integer = -1
                 Dim lTimeCol As Integer = -1
                 Dim lLocnCol As Integer = -1
@@ -59,26 +62,21 @@ Public Class atcDataSourceBasinsObsWQ
                 Dim lTSKey As String
                 Dim lTSIndex As Integer
                 Dim lLocation As String = ""
-                Dim s As String
                 Dim lNaN As Double = GetNaN()
-                lDBF = New atcTableDBF
                 lDBF.OpenFile(Specification)
-                For i As Integer = 1 To lDBF.NumFields
-                    s = UCase(lDBF.FieldName(i))
-                    If s = "DATE" Then
-                        lDateCol = i
-                    ElseIf s = "TIME" Then
-                        lTimeCol = i
-                    ElseIf InStr(s, "ID") Then 'location
-                        If lLocnCol = -1 Then 'only use first one
-                            'should be sure that field is in use here
-                            lLocnCol = i
-                        End If
-                    ElseIf s = "PARM" Then
-                        lConsCol = i
-                    ElseIf s = "VALUE" Then
-                        lValCol = i
-                    End If
+                For lFieldIndex As Integer = 1 To lDBF.NumFields
+                    Select Case lDBF.FieldName(lFieldIndex).ToUpper
+                        Case "DATE" : lDateCol = lFieldIndex
+                        Case "TIME" : lTimeCol = lFieldIndex
+                        Case "PARM" : lConsCol = lFieldIndex
+                        Case "VALUE" : lValCol = lFieldIndex
+                        Case Else
+                            If lLocnCol = -1 Then 'only use first one
+                                If lDBF.FieldName(lFieldIndex).ToUpper.Contains("ID") Then 'location
+                                    lLocnCol = lFieldIndex
+                                End If
+                            End If
+                    End Select
                 Next
                 If lDateCol > 0 AndAlso lTimeCol > 0 AndAlso lLocnCol > 0 AndAlso _
                    lConsCol > 0 AndAlso lValCol > 0 Then
@@ -140,28 +138,33 @@ Public Class atcDataSourceBasinsObsWQ
     End Function
 
     Private Function parseWQObsDate(ByVal aDate As String, ByVal aTime As String) As Double
+        Dim lDate As String = aDate
+
+        'Check for DBF with date formatted for human readability instead of as DBF date
+        If lDate.Contains("/") Then
+            Dim lParseDate As Date = Date.Parse(lDate)
+            lDate = lParseDate.ToString("yyyyMMdd")
+        End If
+
+        Dim lTime As String = aTime.Replace(":", "")
         'assume point values at specified time
         Dim d(5) As Integer 'date array
-        Dim l As Integer 'Length of year (2 or 4 digit year)
-        Dim i As Integer 'Year offset (1900 for 2-digit year)
 
-        If Not IsNumeric(aTime) Then aTime = "1200" 'assume noon for missing obstime
-        If IsNumeric(aDate) Then
-            If Len(aDate) = 8 Then ' 4 dig yr
-                l = 4
-                i = 0
+        If Not IsNumeric(lTime) Then lTime = "1200" 'assume noon for missing obstime
+        If IsNumeric(lDate) Then
+            If Len(lDate) = 8 Then ' 4 dig yr
+                d(0) = lDate.Substring(0, 4)
+                d(1) = lDate.Substring(4, 2)
+                d(2) = lDate.Substring(6, 2)
             Else
-                l = 2
-                i = 1900
+                d(0) = lDate.Substring(0, 2) + 1900
+                d(1) = lDate.Substring(2, 2)
+                d(2) = lDate.Substring(4, 2)
             End If
-            d(0) = Left(aDate, l) + i
-            d(1) = Mid(aDate, l + 1, 2)
-            d(2) = Right(aDate, 2)
-            If IsNumeric(aTime) Then
-                If aTime.Length < 4 Then aTime = aTime.PadLeft(4, "0")
-                d(3) = Left(aTime, 2)
-                d(4) = Right(aTime, 2)
-            End If
+
+            If lTime.Length < 4 Then lTime = lTime.PadLeft(4, "0")
+            d(3) = lTime.Substring(0, 2)
+            d(4) = lTime.Substring(2, 2)
             Return Date2J(d)
         Else
             Return 0
@@ -171,4 +174,140 @@ Public Class atcDataSourceBasinsObsWQ
     Public Sub New()
         Filter = pFilter
     End Sub
+
+    Public Overrides Function AddDatasets(ByVal aDataGroup As atcDataGroup) As Boolean
+        For Each lTS As atcTimeseries In aDataGroup
+            MyBase.AddDataSet(lTS, EnumExistAction.ExistReplace)
+        Next
+        SaveDataSets(aDataGroup, EnumExistAction.ExistAppend)
+    End Function
+
+    Public Overrides Function AddDataSet(ByVal aDs As atcData.atcDataSet, Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
+        If MyBase.AddDataSet(aDs, aExistAction) Then
+            Return SaveDataSets(New atcDataGroup(aDs), aExistAction)
+        End If
+    End Function
+
+    Public Overrides Function Save(ByVal aSaveFileName As String, Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
+        Specification = aSaveFileName
+        Return SaveDataSets(Me.DataSets, aExistAction)
+    End Function
+
+    Private Function SaveDataSets(ByVal aDataSets As atcDataGroup, _
+                                  ByVal aExistAction As atcData.atcDataSource.EnumExistAction) As Boolean
+        Try
+            Logger.Status("Writing " & Format(aDataSets.Count, "#,##0") & " datasets to " & IO.Path.GetFileName(Specification), True)
+            If IO.File.Exists(Specification) Then
+                Dim lExtension As String = IO.Path.GetExtension(Specification)
+                Dim lRenamedFilename As String = GetTemporaryFileName(Specification.Substring(0, Specification.Length - lExtension.Length), lExtension)
+                Select Case aExistAction
+                    Case EnumExistAction.ExistAppend
+
+                    Case EnumExistAction.ExistAskUser
+                        Select Case Logger.MsgCustom("Attempting to save but file already exists: " & vbCrLf & Specification, "File already exists", _
+                                                     "Append", "Overwrite", "Do not write", "Save as " & IO.Path.GetFileName(lRenamedFilename))
+                            Case "Append"
+
+                            Case "Overwrite"
+                                IO.File.Delete(Specification)
+                            Case "Do not write"
+                                Return False
+                            Case Else
+                                Specification = lRenamedFilename
+                        End Select
+                    Case EnumExistAction.ExistNoAction
+                        Logger.Dbg("Save: File already exists and aExistAction = ExistNoAction, not saving " & Specification)
+                        Return False
+                    Case EnumExistAction.ExistReplace
+                        Logger.Dbg("Save: File already exists, deleting old " & Specification)
+                        IO.File.Delete(Specification)
+                    Case EnumExistAction.ExistRenumber
+                        Logger.Dbg("Save: File already exists and aExistAction = ExistRenumber, saving as " & lRenamedFilename)
+                        Specification = lRenamedFilename
+                End Select
+            End If
+
+            Dim lNumRecords As Integer = 0
+            Dim lMaxFieldLength() As Integer = {0, 16, 8, 4, 10, 10}
+            'Dim lAllDataSets As New atcDataGroup()
+            'lAllDataSets.AddRange(Me.DataSets)
+            'For Each lNewTS As atcTimeseries In aDataSets
+            '    If Not lAllDataSets.Contains(lNewTS) Then
+            '        lAllDataSets.Add(lNewTS)
+            '    End If
+            'Next
+            For Each lTimeseries As atcTimeseries In Me.DataSets
+                lNumRecords += lTimeseries.numValues
+                lMaxFieldLength(1) = Math.Max(lMaxFieldLength(1), lTimeseries.Attributes.GetFormattedValue("Location").Length)
+                lMaxFieldLength(4) = Math.Max(lMaxFieldLength(4), lTimeseries.Attributes.GetFormattedValue("Constituent").Length)
+            Next
+            For Each lTimeseries As atcTimeseries In aDataSets
+                If Not Me.DataSets.Contains(lTimeseries) Then
+                    lNumRecords += lTimeseries.numValues
+                    lMaxFieldLength(1) = Math.Max(lMaxFieldLength(1), lTimeseries.Attributes.GetFormattedValue("Location").Length)
+                    lMaxFieldLength(4) = Math.Max(lMaxFieldLength(4), lTimeseries.Attributes.GetFormattedValue("Constituent").Length)
+                End If
+            Next
+            Dim lStartRecord As Integer = 1
+            Dim lSaveDBF As New atcTableDBF
+            With lSaveDBF
+                Dim lFirstRecord As Boolean = True
+                If IO.File.Exists(Specification) Then
+                    lSaveDBF.OpenFile(Specification)
+                    lStartRecord = lSaveDBF.NumRecords + 1
+                    lNumRecords += lSaveDBF.NumRecords
+                    .NumRecords = lNumRecords
+                    lFirstRecord = False
+                Else
+                    lSaveDBF.NumFields = 5
+                    For lFieldIndex As Integer = 1 To lSaveDBF.NumFields
+                        lSaveDBF.FieldLength(lFieldIndex) = lMaxFieldLength(lFieldIndex)
+                    Next
+                    .FieldType(1) = "C" : .FieldName(1) = "ID"
+                    .FieldType(2) = "D" : .FieldName(2) = "DATE"
+                    .FieldType(3) = "C" : .FieldName(3) = "TIME"
+                    .FieldType(4) = "C" : .FieldName(4) = "PARM"
+                    .FieldType(5) = "N" : .FieldName(5) = "VALUE" : .FieldDecimalCount(5) = 2
+                    .NumRecords = lNumRecords
+                    .InitData()
+                End If
+                .CurrentRecord = lStartRecord
+                Dim lDateArray(6) As Integer
+                Dim lProgress As Integer = 0
+                For Each lTimeseries As atcTimeseries In aDataSets
+                    WriteDataset(lTimeseries, lSaveDBF, lFirstRecord)
+                    lProgress += 1
+                    Logger.Progress(lProgress, aDataSets.Count)
+                Next
+                .WriteFile(Specification)
+                .Clear()
+                Return True
+            End With
+        Catch e As Exception
+            Logger.Msg("Error saving '" & Specification & "': " & e.ToString, MsgBoxStyle.OkOnly, "Did not write file")
+            Return False
+        End Try
+    End Function
+
+    Private Sub WriteDataset(ByVal aTimeseries As atcData.atcTimeseries, ByVal aDBF As atcTableDBF, ByRef aFirstRecord As Boolean)
+        With aDBF
+            Dim lDateArray(6) As Integer
+            Dim lLocation As String = aTimeseries.Attributes.GetFormattedValue("Location")
+            Dim lConstituent As String = aTimeseries.Attributes.GetFormattedValue("Constituent")
+            For lTimeIndex As Integer = 1 To aTimeseries.numValues
+                If aFirstRecord Then
+                    aFirstRecord = False
+                Else
+                    .CurrentRecord += 1
+                End If
+                J2Date(aTimeseries.Dates.Value(lTimeIndex), lDateArray)
+                .Value(1) = lLocation
+                .Value(2) = Format(lDateArray(0), "0000") & Format(lDateArray(1), "00") & Format(lDateArray(2), "00")
+                .Value(3) = Format(lDateArray(3), "00") & Format(lDateArray(4), "00")
+                .Value(4) = lConstituent
+                .Value(5) = DoubleToString(aTimeseries.Value(lTimeIndex), .FieldLength(5))
+            Next
+        End With
+    End Sub
+
 End Class
