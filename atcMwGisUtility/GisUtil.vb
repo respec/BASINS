@@ -2896,10 +2896,98 @@ Public Class GisUtil
         lStreamsGrid.Close()
         lStreamsGrid = Nothing
         Logger.Progress(100, 100)
+        lOutputGrid.Save()
+
+        'now for each cell of the output grid that is 98 (stream) or 99 (wetland)
+        'look for cells that drain to it.  mark those cells as 98/99.
+        'then mark this cell as 28/29 to indicate already searched neighbors.
+        'stop when nothing has been found to change.
+        Dim lFound As Boolean = True
+        Dim lCounter As Integer = 0
+        Do Until lFound = False
+            lCounter += 1
+            Logger.Progress(lCounter, lOutputGrid.Header.NumberRows)
+            lFound = MarkCellsDrainingToWetlandsOrStreams(lOutputGrid, 99)
+        Loop
+        Logger.Progress(100, 100)
+        'lFound = True
+        'Do Until lFound = False
+        '    lFound = MarkCellsDrainingToWetlandsOrStreams(lOutputGrid, 98)
+        'Loop
+
+        'mark all remaining cells as draining to stream
+        For lRow = 0 To lOutputGrid.Header.NumberRows - 1
+            For lCol = 0 To lOutputGrid.Header.NumberCols - 1
+                If lOutputGrid.Value(lCol, lRow) > 0 AndAlso lOutputGrid.Value(lCol, lRow) < 9 Then
+                    lOutputGrid.Value(lCol, lRow) = 28  'this drains to stream
+                End If
+            Next
+        Next
 
         lOutputGrid.Save()
         lOutputGrid = Nothing
     End Sub
+
+    Private Shared Function MarkCellsDrainingToWetlandsOrStreams(ByVal aOutputGrid As MapWinGIS.Grid, ByVal aCode As Integer) As Boolean
+        'now for each cell of the output grid that is 98 (stream) or 99 (wetland)
+        'look for cells that drain to it.  mark those cells as 98/99.
+        'then mark this cell as 28/29 to indicate already searched neighbors.
+        'stop when nothing has been found to change.
+        Dim lFound As Boolean = False
+        Dim lInitRow As Integer = 0
+
+        '      this is the assumed flow dir coding from taudem:
+        '      4 3 2
+        '      5   1
+        '      6 7 8
+
+        For lRow As Integer = 0 To aOutputGrid.Header.NumberRows - 1
+            For lCol As Integer = 0 To aOutputGrid.Header.NumberCols - 1
+                If aOutputGrid.Value(lCol, lRow) = aCode Then
+                    'see if anything around it drains to it
+                    If lCol > 0 AndAlso lRow > 0 AndAlso aOutputGrid.Value(lCol - 1, lRow - 1) = 8 Then
+                        'that cell flows to this one
+                        aOutputGrid.Value(lCol - 1, lRow - 1) = aCode
+                    End If
+                    If lRow > 0 AndAlso aOutputGrid.Value(lCol, lRow - 1) = 7 Then
+                        'that cell flows to this one
+                        aOutputGrid.Value(lCol, lRow - 1) = aCode
+                    End If
+                    If lCol < aOutputGrid.Header.NumberCols - 1 AndAlso lRow > 0 AndAlso aOutputGrid.Value(lCol + 1, lRow - 1) = 6 Then
+                        'that cell flows to this one
+                        aOutputGrid.Value(lCol + 1, lRow - 1) = aCode
+                    End If
+                    If lCol > 0 AndAlso aOutputGrid.Value(lCol - 1, lRow) = 1 Then
+                        'that cell flows to this one
+                        aOutputGrid.Value(lCol - 1, lRow) = aCode
+                    End If
+                    If lCol < aOutputGrid.Header.NumberCols - 1 AndAlso aOutputGrid.Value(lCol + 1, lRow) = 5 Then
+                        'that cell flows to this one
+                        aOutputGrid.Value(lCol + 1, lRow) = aCode
+                    End If
+                    If lCol > 0 AndAlso lRow < aOutputGrid.Header.NumberRows - 1 AndAlso aOutputGrid.Value(lCol - 1, lRow + 1) = 2 Then
+                        'that cell flows to this one
+                        aOutputGrid.Value(lCol - 1, lRow + 1) = aCode
+                    End If
+                    If lRow < aOutputGrid.Header.NumberRows - 1 AndAlso aOutputGrid.Value(lCol, lRow + 1) = 3 Then
+                        'that cell flows to this one
+                        aOutputGrid.Value(lCol, lRow + 1) = aCode
+                    End If
+                    If lCol < aOutputGrid.Header.NumberCols - 1 AndAlso lRow < aOutputGrid.Header.NumberRows - 1 AndAlso aOutputGrid.Value(lCol + 1, lRow + 1) = 4 Then
+                        'that cell flows to this one
+                        aOutputGrid.Value(lCol + 1, lRow + 1) = aCode
+                    End If
+                    aOutputGrid.Value(lCol, lRow) = aCode - 70  'this is the type we were looking for and it has now been checked
+                    lFound = True
+                    If lInitRow = 0 Then
+                        lInitRow = lRow
+                    End If
+                End If
+            Next
+        Next
+
+        Return lFound
+    End Function
 
     Public Shared Function GridGetCellSizeX(ByVal aGridLayerIndex As Integer) As Double
         Dim lGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
