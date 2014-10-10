@@ -38,7 +38,7 @@ Public Class LandUses
                     Loop
                     Dim lLandUse As New LandUse
                     If lFieldCount = 6 Then
-                        'this is the normal way before the snow enhancements 
+                        'this is the normal way before the snow and wetland enhancements 
                         lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
                         lLandUse.Type = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
                         Dim lReachId As String = StrSplit(lCurrentRecord, lDelim, lQuote)
@@ -47,7 +47,7 @@ Public Class LandUses
                         lLandUse.Slope = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                         lLandUse.Distance = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                     ElseIf lFieldCount = 8 Then
-                        'this is the normal way after the 1/2012 snow enhancements 
+                        'this is the normal way after the 1/2012 snow enhancements but without the wetland enhancements
                         lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
                         lLandUse.Type = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
                         Dim lReachId As String = StrSplit(lCurrentRecord, lDelim, lQuote)
@@ -57,6 +57,28 @@ Public Class LandUses
                         lLandUse.Distance = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                         lLandUse.MeanLatitude = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                         lLandUse.MeanElevation = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                    ElseIf lFieldCount = 7 Then
+                        'without the snow but including the wetland enhancements 
+                        lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lLandUse.Type = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        Dim lReachId As String = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lLandUse.Reach = pWatershed.Reaches(lReachId)
+                        lLandUse.Area = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.Slope = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.Distance = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.PercentToWetlands = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                    ElseIf lFieldCount = 9 Then
+                        'with both snow and wetland enhancements
+                        lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lLandUse.Type = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        Dim lReachId As String = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lLandUse.Reach = pWatershed.Reaches(lReachId)
+                        lLandUse.Area = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.Slope = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.Distance = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.MeanLatitude = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.MeanElevation = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.PercentToWetlands = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                     Else 'if coming from old delineator might not be space delimited
                         lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
                         If lCurrentRecord.Length > 23 Then
@@ -121,4 +143,5 @@ Public Class LandUse
     Public ModelID As Integer     'Assigned id for this land use type, e.g. 101 for Forest land uses 
     Public MeanElevation As Single   'mean elevation of this land use within this subbasin (used for snow)
     Public MeanLatitude As Single    'mean latitude of this land use within this subbasin  (used for snow)
+    Public PercentToWetlands As Single   'percent of this land use within this subbasin draining to wetlands
 End Class
