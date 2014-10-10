@@ -52,7 +52,9 @@ Public Module modModelSetup
                               ByVal aPSRCalculate As Boolean, _
                               Optional ByVal aSnowOption As Integer = 0, _
                               Optional ByVal aElevationFileName As String = "", _
-                              Optional ByVal aElevationUnits As String = "") As Boolean
+                              Optional ByVal aElevationUnits As String = "", _
+                              Optional ByVal aDoWetlands As Boolean = False, _
+                              Optional ByVal aToWetlandsFileName As String = "") As Boolean
 
         Logger.Status("Preparing to process")
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
@@ -107,7 +109,7 @@ Public Module modModelSetup
             'usgs giras is the selected land use type
             Logger.Status("Performing overlay for GIRAS landuse")
             Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aSubbasinFieldName, _
-                                                                aSnowOption, aElevationFileName, aElevationUnits)
+                                                                aSnowOption, aElevationFileName, aElevationUnits, aDoWetlands, aToWetlandsFileName)
 
             If lLandUseSubbasinOverlayRecords.Count = 0 Or Not lSuccess Then
                 'problem occurred, get out
@@ -128,7 +130,7 @@ Public Module modModelSetup
             'nlcd grid or other grid is the selected land use type
             Logger.Status("Overlaying Land Use and Subbasins")
             CreateLanduseRecordsGrid(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aLandUseThemeName, _
-                                     aSnowOption, aElevationFileName, aElevationUnits)
+                                     aSnowOption, aElevationFileName, aElevationUnits, aDoWetlands, aToWetlandsFileName)
 
             If aLUType = 1 Then 'nlcd grid
                 If IO.File.Exists(aLandUseClassFile) Then
@@ -153,7 +155,7 @@ Public Module modModelSetup
             'other shape
             Logger.Status("Overlaying Land Use and Subbasins")
             CreateLanduseRecordsShapefile(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aSubbasinFieldName, aLandUseThemeName, aLandUseFieldName, _
-                                          aSnowOption, aElevationFileName, aElevationUnits)
+                                          aSnowOption, aElevationFileName, aElevationUnits, aDoWetlands, aToWetlandsFileName)
 
             lReclassifyFileName = ""
             If aLandUseClassFile <> "<none>" Then
@@ -351,7 +353,9 @@ Public Module modModelSetup
                                               ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String, _
                                               Optional ByVal aSnowOption As Integer = 0, _
                                               Optional ByVal aElevationFileName As String = "", _
-                                              Optional ByVal aElevationUnits As String = "") As Boolean
+                                              Optional ByVal aElevationUnits As String = "", _
+                                              Optional ByVal aDoWetlands As Boolean = False, _
+                                              Optional ByVal aToWetlandsFileName As String = "") As Boolean
 
         'perform overlay for GIRAS 
         Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinThemeName)
@@ -427,6 +431,7 @@ Public Module modModelSetup
 
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
         Dim lMeanElev As Double
+        Dim lPercentToWetlands As Double = 0.0
         For i As Integer = 1 To lTable.NumRecords
             lTable.CurrentRecord = i
             Dim lRec As New LandUseSubbasinOverlayRecord
@@ -453,6 +458,14 @@ Public Module modModelSetup
                 End If
             End If
 
+            If aDoWetlands Then
+                'use the ToWetlands grid to determine percentage of this polygon draining to wetlands
+                If aToWetlandsFileName.Length > 0 Then
+                    GisUtil.GridPercentValuesInPolygon(aToWetlandsFileName, lLandUsePathName & "\overlay.shp", i - 1, 29, lPercentToWetlands)
+                    lRec.PercentToWetlands = lPercentToWetlands
+                End If
+            End If
+
             aLandUseSubbasinOverlayRecords.Add(lRec)
         Next i
 
@@ -465,7 +478,9 @@ Public Module modModelSetup
                                              ByVal aLandUseThemeName As String, ByVal aLandUseFieldName As String, _
                                              Optional ByVal aSnowOption As Integer = 0, _
                                              Optional ByVal aElevationFileName As String = "", _
-                                             Optional ByVal aElevationUnits As String = "")
+                                             Optional ByVal aElevationUnits As String = "", _
+                                             Optional ByVal aDoWetlands As Boolean = False, _
+                                             Optional ByVal aToWetlandsFileName As String = "")
 
         'perform overlay for other shapefiles (not GIRAS) 
 
@@ -487,6 +502,7 @@ Public Module modModelSetup
 
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
         Dim lMeanElev As Double
+        Dim lPercentToWetlands As Double = 0.0
         For i As Integer = 1 To lTable.NumRecords
             lTable.CurrentRecord = i
             Dim lRec As New LandUseSubbasinOverlayRecord
@@ -513,6 +529,14 @@ Public Module modModelSetup
                 End If
             End If
 
+            If aDoWetlands Then
+                'use the ToWetlands grid to determine percentage of this polygon draining to wetlands
+                If aToWetlandsFileName.Length > 0 Then
+                    GisUtil.GridPercentValuesInPolygon(aToWetlandsFileName, lLandUsePathName & "\overlay.shp", i - 1, 29, lPercentToWetlands)
+                    lRec.PercentToWetlands = lPercentToWetlands
+                End If
+            End If
+
             aLandUseSubbasinOverlayRecords.Add(lRec)
         Next i
     End Sub
@@ -522,7 +546,9 @@ Public Module modModelSetup
                                         ByVal aSubbasinThemeName As String, ByVal aLandUseThemeName As String, _
                                         Optional ByVal aSnowOption As Integer = 0, _
                                         Optional ByVal aElevationFileName As String = "", _
-                                        Optional ByVal aElevationUnits As String = "")
+                                        Optional ByVal aElevationUnits As String = "", _
+                                        Optional ByVal aDoWetlands As Boolean = False, _
+                                        Optional ByVal aToWetlandsFileName As String = "")
 
         'perform overlay for land use grid
         Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinThemeName)
@@ -537,11 +563,21 @@ Public Module modModelSetup
             Dim lAreaLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
             Dim lMeanLatLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
             Dim lMeanElevLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
-            If aSnowOption = 0 Then
-                GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS)
+            Dim lPercentToWetlandsLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
+            If Not aDoWetlands Then
+                If aSnowOption = 0 Then
+                    GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS)
+                Else
+                    'use extended version to calc mean latitude and elevation for each land use / subbasin combination
+                    GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS, lMeanLatLS, lMeanElevLS, aElevationFileName)
+                End If
             Else
-                'use extended version to calc mean latitude and elevation for each land use / subbasin combination
-                GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS, lMeanLatLS, lMeanElevLS, aElevationFileName)
+                If aSnowOption = 0 Then
+                    GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS, , , , lPercentToWetlandsLS, aToWetlandsFileName)
+                Else
+                    'use extended version to calc mean latitude and elevation for each land use / subbasin combination
+                    GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS, lMeanLatLS, lMeanElevLS, aElevationFileName, lPercentToWetlandsLS, aToWetlandsFileName)
+                End If
             End If
 
             For Each lShapeindex As String In aSubbasinsSelected.Keys
@@ -563,6 +599,12 @@ Public Module modModelSetup
                                 Else
                                     lRec.MeanElevation = lMeanElevLS(i, lShapeindex)
                                 End If
+                            End If
+                        End If
+                        If aDoWetlands Then
+                            'use the ToWetlands grid to determine percentage of this polygon draining to wetlands
+                            If aToWetlandsFileName.Length > 0 Then
+                                lRec.PercentToWetlands = lPercentToWetlandsLS(i, lShapeindex)
                             End If
                         End If
                         aLandUseSubbasinOverlayRecords.Add(lRec)
@@ -1892,7 +1934,7 @@ Public Module modModelSetup
                                                       " " & lWdmId & " " & lCLOUdsn.ToString & " CLOU 0 1" & _
                                                       " " & lWdmId & " " & lPEVTdsn.ToString & " PEVT 1 1")
         Next
-            SaveFileString(aSegFileName, lSB.ToString)
+        SaveFileString(aSegFileName, lSB.ToString)
     End Sub
 
     Private Sub FindMatchingDSNatThisLocation(ByVal aDataSource As atcWDM.atcDataSourceWDM, ByVal aPrecLoc As String, ByVal aConstituent As String, ByRef aMatchingDsn As Integer)
@@ -1963,4 +2005,5 @@ Friend Class LandUseSubbasinOverlayRecord
     Public Area As Double            'area of this land use within this subbasin
     Public MeanElevation As Single   'mean elevation of this land use within this subbasin (used for snow)
     Public MeanLatitude As Single    'mean latitude of this land use within this subbasin  (used for snow)
+    Public PercentToWetlands As Single  'percent of area draining directly to wetlands (used for new wetlands feature)
 End Class

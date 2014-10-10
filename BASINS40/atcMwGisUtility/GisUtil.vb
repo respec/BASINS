@@ -1315,9 +1315,13 @@ Public Class GisUtil
                                     ByRef aAreaGridPoly(,) As Double, _
                                     Optional ByRef aMeanLatGridPoly(,) As Double = Nothing, _
                                     Optional ByRef aMeanElevGridPoly(,) As Double = Nothing, _
-                                    Optional ByVal aElevationFileName As String = "")
-        'the last 3 args are optional extensions that allow calculation of mean latitude and mean elevation 
+                                    Optional ByVal aElevationFileName As String = "", _
+                                    Optional ByRef aPercentToWetlandsGridPoly(,) As Double = Nothing, _
+                                    Optional ByVal aToWetlandsFileName As String = "")
+        'the 4th-6th args are optional extensions that allow calculation of mean latitude and mean elevation 
         'for each land use and subbasin combination 
+        'the 7th-8th args are optional extensions that allow calculation of percent of each landuse/subbasin 
+        'combination going to a wetland before going to the stream reach
 
         'set input grid
         Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
@@ -1330,6 +1334,14 @@ Public Class GisUtil
             lElevGrid.Open(aElevationFileName)
         Else
             lElevGrid = Nothing
+        End If
+
+        'if we want to compute the percentage going to wetlands at the same time, need to open the ToWetlands grid
+        Dim lToWetlandsGrid As New MapWinGIS.Grid
+        If aToWetlandsFileName.Length > 0 Then
+            lToWetlandsGrid.Open(aToWetlandsFileName)
+        Else
+            lToWetlandsGrid = Nothing
         End If
 
         Dim lMinX As Double
@@ -1394,6 +1406,7 @@ Public Class GisUtil
         Dim lYPos As Double
         Dim lInsideId As Integer
         Dim lGridValue As Integer
+
         'following 3 variables are used in determining mean latitude of each landuse/subbasin combination
         Dim lXLng As Double
         Dim lYLat As Double
@@ -1411,12 +1424,28 @@ Public Class GisUtil
             lElevEndingRow = lElevGrid.Header.NumberRows
             lElevEndingCol = lElevGrid.Header.NumberCols
         End If
+        'following 7 variables are used in determining percent draining to wetlands of each landuse/subbasin combination
+        Dim lToWetlandsValue As Integer = 0
+        Dim lCountToWetlandsLS(1, 1) As Integer
+        Dim lXToWetlands As Double
+        Dim lYToWetlands As Double
+        Dim lColToWetlands As Integer
+        Dim lRowToWetlands As Integer
+        Dim lToWetlandsEndingRow As Integer = 0
+        Dim lToWetlandsEndingCol As Integer = 0
+        If lToWetlandsGrid IsNot Nothing Then
+            lToWetlandsEndingRow = lToWetlandsGrid.Header.NumberRows
+            lToWetlandsEndingCol = lToWetlandsGrid.Header.NumberCols
+        End If
 
         If aMeanLatGridPoly IsNot Nothing Then
             ReDim lCountMeanLatLS(aMeanLatGridPoly.GetUpperBound(0), aMeanLatGridPoly.GetUpperBound(1))
         End If
         If aMeanElevGridPoly IsNot Nothing Then
             ReDim lCountMeanElevLS(aMeanElevGridPoly.GetUpperBound(0), aMeanElevGridPoly.GetUpperBound(1))
+        End If
+        If aPercentToWetlandsGridPoly IsNot Nothing Then
+            ReDim lCountToWetlandsLS(aPercentToWetlandsGridPoly.GetUpperBound(0), aPercentToWetlandsGridPoly.GetUpperBound(1))
         End If
 
         If pStatusShow Then Logger.Status("Tabulating Areas...")
@@ -1461,11 +1490,49 @@ Public Class GisUtil
                             End If
                         End If
                     End If
+                    If aPercentToWetlandsGridPoly IsNot Nothing AndAlso lToWetlandsGrid IsNot Nothing Then
+                        If lGridValue > -1 AndAlso lGridValue <= aPercentToWetlandsGridPoly.GetUpperBound(0) Then
+                            'find corresponding value in 'to wetlands' grid
+                            lInputGrid.CellToProj(lCol, lRow, lXToWetlands, lYToWetlands)
+                            lToWetlandsGrid.ProjToCell(lXToWetlands, lYToWetlands, lColToWetlands, lRowToWetlands)
+                            If lColToWetlands > -1 AndAlso lColToWetlands < lToWetlandsEndingCol And _
+                               lRowToWetlands > -1 AndAlso lRowToWetlands < lToWetlandsEndingRow Then
+                                lToWetlandsValue = lToWetlandsGrid.Value(lColToWetlands, lRowToWetlands)
+                                'store percent to wetlands
+                                If lToWetlandsValue = 29 Then
+                                    'this drains to wetlands
+                                    aPercentToWetlandsGridPoly(lGridValue, lInsideId) += 1
+                                End If
+                                lCountToWetlandsLS(lGridValue, lInsideId) += 1
+                            End If
+                        End If
+                    End If
                 End If
                 lCellCount += 1
                 If pStatusShow Then Logger.Progress(lCellCount, lTotalCellCount)
             Next lCol
         Next lRow
+
+        If aPercentToWetlandsGridPoly IsNot Nothing AndAlso lToWetlandsGrid IsNot Nothing Then
+            'make a pass through the 'percent to wetlands grid converting counts to percentages
+            For lL As Integer = 0 To aPercentToWetlandsGridPoly.GetUpperBound(0)
+                For lS As Integer = 0 To aPercentToWetlandsGridPoly.GetUpperBound(1)
+                    If lCountToWetlandsLS(lL, lS) > 0 Then
+                        aPercentToWetlandsGridPoly(lL, lS) = (aPercentToWetlandsGridPoly(lL, lS) / lCountToWetlandsLS(lL, lS)) * 100.0
+                    End If
+                Next
+            Next
+        End If
+
+        If lElevGrid IsNot Nothing Then
+            lElevGrid.Close()
+            lElevGrid = Nothing
+        End If
+
+        If lToWetlandsGrid IsNot Nothing Then
+            lToWetlandsGrid.Close()
+            lToWetlandsGrid = Nothing
+        End If
 
         If pStatusShow Then Logger.Progress("Tabulating Areas...", lTotalCellCount, lTotalCellCount)
         lPolygonSf.EndPointInShapefile()
@@ -1652,6 +1719,72 @@ Public Class GisUtil
         Else
             Return lInputGrid.Value(lCol, lRow)
         End If
+    End Function
+
+    Public Shared Sub GridPercentValuesInPolygon(ByVal aGridLayerName As String, ByVal aPolygonLayerName As String, _
+                                                 ByVal aPolygonFeatureIndex As Integer, _
+                                                 ByVal aValue As Integer, _
+                                                 ByRef aPercent As Double)
+        'Given a grid and a polygon layer and a value, find the percent of the grid cells within the polygon having that value.
+
+        Dim lPolygonSf As New MapWinGIS.Shapefile
+        If lPolygonSf.Open(aPolygonLayerName) Then
+            aPercent = ComputePercentGridValuesInPolygon(aGridLayerName, lPolygonSf, aPolygonFeatureIndex, aValue)
+            lPolygonSf.Close()
+        Else
+            aPercent = 0.0
+        End If
+    End Sub
+
+    Private Shared Function ComputePercentGridValuesInPolygon(ByVal aGridLayerName As String, ByVal aPolygonShapefile As MapWinGIS.Shapefile, ByVal aPolygonFeatureIndex As Integer, ByVal aValue As Integer) As Double
+        'Given a grid and a polygon layer and a value, find the percent of the grid cells within the polygon having that value.
+
+        Dim lPercent As Double = 0.0
+        If FeatureIndexValid(aPolygonFeatureIndex, aPolygonShapefile) Then
+            'set input grid
+            Dim lInputGrid As New MapWinGIS.Grid
+            lInputGrid.Open(aGridLayerName)
+
+            Dim lShape As New MapWinGIS.Shape
+            lShape = aPolygonShapefile.Shape(aPolygonFeatureIndex)
+
+            'figure out what part of the grid overlays this polygon
+            Dim lStartCol As Integer
+            Dim lEndCol As Integer
+            Dim lStartRow As Integer
+            Dim lEndRow As Integer
+            lInputGrid.ProjToCell(lShape.Extents.xMin, lShape.Extents.yMin, lStartCol, lEndRow)
+            lInputGrid.ProjToCell(lShape.Extents.xMax, lShape.Extents.yMax, lEndCol, lStartRow)
+
+            Dim lCellcount As Integer = 0
+            Dim lTotalCellcount As Integer = 0
+
+            aPolygonShapefile.BeginPointInShapefile()
+            For lCol As Integer = lStartCol To lEndCol
+                For lRow As Integer = lStartRow To lEndRow
+                    Dim lXPos As Double
+                    Dim lYPos As Double
+                    lInputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
+                    Dim lSubId As Integer = aPolygonShapefile.PointInShapefile(lXPos, lYPos)
+                    If lSubId = aPolygonFeatureIndex Then 'this is in the polygon we want
+                        If lInputGrid.Value(lCol, lRow) = aValue Then
+                            lCellcount += 1
+                        End If
+                        lTotalCellcount += 1
+                    End If
+                Next lRow
+            Next lCol
+            aPolygonShapefile.EndPointInShapefile()
+
+            lInputGrid.Close()
+            lInputGrid = Nothing
+
+            If lTotalCellcount > 0 Then
+                lPercent = (lCellcount / lTotalCellcount) * 100.0
+            End If
+        End If
+        Return lPercent
+
     End Function
 
     ''' <summary>
