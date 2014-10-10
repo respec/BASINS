@@ -195,6 +195,7 @@ Public Module modModelSetup
                         lRec.Area = 0.001
                         lRec.MeanLatitude = lTempRec1.MeanLatitude
                         lRec.MeanElevation = lTempRec1.MeanElevation
+                        lRec.PercentToWetlands = 0.0
                         lLandUseSubbasinOverlayRecords.Add(lRec, , lInd)
                         lInd += 1
                         lTempRecInd = lLandUseSubbasinOverlayRecords(lInd)
@@ -239,7 +240,7 @@ Public Module modModelSetup
         'write wsd file
         Logger.Status("Writing WSD file")
         Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, aGridPervious, lLandUses)
-        WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses, aSnowOption)
+        WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses, aSnowOption, aDoWetlands)
 
         'write rch file 
         Logger.Status("Writing RCH file")
@@ -667,6 +668,7 @@ Public Module modModelSetup
                 .Description = .Code
                 .MeanElevation = lRec.MeanElevation
                 .MeanLatitude = lRec.MeanLatitude
+                .PercentToWetlands = lRec.PercentToWetlands
                 '.Distance()
                 '.ImperviousFraction()
                 If Not aReaches Is Nothing Then
@@ -686,16 +688,19 @@ Public Module modModelSetup
             Dim lExistIndex As Integer = lLandUses.IndexOf(lLandUse)
             If Not lLandUse.Reach Is Nothing Then
                 If lLandUses.Contains(lLandUse.Description & ":" & lLandUse.Reach.Id) Then  'already have, add area
-                    'compute area-weighted mean elevation and mean latitude 
+                    'compute area-weighted mean elevation and mean latitude and percent to wetlands
                     Dim lArea As Double = lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).Area
                     Dim lElev As Single = lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).MeanElevation
                     Dim lLat As Single = lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).MeanLatitude
+                    Dim lPerWet As Single = lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).PercentToWetlands
                     Dim lWeightedElevation As Single = ((lArea * lElev) + (lLandUse.Area * lLandUse.MeanElevation)) / (lArea + lLandUse.Area)
                     Dim lWeightedLatitude As Single = ((lArea * lLat) + (lLandUse.Area * lLandUse.MeanLatitude)) / (lArea + lLandUse.Area)
+                    Dim lWeightedPerWet As Single = ((lArea * lPerWet) + (lLandUse.Area * lLandUse.PercentToWetlands)) / (lArea + lLandUse.Area)
                     'now add area
                     lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).Area += lLandUse.Area
                     lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).MeanElevation = lWeightedElevation
                     lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).MeanLatitude = lWeightedLatitude
+                    lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).PercentToWetlands = lWeightedPerWet
                 Else 'new
                     lLandUses.Add(lLandUse)
                 End If
@@ -1301,6 +1306,7 @@ Public Module modModelSetup
         Dim lImpArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
         Dim lMeanElevation(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
         Dim lMeanLatitude(lUniqueSubids.Count, lUniqueLugroups.Count) As Single
+        Dim lPercentToWetlands(lUniqueSubids.Count, lUniqueLugroups.Count) As Single
         Dim lLength(lUniqueSubids.Count) As Double
         Dim lSlope(lUniqueSubids.Count) As Single
 
@@ -1346,8 +1352,10 @@ Public Module modModelSetup
                         Dim lArea As Double = lPerArea(spos, lpos) + lImpArea(spos, lpos)
                         Dim lElev As Single = lMeanElevation(spos, lpos)
                         Dim lLat As Single = lMeanLatitude(spos, lpos)
+                        Dim lPerWet As Single = lPercentToWetlands(spos, lpos)
                         lMeanElevation(spos, lpos) = ((lArea * lElev) + (lLandUse.Area * lLandUse.MeanElevation)) / (lArea + lLandUse.Area)
                         lMeanLatitude(spos, lpos) = ((lArea * lLat) + (lLandUse.Area * lLandUse.MeanLatitude)) / (lArea + lLandUse.Area)
+                        lPercentToWetlands(spos, lpos) = ((lArea * lPerWet) + (lLandUse.Area * lLandUse.PercentToWetlands)) / (lArea + lLandUse.Area)
                         'now update area terms
                         lPerArea(spos, lpos) += (.Area * (100 - lPercentImperv) / 100)
                         lImpArea(spos, lpos) += (.Area * lPercentImperv / 100)
@@ -1438,8 +1446,10 @@ Public Module modModelSetup
                                         Dim lArea As Double = lPerArea(spos, lpos) + lImpArea(spos, lpos)
                                         Dim lElev As Single = lMeanElevation(spos, lpos)
                                         Dim lLat As Single = lMeanLatitude(spos, lpos)
+                                        Dim lPerWet As Single = lPercentToWetlands(spos, lpos)
                                         lMeanElevation(spos, lpos) = ((lArea * lElev) + (lLandUse.Area * lLandUse.MeanElevation)) / (lArea + lLandUse.Area)
                                         lMeanLatitude(spos, lpos) = ((lArea * lLat) + (lLandUse.Area * lLandUse.MeanLatitude)) / (lArea + lLandUse.Area)
+                                        lPercentToWetlands(spos, lpos) = ((lArea * lPerWet) + (lLandUse.Area * lLandUse.PercentToWetlands)) / (lArea + lLandUse.Area)
                                         'now update area terms
                                         lPerArea(spos, lpos) += (.Area * lMultiplier * (100 - lPercentImperv) / 100)
                                         lImpArea(spos, lpos) += (.Area * lMultiplier * lPercentImperv / 100)
@@ -1474,6 +1484,7 @@ Public Module modModelSetup
                         .Type = "COMPOSITE"
                         .MeanElevation = lMeanElevation(spos, lpos)
                         .MeanLatitude = lMeanLatitude(spos, lpos)
+                        .PercentToWetlands = lPercentToWetlands(spos, lpos)
                     End With
                     lReclassifyLandUses.Add(lLandUse)
                 End If
@@ -1485,57 +1496,114 @@ Public Module modModelSetup
 
     Public Sub WriteWSDFile(ByVal aWsdFileName As String, _
                             ByVal aLandUses As LandUses, _
-                            Optional ByVal aSnowOption As Integer = 0)
+                            Optional ByVal aSnowOption As Integer = 0, _
+                            Optional ByVal aDoWetlands As Boolean = False)
 
         Dim lSB As New StringBuilder
-        If aSnowOption = 0 Then
-            lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
-                           """Area""" & "," & """Slope""" & "," & """Distance""")
+
+        If Not aDoWetlands Then
+            If aSnowOption = 0 Then
+                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                               """Area""" & "," & """Slope""" & "," & """Distance""")
+            Else
+                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                               """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """MeanLatitude""" & "," & """MeanElevation""")
+            End If
         Else
-            lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
-                           """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """MeanLatitude""" & "," & """MeanElevation""")
+            If aSnowOption = 0 Then
+                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                               """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """PercentToWetlands""")
+            Else
+                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                               """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """MeanLatitude""" & "," & """MeanElevation""" & "," & """PercentToWetlands""")
+            End If
         End If
+
         For Each lLandUse As LandUse In aLandUses
             Dim lType As String = "2"
             Dim lArea As Double = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 4046.8564
             If lArea > 0 Then 'or CInt(lArea)
-                If aSnowOption = 0 Then
-                    lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                   lType & "     " & _
-                                   lLandUse.ModelID & "     " & _
-                                   Format(lArea, "0.0") & "     " & _
-                                   Format(lLandUse.Slope, "0.000000") & "     " & _
-                                   Format(lLandUse.Distance, "0.0000"))
+                If Not aDoWetlands Then
+                    If aSnowOption = 0 Then
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                       lType & "     " & _
+                                       lLandUse.ModelID & "     " & _
+                                       Format(lArea, "0.0") & "     " & _
+                                       Format(lLandUse.Slope, "0.000000") & "     " & _
+                                       Format(lLandUse.Distance, "0.0000"))
+                    Else
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                       lType & "     " & _
+                                       lLandUse.ModelID & "     " & _
+                                       Format(lArea, "0.0") & "     " & _
+                                       Format(lLandUse.Slope, "0.000000") & "     " & _
+                                       Format(lLandUse.Distance, "0.0000") & "     " & _
+                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
+                                       Format(lLandUse.MeanElevation, "0.00"))
+                    End If
                 Else
-                    lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                   lType & "     " & _
-                                   lLandUse.ModelID & "     " & _
-                                   Format(lArea, "0.0") & "     " & _
-                                   Format(lLandUse.Slope, "0.000000") & "     " & _
-                                   Format(lLandUse.Distance, "0.0000") & "     " & _
-                                   Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
-                                   Format(lLandUse.MeanElevation, "0.00"))
+                    If aSnowOption = 0 Then
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                       lType & "     " & _
+                                       lLandUse.ModelID & "     " & _
+                                       Format(lArea, "0.0") & "     " & _
+                                       Format(lLandUse.Slope, "0.000000") & "     " & _
+                                       Format(lLandUse.Distance, "0.0000") & "     " & _
+                                       Format(lLandUse.PercentToWetlands, "0.00"))
+                    Else
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                       lType & "     " & _
+                                       lLandUse.ModelID & "     " & _
+                                       Format(lArea, "0.0") & "     " & _
+                                       Format(lLandUse.Slope, "0.000000") & "     " & _
+                                       Format(lLandUse.Distance, "0.0000") & "     " & _
+                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
+                                       Format(lLandUse.MeanElevation, "0.00") & "     " & _
+                                       Format(lLandUse.PercentToWetlands, "0.00"))
+                    End If
                 End If
             End If
             lType = "1"
             lArea = lLandUse.Area * lLandUse.ImperviousFraction / 4046.8564
             If lArea > 0 Then 'or CInt(lArea)
-                If aSnowOption = 0 Then
-                    lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                   lType & "     " & _
-                                   lLandUse.ModelID & "     " & _
-                                   Format(lArea, "0.0") & "     " & _
-                                   Format(lLandUse.Slope, "0.000000") & "     " & _
-                                   Format(lLandUse.Distance, "0.0000"))
+                If Not aDoWetlands Then
+                    If aSnowOption = 0 Then
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                       lType & "     " & _
+                                       lLandUse.ModelID & "     " & _
+                                       Format(lArea, "0.0") & "     " & _
+                                       Format(lLandUse.Slope, "0.000000") & "     " & _
+                                       Format(lLandUse.Distance, "0.0000"))
+                    Else
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                       lType & "     " & _
+                                       lLandUse.ModelID & "     " & _
+                                       Format(lArea, "0.0") & "     " & _
+                                       Format(lLandUse.Slope, "0.000000") & "     " & _
+                                       Format(lLandUse.Distance, "0.0000") & "     " & _
+                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
+                                       Format(lLandUse.MeanElevation, "0.00"))
+                    End If
                 Else
-                    lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                   lType & "     " & _
-                                   lLandUse.ModelID & "     " & _
-                                   Format(lArea, "0.0") & "     " & _
-                                   Format(lLandUse.Slope, "0.000000") & "     " & _
-                                   Format(lLandUse.Distance, "0.0000") & "     " & _
-                                   Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
-                                   Format(lLandUse.MeanElevation, "0.00"))
+                    If aSnowOption = 0 Then
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                       lType & "     " & _
+                                       lLandUse.ModelID & "     " & _
+                                       Format(lArea, "0.0") & "     " & _
+                                       Format(lLandUse.Slope, "0.000000") & "     " & _
+                                       Format(lLandUse.Distance, "0.0000") & "     " & _
+                                       Format(lLandUse.PercentToWetlands, "0.00"))
+                    Else
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                       lType & "     " & _
+                                       lLandUse.ModelID & "     " & _
+                                       Format(lArea, "0.0") & "     " & _
+                                       Format(lLandUse.Slope, "0.000000") & "     " & _
+                                       Format(lLandUse.Distance, "0.0000") & "     " & _
+                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
+                                       Format(lLandUse.MeanElevation, "0.00") & "     " & _
+                                       Format(lLandUse.PercentToWetlands, "0.00"))
+                    End If
                 End If
             End If
         Next lLandUse
