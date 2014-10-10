@@ -849,7 +849,7 @@ TryExePath:
                 Dim cdlg As New Windows.Forms.OpenFileDialog
                 With cdlg
                     .Title = aFileDialogTitle
-                    lFileName = AbsolutePath(lFileName, CurDir)
+                    'lFileName = AbsolutePath(aDefaultFileName, CurDir)
                     .FileName = aDefaultFileName
                     .Filter = aFileFilter
                     .FilterIndex = aFilterIndex

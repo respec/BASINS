@@ -222,7 +222,7 @@ ErrHand:
         For Each lCurrentLine As String In LinesInFile(inReader)
             lRecordCount += 1
             If lRecordCount <= NumHeaderRows Then
-                pHeaderLines(lRecordCount) = lCurrentLine
+                pHeaderLines(lRecordCount - 1) = lCurrentLine
             ElseIf lRecordCount = NumHeaderRows + 1 AndAlso NumFieldNameRows > 0 Then
                 NumFields = CountString(lCurrentLine, Delimiter) + 1
                 'Split creates a zero-based array. Prepending pDelimiter inserts blank field name so pFieldNames(1) contains first name
