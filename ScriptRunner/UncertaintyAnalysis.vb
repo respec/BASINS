@@ -13,28 +13,53 @@ Imports atcManDelin
 Imports System.IO
 Imports System.Text
 Imports atcHspfBinOut
+Public Class SensitivityStats
+    Public SiteName As String
+    Public Scenario As String
+    Public SimID As String
+    Public AverageAnnualcfs As Double
+    Public AnnualPeakFlow As Double
+    Public AverageAnnual As Double
+    Public TenPercentHigh As Double
+    Public TwentyFivePercentHigh As Double
+    Public FiftyPercentHigh As Double
+    Public FiftyPercentLow As Double
+    Public TwentyFivePercentLow As Double
+    Public TenPercentLow As Double
+    Public FivePercentLow As Double
+    Public TwoPercentLow As Double
+    Public ErrorAverageAnnualcfs As Double
+    Public ErrorAnnualPeakFlow As Double
+    Public ErrorAverageAnnual As Double
+    Public ErrorTenPercentHigh As Double
+    Public ErrorTwentyFivePercentHigh As Double
+    Public ErrorFiftyPercentHigh As Double
+    Public ErrorFiftyPercentLow As Double
+    Public ErrorTwentyFivePercentLow As Double
+    Public ErrorTenPercentLow As Double
+    Public ErrorFivePercentLow As Double
+    Public ErrorTwoPercentLow As Double
+
+End Class
 Module SensitivityAndUncertaintyAnalysis
     Private pTestpath, pBaseName, pParameterFile, lstr As String
-    Private pHSPFExe As String = "C:\Basins41\models\HSPF\bin\WinHspfLt.exe"
-    Private lExpertSystem As HspfSupport.atcExpertSystem
-    Private lWdmFileName As String = pTestpath & "\" & pBaseName & ".wdm"
-    Private lHSPFBinaryFile As String = pTestpath & "\" & pBaseName & ".hbn"
-    Private lWdmDataSource As New atcWDM.atcDataSourceWDM()
-    Private lBinaryDataSource As New atcTimeseriesFileHspfBinOut()
+    'Private lExpertSystem As HspfSupport.atcExpertSystem
+    'Private lHSPFBinaryFile As String = pTestpath & "\" & pBaseName & ".hbn"
+    'Private lWdmDataSource As New atcWDM.atcDataSourceWDM()
+    'Private lBinaryDataSource As New atcTimeseriesFileHspfBinOut()
     Public uciName, ExpertStatsOutputLine, WQOutputLine, BinaryOutputLine As String
-    Public pOper, oTable, oParameter, oLandUse As String 'pOper for Operation, oTable is for operation Table, oParameter is the name of the parameter
+    Public pOper, oTable, oParameter, oLandUse As String
+    'pOper for Operation, oTable is for operation Table, oParameter is the name of the parameter
     Public pOperNumber As Integer
     Public pValue As Single 'pValue is the parameter value
     Public YearsofSimulation As Integer
-    Dim obsAverageAnnualcfs, obsAverageAnnual, obsTenPercentHigh, obsTwentyFivePercentHigh, obsFiftyPercentHigh, obsFiftyPercentLow As Single
-    Dim obsTwentyFivePercentLow, obsTenPercentLow, obsFivePercentLow, obsTwoPercentLow, obsAnnualPeakFlow As Single
     Public pWaterQuality As Boolean = False
     Public pHydrology As Boolean = False
     Public pOutputFromBinary As Boolean = False
-    Public Sensitivity(100, 4) As Object
+    'Public Sensitivity(100, 4) As Object
     Private WQConstituents() As Object = {"TSS", "TW", "TP", "TN"}
-    Private WQSites() As Object = {"RCH630", "RCH870"} ' "RCH916", "RCH922", "RCH936", "RCH938", "RCH890", "RCH752", "RCH912"}
-    Public WQConstituent As String
+    Private WQSites() As Object = {"RCH630", "RCH870"}
+    ' "RCH916", "RCH922", "RCH936", "RCH938", "RCH890", "RCH752", "RCH912"}
     Private TypeOfAnalysis As String = "Sensitivity"
     'Private TypeOfAnalysis As String = "Uncertainty"
     Private Value As Single = 0.0
@@ -65,12 +90,16 @@ Module SensitivityAndUncertaintyAnalysis
         Dim lUci As New atcUCI.HspfUci
         Dim dateTimeOfUciFile As String = System.IO.File.GetLastWriteTime(pBaseName & ".uci")
         dateTimeOfUciFile = Format(Year(dateTimeOfUciFile), "00") & "_" & Format(Month(dateTimeOfUciFile), "00") & _
-                "_" & Format(Day(dateTimeOfUciFile), "00") & "_" & Format(Hour(dateTimeOfUciFile), "00") & "_" & Format(Minute(dateTimeOfUciFile), "00")
-        System.IO.File.Copy(pBaseName & ".uci", pBaseName & dateTimeOfUciFile & ".uci", True) 'Save the original copy of the uci file before altering
+                "_" & Format(Day(dateTimeOfUciFile), "00") & "_" & Format(Hour(dateTimeOfUciFile), "00") & _
+                "_" & Format(Minute(dateTimeOfUciFile), "00")
+        System.IO.File.Copy(pBaseName & ".uci", pBaseName & dateTimeOfUciFile & ".uci", True)
+        'Save the original copy of the uci file before altering
+
         Dim lMsg As New atcUCI.HspfMsg
+        Dim lStats As New Generic.List(Of SensitivityStats)
         lMsg.Open("hspfmsg.mdb")
 
-        ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Average Annual (cfs), Average Annual (in),10% High (in), 25% High (in), 50% High (in), 50% Low (in0.), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in), Annual Peak Flow(cfs), Error(%) Annual Average, Error(%) 10% High, Error(%) 25% High, Error(%) 50% High, Error(%) 50% Low, Error(%) 25% Low, Error(%) 10% Low, Error(%) 5% Low, Error(%) 2% Low, Error (%) Annual Peak Flow" & vbCrLf
+        ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Mean Annual (cfs), Annual Peak Flow (cfs), Mean Annual runoff(in),10% High (in), 25% High (in), 50% High (in), 50% Low (in), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in), Annual Peak Flow(cfs), Error(%) Annual Average, Error(%) 10% High, Error(%) 25% High, Error(%) 50% High, Error(%) 50% Low, Error(%) 25% Low, Error(%) 10% Low, Error(%) 5% Low, Error(%) 2% Low, Error (%) Annual Peak Flow" & vbCrLf
         IO.File.WriteAllText(pBaseName & "_HydrologyOutput.csv", ExpertStatsOutputLine)
         Dim SimID As Integer = 0
         Dim MetSegRec As Integer
@@ -81,25 +110,34 @@ Module SensitivityAndUncertaintyAnalysis
         'lUci.SaveAs(pBaseName, pBaseName & "temp", 1, 1)
         Dim NewuciName As String
 
-        YearsofSimulation = lUci.GlobalBlock.YearCount
+        YearsofSimulation = (lUci.GlobalBlock.EdateJ - lUci.GlobalBlock.SDateJ) / JulianYear
         pValue = 1
+        pOper = "Baseline"
         oTable = "Baseline"
-        oParameter = ""
+        oParameter = "Baseline"
         If pWaterQuality Then
             Dim i As Integer
-            WQOutputLine = "Water Quality" & vbCrLf
             IO.File.WriteAllText(pBaseName & "_WaterQualityOutput.csv", WQOutputLine)
-            WQOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, "
+            WQOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name "
             For i = 0 To WQConstituents.GetUpperBound(0)
                 Select Case WQConstituents(i)
                     Case "TSS"
-                        WQOutputLine = WQOutputLine & "Sediment (tons/year), 10% High TSS Concenration(mg/l), 50% Low TSS Concentration(mg/l),"
-                    Case "TW"
-                        WQOutputLine = WQOutputLine & "Mean Water Temperature (C), " & "Mean Summer Water Temperature (C),"
+                        WQOutputLine = WQOutputLine & _
+                        ",Mean Ann. TSS Load (tons/year), Mean TSS Conc.(mg/l)," & _
+                        "Geom. Mean TSS Conc. (mg/l), 10% High TSS Conc.(mg/l), 50% Low TSS Conc.(mg/l)"
+
                     Case "TP"
-                        WQOutputLine = WQOutputLine & "Mean Annual TP Load (lbs/yr), 10% High TP Concentration(mg/l), 50% Low TP Concentration(mg/l),"
+                        WQOutputLine = WQOutputLine & _
+                        ",Mean Ann. TP Load (lbs/yr), Mean TP Conc. (mg/l)," & _
+                        "Geom. Mean TP Conc. (mg/l), 10% High TP Conc.(mg/l), 50% Low TP Conc. (mg/l)"
                     Case "TN"
-                        WQOutputLine = WQOutputLine & "Mean Annual TN Load (lbs/yr),10% High TN Concentration(mg/l), 50% Low TN Concentration(mg/l),"
+                        WQOutputLine = WQOutputLine & _
+                        ",Mean Annual TN Load (lbs/yr), Mean TN Conc. (mg/l)," & _
+                        "Geom. Mean TN Conc. (mg/l), 10% High TN Conc.(mg/l), 50% Low TN Conc.(mg/l)"
+                    Case "TW"
+                        WQOutputLine = WQOutputLine & _
+                        ",Mean Water Temp. (F), " & "Mean Summer Water Temp. (F)"
+
                 End Select
             Next
             WQOutputLine &= vbCrLf
@@ -117,28 +155,32 @@ Module SensitivityAndUncertaintyAnalysis
         Dim lExitCode As Integer = 0
         Select Case TypeOfAnalysis
             Case "Sensitivity"
-                Sensitivity(0, 0) = "Baseline"
-                Sensitivity(0, 1) = (0)
-                Sensitivity(0, 2) = ""
-                Sensitivity(0, 3) = (0)
-                If lExitCode = -1 Then
-                    MsgBox("The original uci file could not run. Program will exit")
-                End If
-                ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode) 'Baseline simulation and recording the values
+                Dim ParameterDetails As String = "SIMID, OPERATION, TABLE, OPERATIONNUMBER," & _
+                                                "PARMATERNAME, MONTH/TYPE, PARAMETERVALUE" & vbCrLf
+
+                'Sensitivity(0, 0) = "Baseline"
+                'Sensitivity(0, 1) = (0)
+                'Sensitivity(0, 2) = ""
+                'Sensitivity(0, 3) = (0)
+                'If lExitCode = -1 Then
+                '    MsgBox("The original uci file could not run. Program will exit")
+                'End If
+                ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestpath, YearsofSimulation, lStats) 'Baseline simulation and recording the values
 
                 Dim DBFRecords As Integer
                 lUci.Save()
                 lUci = Nothing
-                lDBF.OpenFile(pParameterFile) 'Opening the dbf file that has the parameter values
+                lDBF.OpenFile(pParameterFile)
+                'Opening the dbf file that has the parameter values
                 'The parameter table will be read from the dbf file
                 Dim pValue() As Single = {0, 0} 'Multipliers to calculate uncertainty
                 Dim LowerLimit, UpperLimit As Single
+                Logger.Dbg("Reading the DBF File")
                 For DBFRecords = 1 To lDBF.NumRecords 'Going through the record in the dbf file
                     lDBF.CurrentRecord = DBFRecords
                     pOper = lDBF.Value(lDBF.FieldNumber("OPERATION"))
                     oTable = lDBF.Value(lDBF.FieldNumber("TABLE"))
                     oParameter = lDBF.Value(lDBF.FieldNumber("PARAMETER"))
-                    oLandUse = lDBF.Value(lDBF.FieldNumber("LANDUSE"))
                     LowerLimit = lDBF.Value(lDBF.FieldNumber("LOWERLIMIT"))
                     UpperLimit = lDBF.Value(lDBF.FieldNumber("UPPERLIMIT"))
                     pValue(0) = lDBF.Value(lDBF.FieldNumber("FACTOR1"))
@@ -150,6 +192,7 @@ Module SensitivityAndUncertaintyAnalysis
                         System.IO.File.Copy(uciName, NewuciName, True) 'Saving original uci file as temp uci file
                         lUci.ReadUci(lMsg, NewuciName, -1, False, pBaseName & ".ech") ' Reading the uci file
                         Value = pValue(j)
+                        Logger.Dbg("Changing the parameters in the UCI file!")
                         Select Case True
                             Case oTable.Contains("EXTNL")
                                 For Each lMetSeg As HspfMetSeg In lUci.MetSegs
@@ -161,9 +204,12 @@ Module SensitivityAndUncertaintyAnalysis
                                         Case "SOLR"
                                             MetSegRec = 5
                                     End Select
-                                    lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP * pValue(j), 3)
+                                    lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP _
+                                                                                             * pValue(j), 3)
                                     'lMetSeg.MetSegRecs(MetSegRec).MFactP = lMetSeg.MetSegRecs(MetSegRec).MFactP * pValue
-                                    lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR * pValue(j), 3)
+                                    lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR _
+                                                                                             * pValue(j), 3)
+
                                 Next
 
                             Case oTable.Contains("MON-")
@@ -177,11 +223,36 @@ Module SensitivityAndUncertaintyAnalysis
                                             ElseIf (lOper.Tables(oTable).Parms(Mon).Value > UpperLimit) Then
                                                 lOper.Tables(oTable).Parms(Mon).Value = UpperLimit
                                             End If
-                                            'lOper.Tables(oTable).Parms(Mon).Value = lOper.Tables(oTable).Parms(Mon).Value * pValue
+                                            ParameterDetails &= SimID & "," & pOper & "," & oTable & "," & lOper.Id & "," & _
+                                            oParameter & "," & Mon & "," & lOper.Tables(oTable).Parms(Mon).Value & vbCrLf
+                                            IO.File.AppendAllText(pBaseName & "_ParameterDetails.txt", ParameterDetails)
+                                            ParameterDetails = ""
                                         Next
 
                                     End If
                                 Next
+
+                            Case oTable.Contains("NUT-BEDCONC")
+
+                                Dim lParameters() As String = {"BNH4(1)", "BNH4(2)", "BNH4(3)", "BPO4(1)", "BPO4(2)", "BPO4(3)"}
+                                For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
+                                    For Each lParameter As String In lParameters
+                                        lOper.Tables("NUT-BEDCONC").ParmValue(lParameter) = _
+                                        SignificantDigits(lOper.Tables("NUT-BEDCONC").ParmValue(lParameter) * pValue(j), 3)
+                                    Next
+                                Next
+
+                            Case oTable.Contains("PLNK-PARM2")
+                                'If oTable.Contains("PLNK-PARM2") Then Stop
+
+                                Dim lParameters() As String = {"CMMLT", "CMMN", "CMMNP", "CMMP"}
+                                For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
+                                    For Each lParameter As String In lParameters
+                                        lOper.Tables("PLNK-PARM2").ParmValue(lParameter) = _
+                                        SignificantDigits(lOper.Tables("PLNK-PARM2").ParmValue(lParameter) * pValue(j), 3)
+                                    Next
+                                Next
+
                             Case oTable.Contains("SILT-CLAY-PM")
                                 For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
                                     For SedimentType As Integer = 15 To 16
@@ -205,6 +276,7 @@ Module SensitivityAndUncertaintyAnalysis
                                         lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue(j), 3)
                                     End If
                                     If lMassLinkID = 21 Then
+
                                         If lMasslink.MassLinkId = 1 AndAlso lMasslink.Source.Group.Contains("IQUAL") Then
                                             lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue(j), 3)
                                         End If
@@ -218,6 +290,8 @@ Module SensitivityAndUncertaintyAnalysis
 
                             Case Else
                                 For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
+                                    If oParameter.Contains("BRBOD(1)") Then oParameter = "BRBOD1"
+                                    If oParameter.Contains("BRBOD(2)") Then oParameter = "BRBOD2"
                                     lOper.Tables(oTable).ParmValue(oParameter) = _
                                             SignificantDigits(lOper.Tables(oTable).ParmValue(oParameter) * pValue(j), 3)
                                     If (lOper.Tables(oTable).ParmValue(oParameter) < LowerLimit) Then
@@ -225,18 +299,26 @@ Module SensitivityAndUncertaintyAnalysis
                                     ElseIf (lOper.Tables(oTable).ParmValue(oParameter) > UpperLimit) Then
                                         lOper.Tables(oTable).ParmValue(oParameter) = UpperLimit
                                     End If
+                                    ParameterDetails &= SimID & "," & pOper & "," & oTable & "," & lOper.Id & "," & _
+                                                                                    oParameter & ",," & _
+                                                                                    lOper.Tables(oTable).ParmValue(oParameter) & vbCrLf
+                                    IO.File.AppendAllText(pBaseName & "_ParameterDetails.txt", ParameterDetails)
+                                    ParameterDetails = ""
                                 Next
                         End Select
+                        Logger.Dbg("Saved the changes in the UCI file")
                         lUci.Save()
-                        ModelRunandReportAnswers(SimID, lUci, NewuciName, lExitCode)
+                        ModelRunandReportAnswers(SimID, lUci, NewuciName, lExitCode, pBaseName, pTestpath, YearsofSimulation, lStats)
+                        Logger.Dbg("Copied the WDM file to a new file with SimID as " & SimID)
                         System.IO.File.Copy(pBaseName & ".wdm", SimID & "-" & pBaseName & ".wdm", True)
                         lUci = Nothing
                     Next
+
                 Next
                 'GraphForSensitivty(Sensitivity)
                 lUci = Nothing
 
-
+                Logger.Dbg("Runs for Sensitivity Analysis finished.")
             Case "Uncertainty"
                 lcsv.OpenFile(pParameterFile) 'Opening the dbf file that has the parameter values
                 'lcsv.Header = 3
@@ -252,7 +334,8 @@ Module SensitivityAndUncertaintyAnalysis
                     Next k
                 Next CurrentRecord
 
-                For NumberOfSimulations As Integer = 101 To lcsv.NumRecords  'Going through the records in dbf file and changing them in the uci file
+                For NumberOfSimulations As Integer = 101 To lcsv.NumRecords
+                    'Going through the records in dbf file and changing them in the uci file
                     lcsv.CurrentRecord = NumberOfSimulations
                     SimID = lcsv.Value(1)
                     'MsgBox("HSPF Simulation " & SimID & " of " & lcsv.NumRecords - 3 & " going on!")
@@ -298,117 +381,190 @@ Module SensitivityAndUncertaintyAnalysis
                     oTable = ""
                     oParameter = ""
                     pValue = Nothing
-                    ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode)
+                    ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestpath, YearsofSimulation, lStats)
                     'System.IO.File.Copy(uciName, SimID & "-" & uciName, True)
+
                     System.IO.File.Copy(pBaseName & ".uci", uciName, True)
                     lUci = Nothing
                 Next
         End Select
     End Sub
 
-    Sub ModelRunandReportAnswers(ByVal SimID As Integer, ByVal lUci As atcUCI.HspfUci, ByVal uciName As String, ByVal lExitCode As Integer)
+    Sub ModelRunandReportAnswers(ByVal SimID As Integer, _
+                                 ByVal lUci As atcUCI.HspfUci, _
+                                 ByVal uciName As String, _
+                                 ByVal lExitCode As Integer, _
+                                 ByVal pBaseName As String, _
+                                 ByVal pTestPath As String, _
+                                 ByVal YearsofSimulation As Single, _
+                                 ByRef lStats As List(Of SensitivityStats))
 
-        'lExitCode = LaunchProgram(pHSPFExe, pTestpath, "-1 -1 " & uciName) 'Run HSPF program
+        'Dim pHSPFExe As String = "C:\Basins41\models\HSPF\bin\WinHspfLt.exe"
+        'Logger.Dbg("Running WinHSPFLt.exe with " & uciName)
+        'lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & uciName) 'Run HSPF program
         'If lExitCode = -1 Then
         '    Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
         '    Exit Sub
         'End If
-
+        'Logger.Dbg("Completed WinHSPFLt.exe run with " & uciName)
+        Dim lWdmFileName As String
+        If SimID > 0 Then
+            lWdmFileName = IO.Path.Combine(pTestPath, SimID & "-" & pBaseName & ".wdm")
+        Else
+            lWdmFileName = IO.Path.Combine(pTestPath, pBaseName & ".wdm")
+        End If
+        'lWdmFileName = IO.Path.Combine(pTestPath, pBaseName & ".wdm")
+        Dim lWdmDataSource As New atcWDM.atcDataSourceWDM
+        lWdmDataSource = atcDataManager.DataSourceBySpecification(lWdmFileName)
+        If lWdmDataSource IsNot Nothing Then
+            atcDataManager.RemoveDataSource(lWdmDataSource)
+        End If
         lWdmDataSource = New atcWDM.atcDataSourceWDM()
-        lWdmFileName = pBaseName & ".wdm"
-        lWdmDataSource.Open(lWdmFileName)      'Open the wdm file
-
+        atcDataManager.OpenDataSource(lWdmDataSource, lWdmFileName, Nothing)
+        Dim lExpertSystem As HspfSupport.atcExpertSystem
+        lExpertSystem = New HspfSupport.atcExpertSystem(lUci, "IRW.exs")
         If pHydrology Then
-            lExpertSystem = New HspfSupport.atcExpertSystem(lUci, lWdmDataSource, "IRW.exs")
+            Logger.Dbg("Calculating Hydrology Statistics for SimID = " & SimID)
+            
             Dim lCons As String = "Flow"
-            Dim AverageAnnual, AverageAnnualcfs, TenPercentHigh, TwentyFivePercentHigh, FiftyPercentHigh, FiftyPercentLow, TwentyFivePercentLow As Single
-            'Dim AverageStormPeakcfs As Single
-            Dim TenPercentLow, FivePercentLow, TwoPercentLow, AnnualPeakFlow As Single
-
-            Dim ErrorAverageAnnual, ErrorTenPercentHigh, ErrorTwentyFivePercentHigh, ErrorFiftyPercentHigh, _
-                ErrorFiftyPercentLow, ErrorFivePercentLow, ErrorTwoPercentLow As Single
-            Dim ErrorTwentyFivePercentLow, ErrorTenPercentLow, ErrorAnnualPeakFlow As Single
             Dim lYearlyAttributes As New atcDataAttributes
-            For Each lSite As HspfSupport.HexSite In lExpertSystem.Sites 'the code below is copied form HSPFOutputReports
-                Dim lSiteName As String = lSite.Name
+            For Each lSite As HspfSupport.HexSite In lExpertSystem.Sites
 
+                Dim lSiteName As String = lSite.Name
                 Dim lArea As Double = lSite.Area
                 If SimID = 0 Then
-                    Dim obsTimeSeries As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(1)), _
-                                                                          lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                    obsTimeSeries = Aggregate(obsTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-                    obsAverageAnnualcfs = obsTimeSeries.Attributes.GetValue("Sum") / YearsofSimulation
-                    obsFiftyPercentHigh = (obsTimeSeries.Attributes.GetValue("Sum") - obsTimeSeries.Attributes.GetValue("%Sum50")) / YearsofSimulation '50% high
-                    obsFiftyPercentLow = (obsTimeSeries.Attributes.GetValue("%Sum50")) / YearsofSimulation '50% low
-                    obsTwentyFivePercentLow = (obsTimeSeries.Attributes.GetValue("%Sum25")) / YearsofSimulation '25% low
-                    obsTenPercentLow = (obsTimeSeries.Attributes.GetValue("%Sum10")) / YearsofSimulation '10% low
-                    obsFivePercentLow = (obsTimeSeries.Attributes.GetValue("%Sum05")) / YearsofSimulation '5% low
-                    obsTwoPercentLow = (obsTimeSeries.Attributes.GetValue("%Sum02")) / YearsofSimulation '2% low
-                    obsTimeSeries = Aggregate(obsTimeSeries, atcTimeUnit.TUYear, 1, atcTran.TranMax)
-                    obsAnnualPeakFlow = obsTimeSeries.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                    ExpertStatsOutputLine = "Observed,,,,, " & _
-                lSiteName & ", " & FormatNumber(obsAverageAnnualcfs, 1, , , TriState.False) & ", " & FormatNumber(obsAverageAnnual, 2) & ", " & _
-                FormatNumber(obsTenPercentHigh, 2) & ", " & FormatNumber(obsTwentyFivePercentHigh, 2) & ", " & _
-                FormatNumber(obsFiftyPercentHigh, 2) & ", " & FormatNumber(obsFiftyPercentLow, 2) & ", " & _
-                FormatNumber(obsTwentyFivePercentLow, 2) & ", " & FormatNumber(obsTenPercentLow, 3) & ", " & _
-                FormatNumber(obsFivePercentLow, 2) & ", " & FormatNumber(obsTwoPercentLow, 2) & FormatNumber(obsAnnualPeakFlow, 2) & vbCrLf
-                    Sensitivity(SimID, 0) = ("Baseline") 'SimID,lsiteName, obsAverageAnnualcfs}
-                    Sensitivity(SimID, 1) = (0)
-                    Sensitivity(SimID, 2) = lSite.Name
-                    Sensitivity(SimID, 3) = AverageAnnual
+                    Dim lNewStatObs As New SensitivityStats
+                    With lNewStatObs
+                        .SimID = SimID
+                        .Scenario = "Observed"
+                        .SiteName = lSiteName
+                        Dim lobsTSercfs As atcData.atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(1)), _
+                                                                              lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                        lobsTSercfs = Aggregate(lobsTSercfs, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                        Dim lMaxObsTSercfs As atcTimeseries = Aggregate(lobsTSercfs, atcTimeUnit.TUYear, 1, atcTran.TranMax)
+
+                        Dim lobsTimeSeriesInches As atcTimeseries = HspfSupport.CfsToInches(lobsTSercfs, lArea)
+                        .AnnualPeakFlow = lMaxObsTSercfs.Attributes.GetValue("Mean")
+                        .AverageAnnualcfs = lobsTSercfs.Attributes.GetValue("SumAnnual")
+
+                        lobsTSercfs = Aggregate(lobsTSercfs, atcTimeUnit.TUYear, 1, atcTran.TranMax)
+                        .AnnualPeakFlow = lobsTSercfs.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+                        .AverageAnnual = lobsTimeSeriesInches.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+                        .TenPercentHigh = (lobsTimeSeriesInches.Attributes.GetDefinedValue("Sum").Value _
+                                            - lobsTimeSeriesInches.Attributes.GetDefinedValue("%Sum90").Value) / YearsofSimulation
+                        .TwentyFivePercentHigh = (lobsTimeSeriesInches.Attributes.GetDefinedValue("Sum").Value _
+                                            - lobsTimeSeriesInches.Attributes.GetDefinedValue("%Sum75").Value) / YearsofSimulation
+                        .FiftyPercentHigh = (lobsTimeSeriesInches.Attributes.GetDefinedValue("Sum").Value _
+                                               - lobsTimeSeriesInches.Attributes.GetDefinedValue("%Sum50").Value) / YearsofSimulation '50% high
+                        .FiftyPercentLow = (lobsTimeSeriesInches.Attributes.GetDefinedValue("%Sum50").Value) / YearsofSimulation '50% low
+                        .TwentyFivePercentLow = (lobsTimeSeriesInches.Attributes.GetDefinedValue("%Sum25").Value) / YearsofSimulation '25% low
+                        .TenPercentLow = (lobsTimeSeriesInches.Attributes.GetDefinedValue("%Sum10").Value) / YearsofSimulation '10% low
+                        .FivePercentLow = (lobsTimeSeriesInches.Attributes.GetDefinedValue("%Sum05").Value) / YearsofSimulation '5% low
+                        .TwoPercentLow = (lobsTimeSeriesInches.Attributes.GetDefinedValue("%Sum02").Value) / YearsofSimulation '2% low
+                        'Annual Peak Flow is being output twice. Fix that. Some numbers have comma when they are output, USe TriState.False in all the output numbers.
+                        lobsTSercfs.Clear()
+                        lMaxObsTSercfs.Clear()
+                        lobsTimeSeriesInches.Clear()
+
+                        ExpertStatsOutputLine = "Observed,Obs,Obs,Obs,Obs, " & _
+                                lSiteName & ", " & FormatNumber(.AverageAnnualcfs, 3, , , TriState.False) & _
+                                ", " & FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & _
+                                ", " & FormatNumber(.AverageAnnual, 3) & ", " & _
+                                FormatNumber(.TenPercentHigh, 3) & ", " & FormatNumber(.TwentyFivePercentHigh, 3) & ", " & _
+                                FormatNumber(.FiftyPercentHigh, 3) & ", " & FormatNumber(.FiftyPercentLow, 3) & ", " & _
+                                FormatNumber(.TwentyFivePercentLow, 3) & ", " & FormatNumber(.TenPercentLow, 3) & ", " & _
+                                FormatNumber(.FivePercentLow, 3) & ", " & FormatNumber(.TwoPercentLow, 3) & ", " & _
+                                FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & vbCrLf
+                    End With
+                    lStats.Add(lNewStatObs)
+                    'Sensitivity(SimID, 0) = ("Observed") 'SimID,lsiteName, obsAverageAnnualcfs}
+                    'Sensitivity(SimID, 1) = (0)
+                    'Sensitivity(SimID, 2) = lSite.Name
+                    'Sensitivity(SimID, 3) = AverageAnnual
                 End If
 
+                Dim lNewStat As New SensitivityStats
+                With lNewStat
+                    If SimID = 0 Then
+                        .Scenario = "Baseline"
+                    Else
+                        .Scenario = "Sensitivity"
+                    End If
+                    .SimID = SimID
+                    .SiteName = lSiteName
+                    Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)), _
+                                                                       lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                    Dim lSimTSercfs As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)), _
+                                                                    lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing) * 0.042 * lArea
+                    Dim lMaxSimTSercfs As atcTimeseries = Aggregate(lSimTSercfs, atcTimeUnit.TUYear, 1, atcTran.TranMax)
 
-                Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)), _
-                                                                   lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                Dim lSimTSercfs As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)), _
-                                                                lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing) * 0.042 * lArea
-                Dim MaxSimTSercfs = Aggregate(lSimTSercfs, atcTimeUnit.TUYear, 1, atcTran.TranMax)
+                    .AverageAnnualcfs = lSimTSercfs.Attributes.GetValue("SumAnnual")
+                    lSimTSercfs = Aggregate(lSimTSercfs, atcTimeUnit.TUYear, 1, atcTran.TranMax)
+                    .AnnualPeakFlow = lMaxSimTSercfs.Attributes.GetValue("Mean")
+                    .AverageAnnual = lSimTSerInches.Attributes.GetValue("SumAnnual")
+                    .TenPercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") - _
+                                      lSimTSerInches.Attributes.GetValue("%Sum90")) _
+                                    / YearsofSimulation '10% high
+                    .TwentyFivePercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") - _
+                                             lSimTSerInches.Attributes.GetValue("%Sum75")) _
+                                             / YearsofSimulation '25% high
+                    .FiftyPercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") - _
+                                        lSimTSerInches.Attributes.GetValue("%Sum50")) _
+                                    / YearsofSimulation '50% high
+                    .FiftyPercentLow = lSimTSerInches.Attributes.GetValue("%Sum50") / YearsofSimulation '50% low
+                    .TwentyFivePercentLow = lSimTSerInches.Attributes.GetValue("%Sum25") / YearsofSimulation '25% low
+                    .TenPercentLow = lSimTSerInches.Attributes.GetValue("%Sum10") / YearsofSimulation '10% low
+                    .FivePercentLow = lSimTSerInches.Attributes.GetValue("%Sum05") / YearsofSimulation '5% low
+                    .TwoPercentLow = lSimTSerInches.Attributes.GetValue("%Sum02") / YearsofSimulation '2% low
+                    'calculating error terms value
+                    lSimTSercfs.Clear()
+                    lSimTSerInches.Clear()
+                    lMaxSimTSercfs.Clear()
+                    Dim ObsValuesList As List(Of SensitivityStats) = lStats.FindAll(Function(x) (x.Scenario = "Observed" _
+                                                                                                 And x.SiteName = lSiteName.ToString))
+                    If ObsValuesList.Count > 0 Then
+                        Dim lObsValues As SensitivityStats = ObsValuesList(0)
+                        .ErrorAverageAnnual = (.AverageAnnual - lObsValues.AverageAnnual) * 100 / lObsValues.AverageAnnual
+                        'calculating error terms value
+                        .ErrorTenPercentHigh = (.TenPercentHigh - lObsValues.TenPercentHigh) * 100 / lObsValues.TenPercentHigh
+                        .ErrorTwentyFivePercentHigh = (.TwentyFivePercentHigh - lObsValues.TwentyFivePercentHigh) * 100 / lObsValues.TwentyFivePercentHigh
+                        .ErrorFiftyPercentHigh = (.FiftyPercentHigh - lObsValues.FiftyPercentHigh) * 100 / lObsValues.FiftyPercentHigh
+                        .ErrorFiftyPercentLow = (.FiftyPercentLow - lObsValues.FiftyPercentLow) * 100 / lObsValues.FiftyPercentLow
+                        .ErrorTwentyFivePercentLow = (.TwentyFivePercentLow - lObsValues.TwentyFivePercentLow) * 100 / lObsValues.TwentyFivePercentLow
+                        .ErrorTenPercentLow = (.TenPercentLow - lObsValues.TenPercentLow) * 100 / lObsValues.TenPercentLow
+                        .ErrorFivePercentLow = (.FivePercentLow - lObsValues.FivePercentLow) * 100 / lObsValues.FivePercentLow
+                        .ErrorTwoPercentLow = (.TwoPercentLow - lObsValues.TwoPercentLow) * 100 / lObsValues.TwoPercentLow
+                        .ErrorAnnualPeakFlow = (.AnnualPeakFlow - lObsValues.AnnualPeakFlow) * 100 / lObsValues.AnnualPeakFlow
+                        ExpertStatsOutputLine = ExpertStatsOutputLine & SimID & ", " & pOper & "," & oTable & ", " & _
+                                    oParameter & ", " & Value & ", " & lSiteName & ", " & _
+                                    FormatNumber(.AverageAnnualcfs, 3, , , TriState.False) & ", " & _
+                                    FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & ", " & _
+                                    FormatNumber(.AverageAnnual, 3) & ", " & _
+                                    FormatNumber(.TenPercentHigh, 3) & ", " & FormatNumber(.TwentyFivePercentHigh, 3) & ", " & _
+                                    FormatNumber(.FiftyPercentHigh, 3) & ", " & FormatNumber(.FiftyPercentLow, 3) & ", " & _
+                                    FormatNumber(.TwentyFivePercentLow, 3) & ", " & FormatNumber(.TenPercentLow, 3) & ", " & _
+                                    FormatNumber(.FivePercentLow, 3) & ", " & FormatNumber(.TwoPercentLow, 3) & ", " & _
+                                    FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & ", " & _
+                                    FormatNumber(.ErrorAverageAnnual, 1) & ", " & FormatNumber(.ErrorTenPercentHigh, 1) & ", " & _
+                                    FormatNumber(.ErrorTwentyFivePercentHigh, 1) & ", " & FormatNumber(.ErrorFiftyPercentHigh, 1) & ", " & _
+                                    FormatNumber(.ErrorFiftyPercentLow, 1) & ", " & FormatNumber(.ErrorTwentyFivePercentLow, 1) & ", " & _
+                                    FormatNumber(.ErrorTenPercentLow, 1) & ", " & FormatNumber(.ErrorFivePercentLow, 1) & ", " & _
+                                    FormatNumber(.ErrorTwoPercentLow, 1) & ", " & FormatNumber(.ErrorAnnualPeakFlow, 1) & vbCrLf
+                        ''Saving the relevant output in a text string to add it to the text file
 
-                'lSeasons.SetSeasonalAttributes(lSimTSercfs, lSeasonalAttributes, lYearlyAttributes)
+                    End If
+                    lStats.Add(lNewStat)
 
-                AverageAnnualcfs = lSimTSercfs.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                lSimTSercfs = Aggregate(lSimTSercfs, atcTimeUnit.TUYear, 1, atcTran.TranMax)
-                AnnualPeakFlow = lSimTSercfs.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                AverageAnnual = lSimTSerInches.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                TenPercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") - lSimTSerInches.Attributes.GetValue("%Sum90")) / YearsofSimulation '10% high
-                TwentyFivePercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") - lSimTSerInches.Attributes.GetValue("%Sum75")) / YearsofSimulation '25% high
-                FiftyPercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") - lSimTSerInches.Attributes.GetValue("%Sum50")) / YearsofSimulation '50% high
-                FiftyPercentLow = (lSimTSerInches.Attributes.GetValue("%Sum50")) / YearsofSimulation '50% low
-                TwentyFivePercentLow = (lSimTSerInches.Attributes.GetValue("%Sum25")) / YearsofSimulation '25% low
-                TenPercentLow = (lSimTSerInches.Attributes.GetValue("%Sum10")) / YearsofSimulation '10% low
-                FivePercentLow = (lSimTSerInches.Attributes.GetValue("%Sum05")) / YearsofSimulation '5% low
-                TwoPercentLow = (lSimTSerInches.Attributes.GetValue("%Sum02")) / YearsofSimulation '2% low
-                'calculating error terms value
-                ErrorAverageAnnual = (AverageAnnual - obsAverageAnnual) * 100 / obsAverageAnnual
-                ErrorTenPercentHigh = (TenPercentHigh - obsTenPercentHigh) * 100 / obsTenPercentHigh
-                ErrorTwentyFivePercentHigh = (TwentyFivePercentHigh - obsTwentyFivePercentHigh) * 100 / obsTwentyFivePercentHigh
-                ErrorFiftyPercentHigh = (FiftyPercentHigh - obsFiftyPercentHigh) * 100 / obsFiftyPercentHigh
-                ErrorFiftyPercentLow = (FiftyPercentLow - obsFiftyPercentLow) * 100 / obsFiftyPercentLow
-                ErrorTwentyFivePercentLow = (TwentyFivePercentLow - obsTwentyFivePercentLow) * 100 / obsTwentyFivePercentLow
-                ErrorTenPercentLow = (TenPercentLow - obsTenPercentLow) * 100 / obsTenPercentLow
-                ErrorFivePercentLow = (FivePercentLow - obsFivePercentLow) * 100 / obsFivePercentLow
-                ErrorTwoPercentLow = (TwoPercentLow - obsTwoPercentLow) * 100 / obsTwoPercentLow
-                ErrorAnnualPeakFlow = (AnnualPeakFlow - obsAnnualPeakFlow) * 100 / obsAnnualPeakFlow
-                ExpertStatsOutputLine = ExpertStatsOutputLine & SimID & ", " & pOper & "," & oTable & ", " & oParameter & ", " & Value & ", " & _
-                lSiteName & ", " & FormatNumber(AverageAnnualcfs, 1, , , TriState.False) & ", " & FormatNumber(AverageAnnual, 2) & ", " & _
-                FormatNumber(TenPercentHigh, 2) & ", " & FormatNumber(TwentyFivePercentHigh, 2) & ", " & _
-                FormatNumber(FiftyPercentHigh, 2) & ", " & FormatNumber(FiftyPercentLow, 2) & ", " & _
-                FormatNumber(TwentyFivePercentLow, 2) & ", " & FormatNumber(TenPercentLow, 3) & ", " & _
-                FormatNumber(FivePercentLow, 3) & ", " & FormatNumber(TwoPercentLow, 3) & ", " & _
-                FormatNumber(ErrorAverageAnnual, 1) & ", " & FormatNumber(ErrorTenPercentHigh, 1) & ", " & _
-                FormatNumber(ErrorTwentyFivePercentHigh, 1) & ", " & FormatNumber(ErrorFiftyPercentHigh, 1) & ", " & _
-                FormatNumber(ErrorFiftyPercentLow, 1) & ", " & FormatNumber(ErrorTwentyFivePercentLow, 1) & ", " & _
-                FormatNumber(ErrorTenPercentLow, 1) & ", " & FormatNumber(ErrorFivePercentLow, 1) & ", " & _
-                FormatNumber(ErrorTwoPercentLow, 1) & FormatNumber(ErrorAnnualPeakFlow, 1) & vbCrLf
+                    IO.File.AppendAllText(pBaseName & "_HydrologyOutput.csv", ExpertStatsOutputLine)
 
-                'Saving the relevant output in a text string to add it to the text file
-                IO.File.AppendAllText(pBaseName & "_HydrologyOutput.csv", ExpertStatsOutputLine)
+                    ExpertStatsOutputLine = ""
+                End With
+
                 If TypeOfAnalysis = "Sensitivity" AndAlso SimID <> 0 Then
-                    Sensitivity(SimID, 0) = (oParameter) 'SimID,lsiteName, obsAverageAnnualcfs}
-                    Sensitivity(SimID, 1) = ((Value - 1) * 100)
-                    Sensitivity(SimID, 2) = lSite.Name
-                    Sensitivity(SimID, 3) = AverageAnnual
+                    'Sensitivity(SimID, 0) = (oParameter) 'SimID,lsiteName, obsAverageAnnualcfs}
+                    'Sensitivity(SimID, 1) = ((Value - 1) * 100)
+                    'Sensitivity(SimID, 2) = lSite.Name
+                    'Sensitivity(SimID, 3) = AverageAnnual
                     'Sensitivity(SimID, 4) = Math.Abs((AverageAnnual - Sensitivity(0, 3)) * 100 / Sensitivity("Observed", 3) / (Value - 1))
                     'Sensitivity(SimID, 5) = (AverageAnnual - Sensitivity("Observed", 3)) * 100 / Sensitivity("Observed", 3)
 
@@ -418,78 +574,111 @@ Module SensitivityAndUncertaintyAnalysis
 
         End If
         If pWaterQuality Then
-            Dim AverageSedimentLoad, AverageWaterTemperature, AverageSummerWaterTemperature, AverageTPLoad, AverageTNLoad As Single
+            Logger.Dbg("Calculating Water Quality Statistics for SimID = " & SimID)
+            Dim AverageSedimentLoad, AverageWaterTemperature, AverageSummerWaterTemperature, _
+                AverageTPLoad, AverageTNLoad As Single
             Dim lTser, lSummerTS As atcTimeseries
             Dim lSeasonsAnnual As New atcSeasonsCalendarYear
-            Dim lyearlyTSGroup As atcTimeseriesGroup
+            Dim lyearlyTSGroup As New atcTimeseriesGroup
             Dim lTenPercentHigh, lFiftyPercentLow As Double
             Dim WQIndex, Site As Integer
             For Site = 0 To WQSites.GetUpperBound(0)
-                ExpertStatsOutputLine = SimID & ", " & pOper & "," & oTable & ", " & oParameter & ", " & Value & ", " & WQSites(Site) & ", "
-                For WQIndex = 0 To WQConstituents.GetUpperBound(0)
+                ExpertStatsOutputLine = SimID & ", " & pOper & "," & oTable & ", " & _
+                oParameter & ", " & Value & ", " & WQSites(Site) & ", "
 
+                For WQIndex = 0 To WQConstituents.GetUpperBound(0)
                     Select Case WQConstituents(WQIndex)
                         Case "TSS"
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "ROSED4"). _
-                            FindData("Location", WQSites(Site))(0)
+                                        FindData("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                             AverageSedimentLoad = lTser.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
                             'Assuming sediment load per day per reach in tons in output from all the reaches
-
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TSS").FindData("Location", WQSites(Site))(0)
+                            lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                            lTser = Aggregate(lTser, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                            Dim lMeanConc As Single = lTser.Attributes.GetValue("Mean")
+                            Dim lGeoMeanConc As Single = lTser.Attributes.GetValue("Geometric Mean")
+
                             lyearlyTSGroup = lSeasonsAnnual.Split(lTser, Nothing)
-                            lTenPercentHigh = 0
-                            lFiftyPercentLow = 0
-                            For Each lyearTS As atcTimeseries In lyearlyTSGroup
-                                lTenPercentHigh += (lyearTS.Attributes.GetValue("sum") - lyearTS.Attributes.GetValue("%sum90"))
-                                lFiftyPercentLow += lyearTS.Attributes.GetValue("%sum50")
-                            Next
-                            lTenPercentHigh = lTenPercentHigh / YearsofSimulation
-                            lFiftyPercentLow = lFiftyPercentLow / YearsofSimulation
-                            ExpertStatsOutputLine &= AverageSedimentLoad & "," & lTenPercentHigh & "," & lFiftyPercentLow & ","
+                            lTenPercentHigh = lTser.Attributes.GetValue("%90")
+                            lFiftyPercentLow = lTser.Attributes.GetValue("%50")
+
+                            'For Each lyearTS As atcTimeseries In lyearlyTSGroup
+                            '    lTenPercentHigh += (lyearTS.Attributes.GetDefinedValue("Sum").Value - lyearTS.Attributes.GetDefinedValue("%Sum90").Value)
+                            '    lFiftyPercentLow += lyearTS.Attributes.GetDefinedValue("%Sum50").Value
+                            'Next
+
+                            'lTenPercentHigh = lTenPercentHigh / YearsofSimulation
+                            'lFiftyPercentLow = lFiftyPercentLow / YearsofSimulation
+                            ExpertStatsOutputLine &= AverageSedimentLoad & "," & lMeanConc & "," & lGeoMeanConc & "," & _
+                            lTenPercentHigh & "," & lFiftyPercentLow & ","
+                            lTser.Clear()
+                            lyearlyTSGroup.Clear()
                         Case "TW"
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TW"). _
-                            FindData("Location", WQSites(Site))(0)
+                                    FindData("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                            lTser = Aggregate(lTser, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                             AverageWaterTemperature = lTser.Attributes.GetDefinedValue("Mean").Value
                             lSeasons.SeasonSelected(0) = True
                             lSummerTS = lSeasons.SplitBySelected(lTser, Nothing).ItemByIndex(1)
                             AverageSummerWaterTemperature = lSummerTS.Attributes.GetDefinedValue("Mean").Value
                             ExpertStatsOutputLine &= AverageWaterTemperature & "," & AverageSummerWaterTemperature & ","
+                            lSummerTS.Clear()
+                            lTser.Clear()
                         Case "TP"
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TPLD"). _
-                            FindData("Location", WQSites(Site))(0)
+                                    FindData("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+
                             AverageTPLoad = lTser.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TP").FindData _
-                            ("Location", WQSites(Site))(0)
+                                    ("Location", WQSites(Site))(0)
+                            lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                            lTser = Aggregate(lTser, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                            Dim lMeanConc As Single = lTser.Attributes.GetValue("Mean")
+                            Dim lGeoMeanConc As Single = lTser.Attributes.GetValue("Geometric Mean")
+
                             lyearlyTSGroup = lSeasonsAnnual.Split(lTser, Nothing)
-                            lTenPercentHigh = 0
-                            lFiftyPercentLow = 0
-                            For Each lyearTS As atcTimeseries In lyearlyTSGroup
-                                lTenPercentHigh += (lyearTS.Attributes.GetValue("sum") - lyearTS.Attributes.GetValue("%sum90"))
-                                lFiftyPercentLow += lyearTS.Attributes.GetValue("%sum50")
-                            Next
-                            lTenPercentHigh = lTenPercentHigh / YearsofSimulation
-                            lFiftyPercentLow = lFiftyPercentLow / YearsofSimulation
-                            ExpertStatsOutputLine &= AverageTPLoad & "," & lTenPercentHigh & "," & lFiftyPercentLow & ","
+                            lTenPercentHigh = lTser.Attributes.GetValue("%90")
+                            lFiftyPercentLow = lTser.Attributes.GetValue("%50")
+                            'For Each lyearTS As atcTimeseries In lyearlyTSGroup
+                            '    lTenPercentHigh += (lyearTS.Attributes.GetDefinedValue("Sum").Value - _
+                            '                        lyearTS.Attributes.GetDefinedValue("%Sum90").Value)
+                            '    lFiftyPercentLow += lyearTS.Attributes.GetDefinedValue("%Sum50").Value
+                            'Next
+                            'lTenPercentHigh = lTenPercentHigh / YearsofSimulation
+                            'lFiftyPercentLow = lFiftyPercentLow / YearsofSimulation
+                            ExpertStatsOutputLine &= AverageTPLoad & "," & lMeanConc & "," & lGeoMeanConc & "," & _
+                            lTenPercentHigh & "," & lFiftyPercentLow & ","
+                            lTser.Clear()
+                            lyearlyTSGroup.Clear()
                         Case "TN"
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TNLD"). _
-                            FindData("Location", WQSites(Site))(0)
+                                    FindData("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                            AverageTNLoad = lTser.Attributes.GetDefinedValue("Mean").Value / YearsofSimulation
-                            lTser = lWdmDataSource.DataSets.FindData("Constituent", "TP").FindData _
-                            ("Location", WQSites(Site))(0)
+                            AverageTNLoad = lTser.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+                            lTser = lWdmDataSource.DataSets.FindData("Constituent", "TN").FindData _
+                                    ("Location", WQSites(Site))(0)
+                            lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                            lTser = Aggregate(lTser, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                            Dim lMeanConc As Single = lTser.Attributes.GetValue("Mean")
+                            Dim lGeoMeanConc As Single = lTser.Attributes.GetValue("Geometric Mean")
+
                             lyearlyTSGroup = lSeasonsAnnual.Split(lTser, Nothing)
-                            lTenPercentHigh = 0
-                            lFiftyPercentLow = 0
-                            For Each lyearTS As atcTimeseries In lyearlyTSGroup
-                                lTenPercentHigh += (lyearTS.Attributes.GetValue("sum") - lyearTS.Attributes.GetValue("%sum90"))
-                                lFiftyPercentLow += lyearTS.Attributes.GetValue("%sum50")
-                            Next
-                            lTenPercentHigh = lTenPercentHigh / YearsofSimulation
-                            lFiftyPercentLow = lFiftyPercentLow / YearsofSimulation
-                            ExpertStatsOutputLine &= AverageTNLoad & "," & lTenPercentHigh & "," & lFiftyPercentLow & ","
+                            lTenPercentHigh = lTser.Attributes.GetValue("%90")
+                            lFiftyPercentLow = lTser.Attributes.GetValue("%50")
+                            'For Each lyearTS As atcTimeseries In lyearlyTSGroup
+                            '    lTenPercentHigh += (lyearTS.Attributes.GetDefinedValue("Sum").Value - lyearTS.Attributes.GetDefinedValue("%sum90").Value)
+                            '    lFiftyPercentLow += lyearTS.Attributes.GetDefinedValue("%Sum50").Value
+                            'Next
+                            'lTenPercentHigh = lTenPercentHigh / YearsofSimulation
+                            'lFiftyPercentLow = lFiftyPercentLow / YearsofSimulation
+                            ExpertStatsOutputLine &= AverageTNLoad & "," & lMeanConc & "," & lGeoMeanConc & "," & _
+                                lTenPercentHigh & "," & lFiftyPercentLow & ","
+                            lTser.Clear()
+                            lyearlyTSGroup.Clear()
                     End Select
 
                 Next
@@ -498,75 +687,75 @@ Module SensitivityAndUncertaintyAnalysis
                 ExpertStatsOutputLine = ""
             Next
         End If
-        lWdmDataSource.Clear()
+        'lWdmDataSource.Clear()
 
-        If pOutputFromBinary Then
-            lBinaryDataSource = New atcTimeseriesFileHspfBinOut()
-            lHSPFBinaryFile = pBaseName & ".hbn"
-            lBinaryDataSource.Open(lHSPFBinaryFile)
-            Dim lEvapT As New atcTimeseriesGroup 'Evapotranspiration Data
-            Dim lPERLNDOperations As HspfOperations = lUci.OpnBlks("PERLND").Ids
+        'If pOutputFromBinary Then
+        '    lBinaryDataSource = New atcTimeseriesFileHspfBinOut()
+        '    lHSPFBinaryFile = pBaseName & ".hbn"
+        '    lBinaryDataSource.Open(lHSPFBinaryFile)
+        '    Dim lEvapT As New atcTimeseriesGroup 'Evapotranspiration Data
+        '    Dim lPERLNDOperations As HspfOperations = lUci.OpnBlks("PERLND").Ids
 
-            Dim lLuName As String
-            Dim lPERLNDNumber As Integer
-            Dim lTempDataset As atcTimeseries
-            Dim SimulatedET As Single
-            BinaryOutputLine = ""
-            For Each lID As HspfOperation In lPERLNDOperations
-                lLuName = lID.Description
-                lPERLNDNumber = lID.Id
-                lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "PET").FindData("Location", "P:" & lID.Id)
-                lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
-                lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-                SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                SimulatedET = SignificantDigits(SimulatedET, 2)
-                BinaryOutputLine = BinaryOutputLine & SimID & ",P:" & lID.Id & "," & lLuName & "," & SimulatedET & "," 'PET is added to the list
+        '    Dim lLuName As String
+        '    Dim lPERLNDNumber As Integer
+        '    Dim lTempDataset As atcTimeseries
+        '    Dim SimulatedET As Single
+        '    BinaryOutputLine = ""
+        '    For Each lID As HspfOperation In lPERLNDOperations
+        '        lLuName = lID.Description
+        '        lPERLNDNumber = lID.Id
+        '        lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "PET").FindData("Location", "P:" & lID.Id)
+        '        lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
+        '        lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        '        SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+        '        SimulatedET = SignificantDigits(SimulatedET, 2)
+        '        BinaryOutputLine = BinaryOutputLine & SimID & ",P:" & lID.Id & "," & lLuName & "," & SimulatedET & "," 'PET is added to the list
 
-                lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "CEPE").FindData("Location", "P:" & lID.Id)
-                lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
-                lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-                SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                SimulatedET = SignificantDigits(SimulatedET, 2)
-                BinaryOutputLine = BinaryOutputLine & SimulatedET & "," 'CEPE is added to the list
+        '        lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "CEPE").FindData("Location", "P:" & lID.Id)
+        '        lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
+        '        lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        '        SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+        '        SimulatedET = SignificantDigits(SimulatedET, 2)
+        '        BinaryOutputLine = BinaryOutputLine & SimulatedET & "," 'CEPE is added to the list
 
-                lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "UZET").FindData("Location", "P:" & lID.Id)
-                lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
-                lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-                SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                SimulatedET = SignificantDigits(SimulatedET, 2)
-                BinaryOutputLine = BinaryOutputLine & SimulatedET & "," 'UZET is added to the list
+        '        lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "UZET").FindData("Location", "P:" & lID.Id)
+        '        lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
+        '        lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        '        SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+        '        SimulatedET = SignificantDigits(SimulatedET, 2)
+        '        BinaryOutputLine = BinaryOutputLine & SimulatedET & "," 'UZET is added to the list
 
-                lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "LZET").FindData("Location", "P:" & lID.Id)
-                lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
-                lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-                SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                SimulatedET = SignificantDigits(SimulatedET, 2)
-                BinaryOutputLine = BinaryOutputLine & SimulatedET & "," 'LZET is added to the list
+        '        lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "LZET").FindData("Location", "P:" & lID.Id)
+        '        lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
+        '        lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        '        SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+        '        SimulatedET = SignificantDigits(SimulatedET, 2)
+        '        BinaryOutputLine = BinaryOutputLine & SimulatedET & "," 'LZET is added to the list
 
-                lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "LZET").FindData("Location", "P:" & lID.Id)
-                lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
-                lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-                SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                SimulatedET = SignificantDigits(SimulatedET, 2)
-                BinaryOutputLine = BinaryOutputLine & SimulatedET & "," 'AGWET is added to the list
+        '        lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "LZET").FindData("Location", "P:" & lID.Id)
+        '        lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
+        '        lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        '        SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+        '        SimulatedET = SignificantDigits(SimulatedET, 2)
+        '        BinaryOutputLine = BinaryOutputLine & SimulatedET & "," 'AGWET is added to the list
 
-                lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "BASET").FindData("Location", "P:" & lID.Id)
-                lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
-                lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-                SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                SimulatedET = SignificantDigits(SimulatedET, 2)
-                BinaryOutputLine = BinaryOutputLine & SimulatedET & "," 'BASET is added to the list
+        '        lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "BASET").FindData("Location", "P:" & lID.Id)
+        '        lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
+        '        lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        '        SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+        '        SimulatedET = SignificantDigits(SimulatedET, 2)
+        '        BinaryOutputLine = BinaryOutputLine & SimulatedET & "," 'BASET is added to the list
 
-                lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "TAET").FindData("Location", "P:" & lID.Id)
-                lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
-                lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-                SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
-                SimulatedET = SignificantDigits(SimulatedET, 2)
-                BinaryOutputLine = BinaryOutputLine & SimulatedET & vbCrLf 'TAET is added to the list
+        '        lEvapT = lBinaryDataSource.DataSets.FindData("Constituent", "TAET").FindData("Location", "P:" & lID.Id)
+        '        lTempDataset = SubsetByDate(lEvapT.Item(0), lUci.GlobalBlock.SDateJ, lUci.GlobalBlock.EdateJ, Nothing)
+        '        lTempDataset = Aggregate(lTempDataset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        '        SimulatedET = lTempDataset.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+        '        SimulatedET = SignificantDigits(SimulatedET, 2)
+        '        BinaryOutputLine = BinaryOutputLine & SimulatedET & vbCrLf 'TAET is added to the list
 
-            Next
-            IO.File.AppendAllText(pBaseName & "_HSPFBinaryOutput.txt", BinaryOutputLine)
-        End If
+        '    Next
+        '    IO.File.AppendAllText(pBaseName & "_HSPFBinaryOutput.txt", BinaryOutputLine)
+        'End If
 
 
     End Sub
