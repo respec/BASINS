@@ -13,6 +13,8 @@ Module modCreateUci
     Dim pLandName(2) As String
     Dim pLastSeg(2) As Integer
     Dim pFirstSeg(2) As Integer
+    Dim pDoWetlands As Boolean
+    Dim pWetlandsOffset As Integer = 100
 
     Friend Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
                                    ByRef aUci As HspfUci, _
@@ -24,8 +26,10 @@ Module modCreateUci
                           Optional ByVal aSnowOption As Integer = 0, _
                           Optional ByVal aFillMissingMetSegRecs As Boolean = False, _
                           Optional ByVal aSJDate As Double = -1, _
-                          Optional ByVal aEJDate As Double = -1)
+                          Optional ByVal aEJDate As Double = -1, _
+                          Optional ByVal aDoWetlands As Boolean = False)
         pWatershed = aWatershed
+        pDoWetlands = aDoWetlands
 
         aUci.Name = aWatershed.Name & ".uci"
         'dummy global block
@@ -271,22 +275,35 @@ Module modCreateUci
         Next
 
         Dim lReachIndex As Integer = -1
+        Dim lWetReach As Boolean = True
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("RCHRES").Ids
-            lReachIndex += 1
+            If pDoWetlands Then
+                If lWetReach Then
+                    'keep the order the same 2x
+                    lReachIndex += 1
+                End If
+            Else
+                lReachIndex += 1
+            End If
+            Dim lOrder As Integer = pWatershed.Reaches(lReachIndex).Order
             Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
             lTable.Parms("HYDRFG").Value = 1
             lTable = lOperation.Tables.Item("GEN-INFO")
-            Dim lStr As String = pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Name
+            Dim lStr As String = pWatershed.Reaches(lOrder).Name
             Dim lLen As Integer = lStr.Length
             If lLen < 19 And _
-              (Not IsNumeric(pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Id) Or _
-               pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Id.Length > 5) Then
-                lStr &= " " & Right(pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Id, 19 - lLen)
+              (Not IsNumeric(pWatershed.Reaches(lOrder).Id) Or _
+               pWatershed.Reaches(lOrder).Id.Length > 5) Then
+                lStr &= " " & Right(pWatershed.Reaches(lOrder).Id, 19 - lLen)
+            End If
+            If pDoWetlands AndAlso lWetReach Then
+                'this is a wetland reach
+                lStr = lOperation.Description
             End If
             lTable.Parms("RCHID").Value = lStr
-            lTable.Parms("NEXITS").Value = pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).NExits
+            lTable.Parms("NEXITS").Value = pWatershed.Reaches(lOrder).NExits
             lTable.Parms("PUNITE").Value = 91
-            If pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Type = "R" Then
+            If pWatershed.Reaches(lOrder).Type = "R" Then
                 lTable.Parms("LKFG").Value = 1
             End If
             lTable = lOperation.Tables.Item("HYDR-PARM1")
@@ -295,13 +312,22 @@ Module modCreateUci
             lTable.Parms("AUX3FG").Value = 1
             lTable.Parms("ODFVF1").Value = 4
             lTable = lOperation.Tables.Item("HYDR-PARM2")
-            lTable.Parms("LEN").Value = pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Length
-            lTable.Parms("DELTH").Value = System.Math.Round(pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).DeltH, 0)
+            lTable.Parms("LEN").Value = pWatershed.Reaches(lOrder).Length
+            lTable.Parms("DELTH").Value = System.Math.Round(pWatershed.Reaches(lOrder).DeltH, 0)
             'set initial volume in reach in ac-ft to 75% of length in miles * mean width in feet * mean depth in feet
             lTable = lOperation.Tables.Item("HYDR-INIT")
-            lTable.Parms("VOL").Value = CInt(pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Length * 5280 * _
-                                             pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Depth * _
-                                             pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Width / 43560 * 0.75)
+            lTable.Parms("VOL").Value = CInt(pWatershed.Reaches(lOrder).Length * 5280 * _
+                                             pWatershed.Reaches(lOrder).Depth * _
+                                             pWatershed.Reaches(lOrder).Width / 43560 * 0.75)
+            If pDoWetlands Then
+                If lWetReach Then
+                    'do the regular reach next time
+                    lWetReach = False
+                Else
+                    'do the wetlands reach next time
+                    lWetReach = True
+                End If
+            End If
         Next lOperation
     End Sub
 
@@ -441,10 +467,33 @@ Module modCreateUci
                 Else 'IMPLND
                     lConnection.MFact = lLandUse.Area * lLandUse.ImperviousFraction
                 End If
+                If pDoWetlands Then
+                    'using new wetlands feature, adjust this area 
+                    lConnection.MFact = lConnection.MFact * (100.0 - lLandUse.PercentToWetlands) / 100.0
+                End If
                 lConnection.Target.VolName = "RCHRES"
                 lConnection.Target.VolId = lLandUse.Reach.Id
                 lConnection.MassLink = TypeId(lType)
                 aUci.Connections.Add(lConnection)
+                If pDoWetlands Then
+                    'using new wetlands feature, add record for direct to wetlands  
+                    Dim lWConnection As New HspfConnection
+                    lWConnection.Uci = aUci
+                    lWConnection.Typ = 3
+                    lWConnection.Source.VolName = lType
+                    lWConnection.Source.VolId = lLandUse.ModelID
+                    If lType = "PERLND" Then
+                        lWConnection.MFact = lLandUse.Area * (1.0 - lLandUse.ImperviousFraction)
+                    Else 'IMPLND
+                        lWConnection.MFact = lLandUse.Area * lLandUse.ImperviousFraction
+                    End If
+                    'adjust this area 
+                    lWConnection.MFact = lWConnection.MFact * (lLandUse.PercentToWetlands) / 100.0
+                    lWConnection.Target.VolName = "RCHRES"
+                    lWConnection.Target.VolId = lLandUse.Reach.Id + pWetlandsOffset
+                    lWConnection.MassLink = TypeId(lType)
+                    aUci.Connections.Add(lWConnection)
+                End If
             Next
         Next
 
@@ -464,6 +513,22 @@ Module modCreateUci
                 aUci.Connections.Add(lConnection)
             End If
         Next
+
+        If pDoWetlands Then
+            'using new wetlands feature, add record for each wetlands reach to each stream reach
+            For Each lReach As Reach In pWatershed.Reaches
+                lConnection = New HspfConnection
+                lConnection.Uci = aUci
+                lConnection.Typ = 3
+                lConnection.Source.VolName = "RCHRES"
+                lConnection.Source.VolId = lReach.Id + pWetlandsOffset
+                lConnection.MFact = 1.0#
+                lConnection.Target.VolName = "RCHRES"
+                lConnection.Target.VolId = lReach.Id
+                lConnection.MassLink = 3
+                aUci.Connections.Add(lConnection)
+            Next
+        End If
     End Sub
 
     Private Sub CreateConnectionsMet(ByRef aUci As HspfUci)
@@ -586,6 +651,23 @@ Module modCreateUci
                 Loop
             End If
 
+            'if using new wetlands feature, determine appropriate operation id offset from stream reach to associated wetlands reach
+            If pDoWetlands Then
+                pWetlandsOffset = 100
+                If pWatershed.Reaches.Count > 500 Then
+                    'this scheme isn't going to work
+                    pDoWetlands = False
+                ElseIf pWatershed.Reaches.Count > 400 Then
+                    pWetlandsOffset = 500
+                ElseIf pWatershed.Reaches.Count > 300 Then
+                    pWetlandsOffset = 400
+                ElseIf pWatershed.Reaches.Count > 200 Then
+                    pWetlandsOffset = 300
+                ElseIf pWatershed.Reaches.Count > 100 Then
+                    pWetlandsOffset = 200
+                End If
+            End If
+
             'add rec to opn seq block for each land use
             pLandName(2) = "PERLND"
             pLandName(1) = "IMPLND"
@@ -594,6 +676,15 @@ Module modCreateUci
             'add record to opn seq block for each reach
             For i As Integer = 0 To pWatershed.Reaches.Count - 1
                 'now add each rchres to opn seq block
+                If pDoWetlands Then
+                    'create a wetlands rchres before each stream rchres
+                    Dim lWetOpn As New HspfOperation
+                    lWetOpn.Uci = aUci
+                    lWetOpn.Name = "RCHRES"
+                    lWetOpn.Description = "Wetlands to R" & pWatershed.Reaches(pWatershed.Reaches(i).Order).Id
+                    lWetOpn.Id = pWetlandsOffset + CInt(pWatershed.Reaches(pWatershed.Reaches(i).Order).Id)
+                    aUci.OpnSeqBlock.Add(lWetOpn)
+                End If
                 Dim lOpn As New HspfOperation
                 lOpn.Uci = aUci
                 lOpn.Name = "RCHRES"
@@ -603,7 +694,6 @@ Module modCreateUci
                 Else
                     lOpn.Description = pWatershed.Reaches(pWatershed.Reaches(i).Order).Name & " (" & pWatershed.Reaches(pWatershed.Reaches(i).Order).Id & ")"
                 End If
-                'newOpn.Id = i
                 lOpn.Id = CInt(pWatershed.Reaches(pWatershed.Reaches(i).Order).Id)
                 aUci.OpnSeqBlock.Add(lOpn)
             Next i

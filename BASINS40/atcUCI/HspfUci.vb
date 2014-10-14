@@ -2715,7 +2715,8 @@ x:
                           Optional ByVal aSnowOption As Integer = 0, _
                           Optional ByVal aFillMissingMetSegRecs As Boolean = False, _
                           Optional ByVal aSJDate As Double = -1, _
-                          Optional ByVal aEJDate As Double = -1)
+                          Optional ByVal aEJDate As Double = -1, _
+                          Optional ByVal aDoWetlands As Boolean = False)
 
         'get starter uci ready for use defaulting parameters and mass links
         Dim lDefUci As New HspfUci
@@ -2723,7 +2724,9 @@ x:
 
         modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources, _
                                          lDefUci, _
-                                         aPollutantListFileName, aMetBaseDsn, aMetWdmId, aSnowOption, aFillMissingMetSegRecs, aSJDate, aEJDate)
+                                         aPollutantListFileName, aMetBaseDsn, aMetWdmId, aSnowOption, _
+                                         aFillMissingMetSegRecs, aSJDate, aEJDate, _
+                                         aDoWetlands)
 
         'add specified pollutants
         If aWQConstituents.Length > 0 Then

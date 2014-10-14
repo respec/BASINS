@@ -174,7 +174,7 @@ Module WetlandsUCITest
                 '5.	Enhance the section of the BASINS/HSPF model setup code responsible for creating the HSPF User Control Input 
                 '   (UCI) file, so that it creates both a 'wetlands' RCHRES and a stream RCHRES within each modeled subbasin.
 
-                If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWdmNames, pWQConstituents) Then
+                If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWdmNames, pWQConstituents, , , True) Then
                     Logger.Status("Completed HSPF Setup")
                     Logger.Dbg("UCIBuilder:  Created UCI file " & lOutputPath & "\" & pBaseOutputName & ".uci")
                 Else

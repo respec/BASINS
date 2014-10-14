@@ -853,7 +853,8 @@ Public Module modModelSetup
                               ByVal aMetWdmNames As atcCollection, _
                               ByVal aWQConstituents() As String, _
                               Optional ByVal aCalledFromFrames As Boolean = False, _
-                              Optional ByVal aSnowOption As Integer = 0) As Boolean
+                              Optional ByVal aSnowOption As Integer = 0, _
+                              Optional ByVal aDoWetlands As Boolean = False) As Boolean
         ChDriveDir(PathNameOnly(aUciName))
         'get message file ready
         Dim lMsg As New atcUCI.HspfMsg("hspfmsg.wdm")
@@ -929,7 +930,7 @@ Public Module modModelSetup
                                          lDataSources, _
                                          lStarterUciName, _
                                          aWQConstituents, _
-                                         lPollutantListFileName, , , aSnowOption)
+                                         lPollutantListFileName, , , aSnowOption, , , , aDoWetlands)
             lHspfUci.Save()
             lCreateUCI = True
         End If
