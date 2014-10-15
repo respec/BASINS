@@ -140,6 +140,15 @@ Module modCreateUci
             If Not lOperation Is Nothing Then
                 lOperation.FTable.FTableFromCrossSect(lChannel)
             End If
+            If aDoWetlands Then
+                'also build ftable for wetlands reach
+                Dim lWetId As Integer = CShort(lChannel.Reach.Id) + pWetlandsOffset
+                lOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(lWetId)
+                If Not lOperation Is Nothing Then
+                    lChannel.WidthMean = lChannel.WidthMean * 10.0
+                    lOperation.FTable.FTableFromCrossSect(lChannel)
+                End If
+            End If
         Next
 
         'create schematic, ext src blocks

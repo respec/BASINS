@@ -193,36 +193,5 @@ Module WetlandsUCITest
         '   from the new wetlands RCHRES operations will be assumed to connect to the corresponding river RCHRES.  It will remain 
         '   up to the user to modify the connectivity and parameterization if the default assumptions are not appropriate. 
 
-        'below is from old create UCI test script
-        'Dim lDataSources As New Collection(Of atcData.atcTimeseriesSource)
-        'Dim lDataSource As New atcWDM.atcDataSourceWDM
-        ''lDataSource.Open("test.wdm")
-        'lDataSource.Open("sdmproject.wdm")
-        'lDataSources.Add(lDataSource)
-        'lDataSource = New atcWDM.atcDataSourceWDM
-        ''lDataSource.Open("md.wdm")
-        'lDataSource.Open("met.wdm")
-        'lDataSources.Add(lDataSource)
-
-        'Dim lStarterUciName As String = "starter.uci"
-        'Dim lPollutantListFileName As String = "Poltnt_2.prn"
-
-        'Dim lMetBaseDsn As Integer = 11
-        'Dim lMetWdmId As String = "WDM2"
-        'Dim lWQConstituents() As String = {}
-
-        'Dim lWatershedName As String = "UCICreation"
-        'lWatershedName = "SDMProject"
-        'Dim lWatershed As New Watershed
-        'If lWatershed.Open(lWatershedName) = 0 Then  'everything read okay, continue
-        '    Dim lHspfUci As New atcUCI.HspfUci
-        '    lHspfUci.Msg = lMsg
-        '    lHspfUci.CreateUciFromBASINS(lWatershed, _
-        '                                 lDataSources, _
-        '                                 lStarterUciName, _
-        '                                 lWQConstituents, _
-        '                                 lPollutantListFileName)
-        '    lHspfUci.Save()
-        'End If
     End Sub
 End Module
