@@ -2964,40 +2964,75 @@ Public Class GisUtil
         Dim lOutputGrid As New MapWinGIS.Grid
         lOutputGrid.Open(aToWetlandsGridFileName)
 
-        'prepare the wetlands layer   'todo: handle if wetlands is a grid instead of shapefile
-        Dim lWetlandsLayerIndex As Integer = 0
-        Dim lPolygonSf As MapWinGIS.Shapefile = Nothing
+        'prepare the wetlands layer   
+        Dim lWetlandsLayerIndex As Integer = -1
+        Dim lWetlandsLayerIsShapefile As Boolean = False
         If GisUtil.IsLayerByFileName(aWetlandsFileName) Then
             lWetlandsLayerIndex = GisUtil.LayerIndex(aWetlandsFileName)
-            lPolygonSf = PolygonShapeFileFromIndex(lWetlandsLayerIndex)
+            If aWetlandsFileName.EndsWith(".shp") Then
+                lWetlandsLayerIsShapefile = True
+            End If
         End If
 
-        'initialize the new grid
-        lPolygonSf.BeginPointInShapefile()
-        Dim lXPos As Double = 0.0
-        Dim lYPos As Double = 0.0
         Dim lCol As Integer = 0
         Dim lRow As Integer = 0
-        Dim lSubId As Integer = -1
-        With lOutputGrid
-            Dim lNumRows As Integer = .Header.NumberRows
-            Dim lNumCols As Integer = .Header.NumberCols
-            Dim lNoData As Double = .Header.NodataValue
-            For lRow = 0 To lNumRows - 1
-                For lCol = 0 To lNumCols - 1
-                    .CellToProj(lCol, lRow, lXPos, lYPos)
-                    lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
-                    If lSubId > -1 Then
-                        .Value(lCol, lRow) = 99  'this is wetlands
-                    End If
-                Next
-                Logger.Progress(lRow, lNumRows)
-            Next
-        End With
-        Logger.Progress(100, 100)
-        lPolygonSf.EndPointInShapefile()
-        lPolygonSf.Close()
-        lPolygonSf = Nothing
+        Dim lXPos As Double = 0.0
+        Dim lYPos As Double = 0.0
+        If lWetlandsLayerIndex > -1 Then
+            If lWetlandsLayerIsShapefile Then
+                Dim lPolygonSf As MapWinGIS.Shapefile = Nothing
+                lPolygonSf = PolygonShapeFileFromIndex(lWetlandsLayerIndex)
+
+                'initialize the new grid
+                lPolygonSf.BeginPointInShapefile()
+                lXPos = 0.0
+                lYPos = 0.0
+                lCol = 0
+                lRow = 0
+                Dim lSubId As Integer = -1
+                With lOutputGrid
+                    Dim lNumRows As Integer = .Header.NumberRows
+                    Dim lNumCols As Integer = .Header.NumberCols
+                    Dim lNoData As Double = .Header.NodataValue
+                    For lRow = 0 To lNumRows - 1
+                        For lCol = 0 To lNumCols - 1
+                            .CellToProj(lCol, lRow, lXPos, lYPos)
+                            lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
+                            If lSubId > -1 Then
+                                .Value(lCol, lRow) = 99  'this is wetlands
+                            End If
+                        Next
+                        Logger.Progress(lRow, lNumRows)
+                    Next
+                End With
+                Logger.Progress(100, 100)
+                lPolygonSf.EndPointInShapefile()
+                lPolygonSf.Close()
+                lPolygonSf = Nothing
+            Else
+                'wetlands layer is a grid
+                Dim lWetlandsGrid As New MapWinGIS.Grid
+                lWetlandsGrid.Open(aWetlandsFileName)
+                Dim lWCol As Integer = 0
+                Dim lWRow As Integer = 0
+                With lOutputGrid
+                    Dim lNumRows As Integer = .Header.NumberRows
+                    Dim lNumCols As Integer = .Header.NumberCols
+                    Dim lNoData As Double = .Header.NodataValue
+                    For lRow = 0 To lNumRows - 1
+                        For lCol = 0 To lNumCols - 1
+                            .CellToProj(lCol, lRow, lXPos, lYPos)
+                            lWetlandsGrid.ProjToCell(lXPos, lYPos, lWCol, lWRow)
+                            If lWetlandsGrid.Value(lWCol, lWRow) > 89 Then
+                                .Value(lCol, lRow) = 99  'this is wetlands
+                            End If
+                        Next
+                        Logger.Progress(lRow, lNumRows)
+                    Next
+                End With
+                Logger.Progress(100, 100)
+            End If
+        End If
 
         ''rasterize the wetland shapefile   'seems to have some issues, not really faster either
         'Dim lTmpWetlandsGridFileName As String = FilenameNoExt(aToWetlandsGridFileName) & "Wetlands.tif"
