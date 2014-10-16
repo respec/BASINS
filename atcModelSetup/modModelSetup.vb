@@ -2066,6 +2066,66 @@ Public Module modModelSetup
         Next lLayerIndex
         SaveFileString(aMapFileName, lSB.ToString)
     End Sub
+
+    Public Function ProcessGridForWetlands(ByVal aDEMFileName As String, ByVal aWetlandsFileName As String, ByVal aStreamsFileName As String) As String
+        'set nodata value properly
+        GisUtil.GridSetNoData(aDEMFileName, -100.0)
+
+        'First Compute the Pit Fill Grid (Corrected DEM)
+        Dim lPitFillDEMLayerName As String = "Corrected DEM"
+        Dim lPitFillDEMLayerIndex As Integer = 0
+        Dim lPitFillDEMFileName As String = ""
+        If GisUtil.IsLayer(lPitFillDEMLayerName) Then
+            lPitFillDEMLayerIndex = GisUtil.LayerIndex(lPitFillDEMLayerName)
+            lPitFillDEMFileName = GisUtil.LayerFileName(lPitFillDEMLayerIndex)
+        Else
+            Logger.Status("Wetlands Step 1 of 3: Computing Pit Fill")
+            lPitFillDEMFileName = FilenameNoExt(aDEMFileName) & "PitFill.tif"
+            GisUtil.GridPitFill(aDEMFileName, lPitFillDEMFileName)
+            GisUtil.AddLayer(lPitFillDEMFileName, lPitFillDEMLayerName)
+            GisUtil.SaveProject(GisUtil.ProjectFileName)
+        End If
+
+        'Flow Direction Grid
+        Dim lFlowDirGridLayerName As String = "Flow Direction Grid"
+        Dim lFlowDirGridLayerIndex As Integer = 0
+        Dim lFlowDirGridFileName As String = ""
+        Dim lSlopeGridFileName As String = ""
+        If GisUtil.IsLayer(lFlowDirGridLayerName) Then
+            lFlowDirGridLayerIndex = GisUtil.LayerIndex(lFlowDirGridLayerName)
+            lFlowDirGridFileName = GisUtil.LayerFileName(lFlowDirGridLayerIndex)
+        Else
+            Logger.Status("Wetlands Step 2 of 3: Computing Flow Direction")
+            lFlowDirGridFileName = FilenameNoExt(aDEMFileName) & "FlowDir.tif"
+            lSlopeGridFileName = FilenameNoExt(aDEMFileName) & "Slope.tif"
+            Dim lRet As Integer = GisUtil.GridFlowDirection(lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName)
+            If Not GisUtil.IsLayer(lFlowDirGridLayerName) Then
+                GisUtil.AddLayer(lFlowDirGridFileName, lFlowDirGridLayerName)
+            End If
+        End If
+
+        'Create a 'ToWetlands' grid, using the Flow Direction grid, wetlands GIS layer, and stream reach shapefile.  
+        'This algorithm determines if each pixel (grid cell) drains to a wetland or to a stream reach (without first passing through a wetland).
+
+        Dim lToWetlandsGridLayerName As String = "ToWetlands"
+        Dim lToWetlandsGridLayerIndex As Integer = 0
+        Dim lToWetlandsGridFileName As String = ""
+        Dim lInputProjectionFileName As String = FilenameSetExt(aDEMFileName, "prj")
+        If GisUtil.IsLayer(lToWetlandsGridLayerName) Then
+            lToWetlandsGridLayerIndex = GisUtil.LayerIndex(lToWetlandsGridLayerName)
+            lToWetlandsGridFileName = GisUtil.LayerFileName(lToWetlandsGridLayerIndex)
+        Else
+            Logger.Status("Wetlands Step 3 of 3: Computing ToWetlands Grid")
+            lToWetlandsGridFileName = FilenameNoExt(aDEMFileName) & "ToWetlands.tif"
+            GisUtil.ComputeToWetlands(lFlowDirGridFileName, aWetlandsFileName, aStreamsFileName, lToWetlandsGridFileName)
+            If FileExists(lInputProjectionFileName) Then
+                FileCopy(lInputProjectionFileName, FilenameSetExt(lToWetlandsGridFileName, "prj"))
+            End If
+            GisUtil.AddLayer(lToWetlandsGridFileName, lToWetlandsGridLayerName)
+            GisUtil.SaveProject(GisUtil.ProjectFileName)
+        End If
+        Return lToWetlandsGridFileName
+    End Function
 End Module
 
 Friend Class LandUseSubbasinOverlayRecord

@@ -1704,6 +1704,16 @@ Public Class GisUtil
         Return lSlope
     End Function
 
+    Public Shared Function GridPitFill(ByVal aDEMFileName As String, ByVal aPitFillDEMFileName As String) As Boolean
+        MapWinGeoProc.Hydrology.Fill(aDEMFileName, aPitFillDEMFileName, False)
+        Return True
+    End Function
+
+    Public Shared Function GridFlowDirection(ByVal aPitFillDEMFileName As String, ByVal aFlowDirGridFileName As String, ByVal aSlopeGridFileName As String) As Integer
+        Dim lRet As Integer = MapWinGeoProc.Hydrology.D8(aPitFillDEMFileName, aFlowDirGridFileName, aSlopeGridFileName, 8, False, Nothing)
+        Return lRet
+    End Function
+
     Public Shared Function GridValueAtPoint(ByVal aGridLayerIndex As Integer, ByVal aX As Double, ByVal aY As Double) As Integer
         'set input grid
         Dim gridLayer As MapWindow.Interfaces.Layer
