@@ -1809,12 +1809,16 @@ Public Class frmModelSetup
             ElseIf GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.Grid Then  'Grid
                 cboDEM.Items.Add(lLayerName)
                 cboDEM2.Items.Add(lLayerName)
+                cboWetlands.Items.Add(lLayerName)
                 If GisUtil.LayerFileName(lLayerIndex).IndexOf("\demg\") >= 0 Or GisUtil.LayerFileName(lLayerIndex).IndexOf("\dem\") >= 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
                     cboDEM2.SelectedIndex = cboDEM2.Items.Count - 1
                 ElseIf GisUtil.LayerFileName(lLayerIndex).IndexOf("\ned\") >= 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
                     cboDEM2.SelectedIndex = cboDEM2.Items.Count - 1
+                End If
+                If lLayerName.ToUpper.Contains("WETLAND") Then
+                    cboWetlands.SelectedIndex = cboWetlands.Items.Count - 1
                 End If
             End If
         Next
