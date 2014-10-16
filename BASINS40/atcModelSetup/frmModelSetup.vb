@@ -25,6 +25,12 @@ Public Class frmModelSetup
     Friend WithEvents cboUnits As System.Windows.Forms.ComboBox
     Friend WithEvents lblUnits As System.Windows.Forms.Label
     Friend pUniqueModelSegmentNames As atcCollection
+    Friend WithEvents gbxWetlands As System.Windows.Forms.GroupBox
+    Friend WithEvents cboDEM2 As System.Windows.Forms.ComboBox
+    Friend WithEvents lblWetElev As System.Windows.Forms.Label
+    Friend WithEvents chkWetlands As System.Windows.Forms.CheckBox
+    Friend WithEvents cboWetlands As System.Windows.Forms.ComboBox
+    Friend WithEvents lblWetLayer As System.Windows.Forms.Label
     Friend pBasinsFolder As String
 
 #Region " Windows Form Designer generated code "
@@ -126,6 +132,8 @@ Public Class frmModelSetup
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
         Me.gbxSnow = New System.Windows.Forms.GroupBox
+        Me.cboUnits = New System.Windows.Forms.ComboBox
+        Me.lblUnits = New System.Windows.Forms.Label
         Me.cboDEM = New System.Windows.Forms.ComboBox
         Me.lblGrid = New System.Windows.Forms.Label
         Me.rbnDegree = New System.Windows.Forms.RadioButton
@@ -199,8 +207,12 @@ Public Class frmModelSetup
         Me.ofdCustom = New System.Windows.Forms.OpenFileDialog
         Me.ofdClass = New System.Windows.Forms.OpenFileDialog
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
-        Me.cboUnits = New System.Windows.Forms.ComboBox
-        Me.lblUnits = New System.Windows.Forms.Label
+        Me.gbxWetlands = New System.Windows.Forms.GroupBox
+        Me.cboDEM2 = New System.Windows.Forms.ComboBox
+        Me.lblWetElev = New System.Windows.Forms.Label
+        Me.chkWetlands = New System.Windows.Forms.CheckBox
+        Me.cboWetlands = New System.Windows.Forms.ComboBox
+        Me.lblWetLayer = New System.Windows.Forms.Label
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.gbxSnow.SuspendLayout()
@@ -210,6 +222,7 @@ Public Class frmModelSetup
         Me.TabPage5.SuspendLayout()
         Me.TabPage6.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.gbxWetlands.SuspendLayout()
         Me.SuspendLayout()
         '
         'TabControl1
@@ -229,12 +242,13 @@ Public Class frmModelSetup
         Me.TabControl1.Location = New System.Drawing.Point(13, 14)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(532, 402)
+        Me.TabControl1.Size = New System.Drawing.Size(532, 525)
         Me.TabControl1.TabIndex = 0
         '
         'TabPage1
         '
         Me.TabPage1.BackColor = System.Drawing.Color.Transparent
+        Me.TabPage1.Controls.Add(Me.gbxWetlands)
         Me.TabPage1.Controls.Add(Me.gbxSnow)
         Me.TabPage1.Controls.Add(Me.cboOutlets)
         Me.TabPage1.Controls.Add(Me.cboStreams)
@@ -248,15 +262,14 @@ Public Class frmModelSetup
         Me.TabPage1.Controls.Add(Me.Label1)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(524, 373)
+        Me.TabPage1.Size = New System.Drawing.Size(524, 496)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
         '
         'gbxSnow
         '
-        Me.gbxSnow.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.gbxSnow.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.gbxSnow.Controls.Add(Me.cboUnits)
         Me.gbxSnow.Controls.Add(Me.lblUnits)
@@ -267,9 +280,31 @@ Public Class frmModelSetup
         Me.gbxSnow.Controls.Add(Me.rbnEnergy)
         Me.gbxSnow.Location = New System.Drawing.Point(12, 241)
         Me.gbxSnow.Name = "gbxSnow"
-        Me.gbxSnow.Size = New System.Drawing.Size(496, 106)
+        Me.gbxSnow.Size = New System.Drawing.Size(496, 111)
         Me.gbxSnow.TabIndex = 13
         Me.gbxSnow.TabStop = False
+        '
+        'cboUnits
+        '
+        Me.cboUnits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboUnits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboUnits.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboUnits.Location = New System.Drawing.Point(420, 71)
+        Me.cboUnits.Name = "cboUnits"
+        Me.cboUnits.Size = New System.Drawing.Size(59, 21)
+        Me.cboUnits.TabIndex = 20
+        '
+        'lblUnits
+        '
+        Me.lblUnits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblUnits.AutoSize = True
+        Me.lblUnits.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblUnits.Location = New System.Drawing.Point(342, 74)
+        Me.lblUnits.Name = "lblUnits"
+        Me.lblUnits.Size = New System.Drawing.Size(72, 13)
+        Me.lblUnits.TabIndex = 19
+        Me.lblUnits.Text = "Vertical Units:"
+        Me.lblUnits.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboDEM
         '
@@ -926,7 +961,7 @@ Public Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.lblStatus)
         Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(13, 423)
+        Me.GroupBox1.Location = New System.Drawing.Point(13, 546)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(532, 47)
         Me.GroupBox1.TabIndex = 1
@@ -948,7 +983,7 @@ Public Class frmModelSetup
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOK.Location = New System.Drawing.Point(13, 478)
+        Me.cmdOK.Location = New System.Drawing.Point(13, 601)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(60, 28)
         Me.cmdOK.TabIndex = 2
@@ -958,7 +993,7 @@ Public Class frmModelSetup
         '
         Me.cmdExisting.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdExisting.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdExisting.Location = New System.Drawing.Point(80, 478)
+        Me.cmdExisting.Location = New System.Drawing.Point(80, 601)
         Me.cmdExisting.Name = "cmdExisting"
         Me.cmdExisting.Size = New System.Drawing.Size(100, 28)
         Me.cmdExisting.TabIndex = 4
@@ -969,7 +1004,7 @@ Public Class frmModelSetup
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(187, 478)
+        Me.cmdCancel.Location = New System.Drawing.Point(187, 601)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(73, 28)
         Me.cmdCancel.TabIndex = 5
@@ -979,7 +1014,7 @@ Public Class frmModelSetup
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(400, 478)
+        Me.cmdHelp.Location = New System.Drawing.Point(400, 601)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(65, 28)
         Me.cmdHelp.TabIndex = 6
@@ -989,7 +1024,7 @@ Public Class frmModelSetup
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(473, 478)
+        Me.cmdAbout.Location = New System.Drawing.Point(473, 601)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(72, 28)
         Me.cmdAbout.TabIndex = 7
@@ -1021,34 +1056,82 @@ Public Class frmModelSetup
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
         '
-        'cboUnits
+        'gbxWetlands
         '
-        Me.cboUnits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboUnits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboUnits.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboUnits.Location = New System.Drawing.Point(420, 71)
-        Me.cboUnits.Name = "cboUnits"
-        Me.cboUnits.Size = New System.Drawing.Size(59, 21)
-        Me.cboUnits.TabIndex = 20
+        Me.gbxWetlands.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxWetlands.Controls.Add(Me.cboWetlands)
+        Me.gbxWetlands.Controls.Add(Me.lblWetLayer)
+        Me.gbxWetlands.Controls.Add(Me.cboDEM2)
+        Me.gbxWetlands.Controls.Add(Me.lblWetElev)
+        Me.gbxWetlands.Controls.Add(Me.chkWetlands)
+        Me.gbxWetlands.Location = New System.Drawing.Point(12, 358)
+        Me.gbxWetlands.Name = "gbxWetlands"
+        Me.gbxWetlands.Size = New System.Drawing.Size(496, 119)
+        Me.gbxWetlands.TabIndex = 14
+        Me.gbxWetlands.TabStop = False
         '
-        'lblUnits
+        'cboDEM2
         '
-        Me.lblUnits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblUnits.AutoSize = True
-        Me.lblUnits.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblUnits.Location = New System.Drawing.Point(342, 74)
-        Me.lblUnits.Name = "lblUnits"
-        Me.lblUnits.Size = New System.Drawing.Size(72, 13)
-        Me.lblUnits.TabIndex = 19
-        Me.lblUnits.Text = "Vertical Units:"
-        Me.lblUnits.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.cboDEM2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboDEM2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboDEM2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboDEM2.Location = New System.Drawing.Point(128, 45)
+        Me.cboDEM2.Name = "cboDEM2"
+        Me.cboDEM2.Size = New System.Drawing.Size(351, 21)
+        Me.cboDEM2.TabIndex = 16
+        '
+        'lblWetElev
+        '
+        Me.lblWetElev.AutoSize = True
+        Me.lblWetElev.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblWetElev.Location = New System.Drawing.Point(24, 48)
+        Me.lblWetElev.Name = "lblWetElev"
+        Me.lblWetElev.Size = New System.Drawing.Size(76, 13)
+        Me.lblWetElev.TabIndex = 15
+        Me.lblWetElev.Text = "Elevation Grid:"
+        Me.lblWetElev.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'chkWetlands
+        '
+        Me.chkWetlands.AutoSize = True
+        Me.chkWetlands.Location = New System.Drawing.Point(18, 19)
+        Me.chkWetlands.Name = "chkWetlands"
+        Me.chkWetlands.Size = New System.Drawing.Size(176, 17)
+        Me.chkWetlands.TabIndex = 11
+        Me.chkWetlands.Text = "Use Advanced Wetlands Setup"
+        Me.chkWetlands.UseVisualStyleBackColor = True
+        '
+        'cboWetlands
+        '
+        Me.cboWetlands.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboWetlands.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboWetlands.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboWetlands.Location = New System.Drawing.Point(128, 78)
+        Me.cboWetlands.Name = "cboWetlands"
+        Me.cboWetlands.Size = New System.Drawing.Size(351, 21)
+        Me.cboWetlands.TabIndex = 18
+        '
+        'lblWetLayer
+        '
+        Me.lblWetLayer.AutoSize = True
+        Me.lblWetLayer.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblWetLayer.Location = New System.Drawing.Point(24, 81)
+        Me.lblWetLayer.Name = "lblWetLayer"
+        Me.lblWetLayer.Size = New System.Drawing.Size(84, 13)
+        Me.lblWetLayer.TabIndex = 17
+        Me.lblWetLayer.Text = "Wetlands Layer:"
+        Me.lblWetLayer.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'frmModelSetup
         '
         Me.AcceptButton = Me.cmdOK
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(560, 517)
+        Me.ClientSize = New System.Drawing.Size(560, 640)
         Me.Controls.Add(Me.cmdAbout)
         Me.Controls.Add(Me.cmdHelp)
         Me.Controls.Add(Me.cmdCancel)
@@ -1074,6 +1157,8 @@ Public Class frmModelSetup
         Me.TabPage6.ResumeLayout(False)
         Me.TabPage6.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
+        Me.gbxWetlands.ResumeLayout(False)
+        Me.gbxWetlands.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1347,7 +1432,7 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
-        Logger.Msg("BASINS " & pModelName & " for MapWindow" & vbCrLf & vbCrLf & "Version 1.1", MsgBoxStyle.OkOnly, "BASINS " & pModelName)
+        Logger.Msg("BASINS " & pModelName & " for MapWindow" & vbCrLf & vbCrLf & "Version 1.2", MsgBoxStyle.OkOnly, "BASINS " & pModelName)
     End Sub
 
     Private Sub cmdExisting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdExisting.Click
@@ -1359,7 +1444,11 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
-        ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
+        If pModelName = "AQUATOX" Then
+            ShowHelp("BASINS Details\Watershed and Instream Model Setup\AQUATOX.html")
+        Else
+            ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
+        End If
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
@@ -1430,13 +1519,25 @@ Public Class frmModelSetup
                                              cboStream7.Items(cboStream7.SelectedIndex), _
                                              cboStream8.Items(cboStream8.SelectedIndex), _
                                              cboStream9.Items(cboStream9.SelectedIndex)}
+            Dim lDoWetlands As Boolean = chkWetlands.Checked
 
             EnableControls(False)
+
             If PreProcessChecking(lOutputPath, lBaseOutputName, pModelName, cboLanduse.SelectedIndex, _
-                                  pMetStations.Count, lSubbasinLayerName, lLandUseLayerName) Then 'early checks OK
+                              pMetStations.Count, lSubbasinLayerName, lLandUseLayerName) Then 'early checks OK
                 lblStatus.Text = "Preparing HSPF Setup"
                 Me.Refresh()
 
+                Dim lToWetlandsGridFileName As String = ""
+                If lDoWetlands Then
+                    'do grid processing for new wetlands option
+                    Dim lWetlandsDEMLayerName As String = cboDEM2.Items(cboDEM2.SelectedIndex)
+                    Dim lWetlandsDEMFileName As String = GisUtil.LayerFileName(lWetlandsDEMLayerName)
+                    Dim lWetlandsLayerName As String = cboWetlands.Items(cboWetlands.SelectedIndex)
+                    Dim lWetlandsFileName As String = GisUtil.LayerFileName(lWetlandsLayerName)
+                    Dim lStreamsFileName As String = GisUtil.LayerFileName(lStreamLayerName)
+                    lToWetlandsGridFileName = ProcessGridForWetlands(lWetlandsDEMFileName, lWetlandsFileName, lStreamsFileName)
+                End If
 
                 'Dim lMetWDM As String = ""    'used to be txtMetWDMName.Text,
                 '                              'enhanced to handle multiple met wdm files 
@@ -1476,14 +1577,15 @@ Public Class frmModelSetup
                              lLanduseFieldName, lLandUseClassFile, _
                              lSubbasinSegmentName, _
                              lPSRCustom, lPSRCustomFile, lPSRCalculate, _
-                             lSnowOption, lElevationFileName, lElevationUnitsName) Then
+                             lSnowOption, lElevationFileName, lElevationUnitsName, _
+                             lDoWetlands, lToWetlandsGridFileName) Then
                     Me.Dispose()
                     Me.Close()
 
                     If CreateUCI(lOutputPath & "\" & lBaseOutputName & ".uci", _
                                  lUniqueMetWDMNames, _
                                  lWQConstituents, , _
-                                 lSnowOption) Then
+                                 lSnowOption, lDoWetlands) Then
                         lblStatus.Text = "Completed HSPF Setup"
                         Me.Refresh()
                         StartWinHSPF(lOutputPath & "\" & lBaseOutputName & ".uci")
@@ -1501,7 +1603,7 @@ Public Class frmModelSetup
             End If
             EnableControls(True)
             Me.Refresh()
-            End If
+        End If
     End Sub
 
     Private Function SetupAQUATOX(ByVal aOutputPath As String, ByVal aBaseOutputName As String) As Boolean
@@ -1642,6 +1744,7 @@ Public Class frmModelSetup
             Label4.Top = 88
             cboStreams.Top = 88
             gbxSnow.Visible = False
+            gbxWetlands.Visible = False
         End If
     End Sub
 
@@ -1686,8 +1789,12 @@ Public Class frmModelSetup
             Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
             If GisUtil.LayerType(lLayerIndex) = 3 Then 'PolygonShapefile 
                 cboSubbasins.Items.Add(lLayerName)
+                cboWetlands.Items.Add(lLayerName)
                 If lLayerName.ToUpper = "SUBBASINS" Or lLayerName.IndexOf("Watershed Shapefile") > -1 Then
                     cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
+                End If
+                If lLayerName.ToUpper.Contains("WETLAND") Then
+                    cboWetlands.SelectedIndex = cboWetlands.Items.Count - 1
                 End If
             ElseIf GisUtil.LayerType(lLayerIndex) = 2 Then 'LineShapefile 
                 cboStreams.Items.Add(lLayerName)
@@ -1701,10 +1808,13 @@ Public Class frmModelSetup
                 End If
             ElseIf GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.Grid Then  'Grid
                 cboDEM.Items.Add(lLayerName)
+                cboDEM2.Items.Add(lLayerName)
                 If GisUtil.LayerFileName(lLayerIndex).IndexOf("\demg\") >= 0 Or GisUtil.LayerFileName(lLayerIndex).IndexOf("\dem\") >= 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
+                    cboDEM2.SelectedIndex = cboDEM2.Items.Count - 1
                 ElseIf GisUtil.LayerFileName(lLayerIndex).IndexOf("\ned\") >= 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
+                    cboDEM2.SelectedIndex = cboDEM2.Items.Count - 1
                 End If
             End If
         Next
@@ -1719,6 +1829,9 @@ Public Class frmModelSetup
         End If
         If cboDEM.Items.Count > 0 And cboDEM.SelectedIndex < 0 Then
             cboDEM.SelectedIndex = 0
+        End If
+        If cboWetlands.Items.Count > 0 And cboWetlands.SelectedIndex < 0 Then
+            cboWetlands.SelectedIndex = 0
         End If
 
         tbxName.Text = IO.Path.GetFileNameWithoutExtension(GisUtil.ProjectFileName)
