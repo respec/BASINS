@@ -112,29 +112,26 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="btnCancel.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
   </data>
   <data name="btnCancel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="btnCancel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>456, 113</value>
-  </data>
-  <data name="btnCancel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>540, 109</value>
   </data>
   <data name="btnCancel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>72, 22</value>
+    <value>80, 24</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="btnCancel.TabIndex" type="System.Int32, mscorlib">
     <value>20</value>
   </data>
@@ -145,7 +142,7 @@
     <value>btnCancel</value>
   </data>
   <data name="&gt;&gt;btnCancel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;btnCancel.Parent" xml:space="preserve">
     <value>pnlButtons</value>
@@ -160,13 +157,10 @@
     <value>NoControl</value>
   </data>
   <data name="btnOk.Location" type="System.Drawing.Point, System.Drawing">
-    <value>380, 113</value>
-  </data>
-  <data name="btnOk.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>454, 109</value>
   </data>
   <data name="btnOk.Size" type="System.Drawing.Size, System.Drawing">
-    <value>72, 22</value>
+    <value>80, 24</value>
   </data>
   <data name="btnOk.TabIndex" type="System.Int32, mscorlib">
     <value>19</value>
@@ -178,7 +172,7 @@
     <value>btnOk</value>
   </data>
   <data name="&gt;&gt;btnOk.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;btnOk.Parent" xml:space="preserve">
     <value>pnlButtons</value>
@@ -187,13 +181,10 @@
     <value>6</value>
   </data>
   <data name="cboTimeUnits.Location" type="System.Drawing.Point, System.Drawing">
-    <value>181, 115</value>
-  </data>
-  <data name="cboTimeUnits.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>188, 112</value>
   </data>
   <data name="cboTimeUnits.Size" type="System.Drawing.Size, System.Drawing">
-    <value>65, 21</value>
+    <value>71, 21</value>
   </data>
   <data name="cboTimeUnits.TabIndex" type="System.Int32, mscorlib">
     <value>25</value>
@@ -202,7 +193,7 @@
     <value>cboTimeUnits</value>
   </data>
   <data name="&gt;&gt;cboTimeUnits.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;cboTimeUnits.Parent" xml:space="preserve">
     <value>pnlButtons</value>
@@ -211,13 +202,10 @@
     <value>0</value>
   </data>
   <data name="cboAggregate.Location" type="System.Drawing.Point, System.Drawing">
-    <value>250, 115</value>
-  </data>
-  <data name="cboAggregate.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>265, 112</value>
   </data>
   <data name="cboAggregate.Size" type="System.Drawing.Size, System.Drawing">
-    <value>116, 21</value>
+    <value>123, 21</value>
   </data>
   <data name="cboAggregate.TabIndex" type="System.Int32, mscorlib">
     <value>24</value>
@@ -226,7 +214,7 @@
     <value>cboAggregate</value>
   </data>
   <data name="&gt;&gt;cboAggregate.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;cboAggregate.Parent" xml:space="preserve">
     <value>pnlButtons</value>
@@ -235,13 +223,10 @@
     <value>1</value>
   </data>
   <data name="txtTimeStep.Location" type="System.Drawing.Point, System.Drawing">
-    <value>148, 115</value>
-  </data>
-  <data name="txtTimeStep.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>151, 112</value>
   </data>
   <data name="txtTimeStep.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 20</value>
+    <value>31, 20</value>
   </data>
   <data name="txtTimeStep.TabIndex" type="System.Int32, mscorlib">
     <value>23</value>
@@ -253,7 +238,7 @@
     <value>txtTimeStep</value>
   </data>
   <data name="&gt;&gt;txtTimeStep.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;txtTimeStep.Parent" xml:space="preserve">
     <value>pnlButtons</value>
@@ -264,14 +249,8 @@
   <data name="chkTimeStep.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="chkTimeStep.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
   <data name="chkTimeStep.Location" type="System.Drawing.Point, System.Drawing">
-    <value>9, 117</value>
-  </data>
-  <data name="chkTimeStep.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>12, 114</value>
   </data>
   <data name="chkTimeStep.Size" type="System.Drawing.Size, System.Drawing">
     <value>133, 17</value>
@@ -286,7 +265,7 @@
     <value>chkTimeStep</value>
   </data>
   <data name="&gt;&gt;chkTimeStep.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;chkTimeStep.Parent" xml:space="preserve">
     <value>pnlButtons</value>
@@ -297,8 +276,11 @@
   <data name="atcSelectedDates.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
+  <data name="atcSelectedDates.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 4, 4, 4</value>
+  </data>
   <data name="atcSelectedDates.Size" type="System.Drawing.Size, System.Drawing">
-    <value>288, 110</value>
+    <value>313, 105</value>
   </data>
   <data name="atcSelectedDates.TabIndex" type="System.Int32, mscorlib">
     <value>21</value>
@@ -319,13 +301,10 @@
     <value>Bottom</value>
   </data>
   <data name="pnlButtons.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 451</value>
-  </data>
-  <data name="pnlButtons.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>0, 480</value>
   </data>
   <data name="pnlButtons.Size" type="System.Drawing.Size, System.Drawing">
-    <value>539, 142</value>
+    <value>632, 141</value>
   </data>
   <data name="pnlButtons.TabIndex" type="System.Int32, mscorlib">
     <value>18</value>
@@ -334,7 +313,7 @@
     <value>pnlButtons</value>
   </data>
   <data name="&gt;&gt;pnlButtons.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;pnlButtons.Parent" xml:space="preserve">
     <value>$this</value>
@@ -342,53 +321,53 @@
   <data name="&gt;&gt;pnlButtons.ZOrder" xml:space="preserve">
     <value>4</value>
   </data>
-  <metadata name="MenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <metadata name="MenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>0, 0</value>
   </metadata>
   <data name="mnuOpenData.Size" type="System.Drawing.Size, System.Drawing">
-    <value>179, 22</value>
+    <value>245, 24</value>
   </data>
   <data name="mnuOpenData.Text" xml:space="preserve">
     <value>Open Data</value>
   </data>
   <data name="mnuFileManage.Size" type="System.Drawing.Size, System.Drawing">
-    <value>179, 22</value>
+    <value>245, 24</value>
   </data>
   <data name="mnuFileManage.Text" xml:space="preserve">
     <value>Manage Data Sources</value>
   </data>
   <data name="mnuSaveFilters.Size" type="System.Drawing.Size, System.Drawing">
-    <value>179, 22</value>
+    <value>245, 24</value>
   </data>
   <data name="mnuSaveFilters.Text" xml:space="preserve">
     <value>Save Filters</value>
   </data>
   <data name="mnuLoadFilters.Size" type="System.Drawing.Size, System.Drawing">
-    <value>179, 22</value>
+    <value>245, 24</value>
   </data>
   <data name="mnuLoadFilters.Text" xml:space="preserve">
     <value>Load Filters</value>
   </data>
   <data name="mnuFile.Size" type="System.Drawing.Size, System.Drawing">
-    <value>35, 20</value>
+    <value>45, 23</value>
   </data>
   <data name="mnuFile.Text" xml:space="preserve">
     <value>File</value>
   </data>
   <data name="mnuAttributesAdd.Size" type="System.Drawing.Size, System.Drawing">
-    <value>113, 22</value>
+    <value>152, 24</value>
   </data>
   <data name="mnuAttributesAdd.Text" xml:space="preserve">
     <value>A&amp;dd</value>
   </data>
   <data name="mnuAttributesRemove.Size" type="System.Drawing.Size, System.Drawing">
-    <value>113, 22</value>
+    <value>152, 24</value>
   </data>
   <data name="mnuAttributesRemove.Text" xml:space="preserve">
     <value>&amp;Remove</value>
   </data>
   <data name="mnuAttributesMove.Size" type="System.Drawing.Size, System.Drawing">
-    <value>113, 22</value>
+    <value>152, 24</value>
   </data>
   <data name="mnuAttributesMove.Text" xml:space="preserve">
     <value>&amp;Move</value>
@@ -397,52 +376,52 @@
     <value>False</value>
   </data>
   <data name="mnuAttributes.Size" type="System.Drawing.Size, System.Drawing">
-    <value>67, 20</value>
+    <value>90, 23</value>
   </data>
   <data name="mnuAttributes.Text" xml:space="preserve">
     <value>Attributes</value>
   </data>
   <data name="mnuSelectAll.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 22</value>
+    <value>266, 24</value>
   </data>
   <data name="mnuSelectAll.Text" xml:space="preserve">
     <value>Select &amp;All</value>
   </data>
   <data name="mnuSelectClear.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 22</value>
+    <value>266, 24</value>
   </data>
   <data name="mnuSelectClear.Text" xml:space="preserve">
     <value>Un-select All</value>
   </data>
   <data name="mnuSelectAllMatching.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 22</value>
+    <value>266, 24</value>
   </data>
   <data name="mnuSelectAllMatching.Text" xml:space="preserve">
     <value>Select &amp;Matching</value>
   </data>
   <data name="mnuSelectNoMatching.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 22</value>
+    <value>266, 24</value>
   </data>
   <data name="mnuSelectNoMatching.Text" xml:space="preserve">
     <value>Un-select Matching</value>
   </data>
   <data name="mnuSelectSeparator1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 6</value>
+    <value>263, 6</value>
   </data>
   <data name="mnuSelectMap.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 22</value>
+    <value>266, 24</value>
   </data>
   <data name="mnuSelectMap.Text" xml:space="preserve">
     <value>Select Locations On Map</value>
   </data>
   <data name="mnuSelect.Size" type="System.Drawing.Size, System.Drawing">
-    <value>48, 20</value>
+    <value>62, 23</value>
   </data>
   <data name="mnuSelect.Text" xml:space="preserve">
     <value>Select</value>
   </data>
   <data name="mnuHelp.Size" type="System.Drawing.Size, System.Drawing">
-    <value>40, 20</value>
+    <value>53, 23</value>
   </data>
   <data name="mnuHelp.Text" xml:space="preserve">
     <value>Help</value>
@@ -450,11 +429,8 @@
   <data name="MenuStrip1.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
-  <data name="MenuStrip1.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 2, 0, 2</value>
-  </data>
   <data name="MenuStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>539, 24</value>
+    <value>632, 27</value>
   </data>
   <data name="MenuStrip1.TabIndex" type="System.Int32, mscorlib">
     <value>19</value>
@@ -463,7 +439,7 @@
     <value>MenuStrip1</value>
   </data>
   <data name="&gt;&gt;MenuStrip1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;MenuStrip1.Parent" xml:space="preserve">
     <value>$this</value>
@@ -475,13 +451,10 @@
     <value>Fill</value>
   </data>
   <data name="pMatchingGrid.Location" type="System.Drawing.Point, System.Drawing">
-    <value>2, 172</value>
-  </data>
-  <data name="pMatchingGrid.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>3, 184</value>
   </data>
   <data name="pMatchingGrid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>535, 156</value>
+    <value>626, 165</value>
   </data>
   <data name="pMatchingGrid.TabIndex" type="System.Int32, mscorlib">
     <value>15</value>
@@ -505,13 +478,10 @@
     <value>NoControl</value>
   </data>
   <data name="lblMatching.Location" type="System.Drawing.Point, System.Drawing">
-    <value>2, 157</value>
-  </data>
-  <data name="lblMatching.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 0, 2, 0</value>
+    <value>3, 168</value>
   </data>
   <data name="lblMatching.Size" type="System.Drawing.Size, System.Drawing">
-    <value>535, 15</value>
+    <value>626, 16</value>
   </data>
   <data name="lblMatching.TabIndex" type="System.Int32, mscorlib">
     <value>14</value>
@@ -523,7 +493,7 @@
     <value>lblMatching</value>
   </data>
   <data name="&gt;&gt;lblMatching.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;lblMatching.Parent" xml:space="preserve">
     <value>groupTop</value>
@@ -538,13 +508,10 @@
     <value>NoControl</value>
   </data>
   <data name="splitAboveMatching.Location" type="System.Drawing.Point, System.Drawing">
-    <value>2, 151</value>
-  </data>
-  <data name="splitAboveMatching.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>3, 161</value>
   </data>
   <data name="splitAboveMatching.Size" type="System.Drawing.Size, System.Drawing">
-    <value>535, 6</value>
+    <value>626, 7</value>
   </data>
   <data name="splitAboveMatching.TabIndex" type="System.Int32, mscorlib">
     <value>12</value>
@@ -553,7 +520,7 @@
     <value>splitAboveMatching</value>
   </data>
   <data name="&gt;&gt;splitAboveMatching.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Splitter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Splitter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;splitAboveMatching.Parent" xml:space="preserve">
     <value>groupTop</value>
@@ -565,13 +532,10 @@
     <value>Top</value>
   </data>
   <data name="panelCriteria.Location" type="System.Drawing.Point, System.Drawing">
-    <value>2, 15</value>
-  </data>
-  <data name="panelCriteria.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>3, 16</value>
   </data>
   <data name="panelCriteria.Size" type="System.Drawing.Size, System.Drawing">
-    <value>535, 136</value>
+    <value>626, 145</value>
   </data>
   <data name="panelCriteria.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -580,7 +544,7 @@
     <value>panelCriteria</value>
   </data>
   <data name="&gt;&gt;panelCriteria.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;panelCriteria.Parent" xml:space="preserve">
     <value>groupTop</value>
@@ -592,16 +556,10 @@
     <value>Top</value>
   </data>
   <data name="groupTop.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 24</value>
-  </data>
-  <data name="groupTop.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
-  </data>
-  <data name="groupTop.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>0, 27</value>
   </data>
   <data name="groupTop.Size" type="System.Drawing.Size, System.Drawing">
-    <value>539, 330</value>
+    <value>632, 352</value>
   </data>
   <data name="groupTop.TabIndex" type="System.Int32, mscorlib">
     <value>20</value>
@@ -613,7 +571,7 @@
     <value>groupTop</value>
   </data>
   <data name="&gt;&gt;groupTop.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;groupTop.Parent" xml:space="preserve">
     <value>$this</value>
@@ -628,13 +586,10 @@
     <value>NoControl</value>
   </data>
   <data name="splitAboveSelected.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 354</value>
-  </data>
-  <data name="splitAboveSelected.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>0, 379</value>
   </data>
   <data name="splitAboveSelected.Size" type="System.Drawing.Size, System.Drawing">
-    <value>539, 7</value>
+    <value>632, 8</value>
   </data>
   <data name="splitAboveSelected.TabIndex" type="System.Int32, mscorlib">
     <value>21</value>
@@ -643,7 +598,7 @@
     <value>splitAboveSelected</value>
   </data>
   <data name="&gt;&gt;splitAboveSelected.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Splitter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Splitter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;splitAboveSelected.Parent" xml:space="preserve">
     <value>$this</value>
@@ -655,13 +610,10 @@
     <value>Fill</value>
   </data>
   <data name="pSelectedGrid.Location" type="System.Drawing.Point, System.Drawing">
-    <value>2, 15</value>
-  </data>
-  <data name="pSelectedGrid.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>3, 16</value>
   </data>
   <data name="pSelectedGrid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>535, 73</value>
+    <value>626, 74</value>
   </data>
   <data name="pSelectedGrid.TabIndex" type="System.Int32, mscorlib">
     <value>17</value>
@@ -682,16 +634,10 @@
     <value>Fill</value>
   </data>
   <data name="groupSelected.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 361</value>
-  </data>
-  <data name="groupSelected.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
-  </data>
-  <data name="groupSelected.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>0, 387</value>
   </data>
   <data name="groupSelected.Size" type="System.Drawing.Size, System.Drawing">
-    <value>539, 90</value>
+    <value>632, 93</value>
   </data>
   <data name="groupSelected.TabIndex" type="System.Int32, mscorlib">
     <value>22</value>
@@ -703,7 +649,7 @@
     <value>groupSelected</value>
   </data>
   <data name="&gt;&gt;groupSelected.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;groupSelected.Parent" xml:space="preserve">
     <value>$this</value>
@@ -711,14 +657,14 @@
   <data name="&gt;&gt;groupSelected.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>6, 13</value>
+  <data name="$this.AutoScaleBaseSize" type="System.Drawing.Size, System.Drawing">
+    <value>5, 13</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>539, 593</value>
+    <value>632, 621</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -762,12 +708,6 @@
         AAAAAAAAAAAAAAAAAAAAAAAA
 </value>
   </data>
-  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
-  </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Select Data</value>
   </data>
@@ -775,108 +715,108 @@
     <value>mnuFile</value>
   </data>
   <data name="&gt;&gt;mnuFile.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuOpenData.Name" xml:space="preserve">
     <value>mnuOpenData</value>
   </data>
   <data name="&gt;&gt;mnuOpenData.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuFileManage.Name" xml:space="preserve">
     <value>mnuFileManage</value>
   </data>
   <data name="&gt;&gt;mnuFileManage.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuSaveFilters.Name" xml:space="preserve">
     <value>mnuSaveFilters</value>
   </data>
   <data name="&gt;&gt;mnuSaveFilters.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuLoadFilters.Name" xml:space="preserve">
     <value>mnuLoadFilters</value>
   </data>
   <data name="&gt;&gt;mnuLoadFilters.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuAttributes.Name" xml:space="preserve">
     <value>mnuAttributes</value>
   </data>
   <data name="&gt;&gt;mnuAttributes.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuAttributesAdd.Name" xml:space="preserve">
     <value>mnuAttributesAdd</value>
   </data>
   <data name="&gt;&gt;mnuAttributesAdd.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuAttributesRemove.Name" xml:space="preserve">
     <value>mnuAttributesRemove</value>
   </data>
   <data name="&gt;&gt;mnuAttributesRemove.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuAttributesMove.Name" xml:space="preserve">
     <value>mnuAttributesMove</value>
   </data>
   <data name="&gt;&gt;mnuAttributesMove.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuSelect.Name" xml:space="preserve">
     <value>mnuSelect</value>
   </data>
   <data name="&gt;&gt;mnuSelect.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuSelectAll.Name" xml:space="preserve">
     <value>mnuSelectAll</value>
   </data>
   <data name="&gt;&gt;mnuSelectAll.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuSelectClear.Name" xml:space="preserve">
     <value>mnuSelectClear</value>
   </data>
   <data name="&gt;&gt;mnuSelectClear.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuSelectAllMatching.Name" xml:space="preserve">
     <value>mnuSelectAllMatching</value>
   </data>
   <data name="&gt;&gt;mnuSelectAllMatching.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuSelectNoMatching.Name" xml:space="preserve">
     <value>mnuSelectNoMatching</value>
   </data>
   <data name="&gt;&gt;mnuSelectNoMatching.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;mnuSelectSeparator1.Name" xml:space="preserve">
-    <value>mnuSelectSeparator1</value>
-  </data>
-  <data name="&gt;&gt;mnuSelectSeparator1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuSelectMap.Name" xml:space="preserve">
     <value>mnuSelectMap</value>
   </data>
   <data name="&gt;&gt;mnuSelectMap.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuHelp.Name" xml:space="preserve">
     <value>mnuHelp</value>
   </data>
   <data name="&gt;&gt;mnuHelp.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;mnuSelectSeparator1.Name" xml:space="preserve">
+    <value>mnuSelectSeparator1</value>
+  </data>
+  <data name="&gt;&gt;mnuSelectSeparator1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>frmSelectData</value>
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>
