@@ -72,40 +72,40 @@ Friend Class frmSelectData
     Friend WithEvents chkTimeStep As System.Windows.Forms.CheckBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectData))
-        Me.btnCancel = New System.Windows.Forms.Button()
-        Me.btnOk = New System.Windows.Forms.Button()
-        Me.pnlButtons = New System.Windows.Forms.Panel()
-        Me.cboTimeUnits = New System.Windows.Forms.ComboBox()
-        Me.cboAggregate = New System.Windows.Forms.ComboBox()
-        Me.txtTimeStep = New System.Windows.Forms.TextBox()
-        Me.chkTimeStep = New System.Windows.Forms.CheckBox()
-        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
-        Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuOpenData = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuFileManage = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuSaveFilters = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuLoadFilters = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuAttributes = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuAttributesAdd = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuAttributesRemove = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuAttributesMove = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuSelect = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuSelectAll = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuSelectClear = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuSelectAllMatching = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuSelectNoMatching = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuSelectSeparator1 = New System.Windows.Forms.ToolStripSeparator()
-        Me.mnuSelectMap = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem()
-        Me.groupTop = New System.Windows.Forms.GroupBox()
-        Me.pMatchingGrid = New atcControls.atcGrid()
-        Me.lblMatching = New System.Windows.Forms.Label()
-        Me.splitAboveMatching = New System.Windows.Forms.Splitter()
-        Me.panelCriteria = New System.Windows.Forms.Panel()
-        Me.splitAboveSelected = New System.Windows.Forms.Splitter()
-        Me.groupSelected = New System.Windows.Forms.GroupBox()
-        Me.pSelectedGrid = New atcControls.atcGrid()
-        Me.atcSelectedDates = New atcData.atcChooseDataGroupDates()
+        Me.btnCancel = New System.Windows.Forms.Button
+        Me.btnOk = New System.Windows.Forms.Button
+        Me.pnlButtons = New System.Windows.Forms.Panel
+        Me.cboTimeUnits = New System.Windows.Forms.ComboBox
+        Me.cboAggregate = New System.Windows.Forms.ComboBox
+        Me.txtTimeStep = New System.Windows.Forms.TextBox
+        Me.chkTimeStep = New System.Windows.Forms.CheckBox
+        Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
+        Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuOpenData = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuFileManage = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSaveFilters = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuLoadFilters = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuAttributes = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuAttributesAdd = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuAttributesRemove = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuAttributesMove = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelect = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectAll = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectClear = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectAllMatching = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectNoMatching = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectMap = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
+        Me.groupTop = New System.Windows.Forms.GroupBox
+        Me.pMatchingGrid = New atcControls.atcGrid
+        Me.lblMatching = New System.Windows.Forms.Label
+        Me.splitAboveMatching = New System.Windows.Forms.Splitter
+        Me.panelCriteria = New System.Windows.Forms.Panel
+        Me.splitAboveSelected = New System.Windows.Forms.Splitter
+        Me.groupSelected = New System.Windows.Forms.GroupBox
+        Me.pSelectedGrid = New atcControls.atcGrid
+        Me.mnuSelectSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.pnlButtons.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.groupTop.SuspendLayout()
@@ -158,6 +158,11 @@ Friend Class frmSelectData
         resources.ApplyResources(Me.chkTimeStep, "chkTimeStep")
         Me.chkTimeStep.Name = "chkTimeStep"
         Me.chkTimeStep.UseVisualStyleBackColor = True
+        '
+        'atcSelectedDates
+        '
+        resources.ApplyResources(Me.atcSelectedDates, "atcSelectedDates")
+        Me.atcSelectedDates.Name = "atcSelectedDates"
         '
         'MenuStrip1
         '
@@ -238,11 +243,6 @@ Friend Class frmSelectData
         Me.mnuSelectNoMatching.Name = "mnuSelectNoMatching"
         resources.ApplyResources(Me.mnuSelectNoMatching, "mnuSelectNoMatching")
         '
-        'mnuSelectSeparator1
-        '
-        Me.mnuSelectSeparator1.Name = "mnuSelectSeparator1"
-        resources.ApplyResources(Me.mnuSelectSeparator1, "mnuSelectSeparator1")
-        '
         'mnuSelectMap
         '
         Me.mnuSelectMap.Checked = True
@@ -320,16 +320,15 @@ Friend Class frmSelectData
         Me.pSelectedGrid.Name = "pSelectedGrid"
         Me.pSelectedGrid.Source = Nothing
         '
-        'atcSelectedDates
+        'mnuSelectSeparator1
         '
-        resources.ApplyResources(Me.atcSelectedDates, "atcSelectedDates")
-        Me.atcSelectedDates.Name = "atcSelectedDates"
+        Me.mnuSelectSeparator1.Name = "mnuSelectSeparator1"
+        resources.ApplyResources(Me.mnuSelectSeparator1, "mnuSelectSeparator1")
         '
         'frmSelectData
         '
         Me.AcceptButton = Me.btnOk
         resources.ApplyResources(Me, "$this")
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
         Me.Controls.Add(Me.groupSelected)
         Me.Controls.Add(Me.splitAboveSelected)
@@ -517,11 +516,6 @@ Friend Class frmSelectData
                 Catch
                 End Try
             End If
-
-            Dim lSplitTS As New atcTimeseriesGroup
-            Dim lSplitForm As New frmSpecifySplit
-            lSplitForm.AskUser(pSelectedGroup, Nothing, lSplitTS)
-
             Return pSelectedGroup
         Else
             Return Nothing
@@ -733,7 +727,6 @@ Restart:
                 pMatchingGroup.Clear()
                 Dim lCount As Integer = 0
                 Dim lNextProgress As Integer = -1
-                Dim lMatchingText As String = ""
                 'Dim selectedValues As atcCollection = CType(plstCriteria(1).Source, ListSource).SelectedItems
                 For Each ts As atcDataSet In lAllDatasets
                     For iCriteria As Integer = 0 To iLastCriteria
@@ -764,16 +757,8 @@ NextTS:
                     If pAbortMatching Then
                         Exit Sub
                     End If
-                    If pMatchingGroup.Count > 999 Then
-                        lMatchingText = "Matching Data (1,000+  of " & Format(pTotalTS, "#,###") & ")"
-                        Exit For
-                    End If
                 Next
-                If lMatchingText.Length > 0 Then
-                    lblMatching.Text = lMatchingText
-                Else
-                    lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & Format(pTotalTS, "#,###") & ")"
-                End If
+                lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
                 pMatchingGrid.Refresh()
                 pSelectedGrid.Refresh()
                 'Logger.Dbg("PopulateMatching " & (Date.Now - lTimeStart).TotalSeconds)
