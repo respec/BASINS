@@ -1036,12 +1036,14 @@ TryExePath:
     Private Class clsLinesInFile
         Implements IEnumerable, IEnumerator, IDisposable
 
+        Private Const ProgressMinFileSize As Integer = 20000
         Private pStreamReader As IO.BinaryReader
         Private pCurrentLine As String
         Private pNextChar As Char = Nothing
         Private pHaveNextChar As Boolean = False
         Private pLength As Long = 0
         Private pProgressDivide As Long = 1
+        Private pLoggerLevel As MapWinUtility.ProgressLevel = Nothing
 
         Public Sub New(ByVal aFileName As String)
             'NOTE: default buffer size (4096) or larger degrades performance - jlk 10/2008
@@ -1051,13 +1053,16 @@ TryExePath:
         End Sub
 
         Private Sub SetProgressDivide()
-            If pLength < Integer.MaxValue Then
-                pProgressDivide = 1
-            Else
-                pProgressDivide = 1000
-                While pLength / pProgressDivide >= Integer.MaxValue
-                    pProgressDivide *= 10
-                End While
+            If pLength > ProgressMinFileSize Then
+                pLoggerLevel = New ProgressLevel()
+                If pLength < Integer.MaxValue Then
+                    pProgressDivide = 1
+                Else
+                    pProgressDivide = 1000
+                    While pLength / pProgressDivide >= Integer.MaxValue
+                        pProgressDivide *= 10
+                    End While
+                End If
             End If
         End Sub
 
@@ -1108,7 +1113,7 @@ ReadCharacter:
                             GoTo ReadCharacter
                     End Select
                     pCurrentLine = lSb.ToString
-                    If pLength * pProgressDivide > 20000 Then
+                    If pLength > ProgressMinFileSize Then
                         Logger.Progress(Math.Floor(pStreamReader.BaseStream.Position / pProgressDivide), pLength / pProgressDivide)
                     End If
                     Return True
@@ -1124,8 +1129,12 @@ AtEndOfStream:
                     End Try
                     pStreamReader = Nothing
                     pCurrentLine = lSb.ToString
-                    If pLength * pProgressDivide > 20000 Then
+                    If pLength > ProgressMinFileSize Then
                         Logger.Progress(pLength / pProgressDivide, pLength / pProgressDivide)
+                        If pLoggerLevel IsNot Nothing Then
+                            pLoggerLevel.Dispose()
+                            pLoggerLevel = Nothing
+                        End If
                     End If
                 End If
                 Return (lSb.Length > 0)
@@ -1152,6 +1161,10 @@ AtEndOfStream:
                 Catch
                 End Try
                 pStreamReader = Nothing
+            End If
+            If pLoggerLevel IsNot Nothing Then
+                pLoggerLevel.Dispose()
+                pLoggerLevel = Nothing
             End If
         End Sub
 
