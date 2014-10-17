@@ -1041,11 +1041,24 @@ TryExePath:
         Private pNextChar As Char = Nothing
         Private pHaveNextChar As Boolean = False
         Private pLength As Long = 0
+        Private pProgressDivide As Long = 1
 
         Public Sub New(ByVal aFileName As String)
             'NOTE: default buffer size (4096) or larger degrades performance - jlk 10/2008
             pLength = FileSystem.FileLen(aFileName)
+            SetProgressDivide()
             pStreamReader = New IO.BinaryReader(New IO.BufferedStream(New IO.FileStream(aFileName, IO.FileMode.Open, IO.FileAccess.Read), 1024))
+        End Sub
+
+        Private Sub SetProgressDivide()
+            If pLength < Integer.MaxValue Then
+                pProgressDivide = 1
+            Else
+                pProgressDivide = 1000
+                While pLength / pProgressDivide >= Integer.MaxValue
+                    pProgressDivide *= 10
+                End While
+            End If
         End Sub
 
         Public Sub New(ByVal aStreamReader As IO.BinaryReader)
@@ -1056,6 +1069,7 @@ TryExePath:
         Private Sub Clear()
             If pStreamReader.BaseStream.CanSeek Then
                 pLength = pStreamReader.BaseStream.Length
+                SetProgressDivide()
             End If
             pHaveNextChar = False
         End Sub
@@ -1094,8 +1108,8 @@ ReadCharacter:
                             GoTo ReadCharacter
                     End Select
                     pCurrentLine = lSb.ToString
-                    If pStreamReader.BaseStream.Length > 20000 AndAlso pStreamReader.BaseStream.Position < pStreamReader.BaseStream.Length Then
-                        Logger.Progress(Math.Floor(pStreamReader.BaseStream.Position / pStreamReader.BaseStream.Length * 1000), 1000)
+                    If pLength * pProgressDivide > 20000 Then
+                        Logger.Progress(Math.Floor(pStreamReader.BaseStream.Position / pProgressDivide), pLength / pProgressDivide)
                     End If
                     Return True
                 Catch lEndOfStreamException As IO.EndOfStreamException
@@ -1110,6 +1124,9 @@ AtEndOfStream:
                     End Try
                     pStreamReader = Nothing
                     pCurrentLine = lSb.ToString
+                    If pLength * pProgressDivide > 20000 Then
+                        Logger.Progress(pLength / pProgressDivide, pLength / pProgressDivide)
+                    End If
                 End If
                 Return (lSb.Length > 0)
             End If
