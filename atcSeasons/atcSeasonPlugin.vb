@@ -55,86 +55,60 @@ Public Class atcSeasonPlugin
         If lTimeSeriesGroup IsNot Nothing AndAlso lTimeSeriesGroup.Count > 0 Then
             If aOperationName.IndexOf("::") > 0 Then
                 lSeasonName = StrSplit(aOperationName, "::", "")
-                For Each typ As Type In AllSeasonTypes
-                    If SeasonClassNameToLabel(typ.Name).Equals(lSeasonName) Then
-                        Try
-                            pSeasons = typ.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
-                        Catch e As Exception
-                            Logger.Dbg("Exception creating " & lSeasonName & ": " & e.Message)
-                        End Try
-                        Exit For
-                    End If
-                Next
-            Else 'TODO: use form to ask for seasons
-                pSeasons = New atcSeasonsMonth
+                pSeasons = atcSeasonBase.CreateSeasonObject("atcSeasons" & lSeasonName)
             End If
-            If pSeasons Is Nothing Then
-                Logger.Dbg("Could not create season of type '" & lSeasonName & "'")
-            Else
-                Select Case aOperationName.ToLower
-                    Case "split"
+            Select Case aOperationName.ToLower
+                Case "split"
                     If pSeasons Is Nothing Then
-
-                        'TODO: use form to ask how to split
-                        'Dim lForm As New frmSpecifySplit
-                        'Return lForm.AskUser(lTimeSeriesGroup, AvailableOperations(False, True), MyBase.DataSets)
-
-                        Logger.Dbg("Could not create season of type '" & lSeasonName & "'")
-                    End If
-                    If pSeasons IsNot Nothing Then
+                        Dim lForm As New frmSpecifySplit
+                        If lForm.AskUser(lTimeSeriesGroup, AvailableOperations(True, False), MyBase.DataSets) Then
+                            Me.Specification = "Split " & DataSets(0).Attributes.GetValue("SeasonDefinition").ToString
+                            Return True
+                        Else
+                            Return False
+                        End If
+                    Else
                         For Each lts As atcTimeseries In lTimeSeriesGroup
                             MyBase.DataSets.AddRange(pSeasons.Split(lts, Me))
                         Next
-                        If MyBase.DataSets.Count > 0 Then Return True
+                        Return MyBase.DataSets.Count > 0
                     End If
-                    Case "seasonalattributes"
-                        Dim lAttributes As atcDataAttributes = aArgs.GetValue("Attributes")
-                        Dim lCalculatedAttributes As atcDataAttributes = aArgs.GetValue("CalculatedAttributes")
-                        If lAttributes Is Nothing OrElse lAttributes.Count = 0 Then
-                            Dim lForm As New frmSpecifySeasonalAttributes
-                            lForm.AskUser(lTimeSeriesGroup, AvailableOperations(False, True))
-                        Else
-                            For Each lts As atcTimeseries In lTimeSeriesGroup
-                                pSeasons.SetSeasonalAttributes(lts, lAttributes, lCalculatedAttributes)
-                            Next
+                Case "attributes", "seasonalattributes"
+                    Dim lAttributes As atcDataAttributes = Nothing
+                    Dim lCalculatedAttributes As atcDataAttributes = Nothing
+                    If aArgs IsNot Nothing AndAlso aArgs.Count > 0 Then
+                        lAttributes = aArgs.GetValue("Attributes")
+                        lCalculatedAttributes = aArgs.GetValue("CalculatedAttributes")
+                    End If
+                    If lAttributes Is Nothing OrElse lAttributes.Count = 0 Then
+                        Dim lForm As New frmSpecifySeasonalAttributes
+                        If lForm.AskUser(lTimeSeriesGroup, AvailableOperations(False, True)) Then
+                            'atcDataManager.ShowDisplay("Analysis::Data Tree", lTimeSeriesGroup)
                         End If
-                        Return True
-                    Case Else
-                        Logger.Msg("Operation '" & aOperationName & "' not recognized", "Season Plugin Open")
-                End Select
-            End If
+                    Else
+                        For Each lts As atcTimeseries In lTimeSeriesGroup
+                            pSeasons.SetSeasonalAttributes(lts, lAttributes, lCalculatedAttributes)
+                        Next
+                    End If
+                    DataSets.Clear()
+                    DataSets.AddRange(lTimeSeriesGroup)
+                    Return True
+                Case Else
+                    Logger.Msg("Operation '" & aOperationName & "' not recognized", "Season Plugin Open")
+            End Select
         End If
         Return False
     End Function
 
     Public Overrides Function ToString() As String
-        Return Name.Substring(23) 'Skip first part of Name which is "Timeseries::Seasonal - "
+        Return Name.Replace("Timeseries::Seasonal - ", "")
     End Function
-
-    Public Shared ReadOnly Property AllSeasonTypes() As atcCollection
-        Get
-            Dim lAllTypes As New atcCollection
-            Try
-                Dim lBase As New atcSeasonBase
-                Dim lAssembly As [Assembly] = Reflection.Assembly.GetAssembly(lBase.GetType)
-                Dim lAssemblyTypes As Type() = lAssembly.GetTypes()
-                For Each lType As Type In lAssemblyTypes
-                    If lType.Name.StartsWith("atcSeasons") Then
-                        lAllTypes.Add(lType)
-                    End If
-                Next
-            Catch e As Exception
-                Logger.Dbg("atcSeasonPlugin.AllSeasonTypes: " & e.Message & vbCrLf & e.StackTrace)
-            End Try
-            Return lAllTypes
-        End Get
-    End Property
 
     Public Overloads ReadOnly Property AvailableOperations(ByVal aIncludeSplits As Boolean, _
                                                            ByVal aIncludeSeasonalAttributes As Boolean) As atcDataAttributes
         Get
             Dim lOperations As atcDataAttributes
-            If aIncludeSplits AndAlso aIncludeSeasonalAttributes AndAlso Not pAvailableOperations Is Nothing Then
+            If aIncludeSplits AndAlso aIncludeSeasonalAttributes AndAlso pAvailableOperations IsNot Nothing Then
                 lOperations = pAvailableOperations
             Else
                 lOperations = New atcDataAttributes
@@ -147,7 +121,7 @@ Public Class atcSeasonPlugin
                     .TypeString = "atcTimeseries"
                 End With
 
-                For Each typ As Type In AllSeasonTypes
+                For Each typ As Type In atcData.atcSeasonBase.AllSeasonTypes
                     If aIncludeSeasonalAttributes Then
                         Dim lSeasonalAttributes As New atcAttributeDefinition
                         With lSeasonalAttributes
@@ -174,6 +148,9 @@ Public Class atcSeasonPlugin
                             .Editable = False
                             .TypeString = "atcDataGroup"
                             .Calculator = Me
+                            .DefaultValue = typ
+                            '.ValidList = New ArrayList
+                            '.ValidList.AddRange(typ.AllSeasonNames)
                         End With
 
                         lArguments = New atcDataAttributes
@@ -215,7 +192,46 @@ Public Class atcSeasonPlugin
 
     Public Overloads Overrides ReadOnly Property AvailableOperations() As atcDataAttributes
         Get
-            Return AvailableOperations(True, True)
+            'Return AvailableOperations(True, True)
+            Dim lOperations As atcDataAttributes
+
+            lOperations = New atcDataAttributes
+            Dim lArguments As atcDataAttributes
+            Dim defTimeSeriesOne As New atcAttributeDefinition
+            With defTimeSeriesOne
+                .Name = "Timeseries"
+                .Description = "One time series"
+                .Editable = True
+                .TypeString = "atcTimeseries"
+            End With
+
+            Dim lSeasonalAttributes As New atcAttributeDefinition
+            With lSeasonalAttributes
+                .Name = "Attributes"
+                .Description = "Attribute values calculated per season"
+                .Editable = False
+                .TypeString = "atcDataAttributes"
+                .Calculator = Me
+            End With
+            lArguments = New atcDataAttributes
+            lArguments.SetValue(defTimeSeriesOne, Nothing)
+            lArguments.SetValue("Attributes", Nothing)
+            lOperations.SetValue(lSeasonalAttributes, Nothing, lArguments)
+
+            Dim lSeasonalSplit As New atcAttributeDefinition
+            With lSeasonalSplit
+                .Name = "Split"
+                .Description = "Split a timeseries by season"
+                .Editable = False
+                .TypeString = "atcDataGroup"
+                .Calculator = Me
+            End With
+
+            lArguments = New atcDataAttributes
+            lArguments.SetValue(defTimeSeriesOne, Nothing)
+            lOperations.SetValue(lSeasonalSplit, Nothing, lArguments)
+
+            Return lOperations
         End Get
     End Property
 End Class

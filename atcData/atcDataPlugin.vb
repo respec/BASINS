@@ -258,7 +258,7 @@ Public Class atcDataPlugin
                             If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
                                 For Each lOperation As atcDefinedValue In lOperations
                                     Select Case lOperation.Definition.TypeString
-                                        Case "atcTimeseries", "atcDataGroup", "atcTimeseriesGroup"
+                                        Case "atcTimeseries", "atcDataGroup", "atcTimeseriesGroup", "atcDataAttributes"
                                             atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
                                             pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName, atcDataManager.ComputeMenuName, lDataSource.Category, , , True))
                                             'Operations might have categories to further divide them

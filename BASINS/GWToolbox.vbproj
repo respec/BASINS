@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{37D44868-95CE-4A21-A43A-13E7E7F2AD09}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -194,9 +194,7 @@
     <Compile Include="modBasinsPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="modDownload.vb">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="modDownload.vb" />
     <EmbeddedResource Include="frmAbout.resx">
       <DependentUpon>frmAbout.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -249,7 +247,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>del S:\dev\BASINS40\Bin\Plugins\Basins\basins.dll</PreBuildEvent>
+    <PreBuildEvent>rem del S:\dev\BASINS40\Bin\Plugins\Basins\basins.dll</PreBuildEvent>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>

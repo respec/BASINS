@@ -575,7 +575,7 @@ SetVariable:
                 lReturnValue = Script.Evaluate
 
                 If Not AbortScript Then
-                    Dim lAllDates As atcTimeseries
+                    Dim lAllDates As atcTimeseries = Nothing
                     Dim lSharedAttributes As New atcDataAttributes
                     With lSharedAttributes
                         .SetValue("Data Source", pDataFilename)
