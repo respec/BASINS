@@ -1,4 +1,5 @@
 ﻿Imports atcUCI
+Imports atcUtility
 
 Public Class frmBMPTools
 
@@ -20,6 +21,13 @@ Public Class frmBMPTools
         atcFtableBuilder.clsGlobals.pHelpManualPage = "User's Guide\Detailed Functions\Reach Editor\LID Controls Tool.html"
         Dim lBuilder As New atcFtableBuilder.mainForm
         lBuilder.ShowDialog()
+    End Sub
+
+    Private Sub frmBMPTools_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\BMP Reach Toolkit.html")
+        End If
     End Sub
 
     Private Sub frmBMPTools_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load

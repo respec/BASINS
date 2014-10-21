@@ -80,6 +80,7 @@ Partial Class frmBMPTools
         Me.Controls.Add(Me.cmdOpen)
         Me.Controls.Add(Me.cmdLID)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.Name = "frmBMPTools"
         Me.Text = "BMP Reach Toolkit"
         Me.ResumeLayout(False)
