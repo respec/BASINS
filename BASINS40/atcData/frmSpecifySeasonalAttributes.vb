@@ -256,7 +256,7 @@ Public Class frmSpecifySeasonalAttributes
             For Each lAttrName As String In lstAttributes.SelectedItems
                 lAttributesToCalculate.SetValue(lAttrName, Nothing)
             Next
-            CalculateAttributes(lAttributesToCalculate, True)
+            CalculateAttributes(cboSeasons.Text, CurrentSeason, lstSeasons.SelectedItems, pTimseriesGroup, lAttributesToCalculate, True)
         End If
         Return pOk
     End Function
@@ -309,13 +309,13 @@ Public Class frmSpecifySeasonalAttributes
     Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
         lstSeasons.Items.Clear()
         Dim lSeasonSource As atcTimeseriesSource = CurrentSeason()
-        If Not lSeasonSource Is Nothing AndAlso lstAttributes.SelectedItems.Count > 0 Then
+        If lSeasonSource IsNot Nothing AndAlso lstAttributes.SelectedItems.Count > 0 Then
             Dim lArguments As New atcDataAttributes
             Dim lAttributes As New atcDataAttributes
             lAttributes.SetValue(lstAttributes.SelectedItems(0), 0)
             lArguments.Add("Attributes", lAttributes)
 
-            For Each lSeasonalAttribute As atcDefinedValue In CalculateAttributes(lAttributes, False)
+            For Each lSeasonalAttribute As atcDefinedValue In CalculateAttributes(cboSeasons.Text, lSeasonSource, lstSeasons.SelectedItems, pTimseriesGroup, lAttributes, False)
                 Dim lSeasonName As String = lSeasonalAttribute.Arguments.GetValue("SeasonName") 'Definition.Name
                 If lSeasonName IsNot Nothing AndAlso Not lstSeasons.Items.Contains(lSeasonName) Then
                     lstSeasons.Items.Add(lSeasonName)
@@ -334,9 +334,12 @@ Public Class frmSpecifySeasonalAttributes
         Return Nothing
     End Function
 
-    Private Function CalculateAttributes(ByVal aAttributes As atcDataAttributes, _
-                                         ByVal aSetInTimeseries As Boolean) As atcDataAttributes
-        Dim lSeasonSource As atcTimeseriesSource = CurrentSeason()
+    Friend Shared Function CalculateAttributes(ByVal aSeasonType As String, _
+                                               ByVal aSeasonSource As atcTimeseriesSource, _
+                                               ByVal aSeasonsSelected As Windows.Forms.ListBox.SelectedObjectCollection, _
+                                               ByVal aTimseriesGroup As atcTimeseriesGroup, _
+                                               ByVal aAttributes As atcDataAttributes, _
+                                               ByVal aSetInTimeseries As Boolean) As atcDataAttributes
         Dim lCalculatedAttributes As New atcDataAttributes
         Dim lAllCalculatedAttributes As atcDataAttributes
 
@@ -345,20 +348,24 @@ Public Class frmSpecifySeasonalAttributes
         Else
             lAllCalculatedAttributes = lCalculatedAttributes
         End If
-        If Not lSeasonSource Is Nothing Then
+        If aSeasonSource IsNot Nothing Then
             Dim lArguments As New atcDataAttributes
 
             lArguments.SetValue("Attributes", aAttributes)
             lArguments.SetValue("CalculatedAttributes", lCalculatedAttributes)
+            Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
 
-            For Each lTimeseries As atcTimeseries In pTimseriesGroup
+            For Each lTimeseries As atcTimeseries In aTimseriesGroup
                 lArguments.SetValue("Timeseries", lTimeseries)
-                If lSeasonSource.Open(cboSeasons.Text & "::SeasonalAttributes", lArguments) AndAlso aSetInTimeseries Then
+                If aSeasonSource.Open(aSeasonType & "::SeasonalAttributes", lArguments) AndAlso aSetInTimeseries Then
                     For Each lAtt As atcDefinedValue In lCalculatedAttributes 'Seasonal Attribute
                         Dim lSeasonName As String = lAtt.Arguments.GetValue("SeasonName")
-                        If lstSeasons.SelectedItems.Contains(lSeasonName) Then 'This season is selected, set the attribute
+                        If aSeasonsSelected.Contains(lSeasonName) Then 'This season is selected, set the attribute
                             lTimeseries.Attributes.SetValue(lAtt.Definition, lAtt.Value, lAtt.Arguments)
                             lAllCalculatedAttributes.SetValue(lAtt.Definition, lAtt.Value, lAtt.Arguments)
+                            If Not lAllDefinitions.Keys.Contains(lAtt.Definition.Name.ToLower) Then
+                                atcDataAttributes.AddDefinition(lAtt.Definition)
+                            End If
                         End If
                     Next
                     lCalculatedAttributes.Clear()

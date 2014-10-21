@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{ADD48409-FC1F-4A92-B07C-6B9A9A5BAC72}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -152,6 +152,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmSpecifyStations.resx">
       <DependentUpon>frmSpecifyStations.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmWDM.resx">
       <SubType>Designer</SubType>
@@ -201,9 +202,9 @@
       <Name>atcUtility</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\BASINS\SWToolbox.vbproj">
-      <Project>{FE1EB45F-9146-4B93-ABA2-5C8C562D9823}</Project>
-      <Name>SWToolbox</Name>
+    <ProjectReference Include="..\BASINS\GWToolbox.vbproj">
+      <Project>{37D44868-95CE-4A21-A43A-13E7E7F2AD09}</Project>
+      <Name>GWToolbox</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

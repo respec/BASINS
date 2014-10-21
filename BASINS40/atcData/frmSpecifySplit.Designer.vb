@@ -22,76 +22,105 @@ Partial Class frmSpecifySplit
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.tabs = New System.Windows.Forms.TabControl
-        Me.tabSeasonal = New System.Windows.Forms.TabPage
-        Me.tabCustom = New System.Windows.Forms.TabPage
+        Me.txtGroupSeasons = New System.Windows.Forms.TextBox
+        Me.radioSeasonsGroup = New System.Windows.Forms.RadioButton
+        Me.radioSeasonsCombine = New System.Windows.Forms.RadioButton
+        Me.radioSeasonsSeparate = New System.Windows.Forms.RadioButton
+        Me.lblSeasons = New System.Windows.Forms.Label
+        Me.lblSeasonType = New System.Windows.Forms.Label
         Me.btnSeasonsNone = New System.Windows.Forms.Button
         Me.btnSeasonsAll = New System.Windows.Forms.Button
         Me.lstSeasons = New System.Windows.Forms.ListBox
         Me.cboSeasons = New System.Windows.Forms.ComboBox
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.radioSeasonsSeparate = New System.Windows.Forms.RadioButton
-        Me.radioSeasonsCombine = New System.Windows.Forms.RadioButton
-        Me.tabs.SuspendLayout()
-        Me.tabSeasonal.SuspendLayout()
+        Me.lblGroupSeasons = New System.Windows.Forms.Label
+        Me.btnSplit = New System.Windows.Forms.Button
+        Me.btnCancel = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
-        'tabs
+        'txtGroupSeasons
         '
-        Me.tabs.Controls.Add(Me.tabSeasonal)
-        Me.tabs.Controls.Add(Me.tabCustom)
-        Me.tabs.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.tabs.Location = New System.Drawing.Point(0, 0)
-        Me.tabs.Name = "tabs"
-        Me.tabs.SelectedIndex = 0
-        Me.tabs.Size = New System.Drawing.Size(450, 412)
-        Me.tabs.TabIndex = 0
+        Me.txtGroupSeasons.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.txtGroupSeasons.Location = New System.Drawing.Point(224, 333)
+        Me.txtGroupSeasons.Name = "txtGroupSeasons"
+        Me.txtGroupSeasons.Size = New System.Drawing.Size(33, 20)
+        Me.txtGroupSeasons.TabIndex = 32
         '
-        'tabSeasonal
+        'radioSeasonsGroup
         '
-        Me.tabSeasonal.Controls.Add(Me.radioSeasonsCombine)
-        Me.tabSeasonal.Controls.Add(Me.radioSeasonsSeparate)
-        Me.tabSeasonal.Controls.Add(Me.Label2)
-        Me.tabSeasonal.Controls.Add(Me.Label1)
-        Me.tabSeasonal.Controls.Add(Me.btnSeasonsNone)
-        Me.tabSeasonal.Controls.Add(Me.btnSeasonsAll)
-        Me.tabSeasonal.Controls.Add(Me.lstSeasons)
-        Me.tabSeasonal.Controls.Add(Me.cboSeasons)
-        Me.tabSeasonal.Location = New System.Drawing.Point(4, 25)
-        Me.tabSeasonal.Name = "tabSeasonal"
-        Me.tabSeasonal.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabSeasonal.Size = New System.Drawing.Size(442, 383)
-        Me.tabSeasonal.TabIndex = 0
-        Me.tabSeasonal.Text = "Seasonal"
-        Me.tabSeasonal.UseVisualStyleBackColor = True
+        Me.radioSeasonsGroup.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.radioSeasonsGroup.AutoSize = True
+        Me.radioSeasonsGroup.Location = New System.Drawing.Point(12, 334)
+        Me.radioSeasonsGroup.Margin = New System.Windows.Forms.Padding(2)
+        Me.radioSeasonsGroup.Name = "radioSeasonsGroup"
+        Me.radioSeasonsGroup.Size = New System.Drawing.Size(207, 17)
+        Me.radioSeasonsGroup.TabIndex = 31
+        Me.radioSeasonsGroup.Text = "Separate time series for each group of "
+        Me.radioSeasonsGroup.UseVisualStyleBackColor = True
         '
-        'tabCustom
+        'radioSeasonsCombine
         '
-        Me.tabCustom.Location = New System.Drawing.Point(4, 25)
-        Me.tabCustom.Name = "tabCustom"
-        Me.tabCustom.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabCustom.Size = New System.Drawing.Size(400, 362)
-        Me.tabCustom.TabIndex = 1
-        Me.tabCustom.Text = "Custom"
-        Me.tabCustom.UseVisualStyleBackColor = True
+        Me.radioSeasonsCombine.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.radioSeasonsCombine.AutoSize = True
+        Me.radioSeasonsCombine.Location = New System.Drawing.Point(11, 292)
+        Me.radioSeasonsCombine.Margin = New System.Windows.Forms.Padding(2)
+        Me.radioSeasonsCombine.Name = "radioSeasonsCombine"
+        Me.radioSeasonsCombine.Size = New System.Drawing.Size(304, 17)
+        Me.radioSeasonsCombine.TabIndex = 30
+        Me.radioSeasonsCombine.Text = "One time series containing all values from selected seasons"
+        Me.radioSeasonsCombine.UseVisualStyleBackColor = True
+        '
+        'radioSeasonsSeparate
+        '
+        Me.radioSeasonsSeparate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.radioSeasonsSeparate.AutoSize = True
+        Me.radioSeasonsSeparate.Checked = True
+        Me.radioSeasonsSeparate.Location = New System.Drawing.Point(11, 313)
+        Me.radioSeasonsSeparate.Margin = New System.Windows.Forms.Padding(2)
+        Me.radioSeasonsSeparate.Name = "radioSeasonsSeparate"
+        Me.radioSeasonsSeparate.Size = New System.Drawing.Size(242, 17)
+        Me.radioSeasonsSeparate.TabIndex = 29
+        Me.radioSeasonsSeparate.TabStop = True
+        Me.radioSeasonsSeparate.Text = "Separate time series for each selected season"
+        Me.radioSeasonsSeparate.UseVisualStyleBackColor = True
+        '
+        'lblSeasons
+        '
+        Me.lblSeasons.AutoSize = True
+        Me.lblSeasons.Location = New System.Drawing.Point(11, 47)
+        Me.lblSeasons.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblSeasons.Name = "lblSeasons"
+        Me.lblSeasons.Size = New System.Drawing.Size(101, 13)
+        Me.lblSeasons.TabIndex = 28
+        Me.lblSeasons.Text = "Seasons to Include:"
+        '
+        'lblSeasonType
+        '
+        Me.lblSeasonType.AutoSize = True
+        Me.lblSeasonType.Location = New System.Drawing.Point(11, 9)
+        Me.lblSeasonType.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblSeasonType.Name = "lblSeasonType"
+        Me.lblSeasonType.Size = New System.Drawing.Size(150, 13)
+        Me.lblSeasonType.TabIndex = 27
+        Me.lblSeasonType.Text = "Type of Seasons To Split Into:"
         '
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(353, 336)
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(270, 266)
+        Me.btnSeasonsNone.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
-        Me.btnSeasonsNone.Size = New System.Drawing.Size(76, 27)
-        Me.btnSeasonsNone.TabIndex = 16
+        Me.btnSeasonsNone.Size = New System.Drawing.Size(57, 22)
+        Me.btnSeasonsNone.TabIndex = 26
         Me.btnSeasonsNone.Text = "None"
         '
         'btnSeasonsAll
         '
         Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Location = New System.Drawing.Point(13, 336)
+        Me.btnSeasonsAll.Location = New System.Drawing.Point(11, 266)
+        Me.btnSeasonsAll.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSeasonsAll.Name = "btnSeasonsAll"
-        Me.btnSeasonsAll.Size = New System.Drawing.Size(76, 27)
-        Me.btnSeasonsAll.TabIndex = 15
+        Me.btnSeasonsAll.Size = New System.Drawing.Size(57, 22)
+        Me.btnSeasonsAll.TabIndex = 25
         Me.btnSeasonsAll.Text = "All"
         '
         'lstSeasons
@@ -100,91 +129,94 @@ Partial Class frmSpecifySplit
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSeasons.IntegralHeight = False
-        Me.lstSeasons.ItemHeight = 16
-        Me.lstSeasons.Location = New System.Drawing.Point(13, 70)
+        Me.lstSeasons.Location = New System.Drawing.Point(11, 62)
+        Me.lstSeasons.Margin = New System.Windows.Forms.Padding(2)
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(416, 203)
-        Me.lstSeasons.TabIndex = 14
+        Me.lstSeasons.Size = New System.Drawing.Size(316, 200)
+        Me.lstSeasons.TabIndex = 24
         Me.lstSeasons.Tag = "Seasons"
         '
         'cboSeasons
         '
         Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSeasons.Enabled = False
-        Me.cboSeasons.Location = New System.Drawing.Point(13, 23)
+        Me.cboSeasons.Location = New System.Drawing.Point(11, 24)
+        Me.cboSeasons.Margin = New System.Windows.Forms.Padding(2)
         Me.cboSeasons.MaxDropDownItems = 20
         Me.cboSeasons.Name = "cboSeasons"
-        Me.cboSeasons.Size = New System.Drawing.Size(416, 24)
-        Me.cboSeasons.TabIndex = 13
+        Me.cboSeasons.Size = New System.Drawing.Size(316, 21)
+        Me.cboSeasons.TabIndex = 23
         Me.cboSeasons.Tag = "SeasonType"
         '
-        'Label1
+        'lblGroupSeasons
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(10, 3)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(198, 17)
-        Me.Label1.TabIndex = 17
-        Me.Label1.Text = "Type of Seasons To Split Into:"
+        Me.lblGroupSeasons.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblGroupSeasons.AutoSize = True
+        Me.lblGroupSeasons.Location = New System.Drawing.Point(263, 336)
+        Me.lblGroupSeasons.Name = "lblGroupSeasons"
+        Me.lblGroupSeasons.Size = New System.Drawing.Size(46, 13)
+        Me.lblGroupSeasons.TabIndex = 33
+        Me.lblGroupSeasons.Text = "seasons"
         '
-        'Label2
+        'btnSplit
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(10, 50)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(132, 17)
-        Me.Label2.TabIndex = 18
-        Me.Label2.Text = "Seasons to Include:"
+        Me.btnSplit.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnSplit.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.btnSplit.Location = New System.Drawing.Point(270, 362)
+        Me.btnSplit.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnSplit.Name = "btnSplit"
+        Me.btnSplit.Size = New System.Drawing.Size(57, 22)
+        Me.btnSplit.TabIndex = 34
+        Me.btnSplit.Text = "Split"
         '
-        'radioSeasonsSeparate
+        'btnCancel
         '
-        Me.radioSeasonsSeparate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.radioSeasonsSeparate.AutoSize = True
-        Me.radioSeasonsSeparate.Checked = True
-        Me.radioSeasonsSeparate.Location = New System.Drawing.Point(13, 279)
-        Me.radioSeasonsSeparate.Name = "radioSeasonsSeparate"
-        Me.radioSeasonsSeparate.Size = New System.Drawing.Size(315, 21)
-        Me.radioSeasonsSeparate.TabIndex = 19
-        Me.radioSeasonsSeparate.TabStop = True
-        Me.radioSeasonsSeparate.Text = "Separate timeseries for each included season"
-        Me.radioSeasonsSeparate.UseVisualStyleBackColor = True
-        '
-        'radioSeasonsCombine
-        '
-        Me.radioSeasonsCombine.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.radioSeasonsCombine.AutoSize = True
-        Me.radioSeasonsCombine.Location = New System.Drawing.Point(13, 306)
-        Me.radioSeasonsCombine.Name = "radioSeasonsCombine"
-        Me.radioSeasonsCombine.Size = New System.Drawing.Size(399, 21)
-        Me.radioSeasonsCombine.TabIndex = 20
-        Me.radioSeasonsCombine.Text = "One timeseries containing all values from included seasons"
-        Me.radioSeasonsCombine.UseVisualStyleBackColor = True
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnCancel.Location = New System.Drawing.Point(200, 362)
+        Me.btnCancel.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnCancel.Name = "btnCancel"
+        Me.btnCancel.Size = New System.Drawing.Size(57, 22)
+        Me.btnCancel.TabIndex = 35
+        Me.btnCancel.Text = "Cancel"
         '
         'frmSpecifySplit
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(450, 412)
-        Me.Controls.Add(Me.tabs)
+        Me.ClientSize = New System.Drawing.Size(338, 395)
+        Me.Controls.Add(Me.btnCancel)
+        Me.Controls.Add(Me.btnSplit)
+        Me.Controls.Add(Me.lblGroupSeasons)
+        Me.Controls.Add(Me.txtGroupSeasons)
+        Me.Controls.Add(Me.radioSeasonsGroup)
+        Me.Controls.Add(Me.radioSeasonsCombine)
+        Me.Controls.Add(Me.radioSeasonsSeparate)
+        Me.Controls.Add(Me.lblSeasons)
+        Me.Controls.Add(Me.lblSeasonType)
+        Me.Controls.Add(Me.btnSeasonsNone)
+        Me.Controls.Add(Me.btnSeasonsAll)
+        Me.Controls.Add(Me.lstSeasons)
+        Me.Controls.Add(Me.cboSeasons)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "frmSpecifySplit"
         Me.Text = "Split Timeseries"
-        Me.tabs.ResumeLayout(False)
-        Me.tabSeasonal.ResumeLayout(False)
-        Me.tabSeasonal.PerformLayout()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
-    Friend WithEvents tabs As System.Windows.Forms.TabControl
-    Friend WithEvents tabSeasonal As System.Windows.Forms.TabPage
+    Friend WithEvents txtGroupSeasons As System.Windows.Forms.TextBox
+    Friend WithEvents radioSeasonsGroup As System.Windows.Forms.RadioButton
+    Friend WithEvents radioSeasonsCombine As System.Windows.Forms.RadioButton
+    Friend WithEvents radioSeasonsSeparate As System.Windows.Forms.RadioButton
+    Friend WithEvents lblSeasons As System.Windows.Forms.Label
+    Friend WithEvents lblSeasonType As System.Windows.Forms.Label
     Friend WithEvents btnSeasonsNone As System.Windows.Forms.Button
     Friend WithEvents btnSeasonsAll As System.Windows.Forms.Button
     Friend WithEvents lstSeasons As System.Windows.Forms.ListBox
     Friend WithEvents cboSeasons As System.Windows.Forms.ComboBox
-    Friend WithEvents tabCustom As System.Windows.Forms.TabPage
-    Friend WithEvents radioSeasonsCombine As System.Windows.Forms.RadioButton
-    Friend WithEvents radioSeasonsSeparate As System.Windows.Forms.RadioButton
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents lblGroupSeasons As System.Windows.Forms.Label
+    Friend WithEvents btnSplit As System.Windows.Forms.Button
+    Friend WithEvents btnCancel As System.Windows.Forms.Button
 End Class

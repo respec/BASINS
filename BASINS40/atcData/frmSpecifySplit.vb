@@ -1,56 +1,86 @@
 ﻿Public Class frmSpecifySplit
 
     Private WithEvents pTimseriesGroup As atcTimeseriesGroup
+    Private pAllDates As atcTimeseries
     Private pSeasonsAvailable As atcDataAttributes
-    Private pOk As Boolean
 
     Public Function AskUser(ByVal aTimeseriesGroup As atcTimeseriesGroup, ByVal aSeasonsAvailable As atcDataAttributes, ByVal aNewDatasets As atcTimeseriesGroup) As Boolean
         pTimseriesGroup = aTimeseriesGroup
         pSeasonsAvailable = aSeasonsAvailable
+
         Clear()
         Me.ShowDialog()
-        If pOk Then
-            'For Each lts As atcTimeseries In pTimseriesGroup
-            '    aNewDatasets.AddRange(pSeasons.Split(lts, Me))
-            'Next
-
-            'Dim lAttributesToCalculate As New atcDataAttributes
-            'For Each lAttrName As String In lstAttributes.SelectedItems
-            '    lAttributesToCalculate.SetValue(lAttrName, Nothing)
-            'Next
-            'CalculateAttributes(lAttributesToCalculate, True)
+        If Me.DialogResult = Windows.Forms.DialogResult.OK Then
+            If radioSeasonsCombine.Checked Then
+                SaveSetting("atcSeasons", "SplitType", "Split", "Combine")
+            End If
+            If radioSeasonsSeparate.Checked Then
+                SaveSetting("atcSeasons", "SplitType", "Split", "Separate")
+            End If
+            Dim lNumToGroup As Integer = 0
+            If radioSeasonsGroup.Checked Then
+                Integer.TryParse(txtGroupSeasons.Text, lNumToGroup)
+                If lNumToGroup < 1 Then
+                    Throw New ApplicationException("Grouping selected, but number to group not specified")
+                End If
+                SaveSetting("atcSeasons", "SplitType", "Split", txtGroupSeasons.Text)
+            End If
+            DoSplit(CurrentSeason, lstSeasons.SelectedItems, pTimseriesGroup, radioSeasonsCombine.Checked, radioSeasonsSeparate.Checked, lNumToGroup, aNewDatasets)
+            Return True
         End If
-        Return pOk
+        Return False
     End Function
 
     Private Sub Clear()
-        pOk = False
         cboSeasons.Items.Clear()
         lstSeasons.Items.Clear()
-        'lstAttributes.Items.Clear()
         For Each lSeason As atcDefinedValue In pSeasonsAvailable
             cboSeasons.Items.Add(lSeason.Definition.Name.Substring(0, lSeason.Definition.Name.IndexOf("::")))
         Next
-        'For Each lDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions()
-        '    If lDef.Calculated AndAlso atcDataAttributes.IsSimple(lDef) Then
-        '        lstAttributes.Items.Add(lDef.Name)
-        '    End If
-        'Next
-        'LoadListSelected(lstAttributes)
-        cboSeasons.SelectedItem = GetSetting("atcSeasons", "SeasonType", "combobox", "")
+        pAllDates = MergeDates(pTimseriesGroup)
+
+        cboSeasons.SelectedItem = GetSetting("atcSeasons", "SeasonType", "Split", "Month")
+        Dim lTypeSetting As String = GetSetting("atcSeasons", "SplitType", "Split", "Separate")
+        Select Case lTypeSetting
+            Case "Combine"
+                radioSeasonsCombine.Checked = True
+                radioSeasonsSeparate.Checked = False
+                radioSeasonsGroup.Checked = False
+            Case "Separate"
+                radioSeasonsCombine.Checked = False
+                radioSeasonsSeparate.Checked = True
+                radioSeasonsGroup.Checked = False
+            Case Else
+                If IsNumeric(lTypeSetting) Then
+                    txtGroupSeasons.Text = lTypeSetting
+                    radioSeasonsCombine.Checked = False
+                    radioSeasonsSeparate.Checked = False
+                    radioSeasonsGroup.Checked = True
+                End If
+        End Select
         frmSpecifySeasonalAttributes.LoadListSelectedSeasons(lstSeasons)
     End Sub
 
     Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
+        SaveSetting("atcSeasons", "SeasonType", "Split", cboSeasons.SelectedItem)
+        Dim lType As Type = CurrentSeason().Definition.DefaultValue
+        Dim lSeasonType As atcSeasonBase = lType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
         lstSeasons.Items.Clear()
-        Dim lSeasonSource As atcTimeseriesSource = CurrentSeason()
-        'If Not lSeasonSource Is Nothing AndAlso lstAttributes.SelectedItems.Count > 0 Then
+
+        For Each lSeasonIndex As Integer In lSeasonType.AllSeasonsInDates(pAllDates.Values)
+            lstSeasons.Items.Add(lSeasonType.SeasonName(lSeasonIndex))
+            lstSeasons.SetSelected(lstSeasons.Items.Count - 1, True)
+        Next
+
+        'Dim lSeasonSource As atcTimeseriesSource = CurrentSeason().Definition.Calculator
+        'If lSeasonSource IsNot Nothing Then
         '    Dim lArguments As New atcDataAttributes
         '    Dim lAttributes As New atcDataAttributes
-        '    lAttributes.SetValue(lstAttributes.SelectedItems(0), 0)
+        '    lAttributes.SetValue("Data Source", 0)
         '    lArguments.Add("Attributes", lAttributes)
 
-        '    For Each lSeasonalAttribute As atcDefinedValue In CalculateAttributes(lAttributes, False)
+        '    'Figure out which seasons exist in pTimeseriesGroup. Especially important for calendar or water year seasons that have no native names and are only named by the years in the data.
+        '    For Each lSeasonalAttribute As atcDefinedValue In frmSpecifySeasonalAttributes.CalculateAttributes(cboSeasons.Text, lSeasonSource, lstSeasons.SelectedItems, pTimseriesGroup, lAttributes, False)
         '        Dim lSeasonName As String = lSeasonalAttribute.Arguments.GetValue("SeasonName") 'Definition.Name
         '        If lSeasonName IsNot Nothing AndAlso Not lstSeasons.Items.Contains(lSeasonName) Then
         '            lstSeasons.Items.Add(lSeasonName)
@@ -60,36 +90,80 @@
         'End If
     End Sub
 
-    Private Function CurrentSeason() As atcTimeseriesSource
+    Private Function CurrentSeason() As atcDefinedValue
         For Each lSeason As atcDefinedValue In pSeasonsAvailable
-            If lSeason.Definition.Name.Equals(cboSeasons.Text & "::SeasonalAttributes") Then
-                Return lSeason.Definition.Calculator
+            If lSeason.Definition.Name.StartsWith(cboSeasons.Text & "::") Then
+                Return lSeason
             End If
         Next
         Return Nothing
     End Function
 
-    Private Function DoSplit() As atcTimeseriesGroup
-        'Dim lSeasonSource As atcTimeseriesSource = CurrentSeason()
-        'If lSeasonSource IsNot Nothing Then
-        '    Dim lArguments As New atcDataAttributes
-        '    For Each lTimeseries As atcTimeseries In pTimseriesGroup
-        '        lArguments.SetValue("Timeseries", lTimeseries)
-        '        If lSeasonSource.Open(cboSeasons.Text & "::SeasonalAttributes", lArguments) AndAlso aSetInTimeseries Then
-        '            For Each lAtt As atcDefinedValue In lCalculatedAttributes 'Seasonal Attribute
-        '                Dim lSeasonName As String = lAtt.Arguments.GetValue("SeasonName")
-        '                If lstSeasons.SelectedItems.Contains(lSeasonName) Then 'This season is selected, set the attribute
-        '                    lTimeseries.Attributes.SetValue(lAtt.Definition, lAtt.Value, lAtt.Arguments)
-        '                    lAllCalculatedAttributes.SetValue(lAtt.Definition, lAtt.Value, lAtt.Arguments)
-        '                End If
-        '            Next
-        '            lCalculatedAttributes.Clear()
-        '        End If
-        '    Next
-        'End If
-        'Return lAllCalculatedAttributes
+    Private Function DoSplit(ByVal aSeasonType As atcDefinedValue, _
+                             ByVal aSeasonsSelected As Windows.Forms.ListBox.SelectedObjectCollection, _
+                             ByVal aTimseriesGroup As atcTimeseriesGroup, _
+                             ByVal aCombineAllSelected As Boolean, _
+                             ByVal aEachSelected As Boolean, _
+                             ByVal aGroupEveryN As Integer, _
+                             ByVal aNewDatasets As atcTimeseriesGroup) As atcTimeseriesGroup
+        If aSeasonType IsNot Nothing Then
+            Dim lType As Type = aSeasonType.Definition.DefaultValue
+            Dim lSeasonType As atcSeasonBase = lType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+            Dim lSeasonIndexes() As Integer = lSeasonType.AllSeasonsInDates(pAllDates.Values)
+            Dim lSeasonIndexesSelected As New Generic.List(Of Integer)
+            For Each lSeasonIndex As Integer In lSeasonIndexes
+                If lstSeasons.SelectedItems.Contains(lSeasonType.SeasonName(lSeasonIndex)) Then
+                    lSeasonType.SeasonSelected(lSeasonIndex) = True
+                    lSeasonIndexesSelected.Add(lSeasonIndex)
+                Else
+                    lSeasonType.SeasonSelected(lSeasonIndex) = False
+                End If
+            Next
 
+            If aCombineAllSelected Then
+                For Each lTimeseries As atcTimeseries In aTimseriesGroup
+                    Dim lSplitTS As atcTimeseriesGroup = lSeasonType.SplitBySelected(lTimeseries, Nothing)
+                    aNewDatasets.Add(lSplitTS(0))
+                Next
+            End If
+            If aEachSelected Then
+                For Each lTimeseries As atcTimeseries In aTimseriesGroup
+                    For Each lSplitTS As atcTimeseries In lSeasonType.Split(lTimeseries, Nothing)
+                        If lSeasonIndexesSelected.Contains(lSplitTS.Attributes.GetValue("SeasonIndex")) Then
+                            aNewDatasets.Add(lSplitTS)
+                        End If
+                    Next
+                Next
+            End If
+            If aGroupEveryN > 0 Then
+                Dim lGroup As New atcTimeseriesGroup
+                Dim lGroupSeasonName As String = ""
+                For Each lTimeseries As atcTimeseries In aTimseriesGroup
+                    For Each lSplitTS As atcTimeseries In lSeasonType.Split(lTimeseries, Nothing)
+                        If lSeasonIndexesSelected.Contains(lSplitTS.Attributes.GetValue("SeasonIndex")) Then
+                            lGroup.Add(lSplitTS)
+                            Select Case lGroup.Count
+                                Case 1
+                                    lGroupSeasonName = lSplitTS.Attributes.GetValue("SeasonName")
+                                Case aGroupEveryN
+                                    lGroupSeasonName &= " - " & lSplitTS.Attributes.GetValue("SeasonName")
+                                    lSplitTS = MergeTimeseries(lGroup)
+                                    lSplitTS.Attributes.SetValue("SeasonName", lGroupSeasonName)
+                                    aNewDatasets.Add(lSplitTS)
+                                    lGroup.Clear()
+
+                            End Select
+                        End If
+                    Next
+                Next
+                If lGroup.Count > 0 Then
+                    aNewDatasets.Add(MergeTimeseries(lGroup))
+                End If
+            End If
+        End If
+        Return aNewDatasets
     End Function
+
 
     Private Sub btnSeasonsAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSeasonsAll.Click
         For index As Integer = 0 To lstSeasons.Items.Count - 1
@@ -113,4 +187,9 @@
     'Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
     '    Close()
     'End Sub
+
+    Private Sub pTimseriesGroup_Added(ByVal aAddedOrRemoved As atcUtility.atcCollection) Handles pTimseriesGroup.Added, pTimseriesGroup.Removed
+        Clear()
+    End Sub
+
 End Class

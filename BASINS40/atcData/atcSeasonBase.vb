@@ -75,9 +75,6 @@ Public Class atcSeasonBase
                 lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1)
             Else
                 lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 0)
-                'If aTS.ValueAttributesExist(lNewTSvalueIndex) Then 'TODO:finish this!
-                '    lnewts.ValueAttributes(lnewtsvalueindex).SetRange(
-                'End If
                 If lPrevSeasonIndex <> lSeasonIndex Then
                     'Insert dummy value for start of interval after skipping dates outside season
                     If lNewTS.numValues <= lNewTSvalueIndex Then
@@ -93,6 +90,9 @@ Public Class atcSeasonBase
                 lNewTS.numValues += Math.Max(10, lNewTSvalueIndex + 1)
             End If
             lNewTS.Value(lNewTSvalueIndex) = aTS.Value(iValue)
+            If aTS.ValueAttributesExist(iValue) Then
+                lNewTS.ValueAttributes(lNewTSvalueIndex) = aTS.ValueAttributes(iValue)
+            End If
             lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue)
             lNewTS.Attributes.SetValue("NextIndex", lNewTSvalueIndex + 1)
         Next
@@ -102,6 +102,15 @@ Public Class atcSeasonBase
             lNewTS.numValues = lNewTSvalueIndex
             lNewTS.Attributes.RemoveByKey("nextindex")
         Next
+
+        If Not atcDataManager.SelectionAttributes.Contains("SeasonName") Then
+            atcDataManager.SelectionAttributes.Add("SeasonName")
+        End If
+
+        If Not atcDataManager.DisplayAttributes.Contains("SeasonName") Then
+            atcDataManager.DisplayAttributes.Add("SeasonName")
+        End If
+
         Return lNewGroup
     End Function
 
@@ -130,6 +139,7 @@ Public Class atcSeasonBase
             .Dates.numValues = aTS.numValues
             .Attributes.AddHistory("Split by " & ToString() & " Inside " & SeasonsSelectedString())
             .Attributes.Add("SeasonDefinition", Me)
+            .Attributes.Add("SeasonName", SeasonsSelectedString())
         End With
         lNewGroup.Add(lSeasonIndex, lInsideTS)
 
@@ -141,6 +151,7 @@ Public Class atcSeasonBase
             .Dates.numValues = aTS.numValues
             .Attributes.AddHistory("Split by " & ToString() & " Outside " & SeasonsSelectedString())
             .Attributes.Add("SeasonDefinition", Me)
+            .Attributes.Add("SeasonName", "Not in " & Me.ToString)
         End With
         lNewGroup.Add(lSeasonIndex, lOutsideTS)
 
@@ -164,9 +175,6 @@ Public Class atcSeasonBase
                 lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1)
             Else
                 lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 0)
-                If aTS.ValueAttributesExist(lNewTSvalueIndex) Then 'TODO:finish this!
-                    'lnewts.ValueAttributes(lnewtsvalueindex).SetRange(
-                End If
                 If lNewTSvalueIndex = 0 OrElse lIsInside <> lWasInside Then
                     'Insert NaN at zero position and at start of interval after dates in other season
                     lNewTS.Values(lNewTSvalueIndex) = pNaN
@@ -176,6 +184,9 @@ Public Class atcSeasonBase
                 End If
             End If
             lNewTS.Value(lNewTSvalueIndex) = aTS.Value(iValue)
+            If aTS.ValueAttributesExist(iValue) Then
+                lNewTS.ValueAttributes(lNewTSvalueIndex) = aTS.ValueAttributes(iValue)
+            End If
             lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue)
             lNewTS.Attributes.SetValue("NextIndex", lNewTSvalueIndex + 1)
         Next
@@ -262,7 +273,62 @@ Public Class atcSeasonBase
     ''' <param name="aXML">True to get list formatted as XML, False for plain text</param>
     Public Overridable Function SeasonsSelectedString(Optional ByVal aXML As Boolean = False) As String
         Dim lSeasons As String = ""
-        For Each lSeasonIndex As Integer In SeasonsSelected
+        Dim lSeasonsSelected As ArrayList = SeasonsSelected
+
+        'Shorten the string by replacing contiguous seasons between start and end with a dash
+        'For example "Jun Jul Aug Sep" becomes "Jun - Sep"
+        If Not aXML AndAlso lSeasonsSelected.Count > 3 Then
+            Dim lContiguous As Boolean = True
+            Dim lPrevSeason As Integer = -1
+            Dim lContiguousStart As Integer = -1
+            Dim lAllSeasons() As Integer = AllSeasons()
+            Dim lSeasonSelectedIndex As Integer
+            For lSeasonSelectedIndex = 0 To lSeasonsSelected.Count - 1
+                Dim lSeasonSelected As Integer = lSeasonsSelected(lSeasonSelectedIndex)
+                If lPrevSeason > -1 AndAlso lSeasonSelected <> lPrevSeason + 1 Then
+                    If lAllSeasons.GetUpperBound(0) > 1 AndAlso lPrevSeason = lAllSeasons(lAllSeasons.GetUpperBound(0)) AndAlso lSeasonSelected = lAllSeasons(0) Then
+                        'Wrapping around to start, still contiguous
+                    Else
+                        lContiguousStart = lSeasonSelectedIndex
+                        lContiguous = False
+                        Exit For
+                    End If
+                End If
+                lPrevSeason = lSeasonSelected
+            Next
+            If lContiguous Then
+                Return SeasonName(lSeasonsSelected(0)) & " - " & SeasonName(lSeasonsSelected(lSeasonsSelected.Count - 1))
+            End If
+
+            'See if they really are contiguous one more time in case SeasonsSelected starts in the middle of wrapping around
+            lContiguous = True
+            lSeasonSelectedIndex = lContiguousStart
+            lPrevSeason = -1
+            Do
+                Dim lSeasonSelected As Integer = lSeasonsSelected(lSeasonSelectedIndex)
+                If lPrevSeason > -1 AndAlso lSeasonSelected <> lPrevSeason + 1 Then
+                    If lAllSeasons.GetUpperBound(0) > 1 AndAlso lPrevSeason = lAllSeasons(lAllSeasons.GetUpperBound(0)) AndAlso lSeasonSelected = lAllSeasons(0) Then
+                        'Wrapping around to start, still contiguous
+                    Else
+                        lContiguous = False
+                        Exit Do
+                    End If
+                End If
+                lPrevSeason = lSeasonSelected
+
+                lSeasonSelectedIndex += 1
+                If lSeasonSelectedIndex = lSeasonsSelected.Count Then
+                    lSeasonSelectedIndex = 0
+                End If
+            Loop While lSeasonSelectedIndex <> lContiguousStart
+
+            If lContiguous Then
+                Return SeasonName(lSeasonsSelected(lContiguousStart)) & " - " & SeasonName(lSeasonsSelected(lContiguousStart - 1))
+            End If
+
+        End If
+
+        For Each lSeasonIndex As Integer In lSeasonsSelected
             Dim lSeasonName As String = SeasonName(lSeasonIndex)
             If aXML Then
                 lSeasons &= "  <Selected Name='" & lSeasonName & "'>" & lSeasonIndex & "</Selected>" & vbCrLf
@@ -272,7 +338,7 @@ Public Class atcSeasonBase
         Next
 
         If aXML AndAlso lSeasons.Length > 0 Then lSeasons = "<SeasonsSelected>" & vbCrLf & lSeasons & "</SeasonsSelected>" & vbCrLf
-        Return lSeasons
+        Return lSeasons.TrimEnd(" ")
     End Function
 
     Public Overridable Property SeasonsSelectedXML() As String
@@ -353,7 +419,39 @@ Public Class atcSeasonBase
         If lString.Length > 0 Then
             lString = " (" & lString & ")"
         End If
-        'Skip first part of Name which is "Timeseries::Seasonal - "
-        Return Name.Substring(23) & lString
+        Return Name.Replace("Timeseries::Seasonal - ", "") & lString
     End Function
+
+    Public Shared ReadOnly Property AllSeasonTypes() As Generic.List(Of Type)
+        Get
+            Dim lAllTypes As New Generic.List(Of Type)
+            Try
+                Dim lAssembly As Reflection.Assembly = Reflection.Assembly.GetAssembly(GetType(atcSeasonBase))
+                Dim lAssemblyTypes As Type() = lAssembly.GetTypes()
+                For Each lType As Type In lAssemblyTypes
+                    If lType.Name.StartsWith("atcSeasons") Then
+                        lAllTypes.Add(lType)
+                    End If
+                Next
+            Catch e As Exception
+                Logger.Dbg("AllSeasonTypes: " & e.Message & vbCrLf & e.StackTrace)
+            End Try
+            Return lAllTypes
+        End Get
+    End Property
+
+    Public Shared Function CreateSeasonObject(ByVal aSeasonTypeName As String) As atcSeasonBase
+        For Each typ As Type In AllSeasonTypes
+            If typ.Name.ToLower.Equals(aSeasonTypeName.ToLower) Then
+                Try
+                    Return typ.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+                Catch e As Exception
+                    Logger.Dbg("Exception creating " & aSeasonTypeName & ": " & e.Message)
+                End Try
+            End If
+        Next
+        Logger.Dbg("Could not find season type: " & aSeasonTypeName)
+        Return Nothing
+    End Function
+
 End Class
