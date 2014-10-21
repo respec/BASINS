@@ -428,4 +428,16 @@ Public Class frmWinHSPF
         End If
         CheckForOpenUCI = lReturn
     End Function
+
+    Private Sub cmdBMPTools_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBMPTools.Click
+        If CheckForOpenUCI() Then
+            BMPReachEditor()
+        End If
+    End Sub
+
+    Private Sub BMPReachToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BMPReachToolStripMenuItem.Click
+        If CheckForOpenUCI() Then
+            BMPReachEditor()
+        End If
+    End Sub
 End Class

@@ -15,6 +15,7 @@ Public Module WinHSPF
     Friend pUCIFullFileName As String
 
     'Variableize each form to prevent multiple open and facilitate BringToFront if already open
+    Friend pfrmBMPTools As frmBMPTools
     Friend pfrmReach As frmReach
     Friend pfrmAbout As frmAbout
     Friend pfrmActivityAll As frmActivityAll
@@ -900,5 +901,33 @@ Public Module WinHSPF
             pPollutantList.Clear()
             Logger.Message("There was an error reading the selected pollutant list." & vbCrLf & "Ensure that the pollutant file selected is formatted properly.", "Error Reading the pollutant file", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
         End Try
+    End Sub
+
+    Sub BMPReachEditor()
+
+        If pUCI.OpnBlks("RCHRES").Count > 0 Then
+
+            If IsNothing(pfrmBMPTools) Then
+                pfrmBMPTools = New frmBMPTools
+                pfrmBMPTools.Show()
+            Else
+                If pfrmBMPTools.IsDisposed Then
+                    pfrmBMPTools = New frmBMPTools
+                    pfrmBMPTools.Show()
+                Else
+                    pfrmBMPTools.WindowState = FormWindowState.Normal
+                    pfrmBMPTools.BringToFront()
+                End If
+            End If
+
+            'With pWinHSPF.SchematicDiagram
+            '    .UCI = pUCI
+            '    'TODO: .UpdateLegend()
+            'End With
+            'UCIForms.Edit(frmWinHSPF, pUCI.OpnBlks("RCHRES").NthOper(1).FTable, "FTABLES", pHSPFManualName, pWinHSPFManualName)
+        Else
+            Logger.Message("The current project contains no reaches.", "BMP Reach Toolkit Problem", _
+                           MessageBoxButtons.OK, MessageBoxIcon.Information, DialogResult.OK)
+        End If
     End Sub
 End Module
