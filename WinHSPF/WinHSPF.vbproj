@@ -132,6 +132,12 @@
     <Compile Include="frmBMPEffic.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmBMPTools.Designer.vb">
+      <DependentUpon>frmBMPTools.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBMPTools.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmHspfParm.Designer.vb">
       <DependentUpon>frmHspfParm.vb</DependentUpon>
     </Compile>
@@ -388,6 +394,9 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <EmbeddedResource Include="frmBMPTools.resx">
+      <DependentUpon>frmBMPTools.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="template.mwprj" />
   </ItemGroup>
   <ItemGroup>
