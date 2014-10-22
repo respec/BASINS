@@ -179,7 +179,7 @@ Public Class atcDataSourceBasinsObsWQ
         For Each lTS As atcTimeseries In aDataGroup
             MyBase.AddDataSet(lTS, EnumExistAction.ExistReplace)
         Next
-        SaveDataSets(aDataGroup, EnumExistAction.ExistAppend)
+        Return SaveDataSets(aDataGroup, EnumExistAction.ExistAppend)
     End Function
 
     Public Overrides Function AddDataSet(ByVal aDs As atcData.atcDataSet, Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
@@ -196,6 +196,11 @@ Public Class atcDataSourceBasinsObsWQ
     Private Function SaveDataSets(ByVal aDataSets As atcDataGroup, _
                                   ByVal aExistAction As atcData.atcDataSource.EnumExistAction) As Boolean
         Try
+            If String.IsNullOrEmpty(Specification) Then
+                Logger.Dbg("No file to save in yet")
+                Return False
+            End If
+
             Logger.Status("Writing " & Format(aDataSets.Count, "#,##0") & " datasets to " & IO.Path.GetFileName(Specification), True)
             If IO.File.Exists(Specification) Then
                 Dim lExtension As String = IO.Path.GetExtension(Specification)
