@@ -547,8 +547,12 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
     Public Function GetDefinedValue(ByVal aAttributeName As String) As atcDefinedValue
         Dim lAttribute As atcDefinedValue = Nothing
         Try
-            Dim lKey As String = AttributeNameToKey(aAttributeName)
+            Dim lKey As String = aAttributeName.ToLower
             lAttribute = pAttributes.ItemByKey(lKey)
+            If lAttribute Is Nothing Then
+                lKey = AttributeNameToKey(aAttributeName)
+                lAttribute = pAttributes.ItemByKey(lKey)
+            End If
 
             If lAttribute Is Nothing Then  'Did not find the named attribute
                 If SharedAttributes IsNot Nothing Then
