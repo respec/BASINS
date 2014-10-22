@@ -399,6 +399,35 @@ FoundMatch:
         Return False
     End Function
 
+    ''' <summary>
+    ''' Return a new group of TS with dates shifted if needed for all TS to start in aStartYear
+    ''' </summary>
+    ''' <param name="aTimeseriesGroup">Data to shift as needed to start in aStartYear</param>
+    ''' <param name="aStartYear">Year that resulting data will be shifted to start in, or zero to start in same year as first TS in aTimeseriesGroup</param>
+    ''' <returns></returns>
+    Public Function MakeCommonStartYear(ByVal aTimeseriesGroup As atcTimeseriesGroup, ByVal aStartYear As Integer) As atcTimeseriesGroup
+        Dim lCommon As New atcTimeseriesGroup
+        Dim lTsStartDate(6) As Integer
+        Dim lDelta As Double
+        For Each lTs As atcTimeseries In aTimeseriesGroup
+            If lTs.numValues > 0 Then
+                modDate.J2Date(lTs.Dates.Value(1), lTsStartDate)
+                If aStartYear = 0 Then 'First timeseries gets to keep its dates
+                    aStartYear = lTsStartDate(0)
+                ElseIf lTsStartDate(0) <> aStartYear Then 'Move other timeseries to start in same year
+                    lDelta = lTs.Dates.Value(1) - Date2J(aStartYear, lTsStartDate(1), lTsStartDate(2), _
+                                                         lTsStartDate(3), lTsStartDate(4), lTsStartDate(5))
+                    Dim lZTs As New atcTimeseries(Nothing)
+                    lZTs.Values = lTs.Values
+                    lZTs.Dates = lTs.Dates - lDelta
+                    lZTs.Attributes.ChangeTo(lTs.Attributes)
+                    lTs = lZTs
+                End If
+                lCommon.Add(lTs)
+            End If
+        Next
+        Return lCommon
+    End Function
 
     ''' <summary>
     ''' Create a new curve from the given atcTimeseries and add it to the ZedGraphControl

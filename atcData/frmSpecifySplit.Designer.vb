@@ -162,7 +162,6 @@ Partial Class frmSpecifySplit
         'btnSplit
         '
         Me.btnSplit.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSplit.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.btnSplit.Location = New System.Drawing.Point(270, 362)
         Me.btnSplit.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSplit.Name = "btnSplit"

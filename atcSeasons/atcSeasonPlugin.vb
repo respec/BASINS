@@ -62,7 +62,11 @@ Public Class atcSeasonPlugin
                     If pSeasons Is Nothing Then
                         Dim lForm As New frmSpecifySplit
                         If lForm.AskUser(lTimeSeriesGroup, AvailableOperations(True, False), MyBase.DataSets) Then
-                            Me.Specification = "Split " & DataSets(0).Attributes.GetValue("SeasonDefinition").ToString
+                            If DataSets.Count < 1 Then
+                                Throw New ApplicationException("No data found in selected seasons")
+                            Else
+                                Me.Specification = "Split " & DataSets(0).Attributes.GetValue("SeasonDefinition").ToString
+                            End If
                             Return True
                         Else
                             Return False
