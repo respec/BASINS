@@ -12,7 +12,8 @@ Public Class atcGraphPlugin
                                            "Running Sum", _
                                            "Residual (TS2 - TS1)", _
                                            "Cumulative Difference", _
-                                           "Scatter (TS2 vs TS1)"}
+                                           "Scatter (TS2 vs TS1)", _
+                                           "Shared Start Year"}
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -71,6 +72,7 @@ Public Class atcGraphPlugin
                     .Items.Add(pGraphTypeNames(4) & lNeededTwoSuffix)
                     .Items.Add(pGraphTypeNames(5) & lNeededTwoSuffix)
                     .Items.Add(pGraphTypeNames(6) & lNeededTwoSuffix)
+                    .Items.Add(pGraphTypeNames(7))
                 End If
 
                 For Each lCheckedName As String In GetSetting("BASINS41", "Graph", "ChooseGraphs", "").Split(","c)
@@ -78,11 +80,7 @@ Public Class atcGraphPlugin
                     If lItemIndex > -1 Then .SetItemChecked(lItemIndex, True)
                 Next
 
-                'lChooseForm.atcDataGroupDates.DataGroup = lDataGroup
-
                 If lChooseForm.ShowDialog() = Windows.Forms.DialogResult.OK Then
-                    'lDataGroup = lChooseForm.atcDataGroupDates.CreateSelectedDataGroupSubset
-
                     Dim lTimeseriesGroups As New Collection
                     If lChooseForm.cbxMultiple.Checked Then
                         'need multiple wq plots, split ltimeseriesgroup into groups by constituent
@@ -139,6 +137,9 @@ Public Class atcGraphPlugin
             Case "Timeseries", "Time-Series"
                 aGraphForm.Text = "Time-Series Graph"
                 Return New clsGraphTime(aDataGroup, aGraphForm.ZedGraphCtrl)
+            Case "Shared Start Year"
+                aGraphForm.Text = aGraphTypeName & " Graph"
+                Return New clsGraphTime(MakeCommonStartYear(aDataGroup, 0), aGraphForm.ZedGraphCtrl)
             Case "Flow/Duration"
                 aGraphForm.Text = "Flow/Duration Graph"
                 Return New clsGraphProbability(aDataGroup, aGraphForm.ZedGraphCtrl)

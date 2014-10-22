@@ -78,7 +78,7 @@ Public Class frmSpecifySeasonalAttributes
         Me.panelTop.Controls.Add(Me.grpAttributes)
         Me.panelTop.Location = New System.Drawing.Point(0, 0)
         Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(408, 321)
+        Me.panelTop.Size = New System.Drawing.Size(408, 328)
         Me.panelTop.TabIndex = 14
         '
         'grpSeasons
@@ -88,9 +88,9 @@ Public Class frmSpecifySeasonalAttributes
         Me.grpSeasons.Controls.Add(Me.lstSeasons)
         Me.grpSeasons.Controls.Add(Me.cboSeasons)
         Me.grpSeasons.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.grpSeasons.Location = New System.Drawing.Point(250, 0)
+        Me.grpSeasons.Location = New System.Drawing.Point(208, 0)
         Me.grpSeasons.Name = "grpSeasons"
-        Me.grpSeasons.Size = New System.Drawing.Size(158, 321)
+        Me.grpSeasons.Size = New System.Drawing.Size(200, 328)
         Me.grpSeasons.TabIndex = 14
         Me.grpSeasons.TabStop = False
         Me.grpSeasons.Text = "Seasons"
@@ -98,18 +98,18 @@ Public Class frmSpecifySeasonalAttributes
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(72, 279)
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(128, 292)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
-        Me.btnSeasonsNone.Size = New System.Drawing.Size(76, 27)
+        Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsNone.TabIndex = 12
         Me.btnSeasonsNone.Text = "None"
         '
         'btnSeasonsAll
         '
         Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Location = New System.Drawing.Point(10, 279)
+        Me.btnSeasonsAll.Location = New System.Drawing.Point(8, 292)
         Me.btnSeasonsAll.Name = "btnSeasonsAll"
-        Me.btnSeasonsAll.Size = New System.Drawing.Size(76, 27)
+        Me.btnSeasonsAll.Size = New System.Drawing.Size(64, 23)
         Me.btnSeasonsAll.TabIndex = 11
         Me.btnSeasonsAll.Text = "All"
         '
@@ -119,11 +119,10 @@ Public Class frmSpecifySeasonalAttributes
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSeasons.IntegralHeight = False
-        Me.lstSeasons.ItemHeight = 16
-        Me.lstSeasons.Location = New System.Drawing.Point(10, 46)
+        Me.lstSeasons.Location = New System.Drawing.Point(8, 40)
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(138, 224)
+        Me.lstSeasons.Size = New System.Drawing.Size(183, 244)
         Me.lstSeasons.TabIndex = 7
         Me.lstSeasons.Tag = "Seasons"
         '
@@ -132,18 +131,18 @@ Public Class frmSpecifySeasonalAttributes
         Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSeasons.Enabled = False
-        Me.cboSeasons.Location = New System.Drawing.Point(10, 18)
+        Me.cboSeasons.Location = New System.Drawing.Point(8, 16)
         Me.cboSeasons.MaxDropDownItems = 20
         Me.cboSeasons.Name = "cboSeasons"
-        Me.cboSeasons.Size = New System.Drawing.Size(138, 24)
+        Me.cboSeasons.Size = New System.Drawing.Size(183, 21)
         Me.cboSeasons.TabIndex = 6
         Me.cboSeasons.Tag = "SeasonType"
         '
         'Splitter1
         '
-        Me.Splitter1.Location = New System.Drawing.Point(240, 0)
+        Me.Splitter1.Location = New System.Drawing.Point(200, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(10, 321)
+        Me.Splitter1.Size = New System.Drawing.Size(8, 328)
         Me.Splitter1.TabIndex = 13
         Me.Splitter1.TabStop = False
         '
@@ -155,7 +154,7 @@ Public Class frmSpecifySeasonalAttributes
         Me.grpAttributes.Dock = System.Windows.Forms.DockStyle.Left
         Me.grpAttributes.Location = New System.Drawing.Point(0, 0)
         Me.grpAttributes.Name = "grpAttributes"
-        Me.grpAttributes.Size = New System.Drawing.Size(240, 321)
+        Me.grpAttributes.Size = New System.Drawing.Size(200, 328)
         Me.grpAttributes.TabIndex = 12
         Me.grpAttributes.TabStop = False
         Me.grpAttributes.Text = "Attributes"
@@ -163,18 +162,18 @@ Public Class frmSpecifySeasonalAttributes
         'btnAttributesNone
         '
         Me.btnAttributesNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnAttributesNone.Location = New System.Drawing.Point(154, 279)
+        Me.btnAttributesNone.Location = New System.Drawing.Point(128, 292)
         Me.btnAttributesNone.Name = "btnAttributesNone"
-        Me.btnAttributesNone.Size = New System.Drawing.Size(76, 27)
+        Me.btnAttributesNone.Size = New System.Drawing.Size(64, 23)
         Me.btnAttributesNone.TabIndex = 10
         Me.btnAttributesNone.Text = "None"
         '
         'btnAttributesAll
         '
         Me.btnAttributesAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnAttributesAll.Location = New System.Drawing.Point(10, 279)
+        Me.btnAttributesAll.Location = New System.Drawing.Point(8, 292)
         Me.btnAttributesAll.Name = "btnAttributesAll"
-        Me.btnAttributesAll.Size = New System.Drawing.Size(76, 27)
+        Me.btnAttributesAll.Size = New System.Drawing.Size(64, 23)
         Me.btnAttributesAll.TabIndex = 9
         Me.btnAttributesAll.Text = "All"
         '
@@ -184,11 +183,10 @@ Public Class frmSpecifySeasonalAttributes
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstAttributes.IntegralHeight = False
-        Me.lstAttributes.ItemHeight = 16
-        Me.lstAttributes.Location = New System.Drawing.Point(10, 18)
+        Me.lstAttributes.Location = New System.Drawing.Point(8, 16)
         Me.lstAttributes.Name = "lstAttributes"
         Me.lstAttributes.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstAttributes.Size = New System.Drawing.Size(220, 252)
+        Me.lstAttributes.Size = New System.Drawing.Size(184, 268)
         Me.lstAttributes.TabIndex = 7
         Me.lstAttributes.Tag = "Attributes"
         '
@@ -197,34 +195,34 @@ Public Class frmSpecifySeasonalAttributes
         Me.panelBottom.Controls.Add(Me.btnCancel)
         Me.panelBottom.Controls.Add(Me.btnOk)
         Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 328)
+        Me.panelBottom.Location = New System.Drawing.Point(0, 334)
         Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(408, 45)
+        Me.panelBottom.Size = New System.Drawing.Size(408, 39)
         Me.panelBottom.TabIndex = 15
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(321, 3)
+        Me.btnCancel.Location = New System.Drawing.Point(335, 3)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(77, 28)
+        Me.btnCancel.Size = New System.Drawing.Size(65, 24)
         Me.btnCancel.TabIndex = 1
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(237, 3)
+        Me.btnOk.Location = New System.Drawing.Point(265, 3)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(77, 28)
+        Me.btnOk.Size = New System.Drawing.Size(65, 24)
         Me.btnOk.TabIndex = 0
         Me.btnOk.Text = "Ok"
         '
         'frmSpecifySeasonalAttributes
         '
         Me.AcceptButton = Me.btnOk
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(408, 373)
         Me.Controls.Add(Me.panelTop)
@@ -409,11 +407,15 @@ Public Class frmSpecifySeasonalAttributes
     End Sub
 
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-        pOk = True
-        SaveListSelectedSeasons(lstAttributes)
-        SaveSetting("atcSeasons", "SeasonType", "combobox", cboSeasons.SelectedItem)
-        SaveListSelectedSeasons(lstSeasons)
-        Close()
+        If lstSeasons.SelectedIndices.Count = 0 Then
+            MapWinUtility.Logger.Msg("At least one season must be selected.", MsgBoxStyle.OkOnly, "No seasons selected")
+        Else
+            pOk = True
+            SaveListSelectedSeasons(lstAttributes)
+            SaveSetting("atcSeasons", "SeasonType", "combobox", cboSeasons.SelectedItem)
+            SaveListSelectedSeasons(lstSeasons)
+            Close()
+        End If
     End Sub
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click

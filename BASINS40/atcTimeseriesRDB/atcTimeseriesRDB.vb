@@ -367,153 +367,158 @@ Public Class atcTimeseriesRDB
 
     Public Overrides Function Open(ByVal aFileName As String, _
                           Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
-        If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
-            aFileName = FindFile("Select " & Name & " file to open", , , Filter, True, , 1)
-        End If
+        'If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
+        '    aFileName = FindFile("Select " & Name & " file to open", , , Filter, True, , 1)
+        'End If
+        'If Not IO.File.Exists(aFileName) Then
+        '    Throw New ApplicationException("File '" & aFileName & "' not found")
 
-        If Not IO.File.Exists(aFileName) Then
-            Throw New ApplicationException("File '" & aFileName & "' not found")
-        ElseIf IO.Path.GetFileName(aFileName).ToLower.StartsWith("nwis_stations") Then
-            Throw New ApplicationException("Station file does not contain timeseries data: " & IO.Path.GetFileName(aFileName))
-        Else
-            Specification = aFileName
-            Try
-                Dim lTimeStartOpen As Date = Now
-                Logger.Dbg("OpenStartFor " & aFileName)
-
-                Dim lInputStream As New FileStream(Specification, FileMode.Open, FileAccess.Read)
-                Dim lInputBuffer As New BufferedStream(lInputStream)
-                Dim lInputReader As New BinaryReader(lInputBuffer)
-
-                Dim lSite As Boolean = False
-                Dim lWQData As Boolean = False
-                Dim lMeasurementsData As Boolean = False
-                Dim lPeriodicGroundwaterData As Boolean = False
-                Dim lIdaData As Boolean = False
-                Dim lDailyDischargeData As Boolean = False
-
-                Dim lAttributes As New atcDataAttributes
-                Dim lCurLine As String
-
-                Dim lAttrName As String
-                Dim lAttrValue As String
-                Dim lFirstLine As Boolean = True
-
-                While lInputReader.PeekChar = 35 ' Asc("#")
-                    lCurLine = NextLine(lInputReader)
-
-                    If lCurLine.Contains("Data for the following station is contained in this file") Then
-                        With lAttributes
-                            If Not .ContainsAttribute("AGENCY") Then 'Only parse this line if attributes not already set
-                                lCurLine = NextLine(lInputReader)
-                                If lCurLine.Contains("----------") Then
-                                    lCurLine = NextLine(lInputReader).Substring(1).Trim
-                                    .SetValue("AGENCY", MapWinUtility.Strings.StrSplit(lCurLine, " ", ""))
-                                    .SetValue("Location", MapWinUtility.Strings.StrSplit(lCurLine, " ", ""))
-                                    .SetValue("StaNam", lCurLine.Trim)
-                                End If
-                            End If
-                        End With
-                    End If
-
-                    If lFirstLine AndAlso lCurLine.Contains("http://") Then 'This looks like a file we downloaded and prepended the original URL
-                        If lCurLine.Contains("qwdata") Then
-                            lWQData = True
-                        ElseIf lCurLine.Contains("measurement") Then
-                            lMeasurementsData = True
-                        ElseIf lCurLine.Contains("gwlevels") Then
-                            lPeriodicGroundwaterData = True
-                        ElseIf lCurLine.Contains("dv?") OrElse lCurLine.Contains("provisional") Then
-                            lDailyDischargeData = True
-                        ElseIf lCurLine.Contains("ida.water.usgs.gov") Then
-                            lIdaData = True
-                        End If
-                        If Not lAttributes.ContainsAttribute("URL") Then
-                            lAttributes.SetValueIfMissing("URL", lCurLine.Substring(lCurLine.IndexOf("http://")).Trim)
-                        End If
-                    ElseIf lCurLine.Contains("Site File") Then
-                        lSite = True
-                        Exit While
-                    ElseIf lCurLine.Contains("File created on") Then
-                        lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.IndexOf("File created on") + 15).Trim)
-                    ElseIf lCurLine.ToLower.Contains("retrieved:") Then
-                        lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.ToLower.IndexOf("retrieved:") + 10).Trim)
-                    ElseIf lCurLine.ToLower.Contains("download_date") Then
-                        lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.ToLower.IndexOf("download_date") + 13).Trim)
-                    ElseIf lCurLine.Contains("contains selected water-quality data") Then
-                        lWQData = True
-                        Exit While
-                    ElseIf lCurLine.Contains("instantaneous data archive") Then
-                        lIdaData = True
-                        Exit While
-                    ElseIf lCurLine.Contains("DD parameter statistic") Then
-                        lDailyDischargeData = True
-                        Exit While
-                    ElseIf lCurLine.Contains("Surface water measurements") Then
-                        lMeasurementsData = True
-                        Exit While
-                    ElseIf lMeasurementsData AndAlso lCurLine.Contains("Stations in this file include") Then
-                        Exit While
-                    ElseIf lCurLine.Contains("groundwater levels") Then
-                        lPeriodicGroundwaterData = True
-                        Exit While
-                    End If
-
-                    If lCurLine.Length > 50 Then
-                        lAttrName = lCurLine.Substring(2, 48).Trim
-                        lAttrValue = lCurLine.Substring(50).Trim
-                        If lAttrName.Length > 0 AndAlso lAttrName.Length < 30 Then
-                            Select Case lAttrName 'translate NWIS attributes to WDM/BASINS names
-                                Case "agency_cd" : lAttributes.SetValue("AGENCY", lAttrValue)
-                                Case "station_nm" : lAttributes.SetValue("StaNam", lAttrValue)
-                                Case "state_cd" : lAttributes.SetValue("STFIPS", lAttrValue)
-                                Case "county_cd" : lAttributes.SetValue("CNTYFIPS", lAttrValue)
-                                Case "huc_cd" : lAttributes.SetValue("HUCODE", lAttrValue)
-                                Case "dec_lat_va" : lAttributes.SetValue("Latitude", CDbl(lAttrValue))
-                                Case "dec_long_va" : lAttributes.SetValue("Longitude", -Math.Abs(CDbl(lAttrValue)))
-                                Case "alt_va" : lAttributes.SetValue("Elevation", lAttrValue)
-                                Case "drain_area_va" : lAttributes.SetValue("Drainage Area", lAttrValue)
-                                Case Else
-                                    If lAttrName.Length > 0 Then
-                                        Select Case lAttrValue
-                                            Case "", "-", "--" 'Skip setting non-values
-                                            Case Else
-                                                lAttributes.SetValue(lAttrName, lAttrValue)
-                                        End Select
-                                    End If
-                            End Select
-                        End If
-                    End If
-                    lFirstLine = False
-                End While
-
-                lAttributes.AddHistory("Read from " & Specification)
-
-                If lSite Then
-                    Throw New ApplicationException("Station list does not contain timeseries data: " & IO.Path.GetFileName(aFileName))
-                ElseIf lWQData Then
-                    ProcessWaterQualityValues(lInputReader, lAttributes)
-                ElseIf lMeasurementsData Then
-                    ProcessMeasurements(lInputReader, lAttributes)
-                ElseIf lIdaData Then
-                    ProcessIdaValues(lInputReader, lAttributes)
-                ElseIf lPeriodicGroundwaterData Then
-                    ProcessPeriodicGroundwater(lInputReader, lAttributes)
-                Else 'If lDailyDischargeData Then
-                    ProcessDailyValues(lInputReader, lAttributes)
-                End If
-
-                Try
-                    If lInputReader IsNot Nothing Then lInputReader.Close()
-                    If lInputBuffer IsNot Nothing Then lInputBuffer.Close()
-                    If lInputStream IsNot Nothing Then lInputStream.Close()
-                Catch
-                End Try
-
+        If MyBase.Open(aFileName, aAttributes) Then
+            If Not IO.File.Exists(Specification) Then
+                Logger.Dbg("Opening new file " & Specification)
                 Return True
-            Catch lException As Exception
-                Throw New ApplicationException("Exception reading '" & aFileName & "': " & lException.Message, lException)
-            End Try
+
+            ElseIf IO.Path.GetFileName(Specification).ToLower.StartsWith("nwis_stations") Then
+                Throw New ApplicationException("Station file does not contain timeseries data: " & IO.Path.GetFileName(Specification))
+            Else
+                Try
+                    Dim lTimeStartOpen As Date = Now
+                    Logger.Dbg("OpenStartFor " & Specification)
+
+                    Dim lInputStream As New FileStream(Specification, FileMode.Open, FileAccess.Read)
+                    Dim lInputBuffer As New BufferedStream(lInputStream)
+                    Dim lInputReader As New BinaryReader(lInputBuffer)
+
+                    Dim lSite As Boolean = False
+                    Dim lWQData As Boolean = False
+                    Dim lMeasurementsData As Boolean = False
+                    Dim lPeriodicGroundwaterData As Boolean = False
+                    Dim lIdaData As Boolean = False
+                    Dim lDailyDischargeData As Boolean = False
+
+                    Dim lAttributes As New atcDataAttributes
+                    Dim lCurLine As String
+
+                    Dim lAttrName As String
+                    Dim lAttrValue As String
+                    Dim lFirstLine As Boolean = True
+
+                    While lInputReader.PeekChar = 35 ' Asc("#")
+                        lCurLine = NextLine(lInputReader)
+
+                        If lCurLine.Contains("Data for the following station is contained in this file") Then
+                            With lAttributes
+                                If Not .ContainsAttribute("AGENCY") Then 'Only parse this line if attributes not already set
+                                    lCurLine = NextLine(lInputReader)
+                                    If lCurLine.Contains("----------") Then
+                                        lCurLine = NextLine(lInputReader).Substring(1).Trim
+                                        .SetValue("AGENCY", MapWinUtility.Strings.StrSplit(lCurLine, " ", ""))
+                                        .SetValue("Location", MapWinUtility.Strings.StrSplit(lCurLine, " ", ""))
+                                        .SetValue("StaNam", lCurLine.Trim)
+                                    End If
+                                End If
+                            End With
+                        End If
+
+                        If lFirstLine AndAlso lCurLine.Contains("http://") Then 'This looks like a file we downloaded and prepended the original URL
+                            If lCurLine.Contains("qwdata") Then
+                                lWQData = True
+                            ElseIf lCurLine.Contains("measurement") Then
+                                lMeasurementsData = True
+                            ElseIf lCurLine.Contains("gwlevels") Then
+                                lPeriodicGroundwaterData = True
+                            ElseIf lCurLine.Contains("dv?") OrElse lCurLine.Contains("provisional") Then
+                                lDailyDischargeData = True
+                            ElseIf lCurLine.Contains("ida.water.usgs.gov") Then
+                                lIdaData = True
+                            End If
+                            If Not lAttributes.ContainsAttribute("URL") Then
+                                lAttributes.SetValueIfMissing("URL", lCurLine.Substring(lCurLine.IndexOf("http://")).Trim)
+                            End If
+                        ElseIf lCurLine.Contains("Site File") Then
+                            lSite = True
+                            Exit While
+                        ElseIf lCurLine.Contains("File created on") Then
+                            lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.IndexOf("File created on") + 15).Trim)
+                        ElseIf lCurLine.ToLower.Contains("retrieved:") Then
+                            lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.ToLower.IndexOf("retrieved:") + 10).Trim)
+                        ElseIf lCurLine.ToLower.Contains("download_date") Then
+                            lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.ToLower.IndexOf("download_date") + 13).Trim)
+                        ElseIf lCurLine.Contains("contains selected water-quality data") Then
+                            lWQData = True
+                            Exit While
+                        ElseIf lCurLine.Contains("instantaneous data archive") Then
+                            lIdaData = True
+                            Exit While
+                        ElseIf lCurLine.Contains("DD parameter statistic") Then
+                            lDailyDischargeData = True
+                            Exit While
+                        ElseIf lCurLine.Contains("Surface water measurements") Then
+                            lMeasurementsData = True
+                            Exit While
+                        ElseIf lMeasurementsData AndAlso lCurLine.Contains("Stations in this file include") Then
+                            Exit While
+                        ElseIf lCurLine.Contains("groundwater levels") Then
+                            lPeriodicGroundwaterData = True
+                            Exit While
+                        End If
+
+                        If lCurLine.Length > 50 Then
+                            lAttrName = lCurLine.Substring(2, 48).Trim
+                            lAttrValue = lCurLine.Substring(50).Trim
+                            If lAttrName.Length > 0 AndAlso lAttrName.Length < 30 Then
+                                Select Case lAttrName 'translate NWIS attributes to WDM/BASINS names
+                                    Case "agency_cd" : lAttributes.SetValue("AGENCY", lAttrValue)
+                                    Case "station_nm" : lAttributes.SetValue("StaNam", lAttrValue)
+                                    Case "state_cd" : lAttributes.SetValue("STFIPS", lAttrValue)
+                                    Case "county_cd" : lAttributes.SetValue("CNTYFIPS", lAttrValue)
+                                    Case "huc_cd" : lAttributes.SetValue("HUCODE", lAttrValue)
+                                    Case "dec_lat_va" : lAttributes.SetValue("Latitude", CDbl(lAttrValue))
+                                    Case "dec_long_va" : lAttributes.SetValue("Longitude", -Math.Abs(CDbl(lAttrValue)))
+                                    Case "alt_va" : lAttributes.SetValue("Elevation", lAttrValue)
+                                    Case "drain_area_va" : lAttributes.SetValue("Drainage Area", lAttrValue)
+                                    Case Else
+                                        If lAttrName.Length > 0 Then
+                                            Select Case lAttrValue
+                                                Case "", "-", "--" 'Skip setting non-values
+                                                Case Else
+                                                    lAttributes.SetValue(lAttrName, lAttrValue)
+                                            End Select
+                                        End If
+                                End Select
+                            End If
+                        End If
+                        lFirstLine = False
+                    End While
+
+                    lAttributes.AddHistory("Read from " & Specification)
+
+                    If lSite Then
+                        Throw New ApplicationException("Station list does not contain timeseries data: " & IO.Path.GetFileName(Specification))
+                    ElseIf lWQData Then
+                        ProcessWaterQualityValues(lInputReader, lAttributes)
+                    ElseIf lMeasurementsData Then
+                        ProcessMeasurements(lInputReader, lAttributes)
+                    ElseIf lIdaData Then
+                        ProcessIdaValues(lInputReader, lAttributes)
+                    ElseIf lPeriodicGroundwaterData Then
+                        ProcessPeriodicGroundwater(lInputReader, lAttributes)
+                    Else 'If lDailyDischargeData Then
+                        ProcessDailyValues(lInputReader, lAttributes)
+                    End If
+
+                    Try
+                        If lInputReader IsNot Nothing Then lInputReader.Close()
+                        If lInputBuffer IsNot Nothing Then lInputBuffer.Close()
+                        If lInputStream IsNot Nothing Then lInputStream.Close()
+                    Catch
+                    End Try
+
+                    Return True
+                Catch lException As Exception
+                    Throw New ApplicationException("Exception reading '" & Specification & "': " & lException.Message, lException)
+                End Try
+            End If
         End If
     End Function
 
