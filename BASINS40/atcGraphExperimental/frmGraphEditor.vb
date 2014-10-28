@@ -291,17 +291,22 @@ Public Class frmGraphEditor
         End If
     End Sub
 
-    Private Sub SetControlsFromSelectedCurve()
-        pSettingControls += 1
+    Private Function CurrentCurve() As CurveItem
         If comboWhichCurve.SelectedIndex >= 0 Then
             Dim lPaneCurves As Integer = 0
             If pPane IsNot Nothing Then lPaneCurves = pPane.CurveList.Count
             If comboWhichCurve.SelectedIndex < lPaneCurves Then
-                SetControlsFromCurve(pPane.CurveList(comboWhichCurve.SelectedIndex))
+                Return pPane.CurveList(comboWhichCurve.SelectedIndex)
             ElseIf pPaneAux IsNot Nothing AndAlso comboWhichCurve.SelectedIndex < lPaneCurves + pPaneAux.CurveList.Count Then
-                SetControlsFromCurve(pPaneAux.CurveList(comboWhichCurve.SelectedIndex - lPaneCurves))
+                Return pPaneAux.CurveList(comboWhichCurve.SelectedIndex - lPaneCurves)
             End If
         End If
+        Return Nothing
+    End Function
+
+    Private Sub SetControlsFromSelectedCurve()
+        pSettingControls += 1
+        SetControlsFromCurve(CurrentCurve)
         pSettingControls -= 1
     End Sub
 
@@ -447,8 +452,10 @@ Public Class frmGraphEditor
             For Each lCurve As CurveItem In pPane.CurveList
                 If lCurve.IsY2Axis Then lRightCount += 1 Else lLeftCount += 1
             Next
-            pPane.YAxis.IsVisible = (lLeftCount > 0)
-            pPane.Y2Axis.IsVisible = (lRightCount > 0)
+
+            'Make sure special groundwater axes do not disappear by checking Title.Text
+            pPane.YAxis.IsVisible = (lLeftCount > 0 OrElse pPane.YAxis.Title.Text.StartsWith("Depth"))
+            pPane.Y2Axis.IsVisible = (lRightCount > 0 OrElse pPane.Y2Axis.Title.Text.StartsWith("Groundwater"))
 
             If txtText.Text.Length > 0 Then
                 Dim lText As TextObj = FindTextObject(txtText.Text)
@@ -764,6 +771,36 @@ Public Class frmGraphEditor
         Dim lGrapher As clsGraphScatter = lForm.Grapher
         lGrapher.AddFitLine()
         AddedLineItem()
+    End Sub
+
+    Private Sub btnNewColors_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNewColors.Click
+        Dim lCurrentCurve As CurveItem = CurrentCurve()
+        For Each lPane As GraphPane In pZgc.MasterPane.PaneList
+
+            For Each lCurve As CurveItem In lPane.CurveList
+                lCurve.Color = Color.FromArgb(255, _
+                               64 + CInt(Rnd() * 128), _
+                               64 + CInt(Rnd() * 128), _
+                               64 + CInt(Rnd() * 128))
+                If Object.ReferenceEquals(lCurrentCurve, lCurve) Then
+                    txtCurveColor.BackColor = lCurve.Color
+                End If
+            Next
+
+            'Grayscale from nearly white (first curve) to all the way black (last curve)
+            'Dim lNumCurves As Integer = lPane.CurveList.Count
+            'Dim lCurveIndex As Integer = 1
+            'For Each lCurve As CurveItem In lPane.CurveList
+            '    Dim lGrayLevel As Integer = 255 - 255 * lCurveIndex / lNumCurves
+            '    lCurve.Color = Color.FromArgb(255, lGrayLevel, lGrayLevel, lGrayLevel)
+            '    If Object.ReferenceEquals(lCurrentCurve, lCurve) Then
+            '        txtCurveColor.BackColor = lCurve.Color
+            '    End If
+            '    lCurveIndex += 1
+            'Next
+
+        Next
+        If chkAutoApply.Checked Then ApplyAll()
     End Sub
 
 End Class

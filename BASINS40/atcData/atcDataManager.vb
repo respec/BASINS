@@ -16,7 +16,7 @@ Public Class atcDataManager
         Set(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
             If pMapWin Is Nothing AndAlso aMapWin IsNot Nothing Then
                 pMapWin = aMapWin
-                If aMapWin.ApplicationInfo.ApplicationName = "USGS GW Toolbox" Then
+                If aMapWin.ApplicationInfo.ApplicationName.StartsWith("USGS GW Toolbox") Then
                     pDefaultSelectionAttributes = pDefaultSelectionAttributesGW
                 End If
                 Clear()
@@ -135,6 +135,8 @@ Public Class atcDataManager
 #End If
 
     Private Shared pDataSources As ArrayList 'of atcTimeseriesSource, the currently open data sources
+    Private Shared pDiscardableTimeseries As atcTimeseries ' As New Generic.List(Of atcTimeseries)
+    Private Shared pDiscardableTimeseriesTotalValues As ULong = 0 'pMinimumAvailableMemory As ULong = My.Computer.Info.TotalPhysicalMemory * 0.2 'When less than this is available, discard pDiscardableTimeseries
     Private Shared pSelectionAttributes As Generic.List(Of String)
     Private Shared pDisplayAttributes As Generic.List(Of String)
     Private Shared pDefaultSelectionAttributes() As String = {"Scenario", "Location", "Constituent"}
@@ -194,6 +196,44 @@ Public Class atcDataManager
         Next
         Return lAllData
     End Function
+
+    'Public Shared Sub AddDiscardableTimeseries(ByVal aTimeseries As atcTimeseries)
+    '    'If My.Computer.Info.AvailablePhysicalMemory < pMinimumAvailableMemory AndAlso pDiscardableTimeseries.Count > 0 Then
+    '    If pDiscardableTimeseriesTotalValues > 0 Then
+    '        'Logger.Dbg("Freeing memory of " & pDiscardableTimeseries.Count & " datasets, " & Format(pDiscardableTimeseriesTotalValues, "#,###") & " values. " & MemUsage())
+    '        For Each lTimeseries As atcTimeseries In pDiscardableTimeseries
+    '            'Try
+    '            lTimeseries.ValuesNeedToBeRead = True
+    '            'Catch eCantDiscard As Exception
+    '            '    Logger.Dbg("Exception discarding timeseries: " & eCantDiscard.ToString)
+    '            'End Try
+    '        Next
+    '        pDiscardableTimeseries.Clear()
+    '        pDiscardableTimeseriesTotalValues = 0
+    '        'Logger.Dbg(MemUsage())
+    '    End If
+    '    pDiscardableTimeseries.Add(aTimeseries)
+    '    pDiscardableTimeseriesTotalValues += 1 ' aTimeseries.numValues
+    'End Sub
+
+    Public Shared Sub AddDiscardableTimeseries(ByVal aTimeseries As atcTimeseries)
+        'If My.Computer.Info.AvailablePhysicalMemory < pMinimumAvailableMemory AndAlso pDiscardableTimeseries.Count > 0 Then
+        'If pDiscardableTimeseriesTotalValues > 0 Then
+        'Logger.Dbg("Freeing memory of " & pDiscardableTimeseries.Count & " datasets, " & Format(pDiscardableTimeseriesTotalValues, "#,###") & " values. " & MemUsage())
+        'For Each lTimeseries As atcTimeseries In pDiscardableTimeseries
+        'Try
+        pDiscardableTimeseries.ValuesNeedToBeRead = True
+        'Catch eCantDiscard As Exception
+        '    Logger.Dbg("Exception discarding timeseries: " & eCantDiscard.ToString)
+        'End Try
+        'Next
+        'pDiscardableTimeseries.Clear()
+        'pDiscardableTimeseriesTotalValues = 0
+        'Logger.Dbg(MemUsage())
+        'End If
+        pDiscardableTimeseries = aTimeseries
+        'pDiscardableTimeseriesTotalValues += 1 ' aTimeseries.numValues
+    End Sub
 
     ''' <summary>Names of attributes used for selection of data in UI</summary>
     Public Shared ReadOnly Property SelectionAttributes() As Generic.List(Of String)

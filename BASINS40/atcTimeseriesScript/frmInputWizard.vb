@@ -678,7 +678,6 @@ ParseFixedDef:
 
     Private Function ScriptStringFromWizard() As String
         Dim tmpstr, tmpstr2 As String
-        Dim ParsePos As Integer
         Dim indent, indentIncrement As Integer
         Dim RepeatStart, RepeatEnd As Integer
         Dim NestedIfs, r, commaPos, CurrentIf As Integer

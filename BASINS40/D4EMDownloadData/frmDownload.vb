@@ -109,24 +109,23 @@ Public Class frmDownload
         If Is64BitOperatingSystem Then 'Old self-extracting archives do not work on 64 bit
             chkBASINS_DEM.Visible = False
         End If
-        Select Case pApplicationName
-            Case "USGS GW Toolbox"
-                lGroups.Add("D4EM Data Download::NWIS", grpNWISStations_GW)
-                lGroups.Add("D4EM Data Download::BASINS", grpBASINS)
-                lGroups.Add("D4EM Data Download::NHDPlus", grpNHDplus)
-                lGroups.Add("D4EM Data Download::NLCD2001", grpNLCD2001)
+        If pApplicationName.StartsWith("USGS GW Toolbox") Then
+            lGroups.Add("D4EM Data Download::NWIS", grpNWISStations_GW)
+            lGroups.Add("D4EM Data Download::BASINS", grpBASINS)
+            lGroups.Add("D4EM Data Download::NHDPlus", grpNHDplus)
+            lGroups.Add("D4EM Data Download::NLCD2001", grpNLCD2001)
 
-                chkBASINS_LSTORET.Visible = False
-                chkBASINS_Census.Visible = False : chkBASINS_MetStations.Left = chkBASINS_Census.Left
-                chkBASINS_303d.Visible = False : chkBASINS_MetData.Left = chkBASINS_303d.Left
-            Case Else
-                lGroups.Add("D4EM Data Download::BASINS", grpBASINS)
-                lGroups.Add("D4EM Data Download::NHDPlus", grpNHDplus)
-                lGroups.Add("D4EM Data Download::NWIS", grpNWISStations)
-                lGroups.Add("D4EM Data Download::NLCD2001", grpNLCD2001)
-                lGroups.Add("D4EM Data Download::STORET", grpSTORET)
-                lGroups.Add("D4EM Data Download::NLDAS", grpNLDAS)
-        End Select
+            chkBASINS_LSTORET.Visible = False
+            chkBASINS_Census.Visible = False : chkBASINS_MetStations.Left = chkBASINS_Census.Left
+            chkBASINS_303d.Visible = False : chkBASINS_MetData.Left = chkBASINS_303d.Left
+        Else
+            lGroups.Add("D4EM Data Download::BASINS", grpBASINS)
+            lGroups.Add("D4EM Data Download::NHDPlus", grpNHDplus)
+            lGroups.Add("D4EM Data Download::NWIS", grpNWISStations)
+            lGroups.Add("D4EM Data Download::NLCD2001", grpNLCD2001)
+            lGroups.Add("D4EM Data Download::STORET", grpSTORET)
+            lGroups.Add("D4EM Data Download::NLDAS", grpNLDAS)
+        End If
 
         For Each lGroupEntry As KeyValuePair(Of String, Windows.Forms.GroupBox) In lGroups
             If LoadPlugin(lGroupEntry.Key) Then
@@ -313,34 +312,33 @@ Public Class frmDownload
             chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
         End If
 
-        Select Case pApplicationName
-            Case "USGS GW Toolbox"
-                chkNWIS_GetNWISDailyDischarge_GW.Visible = True
-                chkNWIS_GetNWISIdaDischarge_GW.Visible = True
-                chkNWIS_GetNWISDailyGW_GW.Visible = True
-                chkNWIS_GetNWISPeriodicGW_GW.Visible = True
-                chkNWIS_GetNWISPrecipitation_GW.Visible = True
+        If pApplicationName.StartsWith("USGS GW Toolbox") Then
+            chkNWIS_GetNWISDailyDischarge_GW.Visible = True
+            chkNWIS_GetNWISIdaDischarge_GW.Visible = True
+            chkNWIS_GetNWISDailyGW_GW.Visible = True
+            chkNWIS_GetNWISPeriodicGW_GW.Visible = True
+            chkNWIS_GetNWISPrecipitation_GW.Visible = True
 
-                chkNWIS_GetNWISDailyDischarge_GW.Enabled = lStationsRegion
-                chkNWIS_GetNWISIdaDischarge_GW.Enabled = lStationsRegion
-                chkNWIS_GetNWISDailyGW_GW.Enabled = lStationsRegion
-                chkNWIS_GetNWISPeriodicGW_GW.Enabled = lStationsRegion
-                chkNWIS_GetNWISPrecipitation_GW.Enabled = lStationsRegion
-            Case Else
-                chkNWIS_GetNWISDailyDischarge.Visible = True
-                chkNWIS_GetNWISIdaDischarge.Visible = True
-                chkNWIS_GetNWISDailyGW.Visible = True
-                chkNWIS_GetNWISPeriodicGW.Visible = True
-                chkNWIS_GetNWISWQ.Visible = True
-                chkNWIS_GetNWISMeasurements.Visible = True
+            chkNWIS_GetNWISDailyDischarge_GW.Enabled = lStationsRegion
+            chkNWIS_GetNWISIdaDischarge_GW.Enabled = lStationsRegion
+            chkNWIS_GetNWISDailyGW_GW.Enabled = lStationsRegion
+            chkNWIS_GetNWISPeriodicGW_GW.Enabled = lStationsRegion
+            chkNWIS_GetNWISPrecipitation_GW.Enabled = lStationsRegion
+        Else
+            chkNWIS_GetNWISDailyDischarge.Visible = True
+            chkNWIS_GetNWISIdaDischarge.Visible = True
+            chkNWIS_GetNWISDailyGW.Visible = True
+            chkNWIS_GetNWISPeriodicGW.Visible = True
+            chkNWIS_GetNWISWQ.Visible = True
+            chkNWIS_GetNWISMeasurements.Visible = True
 
-                chkNWIS_GetNWISDailyDischarge.Enabled = lStationsRegion
-                chkNWIS_GetNWISIdaDischarge.Enabled = lStationsRegion
-                chkNWIS_GetNWISDailyGW.Enabled = lStationsRegion
-                chkNWIS_GetNWISPeriodicGW.Enabled = lStationsRegion
-                chkNWIS_GetNWISWQ.Enabled = lStationsRegion
-                chkNWIS_GetNWISMeasurements.Enabled = lStationsRegion
-        End Select
+            chkNWIS_GetNWISDailyDischarge.Enabled = lStationsRegion
+            chkNWIS_GetNWISIdaDischarge.Enabled = lStationsRegion
+            chkNWIS_GetNWISDailyGW.Enabled = lStationsRegion
+            chkNWIS_GetNWISPeriodicGW.Enabled = lStationsRegion
+            chkNWIS_GetNWISWQ.Enabled = lStationsRegion
+            chkNWIS_GetNWISMeasurements.Enabled = lStationsRegion
+        End If
 
         If pMapWin.View IsNot Nothing Then
             Dim lSelected As MapWindow.Interfaces.SelectInfo = pMapWin.View.SelectedShapes
@@ -348,100 +346,97 @@ Public Class frmDownload
                 Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer)
                 Dim lFilename As String = IO.Path.GetFileNameWithoutExtension(lLayer.FileName).ToLower
 
-                Select Case pApplicationName
-                    Case "USGS GW Toolbox"
-                        Select Case lFilename
-                            Case "nwis_stations_discharge"
-                                chkNWIS_GetNWISDailyDischarge_GW.Enabled = True
-                                chkNWIS_GetNWISDailyDischarge_GW.Checked = True
-                                chkNWIS_GetNWISIdaDischarge_GW.Enabled = True
-                            Case "nwis_stations_gw_daily"
-                                chkNWIS_GetNWISDailyGW_GW.Enabled = True
-                                chkNWIS_GetNWISDailyGW_GW.Checked = True
-                            Case "nwis_stations_gw_periodic"
-                                chkNWIS_GetNWISPeriodicGW_GW.Enabled = True
-                                chkNWIS_GetNWISPeriodicGW_GW.Checked = True
-                            Case "nwis_stations_precipitation"
-                                chkNWIS_GetNWISPrecipitation_GW.Enabled = True
-                                chkNWIS_GetNWISPrecipitation_GW.Checked = True
-                            Case Else
-                                If lFilename.StartsWith("met") Then
-                                    chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
-                                    chkBASINS_MetData.Checked = True
-                                End If
-                        End Select
-                    Case Else
-                        Select Case lFilename
-                            Case "nwis_stations_discharge"
-                                chkNWIS_GetNWISDailyDischarge.Enabled = True
-                                chkNWIS_GetNWISDailyDischarge.Checked = True
-                                chkNWIS_GetNWISIdaDischarge.Enabled = True
-                            Case "nwis_stations_qw"
-                                chkNWIS_GetNWISWQ.Enabled = True
-                                chkNWIS_GetNWISWQ.Checked = True
-                            Case "nwis_stations_measurements"
-                                chkNWIS_GetNWISMeasurements.Enabled = True
-                                chkNWIS_GetNWISMeasurements.Checked = True
-                            Case "nwis_stations_gw_daily"
-                                chkNWIS_GetNWISDailyGW.Enabled = True
-                                chkNWIS_GetNWISDailyGW.Checked = True
-                            Case "nwis_stations_gw_periodic"
-                                chkNWIS_GetNWISPeriodicGW.Enabled = True
-                                chkNWIS_GetNWISPeriodicGW.Checked = True
-                            Case "nwis_stations_peak" 'download of these data not yet implemented
+                If pApplicationName.StartsWith("USGS GW Toolbox") Then
+                    Select Case lFilename
+                        Case "nwis_stations_discharge"
+                            chkNWIS_GetNWISDailyDischarge_GW.Enabled = True
+                            chkNWIS_GetNWISDailyDischarge_GW.Checked = True
+                            chkNWIS_GetNWISIdaDischarge_GW.Enabled = True
+                        Case "nwis_stations_gw_daily"
+                            chkNWIS_GetNWISDailyGW_GW.Enabled = True
+                            chkNWIS_GetNWISDailyGW_GW.Checked = True
+                        Case "nwis_stations_gw_periodic"
+                            chkNWIS_GetNWISPeriodicGW_GW.Enabled = True
+                            chkNWIS_GetNWISPeriodicGW_GW.Checked = True
+                        Case "nwis_stations_precipitation"
+                            chkNWIS_GetNWISPrecipitation_GW.Enabled = True
+                            chkNWIS_GetNWISPrecipitation_GW.Checked = True
+                        Case Else
+                            If lFilename.StartsWith("met") Then
+                                chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
+                                chkBASINS_MetData.Checked = True
+                            End If
+                    End Select
+                Else
+                    Select Case lFilename
+                        Case "nwis_stations_discharge"
+                            chkNWIS_GetNWISDailyDischarge.Enabled = True
+                            chkNWIS_GetNWISDailyDischarge.Checked = True
+                            chkNWIS_GetNWISIdaDischarge.Enabled = True
+                        Case "nwis_stations_qw"
+                            chkNWIS_GetNWISWQ.Enabled = True
+                            chkNWIS_GetNWISWQ.Checked = True
+                        Case "nwis_stations_measurements"
+                            chkNWIS_GetNWISMeasurements.Enabled = True
+                            chkNWIS_GetNWISMeasurements.Checked = True
+                        Case "nwis_stations_gw_daily"
+                            chkNWIS_GetNWISDailyGW.Enabled = True
+                            chkNWIS_GetNWISDailyGW.Checked = True
+                        Case "nwis_stations_gw_periodic"
+                            chkNWIS_GetNWISPeriodicGW.Enabled = True
+                            chkNWIS_GetNWISPeriodicGW.Checked = True
+                        Case "nwis_stations_peak" 'download of these data not yet implemented
 
-                            Case "storet"
-                                chkSTORET_Results.Enabled = True
-                                chkSTORET_Results.Text = "Results"
-                                chkSTORET_Results.Checked = True
-                            Case "nldas_grid", "nldas_grid_center"
-                                chkNLDAS_GetNLDASParameter.Enabled = True
-                                chkNLDAS_GetNLDASParameter.Text = "Precipitation"
-                                chkNLDAS_GetNLDASParameter.Checked = True
-                            Case Else
-                                If lFilename.StartsWith("met") Then
-                                    chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
-                                    chkBASINS_MetData.Checked = True
-                                End If
-                        End Select
-                End Select
+                        Case "storet"
+                            chkSTORET_Results.Enabled = True
+                            chkSTORET_Results.Text = "Results"
+                            chkSTORET_Results.Checked = True
+                        Case "nldas_grid", "nldas_grid_center"
+                            chkNLDAS_GetNLDASParameter.Enabled = True
+                            chkNLDAS_GetNLDASParameter.Text = "Precipitation"
+                            chkNLDAS_GetNLDASParameter.Checked = True
+                        Case Else
+                            If lFilename.StartsWith("met") Then
+                                chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
+                                chkBASINS_MetData.Checked = True
+                            End If
+                    End Select
+                End If
             End If
         End If
+        If pApplicationName.StartsWith("USGS GW Toolbox") Then
+            If Not chkNWIS_GetNWISDailyDischarge_GW.Enabled AndAlso _
+               Not chkNWIS_GetNWISIdaDischarge_GW.Enabled AndAlso _
+               Not chkNWIS_GetNWISDailyGW_GW.Enabled AndAlso _
+               Not chkNWIS_GetNWISPeriodicGW_GW.Enabled AndAlso _
+               Not chkNWIS_GetNWISPrecipitation_GW.Enabled Then
+                panelNWISnoStations_GW.Visible = True
+                panelNWISnoStations_GW.BringToFront()
 
-        Select Case pApplicationName
-            Case "USGS GW Toolbox"
-                If Not chkNWIS_GetNWISDailyDischarge_GW.Enabled AndAlso _
-                   Not chkNWIS_GetNWISIdaDischarge_GW.Enabled AndAlso _
-                   Not chkNWIS_GetNWISDailyGW_GW.Enabled AndAlso _
-                   Not chkNWIS_GetNWISPeriodicGW_GW.Enabled AndAlso _
-                   Not chkNWIS_GetNWISPrecipitation_GW.Enabled Then
-                    panelNWISnoStations_GW.Visible = True
-                    panelNWISnoStations_GW.BringToFront()
+                chkNWIS_GetNWISDailyDischarge_GW.Visible = False
+                chkNWIS_GetNWISIdaDischarge_GW.Visible = False
+                chkNWIS_GetNWISDailyGW_GW.Visible = False
+                chkNWIS_GetNWISPeriodicGW_GW.Visible = False
+                chkNWIS_GetNWISPrecipitation_GW.Visible = False
+            End If
+        Else
+            If Not chkNWIS_GetNWISDailyDischarge.Enabled AndAlso _
+               Not chkNWIS_GetNWISIdaDischarge.Enabled AndAlso _
+               Not chkNWIS_GetNWISDailyGW.Enabled AndAlso _
+               Not chkNWIS_GetNWISPeriodicGW.Enabled AndAlso _
+               Not chkNWIS_GetNWISWQ.Enabled AndAlso _
+               Not chkNWIS_GetNWISMeasurements.Enabled Then
+                panelNWISnoStations.Visible = True
+                panelNWISnoStations.BringToFront()
 
-                    chkNWIS_GetNWISDailyDischarge_GW.Visible = False
-                    chkNWIS_GetNWISIdaDischarge_GW.Visible = False
-                    chkNWIS_GetNWISDailyGW_GW.Visible = False
-                    chkNWIS_GetNWISPeriodicGW_GW.Visible = False
-                    chkNWIS_GetNWISPrecipitation_GW.Visible = False
-                End If
-            Case Else
-                If Not chkNWIS_GetNWISDailyDischarge.Enabled AndAlso _
-                   Not chkNWIS_GetNWISIdaDischarge.Enabled AndAlso _
-                   Not chkNWIS_GetNWISDailyGW.Enabled AndAlso _
-                   Not chkNWIS_GetNWISPeriodicGW.Enabled AndAlso _
-                   Not chkNWIS_GetNWISWQ.Enabled AndAlso _
-                   Not chkNWIS_GetNWISMeasurements.Enabled Then
-                    panelNWISnoStations.Visible = True
-                    panelNWISnoStations.BringToFront()
-
-                    chkNWIS_GetNWISDailyDischarge.Visible = False
-                    chkNWIS_GetNWISIdaDischarge.Visible = False
-                    chkNWIS_GetNWISMeasurements.Visible = False
-                    chkNWIS_GetNWISDailyGW.Visible = False
-                    chkNWIS_GetNWISPeriodicGW.Visible = False
-                    chkNWIS_GetNWISWQ.Visible = False
-                End If
-        End Select
+                chkNWIS_GetNWISDailyDischarge.Visible = False
+                chkNWIS_GetNWISIdaDischarge.Visible = False
+                chkNWIS_GetNWISMeasurements.Visible = False
+                chkNWIS_GetNWISDailyGW.Visible = False
+                chkNWIS_GetNWISPeriodicGW.Visible = False
+                chkNWIS_GetNWISWQ.Visible = False
+            End If
+        End If
     End Sub
 
     Private Sub SetColorsFromAvailability()
