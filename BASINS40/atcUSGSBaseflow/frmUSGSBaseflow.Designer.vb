@@ -437,7 +437,7 @@ Partial Class frmUSGSBaseflow
         Me.btnGraphTimeseries.Name = "btnGraphTimeseries"
         Me.btnGraphTimeseries.Size = New System.Drawing.Size(103, 23)
         Me.btnGraphTimeseries.TabIndex = 17
-        Me.btnGraphTimeseries.Text = "Time-Series"
+        Me.btnGraphTimeseries.Text = "Time Series"
         Me.btnGraphTimeseries.UseVisualStyleBackColor = True
         '
         'gbBFMethods
