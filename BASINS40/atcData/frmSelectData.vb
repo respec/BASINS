@@ -69,12 +69,14 @@ Friend Class frmSelectData
     Friend WithEvents groupSelected As System.Windows.Forms.GroupBox
     Friend WithEvents pSelectedGrid As atcControls.atcGrid
     Friend WithEvents mnuSelectSeparator1 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents chkProvisional As System.Windows.Forms.CheckBox
     Friend WithEvents chkTimeStep As System.Windows.Forms.CheckBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectData))
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
         Me.pnlButtons = New System.Windows.Forms.Panel
+        Me.chkProvisional = New System.Windows.Forms.CheckBox
         Me.cboTimeUnits = New System.Windows.Forms.ComboBox
         Me.cboAggregate = New System.Windows.Forms.ComboBox
         Me.txtTimeStep = New System.Windows.Forms.TextBox
@@ -95,6 +97,7 @@ Friend Class frmSelectData
         Me.mnuSelectClear = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuSelectAllMatching = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuSelectNoMatching = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.mnuSelectMap = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
         Me.groupTop = New System.Windows.Forms.GroupBox
@@ -105,7 +108,6 @@ Friend Class frmSelectData
         Me.splitAboveSelected = New System.Windows.Forms.Splitter
         Me.groupSelected = New System.Windows.Forms.GroupBox
         Me.pSelectedGrid = New atcControls.atcGrid
-        Me.mnuSelectSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.pnlButtons.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.groupTop.SuspendLayout()
@@ -125,6 +127,7 @@ Friend Class frmSelectData
         '
         'pnlButtons
         '
+        Me.pnlButtons.Controls.Add(Me.chkProvisional)
         Me.pnlButtons.Controls.Add(Me.cboTimeUnits)
         Me.pnlButtons.Controls.Add(Me.cboAggregate)
         Me.pnlButtons.Controls.Add(Me.txtTimeStep)
@@ -134,6 +137,14 @@ Friend Class frmSelectData
         Me.pnlButtons.Controls.Add(Me.btnOk)
         resources.ApplyResources(Me.pnlButtons, "pnlButtons")
         Me.pnlButtons.Name = "pnlButtons"
+        '
+        'chkProvisional
+        '
+        resources.ApplyResources(Me.chkProvisional, "chkProvisional")
+        Me.chkProvisional.Checked = True
+        Me.chkProvisional.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkProvisional.Name = "chkProvisional"
+        Me.chkProvisional.UseVisualStyleBackColor = True
         '
         'cboTimeUnits
         '
@@ -243,6 +254,11 @@ Friend Class frmSelectData
         Me.mnuSelectNoMatching.Name = "mnuSelectNoMatching"
         resources.ApplyResources(Me.mnuSelectNoMatching, "mnuSelectNoMatching")
         '
+        'mnuSelectSeparator1
+        '
+        Me.mnuSelectSeparator1.Name = "mnuSelectSeparator1"
+        resources.ApplyResources(Me.mnuSelectSeparator1, "mnuSelectSeparator1")
+        '
         'mnuSelectMap
         '
         Me.mnuSelectMap.Checked = True
@@ -320,15 +336,11 @@ Friend Class frmSelectData
         Me.pSelectedGrid.Name = "pSelectedGrid"
         Me.pSelectedGrid.Source = Nothing
         '
-        'mnuSelectSeparator1
-        '
-        Me.mnuSelectSeparator1.Name = "mnuSelectSeparator1"
-        resources.ApplyResources(Me.mnuSelectSeparator1, "mnuSelectSeparator1")
-        '
         'frmSelectData
         '
         Me.AcceptButton = Me.btnOk
         resources.ApplyResources(Me, "$this")
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
         Me.Controls.Add(Me.groupSelected)
         Me.Controls.Add(Me.splitAboveSelected)
@@ -472,6 +484,19 @@ Friend Class frmSelectData
         Populate()
         pAsking = True
 
+        chkProvisional.Visible = False
+        For Each lDataSet As atcTimeseries In AvailableData
+            If lDataSet.ValueAttributesExist Then
+                For Each lDef As atcAttributeDefinition In lDataSet.ValueAttributeDefinitions
+                    If lDef.Name = "P" Then
+                        chkProvisional.Visible = True
+                        chkProvisional.Checked = (GetSetting("BASINS", "Select Data", "Provisional", "True") = True)
+                        GoTo FoundProvisional
+                    End If
+                Next
+            End If
+        Next
+FoundProvisional:
         Dim lCriteriaIndex As Integer = 0
         While pAsking AndAlso lCriteriaIndex < pcboCriteria(0).Items.Count
             Dim lAttributeName As String = pcboCriteria(0).Items(lCriteriaIndex)
@@ -727,6 +752,7 @@ Restart:
                 pMatchingGroup.Clear()
                 Dim lCount As Integer = 0
                 Dim lNextProgress As Integer = -1
+                Dim lMatchingText As String = ""
                 'Dim selectedValues As atcCollection = CType(plstCriteria(1).Source, ListSource).SelectedItems
                 For Each ts As atcDataSet In lAllDatasets
                     For iCriteria As Integer = 0 To iLastCriteria
@@ -757,8 +783,16 @@ NextTS:
                     If pAbortMatching Then
                         Exit Sub
                     End If
+                    If pMatchingGroup.Count > 999 Then
+                        lMatchingText = "Matching Data (1,000+  of " & Format(pTotalTS, "#,###") & ")"
+                        Exit For
+                    End If
                 Next
-                lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
+                If lMatchingText.Length > 0 Then
+                    lblMatching.Text = lMatchingText
+                Else
+                    lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & Format(pTotalTS, "#,###") & ")"
+                End If
                 pMatchingGrid.Refresh()
                 pSelectedGrid.Refresh()
                 'Logger.Dbg("PopulateMatching " & (Date.Now - lTimeStart).TotalSeconds)
@@ -1063,6 +1097,23 @@ NextName:
         End Set
     End Property
 
+    Private Function GetNonProvisional(ByVal aDataGroup As atcDataGroup) As atcDataGroup
+        Dim lFiltered As New atcDataGroup
+        For Each lDataSet As atcTimeseries In AvailableData
+            If HasProvisionalValues(lDataSet) Then
+                Dim lProvisionalTS As atcTimeseries = Nothing
+                Dim lNonProvisionalTS As atcTimeseries = Nothing
+                SplitProvisional(lDataSet, lProvisionalTS, lNonProvisionalTS)
+                If lNonProvisionalTS IsNot Nothing Then
+                    lFiltered.Add(lNonProvisionalTS)
+                End If
+            Else
+                lFiltered.Add(lDataSet)
+            End If
+        Next
+        Return lFiltered
+    End Function
+
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
         pAbortMatching = True
         If My.Computer.Keyboard.ShiftKeyDown Then
@@ -1079,6 +1130,13 @@ NextName:
             pSelectedGroup.ChangeTo(pMatchingGroup)
         End If
         pSelectedOK = True
+
+        If chkProvisional.Visible Then
+            SaveSetting("BASINS", "Select Data", "Provisional", chkProvisional.Checked)
+            If Not chkProvisional.Checked Then 'Filter out provisional data
+                pSelectedGroup.ChangeTo(GetNonProvisional(pSelectedGroup))
+            End If
+        End If
 
         If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
             pSelectedGroup.ChangeTo(atcSelectedDates.CreateSelectedDataGroupSubset)

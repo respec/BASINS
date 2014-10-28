@@ -385,21 +385,6 @@ FoundMatch:
     End Function
 
     ''' <summary>
-    ''' Test whether aTimeseries contains provisional values by looking for P=True value attribute
-    ''' </summary>
-    Private Function HasProvisionalValues(ByVal aTimeseries As atcTimeseries) As Boolean
-        If aTimeseries.ValueAttributesExist Then
-            Dim lProvisionalAttribute As String = aTimeseries.Attributes.GetValue("ProvisionalValueAttribute", "P")
-            For lIndex As Integer = 0 To aTimeseries.numValues
-                If aTimeseries.ValueAttributesGetValue(lIndex, lProvisionalAttribute, False) Then
-                    Return True
-                End If
-            Next
-        End If
-        Return False
-    End Function
-
-    ''' <summary>
     ''' Return a new group of TS with dates shifted if needed for all TS to start in aStartYear
     ''' </summary>
     ''' <param name="aTimeseriesGroup">Data to shift as needed to start in aStartYear</param>
@@ -500,29 +485,7 @@ FoundMatch:
         Dim lProvisionalTS As atcTimeseries = Nothing
         Dim lNonProvisionalTS As atcTimeseries = Nothing
         If HasProvisionalValues(aTimeseries) Then
-            Dim lProvisionalAttribute As String = aTimeseries.Attributes.GetValue("ProvisionalValueAttribute", "P")
-            Dim lNonProvisionalBuilder As New atcTimeseriesBuilder(Nothing)
-            Dim lProvisionalBuilder As New atcTimeseriesBuilder(Nothing)
-            For lIndex As Integer = 0 To aTimeseries.numValues
-                If aTimeseries.ValueAttributesGetValue(lIndex, lProvisionalAttribute, False) Then
-                    lProvisionalBuilder.AddValue(aTimeseries.Dates.Value(lIndex), aTimeseries.Value(lIndex))
-                Else
-                    lNonProvisionalBuilder.AddValue(aTimeseries.Dates.Value(lIndex), aTimeseries.Value(lIndex))
-                End If
-            Next
-            lProvisionalTS = lProvisionalBuilder.CreateTimeseries
-            lNonProvisionalTS = lNonProvisionalBuilder.CreateTimeseries
-            If Double.IsNaN(lProvisionalTS.Dates.Value(0)) Then
-                Dim lDate1 As Double = lProvisionalTS.Dates.Value(1)
-                Dim lDate2 As Double = lProvisionalTS.Dates.Value(2)
-                Dim lTimeDiff As Double = lDate2 - lDate1
-                Dim lDate0 As Double = lDate1 - lTimeDiff
-                lProvisionalTS.Dates.Value(0) = lDate0
-            End If
-            If aTimeseries.Attributes.ContainsAttribute("Time Step") AndAlso aTimeseries.Attributes.ContainsAttribute("Time Unit") Then
-                lProvisionalTS = FillValues(lProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
-                lNonProvisionalTS = FillValues(lNonProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
-            End If
+            SplitProvisional(aTimeseries, lProvisionalTS, lNonProvisionalTS)
             If lNonProvisionalTS Is Nothing Then 'aTimeseries contains only provisional data
                 'If aTimeseries.Attributes.ContainsAttribute("Units") Then
                 '    If Not aTimeseries.Attributes.GetValue("Units", "").ToString.Contains("Provisional") Then

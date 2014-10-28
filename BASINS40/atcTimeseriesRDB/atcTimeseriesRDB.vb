@@ -12,7 +12,7 @@ Imports System.IO
 ''' </summary>
 ''' <remarks>
 ''' Would need to change pJulianInterval, ts and tu for non-daily values
-''' Does not read provisional values into timeseries
+''' Includes provisional values in timeseries and marks them with a value attribute
 ''' </remarks>
 
 Public Class atcTimeseriesRDB
