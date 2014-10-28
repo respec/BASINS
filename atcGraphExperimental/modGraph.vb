@@ -420,7 +420,59 @@ FoundMatch:
                     Dim lZTs As New atcTimeseries(Nothing)
                     lZTs.Values = lTs.Values
                     lZTs.Dates = lTs.Dates - lDelta
+                    With lZTs.Attributes
+                        .ChangeTo(lTs.Attributes)
+                        .RemoveByKey("Start Date")
+                        .RemoveByKey("End Date")
+                    End With
+                    If lTs.ValueAttributesExist Then
+                        For lIndex As Integer = 1 To lTs.numValues
+                            If lTs.ValueAttributesExist(lIndex) Then
+                                lZTs.ValueAttributes(lIndex) = lTs.ValueAttributes(lIndex)
+                            End If
+                        Next
+                    End If
+                    lTs = lZTs
+                End If
+                lCommon.Add(lTs)
+            End If
+        Next
+        Return lCommon
+    End Function
+
+    ''' <summary>
+    ''' Return a new group of TS with dates shifted if needed for all TS to start on the same day
+    ''' </summary>
+    ''' <param name="aTimeseriesGroup">Data to shift as needed</param>
+    ''' <param name="aStartYear">Year that resulting data will be shifted to start in, or zero to start in same year as first TS in aTimeseriesGroup</param>
+    ''' <param name="aStartMonth">Month that resulting data will be shifted to start in, or zero to start in same month as first TS in aTimeseriesGroup</param>
+    ''' <param name="aStartDay">Day of month that resulting data will be shifted to start in, or zero to start in same day as first TS in aTimeseriesGroup</param>
+    ''' <returns></returns>
+    Public Function MakeCommonStartDay(ByVal aTimeseriesGroup As atcTimeseriesGroup, _
+                                       ByVal aStartYear As Integer, _
+                                       ByVal aStartMonth As Integer, _
+                                       ByVal aStartDay As Integer) As atcTimeseriesGroup
+        Dim lCommon As New atcTimeseriesGroup
+        Dim lTsStartDate(6) As Integer
+        Dim lDelta As Double
+        For Each lTs As atcTimeseries In aTimeseriesGroup
+            If lTs.numValues > 0 Then
+                modDate.J2Date(lTs.Dates.Value(1), lTsStartDate)
+                If aStartYear = 0 Then 'First timeseries gets to keep its dates
+                    aStartYear = lTsStartDate(0)
+                    aStartMonth = lTsStartDate(1)
+                    aStartDay = lTsStartDate(2)
+                ElseIf lTsStartDate(0) <> aStartYear _
+                  OrElse lTsStartDate(1) <> aStartMonth _
+                  OrElse lTsStartDate(2) <> aStartDay Then 'Move timeseries to start in same year
+                    lDelta = lTs.Dates.Value(1) - Date2J(aStartYear, aStartMonth, aStartDay, _
+                                                         lTsStartDate(3), lTsStartDate(4), lTsStartDate(5))
+                    Dim lZTs As New atcTimeseries(Nothing)
+                    lZTs.Values = lTs.Values
+                    lZTs.Dates = lTs.Dates - lDelta
                     lZTs.Attributes.ChangeTo(lTs.Attributes)
+                    lZTs.Attributes.RemoveByKey("SJDay")
+                    lZTs.Attributes.RemoveByKey("EJDay")
                     lTs = lZTs
                 End If
                 lCommon.Add(lTs)

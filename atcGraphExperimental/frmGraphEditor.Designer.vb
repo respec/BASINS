@@ -79,6 +79,7 @@ Partial Class frmGraphEditor
         Me.radioAxisLinear = New System.Windows.Forms.RadioButton
         Me.radioAxisTime = New System.Windows.Forms.RadioButton
         Me.tabCurves = New System.Windows.Forms.TabPage
+        Me.btnNewColors = New System.Windows.Forms.Button
         Me.cboCurveStyle = New System.Windows.Forms.ComboBox
         Me.chkCurveSymbolFillVisible = New System.Windows.Forms.CheckBox
         Me.cboCurveStep = New System.Windows.Forms.ComboBox
@@ -736,6 +737,7 @@ Partial Class frmGraphEditor
         '
         'tabCurves
         '
+        Me.tabCurves.Controls.Add(Me.btnNewColors)
         Me.tabCurves.Controls.Add(Me.cboCurveStyle)
         Me.tabCurves.Controls.Add(Me.chkCurveSymbolFillVisible)
         Me.tabCurves.Controls.Add(Me.cboCurveStep)
@@ -763,6 +765,15 @@ Partial Class frmGraphEditor
         Me.tabCurves.TabIndex = 1
         Me.tabCurves.Text = "Curves"
         Me.tabCurves.UseVisualStyleBackColor = True
+        '
+        'btnNewColors
+        '
+        Me.btnNewColors.Location = New System.Drawing.Point(178, 86)
+        Me.btnNewColors.Name = "btnNewColors"
+        Me.btnNewColors.Size = New System.Drawing.Size(248, 20)
+        Me.btnNewColors.TabIndex = 58
+        Me.btnNewColors.Text = "Random New Colors For All Curves"
+        Me.btnNewColors.UseVisualStyleBackColor = True
         '
         'cboCurveStyle
         '
@@ -1311,4 +1322,5 @@ Partial Class frmGraphEditor
     Friend WithEvents lblAuxSizePercent As System.Windows.Forms.Label
     Friend WithEvents lblAuxSize As System.Windows.Forms.Label
     Friend WithEvents txtAuxSize As System.Windows.Forms.TextBox
+    Friend WithEvents btnNewColors As System.Windows.Forms.Button
 End Class

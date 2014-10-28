@@ -6,7 +6,7 @@ Public Class atcGraphPlugin
     Inherits atcData.atcDataDisplay
     Private pIcon As System.Drawing.Icon = Nothing
 
-    Private pGraphTypeNames() As String = {"Time-Series", _
+    Private pGraphTypeNames() As String = {"Time Series", _
                                            "Flow/Duration", _
                                            "Frequency", _
                                            "Running Sum", _
@@ -133,27 +133,23 @@ Public Class atcGraphPlugin
     Private Function GetGraphType(ByVal aGraphTypeName As String, _
                                  ByVal aDataGroup As atcTimeseriesGroup, _
                                  ByVal aGraphForm As atcGraphForm) As clsGraphBase
+        aGraphForm.Text = aGraphTypeName & " Graph"
         Select Case aGraphTypeName
-            Case "Timeseries", "Time-Series"
+            Case "Timeseries", "Time-Series", "Time Series"
                 aGraphForm.Text = "Time-Series Graph"
                 Return New clsGraphTime(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Shared Start Year"
-                aGraphForm.Text = aGraphTypeName & " Graph"
                 Return New clsGraphTime(MakeCommonStartYear(aDataGroup, 0), aGraphForm.ZedGraphCtrl)
             Case "Flow/Duration"
-                aGraphForm.Text = "Flow/Duration Graph"
                 Return New clsGraphProbability(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Frequency"
-                aGraphForm.Text = "Frequency Graph"
                 Return New clsGraphFrequency(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Running Sum"
-                aGraphForm.Text = "Running Sum Graph"
                 Return New clsGraphRunningSum(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Residual (TS2 - TS1)"
                 aGraphForm.Text = "Residual Graph"
                 Return New clsGraphResidual(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Cumulative Difference"
-                aGraphForm.Text = "Cumulative Difference Graph"
                 Return New clsGraphCumulativeDifference(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Scatter (TS2 vs TS1)"
                 aGraphForm.Text = "Scatter Plot"

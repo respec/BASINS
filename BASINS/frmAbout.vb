@@ -200,7 +200,7 @@ Friend Class frmAbout
         Me.lblProgramName.Name = "lblProgramName"
         Me.lblProgramName.Size = New System.Drawing.Size(216, 42)
         Me.lblProgramName.TabIndex = 19
-        Me.lblProgramName.Text = "BASINS 4.1"
+        Me.lblProgramName.Text = "BASINS"
         '
         'lblPluginVersion
         '
@@ -345,7 +345,7 @@ Friend Class frmAbout
             End Try
 
             lblProgramName.Text = g_AppNameLong
-            If g_AppNameLong = "USGS GW Toolbox" Then lblProgramName.Text &= " (Beta)"
+            'If g_AppNameLong = "USGS GW Toolbox" Then lblProgramName.Text &= " (Beta)"
             lblProgramName.Left = picProgramLogo.Left + picProgramLogo.Width + 8
             lblPluginVersion.Left = lblProgramName.Left
 
