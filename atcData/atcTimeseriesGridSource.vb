@@ -21,6 +21,8 @@ Public Class atcTimeseriesGridSource
     Private pSignificantDigits As Integer = 5
     Private pValueAttributeDefs As Generic.List(Of Generic.List(Of atcAttributeDefinition))
 
+    Public AttributeValuesEditable As Boolean = False
+
     Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, _
             ByVal aDisplayAttributes As Generic.List(Of String), _
             ByVal aDisplayValues As Boolean)
@@ -122,7 +124,11 @@ Public Class atcTimeseriesGridSource
 
     Public Overrides Property FixedRows() As Integer
         Get
-            Return pDisplayAttributes.Count
+            If AttributeValuesEditable Then
+                Return 0
+            Else
+                Return pDisplayAttributes.Count
+            End If
         End Get
         Set(ByVal value As Integer)
         End Set

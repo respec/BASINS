@@ -30,9 +30,12 @@
                 DeleteSetting("atcSeasons", "Split" & cboSeasons.Text)
             Catch
             End Try
-            For Each lSeason As Object In lstSeasons.SelectedItems
-                SaveSetting("atcSeasons", "Split" & cboSeasons.Text, lSeason.ToString, "True")
-            Next
+            Dim lSelectedSeasons As System.Windows.Forms.ListBox.SelectedObjectCollection = lstSeasons.SelectedItems
+            If lSelectedSeasons.Count < lstSeasons.Items.Count Then 'Only save selection if fewer than all were selected
+                For Each lSeason As Object In lSelectedSeasons
+                    SaveSetting("atcSeasons", "Split" & cboSeasons.Text, lSeason.ToString, "True")
+                Next
+            End If
             DoSplit(CurrentSeason, lstSeasons.SelectedItems, pTimseriesGroup, radioSeasonsCombine.Checked, radioSeasonsSeparate.Checked, lNumToGroup, aNewDatasets)
             Return True
         End If
@@ -160,7 +163,14 @@
                     Next
                 Next
                 If lGroup.Count > 0 Then
-                    aNewDatasets.Add(MergeTimeseries(lGroup))
+                    If lGroup.Count > 1 Then
+                        lGroupSeasonName &= " - " & lGroup(lGroup.Count - 1).Attributes.GetValue("SeasonName")
+                    End If
+                    Dim lMergedTS As atcTimeseries = MergeTimeseries(lGroup)
+                    lMergedTS.Attributes.SetValue("SeasonName", lGroupSeasonName)
+                    lMergedTS.Attributes.SetValue("SeasonDefinition", lGroup(0).Attributes.GetValue("SeasonDefinition"))
+                    aNewDatasets.Add(lMergedTS)
+                    lGroup.Clear()
                 End If
             End If
         End If

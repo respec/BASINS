@@ -57,6 +57,7 @@ Public Class atcListForm
     Friend WithEvents mnuViewValueAttributes As System.Windows.Forms.MenuItem
     Friend WithEvents mnuSaveChanges As System.Windows.Forms.MenuItem
     Friend WithEvents mnuSaveIn As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuEditAtrributeValues As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -66,9 +67,12 @@ Public Class atcListForm
         Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
+        Me.mnuSaveChanges = New System.Windows.Forms.MenuItem
+        Me.mnuSaveIn = New System.Windows.Forms.MenuItem
         Me.mnuFileSave = New System.Windows.Forms.MenuItem
         Me.mnuEdit = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
+        Me.mnuEditAtrributeValues = New System.Windows.Forms.MenuItem
         Me.mnuView = New System.Windows.Forms.MenuItem
         Me.mnuAttributeRows = New System.Windows.Forms.MenuItem
         Me.mnuAttributeColumns = New System.Windows.Forms.MenuItem
@@ -81,8 +85,6 @@ Public Class atcListForm
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
-        Me.mnuSaveChanges = New System.Windows.Forms.MenuItem
-        Me.mnuSaveIn = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -110,6 +112,16 @@ Public Class atcListForm
         Me.mnuFileSep1.Index = 2
         Me.mnuFileSep1.Text = "-"
         '
+        'mnuSaveChanges
+        '
+        Me.mnuSaveChanges.Index = 3
+        Me.mnuSaveChanges.Text = "Save Changes"
+        '
+        'mnuSaveIn
+        '
+        Me.mnuSaveIn.Index = 4
+        Me.mnuSaveIn.Text = "Save In..."
+        '
         'mnuFileSave
         '
         Me.mnuFileSave.Index = 5
@@ -119,7 +131,7 @@ Public Class atcListForm
         'mnuEdit
         '
         Me.mnuEdit.Index = 1
-        Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy})
+        Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy, Me.mnuEditAtrributeValues})
         Me.mnuEdit.Text = "Edit"
         '
         'mnuEditCopy
@@ -127,6 +139,11 @@ Public Class atcListForm
         Me.mnuEditCopy.Index = 0
         Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
         Me.mnuEditCopy.Text = "Copy"
+        '
+        'mnuEditAtrributeValues
+        '
+        Me.mnuEditAtrributeValues.Index = 1
+        Me.mnuEditAtrributeValues.Text = "Allow Editing Attribute Values"
         '
         'mnuView
         '
@@ -202,16 +219,6 @@ Public Class atcListForm
         Me.agdMain.Size = New System.Drawing.Size(528, 545)
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
-        '
-        'mnuSaveChanges
-        '
-        Me.mnuSaveChanges.Index = 3
-        Me.mnuSaveChanges.Text = "Save Changes"
-        '
-        'mnuSaveIn
-        '
-        Me.mnuSaveIn.Index = 4
-        Me.mnuSaveIn.Text = "Save In..."
         '
         'atcListForm
         '
@@ -323,6 +330,7 @@ Public Class atcListForm
         pSource = New atcTimeseriesGridSource(pDataGroup, pDisplayAttributes, _
                                               mnuViewValues.Checked, _
                                               mnuFilterNoData.Checked)
+        pSource.AttributeValuesEditable = mnuEditAtrributeValues.Checked
         pSource.DisplayValueAttributes = mnuViewValueAttributes.Checked
         With pSource
             .DateFormat = pDateFormat
@@ -420,22 +428,33 @@ Public Class atcListForm
         Dim lst As New atcControls.atcSelectList
         Dim lAvailable As New Generic.List(Of String)
         For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-            Select Case lAttrDef.TypeString.ToLower
-                Case "double", "integer", "boolean", "string", "atctimeunit"
-                    Select Case lAttrDef.Name.ToLower
-                        Case "attributes", "bins", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "kendall tau", "n-day high value", "n-day low value", "n-day high attribute", "n-day low attribute", "number", "return period", "summary file", "vbtime", "%*", "%sum*"
-                            'Skip displaying some things in the list
-                        Case Else
-                            lAvailable.Add(lAttrDef.Name)
-                    End Select
-            End Select
+            If IncludeAttribute(lAttrDef) Then lAvailable.Add(lAttrDef.Name)
+        Next
+        'Add any current display attributes not in atcDataAttributes.AllDefinitions
+        For Each lAttrName As String In pDisplayAttributes
+            If Not lAvailable.Contains(lAttrName) Then
+                lAvailable.Add(lAttrName)
+            End If
         Next
         lAvailable.Sort()
         If lst.AskUser(lAvailable, pDisplayAttributes) Then
-            'TODO: set project modified flag
+            'TODO: set project modified flag?
             PopulateGrid()
         End If
     End Sub
+
+    Private Function IncludeAttribute(ByVal lAttrDef As atcAttributeDefinition) As Boolean
+        Select Case lAttrDef.TypeString.ToLower
+            Case "double", "integer", "boolean", "string", "atctimeunit"
+                Select Case lAttrDef.Name.ToLower
+                    Case "attributes", "bins", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "kendall tau", "n-day high value", "n-day low value", "n-day high attribute", "n-day low attribute", "number", "return period", "summary file", "vbtime", "%*", "%sum*"
+                        'Skip displaying some things in the list
+                    Case Else
+                        Return True
+                End Select
+        End Select
+        Return False
+    End Function
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
         atcDataManager.UserSelectData("", pDataGroup, Nothing, False, True, Me.Icon)
@@ -645,4 +664,9 @@ Public Class atcListForm
         End If
     End Sub
 
+    Private Sub mnuEditAtrributeValues_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditAtrributeValues.Click
+        pSource.AttributeValuesEditable = Not pSource.AttributeValuesEditable
+        mnuEditAtrributeValues.Checked = pSource.AttributeValuesEditable
+        agdMain.Refresh()
+    End Sub
 End Class
