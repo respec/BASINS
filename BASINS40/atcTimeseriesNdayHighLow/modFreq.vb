@@ -112,45 +112,45 @@ Module modFreq
                          ByVal CIH() As Double)
     End Sub
 
-    <DllImport("usgs_swstats.dll", CallingConvention:=CallingConvention.Cdecl, CharSet:=CharSet.Unicode)> _
-    Private Sub EMAFITB_V1(ByRef N As Integer, _
-                           ByVal QL_IN() As Double, _
-                           ByVal QU_IN() As Double, _
-                           ByVal TL_IN() As Double, _
-                           ByVal TU_IN() As Double, _
-                           ByRef REG_SKEW As Double, _
-                           ByRef REG_MSE As Double, _
-                           ByRef NEPS As Integer, _
-                           ByVal EPS() As Single, _
-                           ByRef GBTHRSH0 As Double, _
-                           ByRef PQ As Double, _
-                           ByVal CMOMS(,) As Double, _
-                           ByRef YP As Double, _
-                           ByVal CI_LOW() As Double, _
-                           ByVal CI_HIGH() As Double, _
-                           ByVal VAR_EST() As Double)
-    End Sub
+    '<DllImport("usgs_swstats.dll", CallingConvention:=CallingConvention.Cdecl, CharSet:=CharSet.Unicode)> _
+    'Private Sub EMAFITB_V1(ByRef N As Integer, _
+    '                       ByVal QL_IN() As Double, _
+    '                       ByVal QU_IN() As Double, _
+    '                       ByVal TL_IN() As Double, _
+    '                       ByVal TU_IN() As Double, _
+    '                       ByRef REG_SKEW As Double, _
+    '                       ByRef REG_MSE As Double, _
+    '                       ByRef NEPS As Integer, _
+    '                       ByVal EPS() As Single, _
+    '                       ByRef GBTHRSH0 As Double, _
+    '                       ByRef PQ As Double, _
+    '                       ByVal CMOMS(,) As Double, _
+    '                       ByRef YP As Double, _
+    '                       ByVal CI_LOW() As Double, _
+    '                       ByVal CI_HIGH() As Double, _
+    '                       ByVal VAR_EST() As Double)
+    'End Sub
 
-    <DllImport("usgs_swstats.dll", CallingConvention:=CallingConvention.Cdecl, CharSet:=CharSet.Unicode)> _
-    Private Sub VAR_EMA(ByRef NT As Integer, _
-                        ByVal NOBS() As Double, _
-                        ByVal TL_IN() As Double, _
-                        ByVal TU_IN() As Double, _
-                        ByVal CMOMS() As Double, _
-                        ByRef PQ As Double, _
-                        ByRef REG_MSE As Double, _
-                        ByRef YP As Double, _
-                        ByVal VAR_EST(,) As Double)
-    End Sub
+    '<DllImport("usgs_swstats.dll", CallingConvention:=CallingConvention.Cdecl, CharSet:=CharSet.Unicode)> _
+    'Private Sub VAR_EMA(ByRef NT As Integer, _
+    '                    ByVal NOBS() As Double, _
+    '                    ByVal TL_IN() As Double, _
+    '                    ByVal TU_IN() As Double, _
+    '                    ByVal CMOMS() As Double, _
+    '                    ByRef PQ As Double, _
+    '                    ByRef REG_MSE As Double, _
+    '                    ByRef YP As Double, _
+    '                    ByVal VAR_EST(,) As Double)
+    'End Sub
 
-    <DllImport("usgs_swstats.dll", CallingConvention:=CallingConvention.Cdecl, CharSet:=CharSet.Unicode)> _
-    Private Sub CI_EMA_M3(ByRef YP As Double, _
-                          ByVal VAR_EST(,) As Double, _
-                          ByRef NEPS As Integer, _
-                          ByVal EPS() As Double, _
-                          ByVal CI_LOW() As Double, _
-                          ByVal CI_HIGH() As Double)
-    End Sub
+    '<DllImport("usgs_swstats.dll", CallingConvention:=CallingConvention.Cdecl, CharSet:=CharSet.Unicode)> _
+    'Private Sub CI_EMA_M3(ByRef YP As Double, _
+    '                      ByVal VAR_EST(,) As Double, _
+    '                      ByRef NEPS As Integer, _
+    '                      ByVal EPS() As Double, _
+    '                      ByVal CI_LOW() As Double, _
+    '                      ByVal CI_HIGH() As Double)
+    'End Sub
 
     'Kendall Tau Calculation
     Friend Sub KendallTau(ByVal aTs As atcTimeseries, _
@@ -177,7 +177,7 @@ Module modFreq
                 If pWarned Then
                     Logger.Dbg("Could not compute Kendall Tau: " & ex.Message)
                 Else
-                    Dim lExpectedDLL As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "usgs_swstats.dll")
+                    Dim lExpectedDLL As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "peakfq.dll")
                     If IO.File.Exists(lExpectedDLL) Then
                         Logger.Msg("Required library found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & ex.Message, "Could not compute Kendall Tau")
                     Else
@@ -271,12 +271,12 @@ Module modFreq
             Dim lVarEstArray(1, 1, lIntervalMax) As Double
             Dim lCMoms(2) As Double
             Dim lSkewMin As Single = 0.06324555
-            Dim lWt As Single
-            Dim lPQ As Double
+            'Dim lWt As Single
+            'Dim lPQ As Double
             Dim lneps As Integer = 1
             Dim leps(1) As Double
             Dim lNobs(100) As Double
-            Dim lyp As Double
+            'Dim lyp As Double
             Dim lAdp(lIntervalMax) As Single
             Dim lQnew(lIntervalMax) As Single
             Dim lRi(lIntervalMax) As Single
@@ -301,67 +301,67 @@ Module modFreq
 
                 Dim lCalcEMA As Boolean = aTs.Attributes.GetValue("CalcEMA", False)
                 If lCalcEMA Then
-                    If Not aUseVersion_1 Then
-                        Dim lPQA(lIntervalMax) As Double
-                        For i As Integer = 0 To lIntervalMax
-                            If aHigh Then
-                                lPQA(i) = 1 - lP(i)
-                            Else
-                                lPQA(i) = lP(i)
-                            End If
-                        Next
-                        Dim lR_SD As Double = 1.0
-                        Dim lR_S2 As Double = lR_SD ^ 2
-                        Dim lR_M_MSE As Double = -99
-                        Dim lR_SD_mse As Double = -999
-                        Dim lR_S2_MSE As Double = 4.0 * lR_S2 * lR_SD_mse
-                        Dim lR_G_MSE As Double = 1.0
-                        VAR_EMAB(lneps, lNobs, lTL, lTU, lCMoms, lPQA, (lIntervalMax + 1), leps(0), _
-                                 lR_S2, lR_M_MSE, lR_S2_MSE, lR_G_MSE, lVarEst, lVarEstArray, lCILow, lCIHigh)
-                        Logger.Dbg("BackFrom VAR_EMAB")
-                        For i As Integer = 0 To lIntervalMax
-                            If aLogFg Then
-                                lCILow(i) = 10 ^ lCILow(i)
-                                lCIHigh(i) = 10 ^ lCIHigh(i)
-                                lVarEst(i) = 10 ^ lVarEstArray(0, 0, i)
-                            Else
-                                lVarEst(i) = lVarEstArray(0, 0, i)
-                            End If
-                        Next
-                    Else
-                        For i As Integer = 0 To lIntervalMax
-                            If aHigh Then
-                                lPQ = 1 - lP(i)
-                            Else
-                                lPQ = lP(i)
-                            End If
-                            If Math.Abs(lCMoms(2)) > lSkewMin Then
-                                VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArrayOrig) 'CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
-                                CI_EMA_M3(lyp, lVarEstArrayOrig, lneps, leps, lCILowVal, lCIHighVal)
-                                lCILow(i) = lCILowVal(0)
-                                lCIHigh(i) = lCIHighVal(0)
-                            Else 'for skews close to zero, compute a weighted sum/interpolate values
-                                lCMoms(2) = -lSkewMin
-                                VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArrayOrig)
-                                CI_EMA_M3(lyp, lVarEstArrayOrig, lneps, leps, lCILowVal, lCIHighVal)
+                    'If Not aUseVersion_1 Then
+                    Dim lPQA(lIntervalMax) As Double
+                    For i As Integer = 0 To lIntervalMax
+                        If aHigh Then
+                            lPQA(i) = 1 - lP(i)
+                        Else
+                            lPQA(i) = lP(i)
+                        End If
+                    Next
+                    Dim lR_SD As Double = 1.0
+                    Dim lR_S2 As Double = lR_SD ^ 2
+                    Dim lR_M_MSE As Double = -99
+                    Dim lR_SD_mse As Double = -999
+                    Dim lR_S2_MSE As Double = 4.0 * lR_S2 * lR_SD_mse
+                    Dim lR_G_MSE As Double = 1.0
+                    VAR_EMAB(lneps, lNobs, lTL, lTU, lCMoms, lPQA, (lIntervalMax + 1), leps(0), _
+                             lR_S2, lR_M_MSE, lR_S2_MSE, lR_G_MSE, lVarEst, lVarEstArray, lCILow, lCIHigh)
+                    Logger.Dbg("BackFrom VAR_EMAB")
+                    For i As Integer = 0 To lIntervalMax
+                        If aLogFg Then
+                            lCILow(i) = 10 ^ lCILow(i)
+                            lCIHigh(i) = 10 ^ lCIHigh(i)
+                            lVarEst(i) = 10 ^ lVarEstArray(0, 0, i)
+                        Else
+                            lVarEst(i) = lVarEstArray(0, 0, i)
+                        End If
+                    Next
+                    'Else
+                    '    For i As Integer = 0 To lIntervalMax
+                    '        If aHigh Then
+                    '            lPQ = 1 - lP(i)
+                    '        Else
+                    '            lPQ = lP(i)
+                    '        End If
+                    '        If Math.Abs(lCMoms(2)) > lSkewMin Then
+                    '            VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArrayOrig) 'CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
+                    '            CI_EMA_M3(lyp, lVarEstArrayOrig, lneps, leps, lCILowVal, lCIHighVal)
+                    '            lCILow(i) = lCILowVal(0)
+                    '            lCIHigh(i) = lCIHighVal(0)
+                    '        Else 'for skews close to zero, compute a weighted sum/interpolate values
+                    '            lCMoms(2) = -lSkewMin
+                    '            VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArrayOrig)
+                    '            CI_EMA_M3(lyp, lVarEstArrayOrig, lneps, leps, lCILowVal, lCIHighVal)
 
-                                lCMoms(2) = lSkewMin
-                                VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArrayOrig)
-                                CI_EMA_M3(lyp, lVarEstArrayOrig, lneps, leps, lCILowVal2, lCIHighVal2)
+                    '            lCMoms(2) = lSkewMin
+                    '            VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArrayOrig)
+                    '            CI_EMA_M3(lyp, lVarEstArrayOrig, lneps, leps, lCILowVal2, lCIHighVal2)
 
-                                lWt = (lSkew + lSkewMin) / (2 * lSkewMin) 'weight to attach to positive skew
-                                lCILow(i) = (1 - lWt) * lCILowVal(0) + lWt * lCILowVal2(0)
-                                lCIHigh(i) = (1 - lWt) * lCIHighVal2(0) + lWt * lCIHighVal2(0)
-                            End If
-                            If aLogFg Then
-                                lCILow(i) = 10 ^ lCILow(i)
-                                lCIHigh(i) = 10 ^ lCIHigh(i)
-                                lVarEst(i) = 10 ^ lVarEstArrayOrig(0, 0)
-                            Else
-                                lVarEst(i) = lVarEstArrayOrig(0, 0)
-                            End If
-                        Next i
-                    End If
+                    '            lWt = (lSkew + lSkewMin) / (2 * lSkewMin) 'weight to attach to positive skew
+                    '            lCILow(i) = (1 - lWt) * lCILowVal(0) + lWt * lCILowVal2(0)
+                    '            lCIHigh(i) = (1 - lWt) * lCIHighVal2(0) + lWt * lCIHighVal2(0)
+                    '        End If
+                    '        If aLogFg Then
+                    '            lCILow(i) = 10 ^ lCILow(i)
+                    '            lCIHigh(i) = 10 ^ lCIHigh(i)
+                    '            lVarEst(i) = 10 ^ lVarEstArrayOrig(0, 0)
+                    '        Else
+                    '            lVarEst(i) = lVarEstArrayOrig(0, 0)
+                    '        End If
+                    '    Next i
+                    'End If
                 End If
 
                 Dim lMsg As String = ""
@@ -454,7 +454,7 @@ Module modFreq
                 If pWarned Then
                     Logger.Dbg("Could not compute Pearson Type3 Frequency: " & lEx.Message)
                 Else
-                    Dim lExpectedDLL As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "usgs_swstats.dll")
+                    Dim lExpectedDLL As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "peakfq.dll")
                     If IO.File.Exists(lExpectedDLL) Then
                         Logger.Msg("Required library found: " & vbCrLf & lExpectedDLL & vbCrLf & "Error message: " & lEx.Message, "Could not compute PearsonType3")
                     Else
