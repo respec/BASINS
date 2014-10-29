@@ -89,7 +89,7 @@ Public Class atcBasinsPlugIn
                 BasinsDataPath = "USGS-SW\data\"
 
             Case "GW Toolbox"
-                lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\USGSToolbox.chm")
+                lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\GWToolbox.chm")
                 BasinsDataPath = "USGS-GW\data\"
 
             Case Else ' BASINS 
