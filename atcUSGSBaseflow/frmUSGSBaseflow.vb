@@ -964,7 +964,7 @@ Public Class frmUSGSBaseflow
 
     Private Sub frmUSGSBaseflow_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Analysis\GW Toolbox Hydrograph Analysis\Base-Flow Separation.html")
+            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Base-Flow Separation.html")
         End If
     End Sub
 

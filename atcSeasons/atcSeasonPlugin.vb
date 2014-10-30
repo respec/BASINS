@@ -84,7 +84,7 @@ Public Class atcSeasonPlugin
                         lAttributes = aArgs.GetValue("Attributes")
                         lCalculatedAttributes = aArgs.GetValue("CalculatedAttributes")
                     End If
-                    If lAttributes Is Nothing OrElse lAttributes.Count = 0 Then
+                    If pSeasons Is Nothing OrElse lAttributes Is Nothing OrElse lAttributes.Count = 0 Then
                         Dim lForm As New frmSpecifySeasonalAttributes
                         If lForm.AskUser(lTimeSeriesGroup, AvailableOperations(False, True)) Then
                             'atcDataManager.ShowDisplay("Analysis::Data Tree", lTimeSeriesGroup)

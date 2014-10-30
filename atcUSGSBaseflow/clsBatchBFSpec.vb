@@ -536,14 +536,14 @@ Public Class clsBatchBFSpec
         End If
         Dim lOutputDir As String = GlobalSettings.GetValue(BFBatchInputNames.OUTPUTDIR, "")
         If Not IO.Directory.Exists(lOutputDir) Then
-            Dim lDirInfo As New IO.DirectoryInfo(lOutputDir)
-            Dim ldSecurity As System.Security.AccessControl.DirectorySecurity = lDirInfo.GetAccessControl()
             Try
+                Dim lDirInfo As New IO.DirectoryInfo(lOutputDir)
+                Dim ldSecurity As System.Security.AccessControl.DirectorySecurity = lDirInfo.GetAccessControl()
                 MkDirPath(lOutputDir)
             Catch ex As Exception
                 'RaiseEvent StatusUpdate("0,0,Cannot create output directory: " & vbCrLf & lOutputDir)
                 UpdateStatus("Cannot create output directory: " & vbCrLf & lOutputDir, , True)
-                Return
+                Exit Sub
             End Try
         End If
         Dim lOutputDirWritable As Boolean = True
