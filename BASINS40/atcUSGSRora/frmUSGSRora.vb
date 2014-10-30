@@ -803,4 +803,11 @@ PlotOutput:
 
         lGraphForm.Show()
     End Sub
+
+    Private Sub frmUSGSRora_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("BASINS Details\Analysis\GW Toolbox Hydrograph Analysis\RORA.html")
+        End If
+    End Sub
+
 End Class

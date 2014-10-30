@@ -165,6 +165,7 @@ Public Class frmWelcomeScreen
         Me.Controls.Add(Me.lblOpenProject)
         Me.Controls.Add(Me.lblBuildNew)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.KeyPreview = True
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmWelcomeScreen"
@@ -175,14 +176,14 @@ Public Class frmWelcomeScreen
 
 #End Region
 
-    Private Sub lbBuildNew_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblBuildNew.LinkClicked
+    Private Sub lblBuildNew_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblBuildNew.LinkClicked
         Me.Visible = False
         Application.DoEvents()
         LoadNationalProject()
         Me.Close()
     End Sub
 
-    Private Sub lbOpenProject_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblOpenProject.LinkClicked
+    Private Sub lblOpenProject_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblOpenProject.LinkClicked
         Dim lOpenFileDialog As New OpenFileDialog
 
         With lOpenFileDialog
@@ -197,7 +198,7 @@ Public Class frmWelcomeScreen
         End With
     End Sub
 
-    Private Sub cbShowDlg_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboShowDlg.CheckedChanged
+    Private Sub cboShowDlg_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboShowDlg.CheckedChanged
         lAppInfo.ShowWelcomeScreen = cboShowDlg.Checked
     End Sub
 
@@ -271,14 +272,19 @@ Public Class frmWelcomeScreen
         Me.Close()
     End Sub
 
-    Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs)
-        Logger.Msg("Select the BASINS 3.x Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OkOnly, "BASINS 4.1")
+    Private Sub lblConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs)
+        Logger.Msg("Select the BASINS 3.x Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OkOnly, "BASINS 4.2")
         Me.Close()
         SendKeys.Send("%FB")
     End Sub
 
-    Private Sub lbBasinsHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblHelp.Click
+    Private Sub lblBasinsHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblHelp.Click
         ShowHelp("")
     End Sub
 
+    Private Sub frm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("")
+        End If
+    End Sub
 End Class

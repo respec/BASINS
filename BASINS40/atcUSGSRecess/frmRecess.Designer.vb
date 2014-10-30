@@ -553,6 +553,7 @@ Partial Class frmRecess
         Me.Controls.Add(Me.panelConfiguration)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.Name = "frmRecess"
         Me.Text = "USGS RECESS"
         Me.gbMonthSeason.ResumeLayout(False)
