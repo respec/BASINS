@@ -122,14 +122,18 @@ Public Class clsGraphScatter
 
         Dim lSubsetTimeseriesX As atcTimeseries = SubsetByDate(lTimeseriesX, lSJDay, lEJDay, Nothing)
         Dim lSubsetTimeseriesY As atcTimeseries = SubsetByDate(lTimeseriesY, lSJDay, lEJDay, Nothing)
+        Dim lNote As String = ""
 
-        FitLine(lSubsetTimeseriesX, lSubsetTimeseriesY, lACoef, lBCoef, lRSquare)
+        FitLine(lSubsetTimeseriesX, lSubsetTimeseriesY, lACoef, lBCoef, lRSquare, lNote)
         AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
         Dim lText As New TextObj
         Dim lFmt As String = "###,##0.###"
-        lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X + " & DoubleToString(lBCoef, , lFmt) & Environment.NewLine & _
+        Dim lBstr As String = DoubleToString(lBCoef, , lFmt)
+        If lBCoef >= 0 Then lBstr = "+ " & lBstr 'If it was negative, already have "-" prefix
+        lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X " & lBstr & Environment.NewLine & _
                      "R = " & DoubleToString(Math.Sqrt(lRSquare), , lFmt) & vbCrLf & _
                      "R Squared = " & DoubleToString(lRSquare, , lFmt)
+        If lNote.Length > 0 Then lText.Text &= vbCrLf & lNote
         lText.FontSpec.StringAlignment = Drawing.StringAlignment.Near
         lText.Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
         lText.FontSpec.Border.IsVisible = False
