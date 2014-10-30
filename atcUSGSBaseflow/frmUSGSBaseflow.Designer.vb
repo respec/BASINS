@@ -646,6 +646,7 @@ Partial Class frmUSGSBaseflow
         Me.Controls.Add(Me.MenuStrip1)
         Me.Controls.Add(Me.gbTextOutput)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmUSGSBaseflow"
         Me.Text = "Base-Flow Separation"

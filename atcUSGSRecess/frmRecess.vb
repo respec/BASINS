@@ -2067,4 +2067,10 @@ Public Class frmRecess
             'btnCurv.Enabled = True 'disabled for GWL data
         End If
     End Sub
+
+    Private Sub frmRecess_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("BASINS Details\Analysis\GW Toolbox Hydrograph Analysis\RECESS.html")
+        End If
+    End Sub
 End Class

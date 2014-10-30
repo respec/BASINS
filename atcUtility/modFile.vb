@@ -269,6 +269,8 @@ Public Module modFile
         Return lName
     End Function
 
+    Public HelpSubstitutions As New atcCollection
+
     ''' <summary>
     ''' Show Help for specified topic
     ''' </summary>
@@ -303,7 +305,7 @@ Public Module modFile
 
             If Not aHelpTopic.Equals("CLOSE") Then
                 If Not IO.File.Exists(lHelpFilename) Then
-                    lHelpFilename = FindFile("Please locate BASINS help file", "Basins4.2.chm")
+                    lHelpFilename = FindFile("Please locate help file", "Basins4.2.chm")
                 End If
 
                 If IO.File.Exists(lHelpFilename) Then
@@ -311,8 +313,13 @@ Public Module modFile
                         Logger.Dbg("Showing help file '" & lHelpFilename & "'")
                         lHelpProcess = Process.Start("hh.exe", lHelpFilename)
                     Else
-                        Logger.Dbg("Showing help file '" & lHelpFilename & "' topic '" & aHelpTopic & "'")
-                        lHelpProcess = Process.Start("hh.exe", "mk:@MSITStore:" & lHelpFilename & "::/" & aHelpTopic)
+                        Dim lHelpTopic As String = aHelpTopic
+                        For lSubIndex As Integer = 0 To HelpSubstitutions.Count - 1
+                            lHelpTopic = lHelpTopic.Replace(HelpSubstitutions.Keys(lSubIndex), HelpSubstitutions.ItemByIndex(lSubIndex))
+                        Next
+
+                        Logger.Dbg("Showing help file '" & lHelpFilename & "' topic '" & lHelpTopic & "'")
+                        lHelpProcess = Process.Start("hh.exe", "mk:@MSITStore:" & lHelpFilename & "::/" & lHelpTopic)
                     End If
                 End If
             End If

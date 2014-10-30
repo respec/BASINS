@@ -962,6 +962,12 @@ Public Class frmUSGSBaseflow
         Opened = False
     End Sub
 
+    Private Sub frmUSGSBaseflow_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("BASINS Details\Analysis\GW Toolbox Hydrograph Analysis\Base-Flow Separation.html")
+        End If
+    End Sub
+
     Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Opened = True
         If GetSetting("atcUSGSBaseflow", "Defaults", "MethodPART", "False") = "True" Then
