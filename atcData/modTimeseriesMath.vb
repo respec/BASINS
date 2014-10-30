@@ -1320,21 +1320,20 @@ Finished:
     ''' <param name="aRSquare">'r squared', the coefficient of determination</param>
     ''' <remarks>from fortran-newaqt-FITLIN; x, y values can't be the same values</remarks>
     Public Sub FitLine(ByVal aTSerX As atcTimeseries, ByVal aTSerY As atcTimeseries, _
-                       ByRef aACoef As Double, ByRef aBCoef As Double, ByRef aRSquare As Double)
-        Dim lProblem As String = ""
+                       ByRef aACoef As Double, ByRef aBCoef As Double, ByRef aRSquare As Double, ByRef aNote As String)
+        aNote = ""
         If aTSerX.numValues <> aTSerY.numValues Then
-            lProblem &= aTSerX.ToString & " has " & aTSerX.numValues & " values, " & _
+            aNote &= aTSerX.ToString & " has " & aTSerX.numValues & " values, " & _
                         aTSerY.ToString & " has " & aTSerY.numValues & "." & vbCrLf
         End If
         If aTSerX.Dates.Value(0) <> aTSerY.Dates.Value(0) Then
-            lProblem &= aTSerX.ToString & " starts on " & aTSerX.Dates.Value(0).ToString & ", " & _
+            aNote &= aTSerX.ToString & " starts on " & aTSerX.Dates.Value(0).ToString & ", " & _
                         aTSerY.ToString & " starts on " & aTSerY.Dates.Value(0).ToString & "." & vbCrLf
         End If
-        If lProblem.Length > 0 Then
-            Throw New ApplicationException("Time series are not compatible." & vbCrLf & lProblem)
+        If aNote.Length > 0 Then
+            Throw New ApplicationException("Time series are not compatible." & vbCrLf & aNote)
         End If
 
-        Dim lNote As String = ""
         Dim lSumX As Double = 0.0
         Dim lValX As Double
         Dim lAvgX As Double
@@ -1348,22 +1347,22 @@ Finished:
         For lIndex As Integer = 1 To aTSerX.numValues
             lValX = aTSerX.Values(lIndex)
             lValY = aTSerY.Values(lIndex)
-            If Not Double.IsNaN(lValX) And Not Double.IsNaN(lValY) Then
+            If Not Double.IsNaN(lValX) AndAlso Not Double.IsNaN(lValY) Then
                 lSumX += lValX
                 lSumY += lValY
                 lGoodCount += 1
             Else
                 lSkipCount += 1
                 If lSkipCount = 1 Then
-                    lNote = "*** Note - compare skipped index " & lIndex
+                    aNote = "Skipped missing index " & lIndex
                 End If
             End If
         Next
-        If lNote.Length > 0 Then
-            lNote &= " and " & lSkipCount - 1 & " more" & vbCrLf
+        If aNote.Length > 0 AndAlso lSkipCount > 1 Then
+            aNote &= " and " & lSkipCount - 1 & " more" & vbCrLf
         End If
 
-        If (lSumX > 0.0 And lSumY > 0.0 And lGoodCount > 0) Then 'go ahead and compute
+        If (lSumX > 0.0 AndAlso lSumY > 0.0 AndAlso lGoodCount > 0) Then 'go ahead and compute
             lAvgX = lSumX / lGoodCount
             lAvgY = lSumY / lGoodCount
 
@@ -1372,7 +1371,7 @@ Finished:
             For lIndex As Integer = 1 To aTSerX.numValues
                 lValX = aTSerX.Values(lIndex)
                 lValY = aTSerY.Values(lIndex)
-                If Not Double.IsNaN(lValX) And Not Double.IsNaN(lValY) Then
+                If Not Double.IsNaN(lValX) AndAlso Not Double.IsNaN(lValY) Then
                     lSum3 += (lValX - lAvgX) * (lValY - lAvgY)
                     lSum4 += (lValY - lAvgY) * (lValY - lAvgY)
                 End If
@@ -1385,21 +1384,99 @@ Finished:
             For lIndex As Integer = 1 To aTSerX.numValues
                 lValX = aTSerX.Values(lIndex)
                 lValY = aTSerY.Values(lIndex)
-                If Not Double.IsNaN(lValX) And Not Double.IsNaN(lValY) Then
+                If Not Double.IsNaN(lValX) AndAlso Not Double.IsNaN(lValY) Then
                     lSum5 += ((aACoef * lValY + aBCoef - lAvgX) * (aACoef * lValY) + aBCoef - lAvgX)
                     lSum6 += (lValX - lAvgX) * (lValX - lAvgX)
                 End If
             Next lIndex
             aRSquare = lSum5 / lSum6
+            aRSquare = ComputeR(aTSerX, aTSerY) ^ 2
         Else 'regression doesnt make sense, return NaN
             aACoef = GetNaN()
             aBCoef = GetNaN()
             aRSquare = GetNaN()
         End If
-        If lNote.Length > 0 Then
-            Logger.Dbg("Note:" & lNote)
+        If aNote.Length > 0 Then
+            Logger.Dbg("Note:" & aNote)
         End If
     End Sub
+
+    Public Function ComputeR(ByVal aTSerX As atcTimeseries, ByVal aTSerY As atcTimeseries) As Double
+
+        Dim lNote As String = ""
+        If aTSerX.numValues <> aTSerY.numValues Then
+            lNote &= aTSerX.ToString & " has " & aTSerX.numValues & " values, " & _
+                        aTSerY.ToString & " has " & aTSerY.numValues & "." & vbCrLf
+        End If
+        If aTSerX.Dates.Value(0) <> aTSerY.Dates.Value(0) Then
+            lNote &= aTSerX.ToString & " starts on " & aTSerX.Dates.Value(0).ToString & ", " & _
+                        aTSerY.ToString & " starts on " & aTSerY.Dates.Value(0).ToString & "." & vbCrLf
+        End If
+        If lNote.Length > 0 Then
+            Throw New ApplicationException("Time series are not compatible." & vbCrLf & lNote)
+        End If
+
+        Dim x As Double
+        Dim y As Double
+        Dim lSkipCount As Integer = 0
+        Dim lGoodCount As Integer = 0
+
+        Dim sumOfX As Double = 0
+        Dim sumOfY As Double = 0
+        Dim sumOfXSq As Double = 0
+        Dim sumOfYSq As Double = 0
+        Dim ssX As Double = 0
+        Dim ssY As Double = 0
+        Dim sumCodeviates As Double = 0
+        Dim sCo As Double = 0
+
+        For lIndex As Integer = 1 To aTSerX.numValues
+            x = aTSerX.Values(lIndex)
+            y = aTSerY.Values(lIndex)
+            If Not Double.IsNaN(x) AndAlso Not Double.IsNaN(y) Then
+                sumCodeviates += (x * y)
+                sumOfX += x
+                sumOfY += y
+                sumOfXSq += (x * x)
+                sumOfYSq += (y * y)
+                lGoodCount += 1
+            Else
+                lSkipCount += 1
+            End If
+        Next
+
+        If (sumOfX > 0.0 AndAlso sumOfY > 0.0 AndAlso lGoodCount > 0) Then 'go ahead and compute
+
+            ssX = sumOfXSq - ((sumOfX * sumOfX) / lGoodCount)
+            ssY = sumOfYSq - ((sumOfY * sumOfY) / lGoodCount)
+            Dim RNumerator As Double = (lGoodCount * sumCodeviates) - (sumOfX * sumOfY)
+
+            Dim RDenom As Double = (lGoodCount * sumOfXSq - sumOfX ^ 2) * (lGoodCount * sumOfYSq - sumOfY ^ 2)
+            Dim dblR As Double = RNumerator / Math.Sqrt(RDenom)
+            Return dblR
+            'sCo = sumCodeviates - ((sumOfX * sumOfY) / lGoodCount)
+            'Dim dblSlope As Double = sCo / ssX
+            'Dim meanX As Double = sumOfX / lGoodCount
+            'Dim meanY As Double = sumOfY / lGoodCount
+            'Dim dblYintercept As Double = meanY - (dblSlope * meanX)
+
+            'Console.WriteLine( “R-Squared: {0}”,  Math.Pow( dblR, 2 ) ) ;
+            'Console.WriteLine( “Y-Intercept: {0}”,  dblYIntercept ) ;
+            'Console.WriteLine( “Slope: {0}”,  dblSlope ) ;
+            'Console.ReadLine() ;
+
+            'aACoef = dblSlope
+            'aBCoef = dblYintercept
+            'aRSquare = dblR ^ 2
+
+        Else 'regression doesnt make sense, return NaN
+            Return GetNaN()
+            'aACoef = GetNaN()
+            'aBCoef = GetNaN()
+            'aRSquare = GetNaN()
+        End If
+
+    End Function
 
     ''' <summary>Perform a math operation on one or more timeseries</summary>
     ''' <param name="aOperationName">Math operation</param>
