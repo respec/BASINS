@@ -1819,7 +1819,7 @@ Finished:
             lAddTo.Value(lAddIndex) = aTimeseries.Value(lIndex)
             lAddTo.Dates.Value(lAddIndex) = aTimeseries.Dates.Value(lIndex)
             If lAddIndex = 1 Then
-                lAddTo.Value(1) = pNaN
+                lAddTo.Value(0) = pNaN
                 lAddTo.Dates.Value(0) = aTimeseries.Dates.Value(lIndex - 1)
             End If
             If aTimeseries.ValueAttributesExist(lIndex) Then
