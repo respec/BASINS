@@ -1099,15 +1099,7 @@ NextName:
 
     Private Function GetNonProvisional(ByVal aDataGroup As atcDataGroup) As atcDataGroup
         Dim lFiltered As New atcDataGroup
-        Dim lAvailableData As New atcDataGroup()
-        For Each lDataset As atcDataSet In aDataGroup
-            If AvailableData.IndexOf(lDataset) >= 0 Then
-                lAvailableData.Add(lDataset)
-            End If
-        Next
-        Dim lAvailableDatasets As atcDataGroup = AvailableData
-        If lAvailableData.Count > 0 Then lAvailableDatasets = lAvailableData
-        For Each lDataSet As atcTimeseries In lAvailableDatasets
+        For Each lDataSet As atcTimeseries In aDataGroup
             If HasProvisionalValues(lDataSet) Then
                 Dim lProvisionalTS As atcTimeseries = Nothing
                 Dim lNonProvisionalTS As atcTimeseries = Nothing
