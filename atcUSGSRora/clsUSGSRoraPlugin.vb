@@ -30,12 +30,14 @@ Public Class clsUSGSRoraPlugin
         If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
             lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lTimeseriesGroup)
         End If
-        If lTimeseriesGroup.Count > 0 Then
+        If lTimeseriesGroup.Count = 1 Then
             Dim lForm As New frmUSGSRora
             ShowForm(lTimeseriesGroup, lForm)
             Return lForm
+        ElseIf lTimeseriesGroup.Count > 1 Then
+            Logger.Msg("RORA analyzes one daily streamflow dataset at a time.", "USGS RORA")
         Else
-            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS RORA")
+            Logger.Msg("Need to select a daily streamflow dataset", "USGS RORA")
         End If
     End Function
 

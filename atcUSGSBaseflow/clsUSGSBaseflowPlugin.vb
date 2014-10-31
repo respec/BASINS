@@ -97,12 +97,14 @@ Public Class clsUSGSBaseflowPlugin
         If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
             lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lTimeseriesGroup)
         End If
-        If lTimeseriesGroup.Count > 0 Then
+        If lTimeseriesGroup.Count = 1 Then
             Dim lForm As New frmUSGSBaseflow()
             ShowForm(lTimeseriesGroup, lForm)
             Return lForm
+        ElseIf lTimeseriesGroup.Count > 1 Then
+            Logger.Msg("Interactive mode analyzes one daily streamflow dataset at a time.", "USGS Base-Flow Separation")
         Else
-            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Base-Flow Separation")
+            Logger.Msg("Need to select a daily streamflow dataset", "USGS Base-Flow Separation")
         End If
     End Function
 
