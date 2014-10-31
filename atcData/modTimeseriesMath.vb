@@ -1792,41 +1792,48 @@ Finished:
     Public Sub SplitProvisional(ByVal aTimeseries As atcTimeseries, _
                                 ByRef aProvisionalTS As atcTimeseries, _
                                 ByRef aNonProvisionalTS As atcTimeseries)
+        aNonProvisionalTS = New atcTimeseries(Nothing)
+        aNonProvisionalTS.Dates = New atcTimeseries(Nothing)
+        aNonProvisionalTS.numValues = aTimeseries.numValues
+        aProvisionalTS = New atcTimeseries(Nothing)
+        aProvisionalTS.Dates = New atcTimeseries(Nothing)
+        aProvisionalTS.numValues = aTimeseries.numValues
+
+        Dim lProvisionalNumValuesAdded As Integer = 0
+        Dim lNonProvisionalNumValuesAdded As Integer = 0
+        Dim lAddTo As atcTimeseries
+        Dim lAddIndex As Integer
         Dim lProvisionalAttribute As String = aTimeseries.Attributes.GetValue("ProvisionalValueAttribute", "P")
-        Dim lNonProvisionalBuilder As New atcTimeseriesBuilder(Nothing)
-        Dim lProvisionalBuilder As New atcTimeseriesBuilder(Nothing)
-        Dim lAddTo As atcTimeseriesBuilder
-        For lIndex As Integer = 0 To aTimeseries.numValues
+
+        For lIndex As Integer = 1 To aTimeseries.numValues
             If aTimeseries.ValueAttributesGetValue(lIndex, lProvisionalAttribute, False) Then
-                lAddTo = lProvisionalBuilder
+                lAddTo = aProvisionalTS
+                lProvisionalNumValuesAdded += 1
+                lAddIndex = lProvisionalNumValuesAdded
             Else
-                lAddTo = lNonProvisionalBuilder
+                lAddTo = aNonProvisionalTS
+                lNonProvisionalNumValuesAdded += 1
+                lAddIndex = lNonProvisionalNumValuesAdded
             End If
-            lAddTo.AddValue(aTimeseries.Dates.Value(lIndex), aTimeseries.Value(lIndex))
+
+            lAddTo.Value(lAddIndex) = aTimeseries.Value(lIndex)
+            lAddTo.Dates.Value(lAddIndex) = aTimeseries.Dates.Value(lIndex)
+            If lAddIndex = 1 Then
+                lAddTo.Value(1) = pNaN
+                lAddTo.Dates.Value(0) = aTimeseries.Dates.Value(lIndex - 1)
+            End If
             If aTimeseries.ValueAttributesExist(lIndex) Then
-                lAddTo.AddValueAttributes(aTimeseries.ValueAttributes(lIndex))
+                lAddTo.ValueAttributes(lAddIndex) = aTimeseries.ValueAttributes(lIndex)
             End If
         Next
-        aProvisionalTS = lProvisionalBuilder.CreateTimeseries
-        aNonProvisionalTS = lNonProvisionalBuilder.CreateTimeseries
+        aProvisionalTS.numValues = lProvisionalNumValuesAdded
+        aNonProvisionalTS.numValues = lNonProvisionalNumValuesAdded
 
         Dim lCopiedAttributes As atcDataAttributes = aTimeseries.Attributes.Copy
         lCopiedAttributes.DiscardCalculated()
 
         aProvisionalTS.Attributes.ChangeTo(lCopiedAttributes)
         aNonProvisionalTS.Attributes.ChangeTo(lCopiedAttributes)
-
-        If Double.IsNaN(aProvisionalTS.Dates.Value(0)) Then
-            Dim lDate1 As Double = aProvisionalTS.Dates.Value(1)
-            Dim lDate2 As Double = aProvisionalTS.Dates.Value(2)
-            Dim lTimeDiff As Double = lDate2 - lDate1
-            Dim lDate0 As Double = lDate1 - lTimeDiff
-            aProvisionalTS.Dates.Value(0) = lDate0
-        End If
-        If aTimeseries.Attributes.ContainsAttribute("Time Step") AndAlso aTimeseries.Attributes.ContainsAttribute("Time Unit") Then
-            aProvisionalTS = FillValues(aProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
-            aNonProvisionalTS = FillValues(aNonProvisionalTS, aTimeseries.Attributes.GetValue("Time Unit"), aTimeseries.Attributes.GetValue("Time Step"), GetNaN, GetNaN, GetNaN)
-        End If
 
     End Sub
 End Module
