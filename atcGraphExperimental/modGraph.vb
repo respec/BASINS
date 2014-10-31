@@ -481,122 +481,121 @@ FoundMatch:
                        Optional ByVal aCommonLocation As String = Nothing, _
                        Optional ByVal aCommonUnits As String = Nothing) As CurveItem
 
+        Dim lCurve As LineItem = Nothing
+
         'Graph provisional data separately
+        Dim lGraphThese As New atcTimeseriesGroup
         Dim lProvisionalTS As atcTimeseries = Nothing
         Dim lNonProvisionalTS As atcTimeseries = Nothing
         If HasProvisionalValues(aTimeseries) Then
             SplitProvisional(aTimeseries, lProvisionalTS, lNonProvisionalTS)
-            If lNonProvisionalTS Is Nothing Then 'aTimeseries contains only provisional data
-                'If aTimeseries.Attributes.ContainsAttribute("Units") Then
-                '    If Not aTimeseries.Attributes.GetValue("Units", "").ToString.Contains("Provisional") Then
-                '        aTimeseries.Attributes.SetValue("Units", aTimeseries.Attributes.GetValue("Units", "") & ", Provisional")
-                '    End If
-                'Else
-                '    aTimeseries.Attributes.SetValue("Units", "Provisional")
-                'End If
-                'aTimeseries = lProvisionalTS
-                Try
-                    lProvisionalTS.Clear()
-                Catch
-                End Try
-                lProvisionalTS = Nothing
-            Else 'Graphing both approved and provisional data
-                lNonProvisionalTS.Attributes.ChangeTo(aTimeseries.Attributes)
-                lNonProvisionalTS.Attributes.DiscardCalculated()
-                aTimeseries = lNonProvisionalTS
+            If lNonProvisionalTS IsNot Nothing AndAlso lNonProvisionalTS.numValues > 0 Then
+                lGraphThese.Add(lNonProvisionalTS)
             End If
+            If lProvisionalTS IsNot Nothing AndAlso lProvisionalTS.numValues > 0 Then
+                lGraphThese.Add(lProvisionalTS)
+            End If
+        Else
+            lGraphThese.Add(aTimeseries)
         End If
 
-        Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
-        Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
-        Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
-        Dim lCurveLabel As String = TSCurveLabel(aTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, aCommonLocation, aCommonUnits)
-        Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
-        Dim lCurve As LineItem = Nothing
-
-        Dim lPane As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
-        Dim lYAxis As Axis = lPane.YAxis
-        Dim lXAxisType As ZedGraph.AxisType = AxisTypeFromName(aTimeseries.Attributes.GetValue("GraphXAxisType", "DateDual"))
-        If lPane.XAxis.Type <> lXAxisType Then lPane.XAxis.Type = lXAxisType
-
-        Select Case aYAxisName.ToUpper
-            Case "AUX"
-                EnableAuxAxis(aZgc.MasterPane, True, 0.2)
-                lPane = aZgc.MasterPane.PaneList(0)
-                lYAxis = lPane.YAxis
-            Case "RIGHT"
-                With lPane.YAxis
-                    .MajorTic.IsOpposite = False
-                    .MinorTic.IsOpposite = False
-                End With
-                With lPane.Y2Axis
-                    .MajorTic.IsOpposite = False
-                    .MinorTic.IsOpposite = False
-                    .MinSpace = 80
-                    aZgc.MasterPane.PaneList(0).Y2Axis.MinSpace = .MinSpace 'align right space on aux graph if present
-                End With
-                lYAxis = lPane.Y2Axis
-        End Select
-
-        lYAxis.IsVisible = True
-        lYAxis.Scale.IsVisible = True
-
-        With lPane
-            If .XAxis.Type <> lXAxisType Then .XAxis.Type = lXAxisType
-
-            If aTimeseries.Attributes.GetValue("point", False) Then
-                lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
-                lCurve.Line.IsVisible = False
+        For Each lTimeseries As atcTimeseries In lGraphThese
+            Dim lScen As String = lTimeseries.Attributes.GetValue("scenario")
+            Dim lLoc As String = lTimeseries.Attributes.GetValue("location")
+            Dim lCons As String = lTimeseries.Attributes.GetValue("constituent")
+            Dim lCurveLabel As String = TSCurveLabel(lTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, aCommonLocation, aCommonUnits)
+            Dim lCurveColor As Color
+            If lTimeseries = lProvisionalTS Then
+                lCurveColor = Color.Red
+                lCurveLabel &= " Provisional"
             Else
-                lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
-                lCurve.Line.Width = 1
-                Select Case aTimeseries.Attributes.GetValue("StepType", "rearwardstep").ToString.ToLower
-                    Case "rearwardstep" : lCurve.Line.StepType = StepType.RearwardStep
-                    Case "forwardsegment" : lCurve.Line.StepType = StepType.ForwardSegment
-                    Case "forwardstep" : lCurve.Line.StepType = StepType.ForwardStep
-                    Case "nonstep" : lCurve.Line.StepType = StepType.NonStep
-                    Case "rearwardsegment" : lCurve.Line.StepType = StepType.RearwardSegment
-                End Select
+                lCurveColor = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
             End If
 
-            lCurve.Tag = aTimeseries.Serial 'Make this easy to find again even if label changes
+            Dim lPane As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
+            Dim lYAxis As Axis = lPane.YAxis
+            Dim lXAxisType As ZedGraph.AxisType = AxisTypeFromName(lTimeseries.Attributes.GetValue("GraphXAxisType", "DateDual"))
+            If lPane.XAxis.Type <> lXAxisType Then lPane.XAxis.Type = lXAxisType
 
-            If aYAxisName.ToUpper.Equals("RIGHT") Then lCurve.IsY2Axis = True
+            Select Case aYAxisName.ToUpper
+                Case "AUX"
+                    EnableAuxAxis(aZgc.MasterPane, True, 0.2)
+                    lPane = aZgc.MasterPane.PaneList(0)
+                    lYAxis = lPane.YAxis
+                Case "RIGHT"
+                    With lPane.YAxis
+                        .MajorTic.IsOpposite = False
+                        .MinorTic.IsOpposite = False
+                    End With
+                    With lPane.Y2Axis
+                        .MajorTic.IsOpposite = False
+                        .MinorTic.IsOpposite = False
+                        .MinSpace = 80
+                        aZgc.MasterPane.PaneList(0).Y2Axis.MinSpace = .MinSpace 'align right space on aux graph if present
+                    End With
+                    lYAxis = lPane.Y2Axis
+            End Select
 
-            'Use units as Y axis title (if this data has units and Y axis title is not set)
-            If aTimeseries.Attributes.ContainsAttribute("Units") AndAlso _
-               (lYAxis.Title Is Nothing OrElse lYAxis.Title.Text Is Nothing OrElse lYAxis.Title.Text.Length = 0) Then
-                lYAxis.Title.Text = aTimeseries.Attributes.GetValue("Units")
-                lYAxis.Title.IsVisible = True
-            End If
+            lYAxis.IsVisible = True
+            lYAxis.Scale.IsVisible = True
 
-            Dim lSJDay As Double = aTimeseries.Attributes.GetValue("SJDay")
-            Dim lEJDay As Double = aTimeseries.Attributes.GetValue("EJDay")
-            If .CurveList.Count = 1 Then
-                If aTimeseries.numValues > 0 Then 'Set X axis to contain this date range
-                    .XAxis.Scale.Min = lSJDay
-                    .XAxis.Scale.Max = lEJDay
+            With lPane
+                If .XAxis.Type <> lXAxisType Then .XAxis.Type = lXAxisType
+
+                If lTimeseries.Attributes.GetValue("point", False) Then
+                    lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(lTimeseries), lCurveColor, SymbolType.Plus)
+                    lCurve.Line.IsVisible = False
+                Else
+                    lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(lTimeseries), lCurveColor, SymbolType.None)
+                    lCurve.Line.Width = 1
+                    Select Case lTimeseries.Attributes.GetValue("StepType", "rearwardstep").ToString.ToLower
+                        Case "rearwardstep" : lCurve.Line.StepType = StepType.RearwardStep
+                        Case "forwardsegment" : lCurve.Line.StepType = StepType.ForwardSegment
+                        Case "forwardstep" : lCurve.Line.StepType = StepType.ForwardStep
+                        Case "nonstep" : lCurve.Line.StepType = StepType.NonStep
+                        Case "rearwardsegment" : lCurve.Line.StepType = StepType.RearwardSegment
+                    End Select
                 End If
-            ElseIf .CurveList.Count > 1 AndAlso Not lCurve Is Nothing Then
-                'Expand time scale if needed to include all dates in new curve
-                If aTimeseries.numValues > 0 Then
-                    If lSJDay < .XAxis.Scale.Min Then
+
+                lCurve.Tag = lTimeseries.Serial 'Make this easy to find again even if label changes
+
+                If aYAxisName.ToUpper.Equals("RIGHT") Then lCurve.IsY2Axis = True
+
+                'Use units as Y axis title (if this data has units and Y axis title is not set)
+                If lTimeseries.Attributes.ContainsAttribute("Units") AndAlso _
+                   (lYAxis.Title Is Nothing OrElse lYAxis.Title.Text Is Nothing OrElse lYAxis.Title.Text.Length = 0) Then
+                    lYAxis.Title.Text = lTimeseries.Attributes.GetValue("Units")
+                    lYAxis.Title.IsVisible = True
+                End If
+
+                Dim lSJDay As Double = lTimeseries.Attributes.GetValue("SJDay")
+                Dim lEJDay As Double = lTimeseries.Attributes.GetValue("EJDay")
+                If .CurveList.Count = 1 Then
+                    If lTimeseries.numValues > 0 Then 'Set X axis to contain this date range
                         .XAxis.Scale.Min = lSJDay
-                    End If
-                    If lEJDay > .XAxis.Scale.Max Then
                         .XAxis.Scale.Max = lEJDay
                     End If
+                ElseIf .CurveList.Count > 1 AndAlso Not lCurve Is Nothing Then
+                    'Expand time scale if needed to include all dates in new curve
+                    If lTimeseries.numValues > 0 Then
+                        If lSJDay < .XAxis.Scale.Min Then
+                            .XAxis.Scale.Min = lSJDay
+                        End If
+                        If lEJDay > .XAxis.Scale.Max Then
+                            .XAxis.Scale.Max = lEJDay
+                        End If
+                    End If
                 End If
-            End If
-        End With
 
+            End With
+        Next
         If lProvisionalTS IsNot Nothing Then
-            Dim lProvisionalCurve As CurveItem = AddTimeseriesCurve( _
-                lProvisionalTS, aZgc, aYAxisName, _
-                aCommonTimeUnitName, aCommonScenario, aCommonConstituent, _
-                aCommonLocation, aCommonUnits)
-            lProvisionalCurve.Label.Text = "Provisional"
-            lProvisionalCurve.Color = Color.Red
+            'Dim lProvisionalCurve As CurveItem = AddTimeseriesCurve( _
+            '    lProvisionalTS, aZgc, aYAxisName, _
+            '    aCommonTimeUnitName, aCommonScenario, aCommonConstituent, _
+            '    aCommonLocation, aCommonUnits)
+            'lProvisionalCurve.Label.Text = "Provisional"
+            'lProvisionalCurve.Color = Color.Red
             If Not lProvisionalTS.Attributes.GetValue("point", False) AndAlso lProvisionalTS.Attributes.GetValue("Count") <> lProvisionalTS.numValues Then
                 'atcTimeseriesPointList has its own copy of the values, discard the temporary timeseries
                 lProvisionalTS.Clear()
