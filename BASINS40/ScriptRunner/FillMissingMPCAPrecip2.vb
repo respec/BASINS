@@ -18,26 +18,12 @@ Public Module FillMissingMPCAPrecip
     Private Const pMinNumHrly As Integer = 43830 '5 years of hourly values
     Private Const pMinNumDly As Integer = 1830 '5 years of daily
     Private Const pMaxPctMiss As Integer = 50 '20
-    'Declare Sub F90_MSG Lib "hass_ent.dll" (ByVal aMsg As String, ByVal aMsgLen As Short)
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.StartToFile(pDataPath & "FillMissingMPCA.log", , , True)
         Logger.Dbg("FillMissing:Start")
         ChDriveDir(pDataPath)
         Logger.Dbg(" CurDir:" & CurDir())
-
-        'Dim lStationFile As New atcTableDelimited
-        'If lStationFile.OpenFile(pStationPath & "MetStationTable.csv") Then
-        '    Logger.Dbg("FillMissing: Opened Station Location Master file")
-        'End If
-
-        'Logger.Dbg("FillMissing: Read all lat/lng values")
-        'lStationFile.CurrentRecord = 1
-        'While Not lStationFile.EOF
-        '    X2(lStationFile.CurrentRecord) = lStationFile.Value(2)
-        '    Y2(lStationFile.CurrentRecord) = lStationFile.Value(1)
-        '    lStationFile.CurrentRecord += 1
-        'End While
 
         Dim lFillers As atcCollection = Nothing
         Dim lFillerOTs As atcCollection = Nothing
@@ -52,11 +38,7 @@ Public Module FillMissingMPCAPrecip
         Dim lWDMfile As New atcWDM.atcDataSourceWDM
         lWDMfile.Open(lCurWDM)
 
-        'Dim lBasinsMetWDM As String = pOutputPath & "MN_Met.wdm"
-        'Dim lBasinsMetWDMfile As New atcWDM.atcDataSourceWDM
-        'lBasinsMetWDMfile.Open(lBasinsMetWDM)
-
-        Dim lNewWDM As String = pDataPath & "MNFilledMet.wdm"
+        Dim lNewWDM As String = atcUtility.GetTemporaryFileName(pDataPath & "MNFilledMet", ".wdm")
         Dim lNewWDMfile As New atcWDM.atcDataSourceWDM
         lNewWDMfile.Open(lNewWDM)
 
@@ -83,6 +65,7 @@ Public Module FillMissingMPCAPrecip
         Next
 
         For Each lts As atcTimeseries In lWDMfile.DataSets
+            Dim lFilledTS As atcTimeseries = Nothing
             lAddMe = False
             lCons = lts.Attributes.GetValue("Constituent")
             If lCons = "PREC" Then
@@ -157,16 +140,17 @@ Public Module FillMissingMPCAPrecip
                     If j > 0 Then
                         Logger.Dbg("FillMissing:  Found " & j & " nearby stations for filling")
                         Logger.Dbg("FillMissing:  Before Filling, % Missing:  " & lPctMiss)
+                        lFilledTS = lts.Clone()
                         If lts.Attributes.GetValue("TU") = atcTimeUnit.TUHour Then
                             If lPctMiss > 0 Then
-                                FillHourlyTser(lts, lFillers, lMVal, lMAcc, 90)
+                                FillHourlyTser(lFilledTS, lFillers, lMVal, lMAcc, 90)
                             Else
                                 Logger.Dbg("FillMissing:  All Missing periods filled via interpolation")
                             End If
                         Else 'daily tser
-                            FillDailyTser(lts, Nothing, lFillers, Nothing, lMVal, lMAcc, 90)
+                            FillDailyTser(lFilledTS, Nothing, lFillers, Nothing, lMVal, lMAcc, 90)
                         End If
-                        lStr = MissingDataSummary(lts, lMVal, lMAcc, lFMin, lFMax, lRepType)
+                        lStr = MissingDataSummary(lFilledTS, lMVal, lMAcc, lFMin, lFMax, lRepType)
                         lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
                         Logger.Dbg("FillMissing:  After Filling, % Missing:  " & lPctMiss)
                     Else
@@ -174,19 +158,17 @@ Public Module FillMissingMPCAPrecip
                     End If
                 End If
             Else
-                Logger.Dbg("FillMissing:  Not going to try to fill this dataset!")
+                Logger.Dbg("FillMissing:  Not going to try to fill this dataset from nearby stations.")
             End If
             'write filled data set to new WDM file
-            If lAddMe Then
-                If lNewWDMfile.AddDataset(lts) Then
+            If lFilledTS IsNot Nothing Then
+                If lNewWDMfile.AddDataset(lFilledTS) Then
                     Logger.Dbg("FillMissing:  Added " & lCons & " dataset to WDM file for station " & lStation)
                 Else
                     Logger.Dbg("FillMissing:  PROBLEM adding " & lCons & " dataset to WDM file for station " & lStation)
                 End If
             End If
         Next
-
-        Logger.StartToFile("FillMissEnd.log", , , True)
         Logger.Dbg("FillMissing:Completed Filling")
     End Sub
 
