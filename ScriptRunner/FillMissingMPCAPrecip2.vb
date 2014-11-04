@@ -20,7 +20,8 @@ Public Module FillMissingMPCAPrecip
     Private Const pMaxPctMiss As Integer = 50 '20
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        Logger.StartToFile(pDataPath & "FillMissingMPCA.log", , , True)
+        Dim lCurWDM As String = pDataPath & "precip-2014-11-03.wdm"
+        Logger.StartToFile(IO.Path.ChangeExtension(lCurWDM, ".log"), , , True)
         Logger.Dbg("FillMissing:Start")
         ChDriveDir(pDataPath)
         Logger.Dbg(" CurDir:" & CurDir())
@@ -34,11 +35,10 @@ Public Module FillMissingMPCAPrecip
         Dim lFMax As Double = 10000.0
         Dim lRepType As Integer = 1 'DBF parsing output format
 
-        Dim lCurWDM As String = pDataPath & "MNRawMet.wdm"
         Dim lWDMfile As New atcWDM.atcDataSourceWDM
         lWDMfile.Open(lCurWDM)
 
-        Dim lNewWDM As String = atcUtility.GetTemporaryFileName(pDataPath & "MNFilledMet", ".wdm")
+        Dim lNewWDM As String = atcUtility.GetTemporaryFileName(IO.Path.ChangeExtension(lCurWDM, ".Filled"), ".wdm")
         Dim lNewWDMfile As New atcWDM.atcDataSourceWDM
         lNewWDMfile.Open(lNewWDM)
 
@@ -100,7 +100,7 @@ Public Module FillMissingMPCAPrecip
                             Dim lDistance As Double = System.Math.Sqrt((X1 - lOtherAtt.GetValue("Longitude")) ^ 2 + _
                                                                        (Y1 - lOtherAtt.GetValue("Latitude")) ^ 2)
                             While lOtherDataSets.Keys.Contains(lDistance)
-                                lDistance += 0.001
+                                lDistance += 0.00001
                             End While
                             lOtherDataSets.Add(lDistance, lStationLocations.ItemByIndex(lStationIndex))
                         End If
@@ -124,7 +124,12 @@ Public Module FillMissingMPCAPrecip
                                 lFillTS = lFillTsers(k)
                                 If lFillTS IsNot Nothing Then
                                     'contains data for time period being filled
-                                    lFillers.Add(lOtherDataSets.Keys(i), lFillTS)
+                                    Dim lDistance As Double = lOtherDataSets.Keys(i)
+                                    While lFillers.Keys.Contains(lDistance)
+                                        lDistance += 0.00001
+                                    End While
+
+                                    lFillers.Add(lDistance, lFillTS)
                                     j += 1
                                     Logger.Dbg("FillMissing:  Using " & _
                                                lFillTS.Attributes.GetValue("Constituent") & " from " & _
