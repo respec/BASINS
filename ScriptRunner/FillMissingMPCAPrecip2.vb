@@ -20,161 +20,168 @@ Public Module FillMissingMPCAPrecip
     Private Const pMaxPctMiss As Integer = 50 '20
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        Dim lCurWDM As String = pDataPath & "precip-2014-11-03.wdm"
-        Logger.StartToFile(IO.Path.ChangeExtension(lCurWDM, ".log"), , , True)
-        Logger.Dbg("FillMissing:Start")
-        ChDriveDir(pDataPath)
-        Logger.Dbg(" CurDir:" & CurDir())
+        Try
+            Dim lCurWDM As String = pDataPath & "precip-2014-11-03.wdm"
+            Logger.StartToFile(IO.Path.ChangeExtension(lCurWDM, ".log"), , , True)
+            Logger.Dbg("FillMissing:Start")
+            ChDriveDir(pDataPath)
+            Logger.Dbg(" CurDir:" & CurDir())
 
-        Dim lFillers As atcCollection = Nothing
-        Dim lFillerOTs As atcCollection = Nothing
+            Dim lFillers As atcCollection = Nothing
+            Dim lFillerOTs As atcCollection = Nothing
 
-        Dim lMVal As Double = -999.0
-        Dim lMAcc As Double = -998.0
-        Dim lFMin As Double = -100.0
-        Dim lFMax As Double = 10000.0
-        Dim lRepType As Integer = 1 'DBF parsing output format
+            Dim lMVal As Double = -999.0
+            Dim lMAcc As Double = -998.0
+            Dim lFMin As Double = -100.0
+            Dim lFMax As Double = 10000.0
+            Dim lRepType As Integer = 1 'DBF parsing output format
 
-        Dim lWDMfile As New atcWDM.atcDataSourceWDM
-        lWDMfile.Open(lCurWDM)
+            Dim lWDMfile As New atcWDM.atcDataSourceWDM
+            lWDMfile.Open(lCurWDM)
 
-        Dim lNewWDM As String = atcUtility.GetTemporaryFileName(IO.Path.ChangeExtension(lCurWDM, ".Filled"), ".wdm")
-        Dim lNewWDMfile As New atcWDM.atcDataSourceWDM
-        lNewWDMfile.Open(lNewWDM)
+            Dim lNewWDM As String = atcUtility.GetTemporaryFileName(IO.Path.ChangeExtension(lCurWDM, ".Filled"), ".wdm")
+            Dim lNewWDMfile As New atcWDM.atcDataSourceWDM
+            lNewWDMfile.Open(lNewWDM)
 
-        Dim lAddMe As Boolean = True
-        Dim lCons As String = ""
-        Dim lStr As String = ""
-        Dim lPctMiss As Double
-        Dim i As Integer
-        Dim j As Integer
-        Dim X1 As Double
-        Dim Y1 As Double
-        Dim lStation As String = ""
-        Dim lStaFill As String = ""
-        Dim lFillTsers As atcCollection
-        Dim lFillTS As atcTimeseries = Nothing
+            Dim lAddMe As Boolean = True
+            Dim lCons As String = ""
+            Dim lStr As String = ""
+            Dim lPctMiss As Double
+            Dim i As Integer
+            Dim j As Integer
+            Dim X1 As Double
+            Dim Y1 As Double
+            Dim lStation As String = ""
+            Dim lStaFill As String = ""
+            Dim lFillTsers As atcCollection
+            Dim lFillTS As atcTimeseries = Nothing
 
-        Dim lStationLocations As New atcCollection
-        For Each lts As atcTimeseries In lWDMfile.DataSets
-            Dim lLocation As String = lts.Attributes.GetValue("Location")
-            Logger.Dbg(lLocation)
-            If Not lStationLocations.Keys.Contains(lLocation) Then
-                lStationLocations.Add(lLocation, lts.Attributes)
-            End If
-        Next
-
-        For Each lts As atcTimeseries In lWDMfile.DataSets
-            Dim lFilledTS As atcTimeseries = Nothing
-            lAddMe = False
-            lCons = lts.Attributes.GetValue("Constituent")
-            If lCons = "PREC" Then
-                lStr = MissingDataSummary(lts, lMVal, lMAcc, lFMin, lFMax, lRepType)
-                lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
-                If lPctMiss < pMaxPctMiss Then '% missing OK
-                    If (lts.Attributes.GetValue("tu") = atcTimeUnit.TUHour AndAlso lts.numValues > pMinNumHrly) OrElse _
-                       (lts.Attributes.GetValue("tu") = atcTimeUnit.TUDay AndAlso lts.numValues > pMinNumDly) Then 'want a significant time span
-                        'ExtendISHTSer(lts)
-                        Logger.Dbg("FillMissing:  Filling data for " & lts.ToString & ", " & lts.Attributes.GetValue("Description"))
-                        lAddMe = True
-                    Else
-                        Logger.Dbg("FillMissing:  Not enough values (" & lts.numValues & ") for " & lts.ToString & _
-                                   " - need at least " & pMinNumHrly)
-                    End If
-                Else
-                    Logger.Dbg("FillMissing:  For " & lts.ToString & ", percent Missing (" & lPctMiss & ") too large (> " & pMaxPctMiss & ")")
+            Dim lStationLocations As New atcCollection
+            For Each lts As atcTimeseries In lWDMfile.DataSets
+                Dim lLocation As String = lts.Attributes.GetValue("Location")
+                Logger.Dbg(lLocation)
+                If Not lStationLocations.Keys.Contains(lLocation) Then
+                    lStationLocations.Add(lLocation, lts.Attributes)
                 End If
-            End If
-            If lAddMe Then
-                If lPctMiss > 0 Then
-                    lStation = lts.Attributes.GetValue("Location")
+            Next
 
-                    X1 = lts.Attributes.GetValue("Longitude")
-                    Y1 = lts.Attributes.GetValue("Latitude")
-                    Logger.Dbg("FillMissing: For Station " & lStation & ",  at Lat/Lng " & Y1 & " / " & X1)
-
-                    Dim lOtherDataSets As New atcCollection ' SortedList(Of Double, atcDataAttributes)
-                    For lStationIndex As Integer = 0 To lStationLocations.Count - 1
-                        If lStationLocations.Keys(lStationIndex) <> lStation Then
-                            Dim lOtherAtt As atcDataAttributes = lStationLocations.ItemByIndex(lStationIndex)
-                            Dim lDistance As Double = System.Math.Sqrt((X1 - lOtherAtt.GetValue("Longitude")) ^ 2 + _
-                                                                       (Y1 - lOtherAtt.GetValue("Latitude")) ^ 2)
-                            While lOtherDataSets.Keys.Contains(lDistance)
-                                lDistance += 0.00001
-                            End While
-                            lOtherDataSets.Add(lDistance, lStationLocations.ItemByIndex(lStationIndex))
+            For Each lts As atcTimeseries In lWDMfile.DataSets
+                'If lts.Attributes.GetValue("Location") <> "PREC0001" Then Continue For
+                Dim lFilledTS As atcTimeseries = Nothing
+                lAddMe = False
+                lCons = lts.Attributes.GetValue("Constituent")
+                If lCons = "PREC" Then
+                    lStr = MissingDataSummary(lts, lMVal, lMAcc, lFMin, lFMax, lRepType)
+                    lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
+                    If lPctMiss < pMaxPctMiss Then '% missing OK
+                        If (lts.Attributes.GetValue("tu") = atcTimeUnit.TUHour AndAlso lts.numValues > pMinNumHrly) OrElse _
+                           (lts.Attributes.GetValue("tu") = atcTimeUnit.TUDay AndAlso lts.numValues > pMinNumDly) Then 'want a significant time span
+                            'ExtendISHTSer(lts)
+                            Logger.Dbg("FillMissing:  Filling data for " & lts.ToString & ", " & lts.Attributes.GetValue("Description"))
+                            lAddMe = True
+                        Else
+                            Logger.Dbg("FillMissing:  Not enough values (" & lts.numValues & ") for " & lts.ToString & _
+                                       " - need at least " & pMinNumHrly)
                         End If
-                    Next
-                    lOtherDataSets.Sort()
-                    Logger.Dbg("FillMissing: Sorted stations by distance")
-                    Logger.Dbg("FillMissing:    Nearby Stations:")
-                    lFillers = New atcCollection
+                    Else
+                        Logger.Dbg("FillMissing:  For " & lts.ToString & ", percent Missing (" & lPctMiss & ") too large (> " & pMaxPctMiss & ")")
+                    End If
+                End If
+                If lAddMe Then
+                    If lPctMiss > 0 Then
+                        lStation = lts.Attributes.GetValue("Location")
 
-                    j = 0
-                    For i = 0 To lOtherDataSets.Count - 1
-                        If j < pMaxNearStas Then
-                            'look through stations, in order of proximity, that can be used to fill
-                            Dim lStationAttribues As atcDataAttributes = lOtherDataSets.ItemByIndex(i)
-                            lStaFill = lStationAttribues.GetValue("Location")
-                            lFillTsers = FindFillTSers(lts, lCons, lStaFill, lWDMfile)
-                            'If lFillTsers.Count = 0 Then
-                            '    lFillTsers = FindFillTSers(lts, "PREC", lStaFill, lBasinsMetWDMfile)
-                            'End If
-                            For k As Integer = 0 To lFillTsers.Count - 1
-                                lFillTS = lFillTsers(k)
-                                If lFillTS IsNot Nothing Then
-                                    'contains data for time period being filled
-                                    Dim lDistance As Double = lOtherDataSets.Keys(i)
-                                    While lFillers.Keys.Contains(lDistance)
-                                        lDistance += 0.00001
-                                    End While
+                        X1 = lts.Attributes.GetValue("Longitude")
+                        Y1 = lts.Attributes.GetValue("Latitude")
+                        Logger.Dbg("FillMissing: For Station " & lStation & ",  at Lat/Lng " & Y1 & " / " & X1)
 
-                                    lFillers.Add(lDistance, lFillTS)
-                                    j += 1
-                                    Logger.Dbg("FillMissing:  Using " & _
-                                               lFillTS.Attributes.GetValue("Constituent") & " from " & _
-                                               lFillTS.Attributes.GetValue("Location") & " at Lat/Lng " & _
-                                               lFillTS.Attributes.GetValue("Latitude") & "/" & _
-                                               lFillTS.Attributes.GetValue("Longitude") & " dist " & lOtherDataSets.Keys(i))
-                                End If
-                            Next
-                            i += 1
-                        End If
-                    Next
-
-                    If j > 0 Then
-                        Logger.Dbg("FillMissing:  Found " & j & " nearby stations for filling")
-                        Logger.Dbg("FillMissing:  Before Filling, % Missing:  " & lPctMiss)
-                        lFilledTS = lts.Clone()
-                        If lts.Attributes.GetValue("TU") = atcTimeUnit.TUHour Then
-                            If lPctMiss > 0 Then
-                                FillHourlyTser(lFilledTS, lFillers, lMVal, lMAcc, 90)
-                            Else
-                                Logger.Dbg("FillMissing:  All Missing periods filled via interpolation")
+                        Dim lOtherDataSets As New atcCollection ' SortedList(Of Double, atcDataAttributes)
+                        For lStationIndex As Integer = 0 To lStationLocations.Count - 1
+                            If lStationLocations.Keys(lStationIndex) <> lStation Then
+                                Dim lOtherAtt As atcDataAttributes = lStationLocations.ItemByIndex(lStationIndex)
+                                Dim lDistance As Double = System.Math.Sqrt((X1 - lOtherAtt.GetValue("Longitude")) ^ 2 + _
+                                                                           (Y1 - lOtherAtt.GetValue("Latitude")) ^ 2)
+                                While lOtherDataSets.Keys.Contains(lDistance)
+                                    lDistance += 0.00001
+                                End While
+                                lOtherDataSets.Add(lDistance, lStationLocations.ItemByIndex(lStationIndex))
                             End If
-                        Else 'daily tser
-                            FillDailyTser(lFilledTS, Nothing, lFillers, Nothing, lMVal, lMAcc, 90)
+                        Next
+                        lOtherDataSets.Sort()
+                        Logger.Dbg("FillMissing: Sorted stations by distance")
+                        Logger.Dbg("FillMissing:    Nearby Stations:")
+                        lFillers = New atcCollection
+
+                        j = 0
+                        For i = 0 To lOtherDataSets.Count - 1
+                            If j < pMaxNearStas Then
+                                'look through stations, in order of proximity, that can be used to fill
+                                Dim lStationAttribues As atcDataAttributes = lOtherDataSets.ItemByIndex(i)
+                                lStaFill = lStationAttribues.GetValue("Location")
+                                lFillTsers = FindFillTSers(lts, lCons, lStaFill, lWDMfile)
+                                'If lFillTsers.Count = 0 Then
+                                '    lFillTsers = FindFillTSers(lts, "PREC", lStaFill, lBasinsMetWDMfile)
+                                'End If
+                                For k As Integer = 0 To lFillTsers.Count - 1
+                                    lFillTS = lFillTsers(k)
+                                    If lFillTS IsNot Nothing Then
+                                        'contains data for time period being filled
+                                        Dim lDistance As Double = lOtherDataSets.Keys(i)
+                                        While lFillers.Keys.Contains(lDistance)
+                                            lDistance += 0.00001
+                                        End While
+
+                                        lFillers.Add(lDistance, lFillTS)
+                                        j += 1
+                                        Logger.Dbg("FillMissing:  Using " & _
+                                                   lFillTS.Attributes.GetValue("Constituent") & " from " & _
+                                                   lFillTS.Attributes.GetValue("Location") & " at Lat/Lng " & _
+                                                   lFillTS.Attributes.GetValue("Latitude") & "/" & _
+                                                   lFillTS.Attributes.GetValue("Longitude") & " dist " & lOtherDataSets.Keys(i))
+                                    End If
+                                Next
+                                i += 1
+                            End If
+                        Next
+
+                        If j > 0 Then
+                            Logger.Dbg("FillMissing:  Found " & j & " nearby stations for filling")
+                            Logger.Dbg("FillMissing:  Before Filling, % Missing:  " & lPctMiss)
+                            lFilledTS = lts.Clone()
+                            If lts.Attributes.GetValue("TU") = atcTimeUnit.TUHour Then
+                                If lPctMiss > 0 Then
+                                    FillHourlyTser(lFilledTS, lFillers, lMVal, lMAcc, 90)
+                                Else
+                                    Logger.Dbg("FillMissing:  All Missing periods filled via interpolation")
+                                End If
+                            Else 'daily tser
+                                FillDailyTser(lFilledTS, Nothing, lFillers, Nothing, lMVal, lMAcc, 90)
+                            End If
+                            lStr = MissingDataSummary(lFilledTS, lMVal, lMAcc, lFMin, lFMax, lRepType)
+                            lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
+                            Logger.Dbg("FillMissing:  After Filling, % Missing:  " & lPctMiss)
+                        Else
+                            Logger.Dbg("FillMissing:  PROBLEM - Could not find any nearby stations for filling")
                         End If
-                        lStr = MissingDataSummary(lFilledTS, lMVal, lMAcc, lFMin, lFMax, lRepType)
-                        lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
-                        Logger.Dbg("FillMissing:  After Filling, % Missing:  " & lPctMiss)
-                    Else
-                        Logger.Dbg("FillMissing:  PROBLEM - Could not find any nearby stations for filling")
                     End If
-                End If
-            Else
-                Logger.Dbg("FillMissing:  Not going to try to fill this dataset from nearby stations.")
-            End If
-            'write filled data set to new WDM file
-            If lFilledTS IsNot Nothing Then
-                If lNewWDMfile.AddDataset(lFilledTS) Then
-                    Logger.Dbg("FillMissing:  Added " & lCons & " dataset to WDM file for station " & lStation)
                 Else
-                    Logger.Dbg("FillMissing:  PROBLEM adding " & lCons & " dataset to WDM file for station " & lStation)
+                    Logger.Dbg("FillMissing:  Not going to try to fill this dataset from nearby stations.")
                 End If
-            End If
-        Next
-        Logger.Dbg("FillMissing:Completed Filling")
+                'write filled data set to new WDM file
+                If lFilledTS IsNot Nothing Then
+                    If lNewWDMfile.AddDataset(lFilledTS) Then
+                        Logger.Dbg("FillMissing:  Added " & lCons & " dataset to WDM file for station " & lStation)
+                    Else
+                        Logger.Dbg("FillMissing:  PROBLEM adding " & lCons & " dataset to WDM file for station " & lStation)
+                    End If
+                    lFilledTS.Clear()
+                End If
+                lts.ValuesNeedToBeRead = True
+            Next
+            Logger.Msg(lNewWDM, MsgBoxStyle.OkOnly, "FillMissing:Completed Filling")
+        Catch ex As Exception
+            Logger.Msg(ex.ToString, MsgBoxStyle.Critical, "FillMissing:Exception")
+        End Try
     End Sub
 
     Private Function FindFillTSers(ByVal aCurTS As atcTimeseries, _
