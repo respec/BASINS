@@ -246,7 +246,7 @@ Public Module WatershedConstituentBalance
                   Optional ByVal aOutFilePrefix As String = "", _
                   Optional ByVal aOutletDetails As Boolean = False, _
                   Optional ByVal aSegmentRows As Boolean = False, _
-                  Optional ByVal aDecimalPlaces As Integer = 4, _
+                  Optional ByVal aDecimalPlaces As Integer = 3, _
                   Optional ByVal aSignificantDigits As Integer = 5, _
                   Optional ByVal aFieldWidth As Integer = 12, _
                   Optional ByVal aSkipZeroOrNoValue As Boolean = True) As atcReport.IReport
@@ -277,7 +277,7 @@ Public Module WatershedConstituentBalance
         lReport.AppendLine()
         lReport.AppendLine()
 
-        Dim lConstituentDataGroup As New atcTimeseriesGroup
+
         Dim lTempDataSet As atcDataSet
         Dim lPendingOutput As String = ""
         Dim lOperationTypeAreas As New atcCollection
@@ -303,6 +303,7 @@ Public Module WatershedConstituentBalance
                         With lOutputTable
                             'For Each lConstituentKey As String In lConstituentsToOutput.Keys
                             For lConstituentIndex As Integer = 0 To lConstituentsToOutput.Count - 1 'Anurag Changed the way For loop works to enable easy skipping when there are no AgCHEM constituents. Basically if the HBN file has no data for ("P:NO3+NO2-N - SURFACE LAYER OUTFLOW") or ("P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW") the code assumes that there are no AGCHEM constituents for that specific PERLND and looks for the PQUAL constituents
+                                Dim lConstituentDataGroup As New atcTimeseriesGroup
                                 'For Each lConstituentKey In lConstituentsToOutput.Keys
                                 lConstituentKey = lConstituentsToOutput.Keys(lConstituentIndex)
                                 If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
@@ -328,21 +329,21 @@ Public Module WatershedConstituentBalance
 
                                             Select Case aBalanceType & "_" & lOperationType
                                                 Case "Water_PERLND", "Water_IMPLND"
-                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (Inches)" & vbCrLf
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & "  (Inches)" & vbCrLf
                                                 Case "Water_RCHRES"
-                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (ac-ft)" & vbCrLf
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & "  (ac-ft)" & vbCrLf
                                                 Case "Sediment_PERLND", "Sediement_IMPLND"
-                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (tons/ac)" & vbCrLf
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons/ac)" & vbCrLf
                                                 Case "Sediment_RCHRES"
-                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (tons)" & vbCrLf
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons)" & vbCrLf
                                                 Case "TotalN_PERLND", "TotalN_IMPLND", "TotalP_PERLND", "TotalP_IMPLND", "BOD-PQUAL_PERLND", "BOD-PQUAL_IMPLND"
-                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (lbs/ac)" & vbCrLf
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs/ac)" & vbCrLf
                                                 Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-PQUAL_RCHRES"
-                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (lbs)" & vbCrLf
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs)" & vbCrLf
                                                 Case "FColi_PERLND", "FColi_IMPLND"
-                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (10^9 org/ac)" & vbCrLf
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & "  (10^9 org/ac)" & vbCrLf
                                                 Case "FColi_RCHRES"
-                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & " ) (10^9 org)" & vbCrLf
+                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & "  (10^9 org)" & vbCrLf
 
                                             End Select
                                             .NumHeaderRows = 2
@@ -413,20 +414,20 @@ Public Module WatershedConstituentBalance
                                                 Dim lTotalArea As Double = 0.0
                                                 Dim MassLinkExists As Boolean = True
 
-                                                If ConstituentsThatNeedMassLink.Contains(lConstituentKey.ToUpper) Then
+                                                If ConstituentsThatNeedMassLink.Contains(lConstituentDataName.ToUpper) Then
                                                     For Each lConnection As HspfConnection In lOperation.Targets
 
                                                         If lConnection.Target.VolName = "RCHRES" Then
                                                             Dim aReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
                                                             Dim aConversionFactor As Double = 0.0
-                                                            If aBalanceType = "TotalN" Or aBalanceType = "TotalN" Then
+                                                            If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Then
                                                                 aConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
                                                             End If
                                                             lMassLinkID = lConnection.MassLink
 
                                                             If Not lMassLinkID = 0 Then
 
-                                                                lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentKey.ToUpper, aBalanceType, _
+                                                                lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentDataName.ToUpper, aBalanceType, _
                                                                                                aConversionFactor, lMultipleIndex)
                                                             Else
                                                                 MassLinkExists = False
