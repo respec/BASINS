@@ -40,6 +40,7 @@ Public Module ConstituentBalance
                   Optional ByVal aSignificantDigits As Integer = 5, _
                   Optional ByVal aFieldWidth As Integer = 12) As atcReport.IReport
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
+       
 
         Dim lReport As New atcReport.ReportText
         lReport.AppendLine(aScenario & " " & "Annual Loading Rates of " & aBalanceType & " For Each PERLND, and IMPLND, and")
@@ -60,6 +61,8 @@ Public Module ConstituentBalance
         Dim lConstituentKey As String
 
         For Each lOperationKey As String In aOperationTypes.Keys
+            Dim lLocationProgress As Integer = 0
+            Dim lLastLocation As Integer = aLocations.Count
             For Each lLocation As String In aLocations
 
                 If lLocation.StartsWith(lOperationKey) Then
@@ -91,7 +94,7 @@ Public Module ConstituentBalance
                                     lConstituentKey = lConstituentKey.Remove(0, 2)
                                     lConstituentDataName = lConstituentDataName.Remove(0, 2)
                                     Dim lConstituentDataGroup As New atcTimeseriesGroup
-                                    lLocationDataGroup.Add(aScenarioResults.DataSets.FindData("Constituent", lConstituentDataName))
+                                    lConstituentDataGroup.Add(lLocationDataGroup.FindData("Constituent", lConstituentDataName))
                                     If lConstituentDataGroup.Count > 0 Then
                                         lHaveData = True
 
@@ -322,6 +325,8 @@ Public Module ConstituentBalance
                 Else
                     'Logger.Dbg("   SKIP " & lLocation)
                 End If
+                'lLocationProgress += 1
+                'Logger.Progress(lLocation, lLocationProgress, lLastLocation)
             Next lLocation
         Next lOperationKey
 
