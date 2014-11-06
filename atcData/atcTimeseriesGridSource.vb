@@ -195,9 +195,16 @@ Public Class atcTimeseriesGridSource
                         Return False 'Can't edit anything in a ValueAttribute column yet
                     End If
                     If aRow < lAttributeRows Then
-                        Dim lDefinedValue As atcDefinedValue = lTs.Attributes.GetDefinedValue(pDisplayAttributes(aRow))
-                        If Not lDefinedValue Is Nothing AndAlso lDefinedValue.Definition.Editable Then
-                            Select Case lDefinedValue.Definition.TypeString
+                        Dim lAttributeName As String = pDisplayAttributes(aRow)
+                        Dim lDefinition As atcAttributeDefinition = atcData.atcDataAttributes.GetDefinition(lAttributeName)
+                        If lDefinition Is Nothing Then
+                            Dim lDefinedValue As atcDefinedValue = lTs.Attributes.GetDefinedValue(lAttributeName)
+                            If lDefinedValue IsNot Nothing Then
+                                lDefinition = lDefinedValue.Definition
+                            End If
+                        End If
+                        If lDefinition IsNot Nothing AndAlso lDefinition.Editable Then
+                            Select Case lDefinition.TypeString
                                 Case "String", "Double", "Single", "Integer" : Return True
                             End Select
                         End If
@@ -303,6 +310,10 @@ Public Class atcTimeseriesGridSource
                     If lIsValue Then
                         If aRow < lAttributeRows Then
                             Dim lDefinedValue As atcDefinedValue = lTs.Attributes.GetDefinedValue(pDisplayAttributes(aRow))
+                            If lDefinedValue Is Nothing Then
+                                lDefinedValue = New atcDefinedValue(atcDataAttributes.GetDefinition(pDisplayAttributes(aRow), True), Nothing)
+                                lTs.Attributes.Add(lDefinedValue.Definition.Name, lDefinedValue)
+                            End If
                             Select Case lDefinedValue.Definition.TypeString
                                 Case "String" : lDefinedValue.Value = newValue
                                 Case "Double" : lDefinedValue.Value = Double.Parse(newValue)

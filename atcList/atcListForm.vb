@@ -58,6 +58,7 @@ Public Class atcListForm
     Friend WithEvents mnuSaveChanges As System.Windows.Forms.MenuItem
     Friend WithEvents mnuSaveIn As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditAtrributeValues As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuEditAddAtrribute As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -85,6 +86,7 @@ Public Class atcListForm
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
+        Me.mnuEditAddAtrribute = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -131,7 +133,7 @@ Public Class atcListForm
         'mnuEdit
         '
         Me.mnuEdit.Index = 1
-        Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy, Me.mnuEditAtrributeValues})
+        Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy, Me.mnuEditAtrributeValues, Me.mnuEditAddAtrribute})
         Me.mnuEdit.Text = "Edit"
         '
         'mnuEditCopy
@@ -219,6 +221,11 @@ Public Class atcListForm
         Me.agdMain.Size = New System.Drawing.Size(528, 545)
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
+        '
+        'mnuEditAddAtrribute
+        '
+        Me.mnuEditAddAtrribute.Index = 2
+        Me.mnuEditAddAtrribute.Text = "Add Attribute"
         '
         'atcListForm
         '
@@ -668,5 +675,19 @@ Public Class atcListForm
         pSource.AttributeValuesEditable = Not pSource.AttributeValuesEditable
         mnuEditAtrributeValues.Checked = pSource.AttributeValuesEditable
         agdMain.Refresh()
+    End Sub
+
+    Private Sub mnuEditAddAtrribute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditAddAtrribute.Click
+
+        Dim lAttributeName As String = InputBox("Attribute Name:", "Add Attribute", "").Trim()
+        If lAttributeName.Length > 0 Then
+            If Not pDisplayAttributes.Contains(lAttributeName) Then
+                Dim lDefinition As atcAttributeDefinition = atcDataAttributes.GetDefinition(lAttributeName, True)
+                If Not pDisplayAttributes.Contains(lDefinition.Name) Then
+                    pDisplayAttributes.Add(lDefinition.Name)
+                    agdMain.Refresh()
+                End If
+            End If
+        End If
     End Sub
 End Class
