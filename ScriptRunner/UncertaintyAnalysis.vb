@@ -101,8 +101,7 @@ Module SensitivityAndUncertaintyAnalysis
         Dim lStats As New Generic.List(Of SensitivityStats)
         lMsg.Open("hspfmsg.mdb")
 
-        ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Mean Annual (cfs), Annual Peak Flow (cfs), Mean Annual runoff(in),10% High (in), 25% High (in), 50% High (in), 50% Low (in), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in), Annual Peak Flow(cfs), Error(%) Annual Average, Error(%) 10% High, Error(%) 25% High, Error(%) 50% High, Error(%) 50% Low, Error(%) 25% Low, Error(%) 10% Low, Error(%) 5% Low, Error(%) 2% Low, Error (%) Annual Peak Flow" & vbCrLf
-        IO.File.WriteAllText(pBaseName & "_HydrologyOutput.csv", ExpertStatsOutputLine)
+        
         Dim SimID As Integer = 0
         Dim MetSegRec As Integer
         Dim Mon As Integer
@@ -159,7 +158,8 @@ Module SensitivityAndUncertaintyAnalysis
                                                 "PARMATERNAME, MONTH/TYPE, PARAMETERVALUE" & vbCrLf
         Select Case TypeOfAnalysis
             Case "Sensitivity"
-                
+                ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Mean Annual (cfs), Annual Peak Flow (cfs), Mean Annual runoff(in),10% High (in), 25% High (in), 50% High (in), 50% Low (in), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in), Annual Peak Flow(cfs), Error(%) Annual Average, Error(%) 10% High, Error(%) 25% High, Error(%) 50% High, Error(%) 50% Low, Error(%) 25% Low, Error(%) 10% Low, Error(%) 5% Low, Error(%) 2% Low, Error (%) Annual Peak Flow" & vbCrLf
+                IO.File.WriteAllText(pBaseName & "_HydrologyOutput.csv", ExpertStatsOutputLine)
 
                 'Sensitivity(0, 0) = "Baseline"
                 'Sensitivity(0, 1) = (0)
@@ -335,6 +335,8 @@ Module SensitivityAndUncertaintyAnalysis
 
                 Logger.Dbg("Runs for Sensitivity Analysis finished.")
             Case "Uncertainty"
+                ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Mean Annual (cfs), Annual Peak Flow (cfs), Mean Annual runoff(in),10% High (in), 25% High (in), 50% High (in), 50% Low (in), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in), Annual Peak Flow(cfs)" & vbCrLf
+                IO.File.WriteAllText(pBaseName & "_HydrologyOutput.csv", ExpertStatsOutputLine)
                 lcsv.OpenFile(pParameterFile) 'Opening the csv file that has the parameter values
                 'lcsv.Header = 3
                 Dim TotalNumberOfParameters, ParameterNumber, k As Integer
@@ -513,11 +515,11 @@ Module SensitivityAndUncertaintyAnalysis
 
         Dim pHSPFExe As String = "C:\Basins41\models\HSPF\bin\WinHspfLt.exe"
         Logger.Dbg("Running WinHSPFLt.exe with " & uciName)
-        lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & uciName) 'Run HSPF program
-        If lExitCode = -1 Then
-            Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
-            Exit Sub
-        End If
+        'lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & uciName) 'Run HSPF program
+        'If lExitCode = -1 Then
+        '    Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
+        '    Exit Sub
+        'End If
         Logger.Dbg("Completed WinHSPFLt.exe run with " & uciName)
         Dim lWdmFileName As String
         lWdmFileName = IO.Path.Combine(pTestPath, pBaseName & ".wdm")
@@ -627,6 +629,16 @@ Module SensitivityAndUncertaintyAnalysis
                     lSimTSercfs.Clear()
                     lSimTSerInches.Clear()
                     lMaxSimTSercfs.Clear()
+                    ExpertStatsOutputLine = SimID & ", " & pOper & "," & oTable & ", " & _
+                                    oParameter & ", " & Value & ", " & lSiteName & ", " & _
+                                    FormatNumber(.AverageAnnualcfs, 3, , , TriState.False) & ", " & _
+                                    FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & ", " & _
+                                    FormatNumber(.AverageAnnual, 3) & ", " & _
+                                    FormatNumber(.TenPercentHigh, 3) & ", " & FormatNumber(.TwentyFivePercentHigh, 3) & ", " & _
+                                    FormatNumber(.FiftyPercentHigh, 3) & ", " & FormatNumber(.FiftyPercentLow, 3) & ", " & _
+                                    FormatNumber(.TwentyFivePercentLow, 3) & ", " & FormatNumber(.TenPercentLow, 3) & ", " & _
+                                    FormatNumber(.FivePercentLow, 3) & ", " & FormatNumber(.TwoPercentLow, 3) & ", " & _
+                                    FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & ", "
                     Dim ObsValuesList As List(Of SensitivityStats) = lStats.FindAll(Function(x) (x.Scenario = "Observed" _
                                                                                                  And x.SiteName = lSiteName.ToString))
                     If ObsValuesList.Count > 0 Then
@@ -642,17 +654,7 @@ Module SensitivityAndUncertaintyAnalysis
                         .ErrorFivePercentLow = (.FivePercentLow - lObsValues.FivePercentLow) * 100 / lObsValues.FivePercentLow
                         .ErrorTwoPercentLow = (.TwoPercentLow - lObsValues.TwoPercentLow) * 100 / lObsValues.TwoPercentLow
                         .ErrorAnnualPeakFlow = (.AnnualPeakFlow - lObsValues.AnnualPeakFlow) * 100 / lObsValues.AnnualPeakFlow
-                        ExpertStatsOutputLine = ExpertStatsOutputLine & SimID & ", " & pOper & "," & oTable & ", " & _
-                                    oParameter & ", " & Value & ", " & lSiteName & ", " & _
-                                    FormatNumber(.AverageAnnualcfs, 3, , , TriState.False) & ", " & _
-                                    FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & ", " & _
-                                    FormatNumber(.AverageAnnual, 3) & ", " & _
-                                    FormatNumber(.TenPercentHigh, 3) & ", " & FormatNumber(.TwentyFivePercentHigh, 3) & ", " & _
-                                    FormatNumber(.FiftyPercentHigh, 3) & ", " & FormatNumber(.FiftyPercentLow, 3) & ", " & _
-                                    FormatNumber(.TwentyFivePercentLow, 3) & ", " & FormatNumber(.TenPercentLow, 3) & ", " & _
-                                    FormatNumber(.FivePercentLow, 3) & ", " & FormatNumber(.TwoPercentLow, 3) & ", " & _
-                                    FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & ", " & _
-                                    FormatNumber(.ErrorAverageAnnual, 1) & ", " & FormatNumber(.ErrorTenPercentHigh, 1) & ", " & _
+                        ExpertStatsOutputLine &= FormatNumber(.ErrorAverageAnnual, 1) & ", " & FormatNumber(.ErrorTenPercentHigh, 1) & ", " & _
                                     FormatNumber(.ErrorTwentyFivePercentHigh, 1) & ", " & FormatNumber(.ErrorFiftyPercentHigh, 1) & ", " & _
                                     FormatNumber(.ErrorFiftyPercentLow, 1) & ", " & FormatNumber(.ErrorTwentyFivePercentLow, 1) & ", " & _
                                     FormatNumber(.ErrorTenPercentLow, 1) & ", " & FormatNumber(.ErrorFivePercentLow, 1) & ", " & _
