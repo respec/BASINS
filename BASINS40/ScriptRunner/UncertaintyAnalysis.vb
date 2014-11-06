@@ -60,15 +60,15 @@ Module SensitivityAndUncertaintyAnalysis
     Private WQConstituents() As Object = {"TSS", "TW", "TP", "TN"}
     Private WQSites() As Object = {"RCH630", "RCH870"}
     ' "RCH916", "RCH922", "RCH936", "RCH938", "RCH890", "RCH752", "RCH912"}
-    Private TypeOfAnalysis As String = "Sensitivity"
-    'Private TypeOfAnalysis As String = "Uncertainty"
+    'Private TypeOfAnalysis As String = "Sensitivity"
+    Private TypeOfAnalysis As String = "Uncertainty"
     Private Value As Single = 0.0
     Private lSeasons As New atcSeasonsYearSubset(aStartMonth:=6, aStartDay:=1, aEndMonth:=8, aEndDay:=31)
     Private Parameters(30, 2) As Object
 
     Private Sub Initialize()
 
-        pTestpath = "C:\BASINS\modelout\IRW\SA\"
+
         pBaseName = "IRW"
         pHydrology = True
         pWaterQuality = True
@@ -76,8 +76,10 @@ Module SensitivityAndUncertaintyAnalysis
         Select Case TypeOfAnalysis
             Case "Sensitivity"
                 pParameterFile = "C:\BASINS\modelout\IRW\SA\ParameterValue_Sensitivity.dbf"
+                pTestpath = "C:\BASINS\modelout\IRW\SA\"
             Case "Uncertainty"
-                pParameterFile = "C:\BASINS\modelout\IRW\UA\MFACT032514.csv"
+                pParameterFile = "C:\BASINS\modelout\IRW\UA\MFACT_110614.csv"
+                pTestpath = "C:\BASINS\modelout\IRW\UA\"
         End Select
 
             End Sub
@@ -123,16 +125,16 @@ Module SensitivityAndUncertaintyAnalysis
                 Select Case WQConstituents(i)
                     Case "TSS"
                         WQOutputLine = WQOutputLine & _
-                        ",Mean Ann. TSS Load (tons/year), Mean TSS Conc.(mg/l)," & _
+                        ",Mean Ann. TSS Load (tons/year), Mean Daily TSS Load (tons/day), Mean TSS Conc.(mg/l)," & _
                         "Geom. Mean TSS Conc. (mg/l), 10% High TSS Conc.(mg/l), 50% Low TSS Conc.(mg/l)"
 
                     Case "TP"
                         WQOutputLine = WQOutputLine & _
-                        ",Mean Ann. TP Load (lbs/yr), Mean TP Conc. (mg/l)," & _
+                        ",Mean Ann. TP Load (lbs/yr), Mean Daily TP Load (lbs/day), Mean TP Conc. (mg/l)," & _
                         "Geom. Mean TP Conc. (mg/l), 10% High TP Conc.(mg/l), 50% Low TP Conc. (mg/l)"
                     Case "TN"
                         WQOutputLine = WQOutputLine & _
-                        ",Mean Annual TN Load (lbs/yr), Mean TN Conc. (mg/l)," & _
+                        ",Mean Annual TN Load (lbs/yr), Mean Daily TN Load (lbs/day), Mean TN Conc. (mg/l)," & _
                         "Geom. Mean TN Conc. (mg/l), 10% High TN Conc.(mg/l), 50% Low TN Conc.(mg/l)"
                     Case "TW"
                         WQOutputLine = WQOutputLine & _
@@ -153,10 +155,11 @@ Module SensitivityAndUncertaintyAnalysis
         
         Dim j As Integer
         Dim lExitCode As Integer = 0
+        Dim ParameterDetails As String = "SIMID, OPERATION, TABLE, OPERATIONNUMBER," & _
+                                                "PARMATERNAME, MONTH/TYPE, PARAMETERVALUE" & vbCrLf
         Select Case TypeOfAnalysis
             Case "Sensitivity"
-                Dim ParameterDetails As String = "SIMID, OPERATION, TABLE, OPERATIONNUMBER," & _
-                                                "PARMATERNAME, MONTH/TYPE, PARAMETERVALUE" & vbCrLf
+                
 
                 'Sensitivity(0, 0) = "Baseline"
                 'Sensitivity(0, 1) = (0)
@@ -165,7 +168,8 @@ Module SensitivityAndUncertaintyAnalysis
                 'If lExitCode = -1 Then
                 '    MsgBox("The original uci file could not run. Program will exit")
                 'End If
-                ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestpath, YearsofSimulation, lStats) 'Baseline simulation and recording the values
+                ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestpath, YearsofSimulation, lStats)
+                'Baseline simulation and recording the values
 
                 Dim DBFRecords As Integer
                 lUci.Save()
@@ -195,22 +199,33 @@ Module SensitivityAndUncertaintyAnalysis
                         Logger.Dbg("Changing the parameters in the UCI file!")
                         Select Case True
                             Case oTable.Contains("EXTNL")
-                                For Each lMetSeg As HspfMetSeg In lUci.MetSegs
-                                    Select Case oParameter
-                                        Case "PREC"
-                                            MetSegRec = 0
-                                        Case "ATEM"
-                                            MetSegRec = 2
-                                        Case "SOLR"
-                                            MetSegRec = 5
-                                    End Select
-                                    lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP _
-                                                                                             * pValue(j), 3)
-                                    'lMetSeg.MetSegRecs(MetSegRec).MFactP = lMetSeg.MetSegRecs(MetSegRec).MFactP * pValue
-                                    lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR _
-                                                                                             * pValue(j), 3)
+                                If oParameter = "POINT SOURCES" Then
+                                    Dim lRchresOperations As HspfOperations = lUci.OpnBlks("RCHRES").Ids
+                                    For Each lReach As HspfOperation In lRchresOperations
+                                        For Each lSource As HspfPointSource In lReach.PointSources
+                                            If lSource.Target.Group = "INFLOW" Then
+                                                lSource.MFact = SignificantDigits(lSource.MFact * pValue(j), 3)
+                                            End If
+                                        Next
+                                    Next
+                                Else
+                                    For Each lMetSeg As HspfMetSeg In lUci.MetSegs
+                                        Select Case oParameter
+                                            Case "PREC"
+                                                MetSegRec = 0
+                                            Case "ATEM"
+                                                MetSegRec = 2
+                                            Case "SOLR"
+                                                MetSegRec = 5
+                                        End Select
 
-                                Next
+                                        lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP _
+                                                                                             * pValue(j), 3)
+                                        'lMetSeg.MetSegRecs(MetSegRec).MFactP = lMetSeg.MetSegRecs(MetSegRec).MFactP * pValue
+                                        lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR _
+                                                                                                 * pValue(j), 3)
+                                    Next
+                                End If
 
                             Case oTable.Contains("MON-")
                                 For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
@@ -275,7 +290,7 @@ Module SensitivityAndUncertaintyAnalysis
                                     If lMasslink.MassLinkId = lMassLinkID AndAlso lMasslink.Source.Group.Contains(oParameter) Then
                                         lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue(j), 3)
                                     End If
-                                    If lMassLinkID = 21 Then
+                                    If lMassLinkID = 11 Then
 
                                         If lMasslink.MassLinkId = 1 AndAlso lMasslink.Source.Group.Contains("IQUAL") Then
                                             lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue(j), 3)
@@ -320,7 +335,7 @@ Module SensitivityAndUncertaintyAnalysis
 
                 Logger.Dbg("Runs for Sensitivity Analysis finished.")
             Case "Uncertainty"
-                lcsv.OpenFile(pParameterFile) 'Opening the dbf file that has the parameter values
+                lcsv.OpenFile(pParameterFile) 'Opening the csv file that has the parameter values
                 'lcsv.Header = 3
                 Dim TotalNumberOfParameters, ParameterNumber, k As Integer
                 TotalNumberOfParameters = lcsv.NumFields - 1
@@ -334,8 +349,8 @@ Module SensitivityAndUncertaintyAnalysis
                     Next k
                 Next CurrentRecord
 
-                For NumberOfSimulations As Integer = 101 To lcsv.NumRecords
-                    'Going through the records in dbf file and changing them in the uci file
+                For NumberOfSimulations As Integer = 3 To lcsv.NumRecords
+                    'Going through the records in the csv file and changing them in the uci file
                     lcsv.CurrentRecord = NumberOfSimulations
                     SimID = lcsv.Value(1)
                     'MsgBox("HSPF Simulation " & SimID & " of " & lcsv.NumRecords - 3 & " going on!")
@@ -348,33 +363,130 @@ Module SensitivityAndUncertaintyAnalysis
                         oParameter = Parameters(ParameterNumber - 1, 2)
                         pValue = lcsv.Value(ParameterNumber + 1)
 
-                        If oTable = "EXTNL" Then
-                            For Each lMetSeg As HspfMetSeg In lUci.MetSegs
-                                Select Case oParameter
-                                    Case "PREC"
-                                        MetSegRec = 0
-                                    Case "ATEM"
-                                        MetSegRec = 2
-                                    Case "SOLR"
-                                        MetSegRec = 5
-                                End Select
-                                lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP * pValue, 3)
-                                lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR * pValue, 3)
-                            Next
-                        Else
-                            For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
-                                If oTable.Contains("MON") And oParameter = "" Then
-                                    'When the monthly tables are provided, the value in each month will be updated with the MultiplicationFactor
-                                    For Mon = 0 To 11
-                                        lOper.Tables(oTable).Parms(Mon).Value = SignificantDigits(lOper.Tables(oTable).Parms(Mon).Value * pValue, 2)
-                                        'lOper.Tables(oTable).Parms(Mon).Value = lOper.Tables(oTable).Parms(Mon).Value * pValue
+                        Select Case True
+                            Case oTable.Contains("EXTNL")
+                                If oParameter = "POINT SOURCES" Then
+                                    Dim lRchresOperations As HspfOperations = lUci.OpnBlks("RCHRES").Ids
+                                    For Each lReach As HspfOperation In lRchresOperations
+                                        For Each lSource As HspfPointSource In lReach.PointSources
+                                            If lSource.Target.Group = "INFLOW" Then
+                                                lSource.MFact = SignificantDigits(lSource.MFact * pValue, 3)
+                                            End If
+                                        Next
                                     Next
                                 Else
-                                    lOper.Tables(oTable).ParmValue(oParameter) = SignificantDigits(lOper.Tables(oTable).ParmValue(oParameter) * pValue, 3)
-                                End If
-                            Next
-                        End If
+                                    For Each lMetSeg As HspfMetSeg In lUci.MetSegs
+                                        Select Case oParameter
+                                            Case "PREC"
+                                                MetSegRec = 0
+                                            Case "ATEM"
+                                                MetSegRec = 2
+                                            Case "SOLR"
+                                                MetSegRec = 5
+                                        End Select
 
+                                        lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP _
+                                                                                             * pValue, 3)
+                                        'lMetSeg.MetSegRecs(MetSegRec).MFactP = lMetSeg.MetSegRecs(MetSegRec).MFactP * pValue
+                                        lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR _
+                                                                                                 * pValue, 3)
+                                    Next
+                                End If
+
+                            Case oTable.Contains("MON-")
+                                For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
+                                    If oLandUse = "" Or lOper.Description = oLandUse Then
+                                        For Mon = 0 To 11
+                                            lOper.Tables(oTable).Parms(Mon).Value = SignificantDigits(lOper.Tables(oTable).Parms(Mon).Value _
+                                                                                                      * pValue, 2)
+                                            'If (lOper.Tables(oTable).Parms(Mon).Value < LowerLimit) Then
+                                            '    lOper.Tables(oTable).Parms(Mon).Value = LowerLimit
+                                            'ElseIf (lOper.Tables(oTable).Parms(Mon).Value > UpperLimit) Then
+                                            '    lOper.Tables(oTable).Parms(Mon).Value = UpperLimit
+                                            'End If
+                                            ParameterDetails &= SimID & "," & pOper & "," & oTable & "," & lOper.Id & "," & _
+                                            oParameter & "," & Mon & "," & lOper.Tables(oTable).Parms(Mon).Value & vbCrLf
+                                            IO.File.AppendAllText(pBaseName & "_ParameterDetails.txt", ParameterDetails)
+                                            ParameterDetails = ""
+                                        Next
+
+                                    End If
+                                Next
+
+                            Case oTable.Contains("NUT-BEDCONC")
+
+                                Dim lParameters() As String = {"BNH4(1)", "BNH4(2)", "BNH4(3)", "BPO4(1)", "BPO4(2)", "BPO4(3)"}
+                                For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
+                                    For Each lParameter As String In lParameters
+                                        lOper.Tables("NUT-BEDCONC").ParmValue(lParameter) = _
+                                        SignificantDigits(lOper.Tables("NUT-BEDCONC").ParmValue(lParameter) * pValue, 3)
+                                    Next
+                                Next
+
+                            Case oTable.Contains("PLNK-PARM2")
+                                'If oTable.Contains("PLNK-PARM2") Then Stop
+
+                                Dim lParameters() As String = {"CMMLT", "CMMN", "CMMNP", "CMMP"}
+                                For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
+                                    For Each lParameter As String In lParameters
+                                        lOper.Tables("PLNK-PARM2").ParmValue(lParameter) = _
+                                        SignificantDigits(lOper.Tables("PLNK-PARM2").ParmValue(lParameter) * pValue, 3)
+                                    Next
+                                Next
+
+                            Case oTable.Contains("SILT-CLAY-PM")
+                                For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
+                                    For SedimentType As Integer = 15 To 16
+
+                                        lOper.Tables(SedimentType).ParmValue(oParameter) = _
+                                        SignificantDigits(lOper.Tables(SedimentType).ParmValue(oParameter) * pValue, 3)
+                                        If oParameter = "TAUCD" Then
+                                            lOper.Tables(SedimentType).ParmValue("TAUCS") = _
+                                        SignificantDigits(lOper.Tables(SedimentType).ParmValue("TAUCS") * pValue, 3)
+                                        End If
+
+                                    Next
+
+                                Next
+                            Case oTable.Contains("MASS-LINK")
+                                Dim lMassLinkID As Integer
+                                lMassLinkID = Mid(oTable, 10)
+
+                                For Each lMasslink As HspfMassLink In lUci.MassLinks
+                                    If lMasslink.MassLinkId = lMassLinkID AndAlso lMasslink.Source.Group.Contains(oParameter) Then
+                                        lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue, 3)
+                                    End If
+                                    If lMassLinkID = 11 Then
+
+                                        If lMasslink.MassLinkId = 1 AndAlso lMasslink.Source.Group.Contains("IQUAL") Then
+                                            lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue, 3)
+                                        End If
+                                    End If
+                                    If oParameter = "NITR" Then
+                                        If lMasslink.MassLinkId = lMassLinkID AndAlso lMasslink.Source.Group.Contains("PHOS") Then
+                                            lMasslink.MFact = SignificantDigits(lMasslink.MFact * pValue, 3)
+                                        End If
+                                    End If
+                                Next
+
+                            Case Else
+                                For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
+                                    If oParameter.Contains("BRBOD(1)") Then oParameter = "BRBOD1"
+                                    If oParameter.Contains("BRBOD(2)") Then oParameter = "BRBOD2"
+                                    lOper.Tables(oTable).ParmValue(oParameter) = _
+                                            SignificantDigits(lOper.Tables(oTable).ParmValue(oParameter) * pValue, 3)
+                                    'If (lOper.Tables(oTable).ParmValue(oParameter) < LowerLimit) Then
+                                    '    lOper.Tables(oTable).ParmValue(oParameter) = LowerLimit
+                                    'ElseIf (lOper.Tables(oTable).ParmValue(oParameter) > UpperLimit) Then
+                                    '    lOper.Tables(oTable).ParmValue(oParameter) = UpperLimit
+                                    'End If
+                                    ParameterDetails &= SimID & "," & pOper & "," & oTable & "," & lOper.Id & "," & _
+                                                                                    oParameter & ",," & _
+                                                                                    lOper.Tables(oTable).ParmValue(oParameter) & vbCrLf
+                                    IO.File.AppendAllText(pBaseName & "_ParameterDetails.txt", ParameterDetails)
+                                    ParameterDetails = ""
+                                Next
+                        End Select
                     Next
                     lUci.Save()
                     pOper = ""
@@ -399,21 +511,16 @@ Module SensitivityAndUncertaintyAnalysis
                                  ByVal YearsofSimulation As Single, _
                                  ByRef lStats As List(Of SensitivityStats))
 
-        'Dim pHSPFExe As String = "C:\Basins41\models\HSPF\bin\WinHspfLt.exe"
-        'Logger.Dbg("Running WinHSPFLt.exe with " & uciName)
-        'lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & uciName) 'Run HSPF program
-        'If lExitCode = -1 Then
-        '    Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
-        '    Exit Sub
-        'End If
-        'Logger.Dbg("Completed WinHSPFLt.exe run with " & uciName)
-        Dim lWdmFileName As String
-        If SimID > 0 Then
-            lWdmFileName = IO.Path.Combine(pTestPath, SimID & "-" & pBaseName & ".wdm")
-        Else
-            lWdmFileName = IO.Path.Combine(pTestPath, pBaseName & ".wdm")
+        Dim pHSPFExe As String = "C:\Basins41\models\HSPF\bin\WinHspfLt.exe"
+        Logger.Dbg("Running WinHSPFLt.exe with " & uciName)
+        lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & uciName) 'Run HSPF program
+        If lExitCode = -1 Then
+            Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
+            Exit Sub
         End If
-        'lWdmFileName = IO.Path.Combine(pTestPath, pBaseName & ".wdm")
+        Logger.Dbg("Completed WinHSPFLt.exe run with " & uciName)
+        Dim lWdmFileName As String
+        lWdmFileName = IO.Path.Combine(pTestPath, pBaseName & ".wdm")
         Dim lWdmDataSource As New atcWDM.atcDataSourceWDM
         lWdmDataSource = atcDataManager.DataSourceBySpecification(lWdmFileName)
         If lWdmDataSource IsNot Nothing Then
@@ -575,9 +682,7 @@ Module SensitivityAndUncertaintyAnalysis
         End If
         If pWaterQuality Then
             Logger.Dbg("Calculating Water Quality Statistics for SimID = " & SimID)
-            Dim AverageSedimentLoad, AverageWaterTemperature, AverageSummerWaterTemperature, _
-                AverageTPLoad, AverageTNLoad As Single
-            Dim lTser, lSummerTS As atcTimeseries
+
             Dim lSeasonsAnnual As New atcSeasonsCalendarYear
             Dim lyearlyTSGroup As New atcTimeseriesGroup
             Dim lTenPercentHigh, lFiftyPercentLow As Double
@@ -589,10 +694,13 @@ Module SensitivityAndUncertaintyAnalysis
                 For WQIndex = 0 To WQConstituents.GetUpperBound(0)
                     Select Case WQConstituents(WQIndex)
                         Case "TSS"
-                            lTser = lWdmDataSource.DataSets.FindData("Constituent", "ROSED4"). _
+
+                            Dim lTser As atcTimeseries = lWdmDataSource.DataSets.FindData("Constituent", "ROSED4"). _
                                         FindData("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                            AverageSedimentLoad = lTser.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+                            lTser = Aggregate(lTser, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                            Dim AverageAnnualSedimentLoad As Single = lTser.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+                            Dim AverageDailySedimentLoad As Single = lTser.Attributes.GetValue("Mean")
                             'Assuming sediment load per day per reach in tons in output from all the reaches
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TSS").FindData("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
@@ -611,28 +719,30 @@ Module SensitivityAndUncertaintyAnalysis
 
                             'lTenPercentHigh = lTenPercentHigh / YearsofSimulation
                             'lFiftyPercentLow = lFiftyPercentLow / YearsofSimulation
-                            ExpertStatsOutputLine &= AverageSedimentLoad & "," & lMeanConc & "," & lGeoMeanConc & "," & _
+                            ExpertStatsOutputLine &= AverageAnnualSedimentLoad & "," & AverageDailySedimentLoad & ", " & lMeanConc & _
+                                                    "," & lGeoMeanConc & "," & _
                             lTenPercentHigh & "," & lFiftyPercentLow & ","
                             lTser.Clear()
                             lyearlyTSGroup.Clear()
                         Case "TW"
-                            lTser = lWdmDataSource.DataSets.FindData("Constituent", "TW"). _
+                            Dim lTser As atcTimeseries = lWdmDataSource.DataSets.FindData("Constituent", "TW"). _
                                     FindData("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                             lTser = Aggregate(lTser, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-                            AverageWaterTemperature = lTser.Attributes.GetDefinedValue("Mean").Value
+                            Dim AverageWaterTemperature As Single = lTser.Attributes.GetDefinedValue("Mean").Value
                             lSeasons.SeasonSelected(0) = True
-                            lSummerTS = lSeasons.SplitBySelected(lTser, Nothing).ItemByIndex(1)
-                            AverageSummerWaterTemperature = lSummerTS.Attributes.GetDefinedValue("Mean").Value
+                            Dim lSummerTS As atcTimeseries = lSeasons.SplitBySelected(lTser, Nothing).ItemByIndex(1)
+                            Dim AverageSummerWaterTemperature As Single = lSummerTS.Attributes.GetDefinedValue("Mean").Value
                             ExpertStatsOutputLine &= AverageWaterTemperature & "," & AverageSummerWaterTemperature & ","
                             lSummerTS.Clear()
                             lTser.Clear()
                         Case "TP"
-                            lTser = lWdmDataSource.DataSets.FindData("Constituent", "TPLD"). _
+                            Dim lTser As atcTimeseries = lWdmDataSource.DataSets.FindData("Constituent", "TPLD"). _
                                     FindData("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-
-                            AverageTPLoad = lTser.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+                            lTser = Aggregate(lTser, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                            Dim AverageAnnualTPLoad As Single = lTser.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+                            Dim AverageDailyTPLoad As Single = lTser.Attributes.GetValue("Mean")
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TP").FindData _
                                     ("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
@@ -650,15 +760,17 @@ Module SensitivityAndUncertaintyAnalysis
                             'Next
                             'lTenPercentHigh = lTenPercentHigh / YearsofSimulation
                             'lFiftyPercentLow = lFiftyPercentLow / YearsofSimulation
-                            ExpertStatsOutputLine &= AverageTPLoad & "," & lMeanConc & "," & lGeoMeanConc & "," & _
+                            ExpertStatsOutputLine &= AverageAnnualTPLoad & "," & AverageDailyTPLoad & ", " & lMeanConc & "," & lGeoMeanConc & "," & _
                             lTenPercentHigh & "," & lFiftyPercentLow & ","
                             lTser.Clear()
                             lyearlyTSGroup.Clear()
                         Case "TN"
-                            lTser = lWdmDataSource.DataSets.FindData("Constituent", "TNLD"). _
+                            Dim lTser As atcTimeseries = lWdmDataSource.DataSets.FindData("Constituent", "TNLD"). _
                                     FindData("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                            AverageTNLoad = lTser.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+                            lTser = Aggregate(lTser, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                            Dim AnnualAverageTNLoad As Single = lTser.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+                            Dim DailyAverageTNLoad As Single = lTser.Attributes.GetValue("Mean")
                             lTser = lWdmDataSource.DataSets.FindData("Constituent", "TN").FindData _
                                     ("Location", WQSites(Site))(0)
                             lTser = SubsetByDate(lTser, lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
@@ -675,7 +787,7 @@ Module SensitivityAndUncertaintyAnalysis
                             'Next
                             'lTenPercentHigh = lTenPercentHigh / YearsofSimulation
                             'lFiftyPercentLow = lFiftyPercentLow / YearsofSimulation
-                            ExpertStatsOutputLine &= AverageTNLoad & "," & lMeanConc & "," & lGeoMeanConc & "," & _
+                            ExpertStatsOutputLine &= AnnualAverageTNLoad & "," & DailyAverageTNLoad & ", " & lMeanConc & "," & lGeoMeanConc & "," & _
                                 lTenPercentHigh & "," & lFiftyPercentLow & ","
                             lTser.Clear()
                             lyearlyTSGroup.Clear()
