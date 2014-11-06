@@ -1,22 +1,12 @@
-﻿'Imports MapWindow.Interfaces
-Imports System.Windows.Forms.DialogResult
+﻿Imports System.Windows.Forms.DialogResult
 Imports System.IO
 Public Class StartUp
-    'Private g_MapWin As IMapWin
     Private Sub cmdStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdStart.Click
-        'Try
         ScriptMain(Nothing)
-        'Catch ex As Exception
-        '    MapWinUtility.Logger.Msg(ex.Message)
-        'End Try
     End Sub
 
     Private Sub cmdBrowse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBrowse.Click
         Dim lOpenDialog As New Windows.Forms.OpenFileDialog
-        'Dim lFileName As String
-        'Dim lPathName As String
-        'Dim lRunFolder As String
-        'Dim lPath() As String
 
         With lOpenDialog
             .Title = "Select UCI File from Current Calibration Run"
@@ -24,20 +14,9 @@ Public Class StartUp
             .FilterIndex = 0
             .Multiselect = False
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                'lFileName = .SafeFileName 'returns just file name and extension
-                'lPathName = Strings.Left(.FileName, Len(.FileName) - Len(lFileName)) 'gets path name from file name, removing file name and extension
                 txtUCIPath.Text = .FileName ' lPathName
-                'check for run number
-                'lPath = Split(lPathName, "\")
-                'lRunFolder = lPath(lPath.GetUpperBound(0) - 1) 'for some reason there is a blank in the top dimension
-                'Dim UCIFilePrefix As String = Strings.Left(lFileName, Len(lFileName) - 4)
-                'takes the file name minus the 4 character extension
-                'txtPrefix.Text = UCIFilePrefix
                 txtUCIPath.Visible = True
-                'txtPrefix.Visible = True
                 txtRCH.Visible = True
-                'lblPrefix.Visible = True
-                lblPrefixWarning.Visible = True
                 lblRCH.Visible = True
                 lblOutReach2.Visible = True
                 pnlHighlight.Visible = True
@@ -55,8 +34,8 @@ Public Class StartUp
         
     End Sub
 
-    Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged, chkTotalNitrogen.CheckedChanged, chkTotalPhosphorus.CheckedChanged, chkBODBalance.CheckedChanged
-        If chkWaterBalance.Checked OrElse chkSedimentBalance.Checked OrElse chkTotalNitrogen.Checked OrElse chkTotalPhosphorus.Checked OrElse chkBODBalance.Checked Then
+    Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged, chkTotalNitrogen.CheckedChanged, chkTotalPhosphorus.CheckedChanged, chkBODBalance.CheckedChanged, chkFecalColiform.CheckedChanged
+        If chkWaterBalance.Checked OrElse chkSedimentBalance.Checked OrElse chkTotalNitrogen.Checked OrElse chkTotalPhosphorus.Checked OrElse chkBODBalance.Checked OrElse chkFecalColiform.Checked Then
             lblRCH.Enabled = True
             lblOutReach2.Enabled = True
             txtRCH.Enabled = True
@@ -70,23 +49,12 @@ Public Class StartUp
 
     End Sub
 
-    Private Sub chkSupportingGraphs_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkGraphStandard.CheckedChanged, chkSupportingGraphs.CheckedChanged
-        chkLogGraphs.Enabled = chkSupportingGraphs.Checked OrElse chkGraphStandard.Checked
-        If Not chkLogGraphs.Enabled Then
-            chkLogGraphs.Checked = False
-        End If
-    End Sub
-
     Private Sub chkExpertStats_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkExpertStats.CheckedChanged
         If chkExpertStats.Checked Then
-
-            grpGraphs.Enabled = True
+            chkGraphStandard.Checked = True
         Else
-            chkAreaReports.Enabled = False
-            grpGraphs.Enabled = False
-
             chkGraphStandard.Checked = False
-            chkSupportingGraphs.Checked = False
+
         End If
     End Sub
 
@@ -131,4 +99,6 @@ Public Class StartUp
     Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkHydrologySensitivity.CheckedChanged
 
     End Sub
+
+   
 End Class
