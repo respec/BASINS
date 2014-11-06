@@ -18,8 +18,8 @@ Public Class atcExpertSystem
     Private pFlowOnly As Boolean
     Private pStatistics As New HexStatistics
     Private pDatasetTypes As New HexDatasetTypes
-    Private pSummerMonths() As Integer = {5, 6, 7}
-    Private pWinterMonths() As Integer = {10, 11, 12}
+    Private pSummerMonths() As Integer = {6, 7, 8}
+    Private pWinterMonths() As Integer = {12, 1, 2}
     Private pUci As atcUCI.HspfUci
     Private pDataSource As atcDataSource
 
@@ -77,18 +77,15 @@ Public Class atcExpertSystem
                 End If
             Next
 
-            'Dim lExsFileString As String = WholeFileString(lFileName)
-            'Dim lExsRecords() As String = lExsFileString.Split(vbLf)
-
-            'Read first line of file
-
             Dim lExsRecord As String = lExsRecords(0).PadRight(51)
             pName = Trim(lExsRecord.Substring(0, 8))
             Dim lWdmFilename As String = CurDir() & "\" & pName & ".wdm"
             'Not sure if CurDir is the best way
             ' Dim pDatasource As New atcDataSource
-            If atcDataManager.OpenDataSource(lWdmFilename) Then
-                pDatasource = atcDataManager.DataSourceBySpecification(lWdmFilename)
+            pDataSource = atcDataManager.DataSourceBySpecification(lWdmFilename)
+            If pDataSource Is Nothing Then
+                atcDataManager.OpenDataSource(lWdmFilename)
+                pDataSource = atcDataManager.DataSourceBySpecification(lWdmFilename)
             End If
 
             Dim lNSites As Integer
@@ -114,15 +111,19 @@ Public Class atcExpertSystem
                 If Not (Integer.TryParse(lExsRecord.Substring(52, 4), lDate(0)) _
                     AndAlso Integer.TryParse(lExsRecord.Substring(56, 2), lDate(1)) _
                     AndAlso Integer.TryParse(lExsRecord.Substring(58, 2), lDate(2))) Then
-                    Throw New ApplicationException("The analysis start and end dates in EXS file are not in correct format. Program will quit!")
+                    Throw New ApplicationException("The analysis start date in EXS file is not in correct format. Program will quit!")
                 End If
+                lDate(3) = 0
+                lDate(4) = 0
                 SDateJ = Date2J(lDate)
 
                 If Not (Integer.TryParse(lExsRecord.Substring(62, 4), lDate(0)) _
                   AndAlso Integer.TryParse(lExsRecord.Substring(66, 2), lDate(1)) _
                   AndAlso Integer.TryParse(lExsRecord.Substring(68, 2), lDate(2))) Then
-                    Throw New ApplicationException("The analysis start and end dates in EXS file are not in correct format. Program will quit!")
+                    Throw New ApplicationException("The analysis end date in EXS file is not in correct format. Program will quit!")
                 End If
+                lDate(3) = 24
+                lDate(4) = 0
                 EDateJ = Date2J(lDate)
                 Logger.Dbg("The simulation time period from the exs file is used for the calibration")
             End If
