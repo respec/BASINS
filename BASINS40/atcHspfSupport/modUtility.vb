@@ -111,124 +111,124 @@ Public Module Utility
         End If
         Return pConstituentsThatNeedMassLink
     End Function
-    Friend Function ConstituentsToOutput(ByVal aType As String, _
+    Public Function ConstituentsToOutput(ByVal aType As String, _
                                 Optional ByVal aCategory As Boolean = False) As atcCollection
         Dim lConstituentsToOutput As New atcCollection
         Select Case aType
             Case "Water"
-            With lConstituentsToOutput
-                      .Add("I:Header0", "Influx")
-                      .Add("I:SUPY", "    Rainfall")
-                      .Add("I:Header1", "Runoff")
-                      .Add("I:SURO", "    Surface ")
-                      .Add("I:Header2", "Evaporation")
-                      .Add("I:PET", "    Potential")
-                      .Add("I:IMPEV", "    Actual  ")
-                      .Add("P:Header0", "Influx")
-                      .Add("P:SUPY", "    Rainfall")
-                      .Add("P:SURLI", "    Irrigation")
-                      .Add("P:Header1", "Runoff")
-                      .Add("P:SURO", "    Surface  ")
-                      .Add("P:IFWO", "    Interflow")
-                      .Add("P:AGWO", "    Baseflow ")
+                With lConstituentsToOutput
+                    .Add("I:Header0", "Influx")
+                    .Add("I:SUPY", "    Rainfall")
+                    .Add("I:Header1", "Runoff")
+                    .Add("I:SURO", "    Surface ")
+                    .Add("I:Header2", "Evaporation")
+                    .Add("I:PET", "    Potential")
+                    .Add("I:IMPEV", "    Actual  ")
+                    .Add("P:Header0", "Influx")
+                    .Add("P:SUPY", "    Rainfall")
+                    .Add("P:SURLI", "    Irrigation")
+                    .Add("P:Header1", "Runoff")
+                    .Add("P:SURO", "    Surface  ")
+                    .Add("P:IFWO", "    Interflow")
+                    .Add("P:AGWO", "    Baseflow ")
                     .Add("P:Total3", "    Total    ")
-                      .Add("P:Header2", "GW Inflow")
-                      .Add("P:IGWI", "    Deep    ")
-                      .Add("P:AGWI", "    Active  ")
+                    .Add("P:Header2", "GW Inflow")
+                    .Add("P:IGWI", "    Deep    ")
+                    .Add("P:AGWI", "    Active  ")
                     '.Add("P:Total2", "    Total   ") 'need total of prev 2 rows
-                      .Add("P:AGWLI", "    Pumping")
-                      .Add("P:Header3", "Evaporation")
-                      .Add("P:PET", "    Potential")
-                      .Add("P:CEPE", "    Intercep St")
-                      .Add("P:UZET", "    Upper Zone")
-                      .Add("P:LZET", "    Lower Zone")
-                      .Add("P:AGWET", "    Grnd Water")
-                      .Add("P:BASET", "    Baseflow")
-                      .Add("P:TAET", "    Total   ")
-                      .Add("R:Header0", "Flow")
-                      .Add("R:ROVOL", "    OutVolume")
-                If aCategory Then 'user used categories to indicate where water came from
-                     .Add("R:ROVOL1", "    OVolPtIn")
-                     .Add("R:ROVOL1-1", "    OVolPtInX1")
-                     .Add("R:ROVOL1-2", "    OVolPtInX2")
-                     .Add("R:ROVOL2", "    OVolNPIn")
-                     .Add("R:ROVOL2-1", "    OVolNPInX1")
-                     .Add("R:ROVOL2-2", "    OVolNPInX2")
-                     .Add("R:ROVOL3", "    OVolPmpIn")
-                     .Add("R:ROVOL3-1", "    OVolPmpInX1")
-                     .Add("R:ROVOL3-2", "    OVolPmpInX2")
-                     .Add("R:ROVOL4", "    OVolRsvIn")
-                     .Add("R:ROVOL4-1", "    OVolRsvInX1")
-                     .Add("R:ROVOL4-2", "    OVolRsvInX2")
-                Else
-                     .Add("R:IVOL", "     InVolume")
-                End If
-                     .Add("R:PRSUPY", "    SurfPrecVol")
-                     .Add("R:VOLEV", "    SurfEvapVol")
-              End With
+                    .Add("P:AGWLI", "    Pumping")
+                    .Add("P:Header3", "Evaporation")
+                    .Add("P:PET", "    Potential")
+                    .Add("P:CEPE", "    Intercep St")
+                    .Add("P:UZET", "    Upper Zone")
+                    .Add("P:LZET", "    Lower Zone")
+                    .Add("P:AGWET", "    Grnd Water")
+                    .Add("P:BASET", "    Baseflow")
+                    .Add("P:TAET", "    Total   ")
+                    .Add("R:Header0", "Flow")
+                    .Add("R:ROVOL", "    OutVolume")
+                    If aCategory Then 'user used categories to indicate where water came from
+                        .Add("R:ROVOL1", "    OVolPtIn")
+                        .Add("R:ROVOL1-1", "    OVolPtInX1")
+                        .Add("R:ROVOL1-2", "    OVolPtInX2")
+                        .Add("R:ROVOL2", "    OVolNPIn")
+                        .Add("R:ROVOL2-1", "    OVolNPInX1")
+                        .Add("R:ROVOL2-2", "    OVolNPInX2")
+                        .Add("R:ROVOL3", "    OVolPmpIn")
+                        .Add("R:ROVOL3-1", "    OVolPmpInX1")
+                        .Add("R:ROVOL3-2", "    OVolPmpInX2")
+                        .Add("R:ROVOL4", "    OVolRsvIn")
+                        .Add("R:ROVOL4-1", "    OVolRsvInX1")
+                        .Add("R:ROVOL4-2", "    OVolRsvInX2")
+                    Else
+                        .Add("R:IVOL", "     InVolume")
+                    End If
+                    .Add("R:PRSUPY", "    SurfPrecVol")
+                    .Add("R:VOLEV", "    SurfEvapVol")
+                End With
             Case "Sediment"
                 With lConstituentsToOutput
-                     .Add("I:Header0", "Storage(tons/acre)")
-                     .Add("I:SLDS", "  All")
-                     .Add("I:Header1", "Washoff(tons/acre)")
+                    .Add("I:Header0", "Storage(tons/acre)")
+                    .Add("I:SLDS", "  All")
+                    .Add("I:Header1", "Washoff(tons/acre)")
                     .Add("I:SOSLD", "  Total")
 
 
-                     .Add("P:Header0", "Storage (tons/acre)")
-                     .Add("P:DETS", "  Detached ")
-                     .Add("P:Header1", "Washoff (tons/acre)")
+                    .Add("P:Header0", "Storage (tons/acre)")
+                    .Add("P:DETS", "  Detached ")
+                    .Add("P:Header1", "Washoff (tons/acre)")
                     .Add("P:WSSD", "  Washoff of Detached Sediment")
                     .Add("P:SCRSD", "  Scour of Matrix (attached) soil")
                     .Add("P:Total2", "Total Sediment Loss (tons/ac)")
 
-                     .Add("R:BEDDEP", "Bed Depth (ft)")
-                     .Add("R:Header0", "Bed Storage (tons)")
-                     .Add("R:RSED-BED-SAND", "  Sand")
-                     .Add("R:RSED-BED-SILT", "  Silt")
-                     .Add("R:RSED-BED-CLAY", "  Clay")
-                     .Add("R:RSED-BED-TOT", "  Total")
-                     .Add("R:Header1", "Inflow (tons)")
-                     .Add("R:ISED-SAND", "  Sand")
-                     .Add("R:ISED-SILT", "  Silt")
-                     .Add("R:ISED-CLAY", "  Clay")
-                     .Add("R:ISED-TOT", "  Total")
-                     .Add("R:Header2", "Dep(+)/Scour(-) (tons)")
-                     .Add("R:DEPSCOUR-SAND", "  Sand")
-                     .Add("R:DEPSCOUR-SILT", "  Silt")
-                     .Add("R:DEPSCOUR-CLAY", "  Clay")
-                     .Add("R:DEPSCOUR-TOT", "  Total")
-                     .Add("R:Header3", "Outflow (tons)")
-                     .Add("R:ROSED-SAND", "  Sand")
-                     .Add("R:ROSED-SILT", "  Silt")
-                     .Add("R:ROSED-CLAY", "  Clay")
-                     .Add("R:ROSED-TOT", "  Total")
-            End With
+                    .Add("R:BEDDEP", "Bed Depth (ft)")
+                    .Add("R:Header0", "Bed Storage (tons)")
+                    .Add("R:RSED-BED-SAND", "  Sand")
+                    .Add("R:RSED-BED-SILT", "  Silt")
+                    .Add("R:RSED-BED-CLAY", "  Clay")
+                    .Add("R:RSED-BED-TOT", "  Total")
+                    .Add("R:Header1", "Inflow (tons)")
+                    .Add("R:ISED-SAND", "  Sand")
+                    .Add("R:ISED-SILT", "  Silt")
+                    .Add("R:ISED-CLAY", "  Clay")
+                    .Add("R:ISED-TOT", "  Total")
+                    .Add("R:Header2", "Dep(+)/Scour(-) (tons)")
+                    .Add("R:DEPSCOUR-SAND", "  Sand")
+                    .Add("R:DEPSCOUR-SILT", "  Silt")
+                    .Add("R:DEPSCOUR-CLAY", "  Clay")
+                    .Add("R:DEPSCOUR-TOT", "  Total")
+                    .Add("R:Header3", "Outflow (tons)")
+                    .Add("R:ROSED-SAND", "  Sand")
+                    .Add("R:ROSED-SILT", "  Silt")
+                    .Add("R:ROSED-CLAY", "  Clay")
+                    .Add("R:ROSED-TOT", "  Total")
+                End With
             Case "SedimentCopper"
-            With lConstituentsToOutput
-                     .Add("I:SOSLD", "Solids   ")
-                     .Add("I:SOQUAL-Copper", "Copper   ")
-                     .Add("I:SOQS-Copper", "Sed-Assoc Cu")
-                     .Add("I:SOQO-Copper", "Flow-Assoc Cu")
-                     .Add("P:SOSED", "Sediment")
-                     .Add("P:SOQUAL-Copper", "  Surface Cu")
-                     .Add("P:IOQUAL-Copper", "  Interflow Cu")
-                     .Add("P:AOQUAL-Copper", "  Groundwater Cu")
-                     .Add("P:SOQS-Copper", "Sed-Assoc Cu")
-                     .Add("P:SOQO-Copper", "Flow-Assoc Cu")
-                     .Add("P:POQUAL-Copper", "Total Cu")
-                     .Add("R:ROSED-SAND", "  Sand")
-                     .Add("R:ROSED-SILT", "  Silt")
-                     .Add("R:ROSED-CLAY", "  Clay")
-                     .Add("R:ROSED-TOT", "Total Sediment")
-                     .Add("R:Copper-RODQAL", "Disolved Cu")
-                     .Add("R:Copper-ROSQAL-SAND", "  Sand Cu")
-                     .Add("R:Copper-ROSQAL-SILT", "  Silt Cu")
-                     .Add("R:Copper-ROSQAL-CLAY", "  Clay Cu")
-                     .Add("R:Copper-ROSQAL-Tot", "Total Sediment Cu")
-                     .Add("R:Copper-TROQAL", "Total Cu")
-                   End With
+                With lConstituentsToOutput
+                    .Add("I:SOSLD", "Solids   ")
+                    .Add("I:SOQUAL-Copper", "Copper   ")
+                    .Add("I:SOQS-Copper", "Sed-Assoc Cu")
+                    .Add("I:SOQO-Copper", "Flow-Assoc Cu")
+                    .Add("P:SOSED", "Sediment")
+                    .Add("P:SOQUAL-Copper", "  Surface Cu")
+                    .Add("P:IOQUAL-Copper", "  Interflow Cu")
+                    .Add("P:AOQUAL-Copper", "  Groundwater Cu")
+                    .Add("P:SOQS-Copper", "Sed-Assoc Cu")
+                    .Add("P:SOQO-Copper", "Flow-Assoc Cu")
+                    .Add("P:POQUAL-Copper", "Total Cu")
+                    .Add("R:ROSED-SAND", "  Sand")
+                    .Add("R:ROSED-SILT", "  Silt")
+                    .Add("R:ROSED-CLAY", "  Clay")
+                    .Add("R:ROSED-TOT", "Total Sediment")
+                    .Add("R:Copper-RODQAL", "Disolved Cu")
+                    .Add("R:Copper-ROSQAL-SAND", "  Sand Cu")
+                    .Add("R:Copper-ROSQAL-SILT", "  Silt Cu")
+                    .Add("R:Copper-ROSQAL-CLAY", "  Clay Cu")
+                    .Add("R:Copper-ROSQAL-Tot", "Total Sediment Cu")
+                    .Add("R:Copper-TROQAL", "Total Cu")
+                End With
             Case "FColi"
-            With lConstituentsToOutput
+                With lConstituentsToOutput
                     .Add("P:Header1", "F.Coliform (10^9 org/ac)")
                     .Add("P:SOQUAL-F.Coliform", "  Surface")
                     .Add("P:IOQUAL-F.Coliform", "  Interflow")
@@ -240,10 +240,10 @@ Public Module Utility
                     .Add("R:F.Coliform-TIQAL", "  Inflow")
                     .Add("R:F.Coliform-DDQAL-TOT", "  Decay")
                     .Add("R:F.Coliform-TROQAL", "  Outflow")
-            End With
+                End With
             Case "N-PQUAL"
-            With lConstituentsToOutput
-                                 
+                With lConstituentsToOutput
+
                     .Add("P:Header1", "NO3 (lb/ac)")
                     .Add("P:SOQUAL-NO3", "  Surface Flow")
                     .Add("P:IOQUAL-NO3", "  Interflow")
@@ -261,9 +261,9 @@ Public Module Utility
                     .Add("R:Header5", "Totals")
                     .Add("R:N-TOT-IN", "  Total N Inflow")
                     .Add("R:N-TOT-OUT", "  Total N Outflow")
-            End With
+                End With
             Case "P-PQUAL"
-            With lConstituentsToOutput
+                With lConstituentsToOutput
                     .Add("P:Header1", "Ortho P (lb/ac)")
                     .Add("P:WASHQS-ORTHO P", "  Sediment Attached")
                     .Add("P:SOQUAL-ORTHO P", "  Surface Flow")
@@ -275,7 +275,7 @@ Public Module Utility
                     .Add("R:Header3", "Total P")
                     .Add("R:P-TOT-IN", "  Total P Inflow")
                     .Add("R:P-TOT-OUT", "  Total P Outflow")
-            End With
+                End With
             Case "TotalN" 'use PQUAL
                 With lConstituentsToOutput
                     .Add("P:Header1", "Nitrogen Loss (lb/ac)")
@@ -308,7 +308,7 @@ Public Module Utility
                     .Add("P:NITROGEN - TOTAL OUTFLOW", "  Total N Loss")
 
                     .Add("P:Header2", "Nitrogen Storages (lb/ac)")
-                    
+
                     .Add("P:Header2a", "  NH4-N Soln Storage")
                     .Add("P:NH4-N SOL - SURFACE LAYER STORAGE", "    Surface")
                     .Add("P:NH4-N SOL - UPPER PRINCIPAL STORAGE", "    Upper")
@@ -463,8 +463,8 @@ Public Module Utility
 
                     .Add("P:Header4", "NO3 (PQUAL)")
                     .Add("P:SOQUAL-NO3", "  Surface Flow")
-                    .Add("P:IOQUAL-NO3", "  Interflow")        
-                    .Add("P:AOQUAL-NO3", "  Groundwater Flow") 
+                    .Add("P:IOQUAL-NO3", "  Interflow")
+                    .Add("P:AOQUAL-NO3", "  Groundwater Flow")
                     .Add("P:Total3a", "  Total")
 
                     .Add("P:Header5", "NH3+NH4 (PQUAL)")
@@ -476,9 +476,9 @@ Public Module Utility
 
                     .Add("P:Header6", "LabileOrgN(PQUAL)")
                     .Add("P:WASHQS-BOD2", "  Sediment Attached")
-                    .Add("P:SOQUAL-BOD2", "  Surface Flow")     
-                    .Add("P:IOQUAL-BOD2", "  Interflow")        
-                    .Add("P:AOQUAL-BOD2", "  Groundwater Flow") 
+                    .Add("P:SOQUAL-BOD2", "  Surface Flow")
+                    .Add("P:IOQUAL-BOD2", "  Interflow")
+                    .Add("P:AOQUAL-BOD2", "  Groundwater Flow")
                     .Add("P:Total3c", "  Total")
 
                     .Add("P:Header7", "RefOrgN (PQUAL)")
@@ -524,7 +524,7 @@ Public Module Utility
                     .Add("R:Header16", "Total N")
                     .Add("R:N-TOT-IN", "  Total N Inflow")
                     .Add("R:N-TOT-OUT", "  Total N Outflow")
-              End With
+                End With
                 '.Add("R:TAM-OUTTOT-EXIT3", "  Total NH3 Outflow-Exit3")
                 '.Add("R:TAM-OUTDIS-EXIT3", "  Dissolved NH3 Outflow-Exit3")
                 '.Add("R:TAM-OUTPART-TOT-EXIT3", "  Particulate NH3 Outflow-Exit3")
@@ -548,7 +548,7 @@ Public Module Utility
                     .Add("P:SDORP", "    Refractory Org P from SEDP 1")
 
                     .Add("P:Total3", "    Total P Loss")
-                 
+
                     .Add("P:Header2", "Plant P")
                     .Add("P:PLANT P - SURFACE LAYER", "    Surface")
                     .Add("P:PLANT P - UPPER PRINCIPAL", "    Upper")
@@ -575,7 +575,7 @@ Public Module Utility
                     .Add("P:ORGANIC P - LOWER LAYER", "    Lower")
                     .Add("P:ORGANIC P - ACTIVE GROUNDWATER", "    GW")
                     .Add("P:ORGANIC P - TOTALS", "    Total")
-                     
+
                     .Add("P:Header6", "P FLUXES")
                     .Add("P:Header6a", "  Atmospheric Deposition (lb/a)")
                     .Add("P:PO4-P - SURFACELAYER - TOTAL", "    PO4-P - Surface")
@@ -616,16 +616,16 @@ Public Module Utility
 
                     .Add("P:Header8", "RefOrgP (PQUAL)")
                     .Add("P:WASHQS-BOD1", "  Sediment Attached")
-                    .Add("P:SOQUAL-BOD1", "  Surface Flow")    
-                    .Add("P:IOQUAL-BOD1", "  Interflow")       
+                    .Add("P:SOQUAL-BOD1", "  Surface Flow")
+                    .Add("P:IOQUAL-BOD1", "  Interflow")
                     .Add("P:AOQUAL-BOD1", "  Groundwater Flow")
                     .Add("P:Total3b", "  Total")
 
                     .Add("P:Header9", "LabileOrgP (PQUAL)")
                     .Add("P:WASHQS-BOD2", "  Sediment Attached")
-                    .Add("P:SOQUAL-BOD2", "  Surface Flow")     
-                    .Add("P:IOQUAL-BOD2", "  Interflow")        
-                    .Add("P:AOQUAL-BOD2", "  Groundwater Flow") 
+                    .Add("P:SOQUAL-BOD2", "  Surface Flow")
+                    .Add("P:IOQUAL-BOD2", "  Interflow")
+                    .Add("P:AOQUAL-BOD2", "  Groundwater Flow")
                     .Add("P:Total3c", "  Total")
 
                     .Add("I:Header10", "Ortho P (IQUAL)")
@@ -668,10 +668,10 @@ Public Module Utility
                     .Add("P:AOQUAL-BOD", "  Groundwater Flow")
                     .Add("P:POQUAL-BOD", "  Total")
                     .Add("P:ORGN - TOTAL OUTFLOW", "  BOD from OrganicN")
-                    
+
                     .Add("I:Header2", "BOD")
                     .Add("I:SOQUAL-BOD", "  Surface Flow")
-                    
+
                     .Add("R:Header3", "BOD")
                     .Add("R:BODIN", "  BODIN")
                     .Add("R:BODFLUX-BODDEC", "  BODFLUX-BODDEC")
@@ -681,7 +681,7 @@ Public Module Utility
                     .Add("R:BODFLUX-ZOO", "  R:BODFLUX-ZOO")
                     .Add("R:BODFLUX-BENTHIC", "  BODFLUX-BENTHIC")
                     .Add("R:BODOUTTOT", "  BODOUTTOT")
-            End With
+                End With
         End Select
         Return lConstituentsToOutput
     End Function
