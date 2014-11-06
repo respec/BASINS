@@ -305,19 +305,25 @@ Public Module Graph
         'Becky added aMakeLog so user can specify whether or not to print the log charts; default to true so I don't break anything preexisting
         For Each lStorm As HexStorm In aExpSystem.Storms
             Dim lDataGroupStorm As New atcTimeseriesGroup
+            Dim SkipGraph As Boolean = False
             For Each lTimeseries As atcTimeseries In aDataGroup
                 Dim lSubset As atcTimeseries = SubsetByDate(lTimeseries, lStorm.SDateJ, lStorm.EDateJ, Nothing)
                 If lSubset.numValues > 0 Then
                     lDataGroupStorm.Add(lSubset)
                 Else
-                    Logger.Dbg("Skipped graphing dataset with no values in the time of interest")
+                    SkipGraph = True
                 End If
             Next
             Dim lDate(6) As Integer
             J2Date(lStorm.SDateJ, lDate)
-            GraphTimeseries(lDataGroupStorm, aPaneCount, _
-                            aOutFileBase & "_" & lDate(0) & "-" & lDate(1) & "-" & lDate(2), _
-                            aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, True, aMakeLog)
+            If SkipGraph = False Then
+                GraphTimeseries(lDataGroupStorm, aPaneCount, _
+                                aOutFileBase & "_" & lDate(0) & "-" & lDate(1) & "-" & lDate(2), _
+                                aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, True, aMakeLog)
+            Else
+                Logger.Dbg("Skipped graph" & aOutFileBase & "_" & lDate(0) & "-" & lDate(1) & "-" & lDate(2) & ". No datasets in this period.")
+            End If
+            
         Next
     End Sub
 
@@ -330,7 +336,7 @@ Public Module Graph
                        Optional ByVal aLogPrefix As Boolean = False, _
                        Optional ByVal aMakeLog As Boolean = True) 'Becky added MakeLog, default true so as not to break other things, 
         'so user can specify whether or not to print log graphs
-
+        
         Dim lZgc As ZedGraphControl = CreateZgc()
         lZgc.Width = aGraphSaveWidth
         lZgc.Height = aGraphSaveHeight
