@@ -92,7 +92,7 @@ Public Module modMetData
                         End If
                         lFilledIt = False
                         j = 1
-                        While j < aTSAvail.Count
+                        While j <= aTSAvail.Count
                             lInd = lDist.IndexFromKey(CStr(j))
                             lTSer = aTSAvail.ItemByIndex(lInd)
                             lFVal = lValMin - 1
@@ -212,7 +212,7 @@ Public Module modMetData
                             End If
                             Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " - " & aTS2Fill.Value(lFPos))
                         Else 'no station had a value for this date
-                            Logger.Dbg("PROBLEM - Could not find acceptable nearby station for filling")
+                            Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " PROBLEM - Could not find acceptable nearby station for filling")
                         End If
                     Next k
                 Else 'fill accumulated period
