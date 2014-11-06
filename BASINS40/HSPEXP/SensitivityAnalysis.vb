@@ -229,7 +229,7 @@ Public Module ModSensitivityAnalysis
         Dim ExpertStatsOutputLine As String
         Dim lExpertSystem As HspfSupport.atcExpertSystem
 
-        lExpertSystem = New HspfSupport.atcExpertSystem(lUci, lWdmDataSource, pBaseName & ".exs")
+        lExpertSystem = New HspfSupport.atcExpertSystem(lUci, pBaseName & ".exs")
         Dim lCons As String = "Flow"
         
         Dim lYearlyAttributes As New atcDataAttributes
