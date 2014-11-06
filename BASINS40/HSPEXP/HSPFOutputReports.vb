@@ -14,6 +14,7 @@ Imports ZedGraph 'this is coming from a DLL as the original project was a C# pro
 Imports System.Collections.Specialized
 Imports System.IO 'added by Becky to get directory exists function
 
+
 Module HSPFOutputReports
     Private pBaseFolders As New ArrayList
     Private pTestPath As String
@@ -75,8 +76,8 @@ Module HSPFOutputReports
         pGraphSaveWidth = 1300
         pGraphSaveHeight = 768
         pMakeStdGraphs = StartUp.chkGraphStandard.Checked
-        pMakeLogGraphs = StartUp.chkLogGraphs.Checked
-        pMakeSupGraphs = StartUp.chkSupportingGraphs.Checked
+        pMakeLogGraphs = True
+        pMakeSupGraphs = True
         pRunUci = StartUp.chkRunHSPF.Checked
         pMakeAreaReports = StartUp.chkAreaReports.Checked
 
@@ -467,7 +468,8 @@ Module HSPFOutputReports
 
                         Dim lReportCons As New atcReport.ReportText
                         Dim lOutFileName As String = ""
-                        Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
+                        Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent)
+                        
 
                         Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
                         lReportCons = Nothing
@@ -500,9 +502,24 @@ Module HSPFOutputReports
 
                         Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
 
+                        Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
+                        Dim lScenarioResults As New atcDataSource
+                        Dim lConstituentNames As New SortedSet(Of String)
+                        For Each lKey As String In lConstituentsToOutput.Keys
+                            If lKey.EndsWith("1") Or lKey.EndsWith("2") Then
+                                lKey = Left(lKey, lKey.Length - 1)
+                            End If
+
+                            lConstituentNames.Add(lKey.Substring(2).ToUpper)
+                        Next
+                        For Each lTs As atcTimeseries In lHspfBinDataSource.DataSets
+                            If lConstituentNames.Contains(lTs.Attributes.GetValue("Constituent").ToString.ToUpper) Then
+                                lScenarioResults.DataSets.Add(lTs)
+                            End If
+                        Next
                         lReportCons = HspfSupport.ConstituentBalance.Report _
                            (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                            lHspfBinDataSource, lLocations, lRunMade)
+                            lScenarioResults, lLocations, lRunMade)
                         lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_OPN_Per_Year.txt"
 
                         SaveFileString(lOutFileName, lReportCons.ToString)
@@ -513,7 +530,7 @@ Module HSPFOutputReports
 
                         lReportCons = HspfSupport.WatershedConstituentBalance.Report _
                         (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                        lHspfBinDataSource, lRunMade)
+                        lScenarioResults, lRunMade)
                         lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
 
                         SaveFileString(lOutFileName, lReportCons.ToString)
@@ -521,7 +538,7 @@ Module HSPFOutputReports
                         If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
                             HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                                lHspfBinDataSource, pOutputLocations, lRunMade, _
+                                lScenarioResults, pOutputLocations, lRunMade, _
                                 loutfoldername, True)
                             'now pivoted version
                             'HspfSupport.WatershedConstituentBalance.ReportsToFiles _
