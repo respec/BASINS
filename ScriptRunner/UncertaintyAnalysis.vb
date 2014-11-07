@@ -168,15 +168,19 @@ Module SensitivityAndUncertaintyAnalysis
                 'If lExitCode = -1 Then
                 '    MsgBox("The original uci file could not run. Program will exit")
                 'End If
-                ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestpath, YearsofSimulation, lStats)
-                'Baseline simulation and recording the values
-
                 Dim DBFRecords As Integer
                 lUci.Save()
                 lUci = Nothing
                 lDBF.OpenFile(pParameterFile)
+                Dim TotalNumberofSimulations = lDBF.NumRecords * 2
                 'Opening the dbf file that has the parameter values
                 'The parameter table will be read from the dbf file
+                Logger.Status("Conducting the baseline simulation of HSPF")
+                Logger.Progress(0, TotalNumberofSimulations)
+                ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestpath, YearsofSimulation, lStats)
+                'Baseline simulation and recording the values
+
+                
                 Dim pValue() As Single = {0, 0} 'Multipliers to calculate uncertainty
                 Dim LowerLimit, UpperLimit As Single
                 Logger.Dbg("Reading the DBF File")
@@ -192,6 +196,8 @@ Module SensitivityAndUncertaintyAnalysis
                     For j = 0 To pValue.GetUpperBound(0) 'This loop goes through all the multipliers defined in the pValue object
                         lUci = New atcUCI.HspfUci
                         SimID += 1
+                        Logger.Status("Conducting the " & SimID & " simulation of HSPF, out of " & TotalNumberofSimulations & ".")
+                        Logger.Progress(SimID, TotalNumberofSimulations)
                         NewuciName = SimID & "-" & uciName
                         System.IO.File.Copy(uciName, NewuciName, True) 'Saving original uci file as temp uci file
                         lUci.ReadUci(lMsg, NewuciName, -1, False, pBaseName & ".ech") ' Reading the uci file
@@ -350,12 +356,15 @@ Module SensitivityAndUncertaintyAnalysis
                         Parameters(k - 1, CurrentRecord) = lcsv.Value(k + 1) 'Saving the properties of each parameter in an array
                     Next k
                 Next CurrentRecord
+                lcsv.CurrentRecord = lcsv.NumRecords
+                Dim lastSimulationID = lcsv.Value(1)
 
                 For NumberOfSimulations As Integer = 3 To lcsv.NumRecords
                     'Going through the records in the csv file and changing them in the uci file
                     lcsv.CurrentRecord = NumberOfSimulations
                     SimID = lcsv.Value(1)
-                    'MsgBox("HSPF Simulation " & SimID & " of " & lcsv.NumRecords - 3 & " going on!")
+                    Logger.Status("Simulations for Uncertainty Analysis. Simulation " & SimID & " of " & lastSimulationID & ".")
+                    Logger.Progress(SimID, lastSimulationID)
                     lUci = New atcUCI.HspfUci
                     lUci.ReadUci(lMsg, uciName, -1, False, pBaseName & ".ech") ' Reading the uci file
                     'Now the loop starts for changing each parameter at a time
@@ -495,6 +504,7 @@ Module SensitivityAndUncertaintyAnalysis
                     oTable = ""
                     oParameter = ""
                     pValue = Nothing
+
                     ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestpath, YearsofSimulation, lStats)
                     'System.IO.File.Copy(uciName, SimID & "-" & uciName, True)
 
@@ -514,12 +524,24 @@ Module SensitivityAndUncertaintyAnalysis
                                  ByRef lStats As List(Of SensitivityStats))
 
         Dim pHSPFExe As String = "C:\Basins41\models\HSPF\bin\WinHspfLt.exe"
+        
         Logger.Dbg("Running WinHSPFLt.exe with " & uciName)
-        'lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & uciName) 'Run HSPF program
-        'If lExitCode = -1 Then
-        '    Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
-        '    Exit Sub
-        'End If
+        lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & uciName) 'Run HSPF program
+        If lExitCode = -1 Then
+            Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
+            Exit Sub
+        End If
+        Dim EchoFile As String = pTestPath & "\" & pBaseName & ".ech"
+
+        Dim lines As String() = File.ReadAllLines(EchoFile)
+        If lines(lines.Length - 1).ToLower.Contains("end of job") Then
+            Logger.Dbg("The HSPF Simulation " & SimID & " completed successfully.")
+            Logger.Status("The HSPF Simulation " & SimID & " completed successfully.")
+        Else
+            Logger.Dbg("The HSPF Simulation " & SimID & " did not complete successfully.")
+            Logger.Dbg("The HSPF Simulation " & SimID & " did not complete successfully.")
+            Exit Sub
+        End If
         Logger.Dbg("Completed WinHSPFLt.exe run with " & uciName)
         Dim lWdmFileName As String
         lWdmFileName = IO.Path.Combine(pTestPath, pBaseName & ".wdm")
