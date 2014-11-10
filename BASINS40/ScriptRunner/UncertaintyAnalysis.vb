@@ -78,7 +78,7 @@ Module SensitivityAndUncertaintyAnalysis
                 pParameterFile = "C:\BASINS\modelout\IRW\SA\ParameterValue_Sensitivity.dbf"
                 pTestpath = "C:\BASINS\modelout\IRW\SA\"
             Case "Uncertainty"
-                pParameterFile = "C:\BASINS\modelout\IRW\UA\MFACT_110614.csv"
+                pParameterFile = "C:\BASINS\modelout\IRW\UA\MFACT_11102014_601_to_1000.csv"
                 pTestpath = "C:\BASINS\modelout\IRW\UA\"
         End Select
 
@@ -410,8 +410,9 @@ Module SensitivityAndUncertaintyAnalysis
                                         For Mon = 0 To 11
                                             lOper.Tables(oTable).Parms(Mon).Value = SignificantDigits(lOper.Tables(oTable).Parms(Mon).Value _
                                                                                                       * pValue, 2)
-                                            'If (lOper.Tables(oTable).Parms(Mon).Value < LowerLimit) Then
-                                            '    lOper.Tables(oTable).Parms(Mon).Value = LowerLimit
+                                            If (oTable.Contains("COVER") AndAlso lOper.Tables(oTable).Parms(Mon).Value > 1) Then
+                                                lOper.Tables(oTable).Parms(Mon).Value = 1
+                                            End If
                                             'ElseIf (lOper.Tables(oTable).Parms(Mon).Value > UpperLimit) Then
                                             '    lOper.Tables(oTable).Parms(Mon).Value = UpperLimit
                                             'End If
@@ -531,7 +532,7 @@ Module SensitivityAndUncertaintyAnalysis
             Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
             Exit Sub
         End If
-        Dim EchoFile As String = pTestPath & "\" & pBaseName & ".ech"
+        Dim EchoFile As String = pTestPath & pBaseName & ".ech"
 
         Dim lines As String() = File.ReadAllLines(EchoFile)
         If lines(lines.Length - 1).ToLower.Contains("end of job") Then
@@ -660,7 +661,7 @@ Module SensitivityAndUncertaintyAnalysis
                                     FormatNumber(.FiftyPercentHigh, 3) & ", " & FormatNumber(.FiftyPercentLow, 3) & ", " & _
                                     FormatNumber(.TwentyFivePercentLow, 3) & ", " & FormatNumber(.TenPercentLow, 3) & ", " & _
                                     FormatNumber(.FivePercentLow, 3) & ", " & FormatNumber(.TwoPercentLow, 3) & ", " & _
-                                    FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & ", "
+                                    FormatNumber(.AnnualPeakFlow, 3, , , TriState.False)
                     Dim ObsValuesList As List(Of SensitivityStats) = lStats.FindAll(Function(x) (x.Scenario = "Observed" _
                                                                                                  And x.SiteName = lSiteName.ToString))
                     If ObsValuesList.Count > 0 Then
@@ -676,16 +677,16 @@ Module SensitivityAndUncertaintyAnalysis
                         .ErrorFivePercentLow = (.FivePercentLow - lObsValues.FivePercentLow) * 100 / lObsValues.FivePercentLow
                         .ErrorTwoPercentLow = (.TwoPercentLow - lObsValues.TwoPercentLow) * 100 / lObsValues.TwoPercentLow
                         .ErrorAnnualPeakFlow = (.AnnualPeakFlow - lObsValues.AnnualPeakFlow) * 100 / lObsValues.AnnualPeakFlow
-                        ExpertStatsOutputLine &= FormatNumber(.ErrorAverageAnnual, 1) & ", " & FormatNumber(.ErrorTenPercentHigh, 1) & ", " & _
+                        ExpertStatsOutputLine &= "," & FormatNumber(.ErrorAverageAnnual, 1) & ", " & FormatNumber(.ErrorTenPercentHigh, 1) & ", " & _
                                     FormatNumber(.ErrorTwentyFivePercentHigh, 1) & ", " & FormatNumber(.ErrorFiftyPercentHigh, 1) & ", " & _
                                     FormatNumber(.ErrorFiftyPercentLow, 1) & ", " & FormatNumber(.ErrorTwentyFivePercentLow, 1) & ", " & _
                                     FormatNumber(.ErrorTenPercentLow, 1) & ", " & FormatNumber(.ErrorFivePercentLow, 1) & ", " & _
-                                    FormatNumber(.ErrorTwoPercentLow, 1) & ", " & FormatNumber(.ErrorAnnualPeakFlow, 1) & vbCrLf
+                                    FormatNumber(.ErrorTwoPercentLow, 1) & ", " & FormatNumber(.ErrorAnnualPeakFlow, 1)
                         ''Saving the relevant output in a text string to add it to the text file
 
                     End If
                     lStats.Add(lNewStat)
-
+                    ExpertStatsOutputLine &= vbCrLf
                     IO.File.AppendAllText(pBaseName & "_HydrologyOutput.csv", ExpertStatsOutputLine)
 
                     ExpertStatsOutputLine = ""
