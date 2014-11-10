@@ -74,6 +74,7 @@ Public Class atcListForm
         Me.mnuEdit = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
         Me.mnuEditAtrributeValues = New System.Windows.Forms.MenuItem
+        Me.mnuEditAddAtrribute = New System.Windows.Forms.MenuItem
         Me.mnuView = New System.Windows.Forms.MenuItem
         Me.mnuAttributeRows = New System.Windows.Forms.MenuItem
         Me.mnuAttributeColumns = New System.Windows.Forms.MenuItem
@@ -86,7 +87,6 @@ Public Class atcListForm
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
-        Me.mnuEditAddAtrribute = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -146,6 +146,11 @@ Public Class atcListForm
         '
         Me.mnuEditAtrributeValues.Index = 1
         Me.mnuEditAtrributeValues.Text = "Allow Editing Attribute Values"
+        '
+        'mnuEditAddAtrribute
+        '
+        Me.mnuEditAddAtrribute.Index = 2
+        Me.mnuEditAddAtrribute.Text = "Add Attribute"
         '
         'mnuView
         '
@@ -218,19 +223,14 @@ Public Class atcListForm
         Me.agdMain.LineWidth = 0.0!
         Me.agdMain.Location = New System.Drawing.Point(0, 0)
         Me.agdMain.Name = "agdMain"
-        Me.agdMain.Size = New System.Drawing.Size(528, 545)
+        Me.agdMain.Size = New System.Drawing.Size(528, 525)
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
-        '
-        'mnuEditAddAtrribute
-        '
-        Me.mnuEditAddAtrribute.Index = 2
-        Me.mnuEditAddAtrribute.Text = "Add Attribute"
         '
         'atcListForm
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(528, 545)
+        Me.ClientSize = New System.Drawing.Size(528, 525)
         Me.Controls.Add(Me.agdMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1

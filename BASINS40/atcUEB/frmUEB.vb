@@ -2723,7 +2723,6 @@ KeepWaiting:
 
     Private Sub SetOutputControl()
         Dim i As Integer
-        Dim lVarName As String
 
         txtOutputHeader.Text = pOutputControlData.Header
         txtAggOutputHeader.Text = pAggOutputControlData.Header
