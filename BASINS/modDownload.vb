@@ -736,10 +736,10 @@ StartOver:
                 End If
 
                 If g_AppNameShort = "GW Toolbox" Then 'Also get some more layers
-                    Dim lRegion As D4EMDataManager.Region 'Use the view extents to include some stations in a buffer outside the original region
-                    With g_MapWin.View.Extents
-                        lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)
-                    End With
+                    'Dim lRegion As D4EMDataManager.Region 'Use the view extents to include some stations in a buffer outside the original region
+                    'With g_MapWin.View.Extents
+                    '    lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)
+                    'End With
                     lQuery = "<function name='GetNWISStations'><arguments>" _
                            & "<DataType>gw_daily</DataType>" _
                            & "<DataType>gw_periodic</DataType>" _
@@ -748,7 +748,7 @@ StartOver:
                            & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                            & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
                            & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
-                           & lRegion.XML _
+                           & aRegion _
                            & "<clip>False</clip> <merge>False</merge>" _
                            & "</arguments></function>"
 
