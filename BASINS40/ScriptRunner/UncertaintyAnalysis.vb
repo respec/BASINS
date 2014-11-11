@@ -81,6 +81,7 @@ Module SensitivityAndUncertaintyAnalysis
                 pParameterFile = "C:\BASINS\modelout\IRW\UA\MFACT_11102014_601_to_1000.csv"
                 pTestpath = "C:\BASINS\modelout\IRW\UA\"
         End Select
+        Logger.StartToFile(pTestpath & "LogFile.txt", aAppend:=True, aForceNameChange:=True, aRenameExisting:=True)
 
             End Sub
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -365,6 +366,7 @@ Module SensitivityAndUncertaintyAnalysis
                     SimID = lcsv.Value(1)
                     Logger.Status("Simulations for Uncertainty Analysis. Simulation " & SimID & " of " & lastSimulationID & ".")
                     Logger.Progress(SimID, lastSimulationID)
+                    Logger.Dbg("Parameter Changes for Simulation " & SimID & " started.")
                     lUci = New atcUCI.HspfUci
                     lUci.ReadUci(lMsg, uciName, -1, False, pBaseName & ".ech") ' Reading the uci file
                     'Now the loop starts for changing each parameter at a time
@@ -412,6 +414,7 @@ Module SensitivityAndUncertaintyAnalysis
                                                                                                       * pValue, 2)
                                             If (oTable.Contains("COVER") AndAlso lOper.Tables(oTable).Parms(Mon).Value > 1) Then
                                                 lOper.Tables(oTable).Parms(Mon).Value = 1
+                                                Logger.Dbg("MON-COVER was over 1, so had to make it 1 for simulation ID " & SimID & "PERLND" & lOper.Id & " Month " & Mon)
                                             End If
                                             'ElseIf (lOper.Tables(oTable).Parms(Mon).Value > UpperLimit) Then
                                             '    lOper.Tables(oTable).Parms(Mon).Value = UpperLimit
