@@ -20,6 +20,23 @@ Public Class SensitivityStats
     Public AverageAnnualcfs As Double
     Public AnnualPeakFlow As Double
     Public AverageAnnual As Double
+    Public Exceed999 As Double 'Flow exceeding 99.9% of the times
+    Public Exceed990 As Double
+    Public Exceed980 As Double
+    Public Exceed950 As Double
+    Public Exceed900 As Double
+    Public Exceed800 As Double
+    Public Exceed700 As Double
+    Public Exceed600 As Double
+    Public Exceed500 As Double
+    Public Exceed400 As Double
+    Public Exceed300 As Double
+    Public Exceed200 As Double
+    Public Exceed100 As Double
+    Public Exceed050 As Double  'Flow exceeding 5% of the times
+    Public Exceed020 As Double
+    Public Exceed010 As Double
+    Public Exceed001 As Double
     Public TenPercentHigh As Double
     Public TwentyFivePercentHigh As Double
     Public FiftyPercentHigh As Double
@@ -159,7 +176,7 @@ Module SensitivityAndUncertaintyAnalysis
                                                 "PARMATERNAME, MONTH/TYPE, PARAMETERVALUE" & vbCrLf
         Select Case TypeOfAnalysis
             Case "Sensitivity"
-                ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Mean Annual (cfs), Annual Peak Flow (cfs), Mean Annual runoff(in),10% High (in), 25% High (in), 50% High (in), 50% Low (in), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in), Annual Peak Flow(cfs), Error(%) Annual Average, Error(%) 10% High, Error(%) 25% High, Error(%) 50% High, Error(%) 50% Low, Error(%) 25% Low, Error(%) 10% Low, Error(%) 5% Low, Error(%) 2% Low, Error (%) Annual Peak Flow" & vbCrLf
+                ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Mean Annual (cfs), Annual Peak Flow (cfs), Mean Annual runoff(in),10% High (in), 25% High (in), 50% High (in), 50% Low (in), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in), 99.9% Exceed (cfs),99% Exceed (cfs),98% Exceed (cfs),95% Exceed (cfs),90% Exceed (cfs),80% Exceed (cfs),70% Exceed (cfs),60% Exceed (cfs),50% Exceed (cfs),40% Exceed (cfs),30% Exceed (cfs),20% Exceed (cfs),10% Exceed (cfs),5% Exceed (cfs),2% Exceed (cfs),1% Exceed (cfs),0.1% Exceed (cfs)" & vbCrLf
                 IO.File.WriteAllText(pBaseName & "_HydrologyOutput.csv", ExpertStatsOutputLine)
 
                 'Sensitivity(0, 0) = "Baseline"
@@ -342,7 +359,7 @@ Module SensitivityAndUncertaintyAnalysis
 
                 Logger.Dbg("Runs for Sensitivity Analysis finished.")
             Case "Uncertainty"
-                ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Mean Annual (cfs), Annual Peak Flow (cfs), Mean Annual runoff(in),10% High (in), 25% High (in), 50% High (in), 50% Low (in), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in), Annual Peak Flow(cfs)" & vbCrLf
+                ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Mean Annual (cfs), Annual Peak Flow (cfs), Mean Annual runoff(in),10% High (in), 25% High (in), 50% High (in), 50% Low (in), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in), 99.9% Exceed (cfs),99% Exceed (cfs),98% Exceed (cfs),95% Exceed (cfs),90% Exceed (cfs),80% Exceed (cfs),70% Exceed (cfs),60% Exceed (cfs),50% Exceed (cfs),40% Exceed (cfs),30% Exceed (cfs),20% Exceed (cfs),10% Exceed (cfs),5% Exceed (cfs),2% Exceed (cfs),1% Exceed (cfs),0.1% Exceed (cfs)" & vbCrLf
                 IO.File.WriteAllText(pBaseName & "_HydrologyOutput.csv", ExpertStatsOutputLine)
                 lcsv.OpenFile(pParameterFile) 'Opening the csv file that has the parameter values
                 'lcsv.Header = 3
@@ -543,7 +560,9 @@ Module SensitivityAndUncertaintyAnalysis
             Logger.Status("The HSPF Simulation " & SimID & " completed successfully.")
         Else
             Logger.Dbg("The HSPF Simulation " & SimID & " did not complete successfully.")
-            Logger.Dbg("The HSPF Simulation " & SimID & " did not complete successfully.")
+            Logger.Status("The HSPF Simulation " & SimID & " did not complete successfully.")
+            System.IO.File.Copy(EchoFile, pTestPath & pBaseName & SimID & ".ech")
+            MsgBox("The HSPF Simulation " & SimID & " did not complete successfully.")
             Exit Sub
         End If
         Logger.Dbg("Completed WinHSPFLt.exe run with " & uciName)
@@ -584,6 +603,25 @@ Module SensitivityAndUncertaintyAnalysis
 
                         lobsTSercfs = Aggregate(lobsTSercfs, atcTimeUnit.TUYear, 1, atcTran.TranMax)
                         .AnnualPeakFlow = lobsTSercfs.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
+                        .Exceed001 = lobsTSercfs.Attributes.GetValue("%0.1")
+                        .Exceed010 = lobsTSercfs.Attributes.GetValue("%1.0")
+                        .Exceed020 = lobsTSercfs.Attributes.GetValue("%2.0")
+                        .Exceed050 = lobsTSercfs.Attributes.GetValue("%5.0")
+                        .Exceed100 = lobsTSercfs.Attributes.GetValue("%10")
+                        .Exceed020 = lobsTSercfs.Attributes.GetValue("%20")
+                        .Exceed300 = lobsTSercfs.Attributes.GetValue("%30")
+                        .Exceed400 = lobsTSercfs.Attributes.GetValue("%40")
+                        .Exceed500 = lobsTSercfs.Attributes.GetValue("%50")
+                        .Exceed600 = lobsTSercfs.Attributes.GetValue("%60")
+                        .Exceed700 = lobsTSercfs.Attributes.GetValue("%70")
+                        .Exceed800 = lobsTSercfs.Attributes.GetValue("%80")
+                        .Exceed900 = lobsTSercfs.Attributes.GetValue("%90")
+                        .Exceed950 = lobsTSercfs.Attributes.GetValue("%95")
+                        .Exceed980 = lobsTSercfs.Attributes.GetValue("%98")
+                        .Exceed990 = lobsTSercfs.Attributes.GetValue("%99")
+                        .Exceed999 = lobsTSercfs.Attributes.GetValue("%99.9")
+
+
                         .AverageAnnual = lobsTimeSeriesInches.Attributes.GetDefinedValue("Sum").Value / YearsofSimulation
                         .TenPercentHigh = (lobsTimeSeriesInches.Attributes.GetDefinedValue("Sum").Value _
                                             - lobsTimeSeriesInches.Attributes.GetDefinedValue("%Sum90").Value) / YearsofSimulation
@@ -608,8 +646,8 @@ Module SensitivityAndUncertaintyAnalysis
                                 FormatNumber(.TenPercentHigh, 3) & ", " & FormatNumber(.TwentyFivePercentHigh, 3) & ", " & _
                                 FormatNumber(.FiftyPercentHigh, 3) & ", " & FormatNumber(.FiftyPercentLow, 3) & ", " & _
                                 FormatNumber(.TwentyFivePercentLow, 3) & ", " & FormatNumber(.TenPercentLow, 3) & ", " & _
-                                FormatNumber(.FivePercentLow, 3) & ", " & FormatNumber(.TwoPercentLow, 3) & ", " & _
-                                FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & vbCrLf
+                                FormatNumber(.FivePercentLow, 3) & ", " & FormatNumber(.TwoPercentLow, 3) & ", " & vbCrLf
+
                     End With
                     lStats.Add(lNewStatObs)
                     'Sensitivity(SimID, 0) = ("Observed") 'SimID,lsiteName, obsAverageAnnualcfs}
@@ -651,6 +689,23 @@ Module SensitivityAndUncertaintyAnalysis
                     .TenPercentLow = lSimTSerInches.Attributes.GetValue("%Sum10") / YearsofSimulation '10% low
                     .FivePercentLow = lSimTSerInches.Attributes.GetValue("%Sum05") / YearsofSimulation '5% low
                     .TwoPercentLow = lSimTSerInches.Attributes.GetValue("%Sum02") / YearsofSimulation '2% low
+                    .Exceed001 = lSimTSercfs.Attributes.GetValue("%0.1")
+                    .Exceed010 = lSimTSercfs.Attributes.GetValue("%1.0")
+                    .Exceed020 = lSimTSercfs.Attributes.GetValue("%2.0")
+                    .Exceed050 = lSimTSercfs.Attributes.GetValue("%5.0")
+                    .Exceed100 = lSimTSercfs.Attributes.GetValue("%10")
+                    .Exceed020 = lSimTSercfs.Attributes.GetValue("%20")
+                    .Exceed300 = lSimTSercfs.Attributes.GetValue("%30")
+                    .Exceed400 = lSimTSercfs.Attributes.GetValue("%40")
+                    .Exceed500 = lSimTSercfs.Attributes.GetValue("%50")
+                    .Exceed600 = lSimTSercfs.Attributes.GetValue("%60")
+                    .Exceed700 = lSimTSercfs.Attributes.GetValue("%70")
+                    .Exceed800 = lSimTSercfs.Attributes.GetValue("%80")
+                    .Exceed900 = lSimTSercfs.Attributes.GetValue("%90")
+                    .Exceed950 = lSimTSercfs.Attributes.GetValue("%95")
+                    .Exceed980 = lSimTSercfs.Attributes.GetValue("%98")
+                    .Exceed990 = lSimTSercfs.Attributes.GetValue("%99")
+                    .Exceed999 = lSimTSercfs.Attributes.GetValue("%99.9")
                     'calculating error terms value
                     lSimTSercfs.Clear()
                     lSimTSerInches.Clear()
@@ -664,7 +719,16 @@ Module SensitivityAndUncertaintyAnalysis
                                     FormatNumber(.FiftyPercentHigh, 3) & ", " & FormatNumber(.FiftyPercentLow, 3) & ", " & _
                                     FormatNumber(.TwentyFivePercentLow, 3) & ", " & FormatNumber(.TenPercentLow, 3) & ", " & _
                                     FormatNumber(.FivePercentLow, 3) & ", " & FormatNumber(.TwoPercentLow, 3) & ", " & _
-                                    FormatNumber(.AnnualPeakFlow, 3, , , TriState.False)
+                                    FormatNumber(.Exceed999, 3) & "," & FormatNumber(.Exceed990, 3) & ", " & _
+                                    FormatNumber(.Exceed980, 3) & "," & FormatNumber(.Exceed950, 3) & ", " & _
+                                    FormatNumber(.Exceed900, 3) & "," & FormatNumber(.Exceed800, 3) & ", " & _
+                                    FormatNumber(.Exceed700, 3) & "," & FormatNumber(.Exceed600, 3) & ", " & _
+                                    FormatNumber(.Exceed500, 3) & "," & FormatNumber(.Exceed400, 3) & ", " & _
+                                    FormatNumber(.Exceed300, 3) & "," & FormatNumber(.Exceed200, 3) & ", " & _
+                                    FormatNumber(.Exceed100, 3) & "," & FormatNumber(.Exceed050, 3) & ", " & _
+                                    FormatNumber(.Exceed020, 3) & "," & FormatNumber(.Exceed010, 3) & ", " & _
+                                    FormatNumber(.Exceed001, 3)
+
                     Dim ObsValuesList As List(Of SensitivityStats) = lStats.FindAll(Function(x) (x.Scenario = "Observed" _
                                                                                                  And x.SiteName = lSiteName.ToString))
                     If ObsValuesList.Count > 0 Then
