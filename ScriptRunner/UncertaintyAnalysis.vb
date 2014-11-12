@@ -561,7 +561,7 @@ Module SensitivityAndUncertaintyAnalysis
         Else
             Logger.Dbg("The HSPF Simulation " & SimID & " did not complete successfully.")
             Logger.Status("The HSPF Simulation " & SimID & " did not complete successfully.")
-            System.IO.File.Copy(EchoFile, pTestPath & pBaseName & SimID & ".ech")
+            System.IO.File.Copy(EchoFile, pTestPath & pBaseName & SimID & ".ech", True)
             MsgBox("The HSPF Simulation " & SimID & " did not complete successfully.")
             Exit Sub
         End If
