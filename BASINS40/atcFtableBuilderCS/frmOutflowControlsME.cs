@@ -596,5 +596,15 @@ namespace atcFtableBuilder
         {
             this.Close();
         }
+
+        private void chkUseExtendedFormat_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!pLoaded) return;
+
+            if (chkUseExtendedFormat.Checked)
+                FTableCalculator.CurrentFormat = FTableCalculator.FTableFormat.Extended;
+            else
+                FTableCalculator.CurrentFormat = FTableCalculator.FTableFormat.Regular;
+        }
     }
 }
