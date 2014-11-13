@@ -183,6 +183,12 @@ namespace atcFtableBuilder
         public ChannelType CurrentType = ChannelType.NONE;
 
         public static double TotalDepth;
+        public enum FTableFormat
+        {
+            Regular,
+            Extended
+        }
+        public static FTableFormat CurrentFormat;
 
         public FTableCalculator()
         {
