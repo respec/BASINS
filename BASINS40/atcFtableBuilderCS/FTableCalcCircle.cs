@@ -167,7 +167,11 @@ namespace atcFtableBuilder
 
                 sDepth = string.Format("{0:0.000000}", dblDepth);
                 sArea = string.Format("{0:0.000000}", dblArea);
-                sVolume = string.Format("{0:0.000000}", dblVolume);
+                if (dblVolume > 0 && dblVolume < 0.000001)
+                    sVolume = string.Format(clsGlobals.NumberFormatSci, dblVolume);
+                else
+                    sVolume = string.Format("{0:0.000000}", dblVolume);
+
                 sOutFlow = string.Format("{0:0.000000}", dblOutFlow);
                 row.Add(sDepth);
                 //row.add("1");

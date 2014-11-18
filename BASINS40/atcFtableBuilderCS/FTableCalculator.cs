@@ -188,7 +188,6 @@ namespace atcFtableBuilder
             Regular,
             Extended
         }
-        public static FTableFormat CurrentFormat;
 
         public FTableCalculator()
         {
@@ -320,7 +319,8 @@ namespace atcFtableBuilder
                     Dictionary<string, ArrayList> lCDOutflows = (Dictionary<string, ArrayList>)controlDeviceVectors[e];
                     if (lCDOutflows == null)
                     {
-                        channelFlowVector.Add(string.Format("{0:0.00000}", lTotalCDOutflow));
+                        //bypass those exits that don't have any control devices
+                        //channelFlowVector.Add(string.Format("{0:0.00000}", lTotalCDOutflow));
                         continue;
                     }
 
@@ -466,6 +466,7 @@ namespace atcFtableBuilder
                         // first we do the below substrate depths to pick up the max vol
                         double maxVol = 0d;
                         IEnumerator rows = newResultTable.GetEnumerator();
+                        double dInfilRate = 0;
                         while (rows.MoveNext())
                         {
                             ArrayList r = (ArrayList)rows.Current;
@@ -484,7 +485,13 @@ namespace atcFtableBuilder
                                         {
                                             maxVol = vol;
                                         }
-                                        string lInfil = string.Format("{0:0.00000}", (vol * backfillP));
+                                        dInfilRate = vol * backfillP;
+                                        string lInfil = "";
+                                        if (dInfilRate > 0 && dInfilRate < 0.00001)
+                                            lInfil = String.Format(System.Globalization.CultureInfo.InvariantCulture, clsGlobals.NumberFormatSci, dInfilRate);
+                                        else
+                                            lInfil = String.Format("{0:0.00000}", dInfilRate);
+
                                         r[volumeIndx] = lInfil;
                                     }
                                 }
@@ -512,7 +519,14 @@ namespace atcFtableBuilder
                                         // the volume of all substrate is capacity at
                                         // highest substrate depth * (1-porosity)
                                         double.TryParse((string)r[volumeIndx], out vol);
-                                        string lInfil = string.Format("{0:0.00000}", (vol - volSubstrate));
+                                        dInfilRate = vol - volSubstrate;
+                                        if (dInfilRate < 0) dInfilRate = 0;
+                                        string lInfil = ""; //string.Format("{0:0.00000}", (vol - volSubstrate));
+                                        if (dInfilRate > 0 && dInfilRate < 0.00001)
+                                            lInfil = String.Format(System.Globalization.CultureInfo.InvariantCulture, clsGlobals.NumberFormatSci, dInfilRate);
+                                        else
+                                            lInfil = String.Format("{0:0.00000}", dInfilRate);
+
                                         r[volumeIndx] = lInfil;
                                     }
                                 }
@@ -530,6 +544,7 @@ namespace atcFtableBuilder
                 String[] units = {" (cms)"," (cfs)"};
                 if (inRate != Double.NaN || inRate >= 0)
                 {
+                    double dInfilRate = 0;
                     newColNames.Add("infiltration" + units[FTableCalculatorConstants.programunits]);
                     IEnumerator rows = newResultTable.GetEnumerator();
                     while (rows.MoveNext())
@@ -541,7 +556,13 @@ namespace atcFtableBuilder
                             {
                                 area = double.Parse((string)r[areaIndx]);
 
-                                string lInfil = string.Format("{0:0.00000}", (area * inRate * infiltrationConversion));
+                                dInfilRate = area * inRate * infiltrationConversion;
+                                string lInfil = ""; //string.Format("{0:0.00000}", dInfilRate);
+                                if (dInfilRate > 0 && dInfilRate < 0.00001)
+                                    lInfil = String.Format(System.Globalization.CultureInfo.InvariantCulture, clsGlobals.NumberFormatSci, dInfilRate);
+                                else
+                                    lInfil = String.Format("{0:0.00000}", dInfilRate);
+
                                 r.Add(lInfil);  //sri
                                 //r.add(String.format("%.6f", new Double((area * inRate * infiltrationConversion)/(Math.pow(10, 6)))));  //sri
                             }

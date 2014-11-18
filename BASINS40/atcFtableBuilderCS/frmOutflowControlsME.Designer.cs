@@ -51,7 +51,6 @@
             this.treeExitControls = new System.Windows.Forms.TreeView();
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnDone = new System.Windows.Forms.Button();
-            this.chkUseExtendedFormat = new System.Windows.Forms.CheckBox();
             this.gbSetup.SuspendLayout();
             this.gbControlParms.SuspendLayout();
             this.SuspendLayout();
@@ -72,7 +71,6 @@
             // 
             this.gbControlParms.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gbControlParms.Controls.Add(this.chkUseExtendedFormat);
             this.gbControlParms.Controls.Add(this.btnClear);
             this.gbControlParms.Controls.Add(this.btnUpdate);
             this.gbControlParms.Controls.Add(this.rdoExit5);
@@ -299,17 +297,6 @@
             this.btnDone.UseVisualStyleBackColor = true;
             this.btnDone.Click += new System.EventHandler(this.btnDone_Click);
             // 
-            // chkUseExtendedFormat
-            // 
-            this.chkUseExtendedFormat.AutoSize = true;
-            this.chkUseExtendedFormat.Location = new System.Drawing.Point(13, 271);
-            this.chkUseExtendedFormat.Name = "chkUseExtendedFormat";
-            this.chkUseExtendedFormat.Size = new System.Drawing.Size(207, 17);
-            this.chkUseExtendedFormat.TabIndex = 16;
-            this.chkUseExtendedFormat.Text = "Use Extended Format (5 columns only)";
-            this.chkUseExtendedFormat.UseVisualStyleBackColor = true;
-            this.chkUseExtendedFormat.CheckedChanged += new System.EventHandler(this.chkUseExtendedFormat_CheckedChanged);
-            // 
             // frmOutflowControlsME
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -354,7 +341,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.Button btnDone;
-        private System.Windows.Forms.CheckBox chkUseExtendedFormat;
 
     }
 }

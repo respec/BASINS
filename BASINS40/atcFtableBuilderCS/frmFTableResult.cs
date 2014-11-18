@@ -18,7 +18,9 @@ namespace atcFtableBuilder
         public FTableCalculator Calc = null;
 
         public ArrayList FTableResults = null;
+        public ArrayList FTableResultsExt = null;
         public ArrayList FTableColumnNames = null;
+        public ArrayList FTableColumnNamesExt = null;
         public string FTableMessage = "";
 
         public frmFTableResult()
@@ -232,13 +234,12 @@ namespace atcFtableBuilder
             }
             txt = string.Format(ftableNumFormat, (object)lsmallestVal);
             double lsmallValTest = double.Parse(txt);
-            if (lsmallValTest - 0 < 0.000001)
+            if (chkExtendedFormat.Checked) //lsmallValTest - 0 < 0.000001
             {
                 ftableFieldWidth = 15;
                 ftableNumFormat = "{0:0.000000}";
             }
             string lzeroStr = ftableNumFormat.Substring(ftableNumFormat.IndexOf(":") + 1).TrimEnd(new char[]{'}'});
-
 
             sbf.AppendLine(numrows.ToString().PadLeft(5) + numcols.ToString().PadLeft(5));
             for (int i = 0; i < numcols; i++)
@@ -260,13 +261,19 @@ namespace atcFtableBuilder
                     if (double.TryParse(FTableSource.get_CellValue(i, j).ToString(), out newValue))
                     {
                         if (!double.IsNaN(newValue))
-                            txt = string.Format(ftableNumFormat, (object)newValue);
+                        {
+                            if (newValue > 0 && newValue < 0.000001)
+                                txt = String.Format(System.Globalization.CultureInfo.InvariantCulture, clsGlobals.NumberFormatSci, newValue);
+                            else
+                                txt = String.Format(ftableNumFormat, (object)newValue);
+                        }
                         else
                             txt = lzeroStr;
                     }
                     else
                         txt = lzeroStr;
 
+                    //txt = FTableSource.get_CellValue(i, j).ToString();
                     sbf.Append(txt.PadLeft(ftableFieldWidth));
                     //if (j<numcols-1) sbf.Append("\t");
                 }
@@ -353,31 +360,54 @@ namespace atcFtableBuilder
                 btnCopyToSpreadsheet.Enabled = false;
                 btnCopyToUCI.Enabled = false;
                 btnClearFTable.Enabled = false;
+                chkExtendedFormat.Enabled = false;
                 if (string.IsNullOrEmpty(FTableMessage) && FTableMessage.Length > 0)
                     lblMessage.Text = "Note: " + FTableMessage;
                 return false;
             }
+            else if (FTableColumnNames.Count < 3)
+            {
+                lblMessage.Text = "Note: Incomplete FTable";
+                return false;
+            }
+
+            ArrayList FTableColumnNamesRT = FTableColumnNames;
+            ArrayList FTableResultsRT = FTableResults;
+            if (chkExtendedFormat.Checked)
+            {
+                SetFTableResultExtendedFormat();
+                FTableColumnNamesRT = FTableColumnNamesExt;
+                FTableResultsRT = FTableResultsExt;
+            }
 
             double lVal;
             FTableSource = new atcControls.atcGridSource();
-            FTableSource.Columns = FTableColumnNames.Count;
+            FTableSource.Columns = FTableColumnNamesRT.Count;
             FTableSource.FixedRows = 1;
             //set header
-            for (int i = 0; i < FTableColumnNames.Count; i++)
+            for (int i = 0; i < FTableColumnNamesRT.Count; i++)
             {
-                FTableSource.set_CellValue(0, i, FTableColumnNames[i].ToString());
+                FTableSource.set_CellValue(0, i, FTableColumnNamesRT[i].ToString());
             }
             ArrayList lRow = null;
             int lgrdRow = 1;
             string lFormat = "{0:0.000000}";
-            for (int i = 0; i < FTableResults.Count; i++)
+            string lsValue = "";
+            string lcellValue = "";
+            for (int i = 0; i < FTableResultsRT.Count; i++)
             {
-                lRow = (ArrayList)FTableResults[i]; //get a FTable row
+                lRow = (ArrayList)FTableResultsRT[i]; //get a FTable row
                 for (int c = 0; c < lRow.Count; c++)
                 {
-                    if (double.TryParse(lRow[c].ToString(), out lVal))
+                    lcellValue = lRow[c].ToString();
+                    if (double.TryParse(lcellValue, out lVal)) //lRow[c].ToString()
                     {
-                        FTableSource.set_CellValue(lgrdRow, c, string.Format(lFormat, (object)lVal));
+                        if (lVal > 0 && lVal < 0.000001)
+                            lsValue = String.Format(System.Globalization.CultureInfo.InvariantCulture, clsGlobals.NumberFormatSci, lVal);
+                        else
+                            lsValue = String.Format(lFormat, lVal);
+
+                        FTableSource.set_CellValue(lgrdRow, c, lsValue);
                     }
                     else
                     {
@@ -387,6 +417,7 @@ namespace atcFtableBuilder
                 lgrdRow++;
             }
 
+            SetGridEditable(1, FTableSource.Rows - 1, 3, FTableSource.Columns - 1, true);
             grdFtableResult.Initialize(FTableSource);
             grdFtableResult.SizeAllColumnsToContents();
             grdFtableResult.Refresh();
@@ -465,8 +496,7 @@ namespace atcFtableBuilder
                 {
                     TablePopulated = false;
                     grdFtableResult.Visible = false;
-                    lblMessage.Text = "Note:\n" +
-                        "ERROR-Depth Increment Mismatch Between Channel and Control Device/s\n" +
+                    lblMessage.Text = "Note: ERROR-Depth Increment Mismatch Between Channel and Control Device/s\n" +
                         "Make sure that the depth increment is a multiple of the invert level";
                 }
 
@@ -480,12 +510,103 @@ namespace atcFtableBuilder
             btnCopyToSpreadsheet.Enabled = lOK;
             btnCopyToUCI.Enabled = lOK;
             btnClearFTable.Enabled = lOK;
+            chkExtendedFormat.Enabled = lOK;
 
             return TablePopulated;
         }
 
+        private void SetFTableResultExtendedFormat()
+        {
+            if (FTableResultsExt != null)
+                return;
+
+            bool hasOutflow = false;
+            foreach (string lcolName in FTableColumnNames)
+            {
+                if (lcolName.ToLower().StartsWith("outflow"))
+                {
+                    hasOutflow = true;
+                    break;
+                }
+            }
+            
+            if (hasOutflow)
+            {
+                FTableColumnNamesExt = FTableColumnNames;
+                FTableResultsExt = FTableResults;
+            }
+            else
+            {
+                FTableResultsExt = new ArrayList();
+                FTableColumnNamesExt = new ArrayList();
+
+                for (int i = 0; i <= 2; i++)
+                    FTableColumnNamesExt.Add(FTableColumnNames[i]);
+                FTableColumnNamesExt.Add("combined");
+
+                ArrayList lRowReg;
+                ArrayList lRowExt;
+                double lcombinedOutflow = 0;
+                double lValReg = 0;
+                string lsValExt = "";
+                for (int i = 0; i < FTableResults.Count; i++)
+                {
+                    lRowReg = (ArrayList)FTableResults[i]; //get a FTable row
+                    lRowExt = new ArrayList();
+                    for (int c = 0; c <=2; c++)
+                        lRowExt.Add(lRowReg[c]);
+
+                    lcombinedOutflow = 0;
+                    for (int c = 3; c < lRowReg.Count; c++)
+                    {
+                        if (double.TryParse(lRowReg[c].ToString(), out lValReg))
+                            lcombinedOutflow += lValReg;
+                    }
+
+                    if (lcombinedOutflow > 0 && lcombinedOutflow < 0.000001)
+                        lsValExt = String.Format(System.Globalization.CultureInfo.InvariantCulture, clsGlobals.NumberFormatSci, lcombinedOutflow);
+                    else
+                        lsValExt = String.Format("{0:0.00000}", lcombinedOutflow);
+
+                    lRowExt.Add(lsValExt);
+
+                    FTableResultsExt.Add(lRowExt);
+                }
+            }
+        }
+
+        private void SetGridEditable(int aRowFrom, int aRowTo, int aColFrom, int aColTo, bool aTF)
+        {
+            for (int c = aColFrom; c <= aColTo; c++)
+            {
+                for (int r = aRowFrom; r <= aRowTo; r++)
+                {
+                    FTableSource.set_CellEditable(r, c, aTF);
+                }
+            }
+        }
+
         private void frmFTableResult_Load(object sender, EventArgs e)
         {
+            switch (clsGlobals.CurrentFTableFormat)
+            {
+                case FTableCalculator.FTableFormat.Regular:
+                    chkExtendedFormat.Checked = false;
+                    break;
+                case FTableCalculator.FTableFormat.Extended:
+                    chkExtendedFormat.Checked = true;
+                    break;
+            }
+            PopulateFTableGrid();
+        }
+
+        private void chkExtendedFormat_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkExtendedFormat.Checked)
+                clsGlobals.CurrentFTableFormat = FTableCalculator.FTableFormat.Extended;
+            else
+                clsGlobals.CurrentFTableFormat = FTableCalculator.FTableFormat.Regular;
+
             PopulateFTableGrid();
         }
     }
