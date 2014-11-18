@@ -132,7 +132,7 @@ namespace atcFtableBuilder
             //}
 
             string lFormattedVal = "";
-            string lFormatResult = "{0:0.00000}";
+            string lFormatResult = "{0:0.000000}";
             double lFormattedg = 0.0;
             string sDepth = "";
             string sArea = "";
@@ -181,7 +181,12 @@ namespace atcFtableBuilder
 
                     sDepth   = string.Format(lFormatResult, (object)g);
                     sArea    = string.Format(lFormatResult, (object)acr);
-                    sVolume  = string.Format(lFormatResult, (object)stot);
+
+                    if (stot > 0 && stot < 0.000001)
+                        sVolume = string.Format(clsGlobals.NumberFormatSci, (object)stot);
+                    else
+                        sVolume = string.Format(lFormatResult, (object)stot);
+
                     sOutFlow = string.Format(lFormatResult, (object)QC);
                     row.Add(sDepth);
                     row.Add(sArea);

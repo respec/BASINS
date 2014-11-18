@@ -222,16 +222,17 @@ namespace atcFtableBuilder
             }
 
             ArrayList lFirstRow = (ArrayList)data[0];
-            if (lFirstRow.Count > 4)
+            if (lFirstRow.Count >= 4)
             {
                 for (int i = 1; i <= 4; i++)
                 {
                     string lExitName = "Exit" + (i + 1).ToString();
-                    int lCount = clsGlobals.gExitOCSetup[i].Nodes.Count; 
+                    int lCount = clsGlobals.gExitOCSetup[i].Nodes.Count;
                     if (lCount > 0)
+                    {
                         lExitName += "CDs" + lCount.ToString();
-
-                    colNames.Add(lExitName);
+                        colNames.Add(lExitName);
+                    }
                 }
             }
 

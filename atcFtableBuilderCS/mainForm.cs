@@ -99,6 +99,8 @@ namespace atcFtableBuilder
                 this.Text = clsGlobals.ToolNameGreen;
             }
 
+            clsGlobals.CurrentFTableFormat = FTableCalculator.FTableFormat.Extended;
+
             pLoaded = true;
        }
 
@@ -375,6 +377,13 @@ namespace atcFtableBuilder
             }
             else
             {
+                if (bmpSketch1.CurrentChannelType == FTableCalculator.ChannelType.TRAPEZOIDAL)
+                {
+                    lblGeomMannN.Visible = true;
+                    txtGeomMannN.Visible = true;
+                    lblGeomLSlope.Visible = true;
+                    txtGeomLSlope.Visible = true;
+                }
             }
         }
 

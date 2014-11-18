@@ -36,12 +36,14 @@
             this.grdFtableResult = new atcControls.atcGrid();
             this.frameStatus = new System.Windows.Forms.Panel();
             this.lblMessage = new System.Windows.Forms.Label();
+            this.chkExtendedFormat = new System.Windows.Forms.CheckBox();
             this.frameCommands.SuspendLayout();
             this.frameStatus.SuspendLayout();
             this.SuspendLayout();
             // 
             // frameCommands
             // 
+            this.frameCommands.Controls.Add(this.chkExtendedFormat);
             this.frameCommands.Controls.Add(this.btnClearFTable);
             this.frameCommands.Controls.Add(this.btnCopyToUCI);
             this.frameCommands.Controls.Add(this.btnCopyToSpreadsheet);
@@ -113,6 +115,19 @@
             this.lblMessage.TabIndex = 0;
             this.lblMessage.Text = "Note:";
             // 
+            // chkExtendedFormat
+            // 
+            this.chkExtendedFormat.AutoSize = true;
+            this.chkExtendedFormat.Checked = true;
+            this.chkExtendedFormat.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkExtendedFormat.Location = new System.Drawing.Point(501, 8);
+            this.chkExtendedFormat.Name = "chkExtendedFormat";
+            this.chkExtendedFormat.Size = new System.Drawing.Size(106, 17);
+            this.chkExtendedFormat.TabIndex = 3;
+            this.chkExtendedFormat.Text = "Extended Format";
+            this.chkExtendedFormat.UseVisualStyleBackColor = true;
+            this.chkExtendedFormat.CheckedChanged += new System.EventHandler(this.chkExtendedFormat_CheckedChanged);
+            // 
             // frmFTableResult
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -126,6 +141,7 @@
             this.Text = "FTable Result";
             this.Load += new System.EventHandler(this.frmFTableResult_Load);
             this.frameCommands.ResumeLayout(false);
+            this.frameCommands.PerformLayout();
             this.frameStatus.ResumeLayout(false);
             this.frameStatus.PerformLayout();
             this.ResumeLayout(false);
@@ -141,5 +157,6 @@
         private atcControls.atcGrid grdFtableResult;
         private System.Windows.Forms.Panel frameStatus;
         private System.Windows.Forms.Label lblMessage;
+        private System.Windows.Forms.CheckBox chkExtendedFormat;
     }
 }

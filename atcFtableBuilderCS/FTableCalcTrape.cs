@@ -183,10 +183,15 @@ namespace atcFtableBuilder
                 //}
                 //else
                 //{
-                    sDepth   = string.Format(lFormat, (object)g);
-                    sArea    = string.Format(lFormat, (object)acr);
-                    sVolume  = string.Format(lFormat, (object)stot);
-                    sOutFlow = string.Format(lFormat, (object)QC);
+                sDepth = string.Format(lFormat, (object)g);
+                sArea = string.Format(lFormat, (object)acr);
+
+                if (stot > 0 && stot < 0.000001)
+                    sVolume = string.Format(clsGlobals.NumberFormatSci, (object)stot);
+                else
+                    sVolume = string.Format(lFormatRect, (object)stot);
+
+                sOutFlow = string.Format(lFormat, (object)QC);
                 //}
                 row.Add(sDepth);
                 row.Add(sArea);

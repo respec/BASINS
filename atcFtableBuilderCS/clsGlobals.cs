@@ -88,7 +88,11 @@ namespace atcFtableBuilder
         public static double BackfillDepth = 0;
         public static double BackfillPorosity = 0.4;
         public static bool HasBackfill = false;
+
         public static FTableCalculator.BMPType gBMPType = FTableCalculator.BMPType.None;
+        public static FTableCalculator.FTableFormat CurrentFTableFormat;
+
+        public static string NumberFormatSci = "{0:0.##E+00}";
 
         public static atcUCI.HspfFtable pFTable;
         public static string pHelpManualName;
