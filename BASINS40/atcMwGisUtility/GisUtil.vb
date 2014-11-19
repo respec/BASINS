@@ -1709,8 +1709,13 @@ Public Class GisUtil
         Return True
     End Function
 
+    Public Shared Function GridBurnIn(ByVal aDEMFileName As String, ByVal aStreamsFileName As String, ByVal aBurnedDEMFileName As String) As Boolean
+        MapWinGeoProc.Hydrology.CanyonBurnin(aStreamsFileName, aDEMFileName, aBurnedDEMFileName, Nothing)
+        Return True
+    End Function
+
     Public Shared Function GridFlowDirection(ByVal aPitFillDEMFileName As String, ByVal aFlowDirGridFileName As String, ByVal aSlopeGridFileName As String) As Integer
-        Dim lRet As Integer = MapWinGeoProc.Hydrology.D8(aPitFillDEMFileName, aFlowDirGridFileName, aSlopeGridFileName, 8, False, Nothing)
+        Dim lRet As Integer = MapWinGeoProc.Hydrology.D8(aPitFillDEMFileName, aFlowDirGridFileName, aSlopeGridFileName, 1, False, Nothing)
         Return lRet
     End Function
 
@@ -3054,6 +3059,14 @@ Public Class GisUtil
         'lWetlandsGrid.Close()
         'lWetlandsGrid = Nothing
         'Logger.Progress(100, 100)
+
+        'save the output grid at this point for seeing where the wetlands cells lie
+        lOutputGrid.Save()
+        Dim lTmpWetlandGridFileName As String = FilenameNoExt(aToWetlandsGridFileName) & "Wetlands.tif"
+        If FileExists(lTmpWetlandGridFileName) Then
+            IO.File.Delete(lTmpWetlandGridFileName)
+        End If
+        IO.File.Copy(aToWetlandsGridFileName, lTmpWetlandGridFileName)
 
         'mark cells along stream lines
         Dim lTmpStreamGridFileName As String = FilenameNoExt(aToWetlandsGridFileName) & "Streams.tif"

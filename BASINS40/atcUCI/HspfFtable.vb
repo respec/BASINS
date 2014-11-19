@@ -288,20 +288,33 @@ Public Class HspfFtable
                 If Not (.Comment Is Nothing) AndAlso .Comment.Length > 0 Then
                     lSB.AppendLine(.Comment)
                 Else
-                    s = "     depth      area    volume"
-                    For lColumn As Integer = 1 To .Ncols - 3
-                        s &= "  outflow" & lColumn
-                    Next lColumn
+                    If .ExtendedFlag Then
+                        s = "          depth           area         volume"
+                        For lColumn As Integer = 1 To .Ncols - 3
+                            s &= "       outflow" & lColumn
+                        Next lColumn
+                    Else
+                        s = "     depth      area    volume"
+                        For lColumn As Integer = 1 To .Ncols - 3
+                            s &= "  outflow" & lColumn
+                        Next lColumn
+                    End If
                     lSB.AppendLine(s & " ***")
                 End If
                 For lRow As Integer = 1 To .Nrows
                     If NumericallyTheSame(.DepthAsRead(lRow), .Depth(lRow)) Then
                         s = .DepthAsRead(lRow)
+                        If s.Length < lSpacing Then
+                            s = s.PadLeft(lSpacing)
+                        End If
                     Else
                         s = Format(.Depth(lRow), lFmt).PadLeft(lSpacing)
                     End If
                     If NumericallyTheSame(.AreaAsRead(lRow), .Area(lRow)) Then
                         t = .AreaAsRead(lRow)
+                        If t.Length < lSpacing Then
+                            t = t.PadLeft(lSpacing)
+                        End If
                     Else
                         t = Format(.Area(lRow), lFmt).PadLeft(lSpacing)
                         If t.Length > lSpacing Or .Area(lRow) < 0.01 Then 'too many digits in the number
@@ -311,6 +324,9 @@ Public Class HspfFtable
                     s &= t
                     If NumericallyTheSame(.VolumeAsRead(lRow), .Volume(lRow)) Then
                         t = .VolumeAsRead(lRow)
+                        If t.Length < lSpacing Then
+                            t = t.PadLeft(lSpacing)
+                        End If
                     Else
                         t = Format(.Volume(lRow), lFmt).PadLeft(lSpacing)
                         If t.Length > lSpacing Or .Volume(lRow) < 0.01 Then 'too many digits in the number
@@ -322,6 +338,9 @@ Public Class HspfFtable
                         If lOutflowIndex = 1 Then
                             If NumericallyTheSame(.Outflow1AsRead(lRow), .Outflow1(lRow)) Then
                                 t = .Outflow1AsRead(lRow)
+                                If t.Length < lSpacing Then
+                                    t = t.PadLeft(lSpacing)
+                                End If
                             Else
                                 t = Format(.Outflow1(lRow), lFmt).PadLeft(lSpacing)
                                 If t.Length > lSpacing Or .Outflow1(lRow) < 0.01 Then 'too many digits in the number
@@ -331,6 +350,9 @@ Public Class HspfFtable
                         ElseIf lOutflowIndex = 2 Then
                             If NumericallyTheSame(.Outflow2AsRead(lRow), .Outflow2(lRow)) Then
                                 t = .Outflow2AsRead(lRow)
+                                If t.Length < lSpacing Then
+                                    t = t.PadLeft(lSpacing)
+                                End If
                             Else
                                 t = Format(.Outflow2(lRow), lFmt).PadLeft(lSpacing)
                                 If t.Length > lSpacing Or .Outflow2(lRow) < 0.01 Then 'too many digits in the number
@@ -340,6 +362,9 @@ Public Class HspfFtable
                         ElseIf lOutflowIndex = 3 Then
                             If NumericallyTheSame(.Outflow3AsRead(lRow), .Outflow3(lRow)) Then
                                 t = .Outflow3AsRead(lRow)
+                                If t.Length < lSpacing Then
+                                    t = t.PadLeft(lSpacing)
+                                End If
                             Else
                                 t = Format(.Outflow3(lRow), lFmt).PadLeft(lSpacing)
                                 If t.Length > lSpacing Or .Outflow3(lRow) < 0.01 Then 'too many digits in the number
@@ -349,6 +374,9 @@ Public Class HspfFtable
                         ElseIf lOutflowIndex = 4 Then
                             If NumericallyTheSame(.Outflow4AsRead(lRow), .Outflow4(lRow)) Then
                                 t = .Outflow4AsRead(lRow)
+                                If t.Length < lSpacing Then
+                                    t = t.PadLeft(lSpacing)
+                                End If
                             Else
                                 t = Format(.Outflow4(lRow), lFmt).PadLeft(lSpacing)
                                 If t.Length > lSpacing Or .Outflow4(lRow) < 0.01 Then 'too many digits in the number
@@ -358,6 +386,9 @@ Public Class HspfFtable
                         ElseIf lOutflowIndex = 5 Then
                             If NumericallyTheSame(.Outflow5AsRead(lRow), .Outflow5(lRow)) Then
                                 t = .Outflow5AsRead(lRow)
+                                If t.Length < lSpacing Then
+                                    t = t.PadLeft(lSpacing)
+                                End If
                             Else
                                 t = Format(.Outflow5(lRow), lFmt).PadLeft(lSpacing)
                                 If t.Length > lSpacing Or .Outflow5(lRow) < 0.01 Then 'too many digits in the number

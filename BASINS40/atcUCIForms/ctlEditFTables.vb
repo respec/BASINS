@@ -432,7 +432,7 @@ Public Class ctlEditFTables
         RefreshGrid()
     End Sub
 
-    Private Sub cmdLID_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdLID.Click
+    Private Sub cmdLID_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         atcFtableBuilder.clsGlobals.gToolType = atcFtableBuilder.clsGlobals.ToolType.Green
         atcFtableBuilder.clsGlobals.pFTable = pHspfFtable
         atcFtableBuilder.clsGlobals.pHelpManualName = pExtendedHelpFile
@@ -445,7 +445,7 @@ Public Class ctlEditFTables
         RefreshGrid()
     End Sub
 
-    Private Sub cmdOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOpen.Click
+    Private Sub cmdOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         atcFtableBuilder.clsGlobals.gToolType = atcFtableBuilder.clsGlobals.ToolType.Gray
         atcFtableBuilder.clsGlobals.pFTable = pHspfFtable
         atcFtableBuilder.clsGlobals.pHelpManualName = pExtendedHelpFile

@@ -32,7 +32,6 @@ Public Module modModelSetup
         End If
     End Sub
 
-    'aLUType - Land use layer type (0 - USGS GIRAS Shape, 1 - NLCD grid, 2 - Other shape, 3 - Other grid)
     Public Function SetupHSPF(ByVal aGridPervious As atcControls.atcGrid, _
                               ByVal aMetBaseDsns As atcCollection, ByVal aMetWdmIds As atcCollection, _
                               ByVal aUniqueModelSegmentNames As atcCollection, _
@@ -55,221 +54,42 @@ Public Module modModelSetup
                               Optional ByVal aElevationUnits As String = "", _
                               Optional ByVal aDoWetlands As Boolean = False, _
                               Optional ByVal aToWetlandsFileName As String = "") As Boolean
+        'this version of SetupHSPF (with arguments) is preserved for backward compatibility, 
+        'but the preferred way of calling SetupHSPF is using the class below
+        Dim lSetup As New HspfSetup
+        With lSetup
+            .GridPervious = aGridPervious
+            .MetBaseDsns = aMetBaseDsns
+            .MetWdmIds = aMetWdmIds
+            .UniqueModelSegmentNames = aUniqueModelSegmentNames
+            .UniqueModelSegmentIds = aUniqueModelSegmentIds
+            .OutputPath = aOutputPath
+            .BaseOutputName = aBaseOutputName
+            .SubbasinLayerName = aSubbasinLayerName
+            .SubbasinFieldName = aSubbasinFieldName
+            .SubbasinSlopeName = aSubbasinSlopeName
+            .StreamLayerName = aStreamLayerName
+            .StreamFields = aStreamFields
+            .LUType = aLUType
+            .LandUseThemeName = aLandUseThemeName
+            .LUInclude = aLUInclude
+            .OutletsLayerName = aOutletsLayerName
+            .PointFieldName = aPointFieldName
+            .PointYear = aPointYear
+            .LandUseFieldName = aLandUseFieldName
+            .LandUseClassFile = aLandUseClassFile
+            .SubbasinSegmentName = aSubbasinSegmentName
+            .PSRCustom = aPSRCustom
+            .PSRCustomFile = aPSRCustomFile
+            .PSRCalculate = aPSRCalculate
+            .SnowOption = aSnowOption
+            .ElevationFileName = aElevationFileName
+            .ElevationUnits = aElevationUnits
+            .DoWetlands = aDoWetlands
+            .ToWetlandsFileName = aToWetlandsFileName
 
-        Logger.Status("Preparing to process")
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
-
-        'build collection of selected subbasins 
-        Dim lSubbasinsSelected As New atcCollection  'key is index, value is subbasin id
-        Dim lSubbasinsSlopes As New atcCollection    'key is subbasin id, value is slope
-        Dim lSubbasinId As Integer
-        Dim lSubbasinSlope As Double
-        Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinLayerName)
-        Dim lSubbasinFieldIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, aSubbasinFieldName)
-        Dim lSubbasinSlopeIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, aSubbasinSlopeName)
-        For i As Integer = 1 To GisUtil.NumSelectedFeatures(lSubbasinLayerIndex)
-            Dim lSelectedIndex As Integer = GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSubbasinLayerIndex)
-            lSubbasinId = GisUtil.FieldValue(lSubbasinLayerIndex, lSelectedIndex, lSubbasinFieldIndex)
-            lSubbasinSlope = GisUtil.FieldValue(lSubbasinLayerIndex, lSelectedIndex, lSubbasinSlopeIndex)
-            lSubbasinsSelected.Add(lSelectedIndex, lSubbasinId)
-            'TODO: be sure SubbasinIds are unique before this!
-            lSubbasinsSlopes.Add(lSubbasinId, lSubbasinSlope)
-        Next
-        If lSubbasinsSelected.Count = 0 Then 'no subbasins selected, act as if all are selected
-            For i As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                lSubbasinId = GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, lSubbasinFieldIndex)
-                lSubbasinSlope = GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, lSubbasinSlopeIndex)
-                lSubbasinsSelected.Add(i - 1, lSubbasinId)
-                lSubbasinsSlopes.Add(lSubbasinId, lSubbasinSlope)
-            Next
-        End If
-
-        'build collection of model segment ids for each subbasin
-        Dim lSubbasinsModelSegmentIds As New atcCollection    'key is subbasin id, value is model segment id
-        Dim lSubbasinSegmentFieldIndex As Integer = -1
-        If aSubbasinSegmentName <> "<none>" And aSubbasinSegmentName <> "" Then 'see if we have some model segments in the subbasin dbf
-            lSubbasinSegmentFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, aSubbasinSegmentName)
-        End If
-        For Each lSubbasinIndex As Integer In lSubbasinsSelected.Keys
-            lSubbasinId = lSubbasinsSelected.ItemByKey(lSubbasinIndex)
-            If lSubbasinSegmentFieldIndex > -1 And aUniqueModelSegmentIds.Count > 0 Then
-                Dim lModelSegment As String = GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex, lSubbasinSegmentFieldIndex)
-                lSubbasinsModelSegmentIds.Add(lSubbasinId, aUniqueModelSegmentIds(aUniqueModelSegmentNames.IndexFromKey(lModelSegment)))
-            Else
-                lSubbasinsModelSegmentIds.Add(lSubbasinId, 1)
-            End If
-        Next
-
-        'each land use code, subbasin id, and area is a single land use record
-        Dim lLandUseSubbasinOverlayRecords As New Collection '(Of LandUseSubbasinOverlayRecord)
-        Dim lReclassifyFileName As String = ""
-
-        If aLUType = 0 Then
-            'usgs giras is the selected land use type
-            Logger.Status("Performing overlay for GIRAS landuse")
-            Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aSubbasinFieldName, _
-                                                                aSnowOption, aElevationFileName, aElevationUnits, aDoWetlands, aToWetlandsFileName)
-
-            If lLandUseSubbasinOverlayRecords.Count = 0 Or Not lSuccess Then
-                'problem occurred, get out
-                Return False
-                Exit Function
-            End If
-            'set reclassify file name for giras
-            Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(GisUtil.LayerIndex("Land Use Index"))) & "\landuse"
-            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-            lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
-            If IO.Directory.Exists(lReclassifyFileName) Then
-                lReclassifyFileName &= "giras.dbf"
-            Else
-                lReclassifyFileName = lBasinsFolder & "\etc\giras.dbf"
-            End If
-
-        ElseIf aLUType = 1 Or aLUType = 3 Then
-            'nlcd grid or other grid is the selected land use type
-            Logger.Status("Overlaying Land Use and Subbasins")
-            CreateLanduseRecordsGrid(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aLandUseThemeName, _
-                                     aSnowOption, aElevationFileName, aElevationUnits, aDoWetlands, aToWetlandsFileName)
-
-            If aLUType = 1 Then 'nlcd grid
-                If IO.File.Exists(aLandUseClassFile) Then
-                    lReclassifyFileName = aLandUseClassFile
-                Else
-                    'try to default if not set
-                    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-                    lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
-                    If IO.Directory.Exists(lReclassifyFileName) Then
-                        lReclassifyFileName &= "nlcd.dbf"
-                    Else
-                        lReclassifyFileName = lBasinsFolder & "\etc\nlcd.dbf"
-                    End If
-                End If
-            Else
-                If aLandUseClassFile <> "<none>" Then
-                    lReclassifyFileName = aLandUseClassFile
-                End If
-            End If
-
-        ElseIf aLUType = 2 Then
-            'other shape
-            Logger.Status("Overlaying Land Use and Subbasins")
-            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aSubbasinFieldName, aLandUseThemeName, aLandUseFieldName, _
-                                          aSnowOption, aElevationFileName, aElevationUnits, aDoWetlands, aToWetlandsFileName)
-
-            lReclassifyFileName = ""
-            If aLandUseClassFile <> "<none>" Then
-                lReclassifyFileName = aLandUseClassFile
-            End If
-
-        End If
-
-        'convert units if the GIS layer units are feet instead of meters
-        Dim lDistFactor As Double = 1.0
-        If GisUtil.MapUnits.ToUpper = "FEET" Then
-            lDistFactor = 3.2808
-            For Each lRec As LandUseSubbasinOverlayRecord In lLandUseSubbasinOverlayRecords
-                lRec.Area = lRec.Area / (lDistFactor * lDistFactor)
-            Next
-        End If
-
-        'special code to always include certain land uses
-        Dim lSub As Integer
-        Dim lFoundLU As Boolean = False
-        Dim lInd As Integer
-        For Each lLU As Integer In aLUInclude
-            Dim lTempRec1 As New LandUseSubbasinOverlayRecord
-            Dim lTempRecInd As New LandUseSubbasinOverlayRecord
-            lTempRec1 = lLandUseSubbasinOverlayRecords(1)
-            lSub = lTempRec1.SubbasinId
-            lInd = 1
-            While lInd <= lLandUseSubbasinOverlayRecords.Count
-                lTempRecInd = lLandUseSubbasinOverlayRecords(lInd)
-                If lTempRecInd.LuCode = lLU Then lFoundLU = True
-                If lTempRecInd.SubbasinId <> lSub OrElse lInd = lLandUseSubbasinOverlayRecords.Count Then
-                    'new subbasin, if LU not found, need to add it
-                    If Not lFoundLU Then
-                        Dim lRec As New LandUseSubbasinOverlayRecord
-                        lRec.LuCode = lLU
-                        lRec.SubbasinId = lSub
-                        lRec.Area = 0.001
-                        lRec.MeanLatitude = lTempRec1.MeanLatitude
-                        lRec.MeanElevation = lTempRec1.MeanElevation
-                        lRec.PercentToWetlands = 0.0
-                        lLandUseSubbasinOverlayRecords.Add(lRec, , lInd)
-                        lInd += 1
-                        lTempRecInd = lLandUseSubbasinOverlayRecords(lInd)
-                        lSub = lTempRecInd.SubbasinId
-                    End If
-                    lFoundLU = False
-                End If
-                lInd += 1
-            End While
-        Next
-
-        Logger.Status("Completed overlay of subbasins and land use layers")
-
-        'Create Reach Segments
-        Dim lReaches As Reaches = CreateReachSegments(lSubbasinsSelected, lSubbasinsModelSegmentIds, aStreamLayerName, aStreamFields)
-
-        'Create Stream Channels
-        Dim lChannels As Channels = CreateStreamChannels(lReaches)
-
-        'Create LandUses
-        Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLandUseSubbasinOverlayRecords, lReaches)
-
-        'figure out which outlets are in which subbasins
-        Dim lOutSubs As New Collection
-        If aOutletsLayerName <> "<none>" Then
-            Logger.Status("Joining point sources to subbasins")
-            Dim i As Integer = GisUtil.LayerIndex(aOutletsLayerName)
-            For j As Integer = 1 To GisUtil.NumFeatures(i)
-                Dim k As Integer = GisUtil.PointInPolygon(i, j - 1, lSubbasinLayerIndex)
-                If k > -1 Then
-                    lOutSubs.Add(GisUtil.FieldValue(lSubbasinLayerIndex, k, lSubbasinFieldIndex))
-                Else
-                    lOutSubs.Add(-1)
-                End If
-            Next j
-        End If
-
-        'make output folder
-        MkDirPath(aOutputPath)
-        Dim lBaseFileName As String = aOutputPath & "\" & aBaseOutputName
-
-        'write wsd file
-        Logger.Status("Writing WSD file")
-        Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, aGridPervious, lLandUses)
-        WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses, aSnowOption, aDoWetlands)
-
-        'write rch file 
-        Logger.Status("Writing RCH file")
-        WriteRCHFile(lBaseFileName & ".rch", lReaches)
-
-        'write ptf file
-        Logger.Status("Writing PTF file")
-        WritePTFFile(lBaseFileName & ".ptf", lChannels)
-
-        'write psr file
-        Logger.Status("Writing PSR file")
-        Dim lOutletsLayerIndex As Integer
-        Dim lPointLayerIndex As Integer
-        If lOutSubs.Count > 0 Then
-            lOutletsLayerIndex = GisUtil.LayerIndex(aOutletsLayerName)
-            lPointLayerIndex = GisUtil.FieldIndex(lOutletsLayerIndex, aPointFieldName)
-        End If
-        WritePSRFile(lBaseFileName & ".psr", lSubbasinsSelected, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
-                     aPSRCustom, aPSRCustomFile, aPSRCalculate, aPointYear)
-
-        'write seg file
-        Logger.Status("Writing SEG file")
-        WriteSEGFile(lBaseFileName & ".seg", aUniqueModelSegmentIds, aMetBaseDsns, aMetWdmIds)
-
-        'write map file
-        Logger.Status("Writing MAP file")
-        WriteMAPFile(lBaseFileName & ".map")
-
-        Logger.Status("")
+            .SetupHSPF()
+        End With
         Return True
     End Function
 
@@ -2071,7 +1891,29 @@ Public Module modModelSetup
         'set nodata value properly
         GisUtil.GridSetNoData(aDEMFileName, -100.0)
 
-        'First Compute the Pit Fill Grid (Corrected DEM)
+        'First burn in the stream lines
+        Dim lBurnedDEMLayerName As String = "Burned DEM"
+        Dim lBurnedDEMLayerIndex As Integer = 0
+        Dim lBurnedDEMFileName As String = ""
+        If GisUtil.IsLayer(lBurnedDEMLayerName) Then
+            lBurnedDEMLayerIndex = GisUtil.LayerIndex(lBurnedDEMLayerName)
+            lBurnedDEMFileName = GisUtil.LayerFileName(lBurnedDEMLayerIndex)
+        Else
+            Logger.Status("Wetlands Step 1 of 4: Burning-in Stream Lines")
+            lBurnedDEMFileName = FilenameNoExt(aDEMFileName) & "BurnIn.tif"
+            If FileExists(lBurnedDEMFileName) Then
+                IO.File.Delete(lBurnedDEMFileName)
+            End If
+            Dim lBurnedDEMPrjFileName As String = FilenameNoExt(aDEMFileName) & "BurnIn.prj"
+            If FileExists(lBurnedDEMPrjFileName) Then
+                IO.File.Delete(lBurnedDEMPrjFileName)
+            End If
+            GisUtil.GridBurnIn(aDEMFileName, aStreamsFileName, lBurnedDEMFileName)
+            GisUtil.AddLayer(lBurnedDEMFileName, lBurnedDEMLayerName)
+            GisUtil.SaveProject(GisUtil.ProjectFileName)
+        End If
+
+        'Compute the Pit Fill Grid (Corrected DEM)
         Dim lPitFillDEMLayerName As String = "Corrected DEM"
         Dim lPitFillDEMLayerIndex As Integer = 0
         Dim lPitFillDEMFileName As String = ""
@@ -2079,9 +1921,9 @@ Public Module modModelSetup
             lPitFillDEMLayerIndex = GisUtil.LayerIndex(lPitFillDEMLayerName)
             lPitFillDEMFileName = GisUtil.LayerFileName(lPitFillDEMLayerIndex)
         Else
-            Logger.Status("Wetlands Step 1 of 3: Computing Pit Fill")
+            Logger.Status("Wetlands Step 2 of 4: Computing Pit Fill")
             lPitFillDEMFileName = FilenameNoExt(aDEMFileName) & "PitFill.tif"
-            GisUtil.GridPitFill(aDEMFileName, lPitFillDEMFileName)
+            GisUtil.GridPitFill(lBurnedDEMFileName, lPitFillDEMFileName)
             GisUtil.AddLayer(lPitFillDEMFileName, lPitFillDEMLayerName)
             GisUtil.SaveProject(GisUtil.ProjectFileName)
         End If
@@ -2095,7 +1937,7 @@ Public Module modModelSetup
             lFlowDirGridLayerIndex = GisUtil.LayerIndex(lFlowDirGridLayerName)
             lFlowDirGridFileName = GisUtil.LayerFileName(lFlowDirGridLayerIndex)
         Else
-            Logger.Status("Wetlands Step 2 of 3: Computing Flow Direction")
+            Logger.Status("Wetlands Step 3 of 4: Computing Flow Direction")
             lFlowDirGridFileName = FilenameNoExt(aDEMFileName) & "FlowDir.tif"
             lSlopeGridFileName = FilenameNoExt(aDEMFileName) & "Slope.tif"
             Dim lRet As Integer = GisUtil.GridFlowDirection(lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName)
@@ -2115,7 +1957,7 @@ Public Module modModelSetup
             lToWetlandsGridLayerIndex = GisUtil.LayerIndex(lToWetlandsGridLayerName)
             lToWetlandsGridFileName = GisUtil.LayerFileName(lToWetlandsGridLayerIndex)
         Else
-            Logger.Status("Wetlands Step 3 of 3: Computing ToWetlands Grid")
+            Logger.Status("Wetlands Step 4 of 4: Computing ToWetlands Grid")
             lToWetlandsGridFileName = FilenameNoExt(aDEMFileName) & "ToWetlands.tif"
             GisUtil.ComputeToWetlands(lFlowDirGridFileName, aWetlandsFileName, aStreamsFileName, lToWetlandsGridFileName)
             If FileExists(lInputProjectionFileName) Then

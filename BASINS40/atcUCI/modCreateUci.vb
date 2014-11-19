@@ -107,6 +107,23 @@ Module modCreateUci
             .EDate(3) = 24
         End With
 
+        Dim lWetlandAreas(pWatershed.Reaches.Count) As Double
+        If pDoWetlands Then
+            'to avoid double counting of wetlands areas, remove wetlands from perlnds.
+            'save area values to add to rchres operations later
+            Dim lIndex As Integer = 0
+            Do While lIndex < pWatershed.LandUses.Count
+                Dim lLandUse As LandUse = pWatershed.LandUses(lIndex)
+                If lLandUse.Description.ToUpper.Contains("WETLAND") Then
+                    'remove from this collection
+                    lWetlandAreas(lLandUse.Reach.Id) += lLandUse.Area
+                    pWatershed.LandUses.RemoveAt(lIndex)
+                Else
+                    lIndex += 1
+                End If
+            Loop
+        End If
+
         'add opn seq block
         CreateOpnSeqBlock(aUci)
 
@@ -145,7 +162,10 @@ Module modCreateUci
                 Dim lWetId As Integer = CShort(lChannel.Reach.Id) + pWetlandsOffset
                 lOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(lWetId)
                 If Not lOperation Is Nothing Then
-                    lChannel.WidthMean = lChannel.WidthMean * 10.0
+                    If lWetlandAreas(lChannel.Reach.Id) > 0.0 Then
+                        lChannel.WidthMean = lWetlandAreas(lChannel.Reach.Id) * 43560 / lChannel.Length
+                    End If
+                    lChannel.SlopeProfile = lChannel.SlopeProfile * 0.1
                     lOperation.FTable.FTableFromCrossSect(lChannel)
                 End If
             End If
@@ -328,6 +348,10 @@ Module modCreateUci
             lTable.Parms("VOL").Value = CInt(pWatershed.Reaches(lOrder).Length * 5280 * _
                                              pWatershed.Reaches(lOrder).Depth * _
                                              pWatershed.Reaches(lOrder).Width / 43560 * 0.75)
+            If pDoWetlands AndAlso lWetReach Then
+                'this is a wetland reach
+                lTable.Parms("VOL").Value = System.Math.Round(lOperation.FTable.Volume(3), 0)  'use the volume at the nominal surface area of the wetland
+            End If
             If pDoWetlands Then
                 If lWetReach Then
                     'do the regular reach next time
@@ -501,7 +525,9 @@ Module modCreateUci
                     lWConnection.Target.VolName = "RCHRES"
                     lWConnection.Target.VolId = lLandUse.Reach.Id + pWetlandsOffset
                     lWConnection.MassLink = TypeId(lType)
-                    aUci.Connections.Add(lWConnection)
+                    If lWConnection.MFact > 0 Then
+                        aUci.Connections.Add(lWConnection)
+                    End If
                 End If
             Next
         Next
