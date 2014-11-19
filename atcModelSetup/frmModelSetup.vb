@@ -1468,75 +1468,80 @@ Public Class frmModelSetup
                 StartAQUATOX(" UNKNOWN " & lOutputPath)
             End If
         Else
-            'TODO: make all the variables below part of a class to pass into SetupHSPF
-            Dim lSubbasinLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
-            Dim lLandUseLayerName As String = ""
-            If cboLandUseLayer.SelectedIndex > -1 Then
-                lLandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-            End If
-            Dim lLanduseFieldName As String = ""
-            If cboDescription.SelectedIndex > -1 Then
-                lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
-            End If
-            Dim lSubbasinFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
-            Dim lSubbasinSlopeName As String = cboSub2.Items(cboSub2.SelectedIndex)
-            Dim lSubbasinSegmentName As String = cboSub3.Items(cboSub3.SelectedIndex)
-            Dim lLUType As Integer = cboLanduse.SelectedIndex
-            Dim lLandUseClassFile As String = lblClass.Text
-            Dim lOutletsLayerName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
-            Dim lPointFieldName As String = ""
-            If cboPoint.SelectedIndex > -1 Then
-                lPointFieldName = cboPoint.Items(cboPoint.SelectedIndex)
-            End If
-            Dim lPointYear As String = cboYear.Items(cboYear.SelectedIndex)
-            Dim lPSRCustom As Boolean = chkCustom.Checked
-            Dim lPSRCustomFile As String = lblCustom.Text
-            Dim lPSRCalculate As Boolean = chkCalculate.Checked
-            Dim lWQConstituents() As String = {}
-            Dim lLUInclude() As Integer = {} ' = {61, 71, 81, 91}
-            Dim lSnowOption As Integer = 0
-            If chkSnow.Checked Then
-                If rbnEnergy.Checked Then
-                    lSnowOption = 1
-                Else
-                    lSnowOption = 2
-                End If
-            End If
-            Dim lElevationLayerName As String = cboDEM.Items(cboDEM.SelectedIndex)
-            Dim lElevationFileName As String = ""
-            If lElevationLayerName <> "<none>" Then
-                lElevationFileName = GisUtil.LayerFileName(lElevationLayerName)
-            End If
-            Dim lElevationUnitsName As String = cboUnits.Items(cboUnits.SelectedIndex)
+            Dim lSetup As New HspfSetup
 
-            Dim lStreamLayerName As String = cboStreams.Items(cboStreams.SelectedIndex)
-            Dim lStreamFields() As String = {cboStream1.Items(cboStream1.SelectedIndex), _
-                                             cboStream2.Items(cboStream2.SelectedIndex), _
-                                             cboStream3.Items(cboStream3.SelectedIndex), _
-                                             cboStream4.Items(cboStream4.SelectedIndex), _
-                                             cboStream5.Items(cboStream5.SelectedIndex), _
-                                             cboStream6.Items(cboStream6.SelectedIndex), _
-                                             cboStream7.Items(cboStream7.SelectedIndex), _
-                                             cboStream8.Items(cboStream8.SelectedIndex), _
-                                             cboStream9.Items(cboStream9.SelectedIndex)}
-            Dim lDoWetlands As Boolean = chkWetlands.Checked
+            'set all the properties of this new class
+            With lSetup
+                .SubbasinLayerName = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+                .LandUseThemeName = ""
+                If cboLandUseLayer.SelectedIndex > -1 Then
+                    .LandUseThemeName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+                End If
+                .LandUseFieldName = ""
+                If cboDescription.SelectedIndex > -1 Then
+                    .LandUseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
+                End If
+                .SubbasinFieldName = cboSub1.Items(cboSub1.SelectedIndex)
+                .SubbasinSlopeName = cboSub2.Items(cboSub2.SelectedIndex)
+                .SubbasinSegmentName = cboSub3.Items(cboSub3.SelectedIndex)
+                .LUType = cboLanduse.SelectedIndex
+                .LandUseClassFile = lblClass.Text
+                .OutletsLayerName = cboOutlets.Items(cboOutlets.SelectedIndex)
+                .PointFieldName = ""
+                If cboPoint.SelectedIndex > -1 Then
+                    .PointFieldName = cboPoint.Items(cboPoint.SelectedIndex)
+                End If
+                .PointYear = cboYear.Items(cboYear.SelectedIndex)
+                .PSRCustom = chkCustom.Checked
+                .PSRCustomFile = lblCustom.Text
+                .PSRCalculate = chkCalculate.Checked
+                Dim lLUInclude() As Integer = {} ' = {61, 71, 81, 91}
+                .LUInclude = lLUInclude
+                .SnowOption = 0
+                If chkSnow.Checked Then
+                    If rbnEnergy.Checked Then
+                        .SnowOption = 1
+                    Else
+                        .SnowOption = 2
+                    End If
+                End If
+                Dim lElevationLayerName As String = cboDEM.Items(cboDEM.SelectedIndex)
+                If lElevationLayerName <> "<none>" Then
+                    .ElevationFileName = GisUtil.LayerFileName(lElevationLayerName)
+                End If
+                .ElevationUnits = cboUnits.Items(cboUnits.SelectedIndex)
+
+                .StreamLayerName = cboStreams.Items(cboStreams.SelectedIndex)
+                Dim lStreamFields() As String = {cboStream1.Items(cboStream1.SelectedIndex), _
+                                                 cboStream2.Items(cboStream2.SelectedIndex), _
+                                                 cboStream3.Items(cboStream3.SelectedIndex), _
+                                                 cboStream4.Items(cboStream4.SelectedIndex), _
+                                                 cboStream5.Items(cboStream5.SelectedIndex), _
+                                                 cboStream6.Items(cboStream6.SelectedIndex), _
+                                                 cboStream7.Items(cboStream7.SelectedIndex), _
+                                                 cboStream8.Items(cboStream8.SelectedIndex), _
+                                                 cboStream9.Items(cboStream9.SelectedIndex)}
+                .StreamFields = lStreamFields
+                .DoWetlands = chkWetlands.Checked
+            End With
+            Dim lWQConstituents() As String = {}
 
             EnableControls(False)
 
             If PreProcessChecking(lOutputPath, lBaseOutputName, pModelName, cboLanduse.SelectedIndex, _
-                              pMetStations.Count, lSubbasinLayerName, lLandUseLayerName) Then 'early checks OK
+                              pMetStations.Count, lSetup.SubbasinLayerName, lSetup.LandUseThemeName) Then 'early checks OK
                 lblStatus.Text = "Preparing HSPF Setup"
                 Me.Refresh()
 
-                Dim lToWetlandsGridFileName As String = ""
-                If lDoWetlands Then
+                lSetup.ToWetlandsFileName = ""
+                If lSetup.DoWetlands Then
                     'do grid processing for new wetlands option
                     Dim lWetlandsDEMLayerName As String = cboDEM2.Items(cboDEM2.SelectedIndex)
                     Dim lWetlandsDEMFileName As String = GisUtil.LayerFileName(lWetlandsDEMLayerName)
                     Dim lWetlandsLayerName As String = cboWetlands.Items(cboWetlands.SelectedIndex)
                     Dim lWetlandsFileName As String = GisUtil.LayerFileName(lWetlandsLayerName)
-                    Dim lStreamsFileName As String = GisUtil.LayerFileName(lStreamLayerName)
-                    lToWetlandsGridFileName = ProcessGridForWetlands(lWetlandsDEMFileName, lWetlandsFileName, lStreamsFileName)
+                    Dim lStreamsFileName As String = GisUtil.LayerFileName(lSetup.StreamLayerName)
+                    lSetup.ToWetlandsFileName = ProcessGridForWetlands(lWetlandsDEMFileName, lWetlandsFileName, lStreamsFileName)
                 End If
 
                 'Dim lMetWDM As String = ""    'used to be txtMetWDMName.Text,
@@ -1565,27 +1570,24 @@ Public Class frmModelSetup
                     lMetWdmIds.Add(lMetWdmIds.Count, "WDM" & (lUniqueMetWDMNames.IndexOf(lFileName) + 2).ToString)
                 Next
 
+                With lSetup
+                    .GridPervious = AtcGridPervious
+                    .MetBaseDsns = lMetBaseDsns
+                    .MetWdmIds = lMetWdmIds
+                    .UniqueModelSegmentNames = pUniqueModelSegmentNames
+                    .UniqueModelSegmentIds = pUniqueModelSegmentIds
+                    .OutputPath = lOutputPath
+                    .BaseOutputName = lBaseOutputName
+                End With
 
-                If SetupHSPF(AtcGridPervious, _
-                             lMetBaseDsns, lMetWdmIds, _
-                             pUniqueModelSegmentNames, pUniqueModelSegmentIds, _
-                             lOutputPath, lBaseOutputName, _
-                             lSubbasinLayerName, lSubbasinFieldName, lSubbasinSlopeName, _
-                             lStreamLayerName, lStreamFields, _
-                             lLUType, lLandUseLayerName, lLUInclude, _
-                             lOutletsLayerName, lPointFieldName, lPointYear, _
-                             lLanduseFieldName, lLandUseClassFile, _
-                             lSubbasinSegmentName, _
-                             lPSRCustom, lPSRCustomFile, lPSRCalculate, _
-                             lSnowOption, lElevationFileName, lElevationUnitsName, _
-                             lDoWetlands, lToWetlandsGridFileName) Then
+                If lSetup.SetupHSPF() Then
                     Me.Dispose()
                     Me.Close()
 
                     If CreateUCI(lOutputPath & "\" & lBaseOutputName & ".uci", _
                                  lUniqueMetWDMNames, _
                                  lWQConstituents, , _
-                                 lSnowOption, lDoWetlands) Then
+                                 lSetup.SnowOption, lSetup.DoWetlands) Then
                         lblStatus.Text = "Completed HSPF Setup"
                         Me.Refresh()
                         StartWinHSPF(lOutputPath & "\" & lBaseOutputName & ".uci")

@@ -29,8 +29,6 @@ Partial Class ctlEditFTables
         Me.txtNCols = New atcControls.atcText
         Me.txtNRows = New atcControls.atcText
         Me.grdEdit = New atcControls.atcGrid
-        Me.cmdLID = New System.Windows.Forms.Button
-        Me.cmdOpen = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'cmdImport
@@ -58,7 +56,7 @@ Partial Class ctlEditFTables
         'cmdFcurve
         '
         Me.cmdFcurve.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdFcurve.Location = New System.Drawing.Point(395, 276)
+        Me.cmdFcurve.Location = New System.Drawing.Point(395, 192)
         Me.cmdFcurve.Margin = New System.Windows.Forms.Padding(2)
         Me.cmdFcurve.Name = "cmdFcurve"
         Me.cmdFcurve.Size = New System.Drawing.Size(97, 38)
@@ -170,34 +168,10 @@ Partial Class ctlEditFTables
         Me.grdEdit.Source = Nothing
         Me.grdEdit.TabIndex = 0
         '
-        'cmdLID
-        '
-        Me.cmdLID.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdLID.Location = New System.Drawing.Point(395, 192)
-        Me.cmdLID.Margin = New System.Windows.Forms.Padding(2)
-        Me.cmdLID.Name = "cmdLID"
-        Me.cmdLID.Size = New System.Drawing.Size(97, 38)
-        Me.cmdLID.TabIndex = 10
-        Me.cmdLID.Text = "LID Controls Tool"
-        Me.cmdLID.UseVisualStyleBackColor = True
-        '
-        'cmdOpen
-        '
-        Me.cmdOpen.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdOpen.Location = New System.Drawing.Point(395, 234)
-        Me.cmdOpen.Margin = New System.Windows.Forms.Padding(2)
-        Me.cmdOpen.Name = "cmdOpen"
-        Me.cmdOpen.Size = New System.Drawing.Size(97, 38)
-        Me.cmdOpen.TabIndex = 11
-        Me.cmdOpen.Text = "Sewer and Open Channel Tool"
-        Me.cmdOpen.UseVisualStyleBackColor = True
-        '
         'ctlEditFTables
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.Controls.Add(Me.cmdOpen)
-        Me.Controls.Add(Me.cmdLID)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
@@ -225,7 +199,5 @@ Partial Class ctlEditFTables
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents cmdLID As System.Windows.Forms.Button
-    Friend WithEvents cmdOpen As System.Windows.Forms.Button
 
 End Class
