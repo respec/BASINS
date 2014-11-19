@@ -292,6 +292,23 @@ namespace atcFtableBuilder
                 clsGlobals.pFTable.Ncols = numcols;
                 clsGlobals.pFTable.Nrows = numrows-1;
 
+                if (ftableFieldWidth == 15)
+                {
+                    clsGlobals.pFTable.ExtendedFlag = true;
+                }
+                else
+                {
+                    clsGlobals.pFTable.ExtendedFlag = false;
+                }
+
+                clsGlobals.pFTable.Comment = "";
+                for (int j = 0; j < numcols; j++)
+                {
+                       string s = FTableSource.get_CellValue(0, j).ToString();
+                       clsGlobals.pFTable.Comment = clsGlobals.pFTable.Comment + s.PadLeft(ftableFieldWidth);
+                }
+                clsGlobals.pFTable.Comment = clsGlobals.pFTable.Comment + " ***";
+
                 for (int i = 0; i < numrows; i++)
                 {
                     if (i == 0) continue;
