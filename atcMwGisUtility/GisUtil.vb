@@ -3610,7 +3610,10 @@ Public Class GisUtil
         Loop
         Dim lNewShapeFile As New MapWinGIS.Shapefile
         Dim rsf As New MapWinGIS.Shapefile
-        lNewShapeFile.CreateNew(lNewShapeFileName, lSf.ShapefileType)
+        'lNewShapeFile.CreateNew(lNewShapeFileName, lSf.ShapefileType)
+        If Not lNewShapeFile.CreateNew(lNewShapeFileName, lSf.ShapefileType) Then
+            Logger.Msg("Failed to create stream shapefile " & lNewShapeFileName & " ErrorCode " & lNewShapeFile.LastErrorCode)
+        End If
         Dim lInputProjectionFileName As String = FilenameSetExt(lSf.Filename, "prj")
         If FileExists(lInputProjectionFileName) Then
             FileCopy(lInputProjectionFileName, FilenameSetExt(lNewShapeFileName, "prj"))

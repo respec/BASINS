@@ -118,7 +118,7 @@
             // chkExtendedFormat
             // 
             this.chkExtendedFormat.AutoSize = true;
-            this.chkExtendedFormat.Checked = true;
+            this.chkExtendedFormat.Checked = false;
             this.chkExtendedFormat.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkExtendedFormat.Location = new System.Drawing.Point(501, 8);
             this.chkExtendedFormat.Name = "chkExtendedFormat";

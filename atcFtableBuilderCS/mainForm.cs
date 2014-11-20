@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -99,7 +99,7 @@ namespace atcFtableBuilder
                 this.Text = clsGlobals.ToolNameGreen;
             }
 
-            clsGlobals.CurrentFTableFormat = FTableCalculator.FTableFormat.Extended;
+            clsGlobals.CurrentFTableFormat = FTableCalculator.FTableFormat.Regular;
 
             pLoaded = true;
        }
