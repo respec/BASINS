@@ -1,6 +1,7 @@
 Option Strict Off
 Option Explicit On
 
+Imports atcData
 Imports MapWinUtility
 Imports atcUtility
 Imports System.Collections.ObjectModel
@@ -37,20 +38,20 @@ End Class
 '    End Function
 'End Class
 
-Friend Class HspfBinaryDatum
-    'Public OutLev As Byte = 0
-    Public JDate As Double = 0
-    Friend ValuesStartPosition As Long = 0
-    'Friend Function AsKey() As String
-    '    Return JDate
-    '    'Return OutLev & ":" & JDate
-    'End Function
-End Class
+'Friend Class HspfBinaryDatum
+'    'Public OutLev As Byte = 0
+'    Public JDate As Double = 0
+'    Friend ValuesStartPosition As Long = 0
+'    'Friend Function AsKey() As String
+'    '    Return JDate
+'    '    'Return OutLev & ":" & JDate
+'    'End Function
+'End Class
 
 Friend Class HspfBinaryHeaders
     Inherits KeyedCollection(Of String, HspfBinaryHeader)
 
-    Private Shared pVersion As Integer = &H48424E31 'HBN1 
+    Private Shared pVersion As Integer = &H48424E32 'HBN2 
 
     Protected Overrides Function GetKeyForItem(ByVal aHspfBinaryHeader As HspfBinaryHeader) As String
         Return aHspfBinaryHeader.Id.AsKey
@@ -69,6 +70,32 @@ Friend Class HspfBinaryHeaders
             Else
                 Try
                     Me.Clear()
+
+                    Dim lNumDates As Integer = lReader.ReadInt32
+                    If lNumDates <= 0 Then
+                        Logger.Dbg("Number of dates <= 0 for " & aFileName & " (" & lNumDates & ")")
+                        lReader.Close()
+                        Return False
+                    End If
+                    HspfBinaryHeader.AllDates.Clear()
+                    HspfBinaryHeader.AllDates.Capacity = lNumDates
+                    For lDatesIndex As Integer = 1 To lNumDates
+                        Dim lReadDates As New atcTimeseries(Nothing)
+                        Dim lTu As atcTimeUnit = lReader.ReadInt32
+                        If lTu = atcTimeUnit.TUUnknown Then
+                            lReadDates.numValues = lReader.ReadInt32
+                            For lIndex As Integer = 0 To lReadDates.numValues
+                                lReadDates.Value(lIndex) = lReader.ReadDouble
+                            Next
+                        Else
+                            Dim lTs As Integer = lReader.ReadInt32
+                            Dim lStartDate As Double = lReader.ReadDouble
+                            Dim lEndDate As Double = lReader.ReadDouble
+                            lReadDates.Values = NewDates(lStartDate, lEndDate, lTu, lTs)
+                        End If
+                        HspfBinaryHeader.AllDates.Add(lReadDates)
+                    Next
+
                     Dim lNumHeaders As Integer = lReader.ReadInt32
                     If lNumHeaders <= 0 Then
                         Logger.Dbg("Number of headers <= 0 for " & aFileName & " (" & lNumHeaders & ")")
@@ -77,20 +104,7 @@ Friend Class HspfBinaryHeaders
                     End If
                     For lHeaderIndex As Integer = 1 To lNumHeaders
                         Dim lHeader As New HspfBinaryHeader
-                        With lHeader
-                            .Id = New HspfBinaryId(lReader.ReadString)
-                            Dim lNumVars As Integer = lReader.ReadInt32
-                            For lVarIndex As Integer = 1 To lNumVars
-                                .VarNames.Add(lReader.ReadString)
-                            Next
-                            Dim lNumData As Integer = lReader.ReadInt32
-                            For lDataIndex As Integer = 1 To lNumData
-                                Dim lNewDatum As New HspfBinaryDatum()
-                                lNewDatum.JDate = lReader.ReadDouble
-                                lNewDatum.ValuesStartPosition = lReader.ReadInt64
-                                .Data.Add(lNewDatum)
-                            Next
-                        End With
+                        lHeader.ReadFromHeader(lReader)
                         Me.Add(lHeader)
                         Logger.Progress(Me.Count / 2, lNumHeaders)
                     Next
@@ -112,20 +126,43 @@ Friend Class HspfBinaryHeaders
             Dim lFileStream As New IO.FileStream(aFileName, IO.FileMode.Create)
             lWriter = New IO.BinaryWriter(lFileStream)
             lWriter.Write(pVersion)
+
+            lWriter.Write(HspfBinaryHeader.AllDates.Count)
+            For Each lDates As atcTimeseries In HspfBinaryHeader.AllDates
+                Dim lTimeUnit As atcTimeUnit = atcTimeUnit.TUUnknown
+                Dim lTimeStep As Integer = 1
+                If lDates.numValues > 1 Then 'Compute Interval and beginning of first interval
+                    Dim lInterval As Double = GetNaN()
+                    CalcTimeUnitStep(lDates.Value(1), lDates.Value(2), lTimeUnit, lTimeStep)
+                    If lTimeUnit <> atcTimeUnit.TUUnknown Then
+                        lDates.Value(0) = TimAddJ(lDates.Value(1), lTimeUnit, lTimeStep, -1)
+                        lDates.Attributes.SetValue("Time Step", lTimeStep)
+                        lDates.Attributes.SetValue("Time Unit", lTimeUnit)
+                        lInterval = CalcInterval(lTimeUnit, lTimeStep)
+                        If Double.IsNaN(lInterval) Then
+                            lDates.Attributes.RemoveByKey("Interval")
+                        Else
+                            lDates.Attributes.SetValue("Interval", lInterval)
+                        End If
+                    End If
+                End If
+
+                lWriter.Write(lTimeUnit)
+                If lTimeUnit = atcTimeUnit.TUUnknown Then
+                    lWriter.Write(lDates.numValues)
+                    For lIndex As Integer = 0 To lDates.numValues
+                        lWriter.Write(lDates.Value(lIndex))
+                    Next
+                Else
+                    lWriter.Write(lTimeStep)
+                    lWriter.Write(lDates.Value(0))
+                    lWriter.Write(lDates.Value(lDates.numValues))
+                End If
+            Next
+
             lWriter.Write(Me.Count)
             For Each lHeader As HspfBinaryHeader In Me
-                With lHeader
-                    lWriter.Write(.Id.AsKey)
-                    lWriter.Write(.VarNames.Count)
-                    For Each lVarName As String In .VarNames
-                        lWriter.Write(lVarName)
-                    Next
-                    lWriter.Write(.Data.Count)
-                    For Each lDatum As HspfBinaryDatum In .Data
-                        lWriter.Write(lDatum.JDate)
-                        lWriter.Write(lDatum.ValuesStartPosition)
-                    Next
-                End With
+                lHeader.Write(lWriter)
             Next
             Logger.Dbg("Saved " & aFileName)
         Catch ex As Exception
@@ -141,14 +178,78 @@ Friend Class HspfBinaryHeaders
 End Class
 
 Friend Class HspfBinaryHeader
+    Public Shared AllDates As New Generic.List(Of atcTimeseries)
+    Private Shared pUniqueVariableNames As New Generic.List(Of String)
+    'Public Shared pDuplicateVariableNames As Integer = 0
+    'Public Shared pTotalVariableLength As Long = 0
+    'Public Shared pDuplicateVariableLength As Long = 0
+
     Public Id As HspfBinaryId
     Public VarNames As New Generic.List(Of String)
-    Public Data As New Generic.List(Of HspfBinaryDatum)
+
+    'Public Data As New Generic.List(Of HspfBinaryDatum)
+    Public ValuesStartPosition As New Generic.List(Of Long)
+    Public Dates As atcTimeseries = Nothing
 
     ''' <summary>
     ''' Output Level: 2=BIVL, 3=day, 4=month, 5=year, 6=never
     ''' </summary>
     Public OutLev As Byte = 6 'Default to 6=never, will be replaced by shortest interval in file.
+
+    Public Sub ReadFromHbn(ByVal lCurrentRecord() As Byte, ByVal aLength As Integer, ByVal aId As HspfBinaryId)
+        Id = aId
+        'Byte position within current header record     
+        Dim lBytePosition As Integer = 20
+        While lBytePosition < aLength
+            Dim lVariableNameLength As Integer = BitConverter.ToInt32(lCurrentRecord, lBytePosition)
+            Dim lVariableName As String = System.Text.ASCIIEncoding.ASCII.GetString(lCurrentRecord, _
+                lBytePosition + 4, lVariableNameLength).Replace("("c, " "c).Replace(")"c, " "c).Trim
+            AddVariable(lVariableName)
+            lBytePosition += lVariableNameLength + 4
+        End While
+        'Logger.Dbg("Header:" & lHspfBinHeader.Id.AsKey)
+    End Sub
+
+    Public Sub ReadFromHeader(ByVal aReader As IO.BinaryReader)
+        Id = New HspfBinaryId(aReader.ReadString)
+        Dim lNumVars As Integer = aReader.ReadInt32
+        VarNames.Capacity = lNumVars
+        For lVarIndex As Integer = 1 To lNumVars
+            AddVariable(aReader.ReadString)
+        Next
+        Dates = AllDates(aReader.ReadInt32)
+        Dim lNumData As Integer = Dates.numValues ' aReader.ReadInt32
+        ValuesStartPosition.Capacity = lNumData
+        For lDataIndex As Integer = 1 To lNumData
+            ValuesStartPosition.Add(aReader.ReadInt64)
+        Next
+    End Sub
+
+    Private Sub AddVariable(ByVal aVariableName As String)
+        Dim lVariableIndex As Integer = pUniqueVariableNames.IndexOf(aVariableName)
+        If lVariableIndex < 0 Then
+            lVariableIndex = pUniqueVariableNames.Count
+            pUniqueVariableNames.Add(aVariableName)
+            '    pTotalVariableLength += aVariableName.Length
+            'Else
+            '    pDuplicateVariableNames += 1
+            '    pDuplicateVariableLength += aVariableName.Length
+        End If
+        VarNames.Add(pUniqueVariableNames(lVariableIndex))
+    End Sub
+
+    Public Sub Write(ByVal aWriter As IO.BinaryWriter)
+        aWriter.Write(Id.AsKey)
+        aWriter.Write(VarNames.Count)
+        For Each lVarName As String In VarNames
+            aWriter.Write(lVarName)
+        Next
+        aWriter.Write(AllDates.IndexOf(Dates))
+        'aWriter.Write(ValuesStartPosition.Count)
+        For Each lValuesStartPosition As Long In ValuesStartPosition
+            aWriter.Write(lValuesStartPosition)
+        Next
+    End Sub
 End Class
 
 ''' <summary>
@@ -164,7 +265,6 @@ Friend Class HspfBinary
     Private pFileRecordIndex As Integer
     Private pHeaders As HspfBinaryHeaders
     Private Shared pNaN As Double = GetNaN()
-    'Private Shared pUniqueVariableNames As New Generic.List(Of String)
 
     Private pFileName As String = ""
     Private pBr As IO.BinaryReader ' pFileNum As Integer = 0
@@ -356,12 +456,16 @@ Friend Class HspfBinary
             End If
             If pHeaders IsNot Nothing Then pHeaders.Clear()
             pHeaders = New HspfBinaryHeaders
-            Dim lHeaderFileName As String = IO.Path.ChangeExtension(aFileName, ".hbnheader")
+            Dim lOldHeaderFileName As String = IO.Path.ChangeExtension(aFileName, ".hbnheader")
+            If IO.File.Exists(lOldHeaderFileName) Then TryDelete(lOldHeaderFileName)
+            Dim lHeaderFileName As String = IO.Path.ChangeExtension(aFileName, ".hbnhead")
             If IO.File.Exists(lHeaderFileName) Then
                 If IO.File.GetLastWriteTime(lHeaderFileName) < IO.File.GetLastWriteTime(aFileName) Then
                     TryDelete(lHeaderFileName)
                 Else
-                    pHeaders.Open(lHeaderFileName)
+                    If Not pHeaders.Open(lHeaderFileName) Then
+                        TryDelete(lHeaderFileName)
+                    End If
                 End If
             End If
             pFileRecordIndex = 0
@@ -410,84 +514,127 @@ Friend Class HspfBinary
                 Select Case lRecordFlag
                     Case 0 'header record
                         Dim lHspfBinaryHeader As HspfBinaryHeader = New HspfBinaryHeader
-                        With lHspfBinaryHeader
-                            Dim lCurrentRecord() As Byte = pBr.ReadBytes(lLength)
-                            .Id = MakeId(lCurrentRecord)
+                        Dim lCurrentRecord() As Byte = pBr.ReadBytes(lLength)
+                        lHspfBinaryHeader.ReadFromHbn(lCurrentRecord, lLength, MakeId(lCurrentRecord))
+                        pHeaders.Add(lHspfBinaryHeader)
 
-                            'Byte position within current header record     
-                            Dim lBytePosition As Integer = 20
-                            While lBytePosition < lLength
-                                Dim lVariableNameLength As Integer = BitConverter.ToInt32(lCurrentRecord, lBytePosition)
-                                Dim lVariableName As String = System.Text.ASCIIEncoding.ASCII.GetString(lCurrentRecord, _
-                                    lBytePosition + 4, lVariableNameLength).Replace("("c, " "c).Replace(")"c, " "c).Trim
-                                'Dim lVariableIndex As Integer = pUniqueVariableNames.IndexOf(lVariableName)
-                                'If lVariableIndex < 0 Then
-                                '    lVariableIndex = pUniqueVariableNames.Count
-                                '    pUniqueVariableNames.Add(lVariableName)
-                                'End If
-                                '.VarNames.Add(pUniqueVariableNames(lVariableIndex))
-                                .VarNames.Add(lVariableName)
-                                lBytePosition += lVariableNameLength + 4
-                            End While
-                            pHeaders.Add(lHspfBinaryHeader)
-                            'Logger.Dbg("Header:" & lHspfBinHeader.Id.AsKey)
-                        End With
                     Case 1 'data record
-                        Dim lHspfBinData As New HspfBinaryDatum
-                        With lHspfBinData
-                            .ValuesStartPosition = pBr.BaseStream.Position + 48
-                            Dim lCurrentRecord() As Byte = pBr.ReadBytes(lLength)
-                            Dim lHspfBinKey As String = MakeId(lCurrentRecord).AsKey
-                            Try
-                                Dim lHspfBinaryHeader As HspfBinaryHeader = pHeaders.Item(lHspfBinKey)
-                                Dim lOutLev As Integer = BitConverter.ToInt32(lCurrentRecord, 24)
-                                If lOutLev <= lHspfBinaryHeader.OutLev Then
-                                    If lOutLev < lHspfBinaryHeader.OutLev Then
-                                        'Discard data headers from longer interval, only keep shortest interval
-                                        lHspfBinaryHeader.Data.Clear()
-                                        lHspfBinaryHeader.OutLev = lOutLev
-                                    End If
-                                    If UnitSystem = atcUnitSystem.atcUnknown Then
-                                        UnitSystem = BitConverter.ToInt32(lCurrentRecord, 20)
-                                    ElseIf UnitSystem <> BitConverter.ToInt32(lCurrentRecord, 20) Then
-                                        Throw New ApplicationException("Different unit systems not supported in same file: " & UnitSystem & " vs. " & BitConverter.ToInt32(lCurrentRecord, 20))
-                                    End If
-                                    For lDateIndex As Integer = 0 To 4
-                                        DateArray(lDateIndex) = BitConverter.ToInt32(lCurrentRecord, 28 + (lDateIndex * 4))
-                                    Next lDateIndex
-                                    If DateArray(4) = 60 AndAlso DateArray(3) = 24 Then
-                                        DateArray(4) = 0 'otherwise jdate is first hour in next day
-                                    End If
-                                    .JDate = Date2J(DateArray)
-                                    'We used to read all the values here, now we wait and read them in atcTimeseriesFileHspfBinOut.ReadData
-                                    'Dim lVariableCount As Integer = lHspfBinaryHeader.VarNames.Count
-                                    'Dim lValues(lVariableCount - 1) As Double
-                                    'For lVariableIndex As Integer = 0 To lVariableCount - 1
-                                    '    Try
-                                    '        Dim lValue As Double = BitConverter.ToSingle(lCurrentRecord, 48 + (lVariableIndex * 4))
-                                    '        If lValue < -1.0E+29 Then
-                                    '            lValues(lVariableIndex) = pNaN
-                                    '        Else
-                                    '            lValues(lVariableIndex) = lValue
-                                    '        End If
-                                    '    Catch e As Exception
-                                    '        Logger.Dbg("***** Problem Converting Data for Key:" & lHspfBinId.AsKey & " " & e.ToString & vbCrLf & " at record " & pFileRecordIndex)
-                                    '        lValues(lVariableIndex) = pNaN
-                                    '    End Try
-                                    'Next lVariableIndex
-                                    Try
-                                        lHspfBinaryHeader.Data.Add(lHspfBinData)
-                                    Catch e As Exception
-                                        Logger.Dbg("***** ReadNewRecords:Could not add data to header " & e.ToString & vbCrLf & " at record " & pFileRecordIndex)
-                                        Throw e
-                                    End Try
+                        Dim lValuesStartPosition As Long = pBr.BaseStream.Position + 48
+                        Dim lCurrentRecord() As Byte = pBr.ReadBytes(lLength)
+                        Dim lHspfBinKey As String = MakeId(lCurrentRecord).AsKey
+                        Try
+                            Dim lHspfBinaryHeader As HspfBinaryHeader = pHeaders.Item(lHspfBinKey)
+                            Dim lOutLev As Integer = BitConverter.ToInt32(lCurrentRecord, 24)
+                            If lOutLev <= lHspfBinaryHeader.OutLev Then
+                                If lOutLev < lHspfBinaryHeader.OutLev Then
+                                    'Discard data headers from longer interval, only keep shortest interval
+                                    lHspfBinaryHeader.ValuesStartPosition.Clear()
+                                    lHspfBinaryHeader.Dates = Nothing
+                                    lHspfBinaryHeader.OutLev = lOutLev
                                 End If
-                            Catch eKey As System.Collections.Generic.KeyNotFoundException
-                                Dim lString As String = "***** Data Without Header for Key:" & lHspfBinKey & " " & eKey.ToString & vbCrLf & " at record " & pFileRecordIndex
-                                Logger.Dbg(lString)
-                                Throw New ApplicationException(lString)
-                            End Try
-                        End With
+                                If UnitSystem = atcUnitSystem.atcUnknown Then
+                                    UnitSystem = BitConverter.ToInt32(lCurrentRecord, 20)
+                                ElseIf UnitSystem <> BitConverter.ToInt32(lCurrentRecord, 20) Then
+                                    Throw New ApplicationException("Different unit systems not supported in same file: " & UnitSystem & " vs. " & BitConverter.ToInt32(lCurrentRecord, 20))
+                                End If
+                                lHspfBinaryHeader.ValuesStartPosition.Add(lValuesStartPosition)
+                                Dim lNewDateIndex As Integer = lHspfBinaryHeader.ValuesStartPosition.Count
+                                For lDateIndex As Integer = 0 To 4
+                                    DateArray(lDateIndex) = BitConverter.ToInt32(lCurrentRecord, 28 + (lDateIndex * 4))
+                                Next lDateIndex
+                                If DateArray(4) = 60 AndAlso DateArray(3) = 24 Then
+                                    DateArray(4) = 0 'otherwise jdate is first hour in next day
+                                End If
+
+                                Dim lNewDate As Double = Date2J(DateArray)
+                                Dim lMatch1 As Boolean = False
+
+                                If lHspfBinaryHeader.Dates IsNot Nothing Then
+                                    If lNewDateIndex <= lHspfBinaryHeader.Dates.numValues Then
+                                        'Test whether this new date matches next date 
+                                        If Math.Abs(lNewDate - lHspfBinaryHeader.Dates.Value(lNewDateIndex)) < JulianSecond / 2 Then
+                                            lMatch1 = True
+                                        Else
+                                            'Mismatch, need to find or create new Dates
+                                        End If
+                                    ElseIf lNewDateIndex = lHspfBinaryHeader.Dates.numValues + 1 Then
+                                        lHspfBinaryHeader.Dates.numValues = lNewDateIndex
+                                        lHspfBinaryHeader.Dates.Values(lNewDateIndex) = lNewDate
+                                        lMatch1 = True
+                                    End If
+                                End If
+
+                                If Not lMatch1 Then
+                                    Dim lMatch2 As Boolean = False
+                                    For Each lDates As atcTimeseries In HspfBinaryHeader.AllDates
+                                        lMatch2 = False
+                                        If lHspfBinaryHeader.Dates Is Nothing Then
+                                            lMatch2 = (lNewDateIndex = 1)
+                                        ElseIf lDates.Serial <> lHspfBinaryHeader.Dates.Serial Then
+                                            'Check whether the dates we already had before match with lDates
+                                            lMatch2 = True
+                                            For lOldIndex As Integer = 1 To lNewDateIndex - 1
+                                                If Math.Abs(lDates.Value(lOldIndex) - lHspfBinaryHeader.Dates.Value(lOldIndex)) > JulianSecond / 2 Then
+                                                    lMatch2 = False
+                                                    Exit For
+                                                End If
+                                            Next
+                                        End If
+                                        If lMatch2 Then 'Make sure newest value matches, or add it
+                                            If lDates.numValues >= lNewDateIndex Then
+                                                If Math.Abs(lDates.Value(lNewDateIndex) - lNewDate) > JulianSecond / 2 Then
+                                                    lMatch2 = False
+                                                End If
+                                            ElseIf lDates.numValues = lNewDateIndex - 1 Then
+                                                lDates.numValues = lNewDateIndex
+                                                lDates.Values(lNewDateIndex) = lNewDate
+                                            Else
+                                                lMatch2 = False
+                                            End If
+                                        End If
+                                        If lMatch2 Then
+                                            lHspfBinaryHeader.Dates = lDates
+                                            Exit For
+                                        End If
+                                    Next
+                                    If Not lMatch2 OrElse lHspfBinaryHeader.Dates Is Nothing Then
+                                        lHspfBinaryHeader.Dates = New atcTimeseries(Nothing)
+                                        lHspfBinaryHeader.Dates.Attributes.SetValue("Shared", True)
+                                        lHspfBinaryHeader.Dates.numValues = 1
+                                        lHspfBinaryHeader.Dates.Value(1) = lNewDate
+                                        HspfBinaryHeader.AllDates.Add(lHspfBinaryHeader.Dates)
+                                        'Dates.Attributes.SetValue("NumValuesSet", 0)
+                                    End If
+                                End If
+
+                                'We used to read all the values here, now we wait and read them in atcTimeseriesFileHspfBinOut.ReadData
+                                'Dim lVariableCount As Integer = lHspfBinaryHeader.VarNames.Count
+                                'Dim lValues(lVariableCount - 1) As Double
+                                'For lVariableIndex As Integer = 0 To lVariableCount - 1
+                                '    Try
+                                '        Dim lValue As Double = BitConverter.ToSingle(lCurrentRecord, 48 + (lVariableIndex * 4))
+                                '        If lValue < -1.0E+29 Then
+                                '            lValues(lVariableIndex) = pNaN
+                                '        Else
+                                '            lValues(lVariableIndex) = lValue
+                                '        End If
+                                '    Catch e As Exception
+                                '        Logger.Dbg("***** Problem Converting Data for Key:" & lHspfBinId.AsKey & " " & e.ToString & vbCrLf & " at record " & pFileRecordIndex)
+                                '        lValues(lVariableIndex) = pNaN
+                                '    End Try
+                                'Next lVariableIndex
+                                'Try
+                                '    lHspfBinaryHeader.Data.Add(lHspfBinData)
+                                'Catch e As Exception
+                                '    Logger.Dbg("***** ReadNewRecords:Could not add data to header " & e.ToString & vbCrLf & " at record " & pFileRecordIndex)
+                                '    Throw e
+                                'End Try
+                            End If
+                        Catch eKey As System.Collections.Generic.KeyNotFoundException
+                            Dim lString As String = "***** Data Without Header for Key:" & lHspfBinKey & " " & eKey.ToString & vbCrLf & " at record " & pFileRecordIndex
+                            Logger.Dbg(lString)
+                            Throw New ApplicationException(lString)
+                        End Try
 
                     Case Else
                         Dim lString As String = "***** Bad Record Type: " & lRecordFlag & " at record " & pFileRecordIndex & " byte " & lSeek
@@ -498,6 +645,9 @@ Friend Class HspfBinary
                 Logger.Progress(lSeek / pDivideForProgress, pProgressMax)
                 pFileRecordIndex += 1
             End While
+            For Each lHspfBinaryHeader As HspfBinaryHeader In pHeaders
+                lHspfBinaryHeader.ValuesStartPosition.TrimExcess()
+            Next
         Catch ex As Exception
             Logger.Progress(0, 0)
             If ex.Message = "User Canceled" Then
