@@ -77,6 +77,7 @@ Public Class atcDataAttributes
             If Not pAllDefinitions.Keys.Contains(lKey) Then
                 aDefinition.Name = PreferredName(aDefinition.Name)
                 pAllDefinitions.Add(lKey, aDefinition)
+                'Logger.Dbg("New attribute: " & aDefinition.Name)
                 lAddDefinition = aDefinition
             ElseIf aDefinition.Calculated Then
                 pAllDefinitions.ItemByKey(lKey) = aDefinition
@@ -128,7 +129,7 @@ Public Class atcDataAttributes
                 lDef = lDef.Clone(aAttributeName) 'Make a specific definition
             ElseIf aCreate Then
                 lDef = New atcAttributeDefinition
-                lDef.Name = aAttributeName
+                lDef.Name = PreferredName(aAttributeName)
                 pAllDefinitions.Add(lKey, lDef)
             End If
         End If
@@ -303,13 +304,19 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
                 lDefinedValue.Definition = AddDefinition(aAttrDefinition)
             Else
                 lDefinedValue.Arguments = aArguments
-                If aArguments.GetValue("SeasonDefinition") Is Nothing Then
+                If Not aArguments.ContainsAttribute("SeasonDefinition") Then
                     lDefinedValue.Definition = AddDefinition(aAttrDefinition) 'Add definition for attributes without season
                 Else
                     lDefinedValue.Definition = aAttrDefinition
                 End If
             End If
+
+            Dim lKeyIndex As Integer = pAllDefinitions.Keys.IndexOf(lKey)
+            If lKeyIndex >= 0 Then 'Re-use existing key to save memory
+                lKey = pAllDefinitions.Keys(lKeyIndex)
+            End If
             lIndex = pAttributes.Add(lKey, lDefinedValue)
+
         Else  'Update existing attribute value
             lDefinedValue = ItemByIndex(lIndex)
             lDefinedValue.Value = aValue
@@ -329,14 +336,15 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         End If
     End Sub
 
-    'Set attribute with name aAttributeName to value aValue
+    ''' <summary>
+    ''' Set attribute with name aAttributeName to value aValue
+    ''' </summary>
+    ''' <param name="aAttributeName">Name of attribute to set</param>
+    ''' <param name="aAttributeValue">Value of attribute</param>
+    ''' <returns>Index of attribute</returns>
+    ''' <remarks>Creates a new atcAttributeDefinition if needed</remarks>
     Public Shadows Function Add(ByVal aAttributeName As String, ByVal aAttributeValue As Object) As Integer
-        Dim lTmpAttrDef As atcAttributeDefinition = GetDefinition(aAttributeName)
-        If lTmpAttrDef Is Nothing Then
-            lTmpAttrDef = New atcAttributeDefinition
-            lTmpAttrDef.Name = aAttributeName
-        End If
-        Return SetValue(lTmpAttrDef, aAttributeValue)
+        Return SetValue(GetDefinition(aAttributeName, True), aAttributeValue)
     End Function
 
     Public Shadows Function Add(ByVal aDefinedValue As atcDefinedValue) As Integer

@@ -81,17 +81,18 @@ Friend Class HspfBinaryHeaders
                     HspfBinaryHeader.AllDates.Capacity = lNumDates
                     For lDatesIndex As Integer = 1 To lNumDates
                         Dim lReadDates As New atcTimeseries(Nothing)
-                        Dim lTu As atcTimeUnit = lReader.ReadInt32
-                        If lTu = atcTimeUnit.TUUnknown Then
+                        Dim lTimeUnit As atcTimeUnit = lReader.ReadInt32
+                        If lTimeUnit = atcTimeUnit.TUUnknown Then
                             lReadDates.numValues = lReader.ReadInt32
                             For lIndex As Integer = 0 To lReadDates.numValues
                                 lReadDates.Value(lIndex) = lReader.ReadDouble
                             Next
                         Else
-                            Dim lTs As Integer = lReader.ReadInt32
+                            Dim lTimeStep As Integer = lReader.ReadInt32
                             Dim lStartDate As Double = lReader.ReadDouble
                             Dim lEndDate As Double = lReader.ReadDouble
-                            lReadDates.Values = NewDates(lStartDate, lEndDate, lTu, lTs)
+                            lReadDates.Values = NewDates(lStartDate, lEndDate, lTimeUnit, lTimeStep)
+                            lReadDates.SetInterval(lTimeUnit, lTimeStep)
                         End If
                         HspfBinaryHeader.AllDates.Add(lReadDates)
                     Next
@@ -456,8 +457,8 @@ Friend Class HspfBinary
             End If
             If pHeaders IsNot Nothing Then pHeaders.Clear()
             pHeaders = New HspfBinaryHeaders
-            Dim lOldHeaderFileName As String = IO.Path.ChangeExtension(aFileName, ".hbnheader")
-            If IO.File.Exists(lOldHeaderFileName) Then TryDelete(lOldHeaderFileName)
+            'Dim lOldHeaderFileName As String = IO.Path.ChangeExtension(aFileName, ".hbnheader")
+            'If IO.File.Exists(lOldHeaderFileName) Then TryDelete(lOldHeaderFileName)
             Dim lHeaderFileName As String = IO.Path.ChangeExtension(aFileName, ".hbnhead")
             If IO.File.Exists(lHeaderFileName) Then
                 If IO.File.GetLastWriteTime(lHeaderFileName) < IO.File.GetLastWriteTime(aFileName) Then
@@ -469,6 +470,7 @@ Friend Class HspfBinary
                 End If
             End If
             pFileRecordIndex = 0
+            'If we did not manage to populate headers from header file above, have to read the main file
             If pHeaders.Count = 0 Then
                 ReadNewRecords()
                 pHeaders.SaveAs(lHeaderFileName)
@@ -558,9 +560,20 @@ Friend Class HspfBinary
                                             'Mismatch, need to find or create new Dates
                                         End If
                                     ElseIf lNewDateIndex = lHspfBinaryHeader.Dates.numValues + 1 Then
-                                        lHspfBinaryHeader.Dates.numValues = lNewDateIndex
-                                        lHspfBinaryHeader.Dates.Values(lNewDateIndex) = lNewDate
                                         lMatch1 = True
+                                        With lHspfBinaryHeader.Dates
+                                            .numValues = lNewDateIndex
+                                            .Value(lNewDateIndex) = lNewDate
+
+                                            If lNewDateIndex = 2 Then
+                                                Dim lInterval As Double = GetNaN()
+                                                Dim lTimeStep As Integer = 1
+                                                Dim lTimeUnit As atcTimeUnit = atcTimeUnit.TUUnknown
+                                                CalcTimeUnitStep(.Value(1), .Value(2), lTimeUnit, lTimeStep)
+                                                .Value(0) = TimAddJ(.Value(1), lTimeUnit, lTimeStep, -1)
+                                                .SetInterval(lTimeUnit, lTimeStep)
+                                            End If
+                                        End With
                                     End If
                                 End If
 
@@ -599,11 +612,14 @@ Friend Class HspfBinary
                                     Next
                                     If Not lMatch2 OrElse lHspfBinaryHeader.Dates Is Nothing Then
                                         lHspfBinaryHeader.Dates = New atcTimeseries(Nothing)
-                                        lHspfBinaryHeader.Dates.Attributes.SetValue("Shared", True)
-                                        lHspfBinaryHeader.Dates.numValues = 1
-                                        lHspfBinaryHeader.Dates.Value(1) = lNewDate
+                                        With lHspfBinaryHeader.Dates
+                                            .Attributes.SetValue("Shared", True)
+                                            .numValues = 1
+                                            .Value(0) = pNaN
+                                            .Value(1) = lNewDate
+                                            '.Attributes.SetValue("NumValuesSet", 0)
+                                        End With
                                         HspfBinaryHeader.AllDates.Add(lHspfBinaryHeader.Dates)
-                                        'Dates.Attributes.SetValue("NumValuesSet", 0)
                                     End If
                                 End If
 
@@ -660,7 +676,7 @@ Friend Class HspfBinary
         Finally
             If lNeedToClose Then Close(True)
         End Try
-        Logger.Dbg("Read " & Format(pFileRecordIndex, "###,###") & " Records, " & Format(pBytesInFile, "###,###") & " Bytes")
+        Logger.Dbg("Read " & Format(pFileRecordIndex, "###,###") & " records (" & Format(pBytesInFile, "###,###") & " bytes)")
         'IO.File.WriteAllText(pFileName & ".logNew.txt", lLog.ToString)
     End Sub
 
