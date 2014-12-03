@@ -479,11 +479,6 @@ Friend Class HspfBinary
                 ReadNewRecords()
                 pHeaders.SaveAs(lHeaderFileName)
             End If
-            For Each lHeader As HspfBinaryHeader In pHeaders
-                If lHeader.Dates Is Nothing OrElse lHeader.Dates.numValues < 2 Then
-                    Logger.Dbg("Missing dates for " & lHeader.Id.AsKey)
-                End If
-            Next
             Close(True)
         End Set
     End Property
@@ -538,7 +533,7 @@ Friend Class HspfBinary
                             Dim lOutLev As Integer = BitConverter.ToInt32(lCurrentRecord, 24)
                             If lOutLev <= lHspfBinaryHeader.OutLev Then
                                 If lOutLev < lHspfBinaryHeader.OutLev Then
-                                    Logger.Dbg("Found finer output level " & lOutLev & " (was " & lHspfBinaryHeader.OutLev & ") for " & lHspfBinKey)
+                                    'Logger.Dbg("Found finer output level " & lOutLev & " (was " & lHspfBinaryHeader.OutLev & ") for " & lHspfBinKey)
                                     'Discard data headers from longer interval, only keep shortest interval
                                     lHspfBinaryHeader.ValuesStartPosition.Clear()
                                     lHspfBinaryHeader.Dates = Nothing
