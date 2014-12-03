@@ -81,6 +81,8 @@ Friend Class HspfBinaryHeaders
                     HspfBinaryHeader.AllDates.Capacity = lNumDates
                     For lDatesIndex As Integer = 1 To lNumDates
                         Dim lReadDates As New atcTimeseries(Nothing)
+                        lReadDates.Attributes.SetValue("Shared", True)
+
                         Dim lTimeUnit As atcTimeUnit = lReader.ReadInt32
                         If lTimeUnit = atcTimeUnit.TUUnknown Then
                             lReadDates.numValues = lReader.ReadInt32
@@ -109,6 +111,7 @@ Friend Class HspfBinaryHeaders
                         Me.Add(lHeader)
                         Logger.Progress(Me.Count / 2, lNumHeaders)
                     Next
+                    Return True
                 Catch ex As Exception
                     Logger.Dbg("Exception opening " & aFileName & vbCrLf & ex.ToString)
                     Me.Clear()
@@ -465,6 +468,7 @@ Friend Class HspfBinary
                     TryDelete(lHeaderFileName)
                 Else
                     If Not pHeaders.Open(lHeaderFileName) Then
+                        pHeaders.Clear()
                         TryDelete(lHeaderFileName)
                     End If
                 End If
@@ -475,6 +479,11 @@ Friend Class HspfBinary
                 ReadNewRecords()
                 pHeaders.SaveAs(lHeaderFileName)
             End If
+            For Each lHeader As HspfBinaryHeader In pHeaders
+                If lHeader.Dates Is Nothing OrElse lHeader.Dates.numValues < 2 Then
+                    Logger.Dbg("Missing dates for " & lHeader.Id.AsKey)
+                End If
+            Next
             Close(True)
         End Set
     End Property
@@ -529,6 +538,7 @@ Friend Class HspfBinary
                             Dim lOutLev As Integer = BitConverter.ToInt32(lCurrentRecord, 24)
                             If lOutLev <= lHspfBinaryHeader.OutLev Then
                                 If lOutLev < lHspfBinaryHeader.OutLev Then
+                                    Logger.Dbg("Found finer output level " & lOutLev & " (was " & lHspfBinaryHeader.OutLev & ") for " & lHspfBinKey)
                                     'Discard data headers from longer interval, only keep shortest interval
                                     lHspfBinaryHeader.ValuesStartPosition.Clear()
                                     lHspfBinaryHeader.Dates = Nothing
@@ -663,6 +673,7 @@ Friend Class HspfBinary
             End While
             For Each lHspfBinaryHeader As HspfBinaryHeader In pHeaders
                 lHspfBinaryHeader.ValuesStartPosition.TrimExcess()
+                If lHspfBinaryHeader.Dates.numValues < 2 Then Logger.Dbg(lHspfBinaryHeader.Id.AsKey & ": read " & lHspfBinaryHeader.Dates.numValues & " dates")
             Next
         Catch ex As Exception
             Logger.Progress(0, 0)
