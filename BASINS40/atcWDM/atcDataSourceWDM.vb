@@ -924,6 +924,7 @@ CaseExistRenumber:
 
                                 For iVal As Integer = 1 To nVals
                                     lDataCurrent = CDbl(lV(iVal - 1))
+                                    'If lDataCurrent < -90 Then Stop
                                     'If value is a very large negative number (from HSPF unable to compute) or is the fill value, treat it as missing
                                     If lDataCurrent < -1.0E+20 OrElse Math.Abs((lDataCurrent - lTsFill)) < pEpsilon Then
                                         lVd(iVal) = pNan
