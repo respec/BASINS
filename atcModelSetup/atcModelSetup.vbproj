@@ -168,6 +168,7 @@
     <Compile Include="frmModelSetup.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="HspfSetup.vb" />
     <Compile Include="modModelSetup.vb" />
     <EmbeddedResource Include="frmModelSetup.resx">
       <DependentUpon>frmModelSetup.vb</DependentUpon>
