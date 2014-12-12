@@ -1887,11 +1887,37 @@ Public Module modModelSetup
         SaveFileString(aMapFileName, lSB.ToString)
     End Sub
 
-    Public Function ProcessGridForWetlands(ByVal aDEMFileName As String, ByVal aWetlandsFileName As String, ByVal aStreamsFileName As String) As String
+    Public Function ProcessGridForWetlands(ByVal aDEMFileName As String, ByVal aWetlandsFileName As String, ByVal aStreamsFileName As String, ByVal aSubbasinsFileName As String) As String
         'set nodata value properly
         GisUtil.GridSetNoData(aDEMFileName, -100.0)
 
-        'First burn in the stream lines
+        'Mask based on subbasins
+        Dim lMaskedDEMLayerName As String = "Masked DEM"
+        Dim lMaskedDEMLayerIndex As Integer = 0
+        Dim lMaskedDEMFileName As String = ""
+        If GisUtil.IsLayer(lMaskedDEMLayerName) Then
+            lMaskedDEMLayerIndex = GisUtil.LayerIndex(lMaskedDEMLayerName)
+            lMaskedDEMFileName = GisUtil.LayerFileName(lMaskedDEMLayerIndex)
+        Else
+            Logger.Status("Wetlands Step 1 of 5: Mask")
+            lMaskedDEMFileName = FilenameNoExt(aDEMFileName) & "Mask.tif"
+            If FileExists(lMaskedDEMFileName) Then
+                IO.File.Delete(lMaskedDEMFileName)
+            End If
+            Dim lMaskedDEMPrjFileName As String = FilenameNoExt(aDEMFileName) & "Mask.prj"
+            If FileExists(lMaskedDEMPrjFileName) Then
+                IO.File.Delete(lMaskedDEMPrjFileName)
+            End If
+            GisUtil.GridMask(aDEMFileName, aSubbasinsFileName, lMaskedDEMFileName)
+            Dim lMaskInputProjectionFileName As String = FilenameSetExt(aDEMFileName, "prj")
+            If FileExists(lMaskInputProjectionFileName) Then
+                FileCopy(lMaskInputProjectionFileName, FilenameSetExt(lMaskedDEMFileName, "prj"))
+            End If
+            GisUtil.AddLayer(lMaskedDEMFileName, lMaskedDEMLayerName)
+            GisUtil.SaveProject(GisUtil.ProjectFileName)
+        End If
+
+        'Burn in the stream lines
         Dim lBurnedDEMLayerName As String = "Burned DEM"
         Dim lBurnedDEMLayerIndex As Integer = 0
         Dim lBurnedDEMFileName As String = ""
@@ -1899,7 +1925,7 @@ Public Module modModelSetup
             lBurnedDEMLayerIndex = GisUtil.LayerIndex(lBurnedDEMLayerName)
             lBurnedDEMFileName = GisUtil.LayerFileName(lBurnedDEMLayerIndex)
         Else
-            Logger.Status("Wetlands Step 1 of 4: Burning-in Stream Lines")
+            Logger.Status("Wetlands Step 2 of 5: Burning-in Stream Lines")
             lBurnedDEMFileName = FilenameNoExt(aDEMFileName) & "BurnIn.tif"
             If FileExists(lBurnedDEMFileName) Then
                 IO.File.Delete(lBurnedDEMFileName)
@@ -1908,7 +1934,7 @@ Public Module modModelSetup
             If FileExists(lBurnedDEMPrjFileName) Then
                 IO.File.Delete(lBurnedDEMPrjFileName)
             End If
-            GisUtil.GridBurnIn(aDEMFileName, aStreamsFileName, lBurnedDEMFileName)
+            GisUtil.GridBurnIn(lMaskedDEMFileName, aStreamsFileName, lBurnedDEMFileName)
             GisUtil.AddLayer(lBurnedDEMFileName, lBurnedDEMLayerName)
             GisUtil.SaveProject(GisUtil.ProjectFileName)
         End If
@@ -1921,7 +1947,7 @@ Public Module modModelSetup
             lPitFillDEMLayerIndex = GisUtil.LayerIndex(lPitFillDEMLayerName)
             lPitFillDEMFileName = GisUtil.LayerFileName(lPitFillDEMLayerIndex)
         Else
-            Logger.Status("Wetlands Step 2 of 4: Computing Pit Fill")
+            Logger.Status("Wetlands Step 3 of 5: Computing Pit Fill")
             lPitFillDEMFileName = FilenameNoExt(aDEMFileName) & "PitFill.tif"
             GisUtil.GridPitFill(lBurnedDEMFileName, lPitFillDEMFileName)
             GisUtil.AddLayer(lPitFillDEMFileName, lPitFillDEMLayerName)
@@ -1937,10 +1963,11 @@ Public Module modModelSetup
             lFlowDirGridLayerIndex = GisUtil.LayerIndex(lFlowDirGridLayerName)
             lFlowDirGridFileName = GisUtil.LayerFileName(lFlowDirGridLayerIndex)
         Else
-            Logger.Status("Wetlands Step 3 of 4: Computing Flow Direction")
+            Logger.Status("Wetlands Step 4 of 5: Computing Flow Direction")
             lFlowDirGridFileName = FilenameNoExt(aDEMFileName) & "FlowDir.tif"
             lSlopeGridFileName = FilenameNoExt(aDEMFileName) & "Slope.tif"
             Dim lRet As Integer = GisUtil.GridFlowDirection(lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName)
+            'Dim lRet As Integer = GisUtil.GridFlowDirectionNoTaudem(lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName)
             If Not GisUtil.IsLayer(lFlowDirGridLayerName) Then
                 GisUtil.AddLayer(lFlowDirGridFileName, lFlowDirGridLayerName)
             End If
@@ -1957,7 +1984,7 @@ Public Module modModelSetup
             lToWetlandsGridLayerIndex = GisUtil.LayerIndex(lToWetlandsGridLayerName)
             lToWetlandsGridFileName = GisUtil.LayerFileName(lToWetlandsGridLayerIndex)
         Else
-            Logger.Status("Wetlands Step 4 of 4: Computing ToWetlands Grid")
+            Logger.Status("Wetlands Step 5 of 5: Computing ToWetlands Grid")
             lToWetlandsGridFileName = FilenameNoExt(aDEMFileName) & "ToWetlands.tif"
             GisUtil.ComputeToWetlands(lFlowDirGridFileName, aWetlandsFileName, aStreamsFileName, lToWetlandsGridFileName)
             If FileExists(lInputProjectionFileName) Then

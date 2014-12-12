@@ -1541,7 +1541,8 @@ Public Class frmModelSetup
                     Dim lWetlandsLayerName As String = cboWetlands.Items(cboWetlands.SelectedIndex)
                     Dim lWetlandsFileName As String = GisUtil.LayerFileName(lWetlandsLayerName)
                     Dim lStreamsFileName As String = GisUtil.LayerFileName(lSetup.StreamLayerName)
-                    lSetup.ToWetlandsFileName = ProcessGridForWetlands(lWetlandsDEMFileName, lWetlandsFileName, lStreamsFileName)
+                    Dim lSubbasinsFileName As String = GisUtil.LayerFileName(lSetup.SubbasinLayerName)
+                    lSetup.ToWetlandsFileName = ProcessGridForWetlands(lWetlandsDEMFileName, lWetlandsFileName, lStreamsFileName, lSubbasinsFileName)
                 End If
 
                 'Dim lMetWDM As String = ""    'used to be txtMetWDMName.Text,

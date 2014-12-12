@@ -1719,6 +1719,504 @@ Public Class GisUtil
         Return lRet
     End Function
 
+    Public Shared Function GridFlowDirectionNoTaudem(ByVal aPitFillDEMFileName As String, ByVal aFlowDirGridFileName As String, ByVal aSlopeGridFileName As String) As Integer
+        'in development, not yet ready for use
+
+        'prepare the output grid
+        If FileExists(aFlowDirGridFileName) Then
+            IO.File.Delete(aFlowDirGridFileName)
+        End If
+        IO.File.Copy(aPitFillDEMFileName, aFlowDirGridFileName)
+
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aFlowDirGridFileName)
+
+        'open the input grid
+        Dim lInputGrid As New MapWinGIS.Grid
+        lInputGrid.Open(aPitFillDEMFileName)
+
+        Dim lRow As Integer = 0
+        Dim lCol As Integer = 0
+
+        'store input grid in an array for quicker access
+        Dim lInArray(lInputGrid.Header.NumberCols, lInputGrid.Header.NumberRows) As Integer
+        For lRow = 0 To lInputGrid.Header.NumberRows - 1
+            For lCol = 0 To lInputGrid.Header.NumberCols - 1
+                lInArray(lCol, lRow) = lInputGrid.Value(lCol, lRow)
+            Next
+        Next
+
+        'store output grid in an array for quicker access
+        Dim lOutArray(lOutputGrid.Header.NumberCols, lOutputGrid.Header.NumberRows) As Integer
+        For lRow = 0 To lOutputGrid.Header.NumberRows - 1
+            For lCol = 0 To lOutputGrid.Header.NumberCols - 1
+                lOutArray(lCol, lRow) = lOutputGrid.Value(lCol, lRow)
+            Next
+        Next
+
+        '      this is the assumed flow dir coding from taudem:
+        '      4 3 2
+        '      5   1
+        '      6 7 8
+
+        'mark all cells as zero flow direction
+        For lRow = 0 To lOutputGrid.Header.NumberRows - 1
+            For lCol = 0 To lOutputGrid.Header.NumberCols - 1
+                lOutArray(lCol, lRow) = 0  'this drains to stream
+            Next
+        Next
+
+        Dim lElevDiffE As Integer = 0
+        Dim lElevDiffNE As Integer = 0
+        Dim lElevDiffN As Integer = 0
+        Dim lElevDiffNW As Integer = 0
+        Dim lElevDiffW As Integer = 0
+        Dim lElevDiffSW As Integer = 0
+        Dim lElevDiffS As Integer = 0
+        Dim lElevDiffSE As Integer = 0
+        Dim lSlopeE As Double = 0
+        Dim lSlopeNE As Double = 0
+        Dim lSlopeN As Double = 0
+        Dim lSlopeNW As Double = 0
+        Dim lSlopeW As Double = 0
+        Dim lSlopeSW As Double = 0
+        Dim lSlopeS As Double = 0
+        Dim lSlopeSE As Double = 0
+        Dim lGreatestSlope As Double = 0
+        Dim lFlowDir As Integer = 0
+        Dim lNumRows As Integer = lOutputGrid.Header.NumberRows
+        Dim lNumCols As Integer = lOutputGrid.Header.NumberCols
+        Dim lOffset As Integer = 1
+        Dim lDone As Boolean = False
+        'check immediate neighbors first
+        For lRow = 1 To lOutputGrid.Header.NumberRows - 2
+            For lCol = 1 To lOutputGrid.Header.NumberCols - 2
+                If lOutArray(lCol, lRow) = 0 Then
+                    lGreatestSlope = 0
+                    lFlowDir = 0
+                    If lInArray(lCol, lRow) > -2000000000 Then
+                        'find slope to the east
+                        lOffset = 1
+                        If lCol + lOffset < lNumCols Then
+                            If lInArray(lCol + lOffset, lRow) > -2000000000 Then
+                                lElevDiffE = lInArray(lCol, lRow) - lInArray(lCol + lOffset, lRow)
+                                If lElevDiffE <> 0 Then
+                                    'compute slope
+                                    lDone = True
+                                    lSlopeE = lElevDiffE / lOffset
+                                End If
+                            End If
+                        End If
+                        'find slope to the northeast
+                        lOffset = 1
+                        If lCol + lOffset < lNumCols Then
+                            If lRow - lOffset > 0 Then
+                                If lInArray(lCol + lOffset, lRow - lOffset) > -2000000000 Then
+                                    lElevDiffNE = lInArray(lCol, lRow) - lInArray(lCol + lOffset, lRow - lOffset)
+                                    If lElevDiffNE <> 0 Then
+                                        'compute slope
+                                        lDone = True
+                                        lSlopeNE = lElevDiffNE / (lOffset * Math.Sqrt(2))
+                                    End If
+                                End If
+                            End If
+                        End If
+                        'find slope to the north
+                        lOffset = 1
+                        If lRow - lOffset > 0 Then
+                            If lInArray(lCol, lRow - lOffset) > -2000000000 Then
+                                lElevDiffN = lInArray(lCol, lRow) - lInArray(lCol, lRow - lOffset)
+                                If lElevDiffN <> 0 Then
+                                    'compute slope
+                                    lDone = True
+                                    lSlopeN = lElevDiffN / lOffset
+                                End If
+                            End If
+                        End If
+                        'find slope to the northwest
+                        lOffset = 1
+                        If lCol - lOffset > 0 Then
+                            If lRow - lOffset > 0 Then
+                                If lInArray(lCol - lOffset, lRow - lOffset) > -2000000000 Then
+                                    lElevDiffNW = lInArray(lCol, lRow) - lInArray(lCol - lOffset, lRow - lOffset)
+                                    If lElevDiffNW <> 0 Then
+                                        'compute slope
+                                        lDone = True
+                                        lSlopeNW = lElevDiffNW / (lOffset * Math.Sqrt(2))
+                                    End If
+                                End If
+                            End If
+                        End If
+                        'find slope to the west
+                        lOffset = 1
+                        If lCol - lOffset > 0 Then
+                            If lInArray(lCol - lOffset, lRow) > -2000000000 Then
+                                lElevDiffW = lInArray(lCol, lRow) - lInArray(lCol - lOffset, lRow)
+                                If lElevDiffW <> 0 Then
+                                    'compute slope
+                                    lDone = True
+                                    lSlopeW = lElevDiffW / lOffset
+                                End If
+                            End If
+                        End If
+                        'find slope to the southwest
+                        lOffset = 1
+                        If lCol - lOffset > 0 Then
+                            If lRow + lOffset < lNumRows Then
+                                If lInArray(lCol - lOffset, lRow + lOffset) > -2000000000 Then
+                                    lElevDiffSW = lInArray(lCol, lRow) - lInArray(lCol - lOffset, lRow + lOffset)
+                                    If lElevDiffSW <> 0 Then
+                                        'compute slope
+                                        lDone = True
+                                        lSlopeSW = lElevDiffSW / (lOffset * Math.Sqrt(2))
+                                    End If
+                                End If
+                            End If
+                        End If
+                        'find slope to the south
+                        lOffset = 1
+                        If lRow + lOffset < lNumRows Then
+                            If lInArray(lCol, lRow + lOffset) > -2000000000 Then
+                                lElevDiffS = lInArray(lCol, lRow) - lInArray(lCol, lRow + lOffset)
+                                If lElevDiffS <> 0 Then
+                                    'compute slope
+                                    lDone = True
+                                    lSlopeS = lElevDiffS / lOffset
+                                End If
+                            End If
+                        End If
+                        'find slope to the southeast
+                        lOffset = 1
+                        If lCol + lOffset < lNumCols Then
+                            If lRow + lOffset < lNumRows Then
+                                If lInArray(lCol + lOffset, lRow + lOffset) > -2000000000 Then
+                                    lElevDiffSE = lInArray(lCol, lRow) - lInArray(lCol + lOffset, lRow + lOffset)
+                                    If lElevDiffSE <> 0 Then
+                                        'compute slope
+                                        lDone = True
+                                        lSlopeSE = lElevDiffSE / (lOffset * Math.Sqrt(2))
+                                    End If
+                                End If
+                            End If
+                        End If
+                        'now find the greatest downslope
+                        lGreatestSlope = 0
+                        If lSlopeE > lGreatestSlope Then
+                            lGreatestSlope = lSlopeE
+                            lFlowDir = 1
+                        End If
+                        If lSlopeNE > lGreatestSlope Then
+                            lGreatestSlope = lSlopeNE
+                            lFlowDir = 2
+                        End If
+                        If lSlopeN > lGreatestSlope Then
+                            lGreatestSlope = lSlopeN
+                            lFlowDir = 3
+                        End If
+                        If lSlopeNW > lGreatestSlope Then
+                            lGreatestSlope = lSlopeNW
+                            lFlowDir = 4
+                        End If
+                        If lSlopeW > lGreatestSlope Then
+                            lGreatestSlope = lSlopeW
+                            lFlowDir = 5
+                        End If
+                        If lSlopeSW > lGreatestSlope Then
+                            lGreatestSlope = lSlopeSW
+                            lFlowDir = 6
+                        End If
+                        If lSlopeS > lGreatestSlope Then
+                            lGreatestSlope = lSlopeS
+                            lFlowDir = 7
+                        End If
+                        If lSlopeSE > lGreatestSlope Then
+                            lGreatestSlope = lSlopeSE
+                            lFlowDir = 8
+                        End If
+                        If lFlowDir > 0 Then
+                            lOutArray(lCol, lRow) = lFlowDir
+                        Else
+                            'Logger.Dbg("No flow dir")
+                        End If
+                    End If
+                End If
+            Next
+            Logger.Progress(lRow, lNumRows)
+        Next
+        Logger.Progress(100, 100)
+
+        'if a neighboring cell does not give us a downslope, check until we find one
+        For lRow = 1 To lOutputGrid.Header.NumberRows - 2
+            For lCol = 1 To lOutputGrid.Header.NumberCols - 2
+                If lOutArray(lCol, lRow) = 0 Then
+                    lGreatestSlope = 0
+                    lFlowDir = 0
+                    If lInArray(lCol, lRow) > -2000000000 Then
+                        'find slope to the east
+                        lDone = False
+                        lOffset = 1
+                        Do While lDone = False
+                            If lCol + lOffset < lNumCols Then
+                                If lInArray(lCol + lOffset, lRow) > -2000000000 Then
+                                    lElevDiffE = lInArray(lCol, lRow) - lInArray(lCol + lOffset, lRow)
+                                    If lElevDiffE <> 0 Then
+                                        'compute slope
+                                        lDone = True
+                                        lSlopeE = lElevDiffE / lOffset
+                                    Else
+                                        lOffset += 1
+                                    End If
+                                Else
+                                    lDone = True
+                                    lSlopeE = 0.0
+                                End If
+                            Else
+                                lDone = True
+                                lSlopeE = 0.0
+                            End If
+                        Loop
+                        'find slope to the northeast
+                        lDone = False
+                        lOffset = 1
+                        Do While lDone = False
+                            If lCol + lOffset < lNumCols Then
+                                If lRow - lOffset > 0 Then
+                                    If lInArray(lCol + lOffset, lRow - lOffset) > -2000000000 Then
+                                        lElevDiffNE = lInArray(lCol, lRow) - lInArray(lCol + lOffset, lRow - lOffset)
+                                        If lElevDiffNE <> 0 Then
+                                            'compute slope
+                                            lDone = True
+                                            lSlopeNE = lElevDiffNE / (lOffset * Math.Sqrt(2))
+                                        Else
+                                            lOffset += 1
+                                        End If
+                                    Else
+                                        lDone = True
+                                        lSlopeNE = 0.0
+                                    End If
+                                Else
+                                    lDone = True
+                                    lSlopeNE = 0.0
+                                End If
+                            Else
+                                lDone = True
+                                lSlopeNE = 0.0
+                            End If
+                        Loop
+                        'find slope to the north
+                        lDone = False
+                        lOffset = 1
+                        Do While lDone = False
+                            If lRow - lOffset > 0 Then
+                                If lInArray(lCol, lRow - lOffset) > -2000000000 Then
+                                    lElevDiffN = lInArray(lCol, lRow) - lInArray(lCol, lRow - lOffset)
+                                    If lElevDiffN <> 0 Then
+                                        'compute slope
+                                        lDone = True
+                                        lSlopeN = lElevDiffN / lOffset
+                                    Else
+                                        lOffset += 1
+                                    End If
+                                Else
+                                    lDone = True
+                                    lSlopeN = 0.0
+                                End If
+                            Else
+                                lDone = True
+                                lSlopeN = 0.0
+                            End If
+                        Loop
+                        'find slope to the northwest
+                        lDone = False
+                        lOffset = 1
+                        Do While lDone = False
+                            If lCol - lOffset > 0 Then
+                                If lRow - lOffset > 0 Then
+                                    If lInArray(lCol - lOffset, lRow - lOffset) > -2000000000 Then
+                                        lElevDiffNW = lInArray(lCol, lRow) - lInArray(lCol - lOffset, lRow - lOffset)
+                                        If lElevDiffNW <> 0 Then
+                                            'compute slope
+                                            lDone = True
+                                            lSlopeNW = lElevDiffNW / (lOffset * Math.Sqrt(2))
+                                        Else
+                                            lOffset += 1
+                                        End If
+                                    Else
+                                        lDone = True
+                                        lSlopeNW = 0.0
+                                    End If
+                                Else
+                                    lDone = True
+                                    lSlopeNW = 0.0
+                                End If
+                            Else
+                                lDone = True
+                                lSlopeNW = 0.0
+                            End If
+                        Loop
+                        'find slope to the west
+                        lDone = False
+                        lOffset = 1
+                        Do While lDone = False
+                            If lCol - lOffset > 0 Then
+                                If lInArray(lCol - lOffset, lRow) > -2000000000 Then
+                                    lElevDiffW = lInArray(lCol, lRow) - lInArray(lCol - lOffset, lRow)
+                                    If lElevDiffW <> 0 Then
+                                        'compute slope
+                                        lDone = True
+                                        lSlopeW = lElevDiffW / lOffset
+                                    Else
+                                        lOffset += 1
+                                    End If
+                                Else
+                                    lDone = True
+                                    lSlopeW = 0.0
+                                End If
+                            Else
+                                lDone = True
+                                lSlopeW = 0.0
+                            End If
+                        Loop
+                        'find slope to the southwest
+                        lDone = False
+                        lOffset = 1
+                        Do While lDone = False
+                            If lCol - lOffset > 0 Then
+                                If lRow + lOffset < lNumRows Then
+                                    If lInArray(lCol - lOffset, lRow + lOffset) > -2000000000 Then
+                                        lElevDiffSW = lInArray(lCol, lRow) - lInArray(lCol - lOffset, lRow + lOffset)
+                                        If lElevDiffSW <> 0 Then
+                                            'compute slope
+                                            lDone = True
+                                            lSlopeSW = lElevDiffSW / (lOffset * Math.Sqrt(2))
+                                        Else
+                                            lOffset += 1
+                                        End If
+                                    Else
+                                        lDone = True
+                                        lSlopeSW = 0.0
+                                    End If
+                                Else
+                                    lDone = True
+                                    lSlopeSW = 0.0
+                                End If
+                            Else
+                                lDone = True
+                                lSlopeSW = 0.0
+                            End If
+                        Loop
+                        'find slope to the south
+                        lDone = False
+                        lOffset = 1
+                        Do While lDone = False
+                            If lRow + lOffset < lNumRows Then
+                                If lInArray(lCol, lRow + lOffset) > -2000000000 Then
+                                    lElevDiffS = lInArray(lCol, lRow) - lInArray(lCol, lRow + lOffset)
+                                    If lElevDiffS <> 0 Then
+                                        'compute slope
+                                        lDone = True
+                                        lSlopeS = lElevDiffS / lOffset
+                                    Else
+                                        lOffset += 1
+                                    End If
+                                Else
+                                    lDone = True
+                                    lSlopeS = 0.0
+                                End If
+                            Else
+                                lDone = True
+                                lSlopeS = 0.0
+                            End If
+                        Loop
+                        'find slope to the southeast
+                        lDone = False
+                        lOffset = 1
+                        Do While lDone = False
+                            If lCol + lOffset < lNumCols Then
+                                If lRow + lOffset < lNumRows Then
+                                    If lInArray(lCol + lOffset, lRow + lOffset) > -2000000000 Then
+                                        lElevDiffSE = lInArray(lCol, lRow) - lInArray(lCol + lOffset, lRow + lOffset)
+                                        If lElevDiffSE <> 0 Then
+                                            'compute slope
+                                            lDone = True
+                                            lSlopeSE = lElevDiffSE / (lOffset * Math.Sqrt(2))
+                                        Else
+                                            lOffset += 1
+                                        End If
+                                    Else
+                                        lDone = True
+                                        lSlopeSE = 0.0
+                                    End If
+                                Else
+                                    lDone = True
+                                    lSlopeSE = 0.0
+                                End If
+                            Else
+                                lDone = True
+                                lSlopeSE = 0.0
+                            End If
+                        Loop
+                        'now find the greatest downslope
+                        lGreatestSlope = 0
+                        If lSlopeE > lGreatestSlope Then
+                            lGreatestSlope = lSlopeE
+                            lFlowDir = 1
+                        End If
+                        If lSlopeNE > lGreatestSlope Then
+                            lGreatestSlope = lSlopeNE
+                            lFlowDir = 2
+                        End If
+                        If lSlopeN > lGreatestSlope Then
+                            lGreatestSlope = lSlopeN
+                            lFlowDir = 3
+                        End If
+                        If lSlopeNW > lGreatestSlope Then
+                            lGreatestSlope = lSlopeNW
+                            lFlowDir = 4
+                        End If
+                        If lSlopeW > lGreatestSlope Then
+                            lGreatestSlope = lSlopeW
+                            lFlowDir = 5
+                        End If
+                        If lSlopeSW > lGreatestSlope Then
+                            lGreatestSlope = lSlopeSW
+                            lFlowDir = 6
+                        End If
+                        If lSlopeS > lGreatestSlope Then
+                            lGreatestSlope = lSlopeS
+                            lFlowDir = 7
+                        End If
+                        If lSlopeSE > lGreatestSlope Then
+                            lGreatestSlope = lSlopeSE
+                            lFlowDir = 8
+                        End If
+                        If lFlowDir > 0 Then
+                            lOutArray(lCol, lRow) = lFlowDir
+                        Else
+                            'Logger.Dbg("No flow dir")
+                        End If
+                    End If
+                End If
+            Next
+            Logger.Progress(lRow, lNumRows)
+        Next
+        Logger.Progress(100, 100)
+
+        'return array to output grid 
+        For lRow = 0 To lOutputGrid.Header.NumberRows - 1
+            For lCol = 0 To lOutputGrid.Header.NumberCols - 1
+                lOutputGrid.Value(lCol, lRow) = lOutArray(lCol, lRow)
+            Next
+        Next
+
+        lOutputGrid.Save()
+        lOutputGrid = Nothing
+        lInputGrid = Nothing
+
+        Dim lRet As Integer = 0
+        Return lRet
+    End Function
+
     Public Shared Function GridValueAtPoint(ByVal aGridLayerIndex As Integer, ByVal aX As Double, ByVal aY As Double) As Integer
         'set input grid
         Dim gridLayer As MapWindow.Interfaces.Layer
@@ -2471,6 +2969,60 @@ Public Class GisUtil
 
     End Sub
 
+    Public Shared Sub GridMask(ByVal aInputGridFileName As String, ByVal aSubbasinsFileName As String, ByVal aMaskGridFileName As String)
+        'mask the dem grid with a polygon shapefile layer
+        
+        'prepare the output grid
+        If FileExists(aMaskGridFileName) Then
+            IO.File.Delete(aMaskGridFileName)
+        End If
+        IO.File.Copy(aInputGridFileName, aMaskGridFileName)
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aMaskGridFileName)
+        Dim lMaskVal As Double = lOutputGrid.Header.NodataValue
+
+        'prepare the mask polygon layer   
+        Dim lSubbasinsLayerIndex As Integer = -1
+        If GisUtil.IsLayerByFileName(aSubbasinsFileName) Then
+            lSubbasinsLayerIndex = GisUtil.LayerIndex(aSubbasinsFileName)
+        End If
+
+        Dim lCol As Integer = 0
+        Dim lRow As Integer = 0
+        Dim lXPos As Double = 0.0
+        Dim lYPos As Double = 0.0
+        If lSubbasinsLayerIndex > -1 Then
+            Dim lPolygonSf As MapWinGIS.Shapefile = Nothing
+            lPolygonSf = PolygonShapeFileFromIndex(lSubbasinsLayerIndex)
+
+            lPolygonSf.BeginPointInShapefile()
+            lXPos = 0.0
+            lYPos = 0.0
+            lCol = 0
+            lRow = 0
+            Dim lSubId As Integer = -1
+            With lOutputGrid
+                Dim lNumRows As Integer = .Header.NumberRows
+                Dim lNumCols As Integer = .Header.NumberCols
+                For lRow = 0 To lNumRows - 1
+                    For lCol = 0 To lNumCols - 1
+                        .CellToProj(lCol, lRow, lXPos, lYPos)
+                        lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
+                        If lSubId = -1 Then
+                            .Value(lCol, lRow) = lMaskVal
+                        End If
+                    Next
+                    Logger.Progress(lRow, lNumRows)
+                Next
+            End With
+            Logger.Progress(100, 100)
+            lPolygonSf.EndPointInShapefile()
+        End If
+
+        lOutputGrid.Save()
+        lOutputGrid = Nothing
+    End Sub
+
     Public Shared Sub GridFromShapefile(ByVal aShapefileLayerIndex As Integer, ByVal aShapefileFieldIndex As Integer, ByVal aBaseGridFileName As String, ByVal aOutputGridFileName As String)
         'create a grid from a shapefile,
         'given a shapefile, a field index, and a base grid
@@ -3003,7 +3555,7 @@ Public Class GisUtil
                         For lCol = 0 To lNumCols - 1
                             .CellToProj(lCol, lRow, lXPos, lYPos)
                             lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
-                            If lSubId > -1 Then
+                            If lSubId > -1 And .Value(lCol, lRow) > 0 Then
                                 .Value(lCol, lRow) = 99  'this is wetlands
                             End If
                         Next
@@ -3012,8 +3564,6 @@ Public Class GisUtil
                 End With
                 Logger.Progress(100, 100)
                 lPolygonSf.EndPointInShapefile()
-                lPolygonSf.Close()
-                lPolygonSf = Nothing
             Else
                 'wetlands layer is a grid
                 Dim lWetlandsGrid As New MapWinGIS.Grid
@@ -3028,7 +3578,7 @@ Public Class GisUtil
                         For lCol = 0 To lNumCols - 1
                             .CellToProj(lCol, lRow, lXPos, lYPos)
                             lWetlandsGrid.ProjToCell(lXPos, lYPos, lWCol, lWRow)
-                            If lWetlandsGrid.Value(lWCol, lWRow) > 89 Then
+                            If lWetlandsGrid.Value(lWCol, lWRow) > 89 And .Value(lCol, lRow) > 0 Then
                                 .Value(lCol, lRow) = 99  'this is wetlands
                             End If
                         Next
@@ -3067,6 +3617,14 @@ Public Class GisUtil
             IO.File.Delete(lTmpWetlandGridFileName)
         End If
         IO.File.Copy(aToWetlandsGridFileName, lTmpWetlandGridFileName)
+
+        'store wetlands cells in an array for later use (99)
+        Dim lWetlandsArray(lOutputGrid.Header.NumberCols, lOutputGrid.Header.NumberRows) As Integer
+        For lRow = 0 To lOutputGrid.Header.NumberRows - 1
+            For lCol = 0 To lOutputGrid.Header.NumberCols - 1
+                lWetlandsArray(lCol, lRow) = lOutputGrid.Value(lCol, lRow)
+            Next
+        Next
 
         'mark cells along stream lines
         Dim lTmpStreamGridFileName As String = FilenameNoExt(aToWetlandsGridFileName) & "Streams.tif"
@@ -3127,6 +3685,15 @@ Public Class GisUtil
             For lCol = 0 To lOutputGrid.Header.NumberCols - 1
                 If lArray(lCol, lRow) > 0 AndAlso lArray(lCol, lRow) < 9 Then
                     lArray(lCol, lRow) = 28  'this drains to stream
+                End If
+            Next
+        Next
+
+        'mark wetlands cells back to 99
+        For lRow = 0 To lOutputGrid.Header.NumberRows - 1
+            For lCol = 0 To lOutputGrid.Header.NumberCols - 1
+                If lWetlandsArray(lCol, lRow) = 99 And lArray(lCol, lRow) <> 98 And lArray(lCol, lRow) > 0 Then
+                    lArray(lCol, lRow) = 99
                 End If
             Next
         Next
