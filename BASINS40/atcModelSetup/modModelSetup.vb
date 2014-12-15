@@ -1991,6 +1991,24 @@ Public Module modModelSetup
                 FileCopy(lInputProjectionFileName, FilenameSetExt(lToWetlandsGridFileName, "prj"))
             End If
             GisUtil.AddLayer(lToWetlandsGridFileName, lToWetlandsGridLayerName)
+            'generate thematic map
+            Dim lBreaks As New Collection
+            lBreaks.Add(28)
+            lBreaks.Add(29)
+            lBreaks.Add(98)
+            lBreaks.Add(99)
+            Dim lColors As New Collection
+            lColors.Add(System.Convert.ToUInt32(RGB(128, 64, 0)))  'brown
+            lColors.Add(System.Convert.ToUInt32(RGB(0, 240, 0)))   'green
+            lColors.Add(System.Convert.ToUInt32(RGB(0, 0, 250)))   'blue
+            lColors.Add(System.Convert.ToUInt32(RGB(0, 128, 0)))   'dark green
+            Dim lCaptions As New Collection
+            lCaptions.Add("Drains to Stream")
+            lCaptions.Add("Drains to Wetlands")
+            lCaptions.Add("Streams")
+            lCaptions.Add("Wetlands")
+            lToWetlandsGridLayerIndex = GisUtil.LayerIndex(lToWetlandsGridLayerName)
+            GisUtil.GridUniqueValuesRenderer(lToWetlandsGridLayerIndex, lBreaks, lColors, lCaptions)
             GisUtil.SaveProject(GisUtil.ProjectFileName)
         End If
         Return lToWetlandsGridFileName

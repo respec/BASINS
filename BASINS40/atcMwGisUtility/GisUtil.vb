@@ -2971,7 +2971,25 @@ Public Class GisUtil
 
     Public Shared Sub GridMask(ByVal aInputGridFileName As String, ByVal aSubbasinsFileName As String, ByVal aMaskGridFileName As String)
         'mask the dem grid with a polygon shapefile layer
-        
+        'If FileExists(aMaskGridFileName) Then
+        '    IO.File.Delete(aMaskGridFileName)
+        'End If
+
+        'Dim lList As New System.Collections.ArrayList
+        'Dim lSubbasinsLayerIndex As Integer = -1
+        'If GisUtil.IsLayerByFileName(aSubbasinsFileName) Then
+        '    lSubbasinsLayerIndex = GisUtil.LayerIndex(aSubbasinsFileName)
+        'End If
+        'If lSubbasinsLayerIndex > -1 Then
+        '    Dim lPolygonSf As MapWinGIS.Shapefile = Nothing
+        '    lPolygonSf = PolygonShapeFileFromIndex(lSubbasinsLayerIndex)
+        '    For i As Integer = 1 To lPolygonSf.NumShapes
+        '        'Dim lShape As MapWinGIS.Shape = lPolygonSf.Shape(i)
+        '        lList.Add(i - 1)
+        '    Next
+        '    MapWinGeoProc.Hydrology.Mask(aInputGridFileName, aSubbasinsFileName, lList, aMaskGridFileName, Nothing)
+        'End If
+
         'prepare the output grid
         If FileExists(aMaskGridFileName) Then
             IO.File.Delete(aMaskGridFileName)
@@ -5149,6 +5167,34 @@ Public Class GisUtil
         lMWlayer.Visible = False
         lMWlayer.Visible = True
         pMapWin.Refresh()
+    End Sub
+
+    Public Shared Sub GridUniqueValuesRenderer(ByVal aLayerIndex As Integer, _
+                                               Optional ByVal aBreaks As Collection = Nothing, _
+                                               Optional ByVal aColors As Collection = Nothing, _
+                                               Optional ByVal aCaptions As Collection = Nothing)
+
+        Dim lMWlayer As MapWindow.Interfaces.Layer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
+
+        If lMWlayer.LayerType = 4 Then
+            'this is a grid
+            Dim lGrid As MapWinGIS.Grid = GridFromIndex(aLayerIndex)
+            Dim lScheme As New MapWinGIS.GridColorScheme
+            For i As Integer = 1 To aBreaks.Count
+                Dim lBreak As New MapWinGIS.GridColorBreak
+                lBreak.LowValue = aBreaks(i)
+                lBreak.HighValue = aBreaks(i)
+                lBreak.Caption = aCaptions(i)
+                lBreak.LowColor = aColors(i)
+                lBreak.HighColor = aColors(i)
+                lScheme.InsertBreak(lBreak)
+            Next i
+
+            lMWlayer.ColoringScheme = lScheme
+            lMWlayer.Visible = False
+            lMWlayer.Visible = True
+            pMapWin.Refresh()
+        End If
     End Sub
 
     Public Shared Sub BufferLayer(ByVal aInputShapefileFilename As String, ByVal aResultShapefileFilename As String, _
