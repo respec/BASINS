@@ -5187,6 +5187,7 @@ Public Class GisUtil
                 lBreak.Caption = aCaptions(i)
                 lBreak.LowColor = aColors(i)
                 lBreak.HighColor = aColors(i)
+                lBreak.ColoringType = 1 ' no hillshade
                 lScheme.InsertBreak(lBreak)
             Next i
 
