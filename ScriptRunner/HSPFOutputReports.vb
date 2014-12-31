@@ -402,7 +402,7 @@ Module HSPFOutputReports
                     'If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
                     '    lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
                     'End If
-                    lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource, lExpertSystemFileName)
+                    lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lExpertSystemFileName)
                     lStr = pTestPath & vbCrLf & lExpertSystem.Report
                     SaveFileString(lOutFolderName & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
                     'SaveFileString(lOutFolderName & pBaseName & ".exs", lExpertSystem.AsString)
@@ -651,7 +651,8 @@ Module HSPFOutputReports
             '    SaveFileString(lOutFileName, lReportCons.ToString)
             'End If
 
-            lReportCons = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
+            'lReportCons = HspfSupport.ConstituentBalance.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
+            lReportCons = HspfSupport.ConstituentBalance.Report(lHspfUci, "", lOperationTypes, pBaseName, lHspfBinDataSource, Nothing, lRunMade)
             lOutFileName = lOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Lds.txt"
             '"All_Budget.txt"
             SaveFileString(lOutFileName, lReportCons.ToString)
