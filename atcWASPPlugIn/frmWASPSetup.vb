@@ -1,11 +1,12 @@
 Imports atcUtility
+Imports atcWASP
 Imports atcMwGisUtility
 Imports MapWinUtility
 Imports atcData
 Imports System.Drawing
 Imports System
 Imports System.Windows.Forms
-Imports atcWASP
+
 
 ''' <summary>
 ''' After the stream segments have been selected, this form is shown to allow you to refine the Wasp segment organization (subdividing and combining NHD segments)
