@@ -441,7 +441,15 @@ Public Class frmVariationCligen
         FindAllCligenParameters()
 
         cboSeasons.Items.Add(AllSeasons)
-        pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
+        If pSeasonsAvailable Is Nothing Then
+            pSeasonsAvailable = New atcCollection()
+        Else
+            pSeasonsAvailable.Clear()
+        End If
+        For Each lType As Type In atcData.atcSeasonBase.AllSeasonTypes
+            pSeasonsAvailable.Add(lType)
+        Next
+        'pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
         For Each lSeasonType As Type In pSeasonsAvailable
             Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
             Select Case lSeasonTypeShortName

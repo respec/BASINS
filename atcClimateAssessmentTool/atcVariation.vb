@@ -794,7 +794,7 @@ Public Class atcVariation
                 Dim lXML As Xml.XmlNode = lXMLdoc.FirstChild
                 If lXML.Name.ToLower.Equals("seasons") Then
                     Dim lSeasonTypeName As String = GetAtt(lXML, "Type")
-                    For Each lSeasonType As Type In atcSeasons.atcSeasonPlugin.AllSeasonTypes
+                    For Each lSeasonType As Type In atcData.atcSeasonBase.AllSeasonTypes
                         If lSeasonType.Name.Equals(lSeasonTypeName) Then
                             Seasons = lSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
                             If lXML.InnerXml.Contains("<") Then

@@ -836,7 +836,15 @@ Imports MapWinUtility
         cboFunction.Items.Clear()
         cboFunction.Items.AddRange(pFunctionLabels)
 
-        pSeasonTypesAvailable = atcSeasonPlugin.AllSeasonTypes
+        If pSeasonTypesAvailable Is Nothing Then
+            pSeasonTypesAvailable = New atcCollection()
+        Else
+            pSeasonTypesAvailable.Clear()
+        End If
+        For Each lType As Type In atcData.atcSeasonBase.AllSeasonTypes
+            pSeasonTypesAvailable.Add(lType)
+        Next
+        'pSeasonTypesAvailable = atcSeasonPlugin.AllSeasonTypes
         For Each lSeasonType As Type In pSeasonTypesAvailable
             Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
             Select Case lSeasonTypeShortName
