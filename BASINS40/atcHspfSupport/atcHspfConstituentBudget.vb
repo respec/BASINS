@@ -213,15 +213,32 @@ Public Module ConstituentBudget
                         End If
                         Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
                         Dim lNonpointVol As Double
+                        Dim lOutflow As Double = ValueForReach(lID, lOutflowData)
+                        Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
+                        Dim lDiversion As Double = 0.0
+                        If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
+                            lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                        Else
+                            Dim lExitNumber As Integer = 0
+                            FindDownStreamExitNumber(aUci, lID, lExitNumber)
+                            If lExitNumber = 0 Then
+                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                            Else
+                                Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "OVOL-" & lExitNumber)(0)
+                                lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual"))
+                                lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
+                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                            End If
 
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointVol, 0.0, 0.0, lTotalInflow, lUpstreamIn)
+                        End If
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointVol, 0.0, 0.0, lTotalInflow, lUpstreamIn, lDiversion)
                             lReport2.Append(.Item1)
                             lNonpointVol = .Item2
                         End With
 
                         Dim lInflowFromPrecip As Double = ValueForReach(lID, lTotalPrecipData)
 
-                        Dim lOutflow As Double = ValueForReach(lID, lOutflowData)
+
                         Dim lEvapLoss As Double = ValueForReach(lID, lEvapLossData)
                         Dim lAdditionalSource As Double = 0.0
                         lAdditionalSource = lTotalInflow - lNonpointVol - lUpstreamIn - lPointVol - lInflowFromPrecip + lEvapLoss
@@ -244,23 +261,7 @@ Public Module ConstituentBudget
                             lReachTrappingEfficiency = 0
                         End Try
 
-                        Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
-                        Dim Diversion As Double = 0.0
-                        If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
-                            lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                        Else
-                            Dim lExitNumber As Integer = 0
-                            FindDownStreamExitNumber(aUci, lID, lExitNumber)
-                            If lExitNumber = 0 Then
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            Else
-                                Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "OVOL-" & lExitNumber)(0)
-                                Diversion = lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            End If
-
-                        End If
+                        
                         lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
                         lCumulativePointNonpointColl.Increment(lDownstreamReachID, lCumulativePointNonpoint)
 
@@ -273,7 +274,7 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = DoubleToString(lTotalInflow, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lOutflow, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lEvapLoss, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(Diversion, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lDiversion, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lAdditionalSource, , lNumberFormat)
 
                     Next
@@ -339,7 +340,26 @@ Public Module ConstituentBudget
                         Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
                         Dim lDepScour As Double = ValueForReach(lID, lDepScourData) 'TotalForReach(lID, lAreas, lDepScourData)
                         Dim lNonpointTons As Double
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointTons, 0.0, lDepScour, lTotalInflow, lUpstreamIn)
+
+                        Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
+                        Dim lDiversion As Double = 0.0
+                        If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
+                            lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                        Else
+                            Dim lExitNumber As Integer = 0
+                            FindDownStreamExitNumber(aUci, lID, lExitNumber)
+                            If lExitNumber = 0 Then
+                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                            Else
+                                Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "OSED-TOT-EXIT" & lExitNumber)(0)
+                                lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual"))
+                                lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
+                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                            End If
+
+                        End If
+
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointTons, 0.0, lDepScour, lTotalInflow, lUpstreamIn, lDiversion)
                             lReport2.Append(.Item1)
                             lNonpointTons = .Item2
 
@@ -357,30 +377,14 @@ Public Module ConstituentBudget
                             lReachTrappingEfficiency = 0
                         End Try
 
-                        Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
-                        Dim Diversion As Double = 0.0
-                        If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
-                            lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                        Else
-                            Dim lExitNumber As Integer = 0
-                            FindDownStreamExitNumber(aUci, lID, lExitNumber)
-                            If lExitNumber = 0 Then
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            Else
-                                Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "OSED-TOT-EXIT" & lExitNumber)(0)
-                                Diversion = lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            End If
-
-                        End If
+                        
                         Dim lCululativeTrappingEfficiency As Double = 0
                         Try
                             lCululativeTrappingEfficiency = 1 - (lOutflow / lCumulativePointNonpoint)
                         Catch
                             lReachTrappingEfficiency = 0
                         End Try
-                        lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+
                         lCumulativePointNonpointColl.Increment(lDownstreamReachID, lCumulativePointNonpoint)
 
                         lField = 0
@@ -394,7 +398,7 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = DoubleToString(lCumulativePointNonpoint, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lCululativeTrappingEfficiency * 100, , lNumberFormat, , , 6)
                         lField += 1 : .Value(lField) = DoubleToString(lReachTrappingEfficiency * 100, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(Diversion, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lDiversion, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lAdditionalSourceTons, , lNumberFormat)
                     Next
                     lReport.Append(.ToString)
@@ -425,7 +429,7 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Additional Sources (wdm)"
 
                     For Each lID As HspfOperation In lRchresOperations
-
+                        'If lID.Id = 3 Then Stop
                         Dim lPointlbs As Double = 0.0
                         .CurrentRecord += 1
 
@@ -475,14 +479,31 @@ Public Module ConstituentBudget
 
                         Dim lOutflow As Double = ValueForReach(lID, lOutflowData)
                         Dim lDepScour As Double = lOutflow - lTotalInflow
+                        Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
+                        Dim lDiversion As Double = 0.0
+                        If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
+                            lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                        Else
+                            Dim lExitNumber As Integer = 0
+                            FindDownStreamExitNumber(aUci, lID, lExitNumber)
+                            If lExitNumber = 0 Then
+                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                            Else
+                                Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "N-TOT-OUT-EXIT" & lExitNumber)(0)
+                                lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual")) 'Diversion is a type of loss so it is calculated as -ve
+                                lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
+                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                            End If
 
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON, lPointlbs, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn)
+                        End If
+
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON, lPointlbs, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn, lDiversion)
                             lReport2.Append(.Item1)
                             lNonpointlbs = .Item2
                         End With
 
                         lAdditionalSourcelbs = lTotalInflow - lNonpointlbs - lTotalAtmDep - lUpstreamIn - lPointlbs
-
+                        'If lID.Id = 637 Then Stop
                         Dim lCumulativePointNonpoint As Double = lNonpointlbs + lPointlbs + lAdditionalSourcelbs
                         If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
                             lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
@@ -495,30 +516,14 @@ Public Module ConstituentBudget
                             lReachTrappingEfficiency = 0
                         End Try
 
-                        Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
-                        Dim Diversion As Double = 0.0
-                        If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
-                            lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                        Else
-                            Dim lExitNumber As Integer = 0
-                            FindDownStreamExitNumber(aUci, lID, lExitNumber)
-                            If lExitNumber = 0 Then
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            Else
-                                Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "N-TOT-OUT-EXIT" & lExitNumber)(0)
-                                Diversion = lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            End If
-
-                        End If
+                        
                         Dim lCululativeTrappingEfficiency As Double = 0
                         Try
                             lCululativeTrappingEfficiency = 1 - (lOutflow / lCumulativePointNonpoint)
                         Catch
                             lReachTrappingEfficiency = 0
                         End Try
-                        pRunningTotals.Add("Reach" & lID.Id & " Diversion", Diversion)
+
 
                         lCumulativePointNonpointColl.Increment(lDownstreamReachID, lCumulativePointNonpoint)
 
@@ -534,7 +539,7 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = DoubleToString(lCumulativePointNonpoint, 15, lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lCululativeTrappingEfficiency * 100, 15, lNumberFormat, , , 6)
                         lField += 1 : .Value(lField) = DoubleToString(lReachTrappingEfficiency * 100, 15, lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(Diversion, 15, lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lDiversion, 15, lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lAdditionalSourcelbs, 15, lNumberFormat)
                     Next
                     lReport.Append(.ToString)
@@ -611,7 +616,28 @@ Public Module ConstituentBudget
                             lTotalAtmDep = ValueForReach(lID, lAtmDepData)
                         End If
                         Dim lAdditionalSourcelbs As Double = 0
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVOP, lPointlbs, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn)
+
+                        'Following few lines calculate diversion if happening in the stream.
+                        Dim Diversion As Double = 0.0
+                        Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
+                        If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
+                            lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                        Else
+                            Dim lExitNumber As Integer = 0
+                            FindDownStreamExitNumber(aUci, lID, lExitNumber)
+                            If lExitNumber = 0 Then
+                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                            Else
+                                Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "P-TOT-OUT-EXIT" & lExitNumber)(0)
+                                Diversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual"))
+                                lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
+                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                            End If
+                        End If
+
+
+
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVOP, lPointlbs, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn, Diversion)
                             lReport2.Append(.Item1)
                             lNonpointlbs = .Item2
                         End With
@@ -636,24 +662,6 @@ Public Module ConstituentBudget
                             lReachTrappingEfficiency = 0
                         End Try
 
-                        Dim Diversion As Double = 0.0
-                        Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
-                        If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
-                            lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                        Else
-                            Dim lExitNumber As Integer = 0
-                            FindDownStreamExitNumber(aUci, lID, lExitNumber)
-                            If lExitNumber = 0 Then
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            Else
-                                Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "P-TOT-OUT-EXIT" & lExitNumber)(0)
-                                Diversion = lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            End If
-                        End If
-
-                        pRunningTotals.Add("Reach" & lID.Id & " Diversion", Diversion)
                         lCumulativePointNonpointColl.Increment(lDownstreamReachID, lCumulativePointNonpoint)
 
                         lField = 0
@@ -738,8 +746,10 @@ Public Module ConstituentBudget
                             End If
                         Next
                     End If
+                    If Not lSourceDescription.Contains("Loss") Then
+                        lTotal += lValue
+                    End If
 
-                    lTotal += lValue
 
                 Next lSourceDescription
 
@@ -868,6 +878,7 @@ Public Module ConstituentBudget
                         ByVal aConnectionArea As Double, _
                         ByVal aLandUse As String)
         Dim lVolPrefix As String = aVolName.Substring(0, 1) & ":"
+        Dim aTotal2 As Double = aTotal 'aTotal2 is used for reporting the loading from the local land area to the reach.
         If aReporting Then
 
             Dim lPercentContrib As Double = 0.0
@@ -880,7 +891,6 @@ Public Module ConstituentBudget
                     Dim UpstreamLoadByCategory As Double = pRunningTotals.ItemByKey("Reach" & lTributaryID & " " & lVolPrefix & aLandUse)
                     aTotal += UpstreamLoadByCategory
                     lPercentContrib = aTotal * 100 / aReachTotal
-
                 End If
             Next
 
@@ -895,8 +905,8 @@ Public Module ConstituentBudget
                 & lVolPrefix _
                 & aLandUse & vbTab _
                 & aConnectionArea & vbTab _
-                & DoubleToString(aTotal / aConnectionArea, 15, "#,##0.###") & vbTab & _
-                                    DoubleToString(aTotal, 15, "#,##0.###") & vbTab & vbCrLf
+                & DoubleToString(aTotal2 / aConnectionArea, 15, "#,##0.###") & vbTab & _
+                                    DoubleToString(aTotal2, 15, "#,##0.###") & vbTab & vbCrLf
             Else
                 aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
                 & lVolPrefix _
@@ -928,11 +938,12 @@ Public Module ConstituentBudget
                                     ByVal aBalanceType As String, _
                                     ByVal aNonpointData As atcTimeseriesGroup, _
                                    ByVal aConversionFactor As Double, _
-                                   ByVal lPoint As Double, _
-                                   ByVal lAtmDep As Double, _
+                                   ByVal aPoint As Double, _
+                                   ByVal aAtmDep As Double, _
                                    ByVal GainLoss As Double, _
-                                   ByVal lTotalInflow As Double, _
-                                   ByVal lUpstreamIn As Double) As Tuple(Of String, Double)
+                                   ByVal aTotalInflow As Double, _
+                                   ByVal aUpstreamIn As Double, _
+                                   ByVal aDiversion As Double) As Tuple(Of String, Double)
         Dim LoadingByLanduse As String = ""
         Dim lReachTotal As Double = 0.0
 
@@ -940,26 +951,29 @@ Public Module ConstituentBudget
         felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent)
         felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent)
 
-        Dim lAdditionalSource As Double = lTotalInflow - lReachTotal - lAtmDep - lPoint - lUpstreamIn
+        Dim lAdditionalSource As Double = aTotalInflow - lReachTotal - aAtmDep - aPoint - aUpstreamIn
 
 
-        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lTotalInflow, True, lContribPercent)
-        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lTotalInflow, True, lContribPercent)
-
+        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent)
+        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent)
+        'If aReach.Id = 637 Then Stop
         For Each lTributary As HspfConnection In aReach.Sources
             If lTributary.Source.VolName = "RCHRES" Then
                 Dim lTributaryId As String = lTributary.Source.VolId
-                lPoint += pRunningTotals.ItemByKey("Reach" & lTributaryId & " PointSources")
+                aPoint += pRunningTotals.ItemByKey("Reach" & lTributaryId & " PointSources")
                 lAdditionalSource += pRunningTotals.ItemByKey("Reach" & lTributaryId & " AdditionalSources")
-                lAtmDep += pRunningTotals.ItemByKey("Reach" & lTributaryId & " DirectAtmosphericDeposition")
+                aAtmDep += pRunningTotals.ItemByKey("Reach" & lTributaryId & " DirectAtmosphericDeposition")
+                aDiversion += pRunningTotals.ItemByKey("Reach" & lTributaryId & " Diversion")
                 pRunningTotals.Increment("Reach" & aReach.Id & " Gain", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Gain"))
                 pRunningTotals.Increment("Reach" & aReach.Id & " Loss", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Loss"))
+                'pRunningTotals.Increment("Reach" & aReach.Id & " Diversion", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Diversion"))
             End If
         Next
 
-        pRunningTotals.Add("Reach" & aReach.Id & " PointSources", lPoint)
-        pRunningTotals.Add("Reach" & aReach.Id & " DirectAtmosphericDeposition", lAtmDep)
+        pRunningTotals.Add("Reach" & aReach.Id & " PointSources", aPoint)
+        pRunningTotals.Add("Reach" & aReach.Id & " DirectAtmosphericDeposition", aAtmDep)
         pRunningTotals.Add("Reach" & aReach.Id & " AdditionalSources", lAdditionalSource)
+        pRunningTotals.Add("Reach" & aReach.Id & " Diversion", aDiversion)
 
         If GainLoss < 0 Then
             pRunningTotals.Increment("Reach" & aReach.Id & " Loss", GainLoss)
@@ -969,9 +983,9 @@ Public Module ConstituentBudget
             pRunningTotals.Increment("Reach" & aReach.Id & " Gain", GainLoss)
         End If
 
-        lContribPercent.Add("Reach" & aReach.Id & " PointSources", lPoint * 100 / lTotalInflow)
-        lContribPercent.Add("Reach" & aReach.Id & " DirectAtmosphericDeposition", lAtmDep * 100 / lTotalInflow)
-        lContribPercent.Add("Reach" & aReach.Id & " AdditionalSources", lAdditionalSource * 100 / lTotalInflow)
+        lContribPercent.Add("Reach" & aReach.Id & " PointSources", aPoint * 100 / aTotalInflow)
+        lContribPercent.Add("Reach" & aReach.Id & " DirectAtmosphericDeposition", aAtmDep * 100 / aTotalInflow)
+        lContribPercent.Add("Reach" & aReach.Id & " AdditionalSources", lAdditionalSource * 100 / aTotalInflow)
 
         If GainLoss < 0 Then
             For Each lKey As String In lContribPercent.Keys
