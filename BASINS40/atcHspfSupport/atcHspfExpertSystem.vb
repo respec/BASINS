@@ -96,8 +96,8 @@ Public Class atcExpertSystem
                 Throw New ApplicationException("The number of sites is 0. Program will quit!")
             End If
             Dim lCurSite As Integer = lExsRecord.Substring(14, 5)
-            If Not Double.TryParse(lExsRecord.Substring(19, 8), pLatMin) AndAlso Double.TryParse(lExsRecord.Substring(27, 8), pLatMax) _
-            AndAlso Double.TryParse(lExsRecord.Substring(35, 8), pLngMin) AndAlso Double.TryParse(lExsRecord.Substring(43, 8), pLngMax) Then
+            If Not (Double.TryParse(lExsRecord.Substring(19, 8), pLatMin) AndAlso Double.TryParse(lExsRecord.Substring(27, 8), pLatMax) _
+            AndAlso Double.TryParse(lExsRecord.Substring(35, 8), pLngMin) AndAlso Double.TryParse(lExsRecord.Substring(43, 8), pLngMax)) Then
                 Throw New ApplicationException("Latitude and Longitude of Watershed are not in correct format. Program will quit!")
             End If
 
