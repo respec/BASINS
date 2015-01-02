@@ -332,7 +332,7 @@ Public Module WatershedConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (Inches)" & vbCrLf
                                                 Case "Water_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (ac-ft)" & vbCrLf
-                                                Case "Sediment_PERLND", "Sediement_IMPLND"
+                                                Case "Sediment_PERLND", "Sediment_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons/ac)" & vbCrLf
                                                 Case "Sediment_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons)" & vbCrLf
