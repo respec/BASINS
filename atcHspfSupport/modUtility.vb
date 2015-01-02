@@ -1017,7 +1017,7 @@ Public Module Utility
                 Select Case aBalanceType
                     Case "Sediment"
                         Select Case aConstituent & "_" & lMassLink.Source.Member.ToString & "_" & lMassLink.Target.Member.ToString
-                            Case "WSSD_WSSD_ISED", "WSSD_SOSED_ISED", "SCRSD_SCRSD_ISED", "SCRSD_SOSED_ISED", "SOSLD_ISED"
+                            Case "WSSD_WSSD_ISED", "WSSD_SOSED_ISED", "SCRSD_SCRSD_ISED", "SCRSD_SOSED_ISED", "SOSLD_SOSLD_ISED"
                                 lMassLinkFactor += lMassLink.MFact
                         End Select
                     Case "Water"
