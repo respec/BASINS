@@ -189,6 +189,18 @@ namespace atcFtableBuilder
 
                 labels.Add(sChTypeName); labels.Add(sChLength); labels.Add(sChSlope); labels.Add(sChHInc);
             }
+            else if (Calc.CurrentType == FTableCalculator.ChannelType.NATURALFP)
+            {
+                string sChTypeName = "*** Channel Type: Natural w/ FP";
+                txt = ((FTableCalcNaturalFP)Calc).inpChannelLength.ToString();
+                string sChLength = "*** Channel Length: " + txt;
+                txt = ((FTableCalcNaturalFP)Calc).inpChannelSlope.ToString();
+                string sChSlope = "*** Channel Slope: " + txt;
+                txt = ((FTableCalcNaturalFP)Calc).inpHeightIncrement.ToString();
+                string sChHInc = "*** Height Increment: " + txt;
+
+                labels.Add(sChTypeName); labels.Add(sChLength); labels.Add(sChSlope); labels.Add(sChHInc);
+            }
 
             SortedList<int, object> lblLens = new SortedList<int, object>();
             int strLen = 0;
