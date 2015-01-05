@@ -147,7 +147,12 @@ Public Class atcBasinsPlugIn
         atcDataManager.AddMenuIfMissing(OurHelpMenuName, TopHelpMenuName, OurHelpMenuString, , "mnuOnlineDocs")
         atcDataManager.AddMenuIfMissing(ProgramWebPageMenuName, TopHelpMenuName, ProgramWebPageMenuString, , "mnuOnlineDocs")
 
-        atcDataManager.AddMenuIfMissing(RegisterMenuName, TopHelpMenuName, RegisterMenuString, , "mnuShortcuts")
+        Select Case g_AppNameShort
+            Case "SW Toolbox"
+            Case "GW Toolbox"
+            Case Else ' BASINS 
+                atcDataManager.AddMenuIfMissing(RegisterMenuName, TopHelpMenuName, RegisterMenuString, , "mnuShortcuts")
+        End Select
 
         g_Menus.Remove("mnuCheckForUpdates") 'Remove MW update menu so only ours will be present
         g_Menus.Remove("mnuFileBreak5")      'Remove MW separator after mnuCheckForUpdates
