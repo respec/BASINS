@@ -3013,7 +3013,21 @@ Public Class GisUtil
             Dim lPolygonSf As MapWinGIS.Shapefile = Nothing
             lPolygonSf = PolygonShapeFileFromIndex(lSubbasinsLayerIndex)
 
-            lPolygonSf.BeginPointInShapefile()
+            'could we buffer the polygon shapefile somehow?
+            Dim lPolygonSfBuffer As New MapWinGIS.Shapefile
+            lPolygonSfBuffer = lPolygonSf.BufferByDistance(200, 1, False, False)
+            System.IO.File.Delete(aSubbasinsFileName & "buffer2.shp")
+            System.IO.File.Delete(aSubbasinsFileName & "buffer2.dbf")
+            System.IO.File.Delete(aSubbasinsFileName & "buffer2.shx")
+            System.IO.File.Delete(aSubbasinsFileName & "buffer2.prj")
+            Dim lSaved As Boolean = lPolygonSfBuffer.SaveAs(aSubbasinsFileName & "buffer2.shp")
+
+            If lSaved Then
+                lPolygonSfBuffer.BeginPointInShapefile()
+            Else
+                'if buffer failed just carry on 
+                lPolygonSf.BeginPointInShapefile()
+            End If
             lXPos = 0.0
             lYPos = 0.0
             lCol = 0
@@ -3025,7 +3039,11 @@ Public Class GisUtil
                 For lRow = 0 To lNumRows - 1
                     For lCol = 0 To lNumCols - 1
                         .CellToProj(lCol, lRow, lXPos, lYPos)
-                        lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
+                        If lSaved Then
+                            lSubId = lPolygonSfBuffer.PointInShapefile(lXPos, lYPos)
+                        Else
+                            lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
+                        End If
                         If lSubId = -1 Then
                             .Value(lCol, lRow) = lMaskVal
                         End If
@@ -3034,7 +3052,11 @@ Public Class GisUtil
                 Next
             End With
             Logger.Progress(100, 100)
-            lPolygonSf.EndPointInShapefile()
+            If lSaved Then
+                lPolygonSfBuffer.EndPointInShapefile()
+            Else
+                lPolygonSf.EndPointInShapefile()
+            End If
         End If
 
         lOutputGrid.Save()
