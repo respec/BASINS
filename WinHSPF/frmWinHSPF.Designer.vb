@@ -395,7 +395,7 @@ Partial Class frmWinHSPF
         Me.ToolStrip1.Location = New System.Drawing.Point(309, 0)
         Me.ToolStrip1.Margin = New System.Windows.Forms.Padding(10, 0, 10, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(301, 27)
+        Me.ToolStrip1.Size = New System.Drawing.Size(270, 27)
         Me.ToolStrip1.TabIndex = 4
         Me.ToolStrip1.Text = "ToolStrip1"
         '

@@ -9,7 +9,7 @@ Public Class frmBMPTools
         atcFtableBuilder.clsGlobals.gToolType = atcFtableBuilder.clsGlobals.ToolType.Gray
         atcFtableBuilder.clsGlobals.pFTable = pHspfFtable
         atcFtableBuilder.clsGlobals.pHelpManualName = pWinHSPFManualName
-        atcFtableBuilder.clsGlobals.pHelpManualPage = "User's Guide\Detailed Functions\Reach Editor\Sewer and Open Channel Tool.html"
+        atcFtableBuilder.clsGlobals.pHelpManualPage = "User's Guide\Detailed Functions\BMP Reach Toolkit.html"
         Dim lBuilder As New atcFtableBuilder.mainForm
         lBuilder.ShowDialog()
     End Sub
@@ -18,7 +18,7 @@ Public Class frmBMPTools
         atcFtableBuilder.clsGlobals.gToolType = atcFtableBuilder.clsGlobals.ToolType.Green
         atcFtableBuilder.clsGlobals.pFTable = pHspfFtable
         atcFtableBuilder.clsGlobals.pHelpManualName = pWinHSPFManualName
-        atcFtableBuilder.clsGlobals.pHelpManualPage = "User's Guide\Detailed Functions\Reach Editor\LID Controls Tool.html"
+        atcFtableBuilder.clsGlobals.pHelpManualPage = "User's Guide\Detailed Functions\BMP Reach Toolkit.html"
         Dim lBuilder As New atcFtableBuilder.mainForm
         lBuilder.ShowDialog()
     End Sub
