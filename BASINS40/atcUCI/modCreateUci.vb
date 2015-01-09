@@ -157,10 +157,13 @@ Module modCreateUci
             If Not lOperation Is Nothing Then
                 lOperation.FTable.FTableFromCrossSect(lChannel)
             End If
-            If aDoWetlands Then
+            If pDoWetlands Then
                 'also build ftable for wetlands reach
                 Dim lWetId As Integer = CShort(lChannel.Reach.Id) + pWetlandsOffset
                 lOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(lWetId)
+                If lWetlandAreas(lChannel.Reach.Id) > 0.0 Then
+                    lOperation.Description = "Wetland - " & lWetlandAreas(lChannel.Reach.Id).ToString & " ac"
+                End If
                 If Not lOperation Is Nothing Then
                     If lWetlandAreas(lChannel.Reach.Id) > 0.0 Then
                         lChannel.WidthMean = lWetlandAreas(lChannel.Reach.Id) * 43560 / lChannel.Length
