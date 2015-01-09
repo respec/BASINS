@@ -108,9 +108,17 @@ Public Class HspfSetup
             Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
             lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
             If IO.Directory.Exists(lReclassifyFileName) Then
-                lReclassifyFileName &= "giras.dbf"
+                If DoWetlands Then
+                    lReclassifyFileName &= "girasWetlands.dbf"
+                Else
+                    lReclassifyFileName &= "giras.dbf"
+                End If
             Else
-                lReclassifyFileName = lBasinsFolder & "\etc\giras.dbf"
+                If DoWetlands Then
+                    lReclassifyFileName = lBasinsFolder & "\etc\girasWetlands.dbf"
+                Else
+                    lReclassifyFileName = lBasinsFolder & "\etc\giras.dbf"
+                End If
             End If
 
         ElseIf LUType = 1 Or LUType = 3 Then
@@ -127,9 +135,17 @@ Public Class HspfSetup
                     Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
                     lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
                     If IO.Directory.Exists(lReclassifyFileName) Then
-                        lReclassifyFileName &= "nlcd.dbf"
+                        If DoWetlands Then
+                            lReclassifyFileName &= "nlcdWetlands.dbf"
+                        Else
+                            lReclassifyFileName &= "nlcd.dbf"
+                        End If
                     Else
-                        lReclassifyFileName = lBasinsFolder & "\etc\nlcd.dbf"
+                        If DoWetlands Then
+                            lReclassifyFileName = lBasinsFolder & "\etc\nlcdWetlands.dbf"
+                        Else
+                            lReclassifyFileName = lBasinsFolder & "\etc\nlcd.dbf"
+                        End If
                     End If
                 End If
             Else

@@ -1329,7 +1329,11 @@ Public Class frmModelSetup
             lblLandUseLayer.Visible = False
             cboDescription.Visible = False
             lblDescription.Visible = False
-            lblClass.Text = pBasinsFolder & "\etc\giras.dbf"
+            If chkWetlands.Checked Then
+                lblClass.Text = pBasinsFolder & "\etc\girasWetlands.dbf"
+            Else
+                lblClass.Text = pBasinsFolder & "\etc\giras.dbf"
+            End If
             SetPerviousGrid(AtcGridPervious, lblClass.Text, cboLanduse.SelectedIndex, lLayerNameLandUse, lFieldNameLandUse)
         ElseIf lLandUseType = "Other Shapefile" Then
             cboLandUseLayer.Items.Clear()
@@ -1368,7 +1372,11 @@ Public Class frmModelSetup
             lblLandUseLayer.Visible = True
             cboDescription.Visible = False
             lblDescription.Visible = False
-            lblClass.Text = pBasinsFolder & "\etc\nlcd.dbf"
+            If chkWetlands.Checked Then
+                lblClass.Text = pBasinsFolder & "\etc\nlcdWetlands.dbf"
+            Else
+                lblClass.Text = pBasinsFolder & "\etc\nlcd.dbf"
+            End If
             SetPerviousGrid(AtcGridPervious, lblClass.Text, cboLanduse.SelectedIndex, lLayerNameLandUse, lFieldNameLandUse)
         Else 'grid
             cboLandUseLayer.Items.Clear()
@@ -1962,5 +1970,9 @@ Public Class frmModelSetup
                 cboUnits.SelectedIndex = 1
             End If
         End If
+    End Sub
+
+    Private Sub chkWetlands_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles chkWetlands.CheckedChanged
+        cboLanduse_SelectedIndexChanged(sender, e)
     End Sub
 End Class
