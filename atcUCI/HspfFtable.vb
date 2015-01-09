@@ -270,7 +270,8 @@ Public Class HspfFtable
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
         Dim t, s As String
-        Dim lFmt As String = "#0.0#####"
+        Dim lFmt1 As String = "#0.0#"
+        Dim lFmt2 As String = "#0.0#####"
 
         lSB.AppendLine("FTABLES")
         For Each lOpn As HspfOperation In pOperation.OpnBlk.Ids
@@ -308,7 +309,7 @@ Public Class HspfFtable
                             s = s.PadLeft(lSpacing)
                         End If
                     Else
-                        s = Format(.Depth(lRow), lFmt).PadLeft(lSpacing)
+                        s = Format(.Depth(lRow), lFmt1).PadLeft(lSpacing)
                     End If
                     If NumericallyTheSame(.AreaAsRead(lRow), .Area(lRow)) Then
                         t = .AreaAsRead(lRow)
@@ -316,7 +317,7 @@ Public Class HspfFtable
                             t = t.PadLeft(lSpacing)
                         End If
                     Else
-                        t = Format(.Area(lRow), lFmt).PadLeft(lSpacing)
+                        t = Format(.Area(lRow), lFmt2).PadLeft(lSpacing)
                         If t.Length > lSpacing Or .Area(lRow) < 0.01 Then 'too many digits in the number
                             t = atcUCI.HspfTable.NumFmtRE(CSng(.Area(lRow)), lSpacing).PadLeft(lSpacing)
                         End If
@@ -328,7 +329,7 @@ Public Class HspfFtable
                             t = t.PadLeft(lSpacing)
                         End If
                     Else
-                        t = Format(.Volume(lRow), lFmt).PadLeft(lSpacing)
+                        t = Format(.Volume(lRow), lFmt2).PadLeft(lSpacing)
                         If t.Length > lSpacing Or .Volume(lRow) < 0.01 Then 'too many digits in the number
                             t = atcUCI.HspfTable.NumFmtRE(CSng(.Volume(lRow)), lSpacing).PadLeft(lSpacing)
                         End If
@@ -342,7 +343,7 @@ Public Class HspfFtable
                                     t = t.PadLeft(lSpacing)
                                 End If
                             Else
-                                t = Format(.Outflow1(lRow), lFmt).PadLeft(lSpacing)
+                                t = Format(.Outflow1(lRow), lFmt2).PadLeft(lSpacing)
                                 If t.Length > lSpacing Or .Outflow1(lRow) < 0.01 Then 'too many digits in the number
                                     t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow1(lRow)), lSpacing).PadLeft(lSpacing)
                                 End If
@@ -354,7 +355,7 @@ Public Class HspfFtable
                                     t = t.PadLeft(lSpacing)
                                 End If
                             Else
-                                t = Format(.Outflow2(lRow), lFmt).PadLeft(lSpacing)
+                                t = Format(.Outflow2(lRow), lFmt2).PadLeft(lSpacing)
                                 If t.Length > lSpacing Or .Outflow2(lRow) < 0.01 Then 'too many digits in the number
                                     t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow2(lRow)), lSpacing).PadLeft(lSpacing)
                                 End If
@@ -366,7 +367,7 @@ Public Class HspfFtable
                                     t = t.PadLeft(lSpacing)
                                 End If
                             Else
-                                t = Format(.Outflow3(lRow), lFmt).PadLeft(lSpacing)
+                                t = Format(.Outflow3(lRow), lFmt2).PadLeft(lSpacing)
                                 If t.Length > lSpacing Or .Outflow3(lRow) < 0.01 Then 'too many digits in the number
                                     t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow3(lRow)), lSpacing).PadLeft(lSpacing)
                                 End If
@@ -378,7 +379,7 @@ Public Class HspfFtable
                                     t = t.PadLeft(lSpacing)
                                 End If
                             Else
-                                t = Format(.Outflow4(lRow), lFmt).PadLeft(lSpacing)
+                                t = Format(.Outflow4(lRow), lFmt2).PadLeft(lSpacing)
                                 If t.Length > lSpacing Or .Outflow4(lRow) < 0.01 Then 'too many digits in the number
                                     t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow4(lRow)), lSpacing).PadLeft(lSpacing)
                                 End If
@@ -390,7 +391,7 @@ Public Class HspfFtable
                                     t = t.PadLeft(lSpacing)
                                 End If
                             Else
-                                t = Format(.Outflow5(lRow), lFmt).PadLeft(lSpacing)
+                                t = Format(.Outflow5(lRow), lFmt2).PadLeft(lSpacing)
                                 If t.Length > lSpacing Or .Outflow5(lRow) < 0.01 Then 'too many digits in the number
                                     t = atcUCI.HspfTable.NumFmtRE(CSng(.Outflow5(lRow)), lSpacing).PadLeft(lSpacing)
                                 End If
@@ -667,14 +668,15 @@ Public Class HspfFtable
                     'build ftable
                     Nrows = 8
                     Ncols = 4
+                    Dim lFmt1 As String = "#0.0#"
                     For i As Integer = 1 To Nrows
                         pDepth(i) = lDepth(i)
                         If pDepth(i) = 0 Then pArea(i) = 0.0
                         'Anurag added this condition so that we do not see some finite area at 0 depth.
                         'That causes excess evaporation at low depths.
-                        pArea(i) = lSurfaceArea(i)
-                        pVolume(i) = lVolume(i)
-                        pOutflow1(i) = lDischarge(i)
+                        pArea(i) = Format(lSurfaceArea(i), lFmt1)
+                        pVolume(i) = Format(lVolume(i), lFmt1)
+                        pOutflow1(i) = Format(lDischarge(i), lFmt1)
                     Next i
                 End If
             End With
