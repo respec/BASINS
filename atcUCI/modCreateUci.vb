@@ -161,11 +161,9 @@ Module modCreateUci
                 'also build ftable for wetlands reach
                 Dim lWetId As Integer = CShort(lChannel.Reach.Id) + pWetlandsOffset
                 lOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(lWetId)
-                If lWetlandAreas(lChannel.Reach.Id) > 0.0 Then
-                    lOperation.Description = "Wetland - " & lWetlandAreas(lChannel.Reach.Id).ToString & " ac"
-                End If
                 If Not lOperation Is Nothing Then
                     If lWetlandAreas(lChannel.Reach.Id) > 0.0 Then
+                        lOperation.Description = "Wetland - " & lWetlandAreas(lChannel.Reach.Id).ToString & " ac"
                         lChannel.WidthMean = lWetlandAreas(lChannel.Reach.Id) * 43560 / lChannel.Length
                     End If
                     lChannel.SlopeProfile = lChannel.SlopeProfile * 0.1
