@@ -213,7 +213,7 @@ Public Module PollutantLoading
                                   laAreaLS)
             'transfer values from selected polygons to lAreasLS
             For i = 1 To lSelectedAreaIndexes.Count
-                For k = 1 To lMaxlu
+                For k = 1 To lGridmax
                     lAreasLS(k, i - 1) = laAreaLS(k, lSelectedAreaIndexes(i))
                 Next k
             Next i

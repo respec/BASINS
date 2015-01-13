@@ -108,15 +108,21 @@ Module modCreateUci
         End With
 
         Dim lWetlandAreas(pWatershed.Reaches.Count) As Double
+        Dim lLakeAreas(pWatershed.Reaches.Count) As Double
         If pDoWetlands Then
             'to avoid double counting of wetlands areas, remove wetlands from perlnds.
             'save area values to add to rchres operations later
+            'yusuf also wants lake areas removed from perlnds similarly
             Dim lIndex As Integer = 0
             Do While lIndex < pWatershed.LandUses.Count
                 Dim lLandUse As LandUse = pWatershed.LandUses(lIndex)
                 If lLandUse.Description.ToUpper.Contains("WETLAND") Then
                     'remove from this collection
                     lWetlandAreas(lLandUse.Reach.Id) += lLandUse.Area
+                    pWatershed.LandUses.RemoveAt(lIndex)
+                ElseIf lLandUse.Description.ToUpper.Contains("WATER") Then
+                    'remove from this collection
+                    lLakeAreas(lLandUse.Reach.Id) += lLandUse.Area
                     pWatershed.LandUses.RemoveAt(lIndex)
                 Else
                     lIndex += 1
@@ -155,6 +161,14 @@ Module modCreateUci
         For Each lChannel As Channel In pWatershed.Channels 'process ftables
             Dim lOperation As HspfOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(CShort(lChannel.Reach.Id))
             If Not lOperation Is Nothing Then
+                If pDoWetlands And lLakeAreas(lChannel.Reach.Id) > 0.0 Then
+                    'yusuf also wants lake areas removed from perlnds and added to rchres when using wetland option
+                    lOperation.Description = "Water - " & lLakeAreas(lChannel.Reach.Id).ToString & " ac"
+                    Dim lLakeWidth As Double = lLakeAreas(lChannel.Reach.Id) * 43560 / lChannel.Length
+                    If lLakeWidth > lChannel.WidthMean Then
+                        lChannel.WidthMean = lLakeWidth
+                    End If
+                End If
                 lOperation.FTable.FTableFromCrossSect(lChannel)
             End If
             If pDoWetlands Then
@@ -326,8 +340,8 @@ Module modCreateUci
                pWatershed.Reaches(lOrder).Id.Length > 5) Then
                 lStr &= " " & Right(pWatershed.Reaches(lOrder).Id, 19 - lLen)
             End If
-            If pDoWetlands AndAlso lWetReach Then
-                'this is a wetland reach
+            If pDoWetlands Then
+                'use the label with the wetland or lake area
                 lStr = lOperation.Description
             End If
             lTable.Parms("RCHID").Value = lStr
