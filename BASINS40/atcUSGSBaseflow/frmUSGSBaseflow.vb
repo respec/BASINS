@@ -968,6 +968,10 @@ Public Class frmUSGSBaseflow
         End If
     End Sub
 
+    Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+        ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Base-Flow Separation.html")
+    End Sub
+
     Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Opened = True
         If GetSetting("atcUSGSBaseflow", "Defaults", "MethodPART", "False") = "True" Then
@@ -1173,10 +1177,6 @@ Public Class frmUSGSBaseflow
                 gbBFI.Enabled = False
             End If
         End If
-    End Sub
-
-    Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        MsgBox("Documentation not yet available")
     End Sub
 
     Private Sub txtAny_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _

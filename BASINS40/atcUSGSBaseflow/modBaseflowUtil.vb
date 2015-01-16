@@ -61,7 +61,7 @@ Public Module modBaseflowUtil
 
                 'lClsBaseFlowCalculator.DataSets.Clear()
                 'Add new results to Datasets
-                'atcDataManager.DataSources.Add(lClsBaseFlowCalculator) 'ToDo: Turn on for next GW Toolbox release
+                atcDataManager.DataSources.Add(lClsBaseFlowCalculator)
             End If
         Catch ex As Exception
             Logger.Msg("Baseflow separation failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Baseflow separation")
