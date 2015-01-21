@@ -182,7 +182,22 @@ Public Class frmMain
         End If
 
         Dim lOutputDirectory As String = IO.Path.GetDirectoryName(pDataGroup(0).Attributes.GetValue("History 1").ToString.Replace("Read from", "").Trim())
-        Dim lOutputFilename As String = FindFile("WTF Output File", IO.Path.Combine(lOutputDirectory, "WTFPrintOut"), "txt")
+        Dim lOutputFilename As String = ""
+        Dim lFD As New SaveFileDialog()
+        With lFD
+            .InitialDirectory = lOutputDirectory
+            .Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
+            .FilterIndex = 1
+            .Title = "WTF Output File"
+            If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
+                lOutputFilename = .FileName
+            End If
+        End With
+
+        If String.IsNullOrEmpty(lOutputFilename) Then
+            Logger.Msg("Please specify output filename.")
+            Exit Sub
+        End If
 
         Dim lDelim As String = vbTab
         Dim lWTFOutputDailyTitle As New Text.StringBuilder()
