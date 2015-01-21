@@ -53,6 +53,7 @@ Public MustInherit Class clsBaseflow
     End Property
 
     Public gError As String
+    Public gBatchRun As Boolean = False
 
     Public Sub New()
     End Sub
