@@ -128,6 +128,22 @@ Public Class clsBatchUnitStation
         End If
     End Sub
 
+    Public Sub ReadData()
+        If DataSource Is Nothing Then
+            DataSource = New atcTimeseriesRDB.atcTimeseriesRDB()
+        Else
+            DataSource.Clear()
+        End If
+
+        If DataSource.Open(StationDataFilename) Then
+            NeedToDownloadData = False
+        Else
+            DataSource.Clear()
+            DataSource = Nothing
+            NeedToDownloadData = True
+            StationDataFilename = ""
+        End If
+    End Sub
     Public Function GetTS(ByVal aFindThese As atcDataAttributes) As atcTimeseriesGroup
         'If DataSource Is Nothing OrElse aRDBFile <> StationDataFilename Then DataSource = New atcTimeseriesRDB.atcTimeseriesRDB()
         If aFindThese Is Nothing Then

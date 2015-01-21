@@ -52,6 +52,13 @@ Public Class atcTimeseriesBaseflow
         End Get
     End Property
 
+    Private pBF_Message As String = ""
+    Public ReadOnly Property BF_Message() As String
+        Get
+            Return pBF_Message
+        End Get
+    End Property
+
     'Definitions of the type of baseflow calculations supported by ComputeBaseflow
     Public Overrides ReadOnly Property AvailableOperations() As atcDataAttributes
         Get
@@ -166,6 +173,7 @@ Public Class atcTimeseriesBaseflow
         Dim lBFIUseSymbol As Boolean = False
         Dim lBFIYearBasis As String = ""
         Dim lStationFile As String = ""
+        Dim lBatchRun As Boolean = False
 
         Dim lAttributeDef As atcAttributeDefinition = Nothing
 
@@ -208,6 +216,7 @@ Public Class atcTimeseriesBaseflow
             End If
 
             lStationFile = aArgs.GetValue(BFInputNames.StationFile) '"Station File"
+            lBatchRun = aArgs.GetValue("BatchRun", False)
 
             'If aArgs.ContainsAttribute("BoundaryMonth") Then
             '    lBoundaryMonth = aArgs.GetValue("BoundaryMonth")
@@ -254,7 +263,7 @@ Public Class atcTimeseriesBaseflow
                 Case Else
             End Select
             With ClsBaseFlow
-
+                .gBatchRun = lBatchRun
                 If lMethod = BFMethods.BFIStandard Or lMethod = BFMethods.BFIModified Then
                     CType(ClsBaseFlow, clsBaseflowBFI).PartitionLengthInDays = lBFINDay
                     CType(ClsBaseFlow, clsBaseflowBFI).UseSymbols = lBFIUseSymbol
@@ -282,6 +291,7 @@ Public Class atcTimeseriesBaseflow
             If lBFDatagroup IsNot Nothing AndAlso lBFDatagroup.Count > 0 Then
                 lBFDataGroupFinal.AddRange(lBFDatagroup)
             End If
+            pBF_Message &= ClsBaseFlow.gError & vbCrLf
         Next
 
         'If Me.DataSets.Count > 0 Then

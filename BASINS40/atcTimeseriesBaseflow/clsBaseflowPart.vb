@@ -73,14 +73,26 @@ Public Class clsBaseflowPart
         End If
 
         If lMsgDrainageArea.Length > 0 Then
-            Dim lYesNo() As String = {"Continue", "Quit"}
-            If Logger.MsgCustom(lMsgDrainageArea, "Problematic Drainage Area", lYesNo) = "Quit" Then
-                Return Nothing
+            If gBatchRun Then
+                If lMsgDrainageArea.Contains("SMALLER") Then
+                    gError = "Warning:PART:Drainage Area Too Small"
+                ElseIf lMsgDrainageArea.Contains("LARGER") Then
+                    gError = "Warning:PART:Draing Area Too Large"
+                End If
+            Else
+                Dim lYesNo() As String = {"Continue", "Quit"}
+                If Logger.MsgCustom(lMsgDrainageArea, "Problematic Drainage Area", lYesNo) = "Quit" Then
+                    Return Nothing
+                End If
             End If
         End If
 
         If TBase = -999.0 Then
-            Logger.Msg("Problem with calculation of required antecedent recession.", MsgBoxStyle.Critical, "PART Method Stopped")
+            If gBatchRun Then
+                gError &= vbCrLf & "Error:PART:antecedent recession calculation."
+            Else
+                Logger.Msg("Problem with calculation of required antecedent recession.", MsgBoxStyle.Critical, "PART Method Stopped")
+            End If
             Return Nothing
         End If
 
@@ -106,6 +118,9 @@ Public Class clsBaseflowPart
                    "*** FLOW RECORD WITHIN THE PERIOD OF **" & vbCrLf & _
                    "*** INTEREST.  PROGRAM TERMINATION. ***" & vbCrLf & _
                    "***************************************", MsgBoxStyle.Critical, "PART Method Stopped")
+            If gBatchRun Then
+                gError &= vbCrLf & "Error:PART:Flow Data Has Gap."
+            End If
             Return Nothing
         End If
 

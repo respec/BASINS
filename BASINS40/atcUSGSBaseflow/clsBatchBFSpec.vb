@@ -16,6 +16,7 @@ Public Class BFBatchInputNames
     'Public Shared BFI_TurnPtFrac As String = "BFI_TurnPtFrac"
     'Public Shared BFI_RecessConst As String = "BFI_RecessConst"
     Public Shared DataDir As String = "DataDir"
+    Public Shared UseCache As String = "USECACHE"
     Public Shared OUTPUTDIR As String = "OUTPUTDIR"
     Public Shared OUTPUTPrefix As String = "OUTPUTPrefix"
     Public Shared SAVERESULT As String = "SAVERESULT"
@@ -289,6 +290,12 @@ Public Class clsBatchBFSpec
                     DownloadDataDirectory = lArr(1)
                 End If
                 GlobalSettings.Add(BFBatchInputNames.DataDir, lArr(1))
+            Case BFBatchInputNames.UseCache.ToLower
+                Dim lUseCache As Boolean = False
+                If Not String.IsNullOrEmpty(lArr(1)) AndAlso lArr(1).ToLower = "yes" Then
+                    lUseCache = True
+                End If
+                GlobalSettings.Add(BFBatchInputNames.UseCache, lUseCache)
             Case atcTimeseriesBaseflow.BFInputNames.BFIReportby.ToLower
                 Dim lReportBySpec As String = lArr(1).Trim().ToUpper()
                 If lReportBySpec = BFBatchInputNames.ReportByWY Then
@@ -469,6 +476,7 @@ Public Class clsBatchBFSpec
     ''' Only call this at time BF is done
     ''' </summary>
     ''' <param name="aStation"></param>
+    ''' <param name="aPreserve">if work off the original Ts or off a clone</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Private Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation, Optional ByVal aPreserve As Boolean = False) As atcTimeseries
@@ -476,26 +484,42 @@ Public Class clsBatchBFSpec
         If ListBatchUnitsData.Keys.Contains(aStation.StationID) Then
             lDataFilename = ListBatchUnitsData.ItemByKey(aStation.StationID)
         Else
-            'first download data, then read it
-            Dim lDataDir As String = aStation.BFInputs.GetValue(BFBatchInputNames.DataDir, "")
-            If lDataDir = "" Then
-                lDataDir = GlobalSettings.GetValue(BFBatchInputNames.DataDir, "")
+            Dim lDataDir As String = GlobalSettings.GetValue(BFBatchInputNames.DataDir, "")
+            Dim lDataFilenameInCache As String = IO.Path.Combine(lDataDir, "NWIS\NWIS_discharge_" & aStation.StationID & ".rdb")
+            Dim lUseCached As Boolean = GlobalSettings.GetValue(BFBatchInputNames.UseCache, False)
+            If lUseCached AndAlso IO.File.Exists(lDataFilenameInCache) Then
+                aStation.SiteInfoDir = BFBatchInputNames.DataDir
+                aStation.StationDataFilename = lDataFilenameInCache
+                aStation.ReadData()
+                lDataFilename = aStation.StationDataFilename
+            Else
+                'first download data, then read it
+                lDataDir = aStation.StationDataFilename
                 If lDataDir = "" Then
-                    Dim lOutDirDiag As New System.Windows.Forms.FolderBrowserDialog()
-                    lOutDirDiag.Description = "Select Directory to Save All Downloaded Streamflow Data"
-                    If lOutDirDiag.ShowDialog = Windows.Forms.DialogResult.OK Then
-                        lDataDir = lOutDirDiag.SelectedPath
-                        GlobalSettings.SetValue(BFBatchInputNames.DataDir, lDataDir)
-                    End If
-                    If String.IsNullOrEmpty(lDataDir) Then
-                        Return Nothing
+                    lDataDir = GlobalSettings.GetValue(BFBatchInputNames.DataDir, "")
+                    If lDataDir = "" Then
+                        Dim lOutDirDiag As New System.Windows.Forms.FolderBrowserDialog()
+                        lOutDirDiag.Description = "Select Directory to Save All Downloaded Streamflow Data"
+                        If lOutDirDiag.ShowDialog = Windows.Forms.DialogResult.OK Then
+                            lDataDir = lOutDirDiag.SelectedPath
+                            GlobalSettings.SetValue(BFBatchInputNames.DataDir, lDataDir)
+                        End If
+                        If String.IsNullOrEmpty(lDataDir) Then
+                            Return Nothing
+                        End If
+                    ElseIf Not IO.Directory.Exists(lDataDir) Then
+                        Try
+                            IO.Directory.CreateDirectory(lDataDir)
+                        Catch ex As Exception
+                            Return Nothing
+                        End Try
                     End If
                 End If
-            End If
 
-            aStation.SiteInfoDir = lDataDir
-            aStation.DownloadData()
-            lDataFilename = aStation.StationDataFilename
+                aStation.SiteInfoDir = lDataDir
+                aStation.DownloadData()
+                lDataFilename = aStation.StationDataFilename
+            End If
         End If
 
         Dim lDataReady As Boolean = False
@@ -530,7 +554,7 @@ Public Class clsBatchBFSpec
         If Not String.IsNullOrEmpty(Message) AndAlso Message.ToLower.StartsWith("error") Then
             Logger.Msg("Please address following issues before running batch:" & vbCrLf & Message, _
                        "Base-flow Separation Batch")
-            Return
+            Exit Sub
         Else
             Message = ""
         End If
@@ -609,6 +633,7 @@ Public Class clsBatchBFSpec
                             lDates = .GetValue(atcTimeseriesBaseflow.BFInputNames.EndDate)
                             .SetValue(atcTimeseriesBaseflow.BFInputNames.EndDate, Date2J(lDates))
                             .SetValue(atcTimeseriesBaseflow.BFInputNames.DrainageArea, lStation.StationDrainageArea)
+                            .SetValue("BatchRun", True)
                         End With
                         If lStation.CalcBF.Open("baseflow", lStation.BFInputs) Then
                             OutputDir = lStationOutDir
@@ -622,6 +647,7 @@ Public Class clsBatchBFSpec
                 Else
                     lStation.Message &= "Error: flow data is missing." & vbCrLf
                 End If
+                lStation.Message &= lStation.CalcBF.BF_Message.Trim()
                 'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
                 UpdateStatus("Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True)
                 lBFOpnCount += 1
