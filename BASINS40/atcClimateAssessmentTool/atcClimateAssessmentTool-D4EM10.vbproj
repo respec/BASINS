@@ -200,9 +200,9 @@
       <Name>atcSeasons-D4EM10</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcSWMM\atcSWMM10.vbproj">
+    <ProjectReference Include="..\atcSWMM\atcSWMM-D4EM10.vbproj">
       <Project>{EB1F831C-4588-4FA5-A9F9-68B0D9E1C390}</Project>
-      <Name>atcSWMM10</Name>
+      <Name>atcSWMM-D4EM10</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcSynopticAnalysis\atcSynopticAnalysis-D4EM10.vbproj">

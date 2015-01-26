@@ -25,7 +25,7 @@ Imports MapWinUtility
     Private pFunctionUnits As String() = {"data unit", "multiplication factor", "%", "%", "", ""}
 
     Private pVariation As atcVariation
-    Private pSeasonTypesAvailable As New atcCollection
+    Private pSeasonTypesAvailable As New Generic.List(Of Type)
     Private pSeasons As atcSeasonBase
     Private pAllSeasons As Integer()
 
@@ -836,15 +836,7 @@ Imports MapWinUtility
         cboFunction.Items.Clear()
         cboFunction.Items.AddRange(pFunctionLabels)
 
-        If pSeasonTypesAvailable Is Nothing Then
-            pSeasonTypesAvailable = New atcCollection()
-        Else
-            pSeasonTypesAvailable.Clear()
-        End If
-        For Each lType As Type In atcData.atcSeasonBase.AllSeasonTypes
-            pSeasonTypesAvailable.Add(lType)
-        Next
-        'pSeasonTypesAvailable = atcSeasonPlugin.AllSeasonTypes
+        pSeasonTypesAvailable = atcData.atcSeasonBase.AllSeasonTypes
         For Each lSeasonType As Type In pSeasonTypesAvailable
             Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
             Select Case lSeasonTypeShortName
