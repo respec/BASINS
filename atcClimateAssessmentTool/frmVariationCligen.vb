@@ -12,7 +12,7 @@ Public Class frmVariationCligen
     Private Const pClickMe As String = "<click to specify>"
 
     Private pVariation As VariationCligen
-    Private pSeasonsAvailable As New atcCollection
+    Private pSeasonsAvailable As New Generic.List(Of Type)
     Private pSeasons As atcSeasonBase
     Private pAllSeasons As Integer()
 
@@ -441,15 +441,7 @@ Public Class frmVariationCligen
         FindAllCligenParameters()
 
         cboSeasons.Items.Add(AllSeasons)
-        If pSeasonsAvailable Is Nothing Then
-            pSeasonsAvailable = New atcCollection()
-        Else
-            pSeasonsAvailable.Clear()
-        End If
-        For Each lType As Type In atcData.atcSeasonBase.AllSeasonTypes
-            pSeasonsAvailable.Add(lType)
-        Next
-        'pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
+        pSeasonsAvailable = atcData.atcSeasonBase.AllSeasonTypes
         For Each lSeasonType As Type In pSeasonsAvailable
             Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
             Select Case lSeasonTypeShortName
