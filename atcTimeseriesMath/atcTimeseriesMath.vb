@@ -123,7 +123,7 @@ Public Class atcTimeseriesMath
 
                 AddOperation("Add", "Add to each value", "Math", defTimeSeriesGroup, defDouble)
 
-                AddOperation("Subtract", "Subtract from each value of first timeseries", "Math", defTimeSeriesOne, defDouble)
+                AddOperation("Subtract", "Subtract from each value of first timeseries", "Math", defTimeSeriesGroup, defDouble)
 
                 AddOperation("Multiply", "Multiply each value", "Math", defTimeSeriesGroup, defDouble)
 
@@ -255,12 +255,22 @@ Public Class atcTimeseriesMath
 #If BatchMode Then
             Throw New ApplicationException("TimeseriesMath: Arguments not specified to Open")
 #Else
-            Dim lSpecify As New frmSpecifyComputation
-            If pIcon IsNot Nothing Then lSpecify.Icon = pIcon
-            lSpecify.Text = Me.Category & ": " & aOperationName
-            If Not lSpecify.AskUser(lArgs) Then
-                Return False 'User cancelled
-            End If
+            Select Case aOperationName
+                Case "Subtract"
+                    Dim lSpecify As New frmSpecifySubtract
+                    If pIcon IsNot Nothing Then lSpecify.Icon = pIcon
+                    lSpecify.Text = Me.Category & ": " & aOperationName
+                    If Not lSpecify.AskUser(lArgs) Then
+                        Return False 'User cancelled
+                    End If
+                Case Else
+                    Dim lSpecify As New frmSpecifyComputation
+                    If pIcon IsNot Nothing Then lSpecify.Icon = pIcon
+                    lSpecify.Text = Me.Category & ": " & aOperationName
+                    If Not lSpecify.AskUser(lArgs) Then
+                        Return False 'User cancelled
+                    End If
+            End Select
 #End If
         End If
 
