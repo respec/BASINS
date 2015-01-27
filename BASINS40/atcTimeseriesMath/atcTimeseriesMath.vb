@@ -256,10 +256,15 @@ Public Class atcTimeseriesMath
             Throw New ApplicationException("TimeseriesMath: Arguments not specified to Open")
 #Else
             Select Case aOperationName
-                Case "Subtract"
+                Case "Subtract", "Divide"
                     Dim lSpecify As New frmSpecifySubtract
                     If pIcon IsNot Nothing Then lSpecify.Icon = pIcon
                     lSpecify.Text = Me.Category & ": " & aOperationName
+                    If aOperationName = "Divide" Then
+                        lSpecify.radioNumberMinusTS.Text = lSpecify.radioNumberMinusTS.Text.Replace("-", "/")
+                        lSpecify.radioTS1MinusTS2.Text = lSpecify.radioTS1MinusTS2.Text.Replace("-", "/")
+                        lSpecify.radioTsMinusNumber.Text = lSpecify.radioTsMinusNumber.Text.Replace("-", "/")
+                    End If
                     If Not lSpecify.AskUser(lArgs) Then
                         Return False 'User cancelled
                     End If
@@ -281,7 +286,7 @@ Public Class atcTimeseriesMath
                 Return True
             End If
         Catch lex As Exception
-            Debug.Print(lex.ToString)
+            MapWinUtility.Logger.Msg(lex.ToString, "Could not perform time series math")
         End Try
         Return False
     End Function

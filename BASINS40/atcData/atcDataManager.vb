@@ -350,7 +350,9 @@ Public Class atcDataManager
                                           ByVal aSpecification As String, _
                                           ByVal aAttributes As atcDataAttributes) As Boolean
         Try
-            RemoveDataSource(aSpecification)
+            If aNewSource.Name <> "Timeseries::Math" Then
+                RemoveDataSource(aSpecification)
+            End If
             If aNewSource.Open(aSpecification, aAttributes) Then
                 Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
                 pDataSources.Add(aNewSource)
@@ -719,9 +721,12 @@ Public Class atcDataManager
                                     Dim lAttributes As atcDataAttributes = Nothing
                                     For Each lAttributeName As String In pSaveAttributes
                                         Try
-                                            Dim lAttributeValue As String = lChildXML.Attributes.GetNamedItem(lAttributeName).InnerText
-                                            If lAttributes Is Nothing Then lAttributes = New atcDataAttributes
-                                            lAttributes.Add(lAttributeName, lAttributeValue)
+                                            Dim lAttributeNode As Xml.XmlNode = lChildXML.Attributes.GetNamedItem(lAttributeName)
+                                            If lAttributeNode IsNot Nothing Then
+                                                Dim lAttributeValue As String = lAttributeNode.InnerText
+                                                If lAttributes Is Nothing Then lAttributes = New atcDataAttributes
+                                                lAttributes.Add(lAttributeName, lAttributeValue)
+                                            End If
                                         Catch
                                         End Try
                                     Next
