@@ -117,7 +117,7 @@ Public Class atcUSGSScreen
                 If Double.IsNaN(lValue) OrElse lValue < 0 Then
                     lTSDur.Value(J) = atcUtility.GetNaN()
                 Else
-                    lTSDur.Value(J) = 5 * I
+                    lTSDur.Value(J) = 1 * I
                 End If
             Next
             lNewTSGroupDuration.Add(lTSDur)
@@ -135,8 +135,15 @@ Public Class atcUSGSScreen
         Dim lGraphTS As New clsGraphTime(lNewTSGroupDuration, lZgc)
         lGraphForm.Grapher = lGraphTS
         With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
-            Dim lScaleMin As Double = 1
-            .YAxis.Scale.Min = lScaleMin
+            .YAxis.Title.Text = "Streamflow Dataset Ordinals"
+            .Title.Text = "Streamflow Dataset Timespan"
+            'Dim lScaleMin As Double = 1
+            '.YAxis.Scale.Min = lScaleMin
+            .YAxis.Scale.MaxAuto = False
+            .YAxis.Scale.Max = aTSGroup.Count + 1
+            '.BarSettings.Base = BarBase.Y
+            .Y2Axis.MinSpace = 5
+            .YAxis.MinorTic.Color = Drawing.Color.White
             .AxisChange()
             '.CurveList.Item(0).Color = Drawing.Color.Red
             For Each lCuv As CurveItem In .CurveList
