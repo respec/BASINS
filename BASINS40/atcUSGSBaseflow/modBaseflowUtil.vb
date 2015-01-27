@@ -138,7 +138,8 @@ Public Module modBaseflowUtil
         End With
 
         'header for data dump file
-        Dim lNumColumns As Integer = 4 + MethodsLastDone.Count * 5
+        Dim lColumnsPerMethod As Integer = 6
+        Dim lNumColumns As Integer = 4 + MethodsLastDone.Count * lColumnsPerMethod
         Dim lTableHeader As New atcTableDelimited
         lTableHeader.Delimiter = ","
         lTableHeader.NumFields = lNumColumns
@@ -163,7 +164,6 @@ Public Module modBaseflowUtil
         Dim lMethodLabelColumnStart As Integer = 7
         Dim lConsLabelColumnStart As Integer = 5
         Dim lUnitsLabelColumnStarts As Integer = 5
-        Dim lColumnsPerMethod As Integer = 5
         With lTableHeader
             For lRow As Integer = 1 To 3
                 lTableHeader.CurrentRecord = lRow
@@ -184,6 +184,7 @@ Public Module modBaseflowUtil
                             .Value(lConsLabelColumnStart) = "Baseflow"
                             .Value(lConsLabelColumnStart + 2) = "Runoff"
                             .Value(lConsLabelColumnStart + 4) = "BFP"
+                            .Value(lConsLabelColumnStart + 5) = "BFI"
                             lConsLabelColumnStart += lColumnsPerMethod
                         Case 3
                             .Value(lUnitsLabelColumnStarts) = "CFS"
@@ -191,6 +192,7 @@ Public Module modBaseflowUtil
                             .Value(lUnitsLabelColumnStarts + 2) = "CFS"
                             .Value(lUnitsLabelColumnStarts + 3) = "IN"
                             .Value(lUnitsLabelColumnStarts + 4) = "(%)"
+                            .Value(lUnitsLabelColumnStarts + 5) = "(--)"
                             lUnitsLabelColumnStarts += lColumnsPerMethod
                     End Select
                 Next
@@ -641,7 +643,8 @@ Public Module modBaseflowUtil
                                  ByVal aTsGroupBFIModified As atcCollection, _
                                  ByVal ATStep As String) As atcTableDelimited
         'set up table
-        Dim lNumColumns As Integer = 4 + MethodsLastDone.Count * 5
+        Dim lNumColumnsPerMethod As Integer = 6
+        Dim lNumColumns As Integer = 4 + MethodsLastDone.Count * lNumColumnsPerMethod
         Dim lTableBody As New atcTableDelimited
         lTableBody.Delimiter = ","
         lTableBody.NumFields = lNumColumns
@@ -693,31 +696,31 @@ Public Module modBaseflowUtil
                     lBF = aTsGroupPart.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupPart.ItemByKey("Depth" & ATStep).Value(I)
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
-                    lLastColumn += 5
+                    lLastColumn += lNumColumnsPerMethod
                 End If
                 If aTsGroupFixed.Count > 0 Then
                     lBF = aTsGroupFixed.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupFixed.ItemByKey("Depth" & ATStep).Value(I)
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
-                    lLastColumn += 5
+                    lLastColumn += lNumColumnsPerMethod
                 End If
                 If aTsGroupLocMin.Count > 0 Then
                     lBF = aTsGroupLocMin.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupLocMin.ItemByKey("Depth" & ATStep).Value(I)
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
-                    lLastColumn += 5
+                    lLastColumn += lNumColumnsPerMethod
                 End If
                 If aTsGroupSlide.Count > 0 Then
                     lBF = aTsGroupSlide.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupSlide.ItemByKey("Depth" & ATStep).Value(I)
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
-                    lLastColumn += 5
+                    lLastColumn += lNumColumnsPerMethod
                 End If
                 If aTsGroupBFIStandard.Count > 0 Then
                     lBF = aTsGroupBFIStandard.ItemByKey("Rate" & ATStep).Value(I)
                     lBFDepth = aTsGroupBFIStandard.ItemByKey("Depth" & ATStep).Value(I)
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
-                    lLastColumn += 5 'second to last column to have this jump
+                    lLastColumn += lNumColumnsPerMethod 'second to last column to have this jump
                 End If
                 If aTsGroupBFIModified.Count > 0 Then
                     lBF = aTsGroupBFIModified.ItemByKey("Rate" & ATStep).Value(I)
@@ -803,12 +806,14 @@ Public Module modBaseflowUtil
                 .Value(aLastColumn + 3) = ""
                 .Value(aLastColumn + 4) = ""
                 .Value(aLastColumn + 5) = ""
+                .Value(aLastColumn + 6) = ""
             Else
                 .Value(aLastColumn + 1) = DoubleToString(aBF, , "0.00")
                 .Value(aLastColumn + 2) = DoubleToString(aBFDepth, , "0.00")
                 .Value(aLastColumn + 3) = DoubleToString(lRO, , "0.00")
                 .Value(aLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
                 .Value(aLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                .Value(aLastColumn + 6) = DoubleToString(lBFPct / 100, , "0.0000")
             End If
         End With
     End Sub
