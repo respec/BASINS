@@ -61,7 +61,99 @@ Public Module modBaseflowUtil
 
                 'lClsBaseFlowCalculator.DataSets.Clear()
                 'Add new results to Datasets
-                atcDataManager.DataSources.Add(lClsBaseFlowCalculator)
+                'atcDataManager.DataSources.Add(lClsBaseFlowCalculator)
+
+                Dim lBFTsersGroup As New atcTimeseriesGroup()
+                Dim lPartDaily1 As atcTimeseries = Nothing
+                Dim lPartDaily2 As atcTimeseries = Nothing
+                Dim linearSlope As Double = Double.NaN
+                For Each lTS As atcTimeseries In lClsBaseFlowCalculator.DataSets
+                    Dim lConName As String = lTS.Attributes.GetValue("Constituent", "").ToLower()
+                    If lConName.Contains("partmonthlyinter") Then
+                        linearSlope = lTS.Attributes.GetValue("LinearSlope", Double.NaN)
+                        Continue For
+                    ElseIf lConName.Contains("monthly") OrElse lConName.Contains("bf_partdaily3") Then
+                        Continue For
+                    ElseIf lConName.Contains("bf_partdaily1") Then
+                        lPartDaily1 = lTS
+                    ElseIf lConName.Contains("bf_partdaily2") Then
+                        lPartDaily2 = lTS
+                    ElseIf lConName.Contains("yearly") Then
+                        Continue For
+                    Else
+                        lBFTsersGroup.Add(lTS)
+                    End If
+                Next
+                If lPartDaily1 IsNot Nothing AndAlso lPartDaily2 IsNot Nothing AndAlso Not Double.IsNaN(linearSlope) Then
+                    Dim lPartDailyDiff As atcTimeseries = lPartDaily2 - lPartDaily1
+                    Dim lPartDailyDiffSlope As atcTimeseries = lPartDailyDiff * linearSlope
+                    Dim lPartDaily As atcTimeseries = lPartDaily1 + lPartDailyDiffSlope
+                    lPartDaily.Attributes.SetValue("Constituent", "BF_PartDaily")
+                    lBFTsersGroup.Add(lPartDaily)
+                End If
+                Dim lTsFlowG As atcTimeseriesGroup = aArgs.GetValue("streamflow", Nothing)
+                If lTsFlowG IsNot Nothing AndAlso lTsFlowG.Count > 0 Then
+                    Dim lSDate As Double = aArgs.GetValue("StartDate", -99)
+                    Dim lEDate As Double = aArgs.GetValue("EndDate", -99)
+                    If lSDate > 0 AndAlso lEDate > 0 AndAlso lEDate > lSDate Then
+                        Dim lTsFlow As atcTimeseries = SubsetByDate(lTsFlowG(0), lSDate, lEDate, Nothing)
+                        Dim lBFConsName As String = ""
+                        Dim lROConsName As String = ""
+                        Dim lBFPConsName As String = ""
+                        Dim lROBFPGroup As New atcTimeseriesGroup()
+                        For Each lBFTs As atcTimeseries In lBFTsersGroup
+                            lBFConsName = lBFTs.Attributes.GetValue("Constituent")
+                            Select Case lBFConsName.ToUpper()
+                                Case "BF_HYSEPFIXED"
+                                    lROConsName = "BF_HYSEPFIXED_RO"
+                                    lBFPConsName = "BF_HYSEPFIXED_BFP"
+                                Case "BF_HYSEPLOCMIN"
+                                    lROConsName = "BF_HYSEPLOCMIN_RO"
+                                    lBFPConsName = "BF_HYSEPLOCMIN_BFP"
+                                Case "BF_HYSEPSLIDE"
+                                    lROConsName = "BF_HYSEPSLIDE_RO"
+                                    lBFPConsName = "BF_HYSEPSLIDE_BFP"
+                                Case "BF_BFISTANDARD"
+                                    lROConsName = "BF_BFISTANDARD_RO"
+                                    lBFPConsName = "BF_BFISTANDARD_BFP"
+                                Case "BF_BFIMODIFIED"
+                                    lROConsName = "BF_BFIMODIFIED_RO"
+                                    lBFPConsName = "BF_BFIMODIFIED_BFP"
+                                Case "BF_PARTDAILY"
+                                    lROConsName = "BF_PARTDAILY_RO"
+                                    lBFPConsName = "BF_PARTDAILY_BFP"
+                            End Select
+                        	Dim lTsRO As atcTimeseries = lTsFlow - lBFTs
+                            Dim lTsBFP As atcTimeseries = lBFTs / lTsFlow * 100
+                            lTsRO.Attributes.SetValue("Constituent", lROConsName)
+                            lTsBFP.Attributes.SetValue("Constituent", lBFPConsName)
+                            lROBFPGroup.Add(lTsRO)
+                            lROBFPGroup.Add(lTsBFP)
+                        Next
+                        lBFTsersGroup.Add(lROBFPGroup)
+                    End If
+                End If
+                Dim lNewTSerSource As New atcTimeseriesSource()
+                For Each lDS As atcDataSet In lBFTsersGroup
+                    lNewTSerSource.AddDataSet(lDS)
+                Next
+                lNewTSerSource.Specification = lClsBaseFlowCalculator.Specification
+                atcDataManager.DataSources.Add(lNewTSerSource)
+
+                'Dim lStart As Double = -99.9
+                'Dim lEnd As Double = -99.9
+                'Dim lDA As Double = -99.9
+                'Dim lSFTser As atcTimeseries = aArgs.GetValue("streamflow", Nothing)
+                'If lSFTser IsNot Nothing Then
+                '    Dim lTsGroupPart As atcCollection = ConstructReportTsGroup(lSFTser, BFMethods.PART, lStart, lEnd, lDA)
+                '    Dim lTsGroupFixed As atcCollection = ConstructReportTsGroup(lSFTser, BFMethods.HySEPFixed, lStart, lEnd, lDA)
+                '    Dim lTsGroupLocMin As atcCollection = ConstructReportTsGroup(lSFTser, BFMethods.HySEPLocMin, lStart, lEnd, lDA)
+                '    Dim lTsGroupSlide As atcCollection = ConstructReportTsGroup(lSFTser, BFMethods.HySEPSlide, lStart, lEnd, lDA)
+                '    Dim lTsGroupBFIStandard As atcCollection = ConstructReportTsGroup(lSFTser, BFMethods.BFIStandard, lStart, lEnd, lDA)
+                '    Dim lTsGroupBFIModified As atcCollection = ConstructReportTsGroup(lSFTser, BFMethods.BFIModified, lStart, lEnd, lDA)
+
+                'End If
+
             End If
         Catch ex As Exception
             Logger.Msg("Baseflow separation failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Baseflow separation")
