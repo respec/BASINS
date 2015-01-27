@@ -1489,12 +1489,14 @@ Finished:
 
         Dim lNumber As Double = GetNaN()
         Dim lHaveNumber As Boolean = False
+        Dim lNumberFirst As Boolean = False
         If aArgs.ContainsAttribute("Number") AndAlso Not aArgs.GetValue("Number") Is Nothing Then
-            Dim lValue As Double = aArgs.GetValue("Number")
+            Dim lValue As Double = aArgs.GetValue("Number", pNaN)
             If Not Double.IsNaN(lValue) Then
                 lHaveNumber = True
                 lArgCount += 1
-                lNumber = CDbl(aArgs.GetValue("Number", 0))
+                lNumber = lValue
+                lNumberFirst = aArgs.ItemByIndex(0).Definition.Name.ToLower = "number"
             End If
         End If
 
@@ -1538,19 +1540,19 @@ Finished:
                 Next
 
             Case "subtract", "-"
-                If lArgCount <> 2 Then
-                    Err.Raise(vbObjectError + 512, , aOperationName & " required two arguments but got " & lArgCount)
-                ElseIf lHaveNumber Then
-                    For lValueIndex = 0 To lValueIndexLast
-                        lNewVals(lValueIndex) -= lNumber
-                    Next
-                ElseIf lTSOriginal Is Nothing Then
-                    Err.Raise(vbObjectError + 512, , aOperationName & " no current Timeseries")
-                Else
-                    For lValueIndex = 0 To lValueIndexLast
+                For lValueIndex = 0 To lValueIndexLast
+                    If lHaveNumber Then
+                        If lNumberFirst Then
+                            lNewVals(lValueIndex) = lNumber - lNewVals(lValueIndex)
+                        Else
+                            lNewVals(lValueIndex) -= lNumber
+                        End If
+                    End If
+                    For lTSIndex = 1 To lTSgroup.Count - 1
+                        lTSOriginal = lTSgroup.Item(lTSIndex)
                         lNewVals(lValueIndex) -= lTSOriginal.Value(lValueIndex)
                     Next
-                End If
+                Next
 
             Case "multiply", "*"
                 For lValueIndex = 0 To lValueIndexLast
@@ -1562,21 +1564,22 @@ Finished:
                 Next
 
             Case "divide", "/"
-                If lArgCount <> 2 Then
-                    Err.Raise(vbObjectError + 512, , aOperationName & " required two arguments but got " & lArgCount)
-                ElseIf lHaveNumber Then
-                    If Math.Abs(lNumber) < 0.000001 Then
-                        Err.Raise(vbObjectError + 512, , aOperationName & " got a divisor too close to zero (" & lNumber & ")")
-                    Else
-                        For lValueIndex = 0 To lValueIndexLast
+                If lHaveNumber AndAlso Math.Abs(lNumber) < 0.000001 Then
+                    Throw New ApplicationException(aOperationName & " divisor too close to zero (" & lNumber & ")")
+                End If
+                For lValueIndex = 0 To lValueIndexLast
+                    If lHaveNumber Then
+                        If lNumberFirst Then
+                            lNewVals(lValueIndex) = lNumber / lNewVals(lValueIndex)
+                        Else
                             lNewVals(lValueIndex) /= lNumber
-                        Next
+                        End If
                     End If
-                Else
-                    For lValueIndex = 0 To lValueIndexLast
+                    For lTSIndex = 1 To lTSgroup.Count - 1
+                        lTSOriginal = lTSgroup.Item(lTSIndex)
                         lNewVals(lValueIndex) /= lTSOriginal.Value(lValueIndex)
                     Next
-                End If
+                Next
 
             Case "mean"
                 For lValueIndex = 0 To lValueIndexLast
