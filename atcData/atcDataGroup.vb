@@ -340,6 +340,8 @@ Public Class atcDataGroup
             If Not aAttributeDefinition Is Nothing Then
                 Dim lAttributeName As String = aAttributeDefinition.Name
                 Dim lAttributeNumeric As Boolean = aAttributeDefinition.IsNumeric
+                Dim lAllNumeric As Boolean = True 'Test to see if values are numeric even if lAttributeNumeric = False
+TryAgain:
                 Dim lTsIndex As Integer = 0
                 Dim lItemIndex As Integer = 0
                 Logger.Status("Finding Values for " & lAttributeName)
@@ -375,7 +377,16 @@ Public Class atcDataGroup
                             End If
                         Else
                             Dim lKey As String = ts.Attributes.GetValue(lAttributeName, aMissingValue)
-                            If Not lKey Is Nothing Then
+                            If lKey Is Nothing Then
+                                lAllNumeric = False
+                            Else
+                                If lAllNumeric Then
+                                    Try
+                                        lAllNumeric = IsNumeric(lKey)
+                                    Catch
+                                        lAllNumeric = False
+                                    End Try
+                                End If
                                 lItemIndex = lSortedValues.BinarySearchForKey(lKey)
                                 If lItemIndex = lSortedValues.Count OrElse Not lKey.Equals(lSortedValues.Keys.Item(lItemIndex)) Then
                                     lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
@@ -392,6 +403,12 @@ Public Class atcDataGroup
                     Catch ex As Exception
                         Logger.Dbg("Can't display value of " & lAttributeName & ": " & ex.Message)
                     End Try
+                    If Not lAttributeNumeric AndAlso lAllNumeric AndAlso lSortedValues.Count > 1 Then
+                        lAttributeNumeric = True
+                        lSortedValues.Clear()
+                        'Logger.Dbg("SortedAttributeValues: Non-numeric attribute " & aAttributeDefinition.Name & ", but all values are numeric, so sorting numerically")
+                        GoTo TryAgain
+                    End If
                     'Discard the values if we just had to read them above
                     'If lNeededToBeRead AndAlso Not ts.ValuesNeedToBeRead AndAlso Me.Count > 100 Then 'TODO: test for whether ts is discardable
                     '    ts.ValuesNeedToBeRead = True

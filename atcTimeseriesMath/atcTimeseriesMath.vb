@@ -60,7 +60,7 @@ Public Class atcTimeseriesMath
 
                 Dim defTimeSeriesGroup As New atcAttributeDefinition
                 With defTimeSeriesGroup
-                    .Name = "Timeseries"
+                    .Name = "OneOrMoreTimeseries"
                     .Description = "One or more time series"
                     .Editable = True
                     .TypeString = "atcDataGroup"

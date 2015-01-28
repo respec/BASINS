@@ -100,7 +100,12 @@ Public Class atcSeasonBase
         For Each lNewTS In lNewGroup
             lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1) - 1
             lNewTS.numValues = lNewTSvalueIndex
-            lNewTS.Attributes.RemoveByKey("nextindex")
+            With lNewTS.Attributes
+                .RemoveByKey("nextindex")
+                .RemoveByKey("begin_date")
+                .RemoveByKey("end_date")
+
+            End With
         Next
 
         If Not atcDataManager.SelectionAttributes.Contains("SeasonName") Then

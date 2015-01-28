@@ -109,7 +109,7 @@ Public Class atcDataManager
     End Function
 
     Friend Shared Sub SelectLocationsOnMap(ByVal aLocations As ArrayList, ByVal aUnselectOthers As Boolean)
-        If Not pMapWin Is Nothing AndAlso Not pMapWin.Layers Is Nothing AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
+        If pMapWin IsNot Nothing AndAlso pMapWin.Layers IsNot Nothing AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
             Dim lCurrentLayerDBFname As String = FilenameSetExt(pMapWin.Layers(pMapWin.Layers.CurrentLayer).FileName.ToLower, "dbf")
             If IO.File.Exists(lCurrentLayerDBFname) Then
                 Dim lDBF As New atcTableDBF 'Table associated with current layer on map
