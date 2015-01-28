@@ -17,7 +17,7 @@ Public Class atcTimeseriesSUSTAIN
     Public Delimiter As String = vbTab
     Public HeaderLineStart As String = "PLOT"
     Public BodyLineStart As String = "WatershedNumber"
-    Public IncludeTimeWhenSaving As Boolean = True 'Change to False to save daily values in SWMM format (for SUSTAINOPT Climate.txt)
+    Public IncludeTimeWhenSaving As Boolean = True 'Change to False to save daily values in SWMM format (for SUSTAINOPT Climate.txt), also affects writing of headers
 
     Private pFilter As String = "SUSTAIN Timeseries Files (*.txt)|*.txt|PLTGEN Files (*.p*)|*.p*|All Files|*.*"
     Private pName As String = "Timeseries::SUSTAIN/PLTGEN"
@@ -261,22 +261,25 @@ Public Class atcTimeseriesSUSTAIN
 
             Dim lTimeseries As atcTimeseries = Me.DataSets(0)
             Dim lWriter As New System.IO.StreamWriter(aSaveFileName)
-            lWriter.WriteLine(HeaderLineStart & "-----------------------------------------------------------------------------------------")
-            lWriter.WriteLine(HeaderLineStart & " HSPF output formatted for use by SUSTAIN")
-            lWriter.WriteLine(HeaderLineStart & "")
-            lWriter.WriteLine(HeaderLineStart & "     AQUA TERRA Consultants")
-            lWriter.WriteLine(HeaderLineStart & "     http://aquaterra.com/")
-            lWriter.WriteLine(HeaderLineStart & "     Mountain View, CA")
-            lWriter.WriteLine(HeaderLineStart & "     (650) 962-1864")
-            lWriter.WriteLine(HeaderLineStart & "-----------------------------------------------------------------------------------------")
-            lWriter.WriteLine(HeaderLineStart & " MODEL OUTPUT FILE")
-            lWriter.WriteLine(HeaderLineStart & " Time interval: " & lTimeseries.Attributes.GetValue("Interval", JulianHour) / JulianMinute & " min      Output option: timestep")
-            lWriter.WriteLine(HeaderLineStart & " Label")
-            
+            If IncludeTimeWhenSaving Then
+                lWriter.WriteLine(HeaderLineStart & "-----------------------------------------------------------------------------------------")
+                lWriter.WriteLine(HeaderLineStart & " HSPF output formatted for use by SUSTAIN")
+                lWriter.WriteLine(HeaderLineStart & "")
+                lWriter.WriteLine(HeaderLineStart & "     AQUA TERRA Consultants")
+                lWriter.WriteLine(HeaderLineStart & "     http://aquaterra.com/")
+                lWriter.WriteLine(HeaderLineStart & "     Mountain View, CA")
+                lWriter.WriteLine(HeaderLineStart & "     (650) 962-1864")
+                lWriter.WriteLine(HeaderLineStart & "-----------------------------------------------------------------------------------------")
+                lWriter.WriteLine(HeaderLineStart & " MODEL OUTPUT FILE")
+                lWriter.WriteLine(HeaderLineStart & " Time interval: " & lTimeseries.Attributes.GetValue("Interval", JulianHour) / JulianMinute & " min      Output option: timestep")
+                lWriter.WriteLine(HeaderLineStart & " Label")
+            End If
+
             Dim lLastTimeStep As Integer = lTimeseries.Dates.numValues
             Dim lInterval As Double = lTimeseries.Attributes.GetValue("Interval", JulianHour)
             Dim lDatasetsToWrite As New atcTimeseriesGroup(lTimeseries)
             For Each lTimeseries In Me.DataSets
+
                 If lTimeseries.Attributes.GetValue("Interval", JulianHour) <> lInterval Then
                     Logger.Msg("Different interval data cannot be written to same file, skipping " & lTimeseries.ToString & " - " & DoubleToString(lTimeseries.Attributes.GetValue("Interval", JulianHour) * 24) & " hours <> " & DoubleToString(lInterval * 24))
                 ElseIf lTimeseries.Dates.numValues < lLastTimeStep Then
@@ -286,24 +289,26 @@ Public Class atcTimeseriesSUSTAIN
                 End If
             Next
 
-            For Each lTimeseries In lDatasetsToWrite
-                Dim lUnits As String = lTimeseries.Attributes.GetValue("Units", "<unknown>")
-                If lUnits = "<unknown>" Then
-                    lUnits = ""
-                Else
-                    lUnits = " (" & lUnits & ")"
-                End If
-                lWriter.WriteLine(HeaderLineStart & " " _
-                                & lTimeseries.Attributes.GetValue("Constituent").ToString.PadRight(8) & " " _
-                                & lTimeseries.Attributes.GetValue("Description") & lUnits)
-            Next
+            If IncludeTimeWhenSaving Then
+                For Each lTimeseries In lDatasetsToWrite
+                    Dim lUnits As String = lTimeseries.Attributes.GetValue("Units", "<unknown>")
+                    If lUnits = "<unknown>" Then
+                        lUnits = ""
+                    Else
+                        lUnits = " (" & lUnits & ")"
+                    End If
+                    lWriter.WriteLine(HeaderLineStart & " " _
+                                    & lTimeseries.Attributes.GetValue("Constituent").ToString.PadRight(8) & " " _
+                                    & lTimeseries.Attributes.GetValue("Description") & lUnits)
+                Next
 
-            lWriter.WriteLine(HeaderLineStart)
-            If WatershedAcres > 0 Then
-                lWriter.WriteLine(HeaderLineStart & " WATERSHED_" & WatershedNumber & " Area:    " & Format(WatershedAcres, "0.000") & " (acres)")
+                lWriter.WriteLine(HeaderLineStart)
+                If WatershedAcres > 0 Then
+                    lWriter.WriteLine(HeaderLineStart & " WATERSHED_" & WatershedNumber & " Area:    " & Format(WatershedAcres, "0.000") & " (acres)")
+                End If
+                lWriter.WriteLine(HeaderLineStart & " Date/time					Values")
+                lWriter.WriteLine(HeaderLineStart)
             End If
-            lWriter.WriteLine(HeaderLineStart & " Date/time					Values")
-            lWriter.WriteLine(HeaderLineStart)
 
             Dim lBodyLineStart As String = BodyLineStart.Replace("WatershedNumber", WatershedNumber)
             For lTimeStep As Integer = 1 To lLastTimeStep
