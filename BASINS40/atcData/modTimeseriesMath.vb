@@ -1503,7 +1503,10 @@ Finished:
         Dim lTSgroup As atcTimeseriesGroup
         lTSgroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries", Nothing))
         If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
-            Err.Raise(vbObjectError + 512, , aOperationName & " did not get a Timeseries argument")
+            lTSgroup = DatasetOrGroupToGroup(aArgs.GetValue("OneOrMoreTimeseries", Nothing))
+            If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
+                Throw New ApplicationException(aOperationName & " did not get a Timeseries argument")
+            End If
         End If
 
         Dim lTSFirst As atcTimeseries = lTSgroup.Item(0)

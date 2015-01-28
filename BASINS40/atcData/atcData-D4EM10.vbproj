@@ -239,6 +239,12 @@
     <Compile Include="frmSpecifySeasonalAttributes.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmSpecifySplit.Designer.vb">
+      <DependentUpon>frmSpecifySplit.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSpecifySplit.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmSpecifyYearSubset.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -282,6 +288,9 @@
     <EmbeddedResource Include="frmSpecifySeasonalAttributes.resx">
       <DependentUpon>frmSpecifySeasonalAttributes.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifySplit.resx">
+      <DependentUpon>frmSpecifySplit.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSpecifyYearSubset.resx">
       <DependentUpon>frmSpecifyYearSubset.vb</DependentUpon>

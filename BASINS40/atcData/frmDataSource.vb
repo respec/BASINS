@@ -199,7 +199,7 @@ Friend Class frmDataSource
                         If lOperations IsNot Nothing AndAlso lOperations.Count > 0 Then
                             For Each lOperation As atcDefinedValue In lOperations
                                 Select Case lOperation.Definition.TypeString
-                                    Case "atcTimeseries", "atcDataGroup", "atcTimeseriesGroup"
+                                    Case "atcTimeseries", "atcDataGroup", "atcTimeseriesGroup", "atcDataAttributes"
                                         'Operations might have categories to further divide them
                                         If lOperation.Definition.Category.Length > 0 Then
                                             Dim lSubCategoryNode As Forms.TreeNode = FindOrCreateNode(lCategoryNode.Nodes, lOperation.Definition.Category)
