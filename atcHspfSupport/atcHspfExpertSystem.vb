@@ -9,6 +9,7 @@ Imports MapWinUtility
 Imports System
 Imports MapWinUtility.Strings
 
+
 Public Class atcExpertSystem
     'Friend ErrorCriteria As HexErrorCriteria
     Public Storms As New Generic.List(Of HexStorm)
@@ -70,7 +71,7 @@ Public Class atcExpertSystem
         Else
             Dim lines() As String = IO.File.ReadAllLines(lFileName)
             Dim lExsRecords As New ArrayList()
-
+            Dim regWhiteSpace As New System.Text.RegularExpressions.Regex("\s")
             For Each line As String In lines
                 If Not line.Contains("***") Then
                     lExsRecords.Add(RTrim(line))
@@ -95,9 +96,9 @@ Public Class atcExpertSystem
             If lNSites = 0 Then
                 Throw New ApplicationException("The number of sites is 0. Program will quit!")
             End If
-            Dim lCurSite As Integer = lExsRecord.Substring(14, 5)
-            If Not (Double.TryParse(lExsRecord.Substring(19, 8), pLatMin) AndAlso Double.TryParse(lExsRecord.Substring(27, 8), pLatMax) _
-            AndAlso Double.TryParse(lExsRecord.Substring(35, 8), pLngMin) AndAlso Double.TryParse(lExsRecord.Substring(43, 8), pLngMax)) Then
+            Dim lCurSite As Integer = lExsRecord.Substring(13, 5)
+            If Not (Double.TryParse(lExsRecord.Substring(19, 8), pLatMin) AndAlso Double.TryParse(lExsRecord.Substring(26, 8), pLatMax) _
+            AndAlso Double.TryParse(lExsRecord.Substring(34, 8), pLngMin) AndAlso Double.TryParse(lExsRecord.Substring(42, 8), pLngMax)) Then
                 Throw New ApplicationException("Latitude and Longitude of Watershed are not in correct format. Program will quit!")
             End If
 
@@ -170,6 +171,7 @@ Public Class atcExpertSystem
             'Read storm end/start dates
             Dim lStormSDate(5) As Integer
             Dim lStormEDate(5) As Integer
+            Dim testString As String
             For lStormIndex As Integer = 1 To lNStorms
                 lExsRecord = lExsRecords(lRecordIndex + lStormIndex)
                 If Not Integer.TryParse(lExsRecord.Substring(0, 5), lStormSDate(0)) _
