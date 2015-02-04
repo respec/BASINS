@@ -86,6 +86,7 @@ Partial Class RWZProgress
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "RWZProgress"
         Me.Text = "Progress"
+        Me.TransparencyKey = System.Drawing.Color.White
         Me.UseWaitCursor = True
         Me.ResumeLayout(False)
         Me.PerformLayout()
