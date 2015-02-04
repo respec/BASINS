@@ -683,7 +683,7 @@ Public Module ConstituentBudget
                 End With
         End Select
 
-        If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Then
+        If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Or aBalanceType = "Sediment" Then
             Dim lLandUses As New List(Of String)
             Dim lReaches As New List(Of String)
             Dim lLandusesHeader As String = ""
@@ -831,35 +831,46 @@ Public Module ConstituentBudget
         For Each landUse As String In aLandUses
             Dim lFound As Boolean = False
             For Each lConnection As HspfConnection In aReach.Sources
-                If lConnection.Source.VolName = aVolName AndAlso lConnection.Source.Opn.Description = landUse Then
-                    lFound = True
-                    Dim lConnectionArea As Double = lConnection.MFact
-
-                    Dim lMassLinkID As Integer = lConnection.MassLink
-                    Dim lTestLocation As String = lConnection.Source.VolName.Substring(0, 1) & ":" & lConnection.Source.VolId
-
-                    Dim lConstituentTotal As Double = 0
-                    lTotal = 0
-                    For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lTestLocation)
-
-                        Dim lMassLinkFactor As Double = 0.0
-                        If lTs.Attributes.GetValue("SumAnnual") > 0 Then
-                            lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lTs.Attributes.GetValue("Constituent"), aBalanceType, _
-                                                                           aConversionFactor, aMultipleIndex:=0)
+                
+                If lConnection.Source.VolName = aVolName Then
+                    If lConnection.Source.Opn Is Nothing Then
+                        If Logger.Msg("The operation " & lConnection.Source.VolName & " " & lConnection.Source.VolId & " is not initialized in the OPN SEQUENCE Block", MsgBoxStyle.OkCancel, "HSPEXP+") = MsgBoxResult.Cancel Then
+                            Throw New ApplicationException("Uninitialized")
+                        Else
+                            Continue For
                         End If
-                        lConstituentTotal = lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor * lConnectionArea
-                        'lConstituentTotal = lConstituentRate * lConnectionArea
+                    End If
+                    If lConnection.Source.Opn.Description = landUse Then
+                        'Need to add test to make sure that the operation was listed in the OPN SEQUENCE block.
+                        lFound = True
+                        Dim lConnectionArea As Double = lConnection.MFact
 
-                        lTotal += lConnectionArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
-                    Next
-                    felu2(aUCI, aReach, aBalanceType, aVolName, aLandUses, aLoadingByLanduse, aReachTotal, aReporting, aContribPercent, lTotal, lConnectionArea, landUse)
-                    Exit For
+                        Dim lMassLinkID As Integer = lConnection.MassLink
+                        Dim lTestLocation As String = lConnection.Source.VolName.Substring(0, 1) & ":" & lConnection.Source.VolId
+
+                        Dim lConstituentTotal As Double = 0
+                        lTotal = 0
+                        For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lTestLocation)
+
+                            Dim lMassLinkFactor As Double = 0.0
+                            If lTs.Attributes.GetValue("SumAnnual") > 0 Then
+                                lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lTs.Attributes.GetValue("Constituent"), aBalanceType, _
+                                                                               aConversionFactor, aMultipleIndex:=0)
+                            End If
+                            lConstituentTotal = lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor * lConnectionArea
+                            'lConstituentTotal = lConstituentRate * lConnectionArea
+
+                            lTotal += lConnectionArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
+                        Next
+                        felu2(aUCI, aReach, aBalanceType, aVolName, aLandUses, aLoadingByLanduse, aReachTotal, aReporting, aContribPercent, lTotal, lConnectionArea, landUse, lTestLocation)
+                        Exit For
+                    End If
                 End If
 
             Next
 
             If Not lFound Then
-                felu2(aUCI, aReach, aBalanceType, aVolName, aLandUses, aLoadingByLanduse, aReachTotal, aReporting, aContribPercent, 0, 0, landUse)
+                felu2(aUCI, aReach, aBalanceType, aVolName, aLandUses, aLoadingByLanduse, aReachTotal, aReporting, aContribPercent, 0, 0, landUse, "")
             End If
 
         Next
@@ -876,7 +887,8 @@ Public Module ConstituentBudget
                         ByRef aContribPercent As atcCollection, _
                         ByRef aTotal As Double, _
                         ByVal aConnectionArea As Double, _
-                        ByVal aLandUse As String)
+                        ByVal aLandUse As String, _
+                        ByVal aTestLocation As String)
         Dim lVolPrefix As String = aVolName.Substring(0, 1) & ":"
         Dim aTotal2 As Double = aTotal 'aTotal2 is used for reporting the loading from the local land area to the reach.
         If aReporting Then
@@ -902,14 +914,14 @@ Public Module ConstituentBudget
 
             If aConnectionArea > 0 Then
                 aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
-                & lVolPrefix _
+                & aTestLocation & " " _
                 & aLandUse & vbTab _
                 & aConnectionArea & vbTab _
                 & DoubleToString(aTotal2 / aConnectionArea, 15, "#,##0.###") & vbTab & _
                                     DoubleToString(aTotal2, 15, "#,##0.###") & vbTab & vbCrLf
             Else
                 aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
-                & lVolPrefix _
+                & aTestLocation & " " _
                 & aLandUse & vbTab _
                 & aConnectionArea & vbTab _
                 & DoubleToString(0.0, 15, "#,##0.###") & vbTab & _
