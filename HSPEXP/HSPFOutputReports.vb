@@ -42,7 +42,7 @@ Module HSPFOutputReports
     Private pMakeLogGraphs As Boolean 'flag to indicate user wants logarithmic graphs (all that are logarithmic)
     Private pMakeSupGraphs As Boolean 'flag to indicate user wants supporting graphs (UZS, LZS, ET, cumulative diff)
     Private pMakeAreaReports As Boolean 'flag to indicate user wants subwatershed & land use reports created
-    Private pHSPFExe As String = FindFile("Please locate WinHspfLt.exe", "WinHspfLt.exe")
+    Friend pHSPFExe As String '= FindFile("Please locate WinHspfLt.exe", IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location), "WinHSPFLt", "WinHspfLt.exe"))
     Private pRunUci As Boolean = False 'Anurag added this option if the user wants this program to run the uci as well
     Private SDateJ, EDateJ As Double
     Private loutfoldername As String
@@ -140,6 +140,8 @@ Module HSPFOutputReports
                     Logger.Status(Now & " Running HSPF Simulation of " & pBaseName & ".uci", True)
                     Dim lExitCode As Integer
                     lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & pBaseName & ".uci") 'Run HSPF program
+                    'Dim WinHSPFLtVersionFound As String = FindFile("Please locate WinHspfLt.exe", IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location), "WinHSPFLt", "WinHspfLt.exe"))
+                    'Logger.Dbg(WinHSPFLtVersionFound)
                     If lExitCode = -1 Then
                         Throw New ApplicationException("WinHSPFLt could not run, Analysis cannot continue")
                         Exit Sub
@@ -198,9 +200,14 @@ Module HSPFOutputReports
                 Logger.Dbg("ReadUCI " & lHspfUci.Name)
                 Logger.Dbg(Now & " Successfully read " & pBaseName & ".uci")
                 Logger.Progress(20, 100)
+
                 If StartUp.chkAdditionalgraphs.Checked Then
-                    ChDriveDir(pTestPath)
-                    MakeAutomatedGraphs(SDateJ, EDateJ)
+                    Try
+                        ChDriveDir(pTestPath)
+                        MakeAutomatedGraphs(SDateJ, EDateJ)
+                    Catch exGraph As Exception
+                        Logger.Msg("Exception while making graphs: " & exGraph.ToString)
+                    End Try
                 End If
 
 
@@ -651,51 +658,54 @@ RWZProgramEnding:
                 Dim lGraphDataset() As String = lGraphRecords(lRecordIndex).split(",")
                 Dim lTimeSeries As atcTimeseries = Nothing
                 Dim lDataSourceFilename As String = AbsolutePath(Trim(lGraphDataset(1)), pTestPath)
-                Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lDataSourceFilename)
+                If IO.File.Exists(lDataSourceFilename) Then
+                    Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lDataSourceFilename)
 
-                If lDataSource Is Nothing Then
-                    If atcDataManager.OpenDataSource(lDataSourceFilename) Then
-                        lDataSource = atcDataManager.DataSourceBySpecification(lDataSourceFilename)
+                    If lDataSource Is Nothing Then
+                        If atcDataManager.OpenDataSource(lDataSourceFilename) Then
+                            lDataSource = atcDataManager.DataSourceBySpecification(lDataSourceFilename)
+                        End If
                     End If
+                    If lDataSource Is Nothing Then
+                        Throw New ApplicationException("Could not open '" & lDataSourceFilename & "'")
+                    End If
+                    Select Case IO.Path.GetExtension(lDataSourceFilename)
+                        Case ".wdm"
+                            lTimeSeries = lDataSource.DataSets.FindData("ID", Trim(lGraphDataset(2)))(0)
+                        Case ".hbn", ".dbf"
+                            lTimeSeries = lDataSource.DataSets.FindData("Location", Trim(lGraphDataset(2))) _
+                                                              .FindData("Constituent", Trim(lGraphDataset(3)))(0)
+
+                    End Select
+
+                    lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
+                    Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
+
+
+                    If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
+                        Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
+                                                       " Curve " & CurveNumber & ". Program will quit!")
+                    End If
+                    lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
+
+                    lTimeSeries = AggregateTS(lTimeSeries, Trim(lGraphDataset(10)).ToLower, Trim(lGraphDataset(11)).ToLower)
+
+                    If Not Trim(lGraphInit(18)) = "" Then
+
+                        Dim SeasonStart() As Integer = Array.ConvertAll(lGraphInit(18).Split("/"), Function(str) Int32.Parse(str))
+                        Dim SeasonEnd() As Integer = Array.ConvertAll(lGraphInit(19).Split("/"), Function(str) Int32.Parse(str))
+                        Dim lseasons As New atcSeasonsYearSubset(SeasonStart(0), SeasonStart(1), SeasonEnd(0), SeasonEnd(1))
+                        lseasons.SeasonSelected(0) = True
+                        lTimeSeries = lseasons.SplitBySelected(lTimeSeries, Nothing).ItemByIndex(1)
+                    End If
+
+                    lTimeseriesGroup.Add(lTimeSeries)
+                Else
+                    Logger.Msg("Could not open '" & lDataSourceFilename & "' Aborting Graphing.", MsgBoxStyle.OkOnly, "HSPEXP+")
+                    Exit Do
                 End If
-                Select Case IO.Path.GetExtension(lDataSourceFilename)
-                    Case ".wdm"
-                        lTimeSeries = lDataSource.DataSets.FindData("ID", Trim(lGraphDataset(2)))(0)
-                    Case ".hbn", ".dbf"
-                        lTimeSeries = lDataSource.DataSets.FindData("Location", Trim(lGraphDataset(2))) _
-                                                          .FindData("Constituent", Trim(lGraphDataset(3)))(0)
-
-                End Select
-
-                lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
-                Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
-
-
-                If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
-                    Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
-                                                   " Curve " & CurveNumber & ". Program will quit!")
-                End If
-                lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
-
-                lTimeSeries = AggregateTS(lTimeSeries, Trim(lGraphDataset(10)).ToLower, Trim(lGraphDataset(11)).ToLower)
-
-                If Not Trim(lGraphInit(18)) = "" Then
-
-                    Dim SeasonStart() As Integer = Array.ConvertAll(lGraphInit(18).Split("/"), Function(str) Int32.Parse(str))
-                    Dim SeasonEnd() As Integer = Array.ConvertAll(lGraphInit(19).Split("/"), Function(str) Int32.Parse(str))
-                    Dim lseasons As New atcSeasonsYearSubset(SeasonStart(0), SeasonStart(1), SeasonEnd(0), SeasonEnd(1))
-                    lseasons.SeasonSelected(0) = True
-                    lTimeSeries = lseasons.SplitBySelected(lTimeSeries, Nothing).ItemByIndex(1)
-                End If
-
-                lTimeseriesGroup.Add(lTimeSeries)
-
                 lRecordIndex += 1
-
             Next CurveNumber
-
-            
-
 
             Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
             Select Case Trim(lGraphInit(0)).ToLower
