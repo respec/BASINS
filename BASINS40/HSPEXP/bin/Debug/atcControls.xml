@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcControls
+</name>
+</assembly>
+<members>
+<member name="P:atcControls.atcGrid.Fixed3D">
+	<summary>
+ True for fixed rows and columns to be rendered with 3-D look
+ </summary>
+</member><member name="M:atcControls.atcGrid.SetHScroller">
+	<summary>
+ Set HScroller.Minimum and HScroller.Maximum from current column widths
+ </summary>
+	<returns>
+ True if HScroller.Value had to be changed to fit between new Minimum and Maximum
+ </returns>
+</member>
+</members>
+</doc>

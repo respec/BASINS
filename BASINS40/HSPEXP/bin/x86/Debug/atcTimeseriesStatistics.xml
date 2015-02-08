@@ -1,0 +1,35 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcTimeseriesStatistics
+</name>
+</assembly>
+<members>
+<member name="P:atcTimeseriesStatistics.atcTimeseriesStatistics.Name">
+	<summary>returns 'Timeseries::Statistics'</summary>
+</member><member name="P:atcTimeseriesStatistics.atcTimeseriesStatistics.Category">
+	<summary>Returns 'Compute Statistics'</summary>
+</member><member name="P:atcTimeseriesStatistics.atcTimeseriesStatistics.Description">
+	<summary>Returns 'Computes statistics of a timeseries and stores them as attributes'</summary>
+</member><member name="M:atcTimeseriesStatistics.atcTimeseriesStatistics.Initialize">
+	<summary>
+ Add operations to atcDataAttributes so they can be computed as needed
+ </summary>
+	<remarks>
+ Same effect as InitializeShared
+ </remarks>
+</member><member name="M:atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared">
+	<summary>
+ Add operations to atcDataAttributes so they can be computed as needed
+ </summary>
+	<remarks>
+ Same effect as the non-shared Initialize
+ </remarks>
+</member><member name="P:atcTimeseriesStatistics.atcTimeseriesStatistics.AvailableOperations">
+	<summary>Definitions of statistics supported by this class.</summary>
+</member><member name="T:atcTimeseriesStatistics.atcTimeseriesStatistics">
+	<summary>Computes statistics of a timeseries</summary>
+</member>
+</members>
+</doc>
