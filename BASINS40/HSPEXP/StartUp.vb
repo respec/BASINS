@@ -1,5 +1,8 @@
 ﻿Imports System.Windows.Forms.DialogResult
 Imports System.IO
+Imports atcUtility
+Imports MapWinUtility
+
 Public Class StartUp
     Private Sub cmdStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdStart.Click
         ScriptMain(Nothing)
@@ -31,7 +34,7 @@ Public Class StartUp
     End Sub
 
     Private Sub chkRunHSPF_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkRunHSPF.CheckedChanged
-        
+
     End Sub
 
     Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged, chkTotalNitrogen.CheckedChanged, chkTotalPhosphorus.CheckedChanged, chkBODBalance.CheckedChanged, chkFecalColiform.CheckedChanged
@@ -75,6 +78,25 @@ Public Class StartUp
     End Sub
 
     Private Sub StartUp_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+
+        Dim WinHspfLtDir As String = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar & "WinHSPFLt"
+        Try
+            'Set Environmental Variable
+            System.Environment.SetEnvironmentVariable("PATH", WinHspfLtDir & ";" & Environment.GetEnvironmentVariable("PATH"))
+        Catch
+        End Try
+        Try
+            Dim lHassentPath As String = IO.Path.Combine(WinHspfLtDir, "hass_ent.dll")
+            If LoadLibraryEx(lHassentPath, IntPtr.Zero, LoadLibraryFlags.LOAD_WITH_ALTERED_SEARCH_PATH) = 0 Then
+                Logger.Msg("Missing HSPF Library at install location:" & vbCrLf & lHassentPath)
+                End
+            End If
+        Catch ex As Exception
+        End Try
+
+        HSPFOutputReports.pHSPFExe = IO.Path.Combine(WinHspfLtDir, "WinHspfLt.exe")
+        atcWDM.atcDataSourceWDM.HSPFMsgFilename = IO.Path.Combine(WinHspfLtDir, "hspfmsg.wdm")
+
         atcData.atcDataManager.Clear()
         With atcData.atcDataManager.DataPlugins
             .Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
