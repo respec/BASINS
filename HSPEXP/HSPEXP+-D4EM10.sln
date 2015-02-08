@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Basic Express 2010
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "HSPEXP+-D4EM10", "HSPEXP+-D4EM10.vbproj", "{186B510F-4AF2-493A-8ADE-6867C7333C76}"
+	ProjectSection(ProjectDependencies) = postProject
+		{92EA3681-9EA9-438A-A598-2531F483A0C6} = {92EA3681-9EA9-438A-A598-2531F483A0C6}
+	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MapWinUtility-D4EM10", "..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM10.vbproj", "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
 EndProject
