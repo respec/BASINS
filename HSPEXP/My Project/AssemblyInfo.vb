@@ -8,11 +8,11 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("HSPEXP")> 
-<Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("Microsoft")> 
+<Assembly: AssemblyTitle("HSPEXP+")> 
+<Assembly: AssemblyDescription("Hydrology & Water Quality Calibration Tool")> 
+<Assembly: AssemblyCompany("AQUA TERRA Consultants")> 
 <Assembly: AssemblyProduct("HSPEXP")> 
-<Assembly: AssemblyCopyright("Copyright © Microsoft 2013")> 
+<Assembly: AssemblyCopyright("")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
