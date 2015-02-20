@@ -593,10 +593,6 @@ ViewOutput:
     '    mnuGraphTimeseries_Click(Nothing, Nothing)
     'End Sub
 
-    Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        MsgBox("Documentation not yet available")
-    End Sub
-
     Private Sub txtDrainageArea_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtDrainageArea.TextChanged
         pDidRora = False
     End Sub
@@ -810,4 +806,7 @@ PlotOutput:
         End If
     End Sub
 
+    Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+        ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/RORA.html")
+    End Sub
 End Class
