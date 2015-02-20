@@ -71,10 +71,10 @@ Public Class clsWTFLinear
             With lSeg
                 If .Flow Is Nothing Then .ReadData()
                 Dim lAntGWL As Double = AntecedentGWL(.Flow.Length - 1, 1, .HzeroDayValue)
-                If .AntecedentGWLs.Keys.Contains(AntecedentGWLMethod.Linear) Then
-                    .AntecedentGWLs.ItemByKey(AntecedentGWLMethod.Linear) = lAntGWL
+                If .AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.Linear) Then
+                    .AntecedentGWLMethods.ItemByKey(AntecedentGWLMethod.Linear) = lAntGWL
                 Else
-                    .AntecedentGWLs.Add(AntecedentGWLMethod.Linear, lAntGWL)
+                    .AntecedentGWLMethods.Add(AntecedentGWLMethod.Linear, lAntGWL)
                 End If
 
                 Dim lDeltaH As Double = .Flow(.Flow.Length - 1) - lAntGWL
