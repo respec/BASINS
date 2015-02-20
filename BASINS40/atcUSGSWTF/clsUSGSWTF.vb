@@ -10,7 +10,7 @@ Public Class clsUSGSWTF
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::USGS Water Table Fluctuation Function"
+            Return "Analysis::USGS Water-Table Fluctuation Function"
         End Get
     End Property
 

@@ -3,6 +3,10 @@ Imports atcData
 Imports atcUtility
 Imports MapWinUtility
 
+Public Enum WTFAnalysis
+    FindRecession
+    FindRecharge
+End Enum
 Public Class clsFall
     Inherits clsRecess
 
@@ -34,21 +38,49 @@ Public Class clsFall
     End Property
 
     Public MinimumRise As Double
+    Public Phase As WTFAnalysis = WTFAnalysis.FindRecession
+    Public PeakAheadDays As Integer = 14
+    Public PeakRisePct As Double = 0.75
+
+    Private pFallD As Double = Double.NaN
+    Public Property FallD(Optional ByVal aRefreshData As Boolean = False) As Double
+        Get
+            Return pFallD
+        End Get
+        Set(ByVal value As Double)
+            'could enforce some rules here
+            If FlowData Is Nothing Then
+                Exit Property
+            End If
+            Dim lMin As Double = FlowData.Attributes.GetValue("Min")
+            If value > lMin Then
+                Throw New ApplicationException("The value of d specified is greater than the minimum groundwater level (" & lMin & ")" & vbCrLf & _
+                           "measured at the site. Re-enter another value of d.")
+                Exit Property
+            End If
+            pFallD = value
+            If aRefreshData Then
+                For Each lRecessSeg As clsRecessionSegment In listOfSegments
+                    lRecessSeg.GetData(True, pFallD)
+                Next
+            End If
+        End Set
+    End Property
 
     ''' <summary>
     ''' Find either a falling (true) or rising (false) limb
     ''' </summary>
     ''' <param name="aFall">True (default): find falling limb; False: find rising limb</param>
     ''' <remarks></remarks>
-    Public Overrides Sub RecessGetAllSegments(Optional ByVal aFall As Boolean = True)
-        If DataType = 1 AndAlso ApplyDatum Then
-            For I As Integer = 1 To FlowData.numValues
-                'If FlowData.Value(I) > 0 Then FlowData.Value(I) *= -1
-                If Not Double.IsNaN(FlowData.Value(I)) Then
-                    FlowData.Value(I) = Datum - FlowData.Value(I)
-                End If
-            Next
-        End If
+    Public Overrides Sub RecessGetAllSegments() 'Optional ByVal aFall As Boolean = True
+        'If DataType = 1 AndAlso ApplyDatum Then
+        '    For I As Integer = 1 To FlowData.numValues
+        '        'If FlowData.Value(I) > 0 Then FlowData.Value(I) *= -1
+        '        If Not Double.IsNaN(FlowData.Value(I)) Then
+        '            FlowData.Value(I) = Datum - FlowData.Value(I)
+        '        End If
+        '    Next
+        'End If
 
         Dim lDate(5) As Integer
 
@@ -70,7 +102,7 @@ Public Class clsFall
             If liCount >= FlowData.numValues Then Continue For
             Dim lCurrentValue As Double = FlowData.Value(liCount)
 
-            If aFall Then 'Find fall limb
+            If Phase = WTFAnalysis.FindRecession Then 'aFall = True, Find fall limb
                 'need to find a local peak as a starting point of a falling limb
                 If liCount < FlowData.numValues AndAlso (lCurrentValue <= FlowData.Value(liCount - 1) Or lCurrentValue <= FlowData.Value(liCount + 1)) Then
                     Continue For 'loop 200
@@ -94,7 +126,7 @@ Public Class clsFall
                 liCount += 1
                 If liCount > FlowData.numValues Then Exit For 'loop 200
 
-                If aFall Then 'Find fall limb
+                If Phase = WTFAnalysis.FindRecession Then 'aFall = True, Find fall limb
                     'if no longer falling, then reaches the end of a falling limb
                     If FlowData.Value(liCount) > FlowData.Value(liCount - 1) Then lOK = 0
                 Else 'Find rise limb
@@ -145,7 +177,7 @@ Public Class clsFall
                     .IsExcluded = True
                     '.GetData() get data later to save memory
 
-                    If Not aFall Then
+                    If Phase = WTFAnalysis.FindRecharge Then 'Not aFall
                         Dim lH0Index As Integer = IndexPeakDay - 1
                         While FlowData.Value(lH0Index) <= FlowData.Value(IndexPeakDay)
                             If lH0Index <= 1 Then
@@ -166,6 +198,270 @@ Public Class clsFall
         Next 'original loop 200
     End Sub
 
+    Public Sub RiseGetAllSegments() 'Optional ByVal aFall As Boolean = True
+        Dim lDate(5) As Integer
+
+        ' ------------- LOCATE a PEAK ---------------------
+        Dim lOK As Integer = 0
+        'CountRecession  
+        Dim lNum As Integer
+        Dim II As Integer = 1
+        Dim liCount As Integer
+        Dim lKey As String
+        Dim liHowFar As Integer
+
+        'Find some guiding gap values
+        Dim lTsGaps As atcTimeseries = FlowData.Clone()
+        Dim lGap As Double = 0
+        Dim lVal1 As Double
+        Dim lVal2 As Double
+        Dim lGapTotal As Double = 0.0
+        Dim lGapCount As Integer = 0
+        Dim lGapMinAboveZero As Double = Double.MaxValue
+        Dim lGapMax As Double = Double.MinValue
+        For I As Integer = 2 To lTsGaps.numValues
+            lVal2 = FlowData.Value(I)
+            lVal1 = FlowData.Value(I - 1)
+            If Double.IsNaN(lVal1) OrElse Double.IsNaN(lVal2) Then
+                lGap = Double.NaN
+            Else
+                lGap = lVal2 - lVal1
+                lGapTotal += Math.Abs(lGap)
+                lGapCount += 1
+            End If
+            lTsGaps.Value(I) = lGap
+            If Not Double.IsNaN(lGap) Then
+                Dim lGapAbs As Double = Math.Abs(lGap)
+                If lGapMinAboveZero > lGapAbs AndAlso lGapAbs > 0 Then
+                    'Get the smallest gap above zero
+                    lGapMinAboveZero = lGapAbs
+                End If
+                If lGapMax < lGapAbs Then
+                    lGapMax = lGapAbs
+                End If
+            End If
+        Next
+        lTsGaps.Value(1) = Double.NaN
+        Dim lGapMean As Double = lGapTotal / lGapCount
+
+        Dim lGapsRunning As New atcCollection()
+        For liCount = 2 To FlowData.numValues 'original loop 200
+            lOK = 0
+            J2Date(FlowData.Dates.Value(liCount - 1), lDate)
+            If Not RecessIncludeMonths.Contains(lDate(1)) Then
+                Continue For 'loop 200
+            End If
+
+            If liCount >= FlowData.numValues Then Continue For
+            Dim lCurrentValue As Double = FlowData.Value(liCount)
+
+            If Phase = WTFAnalysis.FindRecession Then 'aFall = True, Find fall limb
+                'need to find a local peak as a starting point of a falling limb
+                If liCount < FlowData.numValues AndAlso (lCurrentValue <= FlowData.Value(liCount - 1) Or lCurrentValue <= FlowData.Value(liCount + 1)) Then
+                    Continue For 'loop 200
+                Else
+                    IndexPeakDay = liCount
+                    lOK = 1
+                End If
+            Else 'Find rise limb
+                'need to find a local min as a starting point of a rising limb
+                If liCount < FlowData.numValues AndAlso (lCurrentValue >= FlowData.Value(liCount - 1) Or lCurrentValue >= FlowData.Value(liCount + 1)) Then
+                    Continue For 'loop 200
+                Else
+                    lGapsRunning.Clear()
+                    If Not Double.IsNaN(lTsGaps.Value(liCount)) Then
+                        lGapsRunning.Add(lTsGaps.Value(liCount))
+                    End If
+                    Dim lTotalCount As Double = 0
+                    Dim lRiseCount As Double = 0
+                    For I As Integer = 1 To 4
+                        If liCount + I > FlowData.numValues Then
+                            Exit For
+                        End If
+                        Dim lValue As Double = lTsGaps.Value(liCount + I)
+                        If Not Double.IsNaN(lValue) Then
+                            lTotalCount += 1
+                            If lValue > 0 Then
+                                lRiseCount += 1
+                            End If
+                        End If
+                    Next
+                    Dim lRisePct As Double = lRiseCount / lTotalCount
+                    'has to continue on to rise 50% of times in the short future
+                    If lRisePct < 0.5 Then
+                        Continue For 'loop 200
+                    End If
+                    IndexPeakDay = liCount
+                    lOK = 1
+                End If
+            End If
+
+            '-------------- ANALYZE THE RECESSION AFTER THE PEAK: -----------------
+            liHowFar = 0
+            While True 'loop 210
+                liCount += 1
+                If liCount > FlowData.numValues Then Exit For 'loop 200
+
+                If Phase = WTFAnalysis.FindRecession Then 'aFall = True, Find fall limb
+                    'if no longer falling, then reaches the end of a falling limb
+                    If FlowData.Value(liCount) > FlowData.Value(liCount - 1) Then lOK = 0
+                Else 'Find rise limb
+                    'if no longer rising, then reaches the end of a rising limb
+                    If FlowData.Value(liCount) < FlowData.Value(liCount - 1) Then
+                        'lOK = 0
+                        Dim lGapNowIsSignificant As Boolean = True
+                        'Dim lGapNow As Double = FlowData.Value(liCount - 1) - FlowData.Value(liCount)
+                        'If lGapNow < lGapMean Then
+                        '    lGapNowIsSignificant = False
+                        'End If
+                        'Dim lLargeGapCount As Integer = 0
+                        'For Each lGapVal As Double In lGapsRunning
+                        '    If lGapNow < lGapVal Then
+                        '        lLargeGapCount += 1
+                        '    End If
+                        'Next
+                        'If lLargeGapCount / lGapsRunning.Count * 1.0 > 2 / 3 Then
+                        '    lGapNowIsSignificant = False
+                        'End If
+
+                        'Scout ahead a window of 30
+                        Dim I As Integer
+                        Dim lRiseCount As Double = 0
+                        Dim lTotalCount As Double = 0
+                        Dim lFlatCount As Double = 0
+                        Dim lFirstDip As Integer = -99
+                        Dim lwindowSize As Integer = PeakAheadDays
+                        For I = 1 To lwindowSize
+                            'If liCount + I <= FlowData.numValues AndAlso FlowData.Value(liCount + I) > FlowData.Value(liCount) Then
+                            '    lGapNowIsSignificant = False
+                            '    Exit For
+                            'End If
+                            If liCount + I > FlowData.numValues Then
+                                Exit For
+                            End If
+                            Dim lGapVal As Double = lTsGaps.Value(liCount + I)
+                            If Not Double.IsNaN(lGapVal) Then
+                                lTotalCount += 1
+                                If lGapVal > 0 Then
+                                    lRiseCount += 1
+                                Else
+                                    If lFirstDip < 0 Then
+                                        lFirstDip = I
+                                    End If
+                                End If
+                                If Math.Abs(lGapVal) - lGapMinAboveZero > 0.001 Then
+
+                                Else
+                                    lFlatCount += 1
+                                End If
+                            End If
+                        Next
+                        For I = 1 To Int(lFlatCount)
+                            If liCount + lwindowSize + I > FlowData.numValues Then
+                                Exit For
+                            End If
+                            Dim lGapVal As Double = lTsGaps.Value(liCount + lwindowSize + I)
+                            If Not Double.IsNaN(lGapVal) Then
+                                lTotalCount += 1
+                                If lGapVal > 0 Then
+                                    lRiseCount += 1
+                                Else
+                                    If lFirstDip < 0 Then
+                                        lFirstDip = lwindowSize + I
+                                    End If
+                                End If
+                                If Math.Abs(lGapVal) - lGapMinAboveZero > 0.001 Then
+
+                                End If
+                            End If
+                        Next
+
+                        Dim lRisePct As Double = lRiseCount / lTotalCount
+                        If lRisePct > PeakRisePct Then
+                            lGapNowIsSignificant = False
+                        End If
+
+                        If lGapNowIsSignificant Then
+                            lOK = 0
+                        Else
+                            If lFirstDip > 0 Then
+                                liCount += lFirstDip 'I
+                            End If
+                            lOK = 1
+                        End If
+                    End If
+                End If
+                'c............. next line, different from recess.............
+                If Double.IsNaN(FlowData.Value(liCount)) Then lOK = 0
+
+                liHowFar = liCount - IndexPeakDay - 1
+                If lOK = 1 Then
+                    If Not Double.IsNaN(lTsGaps.Value(liCount)) Then
+                        lGapsRunning.Add(lTsGaps.Value(liCount))
+                    End If
+                    Continue While 'loop 210
+                Else
+                    Exit While 'loop 210
+                End If
+            End While 'loop 210
+            'abondon the current rise segment and start over at this local minimum
+            'If liHowFar < RecessMinLengthInDays And lOK = 0 Then
+            '    liCount -= 1
+            '    Continue For 'loop 200
+            'End If
+            If liHowFar >= RecessMinLengthInDays And lOK = 0 Then 'This is a long if branch
+                RecessionSegment = New clsRecessionSegment()
+
+                lNum = liCount - IndexPeakDay - 1
+                If lNum > clsRecessionSegment.MaxSegmentLengthInDaysGW Then
+                    lNum = clsRecessionSegment.MaxSegmentLengthInDaysGW
+                    liCount = IndexPeakDay + clsRecessionSegment.MaxSegmentLengthInDaysGW
+                    'write (*,*) 'Recession period more than 300 days.'
+                    'write (*,*) 'Removed data past 300.'
+                End If
+                'Dim liMin As Integer = 1
+                'Dim liMax As Integer = lNum
+                'For I As Integer = 1 To lNum 'loop 220
+                '    lFlow(I) = FlowData.Value(I + IndexPeakDay)
+                '    If lFlow(I) = 0.0 Then
+                '        lQLog(I) = -88.8
+                '    Else
+                '        lQLog(I) = Math.Log10(lFlow(I))
+                '    End If
+                '    lDates(I) = FlowData.Dates.Value(I + IndexPeakDay - 1)
+                'Next 'loop 220
+                With RecessionSegment
+                    .PeakDayIndex = IndexPeakDay
+                    .PeakDayDate = FlowData.Dates.Value(IndexPeakDay - 1)
+                    .SegmentLength = lNum
+                    .MinDayOrdinal = 1
+                    .MaxDayOrdinal = lNum
+                    .IsExcluded = True
+                    '.GetData() get data later to save memory
+
+                    If Phase = WTFAnalysis.FindRecharge Then 'Not aFall
+                        Dim lH0Index As Integer = IndexPeakDay - 1
+                        While FlowData.Value(lH0Index) <= FlowData.Value(IndexPeakDay)
+                            If lH0Index <= 1 Then
+                                Exit While
+                            End If
+                            lH0Index -= 1
+                        End While
+                        .HzeroDayIndex = lH0Index
+                        .HzeroDayDate = FlowData.Dates.Value(lH0Index - 1)
+                        .HzeroDayValue = FlowData.Value(lH0Index)
+                    End If
+                End With
+                CountRecession += 1
+                J2Date(FlowData.Dates.Value(IndexPeakDay - 1), lDate)
+                lKey = lDate(0).ToString & "/" & lDate(1).ToString.PadLeft(2, " ") & "/" & lDate(2).ToString.PadLeft(2, " ")
+                listOfSegments.Add(lKey, RecessionSegment)
+            Else
+                liCount -= 1
+            End If 'end of long if branch
+        Next 'original loop 200
+    End Sub
+
     Public Overrides Sub SetOutputFiles()
         'pFileFallDat = IO.Path.Combine(OutputPath, pFileFallDat)
         'pFileRecSum = IO.Path.Combine(OutputPath, pFileRecSum)
@@ -182,7 +478,11 @@ Public Class clsFall
         If aRecessKey <> "" Then
             RecessionSegment = listOfSegments.ItemByKey(aRecessKey)
             If RecessionSegment.NeedtoReadData Then
-                RecessionSegment.GetData()
+                If Not Double.IsNaN(pFallD) Then
+                    RecessionSegment.GetData(True, pFallD)
+                Else
+                    RecessionSegment.GetData() 'should not allow to proceed!
+                End If
             End If
         End If
         Select Case aOperation.ToLower
@@ -230,14 +530,28 @@ Public Class clsFall
         With GraphTs
             '.numValues = aSegment.SegmentLength - 1
             '.Dates.Values = aSegment.Dates
-            Dim lSubsetQLog(aSegment.MaxDayOrdinal - aSegment.MinDayOrdinal + 1) As Double
-            Dim lSubsetGWL(aSegment.MaxDayOrdinal - aSegment.MinDayOrdinal + 1) As Double
-            For I As Integer = 1 To aSegment.Flow.Length - 1
-                If I >= aSegment.MinDayOrdinal AndAlso I <= aSegment.MaxDayOrdinal Then
-                    lSubsetGWL(I - aSegment.MinDayOrdinal + 1) = aSegment.Flow(I)
-                End If
-            Next
-            .Values = lSubsetGWL
+
+            Select Case Phase
+                Case WTFAnalysis.FindRecession
+                    Dim lSubsetQLog(aSegment.MaxDayOrdinal - aSegment.MinDayOrdinal + 1) As Double
+                    For I As Integer = 1 To aSegment.QLog.Length - 1
+                        If I >= aSegment.MinDayOrdinal AndAlso I <= aSegment.MaxDayOrdinal Then
+                            lSubsetQLog(I - aSegment.MinDayOrdinal + 1) = aSegment.QLog(I)
+                        End If
+                    Next
+                    .Values = lSubsetQLog
+                Case WTFAnalysis.FindRecharge
+                    Dim lSubsetGWL(aSegment.MaxDayOrdinal - aSegment.MinDayOrdinal + 1) As Double
+                    For I As Integer = 1 To aSegment.Flow.Length - 1
+                        If I >= aSegment.MinDayOrdinal AndAlso I <= aSegment.MaxDayOrdinal Then
+                            lSubsetGWL(I - aSegment.MinDayOrdinal + 1) = aSegment.Flow(I)
+                        End If
+                    Next
+                    .Values = lSubsetGWL
+                Case Else
+                    Exit Sub
+            End Select
+
             .Value(0) = GetNaN()
             '.Dates.Value(0) = aSegment.PeakDayDate
             .Dates.Value(0) = lSDate - JulianHour * 24.0
@@ -245,12 +559,20 @@ Public Class clsFall
             .Attributes.SetValue("point", True)
             .Attributes.SetValue("Constituent", "")
             .Attributes.SetValue("Scenario", "")
-            If DataType = 1 Then
-                .Attributes.SetValue("Units", "GWL Altitude") 'This is converted however by ground_Elev - depth_to_watertable data
-            ElseIf DataType = 2 Then
-                .Attributes.SetValue("Units", "GWL Altitude")
-            End If
 
+            Select Case Phase
+                Case WTFAnalysis.FindRecession
+                    If DataType = 1 Then
+                        .Attributes.SetValue("Units", "ln(GWL,ft)") 'This is converted however by ground_Elev - depth_to_watertable data
+                    ElseIf DataType = 2 Then
+                        .Attributes.SetValue("Units", "ln(GWL,ft)")
+                    End If
+                    If Not Double.IsNaN(pFallD) Then
+                        .Attributes.SetValue("Units", "ln(GWL,(Ht - d))")
+                    End If
+                Case WTFAnalysis.FindRecharge
+                    .Attributes.SetValue("Units", "GWL, ft")
+            End Select
         End With
     End Sub
 

@@ -324,8 +324,7 @@ Public Class clsRecess
 
         pRecSumResult = ""
 
-        Dim lTs As atcTimeseries = SubsetByDate(aTS, lSdate, lEdate, Nothing)
-        FlowData = lTs
+        FlowData = SubsetByDate(aTS, lSdate, lEdate, Nothing)
 
         '***** File IO *****
         Dim lInputfile As String = IO.Path.GetFileName(aTS.Attributes.GetValue("history 1").substring("read from ".Length))
@@ -732,9 +731,8 @@ Public Class clsRecess
         Return Nothing
     End Function
 
-    Public Overridable Sub RecessGetAllSegments(Optional ByVal aFall As Boolean = True)
+    Public Overridable Sub RecessGetAllSegments()
         Dim lDate(5) As Integer
-
         ' ------------- LOCATE a PEAK ---------------------
         Dim lOK As Integer = 0
         'pCountRecession  
@@ -894,9 +892,9 @@ Public Class clsRecess
     Protected Function RecessAnalyse(ByVal aSegment As clsRecessionSegment, Optional ByVal aConstituent As String = "Streamflow") As String
         Dim lMsg As New Text.StringBuilder
         Dim lMaxSegmentLengthInDays As Integer
-        If aConstituent = "Streamflow" OrElse aConstituent = "FLOW" Then
+        If aConstituent.ToUpper() = "STREAMFLOW" OrElse aConstituent.ToUpper() = "FLOW" Then
             lMaxSegmentLengthInDays = clsRecessionSegment.MaxSegmentLengthInDays
-        ElseIf aConstituent = "GW LEVEL" Then
+        ElseIf aConstituent.ToUpper() = "GW LEVEL" Then
             lMaxSegmentLengthInDays = clsRecessionSegment.MaxSegmentLengthInDaysGW
         End If
         With aSegment
@@ -922,14 +920,18 @@ Public Class clsRecess
             'End If
             Dim lTotalLogQ As Double = 0
             Dim lTotalOrdinal As Double = 0
-            For I As Integer = .MinDayOrdinal To .MaxDayOrdinal
+            Dim lMaxDayOrdinal As Integer = .MaxDayOrdinal
+            If aConstituent.ToUpper() = "GW LEVEL" Then
+                lMaxDayOrdinal = .MaxDayOrdinal - 1
+            End If
+            For I As Integer = .MinDayOrdinal To lMaxDayOrdinal
                 lTotalLogQ += .QLog(I)
                 lTotalOrdinal += I
             Next
-            .MeanLogQ = lTotalLogQ / (.MaxDayOrdinal - .MinDayOrdinal + 1)
-            .MeanOrdinals = lTotalOrdinal / (.MaxDayOrdinal - .MinDayOrdinal + 1)
+            .MeanLogQ = lTotalLogQ / (lMaxDayOrdinal - .MinDayOrdinal + 1)
+            .MeanOrdinals = lTotalOrdinal / (lMaxDayOrdinal - .MinDayOrdinal + 1)
 
-            DoRegression2(aSegment)
+            DoRegression2(aSegment, aConstituent)
             'set analysed done
             aSegment.NeedToAnalyse = False
 
@@ -1607,7 +1609,7 @@ Public Class clsRecess
 
     ' -----THIS SUBROUTINE PERFORMS LEAST-SQUARES REGRESSION TO FIND BEST-FIT ---
     ' ---------------- EQUATION OF LINEAR BASIS ( Y = A*X + B ) -----------------
-    Public Shared Sub DoRegression2(ByVal aSegment As clsRecessionSegment)
+    Public Shared Sub DoRegression2(ByVal aSegment As clsRecessionSegment, Optional ByVal aConstituent As String = "")
         Dim lA(2, 4) As Double
         Dim lRoot1 As Double = 0.0
         Dim lRoot2 As Double = 0.0
@@ -1615,10 +1617,14 @@ Public Class clsRecess
         Dim lOrdinal() As Integer
         Dim lNewRecessLength As Integer
         With aSegment
-            lNewRecessLength = .MaxDayOrdinal - .MinDayOrdinal + 1
+            Dim lMaxDayOrdinal As Integer = .MaxDayOrdinal
+            If Not String.IsNullOrEmpty(aConstituent) AndAlso aConstituent.ToUpper() = "GW LEVEL" Then
+                lMaxDayOrdinal = .MaxDayOrdinal - 1
+            End If
+            lNewRecessLength = lMaxDayOrdinal - .MinDayOrdinal + 1
             ReDim lQLog(lNewRecessLength)
             ReDim lOrdinal(lNewRecessLength)
-            For Z As Integer = .MinDayOrdinal To .MaxDayOrdinal
+            For Z As Integer = .MinDayOrdinal To lMaxDayOrdinal
                 lQLog(Z - .MinDayOrdinal + 1) = .QLog(Z)
                 lOrdinal(Z - .MinDayOrdinal + 1) = Z 'actual ordinal number, NOT the rescaled ordinals
             Next

@@ -203,7 +203,7 @@ Public Class frmRecess
             Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
             Dim lDataTypeStr As String = ""
             
-            If lCons = "GW LEVEL" Then
+            If lCons.ToUpper() = "GW LEVEL" OrElse lCons.ToUpper() = "GWLEVEL" Then
                 If lParmCd IsNot Nothing Then
                     lDataTypeStr &= "Parameter Code: " & lParmCd & vbCrLf & vbCrLf
                 End If
@@ -213,9 +213,41 @@ Public Class frmRecess
                 txtDataInfo.Text = lDataTypeStr
 
                 SwitchSeasonControls(False)
-                panelRiseFall.Visible = True
                 btnFallPlot.Visible = True
-            ElseIf lCons = "Streamflow" OrElse lCons = "FLOW" Then
+                btnCurv.Visible = False
+
+                'Adjusting interface elements for using Fall
+                Select Case pFall.Phase
+                    Case WTFAnalysis.FindRecession
+                        Me.Text = "GWL Recession"
+                        btnGetAllSegments.Text = "Find Recessions >"
+                        lblFallD.Visible = True
+                        txtFallD.Visible = True
+                        btnAnalyse.Text = "Analyse Kgw"
+                        btnSummary.Text = "Summarize Kgw"
+                        btnSummary.Width += 25
+                        btnSummary.Left = btnAnalyse.Right + 4
+                        btnFallPlot.Left = lblFallD.Left - 5 - btnFallPlot.Width
+                        btnAnalyse.Enabled = False
+                        btnSummary.Enabled = False
+                        lstRecessSegments.Enabled = False
+                        panRiseParam.Visible = False
+                    Case WTFAnalysis.FindRecharge
+                        btnAnalyse.Visible = False
+                        btnSummary.Visible = False
+                        lblFallD.Visible = False
+                        txtFallD.Visible = False
+                        lblRecessionDays.Visible = True
+                        lblRecessionDays.Text = "Specify minimum recharge duration in days"
+                        txtMinRecessionDays.Visible = True
+                        txtMinRecessionDays.Text = "10"
+                        btnFallPlot.Text = "Plot Rises"
+                        panRiseParam.Visible = True
+                        txtPeakAheadDays.Text = "14"
+                        txtPeakRisePct.Text = "75"
+                End Select
+            ElseIf lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
+                panRiseParam.Visible = False
                 Dim lTuStr As String = "Daily"
                 Dim location As String = ""
                 Dim lStaNam As String = ""
@@ -239,19 +271,20 @@ Public Class frmRecess
                 txtDataInfo.Text = lDataTypeStr
 
                 SwitchSeasonControls(True)
-                panelRiseFall.Visible = False
                 btnFallPlot.Visible = False
+                lblFallD.Visible = False
+                txtFallD.Visible = False
             End If
         End If
         '...FALL...
     End Sub
 
     Public Sub SetFindingRises(ByVal aRise As Boolean)
-        If aRise Then
-            rdoGWRise.Checked = True
-        Else
-            rdoGWFall.Checked = True
-        End If
+        'If aRise Then
+        '    rdoGWRise.Checked = True
+        'Else
+        '    rdoGWFall.Checked = True
+        'End If
     End Sub
 
     Private Sub SwitchSeasonControls(ByVal aOn As Boolean)
@@ -1213,7 +1246,9 @@ Public Class frmRecess
             'If lSeg.IsExcluded Then Continue For
 
             listPP = New PointPairList()
-            If lSeg.NeedtoReadData Then lSeg.GetData()
+            'If lSeg.NeedtoReadData Then
+            lSeg.GetData()
+            'End If
             For I As Integer = 1 To lSeg.Flow.Length - 1
                 listPP.Add(I, lSeg.Flow(I))
             Next
@@ -1349,6 +1384,8 @@ Public Class frmRecess
         If pDataGroup IsNot Nothing Then
             'pDataGroup.Clear()
             'pDataGroup = Nothing
+            pDataGroup(0).Attributes.SetValue("FallD", pFall.FallD)
+            pDataGroup(0).Attributes.SetValue("FallKgw", pFall.RecessionIndex)
         End If
     End Sub
 
@@ -1366,7 +1403,7 @@ Public Class frmRecess
         End If
         If ConfigurationChanged() OrElse lParametersAreSet Then
             Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
-            If lCons = "Streamflow" OrElse lCons = "FLOW" Then
+            If lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
                 'Dim lArgs As New atcDataAttributes
                 'Reset all listing/graphs when redo
                 txtAnalysisResults.Text = ""
@@ -1399,7 +1436,7 @@ Public Class frmRecess
                     RefreshGraphRecess(pGraphRecessDatagroup)
                 End If
                 lConfigurationGood = True
-            ElseIf pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
+            ElseIf lCons.ToUpper() = "GW LEVEL" Then
                 lConfigurationGood = GetAllSegmentsGW()
             End If
         End If
@@ -1431,19 +1468,40 @@ Public Class frmRecess
         'pRecess = New clsRecess()
         'only apply a datum for GWL data
 
-        If pDataGroup(0).Attributes.GetValue("parm_cd") = "72019" OrElse pDataGroup(0).Attributes.GetValue("parm_cd") = "61055" Then
+        Dim lGWLTser As atcTimeseries = pDataGroup(0)
+        Dim lParamCd As String = lGWLTser.Attributes.GetValue("parm_cd")
+        If lParamCd = "72019" OrElse lParamCd = "61055" Then
             pFall.DataType = 1
             Dim lElev As Double = pDataGroup(0).Attributes.GetValue("Elevation", 1000.0) 'this is the ground elevation at the well
             'pLastRunConfigs.Add("ApplyDatum", True) 'only apply datum for depth to water GWL
             'pLastRunConfigs.Add("Datum", lElev)
             pFall.ApplyDatum = True
             pFall.Datum = lElev
+            'Convert to elevation data
+            lGWLTser = pDataGroup(0).Clone()
+            For I As Integer = 1 To lGWLTser.numValues
+                lGWLTser.Value(I) = lElev - lGWLTser.Value(I)
+            Next
         Else
             pFall.DataType = 2
         End If
-        pFall.Initialize(pDataGroup(0), pLastRunConfigs)
+        pFall.Initialize(lGWLTser, pLastRunConfigs)
 
-        pFall.RecessGetAllSegments(pLastRunConfigs.GetValue("GWFall", True))
+        'Dim lFindingFallSegment As Boolean = pLastRunConfigs.GetValue("GWFall", True)
+        Select Case pFall.Phase
+            Case WTFAnalysis.FindRecession
+                pFall.RecessGetAllSegments()
+            Case WTFAnalysis.FindRecharge
+                Dim lPeakAheadDays As Integer = pLastRunConfigs.GetValue("PeakAheadDays", 14)
+                Dim lPeakRisePct As Double = pLastRunConfigs.GetValue("PeakRisePct", 0.75)
+                If lPeakRisePct > 1 And lPeakRisePct <= 100 Then
+                    lPeakRisePct /= 100
+                End If
+                pFall.PeakAheadDays = lPeakAheadDays
+                pFall.PeakRisePct = lPeakRisePct
+                pFall.RiseGetAllSegments()
+        End Select
+
         lstRecessSegments.Items.Clear()
         For Each lPeakDate As String In pFall.listOfSegments.Keys
             lstRecessSegments.Items.Add(lPeakDate)
@@ -1493,8 +1551,34 @@ Public Class frmRecess
 
         If Not IO.Directory.Exists(txtOutputDir.Text) Then lErrMsg &= "- Output directory doesn't exist" & vbCrLf
 
+        Dim lcons As String = pDataGroup(0).Attributes.GetValue("Constituent")
+
         Dim lMinRecLength As Integer = 0
-        If Not Integer.TryParse(txtMinRecessionDays.Text.Trim, lMinRecLength) Then lErrMsg &= "- Min Recession Limb Length not set" & vbCrLf
+        If Not Integer.TryParse(txtMinRecessionDays.Text.Trim, lMinRecLength) Then
+            If lcons.ToUpper() = "GW LEVEL" OrElse lcons.ToUpper() = "GWLEVEL" Then
+                If pFall.Phase = WTFAnalysis.FindRecharge Then
+                    lErrMsg &= "- Minimum Recharge Duration (days) not set" & vbCrLf
+                End If
+            Else
+                lErrMsg &= "- Min Recession Limb Length not set" & vbCrLf
+            End If
+        End If
+
+        If lcons.ToUpper() = "GW LEVEL" OrElse lcons.ToUpper() = "GWLEVEL" Then
+            If pFall.Phase = WTFAnalysis.FindRecharge Then
+                Dim lPeakaheaddays As Integer = 0
+                If Not Integer.TryParse(txtPeakAheadDays.Text, lPeakaheaddays) Then
+                    lErrMsg &= "- Peak Ahead Days is not set (Find recharge events)" & vbCrLf
+                End If
+                Dim lPeakRisePct As Double = 0
+                If Not Double.TryParse(txtPeakRisePct.Text, lPeakRisePct) Then
+                    lErrMsg &= "- Peak Rise Percent is not set (Find recharge events)" & vbCrLf
+                End If
+                If lPeakRisePct < 50 Or lPeakRisePct > 100 Then
+                    lErrMsg &= "- Peak Rise Percent is out of range (50 ~ 100%) (Find recharge events)" & vbCrLf
+                End If
+            End If
+        End If
 
         Dim lMonths As New ArrayList()
         If lstMonths.SelectedItems.Count > 0 Then
@@ -1519,10 +1603,14 @@ Public Class frmRecess
 
             '...FALL...
             If pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
-                If rdoGWFall.Checked Then
-                    Args.SetValue("GWFall", True)
-                ElseIf rdoGWRise.Checked Then
-                    Args.SetValue("GWFall", False)
+                '    If rdoGWFall.Checked Then
+                '        Args.SetValue("GWFall", True)
+                '    ElseIf rdoGWRise.Checked Then
+                '        Args.SetValue("GWFall", False)
+                '    End If
+                If pFall.Phase = WTFAnalysis.FindRecharge Then
+                    Args.SetValue("PeakAheadDays", Integer.Parse(txtPeakAheadDays.Text.Trim()))
+                    Args.SetValue("PeakRisePct", Double.Parse(txtPeakRisePct.Text.Trim()))
                 End If
             End If
             '...FALL...
@@ -1639,9 +1727,9 @@ Public Class frmRecess
             'run for the first time
             'record the selection
             For Each lItem As String In lstRecessSegments.CheckedItems
-                If lCons = "Streamflow" OrElse lCons = "FLOW" Then
+                If lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
                     lSeg = pRecess.listOfSegments.ItemByKey(lItem)
-                ElseIf lCons = "GW LEVEL" Then
+                ElseIf lCons.ToUpper() = "GW LEVEL" Then
                     lSeg = pFall.listOfSegments.ItemByKey(lItem)
                 End If
 
@@ -1823,11 +1911,11 @@ Public Class frmRecess
 
         pZgc.Visible = False
         Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
-        If lCons = "Streamflow" OrElse lCons = "FLOW" Then
+        If lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
             pRecess.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
             lSegs = pRecess.Table.Split(vbCrLf)
             pGraphRecessDatagroup.Add(pRecess.GraphTs)
-        ElseIf lCons = "GW LEVEL" Then
+        ElseIf lCons.ToUpper() = "GW LEVEL" Then
             pFall.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
             lSegs = pFall.Table.Split(vbCrLf)
             pGraphRecessDatagroup.Add(pFall.GraphTs)
@@ -1857,7 +1945,13 @@ Public Class frmRecess
         Dim lResponse As String = Logger.MsgCustomOwned("Set '" & lDayOrdinal & "' as first or last day of this recession segment?", _
                                                         lMsgTitle, Me, lFirstLastCancel)
         If lResponse <> "Cancel" Then
-            Dim lRecSeg As clsRecessionSegment = pRecess.listOfSegments.ItemByKey(lstRecessSegments.SelectedItem.ToString)
+            Dim lRecSeg As clsRecessionSegment = Nothing
+            Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
+            If lCons.ToUpper() = "GW LEVEL" Then
+                lRecSeg = pFall.listOfSegments.ItemByKey(lstRecessSegments.SelectedItem.ToString)
+            ElseIf lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
+                lRecSeg = pRecess.listOfSegments.ItemByKey(lstRecessSegments.SelectedItem.ToString)
+            End If
             If lRecSeg IsNot Nothing Then
                 Dim lOriginalMinDayOrdinal As Integer = lRecSeg.MinDayOrdinal
                 Dim lOriginalMaxDayOrdinal As Integer = lRecSeg.MaxDayOrdinal
@@ -2056,18 +2150,6 @@ Public Class frmRecess
         GraphFallCurves()
     End Sub
 
-    Private Sub rdoGWRise_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoGWRise.CheckedChanged, rdoGWFall.CheckedChanged
-        If rdoGWRise.Checked Then
-            btnAnalyse.Enabled = False
-            btnSummary.Enabled = False
-            'btnCurv.Enabled = False 'disabled for GWL data
-        ElseIf rdoGWFall.Checked Then
-            btnAnalyse.Enabled = True
-            btnSummary.Enabled = True
-            'btnCurv.Enabled = True 'disabled for GWL data
-        End If
-    End Sub
-
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
     End Sub
@@ -2075,6 +2157,41 @@ Public Class frmRecess
     Private Sub frmRecess_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
+        End If
+    End Sub
+
+    Private Sub txtFallD_Validated(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtFallD.Validated
+        Try
+            Dim lFallD As Double = Double.Parse(txtFallD.Text.Trim())
+            pFall.FallD(True) = lFallD
+        Catch ex As Exception
+
+        End Try
+        txtFallD.BackColor = Drawing.Color.White
+        btnAnalyse.Enabled = True
+        btnSummary.Enabled = True
+        lstRecessSegments.Enabled = True
+    End Sub
+
+    Private Sub txtFallD_Validating(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txtFallD.Validating
+        If Not pLoaded Then Exit Sub
+        Dim lFallD As Double
+        If Double.TryParse(txtFallD.Text, lFallD) Then
+            Try
+                pFall.FallD = lFallD
+                e.Cancel = False
+            Catch ex As Exception
+                Logger.Msg(ex.Message, Microsoft.VisualBasic.MsgBoxStyle.Exclamation, "GWL Recession")
+                txtFallD.BackColor = Drawing.Color.Red
+                btnAnalyse.Enabled = False
+                btnSummary.Enabled = False
+                lstRecessSegments.Enabled = False
+                e.Cancel = True
+                Exit Sub
+            End Try
+        Else
+            txtFallD.BackColor = Drawing.Color.Red
+            e.Cancel = True
         End If
     End Sub
 End Class
