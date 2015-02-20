@@ -116,7 +116,7 @@ Public Class clsRecessionSegment
         Recharges = New atcCollection() 'FALL
     End Sub
 
-    Public Sub GetData()
+    Public Sub GetData(Optional ByVal aSetGWPPElev As Boolean = False, Optional ByVal aPPElev As Double = Double.NaN)
         ReDim Flow(SegmentLength)
         ReDim QLog(SegmentLength)
         ReDim Dates(SegmentLength)
@@ -126,15 +126,32 @@ Public Class clsRecessionSegment
             QLog(I) = -99.9
         Next 'loop 215
 
+        Dim lUseNaturalLog As Boolean = False
+        Dim lDataType As String = StreamFlowTS.Attributes.GetValue("Constituent")
+        If lDataType.ToUpper() = "GW LEVEL" Then
+            lUseNaturalLog = True
+        End If
         For I As Integer = 1 To SegmentLength 'loop 220
             Flow(I) = StreamFlowTS.Value(I + PeakDayIndex)
+            If aSetGWPPElev AndAlso Not Double.IsNaN(aPPElev) Then
+                Flow(I) -= aPPElev
+            End If
+
             If Flow(I) = 0.0 Then
                 QLog(I) = -88.8
             Else
                 If Flow(I) > 0 Then
-                    QLog(I) = Math.Log10(Flow(I))
+                    If lUseNaturalLog Then
+                        QLog(I) = Math.Log(Flow(I))
+                    Else
+                        QLog(I) = Math.Log10(Flow(I))
+                    End If
                 Else
-                    QLog(I) = Math.Log10(Flow(I) * -1) 'Actually, might need to raise objection in the interface for this
+                    If lUseNaturalLog Then
+                        QLog(I) = Math.Log(Flow(I) * -1)
+                    Else
+                        QLog(I) = Math.Log10(Flow(I) * -1) 'Actually, might need to raise objection in the interface for this
+                    End If
                 End If
             End If
             Dates(I) = StreamFlowTS.Dates.Value(I + PeakDayIndex - 1)
@@ -142,6 +159,37 @@ Public Class clsRecessionSegment
         NeedtoReadData = False
     End Sub
 
+    Public Sub SetPourpointElevation(ByVal aPPElev As Double)
+        Dim lUseNaturalLog As Boolean = False
+        Dim lDataType As String = StreamFlowTS.Attributes.GetValue("Constituent")
+        If lDataType.ToUpper() = "GW LEVEL" Then
+            lUseNaturalLog = True
+        End If
+        'if aPPElev changes, needs to first GetData, then do this routine again
+        For I As Integer = 1 To SegmentLength 'loop 220
+            Flow(I) = StreamFlowTS.Value(I + PeakDayIndex)
+            Flow(I) -= aPPElev
+            If Flow(I) = 0.0 Then
+                QLog(I) = -88.8
+            Else
+                If Flow(I) > 0 Then
+                    If lUseNaturalLog Then
+                        QLog(I) = Math.Log(Flow(I))
+                    Else
+                        QLog(I) = Math.Log10(Flow(I))
+                    End If
+
+                Else
+                    If lUseNaturalLog Then
+                        QLog(I) = Math.Log(Flow(I) * -1)
+                    Else
+                        QLog(I) = Math.Log10(Flow(I) * -1) 'Actually, might need to raise objection in the interface for this
+                    End If
+                End If
+            End If
+            Dates(I) = StreamFlowTS.Dates.Value(I + PeakDayIndex - 1)
+        Next 'loop 220
+    End Sub
     Public Sub GetDataSubset()
         If MinDayOrdinal = MaxDayOrdinal AndAlso MaxDayOrdinal = 0 Then
             Exit Sub
