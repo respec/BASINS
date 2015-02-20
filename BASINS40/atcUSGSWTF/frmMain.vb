@@ -78,119 +78,75 @@ Public Class frmMain
         End Select
 
         'Dim lResponse As MsgBoxResult = MsgBox("User Specify Parameters?", MsgBoxStyle.YesNoCancel, "Parameters for Estimating Ant. GWL")
-        If rdoAntMethodFall.Checked Then
-            If pWTF Is Nothing Then
-                pWTF = New clsWTFFall()
-            ElseIf Not pWTF.GetType.FullName.ToLower.Contains("fall") Then
-                pWTF.Clear()
-                pWTF = Nothing
-                pWTF = New clsWTFFall()
-            End If
-            'If lResponse = MsgBoxResult.Yes Then
-            '    If FfrmParam Is Nothing OrElse FfrmParam.IsDisposed Then
-            '        FfrmParam = New frmParams()
-            '    End If
-            '    pWTFAttributes.SetValue("FallD", CType(pWTF, clsWTFFall).GWLAsymptote)
-            '    pWTFAttributes.SetValue("FallKgw", CType(pWTF, clsWTFFall).KGWL)
-            '    FfrmParam.Initialize(AntecedentGWLMethod.FALL, pWTFAttributes)
-            'ElseIf lResponse = MsgBoxResult.No Then
-            '    Dim lfrmFall As New frmRecess()
-            '    lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj) 'here you have to write it on a piece of paper
-            'End If
-            Dim lfrmFall As New frmRecess()
-            'lfrmFall.SetFindingRises(False)
-            FallObj = New clsFall()
-            FallObj.Phase = WTFAnalysis.FindRecession
-            lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj) 'here you have to write it on a piece of paper
-        ElseIf rdoAntMethodLinear.Checked Then
-            'If pWTF Is Nothing Then
-            '    pWTF = New clsWTFLinear()
-            'ElseIf Not pWTF.GetType.FullName.ToLower.Contains("linear") Then
-            '    pWTF.Clear()
-            '    pWTF = Nothing
-            '    pWTF = New clsWTFLinear()
-            'End If
-            'If lResponse = MsgBoxResult.Yes Then
-            '    If FfrmParam Is Nothing OrElse FfrmParam.IsDisposed Then
-            '        FfrmParam = New frmParams()
-            '    End If
-            '    pWTFAttributes.SetValue("LinearA", CType(pWTF, clsWTFLinear).LinearSlope)
-            '    pWTFAttributes.SetValue("LinearB", CType(pWTF, clsWTFLinear).LinearIntercept)
-            '    FfrmParam.Initialize(AntecedentGWLMethod.Linear, pWTFAttributes)
-            'ElseIf lResponse = MsgBoxResult.No Then
-            '    Dim lfrmFall As New frmRecess()
-            '    lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj, True)
-            '    pWTF.EstimateParameters(FallObj)
-            'End If
-        ElseIf rdoAntMethodPower.Checked Then
-            'If pWTF Is Nothing Then
-            '    pWTF = New clsWTFPower()
-            'ElseIf Not pWTF.GetType.FullName.ToLower.Contains("power") Then
-            '    pWTF.Clear()
-            '    pWTF = Nothing
-            '    pWTF = New clsWTFPower()
-            'End If
-            'If lResponse = MsgBoxResult.Yes Then
-            '    If FfrmParam Is Nothing OrElse FfrmParam.IsDisposed Then
-            '        FfrmParam = New frmParams()
-            '    End If
-            '    pWTFAttributes.SetValue("PowerCIntercept", CType(pWTF, clsWTFPower).ParamCIntercept)
-            '    pWTFAttributes.SetValue("PowerDMultiplier", CType(pWTF, clsWTFPower).ParamDMultiplier)
-            '    pWTFAttributes.SetValue("PowerEDatum", CType(pWTF, clsWTFPower).ParamEDatum)
-            '    pWTFAttributes.SetValue("PowerFExp", CType(pWTF, clsWTFPower).ParamFExp)
-
-            '    FfrmParam.Initialize(AntecedentGWLMethod.Power, pWTFAttributes)
-
-            'ElseIf lResponse = MsgBoxResult.No Then
-            '    'Dim lfrmFall As New frmRecess()
-            '    'lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj, True)
-            '    'pWTF.EstimateParameters(FallObj)
-            'End If
+        'If rdoAntMethodFall.Checked Then
+        If pWTF Is Nothing Then
+            pWTF = New clsWTFFall()
+        ElseIf Not pWTF.GetType.FullName.ToLower.Contains("fall") Then
+            pWTF.Clear()
+            pWTF = Nothing
+            pWTF = New clsWTFFall()
         End If
-    End Sub
+        'If lResponse = MsgBoxResult.Yes Then
+        '    If FfrmParam Is Nothing OrElse FfrmParam.IsDisposed Then
+        '        FfrmParam = New frmParams()
+        '    End If
+        '    pWTFAttributes.SetValue("FallD", CType(pWTF, clsWTFFall).GWLAsymptote)
+        '    pWTFAttributes.SetValue("FallKgw", CType(pWTF, clsWTFFall).KGWL)
+        '    FfrmParam.Initialize(AntecedentGWLMethod.FALL, pWTFAttributes)
+        'ElseIf lResponse = MsgBoxResult.No Then
+        '    Dim lfrmFall As New frmRecess()
+        '    lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj)
+        'End If
+        Dim lfrmFall As New frmRecess()
+        'lfrmFall.SetFindingRises(False)
+        FallObj = New clsFall()
+        FallObj.Phase = WTFAnalysis.FindRecession
+        lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj)
+        'ElseIf rdoAntMethodLinear.Checked Then
+        '    If pWTF Is Nothing Then
+        '        pWTF = New clsWTFLinear()
+        '    ElseIf Not pWTF.GetType.FullName.ToLower.Contains("linear") Then
+        '        pWTF.Clear()
+        '        pWTF = Nothing
+        '        pWTF = New clsWTFLinear()
+        '    End If
+        '    If lResponse = MsgBoxResult.Yes Then
+        '        If FfrmParam Is Nothing OrElse FfrmParam.IsDisposed Then
+        '            FfrmParam = New frmParams()
+        '        End If
+        '        pWTFAttributes.SetValue("LinearA", CType(pWTF, clsWTFLinear).LinearSlope)
+        '        pWTFAttributes.SetValue("LinearB", CType(pWTF, clsWTFLinear).LinearIntercept)
+        '        FfrmParam.Initialize(AntecedentGWLMethod.Linear, pWTFAttributes)
+        '    ElseIf lResponse = MsgBoxResult.No Then
+        '        Dim lfrmFall As New frmRecess()
+        '        lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj, True)
+        '        pWTF.EstimateParameters(FallObj)
+        '    End If
+        'ElseIf rdoAntMethodPower.Checked Then
+        '    If pWTF Is Nothing Then
+        '        pWTF = New clsWTFPower()
+        '    ElseIf Not pWTF.GetType.FullName.ToLower.Contains("power") Then
+        '        pWTF.Clear()
+        '        pWTF = Nothing
+        '        pWTF = New clsWTFPower()
+        '    End If
+        '    If lResponse = MsgBoxResult.Yes Then
+        '        If FfrmParam Is Nothing OrElse FfrmParam.IsDisposed Then
+        '            FfrmParam = New frmParams()
+        '        End If
+        '        pWTFAttributes.SetValue("PowerCIntercept", CType(pWTF, clsWTFPower).ParamCIntercept)
+        '        pWTFAttributes.SetValue("PowerDMultiplier", CType(pWTF, clsWTFPower).ParamDMultiplier)
+        '        pWTFAttributes.SetValue("PowerEDatum", CType(pWTF, clsWTFPower).ParamEDatum)
+        '        pWTFAttributes.SetValue("PowerFExp", CType(pWTF, clsWTFPower).ParamFExp)
 
-    Private Sub ParameterChanged(ByVal aArgs As atcDataAttributes) Handles FfrmParam.ParameterChanged
-        If rdoAntMethodFall.Checked Then
-            With CType(pWTF, clsWTFFall)
-                Dim lV1 As Double
-                If Not Double.IsNaN(aArgs.GetValue("FallD")) AndAlso Double.TryParse(aArgs.GetValue("FallD"), lV1) AndAlso _
-                   Not Double.IsNaN(aArgs.GetValue("FallKgw")) AndAlso Double.TryParse(aArgs.GetValue("FallKgw"), lV1) Then
-                    .GWLAsymptote = aArgs.GetValue("FallD")
-                    .KGWL = aArgs.GetValue("FallKgw")
-                    .ParametersSet = True
-                Else
-                    .ParametersSet = False
-                End If
-            End With
-        ElseIf rdoAntMethodLinear.Checked Then
-            With CType(pWTF, clsWTFLinear)
-                Dim lV1 As Double
-                If Not Double.IsNaN(aArgs.GetValue("LinearA")) AndAlso Double.TryParse(aArgs.GetValue("LinearA"), lV1) AndAlso _
-                   Not Double.IsNaN(aArgs.GetValue("LinearB")) AndAlso Double.TryParse(aArgs.GetValue("LinearB"), lV1) Then
-                    .LinearSlope = aArgs.GetValue("LinearA")
-                    .LinearIntercept = aArgs.GetValue("LinearB")
-                    CType(pWTF, clsWTFLinear).ParametersSet = True
-                Else
-                    CType(pWTF, clsWTFLinear).ParametersSet = False
-                End If
-            End With
-        ElseIf rdoAntMethodPower.Checked Then
-            With CType(pWTF, clsWTFPower)
-                Dim lV1 As Double
-                If Not Double.IsNaN(aArgs.GetValue("PowerCIntercept")) AndAlso Double.TryParse(aArgs.GetValue("PowerCIntercept"), lV1) AndAlso _
-                   Not Double.IsNaN(aArgs.GetValue("PowerDMultiplier")) AndAlso Double.TryParse(aArgs.GetValue("PowerDMultiplier"), lV1) AndAlso _
-                   Not Double.IsNaN(aArgs.GetValue("PowerEDatum")) AndAlso Double.TryParse(aArgs.GetValue("PowerEDatum"), lV1) AndAlso _
-                   Not Double.IsNaN(aArgs.GetValue("PowerFExp")) AndAlso Double.TryParse(aArgs.GetValue("PowerFExp"), lV1) Then
-                    .ParamCIntercept = aArgs.GetValue("PowerCIntercept")
-                    .ParamDMultiplier = aArgs.GetValue("PowerDMultiplier")
-                    .ParamEDatum = aArgs.GetValue("PowerEDatum")
-                    .ParamFExp = aArgs.GetValue("PowerFExp")
-                    CType(pWTF, clsWTFPower).ParametersSet = True
-                Else
-                    CType(pWTF, clsWTFPower).ParametersSet = False
-                End If
-            End With
-        End If
+        '        FfrmParam.Initialize(AntecedentGWLMethod.Power, pWTFAttributes)
+
+        '    ElseIf lResponse = MsgBoxResult.No Then
+        '        'Dim lfrmFall As New frmRecess()
+        '        'lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj, True)
+        '        'pWTF.EstimateParameters(FallObj)
+        '    End If
+        'End If
     End Sub
 
     Private Sub btnCalcRecharge_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFindRechargeEvents.Click
@@ -311,8 +267,8 @@ Public Class frmMain
                                   .HzeroDayValue & lDelim)
                 Dim lIndexOfHpeak As Double = .PeakDayIndex + .Flow.Length - 1
                 pGraphTsHPeak.Value(lIndexOfHpeak) = lGWLpeak
-                If .AntecedentGWLs.Keys.Contains(AntecedentGWLMethod.FALL) Then
-                    Dim lH2 As Double = Math.Round(.AntecedentGWLs.ItemByKey(AntecedentGWLMethod.FALL), 3)
+                If .AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.FALL) Then
+                    Dim lH2 As Double = Math.Round(.AntecedentGWLMethods.ItemByKey(AntecedentGWLMethod.FALL), 3)
                     lWTFOutput.Append(lH2 & lDelim & Math.Round(lGWLpeak - lH2, 3))
 
                     'Construct proper timeseries
@@ -337,8 +293,8 @@ Public Class frmMain
                     End If
                     lHasFall = True
                 End If
-                If .AntecedentGWLs.Keys.Contains(AntecedentGWLMethod.Linear) Then
-                    Dim lH2 As Double = .AntecedentGWLs.ItemByKey(AntecedentGWLMethod.Linear)
+                If .AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.Linear) Then
+                    Dim lH2 As Double = .AntecedentGWLMethods.ItemByKey(AntecedentGWLMethod.Linear)
                     lWTFOutput.Append(lH2 & lDelim & lGWLpeak - lH2)
 
                     'Construct proper timeseries
@@ -363,8 +319,8 @@ Public Class frmMain
                     End If
                     lHasLinear = True
                 End If
-                If .AntecedentGWLs.Keys.Contains(AntecedentGWLMethod.Power) Then
-                    Dim lH2 As Double = .AntecedentGWLs.ItemByKey(AntecedentGWLMethod.Power)
+                If .AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.Power) Then
+                    Dim lH2 As Double = .AntecedentGWLMethods.ItemByKey(AntecedentGWLMethod.Power)
                     lWTFOutput.Append(lH2 & lDelim & lGWLpeak - lH2)
 
                     'Construct proper timeseries
@@ -627,11 +583,4 @@ Public Class frmMain
                 End If
         End Select
     End Function
-
-    Private Sub txtSy_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtSy.TextChanged
-        Dim lV As Double
-        If Not Double.IsNaN(txtSy.Text) AndAlso Double.TryParse(txtSy.Text, lV) Then
-            pWTF.SpecificYield = lV
-        End If
-    End Sub
 End Class

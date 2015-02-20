@@ -440,13 +440,25 @@ Public Class clsFall
                     '.GetData() get data later to save memory
 
                     If Phase = WTFAnalysis.FindRecharge Then 'Not aFall
-                        Dim lH0Index As Integer = IndexPeakDay - 1
-                        While FlowData.Value(lH0Index) <= FlowData.Value(IndexPeakDay)
+                        'might not need to do this here as user might change 
+                        'the begining of a rising limb
+                        Dim lH0Index As Integer = IndexPeakDay
+                        Dim lGapVal As Double = lTsGaps.Value(IndexPeakDay)
+                        While True
                             If lH0Index <= 1 Then
                                 Exit While
                             End If
-                            lH0Index -= 1
+                            If Not Double.IsNaN(lGapVal) AndAlso lGapVal > 0 Then
+                                lH0Index -= 1
+                                lGapVal = lTsGaps.Value(lH0Index)
+                            Else
+                                lH0Index += 1
+                                Exit While
+                            End If
                         End While
+                        If lH0Index > IndexPeakDay Then
+                            lH0Index = IndexPeakDay
+                        End If
                         .HzeroDayIndex = lH0Index
                         .HzeroDayDate = FlowData.Dates.Value(lH0Index - 1)
                         .HzeroDayValue = FlowData.Value(lH0Index)

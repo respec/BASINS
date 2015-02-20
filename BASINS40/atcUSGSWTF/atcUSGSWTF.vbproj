@@ -96,6 +96,12 @@
     <Compile Include="clsWTFFall.vb" />
     <Compile Include="clsWTFLinear.vb" />
     <Compile Include="clsWTFPower.vb" />
+    <Compile Include="frmEstRecharge.Designer.vb">
+      <DependentUpon>frmEstRecharge.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmEstRecharge.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmParams.Designer.vb">
       <DependentUpon>frmParams.vb</DependentUpon>
     </Compile>
@@ -125,6 +131,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmEstRecharge.resx">
+      <DependentUpon>frmEstRecharge.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmParams.resx">
       <DependentUpon>frmParams.vb</DependentUpon>
     </EmbeddedResource>

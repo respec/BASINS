@@ -14,7 +14,7 @@ Public Class clsRecessionSegment
     Public HzeroDayDate As Double
     Public HzeroDayValue As Double
     Public Recharges As atcCollection
-    Public AntecedentGWLs As atcCollection 'This is a collection in the form of ant.Method vs H2
+    Public AntecedentGWLMethods As atcCollection 'This is a collection in the form of ant.Method vs H2
     '...FALL...
 
     Public PeakDayIndex As Integer
@@ -112,7 +112,7 @@ Public Class clsRecessionSegment
         'ReDim Flow(MaxSegmentLengthInDays)
         'ReDim QLog(MaxSegmentLengthInDays)
         'ReDim Dates(MaxSegmentLengthInDays)
-        AntecedentGWLs = New atcCollection() 'FALL
+        AntecedentGWLMethods = New atcCollection() 'FALL
         Recharges = New atcCollection() 'FALL
     End Sub
 

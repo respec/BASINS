@@ -28,23 +28,23 @@ Partial Class frmParams
         Me.Label2 = New System.Windows.Forms.Label
         Me.txtFallKgw = New System.Windows.Forms.TextBox
         Me.gbFall = New System.Windows.Forms.GroupBox
-        Me.gbLinear = New System.Windows.Forms.GroupBox
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.txtLinearA = New System.Windows.Forms.TextBox
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.txtLinearB = New System.Windows.Forms.TextBox
-        Me.gbPower = New System.Windows.Forms.GroupBox
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.txtPowerIntercept = New System.Windows.Forms.TextBox
-        Me.Label6 = New System.Windows.Forms.Label
-        Me.txtPowerMultiplier = New System.Windows.Forms.TextBox
-        Me.Label7 = New System.Windows.Forms.Label
-        Me.txtPowerDatum = New System.Windows.Forms.TextBox
-        Me.txtPowerExp = New System.Windows.Forms.TextBox
-        Me.Label8 = New System.Windows.Forms.Label
-        Me.Label9 = New System.Windows.Forms.Label
-        Me.Label10 = New System.Windows.Forms.Label
         Me.Label11 = New System.Windows.Forms.Label
+        Me.gbLinear = New System.Windows.Forms.GroupBox
+        Me.Label10 = New System.Windows.Forms.Label
+        Me.txtLinearB = New System.Windows.Forms.TextBox
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.txtLinearA = New System.Windows.Forms.TextBox
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.gbPower = New System.Windows.Forms.GroupBox
+        Me.Label9 = New System.Windows.Forms.Label
+        Me.Label8 = New System.Windows.Forms.Label
+        Me.txtPowerExp = New System.Windows.Forms.TextBox
+        Me.txtPowerDatum = New System.Windows.Forms.TextBox
+        Me.Label7 = New System.Windows.Forms.Label
+        Me.txtPowerMultiplier = New System.Windows.Forms.TextBox
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.txtPowerIntercept = New System.Windows.Forms.TextBox
+        Me.Label5 = New System.Windows.Forms.Label
         Me.gbFall.SuspendLayout()
         Me.gbLinear.SuspendLayout()
         Me.gbPower.SuspendLayout()
@@ -96,6 +96,16 @@ Partial Class frmParams
         Me.gbFall.TabStop = False
         Me.gbFall.Text = "Semi-log Equation Parameters"
         '
+        'Label11
+        '
+        Me.Label11.AutoSize = True
+        Me.Label11.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.Label11.Location = New System.Drawing.Point(6, 16)
+        Me.Label11.Name = "Label11"
+        Me.Label11.Size = New System.Drawing.Size(192, 15)
+        Me.Label11.TabIndex = 9
+        Me.Label11.Text = "Ant.GWL = (H0 - d)^(Kgw(Tp - T0)) + d"
+        '
         'gbLinear
         '
         Me.gbLinear.Controls.Add(Me.Label10)
@@ -110,21 +120,22 @@ Partial Class frmParams
         Me.gbLinear.TabStop = False
         Me.gbLinear.Text = "Linear Model Parameters"
         '
-        'Label3
+        'Label10
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(6, 42)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(114, 13)
-        Me.Label3.TabIndex = 0
-        Me.Label3.Text = "Rate Decline Slope, a:"
+        Me.Label10.AutoSize = True
+        Me.Label10.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.Label10.Location = New System.Drawing.Point(6, 16)
+        Me.Label10.Name = "Label10"
+        Me.Label10.Size = New System.Drawing.Size(176, 15)
+        Me.Label10.TabIndex = 9
+        Me.Label10.Text = "Decline rate = dZwt/dt = a(Zwt) + b"
         '
-        'txtLinearA
+        'txtLinearB
         '
-        Me.txtLinearA.Location = New System.Drawing.Point(6, 58)
-        Me.txtLinearA.Name = "txtLinearA"
-        Me.txtLinearA.Size = New System.Drawing.Size(232, 20)
-        Me.txtLinearA.TabIndex = 1
+        Me.txtLinearB.Location = New System.Drawing.Point(5, 108)
+        Me.txtLinearB.Name = "txtLinearB"
+        Me.txtLinearB.Size = New System.Drawing.Size(232, 20)
+        Me.txtLinearB.TabIndex = 3
         '
         'Label4
         '
@@ -135,12 +146,21 @@ Partial Class frmParams
         Me.Label4.TabIndex = 2
         Me.Label4.Text = "Rate Decline Intercept, b:"
         '
-        'txtLinearB
+        'txtLinearA
         '
-        Me.txtLinearB.Location = New System.Drawing.Point(5, 108)
-        Me.txtLinearB.Name = "txtLinearB"
-        Me.txtLinearB.Size = New System.Drawing.Size(232, 20)
-        Me.txtLinearB.TabIndex = 3
+        Me.txtLinearA.Location = New System.Drawing.Point(6, 58)
+        Me.txtLinearA.Name = "txtLinearA"
+        Me.txtLinearA.Size = New System.Drawing.Size(232, 20)
+        Me.txtLinearA.TabIndex = 1
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(6, 42)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(114, 13)
+        Me.Label3.TabIndex = 0
+        Me.Label3.Text = "Rate Decline Slope, a:"
         '
         'gbPower
         '
@@ -160,70 +180,6 @@ Partial Class frmParams
         Me.gbPower.TabStop = False
         Me.gbPower.Text = "Power Model Parameters"
         '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(6, 45)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(64, 13)
-        Me.Label5.TabIndex = 0
-        Me.Label5.Text = "Intercept, c:"
-        '
-        'txtPowerIntercept
-        '
-        Me.txtPowerIntercept.Location = New System.Drawing.Point(90, 42)
-        Me.txtPowerIntercept.Name = "txtPowerIntercept"
-        Me.txtPowerIntercept.Size = New System.Drawing.Size(148, 20)
-        Me.txtPowerIntercept.TabIndex = 1
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(6, 71)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(63, 13)
-        Me.Label6.TabIndex = 2
-        Me.Label6.Text = "Multiplier, d:"
-        '
-        'txtPowerMultiplier
-        '
-        Me.txtPowerMultiplier.Location = New System.Drawing.Point(90, 68)
-        Me.txtPowerMultiplier.Name = "txtPowerMultiplier"
-        Me.txtPowerMultiplier.Size = New System.Drawing.Size(148, 20)
-        Me.txtPowerMultiplier.TabIndex = 3
-        '
-        'Label7
-        '
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(6, 97)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(53, 13)
-        Me.Label7.TabIndex = 4
-        Me.Label7.Text = "Datum, e:"
-        '
-        'txtPowerDatum
-        '
-        Me.txtPowerDatum.Location = New System.Drawing.Point(90, 94)
-        Me.txtPowerDatum.Name = "txtPowerDatum"
-        Me.txtPowerDatum.Size = New System.Drawing.Size(148, 20)
-        Me.txtPowerDatum.TabIndex = 5
-        '
-        'txtPowerExp
-        '
-        Me.txtPowerExp.Location = New System.Drawing.Point(90, 121)
-        Me.txtPowerExp.Name = "txtPowerExp"
-        Me.txtPowerExp.Size = New System.Drawing.Size(148, 20)
-        Me.txtPowerExp.TabIndex = 6
-        '
-        'Label8
-        '
-        Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(6, 124)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(64, 13)
-        Me.Label8.TabIndex = 7
-        Me.Label8.Text = "Exponent, f:"
-        '
         'Label9
         '
         Me.Label9.AutoSize = True
@@ -234,36 +190,80 @@ Partial Class frmParams
         Me.Label9.TabIndex = 8
         Me.Label9.Text = "Decline rate = dZwt/dt = -(c + d(Zwt - e)^f)"
         '
-        'Label10
+        'Label8
         '
-        Me.Label10.AutoSize = True
-        Me.Label10.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.Label10.Location = New System.Drawing.Point(6, 16)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(176, 15)
-        Me.Label10.TabIndex = 9
-        Me.Label10.Text = "Decline rate = dZwt/dt = a(Zwt) + b"
+        Me.Label8.AutoSize = True
+        Me.Label8.Location = New System.Drawing.Point(6, 124)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(64, 13)
+        Me.Label8.TabIndex = 7
+        Me.Label8.Text = "Exponent, f:"
         '
-        'Label11
+        'txtPowerExp
         '
-        Me.Label11.AutoSize = True
-        Me.Label11.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.Label11.Location = New System.Drawing.Point(6, 16)
-        Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(192, 15)
-        Me.Label11.TabIndex = 9
-        Me.Label11.Text = "Ant.GWL = (H0 - d)^(Kgw(Tp - T0)) + d"
+        Me.txtPowerExp.Location = New System.Drawing.Point(90, 121)
+        Me.txtPowerExp.Name = "txtPowerExp"
+        Me.txtPowerExp.Size = New System.Drawing.Size(148, 20)
+        Me.txtPowerExp.TabIndex = 6
         '
-        'frmParms
+        'txtPowerDatum
+        '
+        Me.txtPowerDatum.Location = New System.Drawing.Point(90, 94)
+        Me.txtPowerDatum.Name = "txtPowerDatum"
+        Me.txtPowerDatum.Size = New System.Drawing.Size(148, 20)
+        Me.txtPowerDatum.TabIndex = 5
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(6, 97)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(53, 13)
+        Me.Label7.TabIndex = 4
+        Me.Label7.Text = "Datum, e:"
+        '
+        'txtPowerMultiplier
+        '
+        Me.txtPowerMultiplier.Location = New System.Drawing.Point(90, 68)
+        Me.txtPowerMultiplier.Name = "txtPowerMultiplier"
+        Me.txtPowerMultiplier.Size = New System.Drawing.Size(148, 20)
+        Me.txtPowerMultiplier.TabIndex = 3
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(6, 71)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(63, 13)
+        Me.Label6.TabIndex = 2
+        Me.Label6.Text = "Multiplier, d:"
+        '
+        'txtPowerIntercept
+        '
+        Me.txtPowerIntercept.Location = New System.Drawing.Point(90, 42)
+        Me.txtPowerIntercept.Name = "txtPowerIntercept"
+        Me.txtPowerIntercept.Size = New System.Drawing.Size(148, 20)
+        Me.txtPowerIntercept.TabIndex = 1
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(6, 45)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(64, 13)
+        Me.Label5.TabIndex = 0
+        Me.Label5.Text = "Intercept, c:"
+        '
+        'frmParams
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(246, 152)
+        Me.ClientSize = New System.Drawing.Size(246, 475)
         Me.Controls.Add(Me.gbPower)
         Me.Controls.Add(Me.gbLinear)
         Me.Controls.Add(Me.gbFall)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Name = "frmParms"
+        Me.Name = "frmParams"
         Me.Text = "Specify Parameters"
         Me.gbFall.ResumeLayout(False)
         Me.gbFall.PerformLayout()

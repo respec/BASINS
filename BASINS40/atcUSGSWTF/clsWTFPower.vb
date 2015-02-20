@@ -41,10 +41,10 @@ Public Class clsWTFPower
             With lSeg
                 If .Flow Is Nothing Then .ReadData()
                 Dim lAntGWL As Double = AntecedentGWL(.Flow.Length - 1, 1, .HzeroDayValue)
-                If .AntecedentGWLs.Keys.Contains(AntecedentGWLMethod.Power) Then
-                    .AntecedentGWLs.ItemByKey(AntecedentGWLMethod.Power) = lAntGWL
+                If .AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.Power) Then
+                    .AntecedentGWLMethods.ItemByKey(AntecedentGWLMethod.Power) = lAntGWL
                 Else
-                    .AntecedentGWLs.Add(AntecedentGWLMethod.Power, lAntGWL)
+                    .AntecedentGWLMethods.Add(AntecedentGWLMethod.Power, lAntGWL)
                 End If
 
                 Dim lDeltaH As Double = .Flow(.Flow.Length - 1) - lAntGWL
