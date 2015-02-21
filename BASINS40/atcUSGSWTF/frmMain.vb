@@ -173,6 +173,8 @@ Public Class frmMain
             Logger.Msg("Unable to calculate recharge.")
             Exit Sub
         End If
+        Dim lfrmEstRecharge As New frmEstRecharge()
+        lfrmEstRecharge.ShowDialog()
 
         Dim lOutputDirectory As String = IO.Path.GetDirectoryName(pDataGroup(0).Attributes.GetValue("History 1").ToString.Replace("Read from", "").Trim())
         Dim lOutputFilename As String = ""
