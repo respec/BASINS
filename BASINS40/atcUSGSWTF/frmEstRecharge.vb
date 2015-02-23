@@ -1,5 +1,6 @@
 ﻿Imports atcData
 Imports atcUtility
+Imports atcUSGSRecess
 Imports MapWinUtility
 
 Public Class frmEstRecharge
@@ -7,6 +8,11 @@ Public Class frmEstRecharge
     Private pFall As clsWTFFall
     Private pLinear As clsWTFLinear
     Private pPower As clsWTFPower
+
+    Private pRiseObj As clsFall
+    Private pBasicAttributes As Generic.List(Of String)
+    Private pDataGroup As atcTimeseriesGroup
+    Private pWTFAttributes As atcDataAttributes
 
     Public Sub New()
 
@@ -20,6 +26,11 @@ Public Class frmEstRecharge
         gbFall.Visible = False
         gbLinear.Visible = False
         gbPower.Visible = False
+    End Sub
+
+    Public Sub Initialize(ByVal aDataGroup As atcTimeseriesGroup, ByVal aRiseObj As clsFall)
+        pDataGroup = aDataGroup
+        pRiseObj = aRiseObj
     End Sub
     'Private Sub ParameterChanged(ByVal aArgs As atcDataAttributes) Handles FfrmParam.ParameterChanged
     '    If rdoAntMethodFall.Checked Then
