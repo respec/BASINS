@@ -32,10 +32,10 @@ Public Class clsWTFFall
                                   ByVal aGWLH0 As Double) As Double
 
         If ParametersSet Then
-            Dim lGWLAntecedent As Double = aGWLH0 - GWLAsymptote
+            Dim lGWLStartAboveD As Double = aGWLH0 - GWLAsymptote
             Dim lPower As Double = KGWL * (aTimePeak - aTime0)
-
-            Return Math.Pow(lGWLAntecedent, lPower) + GWLAsymptote
+            Dim lGWLAntecedent As Double = lGWLStartAboveD * Math.Pow(Math.E, lPower) + GWLAsymptote
+            Return lGWLAntecedent
         Else
             Return -99
         End If
@@ -47,7 +47,11 @@ Public Class clsWTFFall
 
         For Each lSeg As clsRecessionSegment In aRiseObj.listOfSegments
             With lSeg
-                If .Flow Is Nothing Then .ReadData()
+                If .Flow Is Nothing Then
+                    If Double.IsNaN(GWLAsymptote) Then
+                        .GetData(True, GWLAsymptote)
+                    End If
+                End If
                 Dim lAntGWL As Double = AntecedentGWL(.Flow.Length - 1, 1, .HzeroDayValue)
                 If .AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.FALL) Then
                     .AntecedentGWLMethods.ItemByKey(AntecedentGWLMethod.FALL) = lAntGWL
@@ -55,9 +59,9 @@ Public Class clsWTFFall
                     .AntecedentGWLMethods.Add(AntecedentGWLMethod.FALL, lAntGWL)
                 End If
 
-                Dim lDeltaH As Double = .Flow(.Flow.Length - 1) - lAntGWL
+                Dim lDeltaH As Double = .Flow(.Flow.Length - 1) - lAntGWL 'feet
                 If lDeltaH < 0 Then lDeltaH = 0
-                Dim lRecharge As Double = SpecificYield * lDeltaH / (.Flow.Length - 1)
+                Dim lRecharge As Double = SpecificYield * lDeltaH * 12 ' inch
                 If .Recharges.Keys.Contains(AntecedentGWLMethod.FALL) Then
                     .Recharges.ItemByKey(AntecedentGWLMethod.FALL) = lRecharge
                 Else

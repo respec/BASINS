@@ -24,7 +24,7 @@ Partial Class frmMain
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMain))
         Me.btnFindRechargeEvents = New System.Windows.Forms.Button
-        Me.btnWriteOutput = New System.Windows.Forms.Button
+        Me.btnEstRecharge = New System.Windows.Forms.Button
         Me.gbChooseAntMethod = New System.Windows.Forms.GroupBox
         Me.btnAntMethodSpecifyParm = New System.Windows.Forms.Button
         Me.gbFindRecharge = New System.Windows.Forms.GroupBox
@@ -43,14 +43,14 @@ Partial Class frmMain
         Me.btnFindRechargeEvents.Text = "Find Recharge Events"
         Me.btnFindRechargeEvents.UseVisualStyleBackColor = True
         '
-        'btnWriteOutput
+        'btnEstRecharge
         '
-        Me.btnWriteOutput.Location = New System.Drawing.Point(7, 18)
-        Me.btnWriteOutput.Name = "btnWriteOutput"
-        Me.btnWriteOutput.Size = New System.Drawing.Size(268, 23)
-        Me.btnWriteOutput.TabIndex = 5
-        Me.btnWriteOutput.Text = "Estimate Recharge"
-        Me.btnWriteOutput.UseVisualStyleBackColor = True
+        Me.btnEstRecharge.Location = New System.Drawing.Point(7, 18)
+        Me.btnEstRecharge.Name = "btnEstRecharge"
+        Me.btnEstRecharge.Size = New System.Drawing.Size(268, 23)
+        Me.btnEstRecharge.TabIndex = 5
+        Me.btnEstRecharge.Text = "Estimate Recharge"
+        Me.btnEstRecharge.UseVisualStyleBackColor = True
         '
         'gbChooseAntMethod
         '
@@ -88,7 +88,7 @@ Partial Class frmMain
         '
         'gbEstimateRecharge
         '
-        Me.gbEstimateRecharge.Controls.Add(Me.btnWriteOutput)
+        Me.gbEstimateRecharge.Controls.Add(Me.btnEstRecharge)
         Me.gbEstimateRecharge.Location = New System.Drawing.Point(0, 133)
         Me.gbEstimateRecharge.Margin = New System.Windows.Forms.Padding(2)
         Me.gbEstimateRecharge.Name = "gbEstimateRecharge"
@@ -116,7 +116,7 @@ Partial Class frmMain
 
     End Sub
     Friend WithEvents btnFindRechargeEvents As System.Windows.Forms.Button
-    Friend WithEvents btnWriteOutput As System.Windows.Forms.Button
+    Friend WithEvents btnEstRecharge As System.Windows.Forms.Button
     Friend WithEvents gbChooseAntMethod As System.Windows.Forms.GroupBox
     Friend WithEvents btnAntMethodSpecifyParm As System.Windows.Forms.Button
     Friend WithEvents gbFindRecharge As System.Windows.Forms.GroupBox
