@@ -43,7 +43,6 @@ Public Class frmEstRecharge
     Private pDALastUsed As Double = 0.0
     Public OutputFilenameRoot As String
 
-
     Public Sub New()
 
         ' This call is required by the Windows Form Designer.
@@ -193,6 +192,18 @@ Public Class frmEstRecharge
                 End If
             End With
         End If
+        Dim lSy As Double
+        If Double.TryParse(txtSy.Text, lSy) Then
+            If lSy <= 1 AndAlso lSy > 0 Then
+                If pFall IsNot Nothing Then pFall.SpecificYield = lSy
+                If pLinear IsNot Nothing Then pLinear.SpecificYield = lSy
+                If pPower IsNot Nothing Then pPower.SpecificYield = lSy
+            Else
+                lParamErrMsg &= "- Specific yield value is outside valid range (0 ~ 1)." & vbCrLf
+            End If
+        Else
+            lParamErrMsg &= "- Specific yield value is invalid." & vbCrLf
+        End If
         Return lParamErrMsg
     End Function
 
@@ -312,6 +323,7 @@ Public Class frmEstRecharge
             .Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
             .FilterIndex = 1
             .Title = "WTF Output File"
+            .FileName = txtOutputRootName.Text & ".txt"
             If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                 lOutputFilename = .FileName
             End If
@@ -347,9 +359,9 @@ Public Class frmEstRecharge
         End If
 
         For I As Integer = 1 To pGraphTsHPeak.numValues
-            lTsDailyRecharge.Value(I) = 0.0
-            lTsDailyH2.Value(I) = 0.0
-            pGraphTsHPeak.Value(I) = 0.0
+            lTsDailyRecharge.Value(I) = 0.0 'Double.NaN
+            lTsDailyH2.Value(I) = 0.0 'Double.NaN
+            pGraphTsHPeak.Value(I) = 0.0 'Double.NaN
         Next
 
         'Title line
@@ -360,13 +372,13 @@ Public Class frmEstRecharge
                           "GWLpeak" & lDelim & _
                           "H0Date" & lDelim & _
                           "H0 GWL" & lDelim)
-        If RiseObj.listOfSegments(0).AntecedentGWLs.Keys.Contains(AntecedentGWLMethod.FALL) Then
+        If RiseObj.listOfSegments(0).AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.FALL) Then
             lWTFOutputDailyTitle.Append("FALLH2" & lDelim & "(GWLpeak-FALLH2)")
         End If
-        If RiseObj.listOfSegments(0).AntecedentGWLs.Keys.Contains(AntecedentGWLMethod.Linear) Then
+        If RiseObj.listOfSegments(0).AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.Linear) Then
             lWTFOutputDailyTitle.Append("LinearH2" & lDelim & "(GWLpeak-LinearH2)")
         End If
-        If RiseObj.listOfSegments(0).AntecedentGWLs.Keys.Contains(AntecedentGWLMethod.Power) Then
+        If RiseObj.listOfSegments(0).AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.Power) Then
             lWTFOutputDailyTitle.Append("PowerH2" & lDelim & "(GWLpeak-PowerH2)")
         End If
         lWTFOutputDailyTitle.AppendLine("")
@@ -395,7 +407,7 @@ Public Class frmEstRecharge
                                   lGWLpeak & lDelim & _
                                   .HzeroDayDateToString & lDelim & _
                                   .HzeroDayValue & lDelim)
-                Dim lIndexOfHpeak As Double = .PeakDayIndex + .Flow.Length - 1
+                Dim lIndexOfHpeak As Double = .PeakDayIndex + .Flow.Length - 1 - 1
                 pGraphTsHPeak.Value(lIndexOfHpeak) = lGWLpeak
                 If .AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.FALL) Then
                     Dim lH2 As Double = Math.Round(.AntecedentGWLMethods.ItemByKey(AntecedentGWLMethod.FALL), 3)

@@ -26,7 +26,14 @@ Public Class clsWTFFall
     End Property
 
     Public ParametersSet As Boolean = False
-
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aTimePeak"></param>
+    ''' <param name="aTime0"></param>
+    ''' <param name="aGWLH0">Actual GW elevation BEFORE adjusting to FallD</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public Function AntecedentGWL(ByVal aTimePeak As Double, _
                                   ByVal aTime0 As Double, _
                                   ByVal aGWLH0 As Double) As Double
@@ -47,10 +54,13 @@ Public Class clsWTFFall
 
         For Each lSeg As clsRecessionSegment In aRiseObj.listOfSegments
             With lSeg
+                'If .IsExcluded Then Continue For
                 If .Flow Is Nothing Then
-                    If Double.IsNaN(GWLAsymptote) Then
-                        .GetData(True, GWLAsymptote)
-                    End If
+                    'Need the original GW elevation without adjusting to FallD
+                    .GetData()
+                    'If Double.IsNaN(GWLAsymptote) Then
+                    '    .GetData(True, GWLAsymptote)
+                    'End If
                 End If
                 Dim lAntGWL As Double = AntecedentGWL(.Flow.Length - 1, 1, .HzeroDayValue)
                 If .AntecedentGWLMethods.Keys.Contains(AntecedentGWLMethod.FALL) Then
@@ -66,6 +76,9 @@ Public Class clsWTFFall
                     .Recharges.ItemByKey(AntecedentGWLMethod.FALL) = lRecharge
                 Else
                     .Recharges.Add(AntecedentGWLMethod.FALL, lRecharge)
+                End If
+                If Double.IsNaN(lAntGWL) OrElse Double.IsNaN(lRecharge) Then
+                    Dim lStopHere As String = "Yes"
                 End If
             End With
         Next
