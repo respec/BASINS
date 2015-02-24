@@ -750,6 +750,7 @@ Public Class clsRecess
 
             If liCount >= pData.numValues Then Continue For
             Dim lCurrentValue As Double = pData.Value(liCount)
+            If Double.IsNaN(lCurrentValue) Then Continue For
             If liCount < pData.numValues AndAlso (lCurrentValue <= pData.Value(liCount - 1) Or lCurrentValue <= pData.Value(liCount + 1)) Then
                 Continue For 'loop 200
             Else

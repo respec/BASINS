@@ -101,6 +101,7 @@ Public Class clsFall
 
             If liCount >= FlowData.numValues Then Continue For
             Dim lCurrentValue As Double = FlowData.Value(liCount)
+            If Double.IsNaN(lCurrentValue) Then Continue For
 
             If Phase = WTFAnalysis.FindRecession Then 'aFall = True, Find fall limb
                 'need to find a local peak as a starting point of a falling limb
@@ -254,6 +255,7 @@ Public Class clsFall
 
             If liCount >= FlowData.numValues Then Continue For
             Dim lCurrentValue As Double = FlowData.Value(liCount)
+            If Double.IsNaN(lCurrentValue) Then Continue For
 
             If Phase = WTFAnalysis.FindRecession Then 'aFall = True, Find fall limb
                 'need to find a local peak as a starting point of a falling limb

@@ -131,8 +131,10 @@ Public Class clsRecessionSegment
         If lDataType.ToUpper() = "GW LEVEL" Then
             lUseNaturalLog = True
         End If
+        Dim lIndex As Integer
         For I As Integer = 1 To SegmentLength 'loop 220
-            Flow(I) = StreamFlowTS.Value(I + PeakDayIndex)
+            lIndex = I - 1 + PeakDayIndex
+            Flow(I) = StreamFlowTS.Value(lIndex)
             If aSetGWPPElev AndAlso Not Double.IsNaN(aPPElev) Then
                 Flow(I) -= aPPElev
             End If
@@ -154,7 +156,7 @@ Public Class clsRecessionSegment
                     End If
                 End If
             End If
-            Dates(I) = StreamFlowTS.Dates.Value(I + PeakDayIndex - 1)
+            Dates(I) = StreamFlowTS.Dates.Value(lIndex - 1)
         Next 'loop 220
         NeedtoReadData = False
     End Sub
