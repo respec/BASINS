@@ -233,6 +233,7 @@ Public Class frmRecess
                         lstRecessSegments.Enabled = False
                         panRiseParam.Visible = False
                     Case WTFAnalysis.FindRecharge
+                        btnGetAllSegments.Text = "Find Recharges >"
                         btnAnalyse.Visible = False
                         btnSummary.Visible = False
                         lblFallD.Visible = False

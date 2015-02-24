@@ -58,6 +58,11 @@ Partial Class frmRecess
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
         Me.panelConfiguration = New System.Windows.Forms.Panel
+        Me.panRiseParam = New System.Windows.Forms.Panel
+        Me.txtPeakRisePct = New System.Windows.Forms.TextBox
+        Me.lblRisePct = New System.Windows.Forms.Label
+        Me.txtPeakAheadDays = New System.Windows.Forms.TextBox
+        Me.lblScreenWindow = New System.Windows.Forms.Label
         Me.gbDataType = New System.Windows.Forms.GroupBox
         Me.txtDataInfo = New System.Windows.Forms.TextBox
         Me.panelAnalysis = New System.Windows.Forms.Panel
@@ -65,20 +70,15 @@ Partial Class frmRecess
         Me.txtFallD = New System.Windows.Forms.TextBox
         Me.btnFallPlot = New System.Windows.Forms.Button
         Me.btnConfiguration = New System.Windows.Forms.Button
-        Me.panRiseParam = New System.Windows.Forms.Panel
-        Me.lblScreenWindow = New System.Windows.Forms.Label
-        Me.txtPeakAheadDays = New System.Windows.Forms.TextBox
-        Me.lblRisePct = New System.Windows.Forms.Label
-        Me.txtPeakRisePct = New System.Windows.Forms.TextBox
         Me.gbMonthSeason.SuspendLayout()
         Me.gbDates.SuspendLayout()
         Me.scDisplay.Panel1.SuspendLayout()
         Me.scDisplay.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.panelConfiguration.SuspendLayout()
+        Me.panRiseParam.SuspendLayout()
         Me.gbDataType.SuspendLayout()
         Me.panelAnalysis.SuspendLayout()
-        Me.panRiseParam.SuspendLayout()
         Me.SuspendLayout()
         '
         'chkSaveInterimToFile
@@ -494,6 +494,49 @@ Partial Class frmRecess
         Me.panelConfiguration.Size = New System.Drawing.Size(1036, 336)
         Me.panelConfiguration.TabIndex = 31
         '
+        'panRiseParam
+        '
+        Me.panRiseParam.Controls.Add(Me.txtPeakRisePct)
+        Me.panRiseParam.Controls.Add(Me.lblRisePct)
+        Me.panRiseParam.Controls.Add(Me.txtPeakAheadDays)
+        Me.panRiseParam.Controls.Add(Me.lblScreenWindow)
+        Me.panRiseParam.Location = New System.Drawing.Point(426, 136)
+        Me.panRiseParam.Name = "panRiseParam"
+        Me.panRiseParam.Size = New System.Drawing.Size(368, 83)
+        Me.panRiseParam.TabIndex = 47
+        '
+        'txtPeakRisePct
+        '
+        Me.txtPeakRisePct.Location = New System.Drawing.Point(273, 43)
+        Me.txtPeakRisePct.Name = "txtPeakRisePct"
+        Me.txtPeakRisePct.Size = New System.Drawing.Size(88, 22)
+        Me.txtPeakRisePct.TabIndex = 3
+        '
+        'lblRisePct
+        '
+        Me.lblRisePct.AutoSize = True
+        Me.lblRisePct.Location = New System.Drawing.Point(10, 46)
+        Me.lblRisePct.Name = "lblRisePct"
+        Me.lblRisePct.Size = New System.Drawing.Size(257, 17)
+        Me.lblRisePct.TabIndex = 2
+        Me.lblRisePct.Text = "Peek ahead rise percent (50% ~ 100%)"
+        '
+        'txtPeakAheadDays
+        '
+        Me.txtPeakAheadDays.Location = New System.Drawing.Point(273, 15)
+        Me.txtPeakAheadDays.Name = "txtPeakAheadDays"
+        Me.txtPeakAheadDays.Size = New System.Drawing.Size(88, 22)
+        Me.txtPeakAheadDays.TabIndex = 1
+        '
+        'lblScreenWindow
+        '
+        Me.lblScreenWindow.AutoSize = True
+        Me.lblScreenWindow.Location = New System.Drawing.Point(149, 18)
+        Me.lblScreenWindow.Name = "lblScreenWindow"
+        Me.lblScreenWindow.Size = New System.Drawing.Size(118, 17)
+        Me.lblScreenWindow.TabIndex = 0
+        Me.lblScreenWindow.Text = "Peek ahead days"
+        '
         'gbDataType
         '
         Me.gbDataType.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -578,49 +621,6 @@ Partial Class frmRecess
         Me.btnConfiguration.Text = "< Back to Configuration"
         Me.btnConfiguration.UseVisualStyleBackColor = True
         '
-        'panRiseParam
-        '
-        Me.panRiseParam.Controls.Add(Me.txtPeakRisePct)
-        Me.panRiseParam.Controls.Add(Me.lblRisePct)
-        Me.panRiseParam.Controls.Add(Me.txtPeakAheadDays)
-        Me.panRiseParam.Controls.Add(Me.lblScreenWindow)
-        Me.panRiseParam.Location = New System.Drawing.Point(426, 136)
-        Me.panRiseParam.Name = "panRiseParam"
-        Me.panRiseParam.Size = New System.Drawing.Size(368, 83)
-        Me.panRiseParam.TabIndex = 47
-        '
-        'lblScreenWindow
-        '
-        Me.lblScreenWindow.AutoSize = True
-        Me.lblScreenWindow.Location = New System.Drawing.Point(149, 18)
-        Me.lblScreenWindow.Name = "lblScreenWindow"
-        Me.lblScreenWindow.Size = New System.Drawing.Size(118, 17)
-        Me.lblScreenWindow.TabIndex = 0
-        Me.lblScreenWindow.Text = "Peak ahead days"
-        '
-        'txtPeakAheadDays
-        '
-        Me.txtPeakAheadDays.Location = New System.Drawing.Point(273, 15)
-        Me.txtPeakAheadDays.Name = "txtPeakAheadDays"
-        Me.txtPeakAheadDays.Size = New System.Drawing.Size(88, 22)
-        Me.txtPeakAheadDays.TabIndex = 1
-        '
-        'lblRisePct
-        '
-        Me.lblRisePct.AutoSize = True
-        Me.lblRisePct.Location = New System.Drawing.Point(10, 46)
-        Me.lblRisePct.Name = "lblRisePct"
-        Me.lblRisePct.Size = New System.Drawing.Size(257, 17)
-        Me.lblRisePct.TabIndex = 2
-        Me.lblRisePct.Text = "Peak ahead rise percent (50% ~ 100%)"
-        '
-        'txtPeakRisePct
-        '
-        Me.txtPeakRisePct.Location = New System.Drawing.Point(273, 43)
-        Me.txtPeakRisePct.Name = "txtPeakRisePct"
-        Me.txtPeakRisePct.Size = New System.Drawing.Size(88, 22)
-        Me.txtPeakRisePct.TabIndex = 3
-        '
         'frmRecess
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
@@ -645,12 +645,12 @@ Partial Class frmRecess
         Me.MenuStrip1.PerformLayout()
         Me.panelConfiguration.ResumeLayout(False)
         Me.panelConfiguration.PerformLayout()
+        Me.panRiseParam.ResumeLayout(False)
+        Me.panRiseParam.PerformLayout()
         Me.gbDataType.ResumeLayout(False)
         Me.gbDataType.PerformLayout()
         Me.panelAnalysis.ResumeLayout(False)
         Me.panelAnalysis.PerformLayout()
-        Me.panRiseParam.ResumeLayout(False)
-        Me.panRiseParam.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
