@@ -14,15 +14,25 @@ Public Class clsIcon
     Public Selected As Boolean
     Public Label As String = ""
     Public UciFileName As String = ""
+    Public WatershedImageFilename As String
+    Public OrigImage As Image
 
-    Public Function Key() As String
-        Return UciFileName.ToLowerInvariant()
-    End Function
+    Public DownstreamIcon As clsIcon
+    Public UpstreamIcons As New Generic.List(Of clsIcon)
+    Public DistanceFromOutlet As Integer = -1
 
     Sub New()
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         UpdateStyles()
     End Sub
+
+    Public Overrides Function ToString() As String
+        Return UciFileName
+    End Function
+
+    Public Function Key() As String
+        Return UciFileName.ToLowerInvariant()
+    End Function
 
     Public Function Center() As Point
         Return New Point(Me.Left + Me.Width / 2, Me.Top + Me.Height / 2)
@@ -30,19 +40,22 @@ Public Class clsIcon
 
 End Class
 
-Public Class clsSchematicIcon
-    Inherits clsIcon
-
-    Public DownstreamIcons As New Generic.List(Of clsIcon)
-    Public UpstreamIcons As New Generic.List(Of clsIcon)
-    Public DistanceFromOutlet As Integer = -1
-
-End Class
-
 Friend Class IconCollection
     Inherits KeyedCollection(Of String, clsIcon)
     Protected Overrides Function GetKeyForItem(ByVal item As clsIcon) As String
         Return item.Key
+    End Function
+
+    Friend Function FindOrAddIcon(ByVal aUciFilename As String) As clsIcon
+        Dim lIcon As clsIcon
+        If Contains(aUciFilename.ToLowerInvariant) Then
+            lIcon = Item(aUciFilename.ToLowerInvariant)
+        Else
+            lIcon = New clsIcon
+            lIcon.UciFileName = aUciFilename
+            Add(lIcon)
+        End If
+        Return lIcon
     End Function
 End Class
 

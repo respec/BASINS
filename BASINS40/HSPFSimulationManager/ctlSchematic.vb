@@ -14,7 +14,7 @@ Friend Class ctlSchematic
     Private pBeforeDragLocation As Point
     Private pClickedIcon As clsIcon
 
-    Private AllIcons As New IconCollection
+    Public AllIcons As New IconCollection
     Private pOutlets As New IconCollection
     Private pIconsDistantFromOutlet As New atcCollection
     Private pIconsDistantFromOutletPlaced As New atcCollection
@@ -26,19 +26,46 @@ Friend Class ctlSchematic
     Private HighlightBrush As Brush = SystemBrushes.Highlight
     Private LegendScrollPos As Integer
     Private LegendFullHeight As Integer
-    Private pIconWidth As Integer = 73
-    Private pIconHeight As Integer = 41
+    Private pIconWidth As Integer = 150
+    Private pIconHeight As Integer = 150
     Private pBorderWidth As Integer = 3
     Private pTreeBackground As Bitmap
 
     Private LegendOrder As Generic.List(Of String)
 
     Public Sub BuildTree(ByVal aIcons As IconCollection, Optional ByVal aPrinting As Boolean = False)
-        ClearTree()
+        'Clear Tree
+        Dim lSameIcons As Boolean = ReferenceEquals(aIcons, AllIcons)
+
+        picTree.SuspendLayout()
+        If picTree.BackgroundImage IsNot Nothing Then
+            picTree.BackgroundImage.Dispose()
+            picTree.BackgroundImage = Nothing 'New Bitmap(0, 0, Drawing.Imaging.PixelFormat.Format32bppArgb)
+        End If
+        picTree.Controls.Clear()
+
+        For Each lOldIcon As clsIcon In AllIcons
+            RemoveHandler lOldIcon.MouseDown, AddressOf Icon_MouseDown
+            RemoveHandler lOldIcon.MouseMove, AddressOf Icon_MouseMove
+            RemoveHandler lOldIcon.MouseUp, AddressOf Icon_MouseUp
+        Next
+        If Not lSameIcons Then
+            For Each lControl As Control In AllIcons
+                lControl.Dispose()
+            Next
+            AllIcons.Clear()
+        End If
+        picTree.ResumeLayout()
+        pIconsDistantFromOutlet.Clear()
+        pIconsDistantFromOutletPlaced.Clear()
+        pOutlets.Clear()
 
         Dim lNodeSize As New Drawing.Size(pIconWidth, pIconHeight)
 
-        For Each lNewIcon As clsSchematicIcon In aIcons
+        'Will be set True if any icons need a new location (because they are at zero)
+        Dim lRefreshingLayout As Boolean = False
+
+        For Each lNewIcon As clsIcon In aIcons
             With lNewIcon
                 .Size = lNodeSize
                 .BackColor = Drawing.SystemColors.ButtonFace
@@ -46,17 +73,17 @@ Friend Class ctlSchematic
             AddHandler lNewIcon.MouseDown, AddressOf Icon_MouseDown
             AddHandler lNewIcon.MouseMove, AddressOf Icon_MouseMove
             AddHandler lNewIcon.MouseUp, AddressOf Icon_MouseUp
-            AllIcons.Add(lNewIcon)
+            If Not AllIcons.Contains(lNewIcon) Then AllIcons.Add(lNewIcon)
             picTree.Controls.Add(lNewIcon)
+            If lNewIcon.Location.X = 0 Then lRefreshingLayout = True
+            DrawIcon(False, lNewIcon)
         Next
 
         If AllIcons.Count > 0 Then 'okay to do tree
 
-            Dim lIcon As clsSchematicIcon
-
             pMaximumTreeDepth = 1
 
-            For Each lIcon In AllIcons
+            For Each lIcon As clsIcon In AllIcons
                 With lIcon
                     .DistanceFromOutlet = DownLayers(lIcon, lIcon.Key & vbCrLf)
                     pIconsDistantFromOutlet.Increment(.DistanceFromOutlet, 1)
@@ -69,13 +96,16 @@ Friend Class ctlSchematic
                     End If
                 End With
             Next
-            For Each lIcon In AllIcons
-                For Each lUpIcon As clsSchematicIcon In lIcon.UpstreamIcons
-                    lUpIcon.DownstreamIcons.Add(lIcon)
-                Next
-            Next
-
-            LayoutTree(aPrinting)
+            'For Each lIcon In AllIcons
+            '    For Each lUpIcon As clsIcon In lIcon.UpstreamIcons
+            '        lUpIcon.DownstreamIcons.Add(lIcon)
+            '    Next
+            'Next
+            If lRefreshingLayout Then
+                LayoutTree(aPrinting)
+            Else
+                DrawTreeBackground()
+            End If
         End If
     End Sub
 
@@ -153,7 +183,7 @@ Friend Class ctlSchematic
         Dim lGraphics As Graphics = Graphics.FromImage(pTreeBackground)
         Dim lLinesPen As Pen = SystemPens.ControlDarkDark
 
-        For Each lIcon As clsSchematicIcon In AllIcons
+        For Each lIcon As clsIcon In AllIcons
             With lIcon
                 Dim lIconCenter As Point = .Center
                 For Each lUpstreamIcon As clsIcon In lIcon.UpstreamIcons
@@ -168,46 +198,44 @@ Friend Class ctlSchematic
         picTree.BackgroundImage = pTreeBackground
     End Sub
 
-    Private Sub DrawTreeBackground(ByVal aIcon As clsSchematicIcon)
-        Dim lGraphics As Graphics = Graphics.FromImage(picTree.BackgroundImage)
-        Dim lLinesPen As Pen = SystemPens.ControlDarkDark
-        'Dim lClipLeft As Integer = aIcon.Left
-        'Dim lClipRight As Integer = aIcon.Right
-        'Dim lClipTop As Integer = aIcon.Top
-        'Dim lClipBottom As Integer = aIcon.Bottom
+    'Private Sub DrawTreeBackground(ByVal aIcon As clsIcon)
+    '    Dim lGraphics As Graphics = Graphics.FromImage(picTree.BackgroundImage)
+    '    Dim lLinesPen As Pen = SystemPens.ControlDarkDark
+    '    'Dim lClipLeft As Integer = aIcon.Left
+    '    'Dim lClipRight As Integer = aIcon.Right
+    '    'Dim lClipTop As Integer = aIcon.Top
+    '    'Dim lClipBottom As Integer = aIcon.Bottom
 
-        'ExtendClip(lClipLeft, lClipRight, lClipTop, lClipBottom, aIcon.UpstreamIcons)
-        'ExtendClip(lClipLeft, lClipRight, lClipTop, lClipBottom, aIcon.DownstreamIcons)
+    '    'ExtendClip(lClipLeft, lClipRight, lClipTop, lClipBottom, aIcon.UpstreamIcons)
+    '    'ExtendClip(lClipLeft, lClipRight, lClipTop, lClipBottom, aIcon.DownstreamIcons)
 
-        'lGraphics.SetClip(New Rectangle(lClipLeft - pIconWidth, lClipTop - pIconWidth, lClipRight - lClipLeft + pIconWidth * 2, lClipBottom - lClipTop + pIconWidth * 2))
-        lGraphics.Clear(SystemColors.Window)
+    '    'lGraphics.SetClip(New Rectangle(lClipLeft - pIconWidth, lClipTop - pIconWidth, lClipRight - lClipLeft + pIconWidth * 2, lClipBottom - lClipTop + pIconWidth * 2))
+    '    lGraphics.Clear(SystemColors.Window)
 
-        With aIcon
-            Dim lIconCenter As Point = .Center
-            For Each lUpstreamIcon As clsIcon In aIcon.UpstreamIcons
-                With lUpstreamIcon
-                    lGraphics.DrawLine(lLinesPen, lIconCenter, .Center)
-                    If .Selected Then lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
-                    .Invalidate()
-                End With
-            Next
-            For Each lDownstreamIcon As clsIcon In aIcon.DownstreamIcons
-                With lDownstreamIcon
-                    lGraphics.DrawLine(lLinesPen, lIconCenter, .Center)
-                    If .Selected Then lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
-                    .Invalidate()
-                End With
-            Next
-            If .Selected Then
-                lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
-            End If
-        End With
+    '    With aIcon
+    '        Dim lIconCenter As Point = .Center
+    '        For Each lUpstreamIcon As clsIcon In aIcon.UpstreamIcons
+    '            With lUpstreamIcon
+    '                lGraphics.DrawLine(lLinesPen, lIconCenter, .Center)
+    '                If .Selected Then lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
+    '                .Invalidate()
+    '            End With
+    '        Next
+    '        With aIcon.DownstreamIcon
+    '            lGraphics.DrawLine(lLinesPen, lIconCenter, .Center)
+    '            If .Selected Then lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
+    '            .Invalidate()
+    '        End With
+    '        If .Selected Then
+    '            lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
+    '        End If
+    '    End With
 
-        aIcon.Invalidate()
-        lGraphics.Dispose()
-        'picTree.BackgroundImage = pTreeBackground
-        picTree.Invalidate()
-    End Sub
+    '    aIcon.Invalidate()
+    '    lGraphics.Dispose()
+    '    'picTree.BackgroundImage = pTreeBackground
+    '    picTree.Invalidate()
+    'End Sub
 
     Private Sub ExtendClip(ByRef lClipLeft As Integer, ByRef lClipRight As Integer, ByRef lClipTop As Integer, ByRef lClipBottom As Integer, ByVal aIcons As Generic.List(Of clsIcon))
         For Each lIcon As clsIcon In aIcons
@@ -218,341 +246,35 @@ Friend Class ctlSchematic
         Next
     End Sub
 
-    'Private Sub DrawPictureOnReachControl(ByVal aOperation As HspfOperation, ByVal aPrinting As Boolean, ByVal aControl As Control)
-    '    Dim lBitmap As New Bitmap(pIconWidth, pIconHeight, Drawing.Imaging.PixelFormat.Format32bppArgb)
-    '    Dim g As Graphics = Graphics.FromImage(lBitmap)
-    '    SetSchematicIcon(aOperation, g)
-    '    drawBorder(g, pIconWidth, pIconHeight, Not aPrinting)
-    '    g.Dispose()
-    '    aControl.BackgroundImage = lBitmap
-    'End Sub
+    Private Sub DrawIcon(ByVal aPrinting As Boolean, ByVal aIcon As clsIcon)
+        Dim lBitmap As New Bitmap(pIconWidth, pIconHeight, Drawing.Imaging.PixelFormat.Format32bppArgb)
+        Dim g As Graphics = Graphics.FromImage(lBitmap)
 
-    'Private Sub SetLandLegendIcon(ByVal aOperation As HspfOperation, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon, Optional ByVal aClear As Boolean = False)
-    '    Dim lNewIcon As clsSchematicIcon
-    '    Dim lBitmap As Bitmap
-    '    If aExistingIcon Is Nothing Then
-    '        lNewIcon = New clsSchematicIcon
-    '        AddHandler lNewIcon.MouseDown, AddressOf LegendIcon_MouseDown
-    '        aClear = True
-    '        lNewIcon.Width = pCurrentLegend.IconWidth
-    '        lNewIcon.Height = pIconHeight
-    '        lNewIcon.Label = DescToLabel(aOperation.Description)
-    '        lBitmap = New Bitmap(lNewIcon.Width, lNewIcon.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
-    '    Else
-    '        lNewIcon = aExistingIcon
-    '        lBitmap = lNewIcon.BackgroundImage
-    '    End If
-    '    With lNewIcon
+        g.Clear(SystemColors.Control)
 
-    '        Dim g As Graphics = Graphics.FromImage(lBitmap)
+        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(aIcon.Label, Me.Font)
+        Dim lStringX As Single = (pIconWidth - lStringMeasurement.Width) / 2
+        Dim lStringY As Single = pIconHeight - lStringMeasurement.Height * 1.25
 
-    '        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(.Label, Me.Font)
-    '        Dim lX As Single = (.Width - lStringMeasurement.Width) / 2
-    '        Dim lY As Single = .Height - lStringMeasurement.Height * 1.25
-
-    '        If aClear Then
-    '            .Key = .Label
-    '            g.Clear(SystemColors.Control)
-    '            g.DrawString(.Label, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-    '        End If
-
-    '        Dim lBoxHeight As Integer = lY * 0.6
-    '        lY /= 4
-    '        lX = lY
-    '        Dim lBoxWidth As Integer = .Width * 0.4
-
-    '        If aOperation.Name = "PERLND" Then
-    '            .Perlnd = aOperation
-    '            lX = lY
-    '        Else
-    '            .Implnd = aOperation
-    '            lX = .Width - lY - lBoxWidth
-    '        End If
-
-    '        Dim lBrush As Brush = New SolidBrush(ColorFromDesc(.Label))
-    '        g.FillRectangle(lBrush, lX, lY, lBoxWidth, lBoxHeight)
-
-    '        drawBorder(g, .Width, .Height, Not aPrinting)
-    '        g.Dispose()
-    '        .BackgroundImage = lBitmap
-    '    End With
-    '    aExistingIcon = lNewIcon
-    'End Sub
-
-    Private Function DescToLabel(ByVal aDesc As String) As String
-        If aDesc Is Nothing OrElse aDesc.Length = 0 Then Return "Unnamed"
-        If aDesc.Contains(":") Then Return aDesc.Substring(aDesc.IndexOf(":") + 1)
-        Return aDesc
-    End Function
-
-    'Private Function MetSegLabel(ByVal aMetSeg As HspfMetSeg) As String
-    '    Return aMetSeg.Id & ":" & aMetSeg.Name.Replace(",", "") 'Precip location name might be nicer
-    'End Function
-
-    'Private Sub SetMetLegendIcon(ByVal aMetSeg As HspfMetSeg, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon)
-    '    Dim lNewIcon As clsSchematicIcon
-    '    If aExistingIcon Is Nothing Then
-    '        lNewIcon = New clsSchematicIcon
-    '        lNewIcon.Width = pCurrentLegend.IconWidth
-    '        lNewIcon.Height = pIconHeight
-    '        AddHandler lNewIcon.MouseDown, AddressOf LegendIcon_MouseDown
-    '    Else
-    '        lNewIcon = aExistingIcon
-    '    End If
-    '    With lNewIcon
-    '        .Key = aMetSeg.Id
-    '        Dim lBitmap As New Bitmap(.Width, .Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
-    '        Dim g As Graphics = Graphics.FromImage(lBitmap)
-
-    '        .MetSeg = aMetSeg
-    '        .Label = MetSegLabel(aMetSeg)
-
-    '        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(.Label, Me.Font)
-    '        Dim lX As Single = (.Width - lStringMeasurement.Width) / 2
-    '        Dim lY As Single = (.Height - lStringMeasurement.Height) / 2
-
-    '        g.Clear(SystemColors.Control)
-    '        g.DrawString(.Label, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-
-    '        lY /= 4
-
-    '        drawBorder(g, .Width, .Height, Not aPrinting)
-    '        g.Dispose()
-    '        .BackgroundImage = lBitmap
-    '    End With
-    '    aExistingIcon = lNewIcon
-    'End Sub
-
-    'Private Sub SetPointLegendIcon(ByVal aPointSource As HspfPointSource, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon)
-    '    Dim lNewIcon As clsSchematicIcon
-    '    If aExistingIcon Is Nothing Then
-    '        lNewIcon = New clsSchematicIcon
-    '        lNewIcon.Width = pCurrentLegend.IconWidth
-    '        lNewIcon.Height = pIconHeight
-    '        AddHandler lNewIcon.MouseDown, AddressOf LegendIcon_MouseDown
-    '    Else
-    '        lNewIcon = aExistingIcon
-    '    End If
-    '    With lNewIcon
-    '        .Key = aPointSource.Id
-    '        Dim lBitmap As New Bitmap(.Width, .Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
-    '        Dim g As Graphics = Graphics.FromImage(lBitmap)
-
-    '        .PointSource = aPointSource
-    '        .Label = aPointSource.Id & ":" & aPointSource.Name
-
-    '        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(.Label, Me.Font)
-    '        Dim lX As Single = (.Width - lStringMeasurement.Width) / 2
-    '        Dim lY As Single = (.Height - lStringMeasurement.Height) / 2
-
-    '        g.Clear(SystemColors.Control)
-    '        g.DrawString(.Label, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-
-    '        lY /= 4
-
-    '        drawBorder(g, .Width, .Height, Not aPrinting)
-    '        g.Dispose()
-    '        .BackgroundImage = lBitmap
-    '    End With
-    '    aExistingIcon = lNewIcon
-    'End Sub
-
-    ''Draw icon representing aOperation into given graphics object
-    'Public Sub SetSchematicIcon(ByVal aOperation As HspfOperation, ByVal g As Graphics)
-    '    Dim sid, barPos As Integer
-    '    Dim lStr As String
-    '    Dim barDesc As String
-    '    Dim lSource As HspfConnection
-    '    Dim started As Boolean
-    '    Dim included() As Boolean
-
-    '    lStr = OperationKey(aOperation)
-
-    '    'TODO: pic.ToolTipText = pOpnBlk.Name & " " & pId & " " & pDescription
-    '    g.Clear(SystemColors.Control)
-
-    '    Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(lStr, Me.Font)
-    '    Dim lX As Single = (pIconWidth - lStringMeasurement.Width) / 2
-    '    Dim lY As Single = pIconHeight - lStringMeasurement.Height * 1.25
-    '    Dim lBarBottom As Integer = lY
-    '    Dim lBarMaxVal As Double
-    '    Dim lBarMaxTop As Integer = 1
-    '    g.DrawString(lStr, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-    '    Dim myid As Integer
-    '    Dim pPoint As HspfPointSource
-    '    Select Case pCurrentLegend.LegendType
-    '        Case EnumLegendType.LegLand
-    '            Dim lBarFraction As Double
-    '            lBarMaxVal = pUci.MaxAreaByLand2Stream
-    '            barPos = 3
-    '            Dim lBarWidth As Integer
-    '            Dim lBarSpace As Integer = 1
-    '            If LegendOrder Is Nothing OrElse LegendOrder.Count = 0 Then 'Draw all in the order they fall
-    '                lBarWidth = (pIconWidth - 6) / aOperation.Sources.Count
-    '                If lBarWidth < 1 Then
-    '                    lBarWidth = 1
-    '                    lBarSpace = 0
-    '                ElseIf lBarWidth > 10 Then
-    '                    lBarWidth = 10
-    '                End If
-    '                For Each lSource In aOperation.Sources
-    '                    If lSource.Source IsNot Nothing AndAlso lSource.Source.Opn IsNot Nothing _
-    '                      AndAlso (lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND") Then
-    '                        'barHeight = barbase * lSource.MFact / barMaxVal
-    '                        lBarFraction = lSource.MFact / lBarMaxVal
-    '                        If lBarFraction > 0 Then
-    '                            Dim lBrush As Brush = New SolidBrush(ColorFromDesc(DescToLabel(lSource.Source.Opn.Description)))
-    '                            'g.FillRectangle(lBrush, barPos, barbase - barHeight, lBarWidth, barHeight)
-    '                            g.FillRectangle(lBrush, barPos, lBarBottom, lBarWidth, CInt((lBarMaxTop - lBarBottom) * lBarFraction))
-    '                        End If
-    '                        barPos += lBarWidth + lBarSpace
-    '                    End If
-    '                Next lSource
-    '            Else 'Draw only land uses in LegendOrder, in order and leaving spaces for ones that do not appear in this segment
-    '                lBarWidth = (pIconWidth - 6) / LegendOrder.Count
-    '                If lBarWidth < 1 Then
-    '                    lBarWidth = 1
-    '                    lBarSpace = 0
-    '                ElseIf lBarWidth > 10 Then
-    '                    lBarWidth = 10
-    '                End If
-    '                For Each barDesc In LegendOrder
-    '                    lBarFraction = 0
-    '                    For Each lSource In aOperation.Sources
-    '                        If lSource.Source IsNot Nothing AndAlso lSource.Source.Opn IsNot Nothing _
-    '                          AndAlso (lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND") _
-    '                          AndAlso lSource.Source.Opn.Description = barDesc Then
-    '                            lBarFraction += lSource.MFact / lBarMaxVal
-    '                        End If
-    '                    Next lSource
-    '                    If lBarFraction > 0 Then
-    '                        Dim lBrush As Brush = New SolidBrush(ColorFromDesc(barDesc))
-    '                        'g.FillRectangle(lBrush, barPos, barbase - barHeight, lBarWidth, barHeight)
-    '                        Dim lBarTop As Integer = lBarMaxTop + CInt((1 - lBarFraction) * (lBarBottom - lBarMaxTop))
-    '                        g.FillRectangle(lBrush, barPos, lBarTop, lBarWidth, (lBarBottom - lBarTop))
-    '                    End If
-    '                    barPos += lBarWidth + lBarSpace
-    '                Next barDesc
-    '            End If
-
-    '        Case EnumLegendType.LegMet
-    '            ReDim included(pUci.MetSegs.Count)
-    '            If Not aOperation.MetSeg Is Nothing Then
-    '                included(aOperation.MetSeg.Id) = True
-    '                myid = aOperation.MetSeg.Id
-    '            Else
-    '                myid = 0
-    '            End If
-    '            'myid = 0
-    '            For Each lSource In aOperation.Sources
-    '                If lSource.Source.Opn IsNot Nothing Then
-    '                    If lSource.Source.Opn.MetSeg IsNot Nothing Then
-    '                        If lSource.Source.Opn.Name <> "RCHRES" Then
-    '                            'myid = lSource.Source.Opn.MetSeg.Id
-    '                            included(lSource.Source.Opn.MetSeg.Id) = True
-    '                        End If
-    '                    End If
-    '                End If
-    '            Next lSource
-
-    '            lStringMeasurement = g.MeasureString("X", Me.Font)
-    '            lX = lStringMeasurement.Width
-    '            lY = (lBarBottom - lStringMeasurement.Height) / 2
-    '            started = False
-    '            For sid = 1 To pUci.MetSegs.Count
-    '                If included(sid) Then
-    '                    Dim lStrPrint As String
-    '                    If started Then
-    '                        lStrPrint = ", " & sid
-    '                    Else
-    '                        lStrPrint = sid
-    '                        started = True
-    '                    End If
-    '                    'TODO: underline if this met seg contribs to reach directly,
-    '                    'dont underline if this met seg contribs to reach only indirectly through land segment
-    '                    'If sid = myid Then pic.Font = VB6.FontChangeUnderline(pic.Font, True) Else pic.Font = VB6.FontChangeUnderline(pic.Font, False) ' .ForeColor = vbHighlight Else pic.ForeColor = vbButtonText
-    '                    g.DrawString(sid, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-    '                    lX += g.MeasureString(sid, Me.Font).Width
-    '                End If
-    '            Next
-    '            'pic.Font.Underline = False
-    '        Case EnumLegendType.LegPoint
-    '            ReDim included(pUci.PointSources.Count)
-    '            'Debug.Print pPointSources.Count
-    '            For Each pPoint In aOperation.PointSources
-    '                included(pPoint.Id) = True
-    '            Next pPoint
-    '            lStringMeasurement = g.MeasureString("X", Me.Font)
-    '            lX = lStringMeasurement.Width
-    '            lY = (lBarBottom - lStringMeasurement.Height) / 2
-    '            For sid = 1 To pUci.PointSources.Count
-    '                If included(sid) Then
-    '                    Dim lStrPrint As String
-    '                    If started Then
-    '                        lStrPrint = ", " & sid
-    '                    Else
-    '                        lStrPrint = sid
-    '                        started = True
-    '                    End If
-    '                    g.DrawString(sid, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
-    '                    lX += g.MeasureString(sid, Me.Font).Width
-    '                End If
-    '            Next
-    '    End Select
-    '    '  With frmPictures
-    '    '    If pOpnBlk.Name = "RCHRES" Then
-    '    '      If pTables("GEN-INFO").ParmValue("LKFG") = 1 Then 'get the lake picture
-    '    '        pic.PaintPicture .picLake.Picture, pic.Width - .picLake.Width, 0, , , , , , barbase
-    '    '      Else
-    '    '        pic.PaintPicture .picStream.Picture, pic.Width - .picStream.Width, 0, , , , , , barbase
-    '    '      End If
-    '    '    ElseIf pOpnBlk.Name = "BMPRAC" Then
-    '    '      pic.PaintPicture .picBMP.Picture, pic.Width - .picBMP.Width, 0, , , , , , barbase
-    '    '    Else
-    '    '      'don't know what picture to use
-    '    '    End If
-    '    '  End With
-
-    '    Exit Sub
-    'End Sub
-
-    'Returns color for source.VolId
-    Private Function IdColor(ByRef aColorId As Integer) As Integer
-        Dim lIdColor As Integer = RGB(Rnd(-aColorId - 53) * 255, _
-                                      Rnd(-aColorId - 27) * 255, _
-                                      Rnd(-aColorId - 33) * 255)
-        Return lIdColor
-    End Function
-
-    Private Function ColorFromDesc(ByVal aDescription As String) As Color
-        Dim lColor As Color
-        Dim lUcaseDesc As String = aDescription.ToUpper
-        Dim lColorIndex As Integer = ColorMap.IndexFromKey(lUcaseDesc)
-        If lColorIndex >= 0 Then
-            lColor = ColorMap.ItemByIndex(lColorIndex)
-        Else
-            If lUcaseDesc.Contains("FOREST") OrElse lUcaseDesc.Contains("WOOD") Then
-                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("FOREST"))
-            ElseIf lUcaseDesc.Contains("AGRI") OrElse lUcaseDesc.Contains("FARM") Then
-                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("AGRICULTURAL"))
-            ElseIf lUcaseDesc.Contains("CROP") Then
-                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("AGRICULTURAL"))
-            ElseIf lUcaseDesc.Contains("URBAN") OrElse lUcaseDesc.Contains("INDU") Then
-                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("URBAN"))
-            ElseIf lUcaseDesc.Contains("WATER") Then
-                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("WATERWETLANDS"))
-            ElseIf lUcaseDesc.Contains("RESIDENTIAL") Then
-                ColorMap.Add(lUcaseDesc, ColorMap.ItemByKey("RESIDENTIAL"))
-            Else
-                ColorMap.Add(lUcaseDesc, Color.Black)
-            End If
-            Return ColorMap.ItemByKey(lUcaseDesc)
+        If aIcon.OrigImage IsNot Nothing Then
+            Dim lScaleWidth As Single = (pIconWidth - 2) / aIcon.OrigImage.Width
+            Dim lScaleHeight As Single = (lStringY - 2) / aIcon.OrigImage.Height
+            Dim lScale As Single = Math.Min(lScaleHeight, lScaleWidth)
+            g.DrawImage(aIcon.OrigImage, _
+                        (pIconWidth - lScale * aIcon.OrigImage.Width) / 2, _
+                        1 + (lStringY - lScale * aIcon.OrigImage.Height) / 2, _
+                        lScale * aIcon.OrigImage.Width, _
+                        lScale * aIcon.OrigImage.Height)
         End If
-        Return lColor
 
-    End Function
+        g.DrawString(aIcon.Label, Me.Font, SystemBrushes.ControlDarkDark, lStringX, lStringY)
 
-    Private Sub drawBorder(ByVal pic As Graphics, ByVal aWidth As Integer, ByVal aHeight As Integer, ByVal threeD As Boolean)
+        DrawBorder(g, pIconWidth, pIconHeight, Not aPrinting)
+        g.Dispose()
+        aIcon.BackgroundImage = lBitmap
+    End Sub
+
+    Private Sub DrawBorder(ByVal pic As Graphics, ByVal aWidth As Integer, ByVal aHeight As Integer, ByVal threeD As Boolean)
         Dim lPen As Pen
         If threeD Then
             lPen = New Pen(SystemColors.ControlLightLight)
@@ -569,17 +291,18 @@ Friend Class ctlSchematic
     End Sub
 
     'height of tree of this plus all downstream operations. 1=none downstream
-    Private Function DownLayers(ByVal aIcon As clsSchematicIcon, ByVal aAlreadyInPath As String) As Integer
+    Private Function DownLayers(ByVal aIcon As clsIcon, ByVal aAlreadyInPath As String) As Integer
         Dim lDeepestTarget As Integer = 0
-        For Each lDownIcon In aIcon.DownstreamIcons
-            If aAlreadyInPath.Contains(lDownIcon.Key & vbCrLf) AndAlso Not TreeLoopMessageDisplayed Then
+        If aIcon.DownstreamIcon IsNot Nothing Then
+            Dim lDownstreamKey As String = aIcon.DownstreamIcon.Key
+            If aAlreadyInPath.Contains(lDownstreamKey & vbCrLf) AndAlso Not TreeLoopMessageDisplayed Then
                 Dim lMessage As String = aAlreadyInPath
                 Logger.Msg(aAlreadyInPath, "Detected possible loop in operations")
                 TreeLoopMessageDisplayed = True
             Else
-                If AllIcons.Contains(lDownIcon.Key) Then
-                    aAlreadyInPath &= lDownIcon.Key & vbCrLf
-                    Dim lIcon As clsSchematicIcon = AllIcons(lDownIcon.Key)
+                If AllIcons.Contains(lDownstreamKey) Then
+                    aAlreadyInPath &= lDownstreamKey & vbCrLf
+                    Dim lIcon As clsIcon = AllIcons(lDownstreamKey)
                     If Not lIcon.UpstreamIcons.Contains(aIcon) Then lIcon.UpstreamIcons.Add(aIcon)
                     Dim lTargetDepth As Integer = DownLayers(lIcon, aAlreadyInPath)
                     If lTargetDepth > lDeepestTarget Then
@@ -587,12 +310,11 @@ Friend Class ctlSchematic
                     End If
                 End If
             End If
-        Next
+        End If
         Return lDeepestTarget + 1
     End Function
 
-    Private Sub LayoutFromIcon(ByVal aIcon As clsSchematicIcon, ByVal aY As Integer, ByVal aDy As Integer, ByVal aWidth As Integer, ByVal aPrinting As Boolean)
-        'DrawPictureOnReachControl(aIcon.ReachOrBMP, aPrinting, aIcon)
+    Private Sub LayoutFromIcon(ByVal aIcon As clsIcon, ByVal aY As Integer, ByVal aDy As Integer, ByVal aWidth As Integer, ByVal aPrinting As Boolean)
         With aIcon
             aIcon.Top = aY - pIconHeight / 2
             Dim lWidthPerItemThisRow As Integer = aWidth / pIconsDistantFromOutlet.ItemByKey(.DistanceFromOutlet)
@@ -611,23 +333,6 @@ Friend Class ctlSchematic
             Dim lWidthNeeded = aIcon.Left + pIconWidth * 1.5
             If lWidthNeeded > pWidthNeeded Then pWidthNeeded = lWidthNeeded
         End With
-    End Sub
-
-    Public Sub ClearTree()
-        picTree.SuspendLayout()
-        If picTree.BackgroundImage IsNot Nothing Then
-            picTree.BackgroundImage.Dispose()
-            picTree.BackgroundImage = Nothing 'New Bitmap(0, 0, Drawing.Imaging.PixelFormat.Format32bppArgb)
-        End If
-        picTree.Controls.Clear()
-        For Each lControl As Control In AllIcons
-            lControl.Dispose()
-        Next
-        AllIcons.Clear()
-        picTree.ResumeLayout()
-        pIconsDistantFromOutlet.Clear()
-        pIconsDistantFromOutletPlaced.Clear()
-        pOutlets.Clear()
     End Sub
 
     'Private Sub PopulateLandGrid()
@@ -662,7 +367,7 @@ Friend Class ctlSchematic
     '        '.set_ColType(2, ATCoCtl.ATCoDataType.ATCoTxt)
     '        '.set_ColType(3, ATCoCtl.ATCoDataType.ATCoTxt)
     '        '.set_ColType(4, ATCoCtl.ATCoDataType.ATCoTxt)
-    '        For Each lLegendIcon As clsSchematicIcon In pCurrentLegend.Icons
+    '        For Each lLegendIcon As clsIcon In pCurrentLegend.Icons
     '            If lLegendIcon.Selected Then
     '                Ptotal = 0
     '                Itotal = 0
@@ -671,7 +376,7 @@ Friend Class ctlSchematic
     '                lDesc = lLegendIcon.Key
     '                lRow = .Rows
     '                .CellValue(lRow, 0) = lDesc
-    '                For Each lReach As clsSchematicIcon In pIcons
+    '                For Each lReach As clsIcon In pIcons
     '                    AddedThisReach = False
     '                    If lReach.Selected Then
     '                        Dim lOperation As HspfOperation = lReach.ReachOrBMP
@@ -789,7 +494,7 @@ Friend Class ctlSchematic
     ''' <param name="sender">Schematic icon being clicked</param>
     ''' <param name="e"></param>
     Private Sub Icon_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
-        Dim lSender As clsSchematicIcon = sender
+        Dim lSender As clsIcon = sender
         Select Case e.Button
             Case Windows.Forms.MouseButtons.Left
                 pBeforeDragLocation = lSender.Location
@@ -801,8 +506,8 @@ Friend Class ctlSchematic
             Case Windows.Forms.MouseButtons.Right
                 pClickedIcon = lSender
                 RightClickMenu.MenuItems.Clear()
-                RightClickMenu.MenuItems.Add("""" & lSender.Key & """")
-                If lSender.Label <> lSender.Key Then RightClickMenu.MenuItems.Add("""" & lSender.Label & """")
+                RightClickMenu.MenuItems.Add("Open in WinHSPF: """ & lSender.Key & """")
+                'If lSender.Label <> lSender.Key Then RightClickMenu.MenuItems.Add("""" & lSender.Label & """")
                 If lSender.DistanceFromOutlet > 1 Then
                     RightClickMenu.MenuItems.Add("Select Downstream", AddressOf Event_SelectDownstream)
                 End If
@@ -835,13 +540,20 @@ Friend Class ctlSchematic
     ''' <param name="sender">Schematic icon being clicked</param>
     ''' <param name="e"></param>
     Private Sub Icon_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
+        Dim lSender As clsIcon = sender
         Select Case e.Button
             Case Windows.Forms.MouseButtons.Left
                 If pDragging Then 'end the dragging
                     pDragging = False
                     Windows.Forms.Cursor.Clip = Nothing
-                    If sender.Location = pBeforeDragLocation Then
-                        sender.Selected = Not sender.Selected
+                    'If same location, count as click rather than a drag
+                    If lSender.Location = pBeforeDragLocation Then
+                        Dim lModelForm As New frmModel
+                        lModelForm.Schematic = Me
+                        lModelForm.ModelIcon = lSender
+                        lModelForm.Show()
+
+                        'lSender.Selected = Not lSender.Selected
                         'UpdateDetails()
                     End If
                     DrawTreeBackground()
@@ -870,16 +582,16 @@ Friend Class ctlSchematic
         DrawTreeBackground()
     End Sub
 
-    Private Sub SelectDownstreamIcons(ByVal aSelect As Boolean, ByVal aIcon As clsSchematicIcon)
+    Private Sub SelectDownstreamIcons(ByVal aSelect As Boolean, ByVal aIcon As clsIcon)
         aIcon.Selected = True
-        For Each lIcon As clsSchematicIcon In aIcon.DownstreamIcons
-            SelectDownstreamIcons(aSelect, lIcon)
-        Next
+        If aIcon.DownstreamIcon IsNot Nothing Then
+            SelectDownstreamIcons(aSelect, aIcon.DownstreamIcon)
+        End If
     End Sub
 
-    Private Sub SelectUpstreamIcons(ByVal aSelect As Boolean, ByVal aIcon As clsSchematicIcon)
+    Private Sub SelectUpstreamIcons(ByVal aSelect As Boolean, ByVal aIcon As clsIcon)
         aIcon.Selected = True
-        For Each lIcon As clsSchematicIcon In aIcon.UpstreamIcons
+        For Each lIcon As clsIcon In aIcon.UpstreamIcons
             SelectUpstreamIcons(aSelect, lIcon)
         Next
     End Sub
