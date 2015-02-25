@@ -667,6 +667,7 @@ Public Class frmEstRecharge
                 Exit For
             End If
         Next
+
         Dim lGraphTS As New clsGraphTime(aDataGroup, lZgc)
         lGraphForm.Grapher = lGraphTS
         With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
@@ -679,7 +680,7 @@ Public Class frmEstRecharge
             .YAxis.Scale.Max = lMax
 
             .CurveList.Item(0).Color = Drawing.Color.Red 'original GWL data
-            .CurveList.Item(1).Color = Drawing.Color.DarkMagenta 'only the peaks
+            .CurveList.Item(1).Color = Drawing.Color.DarkBlue 'only the peaks
             If aDataGroup.Count > 2 Then
                 CType(.CurveList.Item(0), LineItem).Line.Width = 1
                 For I As Integer = 1 To aDataGroup.Count - 1
@@ -703,7 +704,7 @@ Public Class frmEstRecharge
         Select Case lMethod
             Case "FALL method"
                 If lCons.StartsWith("H2") Then
-                    Return Drawing.Color.Blue
+                    Return Drawing.Color.Magenta
                 ElseIf lCons.StartsWith("Recharge") Then
                     Return Drawing.Color.LightBlue
                 End If
@@ -721,7 +722,7 @@ Public Class frmEstRecharge
                 End If
             Case "Identified" 'hpeak
                 If lCons.StartsWith("Hpeak") Then
-                    Return Drawing.Color.Cyan
+                    Return Drawing.Color.Blue
                 End If
         End Select
     End Function
