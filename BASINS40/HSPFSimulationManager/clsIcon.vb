@@ -63,6 +63,7 @@ Public Class PanelDoubleBuffer
     Inherits Panel
     Sub New()
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
+        Me.BackgroundImageLayout = ImageLayout.None
         UpdateStyles()
     End Sub
 End Class

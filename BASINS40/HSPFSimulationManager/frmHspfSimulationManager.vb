@@ -52,7 +52,11 @@
             '.CheckPathExists = False
             If .ShowDialog(Me) = DialogResult.OK Then
                 Me.Text = "SARA HSPF Simulation Manager - " & .FileName
-                SchematicDiagram.BuildTree(clsSimulationManagerSpecFile.Open(Me.Size, .FileName))
+                Dim lIconSize As New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight)
+                Dim lNewIcons As IconCollection = clsSimulationManagerSpecFile.Open(Me.Size, lIconSize, .FileName)
+                SchematicDiagram.IconWidth = lIconSize.Width
+                SchematicDiagram.IconHeight = lIconSize.Height
+                SchematicDiagram.BuildTree(lNewIcons)
             End If
         End With
     End Sub
@@ -67,7 +71,7 @@
             '.CheckFileExists = False
             '.CheckPathExists = False
             If .ShowDialog(Me) = DialogResult.OK Then
-                clsSimulationManagerSpecFile.Save(SchematicDiagram.AllIcons, Me.Size, .FileName)
+                clsSimulationManagerSpecFile.Save(SchematicDiagram.AllIcons, Me.Size, New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight), .FileName)
             End If
         End With
     End Sub
