@@ -32,6 +32,44 @@ Public Class frmMain
 
         pDataGroup = aTimeseriesGroup
 
+        'Dim lProvisionalTs As atcTimeseries = Nothing
+        'Dim lNonProvisionalTs As atcTimeseries = Nothing
+        'SplitProvisional(pDataGroup(0), lProvisionalTs, lNonProvisionalTs)
+        'If lNonProvisionalTs IsNot Nothing Then
+        '    pDataGroup.Clear()
+        '    pDataGroup.Add(lNonProvisionalTs)
+        'Else
+        '    Throw New ApplicationException("No valid non-provisional data avaiable for analysis.")
+        '    Me.Close()
+        'End If
+
+        Dim lTimeseries As atcTimeseries = pDataGroup(0)
+        Dim lHasProvisional As Boolean = False
+        Dim lProvisionalAttribute As String = lTimeseries.Attributes.GetValue("ProvisionalValueAttribute", "P")
+        Dim lIndexFirstProvisional As Integer = 0
+        For lIndex As Integer = 1 To lTimeseries.numValues
+            If lTimeseries.ValueAttributesGetValue(lIndex, lProvisionalAttribute, False) Then
+                lHasProvisional = True
+                lIndexFirstProvisional = lIndex
+                Exit For
+            End If
+        Next
+        If lHasProvisional Then
+            Dim lDataFileHistory As String = lTimeseries.Attributes.GetValue("History 1")
+            Dim lDataSourceMatch As atcDataSource = Nothing
+            For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                Dim lDataSourceSpec As String = lDataSource.Specification.ToLower()
+                If lDataFileHistory.ToLower().Contains(lDataSourceSpec) Then
+                    lDataSourceMatch = lDataSource
+                    Exit For
+                End If
+            Next
+            Dim lEndDate As Double = lTimeseries.Dates.Value(lIndexFirstProvisional - 2)
+            lTimeseries = SubsetByDate(lTimeseries, lTimeseries.Dates.Value(0), lEndDate, lDataSourceMatch)
+            pDataGroup.Clear()
+            pDataGroup.Add(lTimeseries)
+        End If
+
         pWTFAttributes = New atcDataAttributes()
 
         If FallObj Is Nothing Then
