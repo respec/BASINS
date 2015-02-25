@@ -5,7 +5,7 @@ Public Class clsSimulationManagerSpecFile
     Private Const FileHeader As String = "SARA HSPF Simulation Manager Configuration v1.0"
     Private Shared pDelimiters() As Char = {" "c, Chr(9)}
 
-    Friend Shared Function Open(ByRef aWindowSize As Drawing.Size, ByVal aFileName As String) As IconCollection
+    Friend Shared Function Open(ByRef aWindowSize As Drawing.Size, ByRef aIconSize As Drawing.Size, ByVal aFileName As String) As IconCollection
         Dim lAllModels As New IconCollection
         Dim lReadingModel As clsIcon = Nothing
         Dim lBasePath As String = String.Empty
@@ -64,6 +64,11 @@ Public Class clsSimulationManagerSpecFile
                             If lWidthHeight.Length = 2 Then
                                 aWindowSize = New Drawing.Size(CInt(lWidthHeight(0)), CInt(lWidthHeight(1)))
                             End If
+                        Case "ICONSIZE"
+                            Dim lWidthHeight() As String = lArgument.Replace(" ", "").Split(",")
+                            If lWidthHeight.Length = 2 Then
+                                aIconSize = New Drawing.Size(CInt(lWidthHeight(0)), CInt(lWidthHeight(1)))
+                            End If
                     End Select
                 End If
             End If
@@ -71,10 +76,11 @@ Public Class clsSimulationManagerSpecFile
         Return lAllModels
     End Function
 
-    Friend Shared Sub Save(ByVal aSaveIcons As IconCollection, ByVal aWindowSize As Drawing.Size, ByVal aFileName As String)
+    Friend Shared Sub Save(ByVal aSaveIcons As IconCollection, ByVal aWindowSize As Drawing.Size, ByVal aIconSize As Drawing.Size, ByVal aFileName As String)
         Dim lWriter As New IO.StreamWriter(aFileName)
         lWriter.WriteLine(FileHeader)
         lWriter.WriteLine("WindowSize" & vbTab & aWindowSize.Width & "," & aWindowSize.Height)
+        lWriter.WriteLine("IconSize" & vbTab & aIconSize.Width & "," & aIconSize.Height)
         Try
             Dim lBasePath As String = IO.Path.GetDirectoryName(aSaveIcons(0).UciFileName)
             If lBasePath.Length > 0 Then lBasePath &= IO.Path.DirectorySeparatorChar
@@ -99,26 +105,27 @@ Public Class clsSimulationManagerSpecFile
                     End If
                 End If
             Next
+            'Make sure lBasePath ends with a complete folder name, discard any partial match
             While lBasePath.Length > 0 AndAlso Not lBasePath.EndsWith(IO.Path.DirectorySeparatorChar)
                 lBasePath = lBasePath.Substring(0, lBasePath.Length - 1)
             End While
             If lBasePath.Length > 0 Then
-                lWriter.WriteLine("BASEPATH" & vbTab & lBasePath)
+                lWriter.WriteLine("BasePath" & vbTab & lBasePath)
             End If
 
             For Each lIcon In aSaveIcons
-                lWriter.WriteLine("MODELUCI" & vbTab & RemoveBasePath(lIcon.UciFileName, lBasePath))
-                lWriter.WriteLine("MODELNAME" & vbTab & lIcon.Label)
+                lWriter.WriteLine()
+                lWriter.WriteLine("ModelUCI" & vbTab & RemoveBasePath(lIcon.UciFileName, lBasePath))
+                lWriter.WriteLine("ModelName" & vbTab & lIcon.Label)
                 If lIcon.DownstreamIcon Is Nothing Then
-                    lWriter.WriteLine("DOWNSTREAMUCI" & vbTab & "none")
+                    lWriter.WriteLine("DownstreamUCI" & vbTab & "none")
                 Else
-                    lWriter.WriteLine("DOWNSTREAMUCI" & vbTab & RemoveBasePath(lIcon.DownstreamIcon.UciFileName, lBasePath))
+                    lWriter.WriteLine("DownstreamUCI" & vbTab & RemoveBasePath(lIcon.DownstreamIcon.UciFileName, lBasePath))
                 End If
                 If IO.File.Exists(lIcon.WatershedImageFilename) Then
-                    lWriter.WriteLine("WATERSHEDIMAGE" & vbTab & RemoveBasePath(lIcon.WatershedImageFilename, lBasePath))
+                    lWriter.WriteLine("WatershedImage" & vbTab & RemoveBasePath(lIcon.WatershedImageFilename, lBasePath))
                 End If
-                lWriter.WriteLine("MODELXY" & vbTab & lIcon.Location.X & "," & lIcon.Location.Y)
-                lWriter.WriteLine()
+                lWriter.WriteLine("ModelXY" & vbTab & lIcon.Location.X & "," & lIcon.Location.Y)
             Next
         Catch ex As Exception
             Logger.Msg(ex.ToString, MsgBoxStyle.Exclamation, "Error Saving " & aFileName)

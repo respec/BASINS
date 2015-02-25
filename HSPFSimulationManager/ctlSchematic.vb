@@ -26,8 +26,8 @@ Friend Class ctlSchematic
     Private HighlightBrush As Brush = SystemBrushes.Highlight
     Private LegendScrollPos As Integer
     Private LegendFullHeight As Integer
-    Private pIconWidth As Integer = 150
-    Private pIconHeight As Integer = 150
+    Public IconWidth As Integer = 150
+    Public IconHeight As Integer = 150
     Private pBorderWidth As Integer = 3
     Private pTreeBackground As Bitmap
 
@@ -60,7 +60,7 @@ Friend Class ctlSchematic
         pIconsDistantFromOutletPlaced.Clear()
         pOutlets.Clear()
 
-        Dim lNodeSize As New Drawing.Size(pIconWidth, pIconHeight)
+        Dim lNodeSize As New Drawing.Size(IconWidth, IconHeight)
 
         'Will be set True if any icons need a new location (because they are at zero)
         Dim lRefreshingLayout As Boolean = False
@@ -75,7 +75,7 @@ Friend Class ctlSchematic
             AddHandler lNewIcon.MouseUp, AddressOf Icon_MouseUp
             If Not AllIcons.Contains(lNewIcon) Then AllIcons.Add(lNewIcon)
             picTree.Controls.Add(lNewIcon)
-            If lNewIcon.Location.X = 0 Then lRefreshingLayout = True
+            If lNewIcon.Location.X = 0 AndAlso lNewIcon.Location.Y = 0 Then lRefreshingLayout = True
             DrawIcon(False, lNewIcon)
         Next
 
@@ -106,8 +106,32 @@ Friend Class ctlSchematic
             Else
                 DrawTreeBackground()
             End If
+            'SetScrollVisible()
         End If
     End Sub
+
+    'Public Sub SetScrollVisible()
+    '    Dim lMinX As Integer = Me.Width
+    '    Dim lMaxX As Integer = 0
+    '    Dim lMinY As Integer = Me.Height
+    '    Dim lMaxY As Integer = 0
+    '    For Each lNewIcon As clsIcon In AllIcons
+    '        If lNewIcon.Left < lMinX Then lMinX = lNewIcon.Left
+    '        If lNewIcon.Right > lMaxX Then lMaxX = lNewIcon.Right
+    '        If lNewIcon.Top < lMinY Then lMinY = lNewIcon.Top
+    '        If lNewIcon.Bottom > lMaxY Then lMaxY = lNewIcon.Bottom
+    '    Next
+    '    If lMinX < 0 OrElse lMaxX > Me.Width Then
+    '        Me.HScroll = True
+    '    Else
+    '        Me.HScroll = False
+    '    End If
+    '    If lMinY < 0 OrElse lMaxY > Me.Height Then
+    '        Me.VScroll = True
+    '    Else
+    '        Me.VScroll = False
+    '    End If
+    'End Sub
 
     Private Sub LayoutTree(Optional ByVal aPrinting As Boolean = False)
         Static lInLayout As Boolean = False
@@ -133,9 +157,9 @@ Friend Class ctlSchematic
                 '    'drawsurface = Printer
                 '    'pic = picBuffer
                 'Else
-                If pMaximumTreeDepth > 1 Then dy = (picTree.Height - pIconHeight * 2) / (pMaximumTreeDepth - 1)
-                If dy < pIconHeight * 1.5 Then
-                    dy = pIconHeight * 1.5
+                If pMaximumTreeDepth > 1 Then dy = (picTree.Height - IconHeight * 2) / (pMaximumTreeDepth - 1)
+                If dy < IconHeight * 1.5 Then
+                    dy = IconHeight * 1.5
                     'TODO: enable vertical scrolling
                 End If
                 drawsurface = picTree
@@ -143,7 +167,7 @@ Friend Class ctlSchematic
                 'End If 'Printing
 
                 picTree.Size = Me.ClientSize
-                Dim Ybase As Integer = drawsurface.Height - pIconHeight
+                Dim Ybase As Integer = drawsurface.Height - IconHeight
                 pHeightNeeded = 0
                 pWidthNeeded = 0
 
@@ -247,29 +271,39 @@ Friend Class ctlSchematic
     End Sub
 
     Private Sub DrawIcon(ByVal aPrinting As Boolean, ByVal aIcon As clsIcon)
-        Dim lBitmap As New Bitmap(pIconWidth, pIconHeight, Drawing.Imaging.PixelFormat.Format32bppArgb)
+        Dim lBitmap As New Bitmap(IconWidth, IconHeight, Drawing.Imaging.PixelFormat.Format32bppArgb)
         Dim g As Graphics = Graphics.FromImage(lBitmap)
 
         g.Clear(SystemColors.Control)
+        If aIcon.Font.Size < 8.25 Then
+            aIcon.Font.Dispose()
+            aIcon.Font = New Font("Microsoft Sans Serif", 8.25)
+        End If
 
-        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(aIcon.Label, Me.Font)
-        Dim lStringX As Single = (pIconWidth - lStringMeasurement.Width) / 2
-        Dim lStringY As Single = pIconHeight - lStringMeasurement.Height * 1.25
+        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(aIcon.Label, aIcon.Font)
+        While lStringMeasurement.Width > IconWidth
+            Dim lOldSize As Single = aIcon.Font.Size
+            aIcon.Font = New Font("Microsoft Sans Serif", aIcon.Font.Size - 1)
+            If aIcon.Font.Size = lOldSize Then Exit While
+            lStringMeasurement = g.MeasureString(aIcon.Label, aIcon.Font)
+        End While
+        Dim lStringX As Single = (IconWidth - lStringMeasurement.Width) / 2
+        Dim lStringY As Single = IconHeight - lStringMeasurement.Height * 1.25
 
         If aIcon.OrigImage IsNot Nothing Then
-            Dim lScaleWidth As Single = (pIconWidth - 2) / aIcon.OrigImage.Width
+            Dim lScaleWidth As Single = (IconWidth - 2) / aIcon.OrigImage.Width
             Dim lScaleHeight As Single = (lStringY - 2) / aIcon.OrigImage.Height
             Dim lScale As Single = Math.Min(lScaleHeight, lScaleWidth)
             g.DrawImage(aIcon.OrigImage, _
-                        (pIconWidth - lScale * aIcon.OrigImage.Width) / 2, _
+                        (IconWidth - lScale * aIcon.OrigImage.Width) / 2, _
                         1 + (lStringY - lScale * aIcon.OrigImage.Height) / 2, _
                         lScale * aIcon.OrigImage.Width, _
                         lScale * aIcon.OrigImage.Height)
         End If
 
-        g.DrawString(aIcon.Label, Me.Font, SystemBrushes.ControlDarkDark, lStringX, lStringY)
+        g.DrawString(aIcon.Label, aIcon.Font, SystemBrushes.ControlDarkDark, lStringX, lStringY)
 
-        DrawBorder(g, pIconWidth, pIconHeight, Not aPrinting)
+        DrawBorder(g, IconWidth, IconHeight, Not aPrinting)
         g.Dispose()
         aIcon.BackgroundImage = lBitmap
     End Sub
@@ -316,10 +350,10 @@ Friend Class ctlSchematic
 
     Private Sub LayoutFromIcon(ByVal aIcon As clsIcon, ByVal aY As Integer, ByVal aDy As Integer, ByVal aWidth As Integer, ByVal aPrinting As Boolean)
         With aIcon
-            aIcon.Top = aY - pIconHeight / 2
+            aIcon.Top = aY - IconHeight / 2
             Dim lWidthPerItemThisRow As Integer = aWidth / pIconsDistantFromOutlet.ItemByKey(.DistanceFromOutlet)
             If lWidthPerItemThisRow < aIcon.Width * 1.25 Then lWidthPerItemThisRow = aIcon.Width * 1.25
-            aIcon.Left = pIconsDistantFromOutletPlaced.ItemByKey(.DistanceFromOutlet) * lWidthPerItemThisRow + (lWidthPerItemThisRow - pIconWidth) / 2
+            aIcon.Left = pIconsDistantFromOutletPlaced.ItemByKey(.DistanceFromOutlet) * lWidthPerItemThisRow + (lWidthPerItemThisRow - IconWidth) / 2
             pIconsDistantFromOutletPlaced.Increment(.DistanceFromOutlet, 1)
             Dim lNumUpstream As Integer = aIcon.UpstreamIcons.Count
             If lNumUpstream > 0 Then
@@ -328,9 +362,9 @@ Friend Class ctlSchematic
                     LayoutFromIcon(lUpstreamIcon, aY, aDy, aWidth, aPrinting)
                 Next
             End If
-            Dim lHeightNeeded = picTree.Height - aY + pIconHeight
+            Dim lHeightNeeded = picTree.Height - aY + IconHeight
             If lHeightNeeded > pHeightNeeded Then pHeightNeeded = lHeightNeeded
-            Dim lWidthNeeded = aIcon.Left + pIconWidth * 1.5
+            Dim lWidthNeeded = aIcon.Left + IconWidth * 1.5
             If lWidthNeeded > pWidthNeeded Then pWidthNeeded = lWidthNeeded
         End With
     End Sub
@@ -478,7 +512,7 @@ Friend Class ctlSchematic
         'picTree.Size = Me.ClientSize
         picTree.Dock = DockStyle.Fill
         'picTree.Height = Me.SplitLegendTree.Panel2.Width
-        Me.AutoScroll = True
+        picTree.AutoScroll = True
 
         'LegendLandSurface.LegendType = EnumLegendType.LegLand
         'LegendMetSegs.LegendType = EnumLegendType.LegMet
@@ -502,7 +536,7 @@ Friend Class ctlSchematic
                 pDragging = True
                 pDragOffset = lSender.Location - MPosition
                 Windows.Forms.Cursor.Clip = Me.RectangleToScreen(New Rectangle(picTree.Left + e.X, _
-                                                                 picTree.Top + e.Y, picTree.Width - pIconWidth, picTree.Height - pIconHeight))
+                                                                 picTree.Top + e.Y, picTree.Width - IconWidth, picTree.Height - IconHeight))
             Case Windows.Forms.MouseButtons.Right
                 pClickedIcon = lSender
                 RightClickMenu.MenuItems.Clear()
@@ -615,6 +649,29 @@ Friend Class ctlSchematic
 
     End Sub
 
+    Private Sub Scroll_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseWheel, picTree.MouseWheel
+        Dim lScale As Single
+        If e.Delta > 0 Then
+            lScale = 1.111111
+        Else
+            lScale = 0.9
+        End If
+
+        If IconHeight * lScale < 50 Then
+            lScale = 50 / IconHeight
+        ElseIf IconHeight * lScale > 500 Then
+            lScale = 500 / IconHeight
+        End If
+
+        IconHeight *= lScale
+        IconWidth *= lScale
+        'Dim lScale As Single = (pIconHeight + lDelta) / pIconHeight
+        For Each lIcon As clsIcon In AllIcons
+            lIcon.Location = New Drawing.Point(lIcon.Left * lScale, lIcon.Top * lScale)
+        Next
+        Me.BuildTree(AllIcons)
+    End Sub
+
     'Private Sub pCurrentLegend_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles pCurrentLegend.Resize
     '    UpdateLegend()
     'End Sub
@@ -635,4 +692,5 @@ Friend Class ctlSchematic
     Private Sub SplitLegendTree_SplitterMoved(ByVal sender As Object, ByVal e As System.Windows.Forms.SplitterEventArgs)
         LayoutTree()
     End Sub
+
 End Class

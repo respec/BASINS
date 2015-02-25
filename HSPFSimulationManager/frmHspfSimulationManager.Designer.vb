@@ -27,9 +27,9 @@ Partial Class frmHspfSimulationManager
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.SchematicDiagram = New HSPFSimulationManager.ctlSchematic()
         Me.SaveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.SchematicDiagram = New HSPFSimulationManager.ctlSchematic()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -52,43 +52,45 @@ Partial Class frmHspfSimulationManager
         'OpenToolStripMenuItem
         '
         Me.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem"
-        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(132, 22)
         Me.OpenToolStripMenuItem.Text = "Open"
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
         Me.ExitToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.F4), System.Windows.Forms.Keys)
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(132, 22)
         Me.ExitToolStripMenuItem.Text = "Exit"
-        '
-        'SchematicDiagram
-        '
-        Me.SchematicDiagram.AutoScroll = True
-        Me.SchematicDiagram.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SchematicDiagram.Location = New System.Drawing.Point(0, 0)
-        Me.SchematicDiagram.Name = "SchematicDiagram"
-        Me.SchematicDiagram.Size = New System.Drawing.Size(1253, 732)
-        Me.SchematicDiagram.TabIndex = 3
         '
         'SaveToolStripMenuItem
         '
         Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
-        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(132, 22)
         Me.SaveToolStripMenuItem.Text = "Save"
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(149, 6)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(129, 6)
+        '
+        'SchematicDiagram
+        '
+        Me.SchematicDiagram.AutoScroll = True
+        Me.SchematicDiagram.AutoScrollMargin = New System.Drawing.Size(5, 5)
+        Me.SchematicDiagram.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.SchematicDiagram.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.SchematicDiagram.Location = New System.Drawing.Point(0, 24)
+        Me.SchematicDiagram.Name = "SchematicDiagram"
+        Me.SchematicDiagram.Size = New System.Drawing.Size(1253, 708)
+        Me.SchematicDiagram.TabIndex = 3
         '
         'frmHspfSimulationManager
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1253, 732)
-        Me.Controls.Add(Me.MenuStrip1)
         Me.Controls.Add(Me.SchematicDiagram)
+        Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmHspfSimulationManager"
