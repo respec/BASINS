@@ -99,10 +99,10 @@ Public Class frmMain
             Case "00000" 'no data was measured
                 Exit Sub
             Case "72019" 'Depth to water level, feet below land surface
-                Dim lDatumElev As Double = lGWLTs.Attributes.GetValue("alt_va", -10000)
-                If lDatumElev < -9999 Then
-                    lDatumElev = lGWLTs.Attributes.GetValue("Elev", -10000)
-                    If lDatumElev < -9999 Then
+                Dim lDatumElev As Double = lGWLTs.Attributes.GetValue("alt_va", Double.NaN)
+                If Double.IsNaN(lDatumElev) Then
+                    lDatumElev = lGWLTs.Attributes.GetValue("Elev", Double.NaN)
+                    If Double.IsNaN(lDatumElev) Then
                         Logger.Msg("Missing land surface elevation data for depth GWL data.", MsgBoxStyle.Information, "WTF Analysis")
                         Exit Sub
                     End If
@@ -140,6 +140,14 @@ Public Class frmMain
         FallObj = New clsFall()
         FallObj.Phase = WTFAnalysis.FindRecession
         lfrmFall.Initialize(pDataGroup, pBasicAttributes, , , FallObj)
+        Dim lFallD As Double = pDataGroup(0).Attributes.GetValue("FallD", Double.NaN)
+        Dim lKgw As Double = pDataGroup(0).Attributes.GetValue("FallKgw", Double.NaN)
+        If Double.IsNaN(lFallD) Then
+            If pWTF IsNot Nothing Then
+                CType(pWTF, clsWTFFall).GWLAsymptote = lFallD
+                CType(pWTF, clsWTFFall).KGWL = -1 * (1 / lKgw)
+            End If
+        End If
         'ElseIf rdoAntMethodLinear.Checked Then
         '    If pWTF Is Nothing Then
         '        pWTF = New clsWTFLinear()

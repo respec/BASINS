@@ -343,6 +343,9 @@ Public Class frmEstRecharge
         'Monthly and Yearly Recharge output
         'At the same time construct two separate timeseries (point type) for H2 and Hpeak
 
+        'Dim lNP As atcTimeseries
+        'Dim lP As atcTimeseries
+        'SplitProvisional(pDataGroup(0), lP, lNP)
         Dim lSegCtr As Integer = 1
         Dim lTsDailyRecharge As atcTimeseries = pDataGroup(0).Clone()
         Dim lTsDailyH2 As atcTimeseries = pDataGroup(0).Clone()
@@ -359,9 +362,9 @@ Public Class frmEstRecharge
         End If
 
         For I As Integer = 1 To pGraphTsHPeak.numValues
-            lTsDailyRecharge.Value(I) = 0.0 'Double.NaN
-            lTsDailyH2.Value(I) = 0.0 'Double.NaN
-            pGraphTsHPeak.Value(I) = 0.0 'Double.NaN
+            lTsDailyRecharge.Value(I) = Double.NaN
+            lTsDailyH2.Value(I) = Double.NaN
+            pGraphTsHPeak.Value(I) = Double.NaN
         Next
 
         'Title line
@@ -535,32 +538,39 @@ Public Class frmEstRecharge
         Dim lGraphTsGroup As New atcTimeseriesGroup()
         lGraphTsGroup.Add(RiseObj.FlowData) 'original GWL data
 
-        'processing peak Tser before graphing
-        For I As Integer = 1 To pGraphTsHPeak.numValues
-            If pGraphTsHPeak.Value(I) = 0 Then
-                pGraphTsHPeak.Value(I) = GetNaN()
-            End If
-        Next
+        ''processing peak Tser before graphing
+        'For I As Integer = 1 To pGraphTsHPeak.numValues
+        '    If pGraphTsHPeak.Value(I) = 0 Then
+        '        pGraphTsHPeak.Value(I) = GetNaN()
+        '    End If
+        'Next
         pGraphTsHPeak.Attributes.SetValue("Scenario", "Identified")
         pGraphTsHPeak.Attributes.SetValue("Constituent", "Hpeak")
-        pGraphTsHPeak.Attributes.SetValue("point", True)
+        pGraphTsHPeak.Attributes.SetValue("point", False) 'change it later
         lGraphTsGroup.Add(pGraphTsHPeak) 'only the peaks
 
         'processing H2 Tsers before graphing
         For I As Integer = 0 To pGraphTsGroupH2.Count - 1
-            For J As Integer = 1 To pGraphTsGroupH2(I).numValues
-                If pGraphTsGroupH2(I).Value(J) = 0 Then
-                    pGraphTsGroupH2(I).Value(J) = GetNaN()
-                End If
-            Next
-            pGraphTsGroupH2(I).Attributes.SetValue("point", True)
+            'For J As Integer = 1 To pGraphTsGroupH2(I).numValues
+            '    If pGraphTsGroupH2(I).Value(J) = 0 Then
+            '        pGraphTsGroupH2(I).Value(J) = GetNaN()
+            '    End If
+            'Next
+            pGraphTsGroupH2(I).Attributes.SetValue("point", False) 'change it later
         Next
         lGraphTsGroup.AddRange(pGraphTsGroupH2) 'up to 3 projected H2 Tsers
 
+        Dim lGraphTsGroupSubsetDates As New atcTimeseriesGroup()
         For I As Integer = 0 To lGraphTsGroup.Count - 1
-            lGraphTsGroup(I) = SubsetByDate(lGraphTsGroup(I), lStartDateForGraph, lEndDataForGraph, Nothing)
+            Dim lTs As atcTimeseries = SubsetByDate(lGraphTsGroup(I), lStartDateForGraph, lEndDataForGraph, Nothing)
+            Dim lcons As String = lTs.Attributes.GetValue("Constituent")
+            Select Case lcons.ToUpper()
+                Case "H2", "HPEAK"
+                    lTs.Attributes.SetValue("Point", True)
+            End Select
+            lGraphTsGroupSubsetDates.Add(lTs)
         Next
-        DoWTFGraphTimeseries("Timeseries", False, lGraphTsGroup)
+        DoWTFGraphTimeseries("Timeseries", False, lGraphTsGroupSubsetDates)
 
         Logger.Msg("Writing output is done." & vbCrLf & lOutputFilename, "WTF Output")
     End Sub
