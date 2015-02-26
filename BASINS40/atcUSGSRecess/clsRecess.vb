@@ -459,8 +459,10 @@ Public Class clsRecess
             Next
             listOfSegments.Clear()
         End If
-
-        FlowData = Nothing
+        If FlowData IsNot Nothing Then
+            FlowData.Clear()
+            FlowData = Nothing
+        End If
         FileOut1Created = False
         FileOut2Created = False
         pRecSumResult = ""
