@@ -28,6 +28,12 @@ Public Class frmBatchMap
         If pListStations Is Nothing Then pListStations = New atcCollection()
     End Sub
 
+    Private Sub frmBatchMap_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        If IO.Directory.Exists(txtDataDir.Text) Then
+            SaveSetting("atcUSGSBaseflow", "Default", "DataDir", txtDataDir.Text)
+        End If
+    End Sub
+
     Private Sub frmBatchMap_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         lstStations.LeftLabel = "Stations from map"
         lstStations.RightLabel = "Selected for a group"
@@ -38,6 +44,10 @@ Public Class frmBatchMap
         Next
         pBFInputsGlobal = New atcDataAttributes()
         pBFInputsGroups = New atcCollection()
+        Dim lDataDir As String = GetSetting("atcUSGSBaseflow", "Default", "DataDir", "")
+        If IO.Directory.Exists(lDataDir) Then
+            txtDataDir.Text = lDataDir
+        End If
     End Sub
 
     Private Sub btnCreateGroup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCreateGroup.Click
@@ -153,6 +163,73 @@ Public Class frmBatchMap
                     lBFInputs.SetValue("Operation", "GroupSetParm")
                     lBFInputs.SetValue("Group", lGroupName)
                     pBFInputsGroups.Add(lGroupName, lBFInputs)
+                End If
+                'Try to use global setting as much as possible
+                If pBFInputsGlobal IsNot Nothing Then
+                    Dim lMethods As ArrayList = lBFInputs.GetValue(BFInputNames.BFMethods, Nothing)
+                    If lMethods Is Nothing Then
+                        Dim lMethodsGlobal As ArrayList = pBFInputsGlobal.GetValue(BFInputNames.BFMethods, Nothing)
+                        If lMethodsGlobal IsNot Nothing Then
+                            lBFInputs.SetValue(BFInputNames.BFMethods, lMethodsGlobal)
+                        End If
+                    End If
+                    Dim lOutputDir As String = lBFInputs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+                    If String.IsNullOrEmpty(lOutputDir) Then
+                        Dim lOutputDirGlobal As String = pBFInputsGlobal.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+                        If Not String.IsNullOrEmpty(lOutputDirGlobal) Then
+                            lBFInputs.SetValue(BFBatchInputNames.OUTPUTDIR, lOutputDirGlobal)
+                        End If
+                    End If
+                    Dim lOutputFileRoot As String = lBFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+                    If String.IsNullOrEmpty(lOutputFileRoot) Then
+                        Dim lOutputFileRootGlobal As String = pBFInputsGlobal.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+                        If Not String.IsNullOrEmpty(lOutputFileRootGlobal) Then
+                            lBFInputs.SetValue(BFBatchInputNames.OUTPUTPrefix, lOutputFileRootGlobal)
+                        End If
+                    End If
+                    Dim lBFIReportBy As String = lBFInputs.GetValue(BFInputNames.BFIReportby, "")
+                    If String.IsNullOrEmpty(lBFIReportBy) Then
+                        Dim lBFIReportByGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFIReportby, "")
+                        If Not String.IsNullOrEmpty(lBFIReportByGlobal) Then
+                            lBFInputs.SetValue(BFInputNames.BFIReportby, lBFIReportByGlobal)
+                        End If
+                    End If
+                    Dim lBFIRecessConst As String = lBFInputs.GetValue(BFInputNames.BFIRecessConst, "")
+                    If String.IsNullOrEmpty(lBFIRecessConst) Then
+                        Dim lBFIRecessConstGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFIRecessConst, "")
+                        If Not String.IsNullOrEmpty(lBFIRecessConstGlobal) Then
+                            lBFInputs.SetValue(BFInputNames.BFIRecessConst, lBFIRecessConstGlobal)
+                        End If
+                    End If
+                    Dim lBFITurnPtFrac As String = lBFInputs.GetValue(BFInputNames.BFITurnPtFrac, "")
+                    If String.IsNullOrEmpty(lBFITurnPtFrac) Then
+                        Dim lBFITurnPtFracGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFITurnPtFrac, "")
+                        If Not String.IsNullOrEmpty(lBFITurnPtFracGlobal) Then
+                            lBFInputs.SetValue(BFInputNames.BFITurnPtFrac, lBFITurnPtFracGlobal)
+                        End If
+                    End If
+                    Dim lBFINDay As String = lBFInputs.GetValue(BFInputNames.BFINDayScreen, "")
+                    If String.IsNullOrEmpty(lBFINDay) Then
+                        Dim lBFINDayGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFINDayScreen, "")
+                        If Not String.IsNullOrEmpty(lBFINDayGlobal) Then
+                            lBFInputs.SetValue(BFInputNames.BFINDayScreen, lBFINDayGlobal)
+                        End If
+                    End If
+
+                    Dim lBFStartDate As String = lBFInputs.GetValue(BFInputNames.StartDate, "")
+                    If String.IsNullOrEmpty(lBFStartDate) Then
+                        Dim lBFStartDateGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.StartDate, "")
+                        If Not String.IsNullOrEmpty(lBFStartDateGlobal) Then
+                            lBFInputs.SetValue(BFInputNames.StartDate, lBFStartDateGlobal)
+                        End If
+                    End If
+                    Dim lBFEndDate As String = lBFInputs.GetValue(BFInputNames.EndDate, "")
+                    If String.IsNullOrEmpty(lBFEndDate) Then
+                        Dim lBFEndDateGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.EndDate, "")
+                        If Not String.IsNullOrEmpty(lBFEndDateGlobal) Then
+                            lBFInputs.SetValue(BFInputNames.EndDate, lBFEndDateGlobal)
+                        End If
+                    End If
                 End If
 
                 Dim lArgs As New atcDataAttributes()
@@ -430,13 +507,17 @@ Public Class frmBatchMap
     Private Sub btnSaveSpecs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSaveSpecs.Click
         If pBFInputsGlobal.Count = 0 Then
             Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
-            Return
+            Exit Sub
         End If
         If pBFInputsGroups.Count = 0 Then
             Logger.Msg("Need to set up batch run groups.", "Batch Map Base-flow Separation")
-            Return
+            Exit Sub
         End If
-        pBatchSpecFilefullname = IO.Path.Combine(pDataPath, "BatchConfigBase-flowSep_" & SafeFilename(DateTime.Now) & ".txt")
+        Dim lSpecDir As String = pBFInputsGlobal.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+        If String.IsNullOrEmpty(lSpecDir) Then
+            lSpecDir = pDataPath
+        End If
+        pBatchSpecFilefullname = IO.Path.Combine(lSpecDir, "BatchConfigBase-flowSep_" & SafeFilename(DateTime.Now) & ".txt")
         Dim lSW As IO.StreamWriter = Nothing
         Try
             lSW = New IO.StreamWriter(pBatchSpecFilefullname, False)

@@ -528,9 +528,20 @@ Public Class clsBatchBFSpec
             If aStation.DataSource.Open(lDataFilename) Then
                 lDataReady = True
             End If
-        Else
+        End If
+        If Not lDataReady Then
             If aStation.DataSource.DataSets.Count > 0 Then
                 lDataReady = True
+            Else
+                'Already opened in the project
+                For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                    Dim lSpec As String = lDataSource.Specification
+                    If String.Compare(lDataFilename.Trim(), lSpec.Trim(), True) = 0 Then
+                        lDataReady = True
+                        aStation.DataSource.DataSets.AddRange(lDataSource.DataSets)
+                        Exit For
+                    End If
+                Next
             End If
         End If
         If lDataReady Then
@@ -540,8 +551,8 @@ Public Class clsBatchBFSpec
                     Return lGroup(0)
                 Else
                     Dim lTsFlow As atcTimeseries = lGroup(0).Clone()
-                    aStation.DataSource.Clear()
-                    aStation.DataSource = Nothing
+                    'aStation.DataSource.Clear()
+                    'aStation.DataSource = Nothing
                     Return lTsFlow
                 End If
             End If
@@ -641,13 +652,13 @@ Public Class clsBatchBFSpec
                             MethodsLastDone = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
                             ASCIICommon(lTsFlow)
                         End If
+                        lStation.Message &= lStation.CalcBF.BF_Message.Trim()
                     Catch ex As Exception
                         lStation.Message &= "Error: Base-flow separation and/or reporting failed." & vbCrLf
                     End Try
                 Else
                     lStation.Message &= "Error: flow data is missing." & vbCrLf
                 End If
-                lStation.Message &= lStation.CalcBF.BF_Message.Trim()
                 'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
                 UpdateStatus("Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True)
                 lBFOpnCount += 1
