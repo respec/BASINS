@@ -1,9 +1,10 @@
 ﻿Imports System.Windows.Forms
+Imports System.Threading
 
 Public Class frmBatch
     'Public WithEvents pBatchConfig As New clsBatchBFSpec()
     Private pBatchConfig As clsBatchBFSpec
-
+    'Dim m_oWorker As BackgroundWorker
     Private pBatchSpecFilefullname As String = "'"
     Public Property BatchSpecFile() As String
         Get
@@ -42,6 +43,7 @@ Public Class frmBatch
         If lNewSpecs Then
             pBatchConfig.Clear()
             pBatchConfig.PopulateScenarios()
+            Application.DoEvents()
             pBatchConfig.DoBatch()
         End If
 
