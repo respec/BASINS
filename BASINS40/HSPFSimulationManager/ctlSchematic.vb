@@ -280,28 +280,28 @@ Friend Class ctlSchematic
             aIcon.Font = New Font("Microsoft Sans Serif", 8.25)
         End If
 
-        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(aIcon.Label, aIcon.Font)
+        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(aIcon.WatershedName, aIcon.Font)
         While lStringMeasurement.Width > IconWidth
             Dim lOldSize As Single = aIcon.Font.Size
             aIcon.Font = New Font("Microsoft Sans Serif", aIcon.Font.Size - 1)
             If aIcon.Font.Size = lOldSize Then Exit While
-            lStringMeasurement = g.MeasureString(aIcon.Label, aIcon.Font)
+            lStringMeasurement = g.MeasureString(aIcon.WatershedName, aIcon.Font)
         End While
         Dim lStringX As Single = (IconWidth - lStringMeasurement.Width) / 2
         Dim lStringY As Single = IconHeight - lStringMeasurement.Height * 1.25
 
-        If aIcon.OrigImage IsNot Nothing Then
-            Dim lScaleWidth As Single = (IconWidth - 2) / aIcon.OrigImage.Width
-            Dim lScaleHeight As Single = (lStringY - 2) / aIcon.OrigImage.Height
+        If aIcon.WatershedImage IsNot Nothing Then
+            Dim lScaleWidth As Single = (IconWidth - 2) / aIcon.WatershedImage.Width
+            Dim lScaleHeight As Single = (lStringY - 2) / aIcon.WatershedImage.Height
             Dim lScale As Single = Math.Min(lScaleHeight, lScaleWidth)
-            g.DrawImage(aIcon.OrigImage, _
-                        (IconWidth - lScale * aIcon.OrigImage.Width) / 2, _
-                        1 + (lStringY - lScale * aIcon.OrigImage.Height) / 2, _
-                        lScale * aIcon.OrigImage.Width, _
-                        lScale * aIcon.OrigImage.Height)
+            g.DrawImage(aIcon.WatershedImage, _
+                        (IconWidth - lScale * aIcon.WatershedImage.Width) / 2, _
+                        1 + (lStringY - lScale * aIcon.WatershedImage.Height) / 2, _
+                        lScale * aIcon.WatershedImage.Width, _
+                        lScale * aIcon.WatershedImage.Height)
         End If
 
-        g.DrawString(aIcon.Label, aIcon.Font, SystemBrushes.ControlDarkDark, lStringX, lStringY)
+        g.DrawString(aIcon.WatershedName, aIcon.Font, SystemBrushes.ControlDarkDark, lStringX, lStringY)
 
         DrawBorder(g, IconWidth, IconHeight, Not aPrinting)
         g.Dispose()
