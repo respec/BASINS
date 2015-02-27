@@ -25,10 +25,7 @@ Partial Class frmModel
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmModel))
         Me.btnBrowseUCIFile = New System.Windows.Forms.Button()
         Me.lblUCIFile = New System.Windows.Forms.Label()
-        Me.txtUCI = New System.Windows.Forms.TextBox()
-        Me.btnBrowseDownstream = New System.Windows.Forms.Button()
         Me.lblDownstream = New System.Windows.Forms.Label()
-        Me.txtDownstream = New System.Windows.Forms.TextBox()
         Me.lblName = New System.Windows.Forms.Label()
         Me.txtName = New System.Windows.Forms.TextBox()
         Me.btnImage = New System.Windows.Forms.Button()
@@ -38,16 +35,19 @@ Partial Class frmModel
         Me.btnOk = New System.Windows.Forms.Button()
         Me.btnCancel = New System.Windows.Forms.Button()
         Me.lblWatershedImage = New System.Windows.Forms.Label()
+        Me.lstUciFiles = New System.Windows.Forms.ListBox()
+        Me.btnRemove = New System.Windows.Forms.Button()
+        Me.cboDownstream = New System.Windows.Forms.ComboBox()
         Me.SuspendLayout()
         '
         'btnBrowseUCIFile
         '
         Me.btnBrowseUCIFile.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnBrowseUCIFile.Location = New System.Drawing.Point(604, 12)
+        Me.btnBrowseUCIFile.Location = New System.Drawing.Point(560, 11)
         Me.btnBrowseUCIFile.Name = "btnBrowseUCIFile"
-        Me.btnBrowseUCIFile.Size = New System.Drawing.Size(33, 20)
+        Me.btnBrowseUCIFile.Size = New System.Drawing.Size(64, 20)
         Me.btnBrowseUCIFile.TabIndex = 2
-        Me.btnBrowseUCIFile.Text = "..."
+        Me.btnBrowseUCIFile.Text = "Add"
         Me.btnBrowseUCIFile.UseVisualStyleBackColor = True
         '
         'lblUCIFile
@@ -55,76 +55,48 @@ Partial Class frmModel
         Me.lblUCIFile.AutoSize = True
         Me.lblUCIFile.Location = New System.Drawing.Point(12, 15)
         Me.lblUCIFile.Name = "lblUCIFile"
-        Me.lblUCIFile.Size = New System.Drawing.Size(44, 13)
+        Me.lblUCIFile.Size = New System.Drawing.Size(49, 13)
         Me.lblUCIFile.TabIndex = 24
-        Me.lblUCIFile.Text = "UCI File"
-        '
-        'txtUCI
-        '
-        Me.txtUCI.AllowDrop = True
-        Me.txtUCI.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtUCI.Location = New System.Drawing.Point(105, 12)
-        Me.txtUCI.Name = "txtUCI"
-        Me.txtUCI.Size = New System.Drawing.Size(493, 20)
-        Me.txtUCI.TabIndex = 1
-        Me.txtUCI.Text = "C:\data\Salado_4yr\SaladoCreek_HSPF10_108_over_try162_hourly.uci"
-        '
-        'btnBrowseDownstream
-        '
-        Me.btnBrowseDownstream.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnBrowseDownstream.Location = New System.Drawing.Point(604, 64)
-        Me.btnBrowseDownstream.Name = "btnBrowseDownstream"
-        Me.btnBrowseDownstream.Size = New System.Drawing.Size(33, 20)
-        Me.btnBrowseDownstream.TabIndex = 5
-        Me.btnBrowseDownstream.Text = "..."
-        Me.btnBrowseDownstream.UseVisualStyleBackColor = True
+        Me.lblUCIFile.Text = "UCI Files"
         '
         'lblDownstream
         '
+        Me.lblDownstream.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblDownstream.AutoSize = True
-        Me.lblDownstream.Location = New System.Drawing.Point(12, 67)
+        Me.lblDownstream.Location = New System.Drawing.Point(12, 117)
         Me.lblDownstream.Name = "lblDownstream"
-        Me.lblDownstream.Size = New System.Drawing.Size(87, 13)
+        Me.lblDownstream.Size = New System.Drawing.Size(66, 13)
         Me.lblDownstream.TabIndex = 27
-        Me.lblDownstream.Text = "Downstream UCI"
-        '
-        'txtDownstream
-        '
-        Me.txtDownstream.AllowDrop = True
-        Me.txtDownstream.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDownstream.Location = New System.Drawing.Point(105, 64)
-        Me.txtDownstream.Name = "txtDownstream"
-        Me.txtDownstream.Size = New System.Drawing.Size(493, 20)
-        Me.txtDownstream.TabIndex = 4
-        Me.txtDownstream.Text = "C:\data\USAR\BMPtoolTest_USAR014.uci"
+        Me.lblDownstream.Text = "Downstream"
         '
         'lblName
         '
+        Me.lblName.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblName.AutoSize = True
-        Me.lblName.Location = New System.Drawing.Point(12, 41)
+        Me.lblName.Location = New System.Drawing.Point(12, 91)
         Me.lblName.Name = "lblName"
-        Me.lblName.Size = New System.Drawing.Size(67, 13)
+        Me.lblName.Size = New System.Drawing.Size(90, 13)
         Me.lblName.TabIndex = 29
-        Me.lblName.Text = "Model Name"
+        Me.lblName.Text = "Watershed Name"
         '
         'txtName
         '
         Me.txtName.AllowDrop = True
-        Me.txtName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.txtName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtName.Location = New System.Drawing.Point(105, 38)
+        Me.txtName.Location = New System.Drawing.Point(105, 88)
         Me.txtName.Name = "txtName"
-        Me.txtName.Size = New System.Drawing.Size(493, 20)
+        Me.txtName.Size = New System.Drawing.Size(449, 20)
         Me.txtName.TabIndex = 3
         Me.txtName.Text = "Salado"
         '
         'btnImage
         '
+        Me.btnImage.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnImage.AutoSize = True
         Me.btnImage.BackColor = System.Drawing.SystemColors.ButtonFace
-        Me.btnImage.Location = New System.Drawing.Point(105, 93)
+        Me.btnImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
+        Me.btnImage.Location = New System.Drawing.Point(105, 143)
         Me.btnImage.Name = "btnImage"
         Me.btnImage.Size = New System.Drawing.Size(164, 155)
         Me.btnImage.TabIndex = 6
@@ -134,7 +106,7 @@ Partial Class frmModel
         'btnRunHSPF
         '
         Me.btnRunHSPF.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRunHSPF.Location = New System.Drawing.Point(329, 257)
+        Me.btnRunHSPF.Location = New System.Drawing.Point(329, 304)
         Me.btnRunHSPF.Name = "btnRunHSPF"
         Me.btnRunHSPF.Size = New System.Drawing.Size(93, 23)
         Me.btnRunHSPF.TabIndex = 10
@@ -145,7 +117,7 @@ Partial Class frmModel
         '
         Me.chkRunDownstream.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkRunDownstream.AutoSize = True
-        Me.chkRunDownstream.Location = New System.Drawing.Point(428, 261)
+        Me.chkRunDownstream.Location = New System.Drawing.Point(428, 308)
         Me.chkRunDownstream.Name = "chkRunDownstream"
         Me.chkRunDownstream.Size = New System.Drawing.Size(194, 17)
         Me.chkRunDownstream.TabIndex = 11
@@ -156,7 +128,7 @@ Partial Class frmModel
         '
         Me.btnWinHSPF.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnWinHSPF.AutoSize = True
-        Me.btnWinHSPF.Location = New System.Drawing.Point(230, 257)
+        Me.btnWinHSPF.Location = New System.Drawing.Point(230, 304)
         Me.btnWinHSPF.Name = "btnWinHSPF"
         Me.btnWinHSPF.Size = New System.Drawing.Size(93, 23)
         Me.btnWinHSPF.TabIndex = 9
@@ -167,7 +139,7 @@ Partial Class frmModel
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnOk.AutoSize = True
-        Me.btnOk.Location = New System.Drawing.Point(15, 257)
+        Me.btnOk.Location = New System.Drawing.Point(15, 304)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(84, 23)
         Me.btnOk.TabIndex = 7
@@ -178,7 +150,7 @@ Partial Class frmModel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.AutoSize = True
-        Me.btnCancel.Location = New System.Drawing.Point(105, 257)
+        Me.btnCancel.Location = New System.Drawing.Point(105, 304)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(84, 23)
         Me.btnCancel.TabIndex = 8
@@ -187,18 +159,51 @@ Partial Class frmModel
         '
         'lblWatershedImage
         '
+        Me.lblWatershedImage.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblWatershedImage.AutoSize = True
-        Me.lblWatershedImage.Location = New System.Drawing.Point(12, 93)
+        Me.lblWatershedImage.Location = New System.Drawing.Point(12, 143)
         Me.lblWatershedImage.Name = "lblWatershedImage"
         Me.lblWatershedImage.Size = New System.Drawing.Size(91, 13)
         Me.lblWatershedImage.TabIndex = 36
         Me.lblWatershedImage.Text = "Watershed Image"
         '
+        'lstUciFiles
+        '
+        Me.lstUciFiles.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstUciFiles.FormattingEnabled = True
+        Me.lstUciFiles.IntegralHeight = False
+        Me.lstUciFiles.Location = New System.Drawing.Point(105, 12)
+        Me.lstUciFiles.Name = "lstUciFiles"
+        Me.lstUciFiles.Size = New System.Drawing.Size(449, 70)
+        Me.lstUciFiles.TabIndex = 37
+        '
+        'btnRemove
+        '
+        Me.btnRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnRemove.Location = New System.Drawing.Point(560, 37)
+        Me.btnRemove.Name = "btnRemove"
+        Me.btnRemove.Size = New System.Drawing.Size(64, 20)
+        Me.btnRemove.TabIndex = 38
+        Me.btnRemove.Text = "Remove"
+        Me.btnRemove.UseVisualStyleBackColor = True
+        '
+        'cboDownstream
+        '
+        Me.cboDownstream.FormattingEnabled = True
+        Me.cboDownstream.Location = New System.Drawing.Point(105, 114)
+        Me.cboDownstream.Name = "cboDownstream"
+        Me.cboDownstream.Size = New System.Drawing.Size(449, 21)
+        Me.cboDownstream.TabIndex = 39
+        '
         'frmModel
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(819, 292)
+        Me.ClientSize = New System.Drawing.Size(636, 339)
+        Me.Controls.Add(Me.cboDownstream)
+        Me.Controls.Add(Me.btnRemove)
         Me.Controls.Add(Me.lblWatershedImage)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
@@ -207,13 +212,11 @@ Partial Class frmModel
         Me.Controls.Add(Me.btnRunHSPF)
         Me.Controls.Add(Me.lblName)
         Me.Controls.Add(Me.txtName)
-        Me.Controls.Add(Me.btnBrowseDownstream)
         Me.Controls.Add(Me.lblDownstream)
-        Me.Controls.Add(Me.txtDownstream)
         Me.Controls.Add(Me.btnBrowseUCIFile)
         Me.Controls.Add(Me.lblUCIFile)
-        Me.Controls.Add(Me.txtUCI)
         Me.Controls.Add(Me.btnImage)
+        Me.Controls.Add(Me.lstUciFiles)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmModel"
         Me.Text = "HSPF Model"
@@ -223,10 +226,7 @@ Partial Class frmModel
     End Sub
     Friend WithEvents btnBrowseUCIFile As System.Windows.Forms.Button
     Friend WithEvents lblUCIFile As System.Windows.Forms.Label
-    Friend WithEvents txtUCI As System.Windows.Forms.TextBox
-    Friend WithEvents btnBrowseDownstream As System.Windows.Forms.Button
     Friend WithEvents lblDownstream As System.Windows.Forms.Label
-    Friend WithEvents txtDownstream As System.Windows.Forms.TextBox
     Friend WithEvents lblName As System.Windows.Forms.Label
     Friend WithEvents txtName As System.Windows.Forms.TextBox
     Friend WithEvents btnImage As System.Windows.Forms.Button
@@ -236,4 +236,7 @@ Partial Class frmModel
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents lblWatershedImage As System.Windows.Forms.Label
+    Friend WithEvents lstUciFiles As System.Windows.Forms.ListBox
+    Friend WithEvents btnRemove As System.Windows.Forms.Button
+    Friend WithEvents cboDownstream As System.Windows.Forms.ComboBox
 End Class

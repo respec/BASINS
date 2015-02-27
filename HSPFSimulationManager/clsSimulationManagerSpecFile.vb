@@ -27,8 +27,8 @@ Public Class clsSimulationManagerSpecFile
                         Case "MODELUCI"
                             lReadingModel = lAllModels.FindOrAddIcon(IO.Path.Combine(lBasePath, lArgument))
                         Case "MODELNAME"
-                            lReadingModel.Label = lArgument
-                        Case "DOWNSTREAMUCI"
+                            lReadingModel.WatershedName = lArgument
+                        Case "DOWNSTREAMI"
                             Select Case lArgument.Trim.ToLowerInvariant
                                 Case "", "none" 'No downstream model
                                 Case Else
@@ -37,7 +37,7 @@ Public Class clsSimulationManagerSpecFile
                             End Select
                         Case "WATERSHEDIMAGE"
                             lReadingModel.WatershedImageFilename = IO.Path.Combine(lBasePath, lArgument)
-                            lReadingModel.OrigImage = Drawing.Image.FromFile(lReadingModel.WatershedImageFilename)
+                            lReadingModel.WatershedImage = Drawing.Image.FromFile(lReadingModel.WatershedImageFilename)
                             ' Dim lNewWidth As Integer = lReadingModel.BackgroundImage.Width * 1.1
                             ' Dim lNewHeight As Integer = lReadingModel.BackgroundImage.Height * 1.1
                             'Dim lImageScale As Double = 1
@@ -116,11 +116,11 @@ Public Class clsSimulationManagerSpecFile
             For Each lIcon In aSaveIcons
                 lWriter.WriteLine()
                 lWriter.WriteLine("ModelUCI" & vbTab & RemoveBasePath(lIcon.UciFileName, lBasePath))
-                lWriter.WriteLine("ModelName" & vbTab & lIcon.Label)
+                lWriter.WriteLine("ModelName" & vbTab & lIcon.WatershedName)
                 If lIcon.DownstreamIcon Is Nothing Then
-                    lWriter.WriteLine("DownstreamUCI" & vbTab & "none")
+                    lWriter.WriteLine("Downstream" & vbTab & "none")
                 Else
-                    lWriter.WriteLine("DownstreamUCI" & vbTab & RemoveBasePath(lIcon.DownstreamIcon.UciFileName, lBasePath))
+                    lWriter.WriteLine("Downstream" & vbTab & RemoveBasePath(lIcon.DownstreamIcon.UciFileName, lBasePath))
                 End If
                 If IO.File.Exists(lIcon.WatershedImageFilename) Then
                     lWriter.WriteLine("WatershedImage" & vbTab & RemoveBasePath(lIcon.WatershedImageFilename, lBasePath))

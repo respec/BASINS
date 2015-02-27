@@ -12,10 +12,11 @@ Public Class clsIcon
     Inherits Windows.Forms.Control
 
     Public Selected As Boolean
-    Public Label As String = ""
-    Public UciFileName As String = ""
+    Public UciFileName As String
+    Public UciFileNames As New List(Of String)
+    Public WatershedImage As Image
     Public WatershedImageFilename As String
-    Public OrigImage As Image
+    Public WatershedName As String = ""
 
     Public DownstreamIcon As clsIcon
     Public UpstreamIcons As New Generic.List(Of clsIcon)

@@ -42,23 +42,15 @@
     End Sub
 
     Private Sub OpenToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripMenuItem.Click
-        Dim lFileDialog As New Windows.Forms.OpenFileDialog()
-        With lFileDialog
-            .Title = "Open Simulation Specification File"
-            '.Filter = aFilter
-            '.FilterIndex = 0
-            '.DefaultExt = aExtension
-            '.CheckFileExists = False
-            '.CheckPathExists = False
-            If .ShowDialog(Me) = DialogResult.OK Then
-                Me.Text = "SARA HSPF Simulation Manager - " & .FileName
-                Dim lIconSize As New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight)
-                Dim lNewIcons As IconCollection = clsSimulationManagerSpecFile.Open(Me.Size, lIconSize, .FileName)
-                SchematicDiagram.IconWidth = lIconSize.Width
-                SchematicDiagram.IconHeight = lIconSize.Height
-                SchematicDiagram.BuildTree(lNewIcons)
-            End If
-        End With
+        Dim lFileName As String = String.Empty
+        If BrowseOpen("Open Simulation Specification File", "*.txt", ".txt", Me, lFileName) Then
+            Me.Text = "SARA HSPF Simulation Manager - " & lFileName
+            Dim lIconSize As New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight)
+            Dim lNewIcons As IconCollection = clsSimulationManagerSpecFile.Open(Me.Size, lIconSize, lFileName)
+            SchematicDiagram.IconWidth = lIconSize.Width
+            SchematicDiagram.IconHeight = lIconSize.Height
+            SchematicDiagram.BuildTree(lNewIcons)
+        End If
     End Sub
 
     Private Sub SaveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click
@@ -75,4 +67,26 @@
             End If
         End With
     End Sub
+
+    Public Shared Function BrowseOpen(ByVal aTitle As String, ByVal aFilter As String, ByVal aExtension As String, ByVal aParentForm As Form, ByRef aFileName As String) As Boolean
+        Dim lFileDialog As New Windows.Forms.OpenFileDialog()
+        With lFileDialog
+            .Title = aTitle
+            If IO.File.Exists(aFileName) Then
+                .FileName = aFileName
+            End If
+            If Not String.IsNullOrEmpty(aFilter) Then
+                If Not aFilter.Contains("|") Then aFilter &= "|" & aFilter
+                .Filter = aFilter
+                .FilterIndex = 0
+            End If
+            .DefaultExt = aExtension
+            .CheckFileExists = True
+            If .ShowDialog(aParentForm) = DialogResult.OK Then
+                aFileName = .FileName
+                Return True
+            End If
+        End With
+        Return False
+    End Function
 End Class

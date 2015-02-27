@@ -9,26 +9,38 @@ Public Class frmModel
     Public Property ModelIcon() As clsIcon
         Set(ByVal value As clsIcon)
             pIcon = value
-            txtUCI.Text = pIcon.UciFileName
-            txtName.Text = pIcon.Label
-            txtDownstream.Text = ""
-            If pIcon.DownstreamIcon IsNot Nothing Then
-                txtDownstream.Text = pIcon.DownstreamIcon.UciFileName
+            lstUciFiles.Text = pIcon.UciFileName
+            txtName.Text = pIcon.WatershedName
+
+            cboDownstream.Items.Clear()
+            cboDownstream.Items.Add("None")
+            For Each lIcon In Schematic.AllIcons
+                cboDownstream.Items.Add(lIcon.WatershedName)
+            Next
+            If pIcon.DownstreamIcon Is Nothing Then
+                cboDownstream.SelectedIndex = 0
+            Else
+                Dim lIndex As Integer = cboDownstream.Items.IndexOf(pIcon.DownstreamIcon.WatershedName)
+                If lIndex = -1 Then
+                    lIndex = cboDownstream.Items.Count
+                    cboDownstream.Items.Add(pIcon.DownstreamIcon.WatershedName)
+                End If
+                cboDownstream.SelectedIndex = lIndex
             End If
             btnImage.Text = pIcon.WatershedImageFilename
-            btnImage.BackgroundImage = pIcon.OrigImage
+            btnImage.BackgroundImage = pIcon.WatershedImage
             btnImage.BackgroundImageLayout = ImageLayout.Zoom
         End Set
         Get
-            pIcon.UciFileName = txtUCI.Text
-            pIcon.Label = txtName.Text
+            pIcon.UciFileName = lstUciFiles.Text
+            pIcon.WatershedName = txtName.Text
 
             Dim lNewDownstreamIcon As clsIcon
-            Select Case txtDownstream.Text.Trim.ToLowerInvariant
+            Select Case cboDownstream.SelectedItem.Text.Trim.ToLowerInvariant
                 Case "", "none" 'No downstream model
                     lNewDownstreamIcon = Nothing
                 Case Else
-                    lNewDownstreamIcon = Schematic.AllIcons.FindOrAddIcon(txtDownstream.Text.Trim)
+                    lNewDownstreamIcon = Schematic.AllIcons.FindOrAddIcon(cboDownstream.SelectedItem.Text.Trim)
             End Select
 
             If pIcon.DownstreamIcon IsNot Nothing AndAlso pIcon.DownstreamIcon.UpstreamIcons.Contains(pIcon) Then
@@ -39,25 +51,19 @@ Public Class frmModel
             pIcon.DownstreamIcon.UpstreamIcons.Add(pIcon)
 
             pIcon.WatershedImageFilename = btnImage.Text
-            pIcon.OrigImage = btnImage.BackgroundImage
+            pIcon.WatershedImage = btnImage.BackgroundImage
 
             Return pIcon
         End Get
     End Property
 
     Private Sub btnImage_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnImage.Click
-        Dim lFileDialog As New Windows.Forms.OpenFileDialog()
-        With lFileDialog
-            .Title = "Open Watershed Image File"
-            .Filter = "PNG Files|*.png|All Files|*.*"
-            .FilterIndex = 0
-            .CheckFileExists = True
-            If .ShowDialog(Me) = DialogResult.OK Then
-                btnImage.Text = .FileName
-                btnImage.BackgroundImage = Drawing.Image.FromFile(.FileName)
-                Me.Height = btnImage.Height + 164
-            End If
-        End With
+        Dim lFileName As String = String.Empty
+        If frmHspfSimulationManager.BrowseOpen("Open Watershed Image File", "PNG Files|*.png|All Files|*.*", ".png", Me, lFileName) Then
+            btnImage.Text = lFileName
+            btnImage.BackgroundImage = Drawing.Image.FromFile(lFileName)
+            Me.Height = btnImage.Height + 164
+        End If
     End Sub
 
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
@@ -75,11 +81,11 @@ Public Class frmModel
     End Sub
 
     Private Sub btnWinHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnWinHSPF.Click
-        RunUCI("WinHSPF.exe", txtUCI.Text)
+        RunUCI("WinHSPF.exe", lstUciFiles.Text)
     End Sub
 
     Private Sub btnRunHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRunHSPF.Click
-        RunUCI("WinHSPFlt.exe", txtUCI.Text)
+        RunUCI("WinHSPFlt.exe", lstUciFiles.Text)
     End Sub
 
     Private Sub RunUCI(ByVal aExeName As String, ByVal aUCIFilename As String)
@@ -94,5 +100,19 @@ Public Class frmModel
 
         Logger.Status("Running " & aUCIFilename & " (" & lHspfExe & ")")
         MapWinUtility.LaunchProgram(lHspfExe, IO.Path.GetDirectoryName(aUCIFilename), aUCIFilename)
+    End Sub
+
+    Private Sub btnBrowseUCIFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseUCIFile.Click
+        Dim lFileName As String = String.Empty
+        If frmHspfSimulationManager.BrowseOpen("Open UCI File", "UCI Files|*.uci|All Files|*.*", ".uci", Me, lFileName) Then
+            lstUciFiles.Items.Add(lFileName)
+        End If
+    End Sub
+
+    Private Sub btnRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRemove.Click
+        Try
+            lstUciFiles.Items.Remove(lstUciFiles.SelectedItem)
+        Catch
+        End Try
     End Sub
 End Class
