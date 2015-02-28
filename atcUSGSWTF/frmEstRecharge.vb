@@ -570,6 +570,21 @@ Public Class frmEstRecharge
             End Select
             lGraphTsGroupSubsetDates.Add(lTs)
         Next
+        'Dim lSWdbg As New IO.StreamWriter("C:\temp\GraphTs.txt", False)
+        'For I As Integer = 1 To lGraphTsGroupSubsetDates(0).numValues
+        '    Dim lDateS As Double = lGraphTsGroupSubsetDates(0).Dates.Value(I - 1)
+        '    Dim lGWL As Double = lGraphTsGroupSubsetDates(0).Value(I)
+        '    Dim lPeak As Double = lGraphTsGroupSubsetDates(1).Value(I)
+        '    Dim lH2 As Double = lGraphTsGroupSubsetDates(2).Value(I)
+        '    If Double.IsNaN(lGWL) Then lGWL = 0
+        '    If Double.IsNaN(lPeak) Then lPeak = 0
+        '    If Double.IsNaN(lH2) Then lH2 = 0
+        '    lSWdbg.WriteLine(lDateS & vbTab & lGWL & vbTab & lPeak & vbTab & lH2)
+        'Next
+        'lSWdbg.Flush()
+        'lSWdbg.Close()
+        'lSWdbg = Nothing
+
         DoWTFGraphTimeseries("Timeseries", False, lGraphTsGroupSubsetDates)
 
         Logger.Msg("Writing output is done." & vbCrLf & lOutputFilename, "WTF Output")
@@ -653,8 +668,10 @@ Public Class frmEstRecharge
         Dim lYAxisTitleText As String = "GW LEVEL"
         If aPerUnitArea Then lYAxisTitleText &= " (per unit square mile)"
         'If aGraphType = "CDist" Then lYAxisTitleText = "Flow (in)"
-        aDataGroup(0).Attributes.SetValue("Units", "ft")
-        aDataGroup(0).Attributes.SetValue("YAxis", "LEFT")
+        For Each lTs As atcTimeseries In aDataGroup
+            lTs.Attributes.SetValue("Units", "ft")
+            lTs.Attributes.SetValue("YAxis", "LEFT")
+        Next
 
         If aGraphType = "Timeseries" Then
             DisplayTsGraph(aDataGroup)
