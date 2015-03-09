@@ -194,7 +194,7 @@ FoundMatch:
                 If lCommonConstituent = "GW LEVEL" Then
                     With lMain.YAxis
                         Select Case aDataGroup(0).Attributes.GetValue("parm_cd", "").ToString
-                            Case "61055", "72019" 'Data is depth below lElevation
+                            Case "61055", "72019", "lev_va" 'Data is depth below lElevation
                                 .Title.Text = "Depth to water level, feet below land surface"
                         End Select
                     End With
