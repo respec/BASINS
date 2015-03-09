@@ -229,7 +229,7 @@ FoundMatch:
             Dim lYAxisName As String = aYaxisNames.ItemByKey(lTimeseries.Serial)
             If lYAxisName <> "AUX" Then
                 Select Case lTimeseries.Attributes.GetValue("parm_cd", "").ToString
-                    Case "61055", "72019" 'Data is depth below lElevation
+                    Case "61055", "72019", "lev_va" 'Data is depth below lElevation
                         lYAxisName = "LEFT"
                         lMinElev = Math.Min(lMinElev, aElevation - lTimeseries.Attributes.GetValue("Maximum"))
                         lMaxElev = Math.Max(lMaxElev, aElevation - lTimeseries.Attributes.GetValue("Minimum"))
