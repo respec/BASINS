@@ -9,8 +9,16 @@ Public Class frmModel
     Public Property ModelIcon() As clsIcon
         Set(ByVal value As clsIcon)
             pIcon = value
-            lstUciFiles.Text = pIcon.UciFileName
+
             txtName.Text = pIcon.WatershedName
+
+            Dim lUciFileNames As String = ""
+            For Each lUciFileName As String In value.UciFileNames
+                cboUciFiles.Items.Add(lUciFileName)
+                If lUciFileName = pIcon.UciFileName Then
+                    cboUciFiles.SelectedIndex = cboUciFiles.Items.Count - 1
+                End If
+            Next
 
             cboDownstream.Items.Clear()
             cboDownstream.Items.Add("None")
@@ -32,8 +40,13 @@ Public Class frmModel
             btnImage.BackgroundImageLayout = ImageLayout.Zoom
         End Set
         Get
-            pIcon.UciFileName = lstUciFiles.Text
             pIcon.WatershedName = txtName.Text
+            pIcon.UciFileName = cboUciFiles.SelectedItem.ToString
+
+            pIcon.UciFileNames.Clear()
+            For Each lUciFileName As String In cboUciFiles.Items
+                pIcon.UciFileNames.Add(lUciFileName)
+            Next
 
             Dim lNewDownstreamIcon As clsIcon
             Select Case cboDownstream.SelectedItem.Text.Trim.ToLowerInvariant
@@ -81,11 +94,11 @@ Public Class frmModel
     End Sub
 
     Private Sub btnWinHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnWinHSPF.Click
-        RunUCI("WinHSPF.exe", lstUciFiles.Text)
+        RunUCI("WinHSPF.exe", cboUciFiles.Text)
     End Sub
 
     Private Sub btnRunHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRunHSPF.Click
-        RunUCI("WinHSPFlt.exe", lstUciFiles.Text)
+        RunUCI("WinHSPFlt.exe", cboUciFiles.Text)
     End Sub
 
     Private Sub RunUCI(ByVal aExeName As String, ByVal aUCIFilename As String)
@@ -105,13 +118,13 @@ Public Class frmModel
     Private Sub btnBrowseUCIFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseUCIFile.Click
         Dim lFileName As String = String.Empty
         If frmHspfSimulationManager.BrowseOpen("Open UCI File", "UCI Files|*.uci|All Files|*.*", ".uci", Me, lFileName) Then
-            lstUciFiles.Items.Add(lFileName)
+            cboUciFiles.Items.Add(lFileName)
         End If
     End Sub
 
     Private Sub btnRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRemove.Click
         Try
-            lstUciFiles.Items.Remove(lstUciFiles.SelectedItem)
+            cboUciFiles.Items.RemoveAt(cboUciFiles.SelectedIndex)
         Catch
         End Try
     End Sub

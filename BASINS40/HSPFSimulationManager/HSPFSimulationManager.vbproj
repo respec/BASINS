@@ -48,6 +48,9 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>SARA.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -150,37 +153,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cibolo.Simple.50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Medina.Simple.50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Leon.Simple.50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Salado.Simple.50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="LSAR.Simple.50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="USAR.Simple.50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MedinaAboveLake.Simple.50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MedinaLake.Simple.50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MedinaDiversionLake.Simple.50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MedinaBelowLake.Simple.50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Medio.Simple.50.png" />
+    <Content Include="SARA.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
