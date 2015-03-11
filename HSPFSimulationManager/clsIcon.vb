@@ -28,11 +28,11 @@ Public Class clsIcon
     End Sub
 
     Public Overrides Function ToString() As String
-        Return UciFileName
+        Return WatershedName
     End Function
 
     Public Function Key() As String
-        Return UciFileName.ToLowerInvariant()
+        Return WatershedName.ToLowerInvariant()
     End Function
 
     Public Function Center() As Point
@@ -47,13 +47,13 @@ Friend Class IconCollection
         Return item.Key
     End Function
 
-    Friend Function FindOrAddIcon(ByVal aUciFilename As String) As clsIcon
+    Friend Function FindOrAddIcon(ByVal aWatershedName As String) As clsIcon
         Dim lIcon As clsIcon
-        If Contains(aUciFilename.ToLowerInvariant) Then
-            lIcon = Item(aUciFilename.ToLowerInvariant)
+        If Contains(aWatershedName.ToLowerInvariant) Then
+            lIcon = Item(aWatershedName.ToLowerInvariant)
         Else
             lIcon = New clsIcon
-            lIcon.UciFileName = aUciFilename
+            lIcon.WatershedName = aWatershedName
             Add(lIcon)
         End If
         Return lIcon

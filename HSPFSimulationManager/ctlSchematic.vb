@@ -279,13 +279,16 @@ Friend Class ctlSchematic
             aIcon.Font.Dispose()
             aIcon.Font = New Font("Microsoft Sans Serif", 8.25)
         End If
-
-        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(aIcon.WatershedName, aIcon.Font)
+        Dim lLabel As String = aIcon.WatershedName
+        'If aIcon.UciFileNames.Count > 1 Then
+        lLabel &= ": " & IO.Path.GetFileNameWithoutExtension(aIcon.UciFileName)
+        'End If
+        Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(lLabel, aIcon.Font)
         While lStringMeasurement.Width > IconWidth
             Dim lOldSize As Single = aIcon.Font.Size
             aIcon.Font = New Font("Microsoft Sans Serif", aIcon.Font.Size - 1)
             If aIcon.Font.Size = lOldSize Then Exit While
-            lStringMeasurement = g.MeasureString(aIcon.WatershedName, aIcon.Font)
+            lStringMeasurement = g.MeasureString(lLabel, aIcon.Font)
         End While
         Dim lStringX As Single = (IconWidth - lStringMeasurement.Width) / 2
         Dim lStringY As Single = IconHeight - lStringMeasurement.Height * 1.25
@@ -301,7 +304,7 @@ Friend Class ctlSchematic
                         lScale * aIcon.WatershedImage.Height)
         End If
 
-        g.DrawString(aIcon.WatershedName, aIcon.Font, SystemBrushes.ControlDarkDark, lStringX, lStringY)
+        g.DrawString(lLabel, aIcon.Font, SystemBrushes.ControlDarkDark, lStringX, lStringY)
 
         DrawBorder(g, IconWidth, IconHeight, Not aPrinting)
         g.Dispose()

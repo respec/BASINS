@@ -24,15 +24,28 @@ Public Class clsSimulationManagerSpecFile
                     Dim lKeyword As String = lLine.Substring(0, lDelimPos).Trim.ToUpperInvariant()
                     Select Case lKeyword
                         Case "BASEPATH" : lBasePath = lArgument
-                        Case "MODELUCI"
-                            lReadingModel = lAllModels.FindOrAddIcon(IO.Path.Combine(lBasePath, lArgument))
-                        Case "MODELNAME"
-                            lReadingModel.WatershedName = lArgument
-                        Case "DOWNSTREAMI"
+                        Case "WATERSHEDNAME"
+                            lReadingModel = lAllModels.FindOrAddIcon(lArgument)
+                        Case "UCIFILENAME"
+                            lReadingModel.UciFileName = IO.Path.Combine(lBasePath, lArgument.Trim)
+                            If Not lReadingModel.UciFileNames.Contains(lReadingModel.UciFileName) Then
+                                lReadingModel.UciFileNames.Add(lReadingModel.UciFileName)
+                            End If
+                        Case "UCIFILENAMES"
+                            For Each lUciFileName As String In lArgument.Split(",")
+                                lUciFileName = IO.Path.Combine(lBasePath, lUciFileName.Trim)
+                                If Not lReadingModel.UciFileNames.Contains(lUciFileName) Then
+                                    lReadingModel.UciFileNames.Add(lUciFileName)
+                                    If String.IsNullOrEmpty(lReadingModel.UciFileName) Then
+                                        lReadingModel.UciFileName = lUciFileName
+                                    End If
+                                End If
+                            Next
+                        Case "DOWNSTREAMNAME"
                             Select Case lArgument.Trim.ToLowerInvariant
                                 Case "", "none" 'No downstream model
                                 Case Else
-                                    lReadingModel.DownstreamIcon = lAllModels.FindOrAddIcon(IO.Path.Combine(lBasePath, lArgument))
+                                    lReadingModel.DownstreamIcon = lAllModels.FindOrAddIcon(lArgument)
                                     lReadingModel.DownstreamIcon.UpstreamIcons.Add(lReadingModel)
                             End Select
                         Case "WATERSHEDIMAGE"
@@ -87,22 +100,24 @@ Public Class clsSimulationManagerSpecFile
 
             For Each lIcon In aSaveIcons
                 If lBasePath.Length > 0 Then
-                    Dim lThisPath As String = IO.Path.GetDirectoryName(lIcon.Key)
-                    If lThisPath.Length > 0 Then
-                        lThisPath &= IO.Path.DirectorySeparatorChar
-                        Dim lLastChar As Integer = lBasePath.Length
-                        If lThisPath.Length < lLastChar Then
-                            lLastChar = lThisPath.Length
-                            lBasePath = lBasePath.Substring(0, lLastChar)
-                        End If
-                        lLastChar -= 1
-                        For lCharIndex As Integer = 0 To lLastChar
-                            If lBasePath.Substring(lCharIndex, 1).ToLowerInvariant() <> lThisPath.Substring(lCharIndex, 1) Then
-                                lBasePath = lBasePath.Substring(0, lCharIndex)
-                                Exit For
+                    For Each lThisPath As String In lIcon.UciFileNames
+                        lThisPath = IO.Path.GetDirectoryName(lThisPath)
+                        If lThisPath.Length > 0 Then
+                            lThisPath &= IO.Path.DirectorySeparatorChar
+                            Dim lLastChar As Integer = lBasePath.Length
+                            If lThisPath.Length < lLastChar Then
+                                lLastChar = lThisPath.Length
+                                lBasePath = lBasePath.Substring(0, lLastChar)
                             End If
-                        Next
-                    End If
+                            lLastChar -= 1
+                            For lCharIndex As Integer = 0 To lLastChar
+                                If lBasePath.Substring(lCharIndex, 1).ToLowerInvariant() <> lThisPath.Substring(lCharIndex, 1).ToLowerInvariant() Then
+                                    lBasePath = lBasePath.Substring(0, lCharIndex)
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                    Next
                 End If
             Next
             'Make sure lBasePath ends with a complete folder name, discard any partial match
@@ -115,13 +130,24 @@ Public Class clsSimulationManagerSpecFile
 
             For Each lIcon In aSaveIcons
                 lWriter.WriteLine()
-                lWriter.WriteLine("ModelUCI" & vbTab & RemoveBasePath(lIcon.UciFileName, lBasePath))
-                lWriter.WriteLine("ModelName" & vbTab & lIcon.WatershedName)
+                lWriter.WriteLine("WatershedName" & vbTab & lIcon.WatershedName)
+
                 If lIcon.DownstreamIcon Is Nothing Then
-                    lWriter.WriteLine("Downstream" & vbTab & "none")
+                    lWriter.WriteLine("DownstreamName" & vbTab & "none")
                 Else
-                    lWriter.WriteLine("Downstream" & vbTab & RemoveBasePath(lIcon.DownstreamIcon.UciFileName, lBasePath))
+                    lWriter.WriteLine("DownstreamName" & vbTab & lIcon.DownstreamIcon.WatershedName)
                 End If
+
+                lWriter.WriteLine("UCIFileName" & vbTab & RemoveBasePath(lIcon.UciFileName, lBasePath))
+
+                If lIcon.UciFileNames.Count > 1 Then
+                    Dim lUciFileNames As String = ""
+                    For Each lUciFileName As String In lIcon.UciFileNames
+                        lUciFileNames &= RemoveBasePath(lUciFileName, lBasePath) & ","
+                    Next
+                    lWriter.WriteLine("UCIFileNames" & vbTab & lUciFileNames.TrimEnd(","))
+                End If
+
                 If IO.File.Exists(lIcon.WatershedImageFilename) Then
                     lWriter.WriteLine("WatershedImage" & vbTab & RemoveBasePath(lIcon.WatershedImageFilename, lBasePath))
                 End If
