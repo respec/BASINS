@@ -19,14 +19,14 @@ Module ERGGraph
     Private pComplianceDate As Integer = 2019
     'etowah
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah"
-    'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
+    ''Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
     'Private pLocation As Integer = 18 '1 '50 '18
     'Private pStartYearForBaselinePlot As Integer = 2004
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2021
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        DoERGGraphs()
+        'DoERGGraphs()
         ComputeThreeMonthRollingAverages()
     End Sub
 
@@ -376,7 +376,7 @@ Module ERGGraph
             For Each lOption As String In pOptions
                 Dim lOptionName As String = ""
                 lOptionName = lMetalName & lOption
-                Dim lThreeMonthAverageFileName As String = lOptionName & "ThreeMonthRollingAverage.txt"
+                Dim lThreeMonthAverageFileName As String = lOptionName & "ThreeMonthRollingAverage.csv"
 
                 If Not FileExists(lThreeMonthAverageFileName) Then
                     If FileExists(pTestPath & "\" & lOptionName & "\", True) Then
@@ -424,69 +424,42 @@ Module ERGGraph
         Next
         lWrite.WriteLine(lStr)
 
-        Dim lStartingIndex As Integer = 0
-        Dim lStartingMonth As Integer = 0
-        Dim lNextMonthsStartingIndex As Integer = 0
-        Dim lEndingIndex As Integer = 0
+        'make a first pass to find the start of each desired month
+        Dim lMonthStarts As New atcCollection
         For lIndex As Integer = 1 To aTimSer1.numValues
             J2Date(aTimSer1.Dates.Value(lIndex), lDate)
             If lDate(0) >= aStartYear Then
-                If lStartingIndex = 0 Then
-                    'this is the beginning of the first 3 month period
-                    lStartingIndex = lIndex
-                    lStartingMonth = lDate(1)
-                End If
-                If (lDate(1) = lStartingMonth + 1) Or (lDate(1) = lStartingMonth - 11) Then
-                    lNextMonthsStartingIndex = lIndex
-                End If
-                If (lDate(1) = lStartingMonth + 3) Or (lDate(1) = lStartingMonth - 9) Then
-                    'close out the 3 month period and report
-                    lEndingIndex = lIndex - 1
-                    'get average of values between start and ending index and write
-                    Dim lYr As Integer = lDate(0)
-                    Dim lMo As Integer = lDate(1) - 1
-                    If lMo = 0 Then
-                        lMo = 12
-                        lYr = lYr - 1
-                    End If
-                    lStr = lYr.ToString & ", " & lMo.ToString
-                    For Each lTimSer As atcTimeseries In aTimSerGroup
-                        Dim lThreeMonthSum As Double = 0.0
-                        For lIndexX As Integer = lStartingIndex To lEndingIndex
-                            lThreeMonthSum += lTimSer.Value(lIndexX)
-                        Next
-                        Dim lValue As String = Format((lThreeMonthSum / (lEndingIndex - lStartingIndex + 1)), "0.####")
-                        lStr = lStr & ", " & lValue
-                    Next
-                    lWrite.WriteLine(lStr)
-                    'start again
-                    lStartingIndex = lNextMonthsStartingIndex
-                    If lStartingMonth < 12 Then
-                        lStartingMonth += 1
-                    Else
-                        lStartingMonth = 1
-                    End If
-                End If
-                If (lIndex = aTimSer1.numValues) Then
-                    'last value, report this last month
-                    lEndingIndex = lIndex
-                    'get average of values between start and ending index and write
-                    Dim lYr As Integer = lDate(0)
-                    Dim lMo As Integer = lDate(1)
-                    lStr = lYr.ToString & ", " & lMo.ToString
-                    For Each lTimSer As atcTimeseries In aTimSerGroup
-                        Dim lThreeMonthSum As Double = 0.0
-                        For lIndexX As Integer = lStartingIndex To lEndingIndex
-                            lThreeMonthSum += lTimSer.Value(lIndexX)
-                        Next
-                        Dim lValue As String = Format((lThreeMonthSum / (lEndingIndex - lStartingIndex + 1)), "0.####")
-                        lStr = lStr & ", " & lValue
-                    Next
-                    lWrite.WriteLine(lStr)
+                If lDate(2) = 1 Then
+                    lMonthStarts.Add(lIndex)
                 End If
             End If
         Next
 
+        Dim lStartingIndex As Integer = 0
+        Dim lEndingIndex As Integer = 0
+        For lMonth As Integer = 0 To lMonthStarts.Count - 3
+            lStartingIndex = lMonthStarts(lMonth)
+            If lMonth = lMonthStarts.Count - 3 Then
+                'last month
+                lEndingIndex = aTimSer1.numValues
+            Else
+                lEndingIndex = lMonthStarts(lMonth + 3) - 1
+            End If
+            'get average of values between start and ending index and write
+            J2Date(aTimSer1.Dates.Value(lEndingIndex), lDate)
+            Dim lYr As Integer = lDate(0)
+            Dim lMo As Integer = lDate(1)
+            lStr = lYr.ToString & ", " & lMo.ToString
+            For Each lTimSer As atcTimeseries In aTimSerGroup
+                Dim lThreeMonthSum As Double = 0.0
+                For lIndexX As Integer = lStartingIndex To lEndingIndex
+                    lThreeMonthSum += lTimSer.Value(lIndexX)
+                Next
+                Dim lValue As String = Format((lThreeMonthSum / (lEndingIndex - lStartingIndex + 1)), "0.####")
+                lStr = lStr & ", " & lValue
+            Next
+            lWrite.WriteLine(lStr)
+        Next
         lWrite.Close()
     End Sub
 End Module
