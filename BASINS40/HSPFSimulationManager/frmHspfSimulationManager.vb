@@ -89,4 +89,12 @@
         End With
         Return False
     End Function
+
+    Private Sub btnRunHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRunHSPF.Click
+        Dim lRun As New frmRunHSPF
+        lRun.Icon = Me.Icon
+        lRun.SchematicDiagram = SchematicDiagram
+        lRun.Show(Me)
+        'frmModel.RunUCI()
+    End Sub
 End Class

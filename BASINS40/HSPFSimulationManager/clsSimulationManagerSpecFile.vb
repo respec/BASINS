@@ -50,21 +50,24 @@ Public Class clsSimulationManagerSpecFile
                             End Select
                         Case "WATERSHEDIMAGE"
                             lReadingModel.WatershedImageFilename = IO.Path.Combine(lBasePath, lArgument)
-                            lReadingModel.WatershedImage = Drawing.Image.FromFile(lReadingModel.WatershedImageFilename)
-                            ' Dim lNewWidth As Integer = lReadingModel.BackgroundImage.Width * 1.1
-                            ' Dim lNewHeight As Integer = lReadingModel.BackgroundImage.Height * 1.1
-                            'Dim lImageScale As Double = 1
-                            'If lNewWidth > 200 Then
-                            '    lImageScale = 200.0 / lNewWidth
-                            '    lNewHeight *= lImageScale
-                            '    lNewWidth = 200
-                            'End If
-                            'If lNewHeight > 200 Then
-                            '    lImageScale *= 200.0 / lNewHeight
-                            '    lNewWidth *= lImageScale
-                            '    lNewHeight = 200
-                            'End If
-                            lReadingModel.BackgroundImageLayout = ImageLayout.Zoom
+                            Try
+                                lReadingModel.WatershedImage = Drawing.Image.FromFile(lReadingModel.WatershedImageFilename)
+                                ' Dim lNewWidth As Integer = lReadingModel.BackgroundImage.Width * 1.1
+                                ' Dim lNewHeight As Integer = lReadingModel.BackgroundImage.Height * 1.1
+                                'Dim lImageScale As Double = 1
+                                'If lNewWidth > 200 Then
+                                '    lImageScale = 200.0 / lNewWidth
+                                '    lNewHeight *= lImageScale
+                                '    lNewWidth = 200
+                                'End If
+                                'If lNewHeight > 200 Then
+                                '    lImageScale *= 200.0 / lNewHeight
+                                '    lNewWidth *= lImageScale
+                                '    lNewHeight = 200
+                                'End If
+                                lReadingModel.BackgroundImageLayout = ImageLayout.Zoom
+                            Catch
+                            End Try
 
                             'lReadingModel.Size = New Point(lNewWidth, lNewHeight)
                         Case "MODELXY"

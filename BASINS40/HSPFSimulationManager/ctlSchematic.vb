@@ -144,6 +144,28 @@ Friend Class ctlSchematic
                 Dim dy As Integer
 
                 'If Printing Then
+                'TODO: use new System.Drawing.Printing:
+                'Public Sub prt(ByVal text As String)
+                '    TextToBePrinted = text
+                '    Dim prn As New Printing.PrintDocument
+                '    Using (prn)
+                '        prn.PrinterSettings.PrinterName _
+                '           = "PrinterName" 'Printing.PrinterSettings.InstalledPrinters.Item(0)
+                '        AddHandler prn.PrintPage, _
+                '           AddressOf Me.PrintPageHandler
+                '        prn.Print()
+                '        RemoveHandler prn.PrintPage, _
+                '           AddressOf Me.PrintPageHandler
+                '    End Using
+                'End Sub
+                'Private Sub PrintPageHandler(ByVal sender As Object, _
+                '   ByVal args As Printing.PrintPageEventArgs)
+                '    Dim myFont As New Font("Microsoft San Serif", 10)
+                '    args.Graphics.DrawString(TextToBePrinted, _
+                '       New Font(myFont, FontStyle.Regular), _
+                '       Brushes.Black, 50, 50)
+                'End Sub
+                '
                 '    ''UPGRADE_ISSUE: Constant vbPixels was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="55B59875-9A95-4B71-9D6A-7C294BF7139D"'
                 '    ''UPGRADE_ISSUE: Printer property Printer.ScaleMode was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
                 '    'Printer.ScaleMode = vbPixels
@@ -178,11 +200,13 @@ Friend Class ctlSchematic
                 If pHeightNeeded > picTree.Height Then
                     Dim lMove As Integer = pHeightNeeded - picTree.Height
                     picTree.Height = pHeightNeeded
-                    For Each lControl As Control In AllIcons
+                    For Each lControl As clsIcon In AllIcons
                         lControl.Top += lMove
                     Next
                 End If
-                If pWidthNeeded > picTree.Width Then picTree.Width = pWidthNeeded
+                If pWidthNeeded > picTree.Width Then
+                    picTree.Width = pWidthNeeded
+                End If
 
                 If aPrinting Then
                     'UPGRADE_ISSUE: Printer method Printer.EndDoc was not upgraded. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="076C26E5-B7A9-4E77-B69C-B4448DF39E58"'
@@ -197,29 +221,98 @@ Friend Class ctlSchematic
         End If
     End Sub
 
+    Private Sub CheckScrollbars()
+        Dim lMinX As Integer = picTree.Width
+        Dim lMaxX As Integer = 0
+        Dim lMinY As Integer = picTree.Height
+        Dim lMaxY As Integer = 0
+
+        Dim lDx As Integer = 0
+        Dim lDy As Integer = 0
+
+        For Each lIcon As clsIcon In AllIcons
+            With lIcon
+                If .Top < lMinY Then lMinY = .Top
+                If .Bottom > lMaxY Then lMaxY = .Bottom
+                If .Left < lMinX Then lMinX = .Left
+                If .Right > lMaxX Then lMaxX = .Right
+            End With
+        Next
+
+        Dim lAvailableWidth As Integer = Me.ClientRectangle.Width '- VScroller.Width
+        Dim lAvailableHeight As Integer = Me.ClientRectangle.Height '- HScroller.Height
+
+        If lMaxX - lMinX < lAvailableWidth Then
+            'HScroller.Visible = False
+            'If lMaxX > lAvailableWidth OrElse lMinX < 0 Then
+            lDx = lMinX - (lAvailableWidth - (lMaxX - lMinX)) / 2
+            'End If
+        Else
+            'HScroller.Visible = True
+            'HScroller.Maximum = lAvailableWidth - (lMaxX - lMinX)
+        End If
+
+        If lMaxY - lMinY < lAvailableHeight Then
+            'VScroller.Visible = False
+            'If lMaxY > lAvailableHeight OrElse lMinY < 0 Then
+            lDy = lMinY - (lAvailableHeight - (lMaxY - lMinY)) / 2
+            'End If
+        Else
+            'VScroller.Visible = True
+            'VScroller.Maximum = lAvailableHeight - (lMaxY - lMinY)
+        End If
+
+        If Not pDragging AndAlso (lDx <> 0 OrElse lDy <> 0) Then
+            For Each lIcon As clsIcon In AllIcons
+                With lIcon
+                    .Top -= lDy
+                    .Left -= lDx
+                End With
+            Next
+        End If
+    End Sub
+
     ''' <summary>
     ''' Draw the connecting lines and selection halos behind the tree nodes
     ''' </summary>
     ''' <remarks></remarks>
     Private Sub DrawTreeBackground()
-        If pTreeBackground IsNot Nothing Then pTreeBackground.Dispose()
-        pTreeBackground = New Bitmap(picTree.Width, picTree.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
-        Dim lGraphics As Graphics = Graphics.FromImage(pTreeBackground)
-        Dim lLinesPen As Pen = SystemPens.ControlDarkDark
+        If picTree IsNot Nothing Then
+            Try
+                CheckScrollbars()
+                Dim lDx As Integer = 0, lMaxDx As Integer = 0
+                Dim lDy As Integer = 0, lMaxDy As Integer = 0
+                'If HScroller.Visible Then
+                '    lDx = HScroller.Value
+                '    lMaxDx = HScroller.Maximum
+                'End If
+                'If VScroller.Visible Then
+                '    lDy = VScroller.Value
+                '    lMaxDy = VScroller.Maximum
+                'End If
 
-        For Each lIcon As clsIcon In AllIcons
-            With lIcon
-                Dim lIconCenter As Point = .Center
-                For Each lUpstreamIcon As clsIcon In lIcon.UpstreamIcons
-                    lGraphics.DrawLine(lLinesPen, lIconCenter, lUpstreamIcon.Center)
+                Dim lLinesPen As Pen = SystemPens.ControlDarkDark
+
+                If pTreeBackground IsNot Nothing Then pTreeBackground.Dispose()
+                pTreeBackground = New Bitmap(picTree.Width + lMaxDx, picTree.Height + lMaxDy, Drawing.Imaging.PixelFormat.Format32bppArgb)
+                Dim lGraphics As Graphics = Graphics.FromImage(pTreeBackground)
+                For Each lIcon As clsIcon In AllIcons
+                    With lIcon
+                        Dim lIconCenter As Point = .Center
+                        For Each lUpstreamIcon As clsIcon In lIcon.UpstreamIcons
+                            lGraphics.DrawLine(lLinesPen, lIconCenter, lUpstreamIcon.Center)
+                        Next
+                        If .Selected Then
+                            lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
+                        End If
+                    End With
                 Next
-                If .Selected Then
-                    lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
-                End If
-            End With
-        Next
-        lGraphics.Dispose()
-        picTree.BackgroundImage = pTreeBackground
+                lGraphics.Dispose()
+                picTree.BackgroundImage = pTreeBackground
+            Catch e As Exception
+                Logger.Dbg(e.ToString)
+            End Try
+        End If
     End Sub
 
     'Private Sub DrawTreeBackground(ByVal aIcon As clsIcon)
@@ -505,6 +598,8 @@ Friend Class ctlSchematic
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
         ' Add any initialization after the InitializeComponent() call.
+        SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
+        UpdateStyles()
 
         picTree = New PanelDoubleBuffer
         Me.Controls.Add(Me.picTree)
@@ -515,7 +610,7 @@ Friend Class ctlSchematic
         'picTree.Size = Me.ClientSize
         picTree.Dock = DockStyle.Fill
         'picTree.Height = Me.SplitLegendTree.Panel2.Width
-        picTree.AutoScroll = True
+        'picTree.AutoScroll = True
 
         'LegendLandSurface.LegendType = EnumLegendType.LegLand
         'LegendMetSegs.LegendType = EnumLegendType.LegMet
@@ -543,7 +638,8 @@ Friend Class ctlSchematic
             Case Windows.Forms.MouseButtons.Right
                 pClickedIcon = lSender
                 RightClickMenu.MenuItems.Clear()
-                RightClickMenu.MenuItems.Add("Open in WinHSPF: """ & lSender.Key & """")
+                RightClickMenu.MenuItems.Add("Edit", AddressOf EditModel)
+                'RightClickMenu.MenuItems.Add("Open in WinHSPF: """ & lSender.Key & """")
                 'If lSender.Label <> lSender.Key Then RightClickMenu.MenuItems.Add("""" & lSender.Label & """")
                 If lSender.DistanceFromOutlet > 1 Then
                     RightClickMenu.MenuItems.Add("Select Downstream", AddressOf Event_SelectDownstream)
@@ -553,6 +649,13 @@ Friend Class ctlSchematic
                 End If
                 RightClickMenu.Show(lSender, e.Location)
         End Select
+    End Sub
+
+    Public Sub EditModel(ByVal aSender As Object, ByVal e As System.EventArgs)
+        Dim lModelForm As New frmModel
+        lModelForm.Schematic = Me
+        lModelForm.ModelIcon = pClickedIcon
+        lModelForm.Show()
     End Sub
 
     ''' <summary>
@@ -585,12 +688,8 @@ Friend Class ctlSchematic
                     Windows.Forms.Cursor.Clip = Nothing
                     'If same location, count as click rather than a drag
                     If lSender.Location = pBeforeDragLocation Then
-                        Dim lModelForm As New frmModel
-                        lModelForm.Schematic = Me
-                        lModelForm.ModelIcon = lSender
-                        lModelForm.Show()
 
-                        'lSender.Selected = Not lSender.Selected
+                        lSender.Selected = Not lSender.Selected
                         'UpdateDetails()
                     End If
                     DrawTreeBackground()
@@ -652,7 +751,7 @@ Friend Class ctlSchematic
 
     End Sub
 
-    Private Sub Scroll_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseWheel, picTree.MouseWheel
+    Private Sub Scroll_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseWheel, picTree.MouseWheel ', HScroller.MouseWheel, VScroller.MouseWheel
         Dim lScale As Single
         If e.Delta > 0 Then
             lScale = 1.111111
@@ -669,10 +768,21 @@ Friend Class ctlSchematic
         IconHeight *= lScale
         IconWidth *= lScale
         'Dim lScale As Single = (pIconHeight + lDelta) / pIconHeight
+
+
+        Dim lNodeSize As New Drawing.Size(IconWidth, IconHeight)
+
         For Each lIcon As clsIcon In AllIcons
-            lIcon.Location = New Drawing.Point(lIcon.Left * lScale, lIcon.Top * lScale)
+            With lIcon
+                'If .Left * lScale <= 0 OrElse .Top * lScale <= 0 Then
+                '    Stop
+                'End If
+                .Size = lNodeSize
+                .Location = New Drawing.Point(.Left * lScale, .Top * lScale)
+                DrawIcon(False, lIcon)
+            End With
         Next
-        Me.BuildTree(AllIcons)
+        DrawTreeBackground()
     End Sub
 
     'Private Sub pCurrentLegend_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles pCurrentLegend.Resize
@@ -680,12 +790,7 @@ Friend Class ctlSchematic
     'End Sub
 
     Private Sub ctlSchematic_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
-        RefreshDetails
-    End Sub
-
-    Public Sub RefreshDetails()
-        'agdDetails.SizeAllColumnsToContents(-1)
-        'agdDetails.Refresh()
+        DrawTreeBackground() ' CheckScrollbars()
     End Sub
 
     Private Sub SplitLegendTree_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs)

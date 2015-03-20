@@ -29,9 +29,6 @@ Partial Class frmModel
         Me.lblName = New System.Windows.Forms.Label()
         Me.txtName = New System.Windows.Forms.TextBox()
         Me.btnImage = New System.Windows.Forms.Button()
-        Me.btnRunHSPF = New System.Windows.Forms.Button()
-        Me.chkRunDownstream = New System.Windows.Forms.CheckBox()
-        Me.btnWinHSPF = New System.Windows.Forms.Button()
         Me.btnOk = New System.Windows.Forms.Button()
         Me.btnCancel = New System.Windows.Forms.Button()
         Me.lblWatershedImage = New System.Windows.Forms.Label()
@@ -46,7 +43,7 @@ Partial Class frmModel
         Me.btnBrowseUCIFile.Location = New System.Drawing.Point(500, 65)
         Me.btnBrowseUCIFile.Name = "btnBrowseUCIFile"
         Me.btnBrowseUCIFile.Size = New System.Drawing.Size(64, 20)
-        Me.btnBrowseUCIFile.TabIndex = 3
+        Me.btnBrowseUCIFile.TabIndex = 4
         Me.btnBrowseUCIFile.Text = "Add"
         Me.btnBrowseUCIFile.UseVisualStyleBackColor = True
         '
@@ -83,7 +80,7 @@ Partial Class frmModel
         '
         Me.txtName.AllowDrop = True
         Me.txtName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtName.Location = New System.Drawing.Point(115, 12)
         Me.txtName.Name = "txtName"
         Me.txtName.Size = New System.Drawing.Size(379, 20)
@@ -102,38 +99,6 @@ Partial Class frmModel
         Me.btnImage.TabIndex = 6
         Me.btnImage.TextAlign = System.Drawing.ContentAlignment.BottomCenter
         Me.btnImage.UseVisualStyleBackColor = False
-        '
-        'btnRunHSPF
-        '
-        Me.btnRunHSPF.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRunHSPF.Location = New System.Drawing.Point(329, 304)
-        Me.btnRunHSPF.Name = "btnRunHSPF"
-        Me.btnRunHSPF.Size = New System.Drawing.Size(93, 23)
-        Me.btnRunHSPF.TabIndex = 10
-        Me.btnRunHSPF.Text = "Run HSPF"
-        Me.btnRunHSPF.UseVisualStyleBackColor = True
-        '
-        'chkRunDownstream
-        '
-        Me.chkRunDownstream.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.chkRunDownstream.AutoSize = True
-        Me.chkRunDownstream.Location = New System.Drawing.Point(428, 308)
-        Me.chkRunDownstream.Name = "chkRunDownstream"
-        Me.chkRunDownstream.Size = New System.Drawing.Size(194, 17)
-        Me.chkRunDownstream.TabIndex = 11
-        Me.chkRunDownstream.Text = "Also run downstream: USAR, LSAR"
-        Me.chkRunDownstream.UseVisualStyleBackColor = True
-        '
-        'btnWinHSPF
-        '
-        Me.btnWinHSPF.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnWinHSPF.AutoSize = True
-        Me.btnWinHSPF.Location = New System.Drawing.Point(230, 304)
-        Me.btnWinHSPF.Name = "btnWinHSPF"
-        Me.btnWinHSPF.Size = New System.Drawing.Size(93, 23)
-        Me.btnWinHSPF.TabIndex = 9
-        Me.btnWinHSPF.Text = "Open WinHSPF"
-        Me.btnWinHSPF.UseVisualStyleBackColor = True
         '
         'btnOk
         '
@@ -173,30 +138,30 @@ Partial Class frmModel
         Me.btnRemove.Location = New System.Drawing.Point(570, 65)
         Me.btnRemove.Name = "btnRemove"
         Me.btnRemove.Size = New System.Drawing.Size(64, 20)
-        Me.btnRemove.TabIndex = 4
+        Me.btnRemove.TabIndex = 5
         Me.btnRemove.Text = "Remove"
         Me.btnRemove.UseVisualStyleBackColor = True
         '
         'cboDownstream
         '
         Me.cboDownstream.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboDownstream.FormattingEnabled = True
         Me.cboDownstream.Location = New System.Drawing.Point(115, 38)
         Me.cboDownstream.Name = "cboDownstream"
         Me.cboDownstream.Size = New System.Drawing.Size(379, 21)
-        Me.cboDownstream.TabIndex = 39
+        Me.cboDownstream.TabIndex = 2
         '
         'cboUciFiles
         '
         Me.cboUciFiles.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboUciFiles.FormattingEnabled = True
         Me.cboUciFiles.IntegralHeight = False
         Me.cboUciFiles.Location = New System.Drawing.Point(115, 65)
         Me.cboUciFiles.Name = "cboUciFiles"
         Me.cboUciFiles.Size = New System.Drawing.Size(379, 21)
-        Me.cboUciFiles.TabIndex = 2
+        Me.cboUciFiles.TabIndex = 3
         '
         'frmModel
         '
@@ -209,9 +174,6 @@ Partial Class frmModel
         Me.Controls.Add(Me.lblWatershedImage)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
-        Me.Controls.Add(Me.btnWinHSPF)
-        Me.Controls.Add(Me.chkRunDownstream)
-        Me.Controls.Add(Me.btnRunHSPF)
         Me.Controls.Add(Me.lblName)
         Me.Controls.Add(Me.txtName)
         Me.Controls.Add(Me.lblDownstream)
@@ -231,9 +193,6 @@ Partial Class frmModel
     Friend WithEvents lblName As System.Windows.Forms.Label
     Friend WithEvents txtName As System.Windows.Forms.TextBox
     Friend WithEvents btnImage As System.Windows.Forms.Button
-    Friend WithEvents btnRunHSPF As System.Windows.Forms.Button
-    Friend WithEvents chkRunDownstream As System.Windows.Forms.CheckBox
-    Friend WithEvents btnWinHSPF As System.Windows.Forms.Button
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents lblWatershedImage As System.Windows.Forms.Label
