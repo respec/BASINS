@@ -26,11 +26,14 @@ Partial Class frmHspfSimulationManager
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SchematicDiagram = New HSPFSimulationManager.ctlSchematic()
+        Me.ToolStripMain = New System.Windows.Forms.ToolStrip()
+        Me.btnRunHSPF = New System.Windows.Forms.ToolStripButton()
         Me.MenuStrip1.SuspendLayout()
+        Me.ToolStripMain.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -55,13 +58,6 @@ Partial Class frmHspfSimulationManager
         Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(132, 22)
         Me.OpenToolStripMenuItem.Text = "Open"
         '
-        'ExitToolStripMenuItem
-        '
-        Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.F4), System.Windows.Forms.Keys)
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(132, 22)
-        Me.ExitToolStripMenuItem.Text = "Exit"
-        '
         'SaveToolStripMenuItem
         '
         Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
@@ -73,16 +69,41 @@ Partial Class frmHspfSimulationManager
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
         Me.ToolStripMenuItem1.Size = New System.Drawing.Size(129, 6)
         '
+        'ExitToolStripMenuItem
+        '
+        Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
+        Me.ExitToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.F4), System.Windows.Forms.Keys)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(132, 22)
+        Me.ExitToolStripMenuItem.Text = "Exit"
+        '
         'SchematicDiagram
         '
         Me.SchematicDiagram.AutoScroll = True
         Me.SchematicDiagram.AutoScrollMargin = New System.Drawing.Size(5, 5)
         Me.SchematicDiagram.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
         Me.SchematicDiagram.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SchematicDiagram.Location = New System.Drawing.Point(0, 24)
+        Me.SchematicDiagram.Location = New System.Drawing.Point(0, 49)
         Me.SchematicDiagram.Name = "SchematicDiagram"
-        Me.SchematicDiagram.Size = New System.Drawing.Size(1253, 708)
+        Me.SchematicDiagram.Size = New System.Drawing.Size(1253, 683)
         Me.SchematicDiagram.TabIndex = 3
+        '
+        'ToolStripMain
+        '
+        Me.ToolStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btnRunHSPF})
+        Me.ToolStripMain.Location = New System.Drawing.Point(0, 24)
+        Me.ToolStripMain.Name = "ToolStripMain"
+        Me.ToolStripMain.Size = New System.Drawing.Size(1253, 25)
+        Me.ToolStripMain.TabIndex = 2
+        Me.ToolStripMain.Text = "ToolStrip1"
+        '
+        'btnRunHSPF
+        '
+        Me.btnRunHSPF.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.btnRunHSPF.Image = CType(resources.GetObject("btnRunHSPF.Image"), System.Drawing.Image)
+        Me.btnRunHSPF.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.btnRunHSPF.Name = "btnRunHSPF"
+        Me.btnRunHSPF.Size = New System.Drawing.Size(58, 22)
+        Me.btnRunHSPF.Text = "Run HSPF"
         '
         'frmHspfSimulationManager
         '
@@ -90,6 +111,7 @@ Partial Class frmHspfSimulationManager
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1253, 732)
         Me.Controls.Add(Me.SchematicDiagram)
+        Me.Controls.Add(Me.ToolStripMain)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
@@ -97,6 +119,8 @@ Partial Class frmHspfSimulationManager
         Me.Text = "SARA HSPF Simulation Manager"
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
+        Me.ToolStripMain.ResumeLayout(False)
+        Me.ToolStripMain.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -108,5 +132,7 @@ Partial Class frmHspfSimulationManager
     Friend WithEvents SchematicDiagram As HSPFSimulationManager.ctlSchematic
     Friend WithEvents SaveToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem1 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents ToolStripMain As System.Windows.Forms.ToolStrip
+    Friend WithEvents btnRunHSPF As System.Windows.Forms.ToolStripButton
 
 End Class
