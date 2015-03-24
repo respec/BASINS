@@ -14,6 +14,7 @@ Public Class clsIcon
     Public Selected As Boolean
     Public UciFileName As String
     Public UciFileNames As New List(Of String)
+    Private pUciFile As atcUCI.HspfUci
     Public WatershedImage As Image
     Public WatershedImageFilename As String
     Public WatershedName As String = ""
@@ -37,6 +38,13 @@ Public Class clsIcon
 
     Public Function Center() As Point
         Return New Point(Me.Left + Me.Width / 2, Me.Top + Me.Height / 2)
+    End Function
+
+    Public Function UciFile() As atcUCI.HspfUci
+        If pUciFile Is Nothing OrElse pUciFile.Name <> UciFileName Then
+            pUciFile = OpenUCI(UciFileName)
+        End If
+        Return pUciFile
     End Function
 
 End Class
