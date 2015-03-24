@@ -75,4 +75,70 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         End Try
     End Function
 
+    Public Function ConnectionSummary(ByVal aSourceUCI As HspfUci, ByVal aTargetUCI As HspfUci) As List(Of String)
+        Dim lConnections As New List(Of String)
+        Dim lFileName As String = ""
+
+        'build collection of wdms used by source uci 
+        Dim lSourceWDMs As New atcCollection
+        For lIndex As Integer = 1 To aSourceUCI.FilesBlock.Count
+            Dim lFile As HspfFile = aSourceUCI.FilesBlock.Value(lIndex)
+            Dim lFileTyp As String = lFile.Typ
+            If lFileTyp.StartsWith("WDM") Then
+                If lFileTyp = "WDM" Then
+                    lFileTyp = "WDM1"
+                End If
+                lFileName = AbsolutePath(lFile.Name, aSourceUCI.Name).ToLower
+                lSourceWDMs.Add(lFileTyp, lFileName) 'todo: make standard full path 
+            End If
+        Next
+
+        'build collection of wdms used by target uci
+        Dim lTargetWDMs As New atcCollection
+        For lIndex As Integer = 1 To aTargetUCI.FilesBlock.Count
+            Dim lFile As HspfFile = aTargetUCI.FilesBlock.Value(lIndex)
+            Dim lFileTyp As String = lFile.Typ
+            If lFileTyp.StartsWith("WDM") Then
+                If lFileTyp = "WDM" Then
+                    lFileTyp = "WDM1"
+                End If
+                lFileName = AbsolutePath(lFile.Name, aTargetUCI.Name).ToLower
+                lTargetWDMs.Add(lFileTyp, lFileName) 'todo: make standard full path 
+            End If
+        Next
+
+        For Each lSConn As HspfConnection In aSourceUCI.Connections
+            Dim lOutputVol As String = lSConn.Target.VolName
+            If lOutputVol.StartsWith("WDM") Then
+                If lOutputVol = "WDM" Then
+                    lOutputVol = "WDM1"
+                End If
+                'translate wdm id into file name
+                Dim lOutputWDMFileName As String = lSourceWDMs.ItemByKey(lOutputVol)
+                Dim lOutputDsn As Integer = lSConn.Target.VolId
+                Dim lInputWDMFileName As String = ""
+                Dim lInputDsn As Integer = 0
+                'now see if this wdm/dsn combination shows up as input to the target uci
+                For Each lTConn As HspfConnection In aTargetUCI.Connections
+                    Dim lInputVol As String = lTConn.Source.VolName
+                    If lInputVol.StartsWith("WDM") Then
+                        If lInputVol = "WDM" Then
+                            lInputVol = "WDM1"
+                        End If
+                        'translate wdm id into file name
+                        lInputWDMFileName = lTargetWDMs.ItemByKey(lInputVol)
+                        lInputDsn = lTConn.Source.VolId
+                        'do the check to see if these match
+                        If lInputWDMFileName = lOutputWDMFileName AndAlso lInputDsn = lOutputDsn Then
+                            'we have a match!
+                            lConnections.Add(lInputWDMFileName & "|" & lInputDsn.ToString)
+                        End If
+                    End If
+                Next
+            End If
+        Next
+
+        Return lConnections
+    End Function
+
 End Module
