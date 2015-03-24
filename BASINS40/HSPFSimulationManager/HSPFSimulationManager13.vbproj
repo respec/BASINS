@@ -104,6 +104,7 @@
     <Compile Include="frmRunHSPF.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="modUCI.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -159,9 +160,37 @@
       <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>
       <Name>MapWinUtility-D4EM13</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcControls\atcControls-D4EM13.vbproj">
+      <Project>{b219575f-1541-41db-9fa4-d9d7cd62b4a5}</Project>
+      <Name>atcControls-D4EM13</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData-D4EM13.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcData-D4EM13</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMetCmp\atcMetCmp-D4EM13.vbproj">
+      <Project>{72264bdc-23f5-4a55-b53d-0752099cb263}</Project>
+      <Name>atcMetCmp-D4EM13</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSegmentation\atcSegmentation-D4EM13.vbproj">
+      <Project>{813e3f46-36ca-4320-bb05-325eec553d3d}</Project>
+      <Name>atcSegmentation-D4EM13</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesScript\atcTimeseriesScript-D4EM13.vbproj">
+      <Project>{40de1f29-3531-4bc2-9d7e-324dc92689df}</Project>
+      <Name>atcTimeseriesScript-D4EM13</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUCI\atcUCI-D4EM13.vbproj">
+      <Project>{2fc4314b-792b-40a3-b540-aca05b9ea86b}</Project>
+      <Name>atcUCI-D4EM13</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility-D4EM13.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility-D4EM13</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM-D4EM13.vbproj">
+      <Project>{f0f41e48-35ed-43f4-ab00-30252b0e5690}</Project>
+      <Name>atcWDM-D4EM13</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
