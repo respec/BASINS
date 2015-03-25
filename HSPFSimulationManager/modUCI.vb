@@ -92,7 +92,7 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
                 If lFileTyp = "WDM" Then
                     lFileTyp = "WDM1"
                 End If
-                lFileName = AbsolutePath(lFile.Name, aSourceUCI.Name).ToLower
+                lFileName = AbsolutePath(Trim(lFile.Name), PathNameOnly(aSourceUCI.Name)).ToLower
                 lSourceWDMs.Add(lFileTyp, lFileName) 'todo: make standard full path 
             End If
         Next
@@ -106,7 +106,7 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
                 If lFileTyp = "WDM" Then
                     lFileTyp = "WDM1"
                 End If
-                lFileName = AbsolutePath(lFile.Name, aTargetUCI.Name).ToLower
+                lFileName = AbsolutePath(Trim(lFile.Name), PathNameOnly(aTargetUCI.Name)).ToLower
                 lTargetWDMs.Add(lFileTyp, lFileName) 'todo: make standard full path 
             End If
         Next
@@ -135,7 +135,9 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
                         'do the check to see if these match
                         If lInputWDMFileName = lOutputWDMFileName AndAlso lInputDsn = lOutputDsn Then
                             'we have a match!
-                            lConnections.Add(lInputWDMFileName & "|" & lInputDsn.ToString)
+                            lConnections.Add(lInputWDMFileName & "|" & lInputDsn.ToString & "|" & _
+                                             lSConn.Source.VolName & ":" & lSConn.Source.VolId & ":" & lSConn.Target.Member & " - " & _
+                                             lTConn.Target.VolName & ":" & lTConn.Target.VolId & ":" & lTConn.Source.Member)
                         End If
                     End If
                 Next
