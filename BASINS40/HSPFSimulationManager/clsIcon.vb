@@ -12,8 +12,8 @@ Public Class clsIcon
     Inherits Windows.Forms.Control
 
     Public Selected As Boolean
-    Public UciFileName As String
     Public UciFileNames As New List(Of String)
+    Private pUciFileName As String
     Private pUciFile As atcUCI.HspfUci
     Public WatershedImage As Image
     Public WatershedImageFilename As String
@@ -26,6 +26,7 @@ Public Class clsIcon
     Sub New()
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         UpdateStyles()
+        BackColor = Drawing.SystemColors.ButtonFace
     End Sub
 
     Public Overrides Function ToString() As String
@@ -39,6 +40,20 @@ Public Class clsIcon
     Public Function Center() As Point
         Return New Point(Me.Left + Me.Width / 2, Me.Top + Me.Height / 2)
     End Function
+
+    Public Property UciFileName() As String
+        Set(value As String)
+            pUciFileName = value
+            If FileExists(pUciFileName) Then
+                Me.BackColor = Drawing.SystemColors.ButtonFace
+            Else
+                Me.BackColor = Drawing.Color.Salmon
+            End If
+        End Set
+        Get
+            Return pUciFileName
+        End Get
+    End Property
 
     Public Function UciFile() As atcUCI.HspfUci
         If pUciFile Is Nothing OrElse pUciFile.Name <> UciFileName Then
