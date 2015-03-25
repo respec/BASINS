@@ -7,6 +7,10 @@ Module modUCI
     Public MessageFile As atcUCI.HspfMsg
 
     Function OpenUCI(aUciFileName As String) As atcUCI.HspfUci
+        If Not FileExists(aUciFileName) Then
+            Return Nothing
+        End If
+
         If MessageFile Is Nothing Then
             MessageFile = New atcUCI.HspfMsg()
             Dim lMsgFile As String = FindFile("Locate Message WDM", "hspfmsg.wdm")

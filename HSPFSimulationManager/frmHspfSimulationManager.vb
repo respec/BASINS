@@ -50,6 +50,38 @@
             SchematicDiagram.IconWidth = lIconSize.Width
             SchematicDiagram.IconHeight = lIconSize.Height
             SchematicDiagram.BuildTree(lNewIcons)
+
+            Dim lReport As String = ""
+            Dim lReportLine As String
+
+            For Each lIcon As clsIcon In lNewIcons
+                If lIcon.DownstreamIcon IsNot Nothing Then
+                    Dim lUpstreamUCI As atcUCI.HspfUci = lIcon.UciFile
+                    If lUpstreamUCI Is Nothing Then
+                        lReportLine = "UCI file not found: " & lIcon.UciFileName
+                        If Not lReport.Contains(lReportLine) Then
+                            lReport &= lReportLine & vbCrLf
+                        End If
+                    Else
+                        Dim lDownstreamUCI As atcUCI.HspfUci = lIcon.DownstreamIcon.UciFile
+                        If lDownstreamUCI Is Nothing Then
+                            lReportLine = "UCI file not found: " & lIcon.DownstreamIcon.UciFileName
+                            If Not lReport.Contains(lReportLine) Then
+                                lReport &= lReportLine & vbCrLf
+                            End If
+                        Else
+                            Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(lUpstreamUCI, lDownstreamUCI)
+                            If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
+                                lReport &= "No datasets found connecting " & lIcon.UciFileName & " to " & lIcon.DownstreamIcon.UciFileName & vbCrLf
+                            End If
+                        End If
+                    End If
+                End If
+            Next
+
+            If lReport.Length > 0 Then
+                MsgBox(lReport, MsgBoxStyle.OkOnly, "Connection Report")
+            End If
         End If
     End Sub
 
@@ -96,5 +128,12 @@
         lRun.SchematicDiagram = SchematicDiagram
         lRun.Show(Me)
         'frmModel.RunUCI()
+    End Sub
+
+    Private Sub AddWatershedToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddWatershedToolStripMenuItem.Click
+        Dim lModelForm As New frmModel
+        lModelForm.Schematic = SchematicDiagram
+        lModelForm.ModelIcon = SchematicDiagram.AllIcons.FindOrAddIcon("New Watershed")
+        lModelForm.Show()
     End Sub
 End Class

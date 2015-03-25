@@ -41,7 +41,7 @@ Public Class frmModel
         End Set
         Get
             pIcon.WatershedName = txtName.Text
-            pIcon.UciFileName = cboUciFiles.SelectedItem.ToString
+            pIcon.UciFileName = cboUciFiles.Text
 
             pIcon.UciFileNames.Clear()
             For Each lUciFileName As String In cboUciFiles.Items
@@ -61,8 +61,9 @@ Public Class frmModel
                 pIcon.DownstreamIcon.UpstreamIcons.Remove(pIcon)
             End If
             pIcon.DownstreamIcon = lNewDownstreamIcon
-            pIcon.DownstreamIcon.UpstreamIcons.Add(pIcon)
-
+            If lNewDownstreamIcon IsNot Nothing Then
+                pIcon.DownstreamIcon.UpstreamIcons.Add(pIcon)
+            End If
             pIcon.WatershedImageFilename = btnImage.Text
             pIcon.WatershedImage = btnImage.BackgroundImage
 

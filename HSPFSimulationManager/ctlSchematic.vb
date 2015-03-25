@@ -68,7 +68,6 @@ Friend Class ctlSchematic
         For Each lNewIcon As clsIcon In aIcons
             With lNewIcon
                 .Size = lNodeSize
-                .BackColor = Drawing.SystemColors.ButtonFace
             End With
             AddHandler lNewIcon.MouseDown, AddressOf Icon_MouseDown
             AddHandler lNewIcon.MouseMove, AddressOf Icon_MouseMove
@@ -291,7 +290,8 @@ Friend Class ctlSchematic
                 '    lMaxDy = VScroller.Maximum
                 'End If
 
-                Dim lLinesPen As Pen = SystemPens.ControlDarkDark
+                Dim lGoodLinePen As Pen = SystemPens.ControlDarkDark
+                Dim lBadLinePen As Pen = New Drawing.Pen(Brushes.Salmon)
 
                 If pTreeBackground IsNot Nothing Then pTreeBackground.Dispose()
                 pTreeBackground = New Bitmap(picTree.Width + lMaxDx, picTree.Height + lMaxDy, Drawing.Imaging.PixelFormat.Format32bppArgb)
@@ -300,7 +300,7 @@ Friend Class ctlSchematic
                     With lIcon
                         Dim lIconCenter As Point = .Center
                         For Each lUpstreamIcon As clsIcon In lIcon.UpstreamIcons
-                            lGraphics.DrawLine(lLinesPen, lIconCenter, lUpstreamIcon.Center)
+                            lGraphics.DrawLine(lGoodLinePen, lIconCenter, lUpstreamIcon.Center)
                         Next
                         If .Selected Then
                             lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
@@ -367,7 +367,7 @@ Friend Class ctlSchematic
         Dim lBitmap As New Bitmap(IconWidth, IconHeight, Drawing.Imaging.PixelFormat.Format32bppArgb)
         Dim g As Graphics = Graphics.FromImage(lBitmap)
 
-        g.Clear(SystemColors.Control)
+        g.Clear(aIcon.BackColor)
         If aIcon.Font.Size < 8.25 Then
             aIcon.Font.Dispose()
             aIcon.Font = New Font("Microsoft Sans Serif", 8.25)
