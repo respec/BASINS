@@ -98,12 +98,24 @@ Public Class frmModel
         Dim lFileName As String = String.Empty
         If frmHspfSimulationManager.BrowseOpen("Open UCI File", "UCI Files|*.uci|All Files|*.*", ".uci", Me, lFileName) Then
             cboUciFiles.Items.Add(lFileName)
+            cboUciFiles.SelectedIndex = cboUciFiles.Items.Count - 1
         End If
     End Sub
 
     Private Sub btnRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRemove.Click
         Try
-            cboUciFiles.Items.RemoveAt(cboUciFiles.SelectedIndex)
+            Dim lSelectedIndex As Integer = cboUciFiles.SelectedIndex
+            If lSelectedIndex >= 0 Then
+                cboUciFiles.Items.RemoveAt(lSelectedIndex)
+                If lSelectedIndex >= cboUciFiles.Items.Count Then
+                    lSelectedIndex -= 1
+                End If
+                If lSelectedIndex < 0 OrElse cboUciFiles.Items.Count = 0 Then
+                    cboUciFiles.Text = ""
+                Else
+                    cboUciFiles.SelectedIndex = lSelectedIndex
+                End If
+            End If
         Catch
         End Try
     End Sub

@@ -55,25 +55,18 @@
             Dim lReportLine As String
 
             For Each lIcon As clsIcon In lNewIcons
-                If lIcon.DownstreamIcon IsNot Nothing Then
-                    Dim lUpstreamUCI As atcUCI.HspfUci = lIcon.UciFile
-                    If lUpstreamUCI Is Nothing Then
-                        lReportLine = "UCI file not found: " & lIcon.UciFileName
-                        If Not lReport.Contains(lReportLine) Then
-                            lReport &= lReportLine & vbCrLf
-                        End If
-                    Else
-                        Dim lDownstreamUCI As atcUCI.HspfUci = lIcon.DownstreamIcon.UciFile
-                        If lDownstreamUCI Is Nothing Then
-                            lReportLine = "UCI file not found: " & lIcon.DownstreamIcon.UciFileName
-                            If Not lReport.Contains(lReportLine) Then
-                                lReport &= lReportLine & vbCrLf
-                            End If
-                        Else
-                            Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(lUpstreamUCI, lDownstreamUCI)
-                            If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
-                                lReport &= "No datasets found connecting " & lIcon.UciFileName & " to " & lIcon.DownstreamIcon.UciFileName & vbCrLf
-                            End If
+                Dim lUpstreamUCI As atcUCI.HspfUci = lIcon.UciFile
+                If lUpstreamUCI Is Nothing Then
+                    lReportLine = "UCI file not found: " & lIcon.UciFileName
+                    If Not lReport.Contains(lReportLine) Then
+                        lReport &= lReportLine & vbCrLf
+                    End If
+                ElseIf lIcon.DownstreamIcon IsNot Nothing Then
+                    Dim lDownstreamUCI As atcUCI.HspfUci = lIcon.DownstreamIcon.UciFile
+                    If lDownstreamUCI IsNot Nothing Then
+                        Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(lUpstreamUCI, lDownstreamUCI)
+                        If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
+                            lReport &= "No datasets found connecting " & lIcon.UciFileName & " to " & lIcon.DownstreamIcon.UciFileName & vbCrLf
                         End If
                     End If
                 End If
