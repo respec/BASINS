@@ -1,52 +1,77 @@
-﻿Public Class frmHspfSimulationManager
-    'Dim pTreeBackground As Bitmap
+﻿Imports atcUtility
+Imports MapWinUtility
+
+Public Class frmHspfSimulationManager
+
+    Public Const AppName As String = "HspfSimulationManager"
+
+    Private pSpecFileName As String = String.Empty
+
     Private Sub frmHspfSimulationManager_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        'If pTreeBackground IsNot Nothing Then pTreeBackground.Dispose()
-        'pTreeBackground = New Bitmap(panelSchematic.Width, panelSchematic.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
-        'Dim lGraphics As Graphics = Graphics.FromImage(pTreeBackground)
-        'Dim lLinesPen As Pen = SystemPens.ControlDarkDark
-        'lGraphics.DrawLine(lLinesPen, ButtonCenter(btnMedinaAboveLake), ButtonCenter(btnMedinaLake))
-        'lGraphics.DrawLine(lLinesPen, ButtonCenter(btnMedinaLake), ButtonCenter(btnMedinaDiversionLake))
-        'lGraphics.DrawLine(lLinesPen, ButtonCenter(btnMedio), ButtonCenter(btnMedinaBelowLake))
-        'lGraphics.DrawLine(lLinesPen, ButtonCenter(btnMedinaDiversionLake), ButtonCenter(btnMedinaBelowLake))
-        'lGraphics.DrawLine(lLinesPen, ButtonCenter(btnMedinaBelowLake), ButtonCenter(btnUSAR))
-        'lGraphics.DrawLine(lLinesPen, ButtonCenter(btnLeon), ButtonCenter(btnMedinaBelowLake))
-        'lGraphics.DrawLine(lLinesPen, ButtonCenter(btnSalado), ButtonCenter(btnUSAR))
-        'lGraphics.DrawLine(lLinesPen, ButtonCenter(btnCibolo), ButtonCenter(btnLSAR))
-        'lGraphics.DrawLine(lLinesPen, ButtonCenter(btnUSAR), ButtonCenter(btnLSAR))
-
-        ''For Each lIcon As clsSchematicIcon In pIcons
-        ''    With lIcon
-        ''        Dim lIconCenter As Point = .Center
-        ''        For Each lUpstreamIcon As clsIcon In lIcon.UpstreamIcons
-        ''            lGraphics.DrawLine(lLinesPen, lIconCenter, lUpstreamIcon.Center)
-        ''        Next
-        ''        If .Selected Then
-        ''            lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
-        ''        End If
-        ''    End With
-        ''Next
-        'lGraphics.Dispose()
-        'panelSchematic.BackgroundImage = pTreeBackground
-
+        pSpecFileName = GetSetting(AppName, "Defaults", "FileName", pSpecFileName)
+        If FileExists(pSpecFileName) Then
+            OpenFile(pSpecFileName)
+            'Else
+            '    OpenToolStripMenuItem_Click(Nothing, Nothing)
+        End If
     End Sub
 
-    Private Function ButtonCenter(ByVal aButton As Button) As Drawing.Point
-        With aButton
-            Return New Drawing.Point(.Location.X + .Size.Width / 2, .Location.Y + .Size.Height / 2)
-        End With
-    End Function
+    Private Sub frmHspfSimulationManager_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        If SaveIfChanged() Then
+            e.Cancel = True
+        End If
+    End Sub
 
     Private Sub ExitToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExitToolStripMenuItem.Click
-        End
+        If Not SaveIfChanged() Then
+            End
+        End If
     End Sub
+
+    ''' <summary>
+    ''' Prompt to save changes if there are any changes
+    ''' Returns True if user cancelled
+    ''' </summary>
+    Private Function SaveIfChanged() As Boolean
+        Dim lPromptToSave As Boolean = False
+        If Not FileExists(pSpecFileName) Then
+            lPromptToSave = True
+        Else
+            If SchematicDiagram.AllIcons.Count > 0 Then
+                Dim lTempFileName As String = GetTemporaryFileName("HspfSimMgrSpec", ".txt")
+                clsSimulationManagerSpecFile.Save(SchematicDiagram.AllIcons, Me.Size, New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight), lTempFileName)
+                Dim lNewFileContents As String = IO.File.ReadAllText(lTempFileName)
+                Dim lExistingFileContents As String = IO.File.ReadAllText(pSpecFileName)
+                If lNewFileContents <> lExistingFileContents Then
+                    lPromptToSave = True
+                End If
+                TryDelete(lTempFileName)
+            End If
+        End If
+        If lPromptToSave Then
+            Dim lStyle As MsgBoxStyle = MsgBoxStyle.YesNoCancel
+            Select Case Logger.Msg("Save specification file?", lStyle, "HSPF Simulation Manager")
+                Case MsgBoxResult.Yes
+                    SaveToolStripMenuItem_Click(Nothing, Nothing)
+                Case MsgBoxResult.Cancel
+                    Return True
+            End Select
+        End If
+        Return False
+    End Function
 
     Private Sub OpenToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripMenuItem.Click
         Dim lFileName As String = String.Empty
         If BrowseOpen("Open Simulation Specification File", "*.txt", ".txt", Me, lFileName) Then
-            Me.Text = "SARA HSPF Simulation Manager - " & lFileName
+            OpenFile(lFileName)
+        End If
+    End Sub
+
+    Private Sub OpenFile(aFileName As String)
+        If FileExists(aFileName) Then
+            Me.Text = "SARA HSPF Simulation Manager - " & aFileName
             Dim lIconSize As New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight)
-            Dim lNewIcons As IconCollection = clsSimulationManagerSpecFile.Open(Me.Size, lIconSize, lFileName)
+            Dim lNewIcons As IconCollection = clsSimulationManagerSpecFile.Open(Me.Size, lIconSize, aFileName)
             SchematicDiagram.IconWidth = lIconSize.Width
             SchematicDiagram.IconHeight = lIconSize.Height
             SchematicDiagram.BuildTree(lNewIcons)
@@ -75,22 +100,8 @@
             If lReport.Length > 0 Then
                 MsgBox(lReport, MsgBoxStyle.OkOnly, "Connection Report")
             End If
+            SaveSetting(AppName, "Defaults", "FileName", aFileName)
         End If
-    End Sub
-
-    Private Sub SaveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click
-        Dim lFileDialog As New Windows.Forms.SaveFileDialog()
-        With lFileDialog
-            .Title = "Save Simulation Specification File"
-            '.Filter = aFilter
-            '.FilterIndex = 0
-            '.DefaultExt = aExtension
-            '.CheckFileExists = False
-            '.CheckPathExists = False
-            If .ShowDialog(Me) = DialogResult.OK Then
-                clsSimulationManagerSpecFile.Save(SchematicDiagram.AllIcons, Me.Size, New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight), .FileName)
-            End If
-        End With
     End Sub
 
     Public Shared Function BrowseOpen(ByVal aTitle As String, ByVal aFilter As String, ByVal aExtension As String, ByVal aParentForm As Form, ByRef aFileName As String) As Boolean
@@ -114,6 +125,23 @@
         End With
         Return False
     End Function
+
+    Private Sub SaveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click
+        Dim lFileDialog As New Windows.Forms.SaveFileDialog()
+        With lFileDialog
+            .Title = "Save Simulation Specification File"
+            .FileName = pSpecFileName
+            '.Filter = aFilter
+            '.FilterIndex = 0
+            '.DefaultExt = aExtension
+            '.CheckFileExists = False
+            '.CheckPathExists = False
+            If .ShowDialog(Me) = DialogResult.OK Then
+                clsSimulationManagerSpecFile.Save(SchematicDiagram.AllIcons, Me.Size, New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight), .FileName)
+                SaveSetting(AppName, "Defaults", "FileName", .FileName)
+            End If
+        End With
+    End Sub
 
     Private Sub btnRunHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRunHSPF.Click
         Dim lRun As New frmRunHSPF
