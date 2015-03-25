@@ -48,13 +48,7 @@ Public Class frmModel
                 pIcon.UciFileNames.Add(lUciFileName)
             Next
 
-            Dim lNewDownstreamIcon As clsIcon
-            Select Case cboDownstream.SelectedItem.Trim.ToLowerInvariant
-                Case "", "none" 'No downstream model
-                    lNewDownstreamIcon = Nothing
-                Case Else
-                    lNewDownstreamIcon = Schematic.AllIcons.FindOrAddIcon(cboDownstream.SelectedItem.Trim)
-            End Select
+            Dim lNewDownstreamIcon As clsIcon = CurrentlySelectedDownstreamIcon()
 
             If pIcon.DownstreamIcon IsNot Nothing AndAlso pIcon.DownstreamIcon.UpstreamIcons.Contains(pIcon) Then
                 'Remove old downstream icon connectivity
@@ -62,7 +56,7 @@ Public Class frmModel
             End If
             pIcon.DownstreamIcon = lNewDownstreamIcon
             If lNewDownstreamIcon IsNot Nothing Then
-                pIcon.DownstreamIcon.UpstreamIcons.Add(pIcon)
+                lNewDownstreamIcon.UpstreamIcons.Add(pIcon)
             End If
             pIcon.WatershedImageFilename = btnImage.Text
             pIcon.WatershedImage = btnImage.BackgroundImage
@@ -70,6 +64,15 @@ Public Class frmModel
             Return pIcon
         End Get
     End Property
+
+    Private Function CurrentlySelectedDownstreamIcon() As clsIcon
+        Select Case cboDownstream.SelectedItem.Trim.ToLowerInvariant
+            Case "", "none" 'No downstream model
+                Return Nothing
+            Case Else
+                Return Schematic.AllIcons.FindOrAddIcon(cboDownstream.SelectedItem.Trim)
+        End Select
+    End Function
 
     Private Sub btnImage_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnImage.Click
         Dim lFileName As String = String.Empty
@@ -118,5 +121,36 @@ Public Class frmModel
             End If
         Catch
         End Try
+    End Sub
+
+    Private Sub btnConnectionReport_Click(sender As Object, e As EventArgs) Handles btnConnectionReport.Click
+        Dim lReport As String = ""
+        Dim lReportLine As String
+        Dim lNewDownstreamIcon As clsIcon = CurrentlySelectedDownstreamIcon()
+
+        Dim lUpstreamUCI As atcUCI.HspfUci = pIcon.UciFile
+        If lUpstreamUCI Is Nothing Then
+            lReport &= "UCI file not found: " & pIcon.UciFileName & vbCrLf
+        ElseIf lNewDownstreamIcon Is Nothing Then
+            lReport &= "No downstream watershed specified"
+        Else
+            Dim lDownstreamUCI As atcUCI.HspfUci = lNewDownstreamIcon.UciFile
+            If lDownstreamUCI Is Nothing Then
+                lReport &= "Downstream UCI file not found: " & lNewDownstreamIcon.UciFileName & vbCrLf
+            Else
+                Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(lUpstreamUCI, lDownstreamUCI)
+                If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
+                    lReport &= "No datasets found connecting " & vbCrLf & pIcon.UciFileName & vbCrLf & " to " & vbCrLf & lNewDownstreamIcon.UciFileName & vbCrLf
+                Else
+                    For Each lReportLine In lConnCheck
+                        lReport &= lReportLine & vbCrLf
+                    Next
+                End If
+            End If
+        End If
+
+        If lReport.Length > 0 Then
+            MsgBox(lReport, MsgBoxStyle.OkOnly, "Connection Report for " & txtName.Text)
+        End If
     End Sub
 End Class

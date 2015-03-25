@@ -35,6 +35,7 @@ Partial Class frmModel
         Me.btnRemove = New System.Windows.Forms.Button()
         Me.cboDownstream = New System.Windows.Forms.ComboBox()
         Me.cboUciFiles = New System.Windows.Forms.ComboBox()
+        Me.btnConnectionReport = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'btnBrowseUCIFile
@@ -42,7 +43,7 @@ Partial Class frmModel
         Me.btnBrowseUCIFile.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnBrowseUCIFile.Location = New System.Drawing.Point(500, 65)
         Me.btnBrowseUCIFile.Name = "btnBrowseUCIFile"
-        Me.btnBrowseUCIFile.Size = New System.Drawing.Size(64, 20)
+        Me.btnBrowseUCIFile.Size = New System.Drawing.Size(54, 20)
         Me.btnBrowseUCIFile.TabIndex = 4
         Me.btnBrowseUCIFile.Text = "Add"
         Me.btnBrowseUCIFile.UseVisualStyleBackColor = True
@@ -135,7 +136,7 @@ Partial Class frmModel
         'btnRemove
         '
         Me.btnRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRemove.Location = New System.Drawing.Point(570, 65)
+        Me.btnRemove.Location = New System.Drawing.Point(560, 65)
         Me.btnRemove.Name = "btnRemove"
         Me.btnRemove.Size = New System.Drawing.Size(64, 20)
         Me.btnRemove.TabIndex = 5
@@ -163,11 +164,22 @@ Partial Class frmModel
         Me.cboUciFiles.Size = New System.Drawing.Size(379, 21)
         Me.cboUciFiles.TabIndex = 3
         '
+        'btnConnectionReport
+        '
+        Me.btnConnectionReport.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnConnectionReport.Location = New System.Drawing.Point(500, 37)
+        Me.btnConnectionReport.Name = "btnConnectionReport"
+        Me.btnConnectionReport.Size = New System.Drawing.Size(124, 20)
+        Me.btnConnectionReport.TabIndex = 37
+        Me.btnConnectionReport.Text = "Connection Report"
+        Me.btnConnectionReport.UseVisualStyleBackColor = True
+        '
         'frmModel
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(636, 339)
+        Me.Controls.Add(Me.btnConnectionReport)
         Me.Controls.Add(Me.cboUciFiles)
         Me.Controls.Add(Me.cboDownstream)
         Me.Controls.Add(Me.btnRemove)
@@ -199,4 +211,5 @@ Partial Class frmModel
     Friend WithEvents btnRemove As System.Windows.Forms.Button
     Friend WithEvents cboDownstream As System.Windows.Forms.ComboBox
     Friend WithEvents cboUciFiles As System.Windows.Forms.ComboBox
+    Friend WithEvents btnConnectionReport As System.Windows.Forms.Button
 End Class
