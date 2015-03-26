@@ -26,6 +26,7 @@ Public Class clsIcon
     Sub New()
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         UpdateStyles()
+        Me.AllowDrop = True
         BackColor = Drawing.SystemColors.ButtonFace
     End Sub
 
@@ -44,6 +45,9 @@ Public Class clsIcon
     Public Property UciFileName() As String
         Set(value As String)
             pUciFileName = value
+            If Not Me.UciFileNames.Contains(pUciFileName) Then
+                Me.UciFileNames.Add(pUciFileName)
+            End If
             If FileExists(pUciFileName) Then
                 Me.BackColor = Drawing.SystemColors.ButtonFace
             Else

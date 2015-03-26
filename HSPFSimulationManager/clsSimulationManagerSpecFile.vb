@@ -28,9 +28,6 @@ Public Class clsSimulationManagerSpecFile
                             lReadingModel = lAllModels.FindOrAddIcon(lArgument)
                         Case "UCIFILENAME"
                             lReadingModel.UciFileName = IO.Path.Combine(lBasePath, lArgument.Trim)
-                            If Not lReadingModel.UciFileNames.Contains(lReadingModel.UciFileName) Then
-                                lReadingModel.UciFileNames.Add(lReadingModel.UciFileName)
-                            End If
                         Case "UCIFILENAMES"
                             For Each lUciFileName As String In lArgument.Split(",")
                                 lUciFileName = IO.Path.Combine(lBasePath, lUciFileName.Trim)

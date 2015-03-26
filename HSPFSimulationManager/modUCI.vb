@@ -136,7 +136,7 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
                         If lInputWDMFileName = lOutputWDMFileName AndAlso lInputDsn = lOutputDsn Then
                             'we have a match!
                             lConnections.Add(lInputWDMFileName & "|" & lInputDsn.ToString & "|" & _
-                                             lSConn.Source.VolName & ":" & lSConn.Source.VolId & ":" & lSConn.Target.Member & " - " & _
+                                             lSConn.Source.VolName & ":" & lSConn.Source.VolId & ":" & lSConn.Target.Member & " -> " & _
                                              lTConn.Target.VolName & ":" & lTConn.Target.VolId & ":" & lTConn.Source.Member)
                         End If
                     End If

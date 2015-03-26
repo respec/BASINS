@@ -104,6 +104,12 @@
     <Compile Include="frmRunHSPF.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmText.Designer.vb">
+      <DependentUpon>frmText.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmText.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="modUCI.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -133,6 +139,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmRunHSPF.resx">
       <DependentUpon>frmRunHSPF.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmText.resx">
+      <DependentUpon>frmText.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

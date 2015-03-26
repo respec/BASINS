@@ -136,6 +136,11 @@ Public Class frmHspfSimulationManager
         Dim lModelForm As New frmModel
         lModelForm.Schematic = SchematicDiagram
         lModelForm.ModelIcon = SchematicDiagram.AllIcons.FindOrAddIcon("New Watershed")
+        'Place new icon in middle of diagram, not at extreme upper left which triggers unwanted total layout refresh
+        If lModelForm.ModelIcon.Left = 0 AndAlso lModelForm.ModelIcon.Top = 0 Then
+            lModelForm.ModelIcon.Left = (SchematicDiagram.Width - SchematicDiagram.IconWidth) / 2
+            lModelForm.ModelIcon.Top = (SchematicDiagram.Height - SchematicDiagram.IconHeight) / 2
+        End If
         lModelForm.Show()
     End Sub
 
@@ -171,6 +176,7 @@ Public Class frmHspfSimulationManager
 
         ' This call is required by the designer.
         InitializeComponent()
+        SchematicDiagram.AllowDrop = True
 
         ' Add any initialization after the InitializeComponent() call.
         g_ProgramDir = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)
