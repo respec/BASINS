@@ -3,12 +3,16 @@ Imports MapWinUtility
 
 Public Class frmHspfSimulationManager
 
-    Public Const AppName As String = "HspfSimulationManager"
+    Friend g_ProgramDir As String = ""
+    Friend Const g_AppNameShort As String = "HspfSimulationManager"
+    Friend Const g_AppNameLong As String = "HSPF Simulation Manager"
+
+    Private pStatusMonitor As MonitorProgressStatus
 
     Private pSpecFileName As String = String.Empty
 
     Private Sub frmHspfSimulationManager_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        pSpecFileName = GetSetting(AppName, "Defaults", "FileName", pSpecFileName)
+        pSpecFileName = GetSetting(g_AppNameShort, "Defaults", "FileName", pSpecFileName)
         If FileExists(pSpecFileName) Then
             OpenFile(pSpecFileName)
             'Else
@@ -38,7 +42,7 @@ Public Class frmHspfSimulationManager
             lPromptToSave = True
         Else
             If SchematicDiagram.AllIcons.Count > 0 Then
-                Dim lTempFileName As String = GetTemporaryFileName("HspfSimMgrSpec", ".txt")
+                Dim lTempFileName As String = GetTemporaryFileName(g_AppNameShort, ".txt")
                 clsSimulationManagerSpecFile.Save(SchematicDiagram.AllIcons, Me.Size, New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight), lTempFileName)
                 Dim lNewFileContents As String = IO.File.ReadAllText(lTempFileName)
                 Dim lExistingFileContents As String = IO.File.ReadAllText(pSpecFileName)
@@ -50,7 +54,7 @@ Public Class frmHspfSimulationManager
         End If
         If lPromptToSave Then
             Dim lStyle As MsgBoxStyle = MsgBoxStyle.YesNoCancel
-            Select Case Logger.Msg("Save specification file?", lStyle, "HSPF Simulation Manager")
+            Select Case Logger.Msg("Save specification file?", lStyle, g_AppNameLong)
                 Case MsgBoxResult.Yes
                     SaveToolStripMenuItem_Click(Nothing, Nothing)
                 Case MsgBoxResult.Cancel
@@ -69,14 +73,14 @@ Public Class frmHspfSimulationManager
 
     Private Sub OpenFile(aFileName As String)
         If FileExists(aFileName) Then
-            Me.Text = "SARA HSPF Simulation Manager - " & aFileName
+            Me.Text = g_AppNameLong & " - " & aFileName
             Dim lIconSize As New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight)
             Dim lNewIcons As IconCollection = clsSimulationManagerSpecFile.Open(Me.Size, lIconSize, aFileName)
             SchematicDiagram.IconWidth = lIconSize.Width
             SchematicDiagram.IconHeight = lIconSize.Height
             SchematicDiagram.BuildTree(lNewIcons)
 
-            SaveSetting(AppName, "Defaults", "FileName", aFileName)
+            SaveSetting(g_AppNameShort, "Defaults", "FileName", aFileName)
         End If
     End Sub
 
@@ -114,7 +118,7 @@ Public Class frmHspfSimulationManager
             '.CheckPathExists = False
             If .ShowDialog(Me) = DialogResult.OK Then
                 clsSimulationManagerSpecFile.Save(SchematicDiagram.AllIcons, Me.Size, New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight), .FileName)
-                SaveSetting(AppName, "Defaults", "FileName", .FileName)
+                SaveSetting(g_AppNameShort, "Defaults", "FileName", .FileName)
             End If
         End With
     End Sub
@@ -160,6 +164,59 @@ Public Class frmHspfSimulationManager
         If lReport.Length > 0 Then
             MsgBox(lReport, MsgBoxStyle.OkOnly, "Connection Report")
         End If
+
+    End Sub
+
+    Public Sub New()
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        g_ProgramDir = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)
+        Try
+            Environment.SetEnvironmentVariable("PATH", g_ProgramDir & ";" & Environment.GetEnvironmentVariable("PATH"))
+        Catch eEnv As Exception
+        End Try
+        If g_ProgramDir.EndsWith("bin") Then g_ProgramDir = PathNameOnly(g_ProgramDir)
+        g_ProgramDir &= g_PathChar
+
+        Dim lLogFolder As String = g_ProgramDir & "cache"
+        If IO.Directory.Exists(lLogFolder) Then
+            lLogFolder = lLogFolder & g_PathChar & "log" & g_PathChar
+        Else
+            lLogFolder = IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.MyDocuments, "log") & g_PathChar
+        End If
+        Logger.StartToFile(lLogFolder & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
+        Logger.Icon = Me.Icon
+
+        If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
+            'Start running status monitor to give better progress and status indication during long-running processes
+            pStatusMonitor = New MonitorProgressStatus
+            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
+                                            g_ProgramDir, _
+                                            System.Diagnostics.Process.GetCurrentProcess.Id) Then
+                pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
+                Logger.ProgressStatus = pStatusMonitor
+                Logger.Status("LABEL TITLE " & g_AppNameLong & " Status")
+                Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
+                Logger.Status("")
+            Else
+                pStatusMonitor.StopMonitor()
+                pStatusMonitor = Nothing
+            End If
+        End If
+
+        atcData.atcDataManager.Clear()
+        With atcData.atcDataManager.DataPlugins
+            '.Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
+            '.Add(New atcWdmVb.atcWDMfile)
+            .Add(New atcWDM.atcDataSourceWDM)
+            .Add(New atcTimeseriesScript.atcTimeseriesScriptPlugin)
+
+        End With
+
+        'atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
 
     End Sub
 End Class
