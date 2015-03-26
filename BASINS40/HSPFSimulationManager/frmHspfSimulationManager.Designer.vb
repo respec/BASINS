@@ -26,13 +26,13 @@ Partial Class frmHspfSimulationManager
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddWatershedToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SchematicDiagram = New HSPFSimulationManager.ctlSchematic()
         Me.ToolStripMain = New System.Windows.Forms.ToolStrip()
         Me.btnRunHSPF = New System.Windows.Forms.ToolStripButton()
-        Me.AddWatershedToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStripMain.SuspendLayout()
         Me.SuspendLayout()
@@ -42,7 +42,7 @@ Partial Class frmHspfSimulationManager
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(1253, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(931, 24)
         Me.MenuStrip1.TabIndex = 1
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -56,36 +56,39 @@ Partial Class frmHspfSimulationManager
         'OpenToolStripMenuItem
         '
         Me.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem"
-        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
         Me.OpenToolStripMenuItem.Text = "Open"
+        '
+        'AddWatershedToolStripMenuItem
+        '
+        Me.AddWatershedToolStripMenuItem.Name = "AddWatershedToolStripMenuItem"
+        Me.AddWatershedToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
+        Me.AddWatershedToolStripMenuItem.Text = "Add Watershed"
         '
         'SaveToolStripMenuItem
         '
         Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
-        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
         Me.SaveToolStripMenuItem.Text = "Save"
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(149, 6)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(146, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
         Me.ExitToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Alt Or System.Windows.Forms.Keys.F4), System.Windows.Forms.Keys)
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
         Me.ExitToolStripMenuItem.Text = "Exit"
         '
         'SchematicDiagram
         '
-        Me.SchematicDiagram.AutoScroll = True
-        Me.SchematicDiagram.AutoScrollMargin = New System.Drawing.Size(5, 5)
         Me.SchematicDiagram.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
         Me.SchematicDiagram.Dock = System.Windows.Forms.DockStyle.Fill
         Me.SchematicDiagram.Location = New System.Drawing.Point(0, 49)
         Me.SchematicDiagram.Name = "SchematicDiagram"
-        Me.SchematicDiagram.Size = New System.Drawing.Size(1253, 683)
         Me.SchematicDiagram.TabIndex = 3
         '
         'ToolStripMain
@@ -93,7 +96,7 @@ Partial Class frmHspfSimulationManager
         Me.ToolStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btnRunHSPF})
         Me.ToolStripMain.Location = New System.Drawing.Point(0, 24)
         Me.ToolStripMain.Name = "ToolStripMain"
-        Me.ToolStripMain.Size = New System.Drawing.Size(1253, 25)
+        Me.ToolStripMain.Size = New System.Drawing.Size(931, 25)
         Me.ToolStripMain.TabIndex = 2
         Me.ToolStripMain.Text = "ToolStrip1"
         '
@@ -106,17 +109,12 @@ Partial Class frmHspfSimulationManager
         Me.btnRunHSPF.Size = New System.Drawing.Size(58, 22)
         Me.btnRunHSPF.Text = "Run HSPF"
         '
-        'AddWatershedToolStripMenuItem
-        '
-        Me.AddWatershedToolStripMenuItem.Name = "AddWatershedToolStripMenuItem"
-        Me.AddWatershedToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.AddWatershedToolStripMenuItem.Text = "Add Watershed"
-        '
         'frmHspfSimulationManager
         '
+        Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1253, 732)
+        Me.ClientSize = New System.Drawing.Size(931, 642)
         Me.Controls.Add(Me.SchematicDiagram)
         Me.Controls.Add(Me.ToolStripMain)
         Me.Controls.Add(Me.MenuStrip1)

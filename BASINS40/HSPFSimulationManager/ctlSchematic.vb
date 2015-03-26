@@ -33,6 +33,14 @@ Friend Class ctlSchematic
 
     Private LegendOrder As Generic.List(Of String)
 
+    Private Sub RemoveIconHandlers(aIcon As clsIcon)
+        RemoveHandler aIcon.MouseDown, AddressOf Icon_MouseDown
+        RemoveHandler aIcon.MouseMove, AddressOf Icon_MouseMove
+        RemoveHandler aIcon.MouseUp, AddressOf Icon_MouseUp
+        RemoveHandler aIcon.DragDrop, AddressOf Icon_DragDrop
+        RemoveHandler aIcon.DragEnter, AddressOf Icon_DragEnter
+    End Sub
+
     Public Sub BuildTree(ByVal aIcons As IconCollection, Optional ByVal aPrinting As Boolean = False)
         'Clear Tree
         Dim lSameIcons As Boolean = ReferenceEquals(aIcons, AllIcons)
@@ -45,9 +53,7 @@ Friend Class ctlSchematic
         picTree.Controls.Clear()
 
         For Each lOldIcon As clsIcon In AllIcons
-            RemoveHandler lOldIcon.MouseDown, AddressOf Icon_MouseDown
-            RemoveHandler lOldIcon.MouseMove, AddressOf Icon_MouseMove
-            RemoveHandler lOldIcon.MouseUp, AddressOf Icon_MouseUp
+            RemoveIconHandlers(lOldIcon)
         Next
         If Not lSameIcons Then
             For Each lControl As Control In AllIcons
@@ -72,6 +78,8 @@ Friend Class ctlSchematic
             AddHandler lNewIcon.MouseDown, AddressOf Icon_MouseDown
             AddHandler lNewIcon.MouseMove, AddressOf Icon_MouseMove
             AddHandler lNewIcon.MouseUp, AddressOf Icon_MouseUp
+            AddHandler lNewIcon.DragDrop, AddressOf Icon_DragDrop
+            AddHandler lNewIcon.DragEnter, AddressOf Icon_DragEnter
             If Not AllIcons.Contains(lNewIcon) Then AllIcons.Add(lNewIcon)
             picTree.Controls.Add(lNewIcon)
             If lNewIcon.Location.X = 0 AndAlso lNewIcon.Location.Y = 0 Then lRefreshingLayout = True
@@ -638,7 +646,9 @@ Friend Class ctlSchematic
             Case Windows.Forms.MouseButtons.Right
                 pClickedIcon = lSender
                 RightClickMenu.MenuItems.Clear()
-                RightClickMenu.MenuItems.Add("Edit", AddressOf EditModel)
+                RightClickMenu.MenuItems.Add("Edit", AddressOf EditIcon)
+                RightClickMenu.MenuItems.Add("Remove", AddressOf RemoveIcon)
+                RightClickMenu.MenuItems.Add("Open Folder", AddressOf OpenFolder)
                 'RightClickMenu.MenuItems.Add("Open in WinHSPF: """ & lSender.Key & """")
                 'If lSender.Label <> lSender.Key Then RightClickMenu.MenuItems.Add("""" & lSender.Label & """")
                 If lSender.DistanceFromOutlet > 1 Then
@@ -651,11 +661,30 @@ Friend Class ctlSchematic
         End Select
     End Sub
 
-    Public Sub EditModel(ByVal aSender As Object, ByVal e As System.EventArgs)
+    Public Sub EditIcon(ByVal aSender As Object, ByVal e As System.EventArgs)
         Dim lModelForm As New frmModel
         lModelForm.Schematic = Me
         lModelForm.ModelIcon = pClickedIcon
         lModelForm.Show()
+    End Sub
+
+    Public Sub RemoveIcon(ByVal aSender As Object, ByVal e As System.EventArgs)
+        If Logger.Msg("Remove watershed " & pClickedIcon.WatershedName & "?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+            AllIcons.Remove(pClickedIcon)
+            RemoveIconHandlers(pClickedIcon)
+
+            If pClickedIcon.DownstreamIcon IsNot Nothing AndAlso _
+                pClickedIcon.DownstreamIcon.UpstreamIcons.Contains(pClickedIcon) Then
+                pClickedIcon.DownstreamIcon.UpstreamIcons.Remove(pClickedIcon)
+            End If
+
+            pClickedIcon = Nothing
+            BuildTree(AllIcons)
+        End If
+    End Sub
+
+    Public Sub OpenFolder(ByVal aSender As Object, ByVal e As System.EventArgs)
+        OpenFile(IO.Path.GetDirectoryName(pClickedIcon.UciFileName))
     End Sub
 
     ''' <summary>
@@ -696,6 +725,29 @@ Friend Class ctlSchematic
                     'sender.Invalidate()
                 End If
         End Select
+    End Sub
+
+    Private Sub Icon_DragDrop(sender As Object, e As DragEventArgs)
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            Dim lSender As clsIcon = sender
+            For Each lFileName As String In e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+                If lFileName.ToLower.EndsWith(".uci") Then
+                    If Logger.Msg("Set " & lSender.WatershedName & " UCI file to:" & vbCrLf & lFileName & " ?", MsgBoxStyle.YesNo, frmHspfSimulationManager.g_AppNameLong) = MsgBoxResult.Yes Then
+                        lSender.UciFileName = lFileName
+                        DrawIcon(False, lSender)
+                    End If
+                End If
+            Next
+        End If
+    End Sub
+
+    Private Sub Icon_DragEnter(sender As Object, e As DragEventArgs) Handles Me.DragEnter
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            Dim lFileNames() As String = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+            If lFileNames.Length > 0 AndAlso lFileNames(0).ToLower.EndsWith(".uci") Then
+                e.Effect = Windows.Forms.DragDropEffects.All
+            End If
+        End If
     End Sub
 
     Private Sub Event_SelectDownstream(ByVal sender As Object, ByVal e As System.EventArgs)
@@ -748,7 +800,50 @@ Friend Class ctlSchematic
                 RightClickMenu.MenuItems.Add("Unselect All", AddressOf Event_UnselectAll)
                 RightClickMenu.Show(sender, e.Location)
         End Select
+    End Sub
 
+    Private Sub ctlSchematic_DragDrop(sender As Object, e As DragEventArgs) Handles Me.DragDrop
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            For Each lFileName As String In e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+                Select Case MsgBox("Add new watershed for UCI file " & lFileName & " ?", MsgBoxStyle.YesNoCancel, frmHspfSimulationManager.g_AppNameLong)
+                    Case MsgBoxResult.Yes
+                        Dim lIcon = AllIcons.FindOrAddIcon(IO.Path.GetFileNameWithoutExtension(lFileName))
+                        lIcon.UciFileName = lFileName
+                        If lIcon.Left = 0 AndAlso lIcon.Top = 0 Then
+                            Dim lOffset As Drawing.Point = Me.PointToScreen(New Drawing.Point(0, 0))
+                            lIcon.Left = e.X - lOffset.X - IconWidth / 2
+                            If lIcon.Left <= 0 Then
+                                lIcon.Left = 10
+                            ElseIf lIcon.Left + IconWidth > Width Then
+                                lIcon.Left = Width - IconWidth - 10
+                            End If
+
+                            lIcon.Top = e.Y - lOffset.Y - IconHeight / 2
+                            If lIcon.Top <= 0 Then
+                                lIcon.Top = 10
+                            ElseIf lIcon.Top + IconHeight > Height Then
+                                lIcon.Top = Height - IconHeight - 10
+                            End If
+                        End If
+
+                        Dim lModelForm As New frmModel
+                        lModelForm.Schematic = Me
+                        lModelForm.ModelIcon = lIcon
+                        lModelForm.Show()
+                    Case MsgBoxResult.Cancel
+                        Exit For
+                End Select
+            Next
+        End If
+    End Sub
+
+    Private Sub ctlSchematic_DragEnter(sender As Object, e As DragEventArgs) Handles Me.DragEnter
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            Dim lFileNames() As String = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+            If lFileNames.Length > 0 AndAlso lFileNames(0).ToLower.EndsWith(".uci") Then
+                e.Effect = Windows.Forms.DragDropEffects.All
+            End If
+        End If
     End Sub
 
     Private Sub Scroll_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseWheel, picTree.MouseWheel ', HScroller.MouseWheel, VScroller.MouseWheel

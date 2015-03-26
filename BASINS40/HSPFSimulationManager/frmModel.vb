@@ -124,11 +124,18 @@ Public Class frmModel
     End Sub
 
     Private Sub btnConnectionReport_Click(sender As Object, e As EventArgs) Handles btnConnectionReport.Click
-        Dim lReport As String = ""
+        Me.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+        Dim lReport As String = frmHspfSimulationManager.g_AppNameLong & " Connection Report" & vbCrLf
         Dim lReportLine As String
         Dim lNewDownstreamIcon As clsIcon = CurrentlySelectedDownstreamIcon()
 
-        Dim lUpstreamUCI As atcUCI.HspfUci = pIcon.UciFile
+        Dim lUpstreamUCI As atcUCI.HspfUci = Nothing
+        If pIcon.UciFileName = cboUciFiles.Text Then
+            lUpstreamUCI = pIcon.UciFile
+        Else
+            lUpstreamUCI = OpenUCI(cboUciFiles.Text)
+        End If
         If lUpstreamUCI Is Nothing Then
             lReport &= "UCI file not found: " & pIcon.UciFileName & vbCrLf
         ElseIf lNewDownstreamIcon Is Nothing Then
@@ -138,19 +145,69 @@ Public Class frmModel
             If lDownstreamUCI Is Nothing Then
                 lReport &= "Downstream UCI file not found: " & lNewDownstreamIcon.UciFileName & vbCrLf
             Else
+                lReport &= "Upstream UCI file: " & vbCrLf & cboUciFiles.Text & vbCrLf & vbCrLf & "Downstream UCI file:" & vbCrLf & lNewDownstreamIcon.UciFileName & vbCrLf & vbCrLf
                 Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(lUpstreamUCI, lDownstreamUCI)
                 If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
-                    lReport &= "No datasets found connecting " & vbCrLf & pIcon.UciFileName & vbCrLf & " to " & vbCrLf & lNewDownstreamIcon.UciFileName & vbCrLf
+                    lReport &= "No connecting datasets found." & vbCrLf
                 Else
+                    Dim lWDMFileName As String = String.Empty
                     For Each lReportLine In lConnCheck
-                        lReport &= lReportLine & vbCrLf
+                        Dim lFields() As String = lReportLine.Split("|"c)
+                        If lFields(0) <> lWDMFileName Then
+                            lWDMFileName = lFields(0)
+                            lReport &= "WDM file: " & vbCrLf & lWDMFileName & vbCrLf
+                        End If
+                        For lField = 1 To lFields.Length - 1
+                            lReport &= vbTab & lFields(lField)
+                        Next
+                        lReport &= vbCrLf
                     Next
                 End If
             End If
         End If
 
         If lReport.Length > 0 Then
-            MsgBox(lReport, MsgBoxStyle.OkOnly, "Connection Report for " & txtName.Text)
+            Dim lText As New frmText
+            lText.Icon = Me.Icon
+            lText.Text = frmHspfSimulationManager.g_AppNameLong & " Connection Report"
+            lText.txtMain.Text = lReport
+            lText.Show()
+        End If
+        Me.Cursor = Cursors.Default
+        Me.Enabled = True
+    End Sub
+
+    Private Sub frmModel_DragDrop(sender As Object, e As DragEventArgs) Handles Me.DragDrop
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            For Each lFileName As String In e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+
+                Select Case IO.Path.GetExtension(lFileName).ToLower
+                    Case ".uci"
+                        If Not cboUciFiles.Items.Contains(lFileName) Then
+                            cboUciFiles.Items.Add(lFileName)
+                        End If
+                        cboUciFiles.SelectedItem = lFileName
+
+                    Case ".png", ".jpg", ".gif"
+                        btnImage.Text = lFileName
+                        btnImage.BackgroundImage = Drawing.Image.FromFile(lFileName)
+                        Me.Height = btnImage.Height + 164
+
+                End Select
+            Next
         End If
     End Sub
+
+    Private Sub frmModel_DragEnter(sender As Object, e As DragEventArgs) Handles Me.DragEnter
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            Dim lFileNames() As String = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+            If lFileNames.Length > 0 Then
+                Select Case IO.Path.GetExtension(lFileNames(0)).ToLower
+                    Case ".uci", ".png", ".jpg", ".gif"
+                        e.Effect = Windows.Forms.DragDropEffects.All
+                End Select
+            End If
+        End If
+    End Sub
+
 End Class
