@@ -7,6 +7,7 @@ Public Class frmHspfSimulationManager
     Friend Const g_AppNameShort As String = "HspfSimulationManager"
     Friend Const g_AppNameLong As String = "HSPF Simulation Manager"
 
+    Friend WithEvents SchematicDiagram As HSPFSimulationManager.ctlSchematic
     Private pStatusMonitor As MonitorProgressStatus
 
     Private pSpecFileName As String = String.Empty
@@ -160,7 +161,7 @@ Public Class frmHspfSimulationManager
                 If lDownstreamUCI IsNot Nothing Then
                     Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(lUpstreamUCI, lDownstreamUCI)
                     If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
-                        lReport &= "No datasets found connecting " & lIcon.UciFileName & " to " & lIcon.DownstreamIcon.UciFileName & vbCrLf
+                        lReport &= "No datasets found connecting " & vbCrLf & lIcon.UciFileName & vbCrLf & "to" & vbCrLf & lIcon.DownstreamIcon.UciFileName & vbCrLf
                     End If
                 End If
             End If
@@ -176,7 +177,19 @@ Public Class frmHspfSimulationManager
 
         ' This call is required by the designer.
         InitializeComponent()
-        SchematicDiagram.AllowDrop = True
+
+        ' Moved SchematicDiagram out of InitializeComponent because form designer was having trouble:
+        SchematicDiagram = New HSPFSimulationManager.ctlSchematic()
+        With SchematicDiagram
+            .BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+            .Dock = System.Windows.Forms.DockStyle.Fill
+            .Name = "SchematicDiagram"
+            .TabIndex = 3
+            .AllowDrop = True
+            Me.Controls.Add(SchematicDiagram)
+            .BringToFront()
+            '.Location = New System.Drawing.Point(0, MenuStrip1.Height + Me.ToolStripMain.Height) ' 49)
+        End With
 
         ' Add any initialization after the InitializeComponent() call.
         g_ProgramDir = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)
@@ -224,5 +237,55 @@ Public Class frmHspfSimulationManager
 
         'atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
 
+    End Sub
+
+    Private Sub FullReportToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FullReportToolStripMenuItem.Click
+        Me.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+        Dim lReport As String = frmHspfSimulationManager.g_AppNameLong & " Connection Report" & vbCrLf
+        Dim lReportLine As String
+        For Each lIcon As clsIcon In SchematicDiagram.AllIcons
+            lReport &= vbCrLf & lIcon.WatershedName & ": " & vbCrLf
+            Dim lUpstreamUCI As atcUCI.HspfUci = lIcon.UciFile
+            Dim lDownstreamIcon As clsIcon = lIcon.DownstreamIcon
+            If lUpstreamUCI Is Nothing Then
+                lReport &= "UCI file not found: " & lIcon.UciFileName & vbCrLf
+            ElseIf lDownstreamIcon Is Nothing Then
+                lReport &= "No downstream watershed specified" & vbCrLf
+            Else
+                Dim lDownstreamUCI As atcUCI.HspfUci = lDownstreamIcon.UciFile
+                If lDownstreamUCI Is Nothing Then
+                    lReport &= "Downstream UCI file not found: " & lDownstreamIcon.UciFileName & vbCrLf
+                Else
+                    lReport &= "Upstream UCI file: " & vbCrLf & lIcon.UciFileName & vbCrLf & vbCrLf & "Downstream UCI file:" & vbCrLf & lDownstreamIcon.UciFileName & vbCrLf & vbCrLf
+                    Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(lUpstreamUCI, lDownstreamUCI)
+                    If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
+                        lReport &= "No connecting datasets found." & vbCrLf
+                    Else
+                        Dim lWDMFileName As String = String.Empty
+                        For Each lReportLine In lConnCheck
+                            Dim lFields() As String = lReportLine.Split("|"c)
+                            If lFields(0) <> lWDMFileName Then
+                                lWDMFileName = lFields(0)
+                                lReport &= "WDM file: " & vbCrLf & lWDMFileName & vbCrLf
+                            End If
+                            For lField = 1 To lFields.Length - 1
+                                lReport &= vbTab & lFields(lField)
+                            Next
+                            lReport &= vbCrLf
+                        Next
+                    End If
+                End If
+            End If
+        Next
+        If lReport.Length > 0 Then
+            Dim lText As New frmText
+            lText.Icon = Me.Icon
+            lText.Text = frmHspfSimulationManager.g_AppNameLong & " Connection Report"
+            lText.txtMain.Text = lReport
+            lText.Show()
+        End If
+        Me.Cursor = Cursors.Default
+        Me.Enabled = True
     End Sub
 End Class

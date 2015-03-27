@@ -98,7 +98,7 @@ Friend Class ctlSchematic
                     If .DistanceFromOutlet > pMaximumTreeDepth Then
                         pMaximumTreeDepth = .DistanceFromOutlet
                     End If
-                    If .DistanceFromOutlet = 1 Then
+                    If .DistanceFromOutlet = 1 AndAlso Not pOutlets.Contains(lIcon) Then
                         pOutlets.Add(lIcon)
                     End If
                 End With

@@ -30,16 +30,18 @@ Partial Class frmHspfSimulationManager
         Me.SaveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.SchematicDiagram = New HSPFSimulationManager.ctlSchematic()
         Me.ToolStripMain = New System.Windows.Forms.ToolStrip()
         Me.btnRunHSPF = New System.Windows.Forms.ToolStripButton()
+        Me.ConnectionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FullReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ReportOnEditsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStripMain.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.ConnectionsToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(931, 24)
@@ -83,14 +85,6 @@ Partial Class frmHspfSimulationManager
         Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
         Me.ExitToolStripMenuItem.Text = "Exit"
         '
-        'SchematicDiagram
-        '
-        Me.SchematicDiagram.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.SchematicDiagram.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SchematicDiagram.Location = New System.Drawing.Point(0, 49)
-        Me.SchematicDiagram.Name = "SchematicDiagram"
-        Me.SchematicDiagram.TabIndex = 3
-        '
         'ToolStripMain
         '
         Me.ToolStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btnRunHSPF})
@@ -109,13 +103,33 @@ Partial Class frmHspfSimulationManager
         Me.btnRunHSPF.Size = New System.Drawing.Size(58, 22)
         Me.btnRunHSPF.Text = "Run HSPF"
         '
+        'ConnectionsToolStripMenuItem
+        '
+        Me.ConnectionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FullReportToolStripMenuItem, Me.ReportOnEditsToolStripMenuItem})
+        Me.ConnectionsToolStripMenuItem.Name = "ConnectionsToolStripMenuItem"
+        Me.ConnectionsToolStripMenuItem.Size = New System.Drawing.Size(78, 20)
+        Me.ConnectionsToolStripMenuItem.Text = "Connections"
+        '
+        'FullReportToolStripMenuItem
+        '
+        Me.FullReportToolStripMenuItem.Name = "FullReportToolStripMenuItem"
+        Me.FullReportToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.FullReportToolStripMenuItem.Text = "Full Report"
+        '
+        'ReportOnEditsToolStripMenuItem
+        '
+        Me.ReportOnEditsToolStripMenuItem.Checked = True
+        Me.ReportOnEditsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.ReportOnEditsToolStripMenuItem.Name = "ReportOnEditsToolStripMenuItem"
+        Me.ReportOnEditsToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.ReportOnEditsToolStripMenuItem.Text = "Report On Edits"
+        '
         'frmHspfSimulationManager
         '
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(931, 642)
-        Me.Controls.Add(Me.SchematicDiagram)
         Me.Controls.Add(Me.ToolStripMain)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -134,11 +148,13 @@ Partial Class frmHspfSimulationManager
     Friend WithEvents FileToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents OpenToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ExitToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents SchematicDiagram As HSPFSimulationManager.ctlSchematic
     Friend WithEvents SaveToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ToolStripMain As System.Windows.Forms.ToolStrip
     Friend WithEvents btnRunHSPF As System.Windows.Forms.ToolStripButton
     Friend WithEvents AddWatershedToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ConnectionsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents FullReportToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ReportOnEditsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class
