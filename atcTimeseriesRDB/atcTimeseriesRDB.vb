@@ -653,33 +653,34 @@ Public Class atcTimeseriesRDB
                     lDateString = .Value(lDateField)
                     If lTimeField > 0 Then
                         lTimeString = .Value(lTimeField).Trim
-                        If lTimeString.Length = 4 Then
+                        If lTimeString.Contains(":") AndAlso lTimeString.Length = 5 Then
+                            lDateString &= " " & lTimeString
+                        ElseIf lTimeString.Length = 4 Then
                             lDateString &= " " & lTimeString.Substring(0, 2) & ":" & lTimeString.Substring(2, 2)
                         End If
                     End If
-                    lDate = Date.Parse(lDateString)
-
-                    For lValueFieldIndex = 0 To lLastValueField
-                        If lValueFieldNumber(lValueFieldIndex) > 0 Then
-                            lValueString = .Value(lValueFieldNumber(lValueFieldIndex))
-                            If IsNumeric(lValueString) Then
-                                lValue = Double.Parse(lValueString)
-                                lBuilders(lValueFieldIndex).AddValue(lDate, lValue)
-                                For lField As Integer = 1 To .NumFields
-                                    If Array.IndexOf(lValueFieldNumber, lField) < 0 Then 'Not a value field, add it as value attribute
-                                        Select Case .FieldName(lField)
-                                            Case "agency_cd", "site_no", "lev_dt", "lev_tm", "lev_agency_cd" 'don't need these as value attributes
-                                            Case Else
-                                                Dim lAttributeValue As String = .Value(lField).Trim
-                                                If lAttributeValue.Length > 0 Then
-                                                    lBuilders(lValueFieldIndex).AddValueAttribute(.FieldName(lField), lAttributeValue)
-                                                End If
-                                        End Select
-                                    End If
-                                Next
+                    If Date.TryParse(lDateString, lDate) Then
+                        For lValueFieldIndex = 0 To lLastValueField
+                            If lValueFieldNumber(lValueFieldIndex) > 0 Then
+                                lValueString = .Value(lValueFieldNumber(lValueFieldIndex))
+                                If Double.TryParse(lValueString, lValue) Then
+                                    lBuilders(lValueFieldIndex).AddValue(lDate, lValue)
+                                    For lField As Integer = 1 To .NumFields
+                                        If Array.IndexOf(lValueFieldNumber, lField) < 0 Then 'Not a value field, add it as value attribute
+                                            Select Case .FieldName(lField)
+                                                Case "agency_cd", "site_no", "lev_dt", "lev_tm", "lev_agency_cd" 'don't need these as value attributes
+                                                Case Else
+                                                    Dim lAttributeValue As String = .Value(lField).Trim
+                                                    If lAttributeValue.Length > 0 Then
+                                                        lBuilders(lValueFieldIndex).AddValueAttribute(.FieldName(lField), lAttributeValue)
+                                                    End If
+                                            End Select
+                                        End If
+                                    Next
+                                End If
                             End If
-                        End If
-                    Next
+                        Next
+                    End If
                 Next
                 Dim lTs As atcTimeseries
                 For lValueFieldIndex = 0 To lLastValueField
