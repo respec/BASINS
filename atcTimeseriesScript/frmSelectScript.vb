@@ -225,19 +225,8 @@ SetProperties:
     End Sub
 
     Private Sub EnableButtons()
-        'TODO: enable appropriate buttons
-        '      If agdScripts.SelCount > 0 And Len(agdScripts.Ctlget_Text()) > 0 Then
-        '          cmdWizard.Enabled = True
-        '          If pCurrentRow > 1 Then
-        '              cmdRun.Enabled = True
-        '          Else
-        '              cmdRun.Enabled = False
-        '          End If
-        '      Else
-        '          cmdWizard.Enabled = False
-        '          cmdRun.Enabled = False
-        '      End If
-        'cmdDelete.Enabled = cmdRun.Enabled
+        cmdRun.Enabled = (Me.SelectedScript IsNot Nothing)
+        cmdDelete.Enabled = cmdRun.Enabled
         'cmdTest.Enabled = cmdRun.Enabled
     End Sub
 

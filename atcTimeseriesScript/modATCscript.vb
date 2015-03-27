@@ -620,6 +620,8 @@ SetVariable:
                                     End If
                                     .ts.Clear()
                                     .ts = lFilledTS
+                                Else
+                                    .ts.SetInterval()
                                 End If
 
                                 With .ts
@@ -741,9 +743,8 @@ SetVariable:
 
         For lCharacter As Integer = 33 To 126
             Select Case lCharacter
-                Case 48 : lCharacter = 58
-                Case 65 : lCharacter = 91
-                Case 97 : lCharacter = 123
+                Case 42 : lCharacter = 60
+                Case 63 : lCharacter = 127
             End Select
             lRule = lRule.Replace(Chr(lCharacter), lCharacter.ToString)
         Next lCharacter
