@@ -26,8 +26,10 @@ Module ERGGraph
     'Private pComplianceDate As Integer = 2021
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
+        'DoBaselineHistoricGraphsMultipleLocations()
         'DoERGGraphs()
-        ComputeThreeMonthRollingAverages()
+        'ComputeThreeMonthRollingAverages()
+        DoERGCompositeGraph()
     End Sub
 
     Private Sub DoERGGraphs()
@@ -279,11 +281,22 @@ Module ERGGraph
         Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
         Dim lCurve As ZedGraph.LineItem
 
-        lCurve = lPane.CurveList.Item(0)
-        lCurve.Color = Drawing.Color.Blue
+        For i As Integer = 0 To lPane.CurveList.Count - 1
+            lCurve = lPane.CurveList.Item(i)
+            If i = 0 Then
+                lCurve.Color = Drawing.Color.Blue
+            ElseIf i = 1 Then
+                lCurve.Color = Drawing.Color.Green
+            End If
+        Next i
+
         lPane.YAxis.Scale.Min = 0
 
-        lPane.XAxis.Title.Text = aRunName.Substring(0, 2) & " at Segment " & pLocation
+        If lPane.CurveList.Count = 1 Then
+            lPane.XAxis.Title.Text = aRunName.Substring(0, 2) & " at Segment " & pLocation
+        Else
+            lPane.XAxis.Title.Text = aRunName.Substring(0, 2) & " at Segments " & pLocation & " and " & (pLocation - 1).ToString
+        End If
         lZgc.Width = 1200
 
         lZgc.SaveIn(aOutFile)
@@ -295,6 +308,7 @@ Module ERGGraph
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
         Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
         Dim lCurve As ZedGraph.LineItem
+        'Dim lNewLine As LineItem = AddLine(lPane, 0, yconstant, System.Drawing.Drawing2D.DashStyle.Dash, "Y = " & yconstant)
 
         For i As Integer = 0 To lPane.CurveList.Count - 1
             lCurve = lPane.CurveList.Item(i)
@@ -316,11 +330,145 @@ Module ERGGraph
             End If
         Next i
 
-        lPane.YAxis.Scale.Min = 0
-        lPane.YAxis.Title.Text = aUnits
+        If aOutFile.Contains("Composite") Then
+            lCurve = lPane.CurveList.Item(0)
+            lCurve.Color = Drawing.Color.Blue
+            lCurve = lPane.CurveList.Item(1)
+            lCurve.Color = Drawing.Color.LightGray
+            lCurve = lPane.CurveList.Item(2)
+            lCurve.Color = Drawing.Color.Purple
 
-        lPane.XAxis.Title.Text = aRunName.Substring(0, 2) & " at Segment " & pLocation
-        lZgc.Width = 1200
+            lZgc.Width = 1800
+            lPane.Legend.IsVisible = False
+            lPane.XAxis.Title.Text = ""
+            lPane.YAxis.Type = ZedGraph.AxisType.Log
+            'lPane.YAxis.Scale.Min = 0.001
+
+            'add up to seven additional solid lines
+            Dim lNationalModelBaseline As Double = 0.0
+            Dim lNationalModelOptionD As Double = 0.0
+            Dim lAquaBenchmarkAcute As Double = 0.0
+            Dim lAquaBenchmarkChronic As Double = 0.0
+            Dim lHealthBenchmarkWO As Double = 0.0
+            Dim lHealthBenchmarkO As Double = 0.0
+            Dim lMCL As Double = 0.0
+
+            If aRunName = "As" Then
+                lPane.YAxis.Title.Text = "Total Arsenic (ug/L)"
+                lNationalModelBaseline = 0.0
+                lNationalModelOptionD = 0.0
+                lAquaBenchmarkAcute = 0.0
+                lAquaBenchmarkChronic = 0.0
+                lHealthBenchmarkWO = 0.000018
+                lHealthBenchmarkO = 0.00014
+                lMCL = 0.01
+            ElseIf aRunName = "Cd" Then
+                lPane.YAxis.Title.Text = "Total Cadmium (ug/L)"
+                lNationalModelBaseline = 0.0
+                lNationalModelOptionD = 0.0
+                lAquaBenchmarkAcute = 0.0
+                lAquaBenchmarkChronic = 0.0
+                lHealthBenchmarkWO = 0.0
+                lHealthBenchmarkO = 0.0
+                lMCL = 0.0
+            ElseIf aRunName = "Cu" Then
+                lPane.YAxis.Title.Text = "Total Copper (ug/L)"
+                lNationalModelBaseline = 0.0
+                lNationalModelOptionD = 0.0
+                lAquaBenchmarkAcute = 0.0
+                lAquaBenchmarkChronic = 0.0
+                lHealthBenchmarkWO = 1.3
+                lHealthBenchmarkO = 0.0
+                lMCL = 1.3
+            ElseIf aRunName = "Ni" Then
+                lPane.YAxis.Title.Text = "Total Nickel (ug/L)"
+                lNationalModelBaseline = 0.0
+                lNationalModelOptionD = 0.0
+                lAquaBenchmarkAcute = 0.0
+                lAquaBenchmarkChronic = 0.0
+                lHealthBenchmarkWO = 0.61
+                lHealthBenchmarkO = 4.6
+                lMCL = 0.0
+            ElseIf aRunName = "Pb" Then
+                lPane.YAxis.Title.Text = "Total Lead (ug/L)"
+                lNationalModelBaseline = 0.0
+                lNationalModelOptionD = 0.0
+                lAquaBenchmarkAcute = 0.0
+                lAquaBenchmarkChronic = 0.0
+                lHealthBenchmarkWO = 0.0
+                lHealthBenchmarkO = 0.0
+                lMCL = 0.0
+            ElseIf aRunName = "Se" Then
+                lPane.YAxis.Title.Text = "Total Selenium (ug/L)"
+                lNationalModelBaseline = 0.0
+                lNationalModelOptionD = 0.0
+                lAquaBenchmarkAcute = 0.0
+                lAquaBenchmarkChronic = 0.005
+                lHealthBenchmarkWO = 0.17
+                lHealthBenchmarkO = 4.2
+                lMCL = 0.05
+            ElseIf aRunName = "Tl" Then
+                lPane.YAxis.Title.Text = "Total Thallium (ug/L)"
+                lNationalModelBaseline = 0.0
+                lNationalModelOptionD = 0.0
+                lAquaBenchmarkAcute = 0.0
+                lAquaBenchmarkChronic = 0.0
+                lHealthBenchmarkWO = 0.00024
+                lHealthBenchmarkO = 0.00047
+                lMCL = 0.0
+            ElseIf aRunName = "Zn" Then
+                lPane.YAxis.Title.Text = "Total Zinc (ug/L)"
+                lNationalModelBaseline = 0.0
+                lNationalModelOptionD = 0.0
+                lAquaBenchmarkAcute = 0.0
+                lAquaBenchmarkChronic = 0.0
+                lHealthBenchmarkWO = 7.4
+                lHealthBenchmarkO = 26
+                lMCL = 0.0
+            End If
+            'now add them
+            If lNationalModelBaseline > 0.0 Then
+                Dim lLine1 As ZedGraph.LineItem = AddLine(lPane, 0.0, lNationalModelBaseline * 1000, Drawing.Drawing2D.DashStyle.Dash)
+                lLine1.Color = Drawing.Color.Blue
+                lLine1.Line.Width = 10
+            End If
+            If lNationalModelOptionD > 0.0 Then
+                Dim lLine2 As ZedGraph.LineItem = AddLine(lPane, 0.0, lNationalModelOptionD * 1000, Drawing.Drawing2D.DashStyle.Dash)
+                lLine2.Color = Drawing.Color.Purple
+                lLine2.Line.Width = 10
+            End If
+            If lAquaBenchmarkAcute > 0.0 Then
+                Dim lLine3 As ZedGraph.LineItem = AddLine(lPane, 0.0, lAquaBenchmarkAcute * 1000, Drawing.Drawing2D.DashStyle.Dot)
+                lLine3.Color = Drawing.Color.Brown
+                lLine3.Line.Width = 10
+            End If
+            If lAquaBenchmarkChronic > 0.0 Then
+                Dim lLine4 As ZedGraph.LineItem = AddLine(lPane, 0.0, lAquaBenchmarkChronic * 1000, Drawing.Drawing2D.DashStyle.Dot)
+                lLine4.Color = Drawing.Color.Green
+                lLine4.Line.Width = 10
+            End If
+            If lHealthBenchmarkWO > 0.0 Then
+                Dim lLine5 As ZedGraph.LineItem = AddLine(lPane, 0.0, lHealthBenchmarkWO * 1000, Drawing.Drawing2D.DashStyle.DashDot)
+                lLine5.Color = Drawing.Color.Orange
+                lLine5.Line.Width = 10
+            End If
+            If lHealthBenchmarkO > 0.0 Then
+                Dim lLine6 As ZedGraph.LineItem = AddLine(lPane, 0.0, lHealthBenchmarkO * 1000, Drawing.Drawing2D.DashStyle.DashDot)
+                lLine6.Color = Drawing.Color.Red
+                lLine6.Line.Width = 10
+            End If
+            If lMCL > 0.0 Then
+                Dim lLine7 As ZedGraph.LineItem = AddLine(lPane, 0.0, lMCL * 1000, Drawing.Drawing2D.DashStyle.DashDotDot)
+                lLine7.Color = Drawing.Color.Pink
+                lLine7.Line.Width = 10
+            End If
+            
+        Else
+            lZgc.Width = 1200
+            lPane.XAxis.Title.Text = aRunName.Substring(0, 2) & " at Segment " & pLocation
+            lPane.YAxis.Scale.Min = 0
+            lPane.YAxis.Title.Text = aUnits
+        End If
 
         lZgc.SaveIn(aOutFile)
         lZgc.Dispose()
@@ -461,5 +609,172 @@ Module ERGGraph
             lWrite.WriteLine(lStr)
         Next
         lWrite.Close()
+    End Sub
+
+    Private Sub DoBaselineHistoricGraphsMultipleLocations()
+
+        Dim lCsvName As String = ""
+
+        Dim pRunNames As New atcCollection
+        pRunNames.Add("AsBaselineHistoric")
+        pRunNames.Add("CdBaselineHistoric")
+        pRunNames.Add("CuBaselineHistoric")
+        pRunNames.Add("NiBaselineHistoric")
+        pRunNames.Add("PbBaselineHistoric")
+        pRunNames.Add("SeBaselineHistoric")
+        pRunNames.Add("TlBaselineHistoric")
+        pRunNames.Add("ZnBaselineHistoric")
+
+        lCsvName = "Total_Concentration.csv"
+
+        Dim lTimeseriesGroup As New atcTimeseriesGroup
+        Dim lTimeseriesCsv As New atcTimeseriesCSV.atcTimeseriesCSV
+
+        ChDriveDir(pTestPath & "\OutputPlots")
+
+        Dim lSDate(5) As Integer : lSDate(0) = pStartYearForBaselinePlot : lSDate(1) = 1 : lSDate(2) = 1
+        Dim lSDateJ As Double = Date2J(lSDate)
+        Dim lEDate(5) As Integer : lEDate(0) = 2020 : lEDate(1) = 12 : lEDate(2) = 31
+        Dim lEdatej As Double = Date2J(lEDate)
+
+        'do baseline historic plots
+        For Each lRunName As String In pRunNames
+
+            Dim lOutFileName As String = lRunName & "IRWandNextDownstream.png"
+
+            If Not FileExists(lOutFileName) Then
+
+                'if start date file doesn't exist, copy from the first run name folder 
+                If Not FileExists(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start") Then
+                    FileCopy(pTestPath & "\" & pRunNames(0) & "\" & "Total_Concentration.csv.start", pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start")
+                End If
+
+                Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+                If lTimeseriesCsv.Open(lCsvFileName) Then
+
+                    Dim lTimSer1 As atcTimeseries = lTimeseriesCsv.DataSets.ItemByKey(pLocation)
+
+                    lTimSer1.Attributes.SetValue("YAxis", "Left")
+                    lTimeseriesGroup.Add(SubsetByDate(lTimSer1, _
+                                                lSDateJ, _
+                                                lEdatej, Nothing))
+
+                    Dim lTimSer2 As atcTimeseries = lTimeseriesCsv.DataSets.ItemByKey(pLocation - 1)
+
+                    lTimSer2.Attributes.SetValue("YAxis", "Left")
+                    lTimeseriesGroup.Add(SubsetByDate(lTimSer2, _
+                                                lSDateJ, _
+                                                lEdatej, Nothing))
+
+                    GraphTimeseriesBaselineHistoric(lTimeseriesGroup, lRunName, lOutFileName)
+
+                    lTimeseriesCsv.Clear()
+                    lTimeseriesGroup.Clear()
+                Else
+                    Logger.Msg("Unable to Open " & lCsvFileName)
+                End If
+            End If
+        Next
+    End Sub
+
+    Private Sub DoERGCompositeGraph()
+
+        Dim lCsvName As String = ""
+
+        Dim pMetalNames As New atcCollection
+        pMetalNames.Add("As")
+        pMetalNames.Add("Cd")
+        pMetalNames.Add("Cu")
+        pMetalNames.Add("Ni")
+        pMetalNames.Add("Pb")
+        pMetalNames.Add("Se")
+        pMetalNames.Add("Tl")
+        pMetalNames.Add("Zn")
+
+        lCsvName = "Total_Concentration.csv"
+
+        Dim lTimeseriesGroup As New atcTimeseriesGroup
+
+        ChDriveDir(pTestPath & "\OutputPlots")
+
+        For Each lMetal As String In pMetalNames
+
+            Dim lOutFileName As String = lMetal.Substring(0, 2) & "Composite" & ".png"
+            
+            'get baseline historic data
+            Dim lTimeseriesCsv1 As New atcTimeseriesCSV.atcTimeseriesCSV
+            Dim lRunName As String = lMetal & "BaselineHistoric"
+            Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+            If lTimeseriesCsv1.Open(lCsvFileName) Then
+
+                Dim lTimSer1 As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(pLocation)
+
+                lTimSer1.Attributes.SetValue("YAxis", "Left")
+
+                Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 10 : lSDate(1) = 1 : lSDate(2) = 1
+                Dim lSDateJ As Double = Date2J(lSDate)
+                Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate - 1 : lEDate(1) = 12 : lEDate(2) = 31
+                Dim lEdatej As Double = Date2J(lEDate)
+
+                lTimeseriesGroup.Add(SubsetByDate(lTimSer1, _
+                                            lSDateJ, _
+                                            lEdatej, Nothing))
+                lTimeseriesCsv1.Clear()
+            Else
+                Logger.Msg("Unable to Open " & lCsvFileName)
+            End If
+
+            'get baseline post-compliance data
+            Dim lTimeseriesCsv2 As New atcTimeseriesCSV.atcTimeseriesCSV
+            lRunName = lMetal & "Baseline"
+            lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+            If lTimeseriesCsv2.Open(lCsvFileName) Then
+
+                Dim lTimSer2 As atcTimeseries = lTimeseriesCsv2.DataSets.ItemByKey(pLocation)
+
+                lTimSer2.Attributes.SetValue("YAxis", "Left")
+
+                Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                Dim lSDateJ As Double = Date2J(lSDate)
+                Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                Dim lEdatej As Double = Date2J(lEDate)
+
+                lTimeseriesGroup.Add(SubsetByDate(lTimSer2, _
+                                            lSDateJ, _
+                                            lEdatej, Nothing))
+                lTimeseriesCsv2.Clear()
+            Else
+                Logger.Msg("Unable to Open " & lCsvFileName)
+            End If
+
+            'get option d post-compliance data
+            Dim lTimeseriesCsv3 As New atcTimeseriesCSV.atcTimeseriesCSV
+            lRunName = lMetal & "OptionD"
+            lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+            If lTimeseriesCsv3.Open(lCsvFileName) Then
+
+                Dim lTimSerD As atcTimeseries = lTimeseriesCsv3.DataSets.ItemByKey(pLocation)
+
+                lTimSerD.Attributes.SetValue("YAxis", "Left")
+
+                Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                Dim lSDateJ As Double = Date2J(lSDate)
+                Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                Dim lEdatej As Double = Date2J(lEDate)
+
+                lTimeseriesGroup.Add(SubsetByDate(lTimSerD, _
+                                            lSDateJ, _
+                                            lEdatej, Nothing))
+                lTimeseriesCsv3.Clear()
+            Else
+                Logger.Msg("Unable to Open " & lCsvFileName)
+            End If
+
+            GraphTimeseriesOptions(lTimeseriesGroup, lMetal, lOutFileName, "Computed Tot Conc Ug/L")
+
+            lTimeseriesGroup.Clear()
+
+        Next
+
     End Sub
 End Module
