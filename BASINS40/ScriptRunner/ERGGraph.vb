@@ -339,7 +339,7 @@ Module ERGGraph
             lCurve = lPane.CurveList.Item(2)
             lCurve.Color = Drawing.Color.LightGray
 
-            lZgc.Width = 1800
+            lZgc.Width = 2400
             lPane.Legend.IsVisible = False
             lPane.XAxis.Title.Text = ""
             lPane.YAxis.Type = ZedGraph.AxisType.Log
@@ -356,136 +356,256 @@ Module ERGGraph
 
             'site specific data 
             If aSiteName = "Black" Then
-                If aRunName = "As" Then
-                    lNationalModelBaseline = 0.00003109
-                    lNationalModelOptionD = 0.0000216
-                ElseIf aRunName = "Cd" Then
-                    lNationalModelBaseline = 0.0001746
-                    lNationalModelOptionD = 0.000007179
-                ElseIf aRunName = "Cu" Then
-                    lNationalModelBaseline = 0.00004359
-                    lNationalModelOptionD = 0.000008495
-                ElseIf aRunName = "Pb" Then
-                    lNationalModelBaseline = 0.00001324
-                    lNationalModelOptionD = 0.000005569
-                ElseIf aRunName = "Ni" Then
-                    lNationalModelBaseline = 0.001391
-                    lNationalModelOptionD = 0.00002862
-                ElseIf aRunName = "Se" Then
-                    lNationalModelBaseline = 0.00181
-                    lNationalModelOptionD = 0.00002911
-                ElseIf aRunName = "Tl" Then
-                    lNationalModelBaseline = 0.00005413
-                    lNationalModelOptionD = 0.00001535
-                ElseIf aRunName = "Zn" Then
-                    lNationalModelBaseline = 0.002195
-                    lNationalModelOptionD = 0.00007315
+                If aUnits = "Total" Then
+                    If aRunName = "As" Then  'total
+                        lNationalModelBaseline = 0.00003109
+                        lNationalModelOptionD = 0.0000216
+                    ElseIf aRunName = "Cd" Then
+                        lNationalModelBaseline = 0.0001746
+                        lNationalModelOptionD = 0.000007179
+                    ElseIf aRunName = "Cu" Then
+                        lNationalModelBaseline = 0.00004359
+                        lNationalModelOptionD = 0.000008496
+                    ElseIf aRunName = "Pb" Then
+                        lNationalModelBaseline = 0.00001324
+                        lNationalModelOptionD = 0.00000557
+                    ElseIf aRunName = "Ni" Then
+                        lNationalModelBaseline = 0.001391
+                        lNationalModelOptionD = 0.00002863
+                    ElseIf aRunName = "Se" Then
+                        lNationalModelBaseline = 0.00181
+                        lNationalModelOptionD = 0.00002912
+                    ElseIf aRunName = "Tl" Then
+                        lNationalModelBaseline = 0.00005413
+                        lNationalModelOptionD = 0.00001536
+                    ElseIf aRunName = "Zn" Then
+                        lNationalModelBaseline = 0.002195
+                        lNationalModelOptionD = 0.00007316
+                    End If
+                Else
+                    'for dissolved
+                    If aRunName = "As" Then
+                        lNationalModelBaseline = 0.00003109
+                        lNationalModelOptionD = 0.0000216
+                    ElseIf aRunName = "Cd" Then
+                        lNationalModelBaseline = 0.0001746
+                        lNationalModelOptionD = 0.000007179
+                    ElseIf aRunName = "Cu" Then
+                        lNationalModelBaseline = 0.00004359
+                        lNationalModelOptionD = 0.000008495
+                    ElseIf aRunName = "Pb" Then
+                        lNationalModelBaseline = 0.00001323
+                        lNationalModelOptionD = 0.000005569
+                    ElseIf aRunName = "Ni" Then
+                        lNationalModelBaseline = 0.001391
+                        lNationalModelOptionD = 0.00002862
+                    ElseIf aRunName = "Se" Then
+                        lNationalModelBaseline = 0.00181
+                        lNationalModelOptionD = 0.00002911
+                    ElseIf aRunName = "Tl" Then
+                        lNationalModelBaseline = 0.00005413
+                        lNationalModelOptionD = 0.00001535
+                    ElseIf aRunName = "Zn" Then
+                        lNationalModelBaseline = 0.002195
+                        lNationalModelOptionD = 0.00007315
+                    End If
                 End If
             ElseIf aSiteName = "Etowah" Then
-                If aRunName = "As" Then
-                    lNationalModelBaseline = 0.00000728
-                    lNationalModelOptionD = 0.000003614
-                ElseIf aRunName = "Cd" Then
-                    lNationalModelBaseline = 0.0000704
-                    lNationalModelOptionD = 0.000002608
-                ElseIf aRunName = "Cu" Then
-                    lNationalModelBaseline = 0.00001636
-                    lNationalModelOptionD = 0.000002341
-                ElseIf aRunName = "Pb" Then
-                    lNationalModelBaseline = 0.000005056
-                    lNationalModelOptionD = 0.000002101
-                ElseIf aRunName = "Ni" Then
-                    lNationalModelBaseline = 0.0005551
-                    lNationalModelOptionD = 0.000003906
-                ElseIf aRunName = "Se" Then
-                    lNationalModelBaseline = 0.0007252
-                    lNationalModelOptionD = 0.000003546
-                ElseIf aRunName = "Tl" Then
-                    lNationalModelBaseline = 0.00002092
-                    lNationalModelOptionD = 0.000006077
-                ElseIf aRunName = "Zn" Then
-                    lNationalModelBaseline = 0.0008717
-                    lNationalModelOptionD = 0.00001238
+                If aUnits = "Total" Then
+                    If aRunName = "As" Then
+                        lNationalModelBaseline = 0.00000728
+                        lNationalModelOptionD = 0.000003615
+                    ElseIf aRunName = "Cd" Then
+                        lNationalModelBaseline = 0.0000704
+                        lNationalModelOptionD = 0.000002609
+                    ElseIf aRunName = "Cu" Then
+                        lNationalModelBaseline = 0.00001636
+                        lNationalModelOptionD = 0.000002341
+                    ElseIf aRunName = "Pb" Then
+                        lNationalModelBaseline = 0.000005056
+                        lNationalModelOptionD = 0.000002101
+                    ElseIf aRunName = "Ni" Then
+                        lNationalModelBaseline = 0.0005551
+                        lNationalModelOptionD = 0.000003907
+                    ElseIf aRunName = "Se" Then
+                        lNationalModelBaseline = 0.0007252
+                        lNationalModelOptionD = 0.000003546
+                    ElseIf aRunName = "Tl" Then
+                        lNationalModelBaseline = 0.00002092
+                        lNationalModelOptionD = 0.000006077
+                    ElseIf aRunName = "Zn" Then
+                        lNationalModelBaseline = 0.0008717
+                        lNationalModelOptionD = 0.00001238
+                    End If
+                Else
+                    'for dissolved
+                    If aRunName = "As" Then
+                        lNationalModelBaseline = 0.000007279
+                        lNationalModelOptionD = 0.000003614
+                    ElseIf aRunName = "Cd" Then
+                        lNationalModelBaseline = 0.00007039
+                        lNationalModelOptionD = 0.000002608
+                    ElseIf aRunName = "Cu" Then
+                        lNationalModelBaseline = 0.00001636
+                        lNationalModelOptionD = 0.000002341
+                    ElseIf aRunName = "Pb" Then
+                        lNationalModelBaseline = 0.000005055
+                        lNationalModelOptionD = 0.000002101
+                    ElseIf aRunName = "Ni" Then
+                        lNationalModelBaseline = 0.000555
+                        lNationalModelOptionD = 0.000003906
+                    ElseIf aRunName = "Se" Then
+                        lNationalModelBaseline = 0.0007251
+                        lNationalModelOptionD = 0.000003546
+                    ElseIf aRunName = "Tl" Then
+                        lNationalModelBaseline = 0.00002092
+                        lNationalModelOptionD = 0.000006077
+                    ElseIf aRunName = "Zn" Then
+                        lNationalModelBaseline = 0.0008716
+                        lNationalModelOptionD = 0.00001238
+                    End If
                 End If
             End If
 
-            If aRunName = "As" Then
-                lPane.YAxis.Title.Text = "Total Arsenic (ug/L)"
-                lAquaBenchmarkAcute = 0.0
-                lAquaBenchmarkChronic = 0.0
-                lHealthBenchmarkWO = 0.000018
-                lHealthBenchmarkO = 0.00014
-                lMCL = 0.01
-            ElseIf aRunName = "Cd" Then
-                lPane.YAxis.Title.Text = "Total Cadmium (ug/L)"
-                lAquaBenchmarkAcute = 0.0
-                lAquaBenchmarkChronic = 0.0
-                lHealthBenchmarkWO = 0.0
-                lHealthBenchmarkO = 0.0
-                lMCL = 0.0
-            ElseIf aRunName = "Cu" Then
-                lPane.YAxis.Title.Text = "Total Copper (ug/L)"
-                lAquaBenchmarkAcute = 0.0
-                lAquaBenchmarkChronic = 0.0
-                lHealthBenchmarkWO = 1.3
-                lHealthBenchmarkO = 0.0
-                lMCL = 1.3
-            ElseIf aRunName = "Ni" Then
-                lPane.YAxis.Title.Text = "Total Nickel (ug/L)"
-                lAquaBenchmarkAcute = 0.0
-                lAquaBenchmarkChronic = 0.0
-                lHealthBenchmarkWO = 0.61
-                lHealthBenchmarkO = 4.6
-                lMCL = 0.0
-            ElseIf aRunName = "Pb" Then
-                lPane.YAxis.Title.Text = "Total Lead (ug/L)"
-                lAquaBenchmarkAcute = 0.0
-                lAquaBenchmarkChronic = 0.0
-                lHealthBenchmarkWO = 0.0
-                lHealthBenchmarkO = 0.0
-                lMCL = 0.0
-            ElseIf aRunName = "Se" Then
-                lPane.YAxis.Title.Text = "Total Selenium (ug/L)"
-                lAquaBenchmarkAcute = 0.0
-                lAquaBenchmarkChronic = 0.005
-                lHealthBenchmarkWO = 0.17
-                lHealthBenchmarkO = 4.2
-                lMCL = 0.05
-            ElseIf aRunName = "Tl" Then
-                lPane.YAxis.Title.Text = "Total Thallium (ug/L)"
-                lAquaBenchmarkAcute = 0.0
-                lAquaBenchmarkChronic = 0.0
-                lHealthBenchmarkWO = 0.00024
-                lHealthBenchmarkO = 0.00047
-                lMCL = 0.0
-            ElseIf aRunName = "Zn" Then
-                lPane.YAxis.Title.Text = "Total Zinc (ug/L)"
-                lAquaBenchmarkAcute = 0.0
-                lAquaBenchmarkChronic = 0.0
-                lHealthBenchmarkWO = 7.4
-                lHealthBenchmarkO = 26
-                lMCL = 0.0
+            If aUnits = "Total" Then
+                If aRunName = "As" Then
+                    lPane.YAxis.Title.Text = "Total Arsenic (ug/L)"
+                    lAquaBenchmarkAcute = 0.0
+                    lAquaBenchmarkChronic = 0.0
+                    lHealthBenchmarkWO = 0.000018
+                    lHealthBenchmarkO = 0.00014
+                    lMCL = 0.01
+                ElseIf aRunName = "Cd" Then
+                    lPane.YAxis.Title.Text = "Total Cadmium (ug/L)"
+                    lAquaBenchmarkAcute = 0.0
+                    lAquaBenchmarkChronic = 0.0
+                    lHealthBenchmarkWO = 0.0
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 0.0
+                ElseIf aRunName = "Cu" Then
+                    lPane.YAxis.Title.Text = "Total Copper (ug/L)"
+                    lAquaBenchmarkAcute = 0.0
+                    lAquaBenchmarkChronic = 0.0
+                    lHealthBenchmarkWO = 1.3
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 1.3
+                ElseIf aRunName = "Ni" Then
+                    lPane.YAxis.Title.Text = "Total Nickel (ug/L)"
+                    lAquaBenchmarkAcute = 0.0
+                    lAquaBenchmarkChronic = 0.0
+                    lHealthBenchmarkWO = 0.61
+                    lHealthBenchmarkO = 4.6
+                    lMCL = 0.0
+                ElseIf aRunName = "Pb" Then
+                    lPane.YAxis.Title.Text = "Total Lead (ug/L)"
+                    lAquaBenchmarkAcute = 0.0
+                    lAquaBenchmarkChronic = 0.0
+                    lHealthBenchmarkWO = 0.0
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 0.0
+                ElseIf aRunName = "Se" Then
+                    lPane.YAxis.Title.Text = "Total Selenium (ug/L)"
+                    lAquaBenchmarkAcute = 0.0
+                    lAquaBenchmarkChronic = 0.005
+                    lHealthBenchmarkWO = 0.17
+                    lHealthBenchmarkO = 4.2
+                    lMCL = 0.05
+                ElseIf aRunName = "Tl" Then
+                    lPane.YAxis.Title.Text = "Total Thallium (ug/L)"
+                    lAquaBenchmarkAcute = 0.0
+                    lAquaBenchmarkChronic = 0.0
+                    lHealthBenchmarkWO = 0.00024
+                    lHealthBenchmarkO = 0.00047
+                    lMCL = 0.0
+                ElseIf aRunName = "Zn" Then
+                    lPane.YAxis.Title.Text = "Total Zinc (ug/L)"
+                    lAquaBenchmarkAcute = 0.0
+                    lAquaBenchmarkChronic = 0.0
+                    lHealthBenchmarkWO = 7.4
+                    lHealthBenchmarkO = 26
+                    lMCL = 0.0
+                End If
+            Else
+                'dissolved
+                If aRunName = "As" Then
+                    lPane.YAxis.Title.Text = "Dissolved Arsenic (ug/L)"
+                    lAquaBenchmarkAcute = 0.34
+                    lAquaBenchmarkChronic = 0.15
+                    lHealthBenchmarkWO = 0.0
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 0.0
+                ElseIf aRunName = "Cd" Then
+                    lPane.YAxis.Title.Text = "Dissolved Cadmium (ug/L)"
+                    lAquaBenchmarkAcute = 0.002
+                    lAquaBenchmarkChronic = 0.00025
+                    lHealthBenchmarkWO = 0.0
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 0.0
+                ElseIf aRunName = "Cu" Then
+                    lPane.YAxis.Title.Text = "Dissolved Copper (ug/L)"
+                    lAquaBenchmarkAcute = 0.013
+                    lAquaBenchmarkChronic = 0.009
+                    lHealthBenchmarkWO = 0.0
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 0.0
+                ElseIf aRunName = "Ni" Then
+                    lPane.YAxis.Title.Text = "Dissolved Nickel (ug/L)"
+                    lAquaBenchmarkAcute = 0.47
+                    lAquaBenchmarkChronic = 0.052
+                    lHealthBenchmarkWO = 0.0
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 0.0
+                ElseIf aRunName = "Pb" Then
+                    lPane.YAxis.Title.Text = "Dissolved Lead (ug/L)"
+                    lAquaBenchmarkAcute = 0.065
+                    lAquaBenchmarkChronic = 0.0025
+                    lHealthBenchmarkWO = 0.0
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 0.0
+                ElseIf aRunName = "Se" Then
+                    lPane.YAxis.Title.Text = "Dissolved Selenium (ug/L)"
+                    lAquaBenchmarkAcute = 0.0
+                    lAquaBenchmarkChronic = 0.0
+                    lHealthBenchmarkWO = 0.0
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 0.0
+                ElseIf aRunName = "Tl" Then
+                    lPane.YAxis.Title.Text = "Dissolved Thallium (ug/L)"
+                    lAquaBenchmarkAcute = 0.0
+                    lAquaBenchmarkChronic = 0.0
+                    lHealthBenchmarkWO = 0.0
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 0.0
+                ElseIf aRunName = "Zn" Then
+                    lPane.YAxis.Title.Text = "Dissolved Zinc (ug/L)"
+                    lAquaBenchmarkAcute = 0.12
+                    lAquaBenchmarkChronic = 0.12
+                    lHealthBenchmarkWO = 0.0
+                    lHealthBenchmarkO = 0.0
+                    lMCL = 0.0
+                End If
             End If
+
             'now add them
             If lNationalModelBaseline > 0.0 Then
                 Dim lLine1 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lNationalModelBaseline * 1000, Drawing.Drawing2D.DashStyle.Dash)
                 lLine1.Color = Drawing.Color.Blue
-                lLine1.Line.Width = 10
+                lLine1.Line.Width = 2
             End If
             If lNationalModelOptionD > 0.0 Then
                 Dim lLine2 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lNationalModelOptionD * 1000, Drawing.Drawing2D.DashStyle.Dash)
                 lLine2.Color = Drawing.Color.Purple
-                lLine2.Line.Width = 10
+                lLine2.Line.Width = 2
             End If
             If lAquaBenchmarkAcute > 0.0 Then
                 Dim lLine3 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lAquaBenchmarkAcute * 1000, Drawing.Drawing2D.DashStyle.Dot)
                 lLine3.Color = Drawing.Color.Brown
-                lLine3.Line.Width = 10
+                lLine3.Line.Width = 2
             End If
             If lAquaBenchmarkChronic > 0.0 Then
                 Dim lLine4 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lAquaBenchmarkChronic * 1000, Drawing.Drawing2D.DashStyle.Dot)
                 lLine4.Color = Drawing.Color.Green
-                lLine4.Line.Width = 10
+                lLine4.Line.Width = 2
             End If
             If lHealthBenchmarkWO > 0.0 Then
                 Dim lLine5 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lHealthBenchmarkWO * 1000, Drawing.Drawing2D.DashStyle.DashDot)
@@ -500,9 +620,19 @@ Module ERGGraph
             If lMCL > 0.0 Then
                 Dim lLine7 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lMCL * 1000, Drawing.Drawing2D.DashStyle.DashDotDot)
                 lLine7.Color = Drawing.Color.Pink
-                lLine7.Line.Width = 10
+                lLine7.Line.Width = 2
             End If
-
+            If lPane.YAxis.Scale.Min >= 1 And lPane.YAxis.Scale.Min <= 10 And _
+               lPane.YAxis.Scale.Max >= 1 And lPane.YAxis.Scale.Max <= 10 Then
+                'special case, use 1 log cycle
+                lPane.YAxis.Scale.Min = 1
+                lPane.YAxis.Scale.Max = 10
+            ElseIf lPane.YAxis.Scale.Min >= 0.1 And lPane.YAxis.Scale.Min <= 1 And _
+                   lPane.YAxis.Scale.Max >= 0.1 And lPane.YAxis.Scale.Max <= 1 Then
+                'special case, use 1 log cycle
+                lPane.YAxis.Scale.Min = 0.1
+                lPane.YAxis.Scale.Max = 1
+            End If
         Else
             lZgc.Width = 1200
             lPane.XAxis.Title.Text = aRunName.Substring(0, 2) & " at Segment " & pLocation
@@ -510,8 +640,8 @@ Module ERGGraph
             lPane.YAxis.Title.Text = aUnits
         End If
 
-        lZgc.SaveIn(aOutFile)
-        lZgc.Dispose()
+            lZgc.SaveIn(aOutFile)
+            lZgc.Dispose()
     End Sub
 
     Sub WriteAverageAnnualFile(ByVal aAverageAnnualFileName As String, ByVal aTimSer As atcTimeseries, ByVal aStartYear As Integer, ByVal aHeader As String)
@@ -722,98 +852,110 @@ Module ERGGraph
         Dim lCsvName As String = ""
 
         Dim pMetalNames As New atcCollection
-        'pMetalNames.Add("As")
-        'pMetalNames.Add("Cd")
-        'pMetalNames.Add("Cu")
-        'pMetalNames.Add("Ni")
-        'pMetalNames.Add("Pb")
-        'pMetalNames.Add("Se")
+        pMetalNames.Add("As")
+        pMetalNames.Add("Cd")
+        pMetalNames.Add("Cu")
+        pMetalNames.Add("Ni")
+        pMetalNames.Add("Pb")
+        pMetalNames.Add("Se")
         pMetalNames.Add("Tl")
-        'pMetalNames.Add("Zn")
+        pMetalNames.Add("Zn")
 
-        lCsvName = "Total_Concentration.csv"
+        Dim pTypes As New atcCollection
+        pTypes.Add("Total")
+        pTypes.Add("Dissolved")
 
-        Dim lTimeseriesGroup As New atcTimeseriesGroup
+        For Each lType As String In pTypes
+            lCsvName = lType & "_Concentration.csv"
 
-        ChDriveDir(pTestPath & "\OutputPlots")
+            Dim lTimeseriesGroup As New atcTimeseriesGroup
 
-        For Each lMetal As String In pMetalNames
+            ChDriveDir(pTestPath & "\OutputPlots")
 
-            Dim lOutFileName As String = pSiteName & lMetal.Substring(0, 2) & "Composite" & ".png"
-            
-            'get baseline historic data
-            Dim lTimeseriesCsv1 As New atcTimeseriesCSV.atcTimeseriesCSV
-            Dim lRunName As String = lMetal & "BaselineHistoric"
-            Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
-            If lTimeseriesCsv1.Open(lCsvFileName) Then
+            For Each lMetal As String In pMetalNames
 
-                Dim lTimSer1 As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(pLocation)
+                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "Composite" & ".png"
 
-                lTimSer1.Attributes.SetValue("YAxis", "Left")
+                If Not FileExists(lOutFileName) Then
+                    'get baseline historic data
+                    Dim lTimeseriesCsv1 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    Dim lRunName As String = lMetal & "BaselineHistoric"
+                    Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+                    If lTimeseriesCsv1.Open(lCsvFileName) Then
 
-                Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 10 : lSDate(1) = 1 : lSDate(2) = 1
-                Dim lSDateJ As Double = Date2J(lSDate)
-                Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate - 1 : lEDate(1) = 12 : lEDate(2) = 31
-                Dim lEdatej As Double = Date2J(lEDate)
+                        Dim lTimSer1 As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(pLocation)
 
-                lTimeseriesGroup.Add(SubsetByDate(lTimSer1, _
-                                            lSDateJ, _
-                                            lEdatej, Nothing))
-                lTimeseriesCsv1.Clear()
-            Else
-                Logger.Msg("Unable to Open " & lCsvFileName)
-            End If
+                        lTimSer1.Attributes.SetValue("YAxis", "Left")
 
-            'get option d post-compliance data
-            Dim lTimeseriesCsv3 As New atcTimeseriesCSV.atcTimeseriesCSV
-            lRunName = lMetal & "OptionD"
-            lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
-            If lTimeseriesCsv3.Open(lCsvFileName) Then
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 10 : lSDate(1) = 1 : lSDate(2) = 1
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate - 1 : lEDate(1) = 12 : lEDate(2) = 31
+                        Dim lEdatej As Double = Date2J(lEDate)
 
-                Dim lTimSerD As atcTimeseries = lTimeseriesCsv3.DataSets.ItemByKey(pLocation)
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSer1, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv1.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
 
-                lTimSerD.Attributes.SetValue("YAxis", "Left")
+                    'get option d post-compliance data
+                    Dim lTimeseriesCsv3 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    lRunName = lMetal & "OptionD"
+                    lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+                    If Not FileExists(lCsvFileName) Then
+                        lRunName = lMetal & "OptionC"
+                        lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+                    End If
+                    If lTimeseriesCsv3.Open(lCsvFileName) Then
 
-                Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
-                Dim lSDateJ As Double = Date2J(lSDate)
-                Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
-                Dim lEdatej As Double = Date2J(lEDate)
+                        Dim lTimSerD As atcTimeseries = lTimeseriesCsv3.DataSets.ItemByKey(pLocation)
 
-                lTimeseriesGroup.Add(SubsetByDate(lTimSerD, _
-                                            lSDateJ, _
-                                            lEdatej, Nothing))
-                lTimeseriesCsv3.Clear()
-            Else
-                Logger.Msg("Unable to Open " & lCsvFileName)
-            End If
+                        lTimSerD.Attributes.SetValue("YAxis", "Left")
 
-            'get baseline post-compliance data
-            Dim lTimeseriesCsv2 As New atcTimeseriesCSV.atcTimeseriesCSV
-            lRunName = lMetal & "Baseline"
-            lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
-            If lTimeseriesCsv2.Open(lCsvFileName) Then
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                        Dim lEdatej As Double = Date2J(lEDate)
 
-                Dim lTimSer2 As atcTimeseries = lTimeseriesCsv2.DataSets.ItemByKey(pLocation)
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSerD, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv3.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
 
-                lTimSer2.Attributes.SetValue("YAxis", "Left")
+                    'get baseline post-compliance data
+                    Dim lTimeseriesCsv2 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    lRunName = lMetal & "Baseline"
+                    lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+                    If lTimeseriesCsv2.Open(lCsvFileName) Then
 
-                Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
-                Dim lSDateJ As Double = Date2J(lSDate)
-                Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
-                Dim lEdatej As Double = Date2J(lEDate)
+                        Dim lTimSer2 As atcTimeseries = lTimeseriesCsv2.DataSets.ItemByKey(pLocation)
 
-                lTimeseriesGroup.Add(SubsetByDate(lTimSer2, _
-                                            lSDateJ, _
-                                            lEdatej, Nothing))
-                lTimeseriesCsv2.Clear()
-            Else
-                Logger.Msg("Unable to Open " & lCsvFileName)
-            End If
-            
-            GraphTimeseriesOptions(lTimeseriesGroup, lMetal, lOutFileName, "Computed Tot Conc Ug/L", pSiteName)
+                        lTimSer2.Attributes.SetValue("YAxis", "Left")
 
-            lTimeseriesGroup.Clear()
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                        Dim lEdatej As Double = Date2J(lEDate)
 
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSer2, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv2.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    GraphTimeseriesOptions(lTimeseriesGroup, lMetal, lOutFileName, lType, pSiteName)
+
+                    lTimeseriesGroup.Clear()
+                End If
+
+            Next
         Next
 
     End Sub
