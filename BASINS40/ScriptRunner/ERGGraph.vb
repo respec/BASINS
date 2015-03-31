@@ -17,6 +17,7 @@ Module ERGGraph
     Private pStartYearForBaselinePlot As Integer = 1999
     Private pStartYearForSimulation As Integer = 1982
     Private pComplianceDate As Integer = 2019
+    Private pSiteName As String = "Black"
     'etowah
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah"
     ''Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
@@ -24,6 +25,7 @@ Module ERGGraph
     'Private pStartYearForBaselinePlot As Integer = 2004
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2021
+    'Private pSiteName As String = "Etowah"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         'DoBaselineHistoricGraphsMultipleLocations()
@@ -268,7 +270,7 @@ Module ERGGraph
                     End If
                 End If
 
-                GraphTimeseriesOptions(lTimeseriesGroup, lMetalName, lOutFileName, "Computed Tot Conc Ug/L")
+                GraphTimeseriesOptions(lTimeseriesGroup, lMetalName, lOutFileName, "Computed Tot Conc Ug/L", "")
                 lTimeseriesGroup.Clear()
             End If
         Next
@@ -303,12 +305,11 @@ Module ERGGraph
         lZgc.Dispose()
     End Sub
 
-    Sub GraphTimeseriesOptions(ByVal aDataGroup As atcTimeseriesGroup, ByVal aRunName As String, ByVal aOutFile As String, ByVal aUnits As String)
+    Sub GraphTimeseriesOptions(ByVal aDataGroup As atcTimeseriesGroup, ByVal aRunName As String, ByVal aOutFile As String, ByVal aUnits As String, ByVal aSiteName As String)
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
         Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)
         Dim lCurve As ZedGraph.LineItem
-        'Dim lNewLine As LineItem = AddLine(lPane, 0, yconstant, System.Drawing.Drawing2D.DashStyle.Dash, "Y = " & yconstant)
 
         For i As Integer = 0 To lPane.CurveList.Count - 1
             lCurve = lPane.CurveList.Item(i)
@@ -334,9 +335,9 @@ Module ERGGraph
             lCurve = lPane.CurveList.Item(0)
             lCurve.Color = Drawing.Color.Blue
             lCurve = lPane.CurveList.Item(1)
-            lCurve.Color = Drawing.Color.LightGray
-            lCurve = lPane.CurveList.Item(2)
             lCurve.Color = Drawing.Color.Purple
+            lCurve = lPane.CurveList.Item(2)
+            lCurve.Color = Drawing.Color.LightGray
 
             lZgc.Width = 1800
             lPane.Legend.IsVisible = False
@@ -353,10 +354,63 @@ Module ERGGraph
             Dim lHealthBenchmarkO As Double = 0.0
             Dim lMCL As Double = 0.0
 
+            'site specific data 
+            If aSiteName = "Black" Then
+                If aRunName = "As" Then
+                    lNationalModelBaseline = 0.00003109
+                    lNationalModelOptionD = 0.0000216
+                ElseIf aRunName = "Cd" Then
+                    lNationalModelBaseline = 0.0001746
+                    lNationalModelOptionD = 0.000007179
+                ElseIf aRunName = "Cu" Then
+                    lNationalModelBaseline = 0.00004359
+                    lNationalModelOptionD = 0.000008495
+                ElseIf aRunName = "Pb" Then
+                    lNationalModelBaseline = 0.00001324
+                    lNationalModelOptionD = 0.000005569
+                ElseIf aRunName = "Ni" Then
+                    lNationalModelBaseline = 0.001391
+                    lNationalModelOptionD = 0.00002862
+                ElseIf aRunName = "Se" Then
+                    lNationalModelBaseline = 0.00181
+                    lNationalModelOptionD = 0.00002911
+                ElseIf aRunName = "Tl" Then
+                    lNationalModelBaseline = 0.00005413
+                    lNationalModelOptionD = 0.00001535
+                ElseIf aRunName = "Zn" Then
+                    lNationalModelBaseline = 0.002195
+                    lNationalModelOptionD = 0.00007315
+                End If
+            ElseIf aSiteName = "Etowah" Then
+                If aRunName = "As" Then
+                    lNationalModelBaseline = 0.00000728
+                    lNationalModelOptionD = 0.000003614
+                ElseIf aRunName = "Cd" Then
+                    lNationalModelBaseline = 0.0000704
+                    lNationalModelOptionD = 0.000002608
+                ElseIf aRunName = "Cu" Then
+                    lNationalModelBaseline = 0.00001636
+                    lNationalModelOptionD = 0.000002341
+                ElseIf aRunName = "Pb" Then
+                    lNationalModelBaseline = 0.000005056
+                    lNationalModelOptionD = 0.000002101
+                ElseIf aRunName = "Ni" Then
+                    lNationalModelBaseline = 0.0005551
+                    lNationalModelOptionD = 0.000003906
+                ElseIf aRunName = "Se" Then
+                    lNationalModelBaseline = 0.0007252
+                    lNationalModelOptionD = 0.000003546
+                ElseIf aRunName = "Tl" Then
+                    lNationalModelBaseline = 0.00002092
+                    lNationalModelOptionD = 0.000006077
+                ElseIf aRunName = "Zn" Then
+                    lNationalModelBaseline = 0.0008717
+                    lNationalModelOptionD = 0.00001238
+                End If
+            End If
+
             If aRunName = "As" Then
                 lPane.YAxis.Title.Text = "Total Arsenic (ug/L)"
-                lNationalModelBaseline = 0.0
-                lNationalModelOptionD = 0.0
                 lAquaBenchmarkAcute = 0.0
                 lAquaBenchmarkChronic = 0.0
                 lHealthBenchmarkWO = 0.000018
@@ -364,8 +418,6 @@ Module ERGGraph
                 lMCL = 0.01
             ElseIf aRunName = "Cd" Then
                 lPane.YAxis.Title.Text = "Total Cadmium (ug/L)"
-                lNationalModelBaseline = 0.0
-                lNationalModelOptionD = 0.0
                 lAquaBenchmarkAcute = 0.0
                 lAquaBenchmarkChronic = 0.0
                 lHealthBenchmarkWO = 0.0
@@ -373,8 +425,6 @@ Module ERGGraph
                 lMCL = 0.0
             ElseIf aRunName = "Cu" Then
                 lPane.YAxis.Title.Text = "Total Copper (ug/L)"
-                lNationalModelBaseline = 0.0
-                lNationalModelOptionD = 0.0
                 lAquaBenchmarkAcute = 0.0
                 lAquaBenchmarkChronic = 0.0
                 lHealthBenchmarkWO = 1.3
@@ -382,8 +432,6 @@ Module ERGGraph
                 lMCL = 1.3
             ElseIf aRunName = "Ni" Then
                 lPane.YAxis.Title.Text = "Total Nickel (ug/L)"
-                lNationalModelBaseline = 0.0
-                lNationalModelOptionD = 0.0
                 lAquaBenchmarkAcute = 0.0
                 lAquaBenchmarkChronic = 0.0
                 lHealthBenchmarkWO = 0.61
@@ -391,8 +439,6 @@ Module ERGGraph
                 lMCL = 0.0
             ElseIf aRunName = "Pb" Then
                 lPane.YAxis.Title.Text = "Total Lead (ug/L)"
-                lNationalModelBaseline = 0.0
-                lNationalModelOptionD = 0.0
                 lAquaBenchmarkAcute = 0.0
                 lAquaBenchmarkChronic = 0.0
                 lHealthBenchmarkWO = 0.0
@@ -400,8 +446,6 @@ Module ERGGraph
                 lMCL = 0.0
             ElseIf aRunName = "Se" Then
                 lPane.YAxis.Title.Text = "Total Selenium (ug/L)"
-                lNationalModelBaseline = 0.0
-                lNationalModelOptionD = 0.0
                 lAquaBenchmarkAcute = 0.0
                 lAquaBenchmarkChronic = 0.005
                 lHealthBenchmarkWO = 0.17
@@ -409,8 +453,6 @@ Module ERGGraph
                 lMCL = 0.05
             ElseIf aRunName = "Tl" Then
                 lPane.YAxis.Title.Text = "Total Thallium (ug/L)"
-                lNationalModelBaseline = 0.0
-                lNationalModelOptionD = 0.0
                 lAquaBenchmarkAcute = 0.0
                 lAquaBenchmarkChronic = 0.0
                 lHealthBenchmarkWO = 0.00024
@@ -418,8 +460,6 @@ Module ERGGraph
                 lMCL = 0.0
             ElseIf aRunName = "Zn" Then
                 lPane.YAxis.Title.Text = "Total Zinc (ug/L)"
-                lNationalModelBaseline = 0.0
-                lNationalModelOptionD = 0.0
                 lAquaBenchmarkAcute = 0.0
                 lAquaBenchmarkChronic = 0.0
                 lHealthBenchmarkWO = 7.4
@@ -428,41 +468,41 @@ Module ERGGraph
             End If
             'now add them
             If lNationalModelBaseline > 0.0 Then
-                Dim lLine1 As ZedGraph.LineItem = AddLine(lPane, 0.0, lNationalModelBaseline * 1000, Drawing.Drawing2D.DashStyle.Dash)
+                Dim lLine1 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lNationalModelBaseline * 1000, Drawing.Drawing2D.DashStyle.Dash)
                 lLine1.Color = Drawing.Color.Blue
                 lLine1.Line.Width = 10
             End If
             If lNationalModelOptionD > 0.0 Then
-                Dim lLine2 As ZedGraph.LineItem = AddLine(lPane, 0.0, lNationalModelOptionD * 1000, Drawing.Drawing2D.DashStyle.Dash)
+                Dim lLine2 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lNationalModelOptionD * 1000, Drawing.Drawing2D.DashStyle.Dash)
                 lLine2.Color = Drawing.Color.Purple
                 lLine2.Line.Width = 10
             End If
             If lAquaBenchmarkAcute > 0.0 Then
-                Dim lLine3 As ZedGraph.LineItem = AddLine(lPane, 0.0, lAquaBenchmarkAcute * 1000, Drawing.Drawing2D.DashStyle.Dot)
+                Dim lLine3 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lAquaBenchmarkAcute * 1000, Drawing.Drawing2D.DashStyle.Dot)
                 lLine3.Color = Drawing.Color.Brown
                 lLine3.Line.Width = 10
             End If
             If lAquaBenchmarkChronic > 0.0 Then
-                Dim lLine4 As ZedGraph.LineItem = AddLine(lPane, 0.0, lAquaBenchmarkChronic * 1000, Drawing.Drawing2D.DashStyle.Dot)
+                Dim lLine4 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lAquaBenchmarkChronic * 1000, Drawing.Drawing2D.DashStyle.Dot)
                 lLine4.Color = Drawing.Color.Green
                 lLine4.Line.Width = 10
             End If
             If lHealthBenchmarkWO > 0.0 Then
-                Dim lLine5 As ZedGraph.LineItem = AddLine(lPane, 0.0, lHealthBenchmarkWO * 1000, Drawing.Drawing2D.DashStyle.DashDot)
+                Dim lLine5 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lHealthBenchmarkWO * 1000, Drawing.Drawing2D.DashStyle.DashDot)
                 lLine5.Color = Drawing.Color.Orange
-                lLine5.Line.Width = 10
+                lLine5.Line.Width = 2
             End If
             If lHealthBenchmarkO > 0.0 Then
-                Dim lLine6 As ZedGraph.LineItem = AddLine(lPane, 0.0, lHealthBenchmarkO * 1000, Drawing.Drawing2D.DashStyle.DashDot)
+                Dim lLine6 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lHealthBenchmarkO * 1000, Drawing.Drawing2D.DashStyle.DashDot)
                 lLine6.Color = Drawing.Color.Red
-                lLine6.Line.Width = 10
+                lLine6.Line.Width = 2
             End If
             If lMCL > 0.0 Then
-                Dim lLine7 As ZedGraph.LineItem = AddLine(lPane, 0.0, lMCL * 1000, Drawing.Drawing2D.DashStyle.DashDotDot)
+                Dim lLine7 As ZedGraph.LineItem = AddLineMine(lPane, 0.0, lMCL * 1000, Drawing.Drawing2D.DashStyle.DashDotDot)
                 lLine7.Color = Drawing.Color.Pink
                 lLine7.Line.Width = 10
             End If
-            
+
         Else
             lZgc.Width = 1200
             lPane.XAxis.Title.Text = aRunName.Substring(0, 2) & " at Segment " & pLocation
@@ -682,14 +722,14 @@ Module ERGGraph
         Dim lCsvName As String = ""
 
         Dim pMetalNames As New atcCollection
-        pMetalNames.Add("As")
-        pMetalNames.Add("Cd")
-        pMetalNames.Add("Cu")
-        pMetalNames.Add("Ni")
-        pMetalNames.Add("Pb")
-        pMetalNames.Add("Se")
+        'pMetalNames.Add("As")
+        'pMetalNames.Add("Cd")
+        'pMetalNames.Add("Cu")
+        'pMetalNames.Add("Ni")
+        'pMetalNames.Add("Pb")
+        'pMetalNames.Add("Se")
         pMetalNames.Add("Tl")
-        pMetalNames.Add("Zn")
+        'pMetalNames.Add("Zn")
 
         lCsvName = "Total_Concentration.csv"
 
@@ -699,7 +739,7 @@ Module ERGGraph
 
         For Each lMetal As String In pMetalNames
 
-            Dim lOutFileName As String = lMetal.Substring(0, 2) & "Composite" & ".png"
+            Dim lOutFileName As String = pSiteName & lMetal.Substring(0, 2) & "Composite" & ".png"
             
             'get baseline historic data
             Dim lTimeseriesCsv1 As New atcTimeseriesCSV.atcTimeseriesCSV
@@ -720,29 +760,6 @@ Module ERGGraph
                                             lSDateJ, _
                                             lEdatej, Nothing))
                 lTimeseriesCsv1.Clear()
-            Else
-                Logger.Msg("Unable to Open " & lCsvFileName)
-            End If
-
-            'get baseline post-compliance data
-            Dim lTimeseriesCsv2 As New atcTimeseriesCSV.atcTimeseriesCSV
-            lRunName = lMetal & "Baseline"
-            lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
-            If lTimeseriesCsv2.Open(lCsvFileName) Then
-
-                Dim lTimSer2 As atcTimeseries = lTimeseriesCsv2.DataSets.ItemByKey(pLocation)
-
-                lTimSer2.Attributes.SetValue("YAxis", "Left")
-
-                Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
-                Dim lSDateJ As Double = Date2J(lSDate)
-                Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
-                Dim lEdatej As Double = Date2J(lEDate)
-
-                lTimeseriesGroup.Add(SubsetByDate(lTimSer2, _
-                                            lSDateJ, _
-                                            lEdatej, Nothing))
-                lTimeseriesCsv2.Clear()
             Else
                 Logger.Msg("Unable to Open " & lCsvFileName)
             End If
@@ -770,11 +787,54 @@ Module ERGGraph
                 Logger.Msg("Unable to Open " & lCsvFileName)
             End If
 
-            GraphTimeseriesOptions(lTimeseriesGroup, lMetal, lOutFileName, "Computed Tot Conc Ug/L")
+            'get baseline post-compliance data
+            Dim lTimeseriesCsv2 As New atcTimeseriesCSV.atcTimeseriesCSV
+            lRunName = lMetal & "Baseline"
+            lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+            If lTimeseriesCsv2.Open(lCsvFileName) Then
+
+                Dim lTimSer2 As atcTimeseries = lTimeseriesCsv2.DataSets.ItemByKey(pLocation)
+
+                lTimSer2.Attributes.SetValue("YAxis", "Left")
+
+                Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                Dim lSDateJ As Double = Date2J(lSDate)
+                Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                Dim lEdatej As Double = Date2J(lEDate)
+
+                lTimeseriesGroup.Add(SubsetByDate(lTimSer2, _
+                                            lSDateJ, _
+                                            lEdatej, Nothing))
+                lTimeseriesCsv2.Clear()
+            Else
+                Logger.Msg("Unable to Open " & lCsvFileName)
+            End If
+            
+            GraphTimeseriesOptions(lTimeseriesGroup, lMetal, lOutFileName, "Computed Tot Conc Ug/L", pSiteName)
 
             lTimeseriesGroup.Clear()
 
         Next
 
     End Sub
+
+    Public Function AddLineMine(ByRef aPane As ZedGraph.GraphPane, _
+                            ByVal aACoef As Double, _
+                            ByVal aBCoef As Double, _
+                   Optional ByVal aLineStyle As Drawing.Drawing2D.DashStyle = Drawing.Drawing2D.DashStyle.Solid, _
+                   Optional ByVal aTag As String = Nothing) As LineItem
+        With aPane
+            Dim lXValues(2) As Double
+            Dim lYValues(2) As Double
+            Dim lStep As Double = (.XAxis.Scale.Max - .XAxis.Scale.Min) / lXValues.GetUpperBound(0)
+            For lIndex As Integer = 0 To lXValues.GetUpperBound(0)
+                lXValues(lIndex) = .XAxis.Scale.Min + (lStep * lIndex)
+                lYValues(lIndex) = (aACoef * lXValues(lIndex)) + aBCoef
+            Next
+            Dim lCurve As LineItem = .AddCurve("", lXValues, lYValues, Drawing.Color.Blue, SymbolType.None)
+            lCurve.Line.Style = aLineStyle
+            lCurve.Tag = aTag
+            Return lCurve
+        End With
+    End Function
 End Module
