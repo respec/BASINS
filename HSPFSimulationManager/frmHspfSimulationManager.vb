@@ -124,6 +124,14 @@ Public Class frmHspfSimulationManager
         End With
     End Sub
 
+    Private Sub CloseToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CloseToolStripMenuItem.Click
+        If SaveIfChanged() Then
+            Exit Sub
+        End If
+        SchematicDiagram.AllIcons.Clear()
+        SchematicDiagram.BuildTree(SchematicDiagram.AllIcons)
+    End Sub
+
     Private Sub btnRunHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRunHSPF.Click
         ShowMessageIfNoConnection()
         Dim lRun As New frmRunHSPF
@@ -134,22 +142,23 @@ Public Class frmHspfSimulationManager
     End Sub
 
     Private Sub AddWatershedToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddWatershedToolStripMenuItem.Click
-        Dim lModelForm As New frmModel
-        lModelForm.Schematic = SchematicDiagram
-        lModelForm.ModelIcon = SchematicDiagram.AllIcons.FindOrAddIcon("New Watershed")
+        Dim lWatershedForm As New frmEditWatershed
+        lWatershedForm.Schematic = SchematicDiagram
+        lWatershedForm.ModelIcon = SchematicDiagram.AllIcons.FindOrAddIcon("New Watershed")
         'Place new icon in middle of diagram, not at extreme upper left which triggers unwanted total layout refresh
-        If lModelForm.ModelIcon.Left = 0 AndAlso lModelForm.ModelIcon.Top = 0 Then
-            lModelForm.ModelIcon.Left = (SchematicDiagram.Width - SchematicDiagram.IconWidth) / 2
-            lModelForm.ModelIcon.Top = (SchematicDiagram.Height - SchematicDiagram.IconHeight) / 2
+        If lWatershedForm.ModelIcon.Left = 0 AndAlso lWatershedForm.ModelIcon.Top = 0 Then
+            lWatershedForm.ModelIcon.Left = (SchematicDiagram.Width - SchematicDiagram.IconWidth) / 2
+            lWatershedForm.ModelIcon.Top = (SchematicDiagram.Height - SchematicDiagram.IconHeight) / 2
         End If
-        lModelForm.Show()
+        lWatershedForm.Show()
     End Sub
 
     Private Sub ShowMessageIfNoConnection()
         Dim lReport As String = ""
         Dim lReportLine As String
-
+        Dim lIconIndex As Integer = 0
         For Each lIcon As clsIcon In SchematicDiagram.AllIcons
+            Logger.Progress("Checking " & lIcon.WatershedName, lIconIndex, SchematicDiagram.AllIcons.Count)
             Dim lUpstreamUCI As atcUCI.HspfUci = lIcon.UciFile
             If lUpstreamUCI Is Nothing Then
                 lReportLine = "UCI file not found: " & lIcon.UciFileName
@@ -165,8 +174,9 @@ Public Class frmHspfSimulationManager
                     End If
                 End If
             End If
+            lIconIndex += 1
         Next
-
+        Logger.Progress(lIconIndex, lIconIndex)
         If lReport.Length > 0 Then
             MsgBox(lReport, MsgBoxStyle.OkOnly, "Connection Report")
         End If
@@ -243,9 +253,12 @@ Public Class frmHspfSimulationManager
         Me.Enabled = False
         Me.Cursor = Cursors.WaitCursor
         Dim lReport As String = frmHspfSimulationManager.g_AppNameLong & " Connection Report" & vbCrLf
-        Dim lReportLine As String
+        Dim lIconIndex As Integer = 0
+        Dim lSeparatorLine As New String("_", 80)
         For Each lIcon As clsIcon In SchematicDiagram.AllIcons
-            lReport &= vbCrLf & lIcon.WatershedName & ": " & vbCrLf
+            Logger.Progress("Checking " & lIcon.WatershedName, lIconIndex, SchematicDiagram.AllIcons.Count)
+            lReport &= lSeparatorLine & vbCrLf & lIcon.WatershedName & ", " & lIcon.Scenario.ScenarioName & vbCrLf
+
             Dim lUpstreamUCI As atcUCI.HspfUci = lIcon.UciFile
             Dim lDownstreamIcon As clsIcon = lIcon.DownstreamIcon
             If lUpstreamUCI Is Nothing Then
@@ -257,27 +270,31 @@ Public Class frmHspfSimulationManager
                 If lDownstreamUCI Is Nothing Then
                     lReport &= "Downstream UCI file not found: " & lDownstreamIcon.UciFileName & vbCrLf
                 Else
-                    lReport &= "Upstream UCI file: " & vbCrLf & lIcon.UciFileName & vbCrLf & vbCrLf & "Downstream UCI file:" & vbCrLf & lDownstreamIcon.UciFileName & vbCrLf & vbCrLf
-                    Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(lUpstreamUCI, lDownstreamUCI)
-                    If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
-                        lReport &= "No connecting datasets found." & vbCrLf
-                    Else
-                        Dim lWDMFileName As String = String.Empty
-                        For Each lReportLine In lConnCheck
-                            Dim lFields() As String = lReportLine.Split("|"c)
-                            If lFields(0) <> lWDMFileName Then
-                                lWDMFileName = lFields(0)
-                                lReport &= "WDM file: " & vbCrLf & lWDMFileName & vbCrLf
-                            End If
-                            For lField = 1 To lFields.Length - 1
-                                lReport &= vbTab & lFields(lField)
-                            Next
-                            lReport &= vbCrLf
-                        Next
-                    End If
+                    lReport &= "To: " & lDownstreamIcon.WatershedName & ", " & lDownstreamIcon.Scenario.ScenarioName & vbCrLf & vbCrLf
+                    lReport &= ConnectionReport(lUpstreamUCI, lDownstreamUCI)
+                    'lReport &= "Upstream UCI file: " & vbCrLf & lIcon.UciFileName & vbCrLf & vbCrLf & "Downstream UCI file:" & vbCrLf & lDownstreamIcon.UciFileName & vbCrLf & vbCrLf
+                    'Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(lUpstreamUCI, lDownstreamUCI)
+                    'If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
+                    '    lReport &= "No connecting datasets found." & vbCrLf
+                    'Else
+                    '    Dim lWDMFileName As String = String.Empty
+                    '    For Each lReportLine In lConnCheck
+                    '        Dim lFields() As String = lReportLine.Split("|"c)
+                    '        If lFields(0) <> lWDMFileName Then
+                    '            lWDMFileName = lFields(0)
+                    '            lReport &= "WDM file: " & vbCrLf & lWDMFileName & vbCrLf
+                    '        End If
+                    '        For lField = 1 To lFields.Length - 1
+                    '            lReport &= vbTab & lFields(lField)
+                    '        Next
+                    '        lReport &= vbCrLf
+                    '    Next
+                    'End If
                 End If
             End If
+            lIconIndex += 1
         Next
+        Logger.Progress(lIconIndex, lIconIndex)
         If lReport.Length > 0 Then
             Dim lText As New frmText
             lText.Icon = Me.Icon
@@ -288,4 +305,5 @@ Public Class frmHspfSimulationManager
         Me.Cursor = Cursors.Default
         Me.Enabled = True
     End Sub
+
 End Class

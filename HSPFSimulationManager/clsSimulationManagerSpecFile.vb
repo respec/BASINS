@@ -26,17 +26,11 @@ Public Class clsSimulationManagerSpecFile
                         Case "BASEPATH" : lBasePath = lArgument
                         Case "WATERSHEDNAME"
                             lReadingModel = lAllModels.FindOrAddIcon(lArgument)
-                        Case "UCIFILENAME"
-                            lReadingModel.UciFileName = IO.Path.Combine(lBasePath, lArgument.Trim)
-                        Case "UCIFILENAMES"
-                            For Each lUciFileName As String In lArgument.Split(",")
-                                lUciFileName = IO.Path.Combine(lBasePath, lUciFileName.Trim)
-                                If Not lReadingModel.UciFileNames.Contains(lUciFileName) Then
-                                    lReadingModel.UciFileNames.Add(lUciFileName)
-                                    If String.IsNullOrEmpty(lReadingModel.UciFileName) Then
-                                        lReadingModel.UciFileName = lUciFileName
-                                    End If
-                                End If
+                        Case "SCENARIO"
+                            lReadingModel.Scenario = New clsUciScenario(lArgument.Trim, lBasePath)
+                        Case "SCENARIOS"
+                            For Each lUciScenarioString As String In lArgument.Split(",")
+                                lReadingModel.ScenariosAdd(New clsUciScenario(lUciScenarioString, lBasePath))
                             Next
                         Case "DOWNSTREAMNAME"
                             Select Case lArgument.Trim.ToLowerInvariant
@@ -100,8 +94,8 @@ Public Class clsSimulationManagerSpecFile
 
             For Each lIcon In aSaveIcons
                 If lBasePath.Length > 0 Then
-                    For Each lThisPath As String In lIcon.UciFileNames
-                        lThisPath = IO.Path.GetDirectoryName(lThisPath)
+                    For Each lScenario As clsUciScenario In lIcon.Scenarios
+                        Dim lThisPath As String = IO.Path.GetDirectoryName(lScenario.UciFileName)
                         If lThisPath.Length > 0 Then
                             lThisPath &= IO.Path.DirectorySeparatorChar
                             Dim lLastChar As Integer = lBasePath.Length
@@ -138,14 +132,14 @@ Public Class clsSimulationManagerSpecFile
                     lWriter.WriteLine("DownstreamName" & vbTab & lIcon.DownstreamIcon.WatershedName)
                 End If
 
-                lWriter.WriteLine("UCIFileName" & vbTab & RemoveBasePath(lIcon.UciFileName, lBasePath))
+                lWriter.WriteLine("Scenario" & vbTab & lIcon.Scenario.ScenarioName & "|" & RemoveBasePath(lIcon.Scenario.UciFileName, lBasePath))
 
-                If lIcon.UciFileNames.Count > 1 Then
-                    Dim lUciFileNames As String = ""
-                    For Each lUciFileName As String In lIcon.UciFileNames
-                        lUciFileNames &= RemoveBasePath(lUciFileName, lBasePath) & ","
+                If lIcon.Scenarios.Count > 1 Then
+                    Dim lScenariosString As String = ""
+                    For Each lScenario As clsUciScenario In lIcon.Scenarios
+                        lScenariosString &= lScenario.ScenarioName & "|" & RemoveBasePath(lScenario.UciFileName, lBasePath) & ","
                     Next
-                    lWriter.WriteLine("UCIFileNames" & vbTab & lUciFileNames.TrimEnd(","))
+                    lWriter.WriteLine("Scenarios" & vbTab & lScenariosString.TrimEnd(","))
                 End If
 
                 If IO.File.Exists(lIcon.WatershedImageFilename) Then
