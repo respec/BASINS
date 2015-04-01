@@ -12,20 +12,37 @@ Imports System
 
 Module ERGGraph
     'black
-    Private Const pTestPath As String = "C:\ERG_SteamElectric\Black"
-    Private pLocation As Integer = 39 '1 '97 '39
-    Private pStartYearForBaselinePlot As Integer = 1999
-    Private pStartYearForSimulation As Integer = 1982
-    Private pComplianceDate As Integer = 2019
-    Private pSiteName As String = "Black"
-    'etowah
-    'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah"
-    ''Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
-    'Private pLocation As Integer = 18 '1 '50 '18
-    'Private pStartYearForBaselinePlot As Integer = 2004
+    'Private Const pTestPath As String = "C:\ERG_SteamElectric\Black"
+    'Private pLocation As Integer = 39 '1 '97 '39
+    'Private pStartYearForBaselinePlot As Integer = 1999
     'Private pStartYearForSimulation As Integer = 1982
-    'Private pComplianceDate As Integer = 2021
-    'Private pSiteName As String = "Etowah"
+    'Private pComplianceDate As Integer = 2019
+    'Private pSiteName As String = "Black"
+    'etowah
+    Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah"
+    'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
+    Private pLocation As Integer = 18 '1 '50 '18
+    Private pStartYearForBaselinePlot As Integer = 2004
+    Private pStartYearForSimulation As Integer = 1982
+    Private pComplianceDate As Integer = 2021
+    Private pSiteName As String = "Etowah"
+    'white
+    'Private Const pTestPath As String = "C:\ERG_SteamElectric\White"
+    'Private pLocation As Integer = 17 
+    'Private pStartYearForBaselinePlot As Integer = 1999
+    'Private pStartYearForSimulation As Integer = 1982
+    'Private pComplianceDate As Integer = 2019
+    'Private pSiteName As String = "White"
+    'lake sinclair
+    'Private Const pTestPath As String = "C:\ERG_SteamElectric\LakeSinclair"
+    'Private pLocation As Integer = 276
+    'Private pStartYearForBaselinePlot As Integer = 1999
+    'Private pStartYearForSimulation As Integer = 1982
+    'Private pComplianceDate As Integer = 2019
+    'Private pSiteName As String = "LakeSinclair"
+    'mississippi
+    'ohio
+
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         'DoBaselineHistoricGraphsMultipleLocations()
@@ -338,8 +355,12 @@ Module ERGGraph
             lCurve.Color = Drawing.Color.Purple
             lCurve = lPane.CurveList.Item(2)
             lCurve.Color = Drawing.Color.LightGray
+            lCurve.Color = Drawing.Color.FromKnownColor(Drawing.KnownColor.Gray)
 
-            lZgc.Width = 2400
+            'lZgc.Width = 2400
+            lZgc.Width = 1440 'may sacrifice too much resolution doing this?
+            lZgc.Height = 300
+
             lPane.Legend.IsVisible = False
             lPane.XAxis.Title.Text = ""
             lPane.YAxis.Type = ZedGraph.AxisType.Log
@@ -465,6 +486,65 @@ Module ERGGraph
                         lNationalModelOptionD = 0.00001238
                     End If
                 End If
+            ElseIf aSiteName = "LakeSinclair" Then
+                If aUnits = "Total" Then
+                    If aRunName = "As" Then
+                        lNationalModelBaseline = 0.00001307
+                        lNationalModelOptionD = 0.000003471
+                    ElseIf aRunName = "Cd" Then
+                        lNationalModelBaseline = 0.00006934
+                        lNationalModelOptionD = 0.000002505
+                    ElseIf aRunName = "Cu" Then
+                        lNationalModelBaseline = 0.00002902
+                        lNationalModelOptionD = 0.000002248
+                    ElseIf aRunName = "Pb" Then
+                        lNationalModelBaseline = 0.00001052
+                        lNationalModelOptionD = 0.000002018
+                    ElseIf aRunName = "Ni" Then
+                        lNationalModelBaseline = 0.0005428
+                        lNationalModelOptionD = 0.000003752
+                    ElseIf aRunName = "Se" Then
+                        lNationalModelBaseline = 0.0006987
+                        lNationalModelOptionD = 0.000003405
+                    ElseIf aRunName = "Tl" Then
+                        lNationalModelBaseline = 0.00002335
+                        lNationalModelOptionD = 0.000005836
+                    ElseIf aRunName = "Zn" Then
+                        lNationalModelBaseline = 0.0008857
+                        lNationalModelOptionD = 0.00001189
+                    End If
+                Else
+                    'for dissolved
+                    If aRunName = "As" Then
+                        lNationalModelBaseline = 0.00001307
+                        lNationalModelOptionD = 0.000003471
+                    ElseIf aRunName = "Cd" Then
+                        lNationalModelBaseline = 0.00006933
+                        lNationalModelOptionD = 0.000002505
+                    ElseIf aRunName = "Cu" Then
+                        lNationalModelBaseline = 0.00002902
+                        lNationalModelOptionD = 0.000002248
+                    ElseIf aRunName = "Pb" Then
+                        lNationalModelBaseline = 0.00001052
+                        lNationalModelOptionD = 0.000002018
+                    ElseIf aRunName = "Ni" Then
+                        lNationalModelBaseline = 0.0005428
+                        lNationalModelOptionD = 0.000003751
+                    ElseIf aRunName = "Se" Then
+                        lNationalModelBaseline = 0.0006986
+                        lNationalModelOptionD = 0.000003405
+                    ElseIf aRunName = "Tl" Then
+                        lNationalModelBaseline = 0.00002335
+                        lNationalModelOptionD = 0.000005836
+                    ElseIf aRunName = "Zn" Then
+                        lNationalModelBaseline = 0.0008856
+                        lNationalModelOptionD = 0.00001189
+                    End If
+                End If
+            ElseIf aSiteName = "Mississippi" Then
+                'numbers still to be copied from spreadsheet
+            ElseIf aSiteName = "Ohio" Then
+                'numbers still to be copied from spreadsheet
             End If
 
             If aUnits = "Total" Then
@@ -622,6 +702,18 @@ Module ERGGraph
                 lLine7.Color = Drawing.Color.Pink
                 lLine7.Line.Width = 2
             End If
+
+            If lNationalModelBaseline > 0 Then
+                If lNationalModelBaseline * 1000 < lPane.YAxis.Scale.Min Then
+                    lPane.YAxis.Scale.Min = lNationalModelBaseline * 1000
+                End If
+            End If
+            If lNationalModelOptionD > 0 Then
+                If lNationalModelOptionD * 1000 < lPane.YAxis.Scale.Min Then
+                    lPane.YAxis.Scale.Min = lNationalModelOptionD * 1000
+                End If
+            End If
+
             If lPane.YAxis.Scale.Min >= 1 And lPane.YAxis.Scale.Min <= 10 And _
                lPane.YAxis.Scale.Max >= 1 And lPane.YAxis.Scale.Max <= 10 Then
                 'special case, use 1 log cycle
@@ -640,8 +732,8 @@ Module ERGGraph
             lPane.YAxis.Title.Text = aUnits
         End If
 
-            lZgc.SaveIn(aOutFile)
-            lZgc.Dispose()
+        lZgc.SaveIn(aOutFile)
+        lZgc.Dispose()
     End Sub
 
     Sub WriteAverageAnnualFile(ByVal aAverageAnnualFileName As String, ByVal aTimSer As atcTimeseries, ByVal aStartYear As Integer, ByVal aHeader As String)
@@ -881,6 +973,11 @@ Module ERGGraph
                     Dim lTimeseriesCsv1 As New atcTimeseriesCSV.atcTimeseriesCSV
                     Dim lRunName As String = lMetal & "BaselineHistoric"
                     Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
                     If lTimeseriesCsv1.Open(lCsvFileName) Then
 
                         Dim lTimSer1 As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(pLocation)
@@ -888,6 +985,10 @@ Module ERGGraph
                         lTimSer1.Attributes.SetValue("YAxis", "Left")
 
                         Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 10 : lSDate(1) = 1 : lSDate(2) = 1
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate - 7 : lSDate(1) = 2 : lSDate(2) = 1
+                        End If
                         Dim lSDateJ As Double = Date2J(lSDate)
                         Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate - 1 : lEDate(1) = 12 : lEDate(2) = 31
                         Dim lEdatej As Double = Date2J(lEDate)
@@ -908,6 +1009,11 @@ Module ERGGraph
                         lRunName = lMetal & "OptionC"
                         lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
                     End If
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
                     If lTimeseriesCsv3.Open(lCsvFileName) Then
 
                         Dim lTimSerD As atcTimeseries = lTimeseriesCsv3.DataSets.ItemByKey(pLocation)
@@ -917,6 +1023,10 @@ Module ERGGraph
                         Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
                         Dim lSDateJ As Double = Date2J(lSDate)
                         Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                        End If
                         Dim lEdatej As Double = Date2J(lEDate)
 
                         lTimeseriesGroup.Add(SubsetByDate(lTimSerD, _
@@ -931,6 +1041,11 @@ Module ERGGraph
                     Dim lTimeseriesCsv2 As New atcTimeseriesCSV.atcTimeseriesCSV
                     lRunName = lMetal & "Baseline"
                     lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
                     If lTimeseriesCsv2.Open(lCsvFileName) Then
 
                         Dim lTimSer2 As atcTimeseries = lTimeseriesCsv2.DataSets.ItemByKey(pLocation)
@@ -940,6 +1055,10 @@ Module ERGGraph
                         Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
                         Dim lSDateJ As Double = Date2J(lSDate)
                         Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                        End If
                         Dim lEdatej As Double = Date2J(lEDate)
 
                         lTimeseriesGroup.Add(SubsetByDate(lTimSer2, _
