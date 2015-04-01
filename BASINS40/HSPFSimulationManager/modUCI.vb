@@ -79,6 +79,51 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         End Try
     End Function
 
+    Public Function SimulationPeriodString(aUci As atcUCI.HspfUci) As String
+        Dim lSJDate As Double = aUci.GlobalBlock.SDateJ
+        Dim lEJDate As Double = aUci.GlobalBlock.EdateJ
+        Dim lSDate(6) As Integer
+        Dim lEDate(6) As Integer
+        J2Date(lSJDate, lSDate)
+        J2Date(lEJDate, lEDate)
+        atcUtility.modDate.timcnv(lEDate)
+        Return lSDate(0) & "/" & lSDate(1) & "/" & lSDate(2) & " to " & lEDate(0) & "/" & lEDate(1) & "/" & lEDate(2)
+    End Function
+
+    Public Function ConnectionReport(aUpstreamUCI As atcUCI.HspfUci, aDownstreamUCI As atcUCI.HspfUci) As String
+        Dim lReport As String = String.Empty
+        If aUpstreamUCI Is Nothing Then
+            lReport &= "Upstream UCI file not found" & vbCrLf
+        Else
+            lReport &= "Upstream UCI file: " & vbCrLf & aUpstreamUCI.Name & vbCrLf & vbCrLf
+            If aDownstreamUCI Is Nothing Then
+                lReport &= "Downstream UCI file not found" & vbCrLf
+            Else
+                lReport &= "Downstream UCI file:" & vbCrLf & aDownstreamUCI.Name & vbCrLf & vbCrLf
+                lReport &= "Upstream Simulation Period:    " & vbTab & SimulationPeriodString(aUpstreamUCI) & vbCrLf
+                lReport &= "Downstream Simulation Period: " & vbTab & SimulationPeriodString(aDownstreamUCI) & vbCrLf & vbCrLf
+                Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(aUpstreamUCI, aDownstreamUCI)
+                If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
+                    lReport &= "No connecting datasets found." & vbCrLf
+                Else
+                    Dim lWDMFileName As String = String.Empty
+                    For Each lReportLine In lConnCheck
+                        Dim lFields() As String = lReportLine.Split("|"c)
+                        If lFields(0) <> lWDMFileName Then
+                            lWDMFileName = lFields(0)
+                            lReport &= "WDM file: " & vbCrLf & lWDMFileName & vbCrLf
+                        End If
+                        For lField = 1 To lFields.Length - 1
+                            lReport &= vbTab & lFields(lField)
+                        Next
+                        lReport &= vbCrLf
+                    Next
+                End If
+            End If
+        End If
+        Return lReport
+    End Function
+
     Public Function ConnectionSummary(ByVal aSourceUCI As HspfUci, ByVal aTargetUCI As HspfUci) As List(Of String)
         Dim lConnections As New List(Of String)
         Dim lFileName As String = ""

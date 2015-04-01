@@ -41,6 +41,18 @@ Friend Class ctlSchematic
         RemoveHandler aIcon.DragEnter, AddressOf Icon_DragEnter
     End Sub
 
+    Public Function AllScenarioNames() As SortedSet(Of String)
+        Dim lAllNames As New SortedSet(Of String)
+        For Each lIcon As clsIcon In AllIcons
+            For Each lScenario As clsUciScenario In lIcon.Scenarios
+                If Not lAllNames.Contains(lScenario.ScenarioName) Then
+                    lAllNames.Add(lScenario.ScenarioName)
+                End If
+            Next
+        Next
+        Return lAllNames
+    End Function
+
     Public Sub BuildTree(ByVal aIcons As IconCollection, Optional ByVal aPrinting As Boolean = False)
         'Clear Tree
         Dim lSameIcons As Boolean = ReferenceEquals(aIcons, AllIcons)
@@ -300,16 +312,18 @@ Friend Class ctlSchematic
 
                 Dim lGoodLinePen As Pen = SystemPens.ControlDarkDark
                 Dim lBadLinePen As Pen = New Drawing.Pen(Brushes.Salmon)
+                Dim lLinePen As Pen = lGoodLinePen
 
                 If pTreeBackground IsNot Nothing Then pTreeBackground.Dispose()
                 pTreeBackground = New Bitmap(picTree.Width + lMaxDx, picTree.Height + lMaxDy, Drawing.Imaging.PixelFormat.Format32bppArgb)
                 Dim lGraphics As Graphics = Graphics.FromImage(pTreeBackground)
                 For Each lIcon As clsIcon In AllIcons
                     With lIcon
-                        Dim lIconCenter As Point = .Center
-                        For Each lUpstreamIcon As clsIcon In lIcon.UpstreamIcons
-                            lGraphics.DrawLine(lGoodLinePen, lIconCenter, lUpstreamIcon.Center)
-                        Next
+                        If lIcon.DownstreamIcon IsNot Nothing Then
+                            'TODO: assign lLinePen to lGoodLinePen or lBadLinePen
+                            lGraphics.DrawLine(lLinePen, lIcon.Center, lIcon.DownstreamIcon.Center)
+                        End If
+
                         If .Selected Then
                             lGraphics.FillRectangle(HighlightBrush, .Left - pBorderWidth, .Top - pBorderWidth, .Width + pBorderWidth * 2, .Height + pBorderWidth * 2)
                         End If
@@ -376,14 +390,13 @@ Friend Class ctlSchematic
         Dim g As Graphics = Graphics.FromImage(lBitmap)
 
         g.Clear(aIcon.BackColor)
+
         If aIcon.Font.Size < 8.25 Then
             aIcon.Font.Dispose()
             aIcon.Font = New Font("Microsoft Sans Serif", 8.25)
         End If
         Dim lLabel As String = aIcon.WatershedName
-        'If aIcon.UciFileNames.Count > 1 Then
-        lLabel &= ": " & IO.Path.GetFileNameWithoutExtension(aIcon.UciFileName)
-        'End If
+
         Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(lLabel, aIcon.Font)
         While lStringMeasurement.Width > IconWidth
             Dim lOldSize As Single = aIcon.Font.Size
@@ -392,20 +405,38 @@ Friend Class ctlSchematic
             lStringMeasurement = g.MeasureString(lLabel, aIcon.Font)
         End While
         Dim lStringX As Single = (IconWidth - lStringMeasurement.Width) / 2
-        Dim lStringY As Single = IconHeight - lStringMeasurement.Height * 1.25
+        Dim lStringY As Single = 10
+        Dim lImageTop As Single = 10 + lStringMeasurement.Height * 1.25
+        g.DrawString(lLabel, aIcon.Font, SystemBrushes.ControlDarkDark, lStringX, lStringY)
 
+        If aIcon.Font.Size < 8.25 Then
+            aIcon.Font.Dispose()
+            aIcon.Font = New Font("Microsoft Sans Serif", 8.25)
+        End If
+        lLabel = aIcon.Scenario.ScenarioName
+
+        lStringMeasurement = g.MeasureString(lLabel, aIcon.Font)
+        While lStringMeasurement.Width > IconWidth
+            Dim lOldSize As Single = aIcon.Font.Size
+            aIcon.Font = New Font("Microsoft Sans Serif", aIcon.Font.Size - 1)
+            If aIcon.Font.Size = lOldSize Then Exit While
+            lStringMeasurement = g.MeasureString(lLabel, aIcon.Font)
+        End While
+        lStringX = (IconWidth - lStringMeasurement.Width) / 2
+        lStringY = IconHeight - lStringMeasurement.Height * 1.25
+        g.DrawString(lLabel, aIcon.Font, SystemBrushes.ControlDarkDark, lStringX, lStringY)
+
+        Dim lIconHeightAvailable As Single = lStringY - lImageTop - 2
         If aIcon.WatershedImage IsNot Nothing Then
             Dim lScaleWidth As Single = (IconWidth - 2) / aIcon.WatershedImage.Width
-            Dim lScaleHeight As Single = (lStringY - 2) / aIcon.WatershedImage.Height
+            Dim lScaleHeight As Single = (lIconHeightAvailable) / aIcon.WatershedImage.Height
             Dim lScale As Single = Math.Min(lScaleHeight, lScaleWidth)
             g.DrawImage(aIcon.WatershedImage, _
                         (IconWidth - lScale * aIcon.WatershedImage.Width) / 2, _
-                        1 + (lStringY - lScale * aIcon.WatershedImage.Height) / 2, _
+                        lImageTop + (lIconHeightAvailable - lScale * aIcon.WatershedImage.Height) / 2, _
                         lScale * aIcon.WatershedImage.Width, _
                         lScale * aIcon.WatershedImage.Height)
         End If
-
-        g.DrawString(lLabel, aIcon.Font, SystemBrushes.ControlDarkDark, lStringX, lStringY)
 
         DrawBorder(g, IconWidth, IconHeight, Not aPrinting)
         g.Dispose()
@@ -634,54 +665,68 @@ Friend Class ctlSchematic
     ''' <param name="sender">Schematic icon being clicked</param>
     ''' <param name="e"></param>
     Private Sub Icon_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
-        Dim lSender As clsIcon = sender
+        Dim lIcon As clsIcon = sender
         Select Case e.Button
             Case Windows.Forms.MouseButtons.Left
-                pBeforeDragLocation = lSender.Location
+                pBeforeDragLocation = lIcon.Location
                 Dim MPosition As Point = Me.PointToClient(MousePosition)
                 pDragging = True
-                pDragOffset = lSender.Location - MPosition
+                pDragOffset = lIcon.Location - MPosition
                 Windows.Forms.Cursor.Clip = Me.RectangleToScreen(New Rectangle(picTree.Left + e.X, _
                                                                  picTree.Top + e.Y, picTree.Width - IconWidth, picTree.Height - IconHeight))
             Case Windows.Forms.MouseButtons.Right
-                pClickedIcon = lSender
+                pClickedIcon = lIcon
                 RightClickMenu.MenuItems.Clear()
                 RightClickMenu.MenuItems.Add("Edit", AddressOf EditIcon)
-                RightClickMenu.MenuItems.Add("Remove", AddressOf RemoveIcon)
+                RightClickMenu.MenuItems.Add("Remove", AddressOf RemoveClickedIcon)
                 RightClickMenu.MenuItems.Add("Open Folder", AddressOf OpenFolder)
                 'RightClickMenu.MenuItems.Add("Open in WinHSPF: """ & lSender.Key & """")
                 'If lSender.Label <> lSender.Key Then RightClickMenu.MenuItems.Add("""" & lSender.Label & """")
-                If lSender.DistanceFromOutlet > 1 Then
+                If lIcon.DistanceFromOutlet > 1 Then
                     RightClickMenu.MenuItems.Add("Select Downstream", AddressOf Event_SelectDownstream)
                 End If
-                If lSender.UpstreamIcons.Count > 0 Then
+                If lIcon.UpstreamIcons.Count > 0 Then
                     RightClickMenu.MenuItems.Add("Select Upstream", AddressOf Event_SelectUpstream)
                 End If
-                RightClickMenu.Show(lSender, e.Location)
+                RightClickMenu.Show(lIcon, e.Location)
         End Select
     End Sub
 
     Public Sub EditIcon(ByVal aSender As Object, ByVal e As System.EventArgs)
-        Dim lModelForm As New frmModel
-        lModelForm.Schematic = Me
-        lModelForm.ModelIcon = pClickedIcon
-        lModelForm.Show()
+        Dim lWatershedForm As New frmEditWatershed
+        lWatershedForm.Schematic = Me
+        lWatershedForm.ModelIcon = pClickedIcon
+        lWatershedForm.Show()
     End Sub
 
-    Public Sub RemoveIcon(ByVal aSender As Object, ByVal e As System.EventArgs)
-        If Logger.Msg("Remove watershed " & pClickedIcon.WatershedName & "?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-            AllIcons.Remove(pClickedIcon)
-            RemoveIconHandlers(pClickedIcon)
+    Public Sub RemoveClickedIcon(ByVal aSender As Object, ByVal e As System.EventArgs)
+        RemoveIconAfterAsking(pClickedIcon)
+    End Sub
 
-            If pClickedIcon.DownstreamIcon IsNot Nothing AndAlso _
-                pClickedIcon.DownstreamIcon.UpstreamIcons.Contains(pClickedIcon) Then
-                pClickedIcon.DownstreamIcon.UpstreamIcons.Remove(pClickedIcon)
+    ''' <summary>
+    ''' Ask user whether to remove the given watershed icon from the diagram
+    ''' </summary>
+    ''' <param name="aIcon">Watershed icon to remove</param>
+    ''' <returns>True if icon was removed, False if icon was not removed</returns>
+    ''' <remarks>pClickedIcon is cleared if that was the one removed</remarks>
+    Public Function RemoveIconAfterAsking(aIcon As clsIcon) As Boolean
+        If Logger.Msg("Remove watershed " & aIcon.WatershedName & "?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+            AllIcons.Remove(aIcon)
+            RemoveIconHandlers(aIcon)
+
+            If aIcon.DownstreamIcon IsNot Nothing AndAlso _
+                aIcon.DownstreamIcon.UpstreamIcons.Contains(aIcon) Then
+                aIcon.DownstreamIcon.UpstreamIcons.Remove(aIcon)
             End If
 
-            pClickedIcon = Nothing
+            If Object.ReferenceEquals(aIcon, pClickedIcon) Then
+                pClickedIcon = Nothing
+            End If
             BuildTree(AllIcons)
+            Return True
         End If
-    End Sub
+        Return False
+    End Function
 
     Public Sub OpenFolder(ByVal aSender As Object, ByVal e As System.EventArgs)
         OpenFile(IO.Path.GetDirectoryName(pClickedIcon.UciFileName))
@@ -729,14 +774,21 @@ Friend Class ctlSchematic
 
     Private Sub Icon_DragDrop(sender As Object, e As DragEventArgs)
         If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
-            Dim lSender As clsIcon = sender
+            Dim lIcon As clsIcon = sender
             For Each lFileName As String In e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
-                If lFileName.ToLower.EndsWith(".uci") Then
-                    If Logger.Msg("Set " & lSender.WatershedName & " UCI file to:" & vbCrLf & lFileName & " ?", MsgBoxStyle.YesNo, frmHspfSimulationManager.g_AppNameLong) = MsgBoxResult.Yes Then
-                        lSender.UciFileName = lFileName
-                        DrawIcon(False, lSender)
-                    End If
-                End If
+                Select Case IO.Path.GetExtension(lFileName).ToLower
+                    Case ".uci"
+                        If Logger.Msg("Set " & lIcon.WatershedName & " UCI file to:" & vbCrLf & lFileName & " ?", MsgBoxStyle.YesNo, frmHspfSimulationManager.g_AppNameLong) = MsgBoxResult.Yes Then
+                            lIcon.UciFileName = lFileName
+                            DrawIcon(False, lIcon)
+                        End If
+
+                    Case ".png", ".jpg", ".gif"
+                        lIcon.WatershedImageFilename = lFileName
+                        lIcon.WatershedImage = Drawing.Image.FromFile(lFileName)
+                        DrawIcon(False, lIcon)
+
+                End Select
             Next
         End If
     End Sub
@@ -826,10 +878,10 @@ Friend Class ctlSchematic
                             End If
                         End If
 
-                        Dim lModelForm As New frmModel
-                        lModelForm.Schematic = Me
-                        lModelForm.ModelIcon = lIcon
-                        lModelForm.Show()
+                        Dim lWatershedForm As New frmEditWatershed
+                        lWatershedForm.Schematic = Me
+                        lWatershedForm.ModelIcon = lIcon
+                        lWatershedForm.Show()
                     Case MsgBoxResult.Cancel
                         Exit For
                 End Select
