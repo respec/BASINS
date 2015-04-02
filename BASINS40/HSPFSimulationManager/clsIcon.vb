@@ -13,6 +13,7 @@ Public Class clsUciScenario
 
     Public ScenarioName As String
     Public UciFileName As String
+    Private pUciFile As atcUCI.HspfUci
 
     Public Sub New(aScenarioSpecification As String, aBasePath As String)
         Dim lSplit() As String = aScenarioSpecification.Split("|")
@@ -28,7 +29,7 @@ Public Class clsUciScenario
     End Sub
 
     Public Overrides Function ToString() As String
-        Return ScenarioName & " - " & UciFileName
+        Return ScenarioName & " (" & UciFileName & ")"
     End Function
 
     Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
@@ -51,6 +52,13 @@ Public Class clsUciScenario
             Return False
         End Try
     End Function
+
+    Public Function UciFile() As atcUCI.HspfUci
+        If pUciFile Is Nothing OrElse pUciFile.Name <> UciFileName Then
+            pUciFile = OpenUCI(UciFileName)
+        End If
+        Return pUciFile
+    End Function
 End Class
 
 Public Class clsIcon
@@ -59,7 +67,6 @@ Public Class clsIcon
     Public Selected As Boolean
     Public Scenarios As New List(Of clsUciScenario)
     Private pScenario As clsUciScenario
-    Private pUciFile As atcUCI.HspfUci
     Public WatershedImage As Image
     Public WatershedImageFilename As String
     Public WatershedName As String = ""
@@ -76,7 +83,11 @@ Public Class clsIcon
     End Sub
 
     Public Overrides Function ToString() As String
-        Return WatershedName
+        If Scenario Is Nothing Then
+            Return WatershedName
+        Else
+            Return WatershedName & ": " & Scenario.ToString
+        End If
     End Function
 
     Public Function Key() As String
@@ -99,7 +110,7 @@ Public Class clsIcon
                     Exit Property
                 End If
             Next
-            Dim lScenarioName As String = InputBox("Enter Scenario Name for this UCI file", frmHspfSimulationManager.g_AppNameLong, IO.Path.GetFileNameWithoutExtension(value))
+            Dim lScenarioName As String = IO.Path.GetFileNameWithoutExtension(value) ' InputBox("Enter Scenario Name for this UCI file", frmHspfSimulationManager.g_AppNameLong, IO.Path.GetFileNameWithoutExtension(value))
             Scenario = New clsUciScenario(lScenarioName & "|" & value, "")
         End Set
     End Property
@@ -140,10 +151,7 @@ Public Class clsIcon
     End Sub
 
     Public Function UciFile() As atcUCI.HspfUci
-        If pUciFile Is Nothing OrElse pUciFile.Name <> UciFileName() Then
-            pUciFile = OpenUCI(UciFileName)
-        End If
-        Return pUciFile
+        Return Scenario.UciFile
     End Function
 
 End Class

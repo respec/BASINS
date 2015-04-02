@@ -85,6 +85,12 @@
     <Compile Include="ctlSchematic.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="frmEditWatershed.Designer.vb">
+      <DependentUpon>frmEditWatershed.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmEditWatershed.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmHspfSimulationManager.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -92,10 +98,10 @@
       <DependentUpon>frmHspfSimulationManager.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmModel.Designer.vb">
-      <DependentUpon>frmModel.vb</DependentUpon>
+    <Compile Include="frmNameScenario.Designer.vb">
+      <DependentUpon>frmNameScenario.vb</DependentUpon>
     </Compile>
-    <Compile Include="frmModel.vb">
+    <Compile Include="frmNameScenario.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmRunHSPF.Designer.vb">
@@ -131,11 +137,14 @@
     <EmbeddedResource Include="ctlSchematic.resx">
       <DependentUpon>ctlSchematic.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmEditWatershed.resx">
+      <DependentUpon>frmEditWatershed.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmHspfSimulationManager.resx">
       <DependentUpon>frmHspfSimulationManager.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmModel.resx">
-      <DependentUpon>frmModel.vb</DependentUpon>
+    <EmbeddedResource Include="frmNameScenario.resx">
+      <DependentUpon>frmNameScenario.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmRunHSPF.resx">
       <DependentUpon>frmRunHSPF.vb</DependentUpon>
