@@ -19,23 +19,23 @@ Module ERGGraph
     'Private pComplianceDate As Integer = 2019
     'Private pSiteName As String = "Black"
     'etowah
-    Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah"
-    'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
-    Private pLocation As Integer = 18 '1 '50 '18
-    Private pStartYearForBaselinePlot As Integer = 2004
-    Private pStartYearForSimulation As Integer = 1982
-    Private pComplianceDate As Integer = 2021
-    Private pSiteName As String = "Etowah"
-    'white
-    'Private Const pTestPath As String = "C:\ERG_SteamElectric\White"
-    'Private pLocation As Integer = 17 
-    'Private pStartYearForBaselinePlot As Integer = 1999
+    'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah"
+    ''Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
+    'Private pLocation As Integer = 18 '1 '50 '18
+    'Private pStartYearForBaselinePlot As Integer = 2004
     'Private pStartYearForSimulation As Integer = 1982
-    'Private pComplianceDate As Integer = 2019
-    'Private pSiteName As String = "White"
+    'Private pComplianceDate As Integer = 2021
+    'Private pSiteName As String = "Etowah"
+    'white
+    Private Const pTestPath As String = "C:\ERG_SteamElectric\White"
+    Private pLocation As Integer = 17
+    Private pStartYearForBaselinePlot As Integer = 1999
+    Private pStartYearForSimulation As Integer = 1982
+    Private pComplianceDate As Integer = 2019
+    Private pSiteName As String = "White"
     'lake sinclair
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\LakeSinclair"
-    'Private pLocation As Integer = 276
+    'Private pLocation As Integer = 276 '699 
     'Private pStartYearForBaselinePlot As Integer = 1999
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2019
@@ -356,6 +356,7 @@ Module ERGGraph
             lCurve = lPane.CurveList.Item(2)
             lCurve.Color = Drawing.Color.LightGray
             lCurve.Color = Drawing.Color.FromKnownColor(Drawing.KnownColor.Gray)
+            lCurve.Color = Drawing.Color.LightBlue
 
             'lZgc.Width = 2400
             lZgc.Width = 1440 'may sacrifice too much resolution doing this?
@@ -704,12 +705,12 @@ Module ERGGraph
             End If
 
             If lNationalModelBaseline > 0 Then
-                If lNationalModelBaseline * 1000 < lPane.YAxis.Scale.Min Then
+                If (lNationalModelBaseline * 1000 < lPane.YAxis.Scale.Min) Then
                     lPane.YAxis.Scale.Min = lNationalModelBaseline * 1000
                 End If
             End If
             If lNationalModelOptionD > 0 Then
-                If lNationalModelOptionD * 1000 < lPane.YAxis.Scale.Min Then
+                If (lNationalModelOptionD * 1000 < lPane.YAxis.Scale.Min) Then
                     lPane.YAxis.Scale.Min = lNationalModelOptionD * 1000
                 End If
             End If
@@ -724,6 +725,30 @@ Module ERGGraph
                 'special case, use 1 log cycle
                 lPane.YAxis.Scale.Min = 0.1
                 lPane.YAxis.Scale.Max = 1
+            ElseIf lPane.YAxis.Scale.Min >= 0.01 And lPane.YAxis.Scale.Min <= 0.1 And _
+               lPane.YAxis.Scale.Max >= 0.01 And lPane.YAxis.Scale.Max <= 0.1 Then
+                'special case, use 1 log cycle
+                lPane.YAxis.Scale.Min = 0.01
+                lPane.YAxis.Scale.Max = 0.1
+            ElseIf lPane.YAxis.Scale.Min >= 10 And lPane.YAxis.Scale.Min <= 100 And _
+                lPane.YAxis.Scale.Max >= 10 And lPane.YAxis.Scale.Max <= 100 Then
+                'special case, use 1 log cycle
+                lPane.YAxis.Scale.Min = 10
+                lPane.YAxis.Scale.Max = 100
+            End If
+
+            If lPane.YAxis.Scale.Min = 0.0 Then
+                'last ditch effort to not have zero at the bottom
+                For Each lCurveX As ZedGraph.LineItem In lPane.CurveList
+                    Dim lxMin As Double
+                    Dim lxMax As Double
+                    Dim lyMin As Double
+                    Dim lyMax As Double
+                    lCurveX.GetRange(lxMin, lxMax, lyMin, lyMax, True, False, lPane)
+                    If lyMin < lPane.YAxis.Scale.Min Then
+                        lPane.YAxis.Scale.Min = lyMin
+                    End If
+                Next
             End If
         Else
             lZgc.Width = 1200
@@ -987,7 +1012,7 @@ Module ERGGraph
                         Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 10 : lSDate(1) = 1 : lSDate(2) = 1
                         If pSiteName = "LakeSinclair" Then
                             'special case -- limited data
-                            lSDate(0) = pComplianceDate - 7 : lSDate(1) = 2 : lSDate(2) = 1
+                            lSDate(0) = pComplianceDate - 7 : lSDate(1) = 2 : lSDate(2) = 2
                         End If
                         Dim lSDateJ As Double = Date2J(lSDate)
                         Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate - 1 : lEDate(1) = 12 : lEDate(2) = 31
@@ -1021,6 +1046,10 @@ Module ERGGraph
                         lTimSerD.Attributes.SetValue("YAxis", "Left")
 
                         Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                        End If
                         Dim lSDateJ As Double = Date2J(lSDate)
                         Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
                         If pSiteName = "LakeSinclair" Then
@@ -1053,6 +1082,10 @@ Module ERGGraph
                         lTimSer2.Attributes.SetValue("YAxis", "Left")
 
                         Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                        End If
                         Dim lSDateJ As Double = Date2J(lSDate)
                         Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
                         If pSiteName = "LakeSinclair" Then
