@@ -26,7 +26,7 @@ SortDownstream:
                 End If
             Next
             For Each lIcon In lModels
-                lstModels.Items.Add(lIcon.WatershedName & ": " & lIcon.UciFileName, lIcon.Selected)
+                lstModels.Items.Add(lIcon, lIcon.Selected)
             Next
         End If
     End Sub
@@ -59,11 +59,35 @@ SortDownstream:
         If lstModels.CheckedItems.Count = 0 Then
             Logger.Msg("No models selected to run", "Run HSPF")
         Else
+CheckUCIExists:
+            Dim lAllUcisMissing As String = String.Empty
+            Dim lAllWDMsWritten As New List(Of String)
+            For Each lIcon As clsIcon In lstModels.CheckedItems
+                If IO.File.Exists(lIcon.UciFileName) Then
+                    lAllWDMsWritten.AddRange(WDMsWritten(lIcon.UciFile))
+                Else
+                    lAllUcisMissing &= lIcon.UciFileName & vbCrLf
+                End If
+            Next
+            If lAllUcisMissing.Length > 0 Then
+                Select Case Logger.Msg(lAllUcisMissing, MsgBoxStyle.AbortRetryIgnore, "UCI File Not Found")
+                    Case MsgBoxResult.Abort : Exit Sub
+                    Case MsgBoxResult.Retry : GoTo CheckUCIExists
+                End Select
+            End If
+
+            Dim lMsg As String = "No output WDM files found"
+            If lAllWDMsWritten.Count > 0 Then
+                lMsg = String.Join(vbCrLf, lAllWDMsWritten.ToArray())
+            End If
+            Select Case Logger.Msg(lMsg, MsgBoxStyle.OkCancel, "WDM Files To Be Written")
+                Case MsgBoxResult.Cancel : Exit Sub
+            End Select
+
             For Each lSelection As String In lstModels.CheckedItems
                 Dim lColonPos As Integer = lSelection.IndexOf(":")
                 If lColonPos >= 0 Then
                     Dim lUCIFilename As String = SafeSubstring(lSelection, lColonPos + 1)
-CheckUCIExists:
                     If FileExists(lUCIFilename) Then
                         RunUCI("WinHSPFlt.exe", lUCIFilename)
                         Dim lUCIFile As atcUCI.HspfUci = OpenUCI(lUCIFilename)
@@ -71,11 +95,6 @@ CheckUCIExists:
                             Logger.Msg(lSelection, MsgBoxStyle.Critical, "HSPF Run Did Not Complete")
                             Exit Sub
                         End If
-                    Else
-                        Select Case Logger.Msg(lUCIFilename, MsgBoxStyle.AbortRetryIgnore, "UCI File Not Found")
-                            Case MsgBoxResult.Abort : Exit Sub
-                            Case MsgBoxResult.Retry : GoTo CheckUCIExists
-                        End Select
                     End If
                 End If
                 lFinishedRunning += 1

@@ -133,7 +133,6 @@ Public Class frmHspfSimulationManager
     End Sub
 
     Private Sub btnRunHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRunHSPF.Click
-        ShowMessageIfNoConnection()
         Dim lRun As New frmRunHSPF
         lRun.Icon = Me.Icon
         lRun.SchematicDiagram = SchematicDiagram

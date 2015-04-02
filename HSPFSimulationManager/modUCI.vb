@@ -35,23 +35,12 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         Return lUCI
     End Function
 
-    Function GetEchoFileName(aUCI As atcUCI.HspfUci) As String
-        Dim lFilesBlock As HspfFilesBlk = aUCI.FilesBlock
-        For lIndex As Integer = 0 To lFilesBlock.Count - 1
-            If lFilesBlock.Value(lIndex).Typ = "MESSU" Then
-                Dim lUCIFileDirectory As String = IO.Path.GetDirectoryName(aUCI.Name)
-                Return AbsolutePath(lFilesBlock.Value(lIndex).Name.Trim(), lUCIFileDirectory)
-                Exit For
-            End If
-        Next
-        Return String.Empty
-    End Function
-
     ''' <summary>
     ''' True if echo file contains "End of Job"
     ''' </summary>
     Function RunComplete(aUCI As atcUCI.HspfUci) As Boolean
-        Dim lEchName As String = GetEchoFileName(aUCI)
+        Dim lUCIFileDirectory As String = IO.Path.GetDirectoryName(aUCI.Name)
+        Dim lEchName As String = AbsolutePath(aUCI.EchoFileName, lUCIFileDirectory)
 
         If Not IO.File.Exists(lEchName) Then
             Return False
@@ -190,6 +179,44 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         Next
 
         Return lConnections
+    End Function
+
+    Public Function WDMsWritten(ByVal aUCI As HspfUci) As List(Of String)
+        Dim lAllWDMs As atcCollection = AllWDMs(aUCI)
+        Dim lWDMsWritten As New List(Of String)
+
+        For Each lSConn As HspfConnection In aUCI.Connections
+            Dim lOutputVol As String = lSConn.Target.VolName
+            If lOutputVol.StartsWith("WDM") Then
+                If lOutputVol = "WDM" Then
+                    lOutputVol = "WDM1"
+                End If
+                'translate wdm id into file name
+                Dim lOutputWDMFileName As String = lAllWDMs.ItemByKey(lOutputVol)
+                If Not lWDMsWritten.Contains(lOutputWDMFileName) Then
+                    lWDMsWritten.Add(lOutputWDMFileName)
+                End If
+            End If
+        Next
+
+        Return lWDMsWritten
+    End Function
+
+    Private Function AllWDMs(aUCI As HspfUci) As atcCollection
+        Dim lAllWDMs As New atcCollection
+        Dim lFileName As String
+        For lIndex As Integer = 1 To aUCI.FilesBlock.Count
+            Dim lFile As HspfFile = aUCI.FilesBlock.Value(lIndex)
+            Dim lFileTyp As String = lFile.Typ
+            If lFileTyp.StartsWith("WDM") Then
+                If lFileTyp = "WDM" Then
+                    lFileTyp = "WDM1"
+                End If
+                lFileName = AbsolutePath(Trim(lFile.Name), PathNameOnly(aUCI.Name)).ToLower
+                lAllWDMs.Add(lFileTyp, lFileName)
+            End If
+        Next
+        Return lAllWDMs
     End Function
 
 End Module
