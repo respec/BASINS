@@ -27,19 +27,19 @@ Module ERGGraph
     'Private pComplianceDate As Integer = 2021
     'Private pSiteName As String = "Etowah"
     'white
-    Private Const pTestPath As String = "C:\ERG_SteamElectric\White"
-    Private pLocation As Integer = 17
-    Private pStartYearForBaselinePlot As Integer = 1999
-    Private pStartYearForSimulation As Integer = 1982
-    Private pComplianceDate As Integer = 2019
-    Private pSiteName As String = "White"
-    'lake sinclair
-    'Private Const pTestPath As String = "C:\ERG_SteamElectric\LakeSinclair"
-    'Private pLocation As Integer = 276 '699 
+    'Private Const pTestPath As String = "C:\ERG_SteamElectric\White"
+    'Private pLocation As Integer = 17
     'Private pStartYearForBaselinePlot As Integer = 1999
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2019
-    'Private pSiteName As String = "LakeSinclair"
+    'Private pSiteName As String = "White"
+    'lake sinclair
+    Private Const pTestPath As String = "C:\ERG_SteamElectric\LakeSinclair"
+    Private pLocation As Integer = 276 '699 
+    Private pStartYearForBaselinePlot As Integer = 2012
+    Private pStartYearForSimulation As Integer = 2012
+    Private pComplianceDate As Integer = 2019
+    Private pSiteName As String = "LakeSinclair"
     'mississippi
     'ohio
 
@@ -48,7 +48,8 @@ Module ERGGraph
         'DoBaselineHistoricGraphsMultipleLocations()
         'DoERGGraphs()
         'ComputeThreeMonthRollingAverages()
-        DoERGCompositeGraph()
+        'DoERGCompositeGraph()
+        DoGraphAtMaxConcLocation()
     End Sub
 
     Private Sub DoERGGraphs()
@@ -544,8 +545,153 @@ Module ERGGraph
                 End If
             ElseIf aSiteName = "Mississippi" Then
                 'numbers still to be copied from spreadsheet
+                If aUnits = "Total" Then
+                    If aRunName = "As" Then
+                        lNationalModelBaseline = 0.000006409
+                    ElseIf aRunName = "Cd" Then
+                        lNationalModelBaseline = 0.0000009284
+                    ElseIf aRunName = "Cu" Then
+                        lNationalModelBaseline = 0.000004338
+                    ElseIf aRunName = "Pb" Then
+                        lNationalModelBaseline = 0.000002844
+                    ElseIf aRunName = "Ni" Then
+                        lNationalModelBaseline = 0.000003492
+                    ElseIf aRunName = "Se" Then
+                        lNationalModelBaseline = 0.000002705
+                    ElseIf aRunName = "Tl" Then
+                        lNationalModelBaseline = 0.000003293
+                    ElseIf aRunName = "Zn" Then
+                        lNationalModelBaseline = 0.000007985
+                    End If
+                Else
+                    'for dissolved
+                    If aRunName = "As" Then
+                        lNationalModelBaseline = 0.000006408
+                    ElseIf aRunName = "Cd" Then
+                        lNationalModelBaseline = 0.0000009281
+                    ElseIf aRunName = "Cu" Then
+                        lNationalModelBaseline = 0.000004336
+                    ElseIf aRunName = "Pb" Then
+                        lNationalModelBaseline = 0.000002843
+                    ElseIf aRunName = "Ni" Then
+                        lNationalModelBaseline = 0.000003491
+                    ElseIf aRunName = "Se" Then
+                        lNationalModelBaseline = 0.000002705
+                    ElseIf aRunName = "Tl" Then
+                        lNationalModelBaseline = 0.000003292
+                    ElseIf aRunName = "Zn" Then
+                        lNationalModelBaseline = 0.000007982
+                    End If
+                End If
             ElseIf aSiteName = "Ohio" Then
-                'numbers still to be copied from spreadsheet
+                'If aUnits = "Total" Then  'for mansfield plant
+                '    If aRunName = "As" Then
+                '        lNationalModelBaseline = 0.000001019
+                '        lNationalModelOptionD = 0.000000271
+                '    ElseIf aRunName = "Cd" Then
+                '        lNationalModelBaseline = 0.000005392
+                '        lNationalModelOptionD = 0.0000001955
+                '    ElseIf aRunName = "Cu" Then
+                '        lNationalModelBaseline = 0.000001755
+                '        lNationalModelOptionD = 0.0000001755
+                '    ElseIf aRunName = "Pb" Then
+                '        lNationalModelBaseline = 0.0000007766
+                '        lNationalModelOptionD = 0.0000001575
+                '    ElseIf aRunName = "Ni" Then
+                '        lNationalModelBaseline = 0.00004363
+                '        lNationalModelOptionD = 0.0000002928
+                '    ElseIf aRunName = "Se" Then
+                '        lNationalModelBaseline = 0.00005458
+                '        lNationalModelOptionD = 0.0000002658
+                '    ElseIf aRunName = "Tl" Then
+                '        lNationalModelBaseline = 0.000003846
+                '        lNationalModelOptionD = 0.0000004555
+                '    ElseIf aRunName = "Zn" Then
+                '        lNationalModelBaseline = 0.00006697
+                '        lNationalModelOptionD = 0.0000009278
+                '    End If
+                'Else
+                '    'for dissolved
+                '    If aRunName = "As" Then
+                '        lNationalModelBaseline = 0.000001018
+                '        lNationalModelOptionD = 0.0000002709
+                '    ElseIf aRunName = "Cd" Then
+                '        lNationalModelBaseline = 0.000005391
+                '        lNationalModelOptionD = 0.0000001955
+                '    ElseIf aRunName = "Cu" Then
+                '        lNationalModelBaseline = 0.000001755
+                '        lNationalModelOptionD = 0.0000001755
+                '    ElseIf aRunName = "Pb" Then
+                '        lNationalModelBaseline = 0.0000007765
+                '        lNationalModelOptionD = 0.0000001575
+                '    ElseIf aRunName = "Ni" Then
+                '        lNationalModelBaseline = 0.00004363
+                '        lNationalModelOptionD = 0.0000002928
+                '    ElseIf aRunName = "Se" Then
+                '        lNationalModelBaseline = 0.00005458
+                '        lNationalModelOptionD = 0.0000002658
+                '    ElseIf aRunName = "Tl" Then
+                '        lNationalModelBaseline = 0.000003846
+                '        lNationalModelOptionD = 0.0000004555
+                '    ElseIf aRunName = "Zn" Then
+                '        lNationalModelBaseline = 0.00006696
+                '        lNationalModelOptionD = 0.0000009277
+                '    End If
+                'End If
+                If aUnits = "Total" Then  'for sammis plant
+                    If aRunName = "As" Then
+                        lNationalModelBaseline = 0.000004733
+                        lNationalModelOptionD = 0.00000007468
+                    ElseIf aRunName = "Cd" Then
+                        lNationalModelBaseline = 0.000001185
+                        lNationalModelOptionD = 0.00000005093
+                    ElseIf aRunName = "Cu" Then
+                        lNationalModelBaseline = 0.000005259
+                        lNationalModelOptionD = 0.00000004754
+                    ElseIf aRunName = "Pb" Then
+                        lNationalModelBaseline = 0.000003959
+                        lNationalModelOptionD = 0.00000004092
+                    ElseIf aRunName = "Ni" Then
+                        lNationalModelBaseline = 0.00002002
+                        lNationalModelOptionD = 0.00000007812
+                    ElseIf aRunName = "Se" Then
+                        lNationalModelBaseline = 0.00001334
+                        lNationalModelOptionD = 0.00000009206
+                    ElseIf aRunName = "Tl" Then
+                        lNationalModelBaseline = 0.00002256
+                        lNationalModelOptionD = 0.0000001179
+                    ElseIf aRunName = "Zn" Then
+                        lNationalModelBaseline = 0.00001628
+                        lNationalModelOptionD = 0.0000002461
+                    End If
+                Else
+                    'for dissolved
+                    If aRunName = "As" Then
+                        lNationalModelBaseline = 0.000004733
+                        lNationalModelOptionD = 0.00000007467
+                    ElseIf aRunName = "Cd" Then
+                        lNationalModelBaseline = 0.000001184
+                        lNationalModelOptionD = 0.00000005093
+                    ElseIf aRunName = "Cu" Then
+                        lNationalModelBaseline = 0.000005259
+                        lNationalModelOptionD = 0.00000004753
+                    ElseIf aRunName = "Pb" Then
+                        lNationalModelBaseline = 0.000003958
+                        lNationalModelOptionD = 0.00000004091
+                    ElseIf aRunName = "Ni" Then
+                        lNationalModelBaseline = 0.00002002
+                        lNationalModelOptionD = 0.00000007812
+                    ElseIf aRunName = "Se" Then
+                        lNationalModelBaseline = 0.00001334
+                        lNationalModelOptionD = 0.00000009205
+                    ElseIf aRunName = "Tl" Then
+                        lNationalModelBaseline = 0.00002256
+                        lNationalModelOptionD = 0.0000001179
+                    ElseIf aRunName = "Zn" Then
+                        lNationalModelBaseline = 0.00001628
+                        lNationalModelOptionD = 0.000000246
+                    End If
+                End If
             End If
 
             If aUnits = "Total" Then
@@ -1131,4 +1277,90 @@ Module ERGGraph
             Return lCurve
         End With
     End Function
+
+    Private Sub DoGraphAtMaxConcLocation()
+        Dim lCsvName As String = ""
+
+        Dim pMetalNames As New atcCollection
+        pMetalNames.Add("As")
+        'pMetalNames.Add("Cd")
+        'pMetalNames.Add("Cu")
+        'pMetalNames.Add("Ni")
+        'pMetalNames.Add("Pb")
+        pMetalNames.Add("Se")
+        'pMetalNames.Add("Tl")
+        'pMetalNames.Add("Zn")
+
+        Dim lRun As String = "BaselineHistoric"
+
+        Dim pTypes As New atcCollection
+        pTypes.Add("Total")
+        'pTypes.Add("Dissolved")
+
+        For Each lType As String In pTypes
+            lCsvName = lType & "_Concentration.csv"
+
+            Dim lTimeseriesGroup As New atcTimeseriesGroup
+
+            ChDriveDir(pTestPath & "\OutputPlots")
+
+            For Each lMetal As String In pMetalNames
+
+                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "MaxConc" & ".png"
+
+                If Not FileExists(lOutFileName) Then
+                    'get baseline historic data
+                    Dim lTimeseriesCsv1 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    Dim lRunName As String = lMetal & lRun
+                    Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
+                    If lTimeseriesCsv1.Open(lCsvFileName) Then
+
+                        'determine location of maximum concentration
+                        Dim lMaxVal As Double = -1.0
+                        Dim lMaxLoc As Integer = 0
+
+                        For lIndex As Integer = 1 To lTimeseriesCsv1.DataSets.Count
+                            Dim lTimeseries As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(lIndex)
+                            If lTimeseries.Attributes.GetValue("Max") > lMaxVal Then
+                                lMaxVal = lTimeseries.Attributes.GetValue("Max")
+                                lMaxLoc = lIndex
+                            End If
+                        Next
+
+                        Dim lTimSer1 As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(lMaxLoc)
+                        pLocation = lMaxLoc
+
+                        lTimSer1.Attributes.SetValue("YAxis", "Left")
+
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 10 : lSDate(1) = 1 : lSDate(2) = 1
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate - 7 : lSDate(1) = 2 : lSDate(2) = 2
+                        End If
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate - 1 : lEDate(1) = 12 : lEDate(2) = 31
+                        Dim lEdatej As Double = Date2J(lEDate)
+
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSer1, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv1.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    GraphTimeseriesBaselineHistoric(lTimeseriesGroup, lRunName, lOutFileName)
+
+                    lTimeseriesGroup.Clear()
+                End If
+
+            Next
+        Next
+    End Sub
+
 End Module
