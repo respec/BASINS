@@ -126,6 +126,9 @@ Friend Class ctlSchematic
                 DrawTreeBackground()
             End If
             'SetScrollVisible()
+            Visible = True
+        Else
+            Visible = False
         End If
     End Sub
 
@@ -413,7 +416,11 @@ Friend Class ctlSchematic
             aIcon.Font.Dispose()
             aIcon.Font = New Font("Microsoft Sans Serif", 8.25)
         End If
-        lLabel = aIcon.Scenario.ScenarioName
+        If aIcon.Scenario Is Nothing Then
+            lLabel = "No Scenario"
+        Else
+            lLabel = aIcon.Scenario.ScenarioName
+        End If
 
         lStringMeasurement = g.MeasureString(lLabel, aIcon.Font)
         While lStringMeasurement.Width > IconWidth
@@ -684,6 +691,7 @@ Friend Class ctlSchematic
                 'If lSender.Label <> lSender.Key Then RightClickMenu.MenuItems.Add("""" & lSender.Label & """")
                 If lIcon.DistanceFromOutlet > 1 Then
                     RightClickMenu.MenuItems.Add("Select Downstream", AddressOf Event_SelectDownstream)
+                    RightClickMenu.MenuItems.Add("Downstream Connection Report", AddressOf Event_DownstreamReport)
                 End If
                 If lIcon.UpstreamIcons.Count > 0 Then
                     RightClickMenu.MenuItems.Add("Select Upstream", AddressOf Event_SelectUpstream)
@@ -710,7 +718,7 @@ Friend Class ctlSchematic
     ''' <returns>True if icon was removed, False if icon was not removed</returns>
     ''' <remarks>pClickedIcon is cleared if that was the one removed</remarks>
     Public Function RemoveIconAfterAsking(aIcon As clsIcon) As Boolean
-        If Logger.Msg("Remove watershed " & aIcon.WatershedName & "?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+        If Logger.Msg("Remove this watershed """ & aIcon.WatershedName & """?", MsgBoxStyle.YesNo, frmHspfSimulationManager.g_AppNameLong) = MsgBoxResult.Yes Then
             AllIcons.Remove(aIcon)
             RemoveIconHandlers(aIcon)
 
@@ -802,6 +810,50 @@ Friend Class ctlSchematic
         End If
     End Sub
 
+    Private Sub Event_DownstreamReport(ByVal sender As Object, ByVal e As System.EventArgs)
+        Me.ParentForm.Enabled = False
+        Me.ParentForm.Cursor = Cursors.WaitCursor
+        Try
+            Dim lReport As String = frmHspfSimulationManager.g_AppNameLong & " Connection Report" & vbCrLf
+            If pClickedIcon.Scenario Is Nothing Then
+                lReport &= vbCrLf & pClickedIcon.WatershedName & ": No Scenario"
+            Else
+                lReport &= vbCrLf & pClickedIcon.WatershedName & ": " & pClickedIcon.Scenario.ScenarioName & vbCrLf
+                Dim lNewDownstreamIcon As clsIcon = pClickedIcon.DownstreamIcon
+                Dim lUciFileName As String = pClickedIcon.Scenario.UciFileName
+
+                Dim lUpstreamUCI As atcUCI.HspfUci = pClickedIcon.UciFile
+                If lUpstreamUCI Is Nothing Then
+                    lReport &= "UCI file not found: " & lUciFileName & vbCrLf
+                ElseIf lNewDownstreamIcon Is Nothing Then
+                    lReport &= "No downstream watershed specified"
+                Else
+                    Dim lDownstreamUCI As atcUCI.HspfUci = lNewDownstreamIcon.UciFile
+                    If lDownstreamUCI Is Nothing Then
+                        lReport &= "Upstream UCI file: " & vbCrLf & pClickedIcon.Scenario.UciFileName & vbCrLf
+                        lReport &= "Downstream UCI file not found: " & lNewDownstreamIcon.UciFileName & vbCrLf
+                    Else
+                        lReport &= "To: " & lNewDownstreamIcon.WatershedName & ", " & lNewDownstreamIcon.Scenario.ScenarioName & vbCrLf & vbCrLf
+
+                        lReport &= ConnectionReport(lUpstreamUCI, lDownstreamUCI)
+                    End If
+                End If
+            End If
+
+            If lReport.Length > 0 Then
+                Dim lText As New frmText
+                lText.Icon = Me.ParentForm.Icon
+                lText.Text = frmHspfSimulationManager.g_AppNameLong & " Connection Report"
+                lText.txtMain.Text = lReport
+                lText.Show()
+            End If
+        Catch ex As Exception
+            Logger.Msg("Could not generate downstream report: " & vbCrLf & e.ToString, MsgBoxStyle.Critical, frmHspfSimulationManager.g_AppNameLong)
+        End Try
+        Me.ParentForm.Cursor = Cursors.Default
+        Me.ParentForm.Enabled = True
+    End Sub
+
     Private Sub Event_SelectDownstream(ByVal sender As Object, ByVal e As System.EventArgs)
         SelectDownstreamIcons(True, pClickedIcon)
         DrawTreeBackground()
@@ -854,13 +906,13 @@ Friend Class ctlSchematic
         End Select
     End Sub
 
-    Private Sub ctlSchematic_DragDrop(sender As Object, e As DragEventArgs) Handles Me.DragDrop
+    Friend Sub ctlSchematic_DragDrop(sender As Object, e As DragEventArgs) Handles Me.DragDrop
         If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            ParentForm.BringToFront()
             For Each lFileName As String In e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
-                Select Case MsgBox("Add new watershed for UCI file " & lFileName & " ?", MsgBoxStyle.YesNoCancel, frmHspfSimulationManager.g_AppNameLong)
-                    Case MsgBoxResult.Yes
+                Select Case Logger.MsgCustomOwned("Add new watershed for UCI file " & lFileName & " ?", frmHspfSimulationManager.g_AppNameLong, ParentForm, "Yes", "No", "Cancel")
+                    Case "Yes"
                         Dim lIcon = AllIcons.FindOrAddIcon(IO.Path.GetFileNameWithoutExtension(lFileName))
-                        lIcon.UciFileName = lFileName
                         If lIcon.Left = 0 AndAlso lIcon.Top = 0 Then
                             Dim lOffset As Drawing.Point = Me.PointToScreen(New Drawing.Point(0, 0))
                             lIcon.Left = e.X - lOffset.X - IconWidth / 2
@@ -878,18 +930,24 @@ Friend Class ctlSchematic
                             End If
                         End If
 
+                        Dim lNewScenario As New clsUciScenario(lFileName, "")
+                        Dim lNameScenario As New frmNameScenario
+                        lNameScenario.Icon = ParentForm.Icon
+                        lNameScenario.AskUser(lNewScenario, AllScenarioNames)
+                        lIcon.Scenario = lNewScenario
+
                         Dim lWatershedForm As New frmEditWatershed
                         lWatershedForm.Schematic = Me
                         lWatershedForm.ModelIcon = lIcon
                         lWatershedForm.Show()
-                    Case MsgBoxResult.Cancel
+                    Case "Cancel"
                         Exit For
                 End Select
             Next
         End If
     End Sub
 
-    Private Sub ctlSchematic_DragEnter(sender As Object, e As DragEventArgs) Handles Me.DragEnter
+    Friend Sub ctlSchematic_DragEnter(sender As Object, e As DragEventArgs) Handles Me.DragEnter
         If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
             Dim lFileNames() As String = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
             If lFileNames.Length > 0 AndAlso lFileNames(0).ToLower.EndsWith(".uci") Then

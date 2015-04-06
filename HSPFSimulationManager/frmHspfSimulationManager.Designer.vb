@@ -28,21 +28,20 @@ Partial Class frmHspfSimulationManager
         Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddWatershedToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ConnectionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.FullReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ReportOnEditsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMain = New System.Windows.Forms.ToolStrip()
         Me.btnRunHSPF = New System.Windows.Forms.ToolStripButton()
-        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.btnConnectionReport = New System.Windows.Forms.ToolStripButton()
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStripMain.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.ConnectionsToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(931, 24)
@@ -74,6 +73,12 @@ Partial Class frmHspfSimulationManager
         Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.SaveToolStripMenuItem.Text = "Save"
         '
+        'CloseToolStripMenuItem
+        '
+        Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
+        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.CloseToolStripMenuItem.Text = "Close"
+        '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
@@ -86,30 +91,10 @@ Partial Class frmHspfSimulationManager
         Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.ExitToolStripMenuItem.Text = "Exit"
         '
-        'ConnectionsToolStripMenuItem
-        '
-        Me.ConnectionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FullReportToolStripMenuItem, Me.ReportOnEditsToolStripMenuItem})
-        Me.ConnectionsToolStripMenuItem.Name = "ConnectionsToolStripMenuItem"
-        Me.ConnectionsToolStripMenuItem.Size = New System.Drawing.Size(78, 20)
-        Me.ConnectionsToolStripMenuItem.Text = "Connections"
-        '
-        'FullReportToolStripMenuItem
-        '
-        Me.FullReportToolStripMenuItem.Name = "FullReportToolStripMenuItem"
-        Me.FullReportToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.FullReportToolStripMenuItem.Text = "Full Report"
-        '
-        'ReportOnEditsToolStripMenuItem
-        '
-        Me.ReportOnEditsToolStripMenuItem.Checked = True
-        Me.ReportOnEditsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.ReportOnEditsToolStripMenuItem.Name = "ReportOnEditsToolStripMenuItem"
-        Me.ReportOnEditsToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.ReportOnEditsToolStripMenuItem.Text = "Report On Edits"
-        '
         'ToolStripMain
         '
-        Me.ToolStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btnRunHSPF})
+        Me.ToolStripMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.ToolStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btnRunHSPF, Me.ToolStripSeparator1, Me.btnConnectionReport})
         Me.ToolStripMain.Location = New System.Drawing.Point(0, 24)
         Me.ToolStripMain.Name = "ToolStripMain"
         Me.ToolStripMain.Size = New System.Drawing.Size(931, 25)
@@ -125,20 +110,31 @@ Partial Class frmHspfSimulationManager
         Me.btnRunHSPF.Size = New System.Drawing.Size(58, 22)
         Me.btnRunHSPF.Text = "Run HSPF"
         '
-        'CloseToolStripMenuItem
+        'ToolStripSeparator1
         '
-        Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
-        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.CloseToolStripMenuItem.Text = "Close"
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(6, 25)
+        '
+        'btnConnectionReport
+        '
+        Me.btnConnectionReport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.btnConnectionReport.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.btnConnectionReport.Name = "btnConnectionReport"
+        Me.btnConnectionReport.Size = New System.Drawing.Size(101, 22)
+        Me.btnConnectionReport.Text = "Connection Report"
         '
         'frmHspfSimulationManager
         '
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.BackColor = System.Drawing.Color.White
+        Me.BackgroundImage = Global.HSPFSimulationManager.My.Resources.Resources.transparent177x121
+        Me.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
         Me.ClientSize = New System.Drawing.Size(931, 642)
         Me.Controls.Add(Me.ToolStripMain)
         Me.Controls.Add(Me.MenuStrip1)
+        Me.DoubleBuffered = True
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmHspfSimulationManager"
@@ -160,9 +156,8 @@ Partial Class frmHspfSimulationManager
     Friend WithEvents ToolStripMain As System.Windows.Forms.ToolStrip
     Friend WithEvents btnRunHSPF As System.Windows.Forms.ToolStripButton
     Friend WithEvents AddWatershedToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ConnectionsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents FullReportToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ReportOnEditsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents CloseToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents btnConnectionReport As System.Windows.Forms.ToolStripButton
 
 End Class

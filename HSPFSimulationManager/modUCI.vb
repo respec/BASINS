@@ -114,36 +114,10 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
     End Function
 
     Public Function ConnectionSummary(ByVal aSourceUCI As HspfUci, ByVal aTargetUCI As HspfUci) As List(Of String)
+        Dim lSourceWDMs As atcCollection = AllWDMs(aSourceUCI)
+        Dim lTargetWDMs As atcCollection = AllWDMs(aTargetUCI)
+
         Dim lConnections As New List(Of String)
-        Dim lFileName As String = ""
-
-        'build collection of wdms used by source uci 
-        Dim lSourceWDMs As New atcCollection
-        For lIndex As Integer = 1 To aSourceUCI.FilesBlock.Count
-            Dim lFile As HspfFile = aSourceUCI.FilesBlock.Value(lIndex)
-            Dim lFileTyp As String = lFile.Typ
-            If lFileTyp.StartsWith("WDM") Then
-                If lFileTyp = "WDM" Then
-                    lFileTyp = "WDM1"
-                End If
-                lFileName = AbsolutePath(Trim(lFile.Name), PathNameOnly(aSourceUCI.Name)).ToLower
-                lSourceWDMs.Add(lFileTyp, lFileName) 'todo: make standard full path 
-            End If
-        Next
-
-        'build collection of wdms used by target uci
-        Dim lTargetWDMs As New atcCollection
-        For lIndex As Integer = 1 To aTargetUCI.FilesBlock.Count
-            Dim lFile As HspfFile = aTargetUCI.FilesBlock.Value(lIndex)
-            Dim lFileTyp As String = lFile.Typ
-            If lFileTyp.StartsWith("WDM") Then
-                If lFileTyp = "WDM" Then
-                    lFileTyp = "WDM1"
-                End If
-                lFileName = AbsolutePath(Trim(lFile.Name), PathNameOnly(aTargetUCI.Name)).ToLower
-                lTargetWDMs.Add(lFileTyp, lFileName) 'todo: make standard full path 
-            End If
-        Next
 
         For Each lSConn As HspfConnection In aSourceUCI.Connections
             Dim lOutputVol As String = lSConn.Target.VolName

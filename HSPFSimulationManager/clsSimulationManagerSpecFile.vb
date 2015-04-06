@@ -84,6 +84,10 @@ Public Class clsSimulationManagerSpecFile
     End Function
 
     Friend Shared Sub Save(ByVal aSaveIcons As IconCollection, ByVal aWindowSize As Drawing.Size, ByVal aIconSize As Drawing.Size, ByVal aFileName As String)
+        If aSaveIcons.Count = 0 Then
+            Logger.Msg("There is nothing to save.", MsgBoxStyle.Critical, frmHspfSimulationManager.g_AppNameLong)
+            Exit Sub
+        End If
         Dim lWriter As New IO.StreamWriter(aFileName)
         lWriter.WriteLine(FileHeader)
         lWriter.WriteLine("WindowSize" & vbTab & aWindowSize.Width & "," & aWindowSize.Height)
@@ -131,9 +135,9 @@ Public Class clsSimulationManagerSpecFile
                 Else
                     lWriter.WriteLine("DownstreamName" & vbTab & lIcon.DownstreamIcon.WatershedName)
                 End If
-
-                lWriter.WriteLine("Scenario" & vbTab & lIcon.Scenario.ScenarioName & "|" & RemoveBasePath(lIcon.Scenario.UciFileName, lBasePath))
-
+                If lIcon.Scenario IsNot Nothing Then
+                    lWriter.WriteLine("Scenario" & vbTab & lIcon.Scenario.ScenarioName & "|" & RemoveBasePath(lIcon.Scenario.UciFileName, lBasePath))
+                End If
                 If lIcon.Scenarios.Count > 1 Then
                     Dim lScenariosString As String = ""
                     For Each lScenario As clsUciScenario In lIcon.Scenarios

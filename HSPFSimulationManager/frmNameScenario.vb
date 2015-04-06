@@ -9,6 +9,10 @@
         Return Me.ShowDialog() = Windows.Forms.DialogResult.OK
     End Function
 
+    Private Sub lstExistingScenarioNames_DoubleClick(sender As Object, e As EventArgs) Handles lstExistingScenarioNames.DoubleClick
+        btnOk_Click(Nothing, Nothing)
+    End Sub
+
     Private Sub lstExistingScenarioNames_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstExistingScenarioNames.SelectedIndexChanged
         ScenarioName = lstExistingScenarioNames.SelectedItem
         txtNewScenarioName.Text = ScenarioName
