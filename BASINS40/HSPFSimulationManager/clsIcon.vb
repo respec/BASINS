@@ -9,7 +9,7 @@ Public Enum EnumLegendType
 End Enum
 
 Public Class clsUciScenario
-    Implements IComparable
+    Implements IComparable, ICloneable
 
     Public ScenarioName As String
     Public UciFileName As String
@@ -27,6 +27,16 @@ Public Class clsUciScenario
             Throw New ApplicationException("Expected one pipe delimiter in scenario specification: " & aScenarioSpecification)
         End If
     End Sub
+
+    Private Sub New(aScenarioName As String, aUciFileName As String, aUciFile As atcUCI.HspfUci)
+        ScenarioName = aScenarioName
+        UciFileName = aUciFileName
+        pUciFile = aUciFile
+    End Sub
+
+    Public Function Clone() As Object Implements ICloneable.Clone
+        Return New clsUciScenario(ScenarioName, UciFileName, pUciFile)
+    End Function
 
     Public Overrides Function ToString() As String
         Return ScenarioName & " (" & UciFileName & ")"
@@ -59,6 +69,7 @@ Public Class clsUciScenario
         End If
         Return pUciFile
     End Function
+
 End Class
 
 Public Class clsIcon
@@ -100,7 +111,11 @@ Public Class clsIcon
 
     Public Property UciFileName() As String
         Get
-            Return pScenario.UciFileName
+            If Scenario Is Nothing Then
+                Return "None"
+            Else
+                Return pScenario.UciFileName
+            End If
         End Get
         Set(value As String)
             Dim lValue As String = value.ToLower
@@ -110,6 +125,7 @@ Public Class clsIcon
                     Exit Property
                 End If
             Next
+
             Dim lScenarioName As String = IO.Path.GetFileNameWithoutExtension(value) ' InputBox("Enter Scenario Name for this UCI file", frmHspfSimulationManager.g_AppNameLong, IO.Path.GetFileNameWithoutExtension(value))
             Scenario = New clsUciScenario(lScenarioName & "|" & value, "")
         End Set
@@ -151,7 +167,11 @@ Public Class clsIcon
     End Sub
 
     Public Function UciFile() As atcUCI.HspfUci
-        Return Scenario.UciFile
+        If Scenario Is Nothing Then
+            Return Nothing
+        Else
+            Return Scenario.UciFile
+        End If
     End Function
 
 End Class

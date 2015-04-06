@@ -14,7 +14,7 @@ Public Class frmEditWatershed
 
             Dim lUciFileNames As String = ""
             For Each lScenario As clsUciScenario In value.Scenarios
-                lstScenarios.Items.Add(lScenario)
+                lstScenarios.Items.Add(lScenario.Clone())
                 If lScenario.UciFileName = pIcon.UciFileName Then
                     lstScenarios.SelectedIndex = lstScenarios.Items.Count - 1
                 End If
@@ -42,7 +42,9 @@ Public Class frmEditWatershed
         Get
             pIcon.WatershedName = txtName.Text
             pIcon.Scenarios.Clear()
-            pIcon.Scenario = lstScenarios.SelectedItem
+            If lstScenarios.SelectedItem IsNot Nothing Then
+                pIcon.Scenario = lstScenarios.SelectedItem
+            End If
             For Each lScenario As clsUciScenario In lstScenarios.Items
                 pIcon.ScenariosAdd(lScenario)
             Next
@@ -82,11 +84,12 @@ Public Class frmEditWatershed
     End Sub
 
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
+        Try
+            Schematic.AllIcons.Remove(pIcon)
+        Catch
+        End Try
         pIcon = Me.ModelIcon 'Apply changes to icon
-        If Not Schematic.AllIcons.Contains(pIcon) Then
-            'Make sure this icon is on the schematic
-            Schematic.AllIcons.Add(pIcon)
-        End If
+        Schematic.AllIcons.Add(pIcon)
         Schematic.BuildTree(Schematic.AllIcons)
         Me.Close()
     End Sub
@@ -104,8 +107,7 @@ Public Class frmEditWatershed
     Private Sub btnAddScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAddScenario.Click
         Dim lFileName As String = String.Empty
         If frmHspfSimulationManager.BrowseOpen("Open UCI File", "UCI Files|*.uci|All Files|*.*", ".uci", Me, lFileName) Then
-            lstScenarios.Items.Add(New clsUciScenario(lFileName, ""))
-            lstScenarios.SelectedIndex = lstScenarios.Items.Count - 1
+            AddNewScenario(lFileName)
         End If
     End Sub
 
@@ -130,31 +132,35 @@ Public Class frmEditWatershed
     Private Sub btnConnectionReport_Click(sender As Object, e As EventArgs) Handles btnConnectionReport.Click
         Me.Enabled = False
         Me.Cursor = Cursors.WaitCursor
-        Dim lReport As String = frmHspfSimulationManager.g_AppNameLong & " Connection Report" & vbCrLf
-        lReport &= vbCrLf & txtName.Text & ", " & lstScenarios.SelectedItem.ScenarioName & vbCrLf
-        Dim lNewDownstreamIcon As clsIcon = CurrentlySelectedDownstreamIcon()
-
-        Dim lUciFileName As String = lstScenarios.SelectedItem.UciFileName
-
-        Dim lUpstreamUCI As atcUCI.HspfUci = Nothing
-        If lUciFileName.ToLower.Equals(pIcon.UciFileName.ToLower) Then
-            lUpstreamUCI = pIcon.UciFile
+        Dim lReport As String = frmHspfSimulationManager.g_AppNameLong & " Connection Report" & vbCrLf & vbCrLf & txtName.Text & ": "
+        If lstScenarios.SelectedItem Is Nothing Then
+            lReport &= "No Scenario"
         Else
-            lUpstreamUCI = OpenUCI(lUciFileName)
-        End If
-        If lUpstreamUCI Is Nothing Then
-            lReport &= "UCI file not found: " & lUciFileName & vbCrLf
-        ElseIf lNewDownstreamIcon Is Nothing Then
-            lReport &= "No downstream watershed specified"
-        Else
-            Dim lDownstreamUCI As atcUCI.HspfUci = lNewDownstreamIcon.UciFile
-            If lDownstreamUCI Is Nothing Then
-                lReport &= "Upstream UCI file: " & vbCrLf & lstScenarios.Text & vbCrLf
-                lReport &= "Downstream UCI file not found: " & lNewDownstreamIcon.UciFileName & vbCrLf
+            lReport &= lstScenarios.SelectedItem.ScenarioName & vbCrLf
+            Dim lNewDownstreamIcon As clsIcon = CurrentlySelectedDownstreamIcon()
+
+            Dim lUciFileName As String = lstScenarios.SelectedItem.UciFileName
+
+            Dim lUpstreamUCI As atcUCI.HspfUci = Nothing
+            If lUciFileName.ToLower.Equals(pIcon.UciFileName.ToLower) Then
+                lUpstreamUCI = pIcon.UciFile
             Else
-                lReport &= "To: " & lNewDownstreamIcon.WatershedName & ", " & lNewDownstreamIcon.Scenario.ScenarioName & vbCrLf & vbCrLf
+                lUpstreamUCI = OpenUCI(lUciFileName)
+            End If
+            If lUpstreamUCI Is Nothing Then
+                lReport &= "UCI file not found: " & lUciFileName & vbCrLf
+            ElseIf lNewDownstreamIcon Is Nothing Then
+                lReport &= "No downstream watershed specified"
+            Else
+                Dim lDownstreamUCI As atcUCI.HspfUci = lNewDownstreamIcon.UciFile
+                If lDownstreamUCI Is Nothing Then
+                    lReport &= "Upstream UCI file: " & vbCrLf & lstScenarios.Text & vbCrLf
+                    lReport &= "Downstream UCI file not found: " & lNewDownstreamIcon.UciFileName & vbCrLf
+                Else
+                    lReport &= "To: " & lNewDownstreamIcon.WatershedName & ", " & lNewDownstreamIcon.Scenario.ScenarioName & vbCrLf & vbCrLf
 
-                lReport &= ConnectionReport(lUpstreamUCI, lDownstreamUCI)
+                    lReport &= ConnectionReport(lUpstreamUCI, lDownstreamUCI)
+                End If
             End If
         End If
 
@@ -169,18 +175,30 @@ Public Class frmEditWatershed
         Me.Enabled = True
     End Sub
 
+    Private Sub AddNewScenario(aUciFileName As String)
+        Dim lNewScenario As New clsUciScenario(aUciFileName, "")
+        Dim lNameScenario As New frmNameScenario
+        lNameScenario.Icon = Me.Icon
+        If lNameScenario.AskUser(lNewScenario, Schematic.AllScenarioNames) Then
+            lstScenarios.Items.Add(lNewScenario)
+            lstScenarios.SelectedIndex = lstScenarios.Items.Count - 1
+        End If
+    End Sub
+
     Private Sub frmModel_DragDrop(sender As Object, e As DragEventArgs) Handles Me.DragDrop
         If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
             For Each lFileName As String In e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
 
                 Select Case IO.Path.GetExtension(lFileName).ToLower
                     Case ".uci"
-                        For Each lExistingScenario As clsUciScenario In lstScenarios.Items
-                            If lExistingScenario.UciFileName.ToLower.Equals(lFileName.ToLower) Then GoTo NextFile
-                        Next
-                        lstScenarios.Items.Add(New clsUciScenario(lFileName, ""))
-                        lstScenarios.SelectedIndex = lstScenarios.Items.Count - 1
-
+                        'commented out to allow adding same UCI again and giving it a new scenario name
+                        'For Each lExistingScenario As clsUciScenario In lstScenarios.Items
+                        '    If lExistingScenario.UciFileName.ToLower.Equals(lFileName.ToLower) Then
+                        '        lstScenarios.SelectedItem = lExistingScenario
+                        '        GoTo NextFile
+                        '    End If
+                        'Next
+                        AddNewScenario(lFileName)
                     Case ".png", ".jpg", ".gif"
                         btnImage.Text = lFileName
                         btnImage.BackgroundImage = Drawing.Image.FromFile(lFileName)
@@ -204,11 +222,12 @@ NextFile:
     End Sub
 
     Private Sub btnRenameScenario_Click(sender As Object, e As EventArgs) Handles btnRenameScenario.Click
-        Dim lNameScenario As New frmNameScenario
         Dim lScenario As clsUciScenario = lstScenarios.SelectedItem
         If lScenario Is Nothing Then
             Logger.Msg("Select a scenario UCI file before Renaming", MsgBoxStyle.OkOnly, frmHspfSimulationManager.g_AppNameLong)
         Else
+            Dim lNameScenario As New frmNameScenario
+            lNameScenario.Icon = Me.Icon
             If lNameScenario.AskUser(lScenario, Schematic.AllScenarioNames) Then
                 Dim lSelectedIndex As Integer = lstScenarios.SelectedIndex
                 lstScenarios.Items.RemoveAt(lSelectedIndex)

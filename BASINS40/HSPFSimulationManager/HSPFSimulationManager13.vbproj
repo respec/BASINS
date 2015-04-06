@@ -171,6 +171,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\transparent177x121.png" />
     <Content Include="SARA.ico" />
   </ItemGroup>
   <ItemGroup>

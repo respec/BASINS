@@ -32,7 +32,7 @@ Partial Class frmRunHSPF
         Me.lstModels.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstModels.FormattingEnabled = True
+        Me.lstModels.CheckOnClick = True
         Me.lstModels.IntegralHeight = False
         Me.lstModels.Location = New System.Drawing.Point(12, 25)
         Me.lstModels.Name = "lstModels"

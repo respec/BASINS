@@ -43,21 +43,21 @@ Partial Class frmEditWatershed
         'btnAddScenario
         '
         Me.btnAddScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnAddScenario.Location = New System.Drawing.Point(115, 175)
+        Me.btnAddScenario.Location = New System.Drawing.Point(115, 193)
         Me.btnAddScenario.Name = "btnAddScenario"
-        Me.btnAddScenario.Size = New System.Drawing.Size(54, 20)
-        Me.btnAddScenario.TabIndex = 4
+        Me.btnAddScenario.Size = New System.Drawing.Size(54, 23)
+        Me.btnAddScenario.TabIndex = 5
         Me.btnAddScenario.Text = "Add"
         Me.btnAddScenario.UseVisualStyleBackColor = True
         '
         'lblUCIFile
         '
         Me.lblUCIFile.AutoSize = True
-        Me.lblUCIFile.Location = New System.Drawing.Point(12, 91)
+        Me.lblUCIFile.Location = New System.Drawing.Point(12, 94)
         Me.lblUCIFile.Name = "lblUCIFile"
-        Me.lblUCIFile.Size = New System.Drawing.Size(89, 13)
+        Me.lblUCIFile.Size = New System.Drawing.Size(95, 13)
         Me.lblUCIFile.TabIndex = 24
-        Me.lblUCIFile.Text = "Scenario UCI File"
+        Me.lblUCIFile.Text = "Scenario (UCI File)"
         '
         'lblDownstream
         '
@@ -94,10 +94,10 @@ Partial Class frmEditWatershed
         Me.btnImage.AutoSize = True
         Me.btnImage.BackColor = System.Drawing.SystemColors.ButtonFace
         Me.btnImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
-        Me.btnImage.Location = New System.Drawing.Point(115, 201)
+        Me.btnImage.Location = New System.Drawing.Point(115, 222)
         Me.btnImage.Name = "btnImage"
         Me.btnImage.Size = New System.Drawing.Size(164, 155)
-        Me.btnImage.TabIndex = 6
+        Me.btnImage.TabIndex = 8
         Me.btnImage.TextAlign = System.Drawing.ContentAlignment.BottomCenter
         Me.btnImage.UseVisualStyleBackColor = False
         '
@@ -105,10 +105,10 @@ Partial Class frmEditWatershed
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnOk.AutoSize = True
-        Me.btnOk.Location = New System.Drawing.Point(15, 362)
+        Me.btnOk.Location = New System.Drawing.Point(15, 383)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(84, 23)
-        Me.btnOk.TabIndex = 7
+        Me.btnOk.TabIndex = 9
         Me.btnOk.Text = "Ok"
         Me.btnOk.UseVisualStyleBackColor = True
         '
@@ -116,10 +116,10 @@ Partial Class frmEditWatershed
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.AutoSize = True
-        Me.btnCancel.Location = New System.Drawing.Point(105, 362)
+        Me.btnCancel.Location = New System.Drawing.Point(105, 383)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(84, 23)
-        Me.btnCancel.TabIndex = 8
+        Me.btnCancel.TabIndex = 10
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
@@ -127,7 +127,7 @@ Partial Class frmEditWatershed
         '
         Me.lblWatershedImage.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblWatershedImage.AutoSize = True
-        Me.lblWatershedImage.Location = New System.Drawing.Point(12, 270)
+        Me.lblWatershedImage.Location = New System.Drawing.Point(12, 291)
         Me.lblWatershedImage.Name = "lblWatershedImage"
         Me.lblWatershedImage.Size = New System.Drawing.Size(91, 13)
         Me.lblWatershedImage.TabIndex = 36
@@ -136,10 +136,10 @@ Partial Class frmEditWatershed
         'btnRemoveScenario
         '
         Me.btnRemoveScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRemoveScenario.Location = New System.Drawing.Point(175, 175)
+        Me.btnRemoveScenario.Location = New System.Drawing.Point(175, 193)
         Me.btnRemoveScenario.Name = "btnRemoveScenario"
-        Me.btnRemoveScenario.Size = New System.Drawing.Size(64, 20)
-        Me.btnRemoveScenario.TabIndex = 5
+        Me.btnRemoveScenario.Size = New System.Drawing.Size(64, 23)
+        Me.btnRemoveScenario.TabIndex = 6
         Me.btnRemoveScenario.Text = "Remove"
         Me.btnRemoveScenario.UseVisualStyleBackColor = True
         '
@@ -157,8 +157,8 @@ Partial Class frmEditWatershed
         '
         Me.btnConnectionReport.Location = New System.Drawing.Point(115, 65)
         Me.btnConnectionReport.Name = "btnConnectionReport"
-        Me.btnConnectionReport.Size = New System.Drawing.Size(192, 20)
-        Me.btnConnectionReport.TabIndex = 37
+        Me.btnConnectionReport.Size = New System.Drawing.Size(192, 23)
+        Me.btnConnectionReport.TabIndex = 3
         Me.btnConnectionReport.Text = "Downstream Connection Report"
         Me.btnConnectionReport.UseVisualStyleBackColor = True
         '
@@ -166,10 +166,10 @@ Partial Class frmEditWatershed
         '
         Me.btnRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnRemove.AutoSize = True
-        Me.btnRemove.Location = New System.Drawing.Point(195, 362)
+        Me.btnRemove.Location = New System.Drawing.Point(195, 383)
         Me.btnRemove.Name = "btnRemove"
         Me.btnRemove.Size = New System.Drawing.Size(112, 23)
-        Me.btnRemove.TabIndex = 38
+        Me.btnRemove.TabIndex = 11
         Me.btnRemove.Text = "Remove Watershed"
         Me.btnRemove.UseVisualStyleBackColor = True
         '
@@ -178,20 +178,19 @@ Partial Class frmEditWatershed
         Me.lstScenarios.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstScenarios.FormattingEnabled = True
         Me.lstScenarios.IntegralHeight = False
-        Me.lstScenarios.Location = New System.Drawing.Point(115, 91)
+        Me.lstScenarios.Location = New System.Drawing.Point(115, 94)
         Me.lstScenarios.Name = "lstScenarios"
-        Me.lstScenarios.Size = New System.Drawing.Size(543, 78)
-        Me.lstScenarios.TabIndex = 39
+        Me.lstScenarios.Size = New System.Drawing.Size(543, 93)
+        Me.lstScenarios.TabIndex = 4
         '
         'btnRenameScenario
         '
         Me.btnRenameScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRenameScenario.Location = New System.Drawing.Point(245, 175)
+        Me.btnRenameScenario.Location = New System.Drawing.Point(245, 193)
         Me.btnRenameScenario.Name = "btnRenameScenario"
-        Me.btnRenameScenario.Size = New System.Drawing.Size(64, 20)
-        Me.btnRenameScenario.TabIndex = 40
+        Me.btnRenameScenario.Size = New System.Drawing.Size(64, 23)
+        Me.btnRenameScenario.TabIndex = 7
         Me.btnRenameScenario.Text = "Rename"
         Me.btnRenameScenario.UseVisualStyleBackColor = True
         '
@@ -200,7 +199,7 @@ Partial Class frmEditWatershed
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(670, 397)
+        Me.ClientSize = New System.Drawing.Size(670, 418)
         Me.Controls.Add(Me.btnRenameScenario)
         Me.Controls.Add(Me.lstScenarios)
         Me.Controls.Add(Me.btnRemove)
