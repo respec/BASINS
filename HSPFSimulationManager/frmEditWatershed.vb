@@ -23,18 +23,20 @@ Public Class frmEditWatershed
             cboDownstream.Items.Clear()
             cboDownstream.Items.Add("None")
             For Each lIcon In Schematic.AllIcons
-                cboDownstream.Items.Add(lIcon.WatershedName)
+                If lIcon.WatershedName <> pIcon.WatershedName Then
+                    cboDownstream.Items.Add(lIcon.WatershedName)
+                End If
             Next
-            If pIcon.DownstreamIcon Is Nothing Then
-                cboDownstream.SelectedIndex = 0
-            Else
-                Dim lIndex As Integer = cboDownstream.Items.IndexOf(pIcon.DownstreamIcon.WatershedName)
+
+            Dim lIndex As Integer = 0
+            If pIcon.DownstreamIcon IsNot Nothing Then
+                lIndex = cboDownstream.Items.IndexOf(pIcon.DownstreamIcon.WatershedName)
                 If lIndex = -1 Then
                     lIndex = cboDownstream.Items.Count
                     cboDownstream.Items.Add(pIcon.DownstreamIcon.WatershedName)
                 End If
-                cboDownstream.SelectedIndex = lIndex
             End If
+            cboDownstream.SelectedIndex = lIndex
             btnImage.Text = pIcon.WatershedImageFilename
             btnImage.BackgroundImage = pIcon.WatershedImage
             btnImage.BackgroundImageLayout = ImageLayout.Zoom
