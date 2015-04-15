@@ -18,14 +18,16 @@ Module ERGGraph
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2019
     'Private pSiteName As String = "Black"
+    'Private pBenthicSegmentStart As Integer = 59
     'etowah
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah"
-    ''Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
+    ' ''Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
     'Private pLocation As Integer = 18 '1 '50 '18
     'Private pStartYearForBaselinePlot As Integer = 2004
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2021
     'Private pSiteName As String = "Etowah"
+    'Private pBenthicSegmentStart As Integer = 33
     'white
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\White"
     'Private pLocation As Integer = 17
@@ -33,13 +35,14 @@ Module ERGGraph
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2019
     'Private pSiteName As String = "White"
+    'Private pBenthicSegmentStart As Integer = 26
     'lake sinclair
-    Private Const pTestPath As String = "C:\ERG_SteamElectric\LakeSinclair"
-    Private pLocation As Integer = 276 '699 
-    Private pStartYearForBaselinePlot As Integer = 2012
-    Private pStartYearForSimulation As Integer = 2012
-    Private pComplianceDate As Integer = 2019
-    Private pSiteName As String = "LakeSinclair"
+    'Private Const pTestPath As String = "C:\ERG_SteamElectric\LakeSinclair"
+    'Private pLocation As Integer = 276 '699 
+    'Private pStartYearForBaselinePlot As Integer = 2012
+    'Private pStartYearForSimulation As Integer = 2012
+    'Private pComplianceDate As Integer = 2019
+    'Private pSiteName As String = "LakeSinclair"
     'mississippi
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\MississippiMO"
     'Private pLocation As Integer = 9 '17   9 is rush island, 17 is meramec
@@ -47,21 +50,24 @@ Module ERGGraph
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2019
     'Private pSiteName As String = "MississippiMO"
+    'Private pBenthicSegmentStart As Integer = 31
     'ohio
-    'Private Const pTestPath As String = "C:\ERG_SteamElectric\Ohio"
-    'Private pLocation As Integer = 13 '9 '13  9 is sammis, 13 is mansfield
-    'Private pStartYearForBaselinePlot As Integer = 1999
-    'Private pStartYearForSimulation As Integer = 1982
-    'Private pComplianceDate As Integer = 2019
-    'Private pSiteName As String = "Ohio"
+    Private Const pTestPath As String = "C:\ERG_SteamElectric\Ohio"
+    Private pLocation As Integer = 13 '9 '13  9 is sammis, 13 is mansfield
+    Private pStartYearForBaselinePlot As Integer = 1999
+    Private pStartYearForSimulation As Integer = 1982
+    Private pComplianceDate As Integer = 2019
+    Private pSiteName As String = "Ohio"
+    Private pBenthicSegmentStart As Integer = 29
 
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        'DoBaselineHistoricGraphsMultipleLocations()
-        DoERGGraphs()
-        ComputeThreeMonthRollingAverages()
-        DoERGCompositeGraph()
-        DoGraphAtMaxConcLocation()
+        '      DoBaselineHistoricGraphsMultipleLocations()
+        'DoERGGraphs()
+        'ComputeThreeMonthRollingAverages()
+        'DoERGCompositeGraph()
+        'DoGraphAtMaxConcLocation()
+        DoExceedanceSummary()
     End Sub
 
     Private Sub DoERGGraphs()
@@ -413,445 +419,17 @@ Module ERGGraph
             Dim lHealthBenchmarkO As Double = 0.0
             Dim lMCL As Double = 0.0
 
-            'site specific data 
-            If aSiteName = "Black" Then
-                If aUnits = "Total" Then
-                    If aRunName = "As" Then  'total
-                        lNationalModelBaseline = 0.00003109
-                        lNationalModelOptionD = 0.0000216
-                    ElseIf aRunName = "Cd" Then
-                        lNationalModelBaseline = 0.0001746
-                        lNationalModelOptionD = 0.000007179
-                    ElseIf aRunName = "Cu" Then
-                        lNationalModelBaseline = 0.00004359
-                        lNationalModelOptionD = 0.000008496
-                    ElseIf aRunName = "Pb" Then
-                        lNationalModelBaseline = 0.00001324
-                        lNationalModelOptionD = 0.00000557
-                    ElseIf aRunName = "Ni" Then
-                        lNationalModelBaseline = 0.001391
-                        lNationalModelOptionD = 0.00002863
-                    ElseIf aRunName = "Se" Then
-                        lNationalModelBaseline = 0.00181
-                        lNationalModelOptionD = 0.00002912
-                    ElseIf aRunName = "Tl" Then
-                        lNationalModelBaseline = 0.00005413
-                        lNationalModelOptionD = 0.00001536
-                    ElseIf aRunName = "Zn" Then
-                        lNationalModelBaseline = 0.002195
-                        lNationalModelOptionD = 0.00007316
-                    End If
-                Else
-                    'for dissolved
-                    If aRunName = "As" Then
-                        lNationalModelBaseline = 0.00003109
-                        lNationalModelOptionD = 0.0000216
-                    ElseIf aRunName = "Cd" Then
-                        lNationalModelBaseline = 0.0001746
-                        lNationalModelOptionD = 0.000007179
-                    ElseIf aRunName = "Cu" Then
-                        lNationalModelBaseline = 0.00004359
-                        lNationalModelOptionD = 0.000008495
-                    ElseIf aRunName = "Pb" Then
-                        lNationalModelBaseline = 0.00001323
-                        lNationalModelOptionD = 0.000005569
-                    ElseIf aRunName = "Ni" Then
-                        lNationalModelBaseline = 0.001391
-                        lNationalModelOptionD = 0.00002862
-                    ElseIf aRunName = "Se" Then
-                        lNationalModelBaseline = 0.00181
-                        lNationalModelOptionD = 0.00002911
-                    ElseIf aRunName = "Tl" Then
-                        lNationalModelBaseline = 0.00005413
-                        lNationalModelOptionD = 0.00001535
-                    ElseIf aRunName = "Zn" Then
-                        lNationalModelBaseline = 0.002195
-                        lNationalModelOptionD = 0.00007315
-                    End If
-                End If
-            ElseIf aSiteName = "Etowah" Then
-                If aUnits = "Total" Then
-                    If aRunName = "As" Then
-                        lNationalModelBaseline = 0.00000728
-                        lNationalModelOptionD = 0.000003615
-                    ElseIf aRunName = "Cd" Then
-                        lNationalModelBaseline = 0.0000704
-                        lNationalModelOptionD = 0.000002609
-                    ElseIf aRunName = "Cu" Then
-                        lNationalModelBaseline = 0.00001636
-                        lNationalModelOptionD = 0.000002341
-                    ElseIf aRunName = "Pb" Then
-                        lNationalModelBaseline = 0.000005056
-                        lNationalModelOptionD = 0.000002101
-                    ElseIf aRunName = "Ni" Then
-                        lNationalModelBaseline = 0.0005551
-                        lNationalModelOptionD = 0.000003907
-                    ElseIf aRunName = "Se" Then
-                        lNationalModelBaseline = 0.0007252
-                        lNationalModelOptionD = 0.000003546
-                    ElseIf aRunName = "Tl" Then
-                        lNationalModelBaseline = 0.00002092
-                        lNationalModelOptionD = 0.000006077
-                    ElseIf aRunName = "Zn" Then
-                        lNationalModelBaseline = 0.0008717
-                        lNationalModelOptionD = 0.00001238
-                    End If
-                Else
-                    'for dissolved
-                    If aRunName = "As" Then
-                        lNationalModelBaseline = 0.000007279
-                        lNationalModelOptionD = 0.000003614
-                    ElseIf aRunName = "Cd" Then
-                        lNationalModelBaseline = 0.00007039
-                        lNationalModelOptionD = 0.000002608
-                    ElseIf aRunName = "Cu" Then
-                        lNationalModelBaseline = 0.00001636
-                        lNationalModelOptionD = 0.000002341
-                    ElseIf aRunName = "Pb" Then
-                        lNationalModelBaseline = 0.000005055
-                        lNationalModelOptionD = 0.000002101
-                    ElseIf aRunName = "Ni" Then
-                        lNationalModelBaseline = 0.000555
-                        lNationalModelOptionD = 0.000003906
-                    ElseIf aRunName = "Se" Then
-                        lNationalModelBaseline = 0.0007251
-                        lNationalModelOptionD = 0.000003546
-                    ElseIf aRunName = "Tl" Then
-                        lNationalModelBaseline = 0.00002092
-                        lNationalModelOptionD = 0.000006077
-                    ElseIf aRunName = "Zn" Then
-                        lNationalModelBaseline = 0.0008716
-                        lNationalModelOptionD = 0.00001238
-                    End If
-                End If
-            ElseIf aSiteName = "LakeSinclair" Then
-                If aUnits = "Total" Then
-                    If aRunName = "As" Then
-                        lNationalModelBaseline = 0.00001307
-                        lNationalModelOptionD = 0.000003471
-                    ElseIf aRunName = "Cd" Then
-                        lNationalModelBaseline = 0.00006934
-                        lNationalModelOptionD = 0.000002505
-                    ElseIf aRunName = "Cu" Then
-                        lNationalModelBaseline = 0.00002902
-                        lNationalModelOptionD = 0.000002248
-                    ElseIf aRunName = "Pb" Then
-                        lNationalModelBaseline = 0.00001052
-                        lNationalModelOptionD = 0.000002018
-                    ElseIf aRunName = "Ni" Then
-                        lNationalModelBaseline = 0.0005428
-                        lNationalModelOptionD = 0.000003752
-                    ElseIf aRunName = "Se" Then
-                        lNationalModelBaseline = 0.0006987
-                        lNationalModelOptionD = 0.000003405
-                    ElseIf aRunName = "Tl" Then
-                        lNationalModelBaseline = 0.00002335
-                        lNationalModelOptionD = 0.000005836
-                    ElseIf aRunName = "Zn" Then
-                        lNationalModelBaseline = 0.0008857
-                        lNationalModelOptionD = 0.00001189
-                    End If
-                Else
-                    'for dissolved
-                    If aRunName = "As" Then
-                        lNationalModelBaseline = 0.00001307
-                        lNationalModelOptionD = 0.000003471
-                    ElseIf aRunName = "Cd" Then
-                        lNationalModelBaseline = 0.00006933
-                        lNationalModelOptionD = 0.000002505
-                    ElseIf aRunName = "Cu" Then
-                        lNationalModelBaseline = 0.00002902
-                        lNationalModelOptionD = 0.000002248
-                    ElseIf aRunName = "Pb" Then
-                        lNationalModelBaseline = 0.00001052
-                        lNationalModelOptionD = 0.000002018
-                    ElseIf aRunName = "Ni" Then
-                        lNationalModelBaseline = 0.0005428
-                        lNationalModelOptionD = 0.000003751
-                    ElseIf aRunName = "Se" Then
-                        lNationalModelBaseline = 0.0006986
-                        lNationalModelOptionD = 0.000003405
-                    ElseIf aRunName = "Tl" Then
-                        lNationalModelBaseline = 0.00002335
-                        lNationalModelOptionD = 0.000005836
-                    ElseIf aRunName = "Zn" Then
-                        lNationalModelBaseline = 0.0008856
-                        lNationalModelOptionD = 0.00001189
-                    End If
-                End If
-            ElseIf aSiteName = "MississippiMO" Then
-                If pLocation = 9 Then
-                    If aUnits = "Total" Then
-                        If aRunName = "As" Then
-                            lNationalModelBaseline = 0.000006409
-                        ElseIf aRunName = "Cd" Then
-                            lNationalModelBaseline = 0.0000009284
-                        ElseIf aRunName = "Cu" Then
-                            lNationalModelBaseline = 0.000004338
-                        ElseIf aRunName = "Pb" Then
-                            lNationalModelBaseline = 0.000002844
-                        ElseIf aRunName = "Ni" Then
-                            lNationalModelBaseline = 0.000003492
-                        ElseIf aRunName = "Se" Then
-                            lNationalModelBaseline = 0.000002705
-                        ElseIf aRunName = "Tl" Then
-                            lNationalModelBaseline = 0.000003293
-                        ElseIf aRunName = "Zn" Then
-                            lNationalModelBaseline = 0.000007985
-                        End If
-                    Else
-                        'for dissolved
-                        If aRunName = "As" Then
-                            lNationalModelBaseline = 0.000006408
-                        ElseIf aRunName = "Cd" Then
-                            lNationalModelBaseline = 0.0000009281
-                        ElseIf aRunName = "Cu" Then
-                            lNationalModelBaseline = 0.000004336
-                        ElseIf aRunName = "Pb" Then
-                            lNationalModelBaseline = 0.000002843
-                        ElseIf aRunName = "Ni" Then
-                            lNationalModelBaseline = 0.000003491
-                        ElseIf aRunName = "Se" Then
-                            lNationalModelBaseline = 0.000002705
-                        ElseIf aRunName = "Tl" Then
-                            lNationalModelBaseline = 0.000003292
-                        ElseIf aRunName = "Zn" Then
-                            lNationalModelBaseline = 0.000007982
-                        End If
-                    End If
-                End If
-            ElseIf aSiteName = "Ohio" Then
-                If pLocation = 13 Then
-                    If aUnits = "Total" Then  'for mansfield plant
-                        If aRunName = "As" Then
-                            lNationalModelBaseline = 0.000001019
-                            lNationalModelOptionD = 0.000000271
-                        ElseIf aRunName = "Cd" Then
-                            lNationalModelBaseline = 0.000005392
-                            lNationalModelOptionD = 0.0000001955
-                        ElseIf aRunName = "Cu" Then
-                            lNationalModelBaseline = 0.000001755
-                            lNationalModelOptionD = 0.0000001755
-                        ElseIf aRunName = "Pb" Then
-                            lNationalModelBaseline = 0.0000007766
-                            lNationalModelOptionD = 0.0000001575
-                        ElseIf aRunName = "Ni" Then
-                            lNationalModelBaseline = 0.00004363
-                            lNationalModelOptionD = 0.0000002928
-                        ElseIf aRunName = "Se" Then
-                            lNationalModelBaseline = 0.00005458
-                            lNationalModelOptionD = 0.0000002658
-                        ElseIf aRunName = "Tl" Then
-                            lNationalModelBaseline = 0.000003846
-                            lNationalModelOptionD = 0.0000004555
-                        ElseIf aRunName = "Zn" Then
-                            lNationalModelBaseline = 0.00006697
-                            lNationalModelOptionD = 0.0000009278
-                        End If
-                    Else
-                        'for dissolved
-                        If aRunName = "As" Then
-                            lNationalModelBaseline = 0.000001018
-                            lNationalModelOptionD = 0.0000002709
-                        ElseIf aRunName = "Cd" Then
-                            lNationalModelBaseline = 0.000005391
-                            lNationalModelOptionD = 0.0000001955
-                        ElseIf aRunName = "Cu" Then
-                            lNationalModelBaseline = 0.000001755
-                            lNationalModelOptionD = 0.0000001755
-                        ElseIf aRunName = "Pb" Then
-                            lNationalModelBaseline = 0.0000007765
-                            lNationalModelOptionD = 0.0000001575
-                        ElseIf aRunName = "Ni" Then
-                            lNationalModelBaseline = 0.00004363
-                            lNationalModelOptionD = 0.0000002928
-                        ElseIf aRunName = "Se" Then
-                            lNationalModelBaseline = 0.00005458
-                            lNationalModelOptionD = 0.0000002658
-                        ElseIf aRunName = "Tl" Then
-                            lNationalModelBaseline = 0.000003846
-                            lNationalModelOptionD = 0.0000004555
-                        ElseIf aRunName = "Zn" Then
-                            lNationalModelBaseline = 0.00006696
-                            lNationalModelOptionD = 0.0000009277
-                        End If
-                    End If
-                ElseIf pLocation = 9 Then
-                    If aUnits = "Total" Then  'for sammis plant
-                        If aRunName = "As" Then
-                            lNationalModelBaseline = 0.000004733
-                            lNationalModelOptionD = 0.00000007468
-                        ElseIf aRunName = "Cd" Then
-                            lNationalModelBaseline = 0.000001185
-                            lNationalModelOptionD = 0.00000005093
-                        ElseIf aRunName = "Cu" Then
-                            lNationalModelBaseline = 0.000005259
-                            lNationalModelOptionD = 0.00000004754
-                        ElseIf aRunName = "Pb" Then
-                            lNationalModelBaseline = 0.000003959
-                            lNationalModelOptionD = 0.00000004092
-                        ElseIf aRunName = "Ni" Then
-                            lNationalModelBaseline = 0.00002002
-                            lNationalModelOptionD = 0.00000007812
-                        ElseIf aRunName = "Se" Then
-                            lNationalModelBaseline = 0.00001334
-                            lNationalModelOptionD = 0.00000009206
-                        ElseIf aRunName = "Tl" Then
-                            lNationalModelBaseline = 0.00002256
-                            lNationalModelOptionD = 0.0000001179
-                        ElseIf aRunName = "Zn" Then
-                            lNationalModelBaseline = 0.00001628
-                            lNationalModelOptionD = 0.0000002461
-                        End If
-                    Else
-                        'for dissolved
-                        If aRunName = "As" Then
-                            lNationalModelBaseline = 0.000004733
-                            lNationalModelOptionD = 0.00000007467
-                        ElseIf aRunName = "Cd" Then
-                            lNationalModelBaseline = 0.000001184
-                            lNationalModelOptionD = 0.00000005093
-                        ElseIf aRunName = "Cu" Then
-                            lNationalModelBaseline = 0.000005259
-                            lNationalModelOptionD = 0.00000004753
-                        ElseIf aRunName = "Pb" Then
-                            lNationalModelBaseline = 0.000003958
-                            lNationalModelOptionD = 0.00000004091
-                        ElseIf aRunName = "Ni" Then
-                            lNationalModelBaseline = 0.00002002
-                            lNationalModelOptionD = 0.00000007812
-                        ElseIf aRunName = "Se" Then
-                            lNationalModelBaseline = 0.00001334
-                            lNationalModelOptionD = 0.00000009205
-                        ElseIf aRunName = "Tl" Then
-                            lNationalModelBaseline = 0.00002256
-                            lNationalModelOptionD = 0.0000001179
-                        ElseIf aRunName = "Zn" Then
-                            lNationalModelBaseline = 0.00001628
-                            lNationalModelOptionD = 0.000000246
-                        End If
-                    End If
-                End If
-            End If
-
-            If aUnits = "Total" Then
-                If aRunName = "As" Then
-                    lPane.YAxis.Title.Text = "Total Arsenic (ug/L)"
-                    lAquaBenchmarkAcute = 0.0
-                    lAquaBenchmarkChronic = 0.0
-                    lHealthBenchmarkWO = 0.000018
-                    lHealthBenchmarkO = 0.00014
-                    lMCL = 0.01
-                ElseIf aRunName = "Cd" Then
-                    lPane.YAxis.Title.Text = "Total Cadmium (ug/L)"
-                    lAquaBenchmarkAcute = 0.0
-                    lAquaBenchmarkChronic = 0.0
-                    lHealthBenchmarkWO = 0.0
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 0.0
-                ElseIf aRunName = "Cu" Then
-                    lPane.YAxis.Title.Text = "Total Copper (ug/L)"
-                    lAquaBenchmarkAcute = 0.0
-                    lAquaBenchmarkChronic = 0.0
-                    lHealthBenchmarkWO = 1.3
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 1.3
-                ElseIf aRunName = "Ni" Then
-                    lPane.YAxis.Title.Text = "Total Nickel (ug/L)"
-                    lAquaBenchmarkAcute = 0.0
-                    lAquaBenchmarkChronic = 0.0
-                    lHealthBenchmarkWO = 0.61
-                    lHealthBenchmarkO = 4.6
-                    lMCL = 0.0
-                ElseIf aRunName = "Pb" Then
-                    lPane.YAxis.Title.Text = "Total Lead (ug/L)"
-                    lAquaBenchmarkAcute = 0.0
-                    lAquaBenchmarkChronic = 0.0
-                    lHealthBenchmarkWO = 0.0
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 0.0
-                ElseIf aRunName = "Se" Then
-                    lPane.YAxis.Title.Text = "Total Selenium (ug/L)"
-                    lAquaBenchmarkAcute = 0.0
-                    lAquaBenchmarkChronic = 0.005
-                    lHealthBenchmarkWO = 0.17
-                    lHealthBenchmarkO = 4.2
-                    lMCL = 0.05
-                ElseIf aRunName = "Tl" Then
-                    lPane.YAxis.Title.Text = "Total Thallium (ug/L)"
-                    lAquaBenchmarkAcute = 0.0
-                    lAquaBenchmarkChronic = 0.0
-                    lHealthBenchmarkWO = 0.00024
-                    lHealthBenchmarkO = 0.00047
-                    lMCL = 0.0
-                ElseIf aRunName = "Zn" Then
-                    lPane.YAxis.Title.Text = "Total Zinc (ug/L)"
-                    lAquaBenchmarkAcute = 0.0
-                    lAquaBenchmarkChronic = 0.0
-                    lHealthBenchmarkWO = 7.4
-                    lHealthBenchmarkO = 26
-                    lMCL = 0.0
-                End If
-            Else
-                'dissolved
-                If aRunName = "As" Then
-                    lPane.YAxis.Title.Text = "Dissolved Arsenic (ug/L)"
-                    lAquaBenchmarkAcute = 0.34
-                    lAquaBenchmarkChronic = 0.15
-                    lHealthBenchmarkWO = 0.0
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 0.0
-                ElseIf aRunName = "Cd" Then
-                    lPane.YAxis.Title.Text = "Dissolved Cadmium (ug/L)"
-                    lAquaBenchmarkAcute = 0.002
-                    lAquaBenchmarkChronic = 0.00025
-                    lHealthBenchmarkWO = 0.0
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 0.0
-                ElseIf aRunName = "Cu" Then
-                    lPane.YAxis.Title.Text = "Dissolved Copper (ug/L)"
-                    lAquaBenchmarkAcute = 0.013
-                    lAquaBenchmarkChronic = 0.009
-                    lHealthBenchmarkWO = 0.0
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 0.0
-                ElseIf aRunName = "Ni" Then
-                    lPane.YAxis.Title.Text = "Dissolved Nickel (ug/L)"
-                    lAquaBenchmarkAcute = 0.47
-                    lAquaBenchmarkChronic = 0.052
-                    lHealthBenchmarkWO = 0.0
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 0.0
-                ElseIf aRunName = "Pb" Then
-                    lPane.YAxis.Title.Text = "Dissolved Lead (ug/L)"
-                    lAquaBenchmarkAcute = 0.065
-                    lAquaBenchmarkChronic = 0.0025
-                    lHealthBenchmarkWO = 0.0
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 0.0
-                ElseIf aRunName = "Se" Then
-                    lPane.YAxis.Title.Text = "Dissolved Selenium (ug/L)"
-                    lAquaBenchmarkAcute = 0.0
-                    lAquaBenchmarkChronic = 0.0
-                    lHealthBenchmarkWO = 0.0
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 0.0
-                ElseIf aRunName = "Tl" Then
-                    lPane.YAxis.Title.Text = "Dissolved Thallium (ug/L)"
-                    lAquaBenchmarkAcute = 0.0
-                    lAquaBenchmarkChronic = 0.0
-                    lHealthBenchmarkWO = 0.0
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 0.0
-                ElseIf aRunName = "Zn" Then
-                    lPane.YAxis.Title.Text = "Dissolved Zinc (ug/L)"
-                    lAquaBenchmarkAcute = 0.12
-                    lAquaBenchmarkChronic = 0.12
-                    lHealthBenchmarkWO = 0.0
-                    lHealthBenchmarkO = 0.0
-                    lMCL = 0.0
-                End If
-            End If
+            Dim lLabel As String = ""
+            GetBenchmarks(aSiteName, aUnits, aRunName, _
+                          lNationalModelBaseline, _
+                          lNationalModelOptionD, _
+                          lAquaBenchmarkAcute, _
+                          lAquaBenchmarkChronic, _
+                          lHealthBenchmarkWO, _
+                          lHealthBenchmarkO, _
+                          lMCL, _
+                          lLabel)
+            lPane.YAxis.Title.Text = lLabel
 
             'now add them
             If lNationalModelBaseline > 0.0 Then
@@ -1410,6 +988,816 @@ Module ERGGraph
 
             Next
         Next
+    End Sub
+
+    Private Sub DoExceedanceSummary()
+        Dim lCsvName As String = ""
+
+        Dim pMetalNames As New atcCollection
+        pMetalNames.Add("As")
+        pMetalNames.Add("Cd")
+        pMetalNames.Add("Cu")
+        pMetalNames.Add("Ni")
+        pMetalNames.Add("Pb")
+        pMetalNames.Add("Se")
+        pMetalNames.Add("Tl")
+        pMetalNames.Add("Zn")
+
+        Dim pRunNames As New atcCollection
+        pRunNames.Add("Baseline")
+        pRunNames.Add("OptionD")
+
+        Dim pTypes As New atcCollection
+        pTypes.Add("Total")
+        pTypes.Add("Dissolved")
+
+        ChDriveDir(pTestPath & "\OutputPlots")
+        Dim lOutFileName As String = pSiteName & "ExceedanceSummary.txt"
+
+        If Not FileExists(lOutFileName) Then
+            Dim lWrite As New IO.StreamWriter(lOutFileName, False)
+            Dim lStr As String = ""
+            Dim lDayPercent As Double = 0.0
+
+            For Each lType As String In pTypes
+                lCsvName = lType & "_Concentration.csv"
+
+                Dim lTimeseriesGroup As New atcTimeseriesGroup
+
+                For Each lMetal As String In pMetalNames
+
+                    Dim lNationalModelBaseline As Double = 0.0
+                    Dim lNationalModelOptionD As Double = 0.0
+                    Dim lAquaBenchmarkAcute As Double = 0.0
+                    Dim lAquaBenchmarkChronic As Double = 0.0
+                    Dim lHealthBenchmarkWO As Double = 0.0
+                    Dim lHealthBenchmarkO As Double = 0.0
+                    Dim lMCL As Double = 0.0
+
+                    Dim lLabel As String = ""
+                    GetBenchmarks(pSiteName, lType, lMetal, _
+                                  lNationalModelBaseline, _
+                                  lNationalModelOptionD, _
+                                  lAquaBenchmarkAcute, _
+                                  lAquaBenchmarkChronic, _
+                                  lHealthBenchmarkWO, _
+                                  lHealthBenchmarkO, _
+                                  lMCL, _
+                                  lLabel)
+
+                    Dim lBenthicSedimentCriterion As Double = 0.0
+                    If lMetal = "As" Then
+                        lBenthicSedimentCriterion = 5.9
+                    ElseIf lMetal = "Cd" Then
+                        lBenthicSedimentCriterion = 0.596
+                    ElseIf lMetal = "Cu" Then
+                        lBenthicSedimentCriterion = 35.7
+                    ElseIf lMetal = "Pb" Then
+                        lBenthicSedimentCriterion = 35
+                    ElseIf lMetal = "Ni" Then
+                        lBenthicSedimentCriterion = 18
+                    ElseIf lMetal = "Zn" Then
+                        lBenthicSedimentCriterion = 123
+                    End If
+
+                    For Each lRun As String In pRunNames
+                        'get data
+                        Dim lTimeseriesCsv1 As New atcTimeseriesCSV.atcTimeseriesCSV
+                        Dim lRunName As String = lMetal & lRun
+                        Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+
+                        If Not FileExists(lCsvFileName) Then
+                            'try option c instead
+                            lCsvFileName = pTestPath & "\" & lMetal & "OptionC" & "\" & lCsvName
+                        End If
+
+                        If lTimeseriesCsv1.Open(lCsvFileName) Then
+
+                            'Dim lAquaBenchmarkAcute As Double = 0.0
+                            'Dim lAquaBenchmarkChronic As Double = 0.0
+                            'Dim lHealthBenchmarkWO As Double = 0.0
+                            'Dim lHealthBenchmarkO As Double = 0.0
+                            'Dim lMCL As Double = 0.0
+
+                            Dim lStandard As Double = 0.0
+                            Dim lStandardName As String = ""
+
+                            'freshwater acute
+                            If lAquaBenchmarkAcute > 0.0 Then
+                                lStandard = lAquaBenchmarkAcute * 1000
+                                lStandardName = "FreshwaterAcute"
+                                For lIndex As Integer = 1 To lTimeseriesCsv1.DataSets.Count
+                                    Dim lWholeTimeseries As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(lIndex)
+                                    'get only subset of data
+                                    Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                                    End If
+                                    Dim lSDateJ As Double = Date2J(lSDate)
+                                    Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                                    End If
+                                    Dim lEdatej As Double = Date2J(lEDate)
+                                    Dim lTimeseries As atcTimeseries = SubsetByDate(lWholeTimeseries, lSDateJ, lEdatej, Nothing)
+
+                                    Dim lViolationCount As Integer = 0
+                                    For lVal As Integer = 1 To lTimeseries.numValues
+                                        If lTimeseries.Value(lVal) > lStandard Then
+                                            lViolationCount += 1
+                                        End If
+                                    Next
+                                    If lViolationCount > 0 Then
+                                        'found some violations of this standard at this location
+                                        lDayPercent = (lViolationCount / lTimeseries.numValues) * 100.0
+                                        lStr = lRun & " " & lType & " " & lMetal & " violated " & lStandardName & " standard " & Format(lDayPercent, "0.##") & " percent of days in model segment " & lIndex
+                                        If (lIndex = pLocation) Then
+                                            lStr = lStr & " IRW"
+                                        End If
+                                        If lIndex < pBenthicSegmentStart Then
+                                            lWrite.WriteLine(lStr)
+                                        End If
+                                    End If
+                                Next
+                            End If
+
+                            'freshwater chronic
+                            If lAquaBenchmarkChronic > 0.0 Then
+                                lStandard = lAquaBenchmarkChronic * 1000
+                                lStandardName = "FreshwaterChronic"
+                                For lIndex As Integer = 1 To lTimeseriesCsv1.DataSets.Count
+                                    Dim lWholeTimeseries As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(lIndex)
+                                    'get only subset of data
+                                    Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                                    End If
+                                    Dim lSDateJ As Double = Date2J(lSDate)
+                                    Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                                    End If
+                                    Dim lEdatej As Double = Date2J(lEDate)
+                                    Dim lTimeseries As atcTimeseries = SubsetByDate(lWholeTimeseries, lSDateJ, lEdatej, Nothing)
+
+                                    Dim lViolationCount As Integer = 0
+                                    For lVal As Integer = 1 To lTimeseries.numValues
+                                        If lTimeseries.Value(lVal) > lStandard Then
+                                            lViolationCount += 1
+                                        End If
+                                    Next
+                                    If lViolationCount > 0 Then
+                                        'found some violations of this standard at this location
+                                        lDayPercent = (lViolationCount / lTimeseries.numValues) * 100.0
+                                        lStr = lRun & " " & lType & " " & lMetal & " violated " & lStandardName & " standard " & Format(lDayPercent, "0.##") & " percent of days in model segment " & lIndex
+                                        If (lIndex = pLocation) Then
+                                            lStr = lStr & " IRW"
+                                        End If
+                                        If lIndex < pBenthicSegmentStart Then
+                                            lWrite.WriteLine(lStr)
+                                        End If
+                                    End If
+                                Next
+                            End If
+
+                            'human health water and organism
+                            If lHealthBenchmarkWO > 0.0 Then
+                                lStandard = lHealthBenchmarkWO * 1000
+                                lStandardName = "HumanHealthWaterAndOrganism"
+                                For lIndex As Integer = 1 To lTimeseriesCsv1.DataSets.Count
+                                    Dim lWholeTimeseries As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(lIndex)
+                                    'get only subset of data
+                                    Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                                    End If
+                                    Dim lSDateJ As Double = Date2J(lSDate)
+                                    Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                                    End If
+                                    Dim lEdatej As Double = Date2J(lEDate)
+                                    Dim lTimeseries As atcTimeseries = SubsetByDate(lWholeTimeseries, lSDateJ, lEdatej, Nothing)
+
+                                    Dim lViolationCount As Integer = 0
+                                    For lVal As Integer = 1 To lTimeseries.numValues
+                                        If lTimeseries.Value(lVal) > lStandard Then
+                                            lViolationCount += 1
+                                        End If
+                                    Next
+                                    If lViolationCount > 0 Then
+                                        'found some violations of this standard at this location
+                                        lDayPercent = (lViolationCount / lTimeseries.numValues) * 100.0
+                                        lStr = lRun & " " & lType & " " & lMetal & " violated " & lStandardName & " standard " & Format(lDayPercent, "0.##") & " percent of days in model segment " & lIndex
+                                        If (lIndex = pLocation) Then
+                                            lStr = lStr & " IRW"
+                                        End If
+                                        If lIndex < pBenthicSegmentStart Then
+                                            lWrite.WriteLine(lStr)
+                                        End If
+                                    End If
+                                Next
+                            End If
+
+                            'human health organism only
+                            If lHealthBenchmarkO > 0.0 Then
+                                lStandard = lHealthBenchmarkO * 1000
+                                lStandardName = "HumanHealthOrganismOnly"
+                                For lIndex As Integer = 1 To lTimeseriesCsv1.DataSets.Count
+                                    Dim lWholeTimeseries As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(lIndex)
+                                    'get only subset of data
+                                    Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                                    End If
+                                    Dim lSDateJ As Double = Date2J(lSDate)
+                                    Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                                    End If
+                                    Dim lEdatej As Double = Date2J(lEDate)
+                                    Dim lTimeseries As atcTimeseries = SubsetByDate(lWholeTimeseries, lSDateJ, lEdatej, Nothing)
+
+                                    Dim lViolationCount As Integer = 0
+                                    For lVal As Integer = 1 To lTimeseries.numValues
+                                        If lTimeseries.Value(lVal) > lStandard Then
+                                            lViolationCount += 1
+                                        End If
+                                    Next
+                                    If lViolationCount > 0 Then
+                                        'found some violations of this standard at this location
+                                        lDayPercent = (lViolationCount / lTimeseries.numValues) * 100.0
+                                        lStr = lRun & " " & lType & " " & lMetal & " violated " & lStandardName & " standard " & Format(lDayPercent, "0.##") & " percent of days in model segment " & lIndex
+                                        If (lIndex = pLocation) Then
+                                            lStr = lStr & " IRW"
+                                        End If
+                                        If lIndex < pBenthicSegmentStart Then
+                                            lWrite.WriteLine(lStr)
+                                        End If
+                                    End If
+                                Next
+                            End If
+
+                            'drinking water mcl
+                            If lMCL > 0.0 Then
+                                lStandard = lMCL * 1000
+                                lStandardName = "DrinkingWaterMCL"
+                                For lIndex As Integer = 1 To lTimeseriesCsv1.DataSets.Count
+                                    Dim lWholeTimeseries As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(lIndex)
+                                    'get only subset of data
+                                    Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                                    End If
+                                    Dim lSDateJ As Double = Date2J(lSDate)
+                                    Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                                    End If
+                                    Dim lEdatej As Double = Date2J(lEDate)
+                                    Dim lTimeseries As atcTimeseries = SubsetByDate(lWholeTimeseries, lSDateJ, lEdatej, Nothing)
+
+                                    Dim lViolationCount As Integer = 0
+                                    For lVal As Integer = 1 To lTimeseries.numValues
+                                        If lTimeseries.Value(lVal) > lStandard Then
+                                            lViolationCount += 1
+                                        End If
+                                    Next
+                                    If lViolationCount > 0 Then
+                                        'found some violations of this standard at this location
+                                        lDayPercent = (lViolationCount / lTimeseries.numValues) * 100.0
+                                        lStr = lRun & " " & lType & " " & lMetal & " violated " & lStandardName & " standard " & Format(lDayPercent, "0.##") & " percent of days in model segment " & lIndex
+                                        If (lIndex = pLocation) Then
+                                            lStr = lStr & " IRW"
+                                        End If
+                                        If lIndex < pBenthicSegmentStart Then
+                                            lWrite.WriteLine(lStr)
+                                        End If
+                                    End If
+                                Next
+                            End If
+
+                            'benthic sediment criterion
+                            Dim lBenthicExceedanceFound As Boolean = False
+                            If lBenthicSedimentCriterion > 0.0 Then
+                                lStandard = lBenthicSedimentCriterion * 1000
+                                lStandardName = "BenthicSedimentCriterion"
+                                For lIndex As Integer = 1 To lTimeseriesCsv1.DataSets.Count
+                                    Dim lWholeTimeseries As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(lIndex)
+                                    'get only subset of data
+                                    Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                                    End If
+                                    Dim lSDateJ As Double = Date2J(lSDate)
+                                    Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                                    If pSiteName = "LakeSinclair" Then
+                                        'special case -- limited data
+                                        lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                                    End If
+                                    Dim lEdatej As Double = Date2J(lEDate)
+                                    Dim lTimeseries As atcTimeseries = SubsetByDate(lWholeTimeseries, lSDateJ, lEdatej, Nothing)
+
+                                    Dim lViolationCount As Integer = 0
+                                    For lVal As Integer = 1 To lTimeseries.numValues
+                                        If lTimeseries.Value(lVal) > lStandard Then
+                                            lViolationCount += 1
+                                        End If
+                                    Next
+                                    If lViolationCount > 0 Then
+                                        'found some violations of this standard at this location
+                                        lDayPercent = (lViolationCount / lTimeseries.numValues) * 100.0
+                                        lStr = lRun & " " & lType & " " & lMetal & " violated " & lStandardName & " standard " & Format(lDayPercent, "0.##") & " percent of days in model segment " & lIndex
+                                        If (lIndex = pLocation) Then
+                                            lStr = lStr & " IRW"
+                                        End If
+                                        lWrite.WriteLine(lStr)
+                                        lBenthicExceedanceFound = True
+                                    End If
+                                Next
+                                If lBenthicExceedanceFound = False Then
+                                    lWrite.WriteLine("No exceedance of benthic sediment criterion for " & lRun & " " & lType & " " & lMetal)
+                                End If
+                            End If
+
+                        Else
+                            Logger.Msg("Unable to Open " & lCsvFileName)
+                        End If
+                    Next
+                Next
+            Next
+
+            lWrite.Close()
+        End If
+    End Sub
+
+    Private Sub GetBenchmarks(ByVal aSiteName As String, ByVal aUnits As String, ByVal aMetal As String, _
+                              ByRef aNationalModelBaseline As Double, _
+                              ByRef aNationalModelOptionD As Double, _
+                              ByRef aAquaBenchmarkAcute As Double, _
+                              ByRef aAquaBenchmarkChronic As Double, _
+                              ByRef aHealthBenchmarkWO As Double, _
+                              ByRef aHealthBenchmarkO As Double, _
+                              ByRef aMCL As Double, _
+                              ByRef aLabel As String)
+        'Dim lNationalModelBaseline As Double = 0.0
+        'Dim lNationalModelOptionD As Double = 0.0
+        'Dim lAquaBenchmarkAcute As Double = 0.0
+        'Dim lAquaBenchmarkChronic As Double = 0.0
+        'Dim lHealthBenchmarkWO As Double = 0.0
+        'Dim lHealthBenchmarkO As Double = 0.0
+        'Dim lMCL As Double = 0.0
+
+        'site specific data 
+        If aSiteName = "Black" Then
+            If aUnits = "Total" Then
+                If aMetal = "As" Then  'total
+                    aNationalModelBaseline = 0.00003109
+                    aNationalModelOptionD = 0.0000216
+                ElseIf aMetal = "Cd" Then
+                    aNationalModelBaseline = 0.0001746
+                    aNationalModelOptionD = 0.000007179
+                ElseIf aMetal = "Cu" Then
+                    aNationalModelBaseline = 0.00004359
+                    aNationalModelOptionD = 0.000008496
+                ElseIf aMetal = "Pb" Then
+                    aNationalModelBaseline = 0.00001324
+                    aNationalModelOptionD = 0.00000557
+                ElseIf aMetal = "Ni" Then
+                    aNationalModelBaseline = 0.001391
+                    aNationalModelOptionD = 0.00002863
+                ElseIf aMetal = "Se" Then
+                    aNationalModelBaseline = 0.00181
+                    aNationalModelOptionD = 0.00002912
+                ElseIf aMetal = "Tl" Then
+                    aNationalModelBaseline = 0.00005413
+                    aNationalModelOptionD = 0.00001536
+                ElseIf aMetal = "Zn" Then
+                    aNationalModelBaseline = 0.002195
+                    aNationalModelOptionD = 0.00007316
+                End If
+            Else
+                'for dissolved
+                If aMetal = "As" Then
+                    aNationalModelBaseline = 0.00003109
+                    aNationalModelOptionD = 0.0000216
+                ElseIf aMetal = "Cd" Then
+                    aNationalModelBaseline = 0.0001746
+                    aNationalModelOptionD = 0.000007179
+                ElseIf aMetal = "Cu" Then
+                    aNationalModelBaseline = 0.00004359
+                    aNationalModelOptionD = 0.000008495
+                ElseIf aMetal = "Pb" Then
+                    aNationalModelBaseline = 0.00001323
+                    aNationalModelOptionD = 0.000005569
+                ElseIf aMetal = "Ni" Then
+                    aNationalModelBaseline = 0.001391
+                    aNationalModelOptionD = 0.00002862
+                ElseIf aMetal = "Se" Then
+                    aNationalModelBaseline = 0.00181
+                    aNationalModelOptionD = 0.00002911
+                ElseIf aMetal = "Tl" Then
+                    aNationalModelBaseline = 0.00005413
+                    aNationalModelOptionD = 0.00001535
+                ElseIf aMetal = "Zn" Then
+                    aNationalModelBaseline = 0.002195
+                    aNationalModelOptionD = 0.00007315
+                End If
+            End If
+        ElseIf aSiteName = "Etowah" Then
+            If aUnits = "Total" Then
+                If aMetal = "As" Then
+                    aNationalModelBaseline = 0.00000728
+                    aNationalModelOptionD = 0.000003615
+                ElseIf aMetal = "Cd" Then
+                    aNationalModelBaseline = 0.0000704
+                    aNationalModelOptionD = 0.000002609
+                ElseIf aMetal = "Cu" Then
+                    aNationalModelBaseline = 0.00001636
+                    aNationalModelOptionD = 0.000002341
+                ElseIf aMetal = "Pb" Then
+                    aNationalModelBaseline = 0.000005056
+                    aNationalModelOptionD = 0.000002101
+                ElseIf aMetal = "Ni" Then
+                    aNationalModelBaseline = 0.0005551
+                    aNationalModelOptionD = 0.000003907
+                ElseIf aMetal = "Se" Then
+                    aNationalModelBaseline = 0.0007252
+                    aNationalModelOptionD = 0.000003546
+                ElseIf aMetal = "Tl" Then
+                    aNationalModelBaseline = 0.00002092
+                    aNationalModelOptionD = 0.000006077
+                ElseIf aMetal = "Zn" Then
+                    aNationalModelBaseline = 0.0008717
+                    aNationalModelOptionD = 0.00001238
+                End If
+            Else
+                'for dissolved
+                If aMetal = "As" Then
+                    aNationalModelBaseline = 0.000007279
+                    aNationalModelOptionD = 0.000003614
+                ElseIf aMetal = "Cd" Then
+                    aNationalModelBaseline = 0.00007039
+                    aNationalModelOptionD = 0.000002608
+                ElseIf aMetal = "Cu" Then
+                    aNationalModelBaseline = 0.00001636
+                    aNationalModelOptionD = 0.000002341
+                ElseIf aMetal = "Pb" Then
+                    aNationalModelBaseline = 0.000005055
+                    aNationalModelOptionD = 0.000002101
+                ElseIf aMetal = "Ni" Then
+                    aNationalModelBaseline = 0.000555
+                    aNationalModelOptionD = 0.000003906
+                ElseIf aMetal = "Se" Then
+                    aNationalModelBaseline = 0.0007251
+                    aNationalModelOptionD = 0.000003546
+                ElseIf aMetal = "Tl" Then
+                    aNationalModelBaseline = 0.00002092
+                    aNationalModelOptionD = 0.000006077
+                ElseIf aMetal = "Zn" Then
+                    aNationalModelBaseline = 0.0008716
+                    aNationalModelOptionD = 0.00001238
+                End If
+            End If
+        ElseIf aSiteName = "LakeSinclair" Then
+            If aUnits = "Total" Then
+                If aMetal = "As" Then
+                    aNationalModelBaseline = 0.00001307
+                    aNationalModelOptionD = 0.000003471
+                ElseIf aMetal = "Cd" Then
+                    aNationalModelBaseline = 0.00006934
+                    aNationalModelOptionD = 0.000002505
+                ElseIf aMetal = "Cu" Then
+                    aNationalModelBaseline = 0.00002902
+                    aNationalModelOptionD = 0.000002248
+                ElseIf aMetal = "Pb" Then
+                    aNationalModelBaseline = 0.00001052
+                    aNationalModelOptionD = 0.000002018
+                ElseIf aMetal = "Ni" Then
+                    aNationalModelBaseline = 0.0005428
+                    aNationalModelOptionD = 0.000003752
+                ElseIf aMetal = "Se" Then
+                    aNationalModelBaseline = 0.0006987
+                    aNationalModelOptionD = 0.000003405
+                ElseIf aMetal = "Tl" Then
+                    aNationalModelBaseline = 0.00002335
+                    aNationalModelOptionD = 0.000005836
+                ElseIf aMetal = "Zn" Then
+                    aNationalModelBaseline = 0.0008857
+                    aNationalModelOptionD = 0.00001189
+                End If
+            Else
+                'for dissolved
+                If aMetal = "As" Then
+                    aNationalModelBaseline = 0.00001307
+                    aNationalModelOptionD = 0.000003471
+                ElseIf aMetal = "Cd" Then
+                    aNationalModelBaseline = 0.00006933
+                    aNationalModelOptionD = 0.000002505
+                ElseIf aMetal = "Cu" Then
+                    aNationalModelBaseline = 0.00002902
+                    aNationalModelOptionD = 0.000002248
+                ElseIf aMetal = "Pb" Then
+                    aNationalModelBaseline = 0.00001052
+                    aNationalModelOptionD = 0.000002018
+                ElseIf aMetal = "Ni" Then
+                    aNationalModelBaseline = 0.0005428
+                    aNationalModelOptionD = 0.000003751
+                ElseIf aMetal = "Se" Then
+                    aNationalModelBaseline = 0.0006986
+                    aNationalModelOptionD = 0.000003405
+                ElseIf aMetal = "Tl" Then
+                    aNationalModelBaseline = 0.00002335
+                    aNationalModelOptionD = 0.000005836
+                ElseIf aMetal = "Zn" Then
+                    aNationalModelBaseline = 0.0008856
+                    aNationalModelOptionD = 0.00001189
+                End If
+            End If
+        ElseIf aSiteName = "MississippiMO" Then
+            If pLocation = 9 Then
+                If aUnits = "Total" Then
+                    If aMetal = "As" Then
+                        aNationalModelBaseline = 0.000006409
+                    ElseIf aMetal = "Cd" Then
+                        aNationalModelBaseline = 0.0000009284
+                    ElseIf aMetal = "Cu" Then
+                        aNationalModelBaseline = 0.000004338
+                    ElseIf aMetal = "Pb" Then
+                        aNationalModelBaseline = 0.000002844
+                    ElseIf aMetal = "Ni" Then
+                        aNationalModelBaseline = 0.000003492
+                    ElseIf aMetal = "Se" Then
+                        aNationalModelBaseline = 0.000002705
+                    ElseIf aMetal = "Tl" Then
+                        aNationalModelBaseline = 0.000003293
+                    ElseIf aMetal = "Zn" Then
+                        aNationalModelBaseline = 0.000007985
+                    End If
+                Else
+                    'for dissolved
+                    If aMetal = "As" Then
+                        aNationalModelBaseline = 0.000006408
+                    ElseIf aMetal = "Cd" Then
+                        aNationalModelBaseline = 0.0000009281
+                    ElseIf aMetal = "Cu" Then
+                        aNationalModelBaseline = 0.000004336
+                    ElseIf aMetal = "Pb" Then
+                        aNationalModelBaseline = 0.000002843
+                    ElseIf aMetal = "Ni" Then
+                        aNationalModelBaseline = 0.000003491
+                    ElseIf aMetal = "Se" Then
+                        aNationalModelBaseline = 0.000002705
+                    ElseIf aMetal = "Tl" Then
+                        aNationalModelBaseline = 0.000003292
+                    ElseIf aMetal = "Zn" Then
+                        aNationalModelBaseline = 0.000007982
+                    End If
+                End If
+            End If
+        ElseIf aSiteName = "Ohio" Then
+            If pLocation = 13 Then
+                If aUnits = "Total" Then  'for mansfield plant
+                    If aMetal = "As" Then
+                        aNationalModelBaseline = 0.000001019
+                        aNationalModelOptionD = 0.000000271
+                    ElseIf aMetal = "Cd" Then
+                        aNationalModelBaseline = 0.000005392
+                        aNationalModelOptionD = 0.0000001955
+                    ElseIf aMetal = "Cu" Then
+                        aNationalModelBaseline = 0.000001755
+                        aNationalModelOptionD = 0.0000001755
+                    ElseIf aMetal = "Pb" Then
+                        aNationalModelBaseline = 0.0000007766
+                        aNationalModelOptionD = 0.0000001575
+                    ElseIf aMetal = "Ni" Then
+                        aNationalModelBaseline = 0.00004363
+                        aNationalModelOptionD = 0.0000002928
+                    ElseIf aMetal = "Se" Then
+                        aNationalModelBaseline = 0.00005458
+                        aNationalModelOptionD = 0.0000002658
+                    ElseIf aMetal = "Tl" Then
+                        aNationalModelBaseline = 0.000003846
+                        aNationalModelOptionD = 0.0000004555
+                    ElseIf aMetal = "Zn" Then
+                        aNationalModelBaseline = 0.00006697
+                        aNationalModelOptionD = 0.0000009278
+                    End If
+                Else
+                    'for dissolved
+                    If aMetal = "As" Then
+                        aNationalModelBaseline = 0.000001018
+                        aNationalModelOptionD = 0.0000002709
+                    ElseIf aMetal = "Cd" Then
+                        aNationalModelBaseline = 0.000005391
+                        aNationalModelOptionD = 0.0000001955
+                    ElseIf aMetal = "Cu" Then
+                        aNationalModelBaseline = 0.000001755
+                        aNationalModelOptionD = 0.0000001755
+                    ElseIf aMetal = "Pb" Then
+                        aNationalModelBaseline = 0.0000007765
+                        aNationalModelOptionD = 0.0000001575
+                    ElseIf aMetal = "Ni" Then
+                        aNationalModelBaseline = 0.00004363
+                        aNationalModelOptionD = 0.0000002928
+                    ElseIf aMetal = "Se" Then
+                        aNationalModelBaseline = 0.00005458
+                        aNationalModelOptionD = 0.0000002658
+                    ElseIf aMetal = "Tl" Then
+                        aNationalModelBaseline = 0.000003846
+                        aNationalModelOptionD = 0.0000004555
+                    ElseIf aMetal = "Zn" Then
+                        aNationalModelBaseline = 0.00006696
+                        aNationalModelOptionD = 0.0000009277
+                    End If
+                End If
+            ElseIf pLocation = 9 Then
+                If aUnits = "Total" Then  'for sammis plant
+                    If aMetal = "As" Then
+                        aNationalModelBaseline = 0.000004733
+                        aNationalModelOptionD = 0.00000007468
+                    ElseIf aMetal = "Cd" Then
+                        aNationalModelBaseline = 0.000001185
+                        aNationalModelOptionD = 0.00000005093
+                    ElseIf aMetal = "Cu" Then
+                        aNationalModelBaseline = 0.000005259
+                        aNationalModelOptionD = 0.00000004754
+                    ElseIf aMetal = "Pb" Then
+                        aNationalModelBaseline = 0.000003959
+                        aNationalModelOptionD = 0.00000004092
+                    ElseIf aMetal = "Ni" Then
+                        aNationalModelBaseline = 0.00002002
+                        aNationalModelOptionD = 0.00000007812
+                    ElseIf aMetal = "Se" Then
+                        aNationalModelBaseline = 0.00001334
+                        aNationalModelOptionD = 0.00000009206
+                    ElseIf aMetal = "Tl" Then
+                        aNationalModelBaseline = 0.00002256
+                        aNationalModelOptionD = 0.0000001179
+                    ElseIf aMetal = "Zn" Then
+                        aNationalModelBaseline = 0.00001628
+                        aNationalModelOptionD = 0.0000002461
+                    End If
+                Else
+                    'for dissolved
+                    If aMetal = "As" Then
+                        aNationalModelBaseline = 0.000004733
+                        aNationalModelOptionD = 0.00000007467
+                    ElseIf aMetal = "Cd" Then
+                        aNationalModelBaseline = 0.000001184
+                        aNationalModelOptionD = 0.00000005093
+                    ElseIf aMetal = "Cu" Then
+                        aNationalModelBaseline = 0.000005259
+                        aNationalModelOptionD = 0.00000004753
+                    ElseIf aMetal = "Pb" Then
+                        aNationalModelBaseline = 0.000003958
+                        aNationalModelOptionD = 0.00000004091
+                    ElseIf aMetal = "Ni" Then
+                        aNationalModelBaseline = 0.00002002
+                        aNationalModelOptionD = 0.00000007812
+                    ElseIf aMetal = "Se" Then
+                        aNationalModelBaseline = 0.00001334
+                        aNationalModelOptionD = 0.00000009205
+                    ElseIf aMetal = "Tl" Then
+                        aNationalModelBaseline = 0.00002256
+                        aNationalModelOptionD = 0.0000001179
+                    ElseIf aMetal = "Zn" Then
+                        aNationalModelBaseline = 0.00001628
+                        aNationalModelOptionD = 0.000000246
+                    End If
+                End If
+            End If
+        End If
+
+        If aUnits = "Total" Then
+            If aMetal = "As" Then
+                aLabel = "Total Arsenic (ug/L)"
+                aAquaBenchmarkAcute = 0.0
+                aAquaBenchmarkChronic = 0.0
+                aHealthBenchmarkWO = 0.000018
+                aHealthBenchmarkO = 0.00014
+                aMCL = 0.01
+            ElseIf aMetal = "Cd" Then
+                aLabel = "Total Cadmium (ug/L)"
+                aAquaBenchmarkAcute = 0.0
+                aAquaBenchmarkChronic = 0.0
+                aHealthBenchmarkWO = 0.0
+                aHealthBenchmarkO = 0.0
+                aMCL = 0.0
+            ElseIf aMetal = "Cu" Then
+                aLabel = "Total Copper (ug/L)"
+                aAquaBenchmarkAcute = 0.0
+                aAquaBenchmarkChronic = 0.0
+                aHealthBenchmarkWO = 1.3
+                aHealthBenchmarkO = 0.0
+                aMCL = 1.3
+            ElseIf aMetal = "Ni" Then
+                aLabel = "Total Nickel (ug/L)"
+                aAquaBenchmarkAcute = 0.0
+                aAquaBenchmarkChronic = 0.0
+                aHealthBenchmarkWO = 0.61
+                aHealthBenchmarkO = 4.6
+                aMCL = 0.0
+            ElseIf aMetal = "Pb" Then
+                aLabel = "Total Lead (ug/L)"
+                aAquaBenchmarkAcute = 0.0
+                aAquaBenchmarkChronic = 0.0
+                aHealthBenchmarkWO = 0.0
+                aHealthBenchmarkO = 0.0
+                aMCL = 0.0
+            ElseIf aMetal = "Se" Then
+                aLabel = "Total Selenium (ug/L)"
+                aAquaBenchmarkAcute = 0.0
+                aAquaBenchmarkChronic = 0.005
+                aHealthBenchmarkWO = 0.17
+                aHealthBenchmarkO = 4.2
+                aMCL = 0.05
+            ElseIf aMetal = "Tl" Then
+                aLabel = "Total Thallium (ug/L)"
+                aAquaBenchmarkAcute = 0.0
+                aAquaBenchmarkChronic = 0.0
+                aHealthBenchmarkWO = 0.00024
+                aHealthBenchmarkO = 0.00047
+                aMCL = 0.0
+            ElseIf aMetal = "Zn" Then
+                aLabel = "Total Zinc (ug/L)"
+                aAquaBenchmarkAcute = 0.0
+                aAquaBenchmarkChronic = 0.0
+                aHealthBenchmarkWO = 7.4
+                aHealthBenchmarkO = 26
+                aMCL = 0.0
+            End If
+        Else
+            'dissolved
+            If aMetal = "As" Then
+                aLabel = "Dissolved Arsenic (ug/L)"
+                aAquaBenchmarkAcute = 0.34
+                aAquaBenchmarkChronic = 0.15
+                aHealthBenchmarkWO = 0.0
+                aHealthBenchmarkO = 0.0
+                aMCL = 0.0
+            ElseIf aMetal = "Cd" Then
+                aLabel = "Dissolved Cadmium (ug/L)"
+                aAquaBenchmarkAcute = 0.002
+                aAquaBenchmarkChronic = 0.00025
+                aHealthBenchmarkWO = 0.0
+                aHealthBenchmarkO = 0.0
+                aMCL = 0.0
+            ElseIf aMetal = "Cu" Then
+                aLabel = "Dissolved Copper (ug/L)"
+                aAquaBenchmarkAcute = 0.013
+                aAquaBenchmarkChronic = 0.009
+                aHealthBenchmarkWO = 0.0
+                aHealthBenchmarkO = 0.0
+                aMCL = 0.0
+            ElseIf aMetal = "Ni" Then
+                aLabel = "Dissolved Nickel (ug/L)"
+                aAquaBenchmarkAcute = 0.47
+                aAquaBenchmarkChronic = 0.052
+                aHealthBenchmarkWO = 0.0
+                aHealthBenchmarkO = 0.0
+                aMCL = 0.0
+            ElseIf aMetal = "Pb" Then
+                aLabel = "Dissolved Lead (ug/L)"
+                aAquaBenchmarkAcute = 0.065
+                aAquaBenchmarkChronic = 0.0025
+                aHealthBenchmarkWO = 0.0
+                aHealthBenchmarkO = 0.0
+                aMCL = 0.0
+            ElseIf aMetal = "Se" Then
+                aLabel = "Dissolved Selenium (ug/L)"
+                aAquaBenchmarkAcute = 0.0
+                aAquaBenchmarkChronic = 0.0
+                aHealthBenchmarkWO = 0.0
+                aHealthBenchmarkO = 0.0
+                aMCL = 0.0
+            ElseIf aMetal = "Tl" Then
+                aLabel = "Dissolved Thallium (ug/L)"
+                aAquaBenchmarkAcute = 0.0
+                aAquaBenchmarkChronic = 0.0
+                aHealthBenchmarkWO = 0.0
+                aHealthBenchmarkO = 0.0
+                aMCL = 0.0
+            ElseIf aMetal = "Zn" Then
+                aLabel = "Dissolved Zinc (ug/L)"
+                aAquaBenchmarkAcute = 0.12
+                aAquaBenchmarkChronic = 0.12
+                aHealthBenchmarkWO = 0.0
+                aHealthBenchmarkO = 0.0
+                aMCL = 0.0
+            End If
+        End If
     End Sub
 
 End Module
