@@ -224,7 +224,6 @@ Friend Module modATCscript
                     End Try
                     CurrentLine = sb.ToString
                     LenCurrentLine = Len(CurrentLine)
-                    NextLineStart = NextLineStart + LenCurrentLine
                     percent = NextLineStart / (LenDataFile / 100)
                 Else
                     Dim EOLPos As Long
