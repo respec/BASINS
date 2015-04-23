@@ -1214,6 +1214,7 @@ ParseFixedDef:
                 Next c
             End With
         End If
+        Logger.Progress(100, 100)
         agdSample.Initialize(lNewSource)
         agdSample.SizeAllColumnsToContents()
         agdSample.Refresh()
@@ -1296,7 +1297,7 @@ ParseFixedDef:
             txtSample(linecnt).Text = ""
             linecnt = linecnt + 1
         End While
-        Exit Sub
+        Logger.Progress(100, 100)
     End Sub
 
 
