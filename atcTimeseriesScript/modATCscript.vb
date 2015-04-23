@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports atcUtility
 Imports atcData
+Imports atcMetCmp
 Imports MapWinUtility
 
 Friend Module modATCscript
@@ -171,7 +172,8 @@ Friend Module modATCscript
     Public Sub ScriptNextLine()
         Dim percent As Integer = LastPercent
         Do
-            If NextLineStart > LenDataFile Then
+            If NextLineStart > LenDataFile OrElse _
+            (DataFileHandle IsNot Nothing AndAlso DataFileHandle.EndOfStream()) Then
                 CurrentLine = ""
                 LenCurrentLine = 0
                 Exit Sub
@@ -222,6 +224,7 @@ Friend Module modATCscript
                     End Try
                     CurrentLine = sb.ToString
                     LenCurrentLine = Len(CurrentLine)
+                    NextLineStart = NextLineStart + LenCurrentLine
                     percent = NextLineStart / (LenDataFile / 100)
                 Else
                     Dim EOLPos As Long
