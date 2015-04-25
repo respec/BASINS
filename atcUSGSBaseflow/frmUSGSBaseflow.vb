@@ -798,8 +798,8 @@ Public Class frmUSGSBaseflow
         lGraphForm.Grapher = lGraphTS
         With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
             .YAxis.Type = AxisType.Log
-            Dim lScaleMin As Double = 1
-            .YAxis.Scale.Min = lScaleMin
+            'Dim lScaleMin As Double = 1
+            '.YAxis.Scale.Min = lScaleMin
             .AxisChange()
             .CurveList.Item(0).Color = Drawing.Color.Red
             If aDataGroup.Count > 2 Then
@@ -888,11 +888,11 @@ Public Class frmUSGSBaseflow
         Dim lGraphTS As New clsGraphProbability(aDataGroup, lZgc)
         lGraphForm.Grapher = lGraphTS
         With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
-            .YAxis.Scale.MinAuto = False
-            Dim lScaleMin As Double = 10
-            If aPerUnitArea Then lScaleMin = 0.005
-            .YAxis.Scale.Min = lScaleMin
-            .AxisChange()
+            '.YAxis.Scale.MinAuto = False
+            'Dim lScaleMin As Double = 10
+            'If aPerUnitArea Then lScaleMin = 0.005
+            '.YAxis.Scale.Min = lScaleMin
+            '.AxisChange()
             .CurveList.Item(0).Color = Drawing.Color.Red
 
             If aDataGroup.Count > 3 Then
