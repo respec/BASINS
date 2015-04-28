@@ -208,7 +208,7 @@ Public Class clsRora
         lTextMonCSV.Length = 0
 
         Dim lTextAnnCSV As New Text.StringBuilder
-        lTextAnnCSV.AppendLine("Groundwater Toolbox monthly output for recharge estimates using RORA approach.")
+        lTextAnnCSV.AppendLine("Groundwater Toolbox annual output for recharge estimates using RORA approach.")
         lTextAnnCSV.AppendLine("Station: USGS " & lStationID & " " & lStationName)
         lTextAnnCSV.AppendLine("Drainage area: " & lDA & " square miles")
         lTextAnnCSV.AppendLine(" ")
