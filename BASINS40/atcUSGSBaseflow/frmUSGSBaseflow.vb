@@ -888,11 +888,17 @@ Public Class frmUSGSBaseflow
         Dim lGraphTS As New clsGraphProbability(aDataGroup, lZgc)
         lGraphForm.Grapher = lGraphTS
         With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
-            '.YAxis.Scale.MinAuto = False
-            'Dim lScaleMin As Double = 10
-            'If aPerUnitArea Then lScaleMin = 0.005
-            '.YAxis.Scale.Min = lScaleMin
-            '.AxisChange()
+            .YAxis.Scale.MinAuto = False
+            Dim lScaleMin As Double = 10
+            If pDataGroup IsNot Nothing AndAlso pDataGroup.Count > 0 Then
+                Dim lmeanVal As Double = pDataGroup(0).Attributes.GetValue("Mean")
+                If lmeanVal < lScaleMin Then
+                    lScaleMin = 1.0
+                End If
+            End If
+            If aPerUnitArea Then lScaleMin = 0.005
+            .YAxis.Scale.Min = lScaleMin
+            .AxisChange()
             .CurveList.Item(0).Color = Drawing.Color.Red
 
             If aDataGroup.Count > 3 Then
