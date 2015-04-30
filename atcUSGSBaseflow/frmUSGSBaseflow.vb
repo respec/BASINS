@@ -71,6 +71,19 @@ Public Class frmUSGSBaseflow
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
             pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", _
                                                        pDataGroup, Nothing, True, True, Me.Icon)
+        Else
+            Dim lconstituent As String = pDataGroup(0).Attributes.GetValue("Constituent", "")
+            If String.IsNullOrEmpty(lconstituent) Then
+                Dim lParams() As String = {"Yes", "No"}
+                Dim lResponse As String = Logger.MsgCustomOwned("Is this a streamflow dataset?", "Base-flow Separation", Me, lParams)
+                If lResponse = "Yes" Then
+                    pDataGroup(0).Attributes.SetValue("Constituent", "Streamflow")
+                Else
+                    Logger.Msg("Please select a daily streamflow dataset for analysis.", MsgBoxStyle.Information, "Base-flow Separation")
+                    Me.Close()
+                    Exit Sub
+                End If
+            End If
         End If
 
         If pDataGroup.Count > 0 Then
