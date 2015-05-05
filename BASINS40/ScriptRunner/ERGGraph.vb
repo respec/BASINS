@@ -12,13 +12,13 @@ Imports System
 
 Module ERGGraph
     'black
-    'Private Const pTestPath As String = "C:\ERG_SteamElectric\Black"
-    'Private pLocation As Integer = 39 '1 '97 '39
-    'Private pStartYearForBaselinePlot As Integer = 1999
-    'Private pStartYearForSimulation As Integer = 1982
-    'Private pComplianceDate As Integer = 2019
-    'Private pSiteName As String = "Black"
-    'Private pBenthicSegmentStart As Integer = 59
+    Private Const pTestPath As String = "C:\ERG_SteamElectric\Black"
+    Private pLocation As Integer = 39 '1 '97 '39
+    Private pStartYearForBaselinePlot As Integer = 1999
+    Private pStartYearForSimulation As Integer = 1982
+    Private pComplianceDate As Integer = 2019
+    Private pSiteName As String = "Black"
+    Private pBenthicSegmentStart As Integer = 59
     'etowah
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah"
     ' ''Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
@@ -43,22 +43,23 @@ Module ERGGraph
     'Private pStartYearForSimulation As Integer = 2012
     'Private pComplianceDate As Integer = 2019
     'Private pSiteName As String = "LakeSinclair"
+    'Private pBenthicSegmentStart As Integer = 99999
     'mississippi
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\MississippiMO"
-    'Private pLocation As Integer = 9 '17   9 is rush island, 17 is meramec
+    'Private pLocation As Integer = 17   '9 is rush island, 17 is meramec
     'Private pStartYearForBaselinePlot As Integer = 1999
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2019
     'Private pSiteName As String = "MississippiMO"
     'Private pBenthicSegmentStart As Integer = 31
     'ohio
-    Private Const pTestPath As String = "C:\ERG_SteamElectric\Ohio"
-    Private pLocation As Integer = 13 '9 '13  9 is sammis, 13 is mansfield
-    Private pStartYearForBaselinePlot As Integer = 1999
-    Private pStartYearForSimulation As Integer = 1982
-    Private pComplianceDate As Integer = 2019
-    Private pSiteName As String = "Ohio"
-    Private pBenthicSegmentStart As Integer = 29
+    'Private Const pTestPath As String = "C:\ERG_SteamElectric\Ohio"
+    'Private pLocation As Integer = 9 '13  9 is sammis, 13 is mansfield
+    'Private pStartYearForBaselinePlot As Integer = 1999
+    'Private pStartYearForSimulation As Integer = 1982
+    'Private pComplianceDate As Integer = 2019
+    'Private pSiteName As String = "Ohio"
+    'Private pBenthicSegmentStart As Integer = 29
 
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -66,8 +67,13 @@ Module ERGGraph
         'DoERGGraphs()
         'ComputeThreeMonthRollingAverages()
         'DoERGCompositeGraph()
+        'DoERGCompositeGraphRefined()
         'DoGraphAtMaxConcLocation()
-        DoExceedanceSummary()
+        'DoExceedanceSummary()
+        'ComputeAnnualAverageAcrossAllSegments()
+        ComputeAverageConcentrationInEachSegment()
+        'DoERGCompositeGraphAveraged()
+        '      OutputInitialConditions()
     End Sub
 
     Private Sub DoERGGraphs()
@@ -396,14 +402,21 @@ Module ERGGraph
             lCurve.Color = Drawing.Color.Blue
             lCurve = lPane.CurveList.Item(1)
             lCurve.Color = Drawing.Color.Purple
-            lCurve = lPane.CurveList.Item(2)
-            lCurve.Color = Drawing.Color.LightGray
-            lCurve.Color = Drawing.Color.FromKnownColor(Drawing.KnownColor.Gray)
-            lCurve.Color = Drawing.Color.LightBlue
+            If Not aOutFile.Contains("CompositeRev") Then
+                lCurve = lPane.CurveList.Item(2)
+                lCurve.Color = Drawing.Color.LightGray
+                lCurve.Color = Drawing.Color.FromKnownColor(Drawing.KnownColor.Gray)
+                lCurve.Color = Drawing.Color.LightBlue
+            End If
 
             'lZgc.Width = 2400
             lZgc.Width = 1440 'may sacrifice too much resolution doing this?
             lZgc.Height = 300
+
+            If aOutFile.Contains("CompositeRev") Then
+                lZgc.Width = 1440
+                lZgc.Height = 600
+            End If
 
             lPane.Legend.IsVisible = False
             lPane.XAxis.Title.Text = ""
@@ -527,8 +540,8 @@ Module ERGGraph
             lPane.YAxis.Title.Text = aUnits
         End If
 
-            lZgc.SaveIn(aOutFile)
-            lZgc.Dispose()
+        lZgc.SaveIn(aOutFile)
+        lZgc.Dispose()
     End Sub
 
     Sub WriteAverageAnnualFile(ByVal aAverageAnnualFileName As String, ByVal aTimSer As atcTimeseries, ByVal aStartYear As Integer, ByVal aHeader As String)
@@ -1694,7 +1707,7 @@ Module ERGGraph
                 aAquaBenchmarkChronic = 0.0
                 aHealthBenchmarkWO = 0.0
                 aHealthBenchmarkO = 0.0
-                aMCL = 0.0
+                aMCL = 0.005
             ElseIf aMetal = "Cu" Then
                 aLabel = "Total Copper (ug/L)"
                 aAquaBenchmarkAcute = 0.0
@@ -1715,7 +1728,7 @@ Module ERGGraph
                 aAquaBenchmarkChronic = 0.0
                 aHealthBenchmarkWO = 0.0
                 aHealthBenchmarkO = 0.0
-                aMCL = 0.0
+                aMCL = 0.015
             ElseIf aMetal = "Se" Then
                 aLabel = "Total Selenium (ug/L)"
                 aAquaBenchmarkAcute = 0.0
@@ -1729,7 +1742,7 @@ Module ERGGraph
                 aAquaBenchmarkChronic = 0.0
                 aHealthBenchmarkWO = 0.00024
                 aHealthBenchmarkO = 0.00047
-                aMCL = 0.0
+                aMCL = 0.002
             ElseIf aMetal = "Zn" Then
                 aLabel = "Total Zinc (ug/L)"
                 aAquaBenchmarkAcute = 0.0
@@ -1800,4 +1813,873 @@ Module ERGGraph
         End If
     End Sub
 
+    Private Sub ComputeAnnualAverageAcrossAllSegments()
+
+        Dim lCsvName As String = ""
+
+        Dim pRunNames As New atcCollection
+        pRunNames.Add("AsBaselineHistoric")
+        pRunNames.Add("CdBaselineHistoric")
+        pRunNames.Add("CuBaselineHistoric")
+        pRunNames.Add("NiBaselineHistoric")
+        pRunNames.Add("PbBaselineHistoric")
+        pRunNames.Add("SeBaselineHistoric")
+        pRunNames.Add("TlBaselineHistoric")
+        pRunNames.Add("ZnBaselineHistoric")
+
+        lCsvName = "Total_Concentration.csv"
+
+        Dim lTimeseriesGroup As New atcTimeseriesGroup
+        Dim lTimeseriesCsv As New atcTimeseriesCSV.atcTimeseriesCSV
+
+        ChDriveDir(pTestPath & "\OutputPlots")
+
+        'Dim lSDate(5) As Integer : lSDate(0) = pStartYearForBaselinePlot : lSDate(1) = 1 : lSDate(2) = 1
+        'Dim lSDateJ As Double = Date2J(lSDate)
+        'Dim lEDate(5) As Integer : lEDate(0) = 2020 : lEDate(1) = 12 : lEDate(2) = 31
+        'Dim lEdatej As Double = Date2J(lEDate)
+
+        'do baseline historic 
+        For Each lRunName As String In pRunNames
+
+            Dim lAverageAnnualFileName As String = lRunName & "AnnualAverageForAllSegments.txt"
+
+            If Not FileExists(lAverageAnnualFileName) Then
+
+                Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+                If lTimeseriesCsv.Open(lCsvFileName) Then
+
+                    For Each lTimSerX As atcTimeseries In lTimeseriesCsv.DataSets
+                        lTimeseriesGroup.Add(lTimSerX)
+                    Next
+
+                    'while we've got it open, also output average total conc for each year
+                    Dim lHeader As String = lRunName & " Annual Average from " & lCsvName & " over all segments"
+
+                    Dim lTimSerAverage As atcTimeseries = lTimeseriesCsv.DataSets.ItemByKey(pLocation)
+
+                    Dim lDaySum As Double = 0.0
+                    For lIndex As Integer = 1 To lTimSerAverage.numValues
+                        lDaySum = 0.0
+                        For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                            If lTimSer.Values(1) > -1 Then
+                                lDaySum = lDaySum + lTimSer.Value(lIndex)
+                            End If
+                        Next
+                        lTimSerAverage.Value(lIndex) = lDaySum / (lTimeseriesGroup.Count - 1)
+                    Next
+
+                    WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerAverage, pStartYearForSimulation, lHeader)
+
+                    lTimeseriesCsv.Clear()
+                    lTimeseriesGroup.Clear()
+                Else
+                    Logger.Msg("Unable to Open " & lCsvFileName)
+                End If
+            End If
+        Next
+
+        Dim pMetalNames As New atcCollection
+        pMetalNames.Add("As")
+        pMetalNames.Add("Cd")
+        pMetalNames.Add("Cu")
+        pMetalNames.Add("Ni")
+        pMetalNames.Add("Pb")
+        pMetalNames.Add("Se")
+        pMetalNames.Add("Tl")
+        pMetalNames.Add("Zn")
+
+        'lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+        'lSDateJ = Date2J(lSDate)
+        'lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+        'lEdatej = Date2J(lEDate)
+
+        Dim lTimeseriesOptionsGroup As New atcTimeseriesGroup
+        Dim lTimeseriesCsvOption As New atcTimeseriesCSV.atcTimeseriesCSV
+
+        'do post-compliance options
+        For Each lMetalName As String In pMetalNames
+
+            Dim lAverageAnnualFileName As String = lMetalName & "Baseline" & "AnnualAverageForAllSegments.txt"
+
+            If Not FileExists(lAverageAnnualFileName) Then
+                Dim lOptionName As String = ""
+
+                lOptionName = lMetalName & "Baseline"
+                If FileExists(pTestPath & "\" & lOptionName & "\", True) Then
+                    'baseline folder exists
+
+                    Dim lCsvFileName As String = pTestPath & "\" & lOptionName & "\" & lCsvName
+                    If lTimeseriesCsvOption.Open(lCsvFileName) Then
+
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOption.DataSets
+                            lTimeseriesGroup.Add(lTimSerX)
+                        Next
+
+                        'while we've got it open, also output average total conc for each year
+                        Dim lHeader As String = lOptionName & " Annual Average from " & lCsvName & " over all segments"
+
+                        Dim lTimSerAverage As atcTimeseries = lTimeseriesCsvOption.DataSets.ItemByKey(pLocation)
+
+                        Dim lDaySum As Double = 0.0
+                        For lIndex As Integer = 1 To lTimSerAverage.numValues
+                            lDaySum = 0.0
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                                If lTimSer.Values(1) > -1 Then
+                                    lDaySum = lDaySum + lTimSer.Value(lIndex)
+                                End If
+                            Next
+                            lTimSerAverage.Value(lIndex) = lDaySum / (lTimeseriesGroup.Count - 1)
+                        Next
+                        WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerAverage, pComplianceDate, lHeader)
+
+                        lTimeseriesGroup.Clear()
+                        lTimeseriesCsvOption.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+                End If
+            End If
+
+            lAverageAnnualFileName = lMetalName & "OptionA" & "AnnualAverageForAllSegments.txt"
+            If Not FileExists(lAverageAnnualFileName) Then
+                Dim lOptionName As String = ""
+
+                lOptionName = lMetalName & "OptionA"
+                If FileExists(pTestPath & "\" & lOptionName & "\", True) Then
+                    'folder exists
+
+                    Dim lCsvFileName As String = pTestPath & "\" & lOptionName & "\" & lCsvName
+                    If lTimeseriesCsvOption.Open(lCsvFileName) Then
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOption.DataSets
+                            lTimeseriesGroup.Add(lTimSerX)
+                        Next
+
+                        'while we've got it open, also output average total conc for each year
+                        Dim lHeader As String = lOptionName & " Annual Average from " & lCsvName & " over all segments"
+                        Dim lTimSerAverage As atcTimeseries = lTimeseriesCsvOption.DataSets.ItemByKey(pLocation)
+                        Dim lDaySum As Double = 0.0
+                        For lIndex As Integer = 1 To lTimSerAverage.numValues
+                            lDaySum = 0.0
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                                If lTimSer.Values(1) > -1 Then
+                                    lDaySum = lDaySum + lTimSer.Value(lIndex)
+                                End If
+                            Next
+                            lTimSerAverage.Value(lIndex) = lDaySum / (lTimeseriesGroup.Count - 1)
+                        Next
+                        WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerAverage, pComplianceDate, lHeader)
+
+                        lTimeseriesGroup.Clear()
+                        lTimeseriesCsvOption.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+                End If
+            End If
+
+            lAverageAnnualFileName = lMetalName & "OptionB" & "AnnualAverageForAllSegments.txt"
+            If Not FileExists(lAverageAnnualFileName) Then
+                Dim lOptionName As String = ""
+
+                lOptionName = lMetalName & "OptionB"
+                If FileExists(pTestPath & "\" & lOptionName & "\", True) Then
+                    'folder exists
+
+                    Dim lCsvFileName As String = pTestPath & "\" & lOptionName & "\" & lCsvName
+                    If lTimeseriesCsvOption.Open(lCsvFileName) Then
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOption.DataSets
+                            lTimeseriesGroup.Add(lTimSerX)
+                        Next
+
+                        'while we've got it open, also output average total conc for each year
+                        Dim lHeader As String = lOptionName & " Annual Average from " & lCsvName & " over all segments"
+                        Dim lTimSerAverage As atcTimeseries = lTimeseriesCsvOption.DataSets.ItemByKey(pLocation)
+                        Dim lDaySum As Double = 0.0
+                        For lIndex As Integer = 1 To lTimSerAverage.numValues
+                            lDaySum = 0.0
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                                If lTimSer.Values(1) > -1 Then
+                                    lDaySum = lDaySum + lTimSer.Value(lIndex)
+                                End If
+                            Next
+                            lTimSerAverage.Value(lIndex) = lDaySum / (lTimeseriesGroup.Count - 1)
+                        Next
+                        WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerAverage, pComplianceDate, lHeader)
+
+                        lTimeseriesGroup.Clear()
+                        lTimeseriesCsvOption.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+                End If
+            End If
+
+            lAverageAnnualFileName = lMetalName & "OptionC" & "AnnualAverageForAllSegments.txt"
+            If Not FileExists(lAverageAnnualFileName) Then
+                Dim lOptionName As String = ""
+
+                lOptionName = lMetalName & "OptionC"
+                If FileExists(pTestPath & "\" & lOptionName & "\", True) Then
+                    'folder exists
+
+                    Dim lCsvFileName As String = pTestPath & "\" & lOptionName & "\" & lCsvName
+                    If lTimeseriesCsvOption.Open(lCsvFileName) Then
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOption.DataSets
+                            lTimeseriesGroup.Add(lTimSerX)
+                        Next
+
+                        'while we've got it open, also output average total conc for each year
+                        Dim lHeader As String = lOptionName & " Annual Average from " & lCsvName & " over all segments"
+                        Dim lTimSerAverage As atcTimeseries = lTimeseriesCsvOption.DataSets.ItemByKey(pLocation)
+                        Dim lDaySum As Double = 0.0
+                        For lIndex As Integer = 1 To lTimSerAverage.numValues
+                            lDaySum = 0.0
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                                If lTimSer.Values(1) > -1 Then
+                                    lDaySum = lDaySum + lTimSer.Value(lIndex)
+                                End If
+                            Next
+                            lTimSerAverage.Value(lIndex) = lDaySum / (lTimeseriesGroup.Count - 1)
+                        Next
+                        WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerAverage, pComplianceDate, lHeader)
+
+                        lTimeseriesGroup.Clear()
+                        lTimeseriesCsvOption.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+                End If
+            End If
+
+            lAverageAnnualFileName = lMetalName & "OptionD" & "AnnualAverageForAllSegments.txt"
+            If Not FileExists(lAverageAnnualFileName) Then
+                Dim lOptionName As String = ""
+
+                lOptionName = lMetalName & "OptionD"
+                If FileExists(pTestPath & "\" & lOptionName & "\", True) Then
+                    'folder exists
+
+                    Dim lCsvFileName As String = pTestPath & "\" & lOptionName & "\" & lCsvName
+                    If lTimeseriesCsvOption.Open(lCsvFileName) Then
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOption.DataSets
+                            lTimeseriesGroup.Add(lTimSerX)
+                        Next
+                        'while we've got it open, also output average total conc for each year
+                        Dim lHeader As String = lOptionName & " Annual Average from " & lCsvName & " over all segments"
+                        Dim lTimSerAverage As atcTimeseries = lTimeseriesCsvOption.DataSets.ItemByKey(pLocation)
+                        Dim lDaySum As Double = 0.0
+                        For lIndex As Integer = 1 To lTimSerAverage.numValues
+                            lDaySum = 0.0
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                                If lTimSer.Values(1) > -1 Then
+                                    lDaySum = lDaySum + lTimSer.Value(lIndex)
+                                End If
+                            Next
+                            lTimSerAverage.Value(lIndex) = lDaySum / (lTimeseriesGroup.Count - 1)
+                        Next
+                        WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerAverage, pComplianceDate, lHeader)
+
+                        lTimeseriesGroup.Clear()
+                        lTimeseriesCsvOption.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+                End If
+            End If
+
+        Next
+
+    End Sub
+
+    Private Sub DoERGCompositeGraphAveraged()
+
+        Dim lCsvName As String = ""
+
+        Dim pMetalNames As New atcCollection
+        pMetalNames.Add("As")
+        pMetalNames.Add("Cd")
+        pMetalNames.Add("Cu")
+        pMetalNames.Add("Ni")
+        pMetalNames.Add("Pb")
+        pMetalNames.Add("Se")
+        pMetalNames.Add("Tl")
+        pMetalNames.Add("Zn")
+
+        Dim pTypes As New atcCollection
+        pTypes.Add("Total")
+        pTypes.Add("Dissolved")
+
+        For Each lType As String In pTypes
+            lCsvName = lType & "_Concentration.csv"
+
+            Dim lTimeseriesGroup As New atcTimeseriesGroup
+
+            ChDriveDir(pTestPath & "\OutputPlots")
+
+            For Each lMetal As String In pMetalNames
+
+                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "Composite" & "Averaged.png"
+                If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
+                    lOutFileName = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeSeg" & pLocation.ToString & "Averaged.png"
+                End If
+
+                If Not FileExists(lOutFileName) Then
+                    'get baseline historic data
+                    Dim lTimeseriesCsv1 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    Dim lRunName As String = lMetal & "BaselineHistoric"
+                    Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
+                    If lTimeseriesCsv1.Open(lCsvFileName) Then
+
+                        'calc average value across all cells
+                        Dim lTimeseriesGroupToAverage As New atcTimeseriesGroup
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsv1.DataSets
+                            lTimeseriesGroupToAverage.Add(lTimSerX)
+                        Next
+                        Dim lTimSer1 As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(pLocation)
+                        Dim lDaySum As Double = 0.0
+                        For lIndex As Integer = 1 To lTimSer1.numValues
+                            lDaySum = 0.0
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroupToAverage
+                                If lTimSer.Values(1) > -1 Then
+                                    lDaySum = lDaySum + lTimSer.Value(lIndex)
+                                End If
+                            Next
+                            lTimSer1.Value(lIndex) = lDaySum / (lTimeseriesGroupToAverage.Count - 1)
+                        Next
+                        lTimeseriesGroupToAverage.Clear()
+
+                        lTimSer1.Attributes.SetValue("YAxis", "Left")
+
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 10 : lSDate(1) = 1 : lSDate(2) = 1
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate - 7 : lSDate(1) = 2 : lSDate(2) = 2
+                        End If
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate - 1 : lEDate(1) = 12 : lEDate(2) = 31
+                        Dim lEdatej As Double = Date2J(lEDate)
+
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSer1, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv1.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    'get option d post-compliance data
+                    Dim lTimeseriesCsv3 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    lRunName = lMetal & "OptionD"
+                    lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+                    If Not FileExists(lCsvFileName) Then
+                        lRunName = lMetal & "OptionC"
+                        lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+                    End If
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
+                    If lTimeseriesCsv3.Open(lCsvFileName) Then
+
+                        'calc average value across all cells
+                        Dim lTimeseriesGroupToAverage As New atcTimeseriesGroup
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsv3.DataSets
+                            lTimeseriesGroupToAverage.Add(lTimSerX)
+                        Next
+                        Dim lTimSerD As atcTimeseries = lTimeseriesCsv3.DataSets.ItemByKey(pLocation)
+                        Dim lDaySum As Double = 0.0
+                        For lIndex As Integer = 1 To lTimSerD.numValues
+                            lDaySum = 0.0
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroupToAverage
+                                If lTimSer.Values(1) > -1 Then
+                                    lDaySum = lDaySum + lTimSer.Value(lIndex)
+                                End If
+                            Next
+                            lTimSerD.Value(lIndex) = lDaySum / (lTimeseriesGroupToAverage.Count - 1)
+                        Next
+                        lTimeseriesGroupToAverage.Clear()
+
+                        lTimSerD.Attributes.SetValue("YAxis", "Left")
+
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                        End If
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                        End If
+                        Dim lEdatej As Double = Date2J(lEDate)
+
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSerD, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv3.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    'get baseline post-compliance data
+                    Dim lTimeseriesCsv2 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    lRunName = lMetal & "Baseline"
+                    lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
+                    If lTimeseriesCsv2.Open(lCsvFileName) Then
+
+                        'calc average value across all cells
+                        Dim lTimeseriesGroupToAverage As New atcTimeseriesGroup
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsv2.DataSets
+                            lTimeseriesGroupToAverage.Add(lTimSerX)
+                        Next
+                        Dim lTimSer2 As atcTimeseries = lTimeseriesCsv2.DataSets.ItemByKey(pLocation)
+                        Dim lDaySum As Double = 0.0
+                        For lIndex As Integer = 1 To lTimSer2.numValues
+                            lDaySum = 0.0
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroupToAverage
+                                If lTimSer.Values(1) > -1 Then
+                                    lDaySum = lDaySum + lTimSer.Value(lIndex)
+                                End If
+                            Next
+                            lTimSer2.Value(lIndex) = lDaySum / (lTimeseriesGroupToAverage.Count - 1)
+                        Next
+                        lTimeseriesGroupToAverage.Clear()
+
+                        lTimSer2.Attributes.SetValue("YAxis", "Left")
+
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                        End If
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                        End If
+                        Dim lEdatej As Double = Date2J(lEDate)
+
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSer2, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv2.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    GraphTimeseriesOptions(lTimeseriesGroup, lMetal, lOutFileName, lType, pSiteName)
+
+                    lTimeseriesGroup.Clear()
+                End If
+
+            Next
+        Next
+
+    End Sub
+
+    Private Sub OutputInitialConditions()
+
+        Dim lCsvName As String = ""
+
+        Dim pRunNames As New atcCollection
+        pRunNames.Add("AsBaselineHistoric")
+        pRunNames.Add("CdBaselineHistoric")
+        pRunNames.Add("CuBaselineHistoric")
+        pRunNames.Add("NiBaselineHistoric")
+        pRunNames.Add("PbBaselineHistoric")
+        pRunNames.Add("SeBaselineHistoric")
+        pRunNames.Add("TlBaselineHistoric")
+        pRunNames.Add("ZnBaselineHistoric")
+
+        lCsvName = "Total_Concentration.csv"
+
+        Dim lTimeseriesGroup As New atcTimeseriesGroup
+        Dim lTimeseriesCsv As New atcTimeseriesCSV.atcTimeseriesCSV
+
+        ChDriveDir(pTestPath & "\InitialConditions")
+        Dim lInitialConditionsFileName As String = ""
+
+        'Dim lSDate(5) As Integer : lSDate(0) = pStartYearForBaselinePlot : lSDate(1) = 1 : lSDate(2) = 1
+        'Dim lSDateJ As Double = Date2J(lSDate)
+        'Dim lEDate(5) As Integer : lEDate(0) = 2020 : lEDate(1) = 12 : lEDate(2) = 31
+        'Dim lEdatej As Double = Date2J(lEDate)
+
+        'do baseline historic 
+        For Each lRunName As String In pRunNames
+
+            lInitialConditionsFileName = lRunName.Substring(0, 2) & "InitialConditions.txt"
+
+            If Not FileExists(lInitialConditionsFileName) Then
+
+                Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+                If lTimeseriesCsv.Open(lCsvFileName) Then
+
+                    For Each lTimSerX As atcTimeseries In lTimeseriesCsv.DataSets
+                        lTimeseriesGroup.Add(lTimSerX)
+                    Next
+
+                    Dim lWrite As New IO.StreamWriter(lInitialConditionsFileName, False)
+                    Dim lStr As String = ""
+                    Dim lCnt As Integer = 0
+
+                    For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                        If lTimSer.Values(1) > -1 Then
+                            lCnt += 1
+                            '   1  0.000000  1.00000
+                            lStr = "   " & lCnt.ToString & "  " & lTimSer.Value(lTimSer.numValues).ToString & "  1.00000"
+                            lWrite.WriteLine(lStr)
+                        End If
+                    Next
+
+                    lWrite.Close()
+
+                    lTimeseriesCsv.Clear()
+                    lTimeseriesGroup.Clear()
+                Else
+                    Logger.Msg("Unable to Open " & lCsvFileName)
+                End If
+            End If
+        Next
+
+        'Organic_Solids.csv
+        lInitialConditionsFileName = "Organic_SolidsInitialConditions.txt"
+        lCsvName = "Organic_Solids.csv"
+        If Not FileExists(lInitialConditionsFileName) Then
+
+            Dim lCsvFileName As String = pTestPath & "\" & "AsBaselineHistoric" & "\" & lCsvName
+            If lTimeseriesCsv.Open(lCsvFileName) Then
+
+                For Each lTimSerX As atcTimeseries In lTimeseriesCsv.DataSets
+                    lTimeseriesGroup.Add(lTimSerX)
+                Next
+
+                Dim lWrite As New IO.StreamWriter(lInitialConditionsFileName, False)
+                Dim lStr As String = ""
+                Dim lCnt As Integer = 0
+
+                For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                    If lTimSer.Values(1) > -1 Then
+                        lCnt += 1
+                        '   1  0.000000  1.00000
+                        lStr = "   " & lCnt.ToString & "  " & lTimSer.Value(lTimSer.numValues).ToString & "  1.00000"
+                        lWrite.WriteLine(lStr)
+                    End If
+                Next
+
+                lWrite.Close()
+
+                lTimeseriesCsv.Clear()
+                lTimeseriesGroup.Clear()
+            Else
+                Logger.Msg("Unable to Open " & lCsvFileName)
+            End If
+        End If
+        'Sand.csv
+        lInitialConditionsFileName = "SandInitialConditions.txt"
+        lCsvName = "Sand.csv"
+        If Not FileExists(lInitialConditionsFileName) Then
+
+            Dim lCsvFileName As String = pTestPath & "\" & "AsBaselineHistoric" & "\" & lCsvName
+            If lTimeseriesCsv.Open(lCsvFileName) Then
+
+                For Each lTimSerX As atcTimeseries In lTimeseriesCsv.DataSets
+                    lTimeseriesGroup.Add(lTimSerX)
+                Next
+
+                Dim lWrite As New IO.StreamWriter(lInitialConditionsFileName, False)
+                Dim lStr As String = ""
+                Dim lCnt As Integer = 0
+
+                For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                    If lTimSer.Values(1) > -1 Then
+                        lCnt += 1
+                        '   1  0.000000  1.00000
+                        lStr = "   " & lCnt.ToString & "  " & lTimSer.Value(lTimSer.numValues).ToString & "  1.00000"
+                        lWrite.WriteLine(lStr)
+                    End If
+                Next
+
+                lWrite.Close()
+
+                lTimeseriesCsv.Clear()
+                lTimeseriesGroup.Clear()
+            Else
+                Logger.Msg("Unable to Open " & lCsvFileName)
+            End If
+        End If
+        'Silts_Fines.csv
+        lInitialConditionsFileName = "Silts_FinesInitialConditions.txt"
+        lCsvName = "Silts_Fines.csv"
+        If Not FileExists(lInitialConditionsFileName) Then
+
+            Dim lCsvFileName As String = pTestPath & "\" & "AsBaselineHistoric" & "\" & lCsvName
+            If lTimeseriesCsv.Open(lCsvFileName) Then
+
+                For Each lTimSerX As atcTimeseries In lTimeseriesCsv.DataSets
+                    lTimeseriesGroup.Add(lTimSerX)
+                Next
+
+                Dim lWrite As New IO.StreamWriter(lInitialConditionsFileName, False)
+                Dim lStr As String = ""
+                Dim lCnt As Integer = 0
+
+                For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                    If lTimSer.Values(1) > -1 Then
+                        lCnt += 1
+                        '   1  0.000000  1.00000
+                        lStr = "   " & lCnt.ToString & "  " & lTimSer.Value(lTimSer.numValues).ToString & "  1.00000"
+                        lWrite.WriteLine(lStr)
+                    End If
+                Next
+
+                lWrite.Close()
+
+                lTimeseriesCsv.Clear()
+                lTimeseriesGroup.Clear()
+            Else
+                Logger.Msg("Unable to Open " & lCsvFileName)
+            End If
+        End If
+
+    End Sub
+
+    Private Sub DoERGCompositeGraphRefined()
+
+        Dim lCsvName As String = ""
+
+        Dim pMetalNames As New atcCollection
+        pMetalNames.Add("As")
+        pMetalNames.Add("Cd")
+        pMetalNames.Add("Cu")
+        pMetalNames.Add("Ni")
+        pMetalNames.Add("Pb")
+        pMetalNames.Add("Se")
+        pMetalNames.Add("Tl")
+        pMetalNames.Add("Zn")
+
+        Dim pTypes As New atcCollection
+        pTypes.Add("Total")
+        pTypes.Add("Dissolved")
+
+        For Each lType As String In pTypes
+            lCsvName = lType & "_Concentration.csv"
+
+            Dim lTimeseriesGroup As New atcTimeseriesGroup
+
+            ChDriveDir(pTestPath & "\OutputPlots")
+
+            For Each lMetal As String In pMetalNames
+
+                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeRev" & ".png"
+                If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
+                    lOutFileName = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeRevSeg" & pLocation.ToString & ".png"
+                End If
+
+                If Not FileExists(lOutFileName) Then
+                    'get baseline historic data
+                    Dim lTimeseriesCsv1 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    Dim lRunName As String = lMetal & "BaselineHistoric"
+                    Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
+                    If lTimeseriesCsv1.Open(lCsvFileName) Then
+
+                        Dim lTimSer1 As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(pLocation)
+
+                        lTimSer1.Attributes.SetValue("YAxis", "Left")
+
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 5 : lSDate(1) = 1 : lSDate(2) = 1
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate - 7 : lSDate(1) = 2 : lSDate(2) = 2
+                        End If
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate - 1 : lEDate(1) = 12 : lEDate(2) = 30
+                        Dim lEdatej As Double = Date2J(lEDate)
+
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSer1, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv1.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    'get option d post-compliance data
+                    Dim lTimeseriesCsv3 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    lRunName = lMetal & "OptionD"
+                    lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+                    If Not FileExists(lCsvFileName) Then
+                        lRunName = lMetal & "OptionC"
+                        lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+                    End If
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
+                    If lTimeseriesCsv3.Open(lCsvFileName) Then
+
+                        Dim lTimSerD As atcTimeseries = lTimeseriesCsv3.DataSets.ItemByKey(pLocation)
+
+                        lTimSerD.Attributes.SetValue("YAxis", "Left")
+
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 1 : lSDate(1) = 12 : lSDate(2) = 31
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                        End If
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 4 : lEDate(1) = 12 : lEDate(2) = 31
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                        End If
+                        Dim lEdatej As Double = Date2J(lEDate)
+
+                        'lag dates by a day to account for wasp output convention
+                        For lindex As Integer = lTimSerD.numValues - 1 To 1 Step -1
+                            lTimSerD.Values(lindex + 1) = lTimSerD.Values(lindex)
+                        Next
+
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSerD, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv3.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    GraphTimeseriesOptions(lTimeseriesGroup, lMetal, lOutFileName, lType, pSiteName)
+
+                    lTimeseriesGroup.Clear()
+                End If
+
+            Next
+        Next
+
+    End Sub
+
+    Private Sub ComputeAverageConcentrationInEachSegment()
+
+        Dim lConcCsvName As String = "Total_Concentration.csv"
+        Dim lFlowCsvName As String = "Segment_Outflow.csv"
+
+        Dim lTimeseriesGroupConc As New atcTimeseriesGroup
+        Dim lTimeseriesGroupFlow As New atcTimeseriesGroup
+        Dim lTimeseriesCsv As New atcTimeseriesCSV.atcTimeseriesCSV
+
+        ChDriveDir(pTestPath & "\OutputPlots")
+
+        Dim pMetalNames As New atcCollection
+        pMetalNames.Add("As")
+        'pMetalNames.Add("Cd")
+        'pMetalNames.Add("Cu")
+        'pMetalNames.Add("Ni")
+        pMetalNames.Add("Pb")
+        'pMetalNames.Add("Se")
+        'pMetalNames.Add("Tl")
+        'pMetalNames.Add("Zn")
+
+        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+        Dim lSDateJ As Double = Date2J(lSDate)
+        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
+        Dim lEdatej As Double = Date2J(lEDate)
+
+        Dim lTimeseriesCsvOption As New atcTimeseriesCSV.atcTimeseriesCSV
+
+        For Each lMetalName As String In pMetalNames
+
+            Dim lOutputFileName As String = lMetalName & "Baseline" & "AverageConcentrationForAllSegments.txt"
+
+            If Not FileExists(lOutputFileName) Then
+                Dim lOptionName As String = ""
+
+                lOptionName = lMetalName & "Baseline"
+                If FileExists(pTestPath & "\" & lOptionName & "\", True) Then
+                    'baseline folder exists
+
+                    Dim lCsvFileName As String = pTestPath & "\" & lOptionName & "\" & lConcCsvName
+                    If lTimeseriesCsvOption.Open(lCsvFileName) Then
+
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOption.DataSets
+                            lTimeseriesGroupConc.Add(SubsetByDate(lTimSerX, _
+                                                     lSDateJ, _
+                                                     lEdatej, Nothing))
+                        Next
+
+                        lTimeseriesCsvOption.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    'if start date file doesn't exist, copy from total conc 
+                    If Not FileExists(pTestPath & "\" & lOptionName & "\" & lFlowCsvName & ".start") Then
+                        FileCopy(pTestPath & "\" & lOptionName & "\" & lConcCsvName & ".start", pTestPath & "\" & lOptionName & "\" & lFlowCsvName & ".start")
+                    End If
+
+                    lCsvFileName = pTestPath & "\" & lOptionName & "\" & lFlowCsvName
+                    If lTimeseriesCsvOption.Open(lCsvFileName) Then
+
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOption.DataSets
+                            lTimeseriesGroupFlow.Add(SubsetByDate(lTimSerX, _
+                                                     lSDateJ, _
+                                                     lEdatej, Nothing))
+                        Next
+
+                        lTimeseriesCsvOption.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    'now we have all the conc and flow timeseries available 
+                    Dim lHeader As String = lOptionName & " Average Total Concentration and Outflow for All Segments"
+
+                    WriteAverageConcAndFlowFile(lOutputFileName, lTimeseriesGroupConc, lTimeseriesGroupFlow, lHeader)
+
+                    lTimeseriesGroupConc.Clear()
+                    lTimeseriesGroupFlow.Clear()
+                End If
+            End If
+
+        Next
+
+    End Sub
+
+    Sub WriteAverageConcAndFlowFile(ByVal aOutputFileName As String, ByVal aTimSerGroupConc As atcTimeseriesGroup, ByVal aTimSerGroupFlow As atcTimeseriesGroup, ByVal aHeader As String)
+
+        Dim lWrite As New IO.StreamWriter(aOutputFileName, False)
+        Dim lDate(5) As Integer
+
+        Dim lStr As String = aHeader
+        lWrite.WriteLine(lStr)
+
+        lStr = "Segment, TotalConc, Outflow"
+        lWrite.WriteLine(lStr)
+        For lIndex As Integer = 1 To aTimSerGroupConc.Count
+            Dim aTimSerConc As atcTimeseries = aTimSerGroupConc(lIndex - 1)
+            Dim aTimSerFlow As atcTimeseries = aTimSerGroupFlow(lIndex - 1)
+            lStr = lIndex.ToString & " , " & Format(aTimSerConc.Attributes.GetValue("Mean"), "0.####") & " , " & Format(aTimSerFlow.Attributes.GetValue("Mean"), "0.####")
+            lWrite.WriteLine(lStr)
+        Next
+
+        lWrite.Close()
+    End Sub
 End Module
