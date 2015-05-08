@@ -843,8 +843,8 @@ Public Module ConstituentBudget
                     If lConnection.Source.Opn.Description = landUse Then
                         'Need to add test to make sure that the operation was listed in the OPN SEQUENCE block.
                         lFound = True
-                        Dim lConnectionArea As Double = lConnection.MFact
-
+                        Dim lConnectionArea As Double = lConnection.MFact + 1.0E-30
+                        '1.0E-30 was added to make sure that rate is calculated for operations with zero areas
                         Dim lMassLinkID As Integer = lConnection.MassLink
                         Dim lTestLocation As String = lConnection.Source.VolName.Substring(0, 1) & ":" & lConnection.Source.VolId
 
@@ -857,12 +857,15 @@ Public Module ConstituentBudget
                                 lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lTs.Attributes.GetValue("Constituent"), aBalanceType, _
                                                                                aConversionFactor, aMultipleIndex:=0)
                             End If
+
                             lConstituentTotal = lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor * lConnectionArea
                             'lConstituentTotal = lConstituentRate * lConnectionArea
 
                             lTotal += lConnectionArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
                         Next
+
                         felu2(aUCI, aReach, aBalanceType, aVolName, aLandUses, aLoadingByLanduse, aReachTotal, aReporting, aContribPercent, lTotal, lConnectionArea, landUse, lTestLocation)
+
                         Exit For
                     End If
                 End If
@@ -912,21 +915,26 @@ Public Module ConstituentBudget
 
             aContribPercent.Increment("Reach" & aReach.Id & " " & lVolPrefix & aLandUse, lPercentContrib)
 
-            If aConnectionArea > 0 Then
-                aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
-                & aTestLocation & " " _
-                & aLandUse & vbTab _
-                & aConnectionArea & vbTab _
-                & DoubleToString(aTotal2 / aConnectionArea, 15, "#,##0.###") & vbTab & _
-                                    DoubleToString(aTotal2, 15, "#,##0.###") & vbTab & vbCrLf
-            Else
-                aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
-                & aTestLocation & " " _
-                & aLandUse & vbTab _
-                & aConnectionArea & vbTab _
-                & DoubleToString(0.0, 15, "#,##0.###") & vbTab & _
-                                    DoubleToString(0.0, 15, "#,##0.###") & vbTab & vbCrLf
+            'If aConnectionArea > 0 Then
+            Dim lrate As Double = aTotal2 / aConnectionArea
+            If aConnectionArea = 1.0E-30 Then
+                aConnectionArea = 0
+                aTotal2 = 0
             End If
+            aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
+            & aTestLocation & " " _
+            & aLandUse & vbTab _
+            & aConnectionArea & vbTab _
+            & DoubleToString(lrate, 15, "#,##0.###") & vbTab & _
+                                DoubleToString(aTotal2, 15, "#,##0.###") & vbTab & vbCrLf
+            'Else
+            '    aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
+            '    & aTestLocation & " " _
+            '    & aLandUse & vbTab _
+            '    & aConnectionArea & vbTab _
+            '    & DoubleToString(0.0, 15, "#,##0.###") & vbTab & _
+            '                        DoubleToString(0.0, 15, "#,##0.###") & vbTab & vbCrLf
+            'End If
 
         Else
             pRunningTotals.Add("Reach" & aReach.Id & " " & lVolPrefix & aLandUse, aTotal)
