@@ -26,7 +26,6 @@ Partial Class StartUp
         Me.cmdStart = New System.Windows.Forms.Button()
         Me.cmdBrowse = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.txtUCIPath = New System.Windows.Forms.TextBox()
         Me.lblRCH = New System.Windows.Forms.Label()
         Me.txtRCH = New System.Windows.Forms.TextBox()
         Me.lblOutReach2 = New System.Windows.Forms.Label()
@@ -49,6 +48,7 @@ Partial Class StartUp
         Me.chkWaterQualitySensitivity = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.cmbUCIPath = New System.Windows.Forms.ComboBox()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
@@ -67,6 +67,7 @@ Partial Class StartUp
         '
         'cmdBrowse
         '
+        Me.cmdBrowse.AllowDrop = True
         Me.cmdBrowse.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdBrowse.Location = New System.Drawing.Point(371, 52)
         Me.cmdBrowse.Name = "cmdBrowse"
@@ -84,18 +85,6 @@ Partial Class StartUp
         Me.Label1.TabIndex = 2
         Me.Label1.Text = "Browse to the model UCI file"
         '
-        'txtUCIPath
-        '
-        Me.txtUCIPath.AllowDrop = True
-        Me.txtUCIPath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtUCIPath.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
-        Me.txtUCIPath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.RecentlyUsedList
-        Me.txtUCIPath.Location = New System.Drawing.Point(20, 54)
-        Me.txtUCIPath.Name = "txtUCIPath"
-        Me.txtUCIPath.Size = New System.Drawing.Size(345, 20)
-        Me.txtUCIPath.TabIndex = 2
-        '
         'lblRCH
         '
         Me.lblRCH.AutoSize = True
@@ -106,7 +95,7 @@ Partial Class StartUp
         Me.lblRCH.Size = New System.Drawing.Size(441, 13)
         Me.lblRCH.TabIndex = 7
         Me.lblRCH.Text = "Number(s) of the outlet reach at which you would like water and/or nutrient balan" & _
-            "ce reports?"
+    "ce reports?"
         '
         'txtRCH
         '
@@ -270,7 +259,7 @@ Partial Class StartUp
         Me.chkAdditionalgraphs.Size = New System.Drawing.Size(408, 17)
         Me.chkAdditionalgraphs.TabIndex = 15
         Me.chkAdditionalgraphs.Text = "Generate Additional graphs (Make sure that AdditionalGraphs.csv file is available" & _
-            ")"
+    ")"
         Me.chkAdditionalgraphs.UseVisualStyleBackColor = True
         '
         'btn_help
@@ -335,6 +324,20 @@ Partial Class StartUp
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Water Quality"
         '
+        'cmbUCIPath
+        '
+        Me.cmbUCIPath.AllowDrop = True
+        Me.cmbUCIPath.DisplayMember = """STYLE"""
+        Me.cmbUCIPath.DropDownHeight = 150
+        Me.cmbUCIPath.DropDownStyle = System.Windows.Forms.ComboBoxStyle.Simple
+        Me.cmbUCIPath.FormattingEnabled = True
+        Me.cmbUCIPath.IntegralHeight = False
+        Me.cmbUCIPath.Location = New System.Drawing.Point(22, 54)
+        Me.cmbUCIPath.Name = "cmbUCIPath"
+        Me.cmbUCIPath.Size = New System.Drawing.Size(311, 21)
+        Me.cmbUCIPath.TabIndex = 2
+        Me.cmbUCIPath.ValueMember = """STYLE"""
+        '
         'StartUp
         '
         Me.AcceptButton = Me.cmdStart
@@ -342,6 +345,7 @@ Partial Class StartUp
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
         Me.ClientSize = New System.Drawing.Size(463, 569)
+        Me.Controls.Add(Me.cmbUCIPath)
         Me.Controls.Add(Me.lblRCH)
         Me.Controls.Add(Me.txtRCH)
         Me.Controls.Add(Me.lblOutReach2)
@@ -353,7 +357,6 @@ Partial Class StartUp
         Me.Controls.Add(Me.chkRunHSPF)
         Me.Controls.Add(Me.chkAreaReports)
         Me.Controls.Add(Me.cmdEnd)
-        Me.Controls.Add(Me.txtUCIPath)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.cmdBrowse)
         Me.Controls.Add(Me.cmdStart)
@@ -375,7 +378,6 @@ Partial Class StartUp
     Friend WithEvents cmdStart As System.Windows.Forms.Button
     Friend WithEvents cmdBrowse As System.Windows.Forms.Button
     Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents txtUCIPath As System.Windows.Forms.TextBox
     Friend WithEvents lblRCH As System.Windows.Forms.Label
     Friend WithEvents txtRCH As System.Windows.Forms.TextBox
     Friend WithEvents lblOutReach2 As System.Windows.Forms.Label
@@ -398,5 +400,6 @@ Partial Class StartUp
     Friend WithEvents chkWaterQualitySensitivity As System.Windows.Forms.CheckBox
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents cmbUCIPath As System.Windows.Forms.ComboBox
 
 End Class
