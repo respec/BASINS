@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "HSPEXP+"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "AQUA TERRA Consultants"
 #define MyAppURL "http://www.aquaterra.com/resources/downloads/HSPEXPplus.php"
 #define MyAppExeName "HSPEXP+.exe"
