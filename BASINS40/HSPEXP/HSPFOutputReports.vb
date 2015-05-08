@@ -81,7 +81,7 @@ Module HSPFOutputReports
         pRunUci = StartUp.chkRunHSPF.Checked
         pMakeAreaReports = StartUp.chkAreaReports.Checked
 
-        Dim lTestName As String = IO.Path.GetFileNameWithoutExtension(StartUp.txtUCIPath.Text)
+        Dim lTestName As String = IO.Path.GetFileNameWithoutExtension(StartUp.cmbUCIPath.Text)
         Logger.Status("Beginning analysis of " & lTestName, True)
 
         If StartUp.chkHydrologySensitivity.Checked Then
@@ -110,7 +110,7 @@ Module HSPFOutputReports
         'set up the timeseries attributes for statistics
         atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
         
-        pTestPath = StartUp.txtUCIPath.Text
+        pTestPath = StartUp.cmbUCIPath.Text
         pBaseName = lTestName
         pTestPath = Mid(pTestPath, 1, Len(pTestPath) - Len(pBaseName) - 4)
 
@@ -583,7 +583,8 @@ RWZProgramEnding:
 
         Logger.Status("")
         atcDataManager.Clear()
-        Call Application.Exit()
+        StartUp.Show()
+        'Call Application.Exit()
 
     End Sub
 
@@ -642,12 +643,17 @@ RWZProgramEnding:
             lRecordIndex += 1
 
             If Not Trim(lGraphInit(7)) = "" Then
-                lGraphStartDateJ = Trim(lGraphInit(7))
+                Dim SDate As String() = Trim(lGraphInit(7)).Split("/")
+                lGraphStartDateJ = Date2J(SDate(2), SDate(0), SDate(1))
+
             Else
                 lGraphStartDateJ = lGraphStartJ
             End If
             If Not Trim(lGraphInit(8)) = "" Then
-                lGraphEndDateJ = Trim(lGraphInit(8))
+                Dim EDate As String() = Trim(lGraphInit(8)).Split("/")
+                lGraphEndDateJ = Date2J(EDate(2), EDate(0), EDate(1), 24, 0)
+
+
             Else
                 lGraphEndDateJ = lGraphEndJ
             End If
@@ -679,13 +685,12 @@ RWZProgramEnding:
                     End Select
 
                     lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
-                    Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
-
 
                     If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
                         Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
                                                        " Curve " & CurveNumber & ". Program will quit!")
                     End If
+                    Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
                     lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
 
                     lTimeSeries = AggregateTS(lTimeSeries, Trim(lGraphDataset(10)).ToLower, Trim(lGraphDataset(11)).ToLower)
@@ -731,6 +736,7 @@ RWZProgramEnding:
             lList.Save(lTimeseriesGroup, lOutFileName.Substring(0, Len(lOutFileName) - 4) & ".txt")
             lZgc.Dispose()
             lRecordIndex -= 1
+            lTimeseriesGroup = Nothing
         Loop While (lRecordIndex + 1) < lGraphRecords.Count
         'atcDataManager.Clear()
     End Sub
@@ -831,7 +837,8 @@ RWZProgramEnding:
                 lCurve.Symbol.Type = SymbolType.None
                 lCurve.Line.IsVisible = True
                 lCurve.Line.Style = Drawing.Drawing2D.DashStyle.Solid
-                lCurve.Line.Width = Trim(lGraphDataset(8))
+                lCurve.Line.Width = Math.Max(Convert.ToInt32(Trim(lGraphDataset(8))), 1)
+
             Else
                 lCurve.Line.IsVisible = False
                 Select Case Trim(lGraphDataset(7)).ToLower
@@ -857,29 +864,34 @@ RWZProgramEnding:
                         lCurve.Symbol.Type = SymbolType.XCross
                     Case "star"
                         lCurve.Symbol.Type = SymbolType.Star
+                    Case Else
+                        lCurve.Symbol.Type = SymbolType.Circle
+                        lCurve.Symbol.Fill.IsVisible = True
+
                 End Select
-                lCurve.Symbol.Size = Trim(lGraphDataset(8))
-            End If
-
-            If Trim(lGraphDataset(5)).ToLower = "nonstep" Then
-                lCurve.Line.StepType = StepType.NonStep
-            Else
-                lCurve.Line.StepType = StepType.ForwardStep
-            End If
-
-
-            lCurve.Color = Drawing.Color.FromName(Trim(lGraphDataset(5)).ToLower)
-
-            If Not Trim(lGraphDataset(9)) = "" Then
-                If Trim(lGraphDataset(9)).ToLower = "don't show" Then
-                    lCurve.Label.IsVisible = False
+                lCurve.Symbol.Size = Math.Max(Convert.ToInt32(Trim(lGraphDataset(8))), 1)
                 End If
-                lCurve.Label.Text = Trim(lGraphDataset(9))
-            End If
 
-            'End If
-            aRecordIndex += 1
+                If Trim(lGraphDataset(5)).ToLower = "nonstep" Then
+                    lCurve.Line.StepType = StepType.NonStep
+                Else
+                    lCurve.Line.StepType = StepType.ForwardStep
+                End If
+
+
+                lCurve.Color = Drawing.Color.FromName(Trim(lGraphDataset(5)).ToLower)
+
+                If Not Trim(lGraphDataset(9)) = "" Then
+                    If Trim(lGraphDataset(9)).ToLower = "don't show" Then
+                        lCurve.Label.IsVisible = False
+                    End If
+                    lCurve.Label.Text = Trim(lGraphDataset(9))
+                End If
+
+                'End If
+                aRecordIndex += 1
         Next CurveNumber
+        aTimeseriesgroup = Nothing
         Return aZgc
     End Function
     Private Function FrequencyGraph(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl, ByVal aGraphInit As Object, _
@@ -897,7 +909,7 @@ RWZProgramEnding:
 
         lPaneMain.YAxis.Title.Text = Trim(aGraphInit(3))
         lPaneMain.XAxis.Title.Text = Trim(aGraphInit(4))
-
+        lPaneMain.Legend.FontSpec.Size = 12
 
         If Trim(aGraphInit(15)) = "yes" Then
             lPaneMain.YAxis.Type = AxisType.Log
@@ -938,6 +950,7 @@ RWZProgramEnding:
                     lCurve.Label.IsVisible = False
                 End If
                 lCurve.Label.Text = Trim(lGraphDataset(9))
+
             End If
 
             'End If
