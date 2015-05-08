@@ -196,7 +196,7 @@ Public Class atcExpertSystem
             lRecordIndex += lNStorms + 1
             lExsRecord = lExsRecords(lRecordIndex)
             For lSiteIndex As Integer = 0 To lNSites - 1
-                If Not Double.TryParse(lExsRecord.Substring((lSiteIndex * 8), 8), Sites(lSiteIndex).Area) Then
+                If Not Double.TryParse(SafeSubstring(lExsRecord, (lSiteIndex * 8), 8), Sites(lSiteIndex).Area) Then
                     Throw New ApplicationException("The area for Site " & lSiteIndex & " is not in correct format. Program will quit!")
                 End If
             Next lSiteIndex
