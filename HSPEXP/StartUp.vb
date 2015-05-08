@@ -17,20 +17,27 @@ Public Class StartUp
             .FilterIndex = 0
             .Multiselect = False
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                txtUCIPath.Text = .FileName ' lPathName
-                txtUCIPath.Visible = True
-                txtRCH.Visible = True
-                lblRCH.Visible = True
-                lblOutReach2.Visible = True
-                pnlHighlight.Visible = True
-                cmdStart.Enabled = True
+                cmbUCIPath.Text = .FileName ' lPathName
+                UciChanged()
+                SaveSetting("HSPEXP+", "Defaults", "UCI", .FileName)
             End If
         End With
         Me.Focus()
     End Sub
 
+    Sub UciChanged()
+        Dim lExists As Boolean = IO.File.Exists(cmbUCIPath.Text)
+        'cmbUCIPath.Visible = lExists
+        txtRCH.Visible = lExists
+        lblRCH.Visible = lExists
+        lblOutReach2.Visible = lExists
+        pnlHighlight.Visible = lExists
+        cmdStart.Enabled = lExists
+    End Sub
+
     Private Sub cmdEnd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEnd.Click
         Me.Close()
+        Call Application.Exit()
     End Sub
 
     Private Sub chkRunHSPF_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkRunHSPF.CheckedChanged
@@ -63,9 +70,9 @@ Public Class StartUp
 
 
     Private Sub btnMakeEXSFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMakeEXSFile.Click
-        If txtUCIPath.Text.Length > 0 Then
+        If cmbUCIPath.Text.Length > 0 Then
             MakeEXSFile.Show()
-            MakeEXSFile.lblUCIFileName.Text = txtUCIPath.Text
+            MakeEXSFile.lblUCIFileName.Text = cmbUCIPath.Text
             Dim lWDM As New atcWDM.atcDataSourceWDM
             atcData.atcDataManager.OpenDataSource(lWDM, IO.Path.ChangeExtension(MakeEXSFile.lblUCIFileName.Text, ".wdm"), Nothing)
             Dim lSIMQ As atcData.atcTimeseriesGroup = lWDM.DataSets.FindData("Constituent", "SIMQ")
@@ -80,6 +87,7 @@ Public Class StartUp
     Private Sub StartUp_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Dim WinHspfLtDir As String = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar & "WinHSPFLt"
+        Logger.Dbg("Located WinHSPFLt at " & WinHspfLtDir)
         Try
             'Set Environmental Variable
             System.Environment.SetEnvironmentVariable("PATH", WinHspfLtDir & ";" & Environment.GetEnvironmentVariable("PATH"))
@@ -111,7 +119,12 @@ Public Class StartUp
             .Add(New atcGraph.atcGraphPlugin)
             '.Add(New atcDataTree.atcDataTreePlugin)
         End With
-
+        Dim lUCI As String = GetSetting("HSPEXP+", "Defaults", "UCI", "")
+        If IO.File.Exists(lUCI) Then
+            cmbUCIPath.Items.Add(lUCI)
+            cmbUCIPath.SelectedIndex = 0
+        End If
+        UciChanged
     End Sub
 
     Private Sub btn_help_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_help.Click
@@ -133,5 +146,9 @@ Public Class StartUp
                 ResetAllControlsBackColor(childControl)
             Next childControl
         End If
+    End Sub
+
+    Private Sub cmbUCIPath_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbUCIPath.SelectedIndexChanged
+
     End Sub
 End Class
