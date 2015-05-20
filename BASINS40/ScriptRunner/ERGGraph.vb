@@ -54,7 +54,7 @@ Module ERGGraph
     'Private pBenthicSegmentStart As Integer = 31
     'ohio
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\Ohio"
-    'Private pLocation As Integer = 9 '13  9 is sammis, 13 is mansfield
+    'Private pLocation As Integer = 13  '9 is sammis, 13 is mansfield
     'Private pStartYearForBaselinePlot As Integer = 1999
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2019
@@ -63,16 +63,16 @@ Module ERGGraph
 
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        '      DoBaselineHistoricGraphsMultipleLocations()
-        'DoERGGraphs()
-        'ComputeThreeMonthRollingAverages()
-        'DoERGCompositeGraph()
-        'DoERGCompositeGraphRefined()
-        'DoGraphAtMaxConcLocation()
-        'DoExceedanceSummary()
-        'ComputeAnnualAverageAcrossAllSegments()
-        ComputeAverageConcentrationInEachSegment()
-        'DoERGCompositeGraphAveraged()
+        '      DoBaselineHistoricGraphsMultipleLocations()  
+        DoERGGraphs()
+        ComputeThreeMonthRollingAverages()
+        DoERGCompositeGraph()
+        DoERGCompositeGraphRefined()
+        '      DoGraphAtMaxConcLocation()
+        DoExceedanceSummary()
+        '      ComputeAnnualAverageAcrossAllSegments()
+        '      ComputeAverageConcentrationInEachSegment()
+        '      DoERGCompositeGraphAveraged()
         '      OutputInitialConditions()
     End Sub
 
@@ -2589,7 +2589,7 @@ Module ERGGraph
         ChDriveDir(pTestPath & "\OutputPlots")
 
         Dim pMetalNames As New atcCollection
-        pMetalNames.Add("As")
+        'pMetalNames.Add("As")
         'pMetalNames.Add("Cd")
         'pMetalNames.Add("Cu")
         'pMetalNames.Add("Ni")
@@ -2598,53 +2598,64 @@ Module ERGGraph
         'pMetalNames.Add("Tl")
         'pMetalNames.Add("Zn")
 
+        Dim lOldOrNew As String = ""
+        'lOldOrNew = "\PriorToKdCorrection"
+
         Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
         Dim lSDateJ As Double = Date2J(lSDate)
         Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 9 : lEDate(1) = 12 : lEDate(2) = 31
         Dim lEdatej As Double = Date2J(lEDate)
 
-        Dim lTimeseriesCsvOption As New atcTimeseriesCSV.atcTimeseriesCSV
+        Dim lTimeseriesCsvOptionConc As New atcTimeseriesCSV.atcTimeseriesCSV
+        Dim lTimeseriesCsvOptionFlow As New atcTimeseriesCSV.atcTimeseriesCSV
 
         For Each lMetalName As String In pMetalNames
 
             Dim lOutputFileName As String = lMetalName & "Baseline" & "AverageConcentrationForAllSegments.txt"
+            If lOldOrNew.Length > 0 Then
+                lOutputFileName = lMetalName & "Baseline" & "AverageConcentrationForAllSegmentsPriorToKdCorrections.txt"
+            End If
 
             If Not FileExists(lOutputFileName) Then
                 Dim lOptionName As String = ""
 
                 lOptionName = lMetalName & "Baseline"
-                If FileExists(pTestPath & "\" & lOptionName & "\", True) Then
+                lOptionName = "AAATrial" & lMetalName & "Baseline"
+
+                If FileExists(pTestPath & lOldOrNew & "\" & lOptionName & "\", True) Then
                     'baseline folder exists
 
-                    Dim lCsvFileName As String = pTestPath & "\" & lOptionName & "\" & lConcCsvName
-                    If lTimeseriesCsvOption.Open(lCsvFileName) Then
+                    Dim lCsvFileName As String = pTestPath & lOldOrNew & "\" & lOptionName & "\" & lConcCsvName
+                    If lTimeseriesCsvOptionConc.Open(lCsvFileName) Then
 
-                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOption.DataSets
-                            lTimeseriesGroupConc.Add(SubsetByDate(lTimSerX, _
-                                                     lSDateJ, _
-                                                     lEdatej, Nothing))
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOptionConc.DataSets
+                            'lTimeseriesGroupConc.Add(SubsetByDate(lTimSerX, _
+                            '                         lSDateJ, _
+                            '                         lEdatej, Nothing))
+                            lTimeseriesGroupConc.Add(lTimSerX)
                         Next
 
-                        lTimeseriesCsvOption.Clear()
+                        'lTimeseriesCsvOption.Clear()
                     Else
                         Logger.Msg("Unable to Open " & lCsvFileName)
                     End If
 
                     'if start date file doesn't exist, copy from total conc 
-                    If Not FileExists(pTestPath & "\" & lOptionName & "\" & lFlowCsvName & ".start") Then
-                        FileCopy(pTestPath & "\" & lOptionName & "\" & lConcCsvName & ".start", pTestPath & "\" & lOptionName & "\" & lFlowCsvName & ".start")
+                    If Not FileExists(pTestPath & lOldOrNew & "\" & lOptionName & "\" & lFlowCsvName & ".start") Then
+                        FileCopy(pTestPath & lOldOrNew & "\" & lOptionName & "\" & lConcCsvName & ".start", pTestPath & lOldOrNew & "\" & lOptionName & "\" & lFlowCsvName & ".start")
                     End If
 
-                    lCsvFileName = pTestPath & "\" & lOptionName & "\" & lFlowCsvName
-                    If lTimeseriesCsvOption.Open(lCsvFileName) Then
+                    lCsvFileName = pTestPath & lOldOrNew & "\" & lOptionName & "\" & lFlowCsvName
+                    If lTimeseriesCsvOptionFlow.Open(lCsvFileName) Then
 
-                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOption.DataSets
-                            lTimeseriesGroupFlow.Add(SubsetByDate(lTimSerX, _
-                                                     lSDateJ, _
-                                                     lEdatej, Nothing))
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsvOptionFlow.DataSets
+                            'lTimeseriesGroupFlow.Add(SubsetByDate(lTimSerX, _
+                            '                         lSDateJ, _
+                            '                         lEdatej, Nothing))
+                            lTimeseriesGroupFlow.Add(lTimSerX)
                         Next
 
-                        lTimeseriesCsvOption.Clear()
+                        'lTimeseriesCsvOption.Clear()
                     Else
                         Logger.Msg("Unable to Open " & lCsvFileName)
                     End If
@@ -2673,10 +2684,12 @@ Module ERGGraph
 
         lStr = "Segment, TotalConc, Outflow"
         lWrite.WriteLine(lStr)
-        For lIndex As Integer = 1 To aTimSerGroupConc.Count
+        lStr = "  , ug/L , cms"
+        lWrite.WriteLine(lStr)
+        For lIndex As Integer = 1 To aTimSerGroupConc.Count - 1
             Dim aTimSerConc As atcTimeseries = aTimSerGroupConc(lIndex - 1)
             Dim aTimSerFlow As atcTimeseries = aTimSerGroupFlow(lIndex - 1)
-            lStr = lIndex.ToString & " , " & Format(aTimSerConc.Attributes.GetValue("Mean"), "0.####") & " , " & Format(aTimSerFlow.Attributes.GetValue("Mean"), "0.####")
+            lStr = lIndex.ToString & " , " & Format(aTimSerConc.Attributes.GetValue("Mean"), "0.########") & " , " & Format(aTimSerFlow.Attributes.GetValue("Mean"), "0.####")
             lWrite.WriteLine(lStr)
         Next
 
