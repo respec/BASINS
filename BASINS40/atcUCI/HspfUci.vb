@@ -2473,7 +2473,7 @@ x:
     Public Function EchoFileName() As String
         For lFileIndex As Integer = 1 To pFilesBlk.Count
             If pFilesBlk.Value(lFileIndex).Typ = "MESSU" Then
-                Return pFilesBlk.Value(lFileIndex).Name
+                Return pFilesBlk.Value(lFileIndex).Name.Trim
             End If
         Next lFileIndex
         Return ""
