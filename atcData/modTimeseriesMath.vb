@@ -1156,6 +1156,30 @@ NextOldVal:
         aBins.Insert(aBinIndex, lNewBin.Item(lSplitCount - 1), lNewBin)
     End Sub
 
+    Public Function GetPercentileOf(ByVal aTser As atcTimeseries, ByVal aValue As Double) As Double
+        Dim lPercentile As Double = pNaN
+        If aTser IsNot Nothing AndAlso Not Double.IsNaN(aValue) Then
+            Dim lHigher As Integer = aTser.numValues
+            If lHigher <= 0 Then Return 0 'No values present to compare to
+            Dim lLower As Integer = 0 'Note: this starts one *lower than* start of where to search in array
+            Dim lProbe As Integer
+            While (lHigher - lLower > 1)
+                lProbe = (lHigher + lLower) / 2
+                If aTser.Value(lProbe) < aValue Then
+                    lLower = lProbe
+                Else
+                    lHigher = lProbe
+                End If
+            End While
+            If aValue > aTser.Value(lHigher) Then
+                lPercentile = (lHigher + 1) * 100.0 / aTser.numValues
+            Else
+                lPercentile = lHigher * 100.0 / aTser.numValues
+            End If
+        End If
+        Return lPercentile
+    End Function
+
     ''' <summary>
     ''' Binary search through an ArrayList containing Double values sorted in ascending order
     ''' </summary>
