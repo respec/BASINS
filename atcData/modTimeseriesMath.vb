@@ -1159,22 +1159,19 @@ NextOldVal:
     Public Function GetPercentileOf(ByVal aTser As atcTimeseries, ByVal aValue As Double) As Double
         Dim lPercentile As Double = pNaN
         If aTser IsNot Nothing AndAlso Not Double.IsNaN(aValue) Then
-            Dim lHigher As Integer = aTser.numValues
-            If lHigher <= 0 Then Return 0 'No values present to compare to
-            Dim lLower As Integer = 0 'Note: this starts one *lower than* start of where to search in array
-            Dim lProbe As Integer
-            While (lHigher - lLower > 1)
-                lProbe = (lHigher + lLower) / 2
-                If aTser.Value(lProbe) < aValue Then
-                    lLower = lProbe
-                Else
-                    lHigher = lProbe
-                End If
-            End While
-            If aValue > aTser.Value(lHigher) Then
-                lPercentile = (lHigher + 1) * 100.0 / aTser.numValues
-            Else
-                lPercentile = lHigher * 100.0 / aTser.numValues
+            Dim ValueIndex As Integer = 0
+            Dim lBins As atcCollection = aTser.Attributes.GetValue("Bins", Nothing)
+            If lBins IsNot Nothing Then
+                For Each lBin As ArrayList In lBins
+                    If aValue < lBin(0) Then Exit For
+                    If aValue > lBin(lBin.Count - 1) Then
+                        ValueIndex += lBin.Count - 1
+                    Else
+                        Dim lBinValueIndex As Integer = BinarySearchFirstGreaterDoubleArrayList(lBin, aValue)
+                        ValueIndex += lBinValueIndex
+                    End If
+                Next
+                lPercentile = ValueIndex * 100.0 / aTser.numValues
             End If
         End If
         Return lPercentile
