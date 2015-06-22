@@ -3271,4 +3271,38 @@ x:
         End If
 
     End Function
+
+    ''' <summary>
+    ''' True if echo file ends with "End of Job"
+    ''' </summary>
+    Function ReachedEndOfJob() As Boolean
+        Dim lEchName As String = AbsolutePath(EchoFileName, IO.Path.GetDirectoryName(Name))
+
+        If Not IO.File.Exists(lEchName) Then
+            Logger.Dbg("Echo file not found, so ReachedEndOfJob = False: " & lEchName)
+            Return False
+        End If
+        Dim lEchoFile As IO.FileStream = Nothing
+        Try
+            'Open up the ech file
+            lEchoFile = New IO.FileStream(lEchName, IO.FileMode.Open, IO.FileAccess.Read)
+            Dim lFileLength As Long = lEchoFile.Length
+            Dim lStartReading As Long = Math.Max(0, lFileLength - 20)
+            Dim lReadLength As Long = lFileLength - lStartReading
+            lEchoFile.Position = lStartReading
+            Dim lStreamReader As New IO.StreamReader(lEchoFile, System.Text.Encoding.ASCII)
+            Dim lLastPartOfEchoFile As String = lStreamReader.ReadToEnd()
+            Return lLastPartOfEchoFile.Contains("End of Job")
+        Catch ex As Exception
+            Logger.Dbg("Error reading echo file, so ReachedEndOfJob = False: " & lEchName & " " & ex.ToString)
+            Return False
+        Finally
+            If lEchoFile IsNot Nothing Then
+                Try
+                    lEchoFile.Close()
+                Catch
+                End Try
+            End If
+        End Try
+    End Function
 End Class
