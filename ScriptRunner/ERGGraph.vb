@@ -30,9 +30,9 @@ Module ERGGraph
     'Private pBenthicSegmentStart As Integer = 33
     'white
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\White"
-    'Private pLocation As Integer = 17
+    'Private pLocation As Integer = 76 '16  '76  '17  changed to 76 with addition of lick creek
     'Private pStartYearForBaselinePlot As Integer = 1999
-    'Private pStartYearForSimulation As Integer = 1982
+    'Private pStartYearForSimulation As Integer = 1986
     'Private pComplianceDate As Integer = 2019
     'Private pSiteName As String = "White"
     'Private pBenthicSegmentStart As Integer = 26
@@ -54,7 +54,7 @@ Module ERGGraph
     'Private pBenthicSegmentStart As Integer = 31
     'ohio
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\Ohio"
-    'Private pLocation As Integer = 13  '9 is sammis, 13 is mansfield
+    'Private pLocation As Integer = 13 '9 is sammis, 13 is mansfield
     'Private pStartYearForBaselinePlot As Integer = 1999
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2019
@@ -63,17 +63,17 @@ Module ERGGraph
 
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
+        DoERGGraphs()                          'core
+        ComputeThreeMonthRollingAverages()     'core
+        DoERGCompositeGraph()                  'core  
+        DoERGCompositeGraphRefined()           'core  
+        DoExceedanceSummary()                  'core
         '      DoBaselineHistoricGraphsMultipleLocations()  
-        DoERGGraphs()
-        ComputeThreeMonthRollingAverages()
-        DoERGCompositeGraph()
-        DoERGCompositeGraphRefined()
         '      DoGraphAtMaxConcLocation()
-        DoExceedanceSummary()
-        '      ComputeAnnualAverageAcrossAllSegments()
-        '      ComputeAverageConcentrationInEachSegment()
-        '      DoERGCompositeGraphAveraged()
-        '      OutputInitialConditions()
+        'ComputeAnnualAverageAcrossAllSegments()     'specific to lake sinclair
+        'ComputeAverageConcentrationInEachSegment()  'specific to lake sinclair?
+        'DoERGCompositeGraphAveraged()               'specific to lake sinclair 
+        'OutputInitialConditions()    'specific to lake sinclair
     End Sub
 
     Private Sub DoERGGraphs()
@@ -109,6 +109,9 @@ Module ERGGraph
         For Each lRunName As String In pRunNames
 
             Dim lOutFileName As String = lRunName & ".png"
+            If pSiteName = "White" And pLocation = 16 Then
+                lOutFileName = lRunName & "Seg" & pLocation.ToString & ".png"
+            End If
             If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
                 lOutFileName = lRunName & "Seg" & pLocation.tostring & ".png"
             End If
@@ -134,6 +137,9 @@ Module ERGGraph
 
                     'while we've got it open, also output average total conc for each year
                     Dim lAverageAnnualFileName As String = lRunName & "AnnualAverage.txt"
+                    If pSiteName = "White" And pLocation = 16 Then
+                        lAverageAnnualFileName = lRunName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
+                    End If
                     If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
                         lAverageAnnualFileName = lRunName & "Seg" & pLocation.tostring & "AnnualAverage.txt"
                     End If
@@ -148,6 +154,7 @@ Module ERGGraph
             End If
         Next
 
+        'patrick says these option plots are not needed, but the tables are
         Dim pMetalNames As New atcCollection
         pMetalNames.Add("As")
         pMetalNames.Add("Cd")
@@ -169,6 +176,9 @@ Module ERGGraph
         'do post-compliance option plots
         For Each lMetalName As String In pMetalNames
             Dim lOutFileName As String = lMetalName & "Options.png"
+            If pSiteName = "White" And pLocation = 16 Then
+                lOutFileName = lMetalName & "Seg" & pLocation.ToString & "Options.png"
+            End If
             If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
                 lOutFileName = lMetalName & "Seg" & pLocation.ToString & "Options.png"
             End If
@@ -196,8 +206,11 @@ Module ERGGraph
 
                         'while we've got it open, also output average total conc for each year
                         Dim lAverageAnnualFileName As String = lOptionName & "AnnualAverage.txt"
+                        If pSiteName = "White" And pLocation = 16 Then
+                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
+                        End If
                         If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
-                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.tostring & "AnnualAverage.txt"
+                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
                         End If
                         Dim lHeader As String = lOptionName & " Annual Average from " & lCsvName & " at Seg " & pLocation
                         WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerX, pComplianceDate, lHeader)
@@ -228,8 +241,11 @@ Module ERGGraph
 
                         'while we've got it open, also output average total conc for each year
                         Dim lAverageAnnualFileName As String = lOptionName & "AnnualAverage.txt"
+                        If pSiteName = "White" And pLocation = 16 Then
+                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
+                        End If
                         If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
-                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.tostring & "AnnualAverage.txt"
+                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
                         End If
                         Dim lHeader As String = lOptionName & " Annual Average from " & lCsvName & " at Seg " & pLocation
                         WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerA, pComplianceDate, lHeader)
@@ -260,8 +276,11 @@ Module ERGGraph
 
                         'while we've got it open, also output average total conc for each year
                         Dim lAverageAnnualFileName As String = lOptionName & "AnnualAverage.txt"
+                        If pSiteName = "White" And pLocation = 16 Then
+                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
+                        End If
                         If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
-                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.tostring & "AnnualAverage.txt"
+                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
                         End If
                         Dim lHeader As String = lOptionName & " Annual Average from " & lCsvName & " at Seg " & pLocation
                         WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerB, pComplianceDate, lHeader)
@@ -292,8 +311,11 @@ Module ERGGraph
 
                         'while we've got it open, also output average total conc for each year
                         Dim lAverageAnnualFileName As String = lOptionName & "AnnualAverage.txt"
+                        If pSiteName = "White" And pLocation = 16 Then
+                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
+                        End If
                         If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
-                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.tostring & "AnnualAverage.txt"
+                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
                         End If
                         Dim lHeader As String = lOptionName & " Annual Average from " & lCsvName & " at Seg " & pLocation
                         WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerC, pComplianceDate, lHeader)
@@ -324,8 +346,11 @@ Module ERGGraph
 
                         'while we've got it open, also output average total conc for each year
                         Dim lAverageAnnualFileName As String = lOptionName & "AnnualAverage.txt"
+                        If pSiteName = "White" And pLocation = 16 Then
+                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
+                        End If
                         If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
-                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.tostring & "AnnualAverage.txt"
+                            lAverageAnnualFileName = lOptionName & "Seg" & pLocation.ToString & "AnnualAverage.txt"
                         End If
                         Dim lHeader As String = lOptionName & " Annual Average from " & lCsvName & " at Seg " & pLocation
                         WriteAverageAnnualFile(lAverageAnnualFileName, lTimSerD, pComplianceDate, lHeader)
@@ -570,14 +595,14 @@ Module ERGGraph
         Dim lSDateJ As Double = Date2J(lSDate)
 
         Dim pMetalNames As New atcCollection
-        pMetalNames.Add("As")
-        pMetalNames.Add("Cd")
-        pMetalNames.Add("Cu")
-        pMetalNames.Add("Ni")
-        pMetalNames.Add("Pb")
-        pMetalNames.Add("Se")
-        pMetalNames.Add("Tl")
-        pMetalNames.Add("Zn")
+        'pMetalNames.Add("As")
+        'pMetalNames.Add("Cd")
+        'pMetalNames.Add("Cu")
+        'pMetalNames.Add("Ni")
+        'pMetalNames.Add("Pb")
+        pMetalNames.Add("Se")    'patrick says only selenium for production runs
+        'pMetalNames.Add("Tl")
+        'pMetalNames.Add("Zn")
 
         Dim pOptions As New atcCollection
         pOptions.Add("Baseline")
@@ -774,9 +799,9 @@ Module ERGGraph
 
             For Each lMetal As String In pMetalNames
 
-                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "Composite" & ".png"
+                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "Composite" & "New.png"
                 If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
-                    lOutFileName = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeSeg" & pLocation.ToString & ".png"
+                    lOutFileName = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeSeg" & pLocation.ToString & "New.png"
                 End If
 
                 If Not FileExists(lOutFileName) Then
@@ -1129,7 +1154,7 @@ Module ERGGraph
                                         If (lIndex = pLocation) Then
                                             lStr = lStr & " IRW"
                                         End If
-                                        If lIndex < pBenthicSegmentStart Then
+                                        If lIndex < pBenthicSegmentStart Or lIndex = pLocation Then
                                             lWrite.WriteLine(lStr)
                                         End If
                                     End If
@@ -1170,7 +1195,7 @@ Module ERGGraph
                                         If (lIndex = pLocation) Then
                                             lStr = lStr & " IRW"
                                         End If
-                                        If lIndex < pBenthicSegmentStart Then
+                                        If lIndex < pBenthicSegmentStart Or lIndex = pLocation Then
                                             lWrite.WriteLine(lStr)
                                         End If
                                     End If
@@ -1211,7 +1236,7 @@ Module ERGGraph
                                         If (lIndex = pLocation) Then
                                             lStr = lStr & " IRW"
                                         End If
-                                        If lIndex < pBenthicSegmentStart Then
+                                        If lIndex < pBenthicSegmentStart Or lIndex = pLocation Then
                                             lWrite.WriteLine(lStr)
                                         End If
                                     End If
@@ -1252,7 +1277,7 @@ Module ERGGraph
                                         If (lIndex = pLocation) Then
                                             lStr = lStr & " IRW"
                                         End If
-                                        If lIndex < pBenthicSegmentStart Then
+                                        If lIndex < pBenthicSegmentStart Or lIndex = pLocation Then
                                             lWrite.WriteLine(lStr)
                                         End If
                                     End If
@@ -1293,7 +1318,7 @@ Module ERGGraph
                                         If (lIndex = pLocation) Then
                                             lStr = lStr & " IRW"
                                         End If
-                                        If lIndex < pBenthicSegmentStart Then
+                                        If lIndex < pBenthicSegmentStart Or lIndex = pLocation Then
                                             lWrite.WriteLine(lStr)
                                         End If
                                     End If
@@ -1376,65 +1401,65 @@ Module ERGGraph
         If aSiteName = "Black" Then
             If aUnits = "Total" Then
                 If aMetal = "As" Then  'total
-                    aNationalModelBaseline = 0.00003109
-                    aNationalModelOptionD = 0.0000216
+                    aNationalModelBaseline = 0.00002846
+                    aNationalModelOptionD = 0.00001955
                 ElseIf aMetal = "Cd" Then
-                    aNationalModelBaseline = 0.0001746
-                    aNationalModelOptionD = 0.000007179
+                    aNationalModelBaseline = 0.0001767
+                    aNationalModelOptionD = 0.000009237
                 ElseIf aMetal = "Cu" Then
-                    aNationalModelBaseline = 0.00004359
-                    aNationalModelOptionD = 0.000008496
+                    aNationalModelBaseline = 0.00004296
+                    aNationalModelOptionD = 0.000007874
                 ElseIf aMetal = "Pb" Then
-                    aNationalModelBaseline = 0.00001324
-                    aNationalModelOptionD = 0.00000557
+                    aNationalModelBaseline = 0.00001285
+                    aNationalModelOptionD = 0.000005185
                 ElseIf aMetal = "Ni" Then
-                    aNationalModelBaseline = 0.001391
-                    aNationalModelOptionD = 0.00002863
+                    aNationalModelBaseline = 0.001384
+                    aNationalModelOptionD = 0.0000225
                 ElseIf aMetal = "Se" Then
-                    aNationalModelBaseline = 0.00181
-                    aNationalModelOptionD = 0.00002912
+                    aNationalModelBaseline = 0.001821
+                    aNationalModelOptionD = 0.00003949
                 ElseIf aMetal = "Tl" Then
-                    aNationalModelBaseline = 0.00005413
-                    aNationalModelOptionD = 0.00001536
+                    aNationalModelBaseline = 0.00005049
+                    aNationalModelOptionD = 0.00001532
                 ElseIf aMetal = "Zn" Then
-                    aNationalModelBaseline = 0.002195
-                    aNationalModelOptionD = 0.00007316
+                    aNationalModelBaseline = 0.002211
+                    aNationalModelOptionD = 0.00008888
                 End If
             Else
                 'for dissolved
                 If aMetal = "As" Then
-                    aNationalModelBaseline = 0.00003109
-                    aNationalModelOptionD = 0.0000216
+                    aNationalModelBaseline = 0.00002376
+                    aNationalModelOptionD = 0.00001633
                 ElseIf aMetal = "Cd" Then
-                    aNationalModelBaseline = 0.0001746
-                    aNationalModelOptionD = 0.000007179
+                    aNationalModelBaseline = 0.00005939
+                    aNationalModelOptionD = 0.000003105
                 ElseIf aMetal = "Cu" Then
-                    aNationalModelBaseline = 0.00004359
-                    aNationalModelOptionD = 0.000008495
+                    aNationalModelBaseline = 0.00001909
+                    aNationalModelOptionD = 0.000003499
                 ElseIf aMetal = "Pb" Then
-                    aNationalModelBaseline = 0.00001323
-                    aNationalModelOptionD = 0.000005569
+                    aNationalModelBaseline = 0.000000952
+                    aNationalModelOptionD = 0.0000003841
                 ElseIf aMetal = "Ni" Then
-                    aNationalModelBaseline = 0.001391
-                    aNationalModelOptionD = 0.00002862
+                    aNationalModelBaseline = 0.0009228
+                    aNationalModelOptionD = 0.000015
                 ElseIf aMetal = "Se" Then
-                    aNationalModelBaseline = 0.00181
-                    aNationalModelOptionD = 0.00002911
+                    aNationalModelBaseline = 0.00112
+                    aNationalModelOptionD = 0.0000243
                 ElseIf aMetal = "Tl" Then
-                    aNationalModelBaseline = 0.00005413
-                    aNationalModelOptionD = 0.00001535
+                    aNationalModelBaseline = 0.00003811
+                    aNationalModelOptionD = 0.00001156
                 ElseIf aMetal = "Zn" Then
-                    aNationalModelBaseline = 0.002195
-                    aNationalModelOptionD = 0.00007315
+                    aNationalModelBaseline = 0.0006317
+                    aNationalModelOptionD = 0.00002539
                 End If
             End If
         ElseIf aSiteName = "Etowah" Then
             If aUnits = "Total" Then
                 If aMetal = "As" Then
-                    aNationalModelBaseline = 0.00000728
+                    aNationalModelBaseline = 0.000007059
                     aNationalModelOptionD = 0.000003615
                 ElseIf aMetal = "Cd" Then
-                    aNationalModelBaseline = 0.0000704
+                    aNationalModelBaseline = 0.00007042
                     aNationalModelOptionD = 0.000002609
                 ElseIf aMetal = "Cu" Then
                     aNationalModelBaseline = 0.00001636
@@ -1443,13 +1468,13 @@ Module ERGGraph
                     aNationalModelBaseline = 0.000005056
                     aNationalModelOptionD = 0.000002101
                 ElseIf aMetal = "Ni" Then
-                    aNationalModelBaseline = 0.0005551
+                    aNationalModelBaseline = 0.0005549
                     aNationalModelOptionD = 0.000003907
                 ElseIf aMetal = "Se" Then
                     aNationalModelBaseline = 0.0007252
                     aNationalModelOptionD = 0.000003546
                 ElseIf aMetal = "Tl" Then
-                    aNationalModelBaseline = 0.00002092
+                    aNationalModelBaseline = 0.00001956
                     aNationalModelOptionD = 0.000006077
                 ElseIf aMetal = "Zn" Then
                     aNationalModelBaseline = 0.0008717
@@ -1458,29 +1483,29 @@ Module ERGGraph
             Else
                 'for dissolved
                 If aMetal = "As" Then
-                    aNationalModelBaseline = 0.000007279
-                    aNationalModelOptionD = 0.000003614
+                    aNationalModelBaseline = 0.000005895
+                    aNationalModelOptionD = 0.000003019
                 ElseIf aMetal = "Cd" Then
-                    aNationalModelBaseline = 0.00007039
-                    aNationalModelOptionD = 0.000002608
+                    aNationalModelBaseline = 0.00002367
+                    aNationalModelOptionD = 0.0000008768
                 ElseIf aMetal = "Cu" Then
-                    aNationalModelBaseline = 0.00001636
-                    aNationalModelOptionD = 0.000002341
+                    aNationalModelBaseline = 0.00000727
+                    aNationalModelOptionD = 0.00000104
                 ElseIf aMetal = "Pb" Then
-                    aNationalModelBaseline = 0.000005055
-                    aNationalModelOptionD = 0.000002101
+                    aNationalModelBaseline = 0.0000003745
+                    aNationalModelOptionD = 0.0000001556
                 ElseIf aMetal = "Ni" Then
-                    aNationalModelBaseline = 0.000555
-                    aNationalModelOptionD = 0.000003906
+                    aNationalModelBaseline = 0.00037
+                    aNationalModelOptionD = 0.000002604
                 ElseIf aMetal = "Se" Then
-                    aNationalModelBaseline = 0.0007251
-                    aNationalModelOptionD = 0.000003546
+                    aNationalModelBaseline = 0.0004463
+                    aNationalModelOptionD = 0.000002182
                 ElseIf aMetal = "Tl" Then
-                    aNationalModelBaseline = 0.00002092
-                    aNationalModelOptionD = 0.000006077
+                    aNationalModelBaseline = 0.00001476
+                    aNationalModelOptionD = 0.000004587
                 ElseIf aMetal = "Zn" Then
-                    aNationalModelBaseline = 0.0008716
-                    aNationalModelOptionD = 0.00001238
+                    aNationalModelBaseline = 0.0002491
+                    aNationalModelOptionD = 0.000003536
                 End If
             End If
         ElseIf aSiteName = "LakeSinclair" Then
@@ -1513,46 +1538,46 @@ Module ERGGraph
             Else
                 'for dissolved
                 If aMetal = "As" Then
-                    aNationalModelBaseline = 0.00001307
-                    aNationalModelOptionD = 0.000003471
+                    aNationalModelBaseline = 0.00001091
+                    aNationalModelOptionD = 0.000002899
                 ElseIf aMetal = "Cd" Then
-                    aNationalModelBaseline = 0.00006933
-                    aNationalModelOptionD = 0.000002505
+                    aNationalModelBaseline = 0.00002331
+                    aNationalModelOptionD = 0.0000008421
                 ElseIf aMetal = "Cu" Then
-                    aNationalModelBaseline = 0.00002902
-                    aNationalModelOptionD = 0.000002248
+                    aNationalModelBaseline = 0.0000129
+                    aNationalModelOptionD = 0.0000009992
                 ElseIf aMetal = "Pb" Then
-                    aNationalModelBaseline = 0.00001052
-                    aNationalModelOptionD = 0.000002018
+                    aNationalModelBaseline = 0.0000007792
+                    aNationalModelOptionD = 0.0000001495
                 ElseIf aMetal = "Ni" Then
-                    aNationalModelBaseline = 0.0005428
-                    aNationalModelOptionD = 0.000003751
+                    aNationalModelBaseline = 0.0003619
+                    aNationalModelOptionD = 0.000002501
                 ElseIf aMetal = "Se" Then
-                    aNationalModelBaseline = 0.0006986
-                    aNationalModelOptionD = 0.000003405
+                    aNationalModelBaseline = 0.00043
+                    aNationalModelOptionD = 0.000002096
                 ElseIf aMetal = "Tl" Then
-                    aNationalModelBaseline = 0.00002335
-                    aNationalModelOptionD = 0.000005836
+                    aNationalModelBaseline = 0.00001762
+                    aNationalModelOptionD = 0.000004405
                 ElseIf aMetal = "Zn" Then
-                    aNationalModelBaseline = 0.0008856
-                    aNationalModelOptionD = 0.00001189
+                    aNationalModelBaseline = 0.0002531
+                    aNationalModelOptionD = 0.000003396
                 End If
             End If
         ElseIf aSiteName = "MississippiMO" Then
             If pLocation = 9 Then
                 If aUnits = "Total" Then
                     If aMetal = "As" Then
-                        aNationalModelBaseline = 0.000006409
+                        aNationalModelBaseline = 0.000006317
                     ElseIf aMetal = "Cd" Then
-                        aNationalModelBaseline = 0.0000009284
+                        aNationalModelBaseline = 0.0000009122
                     ElseIf aMetal = "Cu" Then
                         aNationalModelBaseline = 0.000004338
                     ElseIf aMetal = "Pb" Then
                         aNationalModelBaseline = 0.000002844
                     ElseIf aMetal = "Ni" Then
-                        aNationalModelBaseline = 0.000003492
+                        aNationalModelBaseline = 0.000003436
                     ElseIf aMetal = "Se" Then
-                        aNationalModelBaseline = 0.000002705
+                        aNationalModelBaseline = 0.000002741
                     ElseIf aMetal = "Tl" Then
                         aNationalModelBaseline = 0.000003293
                     ElseIf aMetal = "Zn" Then
@@ -1561,21 +1586,21 @@ Module ERGGraph
                 Else
                     'for dissolved
                     If aMetal = "As" Then
-                        aNationalModelBaseline = 0.000006408
+                        aNationalModelBaseline = 0.000004218
                     ElseIf aMetal = "Cd" Then
-                        aNationalModelBaseline = 0.0000009281
+                        aNationalModelBaseline = 0.0000001526
                     ElseIf aMetal = "Cu" Then
-                        aNationalModelBaseline = 0.000004336
+                        aNationalModelBaseline = 0.000001045
                     ElseIf aMetal = "Pb" Then
-                        aNationalModelBaseline = 0.000002843
+                        aNationalModelBaseline = 0.00000008751
                     ElseIf aMetal = "Ni" Then
-                        aNationalModelBaseline = 0.000003491
+                        aNationalModelBaseline = 0.00000152
                     ElseIf aMetal = "Se" Then
-                        aNationalModelBaseline = 0.000002705
+                        aNationalModelBaseline = 0.000001065
                     ElseIf aMetal = "Tl" Then
-                        aNationalModelBaseline = 0.000003292
+                        aNationalModelBaseline = 0.00000181
                     ElseIf aMetal = "Zn" Then
-                        aNationalModelBaseline = 0.000007982
+                        aNationalModelBaseline = 0.000001094
                     End If
                 End If
             End If
@@ -1583,25 +1608,25 @@ Module ERGGraph
             If pLocation = 13 Then
                 If aUnits = "Total" Then  'for mansfield plant
                     If aMetal = "As" Then
-                        aNationalModelBaseline = 0.000001019
+                        aNationalModelBaseline = 0.0000009613
                         aNationalModelOptionD = 0.000000271
                     ElseIf aMetal = "Cd" Then
-                        aNationalModelBaseline = 0.000005392
+                        aNationalModelBaseline = 0.000005398
                         aNationalModelOptionD = 0.0000001955
                     ElseIf aMetal = "Cu" Then
-                        aNationalModelBaseline = 0.000001755
+                        aNationalModelBaseline = 0.000001754
                         aNationalModelOptionD = 0.0000001755
                     ElseIf aMetal = "Pb" Then
-                        aNationalModelBaseline = 0.0000007766
+                        aNationalModelBaseline = 0.0000007768
                         aNationalModelOptionD = 0.0000001575
                     ElseIf aMetal = "Ni" Then
-                        aNationalModelBaseline = 0.00004363
+                        aNationalModelBaseline = 0.00004359
                         aNationalModelOptionD = 0.0000002928
                     ElseIf aMetal = "Se" Then
                         aNationalModelBaseline = 0.00005458
                         aNationalModelOptionD = 0.0000002658
                     ElseIf aMetal = "Tl" Then
-                        aNationalModelBaseline = 0.000003846
+                        aNationalModelBaseline = 0.000003493
                         aNationalModelOptionD = 0.0000004555
                     ElseIf aMetal = "Zn" Then
                         aNationalModelBaseline = 0.00006697
@@ -1610,85 +1635,140 @@ Module ERGGraph
                 Else
                     'for dissolved
                     If aMetal = "As" Then
-                        aNationalModelBaseline = 0.000001018
-                        aNationalModelOptionD = 0.0000002709
+                        aNationalModelBaseline = 0.0000008028
+                        aNationalModelOptionD = 0.0000002263
                     ElseIf aMetal = "Cd" Then
-                        aNationalModelBaseline = 0.000005391
-                        aNationalModelOptionD = 0.0000001955
+                        aNationalModelBaseline = 0.000001814
+                        aNationalModelOptionD = 0.00000006573
                     ElseIf aMetal = "Cu" Then
-                        aNationalModelBaseline = 0.000001755
-                        aNationalModelOptionD = 0.0000001755
+                        aNationalModelBaseline = 0.0000007798
+                        aNationalModelOptionD = 0.00000007799
                     ElseIf aMetal = "Pb" Then
-                        aNationalModelBaseline = 0.0000007765
-                        aNationalModelOptionD = 0.0000001575
+                        aNationalModelBaseline = 0.00000005754
+                        aNationalModelOptionD = 0.00000001167
                     ElseIf aMetal = "Ni" Then
-                        aNationalModelBaseline = 0.00004363
-                        aNationalModelOptionD = 0.0000002928
+                        aNationalModelBaseline = 0.00002906
+                        aNationalModelOptionD = 0.0000001952
                     ElseIf aMetal = "Se" Then
-                        aNationalModelBaseline = 0.00005458
-                        aNationalModelOptionD = 0.0000002658
+                        aNationalModelBaseline = 0.00003359
+                        aNationalModelOptionD = 0.0000001636
                     ElseIf aMetal = "Tl" Then
-                        aNationalModelBaseline = 0.000003846
-                        aNationalModelOptionD = 0.0000004555
+                        aNationalModelBaseline = 0.000002636
+                        aNationalModelOptionD = 0.0000003438
                     ElseIf aMetal = "Zn" Then
-                        aNationalModelBaseline = 0.00006696
-                        aNationalModelOptionD = 0.0000009277
+                        aNationalModelBaseline = 0.00001913
+                        aNationalModelOptionD = 0.0000002651
                     End If
                 End If
             ElseIf pLocation = 9 Then
                 If aUnits = "Total" Then  'for sammis plant
                     If aMetal = "As" Then
-                        aNationalModelBaseline = 0.000004733
-                        aNationalModelOptionD = 0.00000007468
+                        aNationalModelBaseline = 0.000004356
+                        aNationalModelOptionD = 0.00000009819
                     ElseIf aMetal = "Cd" Then
-                        aNationalModelBaseline = 0.000001185
-                        aNationalModelOptionD = 0.00000005093
+                        aNationalModelBaseline = 0.000001233
+                        aNationalModelOptionD = 0.00000005797
                     ElseIf aMetal = "Cu" Then
-                        aNationalModelBaseline = 0.000005259
-                        aNationalModelOptionD = 0.00000004754
+                        aNationalModelBaseline = 0.000005257
+                        aNationalModelOptionD = 0.00000005093
                     ElseIf aMetal = "Pb" Then
-                        aNationalModelBaseline = 0.000003959
-                        aNationalModelOptionD = 0.00000004092
+                        aNationalModelBaseline = 0.00000396
+                        aNationalModelOptionD = 0.00000004073
                     ElseIf aMetal = "Ni" Then
-                        aNationalModelBaseline = 0.00002002
-                        aNationalModelOptionD = 0.00000007812
+                        aNationalModelBaseline = 0.00001974
+                        aNationalModelOptionD = 0.0000001098
                     ElseIf aMetal = "Se" Then
-                        aNationalModelBaseline = 0.00001334
-                        aNationalModelOptionD = 0.00000009206
+                        aNationalModelBaseline = 0.00001338
+                        aNationalModelOptionD = 0.0000001501
                     ElseIf aMetal = "Tl" Then
-                        aNationalModelBaseline = 0.00002256
-                        aNationalModelOptionD = 0.0000001179
+                        aNationalModelBaseline = 0.00002009
+                        aNationalModelOptionD = 0.0000001187
                     ElseIf aMetal = "Zn" Then
-                        aNationalModelBaseline = 0.00001628
-                        aNationalModelOptionD = 0.0000002461
+                        aNationalModelBaseline = 0.00001641
+                        aNationalModelOptionD = 0.0000003943
                     End If
                 Else
                     'for dissolved
                     If aMetal = "As" Then
-                        aNationalModelBaseline = 0.000004733
-                        aNationalModelOptionD = 0.00000007467
+                        aNationalModelBaseline = 0.000003638
+                        aNationalModelOptionD = 0.000000082
                     ElseIf aMetal = "Cd" Then
-                        aNationalModelBaseline = 0.000001184
-                        aNationalModelOptionD = 0.00000005093
+                        aNationalModelBaseline = 0.0000004145
+                        aNationalModelOptionD = 0.00000001949
                     ElseIf aMetal = "Cu" Then
-                        aNationalModelBaseline = 0.000005259
-                        aNationalModelOptionD = 0.00000004753
+                        aNationalModelBaseline = 0.000002336
+                        aNationalModelOptionD = 0.00000002263
                     ElseIf aMetal = "Pb" Then
-                        aNationalModelBaseline = 0.000003958
-                        aNationalModelOptionD = 0.00000004091
+                        aNationalModelBaseline = 0.0000002933
+                        aNationalModelOptionD = 0.000000003017
                     ElseIf aMetal = "Ni" Then
-                        aNationalModelBaseline = 0.00002002
-                        aNationalModelOptionD = 0.00000007812
+                        aNationalModelBaseline = 0.00001316
+                        aNationalModelOptionD = 0.00000007317
                     ElseIf aMetal = "Se" Then
-                        aNationalModelBaseline = 0.00001334
-                        aNationalModelOptionD = 0.00000009205
+                        aNationalModelBaseline = 0.000008237
+                        aNationalModelOptionD = 0.00000009234
                     ElseIf aMetal = "Tl" Then
-                        aNationalModelBaseline = 0.00002256
-                        aNationalModelOptionD = 0.0000001179
+                        aNationalModelBaseline = 0.00001516
+                        aNationalModelOptionD = 0.00000008955
                     ElseIf aMetal = "Zn" Then
-                        aNationalModelBaseline = 0.00001628
-                        aNationalModelOptionD = 0.000000246
+                        aNationalModelBaseline = 0.000004687
+                        aNationalModelOptionD = 0.0000001126
                     End If
+                End If
+            End If
+        ElseIf aSiteName = "White" Then
+            If aUnits = "Total" Then
+                If aMetal = "As" Then
+                    aNationalModelBaseline = 0.004619
+                    aNationalModelOptionD = 0.0002511
+                ElseIf aMetal = "Cd" Then
+                    aNationalModelBaseline = 0.002405
+                    aNationalModelOptionD = 0.0001812
+                ElseIf aMetal = "Cu" Then
+                    aNationalModelBaseline = 0.01546
+                    aNationalModelOptionD = 0.0001626
+                ElseIf aMetal = "Pb" Then
+                    aNationalModelBaseline = 0.007078
+                    aNationalModelOptionD = 0.000146
+                ElseIf aMetal = "Ni" Then
+                    aNationalModelBaseline = 0.01364
+                    aNationalModelOptionD = 0.0002714
+                ElseIf aMetal = "Se" Then
+                    aNationalModelBaseline = 0.04041
+                    aNationalModelOptionD = 0.0002463
+                ElseIf aMetal = "Tl" Then
+                    aNationalModelBaseline = 0.008447
+                    aNationalModelOptionD = 0.0004222
+                ElseIf aMetal = "Zn" Then
+                    aNationalModelBaseline = 0.01425
+                    aNationalModelOptionD = 0.0008598
+                End If
+            Else
+                'for dissolved
+                If aMetal = "As" Then
+                    aNationalModelBaseline = 0.003857
+                    aNationalModelOptionD = 0.0002097
+                ElseIf aMetal = "Cd" Then
+                    aNationalModelBaseline = 0.0008083
+                    aNationalModelOptionD = 0.00006091
+                ElseIf aMetal = "Cu" Then
+                    aNationalModelBaseline = 0.006871
+                    aNationalModelOptionD = 0.00007228
+                ElseIf aMetal = "Pb" Then
+                    aNationalModelBaseline = 0.0005243
+                    aNationalModelOptionD = 0.00001081
+                ElseIf aMetal = "Ni" Then
+                    aNationalModelBaseline = 0.009092
+                    aNationalModelOptionD = 0.0001809
+                ElseIf aMetal = "Se" Then
+                    aNationalModelBaseline = 0.02487
+                    aNationalModelOptionD = 0.0001516
+                ElseIf aMetal = "Tl" Then
+                    aNationalModelBaseline = 0.006375
+                    aNationalModelOptionD = 0.0003186
+                ElseIf aMetal = "Zn" Then
+                    aNationalModelBaseline = 0.004071
+                    aNationalModelOptionD = 0.0002457
                 End If
             End If
         End If
@@ -2119,9 +2199,9 @@ Module ERGGraph
 
             For Each lMetal As String In pMetalNames
 
-                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "Composite" & "Averaged.png"
+                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "Composite" & "AveragedNew.png"
                 If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
-                    lOutFileName = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeSeg" & pLocation.ToString & "Averaged.png"
+                    lOutFileName = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeSeg" & pLocation.ToString & "AveragedNew.png"
                 End If
 
                 If Not FileExists(lOutFileName) Then
@@ -2484,9 +2564,9 @@ Module ERGGraph
 
             For Each lMetal As String In pMetalNames
 
-                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeRev" & ".png"
+                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeRev" & "New.png"
                 If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
-                    lOutFileName = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeRevSeg" & pLocation.ToString & ".png"
+                    lOutFileName = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeRevSeg" & pLocation.ToString & "New.png"
                 End If
 
                 If Not FileExists(lOutFileName) Then
@@ -2548,6 +2628,10 @@ Module ERGGraph
                         End If
                         Dim lSDateJ As Double = Date2J(lSDate)
                         Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 4 : lEDate(1) = 12 : lEDate(2) = 31
+                        If pSiteName = "MississippiMO" Then
+                            'special case -- two compliance dates
+                            lEDate(0) = pComplianceDate + 7 : lEDate(1) = 12 : lEDate(2) = 31
+                        End If
                         If pSiteName = "LakeSinclair" Then
                             'special case -- limited data
                             lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
