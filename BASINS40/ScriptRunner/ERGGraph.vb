@@ -12,13 +12,13 @@ Imports System
 
 Module ERGGraph
     'black
-    Private Const pTestPath As String = "C:\ERG_SteamElectric\Black"
-    Private pLocation As Integer = 39 '1 '97 '39
-    Private pStartYearForBaselinePlot As Integer = 1999
-    Private pStartYearForSimulation As Integer = 1982
-    Private pComplianceDate As Integer = 2019
-    Private pSiteName As String = "Black"
-    Private pBenthicSegmentStart As Integer = 59
+    'Private Const pTestPath As String = "C:\ERG_SteamElectric\Black"
+    'Private pLocation As Integer = 39 '1 '97 '39
+    'Private pStartYearForBaselinePlot As Integer = 1999
+    'Private pStartYearForSimulation As Integer = 1982
+    'Private pComplianceDate As Integer = 2019
+    'Private pSiteName As String = "Black"
+    'Private pBenthicSegmentStart As Integer = 59
     'etowah
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah"
     ' ''Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
@@ -37,16 +37,16 @@ Module ERGGraph
     'Private pSiteName As String = "White"
     'Private pBenthicSegmentStart As Integer = 26
     'lake sinclair
-    'Private Const pTestPath As String = "C:\ERG_SteamElectric\LakeSinclair"
-    'Private pLocation As Integer = 276 '699 
-    'Private pStartYearForBaselinePlot As Integer = 2012
-    'Private pStartYearForSimulation As Integer = 2012
-    'Private pComplianceDate As Integer = 2019
-    'Private pSiteName As String = "LakeSinclair"
-    'Private pBenthicSegmentStart As Integer = 99999
+    Private Const pTestPath As String = "C:\ERG_SteamElectric\LakeSinclair"
+    Private pLocation As Integer = 276 '699 
+    Private pStartYearForBaselinePlot As Integer = 2012
+    Private pStartYearForSimulation As Integer = 2012
+    Private pComplianceDate As Integer = 2019
+    Private pSiteName As String = "LakeSinclair"
+    Private pBenthicSegmentStart As Integer = 99999
     'mississippi
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\MississippiMO"
-    'Private pLocation As Integer = 17   '9 is rush island, 17 is meramec
+    'Private pLocation As Integer = 17  '9 is rush island, 17 is meramec
     'Private pStartYearForBaselinePlot As Integer = 1999
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2019
@@ -54,7 +54,7 @@ Module ERGGraph
     'Private pBenthicSegmentStart As Integer = 31
     'ohio
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\Ohio"
-    'Private pLocation As Integer = 13 '9 is sammis, 13 is mansfield
+    'Private pLocation As Integer = 9 '9 is sammis, 13 is mansfield
     'Private pStartYearForBaselinePlot As Integer = 1999
     'Private pStartYearForSimulation As Integer = 1982
     'Private pComplianceDate As Integer = 2019
@@ -63,16 +63,17 @@ Module ERGGraph
 
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        DoERGGraphs()                          'core
-        ComputeThreeMonthRollingAverages()     'core
-        DoERGCompositeGraph()                  'core  
-        DoERGCompositeGraphRefined()           'core  
-        DoExceedanceSummary()                  'core
+        'DoERGGraphs()                          'core
+        'ComputeThreeMonthRollingAverages()     'core
+        'DoERGCompositeGraph()                  'core  
+        'DoERGCompositeGraphRefined()           'core  
+        'DoExceedanceSummary()                  'core
         '      DoBaselineHistoricGraphsMultipleLocations()  
         '      DoGraphAtMaxConcLocation()
         'ComputeAnnualAverageAcrossAllSegments()     'specific to lake sinclair
         'ComputeAverageConcentrationInEachSegment()  'specific to lake sinclair?
         'DoERGCompositeGraphAveraged()               'specific to lake sinclair 
+        DoERGCompositeGraphAveragedRefined()        'specific to lake sinclair
         'OutputInitialConditions()    'specific to lake sinclair
     End Sub
 
@@ -556,6 +557,10 @@ Module ERGGraph
                         End If
                     End If
                 Next
+            End If
+
+            If lPane.YAxis.Scale.Max < lNationalModelBaseline * 1000 Then
+                lPane.YAxis.Scale.Max = lNationalModelBaseline * 1000 * 1.1  'make max 10 percent higher 
             End If
 
         Else
@@ -2630,7 +2635,163 @@ Module ERGGraph
                         Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 4 : lEDate(1) = 12 : lEDate(2) = 31
                         If pSiteName = "MississippiMO" Then
                             'special case -- two compliance dates
-                            lEDate(0) = pComplianceDate + 7 : lEDate(1) = 12 : lEDate(2) = 31
+                            lEDate(0) = pComplianceDate + 8 : lEDate(1) = 12 : lEDate(2) = 31
+                        End If
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lEDate(0) = pComplianceDate + 6 : lEDate(1) = 11 : lEDate(2) = 30
+                        End If
+                        Dim lEdatej As Double = Date2J(lEDate)
+
+                        'lag dates by a day to account for wasp output convention
+                        For lindex As Integer = lTimSerD.numValues - 1 To 1 Step -1
+                            lTimSerD.Values(lindex + 1) = lTimSerD.Values(lindex)
+                        Next
+
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSerD, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv3.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    GraphTimeseriesOptions(lTimeseriesGroup, lMetal, lOutFileName, lType, pSiteName)
+
+                    lTimeseriesGroup.Clear()
+                End If
+
+            Next
+        Next
+
+    End Sub
+
+    Private Sub DoERGCompositeGraphAveragedRefined()
+
+        Dim lCsvName As String = ""
+
+        Dim pMetalNames As New atcCollection
+        pMetalNames.Add("As")
+        pMetalNames.Add("Cd")
+        pMetalNames.Add("Cu")
+        pMetalNames.Add("Ni")
+        pMetalNames.Add("Pb")
+        pMetalNames.Add("Se")
+        pMetalNames.Add("Tl")
+        pMetalNames.Add("Zn")
+
+        Dim pTypes As New atcCollection
+        pTypes.Add("Total")
+        pTypes.Add("Dissolved")
+
+        For Each lType As String In pTypes
+            lCsvName = lType & "_Concentration.csv"
+
+            Dim lTimeseriesGroup As New atcTimeseriesGroup
+
+            ChDriveDir(pTestPath & "\OutputPlots")
+
+            For Each lMetal As String In pMetalNames
+
+                Dim lOutFileName As String = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeRev" & "AveragedNew.png"
+                If pSiteName = "MississippiMO" Or pSiteName = "Ohio" Then
+                    lOutFileName = pSiteName & lType & lMetal.Substring(0, 2) & "CompositeRevSeg" & pLocation.ToString & "AveragedNew.png"
+                End If
+
+                If Not FileExists(lOutFileName) Then
+                    'get baseline historic data
+                    Dim lTimeseriesCsv1 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    Dim lRunName As String = lMetal & "BaselineHistoric"
+                    Dim lCsvFileName As String = pTestPath & "\" & lRunName & "\" & lCsvName
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
+                    If lTimeseriesCsv1.Open(lCsvFileName) Then
+
+                        'calc average value across all cells
+                        Dim lTimeseriesGroupToAverage As New atcTimeseriesGroup
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsv1.DataSets
+                            lTimeseriesGroupToAverage.Add(lTimSerX)
+                        Next
+                        Dim lTimSer1 As atcTimeseries = lTimeseriesCsv1.DataSets.ItemByKey(pLocation)
+                        Dim lDaySum As Double = 0.0
+                        For lIndex As Integer = 1 To lTimSer1.numValues
+                            lDaySum = 0.0
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroupToAverage
+                                If lTimSer.Values(1) > -1 Then
+                                    lDaySum = lDaySum + lTimSer.Value(lIndex)
+                                End If
+                            Next
+                            lTimSer1.Value(lIndex) = lDaySum / (lTimeseriesGroupToAverage.Count - 1)
+                        Next
+                        lTimeseriesGroupToAverage.Clear()
+
+                        lTimSer1.Attributes.SetValue("YAxis", "Left")
+
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 5 : lSDate(1) = 1 : lSDate(2) = 1
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate - 7 : lSDate(1) = 2 : lSDate(2) = 2
+                        End If
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate - 1 : lEDate(1) = 12 : lEDate(2) = 30
+                        Dim lEdatej As Double = Date2J(lEDate)
+
+                        lTimeseriesGroup.Add(SubsetByDate(lTimSer1, _
+                                                    lSDateJ, _
+                                                    lEdatej, Nothing))
+                        lTimeseriesCsv1.Clear()
+                    Else
+                        Logger.Msg("Unable to Open " & lCsvFileName)
+                    End If
+
+                    'get option d post-compliance data
+                    Dim lTimeseriesCsv3 As New atcTimeseriesCSV.atcTimeseriesCSV
+                    lRunName = lMetal & "OptionD"
+                    lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+                    If Not FileExists(lCsvFileName) Then
+                        lRunName = lMetal & "OptionC"
+                        lCsvFileName = pTestPath & "\" & lRunName & "\" & lCsvName
+                    End If
+
+                    If Not FileExists(lCsvFileName & ".start") Then
+                        FileCopy(pTestPath & "\" & lRunName & "\" & "Total_Concentration.csv.start", lCsvFileName & ".start")
+                    End If
+
+                    If lTimeseriesCsv3.Open(lCsvFileName) Then
+
+                        'calc average value across all cells
+                        Dim lTimeseriesGroupToAverage As New atcTimeseriesGroup
+                        For Each lTimSerX As atcTimeseries In lTimeseriesCsv3.DataSets
+                            lTimeseriesGroupToAverage.Add(lTimSerX)
+                        Next
+                        Dim lTimSerD As atcTimeseries = lTimeseriesCsv3.DataSets.ItemByKey(pLocation)
+                        Dim lDaySum As Double = 0.0
+                        For lIndex As Integer = 1 To lTimSerD.numValues
+                            lDaySum = 0.0
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroupToAverage
+                                If lTimSer.Values(1) > -1 Then
+                                    lDaySum = lDaySum + lTimSer.Value(lIndex)
+                                End If
+                            Next
+                            lTimSerD.Value(lIndex) = lDaySum / (lTimeseriesGroupToAverage.Count - 1)
+                        Next
+                        lTimeseriesGroupToAverage.Clear()
+
+                        lTimSerD.Attributes.SetValue("YAxis", "Left")
+
+                        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate - 1 : lSDate(1) = 12 : lSDate(2) = 31
+                        If pSiteName = "LakeSinclair" Then
+                            'special case -- limited data
+                            lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 2
+                        End If
+                        Dim lSDateJ As Double = Date2J(lSDate)
+                        Dim lEDate(5) As Integer : lEDate(0) = pComplianceDate + 4 : lEDate(1) = 12 : lEDate(2) = 31
+                        If pSiteName = "MississippiMO" Then
+                            'special case -- two compliance dates
+                            lEDate(0) = pComplianceDate + 8 : lEDate(1) = 12 : lEDate(2) = 31
                         End If
                         If pSiteName = "LakeSinclair" Then
                             'special case -- limited data
