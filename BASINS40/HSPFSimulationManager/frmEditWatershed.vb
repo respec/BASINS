@@ -134,7 +134,7 @@ Public Class frmEditWatershed
     Private Sub btnConnectionReport_Click(sender As Object, e As EventArgs) Handles btnConnectionReport.Click
         Me.Enabled = False
         Me.Cursor = Cursors.WaitCursor
-        Dim lReport As String = frmHspfSimulationManager.g_AppNameLong & " Connection Report" & vbCrLf & vbCrLf & txtName.Text & ": "
+        Dim lReport As String = g_AppNameLong & " Connection Report" & vbCrLf & vbCrLf & txtName.Text & ": "
         If lstScenarios.SelectedItem Is Nothing Then
             lReport &= "No Scenario"
         Else
@@ -169,7 +169,7 @@ Public Class frmEditWatershed
         If lReport.Length > 0 Then
             Dim lText As New frmText
             lText.Icon = Me.Icon
-            lText.Text = frmHspfSimulationManager.g_AppNameLong & " Connection Report"
+            lText.Text = g_AppNameLong & " Connection Report"
             lText.txtMain.Text = lReport
             lText.Show()
         End If
@@ -226,7 +226,7 @@ NextFile:
     Private Sub btnRenameScenario_Click(sender As Object, e As EventArgs) Handles btnRenameScenario.Click
         Dim lScenario As clsUciScenario = lstScenarios.SelectedItem
         If lScenario Is Nothing Then
-            Logger.Msg("Select a scenario UCI file before Renaming", MsgBoxStyle.OkOnly, frmHspfSimulationManager.g_AppNameLong)
+            Logger.Msg("Select a scenario UCI file before Renaming", MsgBoxStyle.OkOnly, g_AppNameLong)
         Else
             Dim lNameScenario As New frmNameScenario
             lNameScenario.Icon = Me.Icon

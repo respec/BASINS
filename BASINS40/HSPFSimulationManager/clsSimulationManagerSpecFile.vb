@@ -85,7 +85,7 @@ Public Class clsSimulationManagerSpecFile
 
     Friend Shared Sub Save(ByVal aSaveIcons As IconCollection, ByVal aWindowSize As Drawing.Size, ByVal aIconSize As Drawing.Size, ByVal aFileName As String)
         If aSaveIcons.Count = 0 Then
-            Logger.Msg("There is nothing to save.", MsgBoxStyle.Critical, frmHspfSimulationManager.g_AppNameLong)
+            Logger.Msg("There is nothing to save.", MsgBoxStyle.Critical, g_AppNameLong)
             Exit Sub
         End If
         Dim lWriter As New IO.StreamWriter(aFileName)

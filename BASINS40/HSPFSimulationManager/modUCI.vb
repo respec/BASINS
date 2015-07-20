@@ -4,6 +4,12 @@ Imports MapWinUtility
 
 Module modUCI
 
+    'Global variables, not just for UCI. TODO: move to new global module
+    Friend Const g_AppNameShort As String = "HspfSimulationManager"
+    Friend Const g_AppNameLong As String = "SARA HSPF Simulation Manager"
+    Friend g_ProgramDir As String = ""
+    Friend g_StatusMonitor As MonitorProgressStatus
+
     Public MessageFile As atcUCI.HspfMsg
 
     Function OpenUCI(aUciFileName As String) As atcUCI.HspfUci
@@ -33,39 +39,6 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         Dim lUCI As New atcUCI.HspfUci
         lUCI.FastReadUciForStarter(MessageFile, aUciFileName)
         Return lUCI
-    End Function
-
-    ''' <summary>
-    ''' True if echo file contains "End of Job"
-    ''' </summary>
-    Function RunComplete(aUCI As atcUCI.HspfUci) As Boolean
-        Dim lUCIFileDirectory As String = IO.Path.GetDirectoryName(aUCI.Name)
-        Dim lEchName As String = AbsolutePath(aUCI.EchoFileName, lUCIFileDirectory)
-
-        If Not IO.File.Exists(lEchName) Then
-            Return False
-        End If
-        Dim lEchoFile As IO.FileStream = Nothing
-        Try
-            'Open up the ech file
-            lEchoFile = New IO.FileStream(lEchName, IO.FileMode.Open, IO.FileAccess.Read)
-            Dim lFileLength As Long = lEchoFile.Length
-            Dim lStartReading As Long = Math.Max(0, lFileLength - 1000)
-            Dim lReadLength As Long = lFileLength - lStartReading
-            lEchoFile.Position = lStartReading
-            Dim lStreamReader As New IO.StreamReader(lEchoFile, System.Text.Encoding.ASCII)
-            Dim lLastPartOfEchoFile As String = lStreamReader.ReadToEnd()
-            Return lLastPartOfEchoFile.Contains("End of Job")
-        Catch
-            Return False
-        Finally
-            If lEchoFile IsNot Nothing Then
-                Try
-                    lEchoFile.Close()
-                Catch
-                End Try
-            End If
-        End Try
     End Function
 
     Public Function SimulationPeriodString(aUci As atcUCI.HspfUci) As String
@@ -120,11 +93,8 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         Dim lConnections As New List(Of String)
 
         For Each lSConn As HspfConnection In aSourceUCI.Connections
-            Dim lOutputVol As String = lSConn.Target.VolName
+            Dim lOutputVol As String = GetVolName(lSConn.Target.VolName)
             If lOutputVol.StartsWith("WDM") Then
-                If lOutputVol = "WDM" Then
-                    lOutputVol = "WDM1"
-                End If
                 'translate wdm id into file name
                 Dim lOutputWDMFileName As String = lSourceWDMs.ItemByKey(lOutputVol)
                 Dim lOutputDsn As Integer = lSConn.Target.VolId
@@ -132,16 +102,13 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
                 Dim lInputDsn As Integer = 0
                 'now see if this wdm/dsn combination shows up as input to the target uci
                 For Each lTConn As HspfConnection In aTargetUCI.Connections
-                    Dim lInputVol As String = lTConn.Source.VolName
+                    Dim lInputVol As String = GetVolName(lTConn.Source.VolName)
                     If lInputVol.StartsWith("WDM") Then
-                        If lInputVol = "WDM" Then
-                            lInputVol = "WDM1"
-                        End If
                         'translate wdm id into file name
                         lInputWDMFileName = lTargetWDMs.ItemByKey(lInputVol)
                         lInputDsn = lTConn.Source.VolId
                         'do the check to see if these match
-                        If lInputWDMFileName = lOutputWDMFileName AndAlso lInputDsn = lOutputDsn Then
+                        If lInputWDMFileName.ToLowerInvariant = lOutputWDMFileName.ToLowerInvariant AndAlso lInputDsn = lOutputDsn Then
                             'we have a match!
                             lConnections.Add(lInputWDMFileName & "|" & lInputDsn.ToString & "|" & _
                                              lSConn.Source.VolName & ":" & lSConn.Source.VolId & ":" & lSConn.Target.Member & " -> " & _
@@ -155,16 +122,21 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         Return lConnections
     End Function
 
+    Private Function GetVolName(aUciVolName As String) As String
+        If aUciVolName = "WDM" Then
+            Return "WDM1"
+        Else
+            Return aUciVolName
+        End If
+    End Function
+
     Public Function WDMsWritten(ByVal aUCI As HspfUci) As List(Of String)
         Dim lAllWDMs As atcCollection = AllWDMs(aUCI)
         Dim lWDMsWritten As New List(Of String)
 
         For Each lSConn As HspfConnection In aUCI.Connections
-            Dim lOutputVol As String = lSConn.Target.VolName
+            Dim lOutputVol As String = GetVolName(lSConn.Target.VolName)
             If lOutputVol.StartsWith("WDM") Then
-                If lOutputVol = "WDM" Then
-                    lOutputVol = "WDM1"
-                End If
                 'translate wdm id into file name
                 Dim lOutputWDMFileName As String = lAllWDMs.ItemByKey(lOutputVol)
                 If Not lWDMsWritten.Contains(lOutputWDMFileName) Then
@@ -181,12 +153,9 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         Dim lFileName As String
         For lIndex As Integer = 1 To aUCI.FilesBlock.Count
             Dim lFile As HspfFile = aUCI.FilesBlock.Value(lIndex)
-            Dim lFileTyp As String = lFile.Typ
+            Dim lFileTyp As String = GetVolName(lFile.Typ)
             If lFileTyp.StartsWith("WDM") Then
-                If lFileTyp = "WDM" Then
-                    lFileTyp = "WDM1"
-                End If
-                lFileName = AbsolutePath(Trim(lFile.Name), PathNameOnly(aUCI.Name)).ToLower
+                lFileName = AbsolutePath(Trim(lFile.Name), PathNameOnly(aUCI.Name))
                 lAllWDMs.Add(lFileTyp, lFileName)
             End If
         Next
