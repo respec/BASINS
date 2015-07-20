@@ -126,7 +126,7 @@ Public Class clsIcon
                 End If
             Next
 
-            Dim lScenarioName As String = IO.Path.GetFileNameWithoutExtension(value) ' InputBox("Enter Scenario Name for this UCI file", frmHspfSimulationManager.g_AppNameLong, IO.Path.GetFileNameWithoutExtension(value))
+            Dim lScenarioName As String = IO.Path.GetFileNameWithoutExtension(value) ' InputBox("Enter Scenario Name for this UCI file", g_AppNameLong, IO.Path.GetFileNameWithoutExtension(value))
             Scenario = New clsUciScenario(lScenarioName & "|" & value, "")
         End Set
     End Property
@@ -159,7 +159,7 @@ Public Class clsIcon
         If aScenario IsNot Nothing Then
             If Not ScenariosContains(aScenario) Then
                 Scenarios.Add(aScenario)
-                If Scenario Is Nothing Then
+                If Scenario Is Nothing OrElse Not Scenarios.Contains(Scenario) Then
                     Scenario = aScenario
                 End If
             End If

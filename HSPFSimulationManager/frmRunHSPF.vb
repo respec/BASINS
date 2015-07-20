@@ -54,7 +54,7 @@ SortDownstream:
 
     Private Sub btnRun_Click(sender As Object, e As EventArgs) Handles btnRun.Click
         If lstModels.CheckedItems.Count = 0 Then
-            Logger.Msg("No models selected to run", frmHspfSimulationManager.g_AppNameLong)
+            Logger.Msg("No models selected to run", g_AppNameLong)
         Else
 CheckUCIExists:
             Dim lNumFinishedRunning As Integer = 0
@@ -74,7 +74,7 @@ CheckUCIExists:
                 'If lAllUcisMissing.Length > 0 Then
                 '    Select Case Logger.Msg("UCI File Not Found: " & vbCrLf & lAllUcisMissing, _
                 '                           MsgBoxStyle.AbortRetryIgnore, _
-                '                           frmHspfSimulationManager.g_AppNameLong)
+                '                           g_AppNameLong)
                 '        Case MsgBoxResult.Abort : Exit Sub
                 '        Case MsgBoxResult.Retry : GoTo CheckUCIExists
                 '    End Select
@@ -84,7 +84,7 @@ CheckUCIExists:
                 If lConnectionsMissing.Length > 0 Then
                     Select Case Logger.Msg(lConnectionsMissing, _
                                            MsgBoxStyle.AbortRetryIgnore, _
-                                           frmHspfSimulationManager.g_AppNameLong)
+                                           g_AppNameLong)
                         Case MsgBoxResult.Abort : Exit Sub
                         Case MsgBoxResult.Retry : GoTo CheckUCIExists
                     End Select
@@ -100,10 +100,19 @@ CheckUCIExists:
 
                 For Each lIcon As clsIcon In lstModels.CheckedItems
                     If IO.File.Exists(lIcon.UciFileName) Then
+
+                        'Delete echo file before running to be sure the one we are checking after is new
+                        Dim lEchName As String = AbsolutePath(lIcon.UciFile.EchoFileName, IO.Path.GetDirectoryName(lIcon.UciFile.Name))
+                        While Not TryDelete(lEchName)
+                            If Logger.Msg("Unable to delete echo file, please close it if open in another application:" & vbCrLf & lEchName, MsgBoxStyle.OkCancel, g_AppNameLong) = MsgBoxResult.Cancel Then
+                                Throw New ApplicationException("Unable to delete echo file, HSPF was not run for " & lIcon.UciFileName)
+                            End If
+                        End While
+
                         RunUCI("WinHSPFlt.exe", lIcon.UciFileName)
-                        If Not RunComplete(lIcon.UciFile) Then
+                        If Not lIcon.UciFile.ReachedEndOfJob Then
                             Logger.Msg("HSPF Run Did Not Complete" & vbCrLf & lIcon.ToString(), _
-                                       MsgBoxStyle.Critical, frmHspfSimulationManager.g_AppNameLong)
+                                       MsgBoxStyle.Critical, g_AppNameLong)
                             Exit Sub
                         End If
                         lNumFinishedRunning += 1
@@ -111,7 +120,7 @@ CheckUCIExists:
                     End If
                 Next
             Catch ex As Exception
-                Logger.Msg("Error running HSPF: " & e.ToString, MsgBoxStyle.Critical, frmHspfSimulationManager.g_AppNameLong)
+                Logger.Msg("Error running HSPF: " & e.ToString, MsgBoxStyle.Critical, g_AppNameLong)
             Finally
                 If lNumFinishedRunning > 0 Then
                     Me.Close()
@@ -125,7 +134,7 @@ CheckUCIExists:
             Else
                 lPlural = "s"
             End If
-            Logger.Msg("Finished " & lNumFinishedRunning & " HSPF run" & lPlural, MsgBoxStyle.OkOnly, frmHspfSimulationManager.g_AppNameLong)
+            Logger.Msg("Finished " & lNumFinishedRunning & " HSPF run" & lPlural, MsgBoxStyle.OkOnly, g_AppNameLong)
         End If
     End Sub
 

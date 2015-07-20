@@ -3,13 +3,7 @@ Imports MapWinUtility
 
 Public Class frmHspfSimulationManager
 
-    Friend Shared g_ProgramDir As String = ""
-    Friend Const g_AppNameShort As String = "HspfSimulationManager"
-    Friend Const g_AppNameLong As String = "SARA HSPF Simulation Manager"
-
     Friend WithEvents SchematicDiagram As HSPFSimulationManager.ctlSchematic
-    Private pStatusMonitor As MonitorProgressStatus
-
     Private pSpecFileName As String = String.Empty
 
     Private Sub frmHspfSimulationManager_DragDrop(sender As Object, e As DragEventArgs) Handles Me.DragDrop
@@ -76,25 +70,30 @@ Public Class frmHspfSimulationManager
 
     Private Sub OpenToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripMenuItem.Click
         Dim lFileName As String = String.Empty
-        If BrowseOpen("Open Simulation Specification File", "*.txt", ".txt", Me, lFileName) Then
+        If BrowseOpen("Open Simulation Specification File", "*.hsmspec", ".hsmspec", Me, lFileName) Then
             OpenFile(lFileName)
         End If
     End Sub
 
     Private Sub OpenFile(aFileName As String)
-        If FileExists(aFileName) Then
-            Me.Text = g_AppNameLong & " - " & aFileName
-            With SchematicDiagram
-                Dim lIconSize As New Drawing.Size(SchematicDiagram.IconWidth, .IconHeight)
-                Dim lNewIcons As IconCollection = clsSimulationManagerSpecFile.Open(Me.Size, lIconSize, aFileName)
-                .BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-                .BackgroundImage = Nothing
-                .IconWidth = lIconSize.Width
-                .IconHeight = lIconSize.Height
-                .BuildTree(lNewIcons)
-            End With
-            SaveSetting(g_AppNameShort, "Defaults", "FileName", aFileName)
-        End If
+        Try
+            If FileExists(aFileName) Then
+                With SchematicDiagram
+                    Dim lIconSize As New Drawing.Size(SchematicDiagram.IconWidth, .IconHeight)
+                    Dim lNewIcons As IconCollection = clsSimulationManagerSpecFile.Open(Me.Size, lIconSize, aFileName)
+                    .BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+                    .BackgroundImage = Nothing
+                    .IconWidth = lIconSize.Width
+                    .IconHeight = lIconSize.Height
+                    .BuildTree(lNewIcons)
+                End With
+                pSpecFileName = aFileName
+                Me.Text = g_AppNameLong & " - " & pSpecFileName
+                SaveSetting(g_AppNameShort, "Defaults", "FileName", pSpecFileName)
+            End If
+        Catch ex As Exception
+            Logger.Msg("Could not open: " & aFileName & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Error opening specification file")
+        End Try
     End Sub
 
     Public Shared Function BrowseOpen(ByVal aTitle As String, ByVal aFilter As String, ByVal aExtension As String, ByVal aParentForm As Form, ByRef aFileName As String) As Boolean
@@ -121,21 +120,27 @@ Public Class frmHspfSimulationManager
 
     Private Sub SaveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click
         If SchematicDiagram.AllIcons.Count = 0 Then
-            Logger.Msg("There is nothing to save.", MsgBoxStyle.Critical, frmHspfSimulationManager.g_AppNameLong)
+            Logger.Msg("There is nothing to save.", MsgBoxStyle.Critical, g_AppNameLong)
             Exit Sub
         End If
         Dim lFileDialog As New Windows.Forms.SaveFileDialog()
         With lFileDialog
             .Title = "Save Simulation Specification File"
             .FileName = pSpecFileName
-            '.Filter = aFilter
-            '.FilterIndex = 0
-            '.DefaultExt = aExtension
+            .DefaultExt = ".hsmspec"
+            .Filter = "*" & .DefaultExt & "|*" & .DefaultExt & "*.*|*.*"
+            .FilterIndex = 0
             '.CheckFileExists = False
             '.CheckPathExists = False
             If .ShowDialog(Me) = DialogResult.OK Then
-                clsSimulationManagerSpecFile.Save(SchematicDiagram.AllIcons, Me.Size, New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight), .FileName)
-                SaveSetting(g_AppNameShort, "Defaults", "FileName", .FileName)
+                Try
+                    clsSimulationManagerSpecFile.Save(SchematicDiagram.AllIcons, Me.Size, New Drawing.Size(SchematicDiagram.IconWidth, SchematicDiagram.IconHeight), .FileName)
+                    pSpecFileName = .FileName
+                    Me.Text = g_AppNameLong & " - " & pSpecFileName
+                    SaveSetting(g_AppNameShort, "Defaults", "FileName", pSpecFileName)
+                Catch ex As Exception
+                    Logger.Msg("Could not save: " & .FileName & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Error saving specification file")
+                End Try
             End If
         End With
     End Sub
@@ -147,6 +152,7 @@ Public Class frmHspfSimulationManager
         SchematicDiagram.Visible = False
         SchematicDiagram.AllIcons.Clear()
         SchematicDiagram.BuildTree(SchematicDiagram.AllIcons)
+        Me.Text = g_AppNameLong
     End Sub
 
     Private Sub btnRunHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRunHSPF.Click
@@ -218,18 +224,18 @@ Public Class frmHspfSimulationManager
 
         If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
             'Start running status monitor to give better progress and status indication during long-running processes
-            pStatusMonitor = New MonitorProgressStatus
-            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
+            g_StatusMonitor = New MonitorProgressStatus
+            If g_StatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
                                             g_ProgramDir, _
                                             System.Diagnostics.Process.GetCurrentProcess.Id) Then
-                pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
-                Logger.ProgressStatus = pStatusMonitor
+                g_StatusMonitor.InnerProgressStatus = Logger.ProgressStatus
+                Logger.ProgressStatus = g_StatusMonitor
                 Logger.Status("LABEL TITLE " & g_AppNameLong & " Status")
                 Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
                 Logger.Status("")
             Else
-                pStatusMonitor.StopMonitor()
-                pStatusMonitor = Nothing
+                g_StatusMonitor.StopMonitor()
+                g_StatusMonitor = Nothing
             End If
         End If
 
@@ -253,7 +259,7 @@ Public Class frmHspfSimulationManager
         End If
         Me.Enabled = False
         Me.Cursor = Cursors.WaitCursor
-        Dim lReport As String = frmHspfSimulationManager.g_AppNameLong & " Connection Report" & vbCrLf
+        Dim lReport As String = g_AppNameLong & " Connection Report" & vbCrLf
         Dim lIconIndex As Integer = 0
         Dim lSeparatorLine As New String("_", 80)
         For Each lIcon As clsIcon In SchematicDiagram.AllIcons
@@ -303,7 +309,7 @@ Public Class frmHspfSimulationManager
         If lReport.Length > 0 Then
             Dim lText As New frmText
             lText.Icon = Me.Icon
-            lText.Text = frmHspfSimulationManager.g_AppNameLong & " Connection Report"
+            lText.Text = g_AppNameLong & " Connection Report"
             lText.txtMain.Text = lReport
             lText.Show()
         End If

@@ -299,7 +299,7 @@ Friend Class ctlSchematic
     ''' </summary>
     ''' <remarks></remarks>
     Private Sub DrawTreeBackground()
-        If picTree IsNot Nothing Then
+        If picTree IsNot Nothing AndAlso picTree.Width > 0 AndAlso picTree.Height > 0 Then
             Try
                 CheckScrollbars()
                 Dim lDx As Integer = 0, lMaxDx As Integer = 0
@@ -718,7 +718,7 @@ Friend Class ctlSchematic
     ''' <returns>True if icon was removed, False if icon was not removed</returns>
     ''' <remarks>pClickedIcon is cleared if that was the one removed</remarks>
     Public Function RemoveIconAfterAsking(aIcon As clsIcon) As Boolean
-        If Logger.Msg("Remove this watershed """ & aIcon.WatershedName & """?", MsgBoxStyle.YesNo, frmHspfSimulationManager.g_AppNameLong) = MsgBoxResult.Yes Then
+        If Logger.Msg("Remove this watershed """ & aIcon.WatershedName & """?", MsgBoxStyle.YesNo, g_AppNameLong) = MsgBoxResult.Yes Then
             AllIcons.Remove(aIcon)
             RemoveIconHandlers(aIcon)
 
@@ -786,7 +786,7 @@ Friend Class ctlSchematic
             For Each lFileName As String In e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
                 Select Case IO.Path.GetExtension(lFileName).ToLower
                     Case ".uci"
-                        If Logger.Msg("Set " & lIcon.WatershedName & " UCI file to:" & vbCrLf & lFileName & " ?", MsgBoxStyle.YesNo, frmHspfSimulationManager.g_AppNameLong) = MsgBoxResult.Yes Then
+                        If Logger.Msg("Set " & lIcon.WatershedName & " UCI file to:" & vbCrLf & lFileName & " ?", MsgBoxStyle.YesNo, g_AppNameLong) = MsgBoxResult.Yes Then
                             lIcon.UciFileName = lFileName
                             DrawIcon(False, lIcon)
                         End If
@@ -814,7 +814,7 @@ Friend Class ctlSchematic
         Me.ParentForm.Enabled = False
         Me.ParentForm.Cursor = Cursors.WaitCursor
         Try
-            Dim lReport As String = frmHspfSimulationManager.g_AppNameLong & " Connection Report" & vbCrLf
+            Dim lReport As String = g_AppNameLong & " Connection Report" & vbCrLf
             If pClickedIcon.Scenario Is Nothing Then
                 lReport &= vbCrLf & pClickedIcon.WatershedName & ": No Scenario"
             Else
@@ -843,12 +843,12 @@ Friend Class ctlSchematic
             If lReport.Length > 0 Then
                 Dim lText As New frmText
                 lText.Icon = Me.ParentForm.Icon
-                lText.Text = frmHspfSimulationManager.g_AppNameLong & " Connection Report"
+                lText.Text = g_AppNameLong & " Connection Report"
                 lText.txtMain.Text = lReport
                 lText.Show()
             End If
         Catch ex As Exception
-            Logger.Msg("Could not generate downstream report: " & vbCrLf & e.ToString, MsgBoxStyle.Critical, frmHspfSimulationManager.g_AppNameLong)
+            Logger.Msg("Could not generate downstream report: " & vbCrLf & e.ToString, MsgBoxStyle.Critical, g_AppNameLong)
         End Try
         Me.ParentForm.Cursor = Cursors.Default
         Me.ParentForm.Enabled = True
@@ -909,39 +909,68 @@ Friend Class ctlSchematic
     Friend Sub ctlSchematic_DragDrop(sender As Object, e As DragEventArgs) Handles Me.DragDrop
         If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
             ParentForm.BringToFront()
+            Dim lFileOffset As Integer = 0
             For Each lFileName As String In e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
-                Select Case Logger.MsgCustomOwned("Add new watershed for UCI file " & lFileName & " ?", frmHspfSimulationManager.g_AppNameLong, ParentForm, "Yes", "No", "Cancel")
-                    Case "Yes"
-                        Dim lIcon = AllIcons.FindOrAddIcon(IO.Path.GetFileNameWithoutExtension(lFileName))
-                        If lIcon.Left = 0 AndAlso lIcon.Top = 0 Then
+                Select Case IO.Path.GetExtension(lFileName).ToLowerInvariant()
+                    Case ".uci"
+                        'Select Case Logger.MsgCustomOwned("Add new watershed for UCI file " & lFileName & " ?", g_AppNameLong, ParentForm, "Yes", "No", "Cancel")
+                        '    Case "Yes"
+                        Dim lNewIcon = AllIcons.FindOrAddIcon(IO.Path.GetFileNameWithoutExtension(lFileName))
+                        If lNewIcon.Left = 0 AndAlso lNewIcon.Top = 0 Then
                             Dim lOffset As Drawing.Point = Me.PointToScreen(New Drawing.Point(0, 0))
-                            lIcon.Left = e.X - lOffset.X - IconWidth / 2
-                            If lIcon.Left <= 0 Then
-                                lIcon.Left = 10
-                            ElseIf lIcon.Left + IconWidth > Width Then
-                                lIcon.Left = Width - IconWidth - 10
+                            lNewIcon.Left = e.X - lOffset.X - IconWidth / 2 + lFileOffset
+                            If lNewIcon.Left <= 0 Then
+                                lNewIcon.Left = 10
+                            ElseIf lNewIcon.Left + IconWidth > Width Then
+                                lNewIcon.Left = Width - IconWidth - 10
                             End If
 
-                            lIcon.Top = e.Y - lOffset.Y - IconHeight / 2
-                            If lIcon.Top <= 0 Then
-                                lIcon.Top = 10
-                            ElseIf lIcon.Top + IconHeight > Height Then
-                                lIcon.Top = Height - IconHeight - 10
+                            lNewIcon.Top = e.Y - lOffset.Y - IconHeight / 2 + lFileOffset
+                            If lNewIcon.Top <= 0 Then
+                                lNewIcon.Top = 10
+                            ElseIf lNewIcon.Top + IconHeight > Height Then
+                                lNewIcon.Top = Height - IconHeight - 10
                             End If
+                            lFileOffset += IconWidth * 1.1
                         End If
 
                         Dim lNewScenario As New clsUciScenario(lFileName, "")
+                        'Only try to connect to diagram if it is newly added
+                        'TODO: check that connectivity matches if this is an additional UCI file, 
+                        'but that will only happen here if filename matches, also need to check when adding UCI in frmEditWatershed.
+                        If lNewIcon.Scenario Is Nothing Then
+                            Dim lNewUCI As atcUCI.HspfUci = lNewScenario.UciFile
+                            If lNewUCI IsNot Nothing Then
+                                For Each lOtherIcon As clsIcon In AllIcons
+                                    Dim lOtherUCI As atcUCI.HspfUci = lOtherIcon.UciFile
+                                    If lOtherUCI IsNot Nothing Then
+                                        If lOtherIcon.DownstreamIcon Is Nothing Then
+                                            If modUCI.ConnectionSummary(lOtherUCI, lNewUCI).Count > 0 Then
+                                                lOtherIcon.DownstreamIcon = lNewIcon
+                                            End If
+                                        End If
+                                        If Not ReferenceEquals(lNewIcon, lOtherIcon.DownstreamIcon) Then
+                                            If modUCI.ConnectionSummary(lNewUCI, lOtherUCI).Count > 0 Then
+                                                lNewIcon.DownstreamIcon = lOtherIcon
+                                            End If
+                                        End If
+                                    End If
+                                Next
+                            End If
+                        End If
+
                         Dim lNameScenario As New frmNameScenario
                         lNameScenario.Icon = ParentForm.Icon
                         lNameScenario.AskUser(lNewScenario, AllScenarioNames)
-                        lIcon.Scenario = lNewScenario
+                        lNewIcon.Scenario = lNewScenario
 
                         Dim lWatershedForm As New frmEditWatershed
                         lWatershedForm.Schematic = Me
-                        lWatershedForm.ModelIcon = lIcon
+                        lWatershedForm.ModelIcon = lNewIcon
                         lWatershedForm.Show()
-                    Case "Cancel"
-                        Exit For
+                        '    Case "Cancel"
+                        '        Exit For
+                        'End Select
                 End Select
             Next
         End If
