@@ -43,6 +43,11 @@ Public Class atcDataAttributes
         Dim lAlias As String = Nothing
         If pAllAliases.TryGetValue(lNameLower, lAlias) Then 'We have a preferred alias for this name
             aAttributeName = lAlias
+        ElseIf aAttributeName.StartsWith("%") Then
+            Dim lPercentString As String = aAttributeName.Substring(1)
+            If IsNumeric(lPercentString) Then
+                aAttributeName = "%" & Format(CDbl(lPercentString), "00.####")
+            End If
         Else
             If aAttributeName.Length = 6 Then 'Check for high/low attribute names
                 Dim lFirstChar As String = aAttributeName.Substring(0, 1).ToUpper
