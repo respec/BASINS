@@ -193,7 +193,7 @@ Public Class frmStarter
             Dim lEndParPos As Integer = InStr(Mid(lDesc, lParPos), ")")
             Dim lOpType As String = Mid(lDesc, lParPos + 1, lEndParPos - 2)
             Dim lValidValues As New Collection
-            If pDefUCI.OpnBlks(lOpType).Count > 0 Then
+            If pDefUCI.OpnBlks.Contains(lOpType) AndAlso pDefUCI.OpnBlks(lOpType).Count > 0 Then
                 For Each lOpn As HspfOperation In pDefUCI.OpnBlks(lOpType).Ids
                     lDesc = lOpn.Description
                     lValidValues.Add(lDesc & " (" & lOpn.Name & " " & lOpn.Id & ")")
