@@ -1,0 +1,22 @@
+Dated: 07/02/2015
+HSPEXP+1.02
+1. HSPF12.4 is available with this new version.
+2. A bug was fixed which was causing subsequent runs of HSPEXP+ to crash, if "Run HSPF" option was selected.
+3. BOD balance reports for reach are now generated. 
+
+
+Dated: 05/13/2015
+HSPEXP+ now checks if the last run of the model was succesful. If not, HSPEXP+ quits and recommends the user to correct the error before running the model.
+Dated: 05/11/2015
+AQUA TERRA Consultants releases an update to HSPEXP+1.0. This update addresses multiple issues and adds some small features.
+
+Features
+1. Based on the request from some users, HSPEXP+ loads with the link to previous project. This reduces the time spent in browsing the previous project.
+2. HSPEXP+ does not close after producing the reports. A user can make changes to the project files and run HSPEXP+ again. This saves time as a typical user has to run HSPEXP+ multiple times to complete calibration, and the user does not have to restart HSPEXP+ every time.
+
+Bugs fixed
+1. The annual budget reports per reach was not reporting correct rates of nutrient loading if there were some PERLND or IMPLND with zero areas.  This bug has been fixed.
+2. HSPEXP+ could not read the lines in EXS file with less characters than expected, and was crashing. This bug has been fixed.
+3. HSPEXP+ was expecting Julian dates in AutomatedGraphs.csv. Now it expects dates in mm/dd/yyyy format.
+4. Graphs are plotted even if no size for lines and symbols are provided. A default size 1 is assumed.
+5. The legend font for frequency graphs was too big and has been reduced to size 12 font.
