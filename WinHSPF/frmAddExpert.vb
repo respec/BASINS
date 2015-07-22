@@ -210,9 +210,9 @@ Public Class frmAddExpert
                         Dim lNewDsn As Integer
                         Dim lDescription As String = ""
                         OutputDataSetProperties(lTmem, lDescription)
-                        pUCI.AddOutputWDMDataSetExt(txtLoc.Text, lTmem, atxBase.Text, lWDMId, lOutTu, lDescription, lNewDsn, lSTANAM)
+                        pUCI.AddOutputWDMDataSetExt(txtLoc.Text, lTempMem, atxBase.Text, lWDMId, lOutTu, lDescription, lNewDsn, lSTANAM)
                         pUCI.AddExtTarget(lOpName, lId, lGroup, lMem, lSub1, lSub2, 1.0#, lTrans, _
-                             "WDM" & CStr(lWDMId), lNewDsn, lTmem, 1, lOutputUnits, "AGGR", "REPL")
+                             "WDM" & CStr(lWDMId), lNewDsn, lTempMem, 1, lOutputUnits, "AGGR", "REPL")
                         pUCI.Edited = True
                     End If
                 End If
