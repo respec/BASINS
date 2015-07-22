@@ -46,8 +46,8 @@
     <PublisherName>BASINS</PublisherName>
     <WebPage>index.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>137</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.2.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -165,12 +165,6 @@
     <Compile Include="SplashScreen1.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SplashScreen2.Designer.vb">
-      <DependentUpon>SplashScreen2.vb</DependentUpon>
-    </Compile>
-    <Compile Include="SplashScreen2.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="StartUp.Designer.vb">
       <DependentUpon>StartUp.vb</DependentUpon>
     </Compile>
@@ -197,9 +191,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SplashScreen1.resx">
       <DependentUpon>SplashScreen1.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SplashScreen2.resx">
-      <DependentUpon>SplashScreen2.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="StartUp.resx">
       <DependentUpon>StartUp.vb</DependentUpon>
