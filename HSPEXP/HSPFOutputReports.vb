@@ -172,7 +172,7 @@ Module HSPFOutputReports
                 SDateJ = lHspfUci.GlobalBlock.SDateJ
                 EDateJ = lHspfUci.GlobalBlock.EdateJ
                 Dim lEchoFileisinFilesBlock As Boolean = False
-                Dim lHspfEchoFileName As String
+                Dim lHspfEchoFileName As String = ""
                 Dim echoFileInfo As System.IO.FileInfo
                 For i As Integer = 0 To lHspfUci.FilesBlock.Count
                     If lHspfUci.FilesBlock.Value(i).Typ = "MESSU" Then
@@ -188,6 +188,25 @@ Module HSPFOutputReports
                     echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
                     lRunMade = echoFileInfo.LastWriteTime.ToString
                 End If
+
+                If lHspfEchoFileName = "" Then
+                    Logger.Dbg("There is no echo file available, looks like HSPF didn't run last time!")
+                    Dim ans As Integer
+                    ans = MsgBox("There is no ECHO file available. Did UCI file run properly last time?")
+                    End
+                End If
+                
+                Dim EchoFileReader As StreamReader
+                EchoFileReader = System.IO.File.OpenText(lHspfEchoFileName)
+
+                If EchoFileReader.ReadToEnd.Contains("terminated") Then
+                    Logger.Dbg("ECHO file says that run was terminated last time. HSPEXP+ will exit!")
+                    Dim ans As Integer
+                    ans = MsgBox("ECHO File contains a message that the run was terminated last time. HSPEXP+ will quit. Please make sure that UCI" & _
+                                 " file runs properly!")
+                    End
+                End If
+                EchoFileReader.Close()
 
                 loutfoldername = pTestPath
                 Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") & _
@@ -638,6 +657,7 @@ RWZProgramEnding:
             Dim lGraphInit() As String = lGraphRecords(lRecordIndex).split(",")
             Dim lNumberOfCurves As Integer = Trim(lGraphInit(2))
             Dim lOutFileName As String = loutfoldername & Trim(lGraphInit(1))
+            
             Dim lGraphStartDateJ, lGraphEndDateJ As Double
             'GraphInit has information about number of datasets, their color, symbol etc.
             lRecordIndex += 1
@@ -657,9 +677,9 @@ RWZProgramEnding:
             Else
                 lGraphEndDateJ = lGraphEndJ
             End If
-            If Trim(lGraphInit(0)).ToLower = "scatter" Then
-                lNumberOfCurves = 2
-            End If
+
+            If Trim(lGraphInit(0)).ToLower = "scatter" Then lNumberOfCurves = 2
+            
             For CurveNumber As Integer = 1 To lNumberOfCurves
                 Dim lGraphDataset() As String = lGraphRecords(lRecordIndex).split(",")
                 Dim lTimeSeries As atcTimeseries = Nothing
@@ -678,18 +698,24 @@ RWZProgramEnding:
                     Select Case IO.Path.GetExtension(lDataSourceFilename)
                         Case ".wdm"
                             lTimeSeries = lDataSource.DataSets.FindData("ID", Trim(lGraphDataset(2)))(0)
+                            lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
+                            If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
+                                Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
+                                                               " DSN " & Trim(lGraphDataset(2)) & ". Program will quit!")
+                            End If
+
                         Case ".hbn", ".dbf"
                             lTimeSeries = lDataSource.DataSets.FindData("Location", Trim(lGraphDataset(2))) _
                                                               .FindData("Constituent", Trim(lGraphDataset(3)))(0)
+                            lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
+                            If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
+                                Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
+                                                                                      " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Program will quit!")
+                            End If
 
                     End Select
 
-                    lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
 
-                    If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
-                        Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
-                                                       " Curve " & CurveNumber & ". Program will quit!")
-                    End If
                     Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
                     lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
 
