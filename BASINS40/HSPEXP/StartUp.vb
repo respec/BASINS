@@ -90,8 +90,12 @@ Public Class StartUp
         Logger.Dbg("Located WinHSPFLt at " & WinHspfLtDir)
         Try
             'Set Environmental Variable
-            System.Environment.SetEnvironmentVariable("PATH", WinHspfLtDir & ";" & Environment.GetEnvironmentVariable("PATH"))
-        Catch
+            Dim lEnvPath As String = Environment.GetEnvironmentVariable("PATH")
+            If Not lEnvPath.ToLowerInvariant.Contains(WinHspfLtDir.ToLowerInvariant) Then
+                System.Environment.SetEnvironmentVariable("PATH", WinHspfLtDir & ";" & lEnvPath)
+            End If
+        Catch exSetEnv As Exception
+            Logger.Dbg("Could not add WinHspfLtDir to PATH " & exSetEnv.Message)
         End Try
         Try
             Dim lHassentPath As String = IO.Path.Combine(WinHspfLtDir, "hass_ent.dll")
