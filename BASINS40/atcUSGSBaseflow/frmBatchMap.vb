@@ -233,7 +233,7 @@ Public Class frmBatchMap
                 End If
 
                 Dim lArgs As New atcDataAttributes()
-                lArgs.Add("Constituent", "streamflow")
+                lArgs.Add("Constituent", "streamflow,flow")
                 Dim lTsGroup As New atcTimeseriesGroup()
                 For Each lStationNode As TreeNode In lGroupNode.Nodes
                     Dim lstationId As String = lStationNode.Text
@@ -241,13 +241,19 @@ Public Class frmBatchMap
                     Dim lDataLoaded As Boolean = False
                     For Each lDS As atcDataSource In atcDataManager.DataSources
                         If lDS.Name.ToString.Contains("USGS RDB") Then
+                            Dim lTsCons As String = ""
                             For Each lTs As atcTimeseries In lDS.DataSets
+                                lTsCons = lTs.Attributes.GetValue("Constituent").ToString()
                                 If lTs.Attributes.GetValue("Location") = lstationId AndAlso _
-                                   lTs.Attributes.GetValue("Constituent").ToString.ToLower = "streamflow" Then
+                                   (lTsCons.ToLower = "streamflow" OrElse lTsCons.ToLower() = "flow") Then
                                     lTsGroup.Add(lTs)
                                     lDataLoaded = True
+                                    Exit For
                                 End If
                             Next
+                            If lDataLoaded Then
+                                Exit For
+                            End If
                         End If
                     Next
                     If Not lDataLoaded Then
@@ -472,12 +478,15 @@ Public Class frmBatchMap
     Private Sub btnPlotDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlotDuration.Click
         Dim lTsGroup As New atcTimeseriesGroup()
         Dim lArgs As New atcDataAttributes()
-        lArgs.Add("Constituent", "streamflow")
+        lArgs.Add("Constituent", "streamflow,flow")
         For I As Integer = 0 To lstStations.RightCount - 1
             Dim lstationId As String = lstStations.RightItem(I)
             Dim lDataPath As String = GetDataFileFullPath(lstationId)
             Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
             If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                If String.Compare(lTsGroupTemp(0).Attributes.GetValue("Constituent").ToString(), "flow", True) = 0 Then
+                    lTsGroupTemp(0).Attributes.SetValue("Constituent", "Streamflow")
+                End If
                 lTsGroup.Add(lTsGroupTemp(0))
             End If
         Next
