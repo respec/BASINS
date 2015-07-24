@@ -61,14 +61,22 @@ Public Class clsBatchUtil
         Dim lGroup As atcTimeseriesGroup = Nothing
         If lRDBReader.Open(aRDBFile) Then
             lGroup = New atcTimeseriesGroup()
-            Dim lCons As String
-            Dim lConsFind As String = aFindThese.GetValue("Constituent", "").ToString.ToLower()
-            For Each lTS As atcTimeseries In lRDBReader.DataSets
-                lCons = lTS.Attributes.GetValue("Constituent").ToString.ToLower()
-                If lCons = lConsFind Then
-                    lGroup.Add(lTS.Clone)
-                End If
-            Next
+            Dim lConsFind As String = aFindThese.GetValue("Constituent", "").ToString().ToLower()
+            Dim lArrNames() As String
+            If Not String.IsNullOrEmpty(lConsFind) Then
+                lArrNames = lConsFind.Split(",")
+                Dim lCons As String
+                For Each lTS As atcTimeseries In lRDBReader.DataSets
+                    lCons = lTS.Attributes.GetValue("Constituent").ToString
+                    For Each lName As String In lArrNames
+                        lName = lName.Trim()
+                        If Not String.IsNullOrEmpty(lName) AndAlso String.Compare(lCons, lName, True) = 0 Then
+                            lGroup.Add(lTS.Clone)
+                            Exit For
+                        End If
+                    Next
+                Next
+            End If
         End If
         lRDBReader.Clear()
         lRDBReader = Nothing
