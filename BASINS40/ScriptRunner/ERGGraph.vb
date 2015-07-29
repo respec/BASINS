@@ -19,6 +19,7 @@ Module ERGGraph
     'Private pComplianceDate As Integer = 2019
     'Private pSiteName As String = "Black"
     'Private pBenthicSegmentStart As Integer = 59
+    'Private pEndDate As Integer = 2036
     'etowah
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah"
     ' ''Private Const pTestPath As String = "C:\ERG_SteamElectric\Etowah\RevisedBackground"
@@ -28,6 +29,7 @@ Module ERGGraph
     'Private pComplianceDate As Integer = 2021
     'Private pSiteName As String = "Etowah"
     'Private pBenthicSegmentStart As Integer = 33
+    'Private pEndDate As Integer = 2032
     'white
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\White"
     'Private pLocation As Integer = 76 '16  '76  '17  changed to 76 with addition of lick creek
@@ -36,30 +38,34 @@ Module ERGGraph
     'Private pComplianceDate As Integer = 2019
     'Private pSiteName As String = "White"
     'Private pBenthicSegmentStart As Integer = 26
+    'Private pEndDate As Integer = 2034
     'lake sinclair
     Private Const pTestPath As String = "C:\ERG_SteamElectric\LakeSinclair"
-    Private pLocation As Integer = 276 '699 
+    Private pLocation As Integer = 1253 '276 '699 '1253 for annual average summary
     Private pStartYearForBaselinePlot As Integer = 2012
     Private pStartYearForSimulation As Integer = 2012
     Private pComplianceDate As Integer = 2019
     Private pSiteName As String = "LakeSinclair"
     Private pBenthicSegmentStart As Integer = 99999
+    Private pEndDate As Integer = 2024
     'mississippi
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\MississippiMO"
-    'Private pLocation As Integer = 17  '9 is rush island, 17 is meramec
+    'Private pLocation As Integer = 9  '9 is rush island, 17 is meramec
     'Private pStartYearForBaselinePlot As Integer = 1999
     'Private pStartYearForSimulation As Integer = 1982
-    'Private pComplianceDate As Integer = 2019
+    'Private pComplianceDate As Integer = 2019   '2019    '2023 for annual average summary
     'Private pSiteName As String = "MississippiMO"
     'Private pBenthicSegmentStart As Integer = 31
+    'Private pEndDate As Integer = 2036
     'ohio
     'Private Const pTestPath As String = "C:\ERG_SteamElectric\Ohio"
-    'Private pLocation As Integer = 9 '9 is sammis, 13 is mansfield
+    'Private pLocation As Integer = 13 '9 is sammis, 13 is mansfield
     'Private pStartYearForBaselinePlot As Integer = 1999
     'Private pStartYearForSimulation As Integer = 1982
-    'Private pComplianceDate As Integer = 2019
+    'Private pComplianceDate As Integer = 2020 '2019   '2020 for annual average summary mansfield, 2021 for sammis
     'Private pSiteName As String = "Ohio"
     'Private pBenthicSegmentStart As Integer = 29
+    'Private pEndDate As Integer = 2036
 
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -68,12 +74,13 @@ Module ERGGraph
         'DoERGCompositeGraph()                  'core  
         'DoERGCompositeGraphRefined()           'core  
         'DoExceedanceSummary()                  'core
+        ComputeAverageConcentrations()
         '      DoBaselineHistoricGraphsMultipleLocations()  
         '      DoGraphAtMaxConcLocation()
         'ComputeAnnualAverageAcrossAllSegments()     'specific to lake sinclair
         'ComputeAverageConcentrationInEachSegment()  'specific to lake sinclair?
         'DoERGCompositeGraphAveraged()               'specific to lake sinclair 
-        DoERGCompositeGraphAveragedRefined()        'specific to lake sinclair
+        'DoERGCompositeGraphAveragedRefined()        'specific to lake sinclair
         'OutputInitialConditions()    'specific to lake sinclair
     End Sub
 
@@ -708,6 +715,142 @@ Module ERGGraph
             Next
             lWrite.WriteLine(lStr)
         Next
+        lWrite.Close()
+    End Sub
+
+    Private Sub ComputeAverageConcentrations()
+        ChDriveDir(pTestPath & "\OutputPlots")
+        Dim lCsvName As String = "Total_Concentration.csv"
+
+        Dim pMetalNames As New atcCollection
+        pMetalNames.Add("As")
+        pMetalNames.Add("Cd")
+        pMetalNames.Add("Cu")
+        pMetalNames.Add("Ni")
+        pMetalNames.Add("Pb")
+        pMetalNames.Add("Se")
+        pMetalNames.Add("Tl")
+        pMetalNames.Add("Zn")
+
+        Dim pOptions As New atcCollection
+        pOptions.Add("Baseline")
+        'pOptions.Add("OptionA")
+        'pOptions.Add("OptionB")
+        pOptions.Add("OptionC")
+        pOptions.Add("OptionD")
+
+        Dim lSDate(5) As Integer : lSDate(0) = pComplianceDate : lSDate(1) = 1 : lSDate(2) = 1
+        Dim lSDateJ As Double = Date2J(lSDate)
+
+        Dim lEDate(5) As Integer : lEDate(0) = pEndDate : lEDate(1) = 12 : lEDate(2) = 31
+        Dim lEDateJ As Double = Date2J(lEDate)
+
+        Dim lTimeseriesCsvOption As New atcTimeseriesCSV.atcTimeseriesCSV
+        Dim lTimeseriesGroup As New atcTimeseriesGroup
+
+        'do averages
+        For Each lMetalName As String In pMetalNames
+            For Each lOption As String In pOptions
+                Dim lOptionName As String = ""
+                lOptionName = lMetalName & lOption
+                Dim lAverageFileName As String = lOptionName & "AverageConcentrations.csv"
+
+                If Not FileExists(lAverageFileName) Then
+                    If FileExists(pTestPath & "\" & lOptionName & "\", True) Then
+                        'option folder exists
+
+                        Dim lCsvFileName As String = pTestPath & "\" & lOptionName & "\" & lCsvName
+                        If lTimeseriesCsvOption.Open(lCsvFileName) Then
+
+                            Dim lHeader As String = lOptionName & " Average from " & lCsvName
+
+                            For lLoc As Integer = pLocation To 1 Step -1
+                                Dim lTimSerX As atcTimeseries = lTimeseriesCsvOption.DataSets.ItemByKey(lLoc)
+
+                                If pSiteName = "White" Then
+                                    If lLoc = 76 Or lLoc < 17 Then
+                                        lTimeseriesGroup.Add(SubsetByDate(lTimSerX, _
+                                                    lSDateJ, _
+                                                    lEDateJ, Nothing))
+                                    End If
+                                Else
+                                    lTimeseriesGroup.Add(SubsetByDate(lTimSerX, _
+                                                         lSDateJ, _
+                                                         lEDateJ, Nothing))
+                                End If
+
+                            Next
+
+                            WriteAverageConcentrationFile(lAverageFileName, lTimeseriesGroup, pComplianceDate, pEndDate, lHeader)
+
+                            lTimeseriesCsvOption.Clear()
+                            lTimeseriesGroup.Clear()
+                        Else
+                            Logger.Msg("Unable to Open " & lCsvFileName)
+                        End If
+                    End If
+
+                End If
+            Next
+        Next
+    End Sub
+
+    Sub WriteAverageConcentrationFile(ByVal aFileName As String, ByVal aTimSerGroup As atcTimeseriesGroup, ByVal aStartYear As Integer, ByVal aEndYear As Integer, ByVal aHeader As String)
+        Dim aTimSer1 As atcTimeseries = aTimSerGroup(0)
+        Dim lWrite As New IO.StreamWriter(aFileName, False)
+        Dim lDate(5) As Integer
+
+        Dim lStr As String = aHeader
+        lWrite.WriteLine(lStr)
+        lStr = "Segment, Average"
+        For lYear As Integer = aStartYear To aEndYear
+            lStr &= ", " & lYear.ToString
+        Next
+        lWrite.WriteLine(lStr)
+
+        'make a first pass to find the start of each desired year
+        Dim lYearStarts As New atcCollection
+        Dim lPrevYear As Integer = 0
+        For lIndex As Integer = 1 To aTimSer1.numValues
+            J2Date(aTimSer1.Dates.Value(lIndex), lDate)
+            If lDate(0) <> lPrevYear Then
+                lYearStarts.Add(lIndex)
+            End If
+        Next
+
+        'loop through each segment
+        Dim lCount As Integer = aTimSerGroup.Count
+        For Each lTimSer As atcTimeseries In aTimSerGroup
+            If pSiteName = "White" And lCount = 17 Then
+                lStr = "76"
+            Else
+                lStr = lCount.ToString
+            End If
+            lCount -= 1
+            'find average
+            Dim lSum As Double = 0.0
+            For lIndex As Integer = 1 To lTimSer.numValues
+                lSum += lTimSer.Value(lIndex)
+            Next
+            Dim lValue As String = Format((lSum / lTimSer.numValues), "0.####")
+            lStr = lStr & ", " & lValue
+            'now find annual averages
+            For lYear As Integer = aStartYear To aEndYear
+                lSum = 0.0
+                Dim lAnnualCount As Integer = 0
+                For lIndex As Integer = 1 To lTimSer.numValues
+                    J2Date(lTimSer.Dates.Value(lIndex), lDate)
+                    If lDate(0) = lYear Then
+                        lSum += lTimSer.Value(lIndex)
+                        lAnnualCount += 1
+                    End If
+                Next
+                lValue = Format((lSum / lAnnualCount), "0.####")
+                lStr = lStr & ", " & lValue
+            Next
+            lWrite.WriteLine(lStr)
+        Next
+
         lWrite.Close()
     End Sub
 
