@@ -644,6 +644,7 @@ TryOldString:
     End Function
 
     Public Function ReplaceString(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String) As String
+        If Find Is Nothing OrElse Find.Length = 0 Then Return Source
         Return Source.Replace(Find, ReplaceWith)
     End Function
 
@@ -655,10 +656,12 @@ TryOldString:
     ''' <returns>aSource without any instances of aReplace next to another aReplace</returns>
     ''' <remarks>For example in space-delimited files that delimit with one or more spaces, change to delimited with just one space</remarks>
     Public Function ReplaceRepeats(ByVal aSource As String, ByVal aReplace As String) As String
-        Dim lRepeat As String = aReplace & aReplace
-        While aSource.Contains(lRepeat)
-            aSource = aSource.Replace(lRepeat, aReplace)
-        End While
+        If aReplace IsNot Nothing AndAlso aReplace.Length > 0 Then
+            Dim lRepeat As String = aReplace & aReplace
+            While aSource.Contains(lRepeat)
+                aSource = aSource.Replace(lRepeat, aReplace)
+            End While
+        End If
         Return aSource
     End Function
 
