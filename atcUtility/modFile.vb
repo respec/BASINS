@@ -621,19 +621,16 @@ FoundSameUntil:
         Return lReport.ToString
     End Function
 
+    ''' <summary>
+    ''' IO.File.WriteAllText with Try/Catch/Retry capability in case user can change something to let it work
+    ''' </summary>
+    ''' <param name="filename">create or overwrite this file</param>
+    ''' <param name="FileContents">put this text in the file</param>
     Public Sub SaveFileString(ByVal filename As String, ByVal FileContents As String)
-        ' ##SUMMARY Saves incoming string to a text file.
-        ' ##PARAM FileName I Name of output text file
-        ' ##PARAM FileContents I Incoming string to be saved to file
-        Dim OutFile As Short = FreeFile()
-        ' ##LOCAL OutFile - integer filenumber of output text file
-
 Retry:
         Try
             MkDirPath(PathNameOnly(filename))
-            FileOpen(OutFile, filename, OpenMode.Output, OpenAccess.Write, OpenShare.LockWrite)
-            Print(OutFile, FileContents)
-            FileClose(OutFile)
+            IO.File.WriteAllText(filename, FileContents, System.Text.Encoding.UTF8)
         Catch ex As Exception
             If Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, Microsoft.VisualBasic.MsgBoxStyle.RetryCancel, "SaveFileString") = MsgBoxResult.Retry Then
                 GoTo Retry
@@ -641,25 +638,21 @@ Retry:
         End Try
     End Sub
 
+    ''' <summary>
+    ''' IO.File.WriteAllBytes with Try/Catch/Retry capability in case user can change something to let it work
+    ''' </summary>
+    ''' <param name="filename">create or overwrite this file</param>
+    ''' <param name="FileContents">put these bytes in the file</param>
     Public Sub SaveFileBytes(ByVal filename As String, ByVal FileContents() As Byte)
-        ' ##SUMMARY Saves incoming Byte array to a text file.
-        ' ##PARAM FileName I Name of output text file
-        ' ##PARAM FileContents I Incoming Byte array to be saved to file
-        Dim OutFile As Short
-        ' ##LOCAL OutFile - integer filenumber of output text file
-
-        On Error GoTo ErrorWriting
-
-        MkDirPath(PathNameOnly(filename))
-
-        OutFile = FreeFile()
-        FileOpen(OutFile, filename, OpenMode.Binary, OpenAccess.Write, OpenShare.LockWrite)
-        FilePut(OutFile, FileContents)
-        FileClose(OutFile)
-        Exit Sub
-
-ErrorWriting:
-        Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OkOnly, "SaveFileBytes")
+Retry:
+        Try
+            MkDirPath(PathNameOnly(filename))
+            IO.File.WriteAllBytes(filename, FileContents)
+        Catch ex As Exception
+            If Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, Microsoft.VisualBasic.MsgBoxStyle.RetryCancel, "SaveFileBytes") = MsgBoxResult.Retry Then
+                GoTo Retry
+            End If
+        End Try
     End Sub
 
     Public Function AppendFileString(ByVal filename As String, ByVal appendString As String) As Boolean
@@ -670,15 +663,10 @@ ErrorWriting:
 
         Try
             MkDirPath(PathNameOnly(filename))
-
-            Dim OutFile As Short
-            OutFile = FreeFile()
-            FileOpen(OutFile, filename, OpenMode.Append, OpenAccess.Write, OpenShare.LockWrite)
-            Print(OutFile, appendString)
-            FileClose(OutFile)
+            IO.File.AppendAllText(filename, appendString)
             Return True
         Catch ex As Exception
-            'Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, "AppendFileString")
+            Logger.Dbg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, "AppendFileString")
             Return False
         End Try
 
@@ -692,16 +680,17 @@ ErrorWriting:
         ' ##PARAM Find I Substring to be searched for and replaced
         ' ##PARAM Replace I Substring to replace Find
         ' ##PARAM Filename I Name of output text file
-        Dim findPos As Integer
-        Dim findlen As Integer
-        Dim lastFindEnd As Integer
-        Dim replacelen As Integer
-        Dim OutFile As Short
-        ' ##LOCAL findpos - long position of Find in Source
-        ' ##LOCAL findlen - long length of Find
-        ' ##LOCAL lastFindEnd - long position of first character after last replaced string in Source
-        ' ##LOCAL replacelen - long length of Replace
-        ' ##LOCAL OutFile - integer filenumber of output text file
+
+        Dim findPos As Integer ' ##LOCAL findpos - long position of Find in Source
+        Dim findlen As Integer ' ##LOCAL findlen - long length of Find
+        Dim lastFindEnd As Integer ' ##LOCAL lastFindEnd - long position of first character after last replaced string in Source
+        Dim replacelen As Integer ' ##LOCAL replacelen - long length of Replace
+        Dim OutFile As Short ' ##LOCAL OutFile - integer filenumber of output text file
+
+        'The straightforward way to do this would be:
+        'IO.File.WriteAllText(Source.Replace(Find, ReplaceWith))
+        'This is more complicated in order to avoid running out of memory and taking a long time.
+        'This version is translated from VB6 and a new implementation might be better.
 
         findlen = Len(Find)
         If findlen > 0 Then
@@ -878,9 +867,12 @@ TryExePath:
                 End If
             End If
 
-            If aChangeIntoDir Then
-                lDir = IO.Path.GetDirectoryName(lFileName)
-                If FileExists(lDir, True, False) Then ChDriveDir(lDir)
+            If aChangeIntoDir Then 'Changing into directory was requested
+                If lFileName.Contains(g_PathChar) Then
+                    lDir = "" 'Reset lDir in case next line fails
+                    lDir = IO.Path.GetDirectoryName(lFileName)
+                    If FileExists(lDir, True, False) Then ChDriveDir(lDir)
+                End If
             ElseIf Not lDir.Equals(CurDir) Then 'Change back to dir where we started
                 ChDriveDir(lDir)
             End If
