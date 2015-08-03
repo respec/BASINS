@@ -161,7 +161,7 @@ Module modCreateUci
         For Each lChannel As Channel In pWatershed.Channels 'process ftables
             Dim lOperation As HspfOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(CShort(lChannel.Reach.Id))
             If Not lOperation Is Nothing Then
-                If pDoWetlands And lLakeAreas(lChannel.Reach.Id) > 0.0 Then
+                If pDoWetlands AndAlso lLakeAreas(lChannel.Reach.Id) > 0.0 Then
                     'yusuf also wants lake areas removed from perlnds and added to rchres when using wetland option
                     lOperation.Description = "Water - " & lLakeAreas(lChannel.Reach.Id).ToString & " ac"
                     Dim lLakeWidth As Double = lLakeAreas(lChannel.Reach.Id) * 43560 / lChannel.Length

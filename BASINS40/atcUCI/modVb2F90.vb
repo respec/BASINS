@@ -3,6 +3,7 @@ Option Explicit On
 Module HassLibs
     '##MODULE_REMARKS Copyright 2001-3 AQUA TERRA Consultants - Royalty-free use permitted under open source license
     Declare Sub F90_W99OPN Lib "hass_ent.dll" ()
+    Declare Sub F90_W99CLO Lib "hass_ent.dll" ()
     Declare Sub F90_WDBFIN Lib "hass_ent.dll" ()
     Declare Function F90_WDBOPN Lib "hass_ent.dll" (ByRef l As Integer, ByVal s As String, ByVal i As Short) As Integer
     Declare Sub F90_WMSGTW_XX Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer)
