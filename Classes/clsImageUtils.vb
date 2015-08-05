@@ -110,7 +110,7 @@ Public Class ImageUtils
         Dim pixPerInch As Double
         pixPerInch = GetDeviceCaps(lngDC, LOGPIXELSX)
         TwipsPerPixelX = 1440& / pixPerInch
-        MsgBox("a: " & TwipsPerPixelX)
+        'MsgBox("a: " & TwipsPerPixelX)
         ReleaseDC(HWND_DESKTOP, lngDC)
     End Function
 
@@ -121,7 +121,7 @@ Public Class ImageUtils
         Dim lngDC As Long
         lngDC = GetDC(HWND_DESKTOP)
         TwipsPerPixelY = 1440& / GetDeviceCaps(lngDC, LOGPIXELSY)
-        MsgBox("b: " & TwipsPerPixelY)
+        'MsgBox("b: " & TwipsPerPixelY)
         ReleaseDC(HWND_DESKTOP, lngDC)
     End Function
 End Class
