@@ -173,10 +173,10 @@ Public Class frmSpecifyComputation
                     If iArg = 0 Then
                         .Top = lblDescription.Top + lblDescription.Height * 1.5
                     Else
-                        .Top = pArgLabel(iArg - 1).Top + pArgLabel(iArg - 1).Height * 1.5
+                        .Top = pArgLabel(iArg - 1).Top + pArgLabel(iArg - 1).Height * 2
                     End If
                     .Left = lblDescription.Left
-                    .Text = aDefVal.Definition.Name
+                    .Text = aDefVal.Definition.Description
                     .Width = Math.Max(.Width, g.MeasureString(.Text, .Font).Width + 10)
                 End With
                 Controls.Add(pArgLabel(iArg))
@@ -213,6 +213,15 @@ Public Class frmSpecifyComputation
                     AddHandler pArgText(iArg).TextChanged, AddressOf ArgText_TextChanged
                 End With
                 Controls.Add(pArgText(iArg))
+
+                'Dim lArgDescription As New Windows.Forms.Label
+                'With lArgDescription
+                '    .Top = pArgText(iArg).Top + pArgText(iArg).Height + 2
+                '    .Left = pArgText(iArg).Left
+                '    .Text = aDefVal.Definition.Description
+
+                'End With
+                'Controls.Add(lArgDescription)
 
                 ReDim Preserve pArgButton(iArg)
                 pArgButton(iArg) = New Windows.Forms.Button

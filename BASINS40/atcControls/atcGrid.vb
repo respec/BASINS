@@ -187,7 +187,7 @@ Public Class atcGrid
         pLineWidth = 1
         pLineWidth = 1
 
-        pRowsScrolled = 0
+        'pRowsScrolled = 0 'Commented out because always going to the top when changing the view is not pleasant
 
         pRowHeight = New Generic.List(Of Integer)
         pColumnWidth = New Generic.List(Of Integer)
@@ -531,12 +531,12 @@ Public Class atcGrid
 
                 pVisibleWidth = Me.Width
 
-                If pRowsScrolled > 0 Then 'Scrolled down at least one row
-                    If pRowsScrolled > lRows - lFixedRows Then 'Somehow scrolled past last row
-                        pRowsScrolled = 0        'Reset vertical scroll to top row
-                        Me.VScroller.Value = 0
-                    End If
-                End If
+                'If pRowsScrolled > 0 Then 'Scrolled down at least one row
+                '    If pRowsScrolled > lRows - lFixedRows Then 'Somehow scrolled past last row
+                '        pRowsScrolled = Math.Max(0, lRows - lFixedRows) 'Reset vertical scroll to just as many as might make sense
+                '        Me.VScroller.Value = pRowsScrolled
+                '    End If
+                'End If
 
                 'Check to see if all rows could fit
                 y = 0
