@@ -18,6 +18,11 @@ End Interface
 Public Class clsBatch
     Implements IBatchProcessing
 
+    Public Enum ANALYSIS
+        ITA
+        DFLOW
+    End Enum
+
     Private Specs As clsBatchBFSpec
     Public GlobalSettings As atcData.atcDataAttributes
     Public ListBatchUnitsData As atcCollection 'of clsBatchUnitBF, station id/location as key

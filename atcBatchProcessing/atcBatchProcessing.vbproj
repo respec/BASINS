@@ -200,6 +200,11 @@
       <Name>atcGraph</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcSWSTAT\atcSWSTAT.vbproj">
+      <Project>{C00718A3-FF1D-46C4-822E-C10964469DE2}</Project>
+      <Name>atcSWSTAT</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow.vbproj">
       <Project>{F9A4070C-1FAF-4D17-A8E6-7EB19D414B05}</Project>
       <Name>atcTimeseriesBaseflow</Name>
@@ -218,6 +223,11 @@
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\DFLOW\DFLOWAnalysis.vbproj">
+      <Project>{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}</Project>
+      <Name>DFLOWAnalysis</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

@@ -7,12 +7,20 @@ Imports System.Windows.Forms
 Public Class frmBatchMap
     Private pListStations As atcCollection
     Private pDataPath As String
-    Private pBatchGroupCount As Integer = 1
-    Private pBFInputsGlobal As atcDataAttributes
-    Private pBFInputsGroups As atcCollection
+    Private pBatchGroupCount As Integer = 0
+    Private pBatchGroupCountSWSTAT As Integer = 0
+    Private pBatchGroupCountDFLOW As Integer = 0
+    Private pGlobalInputsBF As atcDataAttributes
+    Private pGroupsInputsBF As atcCollection 'Of atcDataAttributes per group
+    Private pGlobalInputsDFLOW As atcDataAttributes
+    Private pGlobalInputsSWSTAT As atcDataAttributes
+    Private pGroupsInputsDFLOW As atcCollection 'Of atcDataAttributes per group
+    Private pGroupsInputsSWSTAT As atcCollection 'Of atcDataAttributes per group
     Private pBatchSpecFilefullname As String = ""
 
-    Private WithEvents pfrmBFParms As frmUSGSBaseflowBatch
+    Private WithEvents pfrmParamsBF As frmUSGSBaseflowBatch
+    Private WithEvents pfrmParamsSWSTAT As atcSWSTAT.frmSWSTAT
+    Private WithEvents pfrmParamsDFLOW As DFLOWAnalysis.frmDFLOWArgs
 
     Private ReadOnly Property GetDataFileFullPath(ByVal aStationId As String) As String
         Get
@@ -42,8 +50,14 @@ Public Class frmBatchMap
             lstStations.LeftItem(lindex) = lStationID
             lindex += 1
         Next
-        pBFInputsGlobal = New atcDataAttributes()
-        pBFInputsGroups = New atcCollection()
+        pGlobalInputsBF = New atcDataAttributes()
+        pGroupsInputsBF = New atcCollection()
+
+        pGlobalInputsDFLOW = New atcDataAttributes()
+        pGlobalInputsSWSTAT = New atcDataAttributes()
+        pGroupsInputsDFLOW = New atcCollection()
+        pGroupsInputsSWSTAT = New atcCollection()
+
         Dim lDataDir As String = GetSetting("atcUSGSBaseflow", "Default", "DataDir", "")
         If IO.Directory.Exists(lDataDir) Then
             txtDataDir.Text = lDataDir
@@ -51,7 +65,21 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnCreateGroup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCreateGroup.Click
-        Dim lnewTreeNode As New Windows.Forms.TreeNode("BatchGroup_" & pBatchGroupCount)
+        Dim lAnalysis As String = ""
+        Dim lCount As Integer = 0
+        If rdoSWSTAT.Checked Then
+            lAnalysis = clsBatch.ANALYSIS.ITA.ToString()
+            pBatchGroupCountSWSTAT += 1
+            lCount = pBatchGroupCountSWSTAT
+        ElseIf rdoDFLOW.Checked Then
+            lAnalysis = clsBatch.ANALYSIS.DFLOW.ToString()
+            pBatchGroupCountDFLOW += 1
+            lCount = pBatchGroupCountDFLOW
+        End If
+        If String.IsNullOrEmpty(lAnalysis) Then
+            Exit Sub
+        End If
+        Dim lnewTreeNode As New Windows.Forms.TreeNode("BatchGroup_" & lAnalysis & "_" & lCount)
         treeBFGroups.Nodes.Add(lnewTreeNode)
         For I As Integer = 0 To lstStations.RightCount - 1
             With lnewTreeNode
@@ -76,7 +104,7 @@ Public Class frmBatchMap
                 If Not lGroupName.StartsWith("BatchGroup") Then
                     lGroupName = node.Parent.Text
                 End If
-                Dim lArgs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+                Dim lArgs As atcDataAttributes = pGroupsInputsBF.ItemByKey(lGroupName)
                 If lArgs IsNot Nothing Then
                     txtParameters.Text = ParametersToText(lArgs)
                 End If
@@ -106,7 +134,7 @@ Public Class frmBatchMap
                             Dim lStationID As String = node.Text
                             treeBFGroups.Nodes.Remove(node)
 
-                            Dim lBFGroupAttribs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+                            Dim lBFGroupAttribs As atcDataAttributes = pGroupsInputsBF.ItemByKey(lGroupName)
                             If lBFGroupAttribs IsNot Nothing Then
                                 Dim lStationInfo As ArrayList = lBFGroupAttribs.GetValue("StationInfo")
                                 If lStationInfo IsNot Nothing Then
@@ -156,61 +184,61 @@ Public Class frmBatchMap
                 lGroupName = lGroupNode.Text
 
                 Dim lGroupNum As Integer = Integer.Parse(lGroupName.Substring(lGroupingName.Length + 1))
-                Dim lBFInputs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+                Dim lBFInputs As atcDataAttributes = pGroupsInputsBF.ItemByKey(lGroupName)
 
                 If lBFInputs Is Nothing Then
                     lBFInputs = New atcDataAttributes()
                     lBFInputs.SetValue("Operation", "GroupSetParm")
                     lBFInputs.SetValue("Group", lGroupName)
-                    pBFInputsGroups.Add(lGroupName, lBFInputs)
+                    pGroupsInputsBF.Add(lGroupName, lBFInputs)
                 End If
                 'Try to use global setting as much as possible
-                If pBFInputsGlobal IsNot Nothing Then
+                If pGlobalInputsBF IsNot Nothing Then
                     Dim lMethods As ArrayList = lBFInputs.GetValue(BFInputNames.BFMethods, Nothing)
                     If lMethods Is Nothing Then
-                        Dim lMethodsGlobal As ArrayList = pBFInputsGlobal.GetValue(BFInputNames.BFMethods, Nothing)
+                        Dim lMethodsGlobal As ArrayList = pGlobalInputsBF.GetValue(BFInputNames.BFMethods, Nothing)
                         If lMethodsGlobal IsNot Nothing Then
                             lBFInputs.SetValue(BFInputNames.BFMethods, lMethodsGlobal)
                         End If
                     End If
                     Dim lOutputDir As String = lBFInputs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
                     If String.IsNullOrEmpty(lOutputDir) Then
-                        Dim lOutputDirGlobal As String = pBFInputsGlobal.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+                        Dim lOutputDirGlobal As String = pGlobalInputsBF.GetValue(BFBatchInputNames.OUTPUTDIR, "")
                         If Not String.IsNullOrEmpty(lOutputDirGlobal) Then
                             lBFInputs.SetValue(BFBatchInputNames.OUTPUTDIR, lOutputDirGlobal)
                         End If
                     End If
                     Dim lOutputFileRoot As String = lBFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
                     If String.IsNullOrEmpty(lOutputFileRoot) Then
-                        Dim lOutputFileRootGlobal As String = pBFInputsGlobal.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+                        Dim lOutputFileRootGlobal As String = pGlobalInputsBF.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
                         If Not String.IsNullOrEmpty(lOutputFileRootGlobal) Then
                             lBFInputs.SetValue(BFBatchInputNames.OUTPUTPrefix, lOutputFileRootGlobal)
                         End If
                     End If
                     Dim lBFIReportBy As String = lBFInputs.GetValue(BFInputNames.BFIReportby, "")
                     If String.IsNullOrEmpty(lBFIReportBy) Then
-                        Dim lBFIReportByGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFIReportby, "")
+                        Dim lBFIReportByGlobal As String = pGlobalInputsBF.GetValue(BFInputNames.BFIReportby, "")
                         If Not String.IsNullOrEmpty(lBFIReportByGlobal) Then
                             lBFInputs.SetValue(BFInputNames.BFIReportby, lBFIReportByGlobal)
                         End If
                     End If
                     Dim lBFIRecessConst As String = lBFInputs.GetValue(BFInputNames.BFIRecessConst, "")
                     If String.IsNullOrEmpty(lBFIRecessConst) Then
-                        Dim lBFIRecessConstGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFIRecessConst, "")
+                        Dim lBFIRecessConstGlobal As String = pGlobalInputsBF.GetValue(BFInputNames.BFIRecessConst, "")
                         If Not String.IsNullOrEmpty(lBFIRecessConstGlobal) Then
                             lBFInputs.SetValue(BFInputNames.BFIRecessConst, lBFIRecessConstGlobal)
                         End If
                     End If
                     Dim lBFITurnPtFrac As String = lBFInputs.GetValue(BFInputNames.BFITurnPtFrac, "")
                     If String.IsNullOrEmpty(lBFITurnPtFrac) Then
-                        Dim lBFITurnPtFracGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFITurnPtFrac, "")
+                        Dim lBFITurnPtFracGlobal As String = pGlobalInputsBF.GetValue(BFInputNames.BFITurnPtFrac, "")
                         If Not String.IsNullOrEmpty(lBFITurnPtFracGlobal) Then
                             lBFInputs.SetValue(BFInputNames.BFITurnPtFrac, lBFITurnPtFracGlobal)
                         End If
                     End If
                     Dim lBFINDay As String = lBFInputs.GetValue(BFInputNames.BFINDayScreen, "")
                     If String.IsNullOrEmpty(lBFINDay) Then
-                        Dim lBFINDayGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFINDayScreen, "")
+                        Dim lBFINDayGlobal As String = pGlobalInputsBF.GetValue(BFInputNames.BFINDayScreen, "")
                         If Not String.IsNullOrEmpty(lBFINDayGlobal) Then
                             lBFInputs.SetValue(BFInputNames.BFINDayScreen, lBFINDayGlobal)
                         End If
@@ -218,14 +246,14 @@ Public Class frmBatchMap
 
                     Dim lBFStartDate As String = lBFInputs.GetValue(BFInputNames.StartDate, "")
                     If String.IsNullOrEmpty(lBFStartDate) Then
-                        Dim lBFStartDateGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.StartDate, "")
+                        Dim lBFStartDateGlobal As String = pGlobalInputsBF.GetValue(BFInputNames.StartDate, "")
                         If Not String.IsNullOrEmpty(lBFStartDateGlobal) Then
                             lBFInputs.SetValue(BFInputNames.StartDate, lBFStartDateGlobal)
                         End If
                     End If
                     Dim lBFEndDate As String = lBFInputs.GetValue(BFInputNames.EndDate, "")
                     If String.IsNullOrEmpty(lBFEndDate) Then
-                        Dim lBFEndDateGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.EndDate, "")
+                        Dim lBFEndDateGlobal As String = pGlobalInputsBF.GetValue(BFInputNames.EndDate, "")
                         If Not String.IsNullOrEmpty(lBFEndDateGlobal) Then
                             lBFInputs.SetValue(BFInputNames.EndDate, lBFEndDateGlobal)
                         End If
@@ -265,13 +293,48 @@ Public Class frmBatchMap
                     End If
                 Next
                 If lTsGroup.Count > 0 Then
-                    pfrmBFParms = New frmUSGSBaseflowBatch()
-                    pfrmBFParms.Initialize(lTsGroup, lBFInputs)
+                    pfrmParamsBF = New frmUSGSBaseflowBatch()
+                    pfrmParamsBF.Initialize(lTsGroup, lBFInputs)
                 End If
             Case "cmsGlobalSetParm"
-                pBFInputsGlobal.SetValue("Operation", "GlobalSetParm")
-                pfrmBFParms = New frmUSGSBaseflowBatch()
-                pfrmBFParms.Initialize(Nothing, pBFInputsGlobal)
+                Dim lNodeText As String = node.Text
+                If lNodeText.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+                    pGlobalInputsSWSTAT.SetValue("Operation", "GlobalSetParm")
+                    pfrmParamsSWSTAT = New atcSWSTAT.frmSWSTAT()
+                    
+                    Dim lNDay() As Double = pGlobalInputsSWSTAT.GetValue("NDay", Nothing)
+                    Dim lNDays As atcCollection = pGlobalInputsSWSTAT.GetValue("NDays", Nothing)
+                    If lNDay IsNot Nothing Then
+                        If lNDays Is Nothing Then
+                            lNDays = New atcCollection()
+                            For lI As Integer = 0 To lNDay.Length - 1
+                                lNDays.Add(lNDay(lI), False)
+                            Next
+                            pGlobalInputsSWSTAT.SetValue("NDays", lNDays)
+                        End If
+                    End If
+                    Dim lRP() As Double = pGlobalInputsSWSTAT.GetValue("return period", Nothing)
+                    Dim lRPs As atcCollection = pGlobalInputsSWSTAT.GetValue("return periods", Nothing)
+                    If lRP IsNot Nothing Then
+                        If lRPs Is Nothing Then
+                            lRPs = New atcCollection()
+                            For I As Integer = 0 To lRP.Length - 1
+                                lRPs.Add(lRP(I), False)
+                            Next
+                            pGlobalInputsSWSTAT.SetValue("return periods", lRPs)
+                        End If
+                    End If
+
+                    pfrmParamsSWSTAT.Initialize(Nothing, pGlobalInputsSWSTAT)
+                ElseIf lNodeText.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
+                    pGlobalInputsDFLOW.SetValue("Operation", "GlobalSetParm")
+                    pfrmParamsDFLOW = New DFLOWAnalysis.frmDFLOWArgs()
+                    pfrmParamsDFLOW.Initialize(Nothing, pGlobalInputsDFLOW)
+                Else
+                    pGlobalInputsBF.SetValue("Operation", "GlobalSetParm")
+                    pfrmParamsBF = New frmUSGSBaseflowBatch()
+                    pfrmParamsBF.Initialize(Nothing, pGlobalInputsBF)
+                End If
         End Select
     End Sub
 
@@ -281,30 +344,40 @@ Public Class frmBatchMap
     ''' <param name="aBFGroupNode"></param>
     ''' <remarks></remarks>
     Private Sub RemoveBFGroup(ByVal aBFGroupNode As TreeNode)
-        Dim lGroupingName As String = "BatchGroup"
-        Dim lGroupNum As Integer = Integer.Parse(aBFGroupNode.Text.Substring(lGroupingName.Length + 1))
-        pBFInputsGroups.RemoveByKey(aBFGroupNode.Text)
+        Dim lIndex As Integer = aBFGroupNode.Text.LastIndexOf("_")
+        Dim lGroupingName As String = aBFGroupNode.Text.Substring(0, lIndex + 1) '"BatchGroup"
+        Dim lGroupNum As Integer = 0
+        If Not Integer.TryParse(aBFGroupNode.Text.Substring(lGroupingName.Length), lGroupNum) Then
+            Exit Sub
+        End If
+
+        pGroupsInputsBF.RemoveByKey(aBFGroupNode.Text)
         treeBFGroups.Nodes.Remove(aBFGroupNode)
         pBatchGroupCount -= 1
+        If lGroupingName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+            pBatchGroupCountSWSTAT -= 1
+        ElseIf lGroupingName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
+            pBatchGroupCountDFLOW -= 1
+        End If
         Dim loldNodeText As String = ""
         Dim loldNodeIndex As Integer
         For Each lNode As TreeNode In treeBFGroups.Nodes
             If lNode.Text.StartsWith(lGroupingName) Then
                 loldNodeText = lNode.Text
-                loldNodeIndex = pBFInputsGroups.Keys.IndexOf(loldNodeText)
-                Dim lGroupNumRemains As Integer = Integer.Parse(lNode.Text.Substring(lGroupingName.Length + 1))
+                loldNodeIndex = pGroupsInputsBF.Keys.IndexOf(loldNodeText)
+                Dim lGroupNumRemains As Integer = Integer.Parse(lNode.Text.Substring(lGroupingName.Length))
                 If lGroupNumRemains > lGroupNum Then
-                    Dim lNewNodeText As String = lGroupingName & "_" & (lGroupNumRemains - 1).ToString
+                    Dim lNewNodeText As String = lGroupingName & (lGroupNumRemains - 1).ToString
                     lNode.Text = lNewNodeText
-                    If loldNodeIndex >= 0 Then pBFInputsGroups.Keys.Item(loldNodeIndex) = lNewNodeText
+                    If loldNodeIndex >= 0 Then pGroupsInputsBF.Keys.Item(loldNodeIndex) = lNewNodeText
                 End If
             End If
         Next
     End Sub
 
-    Private Sub ParmetersSet(ByVal aArgs As atcDataAttributes) Handles pfrmBFParms.ParametersSet
+    Private Sub ParmetersSet(ByVal aArgs As atcDataAttributes) Handles pfrmParamsBF.ParametersSet
         Dim lText As String = ParametersToText(aArgs)
-        
+
         If String.IsNullOrEmpty(lText) Then
             txtParameters.Text = ""
         Else
@@ -312,13 +385,13 @@ Public Class frmBatchMap
             Dim lgroupname As String = aArgs.GetValue("Group", "")
             Dim lArg As atcDataAttributes = Nothing
             If loperation.ToLower = "groupsetparm" Then
-                lArg = pBFInputsGroups.ItemByKey(lgroupname)
+                lArg = pGroupsInputsBF.ItemByKey(lgroupname)
                 If lArg Is Nothing Then
                     lArg = New atcDataAttributes()
-                    pBFInputsGroups.Add(lgroupname, lArg)
+                    pGroupsInputsBF.Add(lgroupname, lArg)
                 End If
             Else
-                lArg = pBFInputsGlobal
+                lArg = pGlobalInputsBF
             End If
             For Each lDataDef As atcDefinedValue In aArgs
                 lArg.SetValue(lDataDef.Definition.Name, lDataDef.Value)
@@ -496,11 +569,11 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnDoBatch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoBatch.Click
-        If pBFInputsGlobal.Count = 0 Then
+        If pGlobalInputsBF.Count = 0 Then
             Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
             Return
         End If
-        If pBFInputsGroups.Count = 0 Then
+        If pGroupsInputsBF.Count = 0 Then
             Logger.Msg("Need to set up batch run groups.", "Batch Map Base-flow Separation")
             Return
         End If
@@ -514,15 +587,15 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnSaveSpecs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSaveSpecs.Click
-        If pBFInputsGlobal.Count = 0 Then
+        If pGlobalInputsBF.Count = 0 Then
             Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
             Exit Sub
         End If
-        If pBFInputsGroups.Count = 0 Then
+        If pGroupsInputsBF.Count = 0 Then
             Logger.Msg("Need to set up batch run groups.", "Batch Map Base-flow Separation")
             Exit Sub
         End If
-        Dim lSpecDir As String = pBFInputsGlobal.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+        Dim lSpecDir As String = pGlobalInputsBF.GetValue(BFBatchInputNames.OUTPUTDIR, "")
         If String.IsNullOrEmpty(lSpecDir) Then
             lSpecDir = pDataPath
         End If
@@ -531,10 +604,10 @@ Public Class frmBatchMap
         Try
             lSW = New IO.StreamWriter(pBatchSpecFilefullname, False)
             'write global block first
-            lSW.WriteLine(ParametersToText(pBFInputsGlobal))
+            lSW.WriteLine(ParametersToText(pGlobalInputsBF))
 
             'write each group settings
-            For Each lAttrib As atcDataAttributes In pBFInputsGroups
+            For Each lAttrib As atcDataAttributes In pGroupsInputsBF
                 lSW.WriteLine(ParametersToText(lAttrib))
             Next
 
@@ -559,9 +632,15 @@ Public Class frmBatchMap
             lGroupName = lGroupNode.Parent.Text
             lGroupNode = lGroupNode.Parent
         End If
-        Dim lArgs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+        Dim lAnalysis As clsBatch.ANALYSIS = clsBatch.ANALYSIS.DFLOW
+        If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+            lAnalysis = clsBatch.ANALYSIS.ITA
+        End If
+        Dim lArgs As atcDataAttributes = pGroupsInputsBF.ItemByKey(lGroupName)
         If lArgs IsNot Nothing Then
-            lArgs.SetValue("Constituent", "streamflow")
+            lArgs.SetValue("Constituent", "streamflow,flow")
+            Dim lCon As String = ""
+            Dim loc As String = ""
             Dim lTsGroup As New atcTimeseriesGroup()
             For Each lStationNode As TreeNode In lGroupNode.Nodes
                 Dim lstationId As String = lStationNode.Text
@@ -570,8 +649,13 @@ Public Class frmBatchMap
                 For Each lDS As atcDataSource In atcDataManager.DataSources
                     If lDS.Name.ToString.Contains("USGS RDB") Then
                         For Each lTs As atcTimeseries In lDS.DataSets
-                            If lTs.Attributes.GetValue("Location") = lstationId AndAlso _
-                               lTs.Attributes.GetValue("Constituent").ToString.ToLower = "streamflow" Then
+                            lCon = lTs.Attributes.GetValue("Constituent")
+                            loc = lTs.Attributes.GetValue("Location")
+                            If String.IsNullOrEmpty(lCon) Then
+                                Continue For
+                            End If
+                            If loc = lstationId AndAlso _
+                               (lCon.ToString.ToLower = "streamflow" OrElse lCon.ToString.ToLower = "flow") Then
                                 lTsGroup.Add(lTs)
                                 lDataLoaded = True
                             End If
@@ -587,8 +671,13 @@ Public Class frmBatchMap
                 End If
             Next
             If lTsGroup.Count > 0 Then
-                pfrmBFParms = New frmUSGSBaseflowBatch()
-                pfrmBFParms.Initialize(lTsGroup, lArgs)
+                Select Case lAnalysis
+                    Case clsBatch.ANALYSIS.DFLOW
+                    Case clsBatch.ANALYSIS.ITA
+                    Case Else
+                        pfrmParamsBF = New frmUSGSBaseflowBatch()
+                        pfrmParamsBF.Initialize(lTsGroup, lArgs)
+                End Select
             End If
         End If
     End Sub
