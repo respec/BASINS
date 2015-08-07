@@ -8,6 +8,7 @@ Public Interface IBatchProcessing
     Sub SpecifyGroup(ByVal aSpec As String, ByVal aOpnCount As Integer)
     Sub MergeSpecs()
     Sub PopulateScenarios()
+    Function ParametersToText(ByVal aMethod As clsBatch.ANALYSIS, ByVal aArgs As atcDataAttributes) As String
     Sub Clear()
 End Interface
 
@@ -198,6 +199,10 @@ Public Class clsBatch
     Public Overridable Sub SpecifyGlobal(ByVal aSpec As String) Implements IBatchProcessing.SpecifyGlobal
 
     End Sub
+
+    Public Overridable Function ParametersToText(ByVal aMethod As ANALYSIS, ByVal aArgs As atcDataAttributes) As String Implements IBatchProcessing.ParametersToText
+        Return ""
+    End Function
 
     Public Overridable Sub SpecifyGroup(ByVal aSpec As String, ByVal aOpnCount As Integer) Implements IBatchProcessing.SpecifyGroup
 

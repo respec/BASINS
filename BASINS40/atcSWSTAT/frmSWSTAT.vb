@@ -751,6 +751,9 @@ Public Class frmSWSTAT
     Private Const pNoDatesInCommon As String = ": No dates in common"
 
     Public Event ParametersSet(ByVal aArgs As atcDataAttributes)
+    Private pAttributes As atcDataAttributes
+    Private pSetGlobal As Boolean = False
+    Private pBatch As Boolean = False
 
     Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics.html"
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
@@ -1021,11 +1024,7 @@ Public Class frmSWSTAT
             pDataGroup = aTimeseriesGroup
         End If
 
-        'If aBasicAttributes Is Nothing Then
-        '    pBasicAttributes = atcDataManager.DisplayAttributes
-        'Else
-        '    pBasicAttributes = aBasicAttributes
-        'End If
+        pAttributes = attributes
 
         'If aNDayAttributes Is Nothing Then
         '    pNDayAttributes = atcDataManager.DisplayAttributes
@@ -1055,6 +1054,21 @@ Public Class frmSWSTAT
         '                                               pDataGroup, Nothing, True, True, Me.Icon)
         'End If
         'PopulateForm()
+
+        pBatch = True
+        Dim loperation As String = attributes.GetValue("Operation", "")
+        If loperation.ToLower = "globalsetparm" Then
+            pSetGlobal = True
+            btnDoFrequencyGrid.Text = "Set Global Parameters"
+        Else
+            pSetGlobal = False
+            btnDoFrequencyGrid.Text = "Set Group Parameters"
+        End If
+        btnNDay.Visible = False
+        btnDisplayTrend.Visible = False
+        btnDisplayBasic.Visible = False
+        btnDoFrequencyGraph.Visible = False
+
         PopulateForm(attributes)
         Me.Show()
     End Sub
@@ -1104,6 +1118,35 @@ Public Class frmSWSTAT
             End If
         End If
     End Sub
+
+    Private Function SeasonsYearsFromFormBatch() As String
+        pYearStartMonth = cboStartMonth.SelectedIndex + 1
+        pYearEndMonth = cboEndMonth.SelectedIndex + 1
+        If IsNumeric(txtStartDay.Text) Then
+            pYearStartDay = Math.Min(CInt(txtStartDay.Text), DayMon(1901, pYearStartMonth))
+            txtStartDay.Text = pYearStartDay
+        Else
+            pYearStartDay = 0
+        End If
+        If IsNumeric(txtEndDay.Text) Then
+            pYearEndDay = Math.Min(CInt(txtEndDay.Text), DayMon(1901, pYearEndMonth))
+            txtEndDay.Text = pYearEndDay
+        Else
+            pYearEndDay = 0
+        End If
+        If IsNumeric(txtOmitBeforeYear.Text) Then
+            pFirstYear = CInt(txtOmitBeforeYear.Text)
+        Else
+            pFirstYear = 0
+        End If
+        If IsNumeric(txtOmitAfterYear.Text) Then
+            pLastYear = CInt(txtOmitAfterYear.Text)
+        Else
+            pLastYear = 0
+        End If
+        Dim lMsg As String = SaveSettingsBatch()
+        Return lMsg
+    End Function
 
     Private Sub SeasonsYearsFromForm()
         pYearStartMonth = cboStartMonth.SelectedIndex + 1
@@ -1403,9 +1446,32 @@ Public Class frmSWSTAT
         End If
     End Sub
 
+    ''' <summary>
+    ''' Calculate(aOperationName: = "n-day " & HighOrLowString() & " value", _
+    ''' aReturnPeriods() = ListToArray(lstRecurrence))
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub CalculateBatch()
+        If Not pSetGlobal AndAlso pDataGroup IsNot Nothing Then ClearAttributes()
+        Dim lMsg As String = SeasonsYearsFromFormBatch()
+        If Not String.IsNullOrEmpty(lMsg) Then
+            Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lMsg, MsgBoxStyle.Information, "Input Needs Correction")
+            Exit Sub
+        Else
+            If pSetGlobal Then
+                Logger.MsgCustomOwned("Parameters are set for Global Defaults.", "USGS Batch Processing", Me, New String() {"OK"})
+                Me.Close()
+            Else
+                Dim lGroup As String = pAttributes.GetValue("Group", "")
+                Logger.MsgCustomOwned("Group Parameters are set for " & lGroup, "USGS Batch Processing", Me, New String() {"OK"})
+            End If
+        End If
+        RaiseEvent ParametersSet(pAttributes)
+    End Sub
+
     Private Sub Calculate(ByVal aOperationName As String, ByVal aReturnPeriods() As Double)
         ClearAttributes()
-        SeasonsYearsFromForm()
+        SeasonsYearsFromForm() 'setup all inputs from form
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         For Each lTs As atcTimeseries In pDataGroup
             lTs.Attributes.SetValueIfMissing("CalcEMA", True)
@@ -1426,6 +1492,33 @@ Public Class frmSWSTAT
         lCalculator.DataSets.Clear()
     End Sub
 
+    Private Function SaveSettingsBatch() As String
+        Dim lMsg As String = ""
+        Dim lName As String = HighOrLowString()
+        If pYearStartMonth = 0 OrElse pYearStartDay = 0 OrElse pYearEndMonth = 0 OrElse pYearEndDay = 0 Then
+            lMsg &= "- Problem with start and/or end dates." & vbCrLf
+        Else
+            If pAttributes Is Nothing Then
+                pAttributes = New atcDataAttributes()
+            End If
+            With pAttributes
+                .SetValue("StartMonth", pYearStartMonth)
+                .SetValue("StartDay", pYearStartDay)
+                .SetValue("EndMonth", pYearEndMonth)
+                .SetValue("EndDay", pYearEndDay)
+                .SetValue("HighOrLow", lName)
+                .SetValue("Logarithmic", chkLog.Checked)
+                .SetValue("MultipleNDayPlots", chkMultipleNDayPlots.Checked)
+                .SetValue("MultipleStationPlots", chkMultipleStationPlots.Checked)
+            End With
+        End If
+
+        lMsg &= SaveListBatch(lstNday)
+        lMsg &= SaveListBatch(lstRecurrence)
+
+        Return lMsg
+    End Function
+
     Private Sub SaveSettings()
         Dim lName As String = HighOrLowString()
         SaveSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
@@ -1445,6 +1538,41 @@ Public Class frmSWSTAT
             SaveSetting("atcFrequencyGrid", "List." & lst.Tag, lst.Items(lIndex), lst.SelectedIndices.Contains(lIndex))
         Next
     End Sub
+
+    Private Function SaveListBatch(ByVal lst As Windows.Forms.ListBox) As String
+        Dim lMsg As String = ""
+
+        'Dim listing0() As Double = pAttributes.GetValue(lst.Tag, Nothing)
+        'If listing0 IsNot Nothing Then
+        '    ReDim listing0(0)
+        '    listing0 = Nothing
+        'End If
+        Dim lCollection0 As atcCollection = pAttributes.GetValue(lst.Tag & "s", Nothing)
+        If lCollection0 IsNot Nothing Then
+            lCollection0.Clear()
+            lCollection0 = Nothing
+        End If
+        pAttributes.RemoveByKey(lst.Tag)
+        pAttributes.RemoveByKey(lst.Tag & "s")
+        If lst.SelectedIndices.Count = 0 Then
+            lMsg &= "- Need to select at least one " & lst.Tag & vbCrLf
+            Return lMsg
+        Else
+            Dim listing(lst.Items.Count - 1) As Double
+            Dim lCollection As New atcCollection()
+
+            Dim lItemValue As Double
+            For lIndex As Integer = 0 To lst.Items.Count - 1
+                lItemValue = lst.Items(lIndex)
+                listing(lIndex) = lItemValue
+                lCollection.Add(lItemValue, lst.SelectedIndices.Contains(lIndex))
+            Next
+            pAttributes.SetValue(lst.Tag, listing)
+            pAttributes.SetValue(lst.Tag & "s", lCollection)
+        End If
+        
+        Return lMsg
+    End Function
 
     Private Sub ClearAttributes()
         Dim lRemoveThese As New atcCollection
@@ -1578,16 +1706,20 @@ Public Class frmSWSTAT
     End Sub
 
     Private Sub btnDoFrequencyGrid_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequencyGrid.Click
-        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-        Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
+        If pBatch Then
+            CalculateBatch() 'setting params for batch run
+        Else
+            Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+            Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
-        Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup, _
-                                                     aHigh:=radioHigh.Checked, _
-                                                     aNday:=ListToArray(lstNday), _
-                                                     aReturns:=ListToArray(lstRecurrence))
-        lFreqForm.SWSTATform = Me
+            Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup, _
+                                                         aHigh:=radioHigh.Checked, _
+                                                         aNday:=ListToArray(lstNday), _
+                                                         aReturns:=ListToArray(lstRecurrence))
+            lFreqForm.SWSTATform = Me
 
-        Me.Cursor = System.Windows.Forms.Cursors.Default
+            Me.Cursor = System.Windows.Forms.Cursors.Default
+        End If
     End Sub
 
     Private Sub btnDoFrequencyGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequencyGraph.Click
