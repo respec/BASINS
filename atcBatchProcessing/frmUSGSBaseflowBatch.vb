@@ -70,10 +70,6 @@ Public Class frmUSGSBaseflowBatch
         If loperation.ToLower = "globalsetparm" Then
             pSetGlobal = True
         End If
-        If pDataGroup.Count = 0 AndAlso Not pSetGlobal Then 'ask user to specify some timeseries
-            pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", _
-                                                       pDataGroup, Nothing, True, True, Me.Icon)
-        End If
 
         If pDataGroup.Count > 0 OrElse pSetGlobal Then
             PopulateForm()
