@@ -38,11 +38,14 @@ Partial Class frmBatchMap
         Me.btnDoBatch = New System.Windows.Forms.Button
         Me.btnSaveSpecs = New System.Windows.Forms.Button
         Me.cmsNode = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.cmsRemove = New System.Windows.Forms.ToolStripMenuItem
-        Me.cmsPlotDur = New System.Windows.Forms.ToolStripMenuItem
-        Me.cmsGroupSetParm = New System.Windows.Forms.ToolStripMenuItem
         Me.cmsGlobalSetParm = New System.Windows.Forms.ToolStripMenuItem
+        Me.cmsGroupSetParm = New System.Windows.Forms.ToolStripMenuItem
+        Me.cmsPlotDur = New System.Windows.Forms.ToolStripMenuItem
+        Me.cmsRemove = New System.Windows.Forms.ToolStripMenuItem
         Me.btnDownload = New System.Windows.Forms.Button
+        Me.rdoSWSTAT = New System.Windows.Forms.RadioButton
+        Me.rdoDFLOW = New System.Windows.Forms.RadioButton
+        Me.rdoBF = New System.Windows.Forms.RadioButton
         Me.GroupBox1.SuspendLayout()
         Me.cmsNode.SuspendLayout()
         Me.SuspendLayout()
@@ -60,7 +63,7 @@ Partial Class frmBatchMap
         'txtDataDir
         '
         Me.txtDataDir.Location = New System.Drawing.Point(103, 12)
-        Me.txtDataDir.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtDataDir.Margin = New System.Windows.Forms.Padding(4)
         Me.txtDataDir.Name = "txtDataDir"
         Me.txtDataDir.Size = New System.Drawing.Size(383, 22)
         Me.txtDataDir.TabIndex = 1
@@ -68,7 +71,7 @@ Partial Class frmBatchMap
         'btnBrowseDataDir
         '
         Me.btnBrowseDataDir.Location = New System.Drawing.Point(495, 10)
-        Me.btnBrowseDataDir.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnBrowseDataDir.Margin = New System.Windows.Forms.Padding(4)
         Me.btnBrowseDataDir.Name = "btnBrowseDataDir"
         Me.btnBrowseDataDir.Size = New System.Drawing.Size(81, 28)
         Me.btnBrowseDataDir.TabIndex = 2
@@ -81,7 +84,7 @@ Partial Class frmBatchMap
         Me.lstStations.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstStations.LeftLabel = "Available:"
         Me.lstStations.Location = New System.Drawing.Point(21, 46)
-        Me.lstStations.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.lstStations.Margin = New System.Windows.Forms.Padding(4)
         Me.lstStations.MoveDownTip = "Move Item Down In List"
         Me.lstStations.MoveUpTip = "Move Item Up In List"
         Me.lstStations.Name = "lstStations"
@@ -93,7 +96,7 @@ Partial Class frmBatchMap
         'treeBFGroups
         '
         Me.treeBFGroups.Location = New System.Drawing.Point(21, 260)
-        Me.treeBFGroups.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.treeBFGroups.Margin = New System.Windows.Forms.Padding(4)
         Me.treeBFGroups.Name = "treeBFGroups"
         Me.treeBFGroups.Size = New System.Drawing.Size(181, 212)
         Me.treeBFGroups.TabIndex = 4
@@ -110,8 +113,8 @@ Partial Class frmBatchMap
         '
         'btnCreateGroup
         '
-        Me.btnCreateGroup.Location = New System.Drawing.Point(580, 75)
-        Me.btnCreateGroup.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnCreateGroup.Location = New System.Drawing.Point(580, 59)
+        Me.btnCreateGroup.Margin = New System.Windows.Forms.Padding(4)
         Me.btnCreateGroup.Name = "btnCreateGroup"
         Me.btnCreateGroup.Size = New System.Drawing.Size(100, 44)
         Me.btnCreateGroup.TabIndex = 6
@@ -120,8 +123,8 @@ Partial Class frmBatchMap
         '
         'btnPlotDuration
         '
-        Me.btnPlotDuration.Location = New System.Drawing.Point(581, 128)
-        Me.btnPlotDuration.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnPlotDuration.Location = New System.Drawing.Point(580, 111)
+        Me.btnPlotDuration.Margin = New System.Windows.Forms.Padding(4)
         Me.btnPlotDuration.Name = "btnPlotDuration"
         Me.btnPlotDuration.Size = New System.Drawing.Size(100, 28)
         Me.btnPlotDuration.TabIndex = 7
@@ -136,10 +139,10 @@ Partial Class frmBatchMap
         Me.GroupBox1.Controls.Add(Me.btnParmForm)
         Me.GroupBox1.Controls.Add(Me.txtParameters)
         Me.GroupBox1.Location = New System.Drawing.Point(213, 240)
-        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
-        Me.GroupBox1.Size = New System.Drawing.Size(465, 233)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4)
+        Me.GroupBox1.Size = New System.Drawing.Size(554, 233)
         Me.GroupBox1.TabIndex = 8
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Group Parameters"
@@ -148,7 +151,7 @@ Partial Class frmBatchMap
         '
         Me.btnParmForm.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnParmForm.Location = New System.Drawing.Point(8, 197)
-        Me.btnParmForm.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnParmForm.Margin = New System.Windows.Forms.Padding(4)
         Me.btnParmForm.Name = "btnParmForm"
         Me.btnParmForm.Size = New System.Drawing.Size(100, 28)
         Me.btnParmForm.TabIndex = 1
@@ -162,18 +165,18 @@ Partial Class frmBatchMap
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtParameters.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtParameters.Location = New System.Drawing.Point(9, 20)
-        Me.txtParameters.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtParameters.Margin = New System.Windows.Forms.Padding(4)
         Me.txtParameters.Multiline = True
         Me.txtParameters.Name = "txtParameters"
         Me.txtParameters.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtParameters.Size = New System.Drawing.Size(447, 169)
+        Me.txtParameters.Size = New System.Drawing.Size(536, 169)
         Me.txtParameters.TabIndex = 0
         '
         'btnDoBatch
         '
         Me.btnDoBatch.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDoBatch.Location = New System.Drawing.Point(579, 480)
-        Me.btnDoBatch.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnDoBatch.Location = New System.Drawing.Point(668, 480)
+        Me.btnDoBatch.Margin = New System.Windows.Forms.Padding(4)
         Me.btnDoBatch.Name = "btnDoBatch"
         Me.btnDoBatch.Size = New System.Drawing.Size(100, 28)
         Me.btnDoBatch.TabIndex = 9
@@ -183,8 +186,8 @@ Partial Class frmBatchMap
         'btnSaveSpecs
         '
         Me.btnSaveSpecs.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSaveSpecs.Location = New System.Drawing.Point(471, 480)
-        Me.btnSaveSpecs.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnSaveSpecs.Location = New System.Drawing.Point(560, 480)
+        Me.btnSaveSpecs.Margin = New System.Windows.Forms.Padding(4)
         Me.btnSaveSpecs.Name = "btnSaveSpecs"
         Me.btnSaveSpecs.Size = New System.Drawing.Size(100, 28)
         Me.btnSaveSpecs.TabIndex = 10
@@ -197,17 +200,11 @@ Partial Class frmBatchMap
         Me.cmsNode.Name = "cmsGroup"
         Me.cmsNode.Size = New System.Drawing.Size(226, 100)
         '
-        'cmsRemove
+        'cmsGlobalSetParm
         '
-        Me.cmsRemove.Name = "cmsRemove"
-        Me.cmsRemove.Size = New System.Drawing.Size(225, 24)
-        Me.cmsRemove.Text = "Remove"
-        '
-        'cmsPlotDur
-        '
-        Me.cmsPlotDur.Name = "cmsPlotDur"
-        Me.cmsPlotDur.Size = New System.Drawing.Size(225, 24)
-        Me.cmsPlotDur.Text = "Plot Duration"
+        Me.cmsGlobalSetParm.Name = "cmsGlobalSetParm"
+        Me.cmsGlobalSetParm.Size = New System.Drawing.Size(225, 24)
+        Me.cmsGlobalSetParm.Text = "Set Global Parameters"
         '
         'cmsGroupSetParm
         '
@@ -215,43 +212,85 @@ Partial Class frmBatchMap
         Me.cmsGroupSetParm.Size = New System.Drawing.Size(225, 24)
         Me.cmsGroupSetParm.Text = "Set Group Parameters"
         '
-        'cmsGlobalSetParm
+        'cmsPlotDur
         '
-        Me.cmsGlobalSetParm.Name = "cmsGlobalSetParm"
-        Me.cmsGlobalSetParm.Size = New System.Drawing.Size(225, 24)
-        Me.cmsGlobalSetParm.Text = "Set Global Parameters"
+        Me.cmsPlotDur.Name = "cmsPlotDur"
+        Me.cmsPlotDur.Size = New System.Drawing.Size(225, 24)
+        Me.cmsPlotDur.Text = "Plot Duration"
+        '
+        'cmsRemove
+        '
+        Me.cmsRemove.Name = "cmsRemove"
+        Me.cmsRemove.Size = New System.Drawing.Size(225, 24)
+        Me.cmsRemove.Text = "Remove"
         '
         'btnDownload
         '
         Me.btnDownload.Location = New System.Drawing.Point(584, 10)
-        Me.btnDownload.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnDownload.Margin = New System.Windows.Forms.Padding(4)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(100, 28)
         Me.btnDownload.TabIndex = 11
         Me.btnDownload.Text = "Download"
         Me.btnDownload.UseVisualStyleBackColor = True
         '
+        'rdoSWSTAT
+        '
+        Me.rdoSWSTAT.AutoSize = True
+        Me.rdoSWSTAT.Location = New System.Drawing.Point(584, 147)
+        Me.rdoSWSTAT.Name = "rdoSWSTAT"
+        Me.rdoSWSTAT.Size = New System.Drawing.Size(135, 21)
+        Me.rdoSWSTAT.TabIndex = 12
+        Me.rdoSWSTAT.TabStop = True
+        Me.rdoSWSTAT.Text = "Integrated Trend"
+        Me.rdoSWSTAT.UseVisualStyleBackColor = True
+        '
+        'rdoDFLOW
+        '
+        Me.rdoDFLOW.AutoSize = True
+        Me.rdoDFLOW.Location = New System.Drawing.Point(584, 175)
+        Me.rdoDFLOW.Name = "rdoDFLOW"
+        Me.rdoDFLOW.Size = New System.Drawing.Size(79, 21)
+        Me.rdoDFLOW.TabIndex = 13
+        Me.rdoDFLOW.TabStop = True
+        Me.rdoDFLOW.Text = "DFLOW"
+        Me.rdoDFLOW.UseVisualStyleBackColor = True
+        '
+        'rdoBF
+        '
+        Me.rdoBF.AutoSize = True
+        Me.rdoBF.Location = New System.Drawing.Point(584, 203)
+        Me.rdoBF.Name = "rdoBF"
+        Me.rdoBF.Size = New System.Drawing.Size(163, 21)
+        Me.rdoBF.TabIndex = 14
+        Me.rdoBF.TabStop = True
+        Me.rdoBF.Text = "Base-flow Separation"
+        Me.rdoBF.UseVisualStyleBackColor = True
+        '
         'frmBatchMap
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(695, 521)
+        Me.ClientSize = New System.Drawing.Size(784, 521)
+        Me.Controls.Add(Me.rdoBF)
+        Me.Controls.Add(Me.rdoDFLOW)
+        Me.Controls.Add(Me.rdoSWSTAT)
         Me.Controls.Add(Me.btnDownload)
         Me.Controls.Add(Me.btnSaveSpecs)
         Me.Controls.Add(Me.btnDoBatch)
         Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.btnPlotDuration)
         Me.Controls.Add(Me.btnCreateGroup)
-        Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.treeBFGroups)
         Me.Controls.Add(Me.lstStations)
         Me.Controls.Add(Me.txtDataDir)
         Me.Controls.Add(Me.btnBrowseDataDir)
         Me.Controls.Add(Me.Label1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmBatchMap"
-        Me.Text = "Base-flow Separation Batch From Map"
+        Me.Text = "Batch Processing From Map"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.cmsNode.ResumeLayout(False)
@@ -278,4 +317,7 @@ Partial Class frmBatchMap
     Friend WithEvents cmsGroupSetParm As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmsGlobalSetParm As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents btnDownload As System.Windows.Forms.Button
+    Friend WithEvents rdoSWSTAT As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoDFLOW As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoBF As System.Windows.Forms.RadioButton
 End Class

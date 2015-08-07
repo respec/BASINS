@@ -3,7 +3,7 @@ Imports atcUtility
 Imports MapWinUtility
 Imports System.Windows.Forms
 
-Friend Class frmSWSTAT
+Public Class frmSWSTAT
     Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -750,6 +750,8 @@ Friend Class frmSWSTAT
 
     Private Const pNoDatesInCommon As String = ": No dates in common"
 
+    Public Event ParametersSet(ByVal aArgs As atcDataAttributes)
+
     Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics.html"
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp(pHelpLocation)
@@ -773,6 +775,28 @@ Friend Class frmSWSTAT
 
         LoadListSettingsOrDefaults(lstNday)
         LoadListSettingsOrDefaults(lstRecurrence)
+        RepopulateForm()
+    End Sub
+
+    Private Sub PopulateForm(ByVal attribs As atcDataAttributes)
+        pDateFormat = New atcDateFormat
+        With pDateFormat
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .IncludeSeconds = False
+        End With
+
+        Dim lHighLow As String = attribs.GetValue("HighLow", "")
+        If lHighLow.ToLower = "high" Then
+            radioHigh.Checked = True
+        Else
+            radioLow.Checked = True
+        End If
+
+        chkLog.Checked = attribs.GetValue("Logarithmic", True)
+
+        LoadListSettingsOrDefaults(lstNday, attribs)
+        LoadListSettingsOrDefaults(lstRecurrence, attribs)
         RepopulateForm()
     End Sub
 
@@ -897,6 +921,32 @@ Friend Class frmSWSTAT
         End If
     End Sub
 
+    Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox, ByVal attribs As atcDataAttributes)
+        Dim lArgName As String = lst.Tag & "s"
+        Dim listing As atcCollection = attribs.GetValue(lArgName, Nothing)
+        If listing Is Nothing Then
+            Exit Sub
+        End If
+
+        Dim lSelected As New ArrayList
+        lst.Items.Clear()
+
+        If listing.Count > 0 Then
+            Try
+                For lIndex As Integer = 0 To listing.Count - 1
+                    lst.Items.Add(listing.Keys(lIndex))
+                    If listing.ItemByIndex(lIndex) Then
+                        lst.SetSelected(lst.Items.Count - 1, True)
+                    End If
+                Next
+            Catch e As Exception
+                Logger.Dbg("Error retrieving " & lArgName & " settings: " & e.Message)
+            End Try
+        Else
+            LoadListDefaults(lst)
+        End If
+    End Sub
+
     Private Sub frmSWSTAT_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
             ShowHelp(pHelpLocation)
@@ -957,6 +1007,58 @@ Friend Class frmSWSTAT
 
     End Sub
 
+    Public Sub Initialize(ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup, _
+                          ByVal attributes As atcDataAttributes)
+
+        'Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
+        'Optional ByVal aNDayAttributes As Generic.List(Of String) = Nothing, _
+        'Optional ByVal aTrendAttributes As Generic.List(Of String) = Nothing, _
+        'Optional ByVal aShowForm As Boolean = True
+
+        If aTimeseriesGroup Is Nothing Then
+            pDataGroup = New atcTimeseriesGroup
+        Else
+            pDataGroup = aTimeseriesGroup
+        End If
+
+        'If aBasicAttributes Is Nothing Then
+        '    pBasicAttributes = atcDataManager.DisplayAttributes
+        'Else
+        '    pBasicAttributes = aBasicAttributes
+        'End If
+
+        'If aNDayAttributes Is Nothing Then
+        '    pNDayAttributes = atcDataManager.DisplayAttributes
+        'Else
+        '    pNDayAttributes = aNDayAttributes
+        'End If
+
+        'If aTrendAttributes Is Nothing Then
+        '    pTrendAttributes = atcDataManager.DisplayAttributes
+        'Else
+        '    pTrendAttributes = aTrendAttributes
+        'End If
+
+        'If aShowForm Then
+        '    Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
+        '    For Each lDisp As atcDataDisplay In DisplayPlugins
+        '        Dim lMenuText As String = lDisp.Name
+        '        If lMenuText <> "Analysis::USGS Surface Water Statistics (SWSTAT)::Integrated Frequency Analysis" Then
+        '            If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
+        '            mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
+        '        End If
+        '    Next
+        'End If
+
+        'If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
+        '    pDataGroup = atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis", _
+        '                                               pDataGroup, Nothing, True, True, Me.Icon)
+        'End If
+        'PopulateForm()
+        PopulateForm(attributes)
+        Me.Show()
+    End Sub
+
     Public Property DateFormat() As atcDateFormat
         Get
             Return pDateFormat
@@ -1007,13 +1109,13 @@ Friend Class frmSWSTAT
         pYearStartMonth = cboStartMonth.SelectedIndex + 1
         pYearEndMonth = cboEndMonth.SelectedIndex + 1
         If IsNumeric(txtStartDay.Text) Then
-            pYearStartDay = Math.Min(CInt(txtStartDay.Text), daymon(1901, pYearStartMonth))
+            pYearStartDay = Math.Min(CInt(txtStartDay.Text), DayMon(1901, pYearStartMonth))
             txtStartDay.Text = pYearStartDay
         Else
             pYearStartDay = 0
         End If
         If IsNumeric(txtEndDay.Text) Then
-            pYearEndDay = Math.Min(CInt(txtEndDay.Text), daymon(1901, pYearEndMonth))
+            pYearEndDay = Math.Min(CInt(txtEndDay.Text), DayMon(1901, pYearEndMonth))
             txtEndDay.Text = pYearEndDay
         Else
             pYearEndDay = 0

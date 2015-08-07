@@ -10,6 +10,11 @@ Public Class frmDFLOWArgs
     Private pDateFormat As New atcDateFormat
     Private Shared pLastDayOfMonth() As Integer = {99, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
+    Public Sub Initialize(ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup, _
+                          ByVal attributes As atcDataAttributes)
+
+    End Sub
+
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
 
         'Done - Force calculation
