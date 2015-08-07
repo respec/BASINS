@@ -175,7 +175,7 @@ Public Module modDate
         If Double.IsNaN(aJd) Then
             lJd = 0
         Else
-            lJd = Fix(aJd + JulianHalfSecond) 'round up if Julian date is within rounding error of midnight
+            lJd = Int(aJd + JulianHalfSecond) 'round up if Julian date is within rounding error of midnight
         End If
 
         Call INVMJD(lJd, aDate(0), aDate(1), aDate(2))
@@ -690,6 +690,17 @@ Public Module modDate
         End If
         Return lTimAddJ
     End Function
+
+    'Public Function FromOADateATC(ByVal aOADate As Double) As Date
+    '    Dim lDate As Date
+    '    If aOADate > -1657435.0 AndAlso aOADate < 2958466 Then
+    '        lDate = FromOADate(aOADate)
+    '    Else
+    '        lDate = FromOADate(0)
+    '        lDate = lDate.AddDays(aOADate)
+    '    End If
+    '    Return lDate
+    'End Function
 
     ''' <summary>
     ''' Add NVALS time steps to first date to compute second date.
