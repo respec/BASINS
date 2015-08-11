@@ -18,6 +18,8 @@ Public Module modFile
     Public ShapeExtensions() As String = {".shp", ".shx", ".dbf", ".prj", ".spx", ".sbn", ".sbx", ".xml", ".shp.xml", ".mwsr"}
     Public TifExtensions() As String = {".tif", ".prj", ".tfw", ".xml", ".tif.xml", ".mwsr", ".mwleg", ".proj4"}
 
+    Public SaveFileStringEncoding As New System.Text.UTF8Encoding(False)
+
     Public Function TryMove(ByVal aFromFilename As String, ByVal aToPath As String) As Boolean
         Return TryMove(aFromFilename, aToPath, False)
     End Function
@@ -630,7 +632,7 @@ FoundSameUntil:
 Retry:
         Try
             MkDirPath(PathNameOnly(filename))
-            IO.File.WriteAllText(filename, FileContents, System.Text.Encoding.UTF8)
+            IO.File.WriteAllText(filename, FileContents, SaveFileStringEncoding)
         Catch ex As Exception
             If Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, Microsoft.VisualBasic.MsgBoxStyle.RetryCancel, "SaveFileString") = MsgBoxResult.Retry Then
                 GoTo Retry
