@@ -789,14 +789,16 @@ Public Class frmSWSTAT
             .IncludeSeconds = False
         End With
 
-        Dim lHighLow As String = attribs.GetValue("HighLow", "")
+        Dim lHighLow As String = attribs.GetValue(InputNames.HighLow, "")
         If lHighLow.ToLower = "high" Then
             radioHigh.Checked = True
         Else
             radioLow.Checked = True
         End If
 
-        chkLog.Checked = attribs.GetValue("Logarithmic", True)
+        chkLog.Checked = attribs.GetValue(InputNames.Logarithmic, True)
+        chkMultipleNDayPlots.Checked = attribs.GetValue(InputNames.MultiNDayPlot, False)
+        chkMultipleStationPlots.Checked = attribs.GetValue(InputNames.MultiStationPlot, False)
 
         LoadListSettingsOrDefaults(lstNday, attribs)
         LoadListSettingsOrDefaults(lstRecurrence, attribs)

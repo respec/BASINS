@@ -12,6 +12,18 @@ Public Interface IBatchProcessing
     Sub Clear()
 End Interface
 
+Public Class GlobalInputNames
+    Public Shared Streamflow As String = "Streamflow"
+    Public Shared EnglishUnit As String = "EnglishUnit"
+    Public Shared StartDate As String = "StartDate"
+    Public Shared EndDate As String = "EndDate"
+    Public Shared DrainageArea As String = "DrainageArea"
+    Public Shared StationFile As String = "StationFile"
+    Public Shared OutputDir As String = "OUTPUTDIR"
+    Public Shared OutputPrefix As String = "OutputPrefix"
+    Public Shared DataDir As String = "DataDir"
+End Class
+
 ''' <summary>
 ''' The overall organizing program
 ''' </summary>
