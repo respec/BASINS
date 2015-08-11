@@ -29,6 +29,29 @@ Public Class BFBatchInputNames
     Public Shared BFM_BFIM As String = "BFIM"
 
     'Public Shared STREAMFLOW As String = "Streamflow"
+    ''' <summary>
+    ''' !!!! Incomplete list of inputs !!!!
+    ''' </summary>
+    ''' <param name="aSpecialSet"></param>
+    ''' <param name="aCommonSet"></param>
+    ''' <remarks></remarks>
+    Public Shared Sub BuildInputSet(ByRef aSpecialSet As atcDataAttributes, ByVal aCommonSet As atcDataAttributes)
+        If aSpecialSet Is Nothing Then
+            aSpecialSet = New atcDataAttributes()
+        End If
+        If aCommonSet Is Nothing Then
+            With aSpecialSet
+                If .GetValue(BFMethod) Is Nothing Then .SetValue(BFMethod, New atcCollection())
+            End With
+        Else
+            With aSpecialSet
+                If .GetValue(BFMethod) Is Nothing Then .SetValue(BFMethod, aCommonSet.GetValue(BFMethod, New atcCollection()))
+                If .GetValue(OUTPUTDIR) Is Nothing Then .SetValue(OUTPUTDIR, aCommonSet.GetValue(OUTPUTDIR, ""))
+                If .GetValue(OutputPrefix) Is Nothing Then .SetValue(OutputPrefix, aCommonSet.GetValue(OutputPrefix, ""))
+                If .GetValue(DataDir) Is Nothing Then .SetValue(DataDir, aCommonSet.GetValue(DataDir, ""))
+            End With
+        End If
+    End Sub
 End Class
 
 Public Class clsBatchBFSpec

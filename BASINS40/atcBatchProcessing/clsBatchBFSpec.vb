@@ -1,5 +1,6 @@
 ﻿Imports atcUtility
 Imports atcData
+Imports atcTimeseriesBaseflow
 Imports MapWinUtility
 
 Public Class BFBatchInputNames
@@ -620,112 +621,112 @@ Public Class clsBatchBFSpec
     End Function
 
     Private Function ParametersToTextDFLOW(ByVal aArgs As atcDataAttributes) As String
-        If aArgs Is Nothing Then Return ""
-        Dim loperation As String = aArgs.GetValue("Operation", "")
-        Dim lgroupname As String = aArgs.GetValue("Group", "")
-        Dim lSetGlobal As Boolean = (loperation.ToLower = "globalsetparm")
+        'If aArgs Is Nothing Then Return ""
+        'Dim loperation As String = aArgs.GetValue("Operation", "")
+        'Dim lgroupname As String = aArgs.GetValue("Group", "")
+        'Dim lSetGlobal As Boolean = (loperation.ToLower = "globalsetparm")
 
-        Dim lText As New Text.StringBuilder()
-        If loperation.ToLower = "groupsetparm" Then
-            lText.AppendLine("BASE-FLOW")
-            Dim lStationInfo As ArrayList = aArgs.GetValue("StationInfo")
-            If lStationInfo IsNot Nothing Then
-                For Each lstation As String In lStationInfo
-                    lText.AppendLine(lstation)
-                Next
-            End If
-        ElseIf lSetGlobal Then
-            lText.AppendLine("GLOBAL")
-        End If
+        'Dim lText As New Text.StringBuilder()
+        'If loperation.ToLower = "groupsetparm" Then
+        '    lText.AppendLine("BASE-FLOW")
+        '    Dim lStationInfo As ArrayList = aArgs.GetValue("StationInfo")
+        '    If lStationInfo IsNot Nothing Then
+        '        For Each lstation As String In lStationInfo
+        '            lText.AppendLine(lstation)
+        '        Next
+        '    End If
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine("GLOBAL")
+        'End If
 
-        Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate, Date2J(2014, 8, 20, 0, 0, 0))
-        Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate, Date2J(2014, 8, 20, 24, 0, 0))
-        Dim lDates(5) As Integer
-        J2Date(lStartDate, lDates)
-        lText.AppendLine("STARTDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
-        J2Date(lEndDate, lDates)
-        timcnv(lDates)
-        lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+        'Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate, Date2J(2014, 8, 20, 0, 0, 0))
+        'Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate, Date2J(2014, 8, 20, 24, 0, 0))
+        'Dim lDates(5) As Integer
+        'J2Date(lStartDate, lDates)
+        'lText.AppendLine("STARTDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+        'J2Date(lEndDate, lDates)
+        'timcnv(lDates)
+        'lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
 
-        If aArgs.ContainsAttribute(BFInputNames.BFMethods) Then
-            Dim lMethods As ArrayList = aArgs.GetValue(BFInputNames.BFMethods)
-            For Each lMethod As BFMethods In lMethods
-                Select Case lMethod
-                    Case BFMethods.PART
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
-                    Case BFMethods.HySEPFixed
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
-                    Case BFMethods.HySEPLocMin
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
-                    Case BFMethods.HySEPSlide
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
-                    Case BFMethods.BFIStandard
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
-                    Case BFMethods.BFIModified
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
-                End Select
-            Next
-        ElseIf lSetGlobal Then
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
-        End If
+        'If aArgs.ContainsAttribute(BFInputNames.BFMethods) Then
+        '    Dim lMethods As ArrayList = aArgs.GetValue(BFInputNames.BFMethods)
+        '    For Each lMethod As BFMethods In lMethods
+        '        Select Case lMethod
+        '            Case BFMethods.PART
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
+        '            Case BFMethods.HySEPFixed
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
+        '            Case BFMethods.HySEPLocMin
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
+        '            Case BFMethods.HySEPSlide
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
+        '            Case BFMethods.BFIStandard
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
+        '            Case BFMethods.BFIModified
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+        '        End Select
+        '    Next
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+        'End If
 
-        If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
-            Dim lBFITurnPtFrac As Double = aArgs.GetValue(BFInputNames.BFITurnPtFrac)
-            lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & lBFITurnPtFrac)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & "0.9")
-        End If
-        If aArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
-            Dim lBFINDayScreen As Double = aArgs.GetValue(BFInputNames.BFINDayScreen)
-            lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & lBFINDayScreen)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & "5")
-        End If
-        If aArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
-            Dim lBFIRecessConst As Double = aArgs.GetValue(BFInputNames.BFIRecessConst)
-            lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & lBFIRecessConst)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & "0.97915")
-        End If
+        'If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
+        '    Dim lBFITurnPtFrac As Double = aArgs.GetValue(BFInputNames.BFITurnPtFrac)
+        '    lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & lBFITurnPtFrac)
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & "0.9")
+        'End If
+        'If aArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
+        '    Dim lBFINDayScreen As Double = aArgs.GetValue(BFInputNames.BFINDayScreen)
+        '    lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & lBFINDayScreen)
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & "5")
+        'End If
+        'If aArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
+        '    Dim lBFIRecessConst As Double = aArgs.GetValue(BFInputNames.BFIRecessConst)
+        '    lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & lBFIRecessConst)
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & "0.97915")
+        'End If
 
-        If aArgs.ContainsAttribute(BFInputNames.BFIReportby) Then
-            Dim lBFIReportBy As String = aArgs.GetValue(BFInputNames.BFIReportby, "")
-            Select Case lBFIReportBy
-                Case BFInputNames.BFIReportbyCY
-                    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
-                Case BFInputNames.BFIReportbyWY
-                    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
-            End Select
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
-        End If
+        'If aArgs.ContainsAttribute(BFInputNames.BFIReportby) Then
+        '    Dim lBFIReportBy As String = aArgs.GetValue(BFInputNames.BFIReportby, "")
+        '    Select Case lBFIReportBy
+        '        Case BFInputNames.BFIReportbyCY
+        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+        '        Case BFInputNames.BFIReportbyWY
+        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
+        '    End Select
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+        'End If
 
-        If lSetGlobal Then
-            Dim lDatadir As String = aArgs.GetValue(BFBatchInputNames.DataDir, "")
-            If lDatadir = "" Then
-                lDatadir = txtDataDir.Text.Trim()
-                If IO.Directory.Exists(lDatadir) Then
-                    lText.AppendLine(BFBatchInputNames.DataDir & vbTab & lDatadir)
-                End If
-            End If
-        End If
+        'If lSetGlobal Then
+        '    Dim lDatadir As String = aArgs.GetValue(BFBatchInputNames.DataDir, "")
+        '    If lDatadir = "" Then
+        '        lDatadir = txtDataDir.Text.Trim()
+        '        If IO.Directory.Exists(lDatadir) Then
+        '            lText.AppendLine(BFBatchInputNames.DataDir & vbTab & lDatadir)
+        '        End If
+        '    End If
+        'End If
 
-        Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
-        Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
-        lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
-        lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
+        'Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+        'Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+        'lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
+        'lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
 
-        If loperation.ToLower = "groupsetparm" Then
-            lText.AppendLine("END BASE-FLOW")
-        ElseIf lSetGlobal Then
-            lText.AppendLine("END GLOBAL")
-        End If
-        Return lText.ToString()
+        'If loperation.ToLower = "groupsetparm" Then
+        '    lText.AppendLine("END BASE-FLOW")
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine("END GLOBAL")
+        'End If
+        'Return lText.ToString()
     End Function
 
     Private Function ParametersToTextSWSTAT(ByVal aArgs As atcDataAttributes) As String
@@ -736,7 +737,7 @@ Public Class clsBatchBFSpec
 
         Dim lText As New Text.StringBuilder()
         If loperation.ToLower = "groupsetparm" Then
-            lText.AppendLine("BASE-FLOW")
+            lText.AppendLine("SWSTAT")
             Dim lStationInfo As ArrayList = aArgs.GetValue("StationInfo")
             If lStationInfo IsNot Nothing Then
                 For Each lstation As String In lStationInfo
@@ -756,81 +757,101 @@ Public Class clsBatchBFSpec
         timcnv(lDates)
         lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
 
-        If aArgs.ContainsAttribute(BFInputNames.BFMethods) Then
-            Dim lMethods As ArrayList = aArgs.GetValue(BFInputNames.BFMethods)
-            For Each lMethod As BFMethods In lMethods
+        If aArgs.ContainsAttribute(atcSWSTAT.modUtil.InputNames.Method) Then
+            Dim lMethods As ArrayList = aArgs.GetValue(atcSWSTAT.modUtil.InputNames.Method)
+            For Each lMethod As atcSWSTAT.modUtil.InputNames.ITAMethod In lMethods
                 Select Case lMethod
-                    Case BFMethods.PART
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
-                    Case BFMethods.HySEPFixed
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
-                    Case BFMethods.HySEPLocMin
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
-                    Case BFMethods.HySEPSlide
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
-                    Case BFMethods.BFIStandard
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
-                    Case BFMethods.BFIModified
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+                    Case atcSWSTAT.InputNames.ITAMethod.FREQUECYGRID
+                        lText.AppendLine(atcSWSTAT.InputNames.Method & vbTab & atcSWSTAT.InputNames.ITAMethod.FREQUECYGRID.ToString())
+                    Case atcSWSTAT.InputNames.ITAMethod.FREQUENCYGRAPH
+                        lText.AppendLine(atcSWSTAT.InputNames.Method & vbTab & atcSWSTAT.InputNames.ITAMethod.FREQUENCYGRAPH.ToString())
+                    Case atcSWSTAT.InputNames.ITAMethod.NDAYTIMESERIES
+                        lText.AppendLine(atcSWSTAT.InputNames.Method & vbTab & atcSWSTAT.InputNames.ITAMethod.NDAYTIMESERIES.ToString())
+                    Case atcSWSTAT.InputNames.ITAMethod.TRENDLIST
+                        lText.AppendLine(atcSWSTAT.InputNames.Method & vbTab & atcSWSTAT.InputNames.ITAMethod.TRENDLIST.ToString())
                 End Select
             Next
         ElseIf lSetGlobal Then
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+            lText.AppendLine(atcSWSTAT.InputNames.Method & vbTab & atcSWSTAT.InputNames.ITAMethod.FREQUECYGRID.ToString())
+            lText.AppendLine(atcSWSTAT.InputNames.Method & vbTab & atcSWSTAT.InputNames.ITAMethod.FREQUENCYGRAPH.ToString())
+            lText.AppendLine(atcSWSTAT.InputNames.Method & vbTab & atcSWSTAT.InputNames.ITAMethod.NDAYTIMESERIES.ToString())
+            lText.AppendLine(atcSWSTAT.InputNames.Method & vbTab & atcSWSTAT.InputNames.ITAMethod.TRENDLIST.ToString())
         End If
 
-        If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
-            Dim lBFITurnPtFrac As Double = aArgs.GetValue(BFInputNames.BFITurnPtFrac)
-            lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & lBFITurnPtFrac)
+        If aArgs.ContainsAttribute(atcSWSTAT.InputNames.HighLow) Then
+            lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & aArgs.GetValue(atcSWSTAT.InputNames.HighLow))
         ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & "0.9")
+            lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & "HIGH")
+            lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & "LOW")
         End If
-        If aArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
-            Dim lBFINDayScreen As Double = aArgs.GetValue(BFInputNames.BFINDayScreen)
-            lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & lBFINDayScreen)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & "5")
-        End If
-        If aArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
-            Dim lBFIRecessConst As Double = aArgs.GetValue(BFInputNames.BFIRecessConst)
-            lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & lBFIRecessConst)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & "0.97915")
+        'The high/low option will dictate the starting and ending dates
+
+        If aArgs.ContainsAttribute(atcSWSTAT.InputNames.Logarithmic) Then
+            Dim log As String = "YES"
+            If Not aArgs.GetValue(atcSWSTAT.InputNames.Logarithmic) Then log = "NO"
+            lText.AppendLine(atcSWSTAT.InputNames.Logarithmic & vbTab & log)
+            'ElseIf lSetGlobal Then
+            '    lText.AppendLine(atcSWSTAT.InputNames.Logarithmic & vbTab & "YES")
         End If
 
-        If aArgs.ContainsAttribute(BFInputNames.BFIReportby) Then
-            Dim lBFIReportBy As String = aArgs.GetValue(BFInputNames.BFIReportby, "")
-            Select Case lBFIReportBy
-                Case BFInputNames.BFIReportbyCY
-                    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
-                Case BFInputNames.BFIReportbyWY
-                    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
-            End Select
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+        If aArgs.ContainsAttribute(atcSWSTAT.InputNames.MultiNDayPlot) Then
+            Dim mplot As String = "YES"
+            If Not aArgs.GetValue(atcSWSTAT.InputNames.MultiNDayPlot) Then mplot = "NO"
+            lText.AppendLine(atcSWSTAT.InputNames.MultiNDayPlot & vbTab & mplot)
+            'ElseIf lSetGlobal Then
+            '    lText.AppendLine(atcSWSTAT.InputNames.MultiNDayPlot & vbTab & "NO")
+        End If
+
+        If aArgs.ContainsAttribute(atcSWSTAT.InputNames.MultiStationPlot) Then
+            Dim mplot As String = "YES"
+            If Not aArgs.GetValue(atcSWSTAT.InputNames.MultiStationPlot) Then mplot = "NO"
+            lText.AppendLine(atcSWSTAT.InputNames.MultiStationPlot & vbTab & mplot)
+            'ElseIf lSetGlobal Then
+            '    lText.AppendLine(atcSWSTAT.InputNames.MultiStationPlot & vbTab & "NO")
+        End If
+
+        If aArgs.ContainsAttribute(atcSWSTAT.InputNames.NDays) Then
+            Dim lNDays As atcCollection = aArgs.GetValue(atcSWSTAT.InputNames.NDays, Nothing)
+            Dim lNdaysText As String = ""
+            If lNDays IsNot Nothing Then
+                For Each lNday As Double In lNDays.Keys
+                    If lNDays.ItemByKey(lNday) Then
+                        lNdaysText &= Int(lNday) & ","
+                    End If
+                Next
+                lNdaysText.TrimEnd(",")
+            End If
+            lText.AppendLine(atcSWSTAT.InputNames.NDays & vbTab & lNdaysText)
+        End If
+
+        If aArgs.ContainsAttribute(atcSWSTAT.InputNames.ReturnPeriods) Then
+            Dim lRPs As atcCollection = aArgs.GetValue(atcSWSTAT.InputNames.ReturnPeriods, Nothing)
+            Dim lRPsText As String = ""
+            If lRPs IsNot Nothing Then
+                For Each lRP As Double In lRPs.Keys
+                    If lRPs.ItemByKey(lRP) Then
+                        lRPsText &= lRP & ","
+                    End If
+                Next
+                lRPsText.TrimEnd(",")
+            End If
+            lText.AppendLine(atcSWSTAT.InputNames.ReturnPeriodText & vbTab & lRPsText)
         End If
 
         If lSetGlobal Then
-            Dim lDatadir As String = aArgs.GetValue(BFBatchInputNames.DataDir, "")
-            If lDatadir = "" Then
-                lDatadir = txtDataDir.Text.Trim()
-                If IO.Directory.Exists(lDatadir) Then
-                    lText.AppendLine(BFBatchInputNames.DataDir & vbTab & lDatadir)
-                End If
+            Dim lDatadir As String = aArgs.GetValue(atcSWSTAT.InputNames.DataDir, "")
+            If IO.Directory.Exists(lDatadir) Then
+                lText.AppendLine(atcSWSTAT.InputNames.DataDir & vbTab & lDatadir)
             End If
         End If
 
-        Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
-        Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
-        lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
-        lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
+        Dim lOutputDir As String = aArgs.GetValue(atcSWSTAT.InputNames.OutputDir, "")
+        Dim lOutputPrefix As String = aArgs.GetValue(atcSWSTAT.InputNames.OutputPrefix, "")
+        lText.AppendLine(atcSWSTAT.InputNames.OutputDir & vbTab & lOutputDir)
+        lText.AppendLine(atcSWSTAT.InputNames.OutputPrefix & vbTab & lOutputPrefix)
 
         If loperation.ToLower = "groupsetparm" Then
-            lText.AppendLine("END BASE-FLOW")
+            lText.AppendLine("END SWSTAT")
         ElseIf lSetGlobal Then
             lText.AppendLine("END GLOBAL")
         End If
@@ -838,112 +859,112 @@ Public Class clsBatchBFSpec
     End Function
 
     Private Function ParametersToTextBF(ByVal aArgs As atcDataAttributes) As String
-        If aArgs Is Nothing Then Return ""
-        Dim loperation As String = aArgs.GetValue("Operation", "")
-        Dim lgroupname As String = aArgs.GetValue("Group", "")
-        Dim lSetGlobal As Boolean = (loperation.ToLower = "globalsetparm")
+        'If aArgs Is Nothing Then Return ""
+        'Dim loperation As String = aArgs.GetValue("Operation", "")
+        'Dim lgroupname As String = aArgs.GetValue("Group", "")
+        'Dim lSetGlobal As Boolean = (loperation.ToLower = "globalsetparm")
 
-        Dim lText As New Text.StringBuilder()
-        If loperation.ToLower = "groupsetparm" Then
-            lText.AppendLine("BASE-FLOW")
-            Dim lStationInfo As ArrayList = aArgs.GetValue("StationInfo")
-            If lStationInfo IsNot Nothing Then
-                For Each lstation As String In lStationInfo
-                    lText.AppendLine(lstation)
-                Next
-            End If
-        ElseIf lSetGlobal Then
-            lText.AppendLine("GLOBAL")
-        End If
+        'Dim lText As New Text.StringBuilder()
+        'If loperation.ToLower = "groupsetparm" Then
+        '    lText.AppendLine("BASE-FLOW")
+        '    Dim lStationInfo As ArrayList = aArgs.GetValue("StationInfo")
+        '    If lStationInfo IsNot Nothing Then
+        '        For Each lstation As String In lStationInfo
+        '            lText.AppendLine(lstation)
+        '        Next
+        '    End If
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine("GLOBAL")
+        'End If
 
-        Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate, Date2J(2014, 8, 20, 0, 0, 0))
-        Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate, Date2J(2014, 8, 20, 24, 0, 0))
-        Dim lDates(5) As Integer
-        J2Date(lStartDate, lDates)
-        lText.AppendLine("STARTDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
-        J2Date(lEndDate, lDates)
-        timcnv(lDates)
-        lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+        'Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate, Date2J(2014, 8, 20, 0, 0, 0))
+        'Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate, Date2J(2014, 8, 20, 24, 0, 0))
+        'Dim lDates(5) As Integer
+        'J2Date(lStartDate, lDates)
+        'lText.AppendLine("STARTDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+        'J2Date(lEndDate, lDates)
+        'timcnv(lDates)
+        'lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
 
-        If aArgs.ContainsAttribute(BFInputNames.BFMethods) Then
-            Dim lMethods As ArrayList = aArgs.GetValue(BFInputNames.BFMethods)
-            For Each lMethod As BFMethods In lMethods
-                Select Case lMethod
-                    Case BFMethods.PART
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
-                    Case BFMethods.HySEPFixed
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
-                    Case BFMethods.HySEPLocMin
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
-                    Case BFMethods.HySEPSlide
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
-                    Case BFMethods.BFIStandard
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
-                    Case BFMethods.BFIModified
-                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
-                End Select
-            Next
-        ElseIf lSetGlobal Then
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
-        End If
+        'If aArgs.ContainsAttribute(BFInputNames.BFMethods) Then
+        '    Dim lMethods As ArrayList = aArgs.GetValue(BFInputNames.BFMethods)
+        '    For Each lMethod As BFMethods In lMethods
+        '        Select Case lMethod
+        '            Case BFMethods.PART
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
+        '            Case BFMethods.HySEPFixed
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
+        '            Case BFMethods.HySEPLocMin
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
+        '            Case BFMethods.HySEPSlide
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
+        '            Case BFMethods.BFIStandard
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
+        '            Case BFMethods.BFIModified
+        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+        '        End Select
+        '    Next
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
+        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+        'End If
 
-        If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
-            Dim lBFITurnPtFrac As Double = aArgs.GetValue(BFInputNames.BFITurnPtFrac)
-            lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & lBFITurnPtFrac)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & "0.9")
-        End If
-        If aArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
-            Dim lBFINDayScreen As Double = aArgs.GetValue(BFInputNames.BFINDayScreen)
-            lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & lBFINDayScreen)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & "5")
-        End If
-        If aArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
-            Dim lBFIRecessConst As Double = aArgs.GetValue(BFInputNames.BFIRecessConst)
-            lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & lBFIRecessConst)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & "0.97915")
-        End If
+        'If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
+        '    Dim lBFITurnPtFrac As Double = aArgs.GetValue(BFInputNames.BFITurnPtFrac)
+        '    lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & lBFITurnPtFrac)
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & "0.9")
+        'End If
+        'If aArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
+        '    Dim lBFINDayScreen As Double = aArgs.GetValue(BFInputNames.BFINDayScreen)
+        '    lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & lBFINDayScreen)
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & "5")
+        'End If
+        'If aArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
+        '    Dim lBFIRecessConst As Double = aArgs.GetValue(BFInputNames.BFIRecessConst)
+        '    lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & lBFIRecessConst)
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & "0.97915")
+        'End If
 
-        If aArgs.ContainsAttribute(BFInputNames.BFIReportby) Then
-            Dim lBFIReportBy As String = aArgs.GetValue(BFInputNames.BFIReportby, "")
-            Select Case lBFIReportBy
-                Case BFInputNames.BFIReportbyCY
-                    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
-                Case BFInputNames.BFIReportbyWY
-                    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
-            End Select
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
-        End If
+        'If aArgs.ContainsAttribute(BFInputNames.BFIReportby) Then
+        '    Dim lBFIReportBy As String = aArgs.GetValue(BFInputNames.BFIReportby, "")
+        '    Select Case lBFIReportBy
+        '        Case BFInputNames.BFIReportbyCY
+        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+        '        Case BFInputNames.BFIReportbyWY
+        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
+        '    End Select
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+        'End If
 
-        If lSetGlobal Then
-            Dim lDatadir As String = aArgs.GetValue(BFBatchInputNames.DataDir, "")
-            If lDatadir = "" Then
-                lDatadir = txtDataDir.Text.Trim()
-                If IO.Directory.Exists(lDatadir) Then
-                    lText.AppendLine(BFBatchInputNames.DataDir & vbTab & lDatadir)
-                End If
-            End If
-        End If
+        'If lSetGlobal Then
+        '    Dim lDatadir As String = aArgs.GetValue(BFBatchInputNames.DataDir, "")
+        '    If lDatadir = "" Then
+        '        lDatadir = txtDataDir.Text.Trim()
+        '        If IO.Directory.Exists(lDatadir) Then
+        '            lText.AppendLine(BFBatchInputNames.DataDir & vbTab & lDatadir)
+        '        End If
+        '    End If
+        'End If
 
-        Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
-        Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
-        lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
-        lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
+        'Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+        'Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+        'lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
+        'lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
 
-        If loperation.ToLower = "groupsetparm" Then
-            lText.AppendLine("END BASE-FLOW")
-        ElseIf lSetGlobal Then
-            lText.AppendLine("END GLOBAL")
-        End If
-        Return lText.ToString()
+        'If loperation.ToLower = "groupsetparm" Then
+        '    lText.AppendLine("END BASE-FLOW")
+        'ElseIf lSetGlobal Then
+        '    lText.AppendLine("END GLOBAL")
+        'End If
+        'Return lText.ToString()
     End Function
 
     Public Overrides Sub Clear()
