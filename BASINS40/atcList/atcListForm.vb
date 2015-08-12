@@ -16,6 +16,7 @@ Public Class atcListForm
         pFormat = GetSetting("BASINS", "List", "Format", pFormat)
         pExpFormat = GetSetting("BASINS", "List", "ExpFormat", pExpFormat)
         pCantFit = GetSetting("BASINS", "List", "CantFit", pCantFit)
+        Me.Text = GetSetting("BASINS", "List", "Title", Me.Text)
         Integer.TryParse(GetSetting("BASINS", "List", "SignificantDigits", pSignificantDigits), pSignificantDigits)
 
     End Sub
@@ -519,7 +520,22 @@ Public Class atcListForm
     End Property
 
     Public Overrides Function ToString() As String
-        Return Me.Text & vbCrLf & agdMain.ToString
+        Dim lGridText As String = agdMain.ToString()
+        With DateFormat
+            If .IncludeYears OrElse .IncludeMonths OrElse .IncludeDays OrElse .IncludeHours OrElse .IncludeMinutes OrElse .IncludeSeconds Then
+                'There is something in the date field, leave it alone
+            Else 'Date field is empty, skip it entirely by removing tabs
+                lGridText = lGridText.Replace(vbCrLf & vbTab, vbCrLf)
+                If lGridText.StartsWith(vbTab) Then
+                    lGridText = lGridText.Substring(1)
+                End If
+            End If
+        End With
+        If String.IsNullOrWhiteSpace(Me.Text) Then
+            Return lGridText
+        Else
+            Return Me.Text & vbCrLf & lGridText
+        End If
     End Function
 
     Private Sub ShowHelpForList()
@@ -568,6 +584,7 @@ Public Class atcListForm
             .txtSignificantDigits.Text = pSignificantDigits
             .txtMaxWidth.Text = pMaxWidth
             .txtCantFit.Text = pCantFit
+            .txtTitle.Text = Me.Text
 
             .SaveState()
             .Icon = Me.Icon
@@ -607,11 +624,13 @@ Public Class atcListForm
                     .DateFormat = pDateFormat
                     .ValueFormat(pMaxWidth, pFormat, pExpFormat, pCantFit, pSignificantDigits)
                 End With
+                Me.Text = .txtTitle.Text
                 agdMain.SizeAllColumnsToContents()
                 SizeToGrid()
                 agdMain.Refresh()
 
                 SaveSetting("BASINS", "List", "DateFormat", pDateFormat.ToString)
+                SaveSetting("BASINS", "List", "Title", Me.Text.Replace(pEditedText, ""))
                 SaveSetting("BASINS", "List", "MaxWidth", pMaxWidth)
                 SaveSetting("BASINS", "List", "Format", pFormat)
                 SaveSetting("BASINS", "List", "ExpFormat", pExpFormat)
