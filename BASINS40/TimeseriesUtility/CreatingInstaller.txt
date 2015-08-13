@@ -1,0 +1,52 @@
+Open BASINS40/TimeseriesUtility.sln in Visual Studio 2010.
+Solution/Configuration Manager: Debug/x86+Build for all.
+Edit TimeseriesUtility/frmAbout.lblVersion.Text.
+Build/Rebuild Solution.
+Look for "Rebuild All succeeded" message.
+Close Visual Studio.
+
+Check in latest source code changes to repository.
+(frmAbout.vb is optional if the only change is lblVersion.Text)
+
+Open folder: C:\dev\BASINS40\TimeseriesUtility\bin\Debug
+See that DLLs, exe are dated within the last few minutes.
+run Merge.bat
+
+Open folder C:\dev\Packages.
+Copy latest TimeseriesUtility-YYYY-MM-DD folder and paste it.
+Rename new package folder from " - Copy" to current date.
+Inside new package folder:
+  run CopyMergedExeFromDev.bat.
+  verify that TimeseriesUtility.exe now has today's time stamp.
+  edit install.txt, save and exit editor.
+  open TimeseriesUtility.iss
+    edit MyAppVerName
+    increment MyAppVerNum
+    Save
+    Compile
+    Close TimeseriesUtility.iss
+  open Output folder in new package folder
+    Delete old package
+    Rename new package.exe to use underscores: SARA_Timeseries_Utility_
+    Right-click, Send to, Compressed (zipped) folder
+    Rename from .zip to .zzz, confirm
+    Cut the file from here, paste in \\hspf\pub\TimeseriesUtility
+    Copy the exact file name including .zzz
+    Edit index.html to add a link to the new file - both href and text.
+    Save and exit text editor.
+
+Download the newly created package from http://hspf.com/pub/TimeseriesUtility/
+Rename from .zzz to .zip
+Unzip to get installer .exe
+Run installer .exe
+Right-click installed desktop icon SARA Timeseries Utility
+In Properties, verify Target is where expected:
+"C:\Program Files (x86)\SARA Timeseries Utility\TimeseriesUtility.exe"
+Close Properties.
+Run installed SARA Timeseries Utility from desktop icon.
+Verify that the latest change works as expected.
+Perform testing of other functionality as appropriate for release.
+Return to an earlier step if needed. Do not skip any steps.
+
+Announce that the new version is available at:
+  http://hspf.com/pub/TimeseriesUtility/
