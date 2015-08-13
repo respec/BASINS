@@ -10,22 +10,22 @@ Check in latest source code changes to repository.
 
 Open folder: C:\dev\BASINS40\TimeseriesUtility\bin\Debug
 See that DLLs, exe are dated within the last few minutes.
-run Merge.bat
+Run Merge.bat
 
 Open folder C:\dev\Packages.
 Copy latest TimeseriesUtility-YYYY-MM-DD folder and paste it.
 Rename new package folder from " - Copy" to current date.
-Inside new package folder:
-  run CopyMergedExeFromDev.bat.
-  verify that TimeseriesUtility.exe now has today's time stamp.
-  edit install.txt, save and exit editor.
-  open TimeseriesUtility.iss
-    edit MyAppVerName
-    increment MyAppVerNum
+Open the new package folder:
+  Run CopyMergedExeFromDev.bat.
+  Verify that TimeseriesUtility.exe now has today's time stamp.
+  Edit install.txt, save and exit editor.
+  Open TimeseriesUtility.iss:
+    Edit MyAppVerName
+    Increment MyAppVerNum
     Save
     Compile
     Close TimeseriesUtility.iss
-  open Output folder in new package folder
+  Open Output folder in new package folder
     Delete old package
     Rename new package.exe to use underscores: SARA_Timeseries_Utility_
     Right-click, Send to, Compressed (zipped) folder
