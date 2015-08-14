@@ -1466,6 +1466,7 @@ Public Class frmSWSTAT
             Else
                 Dim lGroup As String = pAttributes.GetValue("Group", "")
                 Logger.MsgCustomOwned("Group Parameters are set for " & lGroup, "USGS Batch Processing", Me, New String() {"OK"})
+                Me.Close()
             End If
         End If
         RaiseEvent ParametersSet(pAttributes)

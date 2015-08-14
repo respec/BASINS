@@ -36,7 +36,7 @@ Public Class clsBatch
         DFLOW
     End Enum
 
-    Private Specs As clsBatchBFSpec
+    Private Specs As clsBatchSpec
     Public GlobalSettings As atcData.atcDataAttributes
     Public ListBatchUnitsData As atcCollection 'of clsBatchUnitBF, station id/location as key
     Public Delimiter As String = vbTab
@@ -61,7 +61,7 @@ Public Class clsBatch
         SpecFilename = aSpecFilename
     End Sub
 
-    Public Sub New(ByVal aSpec As clsBatchBFSpec)
+    Public Sub New(ByVal aSpec As clsBatchSpec)
         Specs = aSpec
     End Sub
 
@@ -213,7 +213,7 @@ Public Class clsBatch
     End Sub
 
     Public Overridable Function ParametersToText(ByVal aMethod As ANALYSIS, ByVal aArgs As atcDataAttributes) As String Implements IBatchProcessing.ParametersToText
-        Return ""
+        Return Specs.ParametersToText(aMethod, aArgs)
     End Function
 
     Public Overridable Sub SpecifyGroup(ByVal aSpec As String, ByVal aOpnCount As Integer) Implements IBatchProcessing.SpecifyGroup

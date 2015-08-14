@@ -3,7 +3,7 @@ Imports System.Threading
 
 Public Class frmBatch
     'Public WithEvents pBatchConfig As New clsBatchBFSpec()
-    Private pBatchConfig As clsBatchBFSpec
+    Private pBatchConfig As clsBatchSpec
     'Dim m_oWorker As BackgroundWorker
     Private pBatchSpecFilefullname As String = "'"
     Public Property BatchSpecFile() As String
@@ -67,6 +67,6 @@ Public Class frmBatch
 
     Private Sub frmBatch_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         'AddHandler pBatchConfig.StatusUpdate, AddressOf Me.StatusUpdateHandle
-        pBatchConfig = New clsBatchBFSpec(Me.ProgressBar1, Me.txtMsg)
+        pBatchConfig = New clsBatchSpec(Me.ProgressBar1, Me.txtMsg)
     End Sub
 End Class

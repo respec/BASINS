@@ -98,7 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsBatch.vb" />
-    <Compile Include="clsBatchBFSpec.vb" />
+    <Compile Include="clsBatchSpec.vb" />
     <Compile Include="clsBatchProcessingPlugin.vb" />
     <Compile Include="clsBatchUnitStation.vb" />
     <Compile Include="clsBatchUtil.vb" />
