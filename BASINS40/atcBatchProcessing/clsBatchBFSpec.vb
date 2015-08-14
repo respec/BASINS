@@ -32,7 +32,7 @@ Public Class BFBatchInputNames
     'Public Shared STREAMFLOW As String = "Streamflow"
 End Class
 
-Public Class clsBatchBFSpec
+Public Class clsBatchSpec
     Inherits clsBatch
     Implements IBatchProcessing
 
@@ -45,6 +45,10 @@ Public Class clsBatchBFSpec
 
     Public Sub New(ByVal aSpecFilename As String)
         MyBase.New(aSpecFilename)
+    End Sub
+
+    Public Sub New()
+
     End Sub
 
     Public Overrides Sub PopulateScenarios()
@@ -778,11 +782,20 @@ Public Class clsBatchBFSpec
             lText.AppendLine(atcSWSTAT.InputNames.Method & vbTab & atcSWSTAT.InputNames.ITAMethod.TRENDLIST.ToString())
         End If
 
-        If aArgs.ContainsAttribute(atcSWSTAT.InputNames.HighLow) Then
-            lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & aArgs.GetValue(atcSWSTAT.InputNames.HighLow))
-        ElseIf lSetGlobal Then
+        If lSetGlobal Then
             lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & "HIGH")
+            Dim lHighStart As String = atcSWSTAT.InputNames.HighFlowSeasonStart
+            Dim lHighEnd As String = atcSWSTAT.InputNames.HighFlowSeasonEnd
+            lText.AppendLine(lHighStart & vbTab & aArgs.GetValue(lHighStart, ""))
+            lText.AppendLine(lHighEnd & vbTab & aArgs.GetValue(lHighEnd, ""))
             lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & "LOW")
+            Dim lLowStart As String = atcSWSTAT.InputNames.LowFlowSeasonStart
+            Dim lLowEnd As String = atcSWSTAT.InputNames.LowFlowSeasonEnd
+            lText.AppendLine(lLowStart & vbTab & aArgs.GetValue(lLowStart, ""))
+            lText.AppendLine(lLowEnd & vbTab & aArgs.GetValue(lLowEnd, ""))
+
+        ElseIf aArgs.ContainsAttribute(atcSWSTAT.InputNames.HighLow) Then
+            lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & aArgs.GetValue(atcSWSTAT.InputNames.HighLow))
         End If
         'The high/low option will dictate the starting and ending dates
 
@@ -819,9 +832,8 @@ Public Class clsBatchBFSpec
                         lNdaysText &= Int(lNday) & ","
                     End If
                 Next
-                lNdaysText.TrimEnd(",")
+                lText.AppendLine(atcSWSTAT.InputNames.NDays & vbTab & lNdaysText.TrimEnd(","))
             End If
-            lText.AppendLine(atcSWSTAT.InputNames.NDays & vbTab & lNdaysText)
         End If
 
         If aArgs.ContainsAttribute(atcSWSTAT.InputNames.ReturnPeriods) Then
@@ -833,9 +845,8 @@ Public Class clsBatchBFSpec
                         lRPsText &= lRP & ","
                     End If
                 Next
-                lRPsText.TrimEnd(",")
+                lText.AppendLine(atcSWSTAT.InputNames.ReturnPeriodText & vbTab & lRPsText.TrimEnd(","))
             End If
-            lText.AppendLine(atcSWSTAT.InputNames.ReturnPeriodText & vbTab & lRPsText)
         End If
 
         If lSetGlobal Then
