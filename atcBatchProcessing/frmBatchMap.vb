@@ -423,34 +423,56 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnSaveSpecs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSaveSpecs.Click
-        If pGlobalInputsBF.Count = 0 Then
-            Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
+        If pGlobalInputsSWSTAT.Count = 0 AndAlso pGlobalInputsDFLOW.Count = 0 Then
+            Logger.Msg("Need to specify global default parameters.", "Batch Run Parameter Setup")
             Exit Sub
         End If
-        If pGroupsInputsBF.Count = 0 Then
-            Logger.Msg("Need to set up batch run groups.", "Batch Map Base-flow Separation")
+        If pGroupsInputsSWSTAT.Count = 0 AndAlso pGroupsInputsDFLOW.Count = 0 Then
+            Logger.Msg("Need to set up batch run groups.", "Batch Run Parameter Setup")
             Exit Sub
         End If
-        Dim lSpecDir As String = pGlobalInputsBF.GetValue(BFBatchInputNames.OUTPUTDIR, "")
-        If String.IsNullOrEmpty(lSpecDir) Then
-            lSpecDir = pDataPath
+        If pGlobalInputsSWSTAT.Count > 0 AndAlso pGroupsInputsSWSTAT.Count > 0 Then
+            Dim lSpecDirSWSTAT As String = pGlobalInputsSWSTAT.GetValue(InputNames.OutputDir, "")
+            If String.IsNullOrEmpty(lSpecDirSWSTAT) Then
+                lSpecDirSWSTAT = pDataPath
+            End If
+            pBatchSpecFilefullname = IO.Path.Combine(lSpecDirSWSTAT, "BatchRun_SWSTAT_" & SafeFilename(DateTime.Now) & ".txt")
+            SaveBatchFile(pBatchSpecFilefullname, clsBatch.ANALYSIS.ITA, pGlobalInputsSWSTAT, pGroupsInputsSWSTAT)
         End If
-        pBatchSpecFilefullname = IO.Path.Combine(lSpecDir, "BatchConfigBase-flowSep_" & SafeFilename(DateTime.Now) & ".txt")
+        If pGlobalInputsDFLOW.Count > 0 AndAlso pGroupsInputsDFLOW.Count > 0 Then
+            Dim lSpecDirDFLOW As String = pGlobalInputsDFLOW.GetValue(InputNames.OutputDir, "")
+            If String.IsNullOrEmpty(lSpecDirDFLOW) Then
+                lSpecDirDFLOW = pDataPath
+            End If
+            pBatchSpecFilefullname = IO.Path.Combine(lSpecDirDFLOW, "BatchRun_DFLOW_" & SafeFilename(DateTime.Now) & ".txt")
+            SaveBatchFile(pBatchSpecFilefullname, clsBatch.ANALYSIS.DFLOW, pGlobalInputsDFLOW, pGroupsInputsDFLOW)
+        End If
+        pBatchSpecFilefullname = ""
+    End Sub
+
+    Private Sub SaveBatchFile(ByVal aFilename As String, ByVal aAnalysis As clsBatch.ANALYSIS, _
+                              ByVal aCommonSetting As atcDataAttributes, ByVal aGroupSettings As atcCollection)
         Dim lSW As IO.StreamWriter = Nothing
+        Dim lTitle As String = ""
+        If aAnalysis = clsBatch.ANALYSIS.ITA Then
+            lTitle = "Save SWSTAT Batch File"
+        ElseIf aAnalysis = clsBatch.ANALYSIS.DFLOW Then
+            lTitle = "Save DFLOW Batch File"
+        End If
         Try
-            lSW = New IO.StreamWriter(pBatchSpecFilefullname, False)
+            Dim lBatchSpec As New clsBatchSpec()
+            lSW = New IO.StreamWriter(aFilename, False)
             'write global block first
-            'lSW.WriteLine(ParametersToText(pGlobalInputsBF))
-
+            lSW.WriteLine(lBatchSpec.ParametersToText(aAnalysis, aCommonSetting))
+            lSW.WriteLine("")
             'write each group settings
-            For Each lAttrib As atcDataAttributes In pGroupsInputsBF
-                'lSW.WriteLine(ParametersToText(lAttrib))
+            For Each lGroupAttrib As atcDataAttributes In aGroupSettings
+                lSW.WriteLine(lBatchSpec.ParametersToText(aAnalysis, lGroupAttrib))
+                lSW.WriteLine("")
             Next
-
-            Logger.Msg("Batch file is saved:" & vbCrLf & pBatchSpecFilefullname, "Batch Base-flow Separation")
+            Logger.Msg("Batch file is saved:" & vbCrLf & aFilename, lTitle)
         Catch ex As Exception
-            Logger.Msg("Error Writing Spec File:" & vbCrLf & pBatchSpecFilefullname & vbCrLf & vbCrLf & ex.Message, "Batch Base-flow Separation")
-            pBatchSpecFilefullname = ""
+            Logger.Msg("Error Writing Spec File:" & vbCrLf & aFilename & vbCrLf & vbCrLf & ex.Message, lTitle)
         Finally
             If lSW IsNot Nothing Then
                 lSW.Close()
@@ -458,7 +480,6 @@ Public Class frmBatchMap
             End If
         End Try
     End Sub
-
     Private Sub btnParmForm_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnParmForm.Click
         Dim lGroupNode As TreeNode = treeBFGroups.SelectedNode
         If lGroupNode Is Nothing Then Return

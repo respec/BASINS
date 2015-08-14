@@ -793,9 +793,24 @@ Public Class clsBatchSpec
             Dim lLowEnd As String = atcSWSTAT.InputNames.LowFlowSeasonEnd
             lText.AppendLine(lLowStart & vbTab & aArgs.GetValue(lLowStart, ""))
             lText.AppendLine(lLowEnd & vbTab & aArgs.GetValue(lLowEnd, ""))
-
         ElseIf aArgs.ContainsAttribute(atcSWSTAT.InputNames.HighLow) Then
-            lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & aArgs.GetValue(atcSWSTAT.InputNames.HighLow))
+            Dim lCondition As String = aArgs.GetValue(atcSWSTAT.InputNames.HighLow)
+            If Not String.IsNullOrEmpty(lCondition) Then
+                If lCondition.ToLower().Contains("high") Then
+                    lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & "HIGH")
+                    Dim lHighStart As String = atcSWSTAT.InputNames.HighFlowSeasonStart
+                    Dim lHighEnd As String = atcSWSTAT.InputNames.HighFlowSeasonEnd
+                    lText.AppendLine(lHighStart & vbTab & aArgs.GetValue(lHighStart, ""))
+                    lText.AppendLine(lHighEnd & vbTab & aArgs.GetValue(lHighEnd, ""))
+                ElseIf lCondition.ToLower().Contains("low") Then
+                    lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & "LOW")
+                    Dim lLowStart As String = atcSWSTAT.InputNames.LowFlowSeasonStart
+                    Dim lLowEnd As String = atcSWSTAT.InputNames.LowFlowSeasonEnd
+                    lText.AppendLine(lLowStart & vbTab & aArgs.GetValue(lLowStart, ""))
+                    lText.AppendLine(lLowEnd & vbTab & aArgs.GetValue(lLowEnd, ""))
+                End If
+            End If
+            'lText.AppendLine(atcSWSTAT.InputNames.HighLowText & vbTab & aArgs.GetValue(atcSWSTAT.InputNames.HighLow))
         End If
         'The high/low option will dictate the starting and ending dates
 
