@@ -26,6 +26,7 @@ Public Module modUtil
 
         Public Shared MultiNDayPlot As String = "MultipleNDayPlots"
         Public Shared MultiStationPlot As String = "MultipleStationPlots"
+        Public Shared StationInfo As String = "StationInfo"
 
         Public Shared Method As String = "METHOD"
         Public Enum ITAMethod
