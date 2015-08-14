@@ -266,27 +266,8 @@ Public Class frmBatchMap
                     atcSWSTAT.modUtil.InputNames.BuildInputSet(pGlobalInputsSWSTAT, Nothing)
                     Dim lNDay() As Double = pGlobalInputsSWSTAT.GetValue(atcSWSTAT.modUtil.InputNames.NDay, Nothing)
                     Dim lNDays As atcCollection = pGlobalInputsSWSTAT.GetValue(atcSWSTAT.modUtil.InputNames.NDays, Nothing)
-                    If lNDay IsNot Nothing Then
-                        If lNDays Is Nothing Then
-                            lNDays = New atcCollection()
-                            For lI As Integer = 0 To lNDay.Length - 1
-                                lNDays.Add(lNDay(lI), False)
-                            Next
-                            pGlobalInputsSWSTAT.SetValue(InputNames.NDays, lNDays)
-                        End If
-                    End If
                     Dim lRP() As Double = pGlobalInputsSWSTAT.GetValue(atcSWSTAT.modUtil.InputNames.ReturnPeriod, Nothing)
                     Dim lRPs As atcCollection = pGlobalInputsSWSTAT.GetValue(atcSWSTAT.modUtil.InputNames.ReturnPeriods, Nothing)
-                    If lRP IsNot Nothing Then
-                        If lRPs Is Nothing Then
-                            lRPs = New atcCollection()
-                            For I As Integer = 0 To lRP.Length - 1
-                                lRPs.Add(lRP(I), False)
-                            Next
-                            pGlobalInputsSWSTAT.SetValue(atcSWSTAT.modUtil.InputNames.ReturnPeriods, lRPs)
-                        End If
-                    End If
-
                     pfrmParamsSWSTAT.Initialize(Nothing, pGlobalInputsSWSTAT)
                 ElseIf lNodeText.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
                     pGlobalInputsDFLOW.SetValue("Operation", "GlobalSetParm")
@@ -337,27 +318,29 @@ Public Class frmBatchMap
         Next
     End Sub
 
-    Private Sub ParmetersSet(ByVal aArgs As atcDataAttributes) Handles pfrmParamsSWSTAT.ParametersSet
-        Dim lText As String = "" 'ParametersToText(aArgs)
+    Private Sub ParmetersSetSWSTAT(ByVal aArgs As atcDataAttributes) Handles pfrmParamsSWSTAT.ParametersSet
+        Dim lSpecUtil As New clsBatchSpec()
+
+        Dim lText As String = lSpecUtil.ParametersToText(clsBatch.ANALYSIS.ITA, aArgs)
 
         If String.IsNullOrEmpty(lText) Then
             txtParameters.Text = ""
         Else
-            Dim loperation As String = aArgs.GetValue("Operation", "")
-            Dim lgroupname As String = aArgs.GetValue("Group", "")
-            Dim lArg As atcDataAttributes = Nothing
-            If loperation.ToLower = "groupsetparm" Then
-                lArg = pGroupsInputsBF.ItemByKey(lgroupname)
-                If lArg Is Nothing Then
-                    lArg = New atcDataAttributes()
-                    pGroupsInputsBF.Add(lgroupname, lArg)
-                End If
-            Else
-                lArg = pGlobalInputsBF
-            End If
-            For Each lDataDef As atcDefinedValue In aArgs
-                lArg.SetValue(lDataDef.Definition.Name, lDataDef.Value)
-            Next
+            'Dim loperation As String = aArgs.GetValue("Operation", "")
+            'Dim lgroupname As String = aArgs.GetValue("Group", "")
+            'Dim lArg As atcDataAttributes = Nothing
+            'If loperation.ToLower = "groupsetparm" Then
+            '    lArg = pGroupsInputsBF.ItemByKey(lgroupname)
+            '    If lArg Is Nothing Then
+            '        lArg = New atcDataAttributes()
+            '        pGroupsInputsBF.Add(lgroupname, lArg)
+            '    End If
+            'Else
+            '    lArg = pGlobalInputsBF
+            'End If
+            'For Each lDataDef As atcDefinedValue In aArgs
+            '    lArg.SetValue(lDataDef.Definition.Name, lDataDef.Value)
+            'Next
             txtParameters.Text = lText.ToString()
         End If
     End Sub
