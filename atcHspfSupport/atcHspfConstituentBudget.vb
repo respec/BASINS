@@ -4,10 +4,10 @@ Imports atcUCI
 Imports MapWinUtility
 
 Public Module ConstituentBudget
-    Private pRunningTotals As New atcCollection
-    Private pOutputTotals As New atcCollection
-    Private pPERLND As New atcCollection
-    Private pIMPLND As New atcCollection
+    Private pRunningTotals As atcCollection
+    Private pOutputTotals As atcCollection
+    Private pPERLND As atcCollection
+    Private pIMPLND As atcCollection
     Public Function Report(ByVal aUci As atcUCI.HspfUci, _
                            ByVal aBalanceType As String, _
                            ByVal aOperationTypes As atcCollection, _
@@ -32,6 +32,11 @@ Public Module ConstituentBudget
         Dim lReport4 As New atcReport.ReportText
         Dim lReport5 As New atcReport.ReportText
         Dim lReport6 As New atcReport.ReportText
+
+        pRunningTotals = New atcCollection
+        pOutputTotals = New atcCollection
+        pPERLND = New atcCollection
+        pIMPLND = New atcCollection
 
         For Each lSource As HspfOperation In aUci.OpnSeqBlock.Opns
             If lSource.Name = "PERLND" AndAlso Not pPERLND.Keys.Contains(lSource.Description) Then
@@ -271,7 +276,7 @@ Public Module ConstituentBudget
                         End Try
 
                         
-                        lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                       
                         lCumulativePointNonpointColl.Increment(lDownstreamReachID, lCumulativePointNonpoint)
 
                         lField = 0
@@ -345,7 +350,7 @@ Public Module ConstituentBudget
                         End If
 
                         Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
-
+                        
                         Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
                         Dim lDepScour As Double = ValueForReach(lID, lDepScourData) 'TotalForReach(lID, lAreas, lDepScourData)
                         Dim lNonpointTons As Double
@@ -822,7 +827,7 @@ Public Module ConstituentBudget
                 End With
         End Select
 
-        If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Or aBalanceType = "Sediment" Or aBalanceType = "BOD-PQUAL" Then
+        If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Or aBalanceType = "Sediment" Then 'Or aBalanceType = "BOD-PQUAL" Then
             Dim lLandUses As New List(Of String)
             Dim lReaches As New List(Of String)
             Dim lLandusesHeader As String = ""
@@ -844,11 +849,11 @@ Public Module ConstituentBudget
             lLandusesHeader = lLandusesHeader.Replace("AdditionalSources", "Mass Balance Errors/Additional Sources*")
 
 
-            lReport3.AppendLine("Reach" & lLandusesHeader & vbTab & "Total")
-            lReport4.AppendLine("Reach" & lLandusesHeader)
+            lReport3.AppendLine("Reach" & lLandusesHeader & vbTab & "Total**")
+            lReport4.AppendLine("Reach" & lLandusesHeader & vbTab & "Total**")
             If aOutputLocations.Count > 0 Then
-                lReport5.AppendLine("Reach" & lLandusesHeader & vbTab & "Total")
-                lReport6.AppendLine("Reach" & lLandusesHeader)
+                lReport5.AppendLine("Reach" & lLandusesHeader & vbTab & "Total**")
+                lReport6.AppendLine("Reach" & lLandusesHeader & vbTab & "Total**")
             Else
                 lReport5.AppendLine("Load Allocation Report was not requested for specific reaches.  The Load Allocation Report")
                 lReport5.AppendLine("for all the reaches is available as " & aBalanceType & "_" & aScenario & "_" & "LoadAllocation.txt")
@@ -915,7 +920,10 @@ Public Module ConstituentBudget
                             End If
                         Next
                     End If
-                    lPercentTotal += lValue * 100 / lTotal
+                    If Not lSourceDescription.Contains("Loss") Then
+                        lPercentTotal += lValue * 100 / lTotal
+                    End If
+
                 Next lSourceDescription
                 lReport4.Append(vbTab & FormatNumber(lPercentTotal, 1, TriState.True, TriState.False, TriState.False))
                 lReport4.AppendLine()
@@ -929,10 +937,22 @@ Public Module ConstituentBudget
                 End If
             Next
             lReport3.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+            lReport3.AppendLine("**The totals do not include losses as they have already been applied to the respective sources")
             lReport4.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+            lReport4.AppendLine("**The totals do not include losses as they have already been applied to the respective sources")
+
+            lReport5.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+            lReport5.AppendLine("**The totals do not include losses as they have already been applied to the respective sources")
+            lReport6.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+            lReport6.AppendLine("**The totals do not include losses as they have already been applied to the respective sources")
+
+
+
+
 
             lReport3.Append(lReport4.ToString)
             lReport5.Append(lReport6.ToString)
+            'The Total column in percent line needs to be recalculated.
         Else
             lReport3.AppendLine("Load Allocation Report are not produced for " & aBalanceType)
             lReport5.AppendLine("Load Allocation Report are not produced for " & aBalanceType)
@@ -986,6 +1006,7 @@ Public Module ConstituentBudget
                         '1.0E-30 was added to make sure that rate is calculated for operations with zero areas
                         Dim lMassLinkID As Integer = lConnection.MassLink
                         Dim lTestLocation As String = lConnection.Source.VolName.Substring(0, 1) & ":" & lConnection.Source.VolId
+                        'lTestLocation is the operation Type and operation number
 
                         Dim lConstituentTotal As Double = 0
                         lTotal = 0
@@ -1001,11 +1022,13 @@ Public Module ConstituentBudget
                             'lConstituentTotal = lConstituentRate * lConnectionArea
 
                             lTotal += lConnectionArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
+                            'The area and multiplication factor is multiplied to get the total load of the particular constituent to the reach "aReach" from the specific
+                            'land use and then lTotal accumulates that load
                         Next
 
                         felu2(aUCI, aReach, aBalanceType, aVolName, aLandUses, aLoadingByLanduse, aReachTotal, aReporting, aContribPercent, lTotal, lConnectionArea, landUse, lTestLocation)
 
-                        Exit For
+                        'Exit For
                     End If
                 End If
 
@@ -1076,14 +1099,15 @@ Public Module ConstituentBudget
             'End If
 
         Else
-            pRunningTotals.Add("Reach" & aReach.Id & " " & lVolPrefix & aLandUse, aTotal)
+            pRunningTotals.Increment("Reach" & aReach.Id & " " & lVolPrefix & aLandUse, aTotal)
+            'A key of the land use type and downstream reach is made in pRunningTotals to save the total land from the specific land use.
             aReachTotal += aTotal
             For Each lTributary As HspfConnection In aReach.Sources
 
                 If lTributary.Source.VolName = "RCHRES" Then
                     Dim lTributaryID As String = lTributary.Source.VolId
                     Dim UpstreamLoadByCategory As Double = pRunningTotals.ItemByKey("Reach" & lTributaryID & " " & lVolPrefix & aLandUse)
-                    pRunningTotals.Increment("Reach" & aReach.Id & " " & lVolPrefix & aLandUse, UpstreamLoadByCategory)
+                    pRunningTotals.Increment("Reach" & aReach.Id & " " & lVolPrefix & aLandUse, UpstreamLoadByCategory) '("Reach" & aReach.Id & " " & aTestLocation & aLandUse, UpstreamLoadByCategory)
                 End If
 
             Next
