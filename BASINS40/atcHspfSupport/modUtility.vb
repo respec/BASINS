@@ -1058,7 +1058,18 @@ Public Module Utility
                                     Return lMassLinkFactor
                                 End If
 
+                            Case "POQUAL-NH3+NH4_NUIF2_2", "SOQUAL-NH3+NH4_NUIF2_2", "AOQUAL-NH3+NH4_NUIF2_2", "IOQUAL-NH3+NH4_NUIF2_2", _
+                                "POQUAL-NH3+NH4_NUIF2_3", "SOQUAL-NH3+NH4_NUIF2_3", "AOQUAL-NH3+NH4_NUIF2_3", "IOQUAL-NH3+NH4_NUIF2_3", _
+                                "POQUAL-NH3+NH4_NUIF2_1", "SOQUAL-NH3+NH4_NUIF2_1", "AOQUAL-NH3+NH4_NUIF2_1", "IOQUAL-NH3+NH4_NUIF2_1"
+                                If lMassLink.Target.MemSub2 = 1 Then
+                                    If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                                        lMassLinkFactor = lMassLink.MFact
+                                        Return lMassLinkFactor
+                                    End If
+
+                                End If
                                 
+
                             Case "POQUAL-NO3_NUIF1_1", "SOQUAL-NO3_NUIF1_1", "IOQUAL-NO3_NUIF1_1", "AOQUAL-NO3_NUIF1_1"
                                 If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
                                     lMassLinkFactor = lMassLink.MFact
@@ -1108,6 +1119,17 @@ Public Module Utility
                                 If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
                                     lMassLinkFactor = lMassLink.MFact
                                     Return lMassLinkFactor
+                                End If
+                            Case "POQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_2", "AOQUAL-ORTHO P_NUIF2_2", "IOQUAL-ORTHO P_NUIF2_2", _
+                                "POQUAL-ORTHO P_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_3", "AOQUAL-ORTHO P_NUIF2_3", "IOQUAL-ORTHO P_NUIF2_3", _
+                                "POQUAL-ORTHO P_NUIF2_1", "SOQUAL-ORTHO P_NUIF2_1", "AOQUAL-ORTHO P_NUIF2_1", "IOQUAL-ORTHO P_NUIF2_1"
+
+                                If lMassLink.Target.MemSub2 = 2 Then
+                                    If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                                        lMassLinkFactor = lMassLink.MFact
+                                        Return lMassLinkFactor
+                                    End If
+
                                 End If
 
                             Case "WASHQS-BOD_PKIF_4", "SOQUAL-BOD_PKIF_4", "IOQUAL-BOD_PKIF_4", "AOQUAL-BOD_PKIF_4", "POQUAL-BOD_PKIF_4"
