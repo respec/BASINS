@@ -514,15 +514,15 @@ Module HSPFOutputReports
                                 lReportCons = .Item3
 
                                 'The followng reports are being suppressed until the completion of the 21003-09 project
-                                'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadAllocation.txt"
-                                'SaveFileString(lOutFileName, lReportCons.ToString)
-                                'lReportCons = Nothing
+                                lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadAllocation.txt"
+                                SaveFileString(lOutFileName, lReportCons.ToString)
+                                lReportCons = Nothing
 
-                                'lReportCons = .Item4
-                                'If pOutputLocations.Count > 0 Then
-                                '    lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadAllocation_Locations.txt"
-                                '    SaveFileString(lOutFileName, lReportCons.ToString)
-                                'End If
+                                lReportCons = .Item4
+                                If pOutputLocations.Count > 0 Then
+                                    lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadAllocation_Locations.txt"
+                                    SaveFileString(lOutFileName, lReportCons.ToString)
+                                End If
                                 lReportCons = Nothing
 
                             End With
@@ -672,7 +672,6 @@ RWZProgramEnding:
             If Not Trim(lGraphInit(8)) = "" Then
                 Dim EDate As String() = Trim(lGraphInit(8)).Split("/")
                 lGraphEndDateJ = Date2J(EDate(2), EDate(0), EDate(1), 24, 0)
-
 
             Else
                 lGraphEndDateJ = lGraphEndJ
