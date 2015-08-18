@@ -531,7 +531,7 @@ Public Class atcListForm
                 End If
             End If
         End With
-        If String.IsNullOrWhiteSpace(Me.Text) Then
+        If Me.Text.Trim.Length = 0 Then
             Return lGridText
         Else
             Return Me.Text & vbCrLf & lGridText
