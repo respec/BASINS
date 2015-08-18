@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="atcFrequencyGridSource.vb" />
+    <Compile Include="clsBatchSpec.vb" />
     <Compile Include="clsSWSTATPlugin.vb" />
     <Compile Include="frmDisplayFrequencyGrid.vb">
       <SubType>Form</SubType>

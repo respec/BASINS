@@ -4,7 +4,7 @@ Imports atcTimeseriesBaseflow
 Imports atcSWSTAT
 Imports MapWinUtility
 
-Public Class BFBatchInputNames
+Public Class BatchInputNames
     'Public Shared SDATE As String = "SDATE"
     'Public Shared EDATE As String = "EDATE"
     'Public Shared STARTDATE As String = "StartDate"
@@ -34,10 +34,8 @@ Public Class BFBatchInputNames
 End Class
 
 Public Class clsBatchSpec
-    Inherits clsBatch
-    Implements IBatchProcessing
 
-    Public ListBatchBaseflowOpns As atcCollection
+    Public ListBatchOpns As atcCollection
 
     Public Sub New(ByVal aProgressbar As Windows.Forms.ProgressBar, ByVal aTextField As Windows.Forms.TextBox)
         gProgressBar = aProgressbar
@@ -54,8 +52,8 @@ Public Class clsBatchSpec
 
     Public Overrides Sub PopulateScenarios()
         If IO.File.Exists(SpecFilename) Then
-            If ListBatchBaseflowOpns Is Nothing Then
-                ListBatchBaseflowOpns = New atcCollection()
+            If ListBatchOpns Is Nothing Then
+                ListBatchOpns = New atcCollection()
             End If
             If ListBatchUnitsData Is Nothing Then
                 ListBatchUnitsData = New atcCollection()
@@ -130,7 +128,7 @@ Public Class clsBatchSpec
     ''' </summary>
     ''' <remarks></remarks>
     Public Overrides Sub MergeSpecs()
-        For Each lBFOpn As atcCollection In ListBatchBaseflowOpns
+        For Each lBFOpn As atcCollection In ListBatchOpns
             For Each lStation As clsBatchUnitStation In lBFOpn
                 If lStation.NeedToDownloadData Then
                     If Not DownloadStations.Keys.Contains(lStation.StationID) Then
@@ -169,7 +167,7 @@ Public Class clsBatchSpec
         '    End Try
 
         '    Dim lDownloadFailedStations As New atcCollection()
-        '    For Each lBFOpn As atcCollection In ListBatchBaseflowOpns
+        '    For Each lBFOpn As atcCollection In ListBatchOpns
         '        For Each lStation As clsBatchUnitStation In lBFOpn
         '            If DownloadStations.Contains(lStation.StationID) Then
         '                For Each lStationId As String In DownloadStations
@@ -237,22 +235,22 @@ Public Class clsBatchSpec
                     lDates(5) = 0
                     GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.EndDate, lDates)
                 End If
-            Case BFBatchInputNames.BFMethod.ToLower
+            Case BatchInputNames.BFMethod.ToLower
                 Dim lMethods As atcCollection = GlobalSettings.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
 
                 Dim lMethod As atcTimeseriesBaseflow.BFMethods = 0
                 Select Case lArr(1).ToUpper()
-                    Case BFBatchInputNames.BFM_HYFX
+                    Case BatchInputNames.BFM_HYFX
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPFixed
-                    Case BFBatchInputNames.BFM_HYLM
+                    Case BatchInputNames.BFM_HYLM
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPLocMin
-                    Case BFBatchInputNames.BFM_HYSL
+                    Case BatchInputNames.BFM_HYSL
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPSlide
-                    Case BFBatchInputNames.BFM_PART
+                    Case BatchInputNames.BFM_PART
                         lMethod = atcTimeseriesBaseflow.BFMethods.PART
-                    Case BFBatchInputNames.BFM_BFIS
+                    Case BatchInputNames.BFM_BFIS
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIStandard
-                    Case BFBatchInputNames.BFM_BFIM
+                    Case BatchInputNames.BFM_BFIM
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIModified
                 End Select
                 If lMethod > 0 Then
@@ -270,22 +268,22 @@ Public Class clsBatchSpec
                         End If
                     End If
                 End If
-            Case BFBatchInputNames.DataDir.ToLower
+            Case BatchInputNames.DataDir.ToLower
                 If Not String.IsNullOrEmpty(lArr(1)) AndAlso IO.Directory.Exists(lArr(1)) Then
                     DownloadDataDirectory = lArr(1)
                 End If
-                GlobalSettings.Add(BFBatchInputNames.DataDir, lArr(1))
-            Case BFBatchInputNames.UseCache.ToLower
+                GlobalSettings.Add(BatchInputNames.DataDir, lArr(1))
+            Case BatchInputNames.UseCache.ToLower
                 Dim lUseCache As Boolean = False
                 If Not String.IsNullOrEmpty(lArr(1)) AndAlso lArr(1).ToLower = "yes" Then
                     lUseCache = True
                 End If
-                GlobalSettings.Add(BFBatchInputNames.UseCache, lUseCache)
+                GlobalSettings.Add(BatchInputNames.UseCache, lUseCache)
             Case atcTimeseriesBaseflow.BFInputNames.BFIReportby.ToLower
                 Dim lReportBySpec As String = lArr(1).Trim().ToUpper()
-                If lReportBySpec = BFBatchInputNames.ReportByWY Then
+                If lReportBySpec = BatchInputNames.ReportByWY Then
                     GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.BFIReportby, atcTimeseriesBaseflow.BFInputNames.BFIReportbyWY)
-                ElseIf lReportBySpec = BFBatchInputNames.ReportByCY Then
+                ElseIf lReportBySpec = BatchInputNames.ReportByCY Then
                     GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.BFIReportby, atcTimeseriesBaseflow.BFInputNames.BFIReportbyCY)
                 End If
             Case Else
@@ -304,10 +302,10 @@ Public Class clsBatchSpec
         If lArr.Length < 2 Then Return
         If String.IsNullOrEmpty(lArr(0)) Then Return
 
-        Dim lListBatchUnits As atcCollection = ListBatchBaseflowOpns.ItemByKey(aBaseflowOpnCount)
+        Dim lListBatchUnits As atcCollection = ListBatchOpns.ItemByKey(aBaseflowOpnCount)
         If lListBatchUnits Is Nothing Then
             lListBatchUnits = New atcCollection()
-            ListBatchBaseflowOpns.Add(aBaseflowOpnCount, lListBatchUnits)
+            ListBatchOpns.Add(aBaseflowOpnCount, lListBatchUnits)
         End If
 
         Select Case lArr(0).ToLower
@@ -378,20 +376,20 @@ Public Class clsBatchSpec
                         End If
                     Next
                 End If
-            Case BFBatchInputNames.BFMethod.ToLower
+            Case BatchInputNames.BFMethod.ToLower
                 Dim lMethod As atcTimeseriesBaseflow.BFMethods = 0
                 Select Case lArr(1).Trim().ToUpper()
-                    Case BFBatchInputNames.BFM_HYFX
+                    Case BatchInputNames.BFM_HYFX
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPFixed
-                    Case BFBatchInputNames.BFM_HYLM
+                    Case BatchInputNames.BFM_HYLM
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPLocMin
-                    Case BFBatchInputNames.BFM_HYSL
+                    Case BatchInputNames.BFM_HYSL
                         lMethod = atcTimeseriesBaseflow.BFMethods.HySEPSlide
-                    Case BFBatchInputNames.BFM_PART
+                    Case BatchInputNames.BFM_PART
                         lMethod = atcTimeseriesBaseflow.BFMethods.PART
-                    Case BFBatchInputNames.BFM_BFIS
+                    Case BatchInputNames.BFM_BFIS
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIStandard
-                    Case BFBatchInputNames.BFM_BFIM
+                    Case BatchInputNames.BFM_BFIM
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIModified
                 End Select
                 If lMethod > 0 Then
@@ -410,11 +408,11 @@ Public Class clsBatchSpec
                 End If
             Case atcTimeseriesBaseflow.BFInputNames.BFIReportby.ToLower
                 Dim lReportBySpec As String = lArr(1).Trim().ToUpper()
-                If lReportBySpec = BFBatchInputNames.ReportByWY Then
+                If lReportBySpec = BatchInputNames.ReportByWY Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
                         lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFIReportby, atcTimeseriesBaseflow.BFInputNames.BFIReportbyWY)
                     Next
-                ElseIf lReportBySpec = BFBatchInputNames.ReportByCY Then
+                ElseIf lReportBySpec = BatchInputNames.ReportByCY Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
                         lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFIReportby, atcTimeseriesBaseflow.BFInputNames.BFIReportbyCY)
                     Next
@@ -440,18 +438,18 @@ Public Class clsBatchSpec
                         lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFIRecessConst, lReConst)
                     Next
                 End If
-            Case BFBatchInputNames.OUTPUTDIR.ToLower
+            Case BatchInputNames.OUTPUTDIR.ToLower
                 Dim lOutputDir As String = lArr(1).Trim()
                 If Not String.IsNullOrEmpty(lOutputDir) AndAlso IO.Directory.Exists(lOutputDir) Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        lStation.BFInputs.SetValue(BFBatchInputNames.OUTPUTDIR, lOutputDir)
+                        lStation.BFInputs.SetValue(BatchInputNames.OUTPUTDIR, lOutputDir)
                     Next
                 End If
-            Case BFBatchInputNames.OUTPUTPrefix.ToLower
+            Case BatchInputNames.OUTPUTPrefix.ToLower
                 Dim lOutputPrefix As String = lArr(1).Trim()
                 If Not String.IsNullOrEmpty(lOutputPrefix) Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        lStation.BFInputs.SetValue(BFBatchInputNames.OUTPUTPrefix, lOutputPrefix)
+                        lStation.BFInputs.SetValue(BatchInputNames.OUTPUTPrefix, lOutputPrefix)
                     Next
                 End If
         End Select
@@ -465,7 +463,7 @@ Public Class clsBatchSpec
         Else
             Message = ""
         End If
-        Dim lOutputDir As String = GlobalSettings.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+        Dim lOutputDir As String = GlobalSettings.GetValue(BatchInputNames.OUTPUTDIR, "")
         If Not IO.Directory.Exists(lOutputDir) Then
             Try
                 Dim lDirInfo As New IO.DirectoryInfo(lOutputDir)
@@ -506,8 +504,8 @@ Public Class clsBatchSpec
         End If
 
         Dim lTotalBFOpn As Integer = 0
-        For Each lKey As Integer In ListBatchBaseflowOpns.Keys
-            For Each lstation As clsBatchUnitStation In ListBatchBaseflowOpns.ItemByKey(lKey)
+        For Each lKey As Integer In ListBatchOpns.Keys
+            For Each lstation As clsBatchUnitStation In ListBatchOpns.ItemByKey(lKey)
                 lTotalBFOpn += 1
             Next
         Next
@@ -516,13 +514,13 @@ Public Class clsBatchSpec
         gProgressBar.Step = 1
         Dim lBFOpnCount As Integer = 1
         Dim lConfigFile As IO.StreamWriter = Nothing
-        For Each lBFOpnId As Integer In ListBatchBaseflowOpns.Keys
-            Dim lBFOpn As atcCollection = ListBatchBaseflowOpns.ItemByKey(lBFOpnId)
+        For Each lBFOpnId As Integer In ListBatchOpns.Keys
+            Dim lBFOpn As atcCollection = ListBatchOpns.ItemByKey(lBFOpnId)
             Dim lBFOpnDir As String = IO.Path.Combine(lOutputDir, "BF_Opn_" & lBFOpnId)
             MkDirPath(lBFOpnDir)
 
             For Each lStation As clsBatchUnitStation In lBFOpn
-                Dim lOutputPrefix As String = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+                Dim lOutputPrefix As String = lStation.BFInputs.GetValue(BatchInputNames.OUTPUTPrefix, "")
                 If String.IsNullOrEmpty(lOutputPrefix) Then lOutputPrefix = "BF_" & lStation.StationID
                 'each station has its own directory
                 Dim lStationOutDir As String = IO.Path.Combine(lBFOpnDir, "Station_" & lStation.StationID)
@@ -544,7 +542,7 @@ Public Class clsBatchSpec
                         End With
                         If lStation.CalcBF.Open("baseflow", lStation.BFInputs) Then
                             OutputDir = lStationOutDir
-                            OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "BF")
+                            OutputFilenameRoot = lStation.BFInputs.GetValue(BatchInputNames.OUTPUTPrefix, "BF")
                             MethodsLastDone = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
                             ASCIICommon(lTsFlow)
                         End If
@@ -590,8 +588,8 @@ Public Class clsBatchSpec
             lConfigFile = Nothing
         Next
         Dim lSummary As New IO.StreamWriter(IO.Path.Combine(lOutputDir, "BF_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)
-        For Each lBFOpnId As Integer In ListBatchBaseflowOpns.Keys
-            Dim lBFOpn As atcCollection = ListBatchBaseflowOpns.ItemByKey(lBFOpnId)
+        For Each lBFOpnId As Integer In ListBatchOpns.Keys
+            Dim lBFOpn As atcCollection = ListBatchOpns.ItemByKey(lBFOpnId)
             lSummary.WriteLine("Batch Run Group ***  " & lBFOpnId & "  ***")
             Dim lHasError As Boolean = False
             For Each lStation As clsBatchUnitStation In lBFOpn
@@ -611,7 +609,7 @@ Public Class clsBatchSpec
         lSummary.Flush()
         lSummary.Close()
         lSummary = Nothing
-        UpdateStatus("Base-flow Separation Complete for " & lTotalBFOpn & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", True)
+        UpdateStatus("Base-flow Separation Complete for " & lTotalBFOpn & " Stations in " & ListBatchOpns.Count & " groups.", True)
     End Sub
 
     Public Overrides Function ParametersToText(ByVal aMethod As ANALYSIS, ByVal aArgs As atcDataAttributes) As String
@@ -658,26 +656,26 @@ Public Class clsBatchSpec
         '    For Each lMethod As BFMethods In lMethods
         '        Select Case lMethod
         '            Case BFMethods.PART
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_PART)
         '            Case BFMethods.HySEPFixed
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYFX)
         '            Case BFMethods.HySEPLocMin
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYLM)
         '            Case BFMethods.HySEPSlide
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYSL)
         '            Case BFMethods.BFIStandard
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_BFIS)
         '            Case BFMethods.BFIModified
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_BFIM)
         '        End Select
         '    Next
         'ElseIf lSetGlobal Then
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_PART)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYFX)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYLM)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYSL)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_BFIS)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_BFIM)
         'End If
 
         'If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
@@ -703,28 +701,28 @@ Public Class clsBatchSpec
         '    Dim lBFIReportBy As String = aArgs.GetValue(BFInputNames.BFIReportby, "")
         '    Select Case lBFIReportBy
         '        Case BFInputNames.BFIReportbyCY
-        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BatchInputNames.ReportByCY)
         '        Case BFInputNames.BFIReportbyWY
-        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
+        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BatchInputNames.ReportByWY)
         '    End Select
         'ElseIf lSetGlobal Then
-        '    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+        '    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BatchInputNames.ReportByCY)
         'End If
 
         'If lSetGlobal Then
-        '    Dim lDatadir As String = aArgs.GetValue(BFBatchInputNames.DataDir, "")
+        '    Dim lDatadir As String = aArgs.GetValue(BatchInputNames.DataDir, "")
         '    If lDatadir = "" Then
         '        lDatadir = txtDataDir.Text.Trim()
         '        If IO.Directory.Exists(lDatadir) Then
-        '            lText.AppendLine(BFBatchInputNames.DataDir & vbTab & lDatadir)
+        '            lText.AppendLine(BatchInputNames.DataDir & vbTab & lDatadir)
         '        End If
         '    End If
         'End If
 
-        'Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
-        'Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
-        'lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
-        'lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
+        'Dim lOutputDir As String = aArgs.GetValue(BatchInputNames.OUTPUTDIR, "")
+        'Dim lOutputPrefix As String = aArgs.GetValue(BatchInputNames.OUTPUTPrefix, "")
+        'lText.AppendLine(BatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
+        'lText.AppendLine(BatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
 
         'If loperation.ToLower = "groupsetparm" Then
         '    lText.AppendLine("END BASE-FLOW")
@@ -918,26 +916,26 @@ Public Class clsBatchSpec
         '    For Each lMethod As BFMethods In lMethods
         '        Select Case lMethod
         '            Case BFMethods.PART
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_PART)
         '            Case BFMethods.HySEPFixed
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYFX)
         '            Case BFMethods.HySEPLocMin
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYLM)
         '            Case BFMethods.HySEPSlide
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYSL)
         '            Case BFMethods.BFIStandard
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_BFIS)
         '            Case BFMethods.BFIModified
-        '                lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+        '                lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_BFIM)
         '        End Select
         '    Next
         'ElseIf lSetGlobal Then
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
-        '    lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_PART)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYFX)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYLM)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_HYSL)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_BFIS)
+        '    lText.AppendLine("BFMethod" & vbTab & BatchInputNames.BFM_BFIM)
         'End If
 
         'If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
@@ -963,28 +961,28 @@ Public Class clsBatchSpec
         '    Dim lBFIReportBy As String = aArgs.GetValue(BFInputNames.BFIReportby, "")
         '    Select Case lBFIReportBy
         '        Case BFInputNames.BFIReportbyCY
-        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BatchInputNames.ReportByCY)
         '        Case BFInputNames.BFIReportbyWY
-        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
+        '            lText.AppendLine(BFInputNames.BFIReportby & vbTab & BatchInputNames.ReportByWY)
         '    End Select
         'ElseIf lSetGlobal Then
-        '    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+        '    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BatchInputNames.ReportByCY)
         'End If
 
         'If lSetGlobal Then
-        '    Dim lDatadir As String = aArgs.GetValue(BFBatchInputNames.DataDir, "")
+        '    Dim lDatadir As String = aArgs.GetValue(BatchInputNames.DataDir, "")
         '    If lDatadir = "" Then
         '        lDatadir = txtDataDir.Text.Trim()
         '        If IO.Directory.Exists(lDatadir) Then
-        '            lText.AppendLine(BFBatchInputNames.DataDir & vbTab & lDatadir)
+        '            lText.AppendLine(BatchInputNames.DataDir & vbTab & lDatadir)
         '        End If
         '    End If
         'End If
 
-        'Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
-        'Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
-        'lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
-        'lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
+        'Dim lOutputDir As String = aArgs.GetValue(BatchInputNames.OUTPUTDIR, "")
+        'Dim lOutputPrefix As String = aArgs.GetValue(BatchInputNames.OUTPUTPrefix, "")
+        'lText.AppendLine(BatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
+        'lText.AppendLine(BatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
 
         'If loperation.ToLower = "groupsetparm" Then
         '    lText.AppendLine("END BASE-FLOW")
@@ -996,8 +994,8 @@ Public Class clsBatchSpec
 
     Public Overrides Sub Clear()
         MyBase.Clear()
-        If ListBatchBaseflowOpns IsNot Nothing Then
-            For Each lCollection As atcCollection In ListBatchBaseflowOpns
+        If ListBatchOpns IsNot Nothing Then
+            For Each lCollection As atcCollection In ListBatchOpns
                 For Each lStation As clsBatchUnitStation In lCollection
                     If lStation.StreamFlowData IsNot Nothing Then
                         lStation.StreamFlowData.Clear()
@@ -1008,7 +1006,7 @@ Public Class clsBatchSpec
                 lCollection.Clear()
                 lCollection = Nothing
             Next
-            ListBatchBaseflowOpns.Clear()
+            ListBatchOpns.Clear()
         End If
     End Sub
 End Class

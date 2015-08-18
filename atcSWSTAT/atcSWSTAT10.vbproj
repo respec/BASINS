@@ -160,6 +160,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmTrend.resx">
       <DependentUpon>frmTrend.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

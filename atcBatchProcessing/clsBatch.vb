@@ -7,7 +7,7 @@ Public Interface IBatchProcessing
     Sub SpecifyGlobal(ByVal aSpec As String)
     Sub SpecifyGroup(ByVal aSpec As String, ByVal aOpnCount As Integer)
     Sub MergeSpecs()
-    Sub PopulateScenarios()
+    Sub PopulateScenarios(ByVal aMethod As clsBatch.ANALYSIS)
     Function ParametersToText(ByVal aMethod As clsBatch.ANALYSIS, ByVal aArgs As atcDataAttributes) As String
     Sub Clear()
 End Interface
@@ -22,6 +22,7 @@ Public Class GlobalInputNames
     Public Shared OutputDir As String = "OUTPUTDIR"
     Public Shared OutputPrefix As String = "OutputPrefix"
     Public Shared DataDir As String = "DataDir"
+    Public Shared StationsInfo As String = "StationsInfo"
 End Class
 
 ''' <summary>
@@ -204,7 +205,7 @@ Public Class clsBatch
 
     End Sub
 
-    Public Overridable Sub PopulateScenarios() Implements IBatchProcessing.PopulateScenarios
+    Public Overridable Sub PopulateScenarios(ByVal aMethod As clsBatch.ANALYSIS) Implements IBatchProcessing.PopulateScenarios
 
     End Sub
 
