@@ -1597,6 +1597,11 @@ Public Class frmSWSTAT
             End With
         End If
 
+        If Not pSetGlobal Then
+            Dim lStationsInfo As atcCollection = InputNames.BuildStationsInfo(pDataGroup)
+            pAttributes.SetValue(InputNames.StationsInfo, lStationsInfo)
+        End If
+
         lMsg &= SaveListBatch(lstNday)
         lMsg &= SaveListBatch(lstRecurrence)
 

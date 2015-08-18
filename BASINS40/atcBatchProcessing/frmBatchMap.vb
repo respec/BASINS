@@ -136,7 +136,7 @@ Public Class frmBatchMap
 
                             Dim lBFGroupAttribs As atcDataAttributes = pGroupsInputsBF.ItemByKey(lGroupName)
                             If lBFGroupAttribs IsNot Nothing Then
-                                Dim lStationInfo As ArrayList = lBFGroupAttribs.GetValue("StationInfo")
+                                Dim lStationInfo As ArrayList = lBFGroupAttribs.GetValue(GlobalInputNames.StationsInfo)
                                 If lStationInfo IsNot Nothing Then
                                     Dim lIndexToRemove As Integer = -99
                                     For Each lStation As String In lStationInfo
@@ -212,41 +212,10 @@ Public Class frmBatchMap
                     atcSWSTAT.modUtil.InputNames.BuildInputSet(lBatchInputs, pGlobalInputsSWSTAT)
                 ElseIf lGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
                 Else
-                    
+
                 End If
 
-                Dim lArgs As New atcDataAttributes()
-                lArgs.Add("Constituent", "streamflow,flow")
-                Dim lTsGroup As New atcTimeseriesGroup()
-                For Each lStationNode As TreeNode In lGroupNode.Nodes
-                    Dim lstationId As String = lStationNode.Text
-
-                    Dim lDataLoaded As Boolean = False
-                    For Each lDS As atcDataSource In atcDataManager.DataSources
-                        If lDS.Name.ToString.Contains("USGS RDB") Then
-                            Dim lTsCons As String = ""
-                            For Each lTs As atcTimeseries In lDS.DataSets
-                                lTsCons = lTs.Attributes.GetValue("Constituent").ToString()
-                                If lTs.Attributes.GetValue("Location") = lstationId AndAlso _
-                                   (lTsCons.ToLower = "streamflow" OrElse lTsCons.ToLower() = "flow") Then
-                                    lTsGroup.Add(lTs)
-                                    lDataLoaded = True
-                                    Exit For
-                                End If
-                            Next
-                            If lDataLoaded Then
-                                Exit For
-                            End If
-                        End If
-                    Next
-                    If Not lDataLoaded Then
-                        Dim lDataPath As String = GetDataFileFullPath(lstationId)
-                        Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
-                        If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
-                            lTsGroup.Add(lTsGroupTemp(0).Clone)
-                        End If
-                    End If
-                Next
+                Dim lTsGroup As atcTimeseriesGroup = BuildTserGroup(lGroupNode)
                 If lTsGroup.Count > 0 Then
                     If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
                         pfrmParamsSWSTAT = New atcSWSTAT.frmSWSTAT()
@@ -280,6 +249,42 @@ Public Class frmBatchMap
                 End If
         End Select
     End Sub
+
+    Private Function BuildTserGroup(ByVal aGroupNode As System.Windows.Forms.TreeNode) As atcTimeseriesGroup
+        Dim lArgs As New atcDataAttributes()
+        lArgs.Add("Constituent", "streamflow,flow")
+        Dim lTsGroup As New atcTimeseriesGroup()
+        For Each lStationNode As System.Windows.Forms.TreeNode In aGroupNode.Nodes
+            Dim lstationId As String = lStationNode.Text
+
+            Dim lDataLoaded As Boolean = False
+            For Each lDS As atcDataSource In atcDataManager.DataSources
+                If lDS.Name.ToString.Contains("USGS RDB") Then
+                    Dim lTsCons As String = ""
+                    For Each lTs As atcTimeseries In lDS.DataSets
+                        lTsCons = lTs.Attributes.GetValue("Constituent").ToString()
+                        If lTs.Attributes.GetValue("Location") = lstationId AndAlso _
+                           (lTsCons.ToLower = "streamflow" OrElse lTsCons.ToLower() = "flow") Then
+                            lTsGroup.Add(lTs)
+                            lDataLoaded = True
+                            Exit For
+                        End If
+                    Next
+                    If lDataLoaded Then
+                        Exit For
+                    End If
+                End If
+            Next
+            If Not lDataLoaded Then
+                Dim lDataPath As String = GetDataFileFullPath(lstationId)
+                Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+                If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                    lTsGroup.Add(lTsGroupTemp(0).Clone)
+                End If
+            End If
+        Next
+        Return lTsGroup
+    End Function
 
     ''' <summary>
     ''' Only call when removing a whole group
@@ -405,21 +410,22 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnDoBatch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoBatch.Click
-        If pGlobalInputsBF.Count = 0 Then
-            Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
-            Return
+        If pGroupsInputsSWSTAT.Count = 0 AndAlso pGroupsInputsDFLOW.Count = 0 Then
+            'Logger.Msg("Need to specify global default parameters.", "Batch Run Parameter Setup")
+            Logger.Msg("Need to set up batch run groups.", "Batch Run Parameter Setup")
+            Exit Sub
         End If
-        If pGroupsInputsBF.Count = 0 Then
-            Logger.Msg("Need to set up batch run groups.", "Batch Map Base-flow Separation")
-            Return
-        End If
-        If Not String.IsNullOrEmpty(pBatchSpecFilefullname) AndAlso IO.File.Exists(pBatchSpecFilefullname) Then
-            Dim lfrmBatch As New frmBatch()
-            lfrmBatch.BatchSpecFile = pBatchSpecFilefullname
-            lfrmBatch.ShowDialog()
-        Else
-            Logger.Msg("Need to construct a batch specification file first.", "Batch Base-flow Separation")
-        End If
+        'If pGlobalInputsSWSTAT.Count = 0 Then
+        '    Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
+        '    Return
+        'End If
+        'If Not String.IsNullOrEmpty(pBatchSpecFilefullname) AndAlso IO.File.Exists(pBatchSpecFilefullname) Then
+        'Else
+        '    Logger.Msg("Need to construct a batch specification file first.", "Batch Base-flow Separation")
+        'End If
+        Dim lfrmBatch As New frmBatch()
+        lfrmBatch.BatchSpecFile = pBatchSpecFilefullname
+        lfrmBatch.ShowDialog()
     End Sub
 
     Private Sub btnSaveSpecs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSaveSpecs.Click
@@ -467,6 +473,24 @@ Public Class frmBatchMap
             lSW.WriteLine("")
             'write each group settings
             For Each lGroupAttrib As atcDataAttributes In aGroupSettings
+                Dim lStationsInfo As atcCollection = lGroupAttrib.GetValue(GlobalInputNames.StationsInfo)
+                If lStationsInfo Is Nothing Then
+                    Dim lGroupName As String = lGroupAttrib.GetValue("Group", "")
+                    If Not String.IsNullOrEmpty(lGroupName) Then
+                        Dim lGroupNode As TreeNode = Nothing
+                        For Each lBatchGroupNode As TreeNode In treeBFGroups.Nodes
+                            If String.Compare(lGroupName, lBatchGroupNode.Text, True) = 0 Then
+                                lGroupNode = lBatchGroupNode
+                                Exit For
+                            End If
+                        Next
+                        If lGroupNode IsNot Nothing Then
+                            Dim lTsGroup As atcTimeseriesGroup = BuildTserGroup(lGroupNode)
+                            lStationsInfo = BuildStationsInfo(lTsGroup)
+                        End If
+                    End If
+                    lGroupAttrib.SetValue(GlobalInputNames.StationsInfo, lStationsInfo)
+                End If
                 lSW.WriteLine(lBatchSpec.ParametersToText(aAnalysis, lGroupAttrib))
                 lSW.WriteLine("")
             Next
