@@ -365,17 +365,20 @@ Public Class ctlEditSpecialAction
         Dim lCaption As String = "Special Action Add Problem"
 
         With tabSpecial
-            If .TabIndex = 0 Then 'add a record
+            If .SelectedIndex = 0 Then 'add a record
                 With atcgrid0.Source
+                    If pCurrentSelectedRow = 0 Then
+                        pCurrentSelectedRow = .Rows - 1
+                    End If
                     If pCurrentSelectedRow > 0 Then
                         .Rows += 1
-                        For lRow As Integer = .Rows To pCurrentSelectedRow - 1
+                        For lRow As Integer = .Rows - 1 To pCurrentSelectedRow + 2 Step -1
                             For lColumn As Integer = 0 To .Columns - 1
                                 .CellValue(lRow, lColumn) = .CellValue(lRow - 1, lColumn)
                             Next
                         Next
-                        .CellValue(pCurrentSelectedRow, 0) = "Comment"
-                        .CellValue(pCurrentSelectedRow, 1) = ""
+                        .CellValue(pCurrentSelectedRow + 1, 0) = "Comment"
+                        .CellValue(pCurrentSelectedRow + 1, 1) = ""
                         DisplayCounts()
                     Else
                         Logger.Msg("Select a Row to Add after ", MsgBoxStyle.OkOnly, lCaption)
@@ -396,7 +399,7 @@ Public Class ctlEditSpecialAction
         Dim lCaption As String = "Special Action Remove Problem"
 
         With tabSpecial
-            If .TabIndex = 0 Then 'remove a record
+            If .SelectedIndex = 0 Then 'remove a record
                 With atcgrid0.Source
                     If pCurrentSelectedRow > 0 Then
                         For lRow As Integer = pCurrentSelectedRow To .Rows - 1
@@ -405,8 +408,9 @@ Public Class ctlEditSpecialAction
                             Next
                         Next
                         .Rows -= 1
+                        pCurrentSelectedRow = 0
                     Else
-                        Logger.Msg("No Special Action available to Remove", MsgBoxStyle.OkOnly, lCaption)
+                        Logger.Msg("Select a Special Action to Remove", MsgBoxStyle.OkOnly, lCaption)
                     End If
                 End With
             Else
