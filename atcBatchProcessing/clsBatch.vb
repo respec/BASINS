@@ -7,7 +7,7 @@ Public Interface IBatchProcessing
     Sub SpecifyGlobal(ByVal aSpec As String)
     Sub SpecifyGroup(ByVal aSpec As String, ByVal aOpnCount As Integer)
     Sub MergeSpecs()
-    Sub PopulateScenarios(ByVal aMethod As clsBatch.ANALYSIS)
+    Sub PopulateScenarios()
     Function ParametersToText(ByVal aMethod As clsBatch.ANALYSIS, ByVal aArgs As atcDataAttributes) As String
     Sub Clear()
 End Interface
@@ -37,9 +37,9 @@ Public Class clsBatch
         DFLOW
     End Enum
 
-    Private Specs As clsBatchSpec
     Public GlobalSettings As atcData.atcDataAttributes
     Public ListBatchUnitsData As atcCollection 'of clsBatchUnitBF, station id/location as key
+    Public ListBatchOpns As atcCollection
     Public Delimiter As String = vbTab
     Public DownloadDataDirectory As String = ""
     Public MessageTimeseries As String = ""
@@ -62,23 +62,23 @@ Public Class clsBatch
         SpecFilename = aSpecFilename
     End Sub
 
-    Public Sub New(ByVal aSpec As clsBatchSpec)
-        Specs = aSpec
-    End Sub
+    'Public Sub New(ByVal aSpec As clsBatchSpec)
+    '    Specs = aSpec
+    'End Sub
 
     Public Sub New()
 
     End Sub
 
     Public Sub ProcessBatch()
-        If Specs Is Nothing Then Return
+        'If Specs Is Nothing Then Return
 
-        For Each lBFOpnID As Integer In Specs.ListBatchBaseflowOpns.Keys
-            Dim lBFOpn As atcCollection = Specs.ListBatchBaseflowOpns.ItemByKey(lBFOpnID)
-            For Each lStation As clsBatchUnitStation In lBFOpn
+        'For Each lBFOpnID As Integer In Specs.ListBatchBaseflowOpns.Keys
+        '    Dim lBFOpn As atcCollection = Specs.ListBatchBaseflowOpns.ItemByKey(lBFOpnID)
+        '    For Each lStation As clsBatchUnitStation In lBFOpn
 
-            Next
-        Next
+        '    Next
+        'Next
 
     End Sub
 
@@ -93,7 +93,7 @@ Public Class clsBatch
     ''' <param name="aPreserve">if work off the original Ts or off a clone</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Friend Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation, _
+    Public Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation, _
                                              ByVal aListBatchUnitsData As atcCollection, _
                                              Optional ByVal aPreserve As Boolean = False) As atcTimeseries
         Dim lDataFilename As String = ""
@@ -161,7 +161,10 @@ Public Class clsBatch
             End If
         End If
         If lDataReady Then
-            Dim lGroup As atcTimeseriesGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
+            Dim lGroup As atcTimeseriesGroup = aStation.DataSource.DataSets.FindData("Constituent", "Flow")
+            If lGroup.Count = 0 Then
+                lGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
+            End If
             If lGroup IsNot Nothing AndAlso lGroup.Count > 0 Then
                 If aPreserve Then
                     Return lGroup(0)
@@ -177,7 +180,7 @@ Public Class clsBatch
         Return Nothing
     End Function
 
-    Friend Sub UpdateStatus(ByVal aMsg As String, Optional ByVal aAppend As Boolean = False, Optional ByVal aResetProgress As Boolean = False)
+    Public Sub UpdateStatus(ByVal aMsg As String, Optional ByVal aAppend As Boolean = False, Optional ByVal aResetProgress As Boolean = False)
         If gProgressBar IsNot Nothing Then
             If aResetProgress Then
                 gProgressBar.Minimum = 0
@@ -199,13 +202,27 @@ Public Class clsBatch
 
     Public Overridable Sub Clear() Implements IBatchProcessing.Clear
         If ListBatchUnitsData IsNot Nothing Then ListBatchUnitsData.Clear()
+        If ListBatchOpns IsNot Nothing Then
+            For Each lCollection As atcCollection In ListBatchOpns
+                For Each lStation As clsBatchUnitStation In lCollection
+                    If lStation.StreamFlowData IsNot Nothing Then
+                        lStation.StreamFlowData.Clear()
+                        lStation.StreamFlowData = Nothing
+                    End If
+                    lStation = Nothing
+                Next
+                lCollection.Clear()
+                lCollection = Nothing
+            Next
+            ListBatchOpns.Clear()
+        End If
     End Sub
 
     Public Overridable Sub MergeSpecs() Implements IBatchProcessing.MergeSpecs
 
     End Sub
 
-    Public Overridable Sub PopulateScenarios(ByVal aMethod As clsBatch.ANALYSIS) Implements IBatchProcessing.PopulateScenarios
+    Public Overridable Sub PopulateScenarios() Implements IBatchProcessing.PopulateScenarios
 
     End Sub
 
@@ -214,7 +231,8 @@ Public Class clsBatch
     End Sub
 
     Public Overridable Function ParametersToText(ByVal aMethod As ANALYSIS, ByVal aArgs As atcDataAttributes) As String Implements IBatchProcessing.ParametersToText
-        Return Specs.ParametersToText(aMethod, aArgs)
+        'Return Specs.ParametersToText(aMethod, aArgs)
+        Return ""
     End Function
 
     Public Overridable Sub SpecifyGroup(ByVal aSpec As String, ByVal aOpnCount As Integer) Implements IBatchProcessing.SpecifyGroup

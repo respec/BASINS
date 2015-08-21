@@ -1584,12 +1584,18 @@ Public Class frmSWSTAT
                 .SetValue(InputNames.StartDay, pYearStartDay)
                 .SetValue(InputNames.EndMonth, pYearEndMonth)
                 .SetValue(InputNames.EndDay, pYearEndDay)
+                'For All years, txtOmitBeforeYear and txtOmitAfterYear are empty
+                .SetValue(InputNames.IncludeYears, cboYears.SelectedItem.ToString())
+                .SetValue(InputNames.StartYear, txtOmitBeforeYear.Text)
+                .SetValue(InputNames.EndYear, txtOmitAfterYear.Text)
                 .SetValue(InputNames.HighLow, lName)
                 .SetValue(InputNames.Logarithmic, chkLog.Checked)
                 .SetValue(InputNames.MultiNDayPlot, chkMultipleNDayPlots.Checked)
                 .SetValue(InputNames.MultiStationPlot, chkMultipleStationPlots.Checked)
                 If IO.Directory.Exists(txtOutputDir.Text) Then
                     .SetValue(InputNames.OutputDir, txtOutputDir.Text)
+                Else
+                    lMsg &= "- Need to specify a default output directory."
                 End If
                 If Not String.IsNullOrEmpty(txtOutputRootName.Text.Trim()) Then
                     .SetValue(InputNames.OutputPrefix, txtOutputRootName.Text.Trim())

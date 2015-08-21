@@ -40,10 +40,11 @@ Partial Class frmStations
         Me.txtHeader.Dock = System.Windows.Forms.DockStyle.Top
         Me.txtHeader.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtHeader.Location = New System.Drawing.Point(0, 0)
+        Me.txtHeader.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtHeader.Multiline = True
         Me.txtHeader.Name = "txtHeader"
         Me.txtHeader.ReadOnly = True
-        Me.txtHeader.Size = New System.Drawing.Size(584, 75)
+        Me.txtHeader.Size = New System.Drawing.Size(779, 92)
         Me.txtHeader.TabIndex = 0
         '
         'dgvStationEntries
@@ -53,10 +54,12 @@ Partial Class frmStations
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgvStationEntries.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvStationEntries.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.fld1RDBFilename, Me.fld2DrainageArea, Me.fld3StationID, Me.fld4StationInfo})
-        Me.dgvStationEntries.Location = New System.Drawing.Point(0, 81)
+        Me.dgvStationEntries.Location = New System.Drawing.Point(0, 100)
+        Me.dgvStationEntries.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.dgvStationEntries.MultiSelect = False
         Me.dgvStationEntries.Name = "dgvStationEntries"
-        Me.dgvStationEntries.Size = New System.Drawing.Size(584, 199)
+        Me.dgvStationEntries.RowTemplate.Height = 24
+        Me.dgvStationEntries.Size = New System.Drawing.Size(779, 245)
         Me.dgvStationEntries.TabIndex = 1
         '
         'fld1RDBFilename
@@ -79,15 +82,16 @@ Partial Class frmStations
         Me.fld4StationInfo.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
         Me.fld4StationInfo.HeaderText = "Station Info (optional)"
         Me.fld4StationInfo.Name = "fld4StationInfo"
-        Me.fld4StationInfo.Width = 121
+        Me.fld4StationInfo.Width = 153
         '
         'btnOK
         '
         Me.btnOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.btnOK.Location = New System.Drawing.Point(416, 299)
+        Me.btnOK.Location = New System.Drawing.Point(555, 368)
+        Me.btnOK.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnOK.Name = "btnOK"
-        Me.btnOK.Size = New System.Drawing.Size(75, 23)
+        Me.btnOK.Size = New System.Drawing.Size(100, 28)
         Me.btnOK.TabIndex = 2
         Me.btnOK.Text = "OK"
         Me.btnOK.UseVisualStyleBackColor = True
@@ -96,25 +100,27 @@ Partial Class frmStations
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(497, 299)
+        Me.btnCancel.Location = New System.Drawing.Point(663, 368)
+        Me.btnCancel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(75, 23)
+        Me.btnCancel.Size = New System.Drawing.Size(100, 28)
         Me.btnCancel.TabIndex = 3
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
         'frmStations
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(584, 334)
+        Me.ClientSize = New System.Drawing.Size(779, 411)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.dgvStationEntries)
         Me.Controls.Add(Me.txtHeader)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Name = "frmStations"
-        Me.Text = "USGS Base-Flow Separation Stations"
+        Me.Text = "USGS Batch Run Stations"
         CType(Me.dgvStationEntries, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()

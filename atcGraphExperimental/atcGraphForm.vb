@@ -293,6 +293,18 @@ Public Class atcGraphForm
         atcDataManager.UserSelectData("", pGrapher.Datasets, Nothing, False, True, Me.Icon)
     End Sub
 
+    Public Function SaveGraph(ByVal aFilename As String) As Boolean
+        RefreshGraph()
+        Dim lSaved As Boolean = False
+        Try
+            pZgc.SaveIn(aFilename)
+            lSaved = True
+        Catch ex As Exception
+            lSaved = False
+        End Try
+        Return lSaved
+    End Function
+
     Private Sub mnuFileSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
         RefreshGraph()
         Dim lSavedAs As String

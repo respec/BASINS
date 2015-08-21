@@ -5,8 +5,7 @@ Imports System.Xml
 Public Class clsBatchUnitStation
     Public StationID As String
     Public DataSource As atcTimeseriesRDB.atcTimeseriesRDB
-    Public BFInputs As atcDataAttributes = New atcDataAttributes()
-    Public CalcBF As atcTimeseriesBaseflow.atcTimeseriesBaseflow
+    Public BFInputs As atcDataAttributes = New atcDataAttributes() 'Batch File Inputs
     Public Message As String = ""
     Public NeedToDownloadData As Boolean = True
     Public StationDrainageArea As Double = -99

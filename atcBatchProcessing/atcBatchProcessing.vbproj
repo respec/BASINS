@@ -98,36 +98,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsBatch.vb" />
-    <Compile Include="clsBatchProcessingPlugin.vb" />
     <Compile Include="clsBatchSpec.vb" />
     <Compile Include="clsBatchUnitStation.vb" />
     <Compile Include="clsBatchUtil.vb" />
-    <Compile Include="frmBatch.Designer.vb">
-      <DependentUpon>frmBatch.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmBatch.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmBatchMap.designer.vb">
-      <DependentUpon>frmBatchMap.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmBatchMap.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmStations.designer.vb">
       <DependentUpon>frmStations.vb</DependentUpon>
     </Compile>
     <Compile Include="frmStations.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmUSGSBaseflowBatch.designer.vb">
-      <DependentUpon>frmUSGSBaseflowBatch.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmUSGSBaseflowBatch.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="modBaseflowUtil.vb" />
-    <Compile Include="modUtil.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -145,17 +124,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmBatch.resx">
-      <DependentUpon>frmBatch.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmBatchMap.resx">
-      <DependentUpon>frmBatchMap.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmStations.resx">
       <DependentUpon>frmStations.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmUSGSBaseflowBatch.resx">
-      <DependentUpon>frmUSGSBaseflowBatch.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -199,11 +169,6 @@
     <ProjectReference Include="..\atcGraphExperimental\atcGraph.vbproj">
       <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
       <Name>atcGraph</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcSWSTAT\atcSWSTAT.vbproj">
-      <Project>{C00718A3-FF1D-46C4-822E-C10964469DE2}</Project>
-      <Name>atcSWSTAT</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow.vbproj">
