@@ -305,6 +305,8 @@ Public Class frmSpecifySeasonalAttributes
     End Sub
 
     Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
+        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+        Me.Enabled = False
         lstSeasons.Items.Clear()
         Dim lSeasonSource As atcTimeseriesSource = CurrentSeason()
         If lSeasonSource IsNot Nothing AndAlso lstAttributes.SelectedItems.Count > 0 Then
@@ -321,6 +323,8 @@ Public Class frmSpecifySeasonalAttributes
                 End If
             Next
         End If
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Enabled = True
     End Sub
 
     Private Function CurrentSeason() As atcTimeseriesSource

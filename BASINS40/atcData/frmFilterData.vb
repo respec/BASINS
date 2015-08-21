@@ -1,0 +1,509 @@
+﻿Imports atcData
+Imports atcUtility
+Imports MapWinUtility
+
+Imports System.Windows.Forms
+
+Public Class frmFilterData
+
+    Private pTranSumDivLabel As String = "Accumulate/Divide"
+    Private pTranAverSameLabel As String = "Average/Same"
+    Private pTranMaxLabel As String = "Maximum"
+    Private pTranMinLabel As String = "Minimum"
+    Private pTranCountMissingLabel As String = "Count Missing"
+
+    Private WithEvents pSelectedGroup As atcTimeseriesGroup
+
+    Private pAllDates As atcTimeseries
+
+    Private pInitializing As Boolean = True
+    Private pSelectedOK As Boolean = False
+    Private pAsking As Boolean = False
+
+    'Private pEventsPlugin As atcTimeseriesSource
+
+    Public Function AskUser(Optional ByVal aGroup As atcTimeseriesGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcTimeseriesGroup
+        pInitializing = True 'Gets set back to False in Populate below
+
+        FindEventsPlugin()
+
+        If aGroup Is Nothing Then
+            pSelectedGroup = New atcTimeseriesGroup
+        Else
+            pSelectedGroup = aGroup
+        End If
+
+        atcSelectedDates.DataGroup = pSelectedGroup
+
+        InitSeasons()
+
+        InitTimeStep()
+
+        Me.Show()
+        pAsking = True
+
+        chkProvisional.Visible = False
+        For Each lDataSet As atcTimeseries In pSelectedGroup
+            If lDataSet.ValueAttributesExist Then
+                For Each lDef As atcAttributeDefinition In lDataSet.ValueAttributeDefinitions
+                    If lDef.Name = "P" Then
+                        chkProvisional.Visible = True
+                        chkProvisional.Checked = (GetSetting("BASINS", "Select Data", "Provisional", "True") = True)
+                        GoTo FoundProvisional
+                    End If
+                Next
+            End If
+        Next
+FoundProvisional:
+
+        pInitializing = False
+        If aModal Then
+            While pAsking AndAlso Application.OpenForms.Count > 1
+                Application.DoEvents()
+                Threading.Thread.Sleep(10)
+            End While
+            If pSelectedOK Then
+
+            Else 'User clicked Cancel or closed dialog
+
+            End If
+            Try
+                Me.Close()
+            Catch
+            End Try
+            Return pSelectedGroup
+        Else
+            Return Nothing
+        End If
+    End Function
+
+    Private Sub FindEventsPlugin()
+        'For Each lPlugin As atcDataPlugin In atcDataManager.GetPlugins(GetType(atcTimeseriesSource))
+        '    If (lPlugin.Name = "Timeseries::Events") Then
+        '        pEventsPlugin = lPlugin
+        '        Exit For
+        '    End If
+        'Next
+        'If pEventsPlugin Is Nothing Then Me.TabPage1.Hide()
+    End Sub
+
+    'Public Function CreateSelectedGroupWithTimeStep() As atcTimeseriesGroup
+    '    If pSelectedGroup Is Nothing Then
+    '        'nothing to aggregate, return empty group
+    '        Return New atcTimeseriesGroup
+    '    ElseIf Not chkEnableChangeTimeStep.Checked Then
+    '        'No need to aggregate
+    '        Return pSelectedGroup
+    '    Else
+    '        Dim lAggregatedData As New atcTimeseriesGroup
+
+    '        Dim lTimeStep As Integer
+
+    '        Dim lTU As atcTimeUnit = atcTimeUnit.TUUnknown
+    '        For Each lTimeUnit As atcTimeUnit In [Enum].GetValues(lTU.GetType)
+    '            If [Enum].GetName(lTU.GetType, lTimeUnit) = "TU" & cboTimeUnits.Text Then
+    '                lTU = lTimeUnit
+    '            End If
+    '        Next
+
+    '        Dim lTran As atcTran = atcTran.TranNative
+    '        Select Case cboAggregate.Text
+    '            Case pTranSumDivLabel : lTran = atcTran.TranSumDiv
+    '            Case pTranAverSameLabel : lTran = atcTran.TranAverSame
+    '            Case pTranMaxLabel : lTran = atcTran.TranMax
+    '            Case pTranMinLabel : lTran = atcTran.TranMin
+    '            Case pTranCountMissingLabel : lTran = atcTran.TranCountMissing
+    '            Case Else : lTran = atcTran.TranNative
+    '        End Select
+
+    '        If Not Integer.TryParse(txtTimeStep.Text, lTimeStep) Then
+    '            Logger.Msg("Time step must be specified as an integer.", "Time Step Not Specified")
+    '        ElseIf lTimeStep < 1 Then
+    '            Logger.Msg("Time step must be >= 1.", "Time Step Less Than One")
+    '        ElseIf lTU = atcTimeUnit.TUUnknown Then
+    '            Logger.Msg("Time Units must be selected to change time step.", "Time Units Not Selected")
+    '        ElseIf lTran = atcTran.TranNative Then
+    '            Logger.Msg("Aggregation type must be selected to change time step.", "Type of Aggregation Not Selected")
+    '        Else
+    '            lAggregatedData = New atcTimeseriesGroup
+    '            For Each lTimeseries As atcTimeseries In pSelectedGroup
+    '                lAggregatedData.Add(Aggregate(lTimeseries, lTU, lTimeStep, lTran))
+    '            Next
+    '        End If
+    '        Return lAggregatedData
+    '    End If
+    'End Function
+
+    Private Sub frmFilterData_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        atcSelectedDates.Text = ""
+
+
+        'chkEnableSubsetByDate.Checked = False
+        chkEnableSeasons.Checked = False
+        chkEnableChangeTimeStep.Checked = False
+    End Sub
+
+    Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+        pSelectedOK = False
+        Me.Visible = False
+        pAsking = False
+    End Sub
+
+    Private Sub TimeUnits_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboTimeUnits.SelectedIndexChanged, _
+                                                                                                      cboAggregate.SelectedIndexChanged, _
+                                                                                                      txtTimeStep.TextChanged
+        If Not pInitializing AndAlso Not chkEnableChangeTimeStep.Checked Then chkEnableChangeTimeStep.Checked = True
+    End Sub
+
+    Private Function GetNonProvisional(ByVal aDataGroup As atcDataGroup) As atcDataGroup
+        Dim lFiltered As New atcDataGroup
+        For Each lDataSet As atcTimeseries In aDataGroup
+            If HasProvisionalValues(lDataSet) Then
+                Dim lProvisionalTS As atcTimeseries = Nothing
+                Dim lNonProvisionalTS As atcTimeseries = Nothing
+                SplitProvisional(lDataSet, lProvisionalTS, lNonProvisionalTS)
+                If lNonProvisionalTS IsNot Nothing Then
+                    lFiltered.Add(lNonProvisionalTS)
+                End If
+            Else
+                lFiltered.Add(lDataSet)
+            End If
+        Next
+        Return lFiltered
+    End Function
+
+    Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
+        Try
+            Dim lModifiedGroup As atcTimeseriesGroup = pSelectedGroup.Clone
+
+            If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
+                'Note that ChangeTo uses the atcTimeseriesGroup already inside atcSelectedDates,
+                'so this has to come before other filters that modify lModifiedGroup
+                lModifiedGroup.ChangeTo(atcSelectedDates.CreateSelectedDataGroupSubset)
+            End If
+
+            If chkProvisional.Visible Then
+                SaveSetting("BASINS", "Select Data", "Provisional", chkProvisional.Checked)
+                If Not chkProvisional.Checked Then 'Filter out provisional data
+                    lModifiedGroup.ChangeTo(GetNonProvisional(lModifiedGroup))
+                End If
+            End If
+
+            If chkEnableSeasons.Checked Then
+                If lstSeasons.SelectedIndices.Count = 0 Then
+                    Throw New ApplicationException("Split Into Seasons requested, but no Seasons to include selected.")
+                End If
+                If radioSeasonsCombine.Checked Then
+                    SaveSetting("atcSeasons", "SplitType", "Split", "Combine")
+                End If
+                If radioSeasonsSeparate.Checked Then
+                    SaveSetting("atcSeasons", "SplitType", "Split", "Separate")
+                End If
+                Dim lNumToGroup As Integer = 0
+                If radioSeasonsGroup.Checked Then
+                    Integer.TryParse(txtGroupSeasons.Text, lNumToGroup)
+                    If lNumToGroup < 1 Then
+                        Throw New ApplicationException("Grouping selected, but number to group not specified")
+                    End If
+                    SaveSetting("atcSeasons", "SplitType", "Split", txtGroupSeasons.Text)
+                End If
+                Try 'Try saving first so DeleteSetting will not throw an exception
+                    SaveSetting("atcSeasons", "Split" & cboSeasons.Text, "X", "X")
+                    DeleteSetting("atcSeasons", "Split" & cboSeasons.Text)
+                Catch
+                End Try
+                Dim lSelectedSeasons As System.Windows.Forms.ListBox.SelectedObjectCollection = lstSeasons.SelectedItems
+                If lSelectedSeasons.Count < lstSeasons.Items.Count Then 'Only save selection if fewer than all were selected
+                    For Each lSeason As Object In lSelectedSeasons
+                        SaveSetting("atcSeasons", "Split" & cboSeasons.Text, lSeason.ToString, "True")
+                    Next
+                End If
+                Dim lSeasonalDatasets As New atcTimeseriesGroup
+                DoSplit(CurrentSeason, lSelectedSeasons, lModifiedGroup, radioSeasonsCombine.Checked, radioSeasonsSeparate.Checked, lNumToGroup, lSeasonalDatasets)
+                lModifiedGroup = lSeasonalDatasets
+            End If
+
+            If chkEvents.Checked Then 'AndAlso pEventsPlugin IsNot Nothing Then
+                'Dim lType As System.Type = pEventsPlugin.GetType()
+                'Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(lType)
+                'Dim lNewTimeseriesSource As atcTimeseriesSource = lAssembly.CreateInstance(lType.FullName)
+                'Dim lNewArguments As New atcDataAttributes
+                'lNewArguments.SetValue("Timeseries", lModifiedGroup)
+                'lNewTimeseriesSource.Open("Split", lNewArguments)
+                Dim lMinValue As Double
+                Dim lMaxValue As Double
+                Dim lEnforceMin As Boolean = Double.TryParse(txtValueMinimum.Text, lMinValue)
+                Dim lEnforceMax As Boolean = Double.TryParse(txtValueMaximum.Text, lMaxValue)
+                If lEnforceMin OrElse lEnforceMax Then
+                    Dim lFilteredValuesGroup As New atcTimeseriesGroup
+                    For Each lSearchTS As atcTimeseries In lModifiedGroup
+                        'If we can tell that all values are already in limits, just use it as is
+                        If (Not lEnforceMin OrElse lSearchTS.Attributes.GetValue("Minimum") >= lMinValue) AndAlso _
+                           (Not lEnforceMax OrElse lSearchTS.Attributes.GetValue("Maximum") <= lMaxValue) Then
+                            lFilteredValuesGroup.Add(lSearchTS)
+                        Else
+                            Dim lFilteredValuesBuilder As New atcTimeseriesBuilder(Nothing)
+                            For lValueIndex As Integer = 1 To lSearchTS.numValues
+                                Dim lValue As Double = lSearchTS.Value(lValueIndex)
+                                If (Not lEnforceMin OrElse lValue >= lMinValue) AndAlso _
+                                   (Not lEnforceMax OrElse lValue <= lMaxValue) Then
+                                    lFilteredValuesBuilder.AddValue(lSearchTS.Dates.Value(lValueIndex), lValue)
+                                End If
+                            Next
+                            Dim lFilteredTS As atcTimeseries = lFilteredValuesBuilder.CreateTimeseries()
+                            lFilteredTS.Attributes.ChangeTo(lSearchTS.Attributes.Clone())
+                            lFilteredTS.Attributes.DiscardCalculated()
+                            If lEnforceMin Then
+                                lFilteredTS.Attributes.AddHistory("Filtered >= " & DoubleToString(lMinValue))
+                            End If
+                            If lEnforceMax Then
+                                lFilteredTS.Attributes.AddHistory("Filtered <= " & DoubleToString(lMaxValue))
+                            End If
+                            lFilteredValuesGroup.Add(lFilteredTS)
+                        End If
+                    Next
+
+                    lModifiedGroup = lFilteredValuesGroup
+                End If
+            End If
+
+            If chkEnableChangeTimeStep.Checked Then
+                Dim lAggregatedGroup As New atcTimeseriesGroup
+                Dim lTimeStep As Integer
+
+                Dim lTU As atcTimeUnit = atcTimeUnit.TUUnknown
+                For Each lTimeUnit As atcTimeUnit In [Enum].GetValues(lTU.GetType)
+                    If [Enum].GetName(lTU.GetType, lTimeUnit) = "TU" & cboTimeUnits.Text Then
+                        lTU = lTimeUnit
+                    End If
+                Next
+
+                Dim lTran As atcTran = atcTran.TranNative
+                Select Case cboAggregate.Text
+                    Case pTranSumDivLabel : lTran = atcTran.TranSumDiv
+                    Case pTranAverSameLabel : lTran = atcTran.TranAverSame
+                    Case pTranMaxLabel : lTran = atcTran.TranMax
+                    Case pTranMinLabel : lTran = atcTran.TranMin
+                    Case pTranCountMissingLabel : lTran = atcTran.TranCountMissing
+                    Case Else : lTran = atcTran.TranNative
+                End Select
+
+                If Not Integer.TryParse(txtTimeStep.Text, lTimeStep) Then
+                    Logger.Msg("Time step must be specified as an integer.", "Time Step Not Specified")
+                ElseIf lTimeStep < 1 Then
+                    Logger.Msg("Time step must be >= 1.", "Time Step Less Than One")
+                ElseIf lTU = atcTimeUnit.TUUnknown Then
+                    Logger.Msg("Time Units must be selected to change time step.", "Time Units Not Selected")
+                ElseIf lTran = atcTran.TranNative Then
+                    Logger.Msg("Aggregation type must be selected to change time step.", "Type of Aggregation Not Selected")
+                Else
+                    For Each lTimeseries As atcTimeseries In lModifiedGroup
+                        lAggregatedGroup.Add(Aggregate(lTimeseries, lTU, lTimeStep, lTran))
+                    Next
+                    SaveSetting("BASINS", "Select Data", "TimeUnits", cboTimeUnits.Text)
+                    SaveSetting("BASINS", "Select Data", "TimeStep", lTimeStep)
+                    SaveSetting("BASINS", "Select Data", "Transformation", cboAggregate.Text)
+                End If
+
+                lModifiedGroup = lAggregatedGroup
+            End If
+            pSelectedGroup.ChangeTo(lModifiedGroup)
+            pSelectedOK = True
+            pAsking = False
+        Catch ex As Exception
+            Logger.Msg(ex.Message, "Error Filtering Data")
+        End Try
+    End Sub
+
+    Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
+        lstSeasons.Items.Clear()
+        SaveSetting("atcSeasons", "SeasonType", "Split", cboSeasons.Text)
+        Dim lType As Type = CurrentSeason()
+        If lType IsNot Nothing Then
+            Dim lSeasonType As atcSeasonBase = lType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+            lstSeasons.Items.Clear()
+            Dim lSeasonName As String
+            Dim lNumSelected As Integer = 0
+
+            For Each lSeasonIndex As Integer In lSeasonType.AllSeasonsInDates(pAllDates.Values)
+                lSeasonName = lSeasonType.SeasonName(lSeasonIndex)
+                lstSeasons.Items.Add(lSeasonName)
+                If GetSetting("atcSeasons", "Split" & cboSeasons.Text, lSeasonName) = "True" Then
+                    lNumSelected += 1
+                    lstSeasons.SetSelected(lstSeasons.Items.Count - 1, True)
+                End If
+            Next
+
+            If lNumSelected = 0 Then 'If none were selected in saved settings, default to selecting all
+                For lSeasonIndex As Integer = lstSeasons.Items.Count - 1 To 0 Step -1
+                    lstSeasons.SetSelected(lSeasonIndex, True)
+                Next
+            End If
+        End If
+    End Sub
+
+    Private Sub InitTimeStep()
+        With cboTimeUnits.Items
+            .Clear()
+            Dim lDefaultUnit As String = "TU" & GetSetting("BASINS", "Select Data", "TimeUnits", "Day")
+            For Each lUnitName As String In [Enum].GetNames(GetType(atcTimeUnit))
+                If lUnitName <> "TUUnknown" Then
+                    .Add(lUnitName.Substring(2))
+                    If lUnitName = lDefaultUnit Then
+                        cboTimeUnits.SelectedItem = cboTimeUnits.Items(cboTimeUnits.Items.Count - 1)
+                    End If
+                End If
+            Next
+        End With
+
+        With cboAggregate.Items
+            Dim lDefaultTransformation As String = GetSetting("BASINS", "Select Data", "Transformation", pTranSumDivLabel)
+            .Clear()
+            .Add(pTranSumDivLabel)
+            .Add(pTranAverSameLabel)
+            .Add(pTranMaxLabel)
+            .Add(pTranMinLabel)
+            .Add(pTranCountMissingLabel)
+
+            For lIndex As Integer = 0 To .Count - 1
+                If .Item(lIndex).ToString = lDefaultTransformation Then
+                    cboAggregate.SelectedItem = cboAggregate.Items(lIndex)
+                    Exit For
+                End If
+            Next
+        End With
+
+        txtTimeStep.Text = GetSetting("BASINS", "Select Data", "TimeStep", "1")
+    End Sub
+
+    Private Sub InitSeasons()
+        cboSeasons.Items.Clear()
+        lstSeasons.Items.Clear()
+
+        For Each typ As Type In atcData.atcSeasonBase.AllSeasonTypes
+            cboSeasons.Items.Add(atcSeasonBase.SeasonClassNameToLabel(typ.Name))
+        Next
+        pAllDates = MergeDates(pSelectedGroup)
+
+        cboSeasons.SelectedItem = GetSetting("atcSeasons", "SeasonType", "Split", "Month")
+        Dim lTypeSetting As String = GetSetting("atcSeasons", "SplitType", "Split", "Separate")
+        Select Case lTypeSetting
+            Case "Combine"
+                radioSeasonsCombine.Checked = True
+                radioSeasonsSeparate.Checked = False
+                radioSeasonsGroup.Checked = False
+            Case "Separate"
+                radioSeasonsCombine.Checked = False
+                radioSeasonsSeparate.Checked = True
+                radioSeasonsGroup.Checked = False
+            Case Else
+                If IsNumeric(lTypeSetting) Then
+                    txtGroupSeasons.Text = lTypeSetting
+                    radioSeasonsCombine.Checked = False
+                    radioSeasonsSeparate.Checked = False
+                    radioSeasonsGroup.Checked = True
+                End If
+        End Select
+    End Sub
+
+    Private Function CurrentSeason() As Type
+        For Each typ As Type In atcData.atcSeasonBase.AllSeasonTypes
+            If atcSeasonBase.SeasonClassNameToLabel(typ.Name) = cboSeasons.Text Then
+                Return typ
+            End If
+        Next
+        Return Nothing
+    End Function
+
+    Private Function DoSplit(ByVal aSeasonType As Type, _
+                             ByVal aSeasonsSelected As Windows.Forms.ListBox.SelectedObjectCollection, _
+                             ByVal aTimseriesGroup As atcTimeseriesGroup, _
+                             ByVal aCombineAllSelected As Boolean, _
+                             ByVal aEachSelected As Boolean, _
+                             ByVal aGroupEveryN As Integer, _
+                             ByVal aNewDatasets As atcTimeseriesGroup) As atcTimeseriesGroup
+        If aSeasonType IsNot Nothing Then
+            Dim lSeasonType As atcSeasonBase = aSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+            Dim lSeasonIndexes() As Integer = lSeasonType.AllSeasonsInDates(pAllDates.Values)
+            Dim lSeasonIndexesSelected As New Generic.List(Of Integer)
+            For Each lSeasonIndex As Integer In lSeasonIndexes
+                If lstSeasons.SelectedItems.Contains(lSeasonType.SeasonName(lSeasonIndex)) Then
+                    lSeasonType.SeasonSelected(lSeasonIndex) = True
+                    lSeasonIndexesSelected.Add(lSeasonIndex)
+                Else
+                    lSeasonType.SeasonSelected(lSeasonIndex) = False
+                End If
+            Next
+
+            If aCombineAllSelected Then
+                For Each lTimeseries As atcTimeseries In aTimseriesGroup
+                    Dim lSplitTS As atcTimeseriesGroup = lSeasonType.SplitBySelected(lTimeseries, Nothing)
+                    aNewDatasets.Add(lSplitTS(0))
+                Next
+            End If
+            If aEachSelected Then
+                For Each lTimeseries As atcTimeseries In aTimseriesGroup
+                    For Each lSplitTS As atcTimeseries In lSeasonType.Split(lTimeseries, Nothing)
+                        If lSeasonIndexesSelected.Contains(lSplitTS.Attributes.GetValue("SeasonIndex")) Then
+                            aNewDatasets.Add(lSplitTS)
+                        End If
+                    Next
+                Next
+            End If
+            If aGroupEveryN > 0 Then
+                Dim lGroup As New atcTimeseriesGroup
+                Dim lGroupSeasonName As String = ""
+                For Each lTimeseries As atcTimeseries In aTimseriesGroup
+                    For Each lSplitTS As atcTimeseries In lSeasonType.Split(lTimeseries, Nothing)
+                        If lSeasonIndexesSelected.Contains(lSplitTS.Attributes.GetValue("SeasonIndex")) Then
+                            lGroup.Add(lSplitTS)
+                            Select Case lGroup.Count
+                                Case 1
+                                    lGroupSeasonName = lSplitTS.Attributes.GetValue("SeasonName")
+                                Case aGroupEveryN
+                                    lGroupSeasonName &= " - " & lSplitTS.Attributes.GetValue("SeasonName")
+                                    Dim lMergedTS As atcTimeseries = MergeTimeseries(lGroup)
+                                    lMergedTS.Attributes.SetValue("SeasonName", lGroupSeasonName)
+                                    lMergedTS.Attributes.SetValue("SeasonDefinition", lSplitTS.Attributes.GetValue("SeasonDefinition"))
+                                    aNewDatasets.Add(lMergedTS)
+                                    lGroup.Clear()
+
+                            End Select
+                        End If
+                    Next
+                Next
+                If lGroup.Count > 0 Then
+                    If lGroup.Count > 1 Then
+                        lGroupSeasonName &= " - " & lGroup(lGroup.Count - 1).Attributes.GetValue("SeasonName")
+                    End If
+                    Dim lMergedTS As atcTimeseries = MergeTimeseries(lGroup)
+                    lMergedTS.Attributes.SetValue("SeasonName", lGroupSeasonName)
+                    lMergedTS.Attributes.SetValue("SeasonDefinition", lGroup(0).Attributes.GetValue("SeasonDefinition"))
+                    aNewDatasets.Add(lMergedTS)
+                    lGroup.Clear()
+                End If
+            End If
+        End If
+        Return aNewDatasets
+    End Function
+
+    Private Sub btnSeasonsAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSeasonsAll.Click
+        For index As Integer = 0 To lstSeasons.Items.Count - 1
+            lstSeasons.SetSelected(index, True)
+        Next
+    End Sub
+
+    Private Sub btnSeasonsNone_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSeasonsNone.Click
+        For index As Integer = 0 To lstSeasons.Items.Count - 1
+            lstSeasons.SetSelected(index, False)
+        Next
+    End Sub
+
+    Private Sub lstSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lstSeasons.SelectedIndexChanged
+        chkEnableSeasons.Checked = lstSeasons.SelectedIndices.Count > 0
+    End Sub
+
+    Private Sub txtValue_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtValueMinimum.TextChanged, txtValueMaximum.TextChanged
+        chkEvents.Checked = IsNumeric(txtValueMaximum.Text) OrElse IsNumeric(txtValueMinimum.Text)
+    End Sub
+End Class
