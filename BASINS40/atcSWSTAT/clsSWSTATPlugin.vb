@@ -202,17 +202,17 @@ Public Class clsSWSTATPlugin
         Dim lArgs As New atcDataAttributes
         lArgs.SetValue("Timeseries", aTimeseriesGroup)
 
-        lArgs.SetValue("NDay", aNDay)
+        lArgs.SetValue(InputNames.NDay, aNDay) '"NDay"
         lArgs.SetValue("HighFlag", aHighFlag)
 
-        lArgs.SetValue("FirstYear", aFirstYear)
-        lArgs.SetValue("LastYear", aLastYear)
+        lArgs.SetValue(InputNames.StartYear, aFirstYear) '"FirstYear"
+        lArgs.SetValue(InputNames.EndYear, aLastYear) '"LastYear"
 
-        lArgs.SetValue("BoundaryMonth", aBoundaryMonth)
-        lArgs.SetValue("BoundaryDay", aBoundaryDay)
+        lArgs.SetValue(InputNames.StartMonth, aBoundaryMonth) '"BoundaryMonth"
+        lArgs.SetValue(InputNames.StartDay, aBoundaryDay) '"BoundaryDay"
 
-        lArgs.SetValue("EndMonth", aEndMonth)
-        lArgs.SetValue("EndDay", aEndDay)
+        lArgs.SetValue(InputNames.EndMonth, aEndMonth) '"EndMonth"
+        lArgs.SetValue(InputNames.EndDay, aEndDay) '"EndDay"
 
         Dim lHighLow As String = "low"
         If aHighFlag Then
