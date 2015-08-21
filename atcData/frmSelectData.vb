@@ -39,10 +39,6 @@ Friend Class frmSelectData
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents pnlButtons As System.Windows.Forms.Panel
-    Friend WithEvents atcSelectedDates As atcData.atcChooseDataGroupDates
-    Friend WithEvents cboTimeUnits As System.Windows.Forms.ComboBox
-    Friend WithEvents cboAggregate As System.Windows.Forms.ComboBox
-    Friend WithEvents txtTimeStep As System.Windows.Forms.TextBox
     Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
     Friend WithEvents mnuFile As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuOpenData As System.Windows.Forms.ToolStripMenuItem
@@ -68,20 +64,18 @@ Friend Class frmSelectData
     Friend WithEvents splitAboveSelected As System.Windows.Forms.Splitter
     Friend WithEvents groupSelected As System.Windows.Forms.GroupBox
     Friend WithEvents pSelectedGrid As atcControls.atcGrid
+    Friend WithEvents chkFilter As System.Windows.Forms.CheckBox
+    Friend WithEvents lblDates As System.Windows.Forms.Label
+    Friend WithEvents atcSelectedDates As atcData.atcCommonDataGroupDates
     Friend WithEvents mnuSelectSeparator1 As System.Windows.Forms.ToolStripSeparator
-    Friend WithEvents chkProvisional As System.Windows.Forms.CheckBox
-    Friend WithEvents chkTimeStep As System.Windows.Forms.CheckBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectData))
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
         Me.pnlButtons = New System.Windows.Forms.Panel
-        Me.chkProvisional = New System.Windows.Forms.CheckBox
-        Me.cboTimeUnits = New System.Windows.Forms.ComboBox
-        Me.cboAggregate = New System.Windows.Forms.ComboBox
-        Me.txtTimeStep = New System.Windows.Forms.TextBox
-        Me.chkTimeStep = New System.Windows.Forms.CheckBox
-        Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
+        Me.lblDates = New System.Windows.Forms.Label
+        Me.atcSelectedDates = New atcData.atcCommonDataGroupDates
+        Me.chkFilter = New System.Windows.Forms.CheckBox
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuOpenData = New System.Windows.Forms.ToolStripMenuItem
@@ -127,53 +121,29 @@ Friend Class frmSelectData
         '
         'pnlButtons
         '
-        Me.pnlButtons.Controls.Add(Me.chkProvisional)
-        Me.pnlButtons.Controls.Add(Me.cboTimeUnits)
-        Me.pnlButtons.Controls.Add(Me.cboAggregate)
-        Me.pnlButtons.Controls.Add(Me.txtTimeStep)
-        Me.pnlButtons.Controls.Add(Me.chkTimeStep)
+        Me.pnlButtons.Controls.Add(Me.lblDates)
         Me.pnlButtons.Controls.Add(Me.atcSelectedDates)
+        Me.pnlButtons.Controls.Add(Me.chkFilter)
         Me.pnlButtons.Controls.Add(Me.btnCancel)
         Me.pnlButtons.Controls.Add(Me.btnOk)
         resources.ApplyResources(Me.pnlButtons, "pnlButtons")
         Me.pnlButtons.Name = "pnlButtons"
         '
-        'chkProvisional
+        'lblDates
         '
-        resources.ApplyResources(Me.chkProvisional, "chkProvisional")
-        Me.chkProvisional.Checked = True
-        Me.chkProvisional.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkProvisional.Name = "chkProvisional"
-        Me.chkProvisional.UseVisualStyleBackColor = True
-        '
-        'cboTimeUnits
-        '
-        Me.cboTimeUnits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboTimeUnits.FormattingEnabled = True
-        resources.ApplyResources(Me.cboTimeUnits, "cboTimeUnits")
-        Me.cboTimeUnits.Name = "cboTimeUnits"
-        '
-        'cboAggregate
-        '
-        Me.cboAggregate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        resources.ApplyResources(Me.cboAggregate, "cboAggregate")
-        Me.cboAggregate.Name = "cboAggregate"
-        '
-        'txtTimeStep
-        '
-        resources.ApplyResources(Me.txtTimeStep, "txtTimeStep")
-        Me.txtTimeStep.Name = "txtTimeStep"
-        '
-        'chkTimeStep
-        '
-        resources.ApplyResources(Me.chkTimeStep, "chkTimeStep")
-        Me.chkTimeStep.Name = "chkTimeStep"
-        Me.chkTimeStep.UseVisualStyleBackColor = True
+        resources.ApplyResources(Me.lblDates, "lblDates")
+        Me.lblDates.Name = "lblDates"
         '
         'atcSelectedDates
         '
         resources.ApplyResources(Me.atcSelectedDates, "atcSelectedDates")
         Me.atcSelectedDates.Name = "atcSelectedDates"
+        '
+        'chkFilter
+        '
+        resources.ApplyResources(Me.chkFilter, "chkFilter")
+        Me.chkFilter.Name = "chkFilter"
+        Me.chkFilter.UseVisualStyleBackColor = True
         '
         'MenuStrip1
         '
@@ -393,12 +363,6 @@ Friend Class frmSelectData
 
     Private pAvailableData As atcDataGroup = Nothing
 
-    Private pTranSumDivLabel As String = "Accumulate/Divide"
-    Private pTranAverSameLabel As String = "Average/Same"
-    Private pTranMaxLabel As String = "Maximum"
-    Private pTranMinLabel As String = "Minimum"
-    Private pTranCountMissingLabel As String = "Count Missing"
-
     ''' <summary>
     ''' The datasets available for selection. 
     ''' Set this property before calling AskUser or by default all datasets in all open data sources will be available.
@@ -448,55 +412,10 @@ Friend Class frmSelectData
 
         LoadFiltersMenu()
 
-        With cboTimeUnits.Items
-            .Clear()
-            Dim lDefaultUnit As String = "TU" & GetSetting("BASINS", "Select Data", "TimeUnits", "Day")
-            For Each lUnitName As String In [Enum].GetNames(GetType(atcTimeUnit))
-                If lUnitName <> "TUUnknown" Then
-                    .Add(lUnitName.Substring(2))
-                    If lUnitName = lDefaultUnit Then
-                        cboTimeUnits.SelectedItem = cboTimeUnits.Items(cboTimeUnits.Items.Count - 1)
-                    End If
-                End If
-            Next
-        End With
-
-        With cboAggregate.Items
-            Dim lDefaultTransformation As String = GetSetting("BASINS", "Select Data", "Transformation", pTranSumDivLabel)
-            .Clear()
-            .Add(pTranSumDivLabel)
-            .Add(pTranAverSameLabel)
-            .Add(pTranMaxLabel)
-            .Add(pTranMinLabel)
-            .Add(pTranCountMissingLabel)
-
-            For lIndex As Integer = 0 To .Count - 1
-                If .Item(lIndex).ToString = lDefaultTransformation Then
-                    cboAggregate.SelectedItem = cboAggregate.Items(lIndex)
-                    Exit For
-                End If
-            Next
-        End With
-
-        txtTimeStep.Text = GetSetting("BASINS", "Select Data", "TimeStep", "1")
-
         Me.Show()
         Populate()
         pAsking = True
 
-        chkProvisional.Visible = False
-        For Each lDataSet As atcTimeseries In AvailableData
-            If lDataSet.ValueAttributesExist Then
-                For Each lDef As atcAttributeDefinition In lDataSet.ValueAttributeDefinitions
-                    If lDef.Name = "P" Then
-                        chkProvisional.Visible = True
-                        chkProvisional.Checked = (GetSetting("BASINS", "Select Data", "Provisional", "True") = True)
-                        GoTo FoundProvisional
-                    End If
-                Next
-            End If
-        Next
-FoundProvisional:
         Dim lCriteriaIndex As Integer = 0
         While pAsking AndAlso lCriteriaIndex < pcboCriteria(0).Items.Count
             Dim lAttributeName As String = pcboCriteria(0).Items(lCriteriaIndex)
@@ -528,7 +447,7 @@ FoundProvisional:
         If aModal Then
             While pAsking AndAlso Application.OpenForms.Count > 1
                 Application.DoEvents()
-                Threading.Thread.Sleep(10)
+                Threading.Thread.Sleep(100)
             End While
             If pSelectedOK Then
 
@@ -544,53 +463,6 @@ FoundProvisional:
             Return pSelectedGroup
         Else
             Return Nothing
-        End If
-    End Function
-
-    Public Function CreateSelectedGroupWithTimeStep() As atcTimeseriesGroup
-        If pSelectedGroup Is Nothing Then
-            'nothing to aggregate, return empty group
-            Return New atcTimeseriesGroup
-        ElseIf Not chkTimeStep.Checked Then
-            'No need to aggregate
-            Return pSelectedGroup
-        Else
-            Dim lAggregatedData As New atcTimeseriesGroup
-
-            Dim lTimeStep As Integer
-
-            Dim lTU As atcTimeUnit = atcTimeUnit.TUUnknown
-            For Each lTimeUnit As atcTimeUnit In [Enum].GetValues(lTU.GetType)
-                If [Enum].GetName(lTU.GetType, lTimeUnit) = "TU" & cboTimeUnits.Text Then
-                    lTU = lTimeUnit
-                End If
-            Next
-
-            Dim lTran As atcTran = atcTran.TranNative
-            Select Case cboAggregate.Text
-                Case pTranSumDivLabel : lTran = atcTran.TranSumDiv
-                Case pTranAverSameLabel : lTran = atcTran.TranAverSame
-                Case pTranMaxLabel : lTran = atcTran.TranMax
-                Case pTranMinLabel : lTran = atcTran.TranMin
-                Case pTranCountMissingLabel : lTran = atcTran.TranCountMissing
-                Case Else : lTran = atcTran.TranNative
-            End Select
-
-            If Not Integer.TryParse(txtTimeStep.Text, lTimeStep) Then
-                Logger.Msg("Time step must be specified as an integer.", "Time Step Not Specified")
-            ElseIf lTimeStep < 1 Then
-                Logger.Msg("Time step must be >= 1.", "Time Step Less Than One")
-            ElseIf lTU = atcTimeUnit.TUUnknown Then
-                Logger.Msg("Time Units must be selected to change time step.", "Time Units Not Selected")
-            ElseIf lTran = atcTran.TranNative Then
-                Logger.Msg("Aggregation type must be selected to change time step.", "Type of Aggregation Not Selected")
-            Else
-                lAggregatedData = New atcTimeseriesGroup
-                For Each lTimeseries As atcTimeseries In pSelectedGroup
-                    lAggregatedData.Add(Aggregate(lTimeseries, lTU, lTimeStep, lTran))
-                Next
-            End If
-            Return lAggregatedData
         End If
     End Function
 
@@ -1097,26 +969,9 @@ NextName:
         End Set
     End Property
 
-    Private Function GetNonProvisional(ByVal aDataGroup As atcDataGroup) As atcDataGroup
-        Dim lFiltered As New atcDataGroup
-        For Each lDataSet As atcTimeseries In aDataGroup
-            If HasProvisionalValues(lDataSet) Then
-                Dim lProvisionalTS As atcTimeseries = Nothing
-                Dim lNonProvisionalTS As atcTimeseries = Nothing
-                SplitProvisional(lDataSet, lProvisionalTS, lNonProvisionalTS)
-                If lNonProvisionalTS IsNot Nothing Then
-                    lFiltered.Add(lNonProvisionalTS)
-                End If
-            Else
-                lFiltered.Add(lDataSet)
-            End If
-        Next
-        Return lFiltered
-    End Function
-
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
         pAbortMatching = True
-        If My.Computer.Keyboard.ShiftKeyDown Then
+        If My.Computer.Keyboard.ShiftKeyDown AndAlso Not chkFilter.Checked Then
             'If e IsNot Nothing AndAlso e.GetType.Name = "MouseEventArgs" Then
             '    If CType(e, System.Windows.Forms.MouseEventArgs).Button = Windows.Forms.MouseButtons.Right Then
             pOkCloses = False
@@ -1129,59 +984,13 @@ NextName:
           (pMatchingGroup.Count < AvailableData.Count OrElse pMatchingGroup.Count < 11) Then
             pSelectedGroup.ChangeTo(pMatchingGroup)
         End If
-        pSelectedOK = True
 
-        If chkProvisional.Visible Then
-            SaveSetting("BASINS", "Select Data", "Provisional", chkProvisional.Checked)
-            If Not chkProvisional.Checked Then 'Filter out provisional data
-                pSelectedGroup.ChangeTo(GetNonProvisional(pSelectedGroup))
-            End If
-        End If
-
-        If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
-            pSelectedGroup.ChangeTo(atcSelectedDates.CreateSelectedDataGroupSubset)
-        End If
-        If chkTimeStep.Checked Then
-            Dim lAggregatedGroup As New atcTimeseriesGroup
-            Dim lTimeStep As Integer
-
-            Dim lTU As atcTimeUnit = atcTimeUnit.TUUnknown
-            For Each lTimeUnit As atcTimeUnit In [Enum].GetValues(lTU.GetType)
-                If [Enum].GetName(lTU.GetType, lTimeUnit) = "TU" & cboTimeUnits.Text Then
-                    lTU = lTimeUnit
-                End If
-            Next
-
-            Dim lTran As atcTran = atcTran.TranNative
-            Select Case cboAggregate.Text
-                Case pTranSumDivLabel : lTran = atcTran.TranSumDiv
-                Case pTranAverSameLabel : lTran = atcTran.TranAverSame
-                Case pTranMaxLabel : lTran = atcTran.TranMax
-                Case pTranMinLabel : lTran = atcTran.TranMin
-                Case pTranCountMissingLabel : lTran = atcTran.TranCountMissing
-                Case Else : lTran = atcTran.TranNative
-            End Select
-
-            If Not Integer.TryParse(txtTimeStep.Text, lTimeStep) Then
-                Logger.Msg("Time step must be specified as an integer.", "Time Step Not Specified")
-            ElseIf lTimeStep < 1 Then
-                Logger.Msg("Time step must be >= 1.", "Time Step Less Than One")
-            ElseIf lTU = atcTimeUnit.TUUnknown Then
-                Logger.Msg("Time Units must be selected to change time step.", "Time Units Not Selected")
-            ElseIf lTran = atcTran.TranNative Then
-                Logger.Msg("Aggregation type must be selected to change time step.", "Type of Aggregation Not Selected")
-            Else
-                For Each lTimeseries As atcTimeseries In pSelectedGroup
-                    lAggregatedGroup.Add(Aggregate(lTimeseries, lTU, lTimeStep, lTran))
-                Next
-                SaveSetting("BASINS", "Select Data", "TimeUnits", cboTimeUnits.Text)
-                SaveSetting("BASINS", "Select Data", "TimeStep", lTimeStep)
-                SaveSetting("BASINS", "Select Data", "Transformation", cboAggregate.Text)
-            End If
-
-            pSelectedGroup.ChangeTo(lAggregatedGroup)
-        End If
         If pOkCloses Then Me.Visible = False
+        If chkFilter.Checked Then
+            Dim lFilterForm As New frmFilterData
+            pSelectedGroup = lFilterForm.AskUser(pSelectedGroup, True)
+        End If
+        pSelectedOK = True
         pAsking = False
     End Sub
 
@@ -1509,11 +1318,6 @@ NextName:
         End With
     End Sub
 
-    Private Sub TimeUnits_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboTimeUnits.SelectedIndexChanged, _
-                                                                                                      cboAggregate.SelectedIndexChanged, _
-                                                                                                      txtTimeStep.TextChanged
-        If Not pInitializing AndAlso Not chkTimeStep.Checked Then chkTimeStep.Checked = True
-    End Sub
 End Class
 
 Friend Class GridSource

@@ -446,8 +446,9 @@ Public Class atcSeasonBase
     End Property
 
     Public Shared Function CreateSeasonObject(ByVal aSeasonTypeName As String) As atcSeasonBase
+        Dim lMatchName As String = aSeasonTypeName.Replace(" ", "").ToLower
         For Each typ As Type In AllSeasonTypes
-            If typ.Name.ToLower.Equals(aSeasonTypeName.ToLower) Then
+            If typ.Name.ToLower.Equals(lMatchName) Then
                 Try
                     Return typ.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
                 Catch e As Exception
@@ -457,6 +458,27 @@ Public Class atcSeasonBase
         Next
         Logger.Dbg("Could not find season type: " & aSeasonTypeName)
         Return Nothing
+    End Function
+
+    Public Shared Function SeasonClassNameToLabel(ByVal aName As String) As String
+        If aName.StartsWith("atc") Then
+            Dim lCamelCase As String = aName.Substring(10)
+            If lCamelCase.Equals("AMorPM") Then
+                Return "AM or PM"
+            Else
+                Dim lReturn As String = lCamelCase.Substring(0, 1)
+                For iCh As Integer = 1 To lCamelCase.Length - 1
+                    Dim lCurChar As String = lCamelCase.Substring(iCh, 1)
+                    If lCurChar.ToUpper.Equals(lCurChar) Then
+                        lReturn &= " "
+                    End If
+                    lReturn &= lCurChar
+                Next
+                Return lReturn
+            End If
+        Else
+            Return ""
+        End If
     End Function
 
 End Class
