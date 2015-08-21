@@ -441,7 +441,7 @@ Public Class clsBatchSpec
         gProgressBar.Minimum = 0
         gProgressBar.Maximum = lTotalBFOpn
         gProgressBar.Step = 1
-        Dim lBFOpnCount As Integer = 1
+        Dim lBFOpnCount As Integer = 0
         Dim lConfigFile As IO.StreamWriter = Nothing
         For Each lBFOpnId As Integer In ListBatchOpns.Keys
             Dim lBFOpn As atcCollection = ListBatchOpns.ItemByKey(lBFOpnId)
@@ -476,33 +476,35 @@ Public Class clsBatchSpec
                             OutputDir = lBFOpnDir
                             OutputFilenameRoot = lStation0.BFInputs.GetValue(InputNames.OutputPrefix, "ITFA")
                             MethodsLastDone = lStation0.BFInputs.GetValue(InputNames.ITAMethod.FREQUECYGRID)
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay Calculation.", True)
                             'Do Frequency second
                             Dim lFreqSource As atcFrequencyGridSource = New atcFrequencyGridSource(lDataGroup, lNDays, lReturnPeriods)
                             Dim lCheckFreqSrcMsg As String = InputNames.CheckFreqGrid(lFreqSource)
-                            Dim lSW As New IO.StreamWriter("FrequencyGridReport.txt", False)
+                            Dim lSW As New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridReport.txt"), False)
                             lSW.WriteLine(lFreqSource.CreateReport())
                             lSW.Flush()
                             lSW.Close()
                             lSW = Nothing
-
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency grid.", True)
                             'Do Trend analysis once for radioHigh.Checked once for not
                             Dim lTrendSourceHigh As atcTimeseriesGridSource = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, True)
-                            lSW = New IO.StreamWriter("TrendAnalysisHighFlowReport.txt", False)
+                            lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisHighFlowReport.txt"), False)
                             lSW.WriteLine(lTrendSourceHigh.ToString())
                             lSW.Flush()
                             lSW.Close()
                             lSW = Nothing
                             Dim lTrendSourceLow As atcTimeseriesGridSource = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, False)
-                            lSW = New IO.StreamWriter("TrendAnalysisLowFlowReport.txt", False)
+                            lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisLowFlowReport.txt"), False)
                             lSW.WriteLine(lTrendSourceLow.ToString())
                             lSW.Flush()
                             lSW.Close()
                             lSW = Nothing
                             lTrendSourceHigh = Nothing
                             lTrendSourceLow = Nothing
-
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend analysis.", True)
                             'Do freq graphs
-                            InputNames.DoFrequencyGraph(lDataGroup, lInputArgs, lNDays, lReturnPeriods)
+                            InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods)
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph.", True)
                             'ASCIICommon(lTsFlow)
                         End If
                         'lStation.Message &= lStation.CalcBF.BF_Message.Trim()
@@ -543,8 +545,8 @@ Public Class clsBatchSpec
             End If
             
             'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
-            UpdateStatus("SWSTAT Batch Run : " & lBFOpnId & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True)
-            lBFOpnCount += 1
+            lBFOpnCount += lBFOpn.Count
+            UpdateStatus("SWSTAT Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of total of " & lTotalBFOpn & " stations)", True)
         Next
         
         Dim lSummary As New IO.StreamWriter(IO.Path.Combine(lOutputDir, "ITFA_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)

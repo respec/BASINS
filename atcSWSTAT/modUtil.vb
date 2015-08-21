@@ -397,80 +397,18 @@ Public Module modUtil
             Dim lCalcArgs As New atcDataAttributes
             With lCalcArgs
                 .SetValue("Timeseries", lDataGroup)
-                .SetValue("NDay", aNDayDbl)
-                .SetValue("Return Period", aReturnPeriodDbl)
-                Dim logCheck As Boolean = True
-                Dim logObj As Object = aGroupArgs.GetValue(Logarithmic)
-                Dim lType As Type = logObj.GetType()
-                If lType.Name.ToLower() = "string" Then
-                    If String.Compare(logObj.ToString, "no", True) = 0 Then
-                        logCheck = False
-                    End If
-                ElseIf lType.Name.ToLower() = "Boolean" Then
-                    If Not logObj Then
-                        logCheck = False
-                    End If
-                End If
-                .SetValue("LogFlg", logCheck)
-                Dim lStartYear As String = aGroupArgs.GetValue(StartYear)
-                Dim lEndYear As String = aGroupArgs.GetValue(EndYear)
-                If String.IsNullOrEmpty(lStartYear) OrElse String.IsNullOrEmpty(lEndYear) Then
-                    Dim lDuration As String = aGroupArgs.GetValue(IncludeYears, "")
-                    If Not String.IsNullOrEmpty(lDuration) AndAlso lDuration.ToLower.StartsWith("all") Then
-                        Dim lArr() As String = lDuration.Split(" ")
-                        Dim lStartDate As String = lArr(1)
-                        Dim lEndDate As String = lArr(3)
-
-
-                    End If
-                Else
-                    Dim lStartYearD As Integer
-                    Dim lEndYearD As Integer
-                    If Integer.TryParse(lStartYear, lStartYearD) Then
-                        .SetValue(StartYear, lStartYearD) ' pFirstYear)
-                    End If
-                    If Integer.TryParse(lEndYear, lEndYearD) Then
-                        .SetValue(EndYear, lEndYearD) ' pLastYear)
-                    End If
-                End If
+                .SetValue(NDay, aNDayDbl)
+                .SetValue(ReturnPeriod, aReturnPeriodDbl)
             End With
-
 
             Dim lOperationName As String = ""
             Dim lHighDone As Boolean
+            lDoHigh = True 'just do both High and Low flow conditions
+            lDoLow = True
             If lDoHigh Then
                 lOperationName = "n-day High value"
-                With lCalcArgs
-                    If aGroupArgs.GetValue(StartMonth) IsNot Nothing AndAlso aGroupArgs.GetValue(StartDay) IsNot Nothing Then
-                        .SetValue(StartMonth, aGroupArgs.GetValue(StartMonth)) 'pYearStartMonth)
-                        .SetValue(StartDay, aGroupArgs.GetValue(StartDay)) 'pYearStartDay)
-                    Else
-                        Dim lsMonth As Integer = 10
-                        Dim lsDay As Integer = 1
-                        Dim lStartHigh As String = aGroupArgs.GetValue(HighFlowSeasonStart, "")
-                        If Not String.IsNullOrEmpty(lStartHigh) AndAlso lStartHigh.IndexOf("/") >= 0 Then
-                            Integer.TryParse(lStartHigh.Substring(0, lStartHigh.IndexOf("/")), lsMonth)
-                            Integer.TryParse(lStartHigh.Substring(lStartHigh.IndexOf("/") + 1), lsDay)
-                        End If
-                        .SetValue(StartMonth, lsMonth)
-                        .SetValue(StartDay, lsDay)
-                    End If
-
-                    If aGroupArgs.GetValue(EndMonth) IsNot Nothing AndAlso aGroupArgs.GetValue(EndDay) IsNot Nothing Then
-                        .SetValue(EndMonth, aGroupArgs.GetValue(EndMonth)) 'pYearStartMonth)
-                        .SetValue(EndDay, aGroupArgs.GetValue(EndDay)) 'pYearStartDay)
-                    Else
-                        Dim leMonth As Integer = 9
-                        Dim leDay As Integer = 30
-                        Dim lEndHigh As String = aGroupArgs.GetValue(HighFlowSeasonEnd, "")
-                        If Not String.IsNullOrEmpty(lEndHigh) AndAlso lEndHigh.IndexOf("/") >= 0 Then
-                            Integer.TryParse(lEndHigh.Substring(0, lEndHigh.IndexOf("/")), leMonth)
-                            Integer.TryParse(lEndHigh.Substring(lEndHigh.IndexOf("/") + 1), leDay)
-                        End If
-                        .SetValue(EndMonth, leMonth)
-                        .SetValue(EndDay, leDay)
-                    End If
-                End With
+                'Set start/end month day etc
+                SetInputsForAnalysis(aGroupArgs, lCalcArgs)
                 Try
                     lHighDone = lCalculator.Open(lOperationName, lCalcArgs)
                 Catch ex As Exception
@@ -481,37 +419,7 @@ Public Module modUtil
             Dim lLowDone As Boolean
             If lDoLow Then
                 lOperationName = "n-day Low value"
-                With lCalcArgs
-                    If aGroupArgs.GetValue(StartMonth) IsNot Nothing AndAlso aGroupArgs.GetValue(StartDay) IsNot Nothing Then
-                        .SetValue(StartMonth, aGroupArgs.GetValue(StartMonth)) 'pYearStartMonth)
-                        .SetValue(StartDay, aGroupArgs.GetValue(StartDay)) 'pYearStartDay)
-                    Else
-                        Dim lsMonth As Integer = 4
-                        Dim lsDay As Integer = 1
-                        Dim lStartLow As String = aGroupArgs.GetValue(LowFlowSeasonStart, "")
-                        If Not String.IsNullOrEmpty(lStartLow) AndAlso lStartLow.IndexOf("/") >= 0 Then
-                            Integer.TryParse(lStartLow.Substring(0, lStartLow.IndexOf("/")), lsMonth)
-                            Integer.TryParse(lStartLow.Substring(lStartLow.IndexOf("/") + 1), lsDay)
-                        End If
-                        .SetValue(StartMonth, lsMonth)
-                        .SetValue(StartDay, lsDay)
-                    End If
-
-                    If aGroupArgs.GetValue(EndMonth) IsNot Nothing AndAlso aGroupArgs.GetValue(EndDay) IsNot Nothing Then
-                        .SetValue(EndMonth, aGroupArgs.GetValue(EndMonth)) 'pYearStartMonth)
-                        .SetValue(EndDay, aGroupArgs.GetValue(EndDay)) 'pYearStartDay)
-                    Else
-                        Dim leMonth As Integer = 3
-                        Dim leDay As Integer = 31
-                        Dim lEndLow As String = aGroupArgs.GetValue(LowFlowSeasonEnd, "")
-                        If Not String.IsNullOrEmpty(lEndLow) AndAlso lEndLow.IndexOf("/") >= 0 Then
-                            Integer.TryParse(lEndLow.Substring(0, lEndLow.IndexOf("/")), leMonth)
-                            Integer.TryParse(lEndLow.Substring(lEndLow.IndexOf("/") + 1), leDay)
-                        End If
-                        .SetValue(EndMonth, leMonth)
-                        .SetValue(EndDay, leDay)
-                    End If
-                End With
+                SetInputsForAnalysis(aGroupArgs, lCalcArgs, False)
                 Try
                     lLowDone = lCalculator.Open(lOperationName, lCalcArgs)
                 Catch ex As Exception
@@ -527,39 +435,135 @@ Public Module modUtil
             End If
         End Function
 
-        Public Shared Sub DoFrequencyGraph(ByVal aDataGroup As atcData.atcTimeseriesGroup, _
+        Public Shared Function SetInputsForAnalysis(ByVal aSetInputArgs As atcDataAttributes, _
+                                         ByRef aCalcArgs As atcDataAttributes, _
+                                         Optional ByVal aHighFlow As Boolean = True) As Boolean
+
+            Dim lStartDate As String = ""
+            Dim lEndDate As String = ""
+            If aCalcArgs Is Nothing Then
+                Return False
+            End If
+            Try
+                With aCalcArgs
+                    '.SetValue("Timeseries", lDataGroup)
+                    '.SetValue("NDay", aNDayDbl)
+                    '.SetValue("Return Period", aReturnPeriodDbl)
+                    Dim logCheck As Boolean = True
+                    Dim logObj As Object = aSetInputArgs.GetValue(Logarithmic)
+                    Dim lType As Type = logObj.GetType()
+                    If lType.Name.ToLower() = "string" Then
+                        If String.Compare(logObj.ToString, "no", True) = 0 Then
+                            logCheck = False
+                        End If
+                    ElseIf lType.Name.ToLower() = "Boolean" Then
+                        If Not logObj Then
+                            logCheck = False
+                        End If
+                    End If
+                    .SetValue("LogFlg", logCheck)
+                    Dim lStartYear As String = aSetInputArgs.GetValue(StartYear)
+                    Dim lEndYear As String = aSetInputArgs.GetValue(EndYear)
+                    If String.IsNullOrEmpty(lStartYear) OrElse String.IsNullOrEmpty(lEndYear) Then
+                        Dim lDuration As String = aSetInputArgs.GetValue(IncludeYears, "")
+                        If Not String.IsNullOrEmpty(lDuration) AndAlso lDuration.ToLower.StartsWith("all") Then
+                            Dim lArr() As String = lDuration.Split(" ")
+                            lStartDate = lArr(1)
+                            lEndDate = lArr(3)
+                            Dim lSDate As DateTime
+                            Dim lEDate As DateTime
+                            If DateTime.TryParse(lStartDate, lSDate) Then
+                                .SetValue(StartYear, lSDate.Year)
+                            End If
+                            If DateTime.TryParse(lEndDate, lEDate) Then
+                                .SetValue(EndYear, lEDate.Year)
+                            End If
+                        End If
+                    Else
+                        Dim lStartYearD As Integer
+                        Dim lEndYearD As Integer
+                        If Integer.TryParse(lStartYear, lStartYearD) Then
+                            .SetValue(StartYear, lStartYearD) ' pFirstYear)
+                        End If
+                        If Integer.TryParse(lEndYear, lEndYearD) Then
+                            .SetValue(EndYear, lEndYearD) ' pLastYear)
+                        End If
+                    End If
+                End With
+
+                Dim lOperationName As String = ""
+                Dim lsMonth As Integer
+                Dim lsDay As Integer
+                Dim leMonth As Integer
+                Dim leDay As Integer
+                If aHighFlow Then
+                    lsMonth = 10
+                    lsDay = 1
+                    leMonth = 9
+                    leDay = 30
+                    lStartDate = aSetInputArgs.GetValue(HighFlowSeasonStart, "")
+                    lEndDate = aSetInputArgs.GetValue(HighFlowSeasonEnd, "")
+                Else
+                    lsMonth = 4
+                    lsDay = 1
+                    leMonth = 3
+                    leDay = 31
+                    lStartDate = aSetInputArgs.GetValue(LowFlowSeasonStart, "")
+                    lEndDate = aSetInputArgs.GetValue(LowFlowSeasonEnd, "")
+                End If
+
+                With aCalcArgs
+                    If aSetInputArgs.GetValue(StartMonth) IsNot Nothing AndAlso aSetInputArgs.GetValue(StartDay) IsNot Nothing Then
+                        .SetValue(StartMonth, aSetInputArgs.GetValue(StartMonth)) 'pYearStartMonth)
+                        .SetValue(StartDay, aSetInputArgs.GetValue(StartDay)) 'pYearStartDay)
+                    Else
+                        If Not String.IsNullOrEmpty(lStartDate) AndAlso lStartDate.IndexOf("/") >= 0 Then
+                            Integer.TryParse(lStartDate.Substring(0, lStartDate.IndexOf("/")), lsMonth)
+                            Integer.TryParse(lStartDate.Substring(lStartDate.IndexOf("/") + 1), lsDay)
+                        End If
+                        .SetValue(StartMonth, lsMonth)
+                        .SetValue(StartDay, lsDay)
+                    End If
+
+                    If aSetInputArgs.GetValue(EndMonth) IsNot Nothing AndAlso aSetInputArgs.GetValue(EndDay) IsNot Nothing Then
+                        .SetValue(EndMonth, aSetInputArgs.GetValue(EndMonth)) 'pYearStartMonth)
+                        .SetValue(EndDay, aSetInputArgs.GetValue(EndDay)) 'pYearStartDay)
+                    Else
+                        If Not String.IsNullOrEmpty(lEndDate) AndAlso lEndDate.IndexOf("/") >= 0 Then
+                            Integer.TryParse(lEndDate.Substring(0, lEndDate.IndexOf("/")), leMonth)
+                            Integer.TryParse(lEndDate.Substring(lEndDate.IndexOf("/") + 1), leDay)
+                        End If
+                        .SetValue(EndMonth, leMonth)
+                        .SetValue(EndDay, leDay)
+                    End If
+                End With
+                Return True
+            Catch ex As Exception
+                Return False
+            End Try
+        End Function
+
+        Public Shared Sub DoFrequencyGraph(ByVal aDirectory As String, _
+                                           ByVal aDataGroup As atcData.atcTimeseriesGroup, _
                                            ByVal aInputArgs As atcDataAttributes, _
                                            ByVal aNDaysDbl() As Double, _
                                            ByVal aReturnPeriods() As Double)
-            Dim lFlowConditionOriginal As String = aInputArgs.GetValue(InputNames.HighLowText, "")
-
-            'Do high flow first
-            If aInputArgs.ContainsAttribute(InputNames.HighLowText) Then
-                aInputArgs.SetValue(InputNames.HighLowText, "High")
-            Else
-                aInputArgs.Add(InputNames.HighLowText, "High")
-            End If
 
             'Calculate("n-day " & lFlowCondition & " value", clsSWSTATPlugin.ListDefaultArray("Return Period"))
             CalculateNF(aDataGroup, aInputArgs, aNDaysDbl, clsSWSTATPlugin.ListDefaultArray(InputNames.ReturnPeriod))
             Dim lGraphPlugin As New atcGraph.atcGraphPlugin
             Dim lGraphForm As atcGraph.atcGraphForm
-            'Dim lSeparateGraphs As Boolean = False
-            'Select Case pDataGroup.Count
-            '    Case 0 : Return
-            '    Case 1 : lSeparateGraphs = False
-            '    Case Else
-            '        lSeparateGraphs = (Logger.MsgCustomCheckbox("Create separate graphs or all on one graph?", _
-            '                                                    pDataGroup.Count & " datasets selected", _
-            '                                                    "Do not ask again", "BASINS", "SWSTAT", "SeparateFreqGraphs", _
-            '                                                    "Separate", "One Graph") = "Separate")
-            'End Select
 
             'Get station list
             Dim lStnList As New Generic.List(Of String)
             For Each lDataSet As atcTimeseries In aDataGroup
-                If Not lStnList.Contains(lDataSet.Attributes.GetValue("STAID")) Then
-                    lStnList.Add(lDataSet.Attributes.GetValue("STAID"))
+                Dim loc As String = lDataSet.Attributes.GetValue("STAID", "")
+                If String.IsNullOrEmpty(loc) Then
+                    loc = lDataSet.Attributes.GetValue("Location", "")
+                    lDataSet.Attributes.SetValue("STAID", loc)
+                End If
+                If Not String.IsNullOrEmpty(loc) AndAlso Not lStnList.Contains(loc) Then
+                    lStnList.Add(loc)
                 End If
             Next
             'Get Nday list
@@ -573,14 +577,29 @@ Public Module modUtil
                     End If
                 Next
             Next
-            Dim lMNDayPlot As Boolean = aInputArgs.GetValue(InputNames.MultiNDayPlot)
-            Dim lMStationPlot As Boolean = aInputArgs.GetValue(InputNames.MultiStationPlot)
+
+            Dim lMNDayPlot As Boolean = True
+            Dim lMNDayPlotSetting As String = aInputArgs.GetValue(InputNames.MultiNDayPlot, "")
+            If lMNDayPlotSetting.ToLower() = "no" Then
+                lMNDayPlot = False
+            End If
+            Dim lMStationPlot As Boolean = True
+            Dim lMStationPlotSetting As String = aInputArgs.GetValue(InputNames.MultiStationPlot, "")
+            If lMStationPlotSetting.ToLower() = "no" Then
+                lMStationPlot = False
+            End If
+
             If lMNDayPlot AndAlso lMStationPlot Then 'MultipleNDayPlots() And MultipleStationPlots()
                 For Each lStaId As String In lStnList
                     For Each lNDayTimeseriesName As String In lNDayList
                         Dim lDataGroup As New atcData.atcTimeseriesGroup
                         For Each lDataset As atcTimeseries In aDataGroup
-                            If lDataset.Attributes.GetValue("STAID") = lStaId Then
+                            Dim loc As String = lDataset.Attributes.GetValue("STAID", "")
+                            If String.IsNullOrEmpty(loc) Then
+                                loc = lDataset.Attributes.GetValue("Location", "")
+                                lDataset.Attributes.SetValue("STAID", loc)
+                            End If
+                            If loc = lStaId Then
                                 Dim lTs As atcTimeseries = lDataset.Attributes.GetValue(lNDayTimeseriesName)
                                 If lTs IsNot Nothing Then
                                     lDataGroup.Add(lTs)
@@ -590,9 +609,10 @@ Public Module modUtil
                         If lDataGroup.Count > 0 Then
                             lGraphForm = New atcGraph.atcGraphForm()
                             With lGraphForm
-                                Dim lGraph As New atcGraph.clsGraphFrequency(aDataGroup, .ZedGraphCtrl)
+                                Dim lGraph As New atcGraph.clsGraphFrequency(lDataGroup, .ZedGraphCtrl)
                                 .Grapher = lGraph
-                                .SaveGraph("")
+                                Dim lGraphName As String = "FreqGraph_" & lStaId & "_" & lNDayTimeseriesName & ".png"
+                                .SaveGraph(IO.Path.Combine(aDirectory, lGraphName))
                                 .Close()
                             End With
                         End If
@@ -621,7 +641,8 @@ Public Module modUtil
                         With lGraphForm
                             Dim lGraph As New atcGraph.clsGraphFrequency(lDataGroup, .ZedGraphCtrl)
                             .Grapher = lGraph
-                            .SaveGraph("")
+                            Dim lGraphName As String = "FreqGraph_" & lNDayTimeseriesName & ".png"
+                            .SaveGraph(IO.Path.Combine(aDirectory, lGraphName))
                             .Close()
                         End With
                     End If
@@ -629,22 +650,34 @@ Public Module modUtil
                     lDataGroup = Nothing
                 Next
             ElseIf lMStationPlot Then
-                Dim lDataGroup As atcData.atcTimeseriesGroup = Nothing
+                Dim lDataGroup As New atcData.atcTimeseriesGroup()
                 For Each lStaId As String In lStnList
-                    lDataGroup = aDataGroup.FindData("STAID", lStaId)
-                    If lDataGroup IsNot Nothing Then
+                    'lDataGroup = aDataGroup.FindData("STAID", lStaId)
+                    For Each lDataset As atcTimeseries In aDataGroup
+                        Dim loc As String = lDataset.Attributes.GetValue("STAID", "")
+                        If String.IsNullOrEmpty(loc) Then
+                            loc = lDataset.Attributes.GetValue("Location", "")
+                            lDataset.Attributes.SetValue("STAID", loc)
+                        End If
+                        If loc = lStaId Then
+                            lDataGroup.Add(lDataset)
+                        End If
+                    Next
+
+                    If lDataGroup.Count > 0 Then
                         'lGraphForm = lGraphPlugin.Show(lDataGroup, "Frequency")
                         'lGraphForm.Icon = Me.Icon
                         lGraphForm = New atcGraph.atcGraphForm()
                         With lGraphForm
                             Dim lGraph As New atcGraph.clsGraphFrequency(lDataGroup, .ZedGraphCtrl)
                             .Grapher = lGraph
-                            .SaveGraph("")
+                            Dim lGraphName As String = "FreqGraph_" & lStaId & ".png"
+                            .SaveGraph(IO.Path.Combine(aDirectory, lGraphName))
                             .Close()
                         End With
                     End If
                     lDataGroup.Clear()
-                    lDataGroup = Nothing
+                    'lDataGroup = Nothing
                 Next
             Else
                 'lGraphForm = lGraphPlugin.Show(aDataGroup, "Frequency")
@@ -653,7 +686,8 @@ Public Module modUtil
                 With lGraphForm
                     Dim lGraph As New atcGraph.clsGraphFrequency(aDataGroup, .ZedGraphCtrl)
                     .Grapher = lGraph
-                    .SaveGraph("")
+                    Dim lGraphName As String = "FreqGraph_All.png"
+                    .SaveGraph(IO.Path.Combine(aDirectory, lGraphName))
                     .Close()
                 End With
             End If
@@ -763,16 +797,23 @@ Public Module modUtil
                                              ByVal aInputArgs As atcDataAttributes, _
                                              ByVal aNDays() As Double, _
                                              ByVal aHighFlow As Boolean) As atcTimeseriesGridSource
+            Dim lCalcArgs As New atcDataAttributes()
+            'With lCalcArgs
+            ' not needed as this is done inside computeRankedAnnualTimeseries
+            '    .SetValue("Timeseries", aDataGroup)
+            '    .SetValue(NDay, aNDays)
+            'End With
+            SetInputsForAnalysis(aInputArgs, lCalcArgs, aHighFlow)
             Dim lRankedAnnual As atcTimeseriesGroup = _
                    clsSWSTATPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=aDataGroup, _
                                                                  aNDay:=aNDays, _
                                                                  aHighFlag:=aHighFlow, _
-                                                                 aFirstYear:=aInputArgs.GetValue(InputNames.StartYear), _
-                                                                 aLastYear:=aInputArgs.GetValue(InputNames.EndYear), _
-                                                                 aBoundaryMonth:=aInputArgs.GetValue(InputNames.StartMonth), _
-                                                                 aBoundaryDay:=aInputArgs.GetValue(InputNames.StartDay), _
-                                                                 aEndMonth:=aInputArgs.GetValue(InputNames.EndMonth), _
-                                                                 aEndDay:=aInputArgs.GetValue(InputNames.EndDay))
+                                                                 aFirstYear:=lCalcArgs.GetValue(InputNames.StartYear), _
+                                                                 aLastYear:=lCalcArgs.GetValue(InputNames.EndYear), _
+                                                                 aBoundaryMonth:=lCalcArgs.GetValue(InputNames.StartMonth), _
+                                                                 aBoundaryDay:=lCalcArgs.GetValue(InputNames.StartDay), _
+                                                                 aEndMonth:=lCalcArgs.GetValue(InputNames.EndMonth), _
+                                                                 aEndDay:=lCalcArgs.GetValue(InputNames.EndDay))
             If lRankedAnnual.Count > 0 Then
                 Dim lTrendAttributes As New Generic.List(Of String)
                 Dim lDateFormat As New atcDateFormat
