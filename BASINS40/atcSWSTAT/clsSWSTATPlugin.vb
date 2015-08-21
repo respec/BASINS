@@ -22,10 +22,81 @@ Public Class clsSWSTATPlugin
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
         LoadPlugin("Timeseries::n-day high/low")
+
+        'Start branching for batch mode
+        Show = Nothing
+        Dim lBatchTitle As String = "Batch Run SWSTAT"
+        Dim lChoice As String = Logger.MsgCustomOwned("Please choose analysis approach below:", _
+                                                      "Integrated Frequency Analysis", _
+                                                      Nothing, _
+                                                      New String() {"Interactive", "Batch File", "Batch Map"})
+        If lChoice = "Batch File" Then
+            Dim lfrmBatch As New frmBatch()
+            ShowForm(lfrmBatch)
+            Return lfrmBatch
+        ElseIf lChoice = "Batch Map" Then
+            Dim lStationsAreSelected As Boolean = False
+            Dim lMapLayer As MapWindow.Interfaces.Layer = Nothing
+            For Each lMapLayer In pMapWin.Layers
+                If lMapLayer.Name.ToLower.Contains("nwis daily discharge stations") Then
+                    If lMapLayer.SelectedShapes.NumSelected < 2 Then
+                        Logger.Msg("Please select more than 1 stream gages for batch process." & vbCrLf & vbCrLf & _
+                                   "Layer: " & lMapLayer.Name, lBatchTitle)
+                    End If
+                    lStationsAreSelected = True
+                    Exit For
+                End If
+            Next
+            If lStationsAreSelected Then
+                Dim lSelectedStationIDs As New atcCollection()
+                Dim lShp As New MapWinGIS.Shapefile()
+                If lShp.Open(lMapLayer.FileName, Nothing) Then
+                    Dim lFieldIndex As Integer = -99
+                    Dim lRecordIndex As Integer = 0
+                    For I As Integer = 0 To lShp.NumFields - 1
+                        If lShp.Field(I).Name.ToLower() = "site_no" Then
+                            lFieldIndex = I
+                            Exit For
+                        End If
+                    Next
+                    If lFieldIndex < 0 Then
+                        Logger.Msg("NWIS daily flow layer lack station ID field.", lBatchTitle)
+                        Return Nothing
+                    End If
+                    Dim lStationId As String = ""
+                    For I As Integer = 0 To lMapLayer.SelectedShapes.NumSelected - 1
+                        lRecordIndex = lMapLayer.SelectedShapes(I).ShapeIndex()
+                        lStationId = lShp.CellValue(lFieldIndex, lRecordIndex).ToString()
+                        If Not lSelectedStationIDs.Keys.Contains(lStationId) Then
+                            lSelectedStationIDs.Add(lStationId, lStationId)
+                        End If
+                    Next
+                End If
+                If lSelectedStationIDs.Count > 0 Then
+                    Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf & _
+                               lSelectedStationIDs.ToString(), _
+                               lBatchTitle)
+                End If
+                Dim lfrmBatchMap As New frmBatchMap()
+                lfrmBatchMap.Initiate(lSelectedStationIDs)
+                lfrmBatchMap.ShowDialog()
+                Return Nothing 'for now
+            Else
+
+                Logger.Msg("Could not find stream gage station map layer: NWIS Daily Discharge Stations.", lBatchTitle)
+                'Return Nothing
+            End If
+            
+        End If
+
         Dim lForm As New frmSWSTAT
         lForm.Initialize(aTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
         Return lForm
     End Function
+
+    Private Sub ShowForm(ByVal aForm As frmBatch)
+        aForm.Initialize()
+    End Sub
 
     Private Function BasicAttributes() As Generic.List(Of String)
         Dim lBasicAttributes As New Generic.List(Of String)

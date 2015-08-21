@@ -81,28 +81,28 @@ Friend Class frmDisplayFrequencyGrid
     Friend WithEvents mnuFileSaveViewNDay As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container()
+        Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDisplayFrequencyGrid))
         Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
-        Me.mnuFile = New System.Windows.Forms.MenuItem()
-        Me.mnuFileSaveGrid = New System.Windows.Forms.MenuItem()
-        Me.mnuFileSaveReport = New System.Windows.Forms.MenuItem()
-        Me.mnuFileSaveViewNDay = New System.Windows.Forms.MenuItem()
-        Me.mnuFileExportResults = New System.Windows.Forms.MenuItem()
-        Me.mnuEdit = New System.Windows.Forms.MenuItem()
-        Me.mnuEditCopy = New System.Windows.Forms.MenuItem()
-        Me.mnuView = New System.Windows.Forms.MenuItem()
-        Me.mnuViewColumns = New System.Windows.Forms.MenuItem()
-        Me.mnuViewRows = New System.Windows.Forms.MenuItem()
-        Me.mnuViewSep1 = New System.Windows.Forms.MenuItem()
-        Me.mnuViewHigh = New System.Windows.Forms.MenuItem()
-        Me.mnuViewLow = New System.Windows.Forms.MenuItem()
-        Me.mnuViewSep2 = New System.Windows.Forms.MenuItem()
-        Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem()
-        Me.mnuAnalysis = New System.Windows.Forms.MenuItem()
-        Me.mnuHelp = New System.Windows.Forms.MenuItem()
-        Me.agdMain = New atcControls.atcGrid()
-        Me.lblNote = New System.Windows.Forms.Label()
+        Me.mnuFile = New System.Windows.Forms.MenuItem
+        Me.mnuFileSaveGrid = New System.Windows.Forms.MenuItem
+        Me.mnuFileSaveReport = New System.Windows.Forms.MenuItem
+        Me.mnuFileSaveViewNDay = New System.Windows.Forms.MenuItem
+        Me.mnuFileExportResults = New System.Windows.Forms.MenuItem
+        Me.mnuEdit = New System.Windows.Forms.MenuItem
+        Me.mnuEditCopy = New System.Windows.Forms.MenuItem
+        Me.mnuView = New System.Windows.Forms.MenuItem
+        Me.mnuViewColumns = New System.Windows.Forms.MenuItem
+        Me.mnuViewRows = New System.Windows.Forms.MenuItem
+        Me.mnuViewSep1 = New System.Windows.Forms.MenuItem
+        Me.mnuViewHigh = New System.Windows.Forms.MenuItem
+        Me.mnuViewLow = New System.Windows.Forms.MenuItem
+        Me.mnuViewSep2 = New System.Windows.Forms.MenuItem
+        Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
+        Me.mnuAnalysis = New System.Windows.Forms.MenuItem
+        Me.mnuHelp = New System.Windows.Forms.MenuItem
+        Me.agdMain = New atcControls.atcGrid
+        Me.lblNote = New System.Windows.Forms.Label
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -208,8 +208,8 @@ Friend Class frmDisplayFrequencyGrid
         Me.agdMain.AllowHorizontalScrolling = True
         Me.agdMain.AllowNewValidValues = False
         Me.agdMain.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdMain.CellBackColor = System.Drawing.Color.Empty
         Me.agdMain.Fixed3D = False
         Me.agdMain.LineColor = System.Drawing.Color.Empty
@@ -224,17 +224,17 @@ Friend Class frmDisplayFrequencyGrid
         '
         Me.lblNote.AutoSize = True
         Me.lblNote.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.lblNote.Location = New System.Drawing.Point(0, 532)
+        Me.lblNote.Location = New System.Drawing.Point(0, 528)
         Me.lblNote.Name = "lblNote"
-        Me.lblNote.Size = New System.Drawing.Size(447, 13)
+        Me.lblNote.Size = New System.Drawing.Size(598, 17)
         Me.lblNote.TabIndex = 1
         Me.lblNote.Text = "Note: Could not complete analysis for all values. Review source data for missing " & _
-    "or zero flows."
+            "or zero flows."
         Me.lblNote.Visible = False
         '
         'frmDisplayFrequencyGrid
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.ClientSize = New System.Drawing.Size(720, 545)
         Me.Controls.Add(Me.lblNote)
         Me.Controls.Add(Me.agdMain)
