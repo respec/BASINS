@@ -172,6 +172,12 @@
     <Compile Include="atcChooseDataGroupDates.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="atcCommonDataGroupDates.Designer.vb">
+      <DependentUpon>atcCommonDataGroupDates.vb</DependentUpon>
+    </Compile>
+    <Compile Include="atcCommonDataGroupDates.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="atcDataAttributes.vb">
       <SubType>Code</SubType>
     </Compile>
@@ -221,6 +227,12 @@
     <Compile Include="frmDataSource.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmFilterData.Designer.vb">
+      <DependentUpon>frmFilterData.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmFilterData.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmManager.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -261,6 +273,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>atcChooseDataGroupDates.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="atcCommonDataGroupDates.resx">
+      <DependentUpon>atcCommonDataGroupDates.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="atcSeasonYears.resx">
       <DependentUpon>atcSeasonYears.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -268,6 +283,9 @@
     <EmbeddedResource Include="frmDataSource.resx">
       <DependentUpon>frmDataSource.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFilterData.resx">
+      <DependentUpon>frmFilterData.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmManager.resx">
       <DependentUpon>frmManager.vb</DependentUpon>
