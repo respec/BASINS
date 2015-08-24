@@ -75,6 +75,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="clsBatchSpec.vb" />
     <Compile Include="frmAboutDFLOW.Designer.vb">
       <DependentUpon>frmAboutDFLOW.vb</DependentUpon>
     </Compile>
@@ -83,6 +84,18 @@
     </Compile>
     <Compile Include="DFLOWAnalysisPlugin.vb" />
     <Compile Include="DFLOWCalcs.vb" />
+    <Compile Include="frmBatch.Designer.vb">
+      <DependentUpon>frmBatch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBatch.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBatchMap.Designer.vb">
+      <DependentUpon>frmBatchMap.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBatchMap.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmDFLOWExcursions.Designer.vb">
       <DependentUpon>frmDFLOWExcursions.vb</DependentUpon>
     </Compile>
@@ -107,6 +120,7 @@
     <Compile Include="frmDFLOWResults.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="modUtil.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -127,6 +141,12 @@
     <EmbeddedResource Include="frmAboutDFLOW.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmAboutDFLOW.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBatch.resx">
+      <DependentUpon>frmBatch.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBatchMap.resx">
+      <DependentUpon>frmBatchMap.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmDFLOWArgs.resx">
       <SubType>Designer</SubType>
@@ -163,6 +183,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcBatchProcessing\atcBatchProcessing.vbproj">
+      <Project>{7E95FCAA-7B7C-4585-8EE2-58DB97ED9110}</Project>
+      <Name>atcBatchProcessing</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls</Name>
