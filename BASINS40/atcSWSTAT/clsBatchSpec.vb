@@ -469,44 +469,72 @@ Public Class clsBatchSpec
                 InputNames.GetNdayReturnPeriodAttributes(lInputArgs, lNDays, lReturnPeriods)
                 If (lNDays IsNot Nothing AndAlso lNDays.Length > 0) AndAlso _
                    (lReturnPeriods IsNot Nothing AndAlso lReturnPeriods.Length > 0) Then
-
+                    OutputDir = lBFOpnDir
+                    OutputFilenameRoot = lStation0.BFInputs.GetValue(InputNames.OutputPrefix, "ITFA")
+                    'MethodsLastDone = lStation0.BFInputs.GetValue(InputNames.ITAMethod.FREQUECYGRID)
                     Try
                         'Do NDay first
-                        If InputNames.CalculateNF(lDataGroup, lInputArgs, lNDays, lReturnPeriods) Then
-                            OutputDir = lBFOpnDir
-                            OutputFilenameRoot = lStation0.BFInputs.GetValue(InputNames.OutputPrefix, "ITFA")
-                            MethodsLastDone = lStation0.BFInputs.GetValue(InputNames.ITAMethod.FREQUECYGRID)
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay Calculation.", True)
-                            'Do Frequency second
-                            Dim lFreqSource As atcFrequencyGridSource = New atcFrequencyGridSource(lDataGroup, lNDays, lReturnPeriods)
-                            Dim lCheckFreqSrcMsg As String = InputNames.CheckFreqGrid(lFreqSource)
-                            Dim lSW As New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridReport.txt"), False)
-                            lSW.WriteLine(lFreqSource.CreateReport())
-                            lSW.Flush()
-                            lSW.Close()
-                            lSW = Nothing
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency grid.", True)
-                            'Do Trend analysis once for radioHigh.Checked once for not
-                            Dim lTrendSourceHigh As atcTimeseriesGridSource = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, True)
-                            lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisHighFlowReport.txt"), False)
-                            lSW.WriteLine(lTrendSourceHigh.ToString())
-                            lSW.Flush()
-                            lSW.Close()
-                            lSW = Nothing
-                            Dim lTrendSourceLow As atcTimeseriesGridSource = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, False)
-                            lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisLowFlowReport.txt"), False)
-                            lSW.WriteLine(lTrendSourceLow.ToString())
-                            lSW.Flush()
-                            lSW.Close()
-                            lSW = Nothing
-                            lTrendSourceHigh = Nothing
-                            lTrendSourceLow = Nothing
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend analysis.", True)
-                            'Do freq graphs
-                            InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods)
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph.", True)
-                            'ASCIICommon(lTsFlow)
-                        End If
+                        Dim lNDayHighTserListing As String = InputNames.CalculateNDayTser(lDataGroup, lInputArgs, lNDays, True)
+                        Dim lSW As New IO.StreamWriter(IO.Path.Combine(OutputDir, "NDayHighFlowTimeseries.txt"), False)
+                        lSW.WriteLine(lNDayHighTserListing)
+                        lSW.Flush()
+                        lSW.Close()
+                        lSW = Nothing
+                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay High flow Calculation.", True)
+                        Dim lNDayLowTserListing As String = InputNames.CalculateNDayTser(lDataGroup, lInputArgs, lNDays, False)
+                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "NDayLowFlowTimeseries.txt"), False)
+                        lSW.WriteLine(lNDayLowTserListing)
+                        lSW.Flush()
+                        lSW.Close()
+                        lSW = Nothing
+                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay Low flow Calculation.", True)
+
+                        'Do Frequency second
+                        Dim lFreqGridHigh As String = InputNames.DoFrequencyGrid(lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
+                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridHighFlow.txt"), False)
+                        lSW.WriteLine(lFreqGridHigh)
+                        lSW.Flush()
+                        lSW.Close()
+                        lSW = Nothing
+                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency High Flow Calculation.", True)
+                        Dim lFreqGridLow As String = InputNames.DoFrequencyGrid(lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
+                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridLowFlow.txt"), False)
+                        lSW.WriteLine(lFreqGridLow)
+                        lSW.Flush()
+                        lSW.Close()
+                        lSW = Nothing
+                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency Low Flow Calculation.", True)
+                        'Dim lNDayValuesLowDone As Boolean = InputNames.CalculateNDayValues(lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
+                        'Dim lFreqSource As atcFrequencyGridSource = New atcFrequencyGridSource(lDataGroup, lNDays, lReturnPeriods)
+                        'Dim lCheckFreqSrcMsg As String = InputNames.CheckFreqGrid(lFreqSource)
+                        'lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridReport.txt"), False)
+                        'lSW.WriteLine(lFreqSource.CreateReport())
+                        'lSW.Flush()
+                        'lSW.Close()
+                        'lSW = Nothing
+                        'UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency grid.", True)
+
+                        'Do Trend analysis once for radioHigh.Checked once for not
+                        Dim lTrendHighGridText As String = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, True)
+                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisHighFlowReport.txt"), False)
+                        lSW.WriteLine(lTrendHighGridText)
+                        lSW.Flush()
+                        lSW.Close()
+                        lSW = Nothing
+                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend high flow analysis.", True)
+                        Dim lTrendLowGridText = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, False)
+                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisLowFlowReport.txt"), False)
+                        lSW.WriteLine(lTrendLowGridText)
+                        lSW.Flush()
+                        lSW.Close()
+                        lSW = Nothing
+                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend low flow analysis.", True)
+                        'Do freq graphs
+                        InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
+                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for high flow.", True)
+                        InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
+                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for low flow.", True)
+                        'ASCIICommon(lTsFlow)
                         'lStation.Message &= lStation.CalcBF.BF_Message.Trim()
                     Catch ex As Exception
 

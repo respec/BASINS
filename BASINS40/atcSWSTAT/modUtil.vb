@@ -50,6 +50,49 @@ Public Module modUtil
         Public Shared OutputPrefix As String = "OutputPrefix"
         Public Shared DataDir As String = "DataDir"
 
+        Public Shared Function BasicAttributes() As Generic.List(Of String)
+            Dim lBasicAttributes As New Generic.List(Of String)
+            With lBasicAttributes
+                .Add("ID")
+                .Add("Min")
+                .Add("Max")
+                .Add("Mean")
+                .Add("Standard Deviation")
+                .Add("Count")
+                .Add("Count Missing")
+            End With
+            Return lBasicAttributes
+        End Function
+
+        Public Shared Function NDayAttributes() As Generic.List(Of String)
+            Dim lNDayAttributes As New Generic.List(Of String)
+            With lNDayAttributes
+                .Add("STAID")
+                .Add("STANAM")
+                .Add("Constituent")
+            End With
+            Return lNDayAttributes
+        End Function
+
+        Public Shared Function TrendAttributes() As Generic.List(Of String)
+            Dim lTrendAttributes As New Generic.List(Of String)
+            With lTrendAttributes
+                .Add("Original ID")
+                .Add("KENTAU")
+                .Add("KENPLV")
+                .Add("KENSLPL")
+                .Add("From")
+                .Add("To")
+                .Add("Count")
+                .Add("Not Used")
+                .Add("Min")
+                .Add("Max")
+                .Add("Constituent")
+                .Add("STAID")
+            End With
+            Return lTrendAttributes
+        End Function
+
         Public Shared Sub BuildInputSet(ByRef aSpecialSet As atcDataAttributes, ByVal aCommonSet As atcDataAttributes)
             If aSpecialSet Is Nothing Then
                 aSpecialSet = New atcDataAttributes()
@@ -364,16 +407,15 @@ Public Module modUtil
             Return lText.ToString()
         End Function
 
-        Public Shared Function CalculateNF(ByVal aDataGroup As atcTimeseriesGroup, _
+        Public Shared Function CalculateNDayValues(ByVal aDataGroup As atcTimeseriesGroup, _
                                            ByVal aGroupArgs As atcDataAttributes, _
                                            ByVal aNDayDbl() As Double, _
-                                           ByVal aReturnPeriodDbl() As Double) As Boolean
+                                           ByVal aReturnPeriodDbl() As Double, _
+                                           ByVal aHighFlag As Boolean) As Boolean
 
             'ByVal aOperationName As String, ByVal aReturnPeriods() As Double
             'for NDay calculation, no need for high/low setting
             Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
-            Dim lDoHigh As Boolean = False
-            Dim lDoLow As Boolean = False
             Dim lDataGroup As atcTimeseriesGroup = aDataGroup
             With aGroupArgs
                 'lDataGroup = .GetValue("Timeseries", Nothing)
@@ -381,17 +423,6 @@ Public Module modUtil
                 For Each lTs As atcTimeseries In lDataGroup
                     lTs.Attributes.SetValueIfMissing("CalcEMA", True)
                 Next
-                Dim lFlowCondition As String = .GetValue(InputNames.HighLowText, "")
-                If String.IsNullOrEmpty(lFlowCondition) Then
-                    lDoLow = True
-                    lDoHigh = True
-                Else
-                    If lFlowCondition.ToLower = "low" Then
-                        lDoLow = True
-                    ElseIf lFlowCondition.ToLower = "high" Then
-                        lDoLow = True
-                    End If
-                End If
             End With
 
             Dim lCalcArgs As New atcDataAttributes
@@ -401,40 +432,78 @@ Public Module modUtil
                 .SetValue(ReturnPeriod, aReturnPeriodDbl)
             End With
 
-            Dim lOperationName As String = ""
-            Dim lHighDone As Boolean
-            lDoHigh = True 'just do both High and Low flow conditions
-            lDoLow = True
-            If lDoHigh Then
-                lOperationName = "n-day High value"
-                'Set start/end month day etc
-                SetInputsForAnalysis(aGroupArgs, lCalcArgs)
-                Try
-                    lHighDone = lCalculator.Open(lOperationName, lCalcArgs)
-                Catch ex As Exception
-                    lHighDone = False
-                End Try
+            Dim lOperationName As String = "n-day high value"
+            If Not aHighFlag Then
+                lOperationName = "n-day low value"
+            End If
+            SetInputsForAnalysis(aGroupArgs, lCalcArgs, aHighFlag)
+            Dim lNDayValuesCalculated As Boolean
+            Try
+                lNDayValuesCalculated = lCalculator.Open(lOperationName, lCalcArgs)
+            Catch ex As Exception
+                lNDayValuesCalculated = False
+            Finally
                 lCalculator.DataSets.Clear()
-            End If
-            Dim lLowDone As Boolean
-            If lDoLow Then
-                lOperationName = "n-day Low value"
-                SetInputsForAnalysis(aGroupArgs, lCalcArgs, False)
-                Try
-                    lLowDone = lCalculator.Open(lOperationName, lCalcArgs)
-                Catch ex As Exception
-                    lLowDone = False
-                End Try
-                lCalculator.DataSets.Clear()
-            End If
-
-            If Not (lDoHigh AndAlso lHighDone) OrElse Not (lDoLow AndAlso lLowDone) Then
-                Return False
-            Else
-                Return True
-            End If
+                lCalculator = Nothing
+            End Try
+            Return lNDayValuesCalculated
         End Function
 
+        Public Shared Function CalculateNDayTser(ByVal aDataGroup As atcTimeseriesGroup, _
+                                             ByVal aGroupArgs As atcDataAttributes, _
+                                             ByVal aNDayDbl() As Double, _
+                                             ByVal aHighFlag As Boolean) As String
+            Dim lTserListing As String = ""
+            If (aNDayDbl IsNot Nothing AndAlso aNDayDbl.Length > 0) AndAlso aGroupArgs IsNot Nothing Then
+                Dim lCalcArgs As New atcDataAttributes()
+
+                Dim lHighLowText As String = "high"
+                If Not aHighFlag Then
+                    lHighLowText = "low"
+                End If
+
+                SetInputsForAnalysis(aGroupArgs, lCalcArgs, aHighFlag)
+
+                Dim lFirstYear As Integer = lCalcArgs.GetValue(InputNames.StartYear)
+                Dim lastYear As Integer = lCalcArgs.GetValue(InputNames.EndYear)
+                Dim lStartMonth As Integer = lCalcArgs.GetValue(InputNames.StartMonth)
+                Dim lEndMonth As Integer = lCalcArgs.GetValue(InputNames.EndMonth)
+                Dim lStartDay As Integer = lCalcArgs.GetValue(InputNames.StartDay)
+                Dim lEndDay As Integer = lCalcArgs.GetValue(InputNames.EndDay)
+
+                Dim lRankedAnnual As atcTimeseriesGroup = _
+                   clsSWSTATPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=aDataGroup, _
+                                                                 aNDay:=aNDayDbl, aHighFlag:=aHighFlag, _
+                                                                 aFirstYear:=lFirstYear, aLastYear:=lastYear, _
+                                                                 aBoundaryMonth:=lStartMonth, aBoundaryDay:=lStartDay, _
+                                                                 aEndMonth:=lEndMonth, aEndDay:=lEndDay)
+
+                If lRankedAnnual.Count > 0 Then
+                    For Each lTS As atcTimeseries In lRankedAnnual
+                        lTS.Attributes.SetValue("Units", "Common")
+                    Next
+
+                    Dim lList As New atcList.atcListForm
+                    With lList
+                        With .DateFormat
+                            .IncludeDays = False
+                            .IncludeHours = False
+                            .IncludeMinutes = False
+                            .IncludeMonths = False
+                        End With
+                        .Text = "N-Day " & lHighLowText & " Annual Time Series and Ranking"
+                        .Initialize(lRankedAnnual.Clone, NDayAttributes(), True, , False) 'show value, but not show form
+                        .DisplayValueAttributes = True
+                        lTserListing = .ToString()
+                        '.Icon = Me.Icon
+                        .Close()
+                    End With
+                End If
+            Else
+                'Logger.Msg("Inputs are incomplete.")
+            End If
+            Return lTserListing
+        End Function
         Public Shared Function SetInputsForAnalysis(ByVal aSetInputArgs As atcDataAttributes, _
                                          ByRef aCalcArgs As atcDataAttributes, _
                                          Optional ByVal aHighFlow As Boolean = True) As Boolean
@@ -547,10 +616,15 @@ Public Module modUtil
                                            ByVal aDataGroup As atcData.atcTimeseriesGroup, _
                                            ByVal aInputArgs As atcDataAttributes, _
                                            ByVal aNDaysDbl() As Double, _
-                                           ByVal aReturnPeriods() As Double)
+                                           ByVal aReturnPeriods() As Double, _
+                                           ByVal aHighFlag As Boolean)
+
+            Dim lHighLowText As String = "High"
+            If Not aHighFlag Then lHighLowText = "Low"
+            Dim lGraphFilePrefix As String = "FreqGraph_" & lHighLowText
 
             'Calculate("n-day " & lFlowCondition & " value", clsSWSTATPlugin.ListDefaultArray("Return Period"))
-            CalculateNF(aDataGroup, aInputArgs, aNDaysDbl, clsSWSTATPlugin.ListDefaultArray(InputNames.ReturnPeriod))
+            CalculateNDayValues(aDataGroup, aInputArgs, aNDaysDbl, clsSWSTATPlugin.ListDefaultArray(InputNames.ReturnPeriod), aHighFlag)
             Dim lGraphPlugin As New atcGraph.atcGraphPlugin
             Dim lGraphForm As atcGraph.atcGraphForm
 
@@ -611,7 +685,7 @@ Public Module modUtil
                             With lGraphForm
                                 Dim lGraph As New atcGraph.clsGraphFrequency(lDataGroup, .ZedGraphCtrl)
                                 .Grapher = lGraph
-                                Dim lGraphName As String = "FreqGraph_" & lStaId & "_" & lNDayTimeseriesName & ".png"
+                                Dim lGraphName As String = lGraphFilePrefix & "_" & lStaId & "_" & lNDayTimeseriesName & ".png"
                                 .SaveGraph(IO.Path.Combine(aDirectory, lGraphName))
                                 .Close()
                             End With
@@ -641,7 +715,7 @@ Public Module modUtil
                         With lGraphForm
                             Dim lGraph As New atcGraph.clsGraphFrequency(lDataGroup, .ZedGraphCtrl)
                             .Grapher = lGraph
-                            Dim lGraphName As String = "FreqGraph_" & lNDayTimeseriesName & ".png"
+                            Dim lGraphName As String = lGraphFilePrefix & "_" & lNDayTimeseriesName & ".png"
                             .SaveGraph(IO.Path.Combine(aDirectory, lGraphName))
                             .Close()
                         End With
@@ -671,7 +745,7 @@ Public Module modUtil
                         With lGraphForm
                             Dim lGraph As New atcGraph.clsGraphFrequency(lDataGroup, .ZedGraphCtrl)
                             .Grapher = lGraph
-                            Dim lGraphName As String = "FreqGraph_" & lStaId & ".png"
+                            Dim lGraphName As String = lGraphFilePrefix & "_" & lStaId & ".png"
                             .SaveGraph(IO.Path.Combine(aDirectory, lGraphName))
                             .Close()
                         End With
@@ -686,7 +760,7 @@ Public Module modUtil
                 With lGraphForm
                     Dim lGraph As New atcGraph.clsGraphFrequency(aDataGroup, .ZedGraphCtrl)
                     .Grapher = lGraph
-                    Dim lGraphName As String = "FreqGraph_All.png"
+                    Dim lGraphName As String = lGraphFilePrefix & "_All.png"
                     .SaveGraph(IO.Path.Combine(aDirectory, lGraphName))
                     .Close()
                 End With
@@ -697,6 +771,24 @@ Public Module modUtil
             lStnList.Clear()
             lStnList = Nothing
         End Sub
+
+        Public Shared Function DoFrequencyGrid(ByVal aDataGroup As atcTimeseriesGroup, _
+                                           ByVal aGroupArgs As atcDataAttributes, _
+                                           ByVal aNDayDbl() As Double, _
+                                           ByVal aReturnPeriodDbl() As Double, _
+                                           ByVal aHighFlag As Boolean) As String
+
+            Try
+                Dim lNDayValuesHighDone As Boolean = InputNames.CalculateNDayValues(aDataGroup, aGroupArgs, aNDayDbl, aReturnPeriodDbl, aHighFlag)
+                Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=aDataGroup, _
+                                                 aHigh:=aHighFlag, _
+                                                 aNday:=aNDayDbl, _
+                                                 aReturns:=aReturnPeriodDbl)
+                Return lFreqForm.ToString()
+            Catch ex As Exception
+                Return ""
+            End Try
+        End Function
 
         Public Shared Function CheckFreqGrid(ByVal aSource As atcFrequencyGridSource) As String
             Dim lblNote As String = ""
@@ -796,7 +888,7 @@ Public Module modUtil
         Public Shared Function TrendAnalysis(ByVal aDataGroup As atcTimeseriesGroup, _
                                              ByVal aInputArgs As atcDataAttributes, _
                                              ByVal aNDays() As Double, _
-                                             ByVal aHighFlow As Boolean) As atcTimeseriesGridSource
+                                             ByVal aHighFlow As Boolean) As String
             Dim lCalcArgs As New atcDataAttributes()
             'With lCalcArgs
             ' not needed as this is done inside computeRankedAnnualTimeseries
@@ -814,6 +906,7 @@ Public Module modUtil
                                                                  aBoundaryDay:=lCalcArgs.GetValue(InputNames.StartDay), _
                                                                  aEndMonth:=lCalcArgs.GetValue(InputNames.EndMonth), _
                                                                  aEndDay:=lCalcArgs.GetValue(InputNames.EndDay))
+            Dim lTrendGridText As String = ""
             If lRankedAnnual.Count > 0 Then
                 Dim lTrendAttributes As New Generic.List(Of String)
                 Dim lDateFormat As New atcDateFormat
@@ -830,32 +923,38 @@ Public Module modUtil
                         .SetValue("Not Used", .GetValue("Count Missing"))
                     End With
                 Next
-                Dim lTrendSource As New atcTimeseriesGridSource(lRankedAnnual, lTrendAttributes, False, True)
+                Dim lTrendSource As New atcTimeseriesGridSource(lRankedAnnual, TrendAttributes(), True, True)
                 'mnuViewValues.Checked, _
                 'mnuFilterNoData.Checked)
                 With lTrendSource
                     .AttributeValuesEditable = True 'mnuEditAtrributeValues.Checked
                     .DisplayValueAttributes = False 'mnuViewValueAttributes.Checked
                     .DateFormat = lDateFormat
-                    '.ValueFormat(pMaxWidth, pFormat, pExpFormat, pCantFit, pSignificantDigits)
                 End With
-                'Dim lList As New atcList.atcListForm
-                'With lList
-                '    With .DateFormat
-                '        .IncludeDays = False
-                '        .IncludeHours = False
-                '        .IncludeMinutes = False
-                '        .IncludeMonths = False
-                '    End With
-                '    .Text = "Trend of High Annual Time Series and Statistics"
-                '    .Initialize(lRankedAnnual, lTrendAttributes, False)
-                '    .SwapRowsColumns = True
-                '    '.Icon = Me.Icon
-                'End With
-                Return lTrendSource
+                Dim lList As New atcList.atcListForm
+                With lList
+                    With .DateFormat
+                        .IncludeDays = False
+                        .IncludeHours = False
+                        .IncludeMinutes = False
+                        .IncludeMonths = False
+                    End With
+                    If aHighFlow Then
+                        .Text = "Trend of High Annual Time Series and Statistics"
+                    Else
+                        .Text = "Trend of Low Annual Time Series and Statistics"
+                    End If
+
+                    .Initialize(lRankedAnnual, lTrendAttributes, , , False)
+                    .SwapRowsColumns = True
+                    '.Icon = Me.Icon
+                    lTrendGridText = .ToString()
+                End With
+                'Return lTrendSource
             Else
-                Return Nothing
+                'Return Nothing
             End If
+            Return lTrendGridText
         End Function
     End Class
 End Module

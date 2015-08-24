@@ -20,7 +20,11 @@ Friend Class frmDisplayFrequencyGrid
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, ByVal aHigh As Boolean, ByVal aNday() As Double, ByVal aReturns() As Double)
+    Public Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, _
+                   ByVal aHigh As Boolean, _
+                   ByVal aNday() As Double, _
+                   ByVal aReturns() As Double, _
+                   Optional ByVal aShowForm As Boolean = True)
         MyBase.New()
         pInitializing = True
         Me.Visible = False
@@ -30,18 +34,20 @@ Friend Class frmDisplayFrequencyGrid
 
         InitializeComponent() 'required by Windows Form Designer
 
-        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-        For Each lDisp As atcDataDisplay In DisplayPlugins
-            Dim lMenuText As String = lDisp.Name
-            If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
-            mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
-        Next
+        If aShowForm Then
+            Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
+            For Each lDisp As atcDataDisplay In DisplayPlugins
+                Dim lMenuText As String = lDisp.Name
+                If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
+                mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
+            Next
+        End If
 
         pSource = Nothing 'Get rid of obsolete source before changing HighDisplay to avoid refresh trouble
         Me.HighDisplay = aHigh
         If pInitializing Then
             pInitializing = False
-            Me.Show()
+            If aShowForm Then Me.Show()
         End If
         PopulateGrid()
     End Sub
