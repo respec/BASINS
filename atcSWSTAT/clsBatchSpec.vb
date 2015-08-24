@@ -521,6 +521,7 @@ Public Class clsBatchSpec
                         lSW.Flush()
                         lSW.Close()
                         lSW = Nothing
+                        lTrendHighGridText = ""
                         UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend high flow analysis.", True)
                         Dim lTrendLowGridText = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, False)
                         lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisLowFlowReport.txt"), False)
@@ -528,6 +529,7 @@ Public Class clsBatchSpec
                         lSW.Flush()
                         lSW.Close()
                         lSW = Nothing
+                        lTrendLowGridText = ""
                         UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend low flow analysis.", True)
                         'Do freq graphs
                         InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
