@@ -41,10 +41,6 @@ Module DFLOWCalcs
     Friend fFirstYear As Integer = -1
     Friend fLastYear As Integer = -1
 
-    Public Class BatchInputNamesDFLOW
-
-    End Class
-
     Friend Function Sig2(ByVal x As Double) As String
         If x >= 100 Then
             Sig2 = Format(x, "Scientific")
