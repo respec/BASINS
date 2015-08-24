@@ -783,7 +783,8 @@ Public Module modUtil
                 Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=aDataGroup, _
                                                  aHigh:=aHighFlag, _
                                                  aNday:=aNDayDbl, _
-                                                 aReturns:=aReturnPeriodDbl)
+                                                 aReturns:=aReturnPeriodDbl, _
+                                                 aShowForm:=False)
                 Return lFreqForm.ToString()
             Catch ex As Exception
                 Return ""
@@ -944,8 +945,7 @@ Public Module modUtil
                     Else
                         .Text = "Trend of Low Annual Time Series and Statistics"
                     End If
-
-                    .Initialize(lRankedAnnual, lTrendAttributes, , , False)
+                    .Initialize(lRankedAnnual, TrendAttributes(), , , False)
                     .SwapRowsColumns = True
                     '.Icon = Me.Icon
                     lTrendGridText = .ToString()
