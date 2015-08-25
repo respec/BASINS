@@ -9,6 +9,7 @@ Public Class frmDFLOWArgs
 
     Private pDateFormat As New atcDateFormat
     Private Shared pLastDayOfMonth() As Integer = {99, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+    Public Event ParametersSet(ByVal aArgs As atcDataAttributes)
 
     Public Sub Initialize(ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup, _
                           ByVal attributes As atcDataAttributes)

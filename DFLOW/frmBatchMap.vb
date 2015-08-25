@@ -18,7 +18,7 @@ Public Class frmBatchMap
     Private pGroupsInputsSWSTAT As atcCollection 'Of atcDataAttributes per group
     Private pBatchSpecFilefullname As String = ""
 
-    Private WithEvents pfrmParams As frmSWSTAT
+    Private WithEvents pfrmParams As frmDFLOWArgs
 
     Private ReadOnly Property GetDataFileFullPath(ByVal aStationId As String) As String
         Get
@@ -202,7 +202,7 @@ Public Class frmBatchMap
 
                 'Try to use global setting as much as possible
                 If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
-                    atcSWSTAT.modUtil.InputNames.BuildInputSet(lBatchInputs, pGlobalInputsSWSTAT)
+                    modUtil.InputNames.BuildInputSet(lBatchInputs, pGlobalInputsSWSTAT)
                 ElseIf lGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
                 Else
 
@@ -211,7 +211,7 @@ Public Class frmBatchMap
                 Dim lTsGroup As atcTimeseriesGroup = BuildTserGroup(lGroupNode)
                 If lTsGroup.Count > 0 Then
                     If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
-                        pfrmParams = New atcSWSTAT.frmSWSTAT()
+                        pfrmParams = New frmDFLOWArgs()
                         pfrmParams.Initialize(lTsGroup, lBatchInputs)
                         'pfrmParameters = pfrmParameters.GetType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
                         'pfrmParameters.GetType.InvokeMember("Initialize", Reflection.BindingFlags.InvokeMethod, Nothing, Nothing, New Object() {lTsGroup, lBatchInputs})
@@ -221,13 +221,13 @@ Public Class frmBatchMap
                 Dim lNodeText As String = node.Text
                 If lNodeText.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
                     pGlobalInputsSWSTAT.SetValue("Operation", "GlobalSetParm")
-                    pfrmParams = New atcSWSTAT.frmSWSTAT()
-                    atcSWSTAT.modUtil.InputNames.BuildInputSet(pGlobalInputsSWSTAT, Nothing)
-                    Dim lNDay() As Double = pGlobalInputsSWSTAT.GetValue(atcSWSTAT.modUtil.InputNames.NDay, Nothing)
-                    Dim lNDays As atcCollection = pGlobalInputsSWSTAT.GetValue(atcSWSTAT.modUtil.InputNames.NDays, Nothing)
-                    Dim lRP() As Double = pGlobalInputsSWSTAT.GetValue(atcSWSTAT.modUtil.InputNames.ReturnPeriod, Nothing)
-                    Dim lRPs As atcCollection = pGlobalInputsSWSTAT.GetValue(atcSWSTAT.modUtil.InputNames.ReturnPeriods, Nothing)
-                    pfrmParams.Initialize(Nothing, pGlobalInputsSWSTAT)
+                    pfrmParams = New frmDFLOWArgs()
+                    modUtil.InputNames.BuildInputSet(pGlobalInputsSWSTAT, Nothing)
+                    'Dim lNDay() As Double = pGlobalInputsSWSTAT.GetValue(modUtil.InputNames.NDay, Nothing)
+                    'Dim lNDays As atcCollection = pGlobalInputsSWSTAT.GetValue(modUtil.InputNames.NDays, Nothing)
+                    'Dim lRP() As Double = pGlobalInputsSWSTAT.GetValue(modUtil.InputNames.ReturnPeriod, Nothing)
+                    'Dim lRPs As atcCollection = pGlobalInputsSWSTAT.GetValue(modUtil.InputNames.ReturnPeriods, Nothing)
+                    'pfrmParams.Initialize(Nothing, pGlobalInputsSWSTAT)
                 End If
         End Select
     End Sub
