@@ -205,29 +205,28 @@ Public Class clsBatchSpec
             '    End If
             Case InputNames.Method.ToLower()
                 Dim lMethods As atcCollection = GlobalSettings.GetValue(InputNames.Methods)
-
-                Dim lMethod As InputNames.ITAMethod = 0
-                Select Case lArr(1).ToUpper()
-                    Case InputNames.ITAMethod.FREQUECYGRID.ToString().ToUpper()
-                        lMethod = InputNames.ITAMethod.FREQUECYGRID
-                    Case InputNames.ITAMethod.FREQUENCYGRAPH.ToString().ToUpper()
-                        lMethod = InputNames.ITAMethod.FREQUENCYGRAPH
-                    Case InputNames.ITAMethod.NDAYTIMESERIES.ToString().ToUpper()
-                        lMethod = InputNames.ITAMethod.NDAYTIMESERIES
-                    Case InputNames.ITAMethod.TRENDLIST.ToString().ToUpper()
-                        lMethod = InputNames.ITAMethod.TRENDLIST
-                End Select
-                If lMethod > 0 Then
-                    If lMethods Is Nothing Then
-                        lMethods = New atcCollection()
-                        lMethods.Add(lMethod)
-                        GlobalSettings.Add(InputNames.Methods, lMethods)
-                    Else
-                        If Not lMethods.Contains(lMethod) Then
-                            lMethods.Add(lMethod)
-                        End If
-                    End If
-                End If
+                'Dim lMethod As InputNames.ITAMethod = 0
+                'Select Case lArr(1).ToUpper()
+                '    Case InputNames.ITAMethod.FREQUECYGRID.ToString().ToUpper()
+                '        lMethod = InputNames.ITAMethod.FREQUECYGRID
+                '    Case InputNames.ITAMethod.FREQUENCYGRAPH.ToString().ToUpper()
+                '        lMethod = InputNames.ITAMethod.FREQUENCYGRAPH
+                '    Case InputNames.ITAMethod.NDAYTIMESERIES.ToString().ToUpper()
+                '        lMethod = InputNames.ITAMethod.NDAYTIMESERIES
+                '    Case InputNames.ITAMethod.TRENDLIST.ToString().ToUpper()
+                '        lMethod = InputNames.ITAMethod.TRENDLIST
+                'End Select
+                'If lMethod > 0 Then
+                '    If lMethods Is Nothing Then
+                '        lMethods = New atcCollection()
+                '        lMethods.Add(lMethod)
+                '        GlobalSettings.Add(InputNames.Methods, lMethods)
+                '    Else
+                '        If Not lMethods.Contains(lMethod) Then
+                '            lMethods.Add(lMethod)
+                '        End If
+                '    End If
+                'End If
             Case InputNames.DataDir.ToLower
                 If Not String.IsNullOrEmpty(lArr(1)) AndAlso IO.Directory.Exists(lArr(1)) Then
                     DownloadDataDirectory = lArr(1)
@@ -334,31 +333,31 @@ Public Class clsBatchSpec
                 '        Next
                 '    End If
             Case InputNames.Method.ToLower
-                Dim lMethod As InputNames.ITAMethod = 0
-                Select Case lArr(1).Trim().ToUpper()
-                    Case InputNames.ITAMethod.FREQUECYGRID.ToString().ToUpper()
-                        lMethod = InputNames.ITAMethod.FREQUECYGRID
-                    Case InputNames.ITAMethod.FREQUENCYGRAPH.ToString().ToUpper()
-                        lMethod = InputNames.ITAMethod.FREQUENCYGRAPH
-                    Case InputNames.ITAMethod.NDAYTIMESERIES.ToString().ToUpper()
-                        lMethod = InputNames.ITAMethod.NDAYTIMESERIES
-                    Case InputNames.ITAMethod.TRENDLIST.ToString().ToUpper()
-                        lMethod = InputNames.ITAMethod.TRENDLIST
-                End Select
-                If lMethod > 0 Then
-                    For Each lStation As clsBatchUnitStation In lListBatchUnits
-                        Dim lMethods As atcCollection = lStation.BFInputs.GetValue(InputNames.Methods)
-                        If lMethods Is Nothing Then
-                            lMethods = New atcCollection()
-                            lMethods.Add(lMethod)
-                            lStation.BFInputs.Add(InputNames.Methods, lMethods)
-                        Else
-                            If Not lMethods.Contains(lMethod) Then
-                                lMethods.Add(lMethod)
-                            End If
-                        End If
-                    Next
-                End If
+                'Dim lMethod As InputNames.ITAMethod = 0
+                'Select Case lArr(1).Trim().ToUpper()
+                '    Case InputNames.ITAMethod.FREQUECYGRID.ToString().ToUpper()
+                '        lMethod = InputNames.ITAMethod.FREQUECYGRID
+                '    Case InputNames.ITAMethod.FREQUENCYGRAPH.ToString().ToUpper()
+                '        lMethod = InputNames.ITAMethod.FREQUENCYGRAPH
+                '    Case InputNames.ITAMethod.NDAYTIMESERIES.ToString().ToUpper()
+                '        lMethod = InputNames.ITAMethod.NDAYTIMESERIES
+                '    Case InputNames.ITAMethod.TRENDLIST.ToString().ToUpper()
+                '        lMethod = InputNames.ITAMethod.TRENDLIST
+                'End Select
+                'If lMethod > 0 Then
+                '    For Each lStation As clsBatchUnitStation In lListBatchUnits
+                '        Dim lMethods As atcCollection = lStation.BFInputs.GetValue(InputNames.Methods)
+                '        If lMethods Is Nothing Then
+                '            lMethods = New atcCollection()
+                '            lMethods.Add(lMethod)
+                '            lStation.BFInputs.Add(InputNames.Methods, lMethods)
+                '        Else
+                '            If Not lMethods.Contains(lMethod) Then
+                '                lMethods.Add(lMethod)
+                '            End If
+                '        End If
+                '    Next
+                'End If
             Case InputNames.OutputDir.ToLower
                 Dim lOutputDir As String = lArr(1).Trim()
                 If Not String.IsNullOrEmpty(lOutputDir) AndAlso IO.Directory.Exists(lOutputDir) Then

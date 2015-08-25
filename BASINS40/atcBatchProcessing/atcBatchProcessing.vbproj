@@ -101,6 +101,12 @@
     <Compile Include="clsBatchSpec.vb" />
     <Compile Include="clsBatchUnitStation.vb" />
     <Compile Include="clsBatchUtil.vb" />
+    <Compile Include="frmBatch.Designer.vb">
+      <DependentUpon>frmBatch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBatch.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmStations.designer.vb">
       <DependentUpon>frmStations.vb</DependentUpon>
     </Compile>
@@ -124,6 +130,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmBatch.resx">
+      <DependentUpon>frmBatch.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmStations.resx">
       <DependentUpon>frmStations.vb</DependentUpon>
     </EmbeddedResource>

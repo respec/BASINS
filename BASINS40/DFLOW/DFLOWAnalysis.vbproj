@@ -55,6 +55,11 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Interop.MapWinGIS, Version=4.8.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.3.2955.40261, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
@@ -84,12 +89,6 @@
     </Compile>
     <Compile Include="DFLOWAnalysisPlugin.vb" />
     <Compile Include="DFLOWCalcs.vb" />
-    <Compile Include="frmBatch.Designer.vb">
-      <DependentUpon>frmBatch.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmBatch.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmBatchMap.Designer.vb">
       <DependentUpon>frmBatchMap.vb</DependentUpon>
     </Compile>
@@ -141,9 +140,6 @@
     <EmbeddedResource Include="frmAboutDFLOW.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmAboutDFLOW.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmBatch.resx">
-      <DependentUpon>frmBatch.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmBatchMap.resx">
       <DependentUpon>frmBatchMap.vb</DependentUpon>
@@ -201,6 +197,11 @@
     <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow.vbproj">
       <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
       <Name>atcTimeseriesNdayHighLow</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUSGSUtility\atcUSGSUtility.vbproj">
+      <Project>{4DBC8159-1072-41FA-9242-933E12A88EE6}</Project>
+      <Name>atcUSGSUtility</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
