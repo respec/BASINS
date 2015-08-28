@@ -264,13 +264,13 @@ Public Module Utility
                 End With
             Case "P-PQUAL"
                 With lConstituentsToOutput
-                    .Add("P:Header1", "Ortho P (lb/ac)")
+                    .Add("P:Header1", "ORTHO P (lb/ac)")
                     .Add("P:WASHQS-ORTHO P", "  Sediment Attached")
                     .Add("P:SOQUAL-ORTHO P", "  Surface Flow")
                     .Add("P:IOQUAL-ORTHO P", "  Interflow")
                     .Add("P:AOQUAL-ORTHO P", "  Groundwater Flow")
                     .Add("P:POQUAL-ORTHO P", "  Total")
-                    .Add("I:Header2", "Ortho P (lb/ac)")
+                    .Add("I:Header2", "ORTHO P (lb/ac)")
                     .Add("I:SOQUAL-ORTHO P", "  Surface Flow")
                     .Add("R:Header3", "Total P")
                     .Add("R:P-TOT-IN", "  Total P Inflow")
@@ -608,10 +608,10 @@ Public Module Utility
                     .Add("P:TP4IMB", "    Total")
 
 
-                    .Add("P:Header7", "Ortho P (PQUAL)")
-                    .Add("P:SOQUAL-Ortho P", "  Surface Flow")
-                    .Add("P:IOQUAL-Ortho P", "  Interflow")
-                    .Add("P:AOQUAL-Ortho P", "  Groundwater Flow")
+                    .Add("P:Header7", "ORTHO P (PQUAL)")
+                    .Add("P:SOQUAL-ORTHO P", "  Surface Flow")
+                    .Add("P:IOQUAL-ORTHO P", "  Interflow")
+                    .Add("P:AOQUAL-ORTHO P", "  Groundwater Flow")
                     .Add("P:Total3a", "  Total")
 
                     .Add("P:Header8", "RefOrgP (PQUAL)")
@@ -628,8 +628,8 @@ Public Module Utility
                     .Add("P:AOQUAL-BOD2", "  Groundwater Flow")
                     .Add("P:Total3c", "  Total")
 
-                    .Add("I:Header10", "Ortho P (IQUAL)")
-                    .Add("I:SOQUAL-Ortho P", "  Surface Flow")
+                    .Add("I:Header10", "ORTHO P (IQUAL)")
+                    .Add("I:SOQUAL-ORTHO P", "  Surface Flow")
 
                     .Add("I:Header11", "RefOrgP (IQUAL)")
                     .Add("I:SOQUAL-BOD1", "  Surface Flow")
@@ -1055,7 +1055,7 @@ Public Module Utility
                             Case "POQUAL-NH3+NH4_NUIF1_2", "SOQUAL-NH3+NH4_NUIF1_2", "AOQUAL-NH3+NH4_NUIF1_2", "IOQUAL-NH3+NH4_NUIF1_2"
                                 If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
                                     lMassLinkFactor = lMassLink.MFact
-                                    Return lMassLinkFactor
+                                    'Return lMassLinkFactor
                                 End If
 
                             Case "POQUAL-NH3+NH4_NUIF2_2", "SOQUAL-NH3+NH4_NUIF2_2", "AOQUAL-NH3+NH4_NUIF2_2", "IOQUAL-NH3+NH4_NUIF2_2", _
@@ -1063,8 +1063,8 @@ Public Module Utility
                                 "POQUAL-NH3+NH4_NUIF2_1", "SOQUAL-NH3+NH4_NUIF2_1", "AOQUAL-NH3+NH4_NUIF2_1", "IOQUAL-NH3+NH4_NUIF2_1"
                                 If lMassLink.Target.MemSub2 = 1 Then
                                     If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
-                                        lMassLinkFactor = lMassLink.MFact
-                                        Return lMassLinkFactor
+                                        lMassLinkFactor += lMassLink.MFact
+                                        'Return lMassLinkFactor
                                     End If
 
                                 End If
@@ -1113,12 +1113,14 @@ Public Module Utility
 
 
                     Case "TotalP"
+                        'If aConstituent.Contains("SOQUAL") Then Stop
                         Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
                             "_" & lMassLink.Target.MemSub1
+
                             Case "POQUAL-ORTHO P_NUIF1_4", "SOQUAL-ORTHO P_NUIF1_4", "IOQUAL-ORTHO P_NUIF1_4", "AOQUAL-ORTHO P_NUIF1_4"
                                 If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
                                     lMassLinkFactor = lMassLink.MFact
-                                    Return lMassLinkFactor
+                                    'Return lMassLinkFactor
                                 End If
                             Case "POQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_2", "AOQUAL-ORTHO P_NUIF2_2", "IOQUAL-ORTHO P_NUIF2_2", _
                                 "POQUAL-ORTHO P_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_3", "AOQUAL-ORTHO P_NUIF2_3", "IOQUAL-ORTHO P_NUIF2_3", _
@@ -1126,8 +1128,8 @@ Public Module Utility
 
                                 If lMassLink.Target.MemSub2 = 2 Then
                                     If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
-                                        lMassLinkFactor = lMassLink.MFact
-                                        Return lMassLinkFactor
+                                        lMassLinkFactor += lMassLink.MFact
+                                        'Return lMassLinkFactor
                                     End If
 
                                 End If
@@ -1143,7 +1145,7 @@ Public Module Utility
                                     End If
                                     Return lMassLinkFactor
                                 End If
-                                
+
 
                             Case "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW_NUIF1_4"
                                 lMassLinkFactor = lMassLink.MFact
@@ -1166,7 +1168,7 @@ Public Module Utility
                             Case "ORGN - TOTAL OUTFLOW_OXIF_2"
                                 lMassLinkFactor = lMassLink.MFact * aConversionFactor
                                 Return lMassLinkFactor
-                            
+
                         End Select
                     Case "BOD-PQUAL"
                         Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
