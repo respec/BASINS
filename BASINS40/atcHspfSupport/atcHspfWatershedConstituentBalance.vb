@@ -1076,8 +1076,8 @@ Public Module WatershedConstituentBalance
         Dim lSkipTo As String = Nothing
         Select Case aConstituentKey
             Case "P:NO3+NO2-N - SURFACE LAYER OUTFLOW", "NO3+NO2-N - SURFACE LAYER OUTFLOW" : lSkipTo = "NO3 (PQUAL)"
-            Case "P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW" : lSkipTo = "Ortho P (PQUAL)"
-            Case "P:SOQUAL-Ortho P", "SOQUAL-Ortho P" : lSkipTo = "Ortho P (IQUAL)"
+            Case "P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW" : lSkipTo = "ORTHO P (PQUAL)"
+            Case "P:SOQUAL-ORTHO P", "SOQUAL-ORTHO P" : lSkipTo = "ORTHO P (IQUAL)"
             Case "P:SOQUAL-NO3", "SOQUAL-NO3" : lSkipTo = "NO3 (IQUAL)"
             Case "P:WASHQS-BOD", "WASHQS-BOD" : lSkipTo = "  BOD from OrganicN"
             Case "P:ORGN - TOTAL OUTFLOW", "ORGN - TOTAL OUTFLOW" : lSkipTo = "BOD"
