@@ -269,7 +269,7 @@ Module HSPFOutputReports
                     For Each lExpertSystemFileName As String In lExpertSystemFileNames
                         Logger.Status(Now & " Calculating Expert Statistics for the file " & lExpertSystemFileName, True)
                         Try
-                            Logger.Dbg(Now & " Calculating run statistics to save in " & pBaseName & ".sts")
+                            Logger.Dbg(Now & " Calculating run statistics.")
                             lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lExpertSystemFileName)
                             Dim lHydrologyWDMFileName As String = lExpertSystem.ExpertWDMFileName
                             lStr = lExpertSystem.Report
