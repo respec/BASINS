@@ -89,6 +89,12 @@
     </Compile>
     <Compile Include="DFLOWAnalysisPlugin.vb" />
     <Compile Include="DFLOWCalcs.vb" />
+    <Compile Include="frmBatch.Designer.vb">
+      <DependentUpon>frmBatch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBatch.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmBatchMap.Designer.vb">
       <DependentUpon>frmBatchMap.vb</DependentUpon>
     </Compile>
@@ -140,6 +146,9 @@
     <EmbeddedResource Include="frmAboutDFLOW.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmAboutDFLOW.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBatch.resx">
+      <DependentUpon>frmBatch.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmBatchMap.resx">
       <DependentUpon>frmBatchMap.vb</DependentUpon>

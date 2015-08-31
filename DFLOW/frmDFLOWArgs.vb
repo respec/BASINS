@@ -79,7 +79,7 @@ Public Class frmDFLOWArgs
                 Me.Text = "DFLOW Inputs-Set Group Parameters (" & pAttributes.GetValue("Group", "") & ")"
             End If
 
-            lMessage = SaveBatchSettings(attributes)
+            lMessage = SaveBatchSettings(attributes, aTimeseriesGroup)
         End If
         If String.IsNullOrEmpty(lMessage) Then
             If pSetGlobalParams Then
@@ -91,11 +91,11 @@ Public Class frmDFLOWArgs
             RaiseEvent ParametersSet(pAttributes)
         Else
             Logger.Msg("Please address the following issues before proceed." & vbCrLf & lMessage, "Batch Run DFLOW")
-            lMessage = SaveBatchSettings(attributes)
+            lMessage = SaveBatchSettings(attributes, aTimeseriesGroup)
         End If
     End Sub
 
-    Private Function SaveBatchSettings(ByVal aChoice As atcDataAttributes) As String
+    Private Function SaveBatchSettings(ByVal aChoice As atcDataAttributes, Optional ByVal aDataGroup As atcTimeseriesGroup = Nothing) As String
         Dim lMessage As String = ""
         If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
             'aCBList = Me.clbDataSets
@@ -139,6 +139,10 @@ Public Class frmDFLOWArgs
                 .SetValue(InputNames.OutputDir, loutputdir)
             End If
             .SetValue(InputNames.OutputPrefix, txtOutputRootName.Text)
+            If Not pSetGlobalParams AndAlso aDataGroup IsNot Nothing Then
+                Dim lStationsInfo As atcCollection = InputNames.BuildStationsInfo(aDataGroup)
+                .SetValue(InputNames.StationsInfo, lStationsInfo)
+            End If
         End With
         Return lMessage
     End Function
