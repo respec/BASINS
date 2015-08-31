@@ -51,25 +51,75 @@ Module DFLOWCalcs
         End If
     End Function
 
+    Friend Sub Initialize(Optional ByVal aChoice As atcDataAttributes = Nothing)
+        If aChoice Is Nothing Then
+            ' This sets the initial values for DFLOW calculations - CMC, 7Q10
+            fBioDefault = True
+            fBioType = 0
+            fBioPeriod = 1
+            fBioYears = 3
+            fBioCluster = 120
+            fBioExcursions = 5
 
-    Friend Sub Initialize()
+            fNonBioType = 0
+            fAveragingPeriod = 7
+            fReturnPeriod = 10
+            fExplicitFlow = 1.0
+            fPercentile = 0.1
 
-        ' This sets the initial values for DFLOW calculations - CMC, 7Q10
+            aChoice = New atcDataAttributes()
+            With aChoice
+                .SetValue(InputNames.EBioDFlowType.Acute_maximum_concentration.ToString(), GetBioDefaultParams(InputNames.EBioDFlowType.Acute_maximum_concentration))
+                .SetValue(InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString(), GetBioDefaultParams(InputNames.EBioDFlowType.Chronic_continuous_concentration))
+                .SetValue(InputNames.EBioDFlowType.Ammonia.ToString(), GetBioDefaultParams(InputNames.EBioDFlowType.Ammonia))
+                .SetValue(InputNames.EDFlowType.Hydrological.ToString(), New Integer() {7, 10})
+                .SetValue(InputNames.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                .SetValue(InputNames.EDFlowType.Flow_Percentile.ToString(), 0.1)
+            End With
+        Else
+            With aChoice
+                fBioDefault = .GetValue(InputNames.BioUseDefault, True)
+                fBioType = .GetValue(InputNames.BioSelectedMethod, InputNames.EBioDFlowType.Acute_maximum_concentration)
+                Dim lBio4Params() As Integer '= GetBioDefaultParams(fBioType)
+                If fBioDefault Then
+                    lBio4Params = GetBioDefaultParams(fBioType)
+                Else
+                    Select Case fBioType
+                        Case InputNames.EBioDFlowType.Acute_maximum_concentration
+                            lBio4Params = .GetValue(InputNames.EBioDFlowType.Acute_maximum_concentration.ToString(), GetBioDefaultParams(fBioType))
+                        Case InputNames.EBioDFlowType.Chronic_continuous_concentration
+                            lBio4Params = .GetValue(InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString(), GetBioDefaultParams(fBioType))
+                        Case InputNames.EBioDFlowType.Ammonia
+                            lBio4Params = .GetValue(InputNames.EBioDFlowType.Ammonia.ToString(), GetBioDefaultParams(fBioType))
+                    End Select
+                End If
+                fBioPeriod = lBio4Params(0)
+                fBioYears = lBio4Params(1)
+                fBioCluster = lBio4Params(2)
+                fBioExcursions = lBio4Params(3)
 
-        fBioDefault = True
-        fBioType = 0
-        fBioPeriod = 1
-        fBioYears = 3
-        fBioCluster = 120
-        fBioExcursions = 5
+                fNonBioType = .GetValue(InputNames.NBioSelectedMethod, InputNames.EDFlowType.Hydrological)
+                Dim lHydro2Params() As Integer = .GetValue(InputNames.EDFlowType.Hydrological.ToString(), New Integer() {7, 10})
+                fAveragingPeriod = lHydro2Params(0)
+                fReturnPeriod = lHydro2Params(1)
 
-        fNonBioType = 0
-        fAveragingPeriod = 7
-        fReturnPeriod = 10
-        fExplicitFlow = 1.0
-        fPercentile = 0.1
-
+                fExplicitFlow = .GetValue(InputNames.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                fPercentile = .GetValue(InputNames.EDFlowType.Flow_Percentile.ToString(), 0.1)
+            End With
+        End If
     End Sub
+
+    Private Function GetBioDefaultParams(ByVal aBioType As Integer) As Integer()
+        Dim lBioParam(3) As Integer
+        For I As Integer = 0 To UBound(fBioFPArray, 1)
+            If I = aBioType Then
+                For p As Integer = 0 To 3
+                    lBioParam(p) = fBioFPArray(I, p)
+                Next
+            End If
+        Next
+        Return lBioParam
+    End Function
 
     Friend Function xQy(ByVal aDays As Integer, ByVal aYears As Double, ByVal aDataSet As atcTimeseries) As Double
         Dim lResult As Double = GetNaN()
@@ -209,7 +259,7 @@ Module DFLOWCalcs
             aExcursionCount = lExcL
             Return lFL
         Else
-            Return GetNaN
+            Return GetNaN()
         End If
     End Function
 
@@ -323,13 +373,13 @@ Module DFLOWCalcs
                     .Start = lExcursion.Start
                     .Finish = lEx
                     .Excursions = 0
-                    .events = 0
+                    .Events = 0
                 End With
             End If
             ' add excursion period to cluster
             With lCluster
                 .Finish = lEx
-                .events = .events + 1
+                .Events = .Events + 1
                 .Excursions = .Excursions + lExcursion.SumLength
                 If .Excursions > aMaxExc Then
                     .Excursions = aMaxExc

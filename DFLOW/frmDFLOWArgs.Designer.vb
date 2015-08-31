@@ -63,26 +63,36 @@ Partial Class frmDFLOWArgs
         Me.lblOmitAfter = New System.Windows.Forms.Label
         Me.tbOmitAfterYear = New System.Windows.Forms.TextBox
         Me.tbOmitBeforeYear = New System.Windows.Forms.TextBox
+        Me.gbTextOutput = New System.Windows.Forms.GroupBox
+        Me.txtOutputDir = New System.Windows.Forms.TextBox
+        Me.lblOutputDir = New System.Windows.Forms.Label
+        Me.txtOutputRootName = New System.Windows.Forms.TextBox
+        Me.lblBaseFilename = New System.Windows.Forms.Label
         Me.gbBio.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.grpDates.SuspendLayout()
         Me.grpYears.SuspendLayout()
+        Me.gbTextOutput.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(418, 416)
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button1.Location = New System.Drawing.Point(684, 535)
+        Me.Button1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.Size = New System.Drawing.Size(100, 28)
         Me.Button1.TabIndex = 0
         Me.Button1.Text = "OK"
         Me.Button1.UseVisualStyleBackColor = True
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(499, 416)
+        Me.Button2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button2.Location = New System.Drawing.Point(792, 535)
+        Me.Button2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(75, 23)
+        Me.Button2.Size = New System.Drawing.Size(100, 28)
         Me.Button2.TabIndex = 1
         Me.Button2.Text = "Cancel"
         Me.Button2.UseVisualStyleBackColor = True
@@ -101,9 +111,11 @@ Partial Class frmDFLOWArgs
         Me.gbBio.Controls.Add(Me.rbBio2)
         Me.gbBio.Controls.Add(Me.rbBio1)
         Me.gbBio.Controls.Add(Me.ckbBio)
-        Me.gbBio.Location = New System.Drawing.Point(335, 12)
+        Me.gbBio.Location = New System.Drawing.Point(447, 15)
+        Me.gbBio.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.gbBio.Name = "gbBio"
-        Me.gbBio.Size = New System.Drawing.Size(332, 229)
+        Me.gbBio.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.gbBio.Size = New System.Drawing.Size(443, 282)
         Me.gbBio.TabIndex = 2
         Me.gbBio.TabStop = False
         Me.gbBio.Text = "Biological Design Flow Parameters"
@@ -111,27 +123,30 @@ Partial Class frmDFLOWArgs
         'tbBio3
         '
         Me.tbBio3.Enabled = False
-        Me.tbBio3.Location = New System.Drawing.Point(263, 170)
+        Me.tbBio3.Location = New System.Drawing.Point(351, 209)
+        Me.tbBio3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbBio3.Name = "tbBio3"
-        Me.tbBio3.Size = New System.Drawing.Size(46, 20)
+        Me.tbBio3.Size = New System.Drawing.Size(60, 22)
         Me.tbBio3.TabIndex = 11
         Me.tbBio3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbBio4
         '
         Me.tbBio4.Enabled = False
-        Me.tbBio4.Location = New System.Drawing.Point(263, 195)
+        Me.tbBio4.Location = New System.Drawing.Point(351, 240)
+        Me.tbBio4.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbBio4.Name = "tbBio4"
-        Me.tbBio4.Size = New System.Drawing.Size(46, 20)
+        Me.tbBio4.Size = New System.Drawing.Size(60, 22)
         Me.tbBio4.TabIndex = 10
         Me.tbBio4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbBio2
         '
         Me.tbBio2.Enabled = False
-        Me.tbBio2.Location = New System.Drawing.Point(263, 145)
+        Me.tbBio2.Location = New System.Drawing.Point(351, 178)
+        Me.tbBio2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbBio2.Name = "tbBio2"
-        Me.tbBio2.Size = New System.Drawing.Size(46, 20)
+        Me.tbBio2.Size = New System.Drawing.Size(60, 22)
         Me.tbBio2.TabIndex = 9
         Me.tbBio2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -139,9 +154,10 @@ Partial Class frmDFLOWArgs
         '
         Me.Label4.AutoSize = True
         Me.Label4.Enabled = False
-        Me.Label4.Location = New System.Drawing.Point(3, 198)
+        Me.Label4.Location = New System.Drawing.Point(4, 244)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(247, 13)
+        Me.Label4.Size = New System.Drawing.Size(330, 17)
         Me.Label4.TabIndex = 8
         Me.Label4.Text = "Average number of excursions counted per cluster:"
         '
@@ -149,9 +165,10 @@ Partial Class frmDFLOWArgs
         '
         Me.Label3.AutoSize = True
         Me.Label3.Enabled = False
-        Me.Label3.Location = New System.Drawing.Point(3, 173)
+        Me.Label3.Location = New System.Drawing.Point(4, 213)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(214, 13)
+        Me.Label3.Size = New System.Drawing.Size(289, 17)
         Me.Label3.TabIndex = 7
         Me.Label3.Text = "Length of excursion clustering period (days):"
         '
@@ -159,18 +176,20 @@ Partial Class frmDFLOWArgs
         '
         Me.Label2.AutoSize = True
         Me.Label2.Enabled = False
-        Me.Label2.Location = New System.Drawing.Point(3, 148)
+        Me.Label2.Location = New System.Drawing.Point(4, 182)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(225, 13)
+        Me.Label2.Size = New System.Drawing.Size(300, 17)
         Me.Label2.TabIndex = 6
         Me.Label2.Text = "Average number of years between excursions:"
         '
         'tbBio1
         '
         Me.tbBio1.Enabled = False
-        Me.tbBio1.Location = New System.Drawing.Point(263, 120)
+        Me.tbBio1.Location = New System.Drawing.Point(351, 148)
+        Me.tbBio1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbBio1.Name = "tbBio1"
-        Me.tbBio1.Size = New System.Drawing.Size(46, 20)
+        Me.tbBio1.Size = New System.Drawing.Size(60, 22)
         Me.tbBio1.TabIndex = 5
         Me.tbBio1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -178,18 +197,20 @@ Partial Class frmDFLOWArgs
         '
         Me.Label1.AutoSize = True
         Me.Label1.Enabled = False
-        Me.Label1.Location = New System.Drawing.Point(3, 123)
+        Me.Label1.Location = New System.Drawing.Point(4, 151)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(145, 13)
+        Me.Label1.Size = New System.Drawing.Size(195, 17)
         Me.Label1.TabIndex = 4
         Me.Label1.Text = "Flow averaging period (days):"
         '
         'rbBio3
         '
         Me.rbBio3.AutoSize = True
-        Me.rbBio3.Location = New System.Drawing.Point(22, 88)
+        Me.rbBio3.Location = New System.Drawing.Point(29, 108)
+        Me.rbBio3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.rbBio3.Name = "rbBio3"
-        Me.rbBio3.Size = New System.Drawing.Size(68, 17)
+        Me.rbBio3.Size = New System.Drawing.Size(87, 21)
         Me.rbBio3.TabIndex = 3
         Me.rbBio3.Text = "Ammonia"
         Me.rbBio3.UseVisualStyleBackColor = True
@@ -197,9 +218,10 @@ Partial Class frmDFLOWArgs
         'rbBio2
         '
         Me.rbBio2.AutoSize = True
-        Me.rbBio2.Location = New System.Drawing.Point(22, 65)
+        Me.rbBio2.Location = New System.Drawing.Point(29, 80)
+        Me.rbBio2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.rbBio2.Name = "rbBio2"
-        Me.rbBio2.Size = New System.Drawing.Size(230, 17)
+        Me.rbBio2.Size = New System.Drawing.Size(305, 21)
         Me.rbBio2.TabIndex = 2
         Me.rbBio2.Text = "Criterion continuous concentration (chronic)"
         Me.rbBio2.UseVisualStyleBackColor = True
@@ -208,9 +230,10 @@ Partial Class frmDFLOWArgs
         '
         Me.rbBio1.AutoSize = True
         Me.rbBio1.Checked = True
-        Me.rbBio1.Location = New System.Drawing.Point(22, 42)
+        Me.rbBio1.Location = New System.Drawing.Point(29, 52)
+        Me.rbBio1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.rbBio1.Name = "rbBio1"
-        Me.rbBio1.Size = New System.Drawing.Size(213, 17)
+        Me.rbBio1.Size = New System.Drawing.Size(283, 21)
         Me.rbBio1.TabIndex = 1
         Me.rbBio1.TabStop = True
         Me.rbBio1.Text = "Criterion maximum concentration (acute)"
@@ -221,18 +244,21 @@ Partial Class frmDFLOWArgs
         Me.ckbBio.AutoSize = True
         Me.ckbBio.Checked = True
         Me.ckbBio.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.ckbBio.Location = New System.Drawing.Point(6, 19)
+        Me.ckbBio.Location = New System.Drawing.Point(8, 23)
+        Me.ckbBio.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.ckbBio.Name = "ckbBio"
-        Me.ckbBio.Size = New System.Drawing.Size(85, 17)
+        Me.ckbBio.Size = New System.Drawing.Size(109, 21)
         Me.ckbBio.TabIndex = 0
         Me.ckbBio.Text = "Use defaults"
         Me.ckbBio.UseVisualStyleBackColor = True
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(335, 415)
+        Me.Button3.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button3.Location = New System.Drawing.Point(576, 535)
+        Me.Button3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(75, 23)
+        Me.Button3.Size = New System.Drawing.Size(100, 28)
         Me.Button3.TabIndex = 3
         Me.Button3.Text = "Help"
         Me.Button3.UseVisualStyleBackColor = True
@@ -250,9 +276,11 @@ Partial Class frmDFLOWArgs
         Me.GroupBox2.Controls.Add(Me.rbNonBio3)
         Me.GroupBox2.Controls.Add(Me.rbNonBio2)
         Me.GroupBox2.Controls.Add(Me.rbNonBio1)
-        Me.GroupBox2.Location = New System.Drawing.Point(335, 260)
+        Me.GroupBox2.Location = New System.Drawing.Point(447, 305)
+        Me.GroupBox2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(332, 142)
+        Me.GroupBox2.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox2.Size = New System.Drawing.Size(443, 175)
         Me.GroupBox2.TabIndex = 4
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Non-Biological Design Flow Parameters"
@@ -260,27 +288,30 @@ Partial Class frmDFLOWArgs
         'tbNonBio3
         '
         Me.tbNonBio3.Enabled = False
-        Me.tbNonBio3.Location = New System.Drawing.Point(263, 88)
+        Me.tbNonBio3.Location = New System.Drawing.Point(351, 108)
+        Me.tbNonBio3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbNonBio3.Name = "tbNonBio3"
-        Me.tbNonBio3.Size = New System.Drawing.Size(46, 20)
+        Me.tbNonBio3.Size = New System.Drawing.Size(60, 22)
         Me.tbNonBio3.TabIndex = 11
         Me.tbNonBio3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbNonBio4
         '
         Me.tbNonBio4.Enabled = False
-        Me.tbNonBio4.Location = New System.Drawing.Point(263, 110)
+        Me.tbNonBio4.Location = New System.Drawing.Point(351, 135)
+        Me.tbNonBio4.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbNonBio4.Name = "tbNonBio4"
-        Me.tbNonBio4.Size = New System.Drawing.Size(46, 20)
+        Me.tbNonBio4.Size = New System.Drawing.Size(60, 22)
         Me.tbNonBio4.TabIndex = 10
         Me.tbNonBio4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbNonBio2
         '
         Me.tbNonBio2.Enabled = False
-        Me.tbNonBio2.Location = New System.Drawing.Point(263, 58)
+        Me.tbNonBio2.Location = New System.Drawing.Point(351, 71)
+        Me.tbNonBio2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbNonBio2.Name = "tbNonBio2"
-        Me.tbNonBio2.Size = New System.Drawing.Size(46, 20)
+        Me.tbNonBio2.Size = New System.Drawing.Size(60, 22)
         Me.tbNonBio2.TabIndex = 9
         Me.tbNonBio2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -288,9 +319,10 @@ Partial Class frmDFLOWArgs
         '
         Me.Label5.AutoSize = True
         Me.Label5.Enabled = False
-        Me.Label5.Location = New System.Drawing.Point(308, 92)
+        Me.Label5.Location = New System.Drawing.Point(411, 113)
+        Me.Label5.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(21, 13)
+        Me.Label5.Size = New System.Drawing.Size(26, 17)
         Me.Label5.TabIndex = 8
         Me.Label5.Text = "cfs"
         '
@@ -298,9 +330,10 @@ Partial Class frmDFLOWArgs
         '
         Me.Label6.AutoSize = True
         Me.Label6.Enabled = False
-        Me.Label6.Location = New System.Drawing.Point(308, 113)
+        Me.Label6.Location = New System.Drawing.Point(411, 139)
+        Me.Label6.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(15, 13)
+        Me.Label6.Size = New System.Drawing.Size(20, 17)
         Me.Label6.TabIndex = 7
         Me.Label6.Text = "%"
         '
@@ -308,18 +341,20 @@ Partial Class frmDFLOWArgs
         '
         Me.Label7.AutoSize = True
         Me.Label7.Enabled = False
-        Me.Label7.Location = New System.Drawing.Point(19, 61)
+        Me.Label7.Location = New System.Drawing.Point(25, 75)
+        Me.Label7.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(226, 13)
+        Me.Label7.Size = New System.Drawing.Size(306, 17)
         Me.Label7.TabIndex = 6
         Me.Label7.Text = "Return period on years with excursions (years):"
         '
         'tbNonBio1
         '
         Me.tbNonBio1.Enabled = False
-        Me.tbNonBio1.Location = New System.Drawing.Point(263, 36)
+        Me.tbNonBio1.Location = New System.Drawing.Point(351, 44)
+        Me.tbNonBio1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbNonBio1.Name = "tbNonBio1"
-        Me.tbNonBio1.Size = New System.Drawing.Size(46, 20)
+        Me.tbNonBio1.Size = New System.Drawing.Size(60, 22)
         Me.tbNonBio1.TabIndex = 5
         Me.tbNonBio1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -327,18 +362,20 @@ Partial Class frmDFLOWArgs
         '
         Me.Label8.AutoSize = True
         Me.Label8.Enabled = False
-        Me.Label8.Location = New System.Drawing.Point(19, 39)
+        Me.Label8.Location = New System.Drawing.Point(25, 48)
+        Me.Label8.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(145, 13)
+        Me.Label8.Size = New System.Drawing.Size(195, 17)
         Me.Label8.TabIndex = 4
         Me.Label8.Text = "Flow averaging period (days):"
         '
         'rbNonBio3
         '
         Me.rbNonBio3.AutoSize = True
-        Me.rbNonBio3.Location = New System.Drawing.Point(6, 111)
+        Me.rbNonBio3.Location = New System.Drawing.Point(8, 137)
+        Me.rbNonBio3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.rbNonBio3.Name = "rbNonBio3"
-        Me.rbNonBio3.Size = New System.Drawing.Size(99, 17)
+        Me.rbNonBio3.Size = New System.Drawing.Size(127, 21)
         Me.rbNonBio3.TabIndex = 3
         Me.rbNonBio3.Text = "Flow percentile:"
         Me.rbNonBio3.UseVisualStyleBackColor = True
@@ -346,9 +383,10 @@ Partial Class frmDFLOWArgs
         'rbNonBio2
         '
         Me.rbNonBio2.AutoSize = True
-        Me.rbNonBio2.Location = New System.Drawing.Point(6, 88)
+        Me.rbNonBio2.Location = New System.Drawing.Point(8, 108)
+        Me.rbNonBio2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.rbNonBio2.Name = "rbNonBio2"
-        Me.rbNonBio2.Size = New System.Drawing.Size(112, 17)
+        Me.rbNonBio2.Size = New System.Drawing.Size(142, 21)
         Me.rbNonBio2.TabIndex = 2
         Me.rbNonBio2.Text = "Explicit flow value:"
         Me.rbNonBio2.UseVisualStyleBackColor = True
@@ -357,9 +395,10 @@ Partial Class frmDFLOWArgs
         '
         Me.rbNonBio1.AutoSize = True
         Me.rbNonBio1.Checked = True
-        Me.rbNonBio1.Location = New System.Drawing.Point(6, 19)
+        Me.rbNonBio1.Location = New System.Drawing.Point(8, 23)
+        Me.rbNonBio1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.rbNonBio1.Name = "rbNonBio1"
-        Me.rbNonBio1.Size = New System.Drawing.Size(83, 17)
+        Me.rbNonBio1.Size = New System.Drawing.Size(107, 21)
         Me.rbNonBio1.TabIndex = 1
         Me.rbNonBio1.TabStop = True
         Me.rbNonBio1.Text = "Hydrological"
@@ -369,9 +408,10 @@ Partial Class frmDFLOWArgs
         '
         Me.clbDataSets.CheckOnClick = True
         Me.clbDataSets.FormattingEnabled = True
-        Me.clbDataSets.Location = New System.Drawing.Point(12, 12)
+        Me.clbDataSets.Location = New System.Drawing.Point(16, 15)
+        Me.clbDataSets.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.clbDataSets.Name = "clbDataSets"
-        Me.clbDataSets.Size = New System.Drawing.Size(302, 229)
+        Me.clbDataSets.Size = New System.Drawing.Size(401, 276)
         Me.clbDataSets.TabIndex = 5
         '
         'grpDates
@@ -384,9 +424,11 @@ Partial Class frmDFLOWArgs
         Me.grpDates.Controls.Add(Me.tbStartDay)
         Me.grpDates.Controls.Add(Me.cboEndMonth)
         Me.grpDates.Controls.Add(Me.lblYearEnd)
-        Me.grpDates.Location = New System.Drawing.Point(12, 260)
+        Me.grpDates.Location = New System.Drawing.Point(16, 299)
+        Me.grpDates.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.grpDates.Name = "grpDates"
-        Me.grpDates.Size = New System.Drawing.Size(302, 73)
+        Me.grpDates.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.grpDates.Size = New System.Drawing.Size(403, 90)
         Me.grpDates.TabIndex = 66
         Me.grpDates.TabStop = False
         Me.grpDates.Text = "Year or Season Boundaries"
@@ -394,36 +436,40 @@ Partial Class frmDFLOWArgs
         'cboStartMonth
         '
         Me.cboStartMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
-        Me.cboStartMonth.Location = New System.Drawing.Point(41, 19)
+        Me.cboStartMonth.Location = New System.Drawing.Point(55, 23)
+        Me.cboStartMonth.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cboStartMonth.MaxDropDownItems = 12
         Me.cboStartMonth.Name = "cboStartMonth"
-        Me.cboStartMonth.Size = New System.Drawing.Size(88, 21)
+        Me.cboStartMonth.Size = New System.Drawing.Size(116, 24)
         Me.cboStartMonth.TabIndex = 3
         Me.cboStartMonth.Text = "April"
         '
         'lblYearStart
         '
         Me.lblYearStart.AutoSize = True
-        Me.lblYearStart.Location = New System.Drawing.Point(6, 22)
+        Me.lblYearStart.Location = New System.Drawing.Point(8, 27)
+        Me.lblYearStart.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblYearStart.Name = "lblYearStart"
-        Me.lblYearStart.Size = New System.Drawing.Size(29, 13)
+        Me.lblYearStart.Size = New System.Drawing.Size(38, 17)
         Me.lblYearStart.TabIndex = 23
         Me.lblYearStart.Text = "Start"
         '
         'tbEndDay
         '
-        Me.tbEndDay.Location = New System.Drawing.Point(135, 46)
+        Me.tbEndDay.Location = New System.Drawing.Point(180, 57)
+        Me.tbEndDay.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbEndDay.Name = "tbEndDay"
-        Me.tbEndDay.Size = New System.Drawing.Size(24, 20)
+        Me.tbEndDay.Size = New System.Drawing.Size(31, 22)
         Me.tbEndDay.TabIndex = 63
         Me.tbEndDay.Text = "31"
         Me.tbEndDay.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbStartDay
         '
-        Me.tbStartDay.Location = New System.Drawing.Point(135, 19)
+        Me.tbStartDay.Location = New System.Drawing.Point(180, 23)
+        Me.tbStartDay.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbStartDay.Name = "tbStartDay"
-        Me.tbStartDay.Size = New System.Drawing.Size(24, 20)
+        Me.tbStartDay.Size = New System.Drawing.Size(31, 22)
         Me.tbStartDay.TabIndex = 4
         Me.tbStartDay.Text = "1"
         Me.tbStartDay.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
@@ -431,19 +477,21 @@ Partial Class frmDFLOWArgs
         'cboEndMonth
         '
         Me.cboEndMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
-        Me.cboEndMonth.Location = New System.Drawing.Point(41, 46)
+        Me.cboEndMonth.Location = New System.Drawing.Point(55, 57)
+        Me.cboEndMonth.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cboEndMonth.MaxDropDownItems = 12
         Me.cboEndMonth.Name = "cboEndMonth"
-        Me.cboEndMonth.Size = New System.Drawing.Size(88, 21)
+        Me.cboEndMonth.Size = New System.Drawing.Size(116, 24)
         Me.cboEndMonth.TabIndex = 11
         Me.cboEndMonth.Text = "March"
         '
         'lblYearEnd
         '
         Me.lblYearEnd.AutoSize = True
-        Me.lblYearEnd.Location = New System.Drawing.Point(6, 49)
+        Me.lblYearEnd.Location = New System.Drawing.Point(8, 60)
+        Me.lblYearEnd.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblYearEnd.Name = "lblYearEnd"
-        Me.lblYearEnd.Size = New System.Drawing.Size(26, 13)
+        Me.lblYearEnd.Size = New System.Drawing.Size(33, 17)
         Me.lblYearEnd.TabIndex = 61
         Me.lblYearEnd.Text = "End"
         '
@@ -457,9 +505,11 @@ Partial Class frmDFLOWArgs
         Me.grpYears.Controls.Add(Me.lblOmitAfter)
         Me.grpYears.Controls.Add(Me.tbOmitAfterYear)
         Me.grpYears.Controls.Add(Me.tbOmitBeforeYear)
-        Me.grpYears.Location = New System.Drawing.Point(12, 348)
+        Me.grpYears.Location = New System.Drawing.Point(16, 397)
+        Me.grpYears.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.grpYears.Name = "grpYears"
-        Me.grpYears.Size = New System.Drawing.Size(302, 78)
+        Me.grpYears.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.grpYears.Size = New System.Drawing.Size(403, 83)
         Me.grpYears.TabIndex = 65
         Me.grpYears.TabStop = False
         Me.grpYears.Text = "Years to Include in Analysis"
@@ -467,9 +517,10 @@ Partial Class frmDFLOWArgs
         'lblDataStart
         '
         Me.lblDataStart.AutoSize = True
-        Me.lblDataStart.Location = New System.Drawing.Point(109, 22)
+        Me.lblDataStart.Location = New System.Drawing.Point(145, 27)
+        Me.lblDataStart.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblDataStart.Name = "lblDataStart"
-        Me.lblDataStart.Size = New System.Drawing.Size(60, 13)
+        Me.lblDataStart.Size = New System.Drawing.Size(79, 17)
         Me.lblDataStart.TabIndex = 0
         Me.lblDataStart.Tag = "Data Starts"
         Me.lblDataStart.Text = "Data Starts"
@@ -477,9 +528,10 @@ Partial Class frmDFLOWArgs
         'lblDataEnd
         '
         Me.lblDataEnd.AutoSize = True
-        Me.lblDataEnd.Location = New System.Drawing.Point(109, 48)
+        Me.lblDataEnd.Location = New System.Drawing.Point(145, 59)
+        Me.lblDataEnd.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblDataEnd.Name = "lblDataEnd"
-        Me.lblDataEnd.Size = New System.Drawing.Size(57, 13)
+        Me.lblDataEnd.Size = New System.Drawing.Size(74, 17)
         Me.lblDataEnd.TabIndex = 1
         Me.lblDataEnd.Tag = "Data Ends"
         Me.lblDataEnd.Text = "Data Ends"
@@ -487,42 +539,97 @@ Partial Class frmDFLOWArgs
         'lblOmitBefore
         '
         Me.lblOmitBefore.AutoSize = True
-        Me.lblOmitBefore.Location = New System.Drawing.Point(6, 22)
+        Me.lblOmitBefore.Location = New System.Drawing.Point(8, 27)
+        Me.lblOmitBefore.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblOmitBefore.Name = "lblOmitBefore"
-        Me.lblOmitBefore.Size = New System.Drawing.Size(54, 13)
+        Me.lblOmitBefore.Size = New System.Drawing.Size(72, 17)
         Me.lblOmitBefore.TabIndex = 40
         Me.lblOmitBefore.Text = "Start Year"
         '
         'lblOmitAfter
         '
         Me.lblOmitAfter.AutoSize = True
-        Me.lblOmitAfter.Location = New System.Drawing.Point(6, 48)
+        Me.lblOmitAfter.Location = New System.Drawing.Point(8, 59)
+        Me.lblOmitAfter.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblOmitAfter.Name = "lblOmitAfter"
-        Me.lblOmitAfter.Size = New System.Drawing.Size(51, 13)
+        Me.lblOmitAfter.Size = New System.Drawing.Size(67, 17)
         Me.lblOmitAfter.TabIndex = 43
         Me.lblOmitAfter.Text = "End Year"
         '
         'tbOmitAfterYear
         '
-        Me.tbOmitAfterYear.Location = New System.Drawing.Point(66, 45)
+        Me.tbOmitAfterYear.Location = New System.Drawing.Point(88, 55)
+        Me.tbOmitAfterYear.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbOmitAfterYear.Name = "tbOmitAfterYear"
-        Me.tbOmitAfterYear.Size = New System.Drawing.Size(37, 20)
+        Me.tbOmitAfterYear.Size = New System.Drawing.Size(48, 22)
         Me.tbOmitAfterYear.TabIndex = 6
         Me.tbOmitAfterYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbOmitBeforeYear
         '
-        Me.tbOmitBeforeYear.Location = New System.Drawing.Point(66, 19)
+        Me.tbOmitBeforeYear.Location = New System.Drawing.Point(88, 23)
+        Me.tbOmitBeforeYear.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tbOmitBeforeYear.Name = "tbOmitBeforeYear"
-        Me.tbOmitBeforeYear.Size = New System.Drawing.Size(37, 20)
+        Me.tbOmitBeforeYear.Size = New System.Drawing.Size(48, 22)
         Me.tbOmitBeforeYear.TabIndex = 5
         Me.tbOmitBeforeYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'gbTextOutput
+        '
+        Me.gbTextOutput.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbTextOutput.Controls.Add(Me.txtOutputDir)
+        Me.gbTextOutput.Controls.Add(Me.lblOutputDir)
+        Me.gbTextOutput.Controls.Add(Me.txtOutputRootName)
+        Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
+        Me.gbTextOutput.Location = New System.Drawing.Point(16, 487)
+        Me.gbTextOutput.Name = "gbTextOutput"
+        Me.gbTextOutput.Size = New System.Drawing.Size(546, 78)
+        Me.gbTextOutput.TabIndex = 74
+        Me.gbTextOutput.TabStop = False
+        Me.gbTextOutput.Text = "Output"
+        Me.gbTextOutput.Visible = False
+        '
+        'txtOutputDir
+        '
+        Me.txtOutputDir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtOutputDir.Location = New System.Drawing.Point(81, 15)
+        Me.txtOutputDir.Name = "txtOutputDir"
+        Me.txtOutputDir.Size = New System.Drawing.Size(459, 22)
+        Me.txtOutputDir.TabIndex = 12
+        '
+        'lblOutputDir
+        '
+        Me.lblOutputDir.AutoSize = True
+        Me.lblOutputDir.Location = New System.Drawing.Point(38, 18)
+        Me.lblOutputDir.Name = "lblOutputDir"
+        Me.lblOutputDir.Size = New System.Drawing.Size(37, 17)
+        Me.lblOutputDir.TabIndex = 31
+        Me.lblOutputDir.Text = "Path"
+        '
+        'txtOutputRootName
+        '
+        Me.txtOutputRootName.Location = New System.Drawing.Point(81, 46)
+        Me.txtOutputRootName.Name = "txtOutputRootName"
+        Me.txtOutputRootName.Size = New System.Drawing.Size(241, 22)
+        Me.txtOutputRootName.TabIndex = 13
+        '
+        'lblBaseFilename
+        '
+        Me.lblBaseFilename.AutoSize = True
+        Me.lblBaseFilename.Location = New System.Drawing.Point(6, 49)
+        Me.lblBaseFilename.Name = "lblBaseFilename"
+        Me.lblBaseFilename.Size = New System.Drawing.Size(69, 17)
+        Me.lblBaseFilename.TabIndex = 30
+        Me.lblBaseFilename.Text = "File Prefix"
+        '
         'frmDFLOWArgs
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(679, 480)
+        Me.ClientSize = New System.Drawing.Size(905, 576)
+        Me.Controls.Add(Me.gbTextOutput)
         Me.Controls.Add(Me.grpDates)
         Me.Controls.Add(Me.grpYears)
         Me.Controls.Add(Me.clbDataSets)
@@ -532,6 +639,7 @@ Partial Class frmDFLOWArgs
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Button1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Name = "frmDFLOWArgs"
         Me.Text = "DFLOW Inputs"
         Me.gbBio.ResumeLayout(False)
@@ -542,6 +650,8 @@ Partial Class frmDFLOWArgs
         Me.grpDates.PerformLayout()
         Me.grpYears.ResumeLayout(False)
         Me.grpYears.PerformLayout()
+        Me.gbTextOutput.ResumeLayout(False)
+        Me.gbTextOutput.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -588,4 +698,9 @@ Partial Class frmDFLOWArgs
     Friend WithEvents lblOmitAfter As System.Windows.Forms.Label
     Friend WithEvents tbOmitAfterYear As System.Windows.Forms.TextBox
     Friend WithEvents tbOmitBeforeYear As System.Windows.Forms.TextBox
+    Friend WithEvents gbTextOutput As System.Windows.Forms.GroupBox
+    Friend WithEvents txtOutputDir As System.Windows.Forms.TextBox
+    Friend WithEvents lblOutputDir As System.Windows.Forms.Label
+    Friend WithEvents txtOutputRootName As System.Windows.Forms.TextBox
+    Friend WithEvents lblBaseFilename As System.Windows.Forms.Label
 End Class

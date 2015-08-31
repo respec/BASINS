@@ -2,6 +2,7 @@
 Imports atcUtility
 
 Public Module modUtil
+
     ''' <summary>
     ''' Holds a set of inputs' names for batch run
     ''' </summary>
@@ -13,7 +14,7 @@ Public Module modUtil
         Friend fBioYears As Integer
         Friend fBioCluster As Integer
         Friend fBioExcursions As Integer
-        Friend fBioFPArray(,) As Integer = New Integer(3, 3) {{1, 3, 120, 5}, {4, 3, 120, 5}, {30, 3, 120, 5}, {-1, -1, -1, -1}}
+        Friend Shared fBioFPArray(,) As Integer = New Integer(3, 3) {{1, 3, 120, 5}, {4, 3, 120, 5}, {30, 3, 120, 5}, {-1, -1, -1, -1}}
         Friend fNonBioType As Integer
         Friend fAveragingPeriod As Integer
         Friend fReturnPeriod As Integer
@@ -27,11 +28,30 @@ Public Module modUtil
         'Friend fFirstYear As Integer = -1
         'Friend fLastYear As Integer = -1
 
+        Public Enum EDFLOWCategory
+            Biological
+            NonBiological
+        End Enum
+        Public Shared DFLOWCategoryText As String = "DFLOWCategory"
+        Public Shared BiologicalDFLOW As String = "BiologicalDFLOW"
+
+        Public Enum EBioDFlowParamIndex
+            P0FlowAveragingPeriodDays = 0
+            P1AverageYearsBetweenExcursions
+            P2ExcursionClusterPeriodDays
+            P3AverageExcursionsPerCluster
+        End Enum
+
+        Public Shared TextTrue As String = "Yes"
+        Public Shared TextFalse As String = "No"
         Public Enum EBioDFlowType
             Acute_maximum_concentration
             Chronic_continuous_concentration
             Ammonia
         End Enum
+
+        Public Shared BioUseDefault As String = "Bio_Use_Default"
+        Public Shared BioSelectedMethod As String = "Bio_Selected_Method"
         Public Shared BioAvgPeriod As String = "Bio_Flow_Averaging_Period_days"
         Public Shared BioReturnYears As String = "Bio_Return_Period_of_Excursions_years"
         Public Shared BioClusterDays As String = "Bio_Excursion_Clustering_Period_days"
@@ -42,11 +62,14 @@ Public Module modUtil
             Explicit_Flow_Value
             Flow_Percentile
         End Enum
-        Public Shared AveragingPeriod As String = "Flow_Averaging_Period_days"
-        Public Shared ReturnPeriod As String = "Return_Period_of_Excursions_years"
-        Public Shared ExplicitFlow As String = "Explicit_flow_value"
-        Public Shared FlowPercentile As String = "Flow_percentile"
 
+        Public Shared NBioSelectedMethod As String = "NBio_Selected_Method"
+        Public Shared NBioAveragingPeriod As String = "Flow_Averaging_Period_days"
+        Public Shared NBioReturnPeriod As String = "Return_Period_of_Excursions_years"
+        Public Shared NBioExplicitFlow As String = "Explicit_flow_value"
+        Public Shared NBioFlowPercentile As String = "Flow_percentile"
+
+        Public Shared SelectedMethodText As String = "Selected"
 
         Public Shared IncludeYears As String = "IncludeYears"
         Public Shared StartYear As String = "FirstYear" '"STARTYEAR"
@@ -114,135 +137,153 @@ Public Module modUtil
         End Function
 
         Public Shared Sub BuildInputSet(ByRef aSpecialSet As atcDataAttributes, ByVal aCommonSet As atcDataAttributes)
-            'If aSpecialSet Is Nothing Then
-            '    aSpecialSet = New atcDataAttributes()
-            'End If
-            'Dim lstNDayDefault() As Double = clsSWSTATPlugin.ListDefaultArray(NDay)
-            'Dim lstRPsDefault() As Double = clsSWSTATPlugin.ListDefaultArray(ReturnPeriod)
-            'Dim lNDays As atcUtility.atcCollection
-            'Dim lRPs As atcUtility.atcCollection
-            'If aCommonSet Is Nothing Then
-            '    With aSpecialSet
-            '        If .GetValue(HighLow) Is Nothing Then .SetValue(HighLow, "Low")
-            '        If .GetValue(Logarithmic) Is Nothing Then .SetValue(Logarithmic, True)
-            '        If .GetValue(StartYear) Is Nothing Then .SetValue(StartYear, "")
-            '        If .GetValue(EndYear) Is Nothing Then .SetValue(EndYear, "")
-            '        If .GetValue(MultiNDayPlot) Is Nothing Then .SetValue(MultiNDayPlot, False)
-            '        If .GetValue(MultiStationPlot) Is Nothing Then .SetValue(MultiStationPlot, False)
-            '        If .GetValue(HighFlowSeasonStart) Is Nothing Then .SetValue(HighFlowSeasonStart, "10/01")
-            '        If .GetValue(HighFlowSeasonEnd) Is Nothing Then .SetValue(HighFlowSeasonEnd, "09/30")
-            '        If .GetValue(LowFlowSeasonStart) Is Nothing Then .SetValue(LowFlowSeasonStart, "04/01")
-            '        If .GetValue(LowFlowSeasonEnd) Is Nothing Then .SetValue(LowFlowSeasonEnd, "03/31")
-            '        If .GetValue(NDay) Is Nothing Then
-            '            .SetValue(NDay, lstNDayDefault)
-            '        End If
-            '        Dim lNDaysOriginal As atcUtility.atcCollection = .GetValue(NDays)
-            '        lNDays = New atcUtility.atcCollection()
-            '        If .GetValue(NDays) IsNot Nothing Then
-            '            'detach from original attribute set
-            '            .RemoveByKey(NDays)
-            '        End If
-            '        If lNDaysOriginal IsNot Nothing Then
-            '            For Each lNDayKey As Double In lNDaysOriginal.Keys
-            '                lNDays.Add(lNDayKey, lNDaysOriginal.ItemByKey(lNDayKey))
-            '            Next
-            '            lNDaysOriginal.Clear()
-            '            lNDaysOriginal = Nothing
-            '        End If
+            If aSpecialSet Is Nothing Then
+                aSpecialSet = New atcDataAttributes()
+            End If
+            If aCommonSet Is Nothing Then
+                With aSpecialSet
+                    If .GetValue(StartDay) Is Nothing Then .SetValue(StartDay, 1)
+                    If .GetValue(StartMonth) Is Nothing Then .SetValue(StartMonth, 4)
+                    If .GetValue(StartYear) Is Nothing Then .SetValue(StartYear, 0)
+                    If .GetValue(EndDay) Is Nothing Then .SetValue(EndDay, 31)
+                    If .GetValue(EndMonth) Is Nothing Then .SetValue(EndMonth, 3)
+                    If .GetValue(EndYear) Is Nothing Then .SetValue(EndYear, 0)
 
-            '        For Each lNDay As Double In .GetValue(NDay)
-            '            If Not lNDays.Keys.Contains(lNDay) Then
-            '                lNDays.Add(lNDay, False)
-            '            End If
-            '        Next
-            '        .SetValue(NDays, lNDays)
+                    If .GetValue(BioUseDefault) Is Nothing Then
+                        .SetValue(BioUseDefault, True)
+                    End If
+                    If .GetValue(EBioDFlowType.Acute_maximum_concentration.ToString()) Is Nothing Then
+                        Dim lParams(3) As Integer
+                        For I As Integer = 0 To 3
+                            lParams(I) = fBioFPArray(EBioDFlowType.Acute_maximum_concentration, I)
+                        Next
+                        .SetValue(EBioDFlowType.Acute_maximum_concentration.ToString(), lParams)
+                    End If
+                    If .GetValue(EBioDFlowType.Chronic_continuous_concentration.ToString()) Is Nothing Then
+                        Dim lParams(3) As Integer
+                        For I As Integer = 0 To 3
+                            lParams(I) = fBioFPArray(EBioDFlowType.Chronic_continuous_concentration, I)
+                        Next
+                        .SetValue(EBioDFlowType.Chronic_continuous_concentration.ToString(), lParams)
+                    End If
+                    If .GetValue(EBioDFlowType.Ammonia.ToString()) Is Nothing Then
+                        Dim lParams(3) As Integer
+                        For I As Integer = 0 To 3
+                            lParams(I) = fBioFPArray(EBioDFlowType.Ammonia, I)
+                        Next
+                        .SetValue(EBioDFlowType.Ammonia.ToString(), lParams)
+                    End If
+                    If .GetValue(BioSelectedMethod) Is Nothing Then
+                        .SetValue(BioSelectedMethod, EBioDFlowType.Acute_maximum_concentration)
+                    End If
 
-            '        If .GetValue(ReturnPeriod) Is Nothing Then
-            '            .SetValue(ReturnPeriod, lstRPsDefault)
-            '        End If
-            '        Dim lRPsOriginal As atcUtility.atcCollection = .GetValue(ReturnPeriods)
-            '        If .GetValue(ReturnPeriods) IsNot Nothing Then
-            '            .RemoveByKey(ReturnPeriods)
-            '        End If
-            '        lRPs = New atcUtility.atcCollection()
-            '        If lRPsOriginal IsNot Nothing Then
-            '            For Each lRPKey As Double In lRPsOriginal.Keys
-            '                lRPs.Add(lRPKey, lRPsOriginal.ItemByKey(lRPKey))
-            '            Next
-            '            lRPsOriginal.Clear()
-            '            lRPsOriginal = Nothing
-            '        End If
+                    If .GetValue(EDFlowType.Hydrological.ToString()) Is Nothing Then
+                        Dim lParams() As Integer = {7, 10}
+                        .SetValue(EDFlowType.Hydrological.ToString(), lParams)
+                    End If
+                    If .GetValue(EDFlowType.Explicit_Flow_Value.ToString()) Is Nothing Then
+                        .SetValue(EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                    End If
+                    If .GetValue(EDFlowType.Flow_Percentile.ToString()) Is Nothing Then
+                        .SetValue(EDFlowType.Flow_Percentile.ToString(), 0.1)
+                    End If
+                    If .GetValue(NBioSelectedMethod) Is Nothing Then
+                        .SetValue(NBioSelectedMethod, EDFlowType.Hydrological)
+                    End If
+                End With
+            Else
+                With aSpecialSet
+                    If .GetValue(OutputDir) Is Nothing Then .SetValue(OutputDir, aCommonSet.GetValue(OutputDir, ""))
+                    If .GetValue(OutputPrefix) Is Nothing Then .SetValue(OutputPrefix, aCommonSet.GetValue(OutputPrefix, ""))
+                    If .GetValue(DataDir) Is Nothing Then .SetValue(DataDir, aCommonSet.GetValue(DataDir, ""))
 
-            '        For Each lRP As Double In .GetValue(ReturnPeriod)
-            '            If Not lRPs.Keys.Contains(lRP) Then
-            '                lRPs.Add(lRP, False)
-            '            End If
-            '        Next
-            '        .SetValue(ReturnPeriods, lRPs)
-            '    End With
-            'Else
-            '    With aSpecialSet
-            '        If .GetValue(HighLow) Is Nothing Then .SetValue(HighLow, aCommonSet.GetValue(HighLow, "Low"))
-            '        If .GetValue(Logarithmic) Is Nothing Then .SetValue(Logarithmic, aCommonSet.GetValue(Logarithmic, True))
-            '        If .GetValue(OutputDir) Is Nothing Then .SetValue(OutputDir, aCommonSet.GetValue(OutputDir, ""))
-            '        If .GetValue(OutputPrefix) Is Nothing Then .SetValue(OutputPrefix, aCommonSet.GetValue(OutputPrefix, ""))
-            '        If .GetValue(DataDir) Is Nothing Then .SetValue(DataDir, aCommonSet.GetValue(DataDir, ""))
-            '        If .GetValue(StartYear) Is Nothing Then .SetValue(StartYear, aCommonSet.GetValue(StartYear, ""))
-            '        If .GetValue(EndYear) Is Nothing Then .SetValue(EndYear, aCommonSet.GetValue(EndYear, ""))
-            '        If .GetValue(MultiNDayPlot) Is Nothing Then .SetValue(MultiNDayPlot, aCommonSet.GetValue(MultiNDayPlot, False))
-            '        If .GetValue(MultiStationPlot) Is Nothing Then .SetValue(MultiStationPlot, aCommonSet.GetValue(MultiStationPlot, False))
-            '        If .GetValue(HighFlowSeasonStart) Is Nothing Then .SetValue(HighFlowSeasonStart, aCommonSet.GetValue(HighFlowSeasonStart, "10/01"))
-            '        If .GetValue(HighFlowSeasonEnd) Is Nothing Then .SetValue(HighFlowSeasonEnd, aCommonSet.GetValue(HighFlowSeasonEnd, "09/30"))
-            '        If .GetValue(LowFlowSeasonStart) Is Nothing Then .SetValue(LowFlowSeasonStart, aCommonSet.GetValue(LowFlowSeasonStart, "04/01"))
-            '        If .GetValue(LowFlowSeasonEnd) Is Nothing Then .SetValue(LowFlowSeasonEnd, aCommonSet.GetValue(LowFlowSeasonEnd, "03/31"))
-            '        If .GetValue(NDay) Is Nothing Then
-            '            .SetValue(NDay, aCommonSet.GetValue(NDay, lstNDayDefault))
-            '        End If
-            '        Dim lNDaysOriginal As atcUtility.atcCollection = .GetValue(NDays)
-            '        If lNDaysOriginal IsNot Nothing Then
-            '            'detach from original attribute set
-            '            .RemoveByKey(NDays)
-            '        Else
-            '            lNDaysOriginal = aCommonSet.GetValue(NDays)
-            '        End If
-            '        lNDays = New atcUtility.atcCollection()
-            '        If lNDaysOriginal IsNot Nothing Then
-            '            For Each lNDaykey As Double In lNDaysOriginal.Keys
-            '                lNDays.Add(lNDaykey, lNDaysOriginal.ItemByKey(lNDaykey))
-            '            Next
-            '            'don't clear it as it is the global default
-            '        End If
-            '        For Each lNDay As Double In .GetValue(NDay)
-            '            If Not lNDays.Keys.Contains(lNDay) Then
-            '                lNDays.Add(lNDay, False)
-            '            End If
-            '        Next
-            '        .SetValue(NDays, lNDays)
+                    If .GetValue(StartDay) Is Nothing Then .SetValue(StartDay, aCommonSet.GetValue(StartDay, 1))
+                    If .GetValue(EndDay) Is Nothing Then .SetValue(EndDay, aCommonSet.GetValue(EndDay, 31))
+                    If .GetValue(StartMonth) Is Nothing Then .SetValue(StartMonth, aCommonSet.GetValue(StartMonth, 4))
+                    If .GetValue(EndMonth) Is Nothing Then .SetValue(EndMonth, aCommonSet.GetValue(EndMonth, 3))
+                    If .GetValue(StartYear) Is Nothing Then .SetValue(StartYear, aCommonSet.GetValue(StartYear, 0))
+                    If .GetValue(EndYear) Is Nothing Then .SetValue(EndYear, aCommonSet.GetValue(EndYear, 0))
 
-            '        If .GetValue(ReturnPeriod) Is Nothing Then
-            '            .SetValue(ReturnPeriod, aCommonSet.GetValue(ReturnPeriod, lstRPsDefault))
-            '        End If
-            '        Dim lRPsOriginal As atcUtility.atcCollection = .GetValue(ReturnPeriods)
-            '        If lRPsOriginal IsNot Nothing Then
-            '            .RemoveByKey(ReturnPeriods)
-            '        Else
-            '            lRPsOriginal = aCommonSet.GetValue(ReturnPeriods)
-            '        End If
-            '        lRPs = New atcUtility.atcCollection()
-            '        If lRPsOriginal IsNot Nothing Then
-            '            For Each lRPKey As Double In lRPsOriginal.Keys
-            '                lRPs.Add(lRPKey, lRPsOriginal.ItemByKey(lRPKey))
-            '            Next
-            '            'Don't clear it as it is the global default
-            '        End If
-            '        For Each lRP As Double In .GetValue(ReturnPeriod)
-            '            If Not lRPs.Keys.Contains(lRP) Then
-            '                lRPs.Add(lRP, False)
-            '            End If
-            '        Next
-            '        .SetValue(ReturnPeriods, lRPs)
-            '    End With
-            'End If
+                    If .GetValue(BioUseDefault) Is Nothing Then
+                        .SetValue(BioUseDefault, aCommonSet.GetValue(BioUseDefault, True))
+                    End If
+                    If .GetValue(EBioDFlowType.Acute_maximum_concentration.ToString()) Is Nothing Then
+                        Dim lParams() As Integer = aCommonSet.GetValue(EBioDFlowType.Acute_maximum_concentration.ToString(), Nothing)
+                        If lParams Is Nothing Then
+                            ReDim lParams(3)
+                            For I As Integer = 0 To 3
+                                lParams(I) = fBioFPArray(EBioDFlowType.Acute_maximum_concentration, I)
+                            Next
+                        End If
+                        Dim lParamsCopy(3) As Integer
+                        For I As Integer = 0 To 3
+                            lParamsCopy(I) = lParams(I)
+                        Next
+                        .SetValue(EBioDFlowType.Acute_maximum_concentration.ToString(), lParamsCopy)
+                    End If
+                    If .GetValue(EBioDFlowType.Chronic_continuous_concentration.ToString()) Is Nothing Then
+                        Dim lParams() As Integer = aCommonSet.GetValue(EBioDFlowType.Chronic_continuous_concentration.ToString(), Nothing)
+                        If lParams Is Nothing Then
+                            ReDim lParams(3)
+                            For I As Integer = 0 To 3
+                                lParams(I) = fBioFPArray(EBioDFlowType.Chronic_continuous_concentration, I)
+                            Next
+                        End If
+                        Dim lParamsCopy(3) As Integer
+                        For I As Integer = 0 To 3
+                            lParamsCopy(I) = lParams(I)
+                        Next
+                        .SetValue(EBioDFlowType.Chronic_continuous_concentration.ToString(), lParamsCopy)
+                    End If
+                    If .GetValue(EBioDFlowType.Ammonia.ToString()) Is Nothing Then
+                        Dim lParams() As Integer = aCommonSet.GetValue(EBioDFlowType.Ammonia.ToString(), Nothing)
+                        If lParams Is Nothing Then
+                            ReDim lParams(3)
+                            For I As Integer = 0 To 3
+                                lParams(I) = fBioFPArray(EBioDFlowType.Ammonia, I)
+                            Next
+                        End If
+                        Dim lParamsCopy(3) As Integer
+                        For I As Integer = 0 To 3
+                            lParamsCopy(I) = lParams(I)
+                        Next
+                        .SetValue(EBioDFlowType.Ammonia.ToString(), lParamsCopy)
+                    End If
+                    If .GetValue(BioSelectedMethod) Is Nothing Then
+                        .SetValue(BioSelectedMethod, aCommonSet.GetValue(BioSelectedMethod, EBioDFlowType.Acute_maximum_concentration))
+                    End If
+
+                    If .GetValue(EDFlowType.Hydrological.ToString()) Is Nothing Then
+                        Dim lParams() As Integer = aCommonSet.GetValue(EDFlowType.Hydrological.ToString(), Nothing)
+                        If lParams Is Nothing Then
+                            ReDim lParams(1) : lParams(0) = 7 : lParams(1) = 10
+                        End If
+                        Dim lParamsCopy(1) As Integer
+                        For I As Integer = 0 To 1
+                            lParamsCopy(I) = lParams(I)
+                        Next
+                        .SetValue(EDFlowType.Hydrological.ToString(), lParamsCopy)
+                    End If
+                    If .GetValue(EDFlowType.Explicit_Flow_Value.ToString()) Is Nothing Then
+                        .SetValue(EDFlowType.Explicit_Flow_Value.ToString(), aCommonSet.GetValue(EDFlowType.Explicit_Flow_Value, 1.0))
+                    End If
+                    If .GetValue(EDFlowType.Flow_Percentile.ToString()) Is Nothing Then
+                        .SetValue(EDFlowType.Flow_Percentile.ToString(), aCommonSet.GetValue(EDFlowType.Flow_Percentile, 0.1))
+                    End If
+                    If .GetValue(NBioSelectedMethod) Is Nothing Then
+                        .SetValue(NBioSelectedMethod, aCommonSet.GetValue(NBioSelectedMethod, EDFlowType.Hydrological))
+                    End If
+
+                    If .GetValue(OutputDir) Is Nothing Then
+                        .SetValue(OutputDir, aCommonSet.GetValue(OutputDir, ""))
+                    Else
+                        Dim lOutputDir As String = .GetValue(OutputDir)
+                        If String.IsNullOrEmpty(lOutputDir) OrElse Not IO.Directory.Exists(lOutputDir) Then
+                            .SetValue(OutputDir, aCommonSet.GetValue(OutputDir, ""))
+                        End If
+                    End If
+                End With
+            End If
         End Sub
         Public Shared Function BuildStationsInfo(ByVal aDataGroup As atcTimeseriesGroup) As ArrayList
             Dim lStationsInfo As New atcUtility.atcCollection()
@@ -269,164 +310,156 @@ Public Module modUtil
         End Function
 
         Public Shared Function ParametersToText(ByVal aArgs As atcDataAttributes) As String
-            'If aArgs Is Nothing Then Return ""
-            'Dim loperation As String = aArgs.GetValue("Operation", "")
-            'Dim lgroupname As String = aArgs.GetValue("Group", "")
-            'Dim lSetGlobal As Boolean = (loperation.ToLower = "globalsetparm")
+            If aArgs Is Nothing Then Return ""
+            Dim loperation As String = aArgs.GetValue("Operation", "")
+            Dim lgroupname As String = aArgs.GetValue("Group", "")
+            Dim lSetGlobal As Boolean = (loperation.ToLower = "globalsetparm")
 
-            'Dim lText As New Text.StringBuilder()
-            'If loperation.ToLower = "groupsetparm" Then
-            '    lText.AppendLine("SWSTAT")
-            '    Dim lStationInfo As ArrayList = aArgs.GetValue(InputNames.StationsInfo)
-            '    If lStationInfo IsNot Nothing Then
-            '        For Each lstation As String In lStationInfo
-            '            lText.AppendLine(lstation)
-            '        Next
-            '    End If
-            'ElseIf lSetGlobal Then
-            '    lText.AppendLine("GLOBAL")
-            'End If
+            Dim lText As New Text.StringBuilder()
+            If loperation.ToLower = "groupsetparm" Then
+                lText.AppendLine("DFLOW")
+                Dim lStationInfo As ArrayList = aArgs.GetValue(InputNames.StationsInfo)
+                If lStationInfo IsNot Nothing Then
+                    For Each lstation As String In lStationInfo
+                        lText.AppendLine(lstation)
+                    Next
+                End If
+            ElseIf lSetGlobal Then
+                lText.AppendLine("GLOBAL")
+            End If
 
-            ''Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate, Date2J(2014, 8, 20, 0, 0, 0))
-            ''Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate, Date2J(2014, 8, 20, 24, 0, 0))
-            ''Dim lDates(5) As Integer
-            ''J2Date(lStartDate, lDates)
-            ''lText.AppendLine("STARTDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
-            ''J2Date(lEndDate, lDates)
-            ''timcnv(lDates)
-            ''lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+            'Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate, Date2J(2014, 8, 20, 0, 0, 0))
+            'Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate, Date2J(2014, 8, 20, 24, 0, 0))
+            'Dim lDates(5) As Integer
+            'J2Date(lStartDate, lDates)
+            'lText.AppendLine("STARTDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+            'J2Date(lEndDate, lDates)
+            'timcnv(lDates)
+            'lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
 
-            'If Not lSetGlobal Then
-            '    Dim lDuration As String = aArgs.GetValue(InputNames.IncludeYears, "")
-            '    lText.AppendLine(InputNames.IncludeYears & vbTab & lDuration)
-            '    Dim lStartYear As String = aArgs.GetValue(InputNames.StartYear, "")
-            '    lText.AppendLine(InputNames.StartYear & vbTab & lStartYear)
-            '    Dim lEndYear As String = aArgs.GetValue(InputNames.EndYear, "")
-            '    lText.AppendLine(InputNames.EndYear & vbTab & lEndYear)
-            'End If
-            'If aArgs.ContainsAttribute(modUtil.InputNames.Method) Then
-            '    'Dim lMethods As ArrayList = aArgs.GetValue(modUtil.InputNames.Method)
-            '    'For Each lMethod As modUtil.InputNames.ITAMethod In lMethods
-            '    '    Select Case lMethod
-            '    '        Case InputNames.ITAMethod.FREQUECYGRID
-            '    '            lText.AppendLine(InputNames.Method & vbTab & InputNames.ITAMethod.FREQUECYGRID.ToString())
-            '    '        Case InputNames.ITAMethod.FREQUENCYGRAPH
-            '    '            lText.AppendLine(InputNames.Method & vbTab & InputNames.ITAMethod.FREQUENCYGRAPH.ToString())
-            '    '        Case InputNames.ITAMethod.NDAYTIMESERIES
-            '    '            lText.AppendLine(InputNames.Method & vbTab & InputNames.ITAMethod.NDAYTIMESERIES.ToString())
-            '    '        Case InputNames.ITAMethod.TRENDLIST
-            '    '            lText.AppendLine(InputNames.Method & vbTab & InputNames.ITAMethod.TRENDLIST.ToString())
-            '    '    End Select
-            '    'Next
-            'ElseIf lSetGlobal Then
-            '    'lText.AppendLine(InputNames.Method & vbTab & InputNames.ITAMethod.FREQUECYGRID.ToString())
-            '    'lText.AppendLine(InputNames.Method & vbTab & InputNames.ITAMethod.FREQUENCYGRAPH.ToString())
-            '    'lText.AppendLine(InputNames.Method & vbTab & InputNames.ITAMethod.NDAYTIMESERIES.ToString())
-            '    'lText.AppendLine(InputNames.Method & vbTab & InputNames.ITAMethod.TRENDLIST.ToString())
-            'End If
+            If Not lSetGlobal Then
+                Dim lDuration As String = aArgs.GetValue(InputNames.IncludeYears, "")
+                lText.AppendLine(InputNames.IncludeYears & vbTab & lDuration)
+                Dim lStartYear As String = aArgs.GetValue(InputNames.StartYear, 0)
+                lText.AppendLine(InputNames.StartYear & vbTab & lStartYear)
+                Dim lEndYear As String = aArgs.GetValue(InputNames.EndYear, 0)
+                lText.AppendLine(InputNames.EndYear & vbTab & lEndYear)
+            End If
+            Dim lStartMonth As Integer = aArgs.GetValue(InputNames.StartMonth, 4)
+            lText.AppendLine(InputNames.StartMonth & vbTab & lStartMonth)
+            Dim lStartDay As Integer = aArgs.GetValue(InputNames.StartDay, 1)
+            lText.AppendLine(InputNames.StartDay & vbTab & lStartDay)
+            Dim lEndMonth As String = aArgs.GetValue(InputNames.EndMonth, 3)
+            lText.AppendLine(InputNames.EndMonth & vbTab & lEndMonth)
+            Dim lEndDay As String = aArgs.GetValue(InputNames.EndDay, 31)
+            lText.AppendLine(InputNames.EndDay & vbTab & lEndDay)
 
-            'If lSetGlobal Then
-            '    lText.AppendLine(InputNames.HighLowText & vbTab & "HIGH")
-            '    Dim lHighStart As String = InputNames.HighFlowSeasonStart
-            '    Dim lHighEnd As String = InputNames.HighFlowSeasonEnd
-            '    lText.AppendLine(lHighStart & vbTab & aArgs.GetValue(lHighStart, ""))
-            '    lText.AppendLine(lHighEnd & vbTab & aArgs.GetValue(lHighEnd, ""))
-            '    lText.AppendLine(InputNames.HighLowText & vbTab & "LOW")
-            '    Dim lLowStart As String = InputNames.LowFlowSeasonStart
-            '    Dim lLowEnd As String = InputNames.LowFlowSeasonEnd
-            '    lText.AppendLine(lLowStart & vbTab & aArgs.GetValue(lLowStart, ""))
-            '    lText.AppendLine(lLowEnd & vbTab & aArgs.GetValue(lLowEnd, ""))
-            'ElseIf aArgs.ContainsAttribute(InputNames.HighLow) Then
-            '    Dim lCondition As String = aArgs.GetValue(InputNames.HighLow)
-            '    If Not String.IsNullOrEmpty(lCondition) Then
-            '        If lCondition.ToLower().Contains("high") Then
-            '            lText.AppendLine(InputNames.HighLowText & vbTab & "HIGH")
-            '            Dim lHighStart As String = InputNames.HighFlowSeasonStart
-            '            Dim lHighEnd As String = InputNames.HighFlowSeasonEnd
-            '            lText.AppendLine(lHighStart & vbTab & aArgs.GetValue(lHighStart, ""))
-            '            lText.AppendLine(lHighEnd & vbTab & aArgs.GetValue(lHighEnd, ""))
-            '        ElseIf lCondition.ToLower().Contains("low") Then
-            '            lText.AppendLine(InputNames.HighLowText & vbTab & "LOW")
-            '            Dim lLowStart As String = InputNames.LowFlowSeasonStart
-            '            Dim lLowEnd As String = InputNames.LowFlowSeasonEnd
-            '            lText.AppendLine(lLowStart & vbTab & aArgs.GetValue(lLowStart, ""))
-            '            lText.AppendLine(lLowEnd & vbTab & aArgs.GetValue(lLowEnd, ""))
-            '        End If
-            '    End If
-            '    'lText.AppendLine(InputNames.HighLowText & vbTab & aArgs.GetValue(InputNames.HighLow))
-            'End If
-            ''The high/low option will dictate the starting and ending dates
+            'list all analysis methods
+            lText.AppendLine(Param_Method(aArgs, EBioDFlowType.Acute_maximum_concentration, True))
+            lText.AppendLine(Param_Method(aArgs, EBioDFlowType.Chronic_continuous_concentration, True))
+            lText.AppendLine(Param_Method(aArgs, EBioDFlowType.Ammonia, True))
 
-            'If aArgs.ContainsAttribute(InputNames.Logarithmic) Then
-            '    Dim log As String = "YES"
-            '    If Not aArgs.GetValue(InputNames.Logarithmic) Then log = "NO"
-            '    lText.AppendLine(InputNames.Logarithmic & vbTab & log)
-            '    'ElseIf lSetGlobal Then
-            '    '    lText.AppendLine(InputNames.Logarithmic & vbTab & "YES")
-            'End If
+            lText.AppendLine(Param_Method(aArgs, EDFlowType.Hydrological, False))
+            lText.AppendLine(Param_Method(aArgs, EDFlowType.Explicit_Flow_Value, False))
+            lText.AppendLine(Param_Method(aArgs, EDFlowType.Flow_Percentile, False))
 
-            'If aArgs.ContainsAttribute(InputNames.MultiNDayPlot) Then
-            '    Dim mplot As String = "YES"
-            '    If Not aArgs.GetValue(InputNames.MultiNDayPlot) Then mplot = "NO"
-            '    lText.AppendLine(InputNames.MultiNDayPlot & vbTab & mplot)
-            '    'ElseIf lSetGlobal Then
-            '    '    lText.AppendLine(InputNames.MultiNDayPlot & vbTab & "NO")
-            'End If
+            If lSetGlobal Then
+                Dim lDatadir As String = aArgs.GetValue(InputNames.DataDir, "")
+                If IO.Directory.Exists(lDatadir) Then
+                    lText.AppendLine(InputNames.DataDir & vbTab & lDatadir)
+                End If
+            End If
 
-            'If aArgs.ContainsAttribute(InputNames.MultiStationPlot) Then
-            '    Dim mplot As String = "YES"
-            '    If Not aArgs.GetValue(InputNames.MultiStationPlot) Then mplot = "NO"
-            '    lText.AppendLine(InputNames.MultiStationPlot & vbTab & mplot)
-            '    'ElseIf lSetGlobal Then
-            '    '    lText.AppendLine(InputNames.MultiStationPlot & vbTab & "NO")
-            'End If
+            Dim lOutputDir As String = aArgs.GetValue(InputNames.OutputDir, "")
+            Dim lOutputPrefix As String = aArgs.GetValue(InputNames.OutputPrefix, "")
+            lText.AppendLine(InputNames.OutputDir & vbTab & lOutputDir)
+            lText.AppendLine(InputNames.OutputPrefix & vbTab & lOutputPrefix)
 
-            'If aArgs.ContainsAttribute(InputNames.NDays) Then
-            '    Dim lNDays As atcCollection = aArgs.GetValue(InputNames.NDays, Nothing)
-            '    Dim lNdaysText As String = ""
-            '    If lNDays IsNot Nothing Then
-            '        For Each lNday As Double In lNDays.Keys
-            '            If lNDays.ItemByKey(lNday) Then
-            '                lNdaysText &= Int(lNday) & ","
-            '            End If
-            '        Next
-            '        lText.AppendLine(InputNames.NDays & vbTab & lNdaysText.TrimEnd(","))
-            '    End If
-            'End If
-
-            'If aArgs.ContainsAttribute(InputNames.ReturnPeriods) Then
-            '    Dim lRPs As atcCollection = aArgs.GetValue(InputNames.ReturnPeriods, Nothing)
-            '    Dim lRPsText As String = ""
-            '    If lRPs IsNot Nothing Then
-            '        For Each lRP As Double In lRPs.Keys
-            '            If lRPs.ItemByKey(lRP) Then
-            '                lRPsText &= lRP & ","
-            '            End If
-            '        Next
-            '        lText.AppendLine(InputNames.ReturnPeriodText & vbTab & lRPsText.TrimEnd(","))
-            '    End If
-            'End If
-
-            'If lSetGlobal Then
-            '    Dim lDatadir As String = aArgs.GetValue(InputNames.DataDir, "")
-            '    If IO.Directory.Exists(lDatadir) Then
-            '        lText.AppendLine(InputNames.DataDir & vbTab & lDatadir)
-            '    End If
-            'End If
-
-            'Dim lOutputDir As String = aArgs.GetValue(InputNames.OutputDir, "")
-            'Dim lOutputPrefix As String = aArgs.GetValue(InputNames.OutputPrefix, "")
-            'lText.AppendLine(InputNames.OutputDir & vbTab & lOutputDir)
-            'lText.AppendLine(InputNames.OutputPrefix & vbTab & lOutputPrefix)
-
-            'If loperation.ToLower = "groupsetparm" Then
-            '    lText.AppendLine("END SWSTAT")
-            'ElseIf lSetGlobal Then
-            '    lText.AppendLine("END GLOBAL")
-            'End If
-            'Return lText.ToString()
+            If loperation.ToLower = "groupsetparm" Then
+                lText.AppendLine("END SWSTAT")
+            ElseIf lSetGlobal Then
+                lText.AppendLine("END GLOBAL")
+            End If
+            Return lText.ToString()
         End Function
 
+        Private Shared Function Param_Method(ByVal aArgs As atcDataAttributes, ByVal aMethod As Integer, ByVal aBio As Boolean) As String
+            Dim lMethodBlock As New Text.StringBuilder()
+            lMethodBlock.AppendLine(Method)
+            Dim lParams() As Integer = Nothing
+            If aBio Then
+                lMethodBlock.AppendLine(BiologicalDFLOW & vbTab & TextTrue)
+                Dim lSelectedMethod As Integer = aArgs.GetValue(BioSelectedMethod, -1)
+                Select Case aMethod
+                    Case EBioDFlowType.Acute_maximum_concentration
+                        lMethodBlock.Append("Type_" & EBioDFlowType.Acute_maximum_concentration.ToString())
+                        lParams = aArgs.GetValue(EBioDFlowType.Acute_maximum_concentration.ToString(), Nothing)
+                    Case EBioDFlowType.Chronic_continuous_concentration
+                        lMethodBlock.Append("Type_" & EBioDFlowType.Chronic_continuous_concentration.ToString())
+                        lParams = aArgs.GetValue(EBioDFlowType.Chronic_continuous_concentration.ToString(), Nothing)
+                    Case EBioDFlowType.Ammonia
+                        lMethodBlock.Append("Type_" & EBioDFlowType.Ammonia.ToString())
+                        lParams = aArgs.GetValue(EBioDFlowType.Ammonia.ToString(), Nothing)
+                End Select
+
+                If lSelectedMethod >= 0 Then
+                    Select Case lSelectedMethod
+                        Case EBioDFlowType.Acute_maximum_concentration
+                            lMethodBlock.AppendLine(vbTab & SelectedMethodText)
+                        Case EBioDFlowType.Chronic_continuous_concentration
+                            lMethodBlock.AppendLine(vbTab & SelectedMethodText)
+                        Case EBioDFlowType.Ammonia
+                            lMethodBlock.AppendLine(vbTab & SelectedMethodText)
+                    End Select
+                End If
+
+                If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
+                    lMethodBlock.AppendLine(BioAvgPeriod & vbTab & lParams(0))
+                    lMethodBlock.AppendLine(BioReturnYears & vbTab & lParams(1))
+                    lMethodBlock.AppendLine(BioClusterDays & vbTab & lParams(2))
+                    lMethodBlock.AppendLine(BioNumExcrsnPerCluster & vbTab & lParams(3))
+                End If
+            Else
+                Dim lExFlowValue As Double
+                Dim lFlowPct As Double
+                lMethodBlock.AppendLine(BiologicalDFLOW & vbTab & TextFalse)
+                Dim lSelectedMethod As Integer = aArgs.GetValue(NBioSelectedMethod, -1)
+                Select Case aMethod
+                    Case EDFlowType.Hydrological
+                        lMethodBlock.Append("Type_" & EDFlowType.Hydrological.ToString())
+                        lParams = aArgs.GetValue(EDFlowType.Hydrological.ToString())
+                    Case EDFlowType.Explicit_Flow_Value
+                        lMethodBlock.Append("Type_" & EDFlowType.Explicit_Flow_Value.ToString())
+                        lExFlowValue = aArgs.GetValue(EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                    Case EDFlowType.Flow_Percentile
+                        lMethodBlock.Append("Type_" & EDFlowType.Flow_Percentile.ToString())
+                        lFlowPct = aArgs.GetValue(EDFlowType.Flow_Percentile.ToString(), 0.1)
+                End Select
+                If lSelectedMethod >= 0 Then
+                    Select Case lSelectedMethod
+                        Case EDFlowType.Hydrological
+                            lMethodBlock.AppendLine(vbTab & SelectedMethodText)
+                        Case EDFlowType.Explicit_Flow_Value
+                            lMethodBlock.AppendLine(vbTab & SelectedMethodText)
+                        Case EDFlowType.Flow_Percentile
+                            lMethodBlock.AppendLine(vbTab & SelectedMethodText)
+                    End Select
+                End If
+                Select Case aMethod
+                    Case EDFlowType.Hydrological
+                        If lParams IsNot Nothing AndAlso lParams.Length = 2 Then
+                            lMethodBlock.AppendLine(NBioAveragingPeriod & vbTab & lParams(0))
+                            lMethodBlock.AppendLine(NBioReturnPeriod & vbTab & lParams(1))
+                        End If
+                    Case EDFlowType.Explicit_Flow_Value
+                        lMethodBlock.AppendLine(NBioExplicitFlow & vbTab & lExFlowValue)
+                    Case EDFlowType.Flow_Percentile
+                        lMethodBlock.AppendLine(NBioFlowPercentile & vbTab & lFlowPct)
+                End Select
+            End If
+            lMethodBlock.AppendLine("END " & Method)
+            Return lMethodBlock.ToString()
+        End Function
         Public Shared Function CalculateNDayValues(ByVal aDataGroup As atcTimeseriesGroup, _
                                            ByVal aGroupArgs As atcDataAttributes, _
                                            ByVal aNDayDbl() As Double, _
@@ -449,7 +482,7 @@ Public Module modUtil
             With lCalcArgs
                 .SetValue("Timeseries", lDataGroup)
                 '.SetValue(NDay, aNDayDbl)
-                .SetValue(ReturnPeriod, aReturnPeriodDbl)
+                .SetValue(NBioReturnPeriod, aReturnPeriodDbl)
             End With
 
             Dim lOperationName As String = "n-day high value"
