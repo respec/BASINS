@@ -6,6 +6,8 @@ Imports MapWinUtility
 Public Class clsBatchSpec
     Inherits clsBatch
 
+    Public ListBatchOpnsMethods As atcCollection
+
     Public Sub New(ByVal aProgressbar As Windows.Forms.ProgressBar, ByVal aTextField As Windows.Forms.TextBox)
         gProgressBar = aProgressbar
         gTextStatus = aTextField
@@ -21,6 +23,11 @@ Public Class clsBatchSpec
             Else
                 ListBatchOpns.Clear()
             End If
+            If ListBatchOpnsMethods Is Nothing Then
+                ListBatchOpnsMethods = New atcCollection()
+            Else
+                ListBatchOpnsMethods.Clear()
+            End If
             If ListBatchUnitsData Is Nothing Then
                 ListBatchUnitsData = New atcCollection()
             Else
@@ -32,7 +39,7 @@ Public Class clsBatchSpec
             Dim lOneLine As String
             Dim lSR As New IO.StreamReader(SpecFilename)
 
-            Dim lBaseflowOpnCounter As Integer = 1
+            Dim lOpnCounter As Integer = 1
             While Not lSR.EndOfStream
                 lOneLine = lSR.ReadLine()
                 If lOneLine.Contains("***") Then Continue While 'bypass comments
@@ -44,6 +51,20 @@ Public Class clsBatchSpec
                         lOneLine = lSR.ReadLine()
                         If lOneLine.Contains("***") Then Continue While
                         If lOneLine.Trim() = "" Then Continue While
+                        If lOneLine.StartsWith("METHOD") Then
+                            Dim lMethodSetting As String = ""
+                            While Not lSR.EndOfStream
+                                lOneLine = lSR.ReadLine()
+                                If lOneLine.Contains("***") Then Continue While
+                                If lOneLine.Trim() = "" Then Continue While
+                                If lOneLine.StartsWith("END METHOD") Then
+                                    SpecifyMethod("GLOBAL", lMethodSetting)
+                                    lOneLine = lSR.ReadLine()
+                                    Exit While
+                                End If
+                                lMethodSetting &= lOneLine & ","
+                            End While
+                        End If
                         If lOneLine.StartsWith("END GLOBAL") Then
                             lReachedEnd = True
                             Exit While
@@ -59,12 +80,26 @@ Public Class clsBatchSpec
                         lOneLine = lSR.ReadLine()
                         If lOneLine.Contains("***") Then Continue While
                         If lOneLine.Trim() = "" Then Continue While
+                        If lOneLine.StartsWith("METHOD") Then
+                            Dim lMethodSetting As String = ""
+                            While Not lSR.EndOfStream
+                                lOneLine = lSR.ReadLine()
+                                If lOneLine.Contains("***") Then Continue While
+                                If lOneLine.Trim() = "" Then Continue While
+                                If lOneLine.StartsWith("END METHOD") Then
+                                    SpecifyMethod("GROUP" & lOpnCounter, lMethodSetting)
+                                    lOneLine = lSR.ReadLine()
+                                    Exit While
+                                End If
+                                lMethodSetting &= lOneLine & ","
+                            End While
+                        End If
                         If lOneLine.StartsWith("END DFLOW") Then
                             lReachedEnd = True
-                            lBaseflowOpnCounter += 1
+                            lOpnCounter += 1
                             Exit While
                         End If
-                        SpecifyGroup(lOneLine, lBaseflowOpnCounter)
+                        SpecifyGroup(lOneLine, lOpnCounter)
                     End While
                     If lReachedEnd Then Continue While
                 End If
@@ -112,6 +147,21 @@ Public Class clsBatchSpec
                 Next
             Next
         Next
+
+        Dim lglobalMethods As atcCollection = GlobalSettings.GetValue(InputNames.Methods, Nothing)
+        If lglobalMethods IsNot Nothing Then
+            For Each lGroupKey As Integer In ListBatchOpns.Keys
+                Dim lgroupMethods As atcCollection = ListBatchOpnsMethods.ItemByKey(lGroupKey)
+                If lgroupMethods Is Nothing Then
+                    lgroupMethods = New atcCollection()
+                    ListBatchOpnsMethods.Add(lGroupKey, lgroupMethods)
+                    For Each lMethodKey As String In lglobalMethods.Keys
+                        Dim lglobalMethod As atcCollection = lglobalMethods.ItemByKey(lMethodKey)
+                        lgroupMethods.Add(lMethodKey, lglobalMethod.Clone())
+                    Next
+                End If
+            Next
+        End If
 
         'Below is to download all stations data at once
         'Dim lContinueDataDownload As Boolean = True
@@ -165,6 +215,89 @@ Public Class clsBatchSpec
         'End If
     End Sub
 
+    Private Function GetMethod(ByVal aSpec As String) As atcCollection
+        Dim lMethod As New atcCollection()
+        Dim lSpecs() As String = aSpec.Split(",")
+        Dim lMethodName As String = ""
+        For Each lspec As String In lSpecs
+            lspec = lspec.Trim()
+            If Not String.IsNullOrEmpty(lspec) Then
+                Dim lArr() As String = lspec.Split(vbTab)
+                If lArr(0).ToLower().StartsWith("type_") Then
+                    lMethodName = lArr(0)
+                End If
+                If Not lMethod.Keys.Contains(lArr(0)) Then
+                    lMethod.Add(lArr(0), lArr(1))
+                End If
+            End If
+        Next
+        Return lMethod
+    End Function
+
+    Private Function AddGlobalMethod(ByVal aMethod As atcCollection) As String
+        If GlobalSettings Is Nothing Then Return ""
+
+        Dim lNewMethodKey As String = ""
+        With GlobalSettings
+            Dim lMethods As atcCollection = .GetValue(InputNames.Methods)
+            If lMethods Is Nothing Then
+                lMethods = New atcCollection()
+                .SetValue(InputNames.Methods, lMethods)
+            End If
+
+            For Each lmKey As String In aMethod.Keys
+                If lmKey.ToLower().StartsWith("type_") Then
+                    lNewMethodKey = lmKey
+                End If
+            Next
+            Dim lCount As Integer = 0
+            For Each lmKey As String In lMethods.Keys
+                If lmKey.StartsWith(lNewMethodKey) Then
+                    lCount += 1
+                End If
+            Next
+            lNewMethodKey &= "_" & lCount.ToString()
+            lMethods.Add(lNewMethodKey, aMethod)
+        End With
+        Return lNewMethodKey
+    End Function
+
+    Private Function AddGroupMethod(ByVal aGroupId As Integer, ByVal aMethod As atcCollection) As String
+        Dim lMethods As atcCollection = ListBatchOpnsMethods.ItemByKey(aGroupId)
+        If lMethods Is Nothing Then
+            lMethods = New atcCollection()
+            ListBatchOpnsMethods.Add(aGroupId, lMethods)
+        End If
+        Dim lNewMethodKey As String = ""
+        For Each lmKey As String In aMethod.Keys
+            If lmKey.ToLower().StartsWith("type_") Then
+                lNewMethodKey = lmKey
+            End If
+        Next
+        Dim lCount As Integer = 0
+        For Each lmKey As String In lMethods.Keys
+            If lmKey.StartsWith(lNewMethodKey) Then
+                lCount += 1
+            End If
+        Next
+        lNewMethodKey &= "_" & lCount.ToString()
+        lMethods.Add(lNewMethodKey, aMethod)
+        Return lNewMethodKey
+    End Function
+
+    Private Sub SpecifyMethod(ByVal aTargetGroup As String, ByVal aSpec As String)
+        Dim lMethod As atcCollection = GetMethod(aSpec)
+        If aTargetGroup.StartsWith("GLOBAL") Then
+            If GlobalSettings Is Nothing Then GlobalSettings = New atcDataAttributes()
+            Dim lNewMethodName As String = AddGlobalMethod(lMethod)
+        ElseIf aTargetGroup.StartsWith("GROUP") Then
+            Dim lGroupIdStr As String = aTargetGroup.Substring("GROUP".Length)
+            Dim lGroupId As Integer
+            If Integer.TryParse(lGroupIdStr, lGroupId) Then
+                AddGroupMethod(lGroupId, lMethod)
+            End If
+        End If
+    End Sub
     ''' <summary>
     ''' This routine save a line of global setting
     ''' differentiate by first keyword on the line
@@ -172,6 +305,8 @@ Public Class clsBatchSpec
     ''' <param name="aSpec"></param>
     ''' <remarks></remarks>
     Public Overrides Sub SpecifyGlobal(ByVal aSpec As String)
+        If String.IsNullOrEmpty(aSpec) Then Exit Sub
+        If aSpec.Contains("***") Then Exit Sub
         If GlobalSettings Is Nothing Then GlobalSettings = New atcDataAttributes()
         Dim lArr() As String = aSpec.Split(Delimiter)
         If String.IsNullOrEmpty(lArr(1).Trim()) Then Return
@@ -253,6 +388,9 @@ Public Class clsBatchSpec
     ''' <param name="aSpec"></param>
     ''' <remarks></remarks>
     Public Overrides Sub SpecifyGroup(ByVal aSpec As String, ByVal aOpnCount As Integer)
+        If String.IsNullOrEmpty(aSpec) Then Exit Sub
+        If aSpec.Contains("***") Then Exit Sub
+
         Dim lArr() As String = aSpec.Split(Delimiter)
 
         If lArr.Length < 2 Then Return

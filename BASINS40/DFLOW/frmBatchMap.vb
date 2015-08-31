@@ -330,31 +330,6 @@ Public Class frmBatchMap
         Next
     End Sub
 
-    Private Sub ParmetersSetSWSTAT(ByVal aArgs As atcDataAttributes) Handles pfrmParams.ParametersSet
-        Dim lText As String = InputNames.ParametersToText(aArgs)
-
-        If String.IsNullOrEmpty(lText) Then
-            txtParameters.Text = ""
-        Else
-            'Dim loperation As String = aArgs.GetValue("Operation", "")
-            'Dim lgroupname As String = aArgs.GetValue("Group", "")
-            'Dim lArg As atcDataAttributes = Nothing
-            'If loperation.ToLower = "groupsetparm" Then
-            '    lArg = pGroupsInputsBF.ItemByKey(lgroupname)
-            '    If lArg Is Nothing Then
-            '        lArg = New atcDataAttributes()
-            '        pGroupsInputsBF.Add(lgroupname, lArg)
-            '    End If
-            'Else
-            '    lArg = pGlobalInputsBF
-            'End If
-            'For Each lDataDef As atcDefinedValue In aArgs
-            '    lArg.SetValue(lDataDef.Definition.Name, lDataDef.Value)
-            'Next
-            txtParameters.Text = lText.ToString()
-        End If
-    End Sub
-
     Private Sub btnBrowseDataDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseDataDir.Click
         Dim lFolder As New System.Windows.Forms.FolderBrowserDialog()
         If lFolder.ShowDialog = Windows.Forms.DialogResult.OK Then
@@ -471,11 +446,11 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnDoBatch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoBatch.Click
-        If pGroupsInputsSWSTAT.Count = 0 AndAlso pGroupsInputsDFLOW.Count = 0 Then
-            'Logger.Msg("Need to specify global default parameters.", "Batch Run Parameter Setup")
-            Logger.Msg("Need to set up batch run groups.", "Batch Run Parameter Setup")
-            Exit Sub
-        End If
+        'If pGroupsInputsSWSTAT.Count = 0 AndAlso pGroupsInputsDFLOW.Count = 0 Then
+        '    'Logger.Msg("Need to specify global default parameters.", "Batch Run Parameter Setup")
+        '    Logger.Msg("Need to set up batch run groups.", "Batch Run Parameter Setup")
+        '    Exit Sub
+        'End If
         'If pGlobalInputsSWSTAT.Count = 0 Then
         '    Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
         '    Return
@@ -486,6 +461,7 @@ Public Class frmBatchMap
         'End If
         Dim lfrmBatch As New frmBatch()
         lfrmBatch.BatchSpecFile = pBatchSpecFilefullname
+        lfrmBatch.Text = "DFLOW Batch Run"
         lfrmBatch.ShowDialog()
     End Sub
 
@@ -559,6 +535,7 @@ Public Class frmBatchMap
             Logger.Msg("Error Writing Spec File:" & vbCrLf & aFilename & vbCrLf & vbCrLf & ex.Message, lTitle)
         Finally
             If lSW IsNot Nothing Then
+                lSW.Flush()
                 lSW.Close()
                 lSW = Nothing
             End If

@@ -376,7 +376,7 @@ Public Module modUtil
             lText.AppendLine(InputNames.OutputPrefix & vbTab & lOutputPrefix)
 
             If loperation.ToLower = "groupsetparm" Then
-                lText.AppendLine("END SWSTAT")
+                lText.AppendLine("END DFLOW")
             ElseIf lSetGlobal Then
                 lText.AppendLine("END GLOBAL")
             End If
