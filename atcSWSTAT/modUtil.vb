@@ -277,12 +277,18 @@ Public Module modUtil
             'lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
 
             If Not lSetGlobal Then
-                Dim lDuration As String = aArgs.GetValue(InputNames.IncludeYears, "")
-                lText.AppendLine(InputNames.IncludeYears & vbTab & lDuration)
-                Dim lStartYear As String = aArgs.GetValue(InputNames.StartYear, "")
-                lText.AppendLine(InputNames.StartYear & vbTab & lStartYear)
-                Dim lEndYear As String = aArgs.GetValue(InputNames.EndYear, "")
-                lText.AppendLine(InputNames.EndYear & vbTab & lEndYear)
+                If aArgs.ContainsAttribute(InputNames.IncludeYears) Then
+                    Dim lDuration As String = aArgs.GetValue(InputNames.IncludeYears)
+                    If Not String.IsNullOrEmpty(lDuration) Then lText.AppendLine(InputNames.IncludeYears & vbTab & lDuration)
+                End If
+                If aArgs.ContainsAttribute(InputNames.StartYear) Then
+                    Dim lStartYear As String = aArgs.GetValue(InputNames.StartYear)
+                    If Not String.IsNullOrEmpty(lStartYear) Then lText.AppendLine(InputNames.StartYear & vbTab & lStartYear)
+                End If
+                If aArgs.ContainsAttribute(InputNames.EndYear) Then
+                    Dim lEndYear As String = aArgs.GetValue(InputNames.EndYear)
+                    If Not String.IsNullOrEmpty(lEndYear) Then lText.AppendLine(InputNames.EndYear & vbTab & lEndYear)
+                End If
             End If
             If aArgs.ContainsAttribute(atcSWSTAT.modUtil.InputNames.Method) Then
                 Dim lMethods As ArrayList = aArgs.GetValue(atcSWSTAT.modUtil.InputNames.Method)
@@ -337,32 +343,32 @@ Public Module modUtil
             End If
             'The high/low option will dictate the starting and ending dates
 
-            If aArgs.ContainsAttribute(atcSWSTAT.InputNames.Logarithmic) Then
+            If aArgs.ContainsAttribute(InputNames.Logarithmic) Then
                 Dim log As String = "YES"
-                If Not aArgs.GetValue(atcSWSTAT.InputNames.Logarithmic) Then log = "NO"
-                lText.AppendLine(atcSWSTAT.InputNames.Logarithmic & vbTab & log)
+                If Not aArgs.GetValue(InputNames.Logarithmic) Then log = "NO"
+                lText.AppendLine(InputNames.Logarithmic & vbTab & log)
                 'ElseIf lSetGlobal Then
                 '    lText.AppendLine(atcSWSTAT.InputNames.Logarithmic & vbTab & "YES")
             End If
 
-            If aArgs.ContainsAttribute(atcSWSTAT.InputNames.MultiNDayPlot) Then
+            If aArgs.ContainsAttribute(InputNames.MultiNDayPlot) Then
                 Dim mplot As String = "YES"
-                If Not aArgs.GetValue(atcSWSTAT.InputNames.MultiNDayPlot) Then mplot = "NO"
-                lText.AppendLine(atcSWSTAT.InputNames.MultiNDayPlot & vbTab & mplot)
+                If Not aArgs.GetValue(InputNames.MultiNDayPlot) Then mplot = "NO"
+                lText.AppendLine(InputNames.MultiNDayPlot & vbTab & mplot)
                 'ElseIf lSetGlobal Then
                 '    lText.AppendLine(atcSWSTAT.InputNames.MultiNDayPlot & vbTab & "NO")
             End If
 
-            If aArgs.ContainsAttribute(atcSWSTAT.InputNames.MultiStationPlot) Then
+            If aArgs.ContainsAttribute(InputNames.MultiStationPlot) Then
                 Dim mplot As String = "YES"
-                If Not aArgs.GetValue(atcSWSTAT.InputNames.MultiStationPlot) Then mplot = "NO"
-                lText.AppendLine(atcSWSTAT.InputNames.MultiStationPlot & vbTab & mplot)
+                If Not aArgs.GetValue(InputNames.MultiStationPlot) Then mplot = "NO"
+                lText.AppendLine(InputNames.MultiStationPlot & vbTab & mplot)
                 'ElseIf lSetGlobal Then
                 '    lText.AppendLine(atcSWSTAT.InputNames.MultiStationPlot & vbTab & "NO")
             End If
 
-            If aArgs.ContainsAttribute(atcSWSTAT.InputNames.NDays) Then
-                Dim lNDays As atcCollection = aArgs.GetValue(atcSWSTAT.InputNames.NDays, Nothing)
+            If aArgs.ContainsAttribute(InputNames.NDays) Then
+                Dim lNDays As atcCollection = aArgs.GetValue(InputNames.NDays, Nothing)
                 Dim lNdaysText As String = ""
                 If lNDays IsNot Nothing Then
                     For Each lNday As Double In lNDays.Keys
@@ -370,12 +376,12 @@ Public Module modUtil
                             lNdaysText &= Int(lNday) & ","
                         End If
                     Next
-                    lText.AppendLine(atcSWSTAT.InputNames.NDays & vbTab & lNdaysText.TrimEnd(","))
+                    If Not String.IsNullOrEmpty(lNdaysText) Then lText.AppendLine(InputNames.NDays & vbTab & lNdaysText.TrimEnd(","))
                 End If
             End If
 
-            If aArgs.ContainsAttribute(atcSWSTAT.InputNames.ReturnPeriods) Then
-                Dim lRPs As atcCollection = aArgs.GetValue(atcSWSTAT.InputNames.ReturnPeriods, Nothing)
+            If aArgs.ContainsAttribute(InputNames.ReturnPeriods) Then
+                Dim lRPs As atcCollection = aArgs.GetValue(InputNames.ReturnPeriods, Nothing)
                 Dim lRPsText As String = ""
                 If lRPs IsNot Nothing Then
                     For Each lRP As Double In lRPs.Keys
@@ -383,21 +389,21 @@ Public Module modUtil
                             lRPsText &= lRP & ","
                         End If
                     Next
-                    lText.AppendLine(atcSWSTAT.InputNames.ReturnPeriodText & vbTab & lRPsText.TrimEnd(","))
+                    If Not String.IsNullOrEmpty(lRPsText) Then lText.AppendLine(InputNames.ReturnPeriodText & vbTab & lRPsText.TrimEnd(","))
                 End If
             End If
 
             If lSetGlobal Then
-                Dim lDatadir As String = aArgs.GetValue(atcSWSTAT.InputNames.DataDir, "")
+                Dim lDatadir As String = aArgs.GetValue(InputNames.DataDir, "")
                 If IO.Directory.Exists(lDatadir) Then
-                    lText.AppendLine(atcSWSTAT.InputNames.DataDir & vbTab & lDatadir)
+                    lText.AppendLine(InputNames.DataDir & vbTab & lDatadir)
                 End If
             End If
 
-            Dim lOutputDir As String = aArgs.GetValue(atcSWSTAT.InputNames.OutputDir, "")
-            Dim lOutputPrefix As String = aArgs.GetValue(atcSWSTAT.InputNames.OutputPrefix, "")
-            lText.AppendLine(atcSWSTAT.InputNames.OutputDir & vbTab & lOutputDir)
-            lText.AppendLine(atcSWSTAT.InputNames.OutputPrefix & vbTab & lOutputPrefix)
+            Dim lOutputDir As String = aArgs.GetValue(InputNames.OutputDir, "")
+            Dim lOutputPrefix As String = aArgs.GetValue(InputNames.OutputPrefix, "")
+            If Not String.IsNullOrEmpty(lOutputDir) Then lText.AppendLine(InputNames.OutputDir & vbTab & lOutputDir)
+            If Not String.IsNullOrEmpty(lOutputPrefix) Then lText.AppendLine(InputNames.OutputPrefix & vbTab & lOutputPrefix)
 
             If loperation.ToLower = "groupsetparm" Then
                 lText.AppendLine("END SWSTAT")
