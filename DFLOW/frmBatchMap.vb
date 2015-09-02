@@ -83,7 +83,7 @@ Public Class frmBatchMap
             'For Each lDataDef As atcDefinedValue In aArgs
             '    lArg.SetValue(lDataDef.Definition.Name, lDataDef.Value)
             'Next
-            txtParameters.Text = lText.ToString()
+            txtParameters.Text = lText
         End If
     End Sub
 
@@ -461,7 +461,7 @@ Public Class frmBatchMap
         'End If
         Dim lfrmBatch As New frmBatch()
         lfrmBatch.BatchSpecFile = pBatchSpecFilefullname
-        lfrmBatch.Text = "DFLOW Batch Run"
+        lfrmBatch.Text = "DFLOW: Batch Run"
         lfrmBatch.ShowDialog()
     End Sub
 

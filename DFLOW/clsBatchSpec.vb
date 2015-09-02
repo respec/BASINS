@@ -521,6 +521,47 @@ Public Class clsBatchSpec
         End Select
     End Sub
 
+    Private Function IsDirectoryWritable(ByVal aPath As String, Optional ByVal aCreate As Boolean = True) As Boolean
+        If String.IsNullOrEmpty(aPath) Then Return False
+        If Not IO.Directory.Exists(aPath) Then
+            If aCreate Then
+                Try
+                    Dim lDirInfo As New IO.DirectoryInfo(aPath)
+                    Dim ldSecurity As System.Security.AccessControl.DirectorySecurity = lDirInfo.GetAccessControl()
+                    MkDirPath(aPath)
+                Catch ex As Exception
+                    'RaiseEvent StatusUpdate("0,0,Cannot create output directory: " & vbCrLf & lOutputDir)
+                    UpdateStatus("Cannot create output directory: " & vbCrLf & aPath, , True)
+                    Return False
+                End Try
+            Else
+                Return False
+            End If
+        End If
+
+        Dim lDirWritable As Boolean = True
+        Try
+            Dim lSW As IO.StreamWriter = Nothing
+            Try
+                lSW = New IO.StreamWriter(IO.Path.Combine(aPath, "z.txt"), False)
+                lSW.WriteLine("1")
+                lSW.Flush()
+                lSW.Close()
+                lSW = Nothing
+                IO.File.Delete(IO.Path.Combine(aPath, "z.txt"))
+            Catch ex As Exception
+                If lSW IsNot Nothing Then
+                    lSW.Close()
+                    lSW = Nothing
+                End If
+                lDirWritable = False
+            End Try
+        Catch ex As Exception
+            lDirWritable = False
+        End Try
+        Return lDirWritable
+    End Function
+
     Public Overrides Sub DoBatch()
         If Not String.IsNullOrEmpty(Message) AndAlso Message.ToLower.StartsWith("error") Then
             Logger.Msg("Please address following issues before running batch:" & vbCrLf & Message, _
@@ -530,60 +571,33 @@ Public Class clsBatchSpec
             Message = ""
         End If
         Dim lOutputDir As String = GlobalSettings.GetValue(InputNames.OutputDir, "")
-        If Not IO.Directory.Exists(lOutputDir) Then
-            Try
-                Dim lDirInfo As New IO.DirectoryInfo(lOutputDir)
-                Dim ldSecurity As System.Security.AccessControl.DirectorySecurity = lDirInfo.GetAccessControl()
-                MkDirPath(lOutputDir)
-            Catch ex As Exception
-                'RaiseEvent StatusUpdate("0,0,Cannot create output directory: " & vbCrLf & lOutputDir)
-                UpdateStatus("Cannot create output directory: " & vbCrLf & lOutputDir, , True)
-                Exit Sub
-            End Try
-        End If
-        Dim lOutputDirWritable As Boolean = True
-        Try
-            Dim lSW As IO.StreamWriter = Nothing
-            Try
-                lSW = New IO.StreamWriter(IO.Path.Combine(lOutputDir, "z.txt"), False)
-                lSW.WriteLine("1")
-                lSW.Flush()
-                lSW.Close()
-                lSW = Nothing
-                IO.File.Delete(IO.Path.Combine(lOutputDir, "z.txt"))
-            Catch ex As Exception
-                If lSW IsNot Nothing Then
-                    lSW.Close()
-                    lSW = Nothing
-                End If
-                lOutputDirWritable = False
-            End Try
-        Catch ex As Exception
-            lOutputDirWritable = False
-        End Try
-
+        Dim lOutputDirWritable As Boolean = IsDirectoryWritable(lOutputDir)
         If Not lOutputDirWritable Then
             'RaiseEvent StatusUpdate("0,0,Can not write to output directory: " & vbCrLf & lOutputDir)
             'Windows.Forms.Application.DoEvents()
             UpdateStatus("Can not write to output directory: " & vbCrLf & lOutputDir, , True)
-            Return
+            Exit Sub
         End If
 
-        Dim lTotalBFOpn As Integer = 0
-        For Each lKey As Integer In ListBatchOpns.Keys
-            For Each lstation As clsBatchUnitStation In ListBatchOpns.ItemByKey(lKey)
-                lTotalBFOpn += 1
-            Next
-        Next
+        Dim lTotalStations As Integer
+        Dim lTotalBFOpn As Integer = ListBatchOpns.Count
+        'For Each lKey As Integer In ListBatchOpns.Keys
+        '    For Each lstation As clsBatchUnitStation In ListBatchOpns.ItemByKey(lKey)
+        '        lTotalBFOpn += 1
+        '    Next
+        'Next
         gProgressBar.Minimum = 0
         gProgressBar.Maximum = lTotalBFOpn
-        gProgressBar.Step = 1
+
         Dim lBFOpnCount As Integer = 0
         Dim lConfigFile As IO.StreamWriter = Nothing
         For Each lBFOpnId As Integer In ListBatchOpns.Keys
             Dim lBFOpn As atcCollection = ListBatchOpns.ItemByKey(lBFOpnId)
-            Dim lBFOpnDir As String = IO.Path.Combine(lOutputDir, "ITFA_Opn_" & lBFOpnId)
+            Dim lBFOpnName As String = "DFLOW_Opn_" & lBFOpnId
+            Dim lBFOpnDir As String = IO.Path.Combine(lOutputDir, lBFOpnName)
             MkDirPath(lBFOpnDir)
+            'Retrieve parameters, at least one hydrologic group and one biological group
+            Dim lParams As atcCollection = ListBatchOpnsMethods.ItemByKey(lBFOpnId)
 
             'Build a TserGroup to do ITFA
             Dim lDataGroup As New atcTimeseriesGroup()
@@ -597,126 +611,92 @@ Public Class clsBatchSpec
                     lStation.Message &= "Error: flow data is missing." & vbCrLf
                 End If
             Next
-            If lDataGroup.Count > 0 Then
+            If lDataGroup.Count > 0 AndAlso lParams IsNot Nothing AndAlso lParams.Count >= 2 Then
+                lTotalStations += lDataGroup.Count
                 Dim lStation0 As clsBatchUnitStation = lBFOpn(0)
                 Dim lInputArgs As atcDataAttributes = lStation0.BFInputs
-                'lInputArgs.SetValue("Timeseries", lDataGroup)
-                Dim lNDays(0) As Double
-                Dim lReturnPeriods(0) As Double
-                InputNames.GetNdayReturnPeriodAttributes(lInputArgs, lNDays, lReturnPeriods)
-                If (lNDays IsNot Nothing AndAlso lNDays.Length > 0) AndAlso _
-                   (lReturnPeriods IsNot Nothing AndAlso lReturnPeriods.Length > 0) Then
-                    OutputDir = lBFOpnDir
-                    OutputFilenameRoot = lStation0.BFInputs.GetValue(InputNames.OutputPrefix, "ITFA")
-                    'MethodsLastDone = lStation0.BFInputs.GetValue(InputNames.ITAMethod.FREQUECYGRID)
-                    Try
-                        'Do NDay first
-                        Dim lNDayHighTserListing As String = InputNames.CalculateNDayTser(lDataGroup, lInputArgs, lNDays, True)
-                        Dim lSW As New IO.StreamWriter(IO.Path.Combine(OutputDir, "NDayHighFlowTimeseries.txt"), False)
-                        lSW.WriteLine(lNDayHighTserListing)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay High flow Calculation.", True)
-                        Dim lNDayLowTserListing As String = InputNames.CalculateNDayTser(lDataGroup, lInputArgs, lNDays, False)
-                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "NDayLowFlowTimeseries.txt"), False)
-                        lSW.WriteLine(lNDayLowTserListing)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay Low flow Calculation.", True)
 
-                        'Do Frequency second
-                        Dim lFreqGridHigh As String = InputNames.DoFrequencyGrid(lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
-                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridHighFlow.txt"), False)
-                        lSW.WriteLine(lFreqGridHigh)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency High Flow Calculation.", True)
-                        Dim lFreqGridLow As String = InputNames.DoFrequencyGrid(lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
-                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridLowFlow.txt"), False)
-                        lSW.WriteLine(lFreqGridLow)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency Low Flow Calculation.", True)
-                        'Dim lNDayValuesLowDone As Boolean = InputNames.CalculateNDayValues(lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
-                        'Dim lFreqSource As atcFrequencyGridSource = New atcFrequencyGridSource(lDataGroup, lNDays, lReturnPeriods)
-                        'Dim lCheckFreqSrcMsg As String = InputNames.CheckFreqGrid(lFreqSource)
-                        'lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridReport.txt"), False)
-                        'lSW.WriteLine(lFreqSource.CreateReport())
-                        'lSW.Flush()
-                        'lSW.Close()
-                        'lSW = Nothing
-                        'UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency grid.", True)
+                Dim lBioParamSet As New ArrayList()
+                Dim lNBioParamSet As New ArrayList()
+                For Each lParamSet As atcCollection In lParams
+                    Dim lSetting As String = lParamSet.ItemByKey(InputNames.BiologicalDFLOW)
+                    If lSetting.ToLower() = "yes" Then
+                        lBioParamSet.Add(lParamSet)
+                    Else
+                        lNBioParamSet.Add(lParamSet)
+                    End If
+                Next
+                lTotalBFOpn = lDataGroup.Count * lBioParamSet.Count * lNBioParamSet.Count
+                gProgressBar.Minimum = lDataGroup.Count
+                gProgressBar.Maximum = lTotalBFOpn
+                gProgressBar.Step = lDataGroup.Count
+                Dim lNBioName As String = ""
+                Dim lBioName As String = ""
+                'OutputFilenameRoot = lStation0.BFInputs.GetValue(InputNames.OutputPrefix, "DFLOW")
+                Dim lSW As IO.StreamWriter = Nothing
+                Try
+                    lSW = New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "DFLOW_Report.txt"), False)
+                    For Each lNBioParam As atcCollection In lNBioParamSet
+                        lNBioName = InputNames.GetAbbrevParamSetName(lNBioParam)
+                        For Each lBioParam As atcCollection In lBioParamSet
+                            lBioName = InputNames.GetAbbrevParamSetName(lBioParam)
+                            Try
+                                Dim lReport As String = DFLOWToTable(lDataGroup, lBioParam, lNBioParam, lInputArgs)
+                                lSW.WriteLine("DFLOW :: " & lBFOpnName & " :: NBio(" & lNBioName & ") by Bio(" & lBioName & ")")
+                                lSW.WriteLine(lReport)
+                                lSW.Flush()
+                                lReport = ""
+                                UpdateStatus(lBFOpnName & "-Done NBio(" & lNBioName & ") by Bio(" & lBioName & ")", True)
+                            Catch ex As Exception
+                                UpdateStatus(lBFOpnName & "-Failed NBio(" & lNBioName & ") by Bio(" & lBioName & ")", True)
+                            End Try
+                        Next 'lBioParam
+                    Next 'lNBioParam
+                Catch ex As Exception
 
-                        'Do Trend analysis once for radioHigh.Checked once for not
-                        Dim lTrendHighGridText As String = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, True)
-                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisHighFlowReport.txt"), False)
-                        lSW.WriteLine(lTrendHighGridText)
+                Finally
+                    If lSW IsNot Nothing Then
                         lSW.Flush()
                         lSW.Close()
                         lSW = Nothing
-                        lTrendHighGridText = ""
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend high flow analysis.", True)
-                        Dim lTrendLowGridText = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, False)
-                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisLowFlowReport.txt"), False)
-                        lSW.WriteLine(lTrendLowGridText)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        lTrendLowGridText = ""
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend low flow analysis.", True)
-                        'Do freq graphs
-                        InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for high flow.", True)
-                        InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for low flow.", True)
-                        'ASCIICommon(lTsFlow)
-                        'lStation.Message &= lStation.CalcBF.BF_Message.Trim()
-                    Catch ex As Exception
-
-                    End Try
-                    'If lStationFoundData IsNot Nothing Then Exit For
-                    lConfigFile = New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "Config.txt"), False)
-                    For Each lStation As clsBatchUnitStation In lBFOpn
-                        Dim lDataFilename As String = ListBatchUnitsData.ItemByKey(lStation.StationID)
-                        If String.IsNullOrEmpty(lDataFilename) Then
-                            lDataFilename = lStation.StationDataFilename
-                            If IO.File.Exists(lDataFilename) Then
-                                ListBatchUnitsData.Add(lStation.StationID, lDataFilename)
-                            End If
+                    End If
+                End Try
+                lConfigFile = New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "Config.txt"), False)
+                For Each lStation As clsBatchUnitStation In lBFOpn
+                    Dim lDataFilename As String = ListBatchUnitsData.ItemByKey(lStation.StationID)
+                    If String.IsNullOrEmpty(lDataFilename) Then
+                        lDataFilename = lStation.StationDataFilename
+                        If IO.File.Exists(lDataFilename) Then
+                            ListBatchUnitsData.Add(lStation.StationID, lDataFilename)
                         End If
-                        lConfigFile.WriteLine("Station " & lStation.StationID & ", " & lStation.StationDrainageArea & ", " & lDataFilename)
-                    Next
-                    For Each lAttrib As atcDefinedValue In CType(lBFOpn.ItemByIndex(0), clsBatchUnitStation).BFInputs
-                        Dim lName As String = lAttrib.Definition.Name
-                        Select Case lName.ToLower()
-                            Case "startdate", "enddate"
-                                Dim lDates(5) As Integer
-                                atcUtility.J2Date(lAttrib.Value, lDates)
-                                If lName.ToLower() = "enddate" Then
-                                    timcnv(lDates)
-                                End If
-                                lConfigFile.WriteLine(lName & ", " & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
-                            Case Else
-                                lConfigFile.WriteLine(lName & ", " & lAttrib.Value.ToString())
-                        End Select
-                    Next
-                    lConfigFile.Flush()
-                    lConfigFile.Close()
-                    lConfigFile = Nothing
-                End If
-                
+                    End If
+                    lConfigFile.WriteLine("Station " & lStation.StationID & ", " & lStation.StationDrainageArea & ", " & lDataFilename)
+                Next
+                For Each lAttrib As atcDefinedValue In CType(lBFOpn.ItemByIndex(0), clsBatchUnitStation).BFInputs
+                    Dim lName As String = lAttrib.Definition.Name
+                    Select Case lName.ToLower()
+                        Case "startdate", "enddate"
+                            Dim lDates(5) As Integer
+                            atcUtility.J2Date(lAttrib.Value, lDates)
+                            If lName.ToLower() = "enddate" Then
+                                timcnv(lDates)
+                            End If
+                            lConfigFile.WriteLine(lName & ", " & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+                        Case Else
+                            lConfigFile.WriteLine(lName & ", " & lAttrib.Value.ToString())
+                    End Select
+                Next
+                lConfigFile.Flush()
+                lConfigFile.Close()
+                lConfigFile = Nothing
             End If
             
             'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
-            lBFOpnCount += lBFOpn.Count
-            UpdateStatus("DFLOW Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of total of " & lTotalBFOpn & " stations)", True)
+            lBFOpnCount = lTotalBFOpn / lDataGroup.Count
+            UpdateStatus("DFLOW Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of " & lBFOpnCount & " analysis on " & lDataGroup.Count & " stations)", True, True)
         Next
         
-        Dim lSummary As New IO.StreamWriter(IO.Path.Combine(lOutputDir, "ITFA_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)
+        Dim lSummary As New IO.StreamWriter(IO.Path.Combine(lOutputDir, "DFLOW_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)
         For Each lBFOpnId As Integer In ListBatchOpns.Keys
             Dim lBFOpn As atcCollection = ListBatchOpns.ItemByKey(lBFOpnId)
             lSummary.WriteLine("Batch Run Group ***  " & lBFOpnId & "  ***")
@@ -738,6 +718,6 @@ Public Class clsBatchSpec
         lSummary.Flush()
         lSummary.Close()
         lSummary = Nothing
-        UpdateStatus("Batch Run Complete for " & lTotalBFOpn & " Stations in " & ListBatchOpns.Count & " groups.", True)
+        UpdateStatus("Batch Run Complete for " & lTotalStations & " Stations in " & ListBatchOpns.Count & " groups.", True)
     End Sub
 End Class

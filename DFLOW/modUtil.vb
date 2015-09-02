@@ -8,18 +8,18 @@ Public Module modUtil
     ''' </summary>
     ''' <remarks></remarks>
     Public Class InputNames
-        Friend fBioDefault As Boolean
-        Friend fBioType As Integer
-        Friend fBioPeriod As Integer
-        Friend fBioYears As Integer
-        Friend fBioCluster As Integer
-        Friend fBioExcursions As Integer
-        Friend Shared fBioFPArray(,) As Integer = New Integer(3, 3) {{1, 3, 120, 5}, {4, 3, 120, 5}, {30, 3, 120, 5}, {-1, -1, -1, -1}}
-        Friend fNonBioType As Integer
-        Friend fAveragingPeriod As Integer
-        Friend fReturnPeriod As Integer
-        Friend fExplicitFlow As Double
-        Friend fPercentile As Double
+        'Friend fBioDefault As Boolean
+        'Friend fBioType As Integer
+        'Friend fBioPeriod As Integer
+        'Friend fBioYears As Integer
+        'Friend fBioCluster As Integer
+        'Friend fBioExcursions As Integer
+        'Friend Shared fBioFPArray(,) As Integer = New Integer(3, 3) {{1, 3, 120, 5}, {4, 3, 120, 5}, {30, 3, 120, 5}, {-1, -1, -1, -1}}
+        'Friend fNonBioType As Integer
+        'Friend fAveragingPeriod As Integer
+        'Friend fReturnPeriod As Integer
+        'Friend fExplicitFlow As Double
+        'Friend fPercentile As Double
 
         'Friend fStartMonth As Integer = 4
         'Friend fStartDay As Integer = 1
@@ -49,6 +49,7 @@ Public Module modUtil
             Chronic_continuous_concentration
             Ammonia
         End Enum
+        Public Shared EBioDFLOWTypeAbbrev() As String = {"AcuteMC", "Chronic", "Ammonia"}
 
         Public Shared BioUseDefault As String = "Bio_Use_Default"
         Public Shared BioSelectedMethod As String = "Bio_Selected_Method"
@@ -62,6 +63,7 @@ Public Module modUtil
             Explicit_Flow_Value
             Flow_Percentile
         End Enum
+        Public Shared EDFlowTypeAbbrev() As String = {"Hydrologic", "Explicit_V", "Percentile"}
 
         Public Shared NBioSelectedMethod As String = "NBio_Selected_Method"
         Public Shared NBioAveragingPeriod As String = "Flow_Averaging_Period_days"
@@ -134,6 +136,34 @@ Public Module modUtil
                 .Add("STAID")
             End With
             Return lTrendAttributes
+        End Function
+
+        Public Shared Function GetAbbrevParamSetName(ByVal aParamSet As atcCollection) As String
+            If aParamSet Is Nothing Then Return ""
+            Dim lAbbrevParamSetName As String = ""
+            For Each lParamKey As String In aParamSet.Keys
+                If lParamKey.ToLower().StartsWith("type_") Then
+                    Dim lIndStr As String = lParamKey.Substring(lParamKey.LastIndexOf("_") + 1)
+                    If lParamKey.Contains(EBioDFlowType.Acute_maximum_concentration.ToString()) Then
+                        lAbbrevParamSetName = InputNames.EBioDFLOWTypeAbbrev(InputNames.EBioDFlowType.Acute_maximum_concentration)
+                    ElseIf lParamKey.Contains(EBioDFlowType.Chronic_continuous_concentration.ToString()) Then
+                        lAbbrevParamSetName = InputNames.EBioDFLOWTypeAbbrev(InputNames.EBioDFlowType.Chronic_continuous_concentration)
+                    ElseIf lParamKey.Contains(EBioDFlowType.Ammonia.ToString()) Then
+                        lAbbrevParamSetName = InputNames.EBioDFLOWTypeAbbrev(InputNames.EBioDFlowType.Ammonia)
+                    ElseIf lParamKey.Contains(EDFlowType.Hydrological.ToString()) Then
+                        lAbbrevParamSetName = InputNames.EDFlowTypeAbbrev(InputNames.EDFlowType.Hydrological)
+                    ElseIf lParamKey.Contains(EDFlowType.Explicit_Flow_Value.ToString()) Then
+                        lAbbrevParamSetName = InputNames.EDFlowTypeAbbrev(InputNames.EDFlowType.Explicit_Flow_Value)
+                    ElseIf lParamKey.Contains(EDFlowType.Flow_Percentile.ToString()) Then
+                        lAbbrevParamSetName = InputNames.EDFlowTypeAbbrev(InputNames.EDFlowType.Flow_Percentile)
+                    End If
+                    If Not String.IsNullOrEmpty(lIndStr) AndAlso IsNumeric(lIndStr) Then
+                        lAbbrevParamSetName &= "_" & lIndStr
+                    End If
+                    Exit For
+                End If
+            Next
+            Return lAbbrevParamSetName
         End Function
 
         Public Shared Sub BuildInputSet(ByRef aSpecialSet As atcDataAttributes, ByVal aCommonSet As atcDataAttributes)
