@@ -180,8 +180,11 @@ Public Class clsBatch
         Return Nothing
     End Function
 
-    Public Sub UpdateStatus(ByVal aMsg As String, Optional ByVal aAppend As Boolean = False, Optional ByVal aResetProgress As Boolean = False)
-        If gProgressBar IsNot Nothing Then
+    Public Sub UpdateStatus(ByVal aMsg As String, _
+                            Optional ByVal aAppend As Boolean = False, _
+                            Optional ByVal aResetProgress As Boolean = False, _
+                            Optional ByVal aUpdateProgress As Boolean = True)
+        If gProgressBar IsNot Nothing AndAlso aUpdateProgress Then
             If aResetProgress Then
                 gProgressBar.Minimum = 0
                 gProgressBar.Maximum = 0
@@ -193,7 +196,7 @@ Public Class clsBatch
         End If
         If gTextStatus IsNot Nothing Then
             If aAppend Then
-                gTextStatus.Text &= aMsg & vbCrLf
+                gTextStatus.AppendText(aMsg & vbCrLf)
             Else
                 gTextStatus.Text = aMsg
             End If

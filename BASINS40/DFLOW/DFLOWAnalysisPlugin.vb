@@ -84,9 +84,10 @@ Public Class DFLOWAnalysisPlugin
                                                       Nothing, _
                                                       New String() {"Interactive", "Batch File", "Batch Map"})
         If lChoice = "Batch File" Then
-            Dim lfrmBatch As New atcBatchProcessing.frmBatch()
-            'ShowForm(lfrmBatch)
-            Return lfrmBatch
+            Dim lfrmBatch As New frmBatch()
+            lfrmBatch.Text = "DFLOW: Batch Run"
+            lfrmBatch.ShowDialog()
+            Return Nothing
         ElseIf lChoice = "Batch Map" Then
             Dim lStationsAreSelected As Boolean = False
             Dim lMapLayer As MapWindow.Interfaces.Layer = Nothing
