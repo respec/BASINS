@@ -129,7 +129,7 @@ Public Module modUtil
                         lNDaysOriginal.Clear()
                         lNDaysOriginal = Nothing
                     End If
-                    
+
                     For Each lNDay As Double In .GetValue(NDay)
                         If Not lNDays.Keys.Contains(lNDay) Then
                             lNDays.Add(lNDay, False)
@@ -164,7 +164,7 @@ Public Module modUtil
                 With aSpecialSet
                     If .GetValue(HighLow) Is Nothing Then .SetValue(HighLow, aCommonSet.GetValue(HighLow, "Low"))
                     If .GetValue(Logarithmic) Is Nothing Then .SetValue(Logarithmic, aCommonSet.GetValue(Logarithmic, True))
-                    If .GetValue(OutputDir) Is Nothing Then .SetValue(OutputDir, aCommonSet.GetValue(OutputDir, ""))
+                    If .GetValue(OutputDir) Is Nothing OrElse String.IsNullOrEmpty(.GetValue(OutputDir).ToString()) Then .SetValue(OutputDir, aCommonSet.GetValue(OutputDir, ""))
                     If .GetValue(OutputPrefix) Is Nothing Then .SetValue(OutputPrefix, aCommonSet.GetValue(OutputPrefix, ""))
                     If .GetValue(DataDir) Is Nothing Then .SetValue(DataDir, aCommonSet.GetValue(DataDir, ""))
                     If .GetValue(StartYear) Is Nothing Then .SetValue(StartYear, aCommonSet.GetValue(StartYear, ""))
