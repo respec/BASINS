@@ -493,11 +493,11 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnDoBatch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoBatch.Click
-        If pGroupsInputsSWSTAT.Count = 0 AndAlso pGroupsInputsDFLOW.Count = 0 Then
-            'Logger.Msg("Need to specify global default parameters.", "Batch Run Parameter Setup")
-            Logger.Msg("Need to set up batch run groups.", "Batch Run Parameter Setup")
-            Exit Sub
-        End If
+        'If pGroupsInputsSWSTAT.Count = 0 AndAlso pGroupsInputsDFLOW.Count = 0 Then
+        '    'Logger.Msg("Need to specify global default parameters.", "Batch Run Parameter Setup")
+        '    Logger.Msg("Need to set up batch run groups.", "Batch Run Parameter Setup")
+        '    Exit Sub
+        'End If
         'If pGlobalInputsSWSTAT.Count = 0 Then
         '    Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
         '    Return
