@@ -414,7 +414,7 @@ Public Class frmDFLOWArgs
 
         If pSetBatchParams AndAlso pAttributes IsNot Nothing Then
             If fBioDefault Then
-                Dim lParams() As Double = Nothing
+                Dim lParams() As Integer = Nothing
                 If rbBio1.Checked Then
                     lParams = pAttributes.GetValue(InputNames.EBioDFlowType.Acute_maximum_concentration.ToString, Nothing)
                 ElseIf rbBio2.Checked Then

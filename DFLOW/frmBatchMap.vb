@@ -96,13 +96,20 @@ Public Class frmBatchMap
         If lstStations.RightCount = 0 OrElse String.IsNullOrEmpty(lAnalysis) Then
             Exit Sub
         End If
-        Dim lnewTreeNode As New Windows.Forms.TreeNode("BatchGroup_" & lAnalysis & "_" & lCount)
+        Dim listStations As New List(Of String)
+        Dim lNewNodeText As String = "BatchGroup_" & lAnalysis & "_" & lCount
+        Dim lnewTreeNode As New Windows.Forms.TreeNode(lNewNodeText)
         treeBFGroups.Nodes.Add(lnewTreeNode)
         For I As Integer = 0 To lstStations.RightCount - 1
             With lnewTreeNode
                 .Nodes.Add(lstStations.RightItem(I))
             End With
+            listStations.Add(lstStations.RightItem(I))
         Next
+        Dim lBatchInputs As atcDataAttributes = GetGroupParams(lNewNodeText, False)
+        Dim lDataGroup As atcTimeseriesGroup = BuildTserGroup(listStations)
+        Dim lStationsInfo As atcCollection = InputNames.BuildStationsInfo(lDataGroup)
+        lBatchInputs.SetValue(InputNames.StationsInfo, lStationsInfo)
         pBatchGroupCount += 1
     End Sub
 
@@ -199,40 +206,17 @@ Public Class frmBatchMap
                     lGroupNode = node.Parent
                 End If
                 lGroupName = lGroupNode.Text
-                Dim lBatchInputs As atcDataAttributes = Nothing
+
                 Dim lIndex As Integer = lGroupName.LastIndexOf("_")
                 Dim lGroupNum As Integer = Integer.Parse(lGroupName.Substring(lIndex + 1))
-
-                If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
-                    lBatchInputs = pGroupsInputsSWSTAT.ItemByKey(lGroupName)
-                ElseIf lGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
-                    lBatchInputs = pGroupsInputsDFLOW.ItemByKey(lGroupName)
-                Else
-                    lBatchInputs = pGroupsInputsBF.ItemByKey(lGroupName)
-                End If
-
-                If lBatchInputs Is Nothing Then
-                    lBatchInputs = New atcDataAttributes()
-                    lBatchInputs.SetValue("Operation", "GroupSetParm")
-                    lBatchInputs.SetValue("Group", lGroupName)
-
-                    If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
-                        pGroupsInputsSWSTAT.Add(lGroupName, lBatchInputs)
-                    ElseIf lGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
-                        pGroupsInputsDFLOW.Add(lGroupName, lBatchInputs)
-                    Else
-                        pGroupsInputsBF.Add(lGroupName, lBatchInputs)
-                    End If
-                End If
-
-                'Try to use global setting as much as possible
-                If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
-                    modUtil.InputNames.BuildInputSet(lBatchInputs, pGlobalInputsSWSTAT)
-                ElseIf lGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
-                    modUtil.InputNames.BuildInputSet(lBatchInputs, pGlobalInputsDFLOW)
-                Else
-
-                End If
+                Dim lBatchInputs As atcDataAttributes = GetGroupParams(lGroupName, True)
+                'If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+                '    lBatchInputs = pGroupsInputsSWSTAT.ItemByKey(lGroupName)
+                'ElseIf lGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
+                '    lBatchInputs = pGroupsInputsDFLOW.ItemByKey(lGroupName)
+                'Else
+                '    lBatchInputs = pGroupsInputsBF.ItemByKey(lGroupName)
+                'End If
 
                 Dim lTsGroup As atcTimeseriesGroup = BuildTserGroup(lGroupNode)
                 If lTsGroup.Count > 0 Then
@@ -256,6 +240,35 @@ Public Class frmBatchMap
                 End If
         End Select
     End Sub
+
+    Private Function GetGroupParams(ByVal aGroupName As String, Optional ByVal aUseGlobalDefault As Boolean = False) As atcDataAttributes
+        Dim lBatchInputs As atcDataAttributes = pGroupsInputsDFLOW.ItemByKey(aGroupName)
+        If lBatchInputs Is Nothing Then
+            lBatchInputs = New atcDataAttributes()
+            lBatchInputs.SetValue("Operation", "GroupSetParm")
+            lBatchInputs.SetValue("Group", aGroupName)
+
+            If aGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+                pGroupsInputsSWSTAT.Add(aGroupName, lBatchInputs)
+            ElseIf aGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
+                pGroupsInputsDFLOW.Add(aGroupName, lBatchInputs)
+            Else
+                pGroupsInputsBF.Add(aGroupName, lBatchInputs)
+            End If
+        End If
+
+        If aUseGlobalDefault Then
+            'Try to use global setting as much as possible
+            If aGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+                'atcSWSTAT.modUtil.InputNames.BuildInputSet(lBatchInputs, pGlobalInputsSWSTAT)
+            ElseIf aGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
+                InputNames.BuildInputSet(lBatchInputs, pGlobalInputsDFLOW)
+            Else
+
+            End If
+        End If
+        Return lBatchInputs
+    End Function
 
     Private Function BuildTserGroup(ByVal aGroupNode As System.Windows.Forms.TreeNode) As atcTimeseriesGroup
         Dim lArgs As New atcDataAttributes()
@@ -293,6 +306,40 @@ Public Class frmBatchMap
         Return lTsGroup
     End Function
 
+    Private Function BuildTserGroup(ByVal aListStations As List(Of String)) As atcTimeseriesGroup
+        Dim lArgs As New atcDataAttributes()
+        lArgs.Add("Constituent", "streamflow,flow")
+        Dim lTsGroup As New atcTimeseriesGroup()
+        For Each lStationID As String In aListStations
+            Dim lDataLoaded As Boolean = False
+            For Each lDS As atcDataSource In atcDataManager.DataSources
+                If lDS.Name.ToString.Contains("USGS RDB") Then
+                    Dim lTsCons As String = ""
+                    For Each lTs As atcTimeseries In lDS.DataSets
+                        lTsCons = lTs.Attributes.GetValue("Constituent").ToString()
+                        If lTs.Attributes.GetValue("Location") = lStationID AndAlso _
+                           (lTsCons.ToLower = "streamflow" OrElse lTsCons.ToLower() = "flow") Then
+                            lTsGroup.Add(lTs)
+                            lDataLoaded = True
+                            Exit For
+                        End If
+                    Next
+                    If lDataLoaded Then
+                        Exit For
+                    End If
+                End If
+            Next
+            If Not lDataLoaded Then
+                Dim lDataPath As String = GetDataFileFullPath(lStationID)
+                Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+                If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                    lTsGroup.Add(lTsGroupTemp(0).Clone)
+                End If
+            End If
+        Next
+        Return lTsGroup
+    End Function
+
     ''' <summary>
     ''' Only call when removing a whole group
     ''' </summary>
@@ -306,7 +353,7 @@ Public Class frmBatchMap
             Exit Sub
         End If
 
-        pGroupsInputsBF.RemoveByKey(aBFGroupNode.Text)
+        pGroupsInputsDFLOW.RemoveByKey(aBFGroupNode.Text)
         treeBFGroups.Nodes.Remove(aBFGroupNode)
         pBatchGroupCount -= 1
         If lGroupingName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then

@@ -689,6 +689,13 @@ Public Class clsBatchSpec
                 lConfigFile.Flush()
                 lConfigFile.Close()
                 lConfigFile = Nothing
+
+                If DFLOWMessage IsNot Nothing AndAlso DFLOWMessage.Length > 0 Then
+                    Dim log As New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "DFLOW_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)
+                    log.WriteLine(DFLOWMessage.ToString())
+                    log.Flush() : log.Close() : log = Nothing
+                    DFLOWMessage.Length = 0
+                End If
             End If
             
             'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
@@ -696,28 +703,28 @@ Public Class clsBatchSpec
             UpdateStatus("DFLOW Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of " & lBFOpnCount & " analysis on " & lDataGroup.Count & " stations)", True, True)
         Next
         
-        Dim lSummary As New IO.StreamWriter(IO.Path.Combine(lOutputDir, "DFLOW_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)
-        For Each lBFOpnId As Integer In ListBatchOpns.Keys
-            Dim lBFOpn As atcCollection = ListBatchOpns.ItemByKey(lBFOpnId)
-            lSummary.WriteLine("Batch Run Group ***  " & lBFOpnId & "  ***")
-            Dim lHasError As Boolean = False
-            For Each lStation As clsBatchUnitStation In lBFOpn
-                If Not String.IsNullOrEmpty(lStation.Message) Then
-                    lSummary.WriteLine("---- Station: " & lStation.StationID & "----")
-                    lSummary.WriteLine(lStation.Message)
-                    lSummary.WriteLine("---------------------------------------------")
-                    If lStation.Message.ToLower().Contains("error") Then lHasError = True
-                End If
-            Next
-            If lHasError Then
-                lSummary.WriteLine("End Batch Run Group " & lBFOpnId & ", Has errors.")
-            Else
-                lSummary.WriteLine("End Batch Run Group " & lBFOpnId & ", Successful")
-            End If
-        Next
-        lSummary.Flush()
-        lSummary.Close()
-        lSummary = Nothing
+        'Dim lSummary As New IO.StreamWriter(IO.Path.Combine(lOutputDir, "DFLOW_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)
+        'For Each lBFOpnId As Integer In ListBatchOpns.Keys
+        '    Dim lBFOpn As atcCollection = ListBatchOpns.ItemByKey(lBFOpnId)
+        '    lSummary.WriteLine("Batch Run Group ***  " & lBFOpnId & "  ***")
+        '    Dim lHasError As Boolean = False
+        '    For Each lStation As clsBatchUnitStation In lBFOpn
+        '        If Not String.IsNullOrEmpty(lStation.Message) Then
+        '            lSummary.WriteLine("---- Station: " & lStation.StationID & "----")
+        '            lSummary.WriteLine(lStation.Message)
+        '            lSummary.WriteLine("---------------------------------------------")
+        '            If lStation.Message.ToLower().Contains("error") Then lHasError = True
+        '        End If
+        '    Next
+        '    If lHasError Then
+        '        lSummary.WriteLine("End Batch Run Group " & lBFOpnId & ", Has errors.")
+        '    Else
+        '        lSummary.WriteLine("End Batch Run Group " & lBFOpnId & ", Successful")
+        '    End If
+        'Next
+        'lSummary.Flush()
+        'lSummary.Close()
+        'lSummary = Nothing
         UpdateStatus("Batch Run Complete for " & lTotalStations & " Stations in " & ListBatchOpns.Count & " groups.", True)
     End Sub
 End Class
