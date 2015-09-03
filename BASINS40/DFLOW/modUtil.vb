@@ -368,12 +368,18 @@ Public Module modUtil
             'lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
 
             If Not lSetGlobal Then
-                Dim lDuration As String = aArgs.GetValue(InputNames.IncludeYears, "")
-                lText.AppendLine(InputNames.IncludeYears & vbTab & lDuration)
-                Dim lStartYear As String = aArgs.GetValue(InputNames.StartYear, 0)
-                lText.AppendLine(InputNames.StartYear & vbTab & lStartYear)
-                Dim lEndYear As String = aArgs.GetValue(InputNames.EndYear, 0)
-                lText.AppendLine(InputNames.EndYear & vbTab & lEndYear)
+                If aArgs.ContainsAttribute(InputNames.IncludeYears) Then
+                    Dim lDuration As String = aArgs.GetValue(InputNames.IncludeYears)
+                    If Not String.IsNullOrEmpty(lDuration) Then lText.AppendLine(InputNames.IncludeYears & vbTab & lDuration)
+                End If
+                If aArgs.ContainsAttribute(InputNames.StartYear) Then
+                    Dim lStartYear As String = aArgs.GetValue(InputNames.StartYear, 0)
+                    If Not String.IsNullOrEmpty(lStartYear) Then lText.AppendLine(InputNames.StartYear & vbTab & lStartYear)
+                End If
+                If aArgs.ContainsAttribute(InputNames.EndYear) Then
+                    Dim lEndYear As String = aArgs.GetValue(InputNames.EndYear, 0)
+                    If Not String.IsNullOrEmpty(lEndYear) Then lText.AppendLine(InputNames.EndYear & vbTab & lEndYear)
+                End If
             End If
             Dim lStartMonth As Integer = aArgs.GetValue(InputNames.StartMonth, 4)
             lText.AppendLine(InputNames.StartMonth & vbTab & lStartMonth)
@@ -385,13 +391,19 @@ Public Module modUtil
             lText.AppendLine(InputNames.EndDay & vbTab & lEndDay)
 
             'list all analysis methods
-            lText.AppendLine(Param_Method(aArgs, EBioDFlowType.Acute_maximum_concentration, True))
-            lText.AppendLine(Param_Method(aArgs, EBioDFlowType.Chronic_continuous_concentration, True))
-            lText.AppendLine(Param_Method(aArgs, EBioDFlowType.Ammonia, True))
+            Dim lMethodText As String = Param_Method(aArgs, EBioDFlowType.Acute_maximum_concentration, True)
+            If Not String.IsNullOrEmpty(lMethodText) Then lText.AppendLine(lMethodText)
+            lMethodText = Param_Method(aArgs, EBioDFlowType.Chronic_continuous_concentration, True)
+            If Not String.IsNullOrEmpty(lMethodText) Then lText.AppendLine(lMethodText)
+            lMethodText = Param_Method(aArgs, EBioDFlowType.Ammonia, True)
+            If Not String.IsNullOrEmpty(lMethodText) Then lText.AppendLine(lMethodText)
 
-            lText.AppendLine(Param_Method(aArgs, EDFlowType.Hydrological, False))
-            lText.AppendLine(Param_Method(aArgs, EDFlowType.Explicit_Flow_Value, False))
-            lText.AppendLine(Param_Method(aArgs, EDFlowType.Flow_Percentile, False))
+            lMethodText = Param_Method(aArgs, EDFlowType.Hydrological, False)
+            If Not String.IsNullOrEmpty(lMethodText) Then lText.AppendLine(lMethodText)
+            lMethodText = Param_Method(aArgs, EDFlowType.Explicit_Flow_Value, False)
+            If Not String.IsNullOrEmpty(lMethodText) Then lText.AppendLine(lMethodText)
+            lMethodText = Param_Method(aArgs, EDFlowType.Flow_Percentile, False)
+            If Not String.IsNullOrEmpty(lMethodText) Then lText.AppendLine(lMethodText)
 
             If lSetGlobal Then
                 Dim lDatadir As String = aArgs.GetValue(InputNames.DataDir, "")
@@ -402,8 +414,8 @@ Public Module modUtil
 
             Dim lOutputDir As String = aArgs.GetValue(InputNames.OutputDir, "")
             Dim lOutputPrefix As String = aArgs.GetValue(InputNames.OutputPrefix, "")
-            lText.AppendLine(InputNames.OutputDir & vbTab & lOutputDir)
-            lText.AppendLine(InputNames.OutputPrefix & vbTab & lOutputPrefix)
+            if Not String.IsNullOrEmpty(lOutputDir) Then lText.AppendLine(InputNames.OutputDir & vbTab & lOutputDir)
+            if Not String.IsNullOrEmpty(lOutputPrefix) Then lText.AppendLine(InputNames.OutputPrefix & vbTab & lOutputPrefix)
 
             If loperation.ToLower = "groupsetparm" Then
                 lText.AppendLine("END DFLOW")
@@ -448,22 +460,42 @@ Public Module modUtil
                     lMethodBlock.AppendLine(BioReturnYears & vbTab & lParams(1))
                     lMethodBlock.AppendLine(BioClusterDays & vbTab & lParams(2))
                     lMethodBlock.AppendLine(BioNumExcrsnPerCluster & vbTab & lParams(3))
+                Else
+                    Return "" 'no parameters specified for this bio dflow profile
                 End If
             Else
+                Dim lSetGlobal As Boolean = True
+                Dim lOpn As String = aArgs.GetValue("Operation")
+                If lOpn = "GroupSetParm" Then
+                    lSetGlobal = False
+                End If
+
                 Dim lExFlowValue As Double
                 Dim lFlowPct As Double
                 lMethodBlock.AppendLine(BiologicalDFLOW & vbTab & TextFalse)
                 Dim lSelectedMethod As Integer = aArgs.GetValue(NBioSelectedMethod, -1)
                 Select Case aMethod
                     Case EDFlowType.Hydrological
-                        lMethodBlock.Append("Type_" & EDFlowType.Hydrological.ToString())
-                        lParams = aArgs.GetValue(EDFlowType.Hydrological.ToString())
+                        If lSetGlobal OrElse aArgs.ContainsAttribute(EDFlowType.Hydrological.ToString()) Then
+                            lMethodBlock.Append("Type_" & EDFlowType.Hydrological.ToString())
+                            lParams = aArgs.GetValue(EDFlowType.Hydrological.ToString(), New Integer() {7, 10})
+                        Else
+                            Return ""
+                        End If
                     Case EDFlowType.Explicit_Flow_Value
-                        lMethodBlock.Append("Type_" & EDFlowType.Explicit_Flow_Value.ToString())
-                        lExFlowValue = aArgs.GetValue(EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                        If lSetGlobal OrElse aArgs.ContainsAttribute(EDFlowType.Explicit_Flow_Value.ToString()) Then
+                            lMethodBlock.Append("Type_" & EDFlowType.Explicit_Flow_Value.ToString())
+                            lExFlowValue = aArgs.GetValue(EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                        Else
+                            Return ""
+                        End If
                     Case EDFlowType.Flow_Percentile
-                        lMethodBlock.Append("Type_" & EDFlowType.Flow_Percentile.ToString())
-                        lFlowPct = aArgs.GetValue(EDFlowType.Flow_Percentile.ToString(), 0.1)
+                        If lSetGlobal OrElse aArgs.ContainsAttribute(EDFlowType.Flow_Percentile.ToString()) Then
+                            lMethodBlock.Append("Type_" & EDFlowType.Flow_Percentile.ToString())
+                            lFlowPct = aArgs.GetValue(EDFlowType.Flow_Percentile.ToString(), 0.1)
+                        Else
+                            Return ""
+                        End If
                 End Select
                 If lSelectedMethod >= 0 Then
                     Select Case lSelectedMethod

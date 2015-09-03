@@ -44,6 +44,7 @@ Module DFLOWCalcs
     Friend fLastDay() As Integer = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
     Friend fMonth3 As String = "JanFebMarAprMayJunJulAugSepOctNovDec"
 
+    Friend DFLOWMessage As Text.StringBuilder
 
     Friend Function Sig2(ByVal x As Double) As String
         If x >= 100 Then
@@ -142,7 +143,9 @@ Module DFLOWCalcs
             Dim lBoundaryDay As Integer = fStartDay '1
             Dim lEndMonth As Integer = fEndMonth '3
             Dim lEndDay As Integer = fEndDay '31
+            Dim lBatchMode As Boolean = False
             If aInputs IsNot Nothing Then
+                lBatchMode = True
                 With aInputs
                     If .ContainsAttribute(InputNames.StartMonth) Then lBoundaryMonth = .GetValue(InputNames.StartMonth)
                     If .ContainsAttribute(InputNames.StartDay) Then lBoundaryDay = .GetValue(InputNames.StartDay)
@@ -172,13 +175,27 @@ Module DFLOWCalcs
             If lCalculator.Open(lOperationName, lArgs) AndAlso lCalculator.DataSets.Count = 1 Then
                 lResult = lCalculator.DataSets(0).Attributes.GetValue(lAttrName, lResult)
             Else
-                Logger.Msg(aDataSet.ToString & vbCrLf _
-                           & "LogFlg=" & lLogFlag & vbCrLf _
-                           & "HighFlag=" & lHigh & vbCrLf _
-                           & "BoundaryMonth=" & lBoundaryMonth & vbCrLf _
-                           & "BoundaryDay=" & lBoundaryDay & vbCrLf _
-                           & "Return Period=" & aYears, _
-                           "Could not create " & aDays & "-day timeseries")
+                If lBatchMode Then
+                    If DFLOWMessage Is Nothing Then
+                        DFLOWMessage = New Text.StringBuilder()
+                    End If
+                    DFLOWMessage.AppendLine(aDataSet.ToString & vbCrLf _
+                               & "LogFlg=" & lLogFlag & vbCrLf _
+                               & "HighFlag=" & lHigh & vbCrLf _
+                               & "BoundaryMonth=" & lBoundaryMonth & vbCrLf _
+                               & "BoundaryDay=" & lBoundaryDay & vbCrLf _
+                               & "Return Period=" & aYears & vbCrLf _
+                               & "Could not create " & aDays & "-day timeseries" & vbCrLf)
+                Else
+                    Logger.Msg(aDataSet.ToString & vbCrLf _
+                               & "LogFlg=" & lLogFlag & vbCrLf _
+                               & "HighFlag=" & lHigh & vbCrLf _
+                               & "BoundaryMonth=" & lBoundaryMonth & vbCrLf _
+                               & "BoundaryDay=" & lBoundaryDay & vbCrLf _
+                               & "Return Period=" & aYears, _
+                               "Could not create " & aDays & "-day timeseries")
+
+                End If
             End If
         Catch e As Exception
             MessageBox.Show("Could not calculate value for " & lAttrName & ". " & e.ToString)
