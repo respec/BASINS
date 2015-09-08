@@ -52,10 +52,17 @@ Public Class clsSWSTATPlugin
                 Dim lShp As New MapWinGIS.Shapefile()
                 If lShp.Open(lMapLayer.FileName, Nothing) Then
                     Dim lFieldIndex As Integer = -99
+                    Dim lFieldIndex_nm As Integer = -99
                     Dim lRecordIndex As Integer = 0
                     For I As Integer = 0 To lShp.NumFields - 1
                         If lShp.Field(I).Name.ToLower() = "site_no" Then
                             lFieldIndex = I
+                            'Exit For
+                        End If
+                        If lShp.Field(I).Name.ToLower() = "station_nm" Then
+                            lFieldIndex_nm = I
+                        End If
+                        If lFieldIndex >= 0 AndAlso lFieldIndex_nm >= 0 Then
                             Exit For
                         End If
                     Next
@@ -64,17 +71,19 @@ Public Class clsSWSTATPlugin
                         Return Nothing
                     End If
                     Dim lStationId As String = ""
+                    Dim lStationNm As String = ""
                     For I As Integer = 0 To lMapLayer.SelectedShapes.NumSelected - 1
                         lRecordIndex = lMapLayer.SelectedShapes(I).ShapeIndex()
                         lStationId = lShp.CellValue(lFieldIndex, lRecordIndex).ToString()
+                        lStationNm = lShp.CellValue(lFieldIndex_nm, lRecordIndex).ToString()
                         If Not lSelectedStationIDs.Keys.Contains(lStationId) Then
-                            lSelectedStationIDs.Add(lStationId, lStationId)
+                            lSelectedStationIDs.Add(lStationId, lStationNm)
                         End If
                     Next
                 End If
                 If lSelectedStationIDs.Count > 0 Then
                     Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf & _
-                               lSelectedStationIDs.ToString(), _
+                               StationListing(lSelectedStationIDs), _
                                lBatchTitle)
                 End If
                 Dim lfrmBatchMap As New frmBatchMap()
@@ -92,6 +101,26 @@ Public Class clsSWSTATPlugin
         Dim lForm As New frmSWSTAT
         lForm.Initialize(aTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
         Return lForm
+    End Function
+
+    Private Function StationListing(ByVal aList As atcCollection) As String
+        Dim lStationList As New Text.StringBuilder()
+        Dim lStationCount As Integer
+        For lStationCount = 0 To aList.Count - 1
+            If lStationCount > 9 Then
+                Exit For
+            End If
+            Dim lStationId As String = aList.Keys(lStationCount)
+            Dim lStationNm As String = aList.ItemByIndex(lStationCount)
+            lStationList.AppendLine((lStationCount + 1) & ": " & lStationId & ", " & lStationNm)
+        Next
+        If aList.Count - 1 > lStationCount Then
+            lStationList.AppendLine("Skip...")
+            Dim lStationId As String = aList.Keys(aList.Count - 1)
+            Dim lStationNm As String = aList.ItemByIndex(aList.Count - 1)
+            lStationList.AppendLine(aList.Count & ": " & lStationId & ", " & lStationNm)
+        End If
+        Return lStationList.ToString()
     End Function
 
     Private Sub ShowForm(ByVal aForm As frmBatch)
