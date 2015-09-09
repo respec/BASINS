@@ -46,26 +46,26 @@ Public Class DFLOWAnalysisPlugin
         If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
             ' Do computation driven by contents of paramarry
 
-            If UBound(aOption) > 0 Then fBioPeriod = aOption(0) Else fBioPeriod = 1
-            If UBound(aOption) > 1 Then fBioYears = aOption(1) Else fBioYears = 3
-            If UBound(aOption) > 2 Then fBioCluster = aOption(2) Else fBioCluster = 120
-            If UBound(aOption) > 3 Then fBioExcursions = aOption(3) Else fBioExcursions = 5
-            If UBound(aOption) > 4 Then fStartMonth = aOption(4) Else fStartMonth = 4
-            If UBound(aOption) > 5 Then fStartDay = aOption(5) Else fStartDay = 1
-            If UBound(aOption) > 6 Then fFirstYear = aOption(6) Else fFirstYear = 0
-            If UBound(aOption) > 7 Then fLastYear = aOption(7) Else fLastYear = 0
+            If UBound(aOption) > 0 Then DFLOWCalcs.fBioPeriod = aOption(0) Else DFLOWCalcs.fBioPeriod = 1
+            If UBound(aOption) > 1 Then DFLOWCalcs.fBioYears = aOption(1) Else DFLOWCalcs.fBioYears = 3
+            If UBound(aOption) > 2 Then DFLOWCalcs.fBioCluster = aOption(2) Else DFLOWCalcs.fBioCluster = 120
+            If UBound(aOption) > 3 Then DFLOWCalcs.fBioExcursions = aOption(3) Else DFLOWCalcs.fBioExcursions = 5
+            If UBound(aOption) > 4 Then DFLOWCalcs.fStartMonth = aOption(4) Else DFLOWCalcs.fStartMonth = 4
+            If UBound(aOption) > 5 Then DFLOWCalcs.fStartDay = aOption(5) Else DFLOWCalcs.fStartDay = 1
+            If UBound(aOption) > 6 Then DFLOWCalcs.fFirstYear = aOption(6) Else DFLOWCalcs.fFirstYear = 0
+            If UBound(aOption) > 7 Then DFLOWCalcs.fLastYear = aOption(7) Else DFLOWCalcs.fLastYear = 0
 
-            fEndDay = fStartDay - 1
-            If fEndDay = 0 Then
-                fEndMonth = fStartMonth - 1
-                If fStartMonth = 0 Then fEndMonth = 12
+            DFLOWCalcs.fEndDay = DFLOWCalcs.fStartDay - 1
+            If DFLOWCalcs.fEndDay = 0 Then
+                DFLOWCalcs.fEndMonth = DFLOWCalcs.fStartMonth - 1
+                If DFLOWCalcs.fStartMonth = 0 Then DFLOWCalcs.fEndMonth = 12
                 Dim pLastDayOfMonth() As Integer = {99, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
-                fEndDay = pLastDayOfMonth(fEndMonth)
+                DFLOWCalcs.fEndDay = pLastDayOfMonth(DFLOWCalcs.fEndMonth)
             End If
 
-            fNonBioType = 0
-            fAveragingPeriod = 7
-            fReturnPeriod = 10
+            DFLOWCalcs.fNonBioType = 0
+            DFLOWCalcs.fAveragingPeriod = 7
+            DFLOWCalcs.fReturnPeriod = 10
 
             Dim lForm As New frmDFLOWResults(aTimeseriesGroup)
             If lForm.DialogResult <> Windows.Forms.DialogResult.Cancel Then

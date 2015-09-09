@@ -4,7 +4,7 @@ Imports System.IO
 Imports atcUtility
 Imports MapWinUtility
 
-Module DFLOWCalcs
+Public Class DFLOWCalcs
     Friend Structure stExcursion
         Public Start As Integer
         Public Finish As Integer
@@ -19,34 +19,34 @@ Module DFLOWCalcs
         Public Events As Integer
     End Structure
 
-    Const eps = 0.005
+    Public Shared eps = 0.005
 
-    Friend fBioDefault As Boolean
-    Friend fBioType As Integer
-    Friend fBioPeriod As Integer
-    Friend fBioYears As Integer
-    Friend fBioCluster As Integer
-    Friend fBioExcursions As Integer
-    Friend fBioFPArray(,) As Integer = New Integer(3, 3) {{1, 3, 120, 5}, {4, 3, 120, 5}, {30, 3, 120, 5}, {-1, -1, -1, -1}}
-    Friend fNonBioType As Integer
-    Friend fAveragingPeriod As Integer
-    Friend fReturnPeriod As Integer
-    Friend fExplicitFlow As Double
-    Friend fPercentile As Double
+    Public Shared fBioDefault As Boolean
+    Public Shared fBioType As Integer
+    Public Shared fBioPeriod As Integer
+    Public Shared fBioYears As Integer
+    Public Shared fBioCluster As Integer
+    Public Shared fBioExcursions As Integer
+    Public Shared fBioFPArray(,) As Integer = New Integer(3, 3) {{1, 3, 120, 5}, {4, 3, 120, 5}, {30, 3, 120, 5}, {-1, -1, -1, -1}}
+    Public Shared fNonBioType As Integer
+    Public Shared fAveragingPeriod As Integer
+    Public Shared fReturnPeriod As Integer
+    Public Shared fExplicitFlow As Double
+    Public Shared fPercentile As Double
 
-    Friend fStartDay As Integer = 1
-    Friend fStartMonth As Integer = 4
-    Friend fEndDay As Integer = 31
-    Friend fEndMonth As Integer = 3
-    Friend fFirstYear As Integer = -1
-    Friend fLastYear As Integer = -1
+    Public Shared fStartDay As Integer = 1
+    Public Shared fStartMonth As Integer = 4
+    Public Shared fEndDay As Integer = 31
+    Public Shared fEndMonth As Integer = 3
+    Public Shared fFirstYear As Integer = -1
+    Public Shared fLastYear As Integer = -1
 
-    Friend fLastDay() As Integer = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
-    Friend fMonth3 As String = "JanFebMarAprMayJunJulAugSepOctNovDec"
+    Public Shared fLastDay() As Integer = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+    Public Shared fMonth3 As String = "JanFebMarAprMayJunJulAugSepOctNovDec"
 
-    Friend DFLOWMessage As Text.StringBuilder
+    Public Shared DFLOWMessage As Text.StringBuilder
 
-    Friend Function Sig2(ByVal x As Double) As String
+    Public Shared Function Sig2(ByVal x As Double) As String
         If x >= 100 Then
             Sig2 = Format(x, "Scientific")
         ElseIf x >= 10 Then
@@ -56,7 +56,7 @@ Module DFLOWCalcs
         End If
     End Function
 
-    Friend Sub Initialize(Optional ByVal aChoice As atcDataAttributes = Nothing)
+    Public Shared Sub Initialize(Optional ByVal aChoice As atcDataAttributes = Nothing)
         If aChoice Is Nothing Then
             ' This sets the initial values for DFLOW calculations - CMC, 7Q10
             fBioDefault = True
@@ -114,7 +114,7 @@ Module DFLOWCalcs
         End If
     End Sub
 
-    Private Function GetBioDefaultParams(ByVal aBioType As Integer) As Integer()
+    Public Shared Function GetBioDefaultParams(ByVal aBioType As Integer) As Integer()
         Dim lBioParam(3) As Integer
         For I As Integer = 0 To UBound(fBioFPArray, 1)
             If I = aBioType Then
@@ -126,7 +126,7 @@ Module DFLOWCalcs
         Return lBioParam
     End Function
 
-    Friend Function xQy(ByVal aDays As Integer, _
+    Public Shared Function xQy(ByVal aDays As Integer, _
                         ByVal aYears As Double, _
                         ByVal aDataSet As atcTimeseries, _
                         Optional ByVal aInputs As atcDataAttributes = Nothing) As Double
@@ -204,7 +204,7 @@ Module DFLOWCalcs
         Return lResult
     End Function
 
-    Friend Function xBy(ByVal aDesignFlow As Double, _
+    Public Shared Function xBy(ByVal aDesignFlow As Double, _
                          ByVal aDays As Integer, _
                          ByVal aYears As Integer, _
                          ByVal aMaxDays As Integer, _
@@ -299,7 +299,7 @@ Module DFLOWCalcs
     ''' <param name="aFlowRecord"></param>
     ''' <param name="aExcursions"></param>
     ''' <remarks></remarks>
-    Friend Function CountExcursions(ByVal aDesignFlow As Double, _
+    Public Shared Function CountExcursions(ByVal aDesignFlow As Double, _
                                ByVal aDays As Integer, _
                                ByVal aMaxDays As Integer, _
                                ByVal aMaxExc As Integer, _
@@ -425,7 +425,7 @@ Module DFLOWCalcs
 
     End Function
 
-    Public Function DFLOWToTable(ByVal aDataGroup As atcTimeseriesGroup, _
+    Public Shared Function DFLOWToTable(ByVal aDataGroup As atcTimeseriesGroup, _
                                  ByVal aBioParam As atcCollection, _
                                  ByVal aNBioParam As atcCollection, _
                                  Optional ByVal aInputs As atcDataAttributes = Nothing, _
@@ -909,7 +909,7 @@ Module DFLOWCalcs
 
 
     'if aHelpTopic is a file, set the file to display instead of opening help
-    Public Sub ShowDFLOWHelp(ByVal aHelpTopic As String)
+    Public Shared Sub ShowDFLOWHelp(ByVal aHelpTopic As String)
         Static lHelpFilename As String = ""
         Static lHelpProcess As Process = Nothing
 
@@ -952,4 +952,4 @@ Module DFLOWCalcs
         End If
     End Sub
 
-End Module
+End Class

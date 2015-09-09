@@ -641,7 +641,7 @@ Public Class clsBatchSpec
                         For Each lBioParam As atcCollection In lBioParamSet
                             lBioName = InputNames.GetAbbrevParamSetName(lBioParam)
                             Try
-                                Dim lReport As String = DFLOWToTable(lDataGroup, lBioParam, lNBioParam, lInputArgs)
+                                Dim lReport As String = DFLOWCalcs.DFLOWToTable(lDataGroup, lBioParam, lNBioParam, lInputArgs)
                                 lSW.WriteLine("DFLOW :: " & lBFOpnName & " :: NBio(" & lNBioName & ") by Bio(" & lBioName & ")")
                                 lSW.WriteLine(lReport)
                                 lSW.Flush()
@@ -690,11 +690,11 @@ Public Class clsBatchSpec
                 lConfigFile.Close()
                 lConfigFile = Nothing
 
-                If DFLOWMessage IsNot Nothing AndAlso DFLOWMessage.Length > 0 Then
+                If DFLOWCalcs.DFLOWMessage IsNot Nothing AndAlso DFLOWCalcs.DFLOWMessage.Length > 0 Then
                     Dim log As New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "DFLOW_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)
-                    log.WriteLine(DFLOWMessage.ToString())
+                    log.WriteLine(DFLOWCalcs.DFLOWMessage.ToString())
                     log.Flush() : log.Close() : log = Nothing
-                    DFLOWMessage.Length = 0
+                    DFLOWCalcs.DFLOWMessage.Length = 0
                 End If
             End If
             
