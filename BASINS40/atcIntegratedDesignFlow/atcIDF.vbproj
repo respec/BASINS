@@ -212,6 +212,11 @@
       <Name>atcUtility</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\DFLOW\DFLOWAnalysis.vbproj">
+      <Project>{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}</Project>
+      <Name>DFLOWAnalysis</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

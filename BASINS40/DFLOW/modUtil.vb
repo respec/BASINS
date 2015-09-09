@@ -185,21 +185,21 @@ Public Module modUtil
                     If .GetValue(EBioDFlowType.Acute_maximum_concentration.ToString()) Is Nothing Then
                         Dim lParams(3) As Integer
                         For I As Integer = 0 To 3
-                            lParams(I) = fBioFPArray(EBioDFlowType.Acute_maximum_concentration, I)
+                            lParams(I) = DFLOWCalcs.fBioFPArray(EBioDFlowType.Acute_maximum_concentration, I)
                         Next
                         .SetValue(EBioDFlowType.Acute_maximum_concentration.ToString(), lParams)
                     End If
                     If .GetValue(EBioDFlowType.Chronic_continuous_concentration.ToString()) Is Nothing Then
                         Dim lParams(3) As Integer
                         For I As Integer = 0 To 3
-                            lParams(I) = fBioFPArray(EBioDFlowType.Chronic_continuous_concentration, I)
+                            lParams(I) = DFLOWCalcs.fBioFPArray(EBioDFlowType.Chronic_continuous_concentration, I)
                         Next
                         .SetValue(EBioDFlowType.Chronic_continuous_concentration.ToString(), lParams)
                     End If
                     If .GetValue(EBioDFlowType.Ammonia.ToString()) Is Nothing Then
                         Dim lParams(3) As Integer
                         For I As Integer = 0 To 3
-                            lParams(I) = fBioFPArray(EBioDFlowType.Ammonia, I)
+                            lParams(I) = DFLOWCalcs.fBioFPArray(EBioDFlowType.Ammonia, I)
                         Next
                         .SetValue(EBioDFlowType.Ammonia.ToString(), lParams)
                     End If
@@ -242,7 +242,7 @@ Public Module modUtil
                         If lParams Is Nothing Then
                             ReDim lParams(3)
                             For I As Integer = 0 To 3
-                                lParams(I) = fBioFPArray(EBioDFlowType.Acute_maximum_concentration, I)
+                                lParams(I) = DFLOWCalcs.fBioFPArray(EBioDFlowType.Acute_maximum_concentration, I)
                             Next
                         End If
                         Dim lParamsCopy(3) As Integer
@@ -256,7 +256,7 @@ Public Module modUtil
                         If lParams Is Nothing Then
                             ReDim lParams(3)
                             For I As Integer = 0 To 3
-                                lParams(I) = fBioFPArray(EBioDFlowType.Chronic_continuous_concentration, I)
+                                lParams(I) = DFLOWCalcs.fBioFPArray(EBioDFlowType.Chronic_continuous_concentration, I)
                             Next
                         End If
                         Dim lParamsCopy(3) As Integer
@@ -270,7 +270,7 @@ Public Module modUtil
                         If lParams Is Nothing Then
                             ReDim lParams(3)
                             For I As Integer = 0 To 3
-                                lParams(I) = fBioFPArray(EBioDFlowType.Ammonia, I)
+                                lParams(I) = DFLOWCalcs.fBioFPArray(EBioDFlowType.Ammonia, I)
                             Next
                         End If
                         Dim lParamsCopy(3) As Integer

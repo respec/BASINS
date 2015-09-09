@@ -1,5 +1,6 @@
 Imports atcData
 Imports atcUtility
+Imports DFLOWAnalysis
 Imports MapWinUtility
 Imports System.Windows.Forms
 
@@ -111,6 +112,7 @@ Public Class frmSWSTAT
     Friend WithEvents rbBio2 As System.Windows.Forms.RadioButton
     Friend WithEvents rbBio1 As System.Windows.Forms.RadioButton
     Friend WithEvents ckbBio As System.Windows.Forms.CheckBox
+    Friend WithEvents btnCalculate As System.Windows.Forms.Button
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -198,6 +200,7 @@ Public Class frmSWSTAT
         Me.rbBio2 = New System.Windows.Forms.RadioButton
         Me.rbBio1 = New System.Windows.Forms.RadioButton
         Me.ckbBio = New System.Windows.Forms.CheckBox
+        Me.btnCalculate = New System.Windows.Forms.Button
         Me.tabMain.SuspendLayout()
         Me.tabSelectDates.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
@@ -255,7 +258,7 @@ Public Class frmSWSTAT
         '
         'tabSelectDates
         '
-        Me.tabSelectDates.BackColor = System.Drawing.SystemColors.Control
+        Me.tabSelectDates.BackColor = System.Drawing.Color.Transparent
         Me.tabSelectDates.Controls.Add(Me.gbTextOutput)
         Me.tabSelectDates.Controls.Add(Me.grpHighLow)
         Me.tabSelectDates.Controls.Add(Me.btnDisplayBasic)
@@ -279,7 +282,7 @@ Public Class frmSWSTAT
         Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
         Me.gbTextOutput.Location = New System.Drawing.Point(214, 6)
         Me.gbTextOutput.Name = "gbTextOutput"
-        Me.gbTextOutput.Size = New System.Drawing.Size(213, 144)
+        Me.gbTextOutput.Size = New System.Drawing.Size(212, 144)
         Me.gbTextOutput.TabIndex = 73
         Me.gbTextOutput.TabStop = False
         Me.gbTextOutput.Text = "Output"
@@ -291,7 +294,7 @@ Public Class frmSWSTAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOutputDir.Location = New System.Drawing.Point(6, 45)
         Me.txtOutputDir.Name = "txtOutputDir"
-        Me.txtOutputDir.Size = New System.Drawing.Size(201, 20)
+        Me.txtOutputDir.Size = New System.Drawing.Size(200, 20)
         Me.txtOutputDir.TabIndex = 12
         '
         'lblOutputDir
@@ -524,7 +527,7 @@ Public Class frmSWSTAT
         '
         'tabNDay
         '
-        Me.tabNDay.BackColor = System.Drawing.SystemColors.Control
+        Me.tabNDay.BackColor = System.Drawing.Color.Transparent
         Me.tabNDay.Controls.Add(Me.chkMultipleStationPlots)
         Me.tabNDay.Controls.Add(Me.chkMultipleNDayPlots)
         Me.tabNDay.Controls.Add(Me.btnDoFrequencyGraph)
@@ -545,7 +548,7 @@ Public Class frmSWSTAT
         '
         Me.chkMultipleStationPlots.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkMultipleStationPlots.AutoSize = True
-        Me.chkMultipleStationPlots.Location = New System.Drawing.Point(283, 210)
+        Me.chkMultipleStationPlots.Location = New System.Drawing.Point(282, 210)
         Me.chkMultipleStationPlots.Name = "chkMultipleStationPlots"
         Me.chkMultipleStationPlots.Size = New System.Drawing.Size(124, 17)
         Me.chkMultipleStationPlots.TabIndex = 40
@@ -556,7 +559,7 @@ Public Class frmSWSTAT
         '
         Me.chkMultipleNDayPlots.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkMultipleNDayPlots.AutoSize = True
-        Me.chkMultipleNDayPlots.Location = New System.Drawing.Point(283, 191)
+        Me.chkMultipleNDayPlots.Location = New System.Drawing.Point(283, 192)
         Me.chkMultipleNDayPlots.Name = "chkMultipleNDayPlots"
         Me.chkMultipleNDayPlots.Size = New System.Drawing.Size(121, 17)
         Me.chkMultipleNDayPlots.TabIndex = 39
@@ -568,7 +571,7 @@ Public Class frmSWSTAT
         Me.btnDoFrequencyGraph.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnDoFrequencyGraph.Location = New System.Drawing.Point(138, 204)
         Me.btnDoFrequencyGraph.Name = "btnDoFrequencyGraph"
-        Me.btnDoFrequencyGraph.Size = New System.Drawing.Size(139, 23)
+        Me.btnDoFrequencyGraph.Size = New System.Drawing.Size(138, 23)
         Me.btnDoFrequencyGraph.TabIndex = 38
         Me.btnDoFrequencyGraph.Text = "Frequency Graph"
         Me.btnDoFrequencyGraph.UseVisualStyleBackColor = True
@@ -630,9 +633,9 @@ Public Class frmSWSTAT
         'btnRecurrenceRemove
         '
         Me.btnRecurrenceRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(132, 92)
+        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(131, 92)
         Me.btnRecurrenceRemove.Name = "btnRecurrenceRemove"
-        Me.btnRecurrenceRemove.Size = New System.Drawing.Size(27, 20)
+        Me.btnRecurrenceRemove.Size = New System.Drawing.Size(28, 20)
         Me.btnRecurrenceRemove.TabIndex = 30
         Me.btnRecurrenceRemove.Text = "-"
         '
@@ -670,9 +673,9 @@ Public Class frmSWSTAT
         'btnRecurrenceNone
         '
         Me.btnRecurrenceNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceNone.Location = New System.Drawing.Point(157, 121)
+        Me.btnRecurrenceNone.Location = New System.Drawing.Point(156, 121)
         Me.btnRecurrenceNone.Name = "btnRecurrenceNone"
-        Me.btnRecurrenceNone.Size = New System.Drawing.Size(64, 24)
+        Me.btnRecurrenceNone.Size = New System.Drawing.Size(65, 24)
         Me.btnRecurrenceNone.TabIndex = 33
         Me.btnRecurrenceNone.Text = "None"
         '
@@ -785,7 +788,7 @@ Public Class frmSWSTAT
         Me.btnDoFrequencyGrid.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnDoFrequencyGrid.Location = New System.Drawing.Point(138, 175)
         Me.btnDoFrequencyGrid.Name = "btnDoFrequencyGrid"
-        Me.btnDoFrequencyGrid.Size = New System.Drawing.Size(139, 23)
+        Me.btnDoFrequencyGrid.Size = New System.Drawing.Size(138, 23)
         Me.btnDoFrequencyGrid.TabIndex = 37
         Me.btnDoFrequencyGrid.Text = "Frequency Grid"
         Me.btnDoFrequencyGrid.UseVisualStyleBackColor = True
@@ -812,6 +815,7 @@ Public Class frmSWSTAT
         '
         'tabDFLOW
         '
+        Me.tabDFLOW.Controls.Add(Me.btnCalculate)
         Me.tabDFLOW.Controls.Add(Me.GroupBox2)
         Me.tabDFLOW.Controls.Add(Me.gbBio)
         Me.tabDFLOW.Location = New System.Drawing.Point(4, 22)
@@ -1091,6 +1095,15 @@ Public Class frmSWSTAT
         Me.ckbBio.Text = "Use defaults"
         Me.ckbBio.UseVisualStyleBackColor = True
         '
+        'btnCalculate
+        '
+        Me.btnCalculate.Location = New System.Drawing.Point(8, 359)
+        Me.btnCalculate.Name = "btnCalculate"
+        Me.btnCalculate.Size = New System.Drawing.Size(75, 23)
+        Me.btnCalculate.TabIndex = 7
+        Me.btnCalculate.Text = "Calculate"
+        Me.btnCalculate.UseVisualStyleBackColor = True
+        '
         'frmSWSTAT
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -1162,6 +1175,8 @@ Public Class frmSWSTAT
     Private pAttributes As atcDataAttributes
     Private pSetGlobal As Boolean = False
     Private pBatch As Boolean = False
+
+    Private Shared pLastDayOfMonth() As Integer = {99, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
     Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics.html"
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
@@ -1316,6 +1331,8 @@ Public Class frmSWSTAT
             .Add("Custom")
         End With
         cboYears.SelectedIndex = lLastSelectedIndex
+
+
     End Sub
 
     Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
@@ -1377,6 +1394,7 @@ Public Class frmSWSTAT
                           Optional ByVal aNDayAttributes As Generic.List(Of String) = Nothing, _
                           Optional ByVal aTrendAttributes As Generic.List(Of String) = Nothing, _
                           Optional ByVal aShowForm As Boolean = True)
+
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcTimeseriesGroup
         Else
@@ -1416,9 +1434,10 @@ Public Class frmSWSTAT
             pDataGroup = atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis", _
                                                        pDataGroup, Nothing, True, True, Me.Icon)
         End If
-
+        DFLOWCalcs_Initialize()
         If pDataGroup.Count > 0 Then
             PopulateForm()
+            PopulateDFLOW(pDataGroup)
             If aShowForm Then Me.Show()
         Else 'user declined to specify timeseries
             Me.Close()
@@ -1433,7 +1452,7 @@ Public Class frmSWSTAT
         'Optional ByVal aNDayAttributes As Generic.List(Of String) = Nothing, _
         'Optional ByVal aTrendAttributes As Generic.List(Of String) = Nothing, _
         'Optional ByVal aShowForm As Boolean = True
-
+        DFLOWCalcs_Initialize(attributes)
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcTimeseriesGroup
         Else
@@ -1441,35 +1460,6 @@ Public Class frmSWSTAT
         End If
 
         pAttributes = attributes
-
-        'If aNDayAttributes Is Nothing Then
-        '    pNDayAttributes = atcDataManager.DisplayAttributes
-        'Else
-        '    pNDayAttributes = aNDayAttributes
-        'End If
-
-        'If aTrendAttributes Is Nothing Then
-        '    pTrendAttributes = atcDataManager.DisplayAttributes
-        'Else
-        '    pTrendAttributes = aTrendAttributes
-        'End If
-
-        'If aShowForm Then
-        '    Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-        '    For Each lDisp As atcDataDisplay In DisplayPlugins
-        '        Dim lMenuText As String = lDisp.Name
-        '        If lMenuText <> "Analysis::USGS Surface Water Statistics (SWSTAT)::Integrated Frequency Analysis" Then
-        '            If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
-        '            mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
-        '        End If
-        '    Next
-        'End If
-
-        'If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-        '    pDataGroup = atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis", _
-        '                                               pDataGroup, Nothing, True, True, Me.Icon)
-        'End If
-        'PopulateForm()
 
         pBatch = True
         Dim loperation As String = attributes.GetValue("Operation", "")
@@ -1867,8 +1857,7 @@ Public Class frmSWSTAT
         End If
     End Sub
 
-    ''' <summary>
-    ''' Calculate(aOperationName: = "n-day " & HighOrLowString() & " value", _
+    ''' <summary>Calculate(aOperationName: = "n-day " & HighOrLowString() & " value", _
     ''' aReturnPeriods() = ListToArray(lstRecurrence))
     ''' </summary>
     ''' <remarks></remarks>
@@ -2340,5 +2329,532 @@ Public Class frmSWSTAT
         Next
     End Sub
 
+#Region "DFLOW"
+
+    Private Sub ckbBio_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ckbBio.CheckedChanged
+        Dim i As Integer
+
+        DFLOWCalcs.fBioDefault = ckbBio.Checked
+
+        rbBio1.Enabled = DFLOWCalcs.fBioDefault
+        rbBio2.Enabled = DFLOWCalcs.fBioDefault
+        rbBio3.Enabled = DFLOWCalcs.fBioDefault
+
+        tbBio1.Enabled = Not DFLOWCalcs.fBioDefault
+        tbBio2.Enabled = Not DFLOWCalcs.fBioDefault
+        tbBio3.Enabled = Not DFLOWCalcs.fBioDefault
+        tbBio4.Enabled = Not DFLOWCalcs.fBioDefault
+        Label1.Enabled = Not DFLOWCalcs.fBioDefault
+        Label2.Enabled = Not DFLOWCalcs.fBioDefault
+        Label3.Enabled = Not DFLOWCalcs.fBioDefault
+        Label4.Enabled = Not DFLOWCalcs.fBioDefault
+
+        If DFLOWCalcs.fBioDefault Then
+            tbBio1.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 0)
+            tbBio2.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 1)
+            tbBio3.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
+            tbBio4.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
+        Else
+            For i = 0 To 3
+                If DFLOWCalcs.fBioFPArray(3, i) < 0 Then
+                    DFLOWCalcs.fBioFPArray(3, i) = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, i)
+                End If
+            Next
+            tbBio1.Text = DFLOWCalcs.fBioFPArray(3, 0)
+            tbBio2.Text = DFLOWCalcs.fBioFPArray(3, 1)
+            tbBio3.Text = DFLOWCalcs.fBioFPArray(3, 2)
+            tbBio4.Text = DFLOWCalcs.fBioFPArray(3, 3)
+        End If
+
+        If pBatch AndAlso pAttributes IsNot Nothing Then
+            If DFLOWCalcs.fBioDefault Then
+                Dim lParams() As Integer = Nothing
+                If rbBio1.Checked Then
+                    lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString, Nothing)
+                ElseIf rbBio2.Checked Then
+                    lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString, Nothing)
+                ElseIf rbBio3.Checked Then
+                    lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString, Nothing)
+                End If
+                If lParams IsNot Nothing Then
+                    lParams(0) = DFLOWCalcs.fBioPeriod
+                    lParams(1) = DFLOWCalcs.fBioYears
+                    lParams(2) = DFLOWCalcs.fBioCluster
+                    lParams(3) = DFLOWCalcs.fBioExcursions
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub rbBio1_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbBio1.CheckedChanged, rbBio3.CheckedChanged, rbBio2.CheckedChanged
+        If rbBio1.Checked Then
+            DFLOWCalcs.fBioType = 0
+        ElseIf rbBio2.Checked Then
+            DFLOWCalcs.fBioType = 1
+        Else
+            DFLOWCalcs.fBioType = 2
+        End If
+        If pBatch AndAlso pAttributes IsNot Nothing Then
+            Dim lParams() As Integer = Nothing
+            If rbBio1.Checked Then
+                lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString())
+                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration)
+            ElseIf rbBio2.Checked Then
+                lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString())
+                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration)
+            ElseIf rbBio3.Checked Then
+                lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString())
+                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia)
+            End If
+            If lParams IsNot Nothing Then
+                tbBio1.Text = lParams(0).ToString()
+                tbBio2.Text = lParams(1).ToString()
+                tbBio3.Text = lParams(2).ToString()
+                tbBio4.Text = lParams(3).ToString()
+            End If
+        Else
+            tbBio1.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 0)
+            tbBio2.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 1)
+            tbBio3.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
+            tbBio4.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
+        End If
+    End Sub
+    ' Boolean flag used to determine when a character other than a number is entered.
+    Private nonNumberEntered As Boolean = False
+
+    ' Handle the KeyDown event to determine the type of character entered into the control.
+    Private Sub textBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) _
+         Handles tbBio1.KeyDown, tbBio2.KeyDown, tbBio3.KeyDown, tbBio4.KeyDown, _
+                 tbNonBio1.KeyDown, tbNonBio2.KeyDown, tbNonBio4.KeyDown
+        ' Initialize the flag to false.
+        nonNumberEntered = False
+
+        ' Determine whether the keystroke is a number from the top of the keyboard.
+        If e.KeyCode < Keys.D0 OrElse e.KeyCode > Keys.D9 Then
+            ' Determine whether the keystroke is a number from the keypad.
+            If e.KeyCode < Keys.NumPad0 OrElse e.KeyCode > Keys.NumPad9 Then
+                ' Determine whether the keystroke is a backspace.
+                If e.KeyCode <> Keys.Back Then
+                    ' A non-numerical keystroke was pressed. 
+                    ' Set the flag to true and evaluate in KeyPress event.
+                    nonNumberEntered = True
+                End If
+            End If
+        End If
+    End Sub 'textBox1_KeyDown
+    Private Sub textBox2_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles tbNonBio3.KeyDown
+        ' Initialize the flag to false.
+        nonNumberEntered = False
+
+        ' Determine whether the keystroke is a number from the top of the keyboard.
+        If e.KeyCode = Keys.OemPeriod And InStr(sender.text, ".") = 1 Then
+            If e.KeyCode < Keys.D0 OrElse e.KeyCode > Keys.D9 Then
+                ' Determine whether the keystroke is a number from the keypad.
+                If e.KeyCode < Keys.NumPad0 OrElse e.KeyCode > Keys.NumPad9 Then
+                    ' Determine whether the keystroke is a backspace.
+                    If e.KeyCode <> Keys.Back Then
+                        ' A non-numerical keystroke was pressed. 
+                        ' Set the flag to true and evaluate in KeyPress event.
+                        nonNumberEntered = True
+                    End If
+                End If
+            End If
+        End If
+    End Sub
+
+    ' This event occurs after the KeyDown event and can be used 
+    ' to prevent characters from entering the control.
+    Private Sub textBox_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) _
+        Handles tbBio1.KeyPress, tbBio2.KeyPress, tbBio3.KeyPress, tbBio4.KeyPress, _
+                tbNonBio1.KeyPress, tbNonBio2.KeyPress, tbNonBio4.KeyPress, tbNonBio3.KeyPress
+
+        ' Check for the flag being set in the KeyDown event.
+        If nonNumberEntered = True Then
+            ' Stop the character from being entered into the control since it is non-numerical.
+            e.Handled = True
+        End If
+    End Sub 'textBox1_KeyPress
+
+    Private Sub rbNonBio1_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbNonBio1.CheckedChanged, rbNonBio3.CheckedChanged, rbNonBio2.CheckedChanged
+
+        If rbNonBio1.Checked Then
+            DFLOWCalcs.fNonBioType = 0
+        ElseIf rbNonBio2.Checked Then
+            DFLOWCalcs.fNonBioType = 1
+        Else
+            DFLOWCalcs.fNonBioType = 2
+        End If
+        Label7.Enabled = rbNonBio1.Checked
+        Label8.Enabled = rbNonBio1.Checked
+        tbNonBio1.Enabled = rbNonBio1.Checked
+        tbNonBio2.Enabled = rbNonBio1.Checked
+
+        Label5.Enabled = rbNonBio2.Checked
+        tbNonBio3.Enabled = rbNonBio2.Checked
+
+        Label6.Enabled = rbNonBio3.Checked
+        tbNonBio4.Enabled = rbNonBio3.Checked
+
+        If pBatch AndAlso pAttributes IsNot Nothing Then
+            If rbNonBio1.Checked Then
+                pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Hydrological)
+                'Dim lParams() As Integer = pAttributes.GetValue(InputNames.EDFlowType.Hydrological.ToString(), Nothing)
+                'If lParams IsNot Nothing AndAlso lParams.Length = 2 Then
+                '    tbNonBio1.Text = lParams(0).ToString()
+                '    tbNonBio2.Text = lParams(1).ToString()
+                'End If
+            ElseIf rbNonBio2.Checked Then
+                pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value)
+                'Dim lflowval As Double = pAttributes.GetValue(InputNames.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                'tbNonBio3.Text = lflowval.ToString()
+            ElseIf rbNonBio3.Checked Then
+                pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile)
+                'Dim lflowPct As Double = pAttributes.GetValue(InputNames.EDFlowType.Flow_Percentile.ToString(), 0.1)
+                'tbNonBio4.Text = lflowPct.ToString()
+            End If
+        Else
+            If rbNonBio1.Checked Then
+                If pAttributes IsNot Nothing Then pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Hydrological)
+                Dim lAvgPeriod As Integer
+                Dim lReturnPeriod As Integer
+                If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString()) Then
+                    Dim lParams() As Integer = pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString(), Nothing)
+                    If lParams IsNot Nothing AndAlso lParams.Length = 2 Then
+                        lAvgPeriod = lParams(0)
+                        lReturnPeriod = lParams(1)
+                    Else
+                        lAvgPeriod = DFLOWAnalysis.DFLOWCalcs.fAveragingPeriod
+                        lReturnPeriod = DFLOWAnalysis.DFLOWCalcs.fReturnPeriod
+                    End If
+                Else
+                    lAvgPeriod = DFLOWAnalysis.DFLOWCalcs.fAveragingPeriod
+                    lReturnPeriod = DFLOWAnalysis.DFLOWCalcs.fReturnPeriod
+                End If
+                tbNonBio1.Text = lAvgPeriod.ToString()
+                tbNonBio2.Text = lReturnPeriod.ToString()
+            ElseIf rbNonBio2.Checked Then
+                If pAttributes IsNot Nothing Then pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value)
+                Dim lflowval As Double
+                If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString()) Then
+                    lflowval = pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString())
+                Else
+                    lflowval = DFLOWAnalysis.DFLOWCalcs.fExplicitFlow
+                End If
+                tbNonBio3.Text = lflowval.ToString()
+            ElseIf rbNonBio3.Checked Then
+                If pAttributes IsNot Nothing Then pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile)
+                Dim lflowPct As Double
+                If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString()) Then
+                    lflowPct = pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString())
+                Else
+                    lflowPct = DFLOWAnalysis.DFLOWCalcs.fPercentile
+                End If
+                tbNonBio4.Text = lflowPct.ToString()
+            End If
+        End If
+    End Sub
+
+    Private Sub tbNonBio1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbNonBio1.TextChanged
+        If IsNumeric(tbNonBio1.Text) AndAlso Integer.TryParse(tbNonBio1.Text, DFLOWCalcs.fAveragingPeriod) Then
+            Dim lParams() As Integer = GetSavedParams(False)
+            If lParams IsNot Nothing AndAlso lParams.Length = 2 Then
+                lParams(0) = DFLOWCalcs.fAveragingPeriod
+            End If
+        End If
+    End Sub
+    Private Sub tbNonBio2_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbNonBio2.TextChanged
+        If IsNumeric(tbNonBio2.Text) AndAlso Integer.TryParse(tbNonBio2.Text, DFLOWCalcs.fReturnPeriod) Then
+            Dim lParams() As Integer = GetSavedParams(False)
+            If lParams IsNot Nothing AndAlso lParams.Length = 2 Then
+                lParams(1) = DFLOWCalcs.fReturnPeriod
+            End If
+        End If
+    End Sub
+    Private Sub tbNonBio3_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbNonBio3.TextChanged
+        If IsNumeric(tbNonBio3.Text) AndAlso Double.TryParse(tbNonBio3.Text, DFLOWCalcs.fExplicitFlow) AndAlso DFLOWCalcs.fExplicitFlow > 0 Then
+            Dim lNewValue As Double = GetSavedParams(False, DFLOWCalcs.fExplicitFlow)
+        End If
+    End Sub
+    Private Sub tbNonBio4_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbNonBio4.TextChanged
+        If IsNumeric(tbNonBio4.Text) AndAlso Double.TryParse(tbNonBio4.Text, DFLOWCalcs.fPercentile) AndAlso DFLOWCalcs.fPercentile > 0 Then
+            Dim lNewValue As Double = GetSavedParams(False, DFLOWCalcs.fPercentile)
+        End If
+    End Sub
+
+    Private Sub tbBio1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbBio1.TextChanged
+        If IsNumeric(tbBio1.Text) AndAlso Integer.TryParse(tbBio1.Text, DFLOWCalcs.fBioFPArray(3, 0)) Then
+            'fBioFPArray(3, 0) = tbBio1.Text
+            Dim lParams() As Integer = GetSavedParams()
+            If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
+                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P0FlowAveragingPeriodDays) = Integer.Parse(tbBio1.Text)
+                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
+            End If
+        End If
+    End Sub
+    Private Sub tbBio2_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbBio2.TextChanged
+        If IsNumeric(tbBio2.Text) AndAlso Integer.TryParse(tbBio2.Text, DFLOWCalcs.fBioFPArray(3, 1)) Then
+            'fBioFPArray(3, 1) = tbBio2.Text
+            Dim lParams() As Integer = GetSavedParams()
+            If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
+                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P1AverageYearsBetweenExcursions) = Integer.Parse(tbBio2.Text)
+                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
+            End If
+        End If
+    End Sub
+    Private Sub tbBio3_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbBio3.TextChanged
+        If IsNumeric(tbBio3.Text) AndAlso Integer.TryParse(tbBio3.Text, DFLOWCalcs.fBioFPArray(3, 2)) Then
+            'fBioFPArray(3, 2) = tbBio3.Text
+            Dim lParams() As Integer = GetSavedParams()
+            If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
+                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P2ExcursionClusterPeriodDays) = Integer.Parse(tbBio3.Text)
+                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
+            End If
+        End If
+    End Sub
+    Private Sub tbBio4_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbBio4.TextChanged
+        If IsNumeric(tbBio4.Text) AndAlso Integer.TryParse(tbBio4.Text, DFLOWCalcs.fBioFPArray(3, 3)) Then
+            'fBioFPArray(3, 3) = tbBio4.Text
+            Dim lParams() As Integer = GetSavedParams()
+            If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
+                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P3AverageExcursionsPerCluster) = Integer.Parse(tbBio4.Text)
+                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
+            End If
+        End If
+    End Sub
+
+    Private Function GetSavedParams(Optional ByVal aBio As Boolean = True, Optional ByVal aValue As Double = -99) As Object
+        If pAttributes IsNot Nothing Then
+            If aBio Then
+                If rbBio1.Checked Then
+                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString(), Nothing)
+                ElseIf rbBio2.Checked Then
+                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString(), Nothing)
+                ElseIf rbBio3.Checked Then
+                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString(), Nothing)
+                End If
+            Else
+                If rbNonBio1.Checked Then
+                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString(), Nothing)
+                ElseIf rbNonBio2.Checked Then
+                    If aValue > 0 Then
+                        pAttributes.SetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString(), aValue)
+                    End If
+                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString(), Nothing)
+                ElseIf rbNonBio3.Checked Then
+                    If aValue > 0 Then
+                        pAttributes.SetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString(), aValue)
+                    End If
+                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString(), Nothing)
+                End If
+            End If
+        Else
+            Return Nothing
+        End If
+        Return Nothing
+    End Function
+
+    Friend Sub DFLOWCalcs_Initialize(Optional ByVal aChoice As atcDataAttributes = Nothing)
+        If aChoice Is Nothing Then
+            ' This sets the initial values for DFLOW calculations - CMC, 7Q10
+            DFLOWCalcs.fBioDefault = True
+            DFLOWCalcs.fBioType = 0
+            DFLOWCalcs.fBioPeriod = 1
+            DFLOWCalcs.fBioYears = 3
+            DFLOWCalcs.fBioCluster = 120
+            DFLOWCalcs.fBioExcursions = 5
+
+            DFLOWCalcs.fNonBioType = 0
+            DFLOWCalcs.fAveragingPeriod = 7
+            DFLOWCalcs.fReturnPeriod = 10
+            DFLOWCalcs.fExplicitFlow = 1.0
+            DFLOWCalcs.fPercentile = 0.1
+
+            aChoice = New atcDataAttributes()
+            With aChoice
+                .SetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration))
+                .SetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration))
+                .SetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia))
+                .SetValue(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString(), New Integer() {7, 10})
+                .SetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                .SetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString(), 0.1)
+            End With
+        Else
+            With aChoice
+                DFLOWCalcs.fBioDefault = .GetValue(DFLOWAnalysis.InputNames.BioUseDefault, True)
+                DFLOWCalcs.fBioType = .GetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration)
+                Dim lBio4Params() As Integer '= DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType)
+                If DFLOWCalcs.fBioDefault Then
+                    lBio4Params = DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType)
+                Else
+                    Select Case DFLOWCalcs.fBioType
+                        Case DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration
+                            lBio4Params = .GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType))
+                        Case DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration
+                            lBio4Params = .GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType))
+                        Case DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia
+                            lBio4Params = .GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType))
+                    End Select
+                End If
+                DFLOWCalcs.fBioPeriod = lBio4Params(0)
+                DFLOWCalcs.fBioYears = lBio4Params(1)
+                DFLOWCalcs.fBioCluster = lBio4Params(2)
+                DFLOWCalcs.fBioExcursions = lBio4Params(3)
+
+                DFLOWCalcs.fNonBioType = .GetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Hydrological)
+                Dim lHydro2Params() As Integer = .GetValue(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString(), New Integer() {7, 10})
+                DFLOWCalcs.fAveragingPeriod = lHydro2Params(0)
+                DFLOWCalcs.fReturnPeriod = lHydro2Params(1)
+
+                DFLOWCalcs.fExplicitFlow = .GetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                DFLOWCalcs.fPercentile = .GetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString(), 0.1)
+            End With
+        End If
+    End Sub
+
+    Private Sub PopulateDFLOW(ByVal aTimeseriesGroup As atcTimeseriesGroup)
+        ' This populates the DFLOW input form according to the DFLOW calculation values
+        ckbBio.Checked = DFLOWCalcs.fBioDefault
+        rbBio1.Enabled = DFLOWCalcs.fBioDefault
+        rbBio2.Enabled = DFLOWCalcs.fBioDefault
+        rbBio3.Enabled = DFLOWCalcs.fBioDefault
+
+        Select Case DFLOWCalcs.fBioType
+            Case 0
+                rbBio1.Checked = True
+            Case 1
+                rbBio2.Checked = True
+            Case 2
+                rbBio3.Checked = True
+        End Select
+
+        tbBio1.Enabled = Not DFLOWCalcs.fBioDefault
+        tbBio2.Enabled = Not DFLOWCalcs.fBioDefault
+        tbBio3.Enabled = Not DFLOWCalcs.fBioDefault
+
+        Dim lBioIdx As Integer
+        If DFLOWCalcs.fBioDefault Then
+            lBioIdx = DFLOWCalcs.fBioType
+        Else
+            lBioIdx = 3
+        End If
+
+        RemoveHandler tbBio1.TextChanged, AddressOf tbBio1_TextChanged
+        RemoveHandler tbBio2.TextChanged, AddressOf tbBio2_TextChanged
+        RemoveHandler tbBio3.TextChanged, AddressOf tbBio3_TextChanged
+        RemoveHandler tbBio4.TextChanged, AddressOf tbBio4_TextChanged
+
+        RemoveHandler tbNonBio1.TextChanged, AddressOf tbNonBio1_TextChanged
+        RemoveHandler tbNonBio2.TextChanged, AddressOf tbNonBio2_TextChanged
+        RemoveHandler tbNonBio3.TextChanged, AddressOf tbNonBio3_TextChanged
+        RemoveHandler tbNonBio4.TextChanged, AddressOf tbNonBio4_TextChanged
+
+
+        If DFLOWCalcs.fBioFPArray(lBioIdx, 0) < 0 Then
+            If pBatch Then
+                tbBio1.Text = DFLOWCalcs.fBioPeriod.ToString()
+            Else
+                tbBio1.Text = ""
+            End If
+        Else
+            If pBatch Then
+                tbBio1.Text = DFLOWCalcs.fBioPeriod.ToString()
+            Else
+                tbBio1.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 0)
+            End If
+        End If
+
+        If DFLOWCalcs.fBioFPArray(lBioIdx, 1) < 0 Then
+            If pBatch Then
+                tbBio2.Text = DFLOWCalcs.fBioYears.ToString()
+            Else
+                tbBio2.Text = ""
+            End If
+        Else
+            If pBatch Then
+                tbBio2.Text = DFLOWCalcs.fBioYears.ToString()
+            Else
+                tbBio2.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 1)
+            End If
+        End If
+
+        If DFLOWCalcs.fBioFPArray(lBioIdx, 2) < 0 Then
+            If pBatch Then
+                tbBio3.Text = DFLOWCalcs.fBioExcursions.ToString()
+            Else
+                tbBio3.Text = ""
+            End If
+        Else
+            If pBatch Then
+                tbBio3.Text = DFLOWCalcs.fBioExcursions.ToString()
+            Else
+                tbBio3.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 2)
+            End If
+        End If
+
+        If DFLOWCalcs.fBioFPArray(lBioIdx, 3) < 0 Then
+            If pBatch Then
+                tbBio4.Text = DFLOWCalcs.fBioCluster.ToString()
+            Else
+                tbBio4.Text = ""
+            End If
+        Else
+            If pBatch Then
+                tbBio4.Text = DFLOWCalcs.fBioCluster.ToString()
+            Else
+                tbBio4.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 3)
+            End If
+        End If
+
+        Select Case DFLOWCalcs.fNonBioType
+            Case 0
+                rbNonBio1.Checked = True
+            Case 1
+                rbNonBio2.Checked = True
+            Case 2
+                rbNonBio3.Checked = True
+        End Select
+
+        tbNonBio1.Text = DFLOWCalcs.fAveragingPeriod
+        tbNonBio2.Text = DFLOWCalcs.fReturnPeriod
+        tbNonBio3.Text = DFLOWCalcs.fExplicitFlow
+        tbNonBio4.Text = DFLOWCalcs.fPercentile
+
+        AddHandler tbBio1.TextChanged, AddressOf tbBio1_TextChanged
+        AddHandler tbBio2.TextChanged, AddressOf tbBio2_TextChanged
+        AddHandler tbBio3.TextChanged, AddressOf tbBio3_TextChanged
+        AddHandler tbBio4.TextChanged, AddressOf tbBio4_TextChanged
+
+        AddHandler tbNonBio1.TextChanged, AddressOf tbNonBio1_TextChanged
+        AddHandler tbNonBio2.TextChanged, AddressOf tbNonBio2_TextChanged
+        AddHandler tbNonBio3.TextChanged, AddressOf tbNonBio3_TextChanged
+        AddHandler tbNonBio4.TextChanged, AddressOf tbNonBio4_TextChanged
+
+        'clbDataSets.Items.Clear()
+
+        Dim lDateFormat As atcDateFormat
+        lDateFormat = New atcDateFormat
+        With lDateFormat
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .IncludeSeconds = False
+        End With
+
+        If aTimeseriesGroup IsNot Nothing AndAlso aTimeseriesGroup.Count > 0 Then
+            'Dim lDataSet As atcDataSet
+            'For Each lDataSet In aTimeseriesGroup
+            '    Dim lString As String
+            '    lString = lDataSet.Attributes.GetFormattedValue("Location") & " (" & _
+            '              lDateFormat.JDateToString(lDataSet.Attributes.GetValue("start date")) & " - " & _
+            '              lDateFormat.JDateToString(lDataSet.Attributes.GetValue("end date")) & ")"
+
+            '    clbDataSets.Items.Add(lString, True)
+            'Next
+        End If
+    End Sub
+
+    Private Sub btnCalculate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCalculate.Click
+        Dim lfrmResult As New DFLOWAnalysis.frmDFLOWResults(pDataGroup, , True)
+    End Sub
+#End Region '"DFLOW"
 End Class
 
