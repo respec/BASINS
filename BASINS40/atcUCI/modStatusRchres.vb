@@ -44,7 +44,7 @@ Module modStatusRchres
         If aOperation.TableExists("ACTIVITY") Then
             'moved Benrfg to OXRX  THJ
             ltable = aOperation.Tables.Item("ACTIVITY")
-            If ltable.Parms("HYDRFG").Value = 1 Then
+            If ltable.Parms("HYDRFG").Value = 1 Or ltable.Parms("HYDRFG").Value = 2 Then
                 aTableStatus.Change("HYDR-PARM1", 1, HspfStatusOptional)
                 If aOperation.TableExists("HYDR-PARM1") Then
                     If aOperation.Tables.Item("HYDR-PARM1").ParmValue("VCONFG") = 1 Then
@@ -57,6 +57,32 @@ Module modStatusRchres
                 aTableStatus.Change("HYDR-INIT", 1, HspfStatusOptional)
                 'must pass NCAT from CATEGORY to NCATS in HYDR to be able to
                 'process categories.
+            End If
+            Dim nNodes As Integer = 0
+            Dim nConds As Integer = 0
+            If ltable.Parms("HYDRFG").Value = 2 Then
+                If aOperation.TableExists("DYNAMIC-WAVE") Then
+                    nNodes = aOperation.Tables.Item("DYNAMIC-WAVE").ParmValue("NNODE")
+                    nConds = aOperation.Tables.Item("DYNAMIC-WAVE").ParmValue("NCOND")
+                End If
+                aTableStatus.Change("DYNAMIC-WAVE", 1, HspfStatusRequired)
+                aTableStatus.Change("CONDUIT-PARM", 1, HspfStatusRequired)
+                aTableStatus.Change("CONDUIT-XS", 1, HspfStatusRequired)
+                aTableStatus.Change("NODE-PARM", 1, HspfStatusRequired)
+            End If
+            If ltable.Parms("HYDRFG").Value = 1 Then
+                If aOperation.TableExists("DYNAMIC-WAVE") Then
+                    aOperation.Tables.Remove("DYNAMIC-WAVE")
+                End If
+                If aOperation.TableExists("CONDUIT-PARM") Then
+                    aOperation.Tables.Remove("CONDUIT-PARM")
+                End If
+                If aOperation.TableExists("CONDUIT-XS") Then
+                    aOperation.Tables.Remove("CONDUIT-XS")
+                End If
+                If aOperation.TableExists("NODE-PARM") Then
+                    aOperation.Tables.Remove("NODE-PARM")
+                End If
             End If
             If ltable.Parms("ADFG").Value = 1 Then
                 aTableStatus.Change("ADCALC-DATA", 1, HspfStatusOptional)

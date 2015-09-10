@@ -215,22 +215,24 @@ Public Class ctlEditTable
                 Next i
                 tname = pHspfTable.Name
                 ltable = pHspfTable
-                Dim nRows As Integer = 100
-                If ltable.Opn.TableExists("DYNAMIC-WAVE") Then
-                    nRows = ltable.Opn.Tables("DYNAMIC-WAVE").ParmValue("NCOND")
-                End If
+                Dim nRows As Integer = 0
                 .Rows = 1
-                For j = 1 To nRows
-                    .Rows = .Rows + 1
-                    .CellValue(.Rows - 1, 0) = ltable.Opn.Id
-                    If chkDesc.Checked = True Then
-                        .CellValue(.Rows - 1, 1) = ltable.Opn.Description
+                For Each lOpn As HspfOperation In ltable.Opn.OpnBlk.Ids
+                    If lOpn.TableExists("DYNAMIC-WAVE") Then
+                        nRows += lOpn.Tables("DYNAMIC-WAVE").ParmValue("NCOND")
+                        For j = 1 To nRows
+                            .Rows = .Rows + 1
+                            .CellValue(.Rows - 1, 0) = lOpn.Id
+                            If chkDesc.Checked = True Then
+                                .CellValue(.Rows - 1, 1) = lOpn.Description
+                            End If
+                            For i = 0 To 6
+                                lParmIndex += 1
+                                .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(lParmIndex).Value
+                            Next i
+                        Next j
                     End If
-                    For i = 0 To 6
-                        lParmIndex += 1
-                        .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(lParmIndex).Value
-                    Next i
-                Next j
+                Next
             End With
         ElseIf pHspfTable.Name = "CONDUIT-XS" Then
             'special case 
@@ -249,22 +251,24 @@ Public Class ctlEditTable
                 Next i
                 tname = pHspfTable.Name
                 ltable = pHspfTable
-                Dim nRows As Integer = 100
-                If ltable.Opn.TableExists("DYNAMIC-WAVE") Then
-                    nRows = ltable.Opn.Tables("DYNAMIC-WAVE").ParmValue("NCOND")
-                End If
+                Dim nRows As Integer = 0
                 .Rows = 1
-                For j = 1 To nRows
-                    .Rows = .Rows + 1
-                    .CellValue(.Rows - 1, 0) = ltable.Opn.Id
-                    If chkDesc.Checked = True Then
-                        .CellValue(.Rows - 1, 1) = ltable.Opn.Description
+                For Each lOpn As HspfOperation In ltable.Opn.OpnBlk.Ids
+                    If lOpn.TableExists("DYNAMIC-WAVE") Then
+                        nRows += lOpn.Tables("DYNAMIC-WAVE").ParmValue("NCOND")
+                        For j = 1 To nRows
+                            .Rows = .Rows + 1
+                            .CellValue(.Rows - 1, 0) = lOpn.Id
+                            If chkDesc.Checked = True Then
+                                .CellValue(.Rows - 1, 1) = lOpn.Description
+                            End If
+                            For i = 0 To 4
+                                lParmIndex += 1
+                                .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(lParmIndex).Value
+                            Next i
+                        Next j
                     End If
-                    For i = 0 To 4
-                        lParmIndex += 1
-                        .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(lParmIndex).Value
-                    Next i
-                Next j
+                Next
             End With
         ElseIf pHspfTable.Name = "NODE-PARM" Then
             'special case 
@@ -283,22 +287,24 @@ Public Class ctlEditTable
                 Next i
                 tname = pHspfTable.Name
                 ltable = pHspfTable
-                Dim nRows As Integer = 100
-                If ltable.Opn.TableExists("DYNAMIC-WAVE") Then
-                    nRows = ltable.Opn.Tables("DYNAMIC-WAVE").ParmValue("NNODE")
-                End If
+                Dim nRows As Integer = 0
                 .Rows = 1
-                For j = 1 To nRows
-                    .Rows = .Rows + 1
-                    .CellValue(.Rows - 1, 0) = ltable.Opn.Id
-                    If chkDesc.Checked = True Then
-                        .CellValue(.Rows - 1, 1) = ltable.Opn.Description
+                For Each lOpn As HspfOperation In ltable.Opn.OpnBlk.Ids
+                    If lOpn.TableExists("DYNAMIC-WAVE") Then
+                        nRows += lOpn.Tables("DYNAMIC-WAVE").ParmValue("NNODE")
+                        For j = 1 To nRows
+                            .Rows = .Rows + 1
+                            .CellValue(.Rows - 1, 0) = lOpn.Id
+                            If chkDesc.Checked = True Then
+                                .CellValue(.Rows - 1, 1) = lOpn.Description
+                            End If
+                            For i = 0 To 6
+                                lParmIndex += 1
+                                .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(lParmIndex).Value
+                            Next i
+                        Next j
                     End If
-                    For i = 0 To 6
-                        lParmIndex += 1
-                        .CellValue(.Rows - 1, i + lchkDescInteger + 1) = ltable.Parms(lParmIndex).Value
-                    Next i
-                Next j
+                Next
             End With
         Else
             'normal case
