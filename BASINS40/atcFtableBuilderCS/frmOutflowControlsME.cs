@@ -544,6 +544,8 @@ namespace atcFtableBuilder
                 case "5": rdoExit5.Checked = true; break; 
             }
 
+            int chIndex = lSelectedNode.Text.IndexOf("_");
+            if (chIndex < 0) return;
             string lCDAlias = lSelectedNode.Text.Substring(0, lSelectedNode.Text.IndexOf("_"));
             this.cboOCTypes.SelectedIndexChanged -= this.cboOCTypes_SelectedIndexChanged;
             for (int i = 0; i < cboOCTypes.Items.Count; i++)
