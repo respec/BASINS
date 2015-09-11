@@ -1,0 +1,364 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="txtR.Text" xml:space="preserve">
+    <value>fnGetTrend &lt;-function(dInputarray1, dInputArray2, dPercentConfidenceInterval = 95, intWhat = 0) {
+# Purpose: To calculate Spearman's Rho, p at which rho = 0 
+# and if intWhat = 0 TRUE/FALSE
+# confidence limits for given Percent Confidence Interval (dPercentConfidenceInterval)
+#
+# History: Created February 2010 in VBA by Gregory E. Granato ggranato@usgs.gov
+#
+# Arguments:
+# dInputarray1 First of 2 paired arrays must have same number of values &amp; no NA's   
+# dInputarray2 Second of 2 paired arrays must have same number of values &amp; no NA's
+# dPercentConfidenceInterval: The percent confidence interval (0 &lt; dPercentConfidenceInterval &lt; 100)
+# intWhat Flag determining return value(s)
+# intWhat = 0 return boolean TRUE/FALSE True: there is a trend FALSE: No trend
+# intWhat = 1 return only rho
+# intWhat = 2 return rho &amp; P
+# intWhat = 3 return rho &amp; P &amp; TRUE/FALSE
+# intWhat = 4 return rho &amp; P &amp; confidence intervals (if cross zero no trend at dPercentConfidenceInterval)
+# intwhat = 5 return rho &amp; P &amp; confidence intervals  &amp; TRUE/FALSE
+# intWhat = 6 return rho &amp; P &amp; VB/VBA integer for TRUE/FALSE
+# intWhat = 7 return rho &amp; P &amp; confidence intervals  &amp;  VB/VBA integer for TRUE/FALSE 
+# intWhat = 8 rho &amp; P &amp; confidence intervals  &amp;  VB/VBA integer for TRUE/FALSE
+# intWhat = 9 intwhat = 9 return VB/VBA integer integer for TRUE/FALSE
+# *** Note: vb.net treats False as zero and True as a non-zero integer.
+#  If a boolean is required it may be best to take a number and do an if then to 
+#  covert to a boolean in .net  
+  
+# Uses ggranato@usgs.gov fnGetFishersZ and built-in R cor() function
+
+ # Skip look for problems
+
+ # Get Rho
+  dMyRho &lt;- cor(dInputarray1, dInputArray2, method = "spearman") 
+
+ # Get the upper and lower confidence interval and p zero  
+ # Use fnGetFishersZ to get dMyValues(p, and the upper and lower confidence intervals) 
+ # and report if needed 
+  dMyValues &lt;- fnGetFishersZ(dMyRho, length(dInputarray1), dPercentConfidenceInterval, 3)
+  dMyP &lt;- dMyValues[1]
+  dMyLowerCI &lt;- dMyValues[2]
+  dMyUpperCI &lt;- dMyValues[3]
+  
+  # calculate the p to test to determine trend
+  dConfidenceIntervalP &lt;- (1-(dPercentConfidenceInterval/100))
+  # test calculated P against confidence interval p threshold
+  if (dMyP &gt; dConfidenceIntervalP) {
+   booleanIsTrend = FALSE
+  } else {
+    booleanIsTrend = TRUE 
+  }  
+  # Provide output
+  # If intWhat = 0 return boolean TRUE/FALSE True: there is a trend FALSE: No trend
+  # note except for intWhat == 0 booleanIsTrend is converted to number zero being false and all non-zero values being true
+  OutputArray &lt;- booleanIsTrend # This is the else condition (intWhat = 0 or &gt; 9)
+  # intWhat = 1 return only rho
+  if (intWhat == 1) {OutputArray &lt;- dMyRho} 
+  # intWhat = 2 return rho &amp; P
+  if (intWhat == 2) {OutputArray &lt;- c(dMyRho, dMyP)} 
+  # intWhat = 3 return rho &amp; P &amp; TRUE/FALSE
+  if (intWhat == 3) {OutputArray &lt;- c(dMyRho, dMyP, booleanIsTrend)}
+  # intWhat = 4 return rho &amp; P &amp; confidence intervals (if cross zero no trend at dPercentConfidenceInterval)
+  if (intWhat == 4) {OutputArray &lt;- c(dMyRho, dMyP, dMyLowerCI, dMyUpperCI)}
+  # intwhat = 5 return rho &amp; P &amp; confidence intervals  &amp; TRUE/FALSE
+  if (intWhat == 5) {OutputArray &lt;- c(dMyRho, dMyP, dMyLowerCI, dMyUpperCI, booleanIsTrend)}
+  # intWhat = 6 return rho &amp; P &amp; VB/VBA integer integer for TRUE/FALSE
+  if (intWhat == 6) {OutputArray &lt;- c(dMyRho, dMyP, booleanIsTrend * -1)}
+  # intwhat = 7 return rho &amp; P &amp; confidence intervals  &amp;  VB/VBA integer integer for TRUE/FALSE
+  if (intWhat == 7) {OutputArray &lt;- c(dMyRho, dMyP, booleanIsTrend * -1)}
+  # intwhat = 8 return rho &amp; P &amp; confidence intervals  &amp;  VB/VBA integer integer for TRUE/FALSE
+  if (intWhat == 8) {OutputArray &lt;- c(dMyRho, dMyP, dMyLowerCI, dMyUpperCI, booleanIsTrend * -1)}
+  # intwhat = 9 return VB/VBA integer integer for TRUE/FALSE
+  if (intWhat == 9) {OutputArray &lt;- c(booleanIsTrend * -1)}
+ 
+  return(OutputArray)
+  
+# End Function   
+}
+
+# **********************************
+# **********************************
+# **********************************
+
+fnGetFishersZ &lt;- function(dRhoIn, lngCount, dPercentConfidenceInterval = 95, intWhat = 1) {
+# Purpose: To calculate the confidence intervals of Spearman's Rho or Pearson's R
+# If zero is within the upper and lower confidence interval dLowerOut to dUpperOut
+# then dRhoIn not statistically significant at the dZInPercent confidence level.
+# Otherwise dRhoIn is Statistically significant
+#
+# History: Created February 2010 in VBA by Gregory E. Granato ggranato@usgs.gov
+#          Reimplemented in the R language July 2015 by ggranato@usgs.gov
+# Adapted from
+# Granato, G.E., 2014, Hydrologic Drought Decision Support System (HyDroDSS): 
+# U.S. Geological Survey Open-File Report 2014?1003, 91 p., with CD?ROM, 
+# http://dx.doi.org/10.3133/ofr20141003. 
+#
+# Arguments:
+# dRhoIn:  Spearmans Rho or Pearson's R
+# lngCount The number of data pairs used to calculate rho or R
+# dPercentConfidenceInterval: The percent confidence interval (0 &lt; dPercentConfidenceInterval &lt; 100)
+# intWhat Flag determining return value(s)
+# intWhat = 1 return a one-value vector containing p zero, the probability (0-1) that the value is zero
+# intWhat = 2 Return a two-value vector containing the upper and lower confidence interval of Rho/R
+# intWhat = 3 Return a three-value vector containing p, and the upper and lower confidence intervals
+
+ # Look for problems
+ intError &lt;- 0
+ if (abs(dRhoIn) &gt; 1) {
+  intError &lt;-  1
+ } else if (lngCount &lt; 3) {
+  intError &lt;-  1
+ } else if (dPercentConfidenceInterval &lt;= 0) {
+  intError &lt;-  1
+ } else if (dPercentConfidenceInterval &gt;= 100) {
+  intError &lt;-  1
+ }
+ # if there are problems return predictable bogus values 
+ if (intError != 0) {
+  if (intWhat == 1) {
+   return(1)
+  } else if (intWhat == 2) {
+   dOut &lt;- c(9999, -9999)
+   return(dOut)
+  } else {
+   dOut &lt;- c(1, 9999, -9999)
+   return(dOut)
+  }
+ } 
+
+ # If OK then do the analysis
+ if (abs(dRhoIn) == 1) {
+  # prevent division by zero
+  dRho &lt;- (abs(dRhoIn) - 0.00000001) * (dRhoIn / abs(dRhoIn))
+ } else {
+  dRho &lt;- dRhoIn
+ } 
+ # calculate confidence interval for example input value 95% confidence interval is from -.975 to 0.975
+ dNormalCIvalue &lt;- 1 - ((1 - (dPercentConfidenceInterval / 100)) / 2)
+ 
+ # Set up calculation values
+ # qnorm built in quantile function for the normal distribution
+   dNormalKvalue &lt;- qnorm(dNormalCIvalue)
+   
+ # Calculate Fischers Z  
+ # See Granato 2014 and
+ # Fisher, R.A., 1924, On a distribution yielding the error functions of several well known statistics: 
+ #    Toronto, Proceedings of the International Congress of Mathematics, v. 2, p. 805?813.
+ # Haan, C.T., 1977, Statistical methods in hydrology: Ames, Iowa, Iowa State University Press, 378 p.
+ # Caruso, J.C., and Cliff, Norman, 1997, Empirical size, coverage, and power of the confidence intervals 
+ #     for Spearman?s rho: Educational and Psychological Measurement, v. 57, no. 4, p. 637?653.
+ #
+ dFishersZ &lt;- 0.5 * (log(1 + dRho) - log(1 - dRho))
+ # Standard error size
+ dZStandardError = (1 / ((1 * lngCount) - 3))^0.5
+  
+ # calculate upper C limit
+ dFnZ &lt;- exp((2 * (dFishersZ + dNormalKvalue * dZStandardError)))
+ dUpperOut &lt;- (dFnZ - 1) / (dFnZ + 1)
+ if (dUpperOut &gt; 1) {dUpperOut &lt;- 1 }
+
+ # calculate lower C limit
+ dFnZ &lt;- exp((2 * (dFishersZ - dNormalKvalue * dZStandardError)))
+ dLowerOut &lt;- (dFnZ - 1) / (dFnZ + 1)
+ if (dLowerOut &lt; -1) {dLowerOut &lt;- -1 } 
+
+ # Calculate p at which rho = 0
+ dPZero &lt;- pnorm(abs((dFishersZ - 0)/((1 / ((1 * lngCount) - 3))^0.5)))
+ dPZero &lt;- (1-dPZero) * 2
+ 
+ # Return the requested values
+ if (intWhat == 1) {
+  return(dPZero)
+ } else if (intWhat == 2) {
+  dOut &lt;- c(dLowerOut, dUpperOut)
+  return(dOut)
+ } else {
+  dOut &lt;- c(dPZero, dLowerOut, dUpperOut)
+  return(dOut)
+ }
+# End Function 
+}</value>
+  </data>
+  <data name="txtYears.Text" xml:space="preserve">
+    <value>1968, 1969, 1970, 1971, 1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAEAICAAAAEAGACoDAAAFgAAACgAAAAgAAAAQAAAAAEAGAAAAAAAAAAAACwBAAAsAQAAAAAAAAAA
+        AABQcAJQcABQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcABPbwJQcAJQcABQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcABPbwJQcAJQcABQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcABPbwJQcAJQcABQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcABQcQBQcQBQcABQcABPbwJQcAJQcABQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcABQcABPcAJQcAJQcAJQcQFP
+        bwJQcAJQcABQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcABQcABQcQJ6kj+2w5Xh5tPy9Oru8eXP17iUpWRQcAJQcABQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcABPcABwizLU277+/fz+/vz+
+        /v3+/v7+/v7+/v7+/fxQcAJQcABQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBRcAOhsnb29/DK0rCdr3GKn1aOo1uruYTg5c/+/f3+/v5gfRtPcAFQcQBQ
+        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
+        cQBQcQBQcQBQcABQcQBQcAF7kkLm6tn+/v3//v3+/v7Y38Vshi1QcAJQcABQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBYdw2z
+        wJH8/Pn+/v7+/v74+PJQcAJQcABQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcAB5kUDl6df+/v7///9QcAJQcABQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcABQcQBYdg2yv478/PpQcAJQcABQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBPcABQcAF5
+        kT9QcAJQcABQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQ
+        cQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcQBQcABQcABPbwJQcANPcABPcQBPcQBPcQBPcQBPcQBP
+        cQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBPcQBP
+        cQBPcQBPcQBPcABPbwIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+</value>
+  </data>
+</root>
