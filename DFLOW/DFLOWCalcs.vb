@@ -96,6 +96,8 @@ Public Class DFLOWCalcs
                             lBio4Params = .GetValue(InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString(), GetBioDefaultParams(fBioType))
                         Case InputNames.EBioDFlowType.Ammonia
                             lBio4Params = .GetValue(InputNames.EBioDFlowType.Ammonia.ToString(), GetBioDefaultParams(fBioType))
+                        Case Else
+                            Throw New ApplicationException("Could not set parameters for Bio Type " & InputNames.BioSelectedMethod & " " & fBioType)
                     End Select
                 End If
                 fBioPeriod = lBio4Params(0)
