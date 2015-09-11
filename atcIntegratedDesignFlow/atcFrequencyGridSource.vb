@@ -128,7 +128,7 @@ Public Class atcFrequencyGridSource
     Overrides Property Columns() As Integer
         Get
             If pNdays Is Nothing Then
-                Return 4
+                Return 1 + FixedColumns
             Else
                 Return pNdays.Count + FixedColumns
             End If
@@ -198,6 +198,11 @@ Public Class atcFrequencyGridSource
         If lConstituent.Length > 0 AndAlso lConstituent <> "<unk>" Then
             If lLabel.Length > 0 Then lLabel &= " "
             lLabel &= lConstituent
+        End If
+        Dim lSeason As String = aDataSet.Attributes.GetValue("SeasonName", "")
+        If lSeason.Length > 0 Then
+            If lLabel.Length > 0 Then lLabel &= " "
+            lLabel &= lSeason
         End If
         Return lLabel
     End Function
