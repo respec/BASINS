@@ -44,10 +44,21 @@ Public Class frmBatchMap
         lstStations.LeftLabel = "Stations from map"
         lstStations.RightLabel = "Selected for a group"
         Dim lindex As Integer = 0
-        For Each lStationID As String In pListStations
-            lstStations.LeftItem(lindex) = lStationID
-            lindex += 1
-        Next
+        If pListStations IsNot Nothing AndAlso pListStations.Count > 0 Then
+            Dim lStnIDinKey As Boolean = True
+            If IsNumeric(pListStations.ItemByIndex(0)) AndAlso Not IsNumeric(pListStations.Keys.Item(0)) Then
+                lStnIDinKey = False
+            End If
+            For Each lStationID As String In pListStations.Keys
+                If lStnIDinKey Then
+                    lstStations.LeftItem(lindex) = lStationID
+                Else
+                    lstStations.LeftItem(lindex) = pListStations.ItemByKey(lStationID)
+                End If
+                lindex += 1
+            Next
+        End If
+        
         pGlobalInputsBF = New atcDataAttributes()
         pGroupsInputsBF = New atcCollection()
 
@@ -493,11 +504,11 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnDoBatch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoBatch.Click
-        If pGroupsInputsSWSTAT.Count = 0 AndAlso pGroupsInputsDFLOW.Count = 0 Then
-            'Logger.Msg("Need to specify global default parameters.", "Batch Run Parameter Setup")
-            Logger.Msg("Need to set up batch run groups.", "Batch Run Parameter Setup")
-            Exit Sub
-        End If
+        'If pGroupsInputsSWSTAT.Count = 0 AndAlso pGroupsInputsDFLOW.Count = 0 Then
+        '    'Logger.Msg("Need to specify global default parameters.", "Batch Run Parameter Setup")
+        '    Logger.Msg("Need to set up batch run groups.", "Batch Run Parameter Setup")
+        '    Exit Sub
+        'End If
         'If pGlobalInputsSWSTAT.Count = 0 Then
         '    Logger.Msg("Need to specify global default parameters.", "Batch Map Base-flow Separation")
         '    Return
