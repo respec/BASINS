@@ -2085,6 +2085,57 @@ Public Class frmSWSTAT
 
     End Function
 
+    Private Function RunSpearmanTest(ByVal aAnnualTS As atcTimeseries) As String
+        Dim lRunR As String
+        Dim lPrompt As Boolean = False
+        Do
+            lRunR = FindFile("Locate RunR executable", "RunR.exe", aUserVerifyFileName:=lPrompt)
+            If lRunR.Length = 0 Then Return "RunR.exe not found"
+            lPrompt = True
+        Loop While Not lRunR.ToLower.EndsWith("runr.exe") OrElse Not IO.File.Exists(lRunR)
+
+        lPrompt = False
+        Dim lRcodeFilename As String
+        Do
+            lRcodeFilename = FindFile("Locate R script for computing Spearman Rho Test", "fnGetTrend.R", aUserVerifyFileName:=lPrompt)
+            If lRcodeFilename.Length = 0 Then Return "R script not found"
+            lPrompt = True
+        Loop While Not lRcodeFilename.ToUpper.EndsWith(".R") OrElse Not IO.File.Exists(lRcodeFilename)
+
+        If IO.File.Exists(lRcodeFilename) AndAlso aAnnualTS.numValues > 0 Then
+            Dim lYearsString As String = ""
+            Dim lValuesString As String = ""
+            Dim lDateArray(6) As Integer
+            For lValueIndex As Integer = 1 To aAnnualTS.numValues
+                If Not Double.IsNaN(aAnnualTS.Value(lValueIndex)) Then
+                    J2Date(aAnnualTS.Dates.Value(lValueIndex), lDateArray)
+                    lYearsString &= lDateArray(0) & ", "
+                    lValuesString &= DoubleToString(aAnnualTS.Value(lValueIndex), 15, "0.##########", aSignificantDigits:=8) & ", "
+                End If
+            Next
+            'Trim extra comma and space
+            lYearsString = lYearsString.Substring(0, lYearsString.Length - 2)
+            lValuesString = lValuesString.Substring(0, lValuesString.Length - 2)
+
+            Dim lArgsFilename As String = GetTemporaryFileName("RunR", ".R")
+            Logger.Dbg("Writing trend R function/arguments to " & lArgsFilename)
+            TryCopy(lRcodeFilename, lArgsFilename)
+            Dim lArgWriter As New System.IO.StreamWriter(lArgsFilename, True)
+            lArgWriter.WriteLine()
+            lArgWriter.WriteLine("# Arguments for this run")
+            lArgWriter.WriteLine("InputYears <- c(" & lYearsString & ")")
+            lArgWriter.WriteLine("InputValues <- c(" & lValuesString & ")")
+            lArgWriter.WriteLine("fnGetTrend(InputYears, InputValues, dPercentConfidenceInterval = 95, intWhat = 0)")
+            lArgWriter.Close()
+
+            Dim lResultsFilename As String = GetTemporaryFileName("Rresults", ".txt")
+            Logger.Dbg("Writing trend R results to " & lResultsFilename)
+            LaunchProgram(lRunR, IO.Path.GetDirectoryName(lRcodeFilename), lResultsFilename & " " & lArgsFilename)
+            Return IO.File.ReadAllText(lResultsFilename).TrimEnd(vbLf).TrimEnd(vbCr)
+        End If
+        Return "R code not found"
+    End Function
+
     Private Sub btnDisplayTrend_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDisplayTrend.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         Dim lSelectedData As atcTimeseriesGroup = SelectedData()
@@ -2107,6 +2158,7 @@ Public Class frmSWSTAT
                             .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(1)))
                             .SetValue("To", pDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
                             .SetValue("Not Used", .GetValue("Count Missing"))
+                            .SetValueIfMissing("SpearmanTest", RunSpearmanTest(lTS))
                         End With
                     Next
                     Dim lList As New atcList.atcListForm
@@ -2856,5 +2908,6 @@ Public Class frmSWSTAT
         Dim lfrmResult As New DFLOWAnalysis.frmDFLOWResults(pDataGroup, , True)
     End Sub
 #End Region '"DFLOW"
+
 End Class
 

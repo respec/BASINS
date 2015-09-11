@@ -95,6 +95,7 @@ Public Class clsIDFPlugin
         Dim lTrendAttributes As New Generic.List(Of String)
         With lTrendAttributes
             .Add("Original ID")
+            .Add("SpearmanTest")
             .Add("KENTAU")
             .Add("KENPLV")
             .Add("KENSLPL")
