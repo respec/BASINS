@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{ADD48409-FC1F-4A92-B07C-6B9A9A5BAC72}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>D4EMDataDownload</RootNamespace>
+    <AssemblyName>D4EMDataDownload</AssemblyName>
+    <MyType>Windows</MyType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\AnyDebug\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>D4EMDataDownload.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>None</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>..\local\AnyRelease\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>D4EMDataDownload.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x64Debug\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>D4EMDataDownload.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x64Release\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>D4EMDataDownload.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>None</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x86Debug\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>D4EMDataDownload.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x86Release\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>D4EMDataDownload.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>None</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotSpatial.Analysis">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Analysis.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Compatibility">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Compatibility.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Controls">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Data">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Data.Forms">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Data.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Extensions">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Modeling">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Modeling.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Modeling.Forms">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Modeling.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Plugins.Taudem">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Plugins.Taudem.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Plugins.Taudem.Port">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Plugins.Taudem.Port.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Projections">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Projections.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Projections.Forms">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Projections.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Serialization">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Symbology.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology.Forms">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Symbology.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Tools">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\Tools\DotSpatial.Tools.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Topology">
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\DotSpatial\DotSpatial.Topology.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\local\$(Platform)$(Configuration)\Interop.MapWinGIS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\BASINS\BASINS-D4EM.Data.Source.BASINS.vbproj">
+      <Project>{1A68540D-13CA-46AF-93E6-2C864E6627C7}</Project>
+      <Name>BASINS-D4EM.Data.Source.BASINS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\NHDPlus\BASINS-D4EM.Data.Source.NHDPlus.vbproj">
+      <Project>{6B7283C6-6DDE-41E9-BA00-F3EDD604B38B}</Project>
+      <Name>BASINS-D4EM.Data.Source.NHDPlus</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\NLDAS\BASINS-D4EM.Data.Source.NLDAS.vbproj">
+      <Project>{B8E2D4B9-3AC3-4160-A4B7-6B9D0AE03FE0}</Project>
+      <Name>BASINS-D4EM.Data.Source.NLDAS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\NRCS_Soil\BASINS-D4EM.Data.Source.NRCS_Soil.vbproj">
+      <Project>{7612F73D-72CD-4A3D-861A-401E0E5F72BA}</Project>
+      <Name>BASINS-D4EM.Data.Source.NRCS_Soil</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\NWIS\BASINS-D4EM.Data.Source.NWIS.vbproj">
+      <Project>{E00C40D7-1EB7-44DE-A196-619AC2016689}</Project>
+      <Name>BASINS-D4EM.Data.Source.NWIS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\Storet\BASINS-D4EM.Data.Source.Storet.vbproj">
+      <Project>{B39B85B9-65F1-4FB7-B8E5-7A8559DFA368}</Project>
+      <Name>BASINS-D4EM.Data.Source.Storet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data.Source\USGS_Seamless\BASINS-D4EM.Data.Source.USGS_Seamless.vbproj">
+      <Project>{2CF5E4F7-8649-40F7-8481-CEFE720262CF}</Project>
+      <Name>BASINS-D4EM.Data.Source.USGS_Seamless</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Data\BASINS-D4EM.Data.vbproj">
+      <Project>{06768E3A-87AE-4D46-A45A-C43C6109D43F}</Project>
+      <Name>BASINS-D4EM.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\devNotMW\D4EM\D4EM.Geo\BASINS-D4EM.Geo.vbproj">
+      <Project>{573A99FB-08DE-4B28-8628-AC7089348D96}</Project>
+      <Name>BASINS-D4EM.Geo</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+      <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
+      <Name>BASINS-MapWinUtility10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
+    <Reference Include="WebDownload, Version=1.3.4559.29757, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\devNotMW\D4EM\Externals\x86Debug\WorldWind\WebDownload.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Diagnostics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DownloadDataPlugin10.vb" />
+    <Compile Include="frmDownload10.Designer.vb">
+      <DependentUpon>frmDownload10.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDownload10.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSpecifyRegion10.Designer.vb">
+      <DependentUpon>frmSpecifyRegion10.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSpecifyRegion10.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSpecifyStations.Designer.vb">
+      <DependentUpon>frmSpecifyStations.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSpecifyStations.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmWDM.Designer.vb">
+      <DependentUpon>frmWDM.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmWDM.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="frmDownload10.resx">
+      <DependentUpon>frmDownload10.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifyRegion10.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSpecifyRegion10.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifyStations.resx">
+      <DependentUpon>frmSpecifyStations.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmWDM.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmWDM.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MW4.8.6\MapWindow4Dev\MapWinInterfaces\MapWinInterfaces10.csproj">
+      <Project>{E880AAB1-98B5-45B8-A3B8-CB3D0DB8B317}</Project>
+      <Name>MapWinInterfaces10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData10.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility10.vbproj">
+      <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
+      <Name>atcMwGisUtility10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility10.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\BASINS\BASINS10.vbproj">
+      <Project>{FE50F2FD-56E7-421E-A85D-A1F2DDCD5D9A}</Project>
+      <Name>BASINS10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
