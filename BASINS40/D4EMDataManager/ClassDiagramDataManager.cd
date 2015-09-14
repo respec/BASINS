@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="D4EMDataManager.clsBaseDataExtension" BaseTypeListCollapsed="true">
+    <Position X="4" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IAwEAACAYBAwAUQGgAAAAAQAEAEEAAAAAAAEIAAQAAA=</HashCode>
+      <FileName>clsBaseDataExtension.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="D4EMDataManager.clsLayer" Collapsed="true">
+    <Position X="8.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgEAAAAgIBQCGAAAEAAgAIAAAAEAgQCIAADAAQA=</HashCode>
+      <FileName>clsLayer.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="D4EMDataManager.clsOverlayReclassify" Collapsed="true">
+    <Position X="8.25" Y="2.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAACAAAEAIAAAAAAAAAAEAAAAEAAAAAACA=</HashCode>
+      <FileName>clsOverlayReclassify.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="D4EMDataManager.clsHru" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACEAEAAAAAAAQAAAAAACAAAAAAAAIAAAAAAQAAAAA=</HashCode>
+      <FileName>clsOverlayReclassify.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="D4EMDataManager.clsHruComparer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>clsOverlayReclassify.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="D4EMDataManager.clsHruComparerGeneric" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>clsOverlayReclassify.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="D4EMDataManager.clsHruTable" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="4.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAKAIAAAAJAAASCAAAQAAEAAQAgAEAAAQAAAAAAQAA=</HashCode>
+      <FileName>clsOverlayReclassify.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="D4EMDataManager.DataManager" Collapsed="true">
+    <Position X="8.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAEAQAACAAAAAAAAAAAAAAAAAAAICgAAA=</HashCode>
+      <FileName>DataManager.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="D4EMDataManager.NetworkOperations" Collapsed="true">
+    <Position X="8.25" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>CAAAIQAAAAAEACAAAAwAAAVAAAQAAAAAgBAAAACAIAA=</HashCode>
+      <FileName>NetworkOperations.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="D4EMDataManager.Region" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AKAgAAAAAAiABAAEEAgGACgGQICQABAASCAAAAwAAgE=</HashCode>
+      <FileName>Region.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="D4EMDataManager.RegionShape" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAEAAAAACAAIAAMAAAAAAAAAAAAAAAAACAAAAgAAAA=</HashCode>
+      <FileName>RegionShape.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="D4EMDataManager.SpatialOperations" Collapsed="true">
+    <Position X="8.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAgAiAQCAIAQAA4gQAgQBAgBAAAAAAAAIAAAACAAA=</HashCode>
+      <FileName>SpatialOperations.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="D4EMDataManager.MapWinCallback" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAACAAAA=</HashCode>
+      <FileName>SpatialOperations.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="D4EMDataManager.WaterQualityUtility" Collapsed="true">
+    <Position X="8.25" Y="3" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WaterQualityUtility.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="D4EMDataManager.Zipper" Collapsed="true">
+    <Position X="8.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Zipper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="D4EMDataManager.IDataExtension" Collapsed="true">
+    <Position X="5.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAgAQQAgAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDataExtension.vb</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MapWindow.Interfaces.IPlugin" Collapsed="true">
+    <Position X="3.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Module Name="D4EMDataManager.Download">
+    <Position X="3" Y="0.5" Width="2" />
+    <Members>
+      <Method Name="DefaultCompleteHandler" Hidden="true" />
+      <Method Name="DefaultProgressHandler" Hidden="true" />
+      <Method Name="DownloadURLProgress" Hidden="true" />
+      <Field Name="pBackupURL" Hidden="true" />
+      <Field Name="pLastStatusSent" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>DAAAAgAAAAAAAAAAAAAAAAAAAAJAEAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Download.vb</FileName>
+    </TypeIdentifier>
+  </Module>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>
