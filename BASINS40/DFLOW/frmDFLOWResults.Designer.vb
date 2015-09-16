@@ -33,13 +33,13 @@ Partial Class frmDFLOWResults
         Me.CopyAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.SelectionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.DFLOWHelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripMenuItem4 = New System.Windows.Forms.ToolStripSeparator
+        Me.AboutDFLOWToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.lblYears = New System.Windows.Forms.Label
         Me.Button1 = New System.Windows.Forms.Button
         Me.lblSeasons = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
-        Me.DFLOWHelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripMenuItem4 = New System.Windows.Forms.ToolStripSeparator
-        Me.AboutDFLOWToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.agrResults = New atcControls.atcGrid
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -57,83 +57,100 @@ Partial Class frmDFLOWResults
         '
         Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SelectDataToolStripMenuItem, Me.ToolStripMenuItem1, Me.SepcifyInputsToolStripMenuItem, Me.SaveinputsToolStripMenuItem, Me.ToolStripMenuItem2, Me.SaveGridToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(35, 20)
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
         Me.FileToolStripMenuItem.Text = "&File"
         '
         'SelectDataToolStripMenuItem
         '
         Me.SelectDataToolStripMenuItem.Name = "SelectDataToolStripMenuItem"
-        Me.SelectDataToolStripMenuItem.Size = New System.Drawing.Size(143, 22)
+        Me.SelectDataToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.SelectDataToolStripMenuItem.Text = "Select Data"
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(140, 6)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(145, 6)
         '
         'SepcifyInputsToolStripMenuItem
         '
         Me.SepcifyInputsToolStripMenuItem.Name = "SepcifyInputsToolStripMenuItem"
-        Me.SepcifyInputsToolStripMenuItem.Size = New System.Drawing.Size(143, 22)
+        Me.SepcifyInputsToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.SepcifyInputsToolStripMenuItem.Text = "Specify Inputs"
         '
         'SaveinputsToolStripMenuItem
         '
         Me.SaveinputsToolStripMenuItem.Name = "SaveinputsToolStripMenuItem"
-        Me.SaveinputsToolStripMenuItem.Size = New System.Drawing.Size(143, 22)
+        Me.SaveinputsToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.SaveinputsToolStripMenuItem.Text = "Save [inputs]"
         '
         'ToolStripMenuItem2
         '
         Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(140, 6)
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(145, 6)
         '
         'SaveGridToolStripMenuItem
         '
         Me.SaveGridToolStripMenuItem.Name = "SaveGridToolStripMenuItem"
-        Me.SaveGridToolStripMenuItem.Size = New System.Drawing.Size(143, 22)
+        Me.SaveGridToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.SaveGridToolStripMenuItem.Text = "Save Grid"
         '
         'AttributesToolStripMenuItem
         '
         Me.AttributesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToolStripMenuItem, Me.CopyAllToolStripMenuItem})
         Me.AttributesToolStripMenuItem.Name = "AttributesToolStripMenuItem"
-        Me.AttributesToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
+        Me.AttributesToolStripMenuItem.Size = New System.Drawing.Size(39, 20)
         Me.AttributesToolStripMenuItem.Text = "Edit"
         '
         'CopyToolStripMenuItem
         '
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
-        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(125, 22)
+        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(129, 22)
         Me.CopyToolStripMenuItem.Text = "Copy Base"
         '
         'CopyAllToolStripMenuItem
         '
         Me.CopyAllToolStripMenuItem.Name = "CopyAllToolStripMenuItem"
-        Me.CopyAllToolStripMenuItem.Size = New System.Drawing.Size(125, 22)
+        Me.CopyAllToolStripMenuItem.Size = New System.Drawing.Size(129, 22)
         Me.CopyAllToolStripMenuItem.Text = "Copy All"
         '
         'ViewToolStripMenuItem
         '
         Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
-        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(41, 20)
+        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
         Me.ViewToolStripMenuItem.Text = "View"
         '
         'SelectionToolStripMenuItem
         '
         Me.SelectionToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DFLOWHelpToolStripMenuItem, Me.ToolStripMenuItem4, Me.AboutDFLOWToolStripMenuItem})
         Me.SelectionToolStripMenuItem.Name = "SelectionToolStripMenuItem"
-        Me.SelectionToolStripMenuItem.Size = New System.Drawing.Size(40, 20)
+        Me.SelectionToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
         Me.SelectionToolStripMenuItem.Text = "Help"
+        '
+        'DFLOWHelpToolStripMenuItem
+        '
+        Me.DFLOWHelpToolStripMenuItem.Name = "DFLOWHelpToolStripMenuItem"
+        Me.DFLOWHelpToolStripMenuItem.Size = New System.Drawing.Size(150, 22)
+        Me.DFLOWHelpToolStripMenuItem.Text = "DFLOW &Help"
+        '
+        'ToolStripMenuItem4
+        '
+        Me.ToolStripMenuItem4.Name = "ToolStripMenuItem4"
+        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(147, 6)
+        '
+        'AboutDFLOWToolStripMenuItem
+        '
+        Me.AboutDFLOWToolStripMenuItem.Name = "AboutDFLOWToolStripMenuItem"
+        Me.AboutDFLOWToolStripMenuItem.Size = New System.Drawing.Size(150, 22)
+        Me.AboutDFLOWToolStripMenuItem.Text = "&About DFLOW"
         '
         'lblYears
         '
         Me.lblYears.AutoSize = True
         Me.lblYears.Location = New System.Drawing.Point(12, 34)
         Me.lblYears.Name = "lblYears"
-        Me.lblYears.Size = New System.Drawing.Size(58, 13)
+        Me.lblYears.Size = New System.Drawing.Size(44, 13)
         Me.lblYears.TabIndex = 8
-        Me.lblYears.Text = "lblSeasons"
+        Me.lblYears.Text = "lblYears"
         '
         'Button1
         '
@@ -155,29 +172,13 @@ Partial Class frmDFLOWResults
         '
         'Label1
         '
+        Me.Label1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(12, 262)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(282, 13)
         Me.Label1.TabIndex = 11
         Me.Label1.Text = "Double-click on biological flow value for excursion analysis"
-        '
-        'DFLOWHelpToolStripMenuItem
-        '
-        Me.DFLOWHelpToolStripMenuItem.Name = "DFLOWHelpToolStripMenuItem"
-        Me.DFLOWHelpToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.DFLOWHelpToolStripMenuItem.Text = "DFLOW &Help"
-        '
-        'ToolStripMenuItem4
-        '
-        Me.ToolStripMenuItem4.Name = "ToolStripMenuItem4"
-        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(149, 6)
-        '
-        'AboutDFLOWToolStripMenuItem
-        '
-        Me.AboutDFLOWToolStripMenuItem.Name = "AboutDFLOWToolStripMenuItem"
-        Me.AboutDFLOWToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.AboutDFLOWToolStripMenuItem.Text = "&About DFLOW"
         '
         'agrResults
         '
@@ -188,6 +189,7 @@ Partial Class frmDFLOWResults
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agrResults.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.agrResults.CellBackColor = System.Drawing.Color.Empty
+        Me.agrResults.Fixed3D = False
         Me.agrResults.LineColor = System.Drawing.Color.Empty
         Me.agrResults.LineWidth = 0.0!
         Me.agrResults.Location = New System.Drawing.Point(0, 73)
