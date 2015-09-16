@@ -2208,6 +2208,21 @@ Public Class frmSWSTAT
         Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
 
+    Private Function STAID(ByVal aTs As atcTimeseries) As String
+        Dim lSTAID As String = aTs.Attributes.GetValue("STAID", Nothing)
+        If lSTAID Is Nothing Then
+            lSTAID = aTs.Attributes.GetValue("Location", Nothing)
+            If lSTAID Is Nothing Then
+                lSTAID = aTs.Attributes.GetValue("STANAM", Nothing)
+                If lSTAID Is Nothing Then
+                    lSTAID = "N/A"
+                End If
+            End If
+            aTs.Attributes.SetValue("STAID", lSTAID)
+        End If
+        Return lSTAID
+    End Function
+
     Public Sub DoFrequencyGraph(Optional ByVal aDataGroup As atcData.atcTimeseriesGroup = Nothing)
         Calculate("n-day " & HighOrLowString() & " value", clsIDFPlugin.ListDefaultArray("Return Period"))
         Dim lGraphPlugin As New atcGraph.atcGraphPlugin
@@ -2226,8 +2241,8 @@ Public Class frmSWSTAT
         'Get station list
         Dim lStnList As New Generic.List(Of String)
         For Each lDataSet As atcTimeseries In pDataGroup
-            If Not lStnList.Contains(lDataSet.Attributes.GetValue("STAID")) Then
-                lStnList.Add(lDataSet.Attributes.GetValue("STAID"))
+            If Not lStnList.Contains(STAID(lDataSet)) Then
+                lStnList.Add(STAID(lDataSet))
             End If
         Next
         'Get Nday list
@@ -2246,7 +2261,7 @@ Public Class frmSWSTAT
                 For Each lNDayTimeseriesName As String In lNDayList
                     Dim lDataGroup As New atcData.atcTimeseriesGroup
                     For Each lDataset As atcTimeseries In pDataGroup
-                        If lDataset.Attributes.GetValue("STAID") = lStaId Then
+                        If STAID(lDataset) = lStaId Then
                             Dim lTs As atcTimeseries = lDataset.Attributes.GetValue(lNDayTimeseriesName)
                             If lTs IsNot Nothing Then
                                 lDataGroup.Add(lTs)
@@ -2286,7 +2301,7 @@ Public Class frmSWSTAT
             Dim lDataGroup As atcData.atcTimeseriesGroup = Nothing
             For Each lStaId As String In lStnList
                 lDataGroup = pDataGroup.FindData("STAID", lStaId)
-                If lDataGroup IsNot Nothing Then
+                If lDataGroup IsNot Nothing AndAlso lDataGroup.Count > 0 Then
                     lGraphForm = lGraphPlugin.Show(lDataGroup, "Frequency")
                     lGraphForm.Icon = Me.Icon
                 End If
