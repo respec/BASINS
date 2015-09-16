@@ -479,39 +479,41 @@ Public Class clsGraphFrequency
 
     Private Sub GetDataInfo()
         pNDays = New Generic.List(Of String)
-        For Each lAtt As atcDefinedValue In pDataGroup(0).Attributes
-            Dim lAttName As String = lAtt.Definition.Name.ToUpper
-            If lAttName.Contains("DAYTIMESERIES") Then
-                Dim lAttValue As String = lAtt.Value.ToString.Trim.ToUpper
-                If lAttValue.StartsWith("H") Then
-                    If Not pNDays.Contains(lAttValue) Then
-                        pNDays.Add(lAttValue)
-                    End If
-                ElseIf lAttValue.StartsWith("L") Then
-                    If Not pNDays.Contains(lAttValue) Then
-                        pNDays.Add(lAttValue)
+        If pDataGroup IsNot Nothing AndAlso pDataGroup.Count > 0 Then
+            For Each lAtt As atcDefinedValue In pDataGroup(0).Attributes
+                Dim lAttName As String = lAtt.Definition.Name.ToUpper
+                If lAttName.Contains("DAYTIMESERIES") Then
+                    Dim lAttValue As String = lAtt.Value.ToString.Trim.ToUpper
+                    If lAttValue.StartsWith("H") Then
+                        If Not pNDays.Contains(lAttValue) Then
+                            pNDays.Add(lAttValue)
+                        End If
+                    ElseIf lAttValue.StartsWith("L") Then
+                        If Not pNDays.Contains(lAttValue) Then
+                            pNDays.Add(lAttValue)
+                        End If
                     End If
                 End If
-            End If
-            If lAttName.StartsWith("NONLOG") Then
-                pLogStr = "Log"
-            End If
-        Next
+                If lAttName.StartsWith("NONLOG") Then
+                    pLogStr = "Log"
+                End If
+            Next
 
-        pStations = New Generic.List(Of String)
-        Dim lStation As String
-        For Each lTs As atcTimeseries In pDataGroup
-            If lTs.Attributes.ContainsAttribute("STAID") Then
-                lStation = lTs.Attributes.GetValue("STAID").ToString.Trim()
-            ElseIf lTs.Attributes.ContainsAttribute("Location") Then
-                lStation = lTs.Attributes.GetValue("Location").ToString.Trim()
-            Else
-                lStation = lTs.Serial
-            End If
-            If Not pStations.Contains(lStation) Then
-                pStations.Add(lStation)
-            End If
-        Next
+            pStations = New Generic.List(Of String)
+            Dim lStation As String
+            For Each lTs As atcTimeseries In pDataGroup
+                If lTs.Attributes.ContainsAttribute("STAID") Then
+                    lStation = lTs.Attributes.GetValue("STAID").ToString.Trim()
+                ElseIf lTs.Attributes.ContainsAttribute("Location") Then
+                    lStation = lTs.Attributes.GetValue("Location").ToString.Trim()
+                Else
+                    lStation = lTs.Serial
+                End If
+                If Not pStations.Contains(lStation) Then
+                    pStations.Add(lStation)
+                End If
+            Next
+        End If
     End Sub
 
 End Class

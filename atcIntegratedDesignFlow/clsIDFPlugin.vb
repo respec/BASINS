@@ -94,7 +94,8 @@ Public Class clsIDFPlugin
     Private Function TrendAttributes() As Generic.List(Of String)
         Dim lTrendAttributes As New Generic.List(Of String)
         With lTrendAttributes
-            .Add("Original ID")
+            .Add("STAID")
+            .Add("Constituent")
             .Add("SpearmanTest")
             .Add("KENTAU")
             .Add("KENPLV")
@@ -105,8 +106,6 @@ Public Class clsIDFPlugin
             .Add("Not Used")
             .Add("Min")
             .Add("Max")
-            .Add("Constituent")
-            .Add("STAID")
         End With
         Return lTrendAttributes
     End Function
