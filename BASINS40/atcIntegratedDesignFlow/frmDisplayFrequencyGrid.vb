@@ -342,11 +342,15 @@ Friend Class frmDisplayFrequencyGrid
             .DefaultExt = ".txt"
             .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
-                SaveFileString(.FileName, pSource.CreateReport)
+                SaveFileString(.FileName, CreateReport)
                 OpenFile(.FileName)
             End If
         End With
     End Sub
+
+    Public Function CreateReport() As String
+        Return pSource.CreateReport
+    End Function
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
         PopulateGrid()
