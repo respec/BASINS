@@ -116,6 +116,41 @@ Public Class clsRecess
         pFileOut1 = IO.Path.Combine(OutputPath, "x" & SeasonLabel & "." & pDataFilename)
         pFileOut2 = IO.Path.Combine(OutputPath, "y" & SeasonLabel & "." & pDataFilename)
     End Sub
+
+    '17 FORMAT (A12,A1,1X,1I4,'-',1I4,1I3,3F6.1,2F8.3,1F9.4,2F10.4, 1F8.1,Awhatever)
+    Enum RecSumColumn 'subscript indices
+        c1Stn = 0
+        c2Sn = 12
+        c3YrS = 14
+        c4YrE = 19
+        c5SegCt = 23
+        c6Kmin = 26
+        c7Kmed = 32
+        c8Kmax = 38
+        c9MinLogQC = 44
+        c10MaxLogQC = 52
+        c11CoA = 60
+        c12CoB = 69
+        c13CoC = 79
+        c14DA = 89
+        c15Stnm = 97
+    End Enum
+    Enum RecSumColW
+        c1Stn = 12
+        c2Sn = 1
+        c3YrS = 4
+        c4YrE = 4
+        c5SegCt = 3
+        c6Kmin = 6
+        c7Kmed = 6
+        c8Kmax = 6
+        c9MinLogQC = 8
+        c10MaxLogQC = 8
+        c11CoA = 9
+        c12CoB = 10
+        c13CoC = 10
+        c14DA = 8
+    End Enum
 #End Region
 
 #Region "Size Limits"
@@ -1421,21 +1456,21 @@ Public Class clsRecess
                 Dim lStrYearEnd As String = lDate(0).ToString
                 Dim lStrDuration As String = lStrYearStart & "-" & lStrYearEnd & "  "
 
-                Dim lStrKMin As String = String.Format("{0:0.0}", lKMin).PadLeft(6, " ")
-                Dim lStrKMed As String = String.Format("{0:0.0}", lKMed).PadLeft(6, " ")
-                Dim lStrKMax As String = String.Format("{0:0.0}", lKMax).PadLeft(6, " ")
-                Dim lStrMNLogQC As String = String.Format("{0:0.000}", lMeanQLogMinC).PadLeft(8, " ") 'lMNLogQC
-                Dim lStrMXLogQC As String = String.Format("{0:0.000}", lMeanQLogMaxC).PadLeft(8, " ") 'lMXLogQC
-                Dim lStrCoeffA As String = String.Format("{0:0.0000}", 0.5 * lCoeffA).PadLeft(9, " ")
-                Dim lStrCoeffB As String = String.Format("{0:0.0000}", lCoeffB).PadLeft(10, " ")
-                Dim lStrCoeffC As String = String.Format("{0:0.0000}", lCoeffC).PadLeft(10, " ")
+                Dim lStrKMin As String = String.Format("{0:0.0}", lKMin).PadLeft(RecSumColW.c6Kmin, " ") '6
+                Dim lStrKMed As String = String.Format("{0:0.0}", lKMed).PadLeft(RecSumColW.c7Kmed, " ") '6
+                Dim lStrKMax As String = String.Format("{0:0.0}", lKMax).PadLeft(RecSumColW.c8Kmax, " ") '6
+                Dim lStrMNLogQC As String = String.Format("{0:0.000}", lMeanQLogMinC).PadLeft(RecSumColW.c9MinLogQC, " ") 'lMNLogQC '8
+                Dim lStrMXLogQC As String = String.Format("{0:0.000}", lMeanQLogMaxC).PadLeft(RecSumColW.c10MaxLogQC, " ") 'lMXLogQC '8
+                Dim lStrCoeffA As String = String.Format("{0:0.0000}", 0.5 * lCoeffA).PadLeft(RecSumColW.c11CoA, " ") '9
+                Dim lStrCoeffB As String = String.Format("{0:0.0000}", lCoeffB).PadLeft(RecSumColW.c12CoB, " ") '10
+                Dim lStrCoeffC As String = String.Format("{0:0.0000}", lCoeffC).PadLeft(RecSumColW.c13CoC, " ") '10
 
                 Dim lDrainageArea As Double = FlowData.Attributes.GetValue("Drainage Area", -99.9)
                 Dim lStrDA As String = ""
                 If lDrainageArea < 0 Then
-                    lStrDA = "N/A".PadLeft(8, " ")
+                    lStrDA = "N/A".PadLeft(RecSumColW.c14DA, " ") '8
                 Else
-                    lStrDA = String.Format("{0:0.0}", lDrainageArea).PadLeft(8, " ")
+                    lStrDA = String.Format("{0:0.0}", lDrainageArea).PadLeft(RecSumColW.c14DA, " ") '8
                 End If
                 Dim lStaName As String = FlowData.Attributes.GetValue("STANAM", "").ToString.Trim()
                 If lStaName.Length > 0 Then
@@ -1478,7 +1513,7 @@ Public Class clsRecess
         If aFilename.Length > lFilenameLength Then
             aFilename = aFilename.Substring(0, lFilenameLength)
         End If
-        Return aFilename.PadRight(12, " ")
+        Return aFilename.PadRight(RecSumColW.c1Stn, " ") '12
 
     End Function
 
