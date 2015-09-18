@@ -231,6 +231,7 @@ Public Class frmMRCControl
             lOneLine = lSR.ReadLine()
 
             'Eliminate lines by pattern, at least 12 values and the 3rd to 11th are numeric
+
             lArr = Regex.Split(lOneLine, "\s+")
             If lArr.Length < 12 Then
                 Continue While
@@ -258,6 +259,50 @@ Public Class frmMRCControl
         SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
     End Sub
 
+    Private Sub ParseRecSumRecord(ByVal aLine As String, ByRef Arr() As String)
+        ReDim Arr(0)
+        '17 FORMAT (A12,A1,1X,1I4,'-',1I4,1I3,3F6.1,2F8.3,1F9.4,2F10.4, 1F8.1,Awhatever)
+        If Not String.IsNullOrEmpty(aLine) AndAlso aLine.Length >= 89 Then
+            With aLine
+                Dim lStn As String = .Substring(clsRecess.RecSumColumn.c1Stn, clsRecess.RecSumColW.c1Stn)
+                Dim lSn As String = .Substring(clsRecess.RecSumColumn.c2Sn, clsRecess.RecSumColW.c2Sn)
+                Dim lYrS As String = .Substring(clsRecess.RecSumColumn.c3YrS, clsRecess.RecSumColW.c3YrS)
+                Dim lYrE As String = .Substring(clsRecess.RecSumColumn.c4YrE, clsRecess.RecSumColW.c4YrE)
+                Dim lSegCt As String = .Substring(clsRecess.RecSumColumn.c5SegCt, clsRecess.RecSumColW.c5SegCt)
+                Dim lKmin As String = .Substring(clsRecess.RecSumColumn.c6Kmin, clsRecess.RecSumColW.c6Kmin)
+                Dim lKmed As String = .Substring(clsRecess.RecSumColumn.c7Kmed, clsRecess.RecSumColW.c7Kmed)
+                Dim lKmax As String = .Substring(clsRecess.RecSumColumn.c8Kmax, clsRecess.RecSumColW.c8Kmax)
+                Dim lMinLogQC As String = .Substring(clsRecess.RecSumColumn.c9MinLogQC, clsRecess.RecSumColW.c9MinLogQC)
+                Dim lMaxLogQC As String = .Substring(clsRecess.RecSumColumn.c10MaxLogQC, clsRecess.RecSumColW.c10MaxLogQC)
+                Dim lCoA As String = .Substring(clsRecess.RecSumColumn.c11CoA, clsRecess.RecSumColW.c11CoA)
+                Dim lCoB As String = .Substring(clsRecess.RecSumColumn.c12CoB, clsRecess.RecSumColW.c12CoB)
+                Dim lCoC As String = .Substring(clsRecess.RecSumColumn.c13CoC, clsRecess.RecSumColW.c13CoC)
+                Dim lDA As String = ""
+                Dim lColumns As Integer = 13
+                If aLine.Length >= 97 Then
+                    lDA = .Substring(clsRecess.RecSumColumn.c14DA, clsRecess.RecSumColW.c14DA)
+                    lColumns = 14
+                End If
+                ReDim Arr(lColumns - 1)
+                Arr(0) = lStn
+                Arr(1) = lSn
+                Arr(2) = lYrS
+                Arr(3) = lYrE
+                Arr(4) = lSegCt
+                Arr(5) = lKmin
+                Arr(6) = lKmed
+                Arr(7) = lKmax
+                Arr(8) = lMinLogQC
+                Arr(9) = lMaxLogQC
+                Arr(10) = lCoA
+                Arr(11) = lCoB
+                Arr(12) = lCoC
+                If lColumns = 14 Then
+                    Arr(13) = lDA
+                End If
+            End With
+        End If
+    End Sub
     Private Function RecSumStationMatched() As Boolean
         Dim lMatched As Boolean = True
         If txtStation.Text.Trim() = "" OrElse _
