@@ -254,15 +254,23 @@ Public Class frmGraphEditor
                     End If
                     'lProbScale.Exceedance = chkProbabilityExceedance.Checked
                 End If
-                If Double.TryParse(txtAxisDisplayMinimum.Text, lTemp) Then
-                    .Scale.MinAuto = False
-                    .Scale.Min = lTemp
-                End If
-                If Double.TryParse(txtAxisDisplayMaximum.Text, lTemp) Then
-                    .Scale.MaxAuto = False
-                    .Scale.Max = lTemp
-                End If
+
+                'If Double.TryParse(txtAxisDisplayMinimum.Text, lTemp) Then
+                '    .Scale.MinAuto = False
+                '    .Scale.Min = lTemp
+                'End If
+                'If Double.TryParse(txtAxisDisplayMaximum.Text, lTemp) Then
+                '    .Scale.MaxAuto = False
+                '    .Scale.Max = lTemp
+                'End If
+
                 .Scale.IsReverse = chkRangeReverse.Checked
+                Dim lNewMin As Double
+                Dim lNewMax As Double
+                If Double.TryParse(txtAxisDisplayMinimum.Text, lNewMin) AndAlso _
+                   Double.TryParse(txtAxisDisplayMaximum.Text, lNewMax) Then
+                    SetYAxisScales(aAxis, lNewMin, lNewMax)
+                End If
 
                 .MajorGrid.Color = txtAxisMajorGridColor.BackColor
                 .MajorGrid.IsVisible = chkAxisMajorGridVisible.Checked
@@ -286,6 +294,54 @@ Public Class frmGraphEditor
                     If aAxis Is pPane.XAxis AndAlso pPaneAux IsNot Nothing Then
                         SetAxisFromControls(pPaneAux.XAxis)
                     End If
+                End If
+            End With
+        End If
+    End Sub
+
+    Private Sub SetYAxisScales(ByVal aYAxis As Axis, ByVal aMin As Double, ByVal aMax As Double)
+        Dim lOppositeYAxis As Axis = Nothing
+        If aYAxis IsNot Nothing Then
+            Dim lName As String = aYAxis.GetType().Name
+            If lName.ToLower() = "yaxis" Then
+                lOppositeYAxis = pPane.Y2Axis
+            ElseIf lName.ToLower() = "y2axis" Then
+                lOppositeYAxis = pPane.YAxis
+            End If
+        Else
+            Exit Sub
+        End If
+        Dim lIsReversed As Boolean
+        Dim lYAxisMin0 As Double = GetNaN()
+        Dim lYAxisMax0 As Double = GetNaN()
+        With aYAxis
+            lYAxisMin0 = .Scale.Min
+            lYAxisMax0 = .Scale.Max
+            If Not Double.IsNaN(aMin) Then
+                .Scale.MinAuto = False
+                .Scale.Min = aMin
+            End If
+            If Not Double.IsNaN(aMax) Then
+                .Scale.MaxAuto = False
+                .Scale.Max = aMax
+            End If
+            lIsReversed = .Scale.IsReverse
+        End With
+        If lOppositeYAxis IsNot Nothing Then
+            Dim lChangeFractionMin As Double = (aMin - lYAxisMin0) / (lYAxisMax0 - lYAxisMin0)
+            Dim lChangeFractionMax As Double = (aMax - lYAxisMax0) / (lYAxisMax0 - lYAxisMin0)
+            With lOppositeYAxis.Scale
+                Dim lIsReversedOp As Boolean = .IsReverse
+                Dim lYAxisMinOp0 As Double = .Min
+                Dim lYAxisMaxOp0 As Double = .Max
+                .MinAuto = False
+                .MaxAuto = False
+                If (lIsReversed And Not lIsReversedOp) OrElse (Not lIsReversed And lIsReversedOp) Then
+                    .Max -= lChangeFractionMin * (lYAxisMaxOp0 - lYAxisMinOp0)
+                    .Min -= lChangeFractionMax * (lYAxisMaxOp0 - lYAxisMinOp0)
+                Else
+                    .Min += lChangeFractionMin * (lYAxisMaxOp0 - lYAxisMinOp0)
+                    .Max += lChangeFractionMax * (lYAxisMaxOp0 - lYAxisMinOp0)
                 End If
             End With
         End If
