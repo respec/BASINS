@@ -118,7 +118,25 @@ Public Class clsRecess
     End Sub
 
     '17 FORMAT (A12,A1,1X,1I4,'-',1I4,1I3,3F6.1,2F8.3,1F9.4,2F10.4, 1F8.1,Awhatever)
-    Enum RecSumColumn 'subscript indices
+    Enum RecSumFldIndex 'array subscript indices
+        c1Stn = 0
+        c2Sn
+        c3YrS
+        c4YrE
+        c5SegCt
+        c6Kmin
+        c7Kmed
+        c8Kmax
+        c9MinLogQC
+        c10MaxLogQC
+        c11CoA
+        c12CoB
+        c13CoC
+        c14DA
+        c15Stnm
+    End Enum
+
+    Enum RecSumColumn 'text column subscript indices
         c1Stn = 0
         c2Sn = 12
         c3YrS = 14
@@ -135,7 +153,7 @@ Public Class clsRecess
         c14DA = 89
         c15Stnm = 97
     End Enum
-    Enum RecSumColW
+    Enum RecSumColW 'text column width
         c1Stn = 12
         c2Sn = 1
         c3YrS = 4

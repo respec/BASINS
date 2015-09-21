@@ -116,9 +116,9 @@ Public Class clsMRC
     Public Function WriteCurvTable(Optional ByVal aWriteToFile As Boolean = False) As String
         Dim lResults As New System.Text.StringBuilder
 
-        If DrainageArea <= 0 Then
-            Return "Fail:Invalid Drainage Area"
-        End If
+        'If DrainageArea <= 0 Then
+        '    Return "Fail:Invalid Drainage Area"
+        'End If
 
         Try
             lResults.AppendLine(" ")
@@ -136,9 +136,18 @@ Public Class clsMRC
                 lStrLogQ = String.Format("{0:0.00000}", LogQ(I)).PadLeft(lFieldLength, " ")
 
                 lFlowQ = 10 ^ LogQ(I)
-                lStrLogQsmi = String.Format("{0:0.00000}", Math.Log10(lFlowQ / DrainageArea)).PadLeft(lFieldLength, " ")
+                If DrainageArea > 0 Then
+                    lStrLogQsmi = String.Format("{0:0.00000}", Math.Log10(lFlowQ / DrainageArea)).PadLeft(lFieldLength, " ")
+                Else
+                    lStrLogQsmi = "N/A".PadLeft(lFieldLength, " ")
+                End If
+
                 lStrQ = String.Format("{0:0.00000}", lFlowQ).PadLeft(lFieldLength, " ")
-                lStrQsmi = String.Format("{0:0.00000}", lFlowQ / DrainageArea).PadLeft(lFieldLength, " ")
+                If DrainageArea > 0 Then
+                    lStrQsmi = String.Format("{0:0.00000}", lFlowQ / DrainageArea).PadLeft(lFieldLength, " ")
+                Else
+                    lStrQsmi = "N/A".PadLeft(lFieldLength, " ")
+                End If
 
                 lResults.AppendLine(lStrT & lStrLogQ & lStrLogQsmi & lStrQ & lStrQsmi)
             Next

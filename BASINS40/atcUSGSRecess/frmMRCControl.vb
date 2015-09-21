@@ -129,14 +129,10 @@ Public Class frmMRCControl
             AddMRC(FirstMRC)
         End If
 
-        If File.Exists(pFileStationFullName) Then
-            PopulateStations()
-        End If
-
         If File.Exists(pFileRecSumFullName) Then
             PopulateRecSums()
         End If
-
+        Me.Width += 175
     End Sub
 
     Private Sub AddMRC(ByVal aMRC As clsMRC)
@@ -165,60 +161,12 @@ Public Class frmMRCControl
 
     End Sub
 
-    Private Sub PopulateStations()
-
-        If lstStations.Items.Count > 0 Then lstStations.Items.Clear()
-        Dim lTitleLine1 As String = "Station      DA(sqmi)  Optional Info (Free form)"
-        Dim lTitleLine2 As String = "---------------------- ------------------------------------------"
-
-        'Station      DA(sqmi)  Optional Info (Free form)
-        '---------------------- ------------------------------------------
-        'Indian.txt      8.88   02371200  Indian Creek near Troy Alabama
-        lstStations.Items.Add(lTitleLine1)
-        lstStations.Items.Add(lTitleLine2)
-
-        Dim lSR As New StreamReader(pFileStationFullName)
-        Dim lOneLine As String
-        Dim lTitleSectionLines As Integer = 10
-        Dim lLinesRead As Integer = 1
-
-        While Not lSR.EndOfStream
-            lOneLine = lSR.ReadLine
-            If lLinesRead < lTitleSectionLines Then
-                lLinesRead += 1
-                Continue While
-            End If
-
-            While Not lSR.EndOfStream
-                lOneLine = lSR.ReadLine()
-                If lOneLine.Trim.Length < 2 Then
-                    Continue While
-                End If
-
-                Dim lFoundMatch As Boolean = False
-                'key to use is the RecSum string
-                For Each lItem As String In lstStations.Items
-                    If lItem.ToLower = lOneLine.ToLower Then
-                        lFoundMatch = True
-                        Exit For
-                    End If
-                Next
-                If Not lFoundMatch Then
-                    lstStations.Items.Add(lOneLine)
-                End If
-            End While
-        End While
-        lSR.Close()
-        lSR = Nothing
-        SaveSetting("atcUSGSRecess", "Defaults", "FileStation", pFileStationFullName)
-    End Sub
-
     Private Sub PopulateRecSums()
 
         If lstRecSum.Items.Count > 0 Then lstRecSum.Items.Clear()
-        Dim lTitleLine1 As String = "    File    S     P      #  Kmin  Kmed  Kmax  LogQmn  LogQmx     A         B         C"
-        Dim lTitleLine2 As String = "-----------------------------------------------------------------------------------------"
-        '                            Indian.txt  s 1971-1972  3  11.8  22.9  25.9   0.057   0.709   5.8238  -25.3040   15.0121
+        Dim lTitleLine1 As String = "    File    S     P      #  Kmin  Kmed  Kmax  LogQmn  LogQmx     A         B         C       DA   Stnam"
+        Dim lTitleLine2 As String = "-------------------------------------------------------------------------------------------------------------"
+        '                            Indian.txt  s 1971-1972  3  11.8  22.9  25.9   0.057   0.709   5.8238  -25.3040   15.0121    22.9 HUNT_RIVER_NEAR_EAST_GREENWICH__RI
         lstRecSum.Items.Add(lTitleLine1)
         lstRecSum.Items.Add(lTitleLine2)
 
@@ -226,20 +174,20 @@ Public Class frmMRCControl
         Dim lOneLine As String
         Dim lLinesRead As Integer = 1
 
-        Dim lArr() As String
+        Dim lArr() As String = Nothing
         While Not lSR.EndOfStream
             lOneLine = lSR.ReadLine()
 
             'Eliminate lines by pattern, at least 12 values and the 3rd to 11th are numeric
-
-            lArr = Regex.Split(lOneLine, "\s+")
-            If lArr.Length < 12 Then
-                Continue While
-            Else
-                For I As Integer = 3 To 11
-                    If Not IsNumeric(lArr(I)) Then Continue While
-                Next
-            End If
+            'lArr = Regex.Split(lOneLine, "\s+")
+            'If lArr.Length < 12 Then
+            '    Continue While
+            'Else
+            '    For I As Integer = 3 To 11
+            '        If Not IsNumeric(lArr(I)) Then Continue While
+            '    Next
+            'End If
+            If Not ParseRecSumRecord(lOneLine, lArr) Then Continue While
 
             Dim lFoundMatch As Boolean = False
             'key to use is the RecSum string
@@ -259,7 +207,8 @@ Public Class frmMRCControl
         SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
     End Sub
 
-    Private Sub ParseRecSumRecord(ByVal aLine As String, ByRef Arr() As String)
+    Private Function ParseRecSumRecord(ByVal aLine As String, ByRef Arr() As String) As Boolean
+        Dim lRecordIsValid As Boolean = True
         ReDim Arr(0)
         '17 FORMAT (A12,A1,1X,1I4,'-',1I4,1I3,3F6.1,2F8.3,1F9.4,2F10.4, 1F8.1,Awhatever)
         If Not String.IsNullOrEmpty(aLine) AndAlso aLine.Length >= 89 Then
@@ -297,129 +246,45 @@ Public Class frmMRCControl
                 Arr(10) = lCoA
                 Arr(11) = lCoB
                 Arr(12) = lCoC
+                For I As Integer = 2 To 12
+                    If Not IsNumeric(Arr(I)) Then
+                        lRecordIsValid = False
+                        Exit For
+                    End If
+                Next
                 If lColumns = 14 Then
                     Arr(13) = lDA
                 End If
             End With
-        End If
-    End Sub
-    Private Function RecSumStationMatched() As Boolean
-        Dim lMatched As Boolean = True
-        If txtStation.Text.Trim() = "" OrElse _
-           txtDA.Text.Trim() = "" OrElse _
-           txtLogQMin.Text.Trim() = "" OrElse _
-           txtLogQMax.Text.Trim() = "" OrElse _
-           txtCoefA.Text.Trim() = "" OrElse _
-           txtCoefB.Text.Trim() = "" OrElse _
-           txtCoefC.Text.Trim() = "" Then
-
-            lMatched = False
-
-        ElseIf lstRecSum.SelectedIndex < 2 Then
-            lMatched = False
-        ElseIf Not RecSumStationAddAllowed() Then
-            lMatched = False
-            'Else
-            '    Dim lArrRecSum() As String = Regex.Split(lstRecSum.SelectedItem, "\s+")
-            '    Dim lArrStation() As String = Regex.Split(lstStations.SelectedItem, "\s+")
-            '    If lArrRecSum(0).Trim().ToLower() <> lArrStation(0).Trim().ToLower() Then
-            '        lMatched = False
-            '    End If
-        End If
-        Return lMatched
-    End Function
-
-    Private Function RecSumStationAddAllowed() As Boolean
-        Dim lAddAllowed As Boolean = True
-        Dim lInStationList As Boolean = False
-        Dim lNewStationName As String = txtStation.Text.Trim()
-        Dim lArrRecSum() As String = Regex.Split(lstRecSum.SelectedItem, "\s+")
-        If lNewStationName <> lArrRecSum(0) Then
-            Logger.Msg("Entered station name does not match file name" & vbCrLf & _
-                       "in the Recsum (polynomial coefficients) list.", "Problem adding MRC")
-            lAddAllowed = False
         Else
-            If lstStations.Items.Count > 0 Then
-                Dim lArrStation() As String = Nothing
-                For I As Integer = 2 To lstStations.Items.Count - 1
-                    lArrStation = Regex.Split(lstStations.Items(I), "\s+")
-                    If lNewStationName = lArrStation(0) Then 'already in the list
-                        lInStationList = True
-                        Exit For
-                    End If
-                Next
-            End If
+            lRecordIsValid = False
         End If
-
-        If lAddAllowed AndAlso Not lInStationList Then
-            'Actually "TRY" to add into the station.txt file
-            'doesn't really matter if successful or not
-            If IO.File.Exists(pFileStationFullName) Then
-                If IsNumeric(txtDA.Text) Then
-                    Dim lSW As StreamWriter = Nothing
-                    Try
-                        lSW = New StreamWriter(pFileStationFullName, True)
-                        lSW.WriteLine(lNewStationName.PadRight(12, " ") & txtDA.Text.PadLeft(8, " "))
-                        lSW.Flush() : lSW.Close() : lSW = Nothing
-                        PopulateStations()
-                    Catch ex As Exception
-                        If lSW IsNot Nothing Then
-                            lSW.Close()
-                            lSW = Nothing
-                        End If
-                        'lAddAllowed = False
-                    End Try
-                End If
-            Else
-                'lAddAllowed = False
-            End If
-        End If
-
-        Return lAddAllowed
+        Return lRecordIsValid
     End Function
 
     Private Sub PopulateEquations()
-        If lstRecSum.Items.Count < 3 OrElse lstStations.Items.Count < 3 Then
-            Logger.Msg("No recsum or station listings.", MsgBoxStyle.Information, "Auto Populate Equation Listing")
+        If lstRecSum.Items.Count < 3 Then
+            Logger.Msg("No RECSUM records for constructing MRCs.", MsgBoxStyle.Information, "Auto Populate Equation Listing")
             Exit Sub
         End If
 
-        Dim lArrRecSum() As String
-        Dim lArrStation() As String
-        Dim lStationRecSum As String
-        Dim lStationStation As String
+        Dim lArrRecSum() As String = Nothing
         Dim lMRCToAdd As String
-        'Dim lEquation As String
-        'Dim lRange As String
         For CntRecSum As Integer = 2 To lstRecSum.Items.Count - 1
-            lArrRecSum = Regex.Split(lstRecSum.Items(CntRecSum), "\s+")
-            lStationRecSum = lArrRecSum(0).Trim.ToLower
-            For CntStation As Integer = 2 To lstStations.Items.Count - 1
-                lArrStation = Regex.Split(lstStations.Items(CntStation), "\s+")
-                lStationStation = lArrStation(0).Trim.ToLower
-                If lStationRecSum = lStationStation Then
-                    If IsNumeric(lArrStation(1)) AndAlso _
-                       IsNumeric(lArrRecSum(9)) AndAlso _
-                       IsNumeric(lArrRecSum(10)) AndAlso _
-                       IsNumeric(lArrRecSum(11)) AndAlso _
-                       IsNumeric(lArrRecSum(7)) AndAlso _
-                       IsNumeric(lArrRecSum(8)) Then
-
-                        'lMRCToAdd = lArrStation(0) & "," & lArrStation(1) & ",(" & lArrRecSum(1) & "),"
-                        'lRange = "(" & lArrRecSum(7) & "~" & lArrRecSum(8) & "),"
-                        'lMRCToAdd &= lRange
-                        'lEquation = "Coeff.A:" & lArrRecSum(9) & ",Coeff.B:" & lArrRecSum(10) & ",Coeff.C:" & lArrRecSum(11)
-                        'lMRCToAdd &= lEquation
-
-                        lMRCToAdd = MRCToAdd(lArrStation(0), lArrStation(1), lArrRecSum(1), lArrRecSum(7), lArrRecSum(8), lArrRecSum(9), lArrRecSum(10), lArrRecSum(11))
-                        If Not lstEquations.Items.Contains(lMRCToAdd) Then
-                            lstEquations.Items.Add(lMRCToAdd)
-                        End If
-                    End If
+            If ParseRecSumRecord(lstRecSum.Items(CntRecSum), lArrRecSum) Then
+                lMRCToAdd = MRCToAdd(lArrRecSum(clsRecess.RecSumFldIndex.c1Stn), _
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c14DA), _
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c2Sn), _
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c9MinLogQC), _
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c10MaxLogQC), _
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c11CoA), _
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c12CoB), _
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c13CoC))
+                If Not lstEquations.Items.Contains(lMRCToAdd) Then
+                    lstEquations.Items.Add(lMRCToAdd)
                 End If
-            Next
+            End If
         Next
-
     End Sub
 
     Private Function MRCToAdd(ByVal aStation As String, ByVal aDA As String, ByVal aSeason As String, _
@@ -480,7 +345,10 @@ Public Class frmMRCControl
             lStation = lArr(0)
 
             'get DA
-            lDA = Double.Parse(lArr(1))
+            'lDA = Double.Parse(lArr(1))
+            If Not Double.TryParse(lArr(1), lDA) Then
+                lDA = 0
+            End If
 
             'get season
             lSeason = lArr(2).Replace("(", "").Replace(")", "")
@@ -520,19 +388,6 @@ Public Class frmMRCControl
         txtMRCTable.SelectionLength = 0
     End Sub
 
-    Private Sub lstStations_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstStations.SelectedIndexChanged
-        Dim lSelectedIndex As Integer = lstStations.SelectedIndex
-        If lSelectedIndex < 2 Then
-            txtStation.Text = ""
-            txtDA.Text = ""
-            Exit Sub
-        End If
-
-        Dim lArr() As String = Regex.Split(lstStations.SelectedItem, "\s+")
-        txtStation.Text = lArr(0)
-        txtDA.Text = lArr(1)
-    End Sub
-
     Private Sub lstRecSum_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstRecSum.SelectedIndexChanged
         Dim lSelectedIndex As Integer = lstRecSum.SelectedIndex
         If lSelectedIndex < 2 Then
@@ -544,8 +399,24 @@ Public Class frmMRCControl
             txtSeason.Text = ""
             Exit Sub
         End If
+        'ParseMRCParams(lstRecSum.SelectedItem)
 
-        ParseMRCParams(lstRecSum.SelectedItem)
+        Dim lArr() As String = Nothing
+        If ParseRecSumRecord(lstRecSum.SelectedItem, lArr) Then
+            txtStation.Text = lArr(0)
+            txtSeason.Text = lArr(1)
+            txtLogQMin.Text = lArr(8)
+            txtLogQMax.Text = lArr(9)
+            txtCoefA.Text = lArr(10)
+            txtCoefB.Text = lArr(11)
+            txtCoefC.Text = lArr(12)
+            Dim lDA As Double
+            If lArr.Length >= 14 Then
+                If Not lArr(13).StartsWith("N/A") AndAlso Double.TryParse(lArr(13), lDA) Then
+                    txtDA.Text = lArr(13)
+                End If
+            End If
+        End If
     End Sub
 
     Private Sub ParseMRCParams(ByVal aItem As String, Optional ByVal aComplete As Boolean = False)
@@ -568,7 +439,7 @@ Public Class frmMRCControl
     End Sub
 
     Private Sub btnMRCAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMRCAdd.Click
-        If chkAutoMatching.Checked Then
+        If chkAddAllRecSumRecords.Checked Then
             PopulateEquations()
             Exit Sub
         End If
@@ -605,14 +476,16 @@ Public Class frmMRCControl
         'Dim lEquation As String = "Coeff.A:" & txtCoefA.Text.Trim() & ",Coeff.B:" & txtCoefB.Text.Trim() & ",Coeff.C:" & txtCoefC.Text.Trim()
         'lMRCToAdd &= lEquation
 
-        lMRCToAdd = MRCToAdd(txtStation.Text.Trim(), txtDA.Text.Trim(), txtSeason.Text.Trim(), _
-                             txtLogQMin.Text.Trim(), txtLogQMax.Text.Trim(), _
-                             txtCoefA.Text.Trim(), txtCoefB.Text.Trim(), txtCoefC.Text.Trim())
+        'lMRCToAdd = MRCToAdd(txtStation.Text.Trim(), txtDA.Text.Trim(), txtSeason.Text.Trim(), _
+        '                     txtLogQMin.Text.Trim(), txtLogQMax.Text.Trim(), _
+        '                     txtCoefA.Text.Trim(), txtCoefB.Text.Trim(), txtCoefC.Text.Trim())
+        lMRCToAdd = MRCToAdd(txtStation.Text, txtDA.Text, txtSeason.Text, _
+                             txtLogQMin.Text, txtLogQMax.Text, _
+                             txtCoefA.Text, txtCoefB.Text, txtCoefC.Text)
 
-        If RecSumStationMatched() AndAlso Not lstEquations.Items.Contains(lMRCToAdd) Then
+        If Not lstEquations.Items.Contains(lMRCToAdd) Then
             lstEquations.Items.Add(lMRCToAdd)
         End If
-
     End Sub
 
     Private Sub btnMRCDelete_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnMRCDelete.Click
@@ -657,34 +530,6 @@ Public Class frmMRCControl
         End If
     End Sub
 
-    Private Sub btnStations_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStations.Click
-        Dim lNewFileStationFullName As String = ""
-        Dim lInitialPath As String = ""
-        Try
-            lInitialPath = Path.GetDirectoryName(pFileStationFullName)
-        Catch ex As Exception
-
-        End Try
-        If lInitialPath = "" Then lInitialPath = "C:\"
-
-        Dim lOpenFileDialog As New System.Windows.Forms.OpenFileDialog()
-        With lOpenFileDialog
-            .Title = "Browse For Station File"
-            .InitialDirectory = lInitialPath '"c:\"
-            .Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
-            .FilterIndex = 2
-            .RestoreDirectory = True
-            If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-                lNewFileStationFullName = .FileName
-            End If
-            .Dispose()
-        End With
-        If File.Exists(lNewFileStationFullName) Then
-            pFileStationFullName = lNewFileStationFullName
-            PopulateStations()
-        End If
-    End Sub
-
     Private Sub btnMRCClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMRCClear.Click
         lstEquations.Items.Clear()
         txtStation.Text = ""
@@ -695,5 +540,23 @@ Public Class frmMRCControl
         txtCoefA.Text = ""
         txtCoefB.Text = ""
         txtCoefC.Text = ""
+        RemoveHandler rbSelectAllEqns.CheckedChanged, AddressOf rbSelectAllEqns_CheckedChanged
+        RemoveHandler rbSelectNoneEqns.CheckedChanged, AddressOf rbSelectAllEqns_CheckedChanged
+        rbSelectAllEqns.Checked = False
+        rbSelectNoneEqns.Checked = False
+        AddHandler rbSelectAllEqns.CheckedChanged, AddressOf rbSelectAllEqns_CheckedChanged
+        AddHandler rbSelectNoneEqns.CheckedChanged, AddressOf rbSelectAllEqns_CheckedChanged
+    End Sub
+
+    Private Sub rbSelectAllEqns_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbSelectAllEqns.CheckedChanged, _
+    rbSelectNoneEqns.CheckedChanged
+
+        For I As Integer = 0 To lstEquations.Items.Count - 1
+            If rbSelectAllEqns.Checked Then
+                lstEquations.SetItemChecked(I, True)
+            ElseIf rbSelectNoneEqns.Checked Then
+                lstEquations.SetItemChecked(I, False)
+            End If
+        Next
     End Sub
 End Class

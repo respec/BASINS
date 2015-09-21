@@ -26,6 +26,8 @@ Partial Class frmMRCControl
         Me.tabMRCMain = New System.Windows.Forms.TabControl
         Me.tabConstructMRC = New System.Windows.Forms.TabPage
         Me.gbMRCEquations = New System.Windows.Forms.GroupBox
+        Me.rbSelectNoneEqns = New System.Windows.Forms.RadioButton
+        Me.rbSelectAllEqns = New System.Windows.Forms.RadioButton
         Me.btnMRCClear = New System.Windows.Forms.Button
         Me.txtSeason = New System.Windows.Forms.TextBox
         Me.btnMRCPlot = New System.Windows.Forms.Button
@@ -36,7 +38,7 @@ Partial Class frmMRCControl
         Me.lblMinLogQ = New System.Windows.Forms.Label
         Me.txtStation = New System.Windows.Forms.TextBox
         Me.lblStation = New System.Windows.Forms.Label
-        Me.chkAutoMatching = New System.Windows.Forms.CheckBox
+        Me.chkAddAllRecSumRecords = New System.Windows.Forms.CheckBox
         Me.lstEquations = New System.Windows.Forms.CheckedListBox
         Me.btnMRCAdd = New System.Windows.Forms.Button
         Me.btnMRCDelete = New System.Windows.Forms.Button
@@ -48,9 +50,6 @@ Partial Class frmMRCControl
         Me.txtCoefA = New System.Windows.Forms.TextBox
         Me.txtCoefB = New System.Windows.Forms.TextBox
         Me.txtCoefC = New System.Windows.Forms.TextBox
-        Me.gbDA = New System.Windows.Forms.GroupBox
-        Me.lstStations = New System.Windows.Forms.ListBox
-        Me.btnStations = New System.Windows.Forms.Button
         Me.gbRecSum = New System.Windows.Forms.GroupBox
         Me.btnRecSum = New System.Windows.Forms.Button
         Me.lstRecSum = New System.Windows.Forms.ListBox
@@ -61,7 +60,6 @@ Partial Class frmMRCControl
         Me.tabMRCMain.SuspendLayout()
         Me.tabConstructMRC.SuspendLayout()
         Me.gbMRCEquations.SuspendLayout()
-        Me.gbDA.SuspendLayout()
         Me.gbRecSum.SuspendLayout()
         Me.tabPlotMRC.SuspendLayout()
         Me.tabMRCTable.SuspendLayout()
@@ -76,18 +74,17 @@ Partial Class frmMRCControl
         Me.tabMRCMain.Location = New System.Drawing.Point(0, 0)
         Me.tabMRCMain.Name = "tabMRCMain"
         Me.tabMRCMain.SelectedIndex = 0
-        Me.tabMRCMain.Size = New System.Drawing.Size(660, 466)
+        Me.tabMRCMain.Size = New System.Drawing.Size(711, 484)
         Me.tabMRCMain.TabIndex = 0
         '
         'tabConstructMRC
         '
         Me.tabConstructMRC.Controls.Add(Me.gbMRCEquations)
-        Me.tabConstructMRC.Controls.Add(Me.gbDA)
         Me.tabConstructMRC.Controls.Add(Me.gbRecSum)
         Me.tabConstructMRC.Location = New System.Drawing.Point(4, 22)
         Me.tabConstructMRC.Name = "tabConstructMRC"
         Me.tabConstructMRC.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabConstructMRC.Size = New System.Drawing.Size(652, 440)
+        Me.tabConstructMRC.Size = New System.Drawing.Size(703, 458)
         Me.tabConstructMRC.TabIndex = 0
         Me.tabConstructMRC.Text = "Construct MRC"
         Me.tabConstructMRC.UseVisualStyleBackColor = True
@@ -96,6 +93,8 @@ Partial Class frmMRCControl
         '
         Me.gbMRCEquations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbMRCEquations.Controls.Add(Me.rbSelectNoneEqns)
+        Me.gbMRCEquations.Controls.Add(Me.rbSelectAllEqns)
         Me.gbMRCEquations.Controls.Add(Me.btnMRCClear)
         Me.gbMRCEquations.Controls.Add(Me.txtSeason)
         Me.gbMRCEquations.Controls.Add(Me.btnMRCPlot)
@@ -106,7 +105,7 @@ Partial Class frmMRCControl
         Me.gbMRCEquations.Controls.Add(Me.lblMinLogQ)
         Me.gbMRCEquations.Controls.Add(Me.txtStation)
         Me.gbMRCEquations.Controls.Add(Me.lblStation)
-        Me.gbMRCEquations.Controls.Add(Me.chkAutoMatching)
+        Me.gbMRCEquations.Controls.Add(Me.chkAddAllRecSumRecords)
         Me.gbMRCEquations.Controls.Add(Me.lstEquations)
         Me.gbMRCEquations.Controls.Add(Me.btnMRCAdd)
         Me.gbMRCEquations.Controls.Add(Me.btnMRCDelete)
@@ -118,26 +117,48 @@ Partial Class frmMRCControl
         Me.gbMRCEquations.Controls.Add(Me.txtCoefA)
         Me.gbMRCEquations.Controls.Add(Me.txtCoefB)
         Me.gbMRCEquations.Controls.Add(Me.txtCoefC)
-        Me.gbMRCEquations.Location = New System.Drawing.Point(8, 276)
+        Me.gbMRCEquations.Location = New System.Drawing.Point(8, 210)
         Me.gbMRCEquations.Name = "gbMRCEquations"
-        Me.gbMRCEquations.Size = New System.Drawing.Size(638, 158)
+        Me.gbMRCEquations.Size = New System.Drawing.Size(686, 240)
         Me.gbMRCEquations.TabIndex = 37
         Me.gbMRCEquations.TabStop = False
         Me.gbMRCEquations.Text = "MRC Polynomial Equations (T= Coeff.A * LogQ^2 + Coeff.B * LogQ + Coeff.C)"
         '
+        'rbSelectNoneEqns
+        '
+        Me.rbSelectNoneEqns.AutoSize = True
+        Me.rbSelectNoneEqns.Location = New System.Drawing.Point(81, 164)
+        Me.rbSelectNoneEqns.Name = "rbSelectNoneEqns"
+        Me.rbSelectNoneEqns.Size = New System.Drawing.Size(84, 17)
+        Me.rbSelectNoneEqns.TabIndex = 34
+        Me.rbSelectNoneEqns.TabStop = True
+        Me.rbSelectNoneEqns.Text = "Select None"
+        Me.rbSelectNoneEqns.UseVisualStyleBackColor = True
+        '
+        'rbSelectAllEqns
+        '
+        Me.rbSelectAllEqns.AutoSize = True
+        Me.rbSelectAllEqns.Location = New System.Drawing.Point(6, 164)
+        Me.rbSelectAllEqns.Name = "rbSelectAllEqns"
+        Me.rbSelectAllEqns.Size = New System.Drawing.Size(69, 17)
+        Me.rbSelectAllEqns.TabIndex = 33
+        Me.rbSelectAllEqns.TabStop = True
+        Me.rbSelectAllEqns.Text = "Select All"
+        Me.rbSelectAllEqns.UseVisualStyleBackColor = True
+        '
         'btnMRCClear
         '
         Me.btnMRCClear.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnMRCClear.Location = New System.Drawing.Point(532, 106)
+        Me.btnMRCClear.Location = New System.Drawing.Point(580, 106)
         Me.btnMRCClear.Name = "btnMRCClear"
-        Me.btnMRCClear.Size = New System.Drawing.Size(75, 23)
+        Me.btnMRCClear.Size = New System.Drawing.Size(97, 23)
         Me.btnMRCClear.TabIndex = 32
-        Me.btnMRCClear.Text = "Clear"
+        Me.btnMRCClear.Text = "Clear Equations"
         Me.btnMRCClear.UseVisualStyleBackColor = True
         '
         'txtSeason
         '
-        Me.txtSeason.Location = New System.Drawing.Point(488, 131)
+        Me.txtSeason.Location = New System.Drawing.Point(488, 212)
         Me.txtSeason.Name = "txtSeason"
         Me.txtSeason.Size = New System.Drawing.Size(20, 20)
         Me.txtSeason.TabIndex = 11
@@ -145,9 +166,9 @@ Partial Class frmMRCControl
         'btnMRCPlot
         '
         Me.btnMRCPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnMRCPlot.Location = New System.Drawing.Point(532, 48)
+        Me.btnMRCPlot.Location = New System.Drawing.Point(580, 48)
         Me.btnMRCPlot.Name = "btnMRCPlot"
-        Me.btnMRCPlot.Size = New System.Drawing.Size(75, 23)
+        Me.btnMRCPlot.Size = New System.Drawing.Size(97, 23)
         Me.btnMRCPlot.TabIndex = 16
         Me.btnMRCPlot.Text = "Plot MRC"
         Me.btnMRCPlot.UseVisualStyleBackColor = True
@@ -155,7 +176,7 @@ Partial Class frmMRCControl
         'lblSeason
         '
         Me.lblSeason.AutoSize = True
-        Me.lblSeason.Location = New System.Drawing.Point(485, 115)
+        Me.lblSeason.Location = New System.Drawing.Point(485, 196)
         Me.lblSeason.Name = "lblSeason"
         Me.lblSeason.Size = New System.Drawing.Size(43, 13)
         Me.lblSeason.TabIndex = 31
@@ -163,7 +184,7 @@ Partial Class frmMRCControl
         '
         'txtLogQMax
         '
-        Me.txtLogQMax.Location = New System.Drawing.Point(224, 131)
+        Me.txtLogQMax.Location = New System.Drawing.Point(224, 212)
         Me.txtLogQMax.Name = "txtLogQMax"
         Me.txtLogQMax.Size = New System.Drawing.Size(60, 20)
         Me.txtLogQMax.TabIndex = 7
@@ -171,7 +192,7 @@ Partial Class frmMRCControl
         'lblMaxLogQ
         '
         Me.lblMaxLogQ.AutoSize = True
-        Me.lblMaxLogQ.Location = New System.Drawing.Point(221, 115)
+        Me.lblMaxLogQ.Location = New System.Drawing.Point(221, 196)
         Me.lblMaxLogQ.Name = "lblMaxLogQ"
         Me.lblMaxLogQ.Size = New System.Drawing.Size(53, 13)
         Me.lblMaxLogQ.TabIndex = 29
@@ -179,7 +200,7 @@ Partial Class frmMRCControl
         '
         'txtLogQMin
         '
-        Me.txtLogQMin.Location = New System.Drawing.Point(158, 131)
+        Me.txtLogQMin.Location = New System.Drawing.Point(158, 212)
         Me.txtLogQMin.Name = "txtLogQMin"
         Me.txtLogQMin.Size = New System.Drawing.Size(60, 20)
         Me.txtLogQMin.TabIndex = 6
@@ -187,7 +208,7 @@ Partial Class frmMRCControl
         'lblMinLogQ
         '
         Me.lblMinLogQ.AutoSize = True
-        Me.lblMinLogQ.Location = New System.Drawing.Point(155, 116)
+        Me.lblMinLogQ.Location = New System.Drawing.Point(155, 197)
         Me.lblMinLogQ.Name = "lblMinLogQ"
         Me.lblMinLogQ.Size = New System.Drawing.Size(50, 13)
         Me.lblMinLogQ.TabIndex = 27
@@ -195,7 +216,7 @@ Partial Class frmMRCControl
         '
         'txtStation
         '
-        Me.txtStation.Location = New System.Drawing.Point(6, 131)
+        Me.txtStation.Location = New System.Drawing.Point(6, 212)
         Me.txtStation.Name = "txtStation"
         Me.txtStation.Size = New System.Drawing.Size(80, 20)
         Me.txtStation.TabIndex = 4
@@ -203,40 +224,41 @@ Partial Class frmMRCControl
         'lblStation
         '
         Me.lblStation.AutoSize = True
-        Me.lblStation.Location = New System.Drawing.Point(7, 115)
+        Me.lblStation.Location = New System.Drawing.Point(7, 196)
         Me.lblStation.Name = "lblStation"
         Me.lblStation.Size = New System.Drawing.Size(40, 13)
         Me.lblStation.TabIndex = 25
         Me.lblStation.Text = "Station"
         '
-        'chkAutoMatching
+        'chkAddAllRecSumRecords
         '
-        Me.chkAutoMatching.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.chkAutoMatching.AutoSize = True
-        Me.chkAutoMatching.Location = New System.Drawing.Point(532, 135)
-        Me.chkAutoMatching.Name = "chkAutoMatching"
-        Me.chkAutoMatching.Size = New System.Drawing.Size(94, 17)
-        Me.chkAutoMatching.TabIndex = 17
-        Me.chkAutoMatching.Text = "Auto matching"
-        Me.chkAutoMatching.UseVisualStyleBackColor = True
+        Me.chkAddAllRecSumRecords.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.chkAddAllRecSumRecords.AutoSize = True
+        Me.chkAddAllRecSumRecords.Location = New System.Drawing.Point(611, 135)
+        Me.chkAddAllRecSumRecords.Name = "chkAddAllRecSumRecords"
+        Me.chkAddAllRecSumRecords.Size = New System.Drawing.Size(66, 43)
+        Me.chkAddAllRecSumRecords.TabIndex = 17
+        Me.chkAddAllRecSumRecords.Text = "Add All " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Recsum" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Records"
+        Me.chkAddAllRecSumRecords.UseVisualStyleBackColor = True
         '
         'lstEquations
         '
         Me.lstEquations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstEquations.CheckOnClick = True
         Me.lstEquations.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstEquations.FormattingEnabled = True
         Me.lstEquations.Location = New System.Drawing.Point(6, 19)
         Me.lstEquations.Name = "lstEquations"
-        Me.lstEquations.Size = New System.Drawing.Size(520, 94)
+        Me.lstEquations.Size = New System.Drawing.Size(568, 139)
         Me.lstEquations.TabIndex = 3
         '
         'btnMRCAdd
         '
         Me.btnMRCAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnMRCAdd.Location = New System.Drawing.Point(532, 19)
+        Me.btnMRCAdd.Location = New System.Drawing.Point(580, 19)
         Me.btnMRCAdd.Name = "btnMRCAdd"
-        Me.btnMRCAdd.Size = New System.Drawing.Size(75, 23)
+        Me.btnMRCAdd.Size = New System.Drawing.Size(97, 23)
         Me.btnMRCAdd.TabIndex = 14
         Me.btnMRCAdd.Text = "Add MRC"
         Me.btnMRCAdd.UseVisualStyleBackColor = True
@@ -244,16 +266,16 @@ Partial Class frmMRCControl
         'btnMRCDelete
         '
         Me.btnMRCDelete.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnMRCDelete.Location = New System.Drawing.Point(532, 77)
+        Me.btnMRCDelete.Location = New System.Drawing.Point(580, 77)
         Me.btnMRCDelete.Name = "btnMRCDelete"
-        Me.btnMRCDelete.Size = New System.Drawing.Size(75, 23)
+        Me.btnMRCDelete.Size = New System.Drawing.Size(97, 23)
         Me.btnMRCDelete.TabIndex = 15
         Me.btnMRCDelete.Text = "Delete MRC"
         Me.btnMRCDelete.UseVisualStyleBackColor = True
         '
         'txtDA
         '
-        Me.txtDA.Location = New System.Drawing.Point(92, 131)
+        Me.txtDA.Location = New System.Drawing.Point(92, 212)
         Me.txtDA.Name = "txtDA"
         Me.txtDA.Size = New System.Drawing.Size(60, 20)
         Me.txtDA.TabIndex = 5
@@ -261,7 +283,7 @@ Partial Class frmMRCControl
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(89, 116)
+        Me.Label1.Location = New System.Drawing.Point(89, 197)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(55, 13)
         Me.Label1.TabIndex = 21
@@ -270,7 +292,7 @@ Partial Class frmMRCControl
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(287, 115)
+        Me.Label2.Location = New System.Drawing.Point(287, 196)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(45, 13)
         Me.Label2.TabIndex = 22
@@ -279,7 +301,7 @@ Partial Class frmMRCControl
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(353, 115)
+        Me.Label3.Location = New System.Drawing.Point(353, 196)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(45, 13)
         Me.Label3.TabIndex = 23
@@ -288,7 +310,7 @@ Partial Class frmMRCControl
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(419, 115)
+        Me.Label4.Location = New System.Drawing.Point(419, 196)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(45, 13)
         Me.Label4.TabIndex = 24
@@ -296,59 +318,24 @@ Partial Class frmMRCControl
         '
         'txtCoefA
         '
-        Me.txtCoefA.Location = New System.Drawing.Point(290, 131)
+        Me.txtCoefA.Location = New System.Drawing.Point(290, 212)
         Me.txtCoefA.Name = "txtCoefA"
         Me.txtCoefA.Size = New System.Drawing.Size(60, 20)
         Me.txtCoefA.TabIndex = 8
         '
         'txtCoefB
         '
-        Me.txtCoefB.Location = New System.Drawing.Point(356, 131)
+        Me.txtCoefB.Location = New System.Drawing.Point(356, 212)
         Me.txtCoefB.Name = "txtCoefB"
         Me.txtCoefB.Size = New System.Drawing.Size(60, 20)
         Me.txtCoefB.TabIndex = 9
         '
         'txtCoefC
         '
-        Me.txtCoefC.Location = New System.Drawing.Point(422, 131)
+        Me.txtCoefC.Location = New System.Drawing.Point(422, 212)
         Me.txtCoefC.Name = "txtCoefC"
         Me.txtCoefC.Size = New System.Drawing.Size(60, 20)
         Me.txtCoefC.TabIndex = 10
-        '
-        'gbDA
-        '
-        Me.gbDA.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.gbDA.Controls.Add(Me.lstStations)
-        Me.gbDA.Controls.Add(Me.btnStations)
-        Me.gbDA.Location = New System.Drawing.Point(8, 134)
-        Me.gbDA.Name = "gbDA"
-        Me.gbDA.Size = New System.Drawing.Size(635, 136)
-        Me.gbDA.TabIndex = 38
-        Me.gbDA.TabStop = False
-        Me.gbDA.Text = "Specify Drainage Area (DA)"
-        '
-        'lstStations
-        '
-        Me.lstStations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstStations.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lstStations.FormattingEnabled = True
-        Me.lstStations.ItemHeight = 14
-        Me.lstStations.Location = New System.Drawing.Point(6, 19)
-        Me.lstStations.Name = "lstStations"
-        Me.lstStations.Size = New System.Drawing.Size(517, 102)
-        Me.lstStations.TabIndex = 2
-        '
-        'btnStations
-        '
-        Me.btnStations.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnStations.Location = New System.Drawing.Point(532, 19)
-        Me.btnStations.Name = "btnStations"
-        Me.btnStations.Size = New System.Drawing.Size(97, 23)
-        Me.btnStations.TabIndex = 13
-        Me.btnStations.Text = "Browse Stations"
-        Me.btnStations.UseVisualStyleBackColor = True
         '
         'gbRecSum
         '
@@ -358,7 +345,7 @@ Partial Class frmMRCControl
         Me.gbRecSum.Controls.Add(Me.lstRecSum)
         Me.gbRecSum.Location = New System.Drawing.Point(8, 6)
         Me.gbRecSum.Name = "gbRecSum"
-        Me.gbRecSum.Size = New System.Drawing.Size(635, 122)
+        Me.gbRecSum.Size = New System.Drawing.Size(686, 198)
         Me.gbRecSum.TabIndex = 39
         Me.gbRecSum.TabStop = False
         Me.gbRecSum.Text = "Specify polynomial coefficients"
@@ -366,7 +353,7 @@ Partial Class frmMRCControl
         'btnRecSum
         '
         Me.btnRecSum.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecSum.Location = New System.Drawing.Point(529, 15)
+        Me.btnRecSum.Location = New System.Drawing.Point(580, 15)
         Me.btnRecSum.Name = "btnRecSum"
         Me.btnRecSum.Size = New System.Drawing.Size(100, 23)
         Me.btnRecSum.TabIndex = 12
@@ -375,14 +362,15 @@ Partial Class frmMRCControl
         '
         'lstRecSum
         '
-        Me.lstRecSum.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.lstRecSum.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstRecSum.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstRecSum.FormattingEnabled = True
         Me.lstRecSum.ItemHeight = 14
         Me.lstRecSum.Location = New System.Drawing.Point(6, 15)
         Me.lstRecSum.Name = "lstRecSum"
-        Me.lstRecSum.Size = New System.Drawing.Size(517, 88)
+        Me.lstRecSum.Size = New System.Drawing.Size(568, 172)
         Me.lstRecSum.TabIndex = 1
         '
         'tabPlotMRC
@@ -391,7 +379,7 @@ Partial Class frmMRCControl
         Me.tabPlotMRC.Location = New System.Drawing.Point(4, 22)
         Me.tabPlotMRC.Name = "tabPlotMRC"
         Me.tabPlotMRC.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabPlotMRC.Size = New System.Drawing.Size(652, 440)
+        Me.tabPlotMRC.Size = New System.Drawing.Size(652, 458)
         Me.tabPlotMRC.TabIndex = 1
         Me.tabPlotMRC.Text = "MRC Plot"
         Me.tabPlotMRC.UseVisualStyleBackColor = True
@@ -401,7 +389,7 @@ Partial Class frmMRCControl
         Me.panelGraph.Dock = System.Windows.Forms.DockStyle.Fill
         Me.panelGraph.Location = New System.Drawing.Point(3, 3)
         Me.panelGraph.Name = "panelGraph"
-        Me.panelGraph.Size = New System.Drawing.Size(646, 434)
+        Me.panelGraph.Size = New System.Drawing.Size(646, 452)
         Me.panelGraph.TabIndex = 0
         '
         'tabMRCTable
@@ -409,7 +397,7 @@ Partial Class frmMRCControl
         Me.tabMRCTable.Controls.Add(Me.txtMRCTable)
         Me.tabMRCTable.Location = New System.Drawing.Point(4, 22)
         Me.tabMRCTable.Name = "tabMRCTable"
-        Me.tabMRCTable.Size = New System.Drawing.Size(652, 440)
+        Me.tabMRCTable.Size = New System.Drawing.Size(652, 458)
         Me.tabMRCTable.TabIndex = 2
         Me.tabMRCTable.Text = "MRC Table"
         Me.tabMRCTable.UseVisualStyleBackColor = True
@@ -424,14 +412,14 @@ Partial Class frmMRCControl
         Me.txtMRCTable.Name = "txtMRCTable"
         Me.txtMRCTable.ReadOnly = True
         Me.txtMRCTable.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtMRCTable.Size = New System.Drawing.Size(652, 440)
+        Me.txtMRCTable.Size = New System.Drawing.Size(652, 458)
         Me.txtMRCTable.TabIndex = 0
         '
         'frmMRCControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(660, 466)
+        Me.ClientSize = New System.Drawing.Size(711, 484)
         Me.Controls.Add(Me.tabMRCMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmMRCControl"
@@ -440,7 +428,6 @@ Partial Class frmMRCControl
         Me.tabConstructMRC.ResumeLayout(False)
         Me.gbMRCEquations.ResumeLayout(False)
         Me.gbMRCEquations.PerformLayout()
-        Me.gbDA.ResumeLayout(False)
         Me.gbRecSum.ResumeLayout(False)
         Me.tabPlotMRC.ResumeLayout(False)
         Me.tabMRCTable.ResumeLayout(False)
@@ -453,9 +440,7 @@ Partial Class frmMRCControl
     Friend WithEvents btnRecSum As System.Windows.Forms.Button
     Friend WithEvents btnMRCDelete As System.Windows.Forms.Button
     Friend WithEvents btnMRCAdd As System.Windows.Forms.Button
-    Friend WithEvents btnStations As System.Windows.Forms.Button
     Friend WithEvents lstRecSum As System.Windows.Forms.ListBox
-    Friend WithEvents lstStations As System.Windows.Forms.ListBox
     Friend WithEvents txtCoefC As System.Windows.Forms.TextBox
     Friend WithEvents txtCoefB As System.Windows.Forms.TextBox
     Friend WithEvents txtCoefA As System.Windows.Forms.TextBox
@@ -468,9 +453,8 @@ Partial Class frmMRCControl
     Friend WithEvents tabPlotMRC As System.Windows.Forms.TabPage
     Friend WithEvents btnMRCPlot As System.Windows.Forms.Button
     Friend WithEvents gbMRCEquations As System.Windows.Forms.GroupBox
-    Friend WithEvents gbDA As System.Windows.Forms.GroupBox
     Friend WithEvents gbRecSum As System.Windows.Forms.GroupBox
-    Friend WithEvents chkAutoMatching As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAddAllRecSumRecords As System.Windows.Forms.CheckBox
     Friend WithEvents panelGraph As System.Windows.Forms.Panel
     Friend WithEvents txtStation As System.Windows.Forms.TextBox
     Friend WithEvents lblStation As System.Windows.Forms.Label
@@ -483,4 +467,6 @@ Partial Class frmMRCControl
     Friend WithEvents tabMRCTable As System.Windows.Forms.TabPage
     Friend WithEvents txtMRCTable As System.Windows.Forms.TextBox
     Friend WithEvents btnMRCClear As System.Windows.Forms.Button
+    Friend WithEvents rbSelectNoneEqns As System.Windows.Forms.RadioButton
+    Friend WithEvents rbSelectAllEqns As System.Windows.Forms.RadioButton
 End Class
