@@ -129,11 +129,17 @@ Public Class frmBuildNew
     End Sub
 
     Private Sub frmBuildNew_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
-        Me.Opacity = 1
+        Try
+            Me.Opacity = 1
+        Catch
+        End Try
     End Sub
 
     Private Sub frmBuildNew_Deactivate(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Deactivate
-        Me.Opacity = 0.8
+        Try
+            Me.Opacity = 0.8
+        Catch
+        End Try
     End Sub
 
     Private Sub frmBuildNew_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
