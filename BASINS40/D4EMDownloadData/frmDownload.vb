@@ -606,7 +606,7 @@ Public Class frmDownload
                                 Else
                                     If lChild Is chkNWIS_GetNWISDailyDischarge Then
                                         Dim lWDMfrm As New frmWDM
-                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"),
+                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
                                                                   lChild.Text & " Processing Options")
                                     End If
                                     If lChild Is chkNWIS_GetNWISIdaDischarge Then
@@ -616,12 +616,12 @@ Public Class frmDownload
                                     End If
                                     If lChild Is chkNWIS_GetNWISDailyGW Then
                                         Dim lWDMfrm As New frmWDM
-                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "Groundwater", IO.Path.Combine(lSaveFolderOnly, "nwis"),
+                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "Groundwater", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
                                                                   lChild.Text & " Processing Options")
                                     End If
                                     If lChild Is chkNLDAS_GetNLDASParameter Then
                                         Dim lWDMfrm As New frmWDM
-                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDASPrecipitation", IO.Path.Combine(lSaveFolderOnly, "nldas"),
+                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDASPrecipitation", IO.Path.Combine(lSaveFolderOnly, "nldas"), _
                                                                   "NLDAS Precipitation Processing Options")
                                     End If
                                     'If lChild Is chkNWIS_GetNWISPrecipitation Then
