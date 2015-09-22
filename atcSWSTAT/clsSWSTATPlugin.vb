@@ -130,7 +130,7 @@ Public Class clsSWSTATPlugin
     Private Function BasicAttributes() As Generic.List(Of String)
         Dim lBasicAttributes As New Generic.List(Of String)
         With lBasicAttributes
-            .Add("ID")
+            .Add("Location") '.Add("ID")
             .Add("Min")
             .Add("Max")
             .Add("Mean")
@@ -144,7 +144,7 @@ Public Class clsSWSTATPlugin
     Private Function NDayAttributes() As Generic.List(Of String)
         Dim lNDayAttributes As New Generic.List(Of String)
         With lNDayAttributes
-            .Add("STAID")
+            .Add("Location") '.Add("STAID")
             .Add("STANAM")
             .Add("Constituent")
         End With
@@ -154,7 +154,8 @@ Public Class clsSWSTATPlugin
     Private Function TrendAttributes() As Generic.List(Of String)
         Dim lTrendAttributes As New Generic.List(Of String)
         With lTrendAttributes
-            .Add("Original ID")
+            '.Add("Original ID")
+            .Add("Location") '.Add("STAID")
             .Add("KENTAU")
             .Add("KENPLV")
             .Add("KENSLPL")
@@ -165,7 +166,6 @@ Public Class clsSWSTATPlugin
             .Add("Min")
             .Add("Max")
             .Add("Constituent")
-            .Add("STAID")
         End With
         Return lTrendAttributes
     End Function
