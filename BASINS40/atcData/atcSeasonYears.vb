@@ -214,23 +214,23 @@ Public Class atcSeasonYears
         txtEndDay.Text = "30"
     End Sub
 
-    Private Sub btnCommonYears_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        Dim lCurDate(5) As Integer
-        J2Date(pCommonStart, lCurDate)
-        'TODO: shift by one year when required to follow water/drought year convention
-        txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
-        J2Date(pCommonEnd, lCurDate)
-        txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
-    End Sub
+    'Private Sub btnCommonYears_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    '    Dim lCurDate(5) As Integer
+    '    J2Date(pCommonStart, lCurDate)
+    '    'TODO: shift by one year when required to follow water/drought year convention
+    '    txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
+    '    J2Date(pCommonEnd, lCurDate)
+    '    txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
+    'End Sub
 
-    Private Sub btnAllYears_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        Dim lCurDate(5) As Integer
-        J2Date(pFirstDate, lCurDate)
-        'TODO: shift by one year when required to follow water/drought year convention
-        txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
-        J2Date(pLastDate, lCurDate)
-        txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
-    End Sub
+    'Private Sub btnAllYears_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    '    Dim lCurDate(5) As Integer
+    '    J2Date(pFirstDate, lCurDate)
+    '    'TODO: shift by one year when required to follow water/drought year convention
+    '    txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
+    '    J2Date(pLastDate, lCurDate)
+    '    txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
+    'End Sub
 
 
     Private Sub btnAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAll.Click

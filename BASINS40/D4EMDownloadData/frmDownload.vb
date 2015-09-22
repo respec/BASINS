@@ -16,6 +16,15 @@ Public Class frmDownload
     Private pRegionHydrologicUnit As String = "Hydrologic Unit"
     Private pRegionStationIDs As String = "Station IDs"
 
+    Public Sub New()
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
+    End Sub
+
     ''' <summary>Determine if a process is running on a 64 bit Operating System but in 32 bit emulation mode (WOW64)</summary>
     ''' <param name="hProcess">A handle to the process to check</param>
     ''' <param name="Wow64Process">Output parameter. A boolean that will be set to True if the process is running in WOW64 mode</param>
@@ -105,43 +114,36 @@ Public Class frmDownload
         Dim lGroupMargin As Integer = 6
         Dim lGroupY As Integer = cboRegion.Top + cboRegion.Height + lGroupMargin
 
-        Dim lGroups As New Dictionary(Of String, Windows.Forms.GroupBox)
+        Dim lGroups As New List(Of Windows.Forms.GroupBox) '  Dictionary(Of String, Windows.Forms.GroupBox)
         If Is64BitOperatingSystem Then 'Old self-extracting archives do not work on 64 bit
             chkBASINS_DEM.Visible = False
         End If
         If pApplicationName.StartsWith("USGS GW Toolbox") Then
-            lGroups.Add("D4EM Data Download::NWIS", grpNWISStations_GW)
-            lGroups.Add("D4EM Data Download::BASINS", grpBASINS)
-            lGroups.Add("D4EM Data Download::NHDPlus", grpNHDplus)
-            lGroups.Add("D4EM Data Download::NLCD2001", grpNLCD2001)
+            lGroups.Add(grpNWISStations_GW)
+            lGroups.Add(grpNWIS_GW)
+            lGroups.Add(grpBASINS)
+            lGroups.Add(grpNHDplus)
+            lGroups.Add(grpNLCD2001)
 
             chkBASINS_LSTORET.Visible = False
-            chkBASINS_Census.Visible = False : chkBASINS_MetStations.Left = chkBASINS_Census.Left
-            chkBASINS_303d.Visible = False : chkBASINS_MetData.Left = chkBASINS_303d.Left
+            chkBASINS_Census.Visible = False
+            chkBASINS_MetStations.Left = chkBASINS_Census.Left
+            chkBASINS_303d.Visible = False
+            chkBASINS_MetData.Left = chkBASINS_303d.Left
         Else
-            lGroups.Add("D4EM Data Download::BASINS", grpBASINS)
-            lGroups.Add("D4EM Data Download::NHDPlus", grpNHDplus)
-            lGroups.Add("D4EM Data Download::NWIS", grpNWISStations)
-            lGroups.Add("D4EM Data Download::NLCD2001", grpNLCD2001)
-            lGroups.Add("D4EM Data Download::STORET", grpSTORET)
-            lGroups.Add("D4EM Data Download::NLDAS", grpNLDAS)
+            lGroups.Add(grpBASINS)
+            lGroups.Add(grpNHDplus)
+            lGroups.Add(grpNWISStations)
+            lGroups.Add(grpNWIS)
+            lGroups.Add(grpNLCD2001)
+            lGroups.Add(grpSTORET)
+            lGroups.Add(grpNLDAS)
         End If
 
-        For Each lGroupEntry As KeyValuePair(Of String, Windows.Forms.GroupBox) In lGroups
-            If LoadPlugin(lGroupEntry.Key) Then
-                lGroupEntry.Value.Top = lGroupY
-                lGroupEntry.Value.Visible = True
-                lGroupY += lGroupEntry.Value.Height + lGroupMargin
-                If lGroupEntry.Value Is grpNWISStations Then 'Also show NWIS group for data
-                    grpNWIS.Top = lGroupY
-                    grpNWIS.Visible = True
-                    lGroupY += grpNWIS.Height + lGroupMargin
-                ElseIf lGroupEntry.Value Is grpNWISStations_GW Then
-                    grpNWIS_GW.Top = lGroupY
-                    grpNWIS_GW.Visible = True
-                    lGroupY += grpNWIS_GW.Height + lGroupMargin
-                End If
-            End If
+        For Each lGroup As Windows.Forms.GroupBox In lGroups
+            lGroup.Top = lGroupY
+            lGroup.Visible = True
+            lGroupY += lGroup.Height + lGroupMargin
         Next
 
         Height = lGroupY + 85
@@ -159,6 +161,7 @@ Public Class frmDownload
         End If
 
         SetCheckboxVisibilityFromMapOrRegion()
+        TallyPreChecked(lGroups)
         SetColorsFromAvailability()
 
         Do
@@ -195,17 +198,44 @@ Public Class frmDownload
         Loop
     End Function
 
-    Private Function LoadPlugin(ByVal aPluginName As String) As Boolean
+#Region "ManagePreCheckedBoxes"
+    'Keep track of which check box(es) were checked automatically at startup (for example because a station was selected on the map)
+    'Automatically un-check when another is manually checked since that indicates user wanted different data
+    Private PreChecked As New List(Of Windows.Forms.CheckBox)
+    Private PreUnChecked As New List(Of Windows.Forms.CheckBox)
+    Private Sub TallyPreChecked(aGroups As List(Of Windows.Forms.GroupBox))
+        Dim lAllChecked As New List(Of Windows.Forms.CheckBox)
+        For Each lGroup As Windows.Forms.GroupBox In aGroups
+            For Each lChild As Windows.Forms.Control In lGroup.Controls
+                If lChild.GetType.Name = "CheckBox" Then
+                    Dim lChk As Windows.Forms.CheckBox = lChild
+                    If lChk.Checked Then
+                        PreChecked.Add(lChk)
+                    Else
+                        PreUnChecked.Add(lChk)
+                    End If
+                End If
+            Next
+        Next
+        If PreChecked.Count > 0 Then
+            For Each lChk As Windows.Forms.CheckBox In PreUnChecked
+                AddHandler lChk.CheckedChanged, AddressOf PreUnchkedChanged
+            Next
+        End If
+    End Sub
+
+    Private Sub PreUnchkedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Try
-            Dim lKey As String = DownloadDataPlugin.g_MapWin.Plugins.GetPluginKey(aPluginName)
-            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
-            DownloadDataPlugin.g_MapWin.Plugins.StartPlugin(lKey)
-            Return True
-        Catch e As Exception
-            Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
+            For Each lChk As Windows.Forms.CheckBox In PreChecked
+                lChk.Checked = False
+            Next
+            For Each lChk As Windows.Forms.CheckBox In PreUnChecked
+                RemoveHandler lChk.CheckedChanged, AddressOf PreUnchkedChanged
+            Next
+        Catch
         End Try
-        Return False
-    End Function
+    End Sub
+#End Region
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
         pOk = False
@@ -570,38 +600,41 @@ Public Class frmDownload
                                 lChildName = lChildName.Substring(0, lChildName.Length - 3)
                             End If
                             If lChildName.ToLower.StartsWith("get") Then 'this checkbox has its own function name
-
                                 Dim lWDMxml As String = ""
-                                If lChild Is chkNWIS_GetNWISDailyDischarge Then
-                                    Dim lWDMfrm As New frmWDM
-                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
-                                                              lChild.Text & " Processing Options")
+                                If pApplicationName.StartsWith("USGS") Then
+                                    'Don't offer to save in WDM for USGS versions, always add as individual files
+                                Else
+                                    If lChild Is chkNWIS_GetNWISDailyDischarge Then
+                                        Dim lWDMfrm As New frmWDM
+                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"),
+                                                                  lChild.Text & " Processing Options")
+                                    End If
+                                    If lChild Is chkNWIS_GetNWISIdaDischarge Then
+                                        'Dim lWDMfrm As New frmWDM    'don't add to wdm, just add rdb file to project
+                                        'lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
+                                        '                          lChild.Text & " Processing Options")
+                                    End If
+                                    If lChild Is chkNWIS_GetNWISDailyGW Then
+                                        Dim lWDMfrm As New frmWDM
+                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "Groundwater", IO.Path.Combine(lSaveFolderOnly, "nwis"),
+                                                                  lChild.Text & " Processing Options")
+                                    End If
+                                    If lChild Is chkNLDAS_GetNLDASParameter Then
+                                        Dim lWDMfrm As New frmWDM
+                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDASPrecipitation", IO.Path.Combine(lSaveFolderOnly, "nldas"),
+                                                                  "NLDAS Precipitation Processing Options")
+                                    End If
+                                    'If lChild Is chkNWIS_GetNWISPrecipitation Then
+                                    '    Dim lWDMfrm As New frmWDM
+                                    '    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Precipitation", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
+                                    '                              lChild.Text & " Processing Options")
+                                    'End If
                                 End If
-                                If lChild Is chkNWIS_GetNWISIdaDischarge Then
-                                    'Dim lWDMfrm As New frmWDM    'don't add to wdm, just add rdb file to project
-                                    'lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
-                                    '                          lChild.Text & " Processing Options")
-                                End If
-                                If lChild Is chkNWIS_GetNWISDailyGW Then
-                                    Dim lWDMfrm As New frmWDM
-                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Groundwater", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
-                                                              lChild.Text & " Processing Options")
-                                End If
-                                If lChild Is chkNLDAS_GetNLDASParameter Then
-                                    Dim lWDMfrm As New frmWDM
-                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDASPrecipitation", IO.Path.Combine(lSaveFolderOnly, "nldas"), _
-                                                              "NLDAS Precipitation Processing Options")
-                                End If
-                                'If lChild Is chkNWIS_GetNWISPrecipitation Then
-                                '    Dim lWDMfrm As New frmWDM
-                                '    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Precipitation", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
-                                '                              lChild.Text & " Processing Options")
-                                'End If
                                 If lWDMxml IsNot Nothing Then
                                     lXML &= "<function name='" & lChildName & "'>" & vbCrLf _
-                                         & "<arguments>" & vbCrLf _
-                                         & lWDMxml _
-                                         & lXMLcommon & vbCrLf
+                                             & "<arguments>" & vbCrLf _
+                                             & lWDMxml _
+                                             & lXMLcommon & vbCrLf
                                 End If
                             Else 'This checkbox adds a data type to the parent function
                                 lCheckedChildren &= "<DataType>" & lChildName & "</DataType>" & vbCrLf
