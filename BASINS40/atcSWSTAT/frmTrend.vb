@@ -1054,6 +1054,12 @@ Friend Class frmTrend
                     lArgs.SetValue("LowFlag", radioLow.Checked)
                     lArgs.SetValue("HighFlag", False)
                 End If
+                lArgs.SetValue("FirstYear", pFirstYear)
+                lArgs.SetValue("LastYear", pLastYear)
+                lArgs.SetValue("BoundaryMonth", pYearStartMonth)
+                lArgs.SetValue("BoundaryDay", pYearStartDay)
+                lArgs.SetValue("EndMonth", pYearEndMonth)
+                lArgs.SetValue("EndDay", pYearEndDay)
 
                 If lHiLow.Open("n-day high timeseries", lArgs) Then
                     Dim lDisplayThese As atcTimeseriesGroup = GroupWithinLimits(lHiLow.DataSets)
