@@ -25,6 +25,7 @@ Partial Class frmFilterData
         Me.chkProvisional = New System.Windows.Forms.CheckBox
         Me.tabFilters = New System.Windows.Forms.TabControl
         Me.tabSubsetByDate = New System.Windows.Forms.TabPage
+        Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
         Me.tabSeasons = New System.Windows.Forms.TabPage
         Me.chkEnableSeasons = New System.Windows.Forms.CheckBox
         Me.lblGroupSeasons = New System.Windows.Forms.Label
@@ -66,15 +67,25 @@ Partial Class frmFilterData
         Me.cboAggregate = New System.Windows.Forms.ComboBox
         Me.txtTimeStep = New System.Windows.Forms.TextBox
         Me.chkEnableChangeTimeStep = New System.Windows.Forms.CheckBox
+        Me.tabTimeseriesMath = New System.Windows.Forms.TabPage
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.clbMathOpns = New System.Windows.Forms.CheckedListBox
+        Me.btnAddMathOp = New System.Windows.Forms.Button
+        Me.cboConstant = New System.Windows.Forms.ComboBox
+        Me.cboMathOp = New System.Windows.Forms.ComboBox
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.clbTimeseries = New System.Windows.Forms.CheckedListBox
+        Me.Label2 = New System.Windows.Forms.Label
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
-        Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
         Me.tabFilters.SuspendLayout()
         Me.tabSubsetByDate.SuspendLayout()
         Me.tabSeasons.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.grpValueEventOptions.SuspendLayout()
         Me.tabChangeTimeStep.SuspendLayout()
+        Me.tabTimeseriesMath.SuspendLayout()
         Me.SuspendLayout()
         '
         'chkProvisional
@@ -101,6 +112,7 @@ Partial Class frmFilterData
         Me.tabFilters.Controls.Add(Me.tabSeasons)
         Me.tabFilters.Controls.Add(Me.TabPage1)
         Me.tabFilters.Controls.Add(Me.tabChangeTimeStep)
+        Me.tabFilters.Controls.Add(Me.tabTimeseriesMath)
         Me.tabFilters.Location = New System.Drawing.Point(0, 0)
         Me.tabFilters.Name = "tabFilters"
         Me.tabFilters.SelectedIndex = 0
@@ -117,6 +129,14 @@ Partial Class frmFilterData
         Me.tabSubsetByDate.TabIndex = 0
         Me.tabSubsetByDate.Text = "Subset By Date"
         Me.tabSubsetByDate.UseVisualStyleBackColor = True
+        '
+        'atcSelectedDates
+        '
+        Me.atcSelectedDates.Location = New System.Drawing.Point(9, 30)
+        Me.atcSelectedDates.Margin = New System.Windows.Forms.Padding(4)
+        Me.atcSelectedDates.Name = "atcSelectedDates"
+        Me.atcSelectedDates.Size = New System.Drawing.Size(313, 105)
+        Me.atcSelectedDates.TabIndex = 27
         '
         'tabSeasons
         '
@@ -586,6 +606,107 @@ Partial Class frmFilterData
         Me.chkEnableChangeTimeStep.Text = "Change Time Step To:"
         Me.chkEnableChangeTimeStep.UseVisualStyleBackColor = True
         '
+        'tabTimeseriesMath
+        '
+        Me.tabTimeseriesMath.Controls.Add(Me.Label5)
+        Me.tabTimeseriesMath.Controls.Add(Me.clbMathOpns)
+        Me.tabTimeseriesMath.Controls.Add(Me.btnAddMathOp)
+        Me.tabTimeseriesMath.Controls.Add(Me.cboConstant)
+        Me.tabTimeseriesMath.Controls.Add(Me.cboMathOp)
+        Me.tabTimeseriesMath.Controls.Add(Me.Label4)
+        Me.tabTimeseriesMath.Controls.Add(Me.Label3)
+        Me.tabTimeseriesMath.Controls.Add(Me.clbTimeseries)
+        Me.tabTimeseriesMath.Controls.Add(Me.Label2)
+        Me.tabTimeseriesMath.Location = New System.Drawing.Point(4, 22)
+        Me.tabTimeseriesMath.Name = "tabTimeseriesMath"
+        Me.tabTimeseriesMath.Size = New System.Drawing.Size(587, 487)
+        Me.tabTimeseriesMath.TabIndex = 4
+        Me.tabTimeseriesMath.Text = "Timeseries Math"
+        Me.tabTimeseriesMath.UseVisualStyleBackColor = True
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(11, 264)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(88, 13)
+        Me.Label5.TabIndex = 8
+        Me.Label5.Text = "Math Operations:"
+        '
+        'clbMathOpns
+        '
+        Me.clbMathOpns.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.clbMathOpns.CheckOnClick = True
+        Me.clbMathOpns.FormattingEnabled = True
+        Me.clbMathOpns.Location = New System.Drawing.Point(11, 280)
+        Me.clbMathOpns.Name = "clbMathOpns"
+        Me.clbMathOpns.Size = New System.Drawing.Size(568, 199)
+        Me.clbMathOpns.TabIndex = 7
+        '
+        'btnAddMathOp
+        '
+        Me.btnAddMathOp.Location = New System.Drawing.Point(305, 221)
+        Me.btnAddMathOp.Name = "btnAddMathOp"
+        Me.btnAddMathOp.Size = New System.Drawing.Size(120, 23)
+        Me.btnAddMathOp.TabIndex = 6
+        Me.btnAddMathOp.Text = "Add Math Operation"
+        Me.btnAddMathOp.UseVisualStyleBackColor = True
+        '
+        'cboConstant
+        '
+        Me.cboConstant.FormattingEnabled = True
+        Me.cboConstant.Location = New System.Drawing.Point(431, 31)
+        Me.cboConstant.Name = "cboConstant"
+        Me.cboConstant.Size = New System.Drawing.Size(121, 21)
+        Me.cboConstant.TabIndex = 5
+        '
+        'cboMathOp
+        '
+        Me.cboMathOp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboMathOp.FormattingEnabled = True
+        Me.cboMathOp.Location = New System.Drawing.Point(304, 30)
+        Me.cboMathOp.Name = "cboMathOp"
+        Me.cboMathOp.Size = New System.Drawing.Size(121, 21)
+        Me.cboMathOp.TabIndex = 4
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(431, 15)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(52, 13)
+        Me.Label4.TabIndex = 3
+        Me.Label4.Text = "Constant:"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(301, 14)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(78, 13)
+        Me.Label3.TabIndex = 2
+        Me.Label3.Text = "Math Operator:"
+        '
+        'clbTimeseries
+        '
+        Me.clbTimeseries.CheckOnClick = True
+        Me.clbTimeseries.FormattingEnabled = True
+        Me.clbTimeseries.Location = New System.Drawing.Point(11, 31)
+        Me.clbTimeseries.Name = "clbTimeseries"
+        Me.clbTimeseries.Size = New System.Drawing.Size(287, 214)
+        Me.clbTimeseries.TabIndex = 1
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(8, 14)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(93, 13)
+        Me.Label2.TabIndex = 0
+        Me.Label2.Text = "Select Timeseries:"
+        '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -606,14 +727,6 @@ Partial Class frmFilterData
         Me.btnOk.Size = New System.Drawing.Size(80, 24)
         Me.btnOk.TabIndex = 98
         Me.btnOk.Text = "Ok"
-        '
-        'atcSelectedDates
-        '
-        Me.atcSelectedDates.Location = New System.Drawing.Point(9, 30)
-        Me.atcSelectedDates.Margin = New System.Windows.Forms.Padding(4)
-        Me.atcSelectedDates.Name = "atcSelectedDates"
-        Me.atcSelectedDates.Size = New System.Drawing.Size(313, 105)
-        Me.atcSelectedDates.TabIndex = 27
         '
         'frmFilterData
         '
@@ -636,6 +749,8 @@ Partial Class frmFilterData
         Me.grpValueEventOptions.PerformLayout()
         Me.tabChangeTimeStep.ResumeLayout(False)
         Me.tabChangeTimeStep.PerformLayout()
+        Me.tabTimeseriesMath.ResumeLayout(False)
+        Me.tabTimeseriesMath.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -687,4 +802,14 @@ Partial Class frmFilterData
     Friend WithEvents lblValueAfterSum As System.Windows.Forms.Label
     Friend WithEvents RadioButton1 As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButton2 As System.Windows.Forms.RadioButton
+    Friend WithEvents tabTimeseriesMath As System.Windows.Forms.TabPage
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents clbTimeseries As System.Windows.Forms.CheckedListBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents btnAddMathOp As System.Windows.Forms.Button
+    Friend WithEvents cboConstant As System.Windows.Forms.ComboBox
+    Friend WithEvents cboMathOp As System.Windows.Forms.ComboBox
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents clbMathOpns As System.Windows.Forms.CheckedListBox
 End Class
