@@ -21,6 +21,77 @@ Public Class frmFilterData
     Private pAsking As Boolean = False
 
     'Private pEventsPlugin As atcTimeseriesSource
+    Private pMathOpnNames() As String = {"add", "subtract", "multiply", "divide", "exponent", "e ^ x", "10 ^ x", "log 10", "log e", "absolute value", "celsius to f", "f to celsius"}
+    Private Class MathOpn
+        Public DataGroup As atcTimeseriesGroup
+        Public MathOpn As String
+        Public Constant As Double
+        Public AttributeName As String
+        Public Selected As Boolean = False
+        Public ReadOnly Property IncludeAllTimeseries(ByVal aTotal As Integer) As Boolean
+            Get
+                If DataGroup Is Nothing Then
+                    Return False
+                Else
+                    Return (DataGroup.Count = aTotal)
+                End If
+            End Get
+        End Property
+        Public Function EqualTo(ByVal aMathOpn As MathOpn) As Boolean
+            If aMathOpn Is Nothing Then Return False
+            If MathOpn <> aMathOpn.MathOpn Then Return False
+            If Double.IsNaN(Constant) AndAlso Double.IsNaN(aMathOpn.Constant) Then
+            ElseIf Constant = aMathOpn.Constant Then
+            Else
+                Return False
+            End If
+            If AttributeName <> aMathOpn.AttributeName Then Return False
+            If DataGroup IsNot Nothing AndAlso aMathOpn.DataGroup IsNot Nothing AndAlso DataGroup.Count <> aMathOpn.DataGroup.Count Then
+                Return False
+            End If
+
+            For Each lTser As atcTimeseries In DataGroup
+                Dim loc As String = lTser.Attributes.GetValue("Location")
+                Dim lcon As String = lTser.Attributes.GetValue("Constituent")
+                Dim lTu As atcTimeUnit = lTser.Attributes.GetValue("tu")
+                Dim lFoundMatch As Boolean = False
+                For Each lTser1 As atcTimeseries In aMathOpn.DataGroup
+                    With lTser1.Attributes
+                        If .GetValue("Location") = loc AndAlso _
+                            .GetValue("tu") = lTu AndAlso _
+                            .GetValue("Constituent") = lcon Then
+                            lFoundMatch = True
+                            Exit For
+                        End If
+                    End With
+                Next
+                If Not lFoundMatch Then
+                    Return False
+                End If
+            Next
+            Return True
+        End Function
+        Public Shadows Function ToString(Optional ByVal aIncludeAllTimeseries As Boolean = False) As String
+            Dim lbl As String = ""
+            If DataGroup Is Nothing OrElse DataGroup.Count = 0 Then
+                Return ""
+            Else
+                If aIncludeAllTimeseries Then
+                    lbl = "All Timeseries "
+                Else
+                    lbl = DataGroup(0).Attributes.GetValue("Location") & "...(" & DataGroup.Count & ") "
+                End If
+            End If
+            lbl &= MathOpn & " "
+            If Not Double.IsNaN(Constant) Then
+                lbl &= Constant
+            Else
+                lbl &= AttributeName
+            End If
+            Return lbl
+        End Function
+    End Class
+    Private pMathOpns As Generic.List(Of MathOpn)
 
     Public Function AskUser(Optional ByVal aGroup As atcTimeseriesGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcTimeseriesGroup
         pInitializing = True 'Gets set back to False in Populate below
@@ -38,6 +109,8 @@ Public Class frmFilterData
         InitSeasons()
 
         InitTimeStep()
+
+        InitMath()
 
         Me.Show()
         pAsking = True
@@ -187,6 +260,52 @@ FoundProvisional:
                 If Not chkProvisional.Checked Then 'Filter out provisional data
                     lModifiedGroup.ChangeTo(GetNonProvisional(lModifiedGroup))
                 End If
+            End If
+
+            'Timeseries Math
+            If pMathOpns IsNot Nothing AndAlso pMathOpns.Count > 0 Then
+                For I As Integer = 0 To clbMathOpns.Items.Count - 1
+                    CType(pMathOpns(I), MathOpn).Selected = clbMathOpns.GetItemChecked(I)
+                Next
+                For Each lModifiedTser As atcTimeseries In lModifiedGroup
+                    For Each lMathOp As MathOpn In pMathOpns
+                        If Not String.IsNullOrEmpty(lMathOp.MathOpn) AndAlso lMathOp.Selected Then
+                            For Each lMathDataset As atcTimeseries In lMathOp.DataGroup
+                                If lModifiedTser.Attributes.GetValue("Location") = lMathDataset.Attributes.GetValue("Location") AndAlso _
+                                   lModifiedTser.Attributes.GetValue("Constituent") = lMathDataset.Attributes.GetValue("Constituent") AndAlso _
+                                   lModifiedTser.Attributes.GetValue("tu") = lMathDataset.Attributes.GetValue("tu") Then
+                                    'Now work this modified version of tser
+                                    Dim lArgs As New atcDataAttributes()
+                                    Dim lNumber As Double = GetNaN()
+                                    If Not String.IsNullOrEmpty(lMathOp.AttributeName) AndAlso _
+                                       lModifiedTser.Attributes.ContainsAttribute(lMathOp.AttributeName) Then
+                                        lNumber = lModifiedTser.Attributes.GetValue(lMathOp.AttributeName)
+                                    ElseIf Not Double.IsNaN(lMathOp.Constant) Then
+                                        lNumber = lMathOp.Constant
+                                    Else
+                                    End If
+                                    lArgs.SetValue("Timeseries", lModifiedTser)
+                                    'Number should be defined as second to have the desired effect of Timeseries operator Number
+                                    If Not Double.IsNaN(lNumber) Then
+                                        lArgs.SetValue("Number", lNumber)
+                                    End If
+
+                                    Dim lResult As atcTimeseries = DoMath(lMathOp.MathOpn, lArgs)
+                                    'we know we are not doing subset dates etc, so just do a straightup value copy
+                                    For I As Integer = 1 To lModifiedTser.numValues
+                                        lModifiedTser.Value(I) = lResult.Value(I)
+                                    Next
+                                    Array.Clear(lResult.Values, 0, lResult.numValues)
+                                    lResult = Nothing
+                                    lArgs.Clear()
+                                    lArgs = Nothing
+
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                    Next
+                Next
             End If
 
             If chkEnableSeasons.Checked Then
@@ -406,6 +525,44 @@ FoundProvisional:
         End Select
     End Sub
 
+    Private Function TserLbl(ByVal aTser As atcTimeseries) As String
+        If aTser Is Nothing Then Return ""
+        With aTser.Attributes
+            Dim lItem As String = .GetValue("Location") & "," & .GetValue("tu").ToString() & " " & .GetValue("Constituent")
+            Return lItem
+        End With
+    End Function
+
+    Private Sub InitMath()
+        cboMathOp.Items.Clear()
+        With cboMathOp.Items
+            For Each lOpn As String In pMathOpnNames
+                .Add(lOpn)
+            Next
+        End With
+
+        clbTimeseries.Items.Clear()
+        clbTimeseries.Items.Add("All Timeseries")
+        Dim lAttribs As New ArrayList()
+        For Each lTs As atcTimeseries In pSelectedGroup
+            clbTimeseries.Items.Add(TserLbl(lTs))
+            With lTs
+                For Each lDef As atcDefinedValue In .Attributes
+                    If lDef.Definition.IsNumeric Then
+                        If Not lAttribs.Contains(lDef.Definition.Name) Then
+                            lAttribs.Add(lDef.Definition.Name)
+                        End If
+                    End If
+                Next
+            End With
+        Next
+
+        cboConstant.Items.Clear()
+        cboConstant.Items.AddRange(lAttribs.ToArray())
+
+        clbMathOpns.Items.Clear()
+    End Sub
+
     Private Function CurrentSeason() As Type
         For Each typ As Type In atcData.atcSeasonBase.AllSeasonTypes
             If atcSeasonBase.SeasonClassNameToLabel(typ.Name) = cboSeasons.Text Then
@@ -505,5 +662,74 @@ FoundProvisional:
 
     Private Sub txtValue_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtValueMinimum.TextChanged, txtValueMaximum.TextChanged
         chkEvents.Checked = IsNumeric(txtValueMaximum.Text) OrElse IsNumeric(txtValueMinimum.Text)
+    End Sub
+
+    Private Sub btnAddMathOp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddMathOp.Click
+        If pMathOpns Is Nothing Then
+            pMathOpns = New Generic.List(Of MathOpn)
+        End If
+        Dim lNewOpn As New MathOpn()
+        If clbTimeseries.CheckedIndices.Contains(0) Then
+            lNewOpn.DataGroup = pSelectedGroup
+        Else
+            lNewOpn.DataGroup = New atcTimeseriesGroup()
+            For Each lCheckedItem As String In clbTimeseries.CheckedItems
+                Dim loc As String = lCheckedItem.Substring(0, lCheckedItem.IndexOf(","))
+                Dim lDatagroup As atcTimeseriesGroup = pSelectedGroup.FindData("Location", loc)
+                If lDatagroup IsNot Nothing AndAlso lDatagroup.Count > 0 Then
+                    lNewOpn.DataGroup.Add(lDatagroup(0))
+                End If
+            Next
+        End If
+        If lNewOpn.DataGroup Is Nothing OrElse lNewOpn.DataGroup.Count = 0 Then
+            Exit Sub
+        End If
+
+        If cboMathOp.SelectedItem Is Nothing Then
+            Exit Sub
+        End If
+        lNewOpn.MathOpn = cboMathOp.SelectedItem
+
+        If cboConstant.SelectedItem IsNot Nothing Then
+            lNewOpn.AttributeName = cboConstant.SelectedItem
+            lNewOpn.Constant = GetNaN()
+        Else
+            lNewOpn.AttributeName = ""
+            If Not Double.TryParse(cboConstant.Text, lNewOpn.Constant) Then
+                lNewOpn.Constant = GetNaN()
+            End If
+        End If
+
+        For Each lMathOpn As MathOpn In pMathOpns
+            If lMathOpn.EqualTo(lNewOpn) Then
+                Exit Sub
+            End If
+        Next
+        pMathOpns.Add(lNewOpn)
+
+        If lNewOpn.IncludeAllTimeseries(pSelectedGroup.Count) Then
+            clbMathOpns.Items.Add(lNewOpn.ToString(True))
+        Else
+            clbMathOpns.Items.Add(lNewOpn.ToString())
+        End If
+        clbMathOpns.SetItemChecked(clbMathOpns.Items.Count - 1, True)
+    End Sub
+
+    Private Sub cboMathOp_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboMathOp.SelectedIndexChanged
+        If cboMathOp.SelectedItem IsNot Nothing Then
+            Dim lSelMathOp As String = cboMathOp.SelectedItem
+            Select Case lSelMathOp
+                Case pMathOpnNames(0), pMathOpnNames(1), pMathOpnNames(2), pMathOpnNames(3)
+                    cboConstant.Enabled = True
+                Case Else
+                    cboConstant.SelectedIndex = -1
+                    cboConstant.Text = ""
+                    cboConstant.Enabled = False
+            End Select
+        End If
+    End Sub
+
+    Private Sub clbMathOpns_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles clbMathOpns.ItemCheck
+        'Ctype(pMathOpns(e.Index), MathOpn).Selected = clbMathOpns.GetItemChecked(e.Index)
     End Sub
 End Class
