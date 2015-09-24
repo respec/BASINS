@@ -13,6 +13,7 @@ Public Class atcGraphPlugin
                                            "Residual (TS2 - TS1)", _
                                            "Cumulative Difference", _
                                            "Scatter (TS2 vs TS1)", _
+                                           "Double-Mass Curve", _
                                            "Shared Start Year"}
 
     Public Overrides ReadOnly Property Name() As String
@@ -146,6 +147,8 @@ Public Class atcGraphPlugin
                 Return New clsGraphFrequency(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Running Sum"
                 Return New clsGraphRunningSum(aDataGroup, aGraphForm.ZedGraphCtrl)
+            Case "Double-Mass Curve"
+                Return New clsGraphDoubleMass(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Residual (TS2 - TS1)"
                 aGraphForm.Text = "Residual Graph"
                 Return New clsGraphResidual(aDataGroup, aGraphForm.ZedGraphCtrl)

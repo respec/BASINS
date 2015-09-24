@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -120,6 +120,7 @@
     <Compile Include="atcTimeseriesPointList.vb" />
     <Compile Include="clsGraphBase.vb" />
     <Compile Include="clsGraphCumulativeDifference.vb" />
+    <Compile Include="clsGraphDoubleMass.vb" />
     <Compile Include="clsGraphFrequency.vb" />
     <Compile Include="clsGraphProbability.vb" />
     <Compile Include="clsGraphResidual.vb" />
