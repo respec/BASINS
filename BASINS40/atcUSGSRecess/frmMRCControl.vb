@@ -111,11 +111,6 @@ Public Class frmMRCControl
         pFileStationFullName = GetSetting("atcUSGSRecess", "Defaults", "FileStation", "")
         pFileRecSumFullName = GetSetting("atcUSGSRecess", "Defaults", "FileRecSum", "")
 
-        If Not File.Exists(pFileStationFullName) Then
-            pFileStationFullName = FindFile("Find station.txt", "station.txt", "txt")
-            SaveSetting("atcUSGSRecess", "Defaults", "FileStation", pFileStationFullName)
-        End If
-
         If Not File.Exists(pFileRecSumFullName) Then
             pFileRecSumFullName = FindFile("Find recsum.txt", "recsum.txt", "txt")
             SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
@@ -445,7 +440,6 @@ Public Class frmMRCControl
         End If
         Dim lMRCToAdd As String = ""
         If txtStation.Text.Trim() = "" OrElse _
-           txtDA.Text.Trim() = "" OrElse _
            txtLogQMin.Text.Trim() = "" OrElse _
            txtLogQMax.Text.Trim() = "" OrElse _
            txtCoefA.Text.Trim() = "" OrElse _
@@ -456,17 +450,15 @@ Public Class frmMRCControl
             Logger.Msg("Must specify the following before adding to MRC list:" & vbCrLf & _
                        "- station" & vbCrLf & _
                        "- season" & vbCrLf & _
-                       "- drainage area" & vbCrLf & _
                        "- min, max LogQ" & vbCrLf & _
                        "- polynomial coefficients A, B, and C", MsgBoxStyle.Information, "Add MRC")
             Exit Sub
-        ElseIf Not (IsNumeric(txtDA.Text.Trim()) AndAlso _
-                    IsNumeric(txtCoefA.Text.Trim()) AndAlso _
+        ElseIf Not (IsNumeric(txtCoefA.Text.Trim()) AndAlso _
                     IsNumeric(txtCoefB.Text.Trim()) AndAlso _
                     IsNumeric(txtCoefC.Text.Trim()) AndAlso _
                     IsNumeric(txtLogQMin.Text.Trim()) AndAlso _
                     IsNumeric(txtLogQMax.Text.Trim())) Then
-            Logger.Msg("DA, LogQ, and coefficients are not all numeric values.", MsgBoxStyle.Information, "Add MRC")
+            Logger.Msg("LogQ, and coefficients are not all numeric values.", MsgBoxStyle.Information, "Add MRC")
             Exit Sub
         End If
 
