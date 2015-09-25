@@ -219,7 +219,7 @@ Friend Class frmAbout
         Me.lblProgramURL.Size = New System.Drawing.Size(270, 13)
         Me.lblProgramURL.TabIndex = 2
         Me.lblProgramURL.TabStop = True
-        Me.lblProgramURL.Text = "http://www.epa.gov/waterscience/BASINS/"
+        Me.lblProgramURL.Text = "http://www2.epa.gov/exposure-assessment-models/basins-user-information-and-guidance"
         Me.lblProgramURL.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'grpATC
