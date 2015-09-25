@@ -502,13 +502,12 @@ Public Class atcFrequencyGridSource
 
                         Dim lNumZero As Integer = lNdayTsNonLog.Attributes.GetValue("Count Zero", -1)
                         Dim lNumMissing As Integer = lNdayTsNonLog.Attributes.GetValue("Count Missing", 0)
-                        Dim lNumPositive As Integer = lNdayTsNonLog.numValues - lNumZero - lNumMissing
+                        Dim lNumPositive As Integer = lNdayTsNonLog.Attributes.GetValue("Count Positive", 0) ' lNdayTsNonLog.numValues - lNumZero - lNumMissing
 
                         If lNumMissing = 0 AndAlso lNumZero = 0 Then
                             lPositiveNdayTs = lNdayTsNonLog
                         Else
                             Dim lCurNewValueIndex As Integer = 1
-                            Dim lNumNewValues As Integer = lNumPositive
                             lPositiveNdayTs = New atcTimeseries(Nothing)
                             lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
                             lPositiveNdayTs.numValues = lNumPositive
@@ -526,7 +525,6 @@ Public Class atcFrequencyGridSource
                             lLogNdayTs = New atcTimeseries(Nothing)
                             lLogNdayTs.Dates = New atcTimeseries(Nothing)
                             Dim lCurNewValueIndex As Integer = 1
-                            Dim lNumNewValues As Integer = lNumPositive
                             lLogNdayTs.numValues = lNumPositive
                             For lIndex = 1 To lNdayTs.numValues
                                 If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
