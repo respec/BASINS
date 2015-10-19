@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "HSPEXP+"
-#define MyAppVersion "1.1"
+#define MyAppVersion "1.11"
 #define MyAppPublisher "AQUA TERRA Consultants"
 #define MyAppURL "http://www.aquaterra.com/resources/downloads/HSPEXPplus.php"
 #define MyAppExeName "HSPEXP+.exe"
@@ -21,7 +21,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={reg:HKLM\SOFTWARE\AQUA TERRA Consultants\BASINS41,Base Directory|{pf}\HSPEXP+}
 DefaultGroupName={#MyAppName}
-OutputBaseFilename=HSPEXP+1.1SetUp
+OutputBaseFilename=HSPEXP+1.11SetUp
 Compression=lzma
 SolidCompression=yes
 InfoBeforeFile=install.txt
@@ -33,19 +33,20 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\HSPEXP+.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\WinHSPFLt\*"; DestDir: "{app}\WinHSPFLt"; Flags: ignoreversion
-Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\*.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\*.eer"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Dev\BASINS40\HSPEXP\*.chm"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\hspfmsg.wdm"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\ATCoUnits.mdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Dev\BASINS40\HSPEXP\GraphColors.txt"; DestDir: "{app}"; Flags: ignoreversion
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\HSPEXP+.exe"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
+Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\WinHSPFLt\*"; DestDir: "{app}\WinHSPFLt"; Permissions: everyone-modify; Flags: ignoreversion
+Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\*.dll"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
+Source: "C:\Dev\BASINS40\HSPEXP\*.chm"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
+Source: "C:\Dev\BASINS40\HSPEXP\GraphColors.txt"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
+; NOTE: Don't use "Flags: ignoreversiono" on any shared system files
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+
+[Dirs]
+Name: {app}; Permissions: everyone-modify
+Name: {app}\WinHSPFLt; Permissions: everyone-modify
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
