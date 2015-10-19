@@ -14,15 +14,20 @@ Imports System.Text
 Public Module ESTCP_Climate
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        'ProduceClimateScenarioPrecAndAirTempForFB()
         'ReproduceClimateScenarioPrecAndAirTempForACF()
-        'CombineTmaxTmin()
+
+        'ConvertCAirTempToF()
+        'AppendBASINSAirTemp()
+        'CorrectFtBenningAirTemp()
+        'ProduceClimateScenarioPrecAndAirTempForFB()
         ComputeHamonPETFromHourlyAirTemp()
+
+        'CombineTmaxTmin() -- never used for production 
     End Sub
 
     Private Sub ComputeHamonPETFromHourlyAirTemp()
         Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
-        Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmet.wdm"
+        Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmetClimate.wdm"
         If FileExists(lWDMFileName) Then
             'check to see if this file is already open in this project
             lDataSource = atcDataManager.DataSourceBySpecification(lWDMFileName)
@@ -35,20 +40,179 @@ Public Module ESTCP_Climate
             End If
         End If
 
-        '13 is air temp, now 2005 is the extended version
-        '16 is pevt   - can I get this from 13?
+        '13 is air temp
+        '16 is pevt   
         Dim lAirts As New atcTimeseries(Nothing)
         lAirts = Nothing
-        lAirts = lDataSource.DataSets.ItemByKey(2005)
+        lAirts = lDataSource.DataSets.ItemByKey(13)
         Dim lLat As Double = 32.5161
-        Dim lCTS() As Double = {0, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055}
+        Dim lCTS() As Double = {0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055}
 
         Dim lPETts As New atcTimeseries(Nothing)
         lPETts = DisSolPet(PanEvaporationTimeseriesComputedByHamonX(lAirts, Nothing, True, lLat, lCTS), Nothing, 2, lLat)
 
-        lPETts.Attributes.SetValue("ID", 2013)
-        lDataSource.AddDataset(lPETts, atcDataSource.EnumExistAction.ExistAppend)
+        lPETts.Attributes.SetValue("ID", 16)
+        lDataSource.AddDataset(lPETts, atcDataSource.EnumExistAction.ExistReplace)
         
+    End Sub
+
+    Private Sub CorrectFtBenningAirTemp()
+        'some random hours of the ft benning data set have 0 degrees for air temp, when the BASINS version has real values.  
+        'look through the values and change the ft benning zeros to match the BASINS version.
+
+        'open the source wdm file:
+        Dim lOriginalDataSource As atcWDM.atcDataSourceWDM = Nothing
+        Dim lOriginalWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmet.wdm"
+        Dim lOriginalWDMDsn As Integer = 13
+        If FileExists(lOriginalWDMFileName) Then
+            'check to see if this file is already open in this project
+            lOriginalDataSource = atcDataManager.DataSourceBySpecification(lOriginalWDMFileName)
+
+            If lOriginalDataSource Is Nothing Then 'need to open it here
+                lOriginalDataSource = New atcWDM.atcDataSourceWDM
+                If Not lOriginalDataSource.Open(lOriginalWDMFileName) Then
+                    lOriginalDataSource = Nothing
+                End If
+            End If
+        End If
+
+        'open the second wdm file with later data:
+        Dim lSecondDataSource As atcWDM.atcDataSourceWDM = Nothing
+        Dim lSecondWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\GA092166FromBASINS.wdm"
+        Dim lSecondWDMDsn As Integer = 3
+        If FileExists(lSecondWDMFileName) Then
+            'check to see if this file is already open in this project
+            lSecondDataSource = atcDataManager.DataSourceBySpecification(lSecondWDMFileName)
+
+            If lSecondDataSource Is Nothing Then 'need to open it here
+                lSecondDataSource = New atcWDM.atcDataSourceWDM
+                If Not lSecondDataSource.Open(lSecondWDMFileName) Then
+                    lSecondDataSource = Nothing
+                End If
+            End If
+        End If
+
+        For Each lDataSet As atcTimeseries In lOriginalDataSource.DataSets
+            Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
+            If lDsn = lOriginalWDMDsn Then
+                'this is the hourly air temp 
+                For Each lDataSetSecond As atcTimeseries In lSecondDataSource.DataSets
+                    Dim lDsnSecond As Integer = lDataSetSecond.Attributes.GetValue("Id")
+                    If lDsnSecond = lSecondWDMDsn Then
+                        'if the original is zero, see if there's a better value in the second wdm
+
+                        For lIndex As Integer = 0 To lDataSet.numValues
+                            If lDataSet.Values(lIndex) = 0 Then
+                                'see if the second has a better value at that timestep
+                                Dim lSecondValue As Double = lDataSetSecond.Values(lIndex)
+                                If lSecondValue > 0 Then
+                                    lDataSet.Values(lIndex) = lSecondValue
+                                End If
+                            End If
+                        Next
+                        lOriginalDataSource.AddDataset(lDataSet, atcDataSource.EnumExistAction.ExistAppend)
+
+                    End If
+                Next
+            End If
+        Next
+    End Sub
+
+    Private Sub AppendBASINSAirTemp()
+        'add n years of air temp from the second data source to the original data source
+
+        'open the source wdm file:
+        Dim lOriginalDataSource As atcWDM.atcDataSourceWDM = Nothing
+        Dim lOriginalWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmet.wdm"
+        Dim lOriginalWDMDsn As Integer = 13
+        If FileExists(lOriginalWDMFileName) Then
+            'check to see if this file is already open in this project
+            lOriginalDataSource = atcDataManager.DataSourceBySpecification(lOriginalWDMFileName)
+
+            If lOriginalDataSource Is Nothing Then 'need to open it here
+                lOriginalDataSource = New atcWDM.atcDataSourceWDM
+                If Not lOriginalDataSource.Open(lOriginalWDMFileName) Then
+                    lOriginalDataSource = Nothing
+                End If
+            End If
+        End If
+
+        'open the second wdm file with later data:
+        Dim lSecondDataSource As atcWDM.atcDataSourceWDM = Nothing
+        'Dim lSecondWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\GA092166FromBASINS.wdm"
+        Dim lSecondWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\Columbus.wdm"
+        'Dim lSecondWDMDsn As Integer = 3
+        Dim lSecondWDMDsn As Integer = 14
+        If FileExists(lSecondWDMFileName) Then
+            'check to see if this file is already open in this project
+            lSecondDataSource = atcDataManager.DataSourceBySpecification(lSecondWDMFileName)
+
+            If lSecondDataSource Is Nothing Then 'need to open it here
+                lSecondDataSource = New atcWDM.atcDataSourceWDM
+                If Not lSecondDataSource.Open(lSecondWDMFileName) Then
+                    lSecondDataSource = Nothing
+                End If
+            End If
+        End If
+
+        For Each lDataSet As atcTimeseries In lOriginalDataSource.DataSets
+            Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
+            If lDsn = lOriginalWDMDsn Then
+                'this is the hourly air temp 
+                For Each lDataSetSecond As atcTimeseries In lSecondDataSource.DataSets
+                    Dim lDsnSecond As Integer = lDataSetSecond.Attributes.GetValue("Id")
+                    If lDsnSecond = lSecondWDMDsn Then
+                        'append ldatasetnew to ldataset
+                        'need to subset by date to get just the last year
+                        'Dim lsjdate As Double = Date2J(2009, 1, 1)
+                        'Dim lejdate As Double = Date2J(2009, 12, 31, 24)
+                        Dim lsjdate As Double = Date2J(2010, 1, 1)
+                        Dim lejdate As Double = Date2J(2014, 1, 5, 24)
+                        Dim lSubsetBASINSDataSet As atcTimeseries = atcData.SubsetByDate(lDataSetSecond, lsjdate, lejdate, Nothing)
+                        'create timeseries group containing both timsers
+                        Dim lBoth As New atcTimeseriesGroup
+                        lBoth.Add(lDataSet)
+                        lBoth.Add(lSubsetBASINSDataSet)
+                        'now merge the timsers together
+                        Dim lMerge As atcTimeseries = atcData.MergeTimeseries(lBoth)
+                        'and save it
+                        lMerge.Attributes.SetValue("ID", lOriginalWDMDsn)
+                        lOriginalDataSource.AddDataset(lMerge, atcDataSource.EnumExistAction.ExistReplace)
+                    End If
+                Next
+            End If
+        Next
+    End Sub
+
+    Private Sub ConvertCAirTempToF()
+        'open the source wdm file:
+        Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
+        Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\Columbus.wdm"
+        If FileExists(lWDMFileName) Then
+            'check to see if this file is already open in this project
+            lDataSource = atcDataManager.DataSourceBySpecification(lWDMFileName)
+
+            If lDataSource Is Nothing Then 'need to open it here
+                lDataSource = New atcWDM.atcDataSourceWDM
+                If Not lDataSource.Open(lWDMFileName) Then
+                    lDataSource = Nothing
+                End If
+            End If
+        End If
+
+        For Each lDataSet As atcTimeseries In lDataSource.DataSets
+            Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
+            If lDsn = 13 Then
+                'this is the hourly air temp in c
+                'convert to f
+                For lIndex As Integer = 0 To lDataSet.numValues
+                    lDataSet.Values(lIndex) = (lDataSet.Values(lIndex) * 9 / 5) + 32
+                Next
+                'append ldatasetnew to ldataset
+                lDataSet.Attributes.SetValue("ID", 14)
+                lDataSource.AddDataset(lDataSet, atcDataSource.EnumExistAction.ExistAppend)
+            End If
+        Next
     End Sub
 
     Private Sub CombineTmaxTmin()
