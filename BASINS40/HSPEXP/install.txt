@@ -1,12 +1,43 @@
+Dated 10/19/2015
+HSPEXP+1.11
+Features
+1. The timeseries can be transformed before plotting graphs when AutomatedGraphs option is selected. In the thirteenth column of timeseries description add the following text in quotes (without quotes) for the transformations.
+	a. "c to f" --> Transform from celsius to Fahrenheit.
+	b. "f to c" --> Transform from Fahrenheit to celsius.
+	c. "sum c" --> Add the constant c to the timeseries.
+	d. "product c" -->Multiply the constant c to the timeseries.
+(This functionality will be listed in the Help Manual with next major upgrade.)
+	
+Bugs Fixed
+1. The steptype was not plotted properly. Now the timeseries can be plotted as forwardstep, rearwardstep, or nonostep.
+2. Some point symbols were not filled. Now all the point symbols are filled by default. 
+
+
+Dated:09/01/2015
+HSPEXP+1.1
+
+Features
+1. Nutrient Load Allocation Reports (new report) - MPCA supported the development of load allocation reports for sediment, Total Nitrogen(TN), and Total Phosphorus(TP) in HSPEXP+. The load allocation reports provide load and percent of total load, attributed to each upstream sources at all the reach end points in the watershed, and at the user-selected reaches, whenever sediment, TN, or TP reports are requested. The description of this process is provided in the updated User's Manual. 
+2. Additional cases were added to calculate TN and TP input to a reach if particulate ammonia and orthophosphate are added to the reach as attached to sediment.
+
+Bugs Fixed
+1. A bug was fixed where HSPEXP+ would attempt to run HSPF12.3 instead of HSPF12.4(beta), if the user has HSPF12.3 installed.  HSPEXP+ now runs only HSPF12.4(beta) that is installed with HSPEXP+.
+2. A bug was fixed where total water input to a reach was double counted in the Reach Budget Report for water.
+
+
+
 Dated: 07/02/2015
 HSPEXP+1.02
-1. HSPF12.4 is available with this new version.
-2. A bug was fixed which was causing subsequent runs of HSPEXP+ to crash, if "Run HSPF" option was selected.
-3. BOD balance reports for reach are now generated. 
+Features
+1. HSPF12.4(beta) is available with this new version.
+
+Bugs fixed
+1. A bug was fixed which was causing subsequent runs of HSPEXP+ to crash, if "Run HSPF" option was selected.
+
 
 
 Dated: 05/13/2015
-HSPEXP+ now checks if the last run of the model was succesful. If not, HSPEXP+ quits and recommends the user to correct the error before running the model.
+HSPEXP+ now checks if the last run of the model was successful. If not, HSPEXP+ quits and recommends the user to correct the error before running the model.
 Dated: 05/11/2015
 AQUA TERRA Consultants releases an update to HSPEXP+1.0. This update addresses multiple issues and adds some small features.
 
