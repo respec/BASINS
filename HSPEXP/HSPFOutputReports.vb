@@ -139,7 +139,9 @@ Module HSPFOutputReports
                 If pRunUci = True Then
                     Logger.Status(Now & " Running HSPF Simulation of " & pBaseName & ".uci", True)
                     Dim lExitCode As Integer
+                    ChDriveDir(PathNameOnly(pHSPFExe))
                     lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & pBaseName & ".uci") 'Run HSPF program
+                    ChDriveDir(pTestPath)
                     'Dim WinHSPFLtVersionFound As String = FindFile("Please locate WinHspfLt.exe", IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location), "WinHSPFLt", "WinHspfLt.exe"))
                     'Logger.Dbg(WinHSPFLtVersionFound)
                     If lExitCode = -1 Then
@@ -712,6 +714,13 @@ RWZProgramEnding:
                                                                                       " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Program will quit!")
                             End If
 
+                        Case ".rdb"
+                            lTimeSeries = lDataSource.DataSets.FindData("ParmCode", Trim(lGraphDataset(2)))(0)
+                            lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
+                            If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
+                                Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
+                                                                                      " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Program will quit!")
+                            End If
                     End Select
 
 
@@ -719,6 +728,25 @@ RWZProgramEnding:
                     lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
 
                     lTimeSeries = AggregateTS(lTimeSeries, Trim(lGraphDataset(10)).ToLower, Trim(lGraphDataset(11)).ToLower)
+
+                    Dim Transformation As String = Trim(lGraphDataset(12)).ToLower
+                    Select Case True
+                        Case Transformation.Contains("c to f")
+                            lTimeSeries = lTimeSeries * 1.8 + 32
+
+                        Case Transformation.Contains("f to c")
+                            lTimeSeries = (lTimeSeries - 32) * 0.56
+
+                        Case Transformation.Contains("sum")
+                            Dim Sum As Double = Convert.ToDouble(Transformation.Split(" ")(1))
+                            lTimeSeries = lTimeSeries + Sum
+
+                        Case Transformation.Contains("product")
+                            Dim Product As Double = Convert.ToDouble(Transformation.Split(" ")(1))
+                            lTimeSeries = lTimeSeries * Product
+                    End Select
+
+
 
                     If Not Trim(lGraphInit(18)) = "" Then
 
@@ -869,52 +897,63 @@ RWZProgramEnding:
                 Select Case Trim(lGraphDataset(7)).ToLower
                     Case "circle"
                         lCurve.Symbol.Type = SymbolType.Circle
-                        lCurve.Symbol.Fill.IsVisible = True
+
                     Case "square"
                         lCurve.Symbol.Type = SymbolType.Square
-                        lCurve.Symbol.Fill.IsVisible = True
+
                     Case "plus"
                         lCurve.Symbol.Type = SymbolType.Plus
                     Case "diamond"
                         lCurve.Symbol.Type = SymbolType.Diamond
+
                     Case "hdash"
                         lCurve.Symbol.Type = SymbolType.HDash
                     Case "triangle"
                         lCurve.Symbol.Type = SymbolType.Triangle
                     Case "triangledown"
                         lCurve.Symbol.Type = SymbolType.TriangleDown
+
                     Case "vdash"
                         lCurve.Symbol.Type = SymbolType.VDash
                     Case "xcross"
                         lCurve.Symbol.Type = SymbolType.XCross
                     Case "star"
                         lCurve.Symbol.Type = SymbolType.Star
+
                     Case Else
                         lCurve.Symbol.Type = SymbolType.Circle
-                        lCurve.Symbol.Fill.IsVisible = True
+
 
                 End Select
+                lCurve.Symbol.Fill.IsVisible = True
                 lCurve.Symbol.Size = Math.Max(Convert.ToInt32(Trim(lGraphDataset(8))), 1)
+            End If
+
+            
+            lCurve.Color = Drawing.Color.FromName(Trim(lGraphDataset(5)).ToLower)
+
+            If Trim(lGraphDataset(6)).ToLower.Contains("forward") Then
+                lCurve.Line.StepType = StepType.ForwardStep
+            ElseIf Trim(lGraphDataset(6)).ToLower.Contains("rear") Then
+                lCurve.Line.StepType = StepType.RearwardStep
+            Else
+                lCurve.Line.StepType = StepType.NonStep
+            End If
+
+            If Not Trim(lGraphDataset(9)) = "" Then
+                If Trim(lGraphDataset(9)).ToLower = "don't show" Then
+                    lCurve.Label.IsVisible = False
                 End If
-
-                If Trim(lGraphDataset(5)).ToLower = "nonstep" Then
-                    lCurve.Line.StepType = StepType.NonStep
-                Else
-                    lCurve.Line.StepType = StepType.ForwardStep
-                End If
+                lCurve.Label.Text = Trim(lGraphDataset(9))
+            End If
 
 
-                lCurve.Color = Drawing.Color.FromName(Trim(lGraphDataset(5)).ToLower)
+         
 
-                If Not Trim(lGraphDataset(9)) = "" Then
-                    If Trim(lGraphDataset(9)).ToLower = "don't show" Then
-                        lCurve.Label.IsVisible = False
-                    End If
-                    lCurve.Label.Text = Trim(lGraphDataset(9))
-                End If
+
 
                 'End If
-                aRecordIndex += 1
+            aRecordIndex += 1
         Next CurveNumber
         aTimeseriesgroup = Nothing
         Return aZgc
