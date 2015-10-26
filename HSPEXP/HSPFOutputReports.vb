@@ -76,8 +76,8 @@ Module HSPFOutputReports
         pGraphSaveWidth = 1300
         pGraphSaveHeight = 768
         pMakeStdGraphs = StartUp.chkGraphStandard.Checked
-        pMakeLogGraphs = True
-        pMakeSupGraphs = True
+        pMakeLogGraphs = StartUp.chkGraphStandard.Checked
+        pMakeSupGraphs = StartUp.chkGraphStandard.Checked
         pRunUci = StartUp.chkRunHSPF.Checked
         pMakeAreaReports = StartUp.chkAreaReports.Checked
 
@@ -87,6 +87,7 @@ Module HSPFOutputReports
         If StartUp.chkHydrologySensitivity.Checked Then
             pSensitivity = True
         End If
+        pConstituents.Clear()
         If StartUp.chkWaterBalance.Checked Then
             pConstituents.Add("Water")
         End If
