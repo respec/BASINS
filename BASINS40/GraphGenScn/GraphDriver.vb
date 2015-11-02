@@ -996,15 +996,22 @@ Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
             If pGraphSpec.IsReady And pApplyGraphSpec Then
                 lCrvIndex = pGraphSpec.CurveIndex(lCurveOnMainPane.Label.Text, i)
                 lCurveOnMainPane.Label.Text = pGraphSpec.Crv(lCrvIndex).LegLbl
-                'If pGraphSpec.Crv(i).LType >= 0 Then
-                '    lObserved.Symbol.Type = pGraphSpec.Crv(i).LType Mod 5
-                'Else
-                '    lObserved.Symbol.Type = SymbolType.Circle
-                'End If
                 lCurveOnMainPane.Color = ToNewColor(pGraphSpec.Crv(lCrvIndex).Color)
                 lCurveOnMainPane.Line.StepType = StepType.NonStep
                 lCurveOnMainPane.Line.Width = pGraphSpec.Crv(lCrvIndex).LThck
                 'lPaneMain.Y2Axis.Title.Text = pGraphSpec.Axis(2).label
+                With lCurveOnMainPane.Symbol
+                    If pGraphSpec.Crv(i).SType > 0 Then ' LType >= 0
+                        .Type = pGraphSpec.Crv(i).SType ' Mod 5
+                        .Size = 3.0F
+                        .IsVisible = True
+                        lCurveOnMainPane.Line.IsVisible = False
+                    Else
+                        .Type = SymbolType.None
+                        .IsVisible = False
+                        lCurveOnMainPane.Line.IsVisible = True
+                    End If
+                End With
             Else 'No graph specs loaded
                 If Not lCurveOnMainPane.Label.Text.Contains(" at ") Then
                     lCurveOnMainPane.Label.Text &= " at " & aDataGroup(i).Attributes.GetValue("Location")
