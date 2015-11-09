@@ -1,3 +1,5 @@
+Imports MapWinUtility
+
 Public Class frmWDM
 
     Public Function AskUser(ByVal aIcon As Drawing.Icon, ByVal aType As String, ByVal aSaveFolder As String, Optional ByVal aWindowTitle As String = Nothing) As String
@@ -50,6 +52,9 @@ Public Class frmWDM
         With lDialog
             .Title = "Save new WDM file as..."
             .FileName = txtFilenameNew.Text
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             .Filter = "WDM files|*.wdm"
             .DefaultExt = ".wdm"
             .CheckFileExists = False
@@ -67,6 +72,9 @@ Public Class frmWDM
         With lDialog
             .Title = "Save data in..."
             .FileName = txtFilenameExisting.Text
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             .Filter = "WDM files|*.wdm"
             .DefaultExt = ".wdm"
             .CheckFileExists = False

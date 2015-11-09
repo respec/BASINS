@@ -849,6 +849,9 @@ TryExePath:
                     .Title = aFileDialogTitle
                     'lFileName = AbsolutePath(aDefaultFileName, CurDir)
                     .FileName = aDefaultFileName
+                    If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                        .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+                    End If
                     .Filter = aFileFilter
                     .FilterIndex = aFilterIndex
                     .DefaultExt = aDefaultExt

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EF7A0A9B-E608-4C8E-938B-BD87DAA1D273}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -133,9 +133,11 @@
   <ItemGroup>
     <EmbeddedResource Include="frmBatch.resx">
       <DependentUpon>frmBatch.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmBatchMap.resx">
       <DependentUpon>frmBatchMap.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmDisplayFrequencyGrid.resx">
       <DependentUpon>frmDisplayFrequencyGrid.vb</DependentUpon>
@@ -147,6 +149,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmTrend.resx">
       <DependentUpon>frmTrend.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

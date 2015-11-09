@@ -5343,8 +5343,7 @@ Public Class GisUtil
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property ShapefileProjectionString(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
         Get
-            Dim lSf As New MapWinGIS.Shapefile
-            lSf = ShapeFileFromIndex(aLayerIndex)
+            Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
             Return lSf.Projection
         End Get
     End Property

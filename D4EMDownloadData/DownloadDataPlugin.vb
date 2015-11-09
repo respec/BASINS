@@ -176,7 +176,7 @@ Public Class DownloadDataPlugin
                 atcMwGisUtility.GisUtil.MappingObject = g_MapWin
                 If BASINS.NationalProjectIsOpen() Then
                     BASINS.SpecifyAndCreateNewProject()
-                ElseIf g_MapWin.Layers.NumLayers < 1 Then
+                ElseIf g_MapWin.Layers.NumLayers < 1 AndAlso (g_MapWin.Project Is Nothing OrElse g_MapWin.Project.FileName Is Nothing) Then
                     BASINS.LoadNationalProject()
                 Else
                     Dim lDownloadForm As New frmDownload
@@ -190,18 +190,18 @@ Public Class DownloadDataPlugin
                             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor 'Logger.Busy = True
                             Windows.Forms.Application.DoEvents() 'refresh main form to get rid of vestiges of download form
                             'Make sure all loaded plugins are available for DataManager
-                            Dim lPlugins As New ArrayList
-                            For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
-                                Try
-                                    If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
-                                        lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
-                                    End If
-                                Catch ex As Exception
-                                End Try
-                            Next
-                            Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
+                            'Dim lPlugins As New ArrayList
+                            'For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
+                            '    Try
+                            '        If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
+                            '            lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
+                            '        End If
+                            '    Catch ex As Exception
+                            '    End Try
+                            'Next
+                            'Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
                             Logger.Status("LABEL TITLE BASINS Data Download")
-                            Dim lResult As String = lDownloadManager.Execute(lQuery)
+                            Dim lResult As String = D4EMDataManager.DataManager.Execute(lQuery)
                             If lResult Is Nothing Then
                                 Logger.Dbg("QueryResult:Nothing")
                             Else

@@ -1,6 +1,6 @@
 Imports atcData
 Imports atcUtility
-
+Imports MapWinUtility
 Imports System.Windows.Forms
 
 Friend Class frmDisplayFrequencyGrid
@@ -329,6 +329,9 @@ Friend Class frmDisplayFrequencyGrid
             .Title = "Save Grid As"
             .DefaultExt = ".txt"
             .FileName = ReplaceString(Me.Text, " ", "_") & "_grid.txt"
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
             End If
@@ -341,6 +344,9 @@ Friend Class frmDisplayFrequencyGrid
             .Title = "Save Frequency Report As"
             .DefaultExt = ".txt"
             .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, CreateReport)
                 OpenFile(.FileName)
@@ -456,6 +462,9 @@ Friend Class frmDisplayFrequencyGrid
             .Title = "Export Frequency Results As"
             .DefaultExt = ".txt"
             .FileName = ReplaceString(Me.Text, " ", "_") & "_export.txt"
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, pSource.CreateReport(True))
                 OpenFile(.FileName)

@@ -330,14 +330,16 @@ Public Class frmDFLOWArgs
             End If
         End If
 
-        Select Case DFLOWCalcs.fNonBioType
-            Case 0
-                rbNonBio1.Checked = True
-            Case 1
-                rbNonBio2.Checked = True
-            Case 2
-                rbNonBio3.Checked = True
-        End Select
+        For Each lNonBioType As Integer In DFLOWCalcs.fNonBioType
+            Select Case lNonBioType
+                Case 0
+                    rbNonBio1.Checked = True
+                Case 1
+                    rbNonBio2.Checked = True
+                Case 2
+                    rbNonBio3.Checked = True
+            End Select
+        Next
 
         tbNonBio1.Text = DFLOWCalcs.fAveragingPeriod
         tbNonBio2.Text = DFLOWCalcs.fReturnPeriod
@@ -526,12 +528,15 @@ Public Class frmDFLOWArgs
 
     Private Sub rbNonBio1_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbNonBio1.CheckedChanged, rbNonBio3.CheckedChanged, rbNonBio2.CheckedChanged
 
+        DFLOWCalcs.fNonBioType.Clear()
         If rbNonBio1.Checked Then
-            DFLOWCalcs.fNonBioType = 0
-        ElseIf rbNonBio2.Checked Then
-            DFLOWCalcs.fNonBioType = 1
-        Else
-            DFLOWCalcs.fNonBioType = 2
+            DFLOWCalcs.fNonBioType.Add(0)
+        End If
+        If rbNonBio2.Checked Then
+            DFLOWCalcs.fNonBioType.Add(1)
+        End If
+        If rbNonBio3.Checked Then
+            DFLOWCalcs.fNonBioType.Add(2)
         End If
         Label7.Enabled = rbNonBio1.Checked
         Label8.Enabled = rbNonBio1.Checked

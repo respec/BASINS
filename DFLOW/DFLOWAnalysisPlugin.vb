@@ -43,7 +43,7 @@ Public Class DFLOWAnalysisPlugin
 
         ' "BATCH" VERSION
 
-        If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
+        If aTimeseriesGroup IsNot Nothing AndAlso aTimeseriesGroup.Count > 0 Then
             ' Do computation driven by contents of paramarry
 
             If UBound(aOption) > 0 Then DFLOWCalcs.fBioPeriod = aOption(0) Else DFLOWCalcs.fBioPeriod = 1
@@ -63,7 +63,8 @@ Public Class DFLOWAnalysisPlugin
                 DFLOWCalcs.fEndDay = pLastDayOfMonth(DFLOWCalcs.fEndMonth)
             End If
 
-            DFLOWCalcs.fNonBioType = 0
+            DFLOWCalcs.fNonBioType.Clear()
+            DFLOWCalcs.fNonBioType.Add(0)
             DFLOWCalcs.fAveragingPeriod = 7
             DFLOWCalcs.fReturnPeriod = 10
 

@@ -132,7 +132,9 @@ Public Class clsIDFPlugin
         Dim lParentMenuName As String = "BasinsAnalysis"
         'Dim lParentMenu As MapWindow.Interfaces.MenuItem = CType(pMenusAdded.Item(pMenusAdded.Count - 1), MapWindow.Interfaces.MenuItem
 
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, lMenuName, Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, pIDFName & " Run Existing Batch", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, pIDFName & " Create SWSTAT Batch", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, pIDFName & " Create DFLOW Batch", Me.Icon, , , True))
     End Sub
 
 
@@ -159,7 +161,11 @@ Public Class clsIDFPlugin
                         Dim lForm As New frmTrend
                         lForm.Initialize(lTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
                     End If
-                Case pBatchMenuName
+                Case pBatchMenuName & " Run Existing Batch"
+                    Dim lFrmBatch As New frmBatch()
+                    lFrmBatch.Show()
+
+                Case pBatchMenuName & " Create SWSTAT Batch", pBatchMenuName & " Create DFLOW Batch"
                     Dim lBatchTitle As String = "Batch Run IDF"
                     Dim lStationsAreSelected As Boolean = False
                     Dim lMapLayer As MapWindow.Interfaces.Layer = Nothing
@@ -173,8 +179,8 @@ Public Class clsIDFPlugin
                             Exit For
                         End If
                     Next
+                    Dim lSelectedStationIDs As New atcCollection()
                     If lStationsAreSelected Then
-                        Dim lSelectedStationIDs As New atcCollection()
                         Dim lShp As New MapWinGIS.Shapefile()
                         If lShp.Open(lMapLayer.FileName, Nothing) Then
                             Dim lFieldIndex As Integer = -99
@@ -209,19 +215,20 @@ Public Class clsIDFPlugin
                             Next
                         End If
                         If lSelectedStationIDs.Count > 0 Then
-                            Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf & _
-                                       StationListing(lSelectedStationIDs), _
+                            Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf &
+                                       StationListing(lSelectedStationIDs),
                                        lBatchTitle)
                         End If
-                        Dim lfrmBatchMap As New frmBatchMap()
+                    End If
+                    Dim lfrmBatchMap As New frmBatchMap()
                         lfrmBatchMap.Initiate(lSelectedStationIDs)
                         lfrmBatchMap.ShowDialog()
                         'Return Nothing 'for now
                         Exit Sub
-                    Else
-                        Logger.Msg("Could not find stream gage station map layer: NWIS Daily Discharge Stations.", lBatchTitle)
-                        'Return Nothing
-                    End If
+                    'Else
+                    '    Logger.Msg("Could not find stream gage station map layer: NWIS Daily Discharge Stations.", lBatchTitle)
+                    '    'Return Nothing
+                    'End If
             End Select
         End If
     End Sub

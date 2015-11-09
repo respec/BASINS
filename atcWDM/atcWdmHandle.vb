@@ -47,6 +47,9 @@ TestFileName:
                     With lOpenDialog
                         .Title = "Find '" & IO.Path.GetFileName(lFileName) & "' in another folder"
                         .FileName = aFileName
+                        If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                            .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+                        End If
                         .Filter = "WDM files|*.wdm"
                         .FilterIndex = 0
                         If .ShowDialog = Windows.Forms.DialogResult.OK Then
