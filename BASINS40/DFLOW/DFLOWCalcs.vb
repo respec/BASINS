@@ -28,7 +28,7 @@ Public Class DFLOWCalcs
     Public Shared fBioCluster As Integer
     Public Shared fBioExcursions As Integer
     Public Shared fBioFPArray(,) As Integer = New Integer(3, 3) {{1, 3, 120, 5}, {4, 3, 120, 5}, {30, 3, 120, 5}, {-1, -1, -1, -1}}
-    Public Shared fNonBioType As Integer
+    Public Shared fNonBioType As New List(Of Integer)
     Public Shared fAveragingPeriod As Integer
     Public Shared fReturnPeriod As Integer
     Public Shared fExplicitFlow As Double
@@ -66,7 +66,8 @@ Public Class DFLOWCalcs
             fBioCluster = 120
             fBioExcursions = 5
 
-            fNonBioType = 0
+            fNonBioType.Clear()
+                        fNonBioType.Add( 0)
             fAveragingPeriod = 7
             fReturnPeriod = 10
             fExplicitFlow = 1.0
@@ -501,7 +502,7 @@ Public Class DFLOWCalcs
             End With
         End If
 
-        Dim lNonBioType As Integer = fNonBioType
+        Dim lNonBioType As Integer = fNonBioType(0)
         If aNBioParam IsNot Nothing Then
             With aNBioParam
                 For Each lKey As String In .Keys

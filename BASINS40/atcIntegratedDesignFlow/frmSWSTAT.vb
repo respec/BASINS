@@ -87,142 +87,142 @@ Public Class frmSWSTAT
     Friend WithEvents txtOutputRootName As System.Windows.Forms.TextBox
     Friend WithEvents lblBaseFilename As System.Windows.Forms.Label
     Friend WithEvents tabDFLOW As System.Windows.Forms.TabPage
-    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
-    Friend WithEvents tbNonBio3 As System.Windows.Forms.TextBox
-    Friend WithEvents tbNonBio4 As System.Windows.Forms.TextBox
+    Friend WithEvents groupNonBio As System.Windows.Forms.GroupBox
+    Friend WithEvents txtNonBioExplicitFlow As System.Windows.Forms.TextBox
+    Friend WithEvents txtNonBioFlowPercentile As System.Windows.Forms.TextBox
     Friend WithEvents tbNonBio2 As System.Windows.Forms.TextBox
-    Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents Label6 As System.Windows.Forms.Label
-    Friend WithEvents tbNonBio1 As System.Windows.Forms.TextBox
-    Friend WithEvents gbBio As System.Windows.Forms.GroupBox
-    Friend WithEvents tbBio3 As System.Windows.Forms.TextBox
-    Friend WithEvents tbBio4 As System.Windows.Forms.TextBox
-    Friend WithEvents tbBio2 As System.Windows.Forms.TextBox
-    Friend WithEvents Label4 As System.Windows.Forms.Label
-    Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents tbBio1 As System.Windows.Forms.TextBox
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents ckbBio As System.Windows.Forms.CheckBox
+    Friend WithEvents lblNonBioExplicitFlowUnits As System.Windows.Forms.Label
+    Friend WithEvents lblNonBioFlowPercentileUnits As System.Windows.Forms.Label
+    Friend WithEvents txtNonBioCustomNday1 As System.Windows.Forms.TextBox
+    Friend WithEvents groupBio As System.Windows.Forms.GroupBox
+    Friend WithEvents txtBioExcursionDays As System.Windows.Forms.TextBox
+    Friend WithEvents txtBioExcursionsPerCluster As System.Windows.Forms.TextBox
+    Friend WithEvents txtBioYearsBetween As System.Windows.Forms.TextBox
+    Friend WithEvents lblBioExcursionsPerCluster As System.Windows.Forms.Label
+    Friend WithEvents lblBioExcursionDays As System.Windows.Forms.Label
+    Friend WithEvents lblBioYearsBetween As System.Windows.Forms.Label
+    Friend WithEvents txtBioFlowDays As System.Windows.Forms.TextBox
+    Friend WithEvents lblBioFlowDays As System.Windows.Forms.Label
+    Friend WithEvents chkBioCustom As System.Windows.Forms.CheckBox
     Friend WithEvents btnCalculate As System.Windows.Forms.Button
-    Friend WithEvents CheckBox2 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox1 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox3 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox6 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox5 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox4 As System.Windows.Forms.CheckBox
-    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
-    Friend WithEvents Label10 As System.Windows.Forms.Label
-    Friend WithEvents Label9 As System.Windows.Forms.Label
+    Friend WithEvents chkBioChronic As System.Windows.Forms.CheckBox
+    Friend WithEvents chkBioAcute As System.Windows.Forms.CheckBox
+    Friend WithEvents chkBioAmmonia As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNonBioCustom1 As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNonBioChronic As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNonBioAcute As System.Windows.Forms.CheckBox
+    Friend WithEvents txtNonBioCustomReturn1 As System.Windows.Forms.TextBox
+    Friend WithEvents lblNonBioReturn As System.Windows.Forms.Label
+    Friend WithEvents lblNonBioNday As System.Windows.Forms.Label
     Friend WithEvents Label8 As System.Windows.Forms.Label
-    Friend WithEvents CheckBox9 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox8 As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBox7 As System.Windows.Forms.CheckBox
-    Friend WithEvents TextBox2 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox3 As System.Windows.Forms.TextBox
+    Friend WithEvents chkNonBioFlowPercentile As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNonBioExplicitFlow As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNonBioCustom2 As System.Windows.Forms.CheckBox
+    Friend WithEvents txtNonBioCustomNday2 As System.Windows.Forms.TextBox
+    Friend WithEvents txtNonBioCustomReturn2 As System.Windows.Forms.TextBox
     Friend WithEvents btnNDayGraph As System.Windows.Forms.Button
     Friend WithEvents btnFrequencyReport As System.Windows.Forms.Button
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
-    Friend WithEvents CheckBox10 As System.Windows.Forms.CheckBox
+    Friend WithEvents groupGraph As System.Windows.Forms.GroupBox
+    Friend WithEvents chkNonBioHarmonicMean As System.Windows.Forms.CheckBox
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSWSTAT))
         Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
-        Me.mnuFile = New System.Windows.Forms.MenuItem
-        Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
-        Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-        Me.mnuHelp = New System.Windows.Forms.MenuItem
-        Me.tabMain = New System.Windows.Forms.TabControl
-        Me.tabSelectDates = New System.Windows.Forms.TabPage
-        Me.gbTextOutput = New System.Windows.Forms.GroupBox
-        Me.txtOutputDir = New System.Windows.Forms.TextBox
-        Me.lblOutputDir = New System.Windows.Forms.Label
-        Me.txtOutputRootName = New System.Windows.Forms.TextBox
-        Me.lblBaseFilename = New System.Windows.Forms.Label
-        Me.grpHighLow = New System.Windows.Forms.GroupBox
-        Me.radioHigh = New System.Windows.Forms.RadioButton
-        Me.radioLow = New System.Windows.Forms.RadioButton
-        Me.btnDisplayBasic = New System.Windows.Forms.Button
-        Me.grpDates = New System.Windows.Forms.GroupBox
-        Me.cboStartMonth = New System.Windows.Forms.ComboBox
-        Me.lblYearStart = New System.Windows.Forms.Label
-        Me.txtEndDay = New System.Windows.Forms.TextBox
-        Me.txtStartDay = New System.Windows.Forms.TextBox
-        Me.cboEndMonth = New System.Windows.Forms.ComboBox
-        Me.lblYearEnd = New System.Windows.Forms.Label
-        Me.grpYears = New System.Windows.Forms.GroupBox
-        Me.lblDataStart = New System.Windows.Forms.Label
-        Me.lblDataEnd = New System.Windows.Forms.Label
-        Me.lblOmitBefore = New System.Windows.Forms.Label
-        Me.lblOmitAfter = New System.Windows.Forms.Label
-        Me.txtOmitAfterYear = New System.Windows.Forms.TextBox
-        Me.txtOmitBeforeYear = New System.Windows.Forms.TextBox
-        Me.cboYears = New System.Windows.Forms.ComboBox
-        Me.tabNDay = New System.Windows.Forms.TabPage
-        Me.chkMultipleStationPlots = New System.Windows.Forms.CheckBox
-        Me.chkMultipleNDayPlots = New System.Windows.Forms.CheckBox
-        Me.btnFrequencyGraph = New System.Windows.Forms.Button
-        Me.chkLog = New System.Windows.Forms.CheckBox
-        Me.panelNdayTrendFrequency = New System.Windows.Forms.Panel
-        Me.grpRecurrence = New System.Windows.Forms.GroupBox
-        Me.btnRecurrenceDefault = New System.Windows.Forms.Button
-        Me.btnRecurrenceRemove = New System.Windows.Forms.Button
-        Me.lstRecurrence = New System.Windows.Forms.ListBox
-        Me.btnRecurrenceAdd = New System.Windows.Forms.Button
-        Me.txtRecurrenceAdd = New System.Windows.Forms.TextBox
-        Me.btnRecurrenceNone = New System.Windows.Forms.Button
-        Me.btnRecurrenceAll = New System.Windows.Forms.Button
-        Me.Splitter1 = New System.Windows.Forms.Splitter
-        Me.grpNday = New System.Windows.Forms.GroupBox
-        Me.btnNdayDefault = New System.Windows.Forms.Button
-        Me.btnNdayRemove = New System.Windows.Forms.Button
-        Me.btnNdayAdd = New System.Windows.Forms.Button
-        Me.txtNdayAdd = New System.Windows.Forms.TextBox
-        Me.btnNdayNone = New System.Windows.Forms.Button
-        Me.btnNdayAll = New System.Windows.Forms.Button
-        Me.lstNday = New System.Windows.Forms.ListBox
-        Me.btnFrequencyGrid = New System.Windows.Forms.Button
-        Me.btnScreeningTests = New System.Windows.Forms.Button
-        Me.btnNDayList = New System.Windows.Forms.Button
-        Me.tabDFLOW = New System.Windows.Forms.TabPage
-        Me.btnCalculate = New System.Windows.Forms.Button
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox
-        Me.tbNonBio3 = New System.Windows.Forms.TextBox
-        Me.tbNonBio4 = New System.Windows.Forms.TextBox
-        Me.tbNonBio2 = New System.Windows.Forms.TextBox
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.Label6 = New System.Windows.Forms.Label
-        Me.tbNonBio1 = New System.Windows.Forms.TextBox
-        Me.gbBio = New System.Windows.Forms.GroupBox
-        Me.tbBio3 = New System.Windows.Forms.TextBox
-        Me.tbBio4 = New System.Windows.Forms.TextBox
-        Me.tbBio2 = New System.Windows.Forms.TextBox
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.tbBio1 = New System.Windows.Forms.TextBox
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.ckbBio = New System.Windows.Forms.CheckBox
-        Me.CheckBox1 = New System.Windows.Forms.CheckBox
-        Me.CheckBox2 = New System.Windows.Forms.CheckBox
-        Me.CheckBox3 = New System.Windows.Forms.CheckBox
-        Me.Label9 = New System.Windows.Forms.Label
-        Me.Label10 = New System.Windows.Forms.Label
-        Me.Label8 = New System.Windows.Forms.Label
-        Me.CheckBox4 = New System.Windows.Forms.CheckBox
-        Me.TextBox1 = New System.Windows.Forms.TextBox
-        Me.CheckBox5 = New System.Windows.Forms.CheckBox
-        Me.CheckBox6 = New System.Windows.Forms.CheckBox
-        Me.CheckBox8 = New System.Windows.Forms.CheckBox
-        Me.CheckBox9 = New System.Windows.Forms.CheckBox
-        Me.CheckBox7 = New System.Windows.Forms.CheckBox
-        Me.TextBox2 = New System.Windows.Forms.TextBox
-        Me.TextBox3 = New System.Windows.Forms.TextBox
-        Me.btnNDayGraph = New System.Windows.Forms.Button
-        Me.btnFrequencyReport = New System.Windows.Forms.Button
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.CheckBox10 = New System.Windows.Forms.CheckBox
+        Me.mnuFile = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSelectData = New System.Windows.Forms.MenuItem()
+        Me.mnuAnalysis = New System.Windows.Forms.MenuItem()
+        Me.mnuHelp = New System.Windows.Forms.MenuItem()
+        Me.tabMain = New System.Windows.Forms.TabControl()
+        Me.tabSelectDates = New System.Windows.Forms.TabPage()
+        Me.gbTextOutput = New System.Windows.Forms.GroupBox()
+        Me.txtOutputDir = New System.Windows.Forms.TextBox()
+        Me.lblOutputDir = New System.Windows.Forms.Label()
+        Me.txtOutputRootName = New System.Windows.Forms.TextBox()
+        Me.lblBaseFilename = New System.Windows.Forms.Label()
+        Me.grpHighLow = New System.Windows.Forms.GroupBox()
+        Me.radioHigh = New System.Windows.Forms.RadioButton()
+        Me.radioLow = New System.Windows.Forms.RadioButton()
+        Me.btnDisplayBasic = New System.Windows.Forms.Button()
+        Me.grpDates = New System.Windows.Forms.GroupBox()
+        Me.cboStartMonth = New System.Windows.Forms.ComboBox()
+        Me.lblYearStart = New System.Windows.Forms.Label()
+        Me.txtEndDay = New System.Windows.Forms.TextBox()
+        Me.txtStartDay = New System.Windows.Forms.TextBox()
+        Me.cboEndMonth = New System.Windows.Forms.ComboBox()
+        Me.lblYearEnd = New System.Windows.Forms.Label()
+        Me.grpYears = New System.Windows.Forms.GroupBox()
+        Me.lblDataStart = New System.Windows.Forms.Label()
+        Me.lblDataEnd = New System.Windows.Forms.Label()
+        Me.lblOmitBefore = New System.Windows.Forms.Label()
+        Me.lblOmitAfter = New System.Windows.Forms.Label()
+        Me.txtOmitAfterYear = New System.Windows.Forms.TextBox()
+        Me.txtOmitBeforeYear = New System.Windows.Forms.TextBox()
+        Me.cboYears = New System.Windows.Forms.ComboBox()
+        Me.tabNDay = New System.Windows.Forms.TabPage()
+        Me.groupGraph = New System.Windows.Forms.GroupBox()
+        Me.btnNDayGraph = New System.Windows.Forms.Button()
+        Me.btnFrequencyGraph = New System.Windows.Forms.Button()
+        Me.chkMultipleNDayPlots = New System.Windows.Forms.CheckBox()
+        Me.chkMultipleStationPlots = New System.Windows.Forms.CheckBox()
+        Me.btnFrequencyReport = New System.Windows.Forms.Button()
+        Me.chkLog = New System.Windows.Forms.CheckBox()
+        Me.panelNdayTrendFrequency = New System.Windows.Forms.Panel()
+        Me.grpRecurrence = New System.Windows.Forms.GroupBox()
+        Me.btnRecurrenceDefault = New System.Windows.Forms.Button()
+        Me.btnRecurrenceRemove = New System.Windows.Forms.Button()
+        Me.lstRecurrence = New System.Windows.Forms.ListBox()
+        Me.btnRecurrenceAdd = New System.Windows.Forms.Button()
+        Me.txtRecurrenceAdd = New System.Windows.Forms.TextBox()
+        Me.btnRecurrenceNone = New System.Windows.Forms.Button()
+        Me.btnRecurrenceAll = New System.Windows.Forms.Button()
+        Me.Splitter1 = New System.Windows.Forms.Splitter()
+        Me.grpNday = New System.Windows.Forms.GroupBox()
+        Me.btnNdayDefault = New System.Windows.Forms.Button()
+        Me.btnNdayRemove = New System.Windows.Forms.Button()
+        Me.btnNdayAdd = New System.Windows.Forms.Button()
+        Me.txtNdayAdd = New System.Windows.Forms.TextBox()
+        Me.btnNdayNone = New System.Windows.Forms.Button()
+        Me.btnNdayAll = New System.Windows.Forms.Button()
+        Me.lstNday = New System.Windows.Forms.ListBox()
+        Me.btnFrequencyGrid = New System.Windows.Forms.Button()
+        Me.btnScreeningTests = New System.Windows.Forms.Button()
+        Me.btnNDayList = New System.Windows.Forms.Button()
+        Me.tabDFLOW = New System.Windows.Forms.TabPage()
+        Me.btnCalculate = New System.Windows.Forms.Button()
+        Me.groupNonBio = New System.Windows.Forms.GroupBox()
+        Me.chkNonBioHarmonicMean = New System.Windows.Forms.CheckBox()
+        Me.chkNonBioCustom2 = New System.Windows.Forms.CheckBox()
+        Me.txtNonBioCustomNday2 = New System.Windows.Forms.TextBox()
+        Me.txtNonBioCustomReturn2 = New System.Windows.Forms.TextBox()
+        Me.chkNonBioFlowPercentile = New System.Windows.Forms.CheckBox()
+        Me.chkNonBioExplicitFlow = New System.Windows.Forms.CheckBox()
+        Me.chkNonBioCustom1 = New System.Windows.Forms.CheckBox()
+        Me.chkNonBioChronic = New System.Windows.Forms.CheckBox()
+        Me.chkNonBioAcute = New System.Windows.Forms.CheckBox()
+        Me.lblNonBioReturn = New System.Windows.Forms.Label()
+        Me.txtNonBioCustomNday1 = New System.Windows.Forms.TextBox()
+        Me.txtNonBioCustomReturn1 = New System.Windows.Forms.TextBox()
+        Me.lblNonBioNday = New System.Windows.Forms.Label()
+        Me.txtNonBioExplicitFlow = New System.Windows.Forms.TextBox()
+        Me.txtNonBioFlowPercentile = New System.Windows.Forms.TextBox()
+        Me.lblNonBioExplicitFlowUnits = New System.Windows.Forms.Label()
+        Me.lblNonBioFlowPercentileUnits = New System.Windows.Forms.Label()
+        Me.groupBio = New System.Windows.Forms.GroupBox()
+        Me.chkBioAmmonia = New System.Windows.Forms.CheckBox()
+        Me.chkBioAcute = New System.Windows.Forms.CheckBox()
+        Me.txtBioExcursionDays = New System.Windows.Forms.TextBox()
+        Me.txtBioExcursionsPerCluster = New System.Windows.Forms.TextBox()
+        Me.txtBioYearsBetween = New System.Windows.Forms.TextBox()
+        Me.lblBioExcursionsPerCluster = New System.Windows.Forms.Label()
+        Me.lblBioExcursionDays = New System.Windows.Forms.Label()
+        Me.lblBioYearsBetween = New System.Windows.Forms.Label()
+        Me.txtBioFlowDays = New System.Windows.Forms.TextBox()
+        Me.lblBioFlowDays = New System.Windows.Forms.Label()
+        Me.chkBioCustom = New System.Windows.Forms.CheckBox()
+        Me.chkBioChronic = New System.Windows.Forms.CheckBox()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.tbNonBio2 = New System.Windows.Forms.TextBox()
         Me.tabMain.SuspendLayout()
         Me.tabSelectDates.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
@@ -230,13 +230,13 @@ Public Class frmSWSTAT
         Me.grpDates.SuspendLayout()
         Me.grpYears.SuspendLayout()
         Me.tabNDay.SuspendLayout()
+        Me.groupGraph.SuspendLayout()
         Me.panelNdayTrendFrequency.SuspendLayout()
         Me.grpRecurrence.SuspendLayout()
         Me.grpNday.SuspendLayout()
         Me.tabDFLOW.SuspendLayout()
-        Me.GroupBox2.SuspendLayout()
-        Me.gbBio.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
+        Me.groupNonBio.SuspendLayout()
+        Me.groupBio.SuspendLayout()
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -268,8 +268,8 @@ Public Class frmSWSTAT
         'tabMain
         '
         Me.tabMain.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.tabMain.Controls.Add(Me.tabSelectDates)
         Me.tabMain.Controls.Add(Me.tabNDay)
         Me.tabMain.Controls.Add(Me.tabDFLOW)
@@ -290,7 +290,7 @@ Public Class frmSWSTAT
         Me.tabSelectDates.Location = New System.Drawing.Point(4, 22)
         Me.tabSelectDates.Name = "tabSelectDates"
         Me.tabSelectDates.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabSelectDates.Size = New System.Drawing.Size(435, 390)
+        Me.tabSelectDates.Size = New System.Drawing.Size(515, 497)
         Me.tabSelectDates.TabIndex = 0
         Me.tabSelectDates.Text = "Select Dates"
         Me.tabSelectDates.UseVisualStyleBackColor = True
@@ -298,14 +298,14 @@ Public Class frmSWSTAT
         'gbTextOutput
         '
         Me.gbTextOutput.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.gbTextOutput.Controls.Add(Me.txtOutputDir)
         Me.gbTextOutput.Controls.Add(Me.lblOutputDir)
         Me.gbTextOutput.Controls.Add(Me.txtOutputRootName)
         Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
         Me.gbTextOutput.Location = New System.Drawing.Point(214, 6)
         Me.gbTextOutput.Name = "gbTextOutput"
-        Me.gbTextOutput.Size = New System.Drawing.Size(212, 144)
+        Me.gbTextOutput.Size = New System.Drawing.Size(292, 144)
         Me.gbTextOutput.TabIndex = 73
         Me.gbTextOutput.TabStop = False
         Me.gbTextOutput.Text = "Output"
@@ -314,10 +314,10 @@ Public Class frmSWSTAT
         'txtOutputDir
         '
         Me.txtOutputDir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOutputDir.Location = New System.Drawing.Point(6, 45)
         Me.txtOutputDir.Name = "txtOutputDir"
-        Me.txtOutputDir.Size = New System.Drawing.Size(200, 20)
+        Me.txtOutputDir.Size = New System.Drawing.Size(280, 20)
         Me.txtOutputDir.TabIndex = 12
         '
         'lblOutputDir
@@ -551,7 +551,7 @@ Public Class frmSWSTAT
         'tabNDay
         '
         Me.tabNDay.BackColor = System.Drawing.Color.Transparent
-        Me.tabNDay.Controls.Add(Me.GroupBox1)
+        Me.tabNDay.Controls.Add(Me.groupGraph)
         Me.tabNDay.Controls.Add(Me.btnFrequencyReport)
         Me.tabNDay.Controls.Add(Me.chkLog)
         Me.tabNDay.Controls.Add(Me.panelNdayTrendFrequency)
@@ -566,15 +566,36 @@ Public Class frmSWSTAT
         Me.tabNDay.Text = "N-Day, Trend, Frequency"
         Me.tabNDay.UseVisualStyleBackColor = True
         '
-        'chkMultipleStationPlots
+        'groupGraph
         '
-        Me.chkMultipleStationPlots.AutoSize = True
-        Me.chkMultipleStationPlots.Location = New System.Drawing.Point(15, 100)
-        Me.chkMultipleStationPlots.Name = "chkMultipleStationPlots"
-        Me.chkMultipleStationPlots.Size = New System.Drawing.Size(124, 17)
-        Me.chkMultipleStationPlots.TabIndex = 40
-        Me.chkMultipleStationPlots.Text = "Multiple Station Plots"
-        Me.chkMultipleStationPlots.UseVisualStyleBackColor = True
+        Me.groupGraph.Controls.Add(Me.btnNDayGraph)
+        Me.groupGraph.Controls.Add(Me.btnFrequencyGraph)
+        Me.groupGraph.Controls.Add(Me.chkMultipleNDayPlots)
+        Me.groupGraph.Controls.Add(Me.chkMultipleStationPlots)
+        Me.groupGraph.Location = New System.Drawing.Point(164, 362)
+        Me.groupGraph.Name = "groupGraph"
+        Me.groupGraph.Size = New System.Drawing.Size(160, 127)
+        Me.groupGraph.TabIndex = 43
+        Me.groupGraph.TabStop = False
+        Me.groupGraph.Text = "Graph"
+        '
+        'btnNDayGraph
+        '
+        Me.btnNDayGraph.Location = New System.Drawing.Point(6, 19)
+        Me.btnNDayGraph.Name = "btnNDayGraph"
+        Me.btnNDayGraph.Size = New System.Drawing.Size(140, 23)
+        Me.btnNDayGraph.TabIndex = 41
+        Me.btnNDayGraph.Text = "N-Day Timeseries Graph"
+        Me.btnNDayGraph.UseVisualStyleBackColor = True
+        '
+        'btnFrequencyGraph
+        '
+        Me.btnFrequencyGraph.Location = New System.Drawing.Point(6, 48)
+        Me.btnFrequencyGraph.Name = "btnFrequencyGraph"
+        Me.btnFrequencyGraph.Size = New System.Drawing.Size(140, 23)
+        Me.btnFrequencyGraph.TabIndex = 38
+        Me.btnFrequencyGraph.Text = "Frequency Graph"
+        Me.btnFrequencyGraph.UseVisualStyleBackColor = True
         '
         'chkMultipleNDayPlots
         '
@@ -586,14 +607,25 @@ Public Class frmSWSTAT
         Me.chkMultipleNDayPlots.Text = "Multiple N-Day Plots"
         Me.chkMultipleNDayPlots.UseVisualStyleBackColor = True
         '
-        'btnFrequencyGraph
+        'chkMultipleStationPlots
         '
-        Me.btnFrequencyGraph.Location = New System.Drawing.Point(6, 48)
-        Me.btnFrequencyGraph.Name = "btnFrequencyGraph"
-        Me.btnFrequencyGraph.Size = New System.Drawing.Size(140, 23)
-        Me.btnFrequencyGraph.TabIndex = 38
-        Me.btnFrequencyGraph.Text = "Frequency Graph"
-        Me.btnFrequencyGraph.UseVisualStyleBackColor = True
+        Me.chkMultipleStationPlots.AutoSize = True
+        Me.chkMultipleStationPlots.Location = New System.Drawing.Point(15, 100)
+        Me.chkMultipleStationPlots.Name = "chkMultipleStationPlots"
+        Me.chkMultipleStationPlots.Size = New System.Drawing.Size(124, 17)
+        Me.chkMultipleStationPlots.TabIndex = 40
+        Me.chkMultipleStationPlots.Text = "Multiple Station Plots"
+        Me.chkMultipleStationPlots.UseVisualStyleBackColor = True
+        '
+        'btnFrequencyReport
+        '
+        Me.btnFrequencyReport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnFrequencyReport.Location = New System.Drawing.Point(6, 468)
+        Me.btnFrequencyReport.Name = "btnFrequencyReport"
+        Me.btnFrequencyReport.Size = New System.Drawing.Size(140, 23)
+        Me.btnFrequencyReport.TabIndex = 42
+        Me.btnFrequencyReport.Text = "Frequency Report"
+        Me.btnFrequencyReport.UseVisualStyleBackColor = True
         '
         'chkLog
         '
@@ -611,8 +643,8 @@ Public Class frmSWSTAT
         'panelNdayTrendFrequency
         '
         Me.panelNdayTrendFrequency.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.panelNdayTrendFrequency.Controls.Add(Me.grpRecurrence)
         Me.panelNdayTrendFrequency.Controls.Add(Me.Splitter1)
         Me.panelNdayTrendFrequency.Controls.Add(Me.grpNday)
@@ -661,8 +693,8 @@ Public Class frmSWSTAT
         'lstRecurrence
         '
         Me.lstRecurrence.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstRecurrence.IntegralHeight = False
         Me.lstRecurrence.Location = New System.Drawing.Point(6, 19)
         Me.lstRecurrence.Name = "lstRecurrence"
@@ -683,7 +715,7 @@ Public Class frmSWSTAT
         'txtRecurrenceAdd
         '
         Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 288)
         Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
         Me.txtRecurrenceAdd.Size = New System.Drawing.Size(167, 20)
@@ -765,7 +797,7 @@ Public Class frmSWSTAT
         'txtNdayAdd
         '
         Me.txtNdayAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtNdayAdd.Location = New System.Drawing.Point(6, 288)
         Me.txtNdayAdd.Name = "txtNdayAdd"
         Me.txtNdayAdd.Size = New System.Drawing.Size(54, 20)
@@ -792,8 +824,8 @@ Public Class frmSWSTAT
         'lstNday
         '
         Me.lstNday.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstNday.IntegralHeight = False
         Me.lstNday.Location = New System.Drawing.Point(6, 19)
         Me.lstNday.Name = "lstNday"
@@ -835,8 +867,8 @@ Public Class frmSWSTAT
         'tabDFLOW
         '
         Me.tabDFLOW.Controls.Add(Me.btnCalculate)
-        Me.tabDFLOW.Controls.Add(Me.GroupBox2)
-        Me.tabDFLOW.Controls.Add(Me.gbBio)
+        Me.tabDFLOW.Controls.Add(Me.groupNonBio)
+        Me.tabDFLOW.Controls.Add(Me.groupBio)
         Me.tabDFLOW.Controls.Add(Me.Label8)
         Me.tabDFLOW.Controls.Add(Me.tbNonBio2)
         Me.tabDFLOW.Location = New System.Drawing.Point(4, 22)
@@ -856,252 +888,343 @@ Public Class frmSWSTAT
         Me.btnCalculate.Text = "Calculate"
         Me.btnCalculate.UseVisualStyleBackColor = True
         '
-        'GroupBox2
+        'groupNonBio
         '
-        Me.GroupBox2.Controls.Add(Me.CheckBox10)
-        Me.GroupBox2.Controls.Add(Me.CheckBox7)
-        Me.GroupBox2.Controls.Add(Me.TextBox2)
-        Me.GroupBox2.Controls.Add(Me.TextBox3)
-        Me.GroupBox2.Controls.Add(Me.CheckBox9)
-        Me.GroupBox2.Controls.Add(Me.CheckBox8)
-        Me.GroupBox2.Controls.Add(Me.CheckBox6)
-        Me.GroupBox2.Controls.Add(Me.CheckBox5)
-        Me.GroupBox2.Controls.Add(Me.CheckBox4)
-        Me.GroupBox2.Controls.Add(Me.Label10)
-        Me.GroupBox2.Controls.Add(Me.tbNonBio1)
-        Me.GroupBox2.Controls.Add(Me.TextBox1)
-        Me.GroupBox2.Controls.Add(Me.Label9)
-        Me.GroupBox2.Controls.Add(Me.tbNonBio3)
-        Me.GroupBox2.Controls.Add(Me.tbNonBio4)
-        Me.GroupBox2.Controls.Add(Me.Label5)
-        Me.GroupBox2.Controls.Add(Me.Label6)
-        Me.GroupBox2.Location = New System.Drawing.Point(8, 225)
-        Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(332, 220)
-        Me.GroupBox2.TabIndex = 6
-        Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "Non-Biological Design Flow Parameters"
+        Me.groupNonBio.Controls.Add(Me.chkNonBioHarmonicMean)
+        Me.groupNonBio.Controls.Add(Me.chkNonBioCustom2)
+        Me.groupNonBio.Controls.Add(Me.txtNonBioCustomNday2)
+        Me.groupNonBio.Controls.Add(Me.txtNonBioCustomReturn2)
+        Me.groupNonBio.Controls.Add(Me.chkNonBioFlowPercentile)
+        Me.groupNonBio.Controls.Add(Me.chkNonBioExplicitFlow)
+        Me.groupNonBio.Controls.Add(Me.chkNonBioCustom1)
+        Me.groupNonBio.Controls.Add(Me.chkNonBioChronic)
+        Me.groupNonBio.Controls.Add(Me.chkNonBioAcute)
+        Me.groupNonBio.Controls.Add(Me.lblNonBioReturn)
+        Me.groupNonBio.Controls.Add(Me.txtNonBioCustomNday1)
+        Me.groupNonBio.Controls.Add(Me.txtNonBioCustomReturn1)
+        Me.groupNonBio.Controls.Add(Me.lblNonBioNday)
+        Me.groupNonBio.Controls.Add(Me.txtNonBioExplicitFlow)
+        Me.groupNonBio.Controls.Add(Me.txtNonBioFlowPercentile)
+        Me.groupNonBio.Controls.Add(Me.lblNonBioExplicitFlowUnits)
+        Me.groupNonBio.Controls.Add(Me.lblNonBioFlowPercentileUnits)
+        Me.groupNonBio.Location = New System.Drawing.Point(8, 225)
+        Me.groupNonBio.Name = "groupNonBio"
+        Me.groupNonBio.Size = New System.Drawing.Size(332, 220)
+        Me.groupNonBio.TabIndex = 6
+        Me.groupNonBio.TabStop = False
+        Me.groupNonBio.Text = "Non-Biological Design Flow Parameters"
         '
-        'tbNonBio3
+        'chkNonBioHarmonicMean
         '
-        Me.tbNonBio3.Enabled = False
-        Me.tbNonBio3.Location = New System.Drawing.Point(120, 142)
-        Me.tbNonBio3.Name = "tbNonBio3"
-        Me.tbNonBio3.Size = New System.Drawing.Size(49, 20)
-        Me.tbNonBio3.TabIndex = 11
-        Me.tbNonBio3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.chkNonBioHarmonicMean.AutoSize = True
+        Me.chkNonBioHarmonicMean.Checked = True
+        Me.chkNonBioHarmonicMean.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkNonBioHarmonicMean.Location = New System.Drawing.Point(6, 193)
+        Me.chkNonBioHarmonicMean.Name = "chkNonBioHarmonicMean"
+        Me.chkNonBioHarmonicMean.Size = New System.Drawing.Size(101, 17)
+        Me.chkNonBioHarmonicMean.TabIndex = 28
+        Me.chkNonBioHarmonicMean.Text = "Harmonic Mean"
+        Me.chkNonBioHarmonicMean.UseVisualStyleBackColor = True
         '
-        'tbNonBio4
+        'chkNonBioCustom2
         '
-        Me.tbNonBio4.Enabled = False
-        Me.tbNonBio4.Location = New System.Drawing.Point(120, 168)
-        Me.tbNonBio4.Name = "tbNonBio4"
-        Me.tbNonBio4.Size = New System.Drawing.Size(49, 20)
-        Me.tbNonBio4.TabIndex = 10
-        Me.tbNonBio4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.chkNonBioCustom2.AutoSize = True
+        Me.chkNonBioCustom2.Location = New System.Drawing.Point(6, 118)
+        Me.chkNonBioCustom2.Name = "chkNonBioCustom2"
+        Me.chkNonBioCustom2.Size = New System.Drawing.Size(61, 17)
+        Me.chkNonBioCustom2.TabIndex = 27
+        Me.chkNonBioCustom2.Text = "Custom"
+        Me.chkNonBioCustom2.UseVisualStyleBackColor = True
         '
-        'tbNonBio2
+        'txtNonBioCustomNday2
         '
-        Me.tbNonBio2.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tbNonBio2.Enabled = False
-        Me.tbNonBio2.Location = New System.Drawing.Point(518, 283)
-        Me.tbNonBio2.Name = "tbNonBio2"
-        Me.tbNonBio2.Size = New System.Drawing.Size(46, 20)
-        Me.tbNonBio2.TabIndex = 9
-        Me.tbNonBio2.Text = "10"
-        Me.tbNonBio2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.txtNonBioCustomNday2.Enabled = False
+        Me.txtNonBioCustomNday2.Location = New System.Drawing.Point(120, 116)
+        Me.txtNonBioCustomNday2.Name = "txtNonBioCustomNday2"
+        Me.txtNonBioCustomNday2.Size = New System.Drawing.Size(49, 20)
+        Me.txtNonBioCustomNday2.TabIndex = 25
+        Me.txtNonBioCustomNday2.Text = "30"
+        Me.txtNonBioCustomNday2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'Label5
+        'txtNonBioCustomReturn2
         '
-        Me.Label5.AutoSize = True
-        Me.Label5.Enabled = False
-        Me.Label5.Location = New System.Drawing.Point(172, 145)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(21, 13)
-        Me.Label5.TabIndex = 8
-        Me.Label5.Text = "cfs"
+        Me.txtNonBioCustomReturn2.Enabled = False
+        Me.txtNonBioCustomReturn2.Location = New System.Drawing.Point(175, 116)
+        Me.txtNonBioCustomReturn2.Name = "txtNonBioCustomReturn2"
+        Me.txtNonBioCustomReturn2.Size = New System.Drawing.Size(49, 20)
+        Me.txtNonBioCustomReturn2.TabIndex = 26
+        Me.txtNonBioCustomReturn2.Text = "5"
+        Me.txtNonBioCustomReturn2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'Label6
+        'chkNonBioFlowPercentile
         '
-        Me.Label6.AutoSize = True
-        Me.Label6.Enabled = False
-        Me.Label6.Location = New System.Drawing.Point(175, 171)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(15, 13)
-        Me.Label6.TabIndex = 7
-        Me.Label6.Text = "%"
+        Me.chkNonBioFlowPercentile.AutoSize = True
+        Me.chkNonBioFlowPercentile.Location = New System.Drawing.Point(6, 170)
+        Me.chkNonBioFlowPercentile.Name = "chkNonBioFlowPercentile"
+        Me.chkNonBioFlowPercentile.Size = New System.Drawing.Size(97, 17)
+        Me.chkNonBioFlowPercentile.TabIndex = 24
+        Me.chkNonBioFlowPercentile.Text = "Flow percentile"
+        Me.chkNonBioFlowPercentile.UseVisualStyleBackColor = True
         '
-        'tbNonBio1
+        'chkNonBioExplicitFlow
         '
-        Me.tbNonBio1.Enabled = False
-        Me.tbNonBio1.Location = New System.Drawing.Point(120, 90)
-        Me.tbNonBio1.Name = "tbNonBio1"
-        Me.tbNonBio1.Size = New System.Drawing.Size(49, 20)
-        Me.tbNonBio1.TabIndex = 5
-        Me.tbNonBio1.Text = "30"
-        Me.tbNonBio1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.chkNonBioExplicitFlow.AutoSize = True
+        Me.chkNonBioExplicitFlow.Location = New System.Drawing.Point(6, 147)
+        Me.chkNonBioExplicitFlow.Name = "chkNonBioExplicitFlow"
+        Me.chkNonBioExplicitFlow.Size = New System.Drawing.Size(110, 17)
+        Me.chkNonBioExplicitFlow.TabIndex = 23
+        Me.chkNonBioExplicitFlow.Text = "Explicit flow value"
+        Me.chkNonBioExplicitFlow.UseVisualStyleBackColor = True
         '
-        'gbBio
+        'chkNonBioCustom1
         '
-        Me.gbBio.Controls.Add(Me.CheckBox3)
-        Me.gbBio.Controls.Add(Me.CheckBox1)
-        Me.gbBio.Controls.Add(Me.tbBio3)
-        Me.gbBio.Controls.Add(Me.tbBio4)
-        Me.gbBio.Controls.Add(Me.tbBio2)
-        Me.gbBio.Controls.Add(Me.Label4)
-        Me.gbBio.Controls.Add(Me.Label3)
-        Me.gbBio.Controls.Add(Me.Label2)
-        Me.gbBio.Controls.Add(Me.tbBio1)
-        Me.gbBio.Controls.Add(Me.Label1)
-        Me.gbBio.Controls.Add(Me.ckbBio)
-        Me.gbBio.Controls.Add(Me.CheckBox2)
-        Me.gbBio.Location = New System.Drawing.Point(8, 7)
-        Me.gbBio.Name = "gbBio"
-        Me.gbBio.Size = New System.Drawing.Size(332, 212)
-        Me.gbBio.TabIndex = 5
-        Me.gbBio.TabStop = False
-        Me.gbBio.Text = "Biological Design Flow Parameters"
+        Me.chkNonBioCustom1.AutoSize = True
+        Me.chkNonBioCustom1.Location = New System.Drawing.Point(6, 92)
+        Me.chkNonBioCustom1.Name = "chkNonBioCustom1"
+        Me.chkNonBioCustom1.Size = New System.Drawing.Size(61, 17)
+        Me.chkNonBioCustom1.TabIndex = 19
+        Me.chkNonBioCustom1.Text = "Custom"
+        Me.chkNonBioCustom1.UseVisualStyleBackColor = True
         '
-        'tbBio3
+        'chkNonBioChronic
         '
-        Me.tbBio3.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tbBio3.Enabled = False
-        Me.tbBio3.Location = New System.Drawing.Point(280, 157)
-        Me.tbBio3.Name = "tbBio3"
-        Me.tbBio3.Size = New System.Drawing.Size(46, 20)
-        Me.tbBio3.TabIndex = 11
-        Me.tbBio3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.chkNonBioChronic.AutoSize = True
+        Me.chkNonBioChronic.Location = New System.Drawing.Point(6, 48)
+        Me.chkNonBioChronic.Name = "chkNonBioChronic"
+        Me.chkNonBioChronic.Size = New System.Drawing.Size(263, 17)
+        Me.chkNonBioChronic.TabIndex = 18
+        Me.chkNonBioChronic.Text = "Criterion continuous concentration (chronic, 7Q10)"
+        Me.chkNonBioChronic.UseVisualStyleBackColor = True
         '
-        'tbBio4
+        'chkNonBioAcute
         '
-        Me.tbBio4.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tbBio4.Enabled = False
-        Me.tbBio4.Location = New System.Drawing.Point(280, 183)
-        Me.tbBio4.Name = "tbBio4"
-        Me.tbBio4.Size = New System.Drawing.Size(46, 20)
-        Me.tbBio4.TabIndex = 10
-        Me.tbBio4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.chkNonBioAcute.AutoSize = True
+        Me.chkNonBioAcute.Location = New System.Drawing.Point(6, 25)
+        Me.chkNonBioAcute.Name = "chkNonBioAcute"
+        Me.chkNonBioAcute.Size = New System.Drawing.Size(246, 17)
+        Me.chkNonBioAcute.TabIndex = 17
+        Me.chkNonBioAcute.Text = "Criterion maximum concentration (acute, 1Q10)"
+        Me.chkNonBioAcute.UseVisualStyleBackColor = True
         '
-        'tbBio2
+        'lblNonBioReturn
         '
-        Me.tbBio2.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tbBio2.Enabled = False
-        Me.tbBio2.Location = New System.Drawing.Point(280, 132)
-        Me.tbBio2.Name = "tbBio2"
-        Me.tbBio2.Size = New System.Drawing.Size(46, 20)
-        Me.tbBio2.TabIndex = 9
-        Me.tbBio2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.lblNonBioReturn.AccessibleDescription = "Return period on years with excursions (years)"
+        Me.lblNonBioReturn.AutoSize = True
+        Me.lblNonBioReturn.Location = New System.Drawing.Point(172, 73)
+        Me.lblNonBioReturn.Name = "lblNonBioReturn"
+        Me.lblNonBioReturn.Size = New System.Drawing.Size(39, 13)
+        Me.lblNonBioReturn.TabIndex = 13
+        Me.lblNonBioReturn.Text = "Return"
         '
-        'Label4
+        'txtNonBioCustomNday1
         '
-        Me.Label4.AutoSize = True
-        Me.Label4.Enabled = False
-        Me.Label4.Location = New System.Drawing.Point(27, 186)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(247, 13)
-        Me.Label4.TabIndex = 8
-        Me.Label4.Text = "Average number of excursions counted per cluster:"
+        Me.txtNonBioCustomNday1.Enabled = False
+        Me.txtNonBioCustomNday1.Location = New System.Drawing.Point(120, 90)
+        Me.txtNonBioCustomNday1.Name = "txtNonBioCustomNday1"
+        Me.txtNonBioCustomNday1.Size = New System.Drawing.Size(49, 20)
+        Me.txtNonBioCustomNday1.TabIndex = 5
+        Me.txtNonBioCustomNday1.Text = "30"
+        Me.txtNonBioCustomNday1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'Label3
+        'txtNonBioCustomReturn1
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Enabled = False
-        Me.Label3.Location = New System.Drawing.Point(27, 161)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(214, 13)
-        Me.Label3.TabIndex = 7
-        Me.Label3.Text = "Length of excursion clustering period (days):"
+        Me.txtNonBioCustomReturn1.Enabled = False
+        Me.txtNonBioCustomReturn1.Location = New System.Drawing.Point(175, 90)
+        Me.txtNonBioCustomReturn1.Name = "txtNonBioCustomReturn1"
+        Me.txtNonBioCustomReturn1.Size = New System.Drawing.Size(49, 20)
+        Me.txtNonBioCustomReturn1.TabIndex = 16
+        Me.txtNonBioCustomReturn1.Text = "5"
+        Me.txtNonBioCustomReturn1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'Label2
+        'lblNonBioNday
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Enabled = False
-        Me.Label2.Location = New System.Drawing.Point(27, 136)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(225, 13)
-        Me.Label2.TabIndex = 6
-        Me.Label2.Text = "Average number of years between excursions:"
+        Me.lblNonBioNday.AutoSize = True
+        Me.lblNonBioNday.Location = New System.Drawing.Point(117, 73)
+        Me.lblNonBioNday.Name = "lblNonBioNday"
+        Me.lblNonBioNday.Size = New System.Drawing.Size(37, 13)
+        Me.lblNonBioNday.TabIndex = 12
+        Me.lblNonBioNday.Text = "N-Day"
         '
-        'tbBio1
+        'txtNonBioExplicitFlow
         '
-        Me.tbBio1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tbBio1.Enabled = False
-        Me.tbBio1.Location = New System.Drawing.Point(280, 108)
-        Me.tbBio1.Name = "tbBio1"
-        Me.tbBio1.Size = New System.Drawing.Size(46, 20)
-        Me.tbBio1.TabIndex = 5
-        Me.tbBio1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.txtNonBioExplicitFlow.Enabled = False
+        Me.txtNonBioExplicitFlow.Location = New System.Drawing.Point(120, 142)
+        Me.txtNonBioExplicitFlow.Name = "txtNonBioExplicitFlow"
+        Me.txtNonBioExplicitFlow.Size = New System.Drawing.Size(49, 20)
+        Me.txtNonBioExplicitFlow.TabIndex = 11
+        Me.txtNonBioExplicitFlow.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'Label1
+        'txtNonBioFlowPercentile
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Enabled = False
-        Me.Label1.Location = New System.Drawing.Point(27, 111)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(145, 13)
-        Me.Label1.TabIndex = 4
-        Me.Label1.Text = "Flow averaging period (days):"
+        Me.txtNonBioFlowPercentile.Enabled = False
+        Me.txtNonBioFlowPercentile.Location = New System.Drawing.Point(120, 168)
+        Me.txtNonBioFlowPercentile.Name = "txtNonBioFlowPercentile"
+        Me.txtNonBioFlowPercentile.Size = New System.Drawing.Size(49, 20)
+        Me.txtNonBioFlowPercentile.TabIndex = 10
+        Me.txtNonBioFlowPercentile.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'ckbBio
+        'lblNonBioExplicitFlowUnits
         '
-        Me.ckbBio.AutoSize = True
-        Me.ckbBio.Checked = True
-        Me.ckbBio.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.ckbBio.Location = New System.Drawing.Point(6, 88)
-        Me.ckbBio.Name = "ckbBio"
-        Me.ckbBio.Size = New System.Drawing.Size(61, 17)
-        Me.ckbBio.TabIndex = 0
-        Me.ckbBio.Text = "Custom"
-        Me.ckbBio.UseVisualStyleBackColor = True
+        Me.lblNonBioExplicitFlowUnits.AutoSize = True
+        Me.lblNonBioExplicitFlowUnits.Enabled = False
+        Me.lblNonBioExplicitFlowUnits.Location = New System.Drawing.Point(172, 145)
+        Me.lblNonBioExplicitFlowUnits.Name = "lblNonBioExplicitFlowUnits"
+        Me.lblNonBioExplicitFlowUnits.Size = New System.Drawing.Size(21, 13)
+        Me.lblNonBioExplicitFlowUnits.TabIndex = 8
+        Me.lblNonBioExplicitFlowUnits.Text = "cfs"
         '
-        'CheckBox1
+        'lblNonBioFlowPercentileUnits
         '
-        Me.CheckBox1.AutoSize = True
-        Me.CheckBox1.Location = New System.Drawing.Point(6, 19)
-        Me.CheckBox1.Name = "CheckBox1"
-        Me.CheckBox1.Size = New System.Drawing.Size(239, 17)
-        Me.CheckBox1.TabIndex = 12
-        Me.CheckBox1.Text = "Criterion maximum concentration (acute, 1B3)"
-        Me.CheckBox1.UseVisualStyleBackColor = True
+        Me.lblNonBioFlowPercentileUnits.AutoSize = True
+        Me.lblNonBioFlowPercentileUnits.Enabled = False
+        Me.lblNonBioFlowPercentileUnits.Location = New System.Drawing.Point(175, 171)
+        Me.lblNonBioFlowPercentileUnits.Name = "lblNonBioFlowPercentileUnits"
+        Me.lblNonBioFlowPercentileUnits.Size = New System.Drawing.Size(15, 13)
+        Me.lblNonBioFlowPercentileUnits.TabIndex = 7
+        Me.lblNonBioFlowPercentileUnits.Text = "%"
         '
-        'CheckBox2
+        'groupBio
         '
-        Me.CheckBox2.AutoSize = True
-        Me.CheckBox2.Location = New System.Drawing.Point(6, 42)
-        Me.CheckBox2.Name = "CheckBox2"
-        Me.CheckBox2.Size = New System.Drawing.Size(256, 17)
-        Me.CheckBox2.TabIndex = 13
-        Me.CheckBox2.Text = "Criterion continuous concentration (chronic, 4B3)"
-        Me.CheckBox2.UseVisualStyleBackColor = True
+        Me.groupBio.Controls.Add(Me.chkBioAmmonia)
+        Me.groupBio.Controls.Add(Me.chkBioAcute)
+        Me.groupBio.Controls.Add(Me.txtBioExcursionDays)
+        Me.groupBio.Controls.Add(Me.txtBioExcursionsPerCluster)
+        Me.groupBio.Controls.Add(Me.txtBioYearsBetween)
+        Me.groupBio.Controls.Add(Me.lblBioExcursionsPerCluster)
+        Me.groupBio.Controls.Add(Me.lblBioExcursionDays)
+        Me.groupBio.Controls.Add(Me.lblBioYearsBetween)
+        Me.groupBio.Controls.Add(Me.txtBioFlowDays)
+        Me.groupBio.Controls.Add(Me.lblBioFlowDays)
+        Me.groupBio.Controls.Add(Me.chkBioCustom)
+        Me.groupBio.Controls.Add(Me.chkBioChronic)
+        Me.groupBio.Location = New System.Drawing.Point(8, 7)
+        Me.groupBio.Name = "groupBio"
+        Me.groupBio.Size = New System.Drawing.Size(332, 212)
+        Me.groupBio.TabIndex = 5
+        Me.groupBio.TabStop = False
+        Me.groupBio.Text = "Biological Design Flow Parameters"
         '
-        'CheckBox3
+        'chkBioAmmonia
         '
-        Me.CheckBox3.AutoSize = True
-        Me.CheckBox3.Location = New System.Drawing.Point(6, 65)
-        Me.CheckBox3.Name = "CheckBox3"
-        Me.CheckBox3.Size = New System.Drawing.Size(103, 17)
-        Me.CheckBox3.TabIndex = 14
-        Me.CheckBox3.Text = "Ammonia (30B3)"
-        Me.CheckBox3.UseVisualStyleBackColor = True
+        Me.chkBioAmmonia.AutoSize = True
+        Me.chkBioAmmonia.Location = New System.Drawing.Point(6, 65)
+        Me.chkBioAmmonia.Name = "chkBioAmmonia"
+        Me.chkBioAmmonia.Size = New System.Drawing.Size(103, 17)
+        Me.chkBioAmmonia.TabIndex = 14
+        Me.chkBioAmmonia.Text = "Ammonia (30B3)"
+        Me.chkBioAmmonia.UseVisualStyleBackColor = True
         '
-        'Label9
+        'chkBioAcute
         '
-        Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(117, 73)
-        Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(37, 13)
-        Me.Label9.TabIndex = 12
-        Me.Label9.Text = "N-Day"
+        Me.chkBioAcute.AutoSize = True
+        Me.chkBioAcute.Location = New System.Drawing.Point(6, 19)
+        Me.chkBioAcute.Name = "chkBioAcute"
+        Me.chkBioAcute.Size = New System.Drawing.Size(239, 17)
+        Me.chkBioAcute.TabIndex = 12
+        Me.chkBioAcute.Text = "Criterion maximum concentration (acute, 1B3)"
+        Me.chkBioAcute.UseVisualStyleBackColor = True
         '
-        'Label10
+        'txtBioExcursionDays
         '
-        Me.Label10.AccessibleDescription = "Return period on years with excursions (years)"
-        Me.Label10.AutoSize = True
-        Me.Label10.Location = New System.Drawing.Point(172, 73)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(39, 13)
-        Me.Label10.TabIndex = 13
-        Me.Label10.Text = "Return"
+        Me.txtBioExcursionDays.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtBioExcursionDays.Enabled = False
+        Me.txtBioExcursionDays.Location = New System.Drawing.Point(280, 157)
+        Me.txtBioExcursionDays.Name = "txtBioExcursionDays"
+        Me.txtBioExcursionDays.Size = New System.Drawing.Size(46, 20)
+        Me.txtBioExcursionDays.TabIndex = 11
+        Me.txtBioExcursionDays.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'txtBioExcursionsPerCluster
+        '
+        Me.txtBioExcursionsPerCluster.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtBioExcursionsPerCluster.Enabled = False
+        Me.txtBioExcursionsPerCluster.Location = New System.Drawing.Point(280, 183)
+        Me.txtBioExcursionsPerCluster.Name = "txtBioExcursionsPerCluster"
+        Me.txtBioExcursionsPerCluster.Size = New System.Drawing.Size(46, 20)
+        Me.txtBioExcursionsPerCluster.TabIndex = 10
+        Me.txtBioExcursionsPerCluster.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'txtBioYearsBetween
+        '
+        Me.txtBioYearsBetween.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtBioYearsBetween.Enabled = False
+        Me.txtBioYearsBetween.Location = New System.Drawing.Point(280, 132)
+        Me.txtBioYearsBetween.Name = "txtBioYearsBetween"
+        Me.txtBioYearsBetween.Size = New System.Drawing.Size(46, 20)
+        Me.txtBioYearsBetween.TabIndex = 9
+        Me.txtBioYearsBetween.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'lblBioExcursionsPerCluster
+        '
+        Me.lblBioExcursionsPerCluster.AutoSize = True
+        Me.lblBioExcursionsPerCluster.Enabled = False
+        Me.lblBioExcursionsPerCluster.Location = New System.Drawing.Point(27, 186)
+        Me.lblBioExcursionsPerCluster.Name = "lblBioExcursionsPerCluster"
+        Me.lblBioExcursionsPerCluster.Size = New System.Drawing.Size(247, 13)
+        Me.lblBioExcursionsPerCluster.TabIndex = 8
+        Me.lblBioExcursionsPerCluster.Text = "Average number of excursions counted per cluster:"
+        '
+        'lblBioExcursionDays
+        '
+        Me.lblBioExcursionDays.AutoSize = True
+        Me.lblBioExcursionDays.Enabled = False
+        Me.lblBioExcursionDays.Location = New System.Drawing.Point(27, 161)
+        Me.lblBioExcursionDays.Name = "lblBioExcursionDays"
+        Me.lblBioExcursionDays.Size = New System.Drawing.Size(214, 13)
+        Me.lblBioExcursionDays.TabIndex = 7
+        Me.lblBioExcursionDays.Text = "Length of excursion clustering period (days):"
+        '
+        'lblBioYearsBetween
+        '
+        Me.lblBioYearsBetween.AutoSize = True
+        Me.lblBioYearsBetween.Enabled = False
+        Me.lblBioYearsBetween.Location = New System.Drawing.Point(27, 136)
+        Me.lblBioYearsBetween.Name = "lblBioYearsBetween"
+        Me.lblBioYearsBetween.Size = New System.Drawing.Size(225, 13)
+        Me.lblBioYearsBetween.TabIndex = 6
+        Me.lblBioYearsBetween.Text = "Average number of years between excursions:"
+        '
+        'txtBioFlowDays
+        '
+        Me.txtBioFlowDays.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtBioFlowDays.Enabled = False
+        Me.txtBioFlowDays.Location = New System.Drawing.Point(280, 108)
+        Me.txtBioFlowDays.Name = "txtBioFlowDays"
+        Me.txtBioFlowDays.Size = New System.Drawing.Size(46, 20)
+        Me.txtBioFlowDays.TabIndex = 5
+        Me.txtBioFlowDays.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'lblBioFlowDays
+        '
+        Me.lblBioFlowDays.AutoSize = True
+        Me.lblBioFlowDays.Enabled = False
+        Me.lblBioFlowDays.Location = New System.Drawing.Point(27, 111)
+        Me.lblBioFlowDays.Name = "lblBioFlowDays"
+        Me.lblBioFlowDays.Size = New System.Drawing.Size(145, 13)
+        Me.lblBioFlowDays.TabIndex = 4
+        Me.lblBioFlowDays.Text = "Flow averaging period (days):"
+        '
+        'chkBioCustom
+        '
+        Me.chkBioCustom.AutoSize = True
+        Me.chkBioCustom.Checked = True
+        Me.chkBioCustom.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkBioCustom.Location = New System.Drawing.Point(6, 88)
+        Me.chkBioCustom.Name = "chkBioCustom"
+        Me.chkBioCustom.Size = New System.Drawing.Size(61, 17)
+        Me.chkBioCustom.TabIndex = 0
+        Me.chkBioCustom.Text = "Custom"
+        Me.chkBioCustom.UseVisualStyleBackColor = True
+        '
+        'chkBioChronic
+        '
+        Me.chkBioChronic.AutoSize = True
+        Me.chkBioChronic.Location = New System.Drawing.Point(6, 42)
+        Me.chkBioChronic.Name = "chkBioChronic"
+        Me.chkBioChronic.Size = New System.Drawing.Size(256, 17)
+        Me.chkBioChronic.TabIndex = 13
+        Me.chkBioChronic.Text = "Criterion continuous concentration (chronic, 4B3)"
+        Me.chkBioChronic.UseVisualStyleBackColor = True
         '
         'Label8
         '
@@ -1113,139 +1236,16 @@ Public Class frmSWSTAT
         Me.Label8.TabIndex = 4
         Me.Label8.Text = "Flow averaging period (days):"
         '
-        'CheckBox4
+        'tbNonBio2
         '
-        Me.CheckBox4.AutoSize = True
-        Me.CheckBox4.Location = New System.Drawing.Point(6, 25)
-        Me.CheckBox4.Name = "CheckBox4"
-        Me.CheckBox4.Size = New System.Drawing.Size(246, 17)
-        Me.CheckBox4.TabIndex = 17
-        Me.CheckBox4.Text = "Criterion maximum concentration (acute, 1Q10)"
-        Me.CheckBox4.UseVisualStyleBackColor = True
-        '
-        'TextBox1
-        '
-        Me.TextBox1.Enabled = False
-        Me.TextBox1.Location = New System.Drawing.Point(175, 90)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(49, 20)
-        Me.TextBox1.TabIndex = 16
-        Me.TextBox1.Text = "5"
-        Me.TextBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        '
-        'CheckBox5
-        '
-        Me.CheckBox5.AutoSize = True
-        Me.CheckBox5.Location = New System.Drawing.Point(6, 48)
-        Me.CheckBox5.Name = "CheckBox5"
-        Me.CheckBox5.Size = New System.Drawing.Size(263, 17)
-        Me.CheckBox5.TabIndex = 18
-        Me.CheckBox5.Text = "Criterion continuous concentration (chronic, 7Q10)"
-        Me.CheckBox5.UseVisualStyleBackColor = True
-        '
-        'CheckBox6
-        '
-        Me.CheckBox6.AutoSize = True
-        Me.CheckBox6.Location = New System.Drawing.Point(6, 92)
-        Me.CheckBox6.Name = "CheckBox6"
-        Me.CheckBox6.Size = New System.Drawing.Size(61, 17)
-        Me.CheckBox6.TabIndex = 19
-        Me.CheckBox6.Text = "Custom"
-        Me.CheckBox6.UseVisualStyleBackColor = True
-        '
-        'CheckBox8
-        '
-        Me.CheckBox8.AutoSize = True
-        Me.CheckBox8.Location = New System.Drawing.Point(6, 147)
-        Me.CheckBox8.Name = "CheckBox8"
-        Me.CheckBox8.Size = New System.Drawing.Size(110, 17)
-        Me.CheckBox8.TabIndex = 23
-        Me.CheckBox8.Text = "Explicit flow value"
-        Me.CheckBox8.UseVisualStyleBackColor = True
-        '
-        'CheckBox9
-        '
-        Me.CheckBox9.AutoSize = True
-        Me.CheckBox9.Location = New System.Drawing.Point(6, 170)
-        Me.CheckBox9.Name = "CheckBox9"
-        Me.CheckBox9.Size = New System.Drawing.Size(97, 17)
-        Me.CheckBox9.TabIndex = 24
-        Me.CheckBox9.Text = "Flow percentile"
-        Me.CheckBox9.UseVisualStyleBackColor = True
-        '
-        'CheckBox7
-        '
-        Me.CheckBox7.AutoSize = True
-        Me.CheckBox7.Location = New System.Drawing.Point(6, 118)
-        Me.CheckBox7.Name = "CheckBox7"
-        Me.CheckBox7.Size = New System.Drawing.Size(61, 17)
-        Me.CheckBox7.TabIndex = 27
-        Me.CheckBox7.Text = "Custom"
-        Me.CheckBox7.UseVisualStyleBackColor = True
-        '
-        'TextBox2
-        '
-        Me.TextBox2.Enabled = False
-        Me.TextBox2.Location = New System.Drawing.Point(120, 116)
-        Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(49, 20)
-        Me.TextBox2.TabIndex = 25
-        Me.TextBox2.Text = "30"
-        Me.TextBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        '
-        'TextBox3
-        '
-        Me.TextBox3.Enabled = False
-        Me.TextBox3.Location = New System.Drawing.Point(175, 116)
-        Me.TextBox3.Name = "TextBox3"
-        Me.TextBox3.Size = New System.Drawing.Size(49, 20)
-        Me.TextBox3.TabIndex = 26
-        Me.TextBox3.Text = "5"
-        Me.TextBox3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        '
-        'btnNDayGraph
-        '
-        Me.btnNDayGraph.Location = New System.Drawing.Point(6, 19)
-        Me.btnNDayGraph.Name = "btnNDayGraph"
-        Me.btnNDayGraph.Size = New System.Drawing.Size(140, 23)
-        Me.btnNDayGraph.TabIndex = 41
-        Me.btnNDayGraph.Text = "N-Day Timeseries Graph"
-        Me.btnNDayGraph.UseVisualStyleBackColor = True
-        '
-        'btnFrequencyReport
-        '
-        Me.btnFrequencyReport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnFrequencyReport.Location = New System.Drawing.Point(6, 468)
-        Me.btnFrequencyReport.Name = "btnFrequencyReport"
-        Me.btnFrequencyReport.Size = New System.Drawing.Size(140, 23)
-        Me.btnFrequencyReport.TabIndex = 42
-        Me.btnFrequencyReport.Text = "Frequency Report"
-        Me.btnFrequencyReport.UseVisualStyleBackColor = True
-        '
-        'GroupBox1
-        '
-        Me.GroupBox1.Controls.Add(Me.btnNDayGraph)
-        Me.GroupBox1.Controls.Add(Me.btnFrequencyGraph)
-        Me.GroupBox1.Controls.Add(Me.chkMultipleNDayPlots)
-        Me.GroupBox1.Controls.Add(Me.chkMultipleStationPlots)
-        Me.GroupBox1.Location = New System.Drawing.Point(164, 362)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(160, 127)
-        Me.GroupBox1.TabIndex = 43
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Graph"
-        '
-        'CheckBox10
-        '
-        Me.CheckBox10.AutoSize = True
-        Me.CheckBox10.Checked = True
-        Me.CheckBox10.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox10.Location = New System.Drawing.Point(6, 193)
-        Me.CheckBox10.Name = "CheckBox10"
-        Me.CheckBox10.Size = New System.Drawing.Size(101, 17)
-        Me.CheckBox10.TabIndex = 28
-        Me.CheckBox10.Text = "Harmonic Mean"
-        Me.CheckBox10.UseVisualStyleBackColor = True
+        Me.tbNonBio2.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.tbNonBio2.Enabled = False
+        Me.tbNonBio2.Location = New System.Drawing.Point(518, 283)
+        Me.tbNonBio2.Name = "tbNonBio2"
+        Me.tbNonBio2.Size = New System.Drawing.Size(46, 20)
+        Me.tbNonBio2.TabIndex = 9
+        Me.tbNonBio2.Text = "10"
+        Me.tbNonBio2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'frmSWSTAT
         '
@@ -1268,6 +1268,8 @@ Public Class frmSWSTAT
         Me.grpYears.PerformLayout()
         Me.tabNDay.ResumeLayout(False)
         Me.tabNDay.PerformLayout()
+        Me.groupGraph.ResumeLayout(False)
+        Me.groupGraph.PerformLayout()
         Me.panelNdayTrendFrequency.ResumeLayout(False)
         Me.grpRecurrence.ResumeLayout(False)
         Me.grpRecurrence.PerformLayout()
@@ -1275,12 +1277,10 @@ Public Class frmSWSTAT
         Me.grpNday.PerformLayout()
         Me.tabDFLOW.ResumeLayout(False)
         Me.tabDFLOW.PerformLayout()
-        Me.GroupBox2.ResumeLayout(False)
-        Me.GroupBox2.PerformLayout()
-        Me.gbBio.ResumeLayout(False)
-        Me.gbBio.PerformLayout()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
+        Me.groupNonBio.ResumeLayout(False)
+        Me.groupNonBio.PerformLayout()
+        Me.groupBio.ResumeLayout(False)
+        Me.groupBio.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1410,14 +1410,14 @@ Public Class frmSWSTAT
                     lHaveAnnual = True
                     Dim lConstituent As String = lDataset.Attributes.GetValue("Constituent", "")
                     If lConstituent.Length < 4 Then
-                        Logger.Msg("Dataset #" & lDataset.Attributes.GetValue("ID", "") & " " & lDataset.ToString, _
+                        Logger.Msg("Dataset #" & lDataset.Attributes.GetValue("ID", "") & " " & lDataset.ToString,
                                    "Annual Dataset Missing Constituent")
                     Else
                         Select Case lConstituent.Substring(0, 1).ToUpper
                             Case "L" : lAnnualIsLow = True
                             Case "H" : lAnnualIsHigh = True
                             Case Else
-                                Logger.Msg("Dataset #" & lDataset.Attributes.GetValue("ID", "") & " " & lDataset.ToString, _
+                                Logger.Msg("Dataset #" & lDataset.Attributes.GetValue("ID", "") & " " & lDataset.ToString,
                                            "Annual Dataset Constituent does not start with L or H")
                         End Select
                         Dim lNday As Integer
@@ -1426,7 +1426,7 @@ Public Class frmSWSTAT
                                 lAnnualNday = lNday
                             ElseIf lAnnualNday <> lNday Then
                                 Logger.Msg("Annual datasets with different N-Day cannot be analyzed at the same time." & vbCrLf _
-                                           & "N-Day values of both " & lAnnualNday & " and " & lNday & " were found.", _
+                                           & "N-Day values of both " & lAnnualNday & " and " & lNday & " were found.",
                                            "Incompatible Annual Data Selected")
                             End If
                         End If
@@ -1444,7 +1444,7 @@ Public Class frmSWSTAT
                 grpHighLow.Enabled = False
             Else
                 If lAnnualIsLow Then
-                    Logger.Msg("Low and high annual datasets cannot be analyzed at the same time", _
+                    Logger.Msg("Low and high annual datasets cannot be analyzed at the same time",
                                "Incompatible Annual Data Selected")
                 End If
             End If
@@ -1535,10 +1535,10 @@ Public Class frmSWSTAT
         End If
     End Sub
 
-    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
-                          Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
-                          Optional ByVal aNDayAttributes As Generic.List(Of String) = Nothing, _
-                          Optional ByVal aTrendAttributes As Generic.List(Of String) = Nothing, _
+    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing,
+                          Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing,
+                          Optional ByVal aNDayAttributes As Generic.List(Of String) = Nothing,
+                          Optional ByVal aTrendAttributes As Generic.List(Of String) = Nothing,
                           Optional ByVal aShowForm As Boolean = True)
 
         If aTimeseriesGroup Is Nothing Then
@@ -1577,7 +1577,7 @@ Public Class frmSWSTAT
         End If
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            pDataGroup = atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis", _
+            pDataGroup = atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis",
                                                        pDataGroup, Nothing, True, True, Me.Icon)
         End If
         DFLOWCalcs_Initialize()
@@ -1591,7 +1591,7 @@ Public Class frmSWSTAT
 
     End Sub
 
-    Public Sub Initialize(ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup, _
+    Public Sub Initialize(ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup,
                           ByVal attributes As atcDataAttributes)
 
         'Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
@@ -1658,7 +1658,7 @@ Public Class frmSWSTAT
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis", _
+        atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis",
                                       pDataGroup, Nothing, False, True, Me.Icon)
     End Sub
 
@@ -1898,11 +1898,11 @@ Public Class frmSWSTAT
         Dim lSelectedData As atcTimeseriesGroup = SelectedData()
         If lSelectedData.Count > 0 Then
             If lstNday.SelectedIndices.Count > 0 Then
-                Dim lRankedAnnual As atcTimeseriesGroup = _
-                   clsIDFPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=lSelectedData, _
-                                                                 aNDay:=ListToArray(lstNday), aHighFlag:=radioHigh.Checked, _
-                                                                 aFirstYear:=pFirstYear, aLastYear:=pLastYear, _
-                                                                 aBoundaryMonth:=pYearStartMonth, aBoundaryDay:=pYearStartDay, _
+                Dim lRankedAnnual As atcTimeseriesGroup =
+                   clsIDFPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=lSelectedData,
+                                                                 aNDay:=ListToArray(lstNday), aHighFlag:=radioHigh.Checked,
+                                                                 aFirstYear:=pFirstYear, aLastYear:=pLastYear,
+                                                                 aBoundaryMonth:=pYearStartMonth, aBoundaryDay:=pYearStartDay,
                                                                  aEndMonth:=pYearEndMonth, aEndDay:=pYearEndDay)
                 If lRankedAnnual.Count > 0 Then
                     For Each lTS As atcTimeseries In lRankedAnnual
@@ -2003,7 +2003,7 @@ Public Class frmSWSTAT
         End If
     End Sub
 
-    ''' <summary>Calculate(aOperationName: = "n-day " & HighOrLowString() & " value", _
+    ''' <summary>Calculate(aOperationName: = "n-day "  HighOrLowString()  " value", _
     ''' aReturnPeriods() = ListToArray(lstRecurrence))
     ''' </summary>
     ''' <remarks></remarks>
@@ -2153,7 +2153,7 @@ Public Class frmSWSTAT
         For Each lData As atcDataSet In pDataGroup
             For Each lAttribute As atcDefinedValue In lData.Attributes
                 If Not lAttribute.Arguments Is Nothing Then
-                    If lAttribute.Arguments.ContainsAttribute("Nday") OrElse _
+                    If lAttribute.Arguments.ContainsAttribute("Nday") OrElse
                        lAttribute.Arguments.ContainsAttribute("Return Period") Then
                         lRemoveThese.Add(lAttribute)
                     End If
@@ -2287,15 +2287,15 @@ Public Class frmSWSTAT
         Dim lSelectedData As atcTimeseriesGroup = SelectedData()
         If lSelectedData.Count > 0 Then
             If lstNday.SelectedIndices.Count > 0 Then
-                Dim lRankedAnnual As atcTimeseriesGroup = _
-                   clsIDFPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=lSelectedData, _
-                                                                 aNDay:=ListToArray(lstNday), _
-                                                                 aHighFlag:=radioHigh.Checked, _
-                                                                 aFirstYear:=pFirstYear, _
-                                                                 aLastYear:=pLastYear, _
-                                                                 aBoundaryMonth:=pYearStartMonth, _
-                                                                 aBoundaryDay:=pYearStartDay, _
-                                                                 aEndMonth:=pYearEndMonth, _
+                Dim lRankedAnnual As atcTimeseriesGroup =
+                   clsIDFPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=lSelectedData,
+                                                                 aNDay:=ListToArray(lstNday),
+                                                                 aHighFlag:=radioHigh.Checked,
+                                                                 aFirstYear:=pFirstYear,
+                                                                 aLastYear:=pLastYear,
+                                                                 aBoundaryMonth:=pYearStartMonth,
+                                                                 aBoundaryDay:=pYearStartDay,
+                                                                 aEndMonth:=pYearEndMonth,
                                                                  aEndDay:=pYearEndDay)
                 If lRankedAnnual.Count > 0 Then
                     For Each lTS As atcTimeseries In lRankedAnnual
@@ -2338,9 +2338,9 @@ Public Class frmSWSTAT
             Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
             Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
-            Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup, _
-                                                         aHigh:=radioHigh.Checked, _
-                                                         aNday:=ListToArray(lstNday), _
+            Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
+                                                         aHigh:=radioHigh.Checked,
+                                                         aNday:=ListToArray(lstNday),
                                                          aReturns:=ListToArray(lstRecurrence))
             lFreqForm.SWSTATform = Me
 
@@ -2356,12 +2356,15 @@ Public Class frmSWSTAT
             .Title = "Save Frequency Report As"
             .DefaultExt = ".txt"
             .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
-                Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup, _
-                                                             aHigh:=radioHigh.Checked, _
-                                                             aNday:=ListToArray(lstNday), _
+                Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
+                                                             aHigh:=radioHigh.Checked,
+                                                             aNday:=ListToArray(lstNday),
                                                              aReturns:=ListToArray(lstRecurrence))
                 lFreqForm.Visible = False
 
@@ -2568,100 +2571,101 @@ Public Class frmSWSTAT
 
 #Region "DFLOW"
 
-    Private Sub ckbBio_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ckbBio.CheckedChanged
+    Private Sub chkBioCustom_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkBioCustom.CheckedChanged
         Dim i As Integer
 
-        DFLOWCalcs.fBioDefault = ckbBio.Checked
+        DFLOWCalcs.fBioDefault = chkBioCustom.Checked
 
-        rbBio1.Enabled = DFLOWCalcs.fBioDefault
-        rbBio2.Enabled = DFLOWCalcs.fBioDefault
-        rbBio3.Enabled = DFLOWCalcs.fBioDefault
-
-        tbBio1.Enabled = Not DFLOWCalcs.fBioDefault
-        tbBio2.Enabled = Not DFLOWCalcs.fBioDefault
-        tbBio3.Enabled = Not DFLOWCalcs.fBioDefault
-        tbBio4.Enabled = Not DFLOWCalcs.fBioDefault
-        Label1.Enabled = Not DFLOWCalcs.fBioDefault
-        Label2.Enabled = Not DFLOWCalcs.fBioDefault
-        Label3.Enabled = Not DFLOWCalcs.fBioDefault
-        Label4.Enabled = Not DFLOWCalcs.fBioDefault
+        txtBioFlowDays.Enabled = Not DFLOWCalcs.fBioDefault
+        txtBioYearsBetween.Enabled = Not DFLOWCalcs.fBioDefault
+        txtBioExcursionDays.Enabled = Not DFLOWCalcs.fBioDefault
+        txtBioExcursionsPerCluster.Enabled = Not DFLOWCalcs.fBioDefault
+        lblBioFlowDays.Enabled = Not DFLOWCalcs.fBioDefault
+        lblBioYearsBetween.Enabled = Not DFLOWCalcs.fBioDefault
+        lblBioExcursionDays.Enabled = Not DFLOWCalcs.fBioDefault
+        lblBioExcursionsPerCluster.Enabled = Not DFLOWCalcs.fBioDefault
 
         If DFLOWCalcs.fBioDefault Then
-            tbBio1.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 0)
-            tbBio2.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 1)
-            tbBio3.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
-            tbBio4.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
+            txtBioFlowDays.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 0)
+            txtBioYearsBetween.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 1)
+            txtBioExcursionDays.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
+            txtBioExcursionsPerCluster.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
         Else
             For i = 0 To 3
                 If DFLOWCalcs.fBioFPArray(3, i) < 0 Then
                     DFLOWCalcs.fBioFPArray(3, i) = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, i)
                 End If
             Next
-            tbBio1.Text = DFLOWCalcs.fBioFPArray(3, 0)
-            tbBio2.Text = DFLOWCalcs.fBioFPArray(3, 1)
-            tbBio3.Text = DFLOWCalcs.fBioFPArray(3, 2)
-            tbBio4.Text = DFLOWCalcs.fBioFPArray(3, 3)
+            txtBioFlowDays.Text = DFLOWCalcs.fBioFPArray(3, 0)
+            txtBioYearsBetween.Text = DFLOWCalcs.fBioFPArray(3, 1)
+            txtBioExcursionDays.Text = DFLOWCalcs.fBioFPArray(3, 2)
+            txtBioExcursionsPerCluster.Text = DFLOWCalcs.fBioFPArray(3, 3)
         End If
 
-        If pBatch AndAlso pAttributes IsNot Nothing Then
-            If DFLOWCalcs.fBioDefault Then
-                Dim lParams() As Integer = Nothing
-                If rbBio1.Checked Then
-                    lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString, Nothing)
-                ElseIf rbBio2.Checked Then
-                    lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString, Nothing)
-                ElseIf rbBio3.Checked Then
-                    lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString, Nothing)
-                End If
-                If lParams IsNot Nothing Then
-                    lParams(0) = DFLOWCalcs.fBioPeriod
-                    lParams(1) = DFLOWCalcs.fBioYears
-                    lParams(2) = DFLOWCalcs.fBioCluster
-                    lParams(3) = DFLOWCalcs.fBioExcursions
-                End If
-            End If
-        End If
+        'If pBatch AndAlso pAttributes IsNot Nothing Then
+        '    If DFLOWCalcs.fBioDefault Then
+        '        Dim lParams() As Integer = Nothing
+        '        If rbBio1.Checked Then
+        '            lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString, Nothing)
+        '        ElseIf rbBio2.Checked Then
+        '            lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString, Nothing)
+        '        ElseIf rbBio3.Checked Then
+        '            lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString, Nothing)
+        '        End If
+        '        If lParams IsNot Nothing Then
+        '            lParams(0) = DFLOWCalcs.fBioPeriod
+        '            lParams(1) = DFLOWCalcs.fBioYears
+        '            lParams(2) = DFLOWCalcs.fBioCluster
+        '            lParams(3) = DFLOWCalcs.fBioExcursions
+        '        End If
+        '    End If
+        'End If
     End Sub
 
-    Private Sub rbBio1_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        If rbBio1.Checked Then
+    Private Sub chkBio_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
+            chkBioAcute.CheckedChanged, chkBioChronic.CheckedChanged, chkBioAmmonia.CheckedChanged
+        If chkBioAcute.Checked Then
             DFLOWCalcs.fBioType = 0
-        ElseIf rbBio2.Checked Then
+        ElseIf chkBioChronic.Checked Then
             DFLOWCalcs.fBioType = 1
-        Else
+        ElseIf chkBioAmmonia.Checked Then
             DFLOWCalcs.fBioType = 2
+        Else
+            Exit Sub
         End If
+
         If pBatch AndAlso pAttributes IsNot Nothing Then
             Dim lParams() As Integer = Nothing
-            If rbBio1.Checked Then
+            If chkBioAcute.Checked Then
                 lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString())
                 pAttributes.SetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration)
-            ElseIf rbBio2.Checked Then
+            ElseIf chkBioChronic.Checked Then
                 lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString())
                 pAttributes.SetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration)
-            ElseIf rbBio3.Checked Then
+            ElseIf chkBioAmmonia.Checked Then
                 lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString())
                 pAttributes.SetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia)
             End If
             If lParams IsNot Nothing Then
-                tbBio1.Text = lParams(0).ToString()
-                tbBio2.Text = lParams(1).ToString()
-                tbBio3.Text = lParams(2).ToString()
-                tbBio4.Text = lParams(3).ToString()
+                txtBioFlowDays.Text = lParams(0).ToString()
+                txtBioYearsBetween.Text = lParams(1).ToString()
+                txtBioExcursionDays.Text = lParams(2).ToString()
+                txtBioExcursionsPerCluster.Text = lParams(3).ToString()
             End If
         Else
-            tbBio1.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 0)
-            tbBio2.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 1)
-            tbBio3.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
-            tbBio4.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
+            txtBioFlowDays.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 0)
+            txtBioYearsBetween.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 1)
+            txtBioExcursionDays.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
+            txtBioExcursionsPerCluster.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
         End If
     End Sub
+
     ' Boolean flag used to determine when a character other than a number is entered.
     Private nonNumberEntered As Boolean = False
 
     ' Handle the KeyDown event to determine the type of character entered into the control.
     Private Sub textBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) _
-         Handles tbBio1.KeyDown, tbBio2.KeyDown, tbBio3.KeyDown, tbBio4.KeyDown, tbNonBio1.KeyDown, tbNonBio2.KeyDown, tbNonBio4.KeyDown
+         Handles txtBioFlowDays.KeyDown, txtBioYearsBetween.KeyDown, txtBioExcursionDays.KeyDown, txtBioExcursionsPerCluster.KeyDown, txtNonBioCustomNday1.KeyDown, tbNonBio2.KeyDown, txtNonBioFlowPercentile.KeyDown
         ' Initialize the flag to false.
         nonNumberEntered = False
 
@@ -2678,7 +2682,7 @@ Public Class frmSWSTAT
             End If
         End If
     End Sub 'textBox1_KeyDown
-    Private Sub textBox2_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles tbNonBio3.KeyDown
+    Private Sub textBox2_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txtNonBioExplicitFlow.KeyDown
         ' Initialize the flag to false.
         nonNumberEntered = False
 
@@ -2701,7 +2705,7 @@ Public Class frmSWSTAT
     ' This event occurs after the KeyDown event and can be used 
     ' to prevent characters from entering the control.
     Private Sub textBox_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) _
-        Handles tbBio1.KeyPress, tbBio2.KeyPress, tbBio3.KeyPress, tbBio4.KeyPress, tbNonBio1.KeyPress, tbNonBio2.KeyPress, tbNonBio4.KeyPress, tbNonBio3.KeyPress
+        Handles txtBioFlowDays.KeyPress, txtBioYearsBetween.KeyPress, txtBioExcursionDays.KeyPress, txtBioExcursionsPerCluster.KeyPress, txtNonBioCustomNday1.KeyPress, tbNonBio2.KeyPress, txtNonBioFlowPercentile.KeyPress, txtNonBioExplicitFlow.KeyPress
 
         ' Check for the flag being set in the KeyDown event.
         If nonNumberEntered = True Then
@@ -2710,45 +2714,49 @@ Public Class frmSWSTAT
         End If
     End Sub 'textBox1_KeyPress
 
-    Private Sub rbNonBio1_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Private Sub chkNonBioAcute_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkNonBioAcute.CheckedChanged, chkNonBioChronic.CheckedChanged
 
-        If rbNonBio1.Checked Then
-            DFLOWCalcs.fNonBioType = 0
-        ElseIf rbNonBio2.Checked Then
-            DFLOWCalcs.fNonBioType = 1
-        Else
-            DFLOWCalcs.fNonBioType = 2
+        DFLOWCalcs.fNonBioType.Clear()
+
+        If chkNonBioAcute.Checked Then
+            DFLOWCalcs.fNonBioType.Add(0)
         End If
-        Label7.Enabled = rbNonBio1.Checked
-        Label8.Enabled = rbNonBio1.Checked
-        tbNonBio1.Enabled = rbNonBio1.Checked
-        tbNonBio2.Enabled = rbNonBio1.Checked
+        If chkNonBioChronic.Checked Then
+            DFLOWCalcs.fNonBioType.Add(1)
+        End If
+        If chkNonBioExplicitFlow.Checked Then
+            DFLOWCalcs.fNonBioType.Add(2)
+        End If
+        'Label7.Enabled = chkNonBioAcute.Checked
+        Label8.Enabled = chkNonBioAcute.Checked
+        txtNonBioCustomNday1.Enabled = chkNonBioAcute.Checked
+        tbNonBio2.Enabled = chkNonBioAcute.Checked
 
-        Label5.Enabled = rbNonBio2.Checked
-        tbNonBio3.Enabled = rbNonBio2.Checked
+        lblNonBioExplicitFlowUnits.Enabled = chkNonBioChronic.Checked
+        txtNonBioExplicitFlow.Enabled = chkNonBioChronic.Checked
 
-        Label6.Enabled = rbNonBio3.Checked
-        tbNonBio4.Enabled = rbNonBio3.Checked
+        lblNonBioFlowPercentileUnits.Enabled = chkNonBioFlowPercentile.Checked
+        txtNonBioFlowPercentile.Enabled = chkNonBioFlowPercentile.Checked
 
         If pBatch AndAlso pAttributes IsNot Nothing Then
-            If rbNonBio1.Checked Then
+            If chkNonBioAcute.Checked Then
                 pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Hydrological)
                 'Dim lParams() As Integer = pAttributes.GetValue(InputNames.EDFlowType.Hydrological.ToString(), Nothing)
                 'If lParams IsNot Nothing AndAlso lParams.Length = 2 Then
                 '    tbNonBio1.Text = lParams(0).ToString()
                 '    tbNonBio2.Text = lParams(1).ToString()
                 'End If
-            ElseIf rbNonBio2.Checked Then
+            ElseIf chkNonBioChronic.Checked Then
                 pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value)
                 'Dim lflowval As Double = pAttributes.GetValue(InputNames.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
                 'tbNonBio3.Text = lflowval.ToString()
-            ElseIf rbNonBio3.Checked Then
+            ElseIf chkNonBioFlowPercentile.Checked Then
                 pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile)
                 'Dim lflowPct As Double = pAttributes.GetValue(InputNames.EDFlowType.Flow_Percentile.ToString(), 0.1)
                 'tbNonBio4.Text = lflowPct.ToString()
             End If
         Else
-            If rbNonBio1.Checked Then
+            If chkNonBioAcute.Checked Then
                 If pAttributes IsNot Nothing Then pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Hydrological)
                 Dim lAvgPeriod As Integer
                 Dim lReturnPeriod As Integer
@@ -2765,9 +2773,9 @@ Public Class frmSWSTAT
                     lAvgPeriod = DFLOWAnalysis.DFLOWCalcs.fAveragingPeriod
                     lReturnPeriod = DFLOWAnalysis.DFLOWCalcs.fReturnPeriod
                 End If
-                tbNonBio1.Text = lAvgPeriod.ToString()
+                txtNonBioCustomNday1.Text = lAvgPeriod.ToString()
                 tbNonBio2.Text = lReturnPeriod.ToString()
-            ElseIf rbNonBio2.Checked Then
+            ElseIf chkNonBioChronic.Checked Then
                 If pAttributes IsNot Nothing Then pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value)
                 Dim lflowval As Double
                 If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString()) Then
@@ -2775,8 +2783,8 @@ Public Class frmSWSTAT
                 Else
                     lflowval = DFLOWAnalysis.DFLOWCalcs.fExplicitFlow
                 End If
-                tbNonBio3.Text = lflowval.ToString()
-            ElseIf rbNonBio3.Checked Then
+                txtNonBioExplicitFlow.Text = lflowval.ToString()
+            ElseIf chkNonBioFlowPercentile.Checked Then
                 If pAttributes IsNot Nothing Then pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile)
                 Dim lflowPct As Double
                 If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString()) Then
@@ -2784,13 +2792,13 @@ Public Class frmSWSTAT
                 Else
                     lflowPct = DFLOWAnalysis.DFLOWCalcs.fPercentile
                 End If
-                tbNonBio4.Text = lflowPct.ToString()
+                txtNonBioFlowPercentile.Text = lflowPct.ToString()
             End If
         End If
     End Sub
 
-    Private Sub tbNonBio1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbNonBio1.TextChanged
-        If IsNumeric(tbNonBio1.Text) AndAlso Integer.TryParse(tbNonBio1.Text, DFLOWCalcs.fAveragingPeriod) Then
+    Private Sub tbNonBio1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtNonBioCustomNday1.TextChanged
+        If IsNumeric(txtNonBioCustomNday1.Text) AndAlso Integer.TryParse(txtNonBioCustomNday1.Text, DFLOWCalcs.fAveragingPeriod) Then
             Dim lParams() As Integer = GetSavedParams(False)
             If lParams IsNot Nothing AndAlso lParams.Length = 2 Then
                 lParams(0) = DFLOWCalcs.fAveragingPeriod
@@ -2805,53 +2813,53 @@ Public Class frmSWSTAT
             End If
         End If
     End Sub
-    Private Sub tbNonBio3_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbNonBio3.TextChanged
-        If IsNumeric(tbNonBio3.Text) AndAlso Double.TryParse(tbNonBio3.Text, DFLOWCalcs.fExplicitFlow) AndAlso DFLOWCalcs.fExplicitFlow > 0 Then
+    Private Sub tbNonBio3_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtNonBioExplicitFlow.TextChanged
+        If IsNumeric(txtNonBioExplicitFlow.Text) AndAlso Double.TryParse(txtNonBioExplicitFlow.Text, DFLOWCalcs.fExplicitFlow) AndAlso DFLOWCalcs.fExplicitFlow > 0 Then
             Dim lNewValue As Double = GetSavedParams(False, DFLOWCalcs.fExplicitFlow)
         End If
     End Sub
-    Private Sub tbNonBio4_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbNonBio4.TextChanged
-        If IsNumeric(tbNonBio4.Text) AndAlso Double.TryParse(tbNonBio4.Text, DFLOWCalcs.fPercentile) AndAlso DFLOWCalcs.fPercentile > 0 Then
+    Private Sub tbNonBio4_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtNonBioFlowPercentile.TextChanged
+        If IsNumeric(txtNonBioFlowPercentile.Text) AndAlso Double.TryParse(txtNonBioFlowPercentile.Text, DFLOWCalcs.fPercentile) AndAlso DFLOWCalcs.fPercentile > 0 Then
             Dim lNewValue As Double = GetSavedParams(False, DFLOWCalcs.fPercentile)
         End If
     End Sub
 
-    Private Sub tbBio1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbBio1.TextChanged
-        If IsNumeric(tbBio1.Text) AndAlso Integer.TryParse(tbBio1.Text, DFLOWCalcs.fBioFPArray(3, 0)) Then
+    Private Sub tbBio1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtBioFlowDays.TextChanged
+        If IsNumeric(txtBioFlowDays.Text) AndAlso Integer.TryParse(txtBioFlowDays.Text, DFLOWCalcs.fBioFPArray(3, 0)) Then
             'fBioFPArray(3, 0) = tbBio1.Text
             Dim lParams() As Integer = GetSavedParams()
             If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
-                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P0FlowAveragingPeriodDays) = Integer.Parse(tbBio1.Text)
+                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P0FlowAveragingPeriodDays) = Integer.Parse(txtBioFlowDays.Text)
                 pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
             End If
         End If
     End Sub
-    Private Sub tbBio2_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbBio2.TextChanged
-        If IsNumeric(tbBio2.Text) AndAlso Integer.TryParse(tbBio2.Text, DFLOWCalcs.fBioFPArray(3, 1)) Then
+    Private Sub tbBio2_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtBioYearsBetween.TextChanged
+        If IsNumeric(txtBioYearsBetween.Text) AndAlso Integer.TryParse(txtBioYearsBetween.Text, DFLOWCalcs.fBioFPArray(3, 1)) Then
             'fBioFPArray(3, 1) = tbBio2.Text
             Dim lParams() As Integer = GetSavedParams()
             If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
-                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P1AverageYearsBetweenExcursions) = Integer.Parse(tbBio2.Text)
+                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P1AverageYearsBetweenExcursions) = Integer.Parse(txtBioYearsBetween.Text)
                 pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
             End If
         End If
     End Sub
-    Private Sub tbBio3_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbBio3.TextChanged
-        If IsNumeric(tbBio3.Text) AndAlso Integer.TryParse(tbBio3.Text, DFLOWCalcs.fBioFPArray(3, 2)) Then
+    Private Sub tbBio3_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtBioExcursionDays.TextChanged
+        If IsNumeric(txtBioExcursionDays.Text) AndAlso Integer.TryParse(txtBioExcursionDays.Text, DFLOWCalcs.fBioFPArray(3, 2)) Then
             'fBioFPArray(3, 2) = tbBio3.Text
             Dim lParams() As Integer = GetSavedParams()
             If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
-                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P2ExcursionClusterPeriodDays) = Integer.Parse(tbBio3.Text)
+                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P2ExcursionClusterPeriodDays) = Integer.Parse(txtBioExcursionDays.Text)
                 pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
             End If
         End If
     End Sub
-    Private Sub tbBio4_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbBio4.TextChanged
-        If IsNumeric(tbBio4.Text) AndAlso Integer.TryParse(tbBio4.Text, DFLOWCalcs.fBioFPArray(3, 3)) Then
+    Private Sub tbBio4_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtBioExcursionsPerCluster.TextChanged
+        If IsNumeric(txtBioExcursionsPerCluster.Text) AndAlso Integer.TryParse(txtBioExcursionsPerCluster.Text, DFLOWCalcs.fBioFPArray(3, 3)) Then
             'fBioFPArray(3, 3) = tbBio4.Text
             Dim lParams() As Integer = GetSavedParams()
             If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
-                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P3AverageExcursionsPerCluster) = Integer.Parse(tbBio4.Text)
+                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P3AverageExcursionsPerCluster) = Integer.Parse(txtBioExcursionsPerCluster.Text)
                 pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
             End If
         End If
@@ -2860,22 +2868,22 @@ Public Class frmSWSTAT
     Private Function GetSavedParams(Optional ByVal aBio As Boolean = True, Optional ByVal aValue As Double = -99) As Object
         If pAttributes IsNot Nothing Then
             If aBio Then
-                If rbBio1.Checked Then
+                If chkBioAcute.Checked Then
                     Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString(), Nothing)
-                ElseIf rbBio2.Checked Then
+                ElseIf chkBioChronic.Checked Then
                     Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString(), Nothing)
-                ElseIf rbBio3.Checked Then
+                ElseIf chkBioAmmonia.Checked Then
                     Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString(), Nothing)
                 End If
             Else
-                If rbNonBio1.Checked Then
+                If chkNonBioAcute.Checked Then
                     Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString(), Nothing)
-                ElseIf rbNonBio2.Checked Then
+                ElseIf chkNonBioChronic.Checked Then
                     If aValue > 0 Then
                         pAttributes.SetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString(), aValue)
                     End If
                     Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString(), Nothing)
-                ElseIf rbNonBio3.Checked Then
+                ElseIf chkNonBioFlowPercentile.Checked Then
                     If aValue > 0 Then
                         pAttributes.SetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString(), aValue)
                     End If
@@ -2898,7 +2906,8 @@ Public Class frmSWSTAT
             DFLOWCalcs.fBioCluster = 120
             DFLOWCalcs.fBioExcursions = 5
 
-            DFLOWCalcs.fNonBioType = 0
+            DFLOWCalcs.fNonBioType.Clear()
+            DFLOWCalcs.fNonBioType.Add(0)
             DFLOWCalcs.fAveragingPeriod = 7
             DFLOWCalcs.fReturnPeriod = 10
             DFLOWCalcs.fExplicitFlow = 1.0
@@ -2948,23 +2957,23 @@ Public Class frmSWSTAT
 
     Private Sub PopulateDFLOW(ByVal aTimeseriesGroup As atcTimeseriesGroup)
         ' This populates the DFLOW input form according to the DFLOW calculation values
-        ckbBio.Checked = DFLOWCalcs.fBioDefault
-        rbBio1.Enabled = DFLOWCalcs.fBioDefault
-        rbBio2.Enabled = DFLOWCalcs.fBioDefault
-        rbBio3.Enabled = DFLOWCalcs.fBioDefault
+        chkBioCustom.Checked = DFLOWCalcs.fBioDefault
+        'rbBio1.Enabled = DFLOWCalcs.fBioDefault
+        'rbBio2.Enabled = DFLOWCalcs.fBioDefault
+        'rbBio3.Enabled = DFLOWCalcs.fBioDefault
 
         Select Case DFLOWCalcs.fBioType
             Case 0
-                rbBio1.Checked = True
+                chkBioAcute.Checked = True
             Case 1
-                rbBio2.Checked = True
+                chkBioChronic.Checked = True
             Case 2
-                rbBio3.Checked = True
+                chkBioAmmonia.Checked = True
         End Select
 
-        tbBio1.Enabled = Not DFLOWCalcs.fBioDefault
-        tbBio2.Enabled = Not DFLOWCalcs.fBioDefault
-        tbBio3.Enabled = Not DFLOWCalcs.fBioDefault
+        txtBioFlowDays.Enabled = Not DFLOWCalcs.fBioDefault
+        txtBioYearsBetween.Enabled = Not DFLOWCalcs.fBioDefault
+        txtBioExcursionDays.Enabled = Not DFLOWCalcs.fBioDefault
 
         Dim lBioIdx As Integer
         If DFLOWCalcs.fBioDefault Then
@@ -2973,96 +2982,98 @@ Public Class frmSWSTAT
             lBioIdx = 3
         End If
 
-        RemoveHandler tbBio1.TextChanged, AddressOf tbBio1_TextChanged
-        RemoveHandler tbBio2.TextChanged, AddressOf tbBio2_TextChanged
-        RemoveHandler tbBio3.TextChanged, AddressOf tbBio3_TextChanged
-        RemoveHandler tbBio4.TextChanged, AddressOf tbBio4_TextChanged
+        RemoveHandler txtBioFlowDays.TextChanged, AddressOf tbBio1_TextChanged
+        RemoveHandler txtBioYearsBetween.TextChanged, AddressOf tbBio2_TextChanged
+        RemoveHandler txtBioExcursionDays.TextChanged, AddressOf tbBio3_TextChanged
+        RemoveHandler txtBioExcursionsPerCluster.TextChanged, AddressOf tbBio4_TextChanged
 
-        RemoveHandler tbNonBio1.TextChanged, AddressOf tbNonBio1_TextChanged
+        RemoveHandler txtNonBioCustomNday1.TextChanged, AddressOf tbNonBio1_TextChanged
         RemoveHandler tbNonBio2.TextChanged, AddressOf tbNonBio2_TextChanged
-        RemoveHandler tbNonBio3.TextChanged, AddressOf tbNonBio3_TextChanged
-        RemoveHandler tbNonBio4.TextChanged, AddressOf tbNonBio4_TextChanged
+        RemoveHandler txtNonBioExplicitFlow.TextChanged, AddressOf tbNonBio3_TextChanged
+        RemoveHandler txtNonBioFlowPercentile.TextChanged, AddressOf tbNonBio4_TextChanged
 
 
         If DFLOWCalcs.fBioFPArray(lBioIdx, 0) < 0 Then
             If pBatch Then
-                tbBio1.Text = DFLOWCalcs.fBioPeriod.ToString()
+                txtBioFlowDays.Text = DFLOWCalcs.fBioPeriod.ToString()
             Else
-                tbBio1.Text = ""
+                txtBioFlowDays.Text = ""
             End If
         Else
             If pBatch Then
-                tbBio1.Text = DFLOWCalcs.fBioPeriod.ToString()
+                txtBioFlowDays.Text = DFLOWCalcs.fBioPeriod.ToString()
             Else
-                tbBio1.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 0)
+                txtBioFlowDays.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 0)
             End If
         End If
 
         If DFLOWCalcs.fBioFPArray(lBioIdx, 1) < 0 Then
             If pBatch Then
-                tbBio2.Text = DFLOWCalcs.fBioYears.ToString()
+                txtBioYearsBetween.Text = DFLOWCalcs.fBioYears.ToString()
             Else
-                tbBio2.Text = ""
+                txtBioYearsBetween.Text = ""
             End If
         Else
             If pBatch Then
-                tbBio2.Text = DFLOWCalcs.fBioYears.ToString()
+                txtBioYearsBetween.Text = DFLOWCalcs.fBioYears.ToString()
             Else
-                tbBio2.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 1)
+                txtBioYearsBetween.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 1)
             End If
         End If
 
         If DFLOWCalcs.fBioFPArray(lBioIdx, 2) < 0 Then
             If pBatch Then
-                tbBio3.Text = DFLOWCalcs.fBioExcursions.ToString()
+                txtBioExcursionDays.Text = DFLOWCalcs.fBioExcursions.ToString()
             Else
-                tbBio3.Text = ""
+                txtBioExcursionDays.Text = ""
             End If
         Else
             If pBatch Then
-                tbBio3.Text = DFLOWCalcs.fBioExcursions.ToString()
+                txtBioExcursionDays.Text = DFLOWCalcs.fBioExcursions.ToString()
             Else
-                tbBio3.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 2)
+                txtBioExcursionDays.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 2)
             End If
         End If
 
         If DFLOWCalcs.fBioFPArray(lBioIdx, 3) < 0 Then
             If pBatch Then
-                tbBio4.Text = DFLOWCalcs.fBioCluster.ToString()
+                txtBioExcursionsPerCluster.Text = DFLOWCalcs.fBioCluster.ToString()
             Else
-                tbBio4.Text = ""
+                txtBioExcursionsPerCluster.Text = ""
             End If
         Else
             If pBatch Then
-                tbBio4.Text = DFLOWCalcs.fBioCluster.ToString()
+                txtBioExcursionsPerCluster.Text = DFLOWCalcs.fBioCluster.ToString()
             Else
-                tbBio4.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 3)
+                txtBioExcursionsPerCluster.Text = DFLOWCalcs.fBioFPArray(lBioIdx, 3)
             End If
         End If
 
-        Select Case DFLOWCalcs.fNonBioType
-            Case 0
-                rbNonBio1.Checked = True
-            Case 1
-                rbNonBio2.Checked = True
-            Case 2
-                rbNonBio3.Checked = True
-        End Select
+        For Each lNonBioType As Integer In DFLOWCalcs.fNonBioType
+            Select Case lNonBioType
+                Case 0
+                    chkNonBioAcute.Checked = True
+                Case 1
+                    chkNonBioChronic.Checked = True
+                Case 2
+                    chkNonBioFlowPercentile.Checked = True
+            End Select
+        Next
 
-        tbNonBio1.Text = DFLOWCalcs.fAveragingPeriod
+        txtNonBioCustomNday1.Text = DFLOWCalcs.fAveragingPeriod
         tbNonBio2.Text = DFLOWCalcs.fReturnPeriod
-        tbNonBio3.Text = DFLOWCalcs.fExplicitFlow
-        tbNonBio4.Text = DFLOWCalcs.fPercentile
+        txtNonBioExplicitFlow.Text = DFLOWCalcs.fExplicitFlow
+        txtNonBioFlowPercentile.Text = DFLOWCalcs.fPercentile
 
-        AddHandler tbBio1.TextChanged, AddressOf tbBio1_TextChanged
-        AddHandler tbBio2.TextChanged, AddressOf tbBio2_TextChanged
-        AddHandler tbBio3.TextChanged, AddressOf tbBio3_TextChanged
-        AddHandler tbBio4.TextChanged, AddressOf tbBio4_TextChanged
+        AddHandler txtBioFlowDays.TextChanged, AddressOf tbBio1_TextChanged
+        AddHandler txtBioYearsBetween.TextChanged, AddressOf tbBio2_TextChanged
+        AddHandler txtBioExcursionDays.TextChanged, AddressOf tbBio3_TextChanged
+        AddHandler txtBioExcursionsPerCluster.TextChanged, AddressOf tbBio4_TextChanged
 
-        AddHandler tbNonBio1.TextChanged, AddressOf tbNonBio1_TextChanged
+        AddHandler txtNonBioCustomNday1.TextChanged, AddressOf tbNonBio1_TextChanged
         AddHandler tbNonBio2.TextChanged, AddressOf tbNonBio2_TextChanged
-        AddHandler tbNonBio3.TextChanged, AddressOf tbNonBio3_TextChanged
-        AddHandler tbNonBio4.TextChanged, AddressOf tbNonBio4_TextChanged
+        AddHandler txtNonBioExplicitFlow.TextChanged, AddressOf tbNonBio3_TextChanged
+        AddHandler txtNonBioFlowPercentile.TextChanged, AddressOf tbNonBio4_TextChanged
 
         'clbDataSets.Items.Clear()
 
@@ -3088,12 +3099,14 @@ Public Class frmSWSTAT
     End Sub
 
     Private Sub btnCalculate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCalculate.Click
+
         DFLOWCalcs.fBioPeriod = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 0)
         DFLOWCalcs.fBioYears = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 1)
         DFLOWCalcs.fBioCluster = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
         DFLOWCalcs.fBioExcursions = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
         Dim lfrmResult As New DFLOWAnalysis.frmDFLOWResults(pDataGroup, , True)
     End Sub
+
 #End Region '"DFLOW"
 End Class
 

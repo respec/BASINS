@@ -1,5 +1,6 @@
 Imports atcControls
 Imports atcUtility
+Imports MapWinUtility
 Imports MapWinUtility.Strings
 
 Public Class frmResult
@@ -178,31 +179,41 @@ Public Class frmResult
 
     Private Sub SaveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click
         Dim cdlg As New Windows.Forms.SaveFileDialog
-        cdlg.Filter = "Text Files|*.txt|All Files|*.*"
-        cdlg.FilterIndex = 0
-        cdlg.FileName = pReportFilename
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            pReportFilename = cdlg.FileName
-            Me.Text = pTitle & " - " & cdlg.FileName
-            SaveFileString(cdlg.FileName, pTitle & vbCrLf & "  " & lblHeader.Text & vbCrLf & vbCrLf & agdResult.ToString)
-        End If
+        With cdlg
+            .Filter = "Text Files|*.txt|All Files|*.*"
+            .FilterIndex = 0
+            .FileName = pReportFilename
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
+            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                pReportFilename = .FileName
+                Me.Text = pTitle & " - " & .FileName
+                SaveFileString(cdlg.FileName, pTitle & vbCrLf & "  " & lblHeader.Text & vbCrLf & vbCrLf & agdResult.ToString)
+            End If
+        End With
     End Sub
 
     Private Sub OpenToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripMenuItem.Click
         Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Filter = "Text Files|*.txt|All Files|*.*"
-        cdlg.FilterIndex = 0
-        cdlg.FileName = Me.Text.Substring(pTitle.Length + 3)
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            Me.Text = pTitle & " - " & cdlg.FileName
-            Dim lReportText As String = WholeFileString(cdlg.FileName)
-            pTitle = StrSplit(lReportText, vbCrLf, "")
-            lblHeader.Text = StrSplit(lReportText, vbCrLf, "")
-            SetTitleHeader(pTitle, lblHeader.Text)
-            StrSplit(lReportText, vbCrLf, "")
-            agdResult.Source.FromString(lReportText)
-            ResizeGrid()
-        End If
+        With cdlg
+            .Filter = "Text Files|*.txt|All Files|*.*"
+            .FilterIndex = 0
+            .FileName = Me.Text.Substring(pTitle.Length + 3)
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
+            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                Me.Text = pTitle & " - " & .FileName
+                Dim lReportText As String = WholeFileString(.FileName)
+                pTitle = StrSplit(lReportText, vbCrLf, "")
+                lblHeader.Text = StrSplit(lReportText, vbCrLf, "")
+                SetTitleHeader(pTitle, lblHeader.Text)
+                StrSplit(lReportText, vbCrLf, "")
+                agdResult.Source.FromString(lReportText)
+                ResizeGrid()
+            End If
+        End With
     End Sub
 
     Private Sub ResizeGrid()

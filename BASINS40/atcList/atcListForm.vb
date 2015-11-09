@@ -1,6 +1,6 @@
 Imports atcData
 Imports atcUtility
-
+Imports MapWinUtility
 Imports System.Windows.Forms
 
 Public Class atcListForm
@@ -426,6 +426,9 @@ Public Class atcListForm
             .Title = "Save Grid As"
             .DefaultExt = ".txt"
             .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
             End If

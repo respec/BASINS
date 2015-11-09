@@ -122,6 +122,9 @@ OpenOutput:
                             With cdlg
                                 .Title = "Please locate 'output.hru' from base SWAT run"
                                 .FileName = IO.Path.GetDirectoryName(aFilename) & g_PathChar & "Scenarios\output.hru"
+                                If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                                    .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+                                End If
                                 .Filter = "output.hru|output.hru"
                                 .FilterIndex = 1
                                 .DefaultExt = "hru"

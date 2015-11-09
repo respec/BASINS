@@ -78,9 +78,32 @@ Public Class frmDownload
         'The following line hot-wires the form to just do met data download
         'chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Me.Height = 141 ': Return Me.XML
 
-        cboRegion.Items.Add(pRegionViewRectangle)
-        cboRegion.Items.Add(pRegionExtentSelectedLayer)
-        cboRegion.Items.Add(pRegionExtentSelectedShapes)
+        Dim lExtents As MapWinGIS.Extents = Nothing
+        If pMapWin IsNot Nothing AndAlso pMapWin.Layers.NumLayers > 0 Then
+            Try
+                lExtents = pMapWin.View.Extents
+                If lExtents.xMin < lExtents.yMax AndAlso lExtents.yMin < lExtents.yMax Then
+                    cboRegion.Items.Add(pRegionViewRectangle)
+                End If
+            Catch
+            End Try
+
+            Try
+                lExtents = pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
+                If lExtents.xMin < lExtents.yMax AndAlso lExtents.yMin < lExtents.yMax Then
+                    cboRegion.Items.Add(pRegionExtentSelectedLayer)
+                End If
+            Catch
+            End Try
+
+            Try
+                lExtents = pMapWin.View.SelectedShapes.SelectBounds
+                If lExtents.xMin < lExtents.yMax AndAlso lExtents.yMin < lExtents.yMax Then
+                    cboRegion.Items.Add(pRegionExtentSelectedShapes)
+                End If
+            Catch
+            End Try
+        End If
         cboRegion.Items.Add(pRegionEnterCoordinates)
         cboRegion.Items.Add(pRegionStationIDs)
         If HUC8Layer() IsNot Nothing Then
@@ -123,19 +146,20 @@ Public Class frmDownload
             lGroups.Add(grpNWIS_GW)
             lGroups.Add(grpBASINS)
             lGroups.Add(grpNHDplus)
-            lGroups.Add(grpNLCD2001)
+            lGroups.Add(grpUSGS_Seamless)
 
             chkBASINS_LSTORET.Visible = False
             chkBASINS_Census.Visible = False
             chkBASINS_MetStations.Left = chkBASINS_Census.Left
             chkBASINS_303d.Visible = False
-            chkBASINS_MetData.Left = chkBASINS_303d.Left
+            'chkBASINS_MetData.Left = chkBASINS_303d.Left
         Else
             lGroups.Add(grpBASINS)
+            'lGroups.Add(grpNCDC)
             lGroups.Add(grpNHDplus)
             lGroups.Add(grpNWISStations)
             lGroups.Add(grpNWIS)
-            lGroups.Add(grpNLCD2001)
+            lGroups.Add(grpUSGS_Seamless)
             lGroups.Add(grpSTORET)
             lGroups.Add(grpNLDAS)
         End If
@@ -219,18 +243,18 @@ Public Class frmDownload
         Next
         If PreChecked.Count > 0 Then
             For Each lChk As Windows.Forms.CheckBox In PreUnChecked
-                AddHandler lChk.CheckedChanged, AddressOf PreUnchkedChanged
+                AddHandler lChk.CheckedChanged, AddressOf PreUncheckedChanged
             Next
         End If
     End Sub
 
-    Private Sub PreUnchkedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Private Sub PreUncheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Try
             For Each lChk As Windows.Forms.CheckBox In PreChecked
                 lChk.Checked = False
             Next
             For Each lChk As Windows.Forms.CheckBox In PreUnChecked
-                RemoveHandler lChk.CheckedChanged, AddressOf PreUnchkedChanged
+                RemoveHandler lChk.CheckedChanged, AddressOf PreUncheckedChanged
             Next
         Catch
         End Try
@@ -334,12 +358,14 @@ Public Class frmDownload
 
     Private Sub SetCheckboxVisibilityFromMapOrRegion()
         chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.GrayText
+        'chkNCDC_MetData.ForeColor = System.Drawing.SystemColors.GrayText
         Dim lStationsRegion As Boolean = False
         If cboRegion.Text = pRegionStationIDs Then
             lStationsRegion = True
             panelNWISnoStations.Visible = False
             panelNWISnoStations_GW.Visible = False
             chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
+            'chkNCDC_MetData.ForeColor = System.Drawing.SystemColors.ControlText
         End If
 
         If pApplicationName.StartsWith("USGS GW Toolbox") Then
@@ -376,7 +402,11 @@ Public Class frmDownload
                 Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer)
                 Dim lFilename As String = IO.Path.GetFileNameWithoutExtension(lLayer.FileName).ToLower
 
-                If pApplicationName.StartsWith("USGS GW Toolbox") Then
+                If lFilename.StartsWith("met") Then
+                    chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
+                    chkBASINS_MetData.Checked = True
+                    'chkNCDC_MetData.ForeColor = System.Drawing.SystemColors.ControlText
+                ElseIf pApplicationName.StartsWith("USGS GW Toolbox") Then
                     Select Case lFilename
                         Case "nwis_stations_discharge"
                             chkNWIS_GetNWISDailyDischarge_GW.Enabled = True
@@ -391,11 +421,6 @@ Public Class frmDownload
                         Case "nwis_stations_precipitation"
                             chkNWIS_GetNWISPrecipitation_GW.Enabled = True
                             chkNWIS_GetNWISPrecipitation_GW.Checked = True
-                        Case Else
-                            If lFilename.StartsWith("met") Then
-                                chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
-                                chkBASINS_MetData.Checked = True
-                            End If
                     End Select
                 Else
                     Select Case lFilename
@@ -423,13 +448,8 @@ Public Class frmDownload
                             chkSTORET_Results.Checked = True
                         Case "nldas_grid", "nldas_grid_center"
                             chkNLDAS_GetNLDASParameter.Enabled = True
-                            chkNLDAS_GetNLDASParameter.Text = "Precipitation"
+                            chkNLDAS_GetNLDASParameter.Text = "Hourly Data"
                             chkNLDAS_GetNLDASParameter.Checked = True
-                        Case Else
-                            If lFilename.StartsWith("met") Then
-                                chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
-                                chkBASINS_MetData.Checked = True
-                            End If
                     End Select
                 End If
             End If
@@ -554,8 +574,13 @@ Public Class frmDownload
             End If
             lCacheFolder = "<CacheFolder>" & lCacheFolder & "</CacheFolder>" & vbCrLf
 
-            Dim lCacheOnly As String = ""
-            If chkCacheOnly.Checked Then lCacheOnly = "<CacheOnly>" & chkCacheOnly.Checked & "</CacheOnly>" & vbCrLf
+            Dim lCacheBehavior As String = ""
+            If chkCacheOnly.Checked Then
+                lCacheBehavior = "<CacheOnly>" & chkCacheOnly.Checked & "</CacheOnly>" & vbCrLf
+            End If
+            If chkGetNewest.Checked Then
+                lCacheBehavior = "<GetEvenIfCached>" & chkGetNewest.Checked & "</GetEvenIfCached>" & vbCrLf
+            End If
 
             Dim lCount As String = ""
             Dim lMinCountInt As Integer
@@ -578,7 +603,7 @@ Public Class frmDownload
                                      & lDesiredProjection _
                                      & lRegionXML _
                                      & lStationsXML _
-                                     & lCacheOnly _
+                                     & lCacheBehavior _
                                      & lCount _
                                      & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                                      & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
@@ -606,23 +631,17 @@ Public Class frmDownload
                                 Else
                                     If lChild Is chkNWIS_GetNWISDailyDischarge Then
                                         Dim lWDMfrm As New frmWDM
-                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
-                                                                  lChild.Text & " Processing Options")
-                                    End If
-                                    If lChild Is chkNWIS_GetNWISIdaDischarge Then
+                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), lChild.Text & " Processing Options")
+                                    ElseIf lChild Is chkNWIS_GetNWISIdaDischarge Then
                                         'Dim lWDMfrm As New frmWDM    'don't add to wdm, just add rdb file to project
                                         'lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
                                         '                          lChild.Text & " Processing Options")
-                                    End If
-                                    If lChild Is chkNWIS_GetNWISDailyGW Then
+                                    ElseIf lChild Is chkNWIS_GetNWISDailyGW Then
                                         Dim lWDMfrm As New frmWDM
-                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "Groundwater", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
-                                                                  lChild.Text & " Processing Options")
-                                    End If
-                                    If lChild Is chkNLDAS_GetNLDASParameter Then
+                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "Groundwater", IO.Path.Combine(lSaveFolderOnly, "nwis"), lChild.Text & " Processing Options")
+                                    ElseIf lChild Is chkNLDAS_GetNLDASParameter Then
                                         Dim lWDMfrm As New frmWDM
-                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDASPrecipitation", IO.Path.Combine(lSaveFolderOnly, "nldas"), _
-                                                                  "NLDAS Precipitation Processing Options")
+                                        lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDAS", IO.Path.Combine(lSaveFolderOnly, "nldas"), "NLDAS Processing Options")
                                     End If
                                     'If lChild Is chkNWIS_GetNWISPrecipitation Then
                                     '    Dim lWDMfrm As New frmWDM
@@ -632,9 +651,9 @@ Public Class frmDownload
                                 End If
                                 If lWDMxml IsNot Nothing Then
                                     lXML &= "<function name='" & lChildName & "'>" & vbCrLf _
-                                             & "<arguments>" & vbCrLf _
-                                             & lWDMxml _
-                                             & lXMLcommon & vbCrLf
+                                         & "<arguments>" & vbCrLf _
+                                         & lWDMxml _
+                                         & lXMLcommon & vbCrLf
                                 End If
                             Else 'This checkbox adds a data type to the parent function
                                 lCheckedChildren &= "<DataType>" & lChildName & "</DataType>" & vbCrLf
@@ -886,4 +905,16 @@ Public Class frmDownload
             End If
         End If
     End Sub
+
+    'Private Sub chkNCDC_MetData_CheckedChanged(sender As Object, e As EventArgs) Handles chkNCDC_MetData.CheckedChanged
+    '    If chkNCDC_MetData.ForeColor = System.Drawing.SystemColors.GrayText Then
+    '        If chkNCDC_MetData.Checked Then
+    '            MapWinUtility.Logger.Msg("1. Download BASINS Met Stations" & vbCrLf _
+    '                                   & "2. In the map legend, choose the Weather Station Sites layer" & vbCrLf _
+    '                                   & "3. On the map, select the stations to get data from" & vbCrLf _
+    '                                   & "4. Download NCDC Met Data", "One or more Met Stations must be selected")
+    '            chkNCDC_MetData.Checked = False
+    '        End If
+    '    End If
+    'End Sub
 End Class

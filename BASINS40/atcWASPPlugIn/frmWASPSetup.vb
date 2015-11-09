@@ -85,6 +85,9 @@ Public Class frmWASPSetup
                     dlg.DefaultExt = ".inp"
                     dlg.AddExtension = True
                     dlg.FileName = pPlugIn.WASPProject.INPFileName
+                    If FileExists(IO.Path.GetDirectoryName(dlg.FileName), True, False) Then
+                        dlg.InitialDirectory = IO.Path.GetDirectoryName(dlg.FileName)
+                    End If
                     dlg.Filter = "Wasp Import Files (*.inp)|*.inp|All Files (*.*)|*.*"
                     dlg.OverwritePrompt = True
                     If dlg.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
@@ -826,6 +829,9 @@ Public Class frmWASPSetup
             .Title = "Save WASP Builder File"
             .FileName = pPlugIn.WASPProject.Filename
             If .FileName = "" Then .FileName = pPlugIn.WASPProject.Name & ".WaspBuilder"
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 If Not SaveForm() Then Exit Sub
                 pPlugIn.WASPProject.SaveProject(.FileName)

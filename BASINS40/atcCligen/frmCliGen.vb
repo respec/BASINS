@@ -451,6 +451,9 @@ Public Class frmCliGen
         With cdlg
             .Title = "CliGen Output File"
             .FileName = pOutFileName
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             .Filter = cOutFileFilter
             .OverwritePrompt = True
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -561,6 +564,9 @@ Public Class frmCliGen
         With cdlg
             .Title = "Save CliGen Parameter File"
             .FileName = pParmFileName
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             .Filter = cParmFileFilter
             .OverwritePrompt = True
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -720,6 +726,9 @@ Public Class frmCliGen
             With cdlg
                 .Title = "Save File of CliGen Parameters to edit"
                 .FileName = cParmsFile
+                If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                    .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+                End If
                 .Filter = cParms2EditFilter
                 .OverwritePrompt = True
                 If .ShowDialog() = Windows.Forms.DialogResult.OK Then

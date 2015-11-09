@@ -1398,6 +1398,9 @@ Public Class frmCAT
         Dim lOpenDialog As New Windows.Forms.OpenFileDialog
         With lOpenDialog
             .FileName = GetSetting("BasinsCAT", "Settings", "LastResults", "Results.txt")
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             .Filter = "Text files (*.txt)|*.txt|All files|*.*"
             .FilterIndex = 1
             .Title = "Load Results"
@@ -1490,6 +1493,9 @@ Public Class frmCAT
             Dim lSaveDialog As New Windows.Forms.SaveFileDialog
             With lSaveDialog
                 .FileName = GetSetting("BasinsCAT", "Settings", "LastResults", "Results.txt")
+                If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                    .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+                End If
                 .Filter = "Text files (*.txt)|*.txt|All files|*.*"
                 .FilterIndex = 1
                 .Title = "Save Results as Tab-Delimited Text"
@@ -1507,6 +1513,9 @@ Public Class frmCAT
         Dim lSaveDialog As New Windows.Forms.SaveFileDialog
         With lSaveDialog
             .FileName = GetSetting("BasinsCAT", "Settings", "LastPivot", "Pivot.txt")
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             .Filter = "Text files (*.txt)|*.txt|All files|*.*"
             .FilterIndex = 1
             .Title = "Save Pivot Table as Tab-Delimited Text"
@@ -1667,6 +1676,9 @@ Public Class frmCAT
         Dim lOpenDialog As New Windows.Forms.OpenFileDialog
         With lOpenDialog
             .FileName = GetSetting("BasinsCAT", "Settings", "LastPreparedWDM")
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             .Filter = "WDM files (*.wdm)|*.wdm|All files|*.*"
             .FilterIndex = 1
             .Title = "Select First base WDM file to use"
@@ -1867,6 +1879,9 @@ Public Class frmCAT
         Dim lSaveDialog As New Windows.Forms.SaveFileDialog
         With lSaveDialog
             .FileName = GetSetting("BasinsCAT", "Settings", "LastSetup", "CAT.xml")
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             .Filter = "XML files (*.xml)|*.xml|All files|*.*"
             .FilterIndex = 1
             .Title = "Save Variations as XML Text"
@@ -1886,6 +1901,9 @@ Public Class frmCAT
         Dim lOpenDialog As New Windows.Forms.OpenFileDialog
         With lOpenDialog
             .FileName = GetSetting("BasinsCAT", "Settings", "LastSetup", "CAT.xml")
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             .Filter = "XML files (*.xml)|*.xml|All files|*.*"
             .FilterIndex = 1
             .Title = "Load Variations from XML file"

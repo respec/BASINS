@@ -1024,16 +1024,21 @@ ParseFixedDef:
     ''' </summary>
     Private Sub cmdSaveScript_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdSaveScript.Click
         Dim dlgSaveScript As New Windows.Forms.SaveFileDialog
-        dlgSaveScript.Filter = "Wizard Script Files (*.ws)|*.ws|All Files|*.*"
-        dlgSaveScript.DefaultExt = "ws"
-        dlgSaveScript.Title = "Save Script As"
-        dlgSaveScript.FileName = txtScriptFile.Text
-        If dlgSaveScript.ShowDialog = Windows.Forms.DialogResult.OK Then
-            txtScriptFile.Text = dlgSaveScript.FileName
-            If txtScriptDesc.Text.Trim.Length = 0 Then txtScriptDesc.Text = IO.Path.GetFileNameWithoutExtension(dlgSaveScript.FileName)
-            SaveFileString(dlgSaveScript.FileName, ScriptStringFromWizard)
-            SaveSetting("ATCTimeseriesImport", "Scripts", dlgSaveScript.FileName, txtScriptDesc.Text)
-        End If
+        With dlgSaveScript
+            .Filter = "Wizard Script Files (*.ws)|*.ws|All Files|*.*"
+            .DefaultExt = "ws"
+            .Title = "Save Script As"
+            .FileName = txtScriptFile.Text
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
+            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                txtScriptFile.Text = .FileName
+                If txtScriptDesc.Text.Trim.Length = 0 Then txtScriptDesc.Text = IO.Path.GetFileNameWithoutExtension(.FileName)
+                SaveFileString(.FileName, ScriptStringFromWizard)
+                SaveSetting("ATCTimeseriesImport", "Scripts", .FileName, txtScriptDesc.Text)
+            End If
+        End With
     End Sub
 
     'Returns position of next character from aChars in aString starting at position aStart

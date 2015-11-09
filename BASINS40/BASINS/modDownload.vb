@@ -681,21 +681,21 @@ StartOver:
                & "</arguments>" _
                & "</function>"
 
-        atcDataManager.LoadPlugin("D4EM Data Download::BASINS")
-        Dim lPlugins As New ArrayList
-        For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
-            Try
-                If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
-                    lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
-                End If
-            Catch ex As Exception
-            End Try
-        Next
-        Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
+        'atcDataManager.LoadPlugin("D4EM Data Download::BASINS")
+        'Dim lPlugins As New ArrayList
+        'For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
+        '    Try
+        '        If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
+        '            lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
+        '        End If
+        '    Catch ex As Exception
+        '    End Try
+        'Next
+        'Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
 
         Logger.Status("Building new project")
         Using lLevel As New ProgressLevel()
-            Dim lResult As String = lDownloadManager.Execute(lQuery)
+            Dim lResult As String = D4EMDataManager.DataManager.Execute(lQuery)
             'Logger.Msg(lResult, "Result of Query from DataManager")
 
             Dim lDisplayMessageBoxes As Boolean = Logger.DisplayMessageBoxes
@@ -752,7 +752,7 @@ StartOver:
                            & "<clip>False</clip> <merge>False</merge>" _
                            & "</arguments></function>"
 
-                    lResult = lDownloadManager.Execute(lQuery)
+                    lResult = D4EMDataManager.DataManager.Execute(lQuery)
                     If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
                         Logger.DisplayMessageBoxes = False
                         ProcessDownloadResults(lResult)
@@ -1188,6 +1188,9 @@ StartOver:
             .Title = "Save new project as..."
             .CheckPathExists = False
             .FileName = aDefaultProjectFileName
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
             .DefaultExt = ".mwprj"
             If .ShowDialog() <> Windows.Forms.DialogResult.OK Then
                 TryDelete(aDefDirName, False) 'Cancelled save dialog
@@ -1576,6 +1579,30 @@ StartOver:
                 '        End Try
                 '    End If
                 'End If
+                If g_Project.ProjectProjection IsNot Nothing AndAlso g_Project.ProjectProjection.Length > 1 Then
+                    Dim lLayerProjection4 As String = g.Header.Projection
+                    If lLayerProjection4 Is Nothing OrElse lLayerProjection4.Trim().Length = 0 Then
+                        Dim lPrjFileName As String = IO.Path.ChangeExtension(g.Filename, ".proj4")
+                        If IO.File.Exists(lPrjFileName) Then
+                            lLayerProjection4 = WholeFileString(lPrjFileName)
+                            'Else
+                            '    lPrjFileName = IO.Path.ChangeExtension(g.Filename, ".prj")
+                            '    If IO.File.Exists(lPrjFileName) Then
+
+                            '    End If
+                        End If
+                    End If
+                    If lLayerProjection4 IsNot Nothing AndAlso lLayerProjection4.Trim().Length > 0 AndAlso lLayerProjection4 <> g_Project.ProjectProjection Then
+                        g.Close()
+                        Logger.Status("Reprojecting Grid, this may take several minutes: " & aFilename)
+                        Dim lOutputFileName As String = GetTemporaryFileName(IO.Path.Combine(PathNameOnly(aFilename), FilenameNoExt(aFilename)), IO.Path.GetExtension(aFilename))
+                        MapWinGeoProc.SpatialReference.ProjectGrid(lLayerProjection4, g_Project.ProjectProjection, aFilename, lOutputFileName, True)
+                        g = New MapWinGIS.Grid
+                        Logger.Status("Opening " & aFilename)
+                        g.Open(lOutputFileName)
+                        Logger.Status("")
+                    End If
+                End If
 
                 MWlay = g_MapWin.Layers.Add(g, LayerName)
                 MWlay.Visible = Visible

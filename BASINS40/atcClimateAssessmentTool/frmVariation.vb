@@ -1106,6 +1106,9 @@ Imports MapWinUtility
                     .FilterIndex = 1
                 End Try
                 .FileName = GetSetting("BasinsCAT", "Variation", "ScriptFilename", ReplaceString(Me.Text, " ", "_") & ".vb")
+                If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                    .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+                End If
                 If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                     SaveSetting("BasinsCAT", "Variation", "ScriptExtIndex", .FilterIndex)
                     SaveSetting("BasinsCAT", "Variation", "ScriptFilename", .FileName)
