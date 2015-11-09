@@ -13,11 +13,11 @@ Public Class frmBuildNew
         InitializeComponent()
 
         'Add any initialization after the InitializeComponent() call
-        txtInstructions.Text = "To Build a New " & g_AppNameShort & " Project, " & _
+        txtInstructions.Text = "To Build a New " & g_AppNameLong & " Project, " & _
            "zoom/pan to your geographic area of interest, select (highlight) it, " & _
-           "and then click 'Build'.  " & _
-           "If your area is outside the US, then click 'Build' " & _
-           "with no features selected to create an international project."
+           "and then click 'Build'.  " & vbCrLf & _
+           "If your area is outside the USA or you do not want to use the map, click 'Build' " & _
+           "with no features selected to create an empty project."
 
     End Sub
 
@@ -111,7 +111,6 @@ Public Class frmBuildNew
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmBuildNew"
-        Me.Opacity = 0.8
         Me.Text = "Build New Project"
         Me.TopMost = True
         Me.ResumeLayout(False)
@@ -128,19 +127,19 @@ Public Class frmBuildNew
         SpecifyAndCreateNewProject()
     End Sub
 
-    Private Sub frmBuildNew_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
-        Try
-            Me.Opacity = 1
-        Catch
-        End Try
-    End Sub
+    'Private Sub frmBuildNew_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
+    '    Try
+    '        Me.Opacity = 1
+    '    Catch
+    '    End Try
+    'End Sub
 
-    Private Sub frmBuildNew_Deactivate(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Deactivate
-        Try
-            Me.Opacity = 0.8
-        Catch
-        End Try
-    End Sub
+    'Private Sub frmBuildNew_Deactivate(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Deactivate
+    '    Try
+    '        Me.Opacity = 0.8
+    '    Catch
+    '    End Try
+    'End Sub
 
     Private Sub frmBuildNew_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
