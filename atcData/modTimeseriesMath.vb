@@ -942,10 +942,10 @@ NextOldVal:
     ''' <param name="aAttributeName">Attribute to compute from values in aTimeseries within each new time step to use in new Timeseries</param>
     ''' <param name="aDataSource">Data Source to assign to newly created subset timeseries, can be Nothing</param>
     ''' <returns>Aggregated timeseries</returns>
-    Public Function AggregateByAttribute(ByVal aTimeseries As atcTimeseries,
-                              ByVal aTU As atcTimeUnit,
-                              ByVal aTS As Integer,
-                              ByVal aAttributeName As String,
+    Public Function AggregateByAttribute(ByVal aTimeseries As atcTimeseries, _
+                              ByVal aTU As atcTimeUnit, _
+                              ByVal aTS As Integer, _
+                              ByVal aAttributeName As String, _
                               ByVal aDataSource As atcTimeseriesSource) As atcTimeseries
         If aTimeseries.Attributes.GetValue("tu") = aTU AndAlso
            aTimeseries.Attributes.GetValue("ts") = aTS Then
