@@ -935,6 +935,64 @@ NextOldVal:
         End If
     End Function
 
+    ''' <summary>Aggregate specified timeseries to interval specified, using the specified attribute value for each time step</summary>
+    ''' <param name="aTimeseries">Timeseries to aggregate</param>
+    ''' <param name="aTU">Time units to aggregate to</param>
+    ''' <param name="aTS">Time step to aggregate to (number of time units)</param>
+    ''' <param name="aAttributeName">Attribute to compute from values in aTimeseries within each new time step to use in new Timeseries</param>
+    ''' <param name="aDataSource">Data Source to assign to newly created subset timeseries, can be Nothing</param>
+    ''' <returns>Aggregated timeseries</returns>
+    Public Function AggregateByAttribute(ByVal aTimeseries As atcTimeseries,
+                              ByVal aTU As atcTimeUnit,
+                              ByVal aTS As Integer,
+                              ByVal aAttributeName As String,
+                              ByVal aDataSource As atcTimeseriesSource) As atcTimeseries
+        If aTimeseries.Attributes.GetValue("tu") = aTU AndAlso
+           aTimeseries.Attributes.GetValue("ts") = aTS Then
+            ' Already have desired time unit and time step, clone so we consistently return a new TS
+            Return aTimeseries.Clone(aDataSource)
+        Else
+            Dim lNewDates() As Double = NewDates(aTimeseries, aTU, aTS)
+            Dim lNumNewVals As Integer = lNewDates.GetUpperBound(0)
+            If lNumNewVals > 0 Then
+                Dim lNaN As Double = GetNaN()
+                Dim lNewTSer As New atcTimeseries(aDataSource)
+                lNewTSer.Dates = New atcTimeseries(aDataSource)
+                CopyBaseAttributes(aTimeseries, lNewTSer)
+                lNewTSer.SetInterval(aTU, aTS)
+                lNewTSer.Attributes.SetValue("point", False)
+                If aTimeseries.ValueAttributesExist Then 'TODO:: Something with value attributes
+                End If
+                lNewTSer.Dates.Values = lNewDates
+                Dim lNewIndex As Integer = 1
+                Dim lNewVals(lNumNewVals) As Double
+                Dim lDateNew As Double = lNewDates(1)
+                Dim lDateOld As Double
+                Dim lValOld As Double
+                Dim lOldIndex As Integer = 1
+                Dim lPrevDateOld As Double = lNewDates(0) 'old and new TSers should have same start date
+                Dim lPrevDateNew As Double = lNewDates(0)
+                Dim lNumOldVals As Integer = aTimeseries.numValues
+
+                If aTimeseries.numValues > 0 Then
+                    lValOld = aTimeseries.Value(1)
+                    lDateOld = aTimeseries.Dates.Value(1)
+                End If
+
+                While lNewIndex <= lNumNewVals
+                    Dim lThisTimeStepTs As atcTimeseries = SubsetByDate(aTimeseries, lNewDates(lNewIndex - 1), lNewDates(lNewIndex), Nothing)
+                    lDateNew = lNewDates(lNewIndex)
+                    lNewVals(lNewIndex) = lThisTimeStepTs.Attributes.GetValue(aAttributeName, lNaN)
+                    lNewIndex = lNewIndex + 1
+                End While
+                lNewTSer.Values = lNewVals
+                Return lNewTSer
+            Else
+                Return Nothing
+            End If
+        End If
+    End Function
+
     'Build Date array for a timeseries with start/end of aTSer and time units/step of aTU/aTS
     Public Function NewDates(ByVal aTSer As atcTimeseries, ByVal aTU As atcTimeUnit, ByVal aTS As Integer) As Double()
         Dim lSJDay As Double
