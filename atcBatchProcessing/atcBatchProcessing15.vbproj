@@ -172,9 +172,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\D4EM\DataManager\NWISDataExtension\D4EMNWISDataExtension15.vbproj">
-      <Project>{a97d1620-bfde-4733-b2dc-10f32323df8e}</Project>
-      <Name>D4EMNWISDataExtension15</Name>
+    <ProjectReference Include="..\..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager15.vbproj">
+      <Project>{59e61f35-b014-4d34-8277-63ff6be40dd6}</Project>
+      <Name>BASINS-D4EMDataManager15</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>

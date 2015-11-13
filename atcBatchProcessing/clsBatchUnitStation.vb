@@ -84,10 +84,12 @@ Public Class clsBatchUnitStation
             Return
         End If
         Dim lQuery As New XmlDocument
-        Dim lNode As XmlNode
-        lQuery.LoadXml(XML())
-        lNode = lQuery.FirstChild.FirstChild
-        Dim lResult As String = D4EMNWISDataExtension.GetDailyDischarge(lNode)
+        'Dim lNode As XmlNode
+        'lQuery.LoadXml(XML())
+        'lNode = lQuery.FirstChild.FirstChild
+        'Dim lResult As String = D4EMNWISDataExtension.GetDailyDischarge(lNode)
+        Dim lResult As String = D4EMDataManager.DataManager.Execute(XML())
+
         If lResult Is Nothing Then
             Message = "QueryResult:Nothing"
         Else
