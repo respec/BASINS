@@ -122,6 +122,9 @@ Public Class atcTimeseriesStatistics
                 AddOperation("Geometric Mean", "10 ^ Mean of log(each value)", _
                              defTimeSeriesOne, lCategory, "Double", pNaN)
 
+                AddOperation("Harmonic Mean", "Sub-contrary mean of positive values", _
+                                             defTimeSeriesOne, lCategory, "Double", pNaN)
+
                 AddOperation("Variance", "Statistical variance", _
                              defTimeSeriesOne, lCategory, "Double", pNaN)
 
@@ -236,6 +239,7 @@ Public Class atcTimeseriesStatistics
             Dim lStErSkew As Double = pNaN
             Dim lScc As Double = pNaN
             Dim lCvr As Double = pNaN
+            Dim lSumInverse As Double = 0
 
             For lIndex = 1 To lLastValueIndex
                 Dim lIsNaN As Boolean = True
@@ -259,6 +263,7 @@ Public Class atcTimeseriesStatistics
                             lCountZero += 1
                         ElseIf lVal > 0 Then
                             lCountPositive += 1
+                            lSumInverse += 1.0 / lVal
                         End If
                     End If
                 Catch e As Exception
@@ -277,6 +282,9 @@ Public Class atcTimeseriesStatistics
                 aTimeseries.Attributes.SetValueIfMissing("Point", True)
             End If
             aTimeseries.Attributes.SetValue("Count Zero", lCountZero)
+            If lSumInverse > 0 Then
+                aTimeseries.Attributes.SetValue("Harmonic Mean", lCountPositive / lSumInverse)
+            End If
             If lCount > 0 Then
                 aTimeseries.Attributes.SetValue("Last", aTimeseries.Value(lLastValueIndex))
                 If Not Double.IsNaN(lMax) Then
