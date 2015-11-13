@@ -32,11 +32,12 @@ Public Class clsBatchUtil
 
     Public Shared Sub DownloadData(ByVal aStationList As atcCollection)
         Logger.Status("LABEL TITLE BASINS Data Download")
-        Dim lQuery As New XmlDocument
-        Dim lNode As XmlNode
-        lQuery.LoadXml(XML(aStationList))
-        lNode = lQuery.FirstChild.FirstChild
-        Dim lResult As String = D4EMNWISDataExtension.GetDailyDischarge(lNode)
+        'Dim lQuery As New XmlDocument
+        'Dim lNode As XmlNode
+        'lQuery.LoadXml(XML(aStationList))
+        'lNode = lQuery.FirstChild.FirstChild
+        'Dim lResult As String = D4EMNWISDataExtension.GetDailyDischarge(lNode)
+        Dim lResult As String = D4EMDataManager.DataManager.Execute(XML(aStationList))
         If lResult Is Nothing Then
             Logger.Dbg("QueryResult:Nothing")
         Else
