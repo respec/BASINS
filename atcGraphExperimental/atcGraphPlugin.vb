@@ -39,6 +39,31 @@ Public Class atcGraphPlugin
         Return Show(aTimeseriesGroup, lIcon)
     End Function
 
+    Private Function HasAnnual(ByVal aTimeseriesGroup As atcDataGroup) As Boolean
+        'check to see if any annual timeseries have already been computed by atcTimeseriesNdayHighLow
+        For Each lTimeseries As atcTimeseries In aTimeseriesGroup
+            If lTimeseries.Attributes.GetValue("Time Unit", atcTimeUnit.TUDay) = atcTimeUnit.TUYear Then
+                Return True
+            End If
+            For Each lAttribute As atcDefinedValue In lTimeseries.Attributes
+                Try
+                    If lAttribute.Arguments IsNot Nothing Then
+                        For Each lArgument As atcData.atcDefinedValue In lAttribute.Arguments
+                            If lArgument.Value.GetType.Name = "atcTimeseries" Then
+                                Dim lAnnualTS As atcTimeseries = lArgument.Value
+                                If lAnnualTS.Attributes.GetValue("Time Unit") = atcTimeUnit.TUYear Then
+                                    Return True
+                                End If
+                            End If
+                        Next
+                    End If
+                Catch
+                End Try
+            Next
+        Next
+        Return False
+    End Function
+
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcDataGroup, ByVal aIcon As System.Drawing.Icon) As Object
         pIcon = aIcon
 
@@ -62,7 +87,11 @@ Public Class atcGraphPlugin
                 Else
                     .Items.Add(pGraphTypeNames(0))
                     .Items.Add(pGraphTypeNames(1))
-                    .Items.Add(pGraphTypeNames(2))
+                    If HasAnnual(lTimeseriesGroup) Then
+                        .Items.Add(pGraphTypeNames(2))
+                    Else
+                        '.Items.Add(pGraphTypeNames(2) & " )
+                    End If
                     .Items.Add(pGraphTypeNames(3))
                     Dim lNeededTwoSuffix As String
                     If lTimeseriesGroup.Count = 2 Then
