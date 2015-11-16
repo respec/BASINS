@@ -1,16 +1,23 @@
-Dated 10/19/2015
+Dated 10/30/2015
 HSPEXP+1.11
 Features
-1. The timeseries can be transformed before plotting graphs when AutomatedGraphs option is selected. In the thirteenth column of timeseries description add the following text in quotes (without quotes) for the transformations.
+1. The timeseries can be transformed before plotting graphs when AutomatedGraphs option is selected. In the thirteenth column of timeseries description, add the following text in quotes (without quotes) for the transformations.
 	a. "c to f" --> Transform from celsius to Fahrenheit.
 	b. "f to c" --> Transform from Fahrenheit to celsius.
 	c. "sum c" --> Add the constant c to the timeseries.
 	d. "product c" -->Multiply the constant c to the timeseries.
-(This functionality will be listed in the Help Manual with next major upgrade.)
+2. The timeseries can be aggregated to extract percentiles. For example, a user can specify to extract 75% percentile of daily values from an hourly timeseries by specifying "Daily" as the "Aggregation" and "%75" as the "Aggregation Type."
+3. The specification for graphs can be in multiple *.csv files and the names are not hardcoded anymore. HSPEXP+ looks for all the *.csv files in the project folder for making graphs. HSPEXP+ typically ignores the *csv files that do not have data formatted for additional graphs, but may give error. It is User's responsibility to make sure that all the *.csv files in the project folder are properly formatted.
+(Above functionalities will be listed in the Help Manual with next major upgrade.)
 	
 Bugs Fixed
 1. The steptype was not plotted properly. Now the timeseries can be plotted as forwardstep, rearwardstep, or nonostep.
 2. Some point symbols were not filled. Now all the point symbols are filled by default. 
+3. When HSPEXP+ is started, the pConstituents is cleared so that reports of any constituents from previous run are not generated.
+4. Log scale and supplemental graphs are plotted only if hydrology calibration graphs are selected.
+5. Graphsare generated even if the two header lines starting with "Type of Graph", and "Axis for the Curve" do not exist or are commented out using "***".
+6. The code for reading Echo file was improved to read bigger echo files.
+
 
 
 Dated:09/01/2015
