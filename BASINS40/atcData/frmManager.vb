@@ -201,6 +201,7 @@ Friend Class frmManager
         'CloseToolStripMenuItem
         '
         Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
+        Me.CloseToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete
         Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(259, 24)
         Me.CloseToolStripMenuItem.Text = "Close Selected"
         '

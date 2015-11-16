@@ -22,63 +22,62 @@ Partial Class frmFilterData
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.chkProvisional = New System.Windows.Forms.CheckBox
-        Me.tabFilters = New System.Windows.Forms.TabControl
-        Me.tabSubsetByDate = New System.Windows.Forms.TabPage
-        Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
-        Me.tabSeasons = New System.Windows.Forms.TabPage
-        Me.chkEnableSeasons = New System.Windows.Forms.CheckBox
-        Me.lblGroupSeasons = New System.Windows.Forms.Label
-        Me.txtGroupSeasons = New System.Windows.Forms.TextBox
-        Me.radioSeasonsGroup = New System.Windows.Forms.RadioButton
-        Me.radioSeasonsCombine = New System.Windows.Forms.RadioButton
-        Me.radioSeasonsSeparate = New System.Windows.Forms.RadioButton
-        Me.lblSeasons = New System.Windows.Forms.Label
-        Me.lblSeasonType = New System.Windows.Forms.Label
-        Me.btnSeasonsNone = New System.Windows.Forms.Button
-        Me.btnSeasonsAll = New System.Windows.Forms.Button
-        Me.lstSeasons = New System.Windows.Forms.ListBox
-        Me.cboSeasons = New System.Windows.Forms.ComboBox
-        Me.TabPage1 = New System.Windows.Forms.TabPage
-        Me.grpValueEventOptions = New System.Windows.Forms.GroupBox
-        Me.RadioButton1 = New System.Windows.Forms.RadioButton
-        Me.RadioButton2 = New System.Windows.Forms.RadioButton
-        Me.lblValueAfterGap = New System.Windows.Forms.Label
-        Me.lblValueAfterDuration = New System.Windows.Forms.Label
-        Me.lblValueAfterSum = New System.Windows.Forms.Label
-        Me.txtEventGap = New System.Windows.Forms.TextBox
-        Me.txtValueDuration = New System.Windows.Forms.TextBox
-        Me.txtValueSum = New System.Windows.Forms.TextBox
-        Me.lblValueGap = New System.Windows.Forms.Label
-        Me.lblValueSum = New System.Windows.Forms.Label
-        Me.lblValueDuration = New System.Windows.Forms.Label
-        Me.lblValueGapUnits = New System.Windows.Forms.Label
-        Me.lblValueDurationUnits = New System.Windows.Forms.Label
-        Me.lblValueAfterMaximum = New System.Windows.Forms.Label
-        Me.lblValueAfterMinimum = New System.Windows.Forms.Label
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.txtValueMaximum = New System.Windows.Forms.TextBox
-        Me.lblMinimum = New System.Windows.Forms.Label
-        Me.txtValueMinimum = New System.Windows.Forms.TextBox
-        Me.chkEvents = New System.Windows.Forms.CheckBox
-        Me.lblValueMinimum = New System.Windows.Forms.Label
-        Me.tabChangeTimeStep = New System.Windows.Forms.TabPage
-        Me.cboTimeUnits = New System.Windows.Forms.ComboBox
-        Me.cboAggregate = New System.Windows.Forms.ComboBox
-        Me.txtTimeStep = New System.Windows.Forms.TextBox
-        Me.chkEnableChangeTimeStep = New System.Windows.Forms.CheckBox
-        Me.tabTimeseriesMath = New System.Windows.Forms.TabPage
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.clbMathOpns = New System.Windows.Forms.CheckedListBox
-        Me.btnAddMathOp = New System.Windows.Forms.Button
-        Me.cboConstant = New System.Windows.Forms.ComboBox
-        Me.cboMathOp = New System.Windows.Forms.ComboBox
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.clbTimeseries = New System.Windows.Forms.CheckedListBox
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.btnCancel = New System.Windows.Forms.Button
-        Me.btnOk = New System.Windows.Forms.Button
+        Me.tabFilters = New System.Windows.Forms.TabControl()
+        Me.tabSubsetByDate = New System.Windows.Forms.TabPage()
+        Me.atcSelectedDates = New atcData.atcChooseDataGroupDates()
+        Me.tabSeasons = New System.Windows.Forms.TabPage()
+        Me.chkEnableSeasons = New System.Windows.Forms.CheckBox()
+        Me.lblGroupSeasons = New System.Windows.Forms.Label()
+        Me.txtGroupSeasons = New System.Windows.Forms.TextBox()
+        Me.radioSeasonsGroup = New System.Windows.Forms.RadioButton()
+        Me.radioSeasonsCombine = New System.Windows.Forms.RadioButton()
+        Me.radioSeasonsSeparate = New System.Windows.Forms.RadioButton()
+        Me.lblSeasons = New System.Windows.Forms.Label()
+        Me.lblSeasonType = New System.Windows.Forms.Label()
+        Me.btnSeasonsNone = New System.Windows.Forms.Button()
+        Me.btnSeasonsAll = New System.Windows.Forms.Button()
+        Me.lstSeasons = New System.Windows.Forms.ListBox()
+        Me.cboSeasons = New System.Windows.Forms.ComboBox()
+        Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.grpValueEventOptions = New System.Windows.Forms.GroupBox()
+        Me.RadioButton1 = New System.Windows.Forms.RadioButton()
+        Me.RadioButton2 = New System.Windows.Forms.RadioButton()
+        Me.lblValueAfterGap = New System.Windows.Forms.Label()
+        Me.lblValueAfterDuration = New System.Windows.Forms.Label()
+        Me.lblValueAfterSum = New System.Windows.Forms.Label()
+        Me.txtEventGap = New System.Windows.Forms.TextBox()
+        Me.txtValueDuration = New System.Windows.Forms.TextBox()
+        Me.txtValueSum = New System.Windows.Forms.TextBox()
+        Me.lblValueGap = New System.Windows.Forms.Label()
+        Me.lblValueSum = New System.Windows.Forms.Label()
+        Me.lblValueDuration = New System.Windows.Forms.Label()
+        Me.lblValueGapUnits = New System.Windows.Forms.Label()
+        Me.lblValueDurationUnits = New System.Windows.Forms.Label()
+        Me.lblValueAfterMaximum = New System.Windows.Forms.Label()
+        Me.lblValueAfterMinimum = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.txtValueMaximum = New System.Windows.Forms.TextBox()
+        Me.lblMinimum = New System.Windows.Forms.Label()
+        Me.txtValueMinimum = New System.Windows.Forms.TextBox()
+        Me.chkEvents = New System.Windows.Forms.CheckBox()
+        Me.lblValueMinimum = New System.Windows.Forms.Label()
+        Me.tabChangeTimeStep = New System.Windows.Forms.TabPage()
+        Me.cboTimeUnits = New System.Windows.Forms.ComboBox()
+        Me.cboAggregate = New System.Windows.Forms.ComboBox()
+        Me.txtTimeStep = New System.Windows.Forms.TextBox()
+        Me.chkEnableChangeTimeStep = New System.Windows.Forms.CheckBox()
+        Me.tabTimeseriesMath = New System.Windows.Forms.TabPage()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.clbMathOpns = New System.Windows.Forms.CheckedListBox()
+        Me.btnAddMathOp = New System.Windows.Forms.Button()
+        Me.cboConstant = New System.Windows.Forms.ComboBox()
+        Me.cboMathOp = New System.Windows.Forms.ComboBox()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.clbTimeseries = New System.Windows.Forms.CheckedListBox()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.btnCancel = New System.Windows.Forms.Button()
+        Me.btnOk = New System.Windows.Forms.Button()
         Me.tabFilters.SuspendLayout()
         Me.tabSubsetByDate.SuspendLayout()
         Me.tabSeasons.SuspendLayout()
@@ -88,26 +87,11 @@ Partial Class frmFilterData
         Me.tabTimeseriesMath.SuspendLayout()
         Me.SuspendLayout()
         '
-        'chkProvisional
-        '
-        Me.chkProvisional.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.chkProvisional.AutoSize = True
-        Me.chkProvisional.Checked = True
-        Me.chkProvisional.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkProvisional.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.chkProvisional.Location = New System.Drawing.Point(12, 519)
-        Me.chkProvisional.Name = "chkProvisional"
-        Me.chkProvisional.Size = New System.Drawing.Size(141, 17)
-        Me.chkProvisional.TabIndex = 97
-        Me.chkProvisional.Text = "Include Provisional Data"
-        Me.chkProvisional.UseVisualStyleBackColor = True
-        Me.chkProvisional.Visible = False
-        '
         'tabFilters
         '
         Me.tabFilters.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.tabFilters.Controls.Add(Me.tabSubsetByDate)
         Me.tabFilters.Controls.Add(Me.tabSeasons)
         Me.tabFilters.Controls.Add(Me.TabPage1)
@@ -269,8 +253,8 @@ Partial Class frmFilterData
         'lstSeasons
         '
         Me.lstSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSeasons.IntegralHeight = False
         Me.lstSeasons.Location = New System.Drawing.Point(8, 84)
         Me.lstSeasons.Margin = New System.Windows.Forms.Padding(2)
@@ -283,7 +267,7 @@ Partial Class frmFilterData
         'cboSeasons
         '
         Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSeasons.Location = New System.Drawing.Point(8, 46)
         Me.cboSeasons.Margin = New System.Windows.Forms.Padding(2)
         Me.cboSeasons.MaxDropDownItems = 20
@@ -636,8 +620,8 @@ Partial Class frmFilterData
         'clbMathOpns
         '
         Me.clbMathOpns.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.clbMathOpns.CheckOnClick = True
         Me.clbMathOpns.FormattingEnabled = True
         Me.clbMathOpns.Location = New System.Drawing.Point(11, 280)
@@ -736,7 +720,6 @@ Partial Class frmFilterData
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.tabFilters)
-        Me.Controls.Add(Me.chkProvisional)
         Me.Name = "frmFilterData"
         Me.Text = "Filter Data"
         Me.tabFilters.ResumeLayout(False)
@@ -752,10 +735,8 @@ Partial Class frmFilterData
         Me.tabTimeseriesMath.ResumeLayout(False)
         Me.tabTimeseriesMath.PerformLayout()
         Me.ResumeLayout(False)
-        Me.PerformLayout()
 
     End Sub
-    Friend WithEvents chkProvisional As System.Windows.Forms.CheckBox
     Friend WithEvents atcSelectedDates As atcData.atcChooseDataGroupDates
     Friend WithEvents tabFilters As System.Windows.Forms.TabControl
     Friend WithEvents tabSubsetByDate As System.Windows.Forms.TabPage

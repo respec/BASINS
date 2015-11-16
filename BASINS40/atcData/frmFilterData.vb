@@ -115,20 +115,6 @@ Public Class frmFilterData
         Me.Show()
         pAsking = True
 
-        chkProvisional.Visible = False
-        For Each lDataSet As atcTimeseries In pSelectedGroup
-            If lDataSet.ValueAttributesExist Then
-                For Each lDef As atcAttributeDefinition In lDataSet.ValueAttributeDefinitions
-                    If lDef.Name = "P" Then
-                        chkProvisional.Visible = True
-                        chkProvisional.Checked = (GetSetting("BASINS", "Select Data", "Provisional", "True") = True)
-                        GoTo FoundProvisional
-                    End If
-                Next
-            End If
-        Next
-FoundProvisional:
-
         pInitializing = False
         If aModal Then
             While pAsking AndAlso Application.OpenForms.Count > 1
@@ -228,23 +214,6 @@ FoundProvisional:
         If Not pInitializing AndAlso Not chkEnableChangeTimeStep.Checked Then chkEnableChangeTimeStep.Checked = True
     End Sub
 
-    Private Function GetNonProvisional(ByVal aDataGroup As atcDataGroup) As atcDataGroup
-        Dim lFiltered As New atcDataGroup
-        For Each lDataSet As atcTimeseries In aDataGroup
-            If HasProvisionalValues(lDataSet) Then
-                Dim lProvisionalTS As atcTimeseries = Nothing
-                Dim lNonProvisionalTS As atcTimeseries = Nothing
-                SplitProvisional(lDataSet, lProvisionalTS, lNonProvisionalTS)
-                If lNonProvisionalTS IsNot Nothing Then
-                    lFiltered.Add(lNonProvisionalTS)
-                End If
-            Else
-                lFiltered.Add(lDataSet)
-            End If
-        Next
-        Return lFiltered
-    End Function
-
     Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
         Try
             Dim lModifiedGroup As atcTimeseriesGroup = pSelectedGroup.Clone
@@ -253,13 +222,6 @@ FoundProvisional:
                 'Note that ChangeTo uses the atcTimeseriesGroup already inside atcSelectedDates,
                 'so this has to come before other filters that modify lModifiedGroup
                 lModifiedGroup.ChangeTo(atcSelectedDates.CreateSelectedDataGroupSubset)
-            End If
-
-            If chkProvisional.Visible Then
-                SaveSetting("BASINS", "Select Data", "Provisional", chkProvisional.Checked)
-                If Not chkProvisional.Checked Then 'Filter out provisional data
-                    lModifiedGroup.ChangeTo(GetNonProvisional(lModifiedGroup))
-                End If
             End If
 
             'Timeseries Math
