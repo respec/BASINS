@@ -199,17 +199,27 @@ Module HSPFOutputReports
                     End
                 End If
                 
-                Dim EchoFileReader As StreamReader
-                EchoFileReader = System.IO.File.OpenText(lHspfEchoFileName)
+                Dim HSPFRan As Boolean = True
+                Using echoFileReader As StreamReader = File.OpenText(lHspfEchoFileName)
+                    While Not echoFileReader.EndOfStream
+                        Dim nextLine As String = echoFileReader.ReadLine()
+                        If nextLine.ToUpper.Contains("TERMINATED") Or nextLine.ToUpper.Contains("EXECUTION WILL NOT BE ATTEMPTED BECAUSE ONE OR MORE ERRORS HAVE BEEN DETECTED.") Then
+                            HSPFRan = False
+                        End If
+                    End While
+                End Using
 
-                If EchoFileReader.ReadToEnd.Contains("terminated") Then
+                'Dim EchoFileReader As StreamReader
+                'EchoFileReader = System.IO.File.ReadAllText(lHspfEchoFileName)
+
+                If HSPFRan = False Then
                     Logger.Dbg("ECHO file says that run was terminated last time. HSPEXP+ will exit!")
                     Dim ans As Integer
                     ans = MsgBox("ECHO File contains a message that the run was terminated last time. HSPEXP+ will quit. Please make sure that UCI" & _
                                  " file runs properly!")
                     End
                 End If
-                EchoFileReader.Close()
+
 
                 loutfoldername = pTestPath
                 Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") & _
@@ -631,198 +641,235 @@ RWZProgramEnding:
     Public Sub MakeAutomatedGraphs(ByVal lGraphStartJ As Double, ByVal lGraphEndJ As Double)
 
         'Expect a comma separated file called *.csv
-        Dim lFileName As String = "AutomatedGraphs.csv"
-        Dim lines() As String
-        If System.IO.File.Exists(lFileName) Then
-            lines = IO.File.ReadAllLines(pTestPath & lFileName)
-        Else
-            Throw New ApplicationException("The AutomatedGraphs.csv didn't exist or was blank. Program will quit!")
+        'On 11/13/2015, Anurag decided that aany number of CSV file with *.csv extension could be added. 
+        '
+        Dim lGraphSpecificationFileNames As New NameValueCollection
+        AddFilesInDir(lGraphSpecificationFileNames, IO.Directory.GetCurrentDirectory, False, "*.csv")
+        If lGraphSpecificationFileNames.Count < 1 Then '
+            '
+            Throw New ApplicationException("No CSV (*.csv) file found in directory " & IO.Directory.GetCurrentDirectory)
+            Logger.Dbg(Now & " Custom graphs will not be produced.")
         End If
+        Dim lGraphFilesCount = 0
+        For Each lGraphSpecificationFile As String In lGraphSpecificationFileNames
+            lGraphFilesCount += 1
 
-        Logger.Dbg("AutomatedGraphs.csv was used as the Graph Specification File")
-        Dim lGraphRecords As New ArrayList()
-        Dim lRecordIndex As Integer = 1
-
-
-        For Each line As String In lines
-            If Not (line.Contains("***") Or Trim(line) = "" Or Trim(line).StartsWith(",")) Then
-                line = line.Replace("deg-", ChrW(186))
-                line = line.Replace("mu-", ChrW(956))
-                lGraphRecords.Add(line)
-            End If
-        Next
-
-        Dim lDBFdatasource As New atcDataSourceBasinsObsWQ
-
-        Do
-            Dim lTimeseriesGroup As New atcTimeseriesGroup
-            lRecordIndex += 1
-            Dim lGraphInit() As String = lGraphRecords(lRecordIndex).split(",")
-            Dim lNumberOfCurves As Integer = Trim(lGraphInit(2))
-            Dim lOutFileName As String = loutfoldername & Trim(lGraphInit(1))
-            
-            Dim lGraphStartDateJ, lGraphEndDateJ As Double
-            'GraphInit has information about number of datasets, their color, symbol etc.
-            lRecordIndex += 1
-
-            If Not Trim(lGraphInit(7)) = "" Then
-                Dim SDate As String() = Trim(lGraphInit(7)).Split("/")
-                lGraphStartDateJ = Date2J(SDate(2), SDate(0), SDate(1))
-
+            Dim lines() As String = {}
+            If System.IO.File.Exists(lGraphSpecificationFile) Then
+                lines = IO.File.ReadAllLines(lGraphSpecificationFile)
+                Logger.Dbg(lGraphSpecificationFile & " was used as the Graph Specification File")
+            ElseIf (lGraphSpecificationFileNames.Count = lGraphFilesCount) Then
+                MsgBox("The" & lGraphSpecificationFile & " file didn't exist or was blank.", vbOKOnly)
             Else
-                lGraphStartDateJ = lGraphStartJ
-            End If
-            If Not Trim(lGraphInit(8)) = "" Then
-                Dim EDate As String() = Trim(lGraphInit(8)).Split("/")
-                lGraphEndDateJ = Date2J(EDate(2), EDate(0), EDate(1), 24, 0)
-
-            Else
-                lGraphEndDateJ = lGraphEndJ
+                MsgBox("The" & lGraphSpecificationFile & " file didn't exist or was blank. Reading next CSV file!", vbOKOnly)
+                Continue For
             End If
 
-            If Trim(lGraphInit(0)).ToLower = "scatter" Then lNumberOfCurves = 2
-            
-            For CurveNumber As Integer = 1 To lNumberOfCurves
-                Dim lGraphDataset() As String = lGraphRecords(lRecordIndex).split(",")
-                Dim lTimeSeries As atcTimeseries = Nothing
-                Dim lDataSourceFilename As String = AbsolutePath(Trim(lGraphDataset(1)), pTestPath)
-                If IO.File.Exists(lDataSourceFilename) Then
-                    Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lDataSourceFilename)
+            Dim lGraphRecords As New ArrayList()
+            Dim lRecordIndex As Integer = 0
 
-                    If lDataSource Is Nothing Then
-                        If atcDataManager.OpenDataSource(lDataSourceFilename) Then
-                            lDataSource = atcDataManager.DataSourceBySpecification(lDataSourceFilename)
-                        End If
-                    End If
-                    If lDataSource Is Nothing Then
-                        Throw New ApplicationException("Could not open '" & lDataSourceFilename & "'")
-                    End If
-                    Select Case IO.Path.GetExtension(lDataSourceFilename)
-                        Case ".wdm"
-                            lTimeSeries = lDataSource.DataSets.FindData("ID", Trim(lGraphDataset(2)))(0)
-                            lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
-                            If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
-                                Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
-                                                               " DSN " & Trim(lGraphDataset(2)) & ". Program will quit!")
-                            End If
-
-                        Case ".hbn", ".dbf"
-                            lTimeSeries = lDataSource.DataSets.FindData("Location", Trim(lGraphDataset(2))) _
-                                                              .FindData("Constituent", Trim(lGraphDataset(3)))(0)
-                            lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
-                            If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
-                                Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
-                                                                                      " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Program will quit!")
-                            End If
-
-                        Case ".rdb"
-                            lTimeSeries = lDataSource.DataSets.FindData("ParmCode", Trim(lGraphDataset(2)))(0)
-                            lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
-                            If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
-                                Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
-                                                                                      " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Program will quit!")
-                            End If
-                    End Select
-
-
-                    Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
-                    lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
-
-                    lTimeSeries = AggregateTS(lTimeSeries, Trim(lGraphDataset(10)).ToLower, Trim(lGraphDataset(11)).ToLower)
-
-                    Dim Transformation As String = Trim(lGraphDataset(12)).ToLower
-                    Select Case True
-                        Case Transformation.Contains("c to f")
-                            lTimeSeries = lTimeSeries * 1.8 + 32
-
-                        Case Transformation.Contains("f to c")
-                            lTimeSeries = (lTimeSeries - 32) * 0.56
-
-                        Case Transformation.Contains("sum")
-                            Dim Sum As Double = Convert.ToDouble(Transformation.Split(" ")(1))
-                            lTimeSeries = lTimeSeries + Sum
-
-                        Case Transformation.Contains("product")
-                            Dim Product As Double = Convert.ToDouble(Transformation.Split(" ")(1))
-                            lTimeSeries = lTimeSeries * Product
-                    End Select
-
-
-
-                    If Not Trim(lGraphInit(18)) = "" Then
-
-                        Dim SeasonStart() As Integer = Array.ConvertAll(lGraphInit(18).Split("/"), Function(str) Int32.Parse(str))
-                        Dim SeasonEnd() As Integer = Array.ConvertAll(lGraphInit(19).Split("/"), Function(str) Int32.Parse(str))
-                        Dim lseasons As New atcSeasonsYearSubset(SeasonStart(0), SeasonStart(1), SeasonEnd(0), SeasonEnd(1))
-                        lseasons.SeasonSelected(0) = True
-                        lTimeSeries = lseasons.SplitBySelected(lTimeSeries, Nothing).ItemByIndex(1)
-                    End If
-
-                    lTimeseriesGroup.Add(lTimeSeries)
-                Else
-                    Logger.Msg("Could not open '" & lDataSourceFilename & "' Aborting Graphing.", MsgBoxStyle.OkOnly, "HSPEXP+")
-                    Exit Do
+            For Each line As String In lines
+                If Not (line.Contains("***") Or Trim(line) = "" Or Trim(line).StartsWith(",") Or Trim(line).ToLower.StartsWith("type") Or Trim(line).ToLower.StartsWith("axis")) Then
+                    line = line.Replace("deg-", ChrW(186))
+                    line = line.Replace("mu-", ChrW(956))
+                    lGraphRecords.Add(line)
                 End If
-                lRecordIndex += 1
-            Next CurveNumber
+            Next
 
-            Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
-            Select Case Trim(lGraphInit(0)).ToLower
-                Case "timeseries"
-                    TimeSeriesgraph(lTimeseriesGroup, lZgc, lGraphInit, lGraphRecords, lRecordIndex)
-                Case "frequency"
-                    FrequencyGraph(lTimeseriesGroup, lZgc, lGraphInit, lGraphRecords, lRecordIndex)
-                Case "scatter"
-                    lRecordIndex += 2
-                    ScatterPlotGraph(lTimeseriesGroup, lZgc, lGraphInit, lGraphRecords, lRecordIndex)
-                Case "cumulative probability"
-                    CumulativeProbability(lTimeseriesGroup, lZgc, lGraphInit, lGraphRecords, lRecordIndex)
-            End Select
-
-            Dim GraphDirectory As String = System.IO.Path.GetDirectoryName(lOutFileName)
-            If Not System.IO.Directory.Exists(GraphDirectory) Then
-                System.IO.Directory.CreateDirectory(GraphDirectory)
+            If lGraphRecords.Count < 1 Then
+                MsgBox("The" & lGraphSpecificationFile & " file didn't hava eany useful data. Reading next CSV file!", vbOKOnly)
+                Continue For
             End If
-            lZgc.SaveIn(lOutFileName)
-            Dim newlistofattributes() As String = {"Location", "Constituent"}
-            atcData.atcDataManager.DisplayAttributesSet(newlistofattributes)
-            Dim lList As New atcList.atcListPlugin
-            lList.Save(lTimeseriesGroup, lOutFileName.Substring(0, Len(lOutFileName) - 4) & ".txt")
-            lZgc.Dispose()
-            lRecordIndex -= 1
-            lTimeseriesGroup = Nothing
-        Loop While (lRecordIndex + 1) < lGraphRecords.Count
-        'atcDataManager.Clear()
+
+            Dim lDBFdatasource As New atcDataSourceBasinsObsWQ
+            Do
+                Dim lTimeseriesGroup As New atcTimeseriesGroup
+                Dim lGraphInit() As String = lGraphRecords(lRecordIndex).split(",")
+                Dim lNumberOfCurves As Integer = Trim(lGraphInit(2))
+                Dim lOutFileName As String = loutfoldername & Trim(lGraphInit(1))
+                If lNumberOfCurves < 1 Then
+                    MsgBox("The " & lOutFileName & " graph in " & lGraphSpecificationFile & " file didn't hava eany useful data. Reading next CSV file!", vbOKOnly)
+                    Continue For
+                End If
+                Dim lGraphStartDateJ, lGraphEndDateJ As Double
+                'GraphInit has information about number of datasets, their color, symbol etc.
+
+
+                If Not Trim(lGraphInit(7)) = "" Then
+                    Dim SDate As String() = Trim(lGraphInit(7)).Split("/")
+                    lGraphStartDateJ = Date2J(SDate(2), SDate(0), SDate(1))
+
+                Else
+                    lGraphStartDateJ = lGraphStartJ
+                End If
+                If Not Trim(lGraphInit(8)) = "" Then
+                    Dim EDate As String() = Trim(lGraphInit(8)).Split("/")
+                    lGraphEndDateJ = Date2J(EDate(2), EDate(0), EDate(1), 24, 0)
+
+                Else
+                    lGraphEndDateJ = lGraphEndJ
+                End If
+
+                If Trim(lGraphInit(0)).ToLower = "scatter" Then lNumberOfCurves = 2
+                lRecordIndex += 1
+                For CurveNumber As Integer = 1 To lNumberOfCurves
+                    Dim lGraphDataset() As String = lGraphRecords(lRecordIndex).split(",")
+                    Dim lTimeSeries As atcTimeseries = Nothing
+                    Dim lDataSourceFilename As String = AbsolutePath(Trim(lGraphDataset(1)), pTestPath)
+                    If IO.File.Exists(lDataSourceFilename) Then
+                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lDataSourceFilename)
+
+                        If lDataSource Is Nothing Then
+                            If atcDataManager.OpenDataSource(lDataSourceFilename) Then
+                                lDataSource = atcDataManager.DataSourceBySpecification(lDataSourceFilename)
+                            End If
+                        End If
+                        If lDataSource Is Nothing Then
+                            Throw New ApplicationException("Could not open '" & lDataSourceFilename & "'")
+                        End If
+                        Select Case IO.Path.GetExtension(lDataSourceFilename)
+                            Case ".wdm"
+                                lTimeSeries = lDataSource.DataSets.FindData("ID", Trim(lGraphDataset(2)))(0)
+                                lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
+                                If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
+                                    Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
+                                                                   " DSN " & Trim(lGraphDataset(2)) & ". Program will quit!")
+                                End If
+
+                            Case ".hbn", ".dbf"
+                                lTimeSeries = lDataSource.DataSets.FindData("Location", Trim(lGraphDataset(2))) _
+                                                                  .FindData("Constituent", Trim(lGraphDataset(3)))(0)
+                                lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
+                                If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
+                                    Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
+                                                                                          " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Program will quit!")
+                                End If
+
+                            Case ".rdb"
+                                lTimeSeries = lDataSource.DataSets.FindData("ParmCode", Trim(lGraphDataset(2)))(0)
+                                lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
+                                If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
+                                    Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
+                                                                                          " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Program will quit!")
+                                End If
+                        End Select
+
+
+                        Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
+                        lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
+
+                        lTimeSeries = AggregateTS(lTimeSeries, Trim(lGraphDataset(10)).ToLower, Trim(lGraphDataset(11)).ToLower)
+
+                        Dim Transformation As String = Trim(lGraphDataset(12)).ToLower
+                        Select Case True
+                            Case Transformation.Contains("c to f")
+                                lTimeSeries = lTimeSeries * 1.8 + 32
+
+                            Case Transformation.Contains("f to c")
+                                lTimeSeries = (lTimeSeries - 32) * 0.56
+
+                            Case Transformation.Contains("sum")
+                                Dim Sum As Double = Convert.ToDouble(Transformation.Split(" ")(1))
+                                lTimeSeries = lTimeSeries + Sum
+
+                            Case Transformation.Contains("product")
+                                Dim Product As Double = Convert.ToDouble(Transformation.Split(" ")(1))
+                                lTimeSeries = lTimeSeries * Product
+                        End Select
+
+
+
+                        If Not Trim(lGraphInit(18)) = "" Then
+
+                            Dim SeasonStart() As Integer = Array.ConvertAll(lGraphInit(18).Split("/"), Function(str) Int32.Parse(str))
+                            Dim SeasonEnd() As Integer = Array.ConvertAll(lGraphInit(19).Split("/"), Function(str) Int32.Parse(str))
+                            Dim lseasons As New atcSeasonsYearSubset(SeasonStart(0), SeasonStart(1), SeasonEnd(0), SeasonEnd(1))
+                            lseasons.SeasonSelected(0) = True
+                            lTimeSeries = lseasons.SplitBySelected(lTimeSeries, Nothing).ItemByIndex(1)
+                        End If
+
+                        lTimeseriesGroup.Add(lTimeSeries)
+                    Else
+                        Logger.Msg("Could not open '" & lDataSourceFilename & "' Aborting Graphing.", MsgBoxStyle.OkOnly, "HSPEXP+")
+                        Exit Do
+                    End If
+                    lRecordIndex += 1
+                Next CurveNumber
+
+                Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+                Select Case Trim(lGraphInit(0)).ToLower
+                    Case "timeseries"
+                        TimeSeriesgraph(lTimeseriesGroup, lZgc, lGraphInit, lGraphRecords, lRecordIndex)
+                    Case "frequency"
+                        FrequencyGraph(lTimeseriesGroup, lZgc, lGraphInit, lGraphRecords, lRecordIndex)
+                    Case "scatter"
+                        lRecordIndex += 2
+                        ScatterPlotGraph(lTimeseriesGroup, lZgc, lGraphInit, lGraphRecords, lRecordIndex)
+                    Case "cumulative probability"
+                        CumulativeProbability(lTimeseriesGroup, lZgc, lGraphInit, lGraphRecords, lRecordIndex)
+                End Select
+
+                Dim GraphDirectory As String = System.IO.Path.GetDirectoryName(lOutFileName)
+                If Not System.IO.Directory.Exists(GraphDirectory) Then
+                    System.IO.Directory.CreateDirectory(GraphDirectory)
+                End If
+                lZgc.SaveIn(lOutFileName)
+                Dim newlistofattributes() As String = {"Location", "Constituent"}
+                atcData.atcDataManager.DisplayAttributesSet(newlistofattributes)
+                Dim lList As New atcList.atcListPlugin
+                lList.Save(lTimeseriesGroup, lOutFileName.Substring(0, Len(lOutFileName) - 4) & ".txt")
+                lZgc.Dispose()
+                lRecordIndex -= 1
+                lTimeseriesGroup = Nothing
+                lRecordIndex += 1
+            Loop While (lRecordIndex + 1) < lGraphRecords.Count
+            atcDataManager.DataSets.Clear()
+        Next
     End Sub
 
     Private Function AggregateTS(ByVal aTimeseries As atcTimeseries, ByVal aTimeUnit As String, ByVal aTran As String) As atcTimeseries
-        Select Case aTimeUnit & "_" & aTran
-            Case "daily_average"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-            Case "daily_min"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMin)
-            Case "daily_max"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMax)
-            Case "daily_sum"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
-            Case "monthly_average"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
-            Case "monthly_sum"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
-            Case "monthly_min"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranMin)
-            Case "monthly_max"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranMax)
-            Case "yearly_average"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-            Case "yearly_sum"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-            Case "yearly_min"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranMin)
-            Case "yearly_max"
-                Return Aggregate(aTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranMax)
-        End Select
+        Select Case aTimeUnit
+            Case "daily"
+                Select Case aTran
+                    Case "average"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                    Case "max"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMax)
+                    Case "min"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMin)
+                    Case "sum"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                    Case Else
+                        Return AggregateByAttribute(aTimeseries, atcTimeUnit.TUDay, 1, aTran)
+                End Select
 
+            Case "monthly"
+                Select Case aTran
+                    Case "average"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+                    Case "max"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranMax)
+                    Case "min"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranMin)
+                    Case "sum"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+                    Case Else
+                        Return AggregateByAttribute(aTimeseries, atcTimeUnit.TUDay, 1, aTran)
+                End Select
+            Case "yearly"
+                Select Case aTran
+                    Case "average"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                    Case "max"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranMax)
+                    Case "min"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranMin)
+                    Case "sum"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+                    Case Else
+                        Return AggregateByAttribute(aTimeseries, atcTimeUnit.TUDay, 1, aTran)
+                End Select
+        End Select
         Return aTimeseries
     End Function
     Private Function TimeSeriesgraph(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl, ByVal aGraphInit As Object, _
