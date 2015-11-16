@@ -238,16 +238,10 @@ Public Class frmGraphEditor
                     Dim lProbScale As ZedGraph.ProbabilityScale = aAxis.Scale
                     If radioProbablilityPercent.Checked Then
                         lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.Percent
-                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Fraction", "Percent")
-                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Return Interval", "Percent")
                     ElseIf radioProbablilityFraction.Checked Then
                         lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.Fraction
-                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Percent", "Fraction")
-                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Return Interval", "Fraction")
                     ElseIf radioProbablilityReturnPeriod.Checked Then
                         lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.ReturnInterval
-                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Percent", "Return Interval")
-                        .Title.Text = ReplaceStringNoCase(.Title.Text, "Fraction", "Return Interval")
                     End If
                     If Double.TryParse(txtProbabilityDeviations.Text, lTemp) Then
                         lProbScale.standardDeviations = lTemp
@@ -589,11 +583,24 @@ Public Class frmGraphEditor
     Private Sub radioGeneral_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
             radioAxisLinear.CheckedChanged, radioAxisLogarithmic.CheckedChanged, _
             radioCurveYaxisLeft.CheckedChanged, radioCurveYaxisRight.CheckedChanged, radioCurveYaxisAuxiliary.CheckedChanged, _
-            radioProbablilityFraction.CheckedChanged, radioProbablilityPercent.CheckedChanged, radioProbablilityReturnPeriod.CheckedChanged', chkProbabilityExceedance.CheckedChanged
+            radioProbablilityFraction.CheckedChanged, radioProbablilityPercent.CheckedChanged, radioProbablilityReturnPeriod.CheckedChanged ', chkProbabilityExceedance.CheckedChanged
 
-        If chkAutoApply.Checked Then
-            Dim lRadio As RadioButton = sender
-            If lRadio.Checked Then 'Only apply for newly checked, not also for unchecked
+        Dim lRadio As RadioButton = sender
+        If lRadio.Checked Then 'Only run for the newly checked one, not also for unchecked
+            If radioAxisProbability.Checked Then
+                If radioProbablilityPercent.Checked Then
+                    txtAxisLabel.Text = ReplaceStringNoCase(txtAxisLabel.Text, "Fraction", "Percent")
+                    txtAxisLabel.Text = ReplaceStringNoCase(txtAxisLabel.Text, "Return Interval", "Percent")
+                ElseIf radioProbablilityFraction.Checked Then
+                    txtAxisLabel.Text = ReplaceStringNoCase(txtAxisLabel.Text, "Percent", "Fraction")
+                    txtAxisLabel.Text = ReplaceStringNoCase(txtAxisLabel.Text, "Return Interval", "Fraction")
+                ElseIf radioProbablilityReturnPeriod.Checked Then
+                    txtAxisLabel.Text = ReplaceStringNoCase(txtAxisLabel.Text, "Percent", "Return Interval")
+                    txtAxisLabel.Text = ReplaceStringNoCase(txtAxisLabel.Text, "Fraction", "Return Interval")
+                End If
+            End If
+
+            If chkAutoApply.Checked Then
                 ApplyAll()
             End If
         End If
