@@ -148,7 +148,7 @@
     <value>pnlButtons</value>
   </data>
   <data name="&gt;&gt;btnCancel.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="btnOk.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
@@ -178,7 +178,37 @@
     <value>pnlButtons</value>
   </data>
   <data name="&gt;&gt;btnOk.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>5</value>
+  </data>
+  <data name="chkProvisional.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
+  <data name="chkProvisional.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="chkProvisional.Location" type="System.Drawing.Point, System.Drawing">
+    <value>424, 10</value>
+  </data>
+  <data name="chkProvisional.Size" type="System.Drawing.Size, System.Drawing">
+    <value>141, 17</value>
+  </data>
+  <data name="chkProvisional.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="chkProvisional.Text" xml:space="preserve">
+    <value>Include Provisional Data</value>
+  </data>
+  <data name="&gt;&gt;chkProvisional.Name" xml:space="preserve">
+    <value>chkProvisional</value>
+  </data>
+  <data name="&gt;&gt;chkProvisional.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;chkProvisional.Parent" xml:space="preserve">
+    <value>pnlButtons</value>
+  </data>
+  <data name="&gt;&gt;chkProvisional.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <data name="lblDates.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -205,7 +235,7 @@
     <value>pnlButtons</value>
   </data>
   <data name="&gt;&gt;lblDates.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="atcSelectedDates.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 22</value>
@@ -226,7 +256,7 @@
     <value>pnlButtons</value>
   </data>
   <data name="&gt;&gt;atcSelectedDates.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="chkFilter.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -256,7 +286,7 @@
     <value>pnlButtons</value>
   </data>
   <data name="&gt;&gt;chkFilter.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="pnlButtons.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Bottom</value>
@@ -307,55 +337,55 @@
     <value>3</value>
   </data>
   <data name="mnuFile.Size" type="System.Drawing.Size, System.Drawing">
-    <value>35, 20</value>
+    <value>37, 20</value>
   </data>
   <data name="mnuFile.Text" xml:space="preserve">
     <value>File</value>
   </data>
   <data name="mnuOpenData.Size" type="System.Drawing.Size, System.Drawing">
-    <value>179, 22</value>
+    <value>188, 22</value>
   </data>
   <data name="mnuOpenData.Text" xml:space="preserve">
     <value>Open Data</value>
   </data>
   <data name="mnuFileManage.Size" type="System.Drawing.Size, System.Drawing">
-    <value>179, 22</value>
+    <value>188, 22</value>
   </data>
   <data name="mnuFileManage.Text" xml:space="preserve">
     <value>Manage Data Sources</value>
   </data>
   <data name="mnuSaveFilters.Size" type="System.Drawing.Size, System.Drawing">
-    <value>179, 22</value>
+    <value>188, 22</value>
   </data>
   <data name="mnuSaveFilters.Text" xml:space="preserve">
     <value>Save Filters</value>
   </data>
   <data name="mnuLoadFilters.Size" type="System.Drawing.Size, System.Drawing">
-    <value>179, 22</value>
+    <value>188, 22</value>
   </data>
   <data name="mnuLoadFilters.Text" xml:space="preserve">
     <value>Load Filters</value>
   </data>
   <data name="mnuAttributes.Size" type="System.Drawing.Size, System.Drawing">
-    <value>67, 20</value>
+    <value>71, 20</value>
   </data>
   <data name="mnuAttributes.Text" xml:space="preserve">
     <value>Attributes</value>
   </data>
   <data name="mnuAttributesAdd.Size" type="System.Drawing.Size, System.Drawing">
-    <value>113, 22</value>
+    <value>117, 22</value>
   </data>
   <data name="mnuAttributesAdd.Text" xml:space="preserve">
     <value>A&amp;dd</value>
   </data>
   <data name="mnuAttributesRemove.Size" type="System.Drawing.Size, System.Drawing">
-    <value>113, 22</value>
+    <value>117, 22</value>
   </data>
   <data name="mnuAttributesRemove.Text" xml:space="preserve">
     <value>&amp;Remove</value>
   </data>
   <data name="mnuAttributesMove.Size" type="System.Drawing.Size, System.Drawing">
-    <value>113, 22</value>
+    <value>117, 22</value>
   </data>
   <data name="mnuAttributesMove.Text" xml:space="preserve">
     <value>&amp;Move</value>
@@ -364,46 +394,46 @@
     <value>False</value>
   </data>
   <data name="mnuSelect.Size" type="System.Drawing.Size, System.Drawing">
-    <value>48, 20</value>
+    <value>50, 20</value>
   </data>
   <data name="mnuSelect.Text" xml:space="preserve">
     <value>Select</value>
   </data>
   <data name="mnuSelectAll.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 22</value>
+    <value>205, 22</value>
   </data>
   <data name="mnuSelectAll.Text" xml:space="preserve">
     <value>Select &amp;All</value>
   </data>
   <data name="mnuSelectClear.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 22</value>
+    <value>205, 22</value>
   </data>
   <data name="mnuSelectClear.Text" xml:space="preserve">
     <value>Un-select All</value>
   </data>
   <data name="mnuSelectAllMatching.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 22</value>
+    <value>205, 22</value>
   </data>
   <data name="mnuSelectAllMatching.Text" xml:space="preserve">
     <value>Select &amp;Matching</value>
   </data>
   <data name="mnuSelectNoMatching.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 22</value>
+    <value>205, 22</value>
   </data>
   <data name="mnuSelectNoMatching.Text" xml:space="preserve">
     <value>Un-select Matching</value>
   </data>
   <data name="mnuSelectSeparator1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 6</value>
+    <value>202, 6</value>
   </data>
   <data name="mnuSelectMap.Size" type="System.Drawing.Size, System.Drawing">
-    <value>191, 22</value>
+    <value>205, 22</value>
   </data>
   <data name="mnuSelectMap.Text" xml:space="preserve">
     <value>Select Locations On Map</value>
   </data>
   <data name="mnuHelp.Size" type="System.Drawing.Size, System.Drawing">
-    <value>40, 20</value>
+    <value>44, 20</value>
   </data>
   <data name="mnuHelp.Text" xml:space="preserve">
     <value>Help</value>

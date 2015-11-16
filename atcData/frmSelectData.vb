@@ -68,40 +68,42 @@ Friend Class frmSelectData
     Friend WithEvents lblDates As System.Windows.Forms.Label
     Friend WithEvents atcSelectedDates As atcData.atcCommonDataGroupDates
     Friend WithEvents mnuSelectSeparator1 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents chkProvisional As System.Windows.Forms.CheckBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectData))
-        Me.btnCancel = New System.Windows.Forms.Button
-        Me.btnOk = New System.Windows.Forms.Button
-        Me.pnlButtons = New System.Windows.Forms.Panel
-        Me.lblDates = New System.Windows.Forms.Label
-        Me.atcSelectedDates = New atcData.atcCommonDataGroupDates
-        Me.chkFilter = New System.Windows.Forms.CheckBox
-        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
-        Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuOpenData = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuFileManage = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuSaveFilters = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuLoadFilters = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuAttributes = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuAttributesAdd = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuAttributesRemove = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuAttributesMove = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuSelect = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuSelectAll = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuSelectClear = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuSelectAllMatching = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuSelectNoMatching = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuSelectSeparator1 = New System.Windows.Forms.ToolStripSeparator
-        Me.mnuSelectMap = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
-        Me.groupTop = New System.Windows.Forms.GroupBox
-        Me.pMatchingGrid = New atcControls.atcGrid
-        Me.lblMatching = New System.Windows.Forms.Label
-        Me.splitAboveMatching = New System.Windows.Forms.Splitter
-        Me.panelCriteria = New System.Windows.Forms.Panel
-        Me.splitAboveSelected = New System.Windows.Forms.Splitter
-        Me.groupSelected = New System.Windows.Forms.GroupBox
-        Me.pSelectedGrid = New atcControls.atcGrid
+        Me.btnCancel = New System.Windows.Forms.Button()
+        Me.btnOk = New System.Windows.Forms.Button()
+        Me.pnlButtons = New System.Windows.Forms.Panel()
+        Me.chkProvisional = New System.Windows.Forms.CheckBox()
+        Me.lblDates = New System.Windows.Forms.Label()
+        Me.atcSelectedDates = New atcData.atcCommonDataGroupDates()
+        Me.chkFilter = New System.Windows.Forms.CheckBox()
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
+        Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuOpenData = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuFileManage = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuSaveFilters = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuLoadFilters = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuAttributes = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuAttributesAdd = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuAttributesRemove = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuAttributesMove = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuSelect = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuSelectAll = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuSelectClear = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuSelectAllMatching = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuSelectNoMatching = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuSelectSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.mnuSelectMap = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem()
+        Me.groupTop = New System.Windows.Forms.GroupBox()
+        Me.pMatchingGrid = New atcControls.atcGrid()
+        Me.lblMatching = New System.Windows.Forms.Label()
+        Me.splitAboveMatching = New System.Windows.Forms.Splitter()
+        Me.panelCriteria = New System.Windows.Forms.Panel()
+        Me.splitAboveSelected = New System.Windows.Forms.Splitter()
+        Me.groupSelected = New System.Windows.Forms.GroupBox()
+        Me.pSelectedGrid = New atcControls.atcGrid()
         Me.pnlButtons.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.groupTop.SuspendLayout()
@@ -121,6 +123,7 @@ Friend Class frmSelectData
         '
         'pnlButtons
         '
+        Me.pnlButtons.Controls.Add(Me.chkProvisional)
         Me.pnlButtons.Controls.Add(Me.lblDates)
         Me.pnlButtons.Controls.Add(Me.atcSelectedDates)
         Me.pnlButtons.Controls.Add(Me.chkFilter)
@@ -128,6 +131,12 @@ Friend Class frmSelectData
         Me.pnlButtons.Controls.Add(Me.btnOk)
         resources.ApplyResources(Me.pnlButtons, "pnlButtons")
         Me.pnlButtons.Name = "pnlButtons"
+        '
+        'chkProvisional
+        '
+        resources.ApplyResources(Me.chkProvisional, "chkProvisional")
+        Me.chkProvisional.Name = "chkProvisional"
+        Me.chkProvisional.UseVisualStyleBackColor = True
         '
         'lblDates
         '
@@ -260,7 +269,7 @@ Friend Class frmSelectData
         resources.ApplyResources(Me.pMatchingGrid, "pMatchingGrid")
         Me.pMatchingGrid.Fixed3D = False
         Me.pMatchingGrid.LineColor = System.Drawing.Color.Empty
-        Me.pMatchingGrid.LineWidth = 0.0!
+        Me.pMatchingGrid.LineWidth = 0!
         Me.pMatchingGrid.Name = "pMatchingGrid"
         Me.pMatchingGrid.Source = Nothing
         '
@@ -302,7 +311,7 @@ Friend Class frmSelectData
         resources.ApplyResources(Me.pSelectedGrid, "pSelectedGrid")
         Me.pSelectedGrid.Fixed3D = False
         Me.pSelectedGrid.LineColor = System.Drawing.Color.Empty
-        Me.pSelectedGrid.LineWidth = 0.0!
+        Me.pSelectedGrid.LineWidth = 0!
         Me.pSelectedGrid.Name = "pSelectedGrid"
         Me.pSelectedGrid.Source = Nothing
         '
@@ -416,6 +425,19 @@ Friend Class frmSelectData
         Populate()
         pAsking = True
 
+        chkProvisional.Visible = False
+        For Each lDataSet As atcTimeseries In AvailableData
+            If lDataSet.ValueAttributesExist Then
+                For Each lDef As atcAttributeDefinition In lDataSet.ValueAttributeDefinitions
+                    If lDef.Name = "P" Then
+                        chkProvisional.Visible = True
+                        chkProvisional.Checked = (GetSetting("BASINS", "Select Data", "Provisional", "False") = "True")
+                        GoTo FoundProvisional
+                    End If
+                Next
+            End If
+        Next
+FoundProvisional:
         Dim lCriteriaIndex As Integer = 0
         While pAsking AndAlso lCriteriaIndex < pcboCriteria(0).Items.Count
             Dim lAttributeName As String = pcboCriteria(0).Items(lCriteriaIndex)
@@ -969,6 +991,23 @@ NextName:
         End Set
     End Property
 
+    Private Function GetNonProvisional(ByVal aDataGroup As atcDataGroup) As atcDataGroup
+        Dim lFiltered As New atcDataGroup
+        For Each lDataSet As atcTimeseries In AvailableData
+            If HasProvisionalValues(lDataSet) Then
+                Dim lProvisionalTS As atcTimeseries = Nothing
+                Dim lNonProvisionalTS As atcTimeseries = Nothing
+                SplitProvisional(lDataSet, lProvisionalTS, lNonProvisionalTS)
+                If lNonProvisionalTS IsNot Nothing Then
+                    lFiltered.Add(lNonProvisionalTS)
+                End If
+            Else
+                lFiltered.Add(lDataSet)
+            End If
+        Next
+        Return lFiltered
+    End Function
+
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
         pAbortMatching = True
         If My.Computer.Keyboard.ShiftKeyDown AndAlso Not chkFilter.Checked Then
@@ -983,6 +1022,13 @@ NextName:
         If pSelectedGroup.Count = 0 AndAlso _
           (pMatchingGroup.Count < AvailableData.Count OrElse pMatchingGroup.Count < 11) Then
             pSelectedGroup.ChangeTo(pMatchingGroup)
+        End If
+
+        If chkProvisional.Visible Then
+            SaveSetting("BASINS", "Select Data", "Provisional", chkProvisional.Checked.ToString())
+            If Not chkProvisional.Checked Then 'Filter out provisional data
+                pSelectedGroup.ChangeTo(GetNonProvisional(pSelectedGroup))
+            End If
         End If
 
         If pOkCloses Then Me.Visible = False
