@@ -191,7 +191,7 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Loss from Evaporation"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Additional Source"
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
 
                     For Each lID As HspfOperation In lRchresOperations
                         .CurrentRecord += 1
@@ -315,7 +315,7 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = "(%)" : .FieldName(lField) = "Cumulative Trapping"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = "(%)" : .FieldName(lField) = "Reach Trapping"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Additional Sources"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
                     For Each lID As HspfOperation In lRchresOperations
                         Dim lPointTons As Double = 0.0
                         .CurrentRecord += 1
@@ -442,7 +442,7 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Additional Sources (wdm)"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
 
                     For Each lID As HspfOperation In lRchresOperations
                         'If lID.Id = 3 Then Stop
@@ -714,7 +714,7 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Additional Sources"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
 
                     For Each lID As HspfOperation In lRchresOperations
                         Dim lPointlbs As Double = 0.0
@@ -1177,7 +1177,7 @@ Public Module ConstituentBudget
                 'If aReach.Id = "110" Then Stop
                 For Each lTotalsKey As String In pRunningTotals.Keys
                     Dim ReachIDLength As Integer = aReach.Id.ToString.Length
-                    If lTotalsKey.Contains(aReach.Id) AndAlso lTotalsKey.Contains(SafeSubstring(lKey, 6 + ReachIDLength)) Then
+                    If lTotalsKey.Contains("Reach" & aReach.Id & " ") AndAlso lTotalsKey.Contains(SafeSubstring(lKey, 6 + ReachIDLength)) Then
 
                         pRunningTotals.ItemByKey(lTotalsKey) = pRunningTotals.ItemByKey(lTotalsKey) + (GainLoss * lContribPercent.ItemByKey(lKey) / 100)
                         Exit For
