@@ -1623,17 +1623,6 @@ Public Class frmSWSTATmod
             End If
             radioYearsCommon.Enabled = False
         End If
-
-        Select Case BatchAnalysis
-            Case atcBatchProcessing.clsBatch.ANALYSIS.SWSTAT
-                tabMain.Controls.RemoveByKey("tabDFLOW")
-            'tabNDay.Enabled = True
-            'tabDFLOW.Enabled = False
-            Case atcBatchProcessing.clsBatch.ANALYSIS.DFLOW
-                tabMain.Controls.RemoveByKey("tabNDay")
-                'tabNDay.Enabled = False
-                'tabDFLOW.Enabled = True
-        End Select
     End Sub
 
     Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
