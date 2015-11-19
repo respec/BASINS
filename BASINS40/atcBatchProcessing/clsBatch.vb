@@ -34,6 +34,7 @@ Public Class clsBatch
 
     Public Enum ANALYSIS
         ITA
+        SWSTAT
         DFLOW
     End Enum
 
