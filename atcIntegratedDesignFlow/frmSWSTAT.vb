@@ -1925,7 +1925,7 @@ Public Class frmSWSTAT
         End If
     End Sub
 
-    ''' <summary>Calculate(aOperationName: = "n-day " & HighOrLowString() & " value", _
+    ''' <summary>Calculate(aOperationName: = "n-day " HighOrLowString() " value"
     ''' aReturnPeriods() = ListToArray(lstRecurrence))
     ''' </summary>
     ''' <remarks></remarks>

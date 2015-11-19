@@ -19,13 +19,13 @@ Public Class clsDurationComparePlugin
         pMapWinWindowHandle = aParentHandle
         atcDataManager.MapWindow = aMapWin
 
-        Dim lSWSTATMenuName As String = atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)"
+        'Dim lSWSTATMenuName As String = atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)"
 
         atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
-        atcDataManager.AddMenuWithIcon(lSWSTATMenuName, atcDataManager.AnalysisMenuName, "USGS Surface Water Statistics (SWSTAT)", Me.Icon)
+        'atcDataManager.AddMenuWithIcon(lSWSTATMenuName, atcDataManager.AnalysisMenuName, "USGS Surface Water Statistics (SWSTAT)", Me.Icon)
 
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationCompare", lSWSTATMenuName, "Duration/Compare", Me.Icon, , , True))
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationHydrograph", lSWSTATMenuName, "Duration Hydrograph", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationCompare", atcDataManager.AnalysisMenuString, "Duration/Compare", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationHydrograph", atcDataManager.AnalysisMenuString, "Duration Hydrograph", Me.Icon, , , True))
     End Sub
 
     Public Overrides ReadOnly Property Icon() As System.Drawing.Icon

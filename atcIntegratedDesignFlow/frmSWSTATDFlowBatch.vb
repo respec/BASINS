@@ -2291,7 +2291,7 @@ Public Class frmSWSTATDFlowBatch
         End If
     End Sub
 
-    ''' <summary>Calculate(aOperationName: = "n-day " & HighOrLowString() & " value", _
+    ''' <summary>Calculate aOperationName: "n-day " HighOrLowString " value"
     ''' aReturnPeriods() = ListToArray(lstRecurrence))
     ''' </summary>
     ''' <remarks></remarks>
@@ -2860,8 +2860,6 @@ Public Class frmSWSTATDFlowBatch
 #Region "DFLOW"
 
     Private Sub ckbBio_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ckbBio.CheckedChanged
-        Dim i As Integer
-
         DFLOWCalcs.fBioDefault = Not ckbBio.Checked
 
         'rbBio1.Enabled = DFLOWCalcs.fBioDefault
@@ -2884,7 +2882,7 @@ Public Class frmSWSTATDFlowBatch
             tbBio3.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
             tbBio4.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
         Else
-            'For i = 0 To 3
+            'For i As Integer = 0 To 3
             '    If DFLOWCalcs.fBioFPArray(3, i) < 0 Then
             '        DFLOWCalcs.fBioFPArray(3, i) = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, i)
             '    End If
@@ -2916,8 +2914,6 @@ Public Class frmSWSTATDFlowBatch
     End Sub
 
     Private Sub ckbBioChronic_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ckbBioChronic.CheckedChanged
-        Dim i As Integer
-
         DFLOWCalcs.fBioDefault = Not ckbBioChronic.Checked
 
         tbBio1Chronic.Enabled = Not DFLOWCalcs.fBioDefault
@@ -2931,7 +2927,7 @@ Public Class frmSWSTATDFlowBatch
             tbBio3Chronic.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
             tbBio4Chronic.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
         Else
-            'For i = 0 To 3
+            'For i As Integer = 0 To 3
             '    If DFLOWCalcs.fBioFPArray(3, i) < 0 Then
             '        DFLOWCalcs.fBioFPArray(3, i) = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, i)
             '    End If
@@ -2956,8 +2952,6 @@ Public Class frmSWSTATDFlowBatch
     End Sub
 
     Private Sub ckbBioAmm_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ckbBioAmm.CheckedChanged
-        Dim i As Integer
-
         DFLOWCalcs.fBioDefault = Not ckbBioAmm.Checked
 
         tbBio1Amm.Enabled = Not DFLOWCalcs.fBioDefault
@@ -2971,7 +2965,7 @@ Public Class frmSWSTATDFlowBatch
             tbBio3Amm.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
             tbBio4Amm.Text = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
         Else
-            'For i = 0 To 3
+            'For i As Integer = 0 To 3
             '    If DFLOWCalcs.fBioFPArray(3, i) < 0 Then
             '        DFLOWCalcs.fBioFPArray(3, i) = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, i)
             '    End If

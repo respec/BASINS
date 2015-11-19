@@ -2127,8 +2127,8 @@ Public Class frmSWSTATmod
         End If
     End Sub
 
-    ''' <summary>Calculate(aOperationName: = "n-day " & HighOrLowString() & " value", _
-    ''' aReturnPeriods() = ListToArray(lstRecurrence))
+    ''' <summary>Calculate aOperationName: "n-day "  HighOrLowString()  " value"
+    ''' aReturnPeriods() = ListToArray(lstRecurrence)
     ''' </summary>
     ''' <remarks></remarks>
     Private Sub CalculateBatch()

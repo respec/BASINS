@@ -137,6 +137,7 @@
     <Compile Include="atcTimeseriesPointList.vb" />
     <Compile Include="clsGraphBase.vb" />
     <Compile Include="clsGraphCumulativeDifference.vb" />
+    <Compile Include="clsGraphDoubleMass.vb" />
     <Compile Include="clsGraphFrequency.vb" />
     <Compile Include="clsGraphProbability.vb" />
     <Compile Include="clsGraphResidual.vb" />
