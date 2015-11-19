@@ -887,24 +887,24 @@ Public Module modUtil
             'lStnList = Nothing
         End Sub
 
-        Public Shared Function DoFrequencyGrid(ByVal aDataGroup As atcTimeseriesGroup, _
-                                           ByVal aGroupArgs As atcDataAttributes, _
-                                           ByVal aNDayDbl() As Double, _
-                                           ByVal aReturnPeriodDbl() As Double, _
-                                           ByVal aHighFlag As Boolean) As String
+        'Public Shared Function DoFrequencyGrid(ByVal aDataGroup As atcTimeseriesGroup, _
+        '                                   ByVal aGroupArgs As atcDataAttributes, _
+        '                                   ByVal aNDayDbl() As Double, _
+        '                                   ByVal aReturnPeriodDbl() As Double, _
+        '                                   ByVal aHighFlag As Boolean) As String
 
-            Try
-                'Dim lNDayValuesHighDone As Boolean = InputNames.CalculateNDayValues(aDataGroup, aGroupArgs, aNDayDbl, aReturnPeriodDbl, aHighFlag)
-                'Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=aDataGroup, _
-                '                                 aHigh:=aHighFlag, _
-                '                                 aNday:=aNDayDbl, _
-                '                                 aReturns:=aReturnPeriodDbl, _
-                '                                 aShowForm:=False)
-                'Return lFreqForm.ToString()
-            Catch ex As Exception
-                Return ""
-            End Try
-        End Function
+        '    Try
+        '        'Dim lNDayValuesHighDone As Boolean = InputNames.CalculateNDayValues(aDataGroup, aGroupArgs, aNDayDbl, aReturnPeriodDbl, aHighFlag)
+        '        'Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=aDataGroup, _
+        '        '                                 aHigh:=aHighFlag, _
+        '        '                                 aNday:=aNDayDbl, _
+        '        '                                 aReturns:=aReturnPeriodDbl, _
+        '        '                                 aShowForm:=False)
+        '        'Return lFreqForm.ToString()
+        '    Catch ex As Exception
+        '        Return ""
+        '    End Try
+        'End Function
 
         Public Shared Sub GetNdayReturnPeriodAttributes(ByVal aInputs As atcDataAttributes, _
                                                         ByRef aNDay() As Double, _
@@ -975,75 +975,75 @@ Public Module modUtil
             'End If
         End Sub
 
-        Public Shared Function TrendAnalysis(ByVal aDataGroup As atcTimeseriesGroup, _
-                                             ByVal aInputArgs As atcDataAttributes, _
-                                             ByVal aNDays() As Double, _
-                                             ByVal aHighFlow As Boolean) As String
-            Dim lCalcArgs As New atcDataAttributes()
-            'With lCalcArgs
-            ' not needed as this is done inside computeRankedAnnualTimeseries
-            '    .SetValue("Timeseries", aDataGroup)
-            '    .SetValue(NDay, aNDays)
-            'End With
-            SetInputsForAnalysis(aInputArgs, lCalcArgs, aHighFlow)
-            'Dim lRankedAnnual As atcTimeseriesGroup = _
-            '       clsSWSTATPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=aDataGroup, _
-            '                                                     aNDay:=aNDays, _
-            '                                                     aHighFlag:=aHighFlow, _
-            '                                                     aFirstYear:=lCalcArgs.GetValue(InputNames.StartYear), _
-            '                                                     aLastYear:=lCalcArgs.GetValue(InputNames.EndYear), _
-            '                                                     aBoundaryMonth:=lCalcArgs.GetValue(InputNames.StartMonth), _
-            '                                                     aBoundaryDay:=lCalcArgs.GetValue(InputNames.StartDay), _
-            '                                                     aEndMonth:=lCalcArgs.GetValue(InputNames.EndMonth), _
-            '                                                     aEndDay:=lCalcArgs.GetValue(InputNames.EndDay))
-            'Dim lTrendGridText As String = ""
-            'If lRankedAnnual.Count > 0 Then
-            '    Dim lTrendAttributes As New Generic.List(Of String)
-            '    Dim lDateFormat As New atcDateFormat
-            '    With lDateFormat
-            '        .IncludeHours = False
-            '        .IncludeMinutes = False
-            '        .IncludeSeconds = False
-            '    End With
-            '    For Each lTS As atcTimeseries In lRankedAnnual
-            '        With lTS.Attributes
-            '            .SetValue("Original ID", lTS.OriginalParent.Attributes.GetValue("ID"))
-            '            .SetValue("From", lDateFormat.JDateToString(lTS.Dates.Value(1)))
-            '            .SetValue("To", lDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
-            '            .SetValue("Not Used", .GetValue("Count Missing"))
-            '        End With
-            '    Next
-            '    Dim lTrendSource As New atcTimeseriesGridSource(lRankedAnnual, TrendAttributes(), True, True)
-            '    'mnuViewValues.Checked, _
-            '    'mnuFilterNoData.Checked)
-            '    With lTrendSource
-            '        .AttributeValuesEditable = True 'mnuEditAtrributeValues.Checked
-            '        .DisplayValueAttributes = False 'mnuViewValueAttributes.Checked
-            '        .DateFormat = lDateFormat
-            '    End With
-            '    Dim lList As New atcList.atcListForm
-            '    With lList
-            '        With .DateFormat
-            '            .IncludeDays = False
-            '            .IncludeHours = False
-            '            .IncludeMinutes = False
-            '            .IncludeMonths = False
-            '        End With
-            '        If aHighFlow Then
-            '            .Text = "Trend of High Annual Time Series and Statistics"
-            '        Else
-            '            .Text = "Trend of Low Annual Time Series and Statistics"
-            '        End If
-            '        .Initialize(lRankedAnnual, TrendAttributes(), , , False)
-            '        .SwapRowsColumns = True
-            '        '.Icon = Me.Icon
-            '        lTrendGridText = .ToString()
-            '    End With
-            '    'Return lTrendSource
-            'Else
-            '    'Return Nothing
-            'End If
-            'Return lTrendGridText
-        End Function
+        'Public Shared Function TrendAnalysis(ByVal aDataGroup As atcTimeseriesGroup, _
+        '                                     ByVal aInputArgs As atcDataAttributes, _
+        '                                     ByVal aNDays() As Double, _
+        '                                     ByVal aHighFlow As Boolean) As String
+        '    Dim lCalcArgs As New atcDataAttributes()
+        '    'With lCalcArgs
+        '    ' not needed as this is done inside computeRankedAnnualTimeseries
+        '    '    .SetValue("Timeseries", aDataGroup)
+        '    '    .SetValue(NDay, aNDays)
+        '    'End With
+        '    SetInputsForAnalysis(aInputArgs, lCalcArgs, aHighFlow)
+        '    'Dim lRankedAnnual As atcTimeseriesGroup = _
+        '    '       clsSWSTATPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=aDataGroup, _
+        '    '                                                     aNDay:=aNDays, _
+        '    '                                                     aHighFlag:=aHighFlow, _
+        '    '                                                     aFirstYear:=lCalcArgs.GetValue(InputNames.StartYear), _
+        '    '                                                     aLastYear:=lCalcArgs.GetValue(InputNames.EndYear), _
+        '    '                                                     aBoundaryMonth:=lCalcArgs.GetValue(InputNames.StartMonth), _
+        '    '                                                     aBoundaryDay:=lCalcArgs.GetValue(InputNames.StartDay), _
+        '    '                                                     aEndMonth:=lCalcArgs.GetValue(InputNames.EndMonth), _
+        '    '                                                     aEndDay:=lCalcArgs.GetValue(InputNames.EndDay))
+        '    'Dim lTrendGridText As String = ""
+        '    'If lRankedAnnual.Count > 0 Then
+        '    '    Dim lTrendAttributes As New Generic.List(Of String)
+        '    '    Dim lDateFormat As New atcDateFormat
+        '    '    With lDateFormat
+        '    '        .IncludeHours = False
+        '    '        .IncludeMinutes = False
+        '    '        .IncludeSeconds = False
+        '    '    End With
+        '    '    For Each lTS As atcTimeseries In lRankedAnnual
+        '    '        With lTS.Attributes
+        '    '            .SetValue("Original ID", lTS.OriginalParent.Attributes.GetValue("ID"))
+        '    '            .SetValue("From", lDateFormat.JDateToString(lTS.Dates.Value(1)))
+        '    '            .SetValue("To", lDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
+        '    '            .SetValue("Not Used", .GetValue("Count Missing"))
+        '    '        End With
+        '    '    Next
+        '    '    Dim lTrendSource As New atcTimeseriesGridSource(lRankedAnnual, TrendAttributes(), True, True)
+        '    '    'mnuViewValues.Checked, _
+        '    '    'mnuFilterNoData.Checked)
+        '    '    With lTrendSource
+        '    '        .AttributeValuesEditable = True 'mnuEditAtrributeValues.Checked
+        '    '        .DisplayValueAttributes = False 'mnuViewValueAttributes.Checked
+        '    '        .DateFormat = lDateFormat
+        '    '    End With
+        '    '    Dim lList As New atcList.atcListForm
+        '    '    With lList
+        '    '        With .DateFormat
+        '    '            .IncludeDays = False
+        '    '            .IncludeHours = False
+        '    '            .IncludeMinutes = False
+        '    '            .IncludeMonths = False
+        '    '        End With
+        '    '        If aHighFlow Then
+        '    '            .Text = "Trend of High Annual Time Series and Statistics"
+        '    '        Else
+        '    '            .Text = "Trend of Low Annual Time Series and Statistics"
+        '    '        End If
+        '    '        .Initialize(lRankedAnnual, TrendAttributes(), , , False)
+        '    '        .SwapRowsColumns = True
+        '    '        '.Icon = Me.Icon
+        '    '        lTrendGridText = .ToString()
+        '    '    End With
+        '    '    'Return lTrendSource
+        '    'Else
+        '    '    'Return Nothing
+        '    'End If
+        '    'Return lTrendGridText
+        'End Function
     End Class
 End Module

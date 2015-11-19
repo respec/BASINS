@@ -70,7 +70,8 @@ Public Class clsIDFPlugin
     Private Function BasicAttributes() As Generic.List(Of String)
         Dim lBasicAttributes As New Generic.List(Of String)
         With lBasicAttributes
-            .Add("ID")
+            .Add("STAID")
+            .Add("STANAM")
             .Add("Min")
             .Add("Max")
             .Add("Mean")
