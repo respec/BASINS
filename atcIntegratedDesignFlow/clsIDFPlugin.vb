@@ -6,7 +6,7 @@ Public Class clsIDFPlugin
     Inherits atcData.atcDataDisplay
 
     Private Const pTrendName As String = "Trend"
-    Private pBatchMenuName As String = atcDataManager.AnalysisMenuName & "_" & Name & "_Batch"
+    Private pBatchMenuName As String = atcDataManager.AnalysisMenuName & "_" & Name '& "_Batch"
     Private Const pIDFName As String = "USGS Integrated Design Flow (IDF)"
 
     Public Overrides ReadOnly Property Name() As String
@@ -38,7 +38,7 @@ Public Class clsIDFPlugin
         'ElseIf lChoice = "Batch Map" Then
         'End If
 
-        Dim lForm As New frmSWSTAT
+        Dim lForm As New frmSWSTATmod
         lForm.Initialize(aTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
         Return lForm
     End Function
@@ -132,9 +132,14 @@ Public Class clsIDFPlugin
         Dim lParentMenuName As String = "BasinsAnalysis"
         'Dim lParentMenu As MapWindow.Interfaces.MenuItem = CType(pMenusAdded.Item(pMenusAdded.Count - 1), MapWindow.Interfaces.MenuItem
 
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, pIDFName & " Run Existing Batch", Me.Icon, , , True))
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, pIDFName & " Create SWSTAT Batch", Me.Icon, , , True))
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, pIDFName & " Create DFLOW Batch", Me.Icon, , , True))
+        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, lMenuName & "::Run Existing Batch", Me.Icon, , , True))
+        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, lMenuName & "::Create SWSTAT Batch", Me.Icon, , , True))
+        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, lMenuName & "::Create DFLOW Batch", Me.Icon, , , True))
+
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName & "_Run Existing Batch", pBatchMenuName, "Run Existing Batch", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName & "_Create SWSTAT Batch", pBatchMenuName, "Create SWSTAT Batch", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName & "_Create DFLOW Batch", pBatchMenuName, "Create DFLOW Batch", Me.Icon, , , True))
+
     End Sub
 
 
@@ -152,6 +157,8 @@ Public Class clsIDFPlugin
         MyBase.ItemClicked(aItemName, aHandled)
         If Not aHandled Then
             Select Case aItemName
+                Case atcDataManager.AnalysisMenuName
+                    'Do nothing
                 Case atcDataManager.AnalysisMenuName & "_USGS Integrated Design Flow (IDF)_" & pTrendName
                     Dim lTimeseriesGroup As atcTimeseriesGroup = _
                       atcDataManager.UserSelectData("Select Data For Trend Analysis", _
@@ -161,12 +168,12 @@ Public Class clsIDFPlugin
                         Dim lForm As New frmTrend
                         lForm.Initialize(lTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
                     End If
-                Case pBatchMenuName & " Run Existing Batch"
+                Case pBatchMenuName & "_Run Existing Batch"
                     Dim lFrmBatch As New frmBatch()
                     lFrmBatch.Show()
 
-                Case pBatchMenuName & " Create SWSTAT Batch", pBatchMenuName & " Create DFLOW Batch"
-                    Dim lBatchTitle As String = "Batch Run IDF"
+                Case pBatchMenuName & "_Create SWSTAT Batch", pBatchMenuName & "_Create DFLOW Batch"
+                    Dim lBatchTitle As String = "Batch Run "
                     Dim lStationsAreSelected As Boolean = False
                     Dim lMapLayer As MapWindow.Interfaces.Layer = Nothing
                     For Each lMapLayer In pMapWin.Layers
@@ -215,20 +222,27 @@ Public Class clsIDFPlugin
                             Next
                         End If
                         If lSelectedStationIDs.Count > 0 Then
-                            Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf &
-                                       StationListing(lSelectedStationIDs),
+                            Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf & _
+                                       StationListing(lSelectedStationIDs), _
                                        lBatchTitle)
                         End If
                     End If
                     Dim lfrmBatchMap As New frmBatchMap()
-                        lfrmBatchMap.Initiate(lSelectedStationIDs)
-                        lfrmBatchMap.ShowDialog()
-                        'Return Nothing 'for now
-                        Exit Sub
+                    If aItemName = pBatchMenuName & "_Create SWSTAT Batch" Then
+                        lfrmBatchMap.BatchAnalysis = atcBatchProcessing.clsBatch.ANALYSIS.SWSTAT
+                    ElseIf aItemName = pBatchMenuName & "_Create DFLOW Batch" Then
+                        lfrmBatchMap.BatchAnalysis = atcBatchProcessing.clsBatch.ANALYSIS.DFLOW
+                    End If
+                    lfrmBatchMap.Initiate(lSelectedStationIDs)
+                    lfrmBatchMap.ShowDialog()
+                    'Return Nothing 'for now
+                    Exit Sub
                     'Else
                     '    Logger.Msg("Could not find stream gage station map layer: NWIS Daily Discharge Stations.", lBatchTitle)
                     '    'Return Nothing
                     'End If
+                Case Else
+                    Dim lItem As String = "Stop"
             End Select
         End If
     End Sub

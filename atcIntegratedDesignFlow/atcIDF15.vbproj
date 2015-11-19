@@ -130,6 +130,13 @@
     <Compile Include="atcFrequencyGridSource.vb" />
     <Compile Include="clsBatchSpec.vb" />
     <Compile Include="clsIDFPlugin.vb" />
+    <Compile Include="DFLOWCalcs.vb" />
+    <Compile Include="frmAboutDFLOW.Designer.vb">
+      <DependentUpon>frmAboutDFLOW.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAboutDFLOW.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmBatch.Designer.vb">
       <DependentUpon>frmBatch.vb</DependentUpon>
     </Compile>
@@ -142,10 +149,34 @@
     <Compile Include="frmBatchMap.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmDFLOWExcursions.Designer.vb">
+      <DependentUpon>frmDFLOWExcursions.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDFLOWExcursions.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDFLOWProgress.Designer.vb">
+      <DependentUpon>frmDFLOWProgress.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDFLOWProgress.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDFLOWResults.Designer.vb">
+      <DependentUpon>frmDFLOWResults.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDFLOWResults.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmDisplayFrequencyGrid.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmSWSTAT.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSWSTATDFlowBatch.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSWSTATmod.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmTrend.vb">
@@ -169,6 +200,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmAboutDFLOW.resx">
+      <DependentUpon>frmAboutDFLOW.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmBatch.resx">
       <DependentUpon>frmBatch.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -177,6 +211,15 @@
       <DependentUpon>frmBatchMap.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmDFLOWExcursions.resx">
+      <DependentUpon>frmDFLOWExcursions.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDFLOWProgress.resx">
+      <DependentUpon>frmDFLOWProgress.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDFLOWResults.resx">
+      <DependentUpon>frmDFLOWResults.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmDisplayFrequencyGrid.resx">
       <DependentUpon>frmDisplayFrequencyGrid.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -184,6 +227,12 @@
     <EmbeddedResource Include="frmSWSTAT.resx">
       <DependentUpon>frmSWSTAT.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSWSTATDFlowBatch.resx">
+      <DependentUpon>frmSWSTATDFlowBatch.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSWSTATmod.resx">
+      <DependentUpon>frmSWSTATmod.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmTrend.resx">
       <DependentUpon>frmTrend.vb</DependentUpon>
