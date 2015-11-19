@@ -87,7 +87,6 @@ Public Class clsIDFPlugin
         With lNDayAttributes
             .Add("STAID")
             .Add("STANAM")
-            .Add("Constituent")
         End With
         Return lNDayAttributes
     End Function
@@ -96,7 +95,7 @@ Public Class clsIDFPlugin
         Dim lTrendAttributes As New Generic.List(Of String)
         With lTrendAttributes
             .Add("STAID")
-            .Add("Constituent")
+            .Add("STANAM")
             .Add("SpearmanTest")
             .Add("KENTAU")
             .Add("KENPLV")
@@ -128,18 +127,19 @@ Public Class clsIDFPlugin
 
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
-        'Add menu item for this analysis
-        Dim lMenuName As String = pIDFName & " Batch"
-        Dim lParentMenuName As String = "BasinsAnalysis"
-        'Dim lParentMenu As MapWindow.Interfaces.MenuItem = CType(pMenusAdded.Item(pMenusAdded.Count - 1), MapWindow.Interfaces.MenuItem
 
         'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, lMenuName & "::Run Existing Batch", Me.Icon, , , True))
         'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, lMenuName & "::Create SWSTAT Batch", Me.Icon, , , True))
         'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, lMenuName & "::Create DFLOW Batch", Me.Icon, , , True))
 
+        'Dim lInteractiveMenuName As String = atcDataManager.AnalysisMenuName & "_" & Name
+
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName & "::Interactive", pBatchMenuName, "Interactive", Me.Icon, , , True))
+        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, atcDataManager.AnalysisMenuName, "USGS Surface Water Batch", Me.Icon, lInteractiveMenuName, , True))
+
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName & "_Run Existing Batch", pBatchMenuName, "Run Existing Batch", Me.Icon, , , True))
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName & "_Create SWSTAT Batch", pBatchMenuName, "Create SWSTAT Batch", Me.Icon, , , True))
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName & "_Create DFLOW Batch", pBatchMenuName, "Create DFLOW Batch", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName & "_Create SWSTAT Batch", pBatchMenuName, "Create SWSTAT Batch", Me.Icon, , , True))
 
     End Sub
 
@@ -160,6 +160,9 @@ Public Class clsIDFPlugin
             Select Case aItemName
                 Case atcDataManager.AnalysisMenuName
                     'Do nothing
+                Case atcDataManager.AnalysisMenuName & "_" & Name & "::Interactive"
+                    Show()
+                    aHandled = True
                 Case atcDataManager.AnalysisMenuName & "_USGS Integrated Design Flow (IDF)_" & pTrendName
                     Dim lTimeseriesGroup As atcTimeseriesGroup = _
                       atcDataManager.UserSelectData("Select Data For Trend Analysis", _
@@ -169,9 +172,11 @@ Public Class clsIDFPlugin
                         Dim lForm As New frmTrend
                         lForm.Initialize(lTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
                     End If
+                    aHandled = True
                 Case pBatchMenuName & "_Run Existing Batch"
                     Dim lFrmBatch As New frmBatch()
                     lFrmBatch.Show()
+                    aHandled = True
 
                 Case pBatchMenuName & "_Create SWSTAT Batch", pBatchMenuName & "_Create DFLOW Batch"
                     Dim lBatchTitle As String = "Batch Run "
@@ -236,6 +241,7 @@ Public Class clsIDFPlugin
                     End If
                     lfrmBatchMap.Initiate(lSelectedStationIDs)
                     lfrmBatchMap.ShowDialog()
+                    aHandled = True
                     'Return Nothing 'for now
                     Exit Sub
                     'Else
