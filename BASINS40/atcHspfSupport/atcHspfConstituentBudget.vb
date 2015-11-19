@@ -453,6 +453,7 @@ Public Module ConstituentBudget
                         For Each lSource As HspfPointSource In lID.PointSources
                             If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) _
                                                                         Or (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 2) _
+                                                                        Or (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 3) _
                                                                         Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 3) _
                                                                         Or (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
                                 Dim VolName As String = lSource.Source.VolName
