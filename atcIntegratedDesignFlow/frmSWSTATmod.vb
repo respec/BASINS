@@ -52,7 +52,6 @@ Public Class frmSWSTATmod
     Friend WithEvents lblOmitAfter As System.Windows.Forms.Label
     Friend WithEvents txtOmitAfterYear As System.Windows.Forms.TextBox
     Friend WithEvents txtOmitBeforeYear As System.Windows.Forms.TextBox
-    Friend WithEvents cboYears As System.Windows.Forms.ComboBox
     Friend WithEvents btnNDay As System.Windows.Forms.Button
     Friend WithEvents btnDisplayTrend As System.Windows.Forms.Button
     Friend WithEvents btnDisplayBasic As System.Windows.Forms.Button
@@ -118,6 +117,9 @@ Public Class frmSWSTATmod
     Friend WithEvents btnFrequencyReport As System.Windows.Forms.Button
     Friend WithEvents groupGraph As System.Windows.Forms.GroupBox
     Friend WithEvents chkHarmonicMean As System.Windows.Forms.CheckBox
+    Friend WithEvents radioYearsAll As RadioButton
+    Friend WithEvents radioYearsCustom As RadioButton
+    Friend WithEvents radioYearsCommon As RadioButton
     Friend WithEvents chkBio3Amm As System.Windows.Forms.CheckBox
     Friend WithEvents chkBio2Chronic As System.Windows.Forms.CheckBox
     Friend WithEvents chkBio1Acute As System.Windows.Forms.CheckBox
@@ -161,13 +163,15 @@ Public Class frmSWSTATmod
         Me.cboEndMonth = New System.Windows.Forms.ComboBox()
         Me.lblYearEnd = New System.Windows.Forms.Label()
         Me.grpYears = New System.Windows.Forms.GroupBox()
+        Me.radioYearsCustom = New System.Windows.Forms.RadioButton()
+        Me.radioYearsCommon = New System.Windows.Forms.RadioButton()
+        Me.radioYearsAll = New System.Windows.Forms.RadioButton()
         Me.lblDataStart = New System.Windows.Forms.Label()
         Me.lblDataEnd = New System.Windows.Forms.Label()
         Me.lblOmitBefore = New System.Windows.Forms.Label()
         Me.lblOmitAfter = New System.Windows.Forms.Label()
         Me.txtOmitAfterYear = New System.Windows.Forms.TextBox()
         Me.txtOmitBeforeYear = New System.Windows.Forms.TextBox()
-        Me.cboYears = New System.Windows.Forms.ComboBox()
         Me.tabNDay = New System.Windows.Forms.TabPage()
         Me.groupGraph = New System.Windows.Forms.GroupBox()
         Me.btnDoFrequencyGrid = New System.Windows.Forms.Button()
@@ -398,7 +402,7 @@ Public Class frmSWSTATmod
         '
         'btnDisplayBasic
         '
-        Me.btnDisplayBasic.Location = New System.Drawing.Point(8, 270)
+        Me.btnDisplayBasic.Location = New System.Drawing.Point(8, 307)
         Me.btnDisplayBasic.Name = "btnDisplayBasic"
         Me.btnDisplayBasic.Size = New System.Drawing.Size(157, 23)
         Me.btnDisplayBasic.TabIndex = 10
@@ -481,26 +485,61 @@ Public Class frmSWSTATmod
         'grpYears
         '
         Me.grpYears.BackColor = System.Drawing.SystemColors.Control
+        Me.grpYears.Controls.Add(Me.radioYearsCustom)
+        Me.grpYears.Controls.Add(Me.radioYearsCommon)
+        Me.grpYears.Controls.Add(Me.radioYearsAll)
         Me.grpYears.Controls.Add(Me.lblDataStart)
         Me.grpYears.Controls.Add(Me.lblDataEnd)
         Me.grpYears.Controls.Add(Me.lblOmitBefore)
         Me.grpYears.Controls.Add(Me.lblOmitAfter)
         Me.grpYears.Controls.Add(Me.txtOmitAfterYear)
         Me.grpYears.Controls.Add(Me.txtOmitBeforeYear)
-        Me.grpYears.Controls.Add(Me.cboYears)
         Me.grpYears.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpYears.Location = New System.Drawing.Point(8, 156)
         Me.grpYears.Name = "grpYears"
-        Me.grpYears.Size = New System.Drawing.Size(250, 102)
+        Me.grpYears.Size = New System.Drawing.Size(250, 145)
         Me.grpYears.TabIndex = 66
         Me.grpYears.TabStop = False
         Me.grpYears.Text = "Years to Include in Analysis"
+        '
+        'radioYearsCustom
+        '
+        Me.radioYearsCustom.AutoSize = True
+        Me.radioYearsCustom.Location = New System.Drawing.Point(6, 65)
+        Me.radioYearsCustom.Name = "radioYearsCustom"
+        Me.radioYearsCustom.Size = New System.Drawing.Size(63, 17)
+        Me.radioYearsCustom.TabIndex = 48
+        Me.radioYearsCustom.TabStop = True
+        Me.radioYearsCustom.Text = "Custom:"
+        Me.radioYearsCustom.UseVisualStyleBackColor = True
+        '
+        'radioYearsCommon
+        '
+        Me.radioYearsCommon.AutoSize = True
+        Me.radioYearsCommon.Location = New System.Drawing.Point(6, 42)
+        Me.radioYearsCommon.Name = "radioYearsCommon"
+        Me.radioYearsCommon.Size = New System.Drawing.Size(66, 17)
+        Me.radioYearsCommon.TabIndex = 47
+        Me.radioYearsCommon.TabStop = True
+        Me.radioYearsCommon.Text = "Common"
+        Me.radioYearsCommon.UseVisualStyleBackColor = True
+        '
+        'radioYearsAll
+        '
+        Me.radioYearsAll.AutoSize = True
+        Me.radioYearsAll.Location = New System.Drawing.Point(6, 19)
+        Me.radioYearsAll.Name = "radioYearsAll"
+        Me.radioYearsAll.Size = New System.Drawing.Size(36, 17)
+        Me.radioYearsAll.TabIndex = 46
+        Me.radioYearsAll.TabStop = True
+        Me.radioYearsAll.Text = "All"
+        Me.radioYearsAll.UseVisualStyleBackColor = True
         '
         'lblDataStart
         '
         Me.lblDataStart.AutoSize = True
         Me.lblDataStart.Enabled = False
-        Me.lblDataStart.Location = New System.Drawing.Point(123, 49)
+        Me.lblDataStart.Location = New System.Drawing.Point(122, 91)
         Me.lblDataStart.Name = "lblDataStart"
         Me.lblDataStart.Size = New System.Drawing.Size(119, 13)
         Me.lblDataStart.TabIndex = 45
@@ -511,7 +550,7 @@ Public Class frmSWSTATmod
         '
         Me.lblDataEnd.AutoSize = True
         Me.lblDataEnd.Enabled = False
-        Me.lblDataEnd.Location = New System.Drawing.Point(123, 75)
+        Me.lblDataEnd.Location = New System.Drawing.Point(122, 117)
         Me.lblDataEnd.Name = "lblDataEnd"
         Me.lblDataEnd.Size = New System.Drawing.Size(116, 13)
         Me.lblDataEnd.TabIndex = 1
@@ -522,7 +561,7 @@ Public Class frmSWSTATmod
         '
         Me.lblOmitBefore.AutoSize = True
         Me.lblOmitBefore.Enabled = False
-        Me.lblOmitBefore.Location = New System.Drawing.Point(6, 49)
+        Me.lblOmitBefore.Location = New System.Drawing.Point(5, 91)
         Me.lblOmitBefore.Name = "lblOmitBefore"
         Me.lblOmitBefore.Size = New System.Drawing.Size(54, 13)
         Me.lblOmitBefore.TabIndex = 40
@@ -532,7 +571,7 @@ Public Class frmSWSTATmod
         '
         Me.lblOmitAfter.AutoSize = True
         Me.lblOmitAfter.Enabled = False
-        Me.lblOmitAfter.Location = New System.Drawing.Point(6, 75)
+        Me.lblOmitAfter.Location = New System.Drawing.Point(5, 117)
         Me.lblOmitAfter.Name = "lblOmitAfter"
         Me.lblOmitAfter.Size = New System.Drawing.Size(51, 13)
         Me.lblOmitAfter.TabIndex = 43
@@ -541,7 +580,7 @@ Public Class frmSWSTATmod
         'txtOmitAfterYear
         '
         Me.txtOmitAfterYear.Enabled = False
-        Me.txtOmitAfterYear.Location = New System.Drawing.Point(66, 72)
+        Me.txtOmitAfterYear.Location = New System.Drawing.Point(65, 114)
         Me.txtOmitAfterYear.Name = "txtOmitAfterYear"
         Me.txtOmitAfterYear.Size = New System.Drawing.Size(37, 20)
         Me.txtOmitAfterYear.TabIndex = 9
@@ -550,20 +589,11 @@ Public Class frmSWSTATmod
         'txtOmitBeforeYear
         '
         Me.txtOmitBeforeYear.Enabled = False
-        Me.txtOmitBeforeYear.Location = New System.Drawing.Point(66, 46)
+        Me.txtOmitBeforeYear.Location = New System.Drawing.Point(65, 88)
         Me.txtOmitBeforeYear.Name = "txtOmitBeforeYear"
         Me.txtOmitBeforeYear.Size = New System.Drawing.Size(37, 20)
         Me.txtOmitBeforeYear.TabIndex = 8
         Me.txtOmitBeforeYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'cboYears
-        '
-        Me.cboYears.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboYears.FormattingEnabled = True
-        Me.cboYears.Location = New System.Drawing.Point(6, 18)
-        Me.cboYears.Name = "cboYears"
-        Me.cboYears.Size = New System.Drawing.Size(233, 21)
-        Me.cboYears.TabIndex = 7
         '
         'tabNDay
         '
@@ -1505,9 +1535,6 @@ Public Class frmSWSTATmod
         pCommonStart = GetMinValue()
         pCommonEnd = GetMaxValue()
 
-        Dim lAllText As String = "All"
-        Dim lCommonText As String = "Common"
-
         Dim lHaveAnnual As Boolean = False
         Dim lAnnualIsHigh As Boolean = False
         Dim lAnnualIsLow As Boolean = False
@@ -1575,26 +1602,38 @@ Public Class frmSWSTATmod
         If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
             lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
             lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
-            lAllText &= ": " & pDateFormat.JDateToString(lFirstDate) & " to " & pDateFormat.JDateToString(lLastDate)
+            radioYearsAll.Text = "All: " & pDateFormat.JDateToString(lFirstDate) & " to " & pDateFormat.JDateToString(lLastDate)
+            radioYearsAll.Enabled = True
+        Else
+            If radioYearsAll.Checked Then
+                radioYearsAll.Checked = False
+                radioYearsCustom.Checked = True
+            End If
+            radioYearsAll.Enabled = False
         End If
 
         If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
-            lCommonText &= ": " & pDateFormat.JDateToString(pCommonStart) & " to " & pDateFormat.JDateToString(pCommonEnd)
+            radioYearsCommon.Text = "Common: " & pDateFormat.JDateToString(pCommonStart) & " to " & pDateFormat.JDateToString(pCommonEnd)
+            radioYearsCommon.Enabled = True
         Else
-            lCommonText &= pNoDatesInCommon
+            radioYearsCommon.Text = "Common" & pNoDatesInCommon
+            If radioYearsCommon.Checked Then
+                radioYearsCommon.Checked = False
+                radioYearsCustom.Checked = True
+            End If
+            radioYearsCommon.Enabled = False
         End If
 
-        Dim lLastSelectedIndex As Integer = cboYears.SelectedIndex
-        If lLastSelectedIndex < 0 Then lLastSelectedIndex = 0
-        With cboYears.Items
-            .Clear()
-            .Add(lAllText)
-            .Add(lCommonText)
-            .Add("Custom")
-        End With
-        cboYears.SelectedIndex = lLastSelectedIndex
-
-
+        Select Case BatchAnalysis
+            Case atcBatchProcessing.clsBatch.ANALYSIS.SWSTAT
+                tabMain.Controls.RemoveByKey("tabDFLOW")
+            'tabNDay.Enabled = True
+            'tabDFLOW.Enabled = False
+            Case atcBatchProcessing.clsBatch.ANALYSIS.DFLOW
+                tabMain.Controls.RemoveByKey("tabNDay")
+                'tabNDay.Enabled = False
+                'tabDFLOW.Enabled = True
+        End Select
     End Sub
 
     Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
@@ -2188,7 +2227,13 @@ Public Class frmSWSTATmod
                 .SetValue(InputNames.EndMonth, pYearEndMonth)
                 .SetValue(InputNames.EndDay, pYearEndDay)
                 'For All years, txtOmitBeforeYear and txtOmitAfterYear are empty
-                .SetValue(InputNames.IncludeYears, cboYears.SelectedItem.ToString())
+                If radioYearsAll.Checked Then
+                    .SetValue(InputNames.IncludeYears, radioYearsAll.Text)
+                ElseIf radioYearsCommon.Checked Then
+                    .SetValue(InputNames.IncludeYears, radioYearsCommon.Text)
+                Else
+                    .SetValue(InputNames.IncludeYears, radioYearsCustom.Text.TrimEnd(":"c))
+                End If
                 .SetValue(InputNames.StartYear, txtOmitBeforeYear.Text)
                 .SetValue(InputNames.EndYear, txtOmitAfterYear.Text)
                 .SetValue(InputNames.HighLow, lName)
@@ -2616,26 +2661,34 @@ Public Class frmSWSTATmod
         lStnList = Nothing
     End Sub
 
-    Private Sub cboYears_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboYears.SelectedIndexChanged
-        Select Case cboYears.SelectedIndex
-            Case 0 'All
-                ShowCustomYears(False)
-                txtOmitBeforeYear.Text = ""
-                txtOmitAfterYear.Text = ""
-            Case 1 'Common
-                ShowCustomYears(False)
-                If cboYears.Text.EndsWith(pNoDatesInCommon) Then
-                    cboYears.SelectedIndex = 0
-                Else
-                    Dim lCurDate(5) As Integer
-                    J2Date(pCommonStart, lCurDate)
-                    txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
-                    J2Date(pCommonEnd, lCurDate)
-                    txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
-                End If
-            Case 2 'Custom
-                ShowCustomYears(True)
-        End Select
+
+    Private Sub radioYearsAll_CheckedChanged(sender As Object, e As EventArgs) Handles radioYearsAll.CheckedChanged
+        If radioYearsAll.Checked Then
+            ShowCustomYears(False)
+            txtOmitBeforeYear.Text = ""
+            txtOmitAfterYear.Text = ""
+        End If
+    End Sub
+
+    Private Sub radioYearsCommon_CheckedChanged(sender As Object, e As EventArgs) Handles radioYearsCommon.CheckedChanged
+        If radioYearsCommon.Checked Then
+            ShowCustomYears(False)
+            If radioYearsCommon.Text.EndsWith(pNoDatesInCommon) Then
+                radioYearsAll.Checked = True
+            Else
+                Dim lCurDate(5) As Integer
+                J2Date(pCommonStart, lCurDate)
+                txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
+                J2Date(pCommonEnd, lCurDate)
+                txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
+            End If
+        End If
+    End Sub
+
+    Private Sub radioYearsCustom_CheckedChanged(sender As Object, e As EventArgs) Handles radioYearsCustom.CheckedChanged
+        If radioYearsCustom.Checked Then
+            ShowCustomYears(True)
+        End If
     End Sub
 
     Private Sub btnRecurrenceAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRecurrenceAdd.Click
