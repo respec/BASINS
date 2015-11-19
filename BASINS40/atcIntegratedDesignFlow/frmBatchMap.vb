@@ -19,6 +19,7 @@ Public Class frmBatchMap
     Private pBatchSpecFilefullname As String = ""
 
     Private WithEvents pfrmParams As frmSWSTAT
+    Public BatchAnalysis As clsBatch.ANALYSIS
 
     Private ReadOnly Property GetDataFileFullPath(ByVal aStationId As String) As String
         Get
@@ -74,9 +75,8 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnCreateGroup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCreateGroup.Click
-        Dim lAnalysis As String = ""
+        Dim lAnalysis As String = BatchAnalysis.ToString()
         Dim lCount As Integer = 0
-        lAnalysis = clsBatch.ANALYSIS.ITA.ToString()
         pBatchGroupCountSWSTAT += 1
         lCount = pBatchGroupCountSWSTAT
         If lstStations.RightCount = 0 OrElse String.IsNullOrEmpty(lAnalysis) Then
@@ -94,7 +94,7 @@ Public Class frmBatchMap
         Next
         Dim lBatchInputs As atcDataAttributes = GetGroupParams(lNewNodeText, False)
         Dim lDataGroup As atcTimeseriesGroup = BuildTserGroup(listStations)
-        Dim lStationsInfo As atcCollection = InputNames.BuildStationsInfo(lDataGroup)
+        Dim lStationsInfo As atcCollection = clsBatchUtil.BuildStationsInfo(lDataGroup)
         lBatchInputs.SetValue(InputNames.StationsInfo, lStationsInfo)
         pBatchGroupCount += 1
     End Sub
@@ -196,7 +196,7 @@ Public Class frmBatchMap
                 Dim lIndex As Integer = lGroupName.LastIndexOf("_")
                 Dim lGroupNum As Integer = Integer.Parse(lGroupName.Substring(lIndex + 1))
                 Dim lBatchInputs As atcDataAttributes = GetGroupParams(lGroupName, True)
-                'If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+                'If lGroupName.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
                 '    lBatchInputs = pGroupsInputsSWSTAT.ItemByKey(lGroupName)
                 'ElseIf lGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
                 '    lBatchInputs = pGroupsInputsDFLOW.ItemByKey(lGroupName)
@@ -206,24 +206,28 @@ Public Class frmBatchMap
 
                 Dim lTsGroup As atcTimeseriesGroup = BuildTserGroup(lGroupNode)
                 If lTsGroup.Count > 0 Then
-                    If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
-                        pfrmParams = New atcIDF.frmSWSTAT()
-                        pfrmParams.Initialize(lTsGroup, lBatchInputs)
-                        'pfrmParameters = pfrmParameters.GetType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
-                        'pfrmParameters.GetType.InvokeMember("Initialize", Reflection.BindingFlags.InvokeMethod, Nothing, Nothing, New Object() {lTsGroup, lBatchInputs})
+                    pfrmParams = New atcIDF.frmSWSTAT()
+                    pfrmParams.BatchAnalysis = BatchAnalysis
+                    pfrmParams.Initialize(lTsGroup, lBatchInputs)
+                    'pfrmParameters = pfrmParameters.GetType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+                    'pfrmParameters.GetType.InvokeMember("Initialize", Reflection.BindingFlags.InvokeMethod, Nothing, Nothing, New Object() {lTsGroup, lBatchInputs})
+                    If lGroupName.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
                     End If
                 End If
             Case "cmsGlobalSetParm"
                 Dim lNodeText As String = node.Text
-                If lNodeText.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+                pfrmParams = New atcIDF.frmSWSTAT()
+                pfrmParams.BatchAnalysis = BatchAnalysis
+                If lNodeText.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
                     pGlobalInputsSWSTAT.SetValue("Operation", "GlobalSetParm")
-                    pfrmParams = New atcIDF.frmSWSTAT()
                     atcIDF.modUtil.InputNames.BuildInputSet(pGlobalInputsSWSTAT, Nothing)
                     Dim lNDay() As Double = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.NDay, Nothing)
                     Dim lNDays As atcCollection = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.NDays, Nothing)
                     Dim lRP() As Double = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.ReturnPeriod, Nothing)
                     Dim lRPs As atcCollection = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.ReturnPeriods, Nothing)
                     pfrmParams.Initialize(Nothing, pGlobalInputsSWSTAT)
+                Else
+                    pfrmParams.Initialize(Nothing, pGlobalInputsDFLOW)
                 End If
         End Select
     End Sub
@@ -235,7 +239,7 @@ Public Class frmBatchMap
             lBatchInputs.SetValue("Operation", "GroupSetParm")
             lBatchInputs.SetValue("Group", aGroupName)
 
-            If aGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+            If aGroupName.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
                 pGroupsInputsSWSTAT.Add(aGroupName, lBatchInputs)
             ElseIf aGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
                 pGroupsInputsDFLOW.Add(aGroupName, lBatchInputs)
@@ -246,9 +250,10 @@ Public Class frmBatchMap
 
         If aUseGlobalDefault Then
             'Try to use global setting as much as possible
-            If aGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+            If aGroupName.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
                 atcIDF.modUtil.InputNames.BuildInputSet(lBatchInputs, pGlobalInputsSWSTAT)
             ElseIf aGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
+                atcIDF.modUtil.InputNamesDFLOW.BuildInputSet(lBatchInputs, pGlobalInputsDFLOW)
             Else
 
             End If
@@ -269,7 +274,7 @@ Public Class frmBatchMap
                     Dim lTsCons As String = ""
                     For Each lTs As atcTimeseries In lDS.DataSets
                         lTsCons = lTs.Attributes.GetValue("Constituent").ToString()
-                        If lTs.Attributes.GetValue("Location") = lstationId AndAlso _
+                        If lTs.Attributes.GetValue("Location") = lstationId AndAlso
                            (lTsCons.ToLower = "streamflow" OrElse lTsCons.ToLower() = "flow") Then
                             lTsGroup.Add(lTs)
                             lDataLoaded = True
@@ -303,7 +308,7 @@ Public Class frmBatchMap
                     Dim lTsCons As String = ""
                     For Each lTs As atcTimeseries In lDS.DataSets
                         lTsCons = lTs.Attributes.GetValue("Constituent").ToString()
-                        If lTs.Attributes.GetValue("Location") = lStationID AndAlso _
+                        If lTs.Attributes.GetValue("Location") = lStationID AndAlso
                            (lTsCons.ToLower = "streamflow" OrElse lTsCons.ToLower() = "flow") Then
                             lTsGroup.Add(lTs)
                             lDataLoaded = True
@@ -342,7 +347,7 @@ Public Class frmBatchMap
         pGroupsInputsSWSTAT.RemoveByKey(aBFGroupNode.Text)
         treeBFGroups.Nodes.Remove(aBFGroupNode)
         pBatchGroupCount -= 1
-        If lGroupingName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
+        If lGroupingName.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
             pBatchGroupCountSWSTAT -= 1
         ElseIf lGroupingName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
             pBatchGroupCountDFLOW -= 1
@@ -417,7 +422,7 @@ Public Class frmBatchMap
                         End If
                     End If
                 End While
-                
+
             Catch ex As Exception
 
             Finally
@@ -438,8 +443,8 @@ Public Class frmBatchMap
             ElseIf lName.StartsWith("nwis_discharge_") Then
                 lStationID = lName.Substring("nwis_discharge_".Length)
             End If
-            If Not String.IsNullOrEmpty(lStationID) AndAlso _
-               lStationID.Length = 8 AndAlso _
+            If Not String.IsNullOrEmpty(lStationID) AndAlso
+               lStationID.Length = 8 AndAlso
                Not listStations.Contains(lStationID) Then
                 listStations.Add(lStationID)
             End If
@@ -476,7 +481,7 @@ Public Class frmBatchMap
                     Logger.Msg("Data files already exists in " & pDataPath, "Batch Map:Download")
                 End If
             Catch ex As Exception
-                Logger.Msg("Some issues occurred during download, please examine the RDB files in data directory:" & vbCrLf & _
+                Logger.Msg("Some issues occurred during download, please examine the RDB files in data directory:" & vbCrLf &
                            pDataPath, "Batch Map")
                 Return
             End Try
@@ -538,7 +543,7 @@ Public Class frmBatchMap
                 lSpecDirSWSTAT = pDataPath
             End If
             pBatchSpecFilefullname = IO.Path.Combine(lSpecDirSWSTAT, "BatchRun_SWSTAT_" & SafeFilename(DateTime.Now) & ".txt")
-            SaveBatchFile(pBatchSpecFilefullname, clsBatch.ANALYSIS.ITA, pGlobalInputsSWSTAT, pGroupsInputsSWSTAT)
+            SaveBatchFile(pBatchSpecFilefullname, clsBatch.ANALYSIS.SWSTAT, pGlobalInputsSWSTAT, pGroupsInputsSWSTAT)
         End If
         If pGlobalInputsDFLOW.Count > 0 AndAlso pGroupsInputsDFLOW.Count > 0 Then
             Dim lSpecDirDFLOW As String = pGlobalInputsDFLOW.GetValue(InputNames.OutputDir, "")
@@ -551,11 +556,11 @@ Public Class frmBatchMap
         pBatchSpecFilefullname = ""
     End Sub
 
-    Private Sub SaveBatchFile(ByVal aFilename As String, ByVal aAnalysis As clsBatch.ANALYSIS, _
+    Private Sub SaveBatchFile(ByVal aFilename As String, ByVal aAnalysis As clsBatch.ANALYSIS,
                               ByVal aCommonSetting As atcDataAttributes, ByVal aGroupSettings As atcCollection)
         Dim lSW As IO.StreamWriter = Nothing
         Dim lTitle As String = ""
-        If aAnalysis = clsBatch.ANALYSIS.ITA Then
+        If aAnalysis = clsBatch.ANALYSIS.SWSTAT Then
             lTitle = "Save SWSTAT Batch File"
         ElseIf aAnalysis = clsBatch.ANALYSIS.DFLOW Then
             lTitle = "Save DFLOW Batch File"
@@ -608,8 +613,8 @@ Public Class frmBatchMap
             lGroupNode = lGroupNode.Parent
         End If
         Dim lAnalysis As clsBatch.ANALYSIS = clsBatch.ANALYSIS.DFLOW
-        If lGroupName.Contains(clsBatch.ANALYSIS.ITA.ToString()) Then
-            lAnalysis = clsBatch.ANALYSIS.ITA
+        If lGroupName.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
+            lAnalysis = clsBatch.ANALYSIS.SWSTAT
         End If
         Dim lArgs As atcDataAttributes = pGroupsInputsBF.ItemByKey(lGroupName)
         If lArgs IsNot Nothing Then
@@ -629,7 +634,7 @@ Public Class frmBatchMap
                             If String.IsNullOrEmpty(lCon) Then
                                 Continue For
                             End If
-                            If loc = lstationId AndAlso _
+                            If loc = lstationId AndAlso
                                (lCon.ToString.ToLower = "streamflow" OrElse lCon.ToString.ToLower = "flow") Then
                                 lTsGroup.Add(lTs)
                                 lDataLoaded = True
@@ -648,7 +653,7 @@ Public Class frmBatchMap
             If lTsGroup.Count > 0 Then
                 Select Case lAnalysis
                     Case clsBatch.ANALYSIS.DFLOW
-                    Case clsBatch.ANALYSIS.ITA
+                    Case clsBatch.ANALYSIS.SWSTAT
                 End Select
             End If
         End If

@@ -7,6 +7,8 @@ Friend Class frmDisplayFrequencyGrid
     Inherits System.Windows.Forms.Form
     Private pInitializing As Boolean
     Public WithEvents SWSTATform As frmSWSTAT
+    Public WithEvents SWSTATformmod As frmSWSTATmod
+    Public WithEvents SWSTATDFlowBatchfrm As frmSWSTATDFlowBatch
 
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcTimeseriesGroup
