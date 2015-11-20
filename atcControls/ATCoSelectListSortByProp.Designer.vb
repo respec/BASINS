@@ -29,19 +29,19 @@
     'It can be modified using the Windows Form Designer.
     'Do not modify it using the code editor.
 	<System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ATCoSelectListSortByProp))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.cmdMoveDown = New System.Windows.Forms.Button
-        Me.cmdMoveUp = New System.Windows.Forms.Button
-        Me.cmdMoveAllLeft = New System.Windows.Forms.Button
-        Me.cmdMoveAllRight = New System.Windows.Forms.Button
-        Me.cmdMoveLeft = New System.Windows.Forms.Button
-        Me.cmdMoveRight = New System.Windows.Forms.Button
-        Me.lstRight = New System.Windows.Forms.ListBox
-        Me.lstLeft = New System.Windows.Forms.ListBox
-        Me.lblRight = New System.Windows.Forms.Label
-        Me.lblLeft = New System.Windows.Forms.Label
+        Me.cmdMoveDown = New System.Windows.Forms.Button()
+        Me.cmdMoveUp = New System.Windows.Forms.Button()
+        Me.cmdMoveAllLeft = New System.Windows.Forms.Button()
+        Me.cmdMoveAllRight = New System.Windows.Forms.Button()
+        Me.cmdMoveLeft = New System.Windows.Forms.Button()
+        Me.cmdMoveRight = New System.Windows.Forms.Button()
+        Me.lstRight = New System.Windows.Forms.ListBox()
+        Me.lstLeft = New System.Windows.Forms.ListBox()
+        Me.lblRight = New System.Windows.Forms.Label()
+        Me.lblLeft = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
         'cmdMoveDown
@@ -52,7 +52,7 @@
         Me.cmdMoveDown.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdMoveDown.ForeColor = System.Drawing.SystemColors.ControlText
         Me.cmdMoveDown.Image = CType(resources.GetObject("cmdMoveDown.Image"), System.Drawing.Image)
-        Me.cmdMoveDown.Location = New System.Drawing.Point(389, 125)
+        Me.cmdMoveDown.Location = New System.Drawing.Point(389, 175)
         Me.cmdMoveDown.Name = "cmdMoveDown"
         Me.cmdMoveDown.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdMoveDown.Size = New System.Drawing.Size(25, 41)
@@ -137,7 +137,7 @@
         'lstRight
         '
         Me.lstRight.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lstRight.BackColor = System.Drawing.SystemColors.Window
         Me.lstRight.Cursor = System.Windows.Forms.Cursors.Default
         Me.lstRight.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -148,13 +148,13 @@
         Me.lstRight.Name = "lstRight"
         Me.lstRight.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lstRight.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.lstRight.Size = New System.Drawing.Size(137, 142)
+        Me.lstRight.Size = New System.Drawing.Size(137, 192)
         Me.lstRight.TabIndex = 5
         '
         'lstLeft
         '
         Me.lstLeft.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lstLeft.BackColor = System.Drawing.SystemColors.Window
         Me.lstLeft.Cursor = System.Windows.Forms.Cursors.Default
         Me.lstLeft.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -165,7 +165,7 @@
         Me.lstLeft.Name = "lstLeft"
         Me.lstLeft.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lstLeft.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.lstLeft.Size = New System.Drawing.Size(137, 142)
+        Me.lstLeft.Size = New System.Drawing.Size(137, 192)
         Me.lstLeft.TabIndex = 0
         '
         'lblRight
@@ -208,7 +208,7 @@
         Me.Controls.Add(Me.lblLeft)
         Me.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Name = "ATCoSelectListSortByProp"
-        Me.Size = New System.Drawing.Size(414, 166)
+        Me.Size = New System.Drawing.Size(414, 219)
         Me.ResumeLayout(False)
 
     End Sub

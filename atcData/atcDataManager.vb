@@ -647,7 +647,6 @@ Public Class atcDataManager
 
             If lSaveIn IsNot Nothing AndAlso lSaveIn.Specification.Length > 0 Then
                 lSaveIn.AddDatasets(lSaveGroup)
-                Return lSaveIn.Save(lSaveIn.Specification)
             End If
         End If
         Return False

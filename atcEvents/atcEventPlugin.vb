@@ -34,7 +34,7 @@ Public Class atcEventPlugin
     End Property
 
     'The only element of aArgs is an atcDataGroup or atcTimeseries
-    'The attribute(s) will be set to the result(s) of calculation(s)
+    'aArgs is searched for Timeseries, Threshold, DaysGapAllowed, and High
     Public Overrides Function Open(ByVal aOperationName As String, _
                           Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
         Dim ltsGroup As atcTimeseriesGroup = Nothing

@@ -520,8 +520,8 @@ FoundProvisional:
     End Sub
 
     Private Sub PopulateCriteriaCombos()
-        Dim lCalculatedItems As New atcCollection
-        Dim lNotCalculatedItems As New atcCollection
+        Dim lCalculatedItems As New Generic.List(Of String)
+        Dim lNotCalculatedItems As New Generic.List(Of String)
 
         Dim i As Integer
         For i = 0 To pcboCriteria.GetUpperBound(0)
@@ -531,27 +531,23 @@ FoundProvisional:
         Dim lName As String
         Dim lItemIndex As Integer
         If Not lAllDefinitions Is Nothing Then
+            'Clone lets us use For Each without interfering with other enumeration through AllDefinitions
             For Each def As atcAttributeDefinition In lAllDefinitions.Clone
-                If atcDataAttributes.IsSimple(def) Then
+                If atcDataAttributes.IsSimple(def) AndAlso def.Displayable Then
                     lName = def.Name
-                    Select Case lName.ToLower
-                        Case "attributes", "bins", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "kendall tau", "number", "vbtime", "%*", "%sum*"
-                        Case Else
-                            If def.Calculated Then
-                                lItemIndex = lCalculatedItems.BinarySearchForKey(lName)
-                                If lItemIndex = lCalculatedItems.Count OrElse lCalculatedItems.Keys.Item(lItemIndex) <> lName Then
-                                    lCalculatedItems.Insert(lItemIndex, lName, lName)
-                                End If
-                            Else
-                                'Dim lAttributeValues As atcCollection = AvailableData.SortedAttributeValues(lName, NOTHING_VALUE)
-                                'If lAttributeValues.Count > 1 OrElse (lAttributeValues.Count = 1 AndAlso Not lAttributeValues.Item(0).Equals(NOTHING_VALUE)) Then
-                                lItemIndex = lNotCalculatedItems.BinarySearchForKey(lName)
-                                If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
-                                    lNotCalculatedItems.Insert(lItemIndex, lName, lName)
-                                End If
-                                'End If
-                            End If
-                    End Select
+                    Dim lCollection As Generic.List(Of String)
+                    If def.Calculated Then
+                        lCollection = lCalculatedItems
+                    Else
+                        lCollection = lNotCalculatedItems
+                    End If
+                    'Dim lAttributeValues As atcCollection = AvailableData.SortedAttributeValues(lName, NOTHING_VALUE)
+                    'If lAttributeValues.Count > 1 OrElse (lAttributeValues.Count = 1 AndAlso Not lAttributeValues.Item(0).Equals(NOTHING_VALUE)) Then
+                    'End If
+                    lItemIndex = lCollection.BinarySearch(lName)
+                    If lItemIndex < 0 Then
+                        lCollection.Insert(lItemIndex Xor -1, lName)
+                    End If
                 End If
             Next
             For Each lName In lNotCalculatedItems

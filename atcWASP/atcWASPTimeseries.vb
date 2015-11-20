@@ -17,6 +17,7 @@ Public Class atcWASPTimeseriesCollection
     End Function
 
     Public Function TimeSeriesToFile(ByVal aBaseFileName As String, ByVal aSJDate As Double, ByVal aEJDate As Double) As Boolean
+        Dim lReturnSuccess As Boolean = False
         For Each lWASPTimeseries As atcWASPTimeseries In Me
             If lWASPTimeseries.TimeSeries Is Nothing Then
                 Dim lLocation As String = lWASPTimeseries.Identifier
@@ -24,14 +25,17 @@ Public Class atcWASPTimeseriesCollection
                 Dim lSB As New StringBuilder
                 lSB.Append(lWASPTimeseries.ConstantToString(aSJDate, aEJDate))
                 SaveFileString(lFileName, lSB.ToString)
+                lReturnSuccess = True
             Else
                 Dim lLocation As String = lWASPTimeseries.TimeSeries.Attributes.GetDefinedValue("Location").Value
                 Dim lFileName As String = PathNameOnly(aBaseFileName) & "\" & lLocation & "." & lWASPTimeseries.Type & ".DAT"
                 Dim lSB As New StringBuilder
                 lSB.Append(lWASPTimeseries.TimeSeriesToString(aSJDate, aEJDate))
                 SaveFileString(lFileName, lSB.ToString)
+                lReturnSuccess = True
             End If
         Next
+        Return lReturnSuccess
     End Function
 
 End Class

@@ -174,24 +174,7 @@ Public Class atcSeasonPlugin
     End Property
 
     Public Shared Function SeasonClassNameToLabel(ByVal aName As String) As String
-        If aName.StartsWith("atc") Then
-            Dim lCamelCase As String = aName.Substring(10)
-            If lCamelCase.Equals("AMorPM") Then
-                Return "AM or PM"
-            Else
-                Dim lReturn As String = lCamelCase.Substring(0, 1)
-                For iCh As Integer = 1 To lCamelCase.Length - 1
-                    Dim lCurChar As String = lCamelCase.Substring(iCh, 1)
-                    If lCurChar.ToUpper.Equals(lCurChar) Then
-                        lReturn &= " "
-                    End If
-                    lReturn &= lCurChar
-                Next
-                Return lReturn
-            End If
-        Else
-            Return ""
-        End If
+        Return atcSeasonBase.SeasonClassNameToLabel(aName)
     End Function
 
     Public Overloads Overrides ReadOnly Property AvailableOperations() As atcDataAttributes

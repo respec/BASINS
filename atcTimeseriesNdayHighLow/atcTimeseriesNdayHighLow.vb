@@ -206,6 +206,16 @@ Public Class atcTimeseriesNdayHighLow
         End If
     End Function
 
+    ''' <summary>
+    ''' Compute N-day annual timeseries
+    ''' </summary>
+    ''' <param name="aTimeseries">Original timeseries</param>
+    ''' <param name="aNDay">Number of days (single value or an array of values)</param>
+    ''' <param name="aHigh">True for high flow, false for low flow</param>
+    ''' <param name="aAttributesStorage">Storage location for computed frequency values</param>
+    ''' <param name="aEndMonth">Ending month of the water year to use.</param>
+    ''' <param name="aEndDay">Ending day of the water year to use</param>
+    ''' <returns>N-day annual timeseries, one for each aNDay number of days</returns>
     Private Function HighOrLowTimeseries(ByVal aTimeseries As atcTimeseries, _
                                          ByVal aNDay As Object, _
                                          ByVal aHigh As Boolean, _
@@ -455,6 +465,22 @@ Public Class atcTimeseriesNdayHighLow
         aAttributesStorage.SetValue(lAttrDef, aValue, aArguments)
     End Sub
 
+    ''' <summary>
+    ''' Compute Frequency
+    ''' </summary>
+    ''' <param name="aTimeseries">Original timeseries</param>
+    ''' <param name="aNDay">Number of days (single value or an array of values)</param>
+    ''' <param name="aHigh">True for high flow, false for low flow</param>
+    ''' <param name="aRecurOrProb">Recurrence interval or probability (single value or an array of values)</param>
+    ''' <param name="aLogFg">True for log, False for non-log</param>
+    ''' <param name="aAttributesStorage">Storage location for computed frequency values</param>
+    ''' <param name="aNdayTsGroup">
+    ''' Annual N-day timeseries based on aTimeseries.
+    ''' If this has already been computed, it can be passed in.
+    ''' If not specified, it will be computed internally and returned.</param>
+    ''' <param name="aEndMonth">Ending month of the water year to use.</param>
+    ''' <param name="aEndDay">Ending day of the water year to use</param>
+    ''' <remarks>If aEndMonth, aEndDay are not specified, year starts at first value in aTimeseries</remarks>
     Public Sub ComputeFreq(ByRef aTimeseries As atcTimeseries, _
                            ByVal aNDay As Object, _
                            ByVal aHigh As Boolean, _
@@ -473,7 +499,7 @@ Public Class atcTimeseriesNdayHighLow
         Dim lRecurOrProbs() As Double = Obj2Array(aRecurOrProb)
 
         If aNdayTsGroup Is Nothing Then
-            'calculate the n day annual timeseries
+            'calculate the n-day annual timeseries
             aNdayTsGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh, aAttributesStorage, aEndMonth, aEndDay)
         End If
 

@@ -335,4 +335,21 @@ Public Class atcAttributeDefinition
     Public Sub New()
         Clear()
     End Sub
+
+    ''' <summary>
+    ''' True if suitable for display, False if not suitable for display to user
+    ''' </summary>
+    Public Function Displayable() As Boolean
+        Select Case TypeString.ToLower
+            Case "single", "double", "integer", "boolean", "string", "atctimeunit"
+                Select Case Name.ToLower
+                    Case "attributes", "bins", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "kendall tau", "n-day high value", "n-day low value", "n-day high attribute", "n-day low attribute", "number", "return period", "summary file", "vbtime", "%*", "%sum*"
+                        Return False
+                    Case Else
+                        Return True
+                End Select
+        End Select
+        Return False
+    End Function
+
 End Class

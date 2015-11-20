@@ -30,26 +30,32 @@ Public Class frmSave
     End Function
 
     Private Sub btnSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelectAttributes.Click
-        Dim lst As New atcControls.atcSelectList
-        Dim lAvailable As New Generic.List(Of String)
-        For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-            Select Case lAttrDef.TypeString.ToLower
-                Case "double", "integer", "boolean", "string", "atctimeunit"
-                    Select Case lAttrDef.Name.ToLower
-                        Case "", "attributes", "bins", "cligen out", "cligen parm", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "include daily", "include hourly", _
-                             "kendall tau", "n-day high value", "n-day low value", "n-day high attribute", "n-day low attribute", "number", "num years", "return period", "summary file", "vbtime", "%*", "%sum*"
-                            'Skip displaying some things in the list
-                        Case Else
-                            If pGridSource.DisplayAttributes.Contains(lAttrDef.Name) OrElse Not lAttrDef.Calculated Then
-                                lAvailable.Add(lAttrDef.Name)
-                            End If
-                    End Select
-            End Select
-        Next
-        lAvailable.Sort()
-        If lst.AskUser(lAvailable, pGridSource.DisplayAttributes) Then
+        'Dim lst As New atcControls.atcSelectList
+        'Dim lAvailable As New Generic.List(Of String)
+        'For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+        '    Select Case lAttrDef.TypeString.ToLower
+        '        Case "double", "integer", "boolean", "string", "atctimeunit"
+        '            Select Case lAttrDef.Name.ToLower
+        '                Case "", "attributes", "bins", "cligen out", "cligen parm", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "include daily", "include hourly", _
+        '                     "kendall tau", "n-day high value", "n-day low value", "n-day high attribute", "n-day low attribute", "number", "num years", "return period", "summary file", "vbtime", "%*", "%sum*"
+        '                    'Skip displaying some things in the list
+        '                Case Else
+        '                    If pGridSource.DisplayAttributes.Contains(lAttrDef.Name) OrElse Not lAttrDef.Calculated Then
+        '                        lAvailable.Add(lAttrDef.Name)
+        '                    End If
+        '            End Select
+        '    End Select
+        'Next
+        'lAvailable.Sort()
+        'If lst.AskUser(lAvailable, pGridSource.DisplayAttributes) Then
+        '    pGridSource.DisplayAttributes = pGridSource.DisplayAttributes
+        '    'TODO: allow editing order of attributes, now they are alphabetized which is not really a good order
+        '    pGridSource.Columns = pGridSource.DisplayAttributes.Count
+        '    agdData.Refresh()
+        'End If
+        Dim lSelector As New frmSelectAttributes()
+        If lSelector.AskUser(pDataGroup, pGridSource.DisplayAttributes) Then
             pGridSource.DisplayAttributes = pGridSource.DisplayAttributes
-            'TODO: allow editing order of attributes, now they are alphabetized which is not really a good order
             pGridSource.Columns = pGridSource.DisplayAttributes.Count
             agdData.Refresh()
         End If

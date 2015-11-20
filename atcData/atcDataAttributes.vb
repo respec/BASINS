@@ -413,6 +413,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
             .Add("loc", "Location")
             .Add("locn", "Location")
             .Add("idlocn", "Location")
+            .Add("site_no", "STAID")
 
             .Add("con", "Constituent")
             .Add("cons", "Constituent")
@@ -422,6 +423,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
             .Add("descrp", "Description")
 
             '.Add("stanam", "Station Name")  'Add this when WDM code can handle it - mhg
+            .Add("station_nm", "StaNam")
 
             .Add("long filename", "FileName")
             .Add("path", "FileName")
@@ -467,6 +469,10 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
             .Add("datasource", "Data Source")
             .Add("darea", "Drainage Area")
             .Add("drain_area_va", "Drainage Area")
+            .Add("agency_cd", "AGENCY")
+            .Add("state_cd", "STFIPS")
+            .Add("county_cd", "CNTYFIPS")
+            .Add("huc_cd", "HUCODE")
 
             'Also add lowercase version of all preferred names as keys
             Dim lAllPreferredNames As New Generic.SortedList(Of String, String)

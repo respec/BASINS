@@ -349,7 +349,6 @@ Friend Class frmManager
 
             If lSaveIn IsNot Nothing AndAlso lSaveIn.Specification.Length > 0 Then
                 If lSaveIn.AddDataSets(lSaveGroup) Then
-                    lSaveIn.Save(lSaveIn.Specification)
                     Populate(-1)
                 End If
             End If

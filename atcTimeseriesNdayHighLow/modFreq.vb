@@ -192,7 +192,17 @@ Module modFreq
         aSlope = lSlope
     End Sub
 
-    'frequency analysis for specified recurrence interval or probability
+    ''' <summary>
+    ''' frequency analysis for specified recurrence interval or probability
+    ''' </summary>
+    ''' <param name="aUseVersion_1"></param>
+    ''' <param name="aTs"></param>
+    ''' <param name="aRecurOrProbs"></param>
+    ''' <param name="aHigh"></param>
+    ''' <param name="aLogFg"></param>
+    ''' <param name="aDataSource"></param>
+    ''' <param name="aAttributesStorage"></param>
+    ''' <param name="aNumZero"></param>
     Friend Sub PearsonType3(ByVal aUseVersion_1 As Boolean, _
                             ByVal aTs As atcTimeseries, _
                             ByVal aRecurOrProbs() As Double, _

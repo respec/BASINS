@@ -91,6 +91,14 @@ Public Class ATCoSelectListSortByProp
         End Set
     End Property
 
+    Public Function RightItems() As Generic.List(Of String)
+        Dim lItems As New Generic.List(Of String)
+        For Each lItem As Object In lstRight.Items
+            lItems.Add(lItem.ToString())
+        Next
+        Return lItems
+    End Function
+
     Public Property LeftItem(ByVal i As Integer) As Object
         Get
             If i >= 0 And i < lstLeft.Items.Count Then
@@ -379,8 +387,22 @@ Public Class ATCoSelectListSortByProp
         MoveRight(lstLeft.SelectedIndex)
     End Sub
 
-
     Private Sub lstLeft_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstLeft.SelectedIndexChanged
         RaiseEvent LeftListSelectedIndexChange(sender, e)
+    End Sub
+
+    Private Sub ATCoSelectListSortByProp_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        If Me.Width > 400 Then
+            Dim lMargin As Integer = 6
+            Dim lstWidth As Integer = (Width - 140) / 2
+            lstLeft.Width = lstWidth
+            lstRight.Width = lstWidth
+            Dim lButtonLeft As Integer = lstWidth + lMargin
+            cmdMoveRight.Left = lButtonLeft
+            cmdMoveLeft.Left = lButtonLeft
+            cmdMoveAllRight.Left = lButtonLeft
+            cmdMoveAllLeft.Left = lButtonLeft
+            lstRight.Left = lButtonLeft + cmdMoveRight.Width + lMargin
+        End If
     End Sub
 End Class

@@ -216,12 +216,14 @@ Public Class frmFilterData
 
     Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
         Try
+            Dim lWasModified As Boolean = False
             Dim lModifiedGroup As atcTimeseriesGroup = pSelectedGroup.Clone
 
             If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
                 'Note that ChangeTo uses the atcTimeseriesGroup already inside atcSelectedDates,
                 'so this has to come before other filters that modify lModifiedGroup
                 lModifiedGroup.ChangeTo(atcSelectedDates.CreateSelectedDataGroupSubset)
+                lWasModified = True
             End If
 
             'Timeseries Math
@@ -261,7 +263,7 @@ Public Class frmFilterData
                                     lResult = Nothing
                                     lArgs.Clear()
                                     lArgs = Nothing
-
+                                    lWasModified = True
                                     Exit For
                                 End If
                             Next
@@ -302,6 +304,7 @@ Public Class frmFilterData
                 Dim lSeasonalDatasets As New atcTimeseriesGroup
                 DoSplit(CurrentSeason, lSelectedSeasons, lModifiedGroup, radioSeasonsCombine.Checked, radioSeasonsSeparate.Checked, lNumToGroup, lSeasonalDatasets)
                 lModifiedGroup = lSeasonalDatasets
+                lWasModified = True
             End If
 
             If chkEvents.Checked Then 'AndAlso pEventsPlugin IsNot Nothing Then
@@ -345,6 +348,7 @@ Public Class frmFilterData
                     Next
 
                     lModifiedGroup = lFilteredValuesGroup
+                    lWasModified = True
                 End If
             End If
 
@@ -370,13 +374,13 @@ Public Class frmFilterData
                 End Select
 
                 If Not Integer.TryParse(txtTimeStep.Text, lTimeStep) Then
-                    Logger.Msg("Time step must be specified as an integer.", "Time Step Not Specified")
+                    Throw New ApplicationException("Time step must be specified as an integer.")
                 ElseIf lTimeStep < 1 Then
-                    Logger.Msg("Time step must be >= 1.", "Time Step Less Than One")
+                    Throw New ApplicationException("Time step must be >= 1.")
                 ElseIf lTU = atcTimeUnit.TUUnknown Then
-                    Logger.Msg("Time Units must be selected to change time step.", "Time Units Not Selected")
+                    Throw New ApplicationException("Time Units must be selected to change time step.")
                 ElseIf lTran = atcTran.TranNative Then
-                    Logger.Msg("Aggregation type must be selected to change time step.", "Type of Aggregation Not Selected")
+                    Throw New ApplicationException("Aggregation type must be selected to change time step.")
                 Else
                     For Each lTimeseries As atcTimeseries In lModifiedGroup
                         lAggregatedGroup.Add(Aggregate(lTimeseries, lTU, lTimeStep, lTran))
@@ -387,10 +391,16 @@ Public Class frmFilterData
                 End If
 
                 lModifiedGroup = lAggregatedGroup
+                lWasModified = True
             End If
-            pSelectedGroup.ChangeTo(lModifiedGroup)
-            pSelectedOK = True
-            pAsking = False
+
+            If lWasModified Then
+                pSelectedGroup.ChangeTo(lModifiedGroup)
+                pSelectedOK = True
+                pAsking = False
+            Else
+                Logger.Msg("Select at least one kind of filter." & vbCrLf & "Most options have a checkbox at the top that needs to be checked to activate.")
+            End If
         Catch ex As Exception
             Logger.Msg(ex.Message, "Error Filtering Data")
         End Try

@@ -1421,9 +1421,15 @@ Public Class frmSWSTAT
             End If
             radioYearsCommon.Enabled = False
         End If
-        'If pBatch AndAlso pSetGlobal Then
-        '    radioYearsAll.Checked = True
-        'End If
+        If radioYearsAll.Checked Then
+            radioYearsAll_CheckedChanged(Nothing, Nothing)
+        ElseIf radioYearsCustom.Checked
+            'No need to change it
+        ElseIf radioYearsCommon.Checked Then
+            radioYearsCommon_CheckedChanged(Nothing, Nothing)
+        Else
+            radioYearsCommon.Checked = True
+        End If
     End Sub
 
     Private Sub RepopulateFormDFLOW()
@@ -2396,53 +2402,38 @@ Public Class frmSWSTAT
         End If
     End Sub
 
-    'Private Sub btnFrequencyReport_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnFrequencyReport.Click
-    '    Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+    Private Sub btnFrequencyReport_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnFrequencyReport.Click
+        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
 
-    '    Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
-    '    With lSaveDialog
-    '        .Title = "Save Frequency Report As"
-    '        .DefaultExt = ".txt"
-    '        .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
-    '        If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
-    '            .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
-    '        End If
-    '        If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
-    '            Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
+        Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+        With lSaveDialog
+            .Title = "Save Frequency Report As"
+            .DefaultExt = ".txt"
+            .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
-    '            Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup, _
-    '                                                         aHigh:=radioHigh.Checked, _
-    '                                                         aNday:=ListToArray(lstNday), _
-    '                                                         aReturns:=ListToArray(lstRecurrence))
-    '            lFreqForm.Visible = False
+                Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
+                                                             aHigh:=radioHigh.Checked,
+                                                             aNday:=ListToArray(lstNday),
+                                                             aReturns:=ListToArray(lstRecurrence))
+                lFreqForm.Visible = False
 
-    '            SaveFileString(.FileName, lFreqForm.CreateReport)
-    '            OpenFile(.FileName)
-    '        End If
-    '    End With
-    '    Me.Cursor = System.Windows.Forms.Cursors.Default
-    'End Sub
+                SaveFileString(.FileName, lFreqForm.CreateReport)
+                OpenFile(.FileName)
+            End If
+        End With
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+    End Sub
 
     Private Sub btnDoFrequencyGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequencyGraph.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         DoFrequencyGraph()
         Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
-
-    Private Function STAID(ByVal aTs As atcTimeseries) As String
-        Dim lSTAID As String = aTs.Attributes.GetValue("STAID", Nothing)
-        If lSTAID Is Nothing Then
-            lSTAID = aTs.Attributes.GetValue("Location", Nothing)
-            If lSTAID Is Nothing Then
-                lSTAID = aTs.Attributes.GetValue("STANAM", Nothing)
-                If lSTAID Is Nothing Then
-                    lSTAID = "N/A"
-                End If
-            End If
-            aTs.Attributes.SetValue("STAID", lSTAID)
-        End If
-        Return lSTAID
-    End Function
 
     Public Sub DoFrequencyGraph(Optional ByVal aDataGroup As atcData.atcTimeseriesGroup = Nothing)
         Calculate("n-day " & HighOrLowString() & " value", clsIDFPlugin.ListDefaultArray("Return Period"))
@@ -2555,11 +2546,14 @@ Public Class frmSWSTAT
             If radioYearsCommon.Text.EndsWith(pNoDatesInCommon) Then
                 radioYearsAll.Checked = True
             Else
-                Dim lCurDate(5) As Integer
-                J2Date(pCommonStart, lCurDate)
-                txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
-                J2Date(pCommonEnd, lCurDate)
-                txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
+                Try
+                    Dim lCurDate(5) As Integer
+                    J2Date(pCommonStart, lCurDate)
+                    txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
+                    J2Date(pCommonEnd, lCurDate)
+                    txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
+                Catch
+                End Try
             End If
         End If
     End Sub

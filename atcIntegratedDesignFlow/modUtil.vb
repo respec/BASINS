@@ -4,11 +4,43 @@ Imports atcBatchProcessing
 Imports atcUtility
 
 Public Module modUtil
+
+    ''' <summary>
+    ''' Find a station ID by looking at STAID, site_no, Location, STANAM attributes, set STANAM attribute if found and return it
+    ''' </summary>
+    ''' <param name="aTs">Timeseries to search attributes of and set STANAM</param>
+    ''' <returns></returns>
+    Public Function STAID(ByVal aTs As atcTimeseries) As String
+        Dim lSTAID As String = aTs.Attributes.GetValue("STAID", Nothing)
+        If lSTAID Is Nothing Then
+            lSTAID = aTs.Attributes.GetValue("site_no", Nothing)
+            If lSTAID Is Nothing Then
+                lSTAID = aTs.Attributes.GetValue("Location", Nothing)
+                If lSTAID Is Nothing Then
+                    lSTAID = aTs.Attributes.GetValue("STANAM", Nothing)
+                    If lSTAID Is Nothing Then
+                        lSTAID = "N/A"
+                    End If
+                End If
+            End If
+            aTs.Attributes.SetValue("STAID", lSTAID)
+        End If
+        Return lSTAID
+    End Function
+
+    Public Sub AddSeasonNameIfNeeded(aAttributes As List(Of String), aDataSets As atcTimeseriesGroup)
+        If Not aAttributes.Contains("SeasonName") Then
+            Dim lSeasons As atcCollection = aDataSets.SortedAttributeValues("SeasonName")
+            If lSeasons.Count > 1 OrElse lSeasons.Count = 1 AndAlso lSeasons(0) IsNot Nothing Then
+                aAttributes.Add("SeasonName")
+            End If
+        End If
+    End Sub
+
     ''' <summary>
     ''' Holds a set of inputs' names for batch run
     ''' </summary>
     ''' <remarks></remarks>
-    '''{
     Public Class InputNames
         Inherits Inputs
         Public Shared HighLow As String = "HighOrLow"
