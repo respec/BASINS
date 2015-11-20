@@ -989,7 +989,7 @@ NextName:
 
     Private Function GetNonProvisional(ByVal aDataGroup As atcDataGroup) As atcDataGroup
         Dim lFiltered As New atcDataGroup
-        For Each lDataSet As atcTimeseries In AvailableData
+        For Each lDataSet As atcTimeseries In aDataGroup
             If HasProvisionalValues(lDataSet) Then
                 Dim lProvisionalTS As atcTimeseries = Nothing
                 Dim lNonProvisionalTS As atcTimeseries = Nothing
