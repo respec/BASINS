@@ -5,7 +5,7 @@ Imports System.Xml
 
 Public Class clsBatchUtil
 
-    Public Shared WDMDownload As String = ""
+    'Public Shared WDMDownload As String = ""
     Public Shared SiteInfoDir As String = ""
     Public StationList As atcCollection 'of Station IDs as strings
 
@@ -13,9 +13,9 @@ Public Class clsBatchUtil
         Get
             Dim lXML As String = "<function name='GetNWISDailyDischarge'>" & vbCrLf
             lXML &= "<arguments>" & vbCrLf
-            lXML &= "<SaveWDM>" & WDMDownload & "</SaveWDM>"
+            'lXML &= "<SaveWDM>" & WDMDownload & "</SaveWDM>"
             lXML &= "<SaveIn>" & SiteInfoDir & "</SaveIn>"
-            lXML &= "<CacheFolder>C:\Basins\cache\</CacheFolder>"
+            'lXML &= "<CacheFolder>C:\Basins\cache\</CacheFolder>"
             For Each lStation As String In aStationList
                 lXML &= "<stationid>" & lStation & "</stationid>" & vbCrLf
             Next
@@ -99,7 +99,7 @@ Public Class clsBatchUtil
                     lFrom = lFrom.Substring("read from ".Length)
                 End If
 
-                lStationInfo = "Station " & loc & "," & lDA & "," & lFrom
+                lStationInfo = "Station" & vbTab & loc & "," & lDA & "," & lFrom
                 If Not lStationsInfo.Keys.Contains(loc) Then
                     lStationsInfo.Add(loc, lStationInfo)
                 End If
