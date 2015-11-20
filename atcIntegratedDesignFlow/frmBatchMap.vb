@@ -59,7 +59,7 @@ Public Class frmBatchMap
                 lindex += 1
             Next
         End If
-        
+
         pGlobalInputsBF = New atcDataAttributes()
         pGroupsInputsBF = New atcCollection()
 
@@ -77,8 +77,14 @@ Public Class frmBatchMap
     Private Sub btnCreateGroup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCreateGroup.Click
         Dim lAnalysis As String = BatchAnalysis.ToString()
         Dim lCount As Integer = 0
-        pBatchGroupCountSWSTAT += 1
-        lCount = pBatchGroupCountSWSTAT
+        Select Case BatchAnalysis
+            Case clsBatch.ANALYSIS.SWSTAT
+                pBatchGroupCountSWSTAT += 1
+                lCount = pBatchGroupCountSWSTAT
+            Case clsBatch.ANALYSIS.DFLOW
+                pBatchGroupCountDFLOW += 1
+                lCount = pBatchGroupCountDFLOW
+        End Select
         If lstStations.RightCount = 0 OrElse String.IsNullOrEmpty(lAnalysis) Then
             Exit Sub
         End If
@@ -125,6 +131,7 @@ Public Class frmBatchMap
     Private Sub cmsNode_ItemClicked(ByVal sender As Object, ByVal e As System.Windows.Forms.ToolStripItemClickedEventArgs) Handles cmsNode.ItemClicked
         Dim lcmdName As String = e.ClickedItem.Name
 
+        'ToDo: Put in Buttons
         'Dim p As System.Drawing.Point = New System.Drawing.Point(e.ClickedItem.Bounds.Location.X, e.ClickedItem.Bounds.Location.Y)
         '' Go to the node that the user clicked
         'Dim node As TreeNode = treeBFGroups.GetNodeAt(p)
@@ -234,6 +241,14 @@ Public Class frmBatchMap
 
     Private Function GetGroupParams(ByVal aGroupName As String, Optional ByVal aUseGlobalDefault As Boolean = False) As atcDataAttributes
         Dim lBatchInputs As atcDataAttributes = pGroupsInputsSWSTAT.ItemByKey(aGroupName)
+        Select Case BatchAnalysis
+            Case clsBatch.ANALYSIS.DFLOW
+                lBatchInputs = pGroupsInputsDFLOW.ItemByKey(aGroupName)
+            Case clsBatch.ANALYSIS.SWSTAT
+                lBatchInputs = pGroupsInputsSWSTAT.ItemByKey(aGroupName)
+            Case Else
+                '    lBatchInputs = pGroupsInputsBF.ItemByKey(lGroupName)
+        End Select
         If lBatchInputs Is Nothing Then
             lBatchInputs = New atcDataAttributes()
             lBatchInputs.SetValue("Operation", "GroupSetParm")
@@ -368,7 +383,7 @@ Public Class frmBatchMap
         Next
     End Sub
 
-    Private Sub ParmetersSetSWSTAT(ByVal aArgs As atcDataAttributes) Handles pfrmParams.ParametersSet
+    Private Sub ParmetersSetSWSTAT(ByVal aArgs As atcDataAttributes) Handles pfrmParams.ParametersSetSWSTAT
         Dim lText As String = InputNames.ParametersToText(aArgs)
 
         If String.IsNullOrEmpty(lText) Then
@@ -393,8 +408,36 @@ Public Class frmBatchMap
         End If
     End Sub
 
+    Private Sub ParmetersSetDFLOW(ByVal aArgs As atcDataAttributes) Handles pfrmParams.ParametersSetDFLOW
+        Dim lText As String = InputNamesDFLOW.ParametersToText(aArgs)
+
+        If String.IsNullOrEmpty(lText) Then
+            txtParameters.Text = ""
+        Else
+            'Dim loperation As String = aArgs.GetValue("Operation", "")
+            'Dim lgroupname As String = aArgs.GetValue("Group", "")
+            'Dim lArg As atcDataAttributes = Nothing
+            'If loperation.ToLower = "groupsetparm" Then
+            '    lArg = pGroupsInputsBF.ItemByKey(lgroupname)
+            '    If lArg Is Nothing Then
+            '        lArg = New atcDataAttributes()
+            '        pGroupsInputsBF.Add(lgroupname, lArg)
+            '    End If
+            'Else
+            '    lArg = pGlobalInputsBF
+            'End If
+            'For Each lDataDef As atcDefinedValue In aArgs
+            '    lArg.SetValue(lDataDef.Definition.Name, lDataDef.Value)
+            'Next
+            txtParameters.Text = lText
+        End If
+    End Sub
+
     Private Sub btnBrowseDataDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseDataDir.Click
         Dim lFolder As New System.Windows.Forms.FolderBrowserDialog()
+        If IO.Directory.Exists(pDataPath) Then
+            lFolder.SelectedPath = pDataPath
+        End If
         If lFolder.ShowDialog = Windows.Forms.DialogResult.OK Then
             txtDataDir.Text = lFolder.SelectedPath
             If IO.Directory.Exists(txtDataDir.Text) Then
@@ -468,7 +511,7 @@ Public Class frmBatchMap
     Private Sub btnDownload_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDownload.Click
         If Not String.IsNullOrEmpty(pDataPath) AndAlso IO.Directory.Exists(pDataPath) Then
             Dim lStationsNeedDownload As New atcCollection()
-            For Each lStationID As String In pListStations
+            For Each lStationID As String In pListStations.Keys
                 If Not IO.File.Exists(GetDataFileFullPath(lStationID)) Then
                     lStationsNeedDownload.Add(lStationID, lStationID)
                 End If
@@ -485,6 +528,8 @@ Public Class frmBatchMap
                            pDataPath, "Batch Map")
                 Return
             End Try
+        Else
+            Logger.Msg("Please specify a directory for data download.")
         End If
     End Sub
 
@@ -524,7 +569,8 @@ Public Class frmBatchMap
         'End If
         Dim lfrmBatch As New frmBatch()
         lfrmBatch.BatchSpecFile = pBatchSpecFilefullname
-        lfrmBatch.Text = "Batch Run: Integrated Frequency Analysis"
+        lfrmBatch.BatchAnalysis = BatchAnalysis
+        lfrmBatch.Text = "Batch Run: " & BatchAnalysis.ToString() & " Analysis"
         lfrmBatch.ShowDialog()
     End Sub
 
@@ -546,7 +592,7 @@ Public Class frmBatchMap
             SaveBatchFile(pBatchSpecFilefullname, clsBatch.ANALYSIS.SWSTAT, pGlobalInputsSWSTAT, pGroupsInputsSWSTAT)
         End If
         If pGlobalInputsDFLOW.Count > 0 AndAlso pGroupsInputsDFLOW.Count > 0 Then
-            Dim lSpecDirDFLOW As String = pGlobalInputsDFLOW.GetValue(InputNames.OutputDir, "")
+            Dim lSpecDirDFLOW As String = pGlobalInputsDFLOW.GetValue(InputNamesDFLOW.OutputDir, "")
             If String.IsNullOrEmpty(lSpecDirDFLOW) Then
                 lSpecDirDFLOW = pDataPath
             End If
@@ -568,7 +614,12 @@ Public Class frmBatchMap
         Try
             lSW = New IO.StreamWriter(aFilename, False)
             'write global block first
-            lSW.WriteLine(InputNames.ParametersToText(aCommonSetting))
+            Select Case aAnalysis
+                Case clsBatch.ANALYSIS.SWSTAT
+                    lSW.WriteLine(InputNames.ParametersToText(aCommonSetting))
+                Case clsBatch.ANALYSIS.DFLOW
+                    lSW.WriteLine(InputNamesDFLOW.ParametersToText(aCommonSetting))
+            End Select
             lSW.WriteLine("")
             'write each group settings
             For Each lGroupAttrib As atcDataAttributes In aGroupSettings
@@ -590,7 +641,12 @@ Public Class frmBatchMap
                     End If
                     lGroupAttrib.SetValue(GlobalInputNames.StationsInfo, lStationsInfo)
                 End If
-                lSW.WriteLine(InputNames.ParametersToText(lGroupAttrib))
+                Select Case aAnalysis
+                    Case clsBatch.ANALYSIS.SWSTAT
+                        lSW.WriteLine(InputNames.ParametersToText(lGroupAttrib))
+                    Case clsBatch.ANALYSIS.DFLOW
+                        lSW.WriteLine(InputNamesDFLOW.ParametersToText(lGroupAttrib))
+                End Select
                 lSW.WriteLine("")
             Next
             Logger.Msg("Batch file is saved:" & vbCrLf & aFilename, lTitle)
@@ -656,6 +712,128 @@ Public Class frmBatchMap
                     Case clsBatch.ANALYSIS.SWSTAT
                 End Select
             End If
+        End If
+    End Sub
+
+    Private Sub btnGroupGlobal_Click(sender As Object, e As EventArgs) Handles btnGroupGlobal.Click
+        If treeBFGroups.SelectedNode Is Nothing Then Exit Sub
+        Dim lnode As TreeNode = treeBFGroups.SelectedNode
+        Dim lNodeText As String = lnode.Text
+        pfrmParams = New atcIDF.frmSWSTAT()
+        pfrmParams.BatchAnalysis = BatchAnalysis
+        If lNodeText.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
+            pGlobalInputsSWSTAT.SetValue("Operation", "GlobalSetParm")
+            atcIDF.modUtil.InputNames.BuildInputSet(pGlobalInputsSWSTAT, Nothing)
+            Dim lNDay() As Double = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.NDay, Nothing)
+            Dim lNDays As atcCollection = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.NDays, Nothing)
+            Dim lRP() As Double = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.ReturnPeriod, Nothing)
+            Dim lRPs As atcCollection = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.ReturnPeriods, Nothing)
+            pfrmParams.Initialize(Nothing, pGlobalInputsSWSTAT)
+        Else
+            pGlobalInputsDFLOW.SetValue("Operation", "GlobalSetParm")
+            atcIDF.modUtil.InputNamesDFLOW.BuildInputSet(pGlobalInputsDFLOW, Nothing)
+            'Dim lNDay() As Double = pGlobalInputsDFLOW.GetValue(atcIDF.modUtil.InputNamesDFLOW.NDay, Nothing)
+            'Dim lNDays As atcCollection = pGlobalInputsDFLOW.GetValue(atcIDF.modUtil.InputNamesDFLOW.NDays, Nothing)
+            'Dim lRP() As Double = pGlobalInputsDFLOW.GetValue(atcIDF.modUtil.InputNamesDFLOW.ReturnPeriod, Nothing)
+            'Dim lRPs As atcCollection = pGlobalInputsDFLOW.GetValue(atcIDF.modUtil.InputNamesDFLOW.ReturnPeriods, Nothing)
+            pfrmParams.Initialize(Nothing, pGlobalInputsDFLOW)
+        End If
+    End Sub
+
+    Private Sub btnGroupGroup_Click(sender As Object, e As EventArgs) Handles btnGroupGroup.Click
+        If treeBFGroups.SelectedNode Is Nothing Then Exit Sub
+        Dim lnode As TreeNode = treeBFGroups.SelectedNode
+        Dim lGroupingName As String = "BatchGroup"
+        Dim lGroupName As String = ""
+        Dim lGroupNode As TreeNode
+        If lnode.Text.StartsWith(lGroupingName) Then
+            lGroupNode = lnode
+        Else
+            lGroupNode = lnode.Parent
+        End If
+        lGroupName = lGroupNode.Text
+
+        Dim lIndex As Integer = lGroupName.LastIndexOf("_")
+        Dim lGroupNum As Integer = Integer.Parse(lGroupName.Substring(lIndex + 1))
+        Dim lBatchInputs As atcDataAttributes = GetGroupParams(lGroupName, True)
+        'If lGroupName.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
+        '    lBatchInputs = pGroupsInputsSWSTAT.ItemByKey(lGroupName)
+        'ElseIf lGroupName.Contains(clsBatch.ANALYSIS.DFLOW.ToString()) Then
+        '    lBatchInputs = pGroupsInputsDFLOW.ItemByKey(lGroupName)
+        'Else
+        '    lBatchInputs = pGroupsInputsBF.ItemByKey(lGroupName)
+        'End If
+
+        Dim lTsGroup As atcTimeseriesGroup = BuildTserGroup(lGroupNode)
+        If lTsGroup.Count > 0 Then
+            pfrmParams = New atcIDF.frmSWSTAT()
+            pfrmParams.BatchAnalysis = BatchAnalysis
+            pfrmParams.Initialize(lTsGroup, lBatchInputs)
+            'pfrmParameters = pfrmParameters.GetType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+            'pfrmParameters.GetType.InvokeMember("Initialize", Reflection.BindingFlags.InvokeMethod, Nothing, Nothing, New Object() {lTsGroup, lBatchInputs})
+            'If lGroupName.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
+            'End If
+        End If
+    End Sub
+
+    Private Sub btnGroupRemove_Click(sender As Object, e As EventArgs) Handles btnGroupRemove.Click
+        Dim node As TreeNode = treeBFGroups.SelectedNode
+        If node Is Nothing Then Exit Sub
+        Dim lGroupingName As String = "BatchGroup"
+        If node.Text.StartsWith(lGroupingName) Then
+            RemoveBFGroup(node)
+        Else
+            If node.Parent IsNot Nothing Then
+                If node.Parent.Nodes.Count = 1 Then
+                    RemoveBFGroup(node)
+                Else
+                    Dim lGroupName As String = node.Parent.Text
+                    Dim lStationID As String = node.Text
+                    treeBFGroups.Nodes.Remove(node)
+
+                    Dim lBFGroupAttribs As atcDataAttributes = pGroupsInputsBF.ItemByKey(lGroupName)
+                    If lBFGroupAttribs IsNot Nothing Then
+                        Dim lStationInfo As ArrayList = lBFGroupAttribs.GetValue(GlobalInputNames.StationsInfo)
+                        If lStationInfo IsNot Nothing Then
+                            Dim lIndexToRemove As Integer = -99
+                            For Each lStation As String In lStationInfo
+                                If lStation.Contains(lStationID) Then
+                                    lIndexToRemove = lStationInfo.IndexOf(lStation)
+                                    Exit For
+                                End If
+                            Next
+                            If lIndexToRemove >= 0 Then
+                                lStationInfo.RemoveAt(lIndexToRemove)
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub btnGroupPlot_Click(sender As Object, e As EventArgs) Handles btnGroupPlot.Click
+        Dim node As TreeNode = treeBFGroups.SelectedNode
+        If node Is Nothing Then Exit Sub
+        Dim lGroupingName As String = "BatchGroup"
+        Dim lTsGroup As New atcTimeseriesGroup()
+        Dim lArgs As New atcDataAttributes()
+        lArgs.Add("Constituent", "streamflow,flow")
+        If Not node.Text.StartsWith(lGroupingName) Then
+            node = node.Parent()
+        End If
+        For Each lStationNode As TreeNode In node.Nodes
+            Dim lstationId As String = lStationNode.Text
+            Dim lDataPath As String = GetDataFileFullPath(lstationId)
+            Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+            If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                lTsGroup.Add(lTsGroupTemp(0))
+            End If
+        Next
+        If lTsGroup.Count > 0 Then
+            atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
+        Else
+            Logger.Msg("Need to download data first.", "Batch Map:Plot")
         End If
     End Sub
 End Class

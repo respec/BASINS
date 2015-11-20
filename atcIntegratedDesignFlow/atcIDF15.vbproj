@@ -129,6 +129,7 @@
   <ItemGroup>
     <Compile Include="atcFrequencyGridSource.vb" />
     <Compile Include="clsBatchSpec.vb" />
+    <Compile Include="clsBatchSpecDFLOW.vb" />
     <Compile Include="clsIDFPlugin.vb" />
     <Compile Include="DFLOWCalcs.vb" />
     <Compile Include="frmAboutDFLOW.Designer.vb">

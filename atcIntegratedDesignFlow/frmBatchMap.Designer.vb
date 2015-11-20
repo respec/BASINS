@@ -43,6 +43,10 @@ Partial Class frmBatchMap
         Me.cmsPlotDur = New System.Windows.Forms.ToolStripMenuItem()
         Me.cmsRemove = New System.Windows.Forms.ToolStripMenuItem()
         Me.btnDownload = New System.Windows.Forms.Button()
+        Me.btnGroupGlobal = New System.Windows.Forms.Button()
+        Me.btnGroupGroup = New System.Windows.Forms.Button()
+        Me.btnGroupRemove = New System.Windows.Forms.Button()
+        Me.btnGroupPlot = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.cmsNode.SuspendLayout()
         Me.SuspendLayout()
@@ -90,7 +94,7 @@ Partial Class frmBatchMap
         '
         Me.treeBFGroups.Location = New System.Drawing.Point(16, 211)
         Me.treeBFGroups.Name = "treeBFGroups"
-        Me.treeBFGroups.Size = New System.Drawing.Size(137, 173)
+        Me.treeBFGroups.Size = New System.Drawing.Size(261, 173)
         Me.treeBFGroups.TabIndex = 4
         '
         'Label2
@@ -127,9 +131,9 @@ Partial Class frmBatchMap
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.btnParmForm)
         Me.GroupBox1.Controls.Add(Me.txtParameters)
-        Me.GroupBox1.Location = New System.Drawing.Point(160, 195)
+        Me.GroupBox1.Location = New System.Drawing.Point(283, 195)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(416, 189)
+        Me.GroupBox1.Size = New System.Drawing.Size(293, 189)
         Me.GroupBox1.TabIndex = 8
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Group Parameters"
@@ -154,7 +158,7 @@ Partial Class frmBatchMap
         Me.txtParameters.Multiline = True
         Me.txtParameters.Name = "txtParameters"
         Me.txtParameters.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtParameters.Size = New System.Drawing.Size(404, 138)
+        Me.txtParameters.Size = New System.Drawing.Size(281, 138)
         Me.txtParameters.TabIndex = 0
         '
         'btnDoBatch
@@ -216,11 +220,51 @@ Partial Class frmBatchMap
         Me.btnDownload.Text = "Download"
         Me.btnDownload.UseVisualStyleBackColor = True
         '
+        'btnGroupGlobal
+        '
+        Me.btnGroupGlobal.Location = New System.Drawing.Point(12, 390)
+        Me.btnGroupGlobal.Name = "btnGroupGlobal"
+        Me.btnGroupGlobal.Size = New System.Drawing.Size(47, 23)
+        Me.btnGroupGlobal.TabIndex = 12
+        Me.btnGroupGlobal.Text = "Global"
+        Me.btnGroupGlobal.UseVisualStyleBackColor = True
+        '
+        'btnGroupGroup
+        '
+        Me.btnGroupGroup.Location = New System.Drawing.Point(65, 390)
+        Me.btnGroupGroup.Name = "btnGroupGroup"
+        Me.btnGroupGroup.Size = New System.Drawing.Size(50, 23)
+        Me.btnGroupGroup.TabIndex = 13
+        Me.btnGroupGroup.Text = "Group"
+        Me.btnGroupGroup.UseVisualStyleBackColor = True
+        '
+        'btnGroupRemove
+        '
+        Me.btnGroupRemove.Location = New System.Drawing.Point(121, 390)
+        Me.btnGroupRemove.Name = "btnGroupRemove"
+        Me.btnGroupRemove.Size = New System.Drawing.Size(56, 23)
+        Me.btnGroupRemove.TabIndex = 14
+        Me.btnGroupRemove.Text = "Remove"
+        Me.btnGroupRemove.UseVisualStyleBackColor = True
+        '
+        'btnGroupPlot
+        '
+        Me.btnGroupPlot.Location = New System.Drawing.Point(183, 390)
+        Me.btnGroupPlot.Name = "btnGroupPlot"
+        Me.btnGroupPlot.Size = New System.Drawing.Size(48, 23)
+        Me.btnGroupPlot.TabIndex = 15
+        Me.btnGroupPlot.Text = "Plot"
+        Me.btnGroupPlot.UseVisualStyleBackColor = True
+        '
         'frmBatchMap
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(588, 423)
+        Me.Controls.Add(Me.btnGroupPlot)
+        Me.Controls.Add(Me.btnGroupRemove)
+        Me.Controls.Add(Me.btnGroupGroup)
+        Me.Controls.Add(Me.btnGroupGlobal)
         Me.Controls.Add(Me.btnDownload)
         Me.Controls.Add(Me.btnSaveSpecs)
         Me.Controls.Add(Me.btnDoBatch)
@@ -262,4 +306,8 @@ Partial Class frmBatchMap
     Friend WithEvents cmsGroupSetParm As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmsGlobalSetParm As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents btnDownload As System.Windows.Forms.Button
+    Friend WithEvents btnGroupGlobal As Windows.Forms.Button
+    Friend WithEvents btnGroupGroup As Windows.Forms.Button
+    Friend WithEvents btnGroupRemove As Windows.Forms.Button
+    Friend WithEvents btnGroupPlot As Windows.Forms.Button
 End Class

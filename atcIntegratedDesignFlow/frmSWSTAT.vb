@@ -1259,7 +1259,8 @@ Public Class frmSWSTAT
 
     Private Const pNoDatesInCommon As String = ": No dates in common"
 
-    Public Event ParametersSet(ByVal aArgs As atcDataAttributes)
+    Public Event ParametersSetSWSTAT(ByVal aArgs As atcDataAttributes)
+    Public Event ParametersSetDFLOW(ByVal aArgs As atcDataAttributes)
     Private pAttributes As atcDataAttributes
     Private pSetGlobal As Boolean = False
     Private pBatch As Boolean = False
@@ -1420,17 +1421,85 @@ Public Class frmSWSTAT
             End If
             radioYearsCommon.Enabled = False
         End If
+        'If pBatch AndAlso pSetGlobal Then
+        '    radioYearsAll.Checked = True
+        'End If
+    End Sub
 
-        Select Case BatchAnalysis
-            Case atcBatchProcessing.clsBatch.ANALYSIS.SWSTAT
-                tabMain.Controls.RemoveByKey("tabDFLOW")
-            'tabNDay.Enabled = True
-            'tabDFLOW.Enabled = False
-            Case atcBatchProcessing.clsBatch.ANALYSIS.DFLOW
-                tabMain.Controls.RemoveByKey("tabNDay")
-                'tabNDay.Enabled = False
-                'tabDFLOW.Enabled = True
-        End Select
+    Private Sub RepopulateFormDFLOW()
+        Dim lFirstDate As Double = GetMaxValue()
+        Dim lLastDate As Double = GetMinValue()
+
+        pCommonStart = GetMinValue()
+        pCommonEnd = GetMaxValue()
+
+        Dim lHaveAnnual As Boolean = False
+        Dim lAnnualIsHigh As Boolean = False
+        Dim lAnnualIsLow As Boolean = False
+        Dim lAnnualNday As Integer = 0
+
+        For Each lDataset As atcData.atcTimeseries In pDataGroup
+            If lDataset.Dates.numValues > 0 Then
+                Dim lThisDate As Double = lDataset.Dates.Value(1)
+                If lThisDate < lFirstDate Then lFirstDate = lThisDate
+                If lThisDate > pCommonStart Then pCommonStart = lThisDate
+                lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
+                If lThisDate > lLastDate Then lLastDate = lThisDate
+                If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
+
+                If lDataset.Attributes.GetValue("Tu", atcTimeUnit.TUDay) = atcTimeUnit.TUYear Then
+                    lHaveAnnual = True
+                    Dim lConstituent As String = lDataset.Attributes.GetValue("Constituent", "")
+                    If lConstituent.Length < 4 Then
+                        Logger.Msg("Dataset #" & lDataset.Attributes.GetValue("ID", "") & " " & lDataset.ToString,
+                                   "Annual Dataset Missing Constituent")
+                    Else
+                        Select Case lConstituent.Substring(0, 1).ToUpper
+                            Case "L" : lAnnualIsLow = True
+                            Case "H" : lAnnualIsHigh = True
+                            Case Else
+                                Logger.Msg("Dataset #" & lDataset.Attributes.GetValue("ID", "") & " " & lDataset.ToString,
+                                           "Annual Dataset Constituent does not start with L or H")
+                        End Select
+                        Dim lNday As Integer
+                        If Integer.TryParse(lConstituent.Substring(1), lNday) Then
+                            If lAnnualNday = 0 Then
+                                lAnnualNday = lNday
+                            ElseIf lAnnualNday <> lNday Then
+                                Logger.Msg("Annual datasets with different N-Day cannot be analyzed at the same time." & vbCrLf _
+                                           & "N-Day values of both " & lAnnualNday & " and " & lNday & " were found.",
+                                           "Incompatible Annual Data Selected")
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+        Next
+
+        If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
+            lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
+            lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
+            radioYearsAll.Text = "All: " & pDateFormat.JDateToString(lFirstDate) & " to " & pDateFormat.JDateToString(lLastDate)
+            radioYearsAll.Enabled = True
+        Else
+            If radioYearsAll.Checked Then
+                radioYearsAll.Checked = False
+                radioYearsCustom.Checked = True
+            End If
+            radioYearsAll.Enabled = False
+        End If
+
+        If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
+            radioYearsCommon.Text = "Common: " & pDateFormat.JDateToString(pCommonStart) & " to " & pDateFormat.JDateToString(pCommonEnd)
+            radioYearsCommon.Enabled = True
+        Else
+            radioYearsCommon.Text = "Common" & pNoDatesInCommon
+            If radioYearsCommon.Checked Then
+                radioYearsCommon.Checked = False
+                radioYearsCustom.Checked = True
+            End If
+            radioYearsCommon.Enabled = False
+        End If
     End Sub
 
     Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
@@ -1574,6 +1643,9 @@ Public Class frmSWSTAT
             btnCalculate.Width *= Int((btnCalculate.Text.Length * 1.0) / ("Calculate".Length * 1.0))
             gbTextOutput.Visible = True
             PopulateDFLOW(pDataGroup, attributes)
+            RepopulateFormDFLOW()
+            grpHighLow.Visible = False
+            grpHighLow.Enabled = False
         ElseIf BatchAnalysis = clsBatch.ANALYSIS.SWSTAT
             btnNDay.Visible = False
             btnDisplayTrend.Visible = False
@@ -1586,7 +1658,11 @@ Public Class frmSWSTAT
                 btnDoFrequencyGrid.Text = "Set Group Parameters"
             End If
             PopulateForm(attributes)
+            grpHighLow.Visible = True
+            grpHighLow.Enabled = True
         End If
+        btnDisplayBasic.Visible = False
+        btnDisplayBasic.Enabled = False
         Select Case BatchAnalysis
             Case atcBatchProcessing.clsBatch.ANALYSIS.SWSTAT
                 tabMain.Controls.RemoveByKey("tabDFLOW")
@@ -1989,7 +2065,7 @@ Public Class frmSWSTAT
                 Me.Close()
             End If
         End If
-        RaiseEvent ParametersSet(pAttributes)
+        RaiseEvent ParametersSetSWSTAT(pAttributes)
     End Sub
 
     Private Sub Calculate(ByVal aOperationName As String, ByVal aReturnPeriods() As Double)
@@ -2931,13 +3007,13 @@ Public Class frmSWSTAT
     Private Sub PopulateDFLOWAttributes(ByVal attributes As atcDataAttributes)
         If attributes IsNot Nothing Then
             With attributes
-                DFLOWCalcs.fFirstYear = .GetValue(InputNames.StartYear, -1)
-                DFLOWCalcs.fStartMonth = .GetValue(InputNames.StartMonth, 4)
-                DFLOWCalcs.fStartDay = .GetValue(InputNames.StartDay, 1)
+                DFLOWCalcs.fFirstYear = .GetValue(InputNamesDFLOW.StartYear, -1)
+                DFLOWCalcs.fStartMonth = .GetValue(InputNamesDFLOW.StartMonth, 4)
+                DFLOWCalcs.fStartDay = .GetValue(InputNamesDFLOW.StartDay, 1)
 
-                DFLOWCalcs.fLastYear = .GetValue(InputNames.EndYear, -1)
-                DFLOWCalcs.fEndMonth = .GetValue(InputNames.EndMonth, 3)
-                DFLOWCalcs.fEndDay = .GetValue(InputNames.EndDay, 31)
+                DFLOWCalcs.fLastYear = .GetValue(InputNamesDFLOW.EndYear, -1)
+                DFLOWCalcs.fEndMonth = .GetValue(InputNamesDFLOW.EndMonth, 3)
+                DFLOWCalcs.fEndDay = .GetValue(InputNamesDFLOW.EndDay, 31)
 
                 cboStartMonth.SelectedIndex = DFLOWCalcs.fStartMonth - 1
                 cboEndMonth.SelectedIndex = DFLOWCalcs.fEndMonth - 1
@@ -2945,8 +3021,8 @@ Public Class frmSWSTAT
                 txtStartDay.Text = DFLOWCalcs.fStartDay
                 txtEndDay.Text = DFLOWCalcs.fEndDay
 
-                txtOutputDir.Text = .GetValue(InputNames.OutputDir, "")
-                txtOutputRootName.Text = .GetValue(InputNames.OutputPrefix, "")
+                txtOutputDir.Text = .GetValue(InputNamesDFLOW.OutputDir, "")
+                txtOutputRootName.Text = .GetValue(InputNamesDFLOW.OutputPrefix, "")
 
                 If DFLOWCalcs.fFirstYear > 0 Then txtOmitBeforeYear.Text = DFLOWCalcs.fFirstYear
                 If DFLOWCalcs.fLastYear > 0 Then txtOmitAfterYear.Text = DFLOWCalcs.fLastYear
@@ -3135,7 +3211,7 @@ Public Class frmSWSTAT
                     Logger.Msg("DFLOW Parameters are set for " & pAttributes.GetValue("Group", "") & ".", "Batch Run DFLOW")
                 End If
                 Me.Close()
-                RaiseEvent ParametersSet(pAttributes)
+                RaiseEvent ParametersSetDFLOW(pAttributes)
             Else
                 Logger.Msg("Please address the following issues before proceed." & vbCrLf & lMessage, "Batch Run DFLOW")
                 Exit Sub
@@ -3148,31 +3224,28 @@ Public Class frmSWSTAT
 
     Private Function SaveBatchSettingsDFLOW(ByVal aChoice As atcDataAttributes, Optional ByVal aDataGroup As atcTimeseriesGroup = Nothing) As String
         Dim lMessage As String = ""
-        If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            'aCBList = Me.clbDataSets
-            DFLOWCalcs.fStartMonth = cboStartMonth.SelectedIndex + 1
-            If IsNumeric(txtStartDay.Text) Then
-                DFLOWCalcs.fStartDay = txtStartDay.Text
-            Else
-                DFLOWCalcs.fStartDay = 1
-            End If
-            DFLOWCalcs.fEndMonth = cboEndMonth.SelectedIndex + 1
-            If IsNumeric(txtEndDay.Text) Then
-                DFLOWCalcs.fEndDay = txtEndDay.Text
-            Else
-                DFLOWCalcs.fEndDay = pLastDayOfMonth(DFLOWCalcs.fEndMonth)
-            End If
-            If IsNumeric(txtOmitBeforeYear.Text) Then
-                DFLOWCalcs.fFirstYear = CInt(txtOmitBeforeYear.Text)
-            Else
-                DFLOWCalcs.fFirstYear = 0
-            End If
-            If IsNumeric(txtOmitAfterYear.Text) Then
-                DFLOWCalcs.fLastYear = CInt(txtOmitAfterYear.Text)
-            Else
-                DFLOWCalcs.fLastYear = 0
-            End If
+        'aCBList = Me.clbDataSets
+        DFLOWCalcs.fStartMonth = cboStartMonth.SelectedIndex + 1
+        If IsNumeric(txtStartDay.Text) Then
+            DFLOWCalcs.fStartDay = txtStartDay.Text
         Else
+            DFLOWCalcs.fStartDay = 1
+        End If
+        DFLOWCalcs.fEndMonth = cboEndMonth.SelectedIndex + 1
+        If IsNumeric(txtEndDay.Text) Then
+            DFLOWCalcs.fEndDay = txtEndDay.Text
+        Else
+            DFLOWCalcs.fEndDay = pLastDayOfMonth(DFLOWCalcs.fEndMonth)
+        End If
+        If IsNumeric(txtOmitBeforeYear.Text) Then
+            DFLOWCalcs.fFirstYear = CInt(txtOmitBeforeYear.Text)
+        Else
+            DFLOWCalcs.fFirstYear = 0
+        End If
+        If IsNumeric(txtOmitAfterYear.Text) Then
+            DFLOWCalcs.fLastYear = CInt(txtOmitAfterYear.Text)
+        Else
+            DFLOWCalcs.fLastYear = 0
         End If
         With aChoice
             .SetValue(InputNamesDFLOW.StartYear, DFLOWCalcs.fFirstYear)
