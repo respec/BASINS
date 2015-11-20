@@ -125,7 +125,10 @@ Public Class atcTimeseriesStatistics
                 AddOperation("Harmonic Mean", "Sub-contrary mean of positive values", _
                                              defTimeSeriesOne, lCategory, "Double", pNaN)
 
-                AddOperation("Variance", "Statistical variance", _
+                AddOperation("Harmonic Mean Adj", "Harmonic mean adjusted for zero flows",
+                                             defTimeSeriesOne, lCategory, "Double", pNaN)
+
+                AddOperation("Variance", "Statistical variance",
                              defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Standard Deviation", "Standard deviation", _
@@ -283,7 +286,9 @@ Public Class atcTimeseriesStatistics
             End If
             aTimeseries.Attributes.SetValue("Count Zero", lCountZero)
             If lSumInverse > 0 Then
-                aTimeseries.Attributes.SetValue("Harmonic Mean", lCountPositive / lSumInverse)
+                Dim lHM As Double = lCountPositive / lSumInverse
+                aTimeseries.Attributes.SetValue("Harmonic Mean", lHM)
+                If aTimeseries.numValues > 0 Then aTimeseries.Attributes.SetValue("Harmonic Mean Adj", lHM * (lCountPositive * 1.0) / (aTimeseries.numValues * 1.0))
             End If
             If lCount > 0 Then
                 aTimeseries.Attributes.SetValue("Last", aTimeseries.Value(lLastValueIndex))
