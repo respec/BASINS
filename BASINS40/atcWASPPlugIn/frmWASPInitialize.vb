@@ -88,9 +88,9 @@ Public Class frmWASPInitialize
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         lblWarning.Text = "Selecting upstream segments..."
         System.Windows.Forms.Application.DoEvents()
-        Dim lComids = New atcCollection
-        Dim lToComids = New atcCollection
-        Dim lStreamOrders = New atcCollection
+        Dim lComids As New atcCollection
+        Dim lToComids As New atcCollection
+        Dim lStreamOrders As New atcCollection
 
         If pNumSelected > 0 Then
             'build collection of comid, tocomid

@@ -297,7 +297,7 @@ Public Class frmSWSTATmod
         Me.tabMain.Location = New System.Drawing.Point(0, 2)
         Me.tabMain.Name = "tabMain"
         Me.tabMain.SelectedIndex = 0
-        Me.tabMain.Size = New System.Drawing.Size(443, 535)
+        Me.tabMain.Size = New System.Drawing.Size(443, 566)
         Me.tabMain.TabIndex = 1
         '
         'tabSelectDates
@@ -598,6 +598,7 @@ Public Class frmSWSTATmod
         'tabNDay
         '
         Me.tabNDay.BackColor = System.Drawing.Color.Transparent
+        Me.tabNDay.Controls.Add(Me.btnDoFrequencyGrid)
         Me.tabNDay.Controls.Add(Me.groupGraph)
         Me.tabNDay.Controls.Add(Me.btnFrequencyReport)
         Me.tabNDay.Controls.Add(Me.btnScreeningTests)
@@ -608,7 +609,7 @@ Public Class frmSWSTATmod
         Me.tabNDay.Location = New System.Drawing.Point(4, 22)
         Me.tabNDay.Name = "tabNDay"
         Me.tabNDay.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabNDay.Size = New System.Drawing.Size(435, 509)
+        Me.tabNDay.Size = New System.Drawing.Size(435, 540)
         Me.tabNDay.TabIndex = 2
         Me.tabNDay.Text = "N-Day, Trend, Frequency"
         Me.tabNDay.UseVisualStyleBackColor = True
@@ -616,63 +617,58 @@ Public Class frmSWSTATmod
         'groupGraph
         '
         Me.groupGraph.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.groupGraph.Controls.Add(Me.btnDoFrequencyGrid)
         Me.groupGraph.Controls.Add(Me.btnDoFrequencyGraph)
         Me.groupGraph.Controls.Add(Me.chkMultipleNDayPlots)
         Me.groupGraph.Controls.Add(Me.chkMultipleStationPlots)
-        Me.groupGraph.Location = New System.Drawing.Point(138, 375)
+        Me.groupGraph.Location = New System.Drawing.Point(138, 475)
         Me.groupGraph.Name = "groupGraph"
-        Me.groupGraph.Size = New System.Drawing.Size(200, 128)
+        Me.groupGraph.Size = New System.Drawing.Size(289, 57)
         Me.groupGraph.TabIndex = 43
         Me.groupGraph.TabStop = False
-        Me.groupGraph.Text = "Graph"
         '
         'btnDoFrequencyGrid
         '
         Me.btnDoFrequencyGrid.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDoFrequencyGrid.Location = New System.Drawing.Point(10, 17)
+        Me.btnDoFrequencyGrid.Location = New System.Drawing.Point(148, 423)
         Me.btnDoFrequencyGrid.Name = "btnDoFrequencyGrid"
-        Me.btnDoFrequencyGrid.Size = New System.Drawing.Size(138, 23)
+        Me.btnDoFrequencyGrid.Size = New System.Drawing.Size(124, 23)
         Me.btnDoFrequencyGrid.TabIndex = 37
         Me.btnDoFrequencyGrid.Text = "Frequency Grid"
         Me.btnDoFrequencyGrid.UseVisualStyleBackColor = True
         '
         'btnDoFrequencyGraph
         '
-        Me.btnDoFrequencyGraph.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDoFrequencyGraph.Location = New System.Drawing.Point(10, 46)
+        Me.btnDoFrequencyGraph.Location = New System.Drawing.Point(10, 18)
         Me.btnDoFrequencyGraph.Name = "btnDoFrequencyGraph"
-        Me.btnDoFrequencyGraph.Size = New System.Drawing.Size(138, 23)
+        Me.btnDoFrequencyGraph.Size = New System.Drawing.Size(124, 23)
         Me.btnDoFrequencyGraph.TabIndex = 38
         Me.btnDoFrequencyGraph.Text = "Frequency Graph"
         Me.btnDoFrequencyGraph.UseVisualStyleBackColor = True
         '
         'chkMultipleNDayPlots
         '
-        Me.chkMultipleNDayPlots.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkMultipleNDayPlots.AutoSize = True
-        Me.chkMultipleNDayPlots.Location = New System.Drawing.Point(14, 75)
+        Me.chkMultipleNDayPlots.Location = New System.Drawing.Point(152, 10)
         Me.chkMultipleNDayPlots.Name = "chkMultipleNDayPlots"
-        Me.chkMultipleNDayPlots.Size = New System.Drawing.Size(121, 17)
+        Me.chkMultipleNDayPlots.Size = New System.Drawing.Size(128, 17)
         Me.chkMultipleNDayPlots.TabIndex = 39
-        Me.chkMultipleNDayPlots.Text = "Multiple N-Day Plots"
+        Me.chkMultipleNDayPlots.Text = "Separate N-Day Plots"
         Me.chkMultipleNDayPlots.UseVisualStyleBackColor = True
         '
         'chkMultipleStationPlots
         '
-        Me.chkMultipleStationPlots.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkMultipleStationPlots.AutoSize = True
-        Me.chkMultipleStationPlots.Location = New System.Drawing.Point(14, 98)
+        Me.chkMultipleStationPlots.Location = New System.Drawing.Point(152, 33)
         Me.chkMultipleStationPlots.Name = "chkMultipleStationPlots"
-        Me.chkMultipleStationPlots.Size = New System.Drawing.Size(124, 17)
+        Me.chkMultipleStationPlots.Size = New System.Drawing.Size(131, 17)
         Me.chkMultipleStationPlots.TabIndex = 40
-        Me.chkMultipleStationPlots.Text = "Multiple Station Plots"
+        Me.chkMultipleStationPlots.Text = "Separate Station Plots"
         Me.chkMultipleStationPlots.UseVisualStyleBackColor = True
         '
         'btnFrequencyReport
         '
         Me.btnFrequencyReport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnFrequencyReport.Location = New System.Drawing.Point(8, 479)
+        Me.btnFrequencyReport.Location = New System.Drawing.Point(148, 452)
         Me.btnFrequencyReport.Name = "btnFrequencyReport"
         Me.btnFrequencyReport.Size = New System.Drawing.Size(124, 23)
         Me.btnFrequencyReport.TabIndex = 42
@@ -682,11 +678,11 @@ Public Class frmSWSTATmod
         'btnScreeningTests
         '
         Me.btnScreeningTests.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnScreeningTests.Location = New System.Drawing.Point(8, 450)
+        Me.btnScreeningTests.Location = New System.Drawing.Point(8, 481)
         Me.btnScreeningTests.Name = "btnScreeningTests"
         Me.btnScreeningTests.Size = New System.Drawing.Size(124, 23)
         Me.btnScreeningTests.TabIndex = 41
-        Me.btnScreeningTests.Text = "Screening Tests"
+        Me.btnScreeningTests.Text = "Screening Test (R)"
         Me.btnScreeningTests.UseVisualStyleBackColor = True
         '
         'chkLog
@@ -695,7 +691,7 @@ Public Class frmSWSTATmod
         Me.chkLog.AutoSize = True
         Me.chkLog.Checked = True
         Me.chkLog.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkLog.Location = New System.Drawing.Point(8, 371)
+        Me.chkLog.Location = New System.Drawing.Point(8, 402)
         Me.chkLog.Name = "chkLog"
         Me.chkLog.Size = New System.Drawing.Size(80, 17)
         Me.chkLog.TabIndex = 36
@@ -712,7 +708,7 @@ Public Class frmSWSTATmod
         Me.panelTop.Controls.Add(Me.grpNday)
         Me.panelTop.Location = New System.Drawing.Point(0, 0)
         Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(435, 368)
+        Me.panelTop.Size = New System.Drawing.Size(435, 399)
         Me.panelTop.TabIndex = 34
         '
         'grpRecurrence
@@ -729,7 +725,7 @@ Public Class frmSWSTATmod
         Me.grpRecurrence.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpRecurrence.Location = New System.Drawing.Point(210, 0)
         Me.grpRecurrence.Name = "grpRecurrence"
-        Me.grpRecurrence.Size = New System.Drawing.Size(225, 368)
+        Me.grpRecurrence.Size = New System.Drawing.Size(225, 399)
         Me.grpRecurrence.TabIndex = 7
         Me.grpRecurrence.TabStop = False
         Me.grpRecurrence.Text = "Recurrence Interval"
@@ -737,7 +733,7 @@ Public Class frmSWSTATmod
         'btnRecurrenceDefault
         '
         Me.btnRecurrenceDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(163, 309)
+        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(163, 340)
         Me.btnRecurrenceDefault.Name = "btnRecurrenceDefault"
         Me.btnRecurrenceDefault.Size = New System.Drawing.Size(56, 20)
         Me.btnRecurrenceDefault.TabIndex = 31
@@ -746,7 +742,7 @@ Public Class frmSWSTATmod
         'btnRecurrenceRemove
         '
         Me.btnRecurrenceRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(129, 309)
+        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(129, 340)
         Me.btnRecurrenceRemove.Name = "btnRecurrenceRemove"
         Me.btnRecurrenceRemove.Size = New System.Drawing.Size(28, 20)
         Me.btnRecurrenceRemove.TabIndex = 30
@@ -761,14 +757,14 @@ Public Class frmSWSTATmod
         Me.lstRecurrence.Location = New System.Drawing.Point(6, 19)
         Me.lstRecurrence.Name = "lstRecurrence"
         Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstRecurrence.Size = New System.Drawing.Size(211, 284)
+        Me.lstRecurrence.Size = New System.Drawing.Size(211, 315)
         Me.lstRecurrence.TabIndex = 27
         Me.lstRecurrence.Tag = "Return Period"
         '
         'btnRecurrenceAdd
         '
         Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(97, 309)
+        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(97, 340)
         Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
         Me.btnRecurrenceAdd.Size = New System.Drawing.Size(27, 20)
         Me.btnRecurrenceAdd.TabIndex = 29
@@ -778,7 +774,7 @@ Public Class frmSWSTATmod
         '
         Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 309)
+        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 340)
         Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
         Me.txtRecurrenceAdd.Size = New System.Drawing.Size(85, 20)
         Me.txtRecurrenceAdd.TabIndex = 28
@@ -786,7 +782,7 @@ Public Class frmSWSTATmod
         'btnRecurrenceNone
         '
         Me.btnRecurrenceNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceNone.Location = New System.Drawing.Point(154, 338)
+        Me.btnRecurrenceNone.Location = New System.Drawing.Point(154, 369)
         Me.btnRecurrenceNone.Name = "btnRecurrenceNone"
         Me.btnRecurrenceNone.Size = New System.Drawing.Size(65, 24)
         Me.btnRecurrenceNone.TabIndex = 33
@@ -795,7 +791,7 @@ Public Class frmSWSTATmod
         'btnRecurrenceAll
         '
         Me.btnRecurrenceAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAll.Location = New System.Drawing.Point(6, 338)
+        Me.btnRecurrenceAll.Location = New System.Drawing.Point(6, 369)
         Me.btnRecurrenceAll.Name = "btnRecurrenceAll"
         Me.btnRecurrenceAll.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceAll.TabIndex = 32
@@ -806,7 +802,7 @@ Public Class frmSWSTATmod
         Me.Splitter1.BackColor = System.Drawing.SystemColors.Control
         Me.Splitter1.Location = New System.Drawing.Point(200, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(10, 368)
+        Me.Splitter1.Size = New System.Drawing.Size(10, 399)
         Me.Splitter1.TabIndex = 13
         Me.Splitter1.TabStop = False
         '
@@ -824,7 +820,7 @@ Public Class frmSWSTATmod
         Me.grpNday.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpNday.Location = New System.Drawing.Point(0, 0)
         Me.grpNday.Name = "grpNday"
-        Me.grpNday.Size = New System.Drawing.Size(200, 368)
+        Me.grpNday.Size = New System.Drawing.Size(200, 399)
         Me.grpNday.TabIndex = 1
         Me.grpNday.TabStop = False
         Me.grpNday.Text = "Number of Days"
@@ -832,7 +828,7 @@ Public Class frmSWSTATmod
         'btnNdayDefault
         '
         Me.btnNdayDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayDefault.Location = New System.Drawing.Point(138, 309)
+        Me.btnNdayDefault.Location = New System.Drawing.Point(138, 340)
         Me.btnNdayDefault.Name = "btnNdayDefault"
         Me.btnNdayDefault.Size = New System.Drawing.Size(56, 20)
         Me.btnNdayDefault.TabIndex = 24
@@ -841,7 +837,7 @@ Public Class frmSWSTATmod
         'btnNdayRemove
         '
         Me.btnNdayRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayRemove.Location = New System.Drawing.Point(105, 309)
+        Me.btnNdayRemove.Location = New System.Drawing.Point(105, 340)
         Me.btnNdayRemove.Name = "btnNdayRemove"
         Me.btnNdayRemove.Size = New System.Drawing.Size(27, 20)
         Me.btnNdayRemove.TabIndex = 23
@@ -850,7 +846,7 @@ Public Class frmSWSTATmod
         'btnNdayAdd
         '
         Me.btnNdayAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAdd.Location = New System.Drawing.Point(72, 309)
+        Me.btnNdayAdd.Location = New System.Drawing.Point(72, 340)
         Me.btnNdayAdd.Name = "btnNdayAdd"
         Me.btnNdayAdd.Size = New System.Drawing.Size(27, 20)
         Me.btnNdayAdd.TabIndex = 22
@@ -860,7 +856,7 @@ Public Class frmSWSTATmod
         '
         Me.txtNdayAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNdayAdd.Location = New System.Drawing.Point(6, 309)
+        Me.txtNdayAdd.Location = New System.Drawing.Point(6, 340)
         Me.txtNdayAdd.Name = "txtNdayAdd"
         Me.txtNdayAdd.Size = New System.Drawing.Size(54, 20)
         Me.txtNdayAdd.TabIndex = 21
@@ -868,7 +864,7 @@ Public Class frmSWSTATmod
         'btnNdayNone
         '
         Me.btnNdayNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayNone.Location = New System.Drawing.Point(130, 338)
+        Me.btnNdayNone.Location = New System.Drawing.Point(130, 369)
         Me.btnNdayNone.Name = "btnNdayNone"
         Me.btnNdayNone.Size = New System.Drawing.Size(64, 23)
         Me.btnNdayNone.TabIndex = 26
@@ -877,7 +873,7 @@ Public Class frmSWSTATmod
         'btnNdayAll
         '
         Me.btnNdayAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAll.Location = New System.Drawing.Point(6, 338)
+        Me.btnNdayAll.Location = New System.Drawing.Point(6, 369)
         Me.btnNdayAll.Name = "btnNdayAll"
         Me.btnNdayAll.Size = New System.Drawing.Size(64, 24)
         Me.btnNdayAll.TabIndex = 25
@@ -892,14 +888,14 @@ Public Class frmSWSTATmod
         Me.lstNday.Location = New System.Drawing.Point(6, 19)
         Me.lstNday.Name = "lstNday"
         Me.lstNday.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstNday.Size = New System.Drawing.Size(188, 284)
+        Me.lstNday.Size = New System.Drawing.Size(188, 315)
         Me.lstNday.TabIndex = 20
         Me.lstNday.Tag = "NDay"
         '
         'btnDisplayTrend
         '
         Me.btnDisplayTrend.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDisplayTrend.Location = New System.Drawing.Point(8, 421)
+        Me.btnDisplayTrend.Location = New System.Drawing.Point(8, 452)
         Me.btnDisplayTrend.Name = "btnDisplayTrend"
         Me.btnDisplayTrend.Size = New System.Drawing.Size(124, 23)
         Me.btnDisplayTrend.TabIndex = 35
@@ -909,7 +905,7 @@ Public Class frmSWSTATmod
         'btnNDay
         '
         Me.btnNDay.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNDay.Location = New System.Drawing.Point(8, 392)
+        Me.btnNDay.Location = New System.Drawing.Point(8, 423)
         Me.btnNDay.Name = "btnNDay"
         Me.btnNDay.Size = New System.Drawing.Size(124, 23)
         Me.btnNDay.TabIndex = 34
@@ -924,7 +920,7 @@ Public Class frmSWSTATmod
         Me.tabDFLOW.Location = New System.Drawing.Point(4, 22)
         Me.tabDFLOW.Name = "tabDFLOW"
         Me.tabDFLOW.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabDFLOW.Size = New System.Drawing.Size(435, 509)
+        Me.tabDFLOW.Size = New System.Drawing.Size(435, 540)
         Me.tabDFLOW.TabIndex = 3
         Me.tabDFLOW.Text = "Design Flow"
         Me.tabDFLOW.UseVisualStyleBackColor = True
@@ -1395,7 +1391,7 @@ Public Class frmSWSTATmod
         'frmSWSTATmod
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(443, 537)
+        Me.ClientSize = New System.Drawing.Size(443, 568)
         Me.Controls.Add(Me.tabMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
@@ -1623,6 +1619,16 @@ Public Class frmSWSTATmod
             End If
             radioYearsCommon.Enabled = False
         End If
+
+        If radioYearsAll.Checked Then
+            radioYearsAll_CheckedChanged(Nothing, Nothing)
+        ElseIf radioYearsCustom.Checked
+            'No need to change it
+        ElseIf radioYearsCommon.Checked Then
+            radioYearsCommon_CheckedChanged(Nothing, Nothing)
+        Else
+            radioYearsCommon.Checked = True
+        End If
     End Sub
 
     Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
@@ -1691,7 +1697,7 @@ Public Class frmSWSTATmod
             pDataGroup = aTimeseriesGroup
         End If
 
-        If aBasicAttributes Is Nothing Then
+        If aBasicAttributes Is Nothing OrElse aBasicAttributes.Count < 1 Then
             pBasicAttributes = atcDataManager.DisplayAttributes
         Else
             pBasicAttributes = aBasicAttributes
@@ -1728,6 +1734,10 @@ Public Class frmSWSTATmod
             pDataGroup = atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis",
                                                        pDataGroup, Nothing, True, True, Me.Icon)
         End If
+        'Ensure STAID is set in all timeseries
+        For Each lTs As atcTimeseries In pDataGroup
+            Logger.Dbg("IDF: station " & STAID(lTs))
+        Next
         DFLOWCalcs_Initialize()
         If pDataGroup.Count > 0 Then
             PopulateForm()
@@ -1938,6 +1948,11 @@ Public Class frmSWSTATmod
                 lSeasons.SeasonSelected(0) = True
                 lTsB = lSeasons.SplitBySelected(lTsB, Nothing).ItemByIndex(1)
                 lTsB.Attributes.SetValue("ID", lTs.OriginalParent.Attributes.GetValue("ID"))
+                If lTs.Attributes.ContainsAttribute("SeasonName") Then
+                    lTsB.Attributes.SetValue("SeasonName", lTs.Attributes.GetValue("SeasonName"))
+                Else
+                    lTsB.Attributes.RemoveByKey("SeasonName")
+                End If
             End If
             lDataGroupB.Add(lTsB)
         Next
@@ -1950,7 +1965,9 @@ Public Class frmSWSTATmod
 
         With lList
             .Text = "Basic Statistics"
-            .Initialize(SelectedData(), pBasicAttributes, False, , )
+            Dim lSelectedData As atcTimeseriesGroup = SelectedData()
+            AddSeasonNameIfNeeded(pBasicAttributes, lSelectedData)
+            .Initialize(lSelectedData, pBasicAttributes, False, , )
             .Width = 600
             .SwapRowsColumns = True
             .Icon = Me.Icon
@@ -2070,6 +2087,8 @@ Public Class frmSWSTATmod
                             .IncludeMonths = False
                         End With
                         .Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
+                        AddSeasonNameIfNeeded(pNDayAttributes, lRankedAnnual)
+
                         .Initialize(lRankedAnnual.Clone, pNDayAttributes, True, , )
                         .DisplayValueAttributes = True
                         .Icon = Me.Icon
@@ -2474,6 +2493,7 @@ Public Class frmSWSTATmod
                             .IncludeMonths = False
                         End With
                         .Text = "Trend of " & HighOrLowString() & " Annual Time Series and Statistics"
+                        AddSeasonNameIfNeeded(pTrendAttributes, lRankedAnnual)
                         .Initialize(lRankedAnnual, pTrendAttributes, False)
                         .SwapRowsColumns = True
                         .Icon = Me.Icon
@@ -2506,53 +2526,38 @@ Public Class frmSWSTATmod
         End If
     End Sub
 
-    'Private Sub btnFrequencyReport_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnFrequencyReport.Click
-    '    Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+    Private Sub btnFrequencyReport_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnFrequencyReport.Click
+        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
 
-    '    Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
-    '    With lSaveDialog
-    '        .Title = "Save Frequency Report As"
-    '        .DefaultExt = ".txt"
-    '        .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
-    '        If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
-    '            .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
-    '        End If
-    '        If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
-    '            Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
+        Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+        With lSaveDialog
+            .Title = "Save Frequency Report As"
+            .DefaultExt = ".txt"
+            .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
-    '            Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup, _
-    '                                                         aHigh:=radioHigh.Checked, _
-    '                                                         aNday:=ListToArray(lstNday), _
-    '                                                         aReturns:=ListToArray(lstRecurrence))
-    '            lFreqForm.Visible = False
+                Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
+                                                             aHigh:=radioHigh.Checked,
+                                                             aNday:=ListToArray(lstNday),
+                                                             aReturns:=ListToArray(lstRecurrence))
+                lFreqForm.Visible = False
 
-    '            SaveFileString(.FileName, lFreqForm.CreateReport)
-    '            OpenFile(.FileName)
-    '        End If
-    '    End With
-    '    Me.Cursor = System.Windows.Forms.Cursors.Default
-    'End Sub
+                SaveFileString(.FileName, lFreqForm.CreateReport)
+                OpenFile(.FileName)
+            End If
+        End With
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+    End Sub
 
     Private Sub btnDoFrequencyGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequencyGraph.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         DoFrequencyGraph()
         Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
-
-    Private Function STAID(ByVal aTs As atcTimeseries) As String
-        Dim lSTAID As String = aTs.Attributes.GetValue("STAID", Nothing)
-        If lSTAID Is Nothing Then
-            lSTAID = aTs.Attributes.GetValue("Location", Nothing)
-            If lSTAID Is Nothing Then
-                lSTAID = aTs.Attributes.GetValue("STANAM", Nothing)
-                If lSTAID Is Nothing Then
-                    lSTAID = "N/A"
-                End If
-            End If
-            aTs.Attributes.SetValue("STAID", lSTAID)
-        End If
-        Return lSTAID
-    End Function
 
     Public Sub DoFrequencyGraph(Optional ByVal aDataGroup As atcData.atcTimeseriesGroup = Nothing)
         Calculate("n-day " & HighOrLowString() & " value", clsIDFPlugin.ListDefaultArray("Return Period"))
@@ -2665,11 +2670,14 @@ Public Class frmSWSTATmod
             If radioYearsCommon.Text.EndsWith(pNoDatesInCommon) Then
                 radioYearsAll.Checked = True
             Else
-                Dim lCurDate(5) As Integer
-                J2Date(pCommonStart, lCurDate)
-                txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
-                J2Date(pCommonEnd, lCurDate)
-                txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
+                Try
+                    Dim lCurDate(5) As Integer
+                    J2Date(pCommonStart, lCurDate)
+                    txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
+                    J2Date(pCommonEnd, lCurDate)
+                    txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
+                Catch
+                End Try
             End If
         End If
     End Sub

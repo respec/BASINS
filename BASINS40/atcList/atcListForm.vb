@@ -436,36 +436,27 @@ Public Class atcListForm
     End Sub
 
     Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
-        Dim lst As New atcControls.atcSelectList
-        Dim lAvailable As New Generic.List(Of String)
-        For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-            If IncludeAttribute(lAttrDef) Then lAvailable.Add(lAttrDef.Name)
-        Next
-        'Add any current display attributes not in atcDataAttributes.AllDefinitions
-        For Each lAttrName As String In pDisplayAttributes
-            If Not lAvailable.Contains(lAttrName) Then
-                lAvailable.Add(lAttrName)
-            End If
-        Next
-        lAvailable.Sort()
-        If lst.AskUser(lAvailable, pDisplayAttributes) Then
-            'TODO: set project modified flag?
+        'Dim lst As New atcControls.atcSelectList
+        'Dim lAvailable As New Generic.List(Of String)
+        'For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+        '    If lAttrDef.Displayable Then lAvailable.Add(lAttrDef.Name)
+        'Next
+        ''Add any current display attributes not in atcDataAttributes.AllDefinitions
+        'For Each lAttrName As String In pDisplayAttributes
+        '    If Not lAvailable.Contains(lAttrName) Then
+        '        lAvailable.Add(lAttrName)
+        '    End If
+        'Next
+        'lAvailable.Sort()
+        'If lst.AskUser(lAvailable, pDisplayAttributes) Then
+        '    'TODO: set project modified flag?
+        '    PopulateGrid()
+        'End If
+        Dim lSelector As New frmSelectAttributes()
+        If lSelector.AskUser(pDataGroup, pDisplayAttributes) Then
             PopulateGrid()
         End If
     End Sub
-
-    Private Function IncludeAttribute(ByVal lAttrDef As atcAttributeDefinition) As Boolean
-        Select Case lAttrDef.TypeString.ToLower
-            Case "double", "integer", "boolean", "string", "atctimeunit"
-                Select Case lAttrDef.Name.ToLower
-                    Case "attributes", "bins", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "kendall tau", "n-day high value", "n-day low value", "n-day high attribute", "n-day low attribute", "number", "return period", "summary file", "vbtime", "%*", "%sum*"
-                        'Skip displaying some things in the list
-                    Case Else
-                        Return True
-                End Select
-        End Select
-        Return False
-    End Function
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
         atcDataManager.UserSelectData("", pDataGroup, Nothing, False, True, Me.Icon)

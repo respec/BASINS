@@ -133,7 +133,7 @@ Public Class atcTableDelimited
                     pRecords.Add(lEmptyRecord)
                 End While
             ElseIf newValue < pRecords.Count Then
-                pRecords.RemoveRange(newValue + 1, pRecords.Count - newValue)
+                pRecords.RemoveRange(newValue + 1, pRecords.Count - newValue - 1)
             End If
         End Set
     End Property

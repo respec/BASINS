@@ -250,7 +250,11 @@ Friend Module modATCscript
         Loop While Len(Trim(CurrentLine)) = 0
 
         If percent <> LastPercent AndAlso Not TestingFile Then
-            Logger.Progress(Left(CurrentLine, 100), percent, 100)
+            Dim lProgressMessage As String = SafeSubstring(CurrentLine, 0, 100)
+            If Not FixedColumns AndAlso ColumnDelimiter IsNot Nothing AndAlso ColumnDelimiter <> " " Then
+                lProgressMessage = lProgressMessage.Replace(ColumnDelimiter, " ")
+            End If
+            Logger.Progress(lProgressMessage, percent, 100)
             LastPercent = percent
             System.Windows.Forms.Application.DoEvents()
         End If

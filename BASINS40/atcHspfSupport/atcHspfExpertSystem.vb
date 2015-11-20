@@ -171,7 +171,6 @@ Public Class atcExpertSystem
             'Read storm end/start dates
             Dim lStormSDate(5) As Integer
             Dim lStormEDate(5) As Integer
-            Dim testString As String
             For lStormIndex As Integer = 1 To lNStorms
                 lExsRecord = lExsRecords(lRecordIndex + lStormIndex)
                 If Not Integer.TryParse(lExsRecord.Substring(0, 5), lStormSDate(0)) _
