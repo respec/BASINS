@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{9F09A31B-DE05-4FF8-8E89-867AFFE0ACE7}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -142,18 +142,23 @@
   <ItemGroup>
     <EmbeddedResource Include="frmBatch.resx">
       <DependentUpon>frmBatch.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmBatchMap.resx">
       <DependentUpon>frmBatchMap.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmUSGSBaseflow.resx">
       <DependentUpon>frmUSGSBaseflow.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmStations.resx">
       <DependentUpon>frmStations.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmUSGSBaseflowBatch.resx">
       <DependentUpon>frmUSGSBaseflowBatch.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
