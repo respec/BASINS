@@ -2,6 +2,7 @@
 Imports atcData
 Imports MapWinUtility
 Imports atcTimeseriesBaseflow
+Imports atcBatchProcessing
 Imports System.Windows.Forms
 
 Public Class frmBatchMap
@@ -38,7 +39,7 @@ Public Class frmBatchMap
         lstStations.LeftLabel = "Stations from map"
         lstStations.RightLabel = "Selected for a group"
         Dim lindex As Integer = 0
-        For Each lStationID As String In pListStations
+        For Each lStationID As String In pListStations.Keys
             lstStations.LeftItem(lindex) = lStationID
             lindex += 1
         Next
@@ -455,7 +456,7 @@ Public Class frmBatchMap
     Private Sub btnDownload_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDownload.Click
         If Not String.IsNullOrEmpty(pDataPath) AndAlso IO.Directory.Exists(pDataPath) Then
             Dim lStationsNeedDownload As New atcCollection()
-            For Each lStationID As String In pListStations
+            For Each lStationID As String In pListStations.Keys
                 If Not IO.File.Exists(GetDataFileFullPath(lStationID)) Then
                     lStationsNeedDownload.Add(lStationID, lStationID)
                 End If
@@ -590,6 +591,201 @@ Public Class frmBatchMap
                 pfrmBFParms = New frmUSGSBaseflowBatch()
                 pfrmBFParms.Initialize(lTsGroup, lArgs)
             End If
+        End If
+    End Sub
+
+    Private Sub btnGroupGlobal_Click(sender As Object, e As EventArgs) Handles btnGroupGlobal.Click
+        pBFInputsGlobal.SetValue("Operation", "GlobalSetParm")
+        pfrmBFParms = New frmUSGSBaseflowBatch()
+        pfrmBFParms.Initialize(Nothing, pBFInputsGlobal)
+    End Sub
+
+    Private Sub btnGroupGroup_Click(sender As Object, e As EventArgs) Handles btnGroupGroup.Click
+        If treeBFGroups.SelectedNode Is Nothing Then Exit Sub
+        Dim lnode As TreeNode = treeBFGroups.SelectedNode
+        Dim lGroupingName As String = "BatchGroup"
+        Dim lGroupName As String = ""
+        Dim lGroupNode As TreeNode
+        If lnode.Text.StartsWith(lGroupingName) Then
+            lGroupNode = lnode
+        Else
+            lGroupNode = lnode.Parent
+        End If
+        lGroupName = lGroupNode.Text
+
+        Dim lGroupNum As Integer = Integer.Parse(lGroupName.Substring(lGroupingName.Length + 1))
+        Dim lBFInputs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+
+        If lBFInputs Is Nothing Then
+            lBFInputs = New atcDataAttributes()
+            lBFInputs.SetValue("Operation", "GroupSetParm")
+            lBFInputs.SetValue("Group", lGroupName)
+            pBFInputsGroups.Add(lGroupName, lBFInputs)
+        End If
+        'Try to use global setting as much as possible
+        If pBFInputsGlobal IsNot Nothing Then
+            Dim lMethods As ArrayList = lBFInputs.GetValue(BFInputNames.BFMethods, Nothing)
+            If lMethods Is Nothing Then
+                Dim lMethodsGlobal As ArrayList = pBFInputsGlobal.GetValue(BFInputNames.BFMethods, Nothing)
+                If lMethodsGlobal IsNot Nothing Then
+                    lBFInputs.SetValue(BFInputNames.BFMethods, lMethodsGlobal)
+                End If
+            End If
+            Dim lOutputDir As String = lBFInputs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+            If String.IsNullOrEmpty(lOutputDir) Then
+                Dim lOutputDirGlobal As String = pBFInputsGlobal.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+                If Not String.IsNullOrEmpty(lOutputDirGlobal) Then
+                    lBFInputs.SetValue(BFBatchInputNames.OUTPUTDIR, lOutputDirGlobal)
+                End If
+            End If
+            Dim lOutputFileRoot As String = lBFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+            If String.IsNullOrEmpty(lOutputFileRoot) Then
+                Dim lOutputFileRootGlobal As String = pBFInputsGlobal.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+                If Not String.IsNullOrEmpty(lOutputFileRootGlobal) Then
+                    lBFInputs.SetValue(BFBatchInputNames.OUTPUTPrefix, lOutputFileRootGlobal)
+                End If
+            End If
+            Dim lBFIReportBy As String = lBFInputs.GetValue(BFInputNames.BFIReportby, "")
+            If String.IsNullOrEmpty(lBFIReportBy) Then
+                Dim lBFIReportByGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFIReportby, "")
+                If Not String.IsNullOrEmpty(lBFIReportByGlobal) Then
+                    lBFInputs.SetValue(BFInputNames.BFIReportby, lBFIReportByGlobal)
+                End If
+            End If
+            Dim lBFIRecessConst As String = lBFInputs.GetValue(BFInputNames.BFIRecessConst, "")
+            If String.IsNullOrEmpty(lBFIRecessConst) Then
+                Dim lBFIRecessConstGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFIRecessConst, "")
+                If Not String.IsNullOrEmpty(lBFIRecessConstGlobal) Then
+                    lBFInputs.SetValue(BFInputNames.BFIRecessConst, lBFIRecessConstGlobal)
+                End If
+            End If
+            Dim lBFITurnPtFrac As String = lBFInputs.GetValue(BFInputNames.BFITurnPtFrac, "")
+            If String.IsNullOrEmpty(lBFITurnPtFrac) Then
+                Dim lBFITurnPtFracGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFITurnPtFrac, "")
+                If Not String.IsNullOrEmpty(lBFITurnPtFracGlobal) Then
+                    lBFInputs.SetValue(BFInputNames.BFITurnPtFrac, lBFITurnPtFracGlobal)
+                End If
+            End If
+            Dim lBFINDay As String = lBFInputs.GetValue(BFInputNames.BFINDayScreen, "")
+            If String.IsNullOrEmpty(lBFINDay) Then
+                Dim lBFINDayGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.BFINDayScreen, "")
+                If Not String.IsNullOrEmpty(lBFINDayGlobal) Then
+                    lBFInputs.SetValue(BFInputNames.BFINDayScreen, lBFINDayGlobal)
+                End If
+            End If
+
+            Dim lBFStartDate As String = lBFInputs.GetValue(BFInputNames.StartDate, "")
+            If String.IsNullOrEmpty(lBFStartDate) Then
+                Dim lBFStartDateGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.StartDate, "")
+                If Not String.IsNullOrEmpty(lBFStartDateGlobal) Then
+                    lBFInputs.SetValue(BFInputNames.StartDate, lBFStartDateGlobal)
+                End If
+            End If
+            Dim lBFEndDate As String = lBFInputs.GetValue(BFInputNames.EndDate, "")
+            If String.IsNullOrEmpty(lBFEndDate) Then
+                Dim lBFEndDateGlobal As String = pBFInputsGlobal.GetValue(BFInputNames.EndDate, "")
+                If Not String.IsNullOrEmpty(lBFEndDateGlobal) Then
+                    lBFInputs.SetValue(BFInputNames.EndDate, lBFEndDateGlobal)
+                End If
+            End If
+        End If
+
+        Dim lArgs As New atcDataAttributes()
+        lArgs.Add("Constituent", "streamflow,flow")
+        Dim lTsGroup As New atcTimeseriesGroup()
+        For Each lStationNode As TreeNode In lGroupNode.Nodes
+            Dim lstationId As String = lStationNode.Text
+
+            Dim lDataLoaded As Boolean = False
+            For Each lDS As atcDataSource In atcDataManager.DataSources
+                If lDS.Name.ToString.Contains("USGS RDB") Then
+                    Dim lTsCons As String = ""
+                    For Each lTs As atcTimeseries In lDS.DataSets
+                        lTsCons = lTs.Attributes.GetValue("Constituent").ToString()
+                        If lTs.Attributes.GetValue("Location") = lstationId AndAlso
+                                   (lTsCons.ToLower = "streamflow" OrElse lTsCons.ToLower() = "flow") Then
+                            lTsGroup.Add(lTs)
+                            lDataLoaded = True
+                            Exit For
+                        End If
+                    Next
+                    If lDataLoaded Then
+                        Exit For
+                    End If
+                End If
+            Next
+            If Not lDataLoaded Then
+                Dim lDataPath As String = GetDataFileFullPath(lstationId)
+                Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+                If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                    lTsGroup.Add(lTsGroupTemp(0).Clone)
+                End If
+            End If
+        Next
+        If lTsGroup.Count > 0 Then
+            pfrmBFParms = New frmUSGSBaseflowBatch()
+            pfrmBFParms.Initialize(lTsGroup, lBFInputs)
+        End If
+    End Sub
+
+    Private Sub btnGroupRemove_Click(sender As Object, e As EventArgs) Handles btnGroupRemove.Click
+        Dim node As TreeNode = treeBFGroups.SelectedNode
+        If node Is Nothing Then Exit Sub
+        Dim lGroupingName As String = "BatchGroup"
+        If node.Text.StartsWith(lGroupingName) Then
+            RemoveBFGroup(node)
+        Else
+            If node.Parent IsNot Nothing Then
+                If node.Parent.Nodes.Count = 1 Then
+                    RemoveBFGroup(node)
+                Else
+                    Dim lGroupName As String = node.Parent.Text
+                    Dim lStationID As String = node.Text
+                    treeBFGroups.Nodes.Remove(node)
+
+                    Dim lBFGroupAttribs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+                    If lBFGroupAttribs IsNot Nothing Then
+                        Dim lStationInfo As ArrayList = lBFGroupAttribs.GetValue("StationInfo")
+                        If lStationInfo IsNot Nothing Then
+                            Dim lIndexToRemove As Integer = -99
+                            For Each lStation As String In lStationInfo
+                                If lStation.Contains(lStationID) Then
+                                    lIndexToRemove = lStationInfo.IndexOf(lStation)
+                                    Exit For
+                                End If
+                            Next
+                            If lIndexToRemove >= 0 Then
+                                lStationInfo.RemoveAt(lIndexToRemove)
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub btnGroupPlot_Click(sender As Object, e As EventArgs) Handles btnGroupPlot.Click
+        Dim node As TreeNode = treeBFGroups.SelectedNode
+        If node Is Nothing Then Exit Sub
+        Dim lGroupingName As String = "BatchGroup"
+        Dim lTsGroup As New atcTimeseriesGroup()
+        Dim lArgs As New atcDataAttributes()
+        lArgs.Add("Constituent", "streamflow")
+        If Not node.Text.StartsWith(lGroupingName) Then
+            node = node.Parent()
+        End If
+        For Each lStationNode As TreeNode In node.Nodes
+            Dim lstationId As String = lStationNode.Text
+            Dim lDataPath As String = GetDataFileFullPath(lstationId)
+            Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+            If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                lTsGroup.Add(lTsGroupTemp(0))
+            End If
+        Next
+        If lTsGroup.Count > 0 Then
+            atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
+        Else
+            Logger.Msg("Need to download data first.", "Batch Map:Plot")
         End If
     End Sub
 End Class

@@ -1,5 +1,6 @@
 ﻿Imports atcUtility
 Imports atcData
+Imports atcBatchProcessing
 Imports MapWinUtility
 
 Public Class BFBatchInputNames
@@ -657,7 +658,7 @@ Public Class clsBatchBFSpec
                 Dim lTsFlow As atcTimeseries = GetStationStreamFlowData(lStation)
                 If lTsFlow IsNot Nothing Then
                     Try
-                        lStation.CalcBF = New atcTimeseriesBaseflow.atcTimeseriesBaseflow()
+                        Dim CalcBF As atcTimeseriesBaseflow.atcTimeseriesBaseflow = New atcTimeseriesBaseflow.atcTimeseriesBaseflow()
                         Dim lTsFlowGroup As New atcTimeseriesGroup()
                         lTsFlowGroup.Add(lTsFlow)
                         With lStation.BFInputs
@@ -669,13 +670,13 @@ Public Class clsBatchBFSpec
                             .SetValue(atcTimeseriesBaseflow.BFInputNames.DrainageArea, lStation.StationDrainageArea)
                             .SetValue("BatchRun", True)
                         End With
-                        If lStation.CalcBF.Open("baseflow", lStation.BFInputs) Then
+                        If CalcBF.Open("baseflow", lStation.BFInputs) Then
                             OutputDir = lStationOutDir
                             OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "BF")
                             MethodsLastDone = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
                             ASCIICommon(lTsFlow)
                         End If
-                        lStation.Message &= lStation.CalcBF.BF_Message.Trim()
+                        lStation.Message &= CalcBF.BF_Message.Trim()
                     Catch ex As Exception
                         lStation.Message &= "Error: Base-flow separation and/or reporting failed." & vbCrLf
                     End Try
