@@ -532,6 +532,8 @@ Public Class frmDFLOWResults
             agrResults.SizeColumnToContents(lCol)
         Next
         Me.Text = aTitle
+        lblYears.Text = DFLOWCalcs.LabelYears
+        lblSeasons.Text = DFLOWCalcs.LabelSeasons
         Me.Show()
     End Sub
 
