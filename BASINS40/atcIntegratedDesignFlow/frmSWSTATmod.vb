@@ -3432,8 +3432,9 @@ Public Class frmSWSTATmod
                 Dim lReportSrc As New atcControls.atcGridSource()
                 Dim lTableTemplate As atcControls.atcGridSource = pDFLOWScenarios(0).ReportSrc
                 With lReportSrc
+                    .FixedRows = 1
                     .Rows = 1
-                    .Columns = lTableTemplate.Columns + 4 + 4 + 1
+                    .Columns = lTableTemplate.Columns + 4 + 4 '+ 1
                     Dim I As Integer
                     For I = 0 To .Columns - 1
                         .CellValue(0, I) = lTableTemplate.CellValue(0, I)
@@ -3447,7 +3448,7 @@ Public Class frmSWSTATmod
                     .CellValue(0, I + 5) = "NB_Return"
                     .CellValue(0, I + 6) = "NB_FlowValue"
                     .CellValue(0, I + 7) = "NB_Flow%"
-                    .CellValue(0, I + 8) = "HM"
+                    '.CellValue(0, I + 8) = "HM"
 
                     .Rows = 2
                     Dim lSuperRowIndex As Integer = .Rows - 1
@@ -3466,12 +3467,20 @@ Public Class frmSWSTATmod
                                 .CellValue(lSuperRowIndex, lCol + 4) = lScen.ParamNBioNDay
                                 .CellValue(lSuperRowIndex, lCol + 5) = lScen.ParamNBioReturn
                             Else
-                                .CellValue(lSuperRowIndex, lCol + 4) = ""
-                                .CellValue(lSuperRowIndex, lCol + 5) = ""
+                                .CellValue(lSuperRowIndex, lCol + 4) = "-"
+                                .CellValue(lSuperRowIndex, lCol + 5) = "-"
                             End If
-                            .CellValue(lSuperRowIndex, lCol + 6) = lScen.ParamNBioExpFlow
-                            .CellValue(lSuperRowIndex, lCol + 7) = lScen.ParamNBioFlowPct
-                            .CellValue(lSuperRowIndex, lCol + 8) = GetTserHM(.CellValue(lSuperRowIndex, 0), .CellValue(lSuperRowIndex, 1))
+                            If lScen.ParamNBioExpFlow > 0 Then
+                                .CellValue(lSuperRowIndex, lCol + 6) = lScen.ParamNBioExpFlow
+                            Else
+                                .CellValue(lSuperRowIndex, lCol + 6) = "-"
+                            End If
+                            If lScen.ParamNBioFlowPct > 0 Then
+                                .CellValue(lSuperRowIndex, lCol + 7) = lScen.ParamNBioFlowPct
+                            Else
+                                .CellValue(lSuperRowIndex, lCol + 7) = "-"
+                            End If
+                            '.CellValue(lSuperRowIndex, lCol + 8) = GetTserHM(.CellValue(lSuperRowIndex, 0), .CellValue(lSuperRowIndex, 1))
                             .Rows = .Rows + 1
                             lSuperRowIndex = .Rows - 1
                         Next

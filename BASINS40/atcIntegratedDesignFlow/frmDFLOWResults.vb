@@ -528,6 +528,9 @@ Public Class frmDFLOWResults
     Public Sub UserSpecifyDFLOWResults(ByVal ladsResults As atcControls.atcGridSource, Optional ByVal aTitle As String = "Design Flow Results")
         If ladsResults Is Nothing Then Exit Sub
         agrResults.Initialize(ladsResults)
+        For lCol As Integer = 1 To ladsResults.Columns - 1
+            agrResults.SizeColumnToContents(lCol)
+        Next
         Me.Text = aTitle
         Me.Show()
     End Sub
@@ -539,12 +542,8 @@ Public Class frmDFLOWResults
     End Function
 
     Private Sub SelectDataToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SelectDataToolStripMenuItem.Click
-
         atcDataManager.UserSelectData("Select flow time series for Design Flow calculation", pTimeseriesGroup, Nothing, False)
-
-
         If pTimeseriesGroup.Count = 0 Or Not UserSpecifyDFLOWArgs() Then
-
             'user declined to specify Data
             Me.DialogResult = Windows.Forms.DialogResult.Cancel
         Else
@@ -556,7 +555,6 @@ Public Class frmDFLOWResults
         If UserSpecifyDFLOWArgs() Then
             RefreshCalcs()
         End If
-
     End Sub
 
     Private Sub agrResults_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As System.Int32, ByVal aColumn As System.Int32) Handles agrResults.MouseDownCell
