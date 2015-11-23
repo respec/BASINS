@@ -46,6 +46,9 @@ Public Class DFLOWCalcs
 
     Public Shared DFLOWMessage As Text.StringBuilder
 
+    Public Shared LabelYears As String = ""
+    Public Shared LabelSeasons As String = ""
+
     Public Shared Function Sig2(ByVal x As Double) As String
         If x >= 100 Then
             Sig2 = Format(x, "Scientific")
@@ -578,6 +581,7 @@ Public Class DFLOWCalcs
             lTextSeasons = "Season defined as " & fMonth3.Substring(3 * lStartMonth - 3, 3) & " " & lStartDay & " - " & fMonth3.Substring(3 * lEndMonth - 3, 3) & " " & lEndDay &
                           ". Biological flow is calculated for full climatic year starting at " & fMonth3.Substring(3 * lStartMonth - 3, 3) & " " & lStartDay & "."
         End If
+        LabelSeasons = lTextSeasons
 
         Dim lTextYear As String = ""
         If lFirstYear <= 0 And lLastYear <= 0 Then
@@ -599,6 +603,7 @@ Public Class DFLOWCalcs
                                 " through " & fMonth3.Substring(3 * lEndMonth - 3, 3) & " " & lEndDay & ", " & lLastYear & " are included in analysis."
             End If
         End If
+        LabelYears = lTextYear
 
         ' ----- Count number of items checked in the listbox/ Selected number of datasets
         Dim lTotalItems As Integer = aDataGroup.Count
