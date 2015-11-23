@@ -3090,7 +3090,7 @@ Public Class frmSWSTATmod
 
     Private Sub PopulateDFLOW(ByVal aTimeseriesGroup As atcTimeseriesGroup)
         ' This populates the DFLOW input form according to the DFLOW calculation values
-        ckbBio.Checked = DFLOWCalcs.fBioDefault
+        ckbBio.Checked = Not DFLOWCalcs.fBioDefault
         'rbBio1.Enabled = DFLOWCalcs.fBioDefault
         'rbBio2.Enabled = DFLOWCalcs.fBioDefault
         'rbBio3.Enabled = DFLOWCalcs.fBioDefault
@@ -3231,6 +3231,7 @@ Public Class frmSWSTATmod
             '    clbDataSets.Items.Add(lString, True)
             'Next
         End If
+        chkNonBioChronic.Checked = True
     End Sub
 
     Private Sub btnCalculate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCalculate.Click

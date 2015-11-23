@@ -20,27 +20,27 @@ Partial Class frmDFLOWResults
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDFLOWResults))
-        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
-        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.SelectDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator
-        Me.SepcifyInputsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.SaveinputsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripSeparator
-        Me.SaveGridToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.AttributesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.CopyAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.SelectionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.DFLOWHelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripMenuItem4 = New System.Windows.Forms.ToolStripSeparator
-        Me.AboutDFLOWToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.lblYears = New System.Windows.Forms.Label
-        Me.Button1 = New System.Windows.Forms.Button
-        Me.lblSeasons = New System.Windows.Forms.Label
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.agrResults = New atcControls.atcGrid
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
+        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SelectDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.SepcifyInputsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SaveinputsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripSeparator()
+        Me.SaveGridToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AttributesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CopyAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SelectionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DFLOWHelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem4 = New System.Windows.Forms.ToolStripSeparator()
+        Me.AboutDFLOWToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.lblYears = New System.Windows.Forms.Label()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.lblSeasons = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.agrResults = New atcControls.atcGrid()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -176,22 +176,23 @@ Partial Class frmDFLOWResults
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(12, 262)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(282, 13)
+        Me.Label1.Size = New System.Drawing.Size(446, 13)
         Me.Label1.TabIndex = 11
-        Me.Label1.Text = "Double-click on biological flow value for excursion analysis"
+        Me.Label1.Text = "Double-click on biological flow value (xBy column) to view excursion analysis res" &
+    "ult for a gage"
         '
         'agrResults
         '
         Me.agrResults.AllowHorizontalScrolling = True
         Me.agrResults.AllowNewValidValues = False
         Me.agrResults.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agrResults.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.agrResults.CellBackColor = System.Drawing.Color.Empty
         Me.agrResults.Fixed3D = False
         Me.agrResults.LineColor = System.Drawing.Color.Empty
-        Me.agrResults.LineWidth = 0.0!
+        Me.agrResults.LineWidth = 0!
         Me.agrResults.Location = New System.Drawing.Point(0, 73)
         Me.agrResults.Name = "agrResults"
         Me.agrResults.Size = New System.Drawing.Size(892, 183)
