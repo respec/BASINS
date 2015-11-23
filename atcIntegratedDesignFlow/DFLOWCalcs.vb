@@ -631,10 +631,11 @@ Public Class DFLOWCalcs
             .CellValue(0, 11) = "xQy"
             .CellValue(0, 12) = "Percentile"
             .CellValue(0, 13) = "Harmonic"
-            .CellValue(0, 14) = "Percentile"
+            .CellValue(0, 14) = "Harmonic Adj" 'newly added
+            .CellValue(0, 15) = "Percentile" 'originally 14
 
             Dim lColumn As Integer
-            For lColumn = 0 To 14
+            For lColumn = 0 To 15
                 .CellColor(0, lColumn) = Drawing.Color.White 'Me.BackColor
                 .Alignment(0, lColumn) = atcControls.atcAlignment.HAlignCenter
             Next
@@ -824,15 +825,19 @@ Public Class DFLOWCalcs
             ' ===== Harmonic mean of flows
             Dim lHFlow As Double = 0
             Dim lNH As Integer = 0
-            For lI = 0 To UBound(lTS) - 1
-                If (Not Double.IsNaN(lTS(lI))) And (lTS(lI) <> 0) Then
+            Dim lHFlowAdj As Double = 0
+            For lI = 1 To UBound(lTS) '0 To UBound(lTS) - 1
+                If (Not Double.IsNaN(lTS(lI))) AndAlso (lTS(lI) > 0) Then 'And (lTS(lI) <> 0)
                     lNH = lNH + 1
                     lHFlow = lHFlow + 1 / lTS(lI)
                 End If
             Next
             If lHFlow <> 0 Then
                 lHFlow = lNH / lHFlow
+                If UBound(lTS) > 0 Then lHFlowAdj = lHFlow * ((1.0 * lNH) / (1.0 * UBound(lTS)))
             End If
+            'Dim lHM As Double = lHydrologicTS2.Attributes.GetValue("Harmonic Mean")
+            'Dim lHMAdj As Double = lHydrologicTS2.Attributes.GetValue("Harmonic Mean Adj")
 
             ' ===== Calculate percentiles
             Dim lNMiss As Integer = 0
@@ -893,7 +898,7 @@ Public Class DFLOWCalcs
             ladsResults.Alignment(lItemIdx + 1, 11) = atcControls.atcAlignment.HAlignCenter
             ladsResults.Alignment(lItemIdx + 1, 12) = atcControls.atcAlignment.HAlignCenter
 
-            If lNonBioType = InputNamesDFLOW.EDFlowType.Hydrological Then ' = 0
+            If lNonBioType = InputNamesDFLOW.EDFlowType.Hydrological Then 'DFLOWCalcs.fNonBioType = 0 
                 If lEquivalentxQy > lxBy Then
                     ladsResults.CellValue(lItemIdx + 1, 10) = "> " & lReturnPeriodTry & " years"
                     ladsResults.CellValue(lItemIdx + 1, 11) = "N/A"
@@ -913,9 +918,11 @@ Public Class DFLOWCalcs
 
             ladsResults.CellValue(lItemIdx + 1, 13) = Sig2(lHFlow)
             If Sig2(lHFlow) < 100 Then ladsResults.Alignment(lItemIdx + 1, 13) = atcControls.atcAlignment.HAlignDecimal
+            ladsResults.CellValue(lItemIdx + 1, 14) = Sig2(lHFlowAdj)
+            If Sig2(lHFlowAdj) < 100 Then ladsResults.Alignment(lItemIdx + 1, 14) = atcControls.atcAlignment.HAlignDecimal
 
-            ladsResults.CellValue(lItemIdx + 1, 14) = Format(lNExcHF / (UBound(lTS) - lNMiss), "percent")
-            ladsResults.Alignment(lItemIdx + 1, 14) = atcControls.atcAlignment.HAlignDecimal
+            ladsResults.CellValue(lItemIdx + 1, 15) = Format(lNExcHF / (UBound(lTS) - lNMiss), "percent")
+            ladsResults.Alignment(lItemIdx + 1, 15) = atcControls.atcAlignment.HAlignDecimal
             lItemIdx = lItemIdx + 1
             lHydrologicTS2.Clear() : lHydrologicTS2 = Nothing
             lTimeSeries2.Clear() : lTimeSeries2 = Nothing
