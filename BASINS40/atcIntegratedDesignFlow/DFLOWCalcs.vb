@@ -663,12 +663,16 @@ Public Class DFLOWCalcs
             lfrmProgress.Show()
         End If
 
-        Dim lExcursionCountArray As New ArrayList
-        Dim lExcursionsArray As New ArrayList
-        Dim lClustersArray As New ArrayList
+        'Dim lExcursionCountArray As New ArrayList
+        'Dim lExcursionsArray As New ArrayList
+        'Dim lClustersArray As New ArrayList
         'lExcursionCountArray.Clear()
         'lExcursionsArray.Clear()
         'lClustersArray.Clear()
+        Dim lExcursionCountArray As atcCollection = aInputs.GetValue("ExcursionCountArray")
+        Dim lExcursionsArray As atcCollection = aInputs.GetValue("ExcursionsArray")
+        Dim lClustersArray As atcCollection = aInputs.GetValue("ClustersArray")
+
         Dim lDateFormat As New atcDateFormat
         With lDateFormat
             .IncludeHours = False
@@ -676,6 +680,7 @@ Public Class DFLOWCalcs
             .IncludeSeconds = False
         End With
 
+        '{
         For lDSIndex As Integer = 0 To aDataGroup.Count - 1
             ' ===== Quick trim 
             Dim lHydrologicTS As atcTimeseries = aDataGroup(lDSIndex)
@@ -790,9 +795,10 @@ Public Class DFLOWCalcs
             lxBy = xBy(lxBy, lBioPeriod, lBioYears, lBioCluster, lBioExcursions, lTSN, lExcursionCount, lExcursions, lClusters, lfrmProgress)
             Dim lAttrName As String = lBioPeriod & "B" & lBioYears
             lHydrologicTS.Attributes.SetValue(lAttrName, lxBy)
-            lExcursionCountArray.Add(lExcursionCount)
-            lExcursionsArray.Add(lExcursions)
-            lClustersArray.Add(lClusters)
+            Dim loc As String = aDataGroup(lDSIndex).Attributes.GetValue("Location")
+            lExcursionCountArray.Add(loc, lExcursionCount)
+            lExcursionsArray.Add(loc, lExcursions)
+            lClustersArray.Add(loc, lClusters)
 
             ' ===== If appropriate, calculate equivalent xQy for this xBy
             Dim lEquivalentxQy As Double = 0
@@ -932,7 +938,7 @@ Public Class DFLOWCalcs
             lHydrologicTS2.Clear() : lHydrologicTS2 = Nothing
             lTimeSeries2.Clear() : lTimeSeries2 = Nothing
             GC.Collect()
-        Next
+        Next 'lDSIndex}
 
         If aShowProgress Then
             lfrmProgress.Close()
