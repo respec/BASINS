@@ -1342,6 +1342,7 @@ Public Module modUtil
             NBIOFlowPCT
         End Enum
 
+        Public DataGroup As atcTimeseriesGroup = Nothing
         Public Scenario As String
         Public ReportSrc As atcGridSource
         Public TypeBio As EDFLOWPARAM
@@ -1358,6 +1359,10 @@ Public Module modUtil
         Public ParamNBioFlowPct As Double
 
         Public CalculateHM As Boolean = True
+
+        Public ExcursionCountArray As New atcCollection()
+        Public ExcursionsArray As New atcCollection()
+        Public ClustersArray As New atcCollection()
     End Class
 #End Region
 End Module

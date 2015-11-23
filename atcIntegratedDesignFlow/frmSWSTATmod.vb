@@ -3280,6 +3280,7 @@ Public Class frmSWSTATmod
             lAllScenariosNBio.Add(clsInteractiveDFLOW.EDFLOWPARAM.NBIOFlowPCT, clsInteractiveDFLOW.EDFLOWPARAM.NBIOFlowPCT)
         End If
 
+        Dim lScenID As Integer = 1
         For Each lEScenBio As clsInteractiveDFLOW.EDFLOWPARAM In lAllScenariosBio
             For Each lEScenNBio As clsInteractiveDFLOW.EDFLOWPARAM In lAllScenariosNBio
                 Dim lScen As New clsInteractiveDFLOW()
@@ -3347,7 +3348,8 @@ Public Class frmSWSTATmod
                     End If
                 End With
                 If lBioIsValid AndAlso lNBioIsValid Then
-                    pDFLOWScenarios.Add(lScen)
+                    pDFLOWScenarios.Add(lScenID, lScen)
+                    lScenID += 1
                 End If
             Next 'lEScenNBio 
         Next 'lEScenBio
@@ -3426,6 +3428,12 @@ Public Class frmSWSTATmod
                                 '    .Add(InputNamesDFLOW.NBioReturnPeriod, lScen.ParamNBioReturn)
                         End Select
                     End With
+                    With lInputArgs
+                        .SetValue("ExcursionCountArray", lScen.ExcursionCountArray)
+                        .SetValue("ExcursionsArray", lScen.ExcursionsArray)
+                        .SetValue("ClustersArray", lScen.ClustersArray)
+                    End With
+                    lScen.DataGroup = pDataGroup
                     lScen.ReportSrc = DFLOWCalcs.DFLOWToGrid(pDataGroup, lBioParam, lNBioParam, lInputArgs, True)
                 Next 'lScen
 
@@ -3434,7 +3442,7 @@ Public Class frmSWSTATmod
                 With lReportSrc
                     .FixedRows = 1
                     .Rows = 1
-                    .Columns = lTableTemplate.Columns + 4 + 4 '+ 1
+                    .Columns = lTableTemplate.Columns + 4 + 4 + 1
                     Dim I As Integer
                     For I = 0 To .Columns - 1
                         .CellValue(0, I) = lTableTemplate.CellValue(0, I)
@@ -3449,10 +3457,13 @@ Public Class frmSWSTATmod
                     .CellValue(0, I + 6) = "NB_FlowValue"
                     .CellValue(0, I + 7) = "NB_Flow%"
                     '.CellValue(0, I + 8) = "HM"
+                    .CellValue(0, I + 8) = "ScenID"
 
                     .Rows = 2
                     Dim lSuperRowIndex As Integer = .Rows - 1
-                    For Each lScen As clsInteractiveDFLOW In pDFLOWScenarios
+                    Dim lScen As clsInteractiveDFLOW = Nothing
+                    For Each lScenarioID As Integer In pDFLOWScenarios.Keys
+                        lScen = pDFLOWScenarios.ItemByKey(lScenarioID)
                         For lRow As Integer = 1 To lScen.ReportSrc.Rows - 1
                             Dim lCol As Integer = 0
                             For lCol = 0 To lTableTemplate.Columns - 1
@@ -3481,6 +3492,7 @@ Public Class frmSWSTATmod
                                 .CellValue(lSuperRowIndex, lCol + 7) = "-"
                             End If
                             '.CellValue(lSuperRowIndex, lCol + 8) = GetTserHM(.CellValue(lSuperRowIndex, 0), .CellValue(lSuperRowIndex, 1))
+                            .CellValue(lSuperRowIndex, lCol + 8) = lScenarioID
                             .Rows = .Rows + 1
                             lSuperRowIndex = .Rows - 1
                         Next
@@ -3488,7 +3500,7 @@ Public Class frmSWSTATmod
                 End With
 
                 Dim lReportGrid As New frmDFLOWResults(pDataGroup, ,, True)
-                lReportGrid.UserSpecifyDFLOWResults(lReportSrc) 'pDFLOWScenarios(0).ReportSrc)
+                lReportGrid.UserSpecifyDFLOWResults(lReportSrc, pDFLOWScenarios) 'pDFLOWScenarios(0).ReportSrc)
             End If 'has dataset(s)
         End If 'has scenario(s)
     End Sub

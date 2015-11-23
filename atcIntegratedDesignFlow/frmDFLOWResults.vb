@@ -11,9 +11,11 @@ Public Class frmDFLOWResults
     Private pRow As Integer = -1        ' Row last pressed down in table
     Private pColumn As Integer = -1     ' Col last pressed down in table
 
-    Private pExcursionCountArray As New ArrayList
-    Private pExcursionsArray As New ArrayList
-    Private pClustersArray As New ArrayList
+    'Private pExcursionCountArray As New ArrayList
+    'Private pExcursionsArray As New ArrayList
+    'Private pClustersArray As New ArrayList
+
+    Public pScenarios As atcCollection = Nothing
 
     Private Shared pDateFormat As New atcDateFormat
 
@@ -81,452 +83,454 @@ Public Class frmDFLOWResults
 
     Private Sub RefreshCalcs()
 
-        ' ----- Advisory labels
-
-        Dim lNaN As Double = GetNaN()
-
-        Dim pFirstyear = 1700
-        If DFLOWCalcs.fFirstYear > 0 Then pFirstyear = DFLOWCalcs.fFirstYear
-
-        Dim pLastYear = 2100
-        If DFLOWCalcs.fLastYear > 0 Then pLastYear = DFLOWCalcs.fLastYear
-
-        Dim pEndDay = DFLOWCalcs.fEndDay + 1
-        Dim pEndMonth = DFLOWCalcs.fEndMonth
-        If DFLOWCalcs.fEndDay > DFLOWCalcs.fLastDay(pEndMonth - 1) Then
-            pEndDay = 1
-            If pEndMonth = 12 Then
-                pEndMonth = 1
-                pLastYear = pLastYear + 1
-            End If
-        End If
-
-        If (DFLOWCalcs.fStartMonth = DFLOWCalcs.fEndMonth And DFLOWCalcs.fStartDay = DFLOWCalcs.fEndDay + 1) Or _
-           ((DFLOWCalcs.fStartMonth - DFLOWCalcs.fEndMonth) Mod 12 = 1 And DFLOWCalcs.fStartDay = 1 And DFLOWCalcs.fEndDay = DFLOWCalcs.fLastDay(DFLOWCalcs.fEndMonth - 1)) Then
-            lblSeasons.Text = "Climatic year defined as " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & " - " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fEndMonth - 3, 3) & " " & DFLOWCalcs.fEndDay & "."
-        Else
-            lblSeasons.Text = "Season defined as " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & " - " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fEndMonth - 3, 3) & " " & DFLOWCalcs.fEndDay & _
-                          ". Biological flow is calculated for full climatic year starting at " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & "."
-        End If
-
-        If DFLOWCalcs.fFirstYear <= 0 And DFLOWCalcs.fLastYear <= 0 Then
-            lblYears.Text = "All available years of data are included in analysis."
-        ElseIf DFLOWCalcs.fFirstYear <= 0 Then
-            lblYears.Text = "All available data through " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fEndMonth - 3, 3) & " " & DFLOWCalcs.fEndDay & ", " & DFLOWCalcs.fLastYear & " are included in analysis."
-        ElseIf DFLOWCalcs.fLastYear <= 0 Then
-            If (DFLOWCalcs.fStartMonth < DFLOWCalcs.fEndMonth) Or (DFLOWCalcs.fStartMonth = DFLOWCalcs.fEndMonth And DFLOWCalcs.fStartDay < DFLOWCalcs.fEndDay) Then
-                lblYears.Text = "All available data from " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & ", " & DFLOWCalcs.fFirstYear - 1 & " are included in analysis."
-            Else
-                lblYears.Text = "All available data from " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & ", " & DFLOWCalcs.fFirstYear & " are included in analysis."
-            End If
-        Else
-            If (DFLOWCalcs.fStartMonth < DFLOWCalcs.fEndMonth) Or (DFLOWCalcs.fStartMonth = DFLOWCalcs.fEndMonth And DFLOWCalcs.fStartDay < DFLOWCalcs.fEndDay) Then
-                lblYears.Text = "All available data from " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & ", " & DFLOWCalcs.fFirstYear - 1 & _
-                                " through " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fEndMonth - 3, 3) & " " & DFLOWCalcs.fEndDay & ", " & DFLOWCalcs.fLastYear & " are included in analysis."
-            Else
-                lblYears.Text = "All available data from " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & ", " & DFLOWCalcs.fFirstYear & _
-                                " through " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fEndMonth - 3, 3) & " " & DFLOWCalcs.fEndDay & ", " & DFLOWCalcs.fLastYear & " are included in analysis."
-            End If
-        End If
-
-
-        ' ----- Count number of items checked in the listbox
-        Dim lTotalItems As Integer = 0
-        Dim lDSIndex As Integer
-        If pRemote AndAlso pTimeseriesGroup IsNot Nothing Then
-            lTotalItems = pTimeseriesGroup.Count
-        Else
-            For lDSIndex = 0 To pCBList.Items.Count - 1
-                If pCBList.GetItemChecked(lDSIndex) Then
-                    lTotalItems = lTotalItems + 1
-                End If
-            Next
-        End If
-
-        ' ----- Build data source for results
-
-        Dim ladsResults As New atcControls.atcGridSource
-        With ladsResults
-
-            .Columns = 15
-            .FixedColumns = 4
-            .Rows = lTotalItems + 1
-            .FixedRows = 1
-
-            .CellValue(0, 0) = "Gage"
-            .CellValue(0, 1) = "Period"
-            .CellValue(0, 2) = "Days in Record"
-            .CellValue(0, 3) = "Zero/Missing"
-            .CellValue(0, 4) = DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears
-            .CellValue(0, 5) = "Percentile"
-            .CellValue(0, 6) = "Excur per 3 yr"
-
-            Select Case DFLOWCalcs.fNonBioType
-                Case 0 : .CellValue(0, 7) = DFLOWCalcs.fAveragingPeriod & "Q" & DFLOWCalcs.fReturnPeriod
-                Case 1 : .CellValue(0, 7) = "Explicit Q"
-                Case 2 : .CellValue(0, 7) = "Percentile Q"
-            End Select
-
-            .CellValue(0, 8) = "Percentile"
-            .CellValue(0, 9) = "Excur per 3 yr"
-            .CellValue(0, 10) = DFLOWCalcs.fAveragingPeriod & "Qy Type"
-            .CellValue(0, 11) = "xQy"
-            .CellValue(0, 12) = "Percentile"
-            .CellValue(0, 13) = "Harmonic"
-            .CellValue(0, 14) = "Percentile"
-
-            Dim lColumn As Integer
-            For lColumn = 0 To 14
-                .CellColor(0, lColumn) = Me.BackColor
-                .Alignment(0, lColumn) = atcControls.atcAlignment.HAlignCenter
-            Next
-
-            Dim lRow As Integer
-            For lRow = 1 To lTotalItems
-                For lColumn = 0 To 3
-                    .CellColor(lRow, lColumn) = Me.BackColor
-                Next
-            Next
+        '' ----- Advisory labels
+
+        'Dim lNaN As Double = GetNaN()
+
+        'Dim pFirstyear = 1700
+        'If DFLOWCalcs.fFirstYear > 0 Then pFirstyear = DFLOWCalcs.fFirstYear
+
+        'Dim pLastYear = 2100
+        'If DFLOWCalcs.fLastYear > 0 Then pLastYear = DFLOWCalcs.fLastYear
+
+        'Dim pEndDay = DFLOWCalcs.fEndDay + 1
+        'Dim pEndMonth = DFLOWCalcs.fEndMonth
+        'If DFLOWCalcs.fEndDay > DFLOWCalcs.fLastDay(pEndMonth - 1) Then
+        '    pEndDay = 1
+        '    If pEndMonth = 12 Then
+        '        pEndMonth = 1
+        '        pLastYear = pLastYear + 1
+        '    End If
+        'End If
+
+        'If (DFLOWCalcs.fStartMonth = DFLOWCalcs.fEndMonth And DFLOWCalcs.fStartDay = DFLOWCalcs.fEndDay + 1) Or _
+        '   ((DFLOWCalcs.fStartMonth - DFLOWCalcs.fEndMonth) Mod 12 = 1 And DFLOWCalcs.fStartDay = 1 And DFLOWCalcs.fEndDay = DFLOWCalcs.fLastDay(DFLOWCalcs.fEndMonth - 1)) Then
+        '    lblSeasons.Text = "Climatic year defined as " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & " - " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fEndMonth - 3, 3) & " " & DFLOWCalcs.fEndDay & "."
+        'Else
+        '    lblSeasons.Text = "Season defined as " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & " - " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fEndMonth - 3, 3) & " " & DFLOWCalcs.fEndDay & _
+        '                  ". Biological flow is calculated for full climatic year starting at " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & "."
+        'End If
+
+        'If DFLOWCalcs.fFirstYear <= 0 And DFLOWCalcs.fLastYear <= 0 Then
+        '    lblYears.Text = "All available years of data are included in analysis."
+        'ElseIf DFLOWCalcs.fFirstYear <= 0 Then
+        '    lblYears.Text = "All available data through " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fEndMonth - 3, 3) & " " & DFLOWCalcs.fEndDay & ", " & DFLOWCalcs.fLastYear & " are included in analysis."
+        'ElseIf DFLOWCalcs.fLastYear <= 0 Then
+        '    If (DFLOWCalcs.fStartMonth < DFLOWCalcs.fEndMonth) Or (DFLOWCalcs.fStartMonth = DFLOWCalcs.fEndMonth And DFLOWCalcs.fStartDay < DFLOWCalcs.fEndDay) Then
+        '        lblYears.Text = "All available data from " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & ", " & DFLOWCalcs.fFirstYear - 1 & " are included in analysis."
+        '    Else
+        '        lblYears.Text = "All available data from " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & ", " & DFLOWCalcs.fFirstYear & " are included in analysis."
+        '    End If
+        'Else
+        '    If (DFLOWCalcs.fStartMonth < DFLOWCalcs.fEndMonth) Or (DFLOWCalcs.fStartMonth = DFLOWCalcs.fEndMonth And DFLOWCalcs.fStartDay < DFLOWCalcs.fEndDay) Then
+        '        lblYears.Text = "All available data from " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & ", " & DFLOWCalcs.fFirstYear - 1 & _
+        '                        " through " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fEndMonth - 3, 3) & " " & DFLOWCalcs.fEndDay & ", " & DFLOWCalcs.fLastYear & " are included in analysis."
+        '    Else
+        '        lblYears.Text = "All available data from " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fStartMonth - 3, 3) & " " & DFLOWCalcs.fStartDay & ", " & DFLOWCalcs.fFirstYear & _
+        '                        " through " & DFLOWCalcs.fMonth3.Substring(3 * DFLOWCalcs.fEndMonth - 3, 3) & " " & DFLOWCalcs.fEndDay & ", " & DFLOWCalcs.fLastYear & " are included in analysis."
+        '    End If
+        'End If
+
+
+        '' ----- Count number of items checked in the listbox
+        'Dim lTotalItems As Integer = 0
+        'Dim lDSIndex As Integer
+        'If pRemote AndAlso pTimeseriesGroup IsNot Nothing Then
+        '    lTotalItems = pTimeseriesGroup.Count
+        'Else
+        '    For lDSIndex = 0 To pCBList.Items.Count - 1
+        '        If pCBList.GetItemChecked(lDSIndex) Then
+        '            lTotalItems = lTotalItems + 1
+        '        End If
+        '    Next
+        'End If
+
+        '' ----- Build data source for results
+
+        'Dim ladsResults As New atcControls.atcGridSource
+        'With ladsResults
+
+        '    .Columns = 15
+        '    .FixedColumns = 4
+        '    .Rows = lTotalItems + 1
+        '    .FixedRows = 1
+
+        '    .CellValue(0, 0) = "Gage"
+        '    .CellValue(0, 1) = "Period"
+        '    .CellValue(0, 2) = "Days in Record"
+        '    .CellValue(0, 3) = "Zero/Missing"
+        '    .CellValue(0, 4) = DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears
+        '    .CellValue(0, 5) = "Percentile"
+        '    .CellValue(0, 6) = "Excur per 3 yr"
+
+        '    Select Case DFLOWCalcs.fNonBioType
+        '        Case 0 : .CellValue(0, 7) = DFLOWCalcs.fAveragingPeriod & "Q" & DFLOWCalcs.fReturnPeriod
+        '        Case 1 : .CellValue(0, 7) = "Explicit Q"
+        '        Case 2 : .CellValue(0, 7) = "Percentile Q"
+        '    End Select
+
+        '    .CellValue(0, 8) = "Percentile"
+        '    .CellValue(0, 9) = "Excur per 3 yr"
+        '    .CellValue(0, 10) = DFLOWCalcs.fAveragingPeriod & "Qy Type"
+        '    .CellValue(0, 11) = "xQy"
+        '    .CellValue(0, 12) = "Percentile"
+        '    .CellValue(0, 13) = "Harmonic"
+        '    .CellValue(0, 14) = "Percentile"
+
+        '    Dim lColumn As Integer
+        '    For lColumn = 0 To 14
+        '        .CellColor(0, lColumn) = Me.BackColor
+        '        .Alignment(0, lColumn) = atcControls.atcAlignment.HAlignCenter
+        '    Next
+
+        '    Dim lRow As Integer
+        '    For lRow = 1 To lTotalItems
+        '        For lColumn = 0 To 3
+        '            .CellColor(lRow, lColumn) = Me.BackColor
+        '        Next
+        '    Next
 
-            .Rows = lTotalItems + 1
+        '    .Rows = lTotalItems + 1
 
-        End With
+        'End With
 
 
-        ' ----- Loop over the items in the listbox
+        '' ----- Loop over the items in the listbox
 
-        Dim lItemIdx As Integer = 0
+        'Dim lItemIdx As Integer = 0
 
-        Dim lfrmProgress As New frmDFLOWProgress
-        lfrmProgress.ProgressBar1.Value = 0
-        lfrmProgress.Label1.Text = ""
-        lfrmProgress.Show(Me)
+        'Dim lfrmProgress As New frmDFLOWProgress
+        'lfrmProgress.ProgressBar1.Value = 0
+        'lfrmProgress.Label1.Text = ""
+        'lfrmProgress.Show(Me)
 
-        pExcursionCountArray.Clear()
-        pExcursionsArray.Clear()
-        pClustersArray.Clear()
+        'pExcursionCountArray.Clear()
+        'pExcursionsArray.Clear()
+        'pClustersArray.Clear()
 
-        For lDSIndex = 0 To lTotalItems - 1 'pCBList.Items.Count - 1
-            If (Not pRemote AndAlso pCBList.GetItemChecked(lDSIndex)) OrElse pTimeseriesGroup(lDSIndex) IsNot Nothing Then
+        'For lDSIndex = 0 To lTotalItems - 1 'pCBList.Items.Count - 1
+        '    If (Not pRemote AndAlso pCBList.GetItemChecked(lDSIndex)) OrElse pTimeseriesGroup(lDSIndex) IsNot Nothing Then
 
-                With pDateFormat
-                    .IncludeHours = False
-                    .IncludeMinutes = False
-                    .IncludeSeconds = False
-                End With
+        '        With pDateFormat
+        '            .IncludeHours = False
+        '            .IncludeMinutes = False
+        '            .IncludeSeconds = False
+        '        End With
 
-                ' ===== Quick trim 
+        '        ' ===== Quick trim 
 
-                Dim lHydrologicTS As atcTimeseries = pTimeseriesGroup(lDSIndex)
-                Dim lHydrologicTS2 As atcTimeseries = SubsetByDateBoundary(lHydrologicTS, DFLOWCalcs.fStartMonth, DFLOWCalcs.fStartDay, Nothing, pFirstyear, pLastYear, pEndMonth, pEndDay)
-                Dim lFirstDate As Double = lHydrologicTS2.Attributes.GetValue("start date")
-                Dim lHydrologicDS As atcDataSet = lHydrologicTS2
-                Dim lSYear As Integer = (pDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("start date"))).Substring(0, 4)
-                Dim lEYear As Integer = (pDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("end date"))).Substring(0, 4)
-                Dim lYears As Integer = lEYear - lSYear
-                Dim lTS As Double() = lHydrologicTS2.Values
+        '        Dim lHydrologicTS As atcTimeseries = pTimeseriesGroup(lDSIndex)
+        '        Dim lHydrologicTS2 As atcTimeseries = SubsetByDateBoundary(lHydrologicTS, DFLOWCalcs.fStartMonth, DFLOWCalcs.fStartDay, Nothing, pFirstyear, pLastYear, pEndMonth, pEndDay)
+        '        Dim lFirstDate As Double = lHydrologicTS2.Attributes.GetValue("start date")
+        '        Dim lHydrologicDS As atcDataSet = lHydrologicTS2
+        '        Dim lSYear As Integer = (pDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("start date"))).Substring(0, 4)
+        '        Dim lEYear As Integer = (pDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("end date"))).Substring(0, 4)
+        '        Dim lYears As Integer = lEYear - lSYear
+        '        Dim lTS As Double() = lHydrologicTS2.Values
 
-                pTimeseriesGroup(lDSIndex).Attributes.SetValue("xBy start date", lFirstDate)
+        '        pTimeseriesGroup(lDSIndex).Attributes.SetValue("xBy start date", lFirstDate)
 
-                ' ===== Calculate hydrologic design flow lxQy
+        '        ' ===== Calculate hydrologic design flow lxQy
 
-                Dim lxQy As Double
-                lfrmProgress.ProgressBar1.Value = Int(100 * (3 * lItemIdx + 1) / (3 * lTotalItems))
-                Select Case DFLOWCalcs.fNonBioType
+        '        Dim lxQy As Double
+        '        lfrmProgress.ProgressBar1.Value = Int(100 * (3 * lItemIdx + 1) / (3 * lTotalItems))
+        '        Select Case DFLOWCalcs.fNonBioType
 
-                    Case 0
+        '            Case 0
 
-                        lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - " & DFLOWCalcs.fAveragingPeriod & "Q" & DFLOWCalcs.fReturnPeriod
-                        Application.DoEvents()
+        '                lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - " & DFLOWCalcs.fAveragingPeriod & "Q" & DFLOWCalcs.fReturnPeriod
+        '                Application.DoEvents()
 
-                        If lYears >= DFLOWCalcs.fReturnPeriod Then
-                            lxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, DFLOWCalcs.fReturnPeriod, lHydrologicDS)
-                        Else
-                            lxQy = lNaN
-                        End If
+        '                If lYears >= DFLOWCalcs.fReturnPeriod Then
+        '                    lxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, DFLOWCalcs.fReturnPeriod, lHydrologicDS)
+        '                Else
+        '                    lxQy = lNaN
+        '                End If
 
-                    Case 1
+        '            Case 1
 
-                        lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - explicit flow"
-                        Application.DoEvents()
-                        lxQy = DFLOWCalcs.fExplicitFlow
+        '                lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - explicit flow"
+        '                Application.DoEvents()
+        '                lxQy = DFLOWCalcs.fExplicitFlow
 
-                    Case 2
+        '            Case 2
 
-                        lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - " & DFLOWCalcs.fPercentile & "th percentile"
-                        Application.DoEvents()
-                        modTimeseriesMath.ComputePercentile(lHydrologicTS2, DFLOWCalcs.fPercentile)
-                        lxQy = lHydrologicTS2.Attributes.GetValue("%" & Format(DFLOWCalcs.fPercentile, "00.####"))
+        '                lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - " & DFLOWCalcs.fPercentile & "th percentile"
+        '                Application.DoEvents()
+        '                modTimeseriesMath.ComputePercentile(lHydrologicTS2, DFLOWCalcs.fPercentile)
+        '                lxQy = lHydrologicTS2.Attributes.GetValue("%" & Format(DFLOWCalcs.fPercentile, "00.####"))
 
-                End Select
+        '        End Select
 
-                ' ===== Create 4-day running average for start of xBy excursion analysis - 
+        '        ' ===== Create 4-day running average for start of xBy excursion analysis - 
 
-                Dim lTimeSeries As atcTimeseries = pTimeseriesGroup(lDSIndex)
-                Dim lTimeSeries2 As atcTimeseries = SubsetByDateBoundary(lTimeSeries, DFLOWCalcs.fStartMonth, DFLOWCalcs.fStartDay, Nothing, pFirstyear, pLastYear, pEndMonth, pEndDay)
+        '        Dim lTimeSeries As atcTimeseries = pTimeseriesGroup(lDSIndex)
+        '        Dim lTimeSeries2 As atcTimeseries = SubsetByDateBoundary(lTimeSeries, DFLOWCalcs.fStartMonth, DFLOWCalcs.fStartDay, Nothing, pFirstyear, pLastYear, pEndMonth, pEndDay)
 
-                lTS = lTimeSeries2.Values
-                lTS(0) = lNaN
+        '        lTS = lTimeSeries2.Values
+        '        lTS(0) = lNaN
 
-                Dim lTSN As Double()
-                ReDim lTSN(UBound(lTS))
+        '        Dim lTSN As Double()
+        '        ReDim lTSN(UBound(lTS))
 
-                Dim lSum As Double = 0
-                Dim lN As Integer = 0
+        '        Dim lSum As Double = 0
+        '        Dim lN As Integer = 0
 
-                Dim lI As Integer
-                For lI = 0 To UBound(lTS) - 1
-                    If Double.IsNaN(lTS(lI)) Then
-                        lSum = 0
-                        lN = 0
-                    Else
-                        lSum = lSum + lTS(lI)
-                        lN = lN + 1
-                        If lN > 4 Then
-                            lSum = lSum - lTS(lI - 4)
-                        End If
-                    End If
+        '        Dim lI As Integer
+        '        For lI = 0 To UBound(lTS) - 1
+        '            If Double.IsNaN(lTS(lI)) Then
+        '                lSum = 0
+        '                lN = 0
+        '            Else
+        '                lSum = lSum + lTS(lI)
+        '                lN = lN + 1
+        '                If lN > 4 Then
+        '                    lSum = lSum - lTS(lI - 4)
+        '                End If
+        '            End If
 
-                    If lN >= 4 Then
-                        lTSN(lI) = lSum / 4
-                    Else
-                        lTSN(lI) = lNaN
-                    End If
-                Next
+        '            If lN >= 4 Then
+        '                lTSN(lI) = lSum / 4
+        '            Else
+        '                lTSN(lI) = lNaN
+        '            End If
+        '        Next
 
-                Dim lExcursions As New ArrayList
-                Dim lClusters As New ArrayList
-                Dim lExcQ = DFLOWCalcs.CountExcursions(lxQy, 1, 120, 5, lTSN, lExcursions, lClusters)
-                lExcursions.Clear()
-                lClusters.Clear()
+        '        Dim lExcursions As New ArrayList
+        '        Dim lClusters As New ArrayList
+        '        Dim lExcQ = DFLOWCalcs.CountExcursions(lxQy, 1, 120, 5, lTSN, lExcursions, lClusters)
+        '        lExcursions.Clear()
+        '        lClusters.Clear()
 
 
-                ' ===== Calculate xBy (only defined for full-year)
+        '        ' ===== Calculate xBy (only defined for full-year)
 
-                lfrmProgress.ProgressBar1.Value = Int(100 * (3 * lItemIdx + 2) / (3 * lTotalItems))
-                lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - " & DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears
-                Application.DoEvents()
+        '        lfrmProgress.ProgressBar1.Value = Int(100 * (3 * lItemIdx + 2) / (3 * lTotalItems))
+        '        lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - " & DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears
+        '        Application.DoEvents()
 
-                ' ----- 1. Create n-day running average from current time series
+        '        ' ----- 1. Create n-day running average from current time series
 
-                lSum = 0
-                lN = 0
+        '        lSum = 0
+        '        lN = 0
 
-                For lI = 0 To UBound(lTS) - 1
+        '        For lI = 0 To UBound(lTS) - 1
 
-                    If Double.IsNaN(lTS(lI)) Then
-                        lSum = 0
-                        lN = 0
-                    Else
-                        lSum = lSum + lTS(lI)
-                        lN = lN + 1
-                        If lN > DFLOWCalcs.fBioPeriod Then
-                            lSum = lSum - lTS(lI - DFLOWCalcs.fBioPeriod)
-                        End If
-                    End If
+        '            If Double.IsNaN(lTS(lI)) Then
+        '                lSum = 0
+        '                lN = 0
+        '            Else
+        '                lSum = lSum + lTS(lI)
+        '                lN = lN + 1
+        '                If lN > DFLOWCalcs.fBioPeriod Then
+        '                    lSum = lSum - lTS(lI - DFLOWCalcs.fBioPeriod)
+        '                End If
+        '            End If
 
-                    If lN >= DFLOWCalcs.fBioPeriod Then
-                        lTSN(lI) = lSum / DFLOWCalcs.fBioPeriod
-                    Else
-                        lTSN(lI) = lNaN
-                    End If
-                Next
+        '            If lN >= DFLOWCalcs.fBioPeriod Then
+        '                lTSN(lI) = lSum / DFLOWCalcs.fBioPeriod
+        '            Else
+        '                lTSN(lI) = lNaN
+        '            End If
+        '        Next
 
-                ' ----- 2. Get initial guess
+        '        ' ----- 2. Get initial guess
 
-                Dim lxBy As Double = DFLOWCalcs.xQy(DFLOWCalcs.fBioPeriod, DFLOWCalcs.fBioYears, pTimeseriesGroup(lDSIndex))
+        '        Dim lxBy As Double = DFLOWCalcs.xQy(DFLOWCalcs.fBioPeriod, DFLOWCalcs.fBioYears, pTimeseriesGroup(lDSIndex))
 
-                ' ----- 3. Do xBy calculation
+        '        ' ----- 3. Do xBy calculation
 
-                Dim lExcursionCount As Integer
+        '        Dim lExcursionCount As Integer
 
 
-                lxBy = DFLOWCalcs.xBy(lxBy, DFLOWCalcs.fBioPeriod, DFLOWCalcs.fBioYears, DFLOWCalcs.fBioCluster, DFLOWCalcs.fBioExcursions, lTSN, lExcursionCount, lExcursions, lClusters, lfrmProgress)
-                Dim pAttrName As String = DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears
-                lHydrologicTS.Attributes.SetValue(pAttrName, lxBy)
+        '        lxBy = DFLOWCalcs.xBy(lxBy, DFLOWCalcs.fBioPeriod, DFLOWCalcs.fBioYears, DFLOWCalcs.fBioCluster, DFLOWCalcs.fBioExcursions, lTSN, lExcursionCount, lExcursions, lClusters, lfrmProgress)
+        '        Dim pAttrName As String = DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears
+        '        lHydrologicTS.Attributes.SetValue(pAttrName, lxBy)
 
-                pExcursionCountArray.Add(lExcursionCount)
-                pExcursionsArray.Add(lExcursions)
-                pClustersArray.Add(lClusters)
+        '        pExcursionCountArray.Add(lExcursionCount)
+        '        pExcursionsArray.Add(lExcursions)
+        '        pClustersArray.Add(lClusters)
 
 
-                ' ===== If appropriate, calculate equivalent xQy for this xBy
+        '        ' ===== If appropriate, calculate equivalent xQy for this xBy
 
-                Dim lEquivalentxQy As Double = 0
-                Dim lReturnPeriod As Integer
+        '        Dim lEquivalentxQy As Double = 0
+        '        Dim lReturnPeriod As Integer
 
 
-                If DFLOWCalcs.fNonBioType > 0 Then
+        '        If DFLOWCalcs.fNonBioType > 0 Then
 
-                    lEquivalentxQy = lNaN
+        '            lEquivalentxQy = lNaN
 
-                Else
+        '        Else
 
 
-                    lfrmProgress.ProgressBar1.Value = Int(100 * (3 * lItemIdx + 3) / (3 * lTotalItems))
-                    lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - xQy"
-                    Application.DoEvents()
+        '            lfrmProgress.ProgressBar1.Value = Int(100 * (3 * lItemIdx + 3) / (3 * lTotalItems))
+        '            lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - xQy"
+        '            Application.DoEvents()
 
-                    lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lYears, pTimeseriesGroup(lDSIndex))
-                    If lEquivalentxQy > lxBy Then
+        '            lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lYears, pTimeseriesGroup(lDSIndex))
+        '            If lEquivalentxQy > lxBy Then
 
-                        lReturnPeriod = lYears
+        '                lReturnPeriod = lYears
 
-                    Else
+        '            Else
 
-                        If lxQy > lxBy Then
-                            lReturnPeriod = DFLOWCalcs.fReturnPeriod
-                        Else
-                            lReturnPeriod = 1
-                        End If
+        '                If lxQy > lxBy Then
+        '                    lReturnPeriod = DFLOWCalcs.fReturnPeriod
+        '                Else
+        '                    lReturnPeriod = 1
+        '                End If
 
-                        lEquivalentxQy = lxBy
-                        While lEquivalentxQy >= lxBy And lReturnPeriod < lYears
+        '                lEquivalentxQy = lxBy
+        '                While lEquivalentxQy >= lxBy And lReturnPeriod < lYears
 
-                            lReturnPeriod = lReturnPeriod + 1
-                            lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lReturnPeriod, pTimeseriesGroup(lDSIndex))
+        '                    lReturnPeriod = lReturnPeriod + 1
+        '                    lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lReturnPeriod, pTimeseriesGroup(lDSIndex))
 
-                            lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - xQy (" & lReturnPeriod & " of up to " & lYears & ")"
-                            Application.DoEvents()
+        '                    lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - xQy (" & lReturnPeriod & " of up to " & lYears & ")"
+        '                    Application.DoEvents()
 
-                        End While
+        '                End While
 
-                    End If
+        '            End If
 
-                End If
+        '        End If
 
-                ' ===== Harmonic mean of flows
+        '        ' ===== Harmonic mean of flows
 
-                Dim lHFlow As Double = 0
-                Dim lNH As Integer = 0
+        '        Dim lHFlow As Double = 0
+        '        Dim lNH As Integer = 0
 
-                For lI = 0 To UBound(lTS) - 1
-                    If (Not Double.IsNaN(lTS(lI))) And (lTS(lI) <> 0) Then
-                        lNH = lNH + 1
-                        lHFlow = lHFlow + 1 / lTS(lI)
-                    End If
-                Next
+        '        For lI = 0 To UBound(lTS) - 1
+        '            If (Not Double.IsNaN(lTS(lI))) And (lTS(lI) <> 0) Then
+        '                lNH = lNH + 1
+        '                lHFlow = lHFlow + 1 / lTS(lI)
+        '            End If
+        '        Next
 
-                If lHFlow <> 0 Then
-                    lHFlow = lNH / lHFlow
-                End If
+        '        If lHFlow <> 0 Then
+        '            lHFlow = lNH / lHFlow
+        '        End If
 
 
-                ' ===== Calculate percentiles
+        '        ' ===== Calculate percentiles
 
-                Dim lNMiss As Integer = 0
-                Dim lNZero As Integer = 0
-                Dim lNExc As Integer = 0
-                Dim lNExcB As Integer = 0
-                Dim lNExcBQ As Integer = 0
-                Dim lNExcHF As Integer = 0
+        '        Dim lNMiss As Integer = 0
+        '        Dim lNZero As Integer = 0
+        '        Dim lNExc As Integer = 0
+        '        Dim lNExcB As Integer = 0
+        '        Dim lNExcBQ As Integer = 0
+        '        Dim lNExcHF As Integer = 0
 
-                For lI = 0 To UBound(lTS) - 1
-                    If Double.IsNaN(lTS(lI)) Then
-                        lNMiss = lNMiss + 1
-                    Else
-                        If lTS(lI) = 0 Then
-                            lNZero = lNZero + 1
-                        End If
-                        If lTS(lI) < lxQy Then
-                            lNExc = lNExc + 1
-                        End If
-                        If lTS(lI) < lxBy Then
-                            lNExcB = lNExcB + 1
-                        End If
-                        If lTS(lI) < lEquivalentxQy Then
-                            lNExcBQ = lNExcBQ + 1
-                        End If
-                        If lTS(lI) < lHFlow Then
-                            lNExcHF = lNExcHF + 1
-                        End If
-                    End If
-                Next
+        '        For lI = 0 To UBound(lTS) - 1
+        '            If Double.IsNaN(lTS(lI)) Then
+        '                lNMiss = lNMiss + 1
+        '            Else
+        '                If lTS(lI) = 0 Then
+        '                    lNZero = lNZero + 1
+        '                End If
+        '                If lTS(lI) < lxQy Then
+        '                    lNExc = lNExc + 1
+        '                End If
+        '                If lTS(lI) < lxBy Then
+        '                    lNExcB = lNExcB + 1
+        '                End If
+        '                If lTS(lI) < lEquivalentxQy Then
+        '                    lNExcBQ = lNExcBQ + 1
+        '                End If
+        '                If lTS(lI) < lHFlow Then
+        '                    lNExcHF = lNExcHF + 1
+        '                End If
+        '            End If
+        '        Next
 
-                ' ===== Store results
+        '        ' ===== Store results
 
-                ladsResults.CellValue(lItemIdx + 1, 0) = lHydrologicDS.Attributes.GetFormattedValue("Location") & " - " & lHydrologicDS.Attributes.GetFormattedValue("STANAM")
+        '        ladsResults.CellValue(lItemIdx + 1, 0) = lHydrologicDS.Attributes.GetFormattedValue("Location") & " - " & lHydrologicDS.Attributes.GetFormattedValue("STANAM")
 
-                ' ----- Next three values are corrected by one day to account for current (3/2008) behavior of time series trimming
+        '        ' ----- Next three values are corrected by one day to account for current (3/2008) behavior of time series trimming
 
-                ladsResults.CellValue(lItemIdx + 1, 1) = pDateFormat.JDateToString(1 + lHydrologicDS.Attributes.GetValue("start date")) & " - " & _
-                                                         pDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("end date"))
-                ladsResults.CellValue(lItemIdx + 1, 2) = Format(UBound(lTS) - 1, "#,##0") & " "
-                ladsResults.Alignment(lItemIdx + 1, 2) = atcControls.atcAlignment.HAlignRight
-                ladsResults.CellValue(lItemIdx + 1, 3) = Format(lNZero, "#,##0") & "/" & Format(lNMiss - 1, "#,##0") & " "
-                ladsResults.Alignment(lItemIdx + 1, 3) = atcControls.atcAlignment.HAlignRight
+        '        ladsResults.CellValue(lItemIdx + 1, 1) = pDateFormat.JDateToString(1 + lHydrologicDS.Attributes.GetValue("start date")) & " - " & _
+        '                                                 pDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("end date"))
+        '        ladsResults.CellValue(lItemIdx + 1, 2) = Format(UBound(lTS) - 1, "#,##0") & " "
+        '        ladsResults.Alignment(lItemIdx + 1, 2) = atcControls.atcAlignment.HAlignRight
+        '        ladsResults.CellValue(lItemIdx + 1, 3) = Format(lNZero, "#,##0") & "/" & Format(lNMiss - 1, "#,##0") & " "
+        '        ladsResults.Alignment(lItemIdx + 1, 3) = atcControls.atcAlignment.HAlignRight
 
-                ladsResults.CellValue(lItemIdx + 1, 4) = DFLOWCalcs.Sig2(lxBy)
-                If DFLOWCalcs.Sig2(lxBy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 4) = atcControls.atcAlignment.HAlignDecimal
-                ladsResults.CellValue(lItemIdx + 1, 5) = Format(lNExcB / (UBound(lTS) - lNMiss), "percent")
-                ladsResults.Alignment(lItemIdx + 1, 5) = atcControls.atcAlignment.HAlignDecimal
-                ladsResults.CellValue(lItemIdx + 1, 6) = DFLOWCalcs.Sig2(pExcursionCountArray(lItemIdx) * 3 / lYears)
-                ladsResults.Alignment(lItemIdx + 1, 6) = atcControls.atcAlignment.HAlignDecimal
+        '        ladsResults.CellValue(lItemIdx + 1, 4) = DFLOWCalcs.Sig2(lxBy)
+        '        If DFLOWCalcs.Sig2(lxBy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 4) = atcControls.atcAlignment.HAlignDecimal
+        '        ladsResults.CellValue(lItemIdx + 1, 5) = Format(lNExcB / (UBound(lTS) - lNMiss), "percent")
+        '        ladsResults.Alignment(lItemIdx + 1, 5) = atcControls.atcAlignment.HAlignDecimal
+        '        ladsResults.CellValue(lItemIdx + 1, 6) = DFLOWCalcs.Sig2(pExcursionCountArray(lItemIdx) * 3 / lYears)
+        '        ladsResults.Alignment(lItemIdx + 1, 6) = atcControls.atcAlignment.HAlignDecimal
 
-                ladsResults.CellValue(lItemIdx + 1, 7) = DFLOWCalcs.Sig2(lxQy)
-                If DFLOWCalcs.Sig2(lxQy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 7) = atcControls.atcAlignment.HAlignDecimal
-                ladsResults.CellValue(lItemIdx + 1, 8) = Format(lNExc / (UBound(lTS) - lNMiss), "percent")
-                ladsResults.Alignment(lItemIdx + 1, 8) = atcControls.atcAlignment.HAlignDecimal
-                ladsResults.CellValue(lItemIdx + 1, 9) = DFLOWCalcs.Sig2(lExcQ * 3 / lYears)
-                ladsResults.Alignment(lItemIdx + 1, 9) = atcControls.atcAlignment.HAlignDecimal
+        '        ladsResults.CellValue(lItemIdx + 1, 7) = DFLOWCalcs.Sig2(lxQy)
+        '        If DFLOWCalcs.Sig2(lxQy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 7) = atcControls.atcAlignment.HAlignDecimal
+        '        ladsResults.CellValue(lItemIdx + 1, 8) = Format(lNExc / (UBound(lTS) - lNMiss), "percent")
+        '        ladsResults.Alignment(lItemIdx + 1, 8) = atcControls.atcAlignment.HAlignDecimal
+        '        ladsResults.CellValue(lItemIdx + 1, 9) = DFLOWCalcs.Sig2(lExcQ * 3 / lYears)
+        '        ladsResults.Alignment(lItemIdx + 1, 9) = atcControls.atcAlignment.HAlignDecimal
 
-                ladsResults.Alignment(lItemIdx + 1, 10) = atcControls.atcAlignment.HAlignCenter
-                ladsResults.Alignment(lItemIdx + 1, 11) = atcControls.atcAlignment.HAlignCenter
-                ladsResults.Alignment(lItemIdx + 1, 12) = atcControls.atcAlignment.HAlignCenter
+        '        ladsResults.Alignment(lItemIdx + 1, 10) = atcControls.atcAlignment.HAlignCenter
+        '        ladsResults.Alignment(lItemIdx + 1, 11) = atcControls.atcAlignment.HAlignCenter
+        '        ladsResults.Alignment(lItemIdx + 1, 12) = atcControls.atcAlignment.HAlignCenter
 
-                If DFLOWCalcs.fNonBioType = 0 Then
+        '        If DFLOWCalcs.fNonBioType = 0 Then
 
-                    If lEquivalentxQy > lxBy Then
-                        ladsResults.CellValue(lItemIdx + 1, 10) = "> " & lReturnPeriod & " years"
-                        ladsResults.CellValue(lItemIdx + 1, 11) = "N/A"
-                        ladsResults.CellValue(lItemIdx + 1, 12) = "N/A"
+        '            If lEquivalentxQy > lxBy Then
+        '                ladsResults.CellValue(lItemIdx + 1, 10) = "> " & lReturnPeriod & " years"
+        '                ladsResults.CellValue(lItemIdx + 1, 11) = "N/A"
+        '                ladsResults.CellValue(lItemIdx + 1, 12) = "N/A"
 
 
-                    Else
-                        ladsResults.CellValue(lItemIdx + 1, 10) = DFLOWCalcs.fAveragingPeriod & "Q" & lReturnPeriod
-                        ladsResults.CellValue(lItemIdx + 1, 11) = DFLOWCalcs.Sig2(lEquivalentxQy)
-                        If DFLOWCalcs.Sig2(lEquivalentxQy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 11) = atcControls.atcAlignment.HAlignDecimal
-                        ladsResults.CellValue(lItemIdx + 1, 12) = Format(lNExcBQ / (UBound(lTS) - lNMiss), "percent")
-                        ladsResults.Alignment(lItemIdx + 1, 12) = atcControls.atcAlignment.HAlignDecimal
-                    End If
+        '            Else
+        '                ladsResults.CellValue(lItemIdx + 1, 10) = DFLOWCalcs.fAveragingPeriod & "Q" & lReturnPeriod
+        '                ladsResults.CellValue(lItemIdx + 1, 11) = DFLOWCalcs.Sig2(lEquivalentxQy)
+        '                If DFLOWCalcs.Sig2(lEquivalentxQy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 11) = atcControls.atcAlignment.HAlignDecimal
+        '                ladsResults.CellValue(lItemIdx + 1, 12) = Format(lNExcBQ / (UBound(lTS) - lNMiss), "percent")
+        '                ladsResults.Alignment(lItemIdx + 1, 12) = atcControls.atcAlignment.HAlignDecimal
+        '            End If
 
-                Else
+        '        Else
 
-                    ladsResults.CellValue(lItemIdx + 1, 10) = "N/A"
-                    ladsResults.CellValue(lItemIdx + 1, 11) = "N/A"
-                    ladsResults.CellValue(lItemIdx + 1, 12) = "N/A"
+        '            ladsResults.CellValue(lItemIdx + 1, 10) = "N/A"
+        '            ladsResults.CellValue(lItemIdx + 1, 11) = "N/A"
+        '            ladsResults.CellValue(lItemIdx + 1, 12) = "N/A"
 
-                End If
+        '        End If
 
-                ladsResults.CellValue(lItemIdx + 1, 13) = DFLOWCalcs.Sig2(lHFlow)
-                If DFLOWCalcs.Sig2(lHFlow) < 100 Then ladsResults.Alignment(lItemIdx + 1, 13) = atcControls.atcAlignment.HAlignDecimal
+        '        ladsResults.CellValue(lItemIdx + 1, 13) = DFLOWCalcs.Sig2(lHFlow)
+        '        If DFLOWCalcs.Sig2(lHFlow) < 100 Then ladsResults.Alignment(lItemIdx + 1, 13) = atcControls.atcAlignment.HAlignDecimal
 
-                ladsResults.CellValue(lItemIdx + 1, 14) = Format(lNExcHF / (UBound(lTS) - lNMiss), "percent")
-                ladsResults.Alignment(lItemIdx + 1, 14) = atcControls.atcAlignment.HAlignDecimal
-                lItemIdx = lItemIdx + 1
+        '        ladsResults.CellValue(lItemIdx + 1, 14) = Format(lNExcHF / (UBound(lTS) - lNMiss), "percent")
+        '        ladsResults.Alignment(lItemIdx + 1, 14) = atcControls.atcAlignment.HAlignDecimal
+        '        lItemIdx = lItemIdx + 1
 
-            End If
+        '    End If
 
-        Next
-        lfrmProgress.Close()
-        lfrmProgress.Dispose()
+        'Next
+        'lfrmProgress.Close()
+        'lfrmProgress.Dispose()
 
-        agrResults.Initialize(ladsResults)
+        'agrResults.Initialize(ladsResults)
 
-        If Not pIsBatch Then
-            Me.Refresh()
-        End If
+        'If Not pIsBatch Then
+        '    Me.Refresh()
+        'End If
 
-        If pRemote Then
-            Me.Text = "Design Flow Results (" & DateTime.Now & ")"
-            Me.Show()
-        Else
-            Me.DialogResult = Windows.Forms.DialogResult.OK
-        End If
+        'If pRemote Then
+        '    Me.Text = "Design Flow Results (" & DateTime.Now & ")"
+        '    Me.Show()
+        'Else
+        '    Me.DialogResult = Windows.Forms.DialogResult.OK
+        'End If
     End Sub
 
-    Public Sub UserSpecifyDFLOWResults(ByVal ladsResults As atcControls.atcGridSource, Optional ByVal aTitle As String = "Design Flow Results")
+    Public Sub UserSpecifyDFLOWResults(ByVal ladsResults As atcControls.atcGridSource, ByVal aScenarios As atcCollection, Optional ByVal aTitle As String = "Design Flow Results")
         If ladsResults Is Nothing Then Exit Sub
+        If aScenarios Is Nothing Then Exit Sub
+        pScenarios = aScenarios
         agrResults.Initialize(ladsResults)
         For lCol As Integer = 1 To ladsResults.Columns - 1
             agrResults.SizeColumnToContents(lCol)
@@ -575,17 +579,23 @@ Public Class frmDFLOWResults
                 .IncludeHours = False
                 .IncludeMinutes = False
                 .IncludeSeconds = False
-
             End With
 
-            Dim lExcursionCount As Integer
-            lExcursionCount = pExcursionCountArray(pRow - 1)
-
-            Dim lClusters As ArrayList
-            lClusters = pClustersArray(pRow - 1)
-
-            Dim lExcursions As ArrayList
-            lExcursions = pExcursionsArray(pRow - 1)
+            'Dim lExcursionCount As Integer = pExcursionCountArray(pRow - 1)
+            'Dim lClusters As ArrayList = pClustersArray(pRow - 1)
+            'Dim lExcursions As ArrayList = pExcursionsArray(pRow - 1)
+            Dim lScenID As Integer = Integer.Parse(agrResults.Source.CellValue(pRow, agrResults.Source.Columns - 1))
+            Dim lScen As clsInteractiveDFLOW = pScenarios.ItemByKey(lScenID)
+            If lScen Is Nothing Then Exit Sub
+            If lScen.DataGroup Is Nothing Then Exit Sub
+            Dim lGageDesc As String = agrResults.Source.CellValue(pRow, 0)
+            If String.IsNullOrEmpty(lGageDesc) Then Exit Sub
+            Dim loc As String = lGageDesc.Substring(0, lGageDesc.IndexOf("-"))
+            If String.IsNullOrEmpty(loc) OrElse loc.Trim() = "" Then Exit Sub
+            loc = loc.Trim()
+            Dim lExcursionCount As Integer = lScen.ExcursionCountArray.ItemByKey(loc)
+            Dim lClusters As ArrayList = lScen.ClustersArray.ItemByKey(loc)
+            Dim lExcursions As ArrayList = lScen.ExcursionsArray.ItemByKey(loc)
 
             Dim lagsExcursions As New atcControls.atcGridSource
 
@@ -608,8 +618,8 @@ Public Class frmDFLOWResults
 
             Dim lRow As Integer = 0
             Dim lExcursionIdx As Integer = 0
-            Dim lFirstDate As Double = pTimeseriesGroup(pRow - 1).Attributes.GetValue("xBy start date")
-
+            Dim lTs As atcTimeseries = lScen.DataGroup.FindData("Location", loc)(0)
+            Dim lFirstDate As Double = lTs.Attributes.GetValue("xBy start date") 'pTimeseriesGroup(pRow - 1).Attributes.GetValue("xBy start date")
 
             Dim lCluster As DFLOWCalcs.stCluster
             For Each lCluster In lClusters
@@ -625,14 +635,10 @@ Public Class frmDFLOWResults
                     lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
 
                     Dim lNExc As Integer = 0
-
                     Do
-
                         Dim lExcursion As DFLOWCalcs.stExcursion
                         lExcursion = lExcursions(lRow)
-
                         With lExcursion
-
                             lagsExcursions.CellValue(lRow, 2) = pDateFormat.JDateToString(lFirstDate + .Start)
                             lagsExcursions.CellValue(lRow, 3) = .Count & " "
                             lagsExcursions.CellValue(lRow, 4) = Format(.SumMag / .SumLength - 1, "Percent") & " "
@@ -646,10 +652,7 @@ Public Class frmDFLOWResults
                         lRow = lRow + 1
 
                     Loop Until lNExc >= lCluster.Events
-
                 End If
-
-
             Next
 
             lagsExcursions.CellValue(lRow, 0) = "Total"
@@ -658,8 +661,10 @@ Public Class frmDFLOWResults
 
             Dim lfrmExcursions As New frmDFLOWExcursions
             With lfrmExcursions
-
-                .Text = DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears & " Excursion Analysis for " & pTimeseriesGroup(pRow - 1).Attributes.GetFormattedValue("Location")
+                '.Text = DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears & " Excursion Analysis for " & pTimeseriesGroup(pRow - 1).Attributes.GetFormattedValue("Location")
+                With lScen
+                    lfrmExcursions.Text = .ParamBio1FlowAvgDays & "B" & .ParamBio2YearsBetweenExcursion & " Excursion Analysis for " & loc
+                End With
                 .AtcGrid1.Initialize(lagsExcursions)
                 .AtcGrid1.BorderStyle = BorderStyle.FixedSingle
                 .AtcGrid1.ColumnWidth(0) = 70
@@ -674,11 +679,8 @@ Public Class frmDFLOWResults
                     End If
                 Next
                 .ShowDialog()
-
             End With
-
         End If
-
     End Sub
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
