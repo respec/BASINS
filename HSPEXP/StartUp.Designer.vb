@@ -95,7 +95,7 @@ Partial Class StartUp
         Me.lblRCH.Size = New System.Drawing.Size(441, 13)
         Me.lblRCH.TabIndex = 7
         Me.lblRCH.Text = "Number(s) of the outlet reach at which you would like water and/or nutrient balan" & _
-    "ce reports?"
+            "ce reports?"
         '
         'txtRCH
         '
@@ -256,10 +256,9 @@ Partial Class StartUp
         Me.chkAdditionalgraphs.AutoSize = True
         Me.chkAdditionalgraphs.Location = New System.Drawing.Point(6, 42)
         Me.chkAdditionalgraphs.Name = "chkAdditionalgraphs"
-        Me.chkAdditionalgraphs.Size = New System.Drawing.Size(408, 17)
+        Me.chkAdditionalgraphs.Size = New System.Drawing.Size(283, 17)
         Me.chkAdditionalgraphs.TabIndex = 15
-        Me.chkAdditionalgraphs.Text = "Generate Additional graphs (Make sure that AdditionalGraphs.csv file is available" & _
-    ")"
+        Me.chkAdditionalgraphs.Text = "Generate Graphs from Graph Specification Files (*.csv)"
         Me.chkAdditionalgraphs.UseVisualStyleBackColor = True
         '
         'btn_help
