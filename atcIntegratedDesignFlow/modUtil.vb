@@ -1336,6 +1336,7 @@ Public Module modUtil
             BIOCustom
             NBIOAcute
             NBIOChronic
+            NBIOCustom
             NBIOCustom1
             NBIOCustom2
             NBIOExplicitFlow
@@ -1344,6 +1345,7 @@ Public Module modUtil
 
         Public DataGroup As atcTimeseriesGroup = Nothing
         Public Scenario As String
+        Public ScenarioID As Integer
         Public ReportSrc As atcGridSource
         Public TypeBio As EDFLOWPARAM
         Public TypeNBio As EDFLOWPARAM
@@ -1363,6 +1365,84 @@ Public Module modUtil
         Public ExcursionCountArray As New atcCollection()
         Public ExcursionsArray As New atcCollection()
         Public ClustersArray As New atcCollection()
+
+        Public Function AugmentReport(Optional ByVal aScenarioName As String = "", Optional ByVal aScenarioID As Integer = 0) As atcControls.atcGridSource
+            If ReportSrc Is Nothing Then Return Nothing
+
+            Dim lAugReportSrc As New atcControls.atcGridSource()
+            With lAugReportSrc
+                .FixedRows = 1
+                .Rows = 1
+                .Columns = ReportSrc.Columns + 4 + 4 + 1
+                Dim I As Integer
+                For I = 0 To .Columns - 1
+                    .CellValue(0, I) = ReportSrc.CellValue(0, I)
+                Next
+                I = ReportSrc.Columns
+                .CellValue(0, I) = "B_NDay"
+                .CellValue(0, I + 1) = "B_Return"
+                .CellValue(0, I + 2) = "B_ClusterDays"
+                .CellValue(0, I + 3) = "B_ExcPerCluster"
+                .CellValue(0, I + 4) = "NB_NDay"
+                .CellValue(0, I + 5) = "NB_Return"
+                .CellValue(0, I + 6) = "NB_FlowValue"
+                .CellValue(0, I + 7) = "NB_Flow%"
+                '.CellValue(0, I + 8) = "HM"
+                .CellValue(0, I + 8) = "ScenID"
+
+                .Rows = 2
+                Dim lSuperRowIndex As Integer = .Rows - 1
+                For lRow As Integer = 1 To ReportSrc.Rows - 1
+                    Dim lCol As Integer = 0
+                    For lCol = 0 To ReportSrc.Columns - 1
+                        .CellValue(.Rows - 1, lCol) = ReportSrc.CellValue(lRow, lCol)
+                    Next
+                    lCol = ReportSrc.Columns
+                    .CellValue(lSuperRowIndex, lCol) = ParamBio1FlowAvgDays
+                    .CellValue(lSuperRowIndex, lCol + 1) = ParamBio2YearsBetweenExcursion
+                    .CellValue(lSuperRowIndex, lCol + 2) = ParamBio3ExcursionClusterDays
+                    .CellValue(lSuperRowIndex, lCol + 3) = ParamBio4ExcursionPerCluster
+                    If ParamNBioNDay > 0 Then
+                        .CellValue(lSuperRowIndex, lCol + 4) = ParamNBioNDay
+                        .CellValue(lSuperRowIndex, lCol + 5) = ParamNBioReturn
+                    Else
+                        .CellValue(lSuperRowIndex, lCol + 4) = "-"
+                        .CellValue(lSuperRowIndex, lCol + 5) = "-"
+                    End If
+                    If ParamNBioExpFlow > 0 Then
+                        .CellValue(lSuperRowIndex, lCol + 6) = ParamNBioExpFlow
+                    Else
+                        .CellValue(lSuperRowIndex, lCol + 6) = "-"
+                    End If
+                    If ParamNBioFlowPct > 0 Then
+                        .CellValue(lSuperRowIndex, lCol + 7) = ParamNBioFlowPct
+                    Else
+                        .CellValue(lSuperRowIndex, lCol + 7) = "-"
+                    End If
+                    '.CellValue(lSuperRowIndex, lCol + 8) = GetTserHM(.CellValue(lSuperRowIndex, 0), .CellValue(lSuperRowIndex, 1))
+
+                    If Not String.IsNullOrEmpty(aScenarioName) Then
+                        Scenario = aScenarioName
+                    End If
+                    If aScenarioID > 0 Then 'AndAlso ScenarioID = 0
+                        ScenarioID = aScenarioID
+                    End If
+
+                    If Not String.IsNullOrEmpty(Scenario) AndAlso ScenarioID > 0 Then
+                        .CellValue(lSuperRowIndex, lCol + 8) = ScenarioID & "-" & Scenario
+                    Else
+                        If Not String.IsNullOrEmpty(Scenario) Then
+                            .CellValue(lSuperRowIndex, lCol + 8) = Scenario
+                        Else
+                            .CellValue(lSuperRowIndex, lCol + 8) = ScenarioID
+                        End If
+                    End If
+                    .Rows = .Rows + 1
+                    lSuperRowIndex = .Rows - 1
+                Next
+            End With
+            Return lAugReportSrc
+        End Function
     End Class
 #End Region
 End Module
