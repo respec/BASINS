@@ -1867,7 +1867,9 @@ Finished:
             Dim lProvisionalAttribute As String = aTimeseries.Attributes.GetValue("ProvisionalValueAttribute", "P")
             For lIndex As Integer = 0 To aTimeseries.numValues
                 If aTimeseries.ValueAttributesGetValue(lIndex, lProvisionalAttribute, False) Then
-                    Return True
+                    If Not Double.IsNaN(aTimeseries.Value(lIndex)) Then
+                        Return True
+                    End If
                 End If
             Next
         End If

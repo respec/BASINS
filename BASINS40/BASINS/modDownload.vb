@@ -721,6 +721,14 @@ StartOver:
                 Logger.DisplayMessageBoxes = lDisplayMessageBoxes
 
                 AddAllShapesInDir(aNewDataDir, aNewDataDir)
+
+                Try 'If we retrieved the more detailed NHD, hide the rougher RF1
+                    If lBasinsDataTypes.ToLowerInvariant().Contains(">nhd<") Then
+                        atcMwGisUtility.GisUtil.LayerVisible("Reach File, V1") = False
+                    End If
+                Catch 'Don't worry if we could not do this, it was not critical.
+                End Try
+
                 g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
                 If Not aExistingMapWindowProject Then
                     'regular case, not coming from existing mapwindow project
@@ -735,12 +743,25 @@ StartOver:
                     End If
                 End If
 
-                If g_AppNameShort = "GW Toolbox" Then 'Also get some more layers
-                    'Dim lRegion As D4EMDataManager.Region 'Use the view extents to include some stations in a buffer outside the original region
-                    'With g_MapWin.View.Extents
-                    '    lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)
-                    'End With
-                    lQuery = "<function name='GetNWISStations'><arguments>" _
+                'Get additional layers as desired by variants
+                lQuery = ""
+                Select Case g_AppNameShort
+                    Case "SW Toolbox"
+                        lQuery = "<function name='GetNWISStations'><arguments>" _
+                           & "<DataType>discharge</DataType>" _
+                           & "<MinCount>10</MinCount>" _
+                           & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
+                           & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
+                           & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
+                           & aRegion _
+                           & "<clip>False</clip> <merge>False</merge>" _
+                           & "</arguments></function>"
+                    Case "GW Toolbox"
+                        'Dim lRegion As D4EMDataManager.Region 'Use the view extents to include some stations in a buffer outside the original region
+                        'With g_MapWin.View.Extents
+                        '    lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)
+                        'End With
+                        lQuery = "<function name='GetNWISStations'><arguments>" _
                            & "<DataType>gw_daily</DataType>" _
                            & "<DataType>gw_periodic</DataType>" _
                            & "<DataType>discharge</DataType>" _
@@ -751,7 +772,8 @@ StartOver:
                            & aRegion _
                            & "<clip>False</clip> <merge>False</merge>" _
                            & "</arguments></function>"
-
+                End Select
+                If lQuery.Length > 0 Then
                     lResult = D4EMDataManager.DataManager.Execute(lQuery)
                     If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
                         Logger.DisplayMessageBoxes = False
@@ -762,7 +784,6 @@ StartOver:
                             Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save3Failed:" & g_MapWin.LastError)
                         End If
                     End If
-
                 End If
             End If
         End Using

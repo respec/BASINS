@@ -96,7 +96,6 @@ Public Class clsIDFPlugin
         With lTrendAttributes
             .Add("STAID")
             .Add("STANAM")
-            .Add("SpearmanTest")
             .Add("KENTAU")
             .Add("KENPLV")
             .Add("KENSLPL")

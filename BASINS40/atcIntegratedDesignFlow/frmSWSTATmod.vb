@@ -311,7 +311,7 @@ Public Class frmSWSTATmod
         Me.tabSelectDates.Location = New System.Drawing.Point(4, 22)
         Me.tabSelectDates.Name = "tabSelectDates"
         Me.tabSelectDates.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabSelectDates.Size = New System.Drawing.Size(435, 509)
+        Me.tabSelectDates.Size = New System.Drawing.Size(435, 540)
         Me.tabSelectDates.TabIndex = 0
         Me.tabSelectDates.Text = "Select Dates"
         Me.tabSelectDates.UseVisualStyleBackColor = True
@@ -411,7 +411,7 @@ Public Class frmSWSTATmod
         '
         'grpDates
         '
-        Me.grpDates.BackColor = System.Drawing.SystemColors.Control
+        Me.grpDates.BackColor = System.Drawing.Color.Transparent
         Me.grpDates.Controls.Add(Me.cboStartMonth)
         Me.grpDates.Controls.Add(Me.lblYearStart)
         Me.grpDates.Controls.Add(Me.txtEndDay)
@@ -484,7 +484,7 @@ Public Class frmSWSTATmod
         '
         'grpYears
         '
-        Me.grpYears.BackColor = System.Drawing.SystemColors.Control
+        Me.grpYears.BackColor = System.Drawing.Color.Transparent
         Me.grpYears.Controls.Add(Me.radioYearsCustom)
         Me.grpYears.Controls.Add(Me.radioYearsCommon)
         Me.grpYears.Controls.Add(Me.radioYearsAll)
@@ -713,7 +713,7 @@ Public Class frmSWSTATmod
         '
         'grpRecurrence
         '
-        Me.grpRecurrence.BackColor = System.Drawing.SystemColors.Control
+        Me.grpRecurrence.BackColor = System.Drawing.Color.Transparent
         Me.grpRecurrence.Controls.Add(Me.btnRecurrenceDefault)
         Me.grpRecurrence.Controls.Add(Me.btnRecurrenceRemove)
         Me.grpRecurrence.Controls.Add(Me.lstRecurrence)
@@ -808,7 +808,7 @@ Public Class frmSWSTATmod
         '
         'grpNday
         '
-        Me.grpNday.BackColor = System.Drawing.SystemColors.Control
+        Me.grpNday.BackColor = System.Drawing.Color.Transparent
         Me.grpNday.Controls.Add(Me.btnNdayDefault)
         Me.grpNday.Controls.Add(Me.btnNdayRemove)
         Me.grpNday.Controls.Add(Me.btnNdayAdd)
@@ -2481,7 +2481,7 @@ Public Class frmSWSTATmod
                             .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(1)))
                             .SetValue("To", pDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
                             .SetValue("Not Used", .GetValue("Count Missing"))
-                            .SetValueIfMissing("SpearmanTest", RunSpearmanTest(lTS))
+                            '.SetValueIfMissing("SpearmanTest", RunSpearmanTest(lTS))
                         End With
                     Next
                     Dim lList As New atcList.atcListForm
@@ -2509,6 +2509,72 @@ Public Class frmSWSTATmod
         Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
 
+    ''' <summary>
+    ''' This is currently a close copy of btnDisplayTrend_Click but may become its own new thing
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub btnScreeningTests_Click(sender As Object, e As EventArgs) Handles btnScreeningTests.Click
+        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+        Dim lSelectedData As atcTimeseriesGroup = SelectedData()
+        If lSelectedData.Count > 0 Then
+            If lstNday.SelectedIndices.Count > 0 Then
+                Dim lRankedAnnual As atcTimeseriesGroup =
+                   clsIDFPlugin.ComputeRankedAnnualTimeseries(aTimeseriesGroup:=lSelectedData,
+                                                                 aNDay:=ListToArray(lstNday),
+                                                                 aHighFlag:=radioHigh.Checked,
+                                                                 aFirstYear:=pFirstYear,
+                                                                 aLastYear:=pLastYear,
+                                                                 aBoundaryMonth:=pYearStartMonth,
+                                                                 aBoundaryDay:=pYearStartDay,
+                                                                 aEndMonth:=pYearEndMonth,
+                                                                 aEndDay:=pYearEndDay)
+                If lRankedAnnual.Count > 0 Then
+                    For Each lTS As atcTimeseries In lRankedAnnual
+                        With lTS.Attributes
+                            .SetValue("Original ID", lTS.OriginalParent.Attributes.GetValue("ID"))
+                            .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(1)))
+                            .SetValue("To", pDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
+                            .SetValue("Not Used", .GetValue("Count Missing"))
+                            .SetValueIfMissing("SpearmanTest", RunSpearmanTest(lTS))
+                        End With
+                    Next
+                    Dim lList As New atcList.atcListForm
+                    With lList
+                        With .DateFormat
+                            .IncludeDays = False
+                            .IncludeHours = False
+                            .IncludeMinutes = False
+                            .IncludeMonths = False
+                        End With
+                        .Text = "Screening Tests of " & HighOrLowString() & " Annual Time Series and Statistics"
+                        Dim lAttributes As New List(Of String)
+                        With lAttributes
+                            .Add("STAID")
+                            .Add("STANAM")
+                            .Add("Count")
+                            .Add("Not Used")
+                            .Add("Min")
+                            .Add("Max")
+                            .Add("SpearmanTest")
+                        End With
+                        AddSeasonNameIfNeeded(lAttributes, lRankedAnnual)
+                        .Initialize(lRankedAnnual, lAttributes, False)
+                        .SwapRowsColumns = True
+                        .Icon = Me.Icon
+                    End With
+                End If
+            Else
+                Logger.Msg("Select at least one number of days")
+            End If
+        Else
+            Logger.Msg("Select at least one time series")
+        End If
+
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+
+    End Sub
+
     Private Sub btnDoFrequencyGrid_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequencyGrid.Click
         If pBatch Then
             CalculateBatch() 'setting params for batch run
@@ -2529,22 +2595,22 @@ Public Class frmSWSTATmod
     Private Sub btnFrequencyReport_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnFrequencyReport.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
 
+        Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
+                                                             aHigh:=radioHigh.Checked,
+                                                             aNday:=ListToArray(lstNday),
+                                                             aReturns:=ListToArray(lstRecurrence))
+        lFreqForm.Visible = False
+
         Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
         With lSaveDialog
             .Title = "Save Frequency Report As"
             .DefaultExt = ".txt"
-            .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
+            .FileName = GetNewFileName(SafeFilename(ReplaceString(lFreqForm.Text, " ", "_") & "_report"), ".txt")
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
-
-                Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
-                                                             aHigh:=radioHigh.Checked,
-                                                             aNday:=ListToArray(lstNday),
-                                                             aReturns:=ListToArray(lstRecurrence))
-                lFreqForm.Visible = False
 
                 SaveFileString(.FileName, lFreqForm.CreateReport)
                 OpenFile(.FileName)
@@ -3557,5 +3623,6 @@ Public Class frmSWSTATmod
     End Sub
 
 #End Region '"DFLOW"
+
 End Class
 

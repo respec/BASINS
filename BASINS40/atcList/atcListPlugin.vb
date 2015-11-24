@@ -100,8 +100,9 @@ Public Class atcListPlugin
                         ElseIf lOption.ToLower.StartsWith("displayattributes:") Then
                             lDisplayAttributes = New Generic.List(Of String)
                             lDisplayAttributes.AddRange(lOption.Substring(18).Split(","))
+                        Else
+                            Logger.Dbg("UnknownParameter:" & lOption)
                         End If
-                        Logger.Dbg("UnknownParameter:" & lOption)
                 End Select
             Next
 
