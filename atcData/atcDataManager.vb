@@ -468,7 +468,7 @@ Public Class atcDataManager
     ''' Use OpenDataSource to open one that is not yet open
     ''' </remarks>
     Public Shared Function DataSourceBySpecification(ByVal aSpecification As String) As atcTimeseriesSource
-        If DataSources IsNot Nothing Then
+        If DataSources IsNot Nothing AndAlso aSpecification IsNot Nothing Then
             aSpecification = aSpecification.ToLower
             For Each lDataSource As atcTimeseriesSource In DataSources
                 If lDataSource.Specification.ToLower.Equals(aSpecification) Then

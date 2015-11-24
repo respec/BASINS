@@ -46,14 +46,19 @@ Public Class frmSelectAttributes
             Next
             pCalculatedAttributes.Sort()
             pNotCalculatedAttributes.Sort()
+
             pAllAttributes = New Generic.List(Of String)
             pAllAttributes.AddRange(pCalculatedAttributes)
             pAllAttributes.AddRange(pNotCalculatedAttributes)
             pAllAttributes.Sort()
-            RefreshAvailable()
+
+            ctlSelect.ClearRight()
             For Each lSelected As String In aSelected
                 ctlSelect.RightItem(ctlSelect.RightItems.Count) = lSelected
             Next
+
+            RefreshAvailable()
+
             If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
                 aSelected.Clear()
                 For Each lName In ctlSelect.RightItems
@@ -72,17 +77,24 @@ Public Class frmSelectAttributes
 
     Private Sub RefreshAvailable()
         ctlSelect.ClearLeft()
+        Dim lSelected As Generic.List(Of String) = ctlSelect.RightItems()
         If chkCalculated.Checked AndAlso pCalculatedAttributes IsNot Nothing AndAlso chkNotCalculated.Checked AndAlso pNotCalculatedAttributes IsNot Nothing Then
             For Each lItem As String In pAllAttributes
-                ctlSelect.LeftItemFastAdd(lItem)
+                If Not lSelected.Contains(lItem) Then
+                    ctlSelect.LeftItemFastAdd(lItem)
+                End If
             Next
         ElseIf chkCalculated.Checked AndAlso pCalculatedAttributes IsNot Nothing Then
             For Each lItem As String In pCalculatedAttributes
-                ctlSelect.LeftItemFastAdd(lItem)
+                If Not lSelected.Contains(lItem) Then
+                    ctlSelect.LeftItemFastAdd(lItem)
+                End If
             Next
         ElseIf chkNotCalculated.Checked AndAlso pNotCalculatedAttributes IsNot Nothing Then
             For Each lItem As String In pNotCalculatedAttributes
-                ctlSelect.LeftItemFastAdd(lItem)
+                If Not lSelected.Contains(lItem) Then
+                    ctlSelect.LeftItemFastAdd(lItem)
+                End If
             Next
         End If
     End Sub

@@ -345,7 +345,7 @@ Friend Class frmDisplayFrequencyGrid
         With lSaveDialog
             .Title = "Save Frequency Report As"
             .DefaultExt = ".txt"
-            .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
+            .FileName = GetNewFileName(SafeFilename(ReplaceString(Me.Text, " ", "_") & "_report"), ".txt")
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If

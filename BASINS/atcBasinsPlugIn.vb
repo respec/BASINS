@@ -204,6 +204,7 @@ Public Class atcBasinsPlugIn
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
+        On Error Resume Next
         g_MapWin.Menus.Remove(ProjectsMenuName)
         g_MapWin.Menus.Remove(OurHelpMenuName)
         g_MapWin.Menus.Remove(ProgramWebPageMenuName)
@@ -231,9 +232,13 @@ Public Class atcBasinsPlugIn
             Logger.ProgressStatus = pStatusMonitor.InnerProgressStatus
             pStatusMonitor.StopMonitor()
         End If
+        Dim lSelectionAttributes As String = String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray())
+        'Logger.Dbg("Saving SelectionAttributes " & lSelectionAttributes)
+        SaveSetting(g_AppNameRegistry, "DataManager", "SelectionAttributes", lSelectionAttributes)
 
-        SaveSetting(g_AppNameRegistry, "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray()))
-        SaveSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray()))
+        Dim lDisplayAttributes As String = String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray())
+        'Logger.Dbg("Saving DisplayAttributes " & lDisplayAttributes)
+        SaveSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes", lDisplayAttributes)
     End Sub
 
     Private Sub CloseForms()

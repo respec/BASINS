@@ -376,14 +376,10 @@ Public Class atcFrequencyGridSource
         Dim lRept As New System.Text.StringBuilder
         Dim lExpTab As atcTableDelimited = Nothing
         Dim lExpTabColumns As Integer = 15 + 7 * pRecurrence.Keys.Count
-        Dim lExpTabFieldNames15() As String
-        Dim lExpTabFieldNames7() As String = Nothing
+        Dim lExpTabFieldNames15 As String() = {"Identifier", "Parameter", "SeasBg", "SeaDBg", "SeasNd", "SeaDNd", "BegYear", "EndYear", "NumZro", "NonZro", "NumNeg", "Ldist", "Mean", "Stdev", "Skw"}
+        Dim lExpTabFieldNames7 As String() = {"Recur", "Exceed", "1-Day High", "K-Value", "Variance", "CL_Low", "CL_Up"}
         Dim lStrTemp As String = ""
         If aExpFmt Then 'if for export, then set up the tab-delimited table
-            Dim l15 As String() = {"Identifier", "Parameter", "SeasBg", "SeaDBg", "SeasNd", "SeaDNd", "BegYear", "EndYear", "NumZro", "NonZro", "NumNeg", "Ldist", "Mean", "Stdev", "Skw"}
-            Dim l7 As String() = {"Recur", "Exceed", "1-Day High", "K-Value", "Variance", "CL_Low", "CL_Up"}
-            lExpTabFieldNames15 = l15
-            lExpTabFieldNames7 = l7
             If pHigh Then
                 lExpTabFieldNames7(1) = "Exceed"
             Else
@@ -465,7 +461,7 @@ Public Class atcFrequencyGridSource
                             lRept.AppendLine()
                             lRept.AppendLine("Program SWStat         U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
                             lRept.AppendLine("Ver. 5.0      Log-Pearson & Pearson Type III Statistics   Run Date / Time")
-                            lRept.AppendLine("10/1/2009            based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
+                            lRept.AppendLine("11/24/2015           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
                             lRept.AppendLine()
                             lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
                             lRept.AppendLine("           preliminary computations. Users are responsible for assessment")
@@ -587,7 +583,7 @@ Public Class atcFrequencyGridSource
                             lRept.AppendLine()
                             lRept.AppendLine("Program SWStat         U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
                             lRept.AppendLine("Ver. 5.0      Log-Pearson & Pearson Type III Statistics   Run Date / Time")
-                            lRept.AppendLine("10/1/2009            based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
+                            lRept.AppendLine("11/24/2015           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
                             lRept.AppendLine()
                             lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
                             lRept.AppendLine("           preliminary computations. Users are responsible for assessment")
@@ -604,32 +600,46 @@ Public Class atcFrequencyGridSource
                             ' for years - if 
                             'PRH - USGS Date convention now resolved using call to timcnv on LEndDate above
                             Dim lEndDateForPrint As New Date(lEndDate(0), lEndDate(1), lEndDate(2))
-                            Dim lEndYear As Integer = lEndDate(0)
-                            Dim lEndMon As Integer = lEndDate(1)
-                            lRept.AppendLine("            Season:  " & lStartDate.ToString("MMMM") & lStartDate.Day.ToString.PadLeft(3) & " - " & _
-                                                                       lEndDateForPrint.ToString("MMMM") & lEndDateForPrint.Day.ToString.PadLeft(3))
+
+                            Dim lSeasonName As String = lNdayTs.Attributes.GetValue("SeasonName", Nothing)
+                            If lSeasonName IsNot Nothing Then
+                                lRept.AppendLine("   Selected Subset:  " & lSeasonName)
+                                Dim lEndDateFromNday As Double = Date2J(lEndDate(0), lEndDate(1), lEndDate(2))
+                                Dim lLastDateIndex As Integer = lTimeseries.numValues
+                                Dim lEndDateInTs As Double = lTimeseries.Dates.Value(lLastDateIndex)
+                                While lLastDateIndex > 1 AndAlso (lEndDateInTs > lEndDateFromNday OrElse Double.IsNaN(lTimeseries.Value(lLastDateIndex)))
+                                    lLastDateIndex -= 1
+                                    lEndDateInTs = lTimeseries.Dates.Value(lLastDateIndex)
+                                End While
+                                Dim lEndDateTemp(5) As Integer
+                                J2Date(lEndDateInTs, lEndDateTemp)
+                                timcnv(lEndDateTemp)
+                                lEndDateForPrint = New Date(lEndDateTemp(0), lEndDateTemp(1), lEndDateTemp(2))
+                            Else
+                                lRept.AppendLine("   Year Boundaries:  " & lStartDate.ToString("MMMM") & lStartDate.Day.ToString.PadLeft(3) & " - " &
+                                                                           lEndDateForPrint.ToString("MMMM") & lEndDateForPrint.Day.ToString.PadLeft(3))
+                            End If
 
                             'TODO: verify how the USGS convention for this works
                             Dim lStartYear As Integer = lStartDateAnnual.Year
-                            If Not pHigh AndAlso lEndMon <= lStartDate.Month Then
+                            If Not pHigh AndAlso lEndDateForPrint.Month <= lStartDate.Month Then
                                 lStartYear -= 1
                             End If
-                            lRept.AppendLine("  Period of Record:  " & _
-                                             lStartDate.ToString("MMMM") & lStartDate.Day.ToString.PadLeft(3) & ", " & lStartYear & " - " & _
-                                             lEndDateForPrint.ToString("MMMM") & lEndDateForPrint.Day.ToString.PadLeft(3) & ", " & lEndYear)
+
+                            lRept.AppendLine("  Period in report:  " &
+                                             lStartDate.ToString("MMMM") & lStartDate.Day.ToString.PadLeft(3) & ", " & lStartYear & " - " &
+                                             lEndDateForPrint.ToString("MMMM") & lEndDateForPrint.Day.ToString.PadLeft(3) & ", " & lEndDateForPrint.Year)
 
                             lStr = lNdays & "-day "
                             If pHigh Then lStr &= "high" Else lStr &= "low"
                             lRept.AppendLine("         Parameter:  " & lStr)
 
                             lStr = lNumPositive
-                            lRept.AppendLine("   non-zero values:  " & lStr.PadLeft(4))
+                            lRept.AppendLine("   Non-zero values:  " & lStr.PadLeft(4))
                             lStr = lNumZero
-                            lRept.AppendLine("       zero values:  " & lStr.PadLeft(4))
+                            lRept.AppendLine("       Zero values:  " & lStr.PadLeft(4))
                             lStr = lNumMissing
-                            lRept.AppendLine("   negative values:  " & lStr.PadLeft(4) & "  (ignored)")
-                            ''''
-
+                            lRept.AppendLine("   Negative values:  " & lStr.PadLeft(4) & "  (ignored)")
                             lRept.AppendLine()
                             lRept.AppendLine("Input time series (zero and negative values not included in listing.)")
                             lColumn = 9

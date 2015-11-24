@@ -312,7 +312,7 @@ Public Class atcTimeseriesGridSource
                             Dim lDefinedValue As atcDefinedValue = lTs.Attributes.GetDefinedValue(pDisplayAttributes(aRow))
                             If lDefinedValue Is Nothing Then
                                 lDefinedValue = New atcDefinedValue(atcDataAttributes.GetDefinition(pDisplayAttributes(aRow), True), Nothing)
-                                lTs.Attributes.Add(lDefinedValue.Definition.Name, lDefinedValue)
+                                lTs.Attributes.Add(lDefinedValue)
                             End If
                             Select Case lDefinedValue.Definition.TypeString
                                 Case "String" : lDefinedValue.Value = newValue

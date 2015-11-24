@@ -446,18 +446,29 @@ FoundProvisional:
                     lCriteriaIndex = pcboCriteria(0).Items.Count
                 Case Else
                     Dim lHasValues As Boolean = False
-                    For Each lDataSet As atcDataSet In AvailableData
-                        Application.DoEvents()
-                        If lDataSet.Attributes.ContainsAttribute(lAttributeName) Then
+
+                    'Keep attribute that we are selecting on even if no datasets have this attribute right now
+                    For lComboIndex As Integer = 0 To pcboCriteria.GetUpperBound(0)
+                        If pcboCriteria(lComboIndex).Text = lAttributeName Then
                             lHasValues = True
                             Exit For
                         End If
                     Next
 
+                    If Not lHasValues Then
+                        'See if any datasets have this attribute
+                        For Each lDataSet As atcDataSet In AvailableData
+                            Application.DoEvents()
+                            If lDataSet.Attributes.ContainsAttribute(lAttributeName) Then
+                                lHasValues = True
+                                Exit For
+                            End If
+                        Next
+                    End If
                     If lHasValues Then
                         Logger.Dbg("Keeping " & lAttributeName)
                         lCriteriaIndex += 1
-                    Else
+                    Else 'Remove attributes from list if no available datasets have this attribute
                         Logger.Dbg("Removing " & lAttributeName)
                         For lComboIndex As Integer = 0 To pcboCriteria.GetUpperBound(0)
                             pcboCriteria(lComboIndex).Items.RemoveAt(lCriteriaIndex)
