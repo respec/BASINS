@@ -739,7 +739,8 @@ RWZProgramEnding:
                                             " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Moving to next graph!", vbOKOnly)
                                     Do Until (Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("scatter") Or _
                                                 Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("timeseries") Or _
-                                                Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("frequency"))
+                                                Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("frequency") Or _
+                                                lRecordIndex + 1 < lGraphRecords.Count)
                                         lRecordIndex += 1
                                     Loop
 
@@ -758,7 +759,8 @@ RWZProgramEnding:
                                             " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Moving to next graph!", vbOKOnly)
                                     Do Until (Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("scatter") Or _
                                                 Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("timeseries") Or _
-                                                Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("frequency"))
+                                                Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("frequency") Or _
+                                                lRecordIndex + 1 < lGraphRecords.Count)
                                         lRecordIndex += 1
                                     Loop
 
@@ -776,7 +778,8 @@ RWZProgramEnding:
                                             " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Moving to next graph!", vbOKOnly)
                                     Do Until (Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("scatter") Or _
                                                 Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("timeseries") Or _
-                                                Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("frequency"))
+                                                Trim(lGraphRecords(lRecordIndex)).ToLower.StartsWith("frequency") Or _
+                                                lRecordIndex + 1 < lGraphRecords.Count)
                                         lRecordIndex += 1
                                     Loop
 
