@@ -50,13 +50,14 @@ Public Class DFLOWCalcs
     Public Shared LabelSeasons As String = ""
 
     Public Shared Function Sig2(ByVal x As Double) As String
-        If x >= 100 Then
-            Sig2 = Format(x, "Scientific")
-        ElseIf x >= 10 Then
-            Sig2 = Format(x, "00.0")
-        Else
-            Sig2 = Format(x, "0.00")
-        End If
+        Return DoubleToString(x)
+        'If x >= 100 Then
+        '    Sig2 = Format(x, "Scientific")
+        'ElseIf x >= 10 Then
+        '    Sig2 = Format(x, "00.0")
+        'Else
+        '    Sig2 = Format(x, "0.00")
+        'End If
     End Function
 
     Public Shared Sub Initialize(Optional ByVal aChoice As atcDataAttributes = Nothing)
@@ -551,6 +552,15 @@ Public Class DFLOWCalcs
                             End If
                             lNonBioType = InputNamesDFLOW.EDFlowType.Flow_Percentile
                             Exit For
+                        ElseIf lNonBioTypeName.ToLower().Contains("custom") Then
+                            If .Keys.Contains(InputNamesDFLOW.NBioAveragingPeriod) Then
+                                lAveragingPeriod = .ItemByKey(InputNamesDFLOW.NBioAveragingPeriod)
+                            End If
+                            If .Keys.Contains(InputNamesDFLOW.NBioReturnPeriod) Then
+                                lReturnPeriod = .ItemByKey(InputNamesDFLOW.NBioReturnPeriod)
+                            End If
+                            lNonBioType = InputNamesDFLOW.EDFlowType.Hydrological
+                            Exit For
                         End If
                     End If
                 Next
@@ -607,11 +617,22 @@ Public Class DFLOWCalcs
 
         ' ----- Count number of items checked in the listbox/ Selected number of datasets
         Dim lTotalItems As Integer = aDataGroup.Count
+        Dim lAddSeason As Boolean = False
+        For Each lTsData As atcTimeseries In aDataGroup
+            If lTsData.Attributes.ContainsAttribute("seasonname") Then
+                lAddSeason = True
+                Exit For
+            End If
+        Next
 
         ' ----- Build data source for results
         Dim ladsResults As New atcControls.atcGridSource
         With ladsResults
-            .Columns = 15
+            If lAddSeason Then
+                .Columns = 16
+            Else
+                .Columns = 15
+            End If
             .FixedColumns = 4
             .Rows = lTotalItems + 1
             .FixedRows = 1
@@ -638,6 +659,7 @@ Public Class DFLOWCalcs
             .CellValue(0, 13) = "Harmonic"
             .CellValue(0, 14) = "Harmonic Adj" 'newly added
             .CellValue(0, 15) = "Percentile" 'originally 14
+            If lAddSeason Then .CellValue(0, 16) = "SeasonName"
 
             Dim lColumn As Integer
             For lColumn = 0 To 15
@@ -934,6 +956,10 @@ Public Class DFLOWCalcs
 
             ladsResults.CellValue(lItemIdx + 1, 15) = Format(lNExcHF / (UBound(lTS) - lNMiss), "percent")
             ladsResults.Alignment(lItemIdx + 1, 15) = atcControls.atcAlignment.HAlignDecimal
+
+            If lAddSeason Then
+                ladsResults.CellValue(lItemIdx + 1, 16) = lHydrologicTS.Attributes.GetValue("seasonname")
+            End If
             lItemIdx = lItemIdx + 1
             lHydrologicTS2.Clear() : lHydrologicTS2 = Nothing
             lTimeSeries2.Clear() : lTimeSeries2 = Nothing

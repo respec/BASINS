@@ -591,6 +591,7 @@ Public Class clsBatchSpecDFLOW
 
         Dim lBFOpnCount As Integer = 0
         Dim lConfigFile As IO.StreamWriter = Nothing
+        Dim lScenarios As New atcCollection()
         For Each lBFOpnId As Integer In ListBatchOpns.Keys
             Dim lBFOpn As atcCollection = ListBatchOpns.ItemByKey(lBFOpnId)
             Dim lBFOpnName As String = "DFLOW_Opn_" & lBFOpnId
@@ -636,17 +637,71 @@ Public Class clsBatchSpecDFLOW
                 Dim lSW As IO.StreamWriter = Nothing
                 Try
                     lSW = New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "DFLOW_Report.txt"), False)
+                    Dim lScenarioCount As Integer = 1
                     For Each lNBioParam As atcCollection In lNBioParamSet
                         lNBioName = InputNamesDFLOW.GetAbbrevParamSetName(lNBioParam)
                         For Each lBioParam As atcCollection In lBioParamSet
                             lBioName = InputNamesDFLOW.GetAbbrevParamSetName(lBioParam)
                             Try
-                                Dim lReport As String = DFLOWCalcs.DFLOWToTable(lDataGroup, lBioParam, lNBioParam, lInputArgs)
-                                lSW.WriteLine("DFLOW :: " & lBFOpnName & " :: NBio(" & lNBioName & ") by Bio(" & lBioName & ")")
-                                lSW.WriteLine(lReport)
-                                lSW.Flush()
-                                lReport = ""
-                                UpdateStatus(lBFOpnName & "-Done NBio(" & lNBioName & ") by Bio(" & lBioName & ")", True)
+                                Dim lScen As New clsInteractiveDFLOW()
+                                With lScen
+                                    .ScenarioID = lScenarioCount
+                                    'remember Bio params
+                                    .ParamBio1FlowAvgDays = lBioParam.ItemByKey(InputNamesDFLOW.BioAvgPeriod)
+                                    .ParamBio2YearsBetweenExcursion = lBioParam.ItemByKey(InputNamesDFLOW.BioReturnYears)
+                                    .ParamBio3ExcursionClusterDays = lBioParam.ItemByKey(InputNamesDFLOW.BioClusterDays)
+                                    .ParamBio4ExcursionPerCluster = lBioParam.ItemByKey(InputNamesDFLOW.BioNumExcrsnPerCluster)
+                                    For Each lKey As String In lBioParam.Keys
+                                        If String.Compare(lKey, "type_" & InputNamesDFLOW.EBioDFlowType.Acute_maximum_concentration.ToString(), True) = 0 Then
+                                            .TypeBio = clsInteractiveDFLOW.EDFLOWPARAM.BIOAcute
+                                        ElseIf String.Compare(lKey, "type_" & InputNamesDFLOW.EBioDFlowType.Chronic_continuous_concentration.ToString(), True) = 0 Then
+                                            .TypeBio = clsInteractiveDFLOW.EDFLOWPARAM.BIOChronic
+                                        ElseIf String.Compare(lKey, "type_" & InputNamesDFLOW.EBioDFlowType.Ammonia.ToString(), True) = 0 Then
+                                            .TypeBio = clsInteractiveDFLOW.EDFLOWPARAM.BIOAmmonia
+                                        ElseIf String.Compare(lKey, "type_" & InputNamesDFLOW.EBioDFlowType.Custom.ToString(), True) = 0 Then
+                                            .TypeBio = clsInteractiveDFLOW.EDFLOWPARAM.BIOCustom
+                                        End If
+                                    Next
+
+                                    'remember Non-bio params
+                                    For Each lKey As String In lNBioParam.Keys
+                                        If String.Compare(lKey, "type_" & InputNamesDFLOW.EDFlowType.Hydrological.ToString(), True) = 0 Then
+                                            .TypeNBio = clsInteractiveDFLOW.EDFLOWPARAM.NBIOAcute
+                                            .ParamNBioNDay = lNBioParam.ItemByKey(InputNamesDFLOW.NBioAveragingPeriod)
+                                            .ParamNBioReturn = lNBioParam.ItemByKey(InputNamesDFLOW.NBioReturnPeriod)
+                                            Exit For
+                                        ElseIf String.Compare(lKey, "type_" & InputNamesDFLOW.EDFlowType.Explicit_Flow_Value.ToString(), True) = 0 Then
+                                            .TypeNBio = clsInteractiveDFLOW.EDFLOWPARAM.NBIOExplicitFlow
+                                            .ParamNBioExpFlow = lNBioParam.ItemByKey(InputNamesDFLOW.NBioExplicitFlow)
+                                            Exit For
+                                        ElseIf String.Compare(lKey, "type_" & InputNamesDFLOW.EDFlowType.Flow_Percentile.ToString(), True) = 0 Then
+                                            .TypeNBio = clsInteractiveDFLOW.EDFLOWPARAM.NBIOFlowPCT
+                                            .ParamNBioFlowPct = lNBioParam.ItemByKey(InputNamesDFLOW.NBioFlowPercentile)
+                                            Exit For
+                                        ElseIf lKey.ToLower.Contains("type_" & InputNamesDFLOW.EDFlowType.Custom.ToString().ToLower()) Then
+                                            .TypeNBio = clsInteractiveDFLOW.EDFLOWPARAM.NBIOCustom
+                                            .ParamNBioNDay = lNBioParam.ItemByKey(InputNamesDFLOW.NBioAveragingPeriod)
+                                            .ParamNBioReturn = lNBioParam.ItemByKey(InputNamesDFLOW.NBioReturnPeriod)
+                                            Exit For
+                                        End If
+                                    Next
+
+                                    With lInputArgs
+                                        .SetValue("ExcursionCountArray", lScen.ExcursionCountArray)
+                                        .SetValue("ExcursionsArray", lScen.ExcursionsArray)
+                                        .SetValue("ClustersArray", lScen.ClustersArray)
+                                    End With
+                                    .DataGroup = lDataGroup
+                                    .ReportSrc = DFLOWCalcs.DFLOWToGrid(lDataGroup, lBioParam, lNBioParam, lInputArgs, True)
+                                    Dim lAugReportSrc As atcControls.atcGridSource = .AugmentReport(lNBioName & "-" & lBioName, lScenarioCount)
+                                    lSW.WriteLine("DFLOW :: " & lBFOpnName & " :: NBio(" & lNBioName & ") by Bio(" & lBioName & ")")
+                                    lSW.WriteLine(lAugReportSrc.ToString())
+                                    lSW.Flush()
+                                    lAugReportSrc.Rows = 0
+                                    lAugReportSrc.Columns = 0
+                                    lAugReportSrc = Nothing
+                                    UpdateStatus(lBFOpnName & "-Done NBio(" & lNBioName & ") by Bio(" & lBioName & ")", True)
+                                End With
                             Catch ex As Exception
                                 UpdateStatus(lBFOpnName & "-Failed NBio(" & lNBioName & ") by Bio(" & lBioName & ")", True)
                             End Try
