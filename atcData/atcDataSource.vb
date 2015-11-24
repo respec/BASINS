@@ -135,7 +135,7 @@ Public Class atcDataSource
             aSpecification = AbsolutePath(aSpecification, CurDir())
             If atcDataManager.DataSourceBySpecification(aSpecification) IsNot Nothing Then
                 Logger.Dbg("AlreadyOpen")
-                Open = False
+                Open = True
             End If
         End If
         Me.Specification = aSpecification 'save regardless for messages or further processing
