@@ -11,12 +11,12 @@
         '  properties dialog (under the "Project" menu).
 
         'Application title
-        If My.Application.Info.Title <> "" Then
-            ApplicationTitle.Text = My.Application.Info.Title
-        Else
-            'If the application title is missing, use the application name, without the extension
-            ApplicationTitle.Text = System.IO.Path.GetFileNameWithoutExtension(My.Application.Info.AssemblyName)
-        End If
+        'If My.Application.Info.Title <> "" Then
+        '    ApplicationTitle.Text = My.Application.Info.Title
+        'Else
+        '    'If the application title is missing, use the application name, without the extension
+        '    ApplicationTitle.Text = System.IO.Path.GetFileNameWithoutExtension(My.Application.Info.AssemblyName)
+        'End If
 
         'Format the version information using the text set into the Version control at design time as the
         '  formatting string.  This allows for effective localization if desired.
