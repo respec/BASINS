@@ -584,6 +584,7 @@ Public Class frmDFLOWResults
             'Dim lExcursionCount As Integer = pExcursionCountArray(pRow - 1)
             'Dim lClusters As ArrayList = pClustersArray(pRow - 1)
             'Dim lExcursions As ArrayList = pExcursionsArray(pRow - 1)
+
             Dim lScenID As Integer = Integer.Parse(agrResults.Source.CellValue(pRow, agrResults.Source.Columns - 1))
             Dim lScen As clsInteractiveDFLOW = pScenarios.ItemByKey(lScenID)
             If lScen Is Nothing Then Exit Sub
@@ -593,9 +594,22 @@ Public Class frmDFLOWResults
             Dim loc As String = lGageDesc.Substring(0, lGageDesc.IndexOf("-"))
             If String.IsNullOrEmpty(loc) OrElse loc.Trim() = "" Then Exit Sub
             loc = loc.Trim()
-            Dim lExcursionCount As Integer = lScen.ExcursionCountArray.ItemByKey(loc)
-            Dim lClusters As ArrayList = lScen.ClustersArray.ItemByKey(loc)
-            Dim lExcursions As ArrayList = lScen.ExcursionsArray.ItemByKey(loc)
+            'Dim lSn As String = ""
+            'For lColIndex As Integer = 0 To agrResults.Source.Columns
+            '    If agrResults.Source.CellValue(0, lColIndex) = "SeasonName" Then
+            '        lSn = agrResults.Source.CellValue(pRow, lColIndex)
+            '        Exit For
+            '    End If
+            'Next
+            'Dim lKey As String = loc & "-" & lSn
+            'Dim lExcursionCount As Integer = lScen.ExcursionCountArray.ItemByKey(lKey)
+            'Dim lClusters As ArrayList = lScen.ClustersArray.ItemByKey(lKey)
+            'Dim lExcursions As ArrayList = lScen.ExcursionsArray.ItemByKey(lKey)
+            Dim lIndex As Integer = pRow Mod lScen.DataGroup.Count
+            If lIndex = 0 Then lIndex = lScen.DataGroup.Count
+            Dim lExcursionCount As Integer = lScen.ExcursionCountArray(lIndex - 1)
+            Dim lClusters As ArrayList = lScen.ClustersArray(lIndex - 1)
+            Dim lExcursions As ArrayList = lScen.ExcursionsArray(lIndex - 1)
 
             Dim lagsExcursions As New atcControls.atcGridSource
 
@@ -618,7 +632,19 @@ Public Class frmDFLOWResults
 
             Dim lRow As Integer = 0
             Dim lExcursionIdx As Integer = 0
-            Dim lTs As atcTimeseries = lScen.DataGroup.FindData("Location", loc)(0)
+            'Dim lTsGroup As atcTimeseriesGroup = lScen.DataGroup.FindData("Location", Loc)
+            'Dim lTs As atcTimeseries = Nothing
+            'If Not String.IsNullOrEmpty(lSn) Then
+            '    lTs = lTsGroup.FindData("SeasonName", lSn)(0)
+            'Else
+            '    lTs = lTsGroup(0)
+            'End If
+            'Dim lFirstDate As Double = 0
+            'If lTs IsNot Nothing Then
+            '    lFirstDate = lTs.Attributes.GetValue("xBy start date") 'pTimeseriesGroup(pRow - 1).Attributes.GetValue("xBy start date")
+            'End If
+
+            Dim lTs As atcTimeseries = lScen.DataGroup(lIndex - 1)
             Dim lFirstDate As Double = lTs.Attributes.GetValue("xBy start date") 'pTimeseriesGroup(pRow - 1).Attributes.GetValue("xBy start date")
 
             Dim lCluster As DFLOWCalcs.stCluster

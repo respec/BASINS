@@ -817,10 +817,11 @@ Public Class DFLOWCalcs
             lxBy = xBy(lxBy, lBioPeriod, lBioYears, lBioCluster, lBioExcursions, lTSN, lExcursionCount, lExcursions, lClusters, lfrmProgress)
             Dim lAttrName As String = lBioPeriod & "B" & lBioYears
             lHydrologicTS.Attributes.SetValue(lAttrName, lxBy)
-            Dim loc As String = aDataGroup(lDSIndex).Attributes.GetValue("Location")
-            lExcursionCountArray.Add(loc, lExcursionCount)
-            lExcursionsArray.Add(loc, lExcursions)
-            lClustersArray.Add(loc, lClusters)
+            Dim loc As String = aDataGroup(lDSIndex).Attributes.GetValue("Location", "")
+            Dim lSn As String = aDataGroup(lDSIndex).Attributes.GetValue("seasonname", "")
+            lExcursionCountArray.Add(loc & "-" & lSn, lExcursionCount)
+            lExcursionsArray.Add(loc & "-" & lSn, lExcursions)
+            lClustersArray.Add(loc & "-" & lSn, lClusters)
 
             ' ===== If appropriate, calculate equivalent xQy for this xBy
             Dim lEquivalentxQy As Double = 0
