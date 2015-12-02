@@ -505,6 +505,9 @@ Public Class atcGrid
     Private Sub Render(ByVal g As Graphics)
         Try
             If pSource IsNot Nothing AndAlso Me.Visible Then
+                'Set this early the first time through so SetHScroller has a chance to see there is enough width
+                If pVisibleWidth = 0 Then pVisibleWidth = Me.Width
+
                 SetHScroller()
 
                 Dim x As Integer = 0
