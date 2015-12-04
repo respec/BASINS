@@ -979,6 +979,19 @@ Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
                     .Line.Width = pGraphSpec.Crv(lCrvIndex).LThck
                     .Label.Text = pGraphSpec.Crv(lCrvIndex).LegLbl
                     .Line.StepType = StepType.ForwardStep
+
+                    With .Symbol
+                        If pGraphSpec.Crv(lCrvIndex).SType > 0 Then ' LType >= 0
+                            .Type = pGraphSpec.Crv(lCrvIndex).SType ' Mod 5
+                            .Size = 3.0F
+                            .IsVisible = True
+                            lCurve.Line.IsVisible = False
+                        Else
+                            .Type = SymbolType.None
+                            .IsVisible = False
+                            lCurve.Line.IsVisible = True
+                        End If
+                    End With
                 Else
                     .Line.Width = 2
                     .Color = Drawing.Color.Red
