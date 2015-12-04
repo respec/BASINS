@@ -119,6 +119,8 @@ Public Class atcTimeseriesFEQ
                 Case ".feo"
                     f.NameFeo = Specification
                     FeoRead()
+                    f.NameTsd = IO.Path.ChangeExtension(Specification, ".tsd")
+                    f.NameFtf = IO.Path.ChangeExtension(Specification, ".ftf")
                     Return True
                 Case Else
                     Throw New ApplicationException("Unknown SWAT Data File Type: " & aFileName)
@@ -277,6 +279,8 @@ Public Class atcTimeseriesFEQ
 
         i = FreeFile()
         FileOpen(i, f.NameTsd, OpenMode.Binary, OpenAccess.Read) 'Len = f.RecLen
+        'Dim lFile As New IO.BinaryReader(File.Open(f.NameTsd, FileMode.Open, FileAccess.Read, FileShare.Read))
+        'lFile.BaseStream.Seek(0, SeekOrigin.Begin)
         spos = 0 'fix this!!!!
         Apos = 0
         For pos = spos To spos + pDates.numValues - 1
@@ -284,6 +288,12 @@ Public Class atcTimeseriesFEQ
             lp = (pos * f.RecLen) + (tcol * 4) + 5
             'UPGRADE_WARNING: Get was upgraded to FileGet and has a new behavior.
             FileGet(i, r, lp)
+            'lFile.BaseStream.Seek(lp, SeekOrigin.Current)
+            'Try
+            '    r = lFile.ReadSingle()
+            'Catch ex As Exception
+            '    Exit For
+            'End Try
             If X > 0 Then ' need to use ftable
                 ya = r - e
                 Select Case f.LocDir(lind).FtabTyp
@@ -300,6 +310,9 @@ Public Class atcTimeseriesFEQ
             'flg(Apos) = 0 'Start at index 0
         Next pos
         FileClose(i)
+        'lFile.Close()
+        'lFile.Dispose()
+        'lFile = Nothing
 
         If X > 0 Then
             FindSetTS(LocName, "A", a)
