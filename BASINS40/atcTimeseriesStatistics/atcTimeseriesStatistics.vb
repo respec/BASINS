@@ -125,7 +125,7 @@ Public Class atcTimeseriesStatistics
                 AddOperation("Harmonic Mean", "Sub-contrary mean of positive values", _
                                              defTimeSeriesOne, lCategory, "Double", pNaN)
 
-                AddOperation("Harmonic Mean Adj", "Harmonic mean adjusted for zero flows",
+                AddOperation("Harmonic Mean Adj", "Harmonic mean adjusted for zero values",
                                              defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Variance", "Statistical variance",
@@ -415,6 +415,8 @@ Public Class atcTimeseriesStatistics
                     lSum3 = Math.Sqrt(lSum3)
                     lScc = lScc / lSum3
                     aTimeseries.Attributes.SetValue("Serial Correlation Coefficient", lScc)
+                    ReDim lX(0)
+                    lX = Nothing
                 End If
             End If
         End If
