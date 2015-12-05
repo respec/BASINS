@@ -276,187 +276,187 @@ Public Module modMetData
         'SaveFileString(lFName, lOStr)
     End Sub
 
-    'Use for filling HOURLY OR LESS timeseries.
-    'Fill missing values in timeseries aTS2Fill with values from nearby timeseries (aTSAvail).
-    'Use Tolerance factor aTol to determine which nearby stations are acceptable
-    'for distributing accumulated data (i.e. missing time distribution).
-    Public Sub FillHourlyTser(ByVal aTS2Fill As atcTimeseries, ByVal aTSAvail As atcCollection, ByVal aMVal As Double, ByVal aMAcc As Double, ByVal aTol As Double)
-        Dim j As Integer
-        Dim k As Integer
-        Dim lInd As Integer
-        Dim lCurInd As Integer
-        Dim lFPos As Integer
-        Dim lSPos As Integer
-        Dim lMLen As Integer
-        Dim ld(5) As Integer
-        Dim lMTyp As Integer
-        Dim lNSta As Integer
-        Dim s As String
-        Dim lstr As String
-        Dim lSJDay As Double
-        Dim lMJDay As Double
-        Dim lEJDay As Double
-        Dim lSubSJDay As Double
-        Dim lFVal As Double
-        Dim lFillAdjust As Double
-        Dim lStaAdjust As Double
-        Dim lRatio As Double
-        Dim lCarry As Double
-        Dim lRndOff As Double = 0.001
-        Dim lAccVal As Double
-        Dim lMaxHrVal As Double
-        Dim lMaxHrInd As Integer
-        Dim lDist As atcCollection
-        Dim lTSer As atcTimeseries
-        Dim lAdjustAttribute As String = GetAdjustingAttribute(aTS2Fill)
-        Const lValMin As Double = -90
-        Const lValMax As Double = 200
-        Dim lTol As Double
-        Dim lFilledIt As Boolean
-        Dim lTU As Integer = aTS2Fill.Attributes.GetValue("tu")
-        Dim lTS As Integer = aTS2Fill.Attributes.GetValue("ts")
-        Dim lIntsPerDay As Double
-        Dim lTUStr As String = ""
+    ''Use for filling HOURLY OR LESS timeseries.
+    ''Fill missing values in timeseries aTS2Fill with values from nearby timeseries (aTSAvail).
+    ''Use Tolerance factor aTol to determine which nearby stations are acceptable
+    ''for distributing accumulated data (i.e. missing time distribution).
+    'Public Sub FillHourlyTser(ByVal aTS2Fill As atcTimeseries, ByVal aTSAvail As atcCollection, ByVal aMVal As Double, ByVal aMAcc As Double, ByVal aTol As Double)
+    '    Dim j As Integer
+    '    Dim k As Integer
+    '    Dim lInd As Integer
+    '    Dim lCurInd As Integer
+    '    Dim lFPos As Integer
+    '    Dim lSPos As Integer
+    '    Dim lMLen As Integer
+    '    Dim ld(5) As Integer
+    '    Dim lMTyp As Integer
+    '    Dim lNSta As Integer
+    '    Dim s As String
+    '    Dim lstr As String
+    '    Dim lSJDay As Double
+    '    Dim lMJDay As Double
+    '    Dim lEJDay As Double
+    '    Dim lSubSJDay As Double
+    '    Dim lFVal As Double
+    '    Dim lFillAdjust As Double
+    '    Dim lStaAdjust As Double
+    '    Dim lRatio As Double
+    '    Dim lCarry As Double
+    '    Dim lRndOff As Double = 0.001
+    '    Dim lAccVal As Double
+    '    Dim lMaxHrVal As Double
+    '    Dim lMaxHrInd As Integer
+    '    Dim lDist As atcCollection
+    '    Dim lTSer As atcTimeseries
+    '    Dim lAdjustAttribute As String = GetAdjustingAttribute(aTS2Fill)
+    '    Const lValMin As Double = -90
+    '    Const lValMax As Double = 200
+    '    Dim lTol As Double
+    '    Dim lFilledIt As Boolean
+    '    Dim lTU As Integer = aTS2Fill.Attributes.GetValue("tu")
+    '    Dim lTS As Integer = aTS2Fill.Attributes.GetValue("ts")
+    '    Dim lIntsPerDay As Double
+    '    Dim lTUStr As String = ""
 
-        If lTol > 1 Then 'passed in as percentage
-            lTol = lTol / 100
-        End If
-        lNSta = 10
-        Select Case lTU
-            Case atcTimeUnit.TUHour
-                lIntsPerDay = 24 / lTS
-                lTUStr = "Hour"
-            Case atcTimeUnit.TUMinute
-                lIntsPerDay = 1440 / lTS
-                lTUStr = "Minute"
-            Case atcTimeUnit.TUSecond
-                lIntsPerDay = 86400 / lTS
-                lTUStr = "Second"
-            Case Else
-                Logger.Dbg("  PROBLEM - Time Units of TSer being filled are not hours, minutes, or seconds")
-        End Select
-        Logger.Dbg("Filling " & lTS & "-" & lTUStr & " values for " & aTS2Fill.ToString & ", " & aTS2Fill.Attributes.GetValue("STANAM"))
-        s = MissingDataSummary(aTS2Fill, aMVal, aMAcc, lValMin, lValMax, 2)
-        lstr = StrSplit(s, "DETAIL:DATA", "")
-        If Len(s) > 0 Then 'missing data found
-            lDist = Nothing
-            lDist = CalcMetDistances(aTS2Fill, aTSAvail, lAdjustAttribute)
-            lFillAdjust = aTS2Fill.Attributes.GetValue(lAdjustAttribute, -999)
-            If Math.Abs(lFillAdjust + 999) > pEpsilon Then
-                Logger.Dbg("  (Historical average is " & lFillAdjust & ")")
-            Else
-                Logger.Dbg("  (Historical averages not in use)")
-            End If
-            lSJDay = aTS2Fill.Attributes.GetValue("SJDay")
-            While Len(s) > 0
-                lstr = StrSplit(s, ",", "")
-                lMJDay = CDbl(StrSplit(s, ",", ""))
-                lMLen = CLng(StrSplit(s, ",", ""))
-                lMTyp = CLng(StrSplit(s, ",", ""))
-                J2Date(lMJDay, ld)
-                If lMTyp = 1 Then 'fill missing period
-                    Logger.Dbg("  For Missing period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " lasting " & lMLen & " intervals:")
-                    lCurInd = -1
-                    For k = 1 To lMLen
-                        lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
-                        lFilledIt = False
-                        j = 1
-                        While j < aTSAvail.Count
-                            lInd = lDist.IndexFromKey(CStr(j))
-                            lTSer = aTSAvail.ItemByIndex(lInd)
-                            lFVal = -1
-                            If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Values(1) > pEpsilon And
-                               (lMJDay + (k - 1) / lIntsPerDay) - JulianMillisecond <= lTSer.Dates.Values(lTSer.numValues) Then 'check value
-                                lSPos = lIntsPerDay * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
-                                If lTSer.Value(lSPos) <> aMVal AndAlso lTSer.Value(lSPos) > lValMin AndAlso lTSer.Value(lSPos) < lValMax Then 'good value
-                                    lFVal = lTSer.Value(lSPos)
-                                    lStaAdjust = lTSer.Attributes.GetValue(lAdjustAttribute, -999)
-                                    If Math.Abs(lFillAdjust + 999) > pEpsilon AndAlso
-                                       Math.Abs(lStaAdjust + 999) > pEpsilon Then
-                                        aTS2Fill.Value(lFPos) = lFillAdjust / lStaAdjust * lFVal
-                                    Else
-                                        aTS2Fill.Value(lFPos) = lFVal
-                                    End If
-                                    J2Date(lMJDay + (k - 1) / lIntsPerDay, ld)
-                                    If lCurInd <> lInd Then 'changing station used to fill
-                                        Logger.Dbg("    Filling from TS " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("STANAM"))
-                                        If Math.Abs(lFillAdjust + 999) > 0.0001 Then 'pEpsilon Then
-                                            Logger.Dbg("      (Adjusting values using historical average of " & lStaAdjust & ")")
-                                        End If
-                                        lCurInd = lInd
-                                    End If
-                                    If lTU = atcTimeUnit.TUHour Then
-                                        Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " - " & aTS2Fill.Value(lFPos))
-                                    ElseIf lTU = atcTimeUnit.TUMinute Then
-                                        Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & " - " & aTS2Fill.Value(lFPos))
-                                    ElseIf lTU = atcTimeUnit.TUSecond Then
-                                        Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & ":" & ld(5) & " - " & aTS2Fill.Value(lFPos))
-                                    End If
-                                    j = aTSAvail.Count
-                                    lFilledIt = True
-                                End If
-                            End If
-                            j = j + 1
-                        End While
-                        If Not lFilledIt Then
-                            Logger.Dbg("PROBLEM - Could not find acceptable nearby station for filling")
-                        End If
-                    Next k
-                Else 'fill accumulated period
-                    If lTU = atcTimeUnit.TUHour Then
-                        Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " lasting " & lMLen & " intervals:")
-                    ElseIf lTU = atcTimeUnit.TUMinute Then
-                        Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & " lasting " & lMLen & " intervals:")
-                    ElseIf lTU = atcTimeUnit.TUSecond Then
-                        Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & ":" & ld(5) & " lasting " & lMLen & " intervals:")
-                    End If
-                    lAccVal = CDbl(StrSplit(s, vbCrLf, ""))
-                    lSubSJDay = lMJDay - 1 / lIntsPerDay 'back up one interval for SubSetByDate in ClosestPrecip
-                    lEJDay = lSubSJDay + lMLen / lIntsPerDay
-                    lTSer = ClosestPrecip(aTS2Fill, aTSAvail, lAccVal, lSubSJDay, lEJDay, aTol)
-                    If Not lTSer Is Nothing Then
-                        Logger.Dbg("    Distributing " & lAccVal & " from TS# " & lTSer.ToString)
-                        lRatio = lAccVal / lTSer.Attributes.GetValue("Sum")
-                        For k = 1 To lMLen
-                            lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
-                            aTS2Fill.Value(lFPos) = lRatio * lTSer.Value(k) + lCarry
-                            If aTS2Fill.Value(lFPos) > pEpsilon Then
-                                lCarry = aTS2Fill.Value(lFPos) - (Math.Round(aTS2Fill.Value(lFPos) / lRndOff) * lRndOff)
-                                aTS2Fill.Value(lFPos) = aTS2Fill.Value(lFPos) - lCarry
-                            Else
-                                aTS2Fill.Value(lFPos) = 0.0#
-                            End If
-                            If aTS2Fill.Value(lFPos) > lMaxHrVal Then
-                                lMaxHrVal = aTS2Fill.Value(lFPos)
-                                lMaxHrInd = lFPos
-                            End If
-                            J2Date(lMJDay + (k - 1) / lIntsPerDay, ld)
-                            If lTU = atcTimeUnit.TUHour Then
-                                Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " - " & aTS2Fill.Value(lFPos))
-                            ElseIf lTU = atcTimeUnit.TUMinute Then
-                                Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & " - " & aTS2Fill.Value(lFPos))
-                            ElseIf lTU = atcTimeUnit.TUSecond Then
-                                Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & ":" & ld(5) & " - " & aTS2Fill.Value(lFPos))
-                            End If
-                        Next k
-                        If lCarry > 0 Then 'add remainder to max hourly value
-                            aTS2Fill.Value(lMaxHrInd) = aTS2Fill.Value(lMaxHrInd) + lCarry
-                        End If
-                    Else
-                        J2Date(lEJDay, ld)
-                        Logger.Dbg("      *** No nearby station found for distributing accumulated value of " & lAccVal & " on " & ld(0) & "/" & ld(1) & "/" & ld(2))
-                        For k = 1 To lMLen - 1 'set missing dist period to 0 except for accum value at end
-                            lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
-                            aTS2Fill.Value(lFPos) = 0
-                        Next k
-                    End If
-                End If
-                lstr = StrSplit(s, "DETAIL:DATA", "")
-            End While
-        Else 'no missing data
-            Logger.Dbg("  No missing data to fill!")
-        End If
-    End Sub
+    '    If lTol > 1 Then 'passed in as percentage
+    '        lTol = lTol / 100
+    '    End If
+    '    lNSta = 10
+    '    Select Case lTU
+    '        Case atcTimeUnit.TUHour
+    '            lIntsPerDay = 24 / lTS
+    '            lTUStr = "Hour"
+    '        Case atcTimeUnit.TUMinute
+    '            lIntsPerDay = 1440 / lTS
+    '            lTUStr = "Minute"
+    '        Case atcTimeUnit.TUSecond
+    '            lIntsPerDay = 86400 / lTS
+    '            lTUStr = "Second"
+    '        Case Else
+    '            Logger.Dbg("  PROBLEM - Time Units of TSer being filled are not hours, minutes, or seconds")
+    '    End Select
+    '    Logger.Dbg("Filling " & lTS & "-" & lTUStr & " values for " & aTS2Fill.ToString & ", " & aTS2Fill.Attributes.GetValue("STANAM"))
+    '    s = MissingDataSummary(aTS2Fill, aMVal, aMAcc, lValMin, lValMax, 2)
+    '    lstr = StrSplit(s, "DETAIL:DATA", "")
+    '    If Len(s) > 0 Then 'missing data found
+    '        lDist = Nothing
+    '        lDist = CalcMetDistances(aTS2Fill, aTSAvail, lAdjustAttribute)
+    '        lFillAdjust = aTS2Fill.Attributes.GetValue(lAdjustAttribute, -999)
+    '        If Math.Abs(lFillAdjust + 999) > pEpsilon Then
+    '            Logger.Dbg("  (Historical average is " & lFillAdjust & ")")
+    '        Else
+    '            Logger.Dbg("  (Historical averages not in use)")
+    '        End If
+    '        lSJDay = aTS2Fill.Attributes.GetValue("SJDay")
+    '        While Len(s) > 0
+    '            lstr = StrSplit(s, ",", "")
+    '            lMJDay = CDbl(StrSplit(s, ",", ""))
+    '            lMLen = CLng(StrSplit(s, ",", ""))
+    '            lMTyp = CLng(StrSplit(s, ",", ""))
+    '            J2Date(lMJDay, ld)
+    '            If lMTyp = 1 Then 'fill missing period
+    '                Logger.Dbg("  For Missing period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " lasting " & lMLen & " intervals:")
+    '                lCurInd = -1
+    '                For k = 1 To lMLen
+    '                    lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
+    '                    lFilledIt = False
+    '                    j = 1
+    '                    While j < aTSAvail.Count
+    '                        lInd = lDist.IndexFromKey(CStr(j))
+    '                        lTSer = aTSAvail.ItemByIndex(lInd)
+    '                        lFVal = -1
+    '                        If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Values(1) > pEpsilon And
+    '                           (lMJDay + (k - 1) / lIntsPerDay) - JulianMillisecond <= lTSer.Dates.Values(lTSer.numValues) Then 'check value
+    '                            lSPos = lIntsPerDay * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
+    '                            If lTSer.Value(lSPos) <> aMVal AndAlso lTSer.Value(lSPos) > lValMin AndAlso lTSer.Value(lSPos) < lValMax Then 'good value
+    '                                lFVal = lTSer.Value(lSPos)
+    '                                lStaAdjust = lTSer.Attributes.GetValue(lAdjustAttribute, -999)
+    '                                If Math.Abs(lFillAdjust + 999) > pEpsilon AndAlso
+    '                                   Math.Abs(lStaAdjust + 999) > pEpsilon Then
+    '                                    aTS2Fill.Value(lFPos) = lFillAdjust / lStaAdjust * lFVal
+    '                                Else
+    '                                    aTS2Fill.Value(lFPos) = lFVal
+    '                                End If
+    '                                J2Date(lMJDay + (k - 1) / lIntsPerDay, ld)
+    '                                If lCurInd <> lInd Then 'changing station used to fill
+    '                                    Logger.Dbg("    Filling from TS " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("STANAM"))
+    '                                    If Math.Abs(lFillAdjust + 999) > 0.0001 Then 'pEpsilon Then
+    '                                        Logger.Dbg("      (Adjusting values using historical average of " & lStaAdjust & ")")
+    '                                    End If
+    '                                    lCurInd = lInd
+    '                                End If
+    '                                If lTU = atcTimeUnit.TUHour Then
+    '                                    Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " - " & aTS2Fill.Value(lFPos))
+    '                                ElseIf lTU = atcTimeUnit.TUMinute Then
+    '                                    Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & " - " & aTS2Fill.Value(lFPos))
+    '                                ElseIf lTU = atcTimeUnit.TUSecond Then
+    '                                    Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & ":" & ld(5) & " - " & aTS2Fill.Value(lFPos))
+    '                                End If
+    '                                j = aTSAvail.Count
+    '                                lFilledIt = True
+    '                            End If
+    '                        End If
+    '                        j = j + 1
+    '                    End While
+    '                    If Not lFilledIt Then
+    '                        Logger.Dbg("PROBLEM - Could not find acceptable nearby station for filling")
+    '                    End If
+    '                Next k
+    '            Else 'fill accumulated period
+    '                If lTU = atcTimeUnit.TUHour Then
+    '                    Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " lasting " & lMLen & " intervals:")
+    '                ElseIf lTU = atcTimeUnit.TUMinute Then
+    '                    Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & " lasting " & lMLen & " intervals:")
+    '                ElseIf lTU = atcTimeUnit.TUSecond Then
+    '                    Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & ":" & ld(5) & " lasting " & lMLen & " intervals:")
+    '                End If
+    '                lAccVal = CDbl(StrSplit(s, vbCrLf, ""))
+    '                lSubSJDay = lMJDay - 1 / lIntsPerDay 'back up one interval for SubSetByDate in ClosestPrecip
+    '                lEJDay = lSubSJDay + lMLen / lIntsPerDay
+    '                lTSer = ClosestPrecip(aTS2Fill, aTSAvail, lAccVal, lSubSJDay, lEJDay, aTol)
+    '                If Not lTSer Is Nothing Then
+    '                    Logger.Dbg("    Distributing " & lAccVal & " from TS# " & lTSer.ToString)
+    '                    lRatio = lAccVal / lTSer.Attributes.GetValue("Sum")
+    '                    For k = 1 To lMLen
+    '                        lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
+    '                        aTS2Fill.Value(lFPos) = lRatio * lTSer.Value(k) + lCarry
+    '                        If aTS2Fill.Value(lFPos) > pEpsilon Then
+    '                            lCarry = aTS2Fill.Value(lFPos) - (Math.Round(aTS2Fill.Value(lFPos) / lRndOff) * lRndOff)
+    '                            aTS2Fill.Value(lFPos) = aTS2Fill.Value(lFPos) - lCarry
+    '                        Else
+    '                            aTS2Fill.Value(lFPos) = 0.0#
+    '                        End If
+    '                        If aTS2Fill.Value(lFPos) > lMaxHrVal Then
+    '                            lMaxHrVal = aTS2Fill.Value(lFPos)
+    '                            lMaxHrInd = lFPos
+    '                        End If
+    '                        J2Date(lMJDay + (k - 1) / lIntsPerDay, ld)
+    '                        If lTU = atcTimeUnit.TUHour Then
+    '                            Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " - " & aTS2Fill.Value(lFPos))
+    '                        ElseIf lTU = atcTimeUnit.TUMinute Then
+    '                            Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & " - " & aTS2Fill.Value(lFPos))
+    '                        ElseIf lTU = atcTimeUnit.TUSecond Then
+    '                            Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & ":" & ld(5) & " - " & aTS2Fill.Value(lFPos))
+    '                        End If
+    '                    Next k
+    '                    If lCarry > 0 Then 'add remainder to max hourly value
+    '                        aTS2Fill.Value(lMaxHrInd) = aTS2Fill.Value(lMaxHrInd) + lCarry
+    '                    End If
+    '                Else
+    '                    J2Date(lEJDay, ld)
+    '                    Logger.Dbg("      *** No nearby station found for distributing accumulated value of " & lAccVal & " on " & ld(0) & "/" & ld(1) & "/" & ld(2))
+    '                    For k = 1 To lMLen - 1 'set missing dist period to 0 except for accum value at end
+    '                        lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
+    '                        aTS2Fill.Value(lFPos) = 0
+    '                    Next k
+    '                End If
+    '            End If
+    '            lstr = StrSplit(s, "DETAIL:DATA", "")
+    '        End While
+    '    Else 'no missing data
+    '        Logger.Dbg("  No missing data to fill!")
+    '    End If
+    'End Sub
 
     ''' <summary>
     '''Use for filling HOURLY OR LESS timeseries.
