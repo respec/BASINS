@@ -240,7 +240,6 @@ Public Class atcTimeseriesStatistics
             Dim lVariance As Double = pNaN
             Dim lSkew As Double = pNaN
             Dim lStErSkew As Double = pNaN
-            Dim lScc As Double = pNaN
             Dim lCvr As Double = pNaN
             Dim lSumInverse As Double = 0
 
@@ -374,82 +373,112 @@ Public Class atcTimeseriesStatistics
                     aTimeseries.Attributes.SetValue("Standard Error of Skew", lStErSkew)
                     lCvr = lStdDev / lMean
                     aTimeseries.Attributes.SetValue("Coefficient of Variation", lCvr)
-
-                    Dim lSum1 As Double = 0
-                    Dim lSum2 As Double = 0
-                    Dim lSum3 As Double = 0
-                    Dim lSum4 As Double = 0
-                    Dim lValPl1 As Double
-                    Dim lFirst As Integer = 1
-                    Dim lX(lLastValueIndex) As Double
-
-                    While Double.IsNaN(aTimeseries.Value(lFirst))
-                        lFirst += 1
-                    End While
-                    lVal = aTimeseries.Value(lFirst)
-                    For lIndex = lFirst + 1 To lLastValueIndex
-                        lValPl1 = aTimeseries.Value(lIndex)
-                        If Not Double.IsNaN(lValPl1) Then
-                            lX(lIndex) = lVal * lValPl1
-                            lSum3 += lX(lIndex)
-                            lVal = lValPl1
-                        End If
-                    Next
-                    lScc = (lSum - aTimeseries.Value(lLastValueIndex)) * (lSum - aTimeseries.Value(1))
-                    lScc = ((lCount - 1) * lSum3) - lScc
-                    lSum3 = 0
-                    For lIndex = 1 To lLastValueIndex
-                        lVal = aTimeseries.Value(lIndex)
-                        If Not Double.IsNaN(lVal) Then
-                            lX(lIndex) = lVal * lVal
-                            lSum3 += lX(lIndex)
-                        End If
-                    Next
-                    lSum4 = (lSum3 - (aTimeseries.Value(1) * aTimeseries.Value(1))) * (lCount - 1)
-                    lSum3 = (lSum3 - (aTimeseries.Value(lLastValueIndex) * aTimeseries.Value(lLastValueIndex))) * (lCount - 1)
-                    lSum2 = lSum - aTimeseries.Value(1)
-                    lSum1 = lSum - aTimeseries.Value(lLastValueIndex)
-                    lSum1 = lSum1 * lSum1
-                    lSum2 = lSum2 * lSum2
-                    lSum3 = (lSum3 - lSum1) * (lSum4 - lSum2)
-                    lSum3 = Math.Sqrt(lSum3)
-                    lScc = lScc / lSum3
-                    aTimeseries.Attributes.SetValue("Serial Correlation Coefficient", lScc)
-                    ReDim lX(0)
-                    lX = Nothing
                 End If
             End If
         End If
     End Sub
 
-    'The only element of aArgs is an atcDataGroup or atcTimeseries
-    'The attribute(s) will be set to the result(s) of calculation(s)
+    Private Sub ComputeSCC(aTimeseries As atcTimeseries)
+        Dim lCount As Double = aTimeseries.Attributes.GetValue("Count")
+        If lCount > 1 Then
+            Dim lSum As Double = aTimeseries.Attributes.GetValue("Sum", pNaN)
+            If Not Double.IsNaN(lSum) Then
+                Dim lLastValueIndex As Integer = aTimeseries.numValues
+                Dim lIndex As Integer
+                Dim lVal As Double
+                Dim lSum1 As Double = 0
+                Dim lSum2 As Double = 0
+                Dim lSum3 As Double = 0
+                Dim lSum4 As Double = 0
+                Dim lValPl1 As Double
+                Dim lFirst As Integer = 1
+                Dim lX(lLastValueIndex) As Double
+
+                While Double.IsNaN(aTimeseries.Value(lFirst))
+                    lFirst += 1
+                End While
+                lVal = aTimeseries.Value(lFirst)
+                For lIndex = lFirst + 1 To lLastValueIndex
+                    lValPl1 = aTimeseries.Value(lIndex)
+                    If Not Double.IsNaN(lValPl1) Then
+                        lX(lIndex) = lVal * lValPl1
+                        lSum3 += lX(lIndex)
+                        lVal = lValPl1
+                    End If
+                Next
+                Dim lScc As Double = (lSum - aTimeseries.Value(lLastValueIndex)) * (lSum - aTimeseries.Value(1))
+                lScc = ((lCount - 1) * lSum3) - lScc
+                lSum3 = 0
+                For lIndex = 1 To lLastValueIndex
+                    lVal = aTimeseries.Value(lIndex)
+                    If Not Double.IsNaN(lVal) Then
+                        lX(lIndex) = lVal * lVal
+                        lSum3 += lX(lIndex)
+                    End If
+                Next
+                lSum4 = (lSum3 - (aTimeseries.Value(1) * aTimeseries.Value(1))) * (lCount - 1)
+                lSum3 = (lSum3 - (aTimeseries.Value(lLastValueIndex) * aTimeseries.Value(lLastValueIndex))) * (lCount - 1)
+                lSum2 = lSum - aTimeseries.Value(1)
+                lSum1 = lSum - aTimeseries.Value(lLastValueIndex)
+                lSum1 = lSum1 * lSum1
+                lSum2 = lSum2 * lSum2
+                lSum3 = (lSum3 - lSum1) * (lSum4 - lSum2)
+                lSum3 = Math.Sqrt(lSum3)
+                lScc = lScc / lSum3
+                aTimeseries.Attributes.SetValue("Serial Correlation Coefficient", lScc)
+            End If
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Compute the specified operation and set its value in the Attributes of the specified datasets
+    ''' </summary>
+    ''' <param name="aOperationName">Operation requested</param>
+    ''' <param name="aArgs">atcTimeseries or atcDataGroup to compute aOperationName on</param>
+    ''' <returns>True if some computation was done, False if no operation or datasets were specified</returns>
+    ''' <remarks>For most operations, several other attributes are also computed: see ComputeStatistics</remarks>
     Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-        Dim ltsGroup As atcTimeseriesGroup = Nothing
-        If aArgs Is Nothing Then
+        If aOperationName IsNot Nothing Then
+            Dim lOperationName As String = aOperationName.ToLowerInvariant()
+            Dim ltsGroup As atcTimeseriesGroup = Nothing
+            If aArgs Is Nothing Then
 #If BatchMode Then
 #Else
-            ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
+                ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
 #End If
-        Else
-            ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
+            Else
+                ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
+            End If
+            If ltsGroup IsNot Nothing Then
+                For Each lts As atcTimeseries In ltsGroup
+                    Select Case lOperationName
+                        Case "bins"
+                            lts.Attributes.SetValue("Bins", MakeBins(lts))
+                        Case "sjday"
+                            lts.Attributes.SetValue("SJDay", lts.Dates.FirstNumeric)
+                        Case "ejday"
+                            lts.Attributes.SetValue("EJDay", lts.Dates.Value(lts.numValues))
+                        Case "last"
+                            lts.Attributes.SetValue("Last", lts.Value(lts.numValues))
+                        Case "serial correlation coefficient"
+                            ComputeSCC(lts)
+                        Case Else
+                            If lOperationName.StartsWith("%sum") AndAlso IsNumeric(lOperationName.Substring(4)) Then
+                                ComputePercentileSum(lts, CDbl(lOperationName.Substring(4)))
+                            ElseIf lOperationName.StartsWith("%") Then
+                                Dim lPercentString As String = lOperationName.Substring(1)
+                                If IsNumeric(lPercentString) Then
+                                    ComputePercentile(lts, CDbl(lPercentString))
+                                End If
+                            Else
+                                ComputeStatistics(lts)
+                            End If
+                    End Select
+                Next
+                Return True
+            End If
         End If
-        If Not ltsGroup Is Nothing Then
-            For Each lts As atcTimeseries In ltsGroup
-                If aOperationName.ToLower.StartsWith("%sum") AndAlso IsNumeric(aOperationName.Substring(4)) Then
-                    ComputePercentileSum(lts, CDbl(aOperationName.Substring(4)))
-                ElseIf aOperationName.StartsWith("%") Then
-                    Dim lPercentString As String = aOperationName.Substring(1)
-                    If IsNumeric(lPercentString) Then
-                        ComputePercentile(lts, CDbl(lPercentString))
-                    End If
-                ElseIf aOperationName.ToLower.Equals("bins") Then
-                    lts.Attributes.SetValue("Bins", MakeBins(lts))
-                Else
-                    ComputeStatistics(lts)
-                End If
-            Next
-        End If
+        Return False
     End Function
 
 #If GISProvider = "DotSpatial" Then
