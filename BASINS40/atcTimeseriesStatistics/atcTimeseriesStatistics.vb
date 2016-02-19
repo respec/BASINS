@@ -440,44 +440,42 @@ Public Class atcTimeseriesStatistics
     Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
         If aOperationName IsNot Nothing Then
             Dim lOperationName As String = aOperationName.ToLowerInvariant()
-            Dim ltsGroup As atcTimeseriesGroup = Nothing
-            If aArgs Is Nothing Then
+            Dim ltsGroup As atcTimeseriesGroup = TimeseriesGroupFromArguments(aArgs)
 #If BatchMode Then
 #Else
+            If ltsGroup Is Nothing OrElse ltsGroup.Count < 1 Then
                 ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
+            End If
 #End If
-            Else
-                ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
-            End If
-            If ltsGroup IsNot Nothing Then
-                For Each lts As atcTimeseries In ltsGroup
-                    Select Case lOperationName
-                        Case "bins"
-                            lts.Attributes.SetValue("Bins", MakeBins(lts))
-                        Case "sjday"
-                            lts.Attributes.SetValue("SJDay", lts.Dates.FirstNumeric)
-                        Case "ejday"
-                            lts.Attributes.SetValue("EJDay", lts.Dates.Value(lts.numValues))
-                        Case "last"
-                            lts.Attributes.SetValue("Last", lts.Value(lts.numValues))
-                        Case "serial correlation coefficient"
-                            ComputeSCC(lts)
-                        Case Else
-                            If lOperationName.StartsWith("%sum") AndAlso IsNumeric(lOperationName.Substring(4)) Then
-                                ComputePercentileSum(lts, CDbl(lOperationName.Substring(4)))
-                            ElseIf lOperationName.StartsWith("%") Then
-                                Dim lPercentString As String = lOperationName.Substring(1)
-                                If IsNumeric(lPercentString) Then
-                                    ComputePercentile(lts, CDbl(lPercentString))
-                                End If
-                            Else
-                                ComputeStatistics(lts)
+        If ltsGroup IsNot Nothing AndAlso ltsGroup.Count > 0 Then
+            For Each lts As atcTimeseries In ltsGroup
+                Select Case lOperationName
+                    Case "bins"
+                        lts.Attributes.SetValue("Bins", MakeBins(lts))
+                    Case "sjday"
+                        lts.Attributes.SetValue("SJDay", lts.Dates.FirstNumeric)
+                    Case "ejday"
+                        lts.Attributes.SetValue("EJDay", lts.Dates.Value(lts.numValues))
+                    Case "last"
+                        lts.Attributes.SetValue("Last", lts.Value(lts.numValues))
+                    Case "serial correlation coefficient"
+                        ComputeSCC(lts)
+                    Case Else
+                        If lOperationName.StartsWith("%sum") AndAlso IsNumeric(lOperationName.Substring(4)) Then
+                            ComputePercentileSum(lts, CDbl(lOperationName.Substring(4)))
+                        ElseIf lOperationName.StartsWith("%") Then
+                            Dim lPercentString As String = lOperationName.Substring(1)
+                            If IsNumeric(lPercentString) Then
+                                ComputePercentile(lts, CDbl(lPercentString))
                             End If
-                    End Select
-                Next
-                Return True
-            End If
+                        Else
+                            ComputeStatistics(lts)
+                        End If
+                End Select
+            Next
+            Return True
         End If
+            End If
         Return False
     End Function
 

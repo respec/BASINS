@@ -44,11 +44,8 @@ Public Class atcSeasonPlugin
     Public Overrides Function Open(ByVal aOperationName As String, _
                           Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
         Dim lSeasonName As String = ""
-        Dim lTimeSeriesGroup As atcTimeseriesGroup = Nothing
+        Dim lTimeSeriesGroup As atcTimeseriesGroup = TimeseriesGroupFromArguments(aArgs)
         MyBase.DataSets.Clear()
-        If aArgs IsNot Nothing Then
-            lTimeSeriesGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
-        End If
         If lTimeSeriesGroup Is Nothing Then
             lTimeSeriesGroup = atcDataManager.UserSelectData("Select data for " & aOperationName)
         End If
