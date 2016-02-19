@@ -45,7 +45,7 @@ Public Class atcEventPlugin
         Dim lExtreme As Double
 
         If Not aArgs Is Nothing Then
-            ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
+            ltsGroup = TimeseriesGroupFromArguments(aArgs)
             lThresh = aArgs.GetValue("Threshold", lThresh)
             lDaysGapAllowed = aArgs.GetValue("DaysGapAllowed", 0)
             lHigh = aArgs.GetValue("High", True)

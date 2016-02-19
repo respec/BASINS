@@ -589,15 +589,31 @@ Public Module modTimeseriesMath
         Next
     End Sub
 
+    Public Function TimeseriesGroupFromArguments(ByVal aArgs As atcDataAttributes) As atcDataGroup
+        Dim ltsGroup As atcDataGroup = Nothing
+        If aArgs IsNot Nothing Then
+            ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
+            If ltsGroup Is Nothing OrElse ltsGroup.Count < 1 Then
+                ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("OneOrMoreTimeseries"))
+            End If
+        End If
+        Return ltsGroup
+    End Function
+
     Public Function DatasetOrGroupToGroup(ByVal aObject As Object) As atcDataGroup
-        Select Case aObject.GetType.Name
-            Case "atcDataGroup", "atcTimeseriesGroup" : Return aObject
-            Case "atcTimeseries" : Return New atcTimeseriesGroup(CType(aObject, atcTimeseries))
-            Case "atcDataSet" : Return New atcDataGroup(aObject)
-            Case Else
-                Logger.Dbg("DatasetOrGroupToGroup: Unrecognized type '" & aObject.GetType.Name & "'")
-                Return Nothing
-        End Select
+        If IsNothing(aObject) Then
+            Logger.Dbg("DatasetOrGroupToGroup = Nothing")
+            Return Nothing
+        Else
+            Select Case aObject.GetType.Name
+                Case "atcDataGroup", "atcTimeseriesGroup" : Return aObject
+                Case "atcTimeseries" : Return New atcTimeseriesGroup(CType(aObject, atcTimeseries))
+                Case "atcDataSet" : Return New atcDataGroup(aObject)
+                Case Else
+                    Logger.Dbg("DatasetOrGroupToGroup: Unrecognized type '" & aObject.GetType.Name & "'")
+                    Return Nothing
+            End Select
+        End If
     End Function
 
     ''' <summary>Fill values in constant interval timeseries with specified values.</summary>
@@ -1579,13 +1595,9 @@ Finished:
             End If
         End If
 
-        Dim lTSgroup As atcTimeseriesGroup
-        lTSgroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries", Nothing))
+        Dim lTSgroup As atcTimeseriesGroup = TimeseriesGroupFromArguments(aArgs)
         If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
-            lTSgroup = DatasetOrGroupToGroup(aArgs.GetValue("OneOrMoreTimeseries", Nothing))
-            If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
-                Throw New ApplicationException(aOperationName & " did not get a Timeseries argument")
-            End If
+            Throw New ApplicationException(aOperationName & " did not get a Timeseries argument")
         End If
 
         Dim lTSFirst As atcTimeseries = lTSgroup.Item(0)

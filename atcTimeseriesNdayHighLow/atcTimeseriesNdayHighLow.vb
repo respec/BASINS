@@ -659,7 +659,7 @@ Public Class atcTimeseriesNdayHighLow
                 End If
             End If
         Else
-            ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
+            ltsGroup = TimeseriesGroupFromArguments(aArgs)
             lLogFlg = aArgs.GetValue("LogFlg", lLogFlg)
             lNDay = aArgs.GetValue("NDay", lNDay)
             lReturn = aArgs.GetValue("Return Period", lReturn)
@@ -680,7 +680,7 @@ Public Class atcTimeseriesNdayHighLow
             If aArgs.ContainsAttribute("Attribute") Then lAttributeDef = atcData.atcDataAttributes.GetDefinition(aArgs.GetValue("Attribute"), False)
         End If
 
-        If ltsGroup Is Nothing Then
+        If ltsGroup Is Nothing OrElse ltsGroup.Count < 1 Then
             ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
         End If
 
