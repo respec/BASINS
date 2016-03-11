@@ -110,7 +110,7 @@ Public Module modStat
             Logger.Msg("lLimit is nothing")
         End If
 
-        lStr &= vbCrLf & CompareStats(lTSer1, lTSer2, lLimit)
+        lStr &= vbCrLf & CompareStats(lTSer2, lTSer1, lLimit)
 
         lTSer1.Clear()
         lTSer1.Dates.Clear()
@@ -259,8 +259,8 @@ Public Module modStat
     ''' <summary>
     ''' Compare stats for DS1 (or the observed data) and DS2 (or the simulated data)
     ''' </summary>
-    Public Function CompareStats(ByVal aTSer1 As atcTimeseries, _
-                                 ByVal aTSer2 As atcTimeseries, _
+    Public Function CompareStats(ByVal aTSerObs As atcTimeseries, _
+                                 ByVal aTSerSim As atcTimeseries, _
                         Optional ByVal aClassLimits As Generic.List(Of Double) = Nothing) As String
         Dim lStr As String = ""
         Dim lStrBuilder As New Text.StringBuilder
@@ -270,8 +270,8 @@ Public Module modStat
         Dim lMeanSMO2M1 As Double = 0.0#
         Dim lRmsError As Double = 0.0#
         Dim lValDiff As Double
-        Dim lVal1 As Double
-        Dim lVal2 As Double
+        Dim lValObs As Double
+        Dim lValSim As Double
         Dim lSkipCount As Integer = 0
         Dim lGoodCount As Integer = 0
 
@@ -299,72 +299,69 @@ Public Module modStat
         Dim lClassLimits As Generic.List(Of Double) = aClassLimits
         For lClassLimitsIndex As Integer = 0 To lClassLimits.Count - 1
             lClassLimits(lClassLimitsIndex) = SignificantDigits(lClassLimits(lClassLimitsIndex), 4)
+            lClassBucket = New ClassBucket(lClassLimits(lClassLimitsIndex))
+            lClassBucket.setErrInt(lErrInt)
+            lClassBuckets.Add(lClassLimits(lClassLimitsIndex), lClassBucket)
         Next
 
         Dim lTimeStep As Double = 1
-        If aTSer1.numValues > 1 Then
-            lTimeStep = aTSer1.Dates.Value(2) - aTSer1.Dates.Value(1)
+        If aTSerObs.numValues > 1 Then
+            lTimeStep = aTSerObs.Dates.Value(2) - aTSerObs.Dates.Value(1)
         End If
         Dim lIndex2 As Integer = 1
 
         Dim lNeedToMatchDates As Boolean = False
-        If aTSer1.Attributes.GetValue("Start Date") <> aTSer2.Attributes.GetValue("Start Date") OrElse _
-           aTSer1.Attributes.GetValue("End Date") <> aTSer2.Attributes.GetValue("End Date") Then
+        If aTSerObs.Attributes.GetValue("Start Date") <> aTSerSim.Attributes.GetValue("Start Date") OrElse _
+           aTSerObs.Attributes.GetValue("End Date") <> aTSerSim.Attributes.GetValue("End Date") Then
             lNeedToMatchDates = True
-        ElseIf aTSer1.Attributes.GetFormattedValue("Point") <> aTSer2.Attributes.GetFormattedValue("Point") Then
+        ElseIf aTSerObs.Attributes.GetFormattedValue("Point") <> aTSerSim.Attributes.GetFormattedValue("Point") Then
             lNeedToMatchDates = True
         End If
 
-        Dim lTS1Values As New List(Of Double)
-        Dim lTS2Values As New List(Of Double)
+        Dim lTSObsValues As New List(Of Double)
+        Dim lTSSimValues As New List(Of Double)
 
-        For lIndex As Integer = 1 To aTSer1.numValues
-            lVal1 = aTSer1.Values(lIndex)
+        For lIndex As Integer = 1 To aTSerObs.numValues
+            lValObs = aTSerObs.Values(lIndex)
             If lNeedToMatchDates Then
-                lIndex2 = atcData.FindDateAtOrAfter(aTSer2.Dates.Values, aTSer1.Dates.Value(lIndex), lIndex2)
-                If lIndex2 < 1 OrElse lIndex2 > aTSer2.numValues Then
+                lIndex2 = atcData.FindDateAtOrAfter(aTSerSim.Dates.Values, aTSerObs.Dates.Value(lIndex), lIndex2)
+                If lIndex2 < 1 OrElse lIndex2 > aTSerSim.numValues Then
                     Logger.Dbg("CompareStats: matching value not found at " & lIndex)
                     Continue For
-                ElseIf aTSer1.Dates.Value(lIndex) - aTSer2.Dates.Value(lIndex2) > lTimeStep Then
+                ElseIf aTSerObs.Dates.Value(lIndex) - aTSerSim.Dates.Value(lIndex2) > lTimeStep Then
                     Logger.Dbg("CompareStats: matching value found at " & lIndex2 & " is too far from date at " & lIndex)
                     Continue For
                 End If
-                lVal2 = aTSer2.Value(lIndex2)
+                lValSim = aTSerSim.Value(lIndex2)
             Else
-                lVal2 = aTSer2.Value(lIndex)
+                lValSim = aTSerSim.Value(lIndex)
             End If
 
-            lVal1 = SignificantDigits(lVal1, 4)
-            lVal2 = SignificantDigits(lVal2, 4)
-            If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
-                lTS1Values.Add(lVal1)
-                lTS2Values.Add(lVal2)
+            lValObs = SignificantDigits(lValObs, 4)  'Observed Value
+            lValSim = SignificantDigits(lValSim, 4)  'Simulated Value
+            If Not Double.IsNaN(lValObs) And Not Double.IsNaN(lValSim) Then
+                lTSObsValues.Add(lValObs) 'Observed
+                lTSSimValues.Add(lValSim) 'Simulated
 
-                lValDiff = lVal1 - lVal2
+                lValDiff = lValSim - lValObs 'Simulated-Observed
                 lMeanError += lValDiff
-                lMeanSMO2M1 += lVal2 - lVal1
+                lMeanSMO2M1 += lValSim - lValObs
                 lMeanAbsoluteError += Math.Abs(lValDiff)
                 lRmsError += lValDiff * lValDiff
                 lGoodCount += 1
                 lClassLimit = lClassLimits(0)
                 For Each lLimit As Double In lClassLimits
-                    If lLimit > lVal1 Then Exit For
+                    If lLimit > lValObs Then Exit For
                     lClassLimit = lLimit
                 Next
 
-                If lClassBuckets.Keys.Contains(lClassLimit) Then
-                    lClassBucket = lClassBuckets.ItemByKey(lClassLimit)
-                Else
-                    lClassBucket = New ClassBucket(lClassLimit)
-                    lClassBucket.setErrInt(lErrInt)
-                    lClassBuckets.Add(lClassLimit, lClassBucket)
-                End If
-                lClassBucket.Increment(lVal1, lVal2)
-                lClassBucket.IncrementErr(lVal1, lVal2, lClassLimit)
+                lClassBucket = lClassBuckets.ItemByKey(lClassLimit)
+                lClassBucket.Increment(lValObs, lValSim)
+                lClassBucket.IncrementErr(lValObs, lValSim, lClassLimit)
 
                 lClassLimit = lClassLimits(0)
                 For Each lLimit As Double In lClassLimits
-                    If lLimit > lVal2 Then Exit For
+                    If lLimit > lValSim Then Exit For
                     lClassLimit = lLimit
                 Next
                 If lClassBuckets.Keys.Contains(lClassLimit) Then
@@ -375,7 +372,7 @@ Public Module modStat
                     lClassBuckets.Add(lClassLimit, lClassBucket)
                 End If
                 lClassBucket.Count2 += 1
-                lClassBucket.Total2 += lVal2
+                lClassBucket.Total2 += lValSim
             Else
                 lSkipCount += 1
                 If lSkipCount = 1 Then
@@ -384,33 +381,41 @@ Public Module modStat
             End If
         Next
         '
-        'When all values are screened once, devide the count into the sum of differences
+        'When all values are screened once, divide the count into the sum of differences
         '
         Dim lTPDIF As Double
         Dim lTPDIF2 As Double
         Dim lTPBias As Double
         Dim lTSUMA As Double
         Dim lTSUMB As Double
+        Dim lEmptyBuckets As New List(Of ClassBucket)
         For Each lClassBucket In lClassBuckets
             With lClassBucket
-                lTPDIF += .TotalDifferencePCT
-                lTPDIF2 += .TotalSSPCT ' has to be put here to have the correct sum
-                lTPBias += .TotalBiasPCT
-                lTSUMA += .Total1
-                lTSUMB += .Total2
-                .TotalDifference /= .Count1
-                .TotalSS /= .Count1
-                .TotalSS = Math.Pow(.TotalSS, 0.5)
-                .TotalBias /= .Count1
-                .TotalDifferencePCT /= .Count1
-                .TotalDifferencePCT *= 100
-                .TotalSSPCT /= .Count1
-                .TotalSSPCT = Math.Sqrt(.TotalSSPCT)
-                .TotalSSPCT *= 100
-                .TotalBiasPCT /= .Count1
-                .TotalBiasPCT *= 100
-
+                If lClassBucket.Count1 = 0 Then
+                    lEmptyBuckets.Add(lClassBucket)
+                Else
+                    lTPDIF += .TotalDifferencePCT
+                    lTPDIF2 += .TotalSSPCT ' has to be put here to have the correct sum
+                    lTPBias += .TotalBiasPCT
+                    lTSUMA += .Total1
+                    lTSUMB += .Total2
+                    .TotalDifference /= .Count1
+                    .TotalSS /= .Count1
+                    .TotalSS = Math.Pow(.TotalSS, 0.5)
+                    .TotalBias /= .Count1
+                    .TotalDifferencePCT /= .Count1
+                    .TotalDifferencePCT *= 100
+                    .TotalSSPCT /= .Count1
+                    .TotalSSPCT = Math.Sqrt(.TotalSSPCT)
+                    .TotalSSPCT *= 100
+                    .TotalBiasPCT /= .Count1
+                    .TotalBiasPCT *= 100
+                End If
             End With
+        Next
+
+        For Each lClassBucket In lEmptyBuckets
+            lClassBuckets.Remove(lClassBucket)
         Next
 
         If lNote.Length > 0 Then
@@ -431,8 +436,8 @@ Public Module modStat
         Dim lCorrelationCoefficient As Double = 0.0#
         Dim lNashSutcliffe As Double = 0.0#
 
-        Dim lMean1 As Double = 0.0
-        Dim lMean2 As Double = 0.0
+        Dim lMeanObs As Double = 0.0
+        Dim lMeanSim As Double = 0.0
 
         If lNeedToMatchDates Then
             Dim lOverallTotal1 As Double = 0.0
@@ -442,34 +447,34 @@ Public Module modStat
                 lOverallTotal1 += lClassBucket.Total1
                 lOverallTotal2 += lClassBucket.Total2
             Next
-            lMean1 = lOverallTotal1 / lGoodCount
-            lMean2 = lOverallTotal2 / lGoodCount
+            lMeanObs = lOverallTotal1 / lGoodCount
+            lMeanSim = lOverallTotal2 / lGoodCount
         Else
-            lMean1 = aTSer1.Attributes.GetValue("Mean")
-            lMean2 = aTSer2.Attributes.GetValue("Mean")
+            lMeanObs = aTSerObs.Attributes.GetValue("Mean") 'Observed
+            lMeanSim = aTSerSim.Attributes.GetValue("Mean") 'Simulated
         End If
 
         lIndex2 = 1
-        For lIndex As Integer = 1 To aTSer1.numValues
-            lVal1 = aTSer1.Values(lIndex)
+        For lIndex As Integer = 1 To aTSerObs.numValues
+            lValObs = aTSerObs.Values(lIndex) 'Observed
 
             If lNeedToMatchDates Then
-                lIndex2 = atcData.FindDateAtOrAfter(aTSer2.Dates.Values, aTSer1.Dates.Value(lIndex), lIndex2)
-                If lIndex2 < 1 OrElse lIndex2 > aTSer2.numValues Then
+                lIndex2 = atcData.FindDateAtOrAfter(aTSerSim.Dates.Values, aTSerObs.Dates.Value(lIndex), lIndex2)
+                If lIndex2 < 1 OrElse lIndex2 > aTSerSim.numValues Then
                     Logger.Dbg("CompareStats:Corr.Coef.: matching value not found at " & lIndex)
                     Continue For
-                ElseIf aTSer1.Dates.Value(lIndex) - aTSer2.Dates.Value(lIndex2) > lTimeStep Then
+                ElseIf aTSerObs.Dates.Value(lIndex) - aTSerSim.Dates.Value(lIndex2) > lTimeStep Then
                     Logger.Dbg("CompareStats:Corr.Coef.: matching value found at " & lIndex2 & " is too far from date at " & lIndex)
                     Continue For
                 End If
-                lVal2 = aTSer2.Value(lIndex2)
+                lValSim = aTSerSim.Value(lIndex2) 'Simulated
             Else
-                lVal2 = aTSer2.Value(lIndex)
+                lValSim = aTSerSim.Value(lIndex) 'Simulated
             End If
 
-            If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
-                lCorrelationCoefficient += (lVal1 - lMean1) * (lVal2 - lMean2)
-                lNashSutcliffe += (lVal2 - lMean2) ^ 2
+            If Not Double.IsNaN(lValObs) And Not Double.IsNaN(lValSim) Then
+                lCorrelationCoefficient += (lValObs - lMeanObs) * (lValSim - lMeanSim)
+                lNashSutcliffe += (lValObs - lMeanObs) ^ 2
             End If
         Next
         'lCorrelationCoefficient /= (aTSer1.numValues - 1)
@@ -477,117 +482,144 @@ Public Module modStat
 
         Dim lSD1 As Double = 0.0
         Dim lSD2 As Double = 0.0
+        Dim RSR As Double = 0.0
+        Dim PBIAS As Double = 0.0
         If lNeedToMatchDates Then
-            lSD1 = StandardDeviation(lTS1Values.ToArray, lMean1)
-            lSD2 = StandardDeviation(lTS2Values.ToArray, lMean2)
+            lSD1 = StandardDeviation(lTSObsValues.ToArray, lMeanObs)
+            lSD2 = StandardDeviation(lTSSimValues.ToArray, lMeanSim)
         Else
-            lSD1 = aTSer1.Attributes.GetValue("Standard Deviation")
-            lSD2 = aTSer2.Attributes.GetValue("Standard Deviation")
+            lSD1 = aTSerObs.Attributes.GetValue("Standard Deviation") 'Observed
+            lSD2 = aTSerSim.Attributes.GetValue("Standard Deviation") 'Simulated
         End If
         If Math.Abs(lSD1 * lSD2) > 0.0001 Then
             lCorrelationCoefficient /= (lSD1 * lSD2)
         End If
+        Logger.Dbg("value of Nashutcliffe Denominator is ", lNashSutcliffe)
+        RSR = lRmsError / lSD1
         If lNashSutcliffe > 0 Then
             lNashSutcliffe = lNashSutcliffeNumerator / lNashSutcliffe
         End If
 
-        lStrBuilder.Append(SWStatDisclaimer) 'Add Message Here
-        lStrBuilder.AppendLine("1")
-        lStrBuilder.AppendLine("Note: TS, Time Series")
+        PBIAS = lMeanError * 100 / lMeanObs
+
+        'lStrBuilder.AppendLine("1")
+        'lStrBuilder.AppendLine("Note: TS, Time Series")
+        'lStrBuilder.AppendLine()
+        'If aTSerObs.Attributes("TUUnit)
+        If aTSerObs.Attributes.GetValue("Time Unit").ToString = "TUYear" Then
+            lStrBuilder.AppendLine("The following statistics are only useful if the simulation period spans multiple years ")
+            lStrBuilder.AppendLine("(generally greater than a decade) with significant hydrologic variation.")
+            lStrBuilder.AppendLine()
+        End If
+        Dim lUnits As String = ""
+        If aTSerSim.Attributes.GetValue("Units").ToString.Contains("inches") Then
+            lUnits = "(in)"
+        ElseIf aTSerSim.Attributes.GetValue("Units").ToString.Contains("cfs") Then
+            lUnits = "(cfs)"
+        End If
+        lStrBuilder.AppendLine("Correlation Coefficient".PadLeft(48) & DecimalAlign(lCorrelationCoefficient, 18))
+        lStrBuilder.AppendLine("Coefficient of Determination".PadLeft(48) & DecimalAlign(lCorrelationCoefficient ^ 2, 18))
+        lStrBuilder.AppendLine(("Mean Error " & lUnits).PadLeft(48) & DecimalAlign(lMeanError, 18))
+        lStrBuilder.AppendLine("PBIAS/Mean Percent Error (%)*".PadLeft(48) & DecimalAlign(PBIAS, 18))
+        lStrBuilder.AppendLine(("Mean Absolute Error " & lUnits).PadLeft(48) & DecimalAlign(lMeanAbsoluteError, 18))
+        lStrBuilder.AppendLine(("RMS Error " & lUnits).PadLeft(48) & DecimalAlign(lRmsError, 18))
+        lStrBuilder.AppendLine("Nash-Sutcliffe Efficiency".PadLeft(48) & DecimalAlign(1 - lNashSutcliffe, 18))
+
+        lStrBuilder.AppendLine("RMSE-observations standard deviation ratio**".PadLeft(48) & DecimalAlign(RSR, 18))
         lStrBuilder.AppendLine()
-        lStrBuilder.AppendLine("Correlation Coefficient".PadLeft(36) & DecimalAlign(lCorrelationCoefficient, 18))
-        lStrBuilder.AppendLine("Coefficient of Determination".PadLeft(36) & DecimalAlign(lCorrelationCoefficient ^ 2, 18))
-        lStrBuilder.AppendLine("Mean Error".PadLeft(36) & DecimalAlign(lMeanError, 18))
-        lStrBuilder.AppendLine("Mean Absolute Error".PadLeft(36) & DecimalAlign(lMeanAbsoluteError, 18))
-        lStrBuilder.AppendLine("RMS Error".PadLeft(36) & DecimalAlign(lRmsError, 18))
-        lStrBuilder.AppendLine("Model Fit Efficiency".PadLeft(36) & DecimalAlign(1 - lNashSutcliffe, 18))
+        lStrBuilder.AppendLine("*Positive PBIAS indicates oversimulation and Negative PBIAS indicates undersimulation. Please refer to ")
+        lStrBuilder.AppendLine("1. Lettenmaier, D.P., and E.F. Wood. 1992. Hydrological Forecasting. In Handbook of Hydrology (pp. 26.1-26.30). McGraw-Hill, Inc. ")
+        lStrBuilder.AppendLine("2. Franz., K.J., and T.S. Hogue. 2011. Evaluating uncertainty estimates in hdrologic models: borrowing measures from the ")
+        lStrBuilder.AppendLine("forecast verification community. Hydrology and Earth System Sciences. Vol.15:3367-3382 ")
+        lStrBuilder.AppendLine("**Please refer to Moriasi, D.N., J.G. Arnold, M.W. Van Liew, R.L. Binger, R.D. Harmel, and T.L. Veith. 2007.")
+        lStrBuilder.AppendLine("Model Evaluation Guidelines for Systematic Quantification of Accuracy in Watershed Simulations. Transactions of ASABE. Vol 50(3): 885-900")
         lStrBuilder.AppendLine()
-        lStrBuilder.AppendLine()
-        lStrBuilder.AppendLine()
+
+        'lStrBuilder.AppendLine()
 
         'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
+        lStrBuilder.Append(SWStatDisclaimer) 'Add Message Here
+        'lStrBuilder.AppendLine("Table 1") 'added by Becky to label Table 1
+        'lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSerObs))
+        'lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSerSim))
+        'lStrBuilder.AppendLine()
+        'lStrBuilder.AppendLine("                           Mean               Root mean")
+        'lStrBuilder.AppendLine("   Lower    Number    absolute error(1)     square error(2)        Bias(3)      ")
+        'lStrBuilder.AppendLine("   class      of     ------------------- ------------------- -------------------")
+        'lStrBuilder.AppendLine("   limit     cases   Average    Percent   Average    Percent  Average   Percent ")
+        'lStrBuilder.AppendLine(" --------- --------- --------- --------- --------- --------- --------- ---------")
 
-        lStrBuilder.AppendLine("Table 1") 'added by Becky to label Table 1
-        lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
-        lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
-        lStrBuilder.AppendLine()
-        lStrBuilder.AppendLine("                           Mean               Root mean")
-        lStrBuilder.AppendLine("   Lower    Number    absolute error(1)     square error(2)        Bias(3)      ")
-        lStrBuilder.AppendLine("   class      of     ------------------- ------------------- -------------------")
-        lStrBuilder.AppendLine("   limit     cases   Average    Percent   Average    Percent  Average   Percent ")
-        lStrBuilder.AppendLine(" --------- --------- --------- --------- --------- --------- --------- ---------")
+        'For Each lLimit As Double In lClassLimits
+        '    'lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'lower class limit
+        '    Dim lCount As Integer = 0
+        '    If lClassBuckets.Keys.Contains(lLimit) Then
+        '        lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'lower class limit
+        '        lClassBucket = lClassBuckets.ItemByKey(lLimit)
+        '        With lClassBucket
+        '            lStrBuilder.Append(CStr(.Count1).PadLeft(9).PadRight(10)) ' number of cases
+        '            If Double.IsNaN(.TotalDifference) Then .TotalDifference = 0.0
+        '            If Double.IsNaN(.TotalDifferencePCT) Then .TotalDifferencePCT = 0.0
+        '            If Double.IsNaN(.TotalSS) Then .TotalSS = 0.0
+        '            If Double.IsNaN(.TotalSSPCT) Then .TotalSSPCT = 0.0
+        '            If Double.IsNaN(.TotalBias) Then .TotalBias = 0.0
+        '            If Double.IsNaN(.TotalBiasPCT) Then .TotalBiasPCT = 0.0
 
-        For Each lLimit As Double In lClassLimits
-            'lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'lower class limit
-            Dim lCount As Integer = 0
-            If lClassBuckets.Keys.Contains(lLimit) Then
-                lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'lower class limit
-                lClassBucket = lClassBuckets.ItemByKey(lLimit)
-                With lClassBucket
-                    lStrBuilder.Append(CStr(.Count1).PadLeft(9).PadRight(10)) ' number of cases
-                    If Double.IsNaN(.TotalDifference) Then .TotalDifference = 0.0
-                    If Double.IsNaN(.TotalDifferencePCT) Then .TotalDifferencePCT = 0.0
-                    If Double.IsNaN(.TotalSS) Then .TotalSS = 0.0
-                    If Double.IsNaN(.TotalSSPCT) Then .TotalSSPCT = 0.0
-                    If Double.IsNaN(.TotalBias) Then .TotalBias = 0.0
-                    If Double.IsNaN(.TotalBiasPCT) Then .TotalBiasPCT = 0.0
+        '            lStrBuilder.Append(DoubleToString(.TotalDifference, 10, "0.000").PadLeft(10)) 'mean average
+        '            lStrBuilder.Append(DoubleToString(.TotalDifferencePCT, 10, "0.0").PadLeft(10)) 'mean percent
+        '            lStrBuilder.Append(DoubleToString(.TotalSS, 10, "0.000").PadLeft(10)) 'root mean average
+        '            lStrBuilder.Append(DoubleToString(.TotalSSPCT, 10, "0.0").PadLeft(10)) 'root mean percent
+        '            lStrBuilder.Append(DoubleToString(.TotalBias, 10, "0.000").PadLeft(10)) 'bias average
+        '            lStrBuilder.Append(DoubleToString(.TotalBiasPCT, 10, "0.0").PadLeft(10)) 'bias percent
+        '        End With
+        '        lStrBuilder.AppendLine()
+        '    Else
+        '        Logger.Dbg("No Bucket for " & lLimit)
+        '    End If
+        '    'lStrBuilder.AppendLine()
+        'Next
 
-                    lStrBuilder.Append(DoubleToString(.TotalDifference, 10, "0.000").PadLeft(10)) 'mean average
-                    lStrBuilder.Append(DoubleToString(.TotalDifferencePCT, 10, "0.0").PadLeft(10)) 'mean percent
-                    lStrBuilder.Append(DoubleToString(.TotalSS, 10, "0.000").PadLeft(10)) 'root mean average
-                    lStrBuilder.Append(DoubleToString(.TotalSSPCT, 10, "0.0").PadLeft(10)) 'root mean percent
-                    lStrBuilder.Append(DoubleToString(.TotalBias, 10, "0.000").PadLeft(10)) 'bias average
-                    lStrBuilder.Append(DoubleToString(.TotalBiasPCT, 10, "0.0").PadLeft(10)) 'bias percent
-                End With
-                lStrBuilder.AppendLine()
-            Else
-                Logger.Dbg("No Bucket for " & lLimit)
-            End If
-            'lStrBuilder.AppendLine()
-        Next
+        'lStrBuilder.AppendLine(" --------- --------- --------- --------- --------- --------- --------- ---------")
+        'lStrBuilder.Append(CStr(lGoodCount).PadLeft(19).PadRight(20)) 'total count of values
+        'lStrBuilder.Append(DoubleToString(lMeanAbsoluteError, 10, "0.000").PadLeft(10)) 'mean abs error
+        'lTPDIF *= 100.0
+        'lTPDIF /= lGoodCount
+        'lStrBuilder.Append(DoubleToString(lTPDIF, 10, "0.0").PadLeft(10)) 'Average Percent Difference: TotalDiffPercent/Total#ofObs
+        'lStrBuilder.Append(DoubleToString(lRmsError, 10, "0.000").PadLeft(10)) 'mean rms error
+        ''Logger.Msg("lRmsError = " & CStr(lRmsError))
+        ''Logger.Msg("TPDIF2 = " & CStr(TPDIF2))
+        'lTPDIF2 /= lGoodCount
+        'lTPDIF2 = Math.Sqrt(lTPDIF2)
+        'lTPDIF2 *= 100.0
 
-        lStrBuilder.AppendLine(" --------- --------- --------- --------- --------- --------- --------- ---------")
-        lStrBuilder.Append(CStr(lGoodCount).PadLeft(19).PadRight(20)) 'total count of values
-        lStrBuilder.Append(DoubleToString(lMeanAbsoluteError, 10, "0.000").PadLeft(10)) 'mean abs error
-        lTPDIF *= 100.0
-        lTPDIF /= lGoodCount
-        lStrBuilder.Append(DoubleToString(lTPDIF, 10, "0.0").PadLeft(10)) 'Average Percent Difference: TotalDiffPercent/Total#ofObs
-        lStrBuilder.Append(DoubleToString(lRmsError, 10, "0.000").PadLeft(10)) 'mean rms error
-        'Logger.Msg("lRmsError = " & CStr(lRmsError))
-        'Logger.Msg("TPDIF2 = " & CStr(TPDIF2))
-        lTPDIF2 /= lGoodCount
-        lTPDIF2 = Math.Sqrt(lTPDIF2)
-        lTPDIF2 *= 100.0
+        ''Logger.Msg("TPDIF2 * 100 / lGoodcount = " & CStr(TPDIF2))
+        'lStrBuilder.Append(DoubleToString(lTPDIF2, 10, "0.0").PadLeft(10)) 'Average Percent for Square of Difference: TotalSquareDifference/Total#ofObs
+        ''lStr &= DecimalAlign(Math.Abs(lMeanAbsoluteError), 15)
+        'lStrBuilder.Append(DoubleToString(lMeanSMO2M1, 10, "0.000").PadLeft(10)) 'mean bias
+        'lTPBias *= 100.0
+        'lTPBias /= lGoodCount
+        'lStrBuilder.AppendLine(DoubleToString(lTPBias, 10, "0.0").PadLeft(10)) 'Average Percent Bias: TotalPercentBias/Total#ofObs
+        'lStrBuilder.AppendLine()
+        'Dim STEST As Double
+        'STEST = (lGoodCount / (lGoodCount - 1)) * Math.Sqrt(lRmsError ^ 2 - Math.Abs(lMeanSMO2M1) ^ 2)
+        'lStrBuilder.AppendLine("Standard error of estimate = " & DecimalAlign(STEST, 8, 2)) 'Standard error of estimate
+        'lStrBuilder.AppendLine("         = (n/n-1)*square root*((tot.col.5)**2-(tot.col.7)**2))")
 
-        'Logger.Msg("TPDIF2 * 100 / lGoodcount = " & CStr(TPDIF2))
-        lStrBuilder.Append(DoubleToString(lTPDIF2, 10, "0.0").PadLeft(10)) 'Average Percent for Square of Difference: TotalSquareDifference/Total#ofObs
-        'lStr &= DecimalAlign(Math.Abs(lMeanAbsoluteError), 15)
-        lStrBuilder.Append(DoubleToString(lMeanSMO2M1, 10, "0.000").PadLeft(10)) 'mean bias
-        lTPBias *= 100.0
-        lTPBias /= lGoodCount
-        lStrBuilder.AppendLine(DoubleToString(lTPBias, 10, "0.0").PadLeft(10)) 'Average Percent Bias: TotalPercentBias/Total#ofObs
-        lStrBuilder.AppendLine()
-        Dim STEST As Double
-        STEST = Math.Sqrt(lGoodCount / (lGoodCount - 1) * (lRmsError ^ 2 - Math.Abs(lMeanSMO2M1) ^ 2))
-        lStrBuilder.AppendLine("Standard error of estimate = " & DecimalAlign(STEST, 8, 2)) 'Standard error of estimate
-        lStrBuilder.AppendLine("         = square root((n/n-1)*((tot.col.5)**2-(tot.col.7)**2))")
-
-        lStrBuilder.AppendLine("(1) Average = sum(|TS2-TS1|/n)")
-        lStrBuilder.AppendLine("    Percent = 100 * (sum(|TS2-TS1|/TS1))/n for all TS1 > 0")
-        lStrBuilder.AppendLine("(2) Average = square root(sum((TS2-TS1)**2)/n)")
-        lStrBuilder.AppendLine("    Percent = 100 * square root(sum(((TS2-TS1)/TS1)**2)/n) for all TS1 > 0")
-        lStrBuilder.AppendLine("(3) Average = sum(TS2-TS1)/n")
-        lStrBuilder.AppendLine("    Percent = 100 * sum(((TS2-TS1)/TS1)/n) for all TS1 > 0")
-        lStrBuilder.AppendLine()
-        lStrBuilder.AppendLine()
-        lStrBuilder.AppendLine()
+        'lStrBuilder.AppendLine("(1) Average = sum(|TS2-TS1|/n)")
+        'lStrBuilder.AppendLine("    Percent = 100 * (sum(|TS2-TS1|/TS1))/n for all TS1 > 0")
+        'lStrBuilder.AppendLine("(2) Average = square root(sum((TS2-TS1)**2)/n)")
+        'lStrBuilder.AppendLine("    Percent = 100 * square root(sum(((TS2-TS1)/TS1)**2)/n) for all TS1 > 0")
+        'lStrBuilder.AppendLine("(3) Average = sum(TS2-TS1)/n")
+        'lStrBuilder.AppendLine("    Percent = 100 * sum(((TS2-TS1)/TS1)) for all TS1 > 0")
+        'lStrBuilder.AppendLine()
+        'lStrBuilder.AppendLine()
+        'lStrBuilder.AppendLine()
 
         'Table nubmer 2
 
-        lStrBuilder.AppendLine("1") 'Add Message Here, perhaps no need as disclaimer is added for table 1 above
+        'lStrBuilder.AppendLine("1") 'Add Message Here, perhaps no need as disclaimer is added for table 1 above
         lStrBuilder.AppendLine("Table 2")
-        lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
-        lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
+        lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSerObs))
+        lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSerSim))
         lStrBuilder.AppendLine()
 
         lStrBuilder.AppendLine("         Cases equal or exceeding lower")
@@ -662,8 +694,8 @@ Public Module modStat
         Dim lEdIndex As Integer
         lStrBuilder.AppendLine("1") 'Add Message Here, perhaps no need as disclaimer is added for table 1 above
         lStrBuilder.AppendLine("Table 3") 'added by Becky to label Table 3
-        lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
-        lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
+        lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSerObs))
+        lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSerSim))
         lStrBuilder.AppendLine()
         lStrBuilder.AppendLine("   Lower         Number of occurrences between indicated deviations    ")
         lStrBuilder.AppendLine("   class    -------------------------------------------------------------")
@@ -729,8 +761,8 @@ Public Module modStat
             Try
                 Dim lNonExceedPercent As Double = 100 - lExceedPercent
                 Dim lNonExceedPercentString As String = (lNonExceedPercent).ToString.PadLeft(2, "0")
-                Dim lNonExceedValue1 As Double = aTSer1.Attributes.GetValue("%" & lNonExceedPercentString)
-                Dim lNonExceedValue2 As Double = aTSer2.Attributes.GetValue("%" & lNonExceedPercentString)
+                Dim lNonExceedValue1 As Double = aTSerObs.Attributes.GetValue("%" & lNonExceedPercentString)
+                Dim lNonExceedValue2 As Double = aTSerSim.Attributes.GetValue("%" & lNonExceedPercentString)
                 lStrBuilder.Append(DoubleToString(lNonExceedValue1, 10, "0.0").PadLeft(10))
                 lStrBuilder.Append(DoubleToString(lNonExceedValue2, 10, "0.0").PadLeft(10))
                 lStrBuilder.AppendLine(lExceedPercent.ToString.PadLeft(6))
