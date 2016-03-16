@@ -9,6 +9,34 @@ Public Module modMetData
     Private pMaxValue As Double = GetMaxValue()
     Private Const pEpsilon As Double = 0.000000001
 
+    Private Triang(,) As Double = { _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.1, 0.11}, _
+      {0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.08, 0.09, 0.45, 0.55}, _
+      {0, 0, 0, 0, 0, 0.01, 0.01, 0.06, 0.07, 0.28, 0.36, 1.2, 1.65}, _
+      {0, 0, 0, 0.01, 0.01, 0.04, 0.05, 0.15, 0.21, 0.56, 0.84, 2.1, 3.3}, _
+      {0, 0.01, 0.01, 0.02, 0.03, 0.06, 0.1, 0.2, 0.35, 0.7, 1.26, 2.52, 4.62}, _
+      {0, 0, 0.01, 0.01, 0.03, 0.04, 0.1, 0.15, 0.35, 0.56, 1.26, 2.1, 4.62}, _
+      {0, 0, 0, 0, 0.01, 0.01, 0.05, 0.06, 0.21, 0.28, 0.84, 1.2, 3.3}, _
+      {0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.07, 0.08, 0.36, 0.45, 1.65}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.09, 0.1, 0.55}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.11}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
+    Private Sums() As Double = {0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12, 10.24, 20.48}
+
     'Use for filling DAILY timeseries
     'Fill missing values in timeseries aTS2Fill with values from nearby timeseries (aTSAvail).
     'Use Obs Time timeseries aTS2FillOT and aTSAvaillOT to determine 
@@ -512,9 +540,11 @@ Public Module modMetData
 
         Dim lAvailableRanked As Boolean = False
         Dim lModifierAttributeName As String = ""
+        Dim lUseTriagDistribution As Boolean = False
         If aArgs IsNot Nothing Then
             lAvailableRanked = aArgs.GetValue("AvailableRanked", False)
             lModifierAttributeName = aArgs.GetValue("ModifierAttributeName", "")
+            lUseTriagDistribution = aArgs.GetValue("UseTriagDistribution", False)
         End If
 
         If lTol > 1 Then 'passed in as percentage
@@ -535,7 +565,7 @@ Public Module modMetData
                 Logger.Dbg("  PROBLEM - Time Units of TSer being filled are not hours, minutes, or seconds")
         End Select
         Logger.Dbg("Filling " & lTS & "-" & lTUStr & " values for " & aTS2Fill.ToString & ", " & aTS2Fill.Attributes.GetValue("STANAM"))
-        s = MissingDataSummary(aTS2Fill, aMVal, aMAcc, lValMin, lValMax, 2)
+        s = MissingDataSummary(aTS2Fill, aMVal, aMAcc, lValMin, lValMax, 2, aArgs)
         lstr = StrSplit(s, "DETAIL:DATA", "")
         If Len(s) > 0 Then 'missing data found
             If Not lAvailableRanked Then
@@ -670,17 +700,186 @@ Public Module modMetData
                         End If
                     Else
                         J2Date(lEJDay, ld)
-                        Logger.Dbg("      *** No nearby station found for distributing accumulated value of " & lAccVal & " on " & ld(0) & "/" & ld(1) & "/" & ld(2))
-                        For k = 1 To lMLen - 1 'set missing dist period to 0 except for accum value at end
-                            lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
-                            aTS2Fill.Value(lFPos) = 0
-                        Next k
+                        If lAccVal > 0 Then
+                            If lUseTriagDistribution Then
+                                Logger.Dbg("      *** No nearby station found for distributing accumulated value of " & lAccVal & " on " & ld(0) & "/" & ld(1) & "/" & ld(2) & " (use triag)")
+                                'now apply the triag distribution
+                                'distribute using triangular distribution
+                                Dim lTmpHrVals(24) As Double
+                                Dim retcod, i As Integer
+                                Call DistTriang1(lAccVal, lTmpHrVals, retcod, aArgs)
+
+                                If lMLen < 24 Then 'obs time moved to earlier in day, don't have full day to distribute values
+                                    Dim lNumNonZero As Integer = 0
+                                    For i = 1 To 24
+                                        If lTmpHrVals(i) > 0 Then lNumNonZero += 1
+                                    Next
+                                    If lNumNonZero > lMLen Then 'can't fit disaggregated values in available space
+                                        Dim lMsgRetCod As String = "PROBLEM - Unable to fit distributed values in available hours due to change in Obs Time"
+                                        retcod = -3
+                                        'might just divide evenly and not bother with rounding
+                                        'Dim lRO As Double
+                                        'If aArgs IsNot Nothing Then
+                                        '    If aArgs.ContainsAttribute("Roundoff") Then
+                                        '        lRO = aArgs.GetValue("Roundoff")
+                                        '    Else
+                                        '        lRO = lRndOff
+                                        '    End If
+                                        'End If
+                                        Dim lEvenVal As Double = lAccVal / lMLen
+                                        'Dim lEvenValRounded As Double = Math.Round(lEvenVal / lRO) * lRO
+                                        'Dim lTotal As Double = 0
+                                        For i = 1 To lMLen
+                                            'lHrVals(lHrPos + i) = lTmpHrVals(lStartPos + i)
+                                            lFPos = lIntsPerDay * (lMJDay - lSJDay) + i - 1
+                                            aTS2Fill.Value(lFPos) = lEvenVal
+                                            'lTotal += lEvenVal
+                                        Next
+                                        'If lTotal - lAccVal > 0 Then
+                                        '    aTS2Fill.Value(lFPos) -= lTotal - lAccVal
+                                        'End If
+                                    Else 'lNumNonZero <= lMLen
+                                        Dim lStartPos As Integer = Math.Truncate((24 - lMLen) / 2)
+                                        For i = 1 To lMLen
+                                            'lHrVals(lHrPos + i) = lTmpHrVals(lStartPos + i)
+                                            lFPos = lIntsPerDay * (lMJDay - lSJDay) + i - 1
+                                            aTS2Fill.Value(lFPos) = lTmpHrVals(lStartPos + i)
+                                        Next
+                                    End If
+                                Else 'lMLen >= 24
+                                    If lMTyp = 3 Then 'this is the special type
+                                        'We could pass in the additional arguments that says if mLength = 95, then redistribute to all periods for example
+                                        Logger.Dbg("use triag: special case, back fill full day")
+                                        Dim lRedIndex As Integer = 1
+                                        For i = 1 To lMLen
+                                            lFPos = lIntsPerDay * (lMJDay - lSJDay) + i - 1
+                                            aTS2Fill.Value(lFPos) = lTmpHrVals(lRedIndex) / 4.0
+                                            If i Mod 4 = 0 Then
+                                                lRedIndex += 1
+                                            End If
+                                        Next
+                                    Else 'normal accumulation (lMTyp = 2)
+                                        Dim lNGap As Integer = lMLen - 24
+                                        If lNGap > 0 Then 'obs time moved to later in day, fill "gap" with 0
+                                            For i = 1 To lNGap
+                                                'lHrVals(lHrPos + i) = 0
+                                                lFPos = lIntsPerDay * (lMJDay - lSJDay) + i - 1
+                                                aTS2Fill.Value(lFPos) = 0
+                                            Next
+                                        End If
+                                        'now fill final 24 hours with triangular distributed values
+                                        For i = 1 To 24
+                                            'lHrVals(lHrPos + lNGap + lHrInd) = lTmpHrVals(lHrInd)
+                                            lFPos = lIntsPerDay * (lMJDay - lSJDay) + lNGap + i - 1
+                                            aTS2Fill.Value(lFPos) = lTmpHrVals(i)
+                                        Next i
+                                    End If
+                                End If
+                                If retcod = -1 Then
+                                    Dim lMsgRetCod As String = "PROBLEM - Unable to distribute this much rain (" & lAccVal & ") using triangular distribution." & "Hourly values will be set to -9.98"
+                                    Logger.Dbg(lMsgRetCod)
+                                    'rsp = MsgBox(lMsgRetCod, MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel, "Precipitation Disaggregation Problem")
+                                ElseIf retcod = -2 Then
+                                    Dim lMsgRetCod As String = "PROBLEM distributing " & lAccVal & " using triangular distribution on " & ld(0) & "/" & ld(1) & "/" & ld(2)
+                                    Logger.Dbg(lMsgRetCod)
+                                    'rsp = MsgBox(lMsgRetCod, MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel, "Precipitation Disaggregation Problem")
+                                End If
+                                'logging triag values
+                                For k = 1 To lMLen
+                                    lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
+                                    J2Date(lMJDay + (k - 1) / lIntsPerDay, ld)
+                                    If lTU = atcTimeUnit.TUHour Then
+                                        Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " - " & aTS2Fill.Value(lFPos))
+                                    ElseIf lTU = atcTimeUnit.TUMinute Then
+                                        Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & " - " & aTS2Fill.Value(lFPos))
+                                    ElseIf lTU = atcTimeUnit.TUSecond Then
+                                        Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & ":" & ld(5) & " - " & aTS2Fill.Value(lFPos))
+                                    End If
+                                Next k
+                            Else
+                                Logger.Dbg("      *** No nearby station found for distributing accumulated value of " & lAccVal & " on " & ld(0) & "/" & ld(1) & "/" & ld(2))
+                                For k = 1 To lMLen - 1 'set missing dist period to 0 except for accum value at end
+                                    lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
+                                    aTS2Fill.Value(lFPos) = 0
+                                Next k
+                            End If
+                        Else
+                            'no need for logging as there is nothing to redistribute
+                            For k = 1 To lMLen - 1 'set missing dist period to 0 except for accum value at end
+                                lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
+                                aTS2Fill.Value(lFPos) = 0
+                            Next k
+                        End If
                     End If
                 End If
                 lstr = StrSplit(s, "DETAIL:DATA", "")
             End While
         Else 'no missing data
             Logger.Dbg("  No missing data to fill!")
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' using the DistTriang method's scheme to construct a 24-timestep (whatever that might be) distribution (and put it up 
+    ''' in the middle of an accumulation period)
+    ''' </summary>
+    ''' <param name="aSum">an accumulated value to be distributed, for rain, it is hundredsth of an inch</param>
+    ''' <param name="aVals">a 24-timestep distribution for aSum</param>
+    ''' <param name="aRetCod">operation outcome status flag</param>
+    ''' <param name="Args">additional arguments</param>
+    ''' <remarks></remarks>
+    Private Sub DistTriang1(ByVal aSum As Double, ByRef aVals() As Double, ByRef aRetCod As Integer, Optional Args As atcDataAttributes = Nothing)
+        'Distribute a daily value to 24 hourly values using a triangular distribution
+        'DaySum - daily value
+        'HrVals - array of hourly values
+        'Retcod - 0 - OK, -1 - DaySum too big,
+        '        -2 - sum of hourly values does not match daily value (likely a round off problem)
+
+        Dim i, j As Integer
+        Dim lRndOff, lRatio, lCarry, lDaySum As Single
+
+        aRetCod = 0
+        i = 1
+        Do While aSum > Sums(i)
+            i = i + 1
+            If i > 12 Then
+                aRetCod = -1
+                Exit Sub
+            End If
+        Loop
+
+        lRndOff = 0.001
+        If Args IsNot Nothing Then
+            lRndOff = Args.GetValue("Roundoff", 0.001)
+        End If
+        lCarry = 0
+        lRatio = aSum / Sums(i)
+        lDaySum = 0
+        For j = 1 To 24
+            aVals(j) = lRatio * Triang(j, i) + lCarry
+            If aVals(j) > lRndOff / 100 Then '0.00001
+                lCarry = aVals(j) - (Math.Round(aVals(j) / lRndOff) * lRndOff)
+                aVals(j) = aVals(j) - lCarry
+            Else
+                aVals(j) = 0.0#
+            End If
+            lDaySum = lDaySum + aVals(j)
+        Next j
+
+        If lCarry > lRndOff / 100 Then '0.00001
+            lDaySum = lDaySum - aVals(12)
+            aVals(12) = aVals(12) + lCarry
+            lDaySum = lDaySum + aVals(12)
+        End If
+        If Math.Abs(aSum - lDaySum) > lRndOff Then
+            'values not distributed properly
+            aRetCod = -2
+        End If
+        If aRetCod <> 0 Then 'set to accumulated, with daily value at end
+            For i = 1 To 23
+                aVals(i) = -9.98
+            Next i
+            aVals(24) = aSum
         End If
     End Sub
 
@@ -1050,7 +1249,13 @@ Public Module modMetData
         Return lPrecTSer
     End Function '}
 
-    Public Function MissingDataSummary(ByVal aTSer As atcTimeseries, Optional ByVal aMVal As Double = -9.99, Optional ByVal aMAcc As Double = -9.98, Optional ByVal aFMin As Double = -1, Optional ByVal aFMax As Double = 90000, Optional ByVal aRepTyp As Integer = 0) As String
+    Public Function MissingDataSummary(ByVal aTSer As atcTimeseries,
+                                       Optional ByVal aMVal As Double = -9.99,
+                                       Optional ByVal aMAcc As Double = -9.98,
+                                       Optional ByVal aFMin As Double = -1,
+                                       Optional ByVal aFMax As Double = 90000,
+                                       Optional ByVal aRepTyp As Integer = 0,
+                                       Optional ByVal args As atcDataAttributes = Nothing) As String
         'scan aTSer for missing/accumulated/faulty data 
         'as defined by aMVal, aMAcc, and aFMin/aFMax
         'returns string of summary in 3 different output forms based on aRepTyp:
@@ -1106,7 +1311,7 @@ Public Module modMetData
         lMCod = 1
         lPos = 1
         Do While lMCod > 0
-            Call NxtMis(lPos, aTSer.Values, aMVal, aMAcc, aFMin, aFMax, lMCod, lMPos, lNMVals, lAccVal)
+            Call NxtMis(lPos, aTSer.Values, aMVal, aMAcc, aFMin, aFMax, lMCod, lMPos, lNMVals, lAccVal, args)
             If lMCod > 0 Then 'somethings missing
                 J2Date(aTSer.Dates.Value(lMPos), ldate)
                 lDateStr = ldate(0) & "/" & ldate(1) & "/" & ldate(2)
@@ -1166,7 +1371,17 @@ Public Module modMetData
 
     End Function
 
-    Public Sub NxtMis(ByVal aBufPos As Integer, ByVal aDBuff() As Double, ByVal aValMis As Double, ByVal aValAcc As Double, ByVal aFaultMin As Double, ByVal aFaultMax As Double, ByRef aMisCod As Integer, ByRef aMisPos As Integer, ByRef aNVals As Integer, ByRef aMVal As Double)
+    Public Sub NxtMis(ByVal aBufPos As Integer,
+                      ByVal aDBuff() As Double,
+                      ByVal aValMis As Double,
+                      ByVal aValAcc As Double,
+                      ByVal aFaultMin As Double,
+                      ByVal aFaultMax As Double,
+                      ByRef aMisCod As Integer,
+                      ByRef aMisPos As Integer,
+                      ByRef aNVals As Integer,
+                      ByRef aMVal As Double,
+                      ByVal Optional args As atcDataAttributes = Nothing)
 
         'Find the next missing value or distribution or screwball value
         'in the data buffer (aDBUFF) starting at positions aBufPos.
@@ -1192,6 +1407,11 @@ Public Module modMetData
         Dim lAccFlg As Integer = 0
         Dim lBadFlg As Integer = 0
         Dim lDonFlg As Integer = 0
+
+        Dim lValBadTarget As Double = Double.NaN
+        If args IsNot Nothing Then
+            lValBadTarget = args.GetValue("AdditionalValueTarget", Double.NaN)
+        End If
 
         Do While lDonFlg = 0 And i < aDBuff.Length
             If Double.IsNaN(aDBuff(i)) Or Math.Abs(aDBuff(i) - aValMis) < pEpsilon Then
@@ -1257,7 +1477,15 @@ Public Module modMetData
             'screwball values
             aMisCod = 3
             aNVals = lBadFlg
-            aMVal = -1.0E+30
+            If Not Double.IsNaN(lValBadTarget) Then
+                If Math.Abs(aDBuff(i - 2) - lValBadTarget) < pEpsilon Then
+                    aMVal = aDBuff(i - 1)
+                Else
+                    aMVal = -1.0E+30
+                End If
+            Else
+                aMVal = -1.0E+30
+            End If
         Else
             'no missing data in buffer
             aMisCod = 0
