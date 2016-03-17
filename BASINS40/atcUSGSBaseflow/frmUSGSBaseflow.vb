@@ -180,14 +180,18 @@ Public Class frmUSGSBaseflow
                     Try
                         lTs = SubsetByDate(lTs, lSDate, lEDate, Nothing)
                         If lTs.Attributes.GetValue("Count missing") > 0 Then
-                            If chkMethodHySEPFixed.Checked OrElse _
-                               chkMethodHySEPLocMin.Checked OrElse _
-                               chkMethodHySEPSlide.Checked OrElse _
+                            If chkMethodHySEPFixed.Checked OrElse
+                               chkMethodHySEPLocMin.Checked OrElse
+                               chkMethodHySEPSlide.Checked OrElse
                                chkMethodPART.Checked Then
                                 lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
                                 lTs.Clear()
                                 Exit For
                             End If
+                        ElseIf lTs.numValues < 31 Then
+                            lErrMsg &= "- Selected Dataset is too short (31 days minimum)." & vbCrLf
+                            lTs.Clear()
+                            Exit For
                         Else
                             lTs.Clear()
                         End If
