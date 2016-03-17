@@ -124,7 +124,39 @@ Public Module modBaseflowUtil
                                     lBFPConsName = "BF_PARTDAILY_BFP"
                             End Select
                         	Dim lTsRO As atcTimeseries = lTsFlow - lBFTs
-                            Dim lTsBFP As atcTimeseries = lBFTs / lTsFlow * 100
+                            Dim lTsBFP As atcTimeseries = Nothing
+                            If lBFConsName.ToUpper().Contains("BFI") Then
+                                Dim lTsBFP_Temp As atcTimeseries = lTsFlow.Clone() 'starts out with correct date range
+                                Dim lDateBF As Double = 0
+                                Dim lDateBFPct As Double = 0
+                                Dim lSearchIndex As Integer = 0
+                                Dim lFlowEndDate As Double = lTsFlow.Dates.Value(lTsFlow.numValues)
+                                For I As Integer = 0 To lBFTs.numValues - 1
+                                    lDateBF = lBFTs.Dates.Value(I)
+                                    If lDateBF > lFlowEndDate Then Continue For
+                                    For J As Integer = lSearchIndex To lTsBFP_Temp.numValues - 1
+                                        lDateBFPct = lTsBFP_Temp.Dates.Value(J)
+                                        If lDateBF < lDateBFPct Then
+                                            lSearchIndex = J
+                                            Exit For
+                                        ElseIf lDateBF > lDateBFPct Then
+                                            Continue For
+                                        Else
+                                            lTsBFP_Temp.Value(J + 1) = lBFTs.Value(I + 1) / lTsFlow.Value(J + 1) * 100
+                                            lSearchIndex = J
+                                            Exit For
+                                        End If
+                                    Next
+                                Next
+                                lTsBFP = SubsetByDate(lTsBFP_Temp, lTsFlow.Dates.Value(0), lTsFlow.Dates.Value(lTsFlow.numValues), Nothing)
+                                lTsBFP_Temp.Clear()
+                                'lTsBFP_Temp.Dates.Clear()
+                                'Dim lNewVals(1) As Double
+                                'lTsBFP_Temp.Values = lNewVals
+                            Else
+                                lTsBFP = lBFTs / lTsFlow * 100
+                            End If
+
                             lTsRO.Attributes.SetValue("Constituent", lROConsName)
                             lTsBFP.Attributes.SetValue("Constituent", lBFPConsName)
                             lROBFPGroup.Add(lTsRO)

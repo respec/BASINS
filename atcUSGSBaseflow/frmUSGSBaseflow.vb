@@ -720,7 +720,23 @@ Public Class frmUSGSBaseflow
             Case "bfistandard" : lMethodAtt = BFMethods.BFIStandard
             Case "bfimodified" : lMethodAtt = BFMethods.BFIModified
         End Select
-        Dim lTsBF4Graph As atcTimeseries = aTsCollection.ItemByKey("RateDaily").Clone()
+        Dim lBFTser As atcTimeseries = aTsCollection.ItemByKey("RateDaily")
+        Dim lTsBF4Graph As atcTimeseries = Nothing
+        If lMethod.ToLower().Contains("bfi") Then
+            Dim lStartOfGoodValue As Integer
+            For I As Integer = 0 To lBFTser.numValues - 1
+                If lBFTser.Value(I + 1) > 0 Then
+                    lStartOfGoodValue = lBFTser.Dates.Value(I)
+                    Exit For
+                End If
+            Next
+            If lStartOfGoodValue > lBFTser.Dates.Value(0) Then
+                lTsBF4Graph = SubsetByDate(lBFTser, lStartOfGoodValue, lBFTser.Dates.Value(lBFTser.numValues), Nothing)
+            End If
+        Else
+            lTsBF4Graph = lBFTser.Clone()
+        End If
+
         lDA = lTsBF4Graph.Attributes.GetValue("Drainage Area")
         With lTsBF4Graph.Attributes
             .SetValue("Constituent", "Baseflow")
@@ -731,7 +747,19 @@ Public Class frmUSGSBaseflow
         Dim lDataGroup As New atcData.atcTimeseriesGroup
         Dim lTsRunoff As atcTimeseries = Nothing
         If lGraphType = "Duration" Then
-            lTsRunoff = lTsFlow - lTsBF4Graph
+            lTsRunoff = Nothing 'lTsFlow - lTsBF4Graph
+            If lMethod.ToLower().Contains("bfi") Then
+                If lTsFlow.Dates.Value(0) < lTsBF4Graph.Dates.Value(0) Then
+                    Dim lTsFlowSubs As atcTimeseries = SubsetByDate(lTsFlow, lTsBF4Graph.Dates.Value(0), lTsBF4Graph.Dates.Value(lTsBF4Graph.numValues), Nothing)
+                    lTsRunoff = lTsFlowSubs - lTsBF4Graph
+                    lTsFlowSubs.Clear()
+                Else
+                    lTsRunoff = lTsFlow - lTsBF4Graph
+                End If
+            Else
+                lTsRunoff = lTsFlow - lTsBF4Graph
+            End If
+
             If lPerUnitArea Then
                 lTsFlow = lTsFlow / lDA
                 lTsBF4Graph = lTsBF4Graph / lDA
@@ -749,7 +777,18 @@ Public Class frmUSGSBaseflow
         End If
         If lGraphType = "CDist" Then
             'Dim lTimeUnitToAggregate As atcTimeUnit = atcTimeUnit.TUMonth
-            lTsRunoff = lTsFlow - lTsBF4Graph
+            lTsRunoff = Nothing
+            If lMethod.ToLower().Contains("bfi") Then
+                If lTsFlow.Dates.Value(0) < lTsBF4Graph.Dates.Value(0) Then
+                    Dim lTsFlowSubs As atcTimeseries = SubsetByDate(lTsFlow, lTsBF4Graph.Dates.Value(0), lTsBF4Graph.Dates.Value(lTsBF4Graph.numValues), Nothing)
+                    lTsRunoff = lTsFlowSubs - lTsBF4Graph
+                    lTsFlowSubs.Clear()
+                Else
+                    lTsRunoff = lTsFlow - lTsBF4Graph
+                End If
+            Else
+                lTsRunoff = lTsFlow - lTsBF4Graph
+            End If
 
             'Convert to depth inch
             Dim lConversionFactor As Double = 0.03719 / lDA
