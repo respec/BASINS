@@ -230,10 +230,16 @@ Public Module modBaseflowUtil
         Dim lTsFlowMonthlySum As atcTimeseries = Aggregate(lTsFlowDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
         Dim lTsFlowMonthlyDepth As atcTimeseries = lTsFlowMonthlySum * lConversionFactor
 
-        Dim lTsFlowDailyBnd As atcTimeseries = SubsetByDateBoundary(lTsFlowDaily, 1, 1, Nothing)
-        Dim lTsFlowYearly As atcTimeseries = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-        Dim lTsFlowYearlySum As atcTimeseries = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-        Dim lTsFlowYearlyDepth As atcTimeseries = lTsFlowYearlySum * lConversionFactor
+        Dim lTsFlowDailyBnd As atcTimeseries = Nothing
+        Dim lTsFlowYearly As atcTimeseries = Nothing
+        Dim lTsFlowYearlySum As atcTimeseries = Nothing
+        Dim lTsFlowYearlyDepth As atcTimeseries = Nothing
+        If lTsFlowDaily.numValues > JulianYear Then
+            lTsFlowDailyBnd = SubsetByDateBoundary(lTsFlowDaily, 1, 1, Nothing)
+            lTsFlowYearly = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+            lTsFlowYearlySum = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+            lTsFlowYearlyDepth = lTsFlowYearlySum * lConversionFactor
+        End If
 
         Dim lTsGroupStreamFlow As New atcCollection
         With lTsGroupStreamFlow
@@ -779,26 +785,35 @@ Public Module modBaseflowUtil
         Dim lBF As Double
         Dim lBFDepth As Double
         Dim lBFPct As Double = 0.0
+        Dim lBFTser As atcTimeseries = Nothing
+        Dim lBFDepthTser As atcTimeseries = Nothing
 
         Dim lTsFlow As atcTimeseries = aTsGroupStreamFlow.ItemByKey("Rate" & ATStep)
         Dim lTsFlowDepth As atcTimeseries = aTsGroupStreamFlow.ItemByKey("Depth" & ATStep)
-        Dim lFlowStartDate As Double = lTsFlow.Dates.Value(0)
-        Dim lFlowEndDate As Double = lTsFlow.Dates.Value(lTsFlow.numValues)
+        Dim lFlowStartDate As Double = -99
+        Dim lFlowEndDate As Double = -99
+        If lTsFlow IsNot Nothing Then
+            lFlowStartDate = lTsFlow.Dates.Value(0)
+            lFlowEndDate = lTsFlow.Dates.Value(lTsFlow.numValues)
+        End If
         If aTsGroupBFIStandard.Count > 0 Then
             AdjustDates(aTsGroupBFIStandard, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate)
         End If
         If aTsGroupBFIModified.Count > 0 Then
             AdjustDates(aTsGroupBFIModified, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate)
         End If
+        If lTsFlow Is Nothing Then
+            Return lTableBody
+        End If
         For I As Integer = 1 To lTsFlow.numValues
             If ATStep = "Monthly" Then
-                If ASCIICommonTableSkipOneRow(aTsGroupPart, _
-                                 aTsGroupFixed, _
-                                 aTsGroupLocMin, _
-                                 aTsGroupSlide, _
-                                 aTsGroupBFIStandard, _
-                                 aTsGroupBFIModified, _
-                                 ATStep, _
+                If ASCIICommonTableSkipOneRow(aTsGroupPart,
+                                 aTsGroupFixed,
+                                 aTsGroupLocMin,
+                                 aTsGroupSlide,
+                                 aTsGroupBFIStandard,
+                                 aTsGroupBFIModified,
+                                 ATStep,
                                  I) Then
                     Continue For
                 End If
@@ -817,38 +832,103 @@ Public Module modBaseflowUtil
                 .Value(4) = DoubleToString(lTsFlowDepth.Value(I), , "0.00")
                 Dim lLastColumn As Integer = 4
                 If aTsGroupPart.Count > 0 Then
-                    lBF = aTsGroupPart.ItemByKey("Rate" & ATStep).Value(I)
-                    lBFDepth = aTsGroupPart.ItemByKey("Depth" & ATStep).Value(I)
+                    lBFTser = aTsGroupPart.ItemByKey("Rate" & ATStep)
+                    lBFDepthTser = aTsGroupPart.ItemByKey("Depth" & ATStep)
+                    If lBFTser IsNot Nothing Then
+                        lBF = lBFTser.Value(I)
+                    Else
+                        lBF = -99
+                    End If
+                    If lBFDepthTser IsNot Nothing Then
+                        lBFDepth = lBFDepthTser.Value(I)
+                    Else
+                        lBFDepth = -99
+                    End If
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                     lLastColumn += lNumColumnsPerMethod
                 End If
                 If aTsGroupFixed.Count > 0 Then
-                    lBF = aTsGroupFixed.ItemByKey("Rate" & ATStep).Value(I)
-                    lBFDepth = aTsGroupFixed.ItemByKey("Depth" & ATStep).Value(I)
+                    lBFTser = aTsGroupFixed.ItemByKey("Rate" & ATStep)
+                    lBFDepthTser = aTsGroupFixed.ItemByKey("Depth" & ATStep)
+                    If lBFTser IsNot Nothing Then
+                        lBF = lBFTser.Value(I)
+                    Else
+                        lBF = -99
+                    End If
+                    If lBFDepthTser IsNot Nothing Then
+                        lBFDepth = lBFDepthTser.Value(I)
+                    Else
+                        lBFDepth = -99
+                    End If
+
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                     lLastColumn += lNumColumnsPerMethod
                 End If
                 If aTsGroupLocMin.Count > 0 Then
-                    lBF = aTsGroupLocMin.ItemByKey("Rate" & ATStep).Value(I)
-                    lBFDepth = aTsGroupLocMin.ItemByKey("Depth" & ATStep).Value(I)
+                    lBFTser = aTsGroupLocMin.ItemByKey("Rate" & ATStep)
+                    lBFDepthTser = aTsGroupLocMin.ItemByKey("Depth" & ATStep)
+                    If lBFTser IsNot Nothing Then
+                        lBF = lBFTser.Value(I)
+                    Else
+                        lBF = -99
+                    End If
+                    If lBFDepthTser IsNot Nothing Then
+                        lBFDepth = lBFDepthTser.Value(I)
+                    Else
+                        lBFDepth = -99
+                    End If
+
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                     lLastColumn += lNumColumnsPerMethod
                 End If
                 If aTsGroupSlide.Count > 0 Then
-                    lBF = aTsGroupSlide.ItemByKey("Rate" & ATStep).Value(I)
-                    lBFDepth = aTsGroupSlide.ItemByKey("Depth" & ATStep).Value(I)
+                    lBFTser = aTsGroupSlide.ItemByKey("Rate" & ATStep)
+                    lBFDepthTser = aTsGroupSlide.ItemByKey("Depth" & ATStep)
+                    If lBFTser IsNot Nothing Then
+                        lBF = lBFTser.Value(I)
+                    Else
+                        lBF = -99
+                    End If
+                    If lBFDepthTser IsNot Nothing Then
+                        lBFDepth = lBFDepthTser.Value(I)
+                    Else
+                        lBFDepth = -99
+                    End If
+
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                     lLastColumn += lNumColumnsPerMethod
                 End If
                 If aTsGroupBFIStandard.Count > 0 Then
-                    lBF = aTsGroupBFIStandard.ItemByKey("Rate" & ATStep).Value(I)
-                    lBFDepth = aTsGroupBFIStandard.ItemByKey("Depth" & ATStep).Value(I)
+                    lBFTser = aTsGroupBFIStandard.ItemByKey("Rate" & ATStep)
+                    lBFDepthTser = aTsGroupBFIStandard.ItemByKey("Depth" & ATStep)
+                    If lBFTser IsNot Nothing Then
+                        lBF = lBFTser.Value(I)
+                    Else
+                        lBF = -99
+                    End If
+                    If lBFDepthTser IsNot Nothing Then
+                        lBFDepth = lBFDepthTser.Value(I)
+                    Else
+                        lBFDepth = -99
+                    End If
+
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                     lLastColumn += lNumColumnsPerMethod 'second to last column to have this jump
                 End If
                 If aTsGroupBFIModified.Count > 0 Then
-                    lBF = aTsGroupBFIModified.ItemByKey("Rate" & ATStep).Value(I)
-                    lBFDepth = aTsGroupBFIModified.ItemByKey("Depth" & ATStep).Value(I)
+                    lBFTser = aTsGroupBFIModified.ItemByKey("Rate" & ATStep)
+                    lBFDepthTser = aTsGroupBFIModified.ItemByKey("Depth" & ATStep)
+                    If lBFTser IsNot Nothing Then
+                        lBF = lBFTser.Value(I)
+                    Else
+                        lBF = -99
+                    End If
+                    If lBFDepthTser IsNot Nothing Then
+                        lBFDepth = lBFDepthTser.Value(I)
+                    Else
+                        lBFDepth = -99
+                    End If
+
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
                 End If
                 .CurrentRecord += 1
@@ -958,10 +1038,10 @@ Public Module modBaseflowUtil
     Private Sub AdjustDates(ByRef aTsGroupPerMethod As atcCollection, ByVal aTsFlow As atcTimeseries, ByVal aTStep As String, ByVal aFlowStartDate As Double, ByVal aFlowEndDate As Double)
         Dim lTsBFTemp As atcTimeseries = aTsGroupPerMethod.ItemByKey("Rate" & aTStep)
         Dim lTsBFDepthTemp As atcTimeseries = aTsGroupPerMethod.ItemByKey("Depth" & aTStep)
-        If lTsBFTemp.Dates.Value(0) <> aFlowStartDate OrElse lTsBFTemp.Dates.Value(lTsBFTemp.numValues) <> aFlowEndDate Then
+        If lTsBFTemp IsNot Nothing AndAlso (lTsBFTemp.Dates.Value(0) <> aFlowStartDate OrElse lTsBFTemp.Dates.Value(lTsBFTemp.numValues) <> aFlowEndDate) Then
             aTsGroupPerMethod.ItemByKey("Rate" & aTStep) = SubsetByDate(lTsBFTemp, aFlowStartDate, aFlowEndDate, Nothing)
         End If
-        If lTsBFDepthTemp.Dates.Value(0) <> aFlowStartDate OrElse lTsBFDepthTemp.Dates.Value(lTsBFDepthTemp.numValues) <> aFlowEndDate Then
+        If lTsBFDepthTemp IsNot Nothing AndAlso (lTsBFDepthTemp.Dates.Value(0) <> aFlowStartDate OrElse lTsBFDepthTemp.Dates.Value(lTsBFDepthTemp.numValues) <> aFlowEndDate) Then
             aTsGroupPerMethod.ItemByKey("Depth" & aTStep) = SubsetByDate(lTsBFDepthTemp, aFlowStartDate, aFlowEndDate, Nothing)
         End If
         'If lTsBFTemp.Dates.Value(0) <> aFlowStartDate OrElse lTsBFTemp.Dates.Value(lTsBFTemp.numValues) <> aFlowEndDate Then
@@ -1037,10 +1117,18 @@ Public Module modBaseflowUtil
                 lConversionFactor = pUADepth / lDA
                 Dim lTsBFToReportPartDailyDepth As atcTimeseries = lTsBFToReportPartDaily * lConversionFactor
 
-                Dim lTsBFToReportPartDailyBnd As atcTimeseries = SubsetByDateBoundary(lTsBFToReportPartDaily, 1, 1, Nothing)
-                Dim lTsBFToReportPartYearly As atcTimeseries = Aggregate(lTsBFToReportPartDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-                Dim lTsBFToReportPartYearlySum As atcTimeseries = Aggregate(lTsBFToReportPartDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-                Dim lTsBFToReportPartYearlyDepth As atcTimeseries = lTsBFToReportPartYearlySum * lConversionFactor
+                Dim lNumOfDays As Integer = lTsBFToReportPartDaily.numValues
+
+                Dim lTsBFToReportPartDailyBnd As atcTimeseries = Nothing
+                Dim lTsBFToReportPartYearly As atcTimeseries = Nothing
+                Dim lTsBFToReportPartYearlySum As atcTimeseries = Nothing
+                Dim lTsBFToReportPartYearlyDepth As atcTimeseries = Nothing
+                If lNumOfDays > JulianYear Then
+                    lTsBFToReportPartDailyBnd = SubsetByDateBoundary(lTsBFToReportPartDaily, 1, 1, Nothing)
+                    lTsBFToReportPartYearly = Aggregate(lTsBFToReportPartDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                    lTsBFToReportPartYearlySum = Aggregate(lTsBFToReportPartDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                    lTsBFToReportPartYearlyDepth = lTsBFToReportPartYearlySum * lConversionFactor
+                End If
 
                 'lTsBFToReportPartDaily.Attributes.SetValue(lReportColumnAttributeName, "RateDaily")
                 'lTsBFToReportPartDailyDepth.Attributes.SetValue(lReportColumnAttributeName, "DepthDaily")
@@ -1076,7 +1164,11 @@ Public Module modBaseflowUtil
                 Dim lTsYear As atcTimeseries = Nothing
                 Dim lTsYearSum As atcTimeseries = Nothing
                 Dim lTsYearDepth As atcTimeseries = Nothing
-                Dim lTsDailyBnd As atcTimeseries = SubsetByDateBoundary(lTsDaily, 1, 1, Nothing)
+                Dim lNumOfDays As Integer = lTsDaily.numValues
+                Dim lTsDailyBnd As atcTimeseries = Nothing 'SubsetByDateBoundary(lTsDaily, 1, 1, Nothing)
+                If lNumOfDays > JulianYear Then
+                    lTsDailyBnd = SubsetByDateBoundary(lTsDaily, 1, 1, Nothing)
+                End If
 
                 If lDA > 0 Then
                     lConversionFactor = pUADepth / lDA
@@ -1085,15 +1177,19 @@ Public Module modBaseflowUtil
                     lTsMonSum = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                     lTsMonDepth = lTsMonSum * lConversionFactor
 
-                    lTsYear = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-                    lTsYearSum = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-                    lTsYearDepth = lTsYearSum * lConversionFactor
+                    If lNumOfDays > JulianYear Then
+                        lTsYear = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                        lTsYearSum = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                        lTsYearDepth = lTsYearSum * lConversionFactor
+                    End If
                 Else
                     lTsMon = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
                     lTsMonSum = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
 
-                    lTsYear = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-                    lTsYearSum = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                    If lNumOfDays > JulianYear Then
+                        lTsYear = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                        lTsYearSum = Aggregate(lTsDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                    End If
                 End If
 
                 'lTsDaily.Attributes.SetValue(lReportColumnAttributeName, "RateDaily")
@@ -2116,7 +2212,9 @@ Public Module modBaseflowUtil
         lSW.Flush()
         lSW.Close()
         lSW = Nothing
-        lTsYearly.Clear() : lTsYearly = Nothing
+        If lTsYearly IsNot Nothing Then
+            lTsYearly.Clear() : lTsYearly = Nothing
+        End If
     End Sub
 
     Public Sub ASCIIPartMonthlyDelimited(ByVal aTS As atcTimeseries, ByVal aFilename As String, Optional ByVal aDelim As String = vbTab)
@@ -2340,32 +2438,32 @@ Public Module modBaseflowUtil
                 If lDate(1) = M And lDate(0) = lCurrentYear Then 'within a year
                     Select Case M
                         Case 1, 2, 3
-                            If I > lTsMonthlyFlowDepthExt.numValues OrElse _
-                               lTsMonthlyFlowDepthExt.Value(I) < -99.0 OrElse _
+                            If I > lTsMonthlyFlowDepthExt.numValues OrElse
+                               lTsMonthlyFlowDepthExt.Value(I) < -99.0 OrElse
                                Double.IsNaN(lTsMonthlyFlowDepthExt.Value(I)) Then
                                 lQuarter1Negative = True
                             Else
                                 lQuarter1 += lTsMonthlyFlowDepthExt.Value(I)
                             End If
                         Case 4, 5, 6
-                            If I > lTsMonthlyFlowDepthExt.numValues OrElse _
-                               lTsMonthlyFlowDepthExt.Value(I) < -99.0 OrElse _
+                            If I > lTsMonthlyFlowDepthExt.numValues OrElse
+                               lTsMonthlyFlowDepthExt.Value(I) < -99.0 OrElse
                                Double.IsNaN(lTsMonthlyFlowDepthExt.Value(I)) Then
                                 lQuarter2Negative = True
                             Else
                                 lQuarter2 += lTsMonthlyFlowDepthExt.Value(I)
                             End If
                         Case 7, 8, 9
-                            If I > lTsMonthlyFlowDepthExt.numValues OrElse _
-                               lTsMonthlyFlowDepthExt.Value(I) < -99.0 OrElse _
+                            If I > lTsMonthlyFlowDepthExt.numValues OrElse
+                               lTsMonthlyFlowDepthExt.Value(I) < -99.0 OrElse
                                Double.IsNaN(lTsMonthlyFlowDepthExt.Value(I)) Then
                                 lQuarter3Negative = True
                             Else
                                 lQuarter3 += lTsMonthlyFlowDepthExt.Value(I)
                             End If
                         Case 10, 11, 12
-                            If I > lTsMonthlyFlowDepthExt.numValues OrElse _
-                               lTsMonthlyFlowDepthExt.Value(I) < -99.0 OrElse _
+                            If I > lTsMonthlyFlowDepthExt.numValues OrElse
+                               lTsMonthlyFlowDepthExt.Value(I) < -99.0 OrElse
                                Double.IsNaN(lTsMonthlyFlowDepthExt.Value(I)) Then
                                 lQuarter4Negative = True
                             Else
@@ -2397,8 +2495,8 @@ Public Module modBaseflowUtil
             Dim lStrQ4 As String = String.Format("{0:0.00}", lQuarter4).PadLeft(lFieldWidthO, " ")
 
             Dim lYearlyValue As Double = -99.99
-            If lYearCount <= lTsYearly.numValues Then
-                If Not Double.IsNaN(lTsYearly.Value(lYearCount)) AndAlso _
+            If lTsYearly IsNot Nothing AndAlso lYearCount <= lTsYearly.numValues Then
+                If Not Double.IsNaN(lTsYearly.Value(lYearCount)) AndAlso
                 Not lQuarter1Negative AndAlso Not lQuarter2Negative AndAlso Not lQuarter3Negative AndAlso Not lQuarter4Negative Then
                     lYearlyValue = lTsYearly.Value(lYearCount)
                 End If
@@ -2449,32 +2547,32 @@ Public Module modBaseflowUtil
                 If lDate(1) = M And lDate(0) = lCurrentYear Then 'within a year
                     Select Case M
                         Case 1, 2, 3
-                            If I > lTsMonthlyFlowDepthExt.numValues OrElse _
-                               lTsBaseflowMonthlyDepthExt.Value(I) < -99.0 OrElse _
+                            If I > lTsMonthlyFlowDepthExt.numValues OrElse
+                               lTsBaseflowMonthlyDepthExt.Value(I) < -99.0 OrElse
                                Double.IsNaN(lTsBaseflowMonthlyDepthExt.Value(I)) Then
                                 lQuarter1Negative = True
                             Else
                                 lQuarter1 += lTsBaseflowMonthlyDepthExt.Value(I)
                             End If
                         Case 4, 5, 6
-                            If I > lTsMonthlyFlowDepthExt.numValues OrElse _
-                               lTsBaseflowMonthlyDepthExt.Value(I) < -99.0 OrElse _
+                            If I > lTsMonthlyFlowDepthExt.numValues OrElse
+                               lTsBaseflowMonthlyDepthExt.Value(I) < -99.0 OrElse
                                Double.IsNaN(lTsBaseflowMonthlyDepthExt.Value(I)) Then
                                 lQuarter2Negative = True
                             Else
                                 lQuarter2 += lTsBaseflowMonthlyDepthExt.Value(I)
                             End If
                         Case 7, 8, 9
-                            If I > lTsMonthlyFlowDepthExt.numValues OrElse _
-                               lTsBaseflowMonthlyDepthExt.Value(I) < -99.0 OrElse _
+                            If I > lTsMonthlyFlowDepthExt.numValues OrElse
+                               lTsBaseflowMonthlyDepthExt.Value(I) < -99.0 OrElse
                                Double.IsNaN(lTsBaseflowMonthlyDepthExt.Value(I)) Then
                                 lQuarter3Negative = True
                             Else
                                 lQuarter3 += lTsBaseflowMonthlyDepthExt.Value(I)
                             End If
                         Case 10, 11, 12
-                            If I > lTsMonthlyFlowDepthExt.numValues OrElse _
-                               lTsBaseflowMonthlyDepthExt.Value(I) < -99.0 OrElse _
+                            If I > lTsMonthlyFlowDepthExt.numValues OrElse
+                               lTsBaseflowMonthlyDepthExt.Value(I) < -99.0 OrElse
                                Double.IsNaN(lTsBaseflowMonthlyDepthExt.Value(I)) Then
                                 lQuarter4Negative = True
                             Else
@@ -2506,8 +2604,8 @@ Public Module modBaseflowUtil
             Dim lStrQ4 As String = String.Format("{0:0.00}", lQuarter4).PadLeft(lFieldWidthO, " ")
 
             Dim lYearlyValue As Double = -99.99
-            If lYearCount <= lTsBFYearly.numValues Then
-                If Not Double.IsNaN(lTsBFYearly.Value(lYearCount)) AndAlso _
+            If lTsBFYearly IsNot Nothing AndAlso lYearCount <= lTsBFYearly.numValues Then
+                If Not Double.IsNaN(lTsBFYearly.Value(lYearCount)) AndAlso
                 Not lQuarter1Negative AndAlso Not lQuarter2Negative AndAlso Not lQuarter3Negative AndAlso Not lQuarter4Negative Then
                     lYearlyValue = lTsBFYearly.Value(lYearCount)
                 End If
@@ -2522,8 +2620,9 @@ Public Module modBaseflowUtil
         lSW.Flush()
         lSW.Close()
         lSW = Nothing
-        lTsYearly.Clear() : lTsYearly = Nothing
-
+        If lTsYearly IsNot Nothing Then
+            lTsYearly.Clear() : lTsYearly = Nothing
+        End If
     End Sub
 
     Public Sub ASCIIPartQuarterlyDelimited(ByVal aTS As atcTimeseries, ByVal aFilename As String, Optional ByVal aDelim As String = vbTab)
