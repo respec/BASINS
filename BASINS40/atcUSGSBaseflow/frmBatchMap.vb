@@ -13,7 +13,16 @@ Public Class frmBatchMap
     Private pBFInputsGroups As atcCollection
     Private pBatchSpecFilefullname As String = ""
 
+    Private pDataGroupsChanged As Boolean = False
+    Private pDataStart As Double
+    Private pDataEnd As Double
+    Private pDataStartCommon As Double
+    Private pDataEndCommon As Double
+    Private pRefreshTimeSpan As Boolean = False
+
     Private WithEvents pfrmBFParms As frmUSGSBaseflowBatch
+
+    Private pLoaded As Boolean = False
 
     Private ReadOnly Property GetDataFileFullPath(ByVal aStationId As String) As String
         Get
@@ -49,16 +58,32 @@ Public Class frmBatchMap
         If IO.Directory.Exists(lDataDir) Then
             txtDataDir.Text = lDataDir
         End If
+        pLoaded = True
     End Sub
 
     Private Sub btnCreateGroup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCreateGroup.Click
-        Dim lnewTreeNode As New Windows.Forms.TreeNode("BatchGroup_" & pBatchGroupCount)
+        Dim lGroupName As String = "BatchGroup_" & pBatchGroupCount
+        Dim lnewTreeNode As New Windows.Forms.TreeNode(lGroupName)
         treeBFGroups.Nodes.Add(lnewTreeNode)
         For I As Integer = 0 To lstStations.RightCount - 1
             With lnewTreeNode
                 .Nodes.Add(lstStations.RightItem(I))
             End With
         Next
+
+        Dim lBFInputs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+        If lBFInputs Is Nothing Then
+            lBFInputs = New atcDataAttributes()
+            lBFInputs.SetValue("Operation", "GroupSetParm")
+            lBFInputs.SetValue("Group", lGroupName)
+            pBFInputsGroups.Add(lGroupName, lBFInputs)
+            Dim lStationsInfo As New ArrayList()
+            For I As Integer = 0 To lstStations.RightCount - 1
+                lStationsInfo.Add("Station" & vbTab & lstStations.RightItem(I) & ",0.0,unknown")
+            Next
+            lBFInputs.SetValue("StationInfo", lStationsInfo)
+        End If
+
         pBatchGroupCount += 1
     End Sub
 
@@ -120,6 +145,10 @@ Public Class frmBatchMap
                                     Next
                                     If lIndexToRemove >= 0 Then
                                         lStationInfo.RemoveAt(lIndexToRemove)
+                                        pDataGroupsChanged = True
+                                        If pRefreshTimeSpan Then
+                                            SetDataTimeSpan()
+                                        End If
                                     End If
                                 End If
                             End If
@@ -270,7 +299,14 @@ Public Class frmBatchMap
                     pfrmBFParms.Initialize(lTsGroup, lBFInputs)
                 End If
             Case "cmsGlobalSetParm"
+                If pDataGroupsChanged OrElse pBFInputsGlobal.Count = 0 Then
+                    SetDataTimeSpan(True)
+                End If
                 pBFInputsGlobal.SetValue("Operation", "GlobalSetParm")
+                pBFInputsGlobal.SetValue("SJDATE", pDataStart)
+                pBFInputsGlobal.SetValue("EJDATE", pDataEnd)
+                pBFInputsGlobal.SetValue("SJDATECommon", pDataStartCommon)
+                pBFInputsGlobal.SetValue("EJDATECommon", pDataEndCommon)
                 pfrmBFParms = New frmUSGSBaseflowBatch()
                 pfrmBFParms.Initialize(Nothing, pBFInputsGlobal)
         End Select
@@ -787,5 +823,69 @@ Public Class frmBatchMap
         Else
             Logger.Msg("Need to download data first.", "Batch Map:Plot")
         End If
+    End Sub
+
+    Private Sub SetDataTimeSpan(Optional ByVal aMandatory As Boolean = False)
+        If Not aMandatory AndAlso Not pDataGroupsChanged Then Exit Sub
+        If pBFInputsGroups Is Nothing OrElse pBFInputsGroups.Count = 0 Then Exit Sub
+
+        Dim lTsGroup As New atcTimeseriesGroup()
+        Dim lArgs As New atcDataAttributes()
+        lArgs.Add("Constituent", "streamflow")
+
+        Dim lTotalGroups As Integer = pBFInputsGroups.Count
+        Dim lTotalStations As Integer
+        Dim lGroupCtr As Integer = 1
+        Dim lStnCtr As Integer
+        For Each lBFGroupAttribs As atcDataAttributes In pBFInputsGroups
+            Logger.Progress("Reading group: " & lBFGroupAttribs.GetValue("Group"), lGroupCtr, lTotalGroups)
+            If lBFGroupAttribs IsNot Nothing Then
+                Dim lStationInfo As ArrayList = lBFGroupAttribs.GetValue("StationInfo")
+                If lStationInfo IsNot Nothing Then
+                    lTotalStations = lStationInfo.Count
+                    Using lProgressLevel As New ProgressLevel(False, lStationInfo.Count = 0)
+                        lStnCtr = 1
+                        For Each lStation As String In lStationInfo
+                            Dim lStationID As String = ""
+                            Try
+                                lStationID = lStation.Split(vbTab)(1).Split(",")(0)
+                            Catch ex As Exception
+                                lStnCtr += 1
+                                Continue For
+                            End Try
+                            Logger.Progress("reading station: " & lStationID, lStnCtr, lTotalStations)
+                            If Not String.IsNullOrEmpty(lStationID) AndAlso lStationID.Length = 8 Then
+                                Dim lDataPath As String = GetDataFileFullPath(lStationID)
+                                Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+                                If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                                    lTsGroup.Add(lTsGroupTemp(0))
+                                End If
+                            End If
+                            lStnCtr += 1
+                        Next
+                    End Using
+                End If
+            End If
+            lGroupCtr += 1
+        Next
+        If lTsGroup.Count > 0 Then
+            CommonDates(lTsGroup, pDataStart, pDataEnd, pDataStartCommon, pDataEndCommon)
+        Else
+            pDataStart = 0
+            pDataEnd = 0
+            pDataStartCommon = 0
+            pDataEndCommon = 0
+        End If
+        pDataGroupsChanged = False
+    End Sub
+
+    Private Sub btnRefresh_Click(sender As Object, e As EventArgs) Handles btnRefresh.Click
+        If Not pLoaded Then Exit Sub
+        pDataGroupsChanged = True
+        Try
+            SetDataTimeSpan()
+        Catch ex As Exception
+            pDataGroupsChanged = False
+        End Try
     End Sub
 End Class

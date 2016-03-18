@@ -47,6 +47,7 @@ Partial Class frmBatchMap
         Me.btnGroupRemove = New System.Windows.Forms.Button()
         Me.btnGroupGroup = New System.Windows.Forms.Button()
         Me.btnGroupGlobal = New System.Windows.Forms.Button()
+        Me.btnRefresh = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.cmsNode.SuspendLayout()
         Me.SuspendLayout()
@@ -256,11 +257,21 @@ Partial Class frmBatchMap
         Me.btnGroupGlobal.Text = "Global"
         Me.btnGroupGlobal.UseVisualStyleBackColor = True
         '
+        'btnRefresh
+        '
+        Me.btnRefresh.Location = New System.Drawing.Point(242, 390)
+        Me.btnRefresh.Name = "btnRefresh"
+        Me.btnRefresh.Size = New System.Drawing.Size(52, 23)
+        Me.btnRefresh.TabIndex = 20
+        Me.btnRefresh.Text = "Refresh"
+        Me.btnRefresh.UseVisualStyleBackColor = True
+        '
         'frmBatchMap
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(521, 423)
+        Me.Controls.Add(Me.btnRefresh)
         Me.Controls.Add(Me.btnGroupPlot)
         Me.Controls.Add(Me.btnGroupRemove)
         Me.Controls.Add(Me.btnGroupGroup)
@@ -310,4 +321,5 @@ Partial Class frmBatchMap
     Friend WithEvents btnGroupRemove As Windows.Forms.Button
     Friend WithEvents btnGroupGroup As Windows.Forms.Button
     Friend WithEvents btnGroupGlobal As Windows.Forms.Button
+    Friend WithEvents btnRefresh As Windows.Forms.Button
 End Class
