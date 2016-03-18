@@ -481,7 +481,7 @@ Public Class clsBatchBFSpec
                 End If
             Case BFBatchInputNames.OUTPUTDIR.ToLower
                 Dim lOutputDir As String = lArr(1).Trim()
-                If Not String.IsNullOrEmpty(lOutputDir) AndAlso IO.Directory.Exists(lOutputDir) Then
+                If Not String.IsNullOrEmpty(lOutputDir) Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
                         lStation.BFInputs.SetValue(BFBatchInputNames.OUTPUTDIR, lOutputDir)
                     Next
@@ -585,36 +585,28 @@ Public Class clsBatchBFSpec
         Return Nothing
     End Function
 
-    Public Sub DoBatch()
-        If Not String.IsNullOrEmpty(Message) AndAlso Message.ToLower.StartsWith("error") Then
-            Logger.Msg("Please address following issues before running batch:" & vbCrLf & Message, _
-                       "Base-flow Separation Batch")
-            Exit Sub
-        Else
-            Message = ""
-        End If
-        Dim lOutputDir As String = GlobalSettings.GetValue(BFBatchInputNames.OUTPUTDIR, "")
-        If Not IO.Directory.Exists(lOutputDir) Then
+    Private Function SetupOutputDirectory(ByVal aOutputDir As String) As Boolean
+        If Not IO.Directory.Exists(aOutputDir) Then
             Try
-                Dim lDirInfo As New IO.DirectoryInfo(lOutputDir)
+                Dim lDirInfo As New IO.DirectoryInfo(aOutputDir)
                 Dim ldSecurity As System.Security.AccessControl.DirectorySecurity = lDirInfo.GetAccessControl()
-                MkDirPath(lOutputDir)
+                MkDirPath(aOutputDir)
             Catch ex As Exception
                 'RaiseEvent StatusUpdate("0,0,Cannot create output directory: " & vbCrLf & lOutputDir)
-                UpdateStatus("Cannot create output directory: " & vbCrLf & lOutputDir, , True)
-                Exit Sub
+                UpdateStatus("Cannot create output directory: " & vbCrLf & aOutputDir, , True)
+                Return False
             End Try
         End If
         Dim lOutputDirWritable As Boolean = True
         Try
             Dim lSW As IO.StreamWriter = Nothing
             Try
-                lSW = New IO.StreamWriter(IO.Path.Combine(lOutputDir, "z.txt"), False)
+                lSW = New IO.StreamWriter(IO.Path.Combine(aOutputDir, "z.txt"), False)
                 lSW.WriteLine("1")
                 lSW.Flush()
                 lSW.Close()
                 lSW = Nothing
-                IO.File.Delete(IO.Path.Combine(lOutputDir, "z.txt"))
+                IO.File.Delete(IO.Path.Combine(aOutputDir, "z.txt"))
             Catch ex As Exception
                 If lSW IsNot Nothing Then
                     lSW.Close()
@@ -629,8 +621,23 @@ Public Class clsBatchBFSpec
         If Not lOutputDirWritable Then
             'RaiseEvent StatusUpdate("0,0,Can not write to output directory: " & vbCrLf & lOutputDir)
             'Windows.Forms.Application.DoEvents()
-            UpdateStatus("Can not write to output directory: " & vbCrLf & lOutputDir, , True)
-            Return
+            UpdateStatus("Can not write to output directory: " & vbCrLf & aOutputDir, , True)
+            Return False
+        End If
+        Return True
+    End Function
+
+    Public Sub DoBatch()
+        If Not String.IsNullOrEmpty(Message) AndAlso Message.ToLower.StartsWith("error") Then
+            Logger.Msg("Please address following issues before running batch:" & vbCrLf & Message,
+                       "Base-flow Separation Batch")
+            Exit Sub
+        Else
+            Message = ""
+        End If
+        Dim lOutputDir As String = GlobalSettings.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+        If Not SetupOutputDirectory(lOutputDir) Then
+            Exit Sub
         End If
 
         Dim lTotalBFOpn As Integer = 0
@@ -646,7 +653,14 @@ Public Class clsBatchBFSpec
         Dim lConfigFile As IO.StreamWriter = Nothing
         For Each lBFOpnId As Integer In ListBatchBaseflowOpns.Keys
             Dim lBFOpn As atcCollection = ListBatchBaseflowOpns.ItemByKey(lBFOpnId)
+            Dim lbatchUnitStation As clsBatchUnitStation = lBFOpn.ItemByIndex(0)
+            Dim lBFOpnOutputDir As String = lbatchUnitStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
             Dim lBFOpnDir As String = IO.Path.Combine(lOutputDir, "BF_Opn_" & lBFOpnId)
+            If String.IsNullOrEmpty(lBFOpnOutputDir) Then
+                lBFOpnDir = IO.Path.Combine(lOutputDir, "BF_Opn_" & lBFOpnId)
+            Else
+                lBFOpnDir = IO.Path.Combine(lBFOpnOutputDir, "BF_Opn_" & lBFOpnId)
+            End If
             MkDirPath(lBFOpnDir)
 
             For Each lStation As clsBatchUnitStation In lBFOpn
@@ -755,7 +769,7 @@ Public Class clsBatchBFSpec
         End If
         If gTextStatus IsNot Nothing Then
             If aAppend Then
-                gTextStatus.Text &= aMsg & vbCrLf
+                gTextStatus.AppendText(aMsg & vbCrLf)
             Else
                 gTextStatus.Text = aMsg
             End If

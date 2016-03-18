@@ -107,6 +107,7 @@ Public Class frmUSGSBaseflowBatch
         pCommonStart = GetMinValue()
         pCommonEnd = GetMaxValue()
         Dim lRow As Integer = 1
+        Dim lDates(5) As Integer
 
         If Not pSetGlobal Then
             Dim lStations As ArrayList = pBasicAttributes.GetValue("StationInfo", Nothing)
@@ -150,8 +151,18 @@ Public Class frmUSGSBaseflowBatch
         Else
             grdStations.Visible = False
             btnWriteASCIIOutput.Text = "Set Parameters: Global Defaults"
+            pCommonStart = pBasicAttributes.GetValue("SJDATECommon", 0)
+            pCommonEnd = pBasicAttributes.GetValue("EJDATECommon", 0)
+            Dim lStartDate As Double = pBasicAttributes.GetValue("SJDATE", 0)
+            Dim lEndDate As Double = pBasicAttributes.GetValue("EJDATE", 0)
+            J2Date(lStartDate, lDates)
+            If lStartDate > 0 Then txtDataStart.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+            If lStartDate > 0 Then txtStartDateUser.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+            J2Date(lEndDate, lDates)
+            If lEndDate > 0 Then txtDataEnd.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+            If lEndDate > 0 Then txtEndDateUser.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
         End If
-        
+
         If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
             If txtDataStart.Tag IsNot Nothing AndAlso txtDataEnd.Tag IsNot Nothing Then
                 txtDataStart.Text = txtDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate + 1)
@@ -168,7 +179,6 @@ Public Class frmUSGSBaseflowBatch
             End If
         End If
 
-        Dim lDates(5) As Integer
         Dim lStartFromConfig As Double = pBasicAttributes.GetValue(BFInputNames.StartDate, -99)
         If lStartFromConfig > 0 Then
             J2Date(lStartFromConfig, lDates)
@@ -277,7 +287,7 @@ Public Class frmUSGSBaseflowBatch
                                    chkMethodHySEPLocMin.Checked OrElse _
                                    chkMethodHySEPSlide.Checked OrElse _
                                    chkMethodPART.Checked Then
-                                    lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
+                                    'lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
                                     lTs.Clear()
                                     Exit For
                                 End If
