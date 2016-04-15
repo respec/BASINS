@@ -15,7 +15,8 @@ Public Class clsBatchUtil
             lXML &= "<arguments>" & vbCrLf
             'lXML &= "<SaveWDM>" & WDMDownload & "</SaveWDM>"
             lXML &= "<SaveIn>" & SiteInfoDir & "</SaveIn>"
-            'lXML &= "<CacheFolder>C:\Basins\cache\</CacheFolder>"
+            lXML &= "<CacheFolder>C:\Basins\cache\</CacheFolder>"
+            'lXML &= "<CacheFolder>C:\dev\Basins40\cache\</CacheFolder>"
             For Each lStation As String In aStationList
                 lXML &= "<stationid>" & lStation & "</stationid>" & vbCrLf
             Next
@@ -37,7 +38,8 @@ Public Class clsBatchUtil
         'lQuery.LoadXml(XML(aStationList))
         'lNode = lQuery.FirstChild.FirstChild
         'Dim lResult As String = D4EMNWISDataExtension.GetDailyDischarge(lNode)
-        Dim lResult As String = D4EMDataManager.DataManager.Execute(XML(aStationList))
+        Dim lQuery As String = XML(aStationList)
+        Dim lResult As String = D4EMDataManager.DataManager.Execute(lQuery)
         If lResult Is Nothing Then
             Logger.Dbg("QueryResult:Nothing")
         Else
