@@ -87,7 +87,7 @@ Public Class clsBaseflowPart
             End If
         End If
 
-        If TBase = -999.0 Then
+        If TBase() = -999.0 Then
             If gBatchRun Then
                 gError &= vbCrLf & "Error:PART:antecedent recession calculation."
             Else
