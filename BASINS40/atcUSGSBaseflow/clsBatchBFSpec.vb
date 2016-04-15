@@ -756,6 +756,208 @@ Public Class clsBatchBFSpec
         UpdateStatus("Base-flow Separation Complete for " & lTotalBFOpn & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", True)
     End Sub
 
+    '{
+    Public Sub DoBatchIntermittent()
+        If Not String.IsNullOrEmpty(Message) AndAlso Message.ToLower.StartsWith("error") Then
+            Logger.Msg("Please address following issues before running batch:" & vbCrLf & Message,
+                       "Base-flow Separation Batch")
+            Exit Sub
+        Else
+            Message = ""
+        End If
+        Dim lOutputDir As String = GlobalSettings.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+        If Not SetupOutputDirectory(lOutputDir) Then
+            Exit Sub
+        End If
+
+        Dim lTotalBFOpn As Integer = 0
+        For Each lKey As Integer In ListBatchBaseflowOpns.Keys
+            For Each lstation As clsBatchUnitStation In ListBatchBaseflowOpns.ItemByKey(lKey)
+                lTotalBFOpn += 1
+            Next
+        Next
+        gProgressBar.Minimum = 0
+        gProgressBar.Maximum = lTotalBFOpn
+        gProgressBar.Step = 1
+        Dim lBFOpnCount As Integer = 1
+        Dim lConfigFile As IO.StreamWriter = Nothing
+        Dim lDrainageArea As Double = 0.0
+        For Each lBFOpnId As Integer In ListBatchBaseflowOpns.Keys
+            Dim lBFOpn As atcCollection = ListBatchBaseflowOpns.ItemByKey(lBFOpnId)
+            Dim lbatchUnitStation As clsBatchUnitStation = lBFOpn.ItemByIndex(0)
+            Dim lBFOpnOutputDir As String = lbatchUnitStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+            Dim lBFOpnDir As String = IO.Path.Combine(lOutputDir, "BF_Opn_" & lBFOpnId)
+            If String.IsNullOrEmpty(lBFOpnOutputDir) Then
+                lBFOpnDir = IO.Path.Combine(lOutputDir, "BF_Opn_" & lBFOpnId)
+            Else
+                lBFOpnDir = IO.Path.Combine(lBFOpnOutputDir, "BF_Opn_" & lBFOpnId)
+            End If
+            MkDirPath(lBFOpnDir)
+
+            For Each lStation As clsBatchUnitStation In lBFOpn
+                Dim lOutputPrefix As String = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+                If String.IsNullOrEmpty(lOutputPrefix) Then lOutputPrefix = "BF_" & lStation.StationID
+                'each station has its own directory
+                Dim lStationOutDir As String = IO.Path.Combine(lBFOpnDir, "Station_" & lStation.StationID)
+                MkDirPath(lStationOutDir)
+                Dim lTsFlow As atcTimeseries = GetStationStreamFlowData(lStation)
+                If lTsFlow IsNot Nothing Then
+                    Try
+                        lDrainageArea = lTsFlow.Attributes.GetValue("Drainage Area", -99)
+                        'break up into continuous chunks
+                        Dim lDates() As Integer = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.StartDate)
+                        Dim lAnalysis_Start As Double = Date2J(lDates)
+                        lDates = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.EndDate)
+                        Dim lAnalysis_End As Double = Date2J(lDates)
+                        Dim lTserFullDateRange As New atcTimeseries(Nothing)
+                        With lTserFullDateRange
+                            .Dates = New atcTimeseries(Nothing)
+                            .Dates.Values = NewDates(lAnalysis_Start, lAnalysis_End, atcTimeUnit.TUDay, 1)
+                            .numValues = lTserFullDateRange.Dates.numValues
+                            .SetInterval(atcTimeUnit.TUDay, 1)
+                            For I As Integer = 1 To .numValues
+                                .Value(I) = -99.0
+                            Next
+                        End With
+
+                        Dim lFlowStart As Double = lTsFlow.Dates.Value(0)
+                        Dim lFlowEnd As Double = lTsFlow.Dates.Value(lTsFlow.numValues)
+
+                        Dim lTsAnalysisGroup As New atcTimeseriesGroup()
+                        If lTsFlow.Attributes.GetValue("Count missing") > 0 Then
+                            Dim ctr As Integer = 1
+                            For I As Integer = 1 To lTsFlow.numValues
+                                If Not Double.IsNaN(lTsFlow.Value(I)) Then
+                                    lFlowStart = lTsFlow.Dates.Value(I - 1)
+                                    While (I <= lTsFlow.numValues AndAlso Not Double.IsNaN(lTsFlow.Value(I)))
+                                        I = I + 1
+                                    End While
+                                    lFlowEnd = lTsFlow.Dates.Value(I - 2)
+                                    If (lFlowEnd - lFlowStart) >= 31 Then
+                                        Dim lTs As atcTimeseries = SubsetByDate(lTsFlow, lFlowStart, lFlowEnd, Nothing)
+                                        lTs.Attributes.SetValue("chunk", ctr)
+                                        lTsAnalysisGroup.Add(ctr, lTs)
+                                        ctr += 1
+                                    End If
+                                End If
+                            Next
+                        Else
+                            'cuz lTsFlow for a station has to be used later, the clone will be cleared after batch bf
+                            lTsAnalysisGroup.Add(lTsFlow.Clone())
+                        End If
+
+                        Dim lTsFlowGroup As New atcTimeseriesGroup()
+                        Dim CalcBF As atcTimeseriesBaseflow.atcTimeseriesBaseflow = New atcTimeseriesBaseflow.atcTimeseriesBaseflow()
+                        For Each lTsChunk As atcTimeseries In lTsAnalysisGroup
+                            lTsFlowGroup.Add(lTsChunk)
+                            With lStation.BFInputs
+                                .SetValue(atcTimeseriesBaseflow.BFInputNames.Streamflow, lTsFlowGroup)
+                                lFlowStart = lTsChunk.Dates.Value(0)
+                                lFlowEnd = lTsChunk.Dates.Value(lTsChunk.numValues)
+                                .SetValue(atcTimeseriesBaseflow.BFInputNames.StartDate, lFlowStart) 'lAnalysis_Start) 'Date2J(lDates))
+                                .SetValue(atcTimeseriesBaseflow.BFInputNames.EndDate, lFlowEnd) 'lAnalysis_End) 'Date2J(lDates))
+                                .SetValue(atcTimeseriesBaseflow.BFInputNames.DrainageArea, lStation.StationDrainageArea)
+                                .SetValue("BatchRun", True)
+                            End With
+                            If CalcBF.Open("baseflow", lStation.BFInputs) Then
+                                OutputDir = lStationOutDir
+                                OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+                                Dim lCtr As Integer = lTsChunk.Attributes.GetValue("chunk", 0)
+                                If String.IsNullOrEmpty(OutputFilenameRoot) Then
+                                    OutputFilenameRoot = "BF_chunk_" & lCtr.ToString()
+                                Else
+                                    OutputFilenameRoot &= "_chunk_" & lCtr.ToString()
+                                End If
+                                MethodsLastDone = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
+                                ASCIICommon(lTsChunk)
+                            End If
+                            lStation.Message &= CalcBF.BF_Message.Trim()
+                            lTsFlowGroup.Clear()
+                        Next 'chunk
+                        'after the results are written, then merge, the intermittent time series can be cleared
+                        'the lTsAnalysisGroup contains the chuncky or original time series' clone (if only 1 chunk), these will be cleared
+                        Dim lBFReportGroups As atcDataAttributes = MergeBaseflowResults(lTserFullDateRange, lTsAnalysisGroup, "Daily", True)
+                        With lBFReportGroups
+                            .SetValue("AnalysisStart", lAnalysis_Start)
+                            .SetValue("AnalysisEnd", lAnalysis_End)
+                            .SetValue("Drainage Area", lDrainageArea)
+                            .SetValue("ReportGroupsAvailable", True)
+                            .SetValue("ReportFileSuffix", "fullspan")
+                            .SetValue("ForFullSpan", True)
+                        End With
+                        'Dim lTmpGroup As New atcTimeseriesGroup()
+                        'lTmpGroup.Add(lTsFlow)
+                        'lTmpGroup.Add(lTserFullDateRange)
+                        Dim lTsFlowFullRange As atcTimeseries = MergeBaseflowTimeseries(lTserFullDateRange, lTsFlow, False, True)  'MergeTimeseries(lTmpGroup, True)
+                        AdjustDatesOfReportingTimeseries(lTsFlowFullRange, lBFReportGroups)
+                        ASCIICommon(lTsFlowFullRange, lBFReportGroups)
+                        lTsFlowFullRange.Clear()
+                        lTsFlowFullRange = Nothing
+                    Catch ex As Exception
+                        lStation.Message &= "Error: Base-flow separation and/or reporting failed." & vbCrLf
+                    End Try
+                Else
+                    lStation.Message &= "Error: flow data is missing." & vbCrLf
+                End If
+                'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
+                UpdateStatus("Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True)
+                lBFOpnCount += 1
+            Next
+            'If lStationFoundData IsNot Nothing Then Exit For
+            lConfigFile = New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "Config.txt"), False)
+            For Each lStation As clsBatchUnitStation In lBFOpn
+                Dim lDataFilename As String = ListBatchUnitsData.ItemByKey(lStation.StationID)
+                If String.IsNullOrEmpty(lDataFilename) Then
+                    lDataFilename = lStation.StationDataFilename
+                    If IO.File.Exists(lDataFilename) Then
+                        ListBatchUnitsData.Add(lStation.StationID, lDataFilename)
+                    End If
+                End If
+                lConfigFile.WriteLine("Station " & lStation.StationID & ", " & lStation.StationDrainageArea & ", " & lDataFilename)
+            Next
+            For Each lAttrib As atcDefinedValue In CType(lBFOpn.ItemByIndex(0), clsBatchUnitStation).BFInputs
+                Dim lName As String = lAttrib.Definition.Name
+                Select Case lName.ToLower()
+                    Case "startdate", "enddate"
+                        Dim lDates(5) As Integer
+                        atcUtility.J2Date(lAttrib.Value, lDates)
+                        If lName.ToLower() = "enddate" Then
+                            timcnv(lDates)
+                        End If
+                        lConfigFile.WriteLine(lName & ", " & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
+                    Case Else
+                        lConfigFile.WriteLine(lName & ", " & lAttrib.Value.ToString())
+                End Select
+            Next
+            lConfigFile.Flush()
+            lConfigFile.Close()
+            lConfigFile = Nothing
+        Next
+        Dim lSummary As New IO.StreamWriter(IO.Path.Combine(lOutputDir, "BF_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)
+        For Each lBFOpnId As Integer In ListBatchBaseflowOpns.Keys
+            Dim lBFOpn As atcCollection = ListBatchBaseflowOpns.ItemByKey(lBFOpnId)
+            lSummary.WriteLine("Batch Run Group ***  " & lBFOpnId & "  ***")
+            Dim lHasError As Boolean = False
+            For Each lStation As clsBatchUnitStation In lBFOpn
+                If Not String.IsNullOrEmpty(lStation.Message) Then
+                    lSummary.WriteLine("---- Station: " & lStation.StationID & "----")
+                    lSummary.WriteLine(lStation.Message)
+                    lSummary.WriteLine("---------------------------------------------")
+                    If lStation.Message.ToLower().Contains("error") Then lHasError = True
+                End If
+            Next
+            If lHasError Then
+                lSummary.WriteLine("End Batch Run Group " & lBFOpnId & ", Has errors.")
+            Else
+                lSummary.WriteLine("End Batch Run Group " & lBFOpnId & ", Successful")
+            End If
+        Next
+        lSummary.Flush()
+        lSummary.Close()
+        lSummary = Nothing
+        UpdateStatus("Base-flow Separation Complete for " & lTotalBFOpn & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", True)
+    End Sub '}
+
     Private Sub UpdateStatus(ByVal aMsg As String, Optional ByVal aAppend As Boolean = False, Optional ByVal aResetProgress As Boolean = False)
         If gProgressBar IsNot Nothing Then
             If aResetProgress Then
