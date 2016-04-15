@@ -20,6 +20,8 @@ Public Class frmBatchMap
     Private pDataEndCommon As Double
     Private pRefreshTimeSpan As Boolean = False
 
+    Private pStationInfoGroup As atcCollection
+
     Private WithEvents pfrmBFParms As frmUSGSBaseflowBatch
 
     Private pLoaded As Boolean = False
@@ -33,6 +35,7 @@ Public Class frmBatchMap
             End If
         End Get
     End Property
+
     Public Sub Initiate(ByVal aList As atcCollection)
         pListStations = aList
         If pListStations Is Nothing Then pListStations = New atcCollection()
@@ -54,11 +57,19 @@ Public Class frmBatchMap
         Next
         pBFInputsGlobal = New atcDataAttributes()
         pBFInputsGroups = New atcCollection()
+        pStationInfoGroup = New atcCollection()
         Dim lDataDir As String = GetSetting("atcUSGSBaseflow", "Default", "DataDir", "")
         If IO.Directory.Exists(lDataDir) Then
             txtDataDir.Text = lDataDir
         End If
         pLoaded = True
+    End Sub
+
+    Private Sub LogStationInfo(ByVal aTser As atcTimeseries, ByVal lStationId As String, ByVal lDataPath As String)
+        If Not pStationInfoGroup.Keys.Contains(lStationId) Then
+            Dim ldrainarea As Double = aTser.Attributes.GetValue("Drainage Area", 0.0)
+            pStationInfoGroup.Add(lStationId, "Station" & vbTab & lStationId & "," & ldrainarea & "," & lDataPath)
+        End If
     End Sub
 
     Private Sub btnCreateGroup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCreateGroup.Click
@@ -168,6 +179,7 @@ Public Class frmBatchMap
                     Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
                     If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
                         lTsGroup.Add(lTsGroupTemp(0))
+                        LogStationInfo(lTsGroupTemp(0), lstationId, lDataPath)
                     End If
                 Next
                 If lTsGroup.Count > 0 Then
@@ -291,6 +303,7 @@ Public Class frmBatchMap
                         Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
                         If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
                             lTsGroup.Add(lTsGroupTemp(0).Clone)
+                            LogStationInfo(lTsGroupTemp(0), lstationId, lDataPath)
                         End If
                     End If
                 Next
@@ -364,7 +377,7 @@ Public Class frmBatchMap
         End If
     End Sub
 
-    Private Function ParametersToText(ByVal aArgs As atcDataAttributes) As String
+    Private Function ParametersToText(ByVal aArgs As atcDataAttributes, Optional aDefaultArgs As atcDataAttributes = Nothing) As String
         If aArgs Is Nothing Then Return ""
         Dim loperation As String = aArgs.GetValue("Operation", "")
         Dim lgroupname As String = aArgs.GetValue("Group", "")
@@ -383,8 +396,15 @@ Public Class frmBatchMap
             lText.AppendLine("GLOBAL")
         End If
 
-        Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate, Date2J(2014, 8, 20, 0, 0, 0))
-        Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate, Date2J(2014, 8, 20, 24, 0, 0))
+        Dim lStartDate As Double = aArgs.GetValue(BFInputNames.StartDate, -99) 'Date2J(2014, 8, 20, 0, 0, 0))
+        Dim lEndDate As Double = aArgs.GetValue(BFInputNames.EndDate, -99) 'Date2J(2014, 8, 20, 24, 0, 0))
+        If lStartDate < 0 AndAlso aDefaultArgs IsNot Nothing Then
+            lStartDate = aDefaultArgs.GetValue(BFInputNames.StartDate, 0)
+        End If
+        If lEndDate < 0 AndAlso aDefaultArgs IsNot Nothing Then
+            lEndDate = aDefaultArgs.GetValue(BFInputNames.EndDate, 0)
+        End If
+
         Dim lDates(5) As Integer
         J2Date(lStartDate, lDates)
         lText.AppendLine("STARTDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
@@ -392,8 +412,13 @@ Public Class frmBatchMap
         timcnv(lDates)
         lText.AppendLine("ENDDATE" & vbTab & lDates(0) & "/" & lDates(1) & "/" & lDates(2))
 
+        Dim lMethods As ArrayList = Nothing
         If aArgs.ContainsAttribute(BFInputNames.BFMethods) Then
-            Dim lMethods As ArrayList = aArgs.GetValue(BFInputNames.BFMethods)
+            lMethods = aArgs.GetValue(BFInputNames.BFMethods)
+        ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.BFMethods) Then
+            lMethods = aDefaultArgs.GetValue(BFInputNames.BFMethods)
+        End If
+        If lMethods IsNot Nothing Then
             For Each lMethod As BFMethods In lMethods
                 Select Case lMethod
                     Case BFMethods.PART
@@ -410,43 +435,59 @@ Public Class frmBatchMap
                         lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
                 End Select
             Next
-        ElseIf lSetGlobal Then
+        Else
+            'get 3 representatives
             lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_PART)
             lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYFX)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
+            'lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYLM)
+            'lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_HYSL)
             lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
-            lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+            'lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
         End If
 
+        Dim lBFITurnPtFrac As Double = 0.9
         If aArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
-            Dim lBFITurnPtFrac As Double = aArgs.GetValue(BFInputNames.BFITurnPtFrac)
-            lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & lBFITurnPtFrac)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & "0.9")
+            lBFITurnPtFrac = aArgs.GetValue(BFInputNames.BFITurnPtFrac)
+        ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.BFITurnPtFrac) Then
+            lBFITurnPtFrac = aDefaultArgs.GetValue(BFInputNames.BFITurnPtFrac)
         End If
-        If aArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
-            Dim lBFINDayScreen As Double = aArgs.GetValue(BFInputNames.BFINDayScreen)
-            lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & lBFINDayScreen)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & "5")
-        End If
-        If aArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
-            Dim lBFIRecessConst As Double = aArgs.GetValue(BFInputNames.BFIRecessConst)
-            lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & lBFIRecessConst)
-        ElseIf lSetGlobal Then
-            lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & "0.97915")
-        End If
+        lText.AppendLine(BFInputNames.BFITurnPtFrac & vbTab & lBFITurnPtFrac)
 
+
+        Dim lBFINDayScreen As Double = 5
+        If aArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
+            lBFINDayScreen = aArgs.GetValue(BFInputNames.BFINDayScreen)
+        ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.BFINDayScreen) Then
+            lBFINDayScreen = aDefaultArgs.GetValue(BFInputNames.BFINDayScreen)
+        End If
+        lText.AppendLine(BFInputNames.BFINDayScreen & vbTab & lBFINDayScreen)
+
+        Dim lBFIRecessConst As Double = 0.97915
+        If aArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
+            lBFIRecessConst = aArgs.GetValue(BFInputNames.BFIRecessConst)
+        ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.BFIRecessConst) Then
+            lBFIRecessConst = aDefaultArgs.GetValue(BFInputNames.BFIRecessConst)
+        End If
+        lText.AppendLine(BFInputNames.BFIRecessConst & vbTab & lBFIRecessConst)
+
+        Dim lBFIReportBy As String = ""
         If aArgs.ContainsAttribute(BFInputNames.BFIReportby) Then
-            Dim lBFIReportBy As String = aArgs.GetValue(BFInputNames.BFIReportby, "")
+            lBFIReportBy = aArgs.GetValue(BFInputNames.BFIReportby, "")
             Select Case lBFIReportBy
                 Case BFInputNames.BFIReportbyCY
                     lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
                 Case BFInputNames.BFIReportbyWY
                     lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
             End Select
-        ElseIf lSetGlobal Then
+        ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.BFIReportby) Then
+            lBFIReportBy = aDefaultArgs.GetValue(BFInputNames.BFIReportby, "")
+            Select Case lBFIReportBy
+                Case BFInputNames.BFIReportbyCY
+                    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
+                Case BFInputNames.BFIReportbyWY
+                    lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByWY)
+            End Select
+        Else
             lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
         End If
 
@@ -461,8 +502,15 @@ Public Class frmBatchMap
         End If
 
         Dim lOutputDir As String = aArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
-        Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+        If String.IsNullOrEmpty(lOutputDir) AndAlso aDefaultArgs IsNot Nothing Then
+            lOutputDir = aDefaultArgs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
+        End If
         lText.AppendLine(BFBatchInputNames.OUTPUTDIR & vbTab & lOutputDir)
+
+        Dim lOutputPrefix As String = aArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+        If String.IsNullOrEmpty(lOutputPrefix) AndAlso aDefaultArgs IsNot Nothing Then
+            lOutputPrefix = aDefaultArgs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
+        End If
         lText.AppendLine(BFBatchInputNames.OUTPUTPrefix & vbTab & lOutputPrefix)
 
         If loperation.ToLower = "groupsetparm" Then
@@ -492,8 +540,11 @@ Public Class frmBatchMap
     Private Sub btnDownload_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDownload.Click
         If Not String.IsNullOrEmpty(pDataPath) AndAlso IO.Directory.Exists(pDataPath) Then
             Dim lStationsNeedDownload As New atcCollection()
+            Dim lDataFileFullPath As String = ""
             For Each lStationID As String In pListStations.Keys
-                If Not IO.File.Exists(GetDataFileFullPath(lStationID)) Then
+                lDataFileFullPath = GetDataFileFullPath(lStationID)
+                pListStations.ItemByKey(lStationID) = lDataFileFullPath
+                If Not IO.File.Exists(lDataFileFullPath) Then
                     lStationsNeedDownload.Add(lStationID, lStationID)
                 End If
             Next
@@ -569,10 +620,41 @@ Public Class frmBatchMap
             lSW = New IO.StreamWriter(pBatchSpecFilefullname, False)
             'write global block first
             lSW.WriteLine(ParametersToText(pBFInputsGlobal))
+            lSW.Flush()
 
             'write each group settings
             For Each lAttrib As atcDataAttributes In pBFInputsGroups
-                lSW.WriteLine(ParametersToText(lAttrib))
+                'check for stationInfo to be set
+                Dim lStationInfo As ArrayList = lAttrib.GetValue("StationInfo")
+                Dim lNeedToRefreshStationInfo As Boolean = False
+                For Each lSInfo As String In lStationInfo
+                    If lSInfo.ToLower().Contains("unknown") Then
+                        lNeedToRefreshStationInfo = True
+                        Exit For
+                    End If
+                Next
+                If lNeedToRefreshStationInfo Then
+                    Dim lNewStationInfo As New ArrayList()
+                    For Each lSInfo As String In lStationInfo
+                        Dim lArr() As String = lSInfo.Substring(lSInfo.IndexOf(vbTab) + 1).Split(",")
+                        If pStationInfoGroup.Keys.Contains(lArr(0)) Then
+                            lNewStationInfo.Add(pStationInfoGroup.ItemByKey(lArr(0)))
+                        Else
+                            Dim lArgs As New atcDataAttributes()
+                            lArgs.Add("Constituent", "streamflow")
+                            Dim lDataPath As String = GetDataFileFullPath(lArr(0))
+                            Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+                            If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                                LogStationInfo(lTsGroupTemp(0), lArr(0), lDataPath)
+                            End If
+                            lNewStationInfo.Add(pStationInfoGroup.ItemByKey(lArr(0)))
+                        End If
+                    Next
+                    lAttrib.RemoveByKey("StationInfo")
+                    lAttrib.SetValue("StationInfo", lNewStationInfo)
+                End If
+                lSW.WriteLine(ParametersToText(lAttrib, pBFInputsGlobal))
+                lSW.Flush()
             Next
 
             Logger.Msg("Batch file is saved:" & vbCrLf & pBatchSpecFilefullname, "Batch Base-flow Separation")
@@ -581,6 +663,7 @@ Public Class frmBatchMap
             pBatchSpecFilefullname = ""
         Finally
             If lSW IsNot Nothing Then
+                lSW.Flush()
                 lSW.Close()
                 lSW = Nothing
             End If
@@ -755,6 +838,7 @@ Public Class frmBatchMap
                 Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
                 If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
                     lTsGroup.Add(lTsGroupTemp(0).Clone)
+                    LogStationInfo(lTsGroupTemp(0), lstationId, lDataPath)
                 End If
             End If
         Next
@@ -859,6 +943,7 @@ Public Class frmBatchMap
                                 Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
                                 If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
                                     lTsGroup.Add(lTsGroupTemp(0))
+                                    LogStationInfo(lTsGroupTemp(0), lStationID, lDataPath)
                                 End If
                             End If
                             lStnCtr += 1

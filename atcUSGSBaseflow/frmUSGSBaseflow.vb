@@ -174,31 +174,33 @@ Public Class frmUSGSBaseflow
             Dim lEDate As Double = EndDateFromForm()
             If lSDate < 0 OrElse lEDate < 0 Then
                 lErrMsg &= "- Problematic start and/or end date." & vbCrLf
+            ElseIf (lEDate - lSDate) / (JulianHour * 24) < 31 Then
+                lErrMsg &= "- Analysis duration is too short (31 days minimum)." & vbCrLf
             Else
-                Dim lTs As atcTimeseries = Nothing
-                For Each lTs In pDataGroup
-                    Try
-                        lTs = SubsetByDate(lTs, lSDate, lEDate, Nothing)
-                        If lTs.Attributes.GetValue("Count missing") > 0 Then
-                            If chkMethodHySEPFixed.Checked OrElse
-                               chkMethodHySEPLocMin.Checked OrElse
-                               chkMethodHySEPSlide.Checked OrElse
-                               chkMethodPART.Checked Then
-                                lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
-                                lTs.Clear()
-                                Exit For
-                            End If
-                        ElseIf lTs.numValues < 31 Then
-                            lErrMsg &= "- Selected Dataset is too short (31 days minimum)." & vbCrLf
-                            lTs.Clear()
-                            Exit For
-                        Else
-                            lTs.Clear()
-                        End If
-                    Catch ex As Exception
-                        lErrMsg &= "- Problematic starting and ending dates." & vbCrLf
-                    End Try
-                Next
+                'Dim lTs As atcTimeseries = Nothing
+                'For Each lTs In pDataGroup
+                '    Try
+                '        lTs = SubsetByDate(lTs, lSDate, lEDate, Nothing)
+                '        If lTs.Attributes.GetValue("Count missing") > 0 Then
+                '            If chkMethodHySEPFixed.Checked OrElse
+                '               chkMethodHySEPLocMin.Checked OrElse
+                '               chkMethodHySEPSlide.Checked OrElse
+                '               chkMethodPART.Checked Then
+                '                lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
+                '                lTs.Clear()
+                '                Exit For
+                '            End If
+                '        ElseIf lTs.numValues < 31 Then
+                '            lErrMsg &= "- Selected Dataset is too short (31 days minimum)." & vbCrLf
+                '            lTs.Clear()
+                '            Exit For
+                '        Else
+                '            lTs.Clear()
+                '        End If
+                '    Catch ex As Exception
+                '        lErrMsg &= "- Problematic starting and ending dates." & vbCrLf
+                '    End Try
+                'Next
             End If
         End If
 
@@ -232,6 +234,10 @@ Public Class frmUSGSBaseflow
             If Not Double.TryParse(txtK.Text.Trim(), lK1Day) Then
                 lErrMsg &= "- BFI modified method needs a valid recession constant (K)" & vbCrLf
             End If
+        End If
+
+        If IO.Directory.Exists(txtOutputDir.Text) Then
+            Args.SetValue("OutputDir", txtOutputDir.Text)
         End If
 
         If lErrMsg.Length = 0 Then
@@ -426,7 +432,7 @@ Public Class frmUSGSBaseflow
             Exit Sub
         End If
         ClearAttributes()
-        modBaseflowUtil.ComputeBaseflow(lArgs, True)
+        modBaseflowUtil.ComputeBaseflowIntermittent(lArgs, True)
         'pMethodLastDone = lArgs.GetValue("Method")
         MethodsLastDone = lArgs.GetValue(BFInputNames.BFMethods)
         pDALastUsed = lArgs.GetValue(BFInputNames.DrainageArea) '"Drainage Area")
@@ -478,7 +484,19 @@ Public Class frmUSGSBaseflow
         SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
 
         OutputDir = txtOutputDir.Text.Trim()
-        ASCIICommon(pDataGroup(0))
+
+        'The following ascii output steps are already done during the base-flow analysis process
+        '
+        'Logger.Status("Writing common ascii output files...") 
+        'ASCIICommon(pDataGroup(0))
+        'Logger.Status("Writing legacy ascii output files...")
+        'For Each lMethod As BFMethods In MethodsLastDone
+        '    Logger.Status("Writing legacy ascii output files for method: " & lMethod.ToString())
+        '    ASCIIOriginal(pDataGroup(0), lMethod)
+        'Next
+        Logger.Status("Hide")
+
+        'ToDo: persist the baseflow analysis results?
         'Dim lRDBWriter As New atcTimeseriesRDB()
 
         Logger.MsgCustomOwned("Baseflow output completed.", "USGS Base-Flow Separation", Me, New String() {"OK"})
@@ -711,6 +729,10 @@ Public Class frmUSGSBaseflow
     Private Function SetupGraphTsGroup(ByVal aTsCollection As atcCollection, ByVal aParams As atcDataAttributes) As atcTimeseriesGroup
         Dim lDA As Double = aParams.GetValue("Drainage Area")
         Dim lPerUnitArea As Boolean = aParams.GetValue("PerUnitArea")
+        If lPerUnitArea AndAlso (Not (lDA > 0) OrElse Double.IsNaN(lDA)) Then
+            lDA = 1.0
+            Logger.Msg("Drainage area is not positive, it is set to 1.", MsgBoxStyle.Information, "Setup Graph Time Series Group")
+        End If
         Dim lGraphType As String = aParams.GetValue("GraphType")
         Dim lTsFlow As atcTimeseries = aParams.GetValue("StreamFlow").Clone()
         Dim lYAxisTitleText As String = aParams.GetValue("YAxisTitleText")

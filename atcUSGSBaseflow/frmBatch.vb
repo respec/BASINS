@@ -44,7 +44,8 @@ Public Class frmBatch
             pBatchConfig.Clear()
             pBatchConfig.PopulateScenarios()
             Application.DoEvents()
-            pBatchConfig.DoBatch()
+            'pBatchConfig.DoBatch()
+            pBatchConfig.DoBatchIntermittent()
         End If
 
     End Sub
