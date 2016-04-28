@@ -278,7 +278,7 @@ Public Module modBaseflowUtil
         Dim lDrainageArea As Double = aArgs.GetValue(BFInputNames.DrainageArea)
 
         Dim lMsgTitle As String = "Interactive Base-flow Analysis"
-        'break up into continuous chunks
+        'break up into continuous periods
         Dim lTserFullDateRange As New atcTimeseries(Nothing)
         Logger.Status("Creating Full Date Range Flow Record.")
         Try
@@ -310,10 +310,10 @@ Public Module modBaseflowUtil
                         While (I <= lTsFlow.numValues AndAlso Not Double.IsNaN(lTsFlow.Value(I)))
                             I = I + 1
                         End While
-                        lFlowEnd = lTsFlow.Dates.Value(I - 2)
+                        lFlowEnd = lTsFlow.Dates.Value(I - 1) 'need to record the end of the last time step
                         If (lFlowEnd - lFlowStart) >= 31 Then
                             Dim lTs As atcTimeseries = SubsetByDate(lTsFlow, lFlowStart, lFlowEnd, Nothing)
-                            lTs.Attributes.SetValue("chunk", ctr)
+                            lTs.Attributes.SetValue("period", ctr)
                             lTsAnalysisGroup.Add(ctr, lTs)
                             ctr += 1
                         End If
@@ -333,11 +333,25 @@ Public Module modBaseflowUtil
         Dim CalcBF As atcTimeseriesBaseflow.atcTimeseriesBaseflow = New atcTimeseriesBaseflow.atcTimeseriesBaseflow()
         Dim lTotalGroupCt As Integer = lTsAnalysisGroup.Count
         Dim lGroupCtr As Integer = 1
-        Dim lPattern As String = "_chunk_(\d)+"
+        Dim lPattern As String = "_period_(\d)+"
         Dim rgx = New Regex(lPattern)
         Dim replacement = ""
+        Dim lTsDailyCheck As atcTimeseries = Nothing
+        Dim lActualStart As Double
+        Dim lActualEnd As Double
         For Each lTsChunk As atcTimeseries In lTsAnalysisGroup
             Logger.Progress("Base-flow Analysis for continuous stream records", lGroupCtr, lTotalGroupCt)
+            lActualStart = lTsChunk.Dates.Value(0)
+            lActualEnd = lTsChunk.Dates.Value(lTsChunk.numValues)
+            lTsDailyCheck = SubsetByDate(lTsChunk, lAnalysis_Start, lAnalysis_End, Nothing)
+            If lTsDailyCheck Is Nothing OrElse lTsDailyCheck.Values Is Nothing OrElse lTsDailyCheck.numValues = 0 Then
+                Logger.Dbg("Period " & lGroupCtr & " duration (" & DumpDate(lActualStart) & "~" & DumpDate(lActualEnd) & ") mismatch analysis duration (" & DumpDate(lAnalysis_Start) & "~" & DumpDate(lAnalysis_End) & "). Skipped.")
+                lGroupCtr += 1
+                Continue For
+            Else
+                lTsDailyCheck.Clear()
+                lTsDailyCheck = Nothing
+            End If
             lTsFlowGroup.Add(lTsChunk)
             'With lTsChunkAttributes
             '    .Clear()
@@ -356,14 +370,14 @@ Public Module modBaseflowUtil
                 'OutputDir = lStationOutDir
                 OutputDir = aArgs.GetValue("OutputDir", "")
                 'OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
-                Dim lCtr As Integer = lTsChunk.Attributes.GetValue("chunk", 0)
+                Dim lCtr As Integer = lTsChunk.Attributes.GetValue("period", 0)
                 If String.IsNullOrEmpty(OutputFilenameRoot) Then
-                    OutputFilenameRoot = "BF_chunk_" & lCtr.ToString()
+                    OutputFilenameRoot = "BF_period_" & lCtr.ToString()
                 Else
-                    'Adjust to remove chunk from root name for the full span report files
+                    'Adjust to remove period from root name for the full span report files
                     OutputFilenameRoot = rgx.Replace(OutputFilenameRoot, replacement)
-                    OutputFilenameRoot = OutputFilenameRoot.Replace("_chunk_", "")
-                    OutputFilenameRoot &= "_chunk_" & lCtr.ToString()
+                    OutputFilenameRoot = OutputFilenameRoot.Replace("_period_", "")
+                    OutputFilenameRoot &= "_period_" & lCtr.ToString()
                 End If
                 MethodsLastDone = lMethods
                 If IO.Directory.Exists(OutputDir) Then
@@ -378,9 +392,9 @@ Public Module modBaseflowUtil
             'lStation.Message &= CalcBF.BF_Message.Trim()
             lTsFlowGroup.Clear()
             lGroupCtr += 1
-        Next 'chunk
+        Next 'period
         'after the results are written, then merge, the intermittent time series can be cleared
-        'the lTsAnalysisGroup contains the chuncky or original time series' clone (if only 1 chunk), these will be cleared
+        'the lTsAnalysisGroup contains the chuncky or original time series' clone (if only 1 period), these will be cleared
 
         Dim lBFReportGroups As atcDataAttributes = Nothing
         Try
@@ -616,7 +630,7 @@ Public Module modBaseflowUtil
 
         'return the global 'OutputFilenameRoot' to its original form
         OutputFilenameRoot = rgx.Replace(OutputFilenameRoot, replacement)
-        OutputFilenameRoot = OutputFilenameRoot.Replace("_chunk_", "")
+        OutputFilenameRoot = OutputFilenameRoot.Replace("_period_", "")
 
         Logger.Status("Hide")
     End Sub '}
@@ -717,12 +731,12 @@ Public Module modBaseflowUtil
         If args IsNot Nothing AndAlso Not String.IsNullOrEmpty(lReportFileSuffix) Then
             Dim lForFullSpan As Boolean = args.GetValue("ForFullSpan", False)
             If lForFullSpan Then
-                'Adjust to remove chunk from root name for the full span report files
-                Dim lPattern As String = "_chunk_(\d)+"
+                'Adjust to remove period from root name for the full span report files
+                Dim lPattern As String = "_period_(\d)+"
                 Dim rgx = New Regex(lPattern)
                 Dim replacement = ""
                 lfnRoot = rgx.Replace(lfnRoot, replacement)
-                lfnRoot = lfnRoot.Replace("_chunk_", "")
+                lfnRoot = lfnRoot.Replace("_period_", "")
             End If
             lfnRoot &= "_" & lReportFileSuffix
         End If
@@ -1295,6 +1309,9 @@ Public Module modBaseflowUtil
             '        Continue For
             '    End If
             'End If
+            If I = 13560 Then
+                Dim lStop As String = "Stop"
+            End If
             J2Date(lTsFlow.Dates.Value(I - 1), lDate)
             With lTableBody
                 .Value(1) = I
@@ -3921,14 +3938,14 @@ Public Module modBaseflowUtil
     End Sub
 
     ''' <summary>
-    ''' chainning base-flow analysis results on different continuous chunks of data into complete time series
+    ''' chainning base-flow analysis results on different continuous periods of data into complete time series
     ''' will put the complete base-flow record as an attribute to the original flow time series
     ''' return the daily base-flow time series for all methods in a new time series group, keyed on BFMethod
     ''' </summary>
     ''' <param name="aTserFullDateRange">The flow data time series with full date range, daily</param>
-    ''' <param name="aTsAnalysisGroup">The group of continuous chunk of flow data, bf results are as their attributes</param>
+    ''' <param name="aTsAnalysisGroup">The group of continuous period of flow data, bf results are as their attributes</param>
     ''' <param name="aSTEP">a time step, Daily, Monthly, Yearly</param>
-    ''' <param name="aClearChunks">Whether to clear the group of continuous chunk of flow data, and their bf results are as their attributes</param>
+    ''' <param name="aClearChunks">Whether to clear the group of continuous period of flow data, and their bf results are as their attributes</param>
     Public Function MergeBaseflowResults(ByVal aTserFullDateRange As atcTimeseries,
                                          ByVal aTsAnalysisGroup As atcTimeseriesGroup,
                                          ByVal aSTEP As String,
@@ -4050,110 +4067,188 @@ Public Module modBaseflowUtil
             Dim lTsGroupBFIModified As atcCollection = ConstructReportTsGroup(lTsChunk, BFMethods.BFIModified, lStart, lEnd, lDA)
             If (lStart < 0 AndAlso lEnd < 0) OrElse lDA <= 0 Then Continue For
 
-            Dim lCtr As Integer = lTsChunk.Attributes.GetValue("chunk")
+            Dim lCtr As Integer = lTsChunk.Attributes.GetValue("period")
             aSTEP = "Daily"
             If lTsGroupPart.Count > 0 Then lTsGroupPartAllDaily.Add(lCtr, lTsGroupPart.ItemByKey("Rate" & aSTEP))
             If lTsGroupFixed.Count > 0 Then lTsGroupFixedAllDaily.Add(lCtr, lTsGroupFixed.ItemByKey("Rate" & aSTEP))
             If lTsGroupLocMin.Count > 0 Then lTsGroupLocMinAllDaily.Add(lCtr, lTsGroupLocMin.ItemByKey("Rate" & aSTEP))
             If lTsGroupSlide.Count > 0 Then lTsGroupSlideAllDaily.Add(lCtr, lTsGroupSlide.ItemByKey("Rate" & aSTEP))
-            If lTsGroupBFIStandard.Count > 0 Then lTsGroupBFIStandardAllDaily.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Rate" & aSTEP))
-            If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedAllDaily.Add(lCtr, lTsGroupBFIModified.ItemByKey("Rate" & aSTEP))
 
             If lTsGroupPart.Count > 0 Then lTsGroupPartDepthAllDaily.Add(lCtr, lTsGroupPart.ItemByKey("Depth" & aSTEP))
             If lTsGroupFixed.Count > 0 Then lTsGroupFixedDepthAllDaily.Add(lCtr, lTsGroupFixed.ItemByKey("Depth" & aSTEP))
             If lTsGroupLocMin.Count > 0 Then lTsGroupLocMinDepthAllDaily.Add(lCtr, lTsGroupLocMin.ItemByKey("Depth" & aSTEP))
             If lTsGroupSlide.Count > 0 Then lTsGroupSlideDepthAllDaily.Add(lCtr, lTsGroupSlide.ItemByKey("Depth" & aSTEP))
-            If lTsGroupBFIStandard.Count > 0 Then lTsGroupBFIStandardDepthAllDaily.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Depth" & aSTEP))
-            If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedDepthAllDaily.Add(lCtr, lTsGroupBFIModified.ItemByKey("Depth" & aSTEP))
+
+            'need to break up the BFI resulting time series into periods
+            If lTsGroupBFIStandard.Count > 0 Then
+                Dim lBFIRateTser As atcTimeseries = lTsGroupBFIStandard.ItemByKey("Rate" & aSTEP)
+                Dim lBFIDepthTser As atcTimeseries = lTsGroupBFIStandard.ItemByKey("Depth" & aSTEP)
+                Dim lChunkStart As Double = lTsChunk.Dates.Value(0)
+                Dim lChunkEnd As Double = lTsChunk.Dates.Value(lTsChunk.numValues)
+                If lBFIRateTser IsNot Nothing Then
+                    lTsGroupBFIStandardAllDaily.Add(lCtr, SubsetByDate(lBFIRateTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+                If lBFIDepthTser IsNot Nothing Then
+                    lTsGroupBFIStandardDepthAllDaily.Add(lCtr, SubsetByDate(lBFIDepthTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+            End If
+
+            If lTsGroupBFIModified.Count > 0 Then
+                Dim lBFIRateTser As atcTimeseries = lTsGroupBFIModified.ItemByKey("Rate" & aSTEP)
+                Dim lBFIDepthTser As atcTimeseries = lTsGroupBFIModified.ItemByKey("Depth" & aSTEP)
+                Dim lChunkStart As Double = lTsChunk.Dates.Value(0)
+                Dim lChunkEnd As Double = lTsChunk.Dates.Value(lTsChunk.numValues)
+                If lBFIRateTser IsNot Nothing Then
+                    lTsGroupBFIModifiedAllDaily.Add(lCtr, SubsetByDate(lBFIRateTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+                If lBFIDepthTser IsNot Nothing Then
+                    lTsGroupBFIModifiedDepthAllDaily.Add(lCtr, SubsetByDate(lBFIDepthTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+                'lTsGroupBFIModifiedAllDaily.Add(lCtr, lTsGroupBFIModified.ItemByKey("Rate" & aSTEP))
+                'lTsGroupBFIModifiedDepthAllDaily.Add(lCtr, lTsGroupBFIModified.ItemByKey("Depth" & aSTEP))
+            End If
 
             aSTEP = "Monthly"
             If lTsGroupPart.Count > 0 Then lTsGroupPartAllMonthly.Add(lCtr, lTsGroupPart.ItemByKey("Rate" & aSTEP))
             If lTsGroupFixed.Count > 0 Then lTsGroupFixedAllMonthly.Add(lCtr, lTsGroupFixed.ItemByKey("Rate" & aSTEP))
             If lTsGroupLocMin.Count > 0 Then lTsGroupLocMinAllMonthly.Add(lCtr, lTsGroupLocMin.ItemByKey("Rate" & aSTEP))
             If lTsGroupSlide.Count > 0 Then lTsGroupSlideAllMonthly.Add(lCtr, lTsGroupSlide.ItemByKey("Rate" & aSTEP))
-            If lTsGroupBFIStandard.Count > 0 Then lTsGroupBFIStandardAllMonthly.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Rate" & aSTEP))
-            If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedAllMonthly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Rate" & aSTEP))
 
             If lTsGroupPart.Count > 0 Then lTsGroupPartDepthAllMonthly.Add(lCtr, lTsGroupPart.ItemByKey("Depth" & aSTEP))
             If lTsGroupFixed.Count > 0 Then lTsGroupFixedDepthAllMonthly.Add(lCtr, lTsGroupFixed.ItemByKey("Depth" & aSTEP))
             If lTsGroupLocMin.Count > 0 Then lTsGroupLocMinDepthAllMonthly.Add(lCtr, lTsGroupLocMin.ItemByKey("Depth" & aSTEP))
             If lTsGroupSlide.Count > 0 Then lTsGroupSlideDepthAllMonthly.Add(lCtr, lTsGroupSlide.ItemByKey("Depth" & aSTEP))
-            If lTsGroupBFIStandard.Count > 0 Then lTsGroupBFIStandardDepthAllMonthly.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Depth" & aSTEP))
-            If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedDepthAllMonthly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Depth" & aSTEP))
+
+            If lTsGroupBFIStandard.Count > 0 Then
+                Dim lBFIRateTser As atcTimeseries = lTsGroupBFIStandard.ItemByKey("Rate" & aSTEP)
+                Dim lBFIDepthTser As atcTimeseries = lTsGroupBFIStandard.ItemByKey("Depth" & aSTEP)
+                Dim lChunkStart As Double = lTsChunk.Dates.Value(0)
+                Dim lChunkEnd As Double = lTsChunk.Dates.Value(lTsChunk.numValues)
+                If lBFIRateTser IsNot Nothing Then
+                    lTsGroupBFIStandardAllMonthly.Add(lCtr, SubsetByDate(lBFIRateTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+                If lBFIDepthTser IsNot Nothing Then
+                    lTsGroupBFIStandardDepthAllMonthly.Add(lCtr, SubsetByDate(lBFIDepthTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+
+                'lTsGroupBFIStandardAllMonthly.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Rate" & aSTEP))
+                'lTsGroupBFIStandardDepthAllMonthly.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Depth" & aSTEP))
+            End If
+
+            If lTsGroupBFIModified.Count > 0 Then
+                Dim lBFIRateTser As atcTimeseries = lTsGroupBFIModified.ItemByKey("Rate" & aSTEP)
+                Dim lBFIDepthTser As atcTimeseries = lTsGroupBFIModified.ItemByKey("Depth" & aSTEP)
+                Dim lChunkStart As Double = lTsChunk.Dates.Value(0)
+                Dim lChunkEnd As Double = lTsChunk.Dates.Value(lTsChunk.numValues)
+                If lBFIRateTser IsNot Nothing Then
+                    lTsGroupBFIModifiedAllMonthly.Add(lCtr, SubsetByDate(lBFIRateTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+                If lBFIDepthTser IsNot Nothing Then
+                    lTsGroupBFIModifiedDepthAllMonthly.Add(lCtr, SubsetByDate(lBFIDepthTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+                'lTsGroupBFIModifiedAllMonthly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Rate" & aSTEP))
+                'lTsGroupBFIModifiedDepthAllMonthly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Depth" & aSTEP))
+            End If
 
             aSTEP = "Yearly"
             If lTsGroupPart.Count > 0 Then lTsGroupPartAllYearly.Add(lCtr, lTsGroupPart.ItemByKey("Rate" & aSTEP))
             If lTsGroupFixed.Count > 0 Then lTsGroupFixedAllYearly.Add(lCtr, lTsGroupFixed.ItemByKey("Rate" & aSTEP))
             If lTsGroupLocMin.Count > 0 Then lTsGroupLocMinAllYearly.Add(lCtr, lTsGroupLocMin.ItemByKey("Rate" & aSTEP))
             If lTsGroupSlide.Count > 0 Then lTsGroupSlideAllYearly.Add(lCtr, lTsGroupSlide.ItemByKey("Rate" & aSTEP))
-            If lTsGroupBFIStandard.Count > 0 Then lTsGroupBFIStandardAllYearly.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Rate" & aSTEP))
-            If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedAllYearly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Rate" & aSTEP))
 
             If lTsGroupPart.Count > 0 Then lTsGroupPartDepthAllYearly.Add(lCtr, lTsGroupPart.ItemByKey("Depth" & aSTEP))
             If lTsGroupFixed.Count > 0 Then lTsGroupFixedDepthAllYearly.Add(lCtr, lTsGroupFixed.ItemByKey("Depth" & aSTEP))
             If lTsGroupLocMin.Count > 0 Then lTsGroupLocMinDepthAllYearly.Add(lCtr, lTsGroupLocMin.ItemByKey("Depth" & aSTEP))
             If lTsGroupSlide.Count > 0 Then lTsGroupSlideDepthAllYearly.Add(lCtr, lTsGroupSlide.ItemByKey("Depth" & aSTEP))
-            If lTsGroupBFIStandard.Count > 0 Then lTsGroupBFIStandardDepthAllYearly.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Depth" & aSTEP))
-            If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedDepthAllYearly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Depth" & aSTEP))
+
+            If lTsGroupBFIStandard.Count > 0 Then
+                Dim lBFIRateTser As atcTimeseries = lTsGroupBFIStandard.ItemByKey("Rate" & aSTEP)
+                Dim lBFIDepthTser As atcTimeseries = lTsGroupBFIStandard.ItemByKey("Depth" & aSTEP)
+                Dim lChunkStart As Double = lTsChunk.Dates.Value(0)
+                Dim lChunkEnd As Double = lTsChunk.Dates.Value(lTsChunk.numValues)
+                If lBFIRateTser IsNot Nothing Then
+                    lTsGroupBFIStandardAllYearly.Add(lCtr, SubsetByDate(lBFIRateTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+                If lBFIDepthTser IsNot Nothing Then
+                    lTsGroupBFIStandardDepthAllYearly.Add(lCtr, SubsetByDate(lBFIDepthTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+                'If lTsGroupBFIStandard.Count > 0 Then lTsGroupBFIStandardAllYearly.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Rate" & aSTEP))
+                'If lTsGroupBFIStandard.Count > 0 Then lTsGroupBFIStandardDepthAllYearly.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Depth" & aSTEP))
+            End If
+
+            If lTsGroupBFIModified.Count > 0 Then
+                Dim lBFIRateTser As atcTimeseries = lTsGroupBFIModified.ItemByKey("Rate" & aSTEP)
+                Dim lBFIDepthTser As atcTimeseries = lTsGroupBFIModified.ItemByKey("Depth" & aSTEP)
+                Dim lChunkStart As Double = lTsChunk.Dates.Value(0)
+                Dim lChunkEnd As Double = lTsChunk.Dates.Value(lTsChunk.numValues)
+                If lBFIRateTser IsNot Nothing Then
+                    lTsGroupBFIModifiedAllYearly.Add(lCtr, SubsetByDate(lBFIRateTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+                If lBFIDepthTser IsNot Nothing Then
+                    lTsGroupBFIModifiedDepthAllYearly.Add(lCtr, SubsetByDate(lBFIDepthTser, lChunkStart, lChunkEnd, Nothing))
+                End If
+                'If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedAllYearly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Rate" & aSTEP))
+                'If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedDepthAllYearly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Depth" & aSTEP))
+            End If
         Next
 
         'Daily
-        If lTsGroupPartAllDaily.Count > 0 Then lTsPartAllDaily = MergeTimeseries(lTsGroupPartAllDaily, True)
-        If lTsGroupPartDepthAllDaily.Count > 0 Then lTsPartDepthAllDaily = MergeTimeseries(lTsGroupPartDepthAllDaily, True)
+        If lTsGroupPartAllDaily.Count > 0 Then lTsPartAllDaily = MergeTimeseriesInSequence(lTsGroupPartAllDaily) 'MergeTimeseries(lTsGroupPartAllDaily, True)
+        If lTsGroupPartDepthAllDaily.Count > 0 Then lTsPartDepthAllDaily = MergeTimeseriesInSequence(lTsGroupPartDepthAllDaily) 'MergeTimeseries(lTsGroupPartDepthAllDaily, True)
 
-        If lTsGroupFixedAllDaily.Count > 0 Then lTsFixedAllDaily = MergeTimeseries(lTsGroupFixedAllDaily, True)
-        If lTsGroupFixedDepthAllDaily.Count > 0 Then lTsFixedDepthAllDaily = MergeTimeseries(lTsGroupFixedDepthAllDaily, True)
+        If lTsGroupFixedAllDaily.Count > 0 Then lTsFixedAllDaily = MergeTimeseriesInSequence(lTsGroupFixedAllDaily)
+        If lTsGroupFixedDepthAllDaily.Count > 0 Then lTsFixedDepthAllDaily = MergeTimeseriesInSequence(lTsGroupFixedDepthAllDaily)
 
-        If lTsGroupLocMinAllDaily.Count > 0 Then lTsLocMinAllDaily = MergeTimeseries(lTsGroupLocMinAllDaily, True)
-        If lTsGroupLocMinDepthAllDaily.Count > 0 Then lTsLocMinDepthAllDaily = MergeTimeseries(lTsGroupLocMinDepthAllDaily, True)
+        If lTsGroupLocMinAllDaily.Count > 0 Then lTsLocMinAllDaily = MergeTimeseriesInSequence(lTsGroupLocMinAllDaily)
+        If lTsGroupLocMinDepthAllDaily.Count > 0 Then lTsLocMinDepthAllDaily = MergeTimeseriesInSequence(lTsGroupLocMinDepthAllDaily)
 
-        If lTsGroupSlideAllDaily.Count > 0 Then lTsSlideAllDaily = MergeTimeseries(lTsGroupSlideAllDaily, True)
-        If lTsGroupSlideDepthAllDaily.Count > 0 Then lTsSlideDepthAllDaily = MergeTimeseries(lTsGroupSlideDepthAllDaily, True)
+        If lTsGroupSlideAllDaily.Count > 0 Then lTsSlideAllDaily = MergeTimeseriesInSequence(lTsGroupSlideAllDaily)
+        If lTsGroupSlideDepthAllDaily.Count > 0 Then lTsSlideDepthAllDaily = MergeTimeseriesInSequence(lTsGroupSlideDepthAllDaily)
 
-        If lTsGroupBFIStandardAllDaily.Count > 0 Then lTsBFIStandardAllDaily = MergeTimeseries(lTsGroupBFIStandardAllDaily, True)
-        If lTsGroupBFIStandardDepthAllDaily.Count > 0 Then lTsBFIStandardDepthAllDaily = MergeTimeseries(lTsGroupBFIStandardDepthAllDaily, True)
+        If lTsGroupBFIStandardAllDaily.Count > 0 Then lTsBFIStandardAllDaily = MergeTimeseriesInSequence(lTsGroupBFIStandardAllDaily)
+        If lTsGroupBFIStandardDepthAllDaily.Count > 0 Then lTsBFIStandardDepthAllDaily = MergeTimeseriesInSequence(lTsGroupBFIStandardDepthAllDaily)
 
-        If lTsGroupBFIModifiedAllDaily.Count > 0 Then lTsBFIModifiedAllDaily = MergeTimeseries(lTsGroupBFIModifiedAllDaily, True)
-        If lTsGroupBFIModifiedDepthAllDaily.Count > 0 Then lTsBFIModifiedDepthAllDaily = MergeTimeseries(lTsGroupBFIModifiedDepthAllDaily, True)
+        If lTsGroupBFIModifiedAllDaily.Count > 0 Then lTsBFIModifiedAllDaily = MergeTimeseriesInSequence(lTsGroupBFIModifiedAllDaily)
+        If lTsGroupBFIModifiedDepthAllDaily.Count > 0 Then lTsBFIModifiedDepthAllDaily = MergeTimeseriesInSequence(lTsGroupBFIModifiedDepthAllDaily)
 
 
         'Monthly
-        If Not IsGroupEmpty(lTsGroupPartAllMonthly) Then lTsPartAllMonthly = MergeTimeseries(lTsGroupPartAllMonthly, True)
-        If Not IsGroupEmpty(lTsGroupPartDepthAllMonthly) Then lTsPartDepthAllMonthly = MergeTimeseries(lTsGroupPartDepthAllMonthly, True)
+        If Not IsGroupEmpty(lTsGroupPartAllMonthly) Then lTsPartAllMonthly = MergeTimeseriesInSequence(lTsGroupPartAllMonthly) 'MergeTimeseries(lTsGroupPartAllMonthly, True)
+        If Not IsGroupEmpty(lTsGroupPartDepthAllMonthly) Then lTsPartDepthAllMonthly = MergeTimeseriesInSequence(lTsGroupPartDepthAllMonthly) 'MergeTimeseries(lTsGroupPartDepthAllMonthly, True)
 
-        If Not IsGroupEmpty(lTsGroupFixedAllMonthly) Then lTsFixedAllMonthly = MergeTimeseries(lTsGroupFixedAllMonthly, True)
-        If Not IsGroupEmpty(lTsGroupFixedDepthAllMonthly) Then lTsFixedDepthAllMonthly = MergeTimeseries(lTsGroupFixedDepthAllMonthly, True)
+        If Not IsGroupEmpty(lTsGroupFixedAllMonthly) Then lTsFixedAllMonthly = MergeTimeseriesInSequence(lTsGroupFixedAllMonthly)
+        If Not IsGroupEmpty(lTsGroupFixedDepthAllMonthly) Then lTsFixedDepthAllMonthly = MergeTimeseriesInSequence(lTsGroupFixedDepthAllMonthly)
 
-        If Not IsGroupEmpty(lTsGroupLocMinAllMonthly) Then lTsLocMinAllMonthly = MergeTimeseries(lTsGroupLocMinAllMonthly, True)
-        If Not IsGroupEmpty(lTsGroupLocMinDepthAllMonthly) Then lTsLocMinDepthAllMonthly = MergeTimeseries(lTsGroupLocMinDepthAllMonthly, True)
+        If Not IsGroupEmpty(lTsGroupLocMinAllMonthly) Then lTsLocMinAllMonthly = MergeTimeseriesInSequence(lTsGroupLocMinAllMonthly)
+        If Not IsGroupEmpty(lTsGroupLocMinDepthAllMonthly) Then lTsLocMinDepthAllMonthly = MergeTimeseriesInSequence(lTsGroupLocMinDepthAllMonthly)
 
-        If Not IsGroupEmpty(lTsGroupSlideAllMonthly) Then lTsSlideAllMonthly = MergeTimeseries(lTsGroupSlideAllMonthly, True)
-        If Not IsGroupEmpty(lTsGroupSlideDepthAllMonthly) Then lTsSlideDepthAllMonthly = MergeTimeseries(lTsGroupSlideDepthAllMonthly, True)
+        If Not IsGroupEmpty(lTsGroupSlideAllMonthly) Then lTsSlideAllMonthly = MergeTimeseriesInSequence(lTsGroupSlideAllMonthly)
+        If Not IsGroupEmpty(lTsGroupSlideDepthAllMonthly) Then lTsSlideDepthAllMonthly = MergeTimeseriesInSequence(lTsGroupSlideDepthAllMonthly)
 
-        If Not IsGroupEmpty(lTsGroupBFIStandardAllMonthly) Then lTsBFIStandardAllMonthly = MergeTimeseries(lTsGroupBFIStandardAllMonthly, True)
-        If Not IsGroupEmpty(lTsGroupBFIStandardDepthAllMonthly) Then lTsBFIStandardDepthAllMonthly = MergeTimeseries(lTsGroupBFIStandardDepthAllMonthly, True)
+        If Not IsGroupEmpty(lTsGroupBFIStandardAllMonthly) Then lTsBFIStandardAllMonthly = MergeTimeseriesInSequence(lTsGroupBFIStandardAllMonthly)
+        If Not IsGroupEmpty(lTsGroupBFIStandardDepthAllMonthly) Then lTsBFIStandardDepthAllMonthly = MergeTimeseriesInSequence(lTsGroupBFIStandardDepthAllMonthly)
 
-        If Not IsGroupEmpty(lTsGroupBFIModifiedAllMonthly) Then lTsBFIModifiedAllMonthly = MergeTimeseries(lTsGroupBFIModifiedAllMonthly, True)
-        If Not IsGroupEmpty(lTsGroupBFIModifiedDepthAllMonthly) Then lTsBFIModifiedDepthAllMonthly = MergeTimeseries(lTsGroupBFIModifiedDepthAllMonthly, True)
+        If Not IsGroupEmpty(lTsGroupBFIModifiedAllMonthly) Then lTsBFIModifiedAllMonthly = MergeTimeseriesInSequence(lTsGroupBFIModifiedAllMonthly)
+        If Not IsGroupEmpty(lTsGroupBFIModifiedDepthAllMonthly) Then lTsBFIModifiedDepthAllMonthly = MergeTimeseriesInSequence(lTsGroupBFIModifiedDepthAllMonthly)
 
         'Yearly
-        If Not IsGroupEmpty(lTsGroupPartAllYearly) Then lTsPartAllYearly = MergeTimeseries(lTsGroupPartAllYearly, True)
-        If Not IsGroupEmpty(lTsGroupPartDepthAllYearly) Then lTsPartDepthAllYearly = MergeTimeseries(lTsGroupPartDepthAllYearly, True)
+        If Not IsGroupEmpty(lTsGroupPartAllYearly) Then lTsPartAllYearly = MergeTimeseriesInSequence(lTsGroupPartAllYearly)
+        If Not IsGroupEmpty(lTsGroupPartDepthAllYearly) Then lTsPartDepthAllYearly = MergeTimeseriesInSequence(lTsGroupPartDepthAllYearly)
 
-        If Not IsGroupEmpty(lTsGroupFixedAllYearly) Then lTsFixedAllYearly = MergeTimeseries(lTsGroupFixedAllYearly, True)
-        If Not IsGroupEmpty(lTsGroupFixedDepthAllYearly) Then lTsFixedDepthAllYearly = MergeTimeseries(lTsGroupFixedDepthAllYearly, True)
+        If Not IsGroupEmpty(lTsGroupFixedAllYearly) Then lTsFixedAllYearly = MergeTimeseriesInSequence(lTsGroupFixedAllYearly)
+        If Not IsGroupEmpty(lTsGroupFixedDepthAllYearly) Then lTsFixedDepthAllYearly = MergeTimeseriesInSequence(lTsGroupFixedDepthAllYearly)
 
-        If Not IsGroupEmpty(lTsGroupLocMinAllYearly) Then lTsLocMinAllYearly = MergeTimeseries(lTsGroupLocMinAllYearly, True)
-        If Not IsGroupEmpty(lTsGroupLocMinDepthAllYearly) Then lTsLocMinDepthAllYearly = MergeTimeseries(lTsGroupLocMinDepthAllYearly, True)
+        If Not IsGroupEmpty(lTsGroupLocMinAllYearly) Then lTsLocMinAllYearly = MergeTimeseriesInSequence(lTsGroupLocMinAllYearly)
+        If Not IsGroupEmpty(lTsGroupLocMinDepthAllYearly) Then lTsLocMinDepthAllYearly = MergeTimeseriesInSequence(lTsGroupLocMinDepthAllYearly)
 
-        If Not IsGroupEmpty(lTsGroupSlideAllYearly) Then lTsSlideAllYearly = MergeTimeseries(lTsGroupSlideAllYearly, True)
-        If Not IsGroupEmpty(lTsGroupSlideDepthAllYearly) Then lTsSlideDepthAllYearly = MergeTimeseries(lTsGroupSlideDepthAllYearly, True)
+        If Not IsGroupEmpty(lTsGroupSlideAllYearly) Then lTsSlideAllYearly = MergeTimeseriesInSequence(lTsGroupSlideAllYearly)
+        If Not IsGroupEmpty(lTsGroupSlideDepthAllYearly) Then lTsSlideDepthAllYearly = MergeTimeseriesInSequence(lTsGroupSlideDepthAllYearly)
 
-        If Not IsGroupEmpty(lTsGroupBFIStandardAllYearly) Then lTsBFIStandardAllYearly = MergeTimeseries(lTsGroupBFIStandardAllYearly, True)
-        If Not IsGroupEmpty(lTsGroupBFIStandardDepthAllYearly) Then lTsBFIStandardDepthAllYearly = MergeTimeseries(lTsGroupBFIStandardDepthAllYearly, True)
+        If Not IsGroupEmpty(lTsGroupBFIStandardAllYearly) Then lTsBFIStandardAllYearly = MergeTimeseriesInSequence(lTsGroupBFIStandardAllYearly)
+        If Not IsGroupEmpty(lTsGroupBFIStandardDepthAllYearly) Then lTsBFIStandardDepthAllYearly = MergeTimeseriesInSequence(lTsGroupBFIStandardDepthAllYearly)
 
-        If Not IsGroupEmpty(lTsGroupBFIModifiedAllYearly) Then lTsBFIModifiedAllYearly = MergeTimeseries(lTsGroupBFIModifiedAllYearly, True)
-        If Not IsGroupEmpty(lTsGroupBFIModifiedDepthAllYearly) Then lTsBFIModifiedDepthAllYearly = MergeTimeseries(lTsGroupBFIModifiedDepthAllYearly, True)
+        If Not IsGroupEmpty(lTsGroupBFIModifiedAllYearly) Then lTsBFIModifiedAllYearly = MergeTimeseriesInSequence(lTsGroupBFIModifiedAllYearly)
+        If Not IsGroupEmpty(lTsGroupBFIModifiedDepthAllYearly) Then lTsBFIModifiedDepthAllYearly = MergeTimeseriesInSequence(lTsGroupBFIModifiedDepthAllYearly)
 
         Dim lTmpGroup As New atcTimeseriesGroup()
         'lTmpGroup.Add(aFlowTser)
@@ -4293,6 +4388,55 @@ Public Module modBaseflowUtil
         'Return lNewGroup
     End Function
 
+    ''' <summary>
+    ''' Merge a group of time series that are already in order
+    ''' All time series need to have the same time unit and time step
+    ''' </summary>
+    ''' <param name="aTsGroup"></param>
+    ''' <returns>A brand new merged time series</returns>
+    Public Function MergeTimeseriesInSequence(ByVal aTsGroup As atcTimeseriesGroup) As atcTimeseries
+        If aTsGroup Is Nothing OrElse aTsGroup.Count = 0 Then Return Nothing
+
+        Dim lTu As atcTimeUnit = aTsGroup(0).Attributes.GetValue("Tu")
+        Dim lTs As Integer = aTsGroup(0).Attributes.GetValue("ts")
+        For I As Integer = 1 To aTsGroup.Count - 1
+            If aTsGroup(I).Attributes.GetValue("Tu") <> lTu Then
+                Return Nothing
+            End If
+            If aTsGroup(I).Attributes.GetValue("ts") <> lTs Then
+                Return Nothing
+            End If
+        Next
+
+        Dim lStartTime As Double = aTsGroup(0).Dates.Value(0)
+        Dim lEndTime As Double = aTsGroup(aTsGroup.Count - 1).Dates.Value(aTsGroup(aTsGroup.Count - 1).numValues)
+        Dim lNewTser As atcTimeseries = NewTimeseries(lStartTime, lEndTime, lTu, lTs, Nothing, Double.NaN)
+        MergeAttributes(aTsGroup, lNewTser)
+        Dim lDate1 As Double = 0
+        Dim lDateg As Double = 0
+        Dim lSearchIndex As Integer = 1
+        For J As Integer = 0 To aTsGroup.Count - 1
+            Dim lTsChunk As atcTimeseries = aTsGroup(J)
+            For K As Integer = 1 To lTsChunk.numValues
+                lDate1 = lTsChunk.Dates.Value(K - 1)
+                For I As Integer = lSearchIndex To lNewTser.numValues
+                    lDateg = lNewTser.Dates.Value(I - 1)
+                    If lDate1 > lDateg Then
+                        Continue For
+                    ElseIf lDate1 < lDateg Then
+                        lSearchIndex = I
+                        Exit For
+                    Else
+                        lNewTser.Value(I) = lTsChunk.Value(K)
+                        lSearchIndex = I
+                        Exit For
+                    End If
+                Next
+            Next
+        Next
+
+        Return lNewTser
+    End Function
     ''' <summary>
     ''' Merge the partial base-flow time series with the full range of time series
     ''' Assumption is that both time series are of the same time unit and time step

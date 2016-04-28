@@ -758,6 +758,8 @@ Public Class frmUSGSBaseflow
             Next
             If lStartOfGoodValue > lBFTser.Dates.Value(0) Then
                 lTsBF4Graph = SubsetByDate(lBFTser, lStartOfGoodValue, lBFTser.Dates.Value(lBFTser.numValues), Nothing)
+            ElseIf lTsBF4Graph Is Nothing Then
+                lTsBF4Graph = lBFTser.Clone()
             End If
         Else
             lTsBF4Graph = lBFTser.Clone()
