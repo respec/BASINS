@@ -910,10 +910,17 @@ Public Module modBaseflowUtil
 
         lTableToReport.Clear()
 
+        Dim lDates(5) As Integer
         lTitleLine1 = "Groundwater Toolbox daily output for hydrograph separation."
         lTitleLine2 = "Station: " & lLocation & " " & lStaNam.Replace(",", " ")
         lTitleLine3 = "Drainage area: " & DoubleToString(lDA, , "0.0") & " square miles"
-        lTitleLine4 = "Period of analysis: " & DumpDate(lStart) & " to " & DumpDate(lEnd)
+        J2Date(lStart, lDates)
+        Dim lStartStr As String = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+        J2Date(lEnd, lDates)
+        timcnv(lDates)
+        Dim lEndStr As String = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+        'lTitleLine4 = "Period of analysis: " & DumpDate(lStart) & " to " & DumpDate(lEnd)
+        lTitleLine4 = "Period of analysis: " & lStartStr & " to " & lEndStr
         Dim lTitleLine5 As String = "Percent exceedence: Percentage of time flow was equaled or exceeded"
         Dim lTitleLine6 As String = "Flow: in cubic feet per second"
 
@@ -1272,6 +1279,7 @@ Public Module modBaseflowUtil
 
         Dim lDate(5) As Integer
 
+        Dim lFlowVal As Double
         Dim lBF As Double
         Dim lBFDepth As Double
         Dim lBFPct As Double = 0.0
@@ -1309,9 +1317,6 @@ Public Module modBaseflowUtil
             '        Continue For
             '    End If
             'End If
-            If I = 13560 Then
-                Dim lStop As String = "Stop"
-            End If
             J2Date(lTsFlow.Dates.Value(I - 1), lDate)
             With lTableBody
                 .Value(1) = I
@@ -1322,8 +1327,14 @@ Public Module modBaseflowUtil
                     Case Else : .Value(2) = lDate(0) & "-" & lDate(1) & "-" & lDate(2)
                 End Select
 
-                .Value(3) = DoubleToString(lTsFlow.Value(I), , "0.0")
-                .Value(4) = DoubleToString(lTsFlowDepth.Value(I), , "0.00")
+                lFlowVal = lTsFlow.Value(I)
+                If Double.IsNaN(lFlowVal) OrElse lFlowVal < 0 Then
+                    .Value(3) = "NA"
+                    .Value(4) = "NA"
+                Else
+                    .Value(3) = DoubleToString(lFlowVal, , "0.0")
+                    .Value(4) = DoubleToString(lTsFlowDepth.Value(I), , "0.00")
+                End If
                 Dim lLastColumn As Integer = 4
                 If aTsGroupPart.Count > 0 Then
                     lBFTser = aTsGroupPart.ItemByKey("Rate" & ATStep)
@@ -1482,7 +1493,7 @@ Public Module modBaseflowUtil
                                        ByVal aBFDepth As Double,
                                        ByVal aLastColumn As Integer)
         Dim lRO, lRODepth, lBFPct As Double
-
+        Dim lValueNA As String = "NA"
         If aBF < 0 OrElse aBFDepth < 0 Then
             aBF = -99 : aBFDepth = -99
             lRO = -99 : lRODepth = -99
@@ -1505,20 +1516,29 @@ Public Module modBaseflowUtil
                 '.Value(aLastColumn + 4) = ""
                 '.Value(aLastColumn + 5) = ""
                 '.Value(aLastColumn + 6) = ""
-                'For incomplete Monthly timestep, new order is to put up just -99
-                .Value(aLastColumn + 1) = "-99"
-                .Value(aLastColumn + 2) = "-99"
-                .Value(aLastColumn + 3) = "-99"
-                .Value(aLastColumn + 4) = "-99"
-                .Value(aLastColumn + 5) = "-99"
-                .Value(aLastColumn + 6) = "-99"
+                'For incomplete Monthly timestep, new order is to put up just "NA"
+                .Value(aLastColumn + 1) = lValueNA
+                .Value(aLastColumn + 2) = lValueNA
+                .Value(aLastColumn + 3) = lValueNA
+                .Value(aLastColumn + 4) = lValueNA
+                .Value(aLastColumn + 5) = lValueNA
+                .Value(aLastColumn + 6) = lValueNA
             Else
-                .Value(aLastColumn + 1) = DoubleToString(aBF, , "0.00")
-                .Value(aLastColumn + 2) = DoubleToString(aBFDepth, , "0.00")
-                .Value(aLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                .Value(aLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
-                .Value(aLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
-                .Value(aLastColumn + 6) = DoubleToString(lBFPct / 100, , "0.0000")
+                If Double.IsNaN(aBF) OrElse Double.IsNaN(aBFDepth) OrElse aBF < 0 OrElse aBFDepth < 0 Then
+                    .Value(aLastColumn + 1) = lValueNA
+                    .Value(aLastColumn + 2) = lValueNA
+                    .Value(aLastColumn + 3) = lValueNA
+                    .Value(aLastColumn + 4) = lValueNA
+                    .Value(aLastColumn + 5) = lValueNA
+                    .Value(aLastColumn + 6) = lValueNA
+                Else
+                    .Value(aLastColumn + 1) = DoubleToString(aBF, , "0.00")
+                    .Value(aLastColumn + 2) = DoubleToString(aBFDepth, , "0.00")
+                    .Value(aLastColumn + 3) = DoubleToString(lRO, , "0.00")
+                    .Value(aLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
+                    .Value(aLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    .Value(aLastColumn + 6) = DoubleToString(lBFPct / 100, , "0.0000")
+                End If
             End If
         End With
     End Sub
