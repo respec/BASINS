@@ -895,6 +895,14 @@ StartOver:
                         End If
                     Case "add_shape"
                         lOutputFileName = lProjectorNode.InnerText
+                        If g_MapWin.ApplicationInfo.ApplicationName.StartsWith("USGS") Then
+                            Select Case IO.Path.GetFileNameWithoutExtension(lOutputFileName).ToLowerInvariant()
+                                Case "pcs3", "pcs", "bac_stat", "nawqa", "rf1", "urban", "urban_nm", "epa_reg", "ecoreg", "lulcndx", "mad"
+                                    TryDeleteShapefile(lOutputFileName)
+                                    Continue For  'Skip trying to add this shapefile to the map
+                            End Select
+                        End If
+
                         If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
                         Dim lLayer As MapWindow.Interfaces.Layer = AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
                         If lLayer Is Nothing Then
