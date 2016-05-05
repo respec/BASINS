@@ -637,6 +637,7 @@ Public Class clsBaseflowPart
                         'End of one year
                         lStrBuilderDataSummary.AppendLine(" " & lMonthFlag)
                         I -= 1
+                        J2Date(aTS.Dates.Value(I), lDate) 'need to re-read the year that is just being examined of its December
                     Else
                         lStrBuilderDataSummary.Append(" " & lMonthFlag)
                     End If
