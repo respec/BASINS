@@ -82,6 +82,29 @@ Public Class atcBasinsPlugIn
         'Set g_ProgramDir to folder above the Bin folder where the app and plugins live
         g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
 
+        'Using RegCacheDir allows a user to specify a custom cache folder via regedit by opening registry folder:
+        ' HKEY_CURRENT_USER\SOFTWARE\VB And VBA Program Settings\BASINS\DataDownload
+        ' and setting string value Cache_dir
+        Dim RegCacheDir As String = GetSetting(g_AppNameRegistry, "DataDownload", "Cache_dir")
+        If IsWritableFolder(RegCacheDir) Then
+            g_CacheDir = RegCacheDir
+        Else
+            g_CacheDir = IO.Path.Combine(g_ProgramDir, "cache")
+            If Not IsWritableFolder(g_CacheDir) Then
+                Try
+                    IO.Directory.CreateDirectory(g_CacheDir)
+                Catch ex As Exception
+                    g_CacheDir = IO.Path.GetTempPath
+                End Try
+            End If
+        End If
+        If Not g_CacheDir.EndsWith(g_PathChar) Then
+            g_CacheDir &= g_PathChar
+        End If
+        If g_CacheDir <> RegCacheDir Then
+            SaveSetting(g_AppNameRegistry, "DataDownload", "Cache_dir", g_CacheDir)
+        End If
+
         Dim lHelpFilename As String = String.Empty
         Select Case g_AppNameShort
             Case "SW Toolbox"
@@ -102,14 +125,14 @@ Public Class atcBasinsPlugIn
                 lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.1.chm")
         End Select
 
-        Logger.StartToFile(g_ProgramDir & "cache\log" & g_PathChar _
+        Logger.StartToFile(g_CacheDir & "log" & g_PathChar _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort.Replace(" ", "") & ".log")
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
         If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
             'Start running status monitor to give better progress and status indication during long-running processes
             pStatusMonitor = New MonitorProgressStatus
-            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
-                                            g_ProgramDir & "cache\log" & g_PathChar, _
+            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"),
+                                            g_CacheDir & "log" & g_PathChar,
                                             System.Diagnostics.Process.GetCurrentProcess.Id) Then
                 'put our status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
                 pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
@@ -339,14 +362,13 @@ Public Class atcBasinsPlugIn
             End If
             SaveSetting(g_AppNameRegistry, "Update", "LastCheck", lToday)
 
-            Dim lSavePath As String = IO.Path.Combine(g_ProgramDir, "cache")
             Dim lExePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)
             Dim lUpdateCheckerPath As String = IO.Path.Combine(lExePath, "UpdateCheck.exe")
             If IO.File.Exists(lUpdateCheckerPath) Then
                 Shell("""" & lUpdateCheckerPath & """" & " " _
                     & lQuiet _
                     & Process.GetCurrentProcess.Id & " " _
-                    & """" & lSavePath & """", AppWinStyle.Hide)
+                    & """" & g_CacheDir & """", AppWinStyle.Hide)
             ElseIf Not aQuiet Then 'If manually checking and UpdateCheck.exe is not found, open update web page
                 Logger.Dbg("Did not find update checker at '" & lUpdateCheckerPath & "'")
                 OpenFile("http://hspf.com/pub/basins41/updates.html")

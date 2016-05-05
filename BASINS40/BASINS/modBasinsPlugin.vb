@@ -21,19 +21,19 @@ Public Module modBasinsPlugin
     Friend g_MapWinWindowHandle As Integer
 
 #If ProgramName = "USGS GW Toolbox" Then
-    Friend Const g_AppNameRegistry As String = "USGS-GW" 'For preferences in registry
+    Public Const g_AppNameRegistry As String = "USGS-GW" 'For preferences in registry
     Friend Const g_AppNameShort As String = "GW Toolbox"
     Friend Const g_AppNameLong As String = "USGS GW Toolbox 1.2"
     Friend Const g_URL_Home As String = "http://water.usgs.gov/ogw/gwtoolbox/"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-GW/register.html"
 #ElseIf ProgramName = "USGS SW Toolbox" Then
-    Friend Const g_AppNameRegistry As String = "USGS-SW" 'For preferences in registry
+    Public Const g_AppNameRegistry As String = "USGS-SW" 'For preferences in registry
     Friend Const g_AppNameShort As String = "SW Toolbox"
     Friend Const g_AppNameLong As String = "USGS SW Toolbox"
     Friend Const g_URL_Home As String = "http://water.usgs.gov/software/lists/surface_water/"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-SW/register.html"
 #Else
-    Friend Const g_AppNameRegistry As String = "BASINS" 'For preferences in registry
+    Public Const g_AppNameRegistry As String = "BASINS" 'For preferences in registry
     Friend Const g_AppNameShort As String = "BASINS"
     Friend Const g_AppNameLong As String = "BASINS 4.1"
     Friend Const g_URL_Home As String = "http://www2.epa.gov/exposure-assessment-models/basins-user-information-and-guidance"
@@ -42,6 +42,7 @@ Public Module modBasinsPlugin
 
     Friend g_BasinsDataDirs As New Generic.List(Of String)
     Friend g_ProgramDir As String = ""
+    Public g_CacheDir As String = ""
     Friend g_ProgressPanel As Windows.Forms.Panel
     Friend pBuildFrm As frmBuildNew
 

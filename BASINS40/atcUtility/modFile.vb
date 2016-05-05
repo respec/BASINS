@@ -271,6 +271,22 @@ Public Module modFile
         Return lName
     End Function
 
+    Public Function IsWritableFolder(aFolder) As Boolean
+        If String.IsNullOrEmpty(aFolder) OrElse Not IO.Directory.Exists(aFolder) Then
+            Return False
+        End If
+        Try
+            Dim TempFilename As String = GetTemporaryFileName(IO.Path.Combine(aFolder, "test"), ".txt")
+            SaveFileString(TempFilename, "test")
+            If IO.File.Exists(TempFilename) Then
+                TryDelete(TempFilename)
+                Return True
+            End If
+        Catch ex As Exception
+        End Try
+        Return False
+    End Function
+
     Public HelpSubstitutions As New atcCollection
 
     ''' <summary>
