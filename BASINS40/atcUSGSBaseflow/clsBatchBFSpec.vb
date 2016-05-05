@@ -804,7 +804,7 @@ Public Class clsBatchBFSpec
                 If lTsFlow IsNot Nothing Then
                     Try
                         lDrainageArea = lTsFlow.Attributes.GetValue("Drainage Area", -99)
-                        'break up into continuous chunks
+                        'break up into continuous periods
                         Dim lDates() As Integer = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.StartDate)
                         Dim lAnalysis_Start As Double = Date2J(lDates)
                         lDates = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.EndDate)
@@ -825,6 +825,9 @@ Public Class clsBatchBFSpec
 
                         Dim lTsAnalysisGroup As New atcTimeseriesGroup()
                         If lTsFlow.Attributes.GetValue("Count missing") > 0 Then
+                            If lTsFlow.Attributes.GetValue("Point") Then
+                                lTsFlow.Attributes.SetValue("Point", False)
+                            End If
                             Dim ctr As Integer = 1
                             For I As Integer = 1 To lTsFlow.numValues
                                 If Not Double.IsNaN(lTsFlow.Value(I)) Then
@@ -832,10 +835,10 @@ Public Class clsBatchBFSpec
                                     While (I <= lTsFlow.numValues AndAlso Not Double.IsNaN(lTsFlow.Value(I)))
                                         I = I + 1
                                     End While
-                                    lFlowEnd = lTsFlow.Dates.Value(I - 2)
+                                    lFlowEnd = lTsFlow.Dates.Value(I - 1) 'need to record the end of the last time step
                                     If (lFlowEnd - lFlowStart) >= 31 Then
                                         Dim lTs As atcTimeseries = SubsetByDate(lTsFlow, lFlowStart, lFlowEnd, Nothing)
-                                        lTs.Attributes.SetValue("chunk", ctr)
+                                        lTs.Attributes.SetValue("period", ctr)
                                         lTsAnalysisGroup.Add(ctr, lTs)
                                         ctr += 1
                                     End If
@@ -862,20 +865,20 @@ Public Class clsBatchBFSpec
                             If CalcBF.Open("baseflow", lStation.BFInputs) Then
                                 OutputDir = lStationOutDir
                                 OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
-                                Dim lCtr As Integer = lTsChunk.Attributes.GetValue("chunk", 0)
+                                Dim lCtr As Integer = lTsChunk.Attributes.GetValue("period", 0)
                                 If String.IsNullOrEmpty(OutputFilenameRoot) Then
-                                    OutputFilenameRoot = "BF_chunk_" & lCtr.ToString()
+                                    OutputFilenameRoot = "BF_period_" & lCtr.ToString()
                                 Else
-                                    OutputFilenameRoot &= "_chunk_" & lCtr.ToString()
+                                    OutputFilenameRoot &= "_period_" & lCtr.ToString()
                                 End If
                                 MethodsLastDone = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
                                 ASCIICommon(lTsChunk)
                             End If
                             lStation.Message &= CalcBF.BF_Message.Trim()
                             lTsFlowGroup.Clear()
-                        Next 'chunk
+                        Next 'period
                         'after the results are written, then merge, the intermittent time series can be cleared
-                        'the lTsAnalysisGroup contains the chuncky or original time series' clone (if only 1 chunk), these will be cleared
+                        'the lTsAnalysisGroup contains the chuncky or original time series' clone (if only 1 period), these will be cleared
                         Dim lBFReportGroups As atcDataAttributes = MergeBaseflowResults(lTserFullDateRange, lTsAnalysisGroup, "Daily", True)
                         With lBFReportGroups
                             .SetValue("AnalysisStart", lAnalysis_Start)

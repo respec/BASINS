@@ -1071,6 +1071,15 @@ Public Module modBaseflowUtil
         'End With
     End Function
 
+    Private Sub SetNaNTimeseries(ByVal aTser As atcTimeseries)
+        If aTser Is Nothing Then Exit Sub
+        For I As Integer = 1 To aTser.numValues
+            If aTser.Value(I) < 0 Then
+                aTser.Value(I) = Double.NaN
+            End If
+        Next
+    End Sub
+
     Public Function ASCIICommonDurationTable(ByVal aTsGroupStreamFlow As atcCollection,
                                  ByVal aTsGroupPart As atcCollection,
                                  ByVal aTsGroupFixed As atcCollection,
@@ -1081,7 +1090,7 @@ Public Module modBaseflowUtil
                                  ByVal ATStep As String) As atcTableDelimited
 
         Dim lTsFlow As atcTimeseries = aTsGroupStreamFlow.ItemByKey("Rate" & ATStep)
-
+        SetNaNTimeseries(lTsFlow)
         Dim lTsBFPart As atcTimeseries = Nothing
         Dim lTsROPart As atcTimeseries = Nothing
         Dim lExceedanceListing As New atcCollection
@@ -1091,6 +1100,8 @@ Public Module modBaseflowUtil
         If aTsGroupPart.Count > 0 Then
             lTsBFPart = aTsGroupPart.ItemByKey("Rate" & ATStep)
             lTsROPart = lTsFlow - lTsBFPart
+            SetNaNTimeseries(lTsBFPart)
+            SetNaNTimeseries(lTsROPart)
             lResult = ConstructExceedanceListing(lTsBFPart, "Part", "Baseflow")
             lExceedanceListing.AddRange(lResult.Keys, lResult)
             lResult = ConstructExceedanceListing(lTsROPart, "Part", "Runoff")
@@ -1102,6 +1113,8 @@ Public Module modBaseflowUtil
         If aTsGroupFixed.Count > 0 Then
             lTsBFFixed = aTsGroupFixed.ItemByKey("Rate" & ATStep)
             lTsROFixed = lTsFlow - lTsBFFixed
+            SetNaNTimeseries(lTsBFFixed)
+            SetNaNTimeseries(lTsROFixed)
             lResult = ConstructExceedanceListing(lTsBFFixed, "Fixed", "Baseflow")
             lExceedanceListing.AddRange(lResult.Keys, lResult)
             lResult = ConstructExceedanceListing(lTsROFixed, "Fixed", "Runoff")
@@ -1112,6 +1125,8 @@ Public Module modBaseflowUtil
         If aTsGroupLocMin.Count > 0 Then
             lTsBFLocMin = aTsGroupLocMin.ItemByKey("Rate" & ATStep)
             lTsROLocMin = lTsFlow - lTsBFLocMin
+            SetNaNTimeseries(lTsBFLocMin)
+            SetNaNTimeseries(lTsROLocMin)
             lResult = ConstructExceedanceListing(lTsBFLocMin, "LocMin", "Baseflow")
             lExceedanceListing.AddRange(lResult.Keys, lResult)
             lResult = ConstructExceedanceListing(lTsROLocMin, "LocMin", "Runoff")
@@ -1122,6 +1137,8 @@ Public Module modBaseflowUtil
         If aTsGroupSlide.Count > 0 Then
             lTsBFSlide = aTsGroupSlide.ItemByKey("Rate" & ATStep)
             lTsROSlide = lTsFlow - lTsBFSlide
+            SetNaNTimeseries(lTsBFSlide)
+            SetNaNTimeseries(lTsROSlide)
             lResult = ConstructExceedanceListing(lTsBFSlide, "Slide", "Baseflow")
             lExceedanceListing.AddRange(lResult.Keys, lResult)
             lResult = ConstructExceedanceListing(lTsROSlide, "Slide", "Runoff")
@@ -1133,6 +1150,8 @@ Public Module modBaseflowUtil
         If aTsGroupBFIStandard.Count > 0 Then
             lTsBFBFIStandard = aTsGroupBFIStandard.ItemByKey("Rate" & ATStep)
             lTsROBFIStandard = lTsFlow - lTsBFBFIStandard
+            SetNaNTimeseries(lTsBFBFIStandard)
+            SetNaNTimeseries(lTsROBFIStandard)
             lResult = ConstructExceedanceListing(lTsBFBFIStandard, "BFIStandard", "Baseflow")
             lExceedanceListing.AddRange(lResult.Keys, lResult)
             lResult = ConstructExceedanceListing(lTsROBFIStandard, "BFIStandard", "Runoff")
@@ -1143,6 +1162,8 @@ Public Module modBaseflowUtil
         If aTsGroupBFIModified.Count > 0 Then
             lTsBFBFIModified = aTsGroupBFIModified.ItemByKey("Rate" & ATStep)
             lTsROBFIModified = lTsFlow - lTsBFBFIModified
+            SetNaNTimeseries(lTsBFBFIModified)
+            SetNaNTimeseries(lTsROBFIModified)
             lResult = ConstructExceedanceListing(lTsBFBFIModified, "BFIModified", "Baseflow")
             lExceedanceListing.AddRange(lResult.Keys, lResult)
             lResult = ConstructExceedanceListing(lTsROBFIModified, "BFIModified", "Runoff")
@@ -1699,6 +1720,26 @@ Public Module modBaseflowUtil
                     lTsMon = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
                     lTsMonSum = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                     lTsMonDepth = lTsMonSum * lConversionFactor
+
+                    'Adjust for partial months based on the beginning and end of daily time series for HySEP methods
+                    If aMethod = BFMethods.HySEPFixed OrElse aMethod = BFMethods.HySEPLocMin OrElse aMethod = BFMethods.HySEPSlide Then
+                        If lTsMon IsNot Nothing AndAlso lTsMon.Values IsNot Nothing AndAlso lTsMon.numValues > 0 Then
+                            Dim lDailyDate(5) As Integer
+                            J2Date(lTsDaily.Dates.Value(0), lDailyDate)
+                            If lDailyDate(2) <> 1 Then
+                                lTsMon.Value(1) = -99.99
+                                lTsMonDepth.Value(1) = -99.99
+                            End If
+
+                            ''doesn't seem to need adjusting the end
+                            'J2Date(lTsDaily.Dates.Value(lTsDaily.numValues), lDailyDate)
+                            'timcnv(lDailyDate)
+                            'If lDailyDate(2) <> modDate.DayMon(lDailyDate(0), lDailyDate(1)) Then
+                            '    lTsMon.Value(lTsMon.numValues) = -99.99
+                            '    lTsMonDepth.Value(lTsMonDepth.numValues) = -99.99
+                            'End If
+                        End If
+                    End If
 
                     If lNumOfDays > JulianYear Then
                         If lTsDailyBnd IsNot Nothing AndAlso lTsDailyBnd.Values IsNot Nothing Then
