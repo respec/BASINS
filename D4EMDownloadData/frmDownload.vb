@@ -561,18 +561,7 @@ Public Class frmDownload
 
             If lRegion IsNot Nothing Then lRegionXML = lRegion.XML
 
-            Dim lCacheFolder As String = GetSetting("DataDownload", "defaults", "Cache_dir")
-            If lCacheFolder.Length = 0 Then
-                lCacheFolder = IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar & "cache" & g_PathChar
-            End If
-            If Not IO.Directory.Exists(lCacheFolder) Then
-                Try
-                    IO.Directory.CreateDirectory(lCacheFolder)
-                Catch ex As Exception
-                    lCacheFolder = IO.Path.GetTempPath
-                End Try
-            End If
-            lCacheFolder = "<CacheFolder>" & lCacheFolder & "</CacheFolder>" & vbCrLf
+            Dim lCacheFolder As String = "<CacheFolder>" & BASINS.g_CacheDir & "</CacheFolder>" & vbCrLf
 
             Dim lCacheBehavior As String = ""
             If chkCacheOnly.Checked Then

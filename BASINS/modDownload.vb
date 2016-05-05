@@ -656,7 +656,7 @@ StartOver:
             CopyFromIfNeeded("wqobs_prm.dbf", lNationalDir, aNewDataDir)
         End If
 
-        Dim lCacheFolder As String = IO.Path.Combine(aDataPath, "cache")
+        Dim lCacheFolder As String = g_CacheDir
         If aCacheFolder.Length > 0 Then
             lCacheFolder = aCacheFolder
         End If
