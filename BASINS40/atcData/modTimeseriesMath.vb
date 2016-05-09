@@ -568,13 +568,13 @@ Public Module modTimeseriesMath
         End If
     End Sub
 
-    Private Sub MergeAttributes(ByVal aGroup As atcTimeseriesGroup, ByVal aTarget As atcTimeseries)
+    Public Sub MergeAttributes(ByVal aGroup As atcTimeseriesGroup, ByVal aTarget As atcTimeseries)
         For Each lAttribute As atcDefinedValue In aGroup(0).Attributes
             If lAttribute.Definition.CopiesInherit Then
                 Dim lMatch As Boolean = True
                 For Each lData As atcDataSet In aGroup
                     Try 'Hard-coded SeasonDefinition to avoid exception (it can't use <>)
-                        If lAttribute.Definition.Name = "SeasonDefinition" OrElse _
+                        If lAttribute.Definition.Name = "SeasonDefinition" OrElse
                             lData.Attributes.GetValue(lAttribute.Definition.Name) <> lAttribute.Value Then
                             lMatch = False
                             Exit For 'Skip checking other datasets for this attribute, move on to next attribute
@@ -963,7 +963,7 @@ NextOldVal:
                               ByVal aTS As Integer, _
                               ByVal aAttributeName As String, _
                               ByVal aDataSource As atcTimeseriesSource) As atcTimeseries
-        If aTimeseries.Attributes.GetValue("tu") = aTU AndAlso
+        If aTimeseries.Attributes.GetValue("tu") = aTU AndAlso _
            aTimeseries.Attributes.GetValue("ts") = aTS Then
             ' Already have desired time unit and time step, clone so we consistently return a new TS
             Return aTimeseries.Clone(aDataSource)
