@@ -61,7 +61,10 @@ Public Module WeppWrapper
 
             'set the WDM file path
             'Dim lWDMFilePath As String = "D:\Projects\SERDP\WEPP\FBmet.wdm"
-            Dim lWDMFilePath As String = "D:\ESTCP\FB\FBUpatoiBase\FBmet.wdm"
+            'Dim lWDMFilePath As String = "D:\ESTCP\FB\FBUpatoiBase\FBmet.wdm"
+            'Dim lWDMFilePath As String = "D:\ESTCP\FB\MetDataExt1990\FBmet.wdm"
+            Dim lWDMFilePath As String = "D:\ESTCP\FB\MetDataExt1990\FBmetClimate.wdm"
+            'Dim lWDMFilePath As String = "D:\ESTCP\FB\FBUpatoiWRFP\FBmetClimate.wdm"
             'check if the path is more than 64 characters
             If lWDMFilePath.Length > 64 Then
                 Dim lTempWdmFilePath As String = System.IO.Path.GetTempPath & "\temp.wdm"
@@ -71,11 +74,17 @@ Public Module WeppWrapper
 
             'set the output file path
             'Dim lOutputFilePath As String = "D:\Projects\SERDP\WEPP\9YearRuns\" & lRunId & "\in.cli"
-            Dim lOutputFilePath As String = "D:\Projects\SERDP\WEPP\13YearRuns\" & lRunId & "\in.cli"
+            'Dim lOutputFilePath As String = "D:\Projects\SERDP\WEPP\13YearRuns\" & lRunId & "\in.cli"
+            'Dim lOutputFilePath As String = "D:\Projects\SERDP\WEPP\13YearRunsClimate\" & lRunId & "\in.cli"
+            'Dim lOutputFilePath As String = "D:\Projects\SERDP\WEPP\23YearRuns\" & lRunId & "\in.cli"
+            Dim lOutputFilePath As String = "D:\Projects\SERDP\WEPP\23YearRunsClimate\" & lRunId & "\in.cli"
 
             'set the log file path
             'Dim lLogFilePath As String = "D:\Projects\SERDP\WEPP\9YearRuns\" & lRunId & "-log.txt"
-            Dim lLogFilePath As String = "D:\Projects\SERDP\WEPP\13YearRuns\" & lRunId & "-log.txt"
+            'Dim lLogFilePath As String = "D:\Projects\SERDP\WEPP\13YearRuns\" & lRunId & "-log.txt"
+            'Dim lLogFilePath As String = "D:\Projects\SERDP\WEPP\13YearRunsClimate\" & lRunId & "-log.txt"
+            'Dim lLogFilePath As String = "D:\Projects\SERDP\WEPP\23YearRuns\" & lRunId & "-log.txt"
+            Dim lLogFilePath As String = "D:\Projects\SERDP\WEPP\23YearRunsClimate\" & lRunId & "-log.txt"
 
             'set the units of the ATEMP timeseries
             '1: Celsius
@@ -95,7 +104,7 @@ Public Module WeppWrapper
             Dim lDsnDEWP As Integer = 17
             Dim lDsnWIND As Integer = 14
             Dim lDsnSOLR As Integer = 15
-            'Dim lDsnPEVT As Integer = 16
+            'Dim lDsnPEVT As Integer = 16   'for climate
             Dim lDsnPEVT As Integer = 1016
 
             'Set the elevation in meters
@@ -104,18 +113,26 @@ Public Module WeppWrapper
             'Set the flag for exporting the raw timeseries data as a comma-separated textfile (not in WEPP format). Next line is path to export to.
             Dim lRawTsFlag As Boolean = False
             'Dim lRawTsFilePath As String = "D:\Projects\SERDP\WEPP\9YearRuns\" & lRunId & "-RawTs.csv"
-            Dim lRawTsFilePath As String = "D:\Projects\SERDP\WEPP\13YearRuns\" & lRunId & "-RawTs.csv"
+            'Dim lRawTsFilePath As String = "D:\Projects\SERDP\WEPP\13YearRuns\" & lRunId & "-RawTs.csv"
+            'Dim lRawTsFilePath As String = "D:\Projects\SERDP\WEPP\13YearRunsClimate\" & lRunId & "-RawTs.csv"
+            'Dim lRawTsFilePath As String = "D:\Projects\SERDP\WEPP\23YearRuns\" & lRunId & "-RawTs.csv"
+            Dim lRawTsFilePath As String = "D:\Projects\SERDP\WEPP\23YearRunsClimate\" & lRunId & "-RawTs.csv"
+
 
             'Set arrays of dates for begin/end of model
             'Important: Data must begin on hour "0" of first day and end on hour "24" of last day
-            Dim lStrModelBegin() As Integer = {1999, 10, 1, 0, 0, 0}
+            Dim lStrModelBegin() As Integer = {1989, 10, 1, 0, 0, 0}
+            'Dim lStrModelBegin() As Integer = {1999, 10, 1, 0, 0, 0}
             'Dim lStrModelEnd() As Integer = {2008, 9, 30, 24, 0, 0}
             Dim lStrModelEnd() As Integer = {2012, 9, 30, 24, 0, 0}
 
             'set raw pre int file path
             Dim lPreInterpolatorRawTsFlag As Boolean = False
             'Dim lPreInterpolatorRawTsFilePath As String = "D:\Projects\SERDP\WEPP\9YearRuns\" & lRunId & "-PreInterpolatorRawTs.csv"
-            Dim lPreInterpolatorRawTsFilePath As String = "D:\Projects\SERDP\WEPP\13YearRuns\" & lRunId & "-PreInterpolatorRawTs.csv"
+            'Dim lPreInterpolatorRawTsFilePath As String = "D:\Projects\SERDP\WEPP\13YearRuns\" & lRunId & "-PreInterpolatorRawTs.csv"
+            'Dim lPreInterpolatorRawTsFilePath As String = "D:\Projects\SERDP\WEPP\13YearRunsClimate\" & lRunId & "-PreInterpolatorRawTs.csv"
+            'Dim lPreInterpolatorRawTsFilePath As String = "D:\Projects\SERDP\WEPP\23YearRuns\" & lRunId & "-PreInterpolatorRawTs.csv"
+            Dim lPreInterpolatorRawTsFilePath As String = "D:\Projects\SERDP\WEPP\23YearRunsClimate\" & lRunId & "-PreInterpolatorRawTs.csv"
             'end set block
             '----------------------------------
 
