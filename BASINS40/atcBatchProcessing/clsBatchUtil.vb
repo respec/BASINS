@@ -9,14 +9,29 @@ Public Class clsBatchUtil
     Public Shared SiteInfoDir As String = ""
     Public StationList As atcCollection 'of Station IDs as strings
 
-    Private Shared Property XML(ByVal aStationList As atcCollection) As String
+    Private Shared Property XML(ByVal aStationList As atcCollection, Optional ByVal Args As atcDataAttributes = Nothing) As String
         Get
+            Dim lGetNewest As Boolean = False
+            If Args IsNot Nothing Then
+                lGetNewest = Args.GetValue("GetNewest", False)
+            End If
+            Dim lCacheBehavior As String = ""
+            If lGetNewest Then
+                lCacheBehavior = "<GetEvenIfCached>" & lGetNewest & "</GetEvenIfCached>" & vbCrLf
+            End If
+            Dim lCacheFolder As String = "C:\Basins\cache\"
+            If Args IsNot Nothing Then
+                lCacheFolder = Args.GetValue("CacheFolder", lCacheFolder)
+            End If
             Dim lXML As String = "<function name='GetNWISDailyDischarge'>" & vbCrLf
             lXML &= "<arguments>" & vbCrLf
             'lXML &= "<SaveWDM>" & WDMDownload & "</SaveWDM>"
             lXML &= "<SaveIn>" & SiteInfoDir & "</SaveIn>"
-            lXML &= "<CacheFolder>C:\Basins\cache\</CacheFolder>"
+            lXML &= "<CacheFolder>" & lCacheFolder & "</CacheFolder>"
             'lXML &= "<CacheFolder>C:\dev\Basins40\cache\</CacheFolder>"
+            If Not String.IsNullOrEmpty(lCacheBehavior) Then
+                lXML &= lCacheBehavior & vbCrLf
+            End If
             For Each lStation As String In aStationList
                 lXML &= "<stationid>" & lStation & "</stationid>" & vbCrLf
             Next
@@ -31,14 +46,14 @@ Public Class clsBatchUtil
         End Set
     End Property
 
-    Public Shared Sub DownloadData(ByVal aStationList As atcCollection)
+    Public Shared Sub DownloadData(ByVal aStationList As atcCollection, Optional ByVal Args As atcDataAttributes = Nothing)
         Logger.Status("LABEL TITLE BASINS Data Download")
         'Dim lQuery As New XmlDocument
         'Dim lNode As XmlNode
         'lQuery.LoadXml(XML(aStationList))
         'lNode = lQuery.FirstChild.FirstChild
         'Dim lResult As String = D4EMNWISDataExtension.GetDailyDischarge(lNode)
-        Dim lQuery As String = XML(aStationList)
+        Dim lQuery As String = XML(aStationList, Args)
         Dim lResult As String = D4EMDataManager.DataManager.Execute(lQuery)
         If lResult Is Nothing Then
             Logger.Dbg("QueryResult:Nothing")
