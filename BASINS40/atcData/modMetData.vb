@@ -541,11 +541,15 @@ Public Module modMetData
         Dim lAvailableRanked As Boolean = False
         Dim lModifierAttributeName As String = ""
         Dim lUseTriagDistribution As Boolean = False
+        Dim lFSpecial As Double = GetNaN()
         If aArgs IsNot Nothing Then
             lAvailableRanked = aArgs.GetValue("AvailableRanked", False)
             lModifierAttributeName = aArgs.GetValue("ModifierAttributeName", "")
             lUseTriagDistribution = aArgs.GetValue("UseTriagDistribution", False)
+            lFSpecial = aArgs.GetValue("AdditionalValueTarget", Double.NaN)
         End If
+        Dim lCheckForSpecialFlag As Boolean = False
+        If Not Double.IsNaN(lFSpecial) AndAlso lFSpecial < -900 Then lCheckForSpecialFlag = True
 
         If lTol > 1 Then 'passed in as percentage
             lTol = lTol / 100
@@ -603,7 +607,12 @@ Public Module modMetData
                             If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Values(1) > pEpsilon And
                                (lMJDay + (k - 1) / lIntsPerDay) - JulianMillisecond <= lTSer.Dates.Values(lTSer.numValues) Then 'check value
                                 lSPos = lIntsPerDay * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
-                                If lTSer.Value(lSPos - 1) <> aMAcc AndAlso lTSer.Value(lSPos) <> aMVal AndAlso lTSer.Value(lSPos) > lValMin AndAlso lTSer.Value(lSPos) < lValMax Then 'good value
+                                If lTSer.Value(lSPos - 1) <> aMAcc AndAlso
+                                    lTSer.Value(lSPos) <> aMVal AndAlso
+                                    lTSer.Value(lSPos) > lValMin AndAlso
+                                    lTSer.Value(lSPos) < lValMax AndAlso
+                                    (Not lCheckForSpecialFlag OrElse (lCheckForSpecialFlag AndAlso lTSer.Value(lSPos - 1) <> lFSpecial)) Then 'good value
+
                                     lFVal = lTSer.Value(lSPos)
 
                                     If String.IsNullOrEmpty(lModifierAttributeName) Then
@@ -624,6 +633,12 @@ Public Module modMetData
                                     End If
 
                                     J2Date(lMJDay + (k - 1) / lIntsPerDay, ld)
+                                    '
+                                    'Debug
+                                    If ld(0) = 1999 AndAlso ld(1) = 12 AndAlso ld(2) = 10 AndAlso ld(3) = 23 AndAlso lTSer.ToString() = "OBSERVED Granite PREC" Then
+                                        Dim lStop As String = "Stop"
+                                    End If
+                                    '
                                     If lCurInd <> lInd Then 'changing station used to fill
                                         Logger.Dbg("    Filling from TS " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("STANAM"))
                                         If String.IsNullOrEmpty(lModifierAttributeName) Then
@@ -697,6 +712,15 @@ Public Module modMetData
                         Next k
                         If lCarry > 0 Then 'add remainder to max hourly value
                             aTS2Fill.Value(lMaxHrInd) = aTS2Fill.Value(lMaxHrInd) + lCarry
+                        Else
+                            Dim lastVal As Double = aTS2Fill.Value(lMaxHrInd)
+                        End If
+
+                        If lMTyp = 3 Then
+                            'only for the user-specified extra "bad" value or flag
+                            k = lMLen + 1
+                            lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
+                            aTS2Fill.Value(lFPos) = 0
                         End If
                     Else
                         J2Date(lEJDay, ld)
@@ -726,10 +750,10 @@ Public Module modMetData
                                         '        lRO = lRndOff
                                         '    End If
                                         'End If
-                                        Dim lEvenVal As Double = lAccVal / lMLen
+                                        Dim lEvenVal As Double = lAccVal / (lMLen + 1)
                                         'Dim lEvenValRounded As Double = Math.Round(lEvenVal / lRO) * lRO
                                         'Dim lTotal As Double = 0
-                                        For i = 1 To lMLen
+                                        For i = 1 To lMLen + 1
                                             'lHrVals(lHrPos + i) = lTmpHrVals(lStartPos + i)
                                             lFPos = lIntsPerDay * (lMJDay - lSJDay) + i - 1
                                             aTS2Fill.Value(lFPos) = lEvenVal
@@ -751,9 +775,15 @@ Public Module modMetData
                                         'We could pass in the additional arguments that says if mLength = 95, then redistribute to all periods for example
                                         Logger.Dbg("use triag: special case, back fill full day")
                                         Dim lRedIndex As Integer = 1
-                                        For i = 1 To lMLen
+                                        Dim lValDiv As Double = 0
+                                        For i = 1 To lMLen + 1 'has to cover the entire 96 15-min time steps
                                             lFPos = lIntsPerDay * (lMJDay - lSJDay) + i - 1
-                                            aTS2Fill.Value(lFPos) = lTmpHrVals(lRedIndex) / 4.0
+                                            lValDiv = lTmpHrVals(lRedIndex) / 4.0
+                                            If Math.Abs(lValDiv) < pEpsilon Then
+                                                aTS2Fill.Value(lFPos) = 0.0
+                                            Else
+                                                aTS2Fill.Value(lFPos) = lTmpHrVals(lRedIndex) / 4.0
+                                            End If
                                             If i Mod 4 = 0 Then
                                                 lRedIndex += 1
                                             End If
@@ -785,7 +815,7 @@ Public Module modMetData
                                     'rsp = MsgBox(lMsgRetCod, MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel, "Precipitation Disaggregation Problem")
                                 End If
                                 'logging triag values
-                                For k = 1 To lMLen
+                                For k = 1 To lMLen + 1
                                     lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
                                     J2Date(lMJDay + (k - 1) / lIntsPerDay, ld)
                                     If lTU = atcTimeUnit.TUHour Then
@@ -798,14 +828,15 @@ Public Module modMetData
                                 Next k
                             Else
                                 Logger.Dbg("      *** No nearby station found for distributing accumulated value of " & lAccVal & " on " & ld(0) & "/" & ld(1) & "/" & ld(2))
-                                For k = 1 To lMLen - 1 'set missing dist period to 0 except for accum value at end
+                                For k = 1 To lMLen '- 1 'set missing dist period to 0 except for accum value at end
                                     lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
                                     aTS2Fill.Value(lFPos) = 0
                                 Next k
                             End If
                         Else
                             'no need for logging as there is nothing to redistribute
-                            For k = 1 To lMLen - 1 'set missing dist period to 0 except for accum value at end
+                            Logger.Dbg("      *** No need for redistributing accumulated value " & lAccVal & " on " & ld(0) & "/" & ld(1) & "/" & ld(2))
+                            For k = 1 To lMLen '- 1 'set missing dist period to 0 except for accum value at end
                                 lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
                                 aTS2Fill.Value(lFPos) = 0
                             Next k
@@ -828,7 +859,7 @@ Public Module modMetData
     ''' <param name="aRetCod">operation outcome status flag</param>
     ''' <param name="Args">additional arguments</param>
     ''' <remarks></remarks>
-    Private Sub DistTriang1(ByVal aSum As Double, ByRef aVals() As Double, ByRef aRetCod As Integer, Optional Args As atcDataAttributes = Nothing)
+    Public Sub DistTriang1(ByVal aSum As Double, ByRef aVals() As Double, ByRef aRetCod As Integer, Optional Args As atcDataAttributes = Nothing)
         'Distribute a daily value to 24 hourly values using a triangular distribution
         'DaySum - daily value
         'HrVals - array of hourly values
@@ -1315,6 +1346,9 @@ Public Module modMetData
             If lMCod > 0 Then 'somethings missing
                 J2Date(aTSer.Dates.Value(lMPos), ldate)
                 lDateStr = ldate(0) & "/" & ldate(1) & "/" & ldate(2)
+                If ldate(0) = 1997 AndAlso ldate(1) = 6 AndAlso ldate(2) = 6 Then
+                    Dim lStop = "Stop"
+                End If
                 If aTSer.Attributes.GetValue("TU") < 4 Then 'display h,m,s along with y,m,d
                     lDateStr &= " " & ldate(3) & ":" & ldate(4) & ":" & ldate(5)
                 End If
@@ -1441,11 +1475,17 @@ Public Module modMetData
                     End If
                 End If
             ElseIf aDBuff(i) < aFaultMin Or aDBuff(i) > aFaultMax Then
-                'we have a screwball value
-                lBadFlg += 1
-                If lBadFlg = 1 Then
-                    'first bad value, save start position
-                    aMisPos = i
+                If lMisFlg > 0 Then
+                    'this is missing period leading into bad value period
+                    'so report only missing values now, will get the bad value next time
+                    lDonFlg = 1
+                Else
+                    'we have a screwball value
+                    lBadFlg += 1
+                    If lBadFlg = 1 Then
+                        'first bad value, save start position
+                        aMisPos = i
+                    End If
                 End If
             Else
                 'no problem with this value
