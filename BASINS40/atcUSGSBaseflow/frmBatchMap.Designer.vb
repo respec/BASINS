@@ -27,7 +27,6 @@ Partial Class frmBatchMap
         Me.Label1 = New System.Windows.Forms.Label()
         Me.txtDataDir = New System.Windows.Forms.TextBox()
         Me.btnBrowseDataDir = New System.Windows.Forms.Button()
-        Me.lstStations = New atcControls.ATCoSelectListSortByProp()
         Me.treeBFGroups = New System.Windows.Forms.TreeView()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.btnCreateGroup = New System.Windows.Forms.Button()
@@ -48,6 +47,8 @@ Partial Class frmBatchMap
         Me.btnGroupGroup = New System.Windows.Forms.Button()
         Me.btnGroupGlobal = New System.Windows.Forms.Button()
         Me.btnRefresh = New System.Windows.Forms.Button()
+        Me.chkGetNewest = New System.Windows.Forms.CheckBox()
+        Me.lstStations = New atcControls.ATCoSelectListSortByProp()
         Me.GroupBox1.SuspendLayout()
         Me.cmsNode.SuspendLayout()
         Me.SuspendLayout()
@@ -77,25 +78,13 @@ Partial Class frmBatchMap
         Me.btnBrowseDataDir.Text = "Browse"
         Me.btnBrowseDataDir.UseVisualStyleBackColor = True
         '
-        'lstStations
-        '
-        Me.lstStations.DisplayMember = ""
-        Me.lstStations.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lstStations.LeftLabel = "Available:"
-        Me.lstStations.Location = New System.Drawing.Point(16, 37)
-        Me.lstStations.MoveDownTip = "Move Item Down In List"
-        Me.lstStations.MoveUpTip = "Move Item Up In List"
-        Me.lstStations.Name = "lstStations"
-        Me.lstStations.RightLabel = "Selected:"
-        Me.lstStations.Size = New System.Drawing.Size(413, 151)
-        Me.lstStations.SortMember = Nothing
-        Me.lstStations.TabIndex = 3
-        '
         'treeBFGroups
         '
+        Me.treeBFGroups.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.treeBFGroups.Location = New System.Drawing.Point(16, 211)
         Me.treeBFGroups.Name = "treeBFGroups"
-        Me.treeBFGroups.Size = New System.Drawing.Size(214, 173)
+        Me.treeBFGroups.Size = New System.Drawing.Size(237, 161)
         Me.treeBFGroups.TabIndex = 4
         '
         'Label2
@@ -109,7 +98,7 @@ Partial Class frmBatchMap
         '
         'btnCreateGroup
         '
-        Me.btnCreateGroup.Location = New System.Drawing.Point(435, 61)
+        Me.btnCreateGroup.Location = New System.Drawing.Point(444, 62)
         Me.btnCreateGroup.Name = "btnCreateGroup"
         Me.btnCreateGroup.Size = New System.Drawing.Size(75, 36)
         Me.btnCreateGroup.TabIndex = 6
@@ -118,11 +107,11 @@ Partial Class frmBatchMap
         '
         'btnPlotDuration
         '
-        Me.btnPlotDuration.Location = New System.Drawing.Point(436, 104)
+        Me.btnPlotDuration.Location = New System.Drawing.Point(444, 104)
         Me.btnPlotDuration.Name = "btnPlotDuration"
-        Me.btnPlotDuration.Size = New System.Drawing.Size(75, 23)
+        Me.btnPlotDuration.Size = New System.Drawing.Size(75, 38)
         Me.btnPlotDuration.TabIndex = 7
-        Me.btnPlotDuration.Text = "Durations"
+        Me.btnPlotDuration.Text = "Plot Data" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Timespan"
         Me.btnPlotDuration.UseVisualStyleBackColor = True
         '
         'GroupBox1
@@ -132,9 +121,9 @@ Partial Class frmBatchMap
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.btnParmForm)
         Me.GroupBox1.Controls.Add(Me.txtParameters)
-        Me.GroupBox1.Location = New System.Drawing.Point(236, 195)
+        Me.GroupBox1.Location = New System.Drawing.Point(259, 195)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(273, 189)
+        Me.GroupBox1.Size = New System.Drawing.Size(346, 177)
         Me.GroupBox1.TabIndex = 8
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Group Parameters"
@@ -142,7 +131,7 @@ Partial Class frmBatchMap
         'btnParmForm
         '
         Me.btnParmForm.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnParmForm.Location = New System.Drawing.Point(6, 160)
+        Me.btnParmForm.Location = New System.Drawing.Point(6, 148)
         Me.btnParmForm.Name = "btnParmForm"
         Me.btnParmForm.Size = New System.Drawing.Size(75, 23)
         Me.btnParmForm.TabIndex = 1
@@ -159,13 +148,13 @@ Partial Class frmBatchMap
         Me.txtParameters.Multiline = True
         Me.txtParameters.Name = "txtParameters"
         Me.txtParameters.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtParameters.Size = New System.Drawing.Size(260, 138)
+        Me.txtParameters.Size = New System.Drawing.Size(333, 126)
         Me.txtParameters.TabIndex = 0
         '
         'btnDoBatch
         '
         Me.btnDoBatch.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDoBatch.Location = New System.Drawing.Point(434, 390)
+        Me.btnDoBatch.Location = New System.Drawing.Point(530, 378)
         Me.btnDoBatch.Name = "btnDoBatch"
         Me.btnDoBatch.Size = New System.Drawing.Size(75, 23)
         Me.btnDoBatch.TabIndex = 9
@@ -175,7 +164,7 @@ Partial Class frmBatchMap
         'btnSaveSpecs
         '
         Me.btnSaveSpecs.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSaveSpecs.Location = New System.Drawing.Point(353, 390)
+        Me.btnSaveSpecs.Location = New System.Drawing.Point(449, 378)
         Me.btnSaveSpecs.Name = "btnSaveSpecs"
         Me.btnSaveSpecs.Size = New System.Drawing.Size(75, 23)
         Me.btnSaveSpecs.TabIndex = 10
@@ -204,7 +193,7 @@ Partial Class frmBatchMap
         '
         Me.cmsPlotDur.Name = "cmsPlotDur"
         Me.cmsPlotDur.Size = New System.Drawing.Size(189, 22)
-        Me.cmsPlotDur.Text = "Plot Duration"
+        Me.cmsPlotDur.Text = "Plot Data Timespan"
         '
         'cmsRemove
         '
@@ -223,16 +212,18 @@ Partial Class frmBatchMap
         '
         'btnGroupPlot
         '
-        Me.btnGroupPlot.Location = New System.Drawing.Point(187, 390)
+        Me.btnGroupPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnGroupPlot.Location = New System.Drawing.Point(187, 378)
         Me.btnGroupPlot.Name = "btnGroupPlot"
-        Me.btnGroupPlot.Size = New System.Drawing.Size(48, 23)
+        Me.btnGroupPlot.Size = New System.Drawing.Size(111, 23)
         Me.btnGroupPlot.TabIndex = 19
-        Me.btnGroupPlot.Text = "Plot"
+        Me.btnGroupPlot.Text = "Plot Data Timespan"
         Me.btnGroupPlot.UseVisualStyleBackColor = True
         '
         'btnGroupRemove
         '
-        Me.btnGroupRemove.Location = New System.Drawing.Point(125, 390)
+        Me.btnGroupRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnGroupRemove.Location = New System.Drawing.Point(125, 378)
         Me.btnGroupRemove.Name = "btnGroupRemove"
         Me.btnGroupRemove.Size = New System.Drawing.Size(56, 23)
         Me.btnGroupRemove.TabIndex = 18
@@ -241,7 +232,8 @@ Partial Class frmBatchMap
         '
         'btnGroupGroup
         '
-        Me.btnGroupGroup.Location = New System.Drawing.Point(69, 390)
+        Me.btnGroupGroup.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnGroupGroup.Location = New System.Drawing.Point(69, 378)
         Me.btnGroupGroup.Name = "btnGroupGroup"
         Me.btnGroupGroup.Size = New System.Drawing.Size(50, 23)
         Me.btnGroupGroup.TabIndex = 17
@@ -250,7 +242,8 @@ Partial Class frmBatchMap
         '
         'btnGroupGlobal
         '
-        Me.btnGroupGlobal.Location = New System.Drawing.Point(16, 390)
+        Me.btnGroupGlobal.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnGroupGlobal.Location = New System.Drawing.Point(16, 378)
         Me.btnGroupGlobal.Name = "btnGroupGlobal"
         Me.btnGroupGlobal.Size = New System.Drawing.Size(47, 23)
         Me.btnGroupGlobal.TabIndex = 16
@@ -259,18 +252,44 @@ Partial Class frmBatchMap
         '
         'btnRefresh
         '
-        Me.btnRefresh.Location = New System.Drawing.Point(242, 390)
+        Me.btnRefresh.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnRefresh.Location = New System.Drawing.Point(304, 378)
         Me.btnRefresh.Name = "btnRefresh"
         Me.btnRefresh.Size = New System.Drawing.Size(52, 23)
         Me.btnRefresh.TabIndex = 20
         Me.btnRefresh.Text = "Refresh"
         Me.btnRefresh.UseVisualStyleBackColor = True
         '
+        'chkGetNewest
+        '
+        Me.chkGetNewest.AutoSize = True
+        Me.chkGetNewest.Location = New System.Drawing.Point(519, 12)
+        Me.chkGetNewest.Name = "chkGetNewest"
+        Me.chkGetNewest.Size = New System.Drawing.Size(68, 17)
+        Me.chkGetNewest.TabIndex = 46
+        Me.chkGetNewest.Text = "Get New"
+        Me.chkGetNewest.UseVisualStyleBackColor = True
+        '
+        'lstStations
+        '
+        Me.lstStations.DisplayMember = ""
+        Me.lstStations.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lstStations.LeftLabel = "Available:"
+        Me.lstStations.Location = New System.Drawing.Point(16, 37)
+        Me.lstStations.MoveDownTip = "Move Item Down In List"
+        Me.lstStations.MoveUpTip = "Move Item Up In List"
+        Me.lstStations.Name = "lstStations"
+        Me.lstStations.RightLabel = "Selected:"
+        Me.lstStations.Size = New System.Drawing.Size(422, 151)
+        Me.lstStations.SortMember = Nothing
+        Me.lstStations.TabIndex = 3
+        '
         'frmBatchMap
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(521, 423)
+        Me.ClientSize = New System.Drawing.Size(617, 411)
+        Me.Controls.Add(Me.chkGetNewest)
         Me.Controls.Add(Me.btnRefresh)
         Me.Controls.Add(Me.btnGroupPlot)
         Me.Controls.Add(Me.btnGroupRemove)
@@ -322,4 +341,5 @@ Partial Class frmBatchMap
     Friend WithEvents btnGroupGroup As Windows.Forms.Button
     Friend WithEvents btnGroupGlobal As Windows.Forms.Button
     Friend WithEvents btnRefresh As Windows.Forms.Button
+    Friend WithEvents chkGetNewest As Windows.Forms.CheckBox
 End Class
