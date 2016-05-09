@@ -278,7 +278,7 @@ Public Class atcTimeseriesGridSource
                                                 Return ""
                                             End If
                                         ElseIf Double.IsNaN(lTs.Value(lIndex)) Then
-                                            Return ""
+                                            Return "Missing"
                                         Else
                                             Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
                                         End If
