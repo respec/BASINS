@@ -16,13 +16,14 @@ Public Module ESTCP_Climate
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         'ReproduceClimateScenarioPrecAndAirTempForACF()
+        'MultiplyPrecBy10PercentForPreECMIData()
 
         'ConvertCAirTempToF()
         'AppendBASINSAirTemp()
         'CorrectFtBenningAirTemp()
         'ProduceClimateScenarioPrecAndAirTempForFB()
-        'ComputeHamonPETFromHourlyAirTemp()
-        UpdateFBLandUse()
+        ComputeHamonPETFromHourlyAirTemp()
+        'UpdateFBLandUse()
 
         'CombineTmaxTmin() -- never used for production 
     End Sub
@@ -118,7 +119,8 @@ Public Module ESTCP_Climate
 
     Private Sub ComputeHamonPETFromHourlyAirTemp()
         Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
-        Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmetClimate.wdm"
+        'Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmetClimate.wdm"
+        Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExt1990\FBmetClimate.wdm"
         'Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmetTrialUpdates.wdm"
         If FileExists(lWDMFileName) Then
             'check to see if this file is already open in this project
@@ -363,7 +365,8 @@ Public Module ESTCP_Climate
 
         'open the source wdm file:
         Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
-        Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmet.wdm"
+        'Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmet.wdm"
+        Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExt1990\FBmet.wdm"
         If FileExists(lWDMFileName) Then
             'check to see if this file is already open in this project
             lDataSource = atcDataManager.DataSourceBySpecification(lWDMFileName)
@@ -378,7 +381,8 @@ Public Module ESTCP_Climate
 
         'open the WDM file for the climate results
         Dim lOutputDataSource As atcWDM.atcDataSourceWDM = Nothing
-        Dim lOutputWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmetClimate.wdm"
+        'Dim lOutputWDMFileName As String = "D:\ESTCP\FB\MetDataExtended\FBmetClimate.wdm"
+        Dim lOutputWDMFileName As String = "D:\ESTCP\FB\MetDataExt1990\FBmetClimate.wdm"
         If FileExists(lOutputWDMFileName) Then
             'check to see if this file is already open in this project
             lOutputDataSource = atcDataManager.DataSourceBySpecification(lOutputWDMFileName)
@@ -574,4 +578,85 @@ Public Module ESTCP_Climate
         lDataSource.Save("D:\ESTCP\ACF\ClimateScenario\climate.WDM")
     End Sub
 
+    Private Sub MultiplyPrecBy10PercentForPreECMIData()
+        'this sub applies a 10 percent multiplier to precip data for data prior to 10/1/1999
+        'needed because validation runs used a 10 percent higher multiplier on precip
+
+        'open the source wdm file:
+        Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
+        Dim lWDMFileName As String = "D:\ESTCP\FB\MetDataExt1990\FBmet.wdm"
+        If FileExists(lWDMFileName) Then
+            'check to see if this file is already open in this project
+            lDataSource = atcDataManager.DataSourceBySpecification(lWDMFileName)
+
+            If lDataSource Is Nothing Then 'need to open it here
+                lDataSource = New atcWDM.atcDataSourceWDM
+                If Not lDataSource.Open(lWDMFileName) Then
+                    lDataSource = Nothing
+                End If
+            End If
+        End If
+
+        'open the WDM file for the climate results
+        Dim lOutputDataSource As atcWDM.atcDataSourceWDM = Nothing
+        Dim lOutputWDMFileName As String = "D:\ESTCP\FB\MetDataExt1990\FBmetMult.wdm"
+        If FileExists(lOutputWDMFileName) Then
+            'check to see if this file is already open in this project
+            lOutputDataSource = atcDataManager.DataSourceBySpecification(lOutputWDMFileName)
+
+            If lOutputDataSource Is Nothing Then 'need to open it here
+                lOutputDataSource = New atcWDM.atcDataSourceWDM
+                If Not lOutputDataSource.Open(lOutputWDMFileName) Then
+                    lOutputDataSource = Nothing
+                End If
+            End If
+        End If
+
+        'at this point one can loop through the timeseries of the file
+        For Each lDataSet As atcTimeseries In lDataSource.DataSets
+            Dim lConstituent As String = lDataSet.Attributes.GetValue("Constituent")
+            Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
+            Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
+            Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
+            Dim lFileName As String = lDataSet.Attributes.GetValue("Data Source")
+
+            'data set numbers of interest:
+            '101-110 are precip in FB model
+            '13 is air temp at columbus, 16 is pevt at columbus, 11 is prec at columbus
+
+            Dim lIsPrecip As Boolean = False
+            Dim lMult As Double = 1.1
+
+            If lDsn > 100 And lDsn < 111 Then
+                'If lDsn = 11 Then
+                'columbus precip
+                lIsPrecip = True
+            End If
+
+            If lIsPrecip Then
+                Dim lDateA(6) As Integer
+                For lIndex As Integer = 0 To lDataSet.numValues
+                    'convert julian date into date array so we know what year/month this is
+                    Dim lDate As Double = lDataSet.Dates.Values(lIndex) - 0.0001
+                    J2Date(lDate, lDateA)
+
+                    Dim lValue As Double = lDataSet.Values(lIndex)
+                    If lValue > 0 Then
+                        If lDateA(0) < 1999 Then
+                            lValue = lValue * lMult
+                            lDataSet.Values(lIndex) = lValue
+                        ElseIf lDateA(0) = 1999 Then
+                            If lDateA(1) < 10 Then
+                                lValue = lValue * lMult
+                                lDataSet.Values(lIndex) = lValue
+                            End If
+                        End If
+                    End If
+                Next
+                lOutputDataSource.AddDataset(lDataSet)
+            
+            End If
+
+        Next
+    End Sub
 End Module

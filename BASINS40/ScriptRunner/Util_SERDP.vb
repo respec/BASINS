@@ -321,14 +321,21 @@ Module Util_SERDP
         'Dim l9YearRunPath As String = "D:\Projects\SERDP\WEPP\9YearRuns\"
         'Dim l9YearRunWDMName As String = l9YearRunPath & "NineYearRun.wdm"
         'Dim l9YearRunWDM As New atcWDM.atcDataSourceWDM
-        Dim l13YearRunPath As String = "D:\Projects\SERDP\WEPP\13YearRuns\"
-        Dim l13YearRunWDMName As String = l13YearRunPath & "13YearRun.wdm"
-        Dim l13YearRunWDM As New atcWDM.atcDataSourceWDM
-        If Not l13YearRunWDM.Open(l13YearRunWDMName) Then Exit Sub
-        Dim lSedBegYear As Integer = 1998
+        'Dim l13YearRunPath As String = "D:\Projects\SERDP\WEPP\13YearRuns\"
+        'Dim l13YearRunWDMName As String = l13YearRunPath & "13YearRun.wdm"
+        'Dim l13YearRunPath As String = "D:\Projects\SERDP\WEPP\13YearRunsClimate\"
+        'Dim l13YearRunWDMName As String = l13YearRunPath & "13YearRunClimate.wdm"
+        'Dim l13YearRunWDM As New atcWDM.atcDataSourceWDM
+        Dim l23YearRunPath As String = "D:\Projects\SERDP\WEPP\23YearRuns\"
+        Dim l23YearRunWDMName As String = l23YearRunPath & "23YearRun.wdm"
+        'Dim l23YearRunPath As String = "D:\Projects\SERDP\WEPP\23YearRunsClimate\"
+        'Dim l23YearRunWDMName As String = l23YearRunPath & "23YearRunClimate.wdm"
+        Dim l23YearRunWDM As New atcWDM.atcDataSourceWDM
+        If Not l23YearRunWDM.Open(l23YearRunWDMName) Then Exit Sub
+        Dim lSedBegYear As Integer = 1988
         Dim lRuns() As Integer = {1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
         For Each lRun As Integer In lRuns
-            Dim lRunPath As String = l13YearRunPath & lRun.ToString & "\"
+            Dim lRunPath As String = l23YearRunPath & lRun.ToString & "\"
 
             Dim lCliFile As New TimeseriesSourceWEPPCli(lSedBegYear, lRunPath & "in.cli")
             With lCliFile
@@ -337,12 +344,12 @@ Module Util_SERDP
                 .DailyFractionTimeseries.Attributes.SetValue("ID", 100 + lRun)
 
                 Dim lDataAdded As Boolean = True
-                If Not l13YearRunWDM.AddDataset(.DailyTimeseries, atcDataSource.EnumExistAction.ExistReplace) Then
+                If Not l23YearRunWDM.AddDataset(.DailyTimeseries, atcDataSource.EnumExistAction.ExistReplace) Then
                     Logger.Dbg("Failed to add run " & lRun & " precip to WDM.")
                     lDataAdded = False
                 End If
 
-                If Not l13YearRunWDM.AddDataset(.DailyFractionTimeseries, atcDataSource.EnumExistAction.ExistReplace) Then
+                If Not l23YearRunWDM.AddDataset(.DailyFractionTimeseries, atcDataSource.EnumExistAction.ExistReplace) Then
                     Logger.Dbg("Failed to add run " & lRun & " fraction to WDM.")
                     lDataAdded = False
                 End If
@@ -410,7 +417,7 @@ Module Util_SERDP
             lSedTs.Values = lSedValues
 
             'Write the sed ts to WDM
-            If Not l13YearRunWDM.AddDataset(lSedTs, atcDataSource.EnumExistAction.ExistReplace) Then
+            If Not l23YearRunWDM.AddDataset(lSedTs, atcDataSource.EnumExistAction.ExistReplace) Then
                 Logger.Dbg("Failed to add run " & lRun & " sediment to WDM.")
             End If
 
@@ -418,7 +425,7 @@ Module Util_SERDP
                 lOutPlotFile.ContinuousTs.Attributes.SetValue("ID", 300 + lRun)
                 lOutPlotFile.ContinuousTs.Attributes.SetValue("Location", lSedTs.Attributes.GetValue("Location", "<unk>"))
                 lOutPlotFile.ContinuousTs.Attributes.SetValue("Scenario", lSedTs.Attributes.GetValue("Scenario"))
-                If Not l13YearRunWDM.AddDataset(lOutPlotFile.ContinuousTs, atcDataSource.EnumExistAction.ExistReplace) Then
+                If Not l23YearRunWDM.AddDataset(lOutPlotFile.ContinuousTs, atcDataSource.EnumExistAction.ExistReplace) Then
                     Logger.Dbg("Failed to add run " & lRun & " Point sediment to WDM.")
                 End If
             Catch ex As Exception
@@ -430,8 +437,8 @@ Module Util_SERDP
             lSedTs.Clear() : lSedTs = Nothing
             System.GC.Collect()
         Next 'lRun
-        l13YearRunWDM.Clear()
-        l13YearRunWDM = Nothing
+        l23YearRunWDM.Clear()
+        l23YearRunWDM = Nothing
     End Sub
 
 #Region "UtilityClasses"
