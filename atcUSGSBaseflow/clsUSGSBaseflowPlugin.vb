@@ -35,31 +35,46 @@ Public Class clsUSGSBaseflowPlugin
             ShowForm(lfrmBatch)
             Return lfrmBatch
         ElseIf lChoice = "Batch Map" Then
-            Dim lHandled As Boolean = False
             'If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup()
             'lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", lTimeseriesGroup)
             'If lTimeseriesGroup.Count > 1 Then
             '    atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTimeseriesGroup)
             'End If
+            Dim lgisLayerFound As Boolean = False
+            Dim lstnSelected As Integer = 0
             Dim lMapLayer As MapWindow.Interfaces.Layer = Nothing
             For Each lMapLayer In pMapWin.Layers
                 If lMapLayer.Name.ToLower.Contains("nwis daily discharge stations") Then
-                    If lMapLayer.SelectedShapes.NumSelected < 2 Then
-                        Logger.Msg("Please select more than 1 stream gages for batch process." & vbCrLf & vbCrLf & _
-                                   "Layer: " & lMapLayer.Name, lBatchTitle)
-                    End If
-                    lHandled = True
+                    lgisLayerFound = True
+                    lstnSelected = lMapLayer.SelectedShapes.NumSelected
+                    'lHandled = True
                     Exit For
                 End If
             Next
-            If Not lHandled Then
-                Logger.Msg("Could not find stream gage station layer: NWIS Daily Discharge Stations. No batch.", _
-                           lBatchTitle)
-                Return Nothing
+            Dim lContinueWithNoStns As Boolean = False
+            Dim lContAction As String = ""
+            If lgisLayerFound Then
+                If lstnSelected = 0 Then
+                    lContAction = Logger.MsgCustomOwned("No stream gage is selected." & vbCrLf & "Layer: " & lMapLayer.Name & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
+                    If lContAction = "No" Then
+                        Return Nothing
+                    Else
+                        lContinueWithNoStns = True
+                    End If
+                ElseIf lstnSelected < 2 Then
+                    Logger.Msg("Batch process can handle more than 1 stream gages." & vbCrLf & vbCrLf & "Layer: " & lMapLayer.Name, lBatchTitle)
+                End If
+            Else
+                lContAction = Logger.MsgCustomOwned("Could not find stream gage station layer: NWIS Daily Discharge Stations." & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
+                If lContAction = "No" Then
+                    Return Nothing
+                Else
+                    lContinueWithNoStns = True
+                End If
             End If
             Dim lSelectedStationIDs As New atcCollection()
             Dim lShp As New MapWinGIS.Shapefile()
-            If lShp.Open(lMapLayer.FileName, Nothing) Then
+            If lgisLayerFound AndAlso lShp.Open(lMapLayer.FileName, Nothing) Then
                 Dim lFieldIndex As Integer = -99
                 Dim lFieldIndex_nm As Integer = -99
                 Dim lRecordIndex As Integer = 0
@@ -76,8 +91,7 @@ Public Class clsUSGSBaseflowPlugin
                     End If
                 Next
                 If lFieldIndex < 0 Then
-                    Logger.Msg("NWIS daily flow layer lack station ID field. No batch.", _
-                               lBatchTitle)
+                    Logger.Msg("NWIS daily flow layer lack station ID field. No batch.", lBatchTitle)
                     Return Nothing
                 End If
                 Dim lStationId As String = ""
@@ -91,10 +105,12 @@ Public Class clsUSGSBaseflowPlugin
                     End If
                 Next
             End If
-            If lSelectedStationIDs.Count > 0 Then
-                Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf & _
-                           lSelectedStationIDs.ToString(), _
+            If lSelectedStationIDs.Count > 0 OrElse lContinueWithNoStns Then
+                If lSelectedStationIDs.Count > 0 Then
+                    Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf &
+                           lSelectedStationIDs.ToString(),
                            lBatchTitle)
+                End If
                 Dim lfrmBatchMap As New frmBatchMap()
                 lfrmBatchMap.Initiate(lSelectedStationIDs)
                 lfrmBatchMap.ShowDialog()

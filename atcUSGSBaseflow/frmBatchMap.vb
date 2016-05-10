@@ -523,12 +523,78 @@ Public Class frmBatchMap
 
     Private Sub btnBrowseDataDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseDataDir.Click
         Dim lFolder As New System.Windows.Forms.FolderBrowserDialog()
+        If IO.Directory.Exists(txtDataDir.Text) Then
+            lFolder.SelectedPath = txtDataDir.Text
+            Try
+                SendKeys.Send("{TAB}{TAB}{RIGHT}")
+            Catch ex As Exception
+                'it's ok to fail
+            End Try
+        End If
         If lFolder.ShowDialog = Windows.Forms.DialogResult.OK Then
             txtDataDir.Text = lFolder.SelectedPath
             If IO.Directory.Exists(txtDataDir.Text) Then
                 pDataPath = txtDataDir.Text
             End If
+            If pListStations.Count = 0 Then
+                TryPopulateStationListFromDataPath()
+            End If
         End If
+    End Sub
+
+    Private Sub TryPopulateStationListFromDataPath()
+        Dim lStationFile As String = IO.Path.Combine(pDataPath, "Stations.txt")
+        Dim listStations As New atcCollection()
+        If IO.File.Exists(lStationFile) Then
+            Dim lSR As IO.StreamReader = Nothing
+            Try
+                lSR = New IO.StreamReader(lStationFile)
+                Dim line As String = ""
+                While Not lSR.EndOfStream
+                    line = lSR.ReadLine()
+                    If Not String.IsNullOrEmpty(line) AndAlso IsNumeric(line) Then
+                        If Not String.IsNullOrEmpty(line.Trim()) Then
+                            listStations.Add(line)
+                        End If
+                    End If
+                End While
+
+            Catch ex As Exception
+
+            Finally
+                If lSR IsNot Nothing Then
+                    lSR.Close() : lSR = Nothing
+                End If
+            End Try
+        End If
+
+        'Now get all rdbs from the same folder
+        Dim lFiles As New System.Collections.Specialized.NameValueCollection()
+        AddFilesInDir(lFiles, IO.Path.Combine(pDataPath, "NWIS"), False, "*.rdb")
+        For Each lFile As String In lFiles
+            Dim lName As String = FilenameNoExt(FilenameNoPath(lFile)).ToLower()
+            Dim lStationID As String = ""
+            If lName.StartsWith("nwis_stations_") Then
+                lStationID = lName.Substring("nwis_stations_".Length)
+            ElseIf lName.StartsWith("nwis_discharge_") Then
+                lStationID = lName.Substring("nwis_discharge_".Length)
+            End If
+            If Not String.IsNullOrEmpty(lStationID) AndAlso
+               lStationID.Length = 8 AndAlso
+               IsNumeric(lStationID) AndAlso
+               Not listStations.Contains(lStationID) Then
+                listStations.Add(lStationID)
+            End If
+        Next
+
+        For Each lStationID As String In listStations
+            pListStations.Add(lStationID)
+        Next
+        Dim lindex As Integer = 0
+        For Each lStationID As String In pListStations
+            lstStations.LeftItem(lindex) = lStationID
+            lindex += 1
+        Next
     End Sub
 
     Private Sub txtDataDir_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtDataDir.TextChanged
