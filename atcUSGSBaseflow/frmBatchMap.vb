@@ -621,7 +621,12 @@ Public Class frmBatchMap
                 .SetValue("CacheFolder", BASINS.g_CacheDir)
             End With
             Try
-                If lStationsNeedDownload.Count > 0 Then
+                If lStationsNeedDownload.Count > 0 OrElse chkGetNewest.Checked Then
+                    If lStationsNeedDownload.Count = 0 Then
+                        For Each lStationID As String In pListStations.Keys
+                            lStationsNeedDownload.Add(lStationID, lStationID)
+                        Next
+                    End If
                     clsBatchUtil.DownloadData(lStationsNeedDownload, lArgs)
                 Else
                     Logger.Msg("Data files already exists in " & pDataPath, "Batch Map:Download")
