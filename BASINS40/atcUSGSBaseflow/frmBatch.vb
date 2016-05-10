@@ -1,5 +1,6 @@
 ﻿Imports System.Windows.Forms
 Imports System.Threading
+Imports MapWinUtility
 
 Public Class frmBatch
     'Public WithEvents pBatchConfig As New clsBatchBFSpec()
@@ -45,7 +46,15 @@ Public Class frmBatch
             pBatchConfig.PopulateScenarios()
             Application.DoEvents()
             'pBatchConfig.DoBatch()
-            pBatchConfig.DoBatchIntermittent()
+            Try
+                pBatchConfig.DoBatchIntermittent()
+            Catch ex As Exception
+                If ex.Message = "User Canceled" Then
+                    Logger.Msg("Batch run canceled.", MsgBoxStyle.Information, "Batch Run")
+                Else
+                    Logger.Msg(ex.Message & vbCrLf & ex.StackTrace, MsgBoxStyle.Information, "Batch Run")
+                End If
+            End Try
         End If
 
     End Sub

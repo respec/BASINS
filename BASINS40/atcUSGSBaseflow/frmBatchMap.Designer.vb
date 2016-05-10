@@ -73,9 +73,9 @@ Partial Class frmBatchMap
         '
         Me.btnBrowseDataDir.Location = New System.Drawing.Point(371, 8)
         Me.btnBrowseDataDir.Name = "btnBrowseDataDir"
-        Me.btnBrowseDataDir.Size = New System.Drawing.Size(61, 23)
+        Me.btnBrowseDataDir.Size = New System.Drawing.Size(89, 23)
         Me.btnBrowseDataDir.TabIndex = 2
-        Me.btnBrowseDataDir.Text = "Browse"
+        Me.btnBrowseDataDir.Text = "Browse NWIS"
         Me.btnBrowseDataDir.UseVisualStyleBackColor = True
         '
         'treeBFGroups
@@ -203,9 +203,9 @@ Partial Class frmBatchMap
         '
         'btnDownload
         '
-        Me.btnDownload.Location = New System.Drawing.Point(438, 8)
+        Me.btnDownload.Location = New System.Drawing.Point(466, 8)
         Me.btnDownload.Name = "btnDownload"
-        Me.btnDownload.Size = New System.Drawing.Size(75, 23)
+        Me.btnDownload.Size = New System.Drawing.Size(65, 23)
         Me.btnDownload.TabIndex = 11
         Me.btnDownload.Text = "Download"
         Me.btnDownload.UseVisualStyleBackColor = True
@@ -263,7 +263,7 @@ Partial Class frmBatchMap
         'chkGetNewest
         '
         Me.chkGetNewest.AutoSize = True
-        Me.chkGetNewest.Location = New System.Drawing.Point(519, 12)
+        Me.chkGetNewest.Location = New System.Drawing.Point(537, 12)
         Me.chkGetNewest.Name = "chkGetNewest"
         Me.chkGetNewest.Size = New System.Drawing.Size(68, 17)
         Me.chkGetNewest.TabIndex = 46
