@@ -303,6 +303,9 @@ Public Module modBaseflowUtil
         Dim lTsAnalysisGroup As New atcTimeseriesGroup()
         Try
             If lTsFlow.Attributes.GetValue("Count missing") > 0 Then
+                If lTsFlow.Attributes.GetValue("Point") Then
+                    lTsFlow.Attributes.SetValue("Point", False)
+                End If
                 Dim ctr As Integer = 1
                 For I As Integer = 1 To lTsFlow.numValues
                     If Not Double.IsNaN(lTsFlow.Value(I)) Then
@@ -321,6 +324,9 @@ Public Module modBaseflowUtil
                 Next
             Else
                 'cuz lTsFlow for a station has to be used later, the clone will be cleared after batch bf
+                If lTsFlow.Attributes.GetValue("Point") Then
+                    lTsFlow.Attributes.SetValue("Point", False)
+                End If
                 lTsAnalysisGroup.Add(lTsFlow.Clone())
             End If
         Catch ex As Exception
@@ -466,6 +472,7 @@ Public Module modBaseflowUtil
                 lTs.Attributes.SetValue("Scenario", BFMethods.PART.ToString())
                 lTs.Attributes.SetValue("Constituent", "BF_Part")
                 lTs.Attributes.SetValue("Location", lTsFlow.Attributes.GetValue("Location"))
+                lTs.Attributes.SetValue("Units", "cubic feet per second")
                 If lDrainageArea > 0 Then
                     lTs.Attributes.SetValue("Drainage Area", lDrainageArea)
                 Else
@@ -479,6 +486,13 @@ Public Module modBaseflowUtil
                         .SetValue("Method", BFMethods.PART)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
+                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    With lTsRO.Attributes
+                        .SetValue("Constituent", "RO_Part")
+                        .SetValue("Method", BFMethods.PART)
+                        .SetValue("Units", "cubic feet per second")
+                    End With
+                    lNewBFTserGroup.Add(lTsRO)
                 End If
             End If
             If lTsGroupFixed IsNot Nothing AndAlso lTsGroupFixed.Count > 0 Then
@@ -490,6 +504,7 @@ Public Module modBaseflowUtil
                 lTs.Attributes.SetValue("Scenario", BFMethods.HySEPFixed.ToString())
                 lTs.Attributes.SetValue("Constituent", "BF_HySEPFixed")
                 lTs.Attributes.SetValue("Location", lTsFlow.Attributes.GetValue("Location"))
+                lTs.Attributes.SetValue("Units", "cubic feet per second")
                 If lDrainageArea > 0 Then
                     lTs.Attributes.SetValue("Drainage Area", lDrainageArea)
                 Else
@@ -503,6 +518,13 @@ Public Module modBaseflowUtil
                         .SetValue("Method", BFMethods.HySEPFixed)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
+                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    With lTsRO.Attributes
+                        .SetValue("Constituent", "RO_HySEPFixed")
+                        .SetValue("Method", BFMethods.HySEPFixed)
+                        .SetValue("Units", "cubic feet per second")
+                    End With
+                    lNewBFTserGroup.Add(lTsRO)
                 End If
             End If
 
@@ -514,6 +536,7 @@ Public Module modBaseflowUtil
                 lTs.Attributes.SetValue("Method", BFMethods.HySEPLocMin)
                 lTs.Attributes.SetValue("Constituent", "BF_HySEPLocMin")
                 lTs.Attributes.SetValue("Location", lTsFlow.Attributes.GetValue("Location"))
+                lTs.Attributes.SetValue("Units", "cubic feet per second")
                 If lDrainageArea > 0 Then
                     lTs.Attributes.SetValue("Drainage Area", lDrainageArea)
                 Else
@@ -527,6 +550,13 @@ Public Module modBaseflowUtil
                         .SetValue("Method", BFMethods.HySEPLocMin)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
+                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    With lTsRO.Attributes
+                        .SetValue("Constituent", "RO_HySEPLocMin")
+                        .SetValue("Method", BFMethods.HySEPLocMin)
+                        .SetValue("Units", "cubic feet per second")
+                    End With
+                    lNewBFTserGroup.Add(lTsRO)
                 End If
             End If
 
@@ -538,6 +568,7 @@ Public Module modBaseflowUtil
                 lTs.Attributes.SetValue("Method", BFMethods.HySEPSlide)
                 lTs.Attributes.SetValue("Constituent", "BF_HySEPSlide")
                 lTs.Attributes.SetValue("Location", lTsFlow.Attributes.GetValue("Location"))
+                lTs.Attributes.SetValue("Units", "cubic feet per second")
                 If lDrainageArea > 0 Then
                     lTs.Attributes.SetValue("Drainage Area", lDrainageArea)
                 Else
@@ -551,6 +582,13 @@ Public Module modBaseflowUtil
                         .SetValue("Method", BFMethods.HySEPSlide)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
+                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    With lTsRO.Attributes
+                        .SetValue("Constituent", "RO_HySEPSlide")
+                        .SetValue("Method", BFMethods.HySEPSlide)
+                        .SetValue("Units", "cubic feet per second")
+                    End With
+                    lNewBFTserGroup.Add(lTsRO)
                 End If
             End If
             If lTsGroupBFIStandard IsNot Nothing AndAlso lTsGroupBFIStandard.Count > 0 Then
@@ -561,6 +599,7 @@ Public Module modBaseflowUtil
                 lTs.Attributes.SetValue("Method", BFMethods.BFIStandard)
                 lTs.Attributes.SetValue("Constituent", "BF_BFIStandard")
                 lTs.Attributes.SetValue("Location", lTsFlow.Attributes.GetValue("Location"))
+                lTs.Attributes.SetValue("Units", "cubic feet per second")
                 If lDrainageArea > 0 Then
                     lTs.Attributes.SetValue("Drainage Area", lDrainageArea)
                 Else
@@ -574,6 +613,13 @@ Public Module modBaseflowUtil
                         .SetValue("Method", BFMethods.BFIStandard)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
+                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    With lTsRO.Attributes
+                        .SetValue("Constituent", "RO_BFIStandard")
+                        .SetValue("Method", BFMethods.BFIStandard)
+                        .SetValue("Units", "cubic feet per second")
+                    End With
+                    lNewBFTserGroup.Add(lTsRO)
                 End If
             End If
             If lTsGroupBFIModified IsNot Nothing AndAlso lTsGroupBFIModified.Count > 0 Then
@@ -584,6 +630,7 @@ Public Module modBaseflowUtil
                 lTs.Attributes.SetValue("Method", BFMethods.BFIModified)
                 lTs.Attributes.SetValue("Constituent", "BF_BFIModified")
                 lTs.Attributes.SetValue("Location", lTsFlow.Attributes.GetValue("Location"))
+                lTs.Attributes.SetValue("Units", "cubic feet per second")
                 If lDrainageArea > 0 Then
                     lTs.Attributes.SetValue("Drainage Area", lDrainageArea)
                 Else
@@ -597,6 +644,13 @@ Public Module modBaseflowUtil
                         .SetValue("Method", BFMethods.BFIModified)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
+                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    With lTsRO.Attributes
+                        .SetValue("Constituent", "RO_BFIModified")
+                        .SetValue("Method", BFMethods.BFIModified)
+                        .SetValue("Units", "cubic feet per second")
+                    End With
+                    lNewBFTserGroup.Add(lTsRO)
                 End If
             End If
 
