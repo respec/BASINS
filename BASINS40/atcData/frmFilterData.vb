@@ -472,7 +472,10 @@ Public Class frmFilterData
         lstSeasons.Items.Clear()
 
         For Each typ As Type In atcData.atcSeasonBase.AllSeasonTypes
-            cboSeasons.Items.Add(atcSeasonBase.SeasonClassNameToLabel(typ.Name))
+            Dim SeasonTypeLabel As String = atcSeasonBase.SeasonClassNameToLabel(typ.Name)
+            If SeasonTypeLabel <> "Year Subset" Then
+                cboSeasons.Items.Add(SeasonTypeLabel)
+            End If
         Next
         pAllDates = MergeDates(pSelectedGroup)
 
