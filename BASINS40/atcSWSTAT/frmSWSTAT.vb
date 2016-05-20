@@ -1771,7 +1771,7 @@ Public Class frmSWSTAT
                     For Each lTS As atcTimeseries In lRankedAnnual
                         With lTS.Attributes
                             .SetValue("Original ID", lTS.OriginalParent.Attributes.GetValue("ID"))
-                            .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(1)))
+                            .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(0)))
                             .SetValue("To", pDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
                             .SetValue("Not Used", .GetValue("Count Missing"))
                         End With
