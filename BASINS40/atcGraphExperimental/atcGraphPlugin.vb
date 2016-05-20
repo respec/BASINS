@@ -90,7 +90,7 @@ Public Class atcGraphPlugin
                     If HasAnnual(lTimeseriesGroup) Then
                         .Items.Add(pGraphTypeNames(2))
                     Else
-                        '.Items.Add(pGraphTypeNames(2) & " )
+                        .Items.Add(pGraphTypeNames(2) & " (needs annual time series)")
                     End If
                     .Items.Add(pGraphTypeNames(3))
                     Dim lNeededTwoSuffix As String
