@@ -48,8 +48,8 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub frmBatchMap_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-        lstStations.LeftLabel = "Stations from map"
-        lstStations.RightLabel = "Selected for a group"
+        lstStations.LeftLabel = "Stations"
+        lstStations.RightLabel = "Selected Stations"
         Dim lindex As Integer = 0
         For Each lStationID As String In pListStations.Keys
             lstStations.LeftItem(lindex) = lStationID
