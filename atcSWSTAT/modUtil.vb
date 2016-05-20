@@ -925,7 +925,7 @@ Public Module modUtil
                 For Each lTS As atcTimeseries In lRankedAnnual
                     With lTS.Attributes
                         .SetValue("Original ID", lTS.OriginalParent.Attributes.GetValue("ID"))
-                        .SetValue("From", lDateFormat.JDateToString(lTS.Dates.Value(1)))
+                        .SetValue("From", lDateFormat.JDateToString(lTS.Dates.Value(0)))
                         .SetValue("To", lDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
                         .SetValue("Not Used", .GetValue("Count Missing"))
                     End With
