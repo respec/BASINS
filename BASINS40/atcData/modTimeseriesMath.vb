@@ -44,7 +44,7 @@ Public Module modTimeseriesMath
             lEnd = aTimeseries.numValues
         End If
         'Back up one time step for mean data or point data after end
-        If Not lPointTimeseries OrElse _
+        If Not lPointTimeseries OrElse
           (lEnd > 0 AndAlso aTimeseries.Dates.Value(lEnd) > aEndDate) Then
             lEnd -= 1
         End If
@@ -1377,15 +1377,19 @@ Finished:
     ''' <summary>Compute value at specified percentile of specified timeseries</summary>
     ''' <param name="aTimeseries">Timeseries to analyze.</param>
     ''' <param name="aPercentile">Percentile to compute.</param>
+    ''' <return>The value from aTimeseries closest to the specified percentile position</return>
     ''' <remarks>Computed percentile stored in attribute within timeseries with attribute name built from percentile value prefixed with '%'</remarks>
-    Public Sub ComputePercentile(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double)
+    Public Function ComputePercentile(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double) As Double
         Dim lAttrName As String = "%" & Format(aPercentile, "00.####")
         Dim lNumValues As Integer = aTimeseries.numValues - aTimeseries.Attributes.GetValue("Count Missing")
+        Dim lReturnValue As Double
         Select Case lNumValues
             Case Is < 1
                 'Can't compute with no values
+                lReturnValue = GetNaN()
             Case 1
-                aTimeseries.Attributes.SetValue(lAttrName, aTimeseries.Value(0))
+                lReturnValue = aTimeseries.Value(0)
+                aTimeseries.Attributes.SetValue(lAttrName, lReturnValue)
             Case Else
                 Dim lBins As atcCollection = aTimeseries.Attributes.GetValue("Bins")
                 'TODO: could interpolate between closest two values rather than choosing closest one, should we?
@@ -1401,12 +1405,14 @@ Finished:
                     lNextAccumulatedCount = lAccumulatedCount + lBins(lBinIndex).Count
                 End While
                 Dim lBin As ArrayList = lBins(lBinIndex)
-                aTimeseries.Attributes.SetValue(lAttrName, lBin.Item(lPercentileIndex - lAccumulatedCount))
+                lReturnValue = lBin.Item(lPercentileIndex - lAccumulatedCount)
+                aTimeseries.Attributes.SetValue(lAttrName, lReturnValue)
         End Select
-    End Sub
+        Return lReturnValue
+    End Function
 
     ''' <summary>
-    ''' fit a line through a set of data points using least squares regression.
+    ''' Fit a line through a set of data points using least squares regression.
     ''' </summary>
     ''' <param name="aTSerX"></param>
     ''' <param name="aTSerY"></param>

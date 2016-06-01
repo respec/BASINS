@@ -737,8 +737,7 @@ Public Class DFLOWCalcs
                 Case InputNamesDFLOW.EDFlowType.Flow_Percentile '2
                     If aShowProgress Then lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - " & lPercentile & "th percentile"
                     Application.DoEvents()
-                    modTimeseriesMath.ComputePercentile(lHydrologicTS2, lPercentile)
-                    lxQy = lHydrologicTS2.Attributes.GetValue("%" & Format(lPercentile, "00.####"))
+                    lxQy = modTimeseriesMath.ComputePercentile(lHydrologicTS2, lPercentile)
             End Select
 
             ' ===== Create 4-day running average for start of xBy excursion analysis - 
