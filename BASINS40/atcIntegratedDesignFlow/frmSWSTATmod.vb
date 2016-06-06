@@ -3422,45 +3422,7 @@ Public Class frmSWSTATmod
         Next 'lEScenBio
         If pDFLOWScenarios.Count > 0 Then
             If pDataGroup IsNot Nothing AndAlso pDataGroup.Count > 0 Then
-                Dim lInputArgs As New atcDataAttributes()
-                With lInputArgs
-                    Dim lFirstYear As Integer = 0
-                    Dim lStartMonth As Integer = 4
-                    Dim lStartDay As Integer = 1
-                    Dim lLastYear As Integer = 0
-                    Dim lEndMonth As Integer = 3
-                    Dim lEndDay As Integer = 31
-                    If Integer.TryParse(txtOmitBeforeYear.Text, lFirstYear) Then
-                        If lFirstYear > 1900 Then .SetValue(InputNamesDFLOW.StartYear, lFirstYear)
-                    Else
-                        .SetValue(InputNamesDFLOW.StartYear, 0)
-                    End If
-                    If Integer.TryParse(cboStartMonth.SelectedItem.ToString(), lStartMonth) Then
-                        .SetValue(InputNamesDFLOW.StartMonth, lStartMonth)
-                    Else
-                        .SetValue(InputNamesDFLOW.StartMonth, 4)
-                    End If
-                    If Integer.TryParse(txtStartDay.Text, lStartDay) Then
-                        .SetValue(InputNamesDFLOW.StartDay, lStartDay)
-                    Else
-                        .SetValue(InputNamesDFLOW.StartDay, 1)
-                    End If
-                    If Integer.TryParse(txtOmitAfterYear.Text, lLastYear) Then
-                        If lLastYear > 1900 AndAlso lLastYear > lFirstYear Then .SetValue(InputNamesDFLOW.EndYear, lLastYear)
-                    Else
-                        .SetValue(InputNamesDFLOW.EndYear, 0)
-                    End If
-                    If Integer.TryParse(cboEndMonth.SelectedItem.ToString(), lEndMonth) Then
-                        .SetValue(InputNamesDFLOW.EndMonth, lEndMonth)
-                    Else
-                        .SetValue(InputNamesDFLOW.EndMonth, 3)
-                    End If
-                    If Integer.TryParse(txtEndDay.Text, lEndDay) Then
-                        .SetValue(InputNamesDFLOW.EndDay, lEndDay)
-                    Else
-                        .SetValue(InputNamesDFLOW.EndDay, 31)
-                    End If
-                End With
+                Dim lInputArgs As atcDataAttributes = Me.DateArgsFromForm()
                 For Each lScen As clsInteractiveDFLOW In pDFLOWScenarios
                     Dim lBioParam As New atcCollection()
                     With lBioParam
@@ -3571,6 +3533,50 @@ Public Class frmSWSTATmod
             End If 'has dataset(s)
         End If 'has scenario(s)
     End Sub
+
+    Private Function DateArgsFromForm() As atcDataAttributes
+        Dim lInputArgs As New atcDataAttributes()
+        With lInputArgs
+            Dim lFirstYear As Integer = 0
+            Dim lStartMonth As Integer = 4
+            Dim lStartDay As Integer = 1
+            Dim lLastYear As Integer = 0
+            Dim lEndMonth As Integer = 3
+            Dim lEndDay As Integer = 31
+            If Integer.TryParse(txtOmitBeforeYear.Text, lFirstYear) Then
+                If lFirstYear > 1900 Then .SetValue(InputNamesDFLOW.StartYear, lFirstYear)
+            Else
+                .SetValue(InputNamesDFLOW.StartYear, 0)
+            End If
+            If Integer.TryParse(cboStartMonth.SelectedItem.ToString(), lStartMonth) Then
+                .SetValue(InputNamesDFLOW.StartMonth, lStartMonth)
+            Else
+                .SetValue(InputNamesDFLOW.StartMonth, 4)
+            End If
+            If Integer.TryParse(txtStartDay.Text, lStartDay) Then
+                .SetValue(InputNamesDFLOW.StartDay, lStartDay)
+            Else
+                .SetValue(InputNamesDFLOW.StartDay, 1)
+            End If
+            If Integer.TryParse(txtOmitAfterYear.Text, lLastYear) Then
+                If lLastYear > 1900 AndAlso lLastYear > lFirstYear Then .SetValue(InputNamesDFLOW.EndYear, lLastYear)
+            Else
+                .SetValue(InputNamesDFLOW.EndYear, 0)
+            End If
+            If Integer.TryParse(cboEndMonth.SelectedItem.ToString(), lEndMonth) Then
+                .SetValue(InputNamesDFLOW.EndMonth, lEndMonth)
+            Else
+                .SetValue(InputNamesDFLOW.EndMonth, 3)
+            End If
+            If Integer.TryParse(txtEndDay.Text, lEndDay) Then
+                .SetValue(InputNamesDFLOW.EndDay, lEndDay)
+            Else
+                .SetValue(InputNamesDFLOW.EndDay, 31)
+            End If
+        End With
+        Return lInputArgs
+    End Function
+
     Private Function GetTserHM(ByVal aStationInfo As String, ByVal aDuration As String) As Double
         Dim lStationID As String = aStationInfo.Substring(0, aStationInfo.IndexOf(" "))
         Dim lTsers As atcTimeseriesGroup = pDataGroup.FindData("Location", lStationID)
