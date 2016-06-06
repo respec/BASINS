@@ -444,17 +444,10 @@ Public Class atcTimeseries
         Return -1
     End Function
 
-    ''' <summary>Original parent timeseries of this timeseries</summary>
-    ''' <returns>Timeseries containing original parent of this timeseries, determined recursively</returns>
-    ''' <remarks>If no parent, returns this timeseries</remarks>
-    Public Function OriginalParent() As atcTimeseries
-        Dim lFoundParent As atcTimeseries = Me
-        Dim lNextParent As atcTimeseries = Me.Attributes.GetValue("Parent Timeseries")
-        While lNextParent IsNot Nothing
-            lFoundParent = lNextParent
-            lNextParent = lNextParent.Attributes.GetValue("Parent Timeseries")
-        End While
-        Return lFoundParent
+    ''' <summary>ID of original parent timeseries of this timeseries</summary>
+    ''' <remarks>If no parent, returns ID of this timeseries</remarks>
+    Public Function OriginalParentID() As String
+        Return Me.Attributes.GetValue("Original ID", Me.Attributes.GetValue("ID", ""))
     End Function
 
     ''' <summary>

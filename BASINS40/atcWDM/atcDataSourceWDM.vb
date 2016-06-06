@@ -391,19 +391,19 @@ CaseExistRenumber:
                 For lIndexConst As Integer = 1 To lNumValues
                     Dim lDate As Double
                     If lJulianInterval > 0 Then
-                        lDate = .Dates.Values(0) + (lJulianInterval * lIndexConst)
+                        lDate = .Dates.Value(0) + (lJulianInterval * lIndexConst)
                     Else
                         lDate = TimAddJ(.Dates.Value(0), lTu, lTs, lIndexConst)
                     End If
                     Dim lAggregationCount As Integer = .ValueAttributes(lIndexConst).GetValue("AggregationCount", 0)
-                    .Dates.Values(lIndexConst) = lDate
-                    If lIndex <= lTimser.numValues AndAlso lDate >= (lTimser.Dates.Values(lIndex) - JulianSecond) Then
+                    .Dates.Value(lIndexConst) = lDate
+                    If lIndex <= lTimser.numValues AndAlso lDate >= (lTimser.Dates.Value(lIndex) - JulianSecond) Then
                         'todo: this uses only the last value, have a transformation 
                         lAggregationCount += 1
                         .ValueAttributes(lIndexConst).Add("AggregationCount", lAggregationCount)
-                        Dim lValue As Double = lTimser.Values(lIndex)
+                        Dim lValue As Double = lTimser.Value(lIndex)
                         If lAggregationCount = 1 Then 'save this first value
-                            .Values(lIndexConst) = lValue
+                            .Value(lIndexConst) = lValue
                         Else
                             Select Case lAggr
                                 Case 0 'aver
@@ -428,7 +428,7 @@ CaseExistRenumber:
                     ElseIf lIndex > lTimser.numValues Then
                         Logger.Dbg("OutOfValuesAt:" & lTimser.numValues)
                     ElseIf lAggregationCount = 0 Then
-                        .Values(lIndexConst) = pNan
+                        .Value(lIndexConst) = pNan
                     End If
                 Next
             End With

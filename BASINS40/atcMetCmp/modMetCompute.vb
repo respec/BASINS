@@ -475,7 +475,7 @@ Public Module modMetCompute
         'build obs time TSer with constant value from aObsTime argument
         Dim lObsTimeTS As atcTimeseries = aMnTmpTS.Clone
         For i As Integer = 1 To lObsTimeTS.numValues
-            lObsTimeTS.Values(i) = aObsTime
+            lObsTimeTS.Value(i) = aObsTime
         Next
         lObsTimeTS.Attributes.SetValue("Scenario", "CONST-" & aObsTime)
         lObsTimeTS.Attributes.SetValue("Constituent", aMnTmpTS.Attributes.GetValue("Constituent") & "-OBS")
@@ -589,35 +589,35 @@ Public Module modMetCompute
             lObsTime = CurrentObsTime(aObsTimeTS, i)
             If lObsTime < 6 Then 'min occured yesterday
                 If i < aMnTmpTS.numValues Then
-                    lCurMin = aMnTmpTS.Values(i + 1)
+                    lCurMin = aMnTmpTS.Value(i + 1)
                     If i + 1 < aMnTmpTS.numValues Then
-                        lNxtMin = aMnTmpTS.Values(i + 2)
+                        lNxtMin = aMnTmpTS.Value(i + 2)
                     Else 'at end, just use last value
-                        lNxtMin = aMnTmpTS.Values(aMnTmpTS.numValues)
+                        lNxtMin = aMnTmpTS.Value(aMnTmpTS.numValues)
                     End If
                 Else 'at then end, just use last value
-                    lCurMin = aMnTmpTS.Values(aMnTmpTS.numValues)
-                    lNxtMin = aMnTmpTS.Values(aMnTmpTS.numValues)
+                    lCurMin = aMnTmpTS.Value(aMnTmpTS.numValues)
+                    lNxtMin = aMnTmpTS.Value(aMnTmpTS.numValues)
                 End If
             Else 'min occured today
-                lCurMin = aMnTmpTS.Values(i)
+                lCurMin = aMnTmpTS.Value(i)
                 If i < aMnTmpTS.numValues Then
-                    lNxtMin = aMnTmpTS.Values(i + 1)
+                    lNxtMin = aMnTmpTS.Value(i + 1)
                 Else 'at end, use same value as today for tomorrow's min
                     lNxtMin = lCurMin
                 End If
             End If
             If lObsTime > 16 Then 'max occured today, so need to back up 1 for previous days max
-                lCurMax = aMxTmpTS.Values(i)
+                lCurMax = aMxTmpTS.Value(i)
                 If i > 1 Then
-                    lPreMax = aMxTmpTS.Values(i - 1)
+                    lPreMax = aMxTmpTS.Value(i - 1)
                 Else 'at the first value, use same value as today for previous day's max
                     lPreMax = lCurMax
                 End If
             Else 'max occured yesterday, so need to look ahead one for today's max
-                lPreMax = aMxTmpTS.Values(i)
+                lPreMax = aMxTmpTS.Value(i)
                 If i < aMxTmpTS.numValues Then
-                    lCurMax = aMxTmpTS.Values(i + 1)
+                    lCurMax = aMxTmpTS.Value(i + 1)
                 Else 'at end, use same as yesterday's max for today
                     lCurMax = lPreMax
                 End If
@@ -1663,7 +1663,7 @@ Public Module modMetCompute
         'build obs time TSer with constant value from aObsTime argument
         Dim lObsTimeTS As atcTimeseries = aDyTSer.Clone
         For i As Integer = 1 To lObsTimeTS.numValues
-            lObsTimeTS.Values(i) = aObsTime
+            lObsTimeTS.Value(i) = aObsTime
         Next
         lObsTimeTS.Attributes.SetValue("Scenario", "CONST-" & aObsTime)
         lObsTimeTS.Attributes.SetValue("Constituent", aDyTSer.Attributes.GetValue("Constituent") & "-OBS")
@@ -1735,7 +1735,7 @@ Public Module modMetCompute
         lDate(3) = CurrentObsTime(aObsTimeTS, 1)
         'aDyTSer.Attributes.SetValue("SJDAY", Date2J(lDate))
         'need to set first date value to shift back to previous day's Obs Time
-        aDyTSer.Dates.Values(0) = Date2J(lDate)
+        aDyTSer.Dates.Value(0) = Date2J(lDate)
         lDisTs.Dates = DisaggDates(aDyTSer, aDataSource)
         lDisTs.numValues = lDisTs.Dates.numValues
 
@@ -1790,7 +1790,7 @@ Public Module modMetCompute
                         If lHrVals(i) > 0.00001 Then
                             lCarry = lHrVals(i) - (Math.Round(lHrVals(i) / lRndOff) * lRndOff)
                             lHrVals(i) = lHrVals(i) - lCarry
-                            WriteLine(lOutFil, " Hour " & lHrInd + lDate(3) & " " & DumpDate(lClosestHrTser.Dates.Values(lHrInd).ToString) & " " & lHrVals(i))
+                            WriteLine(lOutFil, " Hour " & lHrInd + lDate(3) & " " & DumpDate(lClosestHrTser.Dates.Value(lHrInd).ToString) & " " & lHrVals(i))
                         Else
                             lHrVals(i) = 0.0#
                         End If

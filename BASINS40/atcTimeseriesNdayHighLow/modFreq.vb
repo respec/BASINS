@@ -165,8 +165,8 @@ Module modFreq
         If aTs.numValues > 0 Then
             Dim lQ(aTs.numValues - 1) As Single
             For i As Integer = 1 To aTs.numValues
-                If Not Double.IsNaN(aTs.Values(i)) Then
-                    lQ(lN) = aTs.Values(i)
+                If Not Double.IsNaN(aTs.Value(i)) Then
+                    lQ(lN) = aTs.Value(i)
                     lN += 1
                 End If
             Next

@@ -191,7 +191,7 @@ Public Class atcChooseDataGroupDates
                             Dim lSeasons As New atcSeasonsYearSubset(lStartDateArray(1), lStartDateArray(2), lEndDateArray(1), lEndDateArray(2))
                             lSeasons.SeasonSelected(0) = True
                             lAddTs = lSeasons.SplitBySelected(lAddTs, Nothing).ItemByIndex(1)
-                            lAddTs.Attributes.SetValue("ID", lTs.OriginalParent.Attributes.GetValue("ID"))
+                            lAddTs.Attributes.SetValue("ID", lTs.OriginalParentID)
                         Else
                             lAddTs = SubsetByDate(lTs, lStartDate, lEndDate, Nothing)
                         End If

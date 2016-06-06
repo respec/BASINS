@@ -27,17 +27,17 @@ Public Class clsGraphDoubleMass
                 'find common start and end dates
                 Dim lSJDay As Double
                 Dim lEJDay As Double
-                If lTimeseriesX.Dates.Values(0) < lTimeseriesY.Dates.Values(0) Then
+                If lTimeseriesX.Dates.Value(0) < lTimeseriesY.Dates.Value(0) Then
                     'y starts after x, use y start date
-                    lSJDay = lTimeseriesY.Dates.Values(0)
+                    lSJDay = lTimeseriesY.Dates.Value(0)
                 Else 'use x start date
-                    lSJDay = lTimeseriesX.Dates.Values(0)
+                    lSJDay = lTimeseriesX.Dates.Value(0)
                 End If
-                If lTimeseriesX.Dates.Values(lTimeseriesX.Dates.numValues) < lTimeseriesY.Dates.Values(lTimeseriesY.Dates.numValues) Then
+                If lTimeseriesX.Dates.Value(lTimeseriesX.Dates.numValues) < lTimeseriesY.Dates.Value(lTimeseriesY.Dates.numValues) Then
                     'x ends before y, use x end date
-                    lEJDay = lTimeseriesX.Dates.Values(lTimeseriesX.Dates.numValues)
+                    lEJDay = lTimeseriesX.Dates.Value(lTimeseriesX.Dates.numValues)
                 Else 'use y end date
-                    lEJDay = lTimeseriesY.Dates.Values(lTimeseriesY.Dates.numValues)
+                    lEJDay = lTimeseriesY.Dates.Value(lTimeseriesY.Dates.numValues)
                 End If
 
                 Dim lSubsetTimeseriesX As atcTimeseries = SubsetByDate(lTimeseriesX, lSJDay, lEJDay, Nothing)
@@ -208,17 +208,17 @@ Public Class clsGraphDoubleMass
         Dim lEJDay As Double
         Dim lTimeseriesX As atcTimeseries = Datasets(1)
         Dim lTimeseriesY As atcTimeseries = Datasets(0)
-        If lTimeseriesX.Dates.Values(0) < lTimeseriesY.Dates.Values(0) Then
+        If lTimeseriesX.Dates.Value(0) < lTimeseriesY.Dates.Value(0) Then
             'y starts after x, use y start date
-            lSJDay = lTimeseriesY.Dates.Values(0)
+            lSJDay = lTimeseriesY.Dates.Value(0)
         Else 'use x start date
-            lSJDay = lTimeseriesX.Dates.Values(0)
+            lSJDay = lTimeseriesX.Dates.Value(0)
         End If
-        If lTimeseriesX.Dates.Values(lTimeseriesX.Dates.numValues) < lTimeseriesY.Dates.Values(lTimeseriesY.Dates.numValues) Then
+        If lTimeseriesX.Dates.Value(lTimeseriesX.Dates.numValues) < lTimeseriesY.Dates.Value(lTimeseriesY.Dates.numValues) Then
             'x ends before y, use x end date
-            lEJDay = lTimeseriesX.Dates.Values(lTimeseriesX.Dates.numValues)
+            lEJDay = lTimeseriesX.Dates.Value(lTimeseriesX.Dates.numValues)
         Else 'use y end date
-            lEJDay = lTimeseriesY.Dates.Values(lTimeseriesY.Dates.numValues)
+            lEJDay = lTimeseriesY.Dates.Value(lTimeseriesY.Dates.numValues)
         End If
 
         Dim lSubsetTimeseriesX As atcTimeseries = SubsetByDate(lTimeseriesX, lSJDay, lEJDay, Nothing)

@@ -182,7 +182,7 @@ Public Class atcSeasonBase
                 lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 0)
                 If lNewTSvalueIndex = 0 OrElse lIsInside <> lWasInside Then
                     'Insert NaN at zero position and at start of interval after dates in other season
-                    lNewTS.Values(lNewTSvalueIndex) = pNaN
+                    lNewTS.Value(lNewTSvalueIndex) = pNaN
                     lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue - 1)
                     lNewTS.ValueAttributes(lNewTSvalueIndex).SetValue("Inserted", True)
                     lNewTSvalueIndex += 1

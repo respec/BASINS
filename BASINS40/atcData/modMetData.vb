@@ -393,8 +393,8 @@ Public Module modMetData
     '                        lInd = lDist.IndexFromKey(CStr(j))
     '                        lTSer = aTSAvail.ItemByIndex(lInd)
     '                        lFVal = -1
-    '                        If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Values(1) > pEpsilon And
-    '                           (lMJDay + (k - 1) / lIntsPerDay) - JulianMillisecond <= lTSer.Dates.Values(lTSer.numValues) Then 'check value
+    '                        If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Value(1) > pEpsilon And
+    '                           (lMJDay + (k - 1) / lIntsPerDay) - JulianMillisecond <= lTSer.Dates.Value(lTSer.numValues) Then 'check value
     '                            lSPos = lIntsPerDay * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
     '                            If lTSer.Value(lSPos) <> aMVal AndAlso lTSer.Value(lSPos) > lValMin AndAlso lTSer.Value(lSPos) < lValMax Then 'good value
     '                                lFVal = lTSer.Value(lSPos)
@@ -604,8 +604,8 @@ Public Module modMetData
                             End If
                             lTSer = aTSAvail.ItemByIndex(lInd)
                             lFVal = -1
-                            If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Values(1) > pEpsilon And
-                               (lMJDay + (k - 1) / lIntsPerDay) - JulianMillisecond <= lTSer.Dates.Values(lTSer.numValues) Then 'check value
+                            If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Value(1) > pEpsilon And
+                               (lMJDay + (k - 1) / lIntsPerDay) - JulianMillisecond <= lTSer.Dates.Value(lTSer.numValues) Then 'check value
                                 lSPos = lIntsPerDay * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
                                 If lTSer.Value(lSPos - 1) <> aMAcc AndAlso
                                     lTSer.Value(lSPos) <> aMVal AndAlso
