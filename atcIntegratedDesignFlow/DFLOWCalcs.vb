@@ -704,9 +704,6 @@ Public Class DFLOWCalcs
 
         '{
         For lDSIndex As Integer = 0 To aDataGroup.Count - 1
-            Logger.Dbg("DFLOW Index " & lDSIndex & " memory " & atcUtility.MemUsage())
-            'System.GC.Collect()
-            'Logger.Dbg("Post-Collect " & atcUtility.MemUsage())
             ' ===== Quick trim 
             Dim lHydrologicTS As atcTimeseries = aDataGroup(lDSIndex)
             Dim lHydrologicTS2 As atcTimeseries = SubsetByDateBoundary(lHydrologicTS, lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
