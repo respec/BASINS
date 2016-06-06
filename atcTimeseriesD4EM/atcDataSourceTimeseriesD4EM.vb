@@ -239,7 +239,7 @@ Public Class atcDataSourceTimeseriesD4EM
                 If lTS Is Nothing Then
                     lWriter.Write(Space(DataColumnWidth))
                 Else
-                    lWriter.Write(DecimalAlign(lTS.Values(lDay), DataColumnWidth, DataDecimalWidth))
+                    lWriter.Write(DecimalAlign(lTS.Value(lDay), DataColumnWidth, DataDecimalWidth))
                 End If
             Next
             lWriter.WriteLine()

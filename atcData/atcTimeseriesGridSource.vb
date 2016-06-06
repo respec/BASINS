@@ -278,7 +278,12 @@ Public Class atcTimeseriesGridSource
                                                 Return ""
                                             End If
                                         ElseIf Double.IsNaN(lTs.Value(lIndex)) Then
-                                            Return "Missing"
+                                            If lTs.ValueAttributesGetValue(lIndex, "Inserted", False) Then
+                                                ' Found NaN inserted at edge of season split, don't label it as missing.
+                                                Return ""
+                                            Else
+                                                Return "Missing"
+                                            End If
                                         Else
                                             Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
                                         End If

@@ -226,7 +226,7 @@ Public Class atcMetCmpPlugin
                     If lOk Then
                         lObsTimeTSer = lTMinTSer.Clone
                         For i As Integer = 1 To lObsTimeTSer.numValues
-                            lObsTimeTSer.Values(i) = lObsTime
+                            lObsTimeTSer.Value(i) = lObsTime
                         Next
                         lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
                         lObsTimeTSer.Attributes.SetValue("Constituent", lTMinTSer.Attributes.GetValue("Constituent") & "-OBS")
@@ -280,7 +280,7 @@ Public Class atcMetCmpPlugin
                         'build obs time TSer with constant value from aObsTime argument
                         lObsTimeTSer = lDlyTSer.Clone
                         For i As Integer = 1 To lObsTimeTSer.numValues
-                            lObsTimeTSer.Values(i) = lObsTime
+                            lObsTimeTSer.Value(i) = lObsTime
                         Next
                         lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
                         lObsTimeTSer.Attributes.SetValue("Constituent", lDlyTSer.Attributes.GetValue("Constituent") & "-OBS")

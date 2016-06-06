@@ -335,7 +335,7 @@ Public Class atcTimeseriesNdayHighLow
                         With newTS.Attributes
                             .SetValue("Date Created", lDateNow)
                             .SetValue("Date Modified", lDateNow)
-                            .SetValue("Parent Timeseries", aTimeseries)
+                            .SetValue("Original ID", aTimeseries.OriginalParentID)
                             .SetValue("HighFlag", aHigh)
                             .SetValue("NDay", lNDayNow)
 

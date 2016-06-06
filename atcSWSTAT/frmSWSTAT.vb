@@ -1305,7 +1305,7 @@ Public Class frmSWSTAT
                 Dim lSeasons As New atcSeasonsYearSubset(pYearStartMonth, pYearStartDay, pYearEndMonth, pYearEndDay)
                 lSeasons.SeasonSelected(0) = True
                 lTsB = lSeasons.SplitBySelected(lTsB, Nothing).ItemByIndex(1)
-                lTsB.Attributes.SetValue("ID", lTs.OriginalParent.Attributes.GetValue("ID"))
+                lTsB.Attributes.SetValue("ID", lTs.OriginalParentID)
             End If
             lDataGroupB.Add(lTsB)
         Next
@@ -1770,7 +1770,7 @@ Public Class frmSWSTAT
                 If lRankedAnnual.Count > 0 Then
                     For Each lTS As atcTimeseries In lRankedAnnual
                         With lTS.Attributes
-                            .SetValue("Original ID", lTS.OriginalParent.Attributes.GetValue("ID"))
+                            .SetValue("Original ID", lTS.OriginalParentID)
                             .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(0)))
                             .SetValue("To", pDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
                             .SetValue("Not Used", .GetValue("Count Missing"))

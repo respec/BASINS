@@ -51,9 +51,9 @@ Public Module modTimeseriesMath
 
         Dim lnewTS As New atcTimeseries(aDataSource)
         lnewTS.Dates = New atcTimeseries(aDataSource)
-        lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
-
+        lnewTS.Attributes.SetValue("Original ID", aTimeseries.OriginalParentID)
         Dim lNumNewValues As Integer = lEnd - lStart + 1
+
         If lNumNewValues > 0 Then
             Dim lNewValues(lNumNewValues) As Double
             Dim lNewDates(lNumNewValues) As Double
@@ -750,11 +750,11 @@ Public Module modTimeseriesMath
         Dim lIndNextNotMissing As Integer
         Logger.Dbg("FillMissingByInterp: NumValues:" & lNewTSer.numValues & "  MaxFillLength, days:" & aMaxFillLength)
         While lInd <= lNewTSer.numValues
-            If Double.IsNaN(lNewTSer.Values(lInd)) OrElse Math.Abs(lNewTSer.Values(lInd) - aMissingValue) < 0.00001 Then 'look for next good value
+            If Double.IsNaN(lNewTSer.Value(lInd)) OrElse Math.Abs(lNewTSer.Value(lInd) - aMissingValue) < 0.00001 Then 'look for next good value
                 lIndNextNotMissing = FindNextNotMissing(lNewTSer, lInd, aMissingValue)
                 Dim lMissingLength As Double
                 With lNewTSer.Dates 'find missing length
-                    lMissingLength = .Values(lIndNextNotMissing) - .Values(lIndPrevNotMissing)
+                    lMissingLength = .Value(lIndNextNotMissing) - .Value(lIndPrevNotMissing)
                 End With
                 'Logger.Dbg("FillMissingByInterp:Missing:", lInd, lIndPrevNotMissing, lIndNextNotMissing, lMissingLength)
                 If Double.IsNaN(aMaxFillLength) OrElse lMissingLength < aMaxFillLength Then
@@ -764,21 +764,21 @@ Public Module modTimeseriesMath
                         aFillInstances.Add(lMissingLength)
                     End If
                     With lNewTSer
-                        If Double.IsNaN(.Values(lIndPrevNotMissing)) Then 'missing at start, use first good value
-                            .Values(lInd) = .Values(lIndNextNotMissing)
-                            'Logger.Dbg("FillMissingByInterp:UseFirstNotMissing:" & .Values(lInd))
-                        ElseIf Double.IsNaN(.Values(lIndNextNotMissing)) Then 'missing at end, use last good value
-                            .Values(lInd) = .Values(lIndPrevNotMissing)
-                            'Logger.Dbg("FillMissingByInterp:UseLastNotMissing:" & .Values(lInd))
+                        If Double.IsNaN(.Value(lIndPrevNotMissing)) Then 'missing at start, use first good value
+                            .Value(lInd) = .Value(lIndNextNotMissing)
+                            'Logger.Dbg("FillMissingByInterp:UseFirstNotMissing:" & .Value(lInd))
+                        ElseIf Double.IsNaN(.Value(lIndNextNotMissing)) Then 'missing at end, use last good value
+                            .Value(lInd) = .Value(lIndPrevNotMissing)
+                            'Logger.Dbg("FillMissingByInterp:UseLastNotMissing:" & .Value(lInd))
                         Else 'values prev and next, interpolate
                             Dim lFracMissing As Double
                             With .Dates
-                                lFracMissing = (.Values(lInd) - .Values(lIndPrevNotMissing)) / _
-                                               (.Values(lIndNextNotMissing) - .Values(lIndPrevNotMissing))
+                                lFracMissing = (.Value(lInd) - .Value(lIndPrevNotMissing)) /
+                                               (.Value(lIndNextNotMissing) - .Value(lIndPrevNotMissing))
                             End With
-                            Dim lIncValue As Double = lFracMissing * (.Values(lIndNextNotMissing) - .Values(lIndPrevNotMissing))
-                            .Values(lInd) = .Values(lIndPrevNotMissing) + lIncValue
-                            'Logger.Dbg("FillMissingByInterp:Interp:" & .Values(lInd) & ":" & lFracMissing & ":" & lIncValue)
+                            Dim lIncValue As Double = lFracMissing * (.Value(lIndNextNotMissing) - .Value(lIndPrevNotMissing))
+                            .Value(lInd) = .Value(lIndPrevNotMissing) + lIncValue
+                            'Logger.Dbg("FillMissingByInterp:Interp:" & .Value(lInd) & ":" & lFracMissing & ":" & lIncValue)
                         End If
                     End With
                 End If
@@ -792,7 +792,7 @@ Public Module modTimeseriesMath
 
     Private Function FindNextNotMissing(ByVal aTser As atcTimeseries, ByVal aInd As Integer, Optional ByVal aMissingValue As Double = Double.NaN) As Integer
         Dim lInd As Integer = aInd
-        While Double.IsNaN(aTser.Values(lInd)) OrElse Math.Abs(aTser.Values(lInd) - aMissingValue) < 0.00001
+        While Double.IsNaN(aTser.Value(lInd)) OrElse Math.Abs(aTser.Value(lInd) - aMissingValue) < 0.00001
             lInd += 1
             If lInd >= aTser.numValues Then
                 Return aTser.numValues
@@ -1446,8 +1446,8 @@ Finished:
         Dim lGoodCount As Integer = 0
 
         For lIndex As Integer = 1 To aTSerX.numValues
-            lValX = aTSerX.Values(lIndex)
-            lValY = aTSerY.Values(lIndex)
+            lValX = aTSerX.Value(lIndex)
+            lValY = aTSerY.Value(lIndex)
             If Not Double.IsNaN(lValX) AndAlso Not Double.IsNaN(lValY) Then
                 lSumX += lValX
                 lSumY += lValY
@@ -1470,8 +1470,8 @@ Finished:
             Dim lSum3 As Double = 0.0
             Dim lSum4 As Double = 0.0
             For lIndex As Integer = 1 To aTSerX.numValues
-                lValX = aTSerX.Values(lIndex)
-                lValY = aTSerY.Values(lIndex)
+                lValX = aTSerX.Value(lIndex)
+                lValY = aTSerY.Value(lIndex)
                 If Not Double.IsNaN(lValX) AndAlso Not Double.IsNaN(lValY) Then
                     lSum3 += (lValX - lAvgX) * (lValY - lAvgY)
                     lSum4 += (lValY - lAvgY) * (lValY - lAvgY)
@@ -1483,8 +1483,8 @@ Finished:
             Dim lSum5 As Double = 0
             Dim lSum6 As Double = 0
             For lIndex As Integer = 1 To aTSerX.numValues
-                lValX = aTSerX.Values(lIndex)
-                lValY = aTSerY.Values(lIndex)
+                lValX = aTSerX.Value(lIndex)
+                lValY = aTSerY.Value(lIndex)
                 If Not Double.IsNaN(lValX) AndAlso Not Double.IsNaN(lValY) Then
                     lSum5 += ((aACoef * lValY + aBCoef - lAvgX) * (aACoef * lValY) + aBCoef - lAvgX)
                     lSum6 += (lValX - lAvgX) * (lValX - lAvgX)
@@ -1532,8 +1532,8 @@ Finished:
         Dim sCo As Double = 0
 
         For lIndex As Integer = 1 To aTSerX.numValues
-            x = aTSerX.Values(lIndex)
-            y = aTSerY.Values(lIndex)
+            x = aTSerX.Value(lIndex)
+            y = aTSerY.Value(lIndex)
             If Not Double.IsNaN(x) AndAlso Not Double.IsNaN(y) Then
                 sumCodeviates += (x * y)
                 sumOfX += x
@@ -1856,9 +1856,9 @@ Finished:
 
             If Not lTSgroup Is Nothing AndAlso lTSgroup.Count > 0 Then
                 If lTSgroup.Count = 1 Then
-                    lNewTS.Attributes.SetValue("Parent Timeseries", lTSgroup.Item(0))
-                Else
-                    lNewTS.Attributes.SetValue("Parent Timeseries Group", lTSgroup)
+                    lNewTS.Attributes.SetValue("Original ID", lTSgroup.Item(0).OriginalParentID)
+                    'Else
+                    '    lNewTS.Attributes.SetValue("Parent Timeseries Group", lTSgroup)
                 End If
             End If
             If lHaveNumber Then

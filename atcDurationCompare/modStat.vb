@@ -136,7 +136,7 @@ Public Module modStat
         Dim lClassLimit As Double
 
         For lIndex As Integer = 1 To aTimeseries.numValues
-            lValue = aTimeseries.Values(lIndex)
+            lValue = aTimeseries.Value(lIndex)
             If Not Double.IsNaN(lValue) Then
                 lGoodCount += 1
                 lClassLimit = aDurationReport.ClassLimits(0)
@@ -322,7 +322,7 @@ Public Module modStat
         Dim lTSSimValues As New List(Of Double)
 
         For lIndex As Integer = 1 To aTSerObs.numValues
-            lValObs = aTSerObs.Values(lIndex)
+            lValObs = aTSerObs.Value(lIndex)
             If lNeedToMatchDates Then
                 lIndex2 = atcData.FindDateAtOrAfter(aTSerSim.Dates.Values, aTSerObs.Dates.Value(lIndex), lIndex2)
                 If lIndex2 < 1 OrElse lIndex2 > aTSerSim.numValues Then
@@ -456,7 +456,7 @@ Public Module modStat
 
         lIndex2 = 1
         For lIndex As Integer = 1 To aTSerObs.numValues
-            lValObs = aTSerObs.Values(lIndex) 'Observed
+            lValObs = aTSerObs.Value(lIndex) 'Observed
 
             If lNeedToMatchDates Then
                 lIndex2 = atcData.FindDateAtOrAfter(aTSerSim.Dates.Values, aTSerObs.Dates.Value(lIndex), lIndex2)
@@ -836,7 +836,7 @@ Public Module modStat
     '    For Each lTS As atcTimeseries In lSplit
     '        lYrs = lTS.Attributes.GetValue("count")
     '        Dim ldates(5) As Integer
-    '        J2Date(lTS.Dates.Values(0), ldates)
+    '        J2Date(lTS.Dates.Value(0), ldates)
     '        If ldates(1) <> lprevTimeStep Then
     '            Dim lHeader As String = lHeaderLines.Replace("ZZZ", MonthName3(ldates(1)))
     '            lStr.AppendLine(lHeader) : lStr.AppendLine()
@@ -961,7 +961,7 @@ Public Module modStat
         For Each lTS As atcTimeseries In lSplit
             lYrs = lTS.Attributes.GetValue("count")
             'Dim ldates(5) As Integer
-            'J2Date(lTS.Dates.Values(0), ldates)
+            'J2Date(lTS.Dates.Value(0), ldates)
             'timcnv(ldates)
             Dim lMonthDay() As String = lTS.Attributes.GetValue("seasonname").split("/")
             Dim lMonth As Integer = CInt(lMonthDay(0))
