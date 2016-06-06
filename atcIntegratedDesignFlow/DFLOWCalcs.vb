@@ -625,7 +625,7 @@ Public Class DFLOWCalcs
             End If
         Next
 
-        ' ----- Build data source for results
+        ' ----- Grid to store results
         Dim ladsResults As New atcControls.atcGridSource
         With ladsResults
             If lAddSeason Then
@@ -704,6 +704,9 @@ Public Class DFLOWCalcs
 
         '{
         For lDSIndex As Integer = 0 To aDataGroup.Count - 1
+            Logger.Dbg("DFLOW Index " & lDSIndex & " memory " & atcUtility.MemUsage())
+            'System.GC.Collect()
+            'Logger.Dbg("Post-Collect " & atcUtility.MemUsage())
             ' ===== Quick trim 
             Dim lHydrologicTS As atcTimeseries = aDataGroup(lDSIndex)
             Dim lHydrologicTS2 As atcTimeseries = SubsetByDateBoundary(lHydrologicTS, lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
@@ -712,7 +715,6 @@ Public Class DFLOWCalcs
             Dim lSYear As Integer = (lDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("start date"))).Substring(0, 4)
             Dim lEYear As Integer = (lDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("end date"))).Substring(0, 4)
             Dim lYears As Integer = lEYear - lSYear
-            Dim lTS As Double() = lHydrologicTS2.Values
             lHydrologicTS.Attributes.SetValue("xBy start date", lFirstDate)
 
             ' ===== Calculate hydrologic design flow lxQy
@@ -744,7 +746,7 @@ Public Class DFLOWCalcs
             Dim lTimeSeries As atcTimeseries = aDataGroup(lDSIndex)
             Dim lTimeSeries2 As atcTimeseries = SubsetByDateBoundary(lTimeSeries, lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
 
-            lTS = lTimeSeries2.Values
+            Dim lTS As Double() = lTimeSeries2.Values
             lTS(0) = lNaN
 
             Dim lTSN As Double()
