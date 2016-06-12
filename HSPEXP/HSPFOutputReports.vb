@@ -421,88 +421,139 @@ Module HSPFOutputReports
                 End If
                 Dim lHspfBinDataSource As New atcDataSource
                 If pConstituents.Count > 0 Then
-                    Logger.Dbg(Now & " Opening the binary output files.")
-                    For i As Integer = 0 To lHspfUci.FilesBlock.Count
-                        If lHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
-                            Dim lHspfBinFileName As String = AbsolutePath(lHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                            Dim lOpenHspfBinDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
-                            If lOpenHspfBinDataSource Is Nothing Then
-                                If atcDataManager.OpenDataSource(lHspfBinFileName) Then
-                                    lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
-                                End If
-                            End If
-                            If lOpenHspfBinDataSource.DataSets.Count > 1 Then
-                                lHspfBinDataSource.DataSets.AddRange(lOpenHspfBinDataSource.DataSets)
-                            End If
-                        End If
-                    Next
-
-
-                    If lHspfBinDataSource.DataSets.Count > 0 Then
+                    
+                    For Each lConstituent As String In pConstituents
+                        Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
                         Dim AcceptableQUALNames As New List(Of String)
-                        AcceptableQUALNames.Add("NO3")
-                        AcceptableQUALNames.Add("NH3+NH4")
-                        AcceptableQUALNames.Add("ORTHO P")
-                        AcceptableQUALNames.Add("BOD")
                         Dim lConstituentName As String = ""
-                        For Each lConstituent As String In pConstituents
-                            Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
-                            Select Case lConstituent
-                                Case "Water"
-                                    lConstituentName = "WAT"
-                                Case "Sediment"
-                                    lConstituentName = "SED"
-                                Case "N-PQUAL"
-                                    lConstituentName = "N"
-                                Case "P-PQUAL"
-                                    lConstituentName = "P"
-                                Case "TotalN"
-                                    lConstituentName = "TN"
-                                Case "TotalP"
-                                    lConstituentName = "TP"
-                                Case "BOD-PQUAL"
-                                    lConstituentName = "BOD"
-                                Case "FColi"
-                                    lConstituentName = "FColi"
-                            End Select
+                        Dim CheckQUALID As Boolean = False
+                        Select Case lConstituent
+                            Case "Water"
+                                lConstituentName = "WAT"
+                            Case "Sediment"
+                                lConstituentName = "SED"
+                            Case "N-PQUAL"
+                                lConstituentName = "N"
+                            Case "P-PQUAL"
+                                lConstituentName = "P"
+                            Case "TotalN"
+                                lConstituentName = "TN"
+                                CheckQUALID = True
+                                AcceptableQUALNames.Add("NO3")
+                                AcceptableQUALNames.Add("NH3+NH4")
+                                AcceptableQUALNames.Add("BOD")
+                            Case "TotalP"
+                                lConstituentName = "TP"
+                                CheckQUALID = True
+                                AcceptableQUALNames.Add("ORTHO P")
+                                AcceptableQUALNames.Add("BOD")
+                            Case "BOD-PQUAL"
+                                lConstituentName = "BOD"
+                                CheckQUALID = True
+                                AcceptableQUALNames.Add("BOD")
+                            Case "FColi"
+                                lConstituentName = "FColi"
+                        End Select
 
-                            Dim lReportCons As New atcReport.ReportText
-                            Dim lOutFileName As String = ""
-                            Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent)
+                        'Following part of code checks if UCI file contains proper QUALID name before going any further for all operations. May be time consuming for lot of operations.
+                        Dim NQUALS As Integer = 0
+                        Dim QUALID As String = ""
 
-                            'Following part of code checks if UCI file contains proper QUALID name before going any further for all operations. May be time consuming for lot of operations.
-                            Dim NQUALS As Integer = 0
-                            Dim QUALID As String = ""
-
+                        If CheckQUALID Then 'Model had issues when PQUAL was not active
+                            Dim QUALIDS As New List(Of String)
                             For i As Integer = 0 To lHspfUci.OpnSeqBlock.Opns.Count - 1
-                                If lHspfUci.OpnSeqBlock.Opns(i).Name = "PERLND" Or lHspfUci.OpnSeqBlock.Opns(i).Name = "IMPLND" Then
-                                    NQUALS = lHspfUci.OpnSeqBlock.Opn(i).Tables("QUAL-PROPS").OccurCount
-                                    For k As Integer = 0 To lHspfUci.OpnSeqBlock.Opn(i).Tables.Count - 1
-                                        If lHspfUci.OpnSeqBlock.Opn(i).Tables(k).Name = "QUAL-PROPS" Then
+                                Dim lOperationType As String = lHspfUci.OpnSeqBlock.Opns(i).Name
+                                If lOperationType = "PERLND" Or lOperationType = "IMPLND" Then
+                                    Dim QUAL As String = lOperationType.Substring(0, 1) & "QALFG"
+                                    Dim QUALActivity As Integer = lHspfUci.OpnSeqBlock.Opn(i).Tables("ACTIVITY").Parms(QUAL).Value
+                                    If QUALActivity = 0 Then 'Make sure to double check code for AGCHEM cases.
 
-                                            QUALID = lHspfUci.OpnSeqBlock.Opn(i).Tables(k).Parms(0).Value
+                                        Logger.Dbg("The operation " & lOperationType & " " & lHspfUci.OpnSeqBlock.Opns(i).Id & _
+                                                     "does not have PQUAL section active. Please check output for consistency!")
+                                    Else
+                                        NQUALS = lHspfUci.OpnSeqBlock.Opn(i).Tables("QUAL-PROPS").OccurCount
+                                        For k As Integer = 0 To lHspfUci.OpnSeqBlock.Opn(i).Tables.Count - 1
+                                            If lHspfUci.OpnSeqBlock.Opn(i).Tables(k).Name = "QUAL-PROPS" Then
 
-                                            If Not AcceptableQUALNames.Contains(QUALID) Then
-                                                Dim ans As Integer
-                                                ans = MsgBox("The QUALID name " & QUALID & " in the UCI file for " & lHspfUci.OpnSeqBlock.Opns(i).Name & " " & lHspfUci.OpnSeqBlock.Opns(i).Id & _
-                                                             " do not match the HSPEXP+ expectations.  Constituent Balance reports will not be generated and the program will exit. ")
-                                                End
+                                                QUALID = lHspfUci.OpnSeqBlock.Opn(i).Tables(k).Parms(0).Value
+                                                If Not QUALIDS.Contains(QUALID) Then
+                                                    QUALIDS.Add(QUALID)
+                                                End If
+
+                                                If Not AcceptableQUALNames.Contains(QUALID) Then
+
+                                                End If
                                             End If
-                                        End If
-                                    Next k
+                                        Next k
+                                    End If
                                 End If
                             Next i
-                            'Done checking QUALID
+                            For Each QUALIDItem In AcceptableQUALNames
+                                If Not QUALIDS.Contains(QUALIDItem) Then
+                                    Dim ans As Integer
+                                    ans = MsgBox("The QUALID " & QUALIDItem & "has not been used for all the operations. The nutrient balance reports will not continue" & _
+                                                 " and the program will exit!")
+                                    End
 
-                            
+                                End If
+                            Next QUALIDItem
+                        End If
+
+
+                        'Done checking QUALID
+
+                        Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent)
+                        Logger.Dbg(Now & " Opening the binary output files.")
+                        Dim lScenarioResults As New atcDataSource
+                        Dim lLocations As atcCollection
+                        For i As Integer = 0 To lHspfUci.FilesBlock.Count
+                            If lHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
+                                Dim lHspfBinFileName As String = AbsolutePath(lHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                                Dim lOpenHspfBinDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                                If lOpenHspfBinDataSource Is Nothing Then
+                                    If atcDataManager.OpenDataSource(lHspfBinFileName) Then
+                                        lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                                    End If
+                                End If
+                                If lOpenHspfBinDataSource.DataSets.Count > 1 Then
+                                    lHspfBinDataSource.DataSets.AddRange(lOpenHspfBinDataSource.DataSets)
+                                    lLocations = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
+
+                                    Dim lConstituentNames As New SortedSet(Of String)
+                                    For Each lKey As String In lConstituentsToOutput.Keys
+                                        If (lKey.EndsWith("1") Or lKey.EndsWith("2")) And Not lKey.ToUpper.Contains("EXIT") Then
+                                            lKey = Left(lKey, lKey.Length - 1)
+                                        End If
+
+                                        lConstituentNames.Add(lKey.Substring(2).ToUpper)
+                                    Next
+                                    For Each lTs As atcTimeseries In lHspfBinDataSource.DataSets
+                                        Dim ConstituentFromTS = lTs.Attributes.GetValue("Constituent").ToString.ToUpper
+                                        If lConstituentNames.Contains(ConstituentFromTS) Then
+                                            If ConstituentsThatUseLast.Contains(ConstituentFromTS) Then
+                                                lScenarioResults.DataSets.Add(lTs)
+                                            Else
+                                                lTs = Aggregate(lTs, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+                                                lScenarioResults.DataSets.Add(lTs)
+                                            End If
+
+                                        End If
+                                    Next lTs
+                                End If
+                            End If
+                            atcDataManager.DataSources.Clear()
+                        Next i
+
+                        If lScenarioResults.DataSets.Count > 0 Then
+                            Dim lReportCons As New atcReport.ReportText
+                            Dim lOutFileName As String = ""
 
                             Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
                             lReportCons = Nothing
 
-                            With HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, pOutputLocations, lRunMade)
+                            With HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lScenarioResults, pOutputLocations, lRunMade)
                                 lReportCons = .Item1
                                 lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
-
 
                                 SaveFileString(lOutFileName, lReportCons.ToString)
                                 lReportCons = Nothing
@@ -526,21 +577,7 @@ Module HSPFOutputReports
                             End With
                             Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
 
-                            Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
-                            Dim lScenarioResults As New atcDataSource
-                            Dim lConstituentNames As New SortedSet(Of String)
-                            For Each lKey As String In lConstituentsToOutput.Keys
-                                If lKey.EndsWith("1") Or lKey.EndsWith("2") Then
-                                    lKey = Left(lKey, lKey.Length - 1)
-                                End If
 
-                                lConstituentNames.Add(lKey.Substring(2).ToUpper)
-                            Next
-                            For Each lTs As atcTimeseries In lHspfBinDataSource.DataSets
-                                If lConstituentNames.Contains(lTs.Attributes.GetValue("Constituent").ToString.ToUpper) Then
-                                    lScenarioResults.DataSets.Add(lTs)
-                                End If
-                            Next
                             lReportCons = HspfSupport.ConstituentBalance.Report _
                                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                                 lScenarioResults, lLocations, lRunMade)
@@ -570,18 +607,18 @@ Module HSPFOutputReports
                                 '    lHspfBinDataSource, pOutputLocations, lRunMade, _
                                 '    lOutFolderName, True, True)
                             End If
-                        Next
+                        Else
+                            Logger.Dbg("The HBN file didn't have any data for the constituent " & lConstituent & "  therefore the balance reports for " & _
+                                       lConstituent & " will not be generated. Make sure that HSPF run completed last time.")
+                            Dim ans As Integer
+                            ans = MsgBox("HBN files do not have any data.  Constituent Balance reports will not be generated. " & _
+                                         "Did uci file run properly last time?")
+                        End If
 
+                    Next
 
-                    Else
-                        Logger.Dbg("The HBN file didn't have any data and therefore constituent balance reports were not generated. Make sure that HSPF" & _
-                                   "run finished last time.")
-                        Dim ans As Integer
-                        ans = MsgBox("HBN files do not have any data.  Constituent Balance reports will not be generated. " & _
-                                     "Did uci file run properly last time?")
-                        End
-                    End If
                 End If
+
                 Logger.Dbg(Now & " Output Written to " & loutfoldername)
                 Logger.Dbg("Reports Written in " & loutfoldername)
 RWZProgramEnding:
