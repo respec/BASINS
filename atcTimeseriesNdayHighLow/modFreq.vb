@@ -222,6 +222,8 @@ Module modFreq
             lArgsMath.SetValue("timeseries", New atcTimeseriesGroup(lPositiveTS))
             lDoLog.Open("log 10", lArgsMath)
             lPositiveLogTs = lDoLog.DataSets(0)
+            lArgsMath.Clear() : lArgsMath = Nothing
+            lDoLog.DataSets.Clear() : lDoLog = Nothing
         Else
             lPositiveLogTs = lPositiveTS
         End If
@@ -299,7 +301,7 @@ Module modFreq
             If aHigh Then lIlh = 1 Else lIlh = 2
 
             Try
-                LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, False, lSe, _
+                LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, False, lSe,
                        lC, lCcpa, lP, lQ, lAdp, lQnew, lRi, lRsout, lKP3Dev, lRetcod)
                 lNobs(0) = lN
                 lTL(0) = -1.0E+21
@@ -326,7 +328,7 @@ Module modFreq
                     Dim lR_SD_mse As Double = -999
                     Dim lR_S2_MSE As Double = 4.0 * lR_S2 * lR_SD_mse
                     Dim lR_G_MSE As Double = 1.0
-                    VAR_EMAB(lneps, lNobs, lTL, lTU, lCMoms, lPQA, (lIntervalMax + 1), leps(0), _
+                    VAR_EMAB(lneps, lNobs, lTL, lTU, lCMoms, lPQA, (lIntervalMax + 1), leps(0),
                              lR_S2, lR_M_MSE, lR_S2_MSE, lR_G_MSE, lVarEst, lVarEstArray, lCILow, lCIHigh)
                     Logger.Dbg("BackFrom VAR_EMAB")
                     For i As Integer = 0 To lIntervalMax
@@ -473,6 +475,30 @@ Module modFreq
                     pWarned = True
                 End If
             End Try
+
+            Erase lC
+            Erase lCcpa
+            Erase lP
+            Erase lQ
+            Erase lTL
+            Erase lTU
+            Erase lCILow
+            Erase lCIHigh
+            Erase lCILowVal
+            Erase lCIHighVal
+            Erase lCILowVal2
+            Erase lCIHighVal2
+            Erase lVarEst
+            Erase lVarEstArrayOrig
+            Erase lVarEstArray
+            Erase lCMoms
+            Erase leps
+            Erase lNobs
+            Erase lAdp
+            Erase lQnew
+            Erase lRi
+            Erase lRsout
+            Erase lKP3Dev
         End If
     End Sub
 

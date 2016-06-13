@@ -368,11 +368,11 @@ Public Class atcTimeseriesNdayHighLow
         Return newTsGroup
     End Function
 
-    Public Sub ComputeTau(ByRef aTimeseries As atcTimeseries, _
-                           ByVal aNDay As Double, _
-                           ByVal aHigh As Boolean, _
-                           ByVal aAttributesStorage As atcDataAttributes, _
-                  Optional ByVal aEndMonth As Integer = 0, _
+    Public Sub ComputeTau(ByRef aTimeseries As atcTimeseries,
+                           ByVal aNDay As Double,
+                           ByVal aHigh As Boolean,
+                           ByVal aAttributesStorage As atcDataAttributes,
+                  Optional ByVal aEndMonth As Integer = 0,
                   Optional ByVal aEndDay As Integer = 0)
         Dim lNdayTsGroup As atcTimeseriesGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh, aAttributesStorage, aEndMonth, aEndDay)
 
@@ -431,12 +431,12 @@ Public Class atcTimeseriesNdayHighLow
         End If
     End Sub
 
-    Private Sub SetKenTauAttr(ByVal aAttributesStorage As atcDataAttributes, _
-                              ByVal aNDay As Double, _
-                              ByVal aHigh As Boolean, _
-                              ByVal aSuffixShort As String, _
-                              ByVal aSuffixLong As String, _
-                              ByVal aValue As Double, _
+    Private Sub SetKenTauAttr(ByVal aAttributesStorage As atcDataAttributes,
+                              ByVal aNDay As Double,
+                              ByVal aHigh As Boolean,
+                              ByVal aSuffixShort As String,
+                              ByVal aSuffixLong As String,
+                              ByVal aValue As Double,
                               ByVal aArguments As atcDataAttributes)
         Dim lS As String = aNDay & "-Day"
         If aHigh Then
@@ -481,14 +481,14 @@ Public Class atcTimeseriesNdayHighLow
     ''' <param name="aEndMonth">Ending month of the water year to use.</param>
     ''' <param name="aEndDay">Ending day of the water year to use</param>
     ''' <remarks>If aEndMonth, aEndDay are not specified, year starts at first value in aTimeseries</remarks>
-    Public Sub ComputeFreq(ByRef aTimeseries As atcTimeseries, _
-                           ByVal aNDay As Object, _
-                           ByVal aHigh As Boolean, _
-                           ByVal aRecurOrProb As Object, _
-                           ByVal aLogFg As Boolean, _
-                           ByVal aAttributesStorage As atcDataAttributes, _
-                  Optional ByRef aNdayTsGroup As atcTimeseriesGroup = Nothing, _
-                  Optional ByVal aEndMonth As Integer = 0, _
+    Public Sub ComputeFreq(ByRef aTimeseries As atcTimeseries,
+                           ByVal aNDay As Object,
+                           ByVal aHigh As Boolean,
+                           ByVal aRecurOrProb As Object,
+                           ByVal aLogFg As Boolean,
+                           ByVal aAttributesStorage As atcDataAttributes,
+                  Optional ByRef aNdayTsGroup As atcTimeseriesGroup = Nothing,
+                  Optional ByVal aEndMonth As Integer = 0,
                   Optional ByVal aEndDay As Integer = 0)
 
         Dim lTsMath As atcTimeseriesSource = Nothing
@@ -530,6 +530,12 @@ Public Class atcTimeseriesNdayHighLow
                     aAttributesStorage.SetValue("SDND", lNdayTs.Attributes.GetValue("Standard Deviation"))
                     aAttributesStorage.SetValue("SKWND", lNdayTs.Attributes.GetValue("Skew"))
                     aAttributesStorage.SetValue("LDIST", "LP3")
+                    lArgsMath.DiscardCalculated()
+                    lArgsMath.Clear()
+                    lArgsMath = Nothing
+                    lTsMath.DataSets.Clear()
+                    lTsMath.Clear()
+                    lTsMath = Nothing
                 Else
                     aAttributesStorage.SetValue("LDIST", "LP")
                 End If
@@ -554,6 +560,7 @@ Public Class atcTimeseriesNdayHighLow
 
                 If Not ReferenceEquals(aTimeseries, lNdayTs) Then
                     'get rid of intermediate timeseries
+                    lNdayTs.Clear()
                     lNdayTs = Nothing
                     Me.DataSets.Clear()
                 End If
@@ -706,6 +713,12 @@ Public Class atcTimeseriesNdayHighLow
                 Case "kendall tau"
                     ComputeTau(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
             End Select
+            If lTs.Attributes.GetValue("Time Unit") = atcTimeUnit.TUYear Then
+                'Do nothing
+            Else
+                lTsB.Clear()
+                lTsB = Nothing
+            End If
         Next
 
         If Me.DataSets.Count > 0 Then
