@@ -169,10 +169,10 @@ Public Class DFLOWCalcs
                 .SetValue("BoundaryDay", lBoundaryDay)
                 .SetValue("EndMonth", lEndMonth)
                 .SetValue("EndDay", lEndDay)
-                Dim lNdays(1) As Double
+                Dim lNdays(0) As Double
                 lNdays(0) = aDays
                 .SetValue("NDay", lNdays)
-                Dim lReturns(1) As Double
+                Dim lReturns(0) As Double
                 lReturns(0) = aYears
                 .SetValue("Return Period", lReturns)
             End With
@@ -203,6 +203,8 @@ Public Class DFLOWCalcs
 
                 End If
             End If
+            lCalculator.Clear()
+            lCalculator = Nothing
         Catch e As Exception
             MessageBox.Show("Could not calculate value for " & lAttrName & ". " & e.ToString)
         End Try
@@ -740,10 +742,9 @@ Public Class DFLOWCalcs
             End Select
 
             ' ===== Create 4-day running average for start of xBy excursion analysis - 
-            Dim lTimeSeries As atcTimeseries = aDataGroup(lDSIndex)
-            Dim lTimeSeries2 As atcTimeseries = SubsetByDateBoundary(lTimeSeries, lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
+            Dim lTimeSeries As atcTimeseries = SubsetByDateBoundary(aDataGroup(lDSIndex), lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
 
-            Dim lTS As Double() = lTimeSeries2.Values
+            Dim lTS As Double() = lTimeSeries.Values
             lTS(0) = lNaN
 
             Dim lTSN As Double()
@@ -849,6 +850,8 @@ Public Class DFLOWCalcs
                         If aShowProgress Then
                             lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - xQy (" & lReturnPeriodTry & " of up to " & lYears & ")"
                         End If
+                        GC.Collect()
+                        GC.WaitForFullGCComplete()
                         Application.DoEvents()
                     End While
                 End If
@@ -961,7 +964,8 @@ Public Class DFLOWCalcs
             End If
             lItemIdx = lItemIdx + 1
             lHydrologicTS2.Clear() : lHydrologicTS2 = Nothing
-            lTimeSeries2.Clear() : lTimeSeries2 = Nothing
+            lTimeSeries.Clear() : lTimeSeries = Nothing
+            Erase lTSN
             GC.Collect()
         Next 'lDSIndex}
 

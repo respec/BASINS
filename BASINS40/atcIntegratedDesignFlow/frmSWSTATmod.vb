@@ -3464,6 +3464,8 @@ Public Class frmSWSTATmod
                     End With
                     lScen.DataGroup = pDataGroup
                     lScen.ReportSrc = DFLOWCalcs.DFLOWToGrid(pDataGroup, lBioParam, lNBioParam, lInputArgs, True)
+                    lNBioParam.Clear() : lNBioParam = Nothing
+                    lBioParam.Clear() : lBioParam = Nothing
                 Next 'lScen
 
                 Dim lReportSrc As New atcControls.atcGridSource()
