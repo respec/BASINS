@@ -4276,16 +4276,31 @@ Public Module modBaseflowUtil
             If lTsGroupLocMin.Count > 0 Then lTsGroupLocMinDepthAllYearly.Add(lCtr, lTsGroupLocMin.ItemByKey("Depth" & aSTEP))
             If lTsGroupSlide.Count > 0 Then lTsGroupSlideDepthAllYearly.Add(lCtr, lTsGroupSlide.ItemByKey("Depth" & aSTEP))
 
+            'For BFI yearly time series, some times subsetbydate using chunk's time span will result in null dates/values due to mismatch time span
+            'so it is important to put in try block and test for null dates to see if yearly subset is sensible
             If lTsGroupBFIStandard.Count > 0 Then
                 Dim lBFIRateTser As atcTimeseries = lTsGroupBFIStandard.ItemByKey("Rate" & aSTEP)
                 Dim lBFIDepthTser As atcTimeseries = lTsGroupBFIStandard.ItemByKey("Depth" & aSTEP)
                 Dim lChunkStart As Double = lTsChunk.Dates.Value(0)
                 Dim lChunkEnd As Double = lTsChunk.Dates.Value(lTsChunk.numValues)
                 If lBFIRateTser IsNot Nothing Then
-                    lTsGroupBFIStandardAllYearly.Add(lCtr, SubsetByDate(lBFIRateTser, lChunkStart, lChunkEnd, Nothing))
+                    Try
+                        Dim lTsBnd As atcTimeseries = SubsetByDate(lBFIRateTser, lChunkStart, lChunkEnd, Nothing)
+                        If lTsBnd IsNot Nothing AndAlso lTsBnd.Dates IsNot Nothing AndAlso lTsBnd.Values IsNot Nothing Then
+                            lTsGroupBFIStandardAllYearly.Add(lCtr, lTsBnd)
+                        End If
+                    Catch ex As Exception
+
+                    End Try
                 End If
                 If lBFIDepthTser IsNot Nothing Then
-                    lTsGroupBFIStandardDepthAllYearly.Add(lCtr, SubsetByDate(lBFIDepthTser, lChunkStart, lChunkEnd, Nothing))
+                    Try
+                        Dim lTsBnd As atcTimeseries = SubsetByDate(lBFIDepthTser, lChunkStart, lChunkEnd, Nothing)
+                        If lTsBnd IsNot Nothing AndAlso lTsBnd.Dates IsNot Nothing AndAlso lTsBnd.Values IsNot Nothing Then
+                            lTsGroupBFIStandardDepthAllYearly.Add(lCtr, lTsBnd)
+                        End If
+                    Catch ex As Exception
+                    End Try
                 End If
                 'If lTsGroupBFIStandard.Count > 0 Then lTsGroupBFIStandardAllYearly.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Rate" & aSTEP))
                 'If lTsGroupBFIStandard.Count > 0 Then lTsGroupBFIStandardDepthAllYearly.Add(lCtr, lTsGroupBFIStandard.ItemByKey("Depth" & aSTEP))
@@ -4297,10 +4312,24 @@ Public Module modBaseflowUtil
                 Dim lChunkStart As Double = lTsChunk.Dates.Value(0)
                 Dim lChunkEnd As Double = lTsChunk.Dates.Value(lTsChunk.numValues)
                 If lBFIRateTser IsNot Nothing Then
-                    lTsGroupBFIModifiedAllYearly.Add(lCtr, SubsetByDate(lBFIRateTser, lChunkStart, lChunkEnd, Nothing))
+                    Try
+                        Dim lTsBnd As atcTimeseries = SubsetByDate(lBFIRateTser, lChunkStart, lChunkEnd, Nothing)
+                        If lTsBnd IsNot Nothing AndAlso lTsBnd.Dates IsNot Nothing AndAlso lTsBnd.Values IsNot Nothing Then
+                            lTsGroupBFIModifiedAllYearly.Add(lCtr, lTsBnd)
+                        End If
+                    Catch ex As Exception
+
+                    End Try
                 End If
                 If lBFIDepthTser IsNot Nothing Then
-                    lTsGroupBFIModifiedDepthAllYearly.Add(lCtr, SubsetByDate(lBFIDepthTser, lChunkStart, lChunkEnd, Nothing))
+                    Try
+                        Dim lTsBnd As atcTimeseries = SubsetByDate(lBFIDepthTser, lChunkStart, lChunkEnd, Nothing)
+                        If lTsBnd IsNot Nothing AndAlso lTsBnd.Dates IsNot Nothing AndAlso lTsBnd.Values IsNot Nothing Then
+                            lTsGroupBFIModifiedDepthAllYearly.Add(lCtr, lTsBnd)
+                        End If
+                    Catch ex As Exception
+
+                    End Try
                 End If
                 'If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedAllYearly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Rate" & aSTEP))
                 'If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedDepthAllYearly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Depth" & aSTEP))
