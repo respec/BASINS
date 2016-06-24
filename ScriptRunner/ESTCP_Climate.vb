@@ -22,8 +22,9 @@ Public Module ESTCP_Climate
         'AppendBASINSAirTemp()
         'CorrectFtBenningAirTemp()
         'ProduceClimateScenarioPrecAndAirTempForFB()
-        ComputeHamonPETFromHourlyAirTemp()
+        'ComputeHamonPETFromHourlyAirTemp()
         'UpdateFBLandUse()
+        UpdateFBLandUseRevJune2016()
 
         'CombineTmaxTmin() -- never used for production 
     End Sub
@@ -114,6 +115,105 @@ Public Module ESTCP_Climate
 
         'save the uci under a new name
         lOrigUCI.Name = "D:\ESTCP\FB\Model_EB\UpatoiFutureLU.uci"
+        lOrigUCI.Save()
+    End Sub
+
+    Private Sub UpdateFBLandUseRevJune2016()
+        Dim lMsg As New atcUCI.HspfMsg
+        lMsg.Open("hspfmsg.wdm")
+
+        Dim lOrigUCI As New HspfUci
+        'lOrigUCI.FastReadUciForStarter(lMsg, "D:\ESTCP\Extended\FBUpatoiBaseExt1990UnpavedCorrPostBRAC\Upatoi.uci")
+        'lOrigUCI.FastReadUciForStarter(lMsg, "D:\ESTCP\Extended\FBUpatoiBaseExt1990UnpavedCorrPostBRACLimited\Upatoi.uci")
+        lOrigUCI.FastReadUciForStarter(lMsg, "D:\ESTCP\Extended\FBUpatoiBaseExt1990UnpavedCorrPostBRACHeightened\Upatoi.uci")
+
+        'Dim lPerMultUpper As Double = 0.041
+        'Dim lImpMultUpper As Double = 0.041
+        'Dim lPerMultLower As Double = 0.198
+        'Dim lImpMultLower As Double = 0.198
+        'Dim lPerMultUpper As Double = 0.053
+        'Dim lImpMultUpper As Double = 0.053
+        'Dim lPerMultLower As Double = 0.063
+        'Dim lImpMultLower As Double = 0.063
+        Dim lPerMultUpper As Double = 0.077
+        Dim lImpMultUpper As Double = 0.077
+        Dim lPerMultLower As Double = 0.181
+        Dim lImpMultLower As Double = 0.181
+        Dim lImpMult As Double = 0.0
+        Dim lPerMult As Double = 0.0
+        For Each lRchOper As HspfOperation In lOrigUCI.OpnBlks("RCHRES").Ids
+            If lRchOper.Id = 607 Or lRchOper.Id = 11 Or lRchOper.Id = 3 Or lRchOper.Id = 605 Or _
+               lRchOper.Id = 612 Or lRchOper.Id = 2 Or lRchOper.Id = 10 Or lRchOper.Id = 609 Or _
+               lRchOper.Id = 6 Or lRchOper.Id = 604 Or lRchOper.Id = 608 Or lRchOper.Id = 1 Or _
+               lRchOper.Id = 615 Or lRchOper.Id = 17 Or lRchOper.Id = 16 Or lRchOper.Id = 613 Or _
+               lRchOper.Id = 14 Or lRchOper.Id = 9 Or lRchOper.Id = 8 Or lRchOper.Id = 7 Or _
+               lRchOper.Id = 15 Or lRchOper.Id = 12 Or lRchOper.Id = 13 Or lRchOper.Id = 616 Or _
+               lRchOper.Id = 5 Or lRchOper.Id = 707 Or lRchOper.Id = 4 Or lRchOper.Id = 614 Then
+                'upper reaches
+                lPerMult = lPerMultUpper
+                lImpMult = lImpMultUpper
+            Else
+                'lower reaches
+                lPerMult = lPerMultLower
+                lImpMult = lImpMultLower
+            End If
+
+            Dim lAddedArea As Double = 0.0
+            Dim lPerOrigArea As Double = 0.0
+            Dim lImpOrigArea As Double = 0.0
+            Dim lPerNewArea As Double = 0.0
+            Dim lImpNewArea As Double = 0.0
+            For Each lConn As HspfConnection In lOrigUCI.Connections
+                If lConn.Target.VolName = "RCHRES" And lConn.Target.VolId = lRchOper.Id Then
+                    'this is a contributor to the current reach
+                    If lConn.Source.VolName = "IMPLND" Then
+                        lImpOrigArea += lConn.MFact
+                        lConn.MFact = lConn.MFact * (1.0 + lImpMult)
+                        lImpNewArea += lConn.MFact
+                    ElseIf lConn.Source.VolName = "PERLND" Then
+                        Dim lPerOpn As HspfOperation = lOrigUCI.OpnBlks("PERLND").OperFromID(lConn.Source.VolId)
+                        If lPerOpn.Description.StartsWith("U/C") Or lPerOpn.Description.StartsWith("Paved Road") Then
+                            lPerOrigArea += lConn.MFact
+                            lConn.MFact = lConn.MFact * (1.0 + lPerMult)
+                            lPerNewArea += lConn.MFact
+                        End If
+                    End If
+                End If
+            Next
+            'see how much area we added
+            lAddedArea = lPerNewArea - lPerOrigArea + lImpNewArea - lImpOrigArea
+            'need to subtract this area from the valid perlnds, first find out how much valid perlnd area exists
+            lPerOrigArea = 0.0
+            For Each lConn As HspfConnection In lOrigUCI.Connections
+                If lConn.Target.VolName = "RCHRES" And lConn.Target.VolId = lRchOper.Id Then
+                    'this is a contributor to the current reach
+                    If lConn.Source.VolName = "PERLND" Then
+                        Dim lPerOpn As HspfOperation = lOrigUCI.OpnBlks("PERLND").OperFromID(lConn.Source.VolId)
+                        If lPerOpn.Description.StartsWith("U/C") Or lPerOpn.Description.StartsWith("Paved Road") Or lPerOpn.Description.StartsWith("Water") Or lPerOpn.Description.StartsWith("Tank") Or lPerOpn.Description.StartsWith("Heavy") Then
+                        Else
+                            lPerOrigArea += lConn.MFact
+                        End If
+                    End If
+                End If
+            Next
+            Dim lPerRemoval As Double = lAddedArea / lPerOrigArea
+            'need to remove equal percentage from all valid perlnds
+            For Each lConn As HspfConnection In lOrigUCI.Connections
+                If lConn.Target.VolName = "RCHRES" And lConn.Target.VolId = lRchOper.Id Then
+                    'this is a contributor to the current reach
+                    If lConn.Source.VolName = "PERLND" Then
+                        Dim lPerOpn As HspfOperation = lOrigUCI.OpnBlks("PERLND").OperFromID(lConn.Source.VolId)
+                        If lPerOpn.Description.StartsWith("U/C") Or lPerOpn.Description.StartsWith("Paved Road") Or lPerOpn.Description.StartsWith("Water") Or lPerOpn.Description.StartsWith("Tank") Or lPerOpn.Description.StartsWith("Heavy") Then
+                        Else
+                            lConn.MFact = lConn.MFact * (1.0 - lPerRemoval)
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        'save the uci under a new name
+        lOrigUCI.Name = "D:\ESTCP\Extended\FBUpatoiBaseExt1990UnpavedCorrPostBRAC\UpatoiPostBRACLU.uci"
         lOrigUCI.Save()
     End Sub
 
