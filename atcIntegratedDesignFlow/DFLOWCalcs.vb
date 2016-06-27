@@ -643,7 +643,8 @@ Public Class DFLOWCalcs
             .CellValue(0, 1) = "Period"
             .CellValue(0, 2) = "Days in Record"
             .CellValue(0, 3) = "Zero/Missing"
-            .CellValue(0, 4) = lBioPeriod & "B" & lBioYears
+            '.CellValue(0, 4) = lBioPeriod & "B" & lBioYears
+            .CellValue(0, 4) = "xBy"
             .CellValue(0, 5) = "Percentile"
             .CellValue(0, 6) = "Excur per 3 yr"
 
@@ -715,6 +716,8 @@ Public Class DFLOWCalcs
             Dim lEYear As Integer = (lDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("end date"))).Substring(0, 4)
             Dim lYears As Integer = lEYear - lSYear
             lHydrologicTS.Attributes.SetValue("xBy start date", lFirstDate)
+            lHydrologicTS.Attributes.SetValue("xBy start year", lSYear)
+            lHydrologicTS.Attributes.SetValue("xBy end year", lEYear)
 
             ' ===== Calculate hydrologic design flow lxQy
             Dim lxQy As Double
@@ -722,6 +725,7 @@ Public Class DFLOWCalcs
             'If aShowProgress Then
             'Logger.Progress(Int(100 * (3 * lItemIdx + 1) / (3 * lTotalItems)), lTotalItems)
             'End If
+            Dim lxQyKey As String = ""
             Select Case lNonBioType
                 Case InputNamesDFLOW.EDFlowType.Hydrological '0
                     If aShowProgress Then lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - " & fAveragingPeriod & "Q" & fReturnPeriod
@@ -731,15 +735,19 @@ Public Class DFLOWCalcs
                     Else
                         lxQy = lNaN
                     End If
+                    lxQyKey = "NONBIOFLOW-" & lAveragingPeriod & "Q" & lReturnPeriod
                 Case InputNamesDFLOW.EDFlowType.Explicit_Flow_Value '1
                     If aShowProgress Then lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - explicit flow"
                     Application.DoEvents()
                     lxQy = lExplicitFlow
+                    lxQyKey = "NONBIOFLOW-Explicit Q"
                 Case InputNamesDFLOW.EDFlowType.Flow_Percentile '2
                     If aShowProgress Then lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - " & lPercentile & "th percentile"
                     Application.DoEvents()
                     lxQy = modTimeseriesMath.ComputePercentile(lHydrologicTS2, lPercentile)
+                    lxQyKey = "NONBIOFLOW-Percentile" & " - " & lPercentile & "%"
             End Select
+            lHydrologicTS.Attributes.SetValue(lxQyKey, lxQy)
 
             ' ===== Create 4-day running average for start of xBy excursion analysis - 
             Dim lTimeSeries As atcTimeseries = SubsetByDateBoundary(aDataGroup(lDSIndex), lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
@@ -917,17 +925,31 @@ Public Class DFLOWCalcs
 
             ladsResults.CellValue(lItemIdx + 1, 4) = Sig2(lxBy)
             If Sig2(lxBy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 4) = atcControls.atcAlignment.HAlignDecimal
-            ladsResults.CellValue(lItemIdx + 1, 5) = Format(lNExcB / (UBound(lTS) - lNMiss), "percent")
+            Dim lPct As Double = lNExcB * 1.0 / (UBound(lTS) - lNMiss)
+            'lHydrologicTS.Attributes.SetValue(lAttrName & "%", lPct)
+            'ladsResults.CellValue(lItemIdx + 1, 5) = Format(lNExcB / (UBound(lTS) - lNMiss), "percent")
+            ladsResults.CellValue(lItemIdx + 1, 5) = Format(lPct, "percent")
             ladsResults.Alignment(lItemIdx + 1, 5) = atcControls.atcAlignment.HAlignDecimal
-            ladsResults.CellValue(lItemIdx + 1, 6) = Sig2(lExcursionCountArray(lItemIdx) * 3 / lYears)
+            Dim lExc As String = Sig2(lExcursionCountArray(lItemIdx) * 3 / lYears)
+            'lHydrologicTS.Attributes.SetValue(lAttrName & "Exc", lExc)
+            'ladsResults.CellValue(lItemIdx + 1, 6) = Sig2(lExcursionCountArray(lItemIdx) * 3 / lYears)
+            ladsResults.CellValue(lItemIdx + 1, 6) = lExc
             ladsResults.Alignment(lItemIdx + 1, 6) = atcControls.atcAlignment.HAlignDecimal
+            Dim lxByRecord As String = lxBy & vbTab & Format(lPct, "percent") & vbTab & lExc
+            lHydrologicTS.Attributes.SetValue("BIOFLOW-" & lAttrName, lxByRecord)
 
             ladsResults.CellValue(lItemIdx + 1, 7) = Sig2(lxQy)
             If Sig2(lxQy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 7) = atcControls.atcAlignment.HAlignDecimal
-            ladsResults.CellValue(lItemIdx + 1, 8) = Format(lNExc / (UBound(lTS) - lNMiss), "percent")
+            lPct = lNExc / (UBound(lTS) - lNMiss)
+            'ladsResults.CellValue(lItemIdx + 1, 8) = Format(lNExc / (UBound(lTS) - lNMiss), "percent")
+            ladsResults.CellValue(lItemIdx + 1, 8) = Format(lPct, "percent")
             ladsResults.Alignment(lItemIdx + 1, 8) = atcControls.atcAlignment.HAlignDecimal
-            ladsResults.CellValue(lItemIdx + 1, 9) = Sig2(lExcQ * 3 / lYears)
+            lExc = Sig2(lExcQ * 3 / lYears)
+            'ladsResults.CellValue(lItemIdx + 1, 9) = Sig2(lExcQ * 3 / lYears)
+            ladsResults.CellValue(lItemIdx + 1, 9) = lExc
             ladsResults.Alignment(lItemIdx + 1, 9) = atcControls.atcAlignment.HAlignDecimal
+            Dim lxQyRecord As String = lxQy & vbTab & Format(lPct, "percent") & vbTab & lExc
+            lHydrologicTS.Attributes.SetValue(lxQyKey, lxQyRecord)
 
             ladsResults.Alignment(lItemIdx + 1, 10) = atcControls.atcAlignment.HAlignCenter
             ladsResults.Alignment(lItemIdx + 1, 11) = atcControls.atcAlignment.HAlignCenter
@@ -951,13 +973,16 @@ Public Class DFLOWCalcs
                 ladsResults.CellValue(lItemIdx + 1, 12) = "N/A"
             End If
 
+            Dim lHMeanKey As String = "NONBIOFLOW-Harmonic Mean"
             ladsResults.CellValue(lItemIdx + 1, 13) = Sig2(lHFlow)
             If Sig2(lHFlow) < 100 Then ladsResults.Alignment(lItemIdx + 1, 13) = atcControls.atcAlignment.HAlignDecimal
             ladsResults.CellValue(lItemIdx + 1, 14) = Sig2(lHFlowAdj)
             If Sig2(lHFlowAdj) < 100 Then ladsResults.Alignment(lItemIdx + 1, 14) = atcControls.atcAlignment.HAlignDecimal
 
-            ladsResults.CellValue(lItemIdx + 1, 15) = Format(lNExcHF / (UBound(lTS) - lNMiss), "percent")
+            lPct = lNExcHF / (UBound(lTS) - lNMiss)
+            ladsResults.CellValue(lItemIdx + 1, 15) = Format(lPct, "percent")
             ladsResults.Alignment(lItemIdx + 1, 15) = atcControls.atcAlignment.HAlignDecimal
+            lHydrologicTS.Attributes.SetValue(lHMeanKey, lHydrologicTS.Attributes.GetValue("Harmonic Mean") & vbTab & Format(lPct, "percent") & vbTab & "N/A")
 
             If lAddSeason Then
                 ladsResults.CellValue(lItemIdx + 1, 16) = lHydrologicTS.Attributes.GetValue("seasonname")
@@ -990,7 +1015,7 @@ Public Class DFLOWCalcs
         If aHelpTopic.ToLower.EndsWith(".chm") Then
             If IO.File.Exists(aHelpTopic) Then
                 lHelpFilename = aHelpTopic
-                Logger.Dbg("Set new help file '" & lHelpFilename & "'")
+                Logger.Dbg("Set New help file '" & lHelpFilename & "'")
             Else
                 Logger.Dbg("New help file not found at '" & lHelpFilename & "'")
             End If

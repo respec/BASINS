@@ -16,6 +16,7 @@ Public Class frmDFLOWResults
     'Private pClustersArray As New ArrayList
 
     Public pScenarios As atcCollection = Nothing
+    Public pInputArgs As atcDataAttributes = Nothing
 
     Private Shared pDateFormat As New atcDateFormat
 
@@ -527,10 +528,11 @@ Public Class frmDFLOWResults
         'End If
     End Sub
 
-    Public Sub UserSpecifyDFLOWResults(ByVal ladsResults As atcControls.atcGridSource, ByVal aScenarios As atcCollection, Optional ByVal aTitle As String = "Design Flow Results")
+    Public Sub UserSpecifyDFLOWResults(ByVal ladsResults As atcControls.atcGridSource, ByVal aScenarios As atcCollection, ByVal aInputArgs As atcDataAttributes, Optional ByVal aTitle As String = "Design Flow Results")
         If ladsResults Is Nothing Then Exit Sub
         If aScenarios Is Nothing Then Exit Sub
         pScenarios = aScenarios
+        pInputArgs = aInputArgs
         agrResults.Initialize(ladsResults)
         For lCol As Integer = 1 To ladsResults.Columns - 1
             agrResults.SizeColumnToContents(lCol)
@@ -568,128 +570,178 @@ Public Class frmDFLOWResults
         pRow = aRow
     End Sub
 
-    Private Sub agrResults_MouseDoubleClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles agrResults.MouseDoubleClick
+    'Private Sub agrResults_MouseDoubleClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles agrResults.MouseDoubleClick
 
+    '    If pRow = 0 Or pColumn <> 4 Then
+    '        Beep()
+    '    Else
+
+    '        With pDateFormat
+
+    '            .IncludeHours = False
+    '            .IncludeMinutes = False
+    '            .IncludeSeconds = False
+    '        End With
+
+    '        'Dim lExcursionCount As Integer = pExcursionCountArray(pRow - 1)
+    '        'Dim lClusters As ArrayList = pClustersArray(pRow - 1)
+    '        'Dim lExcursions As ArrayList = pExcursionsArray(pRow - 1)
+
+    '        Dim lScenID As Integer = Integer.Parse(agrResults.Source.CellValue(pRow, agrResults.Source.Columns - 1))
+    '        Dim lScen As clsInteractiveDFLOW = pScenarios.ItemByKey(lScenID)
+    '        If lScen Is Nothing Then Exit Sub
+    '        If lScen.DataGroup Is Nothing Then Exit Sub
+    '        Dim lGageDesc As String = agrResults.Source.CellValue(pRow, 0)
+    '        If String.IsNullOrEmpty(lGageDesc) Then Exit Sub
+    '        Dim loc As String = lGageDesc.Substring(0, lGageDesc.IndexOf("-"))
+    '        If String.IsNullOrEmpty(loc) OrElse loc.Trim() = "" Then Exit Sub
+    '        loc = loc.Trim()
+    '        'Dim lSn As String = ""
+    '        'For lColIndex As Integer = 0 To agrResults.Source.Columns
+    '        '    If agrResults.Source.CellValue(0, lColIndex) = "SeasonName" Then
+    '        '        lSn = agrResults.Source.CellValue(pRow, lColIndex)
+    '        '        Exit For
+    '        '    End If
+    '        'Next
+    '        'Dim lKey As String = loc & "-" & lSn
+    '        'Dim lExcursionCount As Integer = lScen.ExcursionCountArray.ItemByKey(lKey)
+    '        'Dim lClusters As ArrayList = lScen.ClustersArray.ItemByKey(lKey)
+    '        'Dim lExcursions As ArrayList = lScen.ExcursionsArray.ItemByKey(lKey)
+    '        Dim lIndex As Integer = pRow Mod lScen.DataGroup.Count
+    '        If lIndex = 0 Then lIndex = lScen.DataGroup.Count
+    '        Dim lExcursionCount As Integer = lScen.ExcursionCountArray(lIndex - 1)
+    '        Dim lClusters As ArrayList = lScen.ClustersArray(lIndex - 1)
+    '        Dim lExcursions As ArrayList = lScen.ExcursionsArray(lIndex - 1)
+
+    '        Dim lagsExcursions As New atcControls.atcGridSource
+
+    '        With lagsExcursions
+    '            .Columns = 5
+    '            .Rows = 1 + lExcursions.Count
+    '            .FixedRows = 1
+    '            .CellValue(0, 0) = "Cluster Start"
+    '            .CellValue(0, 1) = "Excursions"
+    '            .CellValue(0, 2) = "Period Start"
+    '            .CellValue(0, 3) = "Duration"
+    '            .CellValue(0, 4) = "Avg Excursion"
+    '            Dim lColumn As Integer
+    '            For lColumn = 0 To 4
+    '                .CellColor(0, lColumn) = Me.BackColor
+    '                .Alignment(0, lColumn) = atcControls.atcAlignment.HAlignCenter
+    '            Next
+
+    '        End With
+
+    '        Dim lRow As Integer = 0
+    '        Dim lExcursionIdx As Integer = 0
+    '        'Dim lTsGroup As atcTimeseriesGroup = lScen.DataGroup.FindData("Location", Loc)
+    '        'Dim lTs As atcTimeseries = Nothing
+    '        'If Not String.IsNullOrEmpty(lSn) Then
+    '        '    lTs = lTsGroup.FindData("SeasonName", lSn)(0)
+    '        'Else
+    '        '    lTs = lTsGroup(0)
+    '        'End If
+    '        'Dim lFirstDate As Double = 0
+    '        'If lTs IsNot Nothing Then
+    '        '    lFirstDate = lTs.Attributes.GetValue("xBy start date") 'pTimeseriesGroup(pRow - 1).Attributes.GetValue("xBy start date")
+    '        'End If
+
+    '        Dim lTs As atcTimeseries = lScen.DataGroup(lIndex - 1)
+    '        Dim lFirstDate As Double = lTs.Attributes.GetValue("xBy start date") 'pTimeseriesGroup(pRow - 1).Attributes.GetValue("xBy start date")
+
+    '        Dim lCluster As DFLOWCalcs.stCluster
+    '        For Each lCluster In lClusters
+
+    '            If lRow = 0 Then
+
+    '                lRow = 1 ' First cluster is always invalid, so it gets skipped
+
+    '            Else
+
+    '                lagsExcursions.CellValue(lRow, 0) = pDateFormat.JDateToString(lFirstDate + lCluster.Start)
+    '                lagsExcursions.CellValue(lRow, 1) = lCluster.Excursions & " "
+    '                lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
+
+    '                Dim lNExc As Integer = 0
+    '                Do
+    '                    Dim lExcursion As DFLOWCalcs.stExcursion
+    '                    lExcursion = lExcursions(lRow)
+    '                    With lExcursion
+    '                        lagsExcursions.CellValue(lRow, 2) = pDateFormat.JDateToString(lFirstDate + .Start)
+    '                        lagsExcursions.CellValue(lRow, 3) = .Count & " "
+    '                        lagsExcursions.CellValue(lRow, 4) = Format(.SumMag / .SumLength - 1, "Percent") & " "
+
+    '                        lagsExcursions.Alignment(lRow, 3) = atcControls.atcAlignment.HAlignRight
+    '                        lagsExcursions.Alignment(lRow, 4) = atcControls.atcAlignment.HAlignRight
+
+    '                    End With
+
+    '                    lNExc = lNExc + 1
+    '                    lRow = lRow + 1
+
+    '                Loop Until lNExc >= lCluster.Events
+    '            End If
+    '        Next
+
+    '        lagsExcursions.CellValue(lRow, 0) = "Total"
+    '        lagsExcursions.CellValue(lRow, 1) = lExcursionCount
+    '        lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
+
+    '        Dim lfrmExcursions As New frmDFLOWExcursions
+    '        With lfrmExcursions
+    '            '.Text = DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears & " Excursion Analysis for " & pTimeseriesGroup(pRow - 1).Attributes.GetFormattedValue("Location")
+    '            With lScen
+    '                lfrmExcursions.Text = .ParamBio1FlowAvgDays & "B" & .ParamBio2YearsBetweenExcursion & " Excursion Analysis for " & loc
+    '            End With
+    '            .AtcGrid1.Initialize(lagsExcursions)
+    '            .AtcGrid1.BorderStyle = BorderStyle.FixedSingle
+    '            .AtcGrid1.ColumnWidth(0) = 70
+    '            .AtcGrid1.ColumnWidth(1) = 60
+    '            .AtcGrid1.ColumnWidth(2) = 70
+    '            .AtcGrid1.ColumnWidth(3) = 50
+    '            .AtcGrid1.ColumnWidth(4) = 90
+    '            .AtcGrid1.Width = 360
+    '            For lRow = 2 To lagsExcursions.Rows - 1
+    '                If lagsExcursions.CellValue(lRow, 0) <> "" Then
+    '                    .AtcGrid1.RowHeight(lRow) = 20
+    '                End If
+    '            Next
+    '            .ShowDialog()
+    '        End With
+    '    End If
+    'End Sub
+
+    '{
+    Private Sub agrResults_MouseDoubleClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles agrResults.MouseDoubleClick
         If pRow = 0 Or pColumn <> 4 Then
             Beep()
         Else
-
             With pDateFormat
-
                 .IncludeHours = False
                 .IncludeMinutes = False
                 .IncludeSeconds = False
             End With
 
-            'Dim lExcursionCount As Integer = pExcursionCountArray(pRow - 1)
-            'Dim lClusters As ArrayList = pClustersArray(pRow - 1)
-            'Dim lExcursions As ArrayList = pExcursionsArray(pRow - 1)
-
             Dim lScenID As Integer = Integer.Parse(agrResults.Source.CellValue(pRow, agrResults.Source.Columns - 1))
             Dim lScen As clsInteractiveDFLOW = pScenarios.ItemByKey(lScenID)
             If lScen Is Nothing Then Exit Sub
             If lScen.DataGroup Is Nothing Then Exit Sub
-            Dim lGageDesc As String = agrResults.Source.CellValue(pRow, 0)
-            If String.IsNullOrEmpty(lGageDesc) Then Exit Sub
-            Dim loc As String = lGageDesc.Substring(0, lGageDesc.IndexOf("-"))
-            If String.IsNullOrEmpty(loc) OrElse loc.Trim() = "" Then Exit Sub
-            loc = loc.Trim()
-            'Dim lSn As String = ""
-            'For lColIndex As Integer = 0 To agrResults.Source.Columns
-            '    If agrResults.Source.CellValue(0, lColIndex) = "SeasonName" Then
-            '        lSn = agrResults.Source.CellValue(pRow, lColIndex)
-            '        Exit For
-            '    End If
-            'Next
-            'Dim lKey As String = loc & "-" & lSn
-            'Dim lExcursionCount As Integer = lScen.ExcursionCountArray.ItemByKey(lKey)
-            'Dim lClusters As ArrayList = lScen.ClustersArray.ItemByKey(lKey)
-            'Dim lExcursions As ArrayList = lScen.ExcursionsArray.ItemByKey(lKey)
+
             Dim lIndex As Integer = pRow Mod lScen.DataGroup.Count
             If lIndex = 0 Then lIndex = lScen.DataGroup.Count
-            Dim lExcursionCount As Integer = lScen.ExcursionCountArray(lIndex - 1)
-            Dim lClusters As ArrayList = lScen.ClustersArray(lIndex - 1)
-            Dim lExcursions As ArrayList = lScen.ExcursionsArray(lIndex - 1)
 
-            Dim lagsExcursions As New atcControls.atcGridSource
-
-            With lagsExcursions
-                .Columns = 5
-                .Rows = 1 + lExcursions.Count
-                .FixedRows = 1
-                .CellValue(0, 0) = "Cluster Start"
-                .CellValue(0, 1) = "Excursions"
-                .CellValue(0, 2) = "Period Start"
-                .CellValue(0, 3) = "Duration"
-                .CellValue(0, 4) = "Avg Excursion"
-                Dim lColumn As Integer
-                For lColumn = 0 To 4
-                    .CellColor(0, lColumn) = Me.BackColor
-                    .Alignment(0, lColumn) = atcControls.atcAlignment.HAlignCenter
-                Next
-
-            End With
-
-            Dim lRow As Integer = 0
-            Dim lExcursionIdx As Integer = 0
-            'Dim lTsGroup As atcTimeseriesGroup = lScen.DataGroup.FindData("Location", Loc)
-            'Dim lTs As atcTimeseries = Nothing
-            'If Not String.IsNullOrEmpty(lSn) Then
-            '    lTs = lTsGroup.FindData("SeasonName", lSn)(0)
-            'Else
-            '    lTs = lTsGroup(0)
-            'End If
-            'Dim lFirstDate As Double = 0
-            'If lTs IsNot Nothing Then
-            '    lFirstDate = lTs.Attributes.GetValue("xBy start date") 'pTimeseriesGroup(pRow - 1).Attributes.GetValue("xBy start date")
-            'End If
-
-            Dim lTs As atcTimeseries = lScen.DataGroup(lIndex - 1)
-            Dim lFirstDate As Double = lTs.Attributes.GetValue("xBy start date") 'pTimeseriesGroup(pRow - 1).Attributes.GetValue("xBy start date")
-
-            Dim lCluster As DFLOWCalcs.stCluster
-            For Each lCluster In lClusters
-
-                If lRow = 0 Then
-
-                    lRow = 1 ' First cluster is always invalid, so it gets skipped
-
-                Else
-
-                    lagsExcursions.CellValue(lRow, 0) = pDateFormat.JDateToString(lFirstDate + lCluster.Start)
-                    lagsExcursions.CellValue(lRow, 1) = lCluster.Excursions & " "
-                    lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
-
-                    Dim lNExc As Integer = 0
-                    Do
-                        Dim lExcursion As DFLOWCalcs.stExcursion
-                        lExcursion = lExcursions(lRow)
-                        With lExcursion
-                            lagsExcursions.CellValue(lRow, 2) = pDateFormat.JDateToString(lFirstDate + .Start)
-                            lagsExcursions.CellValue(lRow, 3) = .Count & " "
-                            lagsExcursions.CellValue(lRow, 4) = Format(.SumMag / .SumLength - 1, "Percent") & " "
-
-                            lagsExcursions.Alignment(lRow, 3) = atcControls.atcAlignment.HAlignRight
-                            lagsExcursions.Alignment(lRow, 4) = atcControls.atcAlignment.HAlignRight
-
-                        End With
-
-                        lNExc = lNExc + 1
-                        lRow = lRow + 1
-
-                    Loop Until lNExc >= lCluster.Events
-                End If
-            Next
-
-            lagsExcursions.CellValue(lRow, 0) = "Total"
-            lagsExcursions.CellValue(lRow, 1) = lExcursionCount
-            lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
+            Dim lagsExcursions As atcControls.atcGridSource = lScen.ExcursionReport("", lIndex - 1)
+            If lagsExcursions Is Nothing Then Exit Sub
 
             Dim lfrmExcursions As New frmDFLOWExcursions
             With lfrmExcursions
                 '.Text = DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears & " Excursion Analysis for " & pTimeseriesGroup(pRow - 1).Attributes.GetFormattedValue("Location")
+                Dim lGageDesc As String = agrResults.Source.CellValue(pRow, 0)
+                If String.IsNullOrEmpty(lGageDesc) Then Exit Sub
+                Dim loc As String = lGageDesc.Substring(0, lGageDesc.IndexOf("-"))
+                If String.IsNullOrEmpty(loc) OrElse loc.Trim() = "" Then Exit Sub
                 With lScen
-                    lfrmExcursions.Text = .ParamBio1FlowAvgDays & "B" & .ParamBio2YearsBetweenExcursion & " Excursion Analysis for " & loc
+                    lfrmExcursions.Text = .ParamBio1FlowAvgDays & "B" & .ParamBio2YearsBetweenExcursion & " Excursion Analysis for " & loc.Trim()
                 End With
                 .AtcGrid1.Initialize(lagsExcursions)
                 .AtcGrid1.BorderStyle = BorderStyle.FixedSingle
@@ -699,7 +751,7 @@ Public Class frmDFLOWResults
                 .AtcGrid1.ColumnWidth(3) = 50
                 .AtcGrid1.ColumnWidth(4) = 90
                 .AtcGrid1.Width = 360
-                For lRow = 2 To lagsExcursions.Rows - 1
+                For lRow As Integer = 2 To lagsExcursions.Rows - 1
                     If lagsExcursions.CellValue(lRow, 0) <> "" Then
                         .AtcGrid1.RowHeight(lRow) = 20
                     End If
@@ -707,11 +759,11 @@ Public Class frmDFLOWResults
                 .ShowDialog()
             End With
         End If
-    End Sub
+    End Sub '}
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
         Dim lBuffer As String
-        lBuffer = Me.Text & vbCrLf & vbcrlf & vbcrlf & lblYears.Text & vbcrlf & vbcrlf
+        lBuffer = Me.Text & vbCrLf & vbCrLf & vbCrLf & lblYears.Text & vbCrLf & vbCrLf
         Dim lRow As Integer
         Dim lCol As Integer
         With (agrResults.Source)
@@ -726,7 +778,7 @@ Public Class frmDFLOWResults
 
     End Sub
 
-    
+
     Public Overrides Function ToString() As String
         Return Me.Text & vbCrLf & _
                lblSeasons.Text & vbCrLf & _
@@ -758,5 +810,70 @@ Public Class frmDFLOWResults
     Private Sub DFLOWHelpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DFLOWHelpToolStripMenuItem.Click
         DFLOWCalcs.ShowDFLOWHelp(Replace(Application.StartupPath.ToLower, g_PathChar & "bin", g_PathChar & "docs") & g_PathChar & "dflow4.chm")
         DFLOWCalcs.ShowDFLOWHelp("html\dlfo6hps.htm")
+    End Sub
+
+    Private Sub SaveOutputReportToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SaveOutputReportToolStripMenuItem.Click
+        Dim lStop As String = "STOP"
+
+        Dim lrptfileName As String = ""
+        Dim lDiag As New System.Windows.Forms.SaveFileDialog()
+        With lDiag
+            .DefaultExt = ".txt"
+            .InitialDirectory = ""
+            .Filter = "Text File|*.txt|All File|*.*"
+            If .ShowDialog = DialogResult.OK Then
+                lrptfileName = .FileName
+            End If
+            .Dispose()
+        End With
+        If Not String.IsNullOrEmpty(lrptfileName) AndAlso IO.Directory.Exists(IO.Path.GetDirectoryName(lrptfileName)) Then
+            Dim lSW As System.IO.StreamWriter = Nothing
+            Try
+                lSW = New System.IO.StreamWriter(lrptfileName, False)
+                Dim lrpt As New DFLOWReportAscii(pScenarios)
+                With lrpt
+                    .i_DataGroup = pTimeseriesGroup
+                    If pInputArgs IsNot Nothing Then
+                        'lFirstYear = pInputArgs.GetValue(InputNamesDFLOW.StartYear, 0)
+                        'lStartMonth = pInputArgs.GetValue(InputNamesDFLOW.StartMonth, 4)
+                        'lStartDay = pInputArgs.GetValue(InputNamesDFLOW.StartDay, 1)
+                        'lLastYear = pInputArgs.GetValue(InputNamesDFLOW.EndYear, 0)
+                        'lEndMonth = pInputArgs.GetValue(InputNamesDFLOW.EndMonth, 3)
+                        'lEndDay = pInputArgs.GetValue(InputNamesDFLOW.EndDay, 31)
+
+                        .i_Version = pInputArgs.GetValue(DFLOWReportUtil.Info.i_Version, "4.x")
+                        .i_BuildDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_BuildDate, "")
+                        .i_RunDateTime = pInputArgs.GetValue(DFLOWReportUtil.Info.i_RunDateTime, "")
+                        .i_Username = pInputArgs.GetValue(DFLOWReportUtil.Info.i_Username, "User")
+                        .i_Seasonal = False
+                        .i_SeasonStartDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonStartDate, "")
+                        .i_SeasonEndDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonEndDate, "")
+                        .i_SeasonStartYear = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonStartYear, 0)
+                        .i_SeasonEndYear = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonEndYear, 0)
+                        .i_YearsIncluded = pInputArgs.GetValue(DFLOWReportUtil.Info.i_YearsIncluded)
+                    Else
+                        .i_RunDateTime = ""
+                        .i_Username = "User"
+                        .i_Seasonal = False
+                        .i_SeasonStartDate = ""
+                        .i_SeasonEndDate = ""
+                        .i_SeasonStartYear = 0
+                        .i_SeasonEndYear = 0
+                    End If
+                End With
+
+                lSW.Write(lrpt.Header())
+                lSW.Write(lrpt.StationReport())
+
+                Logger.Msg("DFLOW report is saved as:" & vbCrLf & lrptfileName, MsgBoxStyle.OkOnly, "DFLOW Report")
+            Catch ex As Exception
+                Logger.Msg("Writing DFLOW report failed.", MsgBoxStyle.Critical, "DFLOW Report")
+            Finally
+                If lSW IsNot Nothing Then
+                    lSW.Close()
+                    lSW = Nothing
+                End If
+            End Try
+        End If
     End Sub
 End Class

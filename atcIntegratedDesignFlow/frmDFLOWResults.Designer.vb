@@ -41,6 +41,7 @@ Partial Class frmDFLOWResults
         Me.lblSeasons = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.agrResults = New atcControls.atcGrid()
+        Me.SaveOutputReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -55,7 +56,7 @@ Partial Class frmDFLOWResults
         '
         'FileToolStripMenuItem
         '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SelectDataToolStripMenuItem, Me.ToolStripMenuItem1, Me.SepcifyInputsToolStripMenuItem, Me.SaveinputsToolStripMenuItem, Me.ToolStripMenuItem2, Me.SaveGridToolStripMenuItem})
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SelectDataToolStripMenuItem, Me.ToolStripMenuItem1, Me.SepcifyInputsToolStripMenuItem, Me.SaveinputsToolStripMenuItem, Me.ToolStripMenuItem2, Me.SaveGridToolStripMenuItem, Me.SaveOutputReportToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
         Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
         Me.FileToolStripMenuItem.Text = "&File"
@@ -63,35 +64,35 @@ Partial Class frmDFLOWResults
         'SelectDataToolStripMenuItem
         '
         Me.SelectDataToolStripMenuItem.Name = "SelectDataToolStripMenuItem"
-        Me.SelectDataToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.SelectDataToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
         Me.SelectDataToolStripMenuItem.Text = "Select Data"
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(145, 6)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(174, 6)
         '
         'SepcifyInputsToolStripMenuItem
         '
         Me.SepcifyInputsToolStripMenuItem.Name = "SepcifyInputsToolStripMenuItem"
-        Me.SepcifyInputsToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.SepcifyInputsToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
         Me.SepcifyInputsToolStripMenuItem.Text = "Specify Inputs"
         '
         'SaveinputsToolStripMenuItem
         '
         Me.SaveinputsToolStripMenuItem.Name = "SaveinputsToolStripMenuItem"
-        Me.SaveinputsToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.SaveinputsToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
         Me.SaveinputsToolStripMenuItem.Text = "Save [inputs]"
         '
         'ToolStripMenuItem2
         '
         Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(145, 6)
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(174, 6)
         '
         'SaveGridToolStripMenuItem
         '
         Me.SaveGridToolStripMenuItem.Name = "SaveGridToolStripMenuItem"
-        Me.SaveGridToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.SaveGridToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
         Me.SaveGridToolStripMenuItem.Text = "Save Grid"
         '
         'AttributesToolStripMenuItem
@@ -104,13 +105,13 @@ Partial Class frmDFLOWResults
         'CopyToolStripMenuItem
         '
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
-        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(129, 22)
+        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.CopyToolStripMenuItem.Text = "Copy Base"
         '
         'CopyAllToolStripMenuItem
         '
         Me.CopyAllToolStripMenuItem.Name = "CopyAllToolStripMenuItem"
-        Me.CopyAllToolStripMenuItem.Size = New System.Drawing.Size(129, 22)
+        Me.CopyAllToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.CopyAllToolStripMenuItem.Text = "Copy All"
         '
         'ViewToolStripMenuItem
@@ -199,6 +200,12 @@ Partial Class frmDFLOWResults
         Me.agrResults.Source = Nothing
         Me.agrResults.TabIndex = 7
         '
+        'SaveOutputReportToolStripMenuItem
+        '
+        Me.SaveOutputReportToolStripMenuItem.Name = "SaveOutputReportToolStripMenuItem"
+        Me.SaveOutputReportToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
+        Me.SaveOutputReportToolStripMenuItem.Text = "Save Output Report"
+        '
         'frmDFLOWResults
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -241,4 +248,5 @@ Partial Class frmDFLOWResults
     Friend WithEvents DFLOWHelpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem4 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents AboutDFLOWToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents SaveOutputReportToolStripMenuItem As Windows.Forms.ToolStripMenuItem
 End Class

@@ -3423,6 +3423,23 @@ Public Class frmSWSTATmod
         If pDFLOWScenarios.Count > 0 Then
             If pDataGroup IsNot Nothing AndAlso pDataGroup.Count > 0 Then
                 Dim lInputArgs As atcDataAttributes = Me.DateArgsFromForm()
+                With lInputArgs
+                    .SetValue(DFLOWReportUtil.Info.i_Version, "4.x")
+                    .SetValue(DFLOWReportUtil.Info.i_BuildDate, "6/30/2016")
+                    Dim lRunDateTime As DateTime = Now()
+                    With lRunDateTime
+                        Dim lRunDateTimeRecord As String = .Month & "/" & .Day & "/" & .Year & " " & .Hour & ":" & .Minute
+                        lInputArgs.SetValue(DFLOWReportUtil.Info.i_RunDateTime, lRunDateTimeRecord)
+                    End With
+                    .SetValue(DFLOWReportUtil.Info.i_Username, Environment.UserName)
+                    .SetValue(DFLOWReportUtil.Info.i_SeasonStartDate, .GetValue(InputNamesDFLOW.StartDay) & "-" & DateAndTime.MonthName(.GetValue(InputNamesDFLOW.StartMonth), True))
+                    .SetValue(DFLOWReportUtil.Info.i_SeasonEndDate, .GetValue(InputNamesDFLOW.EndDay) & "-" & DateAndTime.MonthName(.GetValue(InputNamesDFLOW.EndMonth), True))
+                    Dim lStartYear As Integer = .GetValue(InputNamesDFLOW.StartYear)
+                    Dim lEndYear As Integer = .GetValue(InputNamesDFLOW.EndYear)
+                    .SetValue(DFLOWReportUtil.Info.i_YearsIncluded, lEndYear - lStartYear + 1)
+                    .SetValue(DFLOWReportUtil.Info.i_SeasonStartYear, lStartYear)
+                    .SetValue(DFLOWReportUtil.Info.i_SeasonEndYear, lEndYear)
+                End With
                 For Each lScen As clsInteractiveDFLOW In pDFLOWScenarios
                     Dim lBioParam As New atcCollection()
                     With lBioParam
@@ -3531,7 +3548,7 @@ Public Class frmSWSTATmod
                 End With
 
                 Dim lReportGrid As New frmDFLOWResults(pDataGroup, ,, True)
-                lReportGrid.UserSpecifyDFLOWResults(lReportSrc, pDFLOWScenarios) 'pDFLOWScenarios(0).ReportSrc)
+                lReportGrid.UserSpecifyDFLOWResults(lReportSrc, pDFLOWScenarios, lInputArgs) 'pDFLOWScenarios(0).ReportSrc)
             End If 'has dataset(s)
         End If 'has scenario(s)
     End Sub
