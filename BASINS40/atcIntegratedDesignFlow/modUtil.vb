@@ -1443,6 +1443,341 @@ Public Module modUtil
             End With
             Return lAugReportSrc
         End Function
+
+        ''' <summary>
+        ''' Construct a atcGridSource to report the excursion result for a specific time series in the DataGroup
+        ''' </summary>
+        ''' <param name="aStnID">Streamflow gaging station ID (Location, e.g 00010123)</param>
+        ''' <param name="aIndex">The index of a time series in the DataGroup collection</param>
+        ''' <returns></returns>
+        Public Function ExcursionReport(ByVal aStnID As String, Optional ByVal aIndex As Integer = -1) As atcGridSource
+            Dim pDateFormat As New atcDateFormat()
+            With pDateFormat
+                .IncludeHours = False
+                .IncludeMinutes = False
+                .IncludeSeconds = False
+            End With
+            If DataGroup Is Nothing OrElse
+               DataGroup.Count = 0 OrElse
+               ExcursionCountArray.Count = 0 OrElse
+               ExcursionsArray.Count = 0 OrElse
+               ClustersArray.Count = 0 Then
+                Return Nothing
+            End If
+            Dim lTs As atcTimeseries = Nothing
+            Dim lIndex As Integer = aIndex
+            If lIndex >= 0 AndAlso lIndex < DataGroup.Count Then
+                lTs = DataGroup(lIndex)
+            ElseIf Not String.IsNullOrEmpty(aStnID) Then
+                For lIndex = 0 To DataGroup.Count - 1
+                    lTs = DataGroup(lIndex)
+                    If lTs.Attributes.GetValue("Location") = aStnID Then
+                        Exit For
+                    End If
+                Next
+            End If
+            If lTs Is Nothing Then Return Nothing
+
+            Dim lExcursionCount As Integer = ExcursionCountArray(lIndex)
+            Dim lClusters As ArrayList = ClustersArray(lIndex)
+            Dim lExcursions As ArrayList = ExcursionsArray(lIndex)
+
+            Dim lagsExcursions As New atcControls.atcGridSource
+            With lagsExcursions
+                .Columns = 5
+                .Rows = 1 + lExcursions.Count
+                .FixedRows = 1
+                .CellValue(0, 0) = "Cluster Start"
+                .CellValue(0, 1) = "Excursions"
+                .CellValue(0, 2) = "Period Start"
+                .CellValue(0, 3) = "Duration"
+                .CellValue(0, 4) = "Avg Excursion"
+                Dim lColumn As Integer
+                For lColumn = 0 To 4
+                    .CellColor(0, lColumn) = System.Drawing.Color.White
+                    .Alignment(0, lColumn) = atcControls.atcAlignment.HAlignCenter
+                Next
+            End With
+
+            Dim lRow As Integer = 0
+            Dim lExcursionIdx As Integer = 0
+            Dim lFirstDate As Double = lTs.Attributes.GetValue("xBy start date") 'pTimeseriesGroup(pRow - 1).Attributes.GetValue("xBy start date")
+
+            For Each lCluster As DFLOWCalcs.stCluster In lClusters
+                If lRow = 0 Then
+                    lRow = 1 ' First cluster is always invalid, so it gets skipped
+                Else
+                    lagsExcursions.CellValue(lRow, 0) = pDateFormat.JDateToString(lFirstDate + lCluster.Start)
+                    lagsExcursions.CellValue(lRow, 1) = lCluster.Excursions & " "
+                    lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
+
+                    Dim lNExc As Integer = 0
+                    Dim lExcursion As DFLOWCalcs.stExcursion
+                    Do
+                        lExcursion = lExcursions(lRow)
+                        With lExcursion
+                            lagsExcursions.CellValue(lRow, 2) = pDateFormat.JDateToString(lFirstDate + .Start)
+                            lagsExcursions.CellValue(lRow, 3) = .Count & " "
+                            lagsExcursions.CellValue(lRow, 4) = Format(.SumMag / .SumLength - 1, "Percent") & " "
+
+                            lagsExcursions.Alignment(lRow, 3) = atcControls.atcAlignment.HAlignRight
+                            lagsExcursions.Alignment(lRow, 4) = atcControls.atcAlignment.HAlignRight
+                        End With
+
+                        lNExc = lNExc + 1
+                        lRow = lRow + 1
+                    Loop Until lNExc >= lCluster.Events
+                End If
+            Next
+
+            lagsExcursions.CellValue(lRow, 0) = "Total"
+            lagsExcursions.CellValue(lRow, 1) = lExcursionCount
+            lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
+            Return lagsExcursions
+        End Function
+    End Class
+
+    Public Class DFLOWReportUtil
+        Public Shared ReportInfos As Generic.Dictionary(Of Info, String) = New Dictionary(Of Info, String) From
+            {
+        {Info.i_Version, "DFLOW Version"},
+        {Info.i_BuildDate, "Build Date"},
+        {Info.i_RunDateTime, "Run Date And Time"},
+        {Info.i_Username, "Username"},
+        {Info.i_Seasonal, "Seasonal Calculation"},
+        {Info.i_SeasonStartDate, "Season Or Year Start"},
+        {Info.i_SeasonEndDate, "Season Or Year End"},
+        {Info.i_SeasonStartYear, "Start"},
+        {Info.i_SeasonEndYear, "End"},
+        {Info.i_YearsIncluded, "Years Included in Calculations"}
+            }
+
+        Public Enum Info
+            i_Version
+            i_BuildDate
+            i_RunDateTime
+            i_Username
+            i_Seasonal
+            i_SeasonStartDate
+            i_SeasonEndDate
+            i_SeasonStartYear
+            i_SeasonEndYear
+            i_YearsIncluded
+        End Enum
+    End Class
+    Public Class DFLOWReportAscii
+        Public Scenarios As atcCollection
+        Public i_RunDateTime As String = ""
+        Public i_Username As String = "User"
+        Public i_Seasonal As Boolean = False
+        Public i_SeasonStartDate As String = "" 'could be anything user like to use such as 1-Apr
+        Public i_SeasonEndDate As String = "" 'could be anything user like to use such as 31-Mar
+        Public i_SeasonStartYear As Integer
+        Public i_SeasonEndYear As Integer
+        Public i_Version As String = "4.x"
+        Public i_BuildDate As String = ""
+        Public i_YearsIncluded As Integer = 0
+        Public i_DataGroup As atcTimeseriesGroup = Nothing
+
+        Public Sub New(ByVal aScenarios As atcCollection)
+            Scenarios = aScenarios
+            If Scenarios Is Nothing Then
+                Scenarios = New atcCollection()
+            End If
+        End Sub
+
+        Public ReadOnly Property Header() As String
+            Get
+                Dim lfldpf As String = ":"
+                Dim lHeader As String = "***DFLOW CALCULATION REPORT***" & vbCrLf & vbCrLf
+
+                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Version) & lfldpf & vbTab & i_Version & vbCrLf
+                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_BuildDate) & lfldpf & vbTab & i_BuildDate & vbCrLf
+                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_RunDateTime) & lfldpf & vbTab & i_RunDateTime & vbCrLf
+                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Username) & lfldpf & vbTab & i_Username & vbCrLf & vbCrLf
+
+                lHeader &= "***INPUTS***" & vbCrLf & vbCrLf
+                lHeader &= "YEARS AND SEASONS" & vbCrLf & vbCrLf
+
+                If i_Seasonal Then
+                    lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Seasonal) & "?" & vbTab & "Yes" & vbCrLf
+                Else
+                    lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Seasonal) & "?" & vbTab & "No" & vbCrLf
+                End If
+                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_SeasonStartDate) & lfldpf & vbTab & i_SeasonStartDate & vbCrLf
+                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_SeasonEndDate) & lfldpf & vbTab & i_SeasonEndDate & vbCrLf
+                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_YearsIncluded) & lfldpf & vbTab & i_YearsIncluded & vbCrLf
+                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_SeasonStartYear) & lfldpf & vbTab & i_SeasonStartYear & vbCrLf
+                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_SeasonEndYear) & lfldpf & vbTab & i_SeasonEndYear & vbCrLf & vbCrLf
+
+                lHeader &= "STATIONS" & vbCrLf & vbCrLf
+                Return lHeader
+            End Get
+        End Property
+
+        Public Function StationReport() As String
+            Dim lRpt As New System.Text.StringBuilder()
+            Dim lTs As atcTimeseries = Nothing
+            Dim lDateFormat As New atcDateFormat()
+            With lDateFormat
+                .IncludeDays = True
+                .IncludeMonths = True
+                .IncludeYears = True
+                .IncludeHours = False
+                .IncludeMinutes = False
+                .DateOrder = atcDateFormat.DateOrderEnum.MonthDayYear
+            End With
+            Dim lYearsExcluded As New atcCollection()
+            For I As Integer = 0 To i_DataGroup.Count - 1
+                lTs = i_DataGroup(I)
+                lYearsExcluded.Clear()
+                With lTs.Attributes
+                    Dim lInputFilename As String = .GetValue("history 1")
+                    Dim loc As String = .GetValue("Location")
+                    Dim lDesc As String = .GetValue("Description")
+                    Dim lStart As String = lDateFormat.JDateToString(.GetValue("start date"))
+                    Dim lEnd As String = lDateFormat.JDateToString(.GetValue("end date"))
+                    Dim lDaysInRecord As Integer = lTs.numValues
+                    Dim lMissInRecord As Integer = .GetValue("count missing")
+                    Dim lZeroInRecord As Integer = .GetValue("count zero")
+                    Dim lNegaInRecord As Integer = .GetValue("Count negative")
+                    Dim lSYear As Integer = .GetValue("xBy start year", -99)
+                    Dim lEYear As Integer = .GetValue("xBy end year", -99)
+                    If lSYear > 0 AndAlso lEYear > 0 AndAlso lSYear < lEYear Then
+                        'figure out years not included in the analysis
+                        Dim lDates(5) As Integer
+                        Dim lSDate As Double = lTs.Dates.Value(0)
+                        Dim lEDate As Double = lTs.Dates.Value(lTs.numValues)
+                        J2Date(lSDate, lDates)
+                        Dim lYearStart As Integer = lDates(0)
+                        While lYearStart < lSYear
+                            lYearsExcluded.Add(lYearStart)
+                            lYearStart += 1
+                        End While
+                        J2Date(lEDate, lDates)
+                        Dim lYearEnd As Integer = lDates(0)
+                        lEYear += 1
+                        While lEYear <= lYearEnd
+                            lYearsExcluded.Add(lEYear)
+                            lEYear += 1
+                        End While
+                    End If
+                    If .GetValue("Point") Then
+                        .SetValue("Point", False)
+                    End If
+                    lRpt.AppendLine("Station #" & I + 1)
+                    lRpt.AppendLine("Gage:" & vbTab & "USGS " & loc & " " & lDesc)
+                    lRpt.AppendLine("Input File Name:" & vbTab & lInputFilename)
+                    lRpt.AppendLine("Period of Record Start:" & vbTab & lStart)
+                    lRpt.AppendLine("Period of Record End:" & vbTab & lEnd)
+                    lRpt.AppendLine("Days in Record:" & vbTab & lDaysInRecord)
+                    lRpt.AppendLine("Zero Values:" & vbTab & lZeroInRecord)
+                    lRpt.AppendLine("Missing Values:" & vbTab & lMissInRecord)
+                    lRpt.AppendLine("Negative Values:" & vbTab & lNegaInRecord)
+                    lRpt.AppendLine()
+                    lRpt.AppendLine("***RESULTS: USGS " & loc & " " & lDesc & "***")
+                    lRpt.AppendLine()
+                End With
+                lRpt.AppendLine("BIOLOGICALLY BASED CRITICAL FLOWS")
+                lRpt.AppendLine()
+                lRpt.AppendLine("Flow Statistic" & vbTab & "Flow Value" & vbTab & "Percentile" & vbTab & "Excur per 3 yr")
+                Dim lAttName As String
+                For Each lAtt As atcDefinedValue In lTs.Attributes
+                    lAttName = lAtt.Definition.Name
+                    If lAttName.StartsWith("BIOFLOW-") Then
+                        lRpt.AppendLine(lAttName.Substring("BIOFLOW-".Length) & vbTab & lAtt.Value)
+                    End If
+                Next
+                'For J As Integer = 0 To Scenarios.Count - 1
+                '    Dim lScen As clsInteractiveDFLOW = Scenarios.ItemByIndex(J)
+                '    Dim lBioPeriod As Integer = lScen.ParamBio1FlowAvgDays
+                '    Dim lBioReturn As Integer = lScen.ParamBio2YearsBetweenExcursion
+                '    Dim lxByKey As String = lBioPeriod & "B" & lBioReturn
+                '    Dim lxBy As Double = lTs.Attributes.GetValue(lxByKey)
+                '    Dim lxByPct As Double = lTs.Attributes.GetValue(lxByKey & "%")
+                '    Dim lxByExc As Integer = lTs.Attributes.GetValue(lxByKey & "Exc")
+                '    lRpt.AppendLine(lxByKey & vbCrLf & lxBy & vbCrLf & lxByPct & vbCrLf & lxByExc)
+                'Next J
+                lRpt.AppendLine()
+
+                lRpt.AppendLine("NON-BIOLOGICALLY BASED CRITICAL FLOWS")
+                lRpt.AppendLine()
+                lRpt.AppendLine("Flow Statistic" & vbTab & "Flow Value" & vbTab & "Percentile" & vbTab & "Excur per 3 yr")
+                Dim lHMeanrecord As String = ""
+                For Each lAtt As atcDefinedValue In lTs.Attributes
+                    lAttName = lAtt.Definition.Name
+                    If lAttName.StartsWith("NONBIOFLOW-") Then
+                        If lAttName.Contains("Harmonic") Then
+                            lHMeanrecord = lAttName.Substring("NONBIOFLOW-".Length) & vbTab & lAtt.Value
+                        Else
+                            lRpt.AppendLine(lAttName.Substring("NONBIOFLOW-".Length) & vbTab & lAtt.Value)
+                        End If
+                    End If
+                Next
+                If Not String.IsNullOrEmpty(lHMeanrecord) Then
+                    lRpt.AppendLine(lHMeanrecord)
+                End If
+                lRpt.AppendLine()
+
+                lRpt.AppendLine("EXCURSION ANALYSES FOR BIOLOGICALLY BASED CRITICAL FLOWS")
+                lRpt.AppendLine()
+                'go through every scenario for a given dataset
+                Dim lScen As clsInteractiveDFLOW = Scenarios.ItemByIndex(0)
+                Dim lxByKey As String = lScen.ParamBio1FlowAvgDays & "B" & lScen.ParamBio2YearsBetweenExcursion
+                Dim lGridSrc As atcGridSource = lScen.ExcursionReport("", I)
+                If lGridSrc IsNot Nothing Then
+                    lRpt.AppendLine(lGridSrc.ToString())
+                    lRpt.AppendLine()
+                    lGridSrc.Rows = 1
+                    lGridSrc.Columns = 1
+                End If
+
+                For J As Integer = 1 To Scenarios.Count - 1
+                    lScen = Scenarios.ItemByIndex(J)
+                    With lScen
+                        If .ParamBio1FlowAvgDays & "B" & .ParamBio2YearsBetweenExcursion <> lxByKey Then
+                            lGridSrc = .ExcursionReport("", I)
+                            If lGridSrc IsNot Nothing Then
+                                lRpt.AppendLine(lGridSrc.ToString())
+                                lRpt.AppendLine()
+                                lGridSrc.Rows = 1
+                                lGridSrc.Columns = 1
+                            End If
+                            lxByKey = .ParamBio1FlowAvgDays & "B" & .ParamBio2YearsBetweenExcursion
+                        End If
+                    End With
+                Next
+                lRpt.AppendLine()
+                lRpt.AppendLine("***YEARS EXCLUDED FROM ANALYSIS***")
+                'ToDo: list excluded years???
+                For Each lYear As Integer In lYearsExcluded
+                    lRpt.AppendLine(lYear)
+                Next
+                lRpt.AppendLine()
+                lRpt.AppendLine("*** END OF REPORT FOR STATION #" & I + 1 & " ***")
+                lRpt.AppendLine()
+            Next 'dataset
+
+            lRpt.AppendLine()
+            lRpt.AppendLine("END")
+            Return lRpt.ToString()
+        End Function
+
+        Public Function Save(ByVal aFile As String) As Boolean
+            Dim lSaveGood As Boolean = True
+            Dim lSW As System.IO.StreamWriter = Nothing
+            Try
+
+            Catch ex As Exception
+                lSaveGood = False
+            Finally
+                If lSW IsNot Nothing Then
+                    lSW.Close()
+                    lSW = Nothing
+                End If
+            End Try
+            Return lSaveGood
+        End Function
     End Class
 #End Region
 End Module
