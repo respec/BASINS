@@ -540,8 +540,9 @@ Module HSPFOutputReports
                                         End If
                                     Next lTs
                                 End If
+                                lHspfBinDataSource.DataSets.Clear()
                             End If
-                            atcDataManager.DataSources.Clear()
+                            'atcDataManager.DataSources.Clear()
                         Next i
 
                         If lScenarioResults.DataSets.Count > 0 Then
