@@ -536,6 +536,7 @@ Public Class atcTimeseriesNdayHighLow
                     lTsMath.DataSets.Clear()
                     lTsMath.Clear()
                     lTsMath = Nothing
+                    lNonLogTs.Dates = lNdayTs.Dates.Clone()
                 Else
                     aAttributesStorage.SetValue("LDIST", "LP")
                 End If
