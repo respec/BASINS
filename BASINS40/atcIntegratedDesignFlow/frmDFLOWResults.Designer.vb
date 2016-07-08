@@ -28,6 +28,7 @@ Partial Class frmDFLOWResults
         Me.SaveinputsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripSeparator()
         Me.SaveGridToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SaveOutputReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AttributesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CopyAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -41,7 +42,8 @@ Partial Class frmDFLOWResults
         Me.lblSeasons = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.agrResults = New atcControls.atcGrid()
-        Me.SaveOutputReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.cboDisplay = New System.Windows.Forms.ComboBox()
+        Me.lblDisplay = New System.Windows.Forms.Label()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -95,6 +97,12 @@ Partial Class frmDFLOWResults
         Me.SaveGridToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
         Me.SaveGridToolStripMenuItem.Text = "Save Grid"
         '
+        'SaveOutputReportToolStripMenuItem
+        '
+        Me.SaveOutputReportToolStripMenuItem.Name = "SaveOutputReportToolStripMenuItem"
+        Me.SaveOutputReportToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
+        Me.SaveOutputReportToolStripMenuItem.Text = "Save Output Report"
+        '
         'AttributesToolStripMenuItem
         '
         Me.AttributesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToolStripMenuItem, Me.CopyAllToolStripMenuItem})
@@ -105,13 +113,13 @@ Partial Class frmDFLOWResults
         'CopyToolStripMenuItem
         '
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
-        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(129, 22)
         Me.CopyToolStripMenuItem.Text = "Copy Base"
         '
         'CopyAllToolStripMenuItem
         '
         Me.CopyAllToolStripMenuItem.Name = "CopyAllToolStripMenuItem"
-        Me.CopyAllToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.CopyAllToolStripMenuItem.Size = New System.Drawing.Size(129, 22)
         Me.CopyAllToolStripMenuItem.Text = "Copy All"
         '
         'ViewToolStripMenuItem
@@ -200,17 +208,31 @@ Partial Class frmDFLOWResults
         Me.agrResults.Source = Nothing
         Me.agrResults.TabIndex = 7
         '
-        'SaveOutputReportToolStripMenuItem
+        'cboDisplay
         '
-        Me.SaveOutputReportToolStripMenuItem.Name = "SaveOutputReportToolStripMenuItem"
-        Me.SaveOutputReportToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
-        Me.SaveOutputReportToolStripMenuItem.Text = "Save Output Report"
+        Me.cboDisplay.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboDisplay.FormattingEnabled = True
+        Me.cboDisplay.Location = New System.Drawing.Point(645, 37)
+        Me.cboDisplay.Name = "cboDisplay"
+        Me.cboDisplay.Size = New System.Drawing.Size(121, 21)
+        Me.cboDisplay.TabIndex = 12
+        '
+        'lblDisplay
+        '
+        Me.lblDisplay.AutoSize = True
+        Me.lblDisplay.Location = New System.Drawing.Point(556, 42)
+        Me.lblDisplay.Name = "lblDisplay"
+        Me.lblDisplay.Size = New System.Drawing.Size(83, 13)
+        Me.lblDisplay.TabIndex = 13
+        Me.lblDisplay.Text = "Display Options:"
         '
         'frmDFLOWResults
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(892, 283)
+        Me.Controls.Add(Me.lblDisplay)
+        Me.Controls.Add(Me.cboDisplay)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.lblSeasons)
         Me.Controls.Add(Me.Button1)
@@ -249,4 +271,6 @@ Partial Class frmDFLOWResults
     Friend WithEvents ToolStripMenuItem4 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents AboutDFLOWToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents SaveOutputReportToolStripMenuItem As Windows.Forms.ToolStripMenuItem
+    Friend WithEvents cboDisplay As Windows.Forms.ComboBox
+    Friend WithEvents lblDisplay As Windows.Forms.Label
 End Class

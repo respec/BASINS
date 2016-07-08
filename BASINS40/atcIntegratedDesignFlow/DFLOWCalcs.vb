@@ -706,6 +706,7 @@ Public Class DFLOWCalcs
         End With
 
         '{
+        Dim lValueD As Double
         For lDSIndex As Integer = 0 To aDataGroup.Count - 1
             ' ===== Quick trim 
             Dim lHydrologicTS As atcTimeseries = aDataGroup(lDSIndex)
@@ -924,7 +925,9 @@ Public Class DFLOWCalcs
             ladsResults.Alignment(lItemIdx + 1, 3) = atcControls.atcAlignment.HAlignRight
 
             ladsResults.CellValue(lItemIdx + 1, 4) = Sig2(lxBy)
-            If Sig2(lxBy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 4) = atcControls.atcAlignment.HAlignDecimal
+            Double.TryParse(Sig2(lxBy), lValueD)
+            'If Sig2(lxBy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 4) = atcControls.atcAlignment.HAlignDecimal
+            If lValueD < 100 Then ladsResults.Alignment(lItemIdx + 1, 4) = atcControls.atcAlignment.HAlignDecimal
             Dim lPct As Double = lNExcB * 1.0 / (UBound(lTS) - lNMiss)
             'lHydrologicTS.Attributes.SetValue(lAttrName & "%", lPct)
             'ladsResults.CellValue(lItemIdx + 1, 5) = Format(lNExcB / (UBound(lTS) - lNMiss), "percent")
@@ -939,7 +942,9 @@ Public Class DFLOWCalcs
             lHydrologicTS.Attributes.SetValue("BIOFLOW-" & lAttrName, lxByRecord)
 
             ladsResults.CellValue(lItemIdx + 1, 7) = Sig2(lxQy)
-            If Sig2(lxQy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 7) = atcControls.atcAlignment.HAlignDecimal
+            'If Sig2(lxQy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 7) = atcControls.atcAlignment.HAlignDecimal
+            Double.TryParse(Sig2(lxQy), lValueD)
+            If lValueD < 100 Then ladsResults.Alignment(lItemIdx + 1, 7) = atcControls.atcAlignment.HAlignDecimal
             lPct = lNExc / (UBound(lTS) - lNMiss)
             'ladsResults.CellValue(lItemIdx + 1, 8) = Format(lNExc / (UBound(lTS) - lNMiss), "percent")
             ladsResults.CellValue(lItemIdx + 1, 8) = Format(lPct, "percent")
@@ -963,7 +968,9 @@ Public Class DFLOWCalcs
                 Else
                     ladsResults.CellValue(lItemIdx + 1, 10) = lAveragingPeriod & "Q" & lReturnPeriodTry
                     ladsResults.CellValue(lItemIdx + 1, 11) = Sig2(lEquivalentxQy)
-                    If Sig2(lEquivalentxQy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 11) = atcControls.atcAlignment.HAlignDecimal
+                    'If Sig2(lEquivalentxQy) < 100 Then ladsResults.Alignment(lItemIdx + 1, 11) = atcControls.atcAlignment.HAlignDecimal
+                    Double.TryParse(Sig2(lEquivalentxQy), lValueD)
+                    If lValueD < 100 Then ladsResults.Alignment(lItemIdx + 1, 11) = atcControls.atcAlignment.HAlignDecimal
                     ladsResults.CellValue(lItemIdx + 1, 12) = Format(lNExcBQ / (UBound(lTS) - lNMiss), "percent")
                     ladsResults.Alignment(lItemIdx + 1, 12) = atcControls.atcAlignment.HAlignDecimal
                 End If
@@ -975,9 +982,13 @@ Public Class DFLOWCalcs
 
             Dim lHMeanKey As String = "NONBIOFLOW-Harmonic Mean"
             ladsResults.CellValue(lItemIdx + 1, 13) = Sig2(lHFlow)
-            If Sig2(lHFlow) < 100 Then ladsResults.Alignment(lItemIdx + 1, 13) = atcControls.atcAlignment.HAlignDecimal
+            'If Sig2(lHFlow) < 100 Then ladsResults.Alignment(lItemIdx + 1, 13) = atcControls.atcAlignment.HAlignDecimal
+            Double.TryParse(Sig2(lHFlow), lValueD)
+            If lValueD < 100 Then ladsResults.Alignment(lItemIdx + 1, 13) = atcControls.atcAlignment.HAlignDecimal
             ladsResults.CellValue(lItemIdx + 1, 14) = Sig2(lHFlowAdj)
-            If Sig2(lHFlowAdj) < 100 Then ladsResults.Alignment(lItemIdx + 1, 14) = atcControls.atcAlignment.HAlignDecimal
+            'If Sig2(lHFlowAdj) < 100 Then ladsResults.Alignment(lItemIdx + 1, 14) = atcControls.atcAlignment.HAlignDecimal
+            Double.TryParse(Sig2(lHFlowAdj), lValueD)
+            If lValueD < 100 Then ladsResults.Alignment(lItemIdx + 1, 14) = atcControls.atcAlignment.HAlignDecimal
 
             lPct = lNExcHF / (UBound(lTS) - lNMiss)
             ladsResults.CellValue(lItemIdx + 1, 15) = Format(lPct, "percent")

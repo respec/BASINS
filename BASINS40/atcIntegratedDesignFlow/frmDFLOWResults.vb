@@ -24,6 +24,9 @@ Public Class frmDFLOWResults
     Private pRemote As Boolean = False
     Private pDisplayOnly As Boolean = False
 
+    Private pGridSrcs As atcCollection = Nothing
+    Private pReportASCII As DFLOWReportAscii = Nothing
+
     Public Sub New(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing,
                    Optional ByVal aIsBatch As Boolean = False,
                    Optional ByVal aRemote As Boolean = False,
@@ -41,6 +44,10 @@ Public Class frmDFLOWResults
             pTimeseriesGroup = New atcTimeseriesGroup
         Else
             pTimeseriesGroup = aTimeseriesGroup
+        End If
+
+        If pGridSrcs Is Nothing Then
+            pGridSrcs = New atcCollection()
         End If
 
         InitializeComponent() 'required by Windows Form Designer
@@ -529,17 +536,33 @@ Public Class frmDFLOWResults
     End Sub
 
     Public Sub UserSpecifyDFLOWResults(ByVal ladsResults As atcControls.atcGridSource, ByVal aScenarios As atcCollection, ByVal aInputArgs As atcDataAttributes, Optional ByVal aTitle As String = "Design Flow Results")
-        If ladsResults Is Nothing Then Exit Sub
+        'If ladsResults Is Nothing Then Exit Sub
         If aScenarios Is Nothing Then Exit Sub
         pScenarios = aScenarios
         pInputArgs = aInputArgs
-        agrResults.Initialize(ladsResults)
-        For lCol As Integer = 1 To ladsResults.Columns - 1
-            agrResults.SizeColumnToContents(lCol)
-        Next
+        'All Stations entries are messed up, so not to show
+        'If Not pGridSrcs.Keys.Contains("All Stations") Then pGridSrcs.Add("All Stations", ladsResults)
+        If ladsResults IsNot Nothing Then
+            agrResults.Initialize(ladsResults)
+            For lCol As Integer = 1 To ladsResults.Columns - 1
+                agrResults.SizeColumnToContents(lCol)
+            Next
+        End If
+
         Me.Text = aTitle
         lblYears.Text = DFLOWCalcs.LabelYears
         lblSeasons.Text = DFLOWCalcs.LabelSeasons
+
+        'cboDisplay.Items.Add("All Stations")
+        If pTimeseriesGroup IsNot Nothing Then
+            For Each lTs As atcTimeseries In pTimeseriesGroup
+                cboDisplay.Items.Add(lTs.Attributes.GetValue("Location"))
+            Next
+            'do the first one by default
+            If cboDisplay.Items.Count > 0 Then
+                cboDisplay.SelectedIndex = 0
+            End If
+        End If
         Me.Show()
     End Sub
 
@@ -713,7 +736,7 @@ Public Class frmDFLOWResults
 
     '{
     Private Sub agrResults_MouseDoubleClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles agrResults.MouseDoubleClick
-        If pRow = 0 Or pColumn <> 4 Then
+        If pRow < 7 Or pColumn <> 1 Then 'pRow = 0 Or pColumn <> 4
             Beep()
         Else
             With pDateFormat
@@ -722,15 +745,24 @@ Public Class frmDFLOWResults
                 .IncludeSeconds = False
             End With
 
-            Dim lScenID As Integer = Integer.Parse(agrResults.Source.CellValue(pRow, agrResults.Source.Columns - 1))
-            Dim lScen As clsInteractiveDFLOW = pScenarios.ItemByKey(lScenID)
+            'Find the scenario that has matching xBy as excursion entries are grouped by xBy
+            'Dim lScenID As Integer = Integer.Parse(agrResults.Source.CellValue(pRow, agrResults.Source.Columns - 1))
+            Dim lScen As clsInteractiveDFLOW = Nothing 'pScenarios.ItemByKey(lScenID)
+            For I As Integer = 0 To pScenarios.Count - 1
+                If agrResults.Source.CellValue(pRow, 0) = pScenarios.ItemByIndex(I).ParamBio1FlowAvgDays & "B" & pScenarios.ItemByIndex(I).ParamBio2YearsBetweenExcursion Then
+                    lScen = pScenarios.ItemByIndex(I)
+                    Exit For
+                End If
+            Next
             If lScen Is Nothing Then Exit Sub
-            If lScen.DataGroup Is Nothing Then Exit Sub
+            'If lScen.DataGroup Is Nothing Then Exit Sub
 
-            Dim lIndex As Integer = pRow Mod lScen.DataGroup.Count
-            If lIndex = 0 Then lIndex = lScen.DataGroup.Count
+            'Find index in the excursion collection, they are organized in the same order as the time series in the pTimeseriesGroup
+            'cboDisplay combobox is populated by the station id of time series in the same order as well
+            Dim lIndex As Integer = cboDisplay.SelectedIndex 'pRow Mod lScen.DataGroup.Count
+            'If lIndex = 0 Then lIndex = lScen.DataGroup.Count
 
-            Dim lagsExcursions As atcControls.atcGridSource = lScen.ExcursionReport("", lIndex - 1)
+            Dim lagsExcursions As atcControls.atcGridSource = lScen.ExcursionReport("", lIndex) 'lScen.ExcursionReport("", lIndex - 1)
             If lagsExcursions Is Nothing Then Exit Sub
 
             Dim lfrmExcursions As New frmDFLOWExcursions
@@ -738,7 +770,7 @@ Public Class frmDFLOWResults
                 '.Text = DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears & " Excursion Analysis for " & pTimeseriesGroup(pRow - 1).Attributes.GetFormattedValue("Location")
                 Dim lGageDesc As String = agrResults.Source.CellValue(pRow, 0)
                 If String.IsNullOrEmpty(lGageDesc) Then Exit Sub
-                Dim loc As String = lGageDesc.Substring(0, lGageDesc.IndexOf("-"))
+                Dim loc As String = cboDisplay.SelectedItem.ToString() 'lGageDesc.Substring(0, lGageDesc.IndexOf("-"))
                 If String.IsNullOrEmpty(loc) OrElse loc.Trim() = "" Then Exit Sub
                 With lScen
                     lfrmExcursions.Text = .ParamBio1FlowAvgDays & "B" & .ParamBio2YearsBetweenExcursion & " Excursion Analysis for " & loc.Trim()
@@ -830,40 +862,11 @@ Public Class frmDFLOWResults
             Dim lSW As System.IO.StreamWriter = Nothing
             Try
                 lSW = New System.IO.StreamWriter(lrptfileName, False)
-                Dim lrpt As New DFLOWReportAscii(pScenarios)
-                With lrpt
-                    .i_DataGroup = pTimeseriesGroup
-                    If pInputArgs IsNot Nothing Then
-                        'lFirstYear = pInputArgs.GetValue(InputNamesDFLOW.StartYear, 0)
-                        'lStartMonth = pInputArgs.GetValue(InputNamesDFLOW.StartMonth, 4)
-                        'lStartDay = pInputArgs.GetValue(InputNamesDFLOW.StartDay, 1)
-                        'lLastYear = pInputArgs.GetValue(InputNamesDFLOW.EndYear, 0)
-                        'lEndMonth = pInputArgs.GetValue(InputNamesDFLOW.EndMonth, 3)
-                        'lEndDay = pInputArgs.GetValue(InputNamesDFLOW.EndDay, 31)
-
-                        .i_Version = pInputArgs.GetValue(DFLOWReportUtil.Info.i_Version, "4.x")
-                        .i_BuildDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_BuildDate, "")
-                        .i_RunDateTime = pInputArgs.GetValue(DFLOWReportUtil.Info.i_RunDateTime, "")
-                        .i_Username = pInputArgs.GetValue(DFLOWReportUtil.Info.i_Username, "User")
-                        .i_Seasonal = False
-                        .i_SeasonStartDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonStartDate, "")
-                        .i_SeasonEndDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonEndDate, "")
-                        .i_SeasonStartYear = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonStartYear, 0)
-                        .i_SeasonEndYear = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonEndYear, 0)
-                        .i_YearsIncluded = pInputArgs.GetValue(DFLOWReportUtil.Info.i_YearsIncluded)
-                    Else
-                        .i_RunDateTime = ""
-                        .i_Username = "User"
-                        .i_Seasonal = False
-                        .i_SeasonStartDate = ""
-                        .i_SeasonEndDate = ""
-                        .i_SeasonStartYear = 0
-                        .i_SeasonEndYear = 0
-                    End If
-                End With
-
-                lSW.Write(lrpt.Header())
-                lSW.Write(lrpt.StationReport())
+                If pReportASCII Is Nothing Then
+                    CreateReportAscii()
+                End If
+                lSW.Write(pReportASCII.Header())
+                lSW.Write(pReportASCII.StationReport())
 
                 Logger.Msg("DFLOW report is saved as:" & vbCrLf & lrptfileName, MsgBoxStyle.OkOnly, "DFLOW Report")
             Catch ex As Exception
@@ -876,4 +879,79 @@ Public Class frmDFLOWResults
             End Try
         End If
     End Sub
+
+    Private Sub cboDisplay_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboDisplay.SelectedIndexChanged
+        Dim lChoice As String = cboDisplay.SelectedItem.ToString()
+        Dim lSrc As atcControls.atcGridSource = pGridSrcs.ItemByKey(lChoice)
+        If pReportASCII Is Nothing Then
+            CreateReportAscii()
+        End If
+        Dim lTitle As String = ""
+        Select Case lChoice.ToLower()
+            Case "all stations"
+                lTitle = "DFLOW results for all stations"
+            Case Else
+                Dim lDesc As String = ""
+                For Each lTs As atcTimeseries In pTimeseriesGroup
+                    If lTs.Attributes.GetValue("Location") = lChoice Then
+                        lDesc = lTs.Attributes.GetValue("STANAM")
+                        Exit For
+                    End If
+                Next
+                lTitle = "***RESULTS:  USGS " & lChoice & " " & lDesc & "***"
+                If lSrc Is Nothing Then
+                    lSrc = pReportASCII.StationReport(lChoice)
+                    If lSrc IsNot Nothing Then
+                        pGridSrcs.Add(lChoice, lSrc)
+                    End If
+                End If
+
+        End Select
+        If lSrc IsNot Nothing Then
+            agrResults.Initialize(lSrc)
+            For lCol As Integer = 1 To lSrc.Columns - 1
+                agrResults.SizeColumnToContents(lCol)
+            Next
+            agrResults.Refresh()
+            Me.Text = lTitle
+            lblYears.Text = DFLOWCalcs.LabelYears
+            lblSeasons.Text = DFLOWCalcs.LabelSeasons
+        End If
+    End Sub
+
+    Private Sub CreateReportAscii()
+        pReportASCII = New DFLOWReportAscii(pScenarios)
+        With pReportASCII
+            .i_DataGroup = pTimeseriesGroup
+            If pInputArgs IsNot Nothing Then
+                'lFirstYear = pInputArgs.GetValue(InputNamesDFLOW.StartYear, 0)
+                'lStartMonth = pInputArgs.GetValue(InputNamesDFLOW.StartMonth, 4)
+                'lStartDay = pInputArgs.GetValue(InputNamesDFLOW.StartDay, 1)
+                'lLastYear = pInputArgs.GetValue(InputNamesDFLOW.EndYear, 0)
+                'lEndMonth = pInputArgs.GetValue(InputNamesDFLOW.EndMonth, 3)
+                'lEndDay = pInputArgs.GetValue(InputNamesDFLOW.EndDay, 31)
+
+                .i_Version = pInputArgs.GetValue(DFLOWReportUtil.Info.i_Version, "4.x")
+                .i_BuildDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_BuildDate, "")
+                .i_RunDateTime = pInputArgs.GetValue(DFLOWReportUtil.Info.i_RunDateTime, "")
+                .i_Username = pInputArgs.GetValue(DFLOWReportUtil.Info.i_Username, "User")
+                .i_Seasonal = False
+                .i_SeasonStartDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonStartDate, "")
+                .i_SeasonEndDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonEndDate, "")
+                .i_SeasonStartYear = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonStartYear, 0)
+                .i_SeasonEndYear = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonEndYear, 0)
+                .i_YearsIncluded = pInputArgs.GetValue(DFLOWReportUtil.Info.i_YearsIncluded)
+            Else
+                .i_RunDateTime = ""
+                .i_Username = "User"
+                .i_Seasonal = False
+                .i_SeasonStartDate = ""
+                .i_SeasonEndDate = ""
+                .i_SeasonStartYear = 0
+                .i_SeasonEndYear = 0
+            End If
+        End With
+    End Sub
+
+
 End Class

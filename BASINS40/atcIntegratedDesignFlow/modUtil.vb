@@ -1627,10 +1627,11 @@ Public Module modUtil
                 .IncludeMinutes = False
                 .DateOrder = atcDateFormat.DateOrderEnum.MonthDayYear
             End With
-            Dim lYearsExcluded As New atcCollection()
+            Dim lYearsExcluded As atcCollection = Nothing
             For I As Integer = 0 To i_DataGroup.Count - 1
                 lTs = i_DataGroup(I)
-                lYearsExcluded.Clear()
+                'lYearsExcluded.Clear()
+                lYearsExcluded = AnalysisYears(lTs)
                 With lTs.Attributes
                     Dim lInputFilename As String = .GetValue("history 1")
                     Dim loc As String = .GetValue("Location")
@@ -1641,27 +1642,6 @@ Public Module modUtil
                     Dim lMissInRecord As Integer = .GetValue("count missing")
                     Dim lZeroInRecord As Integer = .GetValue("count zero")
                     Dim lNegaInRecord As Integer = .GetValue("Count negative")
-                    Dim lSYear As Integer = .GetValue("xBy start year", -99)
-                    Dim lEYear As Integer = .GetValue("xBy end year", -99)
-                    If lSYear > 0 AndAlso lEYear > 0 AndAlso lSYear < lEYear Then
-                        'figure out years not included in the analysis
-                        Dim lDates(5) As Integer
-                        Dim lSDate As Double = lTs.Dates.Value(0)
-                        Dim lEDate As Double = lTs.Dates.Value(lTs.numValues)
-                        J2Date(lSDate, lDates)
-                        Dim lYearStart As Integer = lDates(0)
-                        While lYearStart < lSYear
-                            lYearsExcluded.Add(lYearStart)
-                            lYearStart += 1
-                        End While
-                        J2Date(lEDate, lDates)
-                        Dim lYearEnd As Integer = lDates(0)
-                        lEYear += 1
-                        While lEYear <= lYearEnd
-                            lYearsExcluded.Add(lEYear)
-                            lEYear += 1
-                        End While
-                    End If
                     If .GetValue("Point") Then
                         .SetValue("Point", False)
                     End If
@@ -1680,7 +1660,7 @@ Public Module modUtil
                 End With
                 lRpt.AppendLine("BIOLOGICALLY BASED CRITICAL FLOWS")
                 lRpt.AppendLine()
-                lRpt.AppendLine("Flow Statistic" & vbTab & "Flow Value" & vbTab & "Percentile" & vbTab & "Excur per 3 yr")
+                lRpt.AppendLine("Flow Statistic" & vbTab & "Flow Value" & vbTab & "Percentile" & vbTab & "x-day avg. excur. per 3 yr.")
                 Dim lAttName As String
                 For Each lAtt As atcDefinedValue In lTs.Attributes
                     lAttName = lAtt.Definition.Name
@@ -1702,7 +1682,7 @@ Public Module modUtil
 
                 lRpt.AppendLine("NON-BIOLOGICALLY BASED CRITICAL FLOWS")
                 lRpt.AppendLine()
-                lRpt.AppendLine("Flow Statistic" & vbTab & "Flow Value" & vbTab & "Percentile" & vbTab & "Excur per 3 yr")
+                lRpt.AppendLine("Flow Statistic" & vbTab & "Flow Value" & vbTab & "Percentile" & vbTab & "1-day excur. per 3 yr.")
                 Dim lHMeanrecord As String = ""
                 For Each lAtt As atcDefinedValue In lTs.Attributes
                     lAttName = lAtt.Definition.Name
@@ -1761,6 +1741,179 @@ Public Module modUtil
             lRpt.AppendLine()
             lRpt.AppendLine("END")
             Return lRpt.ToString()
+        End Function
+
+        ''' <summary>
+        ''' This internal routine will get the list of years included or excluded by the analysis
+        ''' </summary>
+        ''' <param name="aTs">The target streamflow record that is under analysis</param>
+        ''' <param name="aIncluded">Yes, get years included or No, get years excluded by the analysis</param>
+        ''' <returns>an atcCollection of integer years</returns>
+        Private Function AnalysisYears(ByVal aTs As atcTimeseries, Optional ByVal aIncluded As Boolean = False) As atcCollection
+            If aTs Is Nothing OrElse aTs.Dates Is Nothing OrElse aTs.Values Is Nothing Then Return Nothing
+            Dim lYears As New atcCollection()
+            Dim lSYear As Integer = aTs.Attributes.GetValue("xBy start year", -99)
+            Dim lEYear As Integer = aTs.Attributes.GetValue("xBy end year", -99)
+            If lSYear > 0 AndAlso lEYear > 0 AndAlso lSYear < lEYear Then
+                'figure out years not included in the analysis
+                Dim lDates(5) As Integer
+                Dim lSDate As Double = aTs.Dates.Value(0)
+                Dim lEDate As Double = aTs.Dates.Value(aTs.numValues)
+                If aIncluded Then
+                    J2Date(lSDate, lDates)
+                    Dim lYearStart As Integer = lDates(0)
+                    J2Date(lEDate, lDates)
+                    Dim lYearEnd As Integer = lDates(0)
+                    For I As Integer = lYearStart To lYearEnd
+                        If I >= lSYear AndAlso I <= lEYear Then
+                            lYears.Add(I)
+                        End If
+                    Next
+                Else
+                    J2Date(lSDate, lDates)
+                    Dim lYearStart As Integer = lDates(0)
+                    While lYearStart < lSYear
+                        lYears.Add(lYearStart)
+                        lYearStart += 1
+                    End While
+                    J2Date(lEDate, lDates)
+                    Dim lYearEnd As Integer = lDates(0)
+                    lEYear += 1
+                    While lEYear <= lYearEnd
+                        lYears.Add(lEYear)
+                        lEYear += 1
+                    End While
+                End If
+            End If
+
+            Return lYears
+        End Function
+
+        ''' <summary>
+        ''' this routine will create a new atcGridSource for individual station's xBy and xQy flow information
+        ''' </summary>
+        ''' <param name="aStnID">a station id, e.g. 12490000</param>
+        ''' <returns>a new atcGridSource</returns>
+        Public Function StationReport(ByVal aStnID As String) As atcGridSource
+            If String.IsNullOrEmpty(aStnID) Then Return Nothing
+            If i_DataGroup Is Nothing OrElse i_DataGroup.Count = 0 Then Return Nothing
+            Dim lTs As atcTimeseries = Nothing
+            For I As Integer = 0 To i_DataGroup.Count - 1
+                lTs = i_DataGroup.ItemByIndex(I)
+                If lTs.Attributes.GetValue("Location") = aStnID Then
+                    Exit For
+                End If
+            Next
+            If lTs Is Nothing Then Return Nothing
+            Dim lYears As atcCollection = AnalysisYears(lTs, True)
+
+            Dim lNewSrc As New atcGridSource()
+            With lNewSrc
+                .FixedRows = 7
+                .Columns = 4
+                .CellValue(0, 0) = DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Seasonal) & "?"
+                If i_Seasonal Then
+                    .CellValue(0, 1) = "Yes"
+                Else
+                    .CellValue(0, 1) = "No"
+                End If
+                .CellValue(1, 0) = DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_SeasonStartDate)
+                .CellValue(1, 1) = i_SeasonStartDate
+                .CellValue(2, 0) = DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_SeasonEndDate)
+                .CellValue(2, 1) = i_SeasonEndDate
+                .CellValue(3, 0) = DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_YearsIncluded)
+                .CellValue(3, 1) = lYears.ItemByIndex(0) & "~" & lYears.ItemByIndex(lYears.Count - 1)
+                .CellValue(4, 0) = DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_SeasonStartYear)
+                .CellValue(4, 1) = i_SeasonStartYear
+                .CellValue(5, 0) = DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_SeasonEndYear)
+                .CellValue(5, 1) = i_SeasonEndYear
+                .CellValue(6, 0) = "Flow Statistic"
+                .CellValue(6, 1) = "Flow Value"
+                .CellValue(6, 2) = "Percentile"
+                .CellValue(6, 3) = "x-day avg. Excur. per 3 yr."
+
+                '.Rows = 1
+                Dim lAttName As String
+                Dim lArr() As String
+                Dim lRow As Integer
+                For Each lAtt As atcDefinedValue In lTs.Attributes
+                    If lAtt.Value Is Nothing Then Continue For
+
+                    lAttName = lAtt.Definition.Name
+                    If lAttName.StartsWith("BIOFLOW-") Then
+                        lArr = lAtt.Value.ToString().Split(vbTab)
+                        If lArr.Length <> 3 Then Continue For
+                        lRow = .Rows
+                        .CellValue(lRow, 0) = lAttName.Substring("BIOFLOW-".Length)
+                        Dim lfval As Double
+                        If Double.TryParse(lArr(0), lfval) Then
+                            .CellValue(lRow, 1) = DoubleToString(lfval)
+                        Else
+                            .CellValue(lRow, 1) = "N/A"
+                        End If
+                        .CellValue(lRow, 2) = lArr(1)
+                        .CellValue(lRow, 3) = lArr(2)
+                    End If
+                Next
+
+                lRow = .Rows
+                .CellValue(lRow, 0) = ""
+                .CellValue(lRow, 1) = ""
+                .CellValue(lRow, 2) = ""
+                .CellValue(lRow, 3) = ""
+                lRow = .Rows
+                .CellValue(lRow, 0) = "Flow Statistic"
+                .CellValue(lRow, 1) = "Flow Value"
+                .CellValue(lRow, 2) = "Percentile"
+                .CellValue(lRow, 3) = "1-day Excur. per 3 yr."
+                .CellEditable(lRow, 0) = False
+                .CellEditable(lRow, 1) = False
+                .CellEditable(lRow, 2) = False
+                .CellEditable(lRow, 3) = False
+                .CellColor(lRow, 0) = Drawing.Color.LightGray
+                .CellColor(lRow, 1) = Drawing.Color.LightGray
+                .CellColor(lRow, 2) = Drawing.Color.LightGray
+                .CellColor(lRow, 3) = Drawing.Color.LightGray
+
+                Dim lHMeanrecord As atcDefinedValue = Nothing
+                For Each lAtt As atcDefinedValue In lTs.Attributes
+                    If lAtt.Value Is Nothing Then Continue For
+
+                    lAttName = lAtt.Definition.Name
+                    If lAttName.StartsWith("NONBIOFLOW-") Then
+                        lArr = lAtt.Value.ToString().Split(vbTab)
+                        If lArr.Length <> 3 Then Continue For
+                        If lAttName.Contains("Harmonic") Then
+                            lHMeanrecord = lAtt 'lAttName.Substring("NONBIOFLOW-".Length) & vbTab & lAtt.Value
+                        Else
+                            lRow = .Rows
+                            .CellValue(lRow, 0) = lAttName.Substring("NONBIOFLOW-".Length)
+                            Dim lfval As Double
+                            If Double.TryParse(lArr(0), lfval) Then
+                                .CellValue(lRow, 1) = DoubleToString(lfval,,,,, 5)
+                            Else
+                                .CellValue(lRow, 1) = "N/A"
+                            End If
+                            .CellValue(lRow, 2) = lArr(1)
+                            .CellValue(lRow, 3) = lArr(2)
+                        End If
+                    End If
+                Next
+                If lHMeanrecord IsNot Nothing Then
+                    lArr = lHMeanrecord.Value.ToString().Split(vbTab)
+                    lRow = .Rows
+                    .CellValue(lRow, 0) = lHMeanrecord.Definition.Name.Substring("NONBIOFLOW-".Length)
+                    Dim lfval As Double
+                    If Double.TryParse(lArr(0), lfval) Then
+                        .CellValue(lRow, 1) = DoubleToString(lfval,,,,, 5)
+                    Else
+                        .CellValue(lRow, 1) = "N/A"
+                    End If
+                    .CellValue(lRow, 2) = lArr(1)
+                    .CellValue(lRow, 3) = lArr(2)
+                End If
+            End With
+            Return lNewSrc
         End Function
 
         Public Function Save(ByVal aFile As String) As Boolean
