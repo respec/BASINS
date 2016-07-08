@@ -173,8 +173,8 @@ Public Class frmSWSTATmod
         Me.txtOmitAfterYear = New System.Windows.Forms.TextBox()
         Me.txtOmitBeforeYear = New System.Windows.Forms.TextBox()
         Me.tabNDay = New System.Windows.Forms.TabPage()
-        Me.groupGraph = New System.Windows.Forms.GroupBox()
         Me.btnDoFrequencyGrid = New System.Windows.Forms.Button()
+        Me.groupGraph = New System.Windows.Forms.GroupBox()
         Me.btnDoFrequencyGraph = New System.Windows.Forms.Button()
         Me.chkMultipleNDayPlots = New System.Windows.Forms.CheckBox()
         Me.chkMultipleStationPlots = New System.Windows.Forms.CheckBox()
@@ -614,6 +614,16 @@ Public Class frmSWSTATmod
         Me.tabNDay.Text = "N-Day, Trend, Frequency"
         Me.tabNDay.UseVisualStyleBackColor = True
         '
+        'btnDoFrequencyGrid
+        '
+        Me.btnDoFrequencyGrid.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnDoFrequencyGrid.Location = New System.Drawing.Point(148, 423)
+        Me.btnDoFrequencyGrid.Name = "btnDoFrequencyGrid"
+        Me.btnDoFrequencyGrid.Size = New System.Drawing.Size(124, 23)
+        Me.btnDoFrequencyGrid.TabIndex = 37
+        Me.btnDoFrequencyGrid.Text = "Frequency Grid"
+        Me.btnDoFrequencyGrid.UseVisualStyleBackColor = True
+        '
         'groupGraph
         '
         Me.groupGraph.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -625,16 +635,6 @@ Public Class frmSWSTATmod
         Me.groupGraph.Size = New System.Drawing.Size(289, 57)
         Me.groupGraph.TabIndex = 43
         Me.groupGraph.TabStop = False
-        '
-        'btnDoFrequencyGrid
-        '
-        Me.btnDoFrequencyGrid.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDoFrequencyGrid.Location = New System.Drawing.Point(148, 423)
-        Me.btnDoFrequencyGrid.Name = "btnDoFrequencyGrid"
-        Me.btnDoFrequencyGrid.Size = New System.Drawing.Size(124, 23)
-        Me.btnDoFrequencyGrid.TabIndex = 37
-        Me.btnDoFrequencyGrid.Text = "Frequency Grid"
-        Me.btnDoFrequencyGrid.UseVisualStyleBackColor = True
         '
         'btnDoFrequencyGraph
         '
@@ -930,7 +930,7 @@ Public Class frmSWSTATmod
         Me.btnCalculate.Location = New System.Drawing.Point(6, 478)
         Me.btnCalculate.Name = "btnCalculate"
         Me.btnCalculate.Size = New System.Drawing.Size(75, 23)
-        Me.btnCalculate.TabIndex = 7
+        Me.btnCalculate.TabIndex = 21
         Me.btnCalculate.Text = "Calculate"
         Me.btnCalculate.UseVisualStyleBackColor = True
         '
@@ -973,7 +973,7 @@ Public Class frmSWSTATmod
         Me.chkNonBio3FlowPct.Location = New System.Drawing.Point(6, 169)
         Me.chkNonBio3FlowPct.Name = "chkNonBio3FlowPct"
         Me.chkNonBio3FlowPct.Size = New System.Drawing.Size(100, 17)
-        Me.chkNonBio3FlowPct.TabIndex = 39
+        Me.chkNonBio3FlowPct.TabIndex = 18
         Me.chkNonBio3FlowPct.Text = "Flow percentile:"
         Me.chkNonBio3FlowPct.UseVisualStyleBackColor = True
         '
@@ -983,7 +983,7 @@ Public Class frmSWSTATmod
         Me.chkNonBio2ExpFlow.Location = New System.Drawing.Point(6, 146)
         Me.chkNonBio2ExpFlow.Name = "chkNonBio2ExpFlow"
         Me.chkNonBio2ExpFlow.Size = New System.Drawing.Size(113, 17)
-        Me.chkNonBio2ExpFlow.TabIndex = 38
+        Me.chkNonBio2ExpFlow.TabIndex = 16
         Me.chkNonBio2ExpFlow.Text = "Explicit flow value:"
         Me.chkNonBio2ExpFlow.UseVisualStyleBackColor = True
         '
@@ -993,7 +993,7 @@ Public Class frmSWSTATmod
         Me.chkNonBioCustom2.Location = New System.Drawing.Point(6, 112)
         Me.chkNonBioCustom2.Name = "chkNonBioCustom2"
         Me.chkNonBioCustom2.Size = New System.Drawing.Size(61, 17)
-        Me.chkNonBioCustom2.TabIndex = 37
+        Me.chkNonBioCustom2.TabIndex = 13
         Me.chkNonBioCustom2.Text = "Custom"
         Me.chkNonBioCustom2.UseVisualStyleBackColor = True
         '
@@ -1003,7 +1003,7 @@ Public Class frmSWSTATmod
         Me.txtNonBioCustomNday2.Location = New System.Drawing.Point(120, 110)
         Me.txtNonBioCustomNday2.Name = "txtNonBioCustomNday2"
         Me.txtNonBioCustomNday2.Size = New System.Drawing.Size(49, 20)
-        Me.txtNonBioCustomNday2.TabIndex = 35
+        Me.txtNonBioCustomNday2.TabIndex = 14
         Me.txtNonBioCustomNday2.Text = "30"
         Me.txtNonBioCustomNday2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -1013,7 +1013,7 @@ Public Class frmSWSTATmod
         Me.txtNonBioCustomReturn2.Location = New System.Drawing.Point(175, 110)
         Me.txtNonBioCustomReturn2.Name = "txtNonBioCustomReturn2"
         Me.txtNonBioCustomReturn2.Size = New System.Drawing.Size(49, 20)
-        Me.txtNonBioCustomReturn2.TabIndex = 36
+        Me.txtNonBioCustomReturn2.TabIndex = 15
         Me.txtNonBioCustomReturn2.Text = "5"
         Me.txtNonBioCustomReturn2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -1023,7 +1023,7 @@ Public Class frmSWSTATmod
         Me.chkNonBioCustom1.Location = New System.Drawing.Point(6, 86)
         Me.chkNonBioCustom1.Name = "chkNonBioCustom1"
         Me.chkNonBioCustom1.Size = New System.Drawing.Size(61, 17)
-        Me.chkNonBioCustom1.TabIndex = 34
+        Me.chkNonBioCustom1.TabIndex = 10
         Me.chkNonBioCustom1.Text = "Custom"
         Me.chkNonBioCustom1.UseVisualStyleBackColor = True
         '
@@ -1033,7 +1033,7 @@ Public Class frmSWSTATmod
         Me.chkNonBioChronic.Location = New System.Drawing.Point(6, 42)
         Me.chkNonBioChronic.Name = "chkNonBioChronic"
         Me.chkNonBioChronic.Size = New System.Drawing.Size(263, 17)
-        Me.chkNonBioChronic.TabIndex = 33
+        Me.chkNonBioChronic.TabIndex = 9
         Me.chkNonBioChronic.Text = "Criterion continuous concentration (chronic, 7Q10)"
         Me.chkNonBioChronic.UseVisualStyleBackColor = True
         '
@@ -1043,7 +1043,7 @@ Public Class frmSWSTATmod
         Me.chkNonBioAcute.Location = New System.Drawing.Point(6, 19)
         Me.chkNonBioAcute.Name = "chkNonBioAcute"
         Me.chkNonBioAcute.Size = New System.Drawing.Size(246, 17)
-        Me.chkNonBioAcute.TabIndex = 32
+        Me.chkNonBioAcute.TabIndex = 8
         Me.chkNonBioAcute.Text = "Criterion maximum concentration (acute, 1Q10)"
         Me.chkNonBioAcute.UseVisualStyleBackColor = True
         '
@@ -1063,7 +1063,7 @@ Public Class frmSWSTATmod
         Me.txtNonBioCustomNday1.Location = New System.Drawing.Point(120, 84)
         Me.txtNonBioCustomNday1.Name = "txtNonBioCustomNday1"
         Me.txtNonBioCustomNday1.Size = New System.Drawing.Size(49, 20)
-        Me.txtNonBioCustomNday1.TabIndex = 28
+        Me.txtNonBioCustomNday1.TabIndex = 11
         Me.txtNonBioCustomNday1.Text = "30"
         Me.txtNonBioCustomNday1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -1073,7 +1073,7 @@ Public Class frmSWSTATmod
         Me.txtNonBioCustomReturn1.Location = New System.Drawing.Point(175, 84)
         Me.txtNonBioCustomReturn1.Name = "txtNonBioCustomReturn1"
         Me.txtNonBioCustomReturn1.Size = New System.Drawing.Size(49, 20)
-        Me.txtNonBioCustomReturn1.TabIndex = 31
+        Me.txtNonBioCustomReturn1.TabIndex = 12
         Me.txtNonBioCustomReturn1.Text = "5"
         Me.txtNonBioCustomReturn1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -1094,7 +1094,7 @@ Public Class frmSWSTATmod
         Me.chkHarmonicMean.Location = New System.Drawing.Point(4, 207)
         Me.chkHarmonicMean.Name = "chkHarmonicMean"
         Me.chkHarmonicMean.Size = New System.Drawing.Size(101, 17)
-        Me.chkHarmonicMean.TabIndex = 12
+        Me.chkHarmonicMean.TabIndex = 20
         Me.chkHarmonicMean.Text = "Harmonic Mean"
         Me.chkHarmonicMean.UseVisualStyleBackColor = True
         '
@@ -1104,7 +1104,7 @@ Public Class frmSWSTATmod
         Me.tbNonBio3.Location = New System.Drawing.Point(120, 144)
         Me.tbNonBio3.Name = "tbNonBio3"
         Me.tbNonBio3.Size = New System.Drawing.Size(46, 20)
-        Me.tbNonBio3.TabIndex = 11
+        Me.tbNonBio3.TabIndex = 17
         Me.tbNonBio3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbNonBio4
@@ -1113,7 +1113,7 @@ Public Class frmSWSTATmod
         Me.tbNonBio4.Location = New System.Drawing.Point(120, 170)
         Me.tbNonBio4.Name = "tbNonBio4"
         Me.tbNonBio4.Size = New System.Drawing.Size(46, 20)
-        Me.tbNonBio4.TabIndex = 10
+        Me.tbNonBio4.TabIndex = 19
         Me.tbNonBio4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbNonBio2
@@ -1245,7 +1245,7 @@ Public Class frmSWSTATmod
         Me.chkBio3Amm.Location = New System.Drawing.Point(6, 66)
         Me.chkBio3Amm.Name = "chkBio3Amm"
         Me.chkBio3Amm.Size = New System.Drawing.Size(103, 17)
-        Me.chkBio3Amm.TabIndex = 14
+        Me.chkBio3Amm.TabIndex = 2
         Me.chkBio3Amm.Text = "Ammonia (30B3)"
         Me.chkBio3Amm.UseVisualStyleBackColor = True
         '
@@ -1257,7 +1257,7 @@ Public Class frmSWSTATmod
         Me.chkBio2Chronic.Location = New System.Drawing.Point(6, 43)
         Me.chkBio2Chronic.Name = "chkBio2Chronic"
         Me.chkBio2Chronic.Size = New System.Drawing.Size(256, 17)
-        Me.chkBio2Chronic.TabIndex = 13
+        Me.chkBio2Chronic.TabIndex = 1
         Me.chkBio2Chronic.Text = "Criterion continuous concentration (chronic, 4B3)"
         Me.chkBio2Chronic.UseVisualStyleBackColor = True
         '
@@ -1269,7 +1269,7 @@ Public Class frmSWSTATmod
         Me.chkBio1Acute.Location = New System.Drawing.Point(6, 20)
         Me.chkBio1Acute.Name = "chkBio1Acute"
         Me.chkBio1Acute.Size = New System.Drawing.Size(239, 17)
-        Me.chkBio1Acute.TabIndex = 12
+        Me.chkBio1Acute.TabIndex = 0
         Me.chkBio1Acute.Text = "Criterion maximum concentration (acute, 1B3)"
         Me.chkBio1Acute.UseVisualStyleBackColor = True
         '
@@ -1313,7 +1313,7 @@ Public Class frmSWSTATmod
         Me.tbBio3.Location = New System.Drawing.Point(290, 163)
         Me.tbBio3.Name = "tbBio3"
         Me.tbBio3.Size = New System.Drawing.Size(46, 20)
-        Me.tbBio3.TabIndex = 11
+        Me.tbBio3.TabIndex = 6
         Me.tbBio3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbBio4
@@ -1321,7 +1321,7 @@ Public Class frmSWSTATmod
         Me.tbBio4.Location = New System.Drawing.Point(290, 188)
         Me.tbBio4.Name = "tbBio4"
         Me.tbBio4.Size = New System.Drawing.Size(46, 20)
-        Me.tbBio4.TabIndex = 10
+        Me.tbBio4.TabIndex = 7
         Me.tbBio4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbBio2
@@ -1329,7 +1329,7 @@ Public Class frmSWSTATmod
         Me.tbBio2.Location = New System.Drawing.Point(290, 138)
         Me.tbBio2.Name = "tbBio2"
         Me.tbBio2.Size = New System.Drawing.Size(46, 20)
-        Me.tbBio2.TabIndex = 9
+        Me.tbBio2.TabIndex = 5
         Me.tbBio2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'Label4
@@ -1364,7 +1364,7 @@ Public Class frmSWSTATmod
         Me.tbBio1.Location = New System.Drawing.Point(290, 113)
         Me.tbBio1.Name = "tbBio1"
         Me.tbBio1.Size = New System.Drawing.Size(46, 20)
-        Me.tbBio1.TabIndex = 5
+        Me.tbBio1.TabIndex = 4
         Me.tbBio1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'Label1
@@ -1384,7 +1384,7 @@ Public Class frmSWSTATmod
         Me.ckbBio.Location = New System.Drawing.Point(6, 89)
         Me.ckbBio.Name = "ckbBio"
         Me.ckbBio.Size = New System.Drawing.Size(61, 17)
-        Me.ckbBio.TabIndex = 0
+        Me.ckbBio.TabIndex = 3
         Me.ckbBio.Text = "Custom"
         Me.ckbBio.UseVisualStyleBackColor = True
         '
@@ -2580,7 +2580,7 @@ Public Class frmSWSTATmod
             CalculateBatch() 'setting params for batch run
         Else
             Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-            Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
+            'Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
             Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
                                                          aHigh:=radioHigh.Checked,
@@ -2610,7 +2610,7 @@ Public Class frmSWSTATmod
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
-                Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
+                'Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
                 SaveFileString(.FileName, lFreqForm.CreateReport)
                 OpenFile(.FileName)
@@ -3485,68 +3485,69 @@ Public Class frmSWSTATmod
                     lBioParam.Clear() : lBioParam = Nothing
                 Next 'lScen
 
-                Dim lReportSrc As New atcControls.atcGridSource()
-                Dim lTableTemplate As atcControls.atcGridSource = pDFLOWScenarios(0).ReportSrc
-                With lReportSrc
-                    .FixedRows = 1
-                    .Rows = 1
-                    .Columns = lTableTemplate.Columns + 4 + 4 + 1
-                    Dim I As Integer
-                    For I = 0 To .Columns - 1
-                        .CellValue(0, I) = lTableTemplate.CellValue(0, I)
-                    Next
-                    I = lTableTemplate.Columns
-                    .CellValue(0, I) = "B_NDay"
-                    .CellValue(0, I + 1) = "B_Return"
-                    .CellValue(0, I + 2) = "B_ClusterDays"
-                    .CellValue(0, I + 3) = "B_ExcPerCluster"
-                    .CellValue(0, I + 4) = "NB_NDay"
-                    .CellValue(0, I + 5) = "NB_Return"
-                    .CellValue(0, I + 6) = "NB_FlowValue"
-                    .CellValue(0, I + 7) = "NB_Flow%"
-                    '.CellValue(0, I + 8) = "HM"
-                    .CellValue(0, I + 8) = "ScenID"
+                'Dim lReportSrc As New atcControls.atcGridSource()
+                'Dim lTableTemplate As atcControls.atcGridSource = pDFLOWScenarios(0).ReportSrc
+                'With lReportSrc
+                '    .FixedRows = 1
+                '    .Rows = 1
+                '    .Columns = lTableTemplate.Columns + 4 + 4 + 1
+                '    Dim I As Integer
+                '    For I = 0 To .Columns - 1
+                '        .CellValue(0, I) = lTableTemplate.CellValue(0, I)
+                '    Next
+                '    I = lTableTemplate.Columns
+                '    .CellValue(0, I) = "B_NDay"
+                '    .CellValue(0, I + 1) = "B_Return"
+                '    .CellValue(0, I + 2) = "B_ClusterDays"
+                '    .CellValue(0, I + 3) = "B_ExcPerCluster"
+                '    .CellValue(0, I + 4) = "NB_NDay"
+                '    .CellValue(0, I + 5) = "NB_Return"
+                '    .CellValue(0, I + 6) = "NB_FlowValue"
+                '    .CellValue(0, I + 7) = "NB_Flow%"
+                '    '.CellValue(0, I + 8) = "HM"
+                '    .CellValue(0, I + 8) = "ScenID"
 
-                    .Rows = 2
-                    Dim lSuperRowIndex As Integer = .Rows - 1
-                    Dim lScen As clsInteractiveDFLOW = Nothing
-                    For Each lScenarioID As Integer In pDFLOWScenarios.Keys
-                        lScen = pDFLOWScenarios.ItemByKey(lScenarioID)
-                        For lRow As Integer = 1 To lScen.ReportSrc.Rows - 1
-                            Dim lCol As Integer = 0
-                            For lCol = 0 To lTableTemplate.Columns - 1
-                                .CellValue(.Rows - 1, lCol) = lScen.ReportSrc.CellValue(lRow, lCol)
-                            Next
-                            lCol = lTableTemplate.Columns
-                            .CellValue(lSuperRowIndex, lCol) = lScen.ParamBio1FlowAvgDays
-                            .CellValue(lSuperRowIndex, lCol + 1) = lScen.ParamBio2YearsBetweenExcursion
-                            .CellValue(lSuperRowIndex, lCol + 2) = lScen.ParamBio3ExcursionClusterDays
-                            .CellValue(lSuperRowIndex, lCol + 3) = lScen.ParamBio4ExcursionPerCluster
-                            If lScen.ParamNBioNDay > 0 Then
-                                .CellValue(lSuperRowIndex, lCol + 4) = lScen.ParamNBioNDay
-                                .CellValue(lSuperRowIndex, lCol + 5) = lScen.ParamNBioReturn
-                            Else
-                                .CellValue(lSuperRowIndex, lCol + 4) = "-"
-                                .CellValue(lSuperRowIndex, lCol + 5) = "-"
-                            End If
-                            If lScen.ParamNBioExpFlow > 0 Then
-                                .CellValue(lSuperRowIndex, lCol + 6) = lScen.ParamNBioExpFlow
-                            Else
-                                .CellValue(lSuperRowIndex, lCol + 6) = "-"
-                            End If
-                            If lScen.ParamNBioFlowPct > 0 Then
-                                .CellValue(lSuperRowIndex, lCol + 7) = lScen.ParamNBioFlowPct
-                            Else
-                                .CellValue(lSuperRowIndex, lCol + 7) = "-"
-                            End If
-                            '.CellValue(lSuperRowIndex, lCol + 8) = GetTserHM(.CellValue(lSuperRowIndex, 0), .CellValue(lSuperRowIndex, 1))
-                            .CellValue(lSuperRowIndex, lCol + 8) = lScenarioID
-                            .Rows = .Rows + 1
-                            lSuperRowIndex = .Rows - 1
-                        Next
-                    Next
-                End With
+                '    .Rows = 2
+                '    Dim lSuperRowIndex As Integer = .Rows - 1
+                '    Dim lScen As clsInteractiveDFLOW = Nothing
+                '    For Each lScenarioID As Integer In pDFLOWScenarios.Keys
+                '        lScen = pDFLOWScenarios.ItemByKey(lScenarioID)
+                '        For lRow As Integer = 1 To lScen.ReportSrc.Rows - 1
+                '            Dim lCol As Integer = 0
+                '            For lCol = 0 To lTableTemplate.Columns - 1
+                '                .CellValue(.Rows - 1, lCol) = lScen.ReportSrc.CellValue(lRow, lCol)
+                '            Next
+                '            lCol = lTableTemplate.Columns
+                '            .CellValue(lSuperRowIndex, lCol) = lScen.ParamBio1FlowAvgDays
+                '            .CellValue(lSuperRowIndex, lCol + 1) = lScen.ParamBio2YearsBetweenExcursion
+                '            .CellValue(lSuperRowIndex, lCol + 2) = lScen.ParamBio3ExcursionClusterDays
+                '            .CellValue(lSuperRowIndex, lCol + 3) = lScen.ParamBio4ExcursionPerCluster
+                '            If lScen.ParamNBioNDay > 0 Then
+                '                .CellValue(lSuperRowIndex, lCol + 4) = lScen.ParamNBioNDay
+                '                .CellValue(lSuperRowIndex, lCol + 5) = lScen.ParamNBioReturn
+                '            Else
+                '                .CellValue(lSuperRowIndex, lCol + 4) = "-"
+                '                .CellValue(lSuperRowIndex, lCol + 5) = "-"
+                '            End If
+                '            If lScen.ParamNBioExpFlow > 0 Then
+                '                .CellValue(lSuperRowIndex, lCol + 6) = lScen.ParamNBioExpFlow
+                '            Else
+                '                .CellValue(lSuperRowIndex, lCol + 6) = "-"
+                '            End If
+                '            If lScen.ParamNBioFlowPct > 0 Then
+                '                .CellValue(lSuperRowIndex, lCol + 7) = lScen.ParamNBioFlowPct
+                '            Else
+                '                .CellValue(lSuperRowIndex, lCol + 7) = "-"
+                '            End If
+                '            '.CellValue(lSuperRowIndex, lCol + 8) = GetTserHM(.CellValue(lSuperRowIndex, 0), .CellValue(lSuperRowIndex, 1))
+                '            .CellValue(lSuperRowIndex, lCol + 8) = lScenarioID
+                '            .Rows = .Rows + 1
+                '            lSuperRowIndex = .Rows - 1
+                '        Next
+                '    Next
+                'End With
 
+                Dim lReportSrc As atcControls.atcGridSource = Nothing
                 Dim lReportGrid As New frmDFLOWResults(pDataGroup, ,, True)
                 lReportGrid.UserSpecifyDFLOWResults(lReportSrc, pDFLOWScenarios, lInputArgs) 'pDFLOWScenarios(0).ReportSrc)
             End If 'has dataset(s)
