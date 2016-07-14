@@ -147,6 +147,11 @@ Public Module Utility
                     .Add("P:TAET", "    Total   ")
                     .Add("R:Header0", "Flow")
                     .Add("R:ROVOL", "    OutVolume")
+                    .Add("R:OVOL1", "    OutVolumeExit1")
+                    .Add("R:OVOL2", "    OutVolumeExit2")
+                    .Add("R:OVOL3", "    OutVolumeExit3")
+                    .Add("R:OVOL4", "    OutVolumeExit4")
+                    .Add("R:OVOL5", "    OutVolumeExit5")
                     If aCategory Then 'user used categories to indicate where water came from
                         .Add("R:ROVOL1", "    OVolPtIn")
                         .Add("R:ROVOL1-1", "    OVolPtInX1")
@@ -202,6 +207,11 @@ Public Module Utility
                     .Add("R:ROSED-SILT", "  Silt")
                     .Add("R:ROSED-CLAY", "  Clay")
                     .Add("R:ROSED-TOT", "  Total")
+                    .Add("R:OSED-TOT-EXIT1", "  TotalExit1")
+                    .Add("R:OSED-TOT-EXIT2", "  TotalExit2")
+                    .Add("R:OSED-TOT-EXIT3", "  TotalExit3")
+                    .Add("R:OSED-TOT-EXIT4", "  TotalExit4")
+                    .Add("R:OSED-TOT-EXIT5", "  TotalExit5")
                 End With
             Case "SedimentCopper"
                 With lConstituentsToOutput
@@ -501,13 +511,16 @@ Public Module Utility
                     .Add("R:Header12", "NO3 as N")
                     .Add("R:NO3-INTOT", "  Total NO3 Inflow")
                     .Add("R:NO3-PROCFLUX-TOT", "  NO3 Process Fluxes")
-                    .Add("R:NO3-OUTTOT", "  Total NO3 Outflow")
+                    .Add("R:NO3-ATMDEPTOT", " Atmospheric NO3 Deposition")
+                    .Add("R:NO3-OUTTOT", " Total NO3 Outflow")
+
 
                     .Add("R:Header13", "Total NH3 as N")
                     .Add("R:TAM-INTOT", "  Total NH3 Inflow")
                     .Add("R:TAM-INDIS", "  Dissolved NH3 inflow")
                     .Add("R:NH4-INPART-TOT", "  Particulate NH3 Inflow")
                     .Add("R:TAM-PROCFLUX-TOT", "  NH3 Process Fluxes")
+                    .Add("R:TAM-ATMDEPTOT", " Atmospheric TAM Deposition")
                     .Add("R:TAM-OUTTOT", "  Total NH3 Outflow")
                     .Add("R:TAM-OUTDIS", "  Dissolved NH3 Outflow")
                     .Add("R:TAM-OUTPART-TOT", "  Particulate NH3 Outflow")
@@ -524,6 +537,12 @@ Public Module Utility
                     .Add("R:Header16", "Total N")
                     .Add("R:N-TOT-IN", "  Total N Inflow")
                     .Add("R:N-TOT-OUT", "  Total N Outflow")
+                    .Add("R:N-TOT-OUT-EXIT1", "  Total N OutflowExit1")
+                    .Add("R:N-TOT-OUT-EXIT2", "  Total N OutflowExit2")
+                    .Add("R:N-TOT-OUT-EXIT3", "  Total N OutflowExit3")
+                    .Add("R:N-TOT-OUT-EXIT4", "  Total N OutflowExit4")
+                    .Add("R:N-TOT-OUT-EXIT5", "  Total N OutflowExit5")
+
                 End With
                 '.Add("R:TAM-OUTTOT-EXIT3", "  Total NH3 Outflow-Exit3")
                 '.Add("R:TAM-OUTDIS-EXIT3", "  Dissolved NH3 Outflow-Exit3")
@@ -658,6 +677,12 @@ Public Module Utility
                     .Add("R:Header16", "Total P")
                     .Add("R:P-TOT-IN", "  Total P Inflow")
                     .Add("R:P-TOT-OUT", "  Total P Outflow")
+                    .Add("R:P-TOT-OUT-EXIT1", "  Total P OutflowExit1")
+                    .Add("R:P-TOT-OUT-EXIT2", "  Total P OutflowExit2")
+                    .Add("R:P-TOT-OUT-EXIT3", "  Total P OutflowExit3")
+                    .Add("R:P-TOT-OUT-EXIT4", "  Total P OutflowExit4")
+                    .Add("R:P-TOT-OUT-EXIT5", "  Total P OutflowExit5")
+
                 End With
             Case "BOD-PQUAL"
                 With lConstituentsToOutput
