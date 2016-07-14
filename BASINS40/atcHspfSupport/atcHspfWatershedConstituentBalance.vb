@@ -725,7 +725,10 @@ Public Module WatershedConstituentBalance
                                 lFieldIndex += 1
                                 .Value(lFieldIndex) = DecimalAlign(lAreaTotal, aFieldWidth, aDecimalPlaces, 8)
 
-                                For lConstituentIndex As Integer = 0 To lConstituentsToOutput.Count - 1 'Anurag Changed the way For loop works to enable easy skipping when there are no AgCHEM constituents. Basically if the HBN file has no data for ("P:NO3+NO2-N - SURFACE LAYER OUTFLOW") or ("P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW") the code assumes that there are no AGCHEM constituents for that specific PERLND and looks for the PQUAL constituents
+                                For lConstituentIndex As Integer = 0 To lConstituentsToOutput.Count - 1 'Anurag Changed the way For loop works to enable easy skipping when there are no AgCHEM constituents. 
+                                    'Basically if the HBN file has no data for ("P:NO3+NO2-N - SURFACE LAYER OUTFLOW") or 
+                                    '("P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW") the code assumes that there are no AGCHEM constituents for that 
+                                    'specific PERLND and looks for the PQUAL constituents
                                     'For Each lConstituentKey In lConstituentsToOutput.Keys
                                     Dim lConstituentKey As String = lConstituentsToOutput.Keys(lConstituentIndex)
 
@@ -778,7 +781,7 @@ Public Module WatershedConstituentBalance
                                             lFieldIndex += 1
                                             .Value(lFieldIndex) = DecimalAlign(lValueTotal / lAreaTotal, aFieldWidth, aDecimalPlaces, aSignificantDigits)
 
-                                            If .Value(lFieldIndex) = 0 Then
+                                            If lValueTotal = 0 Then
                                                 Dim lSkipTo As String = FindSkipTo(lConstituentKey)
                                                 If lSkipTo IsNot Nothing Then
                                                     'At this point the specific data for AGCHEM N constitunet
@@ -1081,6 +1084,23 @@ Public Module WatershedConstituentBalance
             Case "P:SOQUAL-NO3", "SOQUAL-NO3" : lSkipTo = "NO3 (IQUAL)"
             Case "P:WASHQS-BOD", "WASHQS-BOD" : lSkipTo = "  BOD from OrganicN"
             Case "P:ORGN - TOTAL OUTFLOW", "ORGN - TOTAL OUTFLOW" : lSkipTo = "BOD"
+            Case "OVOL1" : lSkipTo = "OVOL2"
+            Case "OVOL2" : lSkipTo = "OVOL3"
+            Case "OVOL3" : lSkipTo = "OVOL4"
+            Case "OVOL4" : lSkipTo = "OVOL5"
+            Case "OVOL5" : lSkipTo = "IVOL"
+            Case "N-TOT-OUT1" : lSkipTo = "N-TOT-OUT2"
+            Case "N-TOT-OUT2" : lSkipTo = "N-TOT-OUT3"
+            Case "N-TOT-OUT3" : lSkipTo = "N-TOT-OUT4"
+            Case "N-TOT-OUT4" : lSkipTo = "N-TOT-OUT5"
+            Case "N-TOT-OUT5" : lSkipTo = "END"
+            Case "P-TOT-OUT1" : lSkipTo = "P-TOT-OUT2"
+            Case "P-TOT-OUT2" : lSkipTo = "P-TOT-OUT3"
+            Case "P-TOT-OUT3" : lSkipTo = "P-TOT-OUT4"
+            Case "P-TOT-OUT4" : lSkipTo = "P-TOT-OUT5"
+            Case "P-TOT-OUT5" : lSkipTo = "END"
+
+
         End Select
         Return lSkipTo
     End Function
