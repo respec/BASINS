@@ -85,7 +85,7 @@ Public Module ConstituentBalance
                                     Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
                                     Dim lConstituentDataName As String = lConstituentKey
                                     Dim lMultipleIndex As Integer = 0
-                                    If Not lConstituentKey.ToLower.Contains("header") Then 'Or lConstituentKey.ToLower.StartsWith("total")) Then
+                                    If Not (lConstituentKey.ToLower.Contains("header") Or lConstituentName.ToLower.Contains("exit")) Then 'Or lConstituentKey.ToLower.StartsWith("total")) Then
                                         If lConstituentKey.EndsWith("1") Or lConstituentKey.EndsWith("2") Then
                                             lMultipleIndex = lConstituentKey.Substring(lConstituentKey.Length - 1)
                                             lConstituentDataName = lConstituentDataName.Substring(0, lConstituentDataName.Length - 1)
@@ -188,6 +188,9 @@ Public Module ConstituentBalance
                                                 If lConnection.Target.VolName = "RCHRES" Then
                                                     Dim aReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
                                                     If aReach Is Nothing Then
+                                                        Continue For
+                                                        'Anurag added the continue for here to take care of the cases when a PERLND
+                                                        'or IMPLD connects to a reach that does not exist in OPN SEQUENCE
                                                         MsgBox("The Reach " & lConnection.Target.VolId & " does not exist.  Constituent Balance reports will not be generated.")
 
                                                     End If
