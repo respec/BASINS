@@ -1773,6 +1773,12 @@ Finished:
                 '    GoSub SetCurArgVal
                 '    dataval(valNum) = dataval(valNum) + curArgVal
                 '  Next
+
+            Case "sqrt"
+                For lValueIndex = 0 To lValueIndexLast
+                    lNewVals(lValueIndex) = Math.Sqrt(lNewVals(lValueIndex))
+                Next
+
             Case "abs", "absolute value"
                 For lValueIndex = 0 To lValueIndexLast
                     lNewVals(lValueIndex) = Math.Abs(lNewVals(lValueIndex))
