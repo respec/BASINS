@@ -816,6 +816,11 @@ Public Class clsBatchBFSpec
                     If lTsFlow IsNot Nothing Then
                         Try
                             lDrainageArea = lTsFlow.Attributes.GetValue("Drainage Area", -99)
+                            'Force use drainage area user specified in the batch run spec file (has to be positive value)
+                            'Essentially, user specified positive DA value takes precedence over original streamflow time series's DA
+                            If lDrainageArea <> lStation.StationDrainageArea AndAlso lStation.StationDrainageArea > 0 Then
+                                lDrainageArea = lStation.StationDrainageArea
+                            End If
                             'break up into continuous periods
                             Dim lDates() As Integer = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.StartDate)
                             Dim lAnalysis_Start As Double = Date2J(lDates)
@@ -866,6 +871,15 @@ Public Class clsBatchBFSpec
                             For Each lTsChunk As atcTimeseries In lTsAnalysisGroup
                                 lTsFlowGroup.Add(lTsChunk)
                                 With lStation.BFInputs
+                                    'Ensure user specified positive drainage area value is used for both streamflow and base-flow time series
+                                    'for the calculation of depth
+                                    For Each lTsz As atcTimeseries In lTsFlowGroup
+                                        If lTsz.Attributes.GetValue("Location") = lStation.StationID Then
+                                            If lTsz.Attributes.GetValue("Drainage Area") <> lStation.StationDrainageArea AndAlso lStation.StationDrainageArea > 0 Then
+                                                lTsz.Attributes.SetValue("Drainage Area", lStation.StationDrainageArea)
+                                            End If
+                                        End If
+                                    Next
                                     .SetValue(atcTimeseriesBaseflow.BFInputNames.Streamflow, lTsFlowGroup)
                                     lFlowStart = lTsChunk.Dates.Value(0)
                                     lFlowEnd = lTsChunk.Dates.Value(lTsChunk.numValues)

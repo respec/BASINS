@@ -245,7 +245,7 @@ Public Module modBaseflowUtil
         If aBFTserGroup IsNot Nothing AndAlso aBFTserGroup.Count > 0 Then
             For I As Integer = 0 To aBFTserGroup.Count - 1
                 Dim lTs As atcTimeseries = aBFTserGroup.ItemByIndex(I)
-                If lTs.Attributes.GetValue("tu") = atcTimeUnit.TUYear Then
+                If lTs IsNot Nothing AndAlso lTs.Attributes.GetValue("tu") = atcTimeUnit.TUYear Then
                     lCommonStart = aTsFlowYearly.Attributes.GetValue("SJDay")
                     lCommonEnd = aTsFlowYearly.Attributes.GetValue("EJDay")
                     If lTs.Attributes.GetValue("SJDay") > lCommonStart Then
