@@ -1566,6 +1566,12 @@ Public Module modUtil
         End Enum
     End Class
     Public Class DFLOWReportAscii
+
+        '"DFLOW version 4.0" & vbCrLf & _
+        Public Shared DFLOWDisclaimer As String =
+        "USGS has conducted limited testing and review of this program." & vbCrLf &
+        "Final review and approval is pending." & vbCrLf & vbCrLf
+
         Public Scenarios As atcCollection
         Public i_RunDateTime As String = ""
         Public i_Username As String = "User"
@@ -1594,6 +1600,27 @@ Public Module modUtil
                 lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Version) & lfldpf & vbTab & i_Version & vbCrLf
                 lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_BuildDate) & lfldpf & vbTab & i_BuildDate & vbCrLf
                 lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_RunDateTime) & lfldpf & vbTab & i_RunDateTime & vbCrLf
+
+                'lRept.Append(DFLOWDisclaimer) 'Add Message Here
+                'lRept.AppendLine()
+                'lRept.AppendLine("Program SWToolbox         U.S. GEOLOGICAL SURVEY             ") 'Seq " & lPageCount.ToString.PadLeft(5, "0"))
+                'lRept.AppendLine("Ver. 1.0                 DFLOW (version " & i_Version & "        Run Date / Time")
+                'lRept.AppendLine(i_BuildDate & "           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
+                'lRept.AppendLine()
+                'lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
+                'lRept.AppendLine("           preliminary computations. Users are responsible for assessment")
+                'lRept.AppendLine("           and interpretation.")
+                'lRept.AppendLine()
+                'lRept.AppendLine(vbFormFeed)
+
+                lHeader &= DFLOWDisclaimer 'Add Message Here
+                lHeader &= vbCrLf
+                lHeader &= "Program SWToolbox         U.S. GEOLOGICAL SURVEY             " 'Seq " & lPageCount.ToString.PadLeft(5, "0"))
+                lHeader &= "Ver. 1.0                 DFLOW (version " & i_Version & ")        Run Date / Time"
+                lHeader &= i_BuildDate & "           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt")
+                lHeader &= vbCrLf
+                lHeader &= vbCrLf
+                lHeader &= vbFormFeed
                 lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Username) & lfldpf & vbTab & i_Username & vbCrLf & vbCrLf
 
                 lHeader &= "***INPUTS***" & vbCrLf & vbCrLf
@@ -1699,25 +1726,29 @@ Public Module modUtil
                 End If
                 lRpt.AppendLine()
 
-                lRpt.AppendLine("EXCURSION ANALYSES FOR BIOLOGICALLY BASED CRITICAL FLOWS")
-                lRpt.AppendLine()
+                'lRpt.AppendLine("EXCURSION ANALYSES FOR BIOLOGICALLY BASED CRITICAL FLOWS")
+                'lRpt.AppendLine()
                 'go through every scenario for a given dataset
                 Dim lScen As clsInteractiveDFLOW = Scenarios.ItemByIndex(0)
                 Dim lxByKey As String = lScen.ParamBio1FlowAvgDays & "B" & lScen.ParamBio2YearsBetweenExcursion
                 Dim lGridSrc As atcGridSource = lScen.ExcursionReport("", I)
                 If lGridSrc IsNot Nothing Then
+                    lRpt.AppendLine("EXCURSION ANALYSES FOR BIOLOGICALLY BASED CRITICAL FLOWS (" & lxByKey & ")")
                     lRpt.AppendLine(lGridSrc.ToString())
                     lRpt.AppendLine()
                     lGridSrc.Rows = 1
                     lGridSrc.Columns = 1
                 End If
 
+                Dim lScenxByKey As String = ""
                 For J As Integer = 1 To Scenarios.Count - 1
                     lScen = Scenarios.ItemByIndex(J)
                     With lScen
-                        If .ParamBio1FlowAvgDays & "B" & .ParamBio2YearsBetweenExcursion <> lxByKey Then
+                        lScenxByKey = .ParamBio1FlowAvgDays & "B" & .ParamBio2YearsBetweenExcursion
+                        If lScenxByKey <> lxByKey Then
                             lGridSrc = .ExcursionReport("", I)
                             If lGridSrc IsNot Nothing Then
+                                lRpt.AppendLine("EXCURSION ANALYSES FOR BIOLOGICALLY BASED CRITICAL FLOWS (" & lScenxByKey & ")")
                                 lRpt.AppendLine(lGridSrc.ToString())
                                 lRpt.AppendLine()
                                 lGridSrc.Rows = 1
