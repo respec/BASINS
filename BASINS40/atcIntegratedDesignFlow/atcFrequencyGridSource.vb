@@ -43,6 +43,8 @@ Public Class atcFrequencyGridSource
         'pAdj = New SortedList
         'pAdjProb = New SortedList
 
+        Dim lKeyFmt As String = "00000.0000"
+        Dim lIsSelected As Boolean = False
         For Each lData As atcDataSet In pDataGroup
             For Each lAttribute As atcDefinedValue In lData.Attributes
                 If Not lAttribute.Arguments Is Nothing Then
@@ -52,8 +54,17 @@ Public Class atcFrequencyGridSource
 
                     If lAttribute.Arguments.ContainsAttribute("Nday") Then
                         Dim lNdays As String = lAttribute.Arguments.GetFormattedValue("Nday")
-                        lKey = Format(lAttribute.Arguments.GetValue("Nday"), "00000.0000")
-                        If Not pNdays.ContainsKey(lKey) AndAlso IsIn(lNdays, aNdays) Then
+                        lKey = Format(lAttribute.Arguments.GetValue("Nday"), lKeyFmt)
+                        lIsSelected = False
+                        If aNdays IsNot Nothing Then
+                            For Each lNday As Double In aNdays
+                                If Format(lNday, lKeyFmt) = lKey Then
+                                    lIsSelected = True
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        If Not pNdays.ContainsKey(lKey) AndAlso lIsSelected Then 'IsIn(lNdays, aNdays) Then
                             pNdays.Add(lKey, lNdays)
                         End If
                         lAdjStr &= lNdays & lHighLow
@@ -61,7 +72,16 @@ Public Class atcFrequencyGridSource
                     If lAttribute.Arguments.ContainsAttribute("Return Period") Then
                         Dim lNyears As String = lAttribute.Arguments.GetFormattedValue("Return Period")
                         lKey = Format(lAttribute.Arguments.GetValue("Return Period"), "00000.0000")
-                        If Not pRecurrence.ContainsKey(lKey) AndAlso IsIn(lNyears, aNyears) Then
+                        lIsSelected = False
+                        If aNyears IsNot Nothing Then
+                            For Each lNyear As Double In aNyears
+                                If Format(lNyear, lKeyFmt) = lKey Then
+                                    lIsSelected = True
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        If Not pRecurrence.ContainsKey(lKey) AndAlso lIsSelected Then 'IsIn(lNyears, aNyears) Then
                             pRecurrence.Add(lKey, lNyears)
                         End If ' Not pRecurrence.ContainsKey(lKey)
                         'lAdjStr &= lNyears
@@ -82,7 +102,7 @@ Public Class atcFrequencyGridSource
 
         If aNdays IsNot Nothing Then
             For Each lNdays As Double In aNdays
-                lKey = Format(lNdays, "00000.0000")
+                lKey = Format(lNdays, lKeyFmt)
                 If Not pNdays.ContainsKey(lKey) Then
                     pNdays.Add(lKey, DoubleToString(lNdays))
                 End If
@@ -91,7 +111,7 @@ Public Class atcFrequencyGridSource
 
         If aNyears IsNot Nothing Then
             For Each lNYears As Double In aNyears
-                lKey = Format(lNYears, "00000.0000")
+                lKey = Format(lNYears, lKeyFmt)
                 If Not pRecurrence.ContainsKey(lKey) Then
                     pRecurrence.Add(lKey, Format(lNYears, "0"))
                 End If
