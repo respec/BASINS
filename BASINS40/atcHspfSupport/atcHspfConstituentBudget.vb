@@ -949,10 +949,6 @@ Public Module ConstituentBudget
             lReport6.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
             lReport6.AppendLine("**The totals do not include losses as they have already been applied to the respective sources")
 
-
-
-
-
             lReport3.Append(lReport4.ToString)
             lReport5.Append(lReport6.ToString)
             'The Total column in percent line needs to be recalculated.
@@ -1005,7 +1001,9 @@ Public Module ConstituentBudget
                     If lConnection.Source.Opn.Description = landUse Then
                         'Need to add test to make sure that the operation was listed in the OPN SEQUENCE block.
                         lFound = True
-                        Dim lConnectionArea As Double = lConnection.MFact + 1.0E-30
+
+                        Dim lConnectionArea As Double = lConnection.MFact
+                        If lConnectionArea = 0 Then lConnectionArea = 1.0E-30
                         '1.0E-30 was added to make sure that rate is calculated for operations with zero areas
                         Dim lMassLinkID As Integer = lConnection.MassLink
                         Dim lTestLocation As String = lConnection.Source.VolName.Substring(0, 1) & ":" & lConnection.Source.VolId
@@ -1059,6 +1057,7 @@ Public Module ConstituentBudget
                         ByVal aTestLocation As String)
         Dim lVolPrefix As String = aVolName.Substring(0, 1) & ":"
         Dim aTotal2 As Double = aTotal 'aTotal2 is used for reporting the loading from the local land area to the reach.
+        Dim lKey As String = "Reach" & aReach.Id & " " & lVolPrefix & aLandUse
         If aReporting Then
 
             Dim lPercentContrib As Double = 0.0
@@ -1078,7 +1077,8 @@ Public Module ConstituentBudget
                 lPercentContrib = aTotal * 100 / aReachTotal
             End If
 
-            aContribPercent.Increment("Reach" & aReach.Id & " " & lVolPrefix & aLandUse, lPercentContrib)
+            aContribPercent.RemoveByKey(lKey)
+            aContribPercent.Add(lKey, lPercentContrib)
 
             'If aConnectionArea > 0 Then
             Dim lrate As Double = aTotal2 / aConnectionArea
@@ -1102,18 +1102,25 @@ Public Module ConstituentBudget
             'End If
 
         Else
-            pRunningTotals.Increment("Reach" & aReach.Id & " " & lVolPrefix & aLandUse, aTotal)
+            'If aReach.Id = 260 Then Stop
+            Dim checkedTheTributary As Boolean = False
+
+            If pRunningTotals.Keys.Contains(lKey) Then checkedTheTributary = True
+            pRunningTotals.Increment(lKey, aTotal)
             'A key of the land use type and downstream reach is made in pRunningTotals to save the total land from the specific land use.
             aReachTotal += aTotal
-            For Each lTributary As HspfConnection In aReach.Sources
 
-                If lTributary.Source.VolName = "RCHRES" Then
-                    Dim lTributaryID As String = lTributary.Source.VolId
-                    Dim UpstreamLoadByCategory As Double = pRunningTotals.ItemByKey("Reach" & lTributaryID & " " & lVolPrefix & aLandUse)
-                    pRunningTotals.Increment("Reach" & aReach.Id & " " & lVolPrefix & aLandUse, UpstreamLoadByCategory) '("Reach" & aReach.Id & " " & aTestLocation & aLandUse, UpstreamLoadByCategory)
-                End If
+            If Not checkedTheTributary Then
+                For Each lTributary As HspfConnection In aReach.Sources
+                    If lTributary.Source.VolName = "RCHRES" Then
+                        Dim lTributaryID As String = lTributary.Source.VolId
+                        Dim UpstreamLoadByCategory As Double = pRunningTotals.ItemByKey("Reach" & lTributaryID & " " & lVolPrefix & aLandUse)
+                        pRunningTotals.Increment(lKey, UpstreamLoadByCategory)
+                    End If
+                Next
 
-            Next
+            End If
+
 
         End If
 
@@ -1134,6 +1141,7 @@ Public Module ConstituentBudget
         Dim lReachTotal As Double = 0.0
 
         Dim lContribPercent As New atcCollection
+        'If aReach.Id = "260" Then Stop
         felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent)
         felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent)
 
@@ -1142,7 +1150,7 @@ Public Module ConstituentBudget
 
         felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent)
         felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent)
-        'If aReach.Id = 637 Then Stop
+        'If aReach.Id = 260 Then Stop
         For Each lTributary As HspfConnection In aReach.Sources
             If lTributary.Source.VolName = "RCHRES" Then
                 Dim lTributaryId As String = lTributary.Source.VolId
@@ -1175,12 +1183,13 @@ Public Module ConstituentBudget
 
         If GainLoss < 0 Then
             For Each lKey As String In lContribPercent.Keys
-                'If aReach.Id = "110" Then Stop
+                'If aReach.Id = "260" Then Stop
                 For Each lTotalsKey As String In pRunningTotals.Keys
                     Dim ReachIDLength As Integer = aReach.Id.ToString.Length
                     If lTotalsKey.Contains("Reach" & aReach.Id & " ") AndAlso lTotalsKey.Contains(SafeSubstring(lKey, 6 + ReachIDLength)) Then
 
-                        pRunningTotals.ItemByKey(lTotalsKey) = pRunningTotals.ItemByKey(lTotalsKey) + (GainLoss * lContribPercent.ItemByKey(lKey) / 100)
+                        'pRunningTotals.ItemByKey(lTotalsKey) = pRunningTotals.ItemByKey(lTotalsKey) + (GainLoss * pRunningTotals.ItemByKey(lTotalsKey) / 100)
+                        pRunningTotals.ItemByKey(lTotalsKey) = pRunningTotals.ItemByKey(lTotalsKey) + lContribPercent.ItemByKey(lKey) * GainLoss / 100
                         Exit For
                     End If
 
