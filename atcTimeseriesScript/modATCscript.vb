@@ -50,6 +50,11 @@ Friend Module modATCscript
     Public MissingValueString As String = ""
     Public DatesAllShared As Boolean = False
 
+    Public WarnedAboutCannotIncrement As Boolean = False
+    Public WarnedAboutNonNumericValue As Boolean = False
+    Public WarnedAboutNonNumericDataset As Boolean = False
+
+
     ''' <summary>
     ''' Array of token names
     ''' Be sure to synchronize with Private Enum ATCsToken in clsATCscriptExpression
@@ -91,7 +96,11 @@ Friend Module modATCscript
     Private InBuf As List(Of InputBuffer)
     Private CurBuf As InputBuffer
 
-    Private Sub ScriptInit()
+    ''' <summary>
+    ''' Initialize state of script handling.
+    ''' Used before running a script, before doing a "test run" of a script, and before opening the wizard that helps build a new script
+    ''' </summary>
+    Public Sub ScriptInit()
         'ReDim InBuf(0)
         InBuf = New List(Of InputBuffer)
 
@@ -119,6 +128,9 @@ Friend Module modATCscript
         CurrentLineNum = 0
         FillTS = 0
         AbortScript = False
+        WarnedAboutCannotIncrement = False
+        WarnedAboutNonNumericValue = False
+        WarnedAboutNonNumericDataset = False
     End Sub
 
     Public Function ReadIntLeaveRest(ByRef str_Renamed As String) As Integer
@@ -534,6 +546,12 @@ SetVariable:
         Return True
     End Function
 
+    ''' <summary>
+    ''' Run the "Test" branch of the script to see whether this script thinks it can read this file
+    ''' </summary>
+    ''' <param name="Script"></param>
+    ''' <param name="DataFilename"></param>
+    ''' <returns></returns>
     Public Function ScriptTest(ByRef Script As clsATCscriptExpression, ByRef DataFilename As String) As String
         Dim msg As String
         TestingFile = True
@@ -544,15 +562,15 @@ SetVariable:
             CurrentLine = ""
             LenCurrentLine = 0
             CurrentRepeat = 1
-            ScriptTest = Script.Evaluate
+            Return Script.Evaluate
         Else
             pDataFilename = DataFilename
             msg = ScriptOpenDataFile(DataFilename)
             If msg <> "OK" Then
                 MsgBox(msg, MsgBoxStyle.OkOnly, "Data Import")
-                ScriptTest = "0"
+                Return "0"
             Else
-                ScriptTest = Script.Evaluate
+                Return Script.Evaluate
             End If
         End If
     End Function

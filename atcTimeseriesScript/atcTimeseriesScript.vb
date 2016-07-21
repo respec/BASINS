@@ -70,6 +70,7 @@ Public Class atcTimeseriesScriptPlugin
                     Return RunSelectedScript(lDefinitionFilename, aFileName)
                 ElseIf lDefinitionFilename.StartsWith(pWizardTag) Then
                     Dim lCountBefore As Integer = Me.DataSets.Count
+                    ScriptInit()
                     Dim lfrmInputwizard As New frmInputWizard
                     With lfrmInputwizard
                         If .txtSample.Count = 0 Then

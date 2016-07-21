@@ -562,9 +562,6 @@ ReturnDate:
     Private pAbortResult As String = "Abort"
 
     Public Function Evaluate() As String
-        Static WarnedAboutCannotIncrement As Boolean
-        Static WarnedAboutNonNumericValue As Boolean
-        Static WarnedAboutNonNumericDataset As Boolean
         Dim SubExp As Integer
         Dim tmpval As String = Nothing
         Dim tmpval2 As String = Nothing
@@ -861,7 +858,7 @@ ReturnDate:
                 Else
                     ScriptSetValue(FillMissing)
                     If Not WarnedAboutNonNumericValue Then
-                        MsgBox("Value specified '" & tmpval & "' is not numeric." & vbCr & tmpval, MsgBoxStyle.OkOnly, "Import Data")
+                        MsgBox("Value specified '" & tmpval & "' is not numeric in line " & CurrentLineNum & ":" & vbCr & CurrentLine & vbCr, MsgBoxStyle.OkOnly, "Import Data")
                         WarnedAboutNonNumericValue = True
                     End If
                 End If
