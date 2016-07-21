@@ -271,7 +271,7 @@ Public Module modFile
         Return lName
     End Function
 
-    Public Function IsWritableFolder(aFolder) As Boolean
+    Public Function IsWritableFolder(aFolder As String) As Boolean
         If String.IsNullOrEmpty(aFolder) OrElse Not IO.Directory.Exists(aFolder) Then
             Return False
         End If

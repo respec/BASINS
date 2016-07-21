@@ -1029,8 +1029,15 @@ ParseFixedDef:
             .DefaultExt = "ws"
             .Title = "Save Script As"
             .FileName = txtScriptFile.Text
-            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
-                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            If Len(.FileName) > 0 Then
+                Try
+                    Dim DirectoryName As String = IO.Path.GetDirectoryName(.FileName)
+                    If Len(DirectoryName) > 0 And FileExists(DirectoryName, True, False) Then
+                        .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+                    End If
+                Catch
+                    ' Ignore any error when trying to set InitialDirectory
+                End Try
             End If
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
                 txtScriptFile.Text = .FileName

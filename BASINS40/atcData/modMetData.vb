@@ -1346,9 +1346,9 @@ Public Module modMetData
             If lMCod > 0 Then 'somethings missing
                 J2Date(aTSer.Dates.Value(lMPos), ldate)
                 lDateStr = ldate(0) & "/" & ldate(1) & "/" & ldate(2)
-                If ldate(0) = 1997 AndAlso ldate(1) = 6 AndAlso ldate(2) = 6 Then
-                    Dim lStop = "Stop"
-                End If
+                'If ldate(0) = 1997 AndAlso ldate(1) = 6 AndAlso ldate(2) = 6 Then
+                '    Dim lStop = "Stop"
+                'End If
                 If aTSer.Attributes.GetValue("TU") < 4 Then 'display h,m,s along with y,m,d
                     lDateStr &= " " & ldate(3) & ":" & ldate(4) & ":" & ldate(5)
                 End If
