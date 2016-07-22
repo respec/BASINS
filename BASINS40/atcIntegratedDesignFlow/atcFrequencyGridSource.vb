@@ -71,7 +71,7 @@ Public Class atcFrequencyGridSource
                     End If
                     If lAttribute.Arguments.ContainsAttribute("Return Period") Then
                         Dim lNyears As String = lAttribute.Arguments.GetFormattedValue("Return Period")
-                        lKey = Format(lAttribute.Arguments.GetValue("Return Period"), "00000.0000")
+                        lKey = Format(lAttribute.Arguments.GetValue("Return Period"), lKeyFmt)
                         lIsSelected = False
                         If aNyears IsNot Nothing Then
                             For Each lNyear As Double In aNyears

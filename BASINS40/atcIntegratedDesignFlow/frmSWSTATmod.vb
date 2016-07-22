@@ -682,7 +682,7 @@ Public Class frmSWSTATmod
         Me.btnScreeningTests.Name = "btnScreeningTests"
         Me.btnScreeningTests.Size = New System.Drawing.Size(124, 23)
         Me.btnScreeningTests.TabIndex = 41
-        Me.btnScreeningTests.Text = "Screening Test (R)"
+        Me.btnScreeningTests.Text = "Screening Tests (R)"
         Me.btnScreeningTests.UseVisualStyleBackColor = True
         '
         'chkLog
@@ -2408,22 +2408,57 @@ Public Class frmSWSTATmod
 
     End Function
 
-    Private Function RunSpearmanTest(ByVal aAnnualTS As atcTimeseries) As String
+    Private Function GetRunRExe() As String
         Dim lRunR As String
         Dim lPrompt As Boolean = False
         Do
-            lRunR = FindFile("Locate RunR executable", "RunR.exe", aUserVerifyFileName:=lPrompt)
+            lRunR = FindFile("Locate RunR executable", RunRProg, aUserVerifyFileName:=lPrompt)
             If lRunR.Length = 0 Then Return "RunR.exe not found"
             lPrompt = True
         Loop While Not lRunR.ToLower.EndsWith("runr.exe") OrElse Not IO.File.Exists(lRunR)
+        Return lRunR
+    End Function
 
-        lPrompt = False
+    Private Function GetRScript() As String
         Dim lRcodeFilename As String
+        Dim lPrompt As Boolean = False
         Do
-            lRcodeFilename = FindFile("Locate R script for computing Spearman Rho Test", "fnGetTrend.R", aUserVerifyFileName:=lPrompt)
+            'lRcodeFilename = FindFile("Locate R script for computing Spearman Rho Test", "fnGetTrend.R", aUserVerifyFileName:=lPrompt)
+            lRcodeFilename = FindFile("Locate R script for computing Spearman Rho Test", RScriptFilename, aUserVerifyFileName:=lPrompt)
             If lRcodeFilename.Length = 0 Then Return "R script not found"
             lPrompt = True
         Loop While Not lRcodeFilename.ToUpper.EndsWith(".R") OrElse Not IO.File.Exists(lRcodeFilename)
+        Return lRcodeFilename
+    End Function
+
+    '{
+    ''' <summary>
+    ''' This function calculates Spearman's Rho, p at which rho = 0, and 
+    ''' confidence limits for given Percent Confidence Interval (dPercentConfidenceInterval). 
+    '''JEK: 
+    '''Outputs – If it returns TRUE, then mark it in the table as “FLAG”.  If it returns FALSE, then mark it in the table as “FALSE”.  Do Not show True/False in the SWToolbox table just FLAG Or PASS.
+    '''TRUE -> FLAG
+    '''FALSE -> PASS
+    ''' </summary>
+    ''' <param name="aAnnualTS"></param>
+    ''' <returns></returns>
+    Private Function RunSpearmanTest(ByVal aAnnualTS As atcTimeseries) As String
+        Dim lRunR As String = GetRunRExe()
+        'Dim lPrompt As Boolean = False
+        'Do
+        '    lRunR = FindFile("Locate RunR executable", "RunR.exe", aUserVerifyFileName:=lPrompt)
+        '    If lRunR.Length = 0 Then Return "RunR.exe not found"
+        '    lPrompt = True
+        'Loop While Not lRunR.ToLower.EndsWith("runr.exe") OrElse Not IO.File.Exists(lRunR)
+
+        'lPrompt = False
+        Dim lRcodeFilename As String = GetRScript()
+        'Do
+        '    'lRcodeFilename = FindFile("Locate R script for computing Spearman Rho Test", "fnGetTrend.R", aUserVerifyFileName:=lPrompt)
+        '    lRcodeFilename = FindFile("Locate R script for computing Spearman Rho Test", RScriptFilename, aUserVerifyFileName:=lPrompt)
+        '    If lRcodeFilename.Length = 0 Then Return "R script not found"
+        '    lPrompt = True
+        'Loop While Not lRcodeFilename.ToUpper.EndsWith(".R") OrElse Not IO.File.Exists(lRcodeFilename)
 
         If IO.File.Exists(lRcodeFilename) AndAlso aAnnualTS.numValues > 0 Then
             Dim lYearsString As String = ""
@@ -2440,24 +2475,254 @@ Public Class frmSWSTATmod
             lYearsString = lYearsString.Substring(0, lYearsString.Length - 2)
             lValuesString = lValuesString.Substring(0, lValuesString.Length - 2)
 
-            Dim lArgsFilename As String = GetTemporaryFileName("RunR", ".R")
+            Dim lArgsFilename As String = GetTemporaryFileName("RunR_Spearman", ".R")
             Logger.Dbg("Writing trend R function/arguments to " & lArgsFilename)
             TryCopy(lRcodeFilename, lArgsFilename)
             Dim lArgWriter As New System.IO.StreamWriter(lArgsFilename, True)
             lArgWriter.WriteLine()
             lArgWriter.WriteLine("# Arguments for this run")
-            lArgWriter.WriteLine("InputYears <- c(" & lYearsString & ")")
-            lArgWriter.WriteLine("InputValues <- c(" & lValuesString & ")")
-            lArgWriter.WriteLine("fnGetTrend(InputYears, InputValues, dPercentConfidenceInterval = 95, intWhat = 0)")
+            'lArgWriter.WriteLine("InputYears <- c(" & lYearsString & ")")
+            'lArgWriter.WriteLine("InputValues <- c(" & lValuesString & ")")
+            'lArgWriter.WriteLine("fnGetTrend(InputYears, InputValues, dPercentConfidenceInterval = 95, intWhat = 0)")
+            lArgWriter.WriteLine("dInputarray1 <- c(" & lYearsString & ")")
+            lArgWriter.WriteLine("dInputArray2 <- c(" & lValuesString & ")")
+            lArgWriter.WriteLine("fnGetTrend(dInputarray1, dInputArray2, intReturn = 0, dPercentConfidenceInterval = 95)")
             lArgWriter.Close()
 
-            Dim lResultsFilename As String = GetTemporaryFileName("Rresults", ".txt")
+            Dim lResultsFilename As String = GetTemporaryFileName("Rresults_Spearman", ".txt")
             Logger.Dbg("Writing trend R results to " & lResultsFilename)
-            LaunchProgram(lRunR, IO.Path.GetDirectoryName(lRcodeFilename), lResultsFilename & " " & lArgsFilename)
-            Return IO.File.ReadAllText(lResultsFilename).TrimEnd(vbLf).TrimEnd(vbCr)
+            Try
+                LaunchProgram(lRunR, IO.Path.GetDirectoryName(lRcodeFilename), lResultsFilename & " " & lArgsFilename)
+                Return IO.File.ReadAllText(lResultsFilename).TrimEnd(vbLf).TrimEnd(vbCr)
+            Catch ex As Exception
+                Return "R execution error: " & ex.InnerException.Message
+            End Try
         End If
         Return "R code not found"
-    End Function
+    End Function '}
+
+    '{
+    ''' <summary>
+    ''' This function calculates the probability plot correlation coefficient test value. 
+    ''' It does the test based on the 95-percent confidence interval  
+    '''JEK:
+    '''Inputs:
+    '''dlnArray = n-day minimum time series (in cfs)
+    '''intDistribution = 3, if “logarithmic” Is checked, 2 otherwise.
+    '''Note #1: I am assuming that SWToolbox fits a Pearson Type III distribution no matter what – that no other distributional choices are available To it, And the only difference Is whether it uses a log-transformed dataset Or Not.
+    '''Note #2: No need To pass it the last two vars, where defaults are provided – the defaults are what we want To use.
+    '''Outputs:
+    '''TRUE -> PASS
+    '''FALSE-> FLAG
+    ''' </summary>
+    ''' <param name="aAnnualTS"></param>
+    ''' <returns></returns>
+    Private Function RunPPCCTest(ByVal aAnnualTS As atcTimeseries) As String
+        Dim lRunR As String = GetRunRExe()
+        Dim lRcodeFilename As String = GetRScript()
+
+        If IO.File.Exists(lRcodeFilename) AndAlso aAnnualTS.numValues > 0 Then
+            Dim lYearsString As String = ""
+            Dim lValuesString As String = ""
+            Dim lDateArray(6) As Integer
+            For lValueIndex As Integer = 1 To aAnnualTS.numValues
+                If Not Double.IsNaN(aAnnualTS.Value(lValueIndex)) Then
+                    J2Date(aAnnualTS.Dates.Value(lValueIndex), lDateArray)
+                    lYearsString &= lDateArray(0) & ", "
+                    lValuesString &= DoubleToString(aAnnualTS.Value(lValueIndex), 15, "0.##########", aSignificantDigits:=8) & ", "
+                End If
+            Next
+            'Trim extra comma and space
+            lValuesString = lValuesString.Substring(0, lValuesString.Length - 2)
+
+            Dim lArgsFilename As String = GetTemporaryFileName("RunR_PPCC", ".R")
+            Logger.Dbg("Writing PPCC R function/arguments to " & lArgsFilename)
+            TryCopy(lRcodeFilename, lArgsFilename)
+            Dim lArgWriter As New System.IO.StreamWriter(lArgsFilename, True)
+            lArgWriter.WriteLine()
+            lArgWriter.WriteLine("# Arguments for this run")
+            lArgWriter.WriteLine("dInArray <- c(" & lValuesString & ")")
+            lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
+            lArgWriter.WriteLine("fnPPCCTest(dInArray, intDistribution, intReturn = 0, bCensorZero = TRUE)")
+            lArgWriter.Close()
+
+            Dim lResultsFilename As String = GetTemporaryFileName("Rresults_PPCC", ".txt")
+            Logger.Dbg("Writing PPCC R results to " & lResultsFilename)
+            Try
+                LaunchProgram(lRunR, IO.Path.GetDirectoryName(lRcodeFilename), lResultsFilename & " " & lArgsFilename)
+                Return IO.File.ReadAllText(lResultsFilename).TrimEnd(vbLf).TrimEnd(vbCr)
+            Catch ex As Exception
+                Return "R execution error: " & ex.InnerException.Message
+            End Try
+        End If
+        Return "R code not found"
+    End Function '}
+
+    '{
+    ''' <summary>
+    ''' This Function calculates() the Kolmogorov-Smirnov test fit probability Of the specified distribution. 
+    ''' It does the test based On the 95-percent confidence interval 
+    ''' JEK:
+    ''' ***** Spearman Section ****
+    ''' fnGetTrend
+    ''' calculates Spearman's Rho, p at which rho = 0, and confidence limits for given Percent Confidence Interval (dPercentConfidenceInterval). 
+    ''' Outputs – 
+    ''' TRUE -> FLAG
+    ''' FALSE -> PASS
+    ''' ***** Spearman Section End ****
+    '''
+    ''' ***** PPCC Section ****
+    ''' fnPPCCTest
+    ''' This function calculates the probability plot correlation coefficient test value. 
+    ''' It does the test based on the 95-percent confidence interval  
+    '''JEK:
+    '''Inputs:
+    '''dlnArray = n-day minimum time series (in cfs)
+    '''intDistribution = 3, if “logarithmic” Is checked, 2 otherwise.
+    '''Note #1: I am assuming that SWToolbox fits a Pearson Type III distribution no matter what – that no other distributional choices are available To it, And the only difference Is whether it uses a log-transformed dataset Or Not.
+    '''Note #2: No need To pass it the last two vars, where defaults are provided – the defaults are what we want To use.
+    '''Outputs:
+    '''TRUE -> PASS
+    '''FALSE-> FLAG
+    ''' ***** PPCC Section End ****
+    '''
+    ''' ***** ProbableKSFit Section ****
+    '''fnProbableKSFit(dInArray, intDistribution, intReturn = 0, bCensorZero = TRUE)
+    '''calculates the Kolmogorov-Smirnov test fit probability Of the specified distribution. 
+    '''It does the test based On the 95-percent confidence interval 
+    ''' Inputs:
+    ''' dlnArray = n - Day minimum time series (In cfs)
+    ''' intDistribution = 3, If “logarithmic” Is checked, 2 otherwise.
+    ''' Outputs:
+    ''' TRUE -> PASS
+    ''' FALSE -> FLAG
+    ''' ***** ProbableKSFit Section End ****
+    ''' </summary>
+    ''' <param name="aAnnualTS"></param>
+    ''' <returns></returns>
+    Private Function RunRScreeningTests(ByVal aAnnualTS As atcTimeseries, ByVal aRTest As RTests) As String
+        Dim fnLbl As String = aRTest.ToString()
+        Dim lRunR As String = GetRunRExe()
+        Dim lRcodeFilename As String = GetRScript()
+
+        If IO.File.Exists(lRcodeFilename) AndAlso aAnnualTS.numValues > 0 Then
+            Dim lYearsString As String = ""
+            Dim lValuesString As String = ""
+            Dim lYearsArray As New ArrayList()
+            Dim lValuesArray As New ArrayList()
+            Dim lDateArray(6) As Integer
+            For lValueIndex As Integer = 1 To aAnnualTS.numValues
+                If Not Double.IsNaN(aAnnualTS.Value(lValueIndex)) Then
+                    J2Date(aAnnualTS.Dates.Value(lValueIndex), lDateArray)
+                    lYearsString &= lDateArray(0) & ", "
+                    lValuesString &= DoubleToString(aAnnualTS.Value(lValueIndex), 15, "0.##########", aSignificantDigits:=8) & ", "
+
+                    lYearsArray.Add(lDateArray(0))
+                    lValuesArray.Add(aAnnualTS.Value(lValueIndex))
+                End If
+            Next
+            'Trim extra comma and space
+            lYearsString = lYearsString.Substring(0, lYearsString.Length - 2)
+            lValuesString = lValuesString.Substring(0, lValuesString.Length - 2)
+
+            Dim lArgsFilename As String = GetTemporaryFileName("RunR_" & fnLbl, ".R")
+            Logger.Dbg("Writing " & fnLbl & " R function/arguments to " & lArgsFilename)
+            TryCopy(lRcodeFilename, lArgsFilename)
+            Dim lArgWriter As New System.IO.StreamWriter(lArgsFilename, True)
+            lArgWriter.WriteLine()
+            lArgWriter.WriteLine("# Arguments for this run")
+            Select Case aRTest
+                Case RTests.Spearman
+                    lArgWriter.WriteLine("dInputarray1 <- c(" & lYearsString & ")")
+                    lArgWriter.WriteLine("dInputArray2 <- c(" & lValuesString & ")")
+                    lArgWriter.WriteLine("fnGetTrend(dInputarray1, dInputArray2, intReturn = 0, dPercentConfidenceInterval = 95)")
+                Case RTests.PPCC
+                    lArgWriter.WriteLine("dInArray <- c(" & lValuesString & ")")
+                    lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
+                    lArgWriter.WriteLine("fnPPCCTest(dInArray, intDistribution, intReturn = 0, bCensorZero = TRUE)")
+                Case RTests.KSFit
+                    lArgWriter.WriteLine("dInArray <- c(" & lValuesString & ")")
+                    lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
+                    lArgWriter.WriteLine("fnProbableKSFit(dInArray, intDistribution, intReturn = 0, bCensorZero = TRUE)")
+                Case RTests.BestFitDistribution
+                Case RTests.KRatioOutliers
+                    lArgWriter.WriteLine("dInArray <- c(" & lValuesString & ")")
+                    lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
+                    lArgWriter.WriteLine("fnKRatioOutlierFits(dInArray, intDistribution, bCensorZero = TRUE, intppFormula = 5)")
+                Case RTests.KRatioStations
+            End Select
+            lArgWriter.Close()
+
+            Dim lResultsFilename As String = GetTemporaryFileName("Rresults_" & fnLbl, ".txt")
+            Logger.Dbg("Writing " & fnLbl & " R results to " & lResultsFilename)
+            Try
+                LaunchProgram(lRunR, IO.Path.GetDirectoryName(lRcodeFilename), lResultsFilename & " " & lArgsFilename)
+                If aRTest = RTests.KRatioOutliers Then
+                    Dim lSR As System.IO.StreamReader = Nothing
+                    Dim lKRatio_FLows As New atcCollection()
+                    Dim lFlowVal As Double
+                    Dim lKratio As Double
+                    Try
+                        lSR = New System.IO.StreamReader(lResultsFilename)
+                        Dim lAllText As String = lSR.ReadToEnd()
+                        Dim lFlowLine As String = lAllText.Substring(lAllText.IndexOf("(") + 1, lAllText.IndexOf(")") - 2)
+                        Dim lKratioLine As String = lAllText.Substring(lAllText.LastIndexOf("(") + 1, lAllText.LastIndexOf(")") - lAllText.LastIndexOf("(") - 1)
+                        Dim lStop As String = ""
+                        'lFlowLine = lFlowLine.Replace("c", "").Replace("(", "").Replace(")", "")
+                        'lKratioLine = lKratioLine.Replace("c", "").Replace("(", "").Replace(")", "")
+                        lFlowLine = lFlowLine.Replace(vbLf, "").Replace("&", "").Replace(" ", "")
+                        lKratioLine = lKratioLine.Replace(vbLf, "").Replace("&", "").Replace(" ", "")
+                        Dim lArrFlow() As String = Nothing
+                        Dim lArrKratio() As String = Nothing
+                        lArrFlow = System.Text.RegularExpressions.Regex.Split(lFlowLine, ",")
+                        lArrKratio = System.Text.RegularExpressions.Regex.Split(lKratioLine, ",")
+                        If lArrFlow.Length = lArrKratio.Length Then
+                            For I As Integer = 0 To lArrFlow.Length - 1
+                                If Double.TryParse(lArrFlow(I), lFlowVal) AndAlso Double.TryParse(lArrKratio(I), lKratio) Then
+                                    If Not lKRatio_FLows.Keys.Contains(lFlowVal) Then
+                                        lKRatio_FLows.Add(lFlowVal, lKratio)
+                                    End If
+                                End If
+                            Next
+                        Else
+                            Return ""
+                        End If
+                    Catch ex As Exception
+                        Return ""
+                    Finally
+                        If lSR IsNot Nothing Then
+                            lSR.Close() : lSR = Nothing
+                        End If
+                    End Try
+
+                    Dim lOutlierYears As String = ""
+                    For Each lFlow As Double In lKRatio_FLows.Keys
+                        lKratio = lKRatio_FLows.ItemByKey(lFlow)
+                        If lKratio > 1 Then
+                            For I As Integer = 0 To lValuesArray.Count - 1
+                                Dim lFlowInOrder As Double = lValuesArray(I)
+                                If Math.Abs(lFlowInOrder - lFlow) < 0.00001 Then
+                                    lOutlierYears &= lYearsArray(I) & ","
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                    Next
+                    lValuesArray.Clear() : lValuesArray = Nothing
+                    lYearsArray.Clear() : lYearsArray = Nothing
+                    lKRatio_FLows.Clear() : lKRatio_FLows = Nothing
+                    Return lOutlierYears.TrimEnd(",")
+                Else
+                    lValuesArray.Clear() : lValuesArray = Nothing
+                    lYearsArray.Clear() : lYearsArray = Nothing
+                    Return IO.File.ReadAllText(lResultsFilename).TrimEnd(vbLf).TrimEnd(vbCr)
+                End If
+            Catch ex As Exception
+                Return "R execution error: " & ex.InnerException.Message
+            End Try
+        End If
+        Return "R code not found"
+    End Function '}
 
     Private Sub btnDisplayTrend_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDisplayTrend.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
@@ -2530,13 +2795,78 @@ Public Class frmSWSTATmod
                                                                  aEndMonth:=pYearEndMonth,
                                                                  aEndDay:=pYearEndDay)
                 If lRankedAnnual.Count > 0 Then
+                    Dim lTestResult As String = ""
+                    Dim lTestName As String = ""
                     For Each lTS As atcTimeseries In lRankedAnnual
                         With lTS.Attributes
                             .SetValue("Original ID", lTS.OriginalParentID)
                             .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(1)))
                             .SetValue("To", pDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
                             .SetValue("Not Used", .GetValue("Count Missing"))
-                            .SetValueIfMissing("SpearmanTest", RunSpearmanTest(lTS))
+                            Try
+                                'lTxtSpearman = RunSpearmanTest(lTS)
+                                lTestResult = RunRScreeningTests(lTS, RTests.Spearman)
+                                lTestName = RTests.Spearman.ToString() '"Spearman"
+                                If Not String.IsNullOrEmpty(lTestResult) Then
+                                    lTestResult = lTestResult.ToUpper()
+                                    If lTestResult = "TRUE" Then
+                                        .SetValueIfMissing(lTestName, "FLAG")
+                                    ElseIf lTestResult = "FALSE" Then
+                                        .SetValueIfMissing(lTestName, "PASS")
+                                    End If
+                                Else
+                                    .SetValueIfMissing(lTestName, "N/A")
+                                End If
+                            Catch ex As Exception
+                                .SetValueIfMissing(lTestName, "Test Failed")
+                            End Try
+
+                            Try
+                                lTestResult = RunRScreeningTests(lTS, RTests.PPCC)
+                                lTestName = RTests.PPCC.ToString() '"PPCC"
+                                If Not String.IsNullOrEmpty(lTestResult) Then
+                                    lTestResult = lTestResult.ToUpper()
+                                    If lTestResult = "TRUE" Then
+                                        .SetValueIfMissing(lTestName, "PASS")
+                                    ElseIf lTestResult = "FALSE" Then
+                                        .SetValueIfMissing(lTestName, "FLAG")
+                                    End If
+                                Else
+                                    .SetValueIfMissing(lTestName, "N/A")
+                                End If
+                            Catch ex As Exception
+                                .SetValueIfMissing(lTestName, "Test Failed")
+                            End Try
+
+                            Try
+                                lTestResult = RunRScreeningTests(lTS, RTests.KSFit)
+                                lTestName = RTests.KSFit.ToString() '"KSFit"
+                                If Not String.IsNullOrEmpty(lTestResult) Then
+                                    lTestResult = lTestResult.ToUpper()
+                                    If lTestResult = "TRUE" Then
+                                        .SetValueIfMissing(lTestName, "PASS")
+                                    ElseIf lTestResult = "FALSE" Then
+                                        .SetValueIfMissing(lTestName, "FLAG")
+                                    End If
+                                Else
+                                    .SetValueIfMissing(lTestName, "N/A")
+                                End If
+                            Catch ex As Exception
+                                .SetValueIfMissing(lTestName, "Test Failed")
+                            End Try
+
+                            Try
+                                lTestResult = RunRScreeningTests(lTS, RTests.KRatioOutliers)
+                                lTestName = RTests.KRatioOutliers.ToString()
+                                If Not String.IsNullOrEmpty(lTestResult) Then
+                                    .SetValueIfMissing(lTestName, lTestResult)
+                                Else
+                                    .SetValueIfMissing(lTestName, "")
+                                End If
+                            Catch ex As Exception
+                                .SetValueIfMissing(lTestName, "Test Failed")
+                            End Try
+
                         End With
                     Next
                     Dim lList As New atcList.atcListForm
@@ -2556,7 +2886,15 @@ Public Class frmSWSTATmod
                             .Add("Not Used")
                             .Add("Min")
                             .Add("Max")
-                            .Add("SpearmanTest")
+                            .Add("NDay")
+                            '.Add("Spearman")
+                            '.Add("PPCC")
+                            '.Add("KSFit")
+                            '.Add("KRatioOutliers")
+                            .Add(RTests.Spearman.ToString())
+                            .Add(RTests.PPCC.ToString())
+                            .Add(RTests.KSFit.ToString())
+                            .Add(RTests.KRatioOutliers.ToString())
                         End With
                         AddSeasonNameIfNeeded(lAttributes, lRankedAnnual)
                         .Initialize(lRankedAnnual, lAttributes, False)
