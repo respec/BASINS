@@ -5,6 +5,17 @@ Imports atcUtility
 
 Public Module modUtil
 
+    Public RScriptFilename As String = "fnScreeningTests.R"
+    Public RunRProg As String = "RunR.exe"
+    Public Enum RTests
+        BestFitDistribution
+        Spearman
+        PPCC
+        KSFit
+        KRatioStations
+        KRatioOutliers
+    End Enum
+
     ''' <summary>
     ''' Find a station ID by looking at STAID, site_no, Location, STANAM attributes, set STANAM attribute if found and return it
     ''' </summary>
