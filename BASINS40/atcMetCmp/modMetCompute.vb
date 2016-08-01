@@ -2330,9 +2330,9 @@ OuttaHere:
     ''' <param name="aSource"></param>
     ''' <returns>Dewpint Temperature timeseries at same times as aSpecHumidTSer</returns>
     ''' <remarks></remarks>
-    Public Function NLDASDewpointTimeseriesFromSpecificHumidity(ByVal aSpecHumidTSer As atcTimeseries,
-                                                                ByVal aAirTempTSer As atcTimeseries,
-                                                                ByVal aSource As atcTimeseriesSource,
+    Public Function NLDASDewpointTimeseriesFromSpecificHumidity(ByVal aSpecHumidTSer As atcTimeseries, _
+                                                                ByVal aAirTempTSer As atcTimeseries, _
+                                                                ByVal aSource As atcTimeseriesSource, _
                                                                 Optional ByVal aPressure As Double = 1013.25) As atcTimeseries
 
         Dim lTSGroup As New atcDataGroup(aSpecHumidTSer, aAirTempTSer)
@@ -2361,8 +2361,8 @@ OuttaHere:
             Else
                 Call J2Date(lDewpointTS.Dates.Value(lValueIndex - 1), lDate)
             End If
-            e = 6.112 ^ ((17.67 * aAirTempTSer.Value(lAirTempIndex)) / (aAirTempTSer.Value(lAirTempIndex) + 243.5))
-            es = aSpecHumidTSer.Value(lSpecHumidIndex) * aPressure / (0.378 * aSpecHumidTSer.Value(lSpecHumidIndex) + 0.622)
+            es = 6.112 * Math.Exp((17.67 * aAirTempTSer.Value(lAirTempIndex)) / (aAirTempTSer.Value(lAirTempIndex) + 243.5))
+            e = aSpecHumidTSer.Value(lSpecHumidIndex) * aPressure / (0.378 * aSpecHumidTSer.Value(lSpecHumidIndex) + 0.622)
             RelHumid = e / es
             If RelHumid > 1.0 Then
                 RelHumid = 1.0
