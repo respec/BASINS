@@ -448,6 +448,8 @@ Public Class frmDownload
                             chkSTORET_Results.Checked = True
                         Case "nldas_grid", "nldas_grid_center"
                             chkNLDAS_GetNLDASParameter.Enabled = True
+                            txtTimeZone.Enabled = True
+                            lblTimeZone.Enabled = True
                             chkNLDAS_GetNLDASParameter.Text = "Hourly Data"
                             chkNLDAS_GetNLDASParameter.Checked = True
                     End Select
@@ -631,6 +633,7 @@ Public Class frmDownload
                                     ElseIf lChild Is chkNLDAS_GetNLDASParameter Then
                                         Dim lWDMfrm As New frmWDM
                                         lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDAS", IO.Path.Combine(lSaveFolderOnly, "nldas"), "NLDAS Processing Options")
+                                        lWDMxml &= "<TimeZoneShift>" & txtTimeZone.Text & "</TimeZoneShift>" & vbCrLf
                                     End If
                                     'If lChild Is chkNWIS_GetNWISPrecipitation Then
                                     '    Dim lWDMfrm As New frmWDM

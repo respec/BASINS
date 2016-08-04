@@ -98,6 +98,8 @@ Partial Class frmDownload
         Me.panelNWISnoStations_GW = New System.Windows.Forms.Panel()
         Me.lblNWISnoStations_GW = New System.Windows.Forms.Label()
         Me.grpNCDC = New System.Windows.Forms.GroupBox()
+        Me.txtTimeZone = New System.Windows.Forms.TextBox()
+        Me.lblTimeZone = New System.Windows.Forms.Label()
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.panelNWISnoStations.SuspendLayout()
@@ -355,7 +357,7 @@ Partial Class frmDownload
         'btnHelp
         '
         Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.Location = New System.Drawing.Point(272, 700)
+        Me.btnHelp.Location = New System.Drawing.Point(272, 702)
         Me.btnHelp.Name = "btnHelp"
         Me.btnHelp.Size = New System.Drawing.Size(59, 23)
         Me.btnHelp.TabIndex = 46
@@ -569,7 +571,7 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(17, 704)
+        Me.chkClip.Location = New System.Drawing.Point(17, 706)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 44
@@ -581,7 +583,7 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(222, 690)
+        Me.chkMerge.Location = New System.Drawing.Point(222, 692)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 43
@@ -695,7 +697,7 @@ Partial Class frmDownload
         '
         Me.chkGetNewest.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkGetNewest.AutoSize = True
-        Me.chkGetNewest.Location = New System.Drawing.Point(123, 704)
+        Me.chkGetNewest.Location = New System.Drawing.Point(123, 706)
         Me.chkGetNewest.Name = "chkGetNewest"
         Me.chkGetNewest.Size = New System.Drawing.Size(82, 17)
         Me.chkGetNewest.TabIndex = 49
@@ -728,7 +730,7 @@ Partial Class frmDownload
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(402, 700)
+        Me.btnDownload.Location = New System.Drawing.Point(402, 702)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 48
@@ -759,7 +761,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(337, 700)
+        Me.btnCancel.Location = New System.Drawing.Point(337, 702)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(59, 23)
         Me.btnCancel.TabIndex = 47
@@ -822,7 +824,7 @@ Partial Class frmDownload
         '
         Me.chkCacheOnly.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkCacheOnly.AutoSize = True
-        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 704)
+        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 706)
         Me.chkCacheOnly.Name = "chkCacheOnly"
         Me.chkCacheOnly.Size = New System.Drawing.Size(81, 17)
         Me.chkCacheOnly.TabIndex = 45
@@ -834,11 +836,13 @@ Partial Class frmDownload
         '
         Me.grpNLDAS.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpNLDAS.Controls.Add(Me.lblTimeZone)
+        Me.grpNLDAS.Controls.Add(Me.txtTimeZone)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASParameter)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASGrid)
         Me.grpNLDAS.Location = New System.Drawing.Point(11, 572)
         Me.grpNLDAS.Name = "grpNLDAS"
-        Me.grpNLDAS.Size = New System.Drawing.Size(466, 42)
+        Me.grpNLDAS.Size = New System.Drawing.Size(466, 60)
         Me.grpNLDAS.TabIndex = 39
         Me.grpNLDAS.TabStop = False
         Me.grpNLDAS.Text = "North American Land Data Assimilation System"
@@ -958,7 +962,7 @@ Partial Class frmDownload
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNCDC.Controls.Add(Me.chkNCDC_MetStations)
         Me.grpNCDC.Controls.Add(Me.chkNCDC_MetData)
-        Me.grpNCDC.Location = New System.Drawing.Point(12, 620)
+        Me.grpNCDC.Location = New System.Drawing.Point(12, 638)
         Me.grpNCDC.Name = "grpNCDC"
         Me.grpNCDC.Size = New System.Drawing.Size(466, 44)
         Me.grpNCDC.TabIndex = 50
@@ -966,13 +970,32 @@ Partial Class frmDownload
         Me.grpNCDC.Text = "National Climatic Data Center"
         Me.grpNCDC.Visible = False
         '
+        'txtTimeZone
+        '
+        Me.txtTimeZone.Enabled = False
+        Me.txtTimeZone.Location = New System.Drawing.Point(290, 34)
+        Me.txtTimeZone.Name = "txtTimeZone"
+        Me.txtTimeZone.Size = New System.Drawing.Size(39, 20)
+        Me.txtTimeZone.TabIndex = 43
+        Me.txtTimeZone.Text = "0"
+        '
+        'lblTimeZone
+        '
+        Me.lblTimeZone.AutoSize = True
+        Me.lblTimeZone.Enabled = False
+        Me.lblTimeZone.Location = New System.Drawing.Point(129, 37)
+        Me.lblTimeZone.Name = "lblTimeZone"
+        Me.lblTimeZone.Size = New System.Drawing.Size(155, 13)
+        Me.lblTimeZone.TabIndex = 44
+        Me.lblTimeZone.Text = "Project Time Zone - UTC minus"
+        '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(490, 735)
+        Me.ClientSize = New System.Drawing.Size(490, 737)
         Me.Controls.Add(Me.grpNCDC)
         Me.Controls.Add(Me.chkGetNewest)
         Me.Controls.Add(Me.grpNWISStations_GW)
@@ -1100,4 +1123,6 @@ Partial Class frmDownload
     Friend WithEvents grpNCDC As Windows.Forms.GroupBox
     Friend WithEvents chkNCDC_MetData As Windows.Forms.CheckBox
     Friend WithEvents chkNCDC_MetStations As Windows.Forms.CheckBox
+    Friend WithEvents lblTimeZone As Windows.Forms.Label
+    Friend WithEvents txtTimeZone As Windows.Forms.TextBox
 End Class
