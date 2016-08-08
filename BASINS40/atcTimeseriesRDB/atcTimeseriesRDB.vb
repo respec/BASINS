@@ -6,6 +6,7 @@ Imports atcUtility
 Imports MapWinUtility
 Imports System.Collections
 Imports System.IO
+Imports System.Text.RegularExpressions
 
 ''' <summary>
 ''' Reads USGS rdb files containing daily values
@@ -417,6 +418,7 @@ Public Class atcTimeseriesRDB
                     Dim lDailyDischargeData As Boolean = False
 
                     Dim lAttributes As New atcDataAttributes
+                    lAttributes.SetValue("IsNewParamFormat", True)
                     Dim lCurLine As String
 
                     Dim lAttrName As String
@@ -471,6 +473,10 @@ Public Class atcTimeseriesRDB
                             lIdaData = True
                             Exit While
                         ElseIf lCurLine.Contains("DD parameter statistic") Then
+                            lDailyDischargeData = True
+                            lAttributes.SetValue("IsNewParamFormat", False)
+                            Exit While
+                        ElseIf lCurLine.Replace(" ", "").Contains("TSparameterstatistic") Then
                             lDailyDischargeData = True
                             Exit While
                         ElseIf lCurLine.Contains("Surface water measurements") Then
@@ -834,20 +840,34 @@ Public Class atcTimeseriesRDB
 
     Sub ProcessDailyValues(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
         Dim lCurLine As String
+        Dim lDDTS As String
         Dim lParmCode As String
         Dim lStatisticCode As String
         Dim lQualificationCode As String
         Dim lQualificationCodes As New atcCollection
         Dim lConstituentDescriptions As New atcCollection
+        Dim lArr() As String
 
         While aInputReader.PeekChar = Asc("#")
             lCurLine = NextLine(aInputReader)
             If lCurLine.Length > 50 Then
                 'Remember extended column labels
-                lParmCode = lCurLine.Substring(10, 5)
-                lStatisticCode = lCurLine.Substring(20, 5)
+                lArr = Regex.Split(lCurLine, "\s+")
+                lDDTS = lArr(1)
+                lParmCode = lArr(2)
+                lStatisticCode = lArr(3)
+                'If aAttributes.GetValue("IsNewParamFormat", False) Then
+                '    lDDTS = lCurLine.Substring(9, 6)
+                '    lParmCode = lCurLine.Substring(22, 5)
+                '    lStatisticCode = lCurLine.Substring(32, 5)
+                'Else
+                '    lDDTS = lCurLine.Substring(5, 2)
+                '    lParmCode = lCurLine.Substring(10, 5)
+                '    lStatisticCode = lCurLine.Substring(20, 5)
+                'End If
                 If IsNumeric(lParmCode) AndAlso IsNumeric(lStatisticCode) Then
-                    lConstituentDescriptions.Add(lCurLine.Substring(5, 2) & "_" & lParmCode & "_" & lStatisticCode, lCurLine.Substring(30).Trim)
+                    'lConstituentDescriptions.Add(lCurLine.Substring(5, 2) & "_" & lParmCode & "_" & lStatisticCode, lCurLine.Substring(30).Trim)
+                    lConstituentDescriptions.Add(lDDTS & "_" & lParmCode & "_" & lStatisticCode, lCurLine.Substring(30).Trim)
                 End If
             End If
             If lCurLine.Length > 10 Then
@@ -930,8 +950,8 @@ Public Class atcTimeseriesRDB
                                 lData.Attributes.ChangeTo(aAttributes)
                                 lData.Attributes.SetValue("ID", lRawDataSets.Count + 1)
                                 lData.numValues = lTable.NumRecords - 1
-
-                                Dim lParmCd As String = .FieldName(lField).Substring(3, 5)
+                                lArr = .FieldName(lField).Split("_")
+                                Dim lParmCd As String = lArr(1) '.FieldName(lField).Substring(3, 5)
                                 Dim lConstituent As String = lParmCd
                                 Dim lUnits As String = Nothing
                                 Select Case lConstituent
@@ -982,7 +1002,7 @@ Public Class atcTimeseriesRDB
                                     lData.Attributes.SetValue("Units", lUnits)
                                 End If
 
-                                lStatisticCode = SafeSubstring(.FieldName(lField), 9, 5)
+                                lStatisticCode = lArr(2) 'SafeSubstring(.FieldName(lField), 9, 5)
                                 If IsNumeric(lStatisticCode) Then
                                     lData.Attributes.SetValue("statistic", lStatisticCode)
                                     Select Case lStatisticCode
