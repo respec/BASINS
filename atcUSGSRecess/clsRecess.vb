@@ -5,6 +5,10 @@ Imports MapWinUtility
 
 Public Class clsRecess
 
+    Public Shared RORAKMed As atcAttributeDefinition
+    Public Shared RORASJD As atcAttributeDefinition
+    Public Shared RORAEJD As atcAttributeDefinition
+
     'Assuming when pass in, the pData already has 
     'the desired starting and ending dates!!!
     Private pData As atcTimeseries
