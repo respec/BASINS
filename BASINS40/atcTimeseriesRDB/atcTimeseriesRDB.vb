@@ -418,7 +418,10 @@ Public Class atcTimeseriesRDB
                     Dim lDailyDischargeData As Boolean = False
 
                     Dim lAttributes As New atcDataAttributes
-                    lAttributes.SetValue("IsNewParamFormat", True)
+                    Dim lDefFlagFormat As String = "IsNewParamFormat"
+                    Dim lDefStartDefinition As String = "StartDefinition"
+                    lAttributes.SetValue(lDefFlagFormat, True)
+                    lAttributes.SetValue(lDefStartDefinition, 30)
                     Dim lCurLine As String
 
                     Dim lAttrName As String
@@ -474,10 +477,15 @@ Public Class atcTimeseriesRDB
                             Exit While
                         ElseIf lCurLine.Contains("DD parameter statistic") Then
                             lDailyDischargeData = True
-                            lAttributes.SetValue("IsNewParamFormat", False)
+                            lAttributes.SetValue(lDefFlagFormat, False)
                             Exit While
-                        ElseIf lCurLine.Replace(" ", "").Contains("TSparameterstatistic") Then
+                        ElseIf lCurLine.Replace(" ", "").ToLower().Contains("tsparameterstatistic") Then
                             lDailyDischargeData = True
+                            lAttributes.SetValue(lDefStartDefinition, lCurLine.IndexOf("Description", StringComparison.OrdinalIgnoreCase))
+                            Exit While
+                        ElseIf lCurLine.Replace(" ", "").ToLower().Contains("ts_idparameterstatistic") Then
+                            lDailyDischargeData = True
+                            lAttributes.SetValue(lDefStartDefinition, lCurLine.IndexOf("Description", StringComparison.OrdinalIgnoreCase))
                             Exit While
                         ElseIf lCurLine.Contains("Surface water measurements") Then
                             lMeasurementsData = True
@@ -867,7 +875,11 @@ Public Class atcTimeseriesRDB
                 'End If
                 If IsNumeric(lParmCode) AndAlso IsNumeric(lStatisticCode) Then
                     'lConstituentDescriptions.Add(lCurLine.Substring(5, 2) & "_" & lParmCode & "_" & lStatisticCode, lCurLine.Substring(30).Trim)
-                    lConstituentDescriptions.Add(lDDTS & "_" & lParmCode & "_" & lStatisticCode, lCurLine.Substring(30).Trim)
+                    If aAttributes IsNot Nothing Then
+                        lConstituentDescriptions.Add(lDDTS & "_" & lParmCode & "_" & lStatisticCode, lCurLine.Substring(aAttributes.GetValue("StartDefinition", 30)).Trim)
+                    Else
+                        lConstituentDescriptions.Add(lDDTS & "_" & lParmCode & "_" & lStatisticCode, lCurLine.Substring(30).Trim)
+                    End If
                 End If
             End If
             If lCurLine.Length > 10 Then
