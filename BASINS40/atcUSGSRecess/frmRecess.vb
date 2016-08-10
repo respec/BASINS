@@ -1381,7 +1381,7 @@ Public Class frmRecess
         End While
     End Sub
 
-    Private Sub frmUSGSStreamFlowAnalysis_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
+    Private Sub frmRecess_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
         If pDataGroup IsNot Nothing Then
             'pDataGroup.Clear()
             'pDataGroup = Nothing
@@ -2067,9 +2067,40 @@ Public Class frmRecess
         End If
         aRecess.DoOperation("summary", "")
         With pDataGroup(0).Attributes
-            .SetValue("RORAKMed", aRecess.RecessionIndex)
-            .SetValue("RORASJD", pLastRunConfigs.GetValue("Start Date"))
-            .SetValue("RORAEJD", pLastRunConfigs.GetValue("End Date"))
+            If clsRecess.RORAKMed Is Nothing Then
+                clsRecess.RORAKMed = New atcAttributeDefinition()
+                clsRecess.RORAKMed.Name = "RORAKMed"
+                clsRecess.RORAKMed.TypeString = "Double"
+                clsRecess.RORAKMed.CopiesInherit = True
+                clsRecess.RORAKMed.Editable = False
+
+                clsRecess.RORASJD = New atcAttributeDefinition()
+                clsRecess.RORASJD.Name = "RORASJD"
+                clsRecess.RORASJD.TypeString = "Double"
+                clsRecess.RORASJD.CopiesInherit = True
+                clsRecess.RORASJD.Editable = False
+
+                clsRecess.RORAEJD = New atcAttributeDefinition()
+                clsRecess.RORAEJD.Name = "RORAEJD"
+                clsRecess.RORAEJD.TypeString = "Double"
+                clsRecess.RORAEJD.CopiesInherit = True
+                clsRecess.RORAEJD.Editable = False
+            End If
+            .SetValue(clsRecess.RORAKMed, aRecess.RecessionIndex)
+            .SetValue(clsRecess.RORASJD, pLastRunConfigs.GetValue("Start Date"))
+            .SetValue(clsRecess.RORAEJD, pLastRunConfigs.GetValue("End Date"))
+            Dim lParentSerial As Integer = .GetValue("ParentSerial", -999)
+            If lParentSerial >= 1 Then
+                For Each lTser As atcTimeseries In atcDataManager.DataSets
+                    If lTser.Serial = lParentSerial Then
+                        With lTser.Attributes
+                            .SetValue(clsRecess.RORAKMed, aRecess.RecessionIndex)
+                            .SetValue(clsRecess.RORASJD, pLastRunConfigs.GetValue("Start Date"))
+                            .SetValue(clsRecess.RORAEJD, pLastRunConfigs.GetValue("End Date"))
+                        End With
+                    End If
+                Next
+            End If
         End With
         txtAnalysisResults.Text = aRecess.Bulletin
         txtAnalysisResults.Visible = True

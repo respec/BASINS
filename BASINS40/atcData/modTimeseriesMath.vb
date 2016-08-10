@@ -1945,6 +1945,7 @@ Finished:
 
         aProvisionalTS.Attributes.ChangeTo(lCopiedAttributes)
         aNonProvisionalTS.Attributes.ChangeTo(lCopiedAttributes)
-
+        aProvisionalTS.Attributes.SetValue("ParentSerial", aTimeseries.Serial)
+        aNonProvisionalTS.Attributes.SetValue("ParentSerial", aTimeseries.Serial)
     End Sub
 End Module
