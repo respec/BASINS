@@ -563,6 +563,10 @@ Public Class frmDFLOWResults
                 cboDisplay.SelectedIndex = 0
             End If
         End If
+        'Try to display the entire grid content
+        Dim lRowHeights As Integer = agrResults.RowHeight(0) * agrResults.Source.Rows
+        Me.Height = MenuStrip1.Height + lblYears.Height + lblSeasons.Height + lRowHeights + 100
+
         Me.Show()
     End Sub
 

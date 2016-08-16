@@ -52,7 +52,7 @@ Partial Class frmDFLOWResults
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.AttributesToolStripMenuItem, Me.ViewToolStripMenuItem, Me.SelectionToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(892, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(743, 24)
         Me.MenuStrip1.TabIndex = 0
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -163,7 +163,8 @@ Partial Class frmDFLOWResults
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(772, 37)
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button1.Location = New System.Drawing.Point(609, 37)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(108, 23)
         Me.Button1.TabIndex = 9
@@ -183,7 +184,7 @@ Partial Class frmDFLOWResults
         '
         Me.Label1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 262)
+        Me.Label1.Location = New System.Drawing.Point(12, 519)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(446, 13)
         Me.Label1.TabIndex = 11
@@ -204,23 +205,25 @@ Partial Class frmDFLOWResults
         Me.agrResults.LineWidth = 0!
         Me.agrResults.Location = New System.Drawing.Point(0, 73)
         Me.agrResults.Name = "agrResults"
-        Me.agrResults.Size = New System.Drawing.Size(892, 183)
+        Me.agrResults.Size = New System.Drawing.Size(743, 440)
         Me.agrResults.Source = Nothing
         Me.agrResults.TabIndex = 7
         '
         'cboDisplay
         '
+        Me.cboDisplay.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboDisplay.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboDisplay.FormattingEnabled = True
-        Me.cboDisplay.Location = New System.Drawing.Point(645, 37)
+        Me.cboDisplay.Location = New System.Drawing.Point(482, 37)
         Me.cboDisplay.Name = "cboDisplay"
         Me.cboDisplay.Size = New System.Drawing.Size(121, 21)
         Me.cboDisplay.TabIndex = 12
         '
         'lblDisplay
         '
+        Me.lblDisplay.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblDisplay.AutoSize = True
-        Me.lblDisplay.Location = New System.Drawing.Point(556, 42)
+        Me.lblDisplay.Location = New System.Drawing.Point(393, 42)
         Me.lblDisplay.Name = "lblDisplay"
         Me.lblDisplay.Size = New System.Drawing.Size(83, 13)
         Me.lblDisplay.TabIndex = 13
@@ -230,7 +233,7 @@ Partial Class frmDFLOWResults
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(892, 283)
+        Me.ClientSize = New System.Drawing.Size(743, 540)
         Me.Controls.Add(Me.lblDisplay)
         Me.Controls.Add(Me.cboDisplay)
         Me.Controls.Add(Me.Label1)
