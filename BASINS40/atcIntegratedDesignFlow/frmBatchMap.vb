@@ -234,6 +234,7 @@ Public Class frmBatchMap
                     Dim lRPs As atcCollection = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.ReturnPeriods, Nothing)
                     pfrmParams.Initialize(Nothing, pGlobalInputsSWSTAT)
                 Else
+                    pGlobalInputsDFLOW.SetValue("Operation", "GlobalSetParm")
                     pfrmParams.Initialize(Nothing, pGlobalInputsDFLOW)
                 End If
         End Select

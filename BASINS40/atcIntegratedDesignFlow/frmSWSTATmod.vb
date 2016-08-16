@@ -135,6 +135,21 @@ Public Class frmSWSTATmod
     Friend WithEvents lblNonBioNday As System.Windows.Forms.Label
     Friend WithEvents chkNonBio3FlowPct As System.Windows.Forms.CheckBox
     Friend WithEvents chkNonBio2ExpFlow As System.Windows.Forms.CheckBox
+    Friend WithEvents tabOutlier As TabPage
+    Friend WithEvents grdStations As DataGridView
+    Friend WithEvents btnOutliers As Button
+    Friend WithEvents btnOTall As Button
+    Friend WithEvents btnOTnone As Button
+    Friend WithEvents btnOTCalculateStats As Button
+    Friend WithEvents colOutliers As DataGridViewTextBoxColumn
+    Friend WithEvents col7Q10 As DataGridViewTextBoxColumn
+    Friend WithEvents colTo As DataGridViewTextBoxColumn
+    Friend WithEvents colFrom As DataGridViewTextBoxColumn
+    Friend WithEvents colLong As DataGridViewTextBoxColumn
+    Friend WithEvents colLat As DataGridViewTextBoxColumn
+    Friend WithEvents colStationID As DataGridViewTextBoxColumn
+    Friend WithEvents colSelected As DataGridViewCheckBoxColumn
+    Friend WithEvents BackgroundWorker1 As System.ComponentModel.BackgroundWorker
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
@@ -244,6 +259,21 @@ Public Class frmSWSTATmod
         Me.tbBio1 = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.ckbBio = New System.Windows.Forms.CheckBox()
+        Me.tabOutlier = New System.Windows.Forms.TabPage()
+        Me.btnOutliers = New System.Windows.Forms.Button()
+        Me.btnOTall = New System.Windows.Forms.Button()
+        Me.btnOTnone = New System.Windows.Forms.Button()
+        Me.btnOTCalculateStats = New System.Windows.Forms.Button()
+        Me.grdStations = New System.Windows.Forms.DataGridView()
+        Me.colSelected = New System.Windows.Forms.DataGridViewCheckBoxColumn()
+        Me.colStationID = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colLat = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colLong = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colFrom = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colTo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.col7Q10 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colOutliers = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
         Me.tabMain.SuspendLayout()
         Me.tabSelectDates.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
@@ -258,6 +288,8 @@ Public Class frmSWSTATmod
         Me.tabDFLOW.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.gbBio.SuspendLayout()
+        Me.tabOutlier.SuspendLayout()
+        CType(Me.grdStations, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -294,10 +326,11 @@ Public Class frmSWSTATmod
         Me.tabMain.Controls.Add(Me.tabSelectDates)
         Me.tabMain.Controls.Add(Me.tabNDay)
         Me.tabMain.Controls.Add(Me.tabDFLOW)
+        Me.tabMain.Controls.Add(Me.tabOutlier)
         Me.tabMain.Location = New System.Drawing.Point(0, 2)
         Me.tabMain.Name = "tabMain"
         Me.tabMain.SelectedIndex = 0
-        Me.tabMain.Size = New System.Drawing.Size(443, 566)
+        Me.tabMain.Size = New System.Drawing.Size(472, 545)
         Me.tabMain.TabIndex = 1
         '
         'tabSelectDates
@@ -311,7 +344,7 @@ Public Class frmSWSTATmod
         Me.tabSelectDates.Location = New System.Drawing.Point(4, 22)
         Me.tabSelectDates.Name = "tabSelectDates"
         Me.tabSelectDates.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabSelectDates.Size = New System.Drawing.Size(435, 540)
+        Me.tabSelectDates.Size = New System.Drawing.Size(464, 519)
         Me.tabSelectDates.TabIndex = 0
         Me.tabSelectDates.Text = "Select Dates"
         Me.tabSelectDates.UseVisualStyleBackColor = True
@@ -326,7 +359,7 @@ Public Class frmSWSTATmod
         Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
         Me.gbTextOutput.Location = New System.Drawing.Point(214, 6)
         Me.gbTextOutput.Name = "gbTextOutput"
-        Me.gbTextOutput.Size = New System.Drawing.Size(212, 144)
+        Me.gbTextOutput.Size = New System.Drawing.Size(241, 144)
         Me.gbTextOutput.TabIndex = 73
         Me.gbTextOutput.TabStop = False
         Me.gbTextOutput.Text = "Output"
@@ -338,7 +371,7 @@ Public Class frmSWSTATmod
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOutputDir.Location = New System.Drawing.Point(6, 45)
         Me.txtOutputDir.Name = "txtOutputDir"
-        Me.txtOutputDir.Size = New System.Drawing.Size(200, 20)
+        Me.txtOutputDir.Size = New System.Drawing.Size(229, 20)
         Me.txtOutputDir.TabIndex = 12
         '
         'lblOutputDir
@@ -609,7 +642,7 @@ Public Class frmSWSTATmod
         Me.tabNDay.Location = New System.Drawing.Point(4, 22)
         Me.tabNDay.Name = "tabNDay"
         Me.tabNDay.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabNDay.Size = New System.Drawing.Size(435, 540)
+        Me.tabNDay.Size = New System.Drawing.Size(464, 519)
         Me.tabNDay.TabIndex = 2
         Me.tabNDay.Text = "N-Day, Trend, Frequency"
         Me.tabNDay.UseVisualStyleBackColor = True
@@ -617,7 +650,7 @@ Public Class frmSWSTATmod
         'btnDoFrequencyGrid
         '
         Me.btnDoFrequencyGrid.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDoFrequencyGrid.Location = New System.Drawing.Point(148, 423)
+        Me.btnDoFrequencyGrid.Location = New System.Drawing.Point(177, 402)
         Me.btnDoFrequencyGrid.Name = "btnDoFrequencyGrid"
         Me.btnDoFrequencyGrid.Size = New System.Drawing.Size(124, 23)
         Me.btnDoFrequencyGrid.TabIndex = 37
@@ -630,7 +663,7 @@ Public Class frmSWSTATmod
         Me.groupGraph.Controls.Add(Me.btnDoFrequencyGraph)
         Me.groupGraph.Controls.Add(Me.chkMultipleNDayPlots)
         Me.groupGraph.Controls.Add(Me.chkMultipleStationPlots)
-        Me.groupGraph.Location = New System.Drawing.Point(138, 475)
+        Me.groupGraph.Location = New System.Drawing.Point(138, 454)
         Me.groupGraph.Name = "groupGraph"
         Me.groupGraph.Size = New System.Drawing.Size(289, 57)
         Me.groupGraph.TabIndex = 43
@@ -668,7 +701,7 @@ Public Class frmSWSTATmod
         'btnFrequencyReport
         '
         Me.btnFrequencyReport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnFrequencyReport.Location = New System.Drawing.Point(148, 452)
+        Me.btnFrequencyReport.Location = New System.Drawing.Point(177, 431)
         Me.btnFrequencyReport.Name = "btnFrequencyReport"
         Me.btnFrequencyReport.Size = New System.Drawing.Size(124, 23)
         Me.btnFrequencyReport.TabIndex = 42
@@ -678,7 +711,7 @@ Public Class frmSWSTATmod
         'btnScreeningTests
         '
         Me.btnScreeningTests.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnScreeningTests.Location = New System.Drawing.Point(8, 481)
+        Me.btnScreeningTests.Location = New System.Drawing.Point(8, 460)
         Me.btnScreeningTests.Name = "btnScreeningTests"
         Me.btnScreeningTests.Size = New System.Drawing.Size(124, 23)
         Me.btnScreeningTests.TabIndex = 41
@@ -691,7 +724,7 @@ Public Class frmSWSTATmod
         Me.chkLog.AutoSize = True
         Me.chkLog.Checked = True
         Me.chkLog.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkLog.Location = New System.Drawing.Point(8, 402)
+        Me.chkLog.Location = New System.Drawing.Point(37, 381)
         Me.chkLog.Name = "chkLog"
         Me.chkLog.Size = New System.Drawing.Size(80, 17)
         Me.chkLog.TabIndex = 36
@@ -708,7 +741,7 @@ Public Class frmSWSTATmod
         Me.panelTop.Controls.Add(Me.grpNday)
         Me.panelTop.Location = New System.Drawing.Point(0, 0)
         Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(435, 399)
+        Me.panelTop.Size = New System.Drawing.Size(464, 378)
         Me.panelTop.TabIndex = 34
         '
         'grpRecurrence
@@ -725,7 +758,7 @@ Public Class frmSWSTATmod
         Me.grpRecurrence.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpRecurrence.Location = New System.Drawing.Point(210, 0)
         Me.grpRecurrence.Name = "grpRecurrence"
-        Me.grpRecurrence.Size = New System.Drawing.Size(225, 399)
+        Me.grpRecurrence.Size = New System.Drawing.Size(254, 378)
         Me.grpRecurrence.TabIndex = 7
         Me.grpRecurrence.TabStop = False
         Me.grpRecurrence.Text = "Recurrence Interval"
@@ -733,7 +766,7 @@ Public Class frmSWSTATmod
         'btnRecurrenceDefault
         '
         Me.btnRecurrenceDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(163, 340)
+        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(192, 319)
         Me.btnRecurrenceDefault.Name = "btnRecurrenceDefault"
         Me.btnRecurrenceDefault.Size = New System.Drawing.Size(56, 20)
         Me.btnRecurrenceDefault.TabIndex = 31
@@ -742,7 +775,7 @@ Public Class frmSWSTATmod
         'btnRecurrenceRemove
         '
         Me.btnRecurrenceRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(129, 340)
+        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(158, 319)
         Me.btnRecurrenceRemove.Name = "btnRecurrenceRemove"
         Me.btnRecurrenceRemove.Size = New System.Drawing.Size(28, 20)
         Me.btnRecurrenceRemove.TabIndex = 30
@@ -757,14 +790,14 @@ Public Class frmSWSTATmod
         Me.lstRecurrence.Location = New System.Drawing.Point(6, 19)
         Me.lstRecurrence.Name = "lstRecurrence"
         Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstRecurrence.Size = New System.Drawing.Size(211, 315)
+        Me.lstRecurrence.Size = New System.Drawing.Size(240, 294)
         Me.lstRecurrence.TabIndex = 27
         Me.lstRecurrence.Tag = "Return Period"
         '
         'btnRecurrenceAdd
         '
         Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(97, 340)
+        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(126, 319)
         Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
         Me.btnRecurrenceAdd.Size = New System.Drawing.Size(27, 20)
         Me.btnRecurrenceAdd.TabIndex = 29
@@ -774,15 +807,15 @@ Public Class frmSWSTATmod
         '
         Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 340)
+        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 319)
         Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
-        Me.txtRecurrenceAdd.Size = New System.Drawing.Size(85, 20)
+        Me.txtRecurrenceAdd.Size = New System.Drawing.Size(114, 20)
         Me.txtRecurrenceAdd.TabIndex = 28
         '
         'btnRecurrenceNone
         '
         Me.btnRecurrenceNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceNone.Location = New System.Drawing.Point(154, 369)
+        Me.btnRecurrenceNone.Location = New System.Drawing.Point(183, 348)
         Me.btnRecurrenceNone.Name = "btnRecurrenceNone"
         Me.btnRecurrenceNone.Size = New System.Drawing.Size(65, 24)
         Me.btnRecurrenceNone.TabIndex = 33
@@ -791,7 +824,7 @@ Public Class frmSWSTATmod
         'btnRecurrenceAll
         '
         Me.btnRecurrenceAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAll.Location = New System.Drawing.Point(6, 369)
+        Me.btnRecurrenceAll.Location = New System.Drawing.Point(6, 348)
         Me.btnRecurrenceAll.Name = "btnRecurrenceAll"
         Me.btnRecurrenceAll.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceAll.TabIndex = 32
@@ -802,7 +835,7 @@ Public Class frmSWSTATmod
         Me.Splitter1.BackColor = System.Drawing.SystemColors.Control
         Me.Splitter1.Location = New System.Drawing.Point(200, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(10, 399)
+        Me.Splitter1.Size = New System.Drawing.Size(10, 378)
         Me.Splitter1.TabIndex = 13
         Me.Splitter1.TabStop = False
         '
@@ -820,7 +853,7 @@ Public Class frmSWSTATmod
         Me.grpNday.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpNday.Location = New System.Drawing.Point(0, 0)
         Me.grpNday.Name = "grpNday"
-        Me.grpNday.Size = New System.Drawing.Size(200, 399)
+        Me.grpNday.Size = New System.Drawing.Size(200, 378)
         Me.grpNday.TabIndex = 1
         Me.grpNday.TabStop = False
         Me.grpNday.Text = "Number of Days"
@@ -828,7 +861,7 @@ Public Class frmSWSTATmod
         'btnNdayDefault
         '
         Me.btnNdayDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayDefault.Location = New System.Drawing.Point(138, 340)
+        Me.btnNdayDefault.Location = New System.Drawing.Point(138, 319)
         Me.btnNdayDefault.Name = "btnNdayDefault"
         Me.btnNdayDefault.Size = New System.Drawing.Size(56, 20)
         Me.btnNdayDefault.TabIndex = 24
@@ -837,7 +870,7 @@ Public Class frmSWSTATmod
         'btnNdayRemove
         '
         Me.btnNdayRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayRemove.Location = New System.Drawing.Point(105, 340)
+        Me.btnNdayRemove.Location = New System.Drawing.Point(105, 319)
         Me.btnNdayRemove.Name = "btnNdayRemove"
         Me.btnNdayRemove.Size = New System.Drawing.Size(27, 20)
         Me.btnNdayRemove.TabIndex = 23
@@ -846,7 +879,7 @@ Public Class frmSWSTATmod
         'btnNdayAdd
         '
         Me.btnNdayAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAdd.Location = New System.Drawing.Point(72, 340)
+        Me.btnNdayAdd.Location = New System.Drawing.Point(72, 319)
         Me.btnNdayAdd.Name = "btnNdayAdd"
         Me.btnNdayAdd.Size = New System.Drawing.Size(27, 20)
         Me.btnNdayAdd.TabIndex = 22
@@ -856,7 +889,7 @@ Public Class frmSWSTATmod
         '
         Me.txtNdayAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNdayAdd.Location = New System.Drawing.Point(6, 340)
+        Me.txtNdayAdd.Location = New System.Drawing.Point(6, 319)
         Me.txtNdayAdd.Name = "txtNdayAdd"
         Me.txtNdayAdd.Size = New System.Drawing.Size(54, 20)
         Me.txtNdayAdd.TabIndex = 21
@@ -864,7 +897,7 @@ Public Class frmSWSTATmod
         'btnNdayNone
         '
         Me.btnNdayNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayNone.Location = New System.Drawing.Point(130, 369)
+        Me.btnNdayNone.Location = New System.Drawing.Point(130, 348)
         Me.btnNdayNone.Name = "btnNdayNone"
         Me.btnNdayNone.Size = New System.Drawing.Size(64, 23)
         Me.btnNdayNone.TabIndex = 26
@@ -873,7 +906,7 @@ Public Class frmSWSTATmod
         'btnNdayAll
         '
         Me.btnNdayAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAll.Location = New System.Drawing.Point(6, 369)
+        Me.btnNdayAll.Location = New System.Drawing.Point(6, 348)
         Me.btnNdayAll.Name = "btnNdayAll"
         Me.btnNdayAll.Size = New System.Drawing.Size(64, 24)
         Me.btnNdayAll.TabIndex = 25
@@ -888,14 +921,14 @@ Public Class frmSWSTATmod
         Me.lstNday.Location = New System.Drawing.Point(6, 19)
         Me.lstNday.Name = "lstNday"
         Me.lstNday.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstNday.Size = New System.Drawing.Size(188, 315)
+        Me.lstNday.Size = New System.Drawing.Size(188, 294)
         Me.lstNday.TabIndex = 20
         Me.lstNday.Tag = "NDay"
         '
         'btnDisplayTrend
         '
         Me.btnDisplayTrend.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDisplayTrend.Location = New System.Drawing.Point(8, 452)
+        Me.btnDisplayTrend.Location = New System.Drawing.Point(8, 431)
         Me.btnDisplayTrend.Name = "btnDisplayTrend"
         Me.btnDisplayTrend.Size = New System.Drawing.Size(124, 23)
         Me.btnDisplayTrend.TabIndex = 35
@@ -905,7 +938,7 @@ Public Class frmSWSTATmod
         'btnNDay
         '
         Me.btnNDay.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNDay.Location = New System.Drawing.Point(8, 423)
+        Me.btnNDay.Location = New System.Drawing.Point(8, 402)
         Me.btnNDay.Name = "btnNDay"
         Me.btnNDay.Size = New System.Drawing.Size(124, 23)
         Me.btnNDay.TabIndex = 34
@@ -920,7 +953,7 @@ Public Class frmSWSTATmod
         Me.tabDFLOW.Location = New System.Drawing.Point(4, 22)
         Me.tabDFLOW.Name = "tabDFLOW"
         Me.tabDFLOW.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabDFLOW.Size = New System.Drawing.Size(435, 540)
+        Me.tabDFLOW.Size = New System.Drawing.Size(464, 519)
         Me.tabDFLOW.TabIndex = 3
         Me.tabDFLOW.Text = "Design Flow"
         Me.tabDFLOW.UseVisualStyleBackColor = True
@@ -1388,10 +1421,141 @@ Public Class frmSWSTATmod
         Me.ckbBio.Text = "Custom"
         Me.ckbBio.UseVisualStyleBackColor = True
         '
+        'tabOutlier
+        '
+        Me.tabOutlier.Controls.Add(Me.btnOutliers)
+        Me.tabOutlier.Controls.Add(Me.btnOTall)
+        Me.tabOutlier.Controls.Add(Me.btnOTnone)
+        Me.tabOutlier.Controls.Add(Me.btnOTCalculateStats)
+        Me.tabOutlier.Controls.Add(Me.grdStations)
+        Me.tabOutlier.Location = New System.Drawing.Point(4, 22)
+        Me.tabOutlier.Name = "tabOutlier"
+        Me.tabOutlier.Size = New System.Drawing.Size(464, 519)
+        Me.tabOutlier.TabIndex = 4
+        Me.tabOutlier.Text = "Outlier Test"
+        Me.tabOutlier.UseVisualStyleBackColor = True
+        '
+        'btnOutliers
+        '
+        Me.btnOutliers.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOutliers.Location = New System.Drawing.Point(354, 488)
+        Me.btnOutliers.Name = "btnOutliers"
+        Me.btnOutliers.Size = New System.Drawing.Size(102, 23)
+        Me.btnOutliers.TabIndex = 36
+        Me.btnOutliers.Text = "Detect Outliers"
+        Me.btnOutliers.UseVisualStyleBackColor = True
+        '
+        'btnOTall
+        '
+        Me.btnOTall.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnOTall.Location = New System.Drawing.Point(60, 488)
+        Me.btnOTall.Name = "btnOTall"
+        Me.btnOTall.Size = New System.Drawing.Size(43, 23)
+        Me.btnOTall.TabIndex = 35
+        Me.btnOTall.Text = "All"
+        Me.btnOTall.UseVisualStyleBackColor = True
+        '
+        'btnOTnone
+        '
+        Me.btnOTnone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnOTnone.Location = New System.Drawing.Point(8, 488)
+        Me.btnOTnone.Name = "btnOTnone"
+        Me.btnOTnone.Size = New System.Drawing.Size(46, 23)
+        Me.btnOTnone.TabIndex = 34
+        Me.btnOTnone.Text = "None"
+        Me.btnOTnone.UseVisualStyleBackColor = True
+        '
+        'btnOTCalculateStats
+        '
+        Me.btnOTCalculateStats.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnOTCalculateStats.Location = New System.Drawing.Point(109, 488)
+        Me.btnOTCalculateStats.Name = "btnOTCalculateStats"
+        Me.btnOTCalculateStats.Size = New System.Drawing.Size(106, 23)
+        Me.btnOTCalculateStats.TabIndex = 33
+        Me.btnOTCalculateStats.Text = "Calculate Statistics"
+        Me.btnOTCalculateStats.UseVisualStyleBackColor = True
+        '
+        'grdStations
+        '
+        Me.grdStations.AllowUserToAddRows = False
+        Me.grdStations.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grdStations.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.grdStations.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.colSelected, Me.colStationID, Me.colLat, Me.colLong, Me.colFrom, Me.colTo, Me.col7Q10, Me.colOutliers})
+        Me.grdStations.Location = New System.Drawing.Point(0, 0)
+        Me.grdStations.Name = "grdStations"
+        Me.grdStations.RowHeadersVisible = False
+        Me.grdStations.Size = New System.Drawing.Size(464, 482)
+        Me.grdStations.TabIndex = 32
+        '
+        'colSelected
+        '
+        Me.colSelected.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.colSelected.HeaderText = ""
+        Me.colSelected.Name = "colSelected"
+        Me.colSelected.Width = 5
+        '
+        'colStationID
+        '
+        Me.colStationID.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCellsExceptHeader
+        Me.colStationID.HeaderText = "Station ID"
+        Me.colStationID.MaxInputLength = 16
+        Me.colStationID.MinimumWidth = 8
+        Me.colStationID.Name = "colStationID"
+        Me.colStationID.ReadOnly = True
+        Me.colStationID.Width = 8
+        '
+        'colLat
+        '
+        Me.colLat.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCellsExceptHeader
+        Me.colLat.HeaderText = "Lat"
+        Me.colLat.MaxInputLength = 16
+        Me.colLat.Name = "colLat"
+        Me.colLat.Width = 5
+        '
+        'colLong
+        '
+        Me.colLong.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCellsExceptHeader
+        Me.colLong.HeaderText = "Long"
+        Me.colLong.Name = "colLong"
+        Me.colLong.Width = 5
+        '
+        'colFrom
+        '
+        Me.colFrom.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.colFrom.HeaderText = "From"
+        Me.colFrom.Name = "colFrom"
+        Me.colFrom.Width = 55
+        '
+        'colTo
+        '
+        Me.colTo.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.colTo.HeaderText = "To"
+        Me.colTo.Name = "colTo"
+        Me.colTo.Width = 45
+        '
+        'col7Q10
+        '
+        Me.col7Q10.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.col7Q10.HeaderText = "7Q10"
+        Me.col7Q10.Name = "col7Q10"
+        Me.col7Q10.Width = 58
+        '
+        'colOutliers
+        '
+        Me.colOutliers.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+        Me.colOutliers.HeaderText = "Is Outlier"
+        Me.colOutliers.Name = "colOutliers"
+        '
+        'BackgroundWorker1
+        '
+        Me.BackgroundWorker1.WorkerSupportsCancellation = True
+        '
         'frmSWSTATmod
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(443, 568)
+        Me.ClientSize = New System.Drawing.Size(472, 547)
         Me.Controls.Add(Me.tabMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
@@ -1421,6 +1585,8 @@ Public Class frmSWSTATmod
         Me.GroupBox2.PerformLayout()
         Me.gbBio.ResumeLayout(False)
         Me.gbBio.PerformLayout()
+        Me.tabOutlier.ResumeLayout(False)
+        CType(Me.grdStations, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1465,6 +1631,8 @@ Public Class frmSWSTATmod
     Private Shared pLastDayOfMonth() As Integer = {99, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
     Private pDFLOWScenarios As atcCollection 'a collection of InteractiveDFLOW class objects
+
+    Private pSW As New Stopwatch()
 
     Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics.html"
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
@@ -1536,6 +1704,15 @@ Public Class frmSWSTATmod
         Dim lAnnualIsLow As Boolean = False
         Dim lAnnualNday As Integer = 0
 
+        Dim lAttr_loc As String
+        Dim lAttr_Lat As Double
+        Dim lAttr_Long As Double
+        Dim lAttr_From As String
+        Dim lAttr_To As String
+        Dim lAttr_Stat As Double
+        Dim lAttr_Lat_str As String
+        Dim lAttr_Long_str As String
+        Dim lDate(5) As Integer
         For Each lDataset As atcData.atcTimeseries In pDataGroup
             If lDataset.Dates.numValues > 0 Then
                 Dim lThisDate As Double = lDataset.Dates.Value(1)
@@ -1571,6 +1748,18 @@ Public Class frmSWSTATmod
                         End If
                     End If
                 End If
+
+                'populate the outlier test tab station listing
+                With lDataset.Attributes
+                    lAttr_loc = .GetValue("Location", "")
+                    lAttr_Lat = .GetValue("Latitude", 0)
+                    lAttr_Lat_str = DoubleToString(lAttr_Lat, 15, "0.##########", aSignificantDigits:=8)
+                    lAttr_Long = .GetValue("Longitude", 0)
+                    lAttr_Long_str = DoubleToString(lAttr_Long, 15, "0.##########", aSignificantDigits:=8)
+                    lAttr_From = pDateFormat.JDateToString(lDataset.Dates.Value(0))
+                    lAttr_To = pDateFormat.JDateToString(lDataset.Dates.Value(lDataset.Dates.numValues))
+                End With
+                grdStations.Rows.Add(False, lAttr_loc, lAttr_Lat_str, lAttr_Long_str, lAttr_From, lAttr_To, "")
             End If
         Next
 
@@ -1622,7 +1811,7 @@ Public Class frmSWSTATmod
 
         If radioYearsAll.Checked Then
             radioYearsAll_CheckedChanged(Nothing, Nothing)
-        ElseIf radioYearsCustom.Checked
+        ElseIf radioYearsCustom.Checked Then
             'No need to change it
         ElseIf radioYearsCommon.Checked Then
             radioYearsCommon_CheckedChanged(Nothing, Nothing)
@@ -2197,7 +2386,7 @@ Public Class frmSWSTATmod
         RaiseEvent ParametersSet(pAttributes)
     End Sub
 
-    Private Sub Calculate(ByVal aOperationName As String, ByVal aReturnPeriods() As Double)
+    Private Sub Calculate(ByVal aOperationName As String, ByVal aReturnPeriods() As Double, Optional ByVal aNDays() As Double = Nothing, Optional aDataGroup As atcTimeseriesGroup = Nothing)
         ClearAttributes()
         SeasonsYearsFromForm() 'setup all inputs from form
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
@@ -2205,8 +2394,16 @@ Public Class frmSWSTATmod
             lTs.Attributes.SetValueIfMissing("CalcEMA", True)
         Next
         Dim lArgs As New atcDataAttributes
-        lArgs.SetValue("Timeseries", pDataGroup)
-        lArgs.SetValue("NDay", ListToArray(lstNday))
+        If aDataGroup Is Nothing Then
+            lArgs.SetValue("Timeseries", pDataGroup)
+        Else
+            lArgs.SetValue("Timeseries", aDataGroup)
+        End If
+        If aNDays Is Nothing Then
+            lArgs.SetValue("NDay", ListToArray(lstNday))
+        Else
+            lArgs.SetValue("NDay", aNDays)
+        End If
         lArgs.SetValue("Return Period", aReturnPeriods)
         lArgs.SetValue("LogFlg", chkLog.Checked)
         If pYearStartMonth > 0 Then lArgs.SetValue("BoundaryMonth", pYearStartMonth)
@@ -2503,59 +2700,116 @@ Public Class frmSWSTATmod
 
     '{
     ''' <summary>
-    ''' This function calculates the probability plot correlation coefficient test value. 
-    ''' It does the test based on the 95-percent confidence interval  
+    ''' This function calculates the Pearson Type III K ratio to test if a site statistic is in the sample array. 
+    ''' The Pearson Type III K ratio is used because there may be one or more zeroes among site statistics. 
+    ''' It takes the site statistic and an array of statistics from nearby sites and uses the lat & Long of the site of interest 
+    ''' to rank stations by proximity and compares it to the N nearby stations. 
+    ''' If the statistic for the station of interest "fits" the Kratio then returns one or less otherwise the station is an outlier.
     '''JEK:
-    '''Inputs:
-    '''dlnArray = n-day minimum time series (in cfs)
-    '''intDistribution = 3, if “logarithmic” Is checked, 2 otherwise.
-    '''Note #1: I am assuming that SWToolbox fits a Pearson Type III distribution no matter what – that no other distributional choices are available To it, And the only difference Is whether it uses a log-transformed dataset Or Not.
-    '''Note #2: No need To pass it the last two vars, where defaults are provided – the defaults are what we want To use.
-    '''Outputs:
-    '''TRUE -> PASS
-    '''FALSE-> FLAG
+    '''In order to do this, we would need to allow the user to select sites to include.  
+    '''For those sites, we'd pass the lat/lon, the 7Q10.  
+    '''So this would be done outside the integrated design frequency workflow.  
+    '''There’d have to be a separate menu item under analysis called “Compare station stats” or something like that.   
     ''' </summary>
-    ''' <param name="aAnnualTS"></param>
-    ''' <returns></returns>
-    Private Function RunPPCCTest(ByVal aAnnualTS As atcTimeseries) As String
+    ''' <param name="aDataGroup">The selected group of time series that has the chosen flow stat calculated</param>
+    ''' <param name="aStatName">7Low10</param>
+    ''' <param name="aStationID">The target station ID</param>
+    ''' <returns>R scripting console output that is written to a text file</returns>
+    Private Function RunKRatioStationsTest(ByVal aDataGroup As atcTimeseriesGroup, ByVal aStatName As String, ByVal aStationID As String) As String
+        If aDataGroup Is Nothing OrElse aDataGroup.Count = 0 Then Return "No Data"
+
         Dim lRunR As String = GetRunRExe()
         Dim lRcodeFilename As String = GetRScript()
-
-        If IO.File.Exists(lRcodeFilename) AndAlso aAnnualTS.numValues > 0 Then
-            Dim lYearsString As String = ""
-            Dim lValuesString As String = ""
-            Dim lDateArray(6) As Integer
-            For lValueIndex As Integer = 1 To aAnnualTS.numValues
-                If Not Double.IsNaN(aAnnualTS.Value(lValueIndex)) Then
-                    J2Date(aAnnualTS.Dates.Value(lValueIndex), lDateArray)
-                    lYearsString &= lDateArray(0) & ", "
-                    lValuesString &= DoubleToString(aAnnualTS.Value(lValueIndex), 15, "0.##########", aSignificantDigits:=8) & ", "
-                End If
-            Next
-            'Trim extra comma and space
-            lValuesString = lValuesString.Substring(0, lValuesString.Length - 2)
-
-            Dim lArgsFilename As String = GetTemporaryFileName("RunR_PPCC", ".R")
-            Logger.Dbg("Writing PPCC R function/arguments to " & lArgsFilename)
-            TryCopy(lRcodeFilename, lArgsFilename)
-            Dim lArgWriter As New System.IO.StreamWriter(lArgsFilename, True)
-            lArgWriter.WriteLine()
-            lArgWriter.WriteLine("# Arguments for this run")
-            lArgWriter.WriteLine("dInArray <- c(" & lValuesString & ")")
-            lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
-            lArgWriter.WriteLine("fnPPCCTest(dInArray, intDistribution, intReturn = 0, bCensorZero = TRUE)")
-            lArgWriter.Close()
-
-            Dim lResultsFilename As String = GetTemporaryFileName("Rresults_PPCC", ".txt")
-            Logger.Dbg("Writing PPCC R results to " & lResultsFilename)
-            Try
-                LaunchProgram(lRunR, IO.Path.GetDirectoryName(lRcodeFilename), lResultsFilename & " " & lArgsFilename)
-                Return IO.File.ReadAllText(lResultsFilename).TrimEnd(vbLf).TrimEnd(vbCr)
-            Catch ex As Exception
-                Return "R execution error: " & ex.InnerException.Message
-            End Try
+        If Not IO.File.Exists(lRcodeFilename) Then
+            Return "R code not found"
         End If
-        Return "R code not found"
+        Dim fnLbl As String = RTests.KRatioStations.ToString()
+        Dim dMyLat As Double
+        Dim dMyLong As Double
+        Dim dMyStat As Double
+        Dim lTs As atcTimeseries = pDataGroup.FindData("Location", aStationID)(0)
+        With lTs.Attributes
+            dMyLat = .GetValue("Latitude", Double.NaN)
+            dMyLong = .GetValue("Longitude", Double.NaN)
+            dMyStat = .GetValue(aStatName, Double.NaN)
+        End With
+        If Double.IsNaN(dMyLat) OrElse Double.IsNaN(dMyLong) OrElse Double.IsNaN(dMyStat) Then
+            Return "No Data"
+        End If
+        Dim lngStationCount As Long = aDataGroup.Count
+        Dim dArrayLat(lngStationCount - 2) As Double
+        Dim dArrayLong(lngStationCount - 2) As Double
+        Dim dArrayStat(lngStationCount - 2) As Double
+
+        Dim lDateArray(6) As Integer
+        Dim J As Integer = 0
+        For I As Integer = 0 To aDataGroup.Count - 1
+            lTs = aDataGroup(I)
+            With lTs.Attributes
+                If .GetValue("Location") <> aStationID Then
+                    dArrayLat(J) = .GetValue("Latitude", Double.NaN)
+                    dArrayLong(J) = .GetValue("Longitude", Double.NaN)
+                    dArrayStat(J) = .GetValue(aStatName, Double.NaN)
+                    If Double.IsNaN(dArrayLat(J)) OrElse Double.IsNaN(dArrayLong(J)) OrElse Double.IsNaN(dArrayStat(J)) Then
+                        ReDim dArrayLat(0)
+                        ReDim dArrayLong(0)
+                        ReDim dArrayStat(0)
+                        dArrayLat = Nothing
+                        dArrayLong = Nothing
+                        dArrayStat = Nothing
+                        Return "No Data"
+                    End If
+                    J += 1
+                End If
+            End With
+        Next
+
+        Dim lLatsString As String = ""
+        Dim lLongString As String = ""
+        Dim lStatString As String = ""
+        For lIndex As Integer = 0 To dArrayLat.Length - 1
+            lLatsString &= DoubleToString(dArrayLat(lIndex), 15, "0.##########", aSignificantDigits:=8) & ", "
+            lLongString &= DoubleToString(dArrayLong(lIndex), 15, "0.##########", aSignificantDigits:=8) & ", "
+            lStatString &= DoubleToString(dArrayStat(lIndex), 15, "0.##########", aSignificantDigits:=8) & ", "
+        Next
+        'Trim extra comma and space
+        lLatsString = lLatsString.Substring(0, lLatsString.Length - 2)
+        lLongString = lLongString.Substring(0, lLongString.Length - 2)
+        lStatString = lStatString.Substring(0, lStatString.Length - 2)
+
+        Dim lArgsFilename As String = GetTemporaryFileName("RunR_" & fnLbl, ".R")
+        Logger.Dbg("Writing Stn Outlier Test R function/arguments to " & lArgsFilename)
+        TryCopy(lRcodeFilename, lArgsFilename)
+        Dim lArgWriter As New System.IO.StreamWriter(lArgsFilename, True)
+        lArgWriter.WriteLine()
+        lArgWriter.WriteLine("# Arguments for this run")
+        'fnKRatioStations <- function(dMyLat, dMyLong, dMyStat, lngStationCount, dArrayLat, dArrayLong, dArrayStat, intReturn = 0, intppFormula = 5)
+        lArgWriter.WriteLine("dMyLat <- c(" & dMyLat & ")")
+        lArgWriter.WriteLine("dMyLong <- c(" & dMyLong & ")")
+        lArgWriter.WriteLine("dMyStat <- c(" & dMyStat & ")")
+        lArgWriter.WriteLine("lngStationCount <- c(" & lngStationCount & ")")
+        lArgWriter.WriteLine("dArrayLat <- c(" & lLatsString & ")")
+        lArgWriter.WriteLine("dArrayLong <- c(" & lLongString & ")")
+        lArgWriter.WriteLine("dArrayStat <- c(" & lStatString & ")")
+        lArgWriter.WriteLine("fnKRatioStations(dMyLat, dMyLong, dMyStat, lngStationCount, dArrayLat, dArrayLong, dArrayStat, intReturn = 0, intppFormula = 5)")
+        lArgWriter.Close()
+
+        ReDim dArrayLat(0)
+        ReDim dArrayLong(0)
+        ReDim dArrayStat(0)
+        dArrayLat = Nothing
+        dArrayLong = Nothing
+        dArrayStat = Nothing
+
+        Dim lResultsFilename As String = GetTemporaryFileName("Rresults_" & fnLbl, ".txt")
+        Logger.Dbg("Writing " & fnLbl & " R results to " & lResultsFilename)
+        Try
+            LaunchProgram(lRunR, IO.Path.GetDirectoryName(lRcodeFilename), lResultsFilename & " " & lArgsFilename)
+            Return IO.File.ReadAllText(lResultsFilename).TrimEnd(vbLf).TrimEnd(vbCr)
+        Catch ex As Exception
+            Return "R execution error: " & ex.InnerException.Message
+        End Try
+        Return ""
     End Function '}
 
     '{
@@ -2621,6 +2875,17 @@ Public Class frmSWSTATmod
                     lValuesArray.Add(aAnnualTS.Value(lValueIndex))
                 End If
             Next
+            'Test suitability for R Testing
+            Select Case aRTest
+                Case RTests.Spearman
+                    If lYearsArray.Count < 4 Then
+                        Return "<4yr"
+                    End If
+                Case Else
+                    If lYearsArray.Count < 3 Then
+                        Return "<3yr"
+                    End If
+            End Select
             'Trim extra comma and space
             lYearsString = lYearsString.Substring(0, lYearsString.Length - 2)
             lValuesString = lValuesString.Substring(0, lValuesString.Length - 2)
@@ -2638,16 +2903,28 @@ Public Class frmSWSTATmod
                     lArgWriter.WriteLine("fnGetTrend(dInputarray1, dInputArray2, intReturn = 0, dPercentConfidenceInterval = 95)")
                 Case RTests.PPCC
                     lArgWriter.WriteLine("dInArray <- c(" & lValuesString & ")")
-                    lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
+                    If chkLog.Checked Then
+                        lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
+                    Else
+                        lArgWriter.WriteLine("intDistribution <- c(" & 2 & ")")
+                    End If
                     lArgWriter.WriteLine("fnPPCCTest(dInArray, intDistribution, intReturn = 0, bCensorZero = TRUE)")
                 Case RTests.KSFit
                     lArgWriter.WriteLine("dInArray <- c(" & lValuesString & ")")
-                    lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
+                    If chkLog.Checked Then
+                        lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
+                    Else
+                        lArgWriter.WriteLine("intDistribution <- c(" & 2 & ")")
+                    End If
                     lArgWriter.WriteLine("fnProbableKSFit(dInArray, intDistribution, intReturn = 0, bCensorZero = TRUE)")
                 Case RTests.BestFitDistribution
                 Case RTests.KRatioOutliers
                     lArgWriter.WriteLine("dInArray <- c(" & lValuesString & ")")
-                    lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
+                    If chkLog.Checked Then
+                        lArgWriter.WriteLine("intDistribution <- c(" & 3 & ")")
+                    Else
+                        lArgWriter.WriteLine("intDistribution <- c(" & 2 & ")")
+                    End If
                     lArgWriter.WriteLine("fnKRatioOutlierFits(dInArray, intDistribution, bCensorZero = TRUE, intppFormula = 5)")
                 Case RTests.KRatioStations
             End Select
@@ -2797,6 +3074,8 @@ Public Class frmSWSTATmod
                 If lRankedAnnual.Count > 0 Then
                     Dim lTestResult As String = ""
                     Dim lTestName As String = ""
+                    Logger.Status("Running R Screening Tests...")
+                    Dim lTserIndex As Integer = 1
                     For Each lTS As atcTimeseries In lRankedAnnual
                         With lTS.Attributes
                             .SetValue("Original ID", lTS.OriginalParentID)
@@ -2813,6 +3092,8 @@ Public Class frmSWSTATmod
                                         .SetValueIfMissing(lTestName, "FLAG")
                                     ElseIf lTestResult = "FALSE" Then
                                         .SetValueIfMissing(lTestName, "PASS")
+                                    Else
+                                        .SetValueIfMissing(lTestName, lTestResult)
                                     End If
                                 Else
                                     .SetValueIfMissing(lTestName, "N/A")
@@ -2830,6 +3111,8 @@ Public Class frmSWSTATmod
                                         .SetValueIfMissing(lTestName, "PASS")
                                     ElseIf lTestResult = "FALSE" Then
                                         .SetValueIfMissing(lTestName, "FLAG")
+                                    Else
+                                        .SetValueIfMissing(lTestName, lTestResult)
                                     End If
                                 Else
                                     .SetValueIfMissing(lTestName, "N/A")
@@ -2847,6 +3130,8 @@ Public Class frmSWSTATmod
                                         .SetValueIfMissing(lTestName, "PASS")
                                     ElseIf lTestResult = "FALSE" Then
                                         .SetValueIfMissing(lTestName, "FLAG")
+                                    Else
+                                        .SetValueIfMissing(lTestName, lTestResult)
                                     End If
                                 Else
                                     .SetValueIfMissing(lTestName, "N/A")
@@ -2868,6 +3153,8 @@ Public Class frmSWSTATmod
                             End Try
 
                         End With
+                        Logger.Progress("R Screening Test for " & lTS.Attributes.GetValue("Location"), lTserIndex, lRankedAnnual.Count)
+                        lTserIndex += 1
                     Next
                     Dim lList As New atcList.atcListForm
                     With lList
@@ -3684,7 +3971,14 @@ Public Class frmSWSTATmod
         If chkNonBio3FlowPct.Checked Then
             lAllScenariosNBio.Add(clsInteractiveDFLOW.EDFLOWPARAM.NBIOFlowPCT, clsInteractiveDFLOW.EDFLOWPARAM.NBIOFlowPCT)
         End If
-
+        If lAllScenariosBio.Count = 0 Then
+            Logger.Msg("Need to specify at least one set of biological flow parameters.", MsgBoxStyle.Information, "DFLOW Analysis")
+            Exit Sub
+        End If
+        If lAllScenariosNBio.Count = 0 Then
+            Logger.Msg("Need to specify at least one set of non-biological flow parameters.", MsgBoxStyle.Information, "DFLOW Analysis")
+            Exit Sub
+        End If
         Dim lScenID As Integer = 1
         For Each lEScenBio As clsInteractiveDFLOW.EDFLOWPARAM In lAllScenariosBio
             For Each lEScenNBio As clsInteractiveDFLOW.EDFLOWPARAM In lAllScenariosNBio
@@ -3988,5 +4282,342 @@ Public Class frmSWSTATmod
 
 #End Region '"DFLOW"
 
+    Private Sub btnOTnone_Click(sender As Object, e As EventArgs) Handles btnOTnone.Click
+        With grdStations
+            For I As Integer = 0 To .Rows().Count - 1
+                .Item(0, I).Value = False
+            Next
+        End With
+    End Sub
+
+    Private Sub btnOTall_Click(sender As Object, e As EventArgs) Handles btnOTall.Click
+        With grdStations
+            Dim lStatVal As Double
+            For I As Integer = 0 To .Rows().Count - 1
+                If Not String.IsNullOrEmpty(.Item(6, I).Value) AndAlso Not Double.TryParse(.Item(6, I).Value, lStatVal) Then
+                    .Item(0, I).Value = False
+                    Continue For
+                Else
+                    .Item(0, I).Value = True
+                End If
+            Next
+        End With
+    End Sub
+
+    Private Sub btnOutliers_Click(sender As Object, e As EventArgs) Handles btnOutliers.Click
+        If pDataGroup.Count < 5 Then
+            Logger.Msg("Need to have at least 5 stations to perform the outlier test.", MsgBoxStyle.Exclamation, "Outliers Test")
+            Exit Sub
+        End If
+        Dim lOTStatName As String = "7Low10"
+        'Get selection station ids
+        Dim lNewGroup As New atcTimeseriesGroup()
+        Dim lTs As atcTimeseries = Nothing
+        Dim lStatVal As Double
+        Dim lLat As Double
+        Dim lLong As Double
+        Dim lRowIndices As New atcCollection()
+        Dim lTestInputsMissingInSelected As Boolean = False
+        With grdStations
+            For I As Integer = 0 To .Rows().Count - 1
+                If .Item(0, I).Value Then
+                    lTs = pDataGroup.FindData("Location", .Item(1, I).Value)(0)
+                    lStatVal = lTs.Attributes.GetValue(lOTStatName, Double.NaN)
+                    lLat = lTs.Attributes.GetValue("Latitude", Double.NaN)
+                    lLong = lTs.Attributes.GetValue("Longitude", Double.NaN)
+
+                    'Allow users to type in the lat, long, and 7Q10 statistic into the grid and use them
+                    If Double.IsNaN(lStatVal) Then
+                        If Not Double.TryParse(.Item(6, I).Value, lStatVal) Then
+                            lStatVal = Double.NaN
+                        End If
+                    End If
+                    If Double.IsNaN(lLat) Then
+                        If Not Double.TryParse(.Item(2, I).Value, lLat) Then
+                            lLat = Double.NaN
+                        End If
+                    End If
+                    If Double.IsNaN(lLong) Then
+                        If Not Double.TryParse(.Item(3, I).Value, lLong) Then
+                            lLong = Double.NaN
+                        End If
+                    End If
+                    If Not Double.IsNaN(lStatVal) AndAlso Not Double.IsNaN(lLat) AndAlso Not Double.IsNaN(lLong) Then
+                        lNewGroup.Add(lTs)
+                        lRowIndices.Add(.Item(1, I).Value, I)
+                    Else
+                        'lNewGroup.Clear()
+                        'lNewGroup = Nothing
+                        'Logger.Msg("Need to calculate the required flow statistics first for the following station:" & vbCrLf & .Item(1, I).Value,
+                        '           MsgBoxStyle.Exclamation, "Outliers Test")
+                        'Exit Sub
+
+                        'If row is selected, but missing required data, the unselect it.
+                        .Item(0, I).Value = False
+                        lTestInputsMissingInSelected = True
+                    End If
+                Else
+                    .Item(7, I).Value = ""
+                End If
+            Next
+        End With
+        If lTestInputsMissingInSelected Then
+            Logger.Msg("Some selected stations are excluded due to missing latitude, longitude, or 7Q10 statistics.",
+                       MsgBoxStyle.Information, "Outliers Test")
+        End If
+        If lNewGroup.Count < 5 Then
+            Logger.Msg("Need to select at least 5 stations to perform the outlier test.", MsgBoxStyle.Information, "Outliers Test")
+            Exit Sub
+        End If
+        'Do the outliers test
+        'Dim lRresults As String = OutlierTest(lNewGroup)
+        'rtBoxOT.AppendText(lRresults)
+        Dim lRowToUpdate As Integer = 0
+        Dim lRTable As atcTableDelimited = OutlierTest(lNewGroup)
+        If lRTable IsNot Nothing Then
+            With lRTable
+                .MoveFirst()
+                While Not .EOF()
+                    If Not String.IsNullOrEmpty(.Value(1)) Then
+                        lRowToUpdate = lRowIndices.ItemByKey(.Value(1))
+                        grdStations.Item(7, lRowToUpdate).Value = .Value(7)
+                        If String.IsNullOrEmpty(grdStations.Item(6, lRowToUpdate).Value) Then
+                            grdStations.Item(6, lRowToUpdate).Value = .Value(6)
+                        End If
+                    End If
+                    .MoveNext()
+                End While
+            End With
+            lRTable.Clear()
+            lRTable = Nothing
+        End If
+        lNewGroup.Clear()
+        lNewGroup = Nothing
+    End Sub
+
+    ''' <summary>
+    ''' Do outliers test by calling R script
+    ''' </summary>
+    ''' <param name="aDataGroup">A group of flow time series that already have the required flow stat calculated</param>
+    ''' <returns></returns>
+    Private Function OutlierTest(ByVal aDataGroup As atcTimeseriesGroup) As atcTableDelimited 'String
+        If aDataGroup Is Nothing OrElse aDataGroup.Count = 0 Then Return Nothing
+        Dim lOTStatName As String = "7Low10"
+
+        Dim lRTable As New atcTableDelimited()
+        With lRTable
+            .Delimiter = ","
+            .NumFields = 7
+            .FieldName(1) = "StationID"
+            .FieldName(2) = "Lat"
+            .FieldName(3) = "Long"
+            .FieldName(4) = "From"
+            .FieldName(5) = "To"
+            .FieldName(6) = "7Q10"
+            .FieldName(7) = "IsOutlier"
+            .CurrentRecord = 1
+        End With
+
+        Dim lRresult As String
+        Dim lStatNDayTser As atcTimeseries = Nothing
+        Dim lStationID As String
+        Dim latString As String
+        Dim longString As String
+        Dim lFrom As String
+        Dim lTo As String
+        Dim lStatVal As Double
+        Dim lOTLbl As String
+        Dim lDateFormat = New atcDateFormat()
+        With lDateFormat
+            .IncludeMonths = False
+            .IncludeDays = False
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .IncludeSeconds = False
+        End With
+
+        Logger.Status("Running R K Ratio Station Outlier Testing...")
+        Dim lProgIndex As Integer = 1
+        For Each lTs As atcTimeseries In aDataGroup
+            With lTs.Attributes
+                lStationID = .GetValue("Location")
+                lRresult = RunKRatioStationsTest(aDataGroup, lOTStatName, lStationID)
+                lStatNDayTser = .GetDefinedValue("7Q10").Arguments.GetValue("NDayTimeseries")
+                lFrom = lDateFormat.JDateToString(lStatNDayTser.Dates.Value(0))
+                lTo = lDateFormat.JDateToString(lStatNDayTser.Dates.Value(lStatNDayTser.numValues))
+                lStatVal = lTs.Attributes.GetValue(lOTStatName)
+                lRTable.Value(1) = lStationID
+                lRTable.Value(2) = .GetValue("Latitude")
+                lRTable.Value(3) = .GetValue("Longitude")
+                lRTable.Value(4) = lFrom
+                lRTable.Value(5) = lTo
+                lRTable.Value(6) = DoubleToString(lStatVal, 15, "0.##########", aSignificantDigits:=8)
+                If lRresult = "TRUE" Then
+                    lRTable.Value(7) = "No"
+                ElseIf lRresult = "FALSE" Then
+                    lRTable.Value(7) = "Yes"
+                Else
+                    lRTable.Value(7) = lRresult
+                End If
+                lRTable.CurrentRecord += 1
+            End With
+            Logger.Progress("Outlier Testing: " & lStationID, lProgIndex, aDataGroup.Count)
+            lProgIndex += 1
+        Next
+        'Dim lRTableFW As New atcTableFixed()
+        'With lRTableFW
+        '    .NumFields = 7
+        '    .FieldName(1) = "StationID"
+        '    .FieldName(2) = "Lat"
+        '    .FieldName(3) = "Long"
+        '    .FieldName(4) = "From"
+        '    .FieldName(5) = "To"
+        '    .FieldName(6) = "7Q10"
+        '    .FieldName(7) = "IsOutlier"
+        '    .FieldLength(1) = 10
+        '    .FieldLength(2) = 10
+        '    .FieldLength(3) = 10
+        '    .FieldLength(4) = 5
+        '    .FieldLength(5) = 5
+        '    .FieldLength(6) = 10
+        '    .FieldLength(7) = 10
+        'End With
+
+        'Format the result table
+        'Dim lResultBuilder As New System.Text.StringBuilder()
+        'lResultBuilder.Append("StationID".PadLeft(10, " "))
+        'lResultBuilder.Append("Lat".PadLeft(10, " "))
+        'lResultBuilder.Append("Long".PadLeft(10, " "))
+        'lResultBuilder.Append("From".PadLeft(6, " "))
+        'lResultBuilder.Append("To".PadLeft(6, " "))
+        'lResultBuilder.Append("7Q10".PadLeft(10, " "))
+        'lResultBuilder.AppendLine("IsOutlier".PadLeft(10, " "))
+        'With lRTable
+        '    .MoveFirst()
+        '    While Not .EOF
+        '        lResultBuilder.Append(.Value(1).PadLeft(10, " "))
+        '        lResultBuilder.Append(.Value(2).PadLeft(10, " "))
+        '        lResultBuilder.Append(.Value(3).PadLeft(10, " "))
+        '        lResultBuilder.Append(.Value(4).PadLeft(6, " "))
+        '        lResultBuilder.Append(.Value(5).PadLeft(6, " "))
+        '        lResultBuilder.Append(.Value(6).PadLeft(10, " "))
+        '        lResultBuilder.AppendLine(.Value(7).PadLeft(10, " "))
+        '        .MoveNext()
+        '    End While
+        'End With
+
+        'Return lRTable.ToString()
+        'Return lResultBuilder.ToString()
+        'lRTable.Clear()
+        Return lRTable
+    End Function
+
+    Private Sub btnOTCalculateStats_Click(sender As Object, e As EventArgs) Handles btnOTCalculateStats.Click
+        Dim lOTStatName As String = "7Low10"
+        Dim lNeedToRecalculate As Boolean = False
+        With grdStations
+            Dim lStationID As String
+            Dim lStatVal As Double
+            For I As Integer = 0 To .Rows().Count - 1
+                lStationID = .Item(1, I).Value
+                Dim lTs As atcTimeseries = pDataGroup.FindData("Location", lStationID)(0)
+                lStatVal = lTs.Attributes.GetValue(lOTStatName, Double.NaN)
+                If Double.IsNaN(lStatVal) Then
+                    lNeedToRecalculate = True
+                    Exit For
+                End If
+            Next
+        End With
+        If lNeedToRecalculate Then
+            Dim lWaitTime As Double = 10000
+            Dim lNDays(0) As Double : lNDays(0) = 7
+            Dim lReturns(0) As Double : lReturns(0) = 10
+            'recalculate for all time series in the data group
+            'using the current settings including season starts etc
+            Dim lNewGroup As New atcTimeseriesGroup()
+            Logger.Status("Calculating NDay Statistics...")
+            For J As Integer = 0 To pDataGroup.Count - 1
+                lNewGroup.Add(pDataGroup(J))
+                Try
+                    Calculate("n-day low value", lReturns, lNDays, lNewGroup)
+                    'Dim lInputs As New atcDataAttributes()
+                    'With lInputs
+                    '    .SetValue("NDayOpn", "n-day low value")
+                    '    .SetValue("Returns", lReturns)
+                    '    .SetValue("NDays", lNDays)
+                    '    .SetValue("DataGroup", lNewGroup)
+                    'End With
+                    'pSW.Reset()
+                    'pSW.Start()
+                    'BackgroundWorker1.RunWorkerAsync(lInputs)
+                    'While BackgroundWorker1.IsBusy
+                    '    If pSW.ElapsedMilliseconds > 10000 Then
+                    '        BackgroundWorker1.Dispose()
+                    '    End If
+                    'End While
+                Catch ex As Exception
+                    pDataGroup(J).Attributes.RemoveByKey(lOTStatName)
+                End Try
+                lNewGroup.Clear()
+                Logger.Progress("Calculated 7Q10 for " & pDataGroup(J).Attributes.GetValue("Location"), J + 1, pDataGroup.Count)
+            Next
+            lNewGroup.Clear()
+            lNewGroup = Nothing
+        End If
+        RepopulateOTGrid()
+    End Sub
+
+    'Private Sub BackgroundWorker1_DoWork(sender As System.Object, e As System.ComponentModel.DoWorkEventArgs) Handles BackgroundWorker1.DoWork
+    '    Dim lInputs As atcDataAttributes = e.Argument
+    '    Dim lOpn As String = lInputs.GetValue("NDayOpn")
+    '    Dim lReturns() As Double = lInputs.GetValue("Returns")
+    '    Dim lNDays() As Double = lInputs.GetValue("NDays")
+    '    Dim lDataGroup As atcTimeseriesGroup = lInputs.GetValue("DataGroup")
+    '    Calculate(lOpn, lReturns, lNDays, lDataGroup)
+    'End Sub
+
+    Private Sub RepopulateOTGrid()
+        Dim lOTStatName As String = "7Low10"
+        Dim lStationID As String
+        Dim lStatVal As Double
+        Dim lFrom As String = ""
+        Dim lTo As String = ""
+
+        Dim lDateFormat = New atcDateFormat()
+        With lDateFormat
+            .IncludeMonths = False
+            .IncludeDays = False
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .IncludeSeconds = False
+        End With
+
+        With grdStations
+            Dim lDefinedVal As atcDefinedValue = Nothing
+            Dim lTs As atcTimeseries = Nothing
+            Dim lStatNDayTser As atcTimeseries = Nothing
+            For I As Integer = 0 To .Rows().Count - 1
+                lStationID = .Item(1, I).Value
+                lTs = pDataGroup.FindData("Location", lStationID)(0)
+                lDefinedVal = lTs.Attributes.GetDefinedValue("7Q10")
+                If lDefinedVal IsNot Nothing Then
+                    lStatNDayTser = lDefinedVal.Arguments.GetValue("NDayTimeseries")
+                    lFrom = lDateFormat.JDateToString(lStatNDayTser.Dates.Value(0))
+                    lTo = lDateFormat.JDateToString(lStatNDayTser.Dates.Value(lStatNDayTser.numValues))
+                Else
+                    lFrom = "N/A"
+                    lTo = "N/A"
+                End If
+                .Item(4, I).Value = lFrom
+                .Item(5, I).Value = lTo
+                lStatVal = lTs.Attributes.GetValue(lOTStatName, Double.NaN)
+                If Not Double.IsNaN(lStatVal) Then
+                    .Item(6, I).Value = DoubleToString(lStatVal, 15, "0.##########", aSignificantDigits:=8)
+                Else
+                    .Item(6, I).Value = "NA, <3yr"
+                End If
+            Next
+        End With
+    End Sub
 End Class
 
