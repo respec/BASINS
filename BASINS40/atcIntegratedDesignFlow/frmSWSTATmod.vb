@@ -2743,13 +2743,21 @@ Public Class frmSWSTATmod
 
         Dim lDateArray(6) As Integer
         Dim J As Integer = 0
+        Dim lStatValue As Double = Double.NaN
+        Dim lDA As Double = Double.NaN
         For I As Integer = 0 To aDataGroup.Count - 1
             lTs = aDataGroup(I)
             With lTs.Attributes
                 If .GetValue("Location") <> aStationID Then
                     dArrayLat(J) = .GetValue("Latitude", Double.NaN)
                     dArrayLong(J) = .GetValue("Longitude", Double.NaN)
-                    dArrayStat(J) = .GetValue(aStatName, Double.NaN)
+                    lStatValue = .GetValue(aStatName, Double.NaN)
+                    lDA = .GetValue("Drainage Area", Double.NaN)
+                    If Not Double.IsNaN(lStatValue) AndAlso Not Double.IsNaN(lDA) AndAlso Not Math.Abs(lDA - 0) < 0.00001 Then
+                        dArrayStat(J) = lStatValue / lDA
+                    Else
+                        dArrayStat(J) = Double.NaN
+                    End If
                     If Double.IsNaN(dArrayLat(J)) OrElse Double.IsNaN(dArrayLong(J)) OrElse Double.IsNaN(dArrayStat(J)) Then
                         ReDim dArrayLat(0)
                         ReDim dArrayLong(0)
@@ -4316,6 +4324,7 @@ Public Class frmSWSTATmod
         Dim lStatVal As Double
         Dim lLat As Double
         Dim lLong As Double
+        Dim lDA As Double
         Dim lRowIndices As New atcCollection()
         Dim lTestInputsMissingInSelected As Boolean = False
         With grdStations
@@ -4325,6 +4334,7 @@ Public Class frmSWSTATmod
                     lStatVal = lTs.Attributes.GetValue(lOTStatName, Double.NaN)
                     lLat = lTs.Attributes.GetValue("Latitude", Double.NaN)
                     lLong = lTs.Attributes.GetValue("Longitude", Double.NaN)
+                    lDA = lTs.Attributes.GetValue("Drainage Area", Double.NaN)
 
                     'Allow users to type in the lat, long, and 7Q10 statistic into the grid and use them
                     If Double.IsNaN(lStatVal) Then
@@ -4342,7 +4352,7 @@ Public Class frmSWSTATmod
                             lLong = Double.NaN
                         End If
                     End If
-                    If Not Double.IsNaN(lStatVal) AndAlso Not Double.IsNaN(lLat) AndAlso Not Double.IsNaN(lLong) Then
+                    If Not Double.IsNaN(lStatVal) AndAlso Not Double.IsNaN(lLat) AndAlso Not Double.IsNaN(lLong) AndAlso Not Double.IsNaN(lDA) Then
                         lNewGroup.Add(lTs)
                         lRowIndices.Add(.Item(1, I).Value, I)
                     Else
@@ -4362,7 +4372,7 @@ Public Class frmSWSTATmod
             Next
         End With
         If lTestInputsMissingInSelected Then
-            Logger.Msg("Some selected stations are excluded due to missing latitude, longitude, or 7Q10 statistics.",
+            Logger.Msg("Some selected stations are excluded due to missing latitude, longitude, drainage area, or 7Q10 statistics.",
                        MsgBoxStyle.Information, "Outliers Test")
         End If
         If lNewGroup.Count < 5 Then

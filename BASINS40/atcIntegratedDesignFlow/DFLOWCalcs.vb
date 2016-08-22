@@ -253,10 +253,16 @@ Public Class DFLOWCalcs
             lFU = aDesignFlow
             lExcU = CountExcursions(lFU, aDays, aMaxDays, aMaxExcursions, aFlowRecord, lExcursions, lClusters)
             Do While (lExcU <= lMaxExcursionsAllowed)
+                If Double.IsInfinity(lFU) OrElse Double.IsNaN(lFU) Then
+                    Exit Do
+                End If
                 lFU = lFU * 2 + 1
                 lExcU = CountExcursions(lFU, aDays, aMaxDays, aMaxExcursions, aFlowRecord, lExcursions, lClusters)
             Loop
             Do While ((lFU - lFL) >= eps * lFU) And (Math.Abs(lFU - lFL) >= 0.1) And (Math.Abs(lMaxExcursionsAllowed - lExcL) >= 0.005)
+                If Double.IsInfinity(lFU) OrElse Double.IsNaN(lFU) Then
+                    Exit Do
+                End If
                 If (Math.Abs(lMaxExcursionsAllowed - lExcU) < 0.005) Then
                     lFL = lFU
                 Else
