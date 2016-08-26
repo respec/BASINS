@@ -311,6 +311,7 @@ Public Class clsBaseflowBFLOW
         'compute x and y coords for alpha regress analysis
         Dim npr As Integer = 0
         Dim kk As Integer = 0
+        Dim k As Integer = 0
         Dim x As Double = 0.0
         Dim lDates(5) As Integer
         For I As Integer = 1 To aTS.numValues
@@ -324,7 +325,7 @@ Public Class clsBaseflowBFLOW
                         bfdd(npr) = ndreg(I) / (Math.Log(q0(npr)) - Math.Log(q10(npr)))
                         qaveln(npr) = Math.Log((q0(npr) + q10(npr)) / 2.0)
                         kk = 0
-                        For k As Integer = 1 To ndreg(I)
+                        For k = 1 To ndreg(I)
                             x = Math.Log(aTS.Value(I - k))
                             If x > 0 Then
                                 kk += 1
@@ -355,7 +356,6 @@ Public Class clsBaseflowBFLOW
         Dim amn As Double
         Dim np As Integer
         Dim j As Integer
-        Dim k As Integer
         Dim Now As Integer
         Dim igap As Integer
 
