@@ -13,6 +13,7 @@ Public Enum BFMethods
     PART = 4
     BFIStandard = 5
     BFIModified = 6
+    BFLOW = 7
 End Enum
 
 Public Enum BFConstituents
