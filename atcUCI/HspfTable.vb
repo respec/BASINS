@@ -229,7 +229,9 @@ Public Class HspfTable
                 End If
                 lTableName = Def.Name & ":" & lOccur
             End If
-            If Opn.OpnBlk.TableExists(lTableName) Then lSB.AppendLine("  " & Def.Name)
+            'If Opn.OpnBlk.TableExists(lTableName) Then
+            'End If
+            lSB.AppendLine("  " & Def.Name)
 
             Dim lPendingFlag As Boolean = False
             Dim lFirstOpn As Boolean = True
@@ -378,7 +380,8 @@ notMissingTableForThisOper:
                     lSB.AppendLine(lOutPend.TrimEnd)
                 End If
             End If
-            If Opn.OpnBlk.TableExists(lTableName) Then lSB.AppendLine("  END " & Def.Name)
+            'If Opn.OpnBlk.TableExists(lTableName) Then 
+            lSB.AppendLine("  END " & Def.Name)
         Next lOccur
         Return lSB.ToString
     End Function
