@@ -14,6 +14,7 @@ Public Enum BFMethods
     BFIStandard = 5
     BFIModified = 6
     BFLOW = 7
+    TwoPRDF = 8
 End Enum
 
 Public Enum BFConstituents
