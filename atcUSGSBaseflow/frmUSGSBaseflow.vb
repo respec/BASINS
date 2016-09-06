@@ -327,8 +327,24 @@ Public Class frmUSGSBaseflow
             Dim lAskUser As String = _
             Logger.MsgCustomOwned("Invalid starting date. Use dataset start date?", "Start Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
-                lArr = txtDataStart.Text.Trim.Split("/")
-                txtStartDateUser.Text = ""
+                If String.IsNullOrEmpty(txtDataStart.Text.Trim()) Then
+                    Dim lDates(5) As Integer
+                    Dim lDateVal As Double
+                    For I As Integer = 0 To pDataGroup(0).Dates.numValues
+                        lDateVal = pDataGroup(0).Dates.Value(I)
+                        If Not Double.IsNaN(lDateVal) Then
+                            J2Date(lDateVal, lDates)
+                            ReDim lArr(2)
+                            lArr(0) = lDates(0).ToString()
+                            lArr(1) = lDates(1).ToString()
+                            lArr(2) = lDates(2).ToString()
+                            Exit For
+                        End If
+                    Next
+                Else
+                    lArr = txtDataStart.Text.Trim.Split("/")
+                    txtStartDateUser.Text = ""
+                End If
             Else
                 txtStartDateUser.Focus()
                 Return -99.0
@@ -362,8 +378,24 @@ Public Class frmUSGSBaseflow
             Dim lAskUser As String = _
             Logger.MsgCustomOwned("Invalid ending date. Use dataset end date?", "End Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
-                lArr = txtDataEnd.Text.Trim.Split("/")
-                txtEndDateUser.Text = ""
+                If String.IsNullOrEmpty(txtDataEnd.Text.Trim()) Then
+                    Dim lDates(5) As Integer
+                    Dim lDateVal As Double
+                    For I As Integer = pDataGroup(0).Dates.numValues To 0 Step -1
+                        lDateVal = pDataGroup(0).Dates.Value(I)
+                        If Not Double.IsNaN(lDateVal) Then
+                            J2Date(lDateVal, lDates)
+                            ReDim lArr(2)
+                            lArr(0) = lDates(0).ToString()
+                            lArr(1) = lDates(1).ToString()
+                            lArr(2) = lDates(2).ToString()
+                            Exit For
+                        End If
+                    Next
+                Else
+                    lArr = txtDataEnd.Text.Trim.Split("/")
+                    txtEndDateUser.Text = ""
+                End If
             Else
                 txtEndDateUser.Focus()
                 Return -99.0
