@@ -236,6 +236,23 @@ Public Class frmUSGSBaseflow
             End If
         End If
 
+        Dim lDFBeta As Double = Double.NaN
+        'If chkMethodBFLOW.Checked Then
+        '    If Not Double.TryParse(txtDFParamBeta.Text.Trim(), lDFBeta) Then
+        '        lErrMsg &= "- BFLOW method needs a valid filter parameter." & vbCrLf
+        '    End If
+        'End If
+        Dim lDFRC As Double = Double.NaN
+        Dim lDFBFImax As Double = Double.NaN
+        'If chkMethodTwoPRDF.Checked Then
+        '    If Not Double.TryParse(txtDFParamRC.Text.Trim(), lDFRC) Then
+        '        lErrMsg &= "- TwoPRDF method needs a valid recession constant." & vbCrLf
+        '    End If
+        '    If Not Double.TryParse(txtDFParamBFImax.Text.Trim(), lDFBFImax) Then
+        '        lErrMsg &= "- TwoPRDF method needs a valid BFImax." & vbCrLf
+        '    End If
+        'End If
+
         If IO.Directory.Exists(txtOutputDir.Text) Then
             Args.SetValue("OutputDir", txtOutputDir.Text)
         End If
@@ -268,6 +285,13 @@ Public Class frmUSGSBaseflow
                     lBFIYearBasis = BFInputNames.BFIReportbyWY '"Water"
                 End If
                 Args.SetValue(BFInputNames.BFIReportby, lBFIYearBasis) '"BFIReportby"
+            End If
+            If pMethods.Contains(BFMethods.BFLOW) Then
+                Args.SetValue(BFInputNames.BFLOWFilter, lDFBeta)
+            End If
+            If pMethods.Contains(BFMethods.TwoPRDF) Then
+                Args.SetValue(BFInputNames.TwoPRDFRC, lDFRC)
+                Args.SetValue(BFInputNames.TwoPRDFBFImax, lDFBFImax)
             End If
         End If
         Return lErrMsg
@@ -481,6 +505,8 @@ Public Class frmUSGSBaseflow
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIStandard", chkMethodBFIStandard.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", chkMethodBFIModified.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFLOW", chkMethodBFLOW.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodTwoPRDF", chkMethodTwoPRDF.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
 
         OutputDir = txtOutputDir.Text.Trim()
@@ -1216,12 +1242,14 @@ Public Class frmUSGSBaseflow
         Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
 
-    Private Sub BFMethods_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMethodHySEPFixed.CheckedChanged, _
-                                                                                                             chkMethodHySEPLocMin.CheckedChanged, _
-                                                                                                             chkMethodHySEPSlide.CheckedChanged, _
-                                                                                                             chkMethodPART.CheckedChanged, _
-                                                                                                             chkMethodBFIStandard.CheckedChanged, _
-                                                                                                             chkMethodBFIModified.CheckedChanged
+    Private Sub BFMethods_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMethodHySEPFixed.CheckedChanged,
+                                                                                                             chkMethodHySEPLocMin.CheckedChanged,
+                                                                                                             chkMethodHySEPSlide.CheckedChanged,
+                                                                                                             chkMethodPART.CheckedChanged,
+                                                                                                             chkMethodBFIStandard.CheckedChanged,
+                                                                                                             chkMethodBFIModified.CheckedChanged,
+                                                                                                             chkMethodBFLOW.CheckedChanged,
+                                                                                                             chkMethodTwoPRDF.CheckedChanged
         pDidBFSeparation = False
         pMethods.Clear()
         If Opened Then
@@ -1231,6 +1259,8 @@ Public Class frmUSGSBaseflow
             If chkMethodHySEPSlide.Checked Then pMethods.Add(BFMethods.HySEPSlide)
             If chkMethodBFIStandard.Checked Then pMethods.Add(BFMethods.BFIStandard)
             If chkMethodBFIModified.Checked Then pMethods.Add(BFMethods.BFIModified)
+            If chkMethodBFLOW.Checked Then pMethods.Add(BFMethods.BFLOW)
+            If chkMethodTwoPRDF.Checked Then pMethods.Add(BFMethods.TwoPRDF)
 
             Dim lBFIChosen As Boolean = False
             If chkMethodBFIStandard.Checked And chkMethodBFIModified.Checked Then
@@ -1257,6 +1287,9 @@ Public Class frmUSGSBaseflow
                 lblK.Visible = False
                 txtK.Visible = False
             End If
+            txtDFParamBeta.Enabled = chkMethodBFLOW.Checked
+            txtDFParamRC.Enabled = chkMethodTwoPRDF.Checked
+            txtDFParamBFImax.Enabled = chkMethodTwoPRDF.Checked
             If lBFIChosen Then
                 gbBFI.Enabled = True
             Else

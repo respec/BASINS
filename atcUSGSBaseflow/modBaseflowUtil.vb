@@ -200,15 +200,17 @@ Public Module modBaseflowUtil
     ''' Custom routine to match all time series' date duration such that they can be reported on even footing
     ''' currently focus on yearly bf result time series
     ''' </summary>
-    ''' <param name="lTsFlowFullRange">The streamflow record at full date range for the batch analysis</param>
-    ''' <param name="lBFReportGroup">The atcAttributes that holds all base-flow resulting time series from all methods</param>
-    Public Sub AdjustDatesOfReportingTimeseries(ByVal lTsFlowFullRange As atcTimeseries, ByVal lBFReportGroup As atcDataAttributes)
-        Dim lTsGroupPart As atcCollection = lBFReportGroup.GetValue("GroupPart", Nothing)
-        Dim lTsGroupFixed As atcCollection = lBFReportGroup.GetValue("GroupFixed", Nothing)
-        Dim lTsGroupLocMin As atcCollection = lBFReportGroup.GetValue("GroupLocMin", Nothing)
-        Dim lTsGroupSlide As atcCollection = lBFReportGroup.GetValue("GroupSlide", Nothing)
-        Dim lTsGroupBFIStandard As atcCollection = lBFReportGroup.GetValue("GroupBFIStandard", Nothing)
-        Dim lTsGroupBFIModified As atcCollection = lBFReportGroup.GetValue("GroupBFIModified", Nothing)
+    ''' <param name="aTsFlowFullRange">The streamflow record at full date range for the batch analysis</param>
+    ''' <param name="aBFReportGroup">The atcAttributes that holds all base-flow resulting time series from all methods</param>
+    Public Sub AdjustDatesOfReportingTimeseries(ByVal aTsFlowFullRange As atcTimeseries, ByVal aBFReportGroup As atcDataAttributes)
+        Dim lTsGroupPart As atcCollection = aBFReportGroup.GetValue("GroupPart", Nothing)
+        Dim lTsGroupFixed As atcCollection = aBFReportGroup.GetValue("GroupFixed", Nothing)
+        Dim lTsGroupLocMin As atcCollection = aBFReportGroup.GetValue("GroupLocMin", Nothing)
+        Dim lTsGroupSlide As atcCollection = aBFReportGroup.GetValue("GroupSlide", Nothing)
+        Dim lTsGroupBFIStandard As atcCollection = aBFReportGroup.GetValue("GroupBFIStandard", Nothing)
+        Dim lTsGroupBFIModified As atcCollection = aBFReportGroup.GetValue("GroupBFIModified", Nothing)
+        Dim lTsGroupBFLOW As atcCollection = aBFReportGroup.GetValue("GroupBFLOW", Nothing)
+        Dim lTsGroupTwoPRDF As atcCollection = aBFReportGroup.GetValue("GroupTwoPRDF", Nothing)
         'lStart = lBFReportGroup.GetValue("AnalysisStart", -99)
         'lEnd = lBFReportGroup.GetValue("AnalysisEnd", -99)
         'lDA = lBFReportGroup.GetValue("Drainage Area", -99)
@@ -221,15 +223,19 @@ Public Module modBaseflowUtil
         'Dim lTsFlowYearlySum As atcTimeseries = Nothing
         'Dim lTsFlowYearlyDepth As atcTimeseries = Nothing
         'Yearly Template
-        If lTsFlowFullRange.numValues > JulianYear Then
-            lTsFlowDailyBnd = SubsetByDateBoundary(lTsFlowFullRange, 1, 1, Nothing)
+        If aTsFlowFullRange.numValues > JulianYear Then
+            lTsFlowDailyBnd = SubsetByDateBoundary(aTsFlowFullRange, 1, 1, Nothing)
+            If lTsFlowDailyBnd Is Nothing Then Exit Sub
             lTsFlowYearly = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+            If lTsFlowYearly Is Nothing Then Exit Sub
             If lTsGroupPart IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupPart)
             If lTsGroupFixed IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupFixed)
             If lTsGroupLocMin IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupLocMin)
             If lTsGroupSlide IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupSlide)
             If lTsGroupBFIStandard IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupBFIStandard)
             If lTsGroupBFIModified IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupBFIModified)
+            If lTsGroupBFLOW IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupBFLOW)
+            If lTsGroupTwoPRDF IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupTwoPRDF)
         End If
     End Sub
 
@@ -455,6 +461,8 @@ Public Module modBaseflowUtil
             Dim lTsGroupSlide As atcCollection = Nothing
             Dim lTsGroupBFIStandard As atcCollection = Nothing
             Dim lTsGroupBFIModified As atcCollection = Nothing
+            Dim lTsGroupBFLOW As atcCollection = Nothing
+            Dim lTsGroupTwoPRDF As atcCollection = Nothing
             With lBFReportGroups
                 lTsGroupPart = .GetValue("GroupPart", Nothing)
                 lTsGroupFixed = .GetValue("GroupFixed", Nothing)
@@ -462,6 +470,8 @@ Public Module modBaseflowUtil
                 lTsGroupSlide = .GetValue("GroupSlide", Nothing)
                 lTsGroupBFIStandard = .GetValue("GroupBFIStandard", Nothing)
                 lTsGroupBFIModified = .GetValue("GroupBFIModified", Nothing)
+                lTsGroupBFLOW = .GetValue("GroupBFLOW", Nothing)
+                lTsGroupTwoPRDF = .GetValue("GroupTwoPRDF", Nothing)
             End With
             If lTsGroupPart IsNot Nothing AndAlso lTsGroupPart.Count > 0 Then
                 Dim lTs As atcTimeseries = lTsGroupPart.ItemByKey("RateDaily")
@@ -654,6 +664,70 @@ Public Module modBaseflowUtil
                 End If
             End If
 
+            If lTsGroupBFLOW IsNot Nothing AndAlso lTsGroupBFLOW.Count > 0 Then
+                Dim lTs As atcTimeseries = lTsGroupBFLOW.ItemByKey("RateDaily")
+                For I As Integer = 1 To lTs.numValues
+                    If lTs.Value(I) < 0 Then lTs.Value(I) = Double.NaN
+                Next
+                lTs.Attributes.SetValue("Method", BFMethods.BFLOW)
+                lTs.Attributes.SetValue("Constituent", "BF_BFLOW")
+                lTs.Attributes.SetValue("Location", lTsFlow.Attributes.GetValue("Location"))
+                lTs.Attributes.SetValue("Units", "cubic feet per second")
+                If lDrainageArea > 0 Then
+                    lTs.Attributes.SetValue("Drainage Area", lDrainageArea)
+                Else
+                    lTs.Attributes.SetValue("Drainage Area", -99)
+                End If
+                lNewBFTserGroup.Add(lTs)
+                If lTsFlowFullRange IsNot Nothing Then
+                    Dim lTsBFP As atcTimeseries = lTs / lTsFlowFullRange * 100
+                    With lTsBFP.Attributes
+                        .SetValue("Constituent", "BFPct_BFLOW")
+                        .SetValue("Method", BFMethods.BFLOW)
+                    End With
+                    lNewBFTserGroup.Add(lTsBFP)
+                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    With lTsRO.Attributes
+                        .SetValue("Constituent", "RO_BFLOW")
+                        .SetValue("Method", BFMethods.BFLOW)
+                        .SetValue("Units", "cubic feet per second")
+                    End With
+                    lNewBFTserGroup.Add(lTsRO)
+                End If
+            End If
+
+            If lTsGroupTwoPRDF IsNot Nothing AndAlso lTsGroupTwoPRDF.Count > 0 Then
+                Dim lTs As atcTimeseries = lTsGroupTwoPRDF.ItemByKey("RateDaily")
+                For I As Integer = 1 To lTs.numValues
+                    If lTs.Value(I) < 0 Then lTs.Value(I) = Double.NaN
+                Next
+                lTs.Attributes.SetValue("Method", BFMethods.TwoPRDF)
+                lTs.Attributes.SetValue("Constituent", "BF_TwoPRDF")
+                lTs.Attributes.SetValue("Location", lTsFlow.Attributes.GetValue("Location"))
+                lTs.Attributes.SetValue("Units", "cubic feet per second")
+                If lDrainageArea > 0 Then
+                    lTs.Attributes.SetValue("Drainage Area", lDrainageArea)
+                Else
+                    lTs.Attributes.SetValue("Drainage Area", -99)
+                End If
+                lNewBFTserGroup.Add(lTs)
+                If lTsFlowFullRange IsNot Nothing Then
+                    Dim lTsBFP As atcTimeseries = lTs / lTsFlowFullRange * 100
+                    With lTsBFP.Attributes
+                        .SetValue("Constituent", "BFPct_TwoPRDF")
+                        .SetValue("Method", BFMethods.TwoPRDF)
+                    End With
+                    lNewBFTserGroup.Add(lTsBFP)
+                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    With lTsRO.Attributes
+                        .SetValue("Constituent", "RO_TwoPRDF")
+                        .SetValue("Method", BFMethods.TwoPRDF)
+                        .SetValue("Units", "cubic feet per second")
+                    End With
+                    lNewBFTserGroup.Add(lTsRO)
+                End If
+            End If
+
             Logger.Status("Add full time span base-flow analysis result to data manager.")
             Dim lOldDataSource As atcDataSource = Nothing
             For Each lDataSource As atcDataSource In atcDataManager.DataSources
@@ -713,6 +787,8 @@ Public Module modBaseflowUtil
         Dim lTsGroupSlide As atcCollection = Nothing
         Dim lTsGroupBFIStandard As atcCollection = Nothing
         Dim lTsGroupBFIModified As atcCollection = Nothing
+        Dim lTsGroupBFLOW As atcCollection = Nothing
+        Dim lTsGroupTwoPRDF As atcCollection = Nothing
         If lReportGroupsAvailable Then
             lTsGroupPart = args.GetValue("GroupPart", Nothing)
             lTsGroupFixed = args.GetValue("GroupFixed", Nothing)
@@ -720,6 +796,8 @@ Public Module modBaseflowUtil
             lTsGroupSlide = args.GetValue("GroupSlide", Nothing)
             lTsGroupBFIStandard = args.GetValue("GroupBFIStandard", Nothing)
             lTsGroupBFIModified = args.GetValue("GroupBFIModified", Nothing)
+            lTsGroupBFLOW = args.GetValue("GroupBFLOW", Nothing)
+            lTsGroupTwoPRDF = args.GetValue("GroupTwoPRDF", Nothing)
             lStart = args.GetValue("AnalysisStart", -99)
             lEnd = args.GetValue("AnalysisEnd", -99)
             lDA = args.GetValue("Drainage Area", -99)
@@ -730,6 +808,8 @@ Public Module modBaseflowUtil
             lTsGroupSlide = ConstructReportTsGroup(aTs, BFMethods.HySEPSlide, lStart, lEnd, lDA)
             lTsGroupBFIStandard = ConstructReportTsGroup(aTs, BFMethods.BFIStandard, lStart, lEnd, lDA)
             lTsGroupBFIModified = ConstructReportTsGroup(aTs, BFMethods.BFIModified, lStart, lEnd, lDA)
+            lTsGroupBFLOW = ConstructReportTsGroup(aTs, BFMethods.BFLOW, lStart, lEnd, lDA)
+            lTsGroupTwoPRDF = ConstructReportTsGroup(aTs, BFMethods.TwoPRDF, lStart, lEnd, lDA)
         End If
 
         If (lStart < 0 AndAlso lEnd < 0) OrElse lDA <= 0 Then Exit Sub
@@ -741,6 +821,8 @@ Public Module modBaseflowUtil
             If lTsGroupSlide Is Nothing Then lTsGroupSlide = ConstructReportTsGroup(aTs, BFMethods.HySEPSlide, lStart, lEnd, lDA)
             If lTsGroupBFIStandard Is Nothing Then lTsGroupBFIStandard = ConstructReportTsGroup(aTs, BFMethods.BFIStandard, lStart, lEnd, lDA)
             If lTsGroupBFIModified Is Nothing Then lTsGroupBFIModified = ConstructReportTsGroup(aTs, BFMethods.BFIModified, lStart, lEnd, lDA)
+            If lTsGroupBFLOW Is Nothing Then lTsGroupBFLOW = ConstructReportTsGroup(aTs, BFMethods.BFLOW, lStart, lEnd, lDA)
+            If lTsGroupTwoPRDF Is Nothing Then lTsGroupTwoPRDF = ConstructReportTsGroup(aTs, BFMethods.TwoPRDF, lStart, lEnd, lDA)
         End If
 
         Dim lConversionFactor As Double = pUADepth / lDA
@@ -807,6 +889,8 @@ Public Module modBaseflowUtil
             .Add(BFMethods.HySEPSlide, "HySEP-Slide")
             .Add(BFMethods.BFIStandard, "BFIStandard")
             .Add(BFMethods.BFIModified, "BFIModified")
+            .Add(BFMethods.BFLOW, "BFLOW")
+            .Add(BFMethods.TwoPRDF, "TwoPRDF")
         End With
 
         'header for data dump file
@@ -825,6 +909,8 @@ Public Module modBaseflowUtil
             If Not MethodsLastDone.Contains(BFMethods.PART) Then lTsGroupPart.Clear()
             If Not MethodsLastDone.Contains(BFMethods.BFIStandard) Then lTsGroupBFIStandard.Clear()
             If Not MethodsLastDone.Contains(BFMethods.BFIModified) Then lTsGroupBFIModified.Clear()
+            If Not MethodsLastDone.Contains(BFMethods.BFLOW) Then lTsGroupBFLOW.Clear()
+            If Not MethodsLastDone.Contains(BFMethods.TwoPRDF) Then lTsGroupTwoPRDF.Clear()
         End If
 
         Dim lTableToReport As atcTableDelimited = ASCIICommonTable(lTsGroupStreamFlow,
@@ -834,6 +920,8 @@ Public Module modBaseflowUtil
                                                                    lTsGroupSlide,
                                                                    lTsGroupBFIStandard,
                                                                    lTsGroupBFIModified,
+                                                                   lTsGroupBFLOW,
+                                                                   lTsGroupTwoPRDF,
                                                                    "Daily")
         Dim lMethodLabelColumnStart As Integer = 7
         Dim lConsLabelColumnStart As Integer = 5
@@ -896,6 +984,8 @@ Public Module modBaseflowUtil
                                           lTsGroupSlide,
                                           lTsGroupBFIStandard,
                                           lTsGroupBFIModified,
+                                          lTsGroupBFLOW,
+                                          lTsGroupTwoPRDF,
                                           "Monthly")
         lTableHeader.CurrentRecord = 3
         lTableHeader.Value(1) = "Month"
@@ -917,6 +1007,8 @@ Public Module modBaseflowUtil
                                           lTsGroupSlide,
                                           lTsGroupBFIStandard,
                                           lTsGroupBFIModified,
+                                          lTsGroupBFLOW,
+                                          lTsGroupTwoPRDF,
                                           "Yearly")
         lTableHeader.CurrentRecord = 3
         lTableHeader.Value(1) = "Year"
@@ -990,6 +1082,8 @@ Public Module modBaseflowUtil
                                                   lTsGroupSlide,
                                                   lTsGroupBFIStandard,
                                                   lTsGroupBFIModified,
+                                                  lTsGroupBFLOW,
+                                                  lTsGroupTwoPRDF,
                                                   "Daily")
         lSW.WriteLine(lTableHeaderDuration.ToString)
         lSW.WriteLine(lTableToReport.ToString)
@@ -1022,6 +1116,8 @@ Public Module modBaseflowUtil
             Case BFMethods.PART : lMethodName = "Part"
             Case BFMethods.BFIStandard : lMethodName = "BFIStandard"
             Case BFMethods.BFIModified : lMethodName = "BFIModified"
+            Case BFMethods.BFLOW : lMethodName = "BFLOW"
+            Case BFMethods.TwoPRDF : lMethodName = "TwoPRDF"
         End Select
         'Write original HySEP and PART's output files
         If aMethod = BFMethods.HySEPFixed OrElse
@@ -1093,7 +1189,21 @@ Public Module modBaseflowUtil
             ASCIIBFI(aStreamFlowTs, lFilename, aMethod) 'lMethodName
             lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_" & lMethodName & ".tp")
             ASCIIBFITp(aStreamFlowTs, lFilename, aMethod) 'lMethodName
+        ElseIf aMethod = BFMethods.BFLOW Then
+            Dim loc As String = aStreamFlowTs.Attributes.GetValue("Location", "")
+            Dim lFilename As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_" & lMethodName & "_" & loc & ".dat")
+            ASCIIBFLOWDat(aStreamFlowTs, lFilename, aMethod) 'lMethodName
 
+            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_" & lMethodName & "_" & loc & ".out")
+            ASCIIBFLOWDailyOut(aStreamFlowTs, lFilename) 'lMethodName
+        ElseIf aMethod = BFMethods.TwoPRDF Then
+            Dim lOutputDir As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
+            lOutputDir = lOutputDir.ToLower.Substring("read from ".Length)
+            Dim lBFITXTFile As String = Path.Combine(lOutputDir, "bfi_TwoPRDF.txt")
+            ASCIITwoPRDFDat(lBFITXTFile)
+            Dim loc As String = aTS.Attributes.GetValue("Location")
+            Dim lbaseflowTXTFile As String = Path.Combine(lOutputDir, "baseflow_TwoPRDF_" & loc & ".txt")
+            ASCIITwoPRDFDailyOut(lbaseflowTXTFile, aTS, pTsBaseflow1)
         End If
 
         'With cdlg
@@ -1141,6 +1251,8 @@ Public Module modBaseflowUtil
                                  ByVal aTsGroupSlide As atcCollection,
                                  ByVal aTsGroupBFIStandard As atcCollection,
                                  ByVal aTsGroupBFIModified As atcCollection,
+                                 ByVal aTsGroupBFLOW As atcCollection,
+                                 ByVal aTsGroupTwoPRDF As atcCollection,
                                  ByVal ATStep As String) As atcTableDelimited
 
         Dim lTsFlow As atcTimeseries = aTsGroupStreamFlow.ItemByKey("Rate" & ATStep)
@@ -1223,6 +1335,30 @@ Public Module modBaseflowUtil
             lResult = ConstructExceedanceListing(lTsROBFIModified, "BFIModified", "Runoff")
             lExceedanceListing.AddRange(lResult.Keys, lResult)
         End If
+        Dim lTsBFBFLOW As atcTimeseries = Nothing
+        Dim lTsROBFLOW As atcTimeseries = Nothing
+        If aTsGroupBFLOW.Count > 0 Then
+            lTsBFBFLOW = aTsGroupBFLOW.ItemByKey("Rate" & ATStep)
+            lTsROBFLOW = lTsFlow - lTsBFBFLOW
+            SetNaNTimeseries(lTsBFBFLOW)
+            SetNaNTimeseries(lTsROBFLOW)
+            lResult = ConstructExceedanceListing(lTsBFBFLOW, "BFLOW", "Baseflow")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+            lResult = ConstructExceedanceListing(lTsROBFLOW, "BFLOW", "Runoff")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+        End If
+        Dim lTsBFTwoPRDF As atcTimeseries = Nothing
+        Dim lTsROTwoPRDF As atcTimeseries = Nothing
+        If aTsGroupTwoPRDF.Count > 0 Then
+            lTsBFTwoPRDF = aTsGroupTwoPRDF.ItemByKey("Rate" & ATStep)
+            lTsROTwoPRDF = lTsFlow - lTsBFTwoPRDF
+            SetNaNTimeseries(lTsBFTwoPRDF)
+            SetNaNTimeseries(lTsROTwoPRDF)
+            lResult = ConstructExceedanceListing(lTsBFTwoPRDF, "TwoPRDF", "Baseflow")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+            lResult = ConstructExceedanceListing(lTsROTwoPRDF, "TwoPRDF", "Runoff")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+        End If
 
         'set up table
         Dim lNumColumns As Integer = 2 + MethodsLastDone.Count * 2
@@ -1270,6 +1406,18 @@ Public Module modBaseflowUtil
                 If aTsGroupBFIModified.Count > 0 Then
                     .Value(lLastColumn + 1) = lExceedanceListing.ItemByKey("Y_BFIModified_Baseflow")(I)
                     .Value(lLastColumn + 2) = lExceedanceListing.ItemByKey("Y_BFIModified_Runoff")(I)
+                    lLastColumn += lColumnsPerMethod
+                End If
+
+                If aTsGroupBFLOW.Count > 0 Then
+                    .Value(lLastColumn + 1) = lExceedanceListing.ItemByKey("Y_BFLOW_Baseflow")(I)
+                    .Value(lLastColumn + 2) = lExceedanceListing.ItemByKey("Y_BFLOW_Runoff")(I)
+                    lLastColumn += lColumnsPerMethod
+                End If
+
+                If aTsGroupTwoPRDF.Count > 0 Then
+                    .Value(lLastColumn + 1) = lExceedanceListing.ItemByKey("Y_TwoPRDF_Baseflow")(I)
+                    .Value(lLastColumn + 2) = lExceedanceListing.ItemByKey("Y_TwoPRDF_Runoff")(I)
                     lLastColumn += lColumnsPerMethod
                 End If
                 .CurrentRecord += 1
@@ -1343,6 +1491,8 @@ Public Module modBaseflowUtil
                                  ByVal aTsGroupSlide As atcCollection,
                                  ByVal aTsGroupBFIStandard As atcCollection,
                                  ByVal aTsGroupBFIModified As atcCollection,
+                                 ByVal aTsGroupBFLOW As atcCollection,
+                                 ByVal aTsGroupTwoPRDF As atcCollection,
                                  ByVal ATStep As String) As atcTableDelimited
         'set up table
         Dim lNumColumnsPerMethod As Integer = 6
@@ -1510,7 +1660,44 @@ Public Module modBaseflowUtil
                     End If
 
                     ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
+                    lLastColumn += lNumColumnsPerMethod 'second to last column to have this jump
                 End If
+
+                If aTsGroupBFLOW.Count > 0 Then
+                    lBFTser = aTsGroupBFLOW.ItemByKey("Rate" & ATStep)
+                    lBFDepthTser = aTsGroupBFLOW.ItemByKey("Depth" & ATStep)
+                    If lBFTser IsNot Nothing Then
+                        lBF = lBFTser.Value(I)
+                    Else
+                        lBF = -99
+                    End If
+                    If lBFDepthTser IsNot Nothing Then
+                        lBFDepth = lBFDepthTser.Value(I)
+                    Else
+                        lBFDepth = -99
+                    End If
+
+                    ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
+                    lLastColumn += lNumColumnsPerMethod 'second to last column to have this jump
+                End If
+
+                If aTsGroupTwoPRDF.Count > 0 Then
+                    lBFTser = aTsGroupTwoPRDF.ItemByKey("Rate" & ATStep)
+                    lBFDepthTser = aTsGroupTwoPRDF.ItemByKey("Depth" & ATStep)
+                    If lBFTser IsNot Nothing Then
+                        lBF = lBFTser.Value(I)
+                    Else
+                        lBF = -99
+                    End If
+                    If lBFDepthTser IsNot Nothing Then
+                        lBFDepth = lBFDepthTser.Value(I)
+                    Else
+                        lBFDepth = -99
+                    End If
+
+                    ASCIICommonTableOneRow(lTableBody, lTsFlow, lTsFlowDepth, I, ATStep, lBF, lBFDepth, lLastColumn)
+                End If
+
                 .CurrentRecord += 1
             End With
         Next
@@ -4051,6 +4238,295 @@ Public Module modBaseflowUtil
         lSW.Close()
         lSW = Nothing
     End Sub
+
+    Public Sub ASCIIBFLOWDat(ByVal aTS As atcTimeseries, ByVal aFilename As String, ByVal aMethod As BFMethods)
+        Dim lTsBaseflow As atcTimeseries = Nothing
+        Dim lBFDatagroup As atcTimeseriesGroup = aTS.Attributes.GetDefinedValue("Baseflow").Value
+        If lBFDatagroup IsNot Nothing Then
+            For Each lTsBF As atcTimeseries In lBFDatagroup
+                Select Case lTsBF.Attributes.GetValue("Method")
+                    Case aMethod
+                        lTsBaseflow = lTsBF
+                End Select
+            Next
+        Else
+            Logger.Dbg("ASCIIBFLOWDat: no baseflow data found.")
+            Exit Sub
+        End If
+
+        If lTsBaseflow Is Nothing Then
+            Logger.Dbg("ASCIIBFLOWDat: no baseflow data found.")
+            Exit Sub
+        End If
+
+        Dim lResults As atcDataAttributes = lTsBaseflow.Attributes
+        Dim lSW As System.IO.StreamWriter = Nothing
+        Try
+            lSW = New System.IO.StreamWriter(aFilename, True)
+            Dim lDatasetName As String = lResults.GetValue("Location", "")
+            lSW.WriteLine("Baseflow data file: this file summarizes the fraction " &
+                          "of streamflow that is contributed by baseflow for each " &
+                          "of the 3 passes made by the program")
+            lSW.WriteLine("Gage file      " & " Baseflow Fr1" & " Baseflow Fr2" &
+                          " Baseflow Fr3" & "    NPR" & " Alpha Factor" &
+                          " Baseflow Days")
+
+            '5002 format(a15,1x,f12.2,1x,f12.2,1x,f12.2,1x,i6,1x,f12.4,1x,f13.4)
+
+            Dim lstrfwfile As String = " ".PadLeft(15, " ")
+            If Not String.IsNullOrEmpty(lDatasetName) Then
+                Dim lFilenameOnly As String = IO.Path.GetFileName(lDatasetName)
+                If lFilenameOnly.Length >= 15 Then
+                    lstrfwfile = lFilenameOnly.Substring(0, 15)
+                Else
+                    lstrfwfile = lFilenameOnly.PadLeft(15, " ")
+                End If
+            End If
+            Dim lstrbflw_fr1 As String = DoubleToString(lResults.GetValue("fr1", -99), 12, "#.00").PadLeft(12, " ")
+            Dim lstrbflw_fr2 As String = DoubleToString(lResults.GetValue("fr2", -99), 12, "#.00").PadLeft(12, " ")
+            Dim lstrbflw_fr3 As String = DoubleToString(lResults.GetValue("fr3", -99), 12, "#.00").PadLeft(12, " ")
+            Dim lstrnpr As String = ""
+            Dim lstralf As String = ""
+            Dim lstrbfd As String = ""
+            If lResults.GetValue("npr", -1) > 1 Then
+                lstrnpr = DoubleToString(lResults.GetValue("npr", -99), 0, "0").PadLeft(12, " ")
+                lstralf = DoubleToString(lResults.GetValue("alf", -99), 12, "#.0000").PadLeft(12, " ")
+                lstrbfd = DoubleToString(lResults.GetValue("bfd", -99), 13, "#.0000").PadLeft(13, " ")
+            End If
+            If String.IsNullOrEmpty(lstrnpr) Then
+                lSW.WriteLine(lstrfwfile & " " & lstrbflw_fr1 & " " & lstrbflw_fr2 & " " & lstrbflw_fr3)
+            Else
+                lSW.WriteLine(lstrfwfile & " " & lstrbflw_fr1 & " " & lstrbflw_fr2 & " " & lstrbflw_fr3 & " " &
+                              lstrnpr & " " & lstralf & " " & lstrbfd)
+            End If
+        Catch ex As Exception
+            'lOutputGood = False
+        Finally
+            If lSW IsNot Nothing Then
+                lSW.Close()
+                lSW = Nothing
+            End If
+        End Try
+    End Sub
+
+    Public Sub ASCIIBFLOWDailyOut0(ByVal aTS As atcTimeseries, ByVal aFilename As String)
+        Dim lTsBaseflow1 As atcTimeseries = Nothing
+        Dim lTsBaseflow2 As atcTimeseries = Nothing
+        Dim lTsBaseflow3 As atcTimeseries = Nothing
+
+        Dim lBFDatagroup As atcTimeseriesGroup = aTS.Attributes.GetDefinedValue("Baseflow").Value
+        If lBFDatagroup IsNot Nothing Then
+            For Each lTsBF As atcTimeseries In lBFDatagroup
+                Select Case lTsBF.Attributes.GetValue("Scenario")
+                    Case "BFLOWDaily1"
+                        lTsBaseflow1 = lTsBF
+                    Case "BFLOWDaily2"
+                        lTsBaseflow2 = lTsBF
+                    Case "BFLOWDaily3"
+                        lTsBaseflow3 = lTsBF
+                End Select
+            Next
+        Else
+            Logger.Dbg("ASCIIBFLOWDaily: no baseflow data found.")
+            Exit Sub
+        End If
+
+        If lTsBaseflow1 Is Nothing OrElse lTsBaseflow2 Is Nothing OrElse lTsBaseflow3 Is Nothing Then
+            Logger.Dbg("ASCIIBFLOWDaily: no baseflow data found.")
+            Exit Sub
+        End If
+        Dim lSW As IO.StreamWriter = Nothing
+        Try
+            lSW = New IO.StreamWriter(aFilename, False)
+            Dim lDate(5) As Integer
+            J2Date(aTS.Dates.Value(0), lDate)
+            Dim lStartingYear As String = lDate(0).ToString
+            J2Date(aTS.Dates.Value(aTS.numValues - 1), lDate)
+            Dim lEndingYear As String = lDate(0).ToString
+
+            lSW.WriteLine(" THIS IS FILE BFLOWDAY.TXT WHICH GIVES DAILY OUTPUT OF PROGRAM BFLOW. ")
+            lSW.WriteLine(" NOTE -- RESULTS AT THIS SMALL TIME SCALE ARE PROVIDED FOR ")
+            lSW.WriteLine(" THE PURPOSES OF PROGRAM SCREENING AND FOR GRAPHICS, BUT ")
+            lSW.WriteLine(" SHOULD NOT BE REPORTED OR USED QUANTITATIVELY ")
+            lSW.WriteLine("  INPUT FILE = " & IO.Path.GetFileName(aTS.Attributes.GetValue("History 1")))
+            lSW.WriteLine("  STARTING YEAR =" & lStartingYear.PadLeft(6, " "))
+            lSW.WriteLine("  ENDING YEAR =" & lEndingYear.PadLeft(8, " "))
+            lSW.WriteLine("                          BASE FLOW FOR EACH")
+            lSW.WriteLine("                             REQUIREMENT OF  ")
+            lSW.WriteLine("           STREAM         ANTECEDENT RECESSION ")
+            lSW.WriteLine("  DAY #     FLOW        #1         #2         #3          DATE ")
+            Dim lDayCount As String
+            Dim lStreamFlow As String
+            Dim lBF1 As String
+            Dim lBF2 As String
+            Dim lBF3 As String
+            Dim lDateStr As String
+
+            For I As Integer = 0 To aTS.numValues - 1
+                lDayCount = (I + 1).ToString.PadLeft(5, " ")
+                lStreamFlow = String.Format("{0:0.00}", aTS.Value(I + 1)).PadLeft(11, " ")
+                lBF1 = String.Format("{0:0.00}", lTsBaseflow1.Value(I + 1)).PadLeft(11, " ")
+                lBF2 = String.Format("{0:0.00}", lTsBaseflow2.Value(I + 1)).PadLeft(11, " ")
+                lBF3 = String.Format("{0:0.00}", lTsBaseflow3.Value(I + 1)).PadLeft(11, " ")
+                J2Date(aTS.Dates.Value(I), lDate)
+                lDateStr = lDate(0).ToString.PadLeft(9, " ") &
+                           lDate(1).ToString.PadLeft(4, " ") &
+                           lDate(2).ToString.PadLeft(4, " ")
+                lSW.WriteLine(lDayCount & lStreamFlow & lBF1 & lBF2 & lBF3 & lDateStr)
+            Next
+            lSW.Flush()
+        Catch ex As Exception
+
+        Finally
+            If lSW IsNot Nothing Then
+                lSW.Close()
+                lSW = Nothing
+            End If
+        End Try
+    End Sub
+
+    Public Sub ASCIIBFLOWDailyOut(ByVal aTS As atcTimeseries, ByVal aFilename As String)
+        Dim lTsBaseflow1 As atcTimeseries = Nothing
+        Dim lTsBaseflow2 As atcTimeseries = Nothing
+        Dim lTsBaseflow3 As atcTimeseries = Nothing
+
+        Dim lBFDatagroup As atcTimeseriesGroup = aTS.Attributes.GetDefinedValue("Baseflow").Value
+        If lBFDatagroup IsNot Nothing Then
+            For Each lTsBF As atcTimeseries In lBFDatagroup
+                Select Case lTsBF.Attributes.GetValue("Scenario")
+                    Case "BFLOWDaily1"
+                        lTsBaseflow1 = lTsBF
+                    Case "BFLOWDaily2"
+                        lTsBaseflow2 = lTsBF
+                    Case "BFLOWDaily3"
+                        lTsBaseflow3 = lTsBF
+                End Select
+            Next
+        Else
+            Logger.Dbg("ASCIIBFLOWDaily: no baseflow data found.")
+            Exit Sub
+        End If
+
+        If lTsBaseflow1 Is Nothing OrElse lTsBaseflow2 Is Nothing OrElse lTsBaseflow3 Is Nothing Then
+            Logger.Dbg("ASCIIBFLOWDaily: no baseflow data found.")
+            Exit Sub
+        End If
+        Dim lSW As IO.StreamWriter = Nothing
+        Try
+            Dim lDateFormat As New atcDateFormat()
+            With lDateFormat
+                .IncludeHours = False
+                .IncludeMinutes = False
+                .IncludeSeconds = False
+            End With
+            lSW = New IO.StreamWriter(aFilename, False)
+            Dim lDate(5) As Integer
+            J2Date(aTS.Dates.Value(0), lDate)
+            Dim lStartingYear As String = lDateFormat.JDateToString(aTS.Dates.Value(0))
+            J2Date(aTS.Dates.Value(aTS.numValues - 1), lDate)
+            Dim lEndingYear As String = lDateFormat.JDateToString(aTS.Dates.Value(aTS.numValues))
+
+            lSW.WriteLine("BFLOW Daily baseflow filters values for data from: ")
+            lSW.WriteLine("  INPUT FILE = " & IO.Path.GetFileName(aTS.Attributes.GetValue("History 1")))
+            lSW.WriteLine("  STARTING Date =" & lStartingYear.PadLeft(15, " "))
+            lSW.WriteLine("  ENDING Date =" & lEndingYear.PadLeft(15, " "))
+            lSW.WriteLine("YEARMNDY   Streamflow  Bflow Pass1  Bflow Pass2  Bflow Pass3")
+            Dim lStreamFlow As String
+            Dim lBF1 As String
+            Dim lBF2 As String
+            Dim lBF3 As String
+            Dim lDateStr As String
+
+            'write(4, 6002) iyr(i), mon(i), iday(i), strflow(i), baseq(1,i), baseq(2,i), baseq(3,i)
+            ' 6002 format (i4,i2,i2,1x,e12.6,1x,e12.6,1x,e12.6,1x,e12.6)
+
+            For I As Integer = 0 To aTS.numValues - 1
+                lStreamFlow = String.Format("{0:0.000000}", aTS.Value(I + 1)).PadLeft(13, " ")
+                lBF1 = String.Format("{0:0.000000}", lTsBaseflow1.Value(I + 1)).PadLeft(13, " ")
+                lBF2 = String.Format("{0:0.000000}", lTsBaseflow2.Value(I + 1)).PadLeft(13, " ")
+                lBF3 = String.Format("{0:0.000000}", lTsBaseflow3.Value(I + 1)).PadLeft(13, " ")
+                J2Date(aTS.Dates.Value(I), lDate)
+                lDateStr = lDate(0) &
+                           lDate(1).ToString.PadLeft(2, "0") &
+                           lDate(2).ToString.PadLeft(2, "0")
+                'lDateStr = lDateFormat.JDateToString(aTS.Dates.Value(I))
+                lSW.WriteLine(lDateStr & lStreamFlow & lBF1 & lBF2 & lBF3)
+            Next
+            lSW.Flush()
+        Catch ex As Exception
+
+        Finally
+            If lSW IsNot Nothing Then
+                lSW.Close()
+                lSW = Nothing
+            End If
+        End Try
+    End Sub
+
+    Private Function ASCIITwoPRDFDat(ByVal aFilename As String) As Boolean
+        'aFilename = "bfi.txt" -- unit 12
+        'write(12,'(I11,2X,F5.3,3X,F4.2,5X,F5.2,10X,F5.2)') gageno, a, BFI, sa, SBFImax
+        Dim lOutputGood As Boolean = True
+        Dim lSW As System.IO.StreamWriter = Nothing
+        Try
+            lSW = New StreamWriter(aFilename, True)
+            Dim lstrgageno As String = TargetTS.Attributes.GetValue("Location", "").ToString().PadLeft(11, " ")
+            Dim lstrRC As String = DoubleToString(RC, 5, "#.000").PadLeft(5, " ")
+            Dim lstrBFI As String = DoubleToString(BFI, 4, "#.00").PadLeft(4, " ")
+            Dim lstrSRC As String = DoubleToString(SRC, 5, "#.00").PadLeft(5, " ")
+            Dim lstrSBFI As String = DoubleToString(SBFImax, 5, "#.00").PadLeft(5, " ")
+            lSW.WriteLine(lstrgageno & "  " & lstrRC & "   " & lstrBFI & "     " & lstrSRC & "          " & lstrSBFI)
+        Catch ex As Exception
+            lOutputGood = False
+        Finally
+            If lSW IsNot Nothing Then
+                lSW.Close()
+                lSW = Nothing
+            End If
+        End Try
+        If Not lOutputGood Then
+
+        End If
+        Return lOutputGood
+    End Function
+
+    Private Function ASCIITwoPRDFDailyOut(ByVal aFilename As String, ByVal aTS As atcTimeseries, ByVal aBFTS As atcTimeseries) As Boolean
+        'aFilename = "baseflow_" & TargetTS.Attribute.GetValue("Location") & ".txt"
+        Dim lOutputGood As Boolean = True
+        Dim lSW As System.IO.StreamWriter = Nothing
+        Try
+            lSW = New StreamWriter(aFilename, False)
+            Dim lstrgageno As String = TargetTS.Attributes.GetValue("Location", "")
+            lSW.WriteLine("Stream- and base-flow for gage number " & lstrgageno)
+            lSW.WriteLine("recession constant= " & RC & ", BFI= " & BFI)
+            Dim lDateFormat As New atcDateFormat()
+            With lDateFormat
+                .IncludeHours = False
+                .IncludeMinutes = False
+                .IncludeSeconds = False
+            End With
+            Dim lstrDate As String = ""
+            Dim lstrFlow As String = ""
+            Dim lstrBaseflow As String = ""
+            For I As Integer = 1 To aTS.numValues
+                lstrDate = lDateFormat.JDateToString(aTS.Dates.Value(I - 1)).PadLeft(10, " ")
+                lstrFlow = DoubleToString(aTS.Value(I), 8, "0.0").PadLeft(8, " ")
+                lstrBaseflow = DoubleToString(aBFTS.Value(I), 8, "0.0").PadLeft(8, " ")
+                lSW.WriteLine(lstrDate & lstrFlow & lstrBaseflow)
+            Next
+        Catch ex As Exception
+            lOutputGood = False
+        Finally
+            If lSW IsNot Nothing Then
+                lSW.Close()
+                lSW = Nothing
+            End If
+        End Try
+        If Not lOutputGood Then
+
+        End If
+        Return lOutputGood
+    End Function
 
     ''' <summary>
     ''' chainning base-flow analysis results on different continuous periods of data into complete time series
