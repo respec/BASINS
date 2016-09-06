@@ -4006,9 +4006,12 @@ Public Class GisUtil
                 Logger.Msg("The Shapefile " & aOutputLayerName & " could not be deleted." & vbCrLf & _
                            "This can cause misleading results from the overlay operation.", "Overlay Warning")
             End If
+            lBsuc = lSfOut.SaveAs(aOutputLayerName)
         End If
 
-        lBsuc = lSfOut.SaveAs(aOutputLayerName)
+        If Not aCreateNew Then
+            lBsuc = lSfOut.Save()
+        End If
         lSfOut.StopEditingShapes()
         lSfOut.Close()
     End Sub
