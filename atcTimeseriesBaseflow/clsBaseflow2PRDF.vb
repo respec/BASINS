@@ -83,7 +83,7 @@ Public Class clsBaseflow2PRDF
         End If
 
         Dim lTsBaseflow As atcTimeseries = Nothing
-        'PrintDataSummary(lTsDaily)
+        PrintDataSummary(lTsDaily)
         Dim lNumMissing As Integer = lTsDaily.Attributes.GetValue("Count Missing")
         If lNumMissing <= 1 Then
             Logger.Dbg(
@@ -111,6 +111,7 @@ Public Class clsBaseflow2PRDF
             .SetValue("BFImax", BFImax)
             .SetValue("SBFImax", SBFImax)
             .SetValue("RC", RC)
+            .SetValue("BFI", BFI)
             .SetValue("SRC", SRC)
             .SetValue("Constituent", "BF_TwoPRDFDaily")
             .SetValue("AnalysisStart", StartDate)

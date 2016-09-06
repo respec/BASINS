@@ -263,6 +263,10 @@ Public Class atcTimeseriesBaseflow
                 Case BFMethods.BFIModified
                     ClsBaseFlow = New clsBaseflowBFI()
                     CType(ClsBaseFlow, clsBaseflowBFI).Method = BFMethods.BFIModified
+                Case BFMethods.BFLOW
+                    ClsBaseFlow = New clsBaseflowBFLOW()
+                Case BFMethods.TwoPRDF
+                    ClsBaseFlow = New clsBaseflow2PRDF()
                 Case Else
             End Select
             With ClsBaseFlow
