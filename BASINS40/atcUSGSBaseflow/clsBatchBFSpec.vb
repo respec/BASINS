@@ -588,8 +588,8 @@ Public Class clsBatchBFSpec
     Private Function SetupOutputDirectory(ByVal aOutputDir As String) As Boolean
         If Not IO.Directory.Exists(aOutputDir) Then
             Try
-                Dim lDirInfo As New IO.DirectoryInfo(aOutputDir)
-                Dim ldSecurity As System.Security.AccessControl.DirectorySecurity = lDirInfo.GetAccessControl()
+                'Dim lDirInfo As New IO.DirectoryInfo(aOutputDir)
+                'Dim ldSecurity As System.Security.AccessControl.DirectorySecurity = lDirInfo.GetAccessControl()
                 MkDirPath(aOutputDir)
             Catch ex As Exception
                 'RaiseEvent StatusUpdate("0,0,Cannot create output directory: " & vbCrLf & lOutputDir)
@@ -781,6 +781,13 @@ Public Class clsBatchBFSpec
         'gProgressBar.Minimum = 0
         'gProgressBar.Maximum = lTotalBFOpn
         'gProgressBar.Step = 1
+        Dim lDateFormat As New atcDateFormat()
+        With lDateFormat
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .IncludeSeconds = False
+        End With
+
         Dim lBFOpnCount As Integer = 1
         Dim lConfigFile As IO.StreamWriter = Nothing
         Dim lDrainageArea As Double = 0.0
@@ -839,6 +846,13 @@ Public Class clsBatchBFSpec
 
                             Dim lFlowStart As Double = lTsFlow.Dates.Value(0)
                             Dim lFlowEnd As Double = lTsFlow.Dates.Value(lTsFlow.numValues)
+
+                            'Examine full range Tser and flow Tser's duration
+                            'ToDo: could prevent going forward at this point if determine 
+                            'there is no flow data in the analysis duration.
+                            'If TSerOverlap(lTserFullDateRange, lTsFlow) Then
+                            'Else
+                            'End If
 
                             Dim lTsAnalysisGroup As New atcTimeseriesGroup()
                             If lTsFlow.Attributes.GetValue("Count missing") > 0 Then
@@ -918,15 +932,27 @@ Public Class clsBatchBFSpec
                             'lTmpGroup.Add(lTsFlow)
                             'lTmpGroup.Add(lTserFullDateRange)
                             Dim lTsFlowFullRange As atcTimeseries = MergeBaseflowTimeseries(lTserFullDateRange, lTsFlow, False, True)  'MergeTimeseries(lTmpGroup, True)
-                            AdjustDatesOfReportingTimeseries(lTsFlowFullRange, lBFReportGroups)
-                            ASCIICommon(lTsFlowFullRange, lBFReportGroups)
+                            If lTsFlowFullRange IsNot Nothing AndAlso lTsFlowFullRange.Attributes.GetValue("count positive") > 0 Then
+                                AdjustDatesOfReportingTimeseries(lTsFlowFullRange, lBFReportGroups)
+                                ASCIICommon(lTsFlowFullRange, lBFReportGroups)
+                            Else
+                                Try
+                                    lDateFormat.Midnight24 = False
+                                    Dim lAttr_From As String = lDateFormat.JDateToString(lAnalysis_Start)
+                                    lDateFormat.Midnight24 = True
+                                    Dim lAttr_To As String = lDateFormat.JDateToString(lAnalysis_End)
+                                    lStation.Message &= "No flow data within the analysis duration (" & lAttr_From & "-" & lAttr_To & "), hence no fullspan outputs."
+                                Catch ex As Exception
+                                    lStation.Message &= "No flow data within the analysis duration, hence no fullspan outputs."
+                                End Try
+                            End If
                             lTsFlowFullRange.Clear()
                             lTsFlowFullRange = Nothing
                         Catch ex As Exception
-                            lStation.Message &= "Error: Base-flow separation and/or reporting failed." & vbCrLf
+                            lStation.Message &= "Error: Base-flow separation and/or reporting failed:" & vbCrLf & ex.Message & vbCrLf
                         End Try
                     Else
-                        lStation.Message &= "Error: flow data is missing." & vbCrLf
+                        lStation.Message &= "Note: no flow data, hence no outputs." & vbCrLf
                     End If
                     'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
                     'UpdateStatus("Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True)
@@ -990,6 +1016,34 @@ Public Class clsBatchBFSpec
         'UpdateStatus("Base-flow Separation Complete for " & lTotalBFOpn & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", True)
         Logger.Msg("Base-flow Separation Complete for " & lTotalStations & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", MsgBoxStyle.Information, "Batch Run Base-flow Separation")
     End Sub '}
+
+    Public Shared Function TSerOverlap(ByVal aFullTser As atcTimeseries, ByVal aPartialTser As atcTimeseries) As Boolean
+        If aFullTser Is Nothing Then Return False
+        If aPartialTser Is Nothing Then Return False
+
+        Dim lCommonStart As Double
+        Dim lCommonEnd As Double
+        Dim lFirstStart As Double
+        Dim lastEnd As Double
+        Dim lPRGroup As New atcTimeseriesGroup()
+        lPRGroup.Add(aFullTser)
+        lPRGroup.Add(aPartialTser)
+        Dim lHasCommon As Boolean = CommonDates(lPRGroup, lFirstStart, lastEnd, lCommonStart, lCommonEnd)
+        If lHasCommon Then
+            Return True
+        Else
+            Dim lFullStart As Double = aFullTser.Dates.Value(0)
+            Dim lFullEnd As Double = aFullTser.Dates.Value(aFullTser.numValues)
+            Dim lPartialStart As Double = aPartialTser.Dates.Value(0)
+            Dim lPartialEnd As Double = aPartialTser.Dates.Value(aPartialTser.numValues)
+
+            If lPartialEnd <= lFullStart OrElse lPartialStart >= lFullEnd Then
+                Return False
+            Else
+                Return True
+            End If
+        End If
+    End Function
 
     Private Sub UpdateStatus(ByVal aMsg As String, Optional ByVal aAppend As Boolean = False, Optional ByVal aResetProgress As Boolean = False)
         If gProgressBar IsNot Nothing Then
