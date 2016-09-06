@@ -4763,6 +4763,8 @@ Public Module modBaseflowUtil
                 'lTsGroupBFIModifiedDepthAllDaily.Add(lCtr, lTsGroupBFIModified.ItemByKey("Depth" & aSTEP))
             End If
 
+            If lTsGroupBFLOW.Count > 0 Then lTsGroupBFLOWAllDaily.Add(lCtr, lTsGroupBFLOW.ItemByKey("Rate" & aSTEP))
+            If lTsGroupTwoPRDF.Count > 0 Then lTsGroupTwoPRDFAllDaily.Add(lCtr, lTsGroupTwoPRDF.ItemByKey("Rate" & aSTEP))
             If lTsGroupBFLOW.Count > 0 Then lTsGroupBFLOWDepthAllDaily.Add(lCtr, lTsGroupBFLOW.ItemByKey("Depth" & aSTEP))
             If lTsGroupTwoPRDF.Count > 0 Then lTsGroupTwoPRDFDepthAllDaily.Add(lCtr, lTsGroupTwoPRDF.ItemByKey("Depth" & aSTEP))
 
@@ -4808,6 +4810,8 @@ Public Module modBaseflowUtil
                 'lTsGroupBFIModifiedDepthAllMonthly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Depth" & aSTEP))
             End If
 
+            If lTsGroupBFLOW.Count > 0 Then lTsGroupBFLOWAllMonthly.Add(lCtr, lTsGroupBFLOW.ItemByKey("Rate" & aSTEP))
+            If lTsGroupTwoPRDF.Count > 0 Then lTsGroupTwoPRDFAllMonthly.Add(lCtr, lTsGroupTwoPRDF.ItemByKey("Rate" & aSTEP))
             If lTsGroupBFLOW.Count > 0 Then lTsGroupBFLOWDepthAllMonthly.Add(lCtr, lTsGroupBFLOW.ItemByKey("Depth" & aSTEP))
             If lTsGroupTwoPRDF.Count > 0 Then lTsGroupTwoPRDFDepthAllMonthly.Add(lCtr, lTsGroupTwoPRDF.ItemByKey("Depth" & aSTEP))
 
@@ -4880,6 +4884,8 @@ Public Module modBaseflowUtil
                 'If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedAllYearly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Rate" & aSTEP))
                 'If lTsGroupBFIModified.Count > 0 Then lTsGroupBFIModifiedDepthAllYearly.Add(lCtr, lTsGroupBFIModified.ItemByKey("Depth" & aSTEP))
             End If
+            If lTsGroupBFLOW.Count > 0 Then lTsGroupBFLOWAllYearly.Add(lCtr, lTsGroupBFLOW.ItemByKey("Rate" & aSTEP))
+            If lTsGroupTwoPRDF.Count > 0 Then lTsGroupTwoPRDFAllYearly.Add(lCtr, lTsGroupTwoPRDF.ItemByKey("Rate" & aSTEP))
             If lTsGroupBFLOW.Count > 0 Then lTsGroupBFLOWDepthAllYearly.Add(lCtr, lTsGroupBFLOW.ItemByKey("Depth" & aSTEP))
             If lTsGroupTwoPRDF.Count > 0 Then lTsGroupTwoPRDFDepthAllYearly.Add(lCtr, lTsGroupTwoPRDF.ItemByKey("Depth" & aSTEP))
         Next

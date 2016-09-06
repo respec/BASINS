@@ -605,6 +605,8 @@ Public Class frmUSGSBaseflow
         Dim lTsGroupSlide As atcCollection = ConstructGraphTsGroup(lTsDailyStreamflow, BFMethods.HySEPSlide, lStart, lEnd, lDA)
         Dim lTsGroupBFIStandard As atcCollection = ConstructGraphTsGroup(lTsDailyStreamflow, BFMethods.BFIStandard, lStart, lEnd, lDA)
         Dim lTsGroupBFIModified As atcCollection = ConstructGraphTsGroup(lTsDailyStreamflow, BFMethods.BFIModified, lStart, lEnd, lDA)
+        Dim lTsGroupBFLOW As atcCollection = ConstructGraphTsGroup(lTsDailyStreamflow, BFMethods.BFLOW, lStart, lEnd, lDA)
+        Dim lTsGroupTwoPRDF As atcCollection = ConstructGraphTsGroup(lTsDailyStreamflow, BFMethods.TwoPRDF, lStart, lEnd, lDA)
 
         Dim lYAxisTitleText As String = "FLOW, IN CUBIC FEET PER SECOND"
         If aPerUnitArea Then lYAxisTitleText &= " (per unit square mile)"
@@ -694,6 +696,28 @@ Public Class frmUSGSBaseflow
                     DisplayCDistGraph(lDataGroup)
                 End If
             End If
+            If lTsGroupBFLOW.Count > 0 Then
+                lArgs.SetValue("Method", "BFLOW")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupBFLOW, lArgs)
+                If aGraphType = "Timeseries" Then
+                    DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    DisplayCDistGraph(lDataGroup)
+                End If
+            End If
+            If lTsGroupTwoPRDF.Count > 0 Then
+                lArgs.SetValue("Method", "TwoPRDF")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupTwoPRDF, lArgs)
+                If aGraphType = "Timeseries" Then
+                    DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    DisplayCDistGraph(lDataGroup)
+                End If
+            End If
         Else 'all in one graph
             lTsGraphAll = New atcTimeseriesGroup
 
@@ -703,6 +727,8 @@ Public Class frmUSGSBaseflow
             Dim lTsGroupSlide1 As atcTimeseriesGroup = Nothing
             Dim lTsGroupBFIStandard1 As atcTimeseriesGroup = Nothing
             Dim lTsGroupBFIModified1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupBFLOW1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupTwoPRDF1 As atcTimeseriesGroup = Nothing
             Dim lTsGroupStock As New atcTimeseriesGroup
             If lTsGroupPart.Count > 0 Then
                 lArgs.SetValue("Method", "Part")
@@ -750,6 +776,16 @@ Public Class frmUSGSBaseflow
                 lArgs.SetValue("Method", "BFIModified")
                 lTsGroupBFIModified1 = SetupGraphTsGroup(lTsGroupBFIModified, lArgs)
                 lTsGroupStock.AddRange(lTsGroupBFIModified1)
+            End If
+            If lTsGroupBFLOW.Count > 0 Then
+                lArgs.SetValue("Method", "BFLOW")
+                lTsGroupBFLOW1 = SetupGraphTsGroup(lTsGroupBFLOW, lArgs)
+                lTsGroupStock.AddRange(lTsGroupBFLOW1)
+            End If
+            If lTsGroupTwoPRDF.Count > 0 Then
+                lArgs.SetValue("Method", "TwoPRDF")
+                lTsGroupTwoPRDF1 = SetupGraphTsGroup(lTsGroupTwoPRDF, lArgs)
+                lTsGroupStock.AddRange(lTsGroupTwoPRDF1)
             End If
 
             'Originally thought would treat CDist graph differently from other type of graphs
@@ -803,6 +839,8 @@ Public Class frmUSGSBaseflow
             Case "slide" : lMethodAtt = BFMethods.HySEPSlide
             Case "bfistandard" : lMethodAtt = BFMethods.BFIStandard
             Case "bfimodified" : lMethodAtt = BFMethods.BFIModified
+            Case "bflow" : lMethodAtt = BFMethods.BFLOW
+            Case "twoprdf" : lMethodAtt = BFMethods.TwoPRDF
         End Select
         Dim lBFTser As atcTimeseries = aTsCollection.ItemByKey("RateDaily")
         Dim lTsBF4Graph As atcTimeseries = Nothing
@@ -1015,6 +1053,18 @@ Public Class frmUSGSBaseflow
                     Return Drawing.Color.Yellow
                 ElseIf lCons.StartsWith("runoff") Then
                     Return Drawing.Color.YellowGreen
+                End If
+            Case BFMethods.BFLOW
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkMagenta
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.Magenta
+                End If
+            Case BFMethods.TwoPRDF
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkGoldenrod
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.Goldenrod
                 End If
         End Select
     End Function
