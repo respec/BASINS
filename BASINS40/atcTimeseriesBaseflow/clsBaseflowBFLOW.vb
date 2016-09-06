@@ -103,7 +103,7 @@ Public Class clsBaseflowBFLOW
         End If
 
         Dim lTsBaseflow As atcTimeseries = Nothing
-        'PrintDataSummary(lTsDaily)
+        PrintDataSummary(lTsDaily)
         Dim lNumMissing As Integer = lTsDaily.Attributes.GetValue("Count Missing")
         If lNumMissing <= 1 Then
             Logger.Dbg(

@@ -114,6 +114,7 @@
     </Compile>
     <Compile Include="atcTimeseriesBaseflow.vb" />
     <Compile Include="clsBaseflow.vb" />
+    <Compile Include="clsBaseflow2PRDF.vb" />
     <Compile Include="clsBaseflowBFI.vb" />
     <Compile Include="clsBaseflowBFLOW.vb" />
     <Compile Include="clsBaseflowHySep.vb" />
