@@ -16,6 +16,9 @@ Public Class BFInputNames
     Public Shared BFIReportby As String = "BFI_Reportby"
     Public Shared BFIReportbyCY As String = "Calendar"
     Public Shared BFIReportbyWY As String = "Water"
+    Public Shared BFLOWFilter As String = "BFLOWFilter"
+    Public Shared TwoPRDFRC As String = "TwoPRDF_RC"
+    Public Shared TwoPRDFBFImax As String = "TwoPRDF_BFImax"
     Public Shared StationFile As String = "StationFile"
 End Class
 

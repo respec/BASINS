@@ -47,6 +47,43 @@ Public Class clsBaseflowBFLOW
         End Set
     End Property
 
+    '10 !NDMIN: minimum Number of days for alpha calculation
+    '10 !NDMAX: maximum Number of days for alpha calculation
+    '0 !IPRINT: daily Print option (0-no; 1-yes)
+    Private pNDMIN As Integer = 10
+    Public Property NDMIN() As Double
+        Get
+            Return pNDMIN
+        End Get
+        Set(value As Double)
+            pNDMIN = value
+        End Set
+    End Property
+
+    Private pNDMAX As Integer = 10
+    Public Property NDMAX() As Double
+        Get
+            Return pNDMAX
+        End Get
+        Set(value As Double)
+            pNDMAX = value
+        End Set
+    End Property
+
+    Public Property IPRINT As Integer = 0
+
+    Private pNREGMX As Integer = 300
+    Public Property NREGMX() As Double
+        Get
+            Return pNREGMX
+        End Get
+        Set(value As Double)
+            pNREGMX = value
+        End Set
+    End Property
+
+    Public Property FP1 As Double = 0.925 'original variable name: lf1
+
     Public Sub New()
         MyBase.New()
     End Sub
@@ -71,7 +108,7 @@ Public Class clsBaseflowBFLOW
         If lNumMissing <= 1 Then
             Logger.Dbg(
                   "NUMBER OF DAYS (WITH DATA) COUNTED =            " & lTsDaily.numValues - lNumMissing & vbCrLf &
-                  "NUMBER OF DAYS THAT SHOULD BE IN THIS INTERVAL =" & lTsDaily.numValues, MsgBoxStyle.Information, "Perform PART")
+                  "NUMBER OF DAYS THAT SHOULD BE IN THIS INTERVAL =" & lTsDaily.numValues, MsgBoxStyle.Information, "Perform BFLOW")
             BFLOW(lTsDaily)
         Else
             Logger.Dbg(
@@ -79,71 +116,71 @@ Public Class clsBaseflowBFLOW
                    "*** THERE IS A BREAK IN THE STREAM- ***" & vbCrLf &
                    "*** FLOW RECORD WITHIN THE PERIOD OF **" & vbCrLf &
                    "*** INTEREST.  PROGRAM TERMINATION. ***" & vbCrLf &
-                   "***************************************", MsgBoxStyle.Critical, "PART Method Stopped")
+                   "***************************************", MsgBoxStyle.Critical, "BFLOW Method Stopped")
             If gBatchRun Then
-                gError &= vbCrLf & "Error:PART:Flow Data Has Gap."
+                gError &= vbCrLf & "Error:BFLOW:Flow Data Has Gap."
             End If
             Return Nothing
         End If
 
         Dim lTsBaseflowgroup As New atcTimeseriesGroup
         With pTsBaseflow1.Attributes
-            .SetValue("Scenario", "PartDaily1")
+            .SetValue("Scenario", "BFLOWDaily1")
             .SetValue("Drainage Area", DrainageArea)
-            .SetValue("Method", BFMethods.PART)
-            .SetValue("TBase", TBase)
-            .SetValue("Constituent", "BF_PartDaily1")
+            .SetValue("Method", BFMethods.BFLOW)
+            .SetValue("FP1", FP1)
+            .SetValue("Constituent", "BF_BFLOWDaily1")
             .SetValue("AnalysisStart", StartDate)
             .SetValue("AnalysisEnd", EndDate)
         End With
         With pTsBaseflow2.Attributes
-            .SetValue("Scenario", "PartDaily2")
+            .SetValue("Scenario", "BFLOWDaily2")
             .SetValue("Drainage Area", DrainageArea)
-            .SetValue("Method", BFMethods.PART)
-            .SetValue("TBase", TBase)
-            .SetValue("Constituent", "BF_PartDaily2")
+            .SetValue("Method", BFMethods.BFLOW)
+            .SetValue("FP1", FP1)
+            .SetValue("Constituent", "BF_BFLOWDaily2")
             .SetValue("AnalysisStart", StartDate)
             .SetValue("AnalysisEnd", EndDate)
         End With
         With pTsBaseflow3.Attributes
-            .SetValue("Scenario", "PartDaily3")
-            .SetValue("Constituent", "BF_PartDaily3")
+            .SetValue("Scenario", "BFLOWDaily3")
+            .SetValue("Constituent", "BF_BFLOWDaily3")
         End With
 
         With pTsBaseflow1Monthly.Attributes
-            .SetValue("Scenario", "PartMonthly1")
-            .SetValue("Method", BFMethods.PART)
+            .SetValue("Scenario", "BFLOWMonthly1")
+            .SetValue("Method", BFMethods.BFLOW)
             .SetValue("Drainage Area", DrainageArea)
-            .SetValue("Constituent", "BF_PartMonthly1")
+            .SetValue("Constituent", "BF_BFLOWMonthly1")
             .SetValue("AnalysisStart", StartDate)
             .SetValue("AnalysisEnd", EndDate)
         End With
         With pTsBaseflow2Monthly.Attributes
-            .SetValue("Scenario", "PartMonthly2")
-            .SetValue("Constituent", "BF_PartMonthly2")
+            .SetValue("Scenario", "BFLOWMonthly2")
+            .SetValue("Constituent", "BF_BFLOWMonthly2")
         End With
 
         With pTsBaseflow3Monthly.Attributes
-            .SetValue("Scenario", "PartMonthly3")
-            .SetValue("Constituent", "BF_PartMonthly3")
+            .SetValue("Scenario", "BFLOWMonthly3")
+            .SetValue("Constituent", "BF_BFLOWMonthly3")
         End With
 
         With pTsBaseflowMonthly.Attributes
-            .SetValue("Scenario", "PartMonthlyInterpolated")
-            .SetValue("Method", BFMethods.PART)
+            .SetValue("Scenario", "BFLOWMonthlyInterpolated")
+            .SetValue("Method", BFMethods.BFLOW)
             .SetValue("Drainage Area", DrainageArea)
             'this one has a 'LinearSlope' attribute already
-            .SetValue("Constituent", "BF_PartMonthlyInterpolated")
+            .SetValue("Constituent", "BF_BFLOWMonthlyInterpolated")
             .SetValue("AnalysisStart", StartDate)
             .SetValue("AnalysisEnd", EndDate)
         End With
         With pTsBaseflowMonthlyDepth.Attributes ' a linear interpolation of the first two bf
-            .SetValue("Scenario", "PartMonthlyDepth")
-            .SetValue("Method", BFMethods.PART)
+            .SetValue("Scenario", "BFLOWMonthlyDepth")
+            .SetValue("Method", BFMethods.BFLOW)
             .SetValue("Drainage Area", DrainageArea)
             .SetValue("SumDepth", pTotalBaseflowDepth)
             .SetValue("MissingMonths", pMissingDataMonth)
-            .SetValue("Constituent", "BF_PartMonthlyDepth")
+            .SetValue("Constituent", "BF_BFLOWMonthlyDepth")
             .SetValue("AnalysisStart", StartDate)
             .SetValue("AnalysisEnd", EndDate)
         End With
@@ -179,8 +216,8 @@ Public Class clsBaseflowBFLOW
         pTsBaseflow3.Dates = aTS.Dates
 
         'perform passes to calculate base flow
-        Dim lf1 As Double = 0.925
-        Dim lf2 As Double = (1.0 + lf1) / 2.0
+        'Dim lf1 As Double = 0.925
+        Dim lf2 As Double = (1.0 + FP1) / 2.0
         lsurfq(1) = aTS.Value(1) / 2.0
         pTsBaseflow1.Value(1) = aTS.Value(1) - lsurfq(1)
         pTsBaseflow2.Value(1) = pTsBaseflow1.Value(1)
@@ -188,7 +225,7 @@ Public Class clsBaseflowBFLOW
 
         'first pass, forward
         For I = 2 To aTS.numValues
-            lsurfq(I) = lf1 * lsurfq(I - 1) + lf2 * (aTS.Value(I) - aTS.Value(I - 1))
+            lsurfq(I) = FP1 * lsurfq(I - 1) + lf2 * (aTS.Value(I) - aTS.Value(I - 1))
             If lsurfq(I) < 0 Then
                 lsurfq(I) = 0.0
             End If
@@ -203,7 +240,7 @@ Public Class clsBaseflowBFLOW
         'second pass, backward
         pTsBaseflow2.Value(pTsBaseflow2.numValues) = pTsBaseflow1.Value(pTsBaseflow1.numValues)
         For I = aTS.numValues - 1 To 1
-            lsurfq(I) = lf1 * lsurfq(I + 1) + lf2 * (pTsBaseflow1.Value(I) - pTsBaseflow1.Value(I + 1))
+            lsurfq(I) = FP1 * lsurfq(I + 1) + lf2 * (pTsBaseflow1.Value(I) - pTsBaseflow1.Value(I + 1))
             If lsurfq(I) < 0 Then
                 lsurfq(I) = 0.0
             End If
@@ -219,7 +256,7 @@ Public Class clsBaseflowBFLOW
         'third pass, forward
         pTsBaseflow3.Value(pTsBaseflow3.numValues) = pTsBaseflow1.Value(pTsBaseflow1.numValues)
         For I = 2 To aTS.numValues
-            lsurfq(I) = lf1 * lsurfq(I - 1) + lf2 * (pTsBaseflow2.Value(I) - pTsBaseflow2.Value(I - 1))
+            lsurfq(I) = FP1 * lsurfq(I - 1) + lf2 * (pTsBaseflow2.Value(I) - pTsBaseflow2.Value(I - 1))
             If lsurfq(I) < 0 Then
                 lsurfq(I) = 0.0
             End If
@@ -266,38 +303,38 @@ Public Class clsBaseflowBFLOW
         ReDim q0(aTS.numValues)
         ReDim q10(aTS.numValues)
 
-        Dim nregmx As Integer = 300
+        'Dim nregmx As Integer = 300
         'real, dimension(nregmx, 200) : florec
         'real, dimension(nregmx) : aveflo, bfdd, qaveln
         'Integer, dimension(200) : icount
         'Integer, dimension(nregmx) : npreg, idone
-        Dim florec(nregmx, 200) As Double
-        Dim aveflo(nregmx) As Double
-        Dim bfdd(nregmx) As Double
-        Dim qaveln(nregmx) As Double
-        Dim npreg(nregmx) As Integer
-        Dim idone(nregmx) As Integer
+        Dim florec(NREGMX, 200) As Double
+        Dim aveflo(NREGMX) As Double
+        Dim bfdd(NREGMX) As Double
+        Dim qaveln(NREGMX) As Double
+        Dim npreg(NREGMX) As Integer
+        Dim idone(NREGMX) As Integer
         Dim icount(200) As Integer
 
         Dim nd As Integer = 0
         '10 !NDMIN: minimum Number of days for alpha calculation
         '10 !NDMAX: maximum Number of days for alpha calculation
         '0 !IPRINT: daily Print option (0-no; 1-yes)
-        Dim ndmin As Integer = 10
-        Dim ndmax As Integer = 10
-        Dim iprint As Integer = 0
+        'Dim ndmin As Integer = 10
+        'Dim ndmax As Integer = 10
+        'Dim iprint As Integer = 0
 
         For I As Integer = 1 To aTS.numValues
             If aTS.Value(I) > 0 Then
                 If pTsBaseflow1.Value(I) / aTS.Value(I) < 0.99 Then
-                    If nd >= ndmin Then
+                    If nd >= NDMIN Then
                         alpha(I) = Math.Log(aTS.Value(I - nd) / aTS.Value(I - 1)) / nd
                         ndreg(I) = nd
                     End If
                     nd = 0
                 Else
                     nd += 1
-                    If nd >= ndmax Then
+                    If nd >= NDMAX Then
                         alpha(I) = Math.Log(aTS.Value(I - nd + 1) / aTS.Value(I)) / nd
                         ndreg(I) = nd
                         nd = 0
@@ -405,7 +442,7 @@ Public Class clsBaseflowBFLOW
                     icount(Now) = 1
                     igap = 1
                 Else
-                    For I As Integer = 1 To nregmx
+                    For I As Integer = 1 To NREGMX
                         If florec(1, Now) <= aveflo(I) Then
                             icount(Now) = I
                             igap = 1
@@ -421,7 +458,7 @@ Public Class clsBaseflowBFLOW
                     sumy = 0
                     sumxy = 0
                     sumx2 = 0
-                    For I As Integer = 1 To nregmx
+                    For I As Integer = 1 To NREGMX
                         If aveflo(I) > 0 Then
                             np += 1
                             x *= 1.0
@@ -449,7 +486,7 @@ Public Class clsBaseflowBFLOW
                 End If
 
                 'update average flow array
-                For I As Integer = 1 To ndmax
+                For I As Integer = 1 To NDMAX
                     If florec(1, Now) > 0.0001 Then
                         k = icount(Now) + I - 1
                         aveflo(k) = (aveflo(k) * npreg(k) + florec(I, Now)) / (npreg(k) + 1)
@@ -469,7 +506,7 @@ Public Class clsBaseflowBFLOW
             sumxy = 0.0
             sumx2 = 0.0
             For j = 1 To npr
-                For I As Integer = 1 To ndmax
+                For I As Integer = 1 To NDMAX
                     If (florec(I, j) > 0.0) Then
                         np = np + 1
                         x = (icount(j) + I) * 1.0
@@ -496,23 +533,32 @@ Public Class clsBaseflowBFLOW
                 .Add("alf", alf)
                 .Add("bfd", bfd)
             End With
-            WriteOutputDat("", lResults)
+            If IPRINT = 1 Then
+                'WriteOutputDat("", lResults)
+            End If
             'Write(3, 5002) flwfile, bflw_fr1, bflw_fr2, bflw_fr3, npr, alf, bfd
         Else
-            Dim lResults As New atcDataAttributes()
-            With lResults
-                .Add("DatasetName", aTS.Attributes.GetValue("History 1").Replace("Read from ", ""))
-                .Add("fr1", lbflw_fr1)
-                .Add("fr2", lbflw_fr2)
-                .Add("fr3", lbflw_fr3)
-            End With
-            WriteOutputDat("", lResults)
-            'write(3,5002) flwfile, bflw_fr1, bflw_fr2, bflw_fr3
+            If IPRINT = 1 Then
+                Dim lResults As New atcDataAttributes()
+                With lResults
+                    .Add("DatasetName", aTS.Attributes.GetValue("History 1").Replace("Read from ", ""))
+                    .Add("fr1", lbflw_fr1)
+                    .Add("fr2", lbflw_fr2)
+                    .Add("fr3", lbflw_fr3)
+                End With
+                Dim lOutputDir As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
+                lOutputDir = lOutputDir.ToLower.Substring("read from ".Length)
+                Dim bflowDatFile As String = Path.Combine(lOutputDir, "BFLOW_" & aTS.Attributes.GetValue("Location") & ".dat")
+                WriteOutputDat(bflowDatFile, lResults)
+                'write(3,5002) flwfile, bflw_fr1, bflw_fr2, bflw_fr3
+            End If
         End If
 
         'if daily baseflow values are wanted
-        If iprint = 1 Then
-            Dim flwfileo As String = ""
+        If IPRINT = 1 Then
+            Dim lOutputDir As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
+            lOutputDir = lOutputDir.ToLower.Substring("read from ".Length)
+            Dim flwfileo As String = Path.Combine(lOutputDir, "BFLOW_" & aTS.Attributes.GetValue("Location") & ".out")
             Dim lSW As System.IO.StreamWriter = Nothing
             Try
                 lSW = New StreamWriter(flwfileo, False)
@@ -560,10 +606,53 @@ Public Class clsBaseflowBFLOW
         ReDim idone(0) : idone = Nothing
         ReDim icount(0) : icount = Nothing
 
-        For I As Integer = 0 To nregmx
+        For I As Integer = 0 To NREGMX
             ReDim florec(I, 0)
         Next
         ReDim florec(0, 0) : florec = Nothing
+
+
+        '  NOW DIVIDE EACH BY THE NUMBER OF DAYS IN THE MONTH, TO OBTAIN MEAN
+        '  FLOW IN EACH MONTH IN CFS, FOR EACH OF THE THREE VALUES OF
+        '  THE REQUIREMENT OF ANTECEDENT RECESSION....
+
+        pTsBaseflow1Monthly = Aggregate(pTsBaseflow1, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+        pTsBaseflow2Monthly = Aggregate(pTsBaseflow2, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+        pTsBaseflow3Monthly = Aggregate(pTsBaseflow3, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+        'For I = 1 To pTsBaseflow1Monthly.numValues
+        '    If pTsBaseflow1Monthly.Value(I) = 0 Then pTsBaseflow1Monthly.Value(I) = -99.99
+        '    If pTsBaseflow2Monthly.Value(I) = 0 Then pTsBaseflow2Monthly.Value(I) = -99.99
+        '    If pTsBaseflow3Monthly.Value(I) = 0 Then pTsBaseflow3Monthly.Value(I) = -99.99
+        'Next
+
+        '  DETERMINE MONTHLY BASE FLOW (IN CFS) BY INTERPOLATION BETWEEN
+        '  BASE FLOW FOR TWO DIFFERENT REQUIREMENTS OF ANT. RECESSION:
+        Dim lDate(5) As Integer
+        Dim lX As Double = DrainageArea ^ 0.2 - TBase
+        pTsBaseflowMonthly = pTsBaseflow1Monthly.Clone()
+        For I = 1 To pTsBaseflow1Monthly.numValues
+            J2Date(pTsBaseflow1Monthly.Dates.Value(I - 1), lDate)
+            If Not pMissingDataMonth.Keys.Contains(lDate(0).ToString & "_" & lDate(1).ToString.PadLeft(2, "0")) Then
+                pTsBaseflowMonthly.Value(I) = pTsBaseflow1Monthly.Value(I) + lX * (pTsBaseflow2Monthly.Value(I) - pTsBaseflow1Monthly.Value(I))
+            Else
+                pTsBaseflowMonthly.Value(I) = -99.99
+            End If
+        Next
+
+        '   DETERMINE MONTHLY BASE FLOW IN INCHES AND FLAG AS -99.99 IF
+        '   MONTH IS INCOMPLETE.  ALSO DETERMINE TOTAL OF MONTHLY AMOUNTS:
+        pTotalBaseflowDepth = 0
+        pTsBaseflowMonthlyDepth = pTsBaseflowMonthly.Clone
+        For I = 1 To pTsBaseflowMonthlyDepth.numValues
+            J2Date(pTsBaseflow1Monthly.Dates.Value(I - 1), lDate)
+            If pMissingDataMonth.Keys.Contains(lDate(0).ToString & "_" & lDate(1).ToString.PadLeft(2, "0")) Then
+                pTsBaseflowMonthlyDepth.Value(I) = -99.99
+            Else
+                pTsBaseflowMonthlyDepth.Value(I) *= DayMon(lDate(0), lDate(1)) / (26.888889 * DrainageArea)
+                pTotalBaseflowDepth += pTsBaseflowMonthlyDepth.Value(I)
+            End If
+        Next
+        pTsBaseflowMonthly.Attributes.SetValue("LinearSlope", lX)
 
         Return pTsBaseflow1 'TODO: make sure which one is it
     End Function
@@ -716,7 +805,7 @@ Public Class clsBaseflowBFLOW
         J2Date(aTS.Dates.Value(aTS.numValues - 1), lDate)
         Dim lEndingYear As String = lDate(0).ToString
 
-        lSW.WriteLine(" THIS IS FILE PARTDAY.TXT WHICH GIVES DAILY OUTPUT OF PROGRAM PART. ")
+        lSW.WriteLine(" THIS IS FILE BFLOWDAY.TXT WHICH GIVES DAILY OUTPUT OF PROGRAM BFLOW. ")
         lSW.WriteLine(" NOTE -- RESULTS AT THIS SMALL TIME SCALE ARE PROVIDED FOR ")
         lSW.WriteLine(" THE PURPOSES OF PROGRAM SCREENING AND FOR GRAPHICS, BUT ")
         lSW.WriteLine(" SHOULD NOT BE REPORTED OR USED QUANTITATIVELY ")

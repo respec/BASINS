@@ -38,7 +38,7 @@ Public Class clsBaseflow2PRDF
         End Get
     End Property
 
-    Private pRC As Double = 0.0
+    Private pRC As Double = Double.NaN
     Public Property RC() As Double
         Get
             Return pRC
@@ -61,6 +61,8 @@ Public Class clsBaseflow2PRDF
             Return pSBFImax
         End Get
     End Property
+
+    Public Property IPRINT() As Integer = 0
 
     Public Sub New()
         MyBase.New()
@@ -103,14 +105,14 @@ Public Class clsBaseflow2PRDF
 
         Dim lTsBaseflowgroup As New atcTimeseriesGroup
         With pTsBaseflow1.Attributes
-            .SetValue("Scenario", "TwoPRDF")
+            .SetValue("Scenario", "TwoPRDFDaily")
             .SetValue("Drainage Area", DrainageArea)
             .SetValue("Method", BFMethods.TwoPRDF)
             .SetValue("BFImax", BFImax)
             .SetValue("SBFImax", SBFImax)
             .SetValue("RC", RC)
             .SetValue("SRC", SRC)
-            .SetValue("Constituent", "BF_TwoPRDF")
+            .SetValue("Constituent", "BF_TwoPRDFDaily")
             .SetValue("AnalysisStart", StartDate)
             .SetValue("AnalysisEnd", EndDate)
         End With
@@ -137,8 +139,8 @@ Public Class clsBaseflow2PRDF
 
         With lTsBaseflowgroup
             .Add(pTsBaseflow1)
-            .Add(pTsBaseflow2)
-            .Add(pTsBaseflow3)
+            '.Add(pTsBaseflow2)
+            '.Add(pTsBaseflow3)
             .Add(pTsBaseflowMonthly)
             .Add(pTsBaseflowMonthlyDepth)
         End With
@@ -313,56 +315,92 @@ Public Class clsBaseflow2PRDF
 
         'Calculate the sensitivity indices
         pRC = Math.Round(RC * 1000.0, 0, MidpointRounding.AwayFromZero) / 1000.0
-        pBFI = Math.Round(BFI * 100.0, 0, MidpointRounding.AwayFromZero) / 100.0
+        Dim lBFIadj As Double = Math.Round(BFI * 100.0, 0, MidpointRounding.AwayFromZero) / 100.0
 
-        pSRC = (1.0 - BFImax) * (BFI - BFImax) / (1.0 - RC * BFImax) ^ 2 * RC * BFI
-        pSBFImax = (RC - 1.0) * (RC * BFI - 1.0) / (1.0 - RC * BFImax) ^ 2 * BFImax / BFI
+        pSRC = (1.0 - BFImax) * (lBFIadj - BFImax) / (1.0 - RC * BFImax) ^ 2 * RC * lBFIadj
+        pSBFImax = (RC - 1.0) * (RC * lBFIadj - 1.0) / (1.0 - RC * BFImax) ^ 2 * BFImax / lBFIadj
+
+        If IPRINT = 1 Then
+            Dim lOutputDir As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
+            lOutputDir = lOutputDir.ToLower.Substring("read from ".Length)
+            Dim lBFITXTFile As String = Path.Combine(lOutputDir, "bfi_TwoPRDF.txt")
+            WriteOutputDat(lBFITXTFile)
+            Dim loc As String = aTS.Attributes.GetValue("Location")
+            Dim lbaseflowTXTFile As String = Path.Combine(lOutputDir, "baseflow_TwoPRDF_" & loc & ".txt")
+            WriteOutputBaseflow(lbaseflowTXTFile, aTS, pTsBaseflow1)
+        End If
+
+        pTsBaseflow1Monthly = Aggregate(pTsBaseflow1, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+
+        '   DETERMINE MONTHLY BASE FLOW IN INCHES AND FLAG AS -99.99 IF
+        '   MONTH IS INCOMPLETE.  ALSO DETERMINE TOTAL OF MONTHLY AMOUNTS:
+        pTotalBaseflowDepth = 0
+        pTsBaseflowMonthlyDepth = pTsBaseflow1Monthly.Clone()
+        Dim lDates(5) As Integer
+        For I = 1 To pTsBaseflowMonthlyDepth.numValues
+            J2Date(pTsBaseflow1Monthly.Dates.Value(I - 1), lDates)
+            If pMissingDataMonth.Keys.Contains(lDates(0).ToString & "_" & lDates(1).ToString.PadLeft(2, "0")) Then
+                pTsBaseflowMonthlyDepth.Value(I) = -99.99
+            Else
+                pTsBaseflowMonthlyDepth.Value(I) *= DayMon(lDates(0), lDates(1)) / (26.888889 * DrainageArea)
+                pTotalBaseflowDepth += pTsBaseflowMonthlyDepth.Value(I)
+            End If
+        Next
 
         Return pTsBaseflow1 'TODO: make sure which one is it
     End Function
 
-    Private Function WriteOutputDat(ByVal aFilename As String, ByVal aResults As atcDataAttributes) As Boolean
-        If aResults Is Nothing Then Return False
+    Private Function WriteOutputDat(ByVal aFilename As String) As Boolean
+        'aFilename = "bfi.txt" -- unit 12
+        'write(12,'(I11,2X,F5.3,3X,F4.2,5X,F5.2,10X,F5.2)') gageno, a, BFI, sa, SBFImax
+        Dim lOutputGood As Boolean = True
+        Dim lSW As System.IO.StreamWriter = Nothing
+        Try
+            lSW = New StreamWriter(aFilename, True)
+            Dim lstrgageno As String = TargetTS.Attributes.GetValue("Location", "").ToString().PadLeft(11, " ")
+            Dim lstrRC As String = DoubleToString(RC, 5, "#.000").PadLeft(5, " ")
+            Dim lstrBFI As String = DoubleToString(BFI, 4, "#.00").PadLeft(4, " ")
+            Dim lstrSRC As String = DoubleToString(SRC, 5, "#.00").PadLeft(5, " ")
+            Dim lstrSBFI As String = DoubleToString(SBFImax, 5, "#.00").PadLeft(5, " ")
+            lSW.WriteLine(lstrgageno & "  " & lstrRC & "   " & lstrBFI & "     " & lstrSRC & "          " & lstrSBFI)
+        Catch ex As Exception
+            lOutputGood = False
+        Finally
+            If lSW IsNot Nothing Then
+                lSW.Close()
+                lSW = Nothing
+            End If
+        End Try
+        If Not lOutputGood Then
+
+        End If
+        Return lOutputGood
+    End Function
+
+    Private Function WriteOutputBaseflow(ByVal aFilename As String, ByVal aTS As atcTimeseries, ByVal aBFTS As atcTimeseries) As Boolean
+        'aFilename = "baseflow_" & TargetTS.Attribute.GetValue("Location") & ".txt"
         Dim lOutputGood As Boolean = True
         Dim lSW As System.IO.StreamWriter = Nothing
         Try
             lSW = New StreamWriter(aFilename, False)
-            Dim lDatasetName As String = aResults.GetValue("DatasetName", "")
-            lSW.WriteLine("Baseflow data file: this file summarizes the fraction " &
-                          "of streamflow that is contributed by baseflow for each " &
-                          "of the 3 passes made by the program")
-            lSW.WriteLine("Gage file      " & " Baseflow Fr1" & " Baseflow Fr2" &
-                          " Baseflow Fr3" & "    NPR" & " Alpha Factor" &
-                          " Baseflow Days")
-
-            '5002 format(a15,1x,f12.2,1x,f12.2,1x,f12.2,1x,i6,1x,f12.4,1x,f13.4)
-
-            Dim lstrfwfile As String = " ".PadLeft(15, " ")
-            If Not String.IsNullOrEmpty(lDatasetName) Then
-                Dim lFilenameOnly As String = IO.Path.GetFileName(lDatasetName)
-                If lFilenameOnly.Length >= 15 Then
-                    lstrfwfile = lFilenameOnly.Substring(0, 15)
-                Else
-                    lstrfwfile = lFilenameOnly.PadLeft(15, " ")
-                End If
-            End If
-            Dim lstrbflw_fr1 As String = DoubleToString(aResults.GetValue("fr1", -99), 12, "#.00").PadLeft(12, " ")
-            Dim lstrbflw_fr2 As String = DoubleToString(aResults.GetValue("fr2", -99), 12, "#.00").PadLeft(12, " ")
-            Dim lstrbflw_fr3 As String = DoubleToString(aResults.GetValue("fr3", -99), 12, "#.00").PadLeft(12, " ")
-            Dim lstrnpr As String = ""
-            Dim lstralf As String = ""
-            Dim lstrbfd As String = ""
-            If aResults.GetValue("npr", -1) > 1 Then
-                lstrnpr = DoubleToString(aResults.GetValue("npr", -99), 0, "0").PadLeft(12, " ")
-                lstralf = DoubleToString(aResults.GetValue("alf", -99), 12, "#.0000").PadLeft(12, " ")
-                lstrbfd = DoubleToString(aResults.GetValue("bfd", -99), 13, "#.0000").PadLeft(13, " ")
-            End If
-            If String.IsNullOrEmpty(lstrnpr) Then
-                lSW.WriteLine(lstrfwfile & " " & lstrbflw_fr1 & " " & lstrbflw_fr2 & " " & lstrbflw_fr3)
-            Else
-                lSW.WriteLine(lstrfwfile & " " & lstrbflw_fr1 & " " & lstrbflw_fr2 & " " & lstrbflw_fr3 & " " &
-                              lstrnpr & " " & lstralf & " " & lstrbfd)
-            End If
+            Dim lstrgageno As String = TargetTS.Attributes.GetValue("Location", "")
+            lSW.WriteLine("Stream- and base-flow for gage number " & lstrgageno)
+            lSW.WriteLine("recession constant= " & RC & ", BFI= " & BFI)
+            Dim lDateFormat As New atcDateFormat()
+            With lDateFormat
+                .IncludeHours = False
+                .IncludeMinutes = False
+                .IncludeSeconds = False
+            End With
+            Dim lstrDate As String = ""
+            Dim lstrFlow As String = ""
+            Dim lstrBaseflow As String = ""
+            For I As Integer = 1 To aTS.numValues
+                lstrDate = lDateFormat.JDateToString(aTS.Dates.Value(I - 1)).PadLeft(10, " ")
+                lstrFlow = DoubleToString(aTS.Value(I), 8, "0.0").PadLeft(8, " ")
+                lstrBaseflow = DoubleToString(aBFTS.Value(I), 8, "0.0").PadLeft(8, " ")
+                lSW.WriteLine(lstrDate & lstrFlow & lstrBaseflow)
+            Next
         Catch ex As Exception
             lOutputGood = False
         Finally
