@@ -4244,7 +4244,9 @@ Public Module modBaseflowUtil
             For Each lTsBF As atcTimeseries In lBFDatagroup
                 Select Case lTsBF.Attributes.GetValue("Method")
                     Case aMethod
-                        lTsBaseflow = lTsBF
+                        If lTsBF.Attributes.GetValue("Scenario").ToString() = "BFLOWDaily1" Then
+                            lTsBaseflow = lTsBF
+                        End If
                 End Select
             Next
         Else
