@@ -556,8 +556,13 @@ Public Module modTimeseriesMath
         aIndex += 1
         While aIndex <= aTs.numValues
             If (Not aFilterNoData) OrElse (Not Double.IsNaN(aTs.Value(aIndex))) Then
-                aNextDate = aTs.Dates.Value(aIndex)
-                Exit While
+                If aTs.ValueAttributesGetValue(aIndex, "Inserted", False) Then
+                    ' Found NaN inserted at edge of season split, always skip these, they are not a value and they are not Missing/NoData
+                    aIndex += 1
+                Else
+                    aNextDate = aTs.Dates.Value(aIndex)
+                    Exit While
+                End If
             Else
                 aIndex += 1
             End If
