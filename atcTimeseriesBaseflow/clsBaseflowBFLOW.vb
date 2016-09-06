@@ -523,8 +523,7 @@ Public Class clsBaseflowBFLOW
             ssxx = sumx2 - (sumx * sumx) / np
             alf = ssxy / ssxx
             bfd = 2.3 / alf
-            Dim lResults As New atcDataAttributes()
-            With lResults
+            With pTsBaseflow1.Attributes
                 .Add("DatasetName", aTS.Attributes.GetValue("History 1").Replace("Read from ", ""))
                 .Add("fr1", lbflw_fr1)
                 .Add("fr2", lbflw_fr2)
@@ -534,22 +533,24 @@ Public Class clsBaseflowBFLOW
                 .Add("bfd", bfd)
             End With
             If IPRINT = 1 Then
-                'WriteOutputDat("", lResults)
+                'WriteOutputDat("", pTsBaseflow1.Attributes)
             End If
             'Write(3, 5002) flwfile, bflw_fr1, bflw_fr2, bflw_fr3, npr, alf, bfd
         Else
+            With pTsBaseflow1.Attributes
+                .Add("DatasetName", aTS.Attributes.GetValue("History 1").Replace("Read from ", ""))
+                .Add("fr1", lbflw_fr1)
+                .Add("fr2", lbflw_fr2)
+                .Add("fr3", lbflw_fr3)
+                .Add("npr", npr)
+                .Add("alf", -99)
+                .Add("bfd", -99)
+            End With
             If IPRINT = 1 Then
-                Dim lResults As New atcDataAttributes()
-                With lResults
-                    .Add("DatasetName", aTS.Attributes.GetValue("History 1").Replace("Read from ", ""))
-                    .Add("fr1", lbflw_fr1)
-                    .Add("fr2", lbflw_fr2)
-                    .Add("fr3", lbflw_fr3)
-                End With
                 Dim lOutputDir As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
                 lOutputDir = lOutputDir.ToLower.Substring("read from ".Length)
                 Dim bflowDatFile As String = Path.Combine(lOutputDir, "BFLOW_" & aTS.Attributes.GetValue("Location") & ".dat")
-                WriteOutputDat(bflowDatFile, lResults)
+                WriteOutputDat(bflowDatFile, pTsBaseflow1.Attributes)
                 'write(3,5002) flwfile, bflw_fr1, bflw_fr2, bflw_fr3
             End If
         End If
