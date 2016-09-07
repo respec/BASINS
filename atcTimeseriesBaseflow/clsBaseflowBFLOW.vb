@@ -144,6 +144,7 @@ Public Class clsBaseflowBFLOW
         End With
         With pTsBaseflow3.Attributes
             .SetValue("Scenario", "BFLOWDaily3")
+            .SetValue("Method", BFMethods.BFLOW)
             .SetValue("Constituent", "BF_BFLOWDaily3")
         End With
 
@@ -229,6 +230,7 @@ Public Class clsBaseflowBFLOW
             If lsurfq(I) < 0 Then
                 lsurfq(I) = 0.0
             End If
+            pTsBaseflow1.Value(I) = aTS.Value(I) - lsurfq(I)
             If pTsBaseflow1.Value(I) < 0 Then
                 pTsBaseflow1.Value(I) = 0
             End If
@@ -239,7 +241,7 @@ Public Class clsBaseflowBFLOW
 
         'second pass, backward
         pTsBaseflow2.Value(pTsBaseflow2.numValues) = pTsBaseflow1.Value(pTsBaseflow1.numValues)
-        For I = aTS.numValues - 1 To 1
+        For I = aTS.numValues - 1 To 1 Step -1
             lsurfq(I) = FP1 * lsurfq(I + 1) + lf2 * (pTsBaseflow1.Value(I) - pTsBaseflow1.Value(I + 1))
             If lsurfq(I) < 0 Then
                 lsurfq(I) = 0.0
