@@ -1,0 +1,484 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{483149C8-F683-40DE-AA26-5EB30047AB0F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>Sub Main</StartupObject>
+    <RootNamespace>WinHSPF</RootNamespace>
+    <AssemblyName>WinHSPF</AssemblyName>
+    <MyType>WindowsFormsWithCustomSubMain</MyType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ApplicationIcon>Basins.ico</ApplicationIcon>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>3.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>WinHSPF.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>WinHSPF.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>WinHSPF.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>WinHSPF.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MapWinInterfaces, Version=4.8.6.42296, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ctlLegend.Designer.vb">
+      <DependentUpon>ctlLegend.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlLegend.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ctlSchematic.Designer.vb">
+      <DependentUpon>ctlSchematic.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlSchematic.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="frmAQUATOX.Designer.vb">
+      <DependentUpon>frmAQUATOX.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAQUATOX.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBMP.Designer.vb">
+      <DependentUpon>frmBMP.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBMP.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBMPEffic.Designer.vb">
+      <DependentUpon>frmBMPEffic.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBMPEffic.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBMPTools.Designer.vb">
+      <DependentUpon>frmBMPTools.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBMPTools.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmHspfParm.Designer.vb">
+      <DependentUpon>frmHspfParm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmHspfParm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmImportPoint.Designer.vb">
+      <DependentUpon>frmImportPoint.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmImportPoint.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAbout.Designer.vb">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAbout.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddExpert.Designer.vb">
+      <DependentUpon>frmAddExpert.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddExpert.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddMet.Designer.vb">
+      <DependentUpon>frmAddMet.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddMet.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddPoint.Designer.vb">
+      <DependentUpon>frmAddPoint.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddPoint.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmControl.Designer.vb">
+      <DependentUpon>frmControl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmControl.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmActivityAll.Designer.vb">
+      <DependentUpon>frmActivityAll.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmActivityAll.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmLand.Designer.vb">
+      <DependentUpon>frmLand.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmLand.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmInputDataEditor.Designer.vb">
+      <DependentUpon>frmInputDataEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmInputDataEditor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmOutput.Designer.vb">
+      <DependentUpon>frmOutput.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmOutput.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPoint.Designer.vb">
+      <DependentUpon>frmPoint.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPoint.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPointScenario.Designer.vb">
+      <DependentUpon>frmPointScenario.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPointScenario.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPollutant.Designer.vb">
+      <DependentUpon>frmPollutant.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPollutant.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmReach.Designer.vb">
+      <DependentUpon>frmReach.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmReach.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSaveAs.Designer.vb">
+      <DependentUpon>frmSaveAs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSaveAs.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmStarter.Designer.vb">
+      <DependentUpon>frmStarter.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmStarter.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTime.Designer.vb">
+      <DependentUpon>frmTime.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTime.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTSnew.Designer.vb">
+      <DependentUpon>frmTSnew.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTSnew.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="modWinHSPF.vb" />
+    <Compile Include="frmWinHSPF.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmWinHSPF.Designer.vb">
+      <DependentUpon>frmWinHSPF.vb</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ctlLegend.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ctlLegend.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlSchematic.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ctlSchematic.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAbout.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddExpert.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAddExpert.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddMet.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAddMet.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddPoint.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAddPoint.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAQUATOX.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAQUATOX.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBMP.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmBMP.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBMPEffic.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmBMPEffic.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmControl.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmControl.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmActivityAll.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmActivityAll.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmHspfParm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmHspfParm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmImportPoint.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmImportPoint.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmInputDataEditor.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmInputDataEditor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmLand.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmLand.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmOutput.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmOutput.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPoint.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmPoint.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPointScenario.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmPointScenario.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPollutant.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmPollutant.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmReach.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmReach.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSaveAs.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSaveAs.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmStarter.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmStarter.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTime.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmTime.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTSnew.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmTSnew.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmWinHSPF.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmWinHSPF.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <EmbeddedResource Include="frmBMPTools.resx">
+      <DependentUpon>frmBMPTools.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="template.mwprj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility15.vbproj">
+      <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
+      <Name>BASINS-MapWinUtility15</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcControls\atcControls15.vbproj">
+      <Project>{b219575f-1541-41db-9fa4-d9d7cd62b4a5}</Project>
+      <Name>atcControls15</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData15.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcData15</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcFtableBuilderCS\atcFtableBuilderCS15.csproj">
+      <Project>{854a5e80-0c36-4c6e-bf00-143b2a4c585a}</Project>
+      <Name>atcFtableBuilderCS15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSegmentation\atcSegmentation15.vbproj">
+      <Project>{813e3f46-36ca-4320-bb05-325eec553d3d}</Project>
+      <Name>atcSegmentation15</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUCIForms\atcUCIForms15.vbproj">
+      <Project>{ceec2636-9312-47e0-8877-bf16e0955906}</Project>
+      <Name>atcUCIForms15</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUCI\atcUCI15.vbproj">
+      <Project>{2fc4314b-792b-40a3-b540-aca05b9ea86b}</Project>
+      <Name>atcUCI15</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">
+      <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
+      <Name>atcUtility15</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM15.vbproj">
+      <Project>{f0f41e48-35ed-43f4-ab00-30252b0e5690}</Project>
+      <Name>atcWDM15</Name>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Basins.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
