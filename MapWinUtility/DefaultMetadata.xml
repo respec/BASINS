@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE metadata SYSTEM 'http://www.fgdc.gov/metadata/fgdc-std-001-1998.dtd'>
+<metadata>
+  <idinfo>
+    <citation>
+      <citeinfo>
+        <origin />
+        <pubdate />
+        <title />
+        <geoform />
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract />
+      <purpose />
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <rngdates>
+          <begdate>Unknown</begdate>
+          <enddate>Unknown</enddate>
+        </rngdates>
+      </timeinfo>
+      <current>
+      </current>
+    </timeperd>
+    <status>
+      <progress />
+      <update />
+    </status>
+    <spdom>
+      <bounding>
+         <westbc />
+         <eastbc />
+         <northbc />
+         <southbc />
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>None</themekt>
+        <themekey />
+      </theme>
+    </keywords>
+    <accconst>None</accconst>
+    <useconst>None</useconst>
+  </idinfo>
+  <metainfo>
+    <metd>yyyyMMdd</metd>
+    <metc>
+      <cntinfo>
+        <cntperp>
+          <cntper />
+        </cntperp>
+        <cntaddr>
+          <addrtype />
+          <city />
+          <state />
+          <postal />
+        </cntaddr>
+        <cntvoice />
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001-1998</metstdv>
+  </metainfo>
+</metadata>
