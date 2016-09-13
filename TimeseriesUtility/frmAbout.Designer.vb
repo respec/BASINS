@@ -57,7 +57,7 @@ Partial Class frmAbout
         Me.lblVersion.Name = "lblVersion"
         Me.lblVersion.Size = New System.Drawing.Size(103, 13)
         Me.lblVersion.TabIndex = 21
-        Me.lblVersion.Text = "Release 2013-09-13"
+        Me.lblVersion.Text = "Release 2015-08-13"
         '
         'UpdateLink
         '

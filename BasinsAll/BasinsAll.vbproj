@@ -131,7 +131,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SwatObject\SwatObject10.vbproj">
+    <ProjectReference Include="..\SwatObject\SwatObject10.vbproj">
       <Project>{724F2B12-E252-4493-BE02-708FF8C5D56E}</Project>
       <Name>SwatObject10</Name>
     </ProjectReference>

@@ -174,7 +174,7 @@
       <Project>{06768E3A-87AE-4D46-A45A-C43C6109D43F}</Project>
       <Name>BASINS-D4EM.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+    <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility10.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
       <Name>BASINS-MapWinUtility10</Name>
       <Private>False</Private>

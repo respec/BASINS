@@ -54,7 +54,7 @@ Public Class clsBatchUtil
         'lNode = lQuery.FirstChild.FirstChild
         'Dim lResult As String = D4EMNWISDataExtension.GetDailyDischarge(lNode)
         Dim lQuery As String = XML(aStationList, Args)
-        Dim lResult As String = D4EMDataManager.DataManager.Execute(lQuery)
+        Dim lResult As String = BASINS.Execute(lQuery)
         If lResult Is Nothing Then
             Logger.Dbg("QueryResult:Nothing")
         Else

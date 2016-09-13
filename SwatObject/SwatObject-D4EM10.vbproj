@@ -39,7 +39,7 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\BASINS40\D4EM10\AnyDebug\</OutputPath>
+    <OutputPath>D4EM10\AnyDebug\</OutputPath>
     <DocumentationFile>SwatObject.xml</DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
     <WarningsAsErrors>
@@ -60,7 +60,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\BASINS40\bin-D4EM10\x86Debug\</OutputPath>
+    <OutputPath>bin-D4EM10\x86Debug\</OutputPath>
     <DocumentationFile>SwatObject.xml</DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
@@ -179,12 +179,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BASINS40\atcUtility\atcUtility-D4EM10.vbproj">
+    <ProjectReference Include="atcUtility\atcUtility-D4EM10.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility-D4EM10</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM10.vbproj">
+    <ProjectReference Include="MapWinUtility\MapWinUtility-D4EM10.vbproj">
       <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
       <Name>MapWinUtility-D4EM10</Name>
       <Private>False</Private>

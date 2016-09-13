@@ -66,7 +66,7 @@
     <StartWithIE>true</StartWithIE>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartProgram>\dev\BASINS40\Bin\BASINS.exe</StartProgram>
     <StartWithIE>true</StartWithIE>
     <StartAction>Program</StartAction>
   </PropertyGroup>

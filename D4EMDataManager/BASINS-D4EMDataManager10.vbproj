@@ -51,7 +51,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\..\..\BASINS40\local\AnyDebug\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\..\local\AnyDebug\Plugins\BASINS\</OutputPath>
     <DocumentationFile>D4EMDataManager.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -70,7 +70,7 @@
     <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\..\..\BASINS40\local\AnyRelease\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\..\local\AnyRelease\Plugins\BASINS\</OutputPath>
     <DocumentationFile>D4EMDataManager.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -92,7 +92,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\..\BASINS40\local\x64Debug\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\..\local\x64Debug\Plugins\BASINS\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>D4EMDataManager.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
@@ -105,7 +105,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <DebugSymbols>false</DebugSymbols>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\..\BASINS40\local\x64Release\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\..\local\x64Release\Plugins\BASINS\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>D4EMDataManager.xml</DocumentationFile>
     <Optimize>true</Optimize>
@@ -120,7 +120,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\..\BASINS40\local\x86Debug\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\..\local\x86Debug\Plugins\BASINS\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>D4EMDataManager.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
@@ -133,7 +133,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <DebugSymbols>true</DebugSymbols>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\..\BASINS40\local\x86Release\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\..\local\x86Release\Plugins\BASINS\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>D4EMDataManager.xml</DocumentationFile>
     <Optimize>true</Optimize>
@@ -143,20 +143,20 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+    <ProjectReference Include="..\..\MapWinUtility\BASINS-MapWinUtility10.vbproj">
       <Project>{672FD222-EAF2-43F1-BBB4-A6CC9D016103}</Project>
       <Name>BASINS-MapWinUtility10</Name>
     </ProjectReference>
     <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\BASINS40\local\$(Platform)$(Configuration)\Interop.MapWinGIS.dll</HintPath>
+      <HintPath>..\..\local\$(Platform)$(Configuration)\Interop.MapWinGIS.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinInterfaces">
-      <HintPath>..\..\..\BASINS40\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <ProjectReference Include="..\..\..\BASINS40\atcUtility\atcUtility10.vbproj">
+    <ProjectReference Include="..\..\atcUtility\atcUtility10.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility10</Name>
       <Private>False</Private>
@@ -172,7 +172,7 @@
     </Reference>
     <Reference Include="WebDownload, Version=1.3.2816.19723, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\BASINS40\local\$(Platform)$(Configuration)\Plugins\BASINS\WebDownload.dll</HintPath>
+      <HintPath>..\..\local\$(Platform)$(Configuration)\Plugins\BASINS\WebDownload.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -205,19 +205,19 @@
     <Compile Include="WaterQualityUtility.vb" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BASINS40\atcMwGisUtility\atcMwGisUtility10.vbproj">
+    <ProjectReference Include="..\..\atcMwGisUtility\atcMwGisUtility10.vbproj">
       <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
       <Name>atcMwGisUtility10</Name>
       <Private>False</Private>
     </ProjectReference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.1.271, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\BASINS40\local\$(Platform)$(Configuration)\Plugins\ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>..\..\local\$(Platform)$(Configuration)\Plugins\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinGeoProc, Version=1.0.2712.25298, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\BASINS40\local\$(Platform)$(Configuration)\MapWinGeoProc.dll</HintPath>
+      <HintPath>..\..\local\$(Platform)$(Configuration)\MapWinGeoProc.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Core">

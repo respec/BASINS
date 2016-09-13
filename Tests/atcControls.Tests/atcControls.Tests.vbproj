@@ -93,15 +93,15 @@
     <Shadow Include="Test References\atcControls.accessor" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BASINS40\atcControls\atcControls10.vbproj">
+    <ProjectReference Include="..\..\atcControls\atcControls10.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls10</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\BASINS40\atcUtility\atcUtility10.vbproj">
+    <ProjectReference Include="..\..\atcUtility\atcUtility10.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility10</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+    <ProjectReference Include="..\..\MapWinUtility\BASINS-MapWinUtility10.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
       <Name>BASINS-MapWinUtility10</Name>
     </ProjectReference>

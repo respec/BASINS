@@ -115,7 +115,7 @@
     </Reference>
     <Reference Include="SwatObject, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SwatObject\bin\Debug\SwatObject.dll</HintPath>
+      <HintPath>..\SwatObject\bin\Debug\SwatObject.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System">

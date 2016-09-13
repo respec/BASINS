@@ -140,7 +140,7 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtilityGG.vbproj">
+    <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtilityGG.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
       <Name>BASINS-MapWinUtilityGG</Name>
       <Private>False</Private>

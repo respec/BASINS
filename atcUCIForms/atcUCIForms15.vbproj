@@ -55,11 +55,6 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="atcFtableBuilder, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\WinHSPF\bin\Debug\atcFtableBuilder.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -313,7 +308,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility15.vbproj">
+    <ProjectReference Include="..\atcFtableBuilderCS\atcFtableBuilderCS15.csproj">
+      <Project>{854a5e80-0c36-4c6e-bf00-143b2a4c585a}</Project>
+      <Name>atcFtableBuilderCS15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
       <Private>False</Private>

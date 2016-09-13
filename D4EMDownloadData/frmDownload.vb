@@ -281,8 +281,8 @@ Public Class frmDownload
         Me.Close()
     End Sub
 
-    Public Function SelectedRegion() As D4EMDataManager.Region
-        Dim lRegion As D4EMDataManager.Region = Nothing
+    Public Function SelectedRegion() As BASINS.Region
+        Dim lRegion As BASINS.Region = Nothing
         Dim lPreferredFormat As String = "box"
         Try
             Dim lExtents As MapWinGIS.Extents = Nothing
@@ -295,8 +295,8 @@ Public Class frmDownload
                     lExtents = pMapWin.View.SelectedShapes.SelectBounds
                 Case pRegionEnterCoordinates
                     lRegion = frmSpecifyRegion.AskUser(Me.Icon)
-                    'Case pRegionStationIDs
-                    'lRegion = frmSpecifyStations.AskUser(Me.Icon, StationsFromMap)
+                'Case pRegionStationIDs
+                'lRegion = frmSpecifyStations.AskUser(Me.Icon, StationsFromMap)
                 Case Else
                     Dim lHuc8Layer As MapWindow.Interfaces.Layer = HUC8Layer()
                     If lHuc8Layer IsNot Nothing Then
@@ -306,7 +306,7 @@ Public Class frmDownload
             End Select
 
             If lExtents IsNot Nothing Then
-                lRegion = New D4EMDataManager.Region(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
+                lRegion = New BASINS.Region(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
             End If
 
         Catch ex As Exception
@@ -318,7 +318,7 @@ Public Class frmDownload
         Else
             lRegion.HUC8s = HUC8s()
             lRegion.PreferredFormat = lPreferredFormat
-            Return lRegion.GetProjected(D4EMDataManager.SpatialOperations.GeographicProjection)
+            Return lRegion.GetProjected(BASINS.SpatialOperations.GeographicProjection)
         End If
         Return Nothing
     End Function
@@ -547,7 +547,7 @@ Public Class frmDownload
             Dim lDesiredProjection As String = ""
             Dim lRegionXML As String = ""
             Dim lStationsXML As String
-            Dim lRegion As D4EMDataManager.Region
+            Dim lRegion As BASINS.Region
 
             If cboRegion.SelectedItem = pRegionStationIDs Then
                 lRegion = Nothing

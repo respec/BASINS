@@ -175,7 +175,7 @@
     <Content Include="SARA.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM13.vbproj">
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM13.vbproj">
       <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>
       <Name>MapWinUtility-D4EM13</Name>
     </ProjectReference>

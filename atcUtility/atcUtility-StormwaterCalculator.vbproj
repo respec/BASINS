@@ -218,7 +218,7 @@
     <None Include="ClassDiagramAtcUtility.cd" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-StormwaterCalculator.vbproj">
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-StormwaterCalculator.vbproj">
       <Project>{672FD222-EAF2-43F1-BBB4-A6CC9D016103}</Project>
       <Name>MapWinUtility-StormwaterCalculator</Name>
       <Private>False</Private>

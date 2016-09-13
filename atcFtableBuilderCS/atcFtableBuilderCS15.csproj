@@ -193,11 +193,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility15.vbproj">
-      <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
-      <Name>BASINS-MapWinUtility15</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls15.vbproj">
       <Project>{b219575f-1541-41db-9fa4-d9d7cd62b4a5}</Project>
       <Name>atcControls15</Name>
@@ -216,6 +211,11 @@
     <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility15</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
+      <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
+      <Name>BASINS-MapWinUtility15</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

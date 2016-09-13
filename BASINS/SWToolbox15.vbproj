@@ -213,11 +213,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager15.vbproj">
-      <Project>{59e61f35-b014-4d34-8277-63ff6be40dd6}</Project>
-      <Name>BASINS-D4EMDataManager15</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility15.vbproj">
+    <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
       <Private>False</Private>

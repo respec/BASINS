@@ -239,7 +239,7 @@
     <None Include="ClassDiagramAtcUtility.cd" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility_10_All.vbproj">
+    <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility_10_All.vbproj">
       <Project>{672FD222-EAF2-43F1-BBB4-A6CC9D016103}</Project>
       <Name>BASINS-MapWinUtility_10_All</Name>
       <Private>False</Private>
