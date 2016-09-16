@@ -112,9 +112,9 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcData\atcData15.vbproj">
-      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
-      <Name>atcData15</Name>
+    <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
+      <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
+      <Name>BASINS-MapWinUtility15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility15.vbproj">
@@ -137,13 +137,13 @@
       <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinGeoProc, Version=1.0.2365.24608, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MapWinGeoProc, Version=4.8.6.25969, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinGeoProc.dll</HintPath>
       <Private>False</Private>
-      <HintPath>..\bin\MapWinGeoProc.dll</HintPath>
     </Reference>
-    <Reference Include="MapWinInterfaces">
-      <Name>MapWinInterfaces</Name>
+    <Reference Include="MapWinInterfaces, Version=4.8.6.42296, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -157,9 +157,9 @@
       <Name>System.Windows.Forms</Name>
     </Reference>
     <Reference Include="System.XML" />
-    <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
-      <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
-      <Name>BASINS-MapWinUtility15</Name>
+    <ProjectReference Include="..\atcData\atcData15.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcData15</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
@@ -189,7 +189,11 @@
     <Compile Include="modBasinsPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="modDownload.vb" />
+    <Compile Include="modDownload.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Region.vb" />
+    <Compile Include="SpatialOperations.vb" />
     <EmbeddedResource Include="frmAbout.resx">
       <DependentUpon>frmAbout.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -241,7 +245,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>rem del S:\dev\BASINS40\Bin\Plugins\Basins\basins.dll</PreBuildEvent>
+    <PreBuildEvent>del C:\devNotMW\GitHub\BASINS\Bin\Plugins\BASINS\basins.dll</PreBuildEvent>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
