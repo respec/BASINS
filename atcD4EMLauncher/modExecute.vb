@@ -1,12 +1,5 @@
-﻿Imports MapWinGIS
-Imports MapWindow.Interfaces
-Imports System.Collections.Specialized
-Imports System.Windows.Forms.Application
-Imports MapWinUtility
-Imports MapWinUtility.Strings
-Imports atcData
+﻿Imports MapWinUtility
 Imports atcUtility
-Imports atcMwGisUtility
 
 Public Module modExecute
     ''' <summary>Run D4EMDownload.exe to retrieve data described in aQuery.</summary>
