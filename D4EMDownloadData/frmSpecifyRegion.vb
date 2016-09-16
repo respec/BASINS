@@ -2,7 +2,7 @@ Public Class frmSpecifyRegion
 
     Private Const pAppName = "BASINS Data Download"
 
-    Public Shared Function AskUser(ByVal aIcon As Drawing.Icon) As BASINS.Region
+    Public Shared Function AskUser(ByVal aIcon As Drawing.Icon) As atcD4EMLauncher.Region
         Dim lForm As New frmSpecifyRegion
         With lForm
             .Icon = aIcon
@@ -13,7 +13,7 @@ Public Class frmSpecifyRegion
             .txtRegionProjection.Text = GetSetting(pAppName, "Defaults", "BoxProjection", .txtRegionProjection.Text)
 
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-                Dim lRegion As New BASINS.Region(.txtTop.Text, .txtBottom.Text, .txtLeft.Text, .txtRight.Text, .txtRegionProjection.Text)
+                Dim lRegion As New atcD4EMLauncher.Region(.txtTop.Text, .txtBottom.Text, .txtLeft.Text, .txtRight.Text, .txtRegionProjection.Text)
                 Try
                     lRegion.Validate()
                     SaveSetting(pAppName, "Defaults", "BoxTop", .txtTop.Text)

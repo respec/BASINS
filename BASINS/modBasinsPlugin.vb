@@ -90,6 +90,9 @@ Public Module modBasinsPlugin
     ''' </summary>
     Friend Sub FindBasinsDrives()
         If g_BasinsDataDirs.Count = 0 Then
+            If g_AppNameShort = "GW Toolbox" Then
+                g_BasinsDataDirs.Add("C:\USGS-GWToolbox\data\")
+            End If
             Dim lSavedPaths As String = GetSetting(g_AppNameRegistry, "Folders", "DataPaths")
             If lSavedPaths.Length > 0 Then
                 For Each lSavedPath As String In lSavedPaths.Split(";")

@@ -112,6 +112,11 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcD4EMLauncher\atcD4EMLauncher.vbproj">
+      <Project>{6cde2fe3-deba-46ba-b395-8f71f87159b0}</Project>
+      <Name>atcD4EMLauncher</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
@@ -192,8 +197,6 @@
     <Compile Include="modDownload.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Region.vb" />
-    <Compile Include="SpatialOperations.vb" />
     <EmbeddedResource Include="frmAbout.resx">
       <DependentUpon>frmAbout.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -245,7 +248,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>del C:\devNotMW\GitHub\BASINS\Bin\Plugins\BASINS\basins.dll</PreBuildEvent>
+    <PreBuildEvent>rem del C:\devNotMW\GitHub\BASINS\Bin\Plugins\BASINS\basins.dll</PreBuildEvent>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
