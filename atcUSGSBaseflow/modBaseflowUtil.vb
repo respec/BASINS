@@ -1022,6 +1022,11 @@ Public Module modBaseflowUtil
         lSW.Close()
         lSW = Nothing
 
+        If args IsNot Nothing AndAlso args.GetValue("ForFullSpan", False) Then
+            'Should not write a Duration.csv file for the fullspan time period for the hydrograph-separation techniques. 
+            'It’s fine to keep the Duration.csv files for the individual periods (‘chunks’) of the record, however.
+            Exit Sub
+        End If
         'Write Duration Tables
         'header for duration file
         lNumColumns = 2 + MethodsLastDone.Count * 2
