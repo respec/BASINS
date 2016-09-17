@@ -1025,6 +1025,7 @@ Public Module modBaseflowUtil
         If args IsNot Nothing AndAlso args.GetValue("ForFullSpan", False) Then
             'Should not write a Duration.csv file for the fullspan time period for the hydrograph-separation techniques. 
             'It’s fine to keep the Duration.csv files for the individual periods (‘chunks’) of the record, however.
+            'this change only applies to dataset that has gaps
             Exit Sub
         End If
         'Write Duration Tables
