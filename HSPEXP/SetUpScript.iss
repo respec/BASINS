@@ -2,8 +2,8 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "HSPEXP+"
-#define MyAppVersion "1.11"
-#define MyAppPublisher "AQUA TERRA Consultants"
+#define MyAppVersion "1.13"
+#define MyAppPublisher "AQUA TERRA Consultants (a division of RESPEC) "
 #define MyAppURL "http://www.aquaterra.com/resources/downloads/HSPEXPplus.php"
 #define MyAppExeName "HSPEXP+.exe"
 
@@ -21,7 +21,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={reg:HKLM\SOFTWARE\AQUA TERRA Consultants\BASINS41,Base Directory|{pf}\HSPEXP+}
 DefaultGroupName={#MyAppName}
-OutputBaseFilename=HSPEXP+1.11SetUp
+OutputBaseFilename=HSPEXP+1.13SetUp
 Compression=lzma
 SolidCompression=yes
 InfoBeforeFile=install.txt

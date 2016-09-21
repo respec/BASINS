@@ -226,7 +226,7 @@ Public Module ModSensitivityAnalysis
                 lWdmDataSource = atcDataManager.DataSourceBySpecification(pTestPath & lWdmFileName)
             End If
         End If
-        Dim ExpertStatsOutputLine As String
+        Dim ExpertStatsOutputLine As String = ""
         Dim lExpertSystem As HspfSupport.atcExpertSystem
 
         lExpertSystem = New HspfSupport.atcExpertSystem(lUci, pBaseName & ".exs")

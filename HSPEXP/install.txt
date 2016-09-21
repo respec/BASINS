@@ -1,27 +1,50 @@
-Dated 11/16/2015
+Dated 05/20/2016
+HSPEXP+1.13
+Features
+1. The CSV file is read using a CSV parser which means that the field in quotes are read as one field and the comma inside quotes is ignored.
+2. If a PERLND or IMPLND does not have a valid downstream connection, then that connection is skipped while calculating the contituent balance reports.
+3. If QUALID doesn't meet HSPEXP+ criteria, HSPEXP+ gives warning and quits.
+4. Water quality and water balance report generation process is more efficient so that bigger HBN files can be used for generating reports.
+
+Dated 03/11/2016
+HSPEXP+1.12
+Features
+1. PBIAS has been added as a statistic for time series comparison.
+2. RSR (RMSE-Observations standard deviation ratio) has been added as a statistic for time series comparison.
+3. Appropriate references have been provided for the two statistics above.
+4. Caution has been added to annual flow statistics to avoid misinterpretation of results.
+
+Bugs Fixed
+
+1. Table 1 in the SWSTAT output (classwise comparison of errors, root mean square errors and bias) has been removed due to confusion in the bias calculation procedures.
+
+
+
+Dated 12/02/2015
 HSPEXP+1.11
 Features
-1. New splash screen and updated User's manual.
-1. The timeseries can be transformed before plotting graphs when AutomatedGraphs option is selected. In the thirteenth column of timeseries description, add the following text in quotes (without quotes) for the transformations.
-	a. "c to f" --> Transform from celsius to Fahrenheit.
-	b. "f to c" --> Transform from Fahrenheit to celsius.
-	c. "sum c" --> Add the constant c to the timeseries.
-	d. "product c" -->Multiply the constant c to the timeseries.
-2. The timeseries can be aggregated to extract percentiles. For example, a user can specify to extract 75% percentile of daily values from an hourly timeseries by specifying "Daily" as the "Aggregation" and "%75" as the "Aggregation Type."
-3. The specification for graphs can be in multiple *.csv files and the names are not hardcoded anymore. HSPEXP+ looks for all the *.csv files in the project folder for making graphs. HSPEXP+ typically ignores the *csv files that do not have data formatted for additional graphs, but may give error. It is User's responsibility to make sure that all the *.csv files in the project folder are properly formatted.
+1. New splash screen and updated user's manual.
+2. Any timeseries can be transformed before plotting graphs when Graph Generation option is selected. In the thirteenth column of timeseries description, add the following text inside the quotes (without quotes) for the transformations.
 
-	
+            a. "c to f" --> Transform from Celsius to Fahrenheit.
+            b. "f to c" --> Transform from Fahrenheit to Celsius.
+            c. "sum c" --> Add the constant c to the timeseries.
+            d. "product c" -->Multiply the timeseries by the constant c.
+
+3. A timeseries can be aggregated to extract percentiles. For example, a user can specify to extract 75% percentile of daily values from an hourly timeseries by specifying "Daily" as the "Aggregation" and "%75" as the "Aggregation Type."
+4. The specifications for graphs can be in multiple *.csv files, and the names are no longer hardcoded. HSPEXP+ looks for all the *.csv files in the project folder for making graphs. HSPEXP+ typically ignores the *csv files that do not have data properly formatted for additional graphs. However, it is user's responsibility to make sure that all the *.csv files in the project folder are properly formatted.         
+
 Bugs Fixed
-1. The steptype was not plotted properly. Now the timeseries can be plotted as forwardstep, rearwardstep, or nonostep.
-2. Some point symbols were not filled. Now all the point symbols are filled by default. 
-3. When HSPEXP+ is started, the pConstituents is cleared so that reports of any constituents from previous run are not generated.
-4. Log scale and supplemental graphs are plotted only if hydrology calibration graphs are selected.
-5. Graphs are generated even if the two header lines starting with "Type of Graph", and "Axis for the Curve" do not exist or are commented out using "***".
-6. The code for reading Echo file was improved to read bigger echo files.
-7. The load allocation reports were calculating incorrect loadings when the model contained reach numbers with different digits. This bug is fixed.
-8. The point source contribution calculation for Total N didn't include Nitrite when it was available as a separate source. This bug has been fixed.
-9. More error checking has been introduced in the code for graph generation.
 
+1. The steptype was not plotted properly. Now the timeseries can be plotted as forwardstep, rearwardstep, or nonstep.
+2. Some point symbols were not filled in graphs. Now all the point symbols are filled by default. 
+3. When HSPEXP+ is started, the pConstituents collection is cleared so that the reports of any constituents from the previous run are not generated.
+4. In hydrology calibration, log scale and supplemental graphs are plotted only if hydrology calibration graphs are selected.
+5. Graphs are generated even if the two header lines starting with "Type of Graph", and "Axis for the Curve" do not exist or are commented out using "***" in the graph specification file(s).
+6. The code for reading the HSPF echo file was improved to read echo files with larger size.
+7. The load allocation reports were calculating incorrect loadings when the model contained reach numbers with less than 3 digits. This bug has been fixed.
+8. The point source contribution calculation for Total N didn't include nitrite when it was available as a separate source. This bug has been fixed.
+9. More error checking has been added in the code for graph generation.
 
 
 Dated:09/01/2015

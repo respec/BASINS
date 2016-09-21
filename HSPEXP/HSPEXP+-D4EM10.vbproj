@@ -43,11 +43,11 @@
     <MapFileExtensions>false</MapFileExtensions>
     <TargetCulture>en</TargetCulture>
     <ProductName>HSPEXP+</ProductName>
-    <PublisherName>BASINS</PublisherName>
+    <PublisherName>AQUA TERRA Consultants %28a division of RESPEC%29</PublisherName>
     <WebPage>index.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.10.0.0</ApplicationVersion>
+    <ApplicationVersion>1.12.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
