@@ -141,7 +141,7 @@ Partial Class frmUSGSBaseflow
         Me.gbDates.Controls.Add(Me.txtDataStart)
         Me.gbDates.Controls.Add(Me.lblDataEnd)
         Me.gbDates.Controls.Add(Me.lblDataStart)
-        Me.gbDates.Location = New System.Drawing.Point(12, 293)
+        Me.gbDates.Location = New System.Drawing.Point(12, 196)
         Me.gbDates.Name = "gbDates"
         Me.gbDates.Size = New System.Drawing.Size(375, 114)
         Me.gbDates.TabIndex = 7
@@ -268,6 +268,7 @@ Partial Class frmUSGSBaseflow
         Me.chkMethodBFLOW.Text = "BFLOW"
         Me.toolTip1.SetToolTip(Me.chkMethodBFLOW, "Modified Method")
         Me.chkMethodBFLOW.UseVisualStyleBackColor = True
+        Me.chkMethodBFLOW.Visible = False
         '
         'chkMethodTwoPRDF
         '
@@ -279,6 +280,7 @@ Partial Class frmUSGSBaseflow
         Me.chkMethodTwoPRDF.Text = "TwoPRDF"
         Me.toolTip1.SetToolTip(Me.chkMethodTwoPRDF, "Modified Method")
         Me.chkMethodTwoPRDF.UseVisualStyleBackColor = True
+        Me.chkMethodTwoPRDF.Visible = False
         '
         'MenuStrip1
         '
@@ -380,7 +382,7 @@ Partial Class frmUSGSBaseflow
         Me.gbTextOutput.Controls.Add(Me.lblOutputDir)
         Me.gbTextOutput.Controls.Add(Me.txtOutputRootName)
         Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
-        Me.gbTextOutput.Location = New System.Drawing.Point(12, 413)
+        Me.gbTextOutput.Location = New System.Drawing.Point(12, 316)
         Me.gbTextOutput.Name = "gbTextOutput"
         Me.gbTextOutput.Size = New System.Drawing.Size(375, 111)
         Me.gbTextOutput.TabIndex = 11
@@ -485,7 +487,7 @@ Partial Class frmUSGSBaseflow
         Me.gbBFMethods.Controls.Add(Me.chkMethodHySEPFixed)
         Me.gbBFMethods.Location = New System.Drawing.Point(12, 30)
         Me.gbBFMethods.Name = "gbBFMethods"
-        Me.gbBFMethods.Size = New System.Drawing.Size(112, 257)
+        Me.gbBFMethods.Size = New System.Drawing.Size(112, 160)
         Me.gbBFMethods.TabIndex = 0
         Me.gbBFMethods.TabStop = False
         Me.gbBFMethods.Text = "Select Method(s)"
@@ -538,7 +540,7 @@ Partial Class frmUSGSBaseflow
         Me.gbGraph.Controls.Add(Me.btnGraphCDist)
         Me.gbGraph.Controls.Add(Me.btnGraphTimeseries)
         Me.gbGraph.Controls.Add(Me.btnGraphDuration)
-        Me.gbGraph.Location = New System.Drawing.Point(12, 530)
+        Me.gbGraph.Location = New System.Drawing.Point(12, 433)
         Me.gbGraph.Name = "gbGraph"
         Me.gbGraph.Size = New System.Drawing.Size(375, 90)
         Me.gbGraph.TabIndex = 16
@@ -567,6 +569,7 @@ Partial Class frmUSGSBaseflow
         Me.gbBFI.Controls.Add(Me.txtN)
         Me.gbBFI.Controls.Add(Me.lblK)
         Me.gbBFI.Controls.Add(Me.lblF)
+        Me.gbBFI.Controls.Add(Me.gbDFParam)
         Me.gbBFI.Controls.Add(Me.lblN)
         Me.gbBFI.Location = New System.Drawing.Point(130, 61)
         Me.gbBFI.Name = "gbBFI"
@@ -676,12 +679,13 @@ Partial Class frmUSGSBaseflow
         Me.gbDFParam.Controls.Add(Me.lblBFImax)
         Me.gbDFParam.Controls.Add(Me.lblRC)
         Me.gbDFParam.Controls.Add(Me.lblBeta)
-        Me.gbDFParam.Location = New System.Drawing.Point(133, 197)
+        Me.gbDFParam.Location = New System.Drawing.Point(238, 12)
         Me.gbDFParam.Name = "gbDFParam"
         Me.gbDFParam.Size = New System.Drawing.Size(251, 90)
         Me.gbDFParam.TabIndex = 31
         Me.gbDFParam.TabStop = False
         Me.gbDFParam.Text = "Digital Filter Parameters"
+        Me.gbDFParam.Visible = False
         '
         'txtDFParamBFImax
         '
@@ -746,8 +750,7 @@ Partial Class frmUSGSBaseflow
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(399, 626)
-        Me.Controls.Add(Me.gbDFParam)
+        Me.ClientSize = New System.Drawing.Size(399, 533)
         Me.Controls.Add(Me.gbBFI)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.lblDrainageAreaUnits)
