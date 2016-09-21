@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Basic Express 2005
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "UpdateCheck", "UpdateCheck.vbproj", "{A8ED2DBF-625C-46B4-99F7-1CC3243E2ACD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8B2DA946-C0CF-4D0C-A793-FC5447BA9B5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B2DA946-C0CF-4D0C-A793-FC5447BA9B5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B2DA946-C0CF-4D0C-A793-FC5447BA9B5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B2DA946-C0CF-4D0C-A793-FC5447BA9B5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCB78396-A204-44C6-9449-96705299DD2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCB78396-A204-44C6-9449-96705299DD2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCB78396-A204-44C6-9449-96705299DD2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCB78396-A204-44C6-9449-96705299DD2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8ED2DBF-625C-46B4-99F7-1CC3243E2ACD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8ED2DBF-625C-46B4-99F7-1CC3243E2ACD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8ED2DBF-625C-46B4-99F7-1CC3243E2ACD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8ED2DBF-625C-46B4-99F7-1CC3243E2ACD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22BEC604-2BC5-48A9-AE4F-898B95863EE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22BEC604-2BC5-48A9-AE4F-898B95863EE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22BEC604-2BC5-48A9-AE4F-898B95863EE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22BEC604-2BC5-48A9-AE4F-898B95863EE2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

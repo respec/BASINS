@@ -158,33 +158,33 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
-      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
-      <Name>BASINS-MapWinUtility</Name>
+      <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
+      <Name>BASINS-MapWinUtility15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcData\atcData15.vbproj">
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
-      <Name>atcData</Name>
+      <Name>atcData15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcGraphExperimental\atcGraph15.vbproj">
       <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
-      <Name>atcGraph</Name>
+      <Name>atcGraph15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB15.vbproj">
-      <Project>{EA68C9C7-8A7A-4EDF-8944-413E4E7FA276}</Project>
-      <Name>atcTimeseriesRDB</Name>
+      <Project>{82530A5B-FF39-4B9F-8A04-881468DFC662}</Project>
+      <Name>atcTimeseriesRDB15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUSGSUtility\atcUSGSUtility15.vbproj">
       <Project>{4DBC8159-1072-41FA-9242-933E12A88EE6}</Project>
-      <Name>atcUSGSUtility</Name>
+      <Name>atcUSGSUtility15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Name>atcUtility</Name>
+      <Name>atcUtility15</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

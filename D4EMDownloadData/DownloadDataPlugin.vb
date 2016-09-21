@@ -201,7 +201,7 @@ Public Class DownloadDataPlugin
                             'Next
                             'Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
                             Logger.Status("LABEL TITLE BASINS Data Download")
-                            Dim lResult As String = BASINS.Execute(lQuery)
+                            Dim lResult As String = atcD4EMLauncher.Execute(lQuery)
                             If lResult Is Nothing Then
                                 Logger.Dbg("QueryResult:Nothing")
                             Else

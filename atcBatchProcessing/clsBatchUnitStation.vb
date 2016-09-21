@@ -88,7 +88,7 @@ Public Class clsBatchUnitStation
         'lQuery.LoadXml(XML())
         'lNode = lQuery.FirstChild.FirstChild
         'Dim lResult As String = D4EMNWISDataExtension.GetDailyDischarge(lNode)
-        Dim lResult As String = BASINS.Execute(XML())
+        Dim lResult As String = atcD4EMLauncher.Execute(XML())
 
         If lResult Is Nothing Then
             Message = "QueryResult:Nothing"

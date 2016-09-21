@@ -148,6 +148,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGisUtilities15", "atcGis
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DFLOWAnalysis15", "DFLOW\DFLOWAnalysis15.vbproj", "{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcD4EMLauncher", "atcD4EMLauncher\atcD4EMLauncher.vbproj", "{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1266,6 +1268,22 @@ Global
 		{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}.Release|x64.Build.0 = Release|Any CPU
 		{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}.Release|x86.ActiveCfg = Release|x86
 		{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}.Release|x86.Build.0 = Release|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|x64.Build.0 = Debug|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|x86.ActiveCfg = Debug|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|x86.Build.0 = Debug|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|x64.ActiveCfg = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|x64.Build.0 = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|x86.ActiveCfg = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

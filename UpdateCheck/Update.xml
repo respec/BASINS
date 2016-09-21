@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="no"?>
+<update>
+  <date>07/13/2006 12:17:18 pm</date>
+  <size>11,633,018</size>
+  <description>BASINS 4 beta 2006-7-13
+
+Features included in this update:
+
+- Spiffy new Update Check
+
+- New Streamflow Measurements
+  </description>
+  <get>http://hspf.com/pub/basins4/BASINS4beta07-13.exe</get>
+  <run/>
+</update>

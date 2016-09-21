@@ -636,48 +636,6 @@ StartOver:
         End If
     End Sub
 
-    ''' <summary>Run D4EMDownload.exe to retrieve data described in aQuery.</summary>
-    ''' <returns>
-    ''' String describing error or success.
-    ''' </returns>
-    Public Function Execute(ByVal aQuery As String) As String
-        Dim lResult As String = ""
-        Try
-            Dim lQueryFilename As String = GetTemporaryFileName("DataDownloadQuery", ".txt")
-            Dim lResultsFilename As String = GetTemporaryFileName("DataDownloadResults", ".txt")
-            Logger.Dbg("Writing Data Download Query to " & lQueryFilename & ", requesting results in " & lResultsFilename)
-            SaveFileString(lQueryFilename, aQuery)
-
-            Dim lD4EMDownloadExe As String = IO.Path.Combine(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location), "D4EMDownload") & g_PathChar & "D4EMDownload.exe"
-
-            If Not FileExists(lD4EMDownloadExe) Then
-                lD4EMDownloadExe = FindFile("Please Locate D4EMDownload.exe", "D4EMDownload.exe")
-            End If
-CheckDownloadExe:
-            If IO.File.Exists(lD4EMDownloadExe) Then
-                If lD4EMDownloadExe.ToLowerInvariant().EndsWith("d4emdownload.exe") Then
-                    Dim lArgs As String = """" & lResultsFilename & """ """ & lQueryFilename & """" '& " /debug"
-                    LaunchProgram(lD4EMDownloadExe, IO.Path.GetDirectoryName(lQueryFilename), lArgs)
-                    If IO.File.Exists(lResultsFilename) Then
-                        Return IO.File.ReadAllText(lResultsFilename).TrimEnd(vbLf).TrimEnd(vbCr)
-                    Else
-                        Return "<error>Download did not complete, result status Not found. Query was: " & aQuery & "</error>"
-                    End If
-                Else
-                    lD4EMDownloadExe = FindFile("Please Locate D4EMDownload.exe", "D4EMDownload.exe", aUserVerifyFileName:=True)
-                    GoTo CheckDownloadExe
-                End If
-            End If
-            Return "<error>User Canceled</error>"
-
-        Catch lCancelEx As ProgressCancelException
-            lResult = "<error>User Canceled</error>" 'TODO: send back partial results???
-            Logger.Canceled = False
-        Catch lEx As Exception
-            lResult = "<error>" & lEx.ToString & "</error>"
-        End Try
-        Return lResult
-    End Function
 
     'Returns file name of new project or "" if not built
     Public Sub CreateNewProjectAndDownloadCoreData(ByVal aRegion As String, _
@@ -725,7 +683,7 @@ CheckDownloadExe:
 
         Logger.Status("Building new project")
         Using lLevel As New ProgressLevel()
-            Dim lResult As String = Execute(lQuery)
+            Dim lResult As String = atcD4EMLauncher.Execute(lQuery)
             'Logger.Msg(lResult, "Result of Query from DataManager")
 
             Dim lDisplayMessageBoxes As Boolean = Logger.DisplayMessageBoxes
@@ -804,7 +762,7 @@ CheckDownloadExe:
                            & "</arguments></function>"
                 End Select
                 If lQuery.Length > 0 Then
-                    lResult = Execute(lQuery)
+                    lResult = atcD4EMLauncher.Execute(lQuery)
                     If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
                         Logger.DisplayMessageBoxes = False
                         ProcessDownloadResults(lResult)
@@ -1419,7 +1377,7 @@ CheckDownloadExe:
         MWlay = Nothing
 
         Try
-            Dim lRendererName As String = SpatialOperations.GetDefaultRenderer(aFilename)
+            Dim lRendererName As String = atcD4EMLauncher.SpatialOperations.GetDefaultRenderer(aFilename)
 
             LayerName = IO.Path.GetFileNameWithoutExtension(aFilename)
             If layerXml Is Nothing Then
@@ -1600,7 +1558,7 @@ CheckDownloadExe:
         MWlay = Nothing
 
         Try
-            SpatialOperations.GetDefaultRenderer(aFilename)
+            atcD4EMLauncher.SpatialOperations.GetDefaultRenderer(aFilename)
 
             g_StatusBar.Item(1).Text = "Opening " & aFilename
 
