@@ -225,7 +225,7 @@ Public Module modBaseflowUtil
         'Yearly Template
         If aTsFlowFullRange.numValues > JulianYear Then
             lTsFlowDailyBnd = SubsetByDateBoundary(aTsFlowFullRange, 1, 1, Nothing)
-            If lTsFlowDailyBnd Is Nothing Then Exit Sub
+            If lTsFlowDailyBnd Is Nothing OrElse lTsFlowDailyBnd.Values Is Nothing Then Exit Sub
             lTsFlowYearly = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
             If lTsFlowYearly Is Nothing Then Exit Sub
             If lTsGroupPart IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupPart)
