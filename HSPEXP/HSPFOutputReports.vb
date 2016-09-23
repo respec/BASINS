@@ -106,7 +106,7 @@ Module HSPFOutputReports
             pConstituents.Add("TotalP")
         End If
         If StartUp.chkBODBalance.Checked Then
-            pConstituents.Add("BOD-PQUAL")
+            pConstituents.Add("BOD-Labile")
         End If
         If StartUp.chkFecalColiform.Checked Then
             pConstituents.Add("FColi")
@@ -117,11 +117,7 @@ Module HSPFOutputReports
         pTestPath = StartUp.cmbUCIPath.Text
         pBaseName = lTestName
         pTestPath = Mid(pTestPath, 1, Len(pTestPath) - Len(pBaseName) - 4)
-        'Dim ASDate, AEDate As Date
-        'If StartUp.chkAnalysisPeriod.Checked Then
-        ASDate = StartUp.DateTimePicker1.Value
-        AEDate = StartUp.DateTimePicker2.Value
-        'End If
+
         For Each lRCH As String In StartUp.txtRCH.Text.Split(","c)
             If IsNumeric(lRCH) Then
                 pOutputLocations.Add("R:" & CInt(lRCH)) ' the Cint should get rid of leading spaces and zeros 
@@ -139,8 +135,11 @@ Module HSPFOutputReports
         Logger.Status("HSPEXP+ is running.")
         Try
             Using lProgress As New ProgressLevel
+                SDateJ = StartUp.DateTimePicker1.Value.ToOADate()
+                EDateJ = StartUp.DateTimePicker2.Value.ToOADate() + 1
+
                 If pSensitivity Then
-                    SensitivityAnalysis(pBaseName, pTestPath)
+                    SensitivityAnalysis(pBaseName, pTestPath, SDateJ, EDateJ)
                 End If
 
                 If pRunUci = True Then
@@ -149,8 +148,7 @@ Module HSPFOutputReports
                     ChDriveDir(PathNameOnly(pHSPFExe))
                     lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & pBaseName & ".uci") 'Run HSPF program
                     ChDriveDir(pTestPath)
-                    'Dim WinHSPFLtVersionFound As String = FindFile("Please locate WinHspfLt.exe", IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location), "WinHSPFLt", "WinHspfLt.exe"))
-                    'Logger.Dbg(WinHSPFLtVersionFound)
+
                     If lExitCode = -1 Then
                         Throw New ApplicationException("WinHSPFLt could not run, Analysis cannot continue")
                         Exit Sub
@@ -166,11 +164,6 @@ Module HSPFOutputReports
 
                 Dim lStr As String = ""
                 Dim lRunMade As String = ""
-
-
-                SDateJ = StartUp.DateTimePicker1.Value.ToOADate()
-                EDateJ = StartUp.DateTimePicker2.Value.ToOADate()
-                
 
                 Dim lEchoFileisinFilesBlock As Boolean = False
                 Dim lHspfEchoFileName As String = ""
@@ -209,17 +202,13 @@ Module HSPFOutputReports
                     End While
                 End Using
 
-                'Dim EchoFileReader As StreamReader
-                'EchoFileReader = System.IO.File.ReadAllText(lHspfEchoFileName)
-
                 If HSPFRan = False Then
                     Logger.Dbg("ECHO file says that run was terminated last time. HSPEXP+ will exit!")
                     Dim ans As Integer
-                    ans = MsgBox("ECHO File contains a message that the run was terminated last time. HSPEXP+ will quit. Please make sure that UCI" & _
+                    ans = MsgBox("ECHO File contains a message that the run was terminated last time. HSPEXP+ will quit. Please make sure that UCI" &
                                  " file runs properly!")
                     End
                 End If
-
 
                 loutfoldername = pTestPath
                 Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") & _
@@ -229,9 +218,6 @@ Module HSPFOutputReports
                 System.IO.File.Copy(pTestPath & pBaseName & ".uci", loutfoldername & pBaseName & ".uci", overwrite:=True)
                 'A folder name is given that has the basename and the time when the run was made.
 
-                Logger.Dbg("ReadUCI " & aHspfUci.Name)
-                Logger.Dbg(Now & " Successfully read " & pBaseName & ".uci")
-                Logger.Progress(20, 100)
 
                 If StartUp.chkAdditionalgraphs.Checked Then
                     Try
@@ -274,7 +260,7 @@ Module HSPFOutputReports
                         Logger.Status(Now & " Calculating Expert Statistics for the file " & lExpertSystemFileName, True)
                         Try
                             Logger.Dbg(Now & " Calculating run statistics.")
-                            lExpertSystem = New HspfSupport.atcExpertSystem(aHspfUci, lExpertSystemFileName)
+                            lExpertSystem = New HspfSupport.atcExpertSystem(aHspfUci, lExpertSystemFileName, SDateJ, EDateJ)
                             Dim lHydrologyWDMFileName As String = lExpertSystem.ExpertWDMFileName
                             lStr = lExpertSystem.Report
 
@@ -316,12 +302,6 @@ Module HSPFOutputReports
                                 Dim lPrecTserOriginal As atcTimeseries = SubsetByDate(lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lPrecDsn), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                                 lPrecTserOriginal.Attributes.SetValue("Units", "inches")
                                 Dim lPrecTser As atcTimeseries = Aggregate(lPrecTserOriginal, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
-
-                                'RWZSetArgs(lSimTSerInches)
-                                'RWZSetArgs(lSimTSerInchesOriginal)
-                                'RWZSetArgs(lObsTSerInches)
-                                'RWZSetArgs(lPrecTser)
-                                'RWZSetArgs(lPrecTserOriginal)
 
                                 Logger.Dbg(Now & " Calculating monthly summary for " & lSiteName)
                                 'pProgressBar.pbProgress.Increment(5)
@@ -387,8 +367,7 @@ Module HSPFOutputReports
                                     If pMakeStdGraphs Then 'Becky added, only make storm graphs (log or normal) if we want standard graphs
                                         Logger.Dbg(Now & " Creating storm graphs")
                                         lSimTSer = InchesToCfs(lSimTSerInchesOriginal, lArea)
-                                        'RWZSetArgs(lSimTSer)
-                                        'pProgressBar.pbProgress.Increment(29)
+
                                         lTimeSeries.Add("Observed", lObsTSerOriginal)
                                         lTimeSeries.Add("Simulated", lSimTSer)
                                         lTimeSeries.Add("Prec", lPrecTserOriginal)
@@ -445,8 +424,8 @@ Module HSPFOutputReports
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("ORTHO P")
                                 AcceptableQUALNames.Add("BOD")
-                            Case "BOD-PQUAL"
-                                lConstituentName = "BOD"
+                            Case "BOD-Labile"
+                                lConstituentName = "BOD-Labile"
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("BOD")
                             Case "FColi"
@@ -503,7 +482,7 @@ Module HSPFOutputReports
                         Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent)
                         Logger.Dbg(Now & " Opening the binary output files.")
                         Dim lScenarioResults As New atcDataSource
-                        Dim lLocations As atcCollection
+                        Dim lLocations As New atcCollection
                         For i As Integer = 0 To aHspfUci.FilesBlock.Count
                             If aHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
                                 Dim lHspfBinFileName As String = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
@@ -515,8 +494,7 @@ Module HSPFOutputReports
                                 End If
                                 If lOpenHspfBinDataSource.DataSets.Count > 1 Then
 
-                                    lLocations = lOpenHspfBinDataSource.DataSets.SortedAttributeValues("Location")
-
+                                    lLocations.AddRange(lOpenHspfBinDataSource.DataSets.SortedAttributeValues("Location"))
                                     Dim lConstituentNames As New SortedSet(Of String)
                                     For Each lKey As String In lConstituentsToOutput.Keys
                                         If (lKey.EndsWith("1") Or lKey.EndsWith("2")) And Not lKey.ToUpper.Contains("EXIT") Then
@@ -554,7 +532,8 @@ Module HSPFOutputReports
                             Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
                             lReportCons = Nothing
 
-                            With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName, lScenarioResults, pOutputLocations, lRunMade)
+                            With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
+                                                                      lScenarioResults, pOutputLocations, lRunMade, SDateJ, EDateJ)
                                 lReportCons = .Item1
                                 lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
 
@@ -582,8 +561,8 @@ Module HSPFOutputReports
 
 
                             lReportCons = HspfSupport.ConstituentBalance.Report _
-                               (aHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                                lScenarioResults, lLocations, lRunMade)
+                               (aHspfUci, lConstituent, lOperationTypes, pBaseName,
+                                lScenarioResults, lLocations, lRunMade, SDateJ, EDateJ)
                             lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_OPN_Per_Year.txt"
 
                             SaveFileString(lOutFileName, lReportCons.ToString)
@@ -593,16 +572,16 @@ Module HSPFOutputReports
 
 
                             lReportCons = HspfSupport.WatershedConstituentBalance.Report _
-                            (aHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                            lScenarioResults, lRunMade)
+                            (aHspfUci, lConstituent, lOperationTypes, pBaseName,
+                            lScenarioResults, lRunMade, SDateJ, EDateJ)
                             lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
 
                             SaveFileString(lOutFileName, lReportCons.ToString)
 
                             If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
                                 HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-                                   (aHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                                    lScenarioResults, pOutputLocations, lRunMade, _
+                                   (aHspfUci, lConstituent, lOperationTypes, pBaseName,
+                                    lScenarioResults, pOutputLocations, lRunMade, SDateJ, EDateJ,
                                     loutfoldername, True)
                                 'now pivoted version
                                 'HspfSupport.WatershedConstituentBalance.ReportsToFiles _

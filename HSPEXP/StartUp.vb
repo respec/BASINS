@@ -9,11 +9,16 @@ Public Class StartUp
     Private pUci As atcUCI.HspfUci
 
     Private Sub cmdStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdStart.Click
-        Dim lBaseName = IO.Path.GetFileNameWithoutExtension(cmbUCIPath.Text)
-        If pUci Is Nothing OrElse pUci.Name <> lBaseName & ".uci" Then
+
+        If pUci Is Nothing OrElse pUci.Name <> cmbUCIPath.Text Then
             UciChanged()
         End If
-        ScriptMain(Nothing, pUci)
+        If pUci IsNot Nothing AndAlso IO.File.Exists(pUci.Name) Then
+            ScriptMain(Nothing, pUci)
+        Else
+            Logger.Msg("The UCI file " & cmbUCIPath.Text & " does not exist", MsgBoxStyle.Critical, "HSPEXP+")
+        End If
+
     End Sub
 
     Private Sub cmdBrowse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBrowse.Click
@@ -36,21 +41,40 @@ Public Class StartUp
     Sub UciChanged()
         Dim lExists As Boolean = IO.File.Exists(cmbUCIPath.Text)
         'cmbUCIPath.Visible = lExists
-        txtRCH.Visible = lExists
-        lblRCH.Visible = lExists
-        lblOutReach2.Visible = lExists
-        pnlHighlight.Visible = lExists
+        chkRunHSPF.Enabled = lExists
+        chkAreaReports.Enabled = lExists
+        DateTimePicker1.Enabled = lExists
+        DateTimePicker2.Enabled = lExists
+        chkExpertStats.Enabled = lExists
+        chkGraphStandard.Enabled = lExists
+        chkWaterBalance.Enabled = lExists
+        chkAdditionalgraphs.Enabled = lExists
+        chkSedimentBalance.Enabled = lExists
+        chkTotalNitrogen.Enabled = lExists
+        chkTotalPhosphorus.Enabled = lExists
+        chkBODBalance.Enabled = lExists
+        txtRCH.Enabled = lExists
+        lblRCH.Enabled = lExists
+        lblOutReach2.Enabled = lExists
+        pnlHighlight.Enabled = lExists
         cmdStart.Enabled = lExists
+
 
         Dim lUCI As String = cmbUCIPath.Text
         If IO.File.Exists(lUCI) Then
-            Logger.Status(Now & " Opening " & lUCI, True)
+            'Logger.Status(Now & " Opening " & lUCI, True)
+            Me.Cursor = Cursors.WaitCursor
             pUci = New atcUCI.HspfUci
             pUci.FastReadUciForStarter(pHspfMsg, lUCI)
+            Me.Cursor = Cursors.Default
             Dim lSDateJ = pUci.GlobalBlock.SDateJ
             Dim lEDateJ = pUci.GlobalBlock.EdateJ
+
+
             DateTimePicker1.Value = System.DateTime.FromOADate(lSDateJ)
-            DateTimePicker2.Value = System.DateTime.FromOADate(lEDateJ)
+            DateTimePicker2.Value = System.DateTime.FromOADate(lEDateJ - 1)
+        Else
+            pUci = Nothing
         End If
     End Sub
 
@@ -162,8 +186,10 @@ Public Class StartUp
     End Sub
 
     Private Sub cmbUCIPath_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbUCIPath.SelectedIndexChanged
-
+        UciChanged()
     End Sub
 
-
+    Private Sub cmbUCIPath_TextChanged(sender As Object, e As EventArgs) Handles cmbUCIPath.TextChanged
+        UciChanged()
+    End Sub
 End Class

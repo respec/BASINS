@@ -29,29 +29,31 @@ Public Module WatershedConstituentBalance
     ''' <param name="aFieldWidth"></param>
     ''' <param name="aSkipZeroOrNoValue"></param>
     ''' <remarks>see HSPFOutputReports script for sample usage</remarks>
-    Public Sub ReportsToFiles(ByVal aUci As atcUCI.HspfUci, _
-                              ByVal aBalanceType As String, _
-                              ByVal aOperationTypes As atcCollection, _
-                              ByVal aScenario As String, _
-                              ByVal aScenarioResults As atcDataSource, _
-                              ByVal aOutletLocations As atcCollection, _
-                              ByVal aRunMade As String, _
-                     Optional ByVal aOutFilePrefix As String = "", _
-                     Optional ByVal aOutletDetails As Boolean = False, _
-                     Optional ByVal aSegmentRows As Boolean = False, _
-                     Optional ByVal aDecimalPlaces As Integer = 3, _
-                     Optional ByVal aSignificantDigits As Integer = 5, _
-                     Optional ByVal aFieldWidth As Integer = 12, _
+    Public Sub ReportsToFiles(ByVal aUci As atcUCI.HspfUci,
+                              ByVal aBalanceType As String,
+                              ByVal aOperationTypes As atcCollection,
+                              ByVal aScenario As String,
+                              ByVal aScenarioResults As atcDataSource,
+                              ByVal aOutletLocations As atcCollection,
+                              ByVal aRunMade As String,
+                              ByVal aSDateJ As String,
+                              ByVal aEDateJ As String,
+                     Optional ByVal aOutFilePrefix As String = "",
+                     Optional ByVal aOutletDetails As Boolean = False,
+                     Optional ByVal aSegmentRows As Boolean = False,
+                     Optional ByVal aDecimalPlaces As Integer = 3,
+                     Optional ByVal aSignificantDigits As Integer = 5,
+                     Optional ByVal aFieldWidth As Integer = 12,
                      Optional ByVal aSkipZeroOrNoValue As Boolean = True)
 
 
 
         For Each lOutletLocation As String In aOutletLocations
-            Dim lReport As atcReport.ReportText = Report(aUci, aBalanceType, _
-                                               aOperationTypes, _
-                                               aScenario, aScenarioResults, _
-                                               aRunMade, lOutletLocation, _
-                                               aOutFilePrefix, True, _
+            Dim lReport As atcReport.ReportText = Report(aUci, aBalanceType,
+                                               aOperationTypes,
+                                               aScenario, aScenarioResults,
+                                               aRunMade, lOutletLocation,
+                                               aOutFilePrefix, True,
                                                aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth, aSkipZeroOrNoValue)
 
             Dim lPivotString As String = ""
@@ -79,7 +81,7 @@ Public Module WatershedConstituentBalance
                     Dim lCurrentGroup As String = ""
                     For Each lString As String In LinesInFile(lSummaryFileName)
                         Dim lFields() As Object = lString.Split(vbTab)
-                        If (lFields.GetUpperBound(0) = 3 OrElse _
+                        If (lFields.GetUpperBound(0) = 3 OrElse
                             lFields.GetUpperBound(0) = 2 AndAlso lCurrentOperation = "RCHRES") _
                             AndAlso lFields(0).ToString.Trim.Length > 0 Then
                             Dim lConstituent As String = lFields(0).ToString.Trim
@@ -155,7 +157,7 @@ Public Module WatershedConstituentBalance
 
                 Dim lReport As New atcReport.ReportText
                 lReport.AppendLine(aBalanceType & " Balance Report For " & aScenario)
-                lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
+                lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ))
                 lReport.Append("Location".PadLeft(12))
                 For Each lLocation As String In aOutletLocations
                     lReport.Append(vbTab & lLocation.PadLeft(12) & vbTab & Space(12))
@@ -206,7 +208,7 @@ Public Module WatershedConstituentBalance
                 Return "TN"
             Case "TotalP"
                 Return "TP"
-            Case "BOD-PQUAL"
+            Case "BOD-Labile"
                 Return "BOD"
         End Select
         Return aBalanceType
@@ -236,19 +238,21 @@ Public Module WatershedConstituentBalance
     ''' <param name="aSkipZeroOrNoValue"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Function Report(ByVal aUci As atcUCI.HspfUci, _
-                           ByVal aBalanceType As String, _
-                           ByVal aOperationTypes As atcCollection, _
-                           ByVal aScenario As String, _
-                           ByVal aScenarioResults As atcDataSource, _
-                           ByVal aRunMade As String, _
-                  Optional ByVal aOutletLocation As String = "", _
-                  Optional ByVal aOutFilePrefix As String = "", _
-                  Optional ByVal aOutletDetails As Boolean = False, _
-                  Optional ByVal aSegmentRows As Boolean = False, _
-                  Optional ByVal aDecimalPlaces As Integer = 3, _
-                  Optional ByVal aSignificantDigits As Integer = 5, _
-                  Optional ByVal aFieldWidth As Integer = 12, _
+    Public Function Report(ByVal aUci As atcUCI.HspfUci,
+                           ByVal aBalanceType As String,
+                           ByVal aOperationTypes As atcCollection,
+                           ByVal aScenario As String,
+                           ByVal aScenarioResults As atcDataSource,
+                           ByVal aRunMade As String,
+                           ByVal aSDateJ As Double,
+                           ByVal aEDateJ As Double,
+                  Optional ByVal aOutletLocation As String = "",
+                  Optional ByVal aOutFilePrefix As String = "",
+                  Optional ByVal aOutletDetails As Boolean = False,
+                  Optional ByVal aSegmentRows As Boolean = False,
+                  Optional ByVal aDecimalPlaces As Integer = 3,
+                  Optional ByVal aSignificantDigits As Integer = 5,
+                  Optional ByVal aFieldWidth As Integer = 12,
                   Optional ByVal aSkipZeroOrNoValue As Boolean = True) As atcReport.IReport
 
         Dim lOutletReport As Boolean = False
@@ -266,7 +270,7 @@ Public Module WatershedConstituentBalance
 
         Dim lReport As New atcReport.ReportText
         lReport.AppendLine(aScenario & " Annual Average Watershed Balance Report of " & aBalanceType & " For Each PERLND, IMPLND, and RCHRES.")
-        lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
+        lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ))
         If aBalanceType = "Water" Then
             If aUci.GlobalBlock.EmFg = 1 Then
                 lReport.AppendLine("   (Units:Inches)")
@@ -336,9 +340,9 @@ Public Module WatershedConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons/ac)" & vbCrLf
                                                 Case "Sediment_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons)" & vbCrLf
-                                                Case "TotalN_PERLND", "TotalN_IMPLND", "TotalP_PERLND", "TotalP_IMPLND", "BOD-PQUAL_PERLND", "BOD-PQUAL_IMPLND"
+                                                Case "TotalN_PERLND", "TotalN_IMPLND", "TotalP_PERLND", "TotalP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs/ac)" & vbCrLf
-                                                Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-PQUAL_RCHRES"
+                                                Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-Labile_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs)" & vbCrLf
                                                 Case "FColi_PERLND", "FColi_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (10^9 org/ac)" & vbCrLf
@@ -427,7 +431,7 @@ Public Module WatershedConstituentBalance
 
                                                             If Not lMassLinkID = 0 Then
 
-                                                                lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentDataName.ToUpper, aBalanceType, _
+                                                                lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentDataName.ToUpper, aBalanceType,
                                                                                                aConversionFactor, lMultipleIndex)
                                                             Else
                                                                 MassLinkExists = False
@@ -554,8 +558,8 @@ Public Module WatershedConstituentBalance
                                         End If
 
 
-                                    ElseIf lConstituentKey.StartsWith("Total") AndAlso _
-                                         lConstituentKey.Length > 5 AndAlso _
+                                    ElseIf lConstituentKey.StartsWith("Total") AndAlso
+                                         lConstituentKey.Length > 5 AndAlso
                                          IsNumeric(lConstituentKey.Substring(5, 1)) Then
                                         Dim lTotalCount As Integer = lConstituentKey.Substring(5, 1)
                                         Dim lCurFieldValues(.NumFields) As Double
@@ -679,7 +683,7 @@ Public Module WatershedConstituentBalance
                 Dim lDetailsReport As New atcReport.ReportText
                 Try
                     lDetailsReport.AppendLine(aBalanceType & " Balance by Land Use Category for " & aScenario & " at " & aOutletLocation)
-                    lDetailsReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
+                    lDetailsReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ))
                     lDetailsReport.AppendLine()
                     For Each lOperationType As String In aOperationTypes
                         Dim lOutputTable As New atcTableDelimited
@@ -739,8 +743,8 @@ Public Module WatershedConstituentBalance
                                             .CurrentRecord += 1
                                             .Value(1) = lConstituentName.PadRight(12)
 
-                                        ElseIf lConstituentKey.Substring(2).StartsWith("Total") AndAlso _
-                                       lConstituentKey.Substring(2).Length > 5 AndAlso _
+                                        ElseIf lConstituentKey.Substring(2).StartsWith("Total") AndAlso
+                                       lConstituentKey.Substring(2).Length > 5 AndAlso
                                        IsNumeric(lConstituentKey.Substring(7, 1)) Then
                                             Dim lTotalCount As Integer = lConstituentKey.Substring(7, 1)
                                             Dim lCurFieldValues(.NumFields) As Double
@@ -761,11 +765,6 @@ Public Module WatershedConstituentBalance
                                                 .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             Next
                                             .CurrentRecord += 1
-
-
-
-
-                                        Else
                                             .Value(1) = lConstituentName.PadRight(12)
                                             'fill in values for each land use
                                             Dim lValueTotal As Double = 0.0
@@ -829,7 +828,7 @@ Public Module WatershedConstituentBalance
             ' simple report - PERLND, IMPLND, RCHRES summary
             Dim lSummaryReport As New atcReport.ReportText
             lSummaryReport.AppendLine(Left(aBalanceType, 3) & " Balance for Subbasin " & aOutletLocation)
-            lSummaryReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
+            lSummaryReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ))
             lSummaryReport.AppendLine()
             lSummaryReport.AppendLine("Area Summary (acres)")
             Dim lTotalArea As Double = 0.0
@@ -844,24 +843,24 @@ Public Module WatershedConstituentBalance
 
             Dim lRowIdLength As Integer = 20
             lSummaryReport.AppendLine()
-            lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "OverOperType".PadLeft(12) & _
-                                                        vbTab & "Land".PadLeft(12) & _
+            lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "OverOperType".PadLeft(12) &
+                                                        vbTab & "Land".PadLeft(12) &
                                                         vbTab & "OverAll".PadLeft(12))
             If aBalanceType = "Water" Then
-                lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) & _
-                                                            vbTab & "Ac-Ft".PadLeft(12) & _
+                lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) &
+                                                            vbTab & "Ac-Ft".PadLeft(12) &
                                                             vbTab & "Inches".PadLeft(12))
             ElseIf aBalanceType = "Sediment" Then
-                lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "tons/ac".PadLeft(12) & _
-                                                            vbTab & "tons".PadLeft(12) & _
+                lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "tons/ac".PadLeft(12) &
+                                                            vbTab & "tons".PadLeft(12) &
                                                             vbTab & "tons/ac".PadLeft(12))
             ElseIf aBalanceType = "FColi" Then
-                lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "10^9/ac".PadLeft(12) & _
-                                                            vbTab & "10^9".PadLeft(12) & _
+                lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "10^9/ac".PadLeft(12) &
+                                                            vbTab & "10^9".PadLeft(12) &
                                                             vbTab & "10^9/ac".PadLeft(12))
             Else
-                lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) & _
-                                                            vbTab & "lbs".PadLeft(12) & _
+                lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) &
+                                                            vbTab & "lbs".PadLeft(12) &
                                                             vbTab & "lbs/ac".PadLeft(12))
             End If
             Dim lSubtotals(3) As Double
@@ -880,19 +879,19 @@ Public Module WatershedConstituentBalance
                             lHeaderStart = lSummaryReport.Body.Length
                             lSummaryReport.AppendLine()
                             If lOperationType = "RCHRES" Then
-                                lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "Reach".PadLeft(12) & _
+                                lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "Reach".PadLeft(12) &
                                                                             vbTab & "Outlets".PadLeft(12))
                                 If aBalanceType = "Water" Then
-                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) & _
+                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) &
                                                                                 vbTab & "Ac-Ft".PadLeft(12))
                                 ElseIf aBalanceType = "Sediment" Then
-                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadLeft(12) & _
+                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadLeft(12) &
                                                                                 vbTab & "tons/ac".PadLeft(12))
                                 ElseIf aBalanceType = "FColi" Then
-                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "10^9/ac".PadLeft(12) & _
+                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "10^9/ac".PadLeft(12) &
                                                                                 vbTab & "10^9".PadLeft(12))
                                 Else
-                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) & _
+                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) &
                                                                                 vbTab & "lbs".PadLeft(12))
                                 End If
                                 lSummaryReport.AppendLine("RCHRES") ' & vbTab & vbTab & "Area" & vbTab & DecimalAlign(lTotalArea))
@@ -929,8 +928,8 @@ Public Module WatershedConstituentBalance
                                     '.Value(2) = DecimalAlign(lValue / lUnitsAdjust)
 
 
-                                    lSummaryReport.Append(lConstituentName.PadRight(lRowIdLength) & vbTab & _
-                                               DecimalAlign(lValue / lTotalArea) & vbTab & _
+                                    lSummaryReport.Append(lConstituentName.PadRight(lRowIdLength) & vbTab &
+                                               DecimalAlign(lValue / lTotalArea) & vbTab &
                                                DecimalAlign(lValue / lUnitsAdjust))
                                 Else
                                     Dim lLoadUnit(0) As Double
@@ -941,9 +940,9 @@ Public Module WatershedConstituentBalance
                                     '.Value(2) = (lLoadTotal)
                                     '.Value(3) = (lLoadOverall)
 
-                                    lSummaryReport.Append(lConstituentName.PadRight(lRowIdLength) & vbTab & _
-                                               DecimalAlign(lLoadUnit(0)) & vbTab & _
-                                               DecimalAlign(lLoadTotal) & vbTab & _
+                                    lSummaryReport.Append(lConstituentName.PadRight(lRowIdLength) & vbTab &
+                                               DecimalAlign(lLoadUnit(0)) & vbTab &
+                                               DecimalAlign(lLoadTotal) & vbTab &
                                                DecimalAlign(lLoadOverall))
                                     lSubtotals(0) += lLoadUnit(0)
                                     lSubtotals(1) += lLoadTotal
@@ -957,13 +956,13 @@ Public Module WatershedConstituentBalance
                                 'Logger.Dbg("SkipNoData:" & lConstituentKey)
                             End If
                             '.CurrentRecord += 1
-                        ElseIf lConstituentKey.Substring(2).StartsWith("Total") AndAlso _
-                                 lConstituentKey.Substring(2).Length > 5 AndAlso _
+                        ElseIf lConstituentKey.Substring(2).StartsWith("Total") AndAlso
+                                 lConstituentKey.Substring(2).Length > 5 AndAlso
                                  IsNumeric(lConstituentKey.Substring(7, 1)) Then
 
-                            lSummaryReport.AppendLine("Total".PadRight(lRowIdLength) & vbTab & _
-                                                      DecimalAlign(lSubtotals(0)) & vbTab & _
-                                                      DecimalAlign(lSubtotals(1)) & vbTab & _
+                            lSummaryReport.AppendLine("Total".PadRight(lRowIdLength) & vbTab &
+                                                      DecimalAlign(lSubtotals(0)) & vbTab &
+                                                      DecimalAlign(lSubtotals(1)) & vbTab &
                                                       DecimalAlign(lSubtotals(2)))
                             lSubtotals(0) = 0
                             lSubtotals(1) = 0
@@ -982,8 +981,8 @@ Public Module WatershedConstituentBalance
 
                             Else
 
-                                lSummaryReport.AppendLine(lConstituentName.PadRight(lRowIdLength) & vbTab & _
-                                                           DecimalAlign(0.0) & vbTab & _
+                                lSummaryReport.AppendLine(lConstituentName.PadRight(lRowIdLength) & vbTab &
+                                                           DecimalAlign(0.0) & vbTab &
                                                            DecimalAlign(0.0))
                             End If
 
@@ -1008,9 +1007,9 @@ Public Module WatershedConstituentBalance
                     lSummaryReport.AppendLine(aBalanceType)
                     For Each lLoad As Load In lLoadTotals
                         If lLoad.Count > 1 Then
-                            lSummaryReport.AppendLine(lLoad.Name.PadRight(lRowIdLength) & vbTab & _
-                                                  DecimalAlign(lLoad.Unit(0)) & vbTab & _
-                                                  DecimalAlign(lLoad.Total) & vbTab & _
+                            lSummaryReport.AppendLine(lLoad.Name.PadRight(lRowIdLength) & vbTab &
+                                                  DecimalAlign(lLoad.Unit(0)) & vbTab &
+                                                  DecimalAlign(lLoad.Total) & vbTab &
                                                   DecimalAlign(lLoad.Overall))
                         End If
                     Next
@@ -1068,10 +1067,11 @@ Public Module WatershedConstituentBalance
         End If
     End Sub
 
-    Private Function Header(ByVal aBalanceType As String, ByVal aScenario As String, ByVal aRunMade As Date, ByVal auci As atcUCI.HspfUci) As String
+    Private Function Header(ByVal aBalanceType As String, ByVal aScenario As String, ByVal aRunMade As Date, ByVal auci As atcUCI.HspfUci,
+                            ByVal aSDateJ As Double, ByVal aEDateJ As Double) As String
         Dim lString As String = "   Run Made " & aRunMade & vbCrLf
         lString &= "   " & auci.GlobalBlock.RunInf.Value & vbCrLf
-        lString &= "   " & auci.GlobalBlock.RunPeriod
+        lString &= "   " & TimeSpanAsString(aSDateJ, aEDateJ)
         Return lString
     End Function
 

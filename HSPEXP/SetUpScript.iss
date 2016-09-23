@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "HSPEXP+"
-#define MyAppVersion "1.13"
+#define MyAppVersion "1.20"
 #define MyAppPublisher "AQUA TERRA Consultants (a division of RESPEC) "
 #define MyAppURL "http://www.aquaterra.com/resources/downloads/HSPEXPplus.php"
 #define MyAppExeName "HSPEXP+.exe"
@@ -21,7 +21,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={reg:HKLM\SOFTWARE\AQUA TERRA Consultants\BASINS41,Base Directory|{pf}\HSPEXP+}
 DefaultGroupName={#MyAppName}
-OutputBaseFilename=HSPEXP+1.13SetUp
+OutputBaseFilename=HSPEXP+1.20SetUp
 Compression=lzma
 SolidCompression=yes
 InfoBeforeFile=install.txt
@@ -33,11 +33,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\HSPEXP+.exe"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
-Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\WinHSPFLt\*"; DestDir: "{app}\WinHSPFLt"; Permissions: everyone-modify; Flags: ignoreversion
-Source: "C:\Dev\BASINS40\HSPEXP\bin\x86\Debug\*.dll"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
-Source: "C:\Dev\BASINS40\HSPEXP\*.chm"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
-Source: "C:\Dev\BASINS40\HSPEXP\GraphColors.txt"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
+Source: "C:\Dev\BASINS\BASINS\HSPEXP\bin\x86\Debug\HSPEXP+.exe"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
+Source: "C:\Dev\BASINS\BASINS\HSPEXP\bin\x86\Debug\WinHSPFLt\*"; DestDir: "{app}\WinHSPFLt"; Permissions: everyone-modify; Flags: ignoreversion
+Source: "C:\Dev\BASINS\BASINS\HSPEXP\bin\x86\Debug\*.dll"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
+Source: "C:\Dev\BASINS\BASINS\HSPEXP\*.chm"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
+Source: "C:\Dev\BASINS\BASINS\HSPEXP\GraphColors.txt"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversiono" on any shared system files
 
 [Icons]

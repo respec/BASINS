@@ -5,22 +5,24 @@ Imports atcUCI
 
 
 Public Module ConstituentBalance
-    Public Sub ReportsToFiles(ByVal aUci As atcUCI.HspfUci, _
-                              ByVal aOperations As atcCollection, _
-                              ByVal aBalanceTypes As atcCollection, _
-                              ByVal aScenario As String, _
-                              ByVal aScenarioResults As atcDataSource, _
-                              ByVal aLocations As atcCollection, _
-                              ByVal aRunMade As String, _
-                     Optional ByVal aDateColumns As Boolean = False, _
-                     Optional ByVal aDecimalPlaces As Integer = 3, _
-                     Optional ByVal aSignificantDigits As Integer = 5, _
+    Public Sub ReportsToFiles(ByVal aUci As atcUCI.HspfUci,
+                              ByVal aOperations As atcCollection,
+                              ByVal aBalanceTypes As atcCollection,
+                              ByVal aScenario As String,
+                              ByVal aScenarioResults As atcDataSource,
+                              ByVal aLocations As atcCollection,
+                              ByVal aRunMade As String,
+                              ByVal aSDateJ As Double,
+                              ByVal aEDateJ As Double,
+                     Optional ByVal aDateColumns As Boolean = False,
+                     Optional ByVal aDecimalPlaces As Integer = 3,
+                     Optional ByVal aSignificantDigits As Integer = 5,
                      Optional ByVal aFieldWidth As Integer = 12)
 
         For Each lBalanceType As String In aBalanceTypes
-            Dim lReport As atcReport.ReportText = Report(aUci, lBalanceType, aOperations, _
-                                                         aScenario, aScenarioResults, aLocations, _
-                                                         aRunMade, _
+            Dim lReport As atcReport.ReportText = Report(aUci, lBalanceType, aOperations,
+                                                         aScenario, aScenarioResults, aLocations,
+                                                         aRunMade, aSDateJ, aEDateJ,
                                                          aDateColumns, aDecimalPlaces, aSignificantDigits, aFieldWidth)
             Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_Balance.txt"
             Logger.Dbg("  WriteReportTo " & lOutFileName)
@@ -28,26 +30,28 @@ Public Module ConstituentBalance
         Next lBalanceType
     End Sub
 
-    Public Function Report(ByVal aUci As atcUCI.HspfUci, _
-                           ByVal aBalanceType As String, _
-                           ByVal aOperationTypes As atcCollection, _
-                           ByVal aScenario As String, _
-                           ByVal aScenarioResults As atcDataSource, _
-                           ByVal aLocations As atcCollection, _
-                           ByVal aRunMade As String, _
-                  Optional ByVal aDateRows As Boolean = False, _
-                  Optional ByVal aDecimalPlaces As Integer = 3, _
-                  Optional ByVal aSignificantDigits As Integer = 5, _
+    Public Function Report(ByVal aUci As atcUCI.HspfUci,
+                           ByVal aBalanceType As String,
+                           ByVal aOperationTypes As atcCollection,
+                           ByVal aScenario As String,
+                           ByVal aScenarioResults As atcDataSource,
+                           ByVal aLocations As atcCollection,
+                           ByVal aRunMade As String,
+                           ByVal aSDateJ As Double,
+                           ByVal aEDateJ As Double,
+                  Optional ByVal aDateRows As Boolean = False,
+                  Optional ByVal aDecimalPlaces As Integer = 3,
+                  Optional ByVal aSignificantDigits As Integer = 5,
                   Optional ByVal aFieldWidth As Integer = 12) As atcReport.IReport
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
-       
+
 
         Dim lReport As New atcReport.ReportText
         lReport.AppendLine(aScenario & " " & "Annual Loading Rates of " & aBalanceType & " For Each PERLND, and IMPLND, and")
         lReport.AppendLine("Annual Loadings of" & aBalanceType & " For Each Reach.")
         lReport.AppendLine("   Run Made " & aRunMade)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+        lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ))
         If aBalanceType = "Water" Then
             If aUci.GlobalBlock.EmFg = 1 Then
                 lReport.AppendLine("   (Units:Inches)")
@@ -135,9 +139,9 @@ Public Module ConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons/ac)"
                                                 Case "Sediment_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons)"
-                                                Case "TotalN_PERLND", "TotalN_IMPLND", "TotalP_PERLND", "TotalP_IMPLND", "BOD-PQUAL_PERLND", "BOD-PQUAL_IMPLND"
+                                                Case "TotalN_PERLND", "TotalN_IMPLND", "TotalP_PERLND", "TotalP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs/ac)"
-                                                Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-PQUAL_RCHRES"
+                                                Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-Labile_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs)"
                                                 Case "FColi_PERLND", "FColi_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (10^9 org/ac)"
@@ -145,7 +149,6 @@ Public Module ConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (10^9 org)"
 
                                             End Select
-
 
                                             .NumHeaderRows = 1
                                             .Delimiter = vbTab
@@ -203,7 +206,7 @@ Public Module ConstituentBalance
 
                                                     If Not lMassLinkID = 0 Then
 
-                                                        lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentDataName.ToUpper, aBalanceType, _
+                                                        lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentDataName.ToUpper, aBalanceType,
                                                                                        aConversionFactor, lMultipleIndex)
 
                                                     Else
@@ -259,8 +262,8 @@ Public Module ConstituentBalance
                                             .Value(2) = "Skip-NoData"
                                         End If
                                         .CurrentRecord += 1
-                                    ElseIf lConstituentKey.StartsWith("Total") AndAlso _
-                                           lConstituentKey.Length > 5 AndAlso _
+                                    ElseIf lConstituentKey.StartsWith("Total") AndAlso
+                                           lConstituentKey.Length > 5 AndAlso
                                            IsNumeric(lConstituentKey.Substring(5, 1)) Then
                                         Dim lTotalCount As Integer = lConstituentKey.Substring(5, 1)
                                         Dim lCurFieldValues(.NumFields) As Double

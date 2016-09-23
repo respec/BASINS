@@ -1,3 +1,11 @@
+Dated 09/22/2016
+HSPEXP+1.20/2016
+Features
+1. The HSPEXP+ form now allows user to select analysis dates, in case user wants to select a different analysis period than the model run.
+2. The HSPEXP+ form has better validation for checking the validity of UCI file before enabling the controls.
+3. The load allocation reports have been improved especially for cases when same land uses inputs into the same reach through multiple schematic lines. 
+4. BOD-Reports are now referred to as BOD-Labile report to clarify that the BOD loadings from land includes the mass-link factor.
+
 Dated 05/20/2016
 HSPEXP+1.13
 Features
