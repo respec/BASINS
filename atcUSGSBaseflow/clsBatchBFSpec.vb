@@ -1041,7 +1041,10 @@ Public Class clsBatchBFSpec
                             lTsFlowFullRange.Clear()
                             lTsFlowFullRange = Nothing
                         Catch ex As Exception
-                            lStation.Message &= "Error: Base-flow separation and/or reporting failed:" & vbCrLf & ex.Message & vbCrLf
+                            lStation.Message &= vbCrLf & "Error: Base-flow separation and/or reporting failed:" & vbCrLf & ex.Message & vbCrLf
+                            If ex.Message.Contains("out of range") Then
+                                lStation.Message &= "(Suggestion: check analysis starting and ending dates)" & vbCrLf
+                            End If
                         End Try
                     Else
                         lStation.Message &= "Note: no flow data, hence no outputs." & vbCrLf
