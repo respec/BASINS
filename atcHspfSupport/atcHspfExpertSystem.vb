@@ -57,8 +57,8 @@ Public Class atcExpertSystem
 
     Public Sub New(ByVal aUci As atcUCI.HspfUci,
                    ByVal lExpertSystemFileName As String,
-                   ByVal aSDateJ As Double,
-                   ByVal aEDateJ As Double,
+                   Optional ByVal aSDateJ As Double = 0.0,
+                   Optional ByVal aEDateJ As Double = 0.0,
                    Optional ByVal aExpertFlowOnly As Boolean = False)
         pFlowOnly = aExpertFlowOnly
         pUci = aUci
