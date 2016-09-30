@@ -112,7 +112,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\BASINS40\bin-D4EM10\x86Debug\</OutputPath>
+    <OutputPath>..\bin-D4EM10\x86Debug\</OutputPath>
     <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>MapWinUtility.xml</DocumentationFile>

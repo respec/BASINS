@@ -35,7 +35,7 @@ Public Module WatershedSummary
                 lTotalUnits = "cfs"
                 lRchresConstituents.Add("ROVOL")
                 lRchresConversion = "723.97"
-            Case "BOD-PQUAL"
+            Case "BOD-Labile"
                 lAgchemConstituent = "ORGN - TOTAL OUTFLOW"
                 lPerlndConstituents.Add("POQUAL-BOD")
                 lImplndConstituents.Add("SOQUAL-BOD")
@@ -178,7 +178,7 @@ Public Module WatershedSummary
                                 Dim lMult As Single = 1.0
                                 If lConstituent = "POQUAL-BOD" Or lConstituent = "SOQUAL-BOD" Then
                                     'might need another multiplier for bod
-                                    If aSummaryType = "BOD" Then
+                                    If aSummaryType = "BOD-Labile" Then
                                         lMult = 0.4
                                     ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TotalN" Then
                                         lMult = 0.069176
@@ -230,7 +230,7 @@ Public Module WatershedSummary
                         Dim lMult As Single = 1.0
                         If lConstituent = "BODOUTTOT" Then
                             'might need another multiplier for bod
-                            If aSummaryType = "BOD" Then
+                            If aSummaryType = "BOD-Labile" Then
                                 lMult = 0.4
                             ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TotalN" Then
                                 lMult = 0.069176

@@ -1,9 +1,6 @@
 Imports atcUtility
 Imports atcData
-'Imports atcWDM
 Imports atcGraph
-'Imports atcBasinsObsWQ
-'Imports MapWindow.Interfaces
 Imports ZedGraph
 Imports MapWinUtility
 Imports System
@@ -58,8 +55,10 @@ Public Class atcExpertSystem
     Private Const pConvert As Double = 24.0# * 3600.0# * 12.0# / 43560.0#
     Private Const pNSteps As Integer = 500
 
-    Public Sub New(ByVal aUci As atcUCI.HspfUci, _
-                   ByVal lExpertSystemFileName As String, _
+    Public Sub New(ByVal aUci As atcUCI.HspfUci,
+                   ByVal lExpertSystemFileName As String,
+                   Optional ByVal aSDateJ As Double = 0.0,
+                   Optional ByVal aEDateJ As Double = 0.0,
                    Optional ByVal aExpertFlowOnly As Boolean = False)
         pFlowOnly = aExpertFlowOnly
         pUci = aUci
@@ -234,7 +233,7 @@ Public Class atcExpertSystem
 
             If Not lRecordIndex >= lExsRecords.Count Then
 
-                If Not (lRecordIndex >= lExsRecords.Count Or lExsRecords(lRecordIndex).Trim = "" Or _
+                If Not (lRecordIndex >= lExsRecords.Count Or lExsRecords(lRecordIndex).Trim = "" Or
                         lExsRecords(lRecordIndex).Tolower.contains("seasons")) Then
 
                     'If no text is found in lines after the error criteria, HSPEXP can still work.
@@ -259,7 +258,7 @@ Public Class atcExpertSystem
                 End If
                 'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
                 lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
-                If Not (lExsRecords(lRecordIndex).Trim = "" Or _
+                If Not (lExsRecords(lRecordIndex).Trim = "" Or
                         lExsRecords(lRecordIndex).Tolower.contains("seasons")) Then
 
                     lExsRecord = Trim(lExsRecord.Replace(vbCrLf, "")) & "  " & Trim(lExsRecords(lRecordIndex + 1))
@@ -298,8 +297,8 @@ Public Class atcExpertSystem
                 lRecordIndex += 1
 
             End If
-            End If
-            'pErrorCriteria.Edit()
+        End If
+        'pErrorCriteria.Edit()
     End Sub
 
     Public Function ExpertWDMFileName() As String

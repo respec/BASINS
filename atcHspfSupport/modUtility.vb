@@ -684,7 +684,7 @@ Public Module Utility
                     .Add("R:P-TOT-OUT-EXIT5", "  Total P OutflowExit5")
 
                 End With
-            Case "BOD-PQUAL"
+            Case "BOD-Labile"
                 With lConstituentsToOutput
                     .Add("P:Header1", "BOD")
                     .Add("P:WASHQS-BOD", "  Sediment Attached")
@@ -1195,7 +1195,7 @@ Public Module Utility
                                 Return lMassLinkFactor
 
                         End Select
-                    Case "BOD-PQUAL"
+                    Case "BOD-Labile"
                         Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
                             "_" & lMassLink.Target.MemSub1
 

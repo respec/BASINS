@@ -4,8 +4,21 @@ Imports atcUtility
 Imports MapWinUtility
 
 Public Class StartUp
+
+    Private pHspfMsg As atcUCI.HspfMsg
+    Private pUci As atcUCI.HspfUci
+
     Private Sub cmdStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdStart.Click
-        ScriptMain(Nothing)
+
+        If pUci Is Nothing OrElse pUci.Name <> cmbUCIPath.Text Then
+            UciChanged()
+        End If
+        If pUci IsNot Nothing AndAlso IO.File.Exists(pUci.Name) Then
+            ScriptMain(Nothing, pUci)
+        Else
+            Logger.Msg("The UCI file " & cmbUCIPath.Text & " does not exist", MsgBoxStyle.Critical, "HSPEXP+")
+        End If
+
     End Sub
 
     Private Sub cmdBrowse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBrowse.Click
@@ -28,11 +41,41 @@ Public Class StartUp
     Sub UciChanged()
         Dim lExists As Boolean = IO.File.Exists(cmbUCIPath.Text)
         'cmbUCIPath.Visible = lExists
-        txtRCH.Visible = lExists
-        lblRCH.Visible = lExists
-        lblOutReach2.Visible = lExists
-        pnlHighlight.Visible = lExists
+        chkRunHSPF.Enabled = lExists
+        chkAreaReports.Enabled = lExists
+        DateTimePicker1.Enabled = lExists
+        DateTimePicker2.Enabled = lExists
+        chkExpertStats.Enabled = lExists
+        chkGraphStandard.Enabled = lExists
+        chkWaterBalance.Enabled = lExists
+        chkAdditionalgraphs.Enabled = lExists
+        chkSedimentBalance.Enabled = lExists
+        chkTotalNitrogen.Enabled = lExists
+        chkTotalPhosphorus.Enabled = lExists
+        chkBODBalance.Enabled = lExists
+        txtRCH.Enabled = lExists
+        lblRCH.Enabled = lExists
+        lblOutReach2.Enabled = lExists
+        pnlHighlight.Enabled = lExists
         cmdStart.Enabled = lExists
+
+
+        Dim lUCI As String = cmbUCIPath.Text
+        If IO.File.Exists(lUCI) Then
+            'Logger.Status(Now & " Opening " & lUCI, True)
+            Me.Cursor = Cursors.WaitCursor
+            pUci = New atcUCI.HspfUci
+            pUci.FastReadUciForStarter(pHspfMsg, lUCI)
+            Me.Cursor = Cursors.Default
+            Dim lSDateJ = pUci.GlobalBlock.SDateJ
+            Dim lEDateJ = pUci.GlobalBlock.EdateJ
+
+
+            DateTimePicker1.Value = System.DateTime.FromOADate(lSDateJ)
+            DateTimePicker2.Value = System.DateTime.FromOADate(lEDateJ - 1)
+        Else
+            pUci = Nothing
+        End If
     End Sub
 
     Private Sub cmdEnd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEnd.Click
@@ -69,21 +112,6 @@ Public Class StartUp
     End Sub
 
 
-    Private Sub btnMakeEXSFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMakeEXSFile.Click
-        If cmbUCIPath.Text.Length > 0 Then
-            MakeEXSFile.Show()
-            MakeEXSFile.lblUCIFileName.Text = cmbUCIPath.Text
-            Dim lWDM As New atcWDM.atcDataSourceWDM
-            atcData.atcDataManager.OpenDataSource(lWDM, IO.Path.ChangeExtension(MakeEXSFile.lblUCIFileName.Text, ".wdm"), Nothing)
-            Dim lSIMQ As atcData.atcTimeseriesGroup = lWDM.DataSets.FindData("Constituent", "SIMQ")
-            With MakeEXSFile.lstBOXWDM
-                For Each lTs As atcData.atcTimeseries In lSIMQ
-                    .Items.Add(lTs.Attributes.GetValue("Location"))
-                Next
-            End With
-        End If
-    End Sub
-
     Private Sub StartUp_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Dim WinHspfLtDir As String = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar & "WinHSPFLt"
@@ -109,6 +137,11 @@ Public Class StartUp
         HSPFOutputReports.pHSPFExe = IO.Path.Combine(WinHspfLtDir, "WinHspfLt.exe")
         atcWDM.atcDataSourceWDM.HSPFMsgFilename = IO.Path.Combine(WinHspfLtDir, "hspfmsg.wdm")
 
+        Logger.Dbg(Now & " Attempting to open hspfmsg.wdm")
+        pHspfMsg = New atcUCI.HspfMsg
+        pHspfMsg.Open(atcWDM.atcDataSourceWDM.HSPFMsgFilename) 'Becky: this can be found at C:\BASINS\models\HSPF\bin if you did the typical BASINS install
+
+
         atcData.atcDataManager.Clear()
         With atcData.atcDataManager.DataPlugins
             .Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
@@ -128,7 +161,7 @@ Public Class StartUp
             cmbUCIPath.Items.Add(lUCI)
             cmbUCIPath.SelectedIndex = 0
         End If
-        UciChanged
+        UciChanged()
     End Sub
 
     Private Sub btn_help_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_help.Click
@@ -152,7 +185,11 @@ Public Class StartUp
         End If
     End Sub
 
-    Private Sub cmbUCIPath_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbUCIPath.SelectedIndexChanged
+    Private Sub cmbUCIPath_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbUCIPath.SelectedIndexChanged
+        UciChanged()
+    End Sub
 
+    Private Sub cmbUCIPath_TextChanged(sender As Object, e As EventArgs) Handles cmbUCIPath.TextChanged
+        UciChanged()
     End Sub
 End Class

@@ -8,13 +8,17 @@ Public Module ConstituentBudget
     Private pOutputTotals As atcCollection
     Private pPERLND As atcCollection
     Private pIMPLND As atcCollection
-    Public Function Report(ByVal aUci As atcUCI.HspfUci, _
-                           ByVal aBalanceType As String, _
-                           ByVal aOperationTypes As atcCollection, _
-                           ByVal aScenario As String, _
-                           ByVal aScenarioResults As atcDataSource, _
-                           ByVal aOutputLocations As atcCollection, _
-                           ByVal aRunMade As String) As Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)
+    Private pGENERLoadingExits As Boolean = False
+    Public Function Report(ByVal aUci As atcUCI.HspfUci,
+                           ByVal aBalanceType As String,
+                           ByVal aOperationTypes As atcCollection,
+                           ByVal aScenario As String,
+                           ByVal aScenarioResults As atcDataSource,
+                           ByVal aOutputLocations As atcCollection,
+                           ByVal aRunMade As String,
+                           ByVal aSDateJ As Double,
+                           ByVal aEDateJ As Double) As _
+                           Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)
 
         Dim lNumberFormat As String = "#,##0.###"
         Dim lUnits As String = ""
@@ -39,13 +43,13 @@ Public Module ConstituentBudget
         pIMPLND = New atcCollection
 
         For Each lSource As HspfOperation In aUci.OpnSeqBlock.Opns
+            'Collecting the names of the land uses
             If lSource.Name = "PERLND" AndAlso Not pPERLND.Keys.Contains(lSource.Description) Then
                 pPERLND.Add(lSource.Description)
 
             ElseIf lSource.Name = "IMPLND" AndAlso Not pIMPLND.Keys.Contains(lSource.Description) Then
                 pIMPLND.Add(lSource.Description)
             End If
-
         Next
 
         Select Case aBalanceType
@@ -141,20 +145,20 @@ Public Module ConstituentBudget
         lReport.AppendLine(aScenario & " " & "Average Annual " & aBalanceType & " Budget by Reach " & lUnits & ".")
         lReport.AppendLine("   Run Made " & aRunMade)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+        lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ))
 
 
         lReport2.AppendLine(aScenario & " " & "Average Annual Nonpoint Loading of " & aBalanceType & " by Each Land Use to Each Reach " & lUnits & ".")
         lReport2.AppendLine("   Run Made " & aRunMade)
         lReport2.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport2.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+        lReport2.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ))
 
 
         lReport3.AppendLine(aScenario & " " & " Average Annual Load Allocation of " & aBalanceType & " to Each Source by Reach " & lUnits & ".")
         lReport3.AppendLine("The Losses at Each Reach have been applied to the source, and the Gains are accumulated.")
         lReport3.AppendLine("   Run Made " & aRunMade)
         lReport3.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport3.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+        lReport3.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ))
 
         lReport4.AppendLine("")
         lReport4.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches (%).")
@@ -163,18 +167,18 @@ Public Module ConstituentBudget
         lReport5.AppendLine("The Losses at Each Reach have been applied to the source, and the Gains are accumulated.")
         lReport5.AppendLine("   Run Made " & aRunMade)
         lReport5.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport5.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+        lReport5.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ))
 
         lReport6.AppendLine("")
         lReport6.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches of Interest(%).")
 
 
-        Dim YearsOfSimulation As Double = YearCount(aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ)
+        Dim YearsOfSimulation As Double = YearCount(aSDateJ, aEDateJ)
         Dim lOutputTable As New atcTableDelimited
 
         Select Case aBalanceType
             Case "Water"
-                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab & _
+                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (ft/ac)" & vbTab & "Total Load (ac-ft)")
                 With lOutputTable
                     .Delimiter = vbTab
@@ -213,7 +217,7 @@ Public Module ConstituentBudget
                                             End If
                                         End If
                                         Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                        ltimeseries = SubsetByDate(ltimeseries, aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ, Nothing)
+                                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
                                         lPointVol += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
 
                                     End If
@@ -245,7 +249,8 @@ Public Module ConstituentBudget
                             End If
 
                         End If
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointVol, 0.0, 0.0, lTotalInflow, lUpstreamIn, lDiversion)
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointVol, 0.0, 0.0,
+                                                         lTotalInflow, lUpstreamIn, lDiversion, aSDateJ, aEDateJ)
                             lReport2.Append(.Item1)
                             lNonpointVol = .Item2
                         End With
@@ -275,8 +280,8 @@ Public Module ConstituentBudget
                             lReachTrappingEfficiency = 0
                         End Try
 
-                        
-                       
+
+
                         lCumulativePointNonpointColl.Increment(lDownstreamReachID, lCumulativePointNonpoint)
 
                         lField = 0
@@ -296,7 +301,7 @@ Public Module ConstituentBudget
                 End With
 
             Case "Sediment"
-                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & _
+                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" &
                                     vbTab & "Rate (tons/ac)" & vbTab & "Total Load (tons)")
                 With lOutputTable
                     .Delimiter = vbTab
@@ -335,7 +340,7 @@ Public Module ConstituentBudget
                                             End If
                                         End If
                                         Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                        ltimeseries = SubsetByDate(ltimeseries, aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ, Nothing)
+                                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
                                         lPointTons += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
                                     End If
                                 Next
@@ -350,7 +355,7 @@ Public Module ConstituentBudget
                         End If
 
                         Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
-                        
+
                         Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
                         Dim lDepScour As Double = ValueForReach(lID, lDepScourData) 'TotalForReach(lID, lAreas, lDepScourData)
                         Dim lNonpointTons As Double
@@ -373,7 +378,8 @@ Public Module ConstituentBudget
 
                         End If
 
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointTons, 0.0, -lDepScour, lTotalInflow, lUpstreamIn, lDiversion)
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointTons, 0.0, -lDepScour, lTotalInflow, lUpstreamIn,
+                                                         lDiversion, aSDateJ, aEDateJ)
                             lReport2.Append(.Item1)
                             lNonpointTons = .Item2
                             'When calculating losses and gains to the water columns from the be depth, deposition is the loss from the stream and 
@@ -393,7 +399,7 @@ Public Module ConstituentBudget
                             lReachTrappingEfficiency = 0
                         End Try
 
-                        
+
                         Dim lCululativeTrappingEfficiency As Double = 0
                         Try
                             lCululativeTrappingEfficiency = 1 - (lOutflow / lCumulativePointNonpoint)
@@ -421,7 +427,7 @@ Public Module ConstituentBudget
                 End With
 
             Case "TotalN"
-                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab & _
+                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (lbs/ac)" & vbTab & "Total Load (lbs)")
 
                 With lOutputTable
@@ -471,7 +477,7 @@ Public Module ConstituentBudget
                                             End If
                                         End If
                                         Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                        ltimeseries = SubsetByDate(ltimeseries, aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ, Nothing)
+                                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
                                         lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
 
                                     End If
@@ -514,7 +520,8 @@ Public Module ConstituentBudget
 
                         End If
 
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON, lPointlbs, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn, lDiversion)
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON, lPointlbs, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn,
+                                                         lDiversion, aSDateJ, aEDateJ)
                             lReport2.Append(.Item1)
                             lNonpointlbs = .Item2
                         End With
@@ -533,7 +540,7 @@ Public Module ConstituentBudget
                             lReachTrappingEfficiency = 0
                         End Try
 
-                        
+
                         Dim lCululativeTrappingEfficiency As Double = 0
                         Try
                             lCululativeTrappingEfficiency = 1 - (lOutflow / lCumulativePointNonpoint)
@@ -694,7 +701,7 @@ Public Module ConstituentBudget
                 '        lReport.Append(.ToString)
                 '    End With
             Case "TotalP"
-                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab & _
+                lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (lbs/ac)" & vbTab & "Total Load (lbs)")
 
                 With lOutputTable
@@ -741,7 +748,7 @@ Public Module ConstituentBudget
                                             End If
                                         End If
                                         Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                        ltimeseries = SubsetByDate(ltimeseries, aUci.GlobalBlock.SDateJ, aUci.GlobalBlock.EdateJ, Nothing)
+                                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
                                         lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
 
                                     End If
@@ -783,8 +790,8 @@ Public Module ConstituentBudget
                         End If
 
 
-
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVOP, lPointlbs, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn, Diversion)
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVOP, lPointlbs, lTotalAtmDep,
+                                                         lDepScour, lTotalInflow, lUpstreamIn, Diversion, aSDateJ, aEDateJ)
                             lReport2.Append(.Item1)
                             lNonpointlbs = .Item2
                         End With
@@ -1126,17 +1133,19 @@ Public Module ConstituentBudget
 
     End Sub
 
-    Private Function ConstituentLoadingByLanduse(ByVal aUCI As HspfUci, _
-                                                 ByVal aReach As HspfOperation, _
-                                    ByVal aBalanceType As String, _
-                                    ByVal aNonpointData As atcTimeseriesGroup, _
-                                   ByVal aConversionFactor As Double, _
-                                   ByVal aPoint As Double, _
-                                   ByVal aAtmDep As Double, _
-                                   ByVal GainLoss As Double, _
-                                   ByVal aTotalInflow As Double, _
-                                   ByVal aUpstreamIn As Double, _
-                                   ByVal aDiversion As Double) As Tuple(Of String, Double)
+    Private Function ConstituentLoadingByLanduse(ByVal aUCI As HspfUci,
+                                                 ByVal aReach As HspfOperation,
+                                    ByVal aBalanceType As String,
+                                    ByVal aNonpointData As atcTimeseriesGroup,
+                                   ByVal aConversionFactor As Double,
+                                   ByVal aPoint As Double,
+                                   ByVal aAtmDep As Double,
+                                   ByVal GainLoss As Double,
+                                   ByVal aTotalInflow As Double,
+                                   ByVal aUpstreamIn As Double,
+                                   ByVal aDiversion As Double,
+                                   ByVal aSDateJ As Double,
+                                   ByVal aEDateJ As Double) As Tuple(Of String, Double)
         Dim LoadingByLanduse As String = ""
         Dim lReachTotal As Double = 0.0
 
@@ -1145,26 +1154,68 @@ Public Module ConstituentBudget
         felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent)
         felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent)
 
+
         Dim lAdditionalSource As Double = aTotalInflow - lReachTotal - aAtmDep - aPoint - aUpstreamIn
 
 
         felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent)
         felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent)
         'If aReach.Id = 260 Then Stop
-        For Each lTributary As HspfConnection In aReach.Sources
-            If lTributary.Source.VolName = "RCHRES" Then
-                Dim lTributaryId As String = lTributary.Source.VolId
-                aPoint += pRunningTotals.ItemByKey("Reach" & lTributaryId & " PointSources")
-                lAdditionalSource += pRunningTotals.ItemByKey("Reach" & lTributaryId & " AdditionalSources")
-                aAtmDep += pRunningTotals.ItemByKey("Reach" & lTributaryId & " DirectAtmosphericDeposition")
-                aDiversion += pRunningTotals.ItemByKey("Reach" & lTributaryId & " Diversion")
-                pRunningTotals.Increment("Reach" & aReach.Id & " Gain", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Gain"))
-                pRunningTotals.Increment("Reach" & aReach.Id & " Loss", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Loss"))
-                'pRunningTotals.Increment("Reach" & aReach.Id & " Diversion", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Diversion"))
-            End If
-        Next
 
-        pRunningTotals.Add("Reach" & aReach.Id & " PointSources", aPoint)
+        Dim lGENERLoad As Double = 0.0
+
+        'For Each GENERConnection As HspfConnection In aReach.Sources
+        '    If GENERConnection.Source.VolName = "GENER" Then
+        '        pGENERLoadingExits = True
+        '        Dim GENERID As String = GENERConnection.Source.VolId
+        '        For Each EXTTarget As HspfConnection In aUCI.Connections
+        '            If EXTTarget.Source.VolName = "GENER" AndAlso EXTTarget.Source.VolId = GENERID AndAlso EXTTarget.Target.VolName.Contains("WDM") Then
+        '                'The GENER timeseries is available as a WDM timeseries
+        '                Dim VolName As String = EXTTarget.Source.VolName
+        '                Dim lDSN As Integer = EXTTarget.Target.VolId
+        '                Dim lMfact As Double = EXTTarget.MFact
+        '                For i As Integer = 0 To aUCI.FilesBlock.Count
+        '                    If aUCI.FilesBlock.Value(i).Typ = VolName Then
+        '                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
+        '                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+        '                        If lDataSource Is Nothing Then
+        '                            If atcDataManager.OpenDataSource(lFileName) Then
+        '                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+        '                            End If
+        '                        End If
+        '                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+        '                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+        '                        lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearCount(aSDateJ, aEDateJ)
+        '                    End If
+        '                Next
+        '            Else
+        '                'The GENER timeseries is not available as a WDM timeseries
+        '                Logger.Msg("The operation RCHRES " & aReach.Id & " contains loading from operation GENER " & GENERID & ".Please ensure that the GENER
+        '                            operation is outputs to a WDM dataset, to accurately account for the sources contributing to the reach.", vbOKOnly)
+        '                'Need to end the program here
+        '            End If
+        '        Next
+        '        'Assuming GENER goes through schematic
+        '        Dim lMassLinkID As Integer = GENERConnection.MassLink
+        '        FindMassLinkFactor(aUCI, lMassLinkID,)
+
+        '    End If
+        'Next GENERConnection
+
+        For Each lTributary As HspfConnection In aReach.Sources
+                If lTributary.Source.VolName = "RCHRES" Then
+                    Dim lTributaryId As String = lTributary.Source.VolId
+                    aPoint += pRunningTotals.ItemByKey("Reach" & lTributaryId & " PointSources")
+                    lAdditionalSource += pRunningTotals.ItemByKey("Reach" & lTributaryId & " AdditionalSources")
+                    aAtmDep += pRunningTotals.ItemByKey("Reach" & lTributaryId & " DirectAtmosphericDeposition")
+                    aDiversion += pRunningTotals.ItemByKey("Reach" & lTributaryId & " Diversion")
+                    pRunningTotals.Increment("Reach" & aReach.Id & " Gain", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Gain"))
+                    pRunningTotals.Increment("Reach" & aReach.Id & " Loss", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Loss"))
+                    'pRunningTotals.Increment("Reach" & aReach.Id & " Diversion", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Diversion"))
+                End If
+            Next
+
+            pRunningTotals.Add("Reach" & aReach.Id & " PointSources", aPoint)
         pRunningTotals.Add("Reach" & aReach.Id & " DirectAtmosphericDeposition", aAtmDep)
         pRunningTotals.Add("Reach" & aReach.Id & " AdditionalSources", lAdditionalSource)
         pRunningTotals.Add("Reach" & aReach.Id & " Diversion", aDiversion)
@@ -1201,8 +1252,8 @@ Public Module ConstituentBudget
         Return New Tuple(Of String, Double)(LoadingByLanduse, lReachTotal)
     End Function
 
-    Private Function FindDownStreamExitNumber(ByVal aUCI As HspfUci, _
-                                              ByVal aReachID As HspfOperation, _
+    Private Function FindDownStreamExitNumber(ByVal aUCI As HspfUci,
+                                              ByVal aReachID As HspfOperation,
                                               ByRef aExitNumber As Integer) As Integer
         'Function to find the EXIT number through which the flow is sent to the downstream waterbody.
         Dim lDownstreamReachID As Integer = aReachID.DownOper("RCHRES")
@@ -1223,4 +1274,5 @@ Public Module ConstituentBudget
         Next
         Return aExitNumber
     End Function
+
 End Module
