@@ -1121,11 +1121,11 @@ ReadCharacter:
                         If pLength > 0 AndAlso pStreamReader.BaseStream.Position = pLength Then
                             GoTo AtEndOfStream
                         End If
-                        lChar = pStreamReader.ReadChar
+                        lChar = Chr(pStreamReader.ReadByte)
                     End If
                     Select Case lChar
                         Case ControlChars.Cr 'Found carriage return, consume linefeed if it is next
-                            pNextChar = pStreamReader.ReadChar
+                            pNextChar = Chr(pStreamReader.ReadByte)
                             If pNextChar <> vbLf Then pHaveNextChar = True 'Save next char if it was not LF
                         Case ControlChars.Lf 'Unix-style line ends without carriage return
                         Case Else 'Found a character that does not end the line
