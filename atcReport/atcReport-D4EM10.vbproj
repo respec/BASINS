@@ -113,7 +113,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\x86\Debug\</OutputPath>
+    <OutputPath>..\bin-D4EM10\x86Debug\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcReport.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
