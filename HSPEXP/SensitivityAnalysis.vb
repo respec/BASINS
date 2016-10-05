@@ -34,7 +34,8 @@ End Class
 
 
 Public Module ModSensitivityAnalysis
-    Sub SensitivityAnalysis(ByVal pBaseName As String, ByVal pTestPath As String)
+    Sub SensitivityAnalysis(ByVal pBaseName As String, ByVal pTestPath As String,
+                            aSDateJ As Double, aEDateJ As String)
         Dim YearsofSimulation As Single
         Dim Sensitivity(100, 4) As Object
         Dim ExpertStatsOutputLine As String
@@ -44,9 +45,9 @@ Public Module ModSensitivityAnalysis
         dateTimeOfUciFile = FormatDateTime(dateTimeOfUciFile, DateFormat.LongDate)
         System.IO.File.Copy(pBaseName & ".uci", pBaseName & dateTimeOfUciFile & ".uci", True)
         'Save the original copy of the uci file before altering
-        ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Average Annual (cfs), Average Annual (in)," & _
-            "10% High (in), 25% High (in), 50% High (in), 50% Low (in0.), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in)," & _
-            "Annual Peak Flow(cfs), Error(%) Annual Average, Error(%) 10% High, Error(%) 25% High, Error(%) 50% High, " & _
+        ExpertStatsOutputLine = "SimID, OPERATION, PARM-TABLE, PARM, Value, Site Name, Average Annual (cfs), Average Annual (in)," &
+            "10% High (in), 25% High (in), 50% High (in), 50% Low (in0.), 25% Low (in), 10% Low (in), 5% Low (in), 2% Low (in)," &
+            "Annual Peak Flow(cfs), Error(%) Annual Average, Error(%) 10% High, Error(%) 25% High, Error(%) 50% High, " &
             "Error(%) 50% Low, Error(%) 25% Low, Error(%) 10% Low, Error(%) 5% Low, Error(%) 2% Low, Error (%) Annual Peak Flow" & vbCrLf
         IO.File.WriteAllText(pBaseName & "_HydrologyOutput.csv", ExpertStatsOutputLine)
         Dim lMsg As New atcUCI.HspfMsg
@@ -68,13 +69,14 @@ Public Module ModSensitivityAnalysis
         pOper = "Baseline"
         oTable = "Baseline"
         oParameter = "Baseline"
-        Dim ParameterDetails As String = "SIMID, OPERATION, TABLE, OPERATIONNUMBER," & _
+        Dim ParameterDetails As String = "SIMID, OPERATION, TABLE, OPERATIONNUMBER," &
                                                 "PARMATERNAME, MONTH/TYPE, PARAMETERVALUE" & vbCrLf
 
         If lExitCode = -1 Then
             MsgBox("The original uci file could not run. Program will exit")
         End If
-        ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath, YearsofSimulation, lStats) 'Baseline simulation and recording the values
+        ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath,
+                                 YearsofSimulation, aSDateJ, aEDateJ, lStats) 'Baseline simulation and recording the values
 
         Dim DBFRecords As Integer
         lUci.Save()
@@ -133,7 +135,7 @@ Public Module ModSensitivityAnalysis
                                     ElseIf (lOper.Tables(oTable).Parms(Mon).Value > UpperLimit) Then
                                         lOper.Tables(oTable).Parms(Mon).Value = UpperLimit
                                     End If
-                                    ParameterDetails &= SimID & "," & pOper & "," & oTable & "," & lOper.Id & "," & _
+                                    ParameterDetails &= SimID & "," & pOper & "," & oTable & "," & lOper.Id & "," &
                                     oParameter & "," & Mon & "," & lOper.Tables(oTable).Parms(Mon).Value & vbCrLf
 
                                 Next
@@ -144,10 +146,10 @@ Public Module ModSensitivityAnalysis
                         For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
                             For SedimentType As Integer = 15 To 16
 
-                                lOper.Tables(SedimentType).ParmValue(oParameter) = _
+                                lOper.Tables(SedimentType).ParmValue(oParameter) =
                                 SignificantDigits(lOper.Tables(SedimentType).ParmValue(oParameter) * pValue(j), 3)
                                 If oParameter = "TAUCD" Then
-                                    lOper.Tables(SedimentType).ParmValue("TAUCS") = _
+                                    lOper.Tables(SedimentType).ParmValue("TAUCS") =
                                 SignificantDigits(lOper.Tables(SedimentType).ParmValue("TAUCS") * pValue(j), 3)
                                 End If
 
@@ -177,20 +179,21 @@ Public Module ModSensitivityAnalysis
 
                     Case Else
                         For Each lOper As HspfOperation In lUci.OpnBlks(pOper).Ids
-                            lOper.Tables(oTable).ParmValue(oParameter) = _
+                            lOper.Tables(oTable).ParmValue(oParameter) =
                                     SignificantDigits(lOper.Tables(oTable).ParmValue(oParameter) * pValue(j), 3)
                             If (lOper.Tables(oTable).ParmValue(oParameter) < LowerLimit) Then
                                 lOper.Tables(oTable).ParmValue(oParameter) = LowerLimit
                             ElseIf (lOper.Tables(oTable).ParmValue(oParameter) > UpperLimit) Then
                                 lOper.Tables(oTable).ParmValue(oParameter) = UpperLimit
                             End If
-                            ParameterDetails &= SimID & "," & pOper & "," & oTable & "," & lOper.Id & "," & _
-                                                                            oParameter & ",," & _
+                            ParameterDetails &= SimID & "," & pOper & "," & oTable & "," & lOper.Id & "," &
+                                                                            oParameter & ",," &
                                                                             lOper.Tables(oTable).ParmValue(oParameter) & vbCrLf
                         Next
                 End Select
                 lUci.Save()
-                ModelRunandReportAnswers(SimID, lUci, NewuciName, lExitCode, pBaseName, pTestPath, YearsofSimulation, lStats)
+                ModelRunandReportAnswers(SimID, lUci, NewuciName, lExitCode, pBaseName, pTestPath,
+                                         aSDateJ, aEDateJ, YearsofSimulation, lStats)
 
                 System.IO.File.Copy(pBaseName & ".wdm", SimID & "-" & pBaseName & ".wdm", True)
                 lUci = Nothing
@@ -203,13 +206,15 @@ Public Module ModSensitivityAnalysis
 
     End Sub
 
-    Private Function ModelRunandReportAnswers(ByVal SimID As Integer, _
-                                 ByVal lUci As atcUCI.HspfUci, _
-                                 ByVal uciName As String, _
-                                 ByVal lExitCode As Integer, _
-                                 ByVal pBaseName As String, _
-                                 ByVal pTestPath As String, _
-                                 ByVal YearsofSimulation As Single, _
+    Private Function ModelRunandReportAnswers(ByVal SimID As Integer,
+                                 ByVal lUci As atcUCI.HspfUci,
+                                 ByVal uciName As String,
+                                 ByVal lExitCode As Integer,
+                                 ByVal pBaseName As String,
+                                 ByVal pTestPath As String,
+                                 ByVal aSDateJ As Double,
+                                 ByVal aEDateJ As Double,
+                                 ByVal YearsofSimulation As Single,
                                  ByRef lStats As List(Of SensitivityStats))
 
         'lExitCode = LaunchProgram(pHSPFExe, pTestpath, "-1 -1 " & uciName) 'Run HSPF program
@@ -226,12 +231,12 @@ Public Module ModSensitivityAnalysis
                 lWdmDataSource = atcDataManager.DataSourceBySpecification(pTestPath & lWdmFileName)
             End If
         End If
-        Dim ExpertStatsOutputLine As String
+        Dim ExpertStatsOutputLine As String = ""
         Dim lExpertSystem As HspfSupport.atcExpertSystem
 
-        lExpertSystem = New HspfSupport.atcExpertSystem(lUci, pBaseName & ".exs")
+        lExpertSystem = New HspfSupport.atcExpertSystem(lUci, pBaseName & ".exs", aSDateJ, aEDateJ)
         Dim lCons As String = "Flow"
-        
+
         Dim lYearlyAttributes As New atcDataAttributes
 
         For Each lSite As HspfSupport.HexSite In lExpertSystem.Sites
@@ -242,7 +247,7 @@ Public Module ModSensitivityAnalysis
                 With lNewStatObs
                     .SimID = SimID
                     .Scenario = "Observed"
-                    Dim obsTimeSeriescfs As atcData.atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(1)), _
+                    Dim obsTimeSeriescfs As atcData.atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(1)),
                                                                           lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                     obsTimeSeriescfs = Aggregate(obsTimeSeriescfs, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                     'obsTimeSeriescfs.Attributes.DiscardCalculated()
@@ -265,13 +270,13 @@ Public Module ModSensitivityAnalysis
                     .FivePercentLow = (obsTimeSeriesInches.Attributes.GetDefinedValue("%Sum05").Value) / YearsofSimulation '5% low
                     .TwoPercentLow = (obsTimeSeriesInches.Attributes.GetDefinedValue("%Sum02").Value) / YearsofSimulation '2% low
 
-                    ExpertStatsOutputLine = "Observed,Obs,Obs,Obs,Obs, " & _
-                            lSiteName & ", " & FormatNumber(.AverageAnnualcfs, 3, , , TriState.False) & _
-                            ", " & FormatNumber(.AverageAnnual, 3) & ", " & _
-                            FormatNumber(.TenPercentHigh, 3) & ", " & FormatNumber(.TwentyFivePercentHigh, 3) & ", " & _
-                            FormatNumber(.FiftyPercentHigh, 3) & ", " & FormatNumber(.FiftyPercentLow, 3) & ", " & _
-                            FormatNumber(.TwentyFivePercentLow, 3) & ", " & FormatNumber(.TenPercentLow, 3) & ", " & _
-                            FormatNumber(.FivePercentLow, 3) & ", " & FormatNumber(.TwoPercentLow, 3) & ", " & _
+                    ExpertStatsOutputLine = "Observed,Obs,Obs,Obs,Obs, " &
+                            lSiteName & ", " & FormatNumber(.AverageAnnualcfs, 3, , , TriState.False) &
+                            ", " & FormatNumber(.AverageAnnual, 3) & ", " &
+                            FormatNumber(.TenPercentHigh, 3) & ", " & FormatNumber(.TwentyFivePercentHigh, 3) & ", " &
+                            FormatNumber(.FiftyPercentHigh, 3) & ", " & FormatNumber(.FiftyPercentLow, 3) & ", " &
+                            FormatNumber(.TwentyFivePercentLow, 3) & ", " & FormatNumber(.TenPercentLow, 3) & ", " &
+                            FormatNumber(.FivePercentLow, 3) & ", " & FormatNumber(.TwoPercentLow, 3) & ", " &
                             FormatNumber(.AnnualPeakFlow, 3, , , TriState.False) & vbCrLf
                 End With
                 lStats.Add(lNewStatObs)
@@ -283,9 +288,9 @@ Public Module ModSensitivityAnalysis
                 Else
                     .Scenario = "Sensitivity"
                 End If
-                Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)), _
+                Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)),
                                                                    lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                Dim lSimTSercfs As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)), _
+                Dim lSimTSercfs As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)),
                                                                 lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing) * 0.042 * lArea
                 Dim MaxSimTSercfs = Aggregate(lSimTSercfs, atcTimeUnit.TUYear, 1, atcTran.TranMax)
 
@@ -296,13 +301,13 @@ Public Module ModSensitivityAnalysis
                 lSimTSercfs = Aggregate(lSimTSercfs, atcTimeUnit.TUYear, 1, atcTran.TranMax)
                 .AnnualPeakFlow = lSimTSercfs.Attributes.GetValue("SumAnnual")
                 .AverageAnnual = lSimTSerInches.Attributes.GetValue("SumAnnual")
-                .TenPercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") - _
+                .TenPercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") -
                                   lSimTSerInches.Attributes.GetValue("%Sum90")) _
                                 / YearsofSimulation '10% high
-                .TwentyFivePercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") - _
+                .TwentyFivePercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") -
                                          lSimTSerInches.Attributes.GetValue("%Sum75")) _
                                          / YearsofSimulation '25% high
-                .FiftyPercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") - _
+                .FiftyPercentHigh = (lSimTSerInches.Attributes.GetValue("Sum") -
                                     lSimTSerInches.Attributes.GetValue("%Sum50")) _
                                 / YearsofSimulation '50% high
                 .FiftyPercentLow = lSimTSerInches.Attributes.GetValue("%Sum50") / YearsofSimulation '50% low
