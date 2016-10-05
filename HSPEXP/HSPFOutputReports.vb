@@ -171,24 +171,30 @@ Module HSPFOutputReports
                 For i As Integer = 0 To aHspfUci.FilesBlock.Count
                     If aHspfUci.FilesBlock.Value(i).Typ = "MESSU" Then
                         lHspfEchoFileName = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir()) 'Should check if the echo file is present
-                        echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
-                        lRunMade = echoFileInfo.LastWriteTime.ToString
-                        lEchoFileisinFilesBlock = True
+                        If IO.File.Exists(lHspfEchoFileName) Then
+                            echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
+                            lRunMade = echoFileInfo.LastWriteTime.ToString
+                            lEchoFileisinFilesBlock = True
+                        Else
+                            Logger.Msg("The ECHO file is not available for this model. Please check if model ran successfully last time", vbCritical)
+                            Return
+                        End If
                         Exit For
                     End If
                 Next
                 If Not lEchoFileisinFilesBlock Then
                     lHspfEchoFileName = pTestPath & "hspfecho.out"
-                    echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
-                    lRunMade = echoFileInfo.LastWriteTime.ToString
+                    If IO.File.Exists(lHspfEchoFileName) Then
+                        echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
+                        lRunMade = echoFileInfo.LastWriteTime.ToString
+                        lEchoFileisinFilesBlock = True
+                    Else
+                        Logger.Msg("The ECHO file is not available for this model. Please check if model ran successfully last time", vbCritical)
+                        Return
+                    End If
                 End If
 
-                If lHspfEchoFileName = "" Then
-                    Logger.Dbg("There is no echo file available, looks like HSPF didn't run last time!")
-                    Dim ans As Integer
-                    ans = MsgBox("There is no ECHO file available. Did UCI file run properly last time?")
-                    End
-                End If
+
 
                 Dim HSPFRan As Boolean = True
                 Using echoFileReader As StreamReader = File.OpenText(lHspfEchoFileName)
