@@ -90,10 +90,8 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="ZedGraph, Version=5.1.3.0, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\D4EM\Bin\ZedGraph.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="ZedGraph">
+      <HintPath>..\bin-D4EM10\x86Debug\ZedGraph.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -162,7 +160,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM10.vbproj">
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM10.vbproj">
       <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
       <Name>MapWinUtility-D4EM10</Name>
       <Private>False</Private>
