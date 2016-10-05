@@ -125,7 +125,7 @@ Public Class atcExpertSystem
                 lDate(3) = 24
                 lDate(4) = 0
                 EDateJ = Date2J(lDate)
-                Logger.Dbg("The simulation time period from the exs file is used for the calibration")
+                Logger.Msg("The simulation time period from the EXS file is used for the calibration", vbOKOnly)
             End If
 
             'Default unspecified lat/integer min/max values to contiguous 48 states
