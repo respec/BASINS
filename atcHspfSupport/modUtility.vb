@@ -147,11 +147,11 @@ Public Module Utility
                     .Add("P:TAET", "    Total   ")
                     .Add("R:Header0", "Flow")
                     .Add("R:ROVOL", "    OutVolume")
-                    .Add("R:OVOL1", "    OutVolumeExit1")
-                    .Add("R:OVOL2", "    OutVolumeExit2")
-                    .Add("R:OVOL3", "    OutVolumeExit3")
-                    .Add("R:OVOL4", "    OutVolumeExit4")
-                    .Add("R:OVOL5", "    OutVolumeExit5")
+                    .Add("R:OVOL-1", "    OutVolumeExit1")
+                    .Add("R:OVOL-2", "    OutVolumeExit2")
+                    .Add("R:OVOL-3", "    OutVolumeExit3")
+                    .Add("R:OVOL-4", "    OutVolumeExit4")
+                    .Add("R:OVOL-5", "    OutVolumeExit5")
                     If aCategory Then 'user used categories to indicate where water came from
                         .Add("R:ROVOL1", "    OVolPtIn")
                         .Add("R:ROVOL1-1", "    OVolPtInX1")
@@ -662,6 +662,7 @@ Public Module Utility
                     .Add("R:PO4-INPART-TOT", "  Particulate PO4 Inflow")
                     .Add("R:PO4-PROCFLUX-TOT", "  PO4 Process Fluxes")
                     .Add("R:PO4-OUTTOT", "  Total PO4 Outflow")
+                    .Add("R:PO4-ATMDEPTOT", " Atmospheric PO4 Deposition")
                     .Add("R:PO4-OUTDIS", "  Dissolved PO4 Outflow")
                     .Add("R:PO4-OUTPART-TOT", "  Particulate PO4 Outflow")
 
@@ -684,7 +685,7 @@ Public Module Utility
                     .Add("R:P-TOT-OUT-EXIT5", "  Total P OutflowExit5")
 
                 End With
-            Case "BOD-PQUAL"
+            Case "BOD-Labile"
                 With lConstituentsToOutput
                     .Add("P:Header1", "BOD")
                     .Add("P:WASHQS-BOD", "  Sediment Attached")
@@ -1044,12 +1045,16 @@ Public Module Utility
                         Select Case aConstituent & "_" & lMassLink.Source.Member.ToString & "_" & lMassLink.Target.Member.ToString
                             Case "WSSD_WSSD_ISED", "WSSD_SOSED_ISED", "SCRSD_SCRSD_ISED", "SCRSD_SOSED_ISED", "SOSLD_SOSLD_ISED"
                                 lMassLinkFactor += lMassLink.MFact
+                            Case "GENER_TIMSER_ISED"
+                                lMassLinkFactor += lMassLink.MFact
                         End Select
                     Case "Water"
                         If (lMassLink.Source.Member = "PERO" Or lMassLink.Source.Member = aConstituent) _
                             And lMassLink.Target.Member = "IVOL" Then
                             lMassLinkFactor = lMassLink.MFact
-                            Return lMassLinkFactor
+                        ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "IVOL") Then
+                            lMassLinkFactor = lMassLink.MFact
+                            
                         End If
 
                     Case "TotalN"
@@ -1093,7 +1098,7 @@ Public Module Utility
                                     End If
 
                                 End If
-                                
+
 
                             Case "POQUAL-NO3_NUIF1_1", "SOQUAL-NO3_NUIF1_1", "IOQUAL-NO3_NUIF1_1", "AOQUAL-NO3_NUIF1_1"
                                 If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
@@ -1133,13 +1138,21 @@ Public Module Utility
                         If aConstituent.Contains("NITROGEN - TOTAL OUTFLOW") Then
                             lMassLinkFactor = 1
                             Return lMassLinkFactor
+                        ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1) Then
+                            lMassLinkFactor += lMassLink.MFact
+
+                        ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2) Then
+                            lMassLinkFactor += lMassLink.MFact
+
+                        ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2) Then
+                            lMassLinkFactor += lMassLink.MFact * aConversionFactor
 
                         End If
 
 
                     Case "TotalP"
                         'If aConstituent.Contains("SOQUAL") Then Stop
-                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
+                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString &
                             "_" & lMassLink.Target.MemSub1
 
                             Case "POQUAL-ORTHO P_NUIF1_4", "SOQUAL-ORTHO P_NUIF1_4", "IOQUAL-ORTHO P_NUIF1_4", "AOQUAL-ORTHO P_NUIF1_4"
@@ -1147,8 +1160,8 @@ Public Module Utility
                                     lMassLinkFactor = lMassLink.MFact
                                     'Return lMassLinkFactor
                                 End If
-                            Case "POQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_2", "AOQUAL-ORTHO P_NUIF2_2", "IOQUAL-ORTHO P_NUIF2_2", _
-                                "POQUAL-ORTHO P_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_3", "AOQUAL-ORTHO P_NUIF2_3", "IOQUAL-ORTHO P_NUIF2_3", _
+                            Case "POQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_2", "AOQUAL-ORTHO P_NUIF2_2", "IOQUAL-ORTHO P_NUIF2_2",
+                                "POQUAL-ORTHO P_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_3", "AOQUAL-ORTHO P_NUIF2_3", "IOQUAL-ORTHO P_NUIF2_3",
                                 "POQUAL-ORTHO P_NUIF2_1", "SOQUAL-ORTHO P_NUIF2_1", "AOQUAL-ORTHO P_NUIF2_1", "IOQUAL-ORTHO P_NUIF2_1"
 
                                 If lMassLink.Target.MemSub2 = 2 Then
@@ -1181,7 +1194,7 @@ Public Module Utility
                             Case "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW_NUIF1_4"
                                 lMassLinkFactor = lMassLink.MFact
                                 Return lMassLinkFactor
-                            Case "SDP4A_NUIF2_1", "SDP4A_NUIF2_2", "SDP4A_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_1", _
+                            Case "SDP4A_NUIF2_1", "SDP4A_NUIF2_2", "SDP4A_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_1",
                                 "SOQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_3"
                                 If lMassLink.Target.MemSub2 = 2 Then
                                     lMassLinkFactor += lMassLink.MFact
@@ -1195,7 +1208,16 @@ Public Module Utility
                                 Return lMassLinkFactor
 
                         End Select
-                    Case "BOD-PQUAL"
+
+                        If (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4) Then
+                            lMassLinkFactor += lMassLink.MFact
+
+                        ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2) Then
+                            lMassLinkFactor += lMassLink.MFact * aConversionFactor
+
+                        End If
+
+            Case "BOD-Labile"
                         Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
                             "_" & lMassLink.Target.MemSub1
 
@@ -1257,4 +1279,33 @@ Public Module Utility
 
 
     End Function
+    Public Function ConversionFactorfromBiomass(ByVal aUCI As HspfUci, ByVal aBalanceType As String, ByVal aReach As HspfOperation) As Double
+        Dim aConversionFactorFromBiomass As Double = 0.0
+        Dim lOperationIndex As Integer = aUCI.OpnSeqBlock.Opns.IndexOf(aReach)
+        Dim CVBO As Double = aUCI.OpnSeqBlock.Opns(lOperationIndex).Tables("CONV-VAL1").Parms("CVBO").Value
+        'conversion from mg biomass to mg oxygen
+        Dim CVBPC As Double = aUCI.OpnSeqBlock.Opns(lOperationIndex).Tables("CONV-VAL1").Parms("CVBPC").Value
+        'conversion from biomass expressed as P to C = ratio of moles of C to moles of P in biomass		
+        Dim CVBPN As Double = aUCI.OpnSeqBlock.Opns(lOperationIndex).Tables("CONV-VAL1").Parms("CVBPN").Value
+        'conversion from biomass expressed as P to N = ratio of moles of N to moles of P in biomass		
+        Dim BPCNTC As Double = aUCI.OpnSeqBlock.Opns(lOperationIndex).Tables("CONV-VAL1").Parms("BPCNTC").Value
+        'conversion from biomass expressed as P to N = ratio of moles of N to moles of P in biomass		
+        Dim CVBN As Double = 14 * CVBPN * BPCNTC / 1200 / CVBPC
+        'conversion from biomass to N
+        Dim CVON As Double = CVBN / CVBO
+        'conversion from oxygen to N
+        Dim CVBP As Double = 31 * BPCNTC / 1200 / CVBPC
+        'conversion from biomass to P
+        Dim CVOP As Double = CVBP / CVBO
+        If aBalanceType = "TotalN" Then
+            aConversionFactorFromBiomass = CVBN
+        ElseIf aBalanceType = "TotalP" Then
+            aConversionFactorFromBiomass = CVBP
+        End If
+
+        Return aConversionFactorFromBiomass
+
+
+    End Function
+
 End Module
