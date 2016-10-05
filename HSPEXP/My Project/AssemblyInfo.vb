@@ -1,4 +1,5 @@
-﻿Imports System
+﻿Imports System.Resources
+Imports System
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 
@@ -8,17 +9,17 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("HSPEXP+")> 
-<Assembly: AssemblyDescription("Hydrology & Water Quality Calibration Tool")> 
-<Assembly: AssemblyCompany("AQUA TERRA Consultants")> 
-<Assembly: AssemblyProduct("HSPEXP")> 
-<Assembly: AssemblyCopyright("")> 
-<Assembly: AssemblyTrademark("")> 
+<Assembly: AssemblyTitle("HSPEXP+")>
+<Assembly: AssemblyDescription("Hydrology & Water Quality Calibration Tool")>
+<Assembly: AssemblyCompany("AQUA TERRA Consultants")>
+<Assembly: AssemblyProduct("HSPEXP")>
+<Assembly: AssemblyCopyright("")>
+<Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("c441ee13-d195-4604-b625-49b5a0ad455a")> 
+<Assembly: Guid("c441ee13-d195-4604-b625-49b5a0ad455a")>
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +32,6 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
-<Assembly: AssemblyFileVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("1.20.0.0")>
+<Assembly: AssemblyFileVersion("1.20.0.0")>
+<Assembly: NeutralResourcesLanguage("en-US")>
