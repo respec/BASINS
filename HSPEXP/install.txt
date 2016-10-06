@@ -1,18 +1,28 @@
-Dated 09/22/2016
-HSPEXP+1.20/2016
+Dated 10/05/2016
+HSPEXP+1.20beta
 Features
-1. The HSPEXP+ form now allows user to select analysis dates, in case user wants to select a different analysis period than the model run.
+1. The HSPEXP+ form now allows user to select analysis dates, in case user wants to select a different analysis period than
+the model run.
 2. The HSPEXP+ form has better validation for checking the validity of UCI file before enabling the controls.
-3. The load allocation reports have been improved especially for cases when same land uses inputs into the same reach through multiple schematic lines. 
-4. BOD-Reports are now referred to as BOD-Labile report to clarify that the BOD loadings from land includes the mass-link factor.
+3. BOD-Reports are now referred to as BOD-Labile report to clarify that the BOD loadings from land includes the mass-link
+factor.
+4. The budget reports now check if GENER sources provide input to the RCHRES, and then calculate the loadings from GENER operations. The GENER operation must output a timeseries to a WDM file.
 
+Bugs Fixed
+1. The load allocation reports have been improved for calculation of contribution percent of different sources.
+  
+  
+  
 Dated 05/20/2016
 HSPEXP+1.13
 Features
-1. The CSV file is read using a CSV parser which means that the field in quotes are read as one field and the comma inside quotes is ignored.
-2. If a PERLND or IMPLND does not have a valid downstream connection, then that connection is skipped while calculating the contituent balance reports.
+1. The CSV file is read using a CSV parser which means that the field in quotes are read as one field and the comma inside
+quotes is ignored.
+2. If a PERLND or IMPLND does not have a valid downstream connection, then that connection is skipped while calculating the
+contituent balance reports.
 3. If QUALID doesn't meet HSPEXP+ criteria, HSPEXP+ gives warning and quits.
-4. Water quality and water balance report generation process is more efficient so that bigger HBN files can be used for generating reports.
+4. Water quality and water balance report generation process is more efficient so that bigger HBN files can be used for
+generating reports.
 
 Dated 03/11/2016
 HSPEXP+1.12
@@ -24,7 +34,8 @@ Features
 
 Bugs Fixed
 
-1. Table 1 in the SWSTAT output (classwise comparison of errors, root mean square errors and bias) has been removed due to confusion in the bias calculation procedures.
+1. Table 1 in the SWSTAT output (classwise comparison of errors, root mean square errors and bias) has been removed due to
+confusion in the bias calculation procedures.
 
 
 
@@ -32,26 +43,35 @@ Dated 12/02/2015
 HSPEXP+1.11
 Features
 1. New splash screen and updated user's manual.
-2. Any timeseries can be transformed before plotting graphs when Graph Generation option is selected. In the thirteenth column of timeseries description, add the following text inside the quotes (without quotes) for the transformations.
+2. Any timeseries can be transformed before plotting graphs when Graph Generation option is selected. In the thirteenth
+column of timeseries description, add the following text inside the quotes (without quotes) for the transformations.
 
             a. "c to f" --> Transform from Celsius to Fahrenheit.
             b. "f to c" --> Transform from Fahrenheit to Celsius.
             c. "sum c" --> Add the constant c to the timeseries.
             d. "product c" -->Multiply the timeseries by the constant c.
 
-3. A timeseries can be aggregated to extract percentiles. For example, a user can specify to extract 75% percentile of daily values from an hourly timeseries by specifying "Daily" as the "Aggregation" and "%75" as the "Aggregation Type."
-4. The specifications for graphs can be in multiple *.csv files, and the names are no longer hardcoded. HSPEXP+ looks for all the *.csv files in the project folder for making graphs. HSPEXP+ typically ignores the *csv files that do not have data properly formatted for additional graphs. However, it is user's responsibility to make sure that all the *.csv files in the project folder are properly formatted.         
+3. A timeseries can be aggregated to extract percentiles. For example, a user can specify to extract 75% percentile of daily
+values from an hourly timeseries by specifying "Daily" as the "Aggregation" and "%75" as the "Aggregation Type."
+4. The specifications for graphs can be in multiple *.csv files, and the names are no longer hardcoded. HSPEXP+ looks for all
+the *.csv files in the project folder for making graphs. HSPEXP+ typically ignores the *csv files that do not have data
+properly formatted for additional graphs. However, it is user's responsibility to make sure that all the *.csv files in the
+project folder are properly formatted.         
 
 Bugs Fixed
 
 1. The steptype was not plotted properly. Now the timeseries can be plotted as forwardstep, rearwardstep, or nonstep.
 2. Some point symbols were not filled in graphs. Now all the point symbols are filled by default. 
-3. When HSPEXP+ is started, the pConstituents collection is cleared so that the reports of any constituents from the previous run are not generated.
+3. When HSPEXP+ is started, the pConstituents collection is cleared so that the reports of any constituents from the previous
+run are not generated.
 4. In hydrology calibration, log scale and supplemental graphs are plotted only if hydrology calibration graphs are selected.
-5. Graphs are generated even if the two header lines starting with "Type of Graph", and "Axis for the Curve" do not exist or are commented out using "***" in the graph specification file(s).
+5. Graphs are generated even if the two header lines starting with "Type of Graph", and "Axis for the Curve" do not exist or
+are commented out using "***" in the graph specification file(s).
 6. The code for reading the HSPF echo file was improved to read echo files with larger size.
-7. The load allocation reports were calculating incorrect loadings when the model contained reach numbers with less than 3 digits. This bug has been fixed.
-8. The point source contribution calculation for Total N didn't include nitrite when it was available as a separate source. This bug has been fixed.
+7. The load allocation reports were calculating incorrect loadings when the model contained reach numbers with less than 3
+digits. This bug has been fixed.
+8. The point source contribution calculation for Total N didn't include nitrite when it was available as a separate source.
+This bug has been fixed.
 9. More error checking has been added in the code for graph generation.
 
 
@@ -59,11 +79,16 @@ Dated:09/01/2015
 HSPEXP+1.1
 
 Features
-1. Nutrient Load Allocation Reports (new report) - MPCA supported the development of load allocation reports for sediment, Total Nitrogen(TN), and Total Phosphorus(TP) in HSPEXP+. The load allocation reports provide load and percent of total load, attributed to each upstream sources at all the reach end points in the watershed, and at the user-selected reaches, whenever sediment, TN, or TP reports are requested. The description of this process is provided in the updated User's Manual. 
-2. Additional cases were added to calculate TN and TP input to a reach if particulate ammonia and orthophosphate are added to the reach as attached to sediment.
+1. Nutrient Load Allocation Reports (new report) - MPCA supported the development of load allocation reports for sediment,
+Total Nitrogen(TN), and Total Phosphorus(TP) in HSPEXP+. The load allocation reports provide load and percent of total load,
+attributed to each upstream sources at all the reach end points in the watershed, and at the user-selected reaches, whenever
+sediment, TN, or TP reports are requested. The description of this process is provided in the updated User's Manual. 
+2. Additional cases were added to calculate TN and TP input to a reach if particulate ammonia and orthophosphate are added to
+the reach as attached to sediment.
 
 Bugs Fixed
-1. A bug was fixed where HSPEXP+ would attempt to run HSPF12.3 instead of HSPF12.4(beta), if the user has HSPF12.3 installed.  HSPEXP+ now runs only HSPF12.4(beta) that is installed with HSPEXP+.
+1. A bug was fixed where HSPEXP+ would attempt to run HSPF12.3 instead of HSPF12.4(beta), if the user has HSPF12.3 installed. 
+HSPEXP+ now runs only HSPF12.4(beta) that is installed with HSPEXP+.
 2. A bug was fixed where total water input to a reach was double counted in the Reach Budget Report for water.
 
 
@@ -79,17 +104,23 @@ Bugs fixed
 
 
 Dated: 05/13/2015
-HSPEXP+ now checks if the last run of the model was successful. If not, HSPEXP+ quits and recommends the user to correct the error before running the model.
+HSPEXP+ now checks if the last run of the model was successful. If not, HSPEXP+ quits and recommends the user to correct the
+error before running the model.
 Dated: 05/11/2015
 AQUA TERRA Consultants releases an update to HSPEXP+1.0. This update addresses multiple issues and adds some small features.
 
 Features
-1. Based on the request from some users, HSPEXP+ loads with the link to previous project. This reduces the time spent in browsing the previous project.
-2. HSPEXP+ does not close after producing the reports. A user can make changes to the project files and run HSPEXP+ again. This saves time as a typical user has to run HSPEXP+ multiple times to complete calibration, and the user does not have to restart HSPEXP+ every time.
+1. Based on the request from some users, HSPEXP+ loads with the link to previous project. This reduces the time spent in
+browsing the previous project.
+2. HSPEXP+ does not close after producing the reports. A user can make changes to the project files and run HSPEXP+ again.
+This saves time as a typical user has to run HSPEXP+ multiple times to complete calibration, and the user does not have to
+restart HSPEXP+ every time.
 
 Bugs fixed
-1. The annual budget reports per reach was not reporting correct rates of nutrient loading if there were some PERLND or IMPLND with zero areas.  This bug has been fixed.
-2. HSPEXP+ could not read the lines in EXS file with less characters than expected, and was crashing. This bug has been fixed.
+1. The annual budget reports per reach was not reporting correct rates of nutrient loading if there were some PERLND or
+IMPLND with zero areas.  This bug has been fixed.
+2. HSPEXP+ could not read the lines in EXS file with less characters than expected, and was crashing. This bug has been
+fixed.
 3. HSPEXP+ was expecting Julian dates in AutomatedGraphs.csv. Now it expects dates in mm/dd/yyyy format.
 4. Graphs are plotted even if no size for lines and symbols are provided. A default size 1 is assumed.
 5. The legend font for frequency graphs was too big and has been reduced to size 12 font.

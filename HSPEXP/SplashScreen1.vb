@@ -27,9 +27,9 @@
         '    Version.Text = System.String.Format(Version.Text, My.Application.Info.Version.Major, My.Application.Info.Version.Minor, My.Application.Info.Version.Build, My.Application.Info.Version.Revision)
 
         With My.Application.Info.Version
-            Version.Text = "Version " & .Major & "." & .Minor
+            Version.Text = "Version " & .Major & "." & .Minor & " beta"
             If .MajorRevision > 0 OrElse .MinorRevision > 0 Then
-                Version.Text &= "." & .MajorRevision & "." & .MinorRevision
+                Version.Text &= "." & .MajorRevision & "." & .MinorRevision & "beta"
             End If
         End With
         'Copyright info
