@@ -28,6 +28,8 @@ Public Class BFBatchInputNames
     Public Shared BFM_PART As String = "PART"
     Public Shared BFM_BFIS As String = "BFIS"
     Public Shared BFM_BFIM As String = "BFIM"
+    Public Shared BFM_BFLOW As String = "BFLOW"
+    Public Shared BFM_TwoPRDF As String = "TwoPRDF"
 
     'Public Shared STREAMFLOW As String = "Streamflow"
     ''' <summary>
@@ -293,6 +295,10 @@ Public Class clsBatchBFSpec
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIStandard
                     Case BFBatchInputNames.BFM_BFIM
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIModified
+                    Case BFBatchInputNames.BFM_BFLOW
+                        lMethod = atcTimeseriesBaseflow.BFMethods.BFLOW
+                    Case BFBatchInputNames.BFM_TwoPRDF
+                        lMethod = atcTimeseriesBaseflow.BFMethods.TwoPRDF
                 End Select
                 If lMethod > 0 Then
                     If lMethods Is Nothing Then
@@ -432,6 +438,10 @@ Public Class clsBatchBFSpec
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIStandard
                     Case BFBatchInputNames.BFM_BFIM
                         lMethod = atcTimeseriesBaseflow.BFMethods.BFIModified
+                    Case BFBatchInputNames.BFM_BFLOW
+                        lMethod = atcTimeseriesBaseflow.BFMethods.BFLOW
+                    Case BFBatchInputNames.BFM_TwoPRDF
+                        lMethod = atcTimeseriesBaseflow.BFMethods.TwoPRDF
                 End Select
                 If lMethod > 0 Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits

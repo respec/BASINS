@@ -197,6 +197,8 @@ Public Class frmUSGSBaseflowBatch
         chkMethodHySEPSlide.Checked = False
         chkMethodBFIStandard.Checked = False
         chkMethodBFIModified.Checked = False
+        chkMethodBFLOW.Checked = False
+        chkMethodTwoPRDF.Checked = False
         Dim lMethods As ArrayList = pBasicAttributes.GetValue(BFInputNames.BFMethods, Nothing)
         If lMethods IsNot Nothing Then
             For Each lMethod As BFMethods In lMethods
@@ -219,6 +221,12 @@ Public Class frmUSGSBaseflowBatch
                     Case BFMethods.BFIModified
                         chkMethodBFIModified.Checked = True
                         pMethods.Add(BFMethods.BFIModified)
+                    Case BFMethods.BFLOW
+                        chkMethodBFLOW.Checked = True
+                        pMethods.Add(BFMethods.BFLOW)
+                    Case BFMethods.TwoPRDF
+                        chkMethodTwoPRDF.Checked = True
+                        pMethods.Add(BFMethods.TwoPRDF)
                 End Select
             Next
         End If
@@ -352,6 +360,22 @@ Public Class frmUSGSBaseflowBatch
         If chkMethodBFIModified.Checked Then
             If Not Double.TryParse(txtK.Text.Trim(), lK1Day) Then
                 lErrMsg &= "- BFI modified method needs a valid recession constant (K)" & vbCrLf
+            End If
+        End If
+        Dim lFP1 As Double
+        If chkMethodBFLOW.Checked Then
+            If Not Double.TryParse(txtDFParamBeta.Text.Trim(), lFP1) Then
+                'lErrMsg &= "- BFLOW method needs a valid beta value" & vbCrLf
+            End If
+        End If
+        Dim lRC As Double
+        Dim lBFImax As Double
+        If chkMethodTwoPRDF.Checked Then
+            If Not Double.TryParse(txtDFParamRC.Text.Trim(), lRC) Then
+                'lErrMsg &= "- TwoPRDF method needs a valid recession constant" & vbCrLf
+            End If
+            If Not Double.TryParse(txtDFParamBFImax.Text.Trim(), lBFImax) Then
+                'lErrMsg &= "- TwoPRDF method needs a valid BFImax constant" & vbCrLf
             End If
         End If
 
@@ -608,6 +632,8 @@ Public Class frmUSGSBaseflowBatch
             Case "slide" : lMethodAtt = BFMethods.HySEPSlide
             Case "bfistandard" : lMethodAtt = BFMethods.BFIStandard
             Case "bfimodified" : lMethodAtt = BFMethods.BFIModified
+            Case "bflow" : lMethodAtt = BFMethods.BFLOW
+            Case "twoprdf" : lMethodAtt = BFMethods.TwoPRDF
         End Select
         Dim lTsBF4Graph As atcTimeseries = aTsCollection.ItemByKey("RateDaily").Clone()
         lDA = lTsBF4Graph.Attributes.GetValue("Drainage Area")
@@ -774,12 +800,15 @@ Public Class frmUSGSBaseflowBatch
         mnuGraphTimeseries_Click(Nothing, Nothing)
     End Sub
 
-    Private Sub BFMethods_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMethodHySEPFixed.CheckedChanged, _
-                                                                                                             chkMethodHySEPLocMin.CheckedChanged, _
-                                                                                                             chkMethodHySEPSlide.CheckedChanged, _
-                                                                                                             chkMethodPART.CheckedChanged, _
-                                                                                                             chkMethodBFIStandard.CheckedChanged, _
-                                                                                                             chkMethodBFIModified.CheckedChanged
+    Private Sub BFMethods_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMethodHySEPFixed.CheckedChanged,
+                                                                                                             chkMethodHySEPLocMin.CheckedChanged,
+                                                                                                             chkMethodHySEPSlide.CheckedChanged,
+                                                                                                             chkMethodPART.CheckedChanged,
+                                                                                                             chkMethodBFIStandard.CheckedChanged,
+                                                                                                             chkMethodBFIModified.CheckedChanged,
+                                                                                                             chkMethodBFLOW.CheckedChanged,
+                                                                                                             chkMethodTwoPRDF.CheckedChanged
+
         If Opened Then
             pDidBFSeparation = False
             pMethods.Clear()
@@ -790,6 +819,8 @@ Public Class frmUSGSBaseflowBatch
             If chkMethodHySEPSlide.Checked Then pMethods.Add(BFMethods.HySEPSlide)
             If chkMethodBFIStandard.Checked Then pMethods.Add(BFMethods.BFIStandard)
             If chkMethodBFIModified.Checked Then pMethods.Add(BFMethods.BFIModified)
+            If chkMethodBFLOW.Checked Then pMethods.Add(BFMethods.BFLOW)
+            If chkMethodTwoPRDF.Checked Then pMethods.Add(BFMethods.TwoPRDF)
 
             Dim lBFIChosen As Boolean = False
             If chkMethodBFIStandard.Checked And chkMethodBFIModified.Checked Then
