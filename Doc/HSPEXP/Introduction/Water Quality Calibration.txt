@@ -1,0 +1,14 @@
+<h>Water Quality Calibration</h>
+
+<p>For water quality calibration tasks, HSPEXP+ does not require the EXS file.</>
+
+<ol>
+<li>HSPEXP+ generates nutrient balance reports in a variety of layouts for sediment, total nitrogen, and total phosphorus.</li>
+<li>HSPEXP+ does not calculate statistics to compare observed and simulated water quality data; however, it provides reports and graphs to better understand the water quality simulation, and guide changes in the parameters accordingly. It does not provide advice for water quality parameter adjustments.</li>
+</ol>
+
+
+
+
+
+
