@@ -433,6 +433,10 @@ Public Class frmBatchMap
                         lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIS)
                     Case BFMethods.BFIModified
                         lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFIM)
+                    Case BFMethods.BFLOW
+                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_BFLOW)
+                    Case BFMethods.TwoPRDF
+                        lText.AppendLine("BFMethod" & vbTab & BFBatchInputNames.BFM_TwoPRDF)
                 End Select
             Next
         Else
@@ -710,10 +714,25 @@ Public Class frmBatchMap
                     End If
                 Next
                 If lNeedToRefreshStationInfo Then
+                    Dim lStartDate As Double = lAttrib.GetValue("StartDate", -99)
+                    Dim lEndDate As Double = lAttrib.GetValue("EndDate", -99)
+                    Dim lNeedToSetDates As Boolean = False
+                    Dim lTsGroup4Dates As atcTimeseriesGroup = Nothing
+                    If lStartDate < -90 OrElse lEndDate < -90 Then
+                        Dim lgStartDate As Double = pBFInputsGlobal.GetValue("StartDate", -99)
+                        Dim lgEndDate As Double = pBFInputsGlobal.GetValue("EndDate", -99)
+                        If lgStartDate > 0 AndAlso lgEndDate > 0 Then
+                            'No need to set group's dates if they are not already set, use default
+                        Else
+                            lNeedToSetDates = True
+                            lTsGroup4Dates = New atcTimeseriesGroup()
+                        End If
+                    End If
+
                     Dim lNewStationInfo As New ArrayList()
                     For Each lSInfo As String In lStationInfo
                         Dim lArr() As String = lSInfo.Substring(lSInfo.IndexOf(vbTab) + 1).Split(",")
-                        If pStationInfoGroup.Keys.Contains(lArr(0)) Then
+                        If pStationInfoGroup.Keys.Contains(lArr(0)) AndAlso Not lNeedToSetDates Then
                             lNewStationInfo.Add(pStationInfoGroup.ItemByKey(lArr(0)))
                         Else
                             Dim lArgs As New atcDataAttributes()
@@ -722,10 +741,21 @@ Public Class frmBatchMap
                             Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
                             If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
                                 LogStationInfo(lTsGroupTemp(0), lArr(0), lDataPath)
+                                If lNeedToSetDates Then lTsGroup4Dates.Add(lTsGroupTemp(0))
                             End If
                             lNewStationInfo.Add(pStationInfoGroup.ItemByKey(lArr(0)))
                         End If
                     Next
+                    If lNeedToSetDates AndAlso lTsGroup4Dates.Count > 0 Then
+                        Dim lcstart As Double
+                        Dim lcend As Double
+                        Dim lstart As Double
+                        Dim lend As Double
+                        CommonDates(lTsGroup4Dates, lstart, lend, lcstart, lcend)
+                        lAttrib.SetValue("StartDate", lstart)
+                        lAttrib.SetValue("EndDate", lend)
+                        lTsGroup4Dates.Clear()
+                    End If
                     lAttrib.RemoveByKey("StationInfo")
                     lAttrib.SetValue("StationInfo", lNewStationInfo)
                 End If

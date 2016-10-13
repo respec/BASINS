@@ -1,0 +1,15 @@
+<h>Disclaimer</h>
+
+<p>HSPEXP+ has been developed by AQUA TERRA Consultants (A Division of RESPEC) to support calibration of watershed models that are developed using HSPF. It is an open source project, and is released free of cost to support modelers who are using HSPF. It is under active development, and no active support is available for HSPEXP+ by AQUA TERRA Consultants or any other agency.  AQUA TERRA Consultants and the authors do not assume any responsibility for system operation, output, interpretation, or use.</p>
+
+
+
+
+
+
+
+
+
+
+
+

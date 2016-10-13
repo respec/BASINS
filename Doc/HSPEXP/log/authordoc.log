@@ -1,0 +1,77 @@
+00:00:00.000	Convert_bas:Convert:StartToFile 2016-02-23 11:30:55
+00:00:00.031	Convert_bas:Convert:StartConvert 2
+00:00:01.872	Convert_bas:Status:Opening HSPEXP+ Version 1.1 User's Manual.txt
+00:00:02.652	Convert_bas:Status:Closing HSPEXP+ Version 1.1 User's Manual.txt
+00:00:02.652	Convert_bas:Status:Opening Disclaimer.txt
+00:00:02.964	Convert_bas:Status:Closing Disclaimer.txt
+00:00:02.979	Convert_bas:Status:Opening Acknowledgements.txt
+00:00:03.744	Convert_bas:Status:Closing Acknowledgements.txt
+00:00:03.744	Convert_bas:Status:Opening Assistance.txt
+00:00:04.056	Convert_bas:Status:Closing Assistance.txt
+00:00:04.056	Convert_bas:Status:Opening Introduction.txt
+00:00:04.336	Convert_bas:Status:Closing Introduction.txt
+00:00:04.336	Convert_bas:Status:Opening Introduction\Background.txt
+00:00:04.680	Convert_bas:Status:Closing Introduction\Background.txt
+00:00:04.680	Convert_bas:Status:Opening Introduction\Capabilities.txt
+00:00:04.960	Convert_bas:Status:Closing Introduction\Capabilities.txt
+00:00:04.960	Convert_bas:Status:Opening Introduction\Hydrologic Calibration.txt
+00:00:05.304	Convert_bas:Status:Closing Introduction\Hydrologic Calibration.txt
+00:00:05.319	Convert_bas:Status:Opening Introduction\Water Quality Calibration.txt
+00:00:05.538	Convert_bas:Status:Closing Introduction\Water Quality Calibration.txt
+00:00:05.538	Convert_bas:Status:Opening Introduction\Automated Graph Generation.txt
+00:00:05.803	Convert_bas:Status:Closing Introduction\Automated Graph Generation.txt
+00:00:05.818	Convert_bas:Status:Opening Introduction\Caveats.txt
+00:00:06.084	Convert_bas:Status:Closing Introduction\Caveats.txt
+00:00:06.084	Convert_bas:Status:Opening Using HSPEXP+.txt
+00:00:06.396	Convert_bas:Status:Closing Using HSPEXP+.txt
+00:00:06.411	Convert_bas:Status:Opening Using HSPEXP+\User Interface.txt
+00:00:06.973	Convert_bas:Status:Closing Using HSPEXP+\User Interface.txt
+00:00:06.973	Convert_bas:Status:Opening Using HSPEXP+\Setting up the Project.txt
+00:00:07.254	Convert_bas:Status:Closing Using HSPEXP+\Setting up the Project.txt
+00:00:07.254	Convert_bas:Status:Opening Using HSPEXP+\Setting up the Project\Setting up UCI and other files.txt
+00:00:08.252	Convert_bas:Status:Closing Using HSPEXP+\Setting up the Project\Setting up UCI and other files.txt
+00:00:08.268	Convert_bas:Status:Opening Using HSPEXP+\Setting up the Project\Setting up EXS File(s).txt
+00:00:09.375	Convert_bas:Status:Closing Using HSPEXP+\Setting up the Project\Setting up EXS File(s).txt
+00:00:09.375	Convert_bas:Status:Opening Using HSPEXP+\Setting up the Project\Setting up graph specification file for additional graphs.txt
+00:00:10.342	Convert_bas:Status:Closing Using HSPEXP+\Setting up the Project\Setting up graph specification file for additional graphs.txt
+00:00:10.342	Convert_bas:Status:Opening Using HSPEXP+\Setting up the Project\Setting up BASINS Observed WQ File.txt
+00:00:11.232	Convert_bas:Status:Closing Using HSPEXP+\Setting up the Project\Setting up BASINS Observed WQ File.txt
+00:00:11.232	Convert_bas:Status:Opening Using HSPEXP+\Running HSPEXP+.txt
+00:00:11.653	Convert_bas:Status:Closing Using HSPEXP+\Running HSPEXP+.txt
+00:00:11.653	Convert_bas:Status:Opening Resolving Errors.txt
+00:00:12.058	Convert_bas:Status:Closing Resolving Errors.txt
+00:00:12.074	Convert_bas:Status:Opening Load Allocation Tool.txt
+00:00:13.603	Convert_bas:Status:Closing Load Allocation Tool.txt
+00:00:13.603	Convert_bas:Status:Opening References.txt
+00:00:13.962	Convert_bas:Status:Closing References.txt
+00:00:15.194	Convert_bas:ConvertTableToWord:Table 1 Length:3530 Columns:4
+00:00:17.846	Convert_bas:ConvertTableToWord:Table 1 Length:392 Columns:2
+00:00:19.843	Convert_bas:ConvertTableToWord:Table 1 Length:221 Columns:1
+00:00:22.011	Convert_bas:ConvertTableToWord:Table 1 Length:21571 Columns:17
+00:01:02.869	Convert_bas:ConvertTableToWord:Table 1 Length:21354 Columns:17
+00:01:44.678	Convert_bas:ConvertTableToWord:Table 1 Length:4488 Columns:2
+00:02:19.934	Status:Removing HTML Headers
+00:04:44.734	Status:Translating Paragraph Marks
+00:04:46.294	Status:Removing Whitespace After Paragraph Marks
+00:04:56.325	Status:Removing Whitespace Before Paragraph Marks
+00:05:07.635	Status:Removing Non-HTML Paragraphs
+00:05:09.647	Status:Translating HTML <ul>
+00:05:10.817	Status:Translating HTML <ol>
+00:05:38.150	Status:Replacing HTML Paragraphs
+00:05:56.652	Status:Replacing HTML Line Breaks
+00:06:02.596	Status:Removing Whitespace After Paragraph Marks
+00:06:07.884	Status:Removing Whitespace Before Paragraph Marks
+00:06:13.017	Status:Replacing HTML Page Breaks
+00:06:21.098	Status:Translating Buttons
+00:06:35.699	Status:Formatting Headings
+00:07:07.430	Status:Formatting HTML <div 
+00:07:41.204	Status:Formatting HTML <pre>
+00:07:42.187	Status:Formatting HTML <figure>
+00:07:43.481	Status:Formatting HTML <u>
+00:07:44.558	Status:Formatting HTML <b>
+00:08:07.491	Status:Formatting HTML <i>
+00:08:12.202	Status:Formatting HTML <sub>
+00:08:13.325	Status:Formatting HTML <sup>
+00:08:26.507	Status:Removing Remaining HTML Tags
+00:13:33.551	Status:Saving file: HSPEXP+.doc [Compatibility Mode]
+00:13:50.602	Status:Conversion Finished

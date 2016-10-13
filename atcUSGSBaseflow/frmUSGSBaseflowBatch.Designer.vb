@@ -22,53 +22,63 @@ Partial Class frmUSGSBaseflowBatch
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmUSGSBaseflowBatch))
-        Me.btnExamineData = New System.Windows.Forms.Button
-        Me.gbDates = New System.Windows.Forms.GroupBox
-        Me.btnPlotDur = New System.Windows.Forms.Button
-        Me.lblAnalysisDates = New System.Windows.Forms.Label
-        Me.lblPeriodOfRecord = New System.Windows.Forms.Label
-        Me.txtEndDateUser = New System.Windows.Forms.TextBox
-        Me.txtStartDateUser = New System.Windows.Forms.TextBox
-        Me.txtDataEnd = New System.Windows.Forms.TextBox
-        Me.txtDataStart = New System.Windows.Forms.TextBox
-        Me.lblDataEnd = New System.Windows.Forms.Label
-        Me.lblDataStart = New System.Windows.Forms.Label
+        Me.btnExamineData = New System.Windows.Forms.Button()
+        Me.gbDates = New System.Windows.Forms.GroupBox()
+        Me.btnPlotDur = New System.Windows.Forms.Button()
+        Me.lblAnalysisDates = New System.Windows.Forms.Label()
+        Me.lblPeriodOfRecord = New System.Windows.Forms.Label()
+        Me.txtEndDateUser = New System.Windows.Forms.TextBox()
+        Me.txtStartDateUser = New System.Windows.Forms.TextBox()
+        Me.txtDataEnd = New System.Windows.Forms.TextBox()
+        Me.txtDataStart = New System.Windows.Forms.TextBox()
+        Me.lblDataEnd = New System.Windows.Forms.Label()
+        Me.lblDataStart = New System.Windows.Forms.Label()
         Me.toolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.chkMethodBFIStandard = New System.Windows.Forms.CheckBox
-        Me.chkMethodBFIModified = New System.Windows.Forms.CheckBox
-        Me.chkBFISymbols = New System.Windows.Forms.CheckBox
-        Me.txtOutputRootName = New System.Windows.Forms.TextBox
-        Me.lblBaseFilename = New System.Windows.Forms.Label
-        Me.gbTextOutput = New System.Windows.Forms.GroupBox
-        Me.txtOutputDir = New System.Windows.Forms.TextBox
-        Me.lblOutputDir = New System.Windows.Forms.Label
-        Me.btnWriteASCIIOutput = New System.Windows.Forms.Button
-        Me.gbBFMethods = New System.Windows.Forms.GroupBox
-        Me.chkMethodPART = New System.Windows.Forms.CheckBox
-        Me.chkMethodHySEPSlide = New System.Windows.Forms.CheckBox
-        Me.chkMethodHySEPLocMin = New System.Windows.Forms.CheckBox
-        Me.chkMethodHySEPFixed = New System.Windows.Forms.CheckBox
-        Me.gbBFI = New System.Windows.Forms.GroupBox
-        Me.rdoBFIReportbyWaterYear = New System.Windows.Forms.RadioButton
-        Me.rdoBFIReportbyCalendarYear = New System.Windows.Forms.RadioButton
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.txtK = New System.Windows.Forms.TextBox
-        Me.txtF = New System.Windows.Forms.TextBox
-        Me.txtN = New System.Windows.Forms.TextBox
-        Me.lblK = New System.Windows.Forms.Label
-        Me.lblF = New System.Windows.Forms.Label
-        Me.lblN = New System.Windows.Forms.Label
-        Me.colDataPath = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.colDA = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.colStationID = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.grdStations = New System.Windows.Forms.DataGridView
+        Me.chkMethodBFIStandard = New System.Windows.Forms.CheckBox()
+        Me.chkMethodBFIModified = New System.Windows.Forms.CheckBox()
+        Me.chkBFISymbols = New System.Windows.Forms.CheckBox()
+        Me.txtOutputRootName = New System.Windows.Forms.TextBox()
+        Me.lblBaseFilename = New System.Windows.Forms.Label()
+        Me.gbTextOutput = New System.Windows.Forms.GroupBox()
+        Me.txtOutputDir = New System.Windows.Forms.TextBox()
+        Me.lblOutputDir = New System.Windows.Forms.Label()
+        Me.btnWriteASCIIOutput = New System.Windows.Forms.Button()
+        Me.gbBFMethods = New System.Windows.Forms.GroupBox()
+        Me.chkMethodPART = New System.Windows.Forms.CheckBox()
+        Me.chkMethodHySEPSlide = New System.Windows.Forms.CheckBox()
+        Me.chkMethodHySEPLocMin = New System.Windows.Forms.CheckBox()
+        Me.chkMethodHySEPFixed = New System.Windows.Forms.CheckBox()
+        Me.gbBFI = New System.Windows.Forms.GroupBox()
+        Me.rdoBFIReportbyWaterYear = New System.Windows.Forms.RadioButton()
+        Me.rdoBFIReportbyCalendarYear = New System.Windows.Forms.RadioButton()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.txtK = New System.Windows.Forms.TextBox()
+        Me.txtF = New System.Windows.Forms.TextBox()
+        Me.txtN = New System.Windows.Forms.TextBox()
+        Me.lblK = New System.Windows.Forms.Label()
+        Me.lblF = New System.Windows.Forms.Label()
+        Me.lblN = New System.Windows.Forms.Label()
+        Me.colDataPath = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colDA = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colStationID = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.grdStations = New System.Windows.Forms.DataGridView()
+        Me.chkMethodTwoPRDF = New System.Windows.Forms.CheckBox()
+        Me.chkMethodBFLOW = New System.Windows.Forms.CheckBox()
+        Me.gbDFParam = New System.Windows.Forms.GroupBox()
+        Me.txtDFParamBFImax = New System.Windows.Forms.TextBox()
+        Me.txtDFParamRC = New System.Windows.Forms.TextBox()
+        Me.txtDFParamBeta = New System.Windows.Forms.TextBox()
+        Me.lblBFImax = New System.Windows.Forms.Label()
+        Me.lblRC = New System.Windows.Forms.Label()
+        Me.lblBeta = New System.Windows.Forms.Label()
         Me.gbDates.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
         Me.gbBFMethods.SuspendLayout()
         Me.gbBFI.SuspendLayout()
         CType(Me.grdStations, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.gbDFParam.SuspendLayout()
         Me.SuspendLayout()
         '
         'btnExamineData
@@ -84,7 +94,7 @@ Partial Class frmUSGSBaseflowBatch
         'gbDates
         '
         Me.gbDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.gbDates.Controls.Add(Me.btnPlotDur)
         Me.gbDates.Controls.Add(Me.lblAnalysisDates)
         Me.gbDates.Controls.Add(Me.lblPeriodOfRecord)
@@ -95,7 +105,7 @@ Partial Class frmUSGSBaseflowBatch
         Me.gbDates.Controls.Add(Me.txtDataStart)
         Me.gbDates.Controls.Add(Me.lblDataEnd)
         Me.gbDates.Controls.Add(Me.lblDataStart)
-        Me.gbDates.Location = New System.Drawing.Point(9, 296)
+        Me.gbDates.Location = New System.Drawing.Point(9, 349)
         Me.gbDates.Name = "gbDates"
         Me.gbDates.Size = New System.Drawing.Size(378, 114)
         Me.gbDates.TabIndex = 7
@@ -132,7 +142,7 @@ Partial Class frmUSGSBaseflowBatch
         'txtEndDateUser
         '
         Me.txtEndDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtEndDateUser.Location = New System.Drawing.Point(194, 58)
         Me.txtEndDateUser.Name = "txtEndDateUser"
         Me.txtEndDateUser.Size = New System.Drawing.Size(178, 20)
@@ -142,7 +152,7 @@ Partial Class frmUSGSBaseflowBatch
         'txtStartDateUser
         '
         Me.txtStartDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtStartDateUser.Location = New System.Drawing.Point(194, 31)
         Me.txtStartDateUser.Name = "txtStartDateUser"
         Me.txtStartDateUser.Size = New System.Drawing.Size(178, 20)
@@ -179,7 +189,7 @@ Partial Class frmUSGSBaseflowBatch
         'lblDataStart
         '
         Me.lblDataStart.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblDataStart.AutoSize = True
         Me.lblDataStart.Location = New System.Drawing.Point(6, 32)
         Me.lblDataStart.Name = "lblDataStart"
@@ -240,12 +250,12 @@ Partial Class frmUSGSBaseflowBatch
         'gbTextOutput
         '
         Me.gbTextOutput.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.gbTextOutput.Controls.Add(Me.txtOutputDir)
         Me.gbTextOutput.Controls.Add(Me.lblOutputDir)
         Me.gbTextOutput.Controls.Add(Me.txtOutputRootName)
         Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
-        Me.gbTextOutput.Location = New System.Drawing.Point(9, 416)
+        Me.gbTextOutput.Location = New System.Drawing.Point(9, 469)
         Me.gbTextOutput.Name = "gbTextOutput"
         Me.gbTextOutput.Size = New System.Drawing.Size(378, 80)
         Me.gbTextOutput.TabIndex = 11
@@ -255,7 +265,7 @@ Partial Class frmUSGSBaseflowBatch
         'txtOutputDir
         '
         Me.txtOutputDir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOutputDir.Location = New System.Drawing.Point(78, 20)
         Me.txtOutputDir.Name = "txtOutputDir"
         Me.txtOutputDir.Size = New System.Drawing.Size(294, 20)
@@ -273,8 +283,8 @@ Partial Class frmUSGSBaseflowBatch
         'btnWriteASCIIOutput
         '
         Me.btnWriteASCIIOutput.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnWriteASCIIOutput.Location = New System.Drawing.Point(9, 502)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnWriteASCIIOutput.Location = New System.Drawing.Point(12, 557)
         Me.btnWriteASCIIOutput.Name = "btnWriteASCIIOutput"
         Me.btnWriteASCIIOutput.Size = New System.Drawing.Size(378, 23)
         Me.btnWriteASCIIOutput.TabIndex = 15
@@ -283,6 +293,8 @@ Partial Class frmUSGSBaseflowBatch
         '
         'gbBFMethods
         '
+        Me.gbBFMethods.Controls.Add(Me.chkMethodTwoPRDF)
+        Me.gbBFMethods.Controls.Add(Me.chkMethodBFLOW)
         Me.gbBFMethods.Controls.Add(Me.chkMethodPART)
         Me.gbBFMethods.Controls.Add(Me.chkMethodBFIModified)
         Me.gbBFMethods.Controls.Add(Me.chkMethodHySEPSlide)
@@ -291,7 +303,7 @@ Partial Class frmUSGSBaseflowBatch
         Me.gbBFMethods.Controls.Add(Me.chkMethodHySEPFixed)
         Me.gbBFMethods.Location = New System.Drawing.Point(9, 130)
         Me.gbBFMethods.Name = "gbBFMethods"
-        Me.gbBFMethods.Size = New System.Drawing.Size(112, 160)
+        Me.gbBFMethods.Size = New System.Drawing.Size(112, 213)
         Me.gbBFMethods.TabIndex = 0
         Me.gbBFMethods.TabStop = False
         Me.gbBFMethods.Text = "Select Method(s)"
@@ -339,7 +351,7 @@ Partial Class frmUSGSBaseflowBatch
         'gbBFI
         '
         Me.gbBFI.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.gbBFI.Controls.Add(Me.rdoBFIReportbyWaterYear)
         Me.gbBFI.Controls.Add(Me.rdoBFIReportbyCalendarYear)
         Me.gbBFI.Controls.Add(Me.Label2)
@@ -352,7 +364,7 @@ Partial Class frmUSGSBaseflowBatch
         Me.gbBFI.Controls.Add(Me.lblN)
         Me.gbBFI.Location = New System.Drawing.Point(133, 130)
         Me.gbBFI.Name = "gbBFI"
-        Me.gbBFI.Size = New System.Drawing.Size(254, 160)
+        Me.gbBFI.Size = New System.Drawing.Size(254, 117)
         Me.gbBFI.TabIndex = 30
         Me.gbBFI.TabStop = False
         Me.gbBFI.Text = "BFI Parameters"
@@ -391,7 +403,7 @@ Partial Class frmUSGSBaseflowBatch
         'txtK
         '
         Me.txtK.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtK.Location = New System.Drawing.Point(170, 86)
         Me.txtK.Name = "txtK"
         Me.txtK.Size = New System.Drawing.Size(79, 20)
@@ -402,7 +414,7 @@ Partial Class frmUSGSBaseflowBatch
         'txtF
         '
         Me.txtF.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtF.Location = New System.Drawing.Point(170, 62)
         Me.txtF.Name = "txtF"
         Me.txtF.Size = New System.Drawing.Size(79, 20)
@@ -413,7 +425,7 @@ Partial Class frmUSGSBaseflowBatch
         'txtN
         '
         Me.txtN.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtN.Location = New System.Drawing.Point(170, 37)
         Me.txtN.Name = "txtN"
         Me.txtN.Size = New System.Drawing.Size(79, 20)
@@ -476,7 +488,7 @@ Partial Class frmUSGSBaseflowBatch
         'grdStations
         '
         Me.grdStations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grdStations.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdStations.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.colStationID, Me.colDA, Me.colDataPath})
         Me.grdStations.Location = New System.Drawing.Point(9, 3)
@@ -484,11 +496,110 @@ Partial Class frmUSGSBaseflowBatch
         Me.grdStations.Size = New System.Drawing.Size(378, 121)
         Me.grdStations.TabIndex = 31
         '
+        'chkMethodTwoPRDF
+        '
+        Me.chkMethodTwoPRDF.AutoSize = True
+        Me.chkMethodTwoPRDF.Location = New System.Drawing.Point(6, 182)
+        Me.chkMethodTwoPRDF.Name = "chkMethodTwoPRDF"
+        Me.chkMethodTwoPRDF.Size = New System.Drawing.Size(76, 17)
+        Me.chkMethodTwoPRDF.TabIndex = 11
+        Me.chkMethodTwoPRDF.Text = "TwoPRDF"
+        Me.toolTip1.SetToolTip(Me.chkMethodTwoPRDF, "Modified Method")
+        Me.chkMethodTwoPRDF.UseVisualStyleBackColor = True
+        '
+        'chkMethodBFLOW
+        '
+        Me.chkMethodBFLOW.AutoSize = True
+        Me.chkMethodBFLOW.Location = New System.Drawing.Point(6, 159)
+        Me.chkMethodBFLOW.Name = "chkMethodBFLOW"
+        Me.chkMethodBFLOW.Size = New System.Drawing.Size(64, 17)
+        Me.chkMethodBFLOW.TabIndex = 10
+        Me.chkMethodBFLOW.Text = "BFLOW"
+        Me.toolTip1.SetToolTip(Me.chkMethodBFLOW, "Modified Method")
+        Me.chkMethodBFLOW.UseVisualStyleBackColor = True
+        '
+        'gbDFParam
+        '
+        Me.gbDFParam.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbDFParam.Controls.Add(Me.txtDFParamBFImax)
+        Me.gbDFParam.Controls.Add(Me.txtDFParamRC)
+        Me.gbDFParam.Controls.Add(Me.txtDFParamBeta)
+        Me.gbDFParam.Controls.Add(Me.lblBFImax)
+        Me.gbDFParam.Controls.Add(Me.lblRC)
+        Me.gbDFParam.Controls.Add(Me.lblBeta)
+        Me.gbDFParam.Location = New System.Drawing.Point(133, 253)
+        Me.gbDFParam.Name = "gbDFParam"
+        Me.gbDFParam.Size = New System.Drawing.Size(254, 90)
+        Me.gbDFParam.TabIndex = 32
+        Me.gbDFParam.TabStop = False
+        Me.gbDFParam.Text = "Digital Filter Parameters"
+        '
+        'txtDFParamBFImax
+        '
+        Me.txtDFParamBFImax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDFParamBFImax.Location = New System.Drawing.Point(166, 64)
+        Me.txtDFParamBFImax.Name = "txtDFParamBFImax"
+        Me.txtDFParamBFImax.Size = New System.Drawing.Size(82, 20)
+        Me.txtDFParamBFImax.TabIndex = 11
+        Me.txtDFParamBFImax.Text = "0.5"
+        Me.txtDFParamBFImax.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'txtDFParamRC
+        '
+        Me.txtDFParamRC.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDFParamRC.Location = New System.Drawing.Point(166, 38)
+        Me.txtDFParamRC.Name = "txtDFParamRC"
+        Me.txtDFParamRC.Size = New System.Drawing.Size(82, 20)
+        Me.txtDFParamRC.TabIndex = 10
+        Me.txtDFParamRC.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'txtDFParamBeta
+        '
+        Me.txtDFParamBeta.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDFParamBeta.Location = New System.Drawing.Point(166, 12)
+        Me.txtDFParamBeta.Name = "txtDFParamBeta"
+        Me.txtDFParamBeta.Size = New System.Drawing.Size(82, 20)
+        Me.txtDFParamBeta.TabIndex = 9
+        Me.txtDFParamBeta.Text = "0.925"
+        Me.txtDFParamBeta.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'lblBFImax
+        '
+        Me.lblBFImax.AutoSize = True
+        Me.lblBFImax.Location = New System.Drawing.Point(118, 67)
+        Me.lblBFImax.Name = "lblBFImax"
+        Me.lblBFImax.Size = New System.Drawing.Size(42, 13)
+        Me.lblBFImax.TabIndex = 8
+        Me.lblBFImax.Text = "BFImax"
+        '
+        'lblRC
+        '
+        Me.lblRC.AutoSize = True
+        Me.lblRC.Location = New System.Drawing.Point(46, 41)
+        Me.lblRC.Name = "lblRC"
+        Me.lblRC.Size = New System.Drawing.Size(114, 13)
+        Me.lblRC.TabIndex = 7
+        Me.lblRC.Text = "Recession Constant, a"
+        '
+        'lblBeta
+        '
+        Me.lblBeta.AutoSize = True
+        Me.lblBeta.Location = New System.Drawing.Point(131, 16)
+        Me.lblBeta.Name = "lblBeta"
+        Me.lblBeta.Size = New System.Drawing.Size(29, 13)
+        Me.lblBeta.TabIndex = 6
+        Me.lblBeta.Text = "Beta"
+        '
         'frmUSGSBaseflowBatch
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(399, 538)
+        Me.ClientSize = New System.Drawing.Size(399, 592)
+        Me.Controls.Add(Me.gbDFParam)
         Me.Controls.Add(Me.grdStations)
         Me.Controls.Add(Me.btnWriteASCIIOutput)
         Me.Controls.Add(Me.gbBFI)
@@ -507,6 +618,8 @@ Partial Class frmUSGSBaseflowBatch
         Me.gbBFI.ResumeLayout(False)
         Me.gbBFI.PerformLayout()
         CType(Me.grdStations, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.gbDFParam.ResumeLayout(False)
+        Me.gbDFParam.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -550,4 +663,13 @@ Partial Class frmUSGSBaseflowBatch
     Friend WithEvents colDA As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colStationID As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents grdStations As System.Windows.Forms.DataGridView
+    Friend WithEvents chkMethodTwoPRDF As Windows.Forms.CheckBox
+    Friend WithEvents chkMethodBFLOW As Windows.Forms.CheckBox
+    Friend WithEvents gbDFParam As Windows.Forms.GroupBox
+    Friend WithEvents txtDFParamBFImax As Windows.Forms.TextBox
+    Friend WithEvents txtDFParamRC As Windows.Forms.TextBox
+    Friend WithEvents txtDFParamBeta As Windows.Forms.TextBox
+    Friend WithEvents lblBFImax As Windows.Forms.Label
+    Friend WithEvents lblRC As Windows.Forms.Label
+    Friend WithEvents lblBeta As Windows.Forms.Label
 End Class

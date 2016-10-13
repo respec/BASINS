@@ -1,0 +1,31 @@
+<h>Hydrologic Calibration</h>
+
+<p>HSPEXP+ uses the Basin specification file (EXS file, extension "*.exs") to obtain information about the calibration site, observed flow time series dataset, simulated time series datasets, drainage area, storm periods, error criteria, etc. The format of the EXS file is consistent with that was used in HSPEXP. To read more about this file, please refer to the <a href="http://water.usgs.gov/software/HSPexp/code/doc/hspexp.pdf">HSPEXP manual (Lumb et al., 1994).</a>.  The content and format of the EXS file has been described in the <a href="../Using HSPEXP+/Setting up the Project/Setting up EXS File(s)">EXS File section</a> of this manual.  HSPEXP+ does not have the capability to produce the EXS file (currently under development). Please refer to the manual and/or start with an existing EXS file to make a file for your watershed.</p>
+
+<p>Listed below are HSPEXP+ capabilities for hydrologic calibration:</p>
+
+<ol>
+<li>Produce land use and watershed area reports to provide a quick check of watershed segment connectivity.</li>
+<li>Produce Expert Statistics for hydrology calibration (using the computations from the original HSPEXP), at multiple sites in the watershed, in simple text files.  The EXS file can list more than one site, or the folder containing the model calibration files can have multiple EXS files, for multiple locations.</li>
+<li>Produce advice for model calibration for each calibration site.</li>
+<li>Produce additional statistics including annual, monthly, and daily flow comparisons.</li>
+<li>Produce overall, annual, and monthly timeseries graphs, flow frequency duration graphs, cumulative flow graphs, and time series graphs of other components such as potential evapotranspiration, lower zone storage, upper zone storage, etc.</li>
+<li>By default, HSPEXP+ (and its predecessor, HSPEXP) considers May, June, July to be the summer months, and December, January, February to be the winter months for calculating seasonal statistics.  In HSPEXP+, summer and winter months can be specified in the EXS file, if changes to the default seasons are needed. Please refer to the <a href="../Using HSPEXP+/Setting up the Project/Setting up EXS File(s)">EXS file section</a> for more details.</li>
+<li>All graphs produced by HSPEXP+ are high quality PNG format that can be directly inserted into reports and presentations.</li>
+<li>All reports produced by HSPEXP+ can be directly opened in any spreadsheet program for quick viewing, formatting, and presentation.</li>
+<li>All graphs and reports are produced in a time-stamped folder with a copy of the UCI file for reference.</li>
+<li>HSPEXP+ can generate water balance reports in several layouts including overall water balance, annual water balance, and water balance grouped by land use, etc.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+

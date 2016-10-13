@@ -1,0 +1,18 @@
+[OPTIONS]
+LCID=0x409 0x0 0x0 ; English (United States)
+REPORT=Yes
+CNT=HSPEXP+.cnt
+
+HLP=HSPEXP+.hlp
+
+[FILES]
+HSPEXP+.rtf
+
+[MAP]
+#include <HSPEXP+.ID>
+
+[WINDOWS]
+Main="HSPEXP+ Manual", , 60672, (r14876671), (r12632256), f2; 
+
+[CONFIG]
+BrowseButtons()
