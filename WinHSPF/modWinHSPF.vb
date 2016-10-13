@@ -417,22 +417,28 @@ Public Module WinHSPF
         End If
 
         'DisableAll(True)
-        pUCI.ClearAllOutputDsns()
-        Dim lRetcod As Integer
-        pUCI.RunUci(lRetcod)   'now activate and run
-        'If lRetcod = -99 Then StartHSPFEngine()
-        Dim lMsg As String = pUCI.ErrorDescription
-        If lMsg.Trim.Length > 0 Then
-            If Logger.Msg(lMsg & vbCrLf & vbCrLf & _
-                          "Do you want to view the Echo file?", MsgBoxStyle.YesNo, _
-                          "HSPF Problem") = MsgBoxResult.Yes Then
-                Try
-                    Process.Start(pUCI.EchoFileName.Trim)
-                Catch
-                    Logger.Msg("No application is associated with the Echo file.  It may be opened in a text editor.", vbOKOnly, "HSPF Problem")
-                End Try
+        Try
+            pUCI.ClearAllOutputDsns()
+
+            Dim lRetcod As Integer
+            pUCI.RunUci(lRetcod)   'now activate and run
+            'If lRetcod = -99 Then StartHSPFEngine()
+            Dim lMsg As String = pUCI.ErrorDescription
+            If lMsg.Trim.Length > 0 Then
+                If Logger.Msg(lMsg & vbCrLf & vbCrLf &
+                              "Do you want to view the Echo file?", MsgBoxStyle.YesNo,
+                              "HSPF Problem") = MsgBoxResult.Yes Then
+                    Try
+                        Process.Start(pUCI.EchoFileName.Trim)
+                    Catch
+                        Logger.Msg("No application is associated with the Echo file.  It may be opened in a text editor.", vbOKOnly, "HSPF Problem")
+                    End Try
+                End If
             End If
-        End If
+        Catch ex As Exception
+
+            Logger.Msg(ex.Message, MsgBoxStyle.Critical, "HSPF Problem")
+        End Try
         'DisableAll(False)
 
     End Sub

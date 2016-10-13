@@ -1600,6 +1600,9 @@ Public Class HspfUci
         If Not pWDMObj(lId) Is Nothing Then
             Dim GenTs As atcData.atcTimeseries = GetDataSetFromDsn(lId, aDsn)
             'save attributes
+            If GenTs Is Nothing Then
+                Throw New ApplicationException("DSN " & aDsn & " is not in the WDM file: " & pWDMObj(lId).Specification)
+            End If
             NewGenTs.Attributes.ChangeTo(GenTs.Attributes)
             Dim TsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
             'TODO: copy dates
