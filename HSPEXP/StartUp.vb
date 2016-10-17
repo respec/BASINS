@@ -46,7 +46,7 @@ Public Class StartUp
         DateTimePicker1.Enabled = lExists
         DateTimePicker2.Enabled = lExists
         chkExpertStats.Enabled = lExists
-        chkGraphStandard.Enabled = lExists
+        'chkGraphStandard.Enabled = lExists
         chkWaterBalance.Enabled = lExists
         chkAdditionalgraphs.Enabled = lExists
         chkSedimentBalance.Enabled = lExists
@@ -104,8 +104,10 @@ Public Class StartUp
 
     Private Sub chkExpertStats_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkExpertStats.CheckedChanged
         If chkExpertStats.Checked Then
+            chkGraphStandard.Enabled = True
             chkGraphStandard.Checked = True
         Else
+            chkGraphStandard.Enabled = False
             chkGraphStandard.Checked = False
 
         End If
@@ -192,4 +194,6 @@ Public Class StartUp
     Private Sub cmbUCIPath_TextChanged(sender As Object, e As EventArgs) Handles cmbUCIPath.TextChanged
         UciChanged()
     End Sub
+
+
 End Class

@@ -234,6 +234,9 @@ Module HSPFOutputReports
                     End Try
                 End If
 
+                If StartUp.chkReganGraphs.Checked Then
+                    ReganGraphs(aHspfUci, SDateJ, EDateJ, loutfoldername)
+                End If
 
                 If pMakeAreaReports Then
                     Dim alocations As New atcCollection
@@ -635,6 +638,8 @@ RWZProgramEnding:
     
     Public Sub MakeAutomatedGraphs(ByVal lGraphStartJ As Double, ByVal lGraphEndJ As Double)
 
+
+
         'Expect a comma separated file called *.csv
         'On 11/13/2015, Anurag decided that aany number of CSV file with *.csv extension could be added. 
         '
@@ -962,10 +967,7 @@ RWZProgramEnding:
 
 
         If aZgc.MasterPane.PaneList.Count > 1 Then
-            lPaneMain = aZgc.MasterPane.PaneList(1)
-            lAuxPane = aZgc.MasterPane.PaneList(0)
-            lAuxPane.YAxis.Title.Text = aGraphInit(5)
-            lAuxPane.Y2Axis.Scale.Min = 0
+
             If (aGraphInit.length > 11 AndAlso Not String.IsNullOrEmpty(Trim(aGraphInit(11)))) Then
                 lAuxPane.YAxis.Scale.Min = Trim(aGraphInit(11))
             End If
