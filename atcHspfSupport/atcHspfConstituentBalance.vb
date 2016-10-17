@@ -51,7 +51,7 @@ Public Module ConstituentBalance
         lReport.AppendLine("Annual Loadings of" & aBalanceType & " For Each Reach.")
         lReport.AppendLine("   Run Made " & aRunMade)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ))
+        lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
         If aBalanceType = "Water" Then
             If aUci.GlobalBlock.EmFg = 1 Then
                 lReport.AppendLine("   (Units:Inches)")

@@ -1071,7 +1071,7 @@ Public Module WatershedConstituentBalance
                             ByVal aSDateJ As Double, ByVal aEDateJ As Double) As String
         Dim lString As String = "   Run Made " & aRunMade & vbCrLf
         lString &= "   " & auci.GlobalBlock.RunInf.Value & vbCrLf
-        lString &= "   " & TimeSpanAsString(aSDateJ, aEDateJ)
+        lString &= "   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
         Return lString
     End Function
 

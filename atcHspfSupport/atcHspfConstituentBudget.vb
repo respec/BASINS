@@ -152,20 +152,20 @@ Public Module ConstituentBudget
         lReport.AppendLine(aScenario & " " & "Average Annual " & aBalanceType & " Budget by Reach " & lUnits & ".")
         lReport.AppendLine("   Run Made " & aRunMade)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ))
+        lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
 
 
         lReport2.AppendLine(aScenario & " " & "Average Annual Nonpoint Loading of " & aBalanceType & " by Each Land Use to Each Reach " & lUnits & ".")
         lReport2.AppendLine("   Run Made " & aRunMade)
         lReport2.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport2.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ))
+        lReport2.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
 
 
         lReport3.AppendLine(aScenario & " " & " Average Annual Load Allocation of " & aBalanceType & " to Each Source by Reach " & lUnits & ".")
         lReport3.AppendLine("The Losses at Each Reach have been applied to the source, and the Gains are accumulated.")
         lReport3.AppendLine("   Run Made " & aRunMade)
         lReport3.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport3.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ))
+        lReport3.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
 
         lReport4.AppendLine("")
         lReport4.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches (%).")
@@ -174,7 +174,7 @@ Public Module ConstituentBudget
         lReport5.AppendLine("The Losses at Each Reach have been applied to the source, and the Gains are accumulated.")
         lReport5.AppendLine("   Run Made " & aRunMade)
         lReport5.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport5.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ))
+        lReport5.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
 
         lReport6.AppendLine("")
         lReport6.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches of Interest(%).")
@@ -201,16 +201,18 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Local Drainage"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point Sources"
+                    If pGENERLoadingExits Then
+                        lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "GENER Sources"
+                    End If
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
+
+                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Inflow from Precipitation"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
                     lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Loss from Evaporation"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
-                    If pGENERLoadingExits Then
-                        lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "GENER Sources"
-                    End If
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
+
 
                     For Each lID As HspfOperation In lRchresOperations
                         .CurrentRecord += 1
@@ -309,16 +311,18 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = lID.Name & " " & lID.Id & " - " & lID.Description
                         lField += 1 : .Value(lField) = DoubleToString(lNonpointVol, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lPointVol, , lNumberFormat)
+
+                        If pGENERLoadingExits Then
+                            lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat)
+                        End If
+                        lField += 1 : .Value(lField) = DoubleToString(lDiversion, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lAdditionalSource, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lInflowFromPrecip, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lUpstreamIn, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lTotalInflow, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lOutflow, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lEvapLoss, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lDiversion, , lNumberFormat)
-                        If pGENERLoadingExits Then
-                            lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat)
-                        End If
-                        lField += 1 : .Value(lField) = DoubleToString(lAdditionalSource, , lNumberFormat)
+
 
                     Next
                     lReport.Append(.ToString)
@@ -341,6 +345,12 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point Sources"
+                    If pGENERLoadingExits Then
+                        lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "GENER Sources"
+                    End If
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
+
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
@@ -348,11 +358,7 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = "(%)" : .FieldName(lField) = "Cumulative Trapping"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = "(%)" : .FieldName(lField) = "Reach Trapping"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
-                    If pGENERLoadingExits Then
-                        lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "GENER Sources"
-                    End If
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
+
                     For Each lID As HspfOperation In lRchresOperations
                         Dim lPointTons As Double = 0.0
                         .CurrentRecord += 1
@@ -447,6 +453,12 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = lID.Name & " " & lID.Id & " - " & lID.Description
                         lField += 1 : .Value(lField) = DoubleToString(lNonpointTons, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lPointTons, , lNumberFormat)
+                        If pGENERLoadingExits Then
+                            lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat)
+                        End If
+                        lField += 1 : .Value(lField) = DoubleToString(lDiversion, , lNumberFormat)
+
+                        lField += 1 : .Value(lField) = DoubleToString(lAdditionalSourceTons, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lUpstreamIn, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lTotalInflow, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lOutflow, , lNumberFormat)
@@ -454,11 +466,7 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = DoubleToString(lCumulativePointNonpoint, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lCululativeTrappingEfficiency * 100, , lNumberFormat, , , 6)
                         lField += 1 : .Value(lField) = DoubleToString(lReachTrappingEfficiency * 100, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lDiversion, , lNumberFormat)
-                        If pGENERLoadingExits Then
-                            lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat)
-                        End If
-                        lField += 1 : .Value(lField) = DoubleToString(lAdditionalSourceTons, , lNumberFormat)
+
                     Next
                     lReport.Append(.ToString)
                 End With
@@ -481,6 +489,12 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point Sources"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Atm. Depo. on Water"
+
+                    If pGENERLoadingExits Then
+                        lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "GENER Sources"
+                    End If
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
@@ -488,11 +502,7 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
-                    If pGENERLoadingExits Then
-                        lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "GENER Sources"
-                    End If
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
+
 
                     For Each lID As HspfOperation In lRchresOperations
                         'If lID.Id = 260 Then Stop
@@ -608,6 +618,13 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = DoubleToString(lNonpointlbs, 15, lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lPointlbs, 15, lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lTotalAtmDep, 15, lNumberFormat)
+                        If pGENERLoadingExits Then
+                            lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat)
+                        End If
+                        lField += 1 : .Value(lField) = DoubleToString(lDiversion, 15, lNumberFormat)
+
+                        lField += 1 : .Value(lField) = DoubleToString(lAdditionalSourcelbs, 15, lNumberFormat)
+
                         lField += 1 : .Value(lField) = DoubleToString(lUpstreamIn, 15, lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lTotalInflow, 15, lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lOutflow, 15, lNumberFormat)
@@ -615,11 +632,7 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = DoubleToString(lCumulativePointNonpoint, 15, lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lCululativeTrappingEfficiency * 100, 15, lNumberFormat, , , 6)
                         lField += 1 : .Value(lField) = DoubleToString(lReachTrappingEfficiency * 100, 15, lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(lDiversion, 15, lNumberFormat)
-                        If pGENERLoadingExits Then
-                            lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat)
-                        End If
-                        lField += 1 : .Value(lField) = DoubleToString(lAdditionalSourcelbs, 15, lNumberFormat)
+
                     Next
                     lReport.Append(.ToString)
 
@@ -772,7 +785,13 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 30 : .FieldType(lField) = "C" : .Value(lField) = "    " : .FieldName(lField) = "Reach Segment"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Nonpoint"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Point Sources"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Atmospheric Deposition on Water"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Atm. Depo. on Water"
+                    If pGENERLoadingExits Then
+                        lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "GENER Sources"
+                    End If
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
+                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
+
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Upstream In"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Total Inflow"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Outflow"
@@ -780,11 +799,7 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Diversion"
-                    If pGENERLoadingExits Then
-                        lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "GENER Sources"
-                    End If
-                    lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Mass Balance Differences/Additional Sources"
+
 
                     For Each lID As HspfOperation In lRchresOperations
                         Dim lPointlbs As Double = 0.0
@@ -892,6 +907,12 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = DoubleToString(lNonpointlbs, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lPointlbs, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lTotalAtmDep, , lNumberFormat)
+
+                        If pGENERLoadingExits Then
+                            lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat)
+                        End If
+                        lField += 1 : .Value(lField) = DoubleToString(Diversion, , lNumberFormat)
+                        lField += 1 : .Value(lField) = DoubleToString(lAdditionalSourcelbs, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lUpstreamIn, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lTotalInflow, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lOutflow, , lNumberFormat)
@@ -899,12 +920,7 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = DoubleToString(lCumulativePointNonpoint, , lNumberFormat)
                         lField += 1 : .Value(lField) = DoubleToString(lCululativeTrappingEfficiency * 100, , lNumberFormat, , , 6)
                         lField += 1 : .Value(lField) = DoubleToString(lReachTrappingEfficiency * 100, , lNumberFormat)
-                        lField += 1 : .Value(lField) = DoubleToString(Diversion, , lNumberFormat)
-                        If pGENERLoadingExits Then
-                            lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat)
-                        End If
 
-                        lField += 1 : .Value(lField) = DoubleToString(lAdditionalSourcelbs, , lNumberFormat)
                     Next
                     lReport.Append(.ToString)
                 End With
@@ -1271,8 +1287,8 @@ Public Module ConstituentBudget
         Dim aGENERload As Double = lGENERLoad
         Dim lAdditionalSource As Double = aTotalInflow - lReachTotal - aAtmDep - aPoint - aUpstreamIn - aGENERload
         If lGENERLoadingExists AndAlso (Not GENERTSNotinWDM) AndAlso (Not pMessageShown) Then
-            Logger.Msg("Some RCHRES operation have loadings input from GENER connections. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting. 
-This message box will not be shown again for this constituent.")
+            Logger.Msg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting. 
+This message box will not be shown again for." & aBalanceType)
             pMessageShown = True
         End If
 

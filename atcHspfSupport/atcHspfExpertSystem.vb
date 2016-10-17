@@ -102,8 +102,8 @@ Public Class atcExpertSystem
             End If
 
             If lExsRecord.Length = 51 Then
-                SDateJ = pUci.GlobalBlock.SDateJ
-                EDateJ = pUci.GlobalBlock.EdateJ
+                SDateJ = aSDateJ
+                EDateJ = aEDateJ
                 Logger.Dbg("The simulation time period from the uci file is used for the calibration!")
             Else 'the user could be entering dates on this line if calib period diff from sim period
                 lExsRecord.PadRight(70)
@@ -125,7 +125,9 @@ Public Class atcExpertSystem
                 lDate(3) = 24
                 lDate(4) = 0
                 EDateJ = Date2J(lDate)
-                Logger.Msg("The simulation time period from the EXS file is used for the calibration", vbOKOnly)
+                Logger.Msg("Analysis time period mismatch.: Analysis time period does not match the time period in the EXS file " & lFileName & "." &
+"The time period from the EXS file is used for the hydrologic calibration", vbOKOnly)
+
             End If
 
             'Default unspecified lat/integer min/max values to contiguous 48 states
@@ -829,7 +831,7 @@ Public Class atcExpertSystem
             End If
 
             'error in low flow recession
-            If Double.IsNaN(pStats(6, 1, lSiteIndex)) Or _
+            If Double.IsNaN(pStats(6, 1, lSiteIndex)) Or
                Double.IsNaN(pStats(6, 2, lSiteIndex)) Then
                 lSite.ErrorTerm(2) = GetNaN()
             Else 'okay to calculate this term
@@ -851,7 +853,7 @@ Public Class atcExpertSystem
             End If
 
             'error in seasonal volume
-            If (Double.IsNaN(lSummerError) Or _
+            If (Double.IsNaN(lSummerError) Or
                    Double.IsNaN(lWinterError)) Then 'one term or the other has not been obtained
                 lSite.ErrorTerm(7) = GetNaN()
             Else 'okay to calculate this term
@@ -876,7 +878,7 @@ Public Class atcExpertSystem
         lStr = aUci.GlobalBlock.RunInf.Value & vbCrLf
         lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf
         lStr &= "UCI Edited: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
-        lStr &= TimeSpanAsString(SDateJ, EDateJ)
+        lStr &= TimeSpanAsString(SDateJ, EDateJ, "Analysis Period: ")
 
         For lSiteIndex As Integer = 1 To Sites.Count
             Dim lSite As HexSite = Sites(lSiteIndex - 1)
@@ -894,7 +896,7 @@ Public Class atcExpertSystem
                     Dim lErrorCriterion As HexErrorCriterion = lSite.ErrorCriteria.Criterion(lErrorTerm)
                     If lErrorCriterion.PrintPosition = lErrorPrintIndex Then
                         If lSite.ErrorTerm(lErrorTerm) <> 0.0# Then
-                            lStr &= (lSite.ErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
+                            lStr &= (lSite.ErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) &
                                     DecimalAlign(lSite.ErrorTerm(lErrorTerm))
                             If lSite.ErrorCriteria(lErrorTerm).Value > 0 Then
                                 lStr &= DecimalAlign(lSite.ErrorCriteria(lErrorTerm).Value)

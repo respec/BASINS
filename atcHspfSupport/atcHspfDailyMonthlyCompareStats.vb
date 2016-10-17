@@ -22,7 +22,7 @@ Public Module DailyMonthlyCompareStats
         lStr = "Daily and Monthly " & aCons & " Statistics for '" & IO.Path.GetFileNameWithoutExtension(aUci.Name) & "' scenario." & vbCrLf
         lStr &= "   Run Made " & aRunMade & vbCrLf
         lStr &= "   " & aUci.GlobalBlock.RunInf.Value & vbCrLf
-        lStr &= "   " & TimeSpanAsString(lSDateJ, lEDateJ)
+        lStr &= "   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
         lStr &= "   (Units:CFS days)" & vbCrLf & vbCrLf 'TODO: do this in inches too?
 
         CheckDateJ(aObsTSer, "Observed", lSDateJ, lEDateJ, lStr)

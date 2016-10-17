@@ -23,7 +23,7 @@ Public Module MonthlyAverageCompareStats
         Dim lEDateJ As Double = aEDateJ
         If Math.Abs(lEDateJ) < 0.00001 Then lEDateJ = aUci.GlobalBlock.EdateJ
 
-        lStr &= "   " & TimeSpanAsString(lSDateJ, lEDateJ)
+        lStr &= "   " & TimeSpanAsString(lSDateJ, lEDateJ, "Analysis Period: ")
         lStr &= "   (Units:" & aUnits & ")" & vbCrLf & vbCrLf
 
         CheckDateJ(aObsTSer, "Observed", lSDateJ, lEDateJ, lStr)

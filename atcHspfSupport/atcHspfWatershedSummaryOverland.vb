@@ -112,7 +112,7 @@ Public Module WatershedSummaryOverland
                 lReport.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
             Else
                 Dim lEJDate As Double = TimAddJ(lSJDate, 6, 1, 1)
-                lReport.AppendLine(TimeSpanAsString(lSJDate, lEJDate, "   Time Span: "))
+                lReport.AppendLine(TimeSpanAsString(lSJDate, lEJDate, "Analysis Period: "))
                 lSJDate = lEJDate
             End If
 
