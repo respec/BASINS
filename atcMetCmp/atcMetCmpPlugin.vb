@@ -52,6 +52,7 @@ Public Class atcMetCmpPlugin
         Dim lAttDef As atcAttributeDefinition
         Dim lOk As Boolean
 
+        Dim lOpns As atcDataAttributes = AvailableOperations()
         DataSets.Clear() 'assume we don't want any old datasets (maybe add arg to define this???)
         Select Case aOperationName
             Case "Solar Radiation"
@@ -130,7 +131,12 @@ Public Class atcMetCmpPlugin
                     lOk = True
                 End If
                 If lOk Then
-                    lAttDef = atcDataAttributes.GetDefinition("Hamon Monthly Coefficients")
+                    Dim lHM As atcDefinedValue = lOpns.GetDefinedValue("Hamon PET")
+                    If lHM Is Nothing Then
+                        lAttDef = atcDataAttributes.GetDefinition("Hamon Monthly Coefficients")
+                    Else
+                        lAttDef = lHM.Arguments.GetValue("Hamon Monthly Coefficients")
+                    End If
                     For i As Integer = 1 To 12
                         If lCTS(i) > lAttDef.Max Or lCTS(i) < lAttDef.Min Then
                             lOk = False
@@ -440,7 +446,7 @@ Public Class atcMetCmpPlugin
                 lArguments.SetValue(defTMaxTS, Nothing)
                 lArguments.SetValue(defDegF, Nothing)
                 lArguments.SetValue(defLat, Nothing)
-                lArguments.SetValue(defHMonCoeff, Nothing)
+                lArguments.SetValue(defHMonCoeff, defHMonCoeff)
 
                 pAvailableOperations.SetValue(lHamon, Nothing, lArguments)
 

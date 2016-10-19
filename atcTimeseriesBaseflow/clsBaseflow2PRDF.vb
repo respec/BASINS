@@ -85,23 +85,10 @@ Public Class clsBaseflow2PRDF
         Dim lTsBaseflow As atcTimeseries = Nothing
         PrintDataSummary(lTsDaily)
         Dim lNumMissing As Integer = lTsDaily.Attributes.GetValue("Count Missing")
-        If lNumMissing <= 1 Then
-            Logger.Dbg(
+        Logger.Dbg(
                   "NUMBER OF DAYS (WITH DATA) COUNTED =            " & lTsDaily.numValues - lNumMissing & vbCrLf &
-                  "NUMBER OF DAYS THAT SHOULD BE IN THIS INTERVAL =" & lTsDaily.numValues, MsgBoxStyle.Information, "Perform PART")
-            TwoPRDF(lTsDaily)
-        Else
-            Logger.Dbg(
-                   "***************************************" & vbCrLf &
-                   "*** THERE IS A BREAK IN THE STREAM- ***" & vbCrLf &
-                   "*** FLOW RECORD WITHIN THE PERIOD OF **" & vbCrLf &
-                   "*** INTEREST.  PROGRAM TERMINATION. ***" & vbCrLf &
-                   "***************************************", MsgBoxStyle.Critical, "PART Method Stopped")
-            If gBatchRun Then
-                gError &= vbCrLf & "Error:PART:Flow Data Has Gap."
-            End If
-            Return Nothing
-        End If
+                  "NUMBER OF DAYS THAT SHOULD BE IN THIS INTERVAL =" & lTsDaily.numValues, MsgBoxStyle.Information, "Perform TwoPRDF")
+        TwoPRDF(lTsDaily)
 
         Dim lTsBaseflowgroup As New atcTimeseriesGroup
         With pTsBaseflow1.Attributes
@@ -318,7 +305,7 @@ Public Class clsBaseflow2PRDF
         pRC = Math.Round(RC * 1000.0, 0, MidpointRounding.AwayFromZero) / 1000.0
         Dim lBFIadj As Double = Math.Round(BFI * 100.0, 0, MidpointRounding.AwayFromZero) / 100.0
 
-        pSRC = (1.0 - BFImax) * (lBFIadj - BFImax) / (1.0 - RC * BFImax) ^ 2 * RC * lBFIadj
+        pSRC = (1.0 - BFImax) * (lBFIadj - BFImax) / (1.0 - RC * BFImax) ^ 2 * RC / lBFIadj
         pSBFImax = (RC - 1.0) * (RC * lBFIadj - 1.0) / (1.0 - RC * BFImax) ^ 2 * BFImax / lBFIadj
 
         If IPRINT = 1 Then
@@ -357,12 +344,24 @@ Public Class clsBaseflow2PRDF
         Dim lOutputGood As Boolean = True
         Dim lSW As System.IO.StreamWriter = Nothing
         Try
+            Dim lWriteHeader As Boolean = True
+            If IO.File.Exists(aFilename) Then
+                lWriteHeader = False
+            End If
             lSW = New StreamWriter(aFilename, True)
+            If lWriteHeader Then
+                lSW.WriteLine("gage number      a    BFI  S(BFI|a)  S(BFI|BFImax)")
+                lSW.WriteLine("--------------------------------------------------")
+            End If
             Dim lstrgageno As String = TargetTS.Attributes.GetValue("Location", "").ToString().PadLeft(11, " ")
-            Dim lstrRC As String = DoubleToString(RC, 5, "#.000").PadLeft(5, " ")
-            Dim lstrBFI As String = DoubleToString(BFI, 4, "#.00").PadLeft(4, " ")
-            Dim lstrSRC As String = DoubleToString(SRC, 5, "#.00").PadLeft(5, " ")
-            Dim lstrSBFI As String = DoubleToString(SBFImax, 5, "#.00").PadLeft(5, " ")
+            'Dim lstrRC As String = DoubleToString(RC, 5, "0.000").PadLeft(5, " ")
+            'Dim lstrBFI As String = DoubleToString(BFI, 4, "0.00").PadLeft(4, " ")
+            'Dim lstrSRC As String = DoubleToString(SRC, 5, "0.00").PadLeft(5, " ")
+            'Dim lstrSBFI As String = DoubleToString(SBFImax, 5, "0.00").PadLeft(5, " ")
+            Dim lstrRC As String = String.Format("{0:0.000}", RC).PadLeft(5, " ")
+            Dim lstrBFI As String = String.Format("{0:0.00}", BFI).PadLeft(4, " ")
+            Dim lstrSRC As String = String.Format("{0:0.00}", SRC).PadLeft(5, " ")
+            Dim lstrSBFI As String = String.Format("{0:0.00}", SBFImax).PadLeft(5, " ")
             lSW.WriteLine(lstrgageno & "  " & lstrRC & "   " & lstrBFI & "     " & lstrSRC & "          " & lstrSBFI)
         Catch ex As Exception
             lOutputGood = False
@@ -386,7 +385,7 @@ Public Class clsBaseflow2PRDF
             lSW = New StreamWriter(aFilename, False)
             Dim lstrgageno As String = TargetTS.Attributes.GetValue("Location", "")
             lSW.WriteLine("Stream- and base-flow for gage number " & lstrgageno)
-            lSW.WriteLine("recession constant= " & RC & ", BFI= " & BFI)
+            lSW.WriteLine("recession constant= " & DoubleToString(RC, 5, "0.000") & ", BFI= " & DoubleToString(BFI, 4, "0.00"))
             Dim lDateFormat As New atcDateFormat()
             With lDateFormat
                 .IncludeHours = False

@@ -167,11 +167,13 @@ Public Class frmUSGSBaseflow
         'check validity of inputs
         Dim lErrMsg As String = ""
 
+        Dim lSDate As Double = Double.NaN
+        Dim lEDate As Double = Double.NaN
         If pDataGroup.Count = 0 Then
             lErrMsg &= "- No streamflow data selected" & vbCrLf
         Else
-            Dim lSDate As Double = StartDateFromForm()
-            Dim lEDate As Double = EndDateFromForm()
+            lSDate = StartDateFromForm()
+            lEDate = EndDateFromForm()
             If lSDate < 0 OrElse lEDate < 0 Then
                 lErrMsg &= "- Problematic start and/or end date." & vbCrLf
             ElseIf (lEDate - lSDate) / (JulianHour * 24) < 31 Then
@@ -263,8 +265,8 @@ Public Class frmUSGSBaseflow
             'Set drainage area
             Args.SetValue(BFInputNames.DrainageArea, lDA) '"Drainage Area"
             'set duration
-            Args.SetValue(BFInputNames.StartDate, StartDateFromForm) '"Start Date"
-            Args.SetValue(BFInputNames.EndDate, EndDateFromForm) '"End Date"
+            Args.SetValue(BFInputNames.StartDate, lSDate) '"Start Date"
+            Args.SetValue(BFInputNames.EndDate, lEDate) '"End Date"
             'Set streamflow
             Args.SetValue(BFInputNames.Streamflow, pDataGroup) '"Streamflow"
             'Set Unit
