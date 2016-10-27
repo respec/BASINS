@@ -1,4 +1,4 @@
-Dated 10/05/2016
+Dated 10/27/2016
 HSPEXP+1.20beta
 Features
 1. The HSPEXP+ form now allows user to select analysis dates, in case user wants to select a different analysis period than
@@ -6,12 +6,15 @@ the model run.
 2. The HSPEXP+ form has better validation for checking the validity of UCI file before enabling the controls.
 3. BOD-Reports are now referred to as BOD-Labile report to clarify that the BOD loadings from land includes the mass-link
 factor.
-4. The budget reports now check if GENER sources provide input to the RCHRES, and then calculate the loadings from GENER operations. The GENER operation must output a timeseries to a WDM file.
+4. The budget reports now check if GENER sources provide input to the RCHRES in the SCHEMATIC block, and then calculate the loadings from GENER operations. The GENER operation must output a timeseries to a WDM file.
+5. "Regan Plots" - which a concurrent plots of nutrient concentrations and algal forms can be genrated for all reaches automatically, if PLANK section is active and all the outputs are written to binary file at monthly or shorter intervals.
+6. Tool tips are available on the HSPEXP+ form, to better guide user while running HSPEXP+.
 
 Bugs Fixed
 1.	The load allocation reports have been improved for calculation of contribution percent of different sources.
 2.	The point sources calculations have been improved to include cases when the input load can be attached to sediments or be available as biological material.
 3.	The model gives a useful warning if no echo file is available instead of crashing.
+4.  The balance reports at specific locations were not outputting the correct loads. Those reports have been fixed.
 
   
   
