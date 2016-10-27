@@ -32,7 +32,6 @@ Partial Class StartUp
         Me.lblOutReach2 = New System.Windows.Forms.Label()
         Me.cmdEnd = New System.Windows.Forms.Button()
         Me.chkAreaReports = New System.Windows.Forms.CheckBox()
-        Me.chkGraphStandard = New System.Windows.Forms.CheckBox()
         Me.chkRunHSPF = New System.Windows.Forms.CheckBox()
         Me.pnlHighlight = New System.Windows.Forms.Panel()
         Me.chkWaterBalance = New System.Windows.Forms.CheckBox()
@@ -67,7 +66,7 @@ Partial Class StartUp
         Me.cmdStart.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdStart.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.cmdStart.Enabled = False
-        Me.cmdStart.Location = New System.Drawing.Point(326, 596)
+        Me.cmdStart.Location = New System.Drawing.Point(326, 578)
         Me.cmdStart.Name = "cmdStart"
         Me.cmdStart.Size = New System.Drawing.Size(75, 23)
         Me.cmdStart.TabIndex = 19
@@ -98,19 +97,19 @@ Partial Class StartUp
         '
         Me.lblRCH.AutoSize = True
         Me.lblRCH.Enabled = False
-        Me.lblRCH.Location = New System.Drawing.Point(19, 538)
+        Me.lblRCH.Location = New System.Drawing.Point(18, 518)
         Me.lblRCH.MaximumSize = New System.Drawing.Size(500, 0)
         Me.lblRCH.Name = "lblRCH"
-        Me.lblRCH.Size = New System.Drawing.Size(441, 13)
+        Me.lblRCH.Size = New System.Drawing.Size(391, 13)
         Me.lblRCH.TabIndex = 7
-        Me.lblRCH.Text = "Number(s) of the outlet reach at which you would like water and/or nutrient balan" &
-    "ce reports?"
+        Me.lblRCH.Text = "Number(s) of the outlet reach at which you would like constituent balance reports" &
+    "."
         '
         'txtRCH
         '
         Me.txtRCH.BackColor = System.Drawing.SystemColors.Window
         Me.txtRCH.Enabled = False
-        Me.txtRCH.Location = New System.Drawing.Point(24, 562)
+        Me.txtRCH.Location = New System.Drawing.Point(23, 542)
         Me.txtRCH.Name = "txtRCH"
         Me.txtRCH.Size = New System.Drawing.Size(47, 20)
         Me.txtRCH.TabIndex = 18
@@ -121,7 +120,7 @@ Partial Class StartUp
         '
         Me.lblOutReach2.AutoSize = True
         Me.lblOutReach2.Enabled = False
-        Me.lblOutReach2.Location = New System.Drawing.Point(82, 565)
+        Me.lblOutReach2.Location = New System.Drawing.Point(81, 545)
         Me.lblOutReach2.MaximumSize = New System.Drawing.Size(400, 0)
         Me.lblOutReach2.Name = "lblOutReach2"
         Me.lblOutReach2.Size = New System.Drawing.Size(359, 13)
@@ -132,7 +131,7 @@ Partial Class StartUp
         '
         Me.cmdEnd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdEnd.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdEnd.Location = New System.Drawing.Point(407, 596)
+        Me.cmdEnd.Location = New System.Drawing.Point(407, 578)
         Me.cmdEnd.Name = "cmdEnd"
         Me.cmdEnd.Size = New System.Drawing.Size(75, 23)
         Me.cmdEnd.TabIndex = 20
@@ -149,21 +148,8 @@ Partial Class StartUp
         Me.chkAreaReports.Size = New System.Drawing.Size(143, 17)
         Me.chkAreaReports.TabIndex = 4
         Me.chkAreaReports.Text = "Watershed Area Reports"
-        Me.ttHSPEXP.SetToolTip(Me.chkAreaReports, "Check to provide watershed area reports based on the schematic block.")
+        Me.ttHSPEXP.SetToolTip(Me.chkAreaReports, "Compute reports of watershed area based on the SCHEMATIC BLOCK.")
         Me.chkAreaReports.UseVisualStyleBackColor = True
-        '
-        'chkGraphStandard
-        '
-        Me.chkGraphStandard.AutoSize = True
-        Me.chkGraphStandard.Enabled = False
-        Me.chkGraphStandard.Location = New System.Drawing.Point(3, 15)
-        Me.chkGraphStandard.Name = "chkGraphStandard"
-        Me.chkGraphStandard.Size = New System.Drawing.Size(162, 17)
-        Me.chkGraphStandard.TabIndex = 9
-        Me.chkGraphStandard.Text = "Hydrology Calibration Graphs"
-        Me.ttHSPEXP.SetToolTip(Me.chkGraphStandard, "Hydrology calibration graphs can be prepared only if Expert Statistics are being " &
-        "generated.")
-        Me.chkGraphStandard.UseVisualStyleBackColor = True
         '
         'chkRunHSPF
         '
@@ -175,14 +161,14 @@ Partial Class StartUp
         Me.chkRunHSPF.Size = New System.Drawing.Size(77, 17)
         Me.chkRunHSPF.TabIndex = 3
         Me.chkRunHSPF.Text = "Run HSPF"
-        Me.ttHSPEXP.SetToolTip(Me.chkRunHSPF, "Check to run HSPF before HSPEXP+ analysis.")
+        Me.ttHSPEXP.SetToolTip(Me.chkRunHSPF, "Makes HSPF Simulation Run.")
         Me.chkRunHSPF.UseVisualStyleBackColor = True
         '
         'pnlHighlight
         '
         Me.pnlHighlight.BackColor = System.Drawing.Color.Red
         Me.pnlHighlight.Enabled = False
-        Me.pnlHighlight.Location = New System.Drawing.Point(18, 558)
+        Me.pnlHighlight.Location = New System.Drawing.Point(17, 538)
         Me.pnlHighlight.Name = "pnlHighlight"
         Me.pnlHighlight.Size = New System.Drawing.Size(58, 28)
         Me.pnlHighlight.TabIndex = 17
@@ -193,9 +179,9 @@ Partial Class StartUp
         Me.chkWaterBalance.Enabled = False
         Me.chkWaterBalance.Location = New System.Drawing.Point(6, 19)
         Me.chkWaterBalance.Name = "chkWaterBalance"
-        Me.chkWaterBalance.Size = New System.Drawing.Size(137, 17)
+        Me.chkWaterBalance.Size = New System.Drawing.Size(55, 17)
         Me.chkWaterBalance.TabIndex = 12
-        Me.chkWaterBalance.Text = "Water Balance Reports"
+        Me.chkWaterBalance.Text = "Water"
         Me.chkWaterBalance.UseVisualStyleBackColor = True
         '
         'chkSedimentBalance
@@ -204,9 +190,9 @@ Partial Class StartUp
         Me.chkSedimentBalance.Enabled = False
         Me.chkSedimentBalance.Location = New System.Drawing.Point(6, 42)
         Me.chkSedimentBalance.Name = "chkSedimentBalance"
-        Me.chkSedimentBalance.Size = New System.Drawing.Size(152, 17)
+        Me.chkSedimentBalance.Size = New System.Drawing.Size(70, 17)
         Me.chkSedimentBalance.TabIndex = 13
-        Me.chkSedimentBalance.Text = "Sediment Balance Reports"
+        Me.chkSedimentBalance.Text = "Sediment"
         Me.chkSedimentBalance.UseVisualStyleBackColor = True
         '
         'chkFecalColiform
@@ -215,9 +201,9 @@ Partial Class StartUp
         Me.chkFecalColiform.Enabled = False
         Me.chkFecalColiform.Location = New System.Drawing.Point(6, 134)
         Me.chkFecalColiform.Name = "chkFecalColiform"
-        Me.chkFecalColiform.Size = New System.Drawing.Size(132, 17)
+        Me.chkFecalColiform.Size = New System.Drawing.Size(92, 17)
         Me.chkFecalColiform.TabIndex = 17
-        Me.chkFecalColiform.Text = "Fecal Coliform Reports"
+        Me.chkFecalColiform.Text = "Fecal Coliform"
         Me.chkFecalColiform.UseVisualStyleBackColor = True
         '
         'chkBODBalance
@@ -226,9 +212,9 @@ Partial Class StartUp
         Me.chkBODBalance.Enabled = False
         Me.chkBODBalance.Location = New System.Drawing.Point(6, 111)
         Me.chkBODBalance.Name = "chkBODBalance"
-        Me.chkBODBalance.Size = New System.Drawing.Size(120, 17)
+        Me.chkBODBalance.Size = New System.Drawing.Size(80, 17)
         Me.chkBODBalance.TabIndex = 16
-        Me.chkBODBalance.Text = "BOD-Labile Reports"
+        Me.chkBODBalance.Text = "BOD-Labile"
         Me.chkBODBalance.UseVisualStyleBackColor = True
         '
         'chkTotalPhosphorus
@@ -237,9 +223,9 @@ Partial Class StartUp
         Me.chkTotalPhosphorus.Enabled = False
         Me.chkTotalPhosphorus.Location = New System.Drawing.Point(6, 88)
         Me.chkTotalPhosphorus.Name = "chkTotalPhosphorus"
-        Me.chkTotalPhosphorus.Size = New System.Drawing.Size(191, 17)
+        Me.chkTotalPhosphorus.Size = New System.Drawing.Size(109, 17)
         Me.chkTotalPhosphorus.TabIndex = 15
-        Me.chkTotalPhosphorus.Text = "Total Phosphorus Balance Reports"
+        Me.chkTotalPhosphorus.Text = "Total Phosphorus"
         Me.chkTotalPhosphorus.UseVisualStyleBackColor = True
         '
         'chkTotalNitrogen
@@ -248,9 +234,9 @@ Partial Class StartUp
         Me.chkTotalNitrogen.Enabled = False
         Me.chkTotalNitrogen.Location = New System.Drawing.Point(6, 65)
         Me.chkTotalNitrogen.Name = "chkTotalNitrogen"
-        Me.chkTotalNitrogen.Size = New System.Drawing.Size(175, 17)
+        Me.chkTotalNitrogen.Size = New System.Drawing.Size(93, 17)
         Me.chkTotalNitrogen.TabIndex = 14
-        Me.chkTotalNitrogen.Text = "Total Nitrogen Balance Reports"
+        Me.chkTotalNitrogen.Text = "Total Nitrogen"
         Me.chkTotalNitrogen.UseVisualStyleBackColor = True
         '
         'chkExpertStats
@@ -259,9 +245,9 @@ Partial Class StartUp
         Me.chkExpertStats.Enabled = False
         Me.chkExpertStats.Location = New System.Drawing.Point(6, 42)
         Me.chkExpertStats.Name = "chkExpertStats"
-        Me.chkExpertStats.Size = New System.Drawing.Size(148, 17)
+        Me.chkExpertStats.Size = New System.Drawing.Size(275, 17)
         Me.chkExpertStats.TabIndex = 8
-        Me.chkExpertStats.Text = "Calculate Expert Statistics"
+        Me.chkExpertStats.Text = "Generate Hydrology Calibration Statistics and Graphs"
         Me.ttHSPEXP.SetToolTip(Me.chkExpertStats, "Make sure that the basins specification file (EXS) file is available for the cali" &
         "bration location in the project folder.")
         Me.chkExpertStats.UseVisualStyleBackColor = True
@@ -270,13 +256,13 @@ Partial Class StartUp
         '
         Me.chkAdditionalgraphs.AutoSize = True
         Me.chkAdditionalgraphs.Enabled = False
-        Me.chkAdditionalgraphs.Location = New System.Drawing.Point(3, 39)
+        Me.chkAdditionalgraphs.Location = New System.Drawing.Point(3, 19)
         Me.chkAdditionalgraphs.Name = "chkAdditionalgraphs"
         Me.chkAdditionalgraphs.Size = New System.Drawing.Size(283, 17)
         Me.chkAdditionalgraphs.TabIndex = 10
         Me.chkAdditionalgraphs.Text = "Generate Graphs from Graph Specification Files (*.csv)"
-        Me.ttHSPEXP.SetToolTip(Me.chkAdditionalgraphs, "Make sure that the graph specification file(s) (*.csv) is/are available in the pr" &
-        "oject folder.")
+        Me.ttHSPEXP.SetToolTip(Me.chkAdditionalgraphs, "This option requires one or more correctly formatted graph specification file (*." &
+        "csv) in the project folder.")
         Me.chkAdditionalgraphs.UseVisualStyleBackColor = True
         '
         'btn_help
@@ -298,6 +284,7 @@ Partial Class StartUp
         Me.chkHydrologySensitivity.Size = New System.Drawing.Size(164, 17)
         Me.chkHydrologySensitivity.TabIndex = 7
         Me.chkHydrologySensitivity.Text = "Hydrology Sensitivity Analysis"
+        Me.ttHSPEXP.SetToolTip(Me.chkHydrologySensitivity, "Under development.")
         Me.chkHydrologySensitivity.UseVisualStyleBackColor = True
         '
         'GroupBox1
@@ -320,14 +307,14 @@ Partial Class StartUp
         Me.GroupBox2.Controls.Add(Me.chkWaterBalance)
         Me.GroupBox2.Controls.Add(Me.chkSedimentBalance)
         Me.GroupBox2.Controls.Add(Me.chkTotalNitrogen)
-        Me.GroupBox2.Location = New System.Drawing.Point(18, 366)
+        Me.GroupBox2.Location = New System.Drawing.Point(18, 343)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(442, 160)
         Me.GroupBox2.TabIndex = 10
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Constituent Balance Reports"
-        Me.ttHSPEXP.SetToolTip(Me.GroupBox2, "All the following reports requre the user to output these constituents in binaru " &
-        "file(s) at monthly or shorter intervals. ")
+        Me.ttHSPEXP.SetToolTip(Me.GroupBox2, "This following reports require binary output to be at a monthly or shorter interv" &
+        "al.")
         '
         'cmbUCIPath
         '
@@ -353,6 +340,7 @@ Partial Class StartUp
         Me.DateTimePicker1.Name = "DateTimePicker1"
         Me.DateTimePicker1.Size = New System.Drawing.Size(96, 20)
         Me.DateTimePicker1.TabIndex = 5
+        Me.ttHSPEXP.SetToolTip(Me.DateTimePicker1, "Start date of the analysis. It can be after the model simulation start date.")
         Me.DateTimePicker1.Value = New Date(1996, 1, 1, 0, 0, 0, 0)
         '
         'DateTimePicker2
@@ -363,6 +351,7 @@ Partial Class StartUp
         Me.DateTimePicker2.Name = "DateTimePicker2"
         Me.DateTimePicker2.Size = New System.Drawing.Size(96, 20)
         Me.DateTimePicker2.TabIndex = 6
+        Me.ttHSPEXP.SetToolTip(Me.DateTimePicker2, "End date of the analysis. It can be before the end of the simulation period.")
         Me.DateTimePicker2.Value = New Date(2009, 12, 31, 0, 0, 0, 0)
         '
         'GroupBox3
@@ -399,11 +388,10 @@ Partial Class StartUp
         'Plotting
         '
         Me.Plotting.Controls.Add(Me.chkReganGraphs)
-        Me.Plotting.Controls.Add(Me.chkGraphStandard)
         Me.Plotting.Controls.Add(Me.chkAdditionalgraphs)
         Me.Plotting.Location = New System.Drawing.Point(21, 265)
         Me.Plotting.Name = "Plotting"
-        Me.Plotting.Size = New System.Drawing.Size(438, 86)
+        Me.Plotting.Size = New System.Drawing.Size(438, 69)
         Me.Plotting.TabIndex = 48
         Me.Plotting.TabStop = False
         Me.Plotting.Text = "Graph"
@@ -411,7 +399,7 @@ Partial Class StartUp
         'chkReganGraphs
         '
         Me.chkReganGraphs.AutoSize = True
-        Me.chkReganGraphs.Location = New System.Drawing.Point(3, 62)
+        Me.chkReganGraphs.Location = New System.Drawing.Point(3, 42)
         Me.chkReganGraphs.Name = "chkReganGraphs"
         Me.chkReganGraphs.Size = New System.Drawing.Size(84, 17)
         Me.chkReganGraphs.TabIndex = 11
@@ -426,7 +414,7 @@ Partial Class StartUp
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
-        Me.ClientSize = New System.Drawing.Size(493, 636)
+        Me.ClientSize = New System.Drawing.Size(493, 618)
         Me.Controls.Add(Me.Plotting)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.cmbUCIPath)
@@ -470,7 +458,6 @@ Partial Class StartUp
     Friend WithEvents lblOutReach2 As System.Windows.Forms.Label
     Friend WithEvents cmdEnd As System.Windows.Forms.Button
     Friend WithEvents chkAreaReports As System.Windows.Forms.CheckBox
-    Friend WithEvents chkGraphStandard As System.Windows.Forms.CheckBox
     Friend WithEvents chkRunHSPF As System.Windows.Forms.CheckBox
     Friend WithEvents pnlHighlight As System.Windows.Forms.Panel
     Friend WithEvents chkWaterBalance As System.Windows.Forms.CheckBox

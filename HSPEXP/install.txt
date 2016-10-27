@@ -9,7 +9,10 @@ factor.
 4. The budget reports now check if GENER sources provide input to the RCHRES, and then calculate the loadings from GENER operations. The GENER operation must output a timeseries to a WDM file.
 
 Bugs Fixed
-1. The load allocation reports have been improved for calculation of contribution percent of different sources.
+1.	The load allocation reports have been improved for calculation of contribution percent of different sources.
+2.	The point sources calculations have been improved to include cases when the input load can be attached to sediments or be available as biological material.
+3.	The model gives a useful warning if no echo file is available instead of crashing.
+
   
   
   

@@ -6,29 +6,34 @@ atcHspfBinOut
 </name>
 </assembly>
 <members>
+<member name="T:atcHspfBinOut.atcTimeseriesFileHspfBinOut">
+ <summary>
+ 
+ </summary>
+ <remarks>
+Copyright 2005-2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+ </remarks>
+</member>
 <member name="F:atcHspfBinOut.HspfBinaryHeader.OutLev">
-	<summary>
+ <summary>
  Output Level: 2=BIVL, 3=day, 4=month, 5=year, 6=never
  </summary>
-</member><member name="M:atcHspfBinOut.HspfBinary.Open(System.Boolean)">
-	<summary>
+</member>
+<member name="T:atcHspfBinOut.HspfBinary">
+ <summary>
+ 
+ </summary>
+ <remarks>
+Copyright 2005-2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+</remarks>
+</member>
+<member name="M:atcHspfBinOut.HspfBinary.Open(System.Boolean)">
+ <summary>
  Only for private use or in atcTimeseriesFileHspfBinOut.ReadData
  Open file if it is not already open. Seek to the position where we were when Close was called
  </summary>
-	<returns>true if file needed to be opened, false if file was already open</returns>
-	<remarks>use in conjunction with Close()</remarks>
-</member><member name="T:atcHspfBinOut.HspfBinary">
-	<summary>
-	</summary>
-	<remarks>
-Copyright 2005-2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-</remarks>
-</member><member name="T:atcHspfBinOut.atcTimeseriesFileHspfBinOut">
-	<summary>
-	</summary>
-	<remarks>
-Copyright 2005-2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
- </remarks>
+ <returns>true if file needed to be opened, false if file was already open</returns>
+ <remarks>use in conjunction with Close()</remarks>
 </member>
 </members>
 </doc>

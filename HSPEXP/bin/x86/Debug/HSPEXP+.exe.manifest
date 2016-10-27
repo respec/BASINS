@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="HSPEXP+.exe" version="1.2.0.0" publicKeyToken="0000000000000000" language="en" processorArchitecture="x86" type="win32" />
+  <asmv1:assemblyIdentity name="HSPEXP+.exe" version="1.20.0.0" publicKeyToken="0000000000000000" language="en" processorArchitecture="x86" type="win32" />
   <description asmv2:iconFile="Basins.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="HSPEXP+" version="1.2.0.0" language="neutral" processorArchitecture="x86" />
+    <assemblyIdentity name="HSPEXP+" version="1.20.0.0" language="neutral" processorArchitecture="x86" />
     <commandLine file="HSPEXP+.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -42,223 +42,230 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
-      <assemblyIdentity name="stdole" version="7.0.3300.0" publicKeyToken="B03F5F7F11D50A3A" language="neutral" />
-    </dependentAssembly>
-  </dependency>
-  <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcBasinsObsWQ.dll" size="17920">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcBasinsObsWQ.dll" size="16384">
       <assemblyIdentity name="atcBasinsObsWQ" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>Laoj7919jZ8L1becrDGdMKYKjUQ=</dsig:DigestValue>
+        <dsig:DigestValue>CwYXb9Q7BNGYq+AJRQgjhZPe4hY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcControls.dll" size="112128">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcControls.dll" size="103424">
       <assemblyIdentity name="atcControls" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>pIKU+dZoMBGbDvTMwtaGisyBxxY=</dsig:DigestValue>
+        <dsig:DigestValue>7CM7kcWPcgCsNVc8/5Sa4L44Gxc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcData.dll" size="328704">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcData.dll" size="355328">
       <assemblyIdentity name="atcData" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>1XRRkLtDmzaauk6+JxOocCWm7Io=</dsig:DigestValue>
+        <dsig:DigestValue>wim8tqeOEx/oOrZuN4nuamZNuFI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcDurationCompare.dll" size="93696">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcDurationCompare.dll" size="82432">
       <assemblyIdentity name="atcDurationCompare" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>1Xtoo81P0ftMN+R9GRv4GFsilGA=</dsig:DigestValue>
+        <dsig:DigestValue>duk/K+/RNGAFSY/2IKsfjGL/XfE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcGraph.dll" size="154624">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcGraph.dll" size="145408">
       <assemblyIdentity name="atcGraph" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>qPJwS4C+IIa0MZrc3+siDSH8sSc=</dsig:DigestValue>
+        <dsig:DigestValue>BRStGUtD953tZhivhYOfQLQbMw4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcHspfBinOut.dll" size="33280">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcHspfBinOut.dll" size="30720">
       <assemblyIdentity name="atcHspfBinOut" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>jve6zc4SAnF5gUndz+t5ts0AT5A=</dsig:DigestValue>
+        <dsig:DigestValue>dAdeWLblyzOxmlmGF7mCHrbkOIs=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcHspfSupport.dll" size="254464">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcHspfSupport.dll" size="258560">
       <assemblyIdentity name="atcHspfSupport" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>LCmnFVPIKWpulyQk51JqhSdJCUM=</dsig:DigestValue>
+        <dsig:DigestValue>7XZlVLMBLCzDTy5zpu5qQKrklUQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcList.dll" size="58368">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcList.dll" size="51712">
       <assemblyIdentity name="atcList" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>sl1paRx3Rzzr9+BfkL+QJtRYSBo=</dsig:DigestValue>
+        <dsig:DigestValue>1g+TUbp90bgtwLX89fLayrcow9E=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcMetCmp.dll" size="1138688">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcMetCmp.dll" size="1121280">
       <assemblyIdentity name="atcMetCmp" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>s7vl/fQithUOrWjKgzQ89RHbmHY=</dsig:DigestValue>
+        <dsig:DigestValue>IsqSM0TVo65cHNWomYUz/kUi6Gw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcReport.dll" size="33792">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcReport.dll" size="29696">
       <assemblyIdentity name="atcReport" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>pwtx08H89C9OENRbnHNLksnLFNQ=</dsig:DigestValue>
+        <dsig:DigestValue>fE1ikfwKIig1vPiRHCCsdvREK24=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcSegmentation.dll" size="18944">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcSegmentation.dll" size="16384">
       <assemblyIdentity name="atcSegmentation" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>eICb0HahhLC2jj4TQW7uO2dgrVU=</dsig:DigestValue>
+        <dsig:DigestValue>8KYDxKgiifJaGPy0fVhfdeUcnW4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcTimeseriesMath.dll" size="39424">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcTimeseriesMath.dll" size="35328">
       <assemblyIdentity name="atcTimeseriesMath" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>CWxiNNVj3PR+tBNssoaZ7g0RssU=</dsig:DigestValue>
+        <dsig:DigestValue>ZM2AjsOL7N/AImgrAgP7OmiMyc4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcTimeseriesScript.dll" size="131072">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcTimeseriesScript.dll" size="123392">
       <assemblyIdentity name="atcTimeseriesScript" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>+ay0+tDRne7rg2gTETfXIFB1emY=</dsig:DigestValue>
+        <dsig:DigestValue>0L0mJtWjlWDWCbpEBsJX2xZv5n0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcTimeseriesStatistics.dll" size="17920">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcTimeseriesStatistics.dll" size="16896">
       <assemblyIdentity name="atcTimeseriesStatistics" version="0.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>7UDAwfUrVuQH+X6AcfPFYVWooi8=</dsig:DigestValue>
+        <dsig:DigestValue>AcBESkyGqws9ZPpTd5fIZNN3a/c=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcUCI.dll" size="311808">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcUCI.dll" size="309248">
       <assemblyIdentity name="atcUCI" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>puGU7Kh8AnBrSbKoNkd+EOAep1w=</dsig:DigestValue>
+        <dsig:DigestValue>esQm/FIBH9RpdAcD5wU5SDmxRYs=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcUtility.dll" size="171520">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcUtility.dll" size="164864">
       <assemblyIdentity name="atcUtility" version="3.1.2.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>UFgV2gRot6q5yzCBy3UPxXWXZKk=</dsig:DigestValue>
+        <dsig:DigestValue>WgpYA5OJz8z+wF3jVcNmpToLF1I=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcWDM.dll" size="82432">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcWDM.dll" size="75776">
       <assemblyIdentity name="atcWDM" version="3.1.1.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>nsUPskpFiq0P5qUP11/sObfepbs=</dsig:DigestValue>
+        <dsig:DigestValue>0VpNHup/c3yHAkSquKm5RHnrYK4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="HSPEXP+.exe" size="395264">
-      <assemblyIdentity name="HSPEXP+" version="1.2.0.0" language="neutral" processorArchitecture="x86" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="HSPEXP+.exe" size="459776">
+      <assemblyIdentity name="HSPEXP+" version="1.20.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>6TJ2NyNeOVBXL4vBYXGEYFO8g/M=</dsig:DigestValue>
+        <dsig:DigestValue>rV3YLFC3W0uHKLQtigf/rdGc+WA=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="stdole.dll" size="25592">
+      <assemblyIdentity name="stdole" version="7.0.3300.0" publicKeyToken="B03F5F7F11D50A3A" language="neutral" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>HK7QglaoDljVckUtLki3iqaSlyI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -310,13 +317,13 @@
       <dsig:DigestValue>DyYlB/ja1yA3WmFmUEE2gQ2+utk=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="HSPEXP+.chm" size="284308">
+  <file name="HSPEXP+.chm" size="1032846">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>Y+zrkGS8SU1NzLd/Ti2l/HBfvsM=</dsig:DigestValue>
+      <dsig:DigestValue>ReyKrG0kDbf36THADZCbeXU1rQA=</dsig:DigestValue>
     </hash>
   </file>
   <file name="HSPEXP+.exe.config" size="1319">
