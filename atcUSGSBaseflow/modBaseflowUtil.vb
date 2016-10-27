@@ -378,6 +378,8 @@ Public Module modBaseflowUtil
             'End With
             aArgs.SetValue("BatchRun", False)
             aArgs.SetValue(BFInputNames.Streamflow, lTsFlowGroup)
+            'Below is for running BFLOW using original full time series including gaps
+            'aArgs.SetValue("OriginalFlow", lTsFlow)
             If CalcBF.Open("baseflow", aArgs) Then
                 'OutputDir = lStationOutDir
                 OutputDir = aArgs.GetValue("OutputDir", "")
@@ -4268,14 +4270,20 @@ Public Module modBaseflowUtil
         Dim lResults As atcDataAttributes = lTsBaseflow.Attributes
         Dim lSW As System.IO.StreamWriter = Nothing
         Try
+            Dim lWriteHeader As Boolean = True
+            If IO.File.Exists(aFilename) Then
+                lWriteHeader = False
+            End If
             lSW = New System.IO.StreamWriter(aFilename, True)
             Dim lDatasetName As String = lResults.GetValue("Location", "")
-            lSW.WriteLine("Baseflow data file: this file summarizes the fraction " &
-                          "of streamflow that is contributed by baseflow for each " &
-                          "of the 3 passes made by the program")
-            lSW.WriteLine("Gage file      " & " Baseflow Fr1" & " Baseflow Fr2" &
-                          " Baseflow Fr3" & "    NPR" & " Alpha Factor" &
-                          " Baseflow Days")
+            If lWriteHeader Then
+                lSW.WriteLine("Baseflow data file: this file summarizes the fraction " &
+                              "of streamflow that is contributed by baseflow for each " &
+                              "of the 3 passes made by the program")
+                lSW.WriteLine("Gage_file      " & " Baseflow_Fr1" & " Baseflow_Fr2" &
+                              " Baseflow_Fr3" & "    NPR" & " Alpha_Factor" &
+                              " Baseflow_Days")
+            End If
 
             '5002 format(a15,1x,f12.2,1x,f12.2,1x,f12.2,1x,i6,1x,f12.4,1x,f13.4)
 
@@ -4288,16 +4296,21 @@ Public Module modBaseflowUtil
                     lstrfwfile = lFilenameOnly.PadLeft(15, " ")
                 End If
             End If
-            Dim lstrbflw_fr1 As String = DoubleToString(lResults.GetValue("fr1", -99), 12, "#.00").PadLeft(12, " ")
-            Dim lstrbflw_fr2 As String = DoubleToString(lResults.GetValue("fr2", -99), 12, "#.00").PadLeft(12, " ")
-            Dim lstrbflw_fr3 As String = DoubleToString(lResults.GetValue("fr3", -99), 12, "#.00").PadLeft(12, " ")
+            Dim lstrbflw_fr1 As String = DoubleToString(lResults.GetValue("fr1", -99), 12, "0.00").PadLeft(12, " ")
+            Dim lstrbflw_fr2 As String = DoubleToString(lResults.GetValue("fr2", -99), 12, "0.00").PadLeft(12, " ")
+            Dim lstrbflw_fr3 As String = DoubleToString(lResults.GetValue("fr3", -99), 12, "0.00").PadLeft(12, " ")
             Dim lstrnpr As String = ""
             Dim lstralf As String = ""
             Dim lstrbfd As String = ""
-            If lResults.GetValue("npr", -1) > 1 Then
-                lstrnpr = DoubleToString(lResults.GetValue("npr", -99), 0, "0").PadLeft(12, " ")
-                lstralf = DoubleToString(lResults.GetValue("alf", -99), 12, "#.0000").PadLeft(12, " ")
-                lstrbfd = DoubleToString(lResults.GetValue("bfd", -99), 13, "#.0000").PadLeft(13, " ")
+            Dim lnpr As Integer = 0
+            If Integer.TryParse(lResults.GetValue("npr", -1), lnpr) AndAlso lnpr > 1 Then
+                Dim lalf As Double = lResults.GetValue("alf", -99)
+                Dim lbfd As Double = lResults.GetValue("bfd", -99)
+                lstrnpr = lnpr.ToString().PadLeft(6, " ")
+                'lstralf = DoubleToString(lalf, 12, "#.0000").PadLeft(12, " ")
+                'lstrbfd = DoubleToString(lbfd, 13, "#.00000").PadLeft(13, " ")
+                lstralf = String.Format("{0:0.0000}", lalf).PadLeft(12, " ")
+                lstrbfd = String.Format("{0:0.0000}", lbfd).PadLeft(13, " ")
             End If
             If String.IsNullOrEmpty(lstrnpr) Then
                 lSW.WriteLine(lstrfwfile & " " & lstrbflw_fr1 & " " & lstrbflw_fr2 & " " & lstrbflw_fr3)
@@ -4424,6 +4437,7 @@ Public Module modBaseflowUtil
                 .IncludeHours = False
                 .IncludeMinutes = False
                 .IncludeSeconds = False
+                .Midnight24 = True
             End With
             lSW = New IO.StreamWriter(aFilename, False)
             Dim lDate(5) As Integer
@@ -4500,12 +4514,20 @@ Public Module modBaseflowUtil
         Dim lOutputGood As Boolean = True
         Dim lSW As System.IO.StreamWriter = Nothing
         Try
+            Dim lWriteHeader As Boolean = True
+            If IO.File.Exists(aFilename) Then
+                lWriteHeader = False
+            End If
             lSW = New IO.StreamWriter(aFilename, True)
+            If lWriteHeader Then
+                lSW.WriteLine("gage number      a    BFI  S(BFI|a)  S(BFI|BFImax)")
+                lSW.WriteLine("--------------------------------------------------")
+            End If
             Dim lstrgageno As String = aTS.Attributes.GetValue("Location", "").ToString().PadLeft(11, " ")
-            Dim lstrRC As String = DoubleToString(lRC, 5, "#.000").PadLeft(5, " ")
-            Dim lstrBFI As String = DoubleToString(lBFI, 4, "#.00").PadLeft(4, " ")
-            Dim lstrSRC As String = DoubleToString(lSRC, 5, "#.00").PadLeft(5, " ")
-            Dim lstrSBFI As String = DoubleToString(lSBFImax, 5, "#.00").PadLeft(5, " ")
+            Dim lstrRC As String = DoubleToString(lRC, 5, "0.000").PadLeft(5, " ")
+            Dim lstrBFI As String = DoubleToString(lBFI, 4, "0.00").PadLeft(4, " ")
+            Dim lstrSRC As String = DoubleToString(lSRC, 5, "0.00").PadLeft(5, " ")
+            Dim lstrSBFI As String = DoubleToString(lSBFImax, 5, "0.00").PadLeft(5, " ")
             lSW.WriteLine(lstrgageno & "  " & lstrRC & "   " & lstrBFI & "     " & lstrSRC & "          " & lstrSBFI)
         Catch ex As Exception
             lOutputGood = False
@@ -4544,7 +4566,7 @@ Public Module modBaseflowUtil
             lSW = New IO.StreamWriter(aFilename, False)
             Dim lstrgageno As String = aTS.Attributes.GetValue("Location", "")
             lSW.WriteLine("Stream- and base-flow for gage number " & lstrgageno)
-            lSW.WriteLine("recession constant= " & lRC & ", BFI= " & lBFI)
+            lSW.WriteLine("recession constant= " & String.Format("{0:0.000}", lRC) & ", BFI= " & String.Format("{0:0.00}", lBFI))
             Dim lDateFormat As New atcDateFormat()
             With lDateFormat
                 .IncludeHours = False

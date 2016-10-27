@@ -55,7 +55,10 @@ Friend Class frmInputWizard
     End Sub
 
     Private Sub btnHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnHelp.Click
-        atcUtility.ShowHelp("BASINS Details/Plug-ins/Time-Series Plug-ins/Read Data with Script.html")
+        'ToDo: branch based on application
+        'atcUtility.ShowHelp("BASINS Details/Plug-ins/Time-Series Plug-ins/Read Data with Script.html")
+        atcUtility.ShowHelp("SW Toolbox Details/Plug-ins/Time-Series Plug-ins/Read Data with Script.html")
+        'atcUtility.ShowHelp("GW Toolbox Details/Plug-ins/Time-Series Plug-ins/Read Data with Script.html")
     End Sub
 
     Public WriteOnly Property TserFile() As atcData.atcTimeseriesSource

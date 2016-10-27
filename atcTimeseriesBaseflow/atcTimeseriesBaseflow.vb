@@ -265,6 +265,8 @@ Public Class atcTimeseriesBaseflow
                     CType(ClsBaseFlow, clsBaseflowBFI).Method = BFMethods.BFIModified
                 Case BFMethods.BFLOW
                     ClsBaseFlow = New clsBaseflowBFLOW()
+                    'Below is for testing on using original time series including gaps
+                    'ClsBaseFlow.TargetTS = aArgs.GetValue("OriginalFlow", Nothing)
                 Case BFMethods.TwoPRDF
                     ClsBaseFlow = New clsBaseflow2PRDF()
                 Case Else
@@ -285,7 +287,7 @@ Public Class atcTimeseriesBaseflow
                 'even though BFI doesn't need it, but set it nonetheless, won't hurt
                 'later on reporting and graphing need it too
                 .DrainageArea = lDrainageArea
-                .TargetTS = lTsStreamflow
+                If .TargetTS Is Nothing Then .TargetTS = lTsStreamflow
                 .StartDate = lStartDate
                 .EndDate = lEndDate
                 If lEnglishFlg Then

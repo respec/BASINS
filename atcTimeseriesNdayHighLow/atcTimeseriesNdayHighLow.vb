@@ -542,7 +542,12 @@ Public Class atcTimeseriesNdayHighLow
                 End If
 
                 Try
-                    PearsonType3(UseVersion_1, lNdayTs, lRecurOrProbs, aHigh, aLogFg, Me, aAttributesStorage, lNumZero)
+                    If lNdayTs.numValues < 3 Then
+                        lMsg = "ComputeFreq:NDayTimeseries has less than 3 years. Unable to calculate PearsonType3."
+                        lQ = lNaN
+                    Else
+                        PearsonType3(UseVersion_1, lNdayTs, lRecurOrProbs, aHigh, aLogFg, Me, aAttributesStorage, lNumZero)
+                    End If
                 Catch ex As Exception
                     lMsg = "ComputeFreq:Exception:" & ex.ToString & ":"
                     lQ = lNaN
