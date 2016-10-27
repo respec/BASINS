@@ -102,16 +102,7 @@ Public Class StartUp
 
     End Sub
 
-    Private Sub chkExpertStats_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkExpertStats.CheckedChanged
-        If chkExpertStats.Checked Then
-            chkGraphStandard.Enabled = True
-            chkGraphStandard.Checked = True
-        Else
-            chkGraphStandard.Enabled = False
-            chkGraphStandard.Checked = False
 
-        End If
-    End Sub
 
 
     Private Sub StartUp_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load

@@ -78,9 +78,9 @@ Module HSPFOutputReports
         'pGraphSaveFormat = ".emf"
         pGraphSaveWidth = 1300
         pGraphSaveHeight = 768
-        pMakeStdGraphs = StartUp.chkGraphStandard.Checked
-        pMakeLogGraphs = StartUp.chkGraphStandard.Checked
-        pMakeSupGraphs = StartUp.chkGraphStandard.Checked
+        pMakeStdGraphs = True
+        pMakeLogGraphs = True
+        pMakeSupGraphs = True
         pRunUci = StartUp.chkRunHSPF.Checked
         pMakeAreaReports = StartUp.chkAreaReports.Checked
 

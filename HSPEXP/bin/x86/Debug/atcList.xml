@@ -7,10 +7,10 @@ atcList
 </assembly>
 <members>
 <member name="M:atcList.frmOptions.SaveState">
-	<summary>
+ <summary>
  Save the current state of this form in a private hidden copy of this form
  </summary>
-	<remarks>Useful if the user presses Cancel so we can go back to the original options</remarks>
+ <remarks>Useful if the user presses Cancel so we can go back to the original options</remarks>
 </member>
 </members>
 </doc>

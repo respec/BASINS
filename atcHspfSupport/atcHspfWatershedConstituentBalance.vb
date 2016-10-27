@@ -52,7 +52,7 @@ Public Module WatershedConstituentBalance
             Dim lReport As atcReport.ReportText = Report(aUci, aBalanceType,
                                                aOperationTypes,
                                                aScenario, aScenarioResults,
-                                               aRunMade, lOutletLocation,
+                                               aRunMade, aSDateJ, aEDateJ, lOutletLocation,
                                                aOutFilePrefix, True,
                                                aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth, aSkipZeroOrNoValue)
 
@@ -744,8 +744,8 @@ Public Module WatershedConstituentBalance
                                             .Value(1) = lConstituentName.PadRight(12)
 
                                         ElseIf lConstituentKey.Substring(2).StartsWith("Total") AndAlso
-                                       lConstituentKey.Substring(2).Length > 5 AndAlso
-                                       IsNumeric(lConstituentKey.Substring(7, 1)) Then
+                                                lConstituentKey.Substring(2).Length > 5 AndAlso
+                                                IsNumeric(safesubstring(lConstituentKey, 7, 1)) Then
                                             Dim lTotalCount As Integer = lConstituentKey.Substring(7, 1)
                                             Dim lCurFieldValues(.NumFields) As Double
                                             Dim lCurrentRecordSave As Integer = .CurrentRecord
@@ -759,14 +759,18 @@ Public Module WatershedConstituentBalance
                                                     End If
                                                 Next
                                             Next
-                                            .CurrentRecord = lCurrentRecordSave
+                                            .CurrentRecord+=lTotalCount
+
                                             .Value(1) = lConstituentName.PadRight(aFieldWidth)
                                             For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
                                                 .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             Next
-                                            .CurrentRecord += 1
+                                        Else
+                                            '.CurrentRecord += 1
+
                                             .Value(1) = lConstituentName.PadRight(12)
                                             'fill in values for each land use
+
                                             Dim lValueTotal As Double = 0.0
                                             lFieldIndex = 1
                                             For Each lLandUse As String In lLandUses.Keys
@@ -779,7 +783,6 @@ Public Module WatershedConstituentBalance
                                             Next
                                             lFieldIndex += 1
                                             .Value(lFieldIndex) = DecimalAlign(lValueTotal / lAreaTotal, aFieldWidth, aDecimalPlaces, aSignificantDigits)
-
                                             If lValueTotal = 0 Then
                                                 Dim lSkipTo As String = FindSkipTo(lConstituentKey)
                                                 If lSkipTo IsNot Nothing Then
@@ -801,6 +804,8 @@ Public Module WatershedConstituentBalance
                                             End If
 
                                         End If
+                                        '.CurrentRecord += 1
+
                                     End If
 
 
@@ -944,14 +949,17 @@ Public Module WatershedConstituentBalance
                                                DecimalAlign(lLoadUnit(0)) & vbTab &
                                                DecimalAlign(lLoadTotal) & vbTab &
                                                DecimalAlign(lLoadOverall))
-                                    lSubtotals(0) += lLoadUnit(0)
-                                    lSubtotals(1) += lLoadTotal
-                                    lSubtotals(2) += lLoadOverall
-                                    If aBalanceType <> "Water" Then
-                                        SumLoads(lLoadTotals, lConstituentName, lLoadUnit, lLoadTotal, lLoadOverall)
+                                    If Not lConstituentName.Contains("Rainfall") Then 'Anurag added this case as total rainfall was being added to the runoff
+                                        lSubtotals(0) += lLoadUnit(0)
+                                        lSubtotals(1) += lLoadTotal
+                                        lSubtotals(2) += lLoadOverall
                                     End If
-                                End If
-                                lSummaryReport.AppendLine()
+
+                                    If aBalanceType <> "Water" Then
+                                            SumLoads(lLoadTotals, lConstituentName, lLoadUnit, lLoadTotal, lLoadOverall)
+                                        End If
+                                    End If
+                                    lSummaryReport.AppendLine()
                             Else
                                 'Logger.Dbg("SkipNoData:" & lConstituentKey)
                             End If

@@ -1,9 +1,0 @@
-10:57:33.740 : LOG_MSG:ERROR.FIL OPENED
-10:57:33.879 : HASS_ENT:F90_WDBOPNR:entr:WDMSFL,RWFLG:         100           1 C:\BASINS41\models\HSPF\bin\hspfmsg.wdm
-10:57:33.902 : HASS_ENT:F90_WDBOPNR:exit:WDMSFL,RETCOD         100           0
-10:59:08.252 : LOG_MSG:ERROR.FIL OPENED
-10:59:08.253 : HASS_ENT:F90_WDBOPNR:entr:WDMSFL,RWFLG:         100           1 hspfmsg.wdm
-10:59:08.253 : HASS_ENT:F90_WDBOPNR:exit:WDMSFL,RETCOD         100           0
-FILBLK RETCOD           0
-wdmfl           0           0           0           0
-FILBLK RETCOD           0

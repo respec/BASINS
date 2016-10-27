@@ -244,3 +244,7 @@
 /WinHSPF/logs
 /WinHSPF/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 /WinHSPF/obj/x86/Debug
+/atcD4EMLauncher/obj
+/.vs/WinHSPF_15/v14/.suo
+/atcMetCmp/obj/Debug/atcMetCmp.xml
+/BASINS/BASINS15.vbproj.user
