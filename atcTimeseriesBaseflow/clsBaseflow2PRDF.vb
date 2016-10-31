@@ -136,6 +136,12 @@ Public Class clsBaseflow2PRDF
         Return lTsBaseflowgroup
     End Function
 
+    ''' <summary>
+    ''' This is the original BFImax and RC estimate methods from 2prdf_instructions.pdf
+    ''' that comes with the Eckhardt Fortran program
+    ''' </summary>
+    ''' <param name="aTS"></param>
+    ''' <param name="aConditions"></param>
     Public Sub CalculateBFImax_RC(ByVal aTS As atcTimeseries, Optional ByVal aConditions As atcDataAttributes = Nothing)
         '     Determine if the stream Is perennial Or ephemeral. It Is
         '     considered perennial, If it Is waterless during less than
