@@ -911,6 +911,20 @@ RWZProgramEnding:
 
     Private Function AggregateTS(ByVal aTimeseries As atcTimeseries, ByVal aTimeUnit As String, ByVal aTran As String) As atcTimeseries
         Select Case aTimeUnit
+            Case "hourly"
+                Select Case aTran
+                    Case "average"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUHour, 1, atcTran.TranAverSame)
+                    Case "max"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUHour, 1, atcTran.TranMax)
+                    Case "min"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUHour, 1, atcTran.TranMin)
+                    Case "sum"
+                        Return Aggregate(aTimeseries, atcTimeUnit.TUHour, 1, atcTran.TranSumDiv)
+                    Case Else
+                        Return aTimeseries
+                End Select
+
             Case "daily"
                 Select Case aTran
                     Case "average"
@@ -967,7 +981,8 @@ RWZProgramEnding:
 
 
         If aZgc.MasterPane.PaneList.Count > 1 Then
-
+            lAuxPane = aZgc.MasterPane.PaneList(0)
+            lPaneMain = aZgc.MasterPane.PaneList(1)
             If (aGraphInit.length > 11 AndAlso Not String.IsNullOrEmpty(Trim(aGraphInit(11)))) Then
                 lAuxPane.YAxis.Scale.Min = Trim(aGraphInit(11))
             End If
@@ -977,6 +992,7 @@ RWZProgramEnding:
             If (aGraphInit.length > 16 AndAlso Not String.IsNullOrEmpty(Trim(aGraphInit(16))) AndAlso Trim(aGraphInit(16)).ToLower = "yes") Then
                 lAuxPane.YAxis.Type = AxisType.Log
             End If
+            lAuxPane.YAxis.Title.Text = Trim(aGraphInit(5))
         Else
             lPaneMain = aZgc.MasterPane.PaneList(0)
         End If
