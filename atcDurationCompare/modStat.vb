@@ -507,7 +507,7 @@ Public Module modStat
         'lStrBuilder.AppendLine()
         'If aTSerObs.Attributes("TUUnit)
         If aTSerObs.Attributes.GetValue("Time Unit").ToString = "TUYear" Then
-            lStrBuilder.AppendLine("The following statistics are only useful if the simulation period spans multiple years ")
+            lStrBuilder.AppendLine("The following statistics are generally useful if the simulation period spans multiple years ")
             lStrBuilder.AppendLine("(generally greater than a decade) with significant hydrologic variation.")
             lStrBuilder.AppendLine()
         End If
@@ -527,10 +527,9 @@ Public Module modStat
 
         lStrBuilder.AppendLine("RMSE-observations standard deviation ratio**".PadLeft(48) & DecimalAlign(RSR, 18))
         lStrBuilder.AppendLine()
-        lStrBuilder.AppendLine("*Positive PBIAS indicates oversimulation and Negative PBIAS indicates undersimulation. Please refer to ")
+        lStrBuilder.AppendLine("*Positive PBIAS indicates oversimulation and negative PBIAS indicates undersimulation. Please refer to ")
         lStrBuilder.AppendLine("1. Lettenmaier, D.P., and E.F. Wood. 1992. Hydrological Forecasting. In Handbook of Hydrology (pp. 26.1-26.30). McGraw-Hill, Inc. ")
-        lStrBuilder.AppendLine("2. Franz., K.J., and T.S. Hogue. 2011. Evaluating uncertainty estimates in hdrologic models: borrowing measures from the ")
-        lStrBuilder.AppendLine("forecast verification community. Hydrology and Earth System Sciences. Vol.15:3367-3382 ")
+        lStrBuilder.AppendLine("2. Franz., K.J., and T.S. Hogue. 2011. Evaluating uncertainty estimates in hydrologic models: borrowing measures from the forecast verification community. Hydrology and Earth System Sciences. Vol.15:3367-3382")
         lStrBuilder.AppendLine("**Please refer to Moriasi, D.N., J.G. Arnold, M.W. Van Liew, R.L. Binger, R.D. Harmel, and T.L. Veith. 2007.")
         lStrBuilder.AppendLine("Model Evaluation Guidelines for Systematic Quantification of Accuracy in Watershed Simulations. Transactions of ASABE. Vol 50(3): 885-900")
         lStrBuilder.AppendLine()
@@ -623,7 +622,7 @@ Public Module modStat
         lStrBuilder.AppendLine()
 
         lStrBuilder.AppendLine("         Cases equal or exceeding lower")
-        lStrBuilder.AppendLine("          limit & less then upper limit     Percent cases")
+        lStrBuilder.AppendLine("          limit & less than upper limit     Percent cases")
         lStrBuilder.AppendLine("           ----------------------------       equal or        Average of cases")
         lStrBuilder.AppendLine("   Lower     Cases         Percent         exceeding limit   within class limits")
         lStrBuilder.AppendLine("   class   --------- ------------------- ------------------- -------------------")
