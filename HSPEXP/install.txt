@@ -1,4 +1,4 @@
-Dated 10/27/2016
+Dated 11/03/2016
 HSPEXP+1.20beta
 Features
 1. The HSPEXP+ form now allows user to select analysis dates, in case user wants to select a different analysis period than
@@ -15,6 +15,7 @@ Bugs Fixed
 2.	The point sources calculations have been improved to include cases when the input load can be attached to sediments or be available as biological material.
 3.	The model gives a useful warning if no echo file is available instead of crashing.
 4.  The balance reports at specific locations were not outputting the correct loads. Those reports have been fixed.
+5.  Couple of bugs have been fixed in graph generation code where the graph generation had issues with auxillary axis.
 
   
   
