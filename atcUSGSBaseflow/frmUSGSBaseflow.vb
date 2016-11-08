@@ -239,21 +239,21 @@ Public Class frmUSGSBaseflow
         End If
 
         Dim lDFBeta As Double = Double.NaN
-        'If chkMethodBFLOW.Checked Then
-        '    If Not Double.TryParse(txtDFParamBeta.Text.Trim(), lDFBeta) Then
-        '        lErrMsg &= "- BFLOW method needs a valid filter parameter." & vbCrLf
-        '    End If
-        'End If
+        If chkMethodBFLOW.Checked Then
+            If Not Double.TryParse(txtDFParamBeta.Text.Trim(), lDFBeta) Then
+                lErrMsg &= "- BFLOW method needs a valid filter parameter." & vbCrLf
+            End If
+        End If
         Dim lDFRC As Double = Double.NaN
         Dim lDFBFImax As Double = Double.NaN
-        'If chkMethodTwoPRDF.Checked Then
-        '    If Not Double.TryParse(txtDFParamRC.Text.Trim(), lDFRC) Then
-        '        lErrMsg &= "- TwoPRDF method needs a valid recession constant." & vbCrLf
-        '    End If
-        '    If Not Double.TryParse(txtDFParamBFImax.Text.Trim(), lDFBFImax) Then
-        '        lErrMsg &= "- TwoPRDF method needs a valid BFImax." & vbCrLf
-        '    End If
-        'End If
+        If chkMethodTwoPRDF.Checked Then
+            If Not Double.TryParse(txtDFParamRC.Text.Trim(), lDFRC) Then
+                lErrMsg &= "- TwoPRDF method needs a valid recession constant." & vbCrLf
+            End If
+            If Not Double.TryParse(txtDFParamBFImax.Text.Trim(), lDFBFImax) OrElse Not (lDFBFImax > 0 AndAlso lDFBFImax < 1) Then
+                lErrMsg &= "- TwoPRDF method needs a valid BFImax." & vbCrLf
+            End If
+        End If
 
         If IO.Directory.Exists(txtOutputDir.Text) Then
             Args.SetValue("OutputDir", txtOutputDir.Text)
