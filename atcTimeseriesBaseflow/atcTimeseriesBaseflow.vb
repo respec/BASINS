@@ -177,6 +177,9 @@ Public Class atcTimeseriesBaseflow
         Dim lBFIYearBasis As String = ""
         Dim lStationFile As String = ""
         Dim lBatchRun As Boolean = False
+        Dim lDFBeta As Double = Double.NaN
+        Dim lDFRC As Double = Double.NaN
+        Dim lDFBFImax As Double = Double.NaN
 
         Dim lAttributeDef As atcAttributeDefinition = Nothing
 
@@ -216,6 +219,13 @@ Public Class atcTimeseriesBaseflow
                 lBFINDay = aArgs.GetValue(BFInputNames.BFINDayScreen) '"BFINDay"
                 lBFIUseSymbol = aArgs.GetValue(BFInputNames.BFIUseSymbol) '"BFIUseSymbol"
                 lBFIYearBasis = aArgs.GetValue(BFInputNames.BFIReportby) '"BFIReportby"
+            End If
+            If lMethods.Contains(BFMethods.BFLOW) Then
+                lDFBeta = aArgs.GetValue(BFInputNames.BFLOWFilter, Double.NaN)
+            End If
+            If lMethods.Contains(BFMethods.TwoPRDF) Then
+                lDFRC = aArgs.GetValue(BFInputNames.TwoPRDFRC, Double.NaN)
+                lDFBFImax = aArgs.GetValue(BFInputNames.TwoPRDFBFImax, Double.NaN)
             End If
 
             lStationFile = aArgs.GetValue(BFInputNames.StationFile) '"Station File"
@@ -281,6 +291,15 @@ Public Class atcTimeseriesBaseflow
                         CType(ClsBaseFlow, clsBaseflowBFI).TPTestFraction = lBFIFrac
                     ElseIf lMethod = BFMethods.BFIModified Then
                         CType(ClsBaseFlow, clsBaseflowBFI).OneDayRecessConstant = lBFIK1Day
+                    End If
+                ElseIf lMethod = BFMethods.BFLOW AndAlso Not Double.IsNaN(lDFBeta) Then
+                    CType(ClsBaseFlow, clsBaseflowBFLOW).FP1 = lDFBeta
+                ElseIf lMethod = BFMethods.TwoPRDF Then
+                    If Not Double.IsNaN(lDFRC) Then
+                        CType(ClsBaseFlow, clsBaseflow2PRDF).RC = lDFRC
+                    End If
+                    If Not Double.IsNaN(lDFBFImax) Then
+                        CType(ClsBaseFlow, clsBaseflow2PRDF).BFImax = lDFBFImax
                     End If
                 End If
 
