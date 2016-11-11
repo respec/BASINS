@@ -118,6 +118,7 @@
     </Compile>
     <Compile Include="modAnnualCompareStats.vb" />
     <Compile Include="modGraph.vb" />
+    <Compile Include="modGraphBoxWhiskers.vb" />
     <Compile Include="modMonthlyAverageCompareStats.vb" />
     <Compile Include="modUtility.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

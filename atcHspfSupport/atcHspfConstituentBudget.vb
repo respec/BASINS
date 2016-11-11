@@ -19,7 +19,7 @@ Public Module ConstituentBudget
                            ByVal aRunMade As String,
                            ByVal aSDateJ As Double,
                            ByVal aEDateJ As Double) As _
-                           Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)
+                           Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)
 
         Dim lNumberFormat As String = "#,##0.###"
         Dim lNumberOfSignificantDigits As Integer = 11
@@ -38,6 +38,7 @@ Public Module ConstituentBudget
         Dim lReport4 As New atcReport.ReportText
         Dim lReport5 As New atcReport.ReportText
         Dim lReport6 As New atcReport.ReportText
+        Dim lReportLoadingRate As New atcReport.ReportText
 
         pRunningTotals = New atcCollection
         pOutputTotals = New atcCollection
@@ -142,7 +143,7 @@ Public Module ConstituentBudget
                 lReport4.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
                 lReport5.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
                 lReport6.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)(lReport, lReport2, lReport3, lReport5)
+                Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate)
 
         End Select
 
@@ -180,6 +181,12 @@ Public Module ConstituentBudget
         lReport6.AppendLine("")
         lReport6.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches of Interest(%).")
 
+        lReportLoadingRate.AppendLine(aScenario & " " & " Average Annual " & aBalanceType & "Loading rates " & lUnits & "per unit area (ac).")
+
+        lReportLoadingRate.AppendLine("   Run Made " & aRunMade)
+        lReportLoadingRate.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+        lReportLoadingRate.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+        lReportLoadingRate.AppendLine("")
 
         Dim YearsOfSimulation As Double = YearCount(aSDateJ, aEDateJ)
         Dim lOutputTable As New atcTableDelimited
@@ -952,6 +959,62 @@ Public Module ConstituentBudget
             lLandusesHeader = lLandusesHeader.Replace("AdditionalSources", "Mass Balance Differences/Additional Sources*")
 
 
+            Dim PointSourcesPlacesLocation As Integer = lLandusesHeader.IndexOf("PointSources")
+            Dim LandUsesList() As String = lLandusesHeader.Substring(1, PointSourcesPlacesLocation - 2).Split(vbTab)
+
+            Dim lBoxWhiskerItems As New List(Of BoxWhiskerItem)
+            Dim LoadingRateSummary As String = "Loading Rate Summary for " & aBalanceType & " by Each Land Land Use: " & lUnits & "/acre" & vbCrLf
+            LoadingRateSummary &= "Landuse" & vbTab & "Mean" & vbTab & "Min" & vbTab & "Max" & vbCrLf
+            For Each LandUse As String In LandUsesList
+                Dim LoadingRateLine1 As String = LandUse & vbTab
+                Dim LoadingRateLine2 As String = LandUse & vbTab
+                LoadingRateSummary &= LandUse & vbTab
+                Dim lDataForBoxWhiskerPlot As New BoxWhiskerItem
+                Dim max As Double = 0.0
+                Dim min As Double = 1.0E+30
+                Dim sum As Double = 0.0
+                Dim count As Int16 = 0
+                lDataForBoxWhiskerPlot.Label = LandUse
+                For Each Key As String In pOutputTotals.Keys
+                    Dim colonLocation As Integer = Key.IndexOf(":")
+                    Dim LandUseFromKey As String = SafeSubstring(Key, 0, colonLocation - 1)
+                    Dim OperationType As String = SafeSubstring(Key, colonLocation - 1, 1)
+                    Dim OperationNumber As Integer = SafeSubstring(Key, colonLocation + 1, 3)
+
+                    If OperationType & ":" & LandUseFromKey = LandUse Then
+                        count += 1
+                        LoadingRateLine1 &= OperationType & ":" & OperationNumber & vbTab
+                        LoadingRateLine2 &= DoubleToString(pOutputTotals.ItemByKey(Key), 10,,,, 5) & vbTab
+                        lDataForBoxWhiskerPlot.Values.Add(pOutputTotals.ItemByKey(Key))
+                        sum += pOutputTotals.ItemByKey(Key)
+                        If pOutputTotals.ItemByKey(Key) > max Then
+                            max = pOutputTotals.ItemByKey(Key)
+                        End If
+                        If pOutputTotals.ItemByKey(Key) < min Then
+                            min = pOutputTotals.ItemByKey(Key)
+                        End If
+
+                    End If
+
+
+                Next Key
+                LoadingRateSummary &= DoubleToString(sum / count, 10,,,, 5) & vbTab & DoubleToString(min, 10,,,, 5) & vbTab & DoubleToString(max, 10,,,, 5) & vbCrLf
+                lBoxWhiskerItems.Add(lDataForBoxWhiskerPlot)
+                lReportLoadingRate.AppendLine(LoadingRateLine1)
+                lReportLoadingRate.AppendLine(LoadingRateLine2)
+
+            Next LandUse
+            lReportLoadingRate.AppendLine()
+            lReportLoadingRate.AppendLine()
+            lReportLoadingRate.AppendLine(LoadingRateSummary)
+
+
+
+            'modGraphBoxWhiskers.CreateGraph_BoxAndWhisker(lBoxWhiskerItems)
+
+
+
+
             lReport3.AppendLine("Reach" & lLandusesHeader & vbTab & "Total**")
             lReport4.AppendLine("Reach" & lLandusesHeader & vbTab & "Total**")
             If aOutputLocations.Count > 0 Then
@@ -1058,7 +1121,7 @@ Public Module ConstituentBudget
         End If
         pRunningTotals.Clear()
 
-        Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)(lReport, lReport2, lReport3, lReport5)
+        Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate)
 
     End Function
 
@@ -1122,7 +1185,7 @@ Public Module ConstituentBudget
                             lConstituentTotal = lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor * lConnectionArea
                             'lConstituentTotal = lConstituentRate * lConnectionArea
 
-                            lTotal += lConnectionArea * lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor
+                            lTotal += lConstituentTotal
                             'The area and multiplication factor is multiplied to get the total load of the particular constituent to the reach "aReach" from the specific
                             'land use and then lTotal accumulates that load
                         Next
@@ -1187,6 +1250,7 @@ Public Module ConstituentBudget
                 aConnectionArea = 0
                 aTotal2 = 0
             End If
+            pOutputTotals.Increment(aLandUse & aTestLocation, lrate)
             aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
             & aTestLocation & " " _
             & aLandUse & vbTab _

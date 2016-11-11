@@ -564,7 +564,10 @@ Module HSPFOutputReports
                                     SaveFileString(lOutFileName, lReportCons.ToString)
                                 End If
                                 lReportCons = Nothing
-
+                                lReportCons = .Item5
+                                lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
+                                SaveFileString(lOutFileName, lReportCons.ToString)
+                                lReportCons = Nothing
                             End With
                             Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
 
