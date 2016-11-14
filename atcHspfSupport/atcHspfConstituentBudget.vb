@@ -984,7 +984,7 @@ Public Module ConstituentBudget
                     If OperationType & ":" & LandUseFromKey = LandUse Then
                         count += 1
                         LoadingRateLine1 &= OperationType & ":" & OperationNumber & vbTab
-                        LoadingRateLine2 &= DoubleToString(pOutputTotals.ItemByKey(Key), 10,,,, 5) & vbTab
+                        LoadingRateLine2 &= DoubleToString(pOutputTotals.ItemByKey(Key), , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab
                         lDataForBoxWhiskerPlot.Values.Add(pOutputTotals.ItemByKey(Key))
                         sum += pOutputTotals.ItemByKey(Key)
                         If pOutputTotals.ItemByKey(Key) > max Then
@@ -998,7 +998,9 @@ Public Module ConstituentBudget
 
 
                 Next Key
-                LoadingRateSummary &= DoubleToString(sum / count, 10,,,, 5) & vbTab & DoubleToString(min, 10,,,, 5) & vbTab & DoubleToString(max, 10,,,, 5) & vbCrLf
+                LoadingRateSummary &= DoubleToString(sum / count, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab &
+                    DoubleToString(min, , lNumberFormat,,, lNumberOfSignificantDigits) &
+                    vbTab & DoubleToString(max, , lNumberFormat,,, lNumberOfSignificantDigits) & vbCrLf
                 lBoxWhiskerItems.Add(lDataForBoxWhiskerPlot)
                 lReportLoadingRate.AppendLine(LoadingRateLine1)
                 lReportLoadingRate.AppendLine(LoadingRateLine2)
