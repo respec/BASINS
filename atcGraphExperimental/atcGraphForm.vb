@@ -456,34 +456,37 @@ Public Class atcGraphForm
                     Dim x, y As Double
                     ' Convert the mouse location to X, Y scale values
                     lPane.ReverseTransform(mousePt, x, y)
-                    ' Format the status label text
-                    Select Case lPane.XAxis.Type
-                        Case AxisType.DateDual
-                            Dim lDate As Date = Date.FromOADate(x)
-                            If lPane.XAxis.Scale.Max - lPane.XAxis.Scale.Min > 10 Then
-                                lPositionText = lDate.ToString("yyyy MMM d")
-                            Else
-                                lPositionText = lDate.ToString("yyyy MMM d HH:mm")
-                            End If
-                        Case AxisType.Probability
-                            Dim lProbScale As ZedGraph.ProbabilityScale = lPane.XAxis.Scale
-                            Select Case lProbScale.LabelStyle
-                                Case ProbabilityScale.ProbabilityLabelStyle.Percent
-                                    lPositionText = DoubleToString(x * 100, 3, , , , 3) & "%"
-                                Case ProbabilityScale.ProbabilityLabelStyle.Fraction
-                                    lPositionText = DoubleToString(x, 7, , , , 5)
-                                Case ProbabilityScale.ProbabilityLabelStyle.ReturnInterval
-                                    If x > 0 Then
-                                        lPositionText = DoubleToString(1 / x, , , , , 3) & "yr"
-                                    Else
-                                        lPositionText = ""
-                                    End If
-                            End Select
-
-                        Case Else
-                            lPositionText = DoubleToString(x)
-                    End Select
-                    lPositionText = "(" & lPositionText & ", " & DoubleToString(y) & ")"
+                    If Double.IsNaN(x) OrElse Double.IsNaN(y) Then
+                        lPositionText = ""
+                    Else
+                        ' Format the status label text
+                        Select Case lPane.XAxis.Type
+                            Case AxisType.DateDual
+                                Dim lDate As Date = Date.FromOADate(x)
+                                If lPane.XAxis.Scale.Max - lPane.XAxis.Scale.Min > 10 Then
+                                    lPositionText = lDate.ToString("yyyy MMM d")
+                                Else
+                                    lPositionText = lDate.ToString("yyyy MMM d HH:mm")
+                                End If
+                            Case AxisType.Probability
+                                Dim lProbScale As ZedGraph.ProbabilityScale = lPane.XAxis.Scale
+                                Select Case lProbScale.LabelStyle
+                                    Case ProbabilityScale.ProbabilityLabelStyle.Percent
+                                        lPositionText = DoubleToString(x * 100, 3, , , , 3) & "%"
+                                    Case ProbabilityScale.ProbabilityLabelStyle.Fraction
+                                        lPositionText = DoubleToString(x, 7, , , , 5)
+                                    Case ProbabilityScale.ProbabilityLabelStyle.ReturnInterval
+                                        If x > 0 Then
+                                            lPositionText = DoubleToString(1 / x, , , , , 3) & "yr"
+                                        Else
+                                            lPositionText = ""
+                                        End If
+                                End Select
+                            Case Else
+                                lPositionText = DoubleToString(x)
+                        End Select
+                        lPositionText = "(" & lPositionText & ", " & DoubleToString(y) & ")"
+                    End If
                 Catch
                     'Ignore any error setting coordinate text, default label is fine
                 End Try

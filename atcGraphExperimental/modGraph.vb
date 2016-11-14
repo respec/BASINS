@@ -489,10 +489,10 @@ FoundMatch:
         Dim lNonProvisionalTS As atcTimeseries = Nothing
         If HasProvisionalValues(aTimeseries) Then
             SplitProvisional(aTimeseries, lProvisionalTS, lNonProvisionalTS)
-            If lNonProvisionalTS IsNot Nothing AndAlso lNonProvisionalTS.numValues > 0 Then
+            If lNonProvisionalTS IsNot Nothing AndAlso lNonProvisionalTS.Attributes.GetValue("Count", 0) > 0 Then
                 lGraphThese.Add(lNonProvisionalTS)
             End If
-            If lProvisionalTS IsNot Nothing AndAlso lProvisionalTS.numValues > 0 Then
+            If lProvisionalTS IsNot Nothing AndAlso lProvisionalTS.Attributes.GetValue("Count", 0) > 0 Then
                 lGraphThese.Add(lProvisionalTS)
             End If
         Else
