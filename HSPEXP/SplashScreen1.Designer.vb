@@ -36,14 +36,14 @@ Partial Class SplashScreen1
         Me.MainLayoutPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
         Me.MainLayoutPanel.ColumnCount = 3
         Me.MainLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 300.0!))
-        Me.MainLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 300.0!))
-        Me.MainLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 300.0!))
-        Me.MainLayoutPanel.Controls.Add(Me.Version, 2, 0)
+        Me.MainLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 324.0!))
+        Me.MainLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 276.0!))
+        Me.MainLayoutPanel.Controls.Add(Me.Version, 2, 1)
         Me.MainLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.MainLayoutPanel.Location = New System.Drawing.Point(0, 0)
         Me.MainLayoutPanel.Name = "MainLayoutPanel"
-        Me.MainLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 250.0!))
-        Me.MainLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 125.0!))
+        Me.MainLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 190.0!))
+        Me.MainLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 185.0!))
         Me.MainLayoutPanel.Size = New System.Drawing.Size(900, 375)
         Me.MainLayoutPanel.TabIndex = 0
         '
@@ -52,13 +52,14 @@ Partial Class SplashScreen1
         Me.Version.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.Version.BackColor = System.Drawing.Color.Transparent
         Me.Version.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Version.ImageAlign = System.Drawing.ContentAlignment.TopRight
-        Me.Version.Location = New System.Drawing.Point(625, 150)
+        Me.Version.ImageAlign = System.Drawing.ContentAlignment.TopLeft
+        Me.Version.Location = New System.Drawing.Point(637, 208)
         Me.Version.Name = "Version"
-        Me.Version.Size = New System.Drawing.Size(250, 75)
+        Me.Version.Size = New System.Drawing.Size(250, 148)
         Me.Version.TabIndex = 1
         Me.Version.Text = "Version {0}.{1:00}"
         Me.Version.TextAlign = System.Drawing.ContentAlignment.TopRight
+        Me.Version.UseWaitCursor = True
         '
         'SplashScreen1
         '

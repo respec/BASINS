@@ -1,25 +1,22 @@
-Dated 11/03/2016
-HSPEXP+1.20beta
-Features
-1. The HSPEXP+ form now allows user to select analysis dates, in case user wants to select a different analysis period than
-the model run.
-2. The HSPEXP+ form has better validation for checking the validity of UCI file before enabling the controls.
-3. BOD-Reports are now referred to as BOD-Labile report to clarify that the BOD loadings from land includes the mass-link
-factor.
-4. The budget reports now check if GENER sources provide input to the RCHRES in the SCHEMATIC block, and then calculate the loadings from GENER operations. The GENER operation must output a timeseries to a WDM file.
-5. "Regan Plots" - which a concurrent plots of nutrient concentrations and algal forms can be genrated for all reaches automatically, if PLANK section is active and all the outputs are written to binary file at monthly or shorter intervals.
-6. Tool tips are available on the HSPEXP+ form, to better guide user while running HSPEXP+.
+Dated 11/14/2016
+HSPEXP+1.20
+Features:
+1. The HSPEXP+ form now allows users to select analysis dates, in case a user wants to select a different analysis period than the model run.
+2. The HSPEXP+ form performs improved validation for checking the validity of the UCI file before enabling the controls.
+3. The budget reports now check whether GENER sources are included to provide input to the RCHRES in the SCHEMATIC block, and then calculate the loadings from the GENER operations. The GENER operation must output a timeseries to a WDM file in order to be included in the report.
+4. "Regan Plots" - which are concurrent plots of nutrient concentrations and algal forms can be generated for all reaches automatically if PLANK section is active and all the outputs are written to the binary file at a monthly or shorter interval.
+5. Tool tips are available on the HSPEXP+ form, to better guide users while running HSPEXP+.
+6. An additional loading rate summary table is generated that shows loading rates of sediment, total nitrogen, and total phosphorus by the land use and operations, and also lists average, minimum, and maximum loading rates.
+7. BOD-Reports are now referred to as BOD-Labile report to clarify that the BOD loadings from land area include the mass-link factor fractions.
+8. HSPEXP+ help manual has been updated.
+ 
+Bugs Fixed:
+1. The load allocation reports have been improved for calculation of percent contribution of different sources.
+2. The point sources calculations have been improved to include cases when the input load can be attached to sediments or be available as a biological material.
+3. The model gives a useful warning if no echo file is available, instead of crashing.
+4. Previously, the balance reports at specific locations were not outputting the correct loads. Those reports have been fixed.
+5. Graph generation code has been fixed where the graph generation had issues with the auxiliary axis.
 
-Bugs Fixed
-1.	The load allocation reports have been improved for calculation of contribution percent of different sources.
-2.	The point sources calculations have been improved to include cases when the input load can be attached to sediments or be available as biological material.
-3.	The model gives a useful warning if no echo file is available instead of crashing.
-4.  The balance reports at specific locations were not outputting the correct loads. Those reports have been fixed.
-5.  Couple of bugs have been fixed in graph generation code where the graph generation had issues with auxillary axis.
-
-  
-  
-  
 Dated 05/20/2016
 HSPEXP+1.13
 Features

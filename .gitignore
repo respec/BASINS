@@ -248,3 +248,9 @@
 /.vs/WinHSPF_15/v14/.suo
 /atcMetCmp/obj/Debug/atcMetCmp.xml
 /BASINS/BASINS15.vbproj.user
+*.bak
+/Doc/HSPEXP/Out/HSPEXP+.rtf
+/Doc/HSPEXP/Out/Introduction/respec_black.jpg
+*.hhk
+*.hhp
+*.hhc
