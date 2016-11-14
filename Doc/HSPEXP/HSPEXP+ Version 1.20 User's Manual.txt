@@ -1,0 +1,24 @@
+<p align="right">November 2016</p>
+<center><h>HSPEXP+ Version 1.2 User's Manual</h></center>
+<br>
+<center><p>Anurag Mishra<br>
+Paul B. Duda<br>
+Mark Gray<br>
+Brian R. Bicknell<br>
+Anthony S. Donigian, Jr.<br>
+Rebecca Zeckoski*</p></center>
+<br>
+<center><p>AQUA TERRA Consultants (A Division of RESPEC)<br>
+Mountain View, California 94043</p></center>
+<center><img src="Introduction/respec_black.jpg" style="width:300px;></center>
+<br>
+<br>
+<center><p>*Biological Systems Engineering<br>
+Virginia Tech, Virginia 24061</p></center>
+
+
+
+
+
+
+

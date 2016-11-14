@@ -1,0 +1,24 @@
+<h>Setting up BASINS Observed Water Quality Data File</h>
+
+<p>The observed Water Quality Data can be provided in a DBF file for BASINS or HSPEXP+ to read. This format is useful when the data is at a non-continuous interval. The DBF file can be edited or created in LibreOffice or OpenOffice (Excel 2007 and newer versions do not allow saving to this format).  This file format has only five columns, and they should be named exactly as follows. Any additional columns are not read by BASINS or HSPEXP+.<p>
+
+<p>ID, DATE, TIME, PARM, VALUE</p>
+
+<ol>
+<li>ID: This column should identify the location of the collected data</li>
+<li>DATE: This column should identify the date in text format (mm/dd/yyyy).</li>
+<li>TIME: This column should identify the time in text format(HHMM).</li>
+<li>PARM: This column should identify the name of the constituent.</li>
+<li>VALUE: This column should identify the value recorded at the respective date and time for the respective location and constituent.</li>
+</ol>
+
+<p>There can be as many locations, parameters, and values as the user may wish, limited by the capacity of the software used to create it. Large DBF files may result in longer times to open/close and read the file. Following is part of an example DBF file.</p>
+
+<center><img src="ExampleDBFFile.png"></center>
+
+
+
+
+
+
+

@@ -1,7 +1,6 @@
 <html><head><title>Setting up UCI and Other Files</title></head>
 <body>
 <a name="Setting up UCI and Other Files"><hr size=7><h2>Setting up UCI and Other Files</h2><hr size=7></a>
-Up to: <a href="\Using HSPEXP+\Setting up the Project.html#Setting up the Project">Setting up the Project</a>, <a href="\Using HSPEXP+.html#Using HSPEXP+">Using HSPEXP+</a><p>
 
 
 <p>HSPEXP+ requires that the name of the output WDM file be less than eight characters.  The output file containing the hydrology output (WDM File) from HSPF should be in the same folder as the UCI file. Although HSPF does not require separate WDM files for output and input (there can be as many as four WDM files for each HSPF model), it is recommended to save the output datasets in a different WDM file than the input datasets. When doing hydrologic calibration, the WDM file referred to in the EXS file is used to read the simulated output. The echo (ECH) file from the HSPF run is used to obtain the time stamp of last HSPF run.</p>
@@ -14,7 +13,7 @@ Up to: <a href="\Using HSPEXP+\Setting up the Project.html#Setting up the Projec
 
 <center><img src="../../AddOutput.png"></center>
 
-<p>Click "Close" to close the Add Output Window. Save the UCI file, and run it to populate the data in the newly created datasets. The newly created datasets should be included in the EXS file as described in the <a href="Setting up EXS File(s).html">Setting up EXS File(s) section.</a> 
+<p>Click "Close" to close the Add Output Window. Save the UCI file, and run it to populate the data in the newly created WDM datasets. The newly created datasets should be included in the EXS file as described in the <a href="Setting up EXS File(s).html">Setting up EXS File(s) section.</a> 
 
 If nutrient balance reports are requested, then HSPEXP+ requires that the GEN-INFO table should have names for each PERLND, IMPLND, and RCHRES.  HSPEXP+ uses this information from the GEN-INFO table to group the output. If the GEN-INFO table does not have a proper land use description or the name of a RCHRES, the output in some of the reports will not be grouped in a user-friendly fashion.</p>
 
@@ -25,7 +24,9 @@ If nutrient balance reports are requested, then HSPEXP+ requires that the GEN-IN
 <li>Nitrate should be named as "NO3"</li>
 <li>Orthophosphorus should be named as "ORTHO P"</li>
 <li>Biochemical Oxygen Demand should be named as "BOD"</li>
-</ol><Object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+</ol>
+
+<p>If Regan plots are requested, then the user must ensure that the PLANK section is active and that nutrient and PLANK outputs are written to a HBN file at monthly or shorter intervals.</p><Object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
     <param name="Keyword" value="Setting up UCI and Other Files">
 </Object>
 

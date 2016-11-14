@@ -1,7 +1,6 @@
 <html><head><title>Setting up Graph Specification File (s) for Generating Additional Graphs</title></head>
 <body>
 <a name="Setting up Graph Specification File (s) for Generating Additional Graphs"><hr size=7><h2>Setting up Graph Specification File (s) for Generating Additional Graphs</h2><hr size=7></a>
-Up to: <a href="\Using HSPEXP+\Setting up the Project.html#Setting up the Project">Setting up the Project</a>, <a href="\Using HSPEXP+.html#Using HSPEXP+">Using HSPEXP+</a><p>
 
 
 <p>Graph specification files can be used for producing additional graphs, if needed. The graph specification files should be in the same folder as the UCI file. The graph specification file(s) is a <i>comma separated values,</i> file where the user can provide specifications for as many graphs as necessary. In this file, blank lines, lines starting with a comma (",") or lines containing "***" are not read by HSPEXP+, i.e., they are comments.<p>
@@ -23,10 +22,10 @@ Up to: <a href="\Using HSPEXP+\Setting up the Project.html#Setting up the Projec
 <li>Number of Data Series: An integer value indicating the number of curves in the graph.</li>
 <li>Y-Axis Label: Label for Y Axis(if one writes deg-, or mu-, it is converted to appropriate symbols for "degrees" or "micro".)</li> 
 <li>X-Axis Label: Label for X-Axis (may be blank).</li>
-<li>Aux-Axis Label: Label for Auxiliary Axis, if needed.</li>
-<li>Right Axis Label: Label for Right Axis, if needed.</li>
-<li>Start Date: Start Date in mm/dd/yyyy Format. This date will be used to subset the input dataset. If start and end dates are blank, the dates are read from the simulation time span in the UCI file.</li>
-<li>End Date: End Date in mm/dd/yyyy Format. This date will be used to subset the input dataset.</li>
+<li>Aux-Axis Label: Label for Auxiliary Axis (may be blank).</li>
+<li>Right Axis Label: Label for Right Axis (may be blank).</li>
+<li>Start Date: Start Date in mm/dd/yyyy Format. This date will be used to subset the input dataset. If start and end dates are blank, the dates are read from the simulation time span in main HSPEXP+ form (may be blank).</li>
+<li>End Date: End Date in mm/dd/yyyy Format. This date will be used to subset the input dataset (may be blank).</li>
 <li>Y-Axis Limit (Min): Minimum value for Y-Axis (may be blank).</li>
 <li>Y-Axis Limit (Max): Maximum value for Y-Axis (may be blank).</li>
 <li>Aux-Axis Limit (Min): Minimum value for Aux-Axis (may be blank).</li>
@@ -36,8 +35,8 @@ Up to: <a href="\Using HSPEXP+\Setting up the Project.html#Setting up the Projec
 <li>Y-Axis Log?: Should the Y-Axis be a log scale? Please write "yes" or leave it blank.</li>
 <li>Aux-Axis Log?: Should the Aux-Axis be a log scale? Please write "yes" or leave it blank.</li>
 <li>Right-Axis Log?: Should the Right-Axis be a log scale? Please write "yes" or leave it blank.</li>
-<li>Season Start Month/Day: If you want to plot only seasonal data (for example, only winter months for snow depth frequency duration), provide the start day of the season (for example, 10/1). </li>
-<li>Season End Month/Day: If you want to plot only seasonal data (for example, only winter months for snow depth frequency duration), provide the end day of the season (for example, 4/30). </li>
+<li>Season Start Month/Day: If you want to plot only seasonal data (for example, only winter months for snow depth frequency duration), provide the start day of the season (for example, 10/1) (may be blank). </li>
+<li>Season End Month/Day: If you want to plot only seasonal data (for example, only winter months for snow depth frequency duration), provide the end day of the season (for example, 4/30) (may be blank). </li>
 </ol>
 
 <a name="Specification for Curve"><Object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
@@ -50,7 +49,7 @@ Up to: <a href="\Using HSPEXP+\Setting up the Project.html#Setting up the Projec
 <ol>
 <li>Axis for the Curve: The curve can be plotted on "Left", "Right", or "Aux" axis. For a frequency graph, only a left axis option is available. For scatter graphs, provide the names of axes as "X-Axis," or "Y-Axis" to differentiate between dependent and independent variables. For scatter graphs, a regression line and/or a 45-deg line may be generated. Instead of Axis for the curves, write, "Regression" and/or, "45-deg line". These two lines do not need any source.</li>
 <li>Data Source: The data source can be a WDM file (absolute path or relative path must be provided), a BASINS Observed WQ file, or a HBN file.</li>
-<li>If the dataset is read from a WDM file, provide the DSN number. If the dataset is read from the DBF file or the HBN file provide the location name.</li>
+<li>If the dataset is read from a WDM file, provide the DSN number. If the dataset is read from the DBF file or the HBN file provide the location and the constituent name.</li>
 <li>Blank, if WDM File. Constituent, if DBF or HBN File: Leave it blank if the dataset is read from a WDM file, or else provide the constituent name.</li>
 <li>Plot Type (Line or Point): "line" or "point" indicating the type of the plot.</li>
 <li>Color of Plot: Write the color of the plot (line or points).</li>
@@ -58,7 +57,7 @@ Up to: <a href="\Using HSPEXP+\Setting up the Project.html#Setting up the Projec
 <li>Symbol Type, if Point Graph: The available options are circle, square, plus, diamond, star, hdash, vdash, triangle, triangledown, and xcross. Leave this specification blank for line graphs.</li>
 <li>Size of Line or Point: Size of line or points can be provided as an integer value.</li>
 <li>Label for the Curve: User can provide a label for the curve, or leave it blank for HSPEXP+ to generate a default label. User can also write "don't show" to not show the label and symbol for the curve in the legend</li>
-<li>Aggregation: Prior to plotting, user can aggregate the data from the existing time step to daily, monthly, or yearly.</li>
+<li>Aggregation: Prior to plotting, user can aggregate the data from the existing time step to hourly, daily, monthly, or yearly.</li>
 <li>Aggregation type: User can select the type of aggregation as average, min, max, or sum. User can also aggregate by percentiles. For example "%50" will extract 50th percentile while aggregating.</li>
 <li>Transformation: User can transform the aggregated dataset by using four key words. "c to f" will transform Celsius data to fahrenheit and "f to c" will do vice versa. "sum c", will add a constant "c" to every time step, and "product c", will multiply c to every time step.
 </ol>

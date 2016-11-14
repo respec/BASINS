@@ -1,10 +1,12 @@
 <h>Automated Graph Generation</h>
 
 <ol>
+<li>HSPEXP+ produces "Regan Plots" - a plot of simulated phytoplankton, and benthic algae, along with multiple nutrients at all the reaches.</li>
 <li>HSPEXP+ can generate additional graphs for water quality, snow depth, frequency duration, scatter plots, etc. The specifications for these graphs must be provided in one or more comma-separated file (*.csv format).</li>
 <li>The time series for these graphs can be obtained from a WDM file, HBN file, or a <a href="../Using HSPEXP+/Setting up the Project/Setting up BASINS Observed WQ File">DBF (BASINS Observed WQ file format) file. </a>
 <li>HSPEXP+ also outputs the dataset used for generating the graphs in tab delimited text files. Users can utilize this data for additional analysis outside of BASINS or HSPEXP+.</li>
 </ol>
+
 
 
 

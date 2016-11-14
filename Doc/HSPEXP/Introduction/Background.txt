@@ -6,7 +6,6 @@
 
 <p>HSPEXP uses over 35 rules involving over 80 conditions to recommend parameter adjustments. The rules are divided into four groups -- annual volumes, low flows, storm flows, and seasonal flows. Rules in subsequent groups are not tested until all rules in the previous group 'pass.' The rules are based on the experience of experts in the use of HSPF in a range of climates and physiographic regions.</p>
 
-
 <p>Meteorological records of precipitation and estimates of potential evapotranspiration in a Watershed Data Management (WDM) file are required for watershed simulation using HSPF. Air temperature, dew point temperature, wind, and solar radiation also are required for simulation of snow accumulation and melt. Air temperature, wind, solar radiation, humidity, cloud cover, tillage practices, point sources, and (or) pesticide applications may be required for water quality simulation. Physical measurements and related parameters are required to describe the land area, channels, and reservoirs.</p>
 
 <p>Output options include tables of statistics comparing observed data and simulated results, ten different types of graphical presentations, and tables of the expert advice. Time-series output from the simulation is written to the WDM file. Output may be viewed interactively or written to text files for printing or analysis in a spreadsheet program.</p>
@@ -15,7 +14,8 @@
 
 <p>HSPEXP was developed for older operating systems, and it has been reported by multiple users that it is not suitable for current computers. The USGS has stopped active development of HSPEXP.</p>
 
-<p>Building on the capabilities of HSPEXP, HSPEXP+ was developed by AQUA TERRA Consultants to facilitate hydrologic and water quality calibration projects.  The software is available free of cost at the <a href="http://aquaterra.com" target="_blank">AQUA TERRA Consultants website, </a>and its source code is available along with the <a href="http://svn.mapwindow.org/svnroot/BASINS40/" target="_blank">BASINS source code.</a>
+<p>Building on the capabilities of HSPEXP, HSPEXP+ was developed by RESPEC to facilitate hydrologic and water quality calibration projects.  The software is available free of cost at the <a href="http://aquaterra.com" target="_blank">AQUA TERRA Consultants (A Division of RESPEC) website, </a>and its source code is available along with the <a href="https://github.com/respec/BASINS" target="_blank">BASINS source code.</a>
+
 
 
 

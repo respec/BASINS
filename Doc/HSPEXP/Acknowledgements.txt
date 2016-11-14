@@ -1,0 +1,36 @@
+<h>Acknowledgements</h>
+
+<p>
+HSPEXP+ is being developed by RESPEC for supporting watershed modeling projects. Dr. Anurag Mishra is the Project Manager, responsible for the design, implementation, testing, and continued development of the program.  Technical and administrative guidance is provided by Mr. Paul Duda, Mr. Mark Gray, Mr. Brian Bicknell, and Mr. Tony Donigian.  HSPEXP+ is under continuous development, and new capabilities are added to meet the priority needs of the user community, as and when additional resources are available.</p>
+
+<p>Dr. Rebecca Zeckoski from Virginia Tech provided assistance in developing the initial user interface, and coding the expert guidance. Support for Dr. Zeckoski's contributions was made possible by the Center of Watershed Studies within Virginia Tech's Biological System Engineering Department.</p>
+
+<p>The "Clean Water Fund" of Minnesota partially supported the development of HSPEXP+.</p>
+
+<p align="center"><img src="logo-legacy.png"></p>
+
+<p>RESPEC thanks the modelers who tested the initial versions of HSPEXP+ and provided valuable feedback.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

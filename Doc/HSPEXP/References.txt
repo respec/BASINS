@@ -1,13 +1,12 @@
 <h>References</h>
 
-<p>
-    AQUA TERRA Consultants. 2015. Illinois River Watershed Nutrient Modeling: Model Calibration and Validation (Draft Final Report). Submitted to USEPA Region 6,
-    Dallas, TX.
+<p>AQUA TERRA Consultants. 2015. Illinois River Watershed Nutrient Modeling: Model Calibration and Validation (Draft Final Report). Submitted to USEPA Region 6, Dallas, TX.
 </p>
 
 <p>Bicknell, Brian R., J.C. Imhoff, J.L. Kittle, T.H. Jobes, A.S. Donigian. 2005. <i>HSPF Version 12.2 User's Manual.</i> Submitted to Office of Surface Water, EPA, Reston, VA. </p>
 
 <p>Lumb, Alan M., R. B. McCammon, and J.L. Kittle, Jr. 1994. <i>User's Manual for an Expert System (HSPEXP) for Calibration of the Hydrological Simulation Program-FORTRAN. </i> Reston, VA: U.S. Geological Survey.</p>
+
 
 
 

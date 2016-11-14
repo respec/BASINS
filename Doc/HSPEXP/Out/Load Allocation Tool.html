@@ -1690,21 +1690,15 @@ The typical output in the Load Allocation file is shown in the example Tables 1 
 </Object>
 <b>Limitations</b></p>
 
-<p>
-    Currently, HSPEXP+ can take into account nonpoint sources, point sources, and direct atmospheric deposition to water surfaces only. It cannot account for
-    additional sources such as pollutant loads from tile drainage if represented in a non-conventional manner (e.g., through GENER or SPEC-ACTIONS). Due to the
-    flexibility of HSPF, there are several different ways to model these additional sources, and therefore it is difficult to include them in a standard
-    reporting program. If the user can tabulate these non-conventional source separately, she/he can add these sources into the spreadsheet directly and
-    recalculate the resulting totals and contribution percent.
+<p>Currently, HSPEXP+ can take into account nonpoint sources, point sources, GENER Sources applied through SCHEMATIC Block and direct atmospheric deposition to water surfaces only. It cannot account for additional sources such as pollutant loads from tile drainage if represented in a non-conventional manner (e.g., through GENER in EXT NETWORK Block or SPEC-ACTIONS). Due to the flexibility of HSPF, there are several different ways to model these additional sources, and therefore it is difficult to include them in a standard reporting program. </p>
+
+<p> In a recent (Nov 2016) enhancement when HSPEXP+ encounters a GENER, it checks if the GENER time series is output to a WDM dataset. If the output WDM time series is available, HSPEXP+ reads the time series, obtains the applicable multiplication factors from the MASS-LINK and SCHEMATIC blocks, and calculates the loadings. These loadings are included in the "GENER Sources" category of the Constituent Budget Report. If the GENER time series is not output to a WDM dataset, the GENER loadings for that reach are included in the "Mass Balance Differences/Additional Sources" category of the Constituent Budget Report. The user can also tabulate these non-conventional sources separately, and recalculate the resulting totals and contribution percent.
 </p>
-<p>
-    Another possible limitation of using HSPEXP+ arises in the case of models with multiple UCI files. For example, models of the Redeye, Long Prairie, and
-    Crow Wing rivers were developed as separate watershed models, where the Redeye, and the Long Prairie rivers contributed flow and nutrients to the Crow Wing
-    river (Figure 2). When the load allocation report is prepared for the Crow Wing river model, the Redeye, and Long Prairie rivers are considered as point
-    sources. When losses occur in the Crow Wing river reaches, they are applied back to the Redeye and Long Prairie watershed as point sources, instead of
-    distributing them to the sources upstream of the confluence points of the Redeye and the Long Prairie rivers with the Crow Wing River. The user may have to
-    manually redistribute these losses back to the individual sources of contributing models (in this case Redeye and Long Prairie River watersheds).
+<p> Another possible limitation of using HSPEXP+ arises in the case of models with multiple UCI files. For example, models of the Redeye, Long Prairie, and Crow Wing rivers were developed as separate watershed models, where the Redeye, and the Long Prairie rivers contributed flow and nutrients to the Crow Wing river (Figure 2). When the load allocation report is prepared for the Crow Wing river model, the Redeye, and Long Prairie rivers are considered as point sources. When losses occur in the Crow Wing river reaches, they are applied back to the Redeye and Long Prairie watershed as point sources, instead of   distributing them to the sources upstream of the confluence points of the Redeye and the Long Prairie rivers with the Crow Wing River. The user may have to manually redistribute these losses back to the individual sources of contributing models (in this case Redeye and Long Prairie River watersheds).
 </p>
+<p>HSPEXP+ does not produce reliable loading allocation reports in case of models with complex network. For e.g. models where diversions get rerouted back to the model, or different routing based on surface or groundwater flows.
+</p>
+
 
 <p align="center"><img src="CrowWingExample.png"></p>
 <p align="center"><a name="Figure 2. Hydrography of Redeye, Long Prairie, and Crow Wing River Watersheds."><Object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
