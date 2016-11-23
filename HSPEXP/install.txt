@@ -1,3 +1,9 @@
+Dated 11/22/2016
+HSPEXP+ 1.21
+Bugs Fixed:
+1. HSPEXP+ was giving error when some PERLND or IMPLND did not have any area draining to RCHRES. This bug has been fixed.
+
+
 Dated 11/14/2016
 HSPEXP+1.20
 Features:

@@ -1252,17 +1252,19 @@ Public Module ConstituentBudget
                 aConnectionArea = 0
                 aTotal2 = 0
             End If
-            pOutputTotals.Increment(aLandUse & aTestLocation, lrate)
-            aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
+            If aTestLocation.Contains(":") Then
+                pOutputTotals.Increment(aLandUse & aTestLocation, lrate)
+
+                aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
             & aTestLocation & " " _
             & aLandUse & vbTab _
             & aConnectionArea & vbTab _
             & DoubleToString(lrate, 15, "#,##0.###") & vbTab &
                                 DoubleToString(aTotal2, 15, "#,##0.###") & vbTab & vbCrLf
-
+            End If
         Else
-            'If aReach.Id = 260 Then Stop
-            Dim checkedTheTributary As Boolean = False
+                'If aReach.Id = 260 Then Stop
+                Dim checkedTheTributary As Boolean = False
 
             If pRunningTotals.Keys.Contains(lKey) Then checkedTheTributary = True
             pRunningTotals.Increment(lKey, aTotal)
