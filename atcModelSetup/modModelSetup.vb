@@ -32,27 +32,27 @@ Public Module modModelSetup
         End If
     End Sub
 
-    Public Function SetupHSPF(ByVal aGridPervious As atcControls.atcGrid, _
-                              ByVal aMetBaseDsns As atcCollection, ByVal aMetWdmIds As atcCollection, _
-                              ByVal aUniqueModelSegmentNames As atcCollection, _
-                              ByVal aUniqueModelSegmentIds As atcCollection, _
-                              ByVal aOutputPath As String, ByVal aBaseOutputName As String, _
-                              ByVal aSubbasinLayerName As String, ByVal aSubbasinFieldName As String, ByVal aSubbasinSlopeName As String, _
-                              ByVal aStreamLayerName As String, ByVal aStreamFields() As String, _
-                              ByVal aLUType As Integer, ByVal aLandUseThemeName As String, _
-                              ByVal aLUInclude() As Integer, _
-                              ByVal aOutletsLayerName As String, _
-                              ByVal aPointFieldName As String, _
-                              ByVal aPointYear As String, _
-                              ByVal aLandUseFieldName As String, ByVal aLandUseClassFile As String, _
-                              ByVal aSubbasinSegmentName As String, _
-                              ByVal aPSRCustom As Boolean, _
-                              ByVal aPSRCustomFile As String, _
-                              ByVal aPSRCalculate As Boolean, _
-                              Optional ByVal aSnowOption As Integer = 0, _
-                              Optional ByVal aElevationFileName As String = "", _
-                              Optional ByVal aElevationUnits As String = "", _
-                              Optional ByVal aDoWetlands As Boolean = False, _
+    Public Function SetupHSPF(ByVal aGridPervious As atcControls.atcGrid,
+                              ByVal aMetBaseDsns As atcCollection, ByVal aMetWdmIds As atcCollection,
+                              ByVal aUniqueModelSegmentNames As atcCollection,
+                              ByVal aUniqueModelSegmentIds As atcCollection,
+                              ByVal aOutputPath As String, ByVal aBaseOutputName As String,
+                              ByVal aSubbasinLayerName As String, ByVal aSubbasinFieldName As String, ByVal aSubbasinSlopeName As String,
+                              ByVal aStreamLayerName As String, ByVal aStreamFields() As String,
+                              ByVal aLUType As Integer, ByVal aLandUseThemeName As String,
+                              ByVal aLUInclude() As Integer,
+                              ByVal aOutletsLayerName As String,
+                              ByVal aPointFieldName As String,
+                              ByVal aPointYear As String,
+                              ByVal aLandUseFieldName As String, ByVal aLandUseClassFile As String,
+                              ByVal aSubbasinSegmentName As String,
+                              ByVal aPSRCustom As Boolean,
+                              ByVal aPSRCustomFile As String,
+                              ByVal aPSRCalculate As Boolean,
+                              Optional ByVal aSnowOption As Integer = 0,
+                              Optional ByVal aElevationFileName As String = "",
+                              Optional ByVal aElevationUnits As String = "",
+                              Optional ByVal aDoWetlands As Boolean = False,
                               Optional ByVal aToWetlandsFileName As String = "") As Boolean
         'this version of SetupHSPF (with arguments) is preserved for backward compatibility, 
         'but the preferred way of calling SetupHSPF is using the class below
@@ -93,8 +93,9 @@ Public Module modModelSetup
         Return True
     End Function
 
-    Public Function CreateReachSegments(ByVal aSubbasinsSelected As atcCollection, ByVal aSubbasinsModelSegmentIds As atcCollection, _
-                                        ByVal aStreamLayerName As String, ByVal aStreamFields() As String) As Reaches
+    Public Function CreateReachSegments(ByVal aSubbasinsSelected As atcCollection, ByVal aSubbasinsModelSegmentIds As atcCollection,
+                                        ByVal aStreamLayerName As String, ByVal aStreamFields() As String,
+                                        Optional ByVal MetricUnits As Boolean = False) As Reaches
 
         'for reaches in selected subbasins, populate reach class from dbf
         Dim lReaches As New Reaches
@@ -127,31 +128,56 @@ Public Module modModelSetup
                         .Manning = 0.05
                         .Order = lReaches.Count + 1
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) Then
-                            .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) * 3.28) / 5280
+                            If Not MetricUnits Then
+                                .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) * 3.28 / 5280)
+                            Else
+                                .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) / 1000)
+                            End If
+
                         Else
-                            .Length = 0.0#
+                                .Length = 0.0#
                         End If
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) Then
-                            .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) * 3.28
+                            If Not MetricUnits Then
+                                .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) * 3.28
+                            Else
+                                .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) * 3.28
+                            End If
+
                         Else
-                            .Depth = 0.0#
+                                .Depth = 0.0#
                         End If
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) Then
-                            .Width = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) * 3.28
+                            If Not MetricUnits Then
+                                .Width = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) * 3.28
+                            Else
+                                .Width = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index))
+                            End If
+
                         Else
-                            .Width = 0.0#
+                                .Width = 0.0#
                         End If
                         Dim lMinEl As Single
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) Then
-                            lMinEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) * 3.28
+                            If Not MetricUnits Then
+                                lMinEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) * 3.28
+                            Else
+                                lMinEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex))
+                            End If
+
                         Else
-                            lMinEl = 0.0#
+                                lMinEl = 0.0#
                         End If
                         Dim lMaxEl As Single
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) Then
-                            lMaxEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) * 3.28
+                            If Not MetricUnits Then
+                                lMaxEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) * 3.28
+                            Else
+                                lMaxEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex))
+                            End If
+
                         Else
-                            lMaxEl = 0.0#
+                                lMaxEl = 0.0#
                         End If
                         .Elev = ((lMaxEl + lMinEl) / 2)
                         .DeltH = lMaxEl - lMinEl
@@ -437,7 +463,8 @@ Public Module modModelSetup
 
     End Sub
 
-    Public Function CreateStreamChannels(ByVal aReaches As Reaches) As Channels
+    Public Function CreateStreamChannels(ByVal aReaches As Reaches,
+                                         Optional ByVal MetricUnits As Boolean = False) As Channels
 
         'for reaches in selected subbasins, populate channel class from dbf
         Dim lChannels As New Channels
@@ -446,11 +473,21 @@ Public Module modModelSetup
             Dim lChannel As New Channel
             With lChannel
                 .Reach = lReach
-                .Length = lReach.Length * 5280
+                If Not MetricUnits Then
+                    .Length = lReach.Length * 5280
+                Else
+                    .Length = lReach.Length * 1000
+                End If
+
                 .DepthMean = lReach.Depth
                 .WidthMean = lReach.Width
                 .ManningN = 0.05
-                .SlopeProfile = Math.Abs(lReach.DeltH / (lReach.Length * 5280))
+                If Not MetricUnits Then
+                    .SlopeProfile = Math.Abs(lReach.DeltH / (lReach.Length * 5280))
+                Else
+                    .SlopeProfile = Math.Abs(lReach.DeltH / (lReach.Length * 1000))
+                End If
+
                 If .SlopeProfile < 0.0001 Then
                     .SlopeProfile = 0.001
                 End If
@@ -1504,9 +1541,10 @@ Public Module modModelSetup
         SaveFileString(aPtfFileName, lSBPtf.ToString)
     End Sub
 
-    Public Sub WritePSRFile(ByVal aPsrFileName As String, ByVal aUniqueSubids As atcCollection, ByVal aOutSubs As Collection, _
-                            ByVal aLayerIndex As Integer, ByVal aPointIndex As Integer, ByVal aChkCustom As Boolean, _
+    Public Sub WritePSRFile(ByVal aPsrFileName As String, ByVal aUniqueSubids As atcCollection, ByVal aOutSubs As Collection,
+                            ByVal aLayerIndex As Integer, ByVal aPointIndex As Integer, ByVal aChkCustom As Boolean,
                             ByVal aLblCustom As String, ByVal aChkCalculate As Boolean, ByVal aYear As String)
+
         Dim lSB As New StringBuilder
 
         Dim lNPDESSites As New Collection

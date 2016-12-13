@@ -41,6 +41,7 @@ Public Class HspfSetup
     Public ElevationUnits As String = ""
     Public DoWetlands As Boolean = False
     Public ToWetlandsFileName As String = ""
+    Public MetricUnits As Boolean = False
 
     Public Function SetupHSPF() As Boolean
         Logger.Status("Preparing to process")
@@ -213,10 +214,10 @@ Public Class HspfSetup
         Logger.Status("Completed overlay of subbasins and land use layers")
 
         'Create Reach Segments
-        Dim lReaches As Reaches = CreateReachSegments(lSubbasinsSelected, lSubbasinsModelSegmentIds, StreamLayerName, StreamFields)
+        Dim lReaches As Reaches = CreateReachSegments(lSubbasinsSelected, lSubbasinsModelSegmentIds, StreamLayerName, StreamFields, MetricUnits)
 
         'Create Stream Channels
-        Dim lChannels As Channels = CreateStreamChannels(lReaches)
+        Dim lChannels As Channels = CreateStreamChannels(lReaches, MetricUnits)
 
         'Create LandUses
         Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLandUseSubbasinOverlayRecords, lReaches)
