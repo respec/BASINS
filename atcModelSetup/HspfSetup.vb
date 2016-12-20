@@ -220,7 +220,7 @@ Public Class HspfSetup
         Dim lChannels As Channels = CreateStreamChannels(lReaches, MetricUnits)
 
         'Create LandUses
-        Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLandUseSubbasinOverlayRecords, lReaches)
+        Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLandUseSubbasinOverlayRecords, lReaches, MetricUnits)
 
         'figure out which outlets are in which subbasins
         Dim lOutSubs As New Collection
@@ -244,15 +244,15 @@ Public Class HspfSetup
         'write wsd file
         Logger.Status("Writing WSD file")
         Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, GridPervious, lLandUses)
-        WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses, SnowOption, DoWetlands)
+        WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses, SnowOption, DoWetlands, MetricUnits)
 
         'write rch file 
         Logger.Status("Writing RCH file")
-        WriteRCHFile(lBaseFileName & ".rch", lReaches)
+        WriteRCHFile(lBaseFileName & ".rch", lReaches, MetricUnits)
 
         'write ptf file
         Logger.Status("Writing PTF file")
-        WritePTFFile(lBaseFileName & ".ptf", lChannels)
+        WritePTFFile(lBaseFileName & ".ptf", lChannels, MetricUnits)
 
         'write psr file
         Logger.Status("Writing PSR file")

@@ -474,9 +474,9 @@ Public Module modModelSetup
             With lChannel
                 .Reach = lReach
                 If Not MetricUnits Then
-                    .Length = lReach.Length * 5280
+                    .Length = lReach.Length * 5280 'Length in feet
                 Else
-                    .Length = lReach.Length * 1000
+                    .Length = lReach.Length * 1000 'Length in meters
                 End If
 
                 .DepthMean = lReach.Depth
@@ -510,8 +510,9 @@ Public Module modModelSetup
         Return lChannels
     End Function
 
-    Public Function CreateLanduses(ByVal aSubbasinsSlopes As atcCollection, _
-                                   ByVal aLandUseSubbasinOverlayRecords As Collection, ByVal aReaches As Reaches) As LandUses
+    Public Function CreateLanduses(ByVal aSubbasinsSlopes As atcCollection,
+                                   ByVal aLandUseSubbasinOverlayRecords As Collection, ByVal aReaches As Reaches,
+                                   Optional ByVal MetricUnits As Boolean = False) As LandUses
 
         Dim lLandUses As New LandUses
         For lIndex As Integer = 1 To aLandUseSubbasinOverlayRecords.Count
@@ -1352,114 +1353,126 @@ Public Module modModelSetup
         Return lReclassifyLandUses
     End Function
 
-    Public Sub WriteWSDFile(ByVal aWsdFileName As String, _
-                            ByVal aLandUses As LandUses, _
-                            Optional ByVal aSnowOption As Integer = 0, _
-                            Optional ByVal aDoWetlands As Boolean = False)
+    Public Sub WriteWSDFile(ByVal aWsdFileName As String,
+                            ByVal aLandUses As LandUses,
+                            Optional ByVal aSnowOption As Integer = 0,
+                            Optional ByVal aDoWetlands As Boolean = False,
+                            Optional ByVal aMetricUnits As Boolean = False)
 
         Dim lSB As New StringBuilder
 
         If Not aDoWetlands Then
             If aSnowOption = 0 Then
-                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
                                """Area""" & "," & """Slope""" & "," & """Distance""")
             Else
-                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
                                """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """MeanLatitude""" & "," & """MeanElevation""")
             End If
         Else
             If aSnowOption = 0 Then
-                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
                                """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """PercentToWetlands""")
             Else
-                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
                                """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """MeanLatitude""" & "," & """MeanElevation""" & "," & """PercentToWetlands""")
             End If
         End If
 
         For Each lLandUse As LandUse In aLandUses
             Dim lType As String = "2"
-            Dim lArea As Double = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 4046.8564
+            Dim lArea As Double = 0.0
+            If Not aMetricUnits Then
+                lArea = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 4046.8564
+            Else
+                lArea = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 10000
+            End If
+
             If lArea > 0 Then 'or CInt(lArea)
                 If Not aDoWetlands Then
                     If aSnowOption = 0 Then
-                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                       lType & "     " & _
-                                       lLandUse.ModelID & "     " & _
-                                       Format(lArea, "0.0") & "     " & _
-                                       Format(lLandUse.Slope, "0.000000") & "     " & _
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " &
+                                       lType & "     " &
+                                       lLandUse.ModelID & "     " &
+                                       Format(lArea, "0.0") & "     " &
+                                       Format(lLandUse.Slope, "0.000000") & "     " &
                                        Format(lLandUse.Distance, "0.0000"))
                     Else
-                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                       lType & "     " & _
-                                       lLandUse.ModelID & "     " & _
-                                       Format(lArea, "0.0") & "     " & _
-                                       Format(lLandUse.Slope, "0.000000") & "     " & _
-                                       Format(lLandUse.Distance, "0.0000") & "     " & _
-                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " &
+                                       lType & "     " &
+                                       lLandUse.ModelID & "     " &
+                                       Format(lArea, "0.0") & "     " &
+                                       Format(lLandUse.Slope, "0.000000") & "     " &
+                                       Format(lLandUse.Distance, "0.0000") & "     " &
+                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " &
                                        Format(lLandUse.MeanElevation, "0.00"))
                     End If
                 Else
                     If aSnowOption = 0 Then
-                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                       lType & "     " & _
-                                       lLandUse.ModelID & "     " & _
-                                       Format(lArea, "0.0") & "     " & _
-                                       Format(lLandUse.Slope, "0.000000") & "     " & _
-                                       Format(lLandUse.Distance, "0.0000") & "     " & _
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " &
+                                       lType & "     " &
+                                       lLandUse.ModelID & "     " &
+                                       Format(lArea, "0.0") & "     " &
+                                       Format(lLandUse.Slope, "0.000000") & "     " &
+                                       Format(lLandUse.Distance, "0.0000") & "     " &
                                        Format(lLandUse.PercentToWetlands, "0.00"))
                     Else
-                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                       lType & "     " & _
-                                       lLandUse.ModelID & "     " & _
-                                       Format(lArea, "0.0") & "     " & _
-                                       Format(lLandUse.Slope, "0.000000") & "     " & _
-                                       Format(lLandUse.Distance, "0.0000") & "     " & _
-                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
-                                       Format(lLandUse.MeanElevation, "0.00") & "     " & _
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " &
+                                       lType & "     " &
+                                       lLandUse.ModelID & "     " &
+                                       Format(lArea, "0.0") & "     " &
+                                       Format(lLandUse.Slope, "0.000000") & "     " &
+                                       Format(lLandUse.Distance, "0.0000") & "     " &
+                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " &
+                                       Format(lLandUse.MeanElevation, "0.00") & "     " &
                                        Format(lLandUse.PercentToWetlands, "0.00"))
                     End If
                 End If
             End If
             lType = "1"
-            lArea = lLandUse.Area * lLandUse.ImperviousFraction / 4046.8564
+            If Not aMetricUnits Then
+                lArea = lLandUse.Area * lLandUse.ImperviousFraction / 4046.8564
+            Else
+                lArea = lLandUse.Area * lLandUse.ImperviousFraction / 10000
+            End If
+
             If lArea > 0 Then 'or CInt(lArea)
                 If Not aDoWetlands Then
                     If aSnowOption = 0 Then
-                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                       lType & "     " & _
-                                       lLandUse.ModelID & "     " & _
-                                       Format(lArea, "0.0") & "     " & _
-                                       Format(lLandUse.Slope, "0.000000") & "     " & _
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " &
+                                       lType & "     " &
+                                       lLandUse.ModelID & "     " &
+                                       Format(lArea, "0.0") & "     " &
+                                       Format(lLandUse.Slope, "0.000000") & "     " &
                                        Format(lLandUse.Distance, "0.0000"))
                     Else
-                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                       lType & "     " & _
-                                       lLandUse.ModelID & "     " & _
-                                       Format(lArea, "0.0") & "     " & _
-                                       Format(lLandUse.Slope, "0.000000") & "     " & _
-                                       Format(lLandUse.Distance, "0.0000") & "     " & _
-                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " &
+                                       lType & "     " &
+                                       lLandUse.ModelID & "     " &
+                                       Format(lArea, "0.0") & "     " &
+                                       Format(lLandUse.Slope, "0.000000") & "     " &
+                                       Format(lLandUse.Distance, "0.0000") & "     " &
+                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " &
                                        Format(lLandUse.MeanElevation, "0.00"))
                     End If
                 Else
                     If aSnowOption = 0 Then
-                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                       lType & "     " & _
-                                       lLandUse.ModelID & "     " & _
-                                       Format(lArea, "0.0") & "     " & _
-                                       Format(lLandUse.Slope, "0.000000") & "     " & _
-                                       Format(lLandUse.Distance, "0.0000") & "     " & _
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " &
+                                       lType & "     " &
+                                       lLandUse.ModelID & "     " &
+                                       Format(lArea, "0.0") & "     " &
+                                       Format(lLandUse.Slope, "0.000000") & "     " &
+                                       Format(lLandUse.Distance, "0.0000") & "     " &
                                        Format(lLandUse.PercentToWetlands, "0.00"))
                     Else
-                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                                       lType & "     " & _
-                                       lLandUse.ModelID & "     " & _
-                                       Format(lArea, "0.0") & "     " & _
-                                       Format(lLandUse.Slope, "0.000000") & "     " & _
-                                       Format(lLandUse.Distance, "0.0000") & "     " & _
-                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
-                                       Format(lLandUse.MeanElevation, "0.00") & "     " & _
+                        lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " &
+                                       lType & "     " &
+                                       lLandUse.ModelID & "     " &
+                                       Format(lArea, "0.0") & "     " &
+                                       Format(lLandUse.Slope, "0.000000") & "     " &
+                                       Format(lLandUse.Distance, "0.0000") & "     " &
+                                       Format(lLandUse.MeanLatitude, "0.0000") & "     " &
+                                       Format(lLandUse.MeanElevation, "0.00") & "     " &
                                        Format(lLandUse.PercentToWetlands, "0.00"))
                     End If
                 End If
@@ -1468,17 +1481,18 @@ Public Module modModelSetup
         SaveFileString(aWsdFileName, lSB.ToString)
     End Sub
 
-    Public Sub WriteRCHFile(ByVal aRchFileName As String, _
-                            ByVal aReaches As Reaches)
+    Public Sub WriteRCHFile(ByVal aRchFileName As String,
+                            ByVal aReaches As Reaches,
+                            Optional ByVal aMetricUnits As Boolean = False)
 
         Dim lSBRch As New StringBuilder
 
-        lSBRch.AppendLine("""Rivrch""" & "," & """Pname""" & "," & """Watershed-ID""" & "," & """HeadwaterFlag""" & "," & _
-                  """Exits""" & "," & """Milept""" & "," & """Stream/Resevoir Type""" & "," & """Segl""" & "," & _
-                  """Delth""" & "," & """Elev""" & "," & """Ulcsm""" & "," & """Urcsm""" & "," & """Dscsm""" & "," & """Ccsm""" & "," & _
-                  """Mnflow""" & "," & """Mnvelo""" & "," & """Svtnflow""" & "," & """Svtnvelo""" & "," & """Pslope""" & "," & _
-                  """Pdepth""" & "," & """Pwidth""" & "," & """Pmile""" & "," & """Ptemp""" & "," & """Pph""" & "," & """Pk1""" & "," & _
-                  """Pk2""" & "," & """Pk3""" & "," & """Pmann""" & "," & """Psod""" & "," & """Pbgdo""" & "," & _
+        lSBRch.AppendLine("""Rivrch""" & "," & """Pname""" & "," & """Watershed-ID""" & "," & """HeadwaterFlag""" & "," &
+                  """Exits""" & "," & """Milept""" & "," & """Stream/Resevoir Type""" & "," & """Segl""" & "," &
+                  """Delth""" & "," & """Elev""" & "," & """Ulcsm""" & "," & """Urcsm""" & "," & """Dscsm""" & "," & """Ccsm""" & "," &
+                  """Mnflow""" & "," & """Mnvelo""" & "," & """Svtnflow""" & "," & """Svtnvelo""" & "," & """Pslope""" & "," &
+                  """Pdepth""" & "," & """Pwidth""" & "," & """Pmile""" & "," & """Ptemp""" & "," & """Pph""" & "," & """Pk1""" & "," &
+                  """Pk2""" & "," & """Pk3""" & "," & """Pmann""" & "," & """Psod""" & "," & """Pbgdo""" & "," &
                   """Pbgnh3""" & "," & """Pbgbod5""" & "," & """Pbgbod""" & "," & """Level""" & "," & """ModelSeg""")
 
         Dim lSlope As Double
@@ -1488,17 +1502,17 @@ Public Module modModelSetup
                 If lSlope < 0.00001 Then
                     lSlope = 0.001
                 End If
-                lSBRch.AppendLine(.Id & " " & Chr(34) & .Name & Chr(34) & " " & .Id & " " & _
-                       " 0 1 0 S " & Format(.Length, "0.00") & " " & Format(Math.Abs(.DeltH), "0.00") & " " & _
-                       Format(.Elev, "0.") & " 0 0 " & .DownID & " 0 0 0 0 0 " & _
-                       Format(lSlope, "0.000000") & " " & Format(.Depth, "0.0000") & " " & Format(.Width, "0.000") & _
+                lSBRch.AppendLine(.Id & " " & Chr(34) & .Name & Chr(34) & " " & .Id & " " &
+                       " 0 1 0 S " & Format(.Length, "0.00") & " " & Format(Math.Abs(.DeltH), "0.00") & " " &
+                       Format(.Elev, "0.") & " 0 0 " & .DownID & " 0 0 0 0 0 " &
+                       Format(lSlope, "0.000000") & " " & Format(.Depth, "0.0000") & " " & Format(.Width, "0.000") &
                        " 0 0 0 0 0 0 0 0 0 0 0 0 0 " & .SegmentId)
                 If (2 * .Depth) > .Width Then 'problem
-                    Logger.Msg("The depth and width values specified for Reach " & lReach.Id & ", coupled with the trapezoidal" & vbCrLf & _
-                           "cross section assumptions of WinHSPF, indicate a physical impossibility." & vbCrLf & _
-                           "(Given 1:1 side slopes, the depth of the channel cannot be more than half the width.)" & vbCrLf & vbCrLf & _
-                           "This problem can be corrected in WinHSPF by revising the FTABLE or by " & vbCrLf & _
-                           "importing the ptf with modifications to the width and depth values." & vbCrLf & _
+                    Logger.Msg("The depth and width values specified for Reach " & lReach.Id & ", coupled with the trapezoidal" & vbCrLf &
+                           "cross section assumptions of WinHSPF, indicate a physical impossibility." & vbCrLf &
+                           "(Given 1:1 side slopes, the depth of the channel cannot be more than half the width.)" & vbCrLf & vbCrLf &
+                           "This problem can be corrected in WinHSPF by revising the FTABLE or by " & vbCrLf &
+                           "importing the ptf with modifications to the width and depth values." & vbCrLf &
                            "See the WinHSPF manual for more information.", vbOKOnly, "Channel Problem")
                 End If
             End With
@@ -1507,33 +1521,49 @@ Public Module modModelSetup
         SaveFileString(aRchFileName, lSBRch.ToString)
     End Sub
 
-    Public Sub WritePTFFile(ByVal aPtfFileName As String, _
-                            ByVal aChannels As Channels)
+    Public Sub WritePTFFile(ByVal aPtfFileName As String,
+                            ByVal aChannels As Channels,
+                            Optional ByVal aMetricUnits As Boolean = False)
         Dim lSBPtf As New StringBuilder
-
-        lSBPtf.AppendLine("""Reach Number""" & "," & """Length(ft)""" & "," & _
-            """Mean Depth(ft)""" & "," & """Mean Width (ft)""" & "," & _
-            """Mannings Roughness Coeff.""" & "," & """Long. Slope""" & "," & _
-            """Type of x-section""" & "," & """Side slope of upper FP left""" & "," & _
-            """Side slope of lower FP left""" & "," & """Zero slope FP width left(ft)""" & "," & _
-            """Side slope of channel left""" & "," & """Side slope of channel right""" & "," & _
-            """Zero slope FP width right(ft)""" & "," & """Side slope lower FP right""" & "," & _
-            """Side slope upper FP right""" & "," & """Channel Depth(ft)""" & "," & _
-            """Flood side slope change at depth""" & "," & """Max. depth""" & "," & _
-            """No. of exits""" & "," & """Fraction of flow through exit 1""" & "," & _
-            """Fraction of flow through exit 2""" & "," & """Fraction of flow through exit 3""" & "," & _
+        If Not aMetricUnits Then
+            lSBPtf.AppendLine("""Reach Number""" & "," & """Length(ft)""" & "," &
+            """Mean Depth(ft)""" & "," & """Mean Width (ft)""" & "," &
+            """Mannings Roughness Coeff.""" & "," & """Long. Slope""" & "," &
+            """Type of x-section""" & "," & """Side slope of upper FP left""" & "," &
+            """Side slope of lower FP left""" & "," & """Zero slope FP width left(ft)""" & "," &
+            """Side slope of channel left""" & "," & """Side slope of channel right""" & "," &
+            """Zero slope FP width right(ft)""" & "," & """Side slope lower FP right""" & "," &
+            """Side slope upper FP right""" & "," & """Channel Depth(ft)""" & "," &
+            """Flood side slope change at depth""" & "," & """Max. depth""" & "," &
+            """No. of exits""" & "," & """Fraction of flow through exit 1""" & "," &
+            """Fraction of flow through exit 2""" & "," & """Fraction of flow through exit 3""" & "," &
             """Fraction of flow through exit 4""" & "," & """Fraction of flow through exit 5""")
+        Else
+            lSBPtf.AppendLine("""Reach Number""" & "," & """Length(m)""" & "," &
+            """Mean Depth(m)""" & "," & """Mean Width (m)""" & "," &
+            """Mannings Roughness Coeff.""" & "," & """Long. Slope""" & "," &
+            """Type of x-section""" & "," & """Side slope of upper FP left""" & "," &
+            """Side slope of lower FP left""" & "," & """Zero slope FP width left(m)""" & "," &
+            """Side slope of channel left""" & "," & """Side slope of channel right""" & "," &
+            """Zero slope FP width right(m)""" & "," & """Side slope lower FP right""" & "," &
+            """Side slope upper FP right""" & "," & """Channel Depth(m)""" & "," &
+            """Flood side slope change at depth""" & "," & """Max. depth""" & "," &
+            """No. of exits""" & "," & """Fraction of flow through exit 1""" & "," &
+            """Fraction of flow through exit 2""" & "," & """Fraction of flow through exit 3""" & "," &
+            """Fraction of flow through exit 4""" & "," & """Fraction of flow through exit 5""")
+
+        End If
 
         For Each lChannel As Channel In aChannels
             With lChannel
-                lSBPtf.AppendLine(.Reach.Id & " " & Format(.Length, "0.") & " " & _
-                       Format(.DepthMean, "0.00000") & " " & Format(.WidthMean, "0.00000") & " " & _
-                       Format(.ManningN, "0.00") & " " & Format(.SlopeProfile, "0.00000") & " " & "Trapezoidal" & " " & _
-                       Format(.SlopeSideUpperFPLeft, "0.0") & " " & Format(.SlopeSideLowerFPLeft, "0.0") & " " & _
-                       Format(.WidthZeroSlopeLeft, "0.000") & " " & .SlopeSideLeft & " " & .SlopeSideRight & " " & _
-                       Format(.WidthZeroSlopeRight, "0.000") & " " & _
-                       Format(.SlopeSideLowerFPRight, "0.0") & " " & Format(.SlopeSideUpperFPRight, "0.0") & " " & _
-                       Format(.DepthChannel, "0.0000") & " " & Format(.DepthSlopeChange, "0.0000") & " " & _
+                lSBPtf.AppendLine(.Reach.Id & " " & Format(.Length, "0.") & " " &
+                       Format(.DepthMean, "0.00000") & " " & Format(.WidthMean, "0.00000") & " " &
+                       Format(.ManningN, "0.00") & " " & Format(.SlopeProfile, "0.00000") & " " & "Trapezoidal" & " " &
+                       Format(.SlopeSideUpperFPLeft, "0.0") & " " & Format(.SlopeSideLowerFPLeft, "0.0") & " " &
+                       Format(.WidthZeroSlopeLeft, "0.000") & " " & .SlopeSideLeft & " " & .SlopeSideRight & " " &
+                       Format(.WidthZeroSlopeRight, "0.000") & " " &
+                       Format(.SlopeSideLowerFPRight, "0.0") & " " & Format(.SlopeSideUpperFPRight, "0.0") & " " &
+                       Format(.DepthChannel, "0.0000") & " " & Format(.DepthSlopeChange, "0.0000") & " " &
                        Format(.DepthMax, "0.000") & " 1 1 0 0 0 0")
             End With
         Next
