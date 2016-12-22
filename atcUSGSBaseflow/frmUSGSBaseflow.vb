@@ -43,8 +43,8 @@ Public Class frmUSGSBaseflow
     Public Opened As Boolean = False
     Private pDidBFSeparation As Boolean = False
 
-    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
-                      Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
+    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing,
+                      Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing,
                       Optional ByVal aShowForm As Boolean = True)
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcTimeseriesGroup
@@ -69,7 +69,7 @@ Public Class frmUSGSBaseflow
         End If
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis", _
+            pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Analysis",
                                                        pDataGroup, Nothing, True, True, Me.Icon)
         Else
             Dim lconstituent As String = pDataGroup(0).Attributes.GetValue("Constituent", "")
@@ -152,13 +152,13 @@ Public Class frmUSGSBaseflow
         txtOutputRootName.Text = OutputFilenameRoot
     End Sub
 
-    Public Function AskUser(ByVal aName As String, _
-                        ByVal aDataGroup As atcData.atcTimeseriesGroup, _
-                        ByRef aStartMonth As Integer, _
-                        ByRef aStartDay As Integer, _
-                        ByRef aEndMonth As Integer, _
-                        ByRef aEndDay As Integer, _
-                        ByRef aFirstYear As Integer, _
+    Public Function AskUser(ByVal aName As String,
+                        ByVal aDataGroup As atcData.atcTimeseriesGroup,
+                        ByRef aStartMonth As Integer,
+                        ByRef aStartDay As Integer,
+                        ByRef aEndMonth As Integer,
+                        ByRef aEndDay As Integer,
+                        ByRef aFirstYear As Integer,
                         ByRef aLastYear As Integer) As Boolean
 
     End Function
@@ -210,9 +210,9 @@ Public Class frmUSGSBaseflow
         If pMethods.Count = 0 Then lErrMsg = "- Method not set" & vbCrLf
         Dim lDA As Double = 0.0
         If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then
-            If chkMethodHySEPFixed.Checked OrElse _
-               chkMethodHySEPLocMin.Checked OrElse _
-               chkMethodHySEPSlide.Checked OrElse _
+            If chkMethodHySEPFixed.Checked OrElse
+               chkMethodHySEPLocMin.Checked OrElse
+               chkMethodHySEPSlide.Checked OrElse
                chkMethodPART.Checked Then
                 lErrMsg &= "- Drainage Area not set" & vbCrLf
             End If
@@ -326,7 +326,7 @@ Public Class frmUSGSBaseflow
         If lMatches.Count > 0 Then
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
-            Dim lAskUser As String = _
+            Dim lAskUser As String =
             Logger.MsgCustomOwned("Invalid starting date. Use dataset start date?", "Start Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 If String.IsNullOrEmpty(txtDataStart.Text.Trim()) Then
@@ -377,7 +377,7 @@ Public Class frmUSGSBaseflow
         If lMatches.Count > 0 Then
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
-            Dim lAskUser As String = _
+            Dim lAskUser As String =
             Logger.MsgCustomOwned("Invalid ending date. Use dataset end date?", "End Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 If String.IsNullOrEmpty(txtDataEnd.Text.Trim()) Then
@@ -589,9 +589,9 @@ Public Class frmUSGSBaseflow
             Case 0 : Exit Sub
             Case 1 : lSeparateGraphs = False
             Case Else
-                lSeparateGraphs = (Logger.MsgCustomCheckbox("Create separate graphs or all on one graph?", _
-                                                            MethodsLastDone.Count & " methods selected", _
-                                                            "Do not ask again", "USGS GW Toolbox", "Baseflow Separation", "Separate Timeseries Graphs", _
+                lSeparateGraphs = (Logger.MsgCustomCheckbox("Create separate graphs or all on one graph?",
+                                                            MethodsLastDone.Count & " methods selected",
+                                                            "Do not ask again", "USGS GW Toolbox", "Baseflow Separation", "Separate Timeseries Graphs",
                                                             "Separate", "One Graph") = "Separate")
         End Select
 
@@ -1005,8 +1005,8 @@ Public Class frmUSGSBaseflow
 
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         Dim lPerUnitArea As Boolean = False
-        Dim lResponse As String = Logger.MsgCustomOwned("Calculate exceedance probability per unit drainage area?", _
-                                                        "Per Unit Area Plot", Me, _
+        Dim lResponse As String = Logger.MsgCustomOwned("Calculate exceedance probability per unit drainage area?",
+                                                        "Per Unit Area Plot", Me,
                                                         New String() {"Yes", "No"})
         If lResponse = "Yes" Then
             lPerUnitArea = True
@@ -1151,6 +1151,16 @@ Public Class frmUSGSBaseflow
     End Sub
 
     Private Sub frmMain_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodPART", chkMethodPART.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", chkMethodHySEPFixed.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", chkMethodHySEPLocMin.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIStandard", chkMethodBFIStandard.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", chkMethodBFIModified.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFLOW", chkMethodBFLOW.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodTwoPRDF", chkMethodTwoPRDF.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
+
         If pDataGroup IsNot Nothing Then
             pDataGroup.Clear()
             pDataGroup = Nothing
@@ -1191,11 +1201,18 @@ Public Class frmUSGSBaseflow
         'If GetSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", "False") = "True" Then
         '    chkBFISymbols.Checked = True
         'End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodBFLOW", "False") = "True" Then
+            chkMethodBFLOW.Checked = True
+        End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodTwoPRDF", "False") = "True" Then
+            chkMethodTwoPRDF.Checked = True
+        End If
         If chkMethodBFIStandard.Checked OrElse chkMethodBFIModified.Checked Then
             gbBFI.Enabled = True
         Else
             gbBFI.Enabled = False
         End If
+        BFMethods_CheckedChanged(Nothing, Nothing)
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
@@ -1372,8 +1389,17 @@ Public Class frmUSGSBaseflow
                 txtK.Visible = False
             End If
             txtDFParamBeta.Enabled = chkMethodBFLOW.Checked
-            txtDFParamRC.Enabled = chkMethodTwoPRDF.Checked
-            txtDFParamBFImax.Enabled = chkMethodTwoPRDF.Checked
+            lblBeta.Enabled = chkMethodBFLOW.Checked
+
+            If chkMethodTwoPRDF.Checked Then
+                mnuDFTwoParam.Enabled = True
+            Else
+                mnuDFTwoParam.Enabled = False
+                txtDFParamRC.Enabled = False
+                txtDFParamBFImax.Enabled = False
+                lblRC.Enabled = False
+                lblBFImax.Enabled = False
+            End If
             If lBFIChosen Then
                 gbBFI.Enabled = True
             Else
@@ -1383,7 +1409,7 @@ Public Class frmUSGSBaseflow
     End Sub
 
     Private Sub txtAny_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
-            Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged, _
+            Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged,
             txtN.TextChanged, txtF.TextChanged, txtK.TextChanged, txtOutputDir.TextChanged, txtOutputRootName.TextChanged
         pDidBFSeparation = False
     End Sub
@@ -1417,5 +1443,30 @@ Public Class frmUSGSBaseflow
         Else
             Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Base-Flow Separation")
         End If
+    End Sub
+
+    Private Sub mnuDFTwoParam_Click(sender As Object, e As EventArgs) Handles mnuDFTwoParamCustom.Click,
+                                                                              mnuDFTwoParamEck.Click,
+                                                                              mnuDFTwoParamCF.Click
+        Select Case sender.name.substring("mnuDFTwoParam".Length)
+            Case "Custom"
+                lblBFImax.Enabled = True
+                lblRC.Enabled = True
+                txtDFParamRC.Enabled = True
+                txtDFParamBFImax.Enabled = True
+            Case "Eck"
+                txtDFParamRC.Text = ""
+                txtDFParamBFImax.Text = ""
+                lblBFImax.Enabled = False
+                lblRC.Enabled = False
+                txtDFParamRC.Enabled = False
+                txtDFParamBFImax.Enabled = False
+            Case "CF"
+                lblRC.Enabled = True
+                txtDFParamRC.Enabled = True
+                lblBFImax.Enabled = False
+                txtDFParamBFImax.Enabled = False
+                txtDFParamBFImax.Text = ""
+        End Select
     End Sub
 End Class
