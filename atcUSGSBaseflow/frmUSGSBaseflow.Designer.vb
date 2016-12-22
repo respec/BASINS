@@ -95,6 +95,7 @@ Partial Class frmUSGSBaseflow
         Me.mnuDFTwoParamEck = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuDFTwoParamCF = New System.Windows.Forms.ToolStripMenuItem()
         Me.lblRC = New System.Windows.Forms.Label()
+        Me.mnuTwoParamEstMethod = New System.Windows.Forms.ToolStripMenuItem()
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
@@ -747,11 +748,11 @@ Partial Class frmUSGSBaseflow
         Me.mnuDFTwoParam.Dock = System.Windows.Forms.DockStyle.None
         Me.mnuDFTwoParam.GripMargin = New System.Windows.Forms.Padding(-2)
         Me.mnuDFTwoParam.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible
-        Me.mnuDFTwoParam.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TwoParameterToolStripMenuItem})
+        Me.mnuDFTwoParam.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TwoParameterToolStripMenuItem, Me.mnuTwoParamEstMethod})
         Me.mnuDFTwoParam.Location = New System.Drawing.Point(3, 28)
         Me.mnuDFTwoParam.Name = "mnuDFTwoParam"
         Me.mnuDFTwoParam.Padding = New System.Windows.Forms.Padding(0)
-        Me.mnuDFTwoParam.Size = New System.Drawing.Size(102, 24)
+        Me.mnuDFTwoParam.Size = New System.Drawing.Size(175, 24)
         Me.mnuDFTwoParam.TabIndex = 12
         Me.mnuDFTwoParam.Text = "MenuStrip2"
         '
@@ -764,6 +765,7 @@ Partial Class frmUSGSBaseflow
         '
         'mnuDFTwoParamCustom
         '
+        Me.mnuDFTwoParamCustom.CheckOnClick = True
         Me.mnuDFTwoParamCustom.Name = "mnuDFTwoParamCustom"
         Me.mnuDFTwoParamCustom.Padding = New System.Windows.Forms.Padding(0)
         Me.mnuDFTwoParamCustom.Size = New System.Drawing.Size(152, 20)
@@ -779,6 +781,7 @@ Partial Class frmUSGSBaseflow
         '
         'mnuDFTwoParamEck
         '
+        Me.mnuDFTwoParamEck.CheckOnClick = True
         Me.mnuDFTwoParamEck.Name = "mnuDFTwoParamEck"
         Me.mnuDFTwoParamEck.Padding = New System.Windows.Forms.Padding(0)
         Me.mnuDFTwoParamEck.Size = New System.Drawing.Size(182, 20)
@@ -786,6 +789,7 @@ Partial Class frmUSGSBaseflow
         '
         'mnuDFTwoParamCF
         '
+        Me.mnuDFTwoParamCF.CheckOnClick = True
         Me.mnuDFTwoParamCF.Name = "mnuDFTwoParamCF"
         Me.mnuDFTwoParamCF.Padding = New System.Windows.Forms.Padding(0)
         Me.mnuDFTwoParamCF.Size = New System.Drawing.Size(182, 20)
@@ -799,6 +803,13 @@ Partial Class frmUSGSBaseflow
         Me.lblRC.Size = New System.Drawing.Size(114, 13)
         Me.lblRC.TabIndex = 7
         Me.lblRC.Text = "Recession Constant, a"
+        '
+        'mnuTwoParamEstMethod
+        '
+        Me.mnuTwoParamEstMethod.Enabled = False
+        Me.mnuTwoParamEstMethod.Name = "mnuTwoParamEstMethod"
+        Me.mnuTwoParamEstMethod.Size = New System.Drawing.Size(73, 24)
+        Me.mnuTwoParamEstMethod.Text = "(Eckhardt)"
         '
         'frmUSGSBaseflow
         '
@@ -910,4 +921,5 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents AutomaticToolStripMenuItem As Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuDFTwoParamEck As Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuDFTwoParamCF As Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuTwoParamEstMethod As Windows.Forms.ToolStripMenuItem
 End Class

@@ -1450,13 +1450,16 @@ Public Class frmUSGSBaseflow
     Private Sub mnuDFTwoParam_Click(sender As Object, e As EventArgs) Handles mnuDFTwoParamCustom.Click,
                                                                               mnuDFTwoParamEck.Click,
                                                                               mnuDFTwoParamCF.Click
-        Select Case sender.name.substring("mnuDFTwoParam".Length)
+        Dim lmethodname As String = sender.name.substring("mnuDFTwoParam".Length)
+        mnuDFTwoParamResetCheckStates(lmethodname)
+        Select Case lmethodname
             Case "Custom"
                 lblBFImax.Enabled = True
                 lblRC.Enabled = True
                 txtDFParamRC.Enabled = True
                 txtDFParamBFImax.Enabled = True
                 pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM
+                mnuTwoParamEstMethod.Text = "(Custom)"
             Case "Eck"
                 txtDFParamRC.Text = ""
                 txtDFParamBFImax.Text = ""
@@ -1465,6 +1468,7 @@ Public Class frmUSGSBaseflow
                 txtDFParamRC.Enabled = False
                 txtDFParamBFImax.Enabled = False
                 pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
+                mnuTwoParamEstMethod.Text = "(Eckhdardt)"
             Case "CF"
                 lblRC.Enabled = True
                 txtDFParamRC.Enabled = True
@@ -1472,6 +1476,21 @@ Public Class frmUSGSBaseflow
                 txtDFParamBFImax.Enabled = False
                 txtDFParamBFImax.Text = ""
                 pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CF
+                mnuTwoParamEstMethod.Text = "(CF)"
+        End Select
+    End Sub
+
+    Private Sub mnuDFTwoParamResetCheckStates(ByVal aCheckedMethod As String)
+        Select Case aCheckedMethod
+            Case "Custom"
+                mnuDFTwoParamCF.CheckState = CheckState.Unchecked
+                mnuDFTwoParamEck.CheckState = CheckState.Unchecked
+            Case "Eck"
+                mnuDFTwoParamCF.CheckState = CheckState.Unchecked
+                mnuDFTwoParamCustom.CheckState = CheckState.Unchecked
+            Case "CF"
+                mnuDFTwoParamEck.CheckState = CheckState.Unchecked
+                mnuDFTwoParamCustom.CheckState = CheckState.Unchecked
         End Select
     End Sub
 End Class
