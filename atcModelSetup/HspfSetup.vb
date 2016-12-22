@@ -169,11 +169,9 @@ Public Class HspfSetup
         End If
 
         'convert units if the GIS layer units are feet instead of meters
-        Dim lDistFactor As Double = 1.0
         If GisUtil.MapUnits.ToUpper = "FEET" Then
-            lDistFactor = 3.2808
             For Each lRec As LandUseSubbasinOverlayRecord In lLandUseSubbasinOverlayRecords
-                lRec.Area = lRec.Area / (lDistFactor * lDistFactor)
+                lRec.Area = lRec.Area / (ft_per_m * ft_per_m)
             Next
         End If
 

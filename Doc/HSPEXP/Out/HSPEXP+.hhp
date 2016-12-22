@@ -11,7 +11,7 @@ Language=0x409 English (United States)
 Title=HSPEXP+ Manual
 
 [Files]
-HSPEXP+ Version 1.1 User's Manual.html
+HSPEXP+ Version 1.20 User's Manual.html
 Disclaimer.html
 Acknowledgements.html
 Assistance.html
@@ -35,7 +35,7 @@ Load Allocation Tool.html
 References.html
 
 [ALIAS]
-HSPEXP_Version_User_s_Manual = HSPEXP+ Version 1.1 User's Manual.html
+HSPEXP_Version_User_s_Manual = HSPEXP+ Version 1.20 User's Manual.html
 Disclaimer = Disclaimer.html
 Acknowledgements = Acknowledgements.html
 User_Assistance_and_Feedback = Assistance.html

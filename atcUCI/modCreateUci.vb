@@ -360,9 +360,9 @@ Module modCreateUci
             lTable.Parms("DELTH").Value = System.Math.Round(pWatershed.Reaches(lOrder).DeltH, 0)
             'set initial volume in reach in ac-ft to 75% of length in miles * mean width in feet * mean depth in feet
             lTable = lOperation.Tables.Item("HYDR-INIT")
-            lTable.Parms("VOL").Value = CInt(pWatershed.Reaches(lOrder).Length * 5280 * _
-                                             pWatershed.Reaches(lOrder).Depth * _
-                                             pWatershed.Reaches(lOrder).Width / 43560 * 0.75)
+            lTable.Parms("VOL").Value = CInt(pWatershed.Reaches(lOrder).Length * ft_per_mi *
+                                             pWatershed.Reaches(lOrder).Depth *
+                                             pWatershed.Reaches(lOrder).Width / sqft_per_ac * 0.75)
             If pDoWetlands AndAlso lWetReach Then
                 'this is a wetland reach
                 lTable.Parms("VOL").Value = System.Math.Round(lOperation.FTable.Volume(3), 0)  'use the volume at the nominal surface area of the wetland

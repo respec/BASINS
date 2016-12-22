@@ -217,7 +217,7 @@ Public Module GIRASLanduseTable
                             .Rows = .Rows + 1
                             .CellValue(.Rows - 1, 0) = lcUniqueLugroups(j - 1)
                             For i = 1 To lcUniqueSubids.Count
-                                .CellValue(.Rows - 1, i) = Format((lArea(i, j) / 4046.8564), "0.")   'converting to acres
+                                .CellValue(.Rows - 1, i) = Format((lArea(i, j) / sqm_per_ac), "0.")   'converting to acres
                             Next i
                         Next j
                     End With

@@ -4,7 +4,7 @@
   <description asmv2:iconFile="Basins.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="HSPEXP+" version="1.20.0.0" language="neutral" processorArchitecture="x86" />
+    <assemblyIdentity name="HSPEXP+" version="1.21.0.0" language="neutral" processorArchitecture="x86" />
     <commandLine file="HSPEXP+.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -85,7 +85,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>6V14XcCb3pXcN5CvNL6jNi71pxg=</dsig:DigestValue>
+        <dsig:DigestValue>u8HpzI9x8N29/ge/yWsaFJC8gzg=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -97,7 +97,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>BRStGUtD953tZhivhYOfQLQbMw4=</dsig:DigestValue>
+        <dsig:DigestValue>jlBM4rPyZXLW/wbM1tyJEKomKkE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -114,14 +114,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcHspfSupport.dll" size="261120">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcHspfSupport.dll" size="261632">
       <assemblyIdentity name="atcHspfSupport" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>/8mNd0ve+sDVcTLoWxAnRvtkNqw=</dsig:DigestValue>
+        <dsig:DigestValue>MIMtSDP0jcPir31taiME8pXeLN8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -246,14 +246,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="HSPEXP+.exe" size="460288">
-      <assemblyIdentity name="HSPEXP+" version="1.20.0.0" language="neutral" processorArchitecture="x86" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="HSPEXP+.exe" size="471040">
+      <assemblyIdentity name="HSPEXP+" version="1.21.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>yfSIQ4e0wXl0d/+7yT5hHbvuiRc=</dsig:DigestValue>
+        <dsig:DigestValue>aKUacPqluG8xtlgWouAxhaAoCFE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -317,13 +317,13 @@
       <dsig:DigestValue>DyYlB/ja1yA3WmFmUEE2gQ2+utk=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="HSPEXP+.chm" size="1032846">
+  <file name="HSPEXP+.chm" size="1508545">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>ReyKrG0kDbf36THADZCbeXU1rQA=</dsig:DigestValue>
+      <dsig:DigestValue>lFvtH968giM8c3vjs22seNXyDio=</dsig:DigestValue>
     </hash>
   </file>
   <file name="HSPEXP+.exe.config" size="1319">

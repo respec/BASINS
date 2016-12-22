@@ -254,3 +254,8 @@
 *.hhk
 *.hhp
 *.hhc
+/Doc/HSPEXP/HSPEXP+1.11.pdf
+/Doc/HSPEXP/Introduction/respec_black.jpg
+*.log
+/HSPEXP/pest13
+/HSPEXP/SplashScreenHSPEXP_Nov2016.png

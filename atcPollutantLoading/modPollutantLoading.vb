@@ -223,8 +223,8 @@ Public Module PollutantLoading
         'calculate areas of each subbasin
         For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
             For k = 1 To lMaxlu
-                lAreasS(i) = lAreasS(i) + (lAreasLS(k, i) / 4046.8564)
-                ' / 4046.8564 to convert from m2 to acres
+                lAreasS(i) = lAreasS(i) + (lAreasLS(k, i) / sqm_per_ac)
+
             Next k
         Next i
         Logger.Dbg("SubBasinAreasCalculated")
@@ -236,8 +236,8 @@ Public Module PollutantLoading
             For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                 For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
                     For k = 1 To lMaxlu
-                        lLoadsSC(i, j) = lLoadsSC(i, j) + (lCoeffsLC(k, j) * lAreasLS(k, i) / 4046.8564)
-                        ' / 4046.8564 to convert from m2 to acres
+                        lLoadsSC(i, j) = lLoadsSC(i, j) + (lCoeffsLC(k, j) * lAreasLS(k, i) / sqm_per_ac)
+
                     Next k
                 Next j
             Next i
@@ -253,8 +253,8 @@ Public Module PollutantLoading
             For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                 For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
                     For k = 1 To lMaxlu
-                        lLoadsSC(i, j) = lLoadsSC(i, j) + (lPrecS(i) * lRatio * lRunoffL(k) * lCoeffsLC(k, j) * lAreasLS(k, i) / 4046.8564 * 2.72 / 12)
-                        ' / 4046.8564 to convert from m2 to acres
+                        lLoadsSC(i, j) = lLoadsSC(i, j) + (lPrecS(i) * lRatio * lRunoffL(k) * lCoeffsLC(k, j) * lAreasLS(k, i) / sqm_per_ac * 2.72 / 12)
+
                     Next k
                 Next j
             Next i
@@ -284,7 +284,7 @@ Public Module PollutantLoading
                             End If
                         Else
                             'polygon layer
-                            lBMPArea = GisUtil.AreaOverlappingPolygons(lBMPLayerIndex, k - 1, lSubbasinLayerIndex, lSelectedAreaIndexes(i + 1)) / 4046.8564
+                            lBMPArea = GisUtil.AreaOverlappingPolygons(lBMPLayerIndex, k - 1, lSubbasinLayerIndex, lSelectedAreaIndexes(i + 1)) / sqm_per_ac
                         End If
                         If lBMPArea > 0.0 Then
                             'have some bmp area
@@ -304,9 +304,9 @@ Public Module PollutantLoading
                                 For lLuIndex As Integer = 1 To lMaxlu
                                     'calculate the full load first, for this area, as if no bmp
                                     If aUseExportCoefficent Then 'Export Coefficients Method
-                                        lLoad = (lCoeffsLC(lLuIndex, j) * lBMPAreaL(lLuIndex) / 4046.8564)
+                                        lLoad = (lCoeffsLC(lLuIndex, j) * lBMPAreaL(lLuIndex) / sqm_per_ac)
                                     Else
-                                        lLoad = (lPrecS(i) * lRatio * lRunoffL(lLuIndex) * lCoeffsLC(lLuIndex, j) * lBMPAreaL(lLuIndex) / 4046.8564 * 2.72 / 12)
+                                        lLoad = (lPrecS(i) * lRatio * lRunoffL(lLuIndex) * lCoeffsLC(lLuIndex, j) * lBMPAreaL(lLuIndex) / sqm_per_ac * 2.72 / 12)
                                     End If
                                     'the removal due to the bmp is the load times the efficiency
                                     If lBMPAreaL(lLuIndex) > 0 Then
@@ -438,13 +438,13 @@ Public Module PollutantLoading
             Next i
             For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                 For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
-                    lEMCsSC(i, j) = lEMCsSC(i, j) + (lLoadsSC(i, j) * 4046.8564 * 12 / lDenomS(i))
+                    lEMCsSC(i, j) = lEMCsSC(i, j) + (lLoadsSC(i, j) * sqm_per_ac * 12 / lDenomS(i))
                 Next j
             Next i
             'calc runoff volume in cfs
             For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                 For k = 1 To lMaxlu
-                    lVolume(i) = lVolume(i) + (lPrecS(i) / 12 * lRatio * lRunoffL(k) * lAreasLS(k, i) * 3.281 * 3.281 / 31536000)  '31536000 is what pload uses as the number of seconds in a year
+                    lVolume(i) = lVolume(i) + (lPrecS(i) / 12 * lRatio * lRunoffL(k) * lAreasLS(k, i) * ft_per_m * ft_per_m / 31536000)  '31536000 is what pload uses as the number of seconds in a year
                 Next k
             Next i
         End If
