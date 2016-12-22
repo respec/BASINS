@@ -11,7 +11,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyTitle("DFLOW 4.0")> 
 <Assembly: AssemblyDescription("Stream Design Flow for Steady State WLA")> 
 <Assembly: AssemblyCompany("LimnoTech")> 
-<Assembly: AssemblyProduct("DFLOWAnalysis Plugin for BASINS 4.1")> 
+<Assembly: AssemblyProduct("DFLOWAnalysis Plugin for BASINS")> 
 <Assembly: AssemblyCopyright("Copyright ©  2008")> 
 <Assembly: AssemblyTrademark("")> 
 

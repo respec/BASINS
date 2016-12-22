@@ -323,7 +323,7 @@ Public Module modFile
 
             If Not aHelpTopic.Equals("CLOSE") Then
                 If Not IO.File.Exists(lHelpFilename) Then
-                    lHelpFilename = FindFile("Please locate help file", "Basins4.2.chm")
+                    lHelpFilename = FindFile("Please locate help file", "Basins4.5.chm")
                 End If
 
                 If IO.File.Exists(lHelpFilename) Then
