@@ -248,11 +248,15 @@ Public Class frmUSGSBaseflow
         Dim lDFRC As Double = Double.NaN
         Dim lDFBFImax As Double = Double.NaN
         If chkMethodTwoPRDF.Checked Then
-            If Not Double.TryParse(txtDFParamRC.Text.Trim(), lDFRC) Then
+            If Not Double.TryParse(txtDFParamRC.Text.Trim(), lDFRC) AndAlso
+                pTwoParamEstimationMethod <> clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT Then
                 lErrMsg &= "- TwoPRDF method needs a valid recession constant." & vbCrLf
             End If
-            If Not Double.TryParse(txtDFParamBFImax.Text.Trim(), lDFBFImax) OrElse Not (lDFBFImax > 0 AndAlso lDFBFImax < 1) Then
-                lErrMsg &= "- TwoPRDF method needs a valid BFImax." & vbCrLf
+            If Not Double.TryParse(txtDFParamBFImax.Text.Trim(), lDFBFImax) OrElse
+                Not (lDFBFImax > 0 AndAlso lDFBFImax < 1) Then
+                If pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM Then
+                    lErrMsg &= "- TwoPRDF method needs a valid BFImax." & vbCrLf
+                End If
             End If
         End If
 
@@ -544,6 +548,7 @@ Public Class frmUSGSBaseflow
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFLOW", chkMethodBFLOW.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodTwoPRDF", chkMethodTwoPRDF.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "DFTwoParamEstMethod", pTwoParamEstimationMethod.ToString())
 
         OutputDir = txtOutputDir.Text.Trim()
 
@@ -1162,6 +1167,7 @@ Public Class frmUSGSBaseflow
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFLOW", chkMethodBFLOW.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodTwoPRDF", chkMethodTwoPRDF.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "DFTwoParamEstMethod", pTwoParamEstimationMethod.ToString())
 
         If pDataGroup IsNot Nothing Then
             pDataGroup.Clear()
@@ -1208,6 +1214,15 @@ Public Class frmUSGSBaseflow
         End If
         If GetSetting("atcUSGSBaseflow", "Defaults", "MethodTwoPRDF", "False") = "True" Then
             chkMethodTwoPRDF.Checked = True
+            Dim lparamEstMethod As String = GetSetting("atcUSGSBaseflow", "Defaults", "DFTwoParamEstMethod", clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT)
+            Select Case lparamEstMethod
+                Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT.ToString(), "NONE", "None", "none"
+                    mnuDFTwoParamEck.PerformClick()
+                Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.CF.ToString()
+                    mnuDFTwoParamCF.PerformClick()
+                Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM.ToString()
+                    mnuDFTwoParamCustom.PerformClick()
+            End Select
         End If
         If chkMethodBFIStandard.Checked OrElse chkMethodBFIModified.Checked Then
             gbBFI.Enabled = True
