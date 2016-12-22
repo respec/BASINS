@@ -6,6 +6,13 @@ Imports MapWinUtility
 Public Class clsBaseflow2PRDF
     Inherits clsBaseflow
 
+    Public Enum ETWOPARAMESTIMATION
+        CUSTOM
+        ECKHARDT
+        CF
+        NONE
+    End Enum
+
     Private pTsBaseflow1 As atcTimeseries = Nothing
     Private pTsBaseflow2 As atcTimeseries = Nothing
     Private pTsBaseflow3 As atcTimeseries = Nothing
@@ -21,7 +28,17 @@ Public Class clsBaseflow2PRDF
 
     Private pTotalBaseflowDepth As Double = 0
 
-    Private pBFImax As Double = 0.5
+    Private pParamEstimationMethod As ETWOPARAMESTIMATION = ETWOPARAMESTIMATION.ECKHARDT
+    Public Property ParamEstimationMethod() As ETWOPARAMESTIMATION
+        Get
+            Return pParamEstimationMethod
+        End Get
+        Set(value As ETWOPARAMESTIMATION)
+            pParamEstimationMethod = value
+        End Set
+    End Property
+
+    Private pBFImax As Double = Double.NaN '0.5
     Public Property BFImax() As Double
         Get
             Return pBFImax
@@ -273,7 +290,17 @@ Public Class clsBaseflow2PRDF
         '              respective time step Is evaluated
 
         'Calculate parameters, a (recession constant) and BFImax
-        CalculateBFImax_RC(aTS)
+        Select Case ParamEstimationMethod
+            Case ETWOPARAMESTIMATION.CUSTOM
+                If Double.IsNaN(RC) OrElse Double.IsNaN(BFImax) Then
+                    Logger.Dbg("Custom RC or BFImax is invalid.")
+                    Return Nothing
+                End If
+            Case ETWOPARAMESTIMATION.ECKHARDT, ETWOPARAMESTIMATION.NONE
+                CalculateBFImax_RC(aTS)
+            Case ETWOPARAMESTIMATION.CF
+                'CalculateBFImaxWithUserSpecified_a(aTS)
+        End Select
 
         'Calculate baseflow
         Dim lbsum As Double = 0

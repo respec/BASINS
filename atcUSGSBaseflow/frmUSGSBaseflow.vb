@@ -36,6 +36,7 @@ Public Class frmUSGSBaseflow
     Private pBFIFrac As Double = 0
     Private pBFIK1Day As Double = 0
     Private pBFIUseSymbol As Boolean = False
+    Private pTwoParamEstimationMethod As clsBaseflow2PRDF.ETWOPARAMESTIMATION = clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE
 
     Private WithEvents pDataGroup As atcTimeseriesGroup
     Private WithEvents pfrmStations As frmStations
@@ -294,6 +295,7 @@ Public Class frmUSGSBaseflow
             If pMethods.Contains(BFMethods.TwoPRDF) Then
                 Args.SetValue(BFInputNames.TwoPRDFRC, lDFRC)
                 Args.SetValue(BFInputNames.TwoPRDFBFImax, lDFBFImax)
+                Args.SetValue(BFInputNames.TwoParamEstMethod, pTwoParamEstimationMethod)
             End If
         End If
         Return lErrMsg
@@ -1454,6 +1456,7 @@ Public Class frmUSGSBaseflow
                 lblRC.Enabled = True
                 txtDFParamRC.Enabled = True
                 txtDFParamBFImax.Enabled = True
+                pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM
             Case "Eck"
                 txtDFParamRC.Text = ""
                 txtDFParamBFImax.Text = ""
@@ -1461,12 +1464,14 @@ Public Class frmUSGSBaseflow
                 lblRC.Enabled = False
                 txtDFParamRC.Enabled = False
                 txtDFParamBFImax.Enabled = False
+                pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
             Case "CF"
                 lblRC.Enabled = True
                 txtDFParamRC.Enabled = True
                 lblBFImax.Enabled = False
                 txtDFParamBFImax.Enabled = False
                 txtDFParamBFImax.Text = ""
+                pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CF
         End Select
     End Sub
 End Class

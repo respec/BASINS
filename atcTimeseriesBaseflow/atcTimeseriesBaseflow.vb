@@ -19,6 +19,7 @@ Public Class BFInputNames
     Public Shared BFLOWFilter As String = "BFLOWFilter"
     Public Shared TwoPRDFRC As String = "TwoPRDF_RC"
     Public Shared TwoPRDFBFImax As String = "TwoPRDF_BFImax"
+    Public Shared TwoParamEstMethod As String = "TwoParamEstimationMethod"
     Public Shared StationFile As String = "StationFile"
 End Class
 
@@ -180,6 +181,7 @@ Public Class atcTimeseriesBaseflow
         Dim lDFBeta As Double = Double.NaN
         Dim lDFRC As Double = Double.NaN
         Dim lDFBFImax As Double = Double.NaN
+        Dim lTwoDFParamEstMethod As clsBaseflow2PRDF.ETWOPARAMESTIMATION = clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE
 
         Dim lAttributeDef As atcAttributeDefinition = Nothing
 
@@ -226,6 +228,7 @@ Public Class atcTimeseriesBaseflow
             If lMethods.Contains(BFMethods.TwoPRDF) Then
                 lDFRC = aArgs.GetValue(BFInputNames.TwoPRDFRC, Double.NaN)
                 lDFBFImax = aArgs.GetValue(BFInputNames.TwoPRDFBFImax, Double.NaN)
+                lTwoDFParamEstMethod = aArgs.GetValue(BFInputNames.TwoParamEstMethod, clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE)
             End If
 
             lStationFile = aArgs.GetValue(BFInputNames.StationFile) '"Station File"
@@ -301,6 +304,7 @@ Public Class atcTimeseriesBaseflow
                     If Not Double.IsNaN(lDFBFImax) Then
                         CType(ClsBaseFlow, clsBaseflow2PRDF).BFImax = lDFBFImax
                     End If
+                    CType(ClsBaseFlow, clsBaseflow2PRDF).ParamEstimationMethod = lTwoDFParamEstMethod
                 End If
 
                 'even though BFI doesn't need it, but set it nonetheless, won't hurt
