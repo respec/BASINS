@@ -1468,7 +1468,7 @@ Public Class frmUSGSBaseflow
                 txtDFParamRC.Enabled = False
                 txtDFParamBFImax.Enabled = False
                 pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
-                mnuTwoParamEstMethod.Text = "(Eckhdardt)"
+                mnuTwoParamEstMethod.Text = "(Eckhardt)"
             Case "CF"
                 lblRC.Enabled = True
                 txtDFParamRC.Enabled = True
@@ -1476,7 +1476,7 @@ Public Class frmUSGSBaseflow
                 txtDFParamBFImax.Enabled = False
                 txtDFParamBFImax.Text = ""
                 pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CF
-                mnuTwoParamEstMethod.Text = "(CF)"
+                mnuTwoParamEstMethod.Text = "(Collischonn and Fan)"
         End Select
     End Sub
 
