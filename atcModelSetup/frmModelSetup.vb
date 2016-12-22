@@ -1256,22 +1256,22 @@ Public Class frmModelSetup
                 If lFieldNameUpper = "SUBBASINR" Or lFieldNameUpper = "DSLINKNO" Then
                     cboStream2.SelectedIndex = lFieldIndex
                 End If
-                If lFieldNameUpper = "LEN2" Or lFieldNameUpper = "LENGTH" Then
+                If lFieldNameUpper.StartsWith("LEN2") Or lFieldNameUpper = "LENGTH" Then
                     cboStream3.SelectedIndex = lFieldIndex
                 End If
                 If lFieldNameUpper = "SLO2" Or lFieldNameUpper = "SLOPE" Then
                     cboStream4.SelectedIndex = lFieldIndex
                 End If
-                If lFieldNameUpper = "WID2" Or lFieldNameUpper = "WIDTH" Or lFieldNameUpper = "MEANWIDTH" Then
+                If lFieldNameUpper.StartsWith("WID2") Or lFieldNameUpper = "WIDTH" Or lFieldNameUpper = "MEANWIDTH" Then
                     cboStream5.SelectedIndex = lFieldIndex
                 End If
-                If lFieldNameUpper = "DEP2" Or lFieldNameUpper = "DEPTH" Or lFieldNameUpper = "MEANDEPTH" Then
+                If lFieldNameUpper.StartsWith("DEP2") Or lFieldNameUpper = "DEPTH" Or lFieldNameUpper = "MEANDEPTH" Then
                     cboStream6.SelectedIndex = lFieldIndex
                 End If
-                If lFieldNameUpper = "MINEL" Or lFieldNameUpper = "ELEVLOW" Then
+                If lFieldNameUpper.StartsWith("MINEL") Or lFieldNameUpper = "ELEVLOW" Then
                     cboStream7.SelectedIndex = lFieldIndex
                 End If
-                If lFieldNameUpper = "MAXEL" Or lFieldNameUpper = "ELEVHIGH" Then
+                If lFieldNameUpper.StartsWith("MAXEL") Or lFieldNameUpper = "ELEVHIGH" Then
                     cboStream8.SelectedIndex = lFieldIndex
                 End If
                 If lFieldNameUpper = "SNAME" Then
@@ -1990,7 +1990,5 @@ Public Class frmModelSetup
         cboLanduse_SelectedIndexChanged(sender, e)
     End Sub
 
-    Private Sub chkMetricUnits_CheckedChanged(sender As Object, e As EventArgs) Handles chkMetricUnits.CheckedChanged
-        Dim MetricUnits As Boolean = True
-    End Sub
+
 End Class

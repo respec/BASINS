@@ -10,6 +10,15 @@ End Enum
 
 Public Module modUnits
     '##MODULE_REMARKS Copyright 2001-3 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+    Public Const ft_per_m = 3.28084
+    Public Const ft_per_mi = 5280
+    Public Const m_per_km = 1000
+    Public Const sqm_per_ac = 4046.8564244
+    Public Const sqm_per_ha = 10000
+    Public Const sqm_per_sqmi = 2589988.110336
+    Public Const sqft_per_ac = 43560
+    Public Const sqm_per_sqkm = 1000000
+    Public Const cm_per_m = 100
 
     Private Const UnitsTableName As String = "Units"
     Private Const CategoryTableName As String = "Category"
@@ -17,6 +26,7 @@ Public Module modUnits
 
     Private pSaveUnitsDatabase As Xml.XmlDocument = Nothing
     Private pAlreadyReportedErrOpen As Boolean
+
 
     'Debug.Print GetParameterUnits("LAI", "SwatDbfParameter", "sbs")
     Public Function GetParameterUnits(ByVal ParameterName As String, Optional ByVal FileType As String = "") As String

@@ -129,9 +129,9 @@ Public Module modModelSetup
                         .Order = lReaches.Count + 1
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) Then
                             If Not MetricUnits Then
-                                .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) * 3.28 / 5280)
+                                .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) * ft_per_m / ft_per_mi)
                             Else
-                                .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) / 1000)
+                                .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) / m_per_km)
                             End If
 
                         Else
@@ -139,9 +139,9 @@ Public Module modModelSetup
                         End If
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) Then
                             If Not MetricUnits Then
-                                .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) * 3.28
+                                .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) * ft_per_m
                             Else
-                                .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) * 3.28
+                                .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index))
                             End If
 
                         Else
@@ -149,7 +149,7 @@ Public Module modModelSetup
                         End If
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) Then
                             If Not MetricUnits Then
-                                .Width = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) * 3.28
+                                .Width = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) * ft_per_m
                             Else
                                 .Width = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index))
                             End If
@@ -160,7 +160,7 @@ Public Module modModelSetup
                         Dim lMinEl As Single
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) Then
                             If Not MetricUnits Then
-                                lMinEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) * 3.28
+                                lMinEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) * ft_per_m
                             Else
                                 lMinEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex))
                             End If
@@ -171,7 +171,7 @@ Public Module modModelSetup
                         Dim lMaxEl As Single
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) Then
                             If Not MetricUnits Then
-                                lMaxEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) * 3.28
+                                lMaxEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) * ft_per_m
                             Else
                                 lMaxEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex))
                             End If
@@ -296,9 +296,9 @@ Public Module modModelSetup
                 If aElevationFileName.Length > 0 Then
                     GisUtil.GridMeanInPolygon(aElevationFileName, lLandUsePathName & "\overlay.shp", i - 1, lMeanElev)
                     If aElevationUnits = "Meters" Then
-                        lRec.MeanElevation = lMeanElev * 3.281
+                        lRec.MeanElevation = lMeanElev * ft_per_m
                     ElseIf aElevationUnits = "Centimeters" Then
-                        lRec.MeanElevation = lMeanElev * 3.281 / 100
+                        lRec.MeanElevation = lMeanElev * ft_per_m / 100
                     Else
                         lRec.MeanElevation = lMeanElev
                     End If
@@ -367,9 +367,9 @@ Public Module modModelSetup
                 If aElevationFileName.Length > 0 Then
                     GisUtil.GridMeanInPolygon(aElevationFileName, lLandUsePathName & "\overlay.shp", i - 1, lMeanElev)
                     If aElevationUnits = "Meters" Then
-                        lRec.MeanElevation = lMeanElev * 3.281
+                        lRec.MeanElevation = lMeanElev * ft_per_m
                     ElseIf aElevationUnits = "Centimeters" Then
-                        lRec.MeanElevation = lMeanElev * 3.281 / 100
+                        lRec.MeanElevation = lMeanElev * ft_per_m / 100
                     Else
                         lRec.MeanElevation = lMeanElev
                     End If
@@ -440,9 +440,9 @@ Public Module modModelSetup
                         If aSnowOption > 0 Then
                             If aElevationFileName.Length > 0 Then
                                 If aElevationUnits = "Meters" Then
-                                    lRec.MeanElevation = lMeanElevLS(i, lShapeindex) * 3.281
+                                    lRec.MeanElevation = lMeanElevLS(i, lShapeindex) * ft_per_m
                                 ElseIf aElevationUnits = "Centimeters" Then
-                                    lRec.MeanElevation = lMeanElevLS(i, lShapeindex) * 3.281 / 100
+                                    lRec.MeanElevation = lMeanElevLS(i, lShapeindex) * ft_per_m / 100
                                 Else
                                     lRec.MeanElevation = lMeanElevLS(i, lShapeindex)
                                 End If
@@ -474,18 +474,18 @@ Public Module modModelSetup
             With lChannel
                 .Reach = lReach
                 If Not MetricUnits Then
-                    .Length = lReach.Length * 5280 'Length in feet
+                    .Length = lReach.Length * ft_per_mi 'Length in feet
                 Else
-                    .Length = lReach.Length * 1000 'Length in meters
+                    .Length = lReach.Length * m_per_km 'Length in meters
                 End If
 
                 .DepthMean = lReach.Depth
                 .WidthMean = lReach.Width
                 .ManningN = 0.05
                 If Not MetricUnits Then
-                    .SlopeProfile = Math.Abs(lReach.DeltH / (lReach.Length * 5280))
+                    .SlopeProfile = Math.Abs(lReach.DeltH / (lReach.Length * ft_per_mi))
                 Else
-                    .SlopeProfile = Math.Abs(lReach.DeltH / (lReach.Length * 1000))
+                    .SlopeProfile = Math.Abs(lReach.DeltH / (lReach.Length * m_per_km))
                 End If
 
                 If .SlopeProfile < 0.0001 Then
@@ -1383,9 +1383,9 @@ Public Module modModelSetup
             Dim lType As String = "2"
             Dim lArea As Double = 0.0
             If Not aMetricUnits Then
-                lArea = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 4046.8564
+                lArea = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / sqm_per_ac
             Else
-                lArea = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 10000
+                lArea = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / sqm_per_ha
             End If
 
             If lArea > 0 Then 'or CInt(lArea)
@@ -1431,9 +1431,9 @@ Public Module modModelSetup
             End If
             lType = "1"
             If Not aMetricUnits Then
-                lArea = lLandUse.Area * lLandUse.ImperviousFraction / 4046.8564
+                lArea = lLandUse.Area * lLandUse.ImperviousFraction / sqm_per_ac
             Else
-                lArea = lLandUse.Area * lLandUse.ImperviousFraction / 10000
+                lArea = lLandUse.Area * lLandUse.ImperviousFraction / sqm_per_ha
             End If
 
             If lArea > 0 Then 'or CInt(lArea)
@@ -1498,7 +1498,7 @@ Public Module modModelSetup
         Dim lSlope As Double
         For Each lReach As Reach In aReaches
             With lReach
-                lSlope = Math.Abs(.DeltH / (.Length * 5280))
+                lSlope = Math.Abs(.DeltH / (.Length * ft_per_mi))
                 If lSlope < 0.00001 Then
                     lSlope = 0.001
                 End If
