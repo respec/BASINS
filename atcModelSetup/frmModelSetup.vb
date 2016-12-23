@@ -1610,7 +1610,7 @@ Public Class frmModelSetup
                     If CreateUCI(lOutputPath & "\" & lBaseOutputName & ".uci",
                                  lUniqueMetWDMNames,
                                  lWQConstituents, ,
-                                 lSetup.SnowOption, lSetup.DoWetlands) Then
+                                 lSetup.SnowOption, lSetup.DoWetlands, chkMetricUnits.Checked) Then
                         lblStatus.Text = "Completed HSPF Setup"
                         Me.Refresh()
                         StartWinHSPF(lOutputPath & "\" & lBaseOutputName & ".uci")

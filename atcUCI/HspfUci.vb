@@ -2708,28 +2708,29 @@ x:
         Return lIntAsCat
     End Function
 
-    Public Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
-                                   ByRef aDataSources As Collection(Of atcData.atcTimeseriesSource), _
-                                   ByRef aStarterUciName As String, _
-                                   ByVal aWQConstituents() As String, _
-                          Optional ByRef aPollutantListFileName As String = "", _
-                          Optional ByRef aMetBaseDsn As Integer = 11, _
-                          Optional ByVal aMetWdmId As String = "WDM2", _
-                          Optional ByVal aSnowOption As Integer = 0, _
-                          Optional ByVal aFillMissingMetSegRecs As Boolean = False, _
-                          Optional ByVal aSJDate As Double = -1, _
-                          Optional ByVal aEJDate As Double = -1, _
-                          Optional ByVal aDoWetlands As Boolean = False)
+    Public Sub CreateUciFromBASINS(ByRef aWatershed As Watershed,
+                                   ByRef aDataSources As Collection(Of atcData.atcTimeseriesSource),
+                                   ByRef aStarterUciName As String,
+                                   ByVal aWQConstituents() As String,
+                          Optional ByRef aPollutantListFileName As String = "",
+                          Optional ByRef aMetBaseDsn As Integer = 11,
+                          Optional ByVal aMetWdmId As String = "WDM2",
+                          Optional ByVal aSnowOption As Integer = 0,
+                          Optional ByVal aFillMissingMetSegRecs As Boolean = False,
+                          Optional ByVal aSJDate As Double = -1,
+                          Optional ByVal aEJDate As Double = -1,
+                          Optional ByVal aDoWetlands As Boolean = False,
+                          Optional ByVal aMetricUnits As Boolean = False)
 
         'get starter uci ready for use defaulting parameters and mass links
         Dim lDefUci As New HspfUci
         lDefUci.FastReadUciForStarter(Me.Msg, aStarterUciName)
 
-        modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources, _
-                                         lDefUci, _
-                                         aPollutantListFileName, aMetBaseDsn, aMetWdmId, aSnowOption, _
-                                         aFillMissingMetSegRecs, aSJDate, aEJDate, _
-                                         aDoWetlands)
+        modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources,
+                                         lDefUci,
+                                         aPollutantListFileName, aMetBaseDsn, aMetWdmId, aSnowOption,
+                                         aFillMissingMetSegRecs, aSJDate, aEJDate,
+                                         aDoWetlands, aMetricUnits)
 
         'add specified pollutants
         If aWQConstituents.Length > 0 Then

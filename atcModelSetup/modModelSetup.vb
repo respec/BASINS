@@ -53,7 +53,8 @@ Public Module modModelSetup
                               Optional ByVal aElevationFileName As String = "",
                               Optional ByVal aElevationUnits As String = "",
                               Optional ByVal aDoWetlands As Boolean = False,
-                              Optional ByVal aToWetlandsFileName As String = "") As Boolean
+                              Optional ByVal aToWetlandsFileName As String = "",
+                              Optional ByVal aMetricUnits As Boolean = False) As Boolean
         'this version of SetupHSPF (with arguments) is preserved for backward compatibility, 
         'but the preferred way of calling SetupHSPF is using the class below
         Dim lSetup As New HspfSetup
@@ -87,7 +88,7 @@ Public Module modModelSetup
             .ElevationUnits = aElevationUnits
             .DoWetlands = aDoWetlands
             .ToWetlandsFileName = aToWetlandsFileName
-
+            .MetricUnits = aMetricUnits
             .SetupHSPF()
         End With
         Return True
@@ -95,7 +96,7 @@ Public Module modModelSetup
 
     Public Function CreateReachSegments(ByVal aSubbasinsSelected As atcCollection, ByVal aSubbasinsModelSegmentIds As atcCollection,
                                         ByVal aStreamLayerName As String, ByVal aStreamFields() As String,
-                                        Optional ByVal MetricUnits As Boolean = False) As Reaches
+                                        Optional ByVal aMetricUnits As Boolean = False) As Reaches
 
         'for reaches in selected subbasins, populate reach class from dbf
         Dim lReaches As New Reaches
@@ -128,49 +129,49 @@ Public Module modModelSetup
                         .Manning = 0.05
                         .Order = lReaches.Count + 1
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) Then
-                            If Not MetricUnits Then
+                            If Not aMetricUnits Then
                                 .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) * ft_per_m / ft_per_mi)
                             Else
                                 .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) / m_per_km)
                             End If
 
                         Else
-                                .Length = 0.0#
+                            .Length = 0.0#
                         End If
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) Then
-                            If Not MetricUnits Then
+                            If Not aMetricUnits Then
                                 .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) * ft_per_m
                             Else
                                 .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index))
                             End If
 
                         Else
-                                .Depth = 0.0#
+                            .Depth = 0.0#
                         End If
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) Then
-                            If Not MetricUnits Then
+                            If Not aMetricUnits Then
                                 .Width = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) * ft_per_m
                             Else
                                 .Width = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index))
                             End If
 
                         Else
-                                .Width = 0.0#
+                            .Width = 0.0#
                         End If
                         Dim lMinEl As Single
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) Then
-                            If Not MetricUnits Then
+                            If Not aMetricUnits Then
                                 lMinEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) * ft_per_m
                             Else
                                 lMinEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex))
                             End If
 
                         Else
-                                lMinEl = 0.0#
+                            lMinEl = 0.0#
                         End If
                         Dim lMaxEl As Single
                         If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) Then
-                            If Not MetricUnits Then
+                            If Not aMetricUnits Then
                                 lMaxEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) * ft_per_m
                             Else
                                 lMaxEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex))
@@ -319,15 +320,16 @@ Public Module modModelSetup
         Return True
     End Function
 
-    Public Sub CreateLanduseRecordsShapefile(ByVal aSubbasinsSelected As atcCollection, _
-                                             ByRef aLandUseSubbasinOverlayRecords As Collection, _
-                                             ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String, _
-                                             ByVal aLandUseThemeName As String, ByVal aLandUseFieldName As String, _
-                                             Optional ByVal aSnowOption As Integer = 0, _
-                                             Optional ByVal aElevationFileName As String = "", _
-                                             Optional ByVal aElevationUnits As String = "", _
-                                             Optional ByVal aDoWetlands As Boolean = False, _
-                                             Optional ByVal aToWetlandsFileName As String = "")
+    Public Sub CreateLanduseRecordsShapefile(ByVal aSubbasinsSelected As atcCollection,
+                                             ByRef aLandUseSubbasinOverlayRecords As Collection,
+                                             ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String,
+                                             ByVal aLandUseThemeName As String, ByVal aLandUseFieldName As String,
+                                             Optional ByVal aSnowOption As Integer = 0,
+                                             Optional ByVal aElevationFileName As String = "",
+                                             Optional ByVal aElevationUnits As String = "",
+                                             Optional ByVal aDoWetlands As Boolean = False,
+                                             Optional ByVal aToWetlandsFileName As String = "",
+                                             Optional ByVal aMetricUnits As Boolean = False)
 
         'perform overlay for other shapefiles (not GIRAS) 
 
@@ -337,7 +339,7 @@ Public Module modModelSetup
         Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex))
 
         'do overlay
-        GisUtil.Overlay(aLandUseThemeName, aLandUseFieldName, aSubbasinThemeName, aSubbasinFieldName, _
+        GisUtil.Overlay(aLandUseThemeName, aLandUseFieldName, aSubbasinThemeName, aSubbasinFieldName,
                         lLandUsePathName & "\overlay.shp", True)
 
         If aSnowOption > 0 Then
@@ -366,6 +368,7 @@ Public Module modModelSetup
                 lRec.MeanLatitude = lY
                 If aElevationFileName.Length > 0 Then
                     GisUtil.GridMeanInPolygon(aElevationFileName, lLandUsePathName & "\overlay.shp", i - 1, lMeanElev)
+
                     If aElevationUnits = "Meters" Then
                         lRec.MeanElevation = lMeanElev * ft_per_m
                     ElseIf aElevationUnits = "Centimeters" Then
@@ -373,6 +376,10 @@ Public Module modModelSetup
                     Else
                         lRec.MeanElevation = lMeanElev
                     End If
+                    If aMetricUnits Then
+                        lRec.MeanElevation /= ft_per_m
+                    End If
+
                 End If
             End If
 
@@ -707,12 +714,13 @@ Public Module modModelSetup
         Next lDataSourceGeneric
     End Sub
 
-    Public Function CreateUCI(ByVal aUciName As String, _
-                              ByVal aMetWdmNames As atcCollection, _
-                              ByVal aWQConstituents() As String, _
-                              Optional ByVal aCalledFromFrames As Boolean = False, _
-                              Optional ByVal aSnowOption As Integer = 0, _
-                              Optional ByVal aDoWetlands As Boolean = False) As Boolean
+    Public Function CreateUCI(ByVal aUciName As String,
+                              ByVal aMetWdmNames As atcCollection,
+                              ByVal aWQConstituents() As String,
+                              Optional ByVal aCalledFromFrames As Boolean = False,
+                              Optional ByVal aSnowOption As Integer = 0,
+                              Optional ByVal aDoWetlands As Boolean = False,
+                              Optional ByVal aMetricUnits As Boolean = False) As Boolean
         ChDriveDir(PathNameOnly(aUciName))
         'get message file ready
         Dim lMsg As New atcUCI.HspfMsg("hspfmsg.wdm")
@@ -784,11 +792,11 @@ Public Module modModelSetup
         If lWatershed.Open(lWatershedName) = 0 Then  'everything read okay, continue
             Dim lHspfUci As New atcUCI.HspfUci
             lHspfUci.Msg = lMsg
-            lHspfUci.CreateUciFromBASINS(lWatershed, _
-                                         lDataSources, _
-                                         lStarterUciName, _
-                                         aWQConstituents, _
-                                         lPollutantListFileName, , , aSnowOption, , , , aDoWetlands)
+            lHspfUci.CreateUciFromBASINS(lWatershed,
+                                         lDataSources,
+                                         lStarterUciName,
+                                         aWQConstituents,
+                                         lPollutantListFileName, , , aSnowOption, , , , aDoWetlands, aMetricUnits)
             lHspfUci.Save()
             lCreateUCI = True
         End If
@@ -1361,25 +1369,45 @@ Public Module modModelSetup
 
         Dim lSB As New StringBuilder
 
-        If Not aDoWetlands Then
-            If aSnowOption = 0 Then
-                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
-                               """Area""" & "," & """Slope""" & "," & """Distance""")
+        If Not aMetricUnits Then
+            If Not aDoWetlands Then
+                If aSnowOption = 0 Then
+                    lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
+                               """Area_ac""" & "," & """Slope""" & "," & """Distance_ft""")
+                Else
+                    lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
+                               """Area_ac""" & "," & """Slope""" & "," & """Distance_ft""" & "," & """MeanLatitude""" & "," & """MeanElevation_ft""")
+                End If
             Else
-                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
-                               """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """MeanLatitude""" & "," & """MeanElevation""")
+                If aSnowOption = 0 Then
+                    lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
+                               """Area""" & "," & """Slope""" & "," & """Distance_ft""" & "," & """PercentToWetlands""")
+                Else
+                    lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
+                               """Area""" & "," & """Slope""" & "," & """Distance_ft""" & "," & """MeanLatitude""" & "," & """MeanElevation_ft""" & "," & """PercentToWetlands""")
+                End If
             End If
         Else
-            If aSnowOption = 0 Then
-                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
-                               """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """PercentToWetlands""")
+            If Not aDoWetlands Then
+                If aSnowOption = 0 Then
+                    lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
+                               """Area_ha""" & "," & """Slope""" & "," & """Distance_m""")
+                Else
+                    lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
+                               """Area_ha""" & "," & """Slope""" & "," & """Distance_m""" & "," & """MeanLatitude""" & "," & """MeanElevation_m""")
+                End If
             Else
-                lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
-                               """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """MeanLatitude""" & "," & """MeanElevation""" & "," & """PercentToWetlands""")
+                If aSnowOption = 0 Then
+                    lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
+                               """Area_ha""" & "," & """Slope""" & "," & """Distance_m""" & "," & """PercentToWetlands""")
+                Else
+                    lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," &
+                               """Area_ha""" & "," & """Slope""" & "," & """Distance_m""" & "," & """MeanLatitude""" & "," & """MeanElevation_m""" & "," & """PercentToWetlands""")
+                End If
             End If
         End If
 
-        For Each lLandUse As LandUse In aLandUses
+            For Each lLandUse As LandUse In aLandUses
             Dim lType As String = "2"
             Dim lArea As Double = 0.0
             If Not aMetricUnits Then
@@ -1498,10 +1526,14 @@ Public Module modModelSetup
         Dim lSlope As Double
         For Each lReach As Reach In aReaches
             With lReach
-                lSlope = Math.Abs(.DeltH / (.Length * ft_per_mi))
-                If lSlope < 0.00001 Then
-                    lSlope = 0.001
+                If aMetricUnits Then
+                    lSlope = Math.Abs(.DeltH / (.Length * m_per_km))
+                Else
+                    lSlope = Math.Abs(.DeltH / (.Length * ft_per_mi))
                 End If
+                If lSlope < 0.00001 Then : lSlope = 0.001
+                End If
+
                 lSBRch.AppendLine(.Id & " " & Chr(34) & .Name & Chr(34) & " " & .Id & " " &
                        " 0 1 0 S " & Format(.Length, "0.00") & " " & Format(Math.Abs(.DeltH), "0.00") & " " &
                        Format(.Elev, "0.") & " 0 0 " & .DownID & " 0 0 0 0 0 " &

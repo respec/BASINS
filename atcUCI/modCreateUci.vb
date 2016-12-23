@@ -16,18 +16,19 @@ Module modCreateUci
     Dim pDoWetlands As Boolean
     Dim pWetlandsOffset As Integer = 100
 
-    Friend Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
-                                   ByRef aUci As HspfUci, _
-                                   ByRef aDataSources As Collection(Of atcTimeseriesSource), _
-                                   ByRef aStarterUci As HspfUci, _
-                          Optional ByRef aPollutantListFileName As String = "", _
-                          Optional ByRef aMetBaseDsn As Integer = 11, _
-                          Optional ByRef aMetWdmId As String = "WDM2", _
-                          Optional ByVal aSnowOption As Integer = 0, _
-                          Optional ByVal aFillMissingMetSegRecs As Boolean = False, _
-                          Optional ByVal aSJDate As Double = -1, _
-                          Optional ByVal aEJDate As Double = -1, _
-                          Optional ByVal aDoWetlands As Boolean = False)
+    Friend Sub CreateUciFromBASINS(ByRef aWatershed As Watershed,
+                                   ByRef aUci As HspfUci,
+                                   ByRef aDataSources As Collection(Of atcTimeseriesSource),
+                                   ByRef aStarterUci As HspfUci,
+                          Optional ByRef aPollutantListFileName As String = "",
+                          Optional ByRef aMetBaseDsn As Integer = 11,
+                          Optional ByRef aMetWdmId As String = "WDM2",
+                          Optional ByVal aSnowOption As Integer = 0,
+                          Optional ByVal aFillMissingMetSegRecs As Boolean = False,
+                          Optional ByVal aSJDate As Double = -1,
+                          Optional ByVal aEJDate As Double = -1,
+                          Optional ByVal aDoWetlands As Boolean = False,
+                          Optional ByVal aMetricUnits As Boolean = False)
         pWatershed = aWatershed
         pDoWetlands = aDoWetlands
 
@@ -36,8 +37,14 @@ Module modCreateUci
         With aUci.GlobalBlock  'add global block to empty uci
             .Comment = " "
             .Uci = aUci
-            .RunInf.Value = "UCI Created by WinHSPF for " & aWatershed.Name
-            .EmFg = 1
+            If aMetricUnits Then
+                .RunInf.Value = "UCI Created by BASINS for " & aWatershed.Name & " in Metric Units."
+                .EmFg = 2
+            Else
+                .RunInf.Value = "UCI Created by BASINS for " & aWatershed.Name & " in English Units."
+                .EmFg = 1
+
+            End If
             .OutLev.Value = CStr(1)
             .RunFg = 1
         End With
@@ -67,7 +74,7 @@ Module modCreateUci
             lSJDate = aSJDate
             lEJDate = aEJDate
         Else
-            GetStartEndDatesFromMetsegs(aUci, _
+            GetStartEndDatesFromMetsegs(aUci,
                                         lSJDate, lEJDate)
         End If
         Dim lStartDate(6) As Integer
@@ -651,6 +658,7 @@ Module modCreateUci
         lFile.Unit = 91
         aUci.FilesBlock.Add(lFile)
 
+
         Dim lOutput As atcTimeseriesSource = aDataSources(0)
         If lOutput.Name.Length > 0 Then
             lFile = New HspfFile
@@ -992,6 +1000,7 @@ Module modCreateUci
         If lOutletId > 0 Then 'found watershed outlet
             Dim lWdmId, lNewDsn As Integer
             aUci.AddOutputWDMDataSet("RCH" & lOutletId, "FLOW", 100, lWdmId, lNewDsn)
+
             aUci.AddExtTarget("RCHRES", lOutletId, "HYDR", "RO", 1, 1, 1.0#, "AVER", "WDM" & CStr(lWdmId), lNewDsn, "FLOW", 1, "ENGL", "AGGR", "REPL")
         End If
     End Sub
