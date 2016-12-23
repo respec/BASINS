@@ -495,6 +495,38 @@ Public Class frmBatchMap
             lText.AppendLine(BFInputNames.BFIReportby & vbTab & BFBatchInputNames.ReportByCY)
         End If
 
+        Dim lDFBeta As Double = 0.925
+        If aArgs.ContainsAttribute(BFInputNames.BFLOWFilter) Then
+            lDFBeta = aArgs.GetValue(BFInputNames.BFLOWFilter)
+        ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.BFLOWFilter) Then
+            lDFBeta = aDefaultArgs.GetValue(BFInputNames.BFLOWFilter)
+        End If
+        lText.AppendLine(BFInputNames.BFLOWFilter & vbTab & lDFBeta)
+
+        Dim lDFRC As Double = 0.925
+        If aArgs.ContainsAttribute(BFInputNames.TwoPRDFRC) Then
+            lDFRC = aArgs.GetValue(BFInputNames.TwoPRDFRC)
+        ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.TwoPRDFRC) Then
+            lDFRC = aDefaultArgs.GetValue(BFInputNames.TwoPRDFRC)
+        End If
+        lText.AppendLine(BFInputNames.TwoPRDFRC & vbTab & lDFRC)
+
+        Dim lDFBFImax As Double = 0.8
+        If aArgs.ContainsAttribute(BFInputNames.TwoPRDFBFImax) Then
+            lDFBFImax = aArgs.GetValue(BFInputNames.TwoPRDFBFImax)
+        ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.TwoPRDFBFImax) Then
+            lDFBFImax = aDefaultArgs.GetValue(BFInputNames.TwoPRDFBFImax)
+        End If
+        lText.AppendLine(BFInputNames.TwoPRDFBFImax & vbTab & lDFBFImax)
+
+        Dim lDFParamEstMethod As clsBaseflow2PRDF.ETWOPARAMESTIMATION = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
+        If aArgs.ContainsAttribute(BFInputNames.TwoParamEstMethod) Then
+            lDFParamEstMethod = aArgs.GetValue(BFInputNames.TwoParamEstMethod)
+        ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.TwoParamEstMethod) Then
+            lDFParamEstMethod = aDefaultArgs.GetValue(BFInputNames.TwoParamEstMethod)
+        End If
+        lText.AppendLine(BFInputNames.TwoParamEstMethod & vbTab & lDFParamEstMethod.ToString())
+
         If lSetGlobal Then
             Dim lDatadir As String = aArgs.GetValue(BFBatchInputNames.DataDir, "")
             If lDatadir = "" Then

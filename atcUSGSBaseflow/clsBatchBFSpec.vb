@@ -489,6 +489,38 @@ Public Class clsBatchBFSpec
                         lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFIRecessConst, lReConst)
                     Next
                 End If
+            Case atcTimeseriesBaseflow.BFInputNames.TwoParamEstMethod.ToLower()
+                Dim lParamEstMethod As atcTimeseriesBaseflow.clsBaseflow2PRDF.ETWOPARAMESTIMATION = atcTimeseriesBaseflow.clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
+                If Not String.IsNullOrEmpty(lArr(1).Trim()) Then
+                    Dim lMethodText As String = lArr(1).Trim().ToLower()
+                    If lMethodText.StartsWith("custom") Then
+                        lParamEstMethod = atcTimeseriesBaseflow.clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM
+                    End If
+                    For Each lStation As clsBatchUnitStation In lListBatchUnits
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.TwoParamEstMethod, lParamEstMethod)
+                    Next
+                End If
+            Case atcTimeseriesBaseflow.BFInputNames.BFLOWFilter.ToLower()
+                Dim lBeta As Double
+                If Double.TryParse(lArr(1).Trim(), lBeta) Then
+                    For Each lStation As clsBatchUnitStation In lListBatchUnits
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFLOWFilter, lBeta)
+                    Next
+                End If
+            Case atcTimeseriesBaseflow.BFInputNames.TwoPRDFRC.ToLower()
+                Dim lRC As Double
+                If Double.TryParse(lArr(1).Trim(), lRC) Then
+                    For Each lStation As clsBatchUnitStation In lListBatchUnits
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFRC, lRC)
+                    Next
+                End If
+            Case atcTimeseriesBaseflow.BFInputNames.TwoPRDFBFImax.ToLower()
+                Dim lBFImax As Double
+                If Double.TryParse(lArr(1).Trim(), lBFImax) Then
+                    For Each lStation As clsBatchUnitStation In lListBatchUnits
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFBFImax, lBFImax)
+                    Next
+                End If
             Case BFBatchInputNames.OUTPUTDIR.ToLower
                 Dim lOutputDir As String = lArr(1).Trim()
                 If Not String.IsNullOrEmpty(lOutputDir) Then

@@ -42,6 +42,8 @@ Partial Class frmUSGSBaseflow
         Me.chkBFISymbols = New System.Windows.Forms.CheckBox()
         Me.chkMethodBFLOW = New System.Windows.Forms.CheckBox()
         Me.chkMethodTwoPRDF = New System.Windows.Forms.CheckBox()
+        Me.txtDFParamBFImax = New System.Windows.Forms.TextBox()
+        Me.txtDFParamRC = New System.Windows.Forms.TextBox()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem()
@@ -83,19 +85,17 @@ Partial Class frmUSGSBaseflow
         Me.lblF = New System.Windows.Forms.Label()
         Me.lblN = New System.Windows.Forms.Label()
         Me.gbDFParam = New System.Windows.Forms.GroupBox()
-        Me.txtDFParamBFImax = New System.Windows.Forms.TextBox()
         Me.lblBFImax = New System.Windows.Forms.Label()
         Me.txtDFParamBeta = New System.Windows.Forms.TextBox()
         Me.lblBeta = New System.Windows.Forms.Label()
-        Me.txtDFParamRC = New System.Windows.Forms.TextBox()
         Me.mnuDFTwoParam = New System.Windows.Forms.MenuStrip()
         Me.TwoParameterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuDFTwoParamCustom = New System.Windows.Forms.ToolStripMenuItem()
         Me.AutomaticToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuDFTwoParamEck = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuDFTwoParamCF = New System.Windows.Forms.ToolStripMenuItem()
-        Me.lblRC = New System.Windows.Forms.Label()
         Me.mnuTwoParamEstMethod = New System.Windows.Forms.ToolStripMenuItem()
+        Me.lblRC = New System.Windows.Forms.Label()
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
@@ -287,6 +287,28 @@ Partial Class frmUSGSBaseflow
         Me.chkMethodTwoPRDF.Text = "DF-Two Param"
         Me.toolTip1.SetToolTip(Me.chkMethodTwoPRDF, "Two Parameter Digital Filter (Eckhardt method)")
         Me.chkMethodTwoPRDF.UseVisualStyleBackColor = True
+        '
+        'txtDFParamBFImax
+        '
+        Me.txtDFParamBFImax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDFParamBFImax.Location = New System.Drawing.Point(176, 87)
+        Me.txtDFParamBFImax.Name = "txtDFParamBFImax"
+        Me.txtDFParamBFImax.Size = New System.Drawing.Size(69, 20)
+        Me.txtDFParamBFImax.TabIndex = 11
+        Me.txtDFParamBFImax.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.toolTip1.SetToolTip(Me.txtDFParamBFImax, "a common value is 0.8")
+        '
+        'txtDFParamRC
+        '
+        Me.txtDFParamRC.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDFParamRC.Location = New System.Drawing.Point(177, 61)
+        Me.txtDFParamRC.Name = "txtDFParamRC"
+        Me.txtDFParamRC.Size = New System.Drawing.Size(68, 20)
+        Me.txtDFParamRC.TabIndex = 10
+        Me.txtDFParamRC.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.toolTip1.SetToolTip(Me.txtDFParamRC, "a common value is 0.925")
         '
         'MenuStrip1
         '
@@ -692,17 +714,6 @@ Partial Class frmUSGSBaseflow
         Me.gbDFParam.TabStop = False
         Me.gbDFParam.Text = "Digital Filter (DF) Parameters"
         '
-        'txtDFParamBFImax
-        '
-        Me.txtDFParamBFImax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDFParamBFImax.Location = New System.Drawing.Point(176, 87)
-        Me.txtDFParamBFImax.Name = "txtDFParamBFImax"
-        Me.txtDFParamBFImax.Size = New System.Drawing.Size(69, 20)
-        Me.txtDFParamBFImax.TabIndex = 11
-        Me.txtDFParamBFImax.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.toolTip1.SetToolTip(Me.txtDFParamBFImax, "a common value is 0.8")
-        '
         'lblBFImax
         '
         Me.lblBFImax.AutoSize = True
@@ -732,17 +743,6 @@ Partial Class frmUSGSBaseflow
         Me.lblBeta.TabIndex = 6
         Me.lblBeta.Text = "One Parameter Filter Constant"
         '
-        'txtDFParamRC
-        '
-        Me.txtDFParamRC.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDFParamRC.Location = New System.Drawing.Point(177, 61)
-        Me.txtDFParamRC.Name = "txtDFParamRC"
-        Me.txtDFParamRC.Size = New System.Drawing.Size(68, 20)
-        Me.txtDFParamRC.TabIndex = 10
-        Me.txtDFParamRC.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.toolTip1.SetToolTip(Me.txtDFParamRC, "a common value is 0.925")
-        '
         'mnuDFTwoParam
         '
         Me.mnuDFTwoParam.Dock = System.Windows.Forms.DockStyle.None
@@ -752,7 +752,7 @@ Partial Class frmUSGSBaseflow
         Me.mnuDFTwoParam.Location = New System.Drawing.Point(3, 28)
         Me.mnuDFTwoParam.Name = "mnuDFTwoParam"
         Me.mnuDFTwoParam.Padding = New System.Windows.Forms.Padding(0)
-        Me.mnuDFTwoParam.Size = New System.Drawing.Size(175, 24)
+        Me.mnuDFTwoParam.Size = New System.Drawing.Size(267, 24)
         Me.mnuDFTwoParam.TabIndex = 12
         Me.mnuDFTwoParam.Text = "MenuStrip2"
         '
@@ -794,6 +794,14 @@ Partial Class frmUSGSBaseflow
         Me.mnuDFTwoParamCF.Padding = New System.Windows.Forms.Padding(0)
         Me.mnuDFTwoParamCF.Size = New System.Drawing.Size(182, 20)
         Me.mnuDFTwoParamCF.Text = "Collischonn and Fan"
+        Me.mnuDFTwoParamCF.Visible = False
+        '
+        'mnuTwoParamEstMethod
+        '
+        Me.mnuTwoParamEstMethod.Enabled = False
+        Me.mnuTwoParamEstMethod.Name = "mnuTwoParamEstMethod"
+        Me.mnuTwoParamEstMethod.Size = New System.Drawing.Size(73, 24)
+        Me.mnuTwoParamEstMethod.Text = "(Eckhardt)"
         '
         'lblRC
         '
@@ -803,13 +811,6 @@ Partial Class frmUSGSBaseflow
         Me.lblRC.Size = New System.Drawing.Size(114, 13)
         Me.lblRC.TabIndex = 7
         Me.lblRC.Text = "Recession Constant, a"
-        '
-        'mnuTwoParamEstMethod
-        '
-        Me.mnuTwoParamEstMethod.Enabled = False
-        Me.mnuTwoParamEstMethod.Name = "mnuTwoParamEstMethod"
-        Me.mnuTwoParamEstMethod.Size = New System.Drawing.Size(73, 24)
-        Me.mnuTwoParamEstMethod.Text = "(Eckhardt)"
         '
         'frmUSGSBaseflow
         '
