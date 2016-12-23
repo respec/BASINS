@@ -1206,9 +1206,9 @@ Public Module modBaseflowUtil
             ASCIIBFLOWDailyOut(aStreamFlowTs, lFilename) 'lMethodName
         ElseIf aMethod = BFMethods.TwoPRDF Then
             Dim loc As String = aStreamFlowTs.Attributes.GetValue("Location", "")
-            Dim lBFITXTFile As String = IO.Path.Combine(OutputDir, "bfi_TwoPRDF" & "_" & loc & ".txt")
+            Dim lBFITXTFile As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_TwoPRDF_bfi_" & loc & ".txt")
             ASCIITwoPRDFDat(lBFITXTFile, aStreamFlowTs)
-            Dim lbaseflowTXTFile As String = IO.Path.Combine(OutputDir, "baseflow_TwoPRDF_" & loc & ".txt")
+            Dim lbaseflowTXTFile As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_TwoPRDF_baseflow_" & loc & ".txt")
             ASCIITwoPRDFDailyOut(lbaseflowTXTFile, aStreamFlowTs)
         End If
 
@@ -4577,7 +4577,7 @@ Public Module modBaseflowUtil
             Dim lstrFlow As String = ""
             Dim lstrBaseflow As String = ""
             For I As Integer = 1 To aTS.numValues
-                lstrDate = lDateFormat.JDateToString(aTS.Dates.Value(I - 1)).PadLeft(10, " ")
+                lstrDate = lDateFormat.JDateToString(aTS.Dates.Value(I)).PadLeft(10, " ")
                 lstrFlow = DoubleToString(aTS.Value(I), 8, "0.0").PadLeft(8, " ")
                 lstrBaseflow = DoubleToString(lTsBaseflow1.Value(I), 8, "0.0").PadLeft(8, " ")
                 lSW.WriteLine(lstrDate & lstrFlow & lstrBaseflow)
