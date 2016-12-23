@@ -116,13 +116,13 @@ Public Class atcBasinsPlugIn
                 BasinsDataPath = "USGS-GW\data\"
                 With atcUtility.HelpSubstitutions
                     .Add("BASINS Details", "GW Toolbox Details")
-                    .Add("Welcome to BASINS 4.2 Window", "Welcome to GW Toolbox Window")
+                    .Add("Welcome to BASINS 4.5 Window", "Welcome to GW Toolbox Window")
                     .Add("Build BASINS Project", "Build New Project")
                 End With
 
 
             Case Else ' BASINS 
-                lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.1.chm")
+                lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.5.chm")
         End Select
 
         Logger.StartToFile(g_CacheDir & "log" & g_PathChar _

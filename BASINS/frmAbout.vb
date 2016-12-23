@@ -87,7 +87,7 @@ Friend Class frmAbout
         Me.grpMapWindow.Controls.Add(Me.lblMapWindowURL)
         Me.grpMapWindow.Location = New System.Drawing.Point(12, 308)
         Me.grpMapWindow.Name = "grpMapWindow"
-        Me.grpMapWindow.Size = New System.Drawing.Size(588, 88)
+        Me.grpMapWindow.Size = New System.Drawing.Size(473, 88)
         Me.grpMapWindow.TabIndex = 5
         Me.grpMapWindow.TabStop = False
         Me.grpMapWindow.Text = "Powered by MapWindow Programmable Geographic Information System"
@@ -96,7 +96,7 @@ Friend Class frmAbout
         '
         Me.lblMapwinVersion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblMapwinVersion.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblMapwinVersion.Location = New System.Drawing.Point(420, 24)
+        Me.lblMapwinVersion.Location = New System.Drawing.Point(305, 24)
         Me.lblMapwinVersion.Name = "lblMapwinVersion"
         Me.lblMapwinVersion.Size = New System.Drawing.Size(148, 16)
         Me.lblMapwinVersion.TabIndex = 12
@@ -119,7 +119,7 @@ Friend Class frmAbout
         Me.lblMapWindowURL.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblMapWindowURL.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.lblMapWindowURL.LinkArea = New System.Windows.Forms.LinkArea(0, 25)
-        Me.lblMapWindowURL.Location = New System.Drawing.Point(387, 65)
+        Me.lblMapWindowURL.Location = New System.Drawing.Point(272, 65)
         Me.lblMapWindowURL.Name = "lblMapWindowURL"
         Me.lblMapWindowURL.Size = New System.Drawing.Size(186, 13)
         Me.lblMapWindowURL.TabIndex = 6
@@ -132,7 +132,7 @@ Friend Class frmAbout
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnOk.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnOk.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnOk.Location = New System.Drawing.Point(528, 545)
+        Me.btnOk.Location = New System.Drawing.Point(413, 545)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(72, 23)
         Me.btnOk.TabIndex = 1
@@ -168,7 +168,7 @@ Friend Class frmAbout
         Me.lblProjFile.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.lblProjFile.Location = New System.Drawing.Point(101, 495)
         Me.lblProjFile.Name = "lblProjFile"
-        Me.lblProjFile.Size = New System.Drawing.Size(499, 16)
+        Me.lblProjFile.Size = New System.Drawing.Size(384, 16)
         Me.lblProjFile.TabIndex = 16
         '
         'lblConfigFile
@@ -180,7 +180,7 @@ Friend Class frmAbout
         Me.lblConfigFile.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.lblConfigFile.Location = New System.Drawing.Point(101, 519)
         Me.lblConfigFile.Name = "lblConfigFile"
-        Me.lblConfigFile.Size = New System.Drawing.Size(499, 16)
+        Me.lblConfigFile.Size = New System.Drawing.Size(384, 16)
         Me.lblConfigFile.TabIndex = 17
         '
         'picProgramLogo
@@ -188,7 +188,7 @@ Friend Class frmAbout
         Me.picProgramLogo.Cursor = System.Windows.Forms.Cursors.Hand
         Me.picProgramLogo.Location = New System.Drawing.Point(8, 8)
         Me.picProgramLogo.Name = "picProgramLogo"
-        Me.picProgramLogo.Size = New System.Drawing.Size(136, 128)
+        Me.picProgramLogo.Size = New System.Drawing.Size(81, 72)
         Me.picProgramLogo.TabIndex = 18
         Me.picProgramLogo.TabStop = False
         '
@@ -196,30 +196,34 @@ Friend Class frmAbout
         '
         Me.lblProgramName.AutoSize = True
         Me.lblProgramName.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblProgramName.Location = New System.Drawing.Point(152, 16)
+        Me.lblProgramName.Location = New System.Drawing.Point(119, 9)
+        Me.lblProgramName.Margin = New System.Windows.Forms.Padding(0)
         Me.lblProgramName.Name = "lblProgramName"
-        Me.lblProgramName.Size = New System.Drawing.Size(216, 42)
+        Me.lblProgramName.Size = New System.Drawing.Size(154, 42)
         Me.lblProgramName.TabIndex = 19
         Me.lblProgramName.Text = "BASINS"
         '
         'lblPluginVersion
         '
-        Me.lblPluginVersion.Location = New System.Drawing.Point(160, 64)
+        Me.lblPluginVersion.AutoSize = True
+        Me.lblPluginVersion.Location = New System.Drawing.Point(123, 64)
+        Me.lblPluginVersion.Margin = New System.Windows.Forms.Padding(0)
         Me.lblPluginVersion.Name = "lblPluginVersion"
-        Me.lblPluginVersion.Size = New System.Drawing.Size(176, 16)
+        Me.lblPluginVersion.Size = New System.Drawing.Size(0, 13)
         Me.lblPluginVersion.TabIndex = 20
         '
         'lblProgramURL
         '
-        Me.lblProgramURL.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblProgramURL.AutoSize = True
         Me.lblProgramURL.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblProgramURL.LinkArea = New System.Windows.Forms.LinkArea(0, 39)
-        Me.lblProgramURL.Location = New System.Drawing.Point(315, 67)
+        Me.lblProgramURL.LinkArea = New System.Windows.Forms.LinkArea(0, 83)
+        Me.lblProgramURL.Location = New System.Drawing.Point(24, 99)
         Me.lblProgramURL.Name = "lblProgramURL"
-        Me.lblProgramURL.Size = New System.Drawing.Size(270, 13)
+        Me.lblProgramURL.Size = New System.Drawing.Size(432, 13)
         Me.lblProgramURL.TabIndex = 2
         Me.lblProgramURL.TabStop = True
-        Me.lblProgramURL.Text = "http://www2.epa.gov/exposure-assessment-models/basins-user-information-and-guidance"
+        Me.lblProgramURL.Text = "http://www2.epa.gov/exposure-assessment-models/basins-user-information-and-guidan" &
+    "ce"
         Me.lblProgramURL.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'grpATC
@@ -230,18 +234,19 @@ Friend Class frmAbout
         Me.grpATC.Controls.Add(Me.lblAquaTerraURL)
         Me.grpATC.Location = New System.Drawing.Point(12, 142)
         Me.grpATC.Name = "grpATC"
-        Me.grpATC.Size = New System.Drawing.Size(588, 160)
+        Me.grpATC.Size = New System.Drawing.Size(473, 160)
         Me.grpATC.TabIndex = 3
         Me.grpATC.TabStop = False
-        Me.grpATC.Text = "Developed by AQUA TERRA Consultants"
+        Me.grpATC.Text = "Developed by AQUA TERRA Consultants (a Division of RESPEC, Inc.)"
         '
         'picATC
         '
         Me.picATC.Cursor = System.Windows.Forms.Cursors.Hand
         Me.picATC.Image = CType(resources.GetObject("picATC.Image"), System.Drawing.Image)
-        Me.picATC.Location = New System.Drawing.Point(8, 16)
+        Me.picATC.Location = New System.Drawing.Point(9, 16)
+        Me.picATC.Margin = New System.Windows.Forms.Padding(0)
         Me.picATC.Name = "picATC"
-        Me.picATC.Size = New System.Drawing.Size(408, 136)
+        Me.picATC.Size = New System.Drawing.Size(140, 136)
         Me.picATC.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
         Me.picATC.TabIndex = 25
         Me.picATC.TabStop = False
@@ -251,7 +256,7 @@ Friend Class frmAbout
         Me.lblAquaTerraURL.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblAquaTerraURL.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.lblAquaTerraURL.LinkArea = New System.Windows.Forms.LinkArea(0, 25)
-        Me.lblAquaTerraURL.Location = New System.Drawing.Point(422, 137)
+        Me.lblAquaTerraURL.Location = New System.Drawing.Point(307, 137)
         Me.lblAquaTerraURL.Name = "lblAquaTerraURL"
         Me.lblAquaTerraURL.Size = New System.Drawing.Size(151, 13)
         Me.lblAquaTerraURL.TabIndex = 4
@@ -267,7 +272,7 @@ Friend Class frmAbout
         Me.grpZedGraph.Controls.Add(Me.lblZedGraphURL)
         Me.grpZedGraph.Location = New System.Drawing.Point(12, 402)
         Me.grpZedGraph.Name = "grpZedGraph"
-        Me.grpZedGraph.Size = New System.Drawing.Size(588, 72)
+        Me.grpZedGraph.Size = New System.Drawing.Size(473, 72)
         Me.grpZedGraph.TabIndex = 7
         Me.grpZedGraph.TabStop = False
         Me.grpZedGraph.Text = "Graphing by ZedGraph"
@@ -276,7 +281,7 @@ Friend Class frmAbout
         '
         Me.picZedGraph.Cursor = System.Windows.Forms.Cursors.Hand
         Me.picZedGraph.Image = CType(resources.GetObject("picZedGraph.Image"), System.Drawing.Image)
-        Me.picZedGraph.Location = New System.Drawing.Point(16, 16)
+        Me.picZedGraph.Location = New System.Drawing.Point(9, 18)
         Me.picZedGraph.Name = "picZedGraph"
         Me.picZedGraph.Size = New System.Drawing.Size(176, 48)
         Me.picZedGraph.TabIndex = 28
@@ -286,7 +291,7 @@ Friend Class frmAbout
         '
         Me.lblZedGraphURL.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblZedGraphURL.LinkArea = New System.Windows.Forms.LinkArea(0, 41)
-        Me.lblZedGraphURL.Location = New System.Drawing.Point(345, 47)
+        Me.lblZedGraphURL.Location = New System.Drawing.Point(230, 47)
         Me.lblZedGraphURL.Name = "lblZedGraphURL"
         Me.lblZedGraphURL.Size = New System.Drawing.Size(228, 16)
         Me.lblZedGraphURL.TabIndex = 8
@@ -299,7 +304,7 @@ Friend Class frmAbout
         Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnOk
-        Me.ClientSize = New System.Drawing.Size(612, 580)
+        Me.ClientSize = New System.Drawing.Size(497, 580)
         Me.Controls.Add(Me.lblProgramURL)
         Me.Controls.Add(Me.picProgramLogo)
         Me.Controls.Add(Me.lblPluginVersion)
@@ -357,10 +362,10 @@ Friend Class frmAbout
 
             lblProgramURL.Text = g_URL_Home
             lblProgramURL.LinkArea = New LinkArea(0, g_URL_Home.Length)
-            lblProgramURL.Left = Me.Width - lblProgramURL.Width - 20
+            'lblProgramURL.Left = Me.Width - lblProgramURL.Width - 20
 
             Try
-                lblPluginVersion.Text = "Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
+                lblPluginVersion.Text = " Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
             Catch
             End Try
             Try

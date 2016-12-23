@@ -273,7 +273,7 @@ Public Class frmWelcomeScreen
     End Sub
 
     Private Sub lblConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs)
-        Logger.Msg("Select the BASINS 3.x Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OkOnly, "BASINS 4.2")
+        Logger.Msg("Select the BASINS 3.x Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OkOnly, "BASINS 4.5")
         Me.Close()
         SendKeys.Send("%FB")
     End Sub
