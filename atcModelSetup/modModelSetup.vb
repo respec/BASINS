@@ -728,6 +728,9 @@ Public Module modModelSetup
         'get starter uci ready
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lStarterUciName As String = "starter.uci"
+        If aMetricUnits Then
+            lStarterUciName = "starterMetric.uci"
+        End If
         Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\starter" & g_PathChar & lStarterUciName
         If Not IO.File.Exists(lStarterPath) Then
             lStarterPath = g_PathChar & "basins\models\hspf\bin\starter" & g_PathChar & lStarterUciName

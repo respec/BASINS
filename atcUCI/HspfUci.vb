@@ -2757,8 +2757,8 @@ x:
                                    Optional ByRef aMetBaseDsn As Integer = 11, _
                                    Optional ByVal aMetWdmId As String = "WDM2")
 
-        modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources, _
-                                         aStarterUci, _
+        modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources,
+                                         aStarterUci,
                                          aPollutantListFileName, aMetBaseDsn, aMetWdmId)
     End Sub
 

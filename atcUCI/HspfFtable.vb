@@ -5,6 +5,9 @@ Option Explicit On
 Imports System.Text
 Imports MapWinUtility
 Imports atcSegmentation
+Imports atcUtility
+
+
 
 Public Class HspfFtable
     Private pId As Integer
@@ -532,7 +535,7 @@ Public Class HspfFtable
     '
     'End Sub
 
-    Public Sub FTableFromCrossSect(ByVal aChannel As Channel)
+    Public Sub FTableFromCrossSect(ByVal aChannel As Channel, Optional ByVal aMetricUnits As Boolean = False)
         'algorithm from tt
         Dim lDepth(8) As Single
         Dim lSurfaceArea(8) As Single
@@ -565,10 +568,10 @@ Public Class HspfFtable
                 dWt1 = dWc + .WidthZeroSlopeLeft + .WidthZeroSlopeRight + ((.DepthSlopeChange - .DepthChannel) / .SlopeSideLowerFPLeft) + ((.DepthSlopeChange - .DepthChannel) / .SlopeSideLowerFPRight)
                 dWt2 = dWt1 + ((.DepthMax - .DepthSlopeChange) / .SlopeSideUpperFPLeft) + ((.DepthMax - .DepthSlopeChange) / .SlopeSideUpperFPRight)
 
-                If .DepthMean < 0.0# Or .WidthMean < 0.0# Or _
-                   .ManningN < 0.0# Or .SlopeProfile < 0.0# Or _
-                   .SlopeSideLeft < 0.0# Or .SlopeSideRight < 0.0# Or _
-                   .SlopeSideLowerFPLeft < 0.0# Or .SlopeSideLowerFPRight < 0.0# Or _
+                If .DepthMean < 0.0# Or .WidthMean < 0.0# Or
+                   .ManningN < 0.0# Or .SlopeProfile < 0.0# Or
+                   .SlopeSideLeft < 0.0# Or .SlopeSideRight < 0.0# Or
+                   .SlopeSideLowerFPLeft < 0.0# Or .SlopeSideLowerFPRight < 0.0# Or
                    .SlopeSideUpperFPLeft < 0.0# Or .SlopeSideUpperFPRight < 0.0# Then
                     Nrows = 1
                     Ncols = 4
@@ -660,9 +663,19 @@ Public Class HspfFtable
                         lLeftPiece = SidePiece(lDepth(i), .DepthSlopeChange, .SlopeSideUpperFPRight, .DepthChannel, .SlopeSideLowerFPRight, .SlopeSideRight)
                         lRightPiece = SidePiece(lDepth(i), .DepthSlopeChange, .SlopeSideUpperFPLeft, .DepthChannel, .SlopeSideLowerFPLeft, .SlopeSideLeft)
 
-                        lSurfaceArea(i) = .Length * (lNearestBase + lLeftPiece + lRightPiece) / 43560.0#
-                        lVolume(i) = .Length * lCrossSectionArea / 43560.0#
-                        lDischarge(i) = 1.49 / .ManningN * (lHydraulicRadius ^ (2 / 3)) * System.Math.Sqrt(.SlopeProfile) * lCrossSectionArea
+                        If aMetricUnits Then
+                            lSurfaceArea(i) = .Length * (lNearestBase + lLeftPiece + lRightPiece) / sqm_per_ha
+                            lVolume(i) = .Length * lCrossSectionArea / 1000000.0 'Volume in 1e6 m^3
+                            lDischarge(i) = 1.0 / .ManningN * (lHydraulicRadius ^ (2 / 3)) * System.Math.Sqrt(.SlopeProfile) * lCrossSectionArea
+                        Else
+                            lSurfaceArea(i) = .Length * (lNearestBase + lLeftPiece + lRightPiece) / sqft_per_ac
+
+                            lVolume(i) = .Length * lCrossSectionArea / sqft_per_ac
+
+                            lDischarge(i) = 1.49 / .ManningN * (lHydraulicRadius ^ (2 / 3)) * System.Math.Sqrt(.SlopeProfile) * lCrossSectionArea
+                        End If
+
+
                     Next i
 
                     'build ftable
@@ -671,10 +684,10 @@ Public Class HspfFtable
                     Dim lFmt1 As String = "#0.0#"
                     For i As Integer = 1 To Nrows
                         pDepth(i) = lDepth(i)
+                        pArea(i) = Format(lSurfaceArea(i), lFmt1)
                         If pDepth(i) = 0 Then pArea(i) = 0.0
                         'Anurag added this condition so that we do not see some finite area at 0 depth.
                         'That causes excess evaporation at low depths.
-                        pArea(i) = Format(lSurfaceArea(i), lFmt1)
                         pVolume(i) = Format(lVolume(i), lFmt1)
                         pOutflow1(i) = Format(lDischarge(i), lFmt1)
                     Next i
