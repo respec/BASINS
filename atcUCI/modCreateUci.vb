@@ -15,6 +15,7 @@ Module modCreateUci
     Dim pFirstSeg(2) As Integer
     Dim pDoWetlands As Boolean
     Dim pWetlandsOffset As Integer = 100
+    Dim pMetricUnits As Boolean = False
 
     Friend Sub CreateUciFromBASINS(ByRef aWatershed As Watershed,
                                    ByRef aUci As HspfUci,
@@ -29,6 +30,7 @@ Module modCreateUci
                           Optional ByVal aEJDate As Double = -1,
                           Optional ByVal aDoWetlands As Boolean = False,
                           Optional ByVal aMetricUnits As Boolean = False)
+        pMetricUnits = aMetricUnits
         pWatershed = aWatershed
         pDoWetlands = aDoWetlands
 
@@ -170,13 +172,22 @@ Module modCreateUci
             If Not lOperation Is Nothing Then
                 If pDoWetlands AndAlso lLakeAreas(lChannel.Reach.Id) > 0.0 Then
                     'yusuf also wants lake areas removed from perlnds and added to rchres when using wetland option
-                    lOperation.Description = "Water - " & lLakeAreas(lChannel.Reach.Id).ToString & " ac"
-                    Dim lLakeWidth As Double = lLakeAreas(lChannel.Reach.Id) * 43560 / lChannel.Length
+                    Dim lLakeWidth As Double = 0.0
+                    If pMetricUnits Then
+                        lOperation.Description = "Water - " & lLakeAreas(lChannel.Reach.Id).ToString & " ha"
+                        lLakeWidth = lLakeAreas(lChannel.Reach.Id) * sqm_per_ac / lChannel.Length
+                        'Anurag needs to check this unit conversion
+                    Else
+                        lOperation.Description = "Water - " & lLakeAreas(lChannel.Reach.Id).ToString & " ac"
+                        lLakeWidth = lLakeAreas(lChannel.Reach.Id) * sqft_per_ac / lChannel.Length
+                    End If
+
+
                     If lLakeWidth > lChannel.WidthMean Then
                         lChannel.WidthMean = lLakeWidth
                     End If
                 End If
-                lOperation.FTable.FTableFromCrossSect(lChannel)
+                lOperation.FTable.FTableFromCrossSect(lChannel, pMetricUnits)
             End If
             If pDoWetlands Then
                 'also build ftable for wetlands reach
@@ -184,8 +195,14 @@ Module modCreateUci
                 lOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(lWetId)
                 If Not lOperation Is Nothing Then
                     If lWetlandAreas(lChannel.Reach.Id) > 0.0 Then
-                        lOperation.Description = "Wetland - " & lWetlandAreas(lChannel.Reach.Id).ToString & " ac"
-                        lChannel.WidthMean = lWetlandAreas(lChannel.Reach.Id) * 43560 / lChannel.Length
+                        If pMetricUnits Then
+                            lOperation.Description = "Wetland - " & lWetlandAreas(lChannel.Reach.Id).ToString & " ha"
+                            lChannel.WidthMean = lWetlandAreas(lChannel.Reach.Id) * sqm_per_ha / lChannel.Length
+                        Else
+                            lOperation.Description = "Wetland - " & lWetlandAreas(lChannel.Reach.Id).ToString & " ac"
+                            lChannel.WidthMean = lWetlandAreas(lChannel.Reach.Id) * sqft_per_ac / lChannel.Length
+                        End If
+
                     End If
                     lChannel.SlopeProfile = lChannel.SlopeProfile * 0.1
                     lOperation.FTable.FTableFromCrossSect(lChannel)
@@ -220,6 +237,7 @@ Module modCreateUci
 
         CreateDefaultOutput(aUci)
         CreateBinaryOutput(aUci, aWatershed.Name)
+        CreateTextOutput(aUci, aWatershed.Name)
 
         'set default parameter values and mass links from starter
         aUci.SetDefault(aStarterUci)
@@ -242,7 +260,15 @@ Module modCreateUci
                             lTable.Parms("SNOWFG").Value = 1
                         End If
                         lTable = lOperation.Tables.Item("GEN-INFO")
+                        If pMetricUnits Then
+                            lTable.Parms("IUNITS").Value = 2
+                            lTable.Parms("OUNITS").Value = 2
+                        Else
+                            lTable.Parms("IUNITS").Value = 1
+                            lTable.Parms("OUNITS").Value = 1
+                        End If
                         lTable.Parms("LSID").Value = lLandUse.Description
+
                         lTable = lOperation.Tables.Item("PWAT-PARM2")
                         lTable.Parms("SLSUR").Value = SignificantDigits(CompositeSlope(lLandUse.Reach.SegmentId, pWatershed.LandUses), 3)
                         If lLandUse.Slope <= 0 Then
@@ -265,7 +291,12 @@ Module modCreateUci
                                 If lTimeseries IsNot Nothing Then
                                     If lTimeseries.Attributes.ContainsAttribute("ELEV") Then
                                         If IsNumeric(lTimeseries.Attributes.GetValue("ELEV")) Then
-                                            lGageElev = CSng(lTimeseries.Attributes.GetValue("ELEV")) * 3.281 'will be in meters
+                                            If pMetricUnits Then
+                                                lGageElev = CSng(lTimeseries.Attributes.GetValue("ELEV"))
+                                            Else
+                                                lGageElev = CSng(lTimeseries.Attributes.GetValue("ELEV")) * ft_per_m 'will be in meters
+                                            End If
+
                                         End If
                                     End If
                                 End If
@@ -290,6 +321,13 @@ Module modCreateUci
                         End If
                         lTable = lOperation.Tables.Item("GEN-INFO")
                         lTable.Parms("LSID").Value = lLandUse.Description
+                        If pMetricUnits Then
+                            lTable.Parms("IUNITS").Value = 2
+                            lTable.Parms("OUNITS").Value = 2
+                        Else
+                            lTable.Parms("IUNITS").Value = 1
+                            lTable.Parms("OUNITS").Value = 1
+                        End If
                         lTable = lOperation.Tables.Item("IWAT-PARM2")
                         lTable.Parms("SLSUR").Value = SignificantDigits(CompositeSlope(lLandUse.Reach.SegmentId, pWatershed.LandUses), 3)
                         If lLandUse.Slope <= 0 Then
@@ -312,7 +350,12 @@ Module modCreateUci
                                 If lTimeseries IsNot Nothing Then
                                     If lTimeseries.Attributes.GetValue("ELEV") IsNot Nothing Then
                                         If IsNumeric(lTimeseries.Attributes.GetValue("ELEV")) Then
-                                            lGageElev = CSng(lTimeseries.Attributes.GetValue("ELEV")) * 3.281 'will be in meters
+                                            If pMetricUnits Then
+                                                lGageElev = CSng(lTimeseries.Attributes.GetValue("ELEV"))
+                                            Else
+                                                lGageElev = CSng(lTimeseries.Attributes.GetValue("ELEV")) * ft_per_m 'will be in meters
+                                            End If
+
                                         End If
                                     End If
                                 End If
@@ -341,6 +384,13 @@ Module modCreateUci
             lTable.Parms("HYDRFG").Value = 1
             lTable = lOperation.Tables.Item("GEN-INFO")
             Dim lStr As String = pWatershed.Reaches(lOrder).Name
+            If pMetricUnits Then
+                lTable.Parms("IUNITS").Value = 2
+                lTable.Parms("OUNITS").Value = 2
+            Else
+                lTable.Parms("IUNITS").Value = 1
+                lTable.Parms("OUNITS").Value = 1
+            End If
             Dim lLen As Integer = lStr.Length
             If lLen < 19 And _
               (Not IsNumeric(pWatershed.Reaches(lOrder).Id) Or _
@@ -366,10 +416,24 @@ Module modCreateUci
             lTable.Parms("LEN").Value = pWatershed.Reaches(lOrder).Length
             lTable.Parms("DELTH").Value = System.Math.Round(pWatershed.Reaches(lOrder).DeltH, 0)
             'set initial volume in reach in ac-ft to 75% of length in miles * mean width in feet * mean depth in feet
+            'set initial volume in reach in Mm^3 to 75% of length in km * mean width in m * mean depth in m
             lTable = lOperation.Tables.Item("HYDR-INIT")
-            lTable.Parms("VOL").Value = CInt(pWatershed.Reaches(lOrder).Length * ft_per_mi *
+            Dim lFmt2 As String = "#0.00"
+            If pMetricUnits Then
+                'Volume in Mm^3
+                lTable.Parms("VOL").Value = Format(pWatershed.Reaches(lOrder).Length * m_per_km *
+                                             pWatershed.Reaches(lOrder).Depth *
+                                             pWatershed.Reaches(lOrder).Width / 1000000.0 * 0.75, lFmt2)
+
+            Else
+                'volume in ac-ft
+                lTable.Parms("VOL").Value = CInt(pWatershed.Reaches(lOrder).Length * ft_per_mi *
                                              pWatershed.Reaches(lOrder).Depth *
                                              pWatershed.Reaches(lOrder).Width / sqft_per_ac * 0.75)
+
+            End If
+
+
             If pDoWetlands AndAlso lWetReach Then
                 'this is a wetland reach
                 lTable.Parms("VOL").Value = System.Math.Round(lOperation.FTable.Volume(3), 0)  'use the volume at the nominal surface area of the wetland
@@ -460,7 +524,12 @@ Module modCreateUci
                 lMassLink.Source.VolId = 0
                 lMassLink.Source.Group = "PWATER"
                 lMassLink.Source.Member = "PERO"
-                lMassLink.MFact = 0.0833333
+                If pMetricUnits Then
+                    lMassLink.MFact = 0.000001
+                Else
+                    lMassLink.MFact = 0.0833333
+                End If
+
                 lMassLink.Tran = ""
                 lMassLink.Target.VolName = "RCHRES"
                 lMassLink.Target.VolId = 0
@@ -473,7 +542,11 @@ Module modCreateUci
                 lMassLink.Source.VolId = 0
                 lMassLink.Source.Group = "IWATER"
                 lMassLink.Source.Member = "SURO"
-                lMassLink.MFact = 0.0833333
+                If pMetricUnits Then
+                    lMassLink.MFact = 0.00001
+                Else
+                    lMassLink.MFact = 0.0833333
+                End If
                 lMassLink.Tran = ""
                 lMassLink.Target.VolName = "RCHRES"
                 lMassLink.Target.VolId = 0
@@ -651,17 +724,10 @@ Module modCreateUci
         lFile.Unit = 24
         aUci.FilesBlock.Add(lFile)
 
-        lFile = New HspfFile
-        lFile.Comment = ""
-        lFile.Name = aScenario & ".out"
-        lFile.Typ = " "
-        lFile.Unit = 91
-        aUci.FilesBlock.Add(lFile)
-
-
         Dim lOutput As atcTimeseriesSource = aDataSources(0)
         If lOutput.Name.Length > 0 Then
             lFile = New HspfFile
+            lFile.Comment = "***WDM file to save model output time series"
             lFile.Name = RelativeFilename(lOutput.Specification, CurDir)
             lFile.Typ = lOutput.Name.Substring(lOutput.Name.LastIndexOf(":") + 1) & 1
             lFile.Unit = 25
@@ -671,6 +737,7 @@ Module modCreateUci
         For lWdmIndex As Integer = 1 To aDataSources.Count - 1
             If Not aDataSources(lWdmIndex) Is Nothing AndAlso aDataSources(lWdmIndex).Name.Length > 0 Then
                 lFile = New HspfFile
+                lFile.Comment = "***WDM file that contains the meteorological data"
                 lFile.Name = RelativeFilename(aDataSources(lWdmIndex).Specification, CurDir)
                 With aDataSources(lWdmIndex)
                     lFile.Typ = .Name.Substring(.Name.LastIndexOf(":") + 1) & lWdmIndex + 1
@@ -1000,13 +1067,20 @@ Module modCreateUci
         If lOutletId > 0 Then 'found watershed outlet
             Dim lWdmId, lNewDsn As Integer
             aUci.AddOutputWDMDataSet("RCH" & lOutletId, "FLOW", 100, lWdmId, lNewDsn)
+            If pMetricUnits Then
+                aUci.AddExtTarget("RCHRES", lOutletId, "HYDR", "RO", 1, 1, 1.0#, "AVER", "WDM" & CStr(lWdmId), lNewDsn, "FLOW", 1, "METR", "AGGR", "REPL")
+            Else
+                aUci.AddExtTarget("RCHRES", lOutletId, "HYDR", "RO", 1, 1, 1.0#, "AVER", "WDM" & CStr(lWdmId), lNewDsn, "FLOW", 1, "ENGL", "AGGR", "REPL")
+            End If
 
-            aUci.AddExtTarget("RCHRES", lOutletId, "HYDR", "RO", 1, 1, 1.0#, "AVER", "WDM" & CStr(lWdmId), lNewDsn, "FLOW", 1, "ENGL", "AGGR", "REPL")
+
         End If
     End Sub
 
     Private Function DefaultLSURFromSLSUR(ByRef aSlopeSurface As Double) As Double
+
         Dim lLengthSurface As Double
+
         If aSlopeSurface < 0.005 Then
             lLengthSurface = 500
         ElseIf aSlopeSurface < 0.01 Then
@@ -1022,6 +1096,11 @@ Module modCreateUci
         Else
             lLengthSurface = 150
         End If
+
+        If pMetricUnits Then
+            lLengthSurface = Math.Round(lLengthSurface / ft_per_m)
+        End If
+
         Return lLengthSurface
     End Function
 
@@ -1029,25 +1108,78 @@ Module modCreateUci
         'add file name to files block
         Dim lNewFile As New HspfFile
         lNewFile.Name = aScenario & ".hbn"
+        lNewFile.Comment = "***Binary file for saving model output"
         lNewFile.Typ = "BINO"
         lNewFile.Unit = 92
         aUci.FilesBlock.Add(lNewFile)
 
         'update bin output units
         Dim lOperation As HspfOperation
+
         For Each lOperation In aUci.OpnBlks.Item("PERLND").Ids
-            lOperation.Tables.Item("GEN-INFO").ParmValue("BUNIT1") = 92
+            If pMetricUnits Then
+                lOperation.Tables.Item("GEN-INFO").ParmValue("BUNIT2") = 92
+            Else
+                lOperation.Tables.Item("GEN-INFO").ParmValue("BUNIT1") = 92
+            End If
         Next lOperation
         For Each lOperation In aUci.OpnBlks.Item("IMPLND").Ids
-            lOperation.Tables.Item("GEN-INFO").ParmValue("BUNIT1") = 92
+            If pMetricUnits Then
+                lOperation.Tables.Item("GEN-INFO").ParmValue("BUNIT2") = 92
+            Else
+                lOperation.Tables.Item("GEN-INFO").ParmValue("BUNIT1") = 92
+            End If
         Next lOperation
         For Each lOperation In aUci.OpnBlks.Item("RCHRES").Ids
-            lOperation.Tables.Item("GEN-INFO").ParmValue("BUNITE") = 92
+            If pMetricUnits Then
+                lOperation.Tables.Item("GEN-INFO").ParmValue("BUNITM") = 92
+
+            Else
+                lOperation.Tables.Item("GEN-INFO").ParmValue("BUNITE") = 92
+            End If
         Next lOperation
         'add binary-info tables
         aUci.OpnBlks.Item("PERLND").AddTableForAll("BINARY-INFO", "PERLND")
         aUci.OpnBlks.Item("IMPLND").AddTableForAll("BINARY-INFO", "IMPLND")
         aUci.OpnBlks.Item("RCHRES").AddTableForAll("BINARY-INFO", "RCHRES")
+    End Sub
+    Private Sub CreateTextOutput(ByRef aUci As HspfUci, ByRef aScenario As String)
+        'add file name to files block
+        Dim lNewFile As New HspfFile
+        lNewFile.Name = aScenario & ".out"
+        lNewFile.Comment = "***Model output in a text format"
+        lNewFile.Typ = ""
+        lNewFile.Unit = 91
+        aUci.FilesBlock.Add(lNewFile)
+
+        'update output units
+
+        Dim lOperation As HspfOperation
+        For Each lOperation In aUci.OpnBlks.Item("PERLND").Ids
+            If pMetricUnits Then
+                lOperation.Tables.Item("GEN-INFO").ParmValue("PUNIT2") = 91
+            Else
+                lOperation.Tables.Item("GEN-INFO").ParmValue("PUNIT1") = 91
+            End If
+        Next lOperation
+        For Each lOperation In aUci.OpnBlks.Item("IMPLND").Ids
+            If pMetricUnits Then
+                lOperation.Tables.Item("GEN-INFO").ParmValue("PUNIT2") = 91
+            Else
+                lOperation.Tables.Item("GEN-INFO").ParmValue("PUNIT1") = 91
+            End If
+        Next lOperation
+        For Each lOperation In aUci.OpnBlks.Item("RCHRES").Ids
+            If pMetricUnits Then
+                lOperation.Tables.Item("GEN-INFO").ParmValue("PUNITM") = 91
+            Else
+                lOperation.Tables.Item("GEN-INFO").ParmValue("PUNITE") = 91
+            End If
+        Next lOperation
+        'add print-info tables
+        aUci.OpnBlks.Item("PERLND").AddTableForAll("PRINT-INFO", "PERLND")
+        aUci.OpnBlks.Item("IMPLND").AddTableForAll("PRINT-INFO", "IMPLND")
+        aUci.OpnBlks.Item("RCHRES").AddTableForAll("PRINT-INFO", "RCHRES")
     End Sub
 
     Private Sub SetDefaultMassLink(ByVal aUci As HspfUci, ByVal aDefUci As HspfUci)
@@ -1098,7 +1230,12 @@ Module modCreateUci
         lMetSegRecord.Name = aMember
         lMetSegRecord.Source.VolName = aMetWdmId
         lMetSegRecord.Sgapstrg = ""
-        lMetSegRecord.Ssystem = "ENGL"
+        If pMetricUnits Then
+            lMetSegRecord.Ssystem = "METR"
+        Else
+            lMetSegRecord.Ssystem = "ENGL"
+        End If
+
         lMetSegRecord.Tran = "SAME"
         lMetSegRecord.Source.VolId = aVolId
         lMetSegRecord.Source.Member = aMember
@@ -1128,7 +1265,12 @@ Module modCreateUci
                         lMetSegRecord.Sgapstrg = ""
                     End If
                 End With
-                lMetSegRecord.Ssystem = "ENGL"
+                If pMetricUnits Then
+                    lMetSegRecord.Ssystem = "METR"
+                Else
+                    lMetSegRecord.Ssystem = "ENGL"
+                End If
+
                 lMetSegRecord.Tran = "SAME"
                 'make sure this dsn exists
                 If Not aUci.GetDataSetFromDsn(lMetSegRecord.Source.VolName.Substring(3), lMetSegRecord.Source.VolId) Is Nothing Then
