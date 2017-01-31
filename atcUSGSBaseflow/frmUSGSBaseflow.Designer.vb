@@ -39,7 +39,6 @@ Partial Class frmUSGSBaseflow
         Me.toolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.chkMethodBFIStandard = New System.Windows.Forms.CheckBox()
         Me.chkMethodBFIModified = New System.Windows.Forms.CheckBox()
-        Me.chkBFISymbols = New System.Windows.Forms.CheckBox()
         Me.chkMethodBFLOW = New System.Windows.Forms.CheckBox()
         Me.chkMethodTwoPRDF = New System.Windows.Forms.CheckBox()
         Me.txtDFParamBFImax = New System.Windows.Forms.TextBox()
@@ -88,14 +87,11 @@ Partial Class frmUSGSBaseflow
         Me.lblBFImax = New System.Windows.Forms.Label()
         Me.txtDFParamBeta = New System.Windows.Forms.TextBox()
         Me.lblBeta = New System.Windows.Forms.Label()
-        Me.mnuDFTwoParam = New System.Windows.Forms.MenuStrip()
-        Me.TwoParameterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuDFTwoParamCustom = New System.Windows.Forms.ToolStripMenuItem()
-        Me.AutomaticToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuDFTwoParamEck = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuDFTwoParamCF = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuTwoParamEstMethod = New System.Windows.Forms.ToolStripMenuItem()
         Me.lblRC = New System.Windows.Forms.Label()
+        Me.lblTwoParam = New System.Windows.Forms.Label()
+        Me.rdo2PSpecify = New System.Windows.Forms.RadioButton()
+        Me.rdo2PDefault = New System.Windows.Forms.RadioButton()
+        Me.txt2PDefaultNotice = New System.Windows.Forms.TextBox()
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
@@ -103,7 +99,6 @@ Partial Class frmUSGSBaseflow
         Me.gbGraph.SuspendLayout()
         Me.gbBFI.SuspendLayout()
         Me.gbDFParam.SuspendLayout()
-        Me.mnuDFTwoParam.SuspendLayout()
         Me.SuspendLayout()
         '
         'txtDrainageArea
@@ -254,18 +249,6 @@ Partial Class frmUSGSBaseflow
         Me.toolTip1.SetToolTip(Me.chkMethodBFIModified, "Modified Method")
         Me.chkMethodBFIModified.UseVisualStyleBackColor = True
         '
-        'chkBFISymbols
-        '
-        Me.chkBFISymbols.AutoSize = True
-        Me.chkBFISymbols.Location = New System.Drawing.Point(6, 105)
-        Me.chkBFISymbols.Name = "chkBFISymbols"
-        Me.chkBFISymbols.Size = New System.Drawing.Size(65, 17)
-        Me.chkBFISymbols.TabIndex = 8
-        Me.chkBFISymbols.Text = "Symbols"
-        Me.toolTip1.SetToolTip(Me.chkBFISymbols, "Use symbols in output file")
-        Me.chkBFISymbols.UseVisualStyleBackColor = True
-        Me.chkBFISymbols.Visible = False
-        '
         'chkMethodBFLOW
         '
         Me.chkMethodBFLOW.AutoSize = True
@@ -292,10 +275,11 @@ Partial Class frmUSGSBaseflow
         '
         Me.txtDFParamBFImax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDFParamBFImax.Location = New System.Drawing.Point(176, 87)
+        Me.txtDFParamBFImax.Location = New System.Drawing.Point(195, 99)
         Me.txtDFParamBFImax.Name = "txtDFParamBFImax"
-        Me.txtDFParamBFImax.Size = New System.Drawing.Size(69, 20)
+        Me.txtDFParamBFImax.Size = New System.Drawing.Size(53, 20)
         Me.txtDFParamBFImax.TabIndex = 11
+        Me.txtDFParamBFImax.Text = "0.8"
         Me.txtDFParamBFImax.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         Me.toolTip1.SetToolTip(Me.txtDFParamBFImax, "a common value is 0.8")
         '
@@ -303,10 +287,11 @@ Partial Class frmUSGSBaseflow
         '
         Me.txtDFParamRC.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDFParamRC.Location = New System.Drawing.Point(177, 61)
+        Me.txtDFParamRC.Location = New System.Drawing.Point(195, 73)
         Me.txtDFParamRC.Name = "txtDFParamRC"
-        Me.txtDFParamRC.Size = New System.Drawing.Size(68, 20)
+        Me.txtDFParamRC.Size = New System.Drawing.Size(54, 20)
         Me.txtDFParamRC.TabIndex = 10
+        Me.txtDFParamRC.Text = "0.978"
         Me.txtDFParamRC.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         Me.toolTip1.SetToolTip(Me.txtDFParamRC, "a common value is 0.925")
         '
@@ -591,7 +576,6 @@ Partial Class frmUSGSBaseflow
         Me.gbBFI.Controls.Add(Me.rdoBFIReportbyWaterYear)
         Me.gbBFI.Controls.Add(Me.rdoBFIReportbyCalendarYear)
         Me.gbBFI.Controls.Add(Me.Label2)
-        Me.gbBFI.Controls.Add(Me.chkBFISymbols)
         Me.gbBFI.Controls.Add(Me.txtK)
         Me.gbBFI.Controls.Add(Me.txtF)
         Me.gbBFI.Controls.Add(Me.txtN)
@@ -600,7 +584,7 @@ Partial Class frmUSGSBaseflow
         Me.gbBFI.Controls.Add(Me.lblN)
         Me.gbBFI.Location = New System.Drawing.Point(130, 61)
         Me.gbBFI.Name = "gbBFI"
-        Me.gbBFI.Size = New System.Drawing.Size(254, 129)
+        Me.gbBFI.Size = New System.Drawing.Size(254, 114)
         Me.gbBFI.TabIndex = 30
         Me.gbBFI.TabStop = False
         Me.gbBFI.Text = "BFI Parameters"
@@ -700,16 +684,19 @@ Partial Class frmUSGSBaseflow
         '
         Me.gbDFParam.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbDFParam.Controls.Add(Me.txt2PDefaultNotice)
+        Me.gbDFParam.Controls.Add(Me.rdo2PDefault)
+        Me.gbDFParam.Controls.Add(Me.rdo2PSpecify)
+        Me.gbDFParam.Controls.Add(Me.lblTwoParam)
         Me.gbDFParam.Controls.Add(Me.txtDFParamBFImax)
         Me.gbDFParam.Controls.Add(Me.lblBFImax)
         Me.gbDFParam.Controls.Add(Me.txtDFParamBeta)
         Me.gbDFParam.Controls.Add(Me.lblBeta)
         Me.gbDFParam.Controls.Add(Me.txtDFParamRC)
-        Me.gbDFParam.Controls.Add(Me.mnuDFTwoParam)
         Me.gbDFParam.Controls.Add(Me.lblRC)
-        Me.gbDFParam.Location = New System.Drawing.Point(133, 196)
+        Me.gbDFParam.Location = New System.Drawing.Point(130, 181)
         Me.gbDFParam.Name = "gbDFParam"
-        Me.gbDFParam.Size = New System.Drawing.Size(251, 113)
+        Me.gbDFParam.Size = New System.Drawing.Size(254, 128)
         Me.gbDFParam.TabIndex = 31
         Me.gbDFParam.TabStop = False
         Me.gbDFParam.Text = "Digital Filter (DF) Parameters"
@@ -717,7 +704,7 @@ Partial Class frmUSGSBaseflow
         'lblBFImax
         '
         Me.lblBFImax.AutoSize = True
-        Me.lblBFImax.Location = New System.Drawing.Point(128, 90)
+        Me.lblBFImax.Location = New System.Drawing.Point(122, 102)
         Me.lblBFImax.Name = "lblBFImax"
         Me.lblBFImax.Size = New System.Drawing.Size(42, 13)
         Me.lblBFImax.TabIndex = 8
@@ -727,9 +714,9 @@ Partial Class frmUSGSBaseflow
         '
         Me.txtDFParamBeta.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDFParamBeta.Location = New System.Drawing.Point(177, 12)
+        Me.txtDFParamBeta.Location = New System.Drawing.Point(195, 12)
         Me.txtDFParamBeta.Name = "txtDFParamBeta"
-        Me.txtDFParamBeta.Size = New System.Drawing.Size(68, 20)
+        Me.txtDFParamBeta.Size = New System.Drawing.Size(53, 20)
         Me.txtDFParamBeta.TabIndex = 9
         Me.txtDFParamBeta.Text = "0.925"
         Me.txtDFParamBeta.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
@@ -739,78 +726,64 @@ Partial Class frmUSGSBaseflow
         Me.lblBeta.AutoSize = True
         Me.lblBeta.Location = New System.Drawing.Point(6, 15)
         Me.lblBeta.Name = "lblBeta"
-        Me.lblBeta.Size = New System.Drawing.Size(148, 13)
+        Me.lblBeta.Size = New System.Drawing.Size(183, 13)
         Me.lblBeta.TabIndex = 6
-        Me.lblBeta.Text = "One Parameter Filter Constant"
-        '
-        'mnuDFTwoParam
-        '
-        Me.mnuDFTwoParam.Dock = System.Windows.Forms.DockStyle.None
-        Me.mnuDFTwoParam.GripMargin = New System.Windows.Forms.Padding(-2)
-        Me.mnuDFTwoParam.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible
-        Me.mnuDFTwoParam.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TwoParameterToolStripMenuItem, Me.mnuTwoParamEstMethod})
-        Me.mnuDFTwoParam.Location = New System.Drawing.Point(3, 28)
-        Me.mnuDFTwoParam.Name = "mnuDFTwoParam"
-        Me.mnuDFTwoParam.Padding = New System.Windows.Forms.Padding(0)
-        Me.mnuDFTwoParam.Size = New System.Drawing.Size(267, 24)
-        Me.mnuDFTwoParam.TabIndex = 12
-        Me.mnuDFTwoParam.Text = "MenuStrip2"
-        '
-        'TwoParameterToolStripMenuItem
-        '
-        Me.TwoParameterToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuDFTwoParamCustom, Me.AutomaticToolStripMenuItem})
-        Me.TwoParameterToolStripMenuItem.Name = "TwoParameterToolStripMenuItem"
-        Me.TwoParameterToolStripMenuItem.Size = New System.Drawing.Size(99, 24)
-        Me.TwoParameterToolStripMenuItem.Text = "Two Parameter"
-        '
-        'mnuDFTwoParamCustom
-        '
-        Me.mnuDFTwoParamCustom.CheckOnClick = True
-        Me.mnuDFTwoParamCustom.Name = "mnuDFTwoParamCustom"
-        Me.mnuDFTwoParamCustom.Padding = New System.Windows.Forms.Padding(0)
-        Me.mnuDFTwoParamCustom.Size = New System.Drawing.Size(152, 20)
-        Me.mnuDFTwoParamCustom.Text = "User-specified"
-        '
-        'AutomaticToolStripMenuItem
-        '
-        Me.AutomaticToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuDFTwoParamEck, Me.mnuDFTwoParamCF})
-        Me.AutomaticToolStripMenuItem.Name = "AutomaticToolStripMenuItem"
-        Me.AutomaticToolStripMenuItem.Padding = New System.Windows.Forms.Padding(0)
-        Me.AutomaticToolStripMenuItem.Size = New System.Drawing.Size(152, 20)
-        Me.AutomaticToolStripMenuItem.Text = "Automatic"
-        '
-        'mnuDFTwoParamEck
-        '
-        Me.mnuDFTwoParamEck.CheckOnClick = True
-        Me.mnuDFTwoParamEck.Name = "mnuDFTwoParamEck"
-        Me.mnuDFTwoParamEck.Padding = New System.Windows.Forms.Padding(0)
-        Me.mnuDFTwoParamEck.Size = New System.Drawing.Size(182, 20)
-        Me.mnuDFTwoParamEck.Text = "Eckhardt Method"
-        '
-        'mnuDFTwoParamCF
-        '
-        Me.mnuDFTwoParamCF.CheckOnClick = True
-        Me.mnuDFTwoParamCF.Name = "mnuDFTwoParamCF"
-        Me.mnuDFTwoParamCF.Padding = New System.Windows.Forms.Padding(0)
-        Me.mnuDFTwoParamCF.Size = New System.Drawing.Size(182, 20)
-        Me.mnuDFTwoParamCF.Text = "Collischonn and Fan"
-        Me.mnuDFTwoParamCF.Visible = False
-        '
-        'mnuTwoParamEstMethod
-        '
-        Me.mnuTwoParamEstMethod.Enabled = False
-        Me.mnuTwoParamEstMethod.Name = "mnuTwoParamEstMethod"
-        Me.mnuTwoParamEstMethod.Size = New System.Drawing.Size(73, 24)
-        Me.mnuTwoParamEstMethod.Text = "(Eckhardt)"
+        Me.lblBeta.Text = "One Parameter Filter Constant (alpha)"
         '
         'lblRC
         '
         Me.lblRC.AutoSize = True
-        Me.lblRC.Location = New System.Drawing.Point(57, 64)
+        Me.lblRC.Location = New System.Drawing.Point(47, 76)
         Me.lblRC.Name = "lblRC"
-        Me.lblRC.Size = New System.Drawing.Size(114, 13)
+        Me.lblRC.Size = New System.Drawing.Size(117, 13)
         Me.lblRC.TabIndex = 7
-        Me.lblRC.Text = "Recession Constant, a"
+        Me.lblRC.Text = "Recession Constant (a)"
+        '
+        'lblTwoParam
+        '
+        Me.lblTwoParam.AutoSize = True
+        Me.lblTwoParam.Location = New System.Drawing.Point(6, 40)
+        Me.lblTwoParam.Name = "lblTwoParam"
+        Me.lblTwoParam.Size = New System.Drawing.Size(82, 13)
+        Me.lblTwoParam.TabIndex = 12
+        Me.lblTwoParam.Text = "Two Parameter:"
+        '
+        'rdo2PSpecify
+        '
+        Me.rdo2PSpecify.AutoSize = True
+        Me.rdo2PSpecify.Checked = True
+        Me.rdo2PSpecify.Location = New System.Drawing.Point(94, 38)
+        Me.rdo2PSpecify.Name = "rdo2PSpecify"
+        Me.rdo2PSpecify.Size = New System.Drawing.Size(60, 17)
+        Me.rdo2PSpecify.TabIndex = 13
+        Me.rdo2PSpecify.TabStop = True
+        Me.rdo2PSpecify.Text = "Specify"
+        Me.rdo2PSpecify.UseVisualStyleBackColor = True
+        '
+        'rdo2PDefault
+        '
+        Me.rdo2PDefault.AutoSize = True
+        Me.rdo2PDefault.Location = New System.Drawing.Point(160, 38)
+        Me.rdo2PDefault.Name = "rdo2PDefault"
+        Me.rdo2PDefault.Size = New System.Drawing.Size(59, 17)
+        Me.rdo2PDefault.TabIndex = 14
+        Me.rdo2PDefault.Text = "Default"
+        Me.rdo2PDefault.UseVisualStyleBackColor = True
+        '
+        'txt2PDefaultNotice
+        '
+        Me.txt2PDefaultNotice.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txt2PDefaultNotice.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txt2PDefaultNotice.Location = New System.Drawing.Point(6, 61)
+        Me.txt2PDefaultNotice.Multiline = True
+        Me.txt2PDefaultNotice.Name = "txt2PDefaultNotice"
+        Me.txt2PDefaultNotice.ReadOnly = True
+        Me.txt2PDefaultNotice.Size = New System.Drawing.Size(242, 61)
+        Me.txt2PDefaultNotice.TabIndex = 15
+        Me.txt2PDefaultNotice.Text = "Recession Constant (a) and BFImax are calculated by the program"
+        Me.txt2PDefaultNotice.Visible = False
         '
         'frmUSGSBaseflow
         '
@@ -845,8 +818,6 @@ Partial Class frmUSGSBaseflow
         Me.gbBFI.PerformLayout()
         Me.gbDFParam.ResumeLayout(False)
         Me.gbDFParam.PerformLayout()
-        Me.mnuDFTwoParam.ResumeLayout(False)
-        Me.mnuDFTwoParam.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -902,7 +873,6 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents lblK As System.Windows.Forms.Label
     Friend WithEvents chkMethodBFIModified As System.Windows.Forms.CheckBox
     Friend WithEvents chkMethodBFIStandard As System.Windows.Forms.CheckBox
-    Friend WithEvents chkBFISymbols As System.Windows.Forms.CheckBox
     Friend WithEvents rdoBFIReportbyWaterYear As System.Windows.Forms.RadioButton
     Friend WithEvents rdoBFIReportbyCalendarYear As System.Windows.Forms.RadioButton
     Friend WithEvents Label2 As System.Windows.Forms.Label
@@ -916,11 +886,8 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents lblBFImax As Windows.Forms.Label
     Friend WithEvents lblRC As Windows.Forms.Label
     Friend WithEvents lblBeta As Windows.Forms.Label
-    Friend WithEvents mnuDFTwoParam As Windows.Forms.MenuStrip
-    Friend WithEvents TwoParameterToolStripMenuItem As Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuDFTwoParamCustom As Windows.Forms.ToolStripMenuItem
-    Friend WithEvents AutomaticToolStripMenuItem As Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuDFTwoParamEck As Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuDFTwoParamCF As Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuTwoParamEstMethod As Windows.Forms.ToolStripMenuItem
+    Friend WithEvents rdo2PDefault As Windows.Forms.RadioButton
+    Friend WithEvents rdo2PSpecify As Windows.Forms.RadioButton
+    Friend WithEvents lblTwoParam As Windows.Forms.Label
+    Friend WithEvents txt2PDefaultNotice As Windows.Forms.TextBox
 End Class
