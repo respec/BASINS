@@ -248,14 +248,38 @@ Public Class frmUSGSBaseflow
         Dim lDFRC As Double = Double.NaN
         Dim lDFBFImax As Double = Double.NaN
         If chkMethodTwoPRDF.Checked Then
-            If Not Double.TryParse(txtDFParamRC.Text.Trim(), lDFRC) AndAlso
-                pTwoParamEstimationMethod <> clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT Then
-                lErrMsg &= "- TwoPRDF method needs a valid recession constant." & vbCrLf
-            End If
-            If Not Double.TryParse(txtDFParamBFImax.Text.Trim(), lDFBFImax) OrElse
-                Not (lDFBFImax > 0 AndAlso lDFBFImax < 1) Then
-                If pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM Then
-                    lErrMsg &= "- TwoPRDF method needs a valid BFImax." & vbCrLf
+            If pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT Then
+                'User choose Default parameter
+                If lErrMsg.Length = 0 Then
+                    'For default, use the Eckhardt method to estimate the RC and BFImax parameters
+                    'using the original time series subset to the user specified analysis duration
+                    Try
+                        Dim lDF2P As New clsBaseflow2PRDF()
+                        Dim lTsAnalysis As atcTimeseries = SubsetByDate(pDataGroup(0), lSDate, lEDate, Nothing)
+                        If lTsAnalysis IsNot Nothing Then
+                            lDF2P.CalculateBFImax_RC(lTsAnalysis)
+                            lDFRC = lDF2P.RC
+                            lDFBFImax = lDF2P.BFImax
+                        Else
+                            lDFRC = Double.NaN
+                            lDFBFImax = Double.NaN
+                            lErrMsg &= "- Default TwoPRDF method failed estimate RC and BFImax (check dataset)." & vbCrLf
+                        End If
+                    Catch ex As Exception
+                        lDFRC = Double.NaN
+                        lDFBFImax = Double.NaN
+                        lErrMsg &= "- Default TwoPRDF method failed estimate RC and BFImax (check dataset)." & vbCrLf
+                    End Try
+
+                End If
+            ElseIf pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM Then
+                'User choose Specify parameter
+                If Not Double.TryParse(txtDFParamRC.Text.Trim(), lDFRC) Then
+                    lErrMsg &= "- Custom TwoPRDF method needs a valid recession constant." & vbCrLf
+                End If
+                If Not Double.TryParse(txtDFParamBFImax.Text.Trim(), lDFBFImax) OrElse
+                    Not (lDFBFImax > 0 AndAlso lDFBFImax < 1) Then
+                    lErrMsg &= "- Custom TwoPRDF method needs a valid BFImax." & vbCrLf
                 End If
             End If
         End If

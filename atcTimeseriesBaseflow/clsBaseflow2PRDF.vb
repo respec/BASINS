@@ -297,7 +297,13 @@ Public Class clsBaseflow2PRDF
                     Return Nothing
                 End If
             Case ETWOPARAMESTIMATION.ECKHARDT, ETWOPARAMESTIMATION.NONE
-                CalculateBFImax_RC(aTS)
+                If Double.IsNaN(RC) OrElse Double.IsNaN(BFImax) Then
+                    CalculateBFImax_RC(aTS)
+                Else
+                    'RC and BFImax are provided via calculation (CalculateBFImax_RC)
+                    'using the full time series record, adjusted by the user specified
+                    'analysis duration
+                End If
             Case ETWOPARAMESTIMATION.CF
                 'CalculateBFImaxWithUserSpecified_a(aTS)
         End Select
