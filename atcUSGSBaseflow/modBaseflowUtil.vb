@@ -1014,7 +1014,7 @@ Public Module modBaseflowUtil
                 If lMethods.Contains(BFMethods.BFIStandard) OrElse lMethods.Contains(BFMethods.BFIModified) Then
                     lNDay = .GetValue(BFInputNames.BFINDayScreen, Double.NaN) '"BFINDay"
                     'Dim lBFIYearBasis As String = aArgs.GetValue(BFInputNames.BFIReportby, "") '"BFIReportby"
-                    lBFI_Notes = " " & "," & "BFI:" & ", ," & "Partition Length (N, days):" & lNDay & ";"
+                    lBFI_Notes = " " & "," & "BFI:" & ", ," & "Partition Length (N days):" & lNDay & ";"
                 End If
                 If lMethods.Contains(BFMethods.BFIStandard) Then
                     lFact = .GetValue(BFInputNames.BFITurnPtFrac, Double.NaN) '"BFIFrac"
