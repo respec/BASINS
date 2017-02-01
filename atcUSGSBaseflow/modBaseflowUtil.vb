@@ -400,7 +400,7 @@ Public Module modBaseflowUtil
                         ASCIIOriginal(lTsChunk, lMethod)
                     Next
                     Logger.Status("writing common format text output files for stream record " & lGroupCtr)
-                    ASCIICommon(lTsChunk)
+                    ASCIICommon(lTsChunk, aArgs)
                 End If
             End If
             'lStation.Message &= CalcBF.BF_Message.Trim()
@@ -425,6 +425,34 @@ Public Module modBaseflowUtil
             .SetValue("ReportGroupsAvailable", True)
             .SetValue("ReportFileSuffix", "fullspan")
             .SetValue("ForFullSpan", True)
+            lMethods = aArgs.GetValue(BFInputNames.BFMethods, Nothing)
+            .SetValue(BFInputNames.BFMethods, lMethods)
+            If lMethods.Contains(BFMethods.BFIStandard) Then
+                Dim lFrac = aArgs.GetValue(BFInputNames.BFITurnPtFrac, Double.NaN) '"BFIFrac"
+                .SetValue(BFInputNames.BFITurnPtFrac, lFrac)
+            End If
+            If lMethods.Contains(BFMethods.BFIModified) Then
+                Dim lK1Day = aArgs.GetValue(BFInputNames.BFIRecessConst, Double.NaN) '"BFIK1Day"
+                .SetValue(BFInputNames.BFIRecessConst, lK1Day) '"BFIK1Day"
+            End If
+            If lMethods.Contains(BFMethods.BFIStandard) OrElse lMethods.Contains(BFMethods.BFIModified) Then
+                Dim lNDay = aArgs.GetValue(BFInputNames.BFINDayScreen, Double.NaN) '"BFINDay"
+                .SetValue(BFInputNames.BFINDayScreen, lNDay) '"BFINDay"
+                Dim lBFIYearBasis As String = aArgs.GetValue(BFInputNames.BFIReportby, "") '"BFIReportby"
+                .SetValue(BFInputNames.BFIReportby, lBFIYearBasis) '"BFIReportby"
+            End If
+            If lMethods.Contains(BFMethods.BFLOW) Then
+                Dim lalpha = aArgs.GetValue(BFInputNames.BFLOWFilter, Double.NaN)
+                .SetValue(BFInputNames.BFLOWFilter, lalpha)
+            End If
+            If lMethods.Contains(BFMethods.TwoPRDF) Then
+                Dim lRC = aArgs.GetValue(BFInputNames.TwoPRDFRC, Double.NaN)
+                .SetValue(BFInputNames.TwoPRDFRC, lRC)
+                Dim lBFImax = aArgs.GetValue(BFInputNames.TwoPRDFBFImax, Double.NaN)
+                .SetValue(BFInputNames.TwoPRDFBFImax, lBFImax)
+                Dim lDF2PMethod = aArgs.GetValue(BFInputNames.TwoParamEstMethod, clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE)
+                .SetValue(BFInputNames.TwoParamEstMethod, lDF2PMethod)
+            End If
         End With
 
         Dim lTsFlowFullRange As atcTimeseries = Nothing
@@ -969,9 +997,63 @@ Public Module modBaseflowUtil
         Dim lTitleLine2 As String = "Station: " & lLocation & " " & lStaNam.Replace(",", " ")
         Dim lTitleLine3 As String = "Drainage area: " & DoubleToString(lDA, , "0.0") & " square miles"
         Dim lTitleLine4 As String = "(CFS: cubic feet per second; IN: flow per drainage area (inches); BFP: Base-Flow Percentage (ratio of base-flow to streamflow multiplied by 100)"
+        Dim lParameterNotes As String = ""
+        If args IsNot Nothing Then
+            Dim lFact As Double = Double.NaN
+            Dim lK1Day As Double = Double.NaN
+            Dim lNDay As Double = Double.NaN
+            Dim lalpha As Double = Double.NaN
+            Dim lRC As Double = Double.NaN
+            Dim lBFImax As Double = Double.NaN
+            Dim lDF2PMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE
+            Dim lBFI_Notes As String = ""
+            Dim lDF1P_Notes As String = ""
+            Dim lDF2P_Notes As String = ""
+            With args
+                Dim lMethods = .GetValue(BFInputNames.BFMethods, Nothing)
+                If lMethods.Contains(BFMethods.BFIStandard) OrElse lMethods.Contains(BFMethods.BFIModified) Then
+                    lNDay = .GetValue(BFInputNames.BFINDayScreen, Double.NaN) '"BFINDay"
+                    'Dim lBFIYearBasis As String = aArgs.GetValue(BFInputNames.BFIReportby, "") '"BFIReportby"
+                    lBFI_Notes = " " & "," & "BFI:" & ", ," & "Partition Length (N, days):" & lNDay & ";"
+                End If
+                If lMethods.Contains(BFMethods.BFIStandard) Then
+                    lFact = .GetValue(BFInputNames.BFITurnPtFrac, Double.NaN) '"BFIFrac"
+                    lBFI_Notes &= "Turning Point Test Factor (F):" & lFact & ";"
+                End If
+                If lMethods.Contains(BFMethods.BFIModified) Then
+                    lK1Day = .GetValue(BFInputNames.BFIRecessConst, Double.NaN) '"BFIK1Day"
+                    lBFI_Notes &= "Daily Recession Index (K):" & lK1Day
+                End If
+                If lMethods.Contains(BFMethods.BFLOW) Then
+                    lalpha = .GetValue(BFInputNames.BFLOWFilter, Double.NaN)
+                    lDF1P_Notes = " " & "," & "DF-One Param:" & ", ," & "Filter Constant (alpha):" & lalpha
+                End If
+                If lMethods.Contains(BFMethods.TwoPRDF) Then
+                    lRC = .GetValue(BFInputNames.TwoPRDFRC, Double.NaN)
+                    lBFImax = .GetValue(BFInputNames.TwoPRDFBFImax, Double.NaN)
+                    lDF2PMethod = .GetValue(BFInputNames.TwoParamEstMethod, clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE)
+                    lDF2P_Notes = " " & "," & "DF-Two Param:" & ", ," & "Recession Constant (a):" & lRC & "; BFImax:" & lBFImax
+                End If
+            End With
+            If Not String.IsNullOrEmpty(lBFI_Notes) OrElse Not String.IsNullOrEmpty(lDF1P_Notes) OrElse Not String.IsNullOrEmpty(lDF2P_Notes) Then
+                lParameterNotes = "Parameter Specified:" & vbCrLf
+                If Not String.IsNullOrEmpty(lBFI_Notes) Then
+                    lParameterNotes &= lBFI_Notes & vbCrLf
+                End If
+                If Not String.IsNullOrEmpty(lDF1P_Notes) Then
+                    lParameterNotes &= lDF1P_Notes & vbCrLf
+                End If
+                If Not String.IsNullOrEmpty(lDF2P_Notes) Then
+                    lParameterNotes &= lDF2P_Notes & vbCrLf
+                End If
+            End If
+        End If
 
         Dim lSW As New IO.StreamWriter(lFileDailySum, False)
         lSW.WriteLine(lTitleLine1) : lSW.WriteLine(lTitleLine2) : lSW.WriteLine(lTitleLine3) : lSW.WriteLine(lTitleLine4)
+        If Not String.IsNullOrEmpty(lParameterNotes) Then
+            lSW.Write(lParameterNotes)
+        End If
         lSW.WriteLine(lTableHeader.ToString)
         lSW.WriteLine(lTableToReport.ToString)
         lSW.Flush()
@@ -995,6 +1077,9 @@ Public Module modBaseflowUtil
         lTitleLine1 = lTitleLine1.Replace("daily", "monthly")
         lTitleLine4 = "(CFS: average flow for the month (cubic feet per second); IN: flow per drainage area (inches); BFP: Base-Flow Percentage (ratio of base-flow to streamflow multiplied by 100)"
         lSW.WriteLine(lTitleLine1) : lSW.WriteLine(lTitleLine2) : lSW.WriteLine(lTitleLine3) : lSW.WriteLine(lTitleLine4)
+        If Not String.IsNullOrEmpty(lParameterNotes) Then
+            lSW.Write(lParameterNotes)
+        End If
         lSW.Write(lTableHeader.ToString)
         lSW.WriteLine(lTableToReport.ToString)
         lSW.Flush()
@@ -1018,6 +1103,9 @@ Public Module modBaseflowUtil
         lTitleLine1 = "Groundwater Toolbox annual output for hydrograph separation (calendar year January 1-December 31)"
         lTitleLine4 = "(CFS: average flow for the year (cubic feet per second); IN: flow per drainage area (inches); BFP: Base-Flow Percentage (ratio of base-flow to streamflow multiplied by 100)"
         lSW.WriteLine(lTitleLine1) : lSW.WriteLine(lTitleLine2) : lSW.WriteLine(lTitleLine3) : lSW.WriteLine(lTitleLine4)
+        If Not String.IsNullOrEmpty(lParameterNotes) Then
+            lSW.Write(lParameterNotes)
+        End If
         lSW.WriteLine(lTableHeader.ToString)
         lSW.WriteLine(lTableToReport.ToString)
         lSW.Flush()
@@ -1081,6 +1169,9 @@ Public Module modBaseflowUtil
         lSW = New System.IO.StreamWriter(lFileDuration, False)
         lSW.WriteLine(lTitleLine1) : lSW.WriteLine(lTitleLine2) : lSW.WriteLine(lTitleLine3)
         lSW.WriteLine(lTitleLine4) : lSW.WriteLine(lTitleLine5) : lSW.WriteLine(lTitleLine6)
+        If Not String.IsNullOrEmpty(lParameterNotes) Then
+            lSW.Write(lParameterNotes)
+        End If
 
         lSW.WriteLine("****   Daily Duration Table  ****")
         lTableToReport = ASCIICommonDurationTable(lTsGroupStreamFlow,
