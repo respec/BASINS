@@ -286,7 +286,7 @@ Public Class frmUSGSBaseflow
             End If
             If pMethods.Contains(BFMethods.BFIStandard) OrElse pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue(BFInputNames.BFINDayScreen, lNDay) '"BFINDay"
-                Args.SetValue(BFInputNames.BFIUseSymbol, (chkBFISymbols.Checked)) '"BFIUseSymbol"
+                'Args.SetValue(BFInputNames.BFIUseSymbol, (chkBFISymbols.Checked)) '"BFIUseSymbol"
                 Dim lBFIYearBasis As String = BFInputNames.BFIReportbyCY '"Calendar"
                 If rdoBFIReportbyWaterYear.Checked Then
                     lBFIYearBasis = BFInputNames.BFIReportbyWY '"Water"
@@ -547,7 +547,7 @@ Public Class frmUSGSBaseflow
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", chkMethodBFIModified.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFLOW", chkMethodBFLOW.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodTwoPRDF", chkMethodTwoPRDF.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
+        'SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "DFTwoParamEstMethod", pTwoParamEstimationMethod.ToString())
 
         OutputDir = txtOutputDir.Text.Trim()
@@ -1166,7 +1166,7 @@ Public Class frmUSGSBaseflow
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFIModified", chkMethodBFIModified.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodBFLOW", chkMethodBFLOW.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "MethodTwoPRDF", chkMethodTwoPRDF.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
+        'SaveSetting("atcUSGSBaseflow", "Defaults", "BFISymbols", chkBFISymbols.Checked)
         SaveSetting("atcUSGSBaseflow", "Defaults", "DFTwoParamEstMethod", pTwoParamEstimationMethod.ToString())
 
         If pDataGroup IsNot Nothing Then
@@ -1214,14 +1214,14 @@ Public Class frmUSGSBaseflow
         End If
         If GetSetting("atcUSGSBaseflow", "Defaults", "MethodTwoPRDF", "False") = "True" Then
             chkMethodTwoPRDF.Checked = True
-            Dim lparamEstMethod As String = GetSetting("atcUSGSBaseflow", "Defaults", "DFTwoParamEstMethod", clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT)
+            Dim lparamEstMethod As String = GetSetting("atcUSGSBaseflow", "Defaults", "DFTwoParamEstMethod", clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM)
             Select Case lparamEstMethod
                 Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT.ToString(), "NONE", "None", "none"
-                    mnuDFTwoParamEck.PerformClick()
+                    rdo2PDefault.Checked = True
                 Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.CF.ToString()
-                    mnuDFTwoParamCF.PerformClick()
+                    'mnuDFTwoParamCF.PerformClick()
                 Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM.ToString()
-                    mnuDFTwoParamCustom.PerformClick()
+                    rdo2PSpecify.Checked = True
             End Select
         End If
         If chkMethodBFIStandard.Checked OrElse chkMethodBFIModified.Checked Then
@@ -1409,9 +1409,13 @@ Public Class frmUSGSBaseflow
             lblBeta.Enabled = chkMethodBFLOW.Checked
 
             If chkMethodTwoPRDF.Checked Then
-                mnuDFTwoParam.Enabled = True
+                'mnuDFTwoParam.Enabled = True
+                txtDFParamRC.Enabled = True
+                txtDFParamBFImax.Enabled = True
+                lblRC.Enabled = True
+                lblBFImax.Enabled = True
             Else
-                mnuDFTwoParam.Enabled = False
+                'mnuDFTwoParam.Enabled = False
                 txtDFParamRC.Enabled = False
                 txtDFParamBFImax.Enabled = False
                 lblRC.Enabled = False
@@ -1462,50 +1466,22 @@ Public Class frmUSGSBaseflow
         End If
     End Sub
 
-    Private Sub mnuDFTwoParam_Click(sender As Object, e As EventArgs) Handles mnuDFTwoParamCustom.Click,
-                                                                              mnuDFTwoParamEck.Click,
-                                                                              mnuDFTwoParamCF.Click
-        Dim lmethodname As String = sender.name.substring("mnuDFTwoParam".Length)
-        mnuDFTwoParamResetCheckStates(lmethodname)
-        Select Case lmethodname
-            Case "Custom"
-                lblBFImax.Enabled = True
-                lblRC.Enabled = True
-                txtDFParamRC.Enabled = True
-                txtDFParamBFImax.Enabled = True
-                pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM
-                mnuTwoParamEstMethod.Text = "(Custom)"
-            Case "Eck"
-                txtDFParamRC.Text = ""
-                txtDFParamBFImax.Text = ""
-                lblBFImax.Enabled = False
-                lblRC.Enabled = False
-                txtDFParamRC.Enabled = False
-                txtDFParamBFImax.Enabled = False
-                pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
-                mnuTwoParamEstMethod.Text = "(Eckhardt)"
-            Case "CF"
-                lblRC.Enabled = True
-                txtDFParamRC.Enabled = True
-                lblBFImax.Enabled = False
-                txtDFParamBFImax.Enabled = False
-                txtDFParamBFImax.Text = ""
-                pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CF
-                mnuTwoParamEstMethod.Text = "(Collischonn and Fan)"
-        End Select
-    End Sub
-
-    Private Sub mnuDFTwoParamResetCheckStates(ByVal aCheckedMethod As String)
-        Select Case aCheckedMethod
-            Case "Custom"
-                mnuDFTwoParamCF.CheckState = CheckState.Unchecked
-                mnuDFTwoParamEck.CheckState = CheckState.Unchecked
-            Case "Eck"
-                mnuDFTwoParamCF.CheckState = CheckState.Unchecked
-                mnuDFTwoParamCustom.CheckState = CheckState.Unchecked
-            Case "CF"
-                mnuDFTwoParamEck.CheckState = CheckState.Unchecked
-                mnuDFTwoParamCustom.CheckState = CheckState.Unchecked
-        End Select
+    Private Sub rdo2P_CheckedChanged(sender As Object, e As EventArgs) Handles rdo2PSpecify.CheckedChanged,
+                                                                               rdo2PDefault.CheckedChanged
+        If rdo2PSpecify.Checked Then
+            txt2PDefaultNotice.Visible = False
+            lblBFImax.Enabled = True
+            lblRC.Enabled = True
+            txtDFParamRC.Enabled = True
+            txtDFParamBFImax.Enabled = True
+            pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM
+        Else
+            txt2PDefaultNotice.Visible = True
+            lblBFImax.Enabled = False
+            lblRC.Enabled = False
+            txtDFParamRC.Enabled = False
+            txtDFParamBFImax.Enabled = False
+            pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
+        End If
     End Sub
 End Class
