@@ -890,7 +890,7 @@ Public Class clsBatchBFSpec
                             Dim lFlowEnd As Double = lTsFlow.Dates.Value(lTsFlow.numValues)
                             'Calculate overall RC and BFImax for the DF2P analysis using the full data record
                             'over the user specified analysis duration
-                            Dim lMethods = lStation.BFInputs.GetValue(BFBatchInputNames.BFMethod)
+                            Dim lMethods = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
                             If lMethods.Contains(atcTimeseriesBaseflow.BFMethods.TwoPRDF) Then
                                 Dim lParamEstMode = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.TwoParamEstMethod,
                                                                                atcTimeseriesBaseflow.clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM)
@@ -975,7 +975,7 @@ Public Class clsBatchBFSpec
                                         OutputFilenameRoot &= "_period_" & lCtr.ToString()
                                     End If
                                     MethodsLastDone = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
-                                    ASCIICommon(lTsChunk)
+                                    ASCIICommon(lTsChunk, lStation.BFInputs)
                                 End If
                                 lStation.Message &= CalcBF.BF_Message.Trim()
                                 lTsFlowGroup.Clear()
@@ -990,6 +990,35 @@ Public Class clsBatchBFSpec
                                 .SetValue("ReportGroupsAvailable", True)
                                 .SetValue("ReportFileSuffix", "fullspan")
                                 .SetValue("ForFullSpan", True)
+
+                                'passing in parameter information for common ascii report generation
+                                .SetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods, lMethods)
+                                If lMethods.Contains(atcTimeseriesBaseflow.BFMethods.BFIStandard) Then
+                                    Dim lFrac = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFITurnPtFrac, Double.NaN) '"BFIFrac"
+                                    .SetValue(atcTimeseriesBaseflow.BFInputNames.BFITurnPtFrac, lFrac)
+                                End If
+                                If lMethods.Contains(atcTimeseriesBaseflow.BFMethods.BFIModified) Then
+                                    Dim lK1Day = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFIRecessConst, Double.NaN) '"BFIK1Day"
+                                    .SetValue(atcTimeseriesBaseflow.BFInputNames.BFIRecessConst, lK1Day) '"BFIK1Day"
+                                End If
+                                If lMethods.Contains(atcTimeseriesBaseflow.BFMethods.BFIStandard) OrElse lMethods.Contains(atcTimeseriesBaseflow.BFMethods.BFIModified) Then
+                                    Dim lNDay = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFINDayScreen, Double.NaN) '"BFINDay"
+                                    .SetValue(atcTimeseriesBaseflow.BFInputNames.BFINDayScreen, lNDay) '"BFINDay"
+                                    Dim lBFIYearBasis As String = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFIReportby, "") '"BFIReportby"
+                                    .SetValue(atcTimeseriesBaseflow.BFInputNames.BFIReportby, lBFIYearBasis) '"BFIReportby"
+                                End If
+                                If lMethods.Contains(atcTimeseriesBaseflow.BFMethods.BFLOW) Then
+                                    Dim lalpha = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFLOWFilter, Double.NaN)
+                                    .SetValue(atcTimeseriesBaseflow.BFInputNames.BFLOWFilter, lalpha)
+                                End If
+                                If lMethods.Contains(atcTimeseriesBaseflow.BFMethods.TwoPRDF) Then
+                                    Dim lRC = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFRC, Double.NaN)
+                                    .SetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFRC, lRC)
+                                    Dim lBFImax = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFBFImax, Double.NaN)
+                                    .SetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFBFImax, lBFImax)
+                                    Dim lDF2PMethod = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.TwoParamEstMethod, atcTimeseriesBaseflow.clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE)
+                                    .SetValue(atcTimeseriesBaseflow.BFInputNames.TwoParamEstMethod, lDF2PMethod)
+                                End If
                             End With
                             'Dim lTmpGroup As New atcTimeseriesGroup()
                             'lTmpGroup.Add(lTsFlow)
