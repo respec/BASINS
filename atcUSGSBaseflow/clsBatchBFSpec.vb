@@ -28,8 +28,8 @@ Public Class BFBatchInputNames
     Public Shared BFM_PART As String = "PART"
     Public Shared BFM_BFIS As String = "BFIS"
     Public Shared BFM_BFIM As String = "BFIM"
-    Public Shared BFM_BFLOW As String = "BFLOW"
-    Public Shared BFM_TwoPRDF As String = "TwoPRDF"
+    Public Shared BFM_BFLOW As String = "DF1P" '"BFLOW"
+    Public Shared BFM_TwoPRDF As String = "DF2P" '"TwoPRDF"
 
     'Public Shared STREAMFLOW As String = "Streamflow"
     ''' <summary>
@@ -888,6 +888,27 @@ Public Class clsBatchBFSpec
 
                             Dim lFlowStart As Double = lTsFlow.Dates.Value(0)
                             Dim lFlowEnd As Double = lTsFlow.Dates.Value(lTsFlow.numValues)
+                            'Calculate overall RC and BFImax for the DF2P analysis using the full data record
+                            'over the user specified analysis duration
+                            Dim lMethods = lStation.BFInputs.GetValue(BFBatchInputNames.BFMethod)
+                            If lMethods.Contains(atcTimeseriesBaseflow.BFMethods.TwoPRDF) Then
+                                Dim lParamEstMode = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.TwoParamEstMethod,
+                                                                               atcTimeseriesBaseflow.clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM)
+                                If lParamEstMode = atcTimeseriesBaseflow.clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT Then
+                                    Dim lTsAnalysis As atcTimeseries = SubsetByDate(lTsFlow, lAnalysis_Start, lAnalysis_End, Nothing)
+                                    If lTsAnalysis IsNot Nothing AndAlso lTsAnalysis.Attributes.GetValue("Count Positive") > 31 Then
+                                        Dim lDF2P As New atcTimeseriesBaseflow.clsBaseflow2PRDF()
+                                        Try
+                                            lDF2P.CalculateBFImax_RC(lTsAnalysis)
+                                            lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFRC, lDF2P.RC)
+                                            lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFBFImax, lDF2P.BFImax)
+                                        Catch ex As Exception
+                                            lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFRC, 0.978)
+                                            lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFBFImax, 0.8)
+                                        End Try
+                                    End If
+                                End If
+                            End If
 
                             'Examine full range Tser and flow Tser's duration
                             'ToDo: could prevent going forward at this point if determine 

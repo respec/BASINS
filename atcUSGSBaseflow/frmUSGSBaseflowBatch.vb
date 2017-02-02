@@ -272,10 +272,12 @@ Public Class frmUSGSBaseflowBatch
                         txtDFParamRC.Text = lRC.ToString()
                         txtDFParamBFImax.Text = lBFImax.ToString()
                     End If
+                    txt2PDefaultNotice.Visible = False
                     rdo2PSpecify.Checked = True
                 Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
                     txtDFParamRC.Text = ""
                     txtDFParamBFImax.Text = ""
+                    txt2PDefaultNotice.Visible = True
                     rdo2PDefault.Checked = True
             End Select
         End If
