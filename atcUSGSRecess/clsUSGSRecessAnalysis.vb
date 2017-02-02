@@ -10,7 +10,8 @@ Public Class clsUSGSRecessAnalysis
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::USGS RECESS"
+            'Return "Analysis::USGS RECESS"
+            Return "Analysis::Estimate Hydrograph Parameters::USGS RECESS"
         End Get
     End Property
 
