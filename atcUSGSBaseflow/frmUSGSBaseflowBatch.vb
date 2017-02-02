@@ -264,7 +264,7 @@ Public Class frmUSGSBaseflowBatch
         End If
         pTwoParamEstimationMethod = pBasicAttributes.GetValue(BFInputNames.TwoParamEstMethod, clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT)
         If pMethods.Contains(BFMethods.TwoPRDF) Then
-            Dim lRC As Double = pBasicAttributes.GetValue(BFInputNames.TwoPRDFRC, 0.925)
+            Dim lRC As Double = pBasicAttributes.GetValue(BFInputNames.TwoPRDFRC, 0.978)
             Dim lBFImax As Double = pBasicAttributes.GetValue(BFInputNames.TwoPRDFBFImax, 0.8)
             Select Case pTwoParamEstimationMethod
                 Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM
@@ -272,11 +272,11 @@ Public Class frmUSGSBaseflowBatch
                         txtDFParamRC.Text = lRC.ToString()
                         txtDFParamBFImax.Text = lBFImax.ToString()
                     End If
-                    mnuDFTwoParamCustom.PerformClick()
+                    rdo2PSpecify.Checked = True
                 Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
                     txtDFParamRC.Text = ""
                     txtDFParamBFImax.Text = ""
-                    mnuDFTwoParamEck.PerformClick()
+                    rdo2PDefault.Checked = True
             End Select
         End If
 
@@ -394,17 +394,21 @@ Public Class frmUSGSBaseflowBatch
                 lErrMsg &= "- BFLOW method needs a valid beta value" & vbCrLf
             End If
         End If
-        Dim lRC As Double
-        Dim lBFImax As Double
+        Dim lRC As Double = Double.NaN
+        Dim lBFImax As Double = Double.NaN
+        Dim lDF2P_NeedCalculation As Boolean = False
         If chkMethodTwoPRDF.Checked Then
-            If Not Double.TryParse(txtDFParamRC.Text.Trim(), lRC) AndAlso
-                pTwoParamEstimationMethod <> clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT Then
-                lErrMsg &= "- TwoPRDF method needs a valid recession constant" & vbCrLf
-            End If
-            If Not Double.TryParse(txtDFParamBFImax.Text.Trim(), lBFImax) OrElse
-                Not (lBFImax > 0 AndAlso lBFImax < 1) Then
-                If pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM Then
-                    lErrMsg &= "- TwoPRDF method needs a valid BFImax." & vbCrLf
+            If pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT Then
+                'User choose Default parameter
+                lDF2P_NeedCalculation = True
+            ElseIf pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM Then
+                'User choose Specify parameter
+                If Not Double.TryParse(txtDFParamRC.Text.Trim(), lRC) Then
+                    lErrMsg &= "- Custom TwoPRDF method needs a valid recession constant." & vbCrLf
+                End If
+                If Not Double.TryParse(txtDFParamBFImax.Text.Trim(), lBFImax) OrElse
+                    Not (lBFImax > 0 AndAlso lBFImax < 1) Then
+                    lErrMsg &= "- Custom TwoPRDF method needs a valid BFImax." & vbCrLf
                 End If
             End If
         End If
@@ -435,7 +439,6 @@ Public Class frmUSGSBaseflowBatch
             End If
             If pMethods.Contains(BFMethods.BFIStandard) OrElse pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue(BFInputNames.BFINDayScreen, lNDay) '"BFINDay"
-                Args.SetValue(BFInputNames.BFIUseSymbol, (chkBFISymbols.Checked)) '"BFIUseSymbol"
                 Dim lBFIYearBasis As String = BFInputNames.BFIReportbyCY '"Calendar"
                 If rdoBFIReportbyWaterYear.Checked Then
                     lBFIYearBasis = BFInputNames.BFIReportbyWY '"Water"
@@ -889,9 +892,13 @@ Public Class frmUSGSBaseflowBatch
             lblBeta.Enabled = chkMethodBFLOW.Checked
 
             If chkMethodTwoPRDF.Checked Then
-                mnuDFTwoParam.Enabled = True
+                'mnuDFTwoParam.Enabled = True
+                txtDFParamRC.Enabled = True
+                txtDFParamBFImax.Enabled = True
+                lblRC.Enabled = True
+                lblBFImax.Enabled = True
             Else
-                mnuDFTwoParam.Enabled = False
+                'mnuDFTwoParam.Enabled = False
                 txtDFParamRC.Enabled = False
                 txtDFParamBFImax.Enabled = False
                 lblRC.Enabled = False
@@ -921,51 +928,23 @@ Public Class frmUSGSBaseflowBatch
         End If
     End Sub
 
-    Private Sub mnuDFTwoParam_Click(sender As Object, e As EventArgs) Handles mnuDFTwoParamCustom.Click,
-                                                                              mnuDFTwoParamEck.Click,
-                                                                              mnuDFTwoParamCF.Click
-        Dim lmethodname As String = sender.name.substring("mnuDFTwoParam".Length)
-        mnuDFTwoParamResetCheckStates(lmethodname)
-        Select Case lmethodname
-            Case "Custom"
-                lblBFImax.Enabled = True
-                lblRC.Enabled = True
-                txtDFParamRC.Enabled = True
-                txtDFParamBFImax.Enabled = True
-                pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM
-                mnuTwoParamEstMethod.Text = "(Custom)"
-            Case "Eck"
-                txtDFParamRC.Text = ""
-                txtDFParamBFImax.Text = ""
-                lblBFImax.Enabled = False
-                lblRC.Enabled = False
-                txtDFParamRC.Enabled = False
-                txtDFParamBFImax.Enabled = False
-                pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
-                mnuTwoParamEstMethod.Text = "(Eckhardt)"
-            Case "CF"
-                lblRC.Enabled = True
-                txtDFParamRC.Enabled = True
-                lblBFImax.Enabled = False
-                txtDFParamBFImax.Enabled = False
-                txtDFParamBFImax.Text = ""
-                pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CF
-                mnuTwoParamEstMethod.Text = "(Collischonn and Fan)"
-        End Select
-    End Sub
-
-    Private Sub mnuDFTwoParamResetCheckStates(ByVal aCheckedMethod As String)
-        Select Case aCheckedMethod
-            Case "Custom"
-                mnuDFTwoParamCF.CheckState = CheckState.Unchecked
-                mnuDFTwoParamEck.CheckState = CheckState.Unchecked
-            Case "Eck"
-                mnuDFTwoParamCF.CheckState = CheckState.Unchecked
-                mnuDFTwoParamCustom.CheckState = CheckState.Unchecked
-            Case "CF"
-                mnuDFTwoParamEck.CheckState = CheckState.Unchecked
-                mnuDFTwoParamCustom.CheckState = CheckState.Unchecked
-        End Select
+    Private Sub rdo2P_CheckedChanged(sender As Object, e As EventArgs) Handles rdo2PSpecify.CheckedChanged,
+                                                                               rdo2PDefault.CheckedChanged
+        If rdo2PSpecify.Checked Then
+            txt2PDefaultNotice.Visible = False
+            lblBFImax.Enabled = True
+            lblRC.Enabled = True
+            txtDFParamRC.Enabled = True
+            txtDFParamBFImax.Enabled = True
+            pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM
+        Else
+            txt2PDefaultNotice.Visible = True
+            lblBFImax.Enabled = False
+            lblRC.Enabled = False
+            txtDFParamRC.Enabled = False
+            txtDFParamBFImax.Enabled = False
+            pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
+        End If
     End Sub
 
 End Class
