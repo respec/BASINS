@@ -11,7 +11,8 @@ Public Class atcExpertSystem
     'Friend ErrorCriteria As HexErrorCriteria
     Public Storms As New Generic.List(Of HexStorm)
     Public Sites As New Generic.List(Of HexSite)
-    Public ReadOnly SDateJ As Double, EDateJ As Double
+    Public SDateJ As Double, EDateJ As Double
+    Public Name As String
 
     Private pFlowOnly As Boolean
     Private pStatistics As New HexStatistics
@@ -21,7 +22,7 @@ Public Class atcExpertSystem
     Private pUci As atcUCI.HspfUci
     Private pDataSource As atcDataSource
 
-    Private pName As String
+
     Private pSubjectiveData(25) As Integer
     Private pLatMin As Double, pLatMax As Double
     Private pLngMin As Double, pLngMax As Double
@@ -65,6 +66,17 @@ Public Class atcExpertSystem
 
         Dim lFileName As String = lExpertSystemFileName
         'IO.Path.GetFileNameWithoutExtension(aUci.Name) & ".exs"
+
+        If Len(lFileName) = 0 Then
+            'create a blank one
+            SDateJ = aSDateJ
+            EDateJ = aEDateJ
+            ReDim pHSPFOutput1(8, 1)
+            ReDim pHSPFOutput2(8, 1)
+            ReDim pHSPFOutput3(6, 1)
+            Exit Sub
+        End If
+
         If Not FileExists(lFileName) Then
             Throw New ApplicationException("ExpertSystemFile " & lFileName & " not found")
         Else
@@ -78,8 +90,8 @@ Public Class atcExpertSystem
             Next
 
             Dim lExsRecord As String = lExsRecords(0).PadRight(51)
-            pName = Trim(lExsRecord.Substring(0, 8))
-            Dim lWdmFilename As String = CurDir() & "\" & pName & ".wdm"
+            Name = Trim(lExsRecord.Substring(0, 8))
+            Dim lWdmFilename As String = CurDir() & "\" & Name & ".wdm"
             'Not sure if CurDir is the best way
             ' Dim pDatasource As New atcDataSource
             pDataSource = atcDataManager.DataSourceBySpecification(lWdmFilename)
@@ -303,8 +315,73 @@ Public Class atcExpertSystem
         'pErrorCriteria.Edit()
     End Sub
 
+    Public Sub CreateEXS(aEXSFileName As String, aBaseName As String, aSiteName As String, aRchId As Integer, aDsns() As Integer)
+        'build an EXS file for this location,
+        'use synoptic analysis to find storm dates
+        With Me
+            .Name = aBaseName
+            .SDateJ = pUci.GlobalBlock.SDateJ
+            .EDateJ = pUci.GlobalBlock.EdateJ
+            Dim lExsDsns(9) As Integer
+            lExsDsns(0) = aDsns(1) '0 = simulated total runoff (in)
+            lExsDsns(1) = aDsns(0) '1 = observed streamflow (cfs)
+            For lIndex As Integer = 2 To 9
+                lExsDsns(lIndex) = aDsns(lIndex)
+            Next lIndex
+            Dim lSite As New HspfSupport.HexSite(Me, aSiteName, 0, lExsDsns)
+            lSite.Area = pUci.UpstreamArea(pUci.OpnBlks("RCHRES").OperFromID(aRchId))
+            .Sites.Add(lSite)
+            'use synoptic analysis on precip to find storm dates
+            '- find precip dataset associated with this reach
+            Dim lPrecTimser As atcTimeseries = Nothing
+            Dim lSubsetPrecTimser As atcTimeseries = Nothing
+            If pUci.OpnBlks("RCHRES").OperFromID(aRchId).MetSeg IsNot Nothing Then
+                For Each lMetSegRec As atcUCI.HspfMetSegRecord In pUci.OpnBlks("RCHRES").OperFromID(aRchId).MetSeg.MetSegRecs
+                    If lMetSegRec.Name = "PREC" Then
+                        lPrecTimser = pUci.GetDataSetFromDsn(lMetSegRec.Source.VolName.Substring(3), lMetSegRec.Source.VolId)
+                        lSubsetPrecTimser = SubsetByDate(lPrecTimser, .SDateJ, .EDateJ, Nothing)
+                        Exit For
+                    End If
+                Next
+            End If
+            '- call synop to find less than 35 storms
+            If lSubsetPrecTimser IsNot Nothing Then
+                Dim lInputGroup As New atcTimeseriesGroup
+                lInputGroup.Add(lSubsetPrecTimser)
+                Dim lThreshold As Double = 0.1
+                Dim lOutputGroup As New atcTimeseriesGroup
+                Dim lFirstTime As Boolean = True
+                Do While lOutputGroup.Count > 35 Or lFirstTime
+                    lOutputGroup = atcSynopticAnalysis.atcSynopticAnalysisPlugin.ComputeEvents(lInputGroup, lThreshold, 0.0, True)
+                    lThreshold += 0.1
+                    lFirstTime = False
+                Loop
+                If lOutputGroup.Count > 0 Then
+                    'now add the storm dates
+                    Dim lStormIndex As Integer = 0
+                    For Each lTimSer As atcTimeseries In lOutputGroup
+                        lStormIndex += 1
+                        Dim lStormSDate(5) As Integer
+                        J2Date(lTimSer.Dates.Values(0), lStormSDate)
+                        Dim lStormEDate(5) As Integer
+                        J2Date(lTimSer.Dates.Values(lTimSer.numValues) + 2.0, lStormEDate)  'arbitrarily define storm end as 2 days after rainfall ends
+                        .Storms.Add(New HspfSupport.HexStorm(lStormIndex, lStormSDate, lStormEDate))
+                    Next
+                End If
+            End If
+            If .Storms.Count = 0 Then
+                'just do 1 dummy storm for now
+                Dim lStormSDate(5) As Integer
+                Dim lStormEDate(5) As Integer
+                .Storms.Add(New HspfSupport.HexStorm(1, lStormSDate, lStormEDate))
+            End If
+        End With
+        Dim s As String = Me.AsString()
+        SaveFileString(aEXSFileName, s)
+    End Sub
+
     Public Function ExpertWDMFileName() As String
-        Return pName
+        Return Name
     End Function
     Public Function ExpertWDMDataSource() As atcDataSource
         Return pDataSource
@@ -317,12 +394,12 @@ Public Class atcExpertSystem
 
     Public Function AsString() As String
         Dim lText As New Text.StringBuilder
-        Dim lStr As String = pName.PadRight(8) & _
-                             Sites.Count.ToString.PadLeft(5) & _
-                             "1".PadLeft(5) & _
-                             pLatMin.ToString.PadLeft(8) & _
-                             pLatMax.ToString.PadLeft(8) & _
-                             pLngMin.ToString.PadLeft(8) & _
+        Dim lStr As String = Name.PadRight(8) &
+                             Sites.Count.ToString.PadLeft(5) &
+                             "1".PadLeft(5) &
+                             pLatMin.ToString.PadLeft(8) &
+                             pLatMax.ToString.PadLeft(8) &
+                             pLngMin.ToString.PadLeft(8) &
                              pLngMax.ToString.PadLeft(8)
         If SDateJ > 0 Then
             Dim lDate(5) As Integer
@@ -366,17 +443,16 @@ Public Class atcExpertSystem
         lStr = ""
         For Each lSite As HexSite In Sites
             lStr &= lSite.Area.ToString.PadLeft(8)
-            For Each lError As HexErrorCriterion In lSite.ErrorCriteria
-                lStr &= Format(lError.Value, "#####.00").PadLeft(8)
-            Next
         Next
         lText.AppendLine(lStr)
 
-        'lStr = ""
-        'For Each lError As HexErrorCriterion In ErrorCriteria
-        ' lStr &= Format(lError.Value, "#####.00").PadLeft(8)
-        'Next
-        'lText.AppendLine(lStr)
+        For Each lSite As HexSite In Sites
+            lStr = ""
+            For Each lError As HexErrorCriterion In lSite.ErrorCriteria
+                lStr &= Format(lError.Value, "#####.00").PadLeft(8)
+            Next
+            lText.AppendLine(lStr)
+        Next
 
         For lSiteIndex As Integer = 1 To Sites.Count
             lStr = ""

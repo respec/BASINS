@@ -19,25 +19,25 @@ Partial Class frmAddExpert
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.lblOperation = New System.Windows.Forms.Label
-        Me.lblGroup = New System.Windows.Forms.Label
-        Me.lblLoc = New System.Windows.Forms.Label
-        Me.lblBase = New System.Windows.Forms.Label
-        Me.txtDescription = New System.Windows.Forms.TextBox
-        Me.optH = New System.Windows.Forms.RadioButton
-        Me.optD = New System.Windows.Forms.RadioButton
-        Me.cmdOK = New System.Windows.Forms.Button
-        Me.cmdClose = New System.Windows.Forms.Button
-        Me.lstOperation = New System.Windows.Forms.ListBox
-        Me.lstGroup = New System.Windows.Forms.ListBox
-        Me.txtLoc = New System.Windows.Forms.TextBox
-        Me.atxBase = New atcControls.atcText
-        Me.optMetric = New System.Windows.Forms.RadioButton
-        Me.optEnglish = New System.Windows.Forms.RadioButton
-        Me.Panel1 = New System.Windows.Forms.Panel
-        Me.lblTimeStep = New System.Windows.Forms.Label
-        Me.Panel2 = New System.Windows.Forms.Panel
-        Me.lblUnits = New System.Windows.Forms.Label
+        Me.lblOperation = New System.Windows.Forms.Label()
+        Me.lblGroup = New System.Windows.Forms.Label()
+        Me.lblLoc = New System.Windows.Forms.Label()
+        Me.lblBase = New System.Windows.Forms.Label()
+        Me.txtDescription = New System.Windows.Forms.TextBox()
+        Me.optH = New System.Windows.Forms.RadioButton()
+        Me.optD = New System.Windows.Forms.RadioButton()
+        Me.cmdOK = New System.Windows.Forms.Button()
+        Me.cmdClose = New System.Windows.Forms.Button()
+        Me.lstOperation = New System.Windows.Forms.ListBox()
+        Me.lstGroup = New System.Windows.Forms.ListBox()
+        Me.txtLoc = New System.Windows.Forms.TextBox()
+        Me.atxBase = New atcControls.atcText()
+        Me.optMetric = New System.Windows.Forms.RadioButton()
+        Me.optEnglish = New System.Windows.Forms.RadioButton()
+        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.lblTimeStep = New System.Windows.Forms.Label()
+        Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.lblUnits = New System.Windows.Forms.Label()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.SuspendLayout()
@@ -84,7 +84,7 @@ Partial Class frmAddExpert
         'txtDescription
         '
         Me.txtDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDescription.BackColor = System.Drawing.SystemColors.Control
         Me.txtDescription.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtDescription.Location = New System.Drawing.Point(12, 197)
@@ -139,8 +139,8 @@ Partial Class frmAddExpert
         'lstOperation
         '
         Me.lstOperation.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstOperation.FormattingEnabled = True
         Me.lstOperation.Location = New System.Drawing.Point(15, 27)
         Me.lstOperation.Name = "lstOperation"
@@ -149,8 +149,9 @@ Partial Class frmAddExpert
         '
         'lstGroup
         '
-        Me.lstGroup.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstGroup.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstGroup.FormattingEnabled = True
         Me.lstGroup.Location = New System.Drawing.Point(198, 27)
         Me.lstGroup.Name = "lstGroup"
@@ -172,8 +173,8 @@ Partial Class frmAddExpert
         Me.atxBase.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.atxBase.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.atxBase.DefaultValue = ""
-        Me.atxBase.HardMax = -999
-        Me.atxBase.HardMin = 1
+        Me.atxBase.HardMax = -999.0R
+        Me.atxBase.HardMin = 1.0R
         Me.atxBase.InsideLimitsBackground = System.Drawing.Color.White
         Me.atxBase.Location = New System.Drawing.Point(198, 278)
         Me.atxBase.MaxWidth = 20
@@ -185,10 +186,10 @@ Partial Class frmAddExpert
         Me.atxBase.SelLength = 0
         Me.atxBase.SelStart = 0
         Me.atxBase.Size = New System.Drawing.Size(80, 20)
-        Me.atxBase.SoftMax = -999
-        Me.atxBase.SoftMin = -999
+        Me.atxBase.SoftMax = -999.0R
+        Me.atxBase.SoftMin = -999.0R
         Me.atxBase.TabIndex = 17
-        Me.atxBase.ValueDouble = 1000
+        Me.atxBase.ValueDouble = 1000.0R
         Me.atxBase.ValueInteger = 1000
         '
         'optMetric

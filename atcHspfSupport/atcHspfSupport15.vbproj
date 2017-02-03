@@ -147,6 +147,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcEvents\atcEvents15.vbproj">
+      <Project>{9f469fd8-4a92-4c1f-901c-93d84d457d8f}</Project>
+      <Name>atcEvents15</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSynopticAnalysis\atcSynopticAnalysis15.vbproj">
+      <Project>{fabf7aa3-dde7-48a4-8226-ecd3ad423597}</Project>
+      <Name>atcSynopticAnalysis15</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>

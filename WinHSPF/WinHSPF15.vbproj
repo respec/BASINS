@@ -393,6 +393,11 @@
     <EmbeddedResource Include="template.mwprj" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcHspfSupport\atcHspfSupport15.vbproj">
+      <Project>{3b2eb97a-a305-4394-9843-72e138815152}</Project>
+      <Name>atcHspfSupport15</Name>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>

@@ -10,6 +10,16 @@ Public Class frmAddExpert
 
     Dim pCheckedRadioIndex As Integer
     Dim pListBox1DataItems As New Collection
+    Dim pListBox2DataItems As New Collection
+
+    Private Sub frmAddExpert_Resized(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.ResizeEnd
+        If pCheckedRadioIndex = 1 Then 'applies to calib option
+            lstOperation.Width = (Me.Width / 2) - 30
+            lstGroup.Width = (Me.Width / 2) - 30
+            lstGroup.Left = (Me.Width / 2)
+            lblGroup.Left = lstGroup.Left
+        End If
+    End Sub
 
     Sub New(ByVal aCheckedRadioIndex As Integer)
 
@@ -25,8 +35,6 @@ Public Class frmAddExpert
 
         Select Case pCheckedRadioIndex
             Case 1 'Hydrology Calibration
-                lstOperation.Size = New Size(350, 173)
-                lstGroup.Visible = False
                 txtDescription.Visible = False
                 optH.Visible = False
                 optD.Visible = False
@@ -34,7 +42,7 @@ Public Class frmAddExpert
                 optEnglish.Visible = False
                 optMetric.Visible = False
                 lblUnits.Visible = False
-                lblGroup.Visible = False
+                lblGroup.Text = "Observed Flow Time Series:"
             Case 2 'Flow
                 lstOperation.Size = New Size(350, 173)
                 lstGroup.Visible = False
@@ -54,6 +62,7 @@ Public Class frmAddExpert
         End Select
 
         pListBox1DataItems.Clear()
+        pListBox2DataItems.Clear()
 
         If pCheckedRadioIndex = 4 Then 'other types
             lstGroup.Enabled = False
@@ -90,7 +99,29 @@ Public Class frmAddExpert
                     lstOperation.Items.Add(pfrmOutput.agdOutput.Source.CellValue(lIndex, 0))
                 End If
             Next
+        End If
 
+        If pCheckedRadioIndex = 1 Then 'calib 
+            lstGroup.Enabled = True
+            'look for candidate observed flow WDM datasets
+            Dim lts As Collection = pUCI.FindTimser("OBSERVED", "", "FLOW")
+            Dim lWDMFileName As String = ""
+            For lWdmIndex As Integer = 1 To 4
+                If Not pUCI.GetWDMObj(lWdmIndex) Is Nothing Then 'use this as the output wdm
+                    lWDMFileName = pUCI.GetWDMObj(lWdmIndex).Specification
+                    Exit For
+                End If
+            Next lWdmIndex
+            For Each lTser As atcData.atcTimeseries In lts
+                Dim lDsn As Integer = lTser.Attributes.GetValue("ID")
+                Dim lLoc As String = lTser.Attributes.GetValue("Location")
+                Dim lCon As String = lTser.Attributes.GetValue("Constituent")
+                Dim lSen As String = lTser.Attributes.GetValue("Scenario")
+                If lTser.Attributes.GetValue("Data Source") = lWDMFileName Then
+                    lstGroup.Items.Add(lDsn & " : " & lSen & " " & lCon & " at " & lLoc)
+                    pListBox2DataItems.Add(lDsn)
+                End If
+            Next
         End If
 
         If pCheckedRadioIndex = 2 Or pCheckedRadioIndex = 3 Or pCheckedRadioIndex = 4 Then
@@ -130,11 +161,12 @@ Public Class frmAddExpert
                 lId = pListBox1DataItems.Item(lstOperation.SelectedIndex + 1)
                 If Not pfrmOutput.IsCalibLocation("RCHRES", lId) Then
                     Me.Cursor = Cursors.WaitCursor
-
                     Dim lWDMId As Integer = 0
+                    Dim lWDMFileName As String = ""
                     For lWdmIndex As Integer = 1 To 4
                         If Not pUCI.GetWDMObj(lWdmIndex) Is Nothing Then 'use this as the output wdm
                             lWDMId = lWdmIndex
+                            lWDMFileName = pUCI.GetWDMObj(lWdmIndex).Specification
                             Exit For
                         End If
                     Next lWdmIndex
@@ -142,15 +174,32 @@ Public Class frmAddExpert
                     pUCI.AddExpertSystem(lId, txtLoc.Text, lWDMId, atxBase.Text, lDsns, lOstr)
                     pUCI.Edited = True
                     Me.Cursor = Cursors.Arrow
+
+                    'create an EXS file for this location
+                    If lstGroup.SelectedIndex < 0 Then
+                        'there does not appear to be an observed flow data sets selected, give warning 
+                        Logger.Message("No observed flow data set is selected." & vbCrLf & vbCrLf &
+                                       "To use this location for hydrology calibration in HSPEXP+, " & vbCrLf &
+                                       "observed flow data is required.", "Add Output Notice", MessageBoxButtons.OK, MessageBoxIcon.Information, Windows.Forms.DialogResult.OK)
+                    Else
+                        lDsns(0) = pListBox2DataItems.Item(lstGroup.SelectedIndex + 1)
+                    End If
+                    'now build and write the exs file
+                    Dim lExpertSystem As HspfSupport.atcExpertSystem
+                    lExpertSystem = New HspfSupport.atcExpertSystem(pUCI, "", pUCI.GlobalBlock.SDateJ, pUCI.GlobalBlock.EdateJ)
+                    Dim lFileName As String = FilenameNoExt(pUCIFullFileName) & "-" & txtLoc.Text & ".exs"
+                    lExpertSystem.CreateEXS(lFileName, FilenameNoExt(FilenameNoPath(lWDMFileName)), txtLoc.Text, lId, lDsns)
+
                 End If
             End If
+
         ElseIf pCheckedRadioIndex = 2 Then 'add flow location
             If lstOperation.SelectedIndex > -1 Then
                 lId = pListBox1DataItems.Item(lstOperation.SelectedIndex + 1)
                 Dim lWDMId As Integer
                 Dim lNewDsn As Integer
                 pUCI.AddOutputWDMDataSetExt(txtLoc.Text, "FLOW", atxBase.Text, lWDMId, lOutTu, "", lNewDsn)
-                pUCI.AddExtTarget("RCHRES", lId, "HYDR", "RO", 1, 1, 1.0#, "AVER", _
+                pUCI.AddExtTarget("RCHRES", lId, "HYDR", "RO", 1, 1, 1.0#, "AVER",
                        "WDM" & CStr(lWDMId), lNewDsn, "FLOW", 1, lOutputUnits, "AGGR", "REPL")
                 pUCI.Edited = True
             End If
@@ -211,7 +260,7 @@ Public Class frmAddExpert
                         Dim lDescription As String = ""
                         OutputDataSetProperties(lTmem, lDescription)
                         pUCI.AddOutputWDMDataSetExt(txtLoc.Text, lTempMem, atxBase.Text, lWDMId, lOutTu, lDescription, lNewDsn, lSTANAM)
-                        pUCI.AddExtTarget(lOpName, lId, lGroup, lMem, lSub1, lSub2, 1.0#, lTrans, _
+                        pUCI.AddExtTarget(lOpName, lId, lGroup, lMem, lSub1, lSub2, 1.0#, lTrans,
                              "WDM" & CStr(lWDMId), lNewDsn, lTempMem, 1, lOutputUnits, "AGGR", "REPL")
                         pUCI.Edited = True
                     End If
@@ -249,7 +298,7 @@ Public Class frmAddExpert
                                 'make sure we do not already have this output
                                 Dim lFound As Boolean = False
                                 For Each lToConn As HspfConnection In lToOper.Targets
-                                    If lToConn.Source.Group = lConn.Source.Group And _
+                                    If lToConn.Source.Group = lConn.Source.Group And
                                        lToConn.Source.Member = lConn.Source.Member Then
                                         lFound = True
                                     End If
@@ -259,9 +308,9 @@ Public Class frmAddExpert
                                     Dim lWDMId As Integer
                                     Dim lNewDsn As Integer
                                     Call pUCI.AddOutputWDMDataSet(txtLoc.Text, lConn.Target.Member, atxBase.Text, lWDMId, lNewDsn)
-                                    pUCI.AddExtTarget(lToOper.Name, lToOper.Id, lConn.Source.Group, lConn.Source.Member, _
-                                       lConn.Source.MemSub1, lConn.Source.MemSub2, lConn.MFact, lConn.Tran, _
-                                       "WDM" & CStr(lWDMId), lNewDsn, lConn.Target.Member, lConn.Target.MemSub1, _
+                                    pUCI.AddExtTarget(lToOper.Name, lToOper.Id, lConn.Source.Group, lConn.Source.Member,
+                                       lConn.Source.MemSub1, lConn.Source.MemSub2, lConn.MFact, lConn.Tran,
+                                       "WDM" & CStr(lWDMId), lNewDsn, lConn.Target.Member, lConn.Target.MemSub1,
                                        lConn.Ssystem, lConn.Sgapstrg, lConn.Amdstrg)
                                     pUCI.Edited = True
                                 End If
@@ -435,68 +484,70 @@ Public Class frmAddExpert
 
     Private Sub ListBox2_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstGroup.SelectedIndexChanged
 
-        Dim lId As Integer
-        Dim lOpName As String
-        Dim lSpacePos As Integer = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), " ")
-        Dim lParenPos As Integer = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), "(")
-        If lParenPos = 0 Then lParenPos = Len(lstGroup.Items.Item(lstGroup.SelectedIndex)) + 1
-        If lSpacePos > 0 And lParenPos > 0 Then
-            lId = CInt(Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), lSpacePos, lParenPos - lSpacePos))
-            lOpName = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), 1, lSpacePos - 1)
-            If lId > 0 And Len(lOpName) > 0 Then
-                If lOpName = "PERLND" Then
-                    txtLoc.Text = "P" & CStr(lId)
-                ElseIf lOpName = "IMPLND" Then
-                    txtLoc.Text = "I" & CStr(lId)
-                ElseIf lOpName = "RCHRES" Then
-                    txtLoc.Text = "RCH" & CStr(lId)
-                ElseIf lOpName = "BMPRAC" Then
-                    txtLoc.Text = "BMP" & CStr(lId)
+        If pCheckedRadioIndex <> 1 Then 'does not apply for hydrology calibration locations
+            Dim lId As Integer
+            Dim lOpName As String
+            Dim lSpacePos As Integer = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), " ")
+            Dim lParenPos As Integer = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), "(")
+            If lParenPos = 0 Then lParenPos = Len(lstGroup.Items.Item(lstGroup.SelectedIndex)) + 1
+            If lSpacePos > 0 And lParenPos > 0 Then
+                lId = CInt(Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), lSpacePos, lParenPos - lSpacePos))
+                lOpName = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), 1, lSpacePos - 1)
+                If lId > 0 And Len(lOpName) > 0 Then
+                    If lOpName = "PERLND" Then
+                        txtLoc.Text = "P" & CStr(lId)
+                    ElseIf lOpName = "IMPLND" Then
+                        txtLoc.Text = "I" & CStr(lId)
+                    ElseIf lOpName = "RCHRES" Then
+                        txtLoc.Text = "RCH" & CStr(lId)
+                    ElseIf lOpName = "BMPRAC" Then
+                        txtLoc.Text = "BMP" & CStr(lId)
+                    End If
                 End If
             End If
-        End If
-        'set desc text
-        lSpacePos = InStr(1, lstOperation.Items.Item(lstOperation.SelectedIndex), " ")
-        lParenPos = InStr(1, lstOperation.Items.Item(lstOperation.SelectedIndex), "(")
-        If lSpacePos > 0 And lParenPos > 0 Then
-            lId = CInt(Mid(lstOperation.Items.Item(lstOperation.SelectedIndex), lSpacePos, lParenPos - lSpacePos))
-            lOpName = Mid(lstOperation.Items.Item(lstOperation.SelectedIndex), 1, lSpacePos - 1)
-            If lId > 0 And Len(lOpName) > 0 Then
-                Dim lOper As HspfOperation = pUCI.OpnBlks(lOpName).OperFromID(lId)
-                Dim lColonPos As Integer = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), ":")
-                If lColonPos > 0 Then
-                    Dim lGroup As String = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), 1, lColonPos - 1)
-                    lParenPos = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), "(")
-                    Dim lMem As String
-                    If lParenPos > 0 Then
-                        lMem = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), lColonPos + 1, lParenPos - lColonPos - 1)
-                    Else
-                        lMem = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), lColonPos + 1)
-                    End If
-
-                    For lIndex As Integer = 0 To pUCI.Msg.TSGroupDefs.Count - 1
-                        If pUCI.Msg.TSGroupDefs.Item(lIndex).Name = lGroup Then
-                            Dim lGroupDef As HspfTSGroupDef = pUCI.Msg.TSGroupDefs.Item(lIndex)
-                            Dim lGetMemberDefAtIndex As Integer
-
-                            '.net conversion issue: Becuase no method to fetch via key in lGroupDef.MemberDefs was found, this loop does it manually.
-                            For lIndex2 As Integer = 0 To lGroupDef.MemberDefs.Count - 1
-                                If lGroupDef.MemberDefs.Item(lIndex2).Name = lMem Then
-                                    lGetMemberDefAtIndex = lIndex2
-                                    Exit For
-                                End If
-                            Next
-
-                            'now set the text
-                            txtDescription.Text = lGroup & ":" & lMem & " - " & lGroupDef.MemberDefs.Item(lGetMemberDefAtIndex).Defn
-                            If pUCI.GlobalBlock.EmFg = 1 Then
-                                txtDescription.Text = txtDescription.Text & " (" & lGroupDef.MemberDefs.Item(lGetMemberDefAtIndex).EUnits & ")"
-                            Else
-                                txtDescription.Text = txtDescription.Text & " (" & lGroupDef.MemberDefs.Item(lGetMemberDefAtIndex).MUnits & ")"
-                            End If
-                            Exit For
+            'set desc text
+            lSpacePos = InStr(1, lstOperation.Items.Item(lstOperation.SelectedIndex), " ")
+            lParenPos = InStr(1, lstOperation.Items.Item(lstOperation.SelectedIndex), "(")
+            If lSpacePos > 0 And lParenPos > 0 Then
+                lId = CInt(Mid(lstOperation.Items.Item(lstOperation.SelectedIndex), lSpacePos, lParenPos - lSpacePos))
+                lOpName = Mid(lstOperation.Items.Item(lstOperation.SelectedIndex), 1, lSpacePos - 1)
+                If lId > 0 And Len(lOpName) > 0 Then
+                    Dim lOper As HspfOperation = pUCI.OpnBlks(lOpName).OperFromID(lId)
+                    Dim lColonPos As Integer = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), ":")
+                    If lColonPos > 0 Then
+                        Dim lGroup As String = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), 1, lColonPos - 1)
+                        lParenPos = InStr(1, lstGroup.Items.Item(lstGroup.SelectedIndex), "(")
+                        Dim lMem As String
+                        If lParenPos > 0 Then
+                            lMem = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), lColonPos + 1, lParenPos - lColonPos - 1)
+                        Else
+                            lMem = Mid(lstGroup.Items.Item(lstGroup.SelectedIndex), lColonPos + 1)
                         End If
-                    Next
+
+                        For lIndex As Integer = 0 To pUCI.Msg.TSGroupDefs.Count - 1
+                            If pUCI.Msg.TSGroupDefs.Item(lIndex).Name = lGroup Then
+                                Dim lGroupDef As HspfTSGroupDef = pUCI.Msg.TSGroupDefs.Item(lIndex)
+                                Dim lGetMemberDefAtIndex As Integer
+
+                                '.net conversion issue: Becuase no method to fetch via key in lGroupDef.MemberDefs was found, this loop does it manually.
+                                For lIndex2 As Integer = 0 To lGroupDef.MemberDefs.Count - 1
+                                    If lGroupDef.MemberDefs.Item(lIndex2).Name = lMem Then
+                                        lGetMemberDefAtIndex = lIndex2
+                                        Exit For
+                                    End If
+                                Next
+
+                                'now set the text
+                                txtDescription.Text = lGroup & ":" & lMem & " - " & lGroupDef.MemberDefs.Item(lGetMemberDefAtIndex).Defn
+                                If pUCI.GlobalBlock.EmFg = 1 Then
+                                    txtDescription.Text = txtDescription.Text & " (" & lGroupDef.MemberDefs.Item(lGetMemberDefAtIndex).EUnits & ")"
+                                Else
+                                    txtDescription.Text = txtDescription.Text & " (" & lGroupDef.MemberDefs.Item(lGetMemberDefAtIndex).MUnits & ")"
+                                End If
+                                Exit For
+                            End If
+                        Next
+                    End If
                 End If
             End If
         End If
