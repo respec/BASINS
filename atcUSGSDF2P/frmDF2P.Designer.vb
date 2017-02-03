@@ -29,6 +29,8 @@ Partial Class frmDF2P
         Me.txtMinRecessionDays = New System.Windows.Forms.TextBox()
         Me.lblRecessionDays = New System.Windows.Forms.Label()
         Me.gbMonthSeason = New System.Windows.Forms.GroupBox()
+        Me.btnClear = New System.Windows.Forms.Button()
+        Me.btnAllMonths = New System.Windows.Forms.Button()
         Me.rdoNoSeason = New System.Windows.Forms.RadioButton()
         Me.rdoWinter = New System.Windows.Forms.RadioButton()
         Me.rdoFall = New System.Windows.Forms.RadioButton()
@@ -57,18 +59,15 @@ Partial Class frmDF2P
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem()
         Me.panelConfiguration = New System.Windows.Forms.Panel()
+        Me.lblMinRecessDays = New System.Windows.Forms.Label()
         Me.btnGoStep2 = New System.Windows.Forms.Button()
         Me.lblRC = New System.Windows.Forms.Label()
         Me.txtRC = New System.Windows.Forms.TextBox()
         Me.btnEstRC = New System.Windows.Forms.Button()
-        Me.panRiseParam = New System.Windows.Forms.Panel()
-        Me.txtPeakRisePct = New System.Windows.Forms.TextBox()
-        Me.lblRisePct = New System.Windows.Forms.Label()
-        Me.txtPeakAheadDays = New System.Windows.Forms.TextBox()
-        Me.lblScreenWindow = New System.Windows.Forms.Label()
         Me.gbDataType = New System.Windows.Forms.GroupBox()
         Me.txtDataInfo = New System.Windows.Forms.TextBox()
         Me.panelAnalysis = New System.Windows.Forms.Panel()
+        Me.txtBackDays = New System.Windows.Forms.TextBox()
         Me.txtRC2 = New System.Windows.Forms.TextBox()
         Me.lblRC2 = New System.Windows.Forms.Label()
         Me.btnConfiguration = New System.Windows.Forms.Button()
@@ -78,7 +77,6 @@ Partial Class frmDF2P
         Me.scDisplay.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.panelConfiguration.SuspendLayout()
-        Me.panRiseParam.SuspendLayout()
         Me.gbDataType.SuspendLayout()
         Me.panelAnalysis.SuspendLayout()
         Me.SuspendLayout()
@@ -114,11 +112,11 @@ Partial Class frmDF2P
         '
         'txtMinRecessionDays
         '
-        Me.txtMinRecessionDays.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.txtMinRecessionDays.Location = New System.Drawing.Point(421, 237)
+        Me.txtMinRecessionDays.Location = New System.Drawing.Point(503, 243)
         Me.txtMinRecessionDays.Name = "txtMinRecessionDays"
-        Me.txtMinRecessionDays.Size = New System.Drawing.Size(38, 20)
+        Me.txtMinRecessionDays.Size = New System.Drawing.Size(114, 20)
         Me.txtMinRecessionDays.TabIndex = 9
+        Me.txtMinRecessionDays.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'lblRecessionDays
         '
@@ -133,6 +131,8 @@ Partial Class frmDF2P
         'gbMonthSeason
         '
         Me.gbMonthSeason.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbMonthSeason.Controls.Add(Me.btnClear)
+        Me.gbMonthSeason.Controls.Add(Me.btnAllMonths)
         Me.gbMonthSeason.Controls.Add(Me.rdoNoSeason)
         Me.gbMonthSeason.Controls.Add(Me.rdoWinter)
         Me.gbMonthSeason.Controls.Add(Me.rdoFall)
@@ -145,6 +145,26 @@ Partial Class frmDF2P
         Me.gbMonthSeason.TabIndex = 43
         Me.gbMonthSeason.TabStop = False
         Me.gbMonthSeason.Text = "Months and Season"
+        '
+        'btnClear
+        '
+        Me.btnClear.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnClear.Location = New System.Drawing.Point(218, 146)
+        Me.btnClear.Name = "btnClear"
+        Me.btnClear.Size = New System.Drawing.Size(45, 23)
+        Me.btnClear.TabIndex = 10
+        Me.btnClear.Text = "Clear"
+        Me.btnClear.UseVisualStyleBackColor = True
+        '
+        'btnAllMonths
+        '
+        Me.btnAllMonths.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnAllMonths.Location = New System.Drawing.Point(167, 146)
+        Me.btnAllMonths.Name = "btnAllMonths"
+        Me.btnAllMonths.Size = New System.Drawing.Size(45, 23)
+        Me.btnAllMonths.TabIndex = 9
+        Me.btnAllMonths.Text = "All"
+        Me.btnAllMonths.UseVisualStyleBackColor = True
         '
         'rdoNoSeason
         '
@@ -378,17 +398,17 @@ Partial Class frmDF2P
         'btnSummary
         '
         Me.btnSummary.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSummary.Location = New System.Drawing.Point(686, 235)
+        Me.btnSummary.Location = New System.Drawing.Point(668, 235)
         Me.btnSummary.Name = "btnSummary"
-        Me.btnSummary.Size = New System.Drawing.Size(75, 23)
+        Me.btnSummary.Size = New System.Drawing.Size(93, 23)
         Me.btnSummary.TabIndex = 18
-        Me.btnSummary.Text = "BFImax"
+        Me.btnSummary.Text = "Estimate BFImax"
         Me.btnSummary.UseVisualStyleBackColor = True
         '
         'btnAnalyse
         '
-        Me.btnAnalyse.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnAnalyse.Location = New System.Drawing.Point(605, 235)
+        Me.btnAnalyse.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnAnalyse.Location = New System.Drawing.Point(481, 235)
         Me.btnAnalyse.Name = "btnAnalyse"
         Me.btnAnalyse.Size = New System.Drawing.Size(75, 23)
         Me.btnAnalyse.TabIndex = 17
@@ -397,13 +417,12 @@ Partial Class frmDF2P
         '
         'btnGetAllSegments
         '
-        Me.btnGetAllSegments.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnGetAllSegments.AutoSize = True
-        Me.btnGetAllSegments.Location = New System.Drawing.Point(465, 235)
+        Me.btnGetAllSegments.Location = New System.Drawing.Point(641, 239)
         Me.btnGetAllSegments.Name = "btnGetAllSegments"
-        Me.btnGetAllSegments.Size = New System.Drawing.Size(95, 23)
+        Me.btnGetAllSegments.Size = New System.Drawing.Size(132, 27)
         Me.btnGetAllSegments.TabIndex = 12
-        Me.btnGetAllSegments.Text = "Find Recessions"
+        Me.btnGetAllSegments.Text = "Step 2: Estimate BFImax"
         Me.btnGetAllSegments.UseVisualStyleBackColor = True
         '
         'MenuStrip1
@@ -437,31 +456,43 @@ Partial Class frmDF2P
         '
         'panelConfiguration
         '
-        Me.panelConfiguration.Controls.Add(Me.btnGoStep2)
+        Me.panelConfiguration.Controls.Add(Me.lblMinRecessDays)
+        Me.panelConfiguration.Controls.Add(Me.txtMinRecessionDays)
         Me.panelConfiguration.Controls.Add(Me.lblRC)
         Me.panelConfiguration.Controls.Add(Me.txtRC)
         Me.panelConfiguration.Controls.Add(Me.btnEstRC)
-        Me.panelConfiguration.Controls.Add(Me.panRiseParam)
         Me.panelConfiguration.Controls.Add(Me.gbDataType)
         Me.panelConfiguration.Controls.Add(Me.chkSaveInterimToFile)
         Me.panelConfiguration.Controls.Add(Me.gbDates)
+        Me.panelConfiguration.Controls.Add(Me.btnGetAllSegments)
         Me.panelConfiguration.Controls.Add(Me.txtOutputDir)
         Me.panelConfiguration.Controls.Add(Me.gbMonthSeason)
         Me.panelConfiguration.Controls.Add(Me.lblOutpuDir)
+        Me.panelConfiguration.Controls.Add(Me.btnGoStep2)
         Me.panelConfiguration.Location = New System.Drawing.Point(0, 27)
         Me.panelConfiguration.Name = "panelConfiguration"
         Me.panelConfiguration.Size = New System.Drawing.Size(777, 273)
         Me.panelConfiguration.TabIndex = 31
         '
+        'lblMinRecessDays
+        '
+        Me.lblMinRecessDays.AutoSize = True
+        Me.lblMinRecessDays.Location = New System.Drawing.Point(500, 214)
+        Me.lblMinRecessDays.Name = "lblMinRecessDays"
+        Me.lblMinRecessDays.Size = New System.Drawing.Size(137, 26)
+        Me.lblMinRecessDays.TabIndex = 53
+        Me.lblMinRecessDays.Text = "Step 2: Enter minimum flow " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "recession length in days:"
+        '
         'btnGoStep2
         '
         Me.btnGoStep2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnGoStep2.Location = New System.Drawing.Point(632, 239)
+        Me.btnGoStep2.Location = New System.Drawing.Point(362, 184)
         Me.btnGoStep2.Name = "btnGoStep2"
         Me.btnGoStep2.Size = New System.Drawing.Size(135, 27)
         Me.btnGoStep2.TabIndex = 52
         Me.btnGoStep2.Text = "Step 2: Estimate BFImax"
         Me.btnGoStep2.UseVisualStyleBackColor = True
+        Me.btnGoStep2.Visible = False
         '
         'lblRC
         '
@@ -478,6 +509,7 @@ Partial Class frmDF2P
         Me.txtRC.Name = "txtRC"
         Me.txtRC.Size = New System.Drawing.Size(114, 20)
         Me.txtRC.TabIndex = 50
+        Me.txtRC.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'btnEstRC
         '
@@ -487,54 +519,6 @@ Partial Class frmDF2P
         Me.btnEstRC.TabIndex = 48
         Me.btnEstRC.Text = "Step 1: Estimate Recession Constant"
         Me.btnEstRC.UseVisualStyleBackColor = True
-        '
-        'panRiseParam
-        '
-        Me.panRiseParam.Controls.Add(Me.txtPeakRisePct)
-        Me.panRiseParam.Controls.Add(Me.lblRisePct)
-        Me.panRiseParam.Controls.Add(Me.txtPeakAheadDays)
-        Me.panRiseParam.Controls.Add(Me.lblScreenWindow)
-        Me.panRiseParam.Location = New System.Drawing.Point(320, 110)
-        Me.panRiseParam.Margin = New System.Windows.Forms.Padding(2)
-        Me.panRiseParam.Name = "panRiseParam"
-        Me.panRiseParam.Size = New System.Drawing.Size(276, 67)
-        Me.panRiseParam.TabIndex = 47
-        '
-        'txtPeakRisePct
-        '
-        Me.txtPeakRisePct.Location = New System.Drawing.Point(205, 35)
-        Me.txtPeakRisePct.Margin = New System.Windows.Forms.Padding(2)
-        Me.txtPeakRisePct.Name = "txtPeakRisePct"
-        Me.txtPeakRisePct.Size = New System.Drawing.Size(67, 20)
-        Me.txtPeakRisePct.TabIndex = 3
-        '
-        'lblRisePct
-        '
-        Me.lblRisePct.AutoSize = True
-        Me.lblRisePct.Location = New System.Drawing.Point(8, 37)
-        Me.lblRisePct.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblRisePct.Name = "lblRisePct"
-        Me.lblRisePct.Size = New System.Drawing.Size(191, 13)
-        Me.lblRisePct.TabIndex = 2
-        Me.lblRisePct.Text = "Peek ahead rise percent (50% ~ 100%)"
-        '
-        'txtPeakAheadDays
-        '
-        Me.txtPeakAheadDays.Location = New System.Drawing.Point(205, 12)
-        Me.txtPeakAheadDays.Margin = New System.Windows.Forms.Padding(2)
-        Me.txtPeakAheadDays.Name = "txtPeakAheadDays"
-        Me.txtPeakAheadDays.Size = New System.Drawing.Size(67, 20)
-        Me.txtPeakAheadDays.TabIndex = 1
-        '
-        'lblScreenWindow
-        '
-        Me.lblScreenWindow.AutoSize = True
-        Me.lblScreenWindow.Location = New System.Drawing.Point(112, 15)
-        Me.lblScreenWindow.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblScreenWindow.Name = "lblScreenWindow"
-        Me.lblScreenWindow.Size = New System.Drawing.Size(90, 13)
-        Me.lblScreenWindow.TabIndex = 0
-        Me.lblScreenWindow.Text = "Peek ahead days"
         '
         'gbDataType
         '
@@ -560,7 +544,7 @@ Partial Class frmDF2P
         '
         'panelAnalysis
         '
-        Me.panelAnalysis.Controls.Add(Me.txtMinRecessionDays)
+        Me.panelAnalysis.Controls.Add(Me.txtBackDays)
         Me.panelAnalysis.Controls.Add(Me.lblRecessionDays)
         Me.panelAnalysis.Controls.Add(Me.txtRC2)
         Me.panelAnalysis.Controls.Add(Me.lblRC2)
@@ -569,12 +553,21 @@ Partial Class frmDF2P
         Me.panelAnalysis.Controls.Add(Me.btnSummary)
         Me.panelAnalysis.Controls.Add(Me.btnAnalyse)
         Me.panelAnalysis.Controls.Add(Me.scDisplay)
-        Me.panelAnalysis.Controls.Add(Me.btnGetAllSegments)
         Me.panelAnalysis.Location = New System.Drawing.Point(6, 322)
         Me.panelAnalysis.Name = "panelAnalysis"
         Me.panelAnalysis.Size = New System.Drawing.Size(771, 263)
         Me.panelAnalysis.TabIndex = 32
         Me.panelAnalysis.Visible = False
+        '
+        'txtBackDays
+        '
+        Me.txtBackDays.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.txtBackDays.Location = New System.Drawing.Point(421, 237)
+        Me.txtBackDays.Name = "txtBackDays"
+        Me.txtBackDays.Size = New System.Drawing.Size(54, 20)
+        Me.txtBackDays.TabIndex = 45
+        Me.txtBackDays.Text = "365"
+        Me.txtBackDays.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'txtRC2
         '
@@ -583,6 +576,7 @@ Partial Class frmDF2P
         Me.txtRC2.Name = "txtRC2"
         Me.txtRC2.Size = New System.Drawing.Size(45, 20)
         Me.txtRC2.TabIndex = 43
+        Me.txtRC2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'lblRC2
         '
@@ -609,7 +603,7 @@ Partial Class frmDF2P
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(789, 307)
+        Me.ClientSize = New System.Drawing.Size(789, 306)
         Me.Controls.Add(Me.panelAnalysis)
         Me.Controls.Add(Me.panelConfiguration)
         Me.Controls.Add(Me.MenuStrip1)
@@ -628,8 +622,6 @@ Partial Class frmDF2P
         Me.MenuStrip1.PerformLayout()
         Me.panelConfiguration.ResumeLayout(False)
         Me.panelConfiguration.PerformLayout()
-        Me.panRiseParam.ResumeLayout(False)
-        Me.panRiseParam.PerformLayout()
         Me.gbDataType.ResumeLayout(False)
         Me.gbDataType.PerformLayout()
         Me.panelAnalysis.ResumeLayout(False)
@@ -676,15 +668,14 @@ Partial Class frmDF2P
     Friend WithEvents lblPeriodOfRecord As System.Windows.Forms.Label
     Friend WithEvents gbDataType As System.Windows.Forms.GroupBox
     Friend WithEvents txtDataInfo As System.Windows.Forms.TextBox
-    Friend WithEvents panRiseParam As System.Windows.Forms.Panel
-    Friend WithEvents lblScreenWindow As System.Windows.Forms.Label
-    Friend WithEvents lblRisePct As System.Windows.Forms.Label
-    Friend WithEvents txtPeakAheadDays As System.Windows.Forms.TextBox
-    Friend WithEvents txtPeakRisePct As System.Windows.Forms.TextBox
     Friend WithEvents btnEstRC As Windows.Forms.Button
     Friend WithEvents lblRC As Windows.Forms.Label
     Friend WithEvents txtRC As Windows.Forms.TextBox
     Friend WithEvents txtRC2 As Windows.Forms.TextBox
     Friend WithEvents lblRC2 As Windows.Forms.Label
     Friend WithEvents btnGoStep2 As Windows.Forms.Button
+    Friend WithEvents txtBackDays As Windows.Forms.TextBox
+    Friend WithEvents lblMinRecessDays As Windows.Forms.Label
+    Friend WithEvents btnClear As Windows.Forms.Button
+    Friend WithEvents btnAllMonths As Windows.Forms.Button
 End Class
