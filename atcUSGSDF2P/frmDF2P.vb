@@ -231,7 +231,7 @@ Public Class frmDF2P
                         btnAnalyse.Enabled = False
                         btnSummary.Enabled = False
                         lstRecessSegments.Enabled = False
-                        panRiseParam.Visible = False
+                        'panRiseParam.Visible = False
                     Case WTFAnalysis.FindRecharge
                         btnGetAllSegments.Text = "Find Recharges >"
                         btnAnalyse.Visible = False
@@ -243,12 +243,12 @@ Public Class frmDF2P
                         txtMinRecessionDays.Visible = True
                         txtMinRecessionDays.Text = "10"
                         'btnFallPlot.Text = "Plot Rises"
-                        panRiseParam.Visible = True
-                        txtPeakAheadDays.Text = "14"
-                        txtPeakRisePct.Text = "75"
+                        'panRiseParam.Visible = True
+                        'txtPeakAheadDays.Text = "14"
+                        'txtPeakRisePct.Text = "75"
                 End Select
             ElseIf lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
-                panRiseParam.Visible = False
+                'panRiseParam.Visible = False
                 Dim lTuStr As String = "Daily"
                 Dim location As String = ""
                 Dim lStaNam As String = ""
@@ -1441,10 +1441,10 @@ Public Class frmDF2P
             End If
         End If
 
-        'If lConfigurationGood Then
-        '    panelConfiguration.Visible = False
-        '    panelAnalysis.Visible = True
-        'End If
+        If lConfigurationGood Then
+            panelConfiguration.Visible = False
+            panelAnalysis.Visible = True
+        End If
     End Sub
 
     Private Function GetAllSegmentsGW() As Boolean
@@ -1566,22 +1566,6 @@ Public Class frmDF2P
             End If
         End If
 
-        If lcons.ToUpper() = "GW LEVEL" OrElse lcons.ToUpper() = "GWLEVEL" Then
-            If pFall.Phase = WTFAnalysis.FindRecharge Then
-                Dim lPeakaheaddays As Integer = 0
-                If Not Integer.TryParse(txtPeakAheadDays.Text, lPeakaheaddays) Then
-                    lErrMsg &= "- Peak Ahead Days is not set (Find recharge events)" & vbCrLf
-                End If
-                Dim lPeakRisePct As Double = 0
-                If Not Double.TryParse(txtPeakRisePct.Text, lPeakRisePct) Then
-                    lErrMsg &= "- Peak Rise Percent is not set (Find recharge events)" & vbCrLf
-                End If
-                If lPeakRisePct < 50 Or lPeakRisePct > 100 Then
-                    lErrMsg &= "- Peak Rise Percent is out of range (50 ~ 100%) (Find recharge events)" & vbCrLf
-                End If
-            End If
-        End If
-
         Dim lMonths As New ArrayList()
         If lstMonths.SelectedItems.Count > 0 Then
             For I As Integer = 0 To lstMonths.Items.Count - 1
@@ -1604,20 +1588,6 @@ Public Class frmDF2P
             End If
             Args.SetValue("SelectedMonths", lMonths)
             Args.SetValue("Season", lSeason)
-
-            '...FALL...
-            If pDataGroup(0).Attributes.GetValue("Constituent") = "GW LEVEL" Then
-                '    If rdoGWFall.Checked Then
-                '        Args.SetValue("GWFall", True)
-                '    ElseIf rdoGWRise.Checked Then
-                '        Args.SetValue("GWFall", False)
-                '    End If
-                If pFall.Phase = WTFAnalysis.FindRecharge Then
-                    Args.SetValue("PeakAheadDays", Integer.Parse(txtPeakAheadDays.Text.Trim()))
-                    Args.SetValue("PeakRisePct", Double.Parse(txtPeakRisePct.Text.Trim()))
-                End If
-            End If
-            '...FALL...
 
             'set duration
             Args.SetValue("Start Date", lSDate)
@@ -2237,5 +2207,27 @@ Public Class frmDF2P
             panelConfiguration.Visible = False
             panelAnalysis.Visible = True
         End If
+    End Sub
+
+    Private Sub btnAllMonths_Click(sender As Object, e As EventArgs) Handles btnAllMonths.Click
+        For I As Integer = 0 To lstMonths.Items.Count - 1
+            lstMonths.SetSelected(I, True)
+        Next
+        rdoNoSeason.Checked = True
+    End Sub
+
+    Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
+        For I As Integer = 0 To lstMonths.Items.Count - 1
+            lstMonths.SetSelected(I, False)
+        Next
+        rdoNoSeason.Checked = False
+        rdoSpring.Checked = False
+        rdoSummer.Checked = False
+        rdoFall.Checked = False
+        rdoWinter.Checked = False
+    End Sub
+
+    Private Sub btnEstRC_Click(sender As Object, e As EventArgs) Handles btnEstRC.Click
+
     End Sub
 End Class
