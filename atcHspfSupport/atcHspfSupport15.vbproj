@@ -64,6 +64,10 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="atcDurationCompare, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcDurationCompare.dll</HintPath>
+    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.8.6.42296, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
@@ -175,11 +179,6 @@
     <ProjectReference Include="..\atcData\atcData15.vbproj">
       <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
       <Name>atcData15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcDurationCompare\atcDurationCompare15.vbproj">
-      <Project>{fbaa545b-7d95-43a3-8a4f-cc664d7db201}</Project>
-      <Name>atcDurationCompare15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcGraphExperimental\atcGraph15.vbproj">

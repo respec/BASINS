@@ -7,6 +7,7 @@ Imports System
 Imports MapWinUtility.Strings
 
 
+
 Public Class atcExpertSystem
     'Friend ErrorCriteria As HexErrorCriteria
     Public Storms As New Generic.List(Of HexStorm)

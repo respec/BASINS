@@ -254,3 +254,16 @@
 *.hhk
 *.hhp
 *.hhc
+/HSPEXP/pest13/modules
+/HSPEXP/pest13/papestex
+/HSPEXP/pest13/pestex
+/HSPEXP/pest13/ppestex
+/HSPEXP/pest13/edpestex
+/HSPEXP/pest13/doc
+/HSPEXP/pest13
+/HSPEXP/bin/x86/Debug/atcEvents.dll
+/HSPEXP/bin/x86/Debug/atcEvents.pdb
+/HSPEXP/bin/x86/Debug/atcEvents.xml
+/HSPEXP/bin/x86/Debug/atcSynopticAnalysis.dll
+/HSPEXP/bin/x86/Debug/atcSynopticAnalysis.pdb
+/HSPEXP/bin/x86/Debug/atcSynopticAnalysis.xml
