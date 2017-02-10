@@ -1443,11 +1443,16 @@ Public Class frmDF2P
                 pRecess.RecessGetAllSegments()
                 lstRecessSegments.Items.Clear()
 
+                Dim lBackTraceDays As Integer = 365
+                Integer.TryParse(txtBackDays.Text, lBackTraceDays)
+                RemoveHandler lstRecessSegments.ItemCheck, AddressOf lstRecessSegments_ItemCheck
                 For Each lPeakDate As String In pRecess.listOfSegments.Keys
                     lstRecessSegments.Items.Add(lPeakDate)
-                    Dim item As Object = lstRecessSegments.Items.Item(lstRecessSegments.Items.Count - 1)
-                    'lstRecessSegments.
+                    If pRecess.listOfSegments.ItemByKey(lPeakDate).BackTraceContinuousFlag(lBackTraceDays) Then
+                        lstRecessSegments.SetItemChecked(lstRecessSegments.Items.Count - 1, True)
+                    End If
                 Next
+                AddHandler lstRecessSegments.ItemCheck, AddressOf lstRecessSegments_ItemCheck
 
                 If lstRecessSegments.Items.Count = 0 Then
                     txtAnalysisResults.Text = ""
