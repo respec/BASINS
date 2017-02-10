@@ -161,6 +161,14 @@
       <Name>atcSynopticAnalysis15</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow15.vbproj">
+      <Project>{f9a4070c-1faf-4d17-a8e6-7eb19d414b05}</Project>
+      <Name>atcTimeseriesBaseflow15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUSGSBaseflow\atcUSGSBaseflow15.vbproj">
+      <Project>{9f09a31b-de05-4ff8-8e89-867affe0ace7}</Project>
+      <Name>atcUSGSBaseflow15</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>

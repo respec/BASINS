@@ -7,7 +7,6 @@ Imports System
 Imports MapWinUtility.Strings
 
 
-
 Public Class atcExpertSystem
     'Friend ErrorCriteria As HexErrorCriteria
     Public Storms As New Generic.List(Of HexStorm)
@@ -316,7 +315,7 @@ Public Class atcExpertSystem
         'pErrorCriteria.Edit()
     End Sub
 
-    Public Sub CreateEXS(aEXSFileName As String, aBaseName As String, aSiteName As String, aRchId As Integer, aDsns() As Integer)
+    Public Sub CreateEXS(aEXSFileName As String, aBaseName As String, aSiteName As String, aRchId As Integer, aDsns() As Integer, aObservedTser As atcTimeseries)
         'build an EXS file for this location,
         'use synoptic analysis to find storm dates
         With Me
@@ -332,29 +331,56 @@ Public Class atcExpertSystem
             Dim lSite As New HspfSupport.HexSite(Me, aSiteName, 0, lExsDsns)
             lSite.Area = pUci.UpstreamArea(pUci.OpnBlks("RCHRES").OperFromID(aRchId))
             .Sites.Add(lSite)
-            'use synoptic analysis on precip to find storm dates
-            '- find precip dataset associated with this reach
-            Dim lPrecTimser As atcTimeseries = Nothing
-            Dim lSubsetPrecTimser As atcTimeseries = Nothing
-            If pUci.OpnBlks("RCHRES").OperFromID(aRchId).MetSeg IsNot Nothing Then
-                For Each lMetSegRec As atcUCI.HspfMetSegRecord In pUci.OpnBlks("RCHRES").OperFromID(aRchId).MetSeg.MetSegRecs
-                    If lMetSegRec.Name = "PREC" Then
-                        lPrecTimser = pUci.GetDataSetFromDsn(lMetSegRec.Source.VolName.Substring(3), lMetSegRec.Source.VolId)
-                        lSubsetPrecTimser = SubsetByDate(lPrecTimser, .SDateJ, .EDateJ, Nothing)
-                        Exit For
+            ''use synoptic analysis on precip to find storm dates
+            ''- find precip dataset associated with this reach
+            'Dim lPrecTimser As atcTimeseries = Nothing
+            'Dim lSubsetPrecTimser As atcTimeseries = Nothing
+            'If pUci.OpnBlks("RCHRES").OperFromID(aRchId).MetSeg IsNot Nothing Then
+            '    For Each lMetSegRec As atcUCI.HspfMetSegRecord In pUci.OpnBlks("RCHRES").OperFromID(aRchId).MetSeg.MetSegRecs
+            '        If lMetSegRec.Name = "PREC" Then
+            '            lPrecTimser = pUci.GetDataSetFromDsn(lMetSegRec.Source.VolName.Substring(3), lMetSegRec.Source.VolId)
+            '            lSubsetPrecTimser = SubsetByDate(lPrecTimser, .SDateJ, .EDateJ, Nothing)
+            '            Exit For
+            '        End If
+            '    Next
+            'End If
+            'use synoptic analysis on baseflow-separated observed flow timeseries to find storm dates
+            Dim lSubsetTimser As atcTimeseries = Nothing
+            Dim lNonBaseflowTimser As atcTimeseries = Nothing
+            If aObservedTser IsNot Nothing Then
+                lSubsetTimser = SubsetByDate(aObservedTser, .SDateJ, .EDateJ, Nothing)
+                Try
+                    Dim lTsFlowGroup As New atcTimeseriesGroup()
+                    lTsFlowGroup.Add(lSubsetTimser)
+
+                    Dim lArgs As New atcDataAttributes
+                    Dim lMethods As New ArrayList
+                    lMethods.Add(atcTimeseriesBaseflow.BFMethods.HySEPFixed)
+                    lArgs.SetValue("BFMethods", lMethods)
+                    lArgs.SetValue("DrainageArea", lSite.Area)
+                    lArgs.SetValue("StartDate", .SDateJ)
+                    lArgs.SetValue("EndDate", .EDateJ)
+                    lArgs.SetValue("Streamflow", lTsFlowGroup)
+                    lArgs.SetValue("EnglishUnit", True)
+                    Dim lMessage As String = atcUSGSBaseflow.modBaseflowUtil.ComputeRunoffIntermittent(lArgs)
+
+                    If lMessage.StartsWith("SUCCESS") Then
+                        Dim lKey As String = lMessage.Substring(lMessage.IndexOf(",") + 1)
+                        lNonBaseflowTimser = lSubsetTimser.Attributes.GetValue(lKey)
                     End If
-                Next
+                Catch ex As Exception
+                End Try
             End If
-            '- call synop to find less than 35 storms
-            If lSubsetPrecTimser IsNot Nothing Then
+            '- call synop to find less than 50 storms
+            If lNonBaseflowTimser IsNot Nothing Then
                 Dim lInputGroup As New atcTimeseriesGroup
-                lInputGroup.Add(lSubsetPrecTimser)
-                Dim lThreshold As Double = 0.1
+                lInputGroup.Add(lNonBaseflowTimser)
+                Dim lThreshold As Double = 1.0
                 Dim lOutputGroup As New atcTimeseriesGroup
                 Dim lFirstTime As Boolean = True
-                Do While lOutputGroup.Count > 35 Or lFirstTime
+                Do While lOutputGroup.Count > 50 Or lFirstTime
                     lOutputGroup = atcSynopticAnalysis.atcSynopticAnalysisPlugin.ComputeEvents(lInputGroup, lThreshold, 0.0, True)
-                    lThreshold += 0.1
+                    lThreshold += 1.0
                     lFirstTime = False
                 Loop
                 If lOutputGroup.Count > 0 Then
@@ -365,7 +391,7 @@ Public Class atcExpertSystem
                         Dim lStormSDate(5) As Integer
                         J2Date(lTimSer.Dates.Values(0), lStormSDate)
                         Dim lStormEDate(5) As Integer
-                        J2Date(lTimSer.Dates.Values(lTimSer.numValues) + 2.0, lStormEDate)  'arbitrarily define storm end as 2 days after rainfall ends
+                        J2Date(lTimSer.Dates.Values(lTimSer.numValues), lStormEDate)
                         .Storms.Add(New HspfSupport.HexStorm(lStormIndex, lStormSDate, lStormEDate))
                     Next
                 End If

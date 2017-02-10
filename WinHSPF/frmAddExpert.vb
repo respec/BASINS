@@ -11,6 +11,7 @@ Public Class frmAddExpert
     Dim pCheckedRadioIndex As Integer
     Dim pListBox1DataItems As New Collection
     Dim pListBox2DataItems As New Collection
+    Dim pListBox2Timsers As New Collection
 
     Private Sub frmAddExpert_Resized(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.ResizeEnd
         If pCheckedRadioIndex = 1 Then 'applies to calib option
@@ -63,6 +64,7 @@ Public Class frmAddExpert
 
         pListBox1DataItems.Clear()
         pListBox2DataItems.Clear()
+        pListBox2Timsers.Clear()
 
         If pCheckedRadioIndex = 4 Then 'other types
             lstGroup.Enabled = False
@@ -120,6 +122,7 @@ Public Class frmAddExpert
                 If lTser.Attributes.GetValue("Data Source") = lWDMFileName Then
                     lstGroup.Items.Add(lDsn & " : " & lSen & " " & lCon & " at " & lLoc)
                     pListBox2DataItems.Add(lDsn)
+                    pListBox2Timsers.Add(lTser)
                 End If
             Next
         End If
@@ -176,6 +179,7 @@ Public Class frmAddExpert
                     Me.Cursor = Cursors.Arrow
 
                     'create an EXS file for this location
+                    Dim lObservedTSer As atcTimeseries = Nothing
                     If lstGroup.SelectedIndex < 0 Then
                         'there does not appear to be an observed flow data sets selected, give warning 
                         Logger.Message("No observed flow data set is selected." & vbCrLf & vbCrLf &
@@ -183,12 +187,13 @@ Public Class frmAddExpert
                                        "observed flow data is required.", "Add Output Notice", MessageBoxButtons.OK, MessageBoxIcon.Information, Windows.Forms.DialogResult.OK)
                     Else
                         lDsns(0) = pListBox2DataItems.Item(lstGroup.SelectedIndex + 1)
+                        lObservedTSer = pListBox2Timsers.Item(lstGroup.SelectedIndex + 1)
                     End If
                     'now build and write the exs file
                     Dim lExpertSystem As HspfSupport.atcExpertSystem
                     lExpertSystem = New HspfSupport.atcExpertSystem(pUCI, "", pUCI.GlobalBlock.SDateJ, pUCI.GlobalBlock.EdateJ)
                     Dim lFileName As String = FilenameNoExt(pUCIFullFileName) & "-" & txtLoc.Text & ".exs"
-                    lExpertSystem.CreateEXS(lFileName, FilenameNoExt(FilenameNoPath(lWDMFileName)), txtLoc.Text, lId, lDsns)
+                    lExpertSystem.CreateEXS(lFileName, FilenameNoExt(FilenameNoPath(lWDMFileName)), txtLoc.Text, lId, lDsns, lObservedTSer)
 
                 End If
             End If
