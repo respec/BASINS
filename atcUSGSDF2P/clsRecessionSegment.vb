@@ -34,6 +34,8 @@ Public Class clsRecessionSegment
     Private pMinDayOrdinalChanged As Boolean = False
     Private pMaxDayOrdinalChanged As Boolean = False
 
+    Private pBackTraceFlag As Dictionary(Of Integer, Boolean)
+
     Public Property MinDayOrdinal() As Integer
         Get
             Return pMinDayOrdinal
@@ -104,6 +106,38 @@ Public Class clsRecessionSegment
         End Get
     End Property
 
+    Public ReadOnly Property BackTraceContinuousFlag(ByVal aBackTraceDays As Integer) As Boolean
+        Get
+            If pBackTraceFlag.ContainsKey(aBackTraceDays) Then
+                Return pBackTraceFlag(aBackTraceDays)
+            Else
+                Dim lastDayIndex As Integer = PeakDayIndex + SegmentLength - 1
+                Dim lContinuous As Boolean = True
+                If lastDayIndex - aBackTraceDays < 0 Then
+                    pBackTraceFlag.Add(aBackTraceDays, lContinuous)
+                    Return lContinuous
+                End If
+                Dim lflowVal As Double
+                Dim lDayCount As Integer = 0
+                For I As Integer = lastDayIndex To 0 Step -1
+                    lflowVal = StreamFlowTS.Value(I)
+                    If Double.IsNaN(lflowVal) AndAlso lDayCount < aBackTraceDays Then
+                        lContinuous = False
+                        Exit For
+                    End If
+                    If lDayCount < aBackTraceDays Then
+                        lDayCount += 1
+                    Else
+                        Exit For
+                    End If
+                Next 'loop 220
+                pBackTraceFlag.Add(aBackTraceDays, lContinuous)
+                Return lContinuous
+            End If
+        End Get
+    End Property
+
+
     Public Flow() As Double
     Public QLog() As Double
     Public Dates() As Double
@@ -114,6 +148,7 @@ Public Class clsRecessionSegment
         'ReDim Dates(MaxSegmentLengthInDays)
         AntecedentGWLMethods = New atcCollection() 'FALL
         Recharges = New atcCollection() 'FALL
+        pBackTraceFlag = New Dictionary(Of Integer, Boolean)
     End Sub
 
     Public Sub GetData(Optional ByVal aSetGWPPElev As Boolean = False, Optional ByVal aPPElev As Double = Double.NaN)
@@ -160,6 +195,7 @@ Public Class clsRecessionSegment
         Next 'loop 220
         NeedtoReadData = False
     End Sub
+
 
     Public Sub SetPourpointElevation(ByVal aPPElev As Double)
         Dim lUseNaturalLog As Boolean = False
@@ -241,6 +277,7 @@ Public Class clsRecessionSegment
         ReDim Flow(0)
         ReDim QLog(0)
         ReDim Dates(0)
+        pBackTraceFlag.Clear()
     End Sub
 
     Public Function CompareTo(ByVal obj As Object) As Integer Implements System.IComparable.CompareTo

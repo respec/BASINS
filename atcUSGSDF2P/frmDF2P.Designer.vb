@@ -51,7 +51,7 @@ Partial Class frmDF2P
         Me.scDisplay = New System.Windows.Forms.SplitContainer()
         Me.txtAnalysisResults = New System.Windows.Forms.TextBox()
         Me.lstTable = New System.Windows.Forms.ListBox()
-        Me.btnSummary = New System.Windows.Forms.Button()
+        Me.btnEstimateBFI = New System.Windows.Forms.Button()
         Me.btnAnalyse = New System.Windows.Forms.Button()
         Me.btnGetAllSegments = New System.Windows.Forms.Button()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
@@ -60,12 +60,12 @@ Partial Class frmDF2P
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem()
         Me.panelConfiguration = New System.Windows.Forms.Panel()
         Me.lblMinRecessDays = New System.Windows.Forms.Label()
-        Me.btnGoStep2 = New System.Windows.Forms.Button()
         Me.lblRC = New System.Windows.Forms.Label()
         Me.txtRC = New System.Windows.Forms.TextBox()
         Me.btnEstRC = New System.Windows.Forms.Button()
         Me.gbDataType = New System.Windows.Forms.GroupBox()
         Me.txtDataInfo = New System.Windows.Forms.TextBox()
+        Me.btnGoStep2 = New System.Windows.Forms.Button()
         Me.panelAnalysis = New System.Windows.Forms.Panel()
         Me.txtBackDays = New System.Windows.Forms.TextBox()
         Me.txtRC2 = New System.Windows.Forms.TextBox()
@@ -395,15 +395,15 @@ Partial Class frmDF2P
         Me.lstTable.TabIndex = 0
         Me.lstTable.Visible = False
         '
-        'btnSummary
+        'btnEstimateBFI
         '
-        Me.btnSummary.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSummary.Location = New System.Drawing.Point(668, 235)
-        Me.btnSummary.Name = "btnSummary"
-        Me.btnSummary.Size = New System.Drawing.Size(93, 23)
-        Me.btnSummary.TabIndex = 18
-        Me.btnSummary.Text = "Estimate BFImax"
-        Me.btnSummary.UseVisualStyleBackColor = True
+        Me.btnEstimateBFI.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEstimateBFI.Location = New System.Drawing.Point(668, 235)
+        Me.btnEstimateBFI.Name = "btnEstimateBFI"
+        Me.btnEstimateBFI.Size = New System.Drawing.Size(93, 23)
+        Me.btnEstimateBFI.TabIndex = 18
+        Me.btnEstimateBFI.Text = "Estimate BFImax"
+        Me.btnEstimateBFI.UseVisualStyleBackColor = True
         '
         'btnAnalyse
         '
@@ -483,17 +483,6 @@ Partial Class frmDF2P
         Me.lblMinRecessDays.TabIndex = 53
         Me.lblMinRecessDays.Text = "Step 2: Enter minimum flow " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "recession length in days:"
         '
-        'btnGoStep2
-        '
-        Me.btnGoStep2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnGoStep2.Location = New System.Drawing.Point(362, 184)
-        Me.btnGoStep2.Name = "btnGoStep2"
-        Me.btnGoStep2.Size = New System.Drawing.Size(135, 27)
-        Me.btnGoStep2.TabIndex = 52
-        Me.btnGoStep2.Text = "Step 2: Estimate BFImax"
-        Me.btnGoStep2.UseVisualStyleBackColor = True
-        Me.btnGoStep2.Visible = False
-        '
         'lblRC
         '
         Me.lblRC.AutoSize = True
@@ -542,6 +531,17 @@ Partial Class frmDF2P
         Me.txtDataInfo.Size = New System.Drawing.Size(166, 156)
         Me.txtDataInfo.TabIndex = 0
         '
+        'btnGoStep2
+        '
+        Me.btnGoStep2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnGoStep2.Location = New System.Drawing.Point(362, 184)
+        Me.btnGoStep2.Name = "btnGoStep2"
+        Me.btnGoStep2.Size = New System.Drawing.Size(135, 27)
+        Me.btnGoStep2.TabIndex = 52
+        Me.btnGoStep2.Text = "Step 2: Estimate BFImax"
+        Me.btnGoStep2.UseVisualStyleBackColor = True
+        Me.btnGoStep2.Visible = False
+        '
         'panelAnalysis
         '
         Me.panelAnalysis.Controls.Add(Me.txtBackDays)
@@ -550,7 +550,7 @@ Partial Class frmDF2P
         Me.panelAnalysis.Controls.Add(Me.lblRC2)
         Me.panelAnalysis.Controls.Add(Me.btnConfiguration)
         Me.panelAnalysis.Controls.Add(Me.lstRecessSegments)
-        Me.panelAnalysis.Controls.Add(Me.btnSummary)
+        Me.panelAnalysis.Controls.Add(Me.btnEstimateBFI)
         Me.panelAnalysis.Controls.Add(Me.btnAnalyse)
         Me.panelAnalysis.Controls.Add(Me.scDisplay)
         Me.panelAnalysis.Location = New System.Drawing.Point(6, 322)
@@ -603,7 +603,7 @@ Partial Class frmDF2P
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(789, 306)
+        Me.ClientSize = New System.Drawing.Size(789, 308)
         Me.Controls.Add(Me.panelAnalysis)
         Me.Controls.Add(Me.panelConfiguration)
         Me.Controls.Add(Me.MenuStrip1)
@@ -653,7 +653,7 @@ Partial Class frmDF2P
     Friend WithEvents txtDataStart As System.Windows.Forms.TextBox
     Friend WithEvents lblDataEnd As System.Windows.Forms.Label
     Friend WithEvents lblDataStart As System.Windows.Forms.Label
-    Friend WithEvents btnSummary As System.Windows.Forms.Button
+    Friend WithEvents btnEstimateBFI As System.Windows.Forms.Button
     Friend WithEvents btnAnalyse As System.Windows.Forms.Button
     Friend WithEvents btnGetAllSegments As System.Windows.Forms.Button
     Friend WithEvents scDisplay As System.Windows.Forms.SplitContainer

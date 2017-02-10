@@ -241,18 +241,18 @@ Public Class frmDF2P
                         'lblFallD.Visible = True
                         'txtFallD.Visible = True
                         btnAnalyse.Text = "Analyse Kgw"
-                        btnSummary.Text = "Summarize Kgw"
-                        btnSummary.Width += 25
-                        btnSummary.Left = btnAnalyse.Right + 4
+                        btnEstimateBFI.Text = "Summarize Kgw"
+                        btnEstimateBFI.Width += 25
+                        btnEstimateBFI.Left = btnAnalyse.Right + 4
                         'btnFallPlot.Left = lblFallD.Left - 5 - btnFallPlot.Width
                         btnAnalyse.Enabled = False
-                        btnSummary.Enabled = False
+                        btnEstimateBFI.Enabled = False
                         lstRecessSegments.Enabled = False
                         'panRiseParam.Visible = False
                     Case WTFAnalysis.FindRecharge
                         btnGetAllSegments.Text = "Find Recharges >"
                         btnAnalyse.Visible = False
-                        btnSummary.Visible = False
+                        btnEstimateBFI.Visible = False
                         'lblFallD.Visible = False
                         'txtFallD.Visible = False
                         lblRecessionDays.Visible = True
@@ -1442,8 +1442,11 @@ Public Class frmDF2P
                 pRecess.Initialize(pDataGroup(0), pLastRunConfigs)
                 pRecess.RecessGetAllSegments()
                 lstRecessSegments.Items.Clear()
+
                 For Each lPeakDate As String In pRecess.listOfSegments.Keys
                     lstRecessSegments.Items.Add(lPeakDate)
+                    Dim item As Object = lstRecessSegments.Items.Item(lstRecessSegments.Items.Count - 1)
+                    'lstRecessSegments.
                 Next
 
                 If lstRecessSegments.Items.Count = 0 Then
@@ -2034,7 +2037,7 @@ Public Class frmDF2P
         End If
     End Sub
 
-    Private Sub btnSummary_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSummary.Click
+    Private Sub btnEstimateBFI_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEstimateBFI.Click
         If lstRecessSegments.Items.Count = 0 OrElse lstRecessSegments.CheckedItems.Count = 0 Then
             Exit Sub
         End If
