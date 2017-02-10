@@ -3,6 +3,7 @@ Imports atcUtility
 Imports atcUSGSUtility
 Imports MapWinUtility
 Imports atcTimeseriesRDB
+Imports atcTimeseriesBaseflow
 Imports atcGraph
 Imports ZedGraph
 
@@ -49,6 +50,8 @@ Public Class frmDF2P
     Private pMessage As String = ""
     Private pLoaded As Boolean = False
 
+    Private Months As Dictionary(Of String, Integer) = Nothing
+
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing,
                       Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing,
                       Optional ByVal aShowForm As Boolean = True,
@@ -92,6 +95,20 @@ Public Class frmDF2P
         txtAnalysisResults.Visible = False
         PopulateForm()
         chkSaveInterimToFile.Checked = True
+
+        Months = New Dictionary(Of String, Integer)
+        Months.Add("January", 1)
+        Months.Add("February", 2)
+        Months.Add("March", 3)
+        Months.Add("April", 4)
+        Months.Add("May", 5)
+        Months.Add("June", 6)
+        Months.Add("July", 7)
+        Months.Add("August", 8)
+        Months.Add("September", 9)
+        Months.Add("October", 10)
+        Months.Add("November", 11)
+        Months.Add("December", 12)
         If aModal Then
             Me.ShowDialog()
         Else
@@ -2228,6 +2245,30 @@ Public Class frmDF2P
     End Sub
 
     Private Sub btnEstRC_Click(sender As Object, e As EventArgs) Handles btnEstRC.Click
+        If pDataGroup.Count = 0 Then Exit Sub
+        Dim lStartDate As Double = StartDateFromForm()
+        Dim lEndDate As Double = EndDateFromForm()
+        If Double.IsNaN(lStartDate) OrElse Double.IsNaN(lEndDate) OrElse lStartDate <= 0 OrElse lEndDate <= 0 OrElse lStartDate > lEndDate Then
+            Exit Sub
+        End If
 
+        Dim lMonthsToSkip As New ArrayList()
+        For Each m As String In lstMonths.SelectedItems
+            lMonthsToSkip.Add(Months(m))
+        Next
+
+        Dim lArgs As atcDataAttributes = Nothing
+        If lMonthsToSkip.Count > 0 Then
+            lArgs = New atcDataAttributes()
+            lArgs.SetValue("MonthsToSkip", lMonthsToSkip)
+        End If
+        Dim lTs As atcTimeseries = SubsetByDate(pDataGroup(0), lStartDate, lEndDate, Nothing)
+        Dim lBFDF2P As New clsBaseflow2PRDF()
+        lBFDF2P.CalculateBFImax_RC(lTs, lArgs)
+        If Not Double.IsNaN(lBFDF2P.RC) Then
+            clsBaseflow2PRDF.Estimated_RC = lBFDF2P.RC
+            txtRC.Text = lBFDF2P.RC.ToString()
+            txtRC2.Text = lBFDF2P.RC.ToString()
+        End If
     End Sub
 End Class

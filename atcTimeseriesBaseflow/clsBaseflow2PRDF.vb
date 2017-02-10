@@ -28,6 +28,9 @@ Public Class clsBaseflow2PRDF
 
     Private pTotalBaseflowDepth As Double = 0
 
+    Public Shared Estimated_RC As Double = Double.NaN
+    Public Shared Estimated_BFImax As Double = Double.NaN
+
     Private pParamEstimationMethod As ETWOPARAMESTIMATION = ETWOPARAMESTIMATION.ECKHARDT
     Public Property ParamEstimationMethod() As ETWOPARAMESTIMATION
         Get
@@ -215,7 +218,7 @@ Public Class clsBaseflow2PRDF
             BFImax = 0.5
         End If
 
-        Dim lMonthsToSkip() As Integer = Nothing
+        Dim lMonthsToSkip As ArrayList
         If aConditions IsNot Nothing Then
             lMonthsToSkip = aConditions.GetValue("MonthsToSkip", Nothing)
             If lMonthsToSkip IsNot Nothing Then
