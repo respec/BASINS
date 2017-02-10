@@ -521,6 +521,7 @@ Public Class frmUSGSBaseflow
         End If
         ClearAttributes()
         modBaseflowUtil.ComputeBaseflowIntermittent(lArgs, True)
+        'modBaseflowUtil.ComputeRunoffIntermittent(lArgs)
         'pMethodLastDone = lArgs.GetValue("Method")
         MethodsLastDone = lArgs.GetValue(BFInputNames.BFMethods)
         pDALastUsed = lArgs.GetValue(BFInputNames.DrainageArea) '"Drainage Area")

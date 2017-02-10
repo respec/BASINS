@@ -793,6 +793,218 @@ Public Module modBaseflowUtil
         Logger.Status("Hide")
     End Sub '}
 
+    '{
+    ''' <summary>
+    ''' Calculate Runoff from Streamflow using the HySEP Fixed method (for WinHSPF)
+    ''' </summary>
+    ''' <param name="aArgs">Base-flow separation inputs (e.g. streamflow and parameters)</param>
+    ''' <return>Error message, start with "ERROR". If successful, then it will begin with "SUCCESS,Key" string</return>
+    Public Function ComputeRunoffIntermittent(ByVal aArgs As atcDataAttributes) As String
+        Dim lMessage As String = ""
+        Dim lTsFlow As atcTimeseries = aArgs.GetValue(BFInputNames.Streamflow)(0) 'original timeseries group that contains the original flow record
+        Dim lAnalysis_Start As Double = aArgs.GetValue(BFInputNames.StartDate)
+        Dim lAnalysis_End As Double = aArgs.GetValue(BFInputNames.EndDate)
+        Dim lMethods As ArrayList = aArgs.GetValue(BFInputNames.BFMethods)
+        Dim lDrainageArea As Double = aArgs.GetValue(BFInputNames.DrainageArea)
+
+        Dim lMsgTitle As String = "Interactive Base-flow Analysis"
+        'break up into continuous periods
+        Dim lTserFullDateRange As New atcTimeseries(Nothing)
+        Logger.Dbg("Creating Full Date Range Flow Record.")
+        Try
+            With lTserFullDateRange
+                .Dates = New atcTimeseries(Nothing)
+                .Dates.Values = NewDates(lAnalysis_Start, lAnalysis_End, atcTimeUnit.TUDay, 1)
+                .numValues = lTserFullDateRange.Dates.numValues
+                .SetInterval(atcTimeUnit.TUDay, 1)
+                For I As Integer = 1 To .numValues
+                    .Value(I) = -99.0
+                Next
+            End With
+        Catch ex As Exception
+            lMessage = "ERROR:Creating Full Date Range Flow Record Failed"
+            Return lMessage
+        End Try
+
+        Dim lFlowStart As Double = lTsFlow.Dates.Value(0)
+        Dim lFlowEnd As Double = lTsFlow.Dates.Value(lTsFlow.numValues)
+
+        Logger.Dbg("Construct continuous streamflow records for analysis.")
+        Dim lTsAnalysisGroup As New atcTimeseriesGroup()
+        Try
+            If lTsFlow.Attributes.GetValue("Count missing") > 0 Then
+                If lTsFlow.Attributes.GetValue("Point") Then
+                    lTsFlow.Attributes.SetValue("Point", False)
+                End If
+                Dim ctr As Integer = 1
+                For I As Integer = 1 To lTsFlow.numValues
+                    If Not Double.IsNaN(lTsFlow.Value(I)) Then
+                        lFlowStart = lTsFlow.Dates.Value(I - 1)
+                        While (I <= lTsFlow.numValues AndAlso Not Double.IsNaN(lTsFlow.Value(I)))
+                            I = I + 1
+                        End While
+                        lFlowEnd = lTsFlow.Dates.Value(I - 1) 'need to record the end of the last time step
+                        If (lFlowEnd - lFlowStart) >= 31 Then
+                            Dim lTs As atcTimeseries = SubsetByDate(lTsFlow, lFlowStart, lFlowEnd, Nothing)
+                            lTs.Attributes.SetValue("period", ctr)
+                            lTsAnalysisGroup.Add(ctr, lTs)
+                            ctr += 1
+                        End If
+                    End If
+                Next
+            Else
+                'cuz lTsFlow for a station has to be used later, the clone will be cleared after batch bf
+                If lTsFlow.Attributes.GetValue("Point") Then
+                    lTsFlow.Attributes.SetValue("Point", False)
+                End If
+                lTsAnalysisGroup.Add(lTsFlow.Clone())
+            End If
+        Catch ex As Exception
+            lMessage = "ERROR:Construct continuous streamflow records for analysis failed."
+            Return lMessage
+        End Try
+
+        Dim lTsFlowGroup As New atcTimeseriesGroup()
+        Dim CalcBF As atcTimeseriesBaseflow.atcTimeseriesBaseflow = New atcTimeseriesBaseflow.atcTimeseriesBaseflow()
+        Dim lTotalGroupCt As Integer = lTsAnalysisGroup.Count
+        Dim lGroupCtr As Integer = 1
+        Dim lPattern As String = "_period_(\d)+"
+        Dim rgx = New Regex(lPattern)
+        Dim replacement = ""
+        Dim lTsDailyCheck As atcTimeseries = Nothing
+        Dim lActualStart As Double
+        Dim lActualEnd As Double
+        For Each lTsChunk As atcTimeseries In lTsAnalysisGroup
+            'Logger.Progress("Base-flow Analysis for continuous stream records", lGroupCtr, lTotalGroupCt)
+            lActualStart = lTsChunk.Dates.Value(0)
+            lActualEnd = lTsChunk.Dates.Value(lTsChunk.numValues)
+            lTsDailyCheck = SubsetByDate(lTsChunk, lAnalysis_Start, lAnalysis_End, Nothing)
+            If lTsDailyCheck Is Nothing OrElse lTsDailyCheck.Values Is Nothing OrElse lTsDailyCheck.numValues = 0 Then
+                Logger.Dbg("Period " & lGroupCtr & " duration (" & DumpDate(lActualStart) & "~" & DumpDate(lActualEnd) & ") mismatch analysis duration (" & DumpDate(lAnalysis_Start) & "~" & DumpDate(lAnalysis_End) & "). Skipped.")
+                lGroupCtr += 1
+                Continue For
+            Else
+                lTsDailyCheck.Clear()
+                lTsDailyCheck = Nothing
+            End If
+            lTsFlowGroup.Add(lTsChunk)
+            aArgs.SetValue("BatchRun", False)
+            aArgs.SetValue(BFInputNames.Streamflow, lTsFlowGroup)
+            'Below is for running BFLOW using original full time series including gaps
+            'aArgs.SetValue("OriginalFlow", lTsFlow)
+            If CalcBF.Open("baseflow", aArgs) Then
+                MethodsLastDone = lMethods
+            End If
+            'lStation.Message &= CalcBF.BF_Message.Trim()
+            lTsFlowGroup.Clear()
+            lGroupCtr += 1
+        Next 'period
+        'after the results are written, then merge, the intermittent time series can be cleared
+        'the lTsAnalysisGroup contains the chuncky or original time series' clone (if only 1 period), these will be cleared
+        Dim lBFReportGroups As atcDataAttributes = Nothing
+        Try
+            Logger.Dbg("Construct full span base-flow analysis time series.")
+            lBFReportGroups = MergeBaseflowResults(lTserFullDateRange, lTsAnalysisGroup, "Daily", True)
+        Catch ex As Exception
+            lMessage = "ERROR:Construct full span base-flow analysis time series failed."
+            Return lMessage
+        End Try
+        With lBFReportGroups
+            .SetValue("AnalysisStart", lAnalysis_Start)
+            .SetValue("AnalysisEnd", lAnalysis_End)
+            .SetValue("Drainage Area", lDrainageArea)
+            .SetValue("ReportGroupsAvailable", True)
+            .SetValue("ReportFileSuffix", "fullspan")
+            .SetValue("ForFullSpan", True)
+            lMethods = aArgs.GetValue(BFInputNames.BFMethods, Nothing)
+            .SetValue(BFInputNames.BFMethods, lMethods)
+            If lMethods.Contains(BFMethods.BFIStandard) Then
+                Dim lFrac = aArgs.GetValue(BFInputNames.BFITurnPtFrac, Double.NaN) '"BFIFrac"
+                .SetValue(BFInputNames.BFITurnPtFrac, lFrac)
+            End If
+            If lMethods.Contains(BFMethods.BFIModified) Then
+                Dim lK1Day = aArgs.GetValue(BFInputNames.BFIRecessConst, Double.NaN) '"BFIK1Day"
+                .SetValue(BFInputNames.BFIRecessConst, lK1Day) '"BFIK1Day"
+            End If
+            If lMethods.Contains(BFMethods.BFIStandard) OrElse lMethods.Contains(BFMethods.BFIModified) Then
+                Dim lNDay = aArgs.GetValue(BFInputNames.BFINDayScreen, Double.NaN) '"BFINDay"
+                .SetValue(BFInputNames.BFINDayScreen, lNDay) '"BFINDay"
+                Dim lBFIYearBasis As String = aArgs.GetValue(BFInputNames.BFIReportby, "") '"BFIReportby"
+                .SetValue(BFInputNames.BFIReportby, lBFIYearBasis) '"BFIReportby"
+            End If
+            If lMethods.Contains(BFMethods.BFLOW) Then
+                Dim lalpha = aArgs.GetValue(BFInputNames.BFLOWFilter, Double.NaN)
+                .SetValue(BFInputNames.BFLOWFilter, lalpha)
+            End If
+            If lMethods.Contains(BFMethods.TwoPRDF) Then
+                Dim lRC = aArgs.GetValue(BFInputNames.TwoPRDFRC, Double.NaN)
+                .SetValue(BFInputNames.TwoPRDFRC, lRC)
+                Dim lBFImax = aArgs.GetValue(BFInputNames.TwoPRDFBFImax, Double.NaN)
+                .SetValue(BFInputNames.TwoPRDFBFImax, lBFImax)
+                Dim lDF2PMethod = aArgs.GetValue(BFInputNames.TwoParamEstMethod, clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE)
+                .SetValue(BFInputNames.TwoParamEstMethod, lDF2PMethod)
+            End If
+        End With
+
+        Dim lTsFlowFullRange As atcTimeseries = Nothing
+        Try
+            Logger.Dbg("Construct full span streamflow time series for report.")
+            lTsFlowFullRange = MergeBaseflowTimeseries(lTserFullDateRange, lTsFlow, False, True)  'MergeTimeseries(lTmpGroup, True)
+            AdjustDatesOfReportingTimeseries(lTsFlowFullRange, lBFReportGroups)
+            'lTsFlowFullRange.Clear()
+            'lTsFlowFullRange = Nothing
+        Catch ex As Exception
+            lMessage = "ERROR:Construct full span streamflow time series for report failed."
+            Return lMessage
+        End Try
+
+        Dim lKey As String = "RO_HySEPFixed"
+        Logger.Dbg("Construct full time span base-flow analysis result.")
+        'reconstruct the bf time series as attribute to pDataGroup(0) of the analysis window
+        'first get rid of old method's group
+        Dim lTsGroupFixed As atcCollection = Nothing
+        With lBFReportGroups
+            lTsGroupFixed = .GetValue("GroupFixed", Nothing)
+        End With
+        If lTsGroupFixed IsNot Nothing AndAlso lTsGroupFixed.Count > 0 Then
+            Dim lTs As atcTimeseries = lTsGroupFixed.ItemByKey("RateDaily")
+            For I As Integer = 1 To lTs.numValues
+                If lTs.Value(I) < 0 Then lTs.Value(I) = Double.NaN
+            Next
+            'lTs.Attributes.SetValue("Method", BFMethods.HySEPFixed)
+            'lTs.Attributes.SetValue("Scenario", BFMethods.HySEPFixed.ToString())
+            'lTs.Attributes.SetValue("Constituent", "BF_HySEPFixed")
+            'lTs.Attributes.SetValue("Location", lTsFlow.Attributes.GetValue("Location"))
+            'lTs.Attributes.SetValue("Units", "cubic feet per second")
+            'If lDrainageArea > 0 Then
+            '    lTs.Attributes.SetValue("Drainage Area", lDrainageArea)
+            'Else
+            '    lTs.Attributes.SetValue("Drainage Area", -99)
+            'End If
+            'lNewBFTserGroup.Add(lTs)
+            If lTsFlowFullRange IsNot Nothing Then
+                Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                With lTsRO.Attributes
+                    .SetValue("Constituent", lKey)
+                    .SetValue("Method", BFMethods.HySEPFixed)
+                    .SetValue("Units", "cubic feet per second")
+                    .SetValue("Specification", CalcBF.Specification)
+                End With
+                Dim lTSRo0 As atcTimeseries = lTsFlow.Attributes.GetValue(lKey, Nothing)
+                If lTSRo0 IsNot Nothing Then
+                    lTSRo0.Clear()
+                    lTSRo0 = Nothing
+                    lTsFlow.Attributes.RemoveByKey(lKey)
+                End If
+                lTsFlow.Attributes.SetValue(lKey, lTsRO)
+                lMessage = "SUCCESS," + lKey
+            End If
+        Else
+            lMessage = "ERROR:Base-flow separation failed."
+        End If
+        Return lMessage
+    End Function '}
+
     Public Sub ASCIICommon(ByVal aTs As atcTimeseries, Optional ByVal args As atcDataAttributes = Nothing)
 
         If Not IO.Directory.Exists(OutputDir) Then
