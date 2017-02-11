@@ -1226,8 +1226,9 @@ Public Class frmDF2P
         With pGrapher.ZedGraphCtrl.GraphPane
             If aDataGroup.Count > 0 Then
                 '.YAxis.Type = AxisType.Log
-                .CurveList.Item(0).Color = Drawing.Color.Red
-                .Legend.IsVisible = False
+                .CurveList.Item(0).Color = Drawing.Color.Blue
+                .CurveList.Item(1).Color = Drawing.Color.LightBlue
+                .Legend.IsVisible = True
                 '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
                 'CType(.CurveList.Item(1), LineItem).Line.Width = 2
             End If
@@ -1443,12 +1444,11 @@ Public Class frmDF2P
                 pRecess.RecessGetAllSegments()
                 lstRecessSegments.Items.Clear()
 
-                Dim lBackTraceDays As Integer = 365
-                Integer.TryParse(txtBackDays.Text, lBackTraceDays)
+                Integer.TryParse(txtBackDays.Text, pRecess.BackTraceDays)
                 RemoveHandler lstRecessSegments.ItemCheck, AddressOf lstRecessSegments_ItemCheck
                 For Each lPeakDate As String In pRecess.listOfSegments.Keys
                     lstRecessSegments.Items.Add(lPeakDate)
-                    If pRecess.listOfSegments.ItemByKey(lPeakDate).BackTraceContinuousFlag(lBackTraceDays) Then
+                    If pRecess.listOfSegments.ItemByKey(lPeakDate).BackTraceContinuousFlag(pRecess.BackTraceDays) Then
                         lstRecessSegments.SetItemChecked(lstRecessSegments.Items.Count - 1, True)
                     End If
                 Next
@@ -1886,20 +1886,7 @@ Public Class frmDF2P
     End Sub
 
     Private Sub lstRecessSegments_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstRecessSegments.ItemCheck
-        Dim lOperation As String = ""
-        If e.NewValue = CheckState.Checked Then
-            lOperation = "select"
-        ElseIf e.NewValue = CheckState.Unchecked Then
-            lOperation = "unselect"
-        Else
-            Exit Sub
-        End If
-        Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
-        If lCons = "Streamflow" OrElse lCons = "FLOW" Then
-            pRecess.DoOperation(lOperation, lstRecessSegments.Items(e.Index).ToString)
-        ElseIf lCons = "GW LEVEL" Then
-            pFall.DoOperation(lOperation, lstRecessSegments.Items(e.Index).ToString)
-        End If
+        e.NewValue = e.CurrentValue
     End Sub
 
     Private Sub lstRecessSegments_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstRecessSegments.SelectedIndexChanged
@@ -1911,9 +1898,10 @@ Public Class frmDF2P
         pZgc.Visible = False
         Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
         If lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
-            pRecess.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
-            lSegs = pRecess.Table.Split(vbCrLf)
-            pGraphRecessDatagroup.Add(pRecess.GraphTs)
+            'pRecess.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
+            pRecess.DoOperation("estimate_bfi", lstRecessSegments.SelectedItem.ToString)
+            'lSegs = pRecess.Table.Split(vbCrLf)
+            pGraphRecessDatagroup.Add(pRecess.GraphTsGroup)
         ElseIf lCons.ToUpper() = "GW LEVEL" Then
             pFall.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
             lSegs = pFall.Table.Split(vbCrLf)
@@ -1921,9 +1909,9 @@ Public Class frmDF2P
         End If
 
         'txtDisplayText.Text = pRecess.Table
-        For Each lSeg As String In lSegs
-            If lSeg.Trim() <> "" Then lstTable.Items.Add(lSeg.Trim(vbCr, vbLf))
-        Next
+        'For Each lSeg As String In lSegs
+        '    If lSeg.Trim() <> "" Then lstTable.Items.Add(lSeg.Trim(vbCr, vbLf))
+        'Next
         RefreshGraphRecess(pGraphRecessDatagroup)
         pZgc.Visible = True
     End Sub
@@ -2275,6 +2263,7 @@ Public Class frmDF2P
         lBFDF2P.CalculateBFImax_RC(lTs, lArgs)
         If Not Double.IsNaN(lBFDF2P.RC) Then
             clsBaseflow2PRDF.Estimated_RC = lBFDF2P.RC
+            pRecess.RecessionConstant = lBFDF2P.RC
             txtRC.Text = lBFDF2P.RC.ToString()
             txtRC2.Text = lBFDF2P.RC.ToString()
         End If

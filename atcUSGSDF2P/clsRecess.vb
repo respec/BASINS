@@ -34,6 +34,19 @@ Public Class clsRecess
         End Set
     End Property
 
+    Private pBackTraceDays As Integer = 365
+    Public Property BackTraceDays() As Integer
+        Get
+            Return pBackTraceDays
+        End Get
+        Set(ByVal value As Integer)
+            If value <= 0 Then
+                value = 365
+            End If
+            pBackTraceDays = value
+        End Set
+    End Property
+
     'must be integers, can only be within 1 - 12
     Private pRecessMonths As New ArrayList()
     Public Property RecessIncludeMonths() As ArrayList
@@ -64,6 +77,8 @@ Public Class clsRecess
 
     Private pRecessions As New atcCollection 'collection of clsRecessionSegment
     Public RecessionSegment As clsRecessionSegment = Nothing
+
+    Public RecessionConstant As Double = Double.NaN
 
 #Region "IOManagement"
     Friend fHasWritePermission As Boolean = False
@@ -270,6 +285,7 @@ Public Class clsRecess
 
     Public Table As String 'current recession segment's table
     Public GraphTs As atcTimeseries 'current recession's timeseries
+    Public GraphTsGroup As atcTimeseriesGroup 'current recession's backtrace and b_prime timeseries
 
     Public Bulletin As String = ""
 
@@ -504,6 +520,8 @@ Public Class clsRecess
         End If
         listOfSegments = New atcCollection()
         'RecessAnalysis()
+
+        GraphTsGroup = New atcTimeseriesGroup()
 
     End Sub
 
@@ -877,13 +895,15 @@ Public Class clsRecess
     End Sub
 
     Public Overridable Function DoOperation(ByVal aOperation As String, ByVal aRecessKey As String) As Boolean
-        If aRecessKey <> "" Then
+        If Not String.IsNullOrEmpty(aRecessKey) Then
             RecessionSegment = listOfSegments.ItemByKey(aRecessKey)
             If RecessionSegment.NeedtoReadData Then
                 RecessionSegment.GetData()
             End If
         End If
         Select Case aOperation.ToLower
+            Case "estimate_bfi"
+                BackTraceDisplay(RecessionSegment)
             Case "d"
                 RecessDisplay(RecessionSegment)
             Case "r"
@@ -947,6 +967,60 @@ Public Class clsRecess
             .Attributes.SetValue("Scenario", "")
             .Attributes.SetValue("Units", "Log(Flow, cfs)")
         End With
+    End Sub
+
+    Private Sub BackTraceDisplay(ByVal aSegment As clsRecessionSegment)
+        If Double.IsNaN(RecessionConstant) OrElse BackTraceDays < 365 Then
+            Exit Sub
+        End If
+
+        Dim lTsBackTrace As atcTimeseries = aSegment.BackTraceTimeSeries(BackTraceDays)
+        Dim lTs_b_prime As atcTimeseries = Nothing
+        Dim lMessage As String = aSegment.EstimateBFImax_CF(lTsBackTrace, RecessionConstant, lTs_b_prime)
+        Dim lBFImax As Double = Double.NaN
+        If lMessage.StartsWith("SUCCESS") Then
+            Dim lKey As String = lMessage.Substring(lMessage.IndexOf(",") + 1)
+            lBFImax = lTsBackTrace.Attributes.GetValue(lKey, Double.NaN)
+            Bulletin = "SUCCESS," & lBFImax.ToString()
+        Else
+            Bulletin = lMessage
+            Exit Sub
+        End If
+
+        GraphTsGroup.Clear()
+        With lTsBackTrace
+            'For I As Integer = 1 To .numValues
+            '    If .Value(I) > 0 Then
+            '        .Value(I) = Math.Log10(.Value(I))
+            '    Else
+            '        .Value(I) = Math.Log10(.Value(I) * -1)
+            '    End If
+            'Next
+            .Value(0) = GetNaN()
+            .Attributes.SetValue("YAxis", "LEFT")
+            .Attributes.SetValue("point", False)
+            .Attributes.SetValue("Constituent", "Flow")
+            .Attributes.SetValue("Scenario", "")
+            .Attributes.SetValue("Units", "Log(Flow, cfs)")
+        End With
+
+        With lTs_b_prime
+            'For I As Integer = 1 To .numValues
+            '    If .Value(I) > 0 Then
+            '        .Value(I) = Math.Log10(.Value(I))
+            '    Else
+            '        .Value(I) = Math.Log10(.Value(I) * -1)
+            '    End If
+            'Next
+            .Value(0) = GetNaN()
+            .Attributes.SetValue("YAxis", "LEFT")
+            .Attributes.SetValue("point", False)
+            .Attributes.SetValue("Constituent", "b'")
+            .Attributes.SetValue("Scenario", "")
+            .Attributes.SetValue("Units", "Log(Flow, cfs)")
+        End With
+        GraphTsGroup.Add(lTsBackTrace)
+        GraphTsGroup.Add(lTs_b_prime)
     End Sub
 
     Protected Function RecessAnalyse(ByVal aSegment As clsRecessionSegment, Optional ByVal aConstituent As String = "Streamflow") As String

@@ -35,6 +35,7 @@ Public Class clsRecessionSegment
     Private pMaxDayOrdinalChanged As Boolean = False
 
     Private pBackTraceFlag As Dictionary(Of Integer, Boolean)
+    Private pBFImaxEstimates As Dictionary(Of String, Double)
 
     Public Property MinDayOrdinal() As Integer
         Get
@@ -137,6 +138,85 @@ Public Class clsRecessionSegment
         End Get
     End Property
 
+    Public ReadOnly Property BackTraceTimeSeries(ByVal aBackTraceDays As Integer) As atcTimeseries
+        Get
+            Dim lTsBacktrace As atcTimeseries = Nothing
+            Dim lStartIndex As Integer = PeakDayIndex + SegmentLength - aBackTraceDays
+            Dim lEndIndex As Integer = PeakDayIndex + SegmentLength - 1
+            If lStartIndex < 1 Then Return lTsBacktrace
+
+            Dim lStartDate As Double = StreamFlowTS.Dates.Value(lStartIndex - 1)
+            Dim lEndDate As Double = StreamFlowTS.Dates.Value(lEndIndex - 1)
+            Try
+                lTsBacktrace = SubsetByDate(StreamFlowTS, lStartDate, lEndDate, Nothing)
+            Catch ex As Exception
+                lTsBacktrace = Nothing
+            End Try
+            Return lTsBacktrace
+        End Get
+    End Property
+
+    Public Function EstimateBFImax_CF(ByVal aTSflow As atcTimeseries,
+                                      ByVal aRC As Double,
+                                      Optional ByRef aTS_b_prime As atcTimeseries = Nothing,
+                                      Optional ByVal aRecalculate As Boolean = True) As String
+        If aTSflow Is Nothing OrElse Double.IsNaN(aRC) Then
+            Return "ERROR:Invalid Input"
+        End If
+        If aTSflow.numValues < 366 Then
+            Return "ERROR:Record too Short"
+        End If
+
+        Dim lKey_attr As String = "BFImax_CF"
+        Dim lKey_collection As String = aTSflow.numValues.ToString() & "-" & aRC.ToString()
+
+        If Not aRecalculate Then
+            If pBFImaxEstimates.ContainsKey(lKey_collection) Then
+                aTSflow.Attributes.SetValue(lKey_attr, pBFImaxEstimates(lKey_collection))
+                Return "SUCCESS," & lKey_attr
+            End If
+        End If
+
+        Dim lTsWaterYearBound As atcTimeseries = Nothing
+        Try
+            lTsWaterYearBound = SubsetByDateBoundary(aTSflow, 10, 1, Nothing)
+        Catch ex As Exception
+            lTsWaterYearBound = Nothing
+        End Try
+        If lTsWaterYearBound Is Nothing Then
+            Return "ERROR:Extract water year data failed"
+        End If
+
+        aTS_b_prime = aTSflow.Clone()
+        For I As Integer = 0 To aTS_b_prime.numValues
+            aTS_b_prime.Value(I) = Double.NaN
+        Next
+
+        Dim lflowVal As Double
+        Dim lflowVal_prev As Double
+        Dim lb_prime As Double
+        For I As Integer = aTSflow.numValues To 2 Step -1
+            lflowVal = aTSflow.Value(I)
+            lflowVal_prev = aTSflow.Value(I - 1)
+
+            If lflowVal / aRC < lflowVal_prev Then
+                lb_prime = lflowVal / aRC
+            Else
+                lb_prime = lflowVal_prev
+            End If
+
+            aTS_b_prime.Value(I - 1) = lb_prime
+        Next
+
+        Dim lTs_b_prime_WY As atcTimeseries = SubsetByDateBoundary(aTS_b_prime, 10, 1, Nothing)
+        Dim lSumFlow As Double = lTsWaterYearBound.Attributes.GetValue("Sum")
+        Dim lSum_b_prime As Double = lTs_b_prime_WY.Attributes.GetValue("Sum")
+        Dim lBFImax As Double = lSum_b_prime / lSumFlow
+
+        aTSflow.Attributes.SetValue(lKey_attr, lBFImax)
+        pBFImaxEstimates.Add(lKey_collection, lBFImax)
+        Return "SUCCESS," & lKey_attr
+    End Function
 
     Public Flow() As Double
     Public QLog() As Double
@@ -149,6 +229,7 @@ Public Class clsRecessionSegment
         AntecedentGWLMethods = New atcCollection() 'FALL
         Recharges = New atcCollection() 'FALL
         pBackTraceFlag = New Dictionary(Of Integer, Boolean)
+        pBFImaxEstimates = New Dictionary(Of String, Double)
     End Sub
 
     Public Sub GetData(Optional ByVal aSetGWPPElev As Boolean = False, Optional ByVal aPPElev As Double = Double.NaN)
