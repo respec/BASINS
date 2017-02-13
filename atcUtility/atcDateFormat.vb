@@ -153,7 +153,7 @@ Public Class atcDateFormat
                 Case DateOrderEnum.JulianDate
                     lRetval = StrPad(DoubleToString(aJulianDate, 9, "00,000.000", , , 8), 10)
             End Select
-            If IncludeHours OrElse IncludeMinutes OrElse IncludeSeconds AndAlso lRetval.Length > 0 Then
+            If (IncludeHours OrElse IncludeMinutes OrElse IncludeSeconds) AndAlso lRetval.Length > 0 Then
                 lRetval &= DateTimeSeparator
             End If
             If IncludeHours Then
