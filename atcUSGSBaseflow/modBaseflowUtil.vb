@@ -958,13 +958,13 @@ Public Module modBaseflowUtil
             Return lMessage
         End Try
 
-        Dim lKey As String = "RO_HySEPFixed"
+        Dim lKey As String = "RO_HySEPLocMin" 'I think this should be read from the lMethods. We should not hard code it here.
         Logger.Dbg("Construct full time span base-flow analysis result.")
         'reconstruct the bf time series as attribute to pDataGroup(0) of the analysis window
         'first get rid of old method's group
         Dim lTsGroupFixed As atcCollection = Nothing
         With lBFReportGroups
-            lTsGroupFixed = .GetValue("GroupFixed", Nothing)
+            lTsGroupFixed = .GetValue("GroupLocMin", Nothing)
         End With
         If lTsGroupFixed IsNot Nothing AndAlso lTsGroupFixed.Count > 0 Then
             Dim lTs As atcTimeseries = lTsGroupFixed.ItemByKey("RateDaily")
@@ -986,7 +986,7 @@ Public Module modBaseflowUtil
                 Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
                 With lTsRO.Attributes
                     .SetValue("Constituent", lKey)
-                    .SetValue("Method", BFMethods.HySEPFixed)
+                    .SetValue("Method", BFMethods.HySEPLocMin) 'This should also be read from the lMethods
                     .SetValue("Units", "cubic feet per second")
                     .SetValue("Specification", CalcBF.Specification)
                 End With
