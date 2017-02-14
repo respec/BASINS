@@ -78,7 +78,18 @@ Public Class clsRecess
     Private pRecessions As New atcCollection 'collection of clsRecessionSegment
     Public RecessionSegment As clsRecessionSegment = Nothing
 
-    Public RecessionConstant As Double = Double.NaN
+    Public Structure DF2P
+        Public RecessionConstant As Double
+        Public BFImax As Double
+        Public Estimated_RC As Boolean
+        Public BFIEstimateStartDate As Double
+        Public BFIEstimateEndDate As Double
+        Public isBFIEstimateInWaterYear As Boolean
+    End Structure
+    Public df2p_parameters As DF2P
+
+    Public Shared CF_RC As atcAttributeDefinition
+    Public Shared CF_BFImax As atcAttributeDefinition
 
 #Region "IOManagement"
     Friend fHasWritePermission As Boolean = False
@@ -116,10 +127,12 @@ Public Class clsRecess
     Private pFileIndex As String = "index.txt"
     Private pFileRecData As String = "recdata.txt"
     Private pFileRanges As String = "ranges.txt"
+    Private pFileRC_BFI As String = "DF2P_RC_BFImax.txt"
     Private pHeaderOutFile1 As String = ""
     Private pHeaderOutFile2 As String = ""
     Private pHeaderIndexFile As String = ""
     Private pHeaderRecSumFile As String = ""
+    Private pHeaderRC_BFI As String = ""
 
     Protected pFileOut1 As String = ""
     Protected pFileOut2 As String = ""
@@ -393,6 +406,7 @@ Public Class clsRecess
             OutputPath = aArgs.GetValue("Output Path", "")
             RecessMinLengthInDays = aArgs.GetValue("MinSegmentLength", 5)
             SaveInterimResults = aArgs.GetValue("SaveInterimResults", False)
+            BackTraceDays = aArgs.GetValue("BackTraceDays", 365)
         End If
 
         pRecSumResult = ""
@@ -477,32 +491,11 @@ Public Class clsRecess
 "streamflow    (days per" & vbCrLf & _
 "file          log cycle)" & vbCrLf & _
 "------------------------"
-        'Indian.txt    100.00  (string12, f8.2)
-        'Indian.txt     22.92
 
-        ''Initialize arrays
-        'ReDim pIndicator(MaxNumDaysInAllRecPeriods)
-        'ReDim pXX(MaxNumDaysInAllRecPeriods)
-        'ReDim pYY(MaxNumDaysInAllRecPeriods)
-        'ReDim pZZ(MaxNumDaysInAllRecPeriods)
-        'ReDim pX(MaxNumRecPeriods)
-        'ReDim pY(MaxNumRecPeriods)
-        'ReDim pK(MaxNumRecPeriods)
-        'ReDim pDUMMY(MaxNumRecPeriods)
-
-        'ReDim pXMeanAR(MaxNumRecPeriods)
-        'ReDim pYMeanAR(MaxNumRecPeriods)
-        'ReDim pCoef1AR(MaxNumRecPeriods)
-        'ReDim pCoef2AR(MaxNumRecPeriods)
-        'ReDim pMinAR(MaxNumRecPeriods)
-        'ReDim pMaxAR(MaxNumRecPeriods)
-        'ReDim pPickAR(MaxNumRecPeriods)
-        'ReDim pOrigNoAR(MaxNumRecPeriods)
-        'ReDim pDatesAR(MaxNumRecPeriods)
-        'ReDim pXMNArray(MaxNumRecPeriods)
-        'ReDim pCoefArray(MaxNumRecPeriods)
-        'pXX(1) = -99
-        'pYY(1) = -99
+        pHeaderRC_BFI = "                                                                  BFImax" & vbCrLf &
+            "                              Recession Constant (a)    Start       End         Calc." & vbCrLf &
+            "Gage number Season Dates      Specified   Calculated    Date        Date        BFImax" & vbCrLf &
+            "----------- ------ ---------  ----------------------   -------------------------------"
 
         'Start off a recession search
         pCountDay = 2
@@ -903,7 +896,7 @@ Public Class clsRecess
         End If
         Select Case aOperation.ToLower
             Case "estimate_bfi"
-                BackTraceDisplay(RecessionSegment)
+                BackTraceEstimateBFImax(RecessionSegment)
             Case "d"
                 RecessDisplay(RecessionSegment)
             Case "r"
@@ -969,33 +962,38 @@ Public Class clsRecess
         End With
     End Sub
 
-    Private Sub BackTraceDisplay(ByVal aSegment As clsRecessionSegment)
-        If Double.IsNaN(RecessionConstant) OrElse BackTraceDays < 365 Then
-            Exit Sub
+    Private Function BackTraceEstimateBFImax(ByVal aSegment As clsRecessionSegment) As String
+        If Double.IsNaN(df2p_parameters.RecessionConstant) Then 'OrElse BackTraceDays < 365 Then
+            Return "ERROR:Invalid recession constant"
         End If
 
         Dim lTsBackTrace As atcTimeseries = aSegment.BackTraceTimeSeries(BackTraceDays)
         Dim lTs_b_prime As atcTimeseries = Nothing
-        Dim lMessage As String = aSegment.EstimateBFImax_CF(lTsBackTrace, RecessionConstant, lTs_b_prime)
+        Dim lMessage As String = aSegment.EstimateBFImax_CF(lTsBackTrace, df2p_parameters, lTs_b_prime)
         Dim lBFImax As Double = Double.NaN
         If lMessage.StartsWith("SUCCESS") Then
             Dim lKey As String = lMessage.Substring(lMessage.IndexOf(",") + 1)
-            lBFImax = lTsBackTrace.Attributes.GetValue(lKey, Double.NaN)
-            Bulletin = "SUCCESS," & lBFImax.ToString()
+            'df2p_parameters.BFImax = lTsBackTrace.Attributes.GetValue(lKey, Double.NaN)
+            'df2p_parameters.BFIEstimateStartDate = lTsBackTrace.Attributes.GetValue("BFIEstimateStartDate")
+            'df2p_parameters.BFIEstimateEndDate = lTsBackTrace.Attributes.GetValue("BFIEstimateEndDate")
+            Bulletin = "SUCCESS," & lTsBackTrace.Values.Length.ToString() & "," & df2p_parameters.BFImax.ToString()
         Else
             Bulletin = lMessage
-            Exit Sub
+            df2p_parameters.BFImax = Double.NaN
+            df2p_parameters.BFIEstimateStartDate = Double.NaN
+            df2p_parameters.BFIEstimateEndDate = Double.NaN
+            Return Bulletin
         End If
 
         GraphTsGroup.Clear()
         With lTsBackTrace
-            'For I As Integer = 1 To .numValues
-            '    If .Value(I) > 0 Then
-            '        .Value(I) = Math.Log10(.Value(I))
-            '    Else
-            '        .Value(I) = Math.Log10(.Value(I) * -1)
-            '    End If
-            'Next
+            For I As Integer = 1 To .numValues
+                If .Value(I) > 0 Then
+                    .Value(I) = Math.Log10(.Value(I))
+                Else
+                    .Value(I) = Math.Log10(.Value(I) * -1)
+                End If
+            Next
             .Value(0) = GetNaN()
             .Attributes.SetValue("YAxis", "LEFT")
             .Attributes.SetValue("point", False)
@@ -1005,13 +1003,13 @@ Public Class clsRecess
         End With
 
         With lTs_b_prime
-            'For I As Integer = 1 To .numValues
-            '    If .Value(I) > 0 Then
-            '        .Value(I) = Math.Log10(.Value(I))
-            '    Else
-            '        .Value(I) = Math.Log10(.Value(I) * -1)
-            '    End If
-            'Next
+            For I As Integer = 1 To .numValues
+                If .Value(I) > 0 Then
+                    .Value(I) = Math.Log10(.Value(I))
+                Else
+                    .Value(I) = Math.Log10(.Value(I) * -1)
+                End If
+            Next
             .Value(0) = GetNaN()
             .Attributes.SetValue("YAxis", "LEFT")
             .Attributes.SetValue("point", False)
@@ -1021,7 +1019,8 @@ Public Class clsRecess
         End With
         GraphTsGroup.Add(lTsBackTrace)
         GraphTsGroup.Add(lTs_b_prime)
-    End Sub
+        Return lMessage
+    End Function
 
     Protected Function RecessAnalyse(ByVal aSegment As clsRecessionSegment, Optional ByVal aConstituent As String = "Streamflow") As String
         Dim lMsg As New Text.StringBuilder
@@ -1599,6 +1598,64 @@ Public Class clsRecess
         lMsg.AppendLine(vbCrLf & "Final median recession index: " & String.Format("{0:0.00}", lKMed).PadLeft(8, " "))
         Bulletin = lMsg.ToString
     End Sub
+
+    '{
+    Public Sub DF2P_Output()
+        'If SaveInterimResults Then
+        '    SetOutputFiles()
+        'End If
+
+        Dim lSW As IO.StreamWriter = Nothing
+        Dim lfile_name As String = IO.Path.Combine(OutputPath, pFileRC_BFI)
+        Try
+            If IO.File.Exists(lfile_name) Then
+                lSW = New StreamWriter(lfile_name, True)
+            Else
+                lSW = New StreamWriter(lfile_name, False)
+                lSW.WriteLine(pHeaderRC_BFI)
+            End If
+            Dim loc As String = FlowData().Attributes.GetValue("Location")
+            loc = loc.PadRight(12, " ")
+            Dim lSeasonText As String = SeasonLabel.PadRight(7, " ")
+            Dim lFlowStart As Double = FlowData().Dates.Value(0)
+            Dim lFlowEnd As Double = FlowData().Dates.Value(FlowData().Dates.numValues)
+            Dim lDateFormat As New atcDateFormat()
+            With lDateFormat
+                .IncludeYears = True
+                .IncludeMonths = False
+                .IncludeDays = False
+                .IncludeHours = False
+                .IncludeMinutes = False
+                .IncludeSeconds = False
+            End With
+            Dim lFlowDateRangeText As String = lDateFormat.JDateToString(lFlowStart) & "-" & lDateFormat.JDateToString(lFlowEnd)
+            lFlowDateRangeText &= "  "
+            With lDateFormat
+                .IncludeMonths = True
+                .IncludeDays = True
+                .DateSeparator = "/"
+            End With
+            Dim lBFIStartText As String = lDateFormat.JDateToString(df2p_parameters.BFIEstimateStartDate).PadRight(12, " ")
+            Dim lBFIEndText As String = lDateFormat.JDateToString(df2p_parameters.BFIEstimateEndDate).PadRight(12, " ")
+            Dim lRCText As String = ""
+            If df2p_parameters.Estimated_RC Then
+                lRCText = "            " & DoubleToString(df2p_parameters.RecessionConstant, 13,).PadRight(13, " ")
+            Else
+                lRCText = DoubleToString(df2p_parameters.RecessionConstant, 13, ).PadRight(25, " ")
+            End If
+            Dim lBFImaxText As String = DoubleToString(df2p_parameters.BFImax, 6,)
+            Dim outputText As String = loc & lSeasonText & lFlowDateRangeText & lRCText & lBFIStartText & lBFIEndText & lBFImaxText
+            lSW.WriteLine(outputText)
+            Logger.Msg("Saved parameter valus to file:" & vbCrLf & lfile_name, MsgBoxStyle.Information, "Save Two Parameter Digital Filter Parameters")
+        Catch ex As Exception
+            Logger.Msg("Failed to save parameter valus to file:" & vbCrLf & lfile_name, MsgBoxStyle.Exclamation, "Save Two Parameter Digital Filter Parameters")
+        Finally
+            If lSW IsNot Nothing Then
+                lSW.Close()
+                lSW = Nothing
+            End If
+        End Try
+    End Sub '}
 
     Public Shared Function InputFilename11(ByVal aFilename As String) As String
 

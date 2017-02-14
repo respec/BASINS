@@ -115,6 +115,7 @@ Public Class clsRecessionSegment
                 Dim lastDayIndex As Integer = PeakDayIndex + SegmentLength - 1
                 Dim lContinuous As Boolean = True
                 If lastDayIndex - aBackTraceDays < 0 Then
+                    lContinuous = False
                     pBackTraceFlag.Add(aBackTraceDays, lContinuous)
                     Return lContinuous
                 End If
@@ -143,7 +144,10 @@ Public Class clsRecessionSegment
             Dim lTsBacktrace As atcTimeseries = Nothing
             Dim lStartIndex As Integer = PeakDayIndex + SegmentLength - aBackTraceDays
             Dim lEndIndex As Integer = PeakDayIndex + SegmentLength - 1
-            If lStartIndex < 1 Then Return lTsBacktrace
+            'If lStartIndex < 1 Then Return lTsBacktrace
+            If lStartIndex < 1 Then
+                lStartIndex = 1
+            End If
 
             Dim lStartDate As Double = StreamFlowTS.Dates.Value(lStartIndex - 1)
             Dim lEndDate As Double = StreamFlowTS.Dates.Value(lEndIndex - 1)
@@ -157,18 +161,18 @@ Public Class clsRecessionSegment
     End Property
 
     Public Function EstimateBFImax_CF(ByVal aTSflow As atcTimeseries,
-                                      ByVal aRC As Double,
+                                      ByRef aDF2P As clsRecess.DF2P,
                                       Optional ByRef aTS_b_prime As atcTimeseries = Nothing,
                                       Optional ByVal aRecalculate As Boolean = True) As String
-        If aTSflow Is Nothing OrElse Double.IsNaN(aRC) Then
+        If aTSflow Is Nothing OrElse Double.IsNaN(aDF2P.RecessionConstant) Then
             Return "ERROR:Invalid Input"
         End If
-        If aTSflow.numValues < 366 Then
-            Return "ERROR:Record too Short"
-        End If
+        'If aTSflow.numValues < 366 Then
+        '    Return "ERROR:Record too Short"
+        'End If
 
         Dim lKey_attr As String = "BFImax_CF"
-        Dim lKey_collection As String = aTSflow.numValues.ToString() & "-" & aRC.ToString()
+        Dim lKey_collection As String = aTSflow.numValues.ToString() & "-" & aDF2P.RecessionConstant.ToString()
 
         If Not aRecalculate Then
             If pBFImaxEstimates.ContainsKey(lKey_collection) Then
@@ -178,13 +182,15 @@ Public Class clsRecessionSegment
         End If
 
         Dim lTsWaterYearBound As atcTimeseries = Nothing
-        Try
-            lTsWaterYearBound = SubsetByDateBoundary(aTSflow, 10, 1, Nothing)
-        Catch ex As Exception
-            lTsWaterYearBound = Nothing
-        End Try
-        If lTsWaterYearBound Is Nothing Then
-            Return "ERROR:Extract water year data failed"
+        If aTSflow.numValues > 365 Then
+            Try
+                lTsWaterYearBound = SubsetByDateBoundary(aTSflow, 10, 1, Nothing)
+            Catch ex As Exception
+                lTsWaterYearBound = Nothing
+            End Try
+            If lTsWaterYearBound Is Nothing Then
+                Return "ERROR:Extract water year data failed"
+            End If
         End If
 
         aTS_b_prime = aTSflow.Clone()
@@ -195,26 +201,47 @@ Public Class clsRecessionSegment
         Dim lflowVal As Double
         Dim lflowVal_prev As Double
         Dim lb_prime As Double
-        For I As Integer = aTSflow.numValues To 2 Step -1
-            lflowVal = aTSflow.Value(I)
-            lflowVal_prev = aTSflow.Value(I - 1)
-
-            If lflowVal / aRC < lflowVal_prev Then
-                lb_prime = lflowVal / aRC
+        lflowVal = aTSflow.Value(aTSflow.numValues)
+        lflowVal_prev = aTSflow.Value(aTSflow.numValues - 1)
+        If lflowVal / aDF2P.RecessionConstant < lflowVal_prev Then
+            lb_prime = lflowVal / aDF2P.RecessionConstant
+        Else
+            lb_prime = lflowVal_prev
+        End If
+        aTS_b_prime.Value(aTSflow.numValues - 1) = lb_prime
+        For I As Integer = aTS_b_prime.numValues - 2 To 1 Step -1
+            If aTS_b_prime.Value(I + 1) / aDF2P.RecessionConstant < aTSflow.Value(I) Then
+                aTS_b_prime.Value(I) = aTS_b_prime.Value(I + 1) / aDF2P.RecessionConstant
             Else
-                lb_prime = lflowVal_prev
+                aTS_b_prime.Value(I) = aTSflow.Value(I)
             End If
-
-            aTS_b_prime.Value(I - 1) = lb_prime
         Next
 
-        Dim lTs_b_prime_WY As atcTimeseries = SubsetByDateBoundary(aTS_b_prime, 10, 1, Nothing)
-        Dim lSumFlow As Double = lTsWaterYearBound.Attributes.GetValue("Sum")
-        Dim lSum_b_prime As Double = lTs_b_prime_WY.Attributes.GetValue("Sum")
-        Dim lBFImax As Double = lSum_b_prime / lSumFlow
-
-        aTSflow.Attributes.SetValue(lKey_attr, lBFImax)
-        pBFImaxEstimates.Add(lKey_collection, lBFImax)
+        Dim lSumFlow As Double = 0.0
+        Dim lSum_b_prime As Double = 0.0
+        If aTSflow.numValues > 365 AndAlso lTsWaterYearBound.Values IsNot Nothing Then
+            Dim lTs_b_prime_WY As atcTimeseries = SubsetByDateBoundary(aTS_b_prime, 10, 1, Nothing)
+            lSumFlow = lTsWaterYearBound.Attributes.GetValue("Sum")
+            lSum_b_prime = lTs_b_prime_WY.Attributes.GetValue("Sum")
+            aTSflow.Attributes.SetValue("BFIEstimateStartDate", lTsWaterYearBound.Dates.Value(0))
+            aTSflow.Attributes.SetValue("BFIEstimateEndDate", lTsWaterYearBound.Dates.Value(lTsWaterYearBound.numValues))
+            aDF2P.BFIEstimateStartDate = lTsWaterYearBound.Dates.Value(0)
+            aDF2P.BFIEstimateEndDate = lTsWaterYearBound.Dates.Value(lTsWaterYearBound.numValues)
+            aDF2P.isBFIEstimateInWaterYear = True
+        Else
+            lSumFlow = aTSflow.Attributes.GetValue("Sum")
+            lSum_b_prime = aTS_b_prime.Attributes.GetValue("Sum")
+            aTSflow.Attributes.SetValue("BFIEstimateStartDate", aTSflow.Dates.Value(0))
+            aTSflow.Attributes.SetValue("BFIEstimateEndDate", aTSflow.Dates.Value(aTSflow.numValues))
+            aDF2P.BFIEstimateStartDate = aTSflow.Dates.Value(0)
+            aDF2P.BFIEstimateEndDate = aTSflow.Dates.Value(aTSflow.numValues)
+            aDF2P.isBFIEstimateInWaterYear = False
+        End If
+        aDF2P.BFImax = lSum_b_prime / lSumFlow
+        aTSflow.Attributes.SetValue(lKey_attr, aDF2P.BFImax)
+        If Not pBFImaxEstimates.ContainsKey(lKey_collection) Then
+            pBFImaxEstimates.Add(lKey_collection, aDF2P.BFImax)
+        End If
         Return "SUCCESS," & lKey_attr
     End Function
 
