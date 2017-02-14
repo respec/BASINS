@@ -12,6 +12,7 @@ Imports System.Collections
 Imports System.ComponentModel
 Imports System.IO
 Imports System.Windows.Forms
+Imports System.Web.Script.Serialization
 'Imports System.Runtime.InteropServices
 
 Public Class atcGraphForm
@@ -35,6 +36,8 @@ Public Class atcGraphForm
     Friend WithEvents mnuEditCopyMetafile As System.Windows.Forms.MenuItem
     Friend WithEvents mnuCoordinates As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewZoomAll As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuSaveJson As MenuItem
+    Friend WithEvents mnuApplyJson As MenuItem
     Friend WithEvents mnuCoordinatesOnMenuBar As System.Windows.Forms.MenuItem
 
     Public Property Grapher() As clsGraphBase
@@ -81,7 +84,7 @@ Public Class atcGraphForm
 
 #Region " Windows Form Designer generated code "
 
-    <CLSCompliant(False)> _
+    <CLSCompliant(False)>
     Public Sub New()
         MyBase.New()
         InitializeComponent() 'required by Windows Form Designer
@@ -119,27 +122,29 @@ Public Class atcGraphForm
 
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(atcGraphForm))
         Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
-        Me.mnuFile = New System.Windows.Forms.MenuItem
-        Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
-        Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
-        Me.mnuFileSave = New System.Windows.Forms.MenuItem
-        Me.mnuFilePrint = New System.Windows.Forms.MenuItem
-        Me.mnuEdit = New System.Windows.Forms.MenuItem
-        Me.mnuEditGraph = New System.Windows.Forms.MenuItem
-        Me.mnuEditSep1 = New System.Windows.Forms.MenuItem
-        Me.mnuEditCopy = New System.Windows.Forms.MenuItem
-        Me.mnuEditCopyMetafile = New System.Windows.Forms.MenuItem
-        Me.mnuView = New System.Windows.Forms.MenuItem
-        Me.mnuViewVerticalZoom = New System.Windows.Forms.MenuItem
-        Me.mnuViewHorizontalZoom = New System.Windows.Forms.MenuItem
-        Me.mnuViewZoomAll = New System.Windows.Forms.MenuItem
-        Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-        Me.mnuCoordinates = New System.Windows.Forms.MenuItem
-        Me.mnuCoordinatesOnMenuBar = New System.Windows.Forms.MenuItem
-        Me.mnuHelp = New System.Windows.Forms.MenuItem
+        Me.mnuFile = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSelectData = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSep1 = New System.Windows.Forms.MenuItem()
+        Me.mnuSaveJson = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSave = New System.Windows.Forms.MenuItem()
+        Me.mnuFilePrint = New System.Windows.Forms.MenuItem()
+        Me.mnuEdit = New System.Windows.Forms.MenuItem()
+        Me.mnuEditGraph = New System.Windows.Forms.MenuItem()
+        Me.mnuEditSep1 = New System.Windows.Forms.MenuItem()
+        Me.mnuEditCopy = New System.Windows.Forms.MenuItem()
+        Me.mnuEditCopyMetafile = New System.Windows.Forms.MenuItem()
+        Me.mnuView = New System.Windows.Forms.MenuItem()
+        Me.mnuViewVerticalZoom = New System.Windows.Forms.MenuItem()
+        Me.mnuViewHorizontalZoom = New System.Windows.Forms.MenuItem()
+        Me.mnuViewZoomAll = New System.Windows.Forms.MenuItem()
+        Me.mnuAnalysis = New System.Windows.Forms.MenuItem()
+        Me.mnuCoordinates = New System.Windows.Forms.MenuItem()
+        Me.mnuCoordinatesOnMenuBar = New System.Windows.Forms.MenuItem()
+        Me.mnuHelp = New System.Windows.Forms.MenuItem()
+        Me.mnuApplyJson = New System.Windows.Forms.MenuItem()
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -149,7 +154,7 @@ Public Class atcGraphForm
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSep1, Me.mnuFileSave, Me.mnuFilePrint})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSep1, Me.mnuSaveJson, Me.mnuApplyJson, Me.mnuFileSave, Me.mnuFilePrint})
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
@@ -162,14 +167,19 @@ Public Class atcGraphForm
         Me.mnuFileSep1.Index = 1
         Me.mnuFileSep1.Text = "-"
         '
+        'mnuSaveJson
+        '
+        Me.mnuSaveJson.Index = 2
+        Me.mnuSaveJson.Text = "Save Specs"
+        '
         'mnuFileSave
         '
-        Me.mnuFileSave.Index = 2
+        Me.mnuFileSave.Index = 4
         Me.mnuFileSave.Text = "Save As..."
         '
         'mnuFilePrint
         '
-        Me.mnuFilePrint.Index = 3
+        Me.mnuFilePrint.Index = 5
         Me.mnuFilePrint.Text = "Print"
         '
         'mnuEdit
@@ -246,6 +256,11 @@ Public Class atcGraphForm
         Me.mnuHelp.ShowShortcut = False
         Me.mnuHelp.Text = "Help"
         '
+        'mnuApplyJson
+        '
+        Me.mnuApplyJson.Index = 3
+        Me.mnuApplyJson.Text = "Apply Specs"
+        '
         'atcGraphForm
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -260,14 +275,14 @@ Public Class atcGraphForm
 
 #End Region
 
-    <CLSCompliant(False)> _
+    <CLSCompliant(False)>
     Public ReadOnly Property ZedGraphCtrl() As ZedGraphControl
         Get
             Return pZgc
         End Get
     End Property
 
-    <CLSCompliant(False)> _
+    <CLSCompliant(False)>
     Public ReadOnly Property PaneAux() As GraphPane
         Get
             If pMaster.PaneList.Count > 1 Then
@@ -278,7 +293,7 @@ Public Class atcGraphForm
         End Get
     End Property
 
-    <CLSCompliant(False)> _
+    <CLSCompliant(False)>
     Public ReadOnly Property Pane() As GraphPane
         Get
             If pMaster.PaneList.Count > 1 Then
@@ -504,11 +519,11 @@ Public Class atcGraphForm
             Dim lPaneMain As GraphPane = pMaster.PaneList(1)
             Dim lOrigAuxHeight As Single = lPaneAux.Rect.Height
             Dim lTotalPaneHeight As Single = lOrigAuxHeight + lPaneMain.Rect.Height
-            lPaneAux.Rect = New System.Drawing.Rectangle( _
-                    lPaneAux.Rect.X, lPaneAux.Rect.Y, _
+            lPaneAux.Rect = New System.Drawing.Rectangle(
+                    lPaneAux.Rect.X, lPaneAux.Rect.Y,
                     lPaneAux.Rect.Width, lTotalPaneHeight * AuxFraction)
-            lPaneMain.Rect = New System.Drawing.Rectangle( _
-                    lPaneMain.Rect.X, lPaneMain.Rect.Y - lOrigAuxHeight + lPaneAux.Rect.Height, _
+            lPaneMain.Rect = New System.Drawing.Rectangle(
+                    lPaneMain.Rect.X, lPaneMain.Rect.Y - lOrigAuxHeight + lPaneAux.Rect.Height,
                     lPaneMain.Rect.Width, lTotalPaneHeight - lPaneAux.Rect.Height)
         End If
     End Sub
@@ -542,6 +557,97 @@ Public Class atcGraphForm
     Private Sub mnuViewZoomAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewZoomAll.Click
         pZgc.ZoomOutAll(Pane)
         'TODO: test when Aux pane active
+    End Sub
+
+    Private Sub mnuSaveJson_Click(sender As Object, e As EventArgs) Handles mnuSaveJson.Click
+
+        Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+        With lSaveDialog
+            .Title = "Save graph specs to file"
+            .DefaultExt = ".json"
+            .FileName = ReplaceString(Me.Text, " ", "_") & ".json"
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                Dim lStr As String = ""
+                Dim lSerial As String = ""
+                Dim ser As JavaScriptSerializer = New JavaScriptSerializer()
+
+                'lStr += "CURVES" & vbCrLf
+                'For Each lPane As GraphPane In pZgc.MasterPane.PaneList
+                '    For Each lCurve As CurveItem In lPane.CurveList
+                '        lStr += ser.Serialize(lCurve) & vbCrLf
+                '    Next
+                'Next
+
+                'lStr += "LEGENDS" & vbCrLf
+                'For Each lPane As GraphPane In pZgc.MasterPane.PaneList
+                '    lStr += ser.Serialize(lPane.Legend) & vbCrLf
+                'Next
+
+                'lStr += "OBJECTS" & vbCrLf
+                'For Each lPane As GraphPane In pZgc.MasterPane.PaneList
+                '    For Each lObj As GraphObj In lPane.GraphObjList
+                '        lStr += ser.Serialize(lObj) & vbCrLf
+                '    Next
+                'Next
+
+                'lStr += "AXES" & vbCrLf
+                'For Each lPane As GraphPane In pZgc.MasterPane.PaneList
+                '    For Each lAxis As YAxis In lPane.YAxisList
+                '        lAxis.Scale.FontSpec.Border.GradientFill.Brush = Nothing
+                '        lStr += ser.Serialize(lAxis) & vbCrLf
+                '    Next
+                '    For Each lAxis As Y2Axis In lPane.Y2AxisList
+                '        lAxis.Scale.FontSpec.Border.GradientFill.Brush = Nothing
+                '        lStr += ser.Serialize(lAxis) & vbCrLf
+                '    Next
+                '    lPane.XAxis.Scale.FontSpec.Border.GradientFill.Brush = Nothing
+                '    lStr += ser.Serialize(lPane.XAxis) & vbCrLf
+                'Next
+
+                'fix a problem that will cause serialize to not work
+                For Each lPane As GraphPane In pZgc.MasterPane.PaneList
+                    For Each lAxis As YAxis In lPane.YAxisList
+                        lAxis.Scale.FontSpec.Border.GradientFill.Brush = Nothing
+                    Next
+                    For Each lAxis As Y2Axis In lPane.Y2AxisList
+                        lAxis.Scale.FontSpec.Border.GradientFill.Brush = Nothing
+                    Next
+                    lPane.XAxis.Scale.FontSpec.Border.GradientFill.Brush = Nothing
+                Next
+
+                Try
+                    lSerial += ser.Serialize(pZgc.MasterPane)
+                Catch ex As Exception
+                    lSerial += ex.ToString
+                End Try
+
+                SaveFileString(.FileName, lSerial)
+            End If
+        End With
+
+    End Sub
+
+    Private Sub mnuApplyJson_Click(sender As Object, e As EventArgs) Handles mnuApplyJson.Click
+        Dim lOpenDialog As New System.Windows.Forms.OpenFileDialog
+        With lOpenDialog
+            .Title = "Open file containing graph specs"
+            .DefaultExt = ".json"
+            .FileName = ReplaceString(Me.Text, " ", "_") & ".json"
+            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+            End If
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                Dim JsonString As String = File.ReadAllText(.FileName)
+                Dim ser As JavaScriptSerializer = New JavaScriptSerializer()
+                Try
+                    pZgc.MasterPane = ser.Deserialize(Of ZedGraph.MasterPane)(JsonString)
+                Catch ex As Exception
+                End Try
+            End If
+        End With
     End Sub
 End Class
 

@@ -61,7 +61,7 @@ Public Module modGraph
             If Not aExistingCurves Is Nothing Then
                 For Each lTs As atcTimeseries In aExistingCurves
                     For Each lOldCurve In lPane.CurveList
-                        If lOldCurve.Tag = lTs.Serial Then
+                        If lOldCurve.Tag = lTs.Serial & "|" & lTs.Attributes.GetValue("ID") & "|" & lTs.Attributes.GetValue("Data Source") Then
                             lOldCons = lTs.Attributes.GetValue("constituent")
                             If lOldCons = lCons Then
                                 If lOldCurve.IsY2Axis Then lYAxisName = "RIGHT" Else lYAxisName = "LEFT"
@@ -557,7 +557,7 @@ FoundMatch:
                     End Select
                 End If
 
-                lCurve.Tag = lTimeseries.Serial 'Make this easy to find again even if label changes
+                lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lTimeseries.Attributes.GetValue("Data Source")   'Make this easy to find again even if label changes
 
                 If aYAxisName.ToUpper.Equals("RIGHT") Then lCurve.IsY2Axis = True
 
