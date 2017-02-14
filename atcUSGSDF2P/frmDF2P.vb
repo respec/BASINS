@@ -2314,6 +2314,7 @@ Public Class frmDF2P
 
     Private Sub txtRC_TextChanged(sender As Object, e As EventArgs) Handles txtRC.TextChanged
         If Double.TryParse(txtRC.Text, pRecess.df2p_parameters.RecessionConstant) Then
+            clsBaseflow2PRDF.Estimated_RC = pRecess.df2p_parameters.RecessionConstant
             pRecess.df2p_parameters.Estimated_RC = False
         Else
             pRecess.df2p_parameters.RecessionConstant = Double.NaN
