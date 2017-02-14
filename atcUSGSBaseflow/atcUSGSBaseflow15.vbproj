@@ -233,6 +233,11 @@
       <Name>atcTimeseriesRDB15</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcUSGSDF2P\atcUSGSDF2P15.vbproj">
+      <Project>{4cdfeb5c-1808-44ad-9206-0049ff26fa2e}</Project>
+      <Name>atcUSGSDF2P15</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcUSGSUtility\atcUSGSUtility15.vbproj">
       <Project>{4DBC8159-1072-41FA-9242-933E12A88EE6}</Project>
       <Name>atcUSGSUtility15</Name>

@@ -1,6 +1,7 @@
 ﻿Imports atcData
 Imports atcUtility
 Imports atcUSGSUtility
+Imports atcUSGSDF2P
 Imports atcTimeseriesBaseflow
 Imports atcTimeseriesRDB
 Imports atcGraph
@@ -1212,6 +1213,8 @@ Public Class frmUSGSBaseflow
     End Sub
 
     Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        rdo2PSpecify.Checked = False
+        rdo2PDefault.Checked = False
         Opened = True
         If GetSetting("atcUSGSBaseflow", "Defaults", "MethodPART", "False") = "True" Then
             chkMethodPART.Checked = True
@@ -1239,16 +1242,16 @@ Public Class frmUSGSBaseflow
         End If
         If GetSetting("atcUSGSBaseflow", "Defaults", "MethodTwoPRDF", "False") = "True" Then
             chkMethodTwoPRDF.Checked = True
-            Dim lparamEstMethod As String = GetSetting("atcUSGSBaseflow", "Defaults", "DFTwoParamEstMethod", clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM)
-            Select Case lparamEstMethod
-                Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT.ToString(), "NONE", "None", "none"
-                    rdo2PDefault.Checked = True
-                Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.CF.ToString()
-                    'mnuDFTwoParamCF.PerformClick()
-                Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM.ToString()
-                    rdo2PSpecify.Checked = True
-            End Select
         End If
+        Dim lparamEstMethod As String = GetSetting("atcUSGSBaseflow", "Defaults", "DFTwoParamEstMethod", clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM)
+        Select Case lparamEstMethod
+            Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT.ToString(), "NONE", "None", "none"
+                rdo2PDefault.Checked = True
+            Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.CF.ToString()
+                    'mnuDFTwoParamCF.PerformClick()
+            Case clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM.ToString()
+                rdo2PSpecify.Checked = True
+        End Select
         If chkMethodBFIStandard.Checked OrElse chkMethodBFIModified.Checked Then
             gbBFI.Enabled = True
         Else
@@ -1493,6 +1496,7 @@ Public Class frmUSGSBaseflow
 
     Private Sub rdo2P_CheckedChanged(sender As Object, e As EventArgs) Handles rdo2PSpecify.CheckedChanged,
                                                                                rdo2PDefault.CheckedChanged
+        If Not Opened Then Exit Sub
         If rdo2PSpecify.Checked Then
             txt2PDefaultNotice.Visible = False
             lblBFImax.Enabled = True
@@ -1500,6 +1504,25 @@ Public Class frmUSGSBaseflow
             txtDFParamRC.Enabled = True
             txtDFParamBFImax.Enabled = True
             pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM
+
+            If pDataGroup IsNot Nothing AndAlso pDataGroup.Count > 0 Then
+                Dim lEst_RC As Double = pDataGroup(0).Attributes.GetValue(clsRecess.CF_RC, Double.NaN)
+                Dim lEst_BFImax As Double = pDataGroup(0).Attributes.GetValue(clsRecess.CF_BFImax, Double.NaN)
+                If Not Double.IsNaN(lEst_RC) Then
+                    txtDFParamRC.Text = lEst_RC.ToString()
+                Else
+                    If Not Double.TryParse(txtDFParamRC.Text, lEst_RC) Then
+                        txtDFParamRC.Text = "0.978"
+                    End If
+                End If
+                If Not Double.IsNaN(lEst_BFImax) Then
+                    txtDFParamBFImax.Text = lEst_BFImax.ToString()
+                Else
+                    If Not Double.TryParse(txtDFParamBFImax.Text, lEst_BFImax) Then
+                        txtDFParamBFImax.Text = "0.8"
+                    End If
+                End If
+            End If
         Else
             txt2PDefaultNotice.Visible = True
             lblBFImax.Enabled = False
