@@ -11,7 +11,7 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("HSPEXP+")>
 <Assembly: AssemblyDescription("Hydrology & Water Quality Calibration Tool")>
-<Assembly: AssemblyCompany("AQUA TERRA Consultants")>
+<Assembly: AssemblyCompany("RESPEC")>
 <Assembly: AssemblyProduct("HSPEXP")>
 <Assembly: AssemblyCopyright("")>
 <Assembly: AssemblyTrademark("")>
@@ -32,6 +32,6 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.20.0.0")>
-<Assembly: AssemblyFileVersion("1.20.0.0")>
+<Assembly: AssemblyVersion("1.21.0.0")>
+<Assembly: AssemblyFileVersion("1.21.0.0")>
 <Assembly: NeutralResourcesLanguage("en-US")>
