@@ -493,6 +493,12 @@ FoundProvisional:
                 Catch
                 End Try
             End If
+            Logger.Dbg("The number of datasets selected is " & pSelectedGroup.Count)
+            For Each lTimeseries As atcTimeseries In pSelectedGroup
+                Logger.Dbg("Data Source for Time Series is " & lTimeseries.Attributes.GetDefinedValue("Data Source").Value & "")
+
+            Next lTimeseries
+
             Return pSelectedGroup
         Else
             Return Nothing
