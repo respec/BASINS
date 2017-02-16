@@ -76,15 +76,59 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="atcBatchProcessing, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcBatchProcessing.dll</HintPath>
+    </Reference>
+    <Reference Include="atcControls, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcControls.dll</HintPath>
+    </Reference>
+    <Reference Include="atcData, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcData.dll</HintPath>
+    </Reference>
+    <Reference Include="atcDurationCompare, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcDurationCompare.dll</HintPath>
+    </Reference>
+    <Reference Include="atcGraph, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcGraph.dll</HintPath>
+    </Reference>
+    <Reference Include="atcTimeseriesBaseflow, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcTimeseriesBaseflow.dll</HintPath>
+    </Reference>
+    <Reference Include="atcTimeseriesRDB, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcTimeseriesRDB.dll</HintPath>
+    </Reference>
+    <Reference Include="atcUSGSUtility, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcUSGSUtility.dll</HintPath>
+    </Reference>
+    <Reference Include="atcUtility, Version=3.1.2.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcUtility.dll</HintPath>
+    </Reference>
+    <Reference Include="GWToolbox, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\GWToolbox.dll</HintPath>
+    </Reference>
     <Reference Include="Interop.MapWinGIS, Version=4.8.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="MapWinInterfaces, Version=4.8.1.28373, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MapWinUtility, Version=4.8.8.22609, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\MapWinUtility.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -198,59 +242,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcBatchProcessing\atcBatchProcessing15.vbproj">
-      <Project>{7e95fcaa-7b7c-4585-8ee2-58db97ed9110}</Project>
-      <Name>atcBatchProcessing15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcControls\atcControls15.vbproj">
-      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
-      <Name>atcControls15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData15.vbproj">
-      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
-      <Name>atcData15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcDurationCompare\atcDurationCompare15.vbproj">
-      <Project>{FBAA545B-7D95-43A3-8A4F-CC664D7DB201}</Project>
-      <Name>atcDurationCompare15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcGraphExperimental\atcGraph15.vbproj">
-      <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
-      <Name>atcGraph15</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow15.vbproj">
       <Project>{f9a4070c-1faf-4d17-a8e6-7eb19d414b05}</Project>
       <Name>atcTimeseriesBaseflow15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB15.vbproj">
-      <Project>{82530A5B-FF39-4B9F-8A04-881468DFC662}</Project>
-      <Name>atcTimeseriesRDB15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcUSGSUtility\atcUSGSUtility15.vbproj">
-      <Project>{4DBC8159-1072-41FA-9242-933E12A88EE6}</Project>
-      <Name>atcUSGSUtility15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">
-      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Name>atcUtility15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\BASINS\GWToolbox15.vbproj">
-      <Project>{37d44868-95ce-4a21-a43a-13e7e7f2ad09}</Project>
-      <Name>GWToolbox15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
-      <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
-      <Name>BASINS-MapWinUtility15</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
