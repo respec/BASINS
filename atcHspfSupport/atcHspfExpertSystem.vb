@@ -2,6 +2,7 @@ Imports atcUtility
 Imports atcData
 Imports atcGraph
 Imports ZedGraph
+Imports atcList
 Imports MapWinUtility
 Imports System
 Imports MapWinUtility.Strings
@@ -10,6 +11,7 @@ Imports MapWinUtility.Strings
 Public Class atcExpertSystem
     'Friend ErrorCriteria As HexErrorCriteria
     Public Storms As New Generic.List(Of HexStorm)
+    Public StormsSorted As New Generic.List(Of HexStorm)
     Public Sites As New Generic.List(Of HexSite)
     Public SDateJ As Double, EDateJ As Double
     Public Name As String
@@ -325,26 +327,18 @@ Public Class atcExpertSystem
             Dim lExsDsns(9) As Integer
             lExsDsns(0) = aDsns(1) '0 = simulated total runoff (in)
             lExsDsns(1) = aDsns(0) '1 = observed streamflow (cfs)
-            For lIndex As Integer = 2 To 9
-                lExsDsns(lIndex) = aDsns(lIndex)
-            Next lIndex
+            lExsDsns(2) = aDsns(2) '2 = Surface Runoff in inches
+            lExsDsns(3) = aDsns(3) '3 = Interflow Runoff in inches
+            lExsDsns(4) = aDsns(4) '4 = Groundwater Flow in inches
+            lExsDsns(5) = aDsns(9) '5 = Moisture Supply in inches
+            lExsDsns(6) = aDsns(5) '6 = Potential Evapotranspiration in inches
+            lExsDsns(7) = aDsns(6) '7 = Actual Evapotranspiration in inches
+            lExsDsns(8) = aDsns(7) '2 = UZSX 
+            lExsDsns(9) = aDsns(8) '2 = LZSX
+
             Dim lSite As New HspfSupport.HexSite(Me, aSiteName, 0, lExsDsns)
             lSite.Area = pUci.UpstreamArea(pUci.OpnBlks("RCHRES").OperFromID(aRchId))
             .Sites.Add(lSite)
-            ''use synoptic analysis on precip to find storm dates
-            ''- find precip dataset associated with this reach
-            'Dim lPrecTimser As atcTimeseries = Nothing
-            'Dim lSubsetPrecTimser As atcTimeseries = Nothing
-            'If pUci.OpnBlks("RCHRES").OperFromID(aRchId).MetSeg IsNot Nothing Then
-            '    For Each lMetSegRec As atcUCI.HspfMetSegRecord In pUci.OpnBlks("RCHRES").OperFromID(aRchId).MetSeg.MetSegRecs
-            '        If lMetSegRec.Name = "PREC" Then
-            '            lPrecTimser = pUci.GetDataSetFromDsn(lMetSegRec.Source.VolName.Substring(3), lMetSegRec.Source.VolId)
-            '            lSubsetPrecTimser = SubsetByDate(lPrecTimser, .SDateJ, .EDateJ, Nothing)
-            '            Exit For
-            '        End If
-            '    Next
-            'End If
-            'use synoptic analysis on baseflow-separated observed flow timeseries to find storm dates
             Dim lSubsetTimser As atcTimeseries = Nothing
             Dim lNonBaseflowTimser As atcTimeseries = Nothing
             If aObservedTser IsNot Nothing Then
@@ -373,29 +367,61 @@ Public Class atcExpertSystem
             End If
             '- call synop to find less than 50 storms
             If lNonBaseflowTimser IsNot Nothing Then
+
                 Dim lInputGroup As New atcTimeseriesGroup
                 lInputGroup.Add(lNonBaseflowTimser)
-                Dim lThreshold As Double = 1.0
+
+
+                Dim lThreshold As Double = 0.1
                 Dim lOutputGroup As New atcTimeseriesGroup
                 Dim lFirstTime As Boolean = True
-                Do While lOutputGroup.Count > 50 Or lFirstTime
-                    lOutputGroup = atcSynopticAnalysis.atcSynopticAnalysisPlugin.ComputeEvents(lInputGroup, lThreshold, 0.0, True)
-                    lThreshold += 1.0
-                    lFirstTime = False
-                Loop
+
+                'Do While lOutputGroup.Count > 50 Or lFirstTime
+                lOutputGroup = atcSynopticAnalysis.atcSynopticAnalysisPlugin.ComputeEvents(lInputGroup, lThreshold, 0.0, True)
+                '    lThreshold += 1.0
+                'lFirstTime = False
+                'Loop
+
+                Dim lStormList As New atcCollection
+                Dim SumofStorm As Double
+                Dim StormPeak As Double
                 If lOutputGroup.Count > 0 Then
                     'now add the storm dates
                     Dim lStormIndex As Integer = 0
                     For Each lTimSer As atcTimeseries In lOutputGroup
+                        SumofStorm = 0
+                        StormPeak = 0
+                        If lTimSer.numValues < 2 Or lTimSer.numValues > 70 Then
+                            Continue For
+                        End If
+                        For Each lValue As Double In lTimSer.Values
+                            If lValue > StormPeak Then StormPeak = lValue
+                            SumofStorm += lValue
+                        Next
+
                         lStormIndex += 1
-                        Dim lStormSDate(5) As Integer
-                        J2Date(lTimSer.Dates.Values(0), lStormSDate)
-                        Dim lStormEDate(5) As Integer
-                        J2Date(lTimSer.Dates.Values(lTimSer.numValues), lStormEDate)
-                        .Storms.Add(New HspfSupport.HexStorm(lStormIndex, lStormSDate, lStormEDate))
+                        lStormList.Add(lOutputGroup.IndexFromKey(lTimSer), StormPeak)
                     Next
+                    lStormList.SortByValue()
+
+                    Dim NumberOfStorms As Integer = lStormList.Count
+                    For i As Integer = NumberOfStorms / 2 To NumberOfStorms - 1
+                        Dim localKey As Integer = lStormList.Keys(i)
+
+                        Dim lStormSDate(5) As Integer
+                        J2Date(lOutputGroup(localKey).Dates.Values(0), lStormSDate)
+                        Dim lStormEDate(5) As Integer
+                        J2Date(lOutputGroup(localKey).Dates.Values(lOutputGroup(localKey).numValues), lStormEDate)
+
+                        .Storms.Add(New HspfSupport.HexStorm(i, lStormSDate, lStormEDate))
+
+
+                    Next i
+
                 End If
             End If
+
+
             If .Storms.Count = 0 Then
                 'just do 1 dummy storm for now
                 Dim lStormSDate(5) As Integer
@@ -436,7 +462,7 @@ Public Class atcExpertSystem
             Dim lDate(5) As Integer
             J2Date(SDateJ, lDate)
             lStr &= lDate(0).ToString.PadLeft(6) & lDate(1).ToString.PadLeft(2) & lDate(2).ToString.PadLeft(2)
-            J2Date(EDateJ, lDate)
+            J2Date(EDateJ-1, lDate)
             lStr &= lDate(0).ToString.PadLeft(6) & lDate(1).ToString.PadLeft(2) & lDate(2).ToString.PadLeft(2)
         End If
 
@@ -452,36 +478,56 @@ Public Class atcExpertSystem
             End With
             lText.AppendLine(lStr)
         Next
-        lText.AppendLine("***The following Storm dates are generated by subtracting the baseflow time series from the observed flow time series.")
-        lText.AppendLine("***The baseflow time series was generated using the HysepLocMin method that is available with USGS Surface Water Toolbox.")
-        lText.AppendLine("***The storm date generation process is under testing and user is recommended to verify these dates independently.")
+        lText.AppendLine("***The following Storm dates (100 or less) are generated by subtracting the baseflow time series from the observed flow time series.")
+        lText.AppendLine("***The baseflow time series was generated using the HysepLocMin method that is available with the USGS Surface Water Toolbox.")
+        lText.AppendLine("***The storm date generation process is under development; users should verify these dates independently.")
         lText.AppendLine("<St>***")
         lText.AppendLine(Storms.Count.ToString.PadLeft(4))
 
-        For Each lStorm As HexStorm In Storms
-            lStr = ""
-            With lStorm
-                Dim lDate(5) As Integer
-                J2Date(.SDateJ, lDate)
-                lStr &= lDate(0).ToString.PadLeft(5)
-                For lDateIndex As Integer = 1 To 5
-                    lStr &= lDate(lDateIndex).ToString.PadLeft(3)
-                Next
-                J2Date(.EDateJ, lDate)
-                lStr &= lDate(0).ToString.PadLeft(5)
-                For lDateIndex As Integer = 1 To 5
-                    lStr &= lDate(lDateIndex).ToString.PadLeft(3)
-                Next
-            End With
-            lText.AppendLine(lStr)
+        Dim StormTestDate As Double = 0
+        Dim StormTest As New atcCollection
+        For Each storm As HexStorm In Storms
+            StormTest.Add(storm.SDateJ)
+
         Next
+        StormTest.Sort()
+
+        For i As Integer = 0 To StormTest.Count - 1
+            lStr = ""
+            For Each lstorm As HexStorm In Storms
+                With lstorm
+
+                    If StormTest(i) = .SDateJ Then
+                        Dim lDate(5) As Integer
+                        J2Date(.SDateJ, lDate)
+                        lStr &= lDate(0).ToString.PadLeft(5)
+                        For lDateIndex As Integer = 1 To 5
+                            lStr &= lDate(lDateIndex).ToString.PadLeft(3)
+                        Next
+                        J2Date(.EDateJ, lDate)
+                        lStr &= lDate(0).ToString.PadLeft(5)
+                        For lDateIndex As Integer = 1 To 5
+                            lStr &= lDate(lDateIndex).ToString.PadLeft(3)
+                        Next
+                        Continue For
+                    End If
+                End With
+
+            Next lstorm
+            lText.AppendLine(lStr)
+        Next i
+
 
         lStr = ""
+        lText.AppendLine("*** This area was computed by WinHSPF as the total area of PERLNDs and IMPLNDs contributing to the calibration reach.")
+        lText.AppendLine("***It does Not include the area Of water bodies. It Is Not based On the published (e.g., USGS) streamgage drainage area.")
+        lText.AppendLine("<Area  >***")
         For Each lSite As HexSite In Sites
             lStr &= lSite.Area.ToString.PadLeft(8)
         Next
         lText.AppendLine(lStr)
-        lText.AppendLine("<Area  >***")
+
+
         For Each lSite As HexSite In Sites
             lStr = ""
             For Each lError As HexErrorCriterion In lSite.ErrorCriteria
@@ -509,7 +555,7 @@ Public Class atcExpertSystem
         'Next lSiteIndex
 
         lText.AppendLine("***If you want to specify seasons for your Expert Statistics Calculation, specify them here.")
-        lText.AppendLine("***Seasons is a keyword, that tells HSPEXP+ that user will provide it's own seasons")
+        lText.AppendLine("***Seasons Is a keyword, that tells HSPEXP+ that user will provide it's own seasons")
         lText.AppendLine("Seasons:")
         lText.AppendLine("***Months selected for Summers, comma separated")
         lText.AppendLine("6,7,8")
