@@ -108,6 +108,16 @@ Public Class clsGraphBoxWhisker
         End Set
     End Property
 
+    Private pShowLegend As Boolean = False
+    Public Property ShowLegend() As Boolean
+        Get
+            Return pShowLegend
+        End Get
+        Set(value As Boolean)
+            pShowLegend = value
+        End Set
+    End Property
+
     Private pXLabelAngle As Single = Single.NaN
     Public Property XLabelAngle() As Single
         Get
@@ -151,7 +161,7 @@ Public Class clsGraphBoxWhisker
         'Set up the chart
         pZgc.GraphPane.BarSettings.Type = BarType.Overlay
         pZgc.GraphPane.XAxis.IsVisible = False
-        pZgc.GraphPane.Legend.IsVisible = False
+        pZgc.GraphPane.Legend.IsVisible = pShowLegend
         If String.Compare(Title(), "no title", True) = 0 Then
         ElseIf String.IsNullOrEmpty(Title()) Then
             Dim lcon As String = Datasets(0).Attributes.GetValue("Constituent", "Value")
@@ -235,23 +245,30 @@ Public Class clsGraphBoxWhisker
         pZgc.GraphPane.AxisChange()
         'pZgc.GraphPane.YAxis.Scale.MinGrace = Math.Abs(XLabelBaseline) + pZgc.GraphPane.YAxis.Scale.MajorStep * 5
         pZgc.GraphPane.Margin.Bottom = 80
-        Dim lAngle As Single = -90
-        If Not Single.IsNaN(pXLabelAngle) AndAlso pXLabelAngle <= 90 AndAlso pXLabelAngle >= -90 Then
-            lAngle = pXLabelAngle
-        End If
-        For I As Integer = 0 To Datasets.Count - 1
-            'Dim label As TextObj = New TextObj(XLabels(I), I, XLabelBaseline, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
-            Dim label As TextObj = New TextObj(XLabels(I), I, 1.1, CoordType.XScaleYChartFraction, AlignH.Center, AlignV.Center)
-            label.ZOrder = ZOrder.A_InFront
-            label.FontSpec.Border.IsVisible = False
-            label.FontSpec.Angle = pXLabelAngle
-            If pDataColors IsNot Nothing AndAlso pDataColors.Count = Datasets.Count Then
-                label.FontSpec.FontColor = pDataColors(I)
-            Else
-                'label.FontSpec.FontColor = Color.Black
+
+        If pShowLegend Then
+            pZgc.GraphPane.Legend.IsHStack = True
+            pZgc.GraphPane.Legend.Border.Color = Color.LightGray
+        Else
+            'use labels
+            Dim lAngle As Single = -90
+            If Not Single.IsNaN(pXLabelAngle) AndAlso pXLabelAngle <= 90 AndAlso pXLabelAngle >= -90 Then
+                lAngle = pXLabelAngle
             End If
-            pZgc.GraphPane.GraphObjList.Add(label)
-        Next
+            For I As Integer = 0 To Datasets.Count - 1
+                'Dim label As TextObj = New TextObj(XLabels(I), I, XLabelBaseline, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
+                Dim label As TextObj = New TextObj(XLabels(I), I, 1.1, CoordType.XScaleYChartFraction, AlignH.Center, AlignV.Center)
+                label.ZOrder = ZOrder.A_InFront
+                label.FontSpec.Border.IsVisible = False
+                label.FontSpec.Angle = pXLabelAngle
+                If pDataColors IsNot Nothing AndAlso pDataColors.Count = Datasets.Count Then
+                    label.FontSpec.FontColor = pDataColors(I)
+                Else
+                    'label.FontSpec.FontColor = Color.Black
+                End If
+                pZgc.GraphPane.GraphObjList.Add(label)
+            Next
+        End If
         pZgc.GraphPane.AxisChange()
         'Dim leftMargin As Double = 10
         'Dim rightMargin As Double = 10
