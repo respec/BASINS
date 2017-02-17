@@ -13,6 +13,9 @@ Imports System.ComponentModel
 Imports System.IO
 Imports System.Windows.Forms
 Imports System.Web.Script.Serialization
+Imports System.Xml
+Imports System.Xml.Linq
+Imports System.Runtime.Serialization.Json
 'Imports System.Runtime.InteropServices
 
 Public Class atcGraphForm
@@ -630,6 +633,11 @@ Public Class atcGraphForm
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub mnuApplyJson_Click(sender As Object, e As EventArgs) Handles mnuApplyJson.Click
         Dim lOpenDialog As New System.Windows.Forms.OpenFileDialog
         With lOpenDialog
@@ -641,10 +649,73 @@ Public Class atcGraphForm
             End If
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 Dim JsonString As String = File.ReadAllText(.FileName)
-                Dim ser As JavaScriptSerializer = New JavaScriptSerializer()
+                'Dim ser As JavaScriptSerializer = New JavaScriptSerializer()
                 Try
-                    pZgc.MasterPane = ser.Deserialize(Of ZedGraph.MasterPane)(JsonString)
+                    'pZgc.MasterPane = ser.Deserialize(Of ZedGraph.MasterPane)(JsonString)   'does not work
+                    Dim lBuffer() As Byte = File.ReadAllBytes(.FileName)
+                    Dim lReader As XmlDictionaryReader = JsonReaderWriterFactory.CreateJsonReader(lBuffer, New XmlDictionaryReaderQuotas())
+                    Dim lXml As XElement = XElement.Load(lReader)
+                    Dim lDoc As New XmlDocument
+                    lDoc.LoadXml(lXml.ToString())
+
+                    'set up collection of curves for easy reference
+                    Dim lCurves As New atcCollection
+                    Dim lCurveIndex As Integer = -1
+                    For Each lPane As GraphPane In pZgc.MasterPane.PaneList
+                        For Each lCurve As CurveItem In lPane.CurveList
+                            lCurveIndex += 1
+                            lCurves.Add(lCurveIndex, lCurve)
+                        Next
+                    Next
+
+                    Dim lPaneList As XmlNodeList = lDoc.GetElementsByTagName("PaneList")
+                    Dim lTag As String
+                    lCurveIndex = -1
+                    For Each lPane As XmlNode In lPaneList
+                        For Each lItemNode As XmlNode In lPane.ChildNodes
+                            For Each lCurveNode As XmlNode In lItemNode.ChildNodes
+                                If lCurveNode.Name = "CurveList" Then
+                                    lCurveIndex += 1
+                                    For Each lChildItem As XmlNode In lCurveNode.ChildNodes
+                                        For Each lChildNode As XmlNode In lChildItem.ChildNodes
+                                            If lChildNode.Name = "Tag" Then
+                                                lTag = lChildNode.InnerText
+                                            ElseIf lChildNode.Name = "Label" Then
+                                                lCurves(lCurveIndex).Label.Text = lChildNode.InnerText
+                                            ElseIf lChildNode.Name = "Color" Then
+                                                Dim lA As Integer = 0
+                                                Dim lR As Integer = 0
+                                                Dim lG As Integer = 0
+                                                Dim lB As Integer = 0
+                                                For Each lColorNode As XmlNode In lChildNode.ChildNodes
+                                                    If lColorNode.Name = "R" Then
+                                                        lR = lColorNode.InnerText
+                                                    ElseIf lColorNode.Name = "G" Then
+                                                        lG = lColorNode.InnerText
+                                                    ElseIf lColorNode.Name = "B" Then
+                                                        lB = lColorNode.InnerText
+                                                    ElseIf lColorNode.Name = "A" Then
+                                                        lA = lColorNode.InnerText
+                                                    End If
+                                                Next
+                                                lCurves(lCurveIndex).color = Color.FromArgb(lA, lR, lG, lB)
+                                            ElseIf lChildNode.Name = "Symbol" Then
+                                                For Each lSymbolNode As XmlNode In lChildNode.ChildNodes
+                                                    If lSymbolNode.Name = "Size" Then
+                                                        lCurves(lCurveIndex).Symbol.Size = lSymbolNode.InnerText
+                                                    End If
+                                                Next
+                                            End If
+                                        Next
+                                    Next
+                                End If
+                            Next
+                        Next
+                    Next
+                    RefreshGraph()
+
                 Catch ex As Exception
+                    Dim l As Integer = 0
                 End Try
             End If
         End With
