@@ -109,6 +109,7 @@
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
     </Reference>
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
@@ -135,6 +136,7 @@
     </Compile>
     <Compile Include="atcTimeseriesPointList.vb" />
     <Compile Include="clsGraphBase.vb" />
+    <Compile Include="clsGraphBoxWhisker.vb" />
     <Compile Include="clsGraphCumulativeDifference.vb" />
     <Compile Include="clsGraphDoubleMass.vb" />
     <Compile Include="clsGraphFrequency.vb" />

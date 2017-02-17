@@ -2087,19 +2087,19 @@ Public Class frmDF2P
         End If
         aRecess.DoOperation("summary", "")
         With pDataGroup(0).Attributes
-            If clsRecess.CF_RC Is Nothing Then
-                clsRecess.CF_RC = New atcAttributeDefinition()
-                clsRecess.CF_RC.Name = "CF_RC"
-                clsRecess.CF_RC.TypeString = "Double"
-                clsRecess.CF_RC.CopiesInherit = True
-                clsRecess.CF_RC.Editable = False
+            'If clsRecess.CF_RC Is Nothing Then
+            '    clsRecess.CF_RC = New atcAttributeDefinition()
+            '    clsRecess.CF_RC.Name = "CF_RC"
+            '    clsRecess.CF_RC.TypeString = "Double"
+            '    clsRecess.CF_RC.CopiesInherit = True
+            '    clsRecess.CF_RC.Editable = False
 
-                clsRecess.CF_BFImax = New atcAttributeDefinition()
-                clsRecess.CF_BFImax.Name = "CF_BFImax"
-                clsRecess.CF_BFImax.TypeString = "Double"
-                clsRecess.CF_BFImax.CopiesInherit = True
-                clsRecess.CF_BFImax.Editable = False
-            End If
+            '    clsRecess.CF_BFImax = New atcAttributeDefinition()
+            '    clsRecess.CF_BFImax.Name = "CF_BFImax"
+            '    clsRecess.CF_BFImax.TypeString = "Double"
+            '    clsRecess.CF_BFImax.CopiesInherit = True
+            '    clsRecess.CF_BFImax.Editable = False
+            'End If
             .SetValue(clsRecess.CF_RC, aRecess.df2p_parameters.RecessionConstant)
             Dim lBFImax As Double
             If Double.TryParse(txtBFImax.Text, lBFImax) Then

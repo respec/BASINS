@@ -88,8 +88,8 @@ Public Class clsRecess
     End Structure
     Public df2p_parameters As DF2P
 
-    Public Shared CF_RC As atcAttributeDefinition
-    Public Shared CF_BFImax As atcAttributeDefinition
+    Public Shared CF_RC As String = "CF_RC"
+    Public Shared CF_BFImax As String = "CF_BFImax"
 
 #Region "IOManagement"
     Friend fHasWritePermission As Boolean = False
