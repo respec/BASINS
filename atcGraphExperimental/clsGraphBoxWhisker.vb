@@ -224,6 +224,15 @@ Public Class clsGraphBoxWhisker
                 '.Scale.Min = XLabelBaseline - .Scale.MajorStep * 10
             End With
         End If
+        pZgc.GraphPane.BarSettings.ClusterScaleWidthAuto = False
+        pZgc.GraphPane.BarSettings.MinClusterGap = 0.2
+        pZgc.GraphPane.BarSettings.MinBarGap = 0.2
+        'With pZgc.GraphPane.XAxis
+        '    .Type = AxisType.Text
+        '    .Scale.TextLabels = pXLabels.ToArray()
+        '    .Scale.FontSpec.Angle = -90
+        'End With
+        pZgc.GraphPane.AxisChange()
         'pZgc.GraphPane.YAxis.Scale.MinGrace = Math.Abs(XLabelBaseline) + pZgc.GraphPane.YAxis.Scale.MajorStep * 5
         pZgc.GraphPane.Margin.Bottom = 80
         Dim lAngle As Single = -90
@@ -232,7 +241,7 @@ Public Class clsGraphBoxWhisker
         End If
         For I As Integer = 0 To Datasets.Count - 1
             'Dim label As TextObj = New TextObj(XLabels(I), I, XLabelBaseline, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
-            Dim label As TextObj = New TextObj(XLabels(I), I, 1.1, CoordType.XScaleYChartFraction, AlignH.Center, AlignV.Top)
+            Dim label As TextObj = New TextObj(XLabels(I), I, 1.1, CoordType.XScaleYChartFraction, AlignH.Center, AlignV.Center)
             label.ZOrder = ZOrder.A_InFront
             label.FontSpec.Border.IsVisible = False
             label.FontSpec.Angle = pXLabelAngle
@@ -243,9 +252,6 @@ Public Class clsGraphBoxWhisker
             End If
             pZgc.GraphPane.GraphObjList.Add(label)
         Next
-        pZgc.GraphPane.BarSettings.ClusterScaleWidthAuto = False
-        pZgc.GraphPane.BarSettings.MinClusterGap = 0.1
-        pZgc.GraphPane.BarSettings.MinBarGap = 0.1
         pZgc.GraphPane.AxisChange()
         'Dim leftMargin As Double = 10
         'Dim rightMargin As Double = 10
@@ -305,6 +311,11 @@ Public Class clsGraphBoxWhisker
             '        outs.Add(i, aValue)
             '    End If
             'Next
+            Dim lColor As Color = Color.Black
+            If pDataColors IsNot Nothing AndAlso pDataColors.Count = data.Count Then
+                lColor = DataColors(i)
+            End If
+
             'Plot the items, first the median values
             Dim meadian As CurveItem = myPane.AddCurve("", medians, Color.Black, SymbolType.HDash)
             Dim myLine As LineItem = CType(meadian, LineItem)
@@ -315,13 +326,14 @@ Public Class clsGraphBoxWhisker
             If pDataColors IsNot Nothing AndAlso pDataColors.Count = data.Count Then
                 myCurve = myPane.AddHiLowBar(names(i), hiLowList, DataColors(i))
                 myCurve.Bar.Fill.Type = FillType.Solid
+                myCurve.Bar.Border.Color = Color.LightGray
             Else
                 myCurve = myPane.AddHiLowBar(names(i), hiLowList, Color.Black)
                 myCurve.Bar.Fill.Type = FillType.None
             End If
 
             'Wiskers
-            Dim myerror As ErrorBarItem = myPane.AddErrorBar("", barList, Color.Black)
+            Dim myerror As ErrorBarItem = myPane.AddErrorBar("", barList, lColor)
             'Outliers
             'Dim upper As CurveItem = myPane.AddCurve("", outs, Color.Black, SymbolType.XCross)
             'Dim bLine As LineItem = CType(upper, LineItem)
@@ -357,7 +369,6 @@ Public Class clsGraphBoxWhisker
 
     Private Function GetStatistic(ByVal aDSIndex As Integer, ByVal aStatName As String) As Double
         Dim lTs As atcTimeseries = Datasets(aDSIndex)
-        'lTs.Attributes.DiscardCalculated()
         Return lTs.Attributes.GetValue(aStatName, Double.NaN)
     End Function
 
