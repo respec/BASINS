@@ -75,13 +75,17 @@ With locations
 End With
 
 'specify the orientation angle of the x-axis label texts
-'-90 is vertical orientation, 0 is horizontal
+'-90 (default) is vertical orientation, 0 is horizontal
 lGrapher.XLabelAngle = -90
+
+'specify Y axis title
+'if not specified, then default Y axis title will be constructed
+lGrapher.YTitle = "My kinda quantities"
 
 'specify if to use legend
 'True: use legend to show box category instead of x-axis labels
 'False: use x-axis labels but not legend
-'lGrapher.ShowLegend = True
+lGrapher.ShowLegend = True
 
 'call routine to make the graph
 'input argument: 
