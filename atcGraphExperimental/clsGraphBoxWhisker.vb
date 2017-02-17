@@ -27,6 +27,25 @@ Public Class clsGraphBoxWhisker
         End Set
     End Property
 
+    Private pDataColors As Generic.List(Of Color) = Nothing
+    Public Property DataColors() As Generic.List(Of Color)
+        Get
+            Return pDataColors
+        End Get
+        Set(value As Generic.List(Of Color))
+            If value IsNot Nothing Then
+                If pDataColors Is Nothing Then
+                    pDataColors = New Generic.List(Of Color)()
+                Else
+                    pDataColors.Clear()
+                End If
+                For I As Integer = 0 To value.Count - 1
+                    pDataColors.Add(value(I))
+                Next
+            End If
+        End Set
+    End Property
+
     Private pXTitle As String = ""
     Public Property XTitle() As String
         Get
@@ -86,6 +105,16 @@ Public Class clsGraphBoxWhisker
         End Get
         Set(value As Boolean)
             pShowFullRange = value
+        End Set
+    End Property
+
+    Private pXLabelAngle As Single = Single.NaN
+    Public Property XLabelAngle() As Single
+        Get
+            Return pXLabelAngle
+        End Get
+        Set(value As Single)
+            pXLabelAngle = value
         End Set
     End Property
 
@@ -196,14 +225,27 @@ Public Class clsGraphBoxWhisker
             End With
         End If
         'pZgc.GraphPane.YAxis.Scale.MinGrace = Math.Abs(XLabelBaseline) + pZgc.GraphPane.YAxis.Scale.MajorStep * 5
-        pZgc.GraphPane.Margin.Bottom = 20
+        pZgc.GraphPane.Margin.Bottom = 80
+        Dim lAngle As Single = -90
+        If Not Single.IsNaN(pXLabelAngle) AndAlso pXLabelAngle <= 90 AndAlso pXLabelAngle >= -90 Then
+            lAngle = pXLabelAngle
+        End If
         For I As Integer = 0 To Datasets.Count - 1
             'Dim label As TextObj = New TextObj(XLabels(I), I, XLabelBaseline, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
-            Dim label As TextObj = New TextObj(XLabels(I), I, 1.03, CoordType.XScaleYChartFraction, AlignH.Center, AlignV.Center)
+            Dim label As TextObj = New TextObj(XLabels(I), I, 1.1, CoordType.XScaleYChartFraction, AlignH.Center, AlignV.Top)
             label.ZOrder = ZOrder.A_InFront
             label.FontSpec.Border.IsVisible = False
+            label.FontSpec.Angle = pXLabelAngle
+            If pDataColors IsNot Nothing AndAlso pDataColors.Count = Datasets.Count Then
+                label.FontSpec.FontColor = pDataColors(I)
+            Else
+                'label.FontSpec.FontColor = Color.Black
+            End If
             pZgc.GraphPane.GraphObjList.Add(label)
         Next
+        pZgc.GraphPane.BarSettings.ClusterScaleWidthAuto = False
+        pZgc.GraphPane.BarSettings.MinClusterGap = 0.1
+        pZgc.GraphPane.BarSettings.MinBarGap = 0.1
         pZgc.GraphPane.AxisChange()
         'Dim leftMargin As Double = 10
         'Dim rightMargin As Double = 10
@@ -269,8 +311,15 @@ Public Class clsGraphBoxWhisker
             myLine.Line.IsVisible = False
             myLine.Symbol.Fill.Type = FillType.Solid
             'Box
-            Dim myCurve As HiLowBarItem = myPane.AddHiLowBar(names(i), hiLowList, Color.Black)
-            myCurve.Bar.Fill.Type = FillType.None
+            Dim myCurve As HiLowBarItem = Nothing
+            If pDataColors IsNot Nothing AndAlso pDataColors.Count = data.Count Then
+                myCurve = myPane.AddHiLowBar(names(i), hiLowList, DataColors(i))
+                myCurve.Bar.Fill.Type = FillType.Solid
+            Else
+                myCurve = myPane.AddHiLowBar(names(i), hiLowList, Color.Black)
+                myCurve.Bar.Fill.Type = FillType.None
+            End If
+
             'Wiskers
             Dim myerror As ErrorBarItem = myPane.AddErrorBar("", barList, Color.Black)
             'Outliers
