@@ -6,14 +6,15 @@ Public Class atcGraphPlugin
     Inherits atcData.atcDataDisplay
     Private pIcon As System.Drawing.Icon = Nothing
 
-    Private pGraphTypeNames() As String = {"Time Series", _
-                                           "Flow/Duration", _
-                                           "Frequency", _
-                                           "Running Sum", _
-                                           "Residual (TS2 - TS1)", _
-                                           "Cumulative Difference", _
-                                           "Scatter (TS2 vs TS1)", _
-                                           "Double-Mass Curve", _
+    Private pGraphTypeNames() As String = {"Time Series",
+                                           "Flow/Duration",
+                                           "Frequency",
+                                           "Running Sum",
+                                           "Residual (TS2 - TS1)",
+                                           "Cumulative Difference",
+                                           "Scatter (TS2 vs TS1)",
+                                           "Double-Mass Curve",
+                                           "Box Whisker",
                                            "Shared Start Year"}
 
     Public Overrides ReadOnly Property Name() As String
@@ -103,6 +104,7 @@ Public Class atcGraphPlugin
                     .Items.Add(pGraphTypeNames(5) & lNeededTwoSuffix)
                     .Items.Add(pGraphTypeNames(6) & lNeededTwoSuffix)
                     .Items.Add(pGraphTypeNames(7))
+                    .Items.Add(pGraphTypeNames(8))
                 End If
 
                 For Each lCheckedName As String In GetSetting("BASINS41", "Graph", "ChooseGraphs", "").Split(","c)
@@ -178,6 +180,8 @@ Public Class atcGraphPlugin
                 Return New clsGraphRunningSum(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Double-Mass Curve"
                 Return New clsGraphDoubleMass(aDataGroup, aGraphForm.ZedGraphCtrl)
+            Case "Box Whisker"
+                Return New clsGraphBoxWhisker(aDataGroup, aGraphForm.ZedGraphCtrl)
             Case "Residual (TS2 - TS1)"
                 aGraphForm.Text = "Residual Graph"
                 Return New clsGraphResidual(aDataGroup, aGraphForm.ZedGraphCtrl)
