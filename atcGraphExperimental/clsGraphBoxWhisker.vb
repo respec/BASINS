@@ -147,7 +147,7 @@ Public Class clsGraphBoxWhisker
         End Set
     End Property
 
-    Public Sub SetUpGraph(Optional OutputToFile As Boolean = False)
+    Public Overridable Sub SetUpGraph(Optional OutputToFile As Boolean = False)
         If Datasets.Count = 0 Then
             Exit Sub
         End If

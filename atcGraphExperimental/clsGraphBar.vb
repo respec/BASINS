@@ -16,16 +16,10 @@ Public Class clsGraphBar
         End If
     End Sub
 
-    Public Sub SetUpGraph(Optional OutputToFile As Boolean = False)
+    Public Overrides Sub SetUpGraph(Optional OutputToFile As Boolean = False)
         If Datasets.Count = 0 Then
             Exit Sub
         End If
-        'Dim lTimeseriesX As atcTimeseries = newValue.ItemByIndex(0)
-        'Dim lTimeseriesY As atcTimeseries = newValue.ItemByIndex(1)
-        'If lTimeseriesX.Attributes.GetValue("timeunit") <> lTimeseriesY.Attributes.GetValue("timeunit") Then
-        '    Logger.Msg("BoxWhisker plot requires two timeseries to be of same time unit.")
-        '    Exit Property
-        'End If
 
         'Set up the chart
         pZgc.GraphPane.BarSettings.Type = BarType.Overlay

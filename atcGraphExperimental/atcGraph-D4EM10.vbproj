@@ -138,6 +138,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="atcTimeseriesPointList.vb" />
+    <Compile Include="clsGraphBar.vb" />
     <Compile Include="clsGraphBase.vb" />
     <Compile Include="clsGraphBoxWhisker.vb" />
     <Compile Include="clsGraphCumulativeDifference.vb" />
