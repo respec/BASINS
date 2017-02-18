@@ -65,7 +65,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\x86\Debug\</OutputPath>
+    <OutputPath>..\bin-D4EM10\x86Debug\</OutputPath>
     <DocumentationFile>atcHspfSupport.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
@@ -87,8 +87,20 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="atcBatchProcessing">
+      <HintPath>..\bin-D4EM10\x86Debug\atcBatchProcessing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="atcSynopticAnalysis">
       <HintPath>..\bin\Plugins\BASINS\atcSynopticAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="atcTimeseriesBaseflow">
+      <HintPath>..\bin-D4EM10\x86Debug\atcTimeseriesBaseflow.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="atcUSGSBaseflow">
+      <HintPath>..\bin-D4EM10\x86Debug\atcUSGSBaseflow.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
