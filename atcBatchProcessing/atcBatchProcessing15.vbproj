@@ -173,24 +173,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcD4EMLauncher\atcD4EMLauncher.vbproj">
-      <Project>{6cde2fe3-deba-46ba-b395-8f71f87159b0}</Project>
-      <Name>atcD4EMLauncher</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData15.vbproj">
-      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
-      <Name>atcData15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcGraphExperimental\atcGraph15.vbproj">
-      <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
-      <Name>atcGraph15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow15.vbproj">
