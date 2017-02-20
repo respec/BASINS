@@ -1448,8 +1448,10 @@ Public Class frmDF2P
 
                 Integer.TryParse(txtBackDays.Text, pRecess.BackTraceDays)
                 RemoveHandler lstRecessSegments.ItemCheck, AddressOf lstRecessSegments_ItemCheck
+                Dim lRecessLeg As clsRecessionSegment
                 For Each lPeakDate As String In pRecess.listOfSegments.Keys
-                    lstRecessSegments.Items.Add(lPeakDate)
+                    lRecessLeg = pRecess.listOfSegments.ItemByKey(lPeakDate)
+                    lstRecessSegments.Items.Add(lPeakDate & "-" & lRecessLeg.EndDayDateToString())
                     If pRecess.listOfSegments.ItemByKey(lPeakDate).BackTraceContinuousFlag(pRecess.BackTraceDays) Then
                         lstRecessSegments.SetItemChecked(lstRecessSegments.Items.Count - 1, True)
                     End If

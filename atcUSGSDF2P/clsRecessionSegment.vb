@@ -99,6 +99,16 @@ Public Class clsRecessionSegment
         End Get
     End Property
 
+    Public ReadOnly Property EndDayDateToString() As String
+        Get
+            Dim lastDayIndex As Integer = PeakDayIndex + SegmentLength - 1
+            Dim lEndDate = StreamFlowTS.Dates.Value(lastDayIndex - 1)
+            Dim lDate(5) As Integer
+            J2Date(lEndDate, lDate)
+            Return lDate(0).ToString & "/" & lDate(1).ToString.PadLeft(2, " ") & "/" & lDate(2).ToString.PadLeft(2, " ")
+        End Get
+    End Property
+
     Public ReadOnly Property HzeroDayDateToString() As String
         Get
             Dim lDate(5) As Integer

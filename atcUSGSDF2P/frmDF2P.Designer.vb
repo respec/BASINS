@@ -338,14 +338,15 @@ Partial Class frmDF2P
         '
         'lstRecessSegments
         '
-        Me.lstRecessSegments.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lstRecessSegments.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstRecessSegments.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstRecessSegments.FormattingEnabled = True
         Me.lstRecessSegments.IntegralHeight = False
         Me.lstRecessSegments.Location = New System.Drawing.Point(3, 3)
         Me.lstRecessSegments.Name = "lstRecessSegments"
-        Me.lstRecessSegments.Size = New System.Drawing.Size(122, 228)
+        Me.lstRecessSegments.Size = New System.Drawing.Size(181, 228)
         Me.lstRecessSegments.TabIndex = 13
         '
         'scDisplay
@@ -353,7 +354,7 @@ Partial Class frmDF2P
         Me.scDisplay.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.scDisplay.Location = New System.Drawing.Point(132, 3)
+        Me.scDisplay.Location = New System.Drawing.Point(187, 3)
         Me.scDisplay.Name = "scDisplay"
         '
         'scDisplay.Panel1
@@ -365,8 +366,8 @@ Partial Class frmDF2P
         'scDisplay.Panel2
         '
         Me.scDisplay.Panel2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.scDisplay.Size = New System.Drawing.Size(636, 228)
-        Me.scDisplay.SplitterDistance = 26
+        Me.scDisplay.Size = New System.Drawing.Size(581, 228)
+        Me.scDisplay.SplitterDistance = 25
         Me.scDisplay.TabIndex = 39
         '
         'txtAnalysisResults
@@ -615,7 +616,7 @@ Partial Class frmDF2P
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(789, 314)
+        Me.ClientSize = New System.Drawing.Size(789, 313)
         Me.Controls.Add(Me.panelConfiguration)
         Me.Controls.Add(Me.panelAnalysis)
         Me.Controls.Add(Me.MenuStrip1)
