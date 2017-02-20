@@ -103,12 +103,6 @@
     <Compile Include="frmDF2P.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmUSGSRecessOriginal.Designer.vb">
-      <DependentUpon>frmUSGSRecessOriginal.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmUSGSRecessOriginal.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -132,10 +126,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmDF2P.resx">
       <DependentUpon>frmDF2P.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmUSGSRecessOriginal.resx">
-      <DependentUpon>frmUSGSRecessOriginal.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
