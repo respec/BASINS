@@ -220,6 +220,7 @@ Public Class clsGraphProbability
 
         lCurve = lPane.AddCurve(lCurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)
         lCurve.Line.Width = 2
+        lCurve.Tag = aTimeseries.Serial & "|" & aTimeseries.Attributes.GetValue("ID") & "|" & aTimeseries.Attributes.GetValue("Data Source")
 
         lCurve.Line.StepType = StepType.NonStep
         SetYMax(lPane)
