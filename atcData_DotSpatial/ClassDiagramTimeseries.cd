@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="atcData.atcDataSet" Collapsed="true">
+    <Position X="9" Y="1.5" Width="1.75" />
+    <Members>
+      <Field Name="pAttributes" Hidden="true" />
+      <Field Name="pNextSerial" Hidden="true" />
+      <Field Name="pSerial" Hidden="true" />
+      <Field Name="pStringAttributeNames" Hidden="true" />
+      <Field Name="pStringFormat" Hidden="true" />
+    </Members>
+    <AssociationLine Name="Attributes" Type="atcData.atcDataAttributes" FixedToPoint="true">
+      <Path>
+        <Point X="9.875" Y="2.009" />
+        <Point X="9.875" Y="2.5" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAQAAQgAAAAACAAEAAAABAAQABAAAAAAAAAAAABAQBA=</HashCode>
+      <FileName>atcDataSet.vb</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Attributes" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="atcData.atcDefinedValue" Collapsed="true">
+    <Position X="9" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAEAAAAAAAAAAAAAAAAIAAgAAAAABA=</HashCode>
+      <FileName>atcAttributeDefinition.vb</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="Definition" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="atcData.atcAttributeDefinition" Collapsed="true">
+    <Position X="9" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AoAAAAAEgFAogEAEEAACAIQEIABYAQAgEAAGAAFkDBg=</HashCode>
+      <FileName>atcAttributeDefinition.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcDataAttributes" Collapsed="true">
+    <Position X="9" Y="2.5" Width="1.75" />
+    <Members>
+      <Method Name="AttributeNameToKey" Hidden="true" />
+      <Field Name="pAllAliases" Hidden="true" />
+      <Field Name="pAllDefinitions" Hidden="true" />
+      <Field Name="pDateFormat" Hidden="true" />
+      <Field Name="pOwner" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAIAAACAIJBAAgIEAAAkAQAkAAAKAJABBAgAA0CAAJA=</HashCode>
+      <FileName>atcDataAttributes.vb</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Item(System.Int32)" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="atcData.atcDataGroup" Collapsed="true">
+    <Position X="6.5" Y="1.5" Width="1.75" />
+    <Members>
+      <Field Name="pNaN" Hidden="true" />
+      <Field Name="pSelectedData" Hidden="true" />
+      <Method Name="RaiseAddedOne" Hidden="true" />
+      <Method Name="RaiseRemovedOne" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAIAAEEAKCAAAEIEBAQABEAEAAgAAAAACAAAAMBEBBk=</HashCode>
+      <FileName>atcDataGroup.vb</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Item(System.Int32)" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="atcData.atcDataManager" Collapsed="true">
+    <Position X="1" Y="0.5" Width="1.5" />
+    <Members>
+      <Method Name="DatasetsAtMapSelectedLocations" Hidden="true" />
+      <Field Name="pDefaultDisplayAttributes" Hidden="true" />
+      <Field Name="pDefaultSelectionAttributes" Hidden="true" />
+      <Field Name="pDisplayAttributes" Hidden="true" />
+      <Field Name="pLikelyShapeLocationFieldNames" Hidden="true" />
+      <Field Name="pManagerForm" Hidden="true" />
+      <Field Name="pMapWin" Hidden="true" />
+      <Field Name="pSelectionAttributes" Hidden="true" />
+      <Method Name="RemovedDataSource" Hidden="true" />
+    </Members>
+    <AssociationLine Name="DataPlugins" Type="atcData.atcDataPlugin">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-1.056" Y="0.206" Height="0.16" Width="0.924" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AggAKoAAYsQECAiVCQCACCxGCAgAAJACgoOgF+BEAAA=</HashCode>
+      <FileName>atcDataManager.vb</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="pDataSources" />
+      <Property Name="DataPlugins" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="atcData.atcDataPlugin" Collapsed="true">
+    <Position X="1" Y="1.5" Width="1.5" />
+    <Members>
+      <Field Name="pMapWin" Hidden="true" />
+      <Field Name="pMapWinWindowHandle" Hidden="true" />
+      <Field Name="pMenusAdded" Hidden="true" />
+      <Field Name="pNextSerial" Hidden="true" />
+      <Field Name="pSerial" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>IAwEAICAYBAwAUAGgAABBAQAEAEEAAAAAAAEJAFQCAA=</HashCode>
+      <FileName>atcDataPlugin.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="atcData.atcDataSource" Collapsed="true">
+    <Position X="3.75" Y="1.5" Width="1.75" />
+    <Members>
+      <Field Name="pAttributes" Hidden="true" />
+      <Field Name="pData" Hidden="true" />
+      <Field Name="pFilter" Hidden="true" />
+      <Field Name="pSpecification" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Enum Name="atcData.atcDataSource.EnumExistAction" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>atcDataSource.vb</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <InheritanceLine Type="atcData.atcDataPlugin" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.5" Y="1.812" />
+        <Point X="3.75" Y="1.812" />
+      </Path>
+    </InheritanceLine>
+    <AssociationLine Name="Attributes" Type="atcData.atcDataAttributes" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="4.625" Y="2.13" />
+        <Point X="4.625" Y="2.875" />
+        <Point X="9" Y="2.875" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>BAAggIgAQAABIDAEAAAAAAgSABABAAAAAAAAAQBCQAA=</HashCode>
+      <FileName>atcDataSource.vb</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="DataSets" />
+      <Property Name="Attributes" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="atcData.atcTimeseriesGroup" Collapsed="true">
+    <Position X="6.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAEAAABE=</HashCode>
+      <FileName>atcTimeseriesGroup.vb</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Item(System.Int32)" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="atcData.atcTimeseries" Collapsed="true">
+    <Position X="9" Y="0.5" Width="1.75" />
+    <Members>
+      <Field Name="pDataSource" Hidden="true" />
+      <Field Name="pDates" Hidden="true" />
+      <Field Name="pEpsilon" Hidden="true" />
+      <Field Name="pNaN" Hidden="true" />
+      <Field Name="pNumValues" Hidden="true" />
+      <Field Name="pValueAttributes" Hidden="true" />
+      <Field Name="pValues" Hidden="true" />
+      <Field Name="pValuesNeedToBeRead" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>YCWAAAgQSAAAAQAAAJAgAAgAAgAAAAABAIIgAIBDBBI=</HashCode>
+      <FileName>atcTimeseries.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcTimeseriesSource" Collapsed="true">
+    <Position X="3.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>atcTimeseriesSource.vb</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="DataSets" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

@@ -109,70 +109,69 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcData\atcData15.vbproj">
+      <Project>{ac301067-c700-4cea-bed6-97f90960f5f2}</Project>
+      <Name>atcData15</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls15.vbproj">
       <Project>{b219575f-1541-41db-9fa4-d9d7cd62b4a5}</Project>
       <Name>atcControls15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData15.vbproj">
-      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
-      <Name>atcData15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility15.vbproj">
       <Project>{350d3be7-35a4-4b09-9d28-dde2f6b716cd}</Project>
       <Name>atcMwGisUtility15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <Reference Include="DotSpatial.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=de6dc4a67596c1e5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\DotSpatial.Common.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DotSpatial.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c29dbf30e059ca9d, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\DotSpatial.Data.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DotSpatial.Desktop, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ca60e6823c3a6ee5, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\DotSpatial.Desktop.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DotSpatial.Projections, Version=1.0.0.0, Culture=neutral, PublicKeyToken=272632bddd08a38b, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\DotSpatial.Projections.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DotSpatial.Serialization, Version=1.0.0.0, Culture=neutral, PublicKeyToken=441f200f827611e7, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\DotSpatial.Serialization.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DotSpatial.Topology, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a66b5e9434ca3671, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\DotSpatial.Topology.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="MapWinInterfaces, Version=4.8.6.42296, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>

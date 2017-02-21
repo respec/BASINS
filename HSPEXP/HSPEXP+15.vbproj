@@ -91,9 +91,6 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="atcUSGSBaseflow">
-      <HintPath>..\bin\Plugins\BASINS\atcUSGSBaseflow.dll</HintPath>
-    </Reference>
     <Reference Include="MapWinUtility">
       <HintPath>..\bin\Plugins\BASINS\MapWinUtility.dll</HintPath>
     </Reference>
@@ -277,6 +274,61 @@
       <IncludeHash>True</IncludeHash>
       <FileType>Assembly</FileType>
     </PublishFile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\atcBasinsObsWQ\atcBasinsObsWQ15.vbproj">
+      <Project>{7afda98b-89f8-4847-bef6-50a87d4ef442}</Project>
+      <Name>atcBasinsObsWQ15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData15.vbproj">
+      <Project>{ac301067-c700-4cea-bed6-97f90960f5f2}</Project>
+      <Name>atcData15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcDataDotSpatial.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcDataDotSpatial</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph15.vbproj">
+      <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
+      <Name>atcGraph15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcHspfBinOut\atcHspfBinOut15.vbproj">
+      <Project>{61fab3d2-9a2d-4d0a-bc4d-41c499dbe4b9}</Project>
+      <Name>atcHspfBinOut15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcHspfSupport\atcHspfSupport15.vbproj">
+      <Project>{3b2eb97a-a305-4394-9843-72e138815152}</Project>
+      <Name>atcHspfSupport15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcList\atcList15.vbproj">
+      <Project>{9b23bab1-3254-4054-88b0-51f936666067}</Project>
+      <Name>atcList15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcReport\atcReport15.vbproj">
+      <Project>{c998cf16-4e54-4415-bff1-72294eec8aaf}</Project>
+      <Name>atcReport15</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatisticsDotSpatial.vbproj">
+      <Project>{7e40e3e6-bf8e-45b5-99af-4e11daf039fd}</Project>
+      <Name>atcTimeseriesStatisticsDotSpatial</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUCI\atcUCI15.vbproj">
+      <Project>{5f06dc40-076c-49b6-b790-25a201512200}</Project>
+      <Name>atcUCI15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUSGSBaseflow\atcUSGSBaseflow15.vbproj">
+      <Project>{9f09a31b-de05-4ff8-8e89-867affe0ace7}</Project>
+      <Name>atcUSGSBaseflow15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">
+      <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
+      <Name>atcUtility15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM15.vbproj">
+      <Project>{f0f41e48-35ed-43f4-ab00-30252b0e5690}</Project>
+      <Name>atcWDM15</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

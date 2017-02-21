@@ -215,9 +215,17 @@
       <Project>{f73269c2-2f1f-4ac0-8162-7b19995dd53c}</Project>
       <Name>atcControls15</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData15.vbproj">
+      <Project>{ac301067-c700-4cea-bed6-97f90960f5f2}</Project>
+      <Name>atcData15</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcDurationCompare\atcDurationCompare15.vbproj">
       <Project>{fbaa545b-7d95-43a3-8a4f-cc664d7db201}</Project>
       <Name>atcDurationCompare15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph15.vbproj">
+      <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
+      <Name>atcGraph15</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow15.vbproj">
       <Project>{f9a4070c-1faf-4d17-a8e6-7eb19d414b05}</Project>
@@ -232,10 +240,13 @@
       <Project>{4dbc8159-1072-41fa-9242-933e12a88ee6}</Project>
       <Name>atcUSGSUtility15</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">
+      <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
+      <Name>atcUtility15</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BASINS\GWToolbox15.vbproj">
       <Project>{37d44868-95ce-4a21-a43a-13e7e7f2ad09}</Project>
       <Name>GWToolbox15</Name>
-      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>

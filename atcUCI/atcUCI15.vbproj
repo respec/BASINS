@@ -238,6 +238,18 @@
     <Compile Include="modVb2F90.vb" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcData\atcData15.vbproj">
+      <Project>{ac301067-c700-4cea-bed6-97f90960f5f2}</Project>
+      <Name>atcData15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSegmentation\atcSegmentation15.vbproj">
+      <Project>{813e3f46-36ca-4320-bb05-325eec553d3d}</Project>
+      <Name>atcSegmentation15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM15.vbproj">
+      <Project>{f0f41e48-35ed-43f4-ab00-30252b0e5690}</Project>
+      <Name>atcWDM15</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
@@ -246,11 +258,6 @@
     <ProjectReference Include="..\atcControls\atcControls15.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls15</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData15.vbproj">
-      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
-      <Name>atcData15</Name>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">

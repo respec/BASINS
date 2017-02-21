@@ -316,3 +316,14 @@
 /atcUSGSDF2P/obj/x86/Debug/atcUSGSDF2P15.vbproj.FileListAbsolute.txt
 /atcUSGSDF2P/obj/x86/Debug/atcUSGSDF2P.Resources.resources
 /atcMetCmp/obj/Debug
+*.suo
+/atcData_DotSpatial/My Project/Resources.Designer.vb
+/atcData_DotSpatial/My Project/Resources.resx
+/atcData_DotSpatial/obj/Debug
+/atcData_DotSpatial/obj/x86/Debug/TempPE
+/atcData_DotSpatial/obj/x86/Debug
+/atcTimeseriesGSSHA/obj/x86/Debug
+/atcTimeseriesNCDC/obj/x86/Debug
+/atcTimeseriesSUSTAIN/obj/x86/Debug
+/TimeseriesUtility/obj/x86/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+/TimeseriesUtility/obj/x86/Debug
