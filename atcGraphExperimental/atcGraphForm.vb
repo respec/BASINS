@@ -13,11 +13,9 @@ Imports System.ComponentModel
 Imports System.IO
 Imports System.Windows.Forms
 Imports System.Web.Script.Serialization
-#If GISProvider = "DotSpatial" Then
 Imports System.Xml
 Imports System.Xml.Linq
 Imports System.Runtime.Serialization.Json
-#End If
 'Imports System.Runtime.InteropServices
 
 Public Class atcGraphForm
@@ -649,7 +647,7 @@ Public Class atcGraphForm
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-#If GISProvider = "DotSpatial" Then
+
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 Dim JsonString As String = File.ReadAllText(.FileName)
                 'Dim ser As JavaScriptSerializer = New JavaScriptSerializer()
@@ -676,10 +674,10 @@ Public Class atcGraphForm
                     lCurveIndex = -1
                     For Each lPane As XmlNode In lPaneList
                         For Each lItemNode As XmlNode In lPane.ChildNodes
-                            For Each lCurveNode As XmlNode In lItemNode.ChildNodes
-                                If lCurveNode.Name = "CurveList" Then
+                            For Each lItemNode2 As XmlNode In lItemNode.ChildNodes
+                                If lItemNode2.Name = "CurveList" Then
                                     lCurveIndex += 1
-                                    For Each lChildItem As XmlNode In lCurveNode.ChildNodes
+                                    For Each lChildItem As XmlNode In lItemNode2.ChildNodes
                                         For Each lChildNode As XmlNode In lChildItem.ChildNodes
                                             If lChildNode.Name = "Tag" Then
                                                 lTag = lChildNode.InnerText
@@ -711,6 +709,60 @@ Public Class atcGraphForm
                                             End If
                                         Next
                                     Next
+                                ElseIf lItemNode2.Name = "XAxis" Then
+                                    For Each lChildItem As XmlNode In lItemNode2.ChildNodes
+                                        If lChildItem.Name = "Title" Then
+                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                                If lScaleNode.Name = "Text" Then
+                                                    pZgc.MasterPane.PaneList(0).XAxis.Title.Text = lScaleNode.InnerText
+                                                End If
+                                            Next
+                                        ElseIf lChildItem.Name = "Scale"
+                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                                If lScaleNode.Name = "Min" Then
+                                                    pZgc.MasterPane.PaneList(0).XAxis.Scale.Min = lScaleNode.InnerText
+                                                ElseIf lScaleNode.Name = "Max" Then
+                                                    pZgc.MasterPane.PaneList(0).XAxis.Scale.Max = lScaleNode.InnerText
+                                                End If
+                                            Next
+                                        End If
+                                    Next
+                                ElseIf lItemNode2.Name = "YAxis" Then
+                                    For Each lChildItem As XmlNode In lItemNode2.ChildNodes
+                                        If lChildItem.Name = "Title" Then
+                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                                If lScaleNode.Name = "Text" Then
+                                                    pZgc.MasterPane.PaneList(0).YAxis.Title.Text = lScaleNode.InnerText
+                                                End If
+                                            Next
+                                        ElseIf lChildItem.Name = "Scale"
+                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                                If lScaleNode.Name = "Min" Then
+                                                    pZgc.MasterPane.PaneList(0).YAxis.Scale.Min = lScaleNode.InnerText
+                                                ElseIf lScaleNode.Name = "Max" Then
+                                                    pZgc.MasterPane.PaneList(0).YAxis.Scale.Max = lScaleNode.InnerText
+                                                End If
+                                            Next
+                                        End If
+                                    Next
+                                ElseIf lItemNode2.Name = "Y2Axis" Then
+                                    For Each lChildItem As XmlNode In lItemNode2.ChildNodes
+                                        If lChildItem.Name = "Title" Then
+                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                                If lScaleNode.Name = "Text" Then
+                                                    pZgc.MasterPane.PaneList(0).Y2Axis.Title.Text = lScaleNode.InnerText
+                                                End If
+                                            Next
+                                        ElseIf lChildItem.Name = "Scale"
+                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                                If lScaleNode.Name = "Min" Then
+                                                    pZgc.MasterPane.PaneList(0).Y2Axis.Scale.Min = lScaleNode.InnerText
+                                                ElseIf lScaleNode.Name = "Max" Then
+                                                    pZgc.MasterPane.PaneList(0).Y2Axis.Scale.Max = lScaleNode.InnerText
+                                                End If
+                                            Next
+                                        End If
+                                    Next
                                 End If
                             Next
                         Next
@@ -721,7 +773,6 @@ Public Class atcGraphForm
                     Dim l As Integer = 0
                 End Try
             End If
-#End If
         End With
     End Sub
 End Class
