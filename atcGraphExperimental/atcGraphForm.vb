@@ -13,11 +13,9 @@ Imports System.ComponentModel
 Imports System.IO
 Imports System.Windows.Forms
 Imports System.Web.Script.Serialization
-#If GISProvider = "DotSpatial" Then
 Imports System.Xml
 Imports System.Xml.Linq
 Imports System.Runtime.Serialization.Json
-#End If
 'Imports System.Runtime.InteropServices
 
 Public Class atcGraphForm
@@ -649,7 +647,7 @@ Public Class atcGraphForm
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-#If GISProvider = "DotSpatial" Then
+
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 Dim JsonString As String = File.ReadAllText(.FileName)
                 'Dim ser As JavaScriptSerializer = New JavaScriptSerializer()
@@ -775,7 +773,6 @@ Public Class atcGraphForm
                     Dim l As Integer = 0
                 End Try
             End If
-#End If
         End With
     End Sub
 End Class
