@@ -143,13 +143,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcData\atcData15.vbproj">
-      <Project>{ac301067-c700-4cea-bed6-97f90960f5f2}</Project>
-      <Name>atcData15</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData15.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcData15</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcGraphExperimental\atcGraph15.vbproj">
       <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>

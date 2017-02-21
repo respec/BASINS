@@ -4,7 +4,7 @@
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6F4F08A7-FF03-4E30-BBFF-EF9BCF9E6152}</ProjectGuid>
+    <ProjectGuid>{72264BDC-23F5-4A55-B53D-0752099CB263}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ApplicationIcon>
@@ -98,7 +98,7 @@
     <Reference Include="MapWinInterfaces">
       <Name>MapWinInterfaces</Name>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -113,20 +113,21 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
-    <ProjectReference Include="..\atcData\atcData15.vbproj">
-      <Project>{ac301067-c700-4cea-bed6-97f90960f5f2}</Project>
-      <Name>atcData15</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
-      <Private>True</Private>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData15.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData15</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">
       <Name>atcUtility15</Name>
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
-      <Private>True</Private>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

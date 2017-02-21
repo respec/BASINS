@@ -79,7 +79,7 @@
     <Reference Include="Interop.MapWinGIS, Version=4.8.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -176,34 +176,42 @@
     <ProjectReference Include="..\atcD4EMLauncher\atcD4EMLauncher.vbproj">
       <Project>{6cde2fe3-deba-46ba-b395-8f71f87159b0}</Project>
       <Name>atcD4EMLauncher</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData15.vbproj">
-      <Project>{ac301067-c700-4cea-bed6-97f90960f5f2}</Project>
-      <Name>atcData15</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow15.vbproj">
-      <Project>{f9a4070c-1faf-4d17-a8e6-7eb19d414b05}</Project>
-      <Name>atcTimeseriesBaseflow15</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
-      <Private>True</Private>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData15.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcData15</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph15.vbproj">
+      <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
+      <Name>atcGraph15</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow15.vbproj">
+      <Project>{f9a4070c-1faf-4d17-a8e6-7eb19d414b05}</Project>
+      <Name>atcTimeseriesBaseflow15</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB15.vbproj">
       <Project>{82530a5b-ff39-4b9f-8a04-881468dfc662}</Project>
       <Name>atcTimeseriesRDB15</Name>
-      <Private>True</Private>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUSGSUtility\atcUSGSUtility15.vbproj">
       <Project>{4dbc8159-1072-41fa-9242-933e12a88ee6}</Project>
       <Name>atcUSGSUtility15</Name>
-      <Private>True</Private>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility15</Name>
-      <Private>True</Private>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
