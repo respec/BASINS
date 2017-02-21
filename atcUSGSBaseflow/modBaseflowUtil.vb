@@ -795,7 +795,7 @@ Public Module modBaseflowUtil
 
     '{
     ''' <summary>
-    ''' Calculate Runoff from Streamflow using the HySEP Fixed method (for WinHSPF)
+    ''' Calculate Runoff from Streamflow using the HySEP_LocMin method (for WinHSPF)
     ''' </summary>
     ''' <param name="aArgs">Base-flow separation inputs (e.g. streamflow and parameters)</param>
     ''' <return>Error message, start with "ERROR". If successful, then it will begin with "SUCCESS,Key" string</return>
@@ -962,12 +962,12 @@ Public Module modBaseflowUtil
         Logger.Dbg("Construct full time span base-flow analysis result.")
         'reconstruct the bf time series as attribute to pDataGroup(0) of the analysis window
         'first get rid of old method's group
-        Dim lTsGroupFixed As atcCollection = Nothing
+        Dim lTsGroupLocMin As atcCollection = Nothing
         With lBFReportGroups
-            lTsGroupFixed = .GetValue("GroupLocMin", Nothing)
+            lTsGroupLocMin = .GetValue("GroupLocMin", Nothing)
         End With
-        If lTsGroupFixed IsNot Nothing AndAlso lTsGroupFixed.Count > 0 Then
-            Dim lTs As atcTimeseries = lTsGroupFixed.ItemByKey("RateDaily")
+        If lTsGroupLocMin IsNot Nothing AndAlso lTsGroupLocMin.Count > 0 Then
+            Dim lTs As atcTimeseries = lTsGroupLocMin.ItemByKey("RateDaily")
             For I As Integer = 1 To lTs.numValues
                 If lTs.Value(I) < 0 Then lTs.Value(I) = Double.NaN
             Next

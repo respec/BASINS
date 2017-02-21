@@ -347,7 +347,6 @@ Module HSPFOutputReports
                                 lOutFileName = loutfoldername & "DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
                                 SaveFileString(lOutFileName, lStr)
 
-                                'Becky's addition: only make graphs if user wants them. 
                                 If pMakeLogGraphs Or pMakeStdGraphs Or pMakeSupGraphs Then
                                     Logger.Status(Now & " Preparing Graphs", True)
                                     Dim lTimeSeries As New atcTimeseriesGroup

@@ -87,8 +87,17 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="atcSynopInput">
+      <HintPath>..\bin\Plugins\BASINS\atcSynopInput.dll</HintPath>
+    </Reference>
     <Reference Include="atcSynopticAnalysis">
       <HintPath>..\bin\Plugins\BASINS\atcSynopticAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="atcTimeseriesBaseflow">
+      <HintPath>..\bin\Plugins\BASINS\atcTimeseriesBaseflow.dll</HintPath>
+    </Reference>
+    <Reference Include="atcUSGSBaseflow">
+      <HintPath>..\bin\Plugins\BASINS\atcUSGSBaseflow.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -172,37 +181,37 @@
     <ProjectReference Include="..\atcControls\atcControls-D4EM10.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls-D4EM10</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcData\atcData-D4EM10.vbproj">
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
       <Name>atcData-D4EM10</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcDurationCompare\atcDurationCompare-D4EM10.vbproj">
       <Project>{92EA3681-9EA9-438A-A598-2531F483A0C6}</Project>
       <Name>atcDurationCompare-D4EM10</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcGraphExperimental\atcGraph-D4EM10.vbproj">
       <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
       <Name>atcGraph-D4EM10</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcReport\atcReport-D4EM10.vbproj">
       <Project>{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}</Project>
       <Name>atcReport-D4EM10</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath-D4EM10.vbproj">
       <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
       <Name>atcTimeseriesMath-D4EM10</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI-D4EM10.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
       <Name>atcUCI-D4EM10</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility-D4EM10.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>

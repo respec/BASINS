@@ -64,14 +64,10 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="atcDurationCompare, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\Plugins\BASINS\atcDurationCompare.dll</HintPath>
-    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.8.6.42296, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -151,6 +147,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcDurationCompare\atcDurationCompare15.vbproj">
+      <Project>{fbaa545b-7d95-43a3-8a4f-cc664d7db201}</Project>
+      <Name>atcDurationCompare15</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcEvents\atcEvents15.vbproj">
       <Project>{9f469fd8-4a92-4c1f-901c-93d84d457d8f}</Project>
       <Name>atcEvents15</Name>
@@ -159,7 +159,7 @@
     <ProjectReference Include="..\atcSynopticAnalysis\atcSynopticAnalysis15.vbproj">
       <Project>{fabf7aa3-dde7-48a4-8226-ecd3ad423597}</Project>
       <Name>atcSynopticAnalysis15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow15.vbproj">
       <Project>{f9a4070c-1faf-4d17-a8e6-7eb19d414b05}</Project>
@@ -172,52 +172,27 @@
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcBasinsObsWQ\atcBasinsObsWQ15.vbproj">
-      <Project>{7DCB47A0-7B03-4B7C-BC42-B8D920D46604}</Project>
-      <Name>atcBasinsObsWQ15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls15.vbproj">
       <Project>{b219575f-1541-41db-9fa4-d9d7cd62b4a5}</Project>
       <Name>atcControls15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcData\atcData15.vbproj">
       <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
       <Name>atcData15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcGraphExperimental\atcGraph15.vbproj">
       <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
       <Name>atcGraph15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcReport\atcReport15.vbproj">
-      <Project>{ee3bb0ca-bb0a-4fb6-9ab3-e73f57dd4a21}</Project>
-      <Name>atcReport15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath15.vbproj">
-      <Project>{bd299eb7-7a62-4ef9-8806-86e9288c498f}</Project>
-      <Name>atcTimeseriesMath15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcUCI\atcUCI15.vbproj">
-      <Project>{2fc4314b-792b-40a3-b540-aca05b9ea86b}</Project>
-      <Name>atcUCI15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility15.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcWDM\atcWDM15.vbproj">
-      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
-      <Name>atcWDM15</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />

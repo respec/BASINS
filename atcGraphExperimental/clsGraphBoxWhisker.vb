@@ -147,7 +147,7 @@ Public Class clsGraphBoxWhisker
         End Set
     End Property
 
-    Public Sub SetUpGraph(Optional OutputToFile As Boolean = False)
+    Public Overridable Sub SetUpGraph(Optional OutputToFile As Boolean = False)
         If Datasets.Count = 0 Then
             Exit Sub
         End If
@@ -389,7 +389,7 @@ Public Class clsGraphBoxWhisker
         Return lTs.Attributes.GetValue(aStatName, Double.NaN)
     End Function
 
-    Private Function TimeUnitText(ByVal aTser As atcTimeseries) As String
+    Friend Function TimeUnitText(ByVal aTser As atcTimeseries) As String
         Dim lTimeUnit As String = ""
         With aTser.Attributes
             Select Case CType(.GetValue("timeunit"), atcTimeUnit)

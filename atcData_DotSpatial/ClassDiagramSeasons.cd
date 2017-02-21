@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="atcData.atcSeasonBase">
+    <Position X="0.5" Y="0.5" Width="2" />
+    <Members>
+      <Field Name="pAllSeasons" Hidden="true" />
+      <Field Name="pNaN" Hidden="true" />
+      <Field Name="pSeasonsSelected" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQkAgQGAAAAAEQAAAAAAAQQEAMwAAAADBA=</HashCode>
+      <FileName>atcSeasonBase.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonYears" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AMUABAAEMCAIVgxogACBQEGWlCAgAICBBADCggAZAQg=</HashCode>
+      <FileName>atcSeasonYears.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonsAMorPM" Collapsed="true">
+    <Position X="3" Y="2.75" Width="2" />
+    <InheritanceLine Type="atcData.atcSeasonBase" FixedFromPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.379" />
+        <Point X="2.74" Y="2.379" />
+        <Point X="2.74" Y="3.065" />
+        <Point X="3" Y="3.065" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAEAAAAAAAAAAAAIQAAAAABA=</HashCode>
+      <FileName>atcSeasonsAMorPM.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonsCalendarYear" Collapsed="true">
+    <Position X="3" Y="5.75" Width="2" />
+    <InheritanceLine Type="atcData.atcSeasonBase" FixedFromPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.379" />
+        <Point X="2.74" Y="2.379" />
+        <Point X="2.74" Y="6.065" />
+        <Point X="3" Y="6.065" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAQEAAAAAAAAAAAAIAAAAAABA=</HashCode>
+      <FileName>atcSeasonsCalendarYear.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonsDayOfMonth" Collapsed="true">
+    <Position X="3" Y="3.5" Width="2" />
+    <InheritanceLine Type="atcData.atcSeasonBase" FixedFromPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.379" />
+        <Point X="2.74" Y="2.379" />
+        <Point X="2.74" Y="3.815" />
+        <Point X="3" Y="3.815" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAEAAAAAEAAAAAAAAAAAAIQAAAAABA=</HashCode>
+      <FileName>atcSeasonsDayOfMonth.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonsDayOfWeek" Collapsed="true">
+    <Position X="3" Y="1.25" Width="2" />
+    <InheritanceLine Type="atcData.atcSeasonBase" FixedFromPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.379" />
+        <Point X="2.74" Y="2.379" />
+        <Point X="2.74" Y="1.565" />
+        <Point X="3" Y="1.565" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAEAAAAAEAAAAAAAAAAEAIQAAAgABA=</HashCode>
+      <FileName>atcSeasonsDayOfWeek.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonsDayOfYear" Collapsed="true">
+    <Position X="3" Y="4.25" Width="2" />
+    <InheritanceLine Type="atcData.atcSeasonBase" FixedFromPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.379" />
+        <Point X="2.74" Y="2.379" />
+        <Point X="2.74" Y="4.565" />
+        <Point X="3" Y="4.565" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAEAAAAAEAAAAAAAAAAAAAQAAAAABA=</HashCode>
+      <FileName>atcSeasonsDayOfYear.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonsHour" Collapsed="true">
+    <Position X="3" Y="7.25" Width="2" />
+    <InheritanceLine Type="atcData.atcSeasonBase" FixedFromPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.379" />
+        <Point X="2.74" Y="2.379" />
+        <Point X="2.74" Y="7.565" />
+        <Point X="3" Y="7.565" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAEAAAAAAAAAAAAIQAAAAABA=</HashCode>
+      <FileName>atcSeasonsHour.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonsMonth" Collapsed="true">
+    <Position X="3" Y="0.5" Width="2" />
+    <InheritanceLine Type="atcData.atcSeasonBase" FixedFromPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.379" />
+        <Point X="2.74" Y="2.379" />
+        <Point X="2.74" Y="0.815" />
+        <Point X="3" Y="0.815" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAEAAAAAEAAAAAAAAAAEAIQAAAAABA=</HashCode>
+      <FileName>atcSeasonsMonth.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonsTraditional" Collapsed="true">
+    <Position X="3" Y="2" Width="2" />
+    <InheritanceLine Type="atcData.atcSeasonBase" FixedFromPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.379" />
+        <Point X="2.74" Y="2.379" />
+        <Point X="2.74" Y="2.19" />
+        <Point X="3" Y="2.19" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAEAAAAAEAAAAAAAAAAEAIQAAAAABA=</HashCode>
+      <FileName>atcSeasonsTraditional.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonsWaterYear" Collapsed="true">
+    <Position X="3" Y="5" Width="2" />
+    <Members>
+      <Field Name="pAllSeasons" Hidden="true" />
+    </Members>
+    <InheritanceLine Type="atcData.atcSeasonBase" FixedFromPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.379" />
+        <Point X="2.74" Y="2.379" />
+        <Point X="2.74" Y="5.315" />
+        <Point X="3" Y="5.315" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAQEAAAAAAAAAAAAIAAAAAABA=</HashCode>
+      <FileName>atcSeasonsWaterYear.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcData.atcSeasonsYearSubset" Collapsed="true">
+    <Position X="3" Y="6.5" Width="2" />
+    <InheritanceLine Type="atcData.atcSeasonBase" FixedFromPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.379" />
+        <Point X="2.74" Y="2.379" />
+        <Point X="2.74" Y="6.815" />
+        <Point X="3" Y="6.815" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAEAAAAAAAAQQAAKQAAAEABA=</HashCode>
+      <FileName>atcSeasonsYearSubset.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

@@ -2,6 +2,7 @@ Imports atcUtility
 Imports atcData
 Imports atcGraph
 Imports ZedGraph
+Imports atcList
 Imports MapWinUtility
 Imports System
 Imports MapWinUtility.Strings
@@ -10,9 +11,12 @@ Imports MapWinUtility.Strings
 Public Class atcExpertSystem
     'Friend ErrorCriteria As HexErrorCriteria
     Public Storms As New Generic.List(Of HexStorm)
+    Public StormsSorted As New Generic.List(Of HexStorm)
     Public Sites As New Generic.List(Of HexSite)
     Public SDateJ As Double, EDateJ As Double
     Public Name As String
+    Public ObservedStorms As New atcCollection
+    Public SimulatedStorms As New atcCollection
 
     Private pFlowOnly As Boolean
     Private pStatistics As New HexStatistics
@@ -138,7 +142,7 @@ Public Class atcExpertSystem
                 lDate(4) = 0
                 EDateJ = Date2J(lDate)
                 Logger.Msg("Analysis time period mismatch.: Analysis time period does not match the time period in the EXS file " & lFileName & "." &
-"The time period from the EXS file is used for the hydrologic calibration", vbOKOnly)
+"The time period from the EXS file will be used for the hydrologic calibration", vbOKOnly)
 
             End If
 
@@ -325,26 +329,18 @@ Public Class atcExpertSystem
             Dim lExsDsns(9) As Integer
             lExsDsns(0) = aDsns(1) '0 = simulated total runoff (in)
             lExsDsns(1) = aDsns(0) '1 = observed streamflow (cfs)
-            For lIndex As Integer = 2 To 9
-                lExsDsns(lIndex) = aDsns(lIndex)
-            Next lIndex
+            lExsDsns(2) = aDsns(2) '2 = Surface Runoff in inches
+            lExsDsns(3) = aDsns(3) '3 = Interflow Runoff in inches
+            lExsDsns(4) = aDsns(4) '4 = Groundwater Flow in inches
+            lExsDsns(5) = aDsns(9) '5 = Moisture Supply in inches
+            lExsDsns(6) = aDsns(5) '6 = Potential Evapotranspiration in inches
+            lExsDsns(7) = aDsns(6) '7 = Actual Evapotranspiration in inches
+            lExsDsns(8) = aDsns(7) '2 = UZSX 
+            lExsDsns(9) = aDsns(8) '2 = LZSX
+
             Dim lSite As New HspfSupport.HexSite(Me, aSiteName, 0, lExsDsns)
             lSite.Area = pUci.UpstreamArea(pUci.OpnBlks("RCHRES").OperFromID(aRchId))
             .Sites.Add(lSite)
-            ''use synoptic analysis on precip to find storm dates
-            ''- find precip dataset associated with this reach
-            'Dim lPrecTimser As atcTimeseries = Nothing
-            'Dim lSubsetPrecTimser As atcTimeseries = Nothing
-            'If pUci.OpnBlks("RCHRES").OperFromID(aRchId).MetSeg IsNot Nothing Then
-            '    For Each lMetSegRec As atcUCI.HspfMetSegRecord In pUci.OpnBlks("RCHRES").OperFromID(aRchId).MetSeg.MetSegRecs
-            '        If lMetSegRec.Name = "PREC" Then
-            '            lPrecTimser = pUci.GetDataSetFromDsn(lMetSegRec.Source.VolName.Substring(3), lMetSegRec.Source.VolId)
-            '            lSubsetPrecTimser = SubsetByDate(lPrecTimser, .SDateJ, .EDateJ, Nothing)
-            '            Exit For
-            '        End If
-            '    Next
-            'End If
-            'use synoptic analysis on baseflow-separated observed flow timeseries to find storm dates
             Dim lSubsetTimser As atcTimeseries = Nothing
             Dim lNonBaseflowTimser As atcTimeseries = Nothing
             If aObservedTser IsNot Nothing Then
@@ -373,29 +369,66 @@ Public Class atcExpertSystem
             End If
             '- call synop to find less than 50 storms
             If lNonBaseflowTimser IsNot Nothing Then
+
                 Dim lInputGroup As New atcTimeseriesGroup
                 lInputGroup.Add(lNonBaseflowTimser)
-                Dim lThreshold As Double = 1.0
+
+
+                Dim lThreshold As Double = 0.1
                 Dim lOutputGroup As New atcTimeseriesGroup
                 Dim lFirstTime As Boolean = True
-                Do While lOutputGroup.Count > 50 Or lFirstTime
-                    lOutputGroup = atcSynopticAnalysis.atcSynopticAnalysisPlugin.ComputeEvents(lInputGroup, lThreshold, 0.0, True)
-                    lThreshold += 1.0
-                    lFirstTime = False
-                Loop
+
+                'Do While lOutputGroup.Count > 50 Or lFirstTime
+                lOutputGroup = atcSynopticAnalysis.atcSynopticAnalysisPlugin.ComputeEvents(lInputGroup, lThreshold, 0.0, True)
+                '    lThreshold += 1.0
+                'lFirstTime = False
+                'Loop
+
+                Dim lStormList As New atcCollection
+                Dim SumofStorm As Double
+                Dim StormPeak As Double
+                Dim StormAverageVolumePerDay As Double
                 If lOutputGroup.Count > 0 Then
                     'now add the storm dates
                     Dim lStormIndex As Integer = 0
                     For Each lTimSer As atcTimeseries In lOutputGroup
+                        SumofStorm = 0
+                        StormPeak = 0
+                        StormAverageVolumePerDay = 0.0
+                        'If lTimSer.numValues < 2 Or lTimSer.numValues > 70 Then
+                        '    Continue For
+                        'End If
+                        For Each lValue As Double In lTimSer.Values
+                            If lValue > StormPeak Then StormPeak = lValue
+                            SumofStorm += lValue
+                        Next
+                        StormAverageVolumePerDay = SumofStorm / lTimSer.numValues
                         lStormIndex += 1
-                        Dim lStormSDate(5) As Integer
-                        J2Date(lTimSer.Dates.Values(0), lStormSDate)
-                        Dim lStormEDate(5) As Integer
-                        J2Date(lTimSer.Dates.Values(lTimSer.numValues), lStormEDate)
-                        .Storms.Add(New HspfSupport.HexStorm(lStormIndex, lStormSDate, lStormEDate))
+                        lStormList.Add(lOutputGroup.IndexFromKey(lTimSer), StormAverageVolumePerDay)
                     Next
+                    lStormList.SortByValue()
+
+                    Dim NumberOfStorms As Integer = lStormList.Count
+
+                    Dim NumberOfStormsTobeIncluded As Integer = (.EDateJ - .SDateJ) * 5 / 365.25
+
+                    For i As Integer = (NumberOfStorms - NumberOfStormsTobeIncluded) To NumberOfStorms - 1
+                        Dim localKey As Integer = lStormList.Keys(i)
+
+                        Dim lStormSDate(5) As Integer
+                        J2Date(lOutputGroup(localKey).Dates.Values(0), lStormSDate)
+                        Dim lStormEDate(5) As Integer
+                        J2Date(lOutputGroup(localKey).Dates.Values(lOutputGroup(localKey).numValues), lStormEDate)
+
+                        .Storms.Add(New HspfSupport.HexStorm(i, lStormSDate, lStormEDate))
+
+
+                    Next i
+
                 End If
             End If
+
+
             If .Storms.Count = 0 Then
                 'just do 1 dummy storm for now
                 Dim lStormSDate(5) As Integer
@@ -436,7 +469,7 @@ Public Class atcExpertSystem
             Dim lDate(5) As Integer
             J2Date(SDateJ, lDate)
             lStr &= lDate(0).ToString.PadLeft(6) & lDate(1).ToString.PadLeft(2) & lDate(2).ToString.PadLeft(2)
-            J2Date(EDateJ, lDate)
+            J2Date(EDateJ-1, lDate)
             lStr &= lDate(0).ToString.PadLeft(6) & lDate(1).ToString.PadLeft(2) & lDate(2).ToString.PadLeft(2)
         End If
 
@@ -453,35 +486,59 @@ Public Class atcExpertSystem
             lText.AppendLine(lStr)
         Next
         lText.AppendLine("***The following Storm dates are generated by subtracting the baseflow time series from the observed flow time series.")
-        lText.AppendLine("***The baseflow time series was generated using the HysepLocMin method that is available with USGS Surface Water Toolbox.")
-        lText.AppendLine("***The storm date generation process is under testing and user is recommended to verify these dates independently.")
+        lText.AppendLine("***The baseflow time series was generated using the HysepLocMin method that is available with the USGS Surface Water Toolbox.")
+        lText.AppendLine("***The storm date generation process is under development; users should verify these dates independently, and check for following issues.")
+        lText.AppendLine("***  1)	In some cases where two or three closely-spaced peaks should be considered as a single storm, the method divides them into separate storms.")
+        lText.AppendLine("***  2)	In some cases, the recession tails are too long. These storms should be shortened")
+        lText.AppendLine("*** 3)	Periods of prolonged runoff associated with spring snowmelt are included in the list of storms. These generally should be removed from the list.")
+
         lText.AppendLine("<St>***")
         lText.AppendLine(Storms.Count.ToString.PadLeft(4))
 
-        For Each lStorm As HexStorm In Storms
-            lStr = ""
-            With lStorm
-                Dim lDate(5) As Integer
-                J2Date(.SDateJ, lDate)
-                lStr &= lDate(0).ToString.PadLeft(5)
-                For lDateIndex As Integer = 1 To 5
-                    lStr &= lDate(lDateIndex).ToString.PadLeft(3)
-                Next
-                J2Date(.EDateJ, lDate)
-                lStr &= lDate(0).ToString.PadLeft(5)
-                For lDateIndex As Integer = 1 To 5
-                    lStr &= lDate(lDateIndex).ToString.PadLeft(3)
-                Next
-            End With
-            lText.AppendLine(lStr)
+        Dim StormTestDate As Double = 0
+        Dim StormTest As New atcCollection
+        For Each storm As HexStorm In Storms
+            StormTest.Add(storm.SDateJ)
+
         Next
+        StormTest.Sort()
+        'Sorting the storms before writing them
+        For i As Integer = 0 To StormTest.Count - 1
+            lStr = ""
+            For Each lstorm As HexStorm In Storms
+                With lstorm
+
+                    If StormTest(i) = .SDateJ Then
+                        Dim lDate(5) As Integer
+                        J2Date(.SDateJ, lDate)
+                        lStr &= lDate(0).ToString.PadLeft(5)
+                        For lDateIndex As Integer = 1 To 5
+                            lStr &= lDate(lDateIndex).ToString.PadLeft(3)
+                        Next
+                        J2Date(.EDateJ, lDate)
+                        lStr &= lDate(0).ToString.PadLeft(5)
+                        For lDateIndex As Integer = 1 To 5
+                            lStr &= lDate(lDateIndex).ToString.PadLeft(3)
+                        Next
+                        Continue For
+                    End If
+                End With
+
+            Next lstorm
+            lText.AppendLine(lStr)
+        Next i
+
 
         lStr = ""
+        lText.AppendLine("*** This area was computed by WinHSPF as the total area of PERLNDs and IMPLNDs contributing to the calibration reach.")
+        lText.AppendLine("***It does Not include the area Of water bodies. It Is Not based On the published (e.g., USGS) streamgage drainage area.")
+        lText.AppendLine("<Area  >***")
         For Each lSite As HexSite In Sites
             lStr &= lSite.Area.ToString.PadLeft(8)
         Next
         lText.AppendLine(lStr)
-        lText.AppendLine("<Area  >***")
+
+
         For Each lSite As HexSite In Sites
             lStr = ""
             For Each lError As HexErrorCriterion In lSite.ErrorCriteria
@@ -490,41 +547,15 @@ Public Class atcExpertSystem
             lText.AppendLine(lStr)
         Next
 
-        'For lSiteIndex As Integer = 1 To Sites.Count
-        '    lStr = ""
-        '    For lIndex As Integer = 0 To 7
-        '        lStr &= DecimalAlign(pHSPFOutput1(lIndex + 1, lSiteIndex - 1), 8)
-        '    Next lIndex
-        '    lText.AppendLine(lStr)
-        '    lStr = ""
-        '    For lIndex As Integer = 0 To 7
-        '        lStr &= DecimalAlign(pHSPFOutput2(lIndex + 1, lSiteIndex - 1), 8)
-        '    Next lIndex
-        '    lText.AppendLine(lStr)
-        '    lStr = ""
-        '    For lIndex As Integer = 0 To 5
-        '        lStr &= DecimalAlign(pHSPFOutput3(lIndex + 1, lSiteIndex - 1), 8)
-        '    Next lIndex
-        '    lText.AppendLine(lStr)
-        'Next lSiteIndex
 
         lText.AppendLine("***If you want to specify seasons for your Expert Statistics Calculation, specify them here.")
-        lText.AppendLine("***Seasons is a keyword, that tells HSPEXP+ that user will provide it's own seasons")
+        lText.AppendLine("***Seasons Is a keyword, that tells HSPEXP+ that user will provide it's own seasons")
         lText.AppendLine("Seasons:")
         lText.AppendLine("***Months selected for Summers, comma separated")
         lText.AppendLine("6,7,8")
         lText.AppendLine("***Months selected for Winters, comma separated")
         lText.AppendLine("12,1,2,3")
-        'For lIndex As Integer = 0 To 19
-        '    lStr &= pSubjectiveData(lIndex + 1).ToString.PadLeft(4)
-        'Next lIndex
-        'lText.AppendLine(lStr)
 
-        'lStr = ""
-        'For lIndex As Integer = 20 To 22
-        '    lStr &= pSubjectiveData(lIndex + 1).ToString.PadLeft(4)
-        'Next lIndex
-        'lText.AppendLine(lStr)
         Return lText.ToString
     End Function
 
@@ -654,9 +685,11 @@ Public Class atcExpertSystem
 
         For lSiteIndex As Integer = 1 To Sites.Count
             Dim lSite As HexSite = Sites(lSiteIndex - 1)
+
             For Each lDatasetType As String In lDataSetTypes ' As Integer = 1 To pDatasetTypes.Count
                 Dim lStatGroup As Integer = pDatasetTypes.IndexFromKey(lDatasetType)
                 'set Stats to undefined for this group
+
                 ZipR(pStatistics.Count, GetNaN, pStats, lStatGroup, lSiteIndex)
 
                 Dim lDSN As Integer
@@ -688,6 +721,7 @@ Public Class atcExpertSystem
                 Dim lDailyTSer As atcTimeseries
                 If lStatGroup = 2 Then 'observed flow in cfs, want average
                     lDailyTSer = Aggregate(lNewTSer, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+
                 Else 'want total values
                     lDailyTSer = Aggregate(lNewTSer, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
                 End If
@@ -700,33 +734,78 @@ Public Class atcExpertSystem
                 If lDailyTSer.Values.Length = 0 Then
                     lDataProblem = True
                 End If
+                Dim lValueCollection As New atcCollection
+                Dim lKeyForValueCollection As Integer = 0
+                If lStatGroup = 1 Or lStatGroup = 2 Then
+                    Dim obslTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lSite.DSN(1))) 'Getting the observed data
+                    obslTSer = SubsetByDate(obslTSer, SDateJ, EDateJ, Nothing)
+                    obslTSer = Aggregate(obslTSer, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+
+                    For i As Integer = 0 To obslTSer.numValues
+
+                        If Double.IsNaN(obslTSer.Values(i)) Then
+                            If lStatGroup = 1 Then
+                                lDailyTSer.Value(i) = Double.NaN
+                            End If
+                        Else
+
+                            lValueCollection.Increment(lKeyForValueCollection, lDailyTSer.Values(i))
+
+                            lKeyForValueCollection += 1
+                        End If
+
+                    Next
+
+
+                End If
+
+                lValueCollection.SortByValue()
+                For i As Integer = 0 To lValueCollection.Count - 1
+                    lValueCollection.Increment("Sum", lValueCollection(i))
+
+                    If i < lValueCollection.Count * 0.9 Then lValueCollection.Increment("%Sum90", lValueCollection(i))
+
+                    If i < lValueCollection.Count * 0.75 Then lValueCollection.Increment("%Sum75", lValueCollection(i))
+
+                    If i < lValueCollection.Count * 0.5 Then lValueCollection.Increment("%Sum50", lValueCollection(i))
+
+                    If i < lValueCollection.Count * 0.25 Then lValueCollection.Increment("%Sum25", lValueCollection(i))
+
+                    If i < lValueCollection.Count * 0.1 Then lValueCollection.Increment("%Sum10", lValueCollection(i))
+                    
+                Next
+
 
                 If lDataProblem Then  'if we weren't able to retrieve the data set
-                    'set Stats to undefined
+                        'set Stats to undefined
 
-                    ZipR(pStatistics.Count, GetNaN, pStats, lStatGroup, lSiteIndex)
-                    Logger.Msg("Unable to retrieve DSN " & lDSN & vbCrLf & _
-                               "from the file " & aDataSource.Name, "Bad Data Set")
-                Else  'generate statistics
-                    Dim lValues() As Double = lDailyTSer.Values
+                        ZipR(pStatistics.Count, GetNaN, pStats, lStatGroup, lSiteIndex)
+                        Logger.Msg("Unable to retrieve DSN " & lDSN & vbCrLf &
+                                   "from the file " & aDataSource.Name, "Bad Data Set")
+                    Else  'generate statistics
+                        Dim lValues() As Double = lDailyTSer.Values
                     'total volume always needed 
                     'RWZSetArgs(lDailyTSer) 'Becky's addition Dec 9: this uses atcTimeseriesStatistics to calculate all the sums, bins needed below
-                    pStats(1, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("Sum").Value 'Becky commented this out and used .GetValue instead
+                    pStats(1, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("Sum") 'Becky commented this out and used .GetValue instead
                     'others?
                     If (lStatGroup = 1 Or lStatGroup = 2) Then  'full range of pStats desired
-                        pStats(2, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum50") '50% low
-                        pStats(3, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum90") '10% high
-                        pStats(11, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum10") '10% low
-                        pStats(12, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum25") '25% low
-                        pStats(13, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum75") '25% high
-                        pStats(14, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum50") '50% high
+                        pStats(2, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("%Sum50") 'lDailyTSer.Attributes.GetValue("%Sum50") '50% low
+                        pStats(3, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("Sum") - lValueCollection.ItemByKey("%Sum90") '10% high
+                        pStats(11, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("%Sum10") '10% low
+                        pStats(12, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("%Sum25") '25% low
+                        pStats(13, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("Sum") - lValueCollection.ItemByKey("%Sum75") '25% high
+                        pStats(14, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("Sum") - lValueCollection.ItemByKey("%Sum50") '50% high
 
                         Dim lTmpDate(5) As Integer
-                        J2Date(SDateJ, lTmpDate)
+                            J2Date(SDateJ, lTmpDate)
 
-                        pStats(7, lStatGroup, lSiteIndex) = 0.0# 'summer volume
-                        pStats(8, lStatGroup, lSiteIndex) = 0.0# 'winter volume
+                            pStats(7, lStatGroup, lSiteIndex) = 0.0# 'summer volume
+                            pStats(8, lStatGroup, lSiteIndex) = 0.0# 'winter volume
                         For i As Integer = 1 To lDailyTSer.numValues
+                            If Double.IsNaN(lValues(i)) Then
+                                TIMADD(lTmpDate, lTimeUnit, lTimeStep, lTimeStep, lTmpDate)
+                                Continue For
+                            End If
                             If pSummerMonths.Length > 0 Then
                                 For Each SeasonMonth As Integer In pSummerMonths
                                     If lTmpDate(1) = SeasonMonth Then
@@ -735,6 +814,7 @@ Public Class atcExpertSystem
                                 Next
                                 For Each SeasonMonth As Integer In pWinterMonths
                                     If lTmpDate(1) = SeasonMonth Then
+
                                         pStats(8, lStatGroup, lSiteIndex) += lValues(i)
                                     End If
                                 Next
@@ -754,27 +834,38 @@ Public Class atcExpertSystem
 
 
                     If (lStatGroup >= 1 And lStatGroup <= 4) Then  'calc storm info
-                        pStats(4, lStatGroup, lSiteIndex) = 0.0# 'initialize storm volume
-                        pStats(5, lStatGroup, lSiteIndex) = 0.0# 'storm peaks
-                        pStats(9, lStatGroup, lSiteIndex) = 0.0# 'summer storms
-                        pStats(10, lStatGroup, lSiteIndex) = 0.0# 'winter storms
+                            pStats(4, lStatGroup, lSiteIndex) = 0.0# 'initialize storm volume
+                            pStats(5, lStatGroup, lSiteIndex) = 0.0# 'storm peaks
+                            pStats(9, lStatGroup, lSiteIndex) = 0.0# 'summer storms
+                            pStats(10, lStatGroup, lSiteIndex) = 0.0# 'winter storms
                         For Each lStorm As HexStorm In Storms
-                            If lStorm.SDateJ >= SDateJ And _
+
+                            If lStorm.SDateJ >= SDateJ And
                                lStorm.EDateJ <= EDateJ Then 'storm within run span
                                 'TODO: this matches VB6Script results, needs to have indexes checked!
                                 Dim lN1 As Integer, lN2 As Integer
                                 lN1 = timdifJ(SDateJ, lStorm.SDateJ, lTimeUnit, lTimeStep) + 1
                                 lN2 = timdifJ(SDateJ, lStorm.EDateJ, lTimeUnit, lTimeStep)
+                                Dim SkipStorm As Boolean = False
+                                For i As Integer = lN1 To lN2
+                                    If Double.IsNaN(lValues(i)) Then 'Skip the storm calculation if any of the value in the storm period i Nan
+                                        SkipStorm = True
+                                    End If
+                                Next
+                                If SkipStorm Then Continue For
                                 Dim lNLimit As Integer = lDailyTSer.Values.GetUpperBound(0)
                                 If lN2 <= lNLimit Then
                                     Dim lTmpDate(5) As Integer
                                     J2Date(lStorm.SDateJ - 1, lTmpDate)
                                     Dim lRtmp As Double = lDailyTSer.Values(lN1)
                                     For i As Integer = lN1 To lN2
+
                                         pStats(4, lStatGroup, lSiteIndex) += lValues(i)
+
                                         If (lDailyTSer.Values(i) > lRtmp) Then 'a new peak
                                             lRtmp = lDailyTSer.Values(i)
                                         End If
+
                                         If pSummerMonths.Length > 0 Then
                                             For Each SeasonMonth As Integer In pSummerMonths
                                                 If lTmpDate(1) = SeasonMonth Then
@@ -797,61 +888,74 @@ Public Class atcExpertSystem
                                         End If
                                     Next i
                                     pStats(5, lStatGroup, lSiteIndex) += lRtmp
+                                    J2Date(lStorm.SDateJ, lTmpDate)
+                                    Dim StormStartDate As String = lTmpDate(0) & "," & lTmpDate(1) & "," & lTmpDate(2)
+                                    If lStatGroup = 1 Then
+                                        SimulatedStorms.Increment("Vol_" & StormStartDate, pStats(4, lStatGroup, lSiteIndex))
+
+
+                                        SimulatedStorms.Increment("Peak_" & StormStartDate, pStats(5, lStatGroup, lSiteIndex) * lSite.Area * 43560.0# / (12.0# * 24.0# * 3600.0#))
+                                    ElseIf lStatGroup = 2 Then
+                                        ObservedStorms.Increment("Vol_" & StormStartDate, pStats(4, lStatGroup, lSiteIndex))
+                                        ObservedStorms.Increment("Peak_" & StormStartDate, pStats(5, lStatGroup, lSiteIndex))
+                                    End If
+
+
                                 End If
                             End If
                         Next
                     End If
 
-                    If (lStatGroup = 1 Or lStatGroup = 2) Then 'Change flows to recessions
-                        Dim lRecessionTimser As atcTimeseries = lDailyTSer.Clone
-                        'save first data value
-                        Dim lSavDat As Double = lRecessionTimser.Values(1)
-                        For lIndex As Integer = 2 To lRecessionTimser.Values.GetUpperBound(0)
-                            Dim lRecession As Double
-                            If (lSavDat > 0.0000000001) Then 'have some flow
-                                lRecession = lRecessionTimser.Values(lIndex) / lSavDat
-                            Else 'no flow
-                                lRecession = GetNaN()
+                        If (lStatGroup = 1 Or lStatGroup = 2) Then 'Change flows to recessions
+                            Dim lRecessionTimser As atcTimeseries = lDailyTSer.Clone
+                            'save first data value
+                            Dim lSavDat As Double = lRecessionTimser.Values(1)
+                            For lIndex As Integer = 2 To lRecessionTimser.Values.GetUpperBound(0)
+                                Dim lRecession As Double
+                                If (lSavDat > 0.0000000001) Then 'have some flow
+                                    lRecession = lRecessionTimser.Values(lIndex) / lSavDat
+                                Else 'no flow
+                                    lRecession = GetNaN()
+                                End If
+                                lSavDat = lRecessionTimser.Values(lIndex)
+                                lRecessionTimser.Values(lIndex - 1) = lRecession
+                            Next lIndex
+                            lRecessionTimser.Attributes.DiscardCalculated() 'Becky commented this out, concerned 'calculated' isnt stored properly
+                            'lRecessionTimser.Attributes.CalculateAll()
+
+                            'new percent of time in base flow term
+                            'RWZRecessionPrep(lRecessionTimser) 'added by Becky to clear out attributes since DiscardCalculated doesn't work
+                            'from lDailyTSer and replace with values appropriate to the new recession timeseries
+                            Dim lStr As String = lRecessionTimser.Attributes.GetFormattedValue("%50")
+                            If IsNumeric(lStr) Then
+                                pStats(6, lStatGroup, lSiteIndex) = lStr
+                            Else
+                                pStats(6, lStatGroup, lSiteIndex) = GetNaN()
                             End If
-                            lSavDat = lRecessionTimser.Values(lIndex)
-                            lRecessionTimser.Values(lIndex - 1) = lRecession
-                        Next lIndex
-                        lRecessionTimser.Attributes.DiscardCalculated() 'Becky commented this out, concerned 'calculated' isnt stored properly
-                        'lRecessionTimser.Attributes.CalculateAll()
-
-                        'new percent of time in base flow term
-                        'RWZRecessionPrep(lRecessionTimser) 'added by Becky to clear out attributes since DiscardCalculated doesn't work
-                        'from lDailyTSer and replace with values appropriate to the new recession timeseries
-                        Dim lStr As String = lRecessionTimser.Attributes.GetFormattedValue("%50")
-                        If IsNumeric(lStr) Then
-                            pStats(6, lStatGroup, lSiteIndex) = lStr
-                        Else
-                            pStats(6, lStatGroup, lSiteIndex) = GetNaN()
+                            lRecessionTimser.Clear()
+                            lRecessionTimser.Dates.Clear()
+                            lRecessionTimser = Nothing
                         End If
-                        lRecessionTimser.Clear()
-                        lRecessionTimser.Dates.Clear()
-                        lRecessionTimser = Nothing
                     End If
-                End If
 
-                If lStatGroup = 1 Or lStatGroup = 3 Or lStatGroup = 4 Then 'take average over NStorms
-                    If Storms.Count > 0 Then pStats(5, lStatGroup, lSiteIndex) /= Storms.Count
-                    'convert storm peak stat from acre-inch/day to cfs
-                    pStats(5, lStatGroup, lSiteIndex) *= lSite.Area * 43560.0# / (12.0# * 24.0# * 3600.0#)
-                ElseIf lStatGroup = 2 Then
-                    For i As Integer = 1 To pStatistics.Count
-                        If i < 5 Or i > 6 Then 'convert observed runoff values
-                            pStats(i, lStatGroup, lSiteIndex) *= pConvert / lSite.Area
-                        ElseIf i = 5 AndAlso Storms.Count > 0 Then 'take average over NStorms
-                            pStats(i, lStatGroup, lSiteIndex) /= Storms.Count
-                        End If
-                    Next i
-                End If
-                lDailyTSer.Clear()
-                lDailyTSer.Dates.Clear()
-                lDailyTSer = Nothing
-            Next lDatasetType
-        Next lSiteIndex
+                    If lStatGroup = 1 Or lStatGroup = 3 Or lStatGroup = 4 Then 'take average over NStorms
+                        If Storms.Count > 0 Then pStats(5, lStatGroup, lSiteIndex) /= Storms.Count
+                        'convert storm peak stat from acre-inch/day to cfs
+                        pStats(5, lStatGroup, lSiteIndex) *= lSite.Area * 43560.0# / (12.0# * 24.0# * 3600.0#)
+                    ElseIf lStatGroup = 2 Then
+                        For i As Integer = 1 To pStatistics.Count
+                            If i < 5 Or i > 6 Then 'convert observed runoff values
+                                pStats(i, lStatGroup, lSiteIndex) *= pConvert / lSite.Area
+                            ElseIf i = 5 AndAlso Storms.Count > 0 Then 'take average over NStorms
+                                pStats(i, lStatGroup, lSiteIndex) /= Storms.Count
+                            End If
+                        Next i
+                    End If
+                    lDailyTSer.Clear()
+                    lDailyTSer.Dates.Clear()
+                    lDailyTSer = Nothing
+                Next lDatasetType
+            Next lSiteIndex
     End Sub
 
     Private Function CalcErrorTerms(ByVal aUci As atcUCI.HspfUci) As String

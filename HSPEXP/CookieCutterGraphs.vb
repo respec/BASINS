@@ -11,7 +11,7 @@ Public Module CookieCutterGraphs
     Sub ReganGraphs(ByVal aHSPFUCI As HspfUci, ByVal aSDateJ As Double, ByVal aEDateJ As Double, ByVal lOutputFolder As String)
         Dim lConstituentsToGraph As New atcCollection
         lOutputFolder &= "ReganPlots\"
-        Dim WQCriteriaInmgperliter As Double = 0.5 'Need to be able to provide it dynamically
+        Dim WQCriteriaInmgperliter As Double = 0.05 'Need to be able to provide it dynamically
         Dim acftToCubicft As Double = 43560 'Should be called from modUnits
         Dim CubicftToLiters As Double = 28.317
         Dim PoundsToMilligrams As Double = 453592.0
@@ -207,7 +207,7 @@ All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan pl
                             lCurve.Symbol.Type = SymbolType.None
                             lCurve.Line.Color = Drawing.Color.FromName("orange")
                             lCurve.Line.Width = 2
-                            lCurve.Label.Text = "RES Standard (0.5 mg/l)"
+                            lCurve.Label.Text = "RES Standard (0.05 mg/l)"
                             lCurve = lMainPane.CurveList.Item(1)
                             lCurve.Line.IsVisible = True
                             lCurve.Symbol.Type = SymbolType.None

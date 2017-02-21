@@ -16,7 +16,7 @@ Public Class clsUSGSDF2PAnalysis
 
     Public Overrides ReadOnly Property Icon() As System.Drawing.Icon
         Get
-            Dim lResources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmUSGSRecessOriginal))
+            Dim lResources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDF2P))
             Return CType(lResources.GetObject("$this.Icon"), System.Drawing.Icon)
         End Get
     End Property
@@ -66,7 +66,7 @@ Public Class clsUSGSDF2PAnalysis
 
         If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
             LoadPlugin(pRequiredHelperPlugin)
-            Dim lForm As New frmUSGSRecessOriginal
+            Dim lForm As New frmDF2P()
 
             lForm.Initialize(aTimeseriesGroup)
             atcUtility.SaveFileString(aFileName, lForm.ToString)

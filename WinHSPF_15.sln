@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUCI15", "atcUCI\atcUCI15.vbproj", "{2FC4314B-792B-40A3-B540-ACA05B9EA86B}"
 EndProject
@@ -49,6 +49,8 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUSGSUtility15", "atcUSGSUtility\atcUSGSUtility15.vbproj", "{4DBC8159-1072-41FA-9242-933E12A88EE6}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "GWToolbox15", "BASINS\GWToolbox15.vbproj", "{37D44868-95CE-4A21-A43A-13E7E7F2AD09}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcList15", "atcList\atcList15.vbproj", "{A1A87CB8-8B9E-4C90-9549-C065357E499F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -243,6 +245,14 @@ Global
 		{37D44868-95CE-4A21-A43A-13E7E7F2AD09}.Release|Any CPU.Build.0 = Release|Any CPU
 		{37D44868-95CE-4A21-A43A-13E7E7F2AD09}.Release|x86.ActiveCfg = Release|x86
 		{37D44868-95CE-4A21-A43A-13E7E7F2AD09}.Release|x86.Build.0 = Release|x86
+		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Debug|x86.ActiveCfg = Debug|x86
+		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Debug|x86.Build.0 = Debug|x86
+		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Release|x86.ActiveCfg = Release|x86
+		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
