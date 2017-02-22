@@ -141,15 +141,46 @@ Public Class clsGraphBoxWhisker
             Return MyBase.Datasets
         End Get
         Set(ByVal newValue As atcTimeseriesGroup)
-            If newValue.Count > 1 Then
+            If newValue IsNot Nothing AndAlso newValue.Count > 1 Then
                 MyBase.Datasets = newValue
             End If
         End Set
     End Property
 
+    Private pDatasetsCalc As atcTimeseriesGroup = Nothing
+    ''' <summary>
+    ''' for taking in atcCollection of data 
+    ''' "Key"-->(val0, val1, val2, ...)  
+    ''' </summary>
+    Private pDatasetsCollection As atcCollection = Nothing
+    Public Property DatasetsCollection() As atcCollection
+        Get
+            Return pDatasetsCollection
+        End Get
+        Set(value As atcCollection)
+            pDatasetsCollection = value
+            If value IsNot Nothing Then
+                pDatasetsCalc = New atcTimeseriesGroup()
+                Dim lDates(5) As Integer
+                Dim lStartDate As Double = Date2J(1900, 1, 1, 0, 0, 0)
+                Dim lEndDate As Double = 0
+                For I As Integer = 0 To pDatasetsCollection.Count - 1
+                    lEndDate = lStartDate + JulianHour * 24.0 * pDatasetsCollection.ItemByIndex(I).Length
+                    Dim lNewTS As New atcTimeseries(Nothing)
+                    lNewTS.Values = pDatasetsCollection.ItemByIndex(I)
+                    lNewTS.Dates = NewTimeseries(lStartDate, lEndDate, atcTimeUnit.TUDay, 1, Nothing)
+                    pDatasetsCalc.Add(lNewTS)
+                Next
+            End If
+        End Set
+    End Property
+
+
     Public Overridable Sub SetUpGraph(Optional OutputToFile As Boolean = False)
-        If Datasets.Count = 0 Then
-            Exit Sub
+        If Datasets Is Nothing OrElse Datasets.Count = 0 Then
+            If pDatasetsCollection Is Nothing OrElse pDatasetsCollection.Count = 0 Then
+                Exit Sub
+            End If
         End If
         'Dim lTimeseriesX As atcTimeseries = newValue.ItemByIndex(0)
         'Dim lTimeseriesY As atcTimeseries = newValue.ItemByIndex(1)
@@ -170,34 +201,67 @@ Public Class clsGraphBoxWhisker
             pZgc.GraphPane.Title.Text = Title()
         End If
         Dim listDataArrays As New Generic.List(Of Double())
-        For I As Integer = 0 To Datasets.Count - 1
-            listDataArrays.Add(Datasets(I).Values)
-        Next
-        If pXLabels Is Nothing OrElse pXLabels.Count <> Datasets.Count Then
-            pXLabels = New Generic.List(Of String)
-            Dim lbl As String = ""
+        If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
             For I As Integer = 0 To Datasets.Count - 1
-                lbl = Datasets(I).Attributes.GetValue("Location", "QTY" & I.ToString())
-                If Not String.IsNullOrEmpty(lbl) AndAlso lbl.Length > 8 Then
-                    lbl = lbl.Substring(0, 8)
-                End If
-                pXLabels.Add(lbl)
+                listDataArrays.Add(Datasets(I).Values)
             Next
+        Else
+            If pDatasetsCollection IsNot Nothing AndAlso pDatasetsCollection.Count > 0 Then
+                For I As Integer = 0 To pDatasetsCollection.Count - 1
+                    listDataArrays.Add(pDatasetsCollection.ItemByIndex(I))
+                Next
+            Else
+                pZgc.Refresh()
+                Exit Sub
+            End If
         End If
+        If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
+            If pXLabels Is Nothing OrElse pXLabels.Count <> Datasets.Count Then
+                pXLabels = New Generic.List(Of String)
+                Dim lbl As String = ""
+                For I As Integer = 0 To Datasets.Count - 1
+                    lbl = Datasets(I).Attributes.GetValue("Location", "QTY" & I.ToString())
+                    If Not String.IsNullOrEmpty(lbl) AndAlso lbl.Length > 8 Then
+                        lbl = lbl.Substring(0, 8)
+                    End If
+                    pXLabels.Add(lbl)
+                Next
+            End If
+        Else
+            If pDatasetsCollection IsNot Nothing AndAlso pDatasetsCollection.Count > 0 Then
+                If pXLabels Is Nothing OrElse pXLabels.Count <> pDatasetsCollection.Count Then
+                    pXLabels = New Generic.List(Of String)
+                    Dim lbl As String = ""
+                    For I As Integer = 0 To pDatasetsCollection.Keys.Count - 1
+                        lbl = pDatasetsCollection.Keys(I)
+                        If Not String.IsNullOrEmpty(lbl) AndAlso lbl.Length > 8 Then
+                            lbl = lbl.Substring(0, 8)
+                        End If
+                        pXLabels.Add(lbl)
+                    Next
+                End If
+            Else
+                pZgc.Refresh()
+                Exit Sub
+            End If
+        End If
+
         'Dim lPane As GraphPane = MyBase.pZgc.MasterPane.PaneList(0)
         'lPane.Legend.IsVisible = False
         With pZgc.GraphPane.XAxis
             '.Scale.MaxAuto = False
             If String.IsNullOrEmpty(XTitle()) Then
-                With Datasets(0).Attributes
-                    Dim lScen As String = .GetValue("scenario")
-                    Dim lLoc As String = .GetValue("location")
-                    Dim lCons As String = .GetValue("constituent")
-                    Dim lUnit As String = .GetValue("Units")
-                    Dim lTimeUnit As String = TimeUnitText(Datasets(0))
-                    'Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
-                    pXTitle = lTimeUnit & " " & lCons & " at " & lLoc
-                End With
+                If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
+                    With Datasets(0).Attributes
+                        Dim lScen As String = .GetValue("scenario")
+                        Dim lLoc As String = .GetValue("location")
+                        Dim lCons As String = .GetValue("constituent")
+                        Dim lUnit As String = .GetValue("Units")
+                        Dim lTimeUnit As String = TimeUnitText(Datasets(0))
+                        'Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+                        pXTitle = lTimeUnit & " " & lCons & " at " & lLoc
+                    End With
+                End If
             End If
             .Title.Text = XTitle()
         End With
@@ -212,12 +276,14 @@ Public Class clsGraphBoxWhisker
             '.Scale.MinAuto = False
             '.MinSpace = 80
             If String.IsNullOrEmpty(YTitle()) Then
-                With Datasets(0).Attributes
-                    Dim lCons As String = .GetValue("constituent")
-                    Dim lUnit As String = .GetValue("Units")
-                    Dim lTimeUnit As String = TimeUnitText(Datasets(0))
-                    pYTitle = lCons & " " & lUnit
-                End With
+                If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
+                    With Datasets(0).Attributes
+                        Dim lCons As String = .GetValue("constituent")
+                        Dim lUnit As String = .GetValue("Units")
+                        Dim lTimeUnit As String = TimeUnitText(Datasets(0))
+                        pYTitle = lCons & " " & lUnit
+                    End With
+                End If
             End If
             .Title.Text = YTitle() 'lTimeseriesY.ToString
         End With
@@ -255,13 +321,19 @@ Public Class clsGraphBoxWhisker
             If Not Single.IsNaN(pXLabelAngle) AndAlso pXLabelAngle <= 90 AndAlso pXLabelAngle >= -90 Then
                 lAngle = pXLabelAngle
             End If
-            For I As Integer = 0 To Datasets.Count - 1
+            Dim lDatasetsCount As Integer = 0
+            If Datasets IsNot Nothing Then
+                lDatasetsCount = Datasets.Count
+            ElseIf pDatasetsCalc IsNot Nothing Then
+                lDatasetsCount = pDatasetsCalc.Count
+            End If
+            For I As Integer = 0 To lDatasetsCount - 1
                 'Dim label As TextObj = New TextObj(XLabels(I), I, XLabelBaseline, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
                 Dim label As TextObj = New TextObj(XLabels(I), I, 1.1, CoordType.XScaleYChartFraction, AlignH.Center, AlignV.Center)
                 label.ZOrder = ZOrder.A_InFront
                 label.FontSpec.Border.IsVisible = False
                 label.FontSpec.Angle = pXLabelAngle
-                If pDataColors IsNot Nothing AndAlso pDataColors.Count = Datasets.Count Then
+                If pDataColors IsNot Nothing AndAlso pDataColors.Count = lDatasetsCount Then
                     label.FontSpec.FontColor = pDataColors(I)
                 Else
                     'label.FontSpec.FontColor = Color.Black
@@ -385,8 +457,15 @@ Public Class clsGraphBoxWhisker
     End Function
 
     Private Function GetStatistic(ByVal aDSIndex As Integer, ByVal aStatName As String) As Double
-        Dim lTs As atcTimeseries = Datasets(aDSIndex)
-        Return lTs.Attributes.GetValue(aStatName, Double.NaN)
+        Dim lStat As Double = Double.NaN
+        If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
+            Dim lTs As atcTimeseries = Datasets(aDSIndex)
+            lStat = lTs.Attributes.GetValue(aStatName, Double.NaN)
+        ElseIf pDatasetsCalc IsNot Nothing AndAlso pDatasetsCalc.Count > 0 Then
+            Dim lTs As atcTimeseries = pDatasetsCalc(aDSIndex)
+            lStat = lTs.Attributes.GetValue(aStatName, Double.NaN)
+        End If
+        Return lStat
     End Function
 
     Friend Function TimeUnitText(ByVal aTser As atcTimeseries) As String
