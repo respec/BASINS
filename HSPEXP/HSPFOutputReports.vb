@@ -314,7 +314,7 @@ Module HSPFOutputReports
 
                                 Logger.Dbg(Now & " Calculating monthly summary for " & lSiteName)
                                 'pProgressBar.pbProgress.Increment(5)
-                                Dim lTSerBroken As atcTimeseries = lSimTSer
+                                Dim lTSerBroken As atcTimeseries = lSimTSer.Clone
                                 Dim MissingObservedData As Boolean = False
 
                                 If lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value > 0 Then

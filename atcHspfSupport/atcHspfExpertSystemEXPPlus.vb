@@ -467,7 +467,7 @@ Public Class atcExpertSystem
                 lDataSetTypes(4) = "ObsPotentialET"
                 lDataSetTypes(5) = "SimActualET"
             End If
-
+            ReDim pStats(pStatistics.Count, lDataSetTypes.GetUpperBound(0) + 1, Sites.Count)
             For Each lDatasetType As String In lDataSetTypes
                 Dim lStatGroup As Integer = pDatasetTypes.IndexFromKey(lDatasetType)
                 'set Stats to undefined for this group
