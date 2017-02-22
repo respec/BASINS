@@ -4,16 +4,17 @@ Imports atcTimeseriesMath
 Imports atcDurationCompare
 
 Public Module AnnualCompareStats
-    Public Function Report(ByVal aUci As atcUCI.HspfUci, _
-                           ByVal aCons As String, _
-                           ByVal aSite As String, _
-                           ByVal aUnits As String, _
-                           ByVal aPrecTSer As atcTimeseries, _
-                           ByVal aSimTSer As atcTimeseries, _
-                           ByVal aObsTSer As atcTimeseries, _
-                           ByVal aRunMade As String, _
-                           Optional ByVal aSDateJ As Double = 0, _
-                           Optional ByVal aEDateJ As Double = 0) As String
+    Public Function Report(ByVal aUci As atcUCI.HspfUci,
+                           ByVal aCons As String,
+                           ByVal aSite As String,
+                           ByVal aUnits As String,
+                           ByVal aPrecTSer As atcTimeseries,
+                           ByVal aSimTSer As atcTimeseries,
+                           ByVal aObsTSer As atcTimeseries,
+                           ByVal aRunMade As String,
+                           Optional ByVal aSDateJ As Double = 0,
+                           Optional ByVal aEDateJ As Double = 0,
+                           Optional ByVal MissingData As Boolean = False) As String
 
         Dim lStr As String
         lStr = "Annual Simulated and Observed " & aCons & " Statistics for '" & IO.Path.GetFileNameWithoutExtension(aUci.Name) & "' scenario." & vbCrLf
@@ -28,6 +29,9 @@ Public Module AnnualCompareStats
         lStr &= "   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
         lStr &= "   (Units:" & aUnits & ")" & vbCrLf & vbCrLf
 
+        If MissingData Then
+            lStr &= "The observed data is not continuous, use the statistics with caution" & vbCrLf & vbCrLf
+        End If
         CheckDateJ(aObsTSer, "Observed", lSDateJ, lEDateJ, lStr)
         CheckDateJ(aSimTSer, "Simulated", lSDateJ, lEDateJ, lStr)
 

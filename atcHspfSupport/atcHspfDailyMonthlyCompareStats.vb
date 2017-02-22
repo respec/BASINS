@@ -4,14 +4,15 @@ Imports atcTimeseriesMath
 Imports atcDurationCompare
 
 Public Module DailyMonthlyCompareStats
-    Public Function Report(ByVal aUci As atcUCI.HspfUci, _
-                           ByVal aCons As String, _
-                           ByVal aSite As String, _
-                           ByVal aSimTSer As atcTimeseries, _
-                           ByVal aObsTSer As atcTimeseries, _
-                           ByVal aRunMade As String, _
-                  Optional ByVal aSDateJ As Double = 0, _
-                  Optional ByVal aEDateJ As Double = 0) As String
+    Public Function Report(ByVal aUci As atcUCI.HspfUci,
+                           ByVal aCons As String,
+                           ByVal aSite As String,
+                           ByVal aSimTSer As atcTimeseries,
+                           ByVal aObsTSer As atcTimeseries,
+                           ByVal aRunMade As String,
+                  Optional ByVal aSDateJ As Double = 0,
+                  Optional ByVal aEDateJ As Double = 0,
+                           Optional ByVal MissingData As Boolean = False) As String
 
         Dim lSDateJ As Double = aSDateJ
         If Math.Abs(lSDateJ) < 0.00001 Then lSDateJ = aUci.GlobalBlock.SDateJ
@@ -28,6 +29,9 @@ Public Module DailyMonthlyCompareStats
         CheckDateJ(aObsTSer, "Observed", lSDateJ, lEDateJ, lStr)
         CheckDateJ(aSimTSer, "Simulated", lSDateJ, lEDateJ, lStr)
 
+        If MissingData Then
+            lStr &= "The observed data is not continuous, use the statistics with caution" & vbCrLf & vbCrLf
+        End If
         Dim lNewSimTSer As atcTimeseries = SubsetByDate(aSimTSer, lSDateJ, lEDateJ, Nothing)
         Dim lNewObsTSer As atcTimeseries = SubsetByDate(aObsTSer, lSDateJ, lEDateJ, Nothing)
 

@@ -6,31 +6,44 @@ Imports atcGraph
 Imports ZedGraph
 
 Public Module Graph
-    ' aTimeSeries keys: "Observed", "Simulated", "Precipitation",
+    ' aTimeSeries keys: "Observed", "Simulated", "SimulatedBroken", "Precipitation",
     '                   "LZS", "UZS", "PotET", "ActET", 
     '                   "Baseflow", "Interflow", "Surface"
-    Public Sub GraphAll(ByVal aSDateJ As Double, ByVal aEDateJ As Double, _
-                        ByVal aCons As String, ByVal aSite As String, _
-                        ByVal aTimeSeries As atcTimeseriesGroup, _
-                        ByVal aGraphSaveFormat As String, _
-                        ByVal aGraphSaveWidth As Integer, _
-                        ByVal aGraphSaveHeight As Integer, _
-                        ByVal aGraphAnnual As Boolean, _
-                        ByVal aOutFolderName As String, _
-                        Optional ByVal aMakeStd As Boolean = True, _
-                        Optional ByVal aMakeLog As Boolean = True, _
-                        Optional ByVal aMakeSup As Boolean = True) 'Becky added the last two booleans to indicate which
+    Public Sub GraphAll(ByVal aSDateJ As Double, ByVal aEDateJ As Double,
+                        ByVal aCons As String, ByVal aSite As String,
+                        ByVal aTimeSeries As atcTimeseriesGroup,
+                        ByVal aGraphSaveFormat As String,
+                        ByVal aGraphSaveWidth As Integer,
+                        ByVal aGraphSaveHeight As Integer,
+                        ByVal aGraphAnnual As Boolean,
+                        ByVal aOutFolderName As String,
+                        Optional ByVal aMakeStd As Boolean = True,
+                        Optional ByVal aMakeLog As Boolean = True,
+                        Optional ByVal aMakeSup As Boolean = True,
+                        Optional ByVal aMissingObservedData As Boolean = False)
+        'Becky added the last two booleans to indicate which
         'graphs to print, default them to true so if by some chance this is called from somewhere else the code will
         'still work
         Dim lDataGroup As New atcTimeseriesGroup
-        lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Observed"), _
-                                              aSDateJ, _
-                                              aEDateJ, Nothing), _
+        lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Observed"),
+                                              aSDateJ,
+                                              aEDateJ, Nothing),
                                  atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
-        lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Simulated"), _
-                                              aSDateJ, _
-                                              aEDateJ, Nothing), _
+        If Not aMissingObservedData Then
+            lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Simulated"),
+                                              aSDateJ,
+                                              aEDateJ, Nothing),
                                  atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
+
+
+        Else
+            lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("SimulatedBroken"),
+                                              aSDateJ,
+                                              aEDateJ, Nothing),
+                                 atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
+
+
+        End If
 
         Dim lOutFileBase As String = aOutFolderName & aCons & "_" & aSite
         Dim lZgc As ZedGraphControl
@@ -105,6 +118,17 @@ Public Module Graph
             lGraphDur.Dispose()
             lZgc.Dispose()
         End If
+        lDataGroup.Clear()
+        lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Observed"),
+                                              aSDateJ,
+                                              aEDateJ, Nothing),
+                                 atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
+
+        lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Simulated"),
+                                              aSDateJ,
+                                              aEDateJ, Nothing),
+                                 atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
+
 
         If aMakeSup Then 'Becky added - only do the next graphs if user wants supplemental graphs
             'cummulative difference
@@ -172,9 +196,9 @@ Public Module Graph
         If aTimeSeries.Keys.Contains("Precipitation") Then
             lPrecTser = aTimeSeries.ItemByKey("Precipitation")
             lPrecTser.Attributes.SetValue("YAxis", "Aux")
-            lDataGroup.Add(Aggregate(SubsetByDate(lPrecTser, _
-                                                  aSDateJ, _
-                                                  aEDateJ, Nothing), _
+            lDataGroup.Add(Aggregate(SubsetByDate(lPrecTser,
+                                                  aSDateJ,
+                                                  aEDateJ, Nothing),
                                      atcTimeUnit.TUDay, 1, atcTran.TranSumDiv, Nothing))
             lPaneCount = 2
         End If
@@ -231,7 +255,7 @@ Public Module Graph
         If aMakeSup Then 'Becky added if-then, only do ET and component graphs if user specified supplemental graphs are desired
 
             Dim lKeys As New Collection
-            If aTimeSeries.Keys.Contains("PotET") AndAlso _
+            If aTimeSeries.Keys.Contains("PotET") AndAlso
                aTimeSeries.Keys.Contains("ActET") Then
                 'weekly ET - pet vs act
                 lDataGroup.Clear()
@@ -244,8 +268,8 @@ Public Module Graph
                     If lKey = "PotET" Then ' force pet to be observed
                         lTser.Attributes.SetValue("Scenario", "Observed")
                     End If
-                    lDataGroup.Add(SubsetByDate(Aggregate(lTser, atcTimeUnit.TUDay, 7, atcTran.TranSumDiv), _
-                                                aSDateJ, _
+                    lDataGroup.Add(SubsetByDate(Aggregate(lTser, atcTimeUnit.TUDay, 7, atcTran.TranSumDiv),
+                                                aSDateJ,
                                                 aEDateJ, Nothing))
                 Next
                 lZgc = CreateZgc()
@@ -260,8 +284,8 @@ Public Module Graph
                 lKeys.Clear()
             End If
 
-            If aTimeSeries.Keys.Contains("Baseflow") AndAlso _
-               aTimeSeries.Keys.Contains("Interflow") AndAlso _
+            If aTimeSeries.Keys.Contains("Baseflow") AndAlso
+               aTimeSeries.Keys.Contains("Interflow") AndAlso
                aTimeSeries.Keys.Contains("Surface") Then
                 'flow components
                 lDataGroup.Clear()
@@ -272,21 +296,21 @@ Public Module Graph
                     Dim lTser As atcTimeseries = aTimeSeries.ItemByKey(lKey)
                     lTser.Attributes.SetValue("Units", "Flow (in)")
                     lTser.Attributes.SetValue("YAxis", "Left")
-                    lDataGroup.Add(SubsetByDate(lTser, _
-                                                aSDateJ, _
+                    lDataGroup.Add(SubsetByDate(lTser,
+                                                aSDateJ,
                                                 aEDateJ, Nothing))
                 Next
                 'precip
                 lPrecTser = aTimeSeries.ItemByKey("Precipitation")
                 lPrecTser.Attributes.SetValue("YAxis", "Aux")
-                lDataGroup.Add(SubsetByDate(lPrecTser, _
-                                            aSDateJ, _
+                lDataGroup.Add(SubsetByDate(lPrecTser,
+                                            aSDateJ,
                                             aEDateJ, Nothing))
                 'actual et
                 Dim lETTSer As atcTimeseries = aTimeSeries.ItemByKey("ActET")
                 lETTSer.Attributes.SetValue("YAxis", "Left")
-                lDataGroup.Add(SubsetByDate(lETTSer, _
-                                            aSDateJ, _
+                lDataGroup.Add(SubsetByDate(lETTSer,
+                                            aSDateJ,
                                             aEDateJ, Nothing))
                 'do the graphs
                 GraphFlowComponents(lDataGroup, lOutFileBase, aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, aMakeLog)
