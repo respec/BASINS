@@ -272,7 +272,7 @@ Public Module modBaseflowUtil
     '{
     Public Sub ComputeBaseflowIntermittent(ByVal aArgs As atcDataAttributes, Optional ByVal aMakeAvailable As Boolean = False)
         'get the streamflow records
-        Dim lTsFlow As atcTimeseries = aArgs.GetValue(BFInputNames.Streamflow)(0) 'original timeseries group that contains the original flow record
+        Dim lTsFlowOri As atcTimeseries = aArgs.GetValue(BFInputNames.Streamflow)(0) 'original timeseries group that contains the original flow record
         'Me.Specification = "Base-Flow-" & lTsStreamflow.Attributes.GetValue("Location")
         'lEnglishFlg = aArgs.GetValue(BFInputNames.EnglishUnit, lEnglishFlg)
         'lStartDate = aArgs.GetValue(BFInputNames.StartDate)
@@ -282,7 +282,12 @@ Public Module modBaseflowUtil
         'lMethod = aArgs.GetValue("Method")
         Dim lMethods As ArrayList = aArgs.GetValue(BFInputNames.BFMethods)
         Dim lDrainageArea As Double = aArgs.GetValue(BFInputNames.DrainageArea)
-
+        Dim lTsFlow As atcTimeseries = lTsFlowOri
+        If Not Double.IsNaN(lAnalysis_Start) AndAlso
+            Not Double.IsNaN(lAnalysis_End) AndAlso
+            lAnalysis_End > lAnalysis_Start Then
+            lTsFlow = SubsetByDate(lTsFlow, lAnalysis_Start, lAnalysis_End, Nothing)
+        End If
         Dim lMsgTitle As String = "Interactive Base-flow Analysis"
         'break up into continuous periods
         Dim lTserFullDateRange As New atcTimeseries(Nothing)
@@ -394,6 +399,12 @@ Public Module modBaseflowUtil
                     OutputFilenameRoot &= "_period_" & lCtr.ToString()
                 End If
                 MethodsLastDone = lMethods
+                For Each lAttr As atcDefinedValue In lTsFlowGroup(0).Attributes
+                    If lTsFlowOri.Attributes.ContainsAttribute(lAttr.Definition.Name) Then
+                        lTsFlowOri.Attributes.RemoveByKey(lAttr.Definition.Name)
+                    End If
+                    lTsFlowOri.Attributes.Add(lAttr.Clone())
+                Next
                 If IO.Directory.Exists(OutputDir) Then
                     For Each lMethod As BFMethods In lMethods
                         Logger.Status("writing legacy format text output files for stream record " & lGroupCtr & " for method: " & lMethod.ToString())
