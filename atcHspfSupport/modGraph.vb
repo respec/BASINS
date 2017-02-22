@@ -118,21 +118,8 @@ Public Module Graph
             lGraphDur.Dispose()
             lZgc.Dispose()
         End If
-        lDataGroup.Clear()
-        lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Observed"),
-                                              aSDateJ,
-                                              aEDateJ, Nothing),
-                                 atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
 
-        lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Simulated"),
-                                              aSDateJ,
-                                              aEDateJ, Nothing),
-                                 atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
-
-
-        If aMakeSup Then 'Becky added - only do the next graphs if user wants supplemental graphs
-            'cummulative difference
-            lZgc = CreateZgc()
+        lZgc = CreateZgc()
             lZgc.Width = aGraphSaveWidth
             lZgc.Height = aGraphSaveHeight
             Dim lGraphCum As New clsGraphCumulativeDifference(lDataGroup, lZgc)
@@ -162,33 +149,46 @@ Public Module Graph
             lGraphScatter.Dispose()
             lZgc.Dispose()
 
-            If aTimeSeries.Keys.Contains("LZS") Then 'scatter - LZS vs Error(cfs)
-                lZgc = CreateZgc()
-                lZgc.Width = aGraphSaveWidth
-                lZgc.Height = aGraphSaveHeight
-                If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("LZS"), "LZS (in)") Then
-                    lZgc.SaveIn(lOutFileBase & "_Error_LZS" & aGraphSaveFormat)
-                End If
-            End If
+        'scatter - Observed vs Error(cfs)    
+        lZgc = CreateZgc()
+        lZgc.Width = aGraphSaveWidth
+        lZgc.Height = aGraphSaveHeight
+        If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("Observed"), "Observed (cfs)", AxisType.Log) Then
+            lZgc.SaveIn(lOutFileBase & "_Error_ObsFlow" & aGraphSaveFormat)
+        End If
 
-            If aTimeSeries.Keys.Contains("UZS") Then 'scatter - UZS vs Error(cfs)
-                lZgc = CreateZgc()
-                lZgc.Width = aGraphSaveWidth
-                lZgc.Height = aGraphSaveHeight
-                If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("UZS"), "UZS (in)") Then
-                    lZgc.SaveIn(lOutFileBase & "_Error_UZS" & aGraphSaveFormat)
-                End If
-            End If
 
-            'scatter - Observed vs Error(cfs)    
+        lDataGroup.Clear()
+        lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Observed"),
+                                              aSDateJ,
+                                              aEDateJ, Nothing),
+                                 atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
+
+        lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Simulated"),
+                                              aSDateJ,
+                                              aEDateJ, Nothing),
+                                 atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
+
+
+
+
+        If aTimeSeries.Keys.Contains("LZS") Then 'scatter - LZS vs Error(cfs)
             lZgc = CreateZgc()
             lZgc.Width = aGraphSaveWidth
             lZgc.Height = aGraphSaveHeight
-            If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("Observed"), "Observed (cfs)", AxisType.Log) Then
-                lZgc.SaveIn(lOutFileBase & "_Error_ObsFlow" & aGraphSaveFormat)
+            If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("LZS"), "LZS (in)") Then
+                lZgc.SaveIn(lOutFileBase & "_Error_LZS" & aGraphSaveFormat)
             End If
         End If
 
+        If aTimeSeries.Keys.Contains("UZS") Then 'scatter - UZS vs Error(cfs)
+            lZgc = CreateZgc()
+            lZgc.Width = aGraphSaveWidth
+            lZgc.Height = aGraphSaveHeight
+            If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("UZS"), "UZS (in)") Then
+                lZgc.SaveIn(lOutFileBase & "_Error_UZS" & aGraphSaveFormat)
+            End If
+        End If
 
         'add precip to aux axis
         Dim lPaneCount As Integer = 1
@@ -202,35 +202,34 @@ Public Module Graph
                                      atcTimeUnit.TUDay, 1, atcTran.TranSumDiv, Nothing))
             lPaneCount = 2
         End If
-        If aMakeStd Then 'Becky added, only print overall and monthly charts if user has specified to print standard plots
-            'whole span
-            GraphTimeseries(lDataGroup, lPaneCount, lOutFileBase, aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, , aMakeLog)
 
-            If aGraphAnnual Then 'single year plots
-                Dim lSDateJ As Double = aSDateJ
-                Dim lDate(5) As Integer
-                While lSDateJ < aEDateJ
-                    Dim lEDateJ As Double = TimAddJ(lSDateJ, 6, 1, 1)
-                    Dim lDataGroupYear As New atcTimeseriesGroup
-                    For Each lTimeseries As atcTimeseries In lDataGroup
-                        lDataGroupYear.Add(SubsetByDate(lTimeseries, lSDateJ, lEDateJ, Nothing))
-                    Next
-                    J2Date(lSDateJ, lDate)
-                    If lDate(1) <> 1 OrElse lDate(2) <> 1 Then lDate(0) += 1 'non calendar years label with ending year
-                    GraphTimeseries(lDataGroupYear, lPaneCount, lOutFileBase & "_" & lDate(0), aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, , aMakeLog)
-                    lSDateJ = lEDateJ
-                End While
-            End If
+        GraphTimeseries(lDataGroup, lPaneCount, lOutFileBase, aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, , aMakeLog)
 
-            'monthly
-            Dim lMonthDataGroup As New atcTimeseriesGroup
-            lMonthDataGroup.Add(Aggregate(lDataGroup.Item(0), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
-            lMonthDataGroup.Add(Aggregate(lDataGroup.Item(1), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
-            If lPaneCount = 2 Then
-                lMonthDataGroup.Add(Aggregate(lDataGroup.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
-            End If
-            GraphTimeseries(lMonthDataGroup, lPaneCount, lOutFileBase & "_month", aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, , aMakeLog)
+        If aGraphAnnual Then 'single year plots
+            Dim lSDateJ As Double = aSDateJ
+            Dim lDate(5) As Integer
+            While lSDateJ < aEDateJ
+                Dim lEDateJ As Double = TimAddJ(lSDateJ, 6, 1, 1)
+                Dim lDataGroupYear As New atcTimeseriesGroup
+                For Each lTimeseries As atcTimeseries In lDataGroup
+                    lDataGroupYear.Add(SubsetByDate(lTimeseries, lSDateJ, lEDateJ, Nothing))
+                Next
+                J2Date(lSDateJ, lDate)
+                If lDate(1) <> 1 OrElse lDate(2) <> 1 Then lDate(0) += 1 'non calendar years label with ending year
+                GraphTimeseries(lDataGroupYear, lPaneCount, lOutFileBase & "_" & lDate(0), aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, , aMakeLog)
+                lSDateJ = lEDateJ
+            End While
         End If
+
+        'monthly
+        Dim lMonthDataGroup As New atcTimeseriesGroup
+        lMonthDataGroup.Add(Aggregate(lDataGroup.Item(0), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
+        lMonthDataGroup.Add(Aggregate(lDataGroup.Item(1), atcTimeUnit.TUMonth, 1, atcTran.TranAverSame))
+        If lPaneCount = 2 Then
+            lMonthDataGroup.Add(Aggregate(lDataGroup.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
+        End If
+        GraphTimeseries(lMonthDataGroup, lPaneCount, lOutFileBase & "_month", aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, , aMakeLog)
+
 
         'lZgc = CreateZgc()
         'lZgc.Width = aGraphSaveWidth * 2
@@ -252,70 +251,70 @@ Public Module Graph
         'lZgc.Dispose()
         'lGrapher.Dispose()
 
-        If aMakeSup Then 'Becky added if-then, only do ET and component graphs if user specified supplemental graphs are desired
 
-            Dim lKeys As New Collection
-            If aTimeSeries.Keys.Contains("PotET") AndAlso
+
+        Dim lKeys As New Collection
+        If aTimeSeries.Keys.Contains("PotET") AndAlso
                aTimeSeries.Keys.Contains("ActET") Then
-                'weekly ET - pet vs act
-                lDataGroup.Clear()
-                lKeys.Add("PotET")
-                lKeys.Add("ActET")
-                For Each lKey As String In lKeys
-                    Dim lTser As atcTimeseries = aTimeSeries.ItemByKey(lKey)
-                    lTser.Attributes.SetValue("Units", "ET (in)")
-                    lTser.Attributes.SetValue("YAxis", "Left")
-                    If lKey = "PotET" Then ' force pet to be observed
-                        lTser.Attributes.SetValue("Scenario", "Observed")
-                    End If
-                    lDataGroup.Add(SubsetByDate(Aggregate(lTser, atcTimeUnit.TUDay, 7, atcTran.TranSumDiv),
+            'weekly ET - pet vs act
+            lDataGroup.Clear()
+            lKeys.Add("PotET")
+            lKeys.Add("ActET")
+            For Each lKey As String In lKeys
+                Dim lTser As atcTimeseries = aTimeSeries.ItemByKey(lKey)
+                lTser.Attributes.SetValue("Units", "ET (in)")
+                lTser.Attributes.SetValue("YAxis", "Left")
+                If lKey = "PotET" Then ' force pet to be observed
+                    lTser.Attributes.SetValue("Scenario", "Observed")
+                End If
+                lDataGroup.Add(SubsetByDate(Aggregate(lTser, atcTimeUnit.TUDay, 7, atcTran.TranSumDiv),
                                                 aSDateJ,
                                                 aEDateJ, Nothing))
-                Next
-                lZgc = CreateZgc()
-                lGrapher = New clsGraphTime(lDataGroup, lZgc)
-                lZgc.Width = aGraphSaveWidth
-                lZgc.Height = aGraphSaveHeight
-                lDualDateScale = lZgc.MasterPane.PaneList(0).XAxis.Scale
-                lDualDateScale.MaxDaysMonthLabeled = 1200
-                lZgc.SaveIn(lOutFileBase & "_ET" & aGraphSaveFormat)
-                lZgc.Dispose()
-                lGrapher.Dispose()
-                lKeys.Clear()
-            End If
-
-            If aTimeSeries.Keys.Contains("Baseflow") AndAlso
-               aTimeSeries.Keys.Contains("Interflow") AndAlso
-               aTimeSeries.Keys.Contains("Surface") Then
-                'flow components
-                lDataGroup.Clear()
-                lKeys.Add("Baseflow")
-                lKeys.Add("Interflow")
-                lKeys.Add("Surface")
-                For Each lKey As String In lKeys
-                    Dim lTser As atcTimeseries = aTimeSeries.ItemByKey(lKey)
-                    lTser.Attributes.SetValue("Units", "Flow (in)")
-                    lTser.Attributes.SetValue("YAxis", "Left")
-                    lDataGroup.Add(SubsetByDate(lTser,
-                                                aSDateJ,
-                                                aEDateJ, Nothing))
-                Next
-                'precip
-                lPrecTser = aTimeSeries.ItemByKey("Precipitation")
-                lPrecTser.Attributes.SetValue("YAxis", "Aux")
-                lDataGroup.Add(SubsetByDate(lPrecTser,
-                                            aSDateJ,
-                                            aEDateJ, Nothing))
-                'actual et
-                Dim lETTSer As atcTimeseries = aTimeSeries.ItemByKey("ActET")
-                lETTSer.Attributes.SetValue("YAxis", "Left")
-                lDataGroup.Add(SubsetByDate(lETTSer,
-                                            aSDateJ,
-                                            aEDateJ, Nothing))
-                'do the graphs
-                GraphFlowComponents(lDataGroup, lOutFileBase, aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, aMakeLog)
-            End If
+            Next
+            lZgc = CreateZgc()
+            lGrapher = New clsGraphTime(lDataGroup, lZgc)
+            lZgc.Width = aGraphSaveWidth
+            lZgc.Height = aGraphSaveHeight
+            lDualDateScale = lZgc.MasterPane.PaneList(0).XAxis.Scale
+            lDualDateScale.MaxDaysMonthLabeled = 1200
+            lZgc.SaveIn(lOutFileBase & "_ET" & aGraphSaveFormat)
+            lZgc.Dispose()
+            lGrapher.Dispose()
+            lKeys.Clear()
         End If
+
+        If aTimeSeries.Keys.Contains("Baseflow") AndAlso
+              aTimeSeries.Keys.Contains("Interflow") AndAlso
+              aTimeSeries.Keys.Contains("Surface") Then
+            'flow components
+            lDataGroup.Clear()
+            lKeys.Add("Baseflow")
+            lKeys.Add("Interflow")
+            lKeys.Add("Surface")
+            For Each lKey As String In lKeys
+                Dim lTser As atcTimeseries = aTimeSeries.ItemByKey(lKey)
+                lTser.Attributes.SetValue("Units", "Flow (in)")
+                lTser.Attributes.SetValue("YAxis", "Left")
+                lDataGroup.Add(SubsetByDate(lTser,
+                                                aSDateJ,
+                                                aEDateJ, Nothing))
+            Next
+            'precip
+            lPrecTser = aTimeSeries.ItemByKey("Precipitation")
+            lPrecTser.Attributes.SetValue("YAxis", "Aux")
+            lDataGroup.Add(SubsetByDate(lPrecTser,
+                                            aSDateJ,
+                                            aEDateJ, Nothing))
+            'actual et
+            Dim lETTSer As atcTimeseries = aTimeSeries.ItemByKey("ActET")
+            lETTSer.Attributes.SetValue("YAxis", "Left")
+            lDataGroup.Add(SubsetByDate(lETTSer,
+                                            aSDateJ,
+                                            aEDateJ, Nothing))
+            'do the graphs
+            GraphFlowComponents(lDataGroup, lOutFileBase, aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, aMakeLog)
+        End If
+
     End Sub
 
     Public Sub GraphStorms(ByVal aDataGroup As atcTimeseriesGroup, _
