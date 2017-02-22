@@ -1198,17 +1198,23 @@ This message box will not be shown again for." & aBalanceType)
 
             Dim lBoxWhiskerItems As New List(Of BoxWhiskerItem)
             Dim LoadingRateSummary As String = "Loading Rate Summary for " & aBalanceType & " by Each Land Land Use: " & lUnits & "/acre" & vbCrLf
+            Dim lDataForBoxWhiskerPlot As New BoxWhiskerItem
+            lDataForBoxWhiskerPlot.Constituent = aBalanceType
+            lDataForBoxWhiskerPlot.Units = lUnits
+            lDataForBoxWhiskerPlot.Location = "All"
             LoadingRateSummary &= "Landuse" & vbTab & "Mean" & vbTab & "Min" & vbTab & "Max" & vbCrLf
             For Each LandUse As String In LandUsesList
                 Dim LoadingRateLine1 As String = LandUse & vbTab
                 Dim LoadingRateLine2 As String = LandUse & vbTab
                 LoadingRateSummary &= LandUse & vbTab
-                Dim lDataForBoxWhiskerPlot As New BoxWhiskerItem
+
                 Dim max As Double = 0.0
                 Dim min As Double = 1.0E+30
                 Dim sum As Double = 0.0
                 Dim count As Int16 = 0
-                lDataForBoxWhiskerPlot.Label = LandUse
+
+                Dim LoadingRateCollectionForEachLanduse As New atcCollection
+
                 For Each Key As String In pOutputTotals.Keys
                     Dim colonLocation As Integer = Key.IndexOf(":")
                     Dim LandUseFromKey As String = SafeSubstring(Key, 0, colonLocation - 1)
@@ -1219,7 +1225,7 @@ This message box will not be shown again for." & aBalanceType)
                         count += 1
                         LoadingRateLine1 &= OperationType & ":" & OperationNumber & vbTab
                         LoadingRateLine2 &= DoubleToString(pOutputTotals.ItemByKey(Key), , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab
-                        lDataForBoxWhiskerPlot.Values.Add(pOutputTotals.ItemByKey(Key))
+
                         sum += pOutputTotals.ItemByKey(Key)
                         If pOutputTotals.ItemByKey(Key) > max Then
                             max = pOutputTotals.ItemByKey(Key)
@@ -1228,26 +1234,25 @@ This message box will not be shown again for." & aBalanceType)
                             min = pOutputTotals.ItemByKey(Key)
                         End If
 
+                        LoadingRateCollectionForEachLanduse.Add(count, pOutputTotals.ItemByKey(Key))
+
                     End If
-
-
                 Next Key
+
+                lDataForBoxWhiskerPlot.LabelValueCollection.Add(LandUse, LoadingRateCollectionForEachLanduse.ToArray)
                 LoadingRateSummary &= DoubleToString(sum / count, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab &
                     DoubleToString(min, , lNumberFormat,,, lNumberOfSignificantDigits) &
                     vbTab & DoubleToString(max, , lNumberFormat,,, lNumberOfSignificantDigits) & vbCrLf
-                lBoxWhiskerItems.Add(lDataForBoxWhiskerPlot)
+
+
                 lReportLoadingRate.AppendLine(LoadingRateLine1)
                 lReportLoadingRate.AppendLine(LoadingRateLine2)
 
             Next LandUse
+            CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot)
             lReportLoadingRate.AppendLine()
             lReportLoadingRate.AppendLine()
             lReportLoadingRate.AppendLine(LoadingRateSummary)
-
-
-
-            'modGraphBoxWhiskers.CreateGraph_BoxAndWhisker(lBoxWhiskerItems)
-
 
 
 
@@ -1270,6 +1275,7 @@ This message box will not be shown again for." & aBalanceType)
                 If aOutputLocations.Count > 0 Then
                     For Each lOutputLocation As String In aOutputLocations
                         If lReach.Substring(5) = lOutputLocation.Substring(2) Then
+
                             lReport5.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
                             lReport6.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
                         End If
@@ -1288,7 +1294,9 @@ This message box will not be shown again for." & aBalanceType)
                         For Each lOutputLocation As String In aOutputLocations
                             If lReach.Substring(5) = lOutputLocation.Substring(2) Then
 
+
                                 lReport5.Append(vbTab & FormatNumber(lValue, 2, TriState.True, TriState.False, TriState.False))
+
                             End If
                         Next
                     End If
@@ -1298,6 +1306,8 @@ This message box will not be shown again for." & aBalanceType)
 
 
                 Next lSourceDescription
+
+
 
                 lReport3.AppendLine(vbTab & FormatNumber(lTotal, 2, TriState.True, TriState.False, TriState.False))
                 If aOutputLocations.Count > 0 Then

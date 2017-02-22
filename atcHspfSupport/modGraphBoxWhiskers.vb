@@ -8,101 +8,88 @@ Imports ZedGraph
 Imports System.Collections
 
 Public Class BoxWhiskerItem
-    Public Label As String
-    Public Values As New List(Of Double)
-    Public Max As Double = 0.0
-    Public Min As Double = 0.0
-    Public Mean As Double = 0.0
-    Public Count As Double = Values.Count
 
+    Public Location As String
+    Public Constituent As String
+    Public Units As String
+    'Public Labels As New List(Of String)
+    'Public Values As New List(Of Double)
+    Public LabelValueCollection As New atcCollection
 
-    Public SortedList As New List(Of Double)
-
-
-
-
-
+    'Public SortedList As New List(Of Double)
 
 
 End Class
 
 Public Module modGraphBoxWhiskers
 
-    Public Sub CreateGraph_BoxAndWhisker(items As Generic.List(Of BoxWhiskerItem))
+    Public Sub CreateGraph_BoxAndWhisker(items As BoxWhiskerItem)
 
-        Dim lZgc As New ZedGraphControl
-
-        Dim myPane As GraphPane = lZgc.GraphPane
-
+        Dim lZgc As New ZedGraph.ZedGraphControl()
         lZgc.Width = 1024
         lZgc.Height = 768
 
-        myPane.XAxis.Type = AxisType.Ordinal
+        Dim lGrapher As New atcGraph.clsGraphBoxWhisker(Nothing, lZgc, True)
+        lGrapher.DatasetsCollection = items.LabelValueCollection
+        'Dim locations As New ArrayList()
+        'With locations
+        '    .Add("ForestAB")
+        '    .Add("IDev Med")
+        'End With
+        'Dim lValues_Forest As Double() = {1.637, 2.119, 3.93, 0.932, 5.006, 0.479, 3.529, 2.542, 2.344, 2.272, 0.314, 1.966, 1.295, 1.755, 0.498, 0.154, 0.608}
+        'Dim lValues_IDev As Double() = {2.417, 3.378, 3.997, 1.464, 6.383, 0.76, 4.07, 2.902, 2.687, 3.688, 0.4, 3.061, 1.929, 2.629, 0.765, 0.364, 0.745}
 
-        Dim xLab As New List(Of String)
-        Dim yValues() As Double = {}
-        Dim ItemsForEachLabel As Int16 = 0
-        For Each item As BoxWhiskerItem In items
-            xLab.Add(item.Label)
-            For Each yValue As Double In item.Values
-                yValues(ItemsForEachLabel) = yValue
-                ItemsForEachLabel += 1
+        ''generate dataset group to hold the data
+        'Dim lCol As New atcCollection()
+        'lCol.Add(locations(0), lValues_Forest)
+        'lCol.Add(locations(1), lValues_IDev)
 
-            Next
-
-            'Dim myBar As HiLowBarItem = myPane.AddHiLowBar(item.Label, Nothing, yValues, Nothing, Color.Black)
-
-
-
-
-
-        Next
+        'lGrapher.DatasetsCollection = lCol
 
 
+        'lGrapher.DatasetsCollection = items.LabelValueCollection
+        lGrapher.Title = "Sediment Loading Rate Range"
+        lGrapher.OutputFile = "C:\temp\test\boxwhisker.png"
 
-        Dim list As New PointPairList()
-        Dim i As Integer, x As Double, y As Double
-        For i = 0 To 19
-            x = i
-            y = Math.Sin(x * 5 / 8.0)
-            list.Add(x, y)
-        Next i
-
-
-        ' Horizontal box and whisker chart 
-        ' yval is the vertical position of the box & whisker 
-        Dim yval As Double = 0.3
-        ' pct5 = 5th percentile value 
-        Dim pct5 As Double = 5
-        ' pct25 = 25th percentile value 
-        Dim pct25 As Double = 40
-        ' median = median value 
-        Dim median As Double = 55
-        ' pct75 = 75th percentile value 
-        Dim pct75 As Double = 80
-        ' pct95 = 95th percentile value 
-        Dim pct95 As Double = 95
-
-        ' Draw the box 
-        Dim list2 As New PointPairList()
-        list2.Add(pct25, yval, median)
-        list2.Add(median, yval, pct75)
-        Dim myBar As HiLowBarItem = myPane.AddHiLowBar("box", list2, Color.Black)
-        ' set the size of the box (in points, scaled to graph size) 
-        'myBar.Bar.Size = 20
-        myBar.Bar.Fill.IsVisible = False
-        'myPane.Bar.BarBase = BarBase.Y
+        'Set the color of the data series
+        'if no color are supplied, then all boxes are black in color
+        Dim data_colors As New List(Of Color)
+        With data_colors
+            .Add(Color.Red)
+            .Add(Color.Aqua)
+            .Add(Color.Black)
+            .Add(Color.Yellow)
+        End With
+        lGrapher.DataColors = data_colors
 
 
-        ' Draw the whiskers 
-        Dim xwhisk() As Double = {pct5, pct25, PointPair.Missing, pct75, pct95}
-        Dim ywhisk() As Double = {yval, yval, yval, yval, yval}
-        Dim list3 As New PointPairList()
-        list3.Add(xwhisk, ywhisk)
-        Dim mywhisk As LineItem = myPane.AddCurve("whisker", list3, Color.Black, SymbolType.None)
+        'specify the orientation angle of the x-axis label texts
+        '-90 (default) is vertical orientation, 0 is horizontal
+        lGrapher.XLabelAngle = -90
 
-        lZgc.AxisChange()
-        lZgc.SaveIn("C:\Dev\BoxWhiskersTest.png")
+        'specify Y axis title
+        'if not specified, then default Y axis title will be constructed
+        lGrapher.YTitle = "My kinda quantities"
+
+        'specify if to use legend
+        'True: use legend to show box category instead of x-axis labels
+        'False: use x-axis labels but not legend
+        lGrapher.ShowLegend = True
+
+        'call routine to make the graph
+        'input argument: 
+        '   True, write the graph to output file previously specified
+        '   False, don't write to output file              
+        lGrapher.SetUpGraph(True)
+
+        'Final note: all of the above clsGraphBoxWhisker attributes are optional
+        'if none is specified, then the default values will be used
+        'Example plots are:
+        '  boxwhisker_collection_labels.png --> lGrapher.ShowLegend = False
+        '  boxwhisker_collection_legend.png --> lGrapher.ShowLegend = True
+
+
+
 
         lZgc.Dispose()
     End Sub
