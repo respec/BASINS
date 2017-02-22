@@ -20,7 +20,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <ManifestCertificateThumbprint>09D795A226B4F3306CA9273566E1C1FDC927EED8</ManifestCertificateThumbprint>
     <ManifestKeyFile>HSPEXP_TemporaryKey.pfx</ManifestKeyFile>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
     <SignManifests>false</SignManifests>
     <ApplicationIcon>Basins.ico</ApplicationIcon>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
@@ -91,6 +91,10 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="atcReport, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcReport.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -249,10 +253,6 @@
     <ProjectReference Include="..\atcList\atcList-D4EM10.vbproj">
       <Project>{A1A87CB8-8B9E-4C90-9549-C065357E499F}</Project>
       <Name>atcList-D4EM10</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\atcReport\atcReport-D4EM10.vbproj">
-      <Project>{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}</Project>
-      <Name>atcReport-D4EM10</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics-D4EM10.vbproj">
       <Project>{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}</Project>

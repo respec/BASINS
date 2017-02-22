@@ -1,7 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Basic Express 2010
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "HSPEXP+-D4EM10", "HSPEXP+-D4EM10_common.vbproj", "{186B510F-4AF2-493A-8ADE-6867C7333C76}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "HSPEXP+-D4EM10_common", "HSPEXP+-D4EM10_common.vbproj", "{186B510F-4AF2-493A-8ADE-6867C7333C76}"
 	ProjectSection(ProjectDependencies) = postProject
 		{92EA3681-9EA9-438A-A598-2531F483A0C6} = {92EA3681-9EA9-438A-A598-2531F483A0C6}
 	EndProjectSection
@@ -35,8 +37,6 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcDurationCompare-D4EM10", "..\atcDurationCompare\atcDurationCompare-D4EM10.vbproj", "{92EA3681-9EA9-438A-A598-2531F483A0C6}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSegmentation-D4EM10", "..\atcSegmentation\atcSegmentation-D4EM10.vbproj", "{813E3F46-36CA-4320-BB05-325EEC553D3D}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcReport-D4EM10", "..\atcReport\atcReport-D4EM10.vbproj", "{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcList-D4EM10", "..\atcList\atcList-D4EM10.vbproj", "{A1A87CB8-8B9E-4C90-9549-C065357E499F}"
 EndProject
@@ -218,18 +218,6 @@ Global
 		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Release|x64.ActiveCfg = Release|x86
 		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Release|x86.ActiveCfg = Release|x86
 		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Release|x86.Build.0 = Release|x86
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Debug|x64.ActiveCfg = Debug|x64
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Debug|x64.Build.0 = Debug|x64
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Debug|x86.ActiveCfg = Debug|x86
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Debug|x86.Build.0 = Debug|x86
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Release|x64.ActiveCfg = Release|x64
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Release|x64.Build.0 = Release|x64
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Release|x86.ActiveCfg = Release|x86
-		{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}.Release|x86.Build.0 = Release|x86
 		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Debug|x64.ActiveCfg = Debug|x64

@@ -314,36 +314,52 @@ Module HSPFOutputReports
 
                                 Logger.Dbg(Now & " Calculating monthly summary for " & lSiteName)
                                 'pProgressBar.pbProgress.Increment(5)
+                                Dim lTSerBroken As atcTimeseries = lSimTSer
+                                Dim MissingObservedData As Boolean = False
 
-                                lStr = HspfSupport.MonthlyAverageCompareStats.Report(aHspfUci, _
-                                                                                     lCons, lSiteName, _
-                                                                                     "inches", _
-                                                                                     lSimTSerInches, lObsTSerInches, _
-                                                                                     lRunMade, _
-                                                                                     lExpertSystem.SDateJ, _
-                                                                                     lExpertSystem.EDateJ)
+                                If lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value > 0 Then
+                                    For i As Integer = 1 To lObsTSerInches.numValues
+                                        If Double.IsNaN(lObsTSerInches.Value(i)) Then
+                                            lSimTSerInches.Value(i) = Double.NaN
+                                            lTSerBroken.Value(i) = Double.NaN
+                                            MissingObservedData = True
+                                        End If
+                                    Next
+
+                                End If
+
+                                lStr = HspfSupport.MonthlyAverageCompareStats.Report(aHspfUci,
+                                                                                     lCons, lSiteName,
+                                                                                     "inches",
+                                                                                     lSimTSerInches, lObsTSerInches,
+                                                                                     lRunMade,
+                                                                                     lExpertSystem.SDateJ,
+                                                                                     lExpertSystem.EDateJ,
+                                                                                     MissingObservedData)
                                 Dim lOutFileName As String = loutfoldername & "MonthlyAverage" & lCons & "Stats-" & lSiteName & ".txt"
                                 SaveFileString(lOutFileName, lStr)
 
                                 Logger.Dbg(Now & " Calculating annual summary for " & lSiteName)
-                                lStr = HspfSupport.AnnualCompareStats.Report(aHspfUci, _
-                                                                             lCons, lSiteName, _
-                                                                             "inches", _
-                                                                             lPrecTser, lSimTSerInches, lObsTSerInches, _
-                                                                             lRunMade, _
-                                                                             lExpertSystem.SDateJ, _
-                                                                             lExpertSystem.EDateJ)
+                                lStr = HspfSupport.AnnualCompareStats.Report(aHspfUci,
+                                                                             lCons, lSiteName,
+                                                                             "inches",
+                                                                             lPrecTser, lSimTSerInches, lObsTSerInches,
+                                                                             lRunMade,
+                                                                             lExpertSystem.SDateJ,
+                                                                             lExpertSystem.EDateJ,
+                                                                             MissingObservedData)
                                 lOutFileName = loutfoldername & "Annual" & lCons & "Stats-" & lSiteName & ".txt"
                                 SaveFileString(lOutFileName, lStr)
 
                                 Logger.Dbg(Now & " Calculating daily summary for " & lSiteName)
                                 'pProgressBar.pbProgress.Increment(6)
-                                lStr = HspfSupport.DailyMonthlyCompareStats.Report(aHspfUci, _
-                                                                                   lCons, lSiteName, _
-                                                                                   lSimTSer, lObsTSer, _
-                                                                                   lRunMade, _
-                                                                                   lExpertSystem.SDateJ, _
-                                                                                   lExpertSystem.EDateJ)
+                                lStr = HspfSupport.DailyMonthlyCompareStats.Report(aHspfUci,
+                                                                                   lCons, lSiteName,
+                                                                                   lTSerBroken, lObsTSer,
+                                                                                   lRunMade,
+                                                                                   lExpertSystem.SDateJ,
+                                                                                   lExpertSystem.EDateJ,
+                                                                                   MissingObservedData)
                                 lOutFileName = loutfoldername & "DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
                                 SaveFileString(lOutFileName, lStr)
 
@@ -353,6 +369,9 @@ Module HSPFOutputReports
                                     Logger.Dbg(Now & " Creating nonstorm graphs")
                                     lTimeSeries.Add("Observed", lObsTSer)
                                     lTimeSeries.Add("Simulated", lSimTSer)
+                                    If MissingObservedData Then
+                                        lTimeSeries.Add("SimulatedBroken", lTSerBroken)
+                                    End If
                                     lTimeSeries.Add("Precipitation", lPrecTser)
                                     lTimeSeries.Add("LZS", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(9)))
                                     lTimeSeries.Add("UZS", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(8)))
@@ -361,15 +380,15 @@ Module HSPFOutputReports
                                     lTimeSeries.Add("Baseflow", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(4)))
                                     lTimeSeries.Add("Interflow", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(3)))
                                     lTimeSeries.Add("Surface", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(2)))
-                                    GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ, _
-                                             lCons, lSiteName, _
-                                             lTimeSeries, _
-                                             pGraphSaveFormat, _
-                                             pGraphSaveWidth, _
-                                             pGraphSaveHeight, _
-                                             pGraphAnnual, loutfoldername, _
-                                             pMakeStdGraphs, pMakeLogGraphs, _
-                                             pMakeSupGraphs)
+                                    GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ,
+                                             lCons, lSiteName,
+                                             lTimeSeries,
+                                             pGraphSaveFormat,
+                                             pGraphSaveWidth,
+                                             pGraphSaveHeight,
+                                             pGraphAnnual, loutfoldername,
+                                             pMakeStdGraphs, pMakeLogGraphs,
+                                             pMakeSupGraphs, MissingObservedData)
                                     lTimeSeries.Clear()
 
                                     If pMakeStdGraphs Then 'Becky added, only make storm graphs (log or normal) if we want standard graphs
