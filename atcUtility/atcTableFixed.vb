@@ -307,6 +307,22 @@ TryAgain:
         End Try
     End Function
 
+    Public Function RecordTextFixedWith(ByVal aRecordIndex As Integer) As String
+        Try
+            CurrentRecord = aRecordIndex
+            Dim lRecordText As New System.Text.StringBuilder()
+            Dim lColumn As Integer
+            For lColumn = 1 To NumFields
+                lRecordText.Append(Value(lColumn).PadRight(FieldLength(lColumn)))
+            Next
+            Return lRecordText.ToString()
+            Return True
+        Catch ex As Exception
+            Logger.Dbg("Error accessing record " & aRecordIndex)
+            Return ""
+        End Try
+    End Function
+
     Public Overrides Function CreationCode() As String
         Return ("")
     End Function

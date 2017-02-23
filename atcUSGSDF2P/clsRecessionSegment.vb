@@ -105,6 +105,7 @@ Public Class clsRecessionSegment
             Dim lEndDate = StreamFlowTS.Dates.Value(lastDayIndex - 1)
             Dim lDate(5) As Integer
             J2Date(lEndDate, lDate)
+            'timcnv(lDate)
             Return lDate(0).ToString & "/" & lDate(1).ToString.PadLeft(2, " ") & "/" & lDate(2).ToString.PadLeft(2, " ")
         End Get
     End Property
@@ -152,7 +153,7 @@ Public Class clsRecessionSegment
     Public ReadOnly Property BackTraceTimeSeries(ByVal aBackTraceDays As Integer) As atcTimeseries
         Get
             Dim lTsBacktrace As atcTimeseries = Nothing
-            Dim lStartIndex As Integer = PeakDayIndex + SegmentLength - aBackTraceDays
+            Dim lStartIndex As Integer = PeakDayIndex + SegmentLength - aBackTraceDays - 1
             Dim lEndIndex As Integer = PeakDayIndex + SegmentLength - 1
             'If lStartIndex < 1 Then Return lTsBacktrace
             If lStartIndex < 1 Then
@@ -192,21 +193,22 @@ Public Class clsRecessionSegment
         End If
 
         Dim lTsWaterYearBound As atcTimeseries = Nothing
-        If aTSflow.numValues > 365 Then
-            Try
-                lTsWaterYearBound = SubsetByDateBoundary(aTSflow, 10, 1, Nothing)
-            Catch ex As Exception
-                lTsWaterYearBound = Nothing
-            End Try
-            If lTsWaterYearBound Is Nothing Then
-                Return "ERROR:Extract water year data failed"
-            End If
-        End If
+        'If aTSflow.numValues > 365 Then
+        '    Try
+        '        lTsWaterYearBound = SubsetByDateBoundary(aTSflow, 10, 1, Nothing)
+        '    Catch ex As Exception
+        '        lTsWaterYearBound = Nothing
+        '    End Try
+        '    If lTsWaterYearBound Is Nothing Then
+        '        Return "ERROR:Extract water year data failed"
+        '    End If
+        'End If
 
         aTS_b_prime = aTSflow.Clone()
         For I As Integer = 0 To aTS_b_prime.numValues
             aTS_b_prime.Value(I) = Double.NaN
         Next
+        aTS_b_prime.Attributes.SetValue("Constituent", "b'")
 
         Dim lflowVal As Double
         Dim lflowVal_prev As Double
@@ -229,24 +231,24 @@ Public Class clsRecessionSegment
 
         Dim lSumFlow As Double = 0.0
         Dim lSum_b_prime As Double = 0.0
-        If aTSflow.numValues > 365 AndAlso lTsWaterYearBound.Values IsNot Nothing Then
-            Dim lTs_b_prime_WY As atcTimeseries = SubsetByDateBoundary(aTS_b_prime, 10, 1, Nothing)
-            lSumFlow = lTsWaterYearBound.Attributes.GetValue("Sum")
-            lSum_b_prime = lTs_b_prime_WY.Attributes.GetValue("Sum")
-            aTSflow.Attributes.SetValue("BFIEstimateStartDate", lTsWaterYearBound.Dates.Value(0))
-            aTSflow.Attributes.SetValue("BFIEstimateEndDate", lTsWaterYearBound.Dates.Value(lTsWaterYearBound.numValues))
-            aDF2P.BFIEstimateStartDate = lTsWaterYearBound.Dates.Value(0)
-            aDF2P.BFIEstimateEndDate = lTsWaterYearBound.Dates.Value(lTsWaterYearBound.numValues)
-            aDF2P.isBFIEstimateInWaterYear = True
-        Else
-            lSumFlow = aTSflow.Attributes.GetValue("Sum")
-            lSum_b_prime = aTS_b_prime.Attributes.GetValue("Sum")
-            aTSflow.Attributes.SetValue("BFIEstimateStartDate", aTSflow.Dates.Value(0))
-            aTSflow.Attributes.SetValue("BFIEstimateEndDate", aTSflow.Dates.Value(aTSflow.numValues))
-            aDF2P.BFIEstimateStartDate = aTSflow.Dates.Value(0)
-            aDF2P.BFIEstimateEndDate = aTSflow.Dates.Value(aTSflow.numValues)
-            aDF2P.isBFIEstimateInWaterYear = False
-        End If
+        'If aTSflow.numValues > 365 AndAlso lTsWaterYearBound.Values IsNot Nothing Then
+        '    Dim lTs_b_prime_WY As atcTimeseries = SubsetByDateBoundary(aTS_b_prime, 10, 1, Nothing)
+        '    lSumFlow = lTsWaterYearBound.Attributes.GetValue("Sum")
+        '    lSum_b_prime = lTs_b_prime_WY.Attributes.GetValue("Sum")
+        '    aTSflow.Attributes.SetValue("BFIEstimateStartDate", lTsWaterYearBound.Dates.Value(0))
+        '    aTSflow.Attributes.SetValue("BFIEstimateEndDate", lTsWaterYearBound.Dates.Value(lTsWaterYearBound.numValues))
+        '    aDF2P.BFIEstimateStartDate = lTsWaterYearBound.Dates.Value(0)
+        '    aDF2P.BFIEstimateEndDate = lTsWaterYearBound.Dates.Value(lTsWaterYearBound.numValues)
+        '    aDF2P.isBFIEstimateInWaterYear = True
+        'Else
+        lSumFlow = aTSflow.Attributes.GetValue("Sum")
+        lSum_b_prime = aTS_b_prime.Attributes.GetValue("Sum")
+        aTSflow.Attributes.SetValue("BFIEstimateStartDate", aTSflow.Dates.Value(0))
+        aTSflow.Attributes.SetValue("BFIEstimateEndDate", aTSflow.Dates.Value(aTSflow.numValues - 1))
+        aDF2P.BFIEstimateStartDate = aTSflow.Dates.Value(0)
+        aDF2P.BFIEstimateEndDate = aTSflow.Dates.Value(aTSflow.numValues - 1)
+        aDF2P.isBFIEstimateInWaterYear = False
+        'End If
         aDF2P.BFImax = lSum_b_prime / lSumFlow
         aTSflow.Attributes.SetValue(lKey_attr, aDF2P.BFImax)
         If Not pBFImaxEstimates.ContainsKey(lKey_collection) Then

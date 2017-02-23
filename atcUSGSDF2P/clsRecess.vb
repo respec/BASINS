@@ -492,10 +492,15 @@ Public Class clsRecess
 "file          log cycle)" & vbCrLf & _
 "------------------------"
 
-        pHeaderRC_BFI = "                                                                  BFImax" & vbCrLf &
-            "                              Recession Constant (a)    Start       End         Calc." & vbCrLf &
-            "Gage number Season Dates      Specified   Calculated    Date        Date        BFImax" & vbCrLf &
-            "----------- ------ ---------  ----------------------   -------------------------------"
+        'pHeaderRC_BFI = "                                                                  BFImax" & vbCrLf &
+        '    "                              Recession Constant (a)    Start       End         Calc." & vbCrLf &
+        '    "Gage number Season Dates      Specified   Calculated    Date        Date        BFImax" & vbCrLf &
+        '    "----------- ------ ---------  ----------------------   -------------------------------"
+
+        pHeaderRC_BFI = "                                                               BFImax" & vbCrLf &
+            "Gage              Recession Constant (a)       Start       End         Duration    Calc." & vbCrLf &
+            "number      Season Dates      Spec.   Calc.    Date        Date         (days)     BFImax" & vbCrLf &
+            "----------- --------------------------------   ------------------------------------------"
 
         'Start off a recession search
         pCountDay = 2
@@ -889,7 +894,8 @@ Public Class clsRecess
 
     Public Overridable Function DoOperation(ByVal aOperation As String, ByVal aRecessKey As String) As Boolean
         If Not String.IsNullOrEmpty(aRecessKey) Then
-            RecessionSegment = listOfSegments.ItemByKey(aRecessKey)
+            Dim lKey As String = aRecessKey.Substring(0, 10)
+            RecessionSegment = listOfSegments.ItemByKey(lKey)
             If RecessionSegment.NeedtoReadData Then
                 RecessionSegment.GetData()
             End If
@@ -976,7 +982,7 @@ Public Class clsRecess
             'df2p_parameters.BFImax = lTsBackTrace.Attributes.GetValue(lKey, Double.NaN)
             'df2p_parameters.BFIEstimateStartDate = lTsBackTrace.Attributes.GetValue("BFIEstimateStartDate")
             'df2p_parameters.BFIEstimateEndDate = lTsBackTrace.Attributes.GetValue("BFIEstimateEndDate")
-            Bulletin = "SUCCESS," & lTsBackTrace.Values.Length.ToString() & "," & df2p_parameters.BFImax.ToString()
+            Bulletin = "SUCCESS," & (lTsBackTrace.Values.Length - 1).ToString() & "," & df2p_parameters.BFImax.ToString()
         Else
             Bulletin = lMessage
             df2p_parameters.BFImax = Double.NaN
@@ -1627,6 +1633,7 @@ Public Class clsRecess
                 .IncludeHours = False
                 .IncludeMinutes = False
                 .IncludeSeconds = False
+                .Midnight24 = False
             End With
             Dim lFlowDateRangeText As String = lDateFormat.JDateToString(lFlowStart) & "-" & lDateFormat.JDateToString(lFlowEnd)
             lFlowDateRangeText &= "  "
@@ -1654,6 +1661,99 @@ Public Class clsRecess
                 lSW.Close()
                 lSW = Nothing
             End If
+        End Try
+    End Sub '}
+
+    '{
+    Public Sub DF2P_Output_Ver2()
+        Dim lSW As IO.StreamWriter = Nothing
+        Dim lTable As New atcTableFixed()
+        Dim lfile_name As String = IO.Path.Combine(OutputPath, pFileRC_BFI)
+        Try
+            If IO.File.Exists(lfile_name) Then
+                lSW = New StreamWriter(lfile_name, True)
+            Else
+                lSW = New StreamWriter(lfile_name, False)
+                lSW.WriteLine(pHeaderRC_BFI)
+            End If
+            With lTable
+                .NumFields = 9
+
+                .FieldStart(1) = 1
+                .FieldStart(2) = 13
+                .FieldStart(3) = 20
+                .FieldStart(4) = 31
+                .FieldStart(5) = 39
+                .FieldStart(6) = 48
+                .FieldStart(7) = 60
+                .FieldStart(8) = 72
+                .FieldStart(9) = 84
+
+                .FieldLength(1) = 12
+                .FieldLength(2) = 7
+                .FieldLength(3) = 11
+                .FieldLength(4) = 8
+                .FieldLength(5) = 9
+                .FieldLength(6) = 12
+                .FieldLength(7) = 12
+                .FieldLength(8) = 12
+                .FieldLength(9) = 7
+
+                .FieldName(1) = "Gage"
+                .FieldName(2) = "Season"
+                .FieldName(3) = "Years"
+                .FieldName(4) = "Spec."
+                .FieldName(5) = "Calc."
+                .FieldName(6) = "Start Date"
+                .FieldName(7) = "End Date"
+                .FieldName(8) = "Duration"
+                .FieldName(9) = "BFImax"
+                .NumRecords = 1
+                .Value(1) = FlowData().Attributes.GetValue("Location")
+                .Value(2) = SeasonLabel
+                Dim lFlowStart As Double = FlowData().Dates.Value(0)
+                Dim lFlowEnd As Double = FlowData().Dates.Value(FlowData().Dates.numValues)
+                Dim lDateFormat As New atcDateFormat()
+                With lDateFormat
+                    .IncludeYears = True
+                    .IncludeMonths = False
+                    .IncludeDays = False
+                    .IncludeHours = False
+                    .IncludeMinutes = False
+                    .IncludeSeconds = False
+                    .Midnight24 = False
+                End With
+                .Value(3) = lDateFormat.JDateToString(lFlowStart) & "-" & lDateFormat.JDateToString(lFlowEnd)
+                Dim lRCText As String = ""
+                If df2p_parameters.Estimated_RC Then
+                    .Value(5) = DoubleToString(df2p_parameters.RecessionConstant)
+                Else
+                    .Value(4) = DoubleToString(df2p_parameters.RecessionConstant)
+                End If
+                With lDateFormat
+                    .IncludeMonths = True
+                    .IncludeDays = True
+                    .DateSeparator = "/"
+                End With
+                .Value(6) = lDateFormat.JDateToString(df2p_parameters.BFIEstimateStartDate)
+                .Value(7) = lDateFormat.JDateToString(df2p_parameters.BFIEstimateEndDate)
+                Dim lDuration As Double = (df2p_parameters.BFIEstimateEndDate - df2p_parameters.BFIEstimateStartDate) / JulianHour / 24.0 + 1
+                .Value(8) = Int(lDuration).ToString()
+                .Value(9) = DoubleToString(df2p_parameters.BFImax, 6,)
+            End With
+
+            'Dim outputText As String = loc & lSeasonText & lFlowDateRangeText & lRCText & lBFIStartText & lBFIEndText & lBFImaxText
+            lSW.WriteLine(lTable.RecordTextFixedWith(1))
+            Logger.Msg("Saved parameter valus to file:" & vbCrLf & lfile_name, MsgBoxStyle.Information, "Save Two Parameter Digital Filter Parameters")
+        Catch ex As Exception
+            Logger.Msg("Failed to save parameter valus to file:" & vbCrLf & lfile_name, MsgBoxStyle.Exclamation, "Save Two Parameter Digital Filter Parameters")
+        Finally
+            If lSW IsNot Nothing Then
+                lSW.Close()
+                lSW = Nothing
+            End If
+            lTable.Clear()
+            lTable = Nothing
         End Try
     End Sub '}
 

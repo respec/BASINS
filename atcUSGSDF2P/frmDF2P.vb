@@ -1200,6 +1200,20 @@ Public Class frmDF2P
     Public Sub RefreshGraphRecess(ByVal aDataGroup As atcTimeseriesGroup)
         If pGrapher IsNot Nothing Then
             With pGrapher.ZedGraphCtrl.GraphPane
+                If .CurveList.Count > 2 Then
+                    Dim lRemove As New ArrayList()
+                    For I As Integer = 2 To .CurveList.Count - 1
+                        'CType(.CurveList.Item(I).Points, atcGraph.atcTimeseriesPointList).Clear()
+                        '.CurveList.Item(I).Points = Nothing
+                        Dim lbl = .CurveList.Item(I).Label.Text
+                        lbl = "STOP"
+                        'lRemove.Add(.CurveList.Item(I))
+                    Next
+                    For Each lCurve As CurveItem In lRemove
+                        .CurveList.Remove(lCurve)
+                    Next
+                End If
+                '.CurveList.Clear()
                 'To see if need to refresh the axis
                 If aDataGroup IsNot Nothing AndAlso aDataGroup.Count > 0 AndAlso Not .YAxis.Title.Text = aDataGroup(0).Attributes.GetValue("Units") Then
                     .YAxis.Title.Text = ""
@@ -1224,19 +1238,34 @@ Public Class frmDF2P
         'Dim lDateMax As Double = aDataGroup(0).Dates.Value(aDataGroup(0).numValues)
         'Dim lLogFlag As Boolean = False
         With pGrapher.ZedGraphCtrl.GraphPane
-            If aDataGroup.Count > 0 Then
+            If aDataGroup.Count > 0 AndAlso .CurveList.Count = 2 Then
                 '.YAxis.Type = AxisType.Log
                 .CurveList.Item(0).Color = Drawing.Color.Blue
                 .CurveList.Item(1).Color = Drawing.Color.LightBlue
                 .Legend.IsVisible = True
+                .CurveList.Item(1).Label.Text = "b'"
                 '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
                 'CType(.CurveList.Item(1), LineItem).Line.Width = 2
-            End If
-            'Scalit(lDataMin, lDataMax, lLogFlag, .XAxis.Scale.Min, .XAxis.Scale.Max)
+            ElseIf aDataGroup.Count > 0 AndAlso .CurveList.Count = 4 Then
+                .CurveList.Item(0).Color = Drawing.Color.Blue
+                .CurveList.Item(1).Color = Drawing.Color.Red
+                .CurveList.Item(2).Color = Drawing.Color.LightBlue
+                .CurveList.Item(3).Color = Drawing.Color.LightPink
+                .Legend.IsVisible = True
+                If .CurveList.Item(0).Label.Text.Contains("Daily") AndAlso .CurveList.Item(0).Label.Text.Contains("Flow") Then
+                    .CurveList.Item(0).Label.Text = "Daily Flow"
+                End If
+                If .CurveList.Item(1).Label.Text.Contains("Daily") AndAlso .CurveList.Item(1).Label.Text.Contains("Flow") Then
+                    .CurveList.Item(1).Label.Text = "Daily Flow (Provisional)"
+                End If
+                .CurveList.Item(2).Label.Text = "b'"
+                .CurveList.Item(3).Label.Text = "b' for provisional"
+                End If
+                'Scalit(lDataMin, lDataMax, lLogFlag, .XAxis.Scale.Min, .XAxis.Scale.Max)
 
-            '.YAxis.Scale.Max = Math.Ceiling(lYmax)
-            '.YAxis.Scale.Min = Math.Floor(lYmin)
-            .YAxis.Scale.MaxAuto = True
+                '.YAxis.Scale.Max = Math.Ceiling(lYmax)
+                '.YAxis.Scale.Min = Math.Floor(lYmin)
+                .YAxis.Scale.MaxAuto = True
             .YAxis.Scale.MinAuto = True
             .AxisChange()
         End With
@@ -1451,7 +1480,7 @@ Public Class frmDF2P
                 Dim lRecessLeg As clsRecessionSegment
                 For Each lPeakDate As String In pRecess.listOfSegments.Keys
                     lRecessLeg = pRecess.listOfSegments.ItemByKey(lPeakDate)
-                    lstRecessSegments.Items.Add(lPeakDate & "-" & lRecessLeg.EndDayDateToString())
+                    lstRecessSegments.Items.Add(lPeakDate & " ~ " & lRecessLeg.EndDayDateToString())
                     If pRecess.listOfSegments.ItemByKey(lPeakDate).BackTraceContinuousFlag(pRecess.BackTraceDays) Then
                         lstRecessSegments.SetItemChecked(lstRecessSegments.Items.Count - 1, True)
                     End If
@@ -1471,6 +1500,7 @@ Public Class frmDF2P
         End If
 
         If lConfigurationGood Then
+            'panelAnalysis.Containe
             panelConfiguration.Visible = False
             panelAnalysis.Visible = True
         End If
@@ -1740,28 +1770,30 @@ Public Class frmDF2P
             'run for the first time
             'record the selection
             For Each lItem As String In lstRecessSegments.CheckedItems
+                Dim lKey As String = lItem.Substring(0, 10)
                 If lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
-                    lSeg = pRecess.listOfSegments.ItemByKey(lItem)
+                    lSeg = pRecess.listOfSegments.ItemByKey(lKey)
                 ElseIf lCons.ToUpper() = "GW LEVEL" Then
-                    lSeg = pFall.listOfSegments.ItemByKey(lItem)
+                    lSeg = pFall.listOfSegments.ItemByKey(lKey)
                 End If
 
-                pLastSelectedRecessions.Add(lItem, lSeg.MinDayOrdinal.ToString & "-" & lSeg.MaxDayOrdinal.ToString)
+                pLastSelectedRecessions.Add(lKey, lSeg.MinDayOrdinal.ToString & "-" & lSeg.MaxDayOrdinal.ToString)
             Next
             Return True
         Else
             'check if the current selection is different from that of the previous run
             If lstRecessSegments.CheckedItems.Count = pLastSelectedRecessions.Count Then
                 For Each lItem As String In lstRecessSegments.CheckedItems
-                    If pLastSelectedRecessions.Keys.Contains(lItem) Then
+                    Dim lKey As String = lItem.Substring(0, 10)
+                    If pLastSelectedRecessions.Keys.Contains(lKey) Then
                         If lCons = "Streamflow" OrElse lCons = "FLOW" Then
-                            lSeg = pRecess.listOfSegments.ItemByKey(lItem)
+                            lSeg = pRecess.listOfSegments.ItemByKey(lKey)
                         ElseIf lCons = "GW LEVEL" Then
-                            lSeg = pFall.listOfSegments.ItemByKey(lItem)
+                            lSeg = pFall.listOfSegments.ItemByKey(lKey)
                         End If
 
                         Dim lCurrentDuration As String = lSeg.MinDayOrdinal.ToString & "-" & lSeg.MaxDayOrdinal.ToString
-                        If pLastSelectedRecessions.ItemByKey(lItem) <> lCurrentDuration Then
+                        If pLastSelectedRecessions.ItemByKey(lKey) <> lCurrentDuration Then
                             lIsSelectionChanged = True
                             Exit For
                         End If
@@ -1923,7 +1955,17 @@ Public Class frmDF2P
                 If lMsg.StartsWith("SUCCESS") Then
                     Dim lArr() As String = lMsg.Split(",")
                     Double.TryParse(lMsg.Substring(lMsg.LastIndexOf(",") + 1), pRecess.df2p_parameters.BFImax)
-                    lblEstimatedBFImax.Text = "Estimated BFImax (" + lstRecessSegments.SelectedItem.ToString + ", RC=" + txtRC.Text + ", Duration=" + lArr(1) + " days): "
+
+                    Dim lDateFormat As New atcDateFormat()
+                    With lDateFormat
+                        .IncludeHours = False
+                        .IncludeMinutes = False
+                        .IncludeSeconds = False
+                        .Midnight24 = False
+                    End With
+
+                    Dim lDuration As String = lDateFormat.JDateToString(pRecess.df2p_parameters.BFIEstimateStartDate) & "-" & lDateFormat.JDateToString(pRecess.df2p_parameters.BFIEstimateEndDate)
+                    lblEstimatedBFImax.Text = "Estimated BFImax (" + lDuration + ", RC=" + txtRC.Text + ", Duration=" + lArr(1) + " days): "
                     txtBFImax.Text = DoubleToString(pRecess.df2p_parameters.BFImax, 6, "0.0000")
                     lblEstimatedBFImax.Left = btnConfiguration.Right + 100
                     txtBFImax.Left = lblEstimatedBFImax.Right + 15
@@ -2130,7 +2172,7 @@ Public Class frmDF2P
         '    RefreshGraphRecess(pGraphRecessDatagroup)
         'End If
 
-        pRecess.DF2P_Output()
+        pRecess.DF2P_Output_Ver2()
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
@@ -2188,6 +2230,8 @@ Public Class frmDF2P
         panelConfiguration.Dock = DockStyle.Fill
         panelAnalysis.Dock = DockStyle.Fill
         rdoNoSeason.Checked = True
+        lstRecessSegments.Width = 225
+        lstRecessSegments.Anchor = AnchorStyles.Left + AnchorStyles.Top + AnchorStyles.Bottom
     End Sub
 
     Private Sub btnFallPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)

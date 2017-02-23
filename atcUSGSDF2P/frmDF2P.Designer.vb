@@ -338,9 +338,6 @@ Partial Class frmDF2P
         '
         'lstRecessSegments
         '
-        Me.lstRecessSegments.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstRecessSegments.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstRecessSegments.FormattingEnabled = True
         Me.lstRecessSegments.IntegralHeight = False
@@ -366,7 +363,7 @@ Partial Class frmDF2P
         'scDisplay.Panel2
         '
         Me.scDisplay.Panel2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.scDisplay.Size = New System.Drawing.Size(581, 228)
+        Me.scDisplay.Size = New System.Drawing.Size(581, 230)
         Me.scDisplay.SplitterDistance = 25
         Me.scDisplay.TabIndex = 39
         '
@@ -399,7 +396,7 @@ Partial Class frmDF2P
         'btnSave
         '
         Me.btnSave.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSave.Location = New System.Drawing.Point(675, 233)
+        Me.btnSave.Location = New System.Drawing.Point(675, 235)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(93, 27)
         Me.btnSave.TabIndex = 18
@@ -409,7 +406,7 @@ Partial Class frmDF2P
         'btnAnalyse
         '
         Me.btnAnalyse.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnAnalyse.Location = New System.Drawing.Point(135, 235)
+        Me.btnAnalyse.Location = New System.Drawing.Point(135, 237)
         Me.btnAnalyse.Name = "btnAnalyse"
         Me.btnAnalyse.Size = New System.Drawing.Size(75, 23)
         Me.btnAnalyse.TabIndex = 17
@@ -556,7 +553,7 @@ Partial Class frmDF2P
         Me.panelAnalysis.Controls.Add(Me.scDisplay)
         Me.panelAnalysis.Location = New System.Drawing.Point(6, 322)
         Me.panelAnalysis.Name = "panelAnalysis"
-        Me.panelAnalysis.Size = New System.Drawing.Size(771, 263)
+        Me.panelAnalysis.Size = New System.Drawing.Size(771, 265)
         Me.panelAnalysis.TabIndex = 32
         Me.panelAnalysis.Visible = False
         '
@@ -564,7 +561,7 @@ Partial Class frmDF2P
         '
         Me.txtBFImax.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtBFImax.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtBFImax.Location = New System.Drawing.Point(612, 238)
+        Me.txtBFImax.Location = New System.Drawing.Point(612, 240)
         Me.txtBFImax.Name = "txtBFImax"
         Me.txtBFImax.ReadOnly = True
         Me.txtBFImax.Size = New System.Drawing.Size(57, 20)
@@ -574,7 +571,7 @@ Partial Class frmDF2P
         '
         Me.lblEstimatedBFImax.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblEstimatedBFImax.AutoSize = True
-        Me.lblEstimatedBFImax.Location = New System.Drawing.Point(321, 241)
+        Me.lblEstimatedBFImax.Location = New System.Drawing.Point(321, 243)
         Me.lblEstimatedBFImax.Name = "lblEstimatedBFImax"
         Me.lblEstimatedBFImax.Size = New System.Drawing.Size(72, 13)
         Me.lblEstimatedBFImax.TabIndex = 44
@@ -583,7 +580,7 @@ Partial Class frmDF2P
         'txtRC2
         '
         Me.txtRC2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.txtRC2.Location = New System.Drawing.Point(263, 237)
+        Me.txtRC2.Location = New System.Drawing.Point(263, 239)
         Me.txtRC2.Name = "txtRC2"
         Me.txtRC2.Size = New System.Drawing.Size(45, 20)
         Me.txtRC2.TabIndex = 43
@@ -594,7 +591,7 @@ Partial Class frmDF2P
         '
         Me.lblRC2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblRC2.AutoSize = True
-        Me.lblRC2.Location = New System.Drawing.Point(137, 240)
+        Me.lblRC2.Location = New System.Drawing.Point(137, 242)
         Me.lblRC2.Name = "lblRC2"
         Me.lblRC2.Size = New System.Drawing.Size(120, 13)
         Me.lblRC2.TabIndex = 42
@@ -605,7 +602,7 @@ Partial Class frmDF2P
         '
         Me.btnConfiguration.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnConfiguration.AutoSize = True
-        Me.btnConfiguration.Location = New System.Drawing.Point(3, 233)
+        Me.btnConfiguration.Location = New System.Drawing.Point(3, 235)
         Me.btnConfiguration.Name = "btnConfiguration"
         Me.btnConfiguration.Size = New System.Drawing.Size(122, 27)
         Me.btnConfiguration.TabIndex = 16
@@ -616,7 +613,7 @@ Partial Class frmDF2P
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(789, 313)
+        Me.ClientSize = New System.Drawing.Size(789, 314)
         Me.Controls.Add(Me.panelConfiguration)
         Me.Controls.Add(Me.panelAnalysis)
         Me.Controls.Add(Me.MenuStrip1)
