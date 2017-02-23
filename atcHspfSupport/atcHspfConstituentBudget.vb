@@ -19,7 +19,7 @@ Public Module ConstituentBudget
                            ByVal aRunMade As String,
                            ByVal aSDateJ As Double,
                            ByVal aEDateJ As Double) As _
-                           Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)
+                           Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, BoxWhiskerItem)
 
         Dim lNumberFormat As String = "#,##0.###"
         Dim lNumberOfSignificantDigits As Integer = 11
@@ -39,6 +39,8 @@ Public Module ConstituentBudget
         Dim lReport5 As New atcReport.ReportText
         Dim lReport6 As New atcReport.ReportText
         Dim lReportLoadingRate As New atcReport.ReportText
+        Dim lBoxWhiskerItems As New List(Of BoxWhiskerItem)
+        Dim lDataForBoxWhiskerPlot As New BoxWhiskerItem
 
         pRunningTotals = New atcCollection
         pOutputTotals = New atcCollection
@@ -66,7 +68,7 @@ Public Module ConstituentBudget
 
         Select Case aBalanceType
             Case "Water"
-                lUnits = "(ac-ft)"
+                lUnits = "ac-ft"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SURO"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IFWO"))
@@ -79,7 +81,7 @@ Public Module ConstituentBudget
                 lEvapLossData.Add(aScenarioResults.DataSets.FindData("Constituent", "VOLEV"))
 
             Case "Sediment"
-                lUnits = "(tons)"
+                lUnits = "tons"
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "WSSD"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SCRSD"))
                 lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "SOSLD")))
@@ -88,7 +90,7 @@ Public Module ConstituentBudget
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ROSED-TOT"))
                 lDepScourData.Add(aScenarioResults.DataSets.FindData("Constituent", "DEPSCOUR-TOT"))
             Case "TotalN"
-                lUnits = "(lbs)"
+                lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
 
@@ -110,7 +112,7 @@ Public Module ConstituentBudget
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-OUT"))
 
             Case "TotalP"
-                lUnits = "(lbs)"
+                lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW"))
@@ -146,7 +148,7 @@ Public Module ConstituentBudget
                 lReport4.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
                 lReport5.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
                 lReport6.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate)
+                Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, BoxWhiskerItem)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate, Nothing)
 
         End Select
 
@@ -1196,11 +1198,11 @@ This message box will not be shown again for." & aBalanceType)
             Dim PointSourcesPlacesLocation As Integer = lLandusesHeader.IndexOf("PointSources")
             Dim LandUsesList() As String = lLandusesHeader.Substring(1, PointSourcesPlacesLocation - 2).Split(vbTab)
 
-            Dim lBoxWhiskerItems As New List(Of BoxWhiskerItem)
+
             Dim LoadingRateSummary As String = "Loading Rate Summary for " & aBalanceType & " by Each Land Land Use: " & lUnits & "/acre" & vbCrLf
-            Dim lDataForBoxWhiskerPlot As New BoxWhiskerItem
+
             lDataForBoxWhiskerPlot.Constituent = aBalanceType
-            lDataForBoxWhiskerPlot.Units = lUnits
+            lDataForBoxWhiskerPlot.Units = "(" & lUnits & "/acre)"
             lDataForBoxWhiskerPlot.Location = "All"
             LoadingRateSummary &= "Landuse" & vbTab & "Mean" & vbTab & "Min" & vbTab & "Max" & vbCrLf
             For Each LandUse As String In LandUsesList
@@ -1213,7 +1215,7 @@ This message box will not be shown again for." & aBalanceType)
                 Dim sum As Double = 0.0
                 Dim count As Int16 = 0
 
-                Dim LoadingRateCollectionForEachLanduse As New atcCollection
+                Dim LoadingRateCollectionForEachLanduse As New List(Of Double)
 
                 For Each Key As String In pOutputTotals.Keys
                     Dim colonLocation As Integer = Key.IndexOf(":")
@@ -1234,11 +1236,12 @@ This message box will not be shown again for." & aBalanceType)
                             min = pOutputTotals.ItemByKey(Key)
                         End If
 
-                        LoadingRateCollectionForEachLanduse.Add(count, pOutputTotals.ItemByKey(Key))
+                        LoadingRateCollectionForEachLanduse.Add(pOutputTotals.ItemByKey(Key))
 
                     End If
                 Next Key
-
+                'Dim TestArray As Double()
+                'TestArray = LoadingRateCollectionForEachLanduse.ToArray
                 lDataForBoxWhiskerPlot.LabelValueCollection.Add(LandUse, LoadingRateCollectionForEachLanduse.ToArray)
                 LoadingRateSummary &= DoubleToString(sum / count, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab &
                     DoubleToString(min, , lNumberFormat,,, lNumberOfSignificantDigits) &
@@ -1249,7 +1252,7 @@ This message box will not be shown again for." & aBalanceType)
                 lReportLoadingRate.AppendLine(LoadingRateLine2)
 
             Next LandUse
-            CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot)
+
             lReportLoadingRate.AppendLine()
             lReportLoadingRate.AppendLine()
             lReportLoadingRate.AppendLine(LoadingRateSummary)
@@ -1367,7 +1370,7 @@ This message box will not be shown again for." & aBalanceType)
         End If
         pRunningTotals.Clear()
 
-        Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate)
+        Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, BoxWhiskerItem)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate, lDataForBoxWhiskerPlot)
 
     End Function
 

@@ -554,6 +554,7 @@ Module HSPFOutputReports
 
                         If lScenarioResults.DataSets.Count > 0 Then
                             Dim lReportCons As New atcReport.ReportText
+
                             Dim lOutFileName As String = ""
 
                             Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
@@ -586,6 +587,13 @@ Module HSPFOutputReports
                                 lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
                                 SaveFileString(lOutFileName, lReportCons.ToString)
                                 lReportCons = Nothing
+
+
+                                CreateGraph_BoxAndWhisker(.Item6, loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.png")
+
+
+
+
                             End With
                             Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
 
@@ -621,7 +629,7 @@ Module HSPFOutputReports
                             End If
                         Else
                             Logger.Dbg("The HBN file didn't have any data for the constituent " & lConstituent & "  therefore the balance reports for " & _
-                                       lConstituent & " will not be generated. Make sure that HSPF run completed last time.")
+                                lConstituent & " will not be generated. Make sure that HSPF run completed last time.")
                             Dim ans As Integer
                             ans = MsgBox("HBN files do not have any data.  Constituent Balance reports will not be generated. " & _
                                          "Did uci file run properly last time?")

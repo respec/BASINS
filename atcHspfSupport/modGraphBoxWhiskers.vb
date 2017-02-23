@@ -23,7 +23,7 @@ End Class
 
 Public Module modGraphBoxWhiskers
 
-    Public Sub CreateGraph_BoxAndWhisker(items As BoxWhiskerItem)
+    Public Sub CreateGraph_BoxAndWhisker(items As BoxWhiskerItem, aOutputFileName As String)
 
         Dim lZgc As New ZedGraph.ZedGraphControl()
         lZgc.Width = 1024
@@ -32,6 +32,7 @@ Public Module modGraphBoxWhiskers
         Dim lGrapher As New atcGraph.clsGraphBoxWhisker(Nothing, lZgc, True)
         lGrapher.DatasetsCollection = items.LabelValueCollection
         'Dim locations As New ArrayList()
+        ''locations = items.LabelValueCollection.Keys
         'With locations
         '    .Add("ForestAB")
         '    .Add("IDev Med")
@@ -41,24 +42,42 @@ Public Module modGraphBoxWhiskers
 
         ''generate dataset group to hold the data
         'Dim lCol As New atcCollection()
-        'lCol.Add(locations(0), lValues_Forest)
-        'lCol.Add(locations(1), lValues_IDev)
+        'For Each key As String In items.LabelValueCollection.Keys
+        '    lCol.Add(key, items.LabelValueCollection.ItemByKey(key))
+        'Next
+        ''lCol.Add(locations(0), lValues_Forest)
+        ''lCol.Add(locations(1), lValues_IDev)
 
         'lGrapher.DatasetsCollection = lCol
 
 
         'lGrapher.DatasetsCollection = items.LabelValueCollection
-        lGrapher.Title = "Sediment Loading Rate Range"
-        lGrapher.OutputFile = "C:\temp\test\boxwhisker.png"
+        lGrapher.Title = "Title"
+        lGrapher.OutputFile = aOutputFileName
 
         'Set the color of the data series
         'if no color are supplied, then all boxes are black in color
         Dim data_colors As New List(Of Color)
         With data_colors
-            .Add(Color.Red)
+            .Add(Color.AliceBlue)
             .Add(Color.Aqua)
-            .Add(Color.Black)
-            .Add(Color.Yellow)
+            .Add(Color.Aquamarine)
+            .Add(Color.Azure)
+            .Add(Color.Beige)
+            .Add(Color.Bisque)
+            .Add(Color.BlanchedAlmond)
+            .Add(Color.Brown)
+            .Add(Color.Chartreuse)
+            .Add(Color.Crimson)
+            .Add(Color.Cyan)
+            .Add(Color.DarkGray)
+            .Add(Color.DarkMagenta)
+            .Add(Color.DarkSalmon)
+            .Add(Color.DarkTurquoise)
+            .Add(Color.DeepPink)
+            .Add(Color.DodgerBlue)
+            .Add(Color.Gold)
+            .Add(Color.Indigo)
         End With
         lGrapher.DataColors = data_colors
 
@@ -69,12 +88,12 @@ Public Module modGraphBoxWhiskers
 
         'specify Y axis title
         'if not specified, then default Y axis title will be constructed
-        lGrapher.YTitle = "My kinda quantities"
+        lGrapher.YTitle = items.Constituent & " " & items.Units
 
         'specify if to use legend
         'True: use legend to show box category instead of x-axis labels
         'False: use x-axis labels but not legend
-        lGrapher.ShowLegend = True
+        lGrapher.ShowLegend = False
 
         'call routine to make the graph
         'input argument: 
