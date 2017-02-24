@@ -31,27 +31,7 @@ Public Module modGraphBoxWhiskers
 
         Dim lGrapher As New atcGraph.clsGraphBoxWhisker(Nothing, lZgc, True)
         lGrapher.DatasetsCollection = items.LabelValueCollection
-        'Dim locations As New ArrayList()
-        ''locations = items.LabelValueCollection.Keys
-        'With locations
-        '    .Add("ForestAB")
-        '    .Add("IDev Med")
-        'End With
-        'Dim lValues_Forest As Double() = {1.637, 2.119, 3.93, 0.932, 5.006, 0.479, 3.529, 2.542, 2.344, 2.272, 0.314, 1.966, 1.295, 1.755, 0.498, 0.154, 0.608}
-        'Dim lValues_IDev As Double() = {2.417, 3.378, 3.997, 1.464, 6.383, 0.76, 4.07, 2.902, 2.687, 3.688, 0.4, 3.061, 1.929, 2.629, 0.765, 0.364, 0.745}
 
-        ''generate dataset group to hold the data
-        'Dim lCol As New atcCollection()
-        'For Each key As String In items.LabelValueCollection.Keys
-        '    lCol.Add(key, items.LabelValueCollection.ItemByKey(key))
-        'Next
-        ''lCol.Add(locations(0), lValues_Forest)
-        ''lCol.Add(locations(1), lValues_IDev)
-
-        'lGrapher.DatasetsCollection = lCol
-
-
-        'lGrapher.DatasetsCollection = items.LabelValueCollection
         lGrapher.Title = "Title"
         lGrapher.OutputFile = aOutputFileName
 
