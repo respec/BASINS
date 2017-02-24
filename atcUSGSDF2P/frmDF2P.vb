@@ -52,6 +52,8 @@ Public Class frmDF2P
 
     Private Months As Dictionary(Of String, Integer) = Nothing
 
+    Private pPeakDateDictionary As atcCollection = Nothing
+
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing,
                       Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing,
                       Optional ByVal aShowForm As Boolean = True,
@@ -67,6 +69,7 @@ Public Class frmDF2P
         pGraphRecessDatagroup = New atcTimeseriesGroup()
         pLastRunConfigs = New atcDataAttributes()
         pLastSelectedRecessions = New atcCollection()
+        pPeakDateDictionary = New atcCollection()
 
         If pRecess IsNot Nothing Then
             pRecess.Clear()
@@ -1200,6 +1203,20 @@ Public Class frmDF2P
     Public Sub RefreshGraphRecess(ByVal aDataGroup As atcTimeseriesGroup)
         If pGrapher IsNot Nothing Then
             With pGrapher.ZedGraphCtrl.GraphPane
+                If .CurveList.Count > 2 Then
+                    Dim lRemove As New ArrayList()
+                    For I As Integer = 2 To .CurveList.Count - 1
+                        'CType(.CurveList.Item(I).Points, atcGraph.atcTimeseriesPointList).Clear()
+                        '.CurveList.Item(I).Points = Nothing
+                        Dim lbl = .CurveList.Item(I).Label.Text
+                        lbl = "STOP"
+                        'lRemove.Add(.CurveList.Item(I))
+                    Next
+                    For Each lCurve As CurveItem In lRemove
+                        .CurveList.Remove(lCurve)
+                    Next
+                End If
+                '.CurveList.Clear()
                 'To see if need to refresh the axis
                 If aDataGroup IsNot Nothing AndAlso aDataGroup.Count > 0 AndAlso Not .YAxis.Title.Text = aDataGroup(0).Attributes.GetValue("Units") Then
                     .YAxis.Title.Text = ""
@@ -1224,13 +1241,28 @@ Public Class frmDF2P
         'Dim lDateMax As Double = aDataGroup(0).Dates.Value(aDataGroup(0).numValues)
         'Dim lLogFlag As Boolean = False
         With pGrapher.ZedGraphCtrl.GraphPane
-            If aDataGroup.Count > 0 Then
+            If aDataGroup.Count > 0 AndAlso .CurveList.Count = 2 Then
                 '.YAxis.Type = AxisType.Log
                 .CurveList.Item(0).Color = Drawing.Color.Blue
                 .CurveList.Item(1).Color = Drawing.Color.LightBlue
                 .Legend.IsVisible = True
+                .CurveList.Item(1).Label.Text = "b'"
                 '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
                 'CType(.CurveList.Item(1), LineItem).Line.Width = 2
+            ElseIf aDataGroup.Count > 0 AndAlso .CurveList.Count = 4 Then
+                .CurveList.Item(0).Color = Drawing.Color.Blue
+                .CurveList.Item(1).Color = Drawing.Color.Red
+                .CurveList.Item(2).Color = Drawing.Color.LightBlue
+                .CurveList.Item(3).Color = Drawing.Color.LightPink
+                .Legend.IsVisible = True
+                If .CurveList.Item(0).Label.Text.Contains("Daily") AndAlso .CurveList.Item(0).Label.Text.Contains("Flow") Then
+                    .CurveList.Item(0).Label.Text = "Daily Flow"
+                End If
+                If .CurveList.Item(1).Label.Text.Contains("Daily") AndAlso .CurveList.Item(1).Label.Text.Contains("Flow") Then
+                    .CurveList.Item(1).Label.Text = "Daily Flow (Provisional)"
+                End If
+                .CurveList.Item(2).Label.Text = "b'"
+                .CurveList.Item(3).Label.Text = "b' for provisional"
             End If
             'Scalit(lDataMin, lDataMax, lLogFlag, .XAxis.Scale.Min, .XAxis.Scale.Max)
 
@@ -1428,6 +1460,7 @@ Public Class frmDF2P
                 txtAnalysisResults.Text = ""
                 lstTable.Items.Clear()
                 pGraphRecessDatagroup.Clear()
+                pPeakDateDictionary.Clear()
                 RefreshGraphRecess(pGraphRecessDatagroup)
 
                 'Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
@@ -1449,9 +1482,14 @@ Public Class frmDF2P
                 Integer.TryParse(txtBackDays.Text, pRecess.BackTraceDays)
                 RemoveHandler lstRecessSegments.ItemCheck, AddressOf lstRecessSegments_ItemCheck
                 Dim lRecessLeg As clsRecessionSegment
+                Dim lBFIEstimateEndDate As String
                 For Each lPeakDate As String In pRecess.listOfSegments.Keys
                     lRecessLeg = pRecess.listOfSegments.ItemByKey(lPeakDate)
-                    lstRecessSegments.Items.Add(lPeakDate & "-" & lRecessLeg.EndDayDateToString())
+                    lBFIEstimateEndDate = lRecessLeg.EndDayDateToString(True)
+                    lstRecessSegments.Items.Add(lBFIEstimateEndDate)
+                    If Not pPeakDateDictionary.Keys.Contains(lBFIEstimateEndDate) Then
+                        pPeakDateDictionary.Add(lBFIEstimateEndDate, lPeakDate)
+                    End If
                     If pRecess.listOfSegments.ItemByKey(lPeakDate).BackTraceContinuousFlag(pRecess.BackTraceDays) Then
                         lstRecessSegments.SetItemChecked(lstRecessSegments.Items.Count - 1, True)
                     End If
@@ -1471,6 +1509,7 @@ Public Class frmDF2P
         End If
 
         If lConfigurationGood Then
+            'panelAnalysis.Containe
             panelConfiguration.Visible = False
             panelAnalysis.Visible = True
         End If
@@ -1546,7 +1585,9 @@ Public Class frmDF2P
         Return True
     End Function
 
-    Private Function AttributesFromForm(ByRef Args As atcDataAttributes, Optional aCheckMinLength As Boolean = True) As String
+    Private Function AttributesFromForm(ByRef Args As atcDataAttributes,
+                                        Optional aCheckMinLength As Boolean = True,
+                                        Optional aCheckForRCOnly As Boolean = False) As String
         'check validity of inputs
         Dim lErrMsg As String = ""
 
@@ -1583,7 +1624,7 @@ Public Class frmDF2P
         Dim lcons As String = pDataGroup(0).Attributes.GetValue("Constituent")
 
         Dim lMinRecLength As Integer = 0
-        If aCheckMinLength Then
+        If aCheckMinLength AndAlso Not aCheckForRCOnly Then
             If Not Integer.TryParse(txtMinRecessionDays.Text.Trim, lMinRecLength) Then
                 If lcons.ToUpper() = "GW LEVEL" OrElse lcons.ToUpper() = "GWLEVEL" Then
                     If pFall.Phase = WTFAnalysis.FindRecharge Then
@@ -1611,17 +1652,23 @@ Public Class frmDF2P
         Dim lSeason As String = pSeason
         If lSeason = "" Then lSeason = "n"
         Dim lBackTraceDays As Integer
-        If Integer.TryParse(txtBackDays.Text, lBackTraceDays) Then
-        Else
-            lErrMsg &= "- Number of days for BFImax estimate is not set" & vbCrLf
+        If Not aCheckForRCOnly Then
+            If Integer.TryParse(txtBackDays.Text, lBackTraceDays) Then
+            Else
+                lErrMsg &= "- Number of days for BFImax estimate is not set" & vbCrLf
+            End If
         End If
         Dim lRC As Double
         If Double.TryParse(txtRC.Text, lRC) Then
         Else
-            lErrMsg &= "- Recession Constant for BFImax estimate is not set" & vbCrLf
+            If aCheckForRCOnly Then
+                lErrMsg &= "- Recession Constant is not set" & vbCrLf
+            Else
+                lErrMsg &= "- Recession Constant for BFImax estimate is not set" & vbCrLf
+            End If
         End If
         If lErrMsg.Length = 0 Then
-            If aCheckMinLength Then
+            If aCheckMinLength AndAlso Not aCheckForRCOnly Then
                 Args.SetValue("MinSegmentLength", lMinRecLength)
             End If
             Args.SetValue("SelectedMonths", lMonths)
@@ -1641,7 +1688,9 @@ Public Class frmDF2P
             'Set output directory
             Args.SetValue("Output Path", txtOutputDir.Text)
             Args.SetValue("SaveInterimResults", (chkSaveInterimToFile.Checked))
-            Args.SetValue("BackTraceDays", lBackTraceDays)
+            If Not aCheckForRCOnly Then
+                Args.SetValue("BackTraceDays", lBackTraceDays)
+            End If
         End If
         Return lErrMsg
 
@@ -1740,28 +1789,30 @@ Public Class frmDF2P
             'run for the first time
             'record the selection
             For Each lItem As String In lstRecessSegments.CheckedItems
+                Dim lKey As String = pPeakDateDictionary.ItemByKey(lItem)
                 If lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
-                    lSeg = pRecess.listOfSegments.ItemByKey(lItem)
+                    lSeg = pRecess.listOfSegments.ItemByKey(lKey)
                 ElseIf lCons.ToUpper() = "GW LEVEL" Then
-                    lSeg = pFall.listOfSegments.ItemByKey(lItem)
+                    lSeg = pFall.listOfSegments.ItemByKey(lKey)
                 End If
 
-                pLastSelectedRecessions.Add(lItem, lSeg.MinDayOrdinal.ToString & "-" & lSeg.MaxDayOrdinal.ToString)
+                pLastSelectedRecessions.Add(lKey, lSeg.MinDayOrdinal.ToString & "-" & lSeg.MaxDayOrdinal.ToString)
             Next
             Return True
         Else
             'check if the current selection is different from that of the previous run
             If lstRecessSegments.CheckedItems.Count = pLastSelectedRecessions.Count Then
                 For Each lItem As String In lstRecessSegments.CheckedItems
-                    If pLastSelectedRecessions.Keys.Contains(lItem) Then
+                    Dim lKey As String = lItem.Substring(0, 10)
+                    If pLastSelectedRecessions.Keys.Contains(lKey) Then
                         If lCons = "Streamflow" OrElse lCons = "FLOW" Then
-                            lSeg = pRecess.listOfSegments.ItemByKey(lItem)
+                            lSeg = pRecess.listOfSegments.ItemByKey(lKey)
                         ElseIf lCons = "GW LEVEL" Then
-                            lSeg = pFall.listOfSegments.ItemByKey(lItem)
+                            lSeg = pFall.listOfSegments.ItemByKey(lKey)
                         End If
 
                         Dim lCurrentDuration As String = lSeg.MinDayOrdinal.ToString & "-" & lSeg.MaxDayOrdinal.ToString
-                        If pLastSelectedRecessions.ItemByKey(lItem) <> lCurrentDuration Then
+                        If pLastSelectedRecessions.ItemByKey(lKey) <> lCurrentDuration Then
                             lIsSelectionChanged = True
                             Exit For
                         End If
@@ -1917,13 +1968,23 @@ Public Class frmDF2P
         pZgc.Visible = False
         Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
         If lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
-            pRecess.DoOperation("estimate_bfi", lstRecessSegments.SelectedItem.ToString)
+            pRecess.DoOperation("estimate_bfi", pPeakDateDictionary.ItemByKey(lstRecessSegments.SelectedItem.ToString()))
             Dim lMsg As String = pRecess.Bulletin
             If Not String.IsNullOrEmpty(lMsg) Then
                 If lMsg.StartsWith("SUCCESS") Then
                     Dim lArr() As String = lMsg.Split(",")
                     Double.TryParse(lMsg.Substring(lMsg.LastIndexOf(",") + 1), pRecess.df2p_parameters.BFImax)
-                    lblEstimatedBFImax.Text = "Estimated BFImax (" + lstRecessSegments.SelectedItem.ToString + ", RC=" + txtRC.Text + ", Duration=" + lArr(1) + " days): "
+
+                    Dim lDateFormat As New atcDateFormat()
+                    With lDateFormat
+                        .IncludeHours = False
+                        .IncludeMinutes = False
+                        .IncludeSeconds = False
+                        .Midnight24 = False
+                    End With
+
+                    Dim lDuration As String = lDateFormat.JDateToString(pRecess.df2p_parameters.BFIEstimateStartDate) & "-" & lDateFormat.JDateToString(pRecess.df2p_parameters.BFIEstimateEndDate)
+                    lblEstimatedBFImax.Text = "Estimated BFImax (" + lDuration + ", RC=" + txtRC.Text + ", Duration=" + lArr(1) + " days): "
                     txtBFImax.Text = DoubleToString(pRecess.df2p_parameters.BFImax, 6, "0.0000")
                     lblEstimatedBFImax.Left = btnConfiguration.Right + 100
                     txtBFImax.Left = lblEstimatedBFImax.Right + 15
@@ -2080,14 +2141,33 @@ Public Class frmDF2P
 
     End Sub
 
-    Private Sub DoSummary(ByVal aRecess As clsRecess)
+    Private Sub btnSaveRC_Click(sender As Object, e As EventArgs) Handles btnSaveRC.Click
+        Dim lAttrs As New atcDataAttributes()
+        Dim lMsg As String = AttributesFromForm(lAttrs, False, True)
+        If Not String.IsNullOrEmpty(lMsg) Then
+            Logger.Msg("Please correct the following issues before saving:" & vbCrLf & lMsg, MsgBoxStyle.Exclamation, "Save Recession Constant")
+            Exit Sub
+        End If
+        pRecess.OutputPath = txtOutputDir.Text
+        Dim lSdate As Double = lAttrs.GetValue("Start Date", pDataGroup(0).Dates.Value(0))
+        Dim lEdate As Double = lAttrs.GetValue("End Date", pDataGroup(0).Dates.Value(pDataGroup(0).numValues))
+        pRecess.FlowData = SubsetByDate(pDataGroup(0), lSdate, lEdate, Nothing)
+        Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
+        If lCons = "Streamflow" OrElse lCons = "FLOW" Then
+            DoSummary(pRecess, True)
+        ElseIf lCons = "GW LEVEL" Then
+            DoSummary(pFall)
+        End If
+    End Sub
+
+    Private Sub DoSummary(ByVal aRecess As clsRecess, Optional ByVal aRCOnly As Boolean = False)
         If Not (RecessionSelectionChanged() OrElse ConfigurationChanged()) Then
             'If aRecess.SaveInterimResults Then aRecess.SaveInterimResults = False
         Else
             If chkSaveInterimToFile.Checked Then aRecess.SaveInterimResults = True
             If aRecess.FileOut1Created Then aRecess.FileOut1Created = False
         End If
-        aRecess.DoOperation("summary", "")
+        'aRecess.DoOperation("summary", "")
         With pDataGroup(0).Attributes
             'If clsRecess.CF_RC Is Nothing Then
             '    clsRecess.CF_RC = New atcAttributeDefinition()
@@ -2103,22 +2183,24 @@ Public Class frmDF2P
             '    clsRecess.CF_BFImax.Editable = False
             'End If
             .SetValue(clsRecess.CF_RC, aRecess.df2p_parameters.RecessionConstant)
-            Dim lBFImax As Double
-            If Double.TryParse(txtBFImax.Text, lBFImax) Then
-                .SetValue(clsRecess.CF_BFImax, lBFImax)
-                clsBaseflow2PRDF.Estimated_BFImax = lBFImax
-                'clsBaseflow2PRDF.Estimated_BFImax = pRecess.df2p_parameters.BFImax
-            End If
-            Dim lParentSerial As Integer = .GetValue("ParentSerial", -999)
-            If lParentSerial >= 1 Then
-                For Each lTser As atcTimeseries In atcDataManager.DataSets
-                    If lTser.Serial = lParentSerial Then
-                        With lTser.Attributes
-                            .SetValue(clsRecess.CF_RC, aRecess.df2p_parameters.RecessionConstant)
-                            .SetValue(clsRecess.CF_BFImax, lBFImax)
-                        End With
-                    End If
-                Next
+            If Not aRCOnly Then
+                Dim lBFImax As Double = Double.NaN
+                If Double.TryParse(txtBFImax.Text, lBFImax) Then
+                    .SetValue(clsRecess.CF_BFImax, lBFImax)
+                    clsBaseflow2PRDF.Estimated_BFImax = lBFImax
+                    'clsBaseflow2PRDF.Estimated_BFImax = pRecess.df2p_parameters.BFImax
+                End If
+                Dim lParentSerial As Integer = .GetValue("ParentSerial", -999)
+                If lParentSerial >= 1 Then
+                    For Each lTser As atcTimeseries In atcDataManager.DataSets
+                        If lTser.Serial = lParentSerial Then
+                            With lTser.Attributes
+                                .SetValue(clsRecess.CF_RC, aRecess.df2p_parameters.RecessionConstant)
+                                .SetValue(clsRecess.CF_BFImax, lBFImax)
+                            End With
+                        End If
+                    Next
+                End If
             End If
         End With
         'txtAnalysisResults.Text = aRecess.Bulletin
@@ -2130,7 +2212,7 @@ Public Class frmDF2P
         '    RefreshGraphRecess(pGraphRecessDatagroup)
         'End If
 
-        pRecess.DF2P_Output()
+        pRecess.DF2P_Output_Ver2(aRCOnly)
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
@@ -2188,6 +2270,8 @@ Public Class frmDF2P
         panelConfiguration.Dock = DockStyle.Fill
         panelAnalysis.Dock = DockStyle.Fill
         rdoNoSeason.Checked = True
+        'lstRecessSegments.Width = 225
+        lstRecessSegments.Anchor = AnchorStyles.Left + AnchorStyles.Top + AnchorStyles.Bottom
     End Sub
 
     Private Sub btnFallPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
@@ -2303,14 +2387,47 @@ Public Class frmDF2P
             lArgs.SetValue("MonthsToSkip", lMonthsToSkip)
         End If
         Dim lTs As atcTimeseries = SubsetByDate(pDataGroup(0), lStartDate, lEndDate, Nothing)
-        Dim lBFDF2P As New clsBaseflow2PRDF()
-        lBFDF2P.CalculateBFImax_RC(lTs, lArgs)
-        If Not Double.IsNaN(lBFDF2P.RC) Then
-            clsBaseflow2PRDF.Estimated_RC = lBFDF2P.RC
-            pRecess.df2p_parameters.RecessionConstant = lBFDF2P.RC
-            txtRC.Text = lBFDF2P.RC.ToString()
-            pRecess.df2p_parameters.Estimated_RC = True
-            'txtRC2.Text = lBFDF2P.RC.ToString()
+        If chkRCregression.Checked Then
+            Dim lXs As New ArrayList()
+            Dim lYs As New ArrayList()
+            Dim lX() As Double = Nothing
+            Dim lY() As Double = Nothing
+            Dim lCoeff1 As Double = Double.NaN
+            Dim lCoeff2 As Double = Double.NaN
+            Dim lDates(5) As Integer
+            For I As Integer = 1 To lTs.numValues - 1
+                J2Date(lTs.Dates.Value(I - 1), lDates)
+                If Not lMonthsToSkip.Contains(lDates(1)) Then
+                    If Not Double.IsNaN(lTs.Value(I)) AndAlso
+                       Not Double.IsNaN(lTs.Value(I + 1)) AndAlso
+                       lTs.Value(I) >= 0 AndAlso
+                       lTs.Value(I + 1) >= 0 Then
+                        lXs.Add(lTs.Value(I))
+                        lYs.Add(lTs.Value(I + 1))
+                    End If
+                End If
+            Next
+            lX = CType(lXs.ToArray(GetType(Double)), Double())
+            lY = CType(lYs.ToArray(GetType(Double)), Double())
+            pRecess.DoRegression2(lX, lY, lXs.Count - 1, lCoeff1, lCoeff2)
+            If Not Double.IsNaN(lCoeff1) Then
+                clsBaseflow2PRDF.Estimated_RC = lCoeff1
+                pRecess.df2p_parameters.RecessionConstant = lCoeff1
+                RemoveHandler txtRC.TextChanged, AddressOf txtRC_TextChanged
+                txtRC.Text = DoubleToString(lCoeff1, 6, "0.0000")
+                AddHandler txtRC.TextChanged, AddressOf txtRC_TextChanged
+                pRecess.df2p_parameters.Estimated_RC = True
+            End If
+        Else
+            Dim lBFDF2P As New clsBaseflow2PRDF()
+            lBFDF2P.CalculateBFImax_RC(lTs, lArgs)
+            If Not Double.IsNaN(lBFDF2P.RC) Then
+                clsBaseflow2PRDF.Estimated_RC = lBFDF2P.RC
+                pRecess.df2p_parameters.RecessionConstant = lBFDF2P.RC
+                txtRC.Text = lBFDF2P.RC.ToString()
+                pRecess.df2p_parameters.Estimated_RC = True
+                'txtRC2.Text = lBFDF2P.RC.ToString()
+            End If
         End If
     End Sub
 
@@ -2318,6 +2435,7 @@ Public Class frmDF2P
         If Double.TryParse(txtRC.Text, pRecess.df2p_parameters.RecessionConstant) Then
             clsBaseflow2PRDF.Estimated_RC = pRecess.df2p_parameters.RecessionConstant
             pRecess.df2p_parameters.Estimated_RC = False
+            chkRCregression.Checked = False
         Else
             pRecess.df2p_parameters.RecessionConstant = Double.NaN
         End If
