@@ -169,8 +169,18 @@ FoundMatch:
             MakeDepthAndElevationYAxes(aDataGroup, aZgc, lElevation, lYaxisNames, lCommonTimeUnitName, lCommonScenario, lCommonConstituent)
         Else
             For Each lTimeseries As atcTimeseries In aDataGroup
-                Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYaxisNames.ItemByKey(lTimeseries.Serial))
-                lCurve.Label.Text = TSCurveLabel(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
+                Dim lCurveDict As Generic.Dictionary(Of String, ZedGraph.CurveItem) = AddTimeseriesCurve(lTimeseries, aZgc, lYaxisNames.ItemByKey(lTimeseries.Serial))
+                Dim lMiscText As String = ""
+                For Each lKey As String In lCurveDict.Keys
+                    If lKey = "provisional" Then
+                        lMiscText = "Provisional"
+                    ElseIf lKey = "nonprovisional" Then
+                        lMiscText = ""
+                    End If
+                    lCurveDict.Item(lKey).Label.Text = TSCurveLabel(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits, lMiscText)
+                Next
+                lCurveDict.Clear()
+                lCurveDict = Nothing
             Next
 
             If lLeftDataSets.Count > 0 Then
@@ -244,8 +254,20 @@ FoundMatch:
                     lRightAxisTitle = "Groundwater elevation, feet, " & lTimeseries.Attributes.GetValue("alt_datum_cd")
                 End If
             End If
-            Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYAxisName)
-            lCurve.Label.Text = TSCurveLabel(lTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, "", "feet")
+            'Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYAxisName)
+            'lCurve.Label.Text = TSCurveLabel(lTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, "", "feet")
+            Dim lCurveDict As Generic.Dictionary(Of String, ZedGraph.CurveItem) = AddTimeseriesCurve(lTimeseries, aZgc, lYAxisName)
+            Dim lMiscText As String = ""
+            For Each lKey As String In lCurveDict.Keys
+                If lKey = "provisional" Then
+                    lMiscText = "Provisional"
+                ElseIf lKey = "nonprovisional" Then
+                    lMiscText = ""
+                End If
+                lCurveDict.Item(lKey).Label.Text = TSCurveLabel(lTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, "", "feet", lMiscText)
+            Next
+            lCurveDict.Clear()
+            lCurveDict = Nothing
         Next
         With lMain.YAxis
             If lLeftAxisTitle Is Nothing Then
@@ -472,16 +494,18 @@ FoundMatch:
     ''' <param name="aTimeseries">Timeseries data to turn into a curve</param>
     ''' <param name="aZgc">ZedGraphControl to add the curve to</param>
     ''' <param name="aYAxisName">Y axis to use (LEFT, RIGHT, or AUX)</param>
-    ''' <remarks></remarks>
-    <CLSCompliant(False)> _
-    Function AddTimeseriesCurve(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aYAxisName As String, _
-                       Optional ByVal aCommonTimeUnitName As String = Nothing, _
-                       Optional ByVal aCommonScenario As String = Nothing, _
-                       Optional ByVal aCommonConstituent As String = Nothing, _
-                       Optional ByVal aCommonLocation As String = Nothing, _
-                       Optional ByVal aCommonUnits As String = Nothing) As CurveItem
+    ''' <return>A dictionary of ZedGraph CurveItem Objects, i.e. non-provisional and/or provisional data curves</return>
+    ''' <remarks>The returned collection of CurveItem is keyed on provisional or non-provisional</remarks>
+    <CLSCompliant(False)>
+    Function AddTimeseriesCurve(ByVal aTimeseries As atcTimeseries, ByVal aZgc As ZedGraphControl, ByVal aYAxisName As String,
+                       Optional ByVal aCommonTimeUnitName As String = Nothing,
+                       Optional ByVal aCommonScenario As String = Nothing,
+                       Optional ByVal aCommonConstituent As String = Nothing,
+                       Optional ByVal aCommonLocation As String = Nothing,
+                       Optional ByVal aCommonUnits As String = Nothing) As Generic.Dictionary(Of String, CurveItem)
 
         Dim lCurve As LineItem = Nothing
+        Dim lCurveDict As New Generic.Dictionary(Of String, CurveItem)()
 
         'Graph provisional data separately
         Dim lGraphThese As New atcTimeseriesGroup
@@ -556,13 +580,22 @@ FoundMatch:
                         Case "rearwardsegment" : lCurve.Line.StepType = StepType.RearwardSegment
                     End Select
                 End If
+                If lCurveLabel.Contains("Provisional") Then
+                    If Not lCurveDict.ContainsKey("provisional") Then
+                        lCurveDict.Add("provisional", lCurve)
+                    End If
+                Else
+                    If Not lCurveDict.ContainsKey("nonprovisional") Then
+                        lCurveDict.Add("nonprovisional", lCurve)
+                    End If
+                End If
 
                 lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lTimeseries.Attributes.GetValue("Data Source")   'Make this easy to find again even if label changes
 
                 If aYAxisName.ToUpper.Equals("RIGHT") Then lCurve.IsY2Axis = True
 
                 'Use units as Y axis title (if this data has units and Y axis title is not set)
-                If lTimeseries.Attributes.ContainsAttribute("Units") AndAlso _
+                If lTimeseries.Attributes.ContainsAttribute("Units") AndAlso
                    (lYAxis.Title Is Nothing OrElse lYAxis.Title.Text Is Nothing OrElse lYAxis.Title.Text.Length = 0) Then
                     lYAxis.Title.Text = lTimeseries.Attributes.GetValue("Units")
                     lYAxis.Title.IsVisible = True
@@ -608,21 +641,22 @@ FoundMatch:
             End If
         End If
 
-        Return lCurve
+        Return lCurveDict
     End Function
 
-    Public Function TSCurveLabel(ByVal aTimeseries As atcTimeseries, _
-                        Optional ByVal aCommonTimeUnitName As String = Nothing, _
-                        Optional ByVal aCommonScenario As String = Nothing, _
-                        Optional ByVal aCommonConstituent As String = Nothing, _
-                        Optional ByVal aCommonLocation As String = Nothing, _
-                        Optional ByVal aCommonUnits As String = Nothing) As String
+    Public Function TSCurveLabel(ByVal aTimeseries As atcTimeseries,
+                        Optional ByVal aCommonTimeUnitName As String = Nothing,
+                        Optional ByVal aCommonScenario As String = Nothing,
+                        Optional ByVal aCommonConstituent As String = Nothing,
+                        Optional ByVal aCommonLocation As String = Nothing,
+                        Optional ByVal aCommonUnits As String = Nothing,
+                        Optional ByVal aMiscText As String = "") As String
         With aTimeseries.Attributes
             Dim lCurveLabel As String = ""
 
             If String.IsNullOrEmpty(aCommonTimeUnitName) _
               AndAlso aTimeseries.Attributes.ContainsAttribute("Time Unit") Then
-                lCurveLabel &= TimeUnitName(aTimeseries.Attributes.GetValue("Time Unit"), _
+                lCurveLabel &= TimeUnitName(aTimeseries.Attributes.GetValue("Time Unit"),
                                             aTimeseries.Attributes.GetValue("Time Step", 1)) & " "
             Else
                 lCurveLabel &= aCommonTimeUnitName & " "
@@ -660,6 +694,9 @@ FoundMatch:
                 lCurveLabel &= " (" & .GetValue("Units", "") & ")"
             End If
 
+            If Not String.IsNullOrEmpty(aMiscText) Then
+                lCurveLabel &= " (" & aMiscText & ")"
+            End If
             Return lCurveLabel.Replace("<unk>", "").Trim '.GetValue("scenario") & " " & .GetValue("constituent") & " at " & .GetValue("location")
         End With
     End Function

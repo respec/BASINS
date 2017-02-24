@@ -132,7 +132,7 @@ Public Class clsGraphBoxWhisker
     Public Sub New(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZedGraphControl As ZedGraphControl, Optional aDelaySetup As Boolean = False)
         MyBase.New(aDataGroup, aZedGraphControl)
         If Not aDelaySetup Then
-            SetUpGraph(True)
+            SetUpGraph()
         End If
     End Sub
 
@@ -141,7 +141,7 @@ Public Class clsGraphBoxWhisker
             Return MyBase.Datasets
         End Get
         Set(ByVal newValue As atcTimeseriesGroup)
-            If newValue IsNot Nothing AndAlso newValue.Count > 1 Then
+            If newValue IsNot Nothing AndAlso newValue.Count > 0 Then
                 MyBase.Datasets = newValue
             End If
         End Set
@@ -351,7 +351,7 @@ Public Class clsGraphBoxWhisker
         'pZgc.GraphPane.Chart.Rect = New RectangleF(leftMargin, topMargin, width - leftMargin - rightMargin, height - topMargin - bottomMargin)
 
         If OutputToFile Then
-            If IO.Directory.Exists(IO.Path.GetDirectoryName(pOutputFile)) Then
+            If Not String.IsNullOrEmpty(pOutputFile) AndAlso IO.Directory.Exists(IO.Path.GetDirectoryName(pOutputFile)) Then
                 'pZgc.GraphPane.GetImage().Save("C:\temp\test\boxwhisker.bmp")
                 pZgc.GraphPane.GetImage().Save(pOutputFile)
             End If

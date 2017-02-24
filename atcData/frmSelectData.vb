@@ -495,8 +495,18 @@ FoundProvisional:
             End If
             Logger.Dbg("The number of datasets selected is " & pSelectedGroup.Count)
             For Each lTimeseries As atcTimeseries In pSelectedGroup
-                Logger.Dbg("Data Source for Time Series is " & lTimeseries.Attributes.GetDefinedValue("Data Source").Value & "")
-
+                If lTimeseries.Attributes.ContainsAttribute("Data Source") Then
+                    Logger.Dbg("Data Source for Time Series is " & lTimeseries.Attributes.GetDefinedValue("Data Source").Value & "")
+                Else
+                    If lTimeseries.Attributes.ContainsAttribute("ParentSerial") Then
+                        Dim lID As Long = lTimeseries.Attributes.GetValue("ParentSerial")
+                        For Each lDataset As atcTimeseries In atcDataManager.DataSets
+                            If lDataset.Serial = lID AndAlso lDataset.Attributes.ContainsAttribute("Data Source") Then
+                                Logger.Dbg("Data Source for Time Series is " & lDataset.Attributes.GetDefinedValue("Data Source").Value & "")
+                            End If
+                        Next
+                    End If
+                End If
             Next lTimeseries
 
             Return pSelectedGroup

@@ -38,9 +38,22 @@ Public Class clsGraphCumulativeDifference
                         Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", 0)
                         Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnit, lCommonTimeStep)
                         For Each lTimeseries As atcTimeseries In Datasets
-                            Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, pZgc, FindYAxis(lTimeseries, pZgc, Datasets))
-                            lCurve.Label.Text = TSCurveLabel(aDataGroup(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonTimeUnit) _
-                                      & " - " & TSCurveLabel(aDataGroup(1), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonTimeUnit)
+                            'Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, pZgc, FindYAxis(lTimeseries, pZgc, Datasets))
+                            'lCurve.Label.Text = TSCurveLabel(aDataGroup(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonTimeUnit) _
+                            '          & " - " & TSCurveLabel(aDataGroup(1), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonTimeUnit)
+                            Dim lCurveDict As Generic.Dictionary(Of String, ZedGraph.CurveItem) = AddTimeseriesCurve(lTimeseries, pZgc, FindYAxis(lTimeseries, pZgc, Datasets))
+                            Dim lMiscText As String = ""
+                            For Each lKey As String In lCurveDict.Keys
+                                If lKey = "provisional" Then
+                                    lMiscText = "Provisional"
+                                ElseIf lKey = "nonprovisional" Then
+                                    lMiscText = ""
+                                End If
+                                lCurveDict.Item(lKey).Label.Text = TSCurveLabel(aDataGroup(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonTimeUnit) _
+                                          & " - " & TSCurveLabel(aDataGroup(1), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonTimeUnit, lMiscText)
+                            Next
+                            lCurveDict.Clear()
+                            lCurveDict = Nothing
                         Next
                         pZgc.MasterPane.PaneList(0).XAxis.Title.Text = "Cummulative Difference"
                         AxisTitlesFromCommonAttributes(pZgc.MasterPane.PaneList(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
