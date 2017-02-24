@@ -1665,10 +1665,14 @@ Public Class clsRecess
     End Sub '}
 
     '{
-    Public Sub DF2P_Output_Ver2()
+    Public Sub DF2P_Output_Ver2(Optional ByVal aRCOnly As Boolean = False)
         Dim lSW As IO.StreamWriter = Nothing
         Dim lTable As New atcTableFixed()
         Dim lRecordText As New System.Text.StringBuilder()
+        If Not IO.Directory.Exists(OutputPath) Then
+            Logger.Msg("Output path is not specified.", MsgBoxStyle.Exclamation, "Save Two Parameter Digital Filter Parameters")
+            Exit Sub
+        End If
         Dim lfile_name As String = IO.Path.Combine(OutputPath, pFileRC_BFI)
         Try
             If IO.File.Exists(lfile_name) Then
@@ -1731,16 +1735,18 @@ Public Class clsRecess
                 Else
                     .Value(4) = DoubleToString(df2p_parameters.RecessionConstant)
                 End If
-                With lDateFormat
-                    .IncludeMonths = True
-                    .IncludeDays = True
-                    .DateSeparator = "/"
-                End With
-                .Value(6) = lDateFormat.JDateToString(df2p_parameters.BFIEstimateStartDate)
-                .Value(7) = lDateFormat.JDateToString(df2p_parameters.BFIEstimateEndDate)
-                Dim lDuration As Double = (df2p_parameters.BFIEstimateEndDate - df2p_parameters.BFIEstimateStartDate) / JulianHour / 24.0 + 1
-                .Value(8) = Int(lDuration).ToString()
-                .Value(9) = DoubleToString(df2p_parameters.BFImax, 6,)
+                If Not aRCOnly Then
+                    With lDateFormat
+                        .IncludeMonths = True
+                        .IncludeDays = True
+                        .DateSeparator = "/"
+                    End With
+                    .Value(6) = lDateFormat.JDateToString(df2p_parameters.BFIEstimateStartDate)
+                    .Value(7) = lDateFormat.JDateToString(df2p_parameters.BFIEstimateEndDate)
+                    Dim lDuration As Double = (df2p_parameters.BFIEstimateEndDate - df2p_parameters.BFIEstimateStartDate) / JulianHour / 24.0 + 1
+                    .Value(8) = Int(lDuration).ToString()
+                    .Value(9) = DoubleToString(df2p_parameters.BFImax, 6,)
+                End If
                 .CurrentRecord = 1
                 Dim lColumn As Integer
                 For lColumn = 1 To .NumFields

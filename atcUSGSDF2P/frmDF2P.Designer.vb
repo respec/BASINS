@@ -73,6 +73,8 @@ Partial Class frmDF2P
         Me.lblRC2 = New System.Windows.Forms.Label()
         Me.btnConfiguration = New System.Windows.Forms.Button()
         Me.chkRCregression = New System.Windows.Forms.CheckBox()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.btnSaveRC = New System.Windows.Forms.Button()
         Me.gbMonthSeason.SuspendLayout()
         Me.gbDates.SuspendLayout()
         Me.scDisplay.Panel1.SuspendLayout()
@@ -456,6 +458,8 @@ Partial Class frmDF2P
         '
         'panelConfiguration
         '
+        Me.panelConfiguration.Controls.Add(Me.btnSaveRC)
+        Me.panelConfiguration.Controls.Add(Me.Button1)
         Me.panelConfiguration.Controls.Add(Me.chkRCregression)
         Me.panelConfiguration.Controls.Add(Me.lblMinRecessDays)
         Me.panelConfiguration.Controls.Add(Me.lblRecessionDays)
@@ -621,6 +625,24 @@ Partial Class frmDF2P
         Me.chkRCregression.Text = "Regression (k+1 vs k)"
         Me.chkRCregression.UseVisualStyleBackColor = True
         '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(0, 0)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.TabIndex = 55
+        Me.Button1.Text = "Button1"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
+        'btnSaveRC
+        '
+        Me.btnSaveRC.Location = New System.Drawing.Point(206, 253)
+        Me.btnSaveRC.Name = "btnSaveRC"
+        Me.btnSaveRC.Size = New System.Drawing.Size(75, 22)
+        Me.btnSaveRC.TabIndex = 56
+        Me.btnSaveRC.Text = "Save"
+        Me.btnSaveRC.UseVisualStyleBackColor = True
+        '
         'frmDF2P
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -703,4 +725,6 @@ Partial Class frmDF2P
     Friend WithEvents lblEstimatedBFImax As Windows.Forms.Label
     Friend WithEvents txtBFImax As Windows.Forms.TextBox
     Friend WithEvents chkRCregression As Windows.Forms.CheckBox
+    Friend WithEvents btnSaveRC As Windows.Forms.Button
+    Friend WithEvents Button1 As Windows.Forms.Button
 End Class
