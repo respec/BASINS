@@ -52,6 +52,8 @@ Public Class frmDF2P
 
     Private Months As Dictionary(Of String, Integer) = Nothing
 
+    Private pPeakDateDictionary As atcCollection = Nothing
+
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing,
                       Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing,
                       Optional ByVal aShowForm As Boolean = True,
@@ -67,6 +69,7 @@ Public Class frmDF2P
         pGraphRecessDatagroup = New atcTimeseriesGroup()
         pLastRunConfigs = New atcDataAttributes()
         pLastSelectedRecessions = New atcCollection()
+        pPeakDateDictionary = New atcCollection()
 
         If pRecess IsNot Nothing Then
             pRecess.Clear()
@@ -1457,6 +1460,7 @@ Public Class frmDF2P
                 txtAnalysisResults.Text = ""
                 lstTable.Items.Clear()
                 pGraphRecessDatagroup.Clear()
+                pPeakDateDictionary.Clear()
                 RefreshGraphRecess(pGraphRecessDatagroup)
 
                 'Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
@@ -1478,9 +1482,14 @@ Public Class frmDF2P
                 Integer.TryParse(txtBackDays.Text, pRecess.BackTraceDays)
                 RemoveHandler lstRecessSegments.ItemCheck, AddressOf lstRecessSegments_ItemCheck
                 Dim lRecessLeg As clsRecessionSegment
+                Dim lBFIEstimateEndDate As String
                 For Each lPeakDate As String In pRecess.listOfSegments.Keys
                     lRecessLeg = pRecess.listOfSegments.ItemByKey(lPeakDate)
-                    lstRecessSegments.Items.Add(lPeakDate & " ~ " & lRecessLeg.EndDayDateToString())
+                    lBFIEstimateEndDate = lRecessLeg.EndDayDateToString(True)
+                    lstRecessSegments.Items.Add(lBFIEstimateEndDate)
+                    If Not pPeakDateDictionary.Keys.Contains(lBFIEstimateEndDate) Then
+                        pPeakDateDictionary.Add(lBFIEstimateEndDate, lPeakDate)
+                    End If
                     If pRecess.listOfSegments.ItemByKey(lPeakDate).BackTraceContinuousFlag(pRecess.BackTraceDays) Then
                         lstRecessSegments.SetItemChecked(lstRecessSegments.Items.Count - 1, True)
                     End If
@@ -1770,7 +1779,7 @@ Public Class frmDF2P
             'run for the first time
             'record the selection
             For Each lItem As String In lstRecessSegments.CheckedItems
-                Dim lKey As String = lItem.Substring(0, 10)
+                Dim lKey As String = pPeakDateDictionary.ItemByKey(lItem)
                 If lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
                     lSeg = pRecess.listOfSegments.ItemByKey(lKey)
                 ElseIf lCons.ToUpper() = "GW LEVEL" Then
@@ -1949,7 +1958,7 @@ Public Class frmDF2P
         pZgc.Visible = False
         Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
         If lCons.ToUpper() = "STREAMFLOW" OrElse lCons.ToUpper() = "FLOW" Then
-            pRecess.DoOperation("estimate_bfi", lstRecessSegments.SelectedItem.ToString)
+            pRecess.DoOperation("estimate_bfi", pPeakDateDictionary.ItemByKey(lstRecessSegments.SelectedItem.ToString()))
             Dim lMsg As String = pRecess.Bulletin
             If Not String.IsNullOrEmpty(lMsg) Then
                 If lMsg.StartsWith("SUCCESS") Then
@@ -2230,7 +2239,7 @@ Public Class frmDF2P
         panelConfiguration.Dock = DockStyle.Fill
         panelAnalysis.Dock = DockStyle.Fill
         rdoNoSeason.Checked = True
-        lstRecessSegments.Width = 225
+        'lstRecessSegments.Width = 225
         lstRecessSegments.Anchor = AnchorStyles.Left + AnchorStyles.Top + AnchorStyles.Bottom
     End Sub
 
