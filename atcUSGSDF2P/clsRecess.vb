@@ -894,8 +894,8 @@ Public Class clsRecess
 
     Public Overridable Function DoOperation(ByVal aOperation As String, ByVal aRecessKey As String) As Boolean
         If Not String.IsNullOrEmpty(aRecessKey) Then
-            Dim lKey As String = aRecessKey.Substring(0, 10)
-            RecessionSegment = listOfSegments.ItemByKey(lKey)
+            'Dim lKey As String = aRecessKey.Substring(0, 10)
+            RecessionSegment = listOfSegments.ItemByKey(aRecessKey)
             If RecessionSegment.NeedtoReadData Then
                 RecessionSegment.GetData()
             End If
@@ -1946,7 +1946,7 @@ Public Class clsRecess
 
     ' -----THIS SUBROUTINE PERFORMS LEAST-SQUARES REGRESSION TO FIND BEST-FIT ---
     ' ---------------- EQUATION OF LINEAR BASIS ( Y = A*X + B ) -----------------
-    Private Sub DoRegression2(ByVal aX() As Double, ByVal aY() As Double, ByVal aNumOfDaysInPeriod As Integer, ByRef aCoeff1 As Double, ByRef aCoeff2 As Double)
+    Friend Sub DoRegression2(ByVal aX() As Double, ByVal aY() As Double, ByVal aNumOfDaysInPeriod As Integer, ByRef aCoeff1 As Double, ByRef aCoeff2 As Double)
         Dim lA(2, 4) As Double
         Dim lRoot1 As Double = 0.0
         Dim lRoot2 As Double = 0.0

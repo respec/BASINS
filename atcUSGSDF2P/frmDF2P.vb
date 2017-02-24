@@ -2356,14 +2356,47 @@ Public Class frmDF2P
             lArgs.SetValue("MonthsToSkip", lMonthsToSkip)
         End If
         Dim lTs As atcTimeseries = SubsetByDate(pDataGroup(0), lStartDate, lEndDate, Nothing)
-        Dim lBFDF2P As New clsBaseflow2PRDF()
-        lBFDF2P.CalculateBFImax_RC(lTs, lArgs)
-        If Not Double.IsNaN(lBFDF2P.RC) Then
-            clsBaseflow2PRDF.Estimated_RC = lBFDF2P.RC
-            pRecess.df2p_parameters.RecessionConstant = lBFDF2P.RC
-            txtRC.Text = lBFDF2P.RC.ToString()
-            pRecess.df2p_parameters.Estimated_RC = True
-            'txtRC2.Text = lBFDF2P.RC.ToString()
+        If chkRCregression.Checked Then
+            Dim lXs As New ArrayList()
+            Dim lYs As New ArrayList()
+            Dim lX() As Double = Nothing
+            Dim lY() As Double = Nothing
+            Dim lCoeff1 As Double = Double.NaN
+            Dim lCoeff2 As Double = Double.NaN
+            Dim lDates(5) As Integer
+            For I As Integer = 1 To lTs.numValues - 1
+                J2Date(lTs.Dates.Value(I - 1), lDates)
+                If Not lMonthsToSkip.Contains(lDates(1)) Then
+                    If Not Double.IsNaN(lTs.Value(I)) AndAlso
+                       Not Double.IsNaN(lTs.Value(I + 1)) AndAlso
+                       lTs.Value(I) >= 0 AndAlso
+                       lTs.Value(I + 1) >= 0 Then
+                        lXs.Add(lTs.Value(I))
+                        lYs.Add(lTs.Value(I + 1))
+                    End If
+                End If
+            Next
+            lX = CType(lXs.ToArray(GetType(Double)), Double())
+            lY = CType(lYs.ToArray(GetType(Double)), Double())
+            pRecess.DoRegression2(lX, lY, lXs.Count - 1, lCoeff1, lCoeff2)
+            If Not Double.IsNaN(lCoeff1) Then
+                clsBaseflow2PRDF.Estimated_RC = lCoeff1
+                pRecess.df2p_parameters.RecessionConstant = lCoeff1
+                RemoveHandler txtRC.TextChanged, AddressOf txtRC_TextChanged
+                txtRC.Text = DoubleToString(lCoeff1, 6, "0.0000")
+                AddHandler txtRC.TextChanged, AddressOf txtRC_TextChanged
+                pRecess.df2p_parameters.Estimated_RC = True
+            End If
+        Else
+            Dim lBFDF2P As New clsBaseflow2PRDF()
+            lBFDF2P.CalculateBFImax_RC(lTs, lArgs)
+            If Not Double.IsNaN(lBFDF2P.RC) Then
+                clsBaseflow2PRDF.Estimated_RC = lBFDF2P.RC
+                pRecess.df2p_parameters.RecessionConstant = lBFDF2P.RC
+                txtRC.Text = lBFDF2P.RC.ToString()
+                pRecess.df2p_parameters.Estimated_RC = True
+                'txtRC2.Text = lBFDF2P.RC.ToString()
+            End If
         End If
     End Sub
 
@@ -2371,6 +2404,7 @@ Public Class frmDF2P
         If Double.TryParse(txtRC.Text, pRecess.df2p_parameters.RecessionConstant) Then
             clsBaseflow2PRDF.Estimated_RC = pRecess.df2p_parameters.RecessionConstant
             pRecess.df2p_parameters.Estimated_RC = False
+            chkRCregression.Checked = False
         Else
             pRecess.df2p_parameters.RecessionConstant = Double.NaN
         End If

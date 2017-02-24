@@ -72,6 +72,7 @@ Partial Class frmDF2P
         Me.txtRC2 = New System.Windows.Forms.TextBox()
         Me.lblRC2 = New System.Windows.Forms.Label()
         Me.btnConfiguration = New System.Windows.Forms.Button()
+        Me.chkRCregression = New System.Windows.Forms.CheckBox()
         Me.gbMonthSeason.SuspendLayout()
         Me.gbDates.SuspendLayout()
         Me.scDisplay.Panel1.SuspendLayout()
@@ -116,7 +117,7 @@ Partial Class frmDF2P
         Me.txtMinRecessionDays.Location = New System.Drawing.Point(581, 227)
         Me.txtMinRecessionDays.Name = "txtMinRecessionDays"
         Me.txtMinRecessionDays.Size = New System.Drawing.Size(54, 20)
-        Me.txtMinRecessionDays.TabIndex = 9
+        Me.txtMinRecessionDays.TabIndex = 13
         Me.txtMinRecessionDays.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'lblRecessionDays
@@ -417,10 +418,10 @@ Partial Class frmDF2P
         'btnGetAllSegments
         '
         Me.btnGetAllSegments.AutoSize = True
-        Me.btnGetAllSegments.Location = New System.Drawing.Point(641, 246)
+        Me.btnGetAllSegments.Location = New System.Drawing.Point(641, 252)
         Me.btnGetAllSegments.Name = "btnGetAllSegments"
-        Me.btnGetAllSegments.Size = New System.Drawing.Size(132, 27)
-        Me.btnGetAllSegments.TabIndex = 12
+        Me.btnGetAllSegments.Size = New System.Drawing.Size(132, 23)
+        Me.btnGetAllSegments.TabIndex = 15
         Me.btnGetAllSegments.Text = "Step 2: Estimate BFImax"
         Me.btnGetAllSegments.UseVisualStyleBackColor = True
         '
@@ -455,6 +456,7 @@ Partial Class frmDF2P
         '
         'panelConfiguration
         '
+        Me.panelConfiguration.Controls.Add(Me.chkRCregression)
         Me.panelConfiguration.Controls.Add(Me.lblMinRecessDays)
         Me.panelConfiguration.Controls.Add(Me.lblRecessionDays)
         Me.panelConfiguration.Controls.Add(Me.txtBackDays)
@@ -477,25 +479,25 @@ Partial Class frmDF2P
         'lblMinRecessDays
         '
         Me.lblMinRecessDays.AutoSize = True
-        Me.lblMinRecessDays.Location = New System.Drawing.Point(386, 230)
+        Me.lblMinRecessDays.Location = New System.Drawing.Point(447, 230)
         Me.lblMinRecessDays.Name = "lblMinRecessDays"
-        Me.lblMinRecessDays.Size = New System.Drawing.Size(189, 13)
+        Me.lblMinRecessDays.Size = New System.Drawing.Size(128, 13)
         Me.lblMinRecessDays.TabIndex = 53
-        Me.lblMinRecessDays.Text = "Minimum flow recession length in days:"
+        Me.lblMinRecessDays.Text = "Recession length in days:"
         '
         'txtBackDays
         '
         Me.txtBackDays.Location = New System.Drawing.Point(581, 253)
         Me.txtBackDays.Name = "txtBackDays"
         Me.txtBackDays.Size = New System.Drawing.Size(54, 20)
-        Me.txtBackDays.TabIndex = 45
+        Me.txtBackDays.TabIndex = 14
         Me.txtBackDays.Text = "365"
         Me.txtBackDays.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'lblRC
         '
         Me.lblRC.AutoSize = True
-        Me.lblRC.Location = New System.Drawing.Point(203, 234)
+        Me.lblRC.Location = New System.Drawing.Point(9, 217)
         Me.lblRC.Name = "lblRC"
         Me.lblRC.Size = New System.Drawing.Size(117, 13)
         Me.lblRC.TabIndex = 51
@@ -503,18 +505,18 @@ Partial Class frmDF2P
         '
         'txtRC
         '
-        Me.txtRC.Location = New System.Drawing.Point(206, 250)
+        Me.txtRC.Location = New System.Drawing.Point(143, 215)
         Me.txtRC.Name = "txtRC"
-        Me.txtRC.Size = New System.Drawing.Size(114, 20)
-        Me.txtRC.TabIndex = 50
+        Me.txtRC.Size = New System.Drawing.Size(57, 20)
+        Me.txtRC.TabIndex = 12
         Me.txtRC.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'btnEstRC
         '
-        Me.btnEstRC.Location = New System.Drawing.Point(6, 246)
+        Me.btnEstRC.Location = New System.Drawing.Point(3, 253)
         Me.btnEstRC.Name = "btnEstRC"
-        Me.btnEstRC.Size = New System.Drawing.Size(194, 27)
-        Me.btnEstRC.TabIndex = 48
+        Me.btnEstRC.Size = New System.Drawing.Size(197, 22)
+        Me.btnEstRC.TabIndex = 11
         Me.btnEstRC.Text = "Step 1: Estimate Recession Constant"
         Me.btnEstRC.UseVisualStyleBackColor = True
         '
@@ -609,6 +611,16 @@ Partial Class frmDF2P
         Me.btnConfiguration.Text = "< Back"
         Me.btnConfiguration.UseVisualStyleBackColor = True
         '
+        'chkRCregression
+        '
+        Me.chkRCregression.AutoSize = True
+        Me.chkRCregression.Location = New System.Drawing.Point(12, 233)
+        Me.chkRCregression.Name = "chkRCregression"
+        Me.chkRCregression.Size = New System.Drawing.Size(129, 17)
+        Me.chkRCregression.TabIndex = 54
+        Me.chkRCregression.Text = "Regression (k+1 vs k)"
+        Me.chkRCregression.UseVisualStyleBackColor = True
+        '
         'frmDF2P
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -690,4 +702,5 @@ Partial Class frmDF2P
     Friend WithEvents gbStep2Inputs As Windows.Forms.GroupBox
     Friend WithEvents lblEstimatedBFImax As Windows.Forms.Label
     Friend WithEvents txtBFImax As Windows.Forms.TextBox
+    Friend WithEvents chkRCregression As Windows.Forms.CheckBox
 End Class
