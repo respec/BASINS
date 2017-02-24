@@ -1668,6 +1668,7 @@ Public Class clsRecess
     Public Sub DF2P_Output_Ver2()
         Dim lSW As IO.StreamWriter = Nothing
         Dim lTable As New atcTableFixed()
+        Dim lRecordText As New System.Text.StringBuilder()
         Dim lfile_name As String = IO.Path.Combine(OutputPath, pFileRC_BFI)
         Try
             If IO.File.Exists(lfile_name) Then
@@ -1740,10 +1741,15 @@ Public Class clsRecess
                 Dim lDuration As Double = (df2p_parameters.BFIEstimateEndDate - df2p_parameters.BFIEstimateStartDate) / JulianHour / 24.0 + 1
                 .Value(8) = Int(lDuration).ToString()
                 .Value(9) = DoubleToString(df2p_parameters.BFImax, 6,)
+                .CurrentRecord = 1
+                Dim lColumn As Integer
+                For lColumn = 1 To .NumFields
+                    lRecordText.Append(.Value(lColumn).PadRight(.FieldLength(lColumn)))
+                Next
             End With
 
             'Dim outputText As String = loc & lSeasonText & lFlowDateRangeText & lRCText & lBFIStartText & lBFIEndText & lBFImaxText
-            lSW.WriteLine(lTable.RecordTextFixedWith(1))
+            lSW.WriteLine(lRecordText.ToString())
             Logger.Msg("Saved parameter valus to file:" & vbCrLf & lfile_name, MsgBoxStyle.Information, "Save Two Parameter Digital Filter Parameters")
         Catch ex As Exception
             Logger.Msg("Failed to save parameter valus to file:" & vbCrLf & lfile_name, MsgBoxStyle.Exclamation, "Save Two Parameter Digital Filter Parameters")
