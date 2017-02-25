@@ -1984,7 +1984,7 @@ Public Class frmDF2P
                     End With
 
                     Dim lDuration As String = lDateFormat.JDateToString(pRecess.df2p_parameters.BFIEstimateStartDate) & "-" & lDateFormat.JDateToString(pRecess.df2p_parameters.BFIEstimateEndDate)
-                    lblEstimatedBFImax.Text = "Estimated BFImax (" + lDuration + ", RC=" + txtRC.Text + ", Duration=" + lArr(1) + " days): "
+                    lblEstimatedBFImax.Text = "Estimated BFImax (" & lDuration & ", RC=" & txtRC.Text & ", Duration=" & lArr(1) & " days): "
                     txtBFImax.Text = DoubleToString(pRecess.df2p_parameters.BFImax, 6, "0.0000")
                     lblEstimatedBFImax.Left = btnConfiguration.Right + 100
                     txtBFImax.Left = lblEstimatedBFImax.Right + 15

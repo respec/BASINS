@@ -982,7 +982,7 @@ Public Class clsRecess
             'df2p_parameters.BFImax = lTsBackTrace.Attributes.GetValue(lKey, Double.NaN)
             'df2p_parameters.BFIEstimateStartDate = lTsBackTrace.Attributes.GetValue("BFIEstimateStartDate")
             'df2p_parameters.BFIEstimateEndDate = lTsBackTrace.Attributes.GetValue("BFIEstimateEndDate")
-            Bulletin = "SUCCESS," & (lTsBackTrace.Values.Length - 1).ToString() & "," & df2p_parameters.BFImax.ToString()
+            Bulletin = "SUCCESS," & lTsBackTrace.Attributes.GetValue("Count").ToString() & "," & df2p_parameters.BFImax.ToString()
         Else
             Bulletin = lMessage
             df2p_parameters.BFImax = Double.NaN
