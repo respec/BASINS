@@ -87,6 +87,9 @@ lGrapher.YTitle = "My kinda quantities"
 'False: use x-axis labels but not legend
 lGrapher.ShowLegend = True
 
+'specify if to display outliers
+lGrapher.ShowOutliers = True
+
 'call routine to make the graph
 'input argument: 
 '   True, write the graph to output file previously specified
