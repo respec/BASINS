@@ -222,7 +222,7 @@ Public Class clsGraphBoxWhisker
                 For I As Integer = 0 To Datasets.Count - 1
                     lbl = Datasets(I).Attributes.GetValue("Location", "QTY" & I.ToString())
                     If Not String.IsNullOrEmpty(lbl) AndAlso lbl.Length > 8 Then
-                        lbl = lbl.Substring(0, 8)
+                        'lbl = lbl.Substring(0, 8)
                     End If
                     pXLabels.Add(lbl)
                 Next
@@ -235,9 +235,10 @@ Public Class clsGraphBoxWhisker
                     For I As Integer = 0 To pDatasetsCollection.Keys.Count - 1
                         lbl = pDatasetsCollection.Keys(I)
                         If Not String.IsNullOrEmpty(lbl) AndAlso lbl.Length > 8 Then
-                            lbl = lbl.Substring(0, 8)
+                            'lbl = lbl.Substring(0, 8)
                         End If
                         pXLabels.Add(lbl)
+
                     Next
                 End If
             Else
@@ -264,6 +265,7 @@ Public Class clsGraphBoxWhisker
                 End If
             End If
             .Title.Text = XTitle()
+
         End With
 
         With pZgc.GraphPane.YAxis
@@ -286,6 +288,7 @@ Public Class clsGraphBoxWhisker
                 End If
             End If
             .Title.Text = YTitle() 'lTimeseriesY.ToString
+            .Title.FontSpec.Size = 12
         End With
         'ScaleAxis(Datasets, pZgc.GraphPane.YAxis)
         BoxPlot(listDataArrays, pXLabels)
@@ -310,11 +313,11 @@ Public Class clsGraphBoxWhisker
         'End With
         pZgc.GraphPane.AxisChange()
         'pZgc.GraphPane.YAxis.Scale.MinGrace = Math.Abs(XLabelBaseline) + pZgc.GraphPane.YAxis.Scale.MajorStep * 5
-        pZgc.GraphPane.Margin.Bottom = 80
+        pZgc.GraphPane.Margin.Bottom = 100
 
         If pShowLegend Then
             pZgc.GraphPane.Legend.IsHStack = True
-            pZgc.GraphPane.Legend.Border.Color = Color.LightGray
+            pZgc.GraphPane.Legend.Border.Color = Color.DarkGray
         Else
             'use labels
             Dim lAngle As Single = -90
@@ -329,15 +332,17 @@ Public Class clsGraphBoxWhisker
             End If
             For I As Integer = 0 To lDatasetsCount - 1
                 'Dim label As TextObj = New TextObj(XLabels(I), I, XLabelBaseline, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
-                Dim label As TextObj = New TextObj(XLabels(I), I, 1.1, CoordType.XScaleYChartFraction, AlignH.Center, AlignV.Center)
+                Dim label As TextObj = New TextObj(XLabels(I), I, 1.1, CoordType.XScaleYChartFraction, AlignH.Left, AlignV.Center)
                 label.ZOrder = ZOrder.A_InFront
+
                 label.FontSpec.Border.IsVisible = False
                 label.FontSpec.Angle = pXLabelAngle
-                If pDataColors IsNot Nothing AndAlso pDataColors.Count = lDatasetsCount Then
-                    label.FontSpec.FontColor = pDataColors(I)
-                Else
-                    'label.FontSpec.FontColor = Color.Black
-                End If
+                'If pDataColors IsNot Nothing AndAlso pDataColors.Count = lDatasetsCount Then
+                label.FontSpec.FontColor = Color.Black
+                label.FontSpec.Size = 10
+                'Else
+                'label.FontSpec.FontColor = Color.Black
+                'End If
                 pZgc.GraphPane.GraphObjList.Add(label)
             Next
         End If
@@ -402,33 +407,37 @@ Public Class clsGraphBoxWhisker
             End If
 
             Dim lColor As Color = Color.Black
-            If pDataColors IsNot Nothing AndAlso pDataColors.Count = data.Count Then
+            If pDataColors IsNot Nothing AndAlso pDataColors.Count >= data.Count Then
                 lColor = DataColors(i)
             End If
 
             'Plot the items, first the median values
-            Dim meadian As CurveItem = myPane.AddCurve("", medians, Color.Black, SymbolType.HDash)
-            Dim myLine As LineItem = CType(meadian, LineItem)
+            Dim median As CurveItem = myPane.AddCurve("", medians, Color.Black, SymbolType.HDash)
+            Dim myLine As LineItem = CType(median, LineItem)
             myLine.Line.IsVisible = False
             myLine.Symbol.Fill.Type = FillType.Solid
+
+
+            'Wiskers
+            Dim myerror As ErrorBarItem = myPane.AddErrorBar("", barList, Color.Black)
+
             'Box
             Dim myCurve As HiLowBarItem = Nothing
-            If pDataColors IsNot Nothing AndAlso pDataColors.Count = data.Count Then
+            If pDataColors IsNot Nothing AndAlso pDataColors.Count >= data.Count Then
                 myCurve = myPane.AddHiLowBar(names(i), hiLowList, DataColors(i))
                 myCurve.Bar.Fill.Type = FillType.Solid
-                myCurve.Bar.Border.Color = Color.LightGray
+                myCurve.Bar.Border.Color = Color.DarkGray
             Else
                 myCurve = myPane.AddHiLowBar(names(i), hiLowList, Color.Black)
                 myCurve.Bar.Fill.Type = FillType.None
             End If
 
-            'Wiskers
-            Dim myerror As ErrorBarItem = myPane.AddErrorBar("", barList, lColor)
+
 
             'Outliers
             If pShowOutliers Then
                 Dim lOutlierColor As Color = Color.Black
-                If pDataColors IsNot Nothing AndAlso pDataColors.Count = data.Count Then
+                If pDataColors IsNot Nothing AndAlso pDataColors.Count >= data.Count Then
                     lOutlierColor = DataColors(i)
                 End If
                 Dim upper As CurveItem = myPane.AddCurve("", outs, lOutlierColor, SymbolType.Circle)
