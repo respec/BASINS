@@ -20,7 +20,7 @@ Public Module Graph
                         Optional ByVal aMakeStd As Boolean = True,
                         Optional ByVal aMakeLog As Boolean = True,
                         Optional ByVal aMakeSup As Boolean = True,
-                        Optional ByVal aMissingObservedData As Boolean = False)
+                        Optional ByVal aPercentMissingData As Double = 0.0)
         'Becky added the last two booleans to indicate which
         'graphs to print, default them to true so if by some chance this is called from somewhere else the code will
         'still work
@@ -29,15 +29,15 @@ Public Module Graph
                                               aSDateJ,
                                               aEDateJ, Nothing),
                                  atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
-        If Not aMissingObservedData Then
-            lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Simulated"),
+        If aPercentMissingData > 0 Then
+            lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("SimulatedBroken"),
                                               aSDateJ,
                                               aEDateJ, Nothing),
                                  atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
 
 
         Else
-            lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("SimulatedBroken"),
+            lDataGroup.Add(Aggregate(SubsetByDate(aTimeSeries.ItemByKey("Simulated"),
                                               aSDateJ,
                                               aEDateJ, Nothing),
                                  atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing))
@@ -64,7 +64,12 @@ Public Module Graph
                 .YAxis.Title.Text = "Flow (cfs)"
                 .XAxis.Scale.FontSpec.Size += 1
                 .XAxis.Title.FontSpec.Size += 1
-                .XAxis.Title.Text = "Cumulative Flow"
+                If aPercentMissingData > 0 Then
+                    .XAxis.Title.Text = "Cumulative Flow (" & FormatNumber(aPercentMissingData, 1) & "% observed data is missing)"
+                Else
+                    .XAxis.Title.Text = "Cumulative Flow"
+                End If
+
                 .YAxis.Scale.FontSpec.IsBold = True
                 .YAxis.Scale.FontSpec.Size += 1
                 .Title.Text = lOutFileBase
@@ -103,7 +108,12 @@ Public Module Graph
                 .YAxis.Title.Text = "Flow (cfs)"
                 .XAxis.Scale.FontSpec.Size += 1
                 .XAxis.Title.FontSpec.Size += 1
-                .XAxis.Title.Text = "Percent Chance Daily Flow Exceeded" ' at McBride Bridge"
+                If aPercentMissingData > 0 Then
+                    .XAxis.Title.Text = "Percent Chance Daily Flow Exceeded (" & FormatNumber(aPercentMissingData, 1) & "% observed data is missing)"
+                Else
+                    .XAxis.Title.Text = "Percent Chance Daily Flow Exceeded"
+                End If
+
                 .YAxis.Scale.FontSpec.IsBold = True
                 .YAxis.Scale.FontSpec.Size += 1
                 '.CurveList(0).Label.Text = "Observed Flow"
@@ -120,34 +130,39 @@ Public Module Graph
         End If
 
         lZgc = CreateZgc()
-            lZgc.Width = aGraphSaveWidth
-            lZgc.Height = aGraphSaveHeight
-            Dim lGraphCum As New clsGraphCumulativeDifference(lDataGroup, lZgc)
-            'TODO: add title 
-            lZgc.GraphPane.Title.Text = lOutFileBase
+        lZgc.Width = aGraphSaveWidth
+        lZgc.Height = aGraphSaveHeight
+        Dim lGraphCum As New clsGraphCumulativeDifference(lDataGroup, lZgc)
 
-            lZgc.SaveIn(lOutFileBase & "_cumDif" & aGraphSaveFormat)
-            lGraphCum.Dispose()
-            lZgc.Dispose()
+        If aPercentMissingData > 0 Then
+            lZgc.MasterPane.PaneList(0).XAxis.Title.Text = "Cumulative Difference (Daily) (" & FormatNumber(aPercentMissingData, 1) & "% observed data is missing)"
+        Else
+            lZgc.MasterPane.PaneList(0).XAxis.Title.Text = "Cumulative Difference (Daily)"
+        End If
+        lZgc.GraphPane.Title.Text = lOutFileBase
 
-            'scatter
-            lZgc = CreateZgc()
-            lZgc.Width = aGraphSaveWidth
-            lZgc.Height = aGraphSaveHeight
-            Dim lGraphScatter As New clsGraphScatter(lDataGroup, lZgc)
-            lGraphScatter.AddFitLine()
+        lZgc.SaveIn(lOutFileBase & "_cumDif" & aGraphSaveFormat)
+        lGraphCum.Dispose()
+        lZgc.Dispose()
 
-            lZgc.SaveIn(lOutFileBase & "_scatDay" & aGraphSaveFormat)
-            If aMakeLog Then 'Becky added, only make log version if user wants log version
-                With lZgc.MasterPane.PaneList(0)
-                    .YAxis.Type = AxisType.Log
-                    .XAxis.Type = AxisType.Log
-                    .Title.Text = lOutFileBase
-                End With
-                lZgc.SaveIn(lOutFileBase & "_scatDay_log" & aGraphSaveFormat)
-            End If
-            lGraphScatter.Dispose()
-            lZgc.Dispose()
+        'scatter
+        lZgc = CreateZgc()
+        lZgc.Width = aGraphSaveWidth
+        lZgc.Height = aGraphSaveHeight
+        Dim lGraphScatter As New clsGraphScatter(lDataGroup, lZgc)
+        lGraphScatter.AddFitLine()
+
+        lZgc.SaveIn(lOutFileBase & "_scatDay" & aGraphSaveFormat)
+
+        With lZgc.MasterPane.PaneList(0)
+            .YAxis.Type = AxisType.Log
+            .XAxis.Type = AxisType.Log
+            .Title.Text = lOutFileBase
+        End With
+        lZgc.SaveIn(lOutFileBase & "_scatDay_log" & aGraphSaveFormat)
+
+        lGraphScatter.Dispose()
+        lZgc.Dispose()
 
         'scatter - Observed vs Error(cfs)    
         lZgc = CreateZgc()
