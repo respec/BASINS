@@ -98,13 +98,13 @@ Public Class clsGraphBoxWhisker
         End Set
     End Property
 
-    Private pShowFullRange As Boolean = True
-    Public Property ShowFullRange() As Boolean
+    Private pShowOutliers As Boolean = False
+    Public Property ShowOutliers() As Boolean
         Get
-            Return pShowFullRange
+            Return pShowOutliers
         End Get
         Set(value As Boolean)
-            pShowFullRange = value
+            pShowOutliers = value
         End Set
     End Property
 
@@ -381,25 +381,26 @@ Public Class clsGraphBoxWhisker
             Dim iqr As Double = 1.5 * (lpct75 - lpct25)
             Dim upperLimit As Double = lpct75 + iqr
             Dim lowerLimit As Double = lpct25 - iqr
-            If ShowFullRange() Then
+            If pShowOutliers Then
+                'The wiskers must end on an actual data point
+                barList.Add(i, ValueNearestButGreater(data(i), lowerLimit), ValueNearestButLess(data(i), upperLimit))
+                'Sort out the outliers
+                For Each aValue As Double In data(i)
+                    If (aValue > upperLimit) Then
+                        outs.Add(i, aValue)
+                    End If
+
+                    If (aValue < lowerLimit) Then
+                        outs.Add(i, aValue)
+                    End If
+                Next
+            Else
                 upperLimit = lmax
                 lowerLimit = lmin
                 'The wiskers must end on an actual data point
                 barList.Add(i, lowerLimit, upperLimit)
-            Else
-                'The wiskers must end on an actual data point
-                barList.Add(i, ValueNearestButGreater(data(i), lowerLimit), ValueNearestButLess(data(i), upperLimit))
             End If
-            ''Sort out the outliers
-            'For Each aValue As Double In data(i)
-            '    If (aValue > upperLimit) Then
-            '        outs.Add(i, aValue)
-            '    End If
 
-            '    If (aValue < lowerLimit) Then
-            '        outs.Add(i, aValue)
-            '    End If
-            'Next
             Dim lColor As Color = Color.Black
             If pDataColors IsNot Nothing AndAlso pDataColors.Count = data.Count Then
                 lColor = DataColors(i)
@@ -423,16 +424,24 @@ Public Class clsGraphBoxWhisker
 
             'Wiskers
             Dim myerror As ErrorBarItem = myPane.AddErrorBar("", barList, lColor)
-            'Outliers
-            'Dim upper As CurveItem = myPane.AddCurve("", outs, Color.Black, SymbolType.XCross)
-            'Dim bLine As LineItem = CType(upper, LineItem)
-            'bLine.Symbol.Size = 3
-            'bLine.Line.IsVisible = False
 
-            'Dim label As TextObj = New TextObj(names(i), i, 2.0, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
-            'label.ZOrder = ZOrder.A_InFront
-            'Label.FontSpec.Border.IsVisible = False
-            'myPane.GraphObjList.Add(label)
+            'Outliers
+            If pShowOutliers Then
+                Dim lOutlierColor As Color = Color.Black
+                If pDataColors IsNot Nothing AndAlso pDataColors.Count = data.Count Then
+                    lOutlierColor = DataColors(i)
+                End If
+                Dim upper As CurveItem = myPane.AddCurve("", outs, lOutlierColor, SymbolType.Circle)
+                Dim bLine As LineItem = CType(upper, LineItem)
+                bLine.Symbol.Size = 3
+                bLine.Symbol.Fill = New ZedGraph.Fill(lOutlierColor)
+                bLine.Line.IsVisible = False
+
+                'Dim label As TextObj = New TextObj(names(i), i, 2.0, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
+                'Label.ZOrder = ZOrder.A_InFront
+                'Label.FontSpec.Border.IsVisible = False
+                'myPane.GraphObjList.Add(label)
+            End If
         Next
     End Sub
 
