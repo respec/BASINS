@@ -19,7 +19,7 @@ Public Module ConstituentBudget
                            ByVal aRunMade As String,
                            ByVal aSDateJ As Double,
                            ByVal aEDateJ As Double) As _
-                           Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, BoxWhiskerItem)
+                           Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, BoxWhiskerItem, atcCollection)
 
         Dim lNumberFormat As String = "#,##0.###"
         Dim lNumberOfSignificantDigits As Integer = 11
@@ -41,6 +41,8 @@ Public Module ConstituentBudget
         Dim lReportLoadingRate As New atcReport.ReportText
         Dim lBoxWhiskerItems As New List(Of BoxWhiskerItem)
         Dim lDataForBoxWhiskerPlot As New BoxWhiskerItem
+        Dim lDataForOneBarGraph As New BarGraphItem
+        Dim lDataForAllBarGraphs As New atcCollection
 
         pRunningTotals = New atcCollection
         pOutputTotals = New atcCollection
@@ -62,9 +64,6 @@ Public Module ConstituentBudget
 
             End If
         Next
-
-
-
 
         Select Case aBalanceType
             Case "Water"
@@ -148,7 +147,7 @@ Public Module ConstituentBudget
                 lReport4.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
                 lReport5.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
                 lReport6.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, BoxWhiskerItem)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate, Nothing)
+                Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, BoxWhiskerItem, atcCollection)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate, Nothing, Nothing)
 
         End Select
 
@@ -1240,8 +1239,7 @@ This message box will not be shown again for." & aBalanceType)
 
                     End If
                 Next Key
-                'Dim TestArray As Double()
-                'TestArray = LoadingRateCollectionForEachLanduse.ToArray
+
                 lDataForBoxWhiskerPlot.LabelValueCollection.Add(LandUse, LoadingRateCollectionForEachLanduse.ToArray)
                 LoadingRateSummary &= DoubleToString(sum / count, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab &
                     DoubleToString(min, , lNumberFormat,,, lNumberOfSignificantDigits) &
@@ -1271,6 +1269,8 @@ This message box will not be shown again for." & aBalanceType)
 
 
             For Each lReach As String In lReaches
+                lDataForOneBarGraph.Units = "(" & lUnits & "/acre)"
+                lDataForOneBarGraph.Constituent = aBalanceType
 
                 lReport3.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
                 lReport4.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
@@ -1297,9 +1297,9 @@ This message box will not be shown again for." & aBalanceType)
                         For Each lOutputLocation As String In aOutputLocations
                             If lReach.Substring(5) = lOutputLocation.Substring(2) Then
 
-
                                 lReport5.Append(vbTab & FormatNumber(lValue, 2, TriState.True, TriState.False, TriState.False))
-
+                                lDataForOneBarGraph.LabelValueCollection.Add(lSourceDescription, lValue)
+                                lDataForOneBarGraph.Location = lReach
                             End If
                         Next
                     End If
@@ -1310,7 +1310,9 @@ This message box will not be shown again for." & aBalanceType)
 
                 Next lSourceDescription
 
-
+                If lDataForOneBarGraph.LabelValueCollection.Count > 0 Then
+                    lDataForAllBarGraphs.Add(lReach, lDataForOneBarGraph)
+                End If
 
                 lReport3.AppendLine(vbTab & FormatNumber(lTotal, 2, TriState.True, TriState.False, TriState.False))
                 If aOutputLocations.Count > 0 Then
@@ -1370,7 +1372,7 @@ This message box will not be shown again for." & aBalanceType)
         End If
         pRunningTotals.Clear()
 
-        Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, BoxWhiskerItem)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate, lDataForBoxWhiskerPlot)
+        Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, BoxWhiskerItem, atcCollection)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate, lDataForBoxWhiskerPlot, lDataForAllBarGraphs)
 
     End Function
 
