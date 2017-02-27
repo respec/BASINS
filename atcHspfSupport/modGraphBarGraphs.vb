@@ -7,54 +7,41 @@ Imports atcGraph
 Imports ZedGraph
 Imports System.Collections
 
-Public Class BoxWhiskerItem
+Public Class BarGraphItem
 
     Public Location As String
     Public Constituent As String
     Public Units As String
-    'Public Labels As New List(Of String)
-    'Public Values As New List(Of Double)
     Public LabelValueCollection As New atcCollection
-
-    'Public SortedList As New List(Of Double)
-
-
+    'One value for each label
 End Class
 
-Public Module modGraphBoxWhiskers
+Public Module modBarGraph
 
-    Public Sub CreateGraph_BoxAndWhisker(items As BoxWhiskerItem, aOutputFileName As String)
+    Public Sub CreateGraph_BarGraph(items As BarGraphItem, aOutputFileName As String)
 
         Dim lZgc As New ZedGraph.ZedGraphControl()
         lZgc.Width = 1024
         lZgc.Height = 768
 
-        Dim lGrapher As New atcGraph.clsGraphBoxWhisker(Nothing, lZgc, True)
+        Dim lGrapher As New atcGraph.clsGraphBar(Nothing, lZgc, True)
         lGrapher.DatasetsCollection = items.LabelValueCollection
 
-        Select Case items.Constituent
-            Case "Sediment"
-                lGrapher.Title = "Box-Whisker plot of sediment loading rate from all land uses."
-            Case "TotalP"
-                lGrapher.Title = "Box-Whisker plot of total phoshphorus loading rate from all land uses."
-            Case "TotalN"
-                lGrapher.Title = "Box-Whisker plot of total nitrogen loading rate from all land uses."
-        End Select
-
+        lGrapher.Title = "Title"
         lGrapher.OutputFile = aOutputFileName
 
         'Set the color of the data series
         'if no color are supplied, then all boxes are black in color
         Dim data_colors As New List(Of Color)
         With data_colors
-            .Add(Color.Blue)
-            .Add(Color.Red)
-            .Add(Color.Green)
-            .Add(Color.Yellow)
-            .Add(Color.HotPink)
-            .Add(Color.DarkMagenta)
-            .Add(Color.DarkOliveGreen)
-            .Add(Color.DarkOrchid)
+            .Add(Color.AliceBlue)
+            .Add(Color.Aqua)
+            .Add(Color.Aquamarine)
+            .Add(Color.Azure)
+            .Add(Color.Beige)
+            .Add(Color.Bisque)
+            .Add(Color.BlanchedAlmond)
+            .Add(Color.Brown)
             .Add(Color.Chartreuse)
             .Add(Color.Crimson)
             .Add(Color.Cyan)
@@ -68,7 +55,7 @@ Public Module modGraphBoxWhiskers
             .Add(Color.Indigo)
         End With
         lGrapher.DataColors = data_colors
-        lGrapher.ShowOutliers = True
+
 
         'specify the orientation angle of the x-axis label texts
         '-90 (default) is vertical orientation, 0 is horizontal

@@ -315,14 +315,16 @@ Module HSPFOutputReports
                                 Logger.Dbg(Now & " Calculating monthly summary for " & lSiteName)
                                 'pProgressBar.pbProgress.Increment(5)
                                 Dim lTSerBroken As atcTimeseries = lSimTSer.Clone
-                                Dim MissingObservedData As Boolean = False
+
+                                Dim PercentMissingObservedData As Double = 0.0
 
                                 If lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value > 0 Then
+                                    PercentMissingObservedData = lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value * 100 / lObsTSerInches.Attributes.GetDefinedValue("Count").Value
                                     For i As Integer = 1 To lObsTSerInches.numValues
                                         If Double.IsNaN(lObsTSerInches.Value(i)) Then
                                             lSimTSerInches.Value(i) = Double.NaN
                                             lTSerBroken.Value(i) = Double.NaN
-                                            MissingObservedData = True
+
                                         End If
                                     Next
 
@@ -335,7 +337,7 @@ Module HSPFOutputReports
                                                                                      lRunMade,
                                                                                      lExpertSystem.SDateJ,
                                                                                      lExpertSystem.EDateJ,
-                                                                                     MissingObservedData)
+                                                                                     PercentMissingObservedData)
                                 Dim lOutFileName As String = loutfoldername & "MonthlyAverage" & lCons & "Stats-" & lSiteName & ".txt"
                                 SaveFileString(lOutFileName, lStr)
 
@@ -347,7 +349,7 @@ Module HSPFOutputReports
                                                                              lRunMade,
                                                                              lExpertSystem.SDateJ,
                                                                              lExpertSystem.EDateJ,
-                                                                             MissingObservedData)
+                                                                             PercentMissingObservedData)
                                 lOutFileName = loutfoldername & "Annual" & lCons & "Stats-" & lSiteName & ".txt"
                                 SaveFileString(lOutFileName, lStr)
 
@@ -359,7 +361,7 @@ Module HSPFOutputReports
                                                                                    lRunMade,
                                                                                    lExpertSystem.SDateJ,
                                                                                    lExpertSystem.EDateJ,
-                                                                                   MissingObservedData)
+                                                                                   PercentMissingObservedData)
                                 lOutFileName = loutfoldername & "DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
                                 SaveFileString(lOutFileName, lStr)
 
@@ -369,7 +371,7 @@ Module HSPFOutputReports
                                     Logger.Dbg(Now & " Creating nonstorm graphs")
                                     lTimeSeries.Add("Observed", lObsTSer)
                                     lTimeSeries.Add("Simulated", lSimTSer)
-                                    If MissingObservedData Then
+                                    If PercentMissingObservedData > 0 Then
                                         lTimeSeries.Add("SimulatedBroken", lTSerBroken)
                                     End If
                                     lTimeSeries.Add("Precipitation", lPrecTser)
@@ -388,7 +390,7 @@ Module HSPFOutputReports
                                              pGraphSaveHeight,
                                              pGraphAnnual, loutfoldername,
                                              pMakeStdGraphs, pMakeLogGraphs,
-                                             pMakeSupGraphs, MissingObservedData)
+                                             pMakeSupGraphs, PercentMissingObservedData)
                                     lTimeSeries.Clear()
 
                                     If pMakeStdGraphs Then 'Becky added, only make storm graphs (log or normal) if we want standard graphs
@@ -590,6 +592,13 @@ Module HSPFOutputReports
 
 
                                 CreateGraph_BoxAndWhisker(.Item6, loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.png")
+
+
+                                For Each location As String In .Item7.Keys
+                                    CreateGraph_BarGraph(.Item7.ItemByKey(location), loutfoldername & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
+
+
+                                Next location
 
 
 
