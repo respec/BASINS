@@ -59,7 +59,8 @@ Public Class atcExpertSystem
     '6 = SRHOBS - observed summer flow volume (in)
     Private Const pConvert As Double = 24.0# * 3600.0# * 12.0# / 43560.0#
     Private Const pNSteps As Integer = 500
-    Private pMissingData As Boolean = False
+    Private pCountOfMissingData As Integer = 0
+    Private pPercentOfMissingData As Double = 0.0
 
     Public Sub New(ByVal aUci As atcUCI.HspfUci,
                    ByVal lExpertSystemFileName As String,
@@ -517,11 +518,13 @@ Public Class atcExpertSystem
                 Dim lValueCollection As New atcCollection
                 Dim lKeyForValueCollection As Integer = 0
                 If lStatGroup = 1 Or lStatGroup = 2 Then
-                    For i As Integer = 0 To obslTSer.numValues
 
+                    For i As Integer = 1 To obslTSer.numValues
+                        pCountOfMissingData = obslTSer.Attributes.GetDefinedValue("Count Missing").Value
+                        pPercentOfMissingData = pCountOfMissingData * 100 / obslTSer.Attributes.GetDefinedValue("Count").Value
                         If Double.IsNaN(obslTSer.Values(i)) Then
                             pFlowOnly = True
-                            pMissingData = True
+
                             If lStatGroup = 1 Then
                                 lDailyTSer.Value(i) = Double.NaN
                             End If
@@ -867,9 +870,9 @@ Public Class atcExpertSystem
             lSite.ErrorTerm(8) = lSummerStormVolumeError
             lSite.ErrorTerm(19) = lWinterStormVolumeError
             lSite.ErrorTerm(16) = lAverageStormPeakError
-            If pMissingData = True Then
-                lSite.ErrorTerm(20) = -999
-            End If
+
+            lSite.ErrorTerm(20) = pCountOfMissingData
+
 
         Next lSiteIndex
 
@@ -887,10 +890,12 @@ Public Class atcExpertSystem
         For lSiteIndex As Integer = 1 To Sites.Count
             Dim lSite As HexSite = Sites(lSiteIndex - 1)
             lStr &= "Site: ".PadLeft(15) & lSite.Name & vbCrLf
-            If lSite.ErrorTerm(20) = -999 Then
-                lStr &= "The observed data is not continuous. Please use the statistics with caution" & vbCrLf & vbCrLf
+            If pPercentOfMissingData > 0 Then
+                lStr &= "The observed data is not continuous in this analysis period. The analysis utilizes " & vbCrLf &
+                  "simulated and observed data only on the days (time periods) when observed data are " & vbCrLf &
+                 "available. Use the results with caution." & vbCrLf
+                lStr &= FormatNumber(pPercentOfMissingData, 1) & "% of observed data is missing." & vbCrLf & vbCrLf
             End If
-
             'statistics summary
             lStr &= StatDetails("Total (" & YearCount(SDateJ, EDateJ) & " year run)", lSiteIndex, 1)
             lStr &= StatDetails("Annual Average", lSiteIndex, YearCount(SDateJ, EDateJ))

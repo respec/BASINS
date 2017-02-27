@@ -14,7 +14,7 @@ Public Module AnnualCompareStats
                            ByVal aRunMade As String,
                            Optional ByVal aSDateJ As Double = 0,
                            Optional ByVal aEDateJ As Double = 0,
-                           Optional ByVal MissingData As Boolean = False) As String
+                           Optional ByVal aPercentMissingData As Double = 0.0) As String
 
         Dim lStr As String
         lStr = "Annual Simulated and Observed " & aCons & " Statistics for '" & IO.Path.GetFileNameWithoutExtension(aUci.Name) & "' scenario." & vbCrLf
@@ -29,9 +29,13 @@ Public Module AnnualCompareStats
         lStr &= "   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
         lStr &= "   (Units:" & aUnits & ")" & vbCrLf & vbCrLf
 
-        If MissingData Then
-            lStr &= "The observed data is not continuous, use the statistics with caution" & vbCrLf & vbCrLf
+        If aPercentMissingData > 0 Then
+            lStr &= "The observed data is not continuous in this analysis period. The analysis utilizes " & vbCrLf &
+                  "simulated and observed data only on the days (time periods) when observed data are " & vbCrLf &
+                 "available. Use the results with caution." & vbCrLf
+            lStr &= FormatNumber(aPercentMissingData, 1) & "% of observed data is missing." & vbCrLf & vbCrLf
         End If
+
         CheckDateJ(aObsTSer, "Observed", lSDateJ, lEDateJ, lStr)
         CheckDateJ(aSimTSer, "Simulated", lSDateJ, lEDateJ, lStr)
 
