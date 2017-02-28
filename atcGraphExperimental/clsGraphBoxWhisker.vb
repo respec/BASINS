@@ -118,6 +118,16 @@ Public Class clsGraphBoxWhisker
         End Set
     End Property
 
+    Private pShowXLabelColor As Boolean = False
+    Public Property ShowXLabelColor() As Boolean
+        Get
+            Return pShowXLabelColor
+        End Get
+        Set(value As Boolean)
+            pShowXLabelColor = value
+        End Set
+    End Property
+
     Private pXLabelAngle As Single = Single.NaN
     Public Property XLabelAngle() As Single
         Get
@@ -193,6 +203,8 @@ Public Class clsGraphBoxWhisker
         pZgc.GraphPane.BarSettings.Type = BarType.Overlay
         pZgc.GraphPane.XAxis.IsVisible = False
         pZgc.GraphPane.Legend.IsVisible = pShowLegend
+        pZgc.GraphPane.Title.FontSpec.Size = 14
+        pZgc.GraphPane.Title.FontSpec.IsBold = False
         If String.Compare(Title(), "no title", True) = 0 Then
         ElseIf String.IsNullOrEmpty(Title()) Then
             Dim lcon As String = Datasets(0).Attributes.GetValue("Constituent", "Value")
@@ -238,7 +250,6 @@ Public Class clsGraphBoxWhisker
                             'lbl = lbl.Substring(0, 8)
                         End If
                         pXLabels.Add(lbl)
-
                     Next
                 End If
             Else
@@ -265,7 +276,6 @@ Public Class clsGraphBoxWhisker
                 End If
             End If
             .Title.Text = XTitle()
-
         End With
 
         With pZgc.GraphPane.YAxis
@@ -277,6 +287,11 @@ Public Class clsGraphBoxWhisker
             '.Scale.MaxAuto = False
             '.Scale.MinAuto = False
             '.MinSpace = 80
+            .MajorTic.IsOutside = False
+            .MinorTic.IsOutside = False
+            .MajorTic.Color = Color.DarkGray
+            .MinorTic.Color = Color.DarkGray
+            .Scale.FontSpec.Size = 10
             If String.IsNullOrEmpty(YTitle()) Then
                 If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
                     With Datasets(0).Attributes
@@ -313,7 +328,6 @@ Public Class clsGraphBoxWhisker
         'End With
         pZgc.GraphPane.AxisChange()
         'pZgc.GraphPane.YAxis.Scale.MinGrace = Math.Abs(XLabelBaseline) + pZgc.GraphPane.YAxis.Scale.MajorStep * 5
-        pZgc.GraphPane.Margin.Bottom = 100
 
         If pShowLegend Then
             pZgc.GraphPane.Legend.IsHStack = True
@@ -330,21 +344,30 @@ Public Class clsGraphBoxWhisker
             ElseIf pDatasetsCalc IsNot Nothing Then
                 lDatasetsCount = pDatasetsCalc.Count
             End If
+            Dim labelw As TextObj = Nothing
+            Dim lBufferWid As Integer = -999
             For I As Integer = 0 To lDatasetsCount - 1
                 'Dim label As TextObj = New TextObj(XLabels(I), I, XLabelBaseline, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
-                Dim label As TextObj = New TextObj(XLabels(I), I, 1.1, CoordType.XScaleYChartFraction, AlignH.Left, AlignV.Center)
+                Dim label As TextObj = New TextObj(XLabels(I), I, 1.01, CoordType.XScaleYChartFraction, AlignH.Left, AlignV.Center)
                 label.ZOrder = ZOrder.A_InFront
 
                 label.FontSpec.Border.IsVisible = False
                 label.FontSpec.Angle = pXLabelAngle
-                'If pDataColors IsNot Nothing AndAlso pDataColors.Count = lDatasetsCount Then
-                label.FontSpec.FontColor = Color.Black
-                label.FontSpec.Size = 10
-                'Else
-                'label.FontSpec.FontColor = Color.Black
-                'End If
+                If pShowXLabelColor AndAlso pDataColors IsNot Nothing AndAlso pDataColors.Count >= lDatasetsCount Then
+                    label.FontSpec.FontColor = pDataColors(I)
+                Else
+                    'label.FontSpec.FontColor = Color.Black
+                End If
+
+                If System.Windows.Forms.TextRenderer.MeasureText(XLabels(I), label.FontSpec.GetFont(1.0)).Width > lBufferWid Then
+                    lBufferWid = System.Windows.Forms.TextRenderer.MeasureText(XLabels(I), label.FontSpec.GetFont(1.0)).Width
+                    labelw = label
+                End If
                 pZgc.GraphPane.GraphObjList.Add(label)
             Next
+            If labelw IsNot Nothing Then
+                pZgc.GraphPane.Margin.Bottom = System.Windows.Forms.TextRenderer.MeasureText(labelw.Text, labelw.FontSpec.GetFont(1.0)).Width + 15
+            End If
         End If
         pZgc.GraphPane.AxisChange()
         'Dim leftMargin As Double = 10
@@ -417,7 +440,6 @@ Public Class clsGraphBoxWhisker
             myLine.Line.IsVisible = False
             myLine.Symbol.Fill.Type = FillType.Solid
 
-
             'Wiskers
             Dim myerror As ErrorBarItem = myPane.AddErrorBar("", barList, Color.Black)
 
@@ -431,8 +453,6 @@ Public Class clsGraphBoxWhisker
                 myCurve = myPane.AddHiLowBar(names(i), hiLowList, Color.Black)
                 myCurve.Bar.Fill.Type = FillType.None
             End If
-
-
 
             'Outliers
             If pShowOutliers Then
@@ -474,7 +494,7 @@ Public Class clsGraphBoxWhisker
         Return lowNums
     End Function
 
-    Private Function GetStatistic(ByVal aDSIndex As Integer, ByVal aStatName As String) As Double
+    Friend Function GetStatistic(ByVal aDSIndex As Integer, ByVal aStatName As String) As Double
         Dim lStat As Double = Double.NaN
         If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
             Dim lTs As atcTimeseries = Datasets(aDSIndex)
