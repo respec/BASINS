@@ -175,9 +175,17 @@ Public Class clsGraphBoxWhisker
                 Dim lStartDate As Double = Date2J(1900, 1, 1, 0, 0, 0)
                 Dim lEndDate As Double = 0
                 For I As Integer = 0 To pDatasetsCollection.Count - 1
-                    lEndDate = lStartDate + JulianHour * 24.0 * pDatasetsCollection.ItemByIndex(I).Length
+                    If pDatasetsCollection.ItemByIndex(I).GetType().BaseType.Name = "ValueType" Then
+                        lEndDate = lStartDate + JulianHour * 24.0
+                    Else
+                        lEndDate = lStartDate + JulianHour * 24.0 * pDatasetsCollection.ItemByIndex(I).Length
+                    End If
                     Dim lNewTS As New atcTimeseries(Nothing)
-                    lNewTS.Values = pDatasetsCollection.ItemByIndex(I)
+                    If pDatasetsCollection.ItemByIndex(I).GetType().BaseType.Name = "ValueType" Then
+                        lNewTS.Values = New Double() {pDatasetsCollection.ItemByIndex(I)}
+                    Else
+                        lNewTS.Values = pDatasetsCollection.ItemByIndex(I)
+                    End If
                     lNewTS.Dates = NewTimeseries(lStartDate, lEndDate, atcTimeUnit.TUDay, 1, Nothing)
                     pDatasetsCalc.Add(lNewTS)
                 Next
@@ -227,36 +235,8 @@ Public Class clsGraphBoxWhisker
                 Exit Sub
             End If
         End If
-        If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
-            If pXLabels Is Nothing OrElse pXLabels.Count <> Datasets.Count Then
-                pXLabels = New Generic.List(Of String)
-                Dim lbl As String = ""
-                For I As Integer = 0 To Datasets.Count - 1
-                    lbl = Datasets(I).Attributes.GetValue("Location", "QTY" & I.ToString())
-                    If Not String.IsNullOrEmpty(lbl) AndAlso lbl.Length > 8 Then
-                        'lbl = lbl.Substring(0, 8)
-                    End If
-                    pXLabels.Add(lbl)
-                Next
-            End If
-        Else
-            If pDatasetsCollection IsNot Nothing AndAlso pDatasetsCollection.Count > 0 Then
-                If pXLabels Is Nothing OrElse pXLabels.Count <> pDatasetsCollection.Count Then
-                    pXLabels = New Generic.List(Of String)
-                    Dim lbl As String = ""
-                    For I As Integer = 0 To pDatasetsCollection.Keys.Count - 1
-                        lbl = pDatasetsCollection.Keys(I)
-                        If Not String.IsNullOrEmpty(lbl) AndAlso lbl.Length > 8 Then
-                            'lbl = lbl.Substring(0, 8)
-                        End If
-                        pXLabels.Add(lbl)
-                    Next
-                End If
-            Else
-                pZgc.Refresh()
-                Exit Sub
-            End If
-        End If
+
+        SetupXLabels()
 
         'Dim lPane As GraphPane = MyBase.pZgc.MasterPane.PaneList(0)
         'lPane.Legend.IsVisible = False
@@ -333,41 +313,7 @@ Public Class clsGraphBoxWhisker
             pZgc.GraphPane.Legend.IsHStack = True
             pZgc.GraphPane.Legend.Border.Color = Color.DarkGray
         Else
-            'use labels
-            Dim lAngle As Single = -90
-            If Not Single.IsNaN(pXLabelAngle) AndAlso pXLabelAngle <= 90 AndAlso pXLabelAngle >= -90 Then
-                lAngle = pXLabelAngle
-            End If
-            Dim lDatasetsCount As Integer = 0
-            If Datasets IsNot Nothing Then
-                lDatasetsCount = Datasets.Count
-            ElseIf pDatasetsCalc IsNot Nothing Then
-                lDatasetsCount = pDatasetsCalc.Count
-            End If
-            Dim labelw As TextObj = Nothing
-            Dim lBufferWid As Integer = -999
-            For I As Integer = 0 To lDatasetsCount - 1
-                'Dim label As TextObj = New TextObj(XLabels(I), I, XLabelBaseline, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
-                Dim label As TextObj = New TextObj(XLabels(I), I, 1.01, CoordType.XScaleYChartFraction, AlignH.Left, AlignV.Center)
-                label.ZOrder = ZOrder.A_InFront
-
-                label.FontSpec.Border.IsVisible = False
-                label.FontSpec.Angle = pXLabelAngle
-                If pShowXLabelColor AndAlso pDataColors IsNot Nothing AndAlso pDataColors.Count >= lDatasetsCount Then
-                    label.FontSpec.FontColor = pDataColors(I)
-                Else
-                    'label.FontSpec.FontColor = Color.Black
-                End If
-
-                If System.Windows.Forms.TextRenderer.MeasureText(XLabels(I), label.FontSpec.GetFont(1.0)).Width > lBufferWid Then
-                    lBufferWid = System.Windows.Forms.TextRenderer.MeasureText(XLabels(I), label.FontSpec.GetFont(1.0)).Width
-                    labelw = label
-                End If
-                pZgc.GraphPane.GraphObjList.Add(label)
-            Next
-            If labelw IsNot Nothing Then
-                pZgc.GraphPane.Margin.Bottom = System.Windows.Forms.TextRenderer.MeasureText(labelw.Text, labelw.FontSpec.GetFont(1.0)).Width + 15
-            End If
+            PlotXLabels()
         End If
         pZgc.GraphPane.AxisChange()
         'Dim leftMargin As Double = 10
@@ -379,13 +325,93 @@ Public Class clsGraphBoxWhisker
         'pZgc.GraphPane.Chart.Rect = New RectangleF(leftMargin, topMargin, width - leftMargin - rightMargin, height - topMargin - bottomMargin)
 
         If OutputToFile Then
-            If Not String.IsNullOrEmpty(pOutputFile) AndAlso IO.Directory.Exists(IO.Path.GetDirectoryName(pOutputFile)) Then
-                'pZgc.GraphPane.GetImage().Save("C:\temp\test\boxwhisker.bmp")
-                pZgc.GraphPane.GetImage().Save(pOutputFile)
-            End If
+            SaveToFile()
         End If
         pZgc.Refresh()
     End Sub
+
+    Friend Sub SetupXLabels()
+        If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
+            If pXLabels Is Nothing OrElse pXLabels.Count <> Datasets.Count Then
+                pXLabels = New Generic.List(Of String)
+                Dim lbl As String = ""
+                For I As Integer = 0 To Datasets.Count - 1
+                    lbl = Datasets(I).Attributes.GetValue("Location", "QTY" & I.ToString())
+                    If Not String.IsNullOrEmpty(lbl) AndAlso lbl.Length > 8 Then
+                        'lbl = lbl.Substring(0, 8)
+                    End If
+                    pXLabels.Add(lbl)
+                Next
+            End If
+        Else
+            If pDatasetsCollection IsNot Nothing AndAlso pDatasetsCollection.Count > 0 Then
+                If pXLabels Is Nothing OrElse pXLabels.Count <> pDatasetsCollection.Count Then
+                    pXLabels = New Generic.List(Of String)
+                    Dim lbl As String = ""
+                    For I As Integer = 0 To pDatasetsCollection.Keys.Count - 1
+                        lbl = pDatasetsCollection.Keys(I)
+                        If Not String.IsNullOrEmpty(lbl) AndAlso lbl.Length > 8 Then
+                            'lbl = lbl.Substring(0, 8)
+                        End If
+                        pXLabels.Add(lbl)
+                    Next
+                End If
+            Else
+                pZgc.Refresh()
+                Exit Sub
+            End If
+        End If
+    End Sub
+
+    Friend Sub PlotXLabels()
+        Dim lAngle As Single = -90
+        If Not Single.IsNaN(pXLabelAngle) AndAlso pXLabelAngle <= 90 AndAlso pXLabelAngle >= -90 Then
+            lAngle = pXLabelAngle
+        End If
+        Dim lDatasetsCount As Integer = 0
+        If Datasets IsNot Nothing Then
+            lDatasetsCount = Datasets.Count
+        ElseIf pDatasetsCalc IsNot Nothing Then
+            lDatasetsCount = pDatasetsCalc.Count
+        End If
+        Dim labelw As TextObj = Nothing
+        Dim lBufferWid As Integer = -999
+        For I As Integer = 0 To lDatasetsCount - 1
+            'Dim label As TextObj = New TextObj(XLabels(I), I, XLabelBaseline, CoordType.AxisXYScale, AlignH.Center, AlignV.Center)
+            Dim label As TextObj = New TextObj(XLabels(I), I, 1.01, CoordType.XScaleYChartFraction, AlignH.Left, AlignV.Center)
+            label.ZOrder = ZOrder.A_InFront
+
+            label.FontSpec.Border.IsVisible = False
+            label.FontSpec.Angle = pXLabelAngle
+            If pShowXLabelColor AndAlso pDataColors IsNot Nothing AndAlso pDataColors.Count >= lDatasetsCount Then
+                label.FontSpec.FontColor = pDataColors(I)
+            Else
+                'label.FontSpec.FontColor = Color.Black
+            End If
+
+            If System.Windows.Forms.TextRenderer.MeasureText(XLabels(I), label.FontSpec.GetFont(1.0)).Width > lBufferWid Then
+                lBufferWid = System.Windows.Forms.TextRenderer.MeasureText(XLabels(I), label.FontSpec.GetFont(1.0)).Width
+                labelw = label
+            End If
+            pZgc.GraphPane.GraphObjList.Add(label)
+        Next
+        If labelw IsNot Nothing Then
+            pZgc.GraphPane.Margin.Bottom = System.Windows.Forms.TextRenderer.MeasureText(labelw.Text, labelw.FontSpec.GetFont(1.0)).Width + 15
+        End If
+    End Sub
+
+    Friend Function SaveToFile() As Boolean
+        If Not String.IsNullOrEmpty(pOutputFile) AndAlso IO.Directory.Exists(IO.Path.GetDirectoryName(pOutputFile)) Then
+            Try
+                pZgc.GraphPane.GetImage().Save(pOutputFile)
+                Return True
+            Catch ex As Exception
+                Return False
+            End Try
+        Else
+            Return False
+        End If
+    End Function
 
     Private Sub BoxPlot(ByVal data As Generic.List(Of Double()), ByVal names As Generic.List(Of String))
         Dim myPane As GraphPane = pZgc.GraphPane
@@ -501,7 +527,11 @@ Public Class clsGraphBoxWhisker
             lStat = lTs.Attributes.GetValue(aStatName, Double.NaN)
         ElseIf pDatasetsCalc IsNot Nothing AndAlso pDatasetsCalc.Count > 0 Then
             Dim lTs As atcTimeseries = pDatasetsCalc(aDSIndex)
-            lStat = lTs.Attributes.GetValue(aStatName, Double.NaN)
+            If lTs.numValues = 0 OrElse lTs.Values.Length = 1 Then
+                lStat = lTs.Value(0)
+            Else
+                lStat = lTs.Attributes.GetValue(aStatName, Double.NaN)
+            End If
         End If
         Return lStat
     End Function

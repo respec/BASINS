@@ -8,59 +8,76 @@ Imports ZedGraph
 Public Class clsGraphBar
     Inherits clsGraphBoxWhisker
 
+    Public Property AttributeName() As String = "mean"
+
     <CLSCompliant(False)>
     Public Sub New(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZedGraphControl As ZedGraphControl, Optional aDelaySetup As Boolean = False)
-        MyBase.New(aDataGroup, aZedGraphControl)
+        MyBase.New(aDataGroup, aZedGraphControl, True)
         If Not aDelaySetup Then
             SetUpGraph(True)
         End If
     End Sub
 
     Public Overrides Sub SetUpGraph(Optional OutputToFile As Boolean = False)
-        If Datasets.Count = 0 Then
-            Exit Sub
+        If Datasets Is Nothing OrElse Datasets.Count = 0 Then
+            If DatasetsCollection Is Nothing OrElse DatasetsCollection.Count = 0 Then
+                Exit Sub
+            End If
         End If
-
         'Set up the chart
         pZgc.GraphPane.BarSettings.Type = BarType.Overlay
         pZgc.GraphPane.XAxis.IsVisible = False
         pZgc.GraphPane.Legend.IsVisible = ShowLegend()
+        pZgc.GraphPane.Title.FontSpec.Size = 14
+        pZgc.GraphPane.Title.FontSpec.IsBold = False
         If String.Compare(Title(), "no title", True) = 0 Then
         ElseIf String.IsNullOrEmpty(Title()) Then
-            Dim lcon As String = Datasets(0).Attributes.GetValue("Constituent", "Value")
-            pZgc.GraphPane.Title.Text = lcon & " Ranges"
+            If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
+                Dim lcon As String = Datasets(0).Attributes.GetValue("Constituent", "Value")
+                pZgc.GraphPane.Title.Text = lcon & " " & AttributeName
+            End If
         Else
             pZgc.GraphPane.Title.Text = Title()
         End If
         Dim listDataArrays As New Generic.List(Of Double())
-        For I As Integer = 0 To Datasets.Count - 1
-            listDataArrays.Add(Datasets(I).Values)
-        Next
-        If XLabels Is Nothing OrElse XLabels.Count <> Datasets.Count Then
-            XLabels = New Generic.List(Of String)
-            Dim lbl As String = ""
+        If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
             For I As Integer = 0 To Datasets.Count - 1
-                lbl = Datasets(I).Attributes.GetValue("Location", "QTY" & I.ToString())
-                If Not String.IsNullOrEmpty(lbl) AndAlso lbl.Length > 8 Then
-                    lbl = lbl.Substring(0, 8)
-                End If
-                XLabels.Add(lbl)
+                listDataArrays.Add(Datasets(I).Values)
             Next
+        Else
+            If DatasetsCollection IsNot Nothing AndAlso DatasetsCollection.Count > 0 Then
+                Dim lmin As Double = Double.MaxValue
+                For I As Integer = 0 To DatasetsCollection.Count - 1
+                    If DatasetsCollection.ItemByIndex(I) > lmin Then
+                        lmin = DatasetsCollection.ItemByIndex(I)
+                    End If
+                Next
+                For I As Integer = 0 To DatasetsCollection.Count - 1
+                    listDataArrays.Add(New Double() {lmin, DatasetsCollection.ItemByIndex(I)})
+                Next
+            Else
+                pZgc.Refresh()
+                Exit Sub
+            End If
         End If
+        SetupXLabels()
+
         'Dim lPane As GraphPane = MyBase.pZgc.MasterPane.PaneList(0)
         'lPane.Legend.IsVisible = False
         With pZgc.GraphPane.XAxis
             '.Scale.MaxAuto = False
             If String.IsNullOrEmpty(XTitle()) Then
-                With Datasets(0).Attributes
-                    Dim lScen As String = .GetValue("scenario")
-                    Dim lLoc As String = .GetValue("location")
-                    Dim lCons As String = .GetValue("constituent")
-                    Dim lUnit As String = .GetValue("Units")
-                    Dim lTimeUnit As String = TimeUnitText(Datasets(0))
-                    'Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
-                    XTitle = lTimeUnit & " " & lCons & " at " & lLoc
-                End With
+                If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
+                    With Datasets(0).Attributes
+                        Dim lScen As String = .GetValue("scenario")
+                        Dim lLoc As String = .GetValue("location")
+                        Dim lCons As String = .GetValue("constituent")
+                        Dim lUnit As String = .GetValue("Units")
+                        Dim lTimeUnit As String = TimeUnitText(Datasets(0))
+                        'Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+                        XTitle = lTimeUnit & " " & lCons & " at " & lLoc
+                    End With
+                End If
             End If
             .Title.Text = XTitle()
         End With
@@ -74,18 +91,26 @@ Public Class clsGraphBar
             '.Scale.MaxAuto = False
             '.Scale.MinAuto = False
             '.MinSpace = 80
+            .MajorTic.IsOutside = False
+            .MinorTic.IsOutside = False
+            .MajorTic.Color = Color.DarkGray
+            .MinorTic.Color = Color.DarkGray
+            .Scale.FontSpec.Size = 10
             If String.IsNullOrEmpty(YTitle()) Then
-                With Datasets(0).Attributes
-                    Dim lCons As String = .GetValue("constituent")
-                    Dim lUnit As String = .GetValue("Units")
-                    Dim lTimeUnit As String = TimeUnitText(Datasets(0))
-                    YTitle = lCons & " " & lUnit
-                End With
+                If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
+                    With Datasets(0).Attributes
+                        Dim lCons As String = .GetValue("constituent")
+                        Dim lUnit As String = .GetValue("Units")
+                        Dim lTimeUnit As String = TimeUnitText(Datasets(0))
+                        YTitle = lCons & " " & lUnit
+                    End With
+                End If
             End If
             .Title.Text = YTitle() 'lTimeseriesY.ToString
+            .Title.FontSpec.Size = 12
         End With
         'ScaleAxis(Datasets, pZgc.GraphPane.YAxis)
-        BarPlot(listDataArrays, XLabels())
+        BarPlot(listDataArrays, XLabels)
         If Double.IsNaN(XLabelBaseline) Then
             With pZgc.GraphPane.YAxis
                 If .Type = AxisType.Linear Then
@@ -110,45 +135,50 @@ Public Class clsGraphBar
 
         If ShowLegend Then
             pZgc.GraphPane.Legend.IsHStack = True
-            pZgc.GraphPane.Legend.Border.Color = Color.LightGray
+            pZgc.GraphPane.Legend.Border.Color = Color.DarkGray
         Else
-            'use labels
-            Dim lAngle As Single = -90
-            If Not Single.IsNaN(XLabelAngle) AndAlso XLabelAngle <= 90 AndAlso XLabelAngle >= -90 Then
-                lAngle = XLabelAngle
-            End If
-            Dim labelw As TextObj = Nothing
-            Dim lBufferWid As Integer = -999
-            For I As Integer = 0 To Datasets.Count - 1
-                Dim label As TextObj = New TextObj(XLabels(I), I, 1.01, CoordType.XScaleYChartFraction, AlignH.Left, AlignV.Center)
-                label.ZOrder = ZOrder.A_InFront
-                label.FontSpec.Border.IsVisible = False
-                label.FontSpec.Angle = XLabelAngle
-                If ShowXLabelColor AndAlso DataColors IsNot Nothing AndAlso DataColors.Count = Datasets.Count Then
-                    label.FontSpec.FontColor = DataColors(I)
-                Else
-                    'label.FontSpec.FontColor = Color.Black
-                End If
-                If System.Windows.Forms.TextRenderer.MeasureText(XLabels(I), label.FontSpec.GetFont(1.0)).Width > lBufferWid Then
-                    lBufferWid = System.Windows.Forms.TextRenderer.MeasureText(XLabels(I), label.FontSpec.GetFont(1.0)).Width
-                    labelw = label
-                End If
-                pZgc.GraphPane.GraphObjList.Add(label)
-            Next
-            If labelw IsNot Nothing Then
-                pZgc.GraphPane.Margin.Bottom = System.Windows.Forms.TextRenderer.MeasureText(labelw.Text, labelw.FontSpec.GetFont(1.0)).Width + 15
-            End If
+            PlotXLabels()
         End If
         pZgc.GraphPane.AxisChange()
+        'Dim leftMargin As Double = 10
+        'Dim rightMargin As Double = 10
+        'Dim topMargin As Double = 10
+        'Dim bottomMargin As Double = 8
+        'Dim width As Double = pZgc.GraphPane.Chart.Rect.Width
+        'Dim height As Double = pZgc.GraphPane.Chart.Rect.Height
+        'pZgc.GraphPane.Chart.Rect = New RectangleF(leftMargin, topMargin, width - leftMargin - rightMargin, height - topMargin - bottomMargin)
 
         If OutputToFile Then
-            If IO.Directory.Exists(IO.Path.GetDirectoryName(OutputFile)) Then
-                pZgc.GraphPane.GetImage().Save(OutputFile)
-            End If
+            SaveToFile()
         End If
         pZgc.Refresh()
     End Sub
 
+    '{
     Private Sub BarPlot(ByVal data As Generic.List(Of Double()), ByVal names As Generic.List(Of String))
-    End Sub
+        Dim myPane As GraphPane = pZgc.GraphPane
+        For i As Integer = 0 To data.Count - 1
+            Dim ptList As New PointPairList()
+            'Add the values
+            Dim lattrValue As Double = GetStatistic(i, AttributeName)
+            ptList.Add(i, lattrValue)
+
+            Dim lColor As Color = Color.Black
+            If DataColors IsNot Nothing AndAlso DataColors.Count >= data.Count Then
+                lColor = DataColors(i)
+            End If
+
+            'Box
+            Dim myCurve As BarItem = Nothing
+            If DataColors IsNot Nothing AndAlso DataColors.Count >= data.Count Then
+                myCurve = myPane.AddBar(names(i), ptList, DataColors(i))
+                myCurve.Bar.Fill.Type = FillType.Solid
+                myCurve.Bar.Border.Color = Color.DarkGray
+            Else
+                myCurve = myPane.AddBar(names(i), ptList, Color.Black)
+                myCurve.Bar.Fill.Type = FillType.None
+            End If
+        Next
+    End Sub '}
+
 End Class
