@@ -353,7 +353,7 @@ Public Class atcExpertSystem
                     Dim lMethods As New ArrayList
                     lMethods.Add(atcTimeseriesBaseflow.BFMethods.HySEPLocMin)
                     lArgs.SetValue("BFMethods", lMethods)
-                    lArgs.SetValue("DrainageArea", lSite.Area)
+                    lArgs.SetValue("DrainageArea", lSite.Area / 640.0) 'The factor of 640 converts area from acres to square miles. This conversion factor should be called from modUnits though
                     lArgs.SetValue("StartDate", .SDateJ)
                     lArgs.SetValue("EndDate", .EDateJ)
                     lArgs.SetValue("Streamflow", lTsFlowGroup)
