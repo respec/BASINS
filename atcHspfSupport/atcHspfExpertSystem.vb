@@ -367,37 +367,27 @@ Public Class atcExpertSystem
                 Catch ex As Exception
                 End Try
             End If
-            '- call synop to find less than 50 storms
+            '- call synop to find storms
             If lNonBaseflowTimser IsNot Nothing Then
 
                 Dim lInputGroup As New atcTimeseriesGroup
                 lInputGroup.Add(lNonBaseflowTimser)
 
-
                 Dim lThreshold As Double = 0.1
                 Dim lOutputGroup As New atcTimeseriesGroup
-                Dim lFirstTime As Boolean = True
-
-                'Do While lOutputGroup.Count > 50 Or lFirstTime
                 lOutputGroup = atcSynopticAnalysis.atcSynopticAnalysisPlugin.ComputeEvents(lInputGroup, lThreshold, 0.0, True)
-                '    lThreshold += 1.0
-                'lFirstTime = False
-                'Loop
 
                 Dim lStormList As New atcCollection
                 Dim SumofStorm As Double
                 Dim StormPeak As Double
                 Dim StormAverageVolumePerDay As Double
                 If lOutputGroup.Count > 0 Then
-                    'now add the storm dates
+                    'sort the storms to find the biggest ones
                     Dim lStormIndex As Integer = 0
                     For Each lTimSer As atcTimeseries In lOutputGroup
                         SumofStorm = 0
                         StormPeak = 0
                         StormAverageVolumePerDay = 0.0
-                        'If lTimSer.numValues < 2 Or lTimSer.numValues > 70 Then
-                        '    Continue For
-                        'End If
                         For Each lValue As Double In lTimSer.Values
                             If lValue > StormPeak Then StormPeak = lValue
                             SumofStorm += lValue
@@ -409,10 +399,9 @@ Public Class atcExpertSystem
                     lStormList.SortByValue()
 
                     Dim NumberOfStorms As Integer = lStormList.Count
-
                     Dim NumberOfStormsTobeIncluded As Integer = (.EDateJ - .SDateJ) * 5 / 365.25
-
                     For i As Integer = (NumberOfStorms - NumberOfStormsTobeIncluded) To NumberOfStorms - 1
+                        'these are the biggest storms, add them to the exs
                         Dim localKey As Integer = lStormList.Keys(i)
 
                         Dim lStormSDate(5) As Integer
@@ -421,13 +410,10 @@ Public Class atcExpertSystem
                         J2Date(lOutputGroup(localKey).Dates.Values(lOutputGroup(localKey).numValues), lStormEDate)
 
                         .Storms.Add(New HspfSupport.HexStorm(i, lStormSDate, lStormEDate))
-
-
                     Next i
 
                 End If
             End If
-
 
             If .Storms.Count = 0 Then
                 'just do 1 dummy storm for now
