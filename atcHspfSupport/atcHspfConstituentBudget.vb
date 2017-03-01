@@ -41,7 +41,7 @@ Public Module ConstituentBudget
         Dim lReportLoadingRate As New atcReport.ReportText
         Dim lBoxWhiskerItems As New List(Of BoxWhiskerItem)
         Dim lDataForBoxWhiskerPlot As New BoxWhiskerItem
-        Dim lDataForOneBarGraph As New BarGraphItem
+
         Dim lDataForAllBarGraphs As New atcCollection
 
         pRunningTotals = New atcCollection
@@ -1269,6 +1269,7 @@ This message box will not be shown again for." & aBalanceType)
 
 
             For Each lReach As String In lReaches
+                Dim lDataForOneBarGraph As New BarGraphItem
                 lDataForOneBarGraph.Units = "(" & lUnits & "/acre)"
                 lDataForOneBarGraph.Constituent = aBalanceType
 

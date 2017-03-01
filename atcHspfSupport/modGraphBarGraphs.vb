@@ -27,32 +27,44 @@ Public Module modBarGraph
         Dim lGrapher As New atcGraph.clsGraphBar(Nothing, lZgc, True)
         lGrapher.DatasetsCollection = items.LabelValueCollection
 
-        lGrapher.Title = "Title"
+        Select Case items.Constituent
+            Case "Sediment"
+                lGrapher.Title = "Sediment load allocation from all land uses."
+            Case "TotalP"
+                lGrapher.Title = "Total Phosphorus load allocation from all land uses."
+            Case "TotalN"
+                lGrapher.Title = "Total Nitrogen load allocation from all land uses."
+        End Select
         lGrapher.OutputFile = aOutputFileName
 
         'Set the color of the data series
         'if no color are supplied, then all boxes are black in color
         Dim data_colors As New List(Of Color)
         With data_colors
-            .Add(Color.AliceBlue)
-            .Add(Color.Aqua)
-            .Add(Color.Aquamarine)
-            .Add(Color.Azure)
-            .Add(Color.Beige)
-            .Add(Color.Bisque)
-            .Add(Color.BlanchedAlmond)
-            .Add(Color.Brown)
-            .Add(Color.Chartreuse)
-            .Add(Color.Crimson)
+            .Add(Color.Blue)
+            .Add(Color.Red)
+            .Add(Color.Green)
+            .Add(Color.Yellow)
+            .Add(Color.HotPink)
+            .Add(Color.DarkMagenta)
+            .Add(Color.DarkOliveGreen)
+            .Add(Color.DarkSalmon)
+            .Add(Color.Black)
+            .Add(Color.Indigo)
             .Add(Color.Cyan)
             .Add(Color.DarkGray)
             .Add(Color.DarkMagenta)
-            .Add(Color.DarkSalmon)
+            .Add(Color.DarkGoldenrod)
             .Add(Color.DarkTurquoise)
             .Add(Color.DeepPink)
             .Add(Color.DodgerBlue)
             .Add(Color.Gold)
             .Add(Color.Indigo)
+            .Add(Color.Crimson)
+            .Add(Color.CornflowerBlue)
+            .Add(Color.DarkKhaki)
+            .Add(Color.ForestGreen)
+            .Add(Color.LemonChiffon)
         End With
         lGrapher.DataColors = data_colors
 
