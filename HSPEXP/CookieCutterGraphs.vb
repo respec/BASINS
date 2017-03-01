@@ -4,19 +4,20 @@ Imports atcUCI
 Imports atcData
 Imports ZedGraph 'this is coming from a DLL as the original project was a C# project and not a VB project
 Imports atcGraph
-
-
+Imports System.Collections.Specialized
 
 Public Module CookieCutterGraphs
     Sub ReganGraphs(ByVal aHSPFUCI As HspfUci, ByVal aSDateJ As Double, ByVal aEDateJ As Double, ByVal lOutputFolder As String)
         Dim lConstituentsToGraph As New atcCollection
         lOutputFolder &= "ReganPlots\"
-        Dim WQCriteriaInmgperliter As Double = 0.05 'Need to be able to provide it dynamically
+        Dim WQCriteriaInmgperliter As Double = 0.0
         Dim acftToCubicft As Double = 43560 'Should be called from modUnits
         Dim CubicftToLiters As Double = 28.317
         Dim PoundsToMilligrams As Double = 453592.0
         Dim TSTimeUnit As Integer
-
+        Dim CommonRESStandard As Double = 0.0
+        Dim LowerRangeRCHId As Integer = 0
+        Dim HigherRangeRCHId As Integer = 0
 
         If Not System.IO.Directory.Exists(lOutputFolder) Then
             System.IO.Directory.CreateDirectory(lOutputFolder)
@@ -172,60 +173,125 @@ All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan pl
                         End If
 
                         'Plotting Load Duration Curve
-                        lTimeseriesGroup = New atcTimeseriesGroup
+                        'Read the RES_TP_Standard.csv
+                        If CommonRESStandard = 0.0 Then
 
-                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "IVOL")(0)
 
-                        If lTimeSeries IsNot Nothing Then
-                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
-                            If TSTimeUnit <= 4 Then
-                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
-                                lTimeSeries = lTimeSeries * WQCriteriaInmgperliter * acftToCubicft * CubicftToLiters / PoundsToMilligrams
-                                lTimeSeries.Attributes.SetValue("YAxis", "Left")
-                                lTimeseriesGroup.Add(lTimeSeries)
+                            If Not (lRchId = LowerRangeRCHId Or lRchId = HigherRangeRCHId Or
+                                                        (lRchId > LowerRangeRCHId AndAlso lRchId < HigherRangeRCHId)) Then
+                                WQCriteriaInmgperliter = 0.0
+                                Dim lRESStandardFileNames As New NameValueCollection
+                                AddFilesInDir(lRESStandardFileNames, IO.Directory.GetCurrentDirectory, False, "*RES_TP_Standard.csv")
+                                If lRESStandardFileNames.Count < 1 Then '
+                                    Logger.Dbg(Now & " Custom graphs will not be produced.")
+                                    Continue For
+                                End If
+                                Dim lgraphRecordsNew As New ArrayList()
+                                Using MyReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(lRESStandardFileNames(0))
+                                    Dim lines() As String = {}
+                                    If System.IO.File.Exists(lRESStandardFileNames(0)) Then
+
+                                        MyReader.TextFieldType = FileIO.FieldType.Delimited
+                                        MyReader.SetDelimiters(",")
+                                        Dim CurrentRow As String()
+
+                                        While Not MyReader.EndOfData
+                                            Try
+                                                If MyReader.PeekChars(10000).Contains("***") Or
+                                                MyReader.PeekChars(10000).Contains("RCHRES") Then
+
+                                                    CurrentRow = MyReader.ReadFields
+                                                Else
+                                                    CurrentRow = MyReader.ReadFields
+                                                    If CurrentRow(0).ToLower = "all" Then
+                                                        CommonRESStandard = CurrentRow(1)
+                                                    ElseIf CurrentRow(0).Contains("-") Then
+                                                        Dim Range As String() = CurrentRow(0).Split("-")
+                                                        LowerRangeRCHId = CType(Trim(Range(0)), Integer)
+                                                        HigherRangeRCHId = CType(Trim(Range(1)), Integer)
+                                                        If lRchId = LowerRangeRCHId Or lRchId = HigherRangeRCHId Or
+                                                            (lRchId > LowerRangeRCHId AndAlso lRchId < HigherRangeRCHId) Then
+                                                            WQCriteriaInmgperliter = CurrentRow(1)
+                                                            Exit While
+                                                        End If
+                                                    ElseIf lRchId = CType(CurrentRow(0), Integer) Then
+                                                        WQCriteriaInmgperliter = CurrentRow(1)
+                                                    End If
+                                                    lgraphRecordsNew.Add(CurrentRow)
+
+                                                End If
+                                            Catch ex As Microsoft.VisualBasic.
+                                                FileIO.MalformedLineException
+                                                MsgBox("Line " & ex.Message & "is not valid and will be skipped.")
+                                            End Try
+                                        End While
+                                    End If
+                                End Using
+
                             End If
-                        End If
-                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "P-TOT-IN")(0)
 
-                        If lTimeSeries IsNot Nothing Then
-                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
-                            If TSTimeUnit <= 4 Then
-                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
-                                lTimeSeries.Attributes.SetValue("YAxis", "Left")
-                                lTimeseriesGroup.Add(lTimeSeries)
+
+                        Else
+                            WQCriteriaInmgperliter = CommonRESStandard
+                        End If
+
+                        If WQCriteriaInmgperliter > 0.0 Then
+
+
+                            lTimeseriesGroup = New atcTimeseriesGroup
+
+                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "IVOL")(0)
+
+                            If lTimeSeries IsNot Nothing Then
+                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                                If TSTimeUnit <= 4 Then
+                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                                    lTimeSeries = lTimeSeries * WQCriteriaInmgperliter * acftToCubicft * CubicftToLiters / PoundsToMilligrams
+                                    lTimeSeries.Attributes.SetValue("YAxis", "Left")
+                                    lTimeseriesGroup.Add(lTimeSeries)
+                                End If
                             End If
-                        End If
-                        If lTimeseriesGroup.Count = 2 Then
+                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "P-TOT-IN")(0)
 
-                            Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
-                            Dim lGrapher As New clsGraphProbability(lTimeseriesGroup, lZgc)
-                            Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(0)
+                            If lTimeSeries IsNot Nothing Then
+                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                                If TSTimeUnit <= 4 Then
+                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                                    lTimeSeries.Attributes.SetValue("YAxis", "Left")
+                                    lTimeseriesGroup.Add(lTimeSeries)
+                                End If
+                            End If
+                            If lTimeseriesGroup.Count = 2 Then
 
-                            Dim lCurve As ZedGraph.LineItem = Nothing
-                            lCurve = lMainPane.CurveList.Item(0)
-                            lCurve.Line.IsVisible = True
-                            lCurve.Symbol.Type = SymbolType.None
-                            lCurve.Line.Color = Drawing.Color.FromName("orange")
-                            lCurve.Line.Width = 2
-                            lCurve.Label.Text = "RES Standard (0.05 mg/l)"
-                            lCurve = lMainPane.CurveList.Item(1)
-                            lCurve.Line.IsVisible = True
-                            lCurve.Symbol.Type = SymbolType.None
-                            lCurve.Line.Color = Drawing.Color.FromName("blue")
-                            lCurve.Line.Width = 2
-                            lCurve.Label.Text = "Baseline"
+                                Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+                                Dim lGrapher As New clsGraphProbability(lTimeseriesGroup, lZgc)
+                                Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(0)
 
-                            lMainPane.YAxis.Title.Text = "Total Phosphorus (lbs/day)"
-                            lMainPane.YAxis.Scale.Min = 0
-                            lMainPane.XAxis.Title.Text = "Percent Exceedance at " & lRchresCaption
+                                Dim lCurve As ZedGraph.LineItem = Nothing
+                                lCurve = lMainPane.CurveList.Item(0)
+                                lCurve.Line.IsVisible = True
+                                lCurve.Symbol.Type = SymbolType.None
+                                lCurve.Line.Color = Drawing.Color.FromName("orange")
+                                lCurve.Line.Width = 2
+                                lCurve.Label.Text = "RES Standard (" & WQCriteriaInmgperliter & " mg/l)"
+                                lCurve = lMainPane.CurveList.Item(1)
+                                lCurve.Line.IsVisible = True
+                                lCurve.Symbol.Type = SymbolType.None
+                                lCurve.Line.Color = Drawing.Color.FromName("blue")
+                                lCurve.Line.Width = 2
+                                lCurve.Label.Text = "Baseline"
 
-                            lZgc.SaveIn(lOutputFolder & "LoadDurationTP_RCHRES_" & lRchId & ".png")
+                                lMainPane.YAxis.Title.Text = "Total Phosphorus (lbs/day)"
+                                lMainPane.YAxis.Scale.Min = 0
+                                lMainPane.XAxis.Title.Text = "Percent Exceedance at " & lRchresCaption
+
+                                lZgc.SaveIn(lOutputFolder & "LoadDurationTP_RCHRES_" & lRchId & ".png")
+
+                            End If
 
                         End If
 
                     End If
-
-
 
 
 
