@@ -19,25 +19,24 @@ Partial Class frmAbout
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmAbout))
-        Me.cmdClose = New System.Windows.Forms.Button
+        Me.cmdClose = New System.Windows.Forms.Button()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox
-        Me.PictureBox2 = New System.Windows.Forms.PictureBox
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.txtLabel = New System.Windows.Forms.TextBox
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.txtLabel = New System.Windows.Forms.TextBox()
+        Me.PictureBox2 = New System.Windows.Forms.PictureBox()
+        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.GroupBox1.SuspendLayout()
+        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'cmdClose
         '
-        Me.cmdClose.Location = New System.Drawing.Point(279, 513)
-        Me.cmdClose.Margin = New System.Windows.Forms.Padding(4)
+        Me.cmdClose.Location = New System.Drawing.Point(209, 417)
         Me.cmdClose.Name = "cmdClose"
-        Me.cmdClose.Size = New System.Drawing.Size(161, 38)
+        Me.cmdClose.Size = New System.Drawing.Size(121, 31)
         Me.cmdClose.TabIndex = 3
         Me.cmdClose.Text = "&Close"
         Me.cmdClose.UseVisualStyleBackColor = True
@@ -48,69 +47,67 @@ Partial Class frmAbout
         Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
         Me.ImageList1.Images.SetKeyName(0, "basins.gif")
         Me.ImageList1.Images.SetKeyName(1, "atcLogo.gif")
-        '
-        'PictureBox1
-        '
-        Me.PictureBox1.Location = New System.Drawing.Point(19, 15)
-        Me.PictureBox1.Margin = New System.Windows.Forms.Padding(4)
-        Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(333, 140)
-        Me.PictureBox1.TabIndex = 4
-        Me.PictureBox1.TabStop = False
-        '
-        'PictureBox2
-        '
-        Me.PictureBox2.Location = New System.Drawing.Point(373, 15)
-        Me.PictureBox2.Margin = New System.Windows.Forms.Padding(4)
-        Me.PictureBox2.Name = "PictureBox2"
-        Me.PictureBox2.Size = New System.Drawing.Size(333, 140)
-        Me.PictureBox2.TabIndex = 5
-        Me.PictureBox2.TabStop = False
+        Me.ImageList1.Images.SetKeyName(2, "logo.png")
         '
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.txtLabel)
-        Me.GroupBox1.Location = New System.Drawing.Point(19, 180)
-        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4)
+        Me.GroupBox1.Location = New System.Drawing.Point(14, 146)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4)
-        Me.GroupBox1.Size = New System.Drawing.Size(688, 316)
+        Me.GroupBox1.Size = New System.Drawing.Size(516, 257)
         Me.GroupBox1.TabIndex = 6
         Me.GroupBox1.TabStop = False
         '
         'txtLabel
         '
         Me.txtLabel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtLabel.BackColor = System.Drawing.SystemColors.ControlLight
         Me.txtLabel.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.txtLabel.CausesValidation = False
-        Me.txtLabel.Location = New System.Drawing.Point(16, 36)
+        Me.txtLabel.Location = New System.Drawing.Point(12, 29)
+        Me.txtLabel.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.txtLabel.Multiline = True
         Me.txtLabel.Name = "txtLabel"
         Me.txtLabel.ReadOnly = True
-        Me.txtLabel.Size = New System.Drawing.Size(656, 255)
+        Me.txtLabel.Size = New System.Drawing.Size(492, 207)
         Me.txtLabel.TabIndex = 3
         Me.txtLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
+        'PictureBox2
+        '
+        Me.PictureBox2.Location = New System.Drawing.Point(428, 12)
+        Me.PictureBox2.Name = "PictureBox2"
+        Me.PictureBox2.Size = New System.Drawing.Size(102, 114)
+        Me.PictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
+        Me.PictureBox2.TabIndex = 5
+        Me.PictureBox2.TabStop = False
+        '
+        'PictureBox1
+        '
+        Me.PictureBox1.Location = New System.Drawing.Point(14, 12)
+        Me.PictureBox1.Name = "PictureBox1"
+        Me.PictureBox1.Size = New System.Drawing.Size(250, 114)
+        Me.PictureBox1.TabIndex = 4
+        Me.PictureBox1.TabStop = False
+        '
         'frmAbout
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(725, 572)
+        Me.ClientSize = New System.Drawing.Size(544, 465)
         Me.Controls.Add(Me.PictureBox2)
         Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.GroupBox1)
         Me.KeyPreview = True
-        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmAbout"
         Me.Text = "About WinHSPF"
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub

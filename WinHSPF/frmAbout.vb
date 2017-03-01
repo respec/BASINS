@@ -13,7 +13,7 @@ Public Class frmAbout
         Me.MaximumSize = Me.Size
 
         PictureBox1.Image = ImageList1.Images(0)
-        PictureBox2.Image = ImageList1.Images(1)
+        PictureBox2.Image = ImageList1.Images(2)
         PictureBox1.Cursor = Windows.Forms.Cursors.Hand
         PictureBox2.Cursor = Windows.Forms.Cursors.Hand
 
@@ -26,11 +26,11 @@ Public Class frmAbout
     End Sub
 
     Private Sub PictureBox1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PictureBox1.Click
-        System.Diagnostics.Process.Start("http://www.epa.gov/OST/BASINS/")
+        System.Diagnostics.Process.Start("https://www.epa.gov/exposure-assessment-models/basins")
     End Sub
 
     Private Sub PictureBox2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PictureBox2.Click
-        System.Diagnostics.Process.Start("http://www.aquaterra.com")
+        System.Diagnostics.Process.Start("http://www.respec.com/solution/modeling-optimization/")
     End Sub
 
     Private Function StatusString() As String
