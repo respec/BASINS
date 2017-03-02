@@ -150,6 +150,7 @@ Public Class atcGraphPlugin
     Public Overloads Function Show(ByVal aTimeseriesGroup As atcDataGroup, ByVal aGraphTypeName As String) As Object
         Dim lForm As New atcGraphForm()
         Dim lGrapher As clsGraphBase = GetGraphType(aGraphTypeName, aTimeseriesGroup, lForm)
+        lGrapher.pZgc.MasterPane.Tag = aGraphTypeName
         If lGrapher Is Nothing Then
             lForm.Dispose()
             Return Nothing

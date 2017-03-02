@@ -3,6 +3,10 @@ Imports System.Drawing
 Imports atcData
 Imports atcUtility
 Imports ZedGraph
+Imports System.IO
+Imports System.Xml
+Imports System.Xml.Linq
+Imports System.Runtime.Serialization.Json
 
 Public Module modGraph
     Friend Const DefaultAxisLabelFormat As String = "#,##0.###"
@@ -956,7 +960,7 @@ FoundMatch:
     ''' <param name="aScaleMin"></param>
     ''' <param name="aScaleMax"></param>
     ''' <remarks></remarks>
-    Public Sub Scalit(ByVal aDataMin As Double, ByVal aDataMax As Double, ByVal aLogScale As Boolean, _
+    Public Sub Scalit(ByVal aDataMin As Double, ByVal aDataMax As Double, ByVal aLogScale As Boolean,
                       ByRef aScaleMin As Double, ByRef aScaleMax As Double)
         'TODO: should existing ScaleMin and ScaleMax be respected?
         If Not aLogScale Then 'arithmetic scale
@@ -1042,4 +1046,215 @@ FoundMatch:
             End If
         End If
     End Sub
+
+    Public Sub GraphJsonToFile(ByVal aJsonFileName As String, ByVal aOutputFileName As String)
+
+        'open json to find timeseries needed and plot type
+        Dim lGraphType As String = ""
+        Dim lCurveContents As New atcCollection
+        atcGraph.ReadGraphBasicsFromJSON(aJsonFileName, lGraphType, lCurveContents)
+
+        'put data in data group
+        Dim lTimeseriesGroup As New atcTimeseriesGroup
+        For Each lCurve As String In lCurveContents
+            'get timeseries
+            Dim lIndex As String = MapWinUtility.Strings.StrSplit(lCurve, "|", """")
+            Dim lID As String = MapWinUtility.Strings.StrSplit(lCurve, "|", """")
+            Dim lDataFileName As String = lCurve
+
+            atcDataManager.OpenDataSource(lDataFileName)
+            For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                If lDataSource.Specification = lDataFileName Then
+                    For Each lTimSer As atcTimeseries In lDataSource.DataSets
+                        If lTimSer.Attributes.GetValue("ID").ToString = lID Then
+                            lTimeseriesGroup.Add(lTimSer)
+                            Exit For
+                        End If
+                    Next
+                    Exit For
+                End If
+            Next
+        Next
+
+        'create basic plot
+        Dim lZgc As ZedGraphControl = CreateZgc()
+        If lGraphType = "Time Series" Then
+            Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
+        End If
+
+        'apply specs from json
+        atcGraph.ApplySpecsFromJSON(aJsonFileName, lZgc)
+
+        'save it to a file
+        lZgc.SaveIn(aOutputFileName)
+        lZgc.Dispose()
+
+    End Sub
+
+    Private Sub ReadGraphBasicsFromJSON(ByVal aFilename As String, ByRef aGraphType As String, ByRef aCurveContents As atcCollection)
+        Try
+            Dim lBuffer() As Byte = File.ReadAllBytes(aFilename)
+            Dim lReader As XmlDictionaryReader = JsonReaderWriterFactory.CreateJsonReader(lBuffer, New XmlDictionaryReaderQuotas())
+            Dim lXml As XElement = XElement.Load(lReader)
+            Dim lDoc As New XmlDocument
+            lDoc.LoadXml(lXml.ToString())
+
+            Dim lTagList As XmlNodeList = lDoc.GetElementsByTagName("Tag")
+            For Each lNode As XmlNode In lDoc.ChildNodes(0).ChildNodes
+                If lNode.Name = "Tag" Then
+                    aGraphType = lNode.InnerText
+                End If
+            Next
+
+            Dim lPaneList As XmlNodeList = lDoc.GetElementsByTagName("PaneList")
+            For Each lPane As XmlNode In lPaneList
+                For Each lItemNode As XmlNode In lPane.ChildNodes
+                    For Each lItemNode2 As XmlNode In lItemNode.ChildNodes
+                        If lItemNode2.Name = "CurveList" Then
+                            For Each lChildItem As XmlNode In lItemNode2.ChildNodes
+                                For Each lChildNode As XmlNode In lChildItem.ChildNodes
+                                    If lChildNode.Name = "Tag" Then
+                                        aCurveContents.Add(lChildNode.InnerText)
+                                    End If
+                                Next
+                            Next
+                        End If
+                    Next
+                Next
+            Next
+
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    <CLSCompliant(False)>
+    Friend Function ApplySpecsFromJSON(ByVal aFilename As String, ByRef aZgc As ZedGraph.ZedGraphControl) As Boolean
+        'Dim JsonString As String = File.ReadAllText(.FileName)
+        'Dim ser As JavaScriptSerializer = New JavaScriptSerializer()
+        Try
+            'pZgc.MasterPane = ser.Deserialize(Of ZedGraph.MasterPane)(JsonString)   'does not work
+
+            Dim lBuffer() As Byte = File.ReadAllBytes(aFilename)
+            Dim lReader As XmlDictionaryReader = JsonReaderWriterFactory.CreateJsonReader(lBuffer, New XmlDictionaryReaderQuotas())
+            Dim lXml As XElement = XElement.Load(lReader)
+            Dim lDoc As New XmlDocument
+            lDoc.LoadXml(lXml.ToString())
+
+            'set up collection of curves for easy reference
+            Dim lCurves As New atcCollection
+            Dim lCurveIndex As Integer = -1
+            For Each lPane As GraphPane In aZgc.MasterPane.PaneList
+                For Each lCurve As CurveItem In lPane.CurveList
+                    lCurveIndex += 1
+                    lCurves.Add(lCurveIndex, lCurve)
+                Next
+            Next
+
+            Dim lPaneList As XmlNodeList = lDoc.GetElementsByTagName("PaneList")
+            Dim lTag As String
+            lCurveIndex = -1
+            For Each lPane As XmlNode In lPaneList
+                For Each lItemNode As XmlNode In lPane.ChildNodes
+                    For Each lItemNode2 As XmlNode In lItemNode.ChildNodes
+                        If lItemNode2.Name = "CurveList" Then
+                            lCurveIndex += 1
+                            For Each lChildItem As XmlNode In lItemNode2.ChildNodes
+                                For Each lChildNode As XmlNode In lChildItem.ChildNodes
+                                    If lChildNode.Name = "Tag" Then
+                                        lTag = lChildNode.InnerText
+                                    ElseIf lChildNode.Name = "Label" Then
+                                        If lChildNode.InnerText.EndsWith("true") Then
+                                            lChildNode.InnerText = lChildNode.InnerText.Remove(lChildNode.InnerText.Length - 4, 4) 'work around for a strange bug
+                                        End If
+                                        lCurves(lCurveIndex).Label.Text = lChildNode.InnerText
+                                    ElseIf lChildNode.Name = "Color" Then
+                                        Dim lA As Integer = 0
+                                        Dim lR As Integer = 0
+                                        Dim lG As Integer = 0
+                                        Dim lB As Integer = 0
+                                        For Each lColorNode As XmlNode In lChildNode.ChildNodes
+                                            If lColorNode.Name = "R" Then
+                                                lR = lColorNode.InnerText
+                                            ElseIf lColorNode.Name = "G" Then
+                                                lG = lColorNode.InnerText
+                                            ElseIf lColorNode.Name = "B" Then
+                                                lB = lColorNode.InnerText
+                                            ElseIf lColorNode.Name = "A" Then
+                                                lA = lColorNode.InnerText
+                                            End If
+                                        Next
+                                        lCurves(lCurveIndex).color = Color.FromArgb(lA, lR, lG, lB)
+                                    ElseIf lChildNode.Name = "Symbol" Then
+                                        For Each lSymbolNode As XmlNode In lChildNode.ChildNodes
+                                            If lSymbolNode.Name = "Size" Then
+                                                lCurves(lCurveIndex).Symbol.Size = lSymbolNode.InnerText
+                                            End If
+                                        Next
+                                    End If
+                                Next
+                            Next
+                        ElseIf lItemNode2.Name = "XAxis" Then
+                            For Each lChildItem As XmlNode In lItemNode2.ChildNodes
+                                If lChildItem.Name = "Title" Then
+                                    For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                        If lScaleNode.Name = "Text" Then
+                                            aZgc.MasterPane.PaneList(0).XAxis.Title.Text = lScaleNode.InnerText
+                                        End If
+                                    Next
+                                ElseIf lChildItem.Name = "Scale"
+                                    For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                        If lScaleNode.Name = "Min" Then
+                                            aZgc.MasterPane.PaneList(0).XAxis.Scale.Min = lScaleNode.InnerText
+                                        ElseIf lScaleNode.Name = "Max" Then
+                                            aZgc.MasterPane.PaneList(0).XAxis.Scale.Max = lScaleNode.InnerText
+                                        End If
+                                    Next
+                                End If
+                            Next
+                        ElseIf lItemNode2.Name = "YAxis" Then
+                            For Each lChildItem As XmlNode In lItemNode2.ChildNodes
+                                If lChildItem.Name = "Title" Then
+                                    For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                        If lScaleNode.Name = "Text" Then
+                                            aZgc.MasterPane.PaneList(0).YAxis.Title.Text = lScaleNode.InnerText
+                                        End If
+                                    Next
+                                ElseIf lChildItem.Name = "Scale"
+                                    For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                        If lScaleNode.Name = "Min" Then
+                                            aZgc.MasterPane.PaneList(0).YAxis.Scale.Min = lScaleNode.InnerText
+                                        ElseIf lScaleNode.Name = "Max" Then
+                                            aZgc.MasterPane.PaneList(0).YAxis.Scale.Max = lScaleNode.InnerText
+                                        End If
+                                    Next
+                                End If
+                            Next
+                        ElseIf lItemNode2.Name = "Y2Axis" Then
+                            For Each lChildItem As XmlNode In lItemNode2.ChildNodes
+                                If lChildItem.Name = "Title" Then
+                                    For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                        If lScaleNode.Name = "Text" Then
+                                            aZgc.MasterPane.PaneList(0).Y2Axis.Title.Text = lScaleNode.InnerText
+                                        End If
+                                    Next
+                                ElseIf lChildItem.Name = "Scale"
+                                    For Each lScaleNode As XmlNode In lChildItem.ChildNodes
+                                        If lScaleNode.Name = "Min" Then
+                                            aZgc.MasterPane.PaneList(0).Y2Axis.Scale.Min = lScaleNode.InnerText
+                                        ElseIf lScaleNode.Name = "Max" Then
+                                            aZgc.MasterPane.PaneList(0).Y2Axis.Scale.Max = lScaleNode.InnerText
+                                        End If
+                                    Next
+                                End If
+                            Next
+                        End If
+                    Next
+                Next
+            Next
+
+        Catch ex As Exception
+
+        End Try
+    End Function
 End Module

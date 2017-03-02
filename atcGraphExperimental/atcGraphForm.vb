@@ -10,13 +10,8 @@ Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Collections
 Imports System.ComponentModel
-Imports System.IO
 Imports System.Windows.Forms
 Imports System.Web.Script.Serialization
-Imports System.Xml
-Imports System.Xml.Linq
-Imports System.Runtime.Serialization.Json
-'Imports System.Runtime.InteropServices
 
 Public Class atcGraphForm
     Inherits Form
@@ -649,131 +644,11 @@ Public Class atcGraphForm
             End If
 
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
-                Dim JsonString As String = File.ReadAllText(.FileName)
-                'Dim ser As JavaScriptSerializer = New JavaScriptSerializer()
-                Try
-                    'pZgc.MasterPane = ser.Deserialize(Of ZedGraph.MasterPane)(JsonString)   'does not work
-                    Dim lBuffer() As Byte = File.ReadAllBytes(.FileName)
-                    Dim lReader As XmlDictionaryReader = JsonReaderWriterFactory.CreateJsonReader(lBuffer, New XmlDictionaryReaderQuotas())
-                    Dim lXml As XElement = XElement.Load(lReader)
-                    Dim lDoc As New XmlDocument
-                    lDoc.LoadXml(lXml.ToString())
-
-                    'set up collection of curves for easy reference
-                    Dim lCurves As New atcCollection
-                    Dim lCurveIndex As Integer = -1
-                    For Each lPane As GraphPane In pZgc.MasterPane.PaneList
-                        For Each lCurve As CurveItem In lPane.CurveList
-                            lCurveIndex += 1
-                            lCurves.Add(lCurveIndex, lCurve)
-                        Next
-                    Next
-
-                    Dim lPaneList As XmlNodeList = lDoc.GetElementsByTagName("PaneList")
-                    Dim lTag As String
-                    lCurveIndex = -1
-                    For Each lPane As XmlNode In lPaneList
-                        For Each lItemNode As XmlNode In lPane.ChildNodes
-                            For Each lItemNode2 As XmlNode In lItemNode.ChildNodes
-                                If lItemNode2.Name = "CurveList" Then
-                                    lCurveIndex += 1
-                                    For Each lChildItem As XmlNode In lItemNode2.ChildNodes
-                                        For Each lChildNode As XmlNode In lChildItem.ChildNodes
-                                            If lChildNode.Name = "Tag" Then
-                                                lTag = lChildNode.InnerText
-                                            ElseIf lChildNode.Name = "Label" Then
-                                                lCurves(lCurveIndex).Label.Text = lChildNode.InnerText
-                                            ElseIf lChildNode.Name = "Color" Then
-                                                Dim lA As Integer = 0
-                                                Dim lR As Integer = 0
-                                                Dim lG As Integer = 0
-                                                Dim lB As Integer = 0
-                                                For Each lColorNode As XmlNode In lChildNode.ChildNodes
-                                                    If lColorNode.Name = "R" Then
-                                                        lR = lColorNode.InnerText
-                                                    ElseIf lColorNode.Name = "G" Then
-                                                        lG = lColorNode.InnerText
-                                                    ElseIf lColorNode.Name = "B" Then
-                                                        lB = lColorNode.InnerText
-                                                    ElseIf lColorNode.Name = "A" Then
-                                                        lA = lColorNode.InnerText
-                                                    End If
-                                                Next
-                                                lCurves(lCurveIndex).color = Color.FromArgb(lA, lR, lG, lB)
-                                            ElseIf lChildNode.Name = "Symbol" Then
-                                                For Each lSymbolNode As XmlNode In lChildNode.ChildNodes
-                                                    If lSymbolNode.Name = "Size" Then
-                                                        lCurves(lCurveIndex).Symbol.Size = lSymbolNode.InnerText
-                                                    End If
-                                                Next
-                                            End If
-                                        Next
-                                    Next
-                                ElseIf lItemNode2.Name = "XAxis" Then
-                                    For Each lChildItem As XmlNode In lItemNode2.ChildNodes
-                                        If lChildItem.Name = "Title" Then
-                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
-                                                If lScaleNode.Name = "Text" Then
-                                                    pZgc.MasterPane.PaneList(0).XAxis.Title.Text = lScaleNode.InnerText
-                                                End If
-                                            Next
-                                        ElseIf lChildItem.Name = "Scale"
-                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
-                                                If lScaleNode.Name = "Min" Then
-                                                    pZgc.MasterPane.PaneList(0).XAxis.Scale.Min = lScaleNode.InnerText
-                                                ElseIf lScaleNode.Name = "Max" Then
-                                                    pZgc.MasterPane.PaneList(0).XAxis.Scale.Max = lScaleNode.InnerText
-                                                End If
-                                            Next
-                                        End If
-                                    Next
-                                ElseIf lItemNode2.Name = "YAxis" Then
-                                    For Each lChildItem As XmlNode In lItemNode2.ChildNodes
-                                        If lChildItem.Name = "Title" Then
-                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
-                                                If lScaleNode.Name = "Text" Then
-                                                    pZgc.MasterPane.PaneList(0).YAxis.Title.Text = lScaleNode.InnerText
-                                                End If
-                                            Next
-                                        ElseIf lChildItem.Name = "Scale"
-                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
-                                                If lScaleNode.Name = "Min" Then
-                                                    pZgc.MasterPane.PaneList(0).YAxis.Scale.Min = lScaleNode.InnerText
-                                                ElseIf lScaleNode.Name = "Max" Then
-                                                    pZgc.MasterPane.PaneList(0).YAxis.Scale.Max = lScaleNode.InnerText
-                                                End If
-                                            Next
-                                        End If
-                                    Next
-                                ElseIf lItemNode2.Name = "Y2Axis" Then
-                                    For Each lChildItem As XmlNode In lItemNode2.ChildNodes
-                                        If lChildItem.Name = "Title" Then
-                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
-                                                If lScaleNode.Name = "Text" Then
-                                                    pZgc.MasterPane.PaneList(0).Y2Axis.Title.Text = lScaleNode.InnerText
-                                                End If
-                                            Next
-                                        ElseIf lChildItem.Name = "Scale"
-                                            For Each lScaleNode As XmlNode In lChildItem.ChildNodes
-                                                If lScaleNode.Name = "Min" Then
-                                                    pZgc.MasterPane.PaneList(0).Y2Axis.Scale.Min = lScaleNode.InnerText
-                                                ElseIf lScaleNode.Name = "Max" Then
-                                                    pZgc.MasterPane.PaneList(0).Y2Axis.Scale.Max = lScaleNode.InnerText
-                                                End If
-                                            Next
-                                        End If
-                                    Next
-                                End If
-                            Next
-                        Next
-                    Next
-                    RefreshGraph()
-
-                Catch ex As Exception
-                    Dim l As Integer = 0
-                End Try
+                ApplySpecsFromJSON(.FileName, pZgc)
+                RefreshGraph()
             End If
         End With
     End Sub
+
 End Class
 
