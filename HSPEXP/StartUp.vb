@@ -61,20 +61,29 @@ Public Class StartUp
 
 
         Dim lUCI As String = cmbUCIPath.Text
+
         If IO.File.Exists(lUCI) Then
             'Logger.Status(Now & " Opening " & lUCI, True)
             Me.Cursor = Cursors.WaitCursor
             pUci = New atcUCI.HspfUci
-            pUci.FastReadUciForStarter(pHspfMsg, lUCI)
-            Me.Cursor = Cursors.Default
-            Dim lSDateJ = pUci.GlobalBlock.SDateJ
-            Dim lEDateJ = pUci.GlobalBlock.EdateJ
+            Try
+                pUci.FastReadUciForStarter(pHspfMsg, lUCI)
+                Me.Cursor = Cursors.Default
+                Dim lSDateJ = pUci.GlobalBlock.SDateJ
+                Dim lEDateJ = pUci.GlobalBlock.EdateJ
 
 
-            DateTimePicker1.Value = System.DateTime.FromOADate(lSDateJ)
-            DateTimePicker2.Value = System.DateTime.FromOADate(lEDateJ - 1)
+                DateTimePicker1.Value = System.DateTime.FromOADate(lSDateJ)
+                DateTimePicker2.Value = System.DateTime.FromOADate(lEDateJ - 1)
+            Catch ex As Exception
+                Logger.Msg("HSPEXP+ had trouble opening " & lUCI, MsgBoxStyle.Critical, "UCI Reading Issue!")
+                pUci = Nothing
+                Me.Cursor = Cursors.Arrow
+            End Try
+
         Else
             pUci = Nothing
+            Me.Cursor = Cursors.Arrow
         End If
     End Sub
 
@@ -154,7 +163,7 @@ Public Class StartUp
             cmbUCIPath.Items.Add(lUCI)
             cmbUCIPath.SelectedIndex = 0
         End If
-        UciChanged()
+        'UciChanged()
     End Sub
 
     Private Sub btn_help_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_help.Click
@@ -178,9 +187,9 @@ Public Class StartUp
         End If
     End Sub
 
-    Private Sub cmbUCIPath_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbUCIPath.SelectedIndexChanged
-        UciChanged()
-    End Sub
+    'Private Sub cmbUCIPath_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbUCIPath.SelectedIndexChanged
+    '    UciChanged()
+    'End Sub
 
     Private Sub cmbUCIPath_TextChanged(sender As Object, e As EventArgs) Handles cmbUCIPath.TextChanged
         UciChanged()
