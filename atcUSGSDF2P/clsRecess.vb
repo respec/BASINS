@@ -390,7 +390,15 @@ Public Class clsRecess
 #End Region
 
     Public Sub New()
+        'pHeaderRC_BFI = "                                                                  BFImax" & vbCrLf &
+        '    "                              Recession Constant (a)    Start       End         Calc." & vbCrLf &
+        '    "Gage number Season Dates      Specified   Calculated    Date        Date        BFImax" & vbCrLf &
+        '    "----------- ------ ---------  ----------------------   -------------------------------"
 
+        pHeaderRC_BFI = "                                                               BFImax" & vbCrLf &
+            "Gage              Recession Constant (a)       Start       End         Duration    Calc." & vbCrLf &
+            "number      Season Dates      Spec.   Calc.    Date        Date         (days)     BFImax" & vbCrLf &
+            "----------- --------------------------------   ------------------------------------------"
     End Sub
 
     Public Sub Initialize(ByVal aTS As atcTimeseries, Optional ByVal aArgs As atcDataAttributes = Nothing)
@@ -491,16 +499,6 @@ Public Class clsRecess
 "streamflow    (days per" & vbCrLf & _
 "file          log cycle)" & vbCrLf & _
 "------------------------"
-
-        'pHeaderRC_BFI = "                                                                  BFImax" & vbCrLf &
-        '    "                              Recession Constant (a)    Start       End         Calc." & vbCrLf &
-        '    "Gage number Season Dates      Specified   Calculated    Date        Date        BFImax" & vbCrLf &
-        '    "----------- ------ ---------  ----------------------   -------------------------------"
-
-        pHeaderRC_BFI = "                                                               BFImax" & vbCrLf &
-            "Gage              Recession Constant (a)       Start       End         Duration    Calc." & vbCrLf &
-            "number      Season Dates      Spec.   Calc.    Date        Date         (days)     BFImax" & vbCrLf &
-            "----------- --------------------------------   ------------------------------------------"
 
         'Start off a recession search
         pCountDay = 2
