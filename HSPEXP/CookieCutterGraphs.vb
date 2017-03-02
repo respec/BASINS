@@ -30,7 +30,8 @@ Public Module CookieCutterGraphs
             .Add("NO3-CONCDIS", "Nitrate")
             .Add("IVOL", "Water Volume")
             .Add("P-TOT-IN", "Input of Total P (Existing Conditions)")
-            .Add("SSED-TOT", "Total Suspended Solids")
+            .Add("SSED-TOT", "Total Suspended Solids (mg/l)")
+            .Add("RO", "Flow (cfs)")
         End With
 
         Dim lLocations As New atcCollection
@@ -171,6 +172,62 @@ Public Module CookieCutterGraphs
                             Logger.Msg("Cannot generate Regan Plot for RCHRES" & lRchId & ". : 
 All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan plot will not be generated for this reach.")
                         End If
+
+                        'Plotting the TSS Curve
+
+
+                        lTimeseriesGroup = New atcTimeseriesGroup
+
+                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "RO")(0)
+
+                        If lTimeSeries IsNot Nothing Then
+                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                            If TSTimeUnit <= 4 Then
+                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                            End If
+                            lTimeSeries.Attributes.SetValue("YAxis", "Aux")
+                            lTimeseriesGroup.Add(lTimeSeries)
+                        End If
+                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "SSED-TOT")(0)
+
+                        If lTimeSeries IsNot Nothing Then
+                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                            If TSTimeUnit <= 4 Then
+                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                            End If
+                            lTimeSeries.Attributes.SetValue("YAxis", "Left")
+                            lTimeseriesGroup.Add(lTimeSeries)
+                        End If
+
+                        If lTimeseriesGroup.Count = 2 Then
+                            Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+                            Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
+                            Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(1)
+                            Dim lAuxPane As GraphPane = lZgc.MasterPane.PaneList(0)
+                            Dim lCurve As ZedGraph.LineItem = Nothing
+                            lAuxPane.YAxis.Title.Text = "Flow (cfs)"
+                            lAuxPane.YAxis.Scale.Min = 0
+                            lMainPane.Y2Axis.Title.Text = "Total Suspended Solids (mg/l)"
+                            lMainPane.Y2Axis.Scale.Min = 0
+                            lMainPane.XAxis.Title.Text = lRchresCaption
+
+                            lCurve = lAuxPane.CurveList.Item(0)
+                            lCurve.Line.IsVisible = True
+                            lCurve.Symbol.Type = SymbolType.None
+                            lCurve.Line.Color = Drawing.Color.FromName("Red")
+                            lCurve.Line.Width = 1
+
+                            lCurve.Label.Text = "Flow (cfs)"
+
+                            lCurve = lMainPane.CurveList.Item(0)
+                            lCurve.Line.IsVisible = True
+                            lCurve.Symbol.Type = SymbolType.None
+                            lCurve.Line.Color = Drawing.Color.FromName("Red")
+                            lCurve.Line.Width = 1
+                            lCurve.Label.Text = "Total Suspended Solids (mg/l)"
+                            lZgc.SaveIn(lOutputFolder & "TSS_RCHRES_" & lRchId & ".png")
+                        End If
+
 
                         'Plotting Load Duration Curve
                         'Read the RES_TP_Standard.csv
