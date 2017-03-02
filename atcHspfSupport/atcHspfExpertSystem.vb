@@ -540,7 +540,7 @@ Public Class atcExpertSystem
         lText.AppendLine("***Months selected for Summers, comma separated")
         lText.AppendLine("6,7,8")
         lText.AppendLine("***Months selected for Winters, comma separated")
-        lText.AppendLine("12,1,2,3")
+        lText.AppendLine("12,1,2")
 
         Return lText.ToString
     End Function

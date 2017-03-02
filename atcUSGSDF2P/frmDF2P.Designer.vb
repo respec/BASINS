@@ -59,6 +59,9 @@ Partial Class frmDF2P
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem()
         Me.panelConfiguration = New System.Windows.Forms.Panel()
+        Me.btnSaveRC = New System.Windows.Forms.Button()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.chkRCregression = New System.Windows.Forms.CheckBox()
         Me.lblMinRecessDays = New System.Windows.Forms.Label()
         Me.txtBackDays = New System.Windows.Forms.TextBox()
         Me.lblRC = New System.Windows.Forms.Label()
@@ -72,9 +75,6 @@ Partial Class frmDF2P
         Me.txtRC2 = New System.Windows.Forms.TextBox()
         Me.lblRC2 = New System.Windows.Forms.Label()
         Me.btnConfiguration = New System.Windows.Forms.Button()
-        Me.chkRCregression = New System.Windows.Forms.CheckBox()
-        Me.Button1 = New System.Windows.Forms.Button()
-        Me.btnSaveRC = New System.Windows.Forms.Button()
         Me.gbMonthSeason.SuspendLayout()
         Me.gbDates.SuspendLayout()
         Me.scDisplay.Panel1.SuspendLayout()
@@ -480,6 +480,35 @@ Partial Class frmDF2P
         Me.panelConfiguration.Size = New System.Drawing.Size(777, 278)
         Me.panelConfiguration.TabIndex = 31
         '
+        'btnSaveRC
+        '
+        Me.btnSaveRC.Location = New System.Drawing.Point(323, 251)
+        Me.btnSaveRC.Name = "btnSaveRC"
+        Me.btnSaveRC.Size = New System.Drawing.Size(47, 22)
+        Me.btnSaveRC.TabIndex = 56
+        Me.btnSaveRC.Text = "Save"
+        Me.btnSaveRC.UseVisualStyleBackColor = True
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(0, 0)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.TabIndex = 55
+        Me.Button1.Text = "Button1"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
+        'chkRCregression
+        '
+        Me.chkRCregression.AutoSize = True
+        Me.chkRCregression.Location = New System.Drawing.Point(12, 233)
+        Me.chkRCregression.Name = "chkRCregression"
+        Me.chkRCregression.Size = New System.Drawing.Size(129, 17)
+        Me.chkRCregression.TabIndex = 54
+        Me.chkRCregression.Text = "Regression (k+1 vs k)"
+        Me.chkRCregression.UseVisualStyleBackColor = True
+        Me.chkRCregression.Visible = False
+        '
         'lblMinRecessDays
         '
         Me.lblMinRecessDays.AutoSize = True
@@ -501,7 +530,7 @@ Partial Class frmDF2P
         'lblRC
         '
         Me.lblRC.AutoSize = True
-        Me.lblRC.Location = New System.Drawing.Point(9, 217)
+        Me.lblRC.Location = New System.Drawing.Point(203, 237)
         Me.lblRC.Name = "lblRC"
         Me.lblRC.Size = New System.Drawing.Size(117, 13)
         Me.lblRC.TabIndex = 51
@@ -509,9 +538,9 @@ Partial Class frmDF2P
         '
         'txtRC
         '
-        Me.txtRC.Location = New System.Drawing.Point(143, 215)
+        Me.txtRC.Location = New System.Drawing.Point(206, 253)
         Me.txtRC.Name = "txtRC"
-        Me.txtRC.Size = New System.Drawing.Size(57, 20)
+        Me.txtRC.Size = New System.Drawing.Size(111, 20)
         Me.txtRC.TabIndex = 12
         Me.txtRC.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -614,34 +643,6 @@ Partial Class frmDF2P
         Me.btnConfiguration.TabIndex = 16
         Me.btnConfiguration.Text = "< Back"
         Me.btnConfiguration.UseVisualStyleBackColor = True
-        '
-        'chkRCregression
-        '
-        Me.chkRCregression.AutoSize = True
-        Me.chkRCregression.Location = New System.Drawing.Point(12, 233)
-        Me.chkRCregression.Name = "chkRCregression"
-        Me.chkRCregression.Size = New System.Drawing.Size(129, 17)
-        Me.chkRCregression.TabIndex = 54
-        Me.chkRCregression.Text = "Regression (k+1 vs k)"
-        Me.chkRCregression.UseVisualStyleBackColor = True
-        '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(0, 0)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(75, 23)
-        Me.Button1.TabIndex = 55
-        Me.Button1.Text = "Button1"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
-        'btnSaveRC
-        '
-        Me.btnSaveRC.Location = New System.Drawing.Point(206, 253)
-        Me.btnSaveRC.Name = "btnSaveRC"
-        Me.btnSaveRC.Size = New System.Drawing.Size(75, 22)
-        Me.btnSaveRC.TabIndex = 56
-        Me.btnSaveRC.Text = "Save"
-        Me.btnSaveRC.UseVisualStyleBackColor = True
         '
         'frmDF2P
         '
