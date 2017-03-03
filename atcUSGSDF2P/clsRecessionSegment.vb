@@ -101,7 +101,7 @@ Public Class clsRecessionSegment
 
     Public ReadOnly Property EndDayDateToString(Optional ByVal aBFIEstimateEndDay As Boolean = False) As String
         Get
-            Dim lastDayIndex As Integer = PeakDayIndex + SegmentLength - 1
+            Dim lastDayIndex As Integer = PeakDayIndex + SegmentLength
             If aBFIEstimateEndDay Then
                 lastDayIndex -= 1
             End If
@@ -155,8 +155,8 @@ Public Class clsRecessionSegment
     Public ReadOnly Property BackTraceTimeSeries(ByVal aBackTraceDays As Integer) As atcTimeseries
         Get
             Dim lTsBacktrace As atcTimeseries = Nothing
-            Dim lStartIndex As Integer = PeakDayIndex + SegmentLength - aBackTraceDays - 1
-            Dim lEndIndex As Integer = PeakDayIndex + SegmentLength - 1
+            Dim lEndIndex As Integer = PeakDayIndex + SegmentLength
+            Dim lStartIndex As Integer = lEndIndex - aBackTraceDays
             'If lStartIndex < 1 Then Return lTsBacktrace
             If lStartIndex < 1 Then
                 lStartIndex = 1
