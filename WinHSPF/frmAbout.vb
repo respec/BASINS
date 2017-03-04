@@ -12,7 +12,7 @@ Public Class frmAbout
         Me.MinimumSize = Me.Size
         Me.MaximumSize = Me.Size
 
-        PictureBox1.Image = ImageList1.Images(0)
+        'PictureBox1.Image = ImageList1.Images(0)
         PictureBox2.Image = ImageList1.Images(2)
         PictureBox1.Cursor = Windows.Forms.Cursors.Hand
         PictureBox2.Cursor = Windows.Forms.Cursors.Hand
@@ -25,7 +25,7 @@ Public Class frmAbout
         Me.Dispose()
     End Sub
 
-    Private Sub PictureBox1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PictureBox1.Click
+    Private Sub PictureBox1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         System.Diagnostics.Process.Start("https://www.epa.gov/exposure-assessment-models/basins")
     End Sub
 

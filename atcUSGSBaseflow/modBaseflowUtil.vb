@@ -1237,29 +1237,30 @@ Public Module modBaseflowUtil
                 If lMethods.Contains(BFMethods.BFIStandard) OrElse lMethods.Contains(BFMethods.BFIModified) Then
                     lNDay = .GetValue(BFInputNames.BFINDayScreen, Double.NaN) '"BFINDay"
                     'Dim lBFIYearBasis As String = aArgs.GetValue(BFInputNames.BFIReportby, "") '"BFIReportby"
-                    lBFI_Notes = " " & "," & "BFI:" & ", ," & "Partition Length (N days):" & lNDay & ";"
+                    lBFI_Notes = " " & "," & "BFI" & ", ," & "Partition Length (N days):" & lNDay & ";"
                 End If
                 If lMethods.Contains(BFMethods.BFIStandard) Then
                     lFact = .GetValue(BFInputNames.BFITurnPtFrac, Double.NaN) '"BFIFrac"
-                    lBFI_Notes &= "Turning Point Test Factor (F):" & lFact & ";"
+                    lBFI_Notes &= " Turning Point Test Factor (F):" & lFact & ";"
                 End If
                 If lMethods.Contains(BFMethods.BFIModified) Then
                     lK1Day = .GetValue(BFInputNames.BFIRecessConst, Double.NaN) '"BFIK1Day"
-                    lBFI_Notes &= "Daily Recession Index (K):" & lK1Day
+                    lBFI_Notes &= " Daily Recession Index (K):" & lK1Day
                 End If
+                lBFI_Notes = lBFI_Notes.TrimEnd(";")
                 If lMethods.Contains(BFMethods.BFLOW) Then
                     lalpha = .GetValue(BFInputNames.BFLOWFilter, Double.NaN)
-                    lDF1P_Notes = " " & "," & "DF-One Param:" & ", ," & "Filter Constant (alpha):" & lalpha
+                    lDF1P_Notes = " " & "," & "DF1Param" & ", ," & "Filter Constant (alpha):" & lalpha
                 End If
                 If lMethods.Contains(BFMethods.TwoPRDF) Then
                     lRC = .GetValue(BFInputNames.TwoPRDFRC, Double.NaN)
                     lBFImax = .GetValue(BFInputNames.TwoPRDFBFImax, Double.NaN)
                     lDF2PMethod = .GetValue(BFInputNames.TwoParamEstMethod, clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE)
-                    lDF2P_Notes = " " & "," & "DF-Two Param:" & ", ," & "Recession Constant (a):" & lRC & "; BFImax:" & lBFImax
+                    lDF2P_Notes = " " & "," & "DF2Param" & ", ," & "Recession Constant (a):" & lRC & "; BFImax:" & lBFImax
                 End If
             End With
             If Not String.IsNullOrEmpty(lBFI_Notes) OrElse Not String.IsNullOrEmpty(lDF1P_Notes) OrElse Not String.IsNullOrEmpty(lDF2P_Notes) Then
-                lParameterNotes = "Parameter Specified:" & vbCrLf
+                lParameterNotes = "Parameters Specified:" & vbCrLf
                 If Not String.IsNullOrEmpty(lBFI_Notes) Then
                     lParameterNotes &= lBFI_Notes & vbCrLf
                 End If

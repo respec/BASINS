@@ -75,6 +75,7 @@ Partial Class frmDF2P
         Me.txtRC2 = New System.Windows.Forms.TextBox()
         Me.lblRC2 = New System.Windows.Forms.Label()
         Me.btnConfiguration = New System.Windows.Forms.Button()
+        Me.lbl_lstSegment = New System.Windows.Forms.Label()
         Me.gbMonthSeason.SuspendLayout()
         Me.gbDates.SuspendLayout()
         Me.scDisplay.Panel1.SuspendLayout()
@@ -125,11 +126,11 @@ Partial Class frmDF2P
         'lblRecessionDays
         '
         Me.lblRecessionDays.AutoSize = True
-        Me.lblRecessionDays.Location = New System.Drawing.Point(440, 256)
+        Me.lblRecessionDays.Location = New System.Drawing.Point(437, 256)
         Me.lblRecessionDays.Name = "lblRecessionDays"
-        Me.lblRecessionDays.Size = New System.Drawing.Size(135, 13)
+        Me.lblRecessionDays.Size = New System.Drawing.Size(138, 13)
         Me.lblRecessionDays.TabIndex = 44
-        Me.lblRecessionDays.Text = "Estimation duration in days:"
+        Me.lblRecessionDays.Text = "Estimation duration, in days:"
         '
         'gbMonthSeason
         '
@@ -344,9 +345,9 @@ Partial Class frmDF2P
         Me.lstRecessSegments.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstRecessSegments.FormattingEnabled = True
         Me.lstRecessSegments.IntegralHeight = False
-        Me.lstRecessSegments.Location = New System.Drawing.Point(3, 3)
+        Me.lstRecessSegments.Location = New System.Drawing.Point(3, 19)
         Me.lstRecessSegments.Name = "lstRecessSegments"
-        Me.lstRecessSegments.Size = New System.Drawing.Size(181, 228)
+        Me.lstRecessSegments.Size = New System.Drawing.Size(181, 212)
         Me.lstRecessSegments.TabIndex = 13
         '
         'scDisplay
@@ -512,11 +513,11 @@ Partial Class frmDF2P
         'lblMinRecessDays
         '
         Me.lblMinRecessDays.AutoSize = True
-        Me.lblMinRecessDays.Location = New System.Drawing.Point(447, 230)
+        Me.lblMinRecessDays.Location = New System.Drawing.Point(405, 230)
         Me.lblMinRecessDays.Name = "lblMinRecessDays"
-        Me.lblMinRecessDays.Size = New System.Drawing.Size(128, 13)
+        Me.lblMinRecessDays.Size = New System.Drawing.Size(170, 13)
         Me.lblMinRecessDays.TabIndex = 53
-        Me.lblMinRecessDays.Text = "Recession length in days:"
+        Me.lblMinRecessDays.Text = "Minimum recession length, in days:"
         '
         'txtBackDays
         '
@@ -577,6 +578,7 @@ Partial Class frmDF2P
         '
         'panelAnalysis
         '
+        Me.panelAnalysis.Controls.Add(Me.lbl_lstSegment)
         Me.panelAnalysis.Controls.Add(Me.txtBFImax)
         Me.panelAnalysis.Controls.Add(Me.lblEstimatedBFImax)
         Me.panelAnalysis.Controls.Add(Me.txtRC2)
@@ -644,11 +646,20 @@ Partial Class frmDF2P
         Me.btnConfiguration.Text = "< Back"
         Me.btnConfiguration.UseVisualStyleBackColor = True
         '
+        'lbl_lstSegment
+        '
+        Me.lbl_lstSegment.AutoSize = True
+        Me.lbl_lstSegment.Location = New System.Drawing.Point(3, 3)
+        Me.lbl_lstSegment.Name = "lbl_lstSegment"
+        Me.lbl_lstSegment.Size = New System.Drawing.Size(114, 13)
+        Me.lbl_lstSegment.TabIndex = 46
+        Me.lbl_lstSegment.Text = "Last Day of Recession"
+        '
         'frmDF2P
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(789, 314)
+        Me.ClientSize = New System.Drawing.Size(789, 312)
         Me.Controls.Add(Me.panelConfiguration)
         Me.Controls.Add(Me.panelAnalysis)
         Me.Controls.Add(Me.MenuStrip1)
@@ -728,4 +739,5 @@ Partial Class frmDF2P
     Friend WithEvents chkRCregression As Windows.Forms.CheckBox
     Friend WithEvents btnSaveRC As Windows.Forms.Button
     Friend WithEvents Button1 As Windows.Forms.Button
+    Friend WithEvents lbl_lstSegment As Windows.Forms.Label
 End Class

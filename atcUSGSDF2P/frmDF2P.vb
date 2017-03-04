@@ -1485,7 +1485,7 @@ Public Class frmDF2P
                 Dim lBFIEstimateEndDate As String
                 For Each lPeakDate As String In pRecess.listOfSegments.Keys
                     lRecessLeg = pRecess.listOfSegments.ItemByKey(lPeakDate)
-                    lBFIEstimateEndDate = lRecessLeg.EndDayDateToString(True)
+                    lBFIEstimateEndDate = lRecessLeg.EndDayDateToString()
                     lstRecessSegments.Items.Add(lBFIEstimateEndDate)
                     If Not pPeakDateDictionary.Keys.Contains(lBFIEstimateEndDate) Then
                         pPeakDateDictionary.Add(lBFIEstimateEndDate, lPeakDate)

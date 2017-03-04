@@ -186,7 +186,7 @@ Friend Class frmAbout
         'picProgramLogo
         '
         Me.picProgramLogo.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.picProgramLogo.Location = New System.Drawing.Point(8, 8)
+        Me.picProgramLogo.Location = New System.Drawing.Point(21, 9)
         Me.picProgramLogo.Name = "picProgramLogo"
         Me.picProgramLogo.Size = New System.Drawing.Size(81, 72)
         Me.picProgramLogo.TabIndex = 18
@@ -237,7 +237,7 @@ Friend Class frmAbout
         Me.grpATC.Size = New System.Drawing.Size(473, 160)
         Me.grpATC.TabIndex = 3
         Me.grpATC.TabStop = False
-        Me.grpATC.Text = "Developed by AQUA TERRA Consultants (a Division of RESPEC, Inc.)"
+        Me.grpATC.Text = "Developed by AQUA TERRA Division of RESPEC."
         '
         'picATC
         '
@@ -255,13 +255,12 @@ Friend Class frmAbout
         '
         Me.lblAquaTerraURL.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblAquaTerraURL.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblAquaTerraURL.LinkArea = New System.Windows.Forms.LinkArea(0, 25)
-        Me.lblAquaTerraURL.Location = New System.Drawing.Point(307, 137)
+        Me.lblAquaTerraURL.Location = New System.Drawing.Point(171, 139)
         Me.lblAquaTerraURL.Name = "lblAquaTerraURL"
-        Me.lblAquaTerraURL.Size = New System.Drawing.Size(151, 13)
+        Me.lblAquaTerraURL.Size = New System.Drawing.Size(287, 18)
         Me.lblAquaTerraURL.TabIndex = 4
         Me.lblAquaTerraURL.TabStop = True
-        Me.lblAquaTerraURL.Text = "http://www.aquaterra.com/"
+        Me.lblAquaTerraURL.Text = "http://www.respec.com/service-area/water-environment/"
         Me.lblAquaTerraURL.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'grpZedGraph
