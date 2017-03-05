@@ -185,7 +185,7 @@ Public Module ConstituentBudget
         lReport6.AppendLine("")
         lReport6.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches of Interest(%).")
 
-        lReportLoadingRate.AppendLine(aScenario & " " & " Average Annual " & aBalanceType & "Loading rates " & lUnits & "per unit area (ac).")
+        lReportLoadingRate.AppendLine(aScenario & " " & " Average Annual " & aBalanceType & "Loading rates " & lUnits & "ac/yr.")
 
         lReportLoadingRate.AppendLine("   Run Made " & aRunMade)
         lReportLoadingRate.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
@@ -1198,10 +1198,12 @@ This message box will not be shown again for." & aBalanceType)
             Dim LandUsesList() As String = lLandusesHeader.Substring(1, PointSourcesPlacesLocation - 2).Split(vbTab)
 
 
-            Dim LoadingRateSummary As String = "Loading Rate Summary for " & aBalanceType & " by Each Land Land Use: " & lUnits & "/acre" & vbCrLf
+            Dim LoadingRateSummary As String = "Loading Rate Summary for " & aBalanceType & " by Each Land Land Use: " & lUnits & "/acre/yr" & vbCrLf
 
             lDataForBoxWhiskerPlot.Constituent = aBalanceType
-            lDataForBoxWhiskerPlot.Units = "(" & lUnits & "/acre)"
+            lDataForBoxWhiskerPlot.Scenario = aScenario
+            lDataForBoxWhiskerPlot.TimeSpan = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+            lDataForBoxWhiskerPlot.Units = "(" & lUnits & "/acre/yr)"
             lDataForBoxWhiskerPlot.Location = "All"
             LoadingRateSummary &= "Landuse" & vbTab & "Mean" & vbTab & "Min" & vbTab & "Max" & vbCrLf
             For Each LandUse As String In LandUsesList
@@ -1270,7 +1272,9 @@ This message box will not be shown again for." & aBalanceType)
 
             For Each lReach As String In lReaches
                 Dim lDataForOneBarGraph As New BarGraphItem
-                lDataForOneBarGraph.Units = "(" & lUnits & "/acre)"
+                lDataForOneBarGraph.Scenario = aScenario
+                lDataForOneBarGraph.TimeSpan = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+                lDataForOneBarGraph.Units = "(" & lUnits & "/yr)"
                 lDataForOneBarGraph.Constituent = aBalanceType
 
                 lReport3.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
@@ -1297,6 +1301,12 @@ This message box will not be shown again for." & aBalanceType)
                     If aOutputLocations.Count > 0 Then
                         For Each lOutputLocation As String In aOutputLocations
                             If lReach.Substring(5) = lOutputLocation.Substring(2) Then
+                                lSourceDescription = lSourceDescription.Replace("Loss", "Cumulative Instream Losses")
+                                lSourceDescription = lSourceDescription.Replace("Gain", "Cumulative Instream Gains")
+                                lSourceDescription = lSourceDescription.Replace("AdditionalSources", "Additional Sources")
+                                lSourceDescription = lSourceDescription.Replace("DirectAtmosphericDeposition", "Direct Atm. Desposition")
+                                lSourceDescription = lSourceDescription.Replace("GENERSources", "GENER Sources")
+                                lSourceDescription = lSourceDescription.Replace("PointSources", "Point Sources")
 
                                 lReport5.Append(vbTab & FormatNumber(lValue, 2, TriState.True, TriState.False, TriState.False))
                                 lDataForOneBarGraph.LabelValueCollection.Add(lSourceDescription, lValue)
