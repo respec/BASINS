@@ -1497,6 +1497,7 @@ Public Class frmUSGSBaseflow
     Private Sub rdo2P_CheckedChanged(sender As Object, e As EventArgs) Handles rdo2PSpecify.CheckedChanged,
                                                                                rdo2PDefault.CheckedChanged
         If Not Opened Then Exit Sub
+        pDidBFSeparation = False
         If rdo2PSpecify.Checked Then
             txt2PDefaultNotice.Visible = False
             lblBFImax.Enabled = True
