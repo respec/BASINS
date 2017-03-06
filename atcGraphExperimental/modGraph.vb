@@ -1062,7 +1062,11 @@ FoundMatch:
             Dim lID As String = MapWinUtility.Strings.StrSplit(lCurve, "|", """")
             Dim lDataFileName As String = lCurve
 
-            atcDataManager.OpenDataSource(lDataFileName)
+            Dim lTimeSource As atcTimeseriesSource = atcDataManager.DataSourceBySpecification(lDataFileName)
+            If lTimeSource Is Nothing Then 'not already open
+                atcDataManager.OpenDataSource(lDataFileName)
+            End If
+
             For Each lDataSource As atcDataSource In atcDataManager.DataSources
                 If lDataSource.Specification = lDataFileName Then
                     For Each lTimSer As atcTimeseries In lDataSource.DataSets
@@ -1078,9 +1082,28 @@ FoundMatch:
 
         'create basic plot
         Dim lZgc As ZedGraphControl = CreateZgc()
-        If lGraphType = "Time Series" Then
-            Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
-        End If
+        Select Case lGraphType
+            Case "Timeseries", "Time-Series", "Time Series"
+                Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
+            Case "Shared Start Year"
+                Dim lGrapher As New clsGraphTime(MakeCommonStartYear(lTimeseriesGroup, 0), lZgc)
+            Case "Flow/Duration"
+                Dim lGrapher As New clsGraphProbability(lTimeseriesGroup, lZgc)
+            Case "Frequency"
+                Dim lGrapher As New clsGraphFrequency(lTimeseriesGroup, lZgc)
+            Case "Running Sum"
+                Dim lGrapher As New clsGraphRunningSum(lTimeseriesGroup, lZgc)
+            Case "Double-Mass Curve"
+                Dim lGrapher As New clsGraphDoubleMass(lTimeseriesGroup, lZgc)
+            Case "Box Whisker"
+                Dim lGrapher As New clsGraphBoxWhisker(lTimeseriesGroup, lZgc)
+            Case "Residual (TS2 - TS1)"
+                Dim lGrapher As New clsGraphResidual(lTimeseriesGroup, lZgc)
+            Case "Cumulative Difference"
+                Dim lGrapher As New clsGraphCumulativeDifference(lTimeseriesGroup, lZgc)
+            Case "Scatter (TS2 vs TS1)"
+                Dim lGrapher As New clsGraphScatter(lTimeseriesGroup, lZgc)
+        End Select
 
         'apply specs from json
         atcGraph.ApplySpecsFromJSON(aJsonFileName, lZgc)
@@ -1114,7 +1137,14 @@ FoundMatch:
                             For Each lChildItem As XmlNode In lItemNode2.ChildNodes
                                 For Each lChildNode As XmlNode In lChildItem.ChildNodes
                                     If lChildNode.Name = "Tag" Then
-                                        aCurveContents.Add(lChildNode.InnerText)
+                                        Dim lDelims() As String = lChildNode.InnerText.Split({"||"}, 2, StringSplitOptions.None)
+                                        If lDelims.Length > 0 Then
+                                            'like a scatter plot where there are 2 timeseries on a curve
+                                            aCurveContents.Add(lDelims(0))
+                                            aCurveContents.Add(lDelims(1))
+                                        Else
+                                            aCurveContents.Add(lChildNode.InnerText)
+                                        End If
                                     End If
                                 Next
                             Next

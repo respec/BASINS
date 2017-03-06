@@ -81,7 +81,8 @@ Public Class clsGraphScatter
                         lCurve.Symbol.Size = 2
                     End If
                     lCurve.Line.IsVisible = False
-                    lCurve.Tag = lTimeseriesY.ToString & " vs " & lTimeseriesX.ToString
+                    lCurve.Tag = lTimeseriesY.Serial & "|" & lTimeseriesY.Attributes.GetValue("ID") & "|" & lTimeseriesY.Attributes.GetValue("Data Source") & "||" &
+                                 lTimeseriesX.Serial & "|" & lTimeseriesX.Attributes.GetValue("ID") & "|" & lTimeseriesX.Attributes.GetValue("Data Source")
                 End With
                 ScaleAxis(lSubsetGroup, lPane.YAxis)
                 lPane.XAxis.Scale.Min = lPane.YAxis.Scale.Min
