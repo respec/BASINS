@@ -422,20 +422,20 @@ Public Class clsRecess
         FlowData = SubsetByDate(aTS, lSdate, lEdate, Nothing)
 
         '***** File IO *****
-        Dim lInputfile As String = IO.Path.GetFileName(aTS.Attributes.GetValue("history 1").substring("read from ".Length))
-        pDataFilename = IO.Path.GetFileName(lInputfile)
-        If SaveInterimResults Then
-            SetOutputFiles()
-            If fHasWritePermission Then
-                Dim lSW As StreamWriter = Nothing
-                lSW = New StreamWriter(pFileOut1, False)
-                lSW.Close() : lSW = Nothing
-                lSW = New StreamWriter(pFileOut2, False)
-                lSW.Close() : lSW = Nothing
-                FileOut1Created = True
-                FileOut1Created = True
-            End If
-        End If
+        'Dim lInputfile As String = IO.Path.GetFileName(aTS.Attributes.GetValue("history 1").substring("read from ".Length))
+        'pDataFilename = IO.Path.GetFileName(lInputfile)
+        'If SaveInterimResults Then
+        '    SetOutputFiles()
+        '    If fHasWritePermission Then
+        '        Dim lSW As StreamWriter = Nothing
+        '        lSW = New StreamWriter(pFileOut1, False)
+        '        lSW.Close() : lSW = Nothing
+        '        lSW = New StreamWriter(pFileOut2, False)
+        '        lSW.Close() : lSW = Nothing
+        '        FileOut1Created = True
+        '        FileOut1Created = True
+        '    End If
+        'End If
 
         Dim lYearStart As Integer
         J2Date(lSdate, lDate) : lYearStart = lDate(0)
