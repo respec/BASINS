@@ -1497,6 +1497,7 @@ Public Class frmUSGSBaseflow
     Private Sub rdo2P_CheckedChanged(sender As Object, e As EventArgs) Handles rdo2PSpecify.CheckedChanged,
                                                                                rdo2PDefault.CheckedChanged
         If Not Opened Then Exit Sub
+        pDidBFSeparation = False
         If rdo2PSpecify.Checked Then
             txt2PDefaultNotice.Visible = False
             lblBFImax.Enabled = True
@@ -1505,7 +1506,16 @@ Public Class frmUSGSBaseflow
             txtDFParamBFImax.Enabled = True
             pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.CUSTOM
 
+            Dim lEntered_RC As Double = -1.0
+            Dim lEntered_BFImax As Double = -1.0
             If pDataGroup IsNot Nothing AndAlso pDataGroup.Count > 0 Then
+                'ToDo: let the client decide if the last estimated RC and BFImax should be the default specified parameter
+                'or whatever user's last entered values
+                If Double.TryParse(txtDFParamRC.Text, lEntered_RC) AndAlso lEntered_RC > 0 Then
+
+                Else
+
+                End If
                 Dim lEst_RC As Double = pDataGroup(0).Attributes.GetValue(clsRecess.CF_RC, Double.NaN)
                 Dim lEst_BFImax As Double = pDataGroup(0).Attributes.GetValue(clsRecess.CF_BFImax, Double.NaN)
                 If Not Double.IsNaN(lEst_RC) Then
