@@ -594,7 +594,15 @@ FoundMatch:
                     End If
                 End If
 
-                lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lTimeseries.Attributes.GetValue("Data Source")   'Make this easy to find again even if label changes
+                Dim lSourceFile As String = ""
+                If lTimeseries.Attributes.ContainsAttribute("Data Source") Then
+                    lSourceFile = lTimeseries.Attributes.GetValue("Data Source")
+                End If
+                If Not IO.File.Exists(lSourceFile) And lTimeseries.Attributes.GetValue("History 1").Length > 9 Then
+                    'see if the history attribute contains a file name
+                    lSourceFile = lTimeseries.Attributes.GetValue("History 1").Substring(10)
+                End If
+                lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lSourceFile   'Make this easy to find again even if label changes
 
                 If aYAxisName.ToUpper.Equals("RIGHT") Then lCurve.IsY2Axis = True
 
@@ -1080,6 +1088,20 @@ FoundMatch:
             Next
         Next
 
+        'do subset by date for residual and cummulative diff graphs
+        Dim lTimeseriesGroupSubset As New atcTimeseriesGroup
+        If lTimeseriesGroup.Count > 1 Then
+            'find common dates
+            Dim lFirstStart As Double
+            Dim lLastEnd As Double
+            Dim lCommonStart As Double
+            Dim lCommonEnd As Double
+            CommonDates(lTimeseriesGroup, lFirstStart, lLastEnd, lCommonStart, lCommonEnd)
+            For Each lTs As atcTimeseries In lTimeseriesGroup
+                lTimeseriesGroupSubset.Add(SubsetByDate(lTs, lCommonStart, lCommonEnd, Nothing))
+            Next
+        End If
+
         'create basic plot
         Dim lZgc As ZedGraphControl = CreateZgc()
         Select Case lGraphType
@@ -1098,9 +1120,9 @@ FoundMatch:
             Case "Box Whisker"
                 Dim lGrapher As New clsGraphBoxWhisker(lTimeseriesGroup, lZgc)
             Case "Residual (TS2 - TS1)"
-                Dim lGrapher As New clsGraphResidual(lTimeseriesGroup, lZgc)
+                Dim lGrapher As New clsGraphResidual(lTimeseriesGroupSubset, lZgc)
             Case "Cumulative Difference"
-                Dim lGrapher As New clsGraphCumulativeDifference(lTimeseriesGroup, lZgc)
+                Dim lGrapher As New clsGraphCumulativeDifference(lTimeseriesGroupSubset, lZgc)
             Case "Scatter (TS2 vs TS1)"
                 Dim lGrapher As New clsGraphScatter(lTimeseriesGroup, lZgc)
         End Select
@@ -1136,9 +1158,9 @@ FoundMatch:
                         If lItemNode2.Name = "CurveList" Then
                             For Each lChildItem As XmlNode In lItemNode2.ChildNodes
                                 For Each lChildNode As XmlNode In lChildItem.ChildNodes
-                                    If lChildNode.Name = "Tag" Then
+                                    If lChildNode.Name = "Tag" And lChildNode.InnerText.Length > 0 Then
                                         Dim lDelims() As String = lChildNode.InnerText.Split({"||"}, 2, StringSplitOptions.None)
-                                        If lDelims.Length > 0 Then
+                                        If lDelims.Length > 1 Then
                                             'like a scatter plot where there are 2 timeseries on a curve
                                             aCurveContents.Add(lDelims(0))
                                             aCurveContents.Add(lDelims(1))
@@ -1188,8 +1210,8 @@ FoundMatch:
                 For Each lItemNode As XmlNode In lPane.ChildNodes
                     For Each lItemNode2 As XmlNode In lItemNode.ChildNodes
                         If lItemNode2.Name = "CurveList" Then
-                            lCurveIndex += 1
                             For Each lChildItem As XmlNode In lItemNode2.ChildNodes
+                                lCurveIndex += 1
                                 For Each lChildNode As XmlNode In lChildItem.ChildNodes
                                     If lChildNode.Name = "Tag" Then
                                         lTag = lChildNode.InnerText
@@ -1284,7 +1306,7 @@ FoundMatch:
             Next
 
         Catch ex As Exception
-
+            Dim s As String = ex.ToString
         End Try
     End Function
 End Module

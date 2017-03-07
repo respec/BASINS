@@ -56,6 +56,26 @@ Public Class clsGraphCumulativeDifference
                             lCurveDict = Nothing
                         Next
                         pZgc.MasterPane.PaneList(0).XAxis.Title.Text = "Cummulative Difference"
+
+                        Dim lSourceFile1 As String = ""
+                        If aDataGroup(0).Attributes.ContainsAttribute("Data Source") Then
+                            lSourceFile1 = aDataGroup(0).Attributes.GetValue("Data Source")
+                        End If
+                        If Not IO.File.Exists(lSourceFile1) And aDataGroup(0).Attributes.GetValue("History 1").Length > 9 Then
+                            'see if the history attribute contains a file name
+                            lSourceFile1 = aDataGroup(0).Attributes.GetValue("History 1").Substring(10)
+                        End If
+                        Dim lSourceFile2 As String = ""
+                        If aDataGroup(1).Attributes.ContainsAttribute("Data Source") Then
+                            lSourceFile2 = aDataGroup(1).Attributes.GetValue("Data Source")
+                        End If
+                        If Not IO.File.Exists(lSourceFile2) And aDataGroup(1).Attributes.GetValue("History 1").Length > 9 Then
+                            'see if the history attribute contains a file name
+                            lSourceFile2 = aDataGroup(1).Attributes.GetValue("History 1").Substring(10)
+                        End If
+                        pZgc.MasterPane.PaneList(0).CurveList(0).Tag = aDataGroup(0).Serial & "|" & aDataGroup(0).Attributes.GetValue("ID") & "|" & lSourceFile1 & "||" &
+                                                                       aDataGroup(1).Serial & "|" & aDataGroup(1).Attributes.GetValue("ID") & "|" & lSourceFile2
+
                         AxisTitlesFromCommonAttributes(pZgc.MasterPane.PaneList(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
                         pZgc.Refresh()
                     Else

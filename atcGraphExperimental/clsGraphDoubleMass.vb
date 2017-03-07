@@ -153,7 +153,8 @@ Public Class clsGraphDoubleMass
                     lCurve.Symbol.Size = 3
                 End If
                 lCurve.Line.IsVisible = False
-                lCurve.Tag = lTimeseriesY.ToString & " vs " & lTimeseriesX.ToString
+                lCurve.Tag = lTimeseriesY.Serial & "|" & lTimeseriesY.Attributes.GetValue("ID") & "|" & lTimeseriesY.Attributes.GetValue("Data Source") & "||" &
+                             lTimeseriesX.Serial & "|" & lTimeseriesX.Attributes.GetValue("ID") & "|" & lTimeseriesX.Attributes.GetValue("Data Source")
                 Dim lmin As Double = lRunningSums(0).Attributes.GetValue("Min")
                 With lRunningSums(0).Attributes
                     .DiscardCalculated()

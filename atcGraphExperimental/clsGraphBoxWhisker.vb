@@ -298,6 +298,14 @@ Public Class clsGraphBoxWhisker
                 '.Scale.Min = XLabelBaseline - .Scale.MajorStep * 10
             End With
         End If
+
+        Dim lIndex As Integer = 0
+        For Each lTimSer As atcTimeseries In Datasets
+            pZgc.GraphPane.CurveList(lIndex).Tag = lTimSer.Serial & "|" & lTimSer.Attributes.GetValue("ID") & "|" & lTimSer.Attributes.GetValue("Data Source")
+            lIndex += 3
+        Next
+        'lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lTimeseries.Attributes.GetValue("Data Source")   'Make this easy to find again even if label changes
+
         pZgc.GraphPane.BarSettings.ClusterScaleWidthAuto = False
         pZgc.GraphPane.BarSettings.MinClusterGap = 0.2
         pZgc.GraphPane.BarSettings.MinBarGap = 0.2
