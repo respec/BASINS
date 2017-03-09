@@ -1074,10 +1074,14 @@ RWZProgramEnding:
                 lCurve.Symbol.Type = SymbolType.None
                 lCurve.Line.IsVisible = True
                 lCurve.Line.Style = Drawing.Drawing2D.DashStyle.Solid
-                lCurve.Line.Width = Math.Max(Convert.ToInt32(Trim(lGraphDataset(8))), 1)
 
+                If lGraphDataset(8).Length = 0 Then
+                    lCurve.Line.Width = 1
+                Else
+                    lCurve.Line.Width = Math.Max(Convert.ToInt32(Trim(lGraphDataset(8))), 1)
+                End If
             Else
-                lCurve.Line.IsVisible = False
+                    lCurve.Line.IsVisible = False
                 Select Case Trim(lGraphDataset(7)).ToLower
                     Case "circle"
                         lCurve.Symbol.Type = SymbolType.Circle
@@ -1103,10 +1107,14 @@ RWZProgramEnding:
                         lCurve.Symbol.Type = SymbolType.Circle
                 End Select
                 lCurve.Symbol.Fill.IsVisible = True
-                lCurve.Symbol.Size = Math.Max(Convert.ToInt32(Trim(lGraphDataset(8))), 1)
+                If lGraphDataset(8).Length = 0 Then
+                    lCurve.Symbol.Size = 1
+                Else
+                    lCurve.Symbol.Size = Math.Max(Convert.ToInt32(Trim(lGraphDataset(8))), 1)
+                End If
             End If
 
-            lCurve.Color = Drawing.Color.FromName(Trim(lGraphDataset(5)).ToLower)
+                lCurve.Color = Drawing.Color.FromName(Trim(lGraphDataset(5)).ToLower)
 
             If Trim(lGraphDataset(6)).ToLower.Contains("forward") Then
                 lCurve.Line.StepType = StepType.ForwardStep
