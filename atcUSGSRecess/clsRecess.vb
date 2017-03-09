@@ -270,6 +270,7 @@ Public Class clsRecess
 
     Public Table As String 'current recession segment's table
     Public GraphTs As atcTimeseries 'current recession's timeseries
+    Public GraphTsMeanLogQ As atcTimeseries 'mean logQ of selected recession segments
 
     Public Bulletin As String = ""
 
@@ -1405,6 +1406,22 @@ Public Class clsRecess
             .Attributes.SetValue("Units", "K")
         End With
 
+        'construct graph TS for just the mean logQ
+        If GraphTsMeanLogQ IsNot Nothing Then GraphTsMeanLogQ.Clear()
+        GraphTsMeanLogQ = New atcTimeseries(Nothing)
+        GraphTsMeanLogQ.Dates = New atcTimeseries(Nothing)
+        Order(lListOfChosenSegments.Count, lKDates, lX)
+        GraphTsMeanLogQ.Dates.Values = lKDates
+        GraphTsMeanLogQ.Values = lX
+        With GraphTsMeanLogQ
+            .Value(0) = GetNaN()
+            .Dates.Value(0) = .Dates.Value(1) - JulianHour * 24.0
+            .Attributes.SetValue("YAxis", "AUX")
+            .Attributes.SetValue("point", True)
+            .Attributes.SetValue("Constituent", "")
+            .Attributes.SetValue("Scenario", "")
+            .Attributes.SetValue("Units", "MeanLogQ")
+        End With
         ''------------------- WRITE RAW RECESSION DATA TO "y-file"  ----------------
         If fHasWritePermission And SaveInterimResults Then
             lSW = New IO.StreamWriter(pFileOut2, True)

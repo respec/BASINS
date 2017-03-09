@@ -1225,6 +1225,50 @@ Public Class frmRecess
         pZgc.Refresh()
     End Sub
 
+    Public Sub RefreshGraphRecessSummary(ByVal aDataGroup As atcTimeseriesGroup)
+        If pGrapher IsNot Nothing Then
+            With pGrapher.ZedGraphCtrl.GraphPane
+                'To see if need to refresh the axis
+                If aDataGroup IsNot Nothing AndAlso aDataGroup.Count > 0 AndAlso Not .YAxis.Title.Text = aDataGroup(0).Attributes.GetValue("Units") Then
+                    .YAxis.Title.Text = ""
+                    '.XAxis.Title.Text = ""
+                    pGrapher = Nothing
+                    'RefreshGraph()
+                End If
+            End With
+        End If
+        Dim lYmin As Double
+        Dim lYmax As Double
+        If aDataGroup IsNot Nothing AndAlso aDataGroup.Count > 0 Then
+            lYmin = aDataGroup(0).Attributes.GetValue("Min")
+            lYmax = aDataGroup(0).Attributes.GetValue("Max")
+        End If
+        If pGrapher Is Nothing Then
+            pGrapher = New clsGraphTime(aDataGroup, pZgc)
+        Else
+            'pGrapher.Datasets = aDataGroup
+        End If
+        'Dim lDateMin As Double = aDataGroup(0).Dates.Value(0)
+        'Dim lDateMax As Double = aDataGroup(0).Dates.Value(aDataGroup(0).numValues)
+        'Dim lLogFlag As Boolean = False
+        With pGrapher.ZedGraphCtrl.GraphPane
+            If aDataGroup.Count > 0 Then
+                '.YAxis.Type = AxisType.Log
+                .CurveList.Item(0).Color = Drawing.Color.Red
+                .Legend.IsVisible = False
+                '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
+                'CType(.CurveList.Item(1), LineItem).Line.Width = 2
+            End If
+            'Scalit(lDataMin, lDataMax, lLogFlag, .XAxis.Scale.Min, .XAxis.Scale.Max)
+
+            '.YAxis.Scale.Max = Math.Ceiling(lYmax)
+            '.YAxis.Scale.Min = Math.Floor(lYmin)
+            .YAxis.Scale.MaxAuto = True
+            .YAxis.Scale.MinAuto = True
+            .AxisChange()
+        End With
+        pZgc.Refresh()
+    End Sub
     Public Sub GraphFallCurves()
         ' get a reference to the GraphPane
         If pZgc IsNot Nothing Then
@@ -2108,6 +2152,9 @@ Public Class frmRecess
         pGraphRecessDatagroup.Clear()
         If aRecess.GraphTs.numValues > 1 Then
             pGraphRecessDatagroup.Add(aRecess.GraphTs)
+            If aRecess.GraphTsMeanLogQ IsNot Nothing AndAlso aRecess.GraphTsMeanLogQ.numValues > 1 Then
+                pGraphRecessDatagroup.Add(aRecess.GraphTsMeanLogQ)
+            End If
             RefreshGraphRecess(pGraphRecessDatagroup)
         End If
     End Sub
