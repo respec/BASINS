@@ -108,13 +108,17 @@ Public Class frmMRCControl
     End Sub
 
     Private Sub PopulateForm()
-        pFileStationFullName = GetSetting("atcUSGSRecess", "Defaults", "FileStation", "")
-        pFileRecSumFullName = GetSetting("atcUSGSRecess", "Defaults", "FileRecSum", "")
-
-        If Not File.Exists(pFileRecSumFullName) Then
-            pFileRecSumFullName = FindFile("Find recsum.txt", "recsum.txt", "txt")
-            SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
+        If Not String.IsNullOrEmpty(pFileInitialDir) AndAlso Directory.Exists(pFileInitialDir) Then
+            pFileRecSumFullName = Path.Combine(pFileInitialDir, "recsum.txt")
+        Else
+            pFileRecSumFullName = ""
         End If
+        'pFileStationFullName = GetSetting("atcUSGSRecess", "Defaults", "FileStation", "")
+        'pFileRecSumFullName = GetSetting("atcUSGSRecess", "Defaults", "FileRecSum", "")
+        'If Not File.Exists(pFileRecSumFullName) Then
+        '    pFileRecSumFullName = FindFile("Find recsum.txt", "recsum.txt", "txt")
+        '    SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
+        'End If
         RepopulateForm()
     End Sub
 

@@ -49,11 +49,11 @@ Public Class frmRecess
     Private pMessage As String = ""
     Private pLoaded As Boolean = False
 
-    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
-                      Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
-                      Optional ByVal aShowForm As Boolean = True, _
-                      Optional ByVal aRecess As clsRecess = Nothing, _
-                      Optional ByVal aFall As clsFall = Nothing, _
+    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing,
+                      Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing,
+                      Optional ByVal aShowForm As Boolean = True,
+                      Optional ByVal aRecess As clsRecess = Nothing,
+                      Optional ByVal aFall As clsFall = Nothing,
                       Optional ByVal aModal As Boolean = False)
         If aBasicAttributes Is Nothing Then
             pBasicAttributes = atcDataManager.DisplayAttributes
@@ -202,7 +202,7 @@ Public Class frmRecess
             Dim lDescription As String = pDataGroup(0).Attributes.GetValue("Description")
             Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
             Dim lDataTypeStr As String = ""
-            
+
             If lCons.ToUpper() = "GW LEVEL" OrElse lCons.ToUpper() = "GWLEVEL" Then
                 If lParmCd IsNot Nothing Then
                     lDataTypeStr &= "Parameter Code: " & lParmCd & vbCrLf & vbCrLf
@@ -357,29 +357,29 @@ Public Class frmRecess
         lFileOut2 = IO.Path.Combine(lOutputPath, "y" & lAskUserSeason & "Indian" & ".txt")
 
         Dim lHeaderOutFile1 As String = ""
-        lHeaderOutFile1 &= _
-      " FILE " & lFileOut1 & "--  UNIT 10 OUTPUT OF RECESS.F " & vbCrLf & _
-      " INPUT FILE = " & lInputfile & vbCrLf & _
-      " START = " & lYearStart & vbCrLf & _
-      " END =   " & lYearEnd & vbCrLf & _
-      " DAYS OF RECESSION REQUIRED FOR DETECTION=" & lAskUseriFarcri.ToString & vbCrLf & _
-      " MONTHS SELECTED:" & lStrMonths & vbCrLf & _
-      " " & vbCrLf & _
-      "-----------------------------------------------------------------------" & vbCrLf & _
-      "              RECESSION PERIODS INITIALLY SELECTED: " & vbCrLf & _
-      "   LOG Q       RECESS.INDEX     TIME SINCE PEAK    .       DATE OF PEAK " & vbCrLf & _
+        lHeaderOutFile1 &=
+      " FILE " & lFileOut1 & "--  UNIT 10 OUTPUT OF RECESS.F " & vbCrLf &
+      " INPUT FILE = " & lInputfile & vbCrLf &
+      " START = " & lYearStart & vbCrLf &
+      " END =   " & lYearEnd & vbCrLf &
+      " DAYS OF RECESSION REQUIRED FOR DETECTION=" & lAskUseriFarcri.ToString & vbCrLf &
+      " MONTHS SELECTED:" & lStrMonths & vbCrLf &
+      " " & vbCrLf &
+      "-----------------------------------------------------------------------" & vbCrLf &
+      "              RECESSION PERIODS INITIALLY SELECTED: " & vbCrLf &
+      "   LOG Q       RECESS.INDEX     TIME SINCE PEAK    .       DATE OF PEAK " & vbCrLf &
       "   (MEAN)    ( -dT/d(LogQ) ) (START)(MIDDLE)(END)  .        (yr, mo, d) " & vbCrLf
 
         Dim lHeaderOutFile2 As String = ""
-        lHeaderOutFile2 &= _
-      " FILE " & lFileOut2 & "--  UNIT 11 OUTPUT OF RECESS.F: " & vbCrLf & _
-      " INPUT DATA FILE FOR THIS SESSION: ', INFILE" & vbCrLf & _
-      " Tpeak is the time since the last peak  " & vbCrLf & _
-      " Tmrc is the time on the Master Recession Curve " & vbCrLf & _
-      " LogQ is the log of flow " & vbCrLf & _
-      " Q is the flow " & vbCrLf & _
-      " Seq# is the sequence number in which the segment " & vbCrLf & _
-      " was selected.  " & vbCrLf & _
+        lHeaderOutFile2 &=
+      " FILE " & lFileOut2 & "--  UNIT 11 OUTPUT OF RECESS.F: " & vbCrLf &
+      " INPUT DATA FILE FOR THIS SESSION: ', INFILE" & vbCrLf &
+      " Tpeak is the time since the last peak  " & vbCrLf &
+      " Tmrc is the time on the Master Recession Curve " & vbCrLf &
+      " LogQ is the log of flow " & vbCrLf &
+      " Q is the flow " & vbCrLf &
+      " Seq# is the sequence number in which the segment " & vbCrLf &
+      " was selected.  " & vbCrLf &
       "-----------------------------------------------------------------------"
         Dim lSW As IO.StreamWriter = Nothing
         ' ------------- LOCATE a PEAK ---------------------
@@ -1042,7 +1042,7 @@ Public Class frmRecess
             lStrCoeffB = String.Format("{0:0.0000}", lCoeffB).PadLeft(10, " ")
             lStrCoeffC = String.Format("{0:0.0000}", lCoeffC).PadLeft(10, " ")
 
-            lSW.WriteLine(lStrInputFile & lAskUserSeason & " " & lStrYearStart & "-" & lStrYearEnd & lNumRecessPeriods.ToString & _
+            lSW.WriteLine(lStrInputFile & lAskUserSeason & " " & lStrYearStart & "-" & lStrYearEnd & lNumRecessPeriods.ToString &
                           lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC)
             lSW.Flush()
             lSW.Close()
@@ -1060,13 +1060,13 @@ Public Class frmRecess
     End Sub
 
     '--------- THIS SUBROUTINE MAKES TABULAR OUTPUT OF RECESSION DATA: -----
-    Private Function TableRecess(ByVal aQLog() As Double, _
-                            ByVal aFlow() As Double, _
-                            ByVal aDates() As Double, _
-                            ByVal aiPeak As Integer, _
-                            ByVal aiMin As Integer, _
-                            ByVal aiMax As Integer, _
-                            ByVal aPickStartingDay As Integer, _
+    Private Function TableRecess(ByVal aQLog() As Double,
+                            ByVal aFlow() As Double,
+                            ByVal aDates() As Double,
+                            ByVal aiPeak As Integer,
+                            ByVal aiMin As Integer,
+                            ByVal aiMax As Integer,
+                            ByVal aPickStartingDay As Integer,
                             ByVal aiDisplayLastDay As Integer) As String
 
         Logger.Dbg("ENTER STARTING DAY (1, 11, OR 21)") 'originally dynamically read in
@@ -1112,16 +1112,16 @@ Public Class frmRecess
     End Function
 
     '------ THIS SUBROUTINE MAKES GRAPHICAL OUTPUT OF RECESSION DATA: ----
-    Private Function GraphRecess(ByVal aQLog() As Double, _
-                            ByVal aFlow() As Double, _
-                            ByVal aDates() As Double, _
-                            ByVal aiPeak As Integer, _
-                            ByVal aiMin As Integer, _
-                            ByVal aiMax As Integer, _
-                            ByVal aXLogQMin As Double, _
-                            ByVal aXLogQMax As Double, _
-                            ByVal aPickStartingDay As Integer, _
-                            ByVal aPickInterval As Integer, _
+    Private Function GraphRecess(ByVal aQLog() As Double,
+                            ByVal aFlow() As Double,
+                            ByVal aDates() As Double,
+                            ByVal aiPeak As Integer,
+                            ByVal aiMin As Integer,
+                            ByVal aiMax As Integer,
+                            ByVal aXLogQMin As Double,
+                            ByVal aXLogQMax As Double,
+                            ByVal aPickStartingDay As Integer,
+                            ByVal aPickInterval As Integer,
                             ByVal aiDisplayLastDay As Integer) As String
 
         Dim liStart As Integer = aPickStartingDay
@@ -1646,7 +1646,7 @@ Public Class frmRecess
         If lMatches.Count > 0 Then
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
-            Dim lAskUser As String = _
+            Dim lAskUser As String =
             Logger.MsgCustomOwned("Invalid starting date. Use dataset start date?", "Start Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 lArr = txtDataStart.Text.Trim.Split("/")
@@ -1681,7 +1681,7 @@ Public Class frmRecess
         If lMatches.Count > 0 Then
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
-            Dim lAskUser As String = _
+            Dim lAskUser As String =
             Logger.MsgCustomOwned("Invalid ending date. Use dataset end date?", "End Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 lArr = txtDataEnd.Text.Trim.Split("/")
@@ -1943,7 +1943,7 @@ Public Class frmRecess
 
         Dim lDayOrdinal As Integer = CInt(lArr(0))
         Dim lFirstLastCancel() As String = {"First Day", "Last Day", "Reset All", "Cancel"}
-        Dim lResponse As String = Logger.MsgCustomOwned("Set '" & lDayOrdinal & "' as first or last day of this recession segment?", _
+        Dim lResponse As String = Logger.MsgCustomOwned("Set '" & lDayOrdinal & "' as first or last day of this recession segment?",
                                                         lMsgTitle, Me, lFirstLastCancel)
         If lResponse <> "Cancel" Then
             Dim lRecSeg As clsRecessionSegment = Nothing
@@ -2124,6 +2124,33 @@ Public Class frmRecess
     End Sub
 
     Private Sub btnCurv_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCurv.Click
+        Dim lfrmMRC As New frmMRCControl()
+        Dim lArgs As atcDataAttributes = Nothing
+        If pRecess IsNot Nothing AndAlso pRecess.RecSumResult.Length > 0 Then
+            Dim lArr() As String = Regex.Split(pRecess.RecSumResult, "\s+")
+            If lArr.Length >= 12 Then
+                Dim lFirstMRC As New clsMRC
+                With lFirstMRC
+                    .RecSum = pRecess.RecSumResult
+                    Dim lDA As Double
+                    If lArr.Length > 12 AndAlso (Not lArr(12).StartsWith("N/A")) AndAlso Double.TryParse(lArr(12), lDA) Then
+                        .DrainageArea = lDA
+                    End If
+                End With
+                If lFirstMRC.BuildMRC() Then
+                    lArgs = New atcDataAttributes
+                    lArgs.SetValue("FirstMRC", lFirstMRC)
+                    Dim lWorkingDir As String = txtOutputDir.Text.Trim()
+                    If lWorkingDir.Length > 0 AndAlso IO.Directory.Exists(lWorkingDir) Then
+                        lArgs.SetValue("WorkingDirectory", lWorkingDir)
+                    End If
+                End If
+            End If
+        End If
+        lfrmMRC.Initialize("", lArgs)
+    End Sub
+
+    Private Sub btnViewMRCs_Click(sender As Object, e As EventArgs) Handles btnViewMRCs.Click
         Dim lfrmMRC As New frmMRCControl()
         Dim lArgs As atcDataAttributes = Nothing
         If pRecess IsNot Nothing AndAlso pRecess.RecSumResult.Length > 0 Then
