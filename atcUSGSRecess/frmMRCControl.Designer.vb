@@ -60,6 +60,10 @@ Partial Class frmMRCControl
         Me.panelGraphUA = New System.Windows.Forms.Panel()
         Me.tabMRCTable = New System.Windows.Forms.TabPage()
         Me.txtMRCTable = New System.Windows.Forms.TextBox()
+        Me.txtYearStart = New System.Windows.Forms.TextBox()
+        Me.lblYearStart = New System.Windows.Forms.Label()
+        Me.txtYearEnd = New System.Windows.Forms.TextBox()
+        Me.lblYearEnd = New System.Windows.Forms.Label()
         Me.tabMRCMain.SuspendLayout()
         Me.tabConstructMRC.SuspendLayout()
         Me.gbMRCEquations.SuspendLayout()
@@ -98,6 +102,10 @@ Partial Class frmMRCControl
         '
         Me.gbMRCEquations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbMRCEquations.Controls.Add(Me.txtYearEnd)
+        Me.gbMRCEquations.Controls.Add(Me.lblYearEnd)
+        Me.gbMRCEquations.Controls.Add(Me.txtYearStart)
+        Me.gbMRCEquations.Controls.Add(Me.lblYearStart)
         Me.gbMRCEquations.Controls.Add(Me.rbSelectNoneEqns)
         Me.gbMRCEquations.Controls.Add(Me.rbSelectAllEqns)
         Me.gbMRCEquations.Controls.Add(Me.btnMRCClear)
@@ -449,6 +457,40 @@ Partial Class frmMRCControl
         Me.txtMRCTable.Size = New System.Drawing.Size(703, 458)
         Me.txtMRCTable.TabIndex = 0
         '
+        'txtYearStart
+        '
+        Me.txtYearStart.Location = New System.Drawing.Point(532, 212)
+        Me.txtYearStart.Name = "txtYearStart"
+        Me.txtYearStart.Size = New System.Drawing.Size(42, 20)
+        Me.txtYearStart.TabIndex = 35
+        '
+        'lblYearStart
+        '
+        Me.lblYearStart.AutoSize = True
+        Me.lblYearStart.ForeColor = System.Drawing.SystemColors.ControlDark
+        Me.lblYearStart.Location = New System.Drawing.Point(529, 196)
+        Me.lblYearStart.Name = "lblYearStart"
+        Me.lblYearStart.Size = New System.Drawing.Size(54, 13)
+        Me.lblYearStart.TabIndex = 36
+        Me.lblYearStart.Text = "Start Year"
+        '
+        'txtYearEnd
+        '
+        Me.txtYearEnd.Location = New System.Drawing.Point(592, 212)
+        Me.txtYearEnd.Name = "txtYearEnd"
+        Me.txtYearEnd.Size = New System.Drawing.Size(48, 20)
+        Me.txtYearEnd.TabIndex = 37
+        '
+        'lblYearEnd
+        '
+        Me.lblYearEnd.AutoSize = True
+        Me.lblYearEnd.ForeColor = System.Drawing.SystemColors.ControlDark
+        Me.lblYearEnd.Location = New System.Drawing.Point(589, 197)
+        Me.lblYearEnd.Name = "lblYearEnd"
+        Me.lblYearEnd.Size = New System.Drawing.Size(51, 13)
+        Me.lblYearEnd.TabIndex = 38
+        Me.lblYearEnd.Text = "End Year"
+        '
         'frmMRCControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -507,4 +549,8 @@ Partial Class frmMRCControl
     Friend WithEvents btnClearRecSum As Windows.Forms.Button
     Friend WithEvents tabPlotMRCunitarea As Windows.Forms.TabPage
     Friend WithEvents panelGraphUA As Windows.Forms.Panel
+    Friend WithEvents txtYearEnd As Windows.Forms.TextBox
+    Friend WithEvents lblYearEnd As Windows.Forms.Label
+    Friend WithEvents txtYearStart As Windows.Forms.TextBox
+    Friend WithEvents lblYearStart As Windows.Forms.Label
 End Class

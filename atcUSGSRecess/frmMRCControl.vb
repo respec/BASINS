@@ -483,6 +483,8 @@ Public Class frmMRCControl
             txtLogQMin.Text = ""
             txtLogQMax.Text = ""
             txtSeason.Text = ""
+            txtYearStart.Text = ""
+            txtYearEnd.Text = ""
             Exit Sub
         End If
         'ParseMRCParams(lstRecSum.SelectedItem)
@@ -496,6 +498,8 @@ Public Class frmMRCControl
             txtCoefA.Text = lArr(10)
             txtCoefB.Text = lArr(11)
             txtCoefC.Text = lArr(12)
+            txtYearStart.Text = lArr(2)
+            txtYearEnd.Text = lArr(3)
             Dim lDA As Double
             If lArr.Length >= 14 Then
                 If Not lArr(13).StartsWith("N/A") AndAlso Double.TryParse(lArr(13), lDA) Then
@@ -516,6 +520,13 @@ Public Class frmMRCControl
         txtCoefA.Text = lArr(9)
         txtCoefB.Text = lArr(10)
         txtCoefC.Text = lArr(11)
+        Dim lYearArr() As String = lArr(2).Split("-")
+        If lYearArr.Length = 2 Then
+            If IsNumeric(lYearArr(0)) AndAlso IsNumeric(lYearArr(1)) Then
+                txtYearStart.Text = lYearArr(0)
+                txtYearEnd.Text = lYearArr(1)
+            End If
+        End If
         Dim lDA As Double
         If lArr.Length > 12 Then
             If Not lArr(12).StartsWith("N/A") AndAlso Double.TryParse(lArr(12), lDA) Then
@@ -562,9 +573,17 @@ Public Class frmMRCControl
         'lMRCToAdd = MRCToAdd(txtStation.Text.Trim(), txtDA.Text.Trim(), txtSeason.Text.Trim(), _
         '                     txtLogQMin.Text.Trim(), txtLogQMax.Text.Trim(), _
         '                     txtCoefA.Text.Trim(), txtCoefB.Text.Trim(), txtCoefC.Text.Trim())
+        Dim lYearStart As Integer
+        Dim lYearEnd As Integer
+        Dim lYearStartText As String = ""
+        Dim lYearEndText As String = ""
+        If Integer.TryParse(txtYearStart.Text, lYearStart) AndAlso Integer.TryParse(txtYearEnd.Text, lYearEnd) Then
+            lYearStartText = lYearStart.ToString()
+            lYearEndText = lYearEnd.ToString()
+        End If
         lMRCToAdd = MRCToAdd(txtStation.Text, txtDA.Text, txtSeason.Text,
                              txtLogQMin.Text, txtLogQMax.Text,
-                             txtCoefA.Text, txtCoefB.Text, txtCoefC.Text, "", "")
+                             txtCoefA.Text, txtCoefB.Text, txtCoefC.Text, lYearStartText, lYearEndText)
 
         If Not lstEquations.Items.Contains(lMRCToAdd) Then
             lstEquations.Items.Add(lMRCToAdd)
