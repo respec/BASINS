@@ -2306,7 +2306,7 @@ Public Class frmRecess
 
     Private Sub btnViewMRCs_Click(sender As Object, e As EventArgs) Handles btnViewMRCs.Click
         Dim lfrmMRC As New frmMRCControl()
-        Dim lArgs As atcDataAttributes = Nothing
+        Dim lArgs As New atcDataAttributes()
         If pRecess IsNot Nothing AndAlso pRecess.RecSumResult.Length > 0 Then
             Dim lArr() As String = Regex.Split(pRecess.RecSumResult, "\s+")
             If lArr.Length >= 12 Then
@@ -2319,14 +2319,14 @@ Public Class frmRecess
                     End If
                 End With
                 If lFirstMRC.BuildMRC() Then
-                    lArgs = New atcDataAttributes
+                    If lArgs Is Nothing Then lArgs = New atcDataAttributes()
                     lArgs.SetValue("FirstMRC", lFirstMRC)
-                    Dim lWorkingDir As String = txtOutputDir.Text.Trim()
-                    If lWorkingDir.Length > 0 AndAlso IO.Directory.Exists(lWorkingDir) Then
-                        lArgs.SetValue("WorkingDirectory", lWorkingDir)
-                    End If
                 End If
             End If
+        End If
+        Dim lWorkingDir As String = txtOutputDir.Text.Trim()
+        If lWorkingDir.Length > 0 AndAlso IO.Directory.Exists(lWorkingDir) Then
+            lArgs.SetValue("WorkingDirectory", lWorkingDir)
         End If
         lfrmMRC.Initialize("", lArgs)
     End Sub

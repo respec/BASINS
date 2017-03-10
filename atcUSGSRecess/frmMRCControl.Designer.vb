@@ -23,40 +23,41 @@ Partial Class frmMRCControl
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMRCControl))
-        Me.tabMRCMain = New System.Windows.Forms.TabControl
-        Me.tabConstructMRC = New System.Windows.Forms.TabPage
-        Me.gbMRCEquations = New System.Windows.Forms.GroupBox
-        Me.rbSelectNoneEqns = New System.Windows.Forms.RadioButton
-        Me.rbSelectAllEqns = New System.Windows.Forms.RadioButton
-        Me.btnMRCClear = New System.Windows.Forms.Button
-        Me.txtSeason = New System.Windows.Forms.TextBox
-        Me.btnMRCPlot = New System.Windows.Forms.Button
-        Me.lblSeason = New System.Windows.Forms.Label
-        Me.txtLogQMax = New System.Windows.Forms.TextBox
-        Me.lblMaxLogQ = New System.Windows.Forms.Label
-        Me.txtLogQMin = New System.Windows.Forms.TextBox
-        Me.lblMinLogQ = New System.Windows.Forms.Label
-        Me.txtStation = New System.Windows.Forms.TextBox
-        Me.lblStation = New System.Windows.Forms.Label
-        Me.chkAddAllRecSumRecords = New System.Windows.Forms.CheckBox
-        Me.lstEquations = New System.Windows.Forms.CheckedListBox
-        Me.btnMRCAdd = New System.Windows.Forms.Button
-        Me.btnMRCDelete = New System.Windows.Forms.Button
-        Me.txtDA = New System.Windows.Forms.TextBox
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.txtCoefA = New System.Windows.Forms.TextBox
-        Me.txtCoefB = New System.Windows.Forms.TextBox
-        Me.txtCoefC = New System.Windows.Forms.TextBox
-        Me.gbRecSum = New System.Windows.Forms.GroupBox
-        Me.btnRecSum = New System.Windows.Forms.Button
-        Me.lstRecSum = New System.Windows.Forms.ListBox
-        Me.tabPlotMRC = New System.Windows.Forms.TabPage
-        Me.panelGraph = New System.Windows.Forms.Panel
-        Me.tabMRCTable = New System.Windows.Forms.TabPage
-        Me.txtMRCTable = New System.Windows.Forms.TextBox
+        Me.tabMRCMain = New System.Windows.Forms.TabControl()
+        Me.tabConstructMRC = New System.Windows.Forms.TabPage()
+        Me.gbMRCEquations = New System.Windows.Forms.GroupBox()
+        Me.rbSelectNoneEqns = New System.Windows.Forms.RadioButton()
+        Me.rbSelectAllEqns = New System.Windows.Forms.RadioButton()
+        Me.btnMRCClear = New System.Windows.Forms.Button()
+        Me.txtSeason = New System.Windows.Forms.TextBox()
+        Me.btnMRCPlot = New System.Windows.Forms.Button()
+        Me.lblSeason = New System.Windows.Forms.Label()
+        Me.txtLogQMax = New System.Windows.Forms.TextBox()
+        Me.lblMaxLogQ = New System.Windows.Forms.Label()
+        Me.txtLogQMin = New System.Windows.Forms.TextBox()
+        Me.lblMinLogQ = New System.Windows.Forms.Label()
+        Me.txtStation = New System.Windows.Forms.TextBox()
+        Me.lblStation = New System.Windows.Forms.Label()
+        Me.chkAddAllRecSumRecords = New System.Windows.Forms.CheckBox()
+        Me.lstEquations = New System.Windows.Forms.CheckedListBox()
+        Me.btnMRCAdd = New System.Windows.Forms.Button()
+        Me.btnMRCDelete = New System.Windows.Forms.Button()
+        Me.txtDA = New System.Windows.Forms.TextBox()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.txtCoefA = New System.Windows.Forms.TextBox()
+        Me.txtCoefB = New System.Windows.Forms.TextBox()
+        Me.txtCoefC = New System.Windows.Forms.TextBox()
+        Me.gbRecSum = New System.Windows.Forms.GroupBox()
+        Me.btnRecSum = New System.Windows.Forms.Button()
+        Me.lstRecSum = New System.Windows.Forms.ListBox()
+        Me.tabPlotMRC = New System.Windows.Forms.TabPage()
+        Me.panelGraph = New System.Windows.Forms.Panel()
+        Me.tabMRCTable = New System.Windows.Forms.TabPage()
+        Me.txtMRCTable = New System.Windows.Forms.TextBox()
+        Me.btnClearRecSum = New System.Windows.Forms.Button()
         Me.tabMRCMain.SuspendLayout()
         Me.tabConstructMRC.SuspendLayout()
         Me.gbMRCEquations.SuspendLayout()
@@ -92,7 +93,7 @@ Partial Class frmMRCControl
         'gbMRCEquations
         '
         Me.gbMRCEquations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.gbMRCEquations.Controls.Add(Me.rbSelectNoneEqns)
         Me.gbMRCEquations.Controls.Add(Me.rbSelectAllEqns)
         Me.gbMRCEquations.Controls.Add(Me.btnMRCClear)
@@ -244,7 +245,7 @@ Partial Class frmMRCControl
         'lstEquations
         '
         Me.lstEquations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstEquations.CheckOnClick = True
         Me.lstEquations.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstEquations.FormattingEnabled = True
@@ -340,7 +341,8 @@ Partial Class frmMRCControl
         'gbRecSum
         '
         Me.gbRecSum.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbRecSum.Controls.Add(Me.btnClearRecSum)
         Me.gbRecSum.Controls.Add(Me.btnRecSum)
         Me.gbRecSum.Controls.Add(Me.lstRecSum)
         Me.gbRecSum.Location = New System.Drawing.Point(8, 6)
@@ -363,8 +365,8 @@ Partial Class frmMRCControl
         'lstRecSum
         '
         Me.lstRecSum.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstRecSum.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstRecSum.FormattingEnabled = True
         Me.lstRecSum.ItemHeight = 14
@@ -379,7 +381,7 @@ Partial Class frmMRCControl
         Me.tabPlotMRC.Location = New System.Drawing.Point(4, 22)
         Me.tabPlotMRC.Name = "tabPlotMRC"
         Me.tabPlotMRC.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabPlotMRC.Size = New System.Drawing.Size(652, 458)
+        Me.tabPlotMRC.Size = New System.Drawing.Size(703, 458)
         Me.tabPlotMRC.TabIndex = 1
         Me.tabPlotMRC.Text = "MRC Plot"
         Me.tabPlotMRC.UseVisualStyleBackColor = True
@@ -389,7 +391,7 @@ Partial Class frmMRCControl
         Me.panelGraph.Dock = System.Windows.Forms.DockStyle.Fill
         Me.panelGraph.Location = New System.Drawing.Point(3, 3)
         Me.panelGraph.Name = "panelGraph"
-        Me.panelGraph.Size = New System.Drawing.Size(646, 452)
+        Me.panelGraph.Size = New System.Drawing.Size(697, 452)
         Me.panelGraph.TabIndex = 0
         '
         'tabMRCTable
@@ -397,7 +399,7 @@ Partial Class frmMRCControl
         Me.tabMRCTable.Controls.Add(Me.txtMRCTable)
         Me.tabMRCTable.Location = New System.Drawing.Point(4, 22)
         Me.tabMRCTable.Name = "tabMRCTable"
-        Me.tabMRCTable.Size = New System.Drawing.Size(652, 458)
+        Me.tabMRCTable.Size = New System.Drawing.Size(703, 458)
         Me.tabMRCTable.TabIndex = 2
         Me.tabMRCTable.Text = "MRC Table"
         Me.tabMRCTable.UseVisualStyleBackColor = True
@@ -412,8 +414,18 @@ Partial Class frmMRCControl
         Me.txtMRCTable.Name = "txtMRCTable"
         Me.txtMRCTable.ReadOnly = True
         Me.txtMRCTable.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtMRCTable.Size = New System.Drawing.Size(652, 458)
+        Me.txtMRCTable.Size = New System.Drawing.Size(703, 458)
         Me.txtMRCTable.TabIndex = 0
+        '
+        'btnClearRecSum
+        '
+        Me.btnClearRecSum.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnClearRecSum.Location = New System.Drawing.Point(581, 45)
+        Me.btnClearRecSum.Name = "btnClearRecSum"
+        Me.btnClearRecSum.Size = New System.Drawing.Size(99, 23)
+        Me.btnClearRecSum.TabIndex = 13
+        Me.btnClearRecSum.Text = "Clear RecSum"
+        Me.btnClearRecSum.UseVisualStyleBackColor = True
         '
         'frmMRCControl
         '
@@ -469,4 +481,5 @@ Partial Class frmMRCControl
     Friend WithEvents btnMRCClear As System.Windows.Forms.Button
     Friend WithEvents rbSelectNoneEqns As System.Windows.Forms.RadioButton
     Friend WithEvents rbSelectAllEqns As System.Windows.Forms.RadioButton
+    Friend WithEvents btnClearRecSum As Windows.Forms.Button
 End Class

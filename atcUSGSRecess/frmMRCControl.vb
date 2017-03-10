@@ -161,13 +161,15 @@ Public Class frmMRCControl
     End Sub
 
     Private Sub PopulateRecSums()
-
-        If lstRecSum.Items.Count > 0 Then lstRecSum.Items.Clear()
-        Dim lTitleLine1 As String = "    File    S     P      #  Kmin  Kmed  Kmax  LogQmn  LogQmx     A         B         C       DA   Stnam"
-        Dim lTitleLine2 As String = "-------------------------------------------------------------------------------------------------------------"
-        '                            Indian.txt  s 1971-1972  3  11.8  22.9  25.9   0.057   0.709   5.8238  -25.3040   15.0121    22.9 HUNT_RIVER_NEAR_EAST_GREENWICH__RI
-        lstRecSum.Items.Add(lTitleLine1)
-        lstRecSum.Items.Add(lTitleLine2)
+        If lstRecSum.Items.Count > 0 Then
+            'lstRecSum.Items.Clear()
+        Else
+            Dim lTitleLine1 As String = "    File    S     P      #  Kmin  Kmed  Kmax  LogQmn  LogQmx     A         B         C       DA   Stnam"
+            Dim lTitleLine2 As String = "-------------------------------------------------------------------------------------------------------------"
+            '                            Indian.txt  s 1971-1972  3  11.8  22.9  25.9   0.057   0.709   5.8238  -25.3040   15.0121    22.9 HUNT_RIVER_NEAR_EAST_GREENWICH__RI
+            lstRecSum.Items.Add(lTitleLine1)
+            lstRecSum.Items.Add(lTitleLine2)
+        End If
 
         Dim lSR As New StreamReader(pFileRecSumFullName)
         Dim lOneLine As String
@@ -203,7 +205,7 @@ Public Class frmMRCControl
 
         lSR.Close()
         lSR = Nothing
-        SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
+        'SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
     End Sub
 
     Private Function ParseRecSumRecord(ByVal aLine As String, ByRef Arr() As String) As Boolean
@@ -503,16 +505,17 @@ Public Class frmMRCControl
         Try
             lInitialPath = Path.GetDirectoryName(pFileRecSumFullName)
         Catch ex As Exception
-
+            lInitialPath = ""
         End Try
         If lInitialPath = "" Then lInitialPath = "C:\"
 
         Dim lOpenFileDialog As New System.Windows.Forms.OpenFileDialog()
         With lOpenFileDialog
+            '.AutoUpgradeEnabled = False
             .Title = "Browse For RecSum File"
             .InitialDirectory = lInitialPath '"c:\"
-            .Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
-            .FilterIndex = 2
+            .Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
+            .FilterIndex = 1
             .RestoreDirectory = True
             If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                 lNewFileRecSumFullName = .FileName
@@ -554,5 +557,11 @@ Public Class frmMRCControl
                 lstEquations.SetItemChecked(I, False)
             End If
         Next
+    End Sub
+
+    Private Sub btnClearRecSum_Click(sender As Object, e As EventArgs) Handles btnClearRecSum.Click
+        If lstRecSum.Items.Count > 0 Then
+            lstRecSum.Items.Clear()
+        End If
     End Sub
 End Class
