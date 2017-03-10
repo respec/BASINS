@@ -406,7 +406,7 @@ Partial Class frmRecess
         '
         Me.btnGetAllSegments.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnGetAllSegments.AutoSize = True
-        Me.btnGetAllSegments.Location = New System.Drawing.Point(3, 243)
+        Me.btnGetAllSegments.Location = New System.Drawing.Point(3, 246)
         Me.btnGetAllSegments.Name = "btnGetAllSegments"
         Me.btnGetAllSegments.Size = New System.Drawing.Size(100, 27)
         Me.btnGetAllSegments.TabIndex = 12
@@ -457,13 +457,13 @@ Partial Class frmRecess
         Me.panelConfiguration.Controls.Add(Me.txtMinRecessionDays)
         Me.panelConfiguration.Location = New System.Drawing.Point(0, 27)
         Me.panelConfiguration.Name = "panelConfiguration"
-        Me.panelConfiguration.Size = New System.Drawing.Size(777, 273)
+        Me.panelConfiguration.Size = New System.Drawing.Size(777, 276)
         Me.panelConfiguration.TabIndex = 31
         '
         'btnViewMRCs
         '
         Me.btnViewMRCs.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnViewMRCs.Location = New System.Drawing.Point(694, 243)
+        Me.btnViewMRCs.Location = New System.Drawing.Point(694, 246)
         Me.btnViewMRCs.Name = "btnViewMRCs"
         Me.btnViewMRCs.Size = New System.Drawing.Size(75, 27)
         Me.btnViewMRCs.TabIndex = 48
@@ -551,7 +551,7 @@ Partial Class frmRecess
         Me.panelAnalysis.Controls.Add(Me.btnSummary)
         Me.panelAnalysis.Controls.Add(Me.btnAnalyse)
         Me.panelAnalysis.Controls.Add(Me.scDisplay)
-        Me.panelAnalysis.Location = New System.Drawing.Point(6, 322)
+        Me.panelAnalysis.Location = New System.Drawing.Point(15, 337)
         Me.panelAnalysis.Name = "panelAnalysis"
         Me.panelAnalysis.Size = New System.Drawing.Size(715, 241)
         Me.panelAnalysis.TabIndex = 32
@@ -602,7 +602,7 @@ Partial Class frmRecess
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(789, 605)
+        Me.ClientSize = New System.Drawing.Size(789, 308)
         Me.Controls.Add(Me.panelAnalysis)
         Me.Controls.Add(Me.panelConfiguration)
         Me.Controls.Add(Me.MenuStrip1)

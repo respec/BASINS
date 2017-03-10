@@ -1392,10 +1392,13 @@ Public Class clsRecess
         If GraphTs IsNot Nothing Then GraphTs.Clear()
         GraphTs = New atcTimeseries(Nothing)
         GraphTs.Dates = New atcTimeseries(Nothing)
-        Order(lListOfChosenSegments.Count, lKDates, lY)
+        Order(lListOfChosenSegments.Count, lKDates, lY, lX)
         GraphTs.Dates.Values = lKDates
         GraphTs.Values = lY
-        GraphTs = GraphTs * -1
+        For I As Integer = 1 To GraphTs.numValues
+            GraphTs.Value(I) *= -1.0
+        Next
+        'GraphTs = GraphTs * -1
         With GraphTs
             .Value(0) = GetNaN()
             .Dates.Value(0) = .Dates.Value(1) - JulianHour * 24.0
@@ -1410,7 +1413,7 @@ Public Class clsRecess
         If GraphTsMeanLogQ IsNot Nothing Then GraphTsMeanLogQ.Clear()
         GraphTsMeanLogQ = New atcTimeseries(Nothing)
         GraphTsMeanLogQ.Dates = New atcTimeseries(Nothing)
-        Order(lListOfChosenSegments.Count, lKDates, lX)
+        'Order(lListOfChosenSegments.Count, lKDates, lX)
         GraphTsMeanLogQ.Dates.Values = lKDates
         GraphTsMeanLogQ.Values = lX
         With GraphTsMeanLogQ
@@ -1796,10 +1799,10 @@ Public Class clsRecess
     'LIST1 e.g XMean
     'LIST2 e.g Coefficient1
     'LIST3 e.g Original ordinal number of each segment
-    Private Sub Order(ByVal aNumOfRecessPeriods As Integer, _
-                      ByRef aList1() As Double, _
-             Optional ByRef aList2() As Double = Nothing, _
-             Optional ByRef aList3() As Integer = Nothing)
+    Private Sub Order(ByVal aNumOfRecessPeriods As Integer,
+                      ByRef aList1() As Double,
+             Optional ByRef aList2() As Double = Nothing,
+             Optional ByRef aList3() As Double = Nothing)
         Dim lSwapped As Boolean
         Dim lPasses As Integer = 0
         Dim lTempValue As Double

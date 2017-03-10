@@ -122,7 +122,8 @@ Public Class frmRecess
                 '.IsEnableVPan = mnuViewVerticalZoom.Checked
                 '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
                 pMaster = .MasterPane
-
+                .IsSynchronizeXAxes = False
+                .IsSynchronizeYAxes = False
             End With
         Else
             pZgc.GraphPane.CurveList.Clear()
@@ -1181,6 +1182,11 @@ Public Class frmRecess
     End Function
 
     Public Sub RefreshGraphRecess(ByVal aDataGroup As atcTimeseriesGroup)
+        If pZgc.MasterPane.PaneList.Count > 1 Then
+            pZgc.MasterPane.PaneList.RemoveAt(1)
+            pZgc.MasterPane.Margin.All = 0
+            pZgc.MasterPane.SetLayout(scDisplay.Panel2.CreateGraphics(), PaneLayout.SquareRowPreferred)
+        End If
         If pGrapher IsNot Nothing Then
             With pGrapher.ZedGraphCtrl.GraphPane
                 'To see if need to refresh the axis
@@ -1225,7 +1231,7 @@ Public Class frmRecess
         pZgc.Refresh()
     End Sub
 
-    Public Sub RefreshGraphRecessSummary(ByVal aDataGroup As atcTimeseriesGroup)
+    Public Sub RefreshGraphRecessSummary(ByVal aDataGroup As atcTimeseriesGroup, ByVal aDataGroupAux As atcTimeseriesGroup)
         If pGrapher IsNot Nothing Then
             With pGrapher.ZedGraphCtrl.GraphPane
                 'To see if need to refresh the axis
@@ -1248,6 +1254,7 @@ Public Class frmRecess
         Else
             'pGrapher.Datasets = aDataGroup
         End If
+
         'Dim lDateMin As Double = aDataGroup(0).Dates.Value(0)
         'Dim lDateMax As Double = aDataGroup(0).Dates.Value(aDataGroup(0).numValues)
         'Dim lLogFlag As Boolean = False
@@ -1267,8 +1274,102 @@ Public Class frmRecess
             .YAxis.Scale.MinAuto = True
             .AxisChange()
         End With
+        Dim lauxGroup As New atcTimeseriesGroup()
+        lauxGroup.Add(aDataGroup(0)) 'K
+        lauxGroup.Add(aDataGroupAux(0)) 'MeanLogQ
+        GraphSetupAux(lauxGroup)
+        pZgc.MasterPane.SetLayout(scDisplay.Panel2.CreateGraphics(), PaneLayout.SquareRowPreferred)
         pZgc.Refresh()
     End Sub
+
+    Private Function GraphSetupAux(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
+        If aDataGroup Is Nothing OrElse aDataGroup.Count < 2 Then Return False
+        Dim lTimeseriesX As atcTimeseries = aDataGroup.ItemByIndex(0) 'K
+        Dim lTimeseriesY As atcTimeseries = aDataGroup.ItemByIndex(1) 'MeanLogQ
+
+        'find common start and end dates
+        'Dim lSJDay As Double
+        'Dim lEJDay As Double
+        'If lTimeseriesX.Dates.Value(0) < lTimeseriesY.Dates.Value(0) Then
+        '    'y starts after x, use y start date
+        '    lSJDay = lTimeseriesY.Dates.Value(0)
+        'Else 'use x start date
+        '    lSJDay = lTimeseriesX.Dates.Value(0)
+        'End If
+        'If lTimeseriesX.Dates.Value(lTimeseriesX.Dates.numValues) < lTimeseriesY.Dates.Value(lTimeseriesY.Dates.numValues) Then
+        '    'x ends before y, use x end date
+        '    lEJDay = lTimeseriesX.Dates.Value(lTimeseriesX.Dates.numValues)
+        'Else 'use y end date
+        '    lEJDay = lTimeseriesY.Dates.Value(lTimeseriesY.Dates.numValues)
+        'End If
+
+        'Dim lSubsetTimeseriesX As atcTimeseries = SubsetByDate(lTimeseriesX, lSJDay, lEJDay, Nothing)
+        'Dim lSubsetTimeseriesY As atcTimeseries = SubsetByDate(lTimeseriesY, lSJDay, lEJDay, Nothing)
+        'Dim lSubsetGroup As New atcTimeseriesGroup
+        'lSubsetGroup.Add(lSubsetTimeseriesX)
+        'lSubsetGroup.Add(lSubsetTimeseriesY)
+
+        'EnableAuxAxis(pZgc.MasterPane, True, 0.2)
+        'Dim lPaneAux As GraphPane = pZgc.MasterPane.PaneList(0)
+        Dim lPaneAux As New ZedGraph.GraphPane()
+        FormatPaneWithDefaults(lPaneAux)
+        pZgc.MasterPane.Add(lPaneAux)
+        lPaneAux.Legend.IsVisible = False
+        With lPaneAux.XAxis
+            .Type = AxisType.Linear
+            '.Scale.MaxAuto = False
+            .Scale.MajorStepAuto = False
+            .Scale.MinorStepAuto = False
+            .Scale.MajorStep = 10
+            .Scale.MinorStep = 2
+            .Title.Text = "K" 'lTimeseriesX.ToString
+        End With
+
+        With lPaneAux.YAxis
+            .Type = AxisType.Linear
+            '.Scale.MaxAuto = False
+            .Title.Text = "Mean LogQ" 'lTimeseriesY.ToString
+        End With
+
+        With lTimeseriesY.Attributes
+            'Dim lScen As String = .GetValue("scenario")
+            'Dim lLoc As String = .GetValue("location")
+            'Dim lCons As String = .GetValue("constituent")
+            'Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+            Dim lCurveColor As System.Drawing.Color = System.Drawing.Color.Blue
+            Dim lCurve As LineItem = Nothing
+            'Dim lXValues() As Double = lSubsetTimeseriesX.Values
+            'Dim lYValues() As Double = lSubsetTimeseriesY.Values
+            Dim lXValues() As Double = lTimeseriesX.Values
+            Dim lYValues() As Double = lTimeseriesY.Values
+            Dim lSymbol As SymbolType
+            Dim lNPts As Integer = lXValues.GetUpperBound(0)
+            If lNPts < 100 Then
+                lSymbol = SymbolType.Circle
+            Else
+                lSymbol = SymbolType.Circle
+            End If
+            lCurve = lPaneAux.AddCurve("", lXValues, lYValues, lCurveColor, lSymbol)
+            If lNPts >= 1000 Then
+                lCurve.Symbol.Size = 1
+            ElseIf lNPts >= 100 Then
+                lCurve.Symbol.Size = 2
+            Else
+                lCurve.Symbol.Size = 7.0F
+            End If
+            lCurve.Line.IsVisible = False
+            lCurve.Symbol.Fill = New Fill(System.Drawing.Color.Blue)
+            lCurve.Symbol.Fill.Type = FillType.Solid
+            lCurve.Symbol.Border.IsVisible = False
+        End With
+        'ScaleAxis(aDataGroup, lPaneAux.YAxis)
+        lPaneAux.XAxis.Scale.Min = Int(lTimeseriesX.Attributes.GetValue("Min") - 5.0)
+        lPaneAux.XAxis.Scale.Max = Int(lTimeseriesX.Attributes.GetValue("Max") + 5.0)
+        lPaneAux.YAxis.Scale.Min = lTimeseriesY.Attributes.GetValue("Min") - 0.2
+        lPaneAux.YAxis.Scale.Max = lTimeseriesY.Attributes.GetValue("Max") + 0.2
+        Return True
+    End Function
+
     Public Sub GraphFallCurves()
         ' get a reference to the GraphPane
         If pZgc IsNot Nothing Then
@@ -1489,6 +1590,7 @@ Public Class frmRecess
         If lConfigurationGood Then
             panelConfiguration.Visible = False
             panelAnalysis.Visible = True
+            Me.Height = 470
         End If
     End Sub
 
@@ -2149,13 +2251,18 @@ Public Class frmRecess
         txtAnalysisResults.Text = aRecess.Bulletin
         txtAnalysisResults.Visible = True
 
+        Dim lauxGroup As New atcTimeseriesGroup()
+        If aRecess.GraphTsMeanLogQ IsNot Nothing AndAlso aRecess.GraphTsMeanLogQ.numValues > 0 Then
+            lauxGroup.Add(aRecess.GraphTsMeanLogQ)
+        End If
         pGraphRecessDatagroup.Clear()
         If aRecess.GraphTs.numValues > 1 Then
             pGraphRecessDatagroup.Add(aRecess.GraphTs)
-            If aRecess.GraphTsMeanLogQ IsNot Nothing AndAlso aRecess.GraphTsMeanLogQ.numValues > 1 Then
-                pGraphRecessDatagroup.Add(aRecess.GraphTsMeanLogQ)
+            If lauxGroup.Count > 0 Then
+                RefreshGraphRecessSummary(pGraphRecessDatagroup, lauxGroup)
+            Else
+                RefreshGraphRecess(pGraphRecessDatagroup)
             End If
-            RefreshGraphRecess(pGraphRecessDatagroup)
         End If
     End Sub
 
@@ -2235,6 +2342,7 @@ Public Class frmRecess
     Private Sub btnConfiguration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnConfiguration.Click
         panelAnalysis.Visible = False
         panelConfiguration.Visible = True
+        Me.Height = 350
     End Sub
 
     Private Sub frmRecess_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
