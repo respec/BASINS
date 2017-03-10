@@ -7,8 +7,6 @@ Imports ZedGraph
 Imports System.Text.RegularExpressions
 
 Public Class frmMRCControl
-    Private pMaster As ZedGraph.MasterPane
-
     Private pFileInitialDir As String = ""
     Private pFileNameStations As String = "Station.txt"
     Private pFileNameRecSum As String = "recsum.txt"
@@ -17,9 +15,12 @@ Public Class frmMRCControl
 
     Public FirstMRC As clsMRC = Nothing
     Private WithEvents pZgc As ZedGraphControl
+    Private WithEvents pZgcUA As ZedGraphControl
     Private pGrapher As clsGraphBase
+    Private pGrapherUA As clsGraphBase
 
     Private pGraphDataGroup As atcTimeseriesGroup
+    Private pGraphDataGroupUA As atcTimeseriesGroup
 
     Private pMRCGroup As atcCollection
     Private pMRCSelectedGroup As atcCollection
@@ -36,11 +37,12 @@ Public Class frmMRCControl
         pMRCGroup = New atcCollection()
         pMRCSelectedGroup = New atcCollection()
         pGraphDataGroup = New atcTimeseriesGroup()
+        pGraphDataGroupUA = New atcTimeseriesGroup()
         If lFirstMRC IsNot Nothing Then
             FirstMRC = lFirstMRC
         End If
 
-        InitMasterPane()
+        InitMasterPanes()
         lstEquations.Items.Clear()
 
         PopulateForm()
@@ -58,7 +60,17 @@ Public Class frmMRCControl
         End Set
     End Property
 
-    Private Sub InitMasterPane()
+    Public Property GrapherUA() As clsGraphBase
+        Get
+            Return pGrapherUA
+        End Get
+        Set(ByVal newValue As clsGraphBase)
+            pGrapherUA = newValue
+            RefreshGraphUA()
+        End Set
+    End Property
+
+    Private Sub InitMasterPanes()
         If pZgc Is Nothing Then
             pZgc = CreateZgc()
             Me.Controls.Add(pZgc)
@@ -70,13 +82,28 @@ Public Class frmMRCControl
                 '.IsEnableVZoom = mnuViewVerticalZoom.Checked
                 '.IsEnableVPan = mnuViewVerticalZoom.Checked
                 '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
-                pMaster = .MasterPane
-
             End With
         Else
             pZgc.GraphPane.CurveList.Clear()
         End If
         RefreshGraph()
+
+        If pZgcUA Is Nothing Then
+            pZgcUA = CreateZgc()
+            Me.Controls.Add(pZgcUA)
+            panelGraphUA.Controls.Add(pZgcUA)
+            With pZgcUA
+                .Dock = System.Windows.Forms.DockStyle.Fill
+                '.IsEnableHZoom = mnuViewHorizontalZoom.Checked
+                '.IsEnableHPan = mnuViewHorizontalZoom.Checked
+                '.IsEnableVZoom = mnuViewVerticalZoom.Checked
+                '.IsEnableVPan = mnuViewVerticalZoom.Checked
+                '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
+            End With
+        Else
+            pZgcUA.GraphPane.CurveList.Clear()
+        End If
+        RefreshGraphUA()
     End Sub
 
     Public Sub RefreshGraph()
@@ -85,7 +112,13 @@ Public Class frmMRCControl
         Refresh()
     End Sub
 
-    Private Sub RefreshGraphMRC(ByVal aDataGroup As atcTimeseriesGroup)
+    Public Sub RefreshGraphUA()
+        pZgcUA.AxisChange()
+        Invalidate()
+        Refresh()
+    End Sub
+
+    Private Sub RefreshGraphMRC(ByVal aDataGroup As atcTimeseriesGroup, ByVal aDataGroupUA As atcTimeseriesGroup)
         If pGrapher IsNot Nothing Then
             With pGrapher.ZedGraphCtrl.GraphPane
                 .YAxis.Title.Text = ""
@@ -105,6 +138,30 @@ Public Class frmMRCControl
             'CType(.CurveList.Item(1), LineItem).Line.Width = 2
         End With
         pZgc.Refresh()
+
+        If pGrapherUA IsNot Nothing Then
+            With pGrapherUA.ZedGraphCtrl.GraphPane
+                .YAxis.Title.Text = ""
+            End With
+            pGrapherUA = Nothing
+        End If
+        pGrapherUA = New clsGraphTime(aDataGroupUA, pZgcUA)
+        'pGrapherUA = New clsGraphOrdinal(aDataGroup, pZgcUA)
+        With pGrapherUA.ZedGraphCtrl.GraphPane
+            '.YAxis.Type = AxisType.Log
+            .YAxis.Title.Text = "FLOW PER UNIT AREA"
+            .XAxis.Title.Text = "TIME, IN DAYS"
+            .AxisChange()
+            '.CurveList.Item(0).Color = Drawing.Color.Red
+            '.Legend.IsVisible = False
+            '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
+            'CType(.CurveList.Item(1), LineItem).Line.Width = 2
+            For I As Integer = 0 To pGrapher.ZedGraphCtrl.GraphPane.CurveList.Count - 1
+                .CurveList.Item(I).Color = pGrapher.ZedGraphCtrl.GraphPane.CurveList.Item(I).Color
+            Next
+        End With
+        pZgcUA.Refresh()
+
     End Sub
 
     Private Sub PopulateForm()
@@ -144,7 +201,13 @@ Public Class frmMRCControl
             Dim lArr() As String = Regex.Split(.RecSum, "\s+")
             Dim lDA As Double
             If lArr.Length > 12 AndAlso Double.TryParse(lArr(12), lDA) Then
-                Dim lthisEquation As String = MRCToAdd(lArr(0), lArr(12), lArr(1), lArr(7), lArr(8), lArr(9), lArr(10), lArr(11))
+                Dim lYearArr() As String = lArr(2).Split("-")
+                Dim lthisEquation As String = "" 'MRCToAdd(lArr(0), lArr(12), lArr(1), lArr(7), lArr(8), lArr(9), lArr(10), lArr(11))
+                If lYearArr.Length = 2 Then
+                    lthisEquation = MRCToAdd(lArr(0), lArr(12), lArr(1), lArr(7), lArr(8), lArr(9), lArr(10), lArr(11), lYearArr(0), lYearArr(1))
+                Else
+                    lthisEquation = MRCToAdd(lArr(0), lArr(12), lArr(1), lArr(7), lArr(8), lArr(9), lArr(10), lArr(11), "", "")
+                End If
                 'key to use is the RecSum string
                 For Each lItem As String In lstEquations.Items
                     If lItem.ToLower = lthisEquation.ToLower Then
@@ -273,14 +336,16 @@ Public Class frmMRCControl
         Dim lMRCToAdd As String
         For CntRecSum As Integer = 2 To lstRecSum.Items.Count - 1
             If ParseRecSumRecord(lstRecSum.Items(CntRecSum), lArrRecSum) Then
-                lMRCToAdd = MRCToAdd(lArrRecSum(clsRecess.RecSumFldIndex.c1Stn), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c14DA), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c2Sn), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c9MinLogQC), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c10MaxLogQC), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c11CoA), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c12CoB), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c13CoC))
+                lMRCToAdd = MRCToAdd(lArrRecSum(clsRecess.RecSumFldIndex.c1Stn),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c14DA),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c2Sn),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c9MinLogQC),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c10MaxLogQC),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c11CoA),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c12CoB),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c13CoC),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c3YrS),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c4YrE))
                 If Not lstEquations.Items.Contains(lMRCToAdd) Then
                     lstEquations.Items.Add(lMRCToAdd)
                 End If
@@ -288,14 +353,19 @@ Public Class frmMRCControl
         Next
     End Sub
 
-    Private Function MRCToAdd(ByVal aStation As String, ByVal aDA As String, ByVal aSeason As String, _
-                              ByVal aLogQMin As String, ByVal aLogQMax As String, _
-                              ByVal aCoeffA As String, ByVal aCoeffB As String, ByVal aCoeffC As String) As String
+    Private Function MRCToAdd(ByVal aStation As String, ByVal aDA As String, ByVal aSeason As String,
+                              ByVal aLogQMin As String, ByVal aLogQMax As String,
+                              ByVal aCoeffA As String, ByVal aCoeffB As String, ByVal aCoeffC As String,
+                              ByVal aYearStart As String,
+                              ByVal aYearEnd As String) As String
         Dim lMRCToAdd As String = aStation & "," & aDA & ",(" & aSeason & "),"
         Dim lRange As String = "(" & aLogQMin & "~" & aLogQMax & "),"
         lMRCToAdd &= lRange
         Dim lEquation As String = "Coeff.A:" & aCoeffA & ",Coeff.B:" & aCoeffB & ",Coeff.C:" & aCoeffC
         lMRCToAdd &= lEquation
+        If Not String.IsNullOrEmpty(aYearStart) AndAlso Not String.IsNullOrEmpty(aYearEnd) Then
+            lMRCToAdd &= "," & aYearStart & "," & aYearEnd
+        End If
         Return lMRCToAdd
     End Function
 
@@ -308,6 +378,8 @@ Public Class frmMRCControl
         Dim lCoB As Double
         Dim lCoC As Double
         Dim lSeason As String
+        Dim lYearStart As String
+        Dim lYearEnd As String
 
         Dim lMRCOutputDir As String = GetSetting("atcUSGSRecess", "Defaults", "FileRecSumDir", "")
         If Not String.IsNullOrEmpty(pFileRecSumFullName) Then
@@ -364,6 +436,14 @@ Public Class frmMRCControl
             lCoB = Double.Parse(lArr(5).Substring("Coeff.B:".Length))
             lCoC = Double.Parse(lArr(6).Substring("Coeff.C:".Length))
 
+            'get years
+            lYearStart = ""
+            lYearEnd = ""
+            If lArr.Length = 9 Then
+                lYearStart = lArr(7)
+                lYearEnd = lArr(8)
+            End If
+
             Dim lMRC As New clsMRC
             With lMRC
                 .Station = lStation
@@ -374,6 +454,8 @@ Public Class frmMRCControl
                 .MaxLogQ = lMaxLogQ
                 .MinLogQ = lMinLogQ
                 .Season = lSeason
+                .YearStart = lYearStart
+                .YearEnd = lYearEnd
                 If .BuildMRC() Then
                     .FileCurvOut = lCurvFileName
                     Try
@@ -382,6 +464,9 @@ Public Class frmMRCControl
                         'Do Nothing
                     End Try
                     pGraphDataGroup.Add(.CurveData)
+                    If .CurveDataUA IsNot Nothing Then
+                        pGraphDataGroupUA.Add(.CurveDataUA)
+                    End If
                 End If
             End With
             pMRCGroup.Add(lMRC)
@@ -477,9 +562,9 @@ Public Class frmMRCControl
         'lMRCToAdd = MRCToAdd(txtStation.Text.Trim(), txtDA.Text.Trim(), txtSeason.Text.Trim(), _
         '                     txtLogQMin.Text.Trim(), txtLogQMax.Text.Trim(), _
         '                     txtCoefA.Text.Trim(), txtCoefB.Text.Trim(), txtCoefC.Text.Trim())
-        lMRCToAdd = MRCToAdd(txtStation.Text, txtDA.Text, txtSeason.Text, _
-                             txtLogQMin.Text, txtLogQMax.Text, _
-                             txtCoefA.Text, txtCoefB.Text, txtCoefC.Text)
+        lMRCToAdd = MRCToAdd(txtStation.Text, txtDA.Text, txtSeason.Text,
+                             txtLogQMin.Text, txtLogQMax.Text,
+                             txtCoefA.Text, txtCoefB.Text, txtCoefC.Text, "", "")
 
         If Not lstEquations.Items.Contains(lMRCToAdd) Then
             lstEquations.Items.Add(lMRCToAdd)
@@ -494,8 +579,9 @@ Public Class frmMRCControl
 
     Private Sub btnMRCPlot_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnMRCPlot.Click
         pGraphDataGroup.Clear()
+        pGraphDataGroupUA.Clear()
         BuildMRCs()
-        RefreshGraphMRC(pGraphDataGroup)
+        RefreshGraphMRC(pGraphDataGroup, pGraphDataGroupUA)
         tabMRCMain.SelectedIndex = 1
     End Sub
 

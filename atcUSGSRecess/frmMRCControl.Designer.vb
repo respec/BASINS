@@ -51,18 +51,21 @@ Partial Class frmMRCControl
         Me.txtCoefB = New System.Windows.Forms.TextBox()
         Me.txtCoefC = New System.Windows.Forms.TextBox()
         Me.gbRecSum = New System.Windows.Forms.GroupBox()
+        Me.btnClearRecSum = New System.Windows.Forms.Button()
         Me.btnRecSum = New System.Windows.Forms.Button()
         Me.lstRecSum = New System.Windows.Forms.ListBox()
         Me.tabPlotMRC = New System.Windows.Forms.TabPage()
         Me.panelGraph = New System.Windows.Forms.Panel()
+        Me.tabPlotMRCunitarea = New System.Windows.Forms.TabPage()
+        Me.panelGraphUA = New System.Windows.Forms.Panel()
         Me.tabMRCTable = New System.Windows.Forms.TabPage()
         Me.txtMRCTable = New System.Windows.Forms.TextBox()
-        Me.btnClearRecSum = New System.Windows.Forms.Button()
         Me.tabMRCMain.SuspendLayout()
         Me.tabConstructMRC.SuspendLayout()
         Me.gbMRCEquations.SuspendLayout()
         Me.gbRecSum.SuspendLayout()
         Me.tabPlotMRC.SuspendLayout()
+        Me.tabPlotMRCunitarea.SuspendLayout()
         Me.tabMRCTable.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -70,6 +73,7 @@ Partial Class frmMRCControl
         '
         Me.tabMRCMain.Controls.Add(Me.tabConstructMRC)
         Me.tabMRCMain.Controls.Add(Me.tabPlotMRC)
+        Me.tabMRCMain.Controls.Add(Me.tabPlotMRCunitarea)
         Me.tabMRCMain.Controls.Add(Me.tabMRCTable)
         Me.tabMRCMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.tabMRCMain.Location = New System.Drawing.Point(0, 0)
@@ -352,6 +356,16 @@ Partial Class frmMRCControl
         Me.gbRecSum.TabStop = False
         Me.gbRecSum.Text = "Specify polynomial coefficients"
         '
+        'btnClearRecSum
+        '
+        Me.btnClearRecSum.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnClearRecSum.Location = New System.Drawing.Point(581, 45)
+        Me.btnClearRecSum.Name = "btnClearRecSum"
+        Me.btnClearRecSum.Size = New System.Drawing.Size(99, 23)
+        Me.btnClearRecSum.TabIndex = 13
+        Me.btnClearRecSum.Text = "Clear RecSum"
+        Me.btnClearRecSum.UseVisualStyleBackColor = True
+        '
         'btnRecSum
         '
         Me.btnRecSum.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -383,7 +397,7 @@ Partial Class frmMRCControl
         Me.tabPlotMRC.Padding = New System.Windows.Forms.Padding(3)
         Me.tabPlotMRC.Size = New System.Drawing.Size(703, 458)
         Me.tabPlotMRC.TabIndex = 1
-        Me.tabPlotMRC.Text = "MRC Plot"
+        Me.tabPlotMRC.Text = "MRC Plot Log(Flow)"
         Me.tabPlotMRC.UseVisualStyleBackColor = True
         '
         'panelGraph
@@ -393,6 +407,24 @@ Partial Class frmMRCControl
         Me.panelGraph.Name = "panelGraph"
         Me.panelGraph.Size = New System.Drawing.Size(697, 452)
         Me.panelGraph.TabIndex = 0
+        '
+        'tabPlotMRCunitarea
+        '
+        Me.tabPlotMRCunitarea.Controls.Add(Me.panelGraphUA)
+        Me.tabPlotMRCunitarea.Location = New System.Drawing.Point(4, 22)
+        Me.tabPlotMRCunitarea.Name = "tabPlotMRCunitarea"
+        Me.tabPlotMRCunitarea.Size = New System.Drawing.Size(703, 458)
+        Me.tabPlotMRCunitarea.TabIndex = 3
+        Me.tabPlotMRCunitarea.Text = "MRC Plot Flow (per unit area)"
+        Me.tabPlotMRCunitarea.UseVisualStyleBackColor = True
+        '
+        'panelGraphUA
+        '
+        Me.panelGraphUA.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.panelGraphUA.Location = New System.Drawing.Point(0, 0)
+        Me.panelGraphUA.Name = "panelGraphUA"
+        Me.panelGraphUA.Size = New System.Drawing.Size(703, 458)
+        Me.panelGraphUA.TabIndex = 0
         '
         'tabMRCTable
         '
@@ -417,16 +449,6 @@ Partial Class frmMRCControl
         Me.txtMRCTable.Size = New System.Drawing.Size(703, 458)
         Me.txtMRCTable.TabIndex = 0
         '
-        'btnClearRecSum
-        '
-        Me.btnClearRecSum.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnClearRecSum.Location = New System.Drawing.Point(581, 45)
-        Me.btnClearRecSum.Name = "btnClearRecSum"
-        Me.btnClearRecSum.Size = New System.Drawing.Size(99, 23)
-        Me.btnClearRecSum.TabIndex = 13
-        Me.btnClearRecSum.Text = "Clear RecSum"
-        Me.btnClearRecSum.UseVisualStyleBackColor = True
-        '
         'frmMRCControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -442,6 +464,7 @@ Partial Class frmMRCControl
         Me.gbMRCEquations.PerformLayout()
         Me.gbRecSum.ResumeLayout(False)
         Me.tabPlotMRC.ResumeLayout(False)
+        Me.tabPlotMRCunitarea.ResumeLayout(False)
         Me.tabMRCTable.ResumeLayout(False)
         Me.tabMRCTable.PerformLayout()
         Me.ResumeLayout(False)
@@ -482,4 +505,6 @@ Partial Class frmMRCControl
     Friend WithEvents rbSelectNoneEqns As System.Windows.Forms.RadioButton
     Friend WithEvents rbSelectAllEqns As System.Windows.Forms.RadioButton
     Friend WithEvents btnClearRecSum As Windows.Forms.Button
+    Friend WithEvents tabPlotMRCunitarea As Windows.Forms.TabPage
+    Friend WithEvents panelGraphUA As Windows.Forms.Panel
 End Class
