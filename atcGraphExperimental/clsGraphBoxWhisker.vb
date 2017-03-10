@@ -302,10 +302,14 @@ Public Class clsGraphBoxWhisker
         End If
 
         Dim lIndex As Integer = 0
-        For Each lTimSer As atcTimeseries In Datasets
-            pZgc.GraphPane.CurveList(lIndex).Tag = lTimSer.Serial & "|" & lTimSer.Attributes.GetValue("ID") & "|" & lTimSer.Attributes.GetValue("Data Source")
-            lIndex += 3
-        Next
+        If Datasets IsNot Nothing AndAlso Datasets.Count = 0 Then
+            For Each lTimSer As atcTimeseries In Datasets
+                pZgc.GraphPane.CurveList(lIndex).Tag = lTimSer.Serial & "|" & lTimSer.Attributes.GetValue("ID") & "|" & lTimSer.Attributes.GetValue("Data Source")
+                lIndex += 3
+            Next
+        End If
+
+
         'lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lTimeseries.Attributes.GetValue("Data Source")   'Make this easy to find again even if label changes
 
         pZgc.GraphPane.BarSettings.ClusterScaleWidthAuto = False

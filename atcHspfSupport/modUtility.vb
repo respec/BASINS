@@ -125,8 +125,9 @@ Public Module Utility
                     .Add("I:PET", "    Potential")
                     .Add("I:IMPEV", "    Actual  ")
                     .Add("P:Header0", "Influx")
-                    .Add("P:SUPY", "    Rainfall")
-                    .Add("P:SURLI", "    Irrigation")
+                    .Add("P:SUPY", "    Rainfall+SnowMelt")
+                    .Add("P:IRRAPP6", "    Irrigation")
+                    '.Add("P:SURLI", "    Surface Lateral Inflow") If needed for a specific project then think about the details.
                     .Add("P:Header1", "Runoff")
                     .Add("P:SURO", "    Surface  ")
                     .Add("P:IFWO", "    Interflow")

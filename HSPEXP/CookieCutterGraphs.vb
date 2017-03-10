@@ -32,6 +32,7 @@ Public Module CookieCutterGraphs
             .Add("P-TOT-IN", "Input of Total P (Existing Conditions)")
             .Add("SSED-TOT", "Total Suspended Solids (mg/l)")
             .Add("RO", "Flow (cfs)")
+            .Add("BEDDEP", "Bed Depth (ft)")
         End With
 
         Dim lLocations As New atcCollection
@@ -198,8 +199,17 @@ All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan pl
                             lTimeSeries.Attributes.SetValue("YAxis", "Left")
                             lTimeseriesGroup.Add(lTimeSeries)
                         End If
+                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "BEDDEP")(0)
+                        If lTimeSeries IsNot Nothing Then
+                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                            If TSTimeUnit <= 4 Then
+                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                            End If
+                            lTimeSeries.Attributes.SetValue("YAxis", "Right")
+                            lTimeseriesGroup.Add(lTimeSeries)
+                        End If
 
-                        If lTimeseriesGroup.Count = 2 Then
+                        If lTimeseriesGroup.Count = 3 Then
                             Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
                             Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
                             Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(1)
@@ -207,9 +217,11 @@ All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan pl
                             Dim lCurve As ZedGraph.LineItem = Nothing
                             lAuxPane.YAxis.Title.Text = "Flow (cfs)"
                             lAuxPane.YAxis.Scale.Min = 0
-                            lMainPane.Y2Axis.Title.Text = "Total Suspended Solids (mg/l)"
-                            lMainPane.Y2Axis.Scale.Min = 0
+                            lMainPane.YAxis.Title.Text = "Total Suspended Solids (mg/l)"
+                            lMainPane.YAxis.Scale.Min = 0
                             lMainPane.XAxis.Title.Text = lRchresCaption
+                            lMainPane.Y2Axis.Title.Text = "Bed Depth (ft)"
+                            lMainPane.Y2Axis.Scale.Min = 0
 
                             lCurve = lAuxPane.CurveList.Item(0)
                             lCurve.Line.IsVisible = True
@@ -225,6 +237,13 @@ All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan pl
                             lCurve.Line.Color = Drawing.Color.FromName("Red")
                             lCurve.Line.Width = 1
                             lCurve.Label.Text = "Total Suspended Solids (mg/l)"
+
+                            lCurve = lMainPane.CurveList.Item(1)
+                            lCurve.Line.IsVisible = True
+                            lCurve.Symbol.Type = SymbolType.None
+                            lCurve.Line.Color = Drawing.Color.FromName("Green")
+                            lCurve.Line.Width = 1
+                            lCurve.Label.Text = "Bed Depth (ft)"
                             lZgc.SaveIn(lOutputFolder & "TSS_RCHRES_" & lRchId & ".png")
                         End If
 

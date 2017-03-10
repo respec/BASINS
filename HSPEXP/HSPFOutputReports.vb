@@ -590,11 +590,11 @@ Module HSPFOutputReports
                                 SaveFileString(lOutFileName, lReportCons.ToString)
                                 lReportCons = Nothing
 
-                                If .Item6.LabelValueCollection.Count > 0 Then
+                                If .Item6 IsNot Nothing AndAlso .Item6.LabelValueCollection.Count > 0 Then
                                     CreateGraph_BoxAndWhisker(.Item6, loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.png")
                                 End If
 
-                                If .Item7.Keys.Count > 0 Then
+                                If .Item7 IsNot Nothing AndAlso .Item7.Keys.Count > 0 Then
                                     For Each location As String In .Item7.Keys
                                         CreateGraph_BarGraph(.Item7.ItemByKey(location), loutfoldername & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
                                     Next location
