@@ -1261,7 +1261,7 @@ Public Class frmRecess
         With pGrapher.ZedGraphCtrl.GraphPane
             If aDataGroup.Count > 0 Then
                 '.YAxis.Type = AxisType.Log
-                .CurveList.Item(0).Color = Drawing.Color.Red
+                If .CurveList.Count > 0 Then .CurveList.Item(0).Color = Drawing.Color.Red
                 .Legend.IsVisible = False
                 '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
                 'CType(.CurveList.Item(1), LineItem).Line.Width = 2
@@ -1274,6 +1274,9 @@ Public Class frmRecess
             .YAxis.Scale.MinAuto = True
             .AxisChange()
         End With
+        If pGrapher.ZedGraphCtrl.MasterPane.PaneList.Count > 1 Then
+            pGrapher.ZedGraphCtrl.MasterPane.PaneList.RemoveAt(1)
+        End If
         Dim lauxGroup As New atcTimeseriesGroup()
         lauxGroup.Add(aDataGroup(0)) 'K
         lauxGroup.Add(aDataGroupAux(0)) 'MeanLogQ

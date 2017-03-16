@@ -1496,7 +1496,8 @@ Public Class clsRecess
                 Dim lStrYearStart As String = lDate(0).ToString
                 J2Date(FlowData.Dates.Value(FlowData.numValues - 1), lDate)
                 Dim lStrYearEnd As String = lDate(0).ToString
-                Dim lStrDuration As String = lStrYearStart & "-" & lStrYearEnd & "  "
+                Dim lStrDuration As String = lStrYearStart & "-" & lStrYearEnd
+                Dim lStrSegCtr As String = lListOfChosenSegments.Count.ToString().PadLeft(3, " ")
 
                 Dim lStrKMin As String = String.Format("{0:0.0}", lKMin).PadLeft(RecSumColW.c6Kmin, " ") '6
                 Dim lStrKMed As String = String.Format("{0:0.0}", lKMed).PadLeft(RecSumColW.c7Kmed, " ") '6
@@ -1520,8 +1521,8 @@ Public Class clsRecess
                     lStaName = lStaName.Replace(",", "_")
                 End If
 
-                pRecSumResult = lStrInputFile & SeasonLabel & " " & lStrDuration & lListOfChosenSegments.Count & _
-                              lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC & _
+                pRecSumResult = lStrInputFile & SeasonLabel & " " & lStrDuration & lStrSegCtr &
+                              lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC &
                               lStrDA & " " & lStaName
 
                 lSW.WriteLine(pRecSumResult)
