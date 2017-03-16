@@ -241,17 +241,11 @@ Public Class frmMRCControl
         Dim lArr() As String = Nothing
         While Not lSR.EndOfStream
             lOneLine = lSR.ReadLine()
-
-            'Eliminate lines by pattern, at least 12 values and the 3rd to 11th are numeric
-            'lArr = Regex.Split(lOneLine, "\s+")
-            'If lArr.Length < 12 Then
-            '    Continue While
-            'Else
-            '    For I As Integer = 3 To 11
-            '        If Not IsNumeric(lArr(I)) Then Continue While
-            '    Next
-            'End If
-            If Not ParseRecSumRecord(lOneLine, lArr) Then Continue While
+            If Not ParseRecSumRecord(lOneLine, lArr) Then
+                If Not ParseRecSumRecord(lOneLine, lArr, False) Then
+                    Continue While
+                End If
+            End If
 
             Dim lFoundMatch As Boolean = False
             'key to use is the RecSum string
@@ -271,53 +265,74 @@ Public Class frmMRCControl
         'SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
     End Sub
 
-    Private Function ParseRecSumRecord(ByVal aLine As String, ByRef Arr() As String) As Boolean
+    Private Function ParseRecSumRecord(ByVal aLine As String, ByRef Arr() As String, Optional ByVal aFixedWidth As Boolean = True) As Boolean
         Dim lRecordIsValid As Boolean = True
         ReDim Arr(0)
         '17 FORMAT (A12,A1,1X,1I4,'-',1I4,1I3,3F6.1,2F8.3,1F9.4,2F10.4, 1F8.1,Awhatever)
         If Not String.IsNullOrEmpty(aLine) AndAlso aLine.Length >= 89 Then
+            Dim lColumns As Integer = 0
+            Dim lDA As String = ""
+            Dim lStartIndex As Integer = 2
             With aLine
-                Dim lStn As String = .Substring(clsRecess.RecSumColumn.c1Stn, clsRecess.RecSumColW.c1Stn)
-                Dim lSn As String = .Substring(clsRecess.RecSumColumn.c2Sn, clsRecess.RecSumColW.c2Sn)
-                Dim lYrS As String = .Substring(clsRecess.RecSumColumn.c3YrS, clsRecess.RecSumColW.c3YrS)
-                Dim lYrE As String = .Substring(clsRecess.RecSumColumn.c4YrE, clsRecess.RecSumColW.c4YrE)
-                Dim lSegCt As String = .Substring(clsRecess.RecSumColumn.c5SegCt, clsRecess.RecSumColW.c5SegCt)
-                Dim lKmin As String = .Substring(clsRecess.RecSumColumn.c6Kmin, clsRecess.RecSumColW.c6Kmin)
-                Dim lKmed As String = .Substring(clsRecess.RecSumColumn.c7Kmed, clsRecess.RecSumColW.c7Kmed)
-                Dim lKmax As String = .Substring(clsRecess.RecSumColumn.c8Kmax, clsRecess.RecSumColW.c8Kmax)
-                Dim lMinLogQC As String = .Substring(clsRecess.RecSumColumn.c9MinLogQC, clsRecess.RecSumColW.c9MinLogQC)
-                Dim lMaxLogQC As String = .Substring(clsRecess.RecSumColumn.c10MaxLogQC, clsRecess.RecSumColW.c10MaxLogQC)
-                Dim lCoA As String = .Substring(clsRecess.RecSumColumn.c11CoA, clsRecess.RecSumColW.c11CoA)
-                Dim lCoB As String = .Substring(clsRecess.RecSumColumn.c12CoB, clsRecess.RecSumColW.c12CoB)
-                Dim lCoC As String = .Substring(clsRecess.RecSumColumn.c13CoC, clsRecess.RecSumColW.c13CoC)
-                Dim lDA As String = ""
-                Dim lColumns As Integer = 13
-                If aLine.Length >= 97 Then
-                    lDA = .Substring(clsRecess.RecSumColumn.c14DA, clsRecess.RecSumColW.c14DA)
-                    lColumns = 14
-                End If
-                ReDim Arr(lColumns - 1)
-                Arr(0) = lStn
-                Arr(1) = lSn
-                Arr(2) = lYrS
-                Arr(3) = lYrE
-                Arr(4) = lSegCt
-                Arr(5) = lKmin
-                Arr(6) = lKmed
-                Arr(7) = lKmax
-                Arr(8) = lMinLogQC
-                Arr(9) = lMaxLogQC
-                Arr(10) = lCoA
-                Arr(11) = lCoB
-                Arr(12) = lCoC
-                For I As Integer = 2 To 12
-                    If Not IsNumeric(Arr(I)) Then
-                        lRecordIsValid = False
-                        Exit For
+                If aFixedWidth Then
+                    Dim lStn As String = .Substring(clsRecess.RecSumColumn.c1Stn, clsRecess.RecSumColW.c1Stn)
+                    Dim lSn As String = .Substring(clsRecess.RecSumColumn.c2Sn, clsRecess.RecSumColW.c2Sn)
+                    Dim lYrS As String = .Substring(clsRecess.RecSumColumn.c3YrS, clsRecess.RecSumColW.c3YrS)
+                    Dim lYrE As String = .Substring(clsRecess.RecSumColumn.c4YrE, clsRecess.RecSumColW.c4YrE)
+                    Dim lSegCt As String = .Substring(clsRecess.RecSumColumn.c5SegCt, clsRecess.RecSumColW.c5SegCt)
+                    Dim lKmin As String = .Substring(clsRecess.RecSumColumn.c6Kmin, clsRecess.RecSumColW.c6Kmin)
+                    Dim lKmed As String = .Substring(clsRecess.RecSumColumn.c7Kmed, clsRecess.RecSumColW.c7Kmed)
+                    Dim lKmax As String = .Substring(clsRecess.RecSumColumn.c8Kmax, clsRecess.RecSumColW.c8Kmax)
+                    Dim lMinLogQC As String = .Substring(clsRecess.RecSumColumn.c9MinLogQC, clsRecess.RecSumColW.c9MinLogQC)
+                    Dim lMaxLogQC As String = .Substring(clsRecess.RecSumColumn.c10MaxLogQC, clsRecess.RecSumColW.c10MaxLogQC)
+                    Dim lCoA As String = .Substring(clsRecess.RecSumColumn.c11CoA, clsRecess.RecSumColW.c11CoA)
+                    Dim lCoB As String = .Substring(clsRecess.RecSumColumn.c12CoB, clsRecess.RecSumColW.c12CoB)
+                    Dim lCoC As String = .Substring(clsRecess.RecSumColumn.c13CoC, clsRecess.RecSumColW.c13CoC)
+                    lColumns = 13
+                    If aLine.Length >= 97 Then
+                        lDA = .Substring(clsRecess.RecSumColumn.c14DA, clsRecess.RecSumColW.c14DA)
+                        lColumns = 14
                     End If
-                Next
-                If lColumns = 14 Then
-                    Arr(13) = lDA
+                    ReDim Arr(lColumns - 1)
+                    Arr(0) = lStn
+                    Arr(1) = lSn
+                    Arr(2) = lYrS
+                    Arr(3) = lYrE
+                    Arr(4) = lSegCt
+                    Arr(5) = lKmin
+                    Arr(6) = lKmed
+                    Arr(7) = lKmax
+                    Arr(8) = lMinLogQC
+                    Arr(9) = lMaxLogQC
+                    Arr(10) = lCoA
+                    Arr(11) = lCoB
+                    Arr(12) = lCoC
+                Else
+                    Arr = Regex.Split(aLine, "\s+")
+                    Dim lpat As String = "^[1-9]\d{3}-[1-9]\d{3}$"
+                    If Not Regex.IsMatch(Arr(2), lpat) Then
+                        lRecordIsValid = False
+                    End If
+                    lStartIndex = 3
+                    lColumns = 12
+                End If
+
+                If lRecordIsValid Then
+                    If Arr.Length < 13 Then
+                        lRecordIsValid = False
+                    Else
+                        'Eliminate lines by pattern, at least 13 values and the 3rd to 13th are numeric
+                        For I As Integer = lStartIndex To 12
+                            If Not IsNumeric(Arr(I)) Then
+                                lRecordIsValid = False
+                                Exit For
+                            End If
+                        Next
+                    End If
+
+                    If lColumns = 14 Then
+                        Arr(13) = lDA
+                    End If
                 End If
             End With
         Else
@@ -346,6 +361,20 @@ Public Class frmMRCControl
                                      lArrRecSum(clsRecess.RecSumFldIndex.c13CoC),
                                      lArrRecSum(clsRecess.RecSumFldIndex.c3YrS),
                                      lArrRecSum(clsRecess.RecSumFldIndex.c4YrE))
+                If Not lstEquations.Items.Contains(lMRCToAdd) Then
+                    lstEquations.Items.Add(lMRCToAdd)
+                End If
+            ElseIf ParseRecSumRecord(lstRecSum.Items(CntRecSum), lArrRecSum, False) Then
+                lMRCToAdd = MRCToAdd(lArrRecSum(clsRecess.RecSumFldIndex.c1Stn),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c14DA - 1),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c2Sn),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c9MinLogQC - 1),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c10MaxLogQC - 1),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c11CoA - 1),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c12CoB - 1),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c13CoC - 1),
+                                     lArrRecSum(2).Substring(0, 4),
+                                     lArrRecSum(2).Substring(lArrRecSum(2).IndexOf("-") + 1))
                 If Not lstEquations.Items.Contains(lMRCToAdd) Then
                     lstEquations.Items.Add(lMRCToAdd)
                 End If
@@ -506,6 +535,22 @@ Public Class frmMRCControl
                     txtDA.Text = lArr(13)
                 End If
             End If
+        ElseIf ParseRecSumRecord(lstRecSum.SelectedItem, lArr, False) Then
+            txtStation.Text = lArr(0)
+            txtSeason.Text = lArr(1)
+            txtLogQMin.Text = lArr(7)
+            txtLogQMax.Text = lArr(8)
+            txtCoefA.Text = lArr(9)
+            txtCoefB.Text = lArr(10)
+            txtCoefC.Text = lArr(11)
+            txtYearStart.Text = lArr(2).Substring(0, 4)
+            txtYearEnd.Text = lArr(2).Substring(lArr(2).IndexOf("-") + 1)
+            Dim lDA As Double
+            If lArr.Length >= 13 Then
+                If Not lArr(12).StartsWith("N/A") AndAlso Double.TryParse(lArr(12), lDA) Then
+                    txtDA.Text = lArr(12)
+                End If
+            End If
         End If
     End Sub
 
@@ -644,6 +689,8 @@ Public Class frmMRCControl
         txtCoefA.Text = ""
         txtCoefB.Text = ""
         txtCoefC.Text = ""
+        txtYearStart.Text = ""
+        txtYearEnd.Text = ""
         RemoveHandler rbSelectAllEqns.CheckedChanged, AddressOf rbSelectAllEqns_CheckedChanged
         RemoveHandler rbSelectNoneEqns.CheckedChanged, AddressOf rbSelectAllEqns_CheckedChanged
         rbSelectAllEqns.Checked = False
