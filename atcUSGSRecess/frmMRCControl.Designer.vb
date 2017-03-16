@@ -26,6 +26,10 @@ Partial Class frmMRCControl
         Me.tabMRCMain = New System.Windows.Forms.TabControl()
         Me.tabConstructMRC = New System.Windows.Forms.TabPage()
         Me.gbMRCEquations = New System.Windows.Forms.GroupBox()
+        Me.txtYearEnd = New System.Windows.Forms.TextBox()
+        Me.lblYearEnd = New System.Windows.Forms.Label()
+        Me.txtYearStart = New System.Windows.Forms.TextBox()
+        Me.lblYearStart = New System.Windows.Forms.Label()
         Me.rbSelectNoneEqns = New System.Windows.Forms.RadioButton()
         Me.rbSelectAllEqns = New System.Windows.Forms.RadioButton()
         Me.btnMRCClear = New System.Windows.Forms.Button()
@@ -60,10 +64,6 @@ Partial Class frmMRCControl
         Me.panelGraphUA = New System.Windows.Forms.Panel()
         Me.tabMRCTable = New System.Windows.Forms.TabPage()
         Me.txtMRCTable = New System.Windows.Forms.TextBox()
-        Me.txtYearStart = New System.Windows.Forms.TextBox()
-        Me.lblYearStart = New System.Windows.Forms.Label()
-        Me.txtYearEnd = New System.Windows.Forms.TextBox()
-        Me.lblYearEnd = New System.Windows.Forms.Label()
         Me.tabMRCMain.SuspendLayout()
         Me.tabConstructMRC.SuspendLayout()
         Me.gbMRCEquations.SuspendLayout()
@@ -135,7 +135,41 @@ Partial Class frmMRCControl
         Me.gbMRCEquations.Size = New System.Drawing.Size(686, 240)
         Me.gbMRCEquations.TabIndex = 37
         Me.gbMRCEquations.TabStop = False
-        Me.gbMRCEquations.Text = "MRC Polynomial Equations (T= Coeff.A * LogQ^2 + Coeff.B * LogQ + Coeff.C)"
+        Me.gbMRCEquations.Text = "Selected MRC Data"
+        '
+        'txtYearEnd
+        '
+        Me.txtYearEnd.Location = New System.Drawing.Point(592, 212)
+        Me.txtYearEnd.Name = "txtYearEnd"
+        Me.txtYearEnd.Size = New System.Drawing.Size(48, 20)
+        Me.txtYearEnd.TabIndex = 37
+        '
+        'lblYearEnd
+        '
+        Me.lblYearEnd.AutoSize = True
+        Me.lblYearEnd.ForeColor = System.Drawing.SystemColors.ControlDark
+        Me.lblYearEnd.Location = New System.Drawing.Point(589, 197)
+        Me.lblYearEnd.Name = "lblYearEnd"
+        Me.lblYearEnd.Size = New System.Drawing.Size(51, 13)
+        Me.lblYearEnd.TabIndex = 38
+        Me.lblYearEnd.Text = "End Year"
+        '
+        'txtYearStart
+        '
+        Me.txtYearStart.Location = New System.Drawing.Point(532, 212)
+        Me.txtYearStart.Name = "txtYearStart"
+        Me.txtYearStart.Size = New System.Drawing.Size(42, 20)
+        Me.txtYearStart.TabIndex = 35
+        '
+        'lblYearStart
+        '
+        Me.lblYearStart.AutoSize = True
+        Me.lblYearStart.ForeColor = System.Drawing.SystemColors.ControlDark
+        Me.lblYearStart.Location = New System.Drawing.Point(529, 196)
+        Me.lblYearStart.Name = "lblYearStart"
+        Me.lblYearStart.Size = New System.Drawing.Size(54, 13)
+        Me.lblYearStart.TabIndex = 36
+        Me.lblYearStart.Text = "Start Year"
         '
         'rbSelectNoneEqns
         '
@@ -362,7 +396,7 @@ Partial Class frmMRCControl
         Me.gbRecSum.Size = New System.Drawing.Size(686, 198)
         Me.gbRecSum.TabIndex = 39
         Me.gbRecSum.TabStop = False
-        Me.gbRecSum.Text = "Specify polynomial coefficients"
+        Me.gbRecSum.Text = "MRC Data"
         '
         'btnClearRecSum
         '
@@ -456,40 +490,6 @@ Partial Class frmMRCControl
         Me.txtMRCTable.ScrollBars = System.Windows.Forms.ScrollBars.Both
         Me.txtMRCTable.Size = New System.Drawing.Size(703, 458)
         Me.txtMRCTable.TabIndex = 0
-        '
-        'txtYearStart
-        '
-        Me.txtYearStart.Location = New System.Drawing.Point(532, 212)
-        Me.txtYearStart.Name = "txtYearStart"
-        Me.txtYearStart.Size = New System.Drawing.Size(42, 20)
-        Me.txtYearStart.TabIndex = 35
-        '
-        'lblYearStart
-        '
-        Me.lblYearStart.AutoSize = True
-        Me.lblYearStart.ForeColor = System.Drawing.SystemColors.ControlDark
-        Me.lblYearStart.Location = New System.Drawing.Point(529, 196)
-        Me.lblYearStart.Name = "lblYearStart"
-        Me.lblYearStart.Size = New System.Drawing.Size(54, 13)
-        Me.lblYearStart.TabIndex = 36
-        Me.lblYearStart.Text = "Start Year"
-        '
-        'txtYearEnd
-        '
-        Me.txtYearEnd.Location = New System.Drawing.Point(592, 212)
-        Me.txtYearEnd.Name = "txtYearEnd"
-        Me.txtYearEnd.Size = New System.Drawing.Size(48, 20)
-        Me.txtYearEnd.TabIndex = 37
-        '
-        'lblYearEnd
-        '
-        Me.lblYearEnd.AutoSize = True
-        Me.lblYearEnd.ForeColor = System.Drawing.SystemColors.ControlDark
-        Me.lblYearEnd.Location = New System.Drawing.Point(589, 197)
-        Me.lblYearEnd.Name = "lblYearEnd"
-        Me.lblYearEnd.Size = New System.Drawing.Size(51, 13)
-        Me.lblYearEnd.TabIndex = 38
-        Me.lblYearEnd.Text = "End Year"
         '
         'frmMRCControl
         '
