@@ -727,7 +727,7 @@ Public Class clsBatchBFSpec
                             .SetValue(atcTimeseriesBaseflow.BFInputNames.DrainageArea, lStation.StationDrainageArea)
                             .SetValue("BatchRun", True)
                         End With
-                        If CalcBF.Open("baseflow", lStation.BFInputs) Then
+                        If CalcBF.Calculate("baseflow", lStation.BFInputs) Then
                             OutputDir = lStationOutDir
                             OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "BF")
                             MethodsLastDone = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods)
@@ -965,7 +965,7 @@ Public Class clsBatchBFSpec
                                     .SetValue(atcTimeseriesBaseflow.BFInputNames.DrainageArea, lStation.StationDrainageArea)
                                     .SetValue("BatchRun", True)
                                 End With
-                                If CalcBF.Open("baseflow", lStation.BFInputs) Then
+                                If CalcBF.Calculate("baseflow", lStation.BFInputs) Then
                                     OutputDir = lStationOutDir
                                     OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
                                     Dim lCtr As Integer = lTsChunk.Attributes.GetValue("period", 0)

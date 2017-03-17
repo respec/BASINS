@@ -45,7 +45,7 @@ Public Module modBaseflowUtil
     Public Sub ComputeBaseflow(ByVal aArgs As atcDataAttributes, Optional ByVal aMakeAvailable As Boolean = False)
         Dim lClsBaseFlowCalculator As New atcTimeseriesBaseflow.atcTimeseriesBaseflow
         Try
-            lClsBaseFlowCalculator.Open("Baseflow", aArgs)
+            lClsBaseFlowCalculator.Calculate("Baseflow", aArgs)
 
             If aMakeAvailable Then
                 Dim lOldDataSource As atcDataSource = Nothing
@@ -385,7 +385,7 @@ Public Module modBaseflowUtil
             aArgs.SetValue(BFInputNames.Streamflow, lTsFlowGroup)
             'Below is for running BFLOW using original full time series including gaps
             'aArgs.SetValue("OriginalFlow", lTsFlow)
-            If CalcBF.Open("baseflow", aArgs) Then
+            If CalcBF.Calculate("baseflow", aArgs) Then
                 'OutputDir = lStationOutDir
                 OutputDir = aArgs.GetValue("OutputDir", "")
                 'OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
@@ -903,7 +903,7 @@ Public Module modBaseflowUtil
             aArgs.SetValue(BFInputNames.Streamflow, lTsFlowGroup)
             'Below is for running BFLOW using original full time series including gaps
             'aArgs.SetValue("OriginalFlow", lTsFlow)
-            If CalcBF.Open("baseflow", aArgs) Then
+            If CalcBF.Calculate("baseflow", aArgs) Then
                 MethodsLastDone = lMethods
             End If
             'lStation.Message &= CalcBF.BF_Message.Trim()

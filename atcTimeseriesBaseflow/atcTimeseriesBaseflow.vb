@@ -153,9 +153,12 @@ Public Class atcTimeseriesBaseflow
 
     End Sub
 
+    Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
+    End Function
+
     'first element of aArgs is atcData object whose attribute(s) will be set to the result(s) of calculation(s)
     'remaining aArgs are expected to follow the args required for the specified operation
-    Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
+    Public Function Calculate(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
         Dim lEnglishFlg As Boolean = True
         Dim lOperationName As String = aOperationName.ToLower
         Dim lBoundaryMonth As Integer = 10
