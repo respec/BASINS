@@ -678,7 +678,7 @@ Public Class atcDataManager
                 lSaveXML.Append("<DisplayAttribute>" & lName & "</DisplayAttribute>")
             Next
             For Each lSource As atcTimeseriesSource In pDataSources
-                If lSource.Category = "File" Then
+                If lSource.Category = "File" AndAlso IO.File.Exists(lSource.Specification) Then
                     Dim lAttributeValues As String = ""
                     For Each lAttributeName As String In pSaveAttributes
                         Dim lAttributeValue As String = lSource.Attributes.GetValue(lAttributeName, "")
