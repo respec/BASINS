@@ -1,6 +1,7 @@
 ﻿Imports atcData
 Imports atcUtility
 Imports MapWinUtility
+Imports System.IO
 
 Public Class BFInputNames
     Public Shared Streamflow As String = "Streamflow"
@@ -39,7 +40,8 @@ Public Class atcTimeseriesBaseflow
 
     Public Overrides ReadOnly Property Category() As String
         Get
-            Return "Generate Timeseries"
+            'Return "Generate Timeseries"
+            Return "File"
         End Get
     End Property
 
@@ -153,8 +155,285 @@ Public Class atcTimeseriesBaseflow
 
     End Sub
 
-    Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-    End Function
+    '{
+    ''' <summary>
+    ''' Read base-flow analysis output persisted in the form of .csv file, namely, the *_fullspan_Daily.csv
+    ''' </summary>
+    ''' <param name="aFileName">the name of the CSV file</param>
+    ''' <param name="aAttributes">additional conditions</param>
+    ''' <returns>True: success; False: failure</returns>
+    Public Overrides Function Open(ByVal aFileName As String,
+                          Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
+        If MyBase.Open(aFileName, aAttributes) Then
+            If Not IO.File.Exists(Specification) Then
+                Logger.Dbg("Opening new file " & Specification)
+                Return True
+            ElseIf IO.Path.GetFileName(Specification).ToLower.StartsWith("nwis_stations") Then
+                Throw New ApplicationException("Station file does not contain timeseries data: " & IO.Path.GetFileName(Specification))
+            Else
+                Try
+                    Dim lTimeStartOpen As Date = Now
+                    Logger.Dbg("OpenStartFor " & Specification)
+
+                    Dim lDataGroup As New atcTimeseriesGroup()
+                    Dim location As String = ""
+                    Dim lDA As Double = Double.NaN
+                    Dim lMethods As New ArrayList()
+                    Dim lDateStart As Double = Double.NaN
+                    Dim lDateEnd As Double = Double.NaN
+                    Dim lBFI_N As Integer = -1
+                    Dim lBFI_TurnFac As Double = Double.NaN
+                    Dim lBFI_K As Double = Double.NaN
+                    Dim lDF1ParamAlpha As Double = Double.NaN
+                    Dim lDF2ParamRC As Double = Double.NaN
+                    Dim lDF2ParamBFImax As Double = Double.NaN
+                    Dim lMethod As BFMethods = Nothing
+
+                    Dim lFirstLine As Boolean = True
+                    Dim lAttributes As New atcDataAttributes()
+                    lAttributes.AddHistory("Read from " & Specification)
+
+                    Dim lArr() As String
+                    Dim lContinueToData As Boolean = False
+                    Dim lHeaderLines As Integer = 0
+                    Dim lSR As New StreamReader(Specification)
+                    Dim lCurLine As String = lSR.ReadLine()
+                    lHeaderLines += 1
+                    Dim lDays As Integer = 0
+                    While Not lSR.EndOfStream
+                        If lCurLine.StartsWith("Station:") Then
+                            lArr = lCurLine.Split(" ")
+                            If IsNumeric(lArr(1)) Then
+                                lAttributes.SetValue("Location", lArr(1))
+                            End If
+                            Dim lStnName As String = lCurLine.Substring(("Station: " & lArr(1)).Length + 1)
+                            If Not String.IsNullOrEmpty(lStnName) Then
+                                lAttributes.SetValue("StaNam", lStnName)
+                            End If
+                        ElseIf lCurLine.Contains("Drainage") Then
+                            lArr = lCurLine.Split(":")
+                            If lArr.Length > 1 AndAlso Not String.IsNullOrEmpty(lArr(1).Trim()) Then
+                                Dim lArr1() As String = lArr(1).Trim().Split(" ")
+                                lAttributes.SetValue("Drainage Area", lArr1(0))
+                            End If
+                        ElseIf lCurLine.Contains("BFI:") Then
+                            lArr = lCurLine.Split(";")
+                            If lArr.Length > 0 Then
+                                lAttributes.SetValue("BFI_N", lArr(0).Substring(lArr(0).LastIndexOf(":") + 1))
+                            End If
+                            If lArr.Length > 1 Then
+                                lAttributes.SetValue("BFI_TurnPtFac", lArr(1).Substring(lArr(1).LastIndexOf(":") + 1))
+                            End If
+                            If lArr.Length > 2 Then
+                                lAttributes.SetValue("BFI_K", lArr(2).Substring(lArr(2).LastIndexOf(":") + 1))
+                            End If
+                        ElseIf lCurLine.Contains("DF1Param:") Then
+                            lAttributes.SetValue("DF1Param_Alpha", lCurLine.Substring(lCurLine.LastIndexOf(":") + 1))
+                        ElseIf lCurLine.Contains("DF2Param:") Then
+                            lArr = lCurLine.Split(";")
+                            lAttributes.SetValue("DF2Param_RC", lArr(0).Substring(lArr(0).LastIndexOf(":") + 1))
+                            lAttributes.SetValue("DF2Param_BFImax", lArr(1).Substring(lArr(1).LastIndexOf(":") + 1))
+                        ElseIf lCurLine.Contains("BFIStandard") OrElse lCurLine.Contains("BFIModified") OrElse
+                               lCurLine.Contains("BFLOW") OrElse lCurLine.Contains("TwoPRDF") OrElse
+                               lCurLine.Contains("PART") OrElse lCurLine.Contains("HySEP-") Then
+                            lArr = lCurLine.Split(",")
+                            For I As Integer = 0 To lArr.Length - 1
+                                If Not String.IsNullOrEmpty(lArr(I)) Then
+                                    If lArr(I).StartsWith("HySEP") Then
+                                        If lArr(I).Contains("Fix") Then
+                                            lMethod = BFMethods.HySEPFixed
+                                            lAttributes.SetValue("Index_BF_" & BFMethods.HySEPFixed.ToString(), I - 2)
+                                            lAttributes.SetValue("Index_RO_" & BFMethods.HySEPFixed.ToString(), I)
+                                        ElseIf lArr(I).Contains("Min") Then
+                                            lMethod = BFMethods.HySEPLocMin
+                                            lAttributes.SetValue("Index_BF_" & BFMethods.HySEPLocMin.ToString(), I - 2)
+                                            lAttributes.SetValue("Index_RO_" & BFMethods.HySEPLocMin.ToString(), I)
+                                        ElseIf lArr(I).Contains("Slide") Then
+                                            lMethod = BFMethods.HySEPSlide
+                                            lAttributes.SetValue("Index_BF_" & BFMethods.HySEPSlide.ToString(), I - 2)
+                                            lAttributes.SetValue("Index_RO_" & BFMethods.HySEPSlide.ToString(), I)
+                                        End If
+                                    ElseIf lArr(I).StartsWith("PART") Then
+                                        lMethod = BFMethods.PART
+                                        lAttributes.SetValue("Index_BF_" & BFMethods.PART.ToString(), I - 2)
+                                        lAttributes.SetValue("Index_RO_" & BFMethods.PART.ToString(), I)
+                                    ElseIf lArr(I).StartsWith("BFLOW") Then
+                                        lMethod = BFMethods.BFLOW
+                                        lAttributes.SetValue("Index_BF_" & BFMethods.BFLOW.ToString(), I - 2)
+                                        lAttributes.SetValue("Index_RO_" & BFMethods.BFLOW.ToString(), I)
+                                    ElseIf lArr(I).StartsWith("Two") Then
+                                        lMethod = BFMethods.TwoPRDF
+                                        lAttributes.SetValue("Index_BF_" & BFMethods.TwoPRDF.ToString(), I - 2)
+                                        lAttributes.SetValue("Index_RO_" & BFMethods.TwoPRDF.ToString(), I)
+                                    ElseIf lArr(I).StartsWith("BFIStandard") Then
+                                        lMethod = BFMethods.BFIStandard
+                                        lAttributes.SetValue("Index_BF_" & BFMethods.BFIStandard.ToString(), I - 2)
+                                        lAttributes.SetValue("Index_RO_" & BFMethods.BFIStandard.ToString(), I)
+                                    ElseIf lArr(I).StartsWith("BFIModified") Then
+                                        lMethod = BFMethods.BFIModified
+                                        lAttributes.SetValue("Index_BF_" & BFMethods.BFIModified.ToString(), I - 2)
+                                        lAttributes.SetValue("Index_RO_" & BFMethods.BFIModified.ToString(), I)
+                                    End If
+                                    If Not lMethods.Contains(lMethod) Then
+                                        lMethods.Add(lMethod)
+                                    End If
+                                End If
+                            Next
+                        ElseIf lCurLine.Contains("Day") AndAlso lCurLine.Contains("Date") Then
+                            While Not lSR.EndOfStream
+                                lCurLine = lSR.ReadLine()
+                                lHeaderLines += 1
+                                If Not String.IsNullOrEmpty(lCurLine) Then
+                                    If lCurLine.StartsWith("1") Then
+                                        lHeaderLines -= 1
+                                        'Exit While
+                                        'Start count days
+                                        lDays += 1
+                                        lArr = lCurLine.Split(",")
+                                        If lArr.Length > 1 AndAlso Not String.IsNullOrEmpty(lArr(1)) Then
+                                            Dim lDateTime As New DateTime()
+                                            If DateTime.TryParse(lArr(1), lDateTime) Then
+                                                lDateStart = Date2J(lDateTime.Year, lDateTime.Month, lDateTime.Day, 0, 0, 0)
+                                            End If
+                                        End If
+                                        While Not lSR.EndOfStream
+                                            lCurLine = lSR.ReadLine()
+                                            If Not String.IsNullOrEmpty(lCurLine) AndAlso IsNumeric(lCurLine.Substring(0, lCurLine.IndexOf(","))) Then
+                                                lDays += 1
+                                            End If
+                                        End While
+                                        Exit While
+                                    End If
+                                End If
+                            End While
+                            If lMethods.Count > 0 Then
+                                lContinueToData = True
+                            End If
+                            Exit While
+                        End If
+                        lCurLine = lSR.ReadLine()
+                        lHeaderLines += 1
+                    End While
+
+                    If lContinueToData Then
+                        'Now read data
+                        Dim lTsAttributes As atcDataAttributes = lAttributes.Copy()
+                        Dim lRmDefs As New ArrayList()
+                        For Each lDef As atcDefinedValue In lTsAttributes
+                            If lDef.Definition.Name.StartsWith("Index") Then
+                                lRmDefs.Add(lDef)
+                            ElseIf lDef.Definition.Name.StartsWith("DF") Then
+                                lRmDefs.Add(lDef)
+                            ElseIf lDef.Definition.Name.StartsWith("BFI") Then
+                                lRmDefs.Add(lDef)
+                            End If
+                        Next
+                        For Each lDef As atcDefinedValue In lRmDefs
+                            lTsAttributes.Remove(lDef)
+                        Next
+                        lDateEnd = lDateStart + JulianHour * 24 * lDays
+                        For Each lMethod In lMethods
+                            Dim lTsRO As atcTimeseries = NewTimeseries(lDateStart, lDateEnd, atcTimeUnit.TUDay, 1, Me, Double.NaN)
+                            Dim lTsBF As atcTimeseries = NewTimeseries(lDateStart, lDateEnd, atcTimeUnit.TUDay, 1, Me, Double.NaN)
+                            With lTsBF.Attributes
+                                .ChangeTo(lTsAttributes)
+                                If lMethod = BFMethods.BFIStandard Then
+                                    .SetValue("BFI_N", lAttributes.GetValue("BFI_N"))
+                                    .SetValue("BFI_TurnPtFac", lAttributes.GetValue("BFI_TurnPtFac"))
+                                ElseIf lMethod = BFMethods.BFIModified Then
+                                    .SetValue("BFI_N", lAttributes.GetValue("BFI_N"))
+                                    .SetValue("BFI_K", lAttributes.GetValue("BFI_K"))
+                                ElseIf lMethod = BFMethods.BFLOW Then
+                                    .SetValue("DF1Param_Alpha", lAttributes.GetValue("DF1Param_Alpha"))
+                                ElseIf lMethod = BFMethods.TwoPRDF Then
+                                    .SetValue("DF2Param_RC", lAttributes.GetValue("DF2Param_RC"))
+                                    .SetValue("DF2Param_BFImax", lAttributes.GetValue("DF2Param_BFImax"))
+                                End If
+                                .SetValue("Constituent", "BF_" & lMethod.ToString())
+                                .SetValue("Description", "baseflow cfs")
+                                .SetValue("Units", "cubic feet per second")
+                            End With
+                            With lTsRO.Attributes
+                                .ChangeTo(lTsAttributes)
+                                If lMethod = BFMethods.BFIStandard Then
+                                    .SetValue("BFI_N", lAttributes.GetValue("BFI_N"))
+                                    .SetValue("BFI_TurnPtFac", lAttributes.GetValue("BFI_TurnPtFac"))
+                                ElseIf lMethod = BFMethods.BFIModified Then
+                                    .SetValue("BFI_N", lAttributes.GetValue("BFI_N"))
+                                    .SetValue("BFI_K", lAttributes.GetValue("BFI_K"))
+                                ElseIf lMethod = BFMethods.BFLOW Then
+                                    .SetValue("DF1Param_Alpha", lAttributes.GetValue("DF1Param_Alpha"))
+                                ElseIf lMethod = BFMethods.TwoPRDF Then
+                                    .SetValue("DF2Param_RC", lAttributes.GetValue("DF2Param_RC"))
+                                    .SetValue("DF2Param_BFImax", lAttributes.GetValue("DF2Param_BFImax"))
+                                End If
+                                .SetValue("Constituent", "RO_" & lMethod.ToString())
+                                .SetValue("Description", "runoff cfs")
+                                .SetValue("Units", "cubic feet per second")
+                            End With
+                            lDataGroup.Add("BF_" & lMethod.ToString(), lTsBF)
+                            lDataGroup.Add("RO_" & lMethod.ToString(), lTsRO)
+                        Next
+                        lSR.BaseStream.Seek(0, SeekOrigin.Begin)
+                        For I As Integer = 1 To lHeaderLines
+                            lCurLine = lSR.ReadLine()
+                        Next
+                        Dim lDayCtr As Integer = 1
+                        Dim lVal As Double
+                        While Not lSR.EndOfStream
+                            lCurLine = lSR.ReadLine()
+                            If String.IsNullOrEmpty(lCurLine) Then
+                                Exit While
+                            End If
+                            lArr = lCurLine.Split(",")
+                            If String.IsNullOrEmpty(lArr(0)) Then
+                                Exit While
+                            End If
+                            For Each lMethod In lMethods
+                                If Double.TryParse(lArr(lAttributes.GetValue("Index_BF_" & lMethod.ToString())), lVal) Then
+                                Else
+                                    lVal = Double.NaN
+                                End If
+                                lDataGroup.ItemByKey("BF_" & lMethod.ToString()).Value(lDayCtr) = lVal
+                                If Double.TryParse(lArr(lAttributes.GetValue("Index_RO_" & lMethod.ToString())), lVal) Then
+                                Else
+                                    lVal = Double.NaN
+                                End If
+                                lDataGroup.ItemByKey("RO_" & lMethod.ToString()).Value(lDayCtr) = lVal
+                            Next
+                            lDayCtr += 1
+                            If lDayCtr > lDays Then
+                                Exit While
+                            End If
+                        End While
+                    End If
+                    Try
+                        If lSR IsNot Nothing Then
+                            lSR.DiscardBufferedData()
+                            lSR.Close()
+                            lSR = Nothing
+                        End If
+                    Catch
+                    End Try
+                    Dim lMissingVal As Double = -999
+                    Dim lTSIndex As Integer = 0
+                    For Each lData In lDataGroup
+                        lTSIndex = lData.Attributes.GetValue("Count")
+                        If lData.numValues <> lTSIndex Then
+                            lData.numValues = lTSIndex
+                        End If
+                        lData.Attributes.RemoveByKey("DataKey")
+                        'further processing could be done here, eg filling missing/gaps etc
+                        DataSets.Add(lData)
+                    Next
+                    'lDataGroup.Clear()
+                    Return True
+                Catch lException As Exception
+                    Throw New ApplicationException("Exception reading '" & Specification & "': " & lException.Message, lException)
+                End Try
+            End If
+        End If
+    End Function '}
 
     'first element of aArgs is atcData object whose attribute(s) will be set to the result(s) of calculation(s)
     'remaining aArgs are expected to follow the args required for the specified operation
