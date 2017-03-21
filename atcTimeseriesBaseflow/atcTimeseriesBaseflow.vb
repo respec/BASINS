@@ -244,35 +244,43 @@ Public Class atcTimeseriesBaseflow
                                             lMethod = BFMethods.HySEPFixed
                                             lAttributes.SetValue("Index_BF_" & BFMethods.HySEPFixed.ToString(), I - 2)
                                             lAttributes.SetValue("Index_RO_" & BFMethods.HySEPFixed.ToString(), I)
+                                            lAttributes.SetValue("Index_BFPCT_" & BFMethods.HySEPFixed.ToString(), I + 2)
                                         ElseIf lArr(I).Contains("Min") Then
                                             lMethod = BFMethods.HySEPLocMin
                                             lAttributes.SetValue("Index_BF_" & BFMethods.HySEPLocMin.ToString(), I - 2)
                                             lAttributes.SetValue("Index_RO_" & BFMethods.HySEPLocMin.ToString(), I)
+                                            lAttributes.SetValue("Index_BFPCT_" & BFMethods.HySEPLocMin.ToString(), I + 2)
                                         ElseIf lArr(I).Contains("Slide") Then
                                             lMethod = BFMethods.HySEPSlide
                                             lAttributes.SetValue("Index_BF_" & BFMethods.HySEPSlide.ToString(), I - 2)
                                             lAttributes.SetValue("Index_RO_" & BFMethods.HySEPSlide.ToString(), I)
+                                            lAttributes.SetValue("Index_BFPCT_" & BFMethods.HySEPSlide.ToString(), I + 2)
                                         End If
                                     ElseIf lArr(I).StartsWith("PART") Then
                                         lMethod = BFMethods.PART
                                         lAttributes.SetValue("Index_BF_" & BFMethods.PART.ToString(), I - 2)
                                         lAttributes.SetValue("Index_RO_" & BFMethods.PART.ToString(), I)
+                                        lAttributes.SetValue("Index_BFPCT_" & BFMethods.PART.ToString(), I + 2)
                                     ElseIf lArr(I).StartsWith("BFLOW") Then
                                         lMethod = BFMethods.BFLOW
                                         lAttributes.SetValue("Index_BF_" & BFMethods.BFLOW.ToString(), I - 2)
                                         lAttributes.SetValue("Index_RO_" & BFMethods.BFLOW.ToString(), I)
+                                        lAttributes.SetValue("Index_BFPCT_" & BFMethods.BFLOW.ToString(), I + 2)
                                     ElseIf lArr(I).StartsWith("Two") Then
                                         lMethod = BFMethods.TwoPRDF
                                         lAttributes.SetValue("Index_BF_" & BFMethods.TwoPRDF.ToString(), I - 2)
                                         lAttributes.SetValue("Index_RO_" & BFMethods.TwoPRDF.ToString(), I)
+                                        lAttributes.SetValue("Index_BFPCT_" & BFMethods.TwoPRDF.ToString(), I + 2)
                                     ElseIf lArr(I).StartsWith("BFIStandard") Then
                                         lMethod = BFMethods.BFIStandard
                                         lAttributes.SetValue("Index_BF_" & BFMethods.BFIStandard.ToString(), I - 2)
                                         lAttributes.SetValue("Index_RO_" & BFMethods.BFIStandard.ToString(), I)
+                                        lAttributes.SetValue("Index_BFPCT_" & BFMethods.BFIStandard.ToString(), I + 2)
                                     ElseIf lArr(I).StartsWith("BFIModified") Then
                                         lMethod = BFMethods.BFIModified
                                         lAttributes.SetValue("Index_BF_" & BFMethods.BFIModified.ToString(), I - 2)
                                         lAttributes.SetValue("Index_RO_" & BFMethods.BFIModified.ToString(), I)
+                                        lAttributes.SetValue("Index_BFPCT_" & BFMethods.BFIModified.ToString(), I + 2)
                                     End If
                                     If Not lMethods.Contains(lMethod) Then
                                         lMethods.Add(lMethod)
@@ -335,6 +343,7 @@ Public Class atcTimeseriesBaseflow
                         For Each lMethod In lMethods
                             Dim lTsRO As atcTimeseries = NewTimeseries(lDateStart, lDateEnd, atcTimeUnit.TUDay, 1, Me, Double.NaN)
                             Dim lTsBF As atcTimeseries = NewTimeseries(lDateStart, lDateEnd, atcTimeUnit.TUDay, 1, Me, Double.NaN)
+                            Dim lTsBFPCT As atcTimeseries = NewTimeseries(lDateStart, lDateEnd, atcTimeUnit.TUDay, 1, Me, Double.NaN)
                             With lTsBF.Attributes
                                 .ChangeTo(lTsAttributes)
                                 If lMethod = BFMethods.BFIStandard Then
@@ -371,8 +380,27 @@ Public Class atcTimeseriesBaseflow
                                 .SetValue("Description", "runoff cfs")
                                 .SetValue("Units", "cubic feet per second")
                             End With
+                            With lTsBFPCT.Attributes
+                                .ChangeTo(lTsAttributes)
+                                If lMethod = BFMethods.BFIStandard Then
+                                    .SetValue("BFI_N", lAttributes.GetValue("BFI_N"))
+                                    .SetValue("BFI_TurnPtFac", lAttributes.GetValue("BFI_TurnPtFac"))
+                                ElseIf lMethod = BFMethods.BFIModified Then
+                                    .SetValue("BFI_N", lAttributes.GetValue("BFI_N"))
+                                    .SetValue("BFI_K", lAttributes.GetValue("BFI_K"))
+                                ElseIf lMethod = BFMethods.BFLOW Then
+                                    .SetValue("DF1Param_Alpha", lAttributes.GetValue("DF1Param_Alpha"))
+                                ElseIf lMethod = BFMethods.TwoPRDF Then
+                                    .SetValue("DF2Param_RC", lAttributes.GetValue("DF2Param_RC"))
+                                    .SetValue("DF2Param_BFImax", lAttributes.GetValue("DF2Param_BFImax"))
+                                End If
+                                .SetValue("Constituent", "BFPCT_" & lMethod.ToString())
+                                .SetValue("Description", "baseflow%")
+                                .SetValue("Units", "percent")
+                            End With
                             lDataGroup.Add("BF_" & lMethod.ToString(), lTsBF)
                             lDataGroup.Add("RO_" & lMethod.ToString(), lTsRO)
+                            lDataGroup.Add("BFPCT_" & lMethod.ToString(), lTsBFPCT)
                         Next
                         lSR.BaseStream.Seek(0, SeekOrigin.Begin)
                         For I As Integer = 1 To lHeaderLines
@@ -400,6 +428,11 @@ Public Class atcTimeseriesBaseflow
                                     lVal = Double.NaN
                                 End If
                                 lDataGroup.ItemByKey("RO_" & lMethod.ToString()).Value(lDayCtr) = lVal
+                                If Double.TryParse(lArr(lAttributes.GetValue("Index_BFPCT_" & lMethod.ToString())), lVal) Then
+                                Else
+                                    lVal = Double.NaN
+                                End If
+                                lDataGroup.ItemByKey("BFPCT_" & lMethod.ToString()).Value(lDayCtr) = lVal
                             Next
                             lDayCtr += 1
                             If lDayCtr > lDays Then
