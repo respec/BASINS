@@ -399,7 +399,7 @@ Public Class atcExpertSystem
                     lStormList.SortByValue()
 
                     Dim NumberOfStorms As Integer = lStormList.Count
-                    Dim NumberOfStormsTobeIncluded As Integer = (.EDateJ - .SDateJ) * 5 / 365.25
+                    Dim NumberOfStormsTobeIncluded As Integer = Math.Min((.EDateJ - .SDateJ) * 5 / 365.25, NumberOfStorms)
                     For i As Integer = (NumberOfStorms - NumberOfStormsTobeIncluded) To NumberOfStorms - 1
                         'these are the biggest storms, add them to the exs
                         Dim localKey As Integer = lStormList.Keys(i)
