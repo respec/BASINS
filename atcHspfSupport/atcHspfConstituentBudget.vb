@@ -426,7 +426,7 @@ This message box will not be shown again for." & aBalanceType)
 
                             Dim lPointTons As Double = 0.0
                             .CurrentRecord += 1
-                            'If lID.Id = 102 Then Stop
+                            If lID.Id = 610 Then Stop
                             For Each lSource As HspfPointSource In lID.PointSources
                                 If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
                                     Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
@@ -532,7 +532,7 @@ This message box will not be shown again for." & aBalanceType)
                                                          lDiversion, aSDateJ, aEDateJ)
                                 lReport2.Append(.Item1)
                                 lNonpointTons = .Item2
-                                lGENERLoad = .Item3
+                                lGENERLoad = + .Item3
                                 'When calculating losses and gains to the water columns from the be depth, deposition is the loss from the stream and 
                                 'scour is the gain from the stream. Using this terminology for Load Allocation report makes it consistent for the Load Allocation Report.
 
@@ -1244,8 +1244,10 @@ This message box will not be shown again for." & aBalanceType)
 
                     End If
                 Next Key
+                If LoadingRateCollectionForEachLanduse.Count > 0 Then
+                    lDataForBoxWhiskerPlot.LabelValueCollection.Add(LandUse, LoadingRateCollectionForEachLanduse.ToArray)
+                End If
 
-                lDataForBoxWhiskerPlot.LabelValueCollection.Add(LandUse, LoadingRateCollectionForEachLanduse.ToArray)
                 LoadingRateSummary &= DoubleToString(sum / count, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab &
                     DoubleToString(min, , lNumberFormat,,, lNumberOfSignificantDigits) &
                     vbTab & DoubleToString(max, , lNumberFormat,,, lNumberOfSignificantDigits) & vbCrLf
@@ -1698,7 +1700,7 @@ This message box will not be shown again for." & aBalanceType)
 
         End If
 
-        Return New Tuple(Of String, Double, Double)(LoadingByLanduse, lReachTotal, aGENERLoad)
+        Return New Tuple(Of String, Double, Double)(LoadingByLanduse, lReachTotal, TotalGENERLoad)
     End Function
 
     Private Function FindDownStreamExitNumber(ByVal aUCI As HspfUci,
