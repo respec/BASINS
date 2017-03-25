@@ -426,7 +426,7 @@ This message box will not be shown again for." & aBalanceType)
 
                             Dim lPointTons As Double = 0.0
                             .CurrentRecord += 1
-                            If lID.Id = 610 Then Stop
+                            'If lID.Id = 610 Then Stop
                             For Each lSource As HspfPointSource In lID.PointSources
                                 If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
                                     Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
