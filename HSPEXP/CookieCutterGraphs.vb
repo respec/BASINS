@@ -170,8 +170,8 @@ Public Module CookieCutterGraphs
                             lCurve.Label.Text = "Dissolved NO3-N"
                             lZgc.SaveIn(lOutputFolder & "RCHRES_" & lRchId & ".png")
                         Else
-                            Logger.Msg("Cannot generate Regan Plot for RCHRES" & lRchId & ". : 
-All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan plot will not be generated for this reach.")
+                            '                            Logger.Msg("Cannot generate Regan Plot for RCHRES" & lRchId & ". : 
+                            'All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan plot will not be generated for this reach.")
                         End If
 
                         'Plotting the TSS Curve

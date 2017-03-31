@@ -48,6 +48,7 @@ Module HSPFOutputReports
     Private SDateJ, EDateJ As Double
     Private loutfoldername As String
     Private pSensitivity As Boolean = False
+    Private pListModelParameters As Boolean = False
     Private ASDate, AEDate As Date
 
 
@@ -217,13 +218,20 @@ Module HSPFOutputReports
                 End If
 
                 loutfoldername = pTestPath
+
+
+
                 Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") & _
                                     Format(Microsoft.VisualBasic.DateAndTime.Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
                 loutfoldername = pTestPath & "Reports_" & lDateString & "\"
                 System.IO.Directory.CreateDirectory(loutfoldername)
                 System.IO.File.Copy(pTestPath & pBaseName & ".uci", loutfoldername & pBaseName & ".uci", overwrite:=True)
                 'A folder name is given that has the basename and the time when the run was made.
-
+                pListModelParameters = False
+                If pListModelParameters Then
+                    ListReachParametersForAllUCIFiles(loutfoldername)
+                    'modListUCIParameters.ListReachParameters(aHspfUci, loutfoldername)
+                End If
 
                 If StartUp.chkAdditionalgraphs.Checked Then
                     Try
@@ -605,8 +613,7 @@ Module HSPFOutputReports
                             Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
 
 
-                            lReportCons = HspfSupport.ConstituentBalance.Report _
-                               (aHspfUci, lConstituent, lOperationTypes, pBaseName,
+                            lReportCons = HspfSupport.ConstituentBalance.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
                                 lScenarioResults, lLocations, lRunMade, SDateJ, EDateJ)
                             lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_OPN_Per_Year.txt"
 
@@ -616,8 +623,7 @@ Module HSPFOutputReports
                             'constituent balance
 
 
-                            lReportCons = HspfSupport.WatershedConstituentBalance.Report _
-                            (aHspfUci, lConstituent, lOperationTypes, pBaseName,
+                            lReportCons = HspfSupport.WatershedConstituentBalance.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
                             lScenarioResults, lRunMade, SDateJ, EDateJ)
                             lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
 
@@ -680,12 +686,43 @@ RWZProgramEnding:
         'On 11/13/2015, Anurag decided that aany number of CSV file with *.csv extension could be added. 
         '
         Dim lGraphSpecificationFileNames As New NameValueCollection
+
+        AddFilesInDir(lGraphSpecificationFileNames, IO.Directory.GetCurrentDirectory, False, "*.json")
+
+        If Not System.IO.Directory.Exists(loutfoldername) Then
+            System.IO.Directory.CreateDirectory(loutfoldername)
+        End If
+
+        Dim NumberOfJSonFiles = lGraphSpecificationFileNames.Count
+        If NumberOfJSonFiles >= 1 Then '
+            Logger.Dbg(Now & " Custom graphs will be produced from JSON Files.")
+            For Each lGraphSpecificationFile As String In lGraphSpecificationFileNames
+                Dim lOutPutGraphFileName As String = IO.Path.GetFileName(lGraphSpecificationFile)
+                lOutPutGraphFileName = IO.Path.Combine(loutfoldername, lOutPutGraphFileName)
+                lOutPutGraphFileName = IO.Path.ChangeExtension(lOutPutGraphFileName, ".png")
+                atcGraph.GraphJsonToFile(lGraphSpecificationFile, lOutPutGraphFileName)
+            Next
+        End If
+
+        lGraphSpecificationFileNames.Clear()
+
         AddFilesInDir(lGraphSpecificationFileNames, IO.Directory.GetCurrentDirectory, False, "*.csv")
-        If lGraphSpecificationFileNames.Count < 1 Then '
+        Dim NumberOfCSVFiles = lGraphSpecificationFileNames.Count
+
+        If NumberOfCSVFiles >= 1 Then '
+            Logger.Dbg(Now & " Custom graphs will be produced from CSV Files.")
+        End If
+
+        If NumberOfCSVFiles = 0 AndAlso NumberOfJSonFiles = 0 Then '
             '
-            Throw New ApplicationException("No CSV (*.csv) file found in directory " & IO.Directory.GetCurrentDirectory)
+            Throw New ApplicationException("No graph specification file found in directory " & IO.Directory.GetCurrentDirectory)
             Logger.Dbg(Now & " Custom graphs will not be produced.")
         End If
+
+
+
+
+
         Dim lGraphFilesCount = 0
         For Each lGraphSpecificationFile As String In lGraphSpecificationFileNames
             lGraphFilesCount += 1
@@ -782,9 +819,15 @@ RWZProgramEnding:
 
                     If TypeOfGraph = "scatter" Then lNumberOfCurves = 2
                     lRecordIndex += 1
+                    Dim lGraphDataset() As String = lgraphRecordsNew(lRecordIndex)
                     Dim skipGraph As Boolean = False
-                    For CurveNumber As Integer = 1 To lNumberOfCurves
-                        Dim lGraphDataset() As String = lgraphRecordsNew(lRecordIndex)
+
+                    Do While (lGraphDataset(0).ToLower = "left" Or lGraphDataset(0).ToLower = "right" Or
+                        lGraphDataset(0).ToLower = "aux" Or lGraphDataset(0).ToLower = "regression" Or lGraphDataset(0).ToLower = "45-deg line" Or skipGraph)
+
+
+                        'For CurveNumber As Integer = 1 To lNumberOfCurves
+
                         Dim lTimeSeries As atcTimeseries = Nothing
                         Dim lDataSourceFilename As String = AbsolutePath(Trim(lGraphDataset(1)), pTestPath)
                         If IO.File.Exists(lDataSourceFilename) Then
@@ -803,18 +846,18 @@ RWZProgramEnding:
                                     lTimeSeries = lDataSource.DataSets.FindData("ID", Trim(lGraphDataset(2)))(0)
                                     lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
                                     If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
-                                        MsgBox("No timeseries was available from " & lDataSourceFilename & " for " & _
+                                        MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
                                                 " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Moving to next graph!", vbOKOnly)
                                         lRecordIndex += 1
-                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("scatter") Or _
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("timeseries") Or _
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("frequency") Or _
-                                                    lRecordIndex + 1 < lgraphRecordsNew.Count)
+                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("scatter") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("timeseries") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("frequency") Or
+                                                    lRecordIndex + 1 > lgraphRecordsNew.Count)
                                             lRecordIndex += 1
                                         Loop
 
                                         skipGraph = True
-                                        Exit For
+                                        Exit Do
                                         'Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
                                         '                               " DSN " & Trim(lGraphDataset(2)) & ". Program will quit!")
                                     End If
@@ -824,12 +867,12 @@ RWZProgramEnding:
                                                                       .FindData("Constituent", Trim(lGraphDataset(3)))(0)
                                     lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
                                     If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
-                                        MsgBox("No timeseries was available from " & lDataSourceFilename & " for " & _
+                                        MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
                                                 " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Moving to next graph!", vbOKOnly)
                                         lRecordIndex += 1
-                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("scatter") Or _
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("timeseries") Or _
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("frequency") Or _
+                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("scatter") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("timeseries") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("frequency") Or
                                                     lRecordIndex + 1 < lgraphRecordsNew.Count)
                                             lRecordIndex += 1
                                         Loop
@@ -844,12 +887,12 @@ RWZProgramEnding:
                                     lTimeSeries = lDataSource.DataSets.FindData("ParmCode", Trim(lGraphDataset(2)))(0)
                                     lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
                                     If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
-                                        MsgBox("No timeseries was available from " & lDataSourceFilename & " for " & _
+                                        MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
                                                 " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Moving to next graph!", vbOKOnly)
                                         lRecordIndex += 1
-                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("scatter") Or _
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("timeseries") Or _
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("frequency") Or _
+                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("scatter") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("timeseries") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("frequency") Or
                                                     lRecordIndex + 1 < lgraphRecordsNew.Count)
                                             lRecordIndex += 1
                                         Loop
@@ -903,43 +946,47 @@ RWZProgramEnding:
                             Logger.Msg("Could not open '" & lDataSourceFilename & "' Aborting Graphing.", MsgBoxStyle.OkOnly, "HSPEXP+")
                             Exit Do
                         End If
+
+                        'Next CurveNumber
                         lRecordIndex += 1
-                    Next CurveNumber
+                        If lRecordIndex >= lgraphRecordsNew.Count Then Exit Do
+                        lGraphDataset = lgraphRecordsNew(lRecordIndex)
+                    Loop
                     If Not skipGraph Then
 
 
-                        Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
-                        Select Case Trim(lGraphInit(0)).ToLower
-                            Case "timeseries"
-                                TimeSeriesgraph(lTimeseriesGroup, lZgc, lGraphInit, lgraphRecordsNew, lRecordIndex)
-                            Case "frequency"
-                                FrequencyGraph(lTimeseriesGroup, lZgc, lGraphInit, lgraphRecordsNew, lRecordIndex)
-                            Case "scatter"
-                                lRecordIndex += 2
-                                ScatterPlotGraph(lTimeseriesGroup, lZgc, lGraphInit, lgraphRecordsNew, lRecordIndex)
-                            Case "cumulative probability"
-                                CumulativeProbability(lTimeseriesGroup, lZgc, lGraphInit, lgraphRecordsNew, lRecordIndex)
-                        End Select
+                            Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+                            Select Case Trim(lGraphInit(0)).ToLower
+                                Case "timeseries"
+                                    TimeSeriesgraph(lTimeseriesGroup, lZgc, lGraphInit, lgraphRecordsNew, lRecordIndex)
+                                Case "frequency"
+                                    FrequencyGraph(lTimeseriesGroup, lZgc, lGraphInit, lgraphRecordsNew, lRecordIndex)
+                                Case "scatter"
+                                    lRecordIndex += 2
+                                    ScatterPlotGraph(lTimeseriesGroup, lZgc, lGraphInit, lgraphRecordsNew, lRecordIndex)
+                                Case "cumulative probability"
+                                    CumulativeProbability(lTimeseriesGroup, lZgc, lGraphInit, lgraphRecordsNew, lRecordIndex)
+                            End Select
 
-                        Dim GraphDirectory As String = System.IO.Path.GetDirectoryName(lOutFileName)
-                        If Not System.IO.Directory.Exists(GraphDirectory) Then
-                            System.IO.Directory.CreateDirectory(GraphDirectory)
+                            Dim GraphDirectory As String = System.IO.Path.GetDirectoryName(lOutFileName)
+                            If Not System.IO.Directory.Exists(GraphDirectory) Then
+                                System.IO.Directory.CreateDirectory(GraphDirectory)
+                            End If
+                            lZgc.SaveIn(lOutFileName)
+
+                            Dim newlistofattributes() As String = {"Location", "Constituent"}
+                            atcData.atcDataManager.DisplayAttributesSet(newlistofattributes)
+                            Dim lList As New atcList.atcListPlugin
+                            lList.Save(lTimeseriesGroup, lOutFileName.Substring(0, Len(lOutFileName) - 4) & ".txt")
+                            lZgc.Dispose()
+                            lRecordIndex -= 1
+                            lTimeseriesGroup = Nothing
+                            lRecordIndex += 1
                         End If
-                        lZgc.SaveIn(lOutFileName)
 
-                        Dim newlistofattributes() As String = {"Location", "Constituent"}
-                        atcData.atcDataManager.DisplayAttributesSet(newlistofattributes)
-                        Dim lList As New atcList.atcListPlugin
-                        lList.Save(lTimeseriesGroup, lOutFileName.Substring(0, Len(lOutFileName) - 4) & ".txt")
-                        lZgc.Dispose()
-                        lRecordIndex -= 1
-                        lTimeseriesGroup = Nothing
-                        lRecordIndex += 1
-                    End If
+                    Loop While (lRecordIndex + 1) < lgraphRecordsNew.Count
 
-                Loop While (lRecordIndex + 1) < lgraphRecordsNew.Count
-
-                atcDataManager.DataSets.Clear()
+                    atcDataManager.DataSets.Clear()
                 atcDataManager.Clear()
             End Using
         Next

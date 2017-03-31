@@ -1,3 +1,22 @@
+Dated: 3/30/2017
+HSPEXP+1.30
+Features:
+1. If the observed flow data is non-continuous, HSPEXP+ compares the observed and simulated data, and discards the data for dates where corresponding observed data is not available. The expert statistics calculation, annual, monthly, and daily flow comparisons are conducted on the remaining data. All output reports include information about the percent of data that is missing, and to use caution while using the results 
+2. Newer versions of BASINS will have capability to produce graph specifications as a JSON file. HSPEXP+1.30 can produce graphs using the JSON file, if it is available in the project folder.
+3. Regan Plots: Regan Plots were expanded with following two plots.
+   3a. When River Eutrophication Standard (RES) file is provided in the project file as a csv file with names as RES_TP_Standard.csv, total phosphorus load duration curve are generated at the locations where RES standard is provided. The RES Standard file expects Reach Number and reach standard separated by a comma.
+   3b. If model output binary files contain sediment output, TSS plots at all the locations are produced along with the bed depth. These plots help determine if there is any issue with the model stability.
+4. Box-Whisker Plot of nutrient loadings- When nutrient loading reports are generated, HSPEXP+ also generates a box-whisker plot of nutrient loading rates of ech land use. This helps a modeler quickly compare the land use loading rates and notice any anomalies.
+5. Bar graph of the nutrient loading allocation - When a user requests nutrient reports at specific locations, a bar graph of nutrient loads at those locations is also generated. 
+6. The reach budget and load allocation reports now include the GENER sources that are listed in NETWORK block.
+
+Bugs Fixed:
+1. The nutrient loading rate reports had some calculation mistake, which could be noticed only on big models. It has been fixed.
+2. The reach budget calculations and loading rate calculations have been improved.
+3. Default values for line and point size have been added in the graphing section.
+4. If HSPEXP+ is started and the UCI file is not read properly, HSPEXP+ gives an option to browse to a different UCI file.
+
+
 Dated 11/22/2016
 HSPEXP+ 1.21
 Bugs Fixed:
