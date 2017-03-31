@@ -387,3 +387,9 @@
 /WinHSPF/WinHSPF15.vbproj.user
 HSPEXP/bin/x86/Debug/atcBasinsObsWQ.dll
 *.pdb
+atcBasinsObsWQ/atcBasinsObsWQ-D4EM10.vbproj
+atcGraphFromJSON/obj/x86/Debug/atcGraphFromJSON.xml
+atcGraphFromJSON/obj/x86/Debug/atcGraphFromJSON15-4.0.vbproj.FileListAbsolute.txt
+*.cache
+atcGraphFromJSON/obj/x86/Debug/atcGraphFromJSON15.vbproj.FileListAbsolute.txt
+*.force
