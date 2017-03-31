@@ -719,14 +719,10 @@ RWZProgramEnding:
             Logger.Dbg(Now & " Custom graphs will not be produced.")
         End If
 
-
-
-
-
         Dim lGraphFilesCount = 0
         For Each lGraphSpecificationFile As String In lGraphSpecificationFileNames
             lGraphFilesCount += 1
-            If lGraphSpecificationFile = "RES_TP_Standard.csv" Then Continue For
+            If lGraphSpecificationFile.ToLower = "res_tp_standard.csv" Then Continue For
             Dim lgraphRecordsNew As New ArrayList()
             Using MyReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(lGraphSpecificationFile)
                 Dim lines() As String = {}
