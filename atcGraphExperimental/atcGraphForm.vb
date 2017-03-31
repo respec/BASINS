@@ -563,6 +563,8 @@ Public Class atcGraphForm
         With lSaveDialog
             .Title = "Save graph specs to file"
             .DefaultExt = ".json"
+
+            .Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*"
             .FileName = ReplaceString(Me.Text, " ", "_") & ".json"
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
