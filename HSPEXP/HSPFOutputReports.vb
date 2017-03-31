@@ -722,7 +722,7 @@ RWZProgramEnding:
         Dim lGraphFilesCount = 0
         For Each lGraphSpecificationFile As String In lGraphSpecificationFileNames
             lGraphFilesCount += 1
-            If lGraphSpecificationFile.ToLower = "res_tp_standard.csv" Then Continue For
+            If IO.Path.GetFileName(lGraphSpecificationFile).ToLower = "res_tp_standard.csv" Then Continue For
             Dim lgraphRecordsNew As New ArrayList()
             Using MyReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(lGraphSpecificationFile)
                 Dim lines() As String = {}
