@@ -60,7 +60,6 @@ Partial Class frmDF2P
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem()
         Me.panelConfiguration = New System.Windows.Forms.Panel()
         Me.btnSaveRC = New System.Windows.Forms.Button()
-        Me.Button1 = New System.Windows.Forms.Button()
         Me.chkRCregression = New System.Windows.Forms.CheckBox()
         Me.lblMinRecessDays = New System.Windows.Forms.Label()
         Me.txtBackDays = New System.Windows.Forms.TextBox()
@@ -70,12 +69,12 @@ Partial Class frmDF2P
         Me.gbDataType = New System.Windows.Forms.GroupBox()
         Me.txtDataInfo = New System.Windows.Forms.TextBox()
         Me.panelAnalysis = New System.Windows.Forms.Panel()
+        Me.lbl_lstSegment = New System.Windows.Forms.Label()
         Me.txtBFImax = New System.Windows.Forms.TextBox()
         Me.lblEstimatedBFImax = New System.Windows.Forms.Label()
         Me.txtRC2 = New System.Windows.Forms.TextBox()
         Me.lblRC2 = New System.Windows.Forms.Label()
         Me.btnConfiguration = New System.Windows.Forms.Button()
-        Me.lbl_lstSegment = New System.Windows.Forms.Label()
         Me.gbMonthSeason.SuspendLayout()
         Me.gbDates.SuspendLayout()
         Me.scDisplay.Panel1.SuspendLayout()
@@ -460,7 +459,6 @@ Partial Class frmDF2P
         'panelConfiguration
         '
         Me.panelConfiguration.Controls.Add(Me.btnSaveRC)
-        Me.panelConfiguration.Controls.Add(Me.Button1)
         Me.panelConfiguration.Controls.Add(Me.chkRCregression)
         Me.panelConfiguration.Controls.Add(Me.lblMinRecessDays)
         Me.panelConfiguration.Controls.Add(Me.lblRecessionDays)
@@ -489,15 +487,6 @@ Partial Class frmDF2P
         Me.btnSaveRC.TabIndex = 56
         Me.btnSaveRC.Text = "Save"
         Me.btnSaveRC.UseVisualStyleBackColor = True
-        '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(0, 0)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(75, 23)
-        Me.Button1.TabIndex = 55
-        Me.Button1.Text = "Button1"
-        Me.Button1.UseVisualStyleBackColor = True
         '
         'chkRCregression
         '
@@ -594,6 +583,15 @@ Partial Class frmDF2P
         Me.panelAnalysis.TabIndex = 32
         Me.panelAnalysis.Visible = False
         '
+        'lbl_lstSegment
+        '
+        Me.lbl_lstSegment.AutoSize = True
+        Me.lbl_lstSegment.Location = New System.Drawing.Point(3, 3)
+        Me.lbl_lstSegment.Name = "lbl_lstSegment"
+        Me.lbl_lstSegment.Size = New System.Drawing.Size(114, 13)
+        Me.lbl_lstSegment.TabIndex = 46
+        Me.lbl_lstSegment.Text = "Last Day of Recession"
+        '
         'txtBFImax
         '
         Me.txtBFImax.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -645,15 +643,6 @@ Partial Class frmDF2P
         Me.btnConfiguration.TabIndex = 16
         Me.btnConfiguration.Text = "< Back"
         Me.btnConfiguration.UseVisualStyleBackColor = True
-        '
-        'lbl_lstSegment
-        '
-        Me.lbl_lstSegment.AutoSize = True
-        Me.lbl_lstSegment.Location = New System.Drawing.Point(3, 3)
-        Me.lbl_lstSegment.Name = "lbl_lstSegment"
-        Me.lbl_lstSegment.Size = New System.Drawing.Size(114, 13)
-        Me.lbl_lstSegment.TabIndex = 46
-        Me.lbl_lstSegment.Text = "Last Day of Recession"
         '
         'frmDF2P
         '
@@ -738,6 +727,5 @@ Partial Class frmDF2P
     Friend WithEvents txtBFImax As Windows.Forms.TextBox
     Friend WithEvents chkRCregression As Windows.Forms.CheckBox
     Friend WithEvents btnSaveRC As Windows.Forms.Button
-    Friend WithEvents Button1 As Windows.Forms.Button
     Friend WithEvents lbl_lstSegment As Windows.Forms.Label
 End Class
