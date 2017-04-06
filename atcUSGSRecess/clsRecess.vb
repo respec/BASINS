@@ -82,6 +82,7 @@ Public Class clsRecess
                     lSW = Nothing
                     pOutputPath = value
                     fHasWritePermission = True
+                    TryDelete(IO.Path.Combine(value, "z.txt"))
                 Catch ex As Exception
                     If lSW IsNot Nothing Then
                         lSW.Close()
