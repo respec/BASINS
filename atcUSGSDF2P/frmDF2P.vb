@@ -2111,10 +2111,12 @@ Public Class frmDF2P
                 txtOutputDir.Focus()
             Else
                 Try
-                    Dim lSW As New IO.StreamWriter(IO.Path.Combine(txtOutputDir.Text.Trim(), "z.txt"), False)
+                    Dim ltestFile As String = IO.Path.Combine(txtOutputDir.Text.Trim(), "z.txt")
+                    Dim lSW As New IO.StreamWriter(ltestFile, False)
                     lSW.WriteLine("Done testing for WRITE permission.")
                     lSW.Flush()
                     lSW.Close()
+                    TryDelete(ltestFile)
                 Catch ex As Exception
                     Logger.Msg("Unable to write to specified output directory." & "Try another directory.", MsgBoxStyle.Information, "Save Intermediate Results")
                     txtOutputDir.Focus()
