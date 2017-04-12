@@ -49,11 +49,11 @@ Public Class frmRecess
     Private pMessage As String = ""
     Private pLoaded As Boolean = False
 
-    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
-                      Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
-                      Optional ByVal aShowForm As Boolean = True, _
-                      Optional ByVal aRecess As clsRecess = Nothing, _
-                      Optional ByVal aFall As clsFall = Nothing, _
+    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing,
+                      Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing,
+                      Optional ByVal aShowForm As Boolean = True,
+                      Optional ByVal aRecess As clsRecess = Nothing,
+                      Optional ByVal aFall As clsFall = Nothing,
                       Optional ByVal aModal As Boolean = False)
         If aBasicAttributes Is Nothing Then
             pBasicAttributes = atcDataManager.DisplayAttributes
@@ -122,7 +122,8 @@ Public Class frmRecess
                 '.IsEnableVPan = mnuViewVerticalZoom.Checked
                 '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
                 pMaster = .MasterPane
-
+                .IsSynchronizeXAxes = False
+                .IsSynchronizeYAxes = False
             End With
         Else
             pZgc.GraphPane.CurveList.Clear()
@@ -202,7 +203,7 @@ Public Class frmRecess
             Dim lDescription As String = pDataGroup(0).Attributes.GetValue("Description")
             Dim lCons As String = pDataGroup(0).Attributes.GetValue("Constituent")
             Dim lDataTypeStr As String = ""
-            
+
             If lCons.ToUpper() = "GW LEVEL" OrElse lCons.ToUpper() = "GWLEVEL" Then
                 If lParmCd IsNot Nothing Then
                     lDataTypeStr &= "Parameter Code: " & lParmCd & vbCrLf & vbCrLf
@@ -357,29 +358,29 @@ Public Class frmRecess
         lFileOut2 = IO.Path.Combine(lOutputPath, "y" & lAskUserSeason & "Indian" & ".txt")
 
         Dim lHeaderOutFile1 As String = ""
-        lHeaderOutFile1 &= _
-      " FILE " & lFileOut1 & "--  UNIT 10 OUTPUT OF RECESS.F " & vbCrLf & _
-      " INPUT FILE = " & lInputfile & vbCrLf & _
-      " START = " & lYearStart & vbCrLf & _
-      " END =   " & lYearEnd & vbCrLf & _
-      " DAYS OF RECESSION REQUIRED FOR DETECTION=" & lAskUseriFarcri.ToString & vbCrLf & _
-      " MONTHS SELECTED:" & lStrMonths & vbCrLf & _
-      " " & vbCrLf & _
-      "-----------------------------------------------------------------------" & vbCrLf & _
-      "              RECESSION PERIODS INITIALLY SELECTED: " & vbCrLf & _
-      "   LOG Q       RECESS.INDEX     TIME SINCE PEAK    .       DATE OF PEAK " & vbCrLf & _
+        lHeaderOutFile1 &=
+      " FILE " & lFileOut1 & "--  UNIT 10 OUTPUT OF RECESS.F " & vbCrLf &
+      " INPUT FILE = " & lInputfile & vbCrLf &
+      " START = " & lYearStart & vbCrLf &
+      " END =   " & lYearEnd & vbCrLf &
+      " DAYS OF RECESSION REQUIRED FOR DETECTION=" & lAskUseriFarcri.ToString & vbCrLf &
+      " MONTHS SELECTED:" & lStrMonths & vbCrLf &
+      " " & vbCrLf &
+      "-----------------------------------------------------------------------" & vbCrLf &
+      "              RECESSION PERIODS INITIALLY SELECTED: " & vbCrLf &
+      "   LOG Q       RECESS.INDEX     TIME SINCE PEAK    .       DATE OF PEAK " & vbCrLf &
       "   (MEAN)    ( -dT/d(LogQ) ) (START)(MIDDLE)(END)  .        (yr, mo, d) " & vbCrLf
 
         Dim lHeaderOutFile2 As String = ""
-        lHeaderOutFile2 &= _
-      " FILE " & lFileOut2 & "--  UNIT 11 OUTPUT OF RECESS.F: " & vbCrLf & _
-      " INPUT DATA FILE FOR THIS SESSION: ', INFILE" & vbCrLf & _
-      " Tpeak is the time since the last peak  " & vbCrLf & _
-      " Tmrc is the time on the Master Recession Curve " & vbCrLf & _
-      " LogQ is the log of flow " & vbCrLf & _
-      " Q is the flow " & vbCrLf & _
-      " Seq# is the sequence number in which the segment " & vbCrLf & _
-      " was selected.  " & vbCrLf & _
+        lHeaderOutFile2 &=
+      " FILE " & lFileOut2 & "--  UNIT 11 OUTPUT OF RECESS.F: " & vbCrLf &
+      " INPUT DATA FILE FOR THIS SESSION: ', INFILE" & vbCrLf &
+      " Tpeak is the time since the last peak  " & vbCrLf &
+      " Tmrc is the time on the Master Recession Curve " & vbCrLf &
+      " LogQ is the log of flow " & vbCrLf &
+      " Q is the flow " & vbCrLf &
+      " Seq# is the sequence number in which the segment " & vbCrLf &
+      " was selected.  " & vbCrLf &
       "-----------------------------------------------------------------------"
         Dim lSW As IO.StreamWriter = Nothing
         ' ------------- LOCATE a PEAK ---------------------
@@ -1042,7 +1043,7 @@ Public Class frmRecess
             lStrCoeffB = String.Format("{0:0.0000}", lCoeffB).PadLeft(10, " ")
             lStrCoeffC = String.Format("{0:0.0000}", lCoeffC).PadLeft(10, " ")
 
-            lSW.WriteLine(lStrInputFile & lAskUserSeason & " " & lStrYearStart & "-" & lStrYearEnd & lNumRecessPeriods.ToString & _
+            lSW.WriteLine(lStrInputFile & lAskUserSeason & " " & lStrYearStart & "-" & lStrYearEnd & lNumRecessPeriods.ToString &
                           lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC)
             lSW.Flush()
             lSW.Close()
@@ -1060,13 +1061,13 @@ Public Class frmRecess
     End Sub
 
     '--------- THIS SUBROUTINE MAKES TABULAR OUTPUT OF RECESSION DATA: -----
-    Private Function TableRecess(ByVal aQLog() As Double, _
-                            ByVal aFlow() As Double, _
-                            ByVal aDates() As Double, _
-                            ByVal aiPeak As Integer, _
-                            ByVal aiMin As Integer, _
-                            ByVal aiMax As Integer, _
-                            ByVal aPickStartingDay As Integer, _
+    Private Function TableRecess(ByVal aQLog() As Double,
+                            ByVal aFlow() As Double,
+                            ByVal aDates() As Double,
+                            ByVal aiPeak As Integer,
+                            ByVal aiMin As Integer,
+                            ByVal aiMax As Integer,
+                            ByVal aPickStartingDay As Integer,
                             ByVal aiDisplayLastDay As Integer) As String
 
         Logger.Dbg("ENTER STARTING DAY (1, 11, OR 21)") 'originally dynamically read in
@@ -1112,16 +1113,16 @@ Public Class frmRecess
     End Function
 
     '------ THIS SUBROUTINE MAKES GRAPHICAL OUTPUT OF RECESSION DATA: ----
-    Private Function GraphRecess(ByVal aQLog() As Double, _
-                            ByVal aFlow() As Double, _
-                            ByVal aDates() As Double, _
-                            ByVal aiPeak As Integer, _
-                            ByVal aiMin As Integer, _
-                            ByVal aiMax As Integer, _
-                            ByVal aXLogQMin As Double, _
-                            ByVal aXLogQMax As Double, _
-                            ByVal aPickStartingDay As Integer, _
-                            ByVal aPickInterval As Integer, _
+    Private Function GraphRecess(ByVal aQLog() As Double,
+                            ByVal aFlow() As Double,
+                            ByVal aDates() As Double,
+                            ByVal aiPeak As Integer,
+                            ByVal aiMin As Integer,
+                            ByVal aiMax As Integer,
+                            ByVal aXLogQMin As Double,
+                            ByVal aXLogQMax As Double,
+                            ByVal aPickStartingDay As Integer,
+                            ByVal aPickInterval As Integer,
                             ByVal aiDisplayLastDay As Integer) As String
 
         Dim liStart As Integer = aPickStartingDay
@@ -1181,6 +1182,11 @@ Public Class frmRecess
     End Function
 
     Public Sub RefreshGraphRecess(ByVal aDataGroup As atcTimeseriesGroup)
+        If pZgc.MasterPane.PaneList.Count > 1 Then
+            pZgc.MasterPane.PaneList.RemoveAt(1)
+            pZgc.MasterPane.Margin.All = 0
+            pZgc.MasterPane.SetLayout(scDisplay.Panel2.CreateGraphics(), PaneLayout.SquareRowPreferred)
+        End If
         If pGrapher IsNot Nothing Then
             With pGrapher.ZedGraphCtrl.GraphPane
                 'To see if need to refresh the axis
@@ -1224,6 +1230,148 @@ Public Class frmRecess
         End With
         pZgc.Refresh()
     End Sub
+
+    Public Sub RefreshGraphRecessSummary(ByVal aDataGroup As atcTimeseriesGroup, ByVal aDataGroupAux As atcTimeseriesGroup)
+        If pGrapher IsNot Nothing Then
+            With pGrapher.ZedGraphCtrl.GraphPane
+                'To see if need to refresh the axis
+                If aDataGroup IsNot Nothing AndAlso aDataGroup.Count > 0 AndAlso Not .YAxis.Title.Text = aDataGroup(0).Attributes.GetValue("Units") Then
+                    .YAxis.Title.Text = ""
+                    '.XAxis.Title.Text = ""
+                    pGrapher = Nothing
+                    'RefreshGraph()
+                End If
+            End With
+        End If
+        Dim lYmin As Double
+        Dim lYmax As Double
+        If aDataGroup IsNot Nothing AndAlso aDataGroup.Count > 0 Then
+            lYmin = aDataGroup(0).Attributes.GetValue("Min")
+            lYmax = aDataGroup(0).Attributes.GetValue("Max")
+        End If
+        If pGrapher Is Nothing Then
+            pGrapher = New clsGraphTime(aDataGroup, pZgc)
+        Else
+            'pGrapher.Datasets = aDataGroup
+        End If
+
+        'Dim lDateMin As Double = aDataGroup(0).Dates.Value(0)
+        'Dim lDateMax As Double = aDataGroup(0).Dates.Value(aDataGroup(0).numValues)
+        'Dim lLogFlag As Boolean = False
+        With pGrapher.ZedGraphCtrl.GraphPane
+            If aDataGroup.Count > 0 Then
+                '.YAxis.Type = AxisType.Log
+                If .CurveList.Count > 0 Then .CurveList.Item(0).Color = Drawing.Color.Red
+                .Legend.IsVisible = False
+                '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
+                'CType(.CurveList.Item(1), LineItem).Line.Width = 2
+            End If
+            'Scalit(lDataMin, lDataMax, lLogFlag, .XAxis.Scale.Min, .XAxis.Scale.Max)
+
+            '.YAxis.Scale.Max = Math.Ceiling(lYmax)
+            '.YAxis.Scale.Min = Math.Floor(lYmin)
+            .YAxis.Scale.MaxAuto = True
+            .YAxis.Scale.MinAuto = True
+            .AxisChange()
+        End With
+        If pGrapher.ZedGraphCtrl.MasterPane.PaneList.Count > 1 Then
+            pGrapher.ZedGraphCtrl.MasterPane.PaneList.RemoveAt(1)
+        End If
+        Dim lauxGroup As New atcTimeseriesGroup()
+        lauxGroup.Add(aDataGroup(0)) 'K
+        lauxGroup.Add(aDataGroupAux(0)) 'MeanLogQ
+        GraphSetupAux(lauxGroup)
+        pZgc.MasterPane.SetLayout(scDisplay.Panel2.CreateGraphics(), PaneLayout.SquareRowPreferred)
+        pZgc.Refresh()
+    End Sub
+
+    Private Function GraphSetupAux(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
+        If aDataGroup Is Nothing OrElse aDataGroup.Count < 2 Then Return False
+        Dim lTimeseriesX As atcTimeseries = aDataGroup.ItemByIndex(0) 'K
+        Dim lTimeseriesY As atcTimeseries = aDataGroup.ItemByIndex(1) 'MeanLogQ
+
+        'find common start and end dates
+        'Dim lSJDay As Double
+        'Dim lEJDay As Double
+        'If lTimeseriesX.Dates.Value(0) < lTimeseriesY.Dates.Value(0) Then
+        '    'y starts after x, use y start date
+        '    lSJDay = lTimeseriesY.Dates.Value(0)
+        'Else 'use x start date
+        '    lSJDay = lTimeseriesX.Dates.Value(0)
+        'End If
+        'If lTimeseriesX.Dates.Value(lTimeseriesX.Dates.numValues) < lTimeseriesY.Dates.Value(lTimeseriesY.Dates.numValues) Then
+        '    'x ends before y, use x end date
+        '    lEJDay = lTimeseriesX.Dates.Value(lTimeseriesX.Dates.numValues)
+        'Else 'use y end date
+        '    lEJDay = lTimeseriesY.Dates.Value(lTimeseriesY.Dates.numValues)
+        'End If
+
+        'Dim lSubsetTimeseriesX As atcTimeseries = SubsetByDate(lTimeseriesX, lSJDay, lEJDay, Nothing)
+        'Dim lSubsetTimeseriesY As atcTimeseries = SubsetByDate(lTimeseriesY, lSJDay, lEJDay, Nothing)
+        'Dim lSubsetGroup As New atcTimeseriesGroup
+        'lSubsetGroup.Add(lSubsetTimeseriesX)
+        'lSubsetGroup.Add(lSubsetTimeseriesY)
+
+        'EnableAuxAxis(pZgc.MasterPane, True, 0.2)
+        'Dim lPaneAux As GraphPane = pZgc.MasterPane.PaneList(0)
+        Dim lPaneAux As New ZedGraph.GraphPane()
+        FormatPaneWithDefaults(lPaneAux)
+        pZgc.MasterPane.Add(lPaneAux)
+        lPaneAux.Legend.IsVisible = False
+        With lPaneAux.XAxis
+            .Type = AxisType.Linear
+            '.Scale.MaxAuto = False
+            .Scale.MajorStepAuto = False
+            .Scale.MinorStepAuto = False
+            .Scale.MajorStep = 10
+            .Scale.MinorStep = 2
+            .Title.Text = "K" 'lTimeseriesX.ToString
+        End With
+
+        With lPaneAux.YAxis
+            .Type = AxisType.Linear
+            '.Scale.MaxAuto = False
+            .Title.Text = "Mean LogQ" 'lTimeseriesY.ToString
+        End With
+
+        With lTimeseriesY.Attributes
+            'Dim lScen As String = .GetValue("scenario")
+            'Dim lLoc As String = .GetValue("location")
+            'Dim lCons As String = .GetValue("constituent")
+            'Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+            Dim lCurveColor As System.Drawing.Color = System.Drawing.Color.Blue
+            Dim lCurve As LineItem = Nothing
+            'Dim lXValues() As Double = lSubsetTimeseriesX.Values
+            'Dim lYValues() As Double = lSubsetTimeseriesY.Values
+            Dim lXValues() As Double = lTimeseriesX.Values
+            Dim lYValues() As Double = lTimeseriesY.Values
+            Dim lSymbol As SymbolType
+            Dim lNPts As Integer = lXValues.GetUpperBound(0)
+            If lNPts < 100 Then
+                lSymbol = SymbolType.Circle
+            Else
+                lSymbol = SymbolType.Circle
+            End If
+            lCurve = lPaneAux.AddCurve("", lXValues, lYValues, lCurveColor, lSymbol)
+            If lNPts >= 1000 Then
+                lCurve.Symbol.Size = 1
+            ElseIf lNPts >= 100 Then
+                lCurve.Symbol.Size = 2
+            Else
+                lCurve.Symbol.Size = 7.0F
+            End If
+            lCurve.Line.IsVisible = False
+            lCurve.Symbol.Fill = New Fill(System.Drawing.Color.Blue)
+            lCurve.Symbol.Fill.Type = FillType.Solid
+            lCurve.Symbol.Border.IsVisible = False
+        End With
+        'ScaleAxis(aDataGroup, lPaneAux.YAxis)
+        lPaneAux.XAxis.Scale.Min = Int(lTimeseriesX.Attributes.GetValue("Min") - 5.0)
+        lPaneAux.XAxis.Scale.Max = Int(lTimeseriesX.Attributes.GetValue("Max") + 5.0)
+        lPaneAux.YAxis.Scale.Min = lTimeseriesY.Attributes.GetValue("Min") - 0.2
+        lPaneAux.YAxis.Scale.Max = lTimeseriesY.Attributes.GetValue("Max") + 0.2
+        Return True
+    End Function
 
     Public Sub GraphFallCurves()
         ' get a reference to the GraphPane
@@ -1445,6 +1593,7 @@ Public Class frmRecess
         If lConfigurationGood Then
             panelConfiguration.Visible = False
             panelAnalysis.Visible = True
+            Me.Height = 470
         End If
     End Sub
 
@@ -1646,7 +1795,7 @@ Public Class frmRecess
         If lMatches.Count > 0 Then
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
-            Dim lAskUser As String = _
+            Dim lAskUser As String =
             Logger.MsgCustomOwned("Invalid starting date. Use dataset start date?", "Start Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 lArr = txtDataStart.Text.Trim.Split("/")
@@ -1681,7 +1830,7 @@ Public Class frmRecess
         If lMatches.Count > 0 Then
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
-            Dim lAskUser As String = _
+            Dim lAskUser As String =
             Logger.MsgCustomOwned("Invalid ending date. Use dataset end date?", "End Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 lArr = txtDataEnd.Text.Trim.Split("/")
@@ -1943,7 +2092,7 @@ Public Class frmRecess
 
         Dim lDayOrdinal As Integer = CInt(lArr(0))
         Dim lFirstLastCancel() As String = {"First Day", "Last Day", "Reset All", "Cancel"}
-        Dim lResponse As String = Logger.MsgCustomOwned("Set '" & lDayOrdinal & "' as first or last day of this recession segment?", _
+        Dim lResponse As String = Logger.MsgCustomOwned("Set '" & lDayOrdinal & "' as first or last day of this recession segment?",
                                                         lMsgTitle, Me, lFirstLastCancel)
         If lResponse <> "Cancel" Then
             Dim lRecSeg As clsRecessionSegment = Nothing
@@ -2030,10 +2179,12 @@ Public Class frmRecess
                 txtOutputDir.Focus()
             Else
                 Try
-                    Dim lSW As New IO.StreamWriter(IO.Path.Combine(txtOutputDir.Text.Trim(), "z.txt"), False)
+                    Dim ltestFile As String = IO.Path.Combine(txtOutputDir.Text.Trim(), "z.txt")
+                    Dim lSW As New IO.StreamWriter(ltestFile, False)
                     lSW.WriteLine("Done testing for WRITE permission.")
                     lSW.Flush()
                     lSW.Close()
+                    TryDelete(ltestFile)
                 Catch ex As Exception
                     Logger.Msg("Unable to write to specified output directory." & "Try another directory.", MsgBoxStyle.Information, "Save Intermediate Results")
                     txtOutputDir.Focus()
@@ -2105,10 +2256,18 @@ Public Class frmRecess
         txtAnalysisResults.Text = aRecess.Bulletin
         txtAnalysisResults.Visible = True
 
+        Dim lauxGroup As New atcTimeseriesGroup()
+        If aRecess.GraphTsMeanLogQ IsNot Nothing AndAlso aRecess.GraphTsMeanLogQ.numValues > 0 Then
+            lauxGroup.Add(aRecess.GraphTsMeanLogQ)
+        End If
         pGraphRecessDatagroup.Clear()
         If aRecess.GraphTs.numValues > 1 Then
             pGraphRecessDatagroup.Add(aRecess.GraphTs)
-            RefreshGraphRecess(pGraphRecessDatagroup)
+            If lauxGroup.Count > 0 Then
+                RefreshGraphRecessSummary(pGraphRecessDatagroup, lauxGroup)
+            Else
+                RefreshGraphRecess(pGraphRecessDatagroup)
+            End If
         End If
     End Sub
 
@@ -2150,6 +2309,33 @@ Public Class frmRecess
         lfrmMRC.Initialize("", lArgs)
     End Sub
 
+    Private Sub btnViewMRCs_Click(sender As Object, e As EventArgs) Handles btnViewMRCs.Click
+        Dim lfrmMRC As New frmMRCControl()
+        Dim lArgs As New atcDataAttributes()
+        If pRecess IsNot Nothing AndAlso pRecess.RecSumResult.Length > 0 Then
+            Dim lArr() As String = Regex.Split(pRecess.RecSumResult, "\s+")
+            If lArr.Length >= 12 Then
+                Dim lFirstMRC As New clsMRC
+                With lFirstMRC
+                    .RecSum = pRecess.RecSumResult
+                    Dim lDA As Double
+                    If lArr.Length > 12 AndAlso (Not lArr(12).StartsWith("N/A")) AndAlso Double.TryParse(lArr(12), lDA) Then
+                        .DrainageArea = lDA
+                    End If
+                End With
+                If lFirstMRC.BuildMRC() Then
+                    If lArgs Is Nothing Then lArgs = New atcDataAttributes()
+                    lArgs.SetValue("FirstMRC", lFirstMRC)
+                End If
+            End If
+        End If
+        Dim lWorkingDir As String = txtOutputDir.Text.Trim()
+        If lWorkingDir.Length > 0 AndAlso IO.Directory.Exists(lWorkingDir) Then
+            lArgs.SetValue("WorkingDirectory", lWorkingDir)
+        End If
+        lfrmMRC.Initialize("", lArgs)
+    End Sub
+
     Private Sub frmRecess_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         pLoaded = True
         If pMessage.Length > 0 Then
@@ -2161,6 +2347,7 @@ Public Class frmRecess
     Private Sub btnConfiguration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnConfiguration.Click
         panelAnalysis.Visible = False
         panelConfiguration.Visible = True
+        Me.Height = 350
     End Sub
 
     Private Sub frmRecess_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load

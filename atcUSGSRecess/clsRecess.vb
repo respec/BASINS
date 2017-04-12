@@ -82,6 +82,7 @@ Public Class clsRecess
                     lSW = Nothing
                     pOutputPath = value
                     fHasWritePermission = True
+                    TryDelete(IO.Path.Combine(value, "z.txt"))
                 Catch ex As Exception
                     If lSW IsNot Nothing Then
                         lSW.Close()
@@ -270,6 +271,7 @@ Public Class clsRecess
 
     Public Table As String 'current recession segment's table
     Public GraphTs As atcTimeseries 'current recession's timeseries
+    Public GraphTsMeanLogQ As atcTimeseries 'mean logQ of selected recession segments
 
     Public Bulletin As String = ""
 
@@ -1391,10 +1393,13 @@ Public Class clsRecess
         If GraphTs IsNot Nothing Then GraphTs.Clear()
         GraphTs = New atcTimeseries(Nothing)
         GraphTs.Dates = New atcTimeseries(Nothing)
-        Order(lListOfChosenSegments.Count, lKDates, lY)
+        Order(lListOfChosenSegments.Count, lKDates, lY, lX)
         GraphTs.Dates.Values = lKDates
         GraphTs.Values = lY
-        GraphTs = GraphTs * -1
+        For I As Integer = 1 To GraphTs.numValues
+            GraphTs.Value(I) *= -1.0
+        Next
+        'GraphTs = GraphTs * -1
         With GraphTs
             .Value(0) = GetNaN()
             .Dates.Value(0) = .Dates.Value(1) - JulianHour * 24.0
@@ -1405,6 +1410,22 @@ Public Class clsRecess
             .Attributes.SetValue("Units", "K")
         End With
 
+        'construct graph TS for just the mean logQ
+        If GraphTsMeanLogQ IsNot Nothing Then GraphTsMeanLogQ.Clear()
+        GraphTsMeanLogQ = New atcTimeseries(Nothing)
+        GraphTsMeanLogQ.Dates = New atcTimeseries(Nothing)
+        'Order(lListOfChosenSegments.Count, lKDates, lX)
+        GraphTsMeanLogQ.Dates.Values = lKDates
+        GraphTsMeanLogQ.Values = lX
+        With GraphTsMeanLogQ
+            .Value(0) = GetNaN()
+            .Dates.Value(0) = .Dates.Value(1) - JulianHour * 24.0
+            .Attributes.SetValue("YAxis", "AUX")
+            .Attributes.SetValue("point", True)
+            .Attributes.SetValue("Constituent", "")
+            .Attributes.SetValue("Scenario", "")
+            .Attributes.SetValue("Units", "MeanLogQ")
+        End With
         ''------------------- WRITE RAW RECESSION DATA TO "y-file"  ----------------
         If fHasWritePermission And SaveInterimResults Then
             lSW = New IO.StreamWriter(pFileOut2, True)
@@ -1476,7 +1497,8 @@ Public Class clsRecess
                 Dim lStrYearStart As String = lDate(0).ToString
                 J2Date(FlowData.Dates.Value(FlowData.numValues - 1), lDate)
                 Dim lStrYearEnd As String = lDate(0).ToString
-                Dim lStrDuration As String = lStrYearStart & "-" & lStrYearEnd & "  "
+                Dim lStrDuration As String = lStrYearStart & "-" & lStrYearEnd
+                Dim lStrSegCtr As String = lListOfChosenSegments.Count.ToString().PadLeft(3, " ")
 
                 Dim lStrKMin As String = String.Format("{0:0.0}", lKMin).PadLeft(RecSumColW.c6Kmin, " ") '6
                 Dim lStrKMed As String = String.Format("{0:0.0}", lKMed).PadLeft(RecSumColW.c7Kmed, " ") '6
@@ -1500,8 +1522,8 @@ Public Class clsRecess
                     lStaName = lStaName.Replace(",", "_")
                 End If
 
-                pRecSumResult = lStrInputFile & SeasonLabel & " " & lStrDuration & lListOfChosenSegments.Count & _
-                              lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC & _
+                pRecSumResult = lStrInputFile & SeasonLabel & " " & lStrDuration & lStrSegCtr &
+                              lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC &
                               lStrDA & " " & lStaName
 
                 lSW.WriteLine(pRecSumResult)
@@ -1779,10 +1801,10 @@ Public Class clsRecess
     'LIST1 e.g XMean
     'LIST2 e.g Coefficient1
     'LIST3 e.g Original ordinal number of each segment
-    Private Sub Order(ByVal aNumOfRecessPeriods As Integer, _
-                      ByRef aList1() As Double, _
-             Optional ByRef aList2() As Double = Nothing, _
-             Optional ByRef aList3() As Integer = Nothing)
+    Private Sub Order(ByVal aNumOfRecessPeriods As Integer,
+                      ByRef aList1() As Double,
+             Optional ByRef aList2() As Double = Nothing,
+             Optional ByRef aList3() As Double = Nothing)
         Dim lSwapped As Boolean
         Dim lPasses As Integer = 0
         Dim lTempValue As Double

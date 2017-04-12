@@ -598,7 +598,7 @@ FoundMatch:
                 If lTimeseries.Attributes.ContainsAttribute("Data Source") Then
                     lSourceFile = lTimeseries.Attributes.GetValue("Data Source")
                 End If
-                If Not IO.File.Exists(lSourceFile) And lTimeseries.Attributes.GetValue("History 1").Length > 9 Then
+                If Not IO.File.Exists(lSourceFile) And (lTimeseries.Attributes.ContainsAttribute("History 1") AndAlso lTimeseries.Attributes.GetValue("History 1").Length > 9) Then
                     'see if the history attribute contains a file name
                     lSourceFile = lTimeseries.Attributes.GetValue("History 1").Substring(10)
                 End If

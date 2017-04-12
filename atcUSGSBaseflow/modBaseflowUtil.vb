@@ -45,7 +45,7 @@ Public Module modBaseflowUtil
     Public Sub ComputeBaseflow(ByVal aArgs As atcDataAttributes, Optional ByVal aMakeAvailable As Boolean = False)
         Dim lClsBaseFlowCalculator As New atcTimeseriesBaseflow.atcTimeseriesBaseflow
         Try
-            lClsBaseFlowCalculator.Open("Baseflow", aArgs)
+            lClsBaseFlowCalculator.Calculate("Baseflow", aArgs)
 
             If aMakeAvailable Then
                 Dim lOldDataSource As atcDataSource = Nothing
@@ -288,6 +288,7 @@ Public Module modBaseflowUtil
             lAnalysis_End > lAnalysis_Start Then
             lTsFlow = SubsetByDate(lTsFlow, lAnalysis_Start, lAnalysis_End, Nothing)
         End If
+        Dim lSaveWithProject As Boolean = aArgs.GetValue("SaveWithProject", True)
         Dim lMsgTitle As String = "Interactive Base-flow Analysis"
         'break up into continuous periods
         Dim lTserFullDateRange As New atcTimeseries(Nothing)
@@ -385,7 +386,7 @@ Public Module modBaseflowUtil
             aArgs.SetValue(BFInputNames.Streamflow, lTsFlowGroup)
             'Below is for running BFLOW using original full time series including gaps
             'aArgs.SetValue("OriginalFlow", lTsFlow)
-            If CalcBF.Open("baseflow", aArgs) Then
+            If CalcBF.Calculate("baseflow", aArgs) Then
                 'OutputDir = lStationOutDir
                 OutputDir = aArgs.GetValue("OutputDir", "")
                 'OutputFilenameRoot = lStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
@@ -436,6 +437,7 @@ Public Module modBaseflowUtil
             .SetValue("ReportGroupsAvailable", True)
             .SetValue("ReportFileSuffix", "fullspan")
             .SetValue("ForFullSpan", True)
+            .SetValue("Specification", "")
             lMethods = aArgs.GetValue(BFInputNames.BFMethods, Nothing)
             .SetValue(BFInputNames.BFMethods, lMethods)
             If lMethods.Contains(BFMethods.BFIStandard) Then
@@ -482,6 +484,10 @@ Public Module modBaseflowUtil
             Logger.Status("Writing full span base-flow analysis result in common text format.")
             If IO.Directory.Exists(OutputDir) Then
                 ASCIICommon(lTsFlowFullRange, lBFReportGroups)
+                Dim lSpec As String = lBFReportGroups.GetValue("Specification")
+                If lSaveWithProject AndAlso Not String.IsNullOrEmpty(lSpec) Then
+                    CalcBF.Specification = lSpec
+                End If
             End If
         Catch ex As Exception
             Logger.Msg("Writing full span base-flow analysis result in common text format failed.", MsgBoxStyle.Exclamation, lMsgTitle)
@@ -782,8 +788,9 @@ Public Module modBaseflowUtil
                 atcDataManager.DataSources.Remove(lOldDataSource)
             End If
 
-            Dim lNewTSerSource As New atcTimeseriesSource()
+            Dim lNewTSerSource As New atcTimeseriesBaseflow.atcTimeseriesBaseflow()
             For Each lDS As atcDataSet In lNewBFTserGroup
+                lDS.Attributes.SetValue("Data Source", CalcBF.Specification)
                 lNewTSerSource.AddDataSet(lDS)
             Next
             lNewTSerSource.Specification = CalcBF.Specification
@@ -903,7 +910,7 @@ Public Module modBaseflowUtil
             aArgs.SetValue(BFInputNames.Streamflow, lTsFlowGroup)
             'Below is for running BFLOW using original full time series including gaps
             'aArgs.SetValue("OriginalFlow", lTsFlow)
-            If CalcBF.Open("baseflow", aArgs) Then
+            If CalcBF.Calculate("baseflow", aArgs) Then
                 MethodsLastDone = lMethods
             End If
             'lStation.Message &= CalcBF.BF_Message.Trim()
@@ -1237,7 +1244,7 @@ Public Module modBaseflowUtil
                 If lMethods.Contains(BFMethods.BFIStandard) OrElse lMethods.Contains(BFMethods.BFIModified) Then
                     lNDay = .GetValue(BFInputNames.BFINDayScreen, Double.NaN) '"BFINDay"
                     'Dim lBFIYearBasis As String = aArgs.GetValue(BFInputNames.BFIReportby, "") '"BFIReportby"
-                    lBFI_Notes = " " & "," & "BFI" & ", ," & "Partition Length (N days):" & lNDay & ";"
+                    lBFI_Notes = " " & "," & "BFI:" & ", ," & "Partition Length (N days):" & lNDay & ";"
                 End If
                 If lMethods.Contains(BFMethods.BFIStandard) Then
                     lFact = .GetValue(BFInputNames.BFITurnPtFrac, Double.NaN) '"BFIFrac"
@@ -1250,13 +1257,13 @@ Public Module modBaseflowUtil
                 lBFI_Notes = lBFI_Notes.TrimEnd(";")
                 If lMethods.Contains(BFMethods.BFLOW) Then
                     lalpha = .GetValue(BFInputNames.BFLOWFilter, Double.NaN)
-                    lDF1P_Notes = " " & "," & "DF1Param" & ", ," & "Filter Constant (alpha):" & lalpha
+                    lDF1P_Notes = " " & "," & "DF1Param:" & ", ," & "Filter Constant (alpha):" & lalpha
                 End If
                 If lMethods.Contains(BFMethods.TwoPRDF) Then
                     lRC = .GetValue(BFInputNames.TwoPRDFRC, Double.NaN)
                     lBFImax = .GetValue(BFInputNames.TwoPRDFBFImax, Double.NaN)
                     lDF2PMethod = .GetValue(BFInputNames.TwoParamEstMethod, clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE)
-                    lDF2P_Notes = " " & "," & "DF2Param" & ", ," & "Recession Constant (a):" & lRC & "; BFImax:" & lBFImax
+                    lDF2P_Notes = " " & "," & "DF2Param:" & ", ," & "Recession Constant (a):" & lRC & "; BFImax:" & lBFImax
                 End If
             End With
             If Not String.IsNullOrEmpty(lBFI_Notes) OrElse Not String.IsNullOrEmpty(lDF1P_Notes) OrElse Not String.IsNullOrEmpty(lDF2P_Notes) Then
@@ -1283,6 +1290,9 @@ Public Module modBaseflowUtil
         lSW.Flush()
         lSW.Close()
         lSW = Nothing
+        If args IsNot Nothing AndAlso args.ContainsAttribute("Specification") Then
+            args.SetValue("Specification", lFileDailySum)
+        End If
 
         lTableToReport.ClearData()
         lTableToReport = ASCIICommonTable(lTsGroupStreamFlow,

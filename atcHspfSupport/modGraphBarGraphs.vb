@@ -10,6 +10,8 @@ Imports System.Collections
 Public Class BarGraphItem
 
     Public Location As String
+    Public Scenario As String
+    Public TimeSpan As String
     Public Constituent As String
     Public Units As String
     Public LabelValueCollection As New atcCollection
@@ -25,16 +27,21 @@ Public Module modBarGraph
         lZgc.Height = 768
 
         Dim lGrapher As New atcGraph.clsGraphBar(Nothing, lZgc, True)
+        lGrapher.ShowOutliers = False
         lGrapher.DatasetsCollection = items.LabelValueCollection
 
         Select Case items.Constituent
             Case "Sediment"
-                lGrapher.Title = "Sediment load allocation from all land uses."
+                lGrapher.Title = "Sediment load allocation for all the sources at " & items.Location & " in " &
+                items.Scenario & " model. " & vbCrLf & items.TimeSpan
             Case "TotalP"
-                lGrapher.Title = "Total Phosphorus load allocation from all land uses."
+                lGrapher.Title = "Total Phosphorus load allocation for all the sources at " & items.Location & " in " &
+                items.Scenario & " model. " & vbCrLf & items.TimeSpan
             Case "TotalN"
-                lGrapher.Title = "Total Nitrogen load allocation from all land uses."
+                lGrapher.Title = "Total Nitrogen load allocation for all the sources at " & items.Location & " in " &
+                items.Scenario & " model. " & vbCrLf & items.TimeSpan
         End Select
+
         lGrapher.OutputFile = aOutputFileName
 
         'Set the color of the data series

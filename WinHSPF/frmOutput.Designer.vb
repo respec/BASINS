@@ -19,18 +19,18 @@ Partial Class frmOutput
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.txtDesc = New System.Windows.Forms.TextBox
-        Me.radio4 = New System.Windows.Forms.RadioButton
-        Me.radio3 = New System.Windows.Forms.RadioButton
-        Me.radio2 = New System.Windows.Forms.RadioButton
-        Me.radio1 = New System.Windows.Forms.RadioButton
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox
-        Me.cmdCopy = New System.Windows.Forms.Button
-        Me.cmdRemove = New System.Windows.Forms.Button
-        Me.cmdAdd = New System.Windows.Forms.Button
-        Me.agdOutput = New atcControls.atcGrid
-        Me.cmdClose = New System.Windows.Forms.Button
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.txtDesc = New System.Windows.Forms.TextBox()
+        Me.radio4 = New System.Windows.Forms.RadioButton()
+        Me.radio3 = New System.Windows.Forms.RadioButton()
+        Me.radio2 = New System.Windows.Forms.RadioButton()
+        Me.radio1 = New System.Windows.Forms.RadioButton()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.cmdCopy = New System.Windows.Forms.Button()
+        Me.cmdRemove = New System.Windows.Forms.Button()
+        Me.cmdAdd = New System.Windows.Forms.Button()
+        Me.agdOutput = New atcControls.atcGrid()
+        Me.cmdClose = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
@@ -38,38 +38,36 @@ Partial Class frmOutput
         'GroupBox1
         '
         Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.txtDesc)
         Me.GroupBox1.Controls.Add(Me.radio4)
         Me.GroupBox1.Controls.Add(Me.radio3)
         Me.GroupBox1.Controls.Add(Me.radio2)
         Me.GroupBox1.Controls.Add(Me.radio1)
-        Me.GroupBox1.Location = New System.Drawing.Point(11, 15)
-        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox1.Location = New System.Drawing.Point(8, 12)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
-        Me.GroupBox1.Size = New System.Drawing.Size(568, 210)
+        Me.GroupBox1.Size = New System.Drawing.Size(426, 171)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Output Type"
         '
         'txtDesc
         '
+        Me.txtDesc.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDesc.BackColor = System.Drawing.SystemColors.ControlLight
-        Me.txtDesc.Location = New System.Drawing.Point(241, 30)
-        Me.txtDesc.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtDesc.Location = New System.Drawing.Point(181, 24)
         Me.txtDesc.Multiline = True
         Me.txtDesc.Name = "txtDesc"
-        Me.txtDesc.Size = New System.Drawing.Size(264, 162)
+        Me.txtDesc.Size = New System.Drawing.Size(199, 132)
         Me.txtDesc.TabIndex = 4
         '
         'radio4
         '
         Me.radio4.AutoSize = True
-        Me.radio4.Location = New System.Drawing.Point(36, 114)
-        Me.radio4.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.radio4.Location = New System.Drawing.Point(27, 93)
         Me.radio4.Name = "radio4"
-        Me.radio4.Size = New System.Drawing.Size(62, 21)
+        Me.radio4.Size = New System.Drawing.Size(51, 17)
         Me.radio4.TabIndex = 3
         Me.radio4.TabStop = True
         Me.radio4.Text = "Other"
@@ -78,10 +76,9 @@ Partial Class frmOutput
         'radio3
         '
         Me.radio3.AutoSize = True
-        Me.radio3.Location = New System.Drawing.Point(36, 86)
-        Me.radio3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.radio3.Location = New System.Drawing.Point(27, 70)
         Me.radio3.Name = "radio3"
-        Me.radio3.Size = New System.Drawing.Size(148, 21)
+        Me.radio3.Size = New System.Drawing.Size(118, 17)
         Me.radio3.TabIndex = 2
         Me.radio3.TabStop = True
         Me.radio3.Text = "AQUATOX Linkage"
@@ -90,10 +87,9 @@ Partial Class frmOutput
         'radio2
         '
         Me.radio2.AutoSize = True
-        Me.radio2.Location = New System.Drawing.Point(36, 58)
-        Me.radio2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.radio2.Location = New System.Drawing.Point(27, 47)
         Me.radio2.Name = "radio2"
-        Me.radio2.Size = New System.Drawing.Size(54, 21)
+        Me.radio2.Size = New System.Drawing.Size(47, 17)
         Me.radio2.TabIndex = 1
         Me.radio2.TabStop = True
         Me.radio2.Text = "Flow"
@@ -102,10 +98,9 @@ Partial Class frmOutput
         'radio1
         '
         Me.radio1.AutoSize = True
-        Me.radio1.Location = New System.Drawing.Point(36, 30)
-        Me.radio1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.radio1.Location = New System.Drawing.Point(27, 24)
         Me.radio1.Name = "radio1"
-        Me.radio1.Size = New System.Drawing.Size(161, 21)
+        Me.radio1.Size = New System.Drawing.Size(124, 17)
         Me.radio1.TabIndex = 0
         Me.radio1.TabStop = True
         Me.radio1.Text = "Hydrology Calibration"
@@ -114,17 +109,15 @@ Partial Class frmOutput
         'GroupBox2
         '
         Me.GroupBox2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox2.Controls.Add(Me.cmdCopy)
         Me.GroupBox2.Controls.Add(Me.cmdRemove)
         Me.GroupBox2.Controls.Add(Me.cmdAdd)
         Me.GroupBox2.Controls.Add(Me.agdOutput)
-        Me.GroupBox2.Location = New System.Drawing.Point(11, 242)
-        Me.GroupBox2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox2.Location = New System.Drawing.Point(8, 197)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
-        Me.GroupBox2.Size = New System.Drawing.Size(568, 320)
+        Me.GroupBox2.Size = New System.Drawing.Size(426, 260)
         Me.GroupBox2.TabIndex = 5
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Output Locations"
@@ -132,10 +125,9 @@ Partial Class frmOutput
         'cmdCopy
         '
         Me.cmdCopy.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCopy.Location = New System.Drawing.Point(199, 288)
-        Me.cmdCopy.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdCopy.Location = New System.Drawing.Point(149, 234)
         Me.cmdCopy.Name = "cmdCopy"
-        Me.cmdCopy.Size = New System.Drawing.Size(80, 25)
+        Me.cmdCopy.Size = New System.Drawing.Size(60, 20)
         Me.cmdCopy.TabIndex = 3
         Me.cmdCopy.Text = "Copy"
         Me.cmdCopy.UseVisualStyleBackColor = True
@@ -143,10 +135,9 @@ Partial Class frmOutput
         'cmdRemove
         '
         Me.cmdRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdRemove.Location = New System.Drawing.Point(109, 288)
-        Me.cmdRemove.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdRemove.Location = New System.Drawing.Point(82, 234)
         Me.cmdRemove.Name = "cmdRemove"
-        Me.cmdRemove.Size = New System.Drawing.Size(80, 25)
+        Me.cmdRemove.Size = New System.Drawing.Size(60, 20)
         Me.cmdRemove.TabIndex = 2
         Me.cmdRemove.Text = "&Remove"
         Me.cmdRemove.UseVisualStyleBackColor = True
@@ -155,10 +146,9 @@ Partial Class frmOutput
         '
         Me.cmdAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.cmdAdd.Location = New System.Drawing.Point(20, 288)
-        Me.cmdAdd.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdAdd.Location = New System.Drawing.Point(15, 234)
         Me.cmdAdd.Name = "cmdAdd"
-        Me.cmdAdd.Size = New System.Drawing.Size(80, 25)
+        Me.cmdAdd.Size = New System.Drawing.Size(60, 20)
         Me.cmdAdd.TabIndex = 1
         Me.cmdAdd.Text = "&Add"
         Me.cmdAdd.UseVisualStyleBackColor = True
@@ -168,40 +158,37 @@ Partial Class frmOutput
         Me.agdOutput.AllowHorizontalScrolling = True
         Me.agdOutput.AllowNewValidValues = False
         Me.agdOutput.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdOutput.CellBackColor = System.Drawing.Color.Empty
         Me.agdOutput.Fixed3D = False
         Me.agdOutput.LineColor = System.Drawing.Color.Empty
-        Me.agdOutput.LineWidth = 0.0!
-        Me.agdOutput.Location = New System.Drawing.Point(20, 26)
-        Me.agdOutput.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.agdOutput.LineWidth = 0!
+        Me.agdOutput.Location = New System.Drawing.Point(15, 21)
         Me.agdOutput.Name = "agdOutput"
-        Me.agdOutput.Size = New System.Drawing.Size(528, 252)
+        Me.agdOutput.Size = New System.Drawing.Size(396, 205)
         Me.agdOutput.Source = Nothing
         Me.agdOutput.TabIndex = 0
         '
         'cmdClose
         '
         Me.cmdClose.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.cmdClose.Location = New System.Drawing.Point(235, 587)
-        Me.cmdClose.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdClose.Location = New System.Drawing.Point(176, 477)
         Me.cmdClose.Name = "cmdClose"
-        Me.cmdClose.Size = New System.Drawing.Size(136, 34)
+        Me.cmdClose.Size = New System.Drawing.Size(102, 28)
         Me.cmdClose.TabIndex = 6
         Me.cmdClose.Text = "&Close"
         Me.cmdClose.UseVisualStyleBackColor = True
         '
         'frmOutput
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(607, 630)
+        Me.ClientSize = New System.Drawing.Size(455, 512)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.KeyPreview = True
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Name = "frmOutput"
         Me.Text = "WinHSPF - Output Manager"
         Me.GroupBox1.ResumeLayout(False)

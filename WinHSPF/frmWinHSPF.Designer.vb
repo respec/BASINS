@@ -19,72 +19,72 @@ Partial Class frmWinHSPF
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWinHSPF))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.BottomToolStripPanel = New System.Windows.Forms.ToolStripPanel
-        Me.TopToolStripPanel = New System.Windows.Forms.ToolStripPanel
-        Me.MenuMain = New System.Windows.Forms.MenuStrip
-        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.SaveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.SaveAsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator
-        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.FunctionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.BMPReachToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ReachEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.SimulationTimeAndMetDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.LandUseEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ControlCardsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.TablesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.DescriptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.InputDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.PollutantToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.PointSourceEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.OutputManagerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ViewOutputToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.RunHSPFToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator
-        Me.AQUATOXToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.BMPToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.HSPFparmToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.StarterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.PESTToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
-        Me.ContentsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.HSPFManualToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.WebSupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.RightToolStripPanel = New System.Windows.Forms.ToolStripPanel
-        Me.LeftToolStripPanel = New System.Windows.Forms.ToolStripPanel
-        Me.ContentPanel = New System.Windows.Forms.ToolStripContentPanel
-        Me.ToolStrip2 = New System.Windows.Forms.ToolStrip
-        Me.NewToolStripButton = New System.Windows.Forms.ToolStripButton
-        Me.OpenToolStripButton = New System.Windows.Forms.ToolStripButton
-        Me.SaveToolStripButton = New System.Windows.Forms.ToolStripButton
-        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
-        Me.cmdBMPTools = New System.Windows.Forms.ToolStripButton
-        Me.cmdReach = New System.Windows.Forms.ToolStripButton
-        Me.cmdTime = New System.Windows.Forms.ToolStripButton
-        Me.cmdLandUse = New System.Windows.Forms.ToolStripButton
-        Me.cmdControl = New System.Windows.Forms.ToolStripDropDownButton
-        Me.EditControlCardsWithToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
-        Me.cmdControlCardsTables = New System.Windows.Forms.ToolStripMenuItem
-        Me.cmdControlCardsDescriptions = New System.Windows.Forms.ToolStripMenuItem
-        Me.cmdPollutant = New System.Windows.Forms.ToolStripButton
-        Me.cmdPoint = New System.Windows.Forms.ToolStripButton
-        Me.cmdInputDataEditor = New System.Windows.Forms.ToolStripButton
-        Me.cmdOutputManager = New System.Windows.Forms.ToolStripButton
-        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
-        Me.cmdRunHSPF = New System.Windows.Forms.ToolStripButton
-        Me.cmdViewOutput = New System.Windows.Forms.ToolStripButton
-        Me.TopPanel = New System.Windows.Forms.FlowLayoutPanel
-        Me.SchematicDiagram = New ctlSchematic
+        Me.BottomToolStripPanel = New System.Windows.Forms.ToolStripPanel()
+        Me.TopToolStripPanel = New System.Windows.Forms.ToolStripPanel()
+        Me.MenuMain = New System.Windows.Forms.MenuStrip()
+        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SaveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SaveAsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FunctionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BMPReachToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ReachEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SimulationTimeAndMetDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.LandUseEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ControlCardsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TablesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DescriptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.InputDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PollutantToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PointSourceEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.OutputManagerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ViewOutputToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RunHSPFToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
+        Me.AQUATOXToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BMPToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.HSPFparmToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.StarterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PESTToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ContentsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.HSPFManualToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.WebSupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RightToolStripPanel = New System.Windows.Forms.ToolStripPanel()
+        Me.LeftToolStripPanel = New System.Windows.Forms.ToolStripPanel()
+        Me.ContentPanel = New System.Windows.Forms.ToolStripContentPanel()
+        Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
+        Me.NewToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.OpenToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.SaveToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
+        Me.cmdBMPTools = New System.Windows.Forms.ToolStripButton()
+        Me.cmdReach = New System.Windows.Forms.ToolStripButton()
+        Me.cmdTime = New System.Windows.Forms.ToolStripButton()
+        Me.cmdLandUse = New System.Windows.Forms.ToolStripButton()
+        Me.cmdControl = New System.Windows.Forms.ToolStripDropDownButton()
+        Me.EditControlCardsWithToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.cmdControlCardsTables = New System.Windows.Forms.ToolStripMenuItem()
+        Me.cmdControlCardsDescriptions = New System.Windows.Forms.ToolStripMenuItem()
+        Me.cmdPollutant = New System.Windows.Forms.ToolStripButton()
+        Me.cmdPoint = New System.Windows.Forms.ToolStripButton()
+        Me.cmdInputDataEditor = New System.Windows.Forms.ToolStripButton()
+        Me.cmdOutputManager = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
+        Me.cmdRunHSPF = New System.Windows.Forms.ToolStripButton()
+        Me.cmdViewOutput = New System.Windows.Forms.ToolStripButton()
+        Me.TopPanel = New System.Windows.Forms.FlowLayoutPanel()
+        Me.SchematicDiagram = New ctlSchematic()
         Me.MenuMain.SuspendLayout()
         Me.ToolStrip2.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
@@ -115,7 +115,7 @@ Partial Class frmWinHSPF
         Me.MenuMain.Margin = New System.Windows.Forms.Padding(0, 0, 10, 0)
         Me.MenuMain.Name = "MenuMain"
         Me.MenuMain.Padding = New System.Windows.Forms.Padding(4, 2, 0, 2)
-        Me.MenuMain.Size = New System.Drawing.Size(197, 24)
+        Me.MenuMain.Size = New System.Drawing.Size(289, 24)
         Me.MenuMain.TabIndex = 0
         Me.MenuMain.Text = "MenuStrip1"
         '
@@ -298,30 +298,30 @@ Partial Class frmWinHSPF
         'AboutToolStripMenuItem
         '
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(145, 22)
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
         Me.AboutToolStripMenuItem.Text = "About"
         '
         'ToolStripSeparator5
         '
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(142, 6)
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(163, 6)
         '
         'ContentsToolStripMenuItem
         '
         Me.ContentsToolStripMenuItem.Name = "ContentsToolStripMenuItem"
-        Me.ContentsToolStripMenuItem.Size = New System.Drawing.Size(145, 22)
-        Me.ContentsToolStripMenuItem.Text = "Contents"
+        Me.ContentsToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
+        Me.ContentsToolStripMenuItem.Text = "WinHSPF Manual"
         '
         'HSPFManualToolStripMenuItem
         '
         Me.HSPFManualToolStripMenuItem.Name = "HSPFManualToolStripMenuItem"
-        Me.HSPFManualToolStripMenuItem.Size = New System.Drawing.Size(145, 22)
+        Me.HSPFManualToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
         Me.HSPFManualToolStripMenuItem.Text = "HSPF Manual"
         '
         'WebSupToolStripMenuItem
         '
         Me.WebSupToolStripMenuItem.Name = "WebSupToolStripMenuItem"
-        Me.WebSupToolStripMenuItem.Size = New System.Drawing.Size(145, 22)
+        Me.WebSupToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
         Me.WebSupToolStripMenuItem.Text = "Web Support"
         '
         'RightToolStripPanel
@@ -352,7 +352,7 @@ Partial Class frmWinHSPF
         Me.ToolStrip2.GripMargin = New System.Windows.Forms.Padding(0)
         Me.ToolStrip2.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripButton, Me.OpenToolStripButton, Me.SaveToolStripButton})
-        Me.ToolStrip2.Location = New System.Drawing.Point(217, 1)
+        Me.ToolStrip2.Location = New System.Drawing.Point(309, 1)
         Me.ToolStrip2.Margin = New System.Windows.Forms.Padding(10, 0, 10, 0)
         Me.ToolStrip2.Name = "ToolStrip2"
         Me.ToolStrip2.Size = New System.Drawing.Size(72, 25)
@@ -392,7 +392,7 @@ Partial Class frmWinHSPF
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.None
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.cmdBMPTools, Me.cmdReach, Me.cmdTime, Me.cmdLandUse, Me.cmdControl, Me.cmdPollutant, Me.cmdPoint, Me.cmdInputDataEditor, Me.cmdOutputManager, Me.ToolStripSeparator2, Me.cmdRunHSPF, Me.cmdViewOutput})
-        Me.ToolStrip1.Location = New System.Drawing.Point(309, 0)
+        Me.ToolStrip1.Location = New System.Drawing.Point(401, 0)
         Me.ToolStrip1.Margin = New System.Windows.Forms.Padding(10, 0, 10, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(270, 27)

@@ -165,12 +165,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM10.vbproj">
-      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
-      <Name>MapWinUtility-D4EM10</Name>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls-D4EM10.vbproj">
       <Name>atcControls-D4EM10</Name>
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
@@ -188,6 +182,10 @@
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM10.vbproj">
+      <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>
+      <Name>MapWinUtility-D4EM10</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

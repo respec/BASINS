@@ -53,9 +53,9 @@ Partial Class SplashScreen1
         Me.Version.BackColor = System.Drawing.Color.Transparent
         Me.Version.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Version.ImageAlign = System.Drawing.ContentAlignment.TopLeft
-        Me.Version.Location = New System.Drawing.Point(637, 208)
+        Me.Version.Location = New System.Drawing.Point(672, 262)
         Me.Version.Name = "Version"
-        Me.Version.Size = New System.Drawing.Size(250, 148)
+        Me.Version.Size = New System.Drawing.Size(179, 40)
         Me.Version.TabIndex = 1
         Me.Version.Text = "Version {0}.{1:00}"
         Me.Version.TextAlign = System.Drawing.ContentAlignment.TopRight
