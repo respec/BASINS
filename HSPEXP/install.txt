@@ -1,4 +1,10 @@
+Dated: 4/14/2017
+HSPEXP+1.31
+Bugs Fixed
+1. The surface runoff, potential evapotranspiration, interflow were not being reported in the ExpertStats output report. This issue has been fixed.
+
 Dated: 3/30/2017
+HSPEXP+1.30
 1. Expert Statistics with non-continuous data - If the observed flow data is non-continuous, HSPEXP+ compares the observed and simulated data and discards the data for dates where corresponding observed data is not available. The expert statistics calculation, annual, monthly, and daily flow comparisons are conducted on the remaining data. All output reports include information about the percent of data that is missing, and to use caution while using the results
 2. Graphs from JSON Files - BASINS 4.5 and later versions will have the capability to produce graph specifications as a JSON file. HSPEXP+1.30 can produce graphs using the JSON file if it is available in the project folder.
 3. Regan Plots - Regan Plots were expanded with following two plots.
