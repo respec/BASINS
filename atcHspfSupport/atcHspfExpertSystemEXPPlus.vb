@@ -567,7 +567,7 @@ Public Class atcExpertSystem
                     Dim lValues() As Double = lDailyTSer.Values
                     'total volume always needed 
                     'RWZSetArgs(lDailyTSer) 'Becky's addition Dec 9: this uses atcTimeseriesStatistics to calculate all the sums, bins needed below
-                    pStats(1, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("Sum") 'Becky commented this out and used .GetValue instead
+                    pStats(1, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("Sum").Value 'Becky commented this out and used .GetValue instead
                     'others?
                     If (lStatGroup = 1 Or lStatGroup = 2) Then  'full range of pStats desired
                         pStats(2, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("%Sum50") 'lDailyTSer.Attributes.GetValue("%Sum50") '50% low
