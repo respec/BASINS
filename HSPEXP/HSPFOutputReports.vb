@@ -178,6 +178,7 @@ Module HSPFOutputReports
                             lEchoFileisinFilesBlock = True
                         Else
                             Logger.Msg("The ECHO file is not available for this model. Please check if model ran successfully last time", vbCritical)
+                            End
                             Return
                         End If
                         Exit For
@@ -197,7 +198,7 @@ Module HSPFOutputReports
 
 
 
-                Dim HSPFRan As Boolean = True
+                Dim HSPFRan As Boolean = False
                 Using echoFileReader As StreamReader = File.OpenText(lHspfEchoFileName)
                     While Not echoFileReader.EndOfStream
                         Dim nextLine As String = echoFileReader.ReadLine()

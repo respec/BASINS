@@ -136,12 +136,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="HSPFOutputReports.vb" />
-    <Compile Include="MakeEXSFile.Designer.vb">
-      <DependentUpon>MakeEXSFile.vb</DependentUpon>
-    </Compile>
-    <Compile Include="MakeEXSFile.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="modListUCIParameters.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -177,14 +171,10 @@
     <Compile Include="StartUp.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="WriteEXSFile.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="HelpForm.resx">
       <DependentUpon>HelpForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MakeEXSFile.resx">
-      <DependentUpon>MakeEXSFile.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
