@@ -1,0 +1,15 @@
+blue OBSERVED:*:*
+steelblue1 OBSERVED:*:*
+lavender OBSERVED:*:*
+cadetblue OBSERVED:*:*
+lightskyblue4 OBSERVED:*:*
+green3 OBSERVED:*:*
+red *
+hotpink *
+darkorange *
+brown *
+khaki *
+magenta3 *
+blue residual
+blue difference
+blue scatter
