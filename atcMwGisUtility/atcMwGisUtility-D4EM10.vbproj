@@ -117,7 +117,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\D4EM\Bin4.0\</OutputPath>
+    <OutputPath>..\bin-D4EM10\x86Debug\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcMwGisUtility.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
@@ -138,7 +138,7 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM10.vbproj">
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM10.vbproj">
       <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
       <Name>MapWinUtility-D4EM10</Name>
       <Private>False</Private>
@@ -183,9 +183,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="GisUtil.vb">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
