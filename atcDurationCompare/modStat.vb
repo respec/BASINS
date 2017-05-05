@@ -1068,10 +1068,12 @@ Public Module modStat
             lNewPETS.Attributes.SetValue("STANAM", aTS.Attributes.GetValue("stanam", ""))
             lNewPETS.Attributes.SetValue("StartYMD", lStartYMD)
             lNewPETS.Attributes.SetValue("EndYMD", lEndYMD)
-            If Not aTS.Attributes.GetValue("Constituent").ToString.Trim = "" Then
-                lNewPETS.Attributes.SetValue("Constituent", aTS.Attributes.GetValue("Constituent"))
-            ElseIf Not aTS.Attributes.GetValue("TSTYPE").ToString.Trim = "" Then
-                lNewPETS.Attributes.SetValue("TSTYPE", aTS.Attributes.GetValue("TSTYPE"))
+            Dim lConstituent As String = aTS.Attributes.GetValue("Constituent", "")
+            Dim lTsType As String = aTS.Attributes.GetValue("TSTYPE", "")
+            If Not String.IsNullOrEmpty(lConstituent) Then
+                lNewPETS.Attributes.SetValue("Constituent", lConstituent)
+            ElseIf Not String.IsNullOrEmpty(lTsType) Then
+                lNewPETS.Attributes.SetValue("TSTYPE", lTsType)
             End If
             lNewPETS.Attributes.SetValue("PEDecimal", lPEDecimal)
 
