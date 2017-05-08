@@ -1,0 +1,14 @@
+ATCclsNodeFile = 220, 220, 1111, 895, C
+ATCclsAttributeCollection = 239, 93, 1171, 725, C
+ATCclsBranch = 198, 198, 1133, 768, C
+ATCclsNode = 0, 0, 0, 0, C
+ATCclsShape = 66, 66, 995, 792, C
+clsDBF = 25, 95, 979, 711, 
+clsNodeEFDC = 53, 17, 1029, 836, 
+UTILITY = 110, 110, 933, 836, C
+UtilShape = 5, 120, 1169, 800, 
+modWin32Api = 276, 291, 1205, 1017, C
+ATCclsAttributeDefinition = 66, 66, 828, 768, 
+ATCclsAttribute = 198, 198, 960, 900, C
+ATCDataTypes = 44, 44, 791, 749, C
+clsNodeDBF = 12, 21, 892, 874, 

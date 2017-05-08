@@ -1,0 +1,12 @@
+VBGROUP 5.0
+StartupProject=WinHspf\WinHspf.vbp
+Project=ATCData\ATCData.vbp
+Project=ATCoCtl\ATCoCtl.vbp
+Project=ATCoHspf\ATCoHspf.vbp
+Project=ATCoDisp\ATCoDisp.vbp
+Project=ATCTSfile\ATCTSfile.vbp
+Project=ATCoCtl\Status\StatusMonitor.vbp
+Project=ATCoFeedback\ATCoFeedback.vbp
+Project=ATCoHSPFOutput\ATCoHSPFOutput.vbp
+Project=ATCoTSdisp\ATCoTSDisp.vbp
+Project=PEST\ATCoPest.vbp

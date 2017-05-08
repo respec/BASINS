@@ -1,0 +1,64 @@
+ATCclsParmDef
+' Class containing definition of a model parameter.
+
+Dim pName As String
+Dim pTyp As Long 'atcoDataType is in control
+Dim pMin As Double
+Dim pMax As Double
+Dim pDefault As String
+Dim pSoftMin As Double
+Dim pSoftMax As Double
+Dim pDefine As String
+Dim pOther As String
+Dim pStartCol As Long
+Dim pLength As Long
+Dim pParent As Object
+
+' Name of parameter.
+Public Property Get Name() As String
+Public Property Let Name(newName As String)
+
+' Type of parameter.
+Public Property Get Typ() As Long
+Public Property Let Typ(newTyp As Long)
+
+' Minimum value for parameter.
+Public Property Get Min() As Double
+Public Property Let Min(newMin As Double)
+
+' Maximum value for parameter
+Public Property Get Max() As Double
+Public Property Let Max(newMax As Double)
+
+' Devault value for parameter.
+Public Property Get Default() As String
+Public Property Let Default(newDefault As String)
+
+' Recommended minimum value for parameter.
+Public Property Get SoftMin() As Double
+Public Property Let SoftMin(newSoftMin As Double)
+
+' Recommended maximum value for parameter.
+Public Property Get SoftMax() As Double
+Public Property Let SoftMax(newSoftMax As Double)
+
+' Text definition of parameter.
+Public Property Get Define() As String
+Public Property Let Define(newDefine As String)
+
+' Parent object of parameter definition.
+Public Property Get Parent() As Object
+Public Property Set Parent(newParent As Object)
+
+' Additional information about parameter.
+Public Property Get Other() As String
+Public Property Let Other(newOther As String)
+
+' Starting column for parameter within a text string.
+Public Property Get StartCol() As Long
+Public Property Let StartCol(newStartCol As Long)
+
+' Length of parameter value when stored as a string.
+Public Property Get Length() As Long
+Public Property Let Length(NewLength As Long)
+

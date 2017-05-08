@@ -1,0 +1,5 @@
+utilRegister = 66, 66, 771, 690, C
+modUpdate = 0, 21, 779, 560, C
+modWin32Api = 48, 111, 706, 551, C
+UTILITY = 44, 44, 749, 668, C
+frmUpdate = 88, 88, 522, 582, C, 122, 185, 589, 681, C

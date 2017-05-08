@@ -1,0 +1,11 @@
+lzsn1         none          factor         6             2             15           lzsn           1             0 
+infilt1       none          factor         0.1           0.001         0.5          infilt         1             0 
+agwrc1        log           factor         0.99          0.85          0.999        agwrc          1             0 
+deepfr1       none          factor         0.1           0.001         0.2          deepfr         1             0 
+basetp1       none          factor         0.0001        0.0001        0.2          basetp         1             0 
+agwetp1       none          factor         0.0001        0.0001        0.2          agwetp         1             0 
+cepsc1        none          factor         0.1           0.01          0.4          cepsc          1             0 
+intfw1        none          factor         2             1             10           intfw          1             0 
+irc1          log           factor         0.6           0.3           0.85         irc            1             0 
+uzsn1         none          factor         0.5           0.05          2            uzsn           1             0 
+lzetp1        none          factor         0.4           0.1           0.9          lzetp          1             0 

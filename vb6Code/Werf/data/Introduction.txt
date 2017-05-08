@@ -1,0 +1,56 @@
+<h>1 Introduction</h>
+Better Assessment Science Integrating Point and Nonpoint Sources (BASINS) is a multipurpose 
+environmental analysis system for use by regional, state, and local agencies in performing 
+watershed- and water-quality-based studies. It was developed by the U.S. Environmental Protection 
+Agency's (EPA's) Office of Water to address three objectives:
+<ul>
+<li>To facilitate examination of environmental information
+<li>To support analysis of environmental systems
+<li>To provide a framework for examining management alternatives
+</ul>
+Because many states and local agencies are moving toward a watershed-based approach, the BASINS system is configured to support environmental and ecological studies in a watershed context. The system is designed to be flexible. It can support analysis at a variety of scales using tools that range from simple to sophisticated.
+<p>
+BASINS was also conceived as a system for supporting the development of total maximum daily loads (TMDLs). Section 303(d) of the Clean Water Act requires states to develop TMDLs for water bodies that are not meeting applicable water quality standards by using technology-based controls. Developing TMDLs requires a watershed-based approach that integrates both point and nonpoint sources. BASINS can support this type of watershed-based point and nonpoint source analysis for a variety of pollutants. It also lets the user test different management options.
+<p>
+Traditional approaches to watershed-based assessments typically involve many separate steps preparing data, summarizing information, developing maps and tables, and applying and interpreting models. Each individual step is performed using a variety of tools and computer systems. The isolated implementation of steps can result in a lack of integration, limited coordination, and time-intensive execution. BASINS makes watershed and water quality studies easier by bringing key data and analytical components "under one roof".  Using the familiar Windows environment, analysts can efficiently access national environmental information, apply assessment and planning tools, and run a variety of proven, robust nonpoint loading and water quality models. With many of the necessary components together in one system, the analysis time is significantly reduced, a greater variety of questions can be answered, and data and management needs can be more efficiently identified. BASINS takes advantage of recent developments in software, data management technologies, and computer capabilities to provide the user with a fully comprehensive watershed management tool.
+<p>
+A geographic information system (GIS) provides the integrating framework for BASINS. GIS organizes spatial information so it can be displayed as maps, tables, or graphics. GIS provides techniques for analyzing landscape information and displaying relationships. Through the use of GIS, BASINS has the flexibility to display and integrate a wide range of information (e.g., land use, point source discharges, water supply withdrawals) at a scale chosen by the user.  For example, some users will need to examine data at a multistate scale to determine problem areas, compare watersheds, or investigate gaps in data. Others will want to work at a much smaller scale, perhaps investigating a particular river segment impaired by multiple point source discharges. This "zooming" capability of BASINS makes it a unique and powerful environmental analysis tool.
+<p>
+Some agencies might wish to perform analyses at a variety of scales, in a nested fashion, to meet several objectives at once. BASINS is designed to facilitate all of these scenarios because it incorporates tools that operate on both large and small watersheds. Adding locally developed, high-resolution data sources to existing data layers is an additional option that expands the local-scale evaluation capabilities.
+<p>
+BASINS comprises a suite of interrelated components for performing the various aspects of environmental analysis. The components include (1) nationally derived databases with <a href="Installation/Data Extraction"><i>Data Extraction</i></a> tools and <a href="Installation/Project Builder"><i>Project Builders</i></a>; (2) assessment tools (<a href="BASINS Assessment Tools/Target"><i>TARGET</i></a>, <a href="BASINS Assessment Tools/Assess"><i>ASSESS</a></i>, and <a href="BASINS Assessment Tools/Data Mining"><i>Data Mining</i></a>) that address large- and small-scale characterization needs; (3) utilities to facilitate organizing and evaluating data; (4) tools for <a href="Delineation Tools"><i>Watershed Delineation</i></a>; (5) utilities for classifying <a href="BASINS Utilities/DEM Reclassification">dems</a>, <a href="BASINS Utilities/Land Use Reclassification">land use</a>, <a href="BASINS Utilities/Land Use, Soils Class and Overlay">soils</a>, and <a href="BASINS Utilities/Water Quality Observation Data Management">water quality observations</a>; (6) <a href="Watershed Characterization Reports">Watershed Characterization Reports</a> that facilitate compilation and output of information on selected watersheds; (7) an instream water quality model, <a href="Watershed and Instream Models/QUAL2E"><i>QUAL2E</i></a>; (8) two watershed loading and transport models, <a href="Watershed and Instream Models/HSPF">Hydrological Simulation Program - Fortran (HSPF)</a> and <a href="Watershed and Instream Models/SWAT">Soil and Water Assessment Tool (SWAT)</a>; and (9) <a href="Watershed and Instream Models/PLOAD">PLOAD</a>, a simplified GIS based model that estimates nonpoint loads (NPS) of pollution on an annual average basis.
+<p>
+The assessment component, working under the GIS umbrella, allows users to quickly evaluate selected areas, organize information, and display results. The modeling component module allows users to examine the impacts of pollutant loadings from point and nonpoint sources. Working together, these modules support several specific aspects of watershed-based analysis by
+<ul>
+<li>Identifying and prioritizing water-quality-limited waters.
+<li>Supplying data characterizing point and nonpoint sources and evaluating their magnitudes and potential significance.
+<li>Integrating point source and nonpoint source loadings and fate and transport processes.
+<li>Evaluating and comparing the relative value of potential control strategies.
+<li>Visualizing and communicating environmental conditions to the public through tables, graphs, and maps.
+</ul>
+This user's guide provides information on the systems and procedures in BASINS Version 3.0. This version provides some significant enhancements and functions beyond those provided by the original release of BASINS, Version 1.0 and Version 2.0. The modification and enhancement of the program reflect the extensive comments and input provided by the user community regarding the initial version. The significant changes between BASINS Versions include the following:
+BASINS 3.0
+<ul>
+<li>Addition of grid data sets including USGS DEM elevations grids (1:250,000 scale).
+<li>Additional flexibility for users to import there own data layers including elevation, landuse soils, streams and point sources themes in shapefile and/or grid file formats.
+<li>New utility to perform automatic watershed delineations based on DEM data. The new watershed delineation tool is used to generate and define the watershed boundary, stream network, and point source discharge themes to be used for watershed modeling using <i>HSPF</i> or <i>SWAT</i>.  The stream network can be generated based on the DEM or defined by an existing stream theme such as USEPA Reach File, Version 1 or Reach File, Version 3.  Point source locations can be selected from the permit compliance system theme or manually added. The tool also generates many of the watershed and stream characteristics needed for modeling including slopes, elevations, and stream widths and depths.
+<li>A significantly enhanced manual delineation tool that provides users additional flexibility in editing shapes and attributes of manually delineated watersheds.
+<li>A grid projector that extends the ArcView projection tool to also project grid data.  This component requires Spatial Analyist.
+<li>An NHD download tool that allows users to download NHD data layers from the USGS web site and import them directly into a BASINS project window using the correct projection.
+<li>Incorporation of the Soil and Water Assessment Tool (SWAT) developed by the USDA Agriculture Research Service (ARS).  SWAT is a physical based, watershed scale model that was developed to predict the impacts of land management practices on water, sediment and agricultural chemical yields in large complex watersheds with varying soils, land uses and management conditions over long periods of time.  SWAT2000 is the underlying model that is run from the BASINS ArcView interface.  SWAT requires the Spatial Analyst extension.
+<li>A new interface to the Hydrological Simulation Program - Fortran (HSPF), called <i>WinHSPF</i>.  In earlier versions of BASINS, the interface to HSPF was known as the Nonpoint Source Model (NPSM).  WinHSPF builds upon the successes of NPSM, but adds enhanced graphical displays and editing capabilities such that all features of HSPF are available in WinHSPF.  WinHSPF fully supports the MASS-LINK, SCHEMATIC and SPECIAL ACTIONS blocks of the UCI File.  This interface also directly reads HSPF UCI file.
+<li>A postprocessor known as <i>GenScn</i>.  GenScn works with data in a variety of formats including Watershed Data Management (WDM) files, SWAT output files, and BASINS observed water quality files.
+<li>A utility program for managing WDM files known as <i>WDMUtil</i>.  WDM files are used by HSPF for input and output timeseries data.  WDMUtil was designed to help manage the large volumes of timeseries data used with HSPF, as well as to add additional timeseries where needed.
+<li>A pollutant loading program known as <i>PLOAD</i>.  Developed by CH2M-Hill, PLOAD estimates nonpoint sources of pollution on an annual average basis, for any user-specified pollutant, using either the export coefficient or simple method approach.
+<p>
+</ul>
+BASINS 2.0
+<ul>
+<li>Additions to the base data sets include USEPA Reach File Version 3 Alpha (RF3 Alpha), STATSGO soils, DEM elevation data, federal and Indian land boundaries, water quality observation data, ecoregions, fish and wildlife consumption advisories, shellfish contamination, and Clean Water Needs Survey.
+<li>New utilities to faciliate data preparation such as <i>Watershed Delineation</i> and Watershed Characterization Reports.
+<li>Expanded functionality of the nonpoint source modeling system to include in-stream transport and visualization.
+<li>Postprocessing tools for evaluation of model output.
+</ul>
+<p>
+Users are encouraged to continue to provide EPA with comments and recommendations for further development. Future enhancements to the system might include adding additional types of information, using higher-resolution data, providing Internet access to data and model updates, expanding assessment and evaluation capabilities, providing enhanced data management and display tools, and adding a wider range of nonpoint source water quality and ecological modeling techniques.
+

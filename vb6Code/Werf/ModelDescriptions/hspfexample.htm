@@ -1,0 +1,211 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>Model Suite:  HSPF RCHRES </TITLE>
+</HEAD>
+<BODY LINK="#0000ff">
+
+<B><P>RCHRES </P>
+
+</B><P>Model Suite: HSPF</P>
+<B>
+</B><P>1. Media of Concern: Receiving water, chemical fate and transport</P>
+
+<P>2. Analysis Level(s): Screening level, detailed</P>
+
+<P>3.  Methods: Deterministic</P>
+
+<P>4.  Temporal Representation: Steady-state, time variable</P>
+
+<P>5. Dimensional Capability: 1-D</P>
+
+<P>6. Source/Release Types:  Constant, time-varying, Single, Multiple </P>
+
+<P>7. Sources: Point Sources, Land Surface Washoff, Dry Deposition, Wet Deposition, </P>
+<P>Bed Exchange</P>
+
+<P>8.  Assessment Extent: Far-Field</P>
+
+<P>9.  Applicability to Water Body Types:  Rivers, streams, lakes, reservoirs</P>
+
+<P>10. Type of Chemicals: Conservatives, Conventional Pollutants, Toxic Pollutants, Pathogens, Sediment, Acid, BOD-DU, eutrophication</P>
+
+<P>11. Critical Processes: Degradation products</P>
+
+<P>12.  Models Use(s): </P><DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Planning:&#9;Resource assessment, risk assessment, pollutant/process evaluation</P>
+<P>Design:&#9;BMP development, TMDL development, NPDES permit development</P>
+<P>Regulation:&#9;TMDL evaluation, NPDES evaluation</P>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+
+<P>13.  Resource Requirements</P><DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Level of effort: &#9;Moderate</P>
+<P>Data requirements:&#9;Moderate</P>
+<P>Modeler expertise: &#9;Moderate</P>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+
+<P>14. Model Use Features: Graphical User Interface, Strong Pre-processing Capabilities,</P>
+<P>Strong Post-processing Capabilities, Integral Database/Database Manager, Linkage to GIS</P>
+
+<P>15.  Model Support: Strong Model Documentation, Developer/Sponsor Assistance, </P>
+<P>User’s Group, Workshops </P>
+
+<P>16.  Model Availability: Public Domain</P>
+
+<U><P ALIGN="JUSTIFY">General Description</U> </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The Hydrological Simulation Program-FORTRAN, known as HSPF, is a mathematical model developed under joint EPA and USGS sponsorship for simulating hydrologic and water quality processes in natural and man-made water systems. It is an analytical tool which has application in the planning, design, and operation of water resources systems.  The model enables the use of probabilistic analysis in the fields of hydrology and water quality management.  HSPF uses such information as the time history of rainfall, temperature, evaporation, and parameters related to land use patterns, soil characteristics, and agricultural practices to simulate the processes that occur in a watershed.  The initial result of an HSPF simulation is a time history of the quantity and quality of water transported over the land surface and through  various soil zones down to the groundwater aquifers.  Runoff flow rate, sediment loads, nutrients, pesticides, toxic chemicals, and other quality constituent concentrations can be predicted.  The model uses these results and stream channel information to simulate instream processes.  From this information, HSPF produces a time history of water quantity and quality at any point in the watershed.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">HSPF is a valuable tool to water resource planners.  Because it is more comprehensive than most systems, it permits effective planning.  Benefits to the user include:</P>
+<P ALIGN="JUSTIFY"></P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>Flexibility in solving a wide range of water quantity and quality problems using a single model</LI></P>
+<P ALIGN="JUSTIFY"><LI>Convenient data management features that save time and money</LI></P>
+<P ALIGN="JUSTIFY"><LI>Modular program structure which facilitates program changes and additions for special applications</LI></P></UL>
+
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">HSPF is currently one of the most comprehensive and flexible models of watershed hydrology and water quality available.  It is the only available model that can simulate the continuous, dynamic event, or steady-state behavior of both hydrologic/hydraulic and water quality processes in a watershed, with an integrated linkage of surface, soil, and stream processes.  The potential applications and uses of the model are comparatively large including:</P>
+<P ALIGN="JUSTIFY"></P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>Flood control planning and operations</LI></P>
+<P ALIGN="JUSTIFY"><LI>Hydropower studies</LI></P>
+<P ALIGN="JUSTIFY"><LI>River basin and watershed planning</LI></P>
+<P ALIGN="JUSTIFY"><LI>Storm drainage analyses</LI></P>
+<P ALIGN="JUSTIFY"><LI>Water quality planning and management</LI></P>
+<P ALIGN="JUSTIFY"><LI>Point and nonpoint source pollution analyses</LI></P>
+<P ALIGN="JUSTIFY"><LI>Soil erosion and sediment transport studies</LI></P>
+<P ALIGN="JUSTIFY"><LI>Evaluation of urban and agricultural best management practices</LI></P>
+<P ALIGN="JUSTIFY"><LI>Fate, transport, exposure assessment, and control of pesticides, nutrients, and toxic substances</LI></P></UL>
+
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">HSPF is designed so that it can be applied to most watersheds using existing meteorologic and hydrologic data; soils and topographic information; and land use, drainage, and system (physical and man-made) characteristics.  The inputs required by HSPF are not different than those needed by most other simpler models.  The primary difference in data needs is that long, rather than short time-series records are preferred.  Typical long time-series records include precipitation, waste discharges, and calibration data such as streamflow and constituent concentrations.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">RCHRES simulates the movement of runoff water and its associated water quality constituents in stream channels and mixed reservoirs.  The module features individual compartments for modeling hydraulics, constituent advection, conservatives, water temperature, inorganic sediment, generalized quality constituents, specific constituents involved in biochemical transformations, and acid mine drainage phenomena.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Model methods include the following:</P>
+<P ALIGN="JUSTIFY"></P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>Finite difference.</LI></P>
+<P ALIGN="JUSTIFY"><LI>1-D branching, uni-directional solution.</LI></P>
+<P ALIGN="JUSTIFY"><LI>Flow routing technique by "kinematic wave" methods (momentum is not considered).</LI></P>
+<P ALIGN="JUSTIFY"><LI>Non-cohesive (sand) and cohesive (silt, clay) sediments are simulated; migration of each sediment fraction between suspension in water and the bed is modeled by balancing deposition and scour computations.  </LI></P>
+<P ALIGN="JUSTIFY"><LI>Code provides the user with the capability to model any subset of the following generalized processes:  advection of dissolved material; decay of dissolved material by hydrolysis, oxidation by free radical oxygen, photolysis, volatilization, biodegradation, and/or generalized first-order decay; production of one modeled constituent as a result of decay of another constituent; advection of adsorbed suspended material; deposition and scour of adsorbed material; and adsorption/desorption between dissolved and sediment-associated phases.</LI></P>
+<P ALIGN="JUSTIFY"><LI>Detailed simulation of constituents involved in biochemical transformations.  Included are dissolved oxygen, BOD, ammonia, nitrite, nitrate, phosphate, phytoplankton, benthic algae, zooplankton, refractory organics, and pH.  </LI></P>
+<P ALIGN="JUSTIFY"><LI>Primary dissolved oxygen and biochemical oxygen demand balances simulated with provisions for decay, settling, benthal sinks and sources, reaeration, and sinks and sources related to plankton.  </LI></P>
+<P ALIGN="JUSTIFY"><LI>Primary nitrogen balance modeled as sequential reactions from ammonia through nitrate.  Ammonia volatilization, ammonification, denitrification, and ammonium adsorption/desorption interactions with suspended sediment fractions considered; both ammonium and phosphate adsorption/desorption to suspended sediment fractions modeled using an equilibrium, linear isotherm approach. </LI></P>
+<P ALIGN="JUSTIFY"><LI>Three types of plankton - phytoplankton, attached algae and zooplankton.  Phytoplankton processes include growth, respiration, sinking, zooplankton predation, and death; zooplankton processes include growth, respiration and death; and benthic algae processes are growth, respiration and death.  </LI></P>
+<P ALIGN="JUSTIFY"><LI>Hydrogen ion activity (pH) calculated by either of two independent code sections: (1) compute pH by considering carbonate system equilibria, or (2) perform user-defined instream chemical computations to represent acid mine drainage and acid rain affected waters.</LI></P></UL>
+
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Limitations</P>
+</U><P ALIGN="JUSTIFY"></P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>Cannot represent backwater effects, bi-directional stream flow, meandering or unstable channels, stratified reservoirs/impoundments and complex, tidally influenced estuaries.</LI></P></UL>
+
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>Descriptive method for computation of sediment oxygen demand and benthic nutrient fluxes.  </LI></P></UL>
+
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Application History</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">HSPF applications since its inception in 1980 have been worldwide and number in the hundreds; nearly all HSPF applications have included application of both the landscape (PERLND, IMPLND) modules and the receiving water (RCHRES) module.  While numerous HSPF applications have been focused on evaluating ‘hydrology-only’ issues, dozens of applications have focused on nutrient cycling and related water quality issues.  HSPFParm, the recently developed interactive database of HSPF model parameters, includes data for over 40 watersheds in 14 states (Donigian et al., 1998).  The model has been applied to such diverse climatic regimes as the tropical rain forests of the Caribbean, arid conditions of Saudi Arabia and the Southwestern U.S., the humid Eastern U.S. and Europe, and snow covered regions of Eastern Canada.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model Use Features</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">A graphical pre- and post-processor GENSCN is available from <A HREF="http://water.usgs.gov/software">http://water.usgs.gov/software</A><U>.</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The USGS Watershed Data Management (WDM) system provides integral database and database management capabilities.  RCHRES can also be used within the EPA Office of Science and Technology’s Better Assessment Science Integrating Point and Nonpoint Sources (BASINS) system; within BASINS, RCHRES users can take advantage of linkage to GIS and nationwide supporting databases. </P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model Support</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Users Manual</P>
+</I><P ALIGN="JUSTIFY">The HSPF RCHRES users manual is not a separate document but is incorporated into the nearly 800 pages of the HSPF users manual which is maintained and updated by the USEPA Environmental Research Laboratory in cooperation with the USGS Office of Surface Water. The version distributed with the model is dated 1996. </P>
+<B><P ALIGN="JUSTIFY"></P>
+</B><I><P ALIGN="JUSTIFY">&nbsp;</P>
+<P ALIGN="JUSTIFY">Developer/Sponsor Support</P>
+</I><P ALIGN="JUSTIFY">The current EPA support for HSPF is coming from an IAG (interagency agreement) with the Army Corps of Engineers at Waterways Experiment Station in Vicksburg, MS.  The support is for the application of HSPF.  Support at this point in time is primarily limited to state, local, federal personnel.  Frank Stancil at EPA in Athens, Georgia is the point of contact. A web page for this HSPF support is currently being implemented.  Until it is operational, modelers can call Frank Stancil at 706-355-8328.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The U.S. Geological Survey serves HSPF, related software, and other hydrologic applications at http://water.usgs.gov/software/Support for HSPF and the other available software is provided to USGS offices and to agencies cooperating with the USGS on modeling studies.  Limited support to others may be available as resources permit.  The point of contact is <B><FONT COLOR="#008000">h2osoft@usgs.gov.</P>
+</B></FONT><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Workshops</P>
+</I><P ALIGN="JUSTIFY">Dozens of HSPF workshops have been held at various locations across the country over the past two decades.  Sponsors have included U.S. EPA, U.S. Geological Survey, U.S. Army Corps of Engineers, state governments, water districts and consultants.</P>
+<P ALIGN="JUSTIFY">  </P>
+<P ALIGN="JUSTIFY">The U.S. EPA and the U.S. Army Corps of Engineers (Waterways Experiment Station) are planning to sponsor two HSPF training workshops in 1999-2000.  These workshops will range from 4 to 4 2 days, and will cover the theory, application, calibration, and operation of HSPF and selected companion software. </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The EPA Office of Science and Technology continues to sponsor additional HSPF training as part of the BASINS training workshops.  Approximately half of each 5 day workshop is devoted to training participants in the NPSM model, which is the HSPF component of BASINS.  </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Another opportunity for training in HSPF is offered by the watershed modeling workshop that is offered by the U.S. Geological Survey.  It is offered about every 12 to 18 months at the Federal Training Center in Denver.  This 5-day course is designed to help Water Resources Division personnel understand, analyze, and predict the hydrologic impacts of changes in land use or climate.  Basic hydrologic processes are presented in the context of three watershed models; the Distributed Routing Rainfall-Runoff Model (DR3M), the Precipitation-Runoff Modeling System (PRMS), and the Hydrological Simulation Program--Fortran (HSPF).  Model calibration, verification, sensitivity analysis, and optimization are presented and attendees gain hands-on experience with PRMS and HSPF.  This course is primarily intended for USGS employees; others may attend on a space available basis.  The course will continue to be offered about once a year.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">In addition to the government-sponsored workshops noted above, AQUA TERRA Consultants (Mountain View, CA), Tetra Tech, Inc. (Fairfax, VA) and Hydrocomp, Inc. (Redwood City, CA) present customized HSPF workshops for various government and private clients across the U.S.  </P>
+<P ALIGN="JUSTIFY">Acquisition/operations support</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Model Distribution Coordinator</P>
+<P ALIGN="JUSTIFY">Center for Exposure Assessment Modeling (CEAM)</P>
+<P ALIGN="JUSTIFY">USEPA</P>
+<P ALIGN="JUSTIFY">960 College Station Road</P>
+<P ALIGN="JUSTIFY">Athens, GA 30605-2700</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Models are available for FTP from:</P>
+<B><FONT COLOR="#008000"><P ALIGN="JUSTIFY">ftp://ftp.epa.gov/epa_ceam/wwwhtml/ceamhome.htm</P>
+</B></FONT><U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">References</U> </P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Model documentation references</P>
+</I><P ALIGN="JUSTIFY">Bicknell, B.R., J.C. Imhoff, J.L. Kittle Jr., A.S. Donigian, Jr. and R.C. Johanson.  1997.</P><DIR>
+<DIR>
+
+<P ALIGN="JUSTIFY">Hydrological Simulation Program - FORTRAN.  User's Manual for Release 11.  EPA/600/R-97/080.  U.S. EPA Environmental Research Laboratory, Athens, GA.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Donigian, A.S., Jr., B.R. Bicknell and J.C. Imhoff.  1995.  Hydrologic Simulation Program -FORTRAN (HSPF).  Chapter 12 in Computer Models of Watershed Hydrology,  V.P. Singh, Ed., Water Resources Publications, Littleton, CO.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Donigian, A.S., Jr., J.C. Imhoff, B.R. Bicknell and J.L. Kittle, Jr.  1984. Application Guide for Hydrological Simulation Program - FORTRAN (HSPF).  EPA- 600/3-84-065.  Office of Research and Development, U.S. Environmental Protection Agency, Athens, GA.</P>
+<P ALIGN="JUSTIFY"></P></DIR>
+</DIR>
+
+<I><P ALIGN="JUSTIFY">Application references</P><DIR>
+<DIR>
+
+</I><P ALIGN="JUSTIFY">Donigian, A.S. Jr., B.R. Bicknell, A.S. Patwardhan, L.C. Linker, C.H. Chang, and R. Reynolds. 1994. Chesapeake Bay Program -  Watershed Model Application to Calculate Bay Nutrient Loadings: Final Findings and Recommendations (FINAL REPORT).  Prepared for U.S. EPA Chesapeake Bay Program, Annapolis, Maryland.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Donigian, A.S., Jr., J.C. Imhoff and J.L. Kittle, Jr.  1998. HSPFParm: An Interactive Database of HSPF Model Parameters - Vesion 1.0.  Office of Science and Technology, Office of Water, U.S. Environmental Protection Agency, Washington, DC.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Maryland Department of the Environment.  1996.  Patuxent Watershed Model:  Final Report.  Baltimore, MD.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Patwardan, A.S., R.M. Jacobson, W.P. Anderson and A.S. Donigian, Jr. 1996.  Modeling Nutrients From the Minnesota River Watershed.  In: WATERSHED '96 - Moving Ahead Together.  Conference Proceedings, June 8-12, 1996. pp.439-442.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Patwardan, A.S., R.M. Jacobson, A.S. Donigian, Jr. and R.V. Chinnaswamy. 1996.  HSPF Model Application to the LeSeur Watershed - Preliminary Findings and Recommendations.  (In Preparation).  Minnesota Pollution Control Agency.  St. Paul, MN.</P></DIR>
+</DIR>
+</BODY>
+</HTML>

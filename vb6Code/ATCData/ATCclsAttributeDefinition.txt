@@ -1,0 +1,47 @@
+ATCclsAttributeDefinition
+
+Option Explicit
+
+Dim pName As String
+Dim pDesc As String
+Dim pValid As String
+Dim pDataType As ATCoDataType
+Dim pDefault As Single
+Dim pEditable As Boolean
+Dim pMin As Single
+Dim pMax As Single
+
+' a string containing details of the Attribute Definition
+Public Function Dump() As String
+
+' The name of the Attribute being defined.
+Public Property Get Name() As String
+Public Property Let Name(newName As String)
+
+' A text description of the Attribute.
+Public Property Get Description() As String
+Public Property Let Description(newDesc As String)
+
+' Type of the Attribute (as an ATCoDataType)
+Public Property Get DataType() As ATCoDataType
+Public Property Let DataType(newType As ATCoDataType)
+
+' Default value for the Attribute.
+Public Property Get Default() As Single
+Public Property Let Default(newrDef As Single)
+
+' Flag indicating if editing of the Attribute is allowed
+Public Property Get Editable() As Boolean
+Public Property Let Editable(newEditable As Boolean)
+
+' Minimum value allowed for the Attribute.
+Public Property Get Min() As Single
+Public Property Let Min(newMin As Single)
+
+' Maximum value allowed for the Attribute.
+Public Property Get Max() As Single
+Public Property Let Max(newMax As Single)
+
+' Comma-separated list of possible values for the Attribute.
+Public Property Get ValidValues() As String
+Public Property Let ValidValues(ValidValues As String)

@@ -1,0 +1,11 @@
+lzsn1                 none    factor         6.00000     2.00000    15.00000   lzsn                       1.00000     0.00000
+infilt1               none    factor         0.10000     0.00100     0.50000   infilt                     1.00000     0.00000
+agwrc1                log     factor         0.99000     0.85000     0.99900   agwrc                      1.00000     0.00000
+deepfr1               none    factor         0.10000     0.00100     0.20000   deepfr                     1.00000     0.00000
+basetp1               none    factor         0.00010     0.00010     0.20000   basetp                     1.00000     0.00000
+agwetp1               none    factor         0.00010     0.00010     0.20000   agwetp                     1.00000     0.00000
+cepsc1                none    factor         0.10000     0.01000     0.40000   cepsc                      1.00000     0.00000
+intfw1                none    factor         2.00000     1.00000    10.00000   intfw                      1.00000     0.00000
+irc1                  log     factor         0.60000     0.30000     0.85000   irc                        1.00000     0.00000
+uzsn1                 none    factor         0.50000     0.05000     2.00000   uzsn                       1.00000     0.00000
+lzetp1                none    factor         0.40000     0.10000     0.90000   lzetp                      1.00000     0.00000

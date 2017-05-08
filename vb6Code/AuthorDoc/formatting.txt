@@ -1,0 +1,114 @@
+AuthorDoc conversion recognizes the following tags:
+
+<h>Header of Section</h>
+Header levels are handled by the converter. The indentation of the
+filename in the project file determines the header level. This
+makes it easy to reorganize documentation and to share sections
+with documentation for other programs.
+
+If a file does not contain a header, a default one will be
+inserted based on the filename. For example, if the file
+Abstract.txt just contains a paragraph of abstract and no <h> tag,
+the string <h>Abstract</h> will be inserted at the top of the file
+during conversion. I expect many sections to have the same name as
+the file, so this should save some typing.
+
+<i>italics</i>
+
+<b>bold</b>
+
+<u>underline</u>
+
+<ul>
+<li>List
+<li>Of
+<li>Bullets
+</ul>
+
+<ol>
+<li>Numbered
+<li>List
+<li>Of
+<li>Points
+</ol>
+
+<p>Paragraph need to start with <p> Only paragraphs that start
+with a paragraph mark will be separated in the output. Blank lines
+are all removed during conversion.
+
+<pre>...</pre>
+Text To Display in Courier fixed-width font, preserving line
+breaks as they are typed. Helpful for text tables like:
+DSN   Filename
+  1   One.wdm
+ 10   Ten.wdm
+134   OneThreeFour.wdm
+
+Also helpful for displaying code samples.
+
+
+<figure>Label for a figure, to be included in table of figures</figure>
+
+<img src="Screenshot.gif">
+Include an image. If the image is not in the same directory, use relative
+paths such as <img src="../images/Screenshot.gif">
+
+<toc>
+Builds a table of contents of the topics that are "children" of this one.
+
+<indexword="WDM">
+Creates a word in the HTML Help index that refers to this section
+
+<keyword="HSPF">
+Creates the same index entry that indexword creates, plus creates a 
+button in HTML Help that pops open a window with links to all 
+the other topics that share this keyword.
+
+<body bgcolor="0xffffff" background="SubtleLogo.gif">
+Override the current body style (if any) just for this file.
+This is standard HTML and only has an effect in HTML and HTMLHelp.
+
+Tables
+
+<table>
+ <thead>
+  <tr>
+     <td>Heading One</td>
+     <td>Heading Two</td>
+     <td>Heading Three</td>
+  </tr>
+ </thead>
+ <tr>
+     <td>Column One Row One</td>
+     <td>Column Two Row One</td>
+     <td>Column Three Row One</td>
+ </tr>
+ <tr>
+     <td>Column One Row Two</td>
+     <td>Column Two Row Two</td>
+     <td>Column Three Row Two</td>
+ </tr>
+</table>
+
+HYPERLINKS
+
+<a href="../OtherSection/RelativeFilename.txt#Header of Section">Link Text</a>
+Hypertext link to another section. The #Header of Section part and the
+.txt are optional and you probably won't want to use them. Simplified:
+<a href="../OtherSection/Filename">Link Text</a>
+
+If the path starts with a slash, the correct relative path will be generated
+during convert: <a href="/icons/x.gif"> might become <a href="../../icons/x.gif">
+If you are linking to a web page: <a href="http://foo.gov/index.html">
+If you want the web page to open in a separate browser window instead of the
+help viewer: <a href="http://foo.gov/index.html" target="_blank">
+
+
+Do not include the following in your source files, they will confuse the converter:
+<html>
+<head>
+<form>
+
+Other HTML tags will be preserved in the HTML and HTML Help output
+but will be lost in the printable document and old-style Windows
+help file.

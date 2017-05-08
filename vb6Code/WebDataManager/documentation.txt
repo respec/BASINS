@@ -1,0 +1,55 @@
+clsBasins.GetData(Query As IXMLDOMDocument, Result As IXMLDOMDocument) As Boolean
+
+find values for basins_dir, project_dir, cache_dir, all ending with \
+
+Parse Query to find which types are requested of core, dem, demg, ned, giras
+  (make subdirectories if needed for the desired types)
+
+find value for base_url, ending with /
+
+find values for URL suffixes for possible types of data to download
+
+create a nodStatus part of Result and indicate that the operation is not yet complete
+
+for each HUC specified in Query, download and process the requested data types
+  processing downloaded data is different for different types:
+  core: 1. merge the downloaded DBFs that are not part of shape files into the
+           corresponding DBFs in the project directory, 
+        2. add an instruction to project and merge the downloaded shape files. 
+        (This instruction will be followed after all downloading is finished.)
+  dem: add XML instruction to project, merge, and add the downloaded shape file 
+       to the project.
+  giras: add an instruction to project and merge the downloaded shape files. 
+  demg, ned: no special processing after each HUC
+
+If core data was downloaded and this run is designated as a "BasinsInitialSetup,"
+  (currently the ArcView portion of BASINS designates this when appropriate)
+  then some files included in the national project are copied and a new ArcView 
+  project is built using BASINSArchive.
+
+If DEM, NED, or DEMG was downloaded, instructions are given for importing them 
+into the ArcView project.
+
+If the process is not cancelled, nodStatus is updated to indicate completion 
+as the function finishes.
+_________________________________________________________________________________
+
+clsPCSDischarge.GetData
+
+find values for project_dir and cache_dir, ending with \
+
+find value for base_url, ending with ?
+
+create a nodStatus part of Result and indicate that the operation is not yet complete
+
+for each PCS site (enumerated by NPDES #)
+  (commented-out code for retrieving PCS_CUR_DMR_MEASUREMENT)
+
+  retrieve PCS_DMR_MEASUREMENT comma-separated values file
+    PCS data is stored in the BASINS project as DBF files named by HUC
+    open, create, or find already opened destination DBF for this station
+    open the CSV just downloaded and import it into the DBF
+
+summarize the stations that did not have data (in PCS_DischargeNoData.txt)
+
+save the opened DBFs back to disk

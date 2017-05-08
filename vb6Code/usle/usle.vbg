@@ -1,0 +1,4 @@
+VBGROUP 5.0
+StartupProject=USLE.vbp
+Project=..\ATCoCtl\ATCoCtl.vbp
+Project=..\ATMl2k\ATML2k.vbp

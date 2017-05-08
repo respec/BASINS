@@ -1,0 +1,5 @@
+VBGROUP 5.0
+StartupProject=WDMOutput.vbp
+Project=..\ATCTSfile\ATCTSfile.vbp
+Project=..\ATCData\ATCData.vbp
+Project=..\ATCoCtl\ATCoCtl.vbp

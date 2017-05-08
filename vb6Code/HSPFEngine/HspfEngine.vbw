@@ -1,0 +1,6 @@
+modHspfEngine = 9, 19, 862, 596, 
+modWin32Api = 160, 142, 836, 644, C
+HassLibs = 33, 23, 709, 525, C
+UTILITY = 0, 0, 0, 0, C
+utilPipe = 44, 44, 720, 546, C
+frmDummy = 0, 0, 0, 0, C, 44, 44, 645, 477, C

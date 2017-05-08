@@ -1,0 +1,9 @@
+clsNHDinGEO = 66, 66, 701, 514, 
+UTILITY = 0, 0, 0, 0, C
+utilXml = 0, 0, 0, 0, C
+clsGeoDatabase = 0, 0, 0, 0, C
+clsDBF = 0, 0, 0, 0, C
+UtilShape = 0, 0, 0, 0, C
+modWin32Api = 0, 0, 0, 0, C
+frmSelectLayers = 63, 12, 703, 642, , 12, 84, 467, 390, C
+UtilUnzip = 0, 0, 0, 0, C

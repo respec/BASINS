@@ -1,0 +1,11 @@
+lzsn                  relative         0.01000     0.00010  switch         2.00000  parabolic
+infilt                relative         0.01000     0.00010  switch         2.00000  parabolic
+agwrc                 relative         0.01000     0.00010  switch         2.00000  parabolic
+deepfr                relative         0.01000     0.00010  switch         2.00000  parabolic
+basetp                relative         0.01000     0.00010  switch         2.00000  parabolic
+agwetp                relative         0.01000     0.00010  switch         2.00000  parabolic
+cepsc                 relative         0.01000     0.00010  switch         2.00000  parabolic
+intfw                 relative         0.01000     0.00010  switch         2.00000  parabolic
+irc                   relative         0.01000     0.00010  switch         2.00000  parabolic
+uzsn                  relative         0.01000     0.00010  switch         2.00000  parabolic
+lzetp                 relative         0.01000     0.00010  switch         2.00000  parabolic

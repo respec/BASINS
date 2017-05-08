@@ -1,0 +1,42 @@
+<!--
+  AQUA TERRA Consultants Component Definition: ATCCompMl.dtd
+  ================================================
+  DEVELOPED BY: AQUA TERRA Consultants
+                Decatur GA
+                 
+
+  VERSION: 0.1
+
+  DESCRIPTION:
+
+
+  GENERAL INFORMATION:
+
+*-->
+
+<!--
+ATCCompMl
+A collection of Components. The ATCCompMl has the following attributes:
+  <none>
+*-->
+<!ELEMENT ATCCompMl (Component+,Remark*)>
+<!--
+  Component ...
+*-->
+  <!ELEMENT Component (Instructions,ReleaseNote*)>
+    <!ATTLIST Component 
+      Name         CDATA      #REQUIRED
+      Version      CDATA      #REQUIRED
+      Date         CDATA      #REQUIRED
+      File         CDATA      #REQUIRED
+      Size         CDATA      #IMPLIED
+      Destination  CDATA      #REQUIRED>
+           
+    <!ELEMENT Instructions (#PCDATA)>
+    <!ELEMENT ReleaseNote  (#PCDATA)>
+
+<!--
+   Remark
+   The Remark is an instance of additional comments.
+*-->
+ <!ELEMENT Remark (#PCDATA)>

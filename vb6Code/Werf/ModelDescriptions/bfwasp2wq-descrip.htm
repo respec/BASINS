@@ -1,0 +1,109 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>MODEL DESCRIPTIONS - SWAT</TITLE>
+</HEAD>
+<BODY>
+
+<B><P>BFWASP </B>(Boundary Fitted Eutrophication Modeling System)</P>
+
+<P>Model Suite: WQMAP (Water Quality Mapping and Analysis Package) </P>
+
+<P>1.  Media of Concern:  Receiving water</P>
+<P>2.  Analysis Level(s):  Screening level, detailed </P>
+<P>3.  Methods:  Deterministic  </P>
+<P>4.  Temporal Representation:  Steady-state, time-variable</P>
+<P>5.  Dimensional Capability:  1-D, 2-D, 3-D</P>
+<P>6.  Source/Release Type:  Single, multiple, constant, time-varying</P>
+<P>7.  Sources:  Point source, non-point source</P>
+<P>8.  Assessment Extent:  Near field, far field</P>
+<P>9.  Applicability to Water Body Types:  Reservoirs, lakes, streams, rivers, estuaries, coastal areas</P>
+<P>10. Type of Chemicals:  Eutrophication</P>
+<P>11. Critical Processes:  Phosphorus cycle, nitrogen cycle, phytoplankton kinetics, dissolved oxygen, benthic interactions</P>
+<P>12. Models Uses(s):</P>
+<P>Planning:  &#9;Environmental impact assessments</P>
+<P>Design:     &#9;Waste load allocations, TMDLs</P>
+<P>Regulation: &#9;Waste load allocations, TMDLs</P>
+
+<P>13. Resource Requirements</P>
+<P>Level of effort:&#9;Moderate to high</P>
+<P>Data requirements:&#9;Moderate to high</P>
+<P>Modeler expertise:&#9;Moderate to high</P>
+
+<P>14. Model Use Features:  Grid generator, GUI, linkage to GIS, linkage to water quality model</P>
+
+<P>15. Model Support:  Model documentation,  supported by developer</P>
+
+<P>16. Model Availability:  Proprietary</P>
+<FONT SIZE=2>
+</FONT><P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">&nbsp;</P>
+<P ALIGN="JUSTIFY">General Description</U>:</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">BFWASP is a multiple constituent eutrophication model incorporating the full EPA WASP EUTRO model kinetic rate equations into the transport model system. The model solves the conservation of mass equations on the boundary fitted grid and the kinetic rate equations to predict the transport and transformation of up to either state variables. The state variables are components of four basic interacting systems simulating the phosphorus cycle, the nitrogen cycle, phytoplankton kinetics and the dissolved oxygen balance. The model is configured to run in three dimensions with sediment compartments. The formulation includes benthic interactions.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">(See the WASP5 description for more details)</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model methods include the following:</P>
+</U><P ALIGN="JUSTIFY"></P>
+<B><P ALIGN="JUSTIFY">Data Management</P>
+</B><P ALIGN="JUSTIFY">For most models, input data describing the study area (land-water grid, bathymetry, and topography), boundary conditions, discharge description, model parameters and output display parameters are required. In general, spatial information input to the model is handled through the gridding module or the WQMAP Geographical Information System, (GIS), time series data through the environmental data management tools and output display through a set of menu options or icon interrogation. Model parameters/options are managed through input forms or optionally through ASCII files.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">While output varies with the model or problem of interest, the system supports plan and transect views of scalar and vector quantities. Typical displays include gridded bathymetry, concentration levels, and velocity vectors and particle distributions. In addition, models allow visualization of global mass or term balances of the constituent of concern. For predictions that are time dependent (e.g. velocity vectors, surface elevations, particle trajectories, constituent concentrations) the user interface allows single frame or animated views. In animations the user can use pause, stop, forward/reverse (fast/slow) and single step to assist in viewing the predictions.</P>
+<P ALIGN="JUSTIFY"></P>
+<B><P ALIGN="JUSTIFY">Geographic Location</P>
+</B><P ALIGN="JUSTIFY">WQMAP is supplied with one base map, or location. Additional areas may be added as enhancements to the basic system. This base map serves as the largest domain over which the model will be employed. Application locations range from small rivers, lakes and estuarine systems with scales of kilometers to bays, seas and continental shelves, with scales of tens to hundreds of kilometers. For each location a geo-referenced shoreline and bathymetry is created from either charts or electronic data. </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The user can have as many locations in the system as computer storage allows. Locations may be geographically distinct or may be embedded within an existing location at a higher resolution. The user can rapidly change from one location to another by simply pointing to the appropriate data set.</P>
+<P ALIGN="JUSTIFY"></P>
+<B><P ALIGN="JUSTIFY">Geographic Information System (GIS)</P>
+</B><P ALIGN="JUSTIFY">The embedded GIS allows the user to input, store, manipulate and display geographically referenced information. The simplified GIS has been designed to be user friendly, interactive, and fast. GIS data is often helpful in analyzing and interpreting model predictions. The GIS allows an unlimited number of geographic databases to be created each with multiple layers of data. Typical uses of the GIS include storing location names, natural resources (bird colonies, shell fishing areas, beaches, marshes, vegetation), pollutant sources, geographical reference points such as buoys and channels, and environmental data (bathymetry, sediment type, rivers and flow data etc.). Through the use of linking procedures, additional information about geographically referenced data can be accessed. These link files include charts, graphics, tables, tutorials, bibliographies, text, scanned charts, photographs, or animations. Examples of data which might be stored in the GIS for a typical sewage outfall siting problem include: contaminant source strengths versus time for the discharge, details and photographs of outfall locations and configurations, water column and sediment quality information, distribution and abundance of biota including shellfish, fish, birds, and marine mammals.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Limitations</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">Application History</P>
+</U><P ALIGN="JUSTIFY"></P>
+<B><P ALIGN="JUSTIFY">Dredging Impacts</P>
+</B><P ALIGN="JUSTIFY">A two-dimensional time dependent hydrodynamic and pollutant transport model application to predict the distribution of suspended sediments and pollutants as a result of dredging and disposal operations. Required inputs are tidal constituents at the open boundary and river flows for the hydrodynamic model. Inputs for the pollutant transport model are time varying loads simulating material release from dredging operations. Output includes contours of pollutant levels over time and maximum impacts.</P>
+<P ALIGN="JUSTIFY"></P>
+<B><P ALIGN="JUSTIFY">Fecal Coliform Exceedance</P>
+</B><P ALIGN="JUSTIFY">A three-dimensional hydrodynamic and pollutant transport model application to predict the distribution of fecal coliforms (FC). Required inputs are freshwater flows and tidal elevations for the hydrodynamic model and FC loads and decay rate for the pollutant transport model. Output is a time varying set of FC concentrations and area-time exceedances of water quality standards.</P>
+<P ALIGN="JUSTIFY"></P>
+<B><P ALIGN="JUSTIFY">Causeway Removal Impacts</P>
+</B><P ALIGN="JUSTIFY">A three-dimensional time-dependent hydrodynamic and pollutant transport model application to predict the changes in circulation and water quality from the removal of a highway causeway. Required inputs are system geometry, altered system geometry, river flow and load inputs. Outputs are, time varying velocity, numerical flushing estimates, sedimentation rates and phosphorus concentrations.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">&nbsp;</P>
+<P ALIGN="JUSTIFY">Model Use Features</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">Model Support</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Users Manual:</P>
+</I><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<I><P ALIGN="JUSTIFY">Developer/Sponsor Support:</P>
+</I><P ALIGN="JUSTIFY">The model was developed by Applied Science Associates:</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Applied Science Assoicates Inc.</P>
+<P ALIGN="JUSTIFY">70 Dean Knauss Drive</P>
+<P ALIGN="JUSTIFY">Narragansett, RI 02882-1143</P>
+<P ALIGN="JUSTIFY">401-789-6224</P>
+<P ALIGN="JUSTIFY">asa@appsci.com</P>
+<I><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Internet Resources</P>
+</I><P ALIGN="JUSTIFY">ASA’s web site is http://www.appsci.com</P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Workshops</P>
+</I><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">References</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Model documentation references</P>
+</I><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<I><P ALIGN="JUSTIFY">Application references</P>
+</I><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P></BODY>
+</HTML>

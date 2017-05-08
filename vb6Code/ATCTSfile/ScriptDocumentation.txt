@@ -1,0 +1,207 @@
+
+Wizard scripts use polish notation (Operator Argument Argument ...)
+The best way to learn how they work is to examine the sample
+scripts (*.ws) but this reference may also be helpful.
+
+Command       Example
+
+And           (And (Not EOF) (< Day 32))
+
+ATCScript     Every scripts starts: (ATCScript "Script Description"
+
+Attribute     (Attribute "Constituent" "PREC")
+
+ColumnFormat  See below
+
+Comment       (Comment "Author: Mark Gray 8 May 2000")
+
+Dataset       (Dataset Scenario "OBSERVED"
+                  Location Location
+                  Constituent Constituent
+                  Description "Summary of the Day")
+
+Date          (Date Year Month Repeat Hour "0")
+
+FatalError    (FatalError "Unknown flag found")
+
+Fill          (Fill H 1 0 -999 -998)
+              This fills in any omitted, missing, or accumulated
+              values to create a constant interval dataset
+              First arg is first letter of time units:
+                    Century, Year, Month, Hour, minute, second
+              Next arg is number of time units between values
+                    (default 1)
+              Next arg is value to fill in for omitted values
+                    (default 0)
+              Next arg is value to fill in between missing values.
+                    Missing values are those set to -999 by the script
+                    (default -999)
+              Next arg is value to fill in between accumulated values
+                    Accumulated values are those set to -998
+                    (default -998)
+
+Flag          (Flag 1) Not used by any application yet
+
+For           (For Repeat = 1 to "31"
+                   (Date Year Month Repeat)
+                   (Value Value))
+
+If            (If (= Value 999999)
+                  (Value -999))
+
+In            (If (In Value 999999 000000)
+                  (Value -999))
+
+Increment     (Increment Repeat) 
+              Sets Repeat = Repeat + 1
+
+IsNumeric     (If (IsNumeric Value)
+                  (Increment Repeat))
+
+LineEnd       (LineEnd CR)
+              Defines end of line
+Literal       "31"
+              Any string enclosed in double quotes is left alone
+
++ / * ^ -     (Set Repeat (+ Repeat 1))
+              (Value (/ Value 100))
+
+Mid           Not yet implemented
+
+NextLine      (NextLine)
+              Moves to the next line of the input file
+
+Not           (While (Not EOF) ...
+              Returns logical opposite of its argument (0, 1)
+
+Or            (If (Or EOF (> Repeat 31)) ...
+
+Set           (Set Constituent Col2)
+              Assigns value of second argument to variable named
+              by first argument. 
+ 
+Test          (Test (And (< Year 2100) (> Year 1800)))
+              If the last expression within a Test returns True
+              (True = 1) then this script will be highlighted.
+
+Trim          (Set Constituent (Trim Col2))
+              Evaluates to its argument without surrounding spaces
+
+Unset         (Unset Constituent)
+              Opposite of Set. Remove variable definition.
+
+Value         (Value Value)
+              The example is confusing - We should change one of
+              these uses of the word. The second Value is the name
+              of the column from the column definition.
+              Assigns argument to data value in current dataset at
+              current date 
+
+Warn          (Warn "Uh, oh!")
+              A message box is opened, then the script proceeds.
+
+While         (While (Not EOF) ... )
+              The first argument is evaluated for truth (0 or 1).
+              If true, the other arguments are evaluated (run)
+              and then the loop repeats.
+
+>             (If (> Repeats 31) ... )
+>=            Comparison operators evaluate to 1 if the comparison
+<             is true, 0 if it is false.
+<=
+<>
+=
+
+Fixed width ColumnFormat Example and discussion
+
+  (ColumnFormat Fixed
+                61-66:Value
+                32-35:Year
+                36-37:Month
+                59-60:Hour
+                9-31:Location
+                55-58:Constituent
+                1-8:Station
+                38-42:Latitude
+                43-48:Longitude
+                49-54:Elevation
+                59-66:Repeating)
+
+For fixed width columns, the first argument is "Fixed". 
+All other arguments are in the format columns:name. 
+Columns are numbered starting with 1 for the first character.
+Columns is either a single number indicating a single character
+position (perhaps a flag column) or a pair of numbers indicating a
+range of columns. 
+10-12 indicates a columns that includes three characters on each
+line: 10, 11, and 12. 
+10+3 indicates the same three characters and is merely an
+alternate syntax for convenience.
+
+The name which appears after the colon is how this column is
+referred to later in the script. 
+
+Repeating is a special column name. This is specified if there is
+more than one value on a line. The columns specified for Repeating
+are the first set of character positions that show the pattern. In
+the example above, 59-66:Repeating includes the colums for
+59-60:Hour and 61-66:Value so both of these columns repeat. It is
+important to get the boundaries of Repeating correct - The
+character just after the end of Repeating should correspond to the
+first character of Repeating. For example, if 50-59:repeating is
+specified, that range should include the first value on the line
+and 60-69 should contain the second value and so on. When reading
+all the values on a line, the special variable Repeat is used to
+determine which position we are looking at.
+
+For delimited columns, the first argument would be "Tab" or
+"Space" or a string of characters which are each to be treated as
+a delimiter. For an Excel spreadsheet saved as comma-separated
+values where one column is a date in the format 6/12/99, the first
+argument might be ,/ so the parts of the date will be separated
+as well as the other columns. As of May 9, 2000 the code for
+reading delimited files is not yet complete, so the discussion
+will focus on fixed-width columns.
+
+List of all words that can appear first after a right paren: 
+And
+ATCScript
+Attribute
+ColumnFormat
+Comment
+Dataset
+Date
+FatalError
+Fill
+Flag
+For
+If
+In
+Increment
+Instr
+IsNumeric
+LineEnd
+Literal
++
+/
+*
+^
+-
+Mid
+NextLine
+Not
+Or
+Set
+Test
+Trim
+Unset
+Value
+Variable
+Warn
+While
+>
+>=
+<
+<=
+<>
+=

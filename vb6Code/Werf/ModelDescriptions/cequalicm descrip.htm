@@ -1,0 +1,110 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>MODEL DESCRIPTIONS - SWAT</TITLE>
+</HEAD>
+<BODY LINK="#0000ff">
+
+<B><P>&#9;CE-QUAL-ICM</P>
+</B>
+<P>1.  Media of Concern:  Receiving water</P>
+<P>2.  Analysis Level(s):  Screening level, detailed</P>
+<P>3.  Methods:  Deterministic</P>
+<OL START=4>
+
+<LI>Temporal Representation:  Steady-state, time varying</LI>
+<LI>Dimensional Capability:  1-D, 2-D, 3-D</LI></OL>
+
+<P>6.  Source/Release Type:  Constant, time-varying, single, multiple</P>
+<P>7.  Sources: Point source, non-point source, tributary, atmospheric, sediment bed exchange</P>
+<P>8.  Assessment Extent:  Near field, far field</P>
+<P>9.  Applicability to Water Body Types:  Lakes, reservoirs, rivers, streams, estuaries, coastal areas</P>
+<P>10. Type of Constiuents:  Eutrophication, carbon, nitrogen, phosphorus, dissolved oxygen</P>
+<P>11. Critical Processes:  Nutrient cycling, primary productivity, sediment water interactions</P>
+<P>12. Models Uses(s):&#9;</P>
+<P>&#9;Planning:&#9; Evironmental impact</P>
+<P>&#9;Design:&#9; WLA, TMDL</P>
+<P>&#9;Regulation:&#9; TMDL</P>
+
+<P>13. Resource Requirements</P>
+<P>&#9;Level of effort:&#9;Moderate to high</P>
+<P>&#9;Data requirements:&#9;Moderate to high</P>
+<P>&#9;Modeler expertise:&#9;Extensive</P>
+
+<P>14. Model Use Features:  See below</P>
+
+<P>15. Model Support:  Model documentation</P>
+
+<P>16. Model Availability:  Public domain</P>
+<FONT SIZE=2>
+</FONT><U><P ALIGN="JUSTIFY">General Description</U>:</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The CE-QUAL-ICM water quality model was initially developed as one component of a model package employed to study eutrophication processes in Chesapeake Bay. Subsequent to employment in the Bay study, the model code was generalized and minor corrections and improvements were installed. </P>
+<P ALIGN="JUSTIFY">ICM stands for "integrated compartment model," which is analogous to the finite volume numerical method. The model computes constituent concentrations resulting from transport and transformations in well-mixed cells that can be arranged in arbitrary one-, two-, or three-dimensional configurations. Thus, the model employs an unstructured grid system. </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The model does not compute hydrodynamics. Flows, diffusion coefficients, and volumes must be specified externally and read into the model. For simple configurations, flows may be entered through an ASCII input file. For more advanced applications, hydrodynamics are usually obtained from a hydrodynamics model such as the CH3D-WES model. The unstructured, finite volume structure of the model was selected to facilitate linkage to a variety of hydrodynamic models. </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">There are two distinctly different development pathways to ICM: a eutrophication model (ICM), and an organic chemical model (ICM/TOXI). The release version of the eutrophication model computes 22 state variables including physical properties; multiple forms of algae, carbon, nitrogen, phosphorus, and silica; and dissolved oxygen. Recently, two size classes of zooplankton, two benthos compartments (deposit feeders and filter feeders), submerged aquatic vegetation (roots and shoots biomass), epiphytes, and benthic algae were added, although this version of the code is not generally released to the public. Each state variable may be individually activated or deactivated. One significant feature of ICM, eutrophication version, is a diagenetic sediment sub-model. The sub-model interactively predicts sediment-water oxygen and nutrient fluxes. Alternatively, these fluxes may be specified based on observations.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model methods include the following:</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Finite difference equations, using QUICKEST scheme to reduce numerical dispersion.  Transport fields can be input from off-line hydrodynamic models, such as the USACE CH3D-WES model.  Detailed specification of modern eutrophication processes and a coupled water column/sediment diagenesis-nutrient flux submodel.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Limitations</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">Application History</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The eutrophication model has been applied to a variety of sites, including: </P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>Chesapeake Bay </LI></P>
+<P ALIGN="JUSTIFY"><LI>Inland Bays of Delaware </LI></P>
+<P ALIGN="JUSTIFY"><LI>New York Bight </LI></P>
+<P ALIGN="JUSTIFY"><LI>Newark Bay </LI></P>
+<P ALIGN="JUSTIFY"><LI>New York - New Jersey Harbors and Estuaries </LI></P>
+<P ALIGN="JUSTIFY"><LI>Lower Green Bay </LI></P>
+<P ALIGN="JUSTIFY"><LI>Los Angeles - Long Beach Harbors </LI></P>
+<P ALIGN="JUSTIFY"><LI>Cache River wetland </LI></P>
+<P ALIGN="JUSTIFY"><LI>San Juan Bay and Estuaries </LI></P>
+<P ALIGN="JUSTIFY"><LI>Florida Bay </LI></P>
+<P ALIGN="JUSTIFY"><LI>Lower St. Johns River (on-going) </LI></P></UL>
+
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model Use Features</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The model computes and reports concentrations, mass transport, kinetics transformations, and mass balances. Features to aid debugging include the ability to activate or deactivate model features, diagnostic output, and volumetric and mass balances. Computations can be restarted following interruption due to computer failure or similar circumstances. CE-QUAL-ICM is coded in ANSI Standard FORTRAN F77. The model operates on a variety of platforms including 486 PC, Silicon Graphics, and Hewlett Packard workstations. A multi-processor version is available but not generally released. The user must provide processors that prepare input files and process output for presentation. </P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model Support</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Users Manual:</P>
+</I><P ALIGN="JUSTIFY">A user’s manual is available</P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Developer/Sponsor Support:</P>
+</I><P ALIGN="JUSTIFY"></P>
+<P>Point of Contact for ICM:<BR>
+Dr. Carl F. Cerco<BR>
+U.S. Army Engineer Research and Development Center, Waterways Experiment Station, Environmental Laboratory<BR>
+ATTN: CEERD-ES-Q<BR>
+3909 Halls Ferry Rd<BR>
+Vicksburg, MS 39180<BR>
+601-634-4207<BR>
+<A HREF="mailto:cercoc@wes.army.mil">cercoc@wes.army.mil</A> </P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Internet Resources</P>
+</I><P ALIGN="JUSTIFY">None.</P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Workshops</P>
+</I><P ALIGN="JUSTIFY">None.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">References</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Model documentation references</P>
+</I><P ALIGN="JUSTIFY">Carl F. Cerco, and Thomas Cole, 1995. User's Guide to the CE-QUAL-ICM Three-Dimensional Eutrophication Model, Release Version 1.0.  Technical Report EL-95-15, <I>US Army Corps of Engineers Water Experiment Station</I>, Vicksburg, MS.</P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Application references</P>
+</I><P ALIGN="JUSTIFY">Carl F. Cerco, and Thomas Cole, 1994. Three-Dimensional Eutrophication Model of Chesapeake Bay.  Technical Report EL-94-4, <I>US Army Corps of Engineers Water Experiment Station</I>, Vicksburg, MS.</P>
+<P ALIGN="JUSTIFY"></P>
+<FONT SIZE=3><P>&nbsp;</P></FONT></BODY>
+</HTML>
