@@ -1,7 +1,0 @@
-clsNLCD = 95, 21, 708, 639, C
-frmSpecifyNLCD = 28, 26, 997, 931, C, 84, -8, 513, 609, C
-UTILITY = 0, 0, 0, 0, C
-modShell = -213, 72, 630, 511, C
-modStateFips = 141, -2, 802, 671, C
-modWin32Api = 0, 0, 0, 0, C
-utilXml = 132, 132, 754, 739, C

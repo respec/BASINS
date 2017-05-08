@@ -1,6 +1,0 @@
-VBGROUP 5.0
-StartupProject=BatchGraph.vbp
-Project=..\ATCData\ATCData.vbp
-Project=..\ATCTSfile\ATCTSfile.vbp
-Project=..\ATCoCtl\ATCoCtl.vbp
-Project=..\ATCoDisp\ATCoDisp.vbp

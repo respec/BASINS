@@ -1,8 +1,0 @@
-NOQUITONERROR
-
-FILES=*.for
-COMPILE=@lf90 -ap -chk -g -co -f90 -lst -pca -sav -stchk -trace -w -wo -xref -win -c %fi
-
-LINK=@lf90 @%rf -exe %ex -fullwarn -g -win
-TARGET=C:\F90Apps\feq\src\FeqLib.exe
-

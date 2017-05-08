@@ -1,9 +1,0 @@
-REGEDIT4
-
-[HKEY_LOCAL_MACHINE\Software\Microsoft\Shared Tools\comctl32.ocx]
-"Path"="C:\\WINDOWS\\SYSTEM\\COMCTL32.OCX"
-
-[HKEY_LOCAL_MACHINE\Software\Microsoft\Shared Tools\comctl32.ocx\Clients]
-"C:\\Program Files\\Visual Studio\\VB98\\Setup\\1033\\VB98PRO.DLL"=""
-"C:\\Program Files\\Microsoft Office\\ODETools\\V9\\Setup\\1033\\ODE98ENT.DLL"=""
-

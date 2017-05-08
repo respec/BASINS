@@ -1,4 +1,0 @@
-VBGROUP 5.0
-StartupProject=TestNodes.vbp
-Project=ATCNodeFile.vbp
-Project=..\ATCoCtl\ATCoCtl.vbp

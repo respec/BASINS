@@ -1,9 +1,0 @@
-CShape_IO = 44, 50, 905, 892, C
-clsCSV = 88, 88, 778, 573, C
-clsDBF = 29, 33, 882, 710, C
-clsPCSFacility = -170, 160, 769, 940, C
-ShapeDefines = 176, 176, 637, 664, C
-UTILITY = 66, 66, 751, 301, C
-modPCSshape = 139, -1, 1009, 731, C
-modWin32Api = 0, 0, 0, 0, C
-utilXml = 66, 66, 748, 615, C

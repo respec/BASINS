@@ -1,9 +1,0 @@
-VBGROUP 5.0
-Project=..\ATCoDisp\ATCoDisp.vbp
-Project=..\ATCoTSdisp\ATCoTSDisp.vbp
-Project=..\ATCoCtl\ATCoCtl.vbp
-Project=..\ATCTSfile\ATCTSfile.vbp
-Project=..\ATCData\ATCData.vbp
-Project=..\ATCoFeedback\ATCoFeedback.vbp
-StartupProject=TimeseriesExample.vbp
-Project=BCtserGDB.vbp

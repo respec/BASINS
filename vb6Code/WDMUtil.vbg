@@ -1,8 +1,0 @@
-VBGROUP 5.0
-StartupProject=WDMUtil\WDMUtil.vbp
-Project=ATCoCtl\ATCoCtl.vbp
-Project=ATCoDisp\ATCoDisp.vbp
-Project=ATCData\ATCData.vbp
-Project=ATCTSfile\ATCTSfile.vbp
-Project=ATCoTSdisp\ATCoTSDisp.vbp
-Project=ATCoFeedback\ATCoFeedback.vbp

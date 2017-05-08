@@ -1,9 +1,0 @@
-utilRegister = 0, 0, 0, 0, C
-modUpdateCheck = -143, -2, 802, 778, 
-UTILITY = 132, 132, 880, 495, 
-modUpdateWin32 = 17, 107, 722, 494, 
-frmCheckBoxes = 132, 132, 817, 619, , 154, 154, 839, 641, C
-modCompareComponents = 132, 187, 858, 586, Z
-utilXml = 0, 0, 0, 0, C
-utilAdmin = 0, 0, 0, 0, C
-frmUpdates = 33, 5, 923, 502, C, 340, -3, 1066, 441, C
