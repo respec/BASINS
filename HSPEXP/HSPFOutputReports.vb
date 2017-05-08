@@ -820,7 +820,8 @@ RWZProgramEnding:
                     Dim skipGraph As Boolean = False
 
                     Do While (lGraphDataset(0).ToLower = "left" Or lGraphDataset(0).ToLower = "right" Or
-                        lGraphDataset(0).ToLower = "aux" Or lGraphDataset(0).ToLower = "regression" Or lGraphDataset(0).ToLower = "45-deg line" Or skipGraph)
+                        lGraphDataset(0).ToLower = "aux" Or lGraphDataset(0).ToLower = "regression" Or lGraphDataset(0).ToLower = "45-deg line" Or
+                        lGraphDataset(0).ToLower = "add" Or lGraphDataset(0).ToLower = "multiply" Or skipGraph)
 
 
                         'For CurveNumber As Integer = 1 To lNumberOfCurves
@@ -903,7 +904,7 @@ RWZProgramEnding:
 
 
                             Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
-                            lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
+
 
                             If (lGraphDataset.GetUpperBound(0) > 10 AndAlso Not String.IsNullOrEmpty(Trim(lGraphDataset(10)))) Then
                                 lTimeSeries = AggregateTS(lTimeSeries, Trim(lGraphDataset(10)).ToLower, Trim(lGraphDataset(11)).ToLower)
@@ -937,8 +938,23 @@ RWZProgramEnding:
 
                             End If
 
+                            If Trim(lGraphDataset(0)).ToLower = "add" Then
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1) = lTimeseriesGroup(lTimeseriesGroup.Count - 1) + lTimeSeries
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("Constituent", "Sum")
 
-                            lTimeseriesGroup.Add(lTimeSeries)
+                            ElseIf Trim(lGraphDataset(0)) = "multiply" Then
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1) = lTimeseriesGroup(lTimeseriesGroup.Count - 1) * lTimeSeries
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("Constituent", "Product")
+                            Else
+                                lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
+                                lTimeseriesGroup.Add(lTimeSeries)
+                            End If
+
+
+
+
+
+
                         Else
                             Logger.Msg("Could not open '" & lDataSourceFilename & "' Aborting Graphing.", MsgBoxStyle.OkOnly, "HSPEXP+")
                             Exit Do
