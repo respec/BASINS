@@ -1,0 +1,15 @@
+<ATCCompMl>
+    <Component
+        File="BASINS3.1update1"
+        Version="1"
+        Date="09/01/2004 3:14:01 pm"
+        Size="737"
+        Name="BASINS3.1update1"
+        Destination="{app}\cache">
+        <ReleaseNote>BASINS 3.1 update 1 - updates GIRAS landuse download name</ReleaseNote>
+        <Instructions>
+          Get "http://hspf.com/pub/basins3/updates/BASINS3.1update1" "{app}\cache\BASINS31update1"
+          Copy "{app}\cache\BASINS31update1" "{app}\etc\DataDownload\ATCWebDataBasins.xml"
+        </Instructions>
+    </Component>
+</ATCCompMl>

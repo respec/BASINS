@@ -1,0 +1,3 @@
+VBGROUP 5.0
+StartupProject=ParseVB.vbp
+Project=..\ATCoCtl\ATCoCtl.vbp

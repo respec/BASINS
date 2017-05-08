@@ -1,0 +1,13 @@
+UTILITY = 0, 0, 672, 400, C
+modStateFips = 154, 154, 775, 600, C
+clsATCTable = 13, 138, 767, 553, C
+clsATCTableDBF = 33, 0, 855, 673, C
+clsATCTableRT1 = 44, 44, 665, 468, C
+clsATCTableRT2 = 70, 26, 691, 450, C
+modMain = 66, 66, 643, 566, C
+ShapeDefines = 3, 5, 678, 307, C
+CShape_IO = 41, 20, 890, 686, 
+frmTIGER = 6, 3, 769, 618, Z, 6, 3, 604, 545, C
+clsATCTableBin = 126, 25, 747, 449, C
+modHUCFIPS = 184, 63, 805, 509, C
+clsATCTableCSV = 11, 147, 892, 667, C

@@ -1,0 +1,50 @@
+
+Todd has added some documentation in the source code for this
+control. If the following documentation is not enough, I suggest 
+browsing through the source code or talking with Todd.
+
+When you are populating the control, these are the
+important parts:
+
+.maxFields
+ The maximum number of fields per view. Set this before calling
+ Clear. The default value is 100, so you will probably not need to
+ set a different one.
+ Example:
+        .maxFields = 100
+
+.nViews
+ The number of views to be displayed. Must be set before calling
+ Clear. 
+ Example:
+        .nViews = 10
+
+.Clear 
+ Removes all the strings from the control and allocates internal
+ arrays for storing view and field names.
+ Example:
+        .Clear
+
+.nFields (view As Long) As Long
+ Number of fields in each view. Must be set after calling Clear.
+ Example:
+        .nFields(1) = 2   'First view contains two fields
+
+.Views(I As Long)
+ An array of view names to be displayed. Start with Views(1).
+ Example: 
+        .Views(1) = "Site"
+        .Views(2) = "WUSite"
+
+.Fields(view As long, field As long, newvalue As string)
+ A two-dimensional array of strings in the control
+ indexed by view and field.
+ Example:
+        .Fields(1, 1) = "SiteID"
+        .Fields(1, 2) = "SiteName"
+ 
+.InitLists
+ Puts all the view and field names in the tree control.
+ Call this after setting all Views and Fields.
+ Example:
+        .InitLists

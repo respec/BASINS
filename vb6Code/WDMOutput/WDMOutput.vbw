@@ -1,0 +1,10 @@
+WDMMain = 142, 102, 698, 584, 
+frmWDMOut = 64, 18, 740, 547, , 97, -7, 853, 522, C
+UtilDate = 132, 132, 1228, 801, C
+UtilDateExt = 0, 0, 0, 0, C
+UTILITY = 14, 168, 1182, 847, C
+modWin32Api = 0, 0, 0, 0, C
+HassLibs = 161, 161, 1125, 793, C
+clsDBF = -293, 20, 717, 800, C
+utilTSerData = 0, 0, 0, 0, C
+UtilBrowseFolder = 0, 0, 0, 0, C

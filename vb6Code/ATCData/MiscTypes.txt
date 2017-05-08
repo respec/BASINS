@@ -1,0 +1,21 @@
+
+
+Public Type ATCPlugIn
+  'Use CreateObject(PluginName & "." & ClassName) to instantiate
+  PluginName As String 'Name of ocx/dll
+  ClassName As String  'Name of this object
+  Version As String    'String to identify version of PlugIn
+  Label As String      'Label for use in interface, defaults to catalog label
+  PluginType As String 'Name of interface implemented
+  id As Long           'counter of created plugins
+  obj As Object        'instantiated object
+End Type
+
+Private Type ATCdetailEXEtype
+  label As String
+  Value As String
+  filter As String
+  isFile As Boolean
+  isOutput As Boolean
+  isOnCommandline As Boolean
+End Type

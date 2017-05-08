@@ -1,0 +1,9 @@
+frmMain = 71, -2, 873, 709, C, 6, 240, 648, 768, C
+clsXMLelement = 24, -1, 844, 699, C
+UTILITY = 15, 71, 856, 608, C
+modDatabaseMain = 18, 4, 862, 709, 
+modWin32Api = 110, 110, 843, 617, C
+UtilShape = 44, 44, 843, 409, 
+clsDBF = 66, 66, 843, 523, C
+clsGeoDatabase = 16, 0, 863, 700, 
+frmSelectLayers = 164, 173, 800, 622, , 9, 57, 373, 585, C

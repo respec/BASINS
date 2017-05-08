@@ -1,0 +1,33 @@
+
+Grid controls are used in several places for displaying tabular
+data. In some grids an entire row is selected as a unit while
+others allow selection of individual cells. The text from
+currently selected cells can be copied to the clipboard by
+pressing Control-C. This text can be pasted into another grid,
+into a different part of the same grid, or into an external
+program such as Excel by selecting the target location and
+pressing Control-V. Data can be copied from an external program
+into an editable grid in the same way.
+<p>
+If the selected target location has fewer rows than the copied
+text, the last rows of the copied text will not be pasted. If the
+selected target location has more rows than the text that was
+copied, extra rows will be filled with additional copies of the
+text as necessary.
+<p>
+Some fields in some grids are editable. Some fields are edited by
+typing a new value, others are changed by selecting a new value
+from a drop-down list. To edit a field, select that field and
+press Enter or simply begin to type the new value. If a drop-down
+list appears, a selection can be made using the mouse or using the
+up and down arrows on the keyboard. Press Enter to finish editing
+the value or press Esc to revert to the old value.
+<p>
+Some editable fields have soft and/or hard limits for acceptable
+values. The tool tip feature displays these limits while editing a
+value. If a value being entered is outside the soft limits, the
+background of the cell will be colored yellow to alert the user,
+but no other actions are taken. If a value is outside the hard
+limits or is incorrectly formatted, the background will be colored
+red. If the user presses Enter while the background is red, the
+value is changed back to the last acceptable value.

@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE ATCCompMl SYSTEM "http://hspf.com/pub/download/ATCCompMl.dtd">
+<ATCCompMl>
+  <Component 
+    File="WebDataUSGSSite.dll" 
+    Version="1.5" 
+    Date="9/19/2002"
+    Name="WebDataUSGSSite"
+    Destination="c:\vbexperimental\update\ComponentXML">
+    <Instructions>
+       Get "ftp..."
+       Delete...
+       Register...
+    </Instructions>
+    <ReleaseNote>
+       Update to version 1.4
+       Fixes bug with yyy
+    </ReleaseNote>
+  </Component>
+</ATCCompMl>

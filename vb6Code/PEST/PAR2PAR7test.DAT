@@ -1,0 +1,43 @@
+* parameter data
+irctrans =  6.0684240E+00
+lzsn     =  5.9380510E+00
+infilt   =  6.9954478E-02
+nsurav   =  2.0802030E-01
+fnsurvar =  1.6670270E-01
+uzsnav   =  1.9073540E+00
+fuzsnvar =  2.5045750E-01
+kger     =  6.8605710E-01
+jger     =  1.1254440E+00
+nsurvar  = fnsurvar*nsurav
+uzsnvar  = fuzsnvar*uzsnav
+irc      = irctrans/(1+irctrans)
+nsur1    = nsurav + nsurvar*sin((0  -270)*.01721)
+nsur2    = nsurav + nsurvar*sin((31 -270)*.01721)
+nsur3    = nsurav + nsurvar*sin((60 -270)*.01721)
+nsur4    = nsurav + nsurvar*sin((91 -270)*.01721)
+nsur5    = nsurav + nsurvar*sin((121-270)*.01721)
+nsur6    = nsurav + nsurvar*sin((152-270)*.01721)
+nsur7    = nsurav + nsurvar*sin((182-270)*.01721)
+nsur8    = nsurav + nsurvar*sin((213-270)*.01721)
+nsur9    = nsurav + nsurvar*sin((244-270)*.01721)
+nsur10   = nsurav + nsurvar*sin((274-270)*.01721)
+nsur11   = nsurav + nsurvar*sin((305-270)*.01721)
+nsur12   = nsurav + nsurvar*sin((335-270)*.01721)
+uzsn1    = uzsnav + uzsnvar*sin((0  -270)*.01721)
+uzsn2    = uzsnav + uzsnvar*sin((31 -270)*.01721)
+uzsn3    = uzsnav + uzsnvar*sin((60 -270)*.01721)
+uzsn4    = uzsnav + uzsnvar*sin((91 -270)*.01721)
+uzsn5    = uzsnav + uzsnvar*sin((121-270)*.01721)
+uzsn6    = uzsnav + uzsnvar*sin((152-270)*.01721)
+uzsn7    = uzsnav + uzsnvar*sin((182-270)*.01721)
+uzsn8    = uzsnav + uzsnvar*sin((213-270)*.01721)
+uzsn9    = uzsnav + uzsnvar*sin((244-270)*.01721)
+uzsn10   = uzsnav + uzsnvar*sin((274-270)*.01721)
+uzsn11   = uzsnav + uzsnvar*sin((305-270)*.01721)
+uzsn12   = uzsnav + uzsnvar*sin((335-270)*.01721)
+
+* template and model input files
+example7.tpl example7.sup
+
+* control data
+single point

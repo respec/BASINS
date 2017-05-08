@@ -1,0 +1,17 @@
+clsUSGSdaily = 13, 44, 851, 724, C
+frmShapeAttributes = 9, 4, 793, 695, C, 242, 242, 837, 739, C
+clsUSGSsite = 134, 152, 923, 614, C
+frmCriteria = 41, 77, 998, 882, , 66, 66, 761, 563, C
+clsWebDataManager = 81, 26, 1131, 727, 
+modWebDataManager = 235, 325, 830, 822, C
+frmDownload = 0, 0, 0, 0, C, 0, 0, 0, 0, C
+modStandaloneMain = 67, 132, 881, 629, 
+clsDBF = 220, 220, 892, 819, C
+clsWebData = 0, 0, 0, 0, C
+modWin32Api = 22, 22, 805, 508, C
+UTILITY = 0, 0, 0, 0, C
+modShell = 44, 44, 827, 530, C
+UtilWindow = 0, 0, 0, 0, C
+UtilBrowseFolder = 198, 198, 870, 797, C
+frmMultiple = 0, 0, 0, 0, C, 22, 22, 813, 312, C
+modStateFips = 415, 185, 1087, 784, C

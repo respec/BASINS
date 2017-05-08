@@ -1,0 +1,9 @@
+modShapeMerge = 45, 19, 661, 634, 
+clsDBF = 44, 44, 616, 448, C
+UTILITY = 0, 0, 0, 0, C
+ShapeDefines = 132, 132, 1006, 747, C
+CShape_IO = 8, 0, 780, 648, 
+frmShapeUtil = 0, 0, 0, 0, C, 44, 44, 919, 659, C
+modShapeProject = 17, 38, 659, 483, 
+modShapeDump = 108, 14, 724, 629, 
+modMain = 29, 22, 700, 506, C

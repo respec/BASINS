@@ -1,0 +1,213 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>MODEL DESCRIPTIONS - SWAT</TITLE>
+</HEAD>
+<BODY>
+
+<B><P>GLLVHT </B>(Generalized, Longitudinal-Lateral-Vertical Hydrodynamics and Transport)</P>
+
+<P>1.  Media of Concern:  Receiving water</P>
+<P>2.  Analysis Level(s):  Screening level, detailed</P>
+<P>3.  Methods:  Deterministic  </P>
+<P>4.  Temporal Representation:  Steady-state, time variable</P>
+<P>5.  Dimensional Capability:  3-D</P>
+<P>6.  Source/Release Type:  Constant, time varying, single, multiple</P>
+<P>7.  Sources:  Point sources, non-point sources</P>
+<P>8.  Assessment Extent:  Near field, far field</P>
+<P>9.  Applicability to Water Body Types:  Rivers, streams, lakes, reservoirs, estuarine and coastal water</P>
+<P>10. Type of Constituents:  Eutrophication</P>
+<P>11. Critical Processes:  Water quality constituent concentrations</P>
+<P>12. Models Uses(s):&#9;</P>
+<P>&#9;Planning:&#9; </P>
+<P>&#9;Design:&#9; </P>
+<P>&#9;Regulation:&#9; </P>
+
+<P>13. Resource Requirements&#9;</P>
+<P>&#9;Level of effort:&#9;&#9;Moderate to high</P>
+<P>&#9;Data requirements:&#9;Moderate to high</P>
+<P>&#9;Modeler expertise:&#9;Moderate to extensive</P>
+
+<P>14. Model Use Features:&#9; Grid generation, 3-D visualization/animation, GUI</P>
+
+<P>15. Model Support:  Model documentation</P>
+
+<P>16. Model Availability:  Proprietary</P>
+
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">General Description</U>:</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">GLLVHT (Generalized, Longitudinal-Lateral-Vertical Hydrodynamic and Transport) is a FORTRAN code that computes time-varying velocities, water surface elevations, and water quality constituent concentrations in rivers, lakes, reservoirs, estuaries, and coastal waterbodies. The computations are done on a horizontal and vertical grid that represents the waterbody bounded by its water surface, shoreline, and bottom. The water surface elevations are computed simultaneously with the velocity components. The water quality constituent concentrations are computed from the velocity components and elevations. Included in the computations are boundary condition formulations for friction, wind shear, turbulence, inflow, outflow, surface heat exchange, and water quality kinetics.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The flow and constituent fields are discretized in time, and the computation marches forward in time steps of 100 s to 900 s, computing the dependent variables throughout the grid at each of these steps. To march the calculations through time, boundary condition data consisting of meteorological data; inflow rates, temperatures, and constituent concentrations; and outflow rates are required. These boundary conditions data have been assembled as separate input files and are described in this user guide.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Output from the model is in the form of text files (also known as ASCII files). Some of these output files are designed in such a way that the user directly import these files in any spreadsheet software such as Excel to do further post processing. Also, some of these output files are specially designed for use in 3-D visualization software called Qual View (Buchak et al., 1997). </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The theoretical basis of the three dimensional Generalized, Longitudinal-Lateral-Vertical Hydrodynamic and Transport (GLLVHT) model was first presented in Edinger and Buchak (1980) and subsequently in Edinger and Buchak (1985). GLLVHT provides three-dimensional, time-varying simulations of rivers, lakes, impoundments, estuaries and coastal water bodies. The GLLVHT model has been peer reviewed and published (Edinger and Buchak, 1995, Edinger, et al., 1994 and 1996). The fundamental computations are an extension of the well known longitudinal-vertical transport model (GLVHT) that was developed by J. E. Edinger Associates, Inc. beginning in 1974 and summarized in Buchak and Edinger (1984). </P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model methods include the following:</P>
+</U><P ALIGN="JUSTIFY"></P>
+<STRONG><P ALIGN="JUSTIFY">Numerical Schemes</P>
+</STRONG><P ALIGN="JUSTIFY">The semi-implicit integration procedure has the advantage that computational stability is not limited by the Courant condition that Dx/Dt, Dy/Dt &lt; (gh<SUB>m</SUB>)<SUP>1/2</SUP> where h<SUB>m</SUB> is the maximum water depth that can lead to inefficiently small time steps of integration. Since the solutions are semi-implicit (for example, explicit in the constituent transport and the time lagged momentum terms) the stability is controlled by the Torrence condition (UDt/Dx, VDt/Dy &lt; 1). Hence, the integration time step can be chosen to realistically represent the details of the boundary data which is about 15 minutes for tides and up to one hour for meteorological data. </P>
+<P ALIGN="JUSTIFY">Transport computation is explicit in time. It is developed so that transport coefficients can be computed once and used for all constituents during that time step at a given "n", "k" location. The solution time is not too sensitive to the number of constituents being examined. Constituent computations are performed using a higher order transport scheme. This scheme uses second order upwind differencing following the method of Mei and Plotkin (1985). The scheme includes an adjustment factor to account for "undershoots" and "overshoots" that normally occurs in any higher order scheme in the presence of sharp gradients. The adjustment factor is computed using local second order and first order gradients similar to ULTIMATE (1988).</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The model is built to accept a large number of transport constituents and constituent relationships. The basic parameter obtained from the water quality model is the constituent flux, H(n,k,nc). For example H(n,k,4) = -KR<SUB>4</SUB>*C(n,k,4)*dxdydz for the decay of constituent 4. Dxdydz is the volume of the grid cell and KR<SUB>4</SUB> is the decay constant. </P>
+<P ALIGN="JUSTIFY"></P>
+<STRONG><P ALIGN="JUSTIFY">Numerical Configuration</P>
+</STRONG><B><I><P ALIGN="JUSTIFY">Grid and coordinate transformations</P>
+</B></I><P ALIGN="JUSTIFY">Rectilinear (quasi-curvilinear) grid for mapping to different detail in different parts of a waterbody.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Space staggered finite difference grid; elevations and constituent concentrations at cell centers, velocities through cell interfaces; this scheme facilitates implementation of control volume approach resulting in perfect water balance.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Z-level fixed layer in the vertical direction, but no transformation; this approach facilitates implementation of the layer cell add and subtract algorithm; different thickness layers with depth; can use thicker layers in deeper water.</P>
+<P ALIGN="JUSTIFY"></P>
+<B><I><P ALIGN="JUSTIFY">Wetting and drying</P>
+</B></I><P ALIGN="JUSTIFY">The basic model variable for water surface elevation, Z, is relative to a local datum at the top of a fixed horizontal layer, KT. When the water surface rises so that it enters a new layer, the current thick layer is divided into two, Z is modified and KT is decremented by 1. The reverse action is taken on falling water surface. When the rising surface floods dry cells, they are also activated (and deactivated when dried again). Wetting and drying is important to account for tidal flats and wetlands.</P>
+<P ALIGN="JUSTIFY"></P>
+<B><I><P ALIGN="JUSTIFY">Time step</P>
+</B></I><P ALIGN="JUSTIFY">Variable time step based on Torrence limitation (see description section for more details); typical time step for 3-D baroclinic circulation is approximately 15 minutes.</P>
+<P ALIGN="JUSTIFY"></P>
+<B><I><P ALIGN="JUSTIFY">Array structure</P>
+</B></I><P ALIGN="JUSTIFY">Hydrodynamic variables identified by surface cell number "n" and vertical layer "k" as for example U(n,k),V(n,k),W(n,k),Az(n,k). Constituent and water quality variables identified with a water quality constituent number, "nc", as C(n,k,nc). Reduces array storage and simplifies computational loops.</P>
+<P ALIGN="JUSTIFY"></P>
+<B><I><P ALIGN="JUSTIFY">Solution method</P>
+</B></I><P ALIGN="JUSTIFY">GLLVHT used a family of fully implicit schemes, either the banded matrix solver (small grids) or the preconditioned conjugate gradient, successive over relaxation, or modified strongly implicit methods (large grids). After performing a series of numerical experiments on conventional problems as well as real world applications, the preconditioned conjugate gradient method is the ultimate solution method used in GLLVHT because of its less computer storage, CPU time and high convergence speed.</P>
+<P ALIGN="JUSTIFY"></P>
+<B><I><P ALIGN="JUSTIFY">Sources, sinks and specific momentum</P>
+</B></I><P ALIGN="JUSTIFY">Discharges/Intakes (e.g. river inflows, outfalls, marine disposals, thermal intakes and discharges etc.) are introduced as sources/sinks to the continuity and transport equations; in addition, sub grid scale jet discharge can be accommodated using a source term for the momentum equations as discussed in the description section. Sources and sinks for continuity equation are applied using the flow rate variable Q(n,k) and for transport equations using the constituent flux variable, H(n,k,nc). Constituent fluxes are also computed from water quality routines.</P>
+<P ALIGN="JUSTIFY"></P>
+<STRONG><P ALIGN="JUSTIFY">Program Structure </P>
+</STRONG><P ALIGN="JUSTIFY">The unique design of GLLVHT gives the user the power of writing adaptation routines to introduce different initial conditions, time variant boundary conditions, replace existing algorithms for source and sink computations related to water quality, sediment transport etc. and nonstandard features or customize the output. In this scheme the main kernel of GLLVHT behaves like a black box.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Efficient routines for specifying input time varying data to the model such as meteorological data, inflows, discharge loads, time series boundary data using standards formats (e.g., Microsoft Excel csv format).</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Separate control switches and input "cards" for hydrodynamics and water quality constituents. Examples of input cards for hydrodynamics include specifying time of beginning and ending computations; types of outputs and their starting and ending times and frequencies; location and characteristics of inflows, discharges and intakes including recirculation coupling; control cards for water quality routines include in addition specification of rate parameters and specifying different combinations of constituents that might be required for a particular simulation.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The design structure of GLLVHT is very flexible to accommodate different three dimensional water quality models. Examples include 1) EPA’s EUTRO and the Corps’ CE-QUAL-ICM (Integrated Compartment Model), sources of water quality kinetics routines; 2) JEEAI’s GITF (Generalized, Integrated Transport and Fate), an integrated plume and particle tracking model for near-, intermediate-, and far-field scales;3) JEEAI’s Qual View, Windows NT/95 visualization package that displays data and model results in three-dimensions that allows including different three dimensional water quality models in GLLVHT (Buchak et al. 1997).<B><FONT COLOR="#0000ff"> </P>
+</B></FONT><P ALIGN="JUSTIFY"></P>
+<STRONG><P ALIGN="JUSTIFY">Programming Language and Operating System </P>
+</STRONG><P ALIGN="JUSTIFY">GLLVHT is written in FORTRAN 90 and uses Microsoft FORTRAN Power Station compiler that runs on Windows NT and Windows 95 operating systems. Soon, the entire program will be ported to Visual FORTRAN from Digital Corporation and is fully compatible with Microsoft current FORTRAN compilers and it can be run on Microsoft’s Visual Studio operating system. Visual FORTRAN is a fully optimized compiler compared to FORTRAN power station which means less CPU time for model simulations. We have also developed add-on tools for GLLVHT that takes advantage of multi language programming (e.g. linking Visual Basic or Visual C++ with FORTRAN) available in FORTRAN Power Station and Visual FORTRAN. </P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Limitations</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The turbulence is modeled by Prandtl mixing length.</P>
+<U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Application History</P>
+</U><P ALIGN="JUSTIFY"></P>
+<B><I><U><P ALIGN="JUSTIFY">Sterling Harbor, Texas</B></I></U> (a tidally driven embayment with industrial discharges for water quality investigations)</P>
+<B><I><U><P ALIGN="JUSTIFY">Grand Lake, New Brunswick</B></I></U> (a wind driven lake proposed for use as a cooling water source for a fossil-fueled generating station)</P>
+<B><I><U><P ALIGN="JUSTIFY">Patuxent River Estuary, Maryland</B></I></U> (a tidally driven estuary with generating station intake and discharge, larval entrainment and water quality)</P>
+<B><I><U><P ALIGN="JUSTIFY">Belledune Harbor, New Brunswick</B></I></U> (an open coastal waterbody proposed for generating station development)</P>
+<B><I><U><P ALIGN="JUSTIFY">Nechako Reservoir, British Columbia</B></I></U> (a section of the reservoir adjacent to the outlet for thermocline drawdown studies)</P>
+<B><I><U><P ALIGN="JUSTIFY">East Waterway, Everett, Washington</B></I></U> (a harbor open to the Puget Sound in which numerical dilution studies were performed)</P>
+<B><I><U><P ALIGN="JUSTIFY">Farley Storage Pond, Dothan, Alabama</B></I></U> (a pond used as the ultimate heat sink at a two unit nuclear generating station for which thermal performance was evaluated)</P>
+<B><I><U><P ALIGN="JUSTIFY">Webber Cove-Barbara Weit Estuary</B></I></U>, Prince Edward Island (coliforms, BOD and dissolved oxygen deficit studies for a waste treatment plant upgrade and new discharge location at a food processing facility)</P>
+<B><I><U><P ALIGN="JUSTIFY">Moller Bay, Alaska</B></I></U> (a major estuary open to the Bering Sea; larval transport and fate of Pacific herring, King crab and Sand lance)</P>
+<B><I><U><P ALIGN="JUSTIFY">Delaware Estuary, Wilmington, Delaware</B></I></U> (jet discharge from a power plant cooling tower blowdown for shoreline plume studies)</P>
+<B><I><U><P ALIGN="JUSTIFY">Baltimore Harbor, Maryland</B></I></U> (study of intake entrainment and exchange of harbor with the bay)</P>
+<B><I><U><P ALIGN="JUSTIFY">Candarli Korfezi</B></I></U> (on the Aegean Sea), Turkey (transport and exchange of waste heat from the Aliaga Thermal Station)</P>
+<B><I><U><P ALIGN="JUSTIFY">Clinton Lake, Illinois</B></I></U> (embedding GLLVHT into GLVHT for detailed three-dimensional plume description)</P>
+<B><I><U><P ALIGN="JUSTIFY">Du Pont Cooper River Plant, Cooper River, South Carolina</B></I></U> (dilutions of intermediate- and far-field wastewater discharge). </P>
+<B><I><U><P ALIGN="JUSTIFY">Sheldon Point, Saint John Harbour, New Brunswick</B></I></U> (open boundary case on the Bay of Fundy for water quality impact of proposed wastewater outfall)</P>
+<B><I><U><P ALIGN="JUSTIFY">Comanche Peak, Texas</B></I></U> (safe shutdown cooling analysis for an additional nuclear generating unit)</P>
+<B><I><U><P ALIGN="JUSTIFY">Humboldt River, Nevada</B></I></U> (three dimensional plume resulting from mixing of tributary into main river)</P>
+<B><I><U><P ALIGN="JUSTIFY">Honolulu, Hawaii</B></I></U> (submerged deep water coastal outfall)</P>
+<B><I><U><P ALIGN="JUSTIFY">Lake Sinclair, Georgia</B></I></U> (embedding GLLVHT into GLVHT for detailed three-dimensional plume descriptions to examine intake and discharge alternatives)</P>
+<B><I><U><P ALIGN="JUSTIFY">Delaware Bay-Artificial Island, New Jersey</B></I></U> (study of effects of surface cooling and wind shear on three dimensional plume sizes)</P>
+<B><I><U><P ALIGN="JUSTIFY">San Diego Bay, CA</B></I></U> (Thermal discharge analysis for detailing monitoring study)</P>
+<B><I><U><P ALIGN="JUSTIFY">Courtney Bay, Saint John New Brunswick</B></I></U> (water quality impact of proposed wastewater outfall)</P>
+<B><I><U><P ALIGN="JUSTIFY">Mactaquac Reservoir, Saint John, New Brunswick</B></I></U> (Discharge dilutions and reservoir flow field and dispersion for use in extended water quality computations)</P>
+<B><I><U><P ALIGN="JUSTIFY">Brooklyn Navy Yard, New York</B></I></U> (proposed cooling water discharge for co-generation plant)</P>
+<B><I><U><P ALIGN="JUSTIFY">Hackensack River-Estuary, New Jersey</B></I></U> (embedding GLLVHT into GLVHT for detailed three-dimensional plume description)</P>
+<B><I><U><P ALIGN="JUSTIFY">Lake Robinson, South Carolina</B></I></U> (existing cooling lake)</P>
+<B><I><U><P ALIGN="JUSTIFY">Cayuga Lake, New York</B></I></U> (entrainment of mysid shrimp for proposed air conditioning chiller facility)</P>
+<B><I><U><P ALIGN="JUSTIFY">Gastineau Channel, Juneau Alaska</B></I></U> (proposed outfall to deep estuary, and estuarine flushing characteristics)</P>
+<B><I><U><P ALIGN="JUSTIFY">Stephens Passage, Alaska</B></I></U> (proposed mine tailings outfall, sediment distributions and sediment build-up rate)</P>
+<B><I><U><P ALIGN="JUSTIFY">Delaware River-Estuary</B></I></U> (analysis of effects of thermal discharges on dissolved oxygen)</P>
+<B><I><U><P ALIGN="JUSTIFY">Miramichi River-Estuary, New Brunswick</B></I></U> (water quality analysis of paper mill outfall and expansion)</P>
+<B><I><U><P ALIGN="JUSTIFY">California Coast near Encina</B></I></U> (Study of bottom impingement of a thermal plume from a power plant).</P>
+<B><I><U><P ALIGN="JUSTIFY">Thames River-Estuary, Connecticut</B></I></U> (Thermal and toxics simulations for planning field surveys)</P>
+<B><I><U><P ALIGN="JUSTIFY">Restigouche-River Estuary, New Brunswick</B></I></U> (proposed discharge dye dilution simulations for planning field surveys)</P>
+<B><I><U><P ALIGN="JUSTIFY">Lake Sinclair, Georgia</B></I></U> (Inclusion of Beaverdam Creek, Little River and a 3.6 km segment of the Oconee River to examine time for recirculation, dilution mitigation, and examination of new permit standards)</P>
+<B><I><U><P ALIGN="JUSTIFY">Lake Sinclair, Georgia</B></I></U> (Detailed study of Beaverdam Creek to examine cooling tower options for meeting temperature and dissolved oxygen limits)</P>
+<B><I><U><P ALIGN="JUSTIFY">Friars Bay, Campobello Island</B></I></U> (Examination of transport of parasites and other water quality effects between fish rearing pens within the bay)</P>
+<B><I><U><P ALIGN="JUSTIFY">Budd Inlet, Puget Sound</B></I></U> (Preliminary simulations to identify locations for velocity measurements, and for setting up and testing of boundary conditions)</P>
+<B><I><U><P ALIGN="JUSTIFY">Budd Inlet, Puget Sound</B></I></U> (Complete setup for hydrodynamics and water quality modeling)</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model Use Features</P>
+</U><P ALIGN="JUSTIFY"></P>
+<STRONG><P ALIGN="JUSTIFY">Key Features of GLLVHT:</P>
+
+<UL>
+</STRONG><P ALIGN="JUSTIFY"><LI>three-dimensional finite difference </LI></P>
+<P ALIGN="JUSTIFY"><LI>curvilinear/rectilinear grid with z-plane </LI></P>
+<P ALIGN="JUSTIFY"><LI>barotropic and baroclinic terms </LI></P>
+<P ALIGN="JUSTIFY"><LI>implicit solution scheme </LI></P>
+<P ALIGN="JUSTIFY"><LI>conjugate gradient solution </LI></P>
+<P ALIGN="JUSTIFY"><LI>auto-stepping time step </LI></P>
+<P ALIGN="JUSTIFY"><LI>layer and cell addition and subtraction </LI></P>
+<P ALIGN="JUSTIFY"><LI>mixing length and turbulence sub-model </LI></P>
+<P ALIGN="JUSTIFY"><LI>advanced open boundary condition </LI></P>
+<P ALIGN="JUSTIFY"><LI>internal boundary condition </LI></P>
+<P ALIGN="JUSTIFY"><LI>term-by-term surface heat exchange </LI></P>
+<P ALIGN="JUSTIFY"><LI>eutrophication model modified from EPA's WASP5 </LI></P>
+<P ALIGN="JUSTIFY"><LI>particle trajectory </LI></P>
+<P ALIGN="JUSTIFY"><LI>sediment transport </LI></P>
+<P ALIGN="JUSTIFY"><LI>automatic grid generation </LI></P>
+<P ALIGN="JUSTIFY"><LI>3-D visualization/animation </LI></P>
+<P ALIGN="JUSTIFY"><LI>peer reviewed and agency accepted<B><FONT COLOR="#0000ff"> </LI></P></UL>
+
+</B></FONT><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The GLLVHT main kernel is an integrated system, designed in a modular fashion for easy coupling of existing as well as other user defined models. Currently the GLLVHT system has five modules:.</P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<BLOCKQUOTE ALIGN="JUSTIFY">Hydrodynamic module &#9;<B>HDM</BLOCKQUOTE>
+</B><BLOCKQUOTE ALIGN="JUSTIFY">Water quality module &#9;<B>WQM</BLOCKQUOTE>
+</B><BLOCKQUOTE ALIGN="JUSTIFY">Sediment transport module&#9;<B>STM</BLOCKQUOTE>
+</B><BLOCKQUOTE ALIGN="JUSTIFY">Particle tracking module &#9;<B>PTM</BLOCKQUOTE>
+</B><BLOCKQUOTE ALIGN="JUSTIFY">Oil-spill module &#9;<B>OPM</B> </BLOCKQUOTE>
+<BLOCKQUOTE ALIGN="JUSTIFY"></BLOCKQUOTE>
+<P ALIGN="JUSTIFY">The inputs to these modules are obtained from their respective control files and the outputs are designed for easy uploading into existing 2-D and 3-D display software.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model Support</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Users Manual:</P>
+</I><P ALIGN="JUSTIFY">The user’s manual provides a description of the hydrodynamic model.  It might be difficult for a first time user to setup and run  the model using this manual alone.  The developer strongly suggests they be involved in the set up and application of the model.</P>
+<I><P ALIGN="JUSTIFY">Developer/Sponsor Support:</P>
+</I><P ALIGN="JUSTIFY">The model was developed by J.E. Edinger Associates, Inc.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">J.E. Edinger Ssociates, Inc.</P>
+<P ALIGN="JUSTIFY">37 West Avenue</P>
+<P ALIGN="JUSTIFY">Wayne, PS, 19087</P>
+<P ALIGN="JUSTIFY">(610) 293-0757</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The developer provides support for the model.</P>
+<I><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Internet Resources</P>
+</I><P ALIGN="JUSTIFY">Information on the model is available at http://www.jeeai.com/</P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Workshops</P>
+</I><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">References</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Model documentation references</P>
+</I><P ALIGN="JUSTIFY">Buchak, E. M. and J. E. Edinger. 1984. <U>Generalized, Longitudinal-Vertical Hydrodynamics and Transport: Development, Programming and Applications</U>. Prepared for U.S. Army Corps of Engineers Waterways Experiment Station, Vicksburg, Miss. Contract No. DACW39-84-M-1636. Prepared by J. E. Edinger Associates Wayne, PA. Document No. 84-18-R. June.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Edinger, J. E. and E. M. Buchak. 1980. <U>Numerical Hydrodynamics of Estuaries in</U> <U>Estuarine and Wetland Processes with Emphasis on Modeling</U>, (P. Hamilton and K. B. Macdonald, eds.). Plenum Press, New York, New York, pp. 115-146.</P>
+<P ALIGN="JUSTIFY"> </P>
+<P ALIGN="JUSTIFY">Edinger, J. E., and E. M. Buchak. 1985. "Numerical Waterbody Dynamics and Small Computers". <U>Proceedings of ASCE 1985 Hydraulic Division Specialty Conference on Hydraulics and Hydrology in the Small Computer Age</U>. American Society of Civil Engineers, Lake Buena Vista, FL. Aug. 13-16.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Edinger, J. E. and E. M. Buchak. 1995. Numerical Intermediate and Far Field Dilution Modelling. <U>Journal Water, Air and Soil Pollution</U> 83: 147-160,1995. Kluwer Academic Publishers, The Netherlands.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Leenderste, J. J and Liu, S-K. 1975. <U>A Three Dimensional Model for Estuaries and Coastal Seas: Volume II, Aspects of Computation</U>. Rand Report R-1764-OWRT, Santa Monica, Calif. June. </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Okubo, A. 1971. Oceanic diffusion diagrams. <U>Deep-Sea</U> <U>Res</U>., <U>18</U>, 789.  S. Army Engineer Waterways Experiment Station, Environmental Laboratory, Hydraulics Laboratory. 1986. <U>CE-QUAL-W2: A Numerical Two-Dimensional, Laterally Averaged Model of Hydrodynamics and Water Quality; User's Manual</U>. Instruction Report E-86-5. Prepared for Department of the Army, U.S. Army Corps of Engineers, Washington, DC. Final Report. August. </P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Application references</P>
+</I><P ALIGN="JUSTIFY">Edinger, J. E., E. M. Buchak, and M. D. McGurk. 1994. Analyzing Larval Distributions Using Hydrodynamic and Transport Modelling. Estuarine and Coastal Modeling III. American Society of Civil Engineers, New York.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Edinger, J. E., E. M. Buchak and V. Kolluru, 1997. Flushing and Mixing in a Deep Estuary, in press <U>Journal Water, Air and Soil Pollution, </U>Kluwer Academic Publishers, The Netherlands, February 1997.</P>
+<P ALIGN="JUSTIFY"></P></BODY>
+</HTML>

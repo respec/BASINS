@@ -1,0 +1,105 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>MODEL DESCRIPTIONS - SWAT</TITLE>
+</HEAD>
+<BODY LINK="#0000ff">
+
+<B><P>&#9; EFDC </B>(Environmental Fluid Dynamics Computer Code)</P>
+
+<P>1.  Media of Concern:  Hydrodynamics, receiving water</P>
+<P>2.  Analysis Level(s):  Screening level, detailed </P>
+<P>3.  Methods:  Deterministic  </P>
+<P>4.  Temporal Representation:  Steady state, time-variable</P>
+<P>5.  Dimensional Capability:  1-D, 2-D, 3-D</P>
+<P>6.  Source/Release Type:  Single, multiple, constant, time varying</P>
+<P>7.  Sources:  Point source, non-point source</P>
+<P>8.  Assessment Extent:  Near field, far field</P>
+<P>9.  Applicability to Water Body Types:  Rivers, lakes, reservoirs, estuaries, wetlands, and coastal regions</P>
+<P>10. Type of Constituents:  Salinity, temperature, eutrophication</P>
+<P>11. Critical Processes:  Circulation, density stratification, primary production, nutrient cycling, sediment nutrient flux</P>
+<P>12. Models Uses(s):&#9;</P>
+<P>&#9;Planning:&#9;Process evaluation, environmental impact assessment </P>
+<P>&#9;Design:&#9;Waste load allocation, TMDL </P>
+<P>&#9;Regulation:&#9;Waste load allocation, TMDL </P>
+
+<P>13. Resource Requirements&#9;</P>
+<P>&#9;Level of effort:&#9;&#9;Moderate to high</P>
+<P>&#9;Data requirements:&#9;Moderate to high</P>
+<P>&#9;Modeler expertise:&#9;Moderate to extensive</P>
+
+<P>14. Model Use Features:&#9;  Post processing software is available to convert generic output files for use by a number of scientific visualization applications</P>
+
+<P>15. Model Support: Model documentation</P>
+
+<P>&nbsp;</P>
+<P>16. Model Availability: Proprietary</P>
+<FONT SIZE=2>
+</FONT><P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">&nbsp;</P>
+<P ALIGN="JUSTIFY">General Description</U>:</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The EFDC model was originally developed as a three-dimensional estuarine and coastal ocean circulation model and has been subsequently extended to model a wide range of surface water flows, including catchment scale overland flow, flow in vegetated fresh and brackish water wetlands, flow in rivers and channel networks and flow in lakes and reservoirs. The EFDC model is also configurable as a mesoscale, limited-area atmospheric model. The model's general three-dimensional formulation readily reduces to one- and two-dimensions in the vertical or horizontal axes to resolve site-specific problems. The model's hydrodynamic simulation is based on a three-time-level, semi-implicit solution of the vertically hydrostatic equation on a curvilinear-orthogonal horizontal grid with a sigma stretched (or topography following) vertical coordinate. For variable density flows, transport equations for salinity and temperature are also solved. The Mellor-Yamada level 2.5 turbulence closure model is implemented for three- and two-dimensional vertical applications. For modeling flows with intermittent drying and wetting, a robust drying and wetting scheme that prohibits negative depths is implemented. For submerged and emergent vegetated environments, the code includes both three-dimensional and two-dimensional vegetation resistance formulations, with the three-dimensional formulation fully coupled to the turbulence closure model. The model also has provisions for hydraulic control structures such as spillways, weirs, gates and culverts. </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The model has the internal capability to simulate the transport and transformation of an arbitrary number of dissolved and suspended constituents using a flux-corrected, positive-definite transport formulation. Transformation kinetics are specified by a user-specified subroutine. Two kinetic subroutines, equivalent to the 8 state variable WASP5 eutrophication model and the 20 state variable CE-QUAL-ICM, are currently being implemented directly into the code to provide a capability for simultaneous hydrodynamic and water quality simulation without the necessity of custom interfacing. The code also has the capability of writing information in the output DYNHYD format transport to drive the WASP5 model in a stand-alone mode. An alternate transport output is implemented to allow the EFDC code to run in a transport and transformation mode. Additional enhancements useful for water quality studies include a Lagrangian plume model for near-field point source loading and interfacing. Two Lagrangian particle tracking schemes are implemented for oil spill simulation and larvae recruitment and transport studies. Planned enhancements to the code include a coupled in-place, three-dimensional groundwater flow model and a sediment-water phase toxics transport model. </P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model methods include the following:</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">A finite difference scheme is used in EFDC with three time levels and an internal-external mode splitting procedure that achieves separation of the internal shear or baroclinic model from the external free-surface gravity wave (barotropic mode).  EFDC uses an implicit external mode with simultaneous computation of a two-dimensional surface elevation field by a multicolor successive overrelaxation procedure.  Using the new surface elevation field, the external solution is completed by calculation of the depth-integrated barotropic velocities.  The advective transport options that can be used include the &quot;centered in time and space&quot; scheme, and the &quot;forward in time and upwind in space&quot; scheme.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Limitations</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Development and calibration of the model requires significant technical expertise.</P>
+<U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Application History</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">EFDC has been used for modeling estuaries of the Chesapeake Bay, the Indian River Lagoon in Florida, Lake Okeechobee in Florida , Peconic Bay in New York, Stephens Passage in Alaska, and Nan Wan Bay, Taiwan.  In the Florida Everglades, EFDC has been used to simulate large scale wetlands flow and transport.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model Use Features</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The model is written in universal FORTRAN.  The model can be run on supercomputers/workstations as well as PCs.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model Support</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Users Manual:</P>
+</I><P ALIGN="JUSTIFY">A user’s manual is available to prepare model input files.  Input file templates are also available.</P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Developer/Sponsor Support:</P>
+</I><P ALIGN="JUSTIFY">John M. Hamrick</P>
+<P ALIGN="JUSTIFY">Tetra Tech, Inc.</P>
+<P ALIGN="JUSTIFY">10306 Eaton Place, Suite 340</P>
+<P ALIGN="JUSTIFY">Fairfax, VA 22030</P>
+<P ALIGN="JUSTIFY">(703) 385-6000</P>
+<FONT SIZE=2><P ALIGN="JUSTIFY"></FONT><A HREF="mailto:ham@visi.net">ham@visi.net</A></P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Virginia Institute of Marine Science</P>
+<P ALIGN="JUSTIFY">School of Marine Science</P>
+<P ALIGN="JUSTIFY">The College of William and Mary</P>
+<P ALIGN="JUSTIFY">Gloucester Point, VA 23502</P>
+<P ALIGN="JUSTIFY">(804) 642-7000</P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Internet Resources</P>
+</I><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<I><P ALIGN="JUSTIFY">Workshops</P>
+</I><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">References</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Model documentation references</P>
+</I><P ALIGN="JUSTIFY">Hamrick, J.M. 1992. A three-dimensional environmental fluid dynamics computer code:theoretical and computational aspects. SRAMSOE #317, The College of William and Mary, Gloucester Point, VA.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Hamrick, J.M. 1992.  Estuarine environmental impact assessment using a three-dimensional circulation and transport model.  In Estuarine and Coastal Modeling, Proceedings of the 2<SUP>nd</SUP> International Conference, ed. M.L. Spaulding, et al., pp. 292-303.  American Society of Civil Engineers, New York.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Hamrick, J.M. 1996.  A User’s Manual for the Environmental Fluid Dynamics Computer Code (EFDC).  The College of William and Mary, Virginia Institute of Marine Science, Special Report 331, 234 pp.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Hamrick, J.M., and T.S. Wu. 1996.  Computational design and optimization of the EFDC/HEM3D surface water hydrodynamic and eutrophication models.  In Computational Mthods of Next Generation Environmental Models, ed. G. Delich, Society of Industrial and Applied Mathematics, Philadelphia.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Park, K., A.Y. Kuo, J. Shen, and J.M. Hamrick. 1995.  A three-dimensional hydrodynamic-eutrophication model (HEM3D): description of water quality and sediment processes submodels.  The College of William and Mary,  Virginia Institute of Marine Science, Gloucester Point, VA.  Special Report 327, 113 pp.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Tetra Tech. 1994.  User’s guide for the three-dimensional EFDC hydrodynamic and salinity model of Indian river Lagoon and Turkey Creek.  Final Report.  Tetra Tech, Inc., Fairfax, VA.</P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Application references</P>
+</I><P ALIGN="JUSTIFY"></P></BODY>
+</HTML>

@@ -1,0 +1,5 @@
+VBGROUP 5.0
+StartupProject=nss\Nss.vbp
+Project=ATCoCtl\ATCoCtl.vbp
+Project=libStreamStatsDB\libStreamStatsDB.vbp
+Project=ATCoDisp\ATCoDisp.vbp

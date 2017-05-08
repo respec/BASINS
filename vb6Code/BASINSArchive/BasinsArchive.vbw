@@ -1,0 +1,13 @@
+clsDBF = 0, 0, 0, 0, C
+clsTar = 0, 0, 0, 0, C
+frmAbout = 22, 22, 582, 470, , 110, 110, 733, 629, C
+frmArchive = 143, 19, 768, 498, , 202, 4, 758, 513, C
+frmConflicts = 0, 0, 0, 0, C, 110, 110, 693, 551, C
+frmMap = 12, 1, 764, 575, C, 154, 154, 766, 599, C
+frmTextBox = 0, 0, 0, 0, C, 132, 132, 744, 573, C
+UTILITY = 9, 173, 874, 720, C
+modBasinsArchive = 15, 1, 774, 457, 
+modFileTime = 0, 0, 0, 0, C
+modShell = 0, 0, 0, 0, C
+modWin32Api = 132, 132, 721, 603, C
+UtilFolder = 0, 0, 0, 0, C

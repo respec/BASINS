@@ -1,0 +1,55 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE ATCCompMl SYSTEM "ATCCompMl.dtd">
+<ATCCompMl>
+  <Component
+    File="WebDataManager.dll"
+    Version="2.5"
+    Name="WebDataManager"
+    Date="8/8/2002"
+    Destination="c:\vbexperimental\update\ComponentXML">
+    <Instructions>
+       Get "http..."
+       Unzip...
+       Delete...
+       Register...
+    </Instructions>
+    <ReleaseNote>
+       Update to version 2.4
+       Fixes bug with xxx
+    </ReleaseNote>
+  </Component>
+  <Component
+    Name="WebDataUSGSSite"
+    File="WebDataUSGSSite.dll"
+    Version="1.5"
+    Date="9/19/2002"
+    Destination="c:\vbexperimental\update\ComponentXML">
+    <Instructions>
+       Get "ftp..."
+       Delete...
+       Register...
+    </Instructions>
+    <ReleaseNote>
+       Update to version 1.4
+       Fixes bug with yyy
+    </ReleaseNote>
+  </Component>
+  <Component
+    Name="WebDataUSGSDaily"
+    File="WebDataUSGSDaily.dll"
+    Version="1.5"
+    Date="9/19/2002"
+    Destination="c:\vbexperimental\update\ComponentXML">
+    <Instructions>
+       Get "ftp..."
+       Delete...
+       Register...
+    </Instructions>
+    <ReleaseNote>
+       Update to version 1.4
+       Fixes bug with yyy
+    </ReleaseNote>
+  </Component>
+  <Remark>This is a test.</Remark>
+  <Remark>This is more of a test.</Remark>
+</ATCCompMl>

@@ -1,0 +1,124 @@
+[Root]
+Most Recent Package=DataBrowse 1.0
+
+
+[Package|DataBrowse 1.0|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=d:\DataBrowsePackage1.0
+
+[Package|DataBrowse 1.0|Configure DAO ISAMs]
+Applicable=Yes
+Text=No
+Xbase=Yes
+Jet 2.x=No
+
+[Package|DataBrowse 1.0|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|DataBrowse 1.0|Files Found]
+
+[Package|DataBrowse 1.0|Files Released]
+
+[Package|DataBrowse 1.0|Missing Dependency Information]
+C:\vb\ATCo99\ATCo99.ocx=
+
+[Package|DataBrowse 1.0|Out-of-Date Dependency Information]
+
+[Package|DataBrowse 1.0|Files Added]
+
+[Package|DataBrowse 1.0|Files Removed]
+
+[Package|DataBrowse 1.0|Files In Project]
+C:\vb\DataBrowse\DataBrowse.exe=Yes
+C:\WINDOWS\SYSTEM\MSVBVM60.DLL=Yes
+C:\WINDOWS\SYSTEM\OLEAUT32.DLL=Yes
+C:\WINDOWS\SYSTEM\OLEPRO32.DLL=Yes
+C:\WINDOWS\SYSTEM\ASYCFILT.DLL=Yes
+C:\WINDOWS\SYSTEM\STDOLE2.TLB=Yes
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\SYSTEM\VB6STKIT.DLL=Yes
+C:\WINDOWS\SYSTEM\COMCTL32.OCX=Yes
+C:\WINDOWS\SYSTEM\COMDLG32.OCX=Yes
+C:\WINDOWS\SYSTEM\RICHTX32.OCX=Yes
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\Redist\RICHED32.DLL=Yes
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=Yes
+C:\WINDOWS\SYSTEM\MSJET35.DLL=Yes
+C:\WINDOWS\SYSTEM\MSJTER35.DLL=Yes
+C:\WINDOWS\SYSTEM\MSJINT35.DLL=Yes
+C:\WINDOWS\SYSTEM\VBAJET32.DLL=Yes
+C:\WINDOWS\SYSTEM\EXPSRV.DLL=Yes
+C:\WINDOWS\SYSTEM\MSRD2X35.DLL=Yes
+C:\WINDOWS\SYSTEM\MSREPL35.DLL=Yes
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=Yes
+C:\WINDOWS\SYSTEM\VB5DB.DLL=Yes
+C:\vb\ATCo99\ATCo99.ocx=Yes
+C:\WINDOWS\SYSTEM\MSXBSE35.DLL=Yes
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\Setup1.exe=Yes
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+
+[Package|DataBrowse 1.0|Configure Registry Files]
+Applicable=No
+
+[Package|DataBrowse 1.0|Configure Remote Servers]
+Applicable=No
+
+[Package|DataBrowse 1.0|Install Locations]
+C:\vb\DataBrowse\DataBrowse.exe=$(AppPath)
+C:\WINDOWS\SYSTEM\MSVBVM60.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\COMCTL32.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\COMDLG32.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\RICHTX32.OCX=$(WinSysPath)
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\Redist\RICHED32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Common Files\Microsoft Shared\DAO\DAO350.DLL=$(MSDAOPath)
+C:\WINDOWS\SYSTEM\MSJET35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSJTER35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSJINT35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\VBAJET32.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\EXPSRV.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSRD2X35.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSREPL35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\Redist\MSVCRT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\VB5DB.DLL=$(WinSysPath)
+C:\vb\ATCo99\ATCo99.ocx=$(WinSysPath)
+C:\WINDOWS\SYSTEM\MSXBSE35.DLL=$(WinSysPathSysFile)
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\Setup1.exe=$(WinPath)
+C:\Program Files\Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+
+[Package|DataBrowse 1.0|Configure Shared Files]
+Applicable=Yes
+C:\vb\DataBrowse\DataBrowse.exe=No
+
+[Package|DataBrowse 1.0|Distribution]
+Type=single
+Size=
+Title=DataBrowse 1.0
+
+[Package|DataBrowse 1.0|IconGroups]
+Group0=$(Programs)
+PrivateGroup0=True
+Parent0=
+
+[Package|DataBrowse 1.0|$(Programs)]
+Icon1=DataBrowse.exe
+Title1=DataBrowse
+StartIn1=$(AppPath)
+Key1=Icon3
+
+[Package|DataBrowse 1.0|Package]
+PackageFolder=d:\DataBrowsePackage1.0
+ProjectFolder=C:\vb\DataBrowse
+ServerSideCab=
+File1=d:\DataBrowsePackage1.0\setup.exe
+File2=d:\DataBrowsePackage1.0\Setup.Lst
+File3=d:\DataBrowsePackage1.0\DataBrowse.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz

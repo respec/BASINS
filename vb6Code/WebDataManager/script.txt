@@ -1,0 +1,185 @@
+During development of the download tool, web sites providing data
+have changed in ways that require changes in the download tool. A
+solution to this maintenance problem will be found.
+
+There are three dimensions to the possible solutions: who updates
+the download tool when a web site changes, what programming
+language they use, and how updates are propagated.
+
+Who updates the tool when a website changes? 
+  end users: 
+        pro: doesn't require Aqua Terra or EPA to be involved
+             might be faster than waiting for someone to do it
+        con: duplicated effort if more than one user fixes it 
+             requires end users to be programmers
+
+ Aqua Terra:
+        pro: no changes required to existing code
+             no additional documentation of existing code
+             nobody new has to learn the internals of the tool
+             no duplication of effort
+        con: requires continuing maintainance contract
+
+        EPA:
+        pro: no duplication of effort
+        con: somebody new has to learn how the tool works        
+
+What programming language? Visual Basic or scripting language?
+
+We could extend our existing scripting language to allow
+downloading web data. When current download tool components are
+translated into the scripting language and documented, this would
+allow users to update downloading scripts without a copy of Visual
+Basic. Some of the most generic details of downloading that do not
+change over time (displaying progress for example) could be hidden
+while exposing all the differences between web sites in scripts.
+
+Extending the script language to support downloading data would
+not be very difficult, but translating all the currently available
+downloable data types into scripts would take considerable effort.
+
+While this would skip the need for a copy of VB and hide some
+details, the scripting language is still a programming language
+and really requires a programmer to make more than the smallest
+change.
+
+If we continue to use VB and not the script language, we could
+provide documentation of the downloading modules and hints for how
+they might need to be edited. Any person who understands VB could
+then make the needed changes.
+
+Another solution would be to use the existing VB code, but make it
+look for strings (in the registry or a text file) that could
+override defaults for situations where a machine name changes but
+all the logic of constructing URLs stays the same. This could
+allow users to make the simple changes and leave complicated
+changes to programmers.
+
+How are updates propagated?
+
+Currently, the whole program is distributed normally and updates
+are available by installing a whole new version of BASINS or at
+least of GenScn/WinHSPF/WDMUtil. Since the download tool is unique
+in having a need for quick updates, we should consider another
+method of updating this tool.
+
+Currently the main parts to the tool are:
+
+cURL.exe: a freely available command-line program that performs
+          the core action of downloading from the web to a file
+          http://curl.sourceforge.net/
+
+WebDataManager.dll: 
+          The central library containing generic code for
+          selecting data types, specifying locations, calling cURL,
+          and displaying progress
+
+DataDownload.exe: a very thin wrapper around WebDataManager.dll
+
+ATCWebData*.dll:
+          Each web site and each type of data has a component
+          responsible for requesting that data and doing any
+          desired post-processing.
+
+We could provide a method for the download tool to check for
+new and updated versions of ATCWebData*.dll, probably in the same
+place BASINS is available for download. If we go to a script-based
+architecture, the same scheme could search for new and updated
+scripts rather than DLLs.
+
+
+Musings on conversion to a script architecture follow. Possibly
+only meaningful to Mark.
+
+Essential parts of each data type:
+
+What does it provide?
+  file format tgz
+  file format csv
+  file format rdb
+  XML npdes 
+      "name", "NPDES #"
+      "type", "string"
+      "selected", "true"
+  XML storetstation
+      "name", "Storet Station"
+      "type", "string"
+      "selected", "true"
+  XML storetlegacystation
+      "name", "Legacy Storet Station"
+      "type", "string"
+
+What does it need to know?
+  save_dir
+  huc_cd
+  state_nlcd
+  site_no
+  SHPfilename
+  WDMfilename
+  storetlegacystation "multiple", "true"
+
+  for USGS stations, any one of:
+
+  "state_abbrev"
+    "type", "State"
+    "multiple", "true"
+    "label", "State Abbreviation"
+  "state_fips"
+    "type", "State"
+    "multiple", "true"
+    "label", "State FIPS Code"
+  "huc_2"
+    "multiple", "true"
+    "label", "2-digit HUC"
+  "huc_cd"
+    "multiple", "true"
+    "label", "8-digit HUC"  
+
+How to get the data?
+
+  First, we need the obvious new token: (Download URL SaveAs Caption)
+  That would only take an hour or so since we already have the body.
+
+  Then we would need to rewrite all twelve of our GetData routines
+  currently in VB to use script language.
+
+  NHD would be easy, it is only a couple of lines long now so it
+  would take a few minutes to create a script. Most of the other
+  ones are a lot harder, requiring more than one Download and
+  parsing of strings with InStr and Mid and checking for errors
+  and looping for each HUC or station ID. 
+
+  The main new thing we would need is an interface to select which
+  data to download. Our current script interface for specifying
+  values for arguments is not sufficient because it only allows
+  one string value for each argument. At the least we would have
+  to extend this to allow entering several HUCs or station IDs.
+  It would also be nice to have a selection of one or more kinds
+  of data to download before anything else.
+
+  We may need a new token that can generate a custom script based
+  on available data download scripts. The "main" script might then
+  be: 
+
+  (ATCScript "Select Data to Download"
+             (SelectData)
+  )
+
+  The SelectData token would search for available download scripts
+  and create a selection script like:
+
+  (ATCScript "Select And Download Data"
+             (Arg "DataTypes" 
+                  "USGS Daily,USGS WQ" --- These might be remembered in the registry as the previous selections
+                  "UsgsDaily,UsgsSite,BasinsProject,NLCD,NHD,EPAPCSFacility,EPAPCSPermit,EPAPCSDischarge,StoretStatn,StoretVisit,StorLstatn,StorLdata,UsgsWQ" 
+                  "Which data do you wish to download?")
+             (For DataSelected in DataTypes
+                (Set ArgList (MergeArgs ArgList DataSelected))
+                (Set GetData (+ GetData CR "(" DataSelected ")"))
+             )
+             (RunScript (+ "(ATCScript Generated " ArgList GetData)))
+  )
+
+  
+  I can imagine that GetSetting and SaveSetting will be convenient
+  new tokens for saving defaults.

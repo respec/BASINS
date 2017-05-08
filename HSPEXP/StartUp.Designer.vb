@@ -201,9 +201,9 @@ Partial Class StartUp
         Me.chkFecalColiform.Enabled = False
         Me.chkFecalColiform.Location = New System.Drawing.Point(6, 134)
         Me.chkFecalColiform.Name = "chkFecalColiform"
-        Me.chkFecalColiform.Size = New System.Drawing.Size(92, 17)
+        Me.chkFecalColiform.Size = New System.Drawing.Size(109, 17)
         Me.chkFecalColiform.TabIndex = 17
-        Me.chkFecalColiform.Text = "Fecal Coliform"
+        Me.chkFecalColiform.Text = "Indicator Bacteria"
         Me.chkFecalColiform.UseVisualStyleBackColor = True
         '
         'chkBODBalance

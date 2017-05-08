@@ -1,0 +1,138 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>MODEL DESCRIPTIONS - SWAT</TITLE>
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><P>AQUASEA</P>
+</B>
+<P>1.  Media of Concern:  Receiving water</P>
+<P>2.  Analysis Level(s):  Screening level, detailed </P>
+<P>3.  Methods:  Deterministic  </P>
+<P>4.  Temporal Representation:  Steady-state, time-variable</P>
+<P>5.  Dimensional Capability:  2-D</P>
+<P>6.  Source/Release Type:  Constant, time-varying, single, multiple</P>
+<P>7.  Sources:  Riverine, point sources</P>
+<P>8.  Assessment Extent:  Near field, far field</P>
+<P>9.  Applicability to Water Body Types:  Lakes, reservoirs, estuaries, coastal areas</P>
+<P>10. Type of Constituents:  Salinity, temperature, suspended sediment, biological, radioactive</P>
+<P>11. Critical Processes:  Water levels, flow, transport, dispersion, decay</P>
+<P>12. Models Uses(s):</P>
+<P>Planning:&#9;Location of wastewater outlets</P>
+<P>Design:&#9;Flow under bridges, navigation problems</P>
+<P>Regulation:&#9;</P>
+
+<P>13. Resource Requirements</P>
+<P>Level of effort:&#9;Moderate</P>
+<P>Data requirements:&#9;Moderate</P>
+<P>Modeler expertise:&#9;Moderate</P>
+
+<P>14. Model Use Features:  GUI, graphics</P>
+
+<P>15. Model Support: Model documentation,  support through developer</P>
+
+<P>16. Model Availability:  Proprietary</P>
+
+<U><P>General Description</U>:</P>
+
+<P ALIGN="JUSTIFY">AQUASEA is a software package developed to solve the shallow water flow and transport equations using the Galerkin finite element method. AQUASEA was first developed in 1983 to solve two-dimensional problems, and since 1992, it has been continuously upgraded and tested worldwide. The latest development of AQUASEA is a version which runs in Windows 95 or Windows NT. It has been specifically configured and compiled to provide maximum efficiency in model set up and fast model run times. The Windows environment provides not only a multi-platform capability but also an assured industry-standard user interface for future developments. AQUASEA<B><FONT COLOR="#008000"> </B></FONT>consists of the following two models: </P>
+<P ALIGN="JUSTIFY"></P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>Hydrodynamic flow model </LI></P>
+<P ALIGN="JUSTIFY"><LI>Transport-dispersion model </LI></P></UL>
+
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The AQUASEA flow model can simulate water level variations and flows in response to various forcing functions in lakes, estuaries, bays and coastal areas. The water levels and flows are approximated in a numerical finite element grid and calculated on the basis of information on the bathymetry, bed resistance coefficients, wind field and boundary conditions. </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The AQUASEA transport-dispersion model simulates the spreading of a substance in the environment under the influence of the fluid flow and the existing dispersion processes. The substance may be a pollutant of any kind, conservative or non-conservative, inorganic or organic salt, heat suspended sediment, dissolved oxygen, inorganic phosphorus, nitrogen and other water quality parameters. </P>
+<P ALIGN="JUSTIFY"></P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>The contaminant transport model is fully integrated with the flow model using the same data input and output screen formats.</LI></P>
+<P ALIGN="JUSTIFY"><LI>The contaminant transport model is designed to calculate bacterial transport, heat and sediment transport.</LI></P>
+<P ALIGN="JUSTIFY"><LI>A model can be altered at any time. The model boundaries can be expanded or contracted and nodes added or removed. Submodels can be created easily within any part of the original model. </LI></P></UL>
+
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model methods include the following:</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">AQUASEA is based on the solution of the two-dimensional shallow water equations including bed resistance, wind stress, Coriolis force, and nonlinear convective terms.  The flow model can simulate water level variations and flows in response to various forcing functions in lakes, estuaries, bays and coastal areas.  The water levels and flows are approximated in a numerical finite element grid and calculated on the basis of information on the bathymetry, bed resistance coefficients, wind field and boundary conditions.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The transport model includes sources, decay, and convective and dispersive transport. </P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">In AQUASEA all model equations are approximated using a Galerkin finite element method on triangular elements.  Continuous approximations are used for water elevation and concentration or temperature or suspended sediments, linear within elements, but piecewise constant approximations for the velocities.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">&nbsp;</P>
+<P ALIGN="JUSTIFY">Limitations</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<U><P ALIGN="JUSTIFY">Application History</P>
+</U><P ALIGN="JUSTIFY"></P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>Lake circulation </LI></P>
+<P ALIGN="JUSTIFY"><LI>Tidal flow in estuaries and coastal areas </LI></P>
+<P ALIGN="JUSTIFY"><LI>Sediment transport </LI></P>
+<P ALIGN="JUSTIFY"><LI>Heat transport from nuclear power plants </LI></P>
+<P ALIGN="JUSTIFY"><LI>Flow in tidal inlets (navigation problems) </LI></P>
+<P ALIGN="JUSTIFY"><LI>Location of wastewater outlets (bacterial decay) </LI></P>
+<P ALIGN="JUSTIFY"><LI>Flow through narrow openings (bridges) </LI></P></UL>
+
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">Model Use Features</P>
+</U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">AQUASEA has a restart capability which means that the solution of the flow or transport equation can be stopped at any stage and the calculated results observed. The program can then be restarted. </P>
+<P ALIGN="JUSTIFY"></P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>Variable depth, bottom friction, wind speed, wind direction, dispersion coefficients and mixing depth.</LI></P>
+<P ALIGN="JUSTIFY"><LI>The model elements can be wetted and dewatered any number of times due to tidal variations.</LI></P>
+<P ALIGN="JUSTIFY"><LI>Bottom friction can be either the Chezy coefficient or the Manning number.</LI></P>
+<P ALIGN="JUSTIFY"><LI>Real time varying data can be entered from actual observed records. AQUASEA automatically accepts different time bases and calculates intermediate values. Time varying wind and tidal boundary conditions as well as time varying sources are accepted.</LI></P>
+<P ALIGN="JUSTIFY"><LI>Rivers are modeled by variable sources taking into account the momentum of river inflows.</LI></P></UL>
+
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">OTHER CAPABILITIES OF<B> </B>AQUASEA<B><FONT COLOR="#008000">:</P>
+</B></FONT><P ALIGN="JUSTIFY"> </P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>Automatic mesh generation.</LI></P>
+<P ALIGN="JUSTIFY"><LI>Local and global mesh condensation.</LI></P>
+<P ALIGN="JUSTIFY"><LI>Option of creating an independent nested model from the main model domain using the submesh facility.</LI></P>
+<P ALIGN="JUSTIFY"><LI>All necessary information such as sources, boundary conditions, etc. are transferred automatically to the nested model.</LI></P>
+<P ALIGN="JUSTIFY"><LI>Graphical output of all results, contours, flow arrows and time series.</LI></P>
+<P ALIGN="JUSTIFY"><LI>AQUASEA can be used without any further knowledge of input and output data.</LI></P>
+<P ALIGN="JUSTIFY"><LI>Automatic time step refinement during calculation.</LI></P>
+<P ALIGN="JUSTIFY"><LI>Direct transfer of result to Surfer, Grapher or Excel (CSV-format). </LI></P></UL>
+
+<U><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">Model Support</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Users Manual:</P>
+</I><P ALIGN="JUSTIFY"> A user’s manual is provided with AquaSea.</P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Developer/Sponsor Support:</P>
+</I><P ALIGN="JUSTIFY">AquaSea was developed by and is supported by the Scientific Software Group.</P>
+<P ALIGN="JUSTIFY"></P>
+<P>Scientific Software Group<B><BR>
+</B>P.O. Box 23041<BR>
+Washington, DC 20026-3041</P>
+<P>703-620-9214</P>
+<FONT SIZE=2><P></FONT><A HREF="mailto:info@scisoftware.com">info@scisoftware.com</A></P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Internet Resources:</P>
+</I><P ALIGN="JUSTIFY">The Scientific Software Group can be found at <A HREF="http://www.scisoftware.com/">http://www.scisoftware.com</A>.</P>
+<P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Workshops:</P>
+</I><P ALIGN="JUSTIFY">Training is available from the Scientific Software Group.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P ALIGN="JUSTIFY">References</P>
+</U><P ALIGN="JUSTIFY"></P>
+<I><P ALIGN="JUSTIFY">Model documentation references</P>
+</I><P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">&nbsp;</P>
+<I><P ALIGN="JUSTIFY">Application references</P></I></BODY>
+</HTML>

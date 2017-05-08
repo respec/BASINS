@@ -1,0 +1,134 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>MODEL NAME: RCA</TITLE>
+</HEAD>
+<BODY>
+
+<B><P>RCA (Row Column AESOP)</P>
+
+</B><P>1. Media of Concern:  Receiving water</P>
+<P>  </P>
+<P>2. Analysis Level(s):  Screening level, detailed </P>
+
+<P>3.  Methods:  Deterministic</P>
+
+<P>4.  Temporal Representation:  Steady-state, time-variable</P>
+
+<P>5. Dimensional Capability:  1-D, 2-D, 3-D</P>
+
+<P>6. Source/Release Types:  Constant, time varying, single, or multiple</P>
+
+<P>7. Sources:  Point source, non-point source, sediment/bed exchange</P>
+
+<P>8.  Assessment Extent:  Near field, far field </P>
+
+<P>9.  Applicability to Water Body Types:  Lakes, reservoirs, rivers, streams, estuaries, coastal areas, oceans</P>
+
+<P>10. Type of Constituents:  Conservative substances, pathogens, BOD/DO, eutrophication</P>
+
+<P>11. Critical Processes:  Degradation products, primary productivity, nutrient cycling, sediment nutrient fluxes</P>
+
+<P>12.  Models Use(s):  </P><DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Planning:&#9; Risk assessment, pollution/process evaluation</P>
+<P>Design:&#9; BMP, TMDL, NPDES permit development</P>
+<P>Regulation:&#9; TMDL, NPDES evluation</P>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+
+<P>13.  Resource Requirements</P><DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Level of effort: &#9;Moderate to high</P>
+<P>Data requirements:&#9;Moderate to high</P>
+<P>Modeler expertise: &#9;Moderate to extensive</P>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+</DIR>
+
+<P>14. Model Use Features:  Linkage to hydrodynamic model</P>
+<P>      </P>
+<P>15.  Model Support:  Users manual</P>
+
+<P>16.  Model Availability:  Proprietary</P>
+<U>
+<P>General Description </P>
+</U>
+<P ALIGN="JUSTIFY">RCA is Row-Column AESOP (Advanced Ecological Systems Modeling Program), a general modeling computer code.  RCA was developed to interface with hydrodynamic models such as ECOM3D, EFDC and DELFT3D.  RCA solves general mass balance equations for water quality variables of interest.  The user is able, via the development of a FORTRAN subroutine, to tailor RCA to address the specific water quality issues of the water body under investigation.  The FORTRAN subroutine prescribes the biological, chemical and/or physical kinetics or interrelationships between the relevant water quality variables of interest.  Therefore, the user may run models from a simple conservative tracer, or first-order decay pathogen model to a more  advanced eutrophication model coupled to a sediment nutrient flux model and a chemical  equilibrium model.</P>
+
+<P ALIGN="JUSTIFY">RCA formulates mass balance equations for each model segment for each water quality constituent or state-variable of interest.  These mass balance equations include all horizontal, lateral and vertical components of advective flow and dispersive mixing between model segments; physical, chemical and biological transformations between the water quality variables within a model segment; and point, non-point, fall-line and atmospheric inputs of the various water quality variables of interest.</P>
+
+<U><P>Model methods include the following:</P>
+</U>
+<P ALIGN="JUSTIFY">The partial differential equations which form the water quality model, together with their boundary conditions, are solved by finite difference techniques.  The concentrations of the water quality variables are assumed to be centered within each water quality segment or grid cell.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">The finite difference equations conserve mass.  Two finite difference approximations are available for the space derivatives, central difference and backward difference.  To reduce the numerical dispersion associated with backward difference solutions, RCA has been coded with an additional user selectable option that permits the use of a backward difference corrector scheme, based on Smolarkiewicz<FONT FACE="WP TypographicSymbols">=</FONT>s anti-diffusive velocity algorithm, which reduces the magnitude of the numerical dispersion in the finite difference solution.  This procedure reduces numerical dispersion, but increases computational overhead.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">RCA provides the user with a number of numerical schemes for solving the water quality mass balance equations.  In time-variable mode, the user may utilize one of four explicit time-stepping algorithms, centered-in-time, centered-in-space, centered-in-time with a Smolarkiewicz corrector, and forward-in-time with or without a Smolarkiewicz corrector.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">RCA grid size is taken from the hydrodynamic model used to drive RCA.  RCA has been developed, so that it can be adapted to either a sigma level or Z-level segmentation in the vertical direction.</P>
+<P ALIGN="JUSTIFY"></P>
+<P ALIGN="JUSTIFY">RCA permits the user two types of storage for computational results:(1) grid-wide dumps of all state-variables at <FONT FACE="WP TypographicSymbols">A</FONT>coarse<FONT FACE="WP TypographicSymbols">@</FONT> time intervals; and/or (2) detailed dumps for selected segments at <FONT FACE="WP TypographicSymbols">A</FONT>fine<FONT FACE="WP TypographicSymbols">@</FONT> time intervals.  Model output provides the user the ability to create both contour plots for any plane within the model and time series plots.  The structure of the model output is defined in the kinetic subroutine.</P>
+<P ALIGN="JUSTIFY"></P>
+<U><P>Limitations</P>
+
+</U><P ALIGN="JUSTIFY">The user must be familiar with FORTRAN and have the source code to modify the systems available in the model.  RCA currently does not have pre- or post-processing capabilities through a GUI.</P>
+<U>
+<P>Application History</P>
+
+</U><P ALIGN="JUSTIFY">Since its development in 1994, RCA has been used in numerous locations including Massachusetts and Cape Cod Bays, Jamaica Bay, the New York Bight, Green Bay, the Mississippi River, and Lake Victoria.  Most applications have been with advanced eutrophication kinetics coupled to sediment nutrient flux, chemical equilibrium, and/or wetlands models.</P>
+<U>
+<P>Model Use Features</P>
+
+<P>&nbsp;</P>
+<P>Model Support</P>
+
+<I><P>Users Manual</P>
+</I></U><P>A users manual is available which describes the development of the input files required to execute an RCA run.</P>
+<U>
+<I><P>Developer/Sponsor Support</P>
+</I></U><P>RCA was developed by HydroQual, Inc.  </P>
+<B><U>
+</B></U><P>&#9;HydroQual, Inc.</P>
+<P>&#9;One Lethbridge Plaza</P>
+<P>&#9;Mahwah, NJ  07430</P>
+<P>&#9;(201) 529-5151</P>
+
+<I><U><P>Internet Resources</P>
+</I></U><P>None.</P>
+<U>
+<I><P>Workshops</P>
+</I></U><P>None.</P>
+<U>
+<P>References</P>
+
+<I><P>Model documentation references</P>
+</I></U><P>HydroQual, Inc. 1992. User<FONT FACE="WP TypographicSymbols">=</FONT>s guide for RCA (Release 2.0)</P>
+<U>
+<I><P>Application references</P>
+</I></U><P ALIGN="JUSTIFY">HydroQual, Inc. 1995.  A water quality model for Massachusetts and Cape Cod Bays:  Calibration of the Bays Eutrophication Model (BEM).  Prepared for the Massachusetts Water Resources Authority.  Boston, Massachusetts.</P>
+<U><P ALIGN="JUSTIFY"></P>
+</U><P>HydroQual, Inc. 1998.  A water quality model for Jamaica Bay: Calibration of the Jamaica Bay Eutrophication Model (JEM).  Prepared for the City of New York Department of Environmental Protection.</P></BODY>
+</HTML>

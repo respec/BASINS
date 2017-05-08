@@ -1,0 +1,22 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE ATCCompMl SYSTEM "http://hspf.com/pub/download/ATCCompMl.dtd">
+<ATCCompMl>
+  <Component 
+    File="WebDataManager.dll" 
+    Version="2.4" 
+    Date="7/8/2002"
+    Size="111222"
+    Name="WebDataManager"
+    Destination="c:\vbexperimental\update\ComponentXML">
+    <Instructions>
+       Get "http..."
+       Unzip...
+       Delete...
+       Register...
+    </Instructions>
+    <ReleaseNote>
+       Update to version 2.3
+       Fixes bug with aaa
+    </ReleaseNote>
+  </Component>
+</ATCCompMl>

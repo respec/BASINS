@@ -1,0 +1,14 @@
+ShapeDefines = 88, 88, 862, 741, 
+CShape_IO = 15, 8, 1109, 950, 
+Layer = 215, 184, 1081, 953, C
+frmMain = 24, 169, 1083, 944, , 60, 8, 750, 493, C
+UTILITY = 308, 308, 1264, 973, C
+UtilMap = 312, 2, 1442, 653, C
+ShapeBrowse = 22, 7, 888, 827, 
+frmEditCols = 0, 0, 0, 0, C, 110, 110, 609, 531, C
+frmOptions = 39, 182, 920, 857, C, 176, 176, 728, 652, C
+UtilProjection = 206, 261, 852, 737, C
+UtilRTF = 22, 20, 726, 645, C
+modShapeDump = 198, 0, 1089, 933, C
+frmText = 326, 231, 1217, 896, C, 29, 44, 920, 709, C
+clsDBF = 0, 0, 0, 0, C
