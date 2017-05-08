@@ -127,11 +127,11 @@ Public Module CookieCutterGraphs
                             Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(1)
                             Dim lAuxPane As GraphPane = lZgc.MasterPane.PaneList(0)
                             Dim lCurve As ZedGraph.LineItem = Nothing
-                            lAuxPane.YAxis.Title.Text = "Benthic Algae (" & ChrW(956) & "g/m^2"
+                            lAuxPane.YAxis.Title.Text = "Ben. algae (" & ChrW(956) & "g/m^2"
                             lAuxPane.YAxis.Scale.Min = 0
-                            lMainPane.YAxis.Title.Text = "Phytoplankton as Chlorophyll a (" & ChrW(956) & "g/l)"
+                            lMainPane.YAxis.Title.Text = "Phytoplankton as chlorophyll a (" & ChrW(956) & "g/L)"
                             lMainPane.YAxis.Scale.Min = 0
-                            lMainPane.Y2Axis.Title.Text = "NH4-N, NO3-N, and PO4-P (mg/l)"
+                            lMainPane.Y2Axis.Title.Text = "Dissolved NH4-N, NO3-N, and PO4-P (mg/L)"
                             lMainPane.Y2Axis.Scale.Min = 0
 
                             lMainPane.XAxis.Title.Text = lRchresCaption
@@ -149,7 +149,7 @@ Public Module CookieCutterGraphs
                             lCurve.Symbol.Type = SymbolType.None
                             lCurve.Line.Color = Drawing.Color.FromName("Red")
                             lCurve.Line.Width = 1
-                            lCurve.Label.Text = "Phytoplankton as Chlorophyll a"
+                            lCurve.Label.Text = "Phytoplankton as chlorophyll a"
                             lCurve = lMainPane.CurveList.Item(1)
                             lCurve.Line.IsVisible = True
                             lCurve.Symbol.Type = SymbolType.None
@@ -217,7 +217,7 @@ Public Module CookieCutterGraphs
                             Dim lCurve As ZedGraph.LineItem = Nothing
                             lAuxPane.YAxis.Title.Text = "Flow (cfs)"
                             lAuxPane.YAxis.Scale.Min = 0
-                            lMainPane.YAxis.Title.Text = "Total Suspended Solids (mg/l)"
+                            lMainPane.YAxis.Title.Text = "Total Suspended Solids (mg/L)"
                             lMainPane.YAxis.Scale.Min = 0
                             lMainPane.XAxis.Title.Text = lRchresCaption
                             lMainPane.Y2Axis.Title.Text = "Bed Depth (ft)"
@@ -236,7 +236,7 @@ Public Module CookieCutterGraphs
                             lCurve.Symbol.Type = SymbolType.None
                             lCurve.Line.Color = Drawing.Color.FromName("Red")
                             lCurve.Line.Width = 1
-                            lCurve.Label.Text = "Total Suspended Solids (mg/l)"
+                            lCurve.Label.Text = "Total Suspended Solids (mg/L)"
 
                             lCurve = lMainPane.CurveList.Item(1)
                             lCurve.Line.IsVisible = True
@@ -349,7 +349,7 @@ Public Module CookieCutterGraphs
                                 lCurve.Symbol.Type = SymbolType.None
                                 lCurve.Line.Color = Drawing.Color.FromName("orange")
                                 lCurve.Line.Width = 2
-                                lCurve.Label.Text = "RES Standard (" & WQCriteriaInmgperliter & " mg/l)"
+                                lCurve.Label.Text = "RES Standard (" & WQCriteriaInmgperliter & " mg/L)"
                                 lCurve = lMainPane.CurveList.Item(1)
                                 lCurve.Line.IsVisible = True
                                 lCurve.Symbol.Type = SymbolType.None
