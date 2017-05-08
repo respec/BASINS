@@ -90,6 +90,10 @@ Public Class frmHspfSimulationManager
                 pSpecFileName = aFileName
                 Me.Text = g_AppNameLong & " - " & pSpecFileName
                 SaveSetting(g_AppNameShort, "Defaults", "FileName", pSpecFileName)
+
+                'do check to see if these UCIs share a common transfer wdm
+                TransferWDMCheck()
+
             End If
         Catch ex As Exception
             Logger.Msg("Could not open: " & aFileName & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Error opening specification file")
@@ -128,7 +132,7 @@ Public Class frmHspfSimulationManager
             .Title = "Save Simulation Specification File"
             .FileName = pSpecFileName
             .DefaultExt = ".hsmspec"
-            .Filter = "*" & .DefaultExt & "|*" & .DefaultExt & "*.*|*.*"
+            .Filter = "HSM Specification File (*." & .DefaultExt & ")|*." & .DefaultExt
             .FilterIndex = 0
             '.CheckFileExists = False
             '.CheckPathExists = False
@@ -139,7 +143,7 @@ Public Class frmHspfSimulationManager
                     Me.Text = g_AppNameLong & " - " & pSpecFileName
                     SaveSetting(g_AppNameShort, "Defaults", "FileName", pSpecFileName)
                 Catch ex As Exception
-                    Logger.Msg("Could not save: " & .FileName & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Error saving specification file")
+                    Logger.Msg("Could Not save: " & .FileName & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Error saving specification file")
                 End Try
             End If
         End With
@@ -191,6 +195,10 @@ Public Class frmHspfSimulationManager
             lWatershedForm.ModelIcon.Top = (SchematicDiagram.Height - SchematicDiagram.IconHeight) / 2 + lRandom.Next(SchematicDiagram.Height / 3)
         End If
         lWatershedForm.ShowDialog(Me)
+
+        'also do transfer wdm check here
+        TransferWDMCheck()
+
     End Sub
 
     Public Sub New()
@@ -315,6 +323,28 @@ Public Class frmHspfSimulationManager
         End If
         Me.Cursor = Cursors.Default
         Me.Enabled = True
+    End Sub
+
+    Private Sub TransferWDMCheck()
+        'do check to see if these UCIs share a common transfer wdm
+        Dim lUCIs As New atcCollection
+        For Each lIcon As clsIcon In SchematicDiagram.AllIcons
+            If lIcon.Scenario IsNot Nothing Then
+                lUCIs.Add(lIcon.UciFile)
+            End If
+        Next
+        If lUCIs.Count > 1 Then
+            'return blank if models are not connected
+            'return name of transfer wdm if models are connected using a single transfer wdm
+            'return 'MULTIPLE' if models are connected but connections use multiple wdms 
+            Dim lTransferWDM As String = UsesTransfer(lUCIs)
+            If lTransferWDM.Length = 0 Then
+                'these models are not connected
+            ElseIf lTransferWDM = "MULTIPLE" Then
+                Logger.Msg("These UCIs are connected through multiple transfer WDM files." & vbCrLf & vbCrLf &
+                           "Do you want to modify them to use a single transfer WDM file?", MsgBoxStyle.YesNo, "Use Transfer WDM?")
+            End If
+        End If
     End Sub
 
 End Class
