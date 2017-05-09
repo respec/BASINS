@@ -1,11 +1,12 @@
 ﻿
 Imports atcUtility
 Imports atcData
-Imports atcGraph
 Imports atcBasinsObsWQ
 Imports MapWinUtility 'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
 Imports ZedGraph 'this is coming from a DLL as the original project was a C# project and not a VB project
 Imports System.Collections.Specialized
+Imports System.Linq
+
 
 
 Public Module AutomatedGraphs
@@ -102,6 +103,8 @@ Public Module AutomatedGraphs
                 End If
 
                 Dim lRecordIndex As Integer = 0
+                Dim ListTypeOfGraph() As String = {"timeseries", "frequency", "scatter", "cumulative probability"}
+                Dim ListDatasetType() As String = {"left", "right", "aux", "add", "multiply", "divide", "subtract", "regression", "45-deg line"}
 
                 If lgraphRecordsNew.Count < 1 Then
                     MsgBox("The" & lGraphSpecificationFile & " file didn't have any useful data. Reading next CSV file!", vbOKOnly)
@@ -111,9 +114,9 @@ Public Module AutomatedGraphs
                 Dim lDBFdatasource As New atcDataSourceBasinsObsWQ
                 Do
                     Dim lTimeseriesGroup As New atcTimeseriesGroup
-                    Dim lGraphInit() As String = lgraphRecordsNew(lRecordIndex) 'MyReader.ReadFields 'lGraphRecords(lRecordIndex).split(",")
+                    Dim lGraphInit() As String = lgraphRecordsNew(lRecordIndex)
                     Dim TypeOfGraph As String = Trim(lGraphInit(0)).ToLower
-                    If Not (TypeOfGraph = "timeseries" Or TypeOfGraph = "frequency" Or TypeOfGraph = "scatter") Then
+                    If Not (ListTypeOfGraph.Contains(TypeOfGraph)) Then
                         MsgBox("Wrong type of graph specified. Aborting graphing from file " & lGraphSpecificationFile & " Reading next CSV file!", vbOKOnly)
                         Continue For
                     End If
@@ -148,10 +151,7 @@ Public Module AutomatedGraphs
                     Dim lGraphDataset() As String = lgraphRecordsNew(lRecordIndex)
                     Dim skipGraph As Boolean = False
 
-                    Do While (lGraphDataset(0).ToLower = "left" Or lGraphDataset(0).ToLower = "right" Or
-                        lGraphDataset(0).ToLower = "aux" Or lGraphDataset(0).ToLower = "regression" Or lGraphDataset(0).ToLower = "45-deg line" Or
-                        lGraphDataset(0).ToLower = "add" Or lGraphDataset(0).ToLower = "multiply" Or skipGraph)
-
+                    Do While (ListDatasetType.Contains(lGraphDataset(0).ToLower) Or skipGraph)
 
                         'For CurveNumber As Integer = 1 To lNumberOfCurves
 
@@ -176,13 +176,7 @@ Public Module AutomatedGraphs
                                         MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
                                                 " DSN " & Trim(lGraphDataset(2)) & " to make " & IO.Path.GetFileName(lOutFileName) &
                                                 " graph. Moving to next graph!", vbOKOnly, "Automated Graph: Time Series Issue")
-                                        lRecordIndex += 1
-                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("scatter") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("timeseries") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("frequency") Or
-                                                    lRecordIndex + 1 > lgraphRecordsNew.Count)
-                                            lRecordIndex += 1
-                                        Loop
+                                        lRecordIndex = skipLines(lgraphRecordsNew, lRecordIndex, ListTypeOfGraph)
 
                                         skipGraph = True
                                         Exit Do
@@ -198,13 +192,7 @@ Public Module AutomatedGraphs
                                                 " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) &
                                                 " to make " & IO.Path.GetFileName(lOutFileName) & " graph. Moving to next graph!",
                                                vbOKOnly, "Automated Graph: Time Series Issue")
-                                        lRecordIndex += 1
-                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("scatter") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("timeseries") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("frequency") Or
-                                                    lRecordIndex + 1 > lgraphRecordsNew.Count)
-                                            lRecordIndex += 1
-                                        Loop
+                                        lRecordIndex = skipLines(lgraphRecordsNew, lRecordIndex, ListTypeOfGraph)
 
                                         skipGraph = True
                                         Exit Do
@@ -219,13 +207,7 @@ Public Module AutomatedGraphs
                                                 " Location " & Trim(lGraphDataset(2)) & " Constituent " &
                                                 Trim(lGraphDataset(3)) & " to make " & IO.Path.GetFileName(lOutFileName) &
                                                 " graph. Moving to next graph!", vbOKOnly, "Automated Graph: Time Series Issue")
-                                        lRecordIndex += 1
-                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("scatter") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("timeseries") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("frequency") Or
-                                                    lRecordIndex + 1 > lgraphRecordsNew.Count)
-                                            lRecordIndex += 1
-                                        Loop
+                                        lRecordIndex = skipLines(lgraphRecordsNew, lRecordIndex, ListTypeOfGraph)
 
                                         skipGraph = True
                                         Exit Do
@@ -233,7 +215,7 @@ Public Module AutomatedGraphs
                             End Select
 
 
-                            Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
+
 
 
                             If (lGraphDataset.GetUpperBound(0) > 10 AndAlso Not String.IsNullOrEmpty(Trim(lGraphDataset(10)))) Then
@@ -267,29 +249,49 @@ Public Module AutomatedGraphs
                                 lTimeSeries = lseasons.SplitBySelected(lTimeSeries, Nothing).ItemByIndex(1)
 
                             End If
+                            Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
+                            If (Trim(lGraphDataset(0)).ToLower = "multiply" Or Trim(lGraphDataset(0)).ToLower = "add" Or
+                                    Trim(lGraphDataset(0)).ToLower = "subtract" Or Trim(lGraphDataset(0)).ToLower = "divide") AndAlso
+                                                        lTimeseriesGroup.Count = 0 Then
+                                'Checking if there is a time series before this operation
+                                MsgBox("No timeseries was read for the graph " & IO.Path.GetFileName(lOutFileName) & " to add, subtract, multiply, or divide the time series." &
+                                           " Skipping to the next graph.", vbOKOnly, "Automated Graph: Time Series Issue")
 
-                            If Trim(lGraphDataset(0)).ToLower = "add" AndAlso lTimeseriesGroup.Count >= 1 Then
+                                lRecordIndex = skipLines(lgraphRecordsNew, lRecordIndex, ListTypeOfGraph)
+
+                                skipGraph = True
+                                Exit Do
+
+                            ElseIf (Trim(lGraphDataset(0)).ToLower = "multiply" Or Trim(lGraphDataset(0)).ToLower = "add" Or
+                                    Trim(lGraphDataset(0)).ToLower = "subtract" Or Trim(lGraphDataset(0)).ToLower = "divide") AndAlso
+                                                       lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.GetDefinedValue("TimeUnit").Value <> aTu Then
+                                'Checking if the time series read before has the same time steps as the current timeseries
+                                MsgBox("The time steps of timseries in the graph " & IO.Path.GetFileName(lOutFileName) & " are different. Mathematical operation will not take place.", vbOKOnly,
+                                       "Automated Graph: Time Series Issue")
+                                lRecordIndex = skipLines(lgraphRecordsNew, lRecordIndex, ListTypeOfGraph)
+                                skipGraph = True
+                                Exit Do
+
+                            ElseIf Trim(lGraphDataset(0)) = "add" AndAlso lTimeseriesGroup.Count >= 1 Then
 
                                 lTimeseriesGroup(lTimeseriesGroup.Count - 1) = lTimeseriesGroup(lTimeseriesGroup.Count - 1) + lTimeSeries
                                 lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("Constituent", "Sum")
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("ID", "")
 
                             ElseIf Trim(lGraphDataset(0)) = "multiply" AndAlso lTimeseriesGroup.Count >= 1 Then
                                 lTimeseriesGroup(lTimeseriesGroup.Count - 1) = lTimeseriesGroup(lTimeseriesGroup.Count - 1) * lTimeSeries
                                 lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("Constituent", "Product")
-                            ElseIf (Trim(lGraphDataset(0)).ToLower = "multiply" Or Trim(lGraphDataset(0)).ToLower = "add") AndAlso
-                                                    lTimeseriesGroup.Count = 0 Then
-                                MsgBox("No timeseries was read for the graph " & IO.Path.GetFileName(lOutFileName) & " to add or multiply the time series." &
-                                       " Skipping to the next graph.", vbOKOnly, "Automated Graph: Time Series Issue")
-                                lRecordIndex += 1
-                                Do Until (Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("scatter") Or
-                                            Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("timeseries") Or
-                                            Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("frequency") Or
-                                            lRecordIndex + 1 > lgraphRecordsNew.Count)
-                                    lRecordIndex += 1
-                                Loop
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("ID", "")
 
-                                skipGraph = True
-                                Exit Do
+                            ElseIf Trim(lGraphDataset(0)) = "subtract" AndAlso lTimeseriesGroup.Count >= 1 Then
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1) = lTimeseriesGroup(lTimeseriesGroup.Count - 1) - lTimeSeries
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("Constituent", "Subtract")
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("ID", "")
+
+                            ElseIf Trim(lGraphDataset(0)) = "divide" AndAlso lTimeseriesGroup.Count >= 1 Then
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1) = lTimeseriesGroup(lTimeseriesGroup.Count - 1) / lTimeSeries
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("Constituent", "divide")
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("ID", "")
 
                             Else
                                 lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
@@ -470,7 +472,9 @@ Public Module AutomatedGraphs
                 lCurve = lPaneMain.CurveList.Item(lNumberOfMainPaneCurves)
                 lNumberOfMainPaneCurves += 1
             ElseIf (Trim(lGraphDataset(0)).ToLower = "add" Or
-                        Trim(lGraphDataset(0)).ToLower = "multiply") Then
+                        Trim(lGraphDataset(0)).ToLower = "multiply" Or
+                        Trim(lGraphDataset(0)).ToLower = "subtract" Or
+                        Trim(lGraphDataset(0)).ToLower = "divide") Then
                 Continue For
 
             End If
@@ -781,5 +785,15 @@ Public Module AutomatedGraphs
 
     End Function
 
+    Private Function skipLines(ByRef aGraphRecords As ArrayList, ByVal aRecordIndex As Integer, ByVal aListTypeOfGraph As String()) As Integer
 
+        aRecordIndex += 1
+
+        Do Until (aRecordIndex + 1 > aGraphRecords.Count) OrElse
+                aListTypeOfGraph.Contains(aGraphRecords(aRecordIndex)(0).ToLower)
+
+            aRecordIndex += 1
+        Loop
+        Return aRecordIndex
+    End Function
 End Module

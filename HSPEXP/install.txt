@@ -1,3 +1,12 @@
+Dated: 5/9/2017
+HSPEXP+1.32
+Features:
+1. A user can now add, subtract, multiply, or divide a timeseries to an existing time series before plotting. Keywords "add", "subtract", "multiply", or "divide" will ensure that the timeseries in the current row will get added, subtracted, multiplied, or divided to the timeseries in the previous row.
+
+Bugs Fixed:
+1. Error checking has been improved. If HSPEXP+ cannot find a timeseries, it provides a proper error message and moves to the next graph, and generates rest of the graphs.
+2. Code has been cleaned by removing unneeded variables and references.
+
 Dated: 4/14/2017
 HSPEXP+1.31
 Bugs Fixed

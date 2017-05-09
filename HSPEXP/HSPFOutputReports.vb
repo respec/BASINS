@@ -1,27 +1,15 @@
-Imports System
 Imports atcUtility
 Imports atcData
 Imports atcGraph
-Imports atcTimeseriesStatistics
-Imports atcWDM
-Imports atcHspfBinOut
 Imports HspfSupport
 Imports atcUCI
-Imports atcBasinsObsWQ
-Imports atcList
 Imports MapWinUtility 'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
-Imports ZedGraph 'this is coming from a DLL as the original project was a C# project and not a VB project
 Imports System.Collections.Specialized
 Imports System.IO 'added by Becky to get directory exists function
 
-
-
 Module HSPFOutputReports
-    Private pBaseFolders As New ArrayList
     Private pTestPath As String
-    Private pRootPath As String 'if the user is using the VT run number folder naming conventions (Run01, Run02, etc.), this is the root path that holds all the run folders
     Private pBaseName As String 'this is the base part of the file name (i.e., without .uci, .wdm, .exs) - it MUST be used to name everything
-    Private pRunNo As Integer = -1 'the current run number - may or may not be provided, if it is then use it to copy to a new folder
     Private pOutputLocations As New atcCollection
 
     Private pGraphSaveFormat As String
@@ -30,13 +18,7 @@ Module HSPFOutputReports
     Private pGraphAnnual As Boolean = True
     Private pCurveStepType As String = "NonStep"
     Private pConstituents As New atcCollection
-    Private pPerlndSegmentStarts() As Integer
-    Private pImplndSegmentStarts() As Integer
-    Private pGraphWQOnly As Boolean = False 'indicates whether ONLY graphing water quality
-    Private pGraphWQ As Boolean = False 'indicates whether to graph only water quality
     Private pWaterYears As Boolean = False
-    Private pExpertPrec As Boolean = False
-    Private pIdsPerSeg As Integer = 50
     'following were added by Becky:
     'Private pProgressBar As New RWZProgress
     Private pMakeStdGraphs As Boolean 'flag to indicate user wants standard graphs (monthly, daily, storms, flow duration)
@@ -51,14 +33,12 @@ Module HSPFOutputReports
     Private pListModelParameters As Boolean = False
     Private ASDate, AEDate As Date
 
-
-
     Private Sub Initialize()
         If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
             'Start running status monitor to give better progress and status indication during long-running processes
             Dim pStatusMonitor As New MonitorProgressStatus
-            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
-                                            IO.Directory.GetCurrentDirectory, _
+            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"),
+                                            IO.Directory.GetCurrentDirectory,
                                             System.Diagnostics.Process.GetCurrentProcess.Id) Then
                 'put our status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
                 pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
@@ -76,7 +56,6 @@ Module HSPFOutputReports
         pOutputLocations.Clear()
 
         pGraphSaveFormat = ".png"
-        'pGraphSaveFormat = ".emf"
         pGraphSaveWidth = 1300
         pGraphSaveHeight = 768
         pMakeStdGraphs = True
@@ -114,7 +93,7 @@ Module HSPFOutputReports
         End If
         'set up the timeseries attributes for statistics
         atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
-        
+
         pTestPath = StartUp.cmbUCIPath.Text
         pBaseName = lTestName
         pTestPath = Mid(pTestPath, 1, Len(pTestPath) - Len(pBaseName) - 4)
@@ -125,7 +104,7 @@ Module HSPFOutputReports
             End If
         Next
         StartUp.Hide()
-        Logger.StartToFile(pTestPath & "LogFile.txt")
+        Logger.StartToFile(pTestPath & "LogFile.txt", , False)
         Logger.Status("Run characteristics read", True)
     End Sub
 
@@ -220,14 +199,13 @@ Module HSPFOutputReports
 
                 loutfoldername = pTestPath
 
-
-
-                Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") & _
+                Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") &
                                     Format(Microsoft.VisualBasic.DateAndTime.Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
                 loutfoldername = pTestPath & "Reports_" & lDateString & "\"
-                System.IO.Directory.CreateDirectory(loutfoldername)
-                System.IO.File.Copy(pTestPath & pBaseName & ".uci", loutfoldername & pBaseName & ".uci", overwrite:=True)
+                Directory.CreateDirectory(loutfoldername)
+                File.Copy(pTestPath & pBaseName & ".uci", loutfoldername & pBaseName & ".uci", overwrite:=True)
                 'A folder name is given that has the basename and the time when the run was made.
+
                 pListModelParameters = False
                 If pListModelParameters Then
                     ListReachParametersForAllUCIFiles(loutfoldername)
@@ -256,7 +234,7 @@ Module HSPFOutputReports
                     Next
                     Logger.Status(Now & " Producing Area Reports.", True)
                     Logger.Dbg(Now & " Producing land use and area reports")
-                    'Now the area repotrs are generated for all the reaches in the UCI file.
+                    'Now the area reports are generated for all the reaches in the UCI file.
                     Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
                     lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
                     SaveFileString(loutfoldername & "/AreaReports/AreaReport.txt", lReport.ToString)
@@ -267,11 +245,12 @@ Module HSPFOutputReports
                     Dim lExpertSystemFileNames As New NameValueCollection
                     AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
                     If lExpertSystemFileNames.Count < 1 Then 'Becky added this if-then to warn the user if no EXS files exist
-                        'In future, at this point, user should get an option if they want to make teir own exs file and this program should
-                        'help the user do it.
-                        MsgBox("No basins specifications file (*.exs) file found in directory " & IO.Directory.GetCurrentDirectory & "!  Statistics, summaries, and graphs cannot be computed.", vbOKOnly, "No Specification File!")
+                        MsgBox("No basins specifications file (*.exs) file found in directory " & IO.Directory.GetCurrentDirectory &
+                               "!  Statistics, summaries, and graphs cannot be computed. EXS file can be generated using WinHSPF3.1 or later.",
+                               vbOKOnly, "No Specification File!")
                         Logger.Dbg(Now & " No basins specifications file found, no statistics computed")
                     End If
+
                     Dim lExpertSystem As HspfSupport.atcExpertSystem
 
                     For Each lExpertSystemFileName As String In lExpertSystemFileNames
@@ -483,7 +462,7 @@ Module HSPFOutputReports
                                     Dim QUALActivity As Integer = aHspfUci.OpnSeqBlock.Opn(i).Tables("ACTIVITY").Parms(QUAL).Value
                                     If QUALActivity = 0 Then 'Make sure to double check code for AGCHEM cases.
 
-                                        Logger.Dbg("The operation " & lOperationType & " " & aHspfUci.OpnSeqBlock.Opns(i).Id & _
+                                        Logger.Dbg("The operation " & lOperationType & " " & aHspfUci.OpnSeqBlock.Opns(i).Id &
                                                      "does not have PQUAL section active. Please check output for consistency!")
                                     Else
                                         NQUALS = aHspfUci.OpnSeqBlock.Opn(i).Tables("QUAL-PROPS").OccurCount
@@ -506,7 +485,7 @@ Module HSPFOutputReports
                             For Each QUALIDItem In AcceptableQUALNames
                                 If Not QUALIDS.Contains(QUALIDItem) Then
                                     Dim ans As Integer
-                                    ans = MsgBox("The QUALID " & QUALIDItem & "has not been used for all the operations. The nutrient balance reports will not continue" & _
+                                    ans = MsgBox("The QUALID " & QUALIDItem & "has not been used for all the operations. The nutrient balance reports will not continue" &
                                                  " and the program will exit!")
                                     End
 
@@ -642,10 +621,10 @@ Module HSPFOutputReports
                                 '    lOutFolderName, True, True)
                             End If
                         Else
-                            Logger.Dbg("The HBN file didn't have any data for the constituent " & lConstituent & "  therefore the balance reports for " & _
+                            Logger.Dbg("The HBN file didn't have any data for the constituent " & lConstituent & "  therefore the balance reports for " &
                                 lConstituent & " will not be generated. Make sure that HSPF run completed last time.")
                             Dim ans As Integer
-                            ans = MsgBox("HBN files do not have any data.  Constituent Balance reports will not be generated. " & _
+                            ans = MsgBox("HBN files do not have any data.  Constituent Balance reports will not be generated. " &
                                          "Did uci file run properly last time?")
                         End If
                         For Each lTimeSeries As atcTimeseries In lScenarioResults.DataSets
