@@ -91,14 +91,14 @@ Public Class atcDataSourceNOAAISH
 
             pColDefs = New Hashtable
             Dim ColRecLength As ColDef = AddColEnd(1, 4, "RecLength")
-            Dim ColISHStation As ColDef = AddColEnd(4, 8, "ISHStation")
-            Dim ColWBANStation As ColDef = AddColEnd(4, 8, "WBANStation")
-            Dim ColYear As ColDef = AddColEnd(9, 12, "Year")
-            Dim ColMonth As ColDef = AddColEnd(13, 14, "Month")
-            Dim ColDay As ColDef = AddColEnd(15, 16, "Day")
-            Dim ColHour As ColDef = AddColEnd(36, 37, "Hour")
-            Dim ColMinute As ColDef = AddColEnd(39, 40, "Minute")
-            Dim ColDataSource As ColDef = AddColEnd(59, 59, "DataSource")
+            Dim ColISHStation As ColDef = AddColEnd(5, 10, "ISHStation")
+            Dim ColWBANStation As ColDef = AddColEnd(11, 15, "WBANStation")
+            Dim ColYear As ColDef = AddColEnd(16, 19, "Year")
+            Dim ColMonth As ColDef = AddColEnd(20, 21, "Month")
+            Dim ColDay As ColDef = AddColEnd(22, 23, "Day")
+            Dim ColHour As ColDef = AddColEnd(24, 25, "Hour")
+            Dim ColMinute As ColDef = AddColEnd(26, 27, "Minute")
+            Dim ColDataSource As ColDef = AddColEnd(28, 28, "DataSource")
 
             '3 mandatory (Wind, ATemp, DPTemp), up to 4 PREC, and up to 6 SKYC-LAY and SKYC-SUM
             Dim ColValue(30) As ColDef
@@ -106,55 +106,26 @@ Public Class atcDataSourceNOAAISH
 
             'do 1st line read and column population to check format
             curLine = NextLine(inReader) 'read line to examine format
-            ''check position 29 
-            'lChr = Mid(curLine, 29, 1)
-            'If lChr = "+" OrElse lChr = "-" Then 'updated format (April 4, 2005)
-            '    Dim ColReportType As ColDef = AddColEnd(29, 33, "ReportType")
-            '    lPos = 66
-            'Else 'older format (Feb 25, 2002)
-            '    Dim ColReportType As ColDef = AddColEnd(29, 33, "ReportType")
-            '    lpos = 39
-            'End If
-            'lPos = 30
+            'check position 29 
+            lChr = Mid(curLine, 29, 1)
+            If lChr = "+" OrElse lChr = "-" Then 'updated format (April 4, 2005)
+                Dim ColReportType As ColDef = AddColEnd(29, 33, "ReportType")
+                lPos = 66
+            Else 'older format (Feb 25, 2002)
+                Dim ColReportType As ColDef = AddColEnd(29, 33, "ReportType")
+                lpos = 39
+            End If
             'set mandatory data fields/flags
-            lNumVals = 0
-            lPos = InStr(curLine, "WIND", CompareMethod.Text)
-            If lPos > 0 Then
-                'lPos += 8 'skip from direction to speed column
-                ColValue(lNumVals) = AddColumn(lPos, 8, "WIND")
-                ColFlag1(lNumVals) = AddColumn(lPos + 8, 8, "WINDFlag")
-                lNumVals += 1
-            End If
-            lPos = InStr(curLine, "ATEMP", CompareMethod.Text)
-            If lPos > 0 Then
-                ColValue(lNumVals) = AddColumn(lPos, 8, "ATEMP")
-                ColFlag1(lNumVals) = AddColumn(lPos + 8, 8, "ATEMPFlag")
-                lNumVals += 1
-            End If
-            lPos = InStr(curLine, "DEWP", CompareMethod.Text)
-            If lPos > 0 Then
-                ColValue(lNumVals) = AddColumn(lPos, 8, "DPTEMP")
-                ColFlag1(lNumVals) = AddColumn(lPos + 8, 8, "TEMPFlag")
-                lNumVals += 1
-            End If
-            lPos = InStr(curLine, "PRECIP", CompareMethod.Text)
-            If lPos > 0 Then
-                lPos += 3 'skip from interval length to amount field
-                ColValue(lNumVals) = AddColumn(lPos, 5, "HPCP1")
-                ColFlag1(lNumVals) = AddColumn(lPos + 8, 1, "HPCP1Flag")
-                lNumVals += 1
-            End If
-            lPos = InStr(curLine, "CLOUD", CompareMethod.Text)
-            If lPos > 0 Then
-                ColValue(lNumVals) = AddColumn(lPos, 8, "CLOU")
-                ColFlag1(lNumVals) = AddColumn(lPos + 8, 8, "CLOUFlag")
-                lNumVals += 1
-            End If
-            curLine = NextLine(inReader) 'skip 2nd header record
+            ColValue(0) = AddColumn(lPos, 4, "WIND")
+            ColFlag1(0) = AddColumn(lPos + 4, 1, "WINDFlag")
+            ColValue(1) = AddColumn(lPos + 22, 5, "ATEMP")
+            ColFlag1(1) = AddColumn(lPos + 27, 1, "ATEMPFlag")
+            ColValue(2) = AddColumn(lPos + 28, 5, "DPTEMP")
+            ColFlag1(2) = AddColumn(lPos + 33, 1, "DPTEMPFlag")
 
             Try
-                curLine = NextLine(inReader)
-                'SetDataColumns(curLine, lNumVals, ColValue, ColFlag1) 'find any additional data
+                'curLine = NextLine(inReader)
+                SetDataColumns(curLine, lNumVals, ColValue, ColFlag1) 'find any additional data
                 PopulateColumns(curLine)
 
                 If (IsNumeric(ColYear.Value) AndAlso _
@@ -173,14 +144,10 @@ Public Class atcDataSourceNOAAISH
                         'If ColDataSource.Value <> "9" AndAlso ColMinute.Value = "00" Then
                         '    'only use values recorded on the hour, not in between
                         lOrigHour = ColHour.Value
-                        'If ColMinute.Value > 0 Then 'round minute to nearest hour
-                        '    ColHour.Value += Math.Round(ColMinute.Value / 60 + Double.Epsilon)
-                        'End If
-                        If ColMinute.Value > 0 Then 'round to next hour
-                            ColHour.Value += 1
+                        If ColMinute.Value > 0 Then 'round minute to nearest hour
+                            ColHour.Value += Math.Round(ColMinute.Value / 60 + Double.Epsilon)
                         End If
                         lJDate = Jday(ColYear.Value, ColMonth.Value, ColDay.Value, ColHour.Value, 0, 0)
-                        'lJDate -= 10 / 24
                         For i As Integer = 0 To lNumVals - 1
                             lData = DataSets.ItemByKey(ColValue(i).Name)
                             If lData Is Nothing Then 'haven't encountered this constituent yet
@@ -205,23 +172,21 @@ Public Class atcDataSourceNOAAISH
                             If lTSInd >= lData.numValues Then 'expand buffer
                                 lData.numValues = lTSInd * 2
                             End If
-                            If ColValue(i).Length > 4 Then
-                                lMissStr = "999.9".Substring(0, 5)
+                            If ColValue(i).Length >= 4 Then
+                                lMissStr = "9999".Substring(0, 4)
                             Else
                                 lMissStr = "9999".Substring(0, ColValue(i).Length)
                             End If
-                            If (Not ColValue(i).Name = "HPCP1-TM" OrElse
-                               ColValue(i).Value = "01") AndAlso
-                               IsNumeric(ColValue(i).Value) Then
+                            If Not ColValue(i).Name = "HPCP1-TM" OrElse _
+                               ColValue(i).Value = "01" Then
                                 If lJDate > lData.Dates.Value(lTSInd) Then
                                     lTSInd += 1
                                     lCurVal = CDbl(ColValue(i).Value)
                                 Else 'duplicate records for same date, see if there's an existing value
-                                    If Not ColValue(i).Value = lMissStr AndAlso
-                                       Not ColFlag1(i).Value.Contains("7") AndAlso
+                                    If Not ColValue(i).Value = lMissStr AndAlso _
+                                       Not ColFlag1(i).Value.Contains("7") AndAlso _
                                        Not ColFlag1(i).Value.Contains("3") Then 'current value is valid
-                                        lCurVal = lData.Value(lTSInd)
-                                        If ColValue(i).Name = "HPCP1" AndAlso
+                                        If ColValue(i).Name = "HPCP1" AndAlso _
                                            ColValue(i).Value > lCurVal Then 'use more recent larger precip value
                                             lCurVal = CDbl(ColValue(i).Value)
                                         ElseIf lData.Value(lTSInd) = MissingVal Then
@@ -230,74 +195,54 @@ Public Class atcDataSourceNOAAISH
                                         Else 'keep existing value
                                             lCurVal = GetNaN()
                                         End If
-                                    Else 'missing or unwanted value
-                                        lCurVal = GetNaN()
                                     End If
                                 End If
                                 If Not Double.IsNaN(lCurVal) Then
                                     lData.Dates.Value(lTSInd) = lJDate
-                                    If lCurVal = CDbl(lMissStr) OrElse
-                                       ColFlag1(i).Value = "3" OrElse
+                                    If lCurVal = CDbl(lMissStr) OrElse _
+                                       ColFlag1(i).Value = "3" OrElse _
                                        ColFlag1(i).Value = "7" Then 'Or ColFlag1(i).Value = "9" Then
                                         lData.Value(lTSInd) = MissingVal
                                     Else
                                         Select Case ColValue(i).Name.Substring(0, 4)
-                                            Case "WIND" 'convert m/s to mph
-                                                lData.Value(lTSInd) = lCurVal' * 2.23694 'no scale factor / 4.47
-                                            Case "ATEM", "DPTE" 'convert Deg C to Deg F
-                                                lData.Value(lTSInd) = lCurVal' * 9 / 5 + 32
+                                            Case "WIND" 'convert m/s (scale factor 10) to mph
+                                                lData.Value(lTSInd) = lCurVal / 4.47
+                                            Case "ATEM", "DPTE" 'convert Deg C (scale factor 10) to Deg F
+                                                lData.Value(lTSInd) = lCurVal / 10 * 9 / 5 + 32
                                             Case "HPCP"
                                                 If ColValue(i).Name.EndsWith("TM") Then
                                                     'keep time units as is
                                                     lData.Value(lTSInd) = lCurVal
                                                 Else
-                                                    'convert mm to inches
-                                                    lData.Value(lTSInd) = lCurVal / 25.4
+                                                    'convert mm (scale factor 10) to inches
+                                                    lData.Value(lTSInd) = lCurVal / 254.0
                                                 End If
-                                                'Case "CLOU"
-                                                '    Select Case CInt(lCurVal)
-                                                '        Case 0, 1
-                                                '            lData.Value(lTSInd) = 0
-                                                '        Case 2
-                                                '            lData.Value(lTSInd) = 2.5
-                                                '        Case 3, 4, 5
-                                                '            lData.Value(lTSInd) = lCurVal + 1
-                                                '        Case 6
-                                                '            lData.Value(lTSInd) = 7.5
-                                                '        Case 7, 8
-                                                '            lData.Value(lTSInd) = lCurVal + 2
-                                                '        Case Else
-                                                '            lData.Value(lTSInd) = MissingVal
-                                                '    End Select
-                                                '    If lData.Value(lTSInd) > 10 Then
-                                                '        lData.Value(lTSInd) = 10
-                                                '    End If
                                             Case Else
                                                 lData.Value(lTSInd) = lCurVal
                                         End Select
-                                        If (ColFlag1(i).Value = "2" OrElse ColFlag1(i).Value = "6") AndAlso
-                                           (ColValue(i).Name = "WIND" OrElse ColValue(i).Name = "ATEMP" OrElse
+                                        If (ColFlag1(i).Value = "2" OrElse ColFlag1(i).Value = "6") AndAlso _
+                                           (ColValue(i).Name = "WIND" OrElse ColValue(i).Name = "ATEMP" OrElse _
                                             ColValue(i).Name = "DPTEMP" OrElse ColValue(i).Name = "HPCP1") Then
-                                            Logger.Dbg("SUSPECT (flag=" & ColFlag1(i).Value & ") value (" & ColValue(i).Value & ") for " & ColValue(i).Name &
-                                                       " found at " & ColYear.Value & "/" &
-                                                       ColMonth.Value & "/" & ColDay.Value & " " &
+                                            Logger.Dbg("SUSPECT (flag=" & ColFlag1(i).Value & ") value (" & ColValue(i).Value & ") for " & ColValue(i).Name & _
+                                                       " found at " & ColYear.Value & "/" & _
+                                                       ColMonth.Value & "/" & ColDay.Value & " " & _
                                                        ColHour.Value & ":" & ColMinute.Value)
                                         End If
                                     End If
                                     lData.Attributes.SetValue("Count", lTSInd)
                                 End If
                             Else 'Precip time value > 1, ignore it 
-                                'move ahead one in loop to skip ensuing precip value
-                                'Logger.Dbg("Skipping Precip value with Time > 1 for " & ColValue(i).Name & " on " & _
-                                'ColYear.Value & "/" & ColMonth.Value & "/" & ColDay.Value & " " & _
-                                'lOrigHour & ":" & ColMinute.Value)
-                                i += 1
+                                    'move ahead one in loop to skip ensuing precip value
+                                    'Logger.Dbg("Skipping Precip value with Time > 1 for " & ColValue(i).Name & " on " & _
+                                    'ColYear.Value & "/" & ColMonth.Value & "/" & ColDay.Value & " " & _
+                                    'lOrigHour & ":" & ColMinute.Value)
+                                    i += 1
                             End If
                         Next
                         'End If
 
                         curLine = NextLine(inReader)
-                        'SetDataColumns(curLine, lNumVals, ColValue, ColFlag1) 'find any additional data
+                        SetDataColumns(curLine, lNumVals, ColValue, ColFlag1) 'find any additional data
                         PopulateColumns(curLine)
                     Loop
                     Open = True
@@ -350,7 +295,7 @@ Public Class atcDataSourceNOAAISH
 
         Dim i As Integer
 
-        aNumVals = 4 '3
+        aNumVals = 3
         'remove all possible pre-existing additional data elements
         For i = 1 To 6
             If i < 5 Then

@@ -213,11 +213,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcD4EMLauncher\atcD4EMLauncher.vbproj">
-      <Project>{6cde2fe3-deba-46ba-b395-8f71f87159b0}</Project>
-      <Name>atcD4EMLauncher</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
@@ -251,8 +246,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>del C:\dev\BASINS\Bin\Plugins\Basins\basins.dll
-del C:\dev\BASINS\Bin\Plugins\Basins\GWToolbox.dll</PreBuildEvent>
+    <PreBuildEvent>del C:\dev\BASINS40\Bin\Plugins\Basins\basins.dll
+del C:\dev\BASINS40\Bin\Plugins\Basins\GWToolbox.dll</PreBuildEvent>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>

@@ -595,12 +595,12 @@ Public Module modMetData
                     For k = 1 To lMLen
                         lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
                         lFilledIt = False
-                        j = 0
+                        j = 1
                         While j < aTSAvail.Count
                             If Not lAvailableRanked Then
-                                lInd = lDist.IndexFromKey(CStr(j + 1))
+                                lInd = lDist.IndexFromKey(CStr(j))
                             Else
-                                lInd = j
+                                lInd = j - 1
                             End If
                             lTSer = aTSAvail.ItemByIndex(lInd)
                             lFVal = -1
