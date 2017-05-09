@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A49A321C-8E78-48AB-9C7F-A06152322D2D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>HSPFSimulationManager.My.MyApplication</StartupObject>
+    <RootNamespace>HSPFSimulationManager</RootNamespace>
+    <AssemblyName>HSPFSimulationManager</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>HSPFSimulationManager.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>HSPFSimulationManager.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>SARA.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MapWinUtility">
+      <HintPath>..\..\BASINS\bin-D4EM15\x86Debug\MapWinUtility.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="clsSimulationManagerSpecFile.vb" />
+    <Compile Include="clsIcon.vb" />
+    <Compile Include="ctlSchematic.Designer.vb">
+      <DependentUpon>ctlSchematic.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlSchematic.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="frmHspfSimulationManager.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmHspfSimulationManager.Designer.vb">
+      <DependentUpon>frmHspfSimulationManager.vb</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEditWatershed.Designer.vb">
+      <DependentUpon>frmEditWatershed.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmEditWatershed.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmNameScenario.Designer.vb">
+      <DependentUpon>frmNameScenario.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmNameScenario.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRunHSPF.Designer.vb">
+      <DependentUpon>frmRunHSPF.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmRunHSPF.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmText.Designer.vb">
+      <DependentUpon>frmText.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmText.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="modUCI.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ctlSchematic.resx">
+      <DependentUpon>ctlSchematic.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmHspfSimulationManager.resx">
+      <DependentUpon>frmHspfSimulationManager.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEditWatershed.resx">
+      <DependentUpon>frmEditWatershed.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmNameScenario.resx">
+      <DependentUpon>frmNameScenario.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmRunHSPF.resx">
+      <DependentUpon>frmRunHSPF.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmText.resx">
+      <DependentUpon>frmText.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\transparent177x121.png" />
+    <Content Include="SARA.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BASINS\atcControls\atcControls-D4EM15.vbproj">
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Name>atcControls-D4EM15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BASINS\atcData\atcData-D4EM15.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData-D4EM15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BASINS\atcMetCmp\atcMetCmp-D4EM15.vbproj">
+      <Project>{72264BDC-23F5-4A55-B53D-0752099CB263}</Project>
+      <Name>atcMetCmp-D4EM15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BASINS\atcSegmentation\atcSegmentation-D4EM15.vbproj">
+      <Project>{813E3F46-36CA-4320-BB05-325EEC553D3D}</Project>
+      <Name>atcSegmentation-D4EM15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BASINS\atcTimeseriesScript\atcTimeseriesScript-D4EM15.vbproj">
+      <Project>{40DE1F29-3531-4BC2-9D7E-324DC92689DF}</Project>
+      <Name>atcTimeseriesScript-D4EM15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BASINS\atcUCI\atcUCI-D4EM15.vbproj">
+      <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
+      <Name>atcUCI-D4EM15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BASINS\atcUtility\atcUtility-D4EM15.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility-D4EM15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BASINS\atcWDM\atcWDM-D4EM15.vbproj">
+      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
+      <Name>atcWDM-D4EM15</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

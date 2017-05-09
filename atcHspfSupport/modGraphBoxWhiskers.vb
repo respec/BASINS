@@ -10,6 +10,8 @@ Imports System.Collections
 Public Class BoxWhiskerItem
 
     Public Location As String
+    Public Scenario As String
+    Public TimeSpan As String
     Public Constituent As String
     Public Units As String
     'Public Labels As New List(Of String)
@@ -30,16 +32,22 @@ Public Module modGraphBoxWhiskers
         lZgc.Height = 768
 
         Dim lGrapher As New atcGraph.clsGraphBoxWhisker(Nothing, lZgc, True)
-        lGrapher.DatasetsCollection = items.LabelValueCollection
-
         Select Case items.Constituent
             Case "Sediment"
-                lGrapher.Title = "Box-Whisker plot of sediment loading rate from all land uses."
+                lGrapher.Title = "Box-Whisker plot of sediment loading rate from all land uses in " & items.Scenario & " model." &
+                    vbCrLf & items.TimeSpan
             Case "TotalP"
-                lGrapher.Title = "Box-Whisker plot of total phoshphorus loading rate from all land uses."
+                lGrapher.Title = "Box-Whisker plot of total phoshphorus loading rate from all land uses in " & items.Scenario & " model." &
+                    vbCrLf & items.TimeSpan
             Case "TotalN"
-                lGrapher.Title = "Box-Whisker plot of total nitrogen loading rate from all land uses."
+                lGrapher.Title = "Box-Whisker plot of total nitrogen loading rate from all land uses in " & items.Scenario & " model." &
+                    vbCrLf & items.TimeSpan
+            Case Else
+                Exit Sub
         End Select
+        lGrapher.DatasetsCollection = items.LabelValueCollection
+        lGrapher.ShowOutliers = False
+
 
         lGrapher.OutputFile = aOutputFileName
 
@@ -68,7 +76,7 @@ Public Module modGraphBoxWhiskers
             .Add(Color.Indigo)
         End With
         lGrapher.DataColors = data_colors
-        lGrapher.ShowOutliers = True
+
 
         'specify the orientation angle of the x-axis label texts
         '-90 (default) is vertical orientation, 0 is horizontal

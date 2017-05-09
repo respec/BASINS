@@ -26,9 +26,9 @@ Public Class clsUSGSBaseflowPlugin
         Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
         Show = Nothing
         Dim lBatchTitle As String = "Base-flow Separation Batch"
-        Dim lChoice As String = Logger.MsgCustomOwned("Please choose analysis approach below:", _
-                                                      "Base-Flow Separation Analysis", _
-                                                      Nothing, _
+        Dim lChoice As String = Logger.MsgCustomOwned("Please choose analysis approach below:",
+                                                      "Base-Flow Separation Analysis",
+                                                      Nothing,
                                                       New String() {"Interactive", "Batch File", "Batch Map"})
         If lChoice = "Batch File" Then
             Dim lfrmBatch As New frmBatch()
@@ -157,8 +157,8 @@ Public Class clsUSGSBaseflowPlugin
         aForm.Initialize(aTimeseriesGroup, lBasicAttributes, True)
     End Sub
 
-    Public Overrides Sub Save(ByVal aTimeseriesGroup As atcData.atcDataGroup, _
-                              ByVal aFileName As String, _
+    Public Overrides Sub Save(ByVal aTimeseriesGroup As atcData.atcDataGroup,
+                              ByVal aFileName As String,
                               ByVal ParamArray aOption() As String)
 
         If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
@@ -184,43 +184,4 @@ Public Class clsUSGSBaseflowPlugin
             Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
         End Try
     End Sub
-
-    Public Shared Function ComputeRankedAnnualTimeseries(ByVal aTimeseriesGroup As atcTimeseriesGroup, _
-                                                         ByVal aNDay() As Double, _
-                                                         ByVal aHighFlag As Boolean, _
-                                                         ByVal aFirstYear As Integer, _
-                                                         ByVal aLastYear As Integer, _
-                                                         ByVal aBoundaryMonth As Integer, _
-                                                         ByVal aBoundaryDay As Integer, _
-                                                         ByVal aEndMonth As Integer, _
-                                                         ByVal aEndDay As Integer) As atcTimeseriesGroup
-        Dim lArgs As New atcDataAttributes
-        lArgs.SetValue("Timeseries", aTimeseriesGroup)
-
-        lArgs.SetValue("NDay", aNDay)
-        lArgs.SetValue("HighFlag", aHighFlag)
-
-        lArgs.SetValue("FirstYear", aFirstYear)
-        lArgs.SetValue("LastYear", aLastYear)
-
-        lArgs.SetValue("BoundaryMonth", aBoundaryMonth)
-        lArgs.SetValue("BoundaryDay", aBoundaryDay)
-
-        lArgs.SetValue("EndMonth", aEndMonth)
-        lArgs.SetValue("EndDay", aEndDay)
-
-        Dim lHighLow As String = "low"
-        If aHighFlag Then
-            lHighLow = "high"
-        End If
-
-        Dim lCalculator As New atcTimeseriesBaseflow.atcTimeseriesBaseflow
-        If lCalculator.Open("n-day " & lHighLow & " timeseries", lArgs) Then
-            For Each lDataset As atcTimeseries In lCalculator.DataSets
-                ComputeRanks(lDataset, Not aHighFlag, False)
-            Next
-        End If
-        Return lCalculator.DataSets
-    End Function
-
 End Class

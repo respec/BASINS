@@ -57,6 +57,10 @@ Public Class clsBaseflowPart
         If TargetTS Is Nothing Then
             Return Nothing
         End If
+        If Double.IsNaN(DrainageArea) OrElse DrainageArea <= 0 Then
+            gError = "Error:PART:Drainage Area for station: " & TargetTS.Attributes.GetValue("Location") & " Is NOT set."
+            Return Nothing
+        End If
 
         'checking the drainage area size
         Dim lMsgDrainageArea As String = ""

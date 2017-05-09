@@ -5,7 +5,8 @@ Imports MapWinUtility
 
 Public Module ConstituentBudget
     Private pRunningTotals As atcCollection
-    Private pOutputTotals As atcCollection
+    Private pOutputConnectionArea As atcCollection
+    Private pOutputLoad As atcCollection
     Private pPERLND As atcCollection
     Private pIMPLND As atcCollection
     Private pGENERLoadingExists As Boolean = False
@@ -45,7 +46,8 @@ Public Module ConstituentBudget
         Dim lDataForAllBarGraphs As New atcCollection
 
         pRunningTotals = New atcCollection
-        pOutputTotals = New atcCollection
+        pOutputConnectionArea = New atcCollection
+        pOutputLoad = New atcCollection
         pPERLND = New atcCollection
         pIMPLND = New atcCollection
         pGENERLoadingExists = False
@@ -185,7 +187,7 @@ Public Module ConstituentBudget
         lReport6.AppendLine("")
         lReport6.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches of Interest(%).")
 
-        lReportLoadingRate.AppendLine(aScenario & " " & " Average Annual " & aBalanceType & "Loading rates " & lUnits & "per unit area (ac).")
+        lReportLoadingRate.AppendLine(aScenario & " " & " Average Annual " & aBalanceType & "Loading rates " & lUnits & "ac/yr.")
 
         lReportLoadingRate.AppendLine("   Run Made " & aRunMade)
         lReportLoadingRate.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
@@ -424,7 +426,7 @@ This message box will not be shown again for." & aBalanceType)
 
                             Dim lPointTons As Double = 0.0
                             .CurrentRecord += 1
-                            'If lID.Id = 102 Then Stop
+                            'If lID.Id = 610 Then Stop
                             For Each lSource As HspfPointSource In lID.PointSources
                                 If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
                                     Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
@@ -530,7 +532,7 @@ This message box will not be shown again for." & aBalanceType)
                                                          lDiversion, aSDateJ, aEDateJ)
                                 lReport2.Append(.Item1)
                                 lNonpointTons = .Item2
-                                lGENERLoad = .Item3
+                                lGENERLoad = + .Item3
                                 'When calculating losses and gains to the water columns from the be depth, deposition is the loss from the stream and 
                                 'scour is the gain from the stream. Using this terminology for Load Allocation report makes it consistent for the Load Allocation Report.
 
@@ -1198,10 +1200,12 @@ This message box will not be shown again for." & aBalanceType)
             Dim LandUsesList() As String = lLandusesHeader.Substring(1, PointSourcesPlacesLocation - 2).Split(vbTab)
 
 
-            Dim LoadingRateSummary As String = "Loading Rate Summary for " & aBalanceType & " by Each Land Land Use: " & lUnits & "/acre" & vbCrLf
+            Dim LoadingRateSummary As String = "Loading Rate Summary for " & aBalanceType & " by Each Land Land Use: " & lUnits & "/acre/yr" & vbCrLf
 
             lDataForBoxWhiskerPlot.Constituent = aBalanceType
-            lDataForBoxWhiskerPlot.Units = "(" & lUnits & "/acre)"
+            lDataForBoxWhiskerPlot.Scenario = aScenario
+            lDataForBoxWhiskerPlot.TimeSpan = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+            lDataForBoxWhiskerPlot.Units = "(" & lUnits & "/acre/yr)"
             lDataForBoxWhiskerPlot.Location = "All"
             LoadingRateSummary &= "Landuse" & vbTab & "Mean" & vbTab & "Min" & vbTab & "Max" & vbCrLf
             For Each LandUse As String In LandUsesList
@@ -1216,31 +1220,34 @@ This message box will not be shown again for." & aBalanceType)
 
                 Dim LoadingRateCollectionForEachLanduse As New List(Of Double)
 
-                For Each Key As String In pOutputTotals.Keys
+                For Each Key As String In pOutputConnectionArea.Keys
                     Dim colonLocation As Integer = Key.IndexOf(":")
                     Dim LandUseFromKey As String = SafeSubstring(Key, 0, colonLocation - 1)
                     Dim OperationType As String = SafeSubstring(Key, colonLocation - 1, 1)
                     Dim OperationNumber As Integer = SafeSubstring(Key, colonLocation + 1, 3)
-
+                    Dim loadingRate As Double = 0.0
                     If OperationType & ":" & LandUseFromKey = LandUse Then
                         count += 1
                         LoadingRateLine1 &= OperationType & ":" & OperationNumber & vbTab
-                        LoadingRateLine2 &= DoubleToString(pOutputTotals.ItemByKey(Key), , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab
+                        loadingRate = pOutputLoad.ItemByKey(Key) / pOutputConnectionArea.ItemByKey(Key)
+                        LoadingRateLine2 &= DoubleToString(loadingRate, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab
 
-                        sum += pOutputTotals.ItemByKey(Key)
-                        If pOutputTotals.ItemByKey(Key) > max Then
-                            max = pOutputTotals.ItemByKey(Key)
+                        sum += loadingRate
+                        If loadingRate > max Then
+                            max = loadingRate
                         End If
-                        If pOutputTotals.ItemByKey(Key) < min Then
-                            min = pOutputTotals.ItemByKey(Key)
+                        If loadingRate < min Then
+                            min = loadingRate
                         End If
 
-                        LoadingRateCollectionForEachLanduse.Add(pOutputTotals.ItemByKey(Key))
+                        LoadingRateCollectionForEachLanduse.Add(loadingRate)
 
                     End If
                 Next Key
+                If LoadingRateCollectionForEachLanduse.Count > 0 Then
+                    lDataForBoxWhiskerPlot.LabelValueCollection.Add(LandUse, LoadingRateCollectionForEachLanduse.ToArray)
+                End If
 
-                lDataForBoxWhiskerPlot.LabelValueCollection.Add(LandUse, LoadingRateCollectionForEachLanduse.ToArray)
                 LoadingRateSummary &= DoubleToString(sum / count, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab &
                     DoubleToString(min, , lNumberFormat,,, lNumberOfSignificantDigits) &
                     vbTab & DoubleToString(max, , lNumberFormat,,, lNumberOfSignificantDigits) & vbCrLf
@@ -1270,7 +1277,9 @@ This message box will not be shown again for." & aBalanceType)
 
             For Each lReach As String In lReaches
                 Dim lDataForOneBarGraph As New BarGraphItem
-                lDataForOneBarGraph.Units = "(" & lUnits & "/acre)"
+                lDataForOneBarGraph.Scenario = aScenario
+                lDataForOneBarGraph.TimeSpan = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+                lDataForOneBarGraph.Units = "(" & lUnits & "/yr)"
                 lDataForOneBarGraph.Constituent = aBalanceType
 
                 lReport3.Append(aUci.OpnBlks("RCHRES").OperFromID(lReach.Substring(5)).Caption.Substring(12))
@@ -1297,6 +1306,12 @@ This message box will not be shown again for." & aBalanceType)
                     If aOutputLocations.Count > 0 Then
                         For Each lOutputLocation As String In aOutputLocations
                             If lReach.Substring(5) = lOutputLocation.Substring(2) Then
+                                lSourceDescription = lSourceDescription.Replace("Loss", "Cumulative Instream Losses")
+                                lSourceDescription = lSourceDescription.Replace("Gain", "Cumulative Instream Gains")
+                                lSourceDescription = lSourceDescription.Replace("AdditionalSources", "Additional Sources")
+                                lSourceDescription = lSourceDescription.Replace("DirectAtmosphericDeposition", "Direct Atm. Desposition")
+                                lSourceDescription = lSourceDescription.Replace("GENERSources", "GENER Sources")
+                                lSourceDescription = lSourceDescription.Replace("PointSources", "Point Sources")
 
                                 lReport5.Append(vbTab & FormatNumber(lValue, 2, TriState.True, TriState.False, TriState.False))
                                 lDataForOneBarGraph.LabelValueCollection.Add(lSourceDescription, lValue)
@@ -1503,7 +1518,8 @@ This message box will not be shown again for." & aBalanceType)
                 aTotal2 = 0
             End If
             If aTestLocation.Contains(":") Then
-                pOutputTotals.Increment(aLandUse & aTestLocation, lrate)
+                pOutputConnectionArea.Increment(aLandUse & aTestLocation, aConnectionArea)
+                pOutputLoad.Increment(aLandUse & aTestLocation, aTotal2)
 
                 aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
             & aTestLocation & " " _
@@ -1622,7 +1638,7 @@ This message box will not be shown again for." & aBalanceType)
 
 
         aGENERLoad += TotalGENERLoad
-        Dim lAdditionalSource As Double = aTotalInflow - lReachTotal - aAtmDep - aPoint - aUpstreamIn - aGENERload + UpStreamDiversion
+        Dim lAdditionalSource As Double = aTotalInflow - lReachTotal - aAtmDep - aPoint - aUpstreamIn - aGENERLoad + UpStreamDiversion
         If lGENERLoadingExists AndAlso (Not GENERTSinWDM) AndAlso (Not pMessageShown) Then
             Logger.Msg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting. 
 This message box will not be shown again for." & aBalanceType)
@@ -1637,7 +1653,7 @@ This message box will not be shown again for." & aBalanceType)
                 aAtmDep += pRunningTotals.ItemByKey("Reach" & lTributaryId & " DirectAtmosphericDeposition")
                 aDiversion += pRunningTotals.ItemByKey("Reach" & lTributaryId & " Diversion")
                 If pGENERLoadingExists Then
-                    aGENERload += pRunningTotals.ItemByKey("Reach" & lTributaryId & " GENERSources")
+                    aGENERLoad += pRunningTotals.ItemByKey("Reach" & lTributaryId & " GENERSources")
                 End If
                 pRunningTotals.Increment("Reach" & aReach.Id & " Gain", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Gain"))
                 pRunningTotals.Increment("Reach" & aReach.Id & " Loss", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Loss"))
@@ -1648,7 +1664,7 @@ This message box will not be shown again for." & aBalanceType)
         pRunningTotals.Add("Reach" & aReach.Id & " PointSources", aPoint)
         pRunningTotals.Add("Reach" & aReach.Id & " DirectAtmosphericDeposition", aAtmDep)
         If pGENERLoadingExists Then
-            pRunningTotals.Add("Reach" & aReach.Id & " GENERSources", aGENERload)
+            pRunningTotals.Add("Reach" & aReach.Id & " GENERSources", aGENERLoad)
         End If
         pRunningTotals.Add("Reach" & aReach.Id & " AdditionalSources", lAdditionalSource)
         pRunningTotals.Add("Reach" & aReach.Id & " Diversion", aDiversion)
@@ -1665,7 +1681,7 @@ This message box will not be shown again for." & aBalanceType)
         lContribPercent.Add("Reach" & aReach.Id & " Gain", pRunningTotals.ItemByKey("Reach" & aReach.Id & " Gain") * 100 / aTotalInflow)
         lContribPercent.Add("Reach" & aReach.Id & " PointSources", aPoint * 100 / aTotalInflow)
         lContribPercent.Add("Reach" & aReach.Id & " DirectAtmosphericDeposition", aAtmDep * 100 / aTotalInflow)
-        lContribPercent.Add("Reach" & aReach.Id & " GENERSources", aGENERload * 100 / aTotalInflow)
+        lContribPercent.Add("Reach" & aReach.Id & " GENERSources", aGENERLoad * 100 / aTotalInflow)
         lContribPercent.Add("Reach" & aReach.Id & " AdditionalSources", lAdditionalSource * 100 / aTotalInflow)
 
 
@@ -1684,7 +1700,7 @@ This message box will not be shown again for." & aBalanceType)
 
         End If
 
-        Return New Tuple(Of String, Double, Double)(LoadingByLanduse, lReachTotal, aGENERLoad)
+        Return New Tuple(Of String, Double, Double)(LoadingByLanduse, lReachTotal, TotalGENERLoad)
     End Function
 
     Private Function FindDownStreamExitNumber(ByVal aUCI As HspfUci,

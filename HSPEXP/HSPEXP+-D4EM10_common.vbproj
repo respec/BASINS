@@ -136,12 +136,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="HSPFOutputReports.vb" />
-    <Compile Include="MakeEXSFile.Designer.vb">
-      <DependentUpon>MakeEXSFile.vb</DependentUpon>
-    </Compile>
-    <Compile Include="MakeEXSFile.vb">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="modListUCIParameters.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -176,14 +171,10 @@
     <Compile Include="StartUp.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="WriteEXSFile.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="HelpForm.resx">
       <DependentUpon>HelpForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MakeEXSFile.resx">
-      <DependentUpon>MakeEXSFile.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -222,10 +213,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM10.vbproj">
-      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
-      <Name>MapWinUtility-D4EM10</Name>
-    </ProjectReference>
     <ProjectReference Include="..\atcBasinsObsWQ\atcBasinsObsWQ-D4EM10.vbproj">
       <Project>{7DCB47A0-7B03-4B7C-BC42-B8D920D46604}</Project>
       <Name>atcBasinsObsWQ-D4EM10</Name>
@@ -269,6 +256,10 @@
     <ProjectReference Include="..\atcWDM\atcWDM-D4EM10.vbproj">
       <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
       <Name>atcWDM-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM10.vbproj">
+      <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>
+      <Name>MapWinUtility-D4EM10</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

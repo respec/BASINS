@@ -215,7 +215,7 @@ Public Class clsGraphProbability
 
         'Upper right corner of chart is better for this graph type
         lPane.Legend.Location = New Location(0.95, 0.05, CoordType.ChartFraction, AlignH.Right, AlignV.Top)
-        lPane.Legend.FontSpec.Size += 2
+        'lPane.Legend.FontSpec.Size += 2
         lPane.Legend.FontSpec.IsBold = True
 
         lCurve = lPane.AddCurve(lCurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)

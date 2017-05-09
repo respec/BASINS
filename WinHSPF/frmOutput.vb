@@ -42,9 +42,11 @@ Public Class frmOutput
         Dim lRow As Integer
 
         If radio1.Checked Then
-            txtDesc.Text = "Output will be generated at each 'Hydrology Calibration' output location for " & _
-              "simulated flow, surface runoff, interflow, base flow, potential evapotranspiration, actual evapotranspiration, " & _
-              "upper zone storage, lower zone storage, and total moisture supply in default project units at daily interval."
+            txtDesc.Text = "Output will be generated at each 'Hydrology Calibration' output location for " &
+              "simulated flow, surface runoff, interflow, base flow, potential evapotranspiration, actual evapotranspiration, " &
+              "upper zone storage, lower zone storage, and total moisture supply in default project units at daily interval." & vbCrLf &
+            "A Basins Specification (EXS) file will also be generated for the output location, that can used with HSPEXP+ to generate " &
+            "calibration statistics and graphs."
             With agdOutput.Source
                 .Rows = 0
                 .Columns = 2

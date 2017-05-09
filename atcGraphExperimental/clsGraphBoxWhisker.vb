@@ -255,6 +255,7 @@ Public Class clsGraphBoxWhisker
                     End With
                 End If
             End If
+            .MajorGrid.IsVisible = True
             .Title.Text = XTitle()
         End With
 
@@ -264,6 +265,7 @@ Public Class clsGraphBoxWhisker
             Else
                 .Type = AxisType.Linear
             End If
+            .MajorGrid.IsVisible = True
             '.Scale.MaxAuto = False
             '.Scale.MinAuto = False
             '.MinSpace = 80
@@ -300,15 +302,20 @@ Public Class clsGraphBoxWhisker
         End If
 
         Dim lIndex As Integer = 0
-        For Each lTimSer As atcTimeseries In Datasets
-            pZgc.GraphPane.CurveList(lIndex).Tag = lTimSer.Serial & "|" & lTimSer.Attributes.GetValue("ID") & "|" & lTimSer.Attributes.GetValue("Data Source")
-            lIndex += 3
-        Next
+        If Datasets IsNot Nothing AndAlso Datasets.Count = 0 Then
+            For Each lTimSer As atcTimeseries In Datasets
+                pZgc.GraphPane.CurveList(lIndex).Tag = lTimSer.Serial & "|" & lTimSer.Attributes.GetValue("ID") & "|" & lTimSer.Attributes.GetValue("Data Source")
+                lIndex += 3
+            Next
+        End If
+
+
         'lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lTimeseries.Attributes.GetValue("Data Source")   'Make this easy to find again even if label changes
 
         pZgc.GraphPane.BarSettings.ClusterScaleWidthAuto = False
         pZgc.GraphPane.BarSettings.MinClusterGap = 0.2
         pZgc.GraphPane.BarSettings.MinBarGap = 0.2
+
         'With pZgc.GraphPane.XAxis
         '    .Type = AxisType.Text
         '    .Scale.TextLabels = pXLabels.ToArray()
@@ -391,6 +398,7 @@ Public Class clsGraphBoxWhisker
 
             label.FontSpec.Border.IsVisible = False
             label.FontSpec.Angle = pXLabelAngle
+            label.FontSpec.Size = 10
             If pShowXLabelColor AndAlso pDataColors IsNot Nothing AndAlso pDataColors.Count >= lDatasetsCount Then
                 label.FontSpec.FontColor = pDataColors(I)
             Else
@@ -423,6 +431,7 @@ Public Class clsGraphBoxWhisker
 
     Private Sub BoxPlot(ByVal data As Generic.List(Of Double()), ByVal names As Generic.List(Of String))
         Dim myPane As GraphPane = pZgc.GraphPane
+        myPane.IsAlignGrids = True
         For i As Integer = 0 To data.Count - 1
             'median of each array
             Dim medians As New PointPairList()
@@ -433,16 +442,17 @@ Public Class clsGraphBoxWhisker
             'outliers
             Dim outs As New PointPairList()
             'Add the values
-            Dim lmean As Double = GetStatistic(i, "mean")
+            Dim lmedian As Double = GetStatistic(i, "%50")
             Dim lmin As Double = GetStatistic(i, "min")
             Dim lmax As Double = GetStatistic(i, "max")
             Dim lpct25 As Double = GetStatistic(i, "%25")
             Dim lpct75 As Double = GetStatistic(i, "%75")
-            medians.Add(i, lmean)
+            medians.Add(i, lmedian)
             hiLowList.Add(i, lpct75, lpct25)
             Dim iqr As Double = 1.5 * (lpct75 - lpct25)
             Dim upperLimit As Double = lpct75 + iqr
             Dim lowerLimit As Double = lpct25 - iqr
+
             If pShowOutliers Then
                 'The wiskers must end on an actual data point
                 barList.Add(i, ValueNearestButGreater(data(i), lowerLimit), ValueNearestButLess(data(i), upperLimit))
@@ -473,6 +483,7 @@ Public Class clsGraphBoxWhisker
             Dim myLine As LineItem = CType(median, LineItem)
             myLine.Line.IsVisible = False
             myLine.Symbol.Fill.Type = FillType.Solid
+
 
             'Wiskers
             Dim myerror As ErrorBarItem = myPane.AddErrorBar("", barList, Color.Black)

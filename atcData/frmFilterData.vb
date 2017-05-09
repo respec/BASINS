@@ -503,7 +503,11 @@ Public Class frmFilterData
     Private Function TserLbl(ByVal aTser As atcTimeseries) As String
         If aTser Is Nothing Then Return ""
         With aTser.Attributes
-            Dim lItem As String = .GetValue("Location") & "," & .GetValue("tu").ToString() & " " & .GetValue("Constituent")
+            Dim ltu_text As String = ""
+            If .GetValue("tu") Then
+                ltu_text = .GetValue("tu").ToString()
+            End If
+            Dim lItem As String = .GetValue("Location") & "," & ltu_text & " " & .GetValue("Constituent")
             Return lItem
         End With
     End Function

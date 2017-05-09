@@ -162,4 +162,84 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         Return lAllWDMs
     End Function
 
+    Public Function UsesTransfer(ByVal aUCIs As atcCollection) As String
+        'return blank if models are not connected
+        'return name of transfer wdm if models are connected using a single transfer wdm
+        'return 'MULTIPLE' if models are connected but connections use multiple wdms 
+        Dim lUsesTransfer As String = ""
+
+        For Each lTargetUCI As HspfUci In aUCIs
+            For Each lSourceUCI As HspfUci In aUCIs
+                If lSourceUCI.Name <> lTargetUCI.Name Then
+
+                    'build collection of wdms used by source uci 
+                    Dim lSourceWDMs As New atcCollection
+                    For lIndex As Integer = 1 To lSourceUCI.FilesBlock.Count
+                        Dim lFile As HspfFile = lSourceUCI.FilesBlock.Value(lIndex)
+                        Dim lFileTyp As String = lFile.Typ
+                        If lFileTyp.StartsWith("WDM") Then
+                            If lFileTyp = "WDM" Then
+                                lFileTyp = "WDM1"
+                            End If
+                            lSourceWDMs.Add(lFileTyp, AbsolutePath(lFile.Name.Trim, PathNameOnly(lSourceUCI.Name)).ToLower)
+                        End If
+                    Next
+
+                    'build collection of wdms used by target uci
+                    Dim lTargetWDMs As New atcCollection
+                    For lIndex As Integer = 1 To lTargetUCI.FilesBlock.Count
+                        Dim lFile As HspfFile = lTargetUCI.FilesBlock.Value(lIndex)
+                        Dim lFileTyp As String = lFile.Typ
+                        If lFileTyp.StartsWith("WDM") Then
+                            If lFileTyp = "WDM" Then
+                                lFileTyp = "WDM1"
+                            End If
+                            lTargetWDMs.Add(lFileTyp, AbsolutePath(lFile.Name.Trim, PathNameOnly(lTargetUCI.Name)).ToLower)
+                        End If
+                    Next
+
+                    Dim lUpdateCounter As Integer = 0
+                    For Each lSConn As HspfConnection In lSourceUCI.Connections
+                        Dim lOutputVol As String = lSConn.Target.VolName
+                        If lOutputVol.StartsWith("WDM") Then
+                            If lOutputVol = "WDM" Then
+                                lOutputVol = "WDM1"
+                            End If
+                            'translate wdm id into file name
+                            Dim lOutputWDMFileName As String = lSourceWDMs.ItemByKey(lOutputVol)
+                            Dim lOutputDsn As Integer = lSConn.Target.VolId
+                            Dim lInputWDMFileName As String = ""
+                            Dim lInputDsn As Integer = 0
+                            'now see if this wdm/dsn combination shows up as input to the target uci
+                            For Each lTConn As HspfConnection In lTargetUCI.Connections
+                                Dim lInputVol As String = lTConn.Source.VolName
+                                If lInputVol.StartsWith("WDM") Then
+                                    If lInputVol = "WDM" Then
+                                        lInputVol = "WDM1"
+                                    End If
+                                    'translate wdm id into file name
+                                    lInputWDMFileName = lTargetWDMs.ItemByKey(lInputVol)
+                                    lInputDsn = lTConn.Source.VolId
+                                    'do the check to see if these match
+                                    If lInputDsn = lOutputDsn Then
+                                        If lInputWDMFileName = lOutputWDMFileName Then
+                                            'we have a match!
+                                            If lUsesTransfer.Length = 0 Then
+                                                lUsesTransfer = lInputWDMFileName
+                                            Else
+                                                lUsesTransfer = "MULTIPLE"
+                                            End If
+                                        End If
+                                    End If
+                                End If
+                            Next
+                        End If
+                    Next
+
+                End If
+            Next
+        Next
+        Return lUsesTransfer
+    End Function
+
 End Module

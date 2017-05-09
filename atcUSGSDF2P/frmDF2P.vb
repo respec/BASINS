@@ -2111,10 +2111,12 @@ Public Class frmDF2P
                 txtOutputDir.Focus()
             Else
                 Try
-                    Dim lSW As New IO.StreamWriter(IO.Path.Combine(txtOutputDir.Text.Trim(), "z.txt"), False)
+                    Dim ltestFile As String = IO.Path.Combine(txtOutputDir.Text.Trim(), "z.txt")
+                    Dim lSW As New IO.StreamWriter(ltestFile, False)
                     lSW.WriteLine("Done testing for WRITE permission.")
                     lSW.Flush()
                     lSW.Close()
+                    TryDelete(ltestFile)
                 Catch ex As Exception
                     Logger.Msg("Unable to write to specified output directory." & "Try another directory.", MsgBoxStyle.Information, "Save Intermediate Results")
                     txtOutputDir.Focus()
@@ -2224,33 +2226,6 @@ Public Class frmDF2P
         Else
             Logger.Msg("Need to select at least one daily streamflow dataset", "USGS RECESS Analysis")
         End If
-    End Sub
-
-    Private Sub btnCurv_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        Dim lfrmMRC As New frmMRCControl()
-        Dim lArgs As atcDataAttributes = Nothing
-        If pRecess IsNot Nothing AndAlso pRecess.RecSumResult.Length > 0 Then
-            Dim lArr() As String = Regex.Split(pRecess.RecSumResult, "\s+")
-            If lArr.Length >= 12 Then
-                Dim lFirstMRC As New clsMRC
-                With lFirstMRC
-                    .RecSum = pRecess.RecSumResult
-                    Dim lDA As Double
-                    If lArr.Length > 12 AndAlso (Not lArr(12).StartsWith("N/A")) AndAlso Double.TryParse(lArr(12), lDA) Then
-                        .DrainageArea = lDA
-                    End If
-                End With
-                If lFirstMRC.BuildMRC() Then
-                    lArgs = New atcDataAttributes
-                    lArgs.SetValue("FirstMRC", lFirstMRC)
-                    Dim lWorkingDir As String = txtOutputDir.Text.Trim()
-                    If lWorkingDir.Length > 0 AndAlso IO.Directory.Exists(lWorkingDir) Then
-                        lArgs.SetValue("WorkingDirectory", lWorkingDir)
-                    End If
-                End If
-            End If
-        End If
-        lfrmMRC.Initialize("", lArgs)
     End Sub
 
     Private Sub frmDF2P_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown

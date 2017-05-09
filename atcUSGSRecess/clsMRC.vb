@@ -13,11 +13,15 @@ Public Class clsMRC
     Public CoeffC As Double
 
     Public Season As String
+    Public YearStart As String
+    Public YearEnd As String
 
     Public TimeOrdinal(MaxLength) As Double
     Public LogQ(MaxLength) As Double
+    Public LogQUA(MaxLength) As Double
 
     Public CurveData As atcTimeseries
+    Public CurveDataUA As atcTimeseries
 
     Public FileCurvOut As String
 
@@ -75,6 +79,7 @@ Public Class clsMRC
 
             ReDim TimeOrdinal(MaxLength)
             ReDim LogQ(MaxLength)
+            ReDim LogQUA(MaxLength)
             Dim lDeltaLogQ As Double = (MaxLogQ - MinLogQ) / (MaxLength - 1)
 
             Dim lLogQ As Double = MaxLogQ
@@ -98,15 +103,43 @@ Public Class clsMRC
             With CurveData.Attributes
                 .SetValue("YAxis", "LEFT")
                 .SetValue("GraphXAxisType", "Linear")
-                .SetValue("Location", Station)
+                '.SetValue("Location", Station)
+                .SetValue("Location", "")
                 .SetValue("Constituent", "")
-                .SetValue("Scenario", Equation)
+                If Not String.IsNullOrEmpty(YearStart) AndAlso Not String.IsNullOrEmpty(YearEnd) Then
+                    .SetValue("Scenario", Equation & " (" & Station & ", " & YearStart & "-" & YearEnd & ", " & Season & ")")
+                Else
+                    .SetValue("Scenario", Equation & " (" & Station & ", " & Season & ")")
+                End If
                 .SetValue("Point", False)
                 .SetValue("StepType", "nonstep")
                 .SetValue("SJDay", TimeOrdinal(1))
                 .SetValue("EJDay", TimeOrdinal(TimeOrdinal.Length - 1))
             End With
 
+            If Not Double.IsNaN(DrainageArea) AndAlso DrainageArea > 0 Then
+                Dim lFlow As Double = 0
+                CurveDataUA = CurveData.Clone()
+                For I As Integer = 1 To CurveDataUA.numValues
+                    lFlow = 10 ^ CurveDataUA.Value(I)
+                    CurveDataUA.Value(I) = lFlow / DrainageArea
+                Next
+                With CurveDataUA.Attributes
+                    .SetValue("Location", Station)
+                    .SetValue("Constituent", "")
+                    '.SetValue("Scenario", "Flow Per Unit Area (" & DrainageArea & " sq mi)")
+                    If Not String.IsNullOrEmpty(YearStart) AndAlso Not String.IsNullOrEmpty(YearEnd) Then
+                        .SetValue("Scenario", Station & ", " & DrainageArea & " sq mi, " & YearStart & "-" & YearEnd & ", " & Season)
+                    Else
+                        .SetValue("Scenario", Station & ", " & DrainageArea & " sq mi, " & Season)
+                    End If
+                End With
+            Else
+                If CurveDataUA IsNot Nothing Then
+                    CurveDataUA.Clear()
+                End If
+                CurveDataUA = Nothing
+            End If
             Return True
         Catch ex As Exception
             Return False

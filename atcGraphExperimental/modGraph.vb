@@ -598,7 +598,7 @@ FoundMatch:
                 If lTimeseries.Attributes.ContainsAttribute("Data Source") Then
                     lSourceFile = lTimeseries.Attributes.GetValue("Data Source")
                 End If
-                If Not IO.File.Exists(lSourceFile) And lTimeseries.Attributes.GetValue("History 1").Length > 9 Then
+                If Not IO.File.Exists(lSourceFile) And (lTimeseries.Attributes.ContainsAttribute("History 1") AndAlso lTimeseries.Attributes.GetValue("History 1").Length > 9) Then
                     'see if the history attribute contains a file name
                     lSourceFile = lTimeseries.Attributes.GetValue("History 1").Substring(10)
                 End If
@@ -1206,8 +1206,10 @@ FoundMatch:
             Dim lPaneList As XmlNodeList = lDoc.GetElementsByTagName("PaneList")
             Dim lTag As String
             lCurveIndex = -1
+            Dim lPaneCount As Integer = -1
             For Each lPane As XmlNode In lPaneList
                 For Each lItemNode As XmlNode In lPane.ChildNodes
+                    lPaneCount += 1
                     For Each lItemNode2 As XmlNode In lItemNode.ChildNodes
                         If lItemNode2.Name = "CurveList" Then
                             For Each lChildItem As XmlNode In lItemNode2.ChildNodes
@@ -1215,6 +1217,14 @@ FoundMatch:
                                 For Each lChildNode As XmlNode In lChildItem.ChildNodes
                                     If lChildNode.Name = "Tag" Then
                                         lTag = lChildNode.InnerText
+                                        If lPaneCount = 0 And lPane.ChildNodes.Count > 1 Then
+                                            'on aux axis
+                                            EnableAuxAxis(aZgc.MasterPane, True, 0.2)
+                                            If Not aZgc.MasterPane.PaneList(0).CurveList.Contains(lCurves(lCurveIndex)) Then
+                                                aZgc.MasterPane.PaneList(0).CurveList.Add(lCurves(lCurveIndex))
+                                                aZgc.MasterPane.PaneList(1).CurveList.Remove(lCurves(lCurveIndex))
+                                            End If
+                                        End If
                                     ElseIf lChildNode.Name = "Label" Then
                                         If lChildNode.InnerText.EndsWith("true") Then
                                             lChildNode.InnerText = lChildNode.InnerText.Remove(lChildNode.InnerText.Length - 4, 4) 'work around for a strange bug
@@ -1251,15 +1261,15 @@ FoundMatch:
                                 If lChildItem.Name = "Title" Then
                                     For Each lScaleNode As XmlNode In lChildItem.ChildNodes
                                         If lScaleNode.Name = "Text" Then
-                                            aZgc.MasterPane.PaneList(0).XAxis.Title.Text = lScaleNode.InnerText
+                                            aZgc.MasterPane.PaneList(lPaneCount).XAxis.Title.Text = lScaleNode.InnerText
                                         End If
                                     Next
                                 ElseIf lChildItem.Name = "Scale"
                                     For Each lScaleNode As XmlNode In lChildItem.ChildNodes
                                         If lScaleNode.Name = "Min" Then
-                                            aZgc.MasterPane.PaneList(0).XAxis.Scale.Min = lScaleNode.InnerText
+                                            aZgc.MasterPane.PaneList(lPaneCount).XAxis.Scale.Min = lScaleNode.InnerText
                                         ElseIf lScaleNode.Name = "Max" Then
-                                            aZgc.MasterPane.PaneList(0).XAxis.Scale.Max = lScaleNode.InnerText
+                                            aZgc.MasterPane.PaneList(lPaneCount).XAxis.Scale.Max = lScaleNode.InnerText
                                         End If
                                     Next
                                 End If
@@ -1269,15 +1279,15 @@ FoundMatch:
                                 If lChildItem.Name = "Title" Then
                                     For Each lScaleNode As XmlNode In lChildItem.ChildNodes
                                         If lScaleNode.Name = "Text" Then
-                                            aZgc.MasterPane.PaneList(0).YAxis.Title.Text = lScaleNode.InnerText
+                                            aZgc.MasterPane.PaneList(lPaneCount).YAxis.Title.Text = lScaleNode.InnerText
                                         End If
                                     Next
                                 ElseIf lChildItem.Name = "Scale"
                                     For Each lScaleNode As XmlNode In lChildItem.ChildNodes
                                         If lScaleNode.Name = "Min" Then
-                                            aZgc.MasterPane.PaneList(0).YAxis.Scale.Min = lScaleNode.InnerText
+                                            aZgc.MasterPane.PaneList(lPaneCount).YAxis.Scale.Min = lScaleNode.InnerText
                                         ElseIf lScaleNode.Name = "Max" Then
-                                            aZgc.MasterPane.PaneList(0).YAxis.Scale.Max = lScaleNode.InnerText
+                                            aZgc.MasterPane.PaneList(lPaneCount).YAxis.Scale.Max = lScaleNode.InnerText
                                         End If
                                     Next
                                 End If
@@ -1287,15 +1297,15 @@ FoundMatch:
                                 If lChildItem.Name = "Title" Then
                                     For Each lScaleNode As XmlNode In lChildItem.ChildNodes
                                         If lScaleNode.Name = "Text" Then
-                                            aZgc.MasterPane.PaneList(0).Y2Axis.Title.Text = lScaleNode.InnerText
+                                            aZgc.MasterPane.PaneList(lPaneCount).Y2Axis.Title.Text = lScaleNode.InnerText
                                         End If
                                     Next
                                 ElseIf lChildItem.Name = "Scale"
                                     For Each lScaleNode As XmlNode In lChildItem.ChildNodes
                                         If lScaleNode.Name = "Min" Then
-                                            aZgc.MasterPane.PaneList(0).Y2Axis.Scale.Min = lScaleNode.InnerText
+                                            aZgc.MasterPane.PaneList(lPaneCount).Y2Axis.Scale.Min = lScaleNode.InnerText
                                         ElseIf lScaleNode.Name = "Max" Then
-                                            aZgc.MasterPane.PaneList(0).Y2Axis.Scale.Max = lScaleNode.InnerText
+                                            aZgc.MasterPane.PaneList(lPaneCount).Y2Axis.Scale.Max = lScaleNode.InnerText
                                         End If
                                     Next
                                 End If

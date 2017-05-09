@@ -189,9 +189,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM10.vbproj">
-      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
+      <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>
       <Name>MapWinUtility-D4EM10</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />

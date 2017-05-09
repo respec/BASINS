@@ -278,7 +278,12 @@ Public Class HspfOpnBlk
             tinit = 0
             If retcod = 2 Then
                 'this is the type of record we want
-                opf = CInt(Left(stemp, 5))
+                Try
+                    opf = CInt(Left(stemp, 5))
+                Catch ex As Exception
+                    Logger.Msg("Trouble reading line number " & srec + 1 & " from the UCI file." & vbCrLf & stemp, MsgBoxStyle.Critical, "UCI Reading Issue")
+                End Try
+
                 'see if we already have a string with this oper
                 sameoper = 0
                 For i = 1 To scnt

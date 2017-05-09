@@ -96,4 +96,5 @@
 <Layer Filename="huc12.shp" Name="12-digit Cataloging Unit Boundaries" Group="Hydrology" Visible="yes" />
 <Layer Filename="SSURGO.shp" Name="SSURGO Soils" Group="Soil, Land Use/Cover" Visible="yes" />
 
+<Layer Filename="NWIS_Stations_gw_periodic.shp" Name="NWIS Periodic Groundwater" Group="Other" />
 </BasinsDefaultLayers>

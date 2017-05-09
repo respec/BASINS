@@ -509,7 +509,11 @@ Public Class frmBatchMap
         ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.TwoPRDFRC) Then
             lDFRC = aDefaultArgs.GetValue(BFInputNames.TwoPRDFRC)
         End If
-        lText.AppendLine(BFInputNames.TwoPRDFRC & vbTab & lDFRC)
+        If Double.IsNaN(lDFRC) Then
+            lText.AppendLine(BFInputNames.TwoPRDFRC & vbTab & "Default")
+        Else
+            lText.AppendLine(BFInputNames.TwoPRDFRC & vbTab & lDFRC)
+        End If
 
         Dim lDFBFImax As Double = 0.8
         If aArgs.ContainsAttribute(BFInputNames.TwoPRDFBFImax) Then
@@ -517,7 +521,11 @@ Public Class frmBatchMap
         ElseIf aDefaultArgs IsNot Nothing AndAlso aDefaultArgs.ContainsAttribute(BFInputNames.TwoPRDFBFImax) Then
             lDFBFImax = aDefaultArgs.GetValue(BFInputNames.TwoPRDFBFImax)
         End If
-        lText.AppendLine(BFInputNames.TwoPRDFBFImax & vbTab & lDFBFImax)
+        If Double.IsNaN(lDFBFImax) Then
+            lText.AppendLine(BFInputNames.TwoPRDFBFImax & vbTab & "Default")
+        Else
+            lText.AppendLine(BFInputNames.TwoPRDFBFImax & vbTab & lDFBFImax)
+        End If
 
         Dim lDFParamEstMethod As clsBaseflow2PRDF.ETWOPARAMESTIMATION = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
         If aArgs.ContainsAttribute(BFInputNames.TwoParamEstMethod) Then

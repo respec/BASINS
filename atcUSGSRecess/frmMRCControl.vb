@@ -7,8 +7,6 @@ Imports ZedGraph
 Imports System.Text.RegularExpressions
 
 Public Class frmMRCControl
-    Private pMaster As ZedGraph.MasterPane
-
     Private pFileInitialDir As String = ""
     Private pFileNameStations As String = "Station.txt"
     Private pFileNameRecSum As String = "recsum.txt"
@@ -17,9 +15,12 @@ Public Class frmMRCControl
 
     Public FirstMRC As clsMRC = Nothing
     Private WithEvents pZgc As ZedGraphControl
+    Private WithEvents pZgcUA As ZedGraphControl
     Private pGrapher As clsGraphBase
+    Private pGrapherUA As clsGraphBase
 
     Private pGraphDataGroup As atcTimeseriesGroup
+    Private pGraphDataGroupUA As atcTimeseriesGroup
 
     Private pMRCGroup As atcCollection
     Private pMRCSelectedGroup As atcCollection
@@ -36,11 +37,12 @@ Public Class frmMRCControl
         pMRCGroup = New atcCollection()
         pMRCSelectedGroup = New atcCollection()
         pGraphDataGroup = New atcTimeseriesGroup()
+        pGraphDataGroupUA = New atcTimeseriesGroup()
         If lFirstMRC IsNot Nothing Then
             FirstMRC = lFirstMRC
         End If
 
-        InitMasterPane()
+        InitMasterPanes()
         lstEquations.Items.Clear()
 
         PopulateForm()
@@ -58,7 +60,17 @@ Public Class frmMRCControl
         End Set
     End Property
 
-    Private Sub InitMasterPane()
+    Public Property GrapherUA() As clsGraphBase
+        Get
+            Return pGrapherUA
+        End Get
+        Set(ByVal newValue As clsGraphBase)
+            pGrapherUA = newValue
+            RefreshGraphUA()
+        End Set
+    End Property
+
+    Private Sub InitMasterPanes()
         If pZgc Is Nothing Then
             pZgc = CreateZgc()
             Me.Controls.Add(pZgc)
@@ -70,13 +82,28 @@ Public Class frmMRCControl
                 '.IsEnableVZoom = mnuViewVerticalZoom.Checked
                 '.IsEnableVPan = mnuViewVerticalZoom.Checked
                 '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
-                pMaster = .MasterPane
-
             End With
         Else
             pZgc.GraphPane.CurveList.Clear()
         End If
         RefreshGraph()
+
+        If pZgcUA Is Nothing Then
+            pZgcUA = CreateZgc()
+            Me.Controls.Add(pZgcUA)
+            panelGraphUA.Controls.Add(pZgcUA)
+            With pZgcUA
+                .Dock = System.Windows.Forms.DockStyle.Fill
+                '.IsEnableHZoom = mnuViewHorizontalZoom.Checked
+                '.IsEnableHPan = mnuViewHorizontalZoom.Checked
+                '.IsEnableVZoom = mnuViewVerticalZoom.Checked
+                '.IsEnableVPan = mnuViewVerticalZoom.Checked
+                '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
+            End With
+        Else
+            pZgcUA.GraphPane.CurveList.Clear()
+        End If
+        RefreshGraphUA()
     End Sub
 
     Public Sub RefreshGraph()
@@ -85,7 +112,13 @@ Public Class frmMRCControl
         Refresh()
     End Sub
 
-    Private Sub RefreshGraphMRC(ByVal aDataGroup As atcTimeseriesGroup)
+    Public Sub RefreshGraphUA()
+        pZgcUA.AxisChange()
+        Invalidate()
+        Refresh()
+    End Sub
+
+    Private Sub RefreshGraphMRC(ByVal aDataGroup As atcTimeseriesGroup, ByVal aDataGroupUA As atcTimeseriesGroup)
         If pGrapher IsNot Nothing Then
             With pGrapher.ZedGraphCtrl.GraphPane
                 .YAxis.Title.Text = ""
@@ -105,16 +138,44 @@ Public Class frmMRCControl
             'CType(.CurveList.Item(1), LineItem).Line.Width = 2
         End With
         pZgc.Refresh()
+
+        If pGrapherUA IsNot Nothing Then
+            With pGrapherUA.ZedGraphCtrl.GraphPane
+                .YAxis.Title.Text = ""
+            End With
+            pGrapherUA = Nothing
+        End If
+        pGrapherUA = New clsGraphTime(aDataGroupUA, pZgcUA)
+        'pGrapherUA = New clsGraphOrdinal(aDataGroup, pZgcUA)
+        With pGrapherUA.ZedGraphCtrl.GraphPane
+            '.YAxis.Type = AxisType.Log
+            .YAxis.Title.Text = "FLOW PER UNIT AREA"
+            .XAxis.Title.Text = "TIME, IN DAYS"
+            .AxisChange()
+            '.CurveList.Item(0).Color = Drawing.Color.Red
+            '.Legend.IsVisible = False
+            '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
+            'CType(.CurveList.Item(1), LineItem).Line.Width = 2
+            For I As Integer = 0 To pGrapher.ZedGraphCtrl.GraphPane.CurveList.Count - 1
+                .CurveList.Item(I).Color = pGrapher.ZedGraphCtrl.GraphPane.CurveList.Item(I).Color
+            Next
+        End With
+        pZgcUA.Refresh()
+
     End Sub
 
     Private Sub PopulateForm()
-        pFileStationFullName = GetSetting("atcUSGSRecess", "Defaults", "FileStation", "")
-        pFileRecSumFullName = GetSetting("atcUSGSRecess", "Defaults", "FileRecSum", "")
-
-        If Not File.Exists(pFileRecSumFullName) Then
-            pFileRecSumFullName = FindFile("Find recsum.txt", "recsum.txt", "txt")
-            SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
+        If Not String.IsNullOrEmpty(pFileInitialDir) AndAlso Directory.Exists(pFileInitialDir) Then
+            pFileRecSumFullName = Path.Combine(pFileInitialDir, "recsum.txt")
+        Else
+            pFileRecSumFullName = ""
         End If
+        'pFileStationFullName = GetSetting("atcUSGSRecess", "Defaults", "FileStation", "")
+        'pFileRecSumFullName = GetSetting("atcUSGSRecess", "Defaults", "FileRecSum", "")
+        'If Not File.Exists(pFileRecSumFullName) Then
+        '    pFileRecSumFullName = FindFile("Find recsum.txt", "recsum.txt", "txt")
+        '    SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
+        'End If
         RepopulateForm()
     End Sub
 
@@ -140,7 +201,13 @@ Public Class frmMRCControl
             Dim lArr() As String = Regex.Split(.RecSum, "\s+")
             Dim lDA As Double
             If lArr.Length > 12 AndAlso Double.TryParse(lArr(12), lDA) Then
-                Dim lthisEquation As String = MRCToAdd(lArr(0), lArr(12), lArr(1), lArr(7), lArr(8), lArr(9), lArr(10), lArr(11))
+                Dim lYearArr() As String = lArr(2).Split("-")
+                Dim lthisEquation As String = "" 'MRCToAdd(lArr(0), lArr(12), lArr(1), lArr(7), lArr(8), lArr(9), lArr(10), lArr(11))
+                If lYearArr.Length = 2 Then
+                    lthisEquation = MRCToAdd(lArr(0), lArr(12), lArr(1), lArr(7), lArr(8), lArr(9), lArr(10), lArr(11), lYearArr(0), lYearArr(1))
+                Else
+                    lthisEquation = MRCToAdd(lArr(0), lArr(12), lArr(1), lArr(7), lArr(8), lArr(9), lArr(10), lArr(11), "", "")
+                End If
                 'key to use is the RecSum string
                 For Each lItem As String In lstEquations.Items
                     If lItem.ToLower = lthisEquation.ToLower Then
@@ -157,13 +224,15 @@ Public Class frmMRCControl
     End Sub
 
     Private Sub PopulateRecSums()
-
-        If lstRecSum.Items.Count > 0 Then lstRecSum.Items.Clear()
-        Dim lTitleLine1 As String = "    File    S     P      #  Kmin  Kmed  Kmax  LogQmn  LogQmx     A         B         C       DA   Stnam"
-        Dim lTitleLine2 As String = "-------------------------------------------------------------------------------------------------------------"
-        '                            Indian.txt  s 1971-1972  3  11.8  22.9  25.9   0.057   0.709   5.8238  -25.3040   15.0121    22.9 HUNT_RIVER_NEAR_EAST_GREENWICH__RI
-        lstRecSum.Items.Add(lTitleLine1)
-        lstRecSum.Items.Add(lTitleLine2)
+        If lstRecSum.Items.Count > 0 Then
+            'lstRecSum.Items.Clear()
+        Else
+            Dim lTitleLine1 As String = "    File    S     P      #  Kmin  Kmed  Kmax  LogQmn  LogQmx     A         B         C       DA   Stnam"
+            Dim lTitleLine2 As String = "-------------------------------------------------------------------------------------------------------------"
+            '                            Indian.txt  s 1971-1972  3  11.8  22.9  25.9   0.057   0.709   5.8238  -25.3040   15.0121    22.9 HUNT_RIVER_NEAR_EAST_GREENWICH__RI
+            lstRecSum.Items.Add(lTitleLine1)
+            lstRecSum.Items.Add(lTitleLine2)
+        End If
 
         Dim lSR As New StreamReader(pFileRecSumFullName)
         Dim lOneLine As String
@@ -172,17 +241,11 @@ Public Class frmMRCControl
         Dim lArr() As String = Nothing
         While Not lSR.EndOfStream
             lOneLine = lSR.ReadLine()
-
-            'Eliminate lines by pattern, at least 12 values and the 3rd to 11th are numeric
-            'lArr = Regex.Split(lOneLine, "\s+")
-            'If lArr.Length < 12 Then
-            '    Continue While
-            'Else
-            '    For I As Integer = 3 To 11
-            '        If Not IsNumeric(lArr(I)) Then Continue While
-            '    Next
-            'End If
-            If Not ParseRecSumRecord(lOneLine, lArr) Then Continue While
+            If Not ParseRecSumRecord(lOneLine, lArr) Then
+                If Not ParseRecSumRecord(lOneLine, lArr, False) Then
+                    Continue While
+                End If
+            End If
 
             Dim lFoundMatch As Boolean = False
             'key to use is the RecSum string
@@ -199,56 +262,77 @@ Public Class frmMRCControl
 
         lSR.Close()
         lSR = Nothing
-        SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
+        'SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
     End Sub
 
-    Private Function ParseRecSumRecord(ByVal aLine As String, ByRef Arr() As String) As Boolean
+    Private Function ParseRecSumRecord(ByVal aLine As String, ByRef Arr() As String, Optional ByVal aFixedWidth As Boolean = True) As Boolean
         Dim lRecordIsValid As Boolean = True
         ReDim Arr(0)
         '17 FORMAT (A12,A1,1X,1I4,'-',1I4,1I3,3F6.1,2F8.3,1F9.4,2F10.4, 1F8.1,Awhatever)
         If Not String.IsNullOrEmpty(aLine) AndAlso aLine.Length >= 89 Then
+            Dim lColumns As Integer = 0
+            Dim lDA As String = ""
+            Dim lStartIndex As Integer = 2
             With aLine
-                Dim lStn As String = .Substring(clsRecess.RecSumColumn.c1Stn, clsRecess.RecSumColW.c1Stn)
-                Dim lSn As String = .Substring(clsRecess.RecSumColumn.c2Sn, clsRecess.RecSumColW.c2Sn)
-                Dim lYrS As String = .Substring(clsRecess.RecSumColumn.c3YrS, clsRecess.RecSumColW.c3YrS)
-                Dim lYrE As String = .Substring(clsRecess.RecSumColumn.c4YrE, clsRecess.RecSumColW.c4YrE)
-                Dim lSegCt As String = .Substring(clsRecess.RecSumColumn.c5SegCt, clsRecess.RecSumColW.c5SegCt)
-                Dim lKmin As String = .Substring(clsRecess.RecSumColumn.c6Kmin, clsRecess.RecSumColW.c6Kmin)
-                Dim lKmed As String = .Substring(clsRecess.RecSumColumn.c7Kmed, clsRecess.RecSumColW.c7Kmed)
-                Dim lKmax As String = .Substring(clsRecess.RecSumColumn.c8Kmax, clsRecess.RecSumColW.c8Kmax)
-                Dim lMinLogQC As String = .Substring(clsRecess.RecSumColumn.c9MinLogQC, clsRecess.RecSumColW.c9MinLogQC)
-                Dim lMaxLogQC As String = .Substring(clsRecess.RecSumColumn.c10MaxLogQC, clsRecess.RecSumColW.c10MaxLogQC)
-                Dim lCoA As String = .Substring(clsRecess.RecSumColumn.c11CoA, clsRecess.RecSumColW.c11CoA)
-                Dim lCoB As String = .Substring(clsRecess.RecSumColumn.c12CoB, clsRecess.RecSumColW.c12CoB)
-                Dim lCoC As String = .Substring(clsRecess.RecSumColumn.c13CoC, clsRecess.RecSumColW.c13CoC)
-                Dim lDA As String = ""
-                Dim lColumns As Integer = 13
-                If aLine.Length >= 97 Then
-                    lDA = .Substring(clsRecess.RecSumColumn.c14DA, clsRecess.RecSumColW.c14DA)
-                    lColumns = 14
-                End If
-                ReDim Arr(lColumns - 1)
-                Arr(0) = lStn
-                Arr(1) = lSn
-                Arr(2) = lYrS
-                Arr(3) = lYrE
-                Arr(4) = lSegCt
-                Arr(5) = lKmin
-                Arr(6) = lKmed
-                Arr(7) = lKmax
-                Arr(8) = lMinLogQC
-                Arr(9) = lMaxLogQC
-                Arr(10) = lCoA
-                Arr(11) = lCoB
-                Arr(12) = lCoC
-                For I As Integer = 2 To 12
-                    If Not IsNumeric(Arr(I)) Then
-                        lRecordIsValid = False
-                        Exit For
+                If aFixedWidth Then
+                    Dim lStn As String = .Substring(clsRecess.RecSumColumn.c1Stn, clsRecess.RecSumColW.c1Stn)
+                    Dim lSn As String = .Substring(clsRecess.RecSumColumn.c2Sn, clsRecess.RecSumColW.c2Sn)
+                    Dim lYrS As String = .Substring(clsRecess.RecSumColumn.c3YrS, clsRecess.RecSumColW.c3YrS)
+                    Dim lYrE As String = .Substring(clsRecess.RecSumColumn.c4YrE, clsRecess.RecSumColW.c4YrE)
+                    Dim lSegCt As String = .Substring(clsRecess.RecSumColumn.c5SegCt, clsRecess.RecSumColW.c5SegCt)
+                    Dim lKmin As String = .Substring(clsRecess.RecSumColumn.c6Kmin, clsRecess.RecSumColW.c6Kmin)
+                    Dim lKmed As String = .Substring(clsRecess.RecSumColumn.c7Kmed, clsRecess.RecSumColW.c7Kmed)
+                    Dim lKmax As String = .Substring(clsRecess.RecSumColumn.c8Kmax, clsRecess.RecSumColW.c8Kmax)
+                    Dim lMinLogQC As String = .Substring(clsRecess.RecSumColumn.c9MinLogQC, clsRecess.RecSumColW.c9MinLogQC)
+                    Dim lMaxLogQC As String = .Substring(clsRecess.RecSumColumn.c10MaxLogQC, clsRecess.RecSumColW.c10MaxLogQC)
+                    Dim lCoA As String = .Substring(clsRecess.RecSumColumn.c11CoA, clsRecess.RecSumColW.c11CoA)
+                    Dim lCoB As String = .Substring(clsRecess.RecSumColumn.c12CoB, clsRecess.RecSumColW.c12CoB)
+                    Dim lCoC As String = .Substring(clsRecess.RecSumColumn.c13CoC, clsRecess.RecSumColW.c13CoC)
+                    lColumns = 13
+                    If aLine.Length >= 97 Then
+                        lDA = .Substring(clsRecess.RecSumColumn.c14DA, clsRecess.RecSumColW.c14DA)
+                        lColumns = 14
                     End If
-                Next
-                If lColumns = 14 Then
-                    Arr(13) = lDA
+                    ReDim Arr(lColumns - 1)
+                    Arr(0) = lStn
+                    Arr(1) = lSn
+                    Arr(2) = lYrS
+                    Arr(3) = lYrE
+                    Arr(4) = lSegCt
+                    Arr(5) = lKmin
+                    Arr(6) = lKmed
+                    Arr(7) = lKmax
+                    Arr(8) = lMinLogQC
+                    Arr(9) = lMaxLogQC
+                    Arr(10) = lCoA
+                    Arr(11) = lCoB
+                    Arr(12) = lCoC
+                Else
+                    Arr = Regex.Split(aLine, "\s+")
+                    Dim lpat As String = "^[1-9]\d{3}-[1-9]\d{3}$"
+                    If Not Regex.IsMatch(Arr(2), lpat) Then
+                        lRecordIsValid = False
+                    End If
+                    lStartIndex = 3
+                    lColumns = 12
+                End If
+
+                If lRecordIsValid Then
+                    If Arr.Length < 13 Then
+                        lRecordIsValid = False
+                    Else
+                        'Eliminate lines by pattern, at least 13 values and the 3rd to 13th are numeric
+                        For I As Integer = lStartIndex To 12
+                            If Not IsNumeric(Arr(I)) Then
+                                lRecordIsValid = False
+                                Exit For
+                            End If
+                        Next
+                    End If
+
+                    If lColumns = 14 Then
+                        Arr(13) = lDA
+                    End If
                 End If
             End With
         Else
@@ -267,14 +351,30 @@ Public Class frmMRCControl
         Dim lMRCToAdd As String
         For CntRecSum As Integer = 2 To lstRecSum.Items.Count - 1
             If ParseRecSumRecord(lstRecSum.Items(CntRecSum), lArrRecSum) Then
-                lMRCToAdd = MRCToAdd(lArrRecSum(clsRecess.RecSumFldIndex.c1Stn), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c14DA), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c2Sn), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c9MinLogQC), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c10MaxLogQC), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c11CoA), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c12CoB), _
-                                     lArrRecSum(clsRecess.RecSumFldIndex.c13CoC))
+                lMRCToAdd = MRCToAdd(lArrRecSum(clsRecess.RecSumFldIndex.c1Stn),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c14DA),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c2Sn),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c9MinLogQC),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c10MaxLogQC),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c11CoA),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c12CoB),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c13CoC),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c3YrS),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c4YrE))
+                If Not lstEquations.Items.Contains(lMRCToAdd) Then
+                    lstEquations.Items.Add(lMRCToAdd)
+                End If
+            ElseIf ParseRecSumRecord(lstRecSum.Items(CntRecSum), lArrRecSum, False) Then
+                lMRCToAdd = MRCToAdd(lArrRecSum(clsRecess.RecSumFldIndex.c1Stn),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c14DA - 1),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c2Sn),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c9MinLogQC - 1),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c10MaxLogQC - 1),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c11CoA - 1),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c12CoB - 1),
+                                     lArrRecSum(clsRecess.RecSumFldIndex.c13CoC - 1),
+                                     lArrRecSum(2).Substring(0, 4),
+                                     lArrRecSum(2).Substring(lArrRecSum(2).IndexOf("-") + 1))
                 If Not lstEquations.Items.Contains(lMRCToAdd) Then
                     lstEquations.Items.Add(lMRCToAdd)
                 End If
@@ -282,14 +382,19 @@ Public Class frmMRCControl
         Next
     End Sub
 
-    Private Function MRCToAdd(ByVal aStation As String, ByVal aDA As String, ByVal aSeason As String, _
-                              ByVal aLogQMin As String, ByVal aLogQMax As String, _
-                              ByVal aCoeffA As String, ByVal aCoeffB As String, ByVal aCoeffC As String) As String
+    Private Function MRCToAdd(ByVal aStation As String, ByVal aDA As String, ByVal aSeason As String,
+                              ByVal aLogQMin As String, ByVal aLogQMax As String,
+                              ByVal aCoeffA As String, ByVal aCoeffB As String, ByVal aCoeffC As String,
+                              ByVal aYearStart As String,
+                              ByVal aYearEnd As String) As String
         Dim lMRCToAdd As String = aStation & "," & aDA & ",(" & aSeason & "),"
         Dim lRange As String = "(" & aLogQMin & "~" & aLogQMax & "),"
         lMRCToAdd &= lRange
         Dim lEquation As String = "Coeff.A:" & aCoeffA & ",Coeff.B:" & aCoeffB & ",Coeff.C:" & aCoeffC
         lMRCToAdd &= lEquation
+        If Not String.IsNullOrEmpty(aYearStart) AndAlso Not String.IsNullOrEmpty(aYearEnd) Then
+            lMRCToAdd &= "," & aYearStart & "," & aYearEnd
+        End If
         Return lMRCToAdd
     End Function
 
@@ -302,6 +407,8 @@ Public Class frmMRCControl
         Dim lCoB As Double
         Dim lCoC As Double
         Dim lSeason As String
+        Dim lYearStart As String
+        Dim lYearEnd As String
 
         Dim lMRCOutputDir As String = GetSetting("atcUSGSRecess", "Defaults", "FileRecSumDir", "")
         If Not String.IsNullOrEmpty(pFileRecSumFullName) Then
@@ -358,6 +465,14 @@ Public Class frmMRCControl
             lCoB = Double.Parse(lArr(5).Substring("Coeff.B:".Length))
             lCoC = Double.Parse(lArr(6).Substring("Coeff.C:".Length))
 
+            'get years
+            lYearStart = ""
+            lYearEnd = ""
+            If lArr.Length = 9 Then
+                lYearStart = lArr(7)
+                lYearEnd = lArr(8)
+            End If
+
             Dim lMRC As New clsMRC
             With lMRC
                 .Station = lStation
@@ -368,6 +483,8 @@ Public Class frmMRCControl
                 .MaxLogQ = lMaxLogQ
                 .MinLogQ = lMinLogQ
                 .Season = lSeason
+                .YearStart = lYearStart
+                .YearEnd = lYearEnd
                 If .BuildMRC() Then
                     .FileCurvOut = lCurvFileName
                     Try
@@ -376,6 +493,9 @@ Public Class frmMRCControl
                         'Do Nothing
                     End Try
                     pGraphDataGroup.Add(.CurveData)
+                    If .CurveDataUA IsNot Nothing Then
+                        pGraphDataGroupUA.Add(.CurveDataUA)
+                    End If
                 End If
             End With
             pMRCGroup.Add(lMRC)
@@ -392,6 +512,8 @@ Public Class frmMRCControl
             txtLogQMin.Text = ""
             txtLogQMax.Text = ""
             txtSeason.Text = ""
+            txtYearStart.Text = ""
+            txtYearEnd.Text = ""
             Exit Sub
         End If
         'ParseMRCParams(lstRecSum.SelectedItem)
@@ -405,10 +527,28 @@ Public Class frmMRCControl
             txtCoefA.Text = lArr(10)
             txtCoefB.Text = lArr(11)
             txtCoefC.Text = lArr(12)
+            txtYearStart.Text = lArr(2)
+            txtYearEnd.Text = lArr(3)
             Dim lDA As Double
             If lArr.Length >= 14 Then
                 If Not lArr(13).StartsWith("N/A") AndAlso Double.TryParse(lArr(13), lDA) Then
                     txtDA.Text = lArr(13)
+                End If
+            End If
+        ElseIf ParseRecSumRecord(lstRecSum.SelectedItem, lArr, False) Then
+            txtStation.Text = lArr(0)
+            txtSeason.Text = lArr(1)
+            txtLogQMin.Text = lArr(7)
+            txtLogQMax.Text = lArr(8)
+            txtCoefA.Text = lArr(9)
+            txtCoefB.Text = lArr(10)
+            txtCoefC.Text = lArr(11)
+            txtYearStart.Text = lArr(2).Substring(0, 4)
+            txtYearEnd.Text = lArr(2).Substring(lArr(2).IndexOf("-") + 1)
+            Dim lDA As Double
+            If lArr.Length >= 13 Then
+                If Not lArr(12).StartsWith("N/A") AndAlso Double.TryParse(lArr(12), lDA) Then
+                    txtDA.Text = lArr(12)
                 End If
             End If
         End If
@@ -425,6 +565,13 @@ Public Class frmMRCControl
         txtCoefA.Text = lArr(9)
         txtCoefB.Text = lArr(10)
         txtCoefC.Text = lArr(11)
+        Dim lYearArr() As String = lArr(2).Split("-")
+        If lYearArr.Length = 2 Then
+            If IsNumeric(lYearArr(0)) AndAlso IsNumeric(lYearArr(1)) Then
+                txtYearStart.Text = lYearArr(0)
+                txtYearEnd.Text = lYearArr(1)
+            End If
+        End If
         Dim lDA As Double
         If lArr.Length > 12 Then
             If Not lArr(12).StartsWith("N/A") AndAlso Double.TryParse(lArr(12), lDA) Then
@@ -471,9 +618,17 @@ Public Class frmMRCControl
         'lMRCToAdd = MRCToAdd(txtStation.Text.Trim(), txtDA.Text.Trim(), txtSeason.Text.Trim(), _
         '                     txtLogQMin.Text.Trim(), txtLogQMax.Text.Trim(), _
         '                     txtCoefA.Text.Trim(), txtCoefB.Text.Trim(), txtCoefC.Text.Trim())
-        lMRCToAdd = MRCToAdd(txtStation.Text, txtDA.Text, txtSeason.Text, _
-                             txtLogQMin.Text, txtLogQMax.Text, _
-                             txtCoefA.Text, txtCoefB.Text, txtCoefC.Text)
+        Dim lYearStart As Integer
+        Dim lYearEnd As Integer
+        Dim lYearStartText As String = ""
+        Dim lYearEndText As String = ""
+        If Integer.TryParse(txtYearStart.Text, lYearStart) AndAlso Integer.TryParse(txtYearEnd.Text, lYearEnd) Then
+            lYearStartText = lYearStart.ToString()
+            lYearEndText = lYearEnd.ToString()
+        End If
+        lMRCToAdd = MRCToAdd(txtStation.Text, txtDA.Text, txtSeason.Text,
+                             txtLogQMin.Text, txtLogQMax.Text,
+                             txtCoefA.Text, txtCoefB.Text, txtCoefC.Text, lYearStartText, lYearEndText)
 
         If Not lstEquations.Items.Contains(lMRCToAdd) Then
             lstEquations.Items.Add(lMRCToAdd)
@@ -488,8 +643,9 @@ Public Class frmMRCControl
 
     Private Sub btnMRCPlot_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnMRCPlot.Click
         pGraphDataGroup.Clear()
+        pGraphDataGroupUA.Clear()
         BuildMRCs()
-        RefreshGraphMRC(pGraphDataGroup)
+        RefreshGraphMRC(pGraphDataGroup, pGraphDataGroupUA)
         tabMRCMain.SelectedIndex = 1
     End Sub
 
@@ -499,16 +655,17 @@ Public Class frmMRCControl
         Try
             lInitialPath = Path.GetDirectoryName(pFileRecSumFullName)
         Catch ex As Exception
-
+            lInitialPath = ""
         End Try
         If lInitialPath = "" Then lInitialPath = "C:\"
 
         Dim lOpenFileDialog As New System.Windows.Forms.OpenFileDialog()
         With lOpenFileDialog
+            '.AutoUpgradeEnabled = False
             .Title = "Browse For RecSum File"
             .InitialDirectory = lInitialPath '"c:\"
-            .Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
-            .FilterIndex = 2
+            .Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
+            .FilterIndex = 1
             .RestoreDirectory = True
             If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                 lNewFileRecSumFullName = .FileName
@@ -532,6 +689,8 @@ Public Class frmMRCControl
         txtCoefA.Text = ""
         txtCoefB.Text = ""
         txtCoefC.Text = ""
+        txtYearStart.Text = ""
+        txtYearEnd.Text = ""
         RemoveHandler rbSelectAllEqns.CheckedChanged, AddressOf rbSelectAllEqns_CheckedChanged
         RemoveHandler rbSelectNoneEqns.CheckedChanged, AddressOf rbSelectAllEqns_CheckedChanged
         rbSelectAllEqns.Checked = False
@@ -550,5 +709,11 @@ Public Class frmMRCControl
                 lstEquations.SetItemChecked(I, False)
             End If
         Next
+    End Sub
+
+    Private Sub btnClearRecSum_Click(sender As Object, e As EventArgs) Handles btnClearRecSum.Click
+        If lstRecSum.Items.Count > 0 Then
+            lstRecSum.Items.Clear()
+        End If
     End Sub
 End Class

@@ -79,6 +79,7 @@ Public Class clsGraphBar
                     End With
                 End If
             End If
+
             .Title.Text = XTitle()
         End With
 
@@ -95,6 +96,7 @@ Public Class clsGraphBar
             .MinorTic.IsOutside = False
             .MajorTic.Color = Color.DarkGray
             .MinorTic.Color = Color.DarkGray
+            .MajorGrid.IsVisible = True
             .Scale.FontSpec.Size = 10
             If String.IsNullOrEmpty(YTitle()) Then
                 If Datasets IsNot Nothing AndAlso Datasets.Count > 0 Then
