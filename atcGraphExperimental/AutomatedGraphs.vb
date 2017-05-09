@@ -1,23 +1,26 @@
 ﻿
 Imports atcUtility
 Imports atcData
+Imports atcGraph
 Imports atcBasinsObsWQ
 Imports MapWinUtility 'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
 Imports ZedGraph 'this is coming from a DLL as the original project was a C# project and not a VB project
 Imports System.Collections.Specialized
 
 
-Module AutomatedGraphs
-    Public Sub MakeAutomatedGraphs(ByVal lGraphStartJ As Double, ByVal lGraphEndJ As Double, ByVal loutfoldername As String)
+Public Module AutomatedGraphs
+    Sub MakeAutomatedGraphs(ByVal lGraphStartJ As Double, ByVal lGraphEndJ As Double, ByVal aOutputDirectory As String,
+                            Optional aTestPath As String = "")
 
         'Expect a comma separated file called *.csv
         'On 11/13/2015, Anurag decided that aany number of CSV file with *.csv extension could be added. 
-        '
+        'In 2017, option to plot JSON files was added.
         Dim lGraphSpecificationFileNames As New NameValueCollection
+
         AddFilesInDir(lGraphSpecificationFileNames, IO.Directory.GetCurrentDirectory, False, "*.json")
 
-        If Not System.IO.Directory.Exists(loutfoldername) Then
-            System.IO.Directory.CreateDirectory(loutfoldername)
+        If Not System.IO.Directory.Exists(aOutputDirectory) Then
+            System.IO.Directory.CreateDirectory(aOutputDirectory)
         End If
 
         Dim NumberOfJSonFiles As Integer = lGraphSpecificationFileNames.Count
@@ -25,9 +28,9 @@ Module AutomatedGraphs
             Logger.Dbg(Now & " Custom graphs will be produced from JSON Files.")
             For Each lGraphSpecificationFile As String In lGraphSpecificationFileNames
                 Dim lOutPutGraphFileName As String = IO.Path.GetFileName(lGraphSpecificationFile)
-                lOutPutGraphFileName = IO.Path.Combine(loutfoldername, lOutPutGraphFileName)
+                lOutPutGraphFileName = IO.Path.Combine(aOutputDirectory, lOutPutGraphFileName)
                 lOutPutGraphFileName = IO.Path.ChangeExtension(lOutPutGraphFileName, ".png")
-                GraphJsonToFile(lGraphSpecificationFile, lOutPutGraphFileName)
+                atcGraph.GraphJsonToFile(lGraphSpecificationFile, lOutPutGraphFileName)
             Next
         End If
 
@@ -41,6 +44,7 @@ Module AutomatedGraphs
         End If
 
         If NumberOfCSVFiles = 0 AndAlso NumberOfJSonFiles = 0 Then '
+            '
             Throw New ApplicationException("No graph specification file found in directory " & IO.Directory.GetCurrentDirectory)
             Logger.Dbg(Now & " Custom graphs will not be produced.")
         End If
@@ -48,7 +52,7 @@ Module AutomatedGraphs
         Dim lGraphFilesCount As Integer = 0
         For Each lGraphSpecificationFile As String In lGraphSpecificationFileNames
             lGraphFilesCount += 1
-            If lGraphSpecificationFile = "RES_TP_Standard.csv" Then Continue For
+            If IO.Path.GetFileName(lGraphSpecificationFile).ToLower = "res_tp_standard.csv" Then Continue For
             Dim lgraphRecordsNew As New ArrayList()
             Using MyReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(lGraphSpecificationFile)
                 Dim lines() As String = {}
@@ -76,8 +80,11 @@ Module AutomatedGraphs
                                     CurrentRow(i) = testtring
                                     i += 1
                                 Next
+
                                 lgraphRecordsNew.Add(CurrentRow)
+
                             End If
+
 
                         Catch ex As Microsoft.VisualBasic.
                                     FileIO.MalformedLineException
@@ -111,7 +118,7 @@ Module AutomatedGraphs
                         Continue For
                     End If
                     Dim lNumberOfCurves As Integer = Trim(lGraphInit(2))
-                    Dim lOutFileName As String = loutfoldername & Trim(lGraphInit(1))
+                    Dim lOutFileName As String = aOutputDirectory & Trim(lGraphInit(1))
                     If lNumberOfCurves < 1 Then
                         MsgBox("The " & lOutFileName & " graph in " & lGraphSpecificationFile & " file didn't have any useful data. Reading next CSV file!", vbOKOnly)
                         Continue For
@@ -142,10 +149,14 @@ Module AutomatedGraphs
                     Dim skipGraph As Boolean = False
 
                     Do While (lGraphDataset(0).ToLower = "left" Or lGraphDataset(0).ToLower = "right" Or
-                        lGraphDataset(0).ToLower = "aux" Or lGraphDataset(0).ToLower = "regression" Or lGraphDataset(0).ToLower = "45-deg line" Or skipGraph)
+                        lGraphDataset(0).ToLower = "aux" Or lGraphDataset(0).ToLower = "regression" Or lGraphDataset(0).ToLower = "45-deg line" Or
+                        lGraphDataset(0).ToLower = "add" Or lGraphDataset(0).ToLower = "multiply" Or skipGraph)
+
+
+                        'For CurveNumber As Integer = 1 To lNumberOfCurves
 
                         Dim lTimeSeries As atcTimeseries = Nothing
-                        Dim lDataSourceFilename As String = AbsolutePath(Trim(lGraphDataset(1)), loutfoldername)
+                        Dim lDataSourceFilename As String = AbsolutePath(Trim(lGraphDataset(1)), aTestPath)
                         If IO.File.Exists(lDataSourceFilename) Then
                             Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lDataSourceFilename)
 
@@ -163,19 +174,18 @@ Module AutomatedGraphs
                                     lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
                                     If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
                                         MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
-                                                " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Moving to next graph!", vbOKOnly)
+                                                " DSN " & Trim(lGraphDataset(2)) & ". Moving to next graph!", vbOKOnly)
                                         lRecordIndex += 1
-                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("scatter") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("timeseries") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("frequency") Or
+                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("scatter") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("timeseries") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("frequency") Or
                                                     lRecordIndex + 1 > lgraphRecordsNew.Count)
                                             lRecordIndex += 1
                                         Loop
 
                                         skipGraph = True
                                         Exit Do
-                                        'Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
-                                        '                               " DSN " & Trim(lGraphDataset(2)) & ". Program will quit!")
+
                                     End If
 
                                 Case ".hbn", ".dbf"
@@ -186,17 +196,16 @@ Module AutomatedGraphs
                                         MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
                                                 " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Moving to next graph!", vbOKOnly)
                                         lRecordIndex += 1
-                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("scatter") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("timeseries") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("frequency") Or
+                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("scatter") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("timeseries") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("frequency") Or
                                                     lRecordIndex + 1 < lgraphRecordsNew.Count)
                                             lRecordIndex += 1
                                         Loop
 
                                         skipGraph = True
                                         Exit For
-                                        'Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
-                                        '                                                      " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Program will quit!")
+
                                     End If
 
                                 Case ".rdb"
@@ -222,7 +231,7 @@ Module AutomatedGraphs
 
 
                             Dim aTu As Integer = lTimeSeries.Attributes.GetValue("TimeUnit")
-                            lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
+
 
                             If (lGraphDataset.GetUpperBound(0) > 10 AndAlso Not String.IsNullOrEmpty(Trim(lGraphDataset(10)))) Then
                                 lTimeSeries = AggregateTS(lTimeSeries, Trim(lGraphDataset(10)).ToLower, Trim(lGraphDataset(11)).ToLower)
@@ -256,8 +265,19 @@ Module AutomatedGraphs
 
                             End If
 
+                            If Trim(lGraphDataset(0)).ToLower = "add" Then
 
-                            lTimeseriesGroup.Add(lTimeSeries)
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1) = lTimeseriesGroup(lTimeseriesGroup.Count - 1) + lTimeSeries
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("Constituent", "Sum")
+
+                            ElseIf Trim(lGraphDataset(0)) = "multiply" Then
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1) = lTimeseriesGroup(lTimeseriesGroup.Count - 1) * lTimeSeries
+                                lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("Constituent", "Product")
+                            Else
+                                lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
+                                lTimeseriesGroup.Add(lTimeSeries)
+                            End If
+
                         Else
                             Logger.Msg("Could not open '" & lDataSourceFilename & "' Aborting Graphing.", MsgBoxStyle.OkOnly, "HSPEXP+")
                             Exit Do
@@ -369,8 +389,7 @@ Module AutomatedGraphs
         Return aTimeseries
     End Function
     Private Function TimeSeriesgraph(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl, ByVal aGraphInit As Object,
-                                     ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer) As ZedGraphControl
-
+                                     ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer)
         Dim lGrapher As New clsGraphTime(aTimeseriesgroup, aZgc)
         Dim lNumberofCurves As Integer = Trim(aGraphInit(2))
         aRecordIndex -= lNumberofCurves
@@ -500,7 +519,7 @@ Module AutomatedGraphs
         Return aZgc
     End Function
     Private Function FrequencyGraph(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl, ByVal aGraphInit As Object,
-                                     ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer) As ZedGraphControl
+                                     ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer)
         Dim lGrapher As New clsGraphProbability(aTimeseriesgroup, aZgc)
 
         Dim lNumberofCurves As Integer = Trim(aGraphInit(2))
@@ -565,7 +584,7 @@ Module AutomatedGraphs
         Return aZgc
     End Function
     Private Function ScatterPlotGraph(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl,
-                                      ByVal aGraphInit As Object, ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer) As ZedGraphControl
+                                      ByVal aGraphInit As Object, ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer)
         Dim lGrapher As New clsGraphScatter(aTimeseriesgroup, aZgc)
 
         Dim lNumberofCurves As Integer = Trim(aGraphInit(2))
@@ -713,8 +732,8 @@ Module AutomatedGraphs
         Next
         Return aZgc
     End Function
-    Private Function CumulativeProbability(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl, ByVal aGraphInit As Object,
-                                     ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer) As ZedGraphControl
+    Private Function CumulativeProbability(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl,
+                                           ByVal aGraphInit As Object, ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer)
 
         Dim lNumberofCurves As Integer = Trim(aGraphInit(2))
         aRecordIndex -= lNumberofCurves
