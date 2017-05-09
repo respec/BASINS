@@ -1,4 +1,5 @@
-﻿Imports atcUtility
+﻿Imports atcUCI
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmHspfSimulationManager
@@ -341,8 +342,37 @@ Public Class frmHspfSimulationManager
             If lTransferWDM.Length = 0 Then
                 'these models are not connected
             ElseIf lTransferWDM = "MULTIPLE" Then
-                Logger.Msg("These UCIs are connected through multiple transfer WDM files." & vbCrLf & vbCrLf &
-                           "Do you want to modify them to use a single transfer WDM file?", MsgBoxStyle.YesNo, "Use Transfer WDM?")
+                If Logger.Msg("These UCIs are connected through multiple transfer WDM files." & vbCrLf & vbCrLf &
+                           "Do you want to modify them to use a single transfer WDM file?", MsgBoxStyle.YesNo, "Use Transfer WDM?") = MsgBoxResult.Yes Then
+                    'prompt for name of transfer wdm
+                    Dim lTransferWDMName As String = ""
+                    Dim lFileDialog As New Windows.Forms.OpenFileDialog()
+                    With lFileDialog
+                        .Title = "Transfer WDM Name"
+                        If IO.File.Exists("transfer.wdm") Then
+                            .FileName = "transfer.wdm"
+                        End If
+                        .Filter = "WDM Files (*.wdm) | *.wdm"
+                        .FilterIndex = 0
+                        .DefaultExt = "wdm"
+                        .CheckFileExists = False
+                        If .ShowDialog(Me) = DialogResult.OK Then
+                            lTransferWDMName = .FileName
+                        End If
+                    End With
+                    If lTransferWDMName.Length > 0 Then
+                        'Change Connections To Use Transfer WDM
+                        ConnectionsToTransferWDM(lTransferWDMName, lUCIs)   'what if transfer wdm is already used here?
+                        'Remove unused WDMs from Files Blocks
+                        RemoveUnusedWDMs(lUCIs)
+                        'Add transfer WDM to Files Blocks
+                        AddTransferWDMtoFilesBlock(lTransferWDMName, lUCIs)
+                        For Each lUCI As HspfUci In lUCIs
+                            FileCopy(lUCI.Name, lUCI.Name & "Save")
+                            lUCI.Save()
+                        Next
+                    End If
+                End If
             End If
         End If
     End Sub
