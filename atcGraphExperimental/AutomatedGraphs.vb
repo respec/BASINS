@@ -174,7 +174,8 @@ Public Module AutomatedGraphs
                                     lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
                                     If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
                                         MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
-                                                " DSN " & Trim(lGraphDataset(2)) & ". Moving to next graph!", vbOKOnly)
+                                                " DSN " & Trim(lGraphDataset(2)) & " to make " & IO.Path.GetFileName(lOutFileName) &
+                                                " graph. Moving to next graph!", vbOKOnly, "Automated Graph: Time Series Issue")
                                         lRecordIndex += 1
                                         Do Until (Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("scatter") Or
                                                     Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("timeseries") Or
@@ -194,17 +195,19 @@ Public Module AutomatedGraphs
                                     lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
                                     If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
                                         MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
-                                                " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Moving to next graph!", vbOKOnly)
+                                                " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) &
+                                                " to make " & IO.Path.GetFileName(lOutFileName) & " graph. Moving to next graph!",
+                                               vbOKOnly, "Automated Graph: Time Series Issue")
                                         lRecordIndex += 1
                                         Do Until (Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("scatter") Or
                                                     Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("timeseries") Or
                                                     Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("frequency") Or
-                                                    lRecordIndex + 1 < lgraphRecordsNew.Count)
+                                                    lRecordIndex + 1 > lgraphRecordsNew.Count)
                                             lRecordIndex += 1
                                         Loop
 
                                         skipGraph = True
-                                        Exit For
+                                        Exit Do
 
                                     End If
 
@@ -213,19 +216,19 @@ Public Module AutomatedGraphs
                                     lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
                                     If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
                                         MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
-                                                " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Moving to next graph!", vbOKOnly)
+                                                " Location " & Trim(lGraphDataset(2)) & " Constituent " &
+                                                Trim(lGraphDataset(3)) & " to make " & IO.Path.GetFileName(lOutFileName) &
+                                                " graph. Moving to next graph!", vbOKOnly, "Automated Graph: Time Series Issue")
                                         lRecordIndex += 1
-                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("scatter") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("timeseries") Or
-                                                    Trim(lgraphRecordsNew(lRecordIndex)).ToLower.StartsWith("frequency") Or
-                                                    lRecordIndex + 1 < lgraphRecordsNew.Count)
+                                        Do Until (Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("scatter") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("timeseries") Or
+                                                    Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("frequency") Or
+                                                    lRecordIndex + 1 > lgraphRecordsNew.Count)
                                             lRecordIndex += 1
                                         Loop
 
                                         skipGraph = True
-                                        Exit For
-                                        'Throw New ApplicationException("No timeseries was available from " & lDataSourceFilename & " for " & _
-                                        '                                                      " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) & ". Program will quit!")
+                                        Exit Do
                                     End If
                             End Select
 
@@ -265,14 +268,29 @@ Public Module AutomatedGraphs
 
                             End If
 
-                            If Trim(lGraphDataset(0)).ToLower = "add" Then
+                            If Trim(lGraphDataset(0)).ToLower = "add" AndAlso lTimeseriesGroup.Count >= 1 Then
 
                                 lTimeseriesGroup(lTimeseriesGroup.Count - 1) = lTimeseriesGroup(lTimeseriesGroup.Count - 1) + lTimeSeries
                                 lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("Constituent", "Sum")
 
-                            ElseIf Trim(lGraphDataset(0)) = "multiply" Then
+                            ElseIf Trim(lGraphDataset(0)) = "multiply" AndAlso lTimeseriesGroup.Count >= 1 Then
                                 lTimeseriesGroup(lTimeseriesGroup.Count - 1) = lTimeseriesGroup(lTimeseriesGroup.Count - 1) * lTimeSeries
                                 lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.SetValue("Constituent", "Product")
+                            ElseIf (Trim(lGraphDataset(0)).ToLower = "multiply" Or Trim(lGraphDataset(0)).ToLower = "add") AndAlso
+                                                    lTimeseriesGroup.Count = 0 Then
+                                MsgBox("No timeseries was read for the graph " & IO.Path.GetFileName(lOutFileName) & " to add or multiply the time series." &
+                                       " Skipping to the next graph.", vbOKOnly, "Automated Graph: Time Series Issue")
+                                lRecordIndex += 1
+                                Do Until (Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("scatter") Or
+                                            Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("timeseries") Or
+                                            Trim(lgraphRecordsNew(lRecordIndex)(0)).ToLower.StartsWith("frequency") Or
+                                            lRecordIndex + 1 > lgraphRecordsNew.Count)
+                                    lRecordIndex += 1
+                                Loop
+
+                                skipGraph = True
+                                Exit Do
+
                             Else
                                 lTimeSeries.Attributes.SetValue("YAxis", Trim(lGraphDataset(0)))
                                 lTimeseriesGroup.Add(lTimeSeries)
@@ -310,7 +328,7 @@ Public Module AutomatedGraphs
                         End If
                         lZgc.SaveIn(lOutFileName)
 
-                        Dim newlistofattributes() As String = {"Location", "Constituent"}
+                        Dim newlistofattributes() As String = {"Location", "Constituent", "ID"}
                         atcData.atcDataManager.DisplayAttributesSet(newlistofattributes)
                         Dim lList As New atcList.atcListPlugin
                         lList.Save(lTimeseriesGroup, lOutFileName.Substring(0, Len(lOutFileName) - 4) & ".txt")
@@ -389,7 +407,7 @@ Public Module AutomatedGraphs
         Return aTimeseries
     End Function
     Private Function TimeSeriesgraph(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl, ByVal aGraphInit As Object,
-                                     ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer)
+                                     ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer) As ZedGraphControl
         Dim lGrapher As New clsGraphTime(aTimeseriesgroup, aZgc)
         Dim lNumberofCurves As Integer = Trim(aGraphInit(2))
         aRecordIndex -= lNumberofCurves
@@ -451,6 +469,10 @@ Public Module AutomatedGraphs
                         Trim(lGraphDataset(0)).ToLower = "right") Then
                 lCurve = lPaneMain.CurveList.Item(lNumberOfMainPaneCurves)
                 lNumberOfMainPaneCurves += 1
+            ElseIf (Trim(lGraphDataset(0)).ToLower = "add" Or
+                        Trim(lGraphDataset(0)).ToLower = "multiply") Then
+                Continue For
+
             End If
 
             If Trim(lGraphDataset(4)).ToLower = "line" Then
@@ -519,7 +541,7 @@ Public Module AutomatedGraphs
         Return aZgc
     End Function
     Private Function FrequencyGraph(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl, ByVal aGraphInit As Object,
-                                     ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer)
+                                     ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer) As ZedGraphControl
         Dim lGrapher As New clsGraphProbability(aTimeseriesgroup, aZgc)
 
         Dim lNumberofCurves As Integer = Trim(aGraphInit(2))
@@ -584,7 +606,7 @@ Public Module AutomatedGraphs
         Return aZgc
     End Function
     Private Function ScatterPlotGraph(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl,
-                                      ByVal aGraphInit As Object, ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer)
+                                      ByVal aGraphInit As Object, ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer) As ZedGraphControl
         Dim lGrapher As New clsGraphScatter(aTimeseriesgroup, aZgc)
 
         Dim lNumberofCurves As Integer = Trim(aGraphInit(2))
@@ -733,7 +755,8 @@ Public Module AutomatedGraphs
         Return aZgc
     End Function
     Private Function CumulativeProbability(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl,
-                                           ByVal aGraphInit As Object, ByVal aGraphRecords As Object, ByVal aRecordIndex As Integer)
+                                           ByVal aGraphInit As Object, ByVal aGraphRecords As Object,
+                                           ByVal aRecordIndex As Integer) As ZedGraphControl
 
         Dim lNumberofCurves As Integer = Trim(aGraphInit(2))
         aRecordIndex -= lNumberofCurves
