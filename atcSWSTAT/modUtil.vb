@@ -778,19 +778,20 @@ Public Module modUtil
             lStnList = Nothing
         End Sub
 
-        Public Shared Function DoFrequencyGrid(ByVal aDataGroup As atcTimeseriesGroup, _
-                                           ByVal aGroupArgs As atcDataAttributes, _
-                                           ByVal aNDayDbl() As Double, _
-                                           ByVal aReturnPeriodDbl() As Double, _
-                                           ByVal aHighFlag As Boolean) As String
+        Public Shared Function DoFrequencyGrid(ByVal aDataGroup As atcTimeseriesGroup,
+                                           ByVal aGroupArgs As atcDataAttributes,
+                                           ByVal aNDayDbl() As Double,
+                                           ByVal aReturnPeriodDbl() As Double,
+                                           ByVal aHighFlag As Boolean,
+                                           Optional aShowForm As Boolean = False) As String
 
             Try
                 Dim lNDayValuesHighDone As Boolean = InputNames.CalculateNDayValues(aDataGroup, aGroupArgs, aNDayDbl, aReturnPeriodDbl, aHighFlag)
-                Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=aDataGroup, _
-                                                 aHigh:=aHighFlag, _
-                                                 aNday:=aNDayDbl, _
-                                                 aReturns:=aReturnPeriodDbl, _
-                                                 aShowForm:=False)
+                Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=aDataGroup,
+                                                 aHigh:=aHighFlag,
+                                                 aNday:=aNDayDbl,
+                                                 aReturns:=aReturnPeriodDbl,
+                                                 aShowForm:=aShowForm)
                 Return lFreqForm.ToString()
             Catch ex As Exception
                 Return ""
