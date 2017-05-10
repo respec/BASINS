@@ -21,7 +21,10 @@ Public Class clsSWSTATPlugin
     End Property
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
+#If GISProvider = "DotSpatial" Then
+#Else
         LoadPlugin("Timeseries::n-day high/low")
+#End If
 
         'Start branching for batch mode
         Show = Nothing
@@ -36,6 +39,8 @@ Public Class clsSWSTATPlugin
             Return lfrmBatch
         ElseIf lChoice = "Batch Map" Then
             Dim lStationsAreSelected As Boolean = False
+#If GISProvider = "DotSpatial" Then
+#Else
             Dim lMapLayer As MapWindow.Interfaces.Layer = Nothing
             For Each lMapLayer In pMapWin.Layers
                 If lMapLayer.Name.ToLower.Contains("nwis daily discharge stations") Then
@@ -82,8 +87,8 @@ Public Class clsSWSTATPlugin
                     Next
                 End If
                 If lSelectedStationIDs.Count > 0 Then
-                    Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf & _
-                               StationListing(lSelectedStationIDs), _
+                    Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf &
+                               StationListing(lSelectedStationIDs),
                                lBatchTitle)
                 End If
                 Dim lfrmBatchMap As New frmBatchMap()
@@ -91,11 +96,10 @@ Public Class clsSWSTATPlugin
                 lfrmBatchMap.ShowDialog()
                 Return Nothing 'for now
             Else
-
                 Logger.Msg("Could not find stream gage station map layer: NWIS Daily Discharge Stations.", lBatchTitle)
                 'Return Nothing
             End If
-            
+#End If
         End If
 
         Dim lForm As New frmSWSTAT
@@ -176,7 +180,10 @@ Public Class clsSWSTATPlugin
                               ByVal ParamArray aOption() As String)
 
         If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
+#If GISProvider = "DotSpatial" Then
+#Else
             LoadPlugin("Timeseries::n-day high/low")
+#End If
             Dim lForm As New frmSWSTAT
 
             lForm.Initialize(aTimeseriesGroup)
@@ -184,6 +191,8 @@ Public Class clsSWSTATPlugin
             lForm.Dispose()
         End If
     End Sub
+#If GISProvider = "DotSpatial" Then
+#Else
 
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
@@ -218,15 +227,16 @@ Public Class clsSWSTATPlugin
             End Select
         End If
     End Sub
+#End If
 
-    Public Shared Function ComputeRankedAnnualTimeseries(ByVal aTimeseriesGroup As atcTimeseriesGroup, _
-                                                         ByVal aNDay() As Double, _
-                                                         ByVal aHighFlag As Boolean, _
-                                                         ByVal aFirstYear As Integer, _
-                                                         ByVal aLastYear As Integer, _
-                                                         ByVal aBoundaryMonth As Integer, _
-                                                         ByVal aBoundaryDay As Integer, _
-                                                         ByVal aEndMonth As Integer, _
+    Public Shared Function ComputeRankedAnnualTimeseries(ByVal aTimeseriesGroup As atcTimeseriesGroup,
+                                                         ByVal aNDay() As Double,
+                                                         ByVal aHighFlag As Boolean,
+                                                         ByVal aFirstYear As Integer,
+                                                         ByVal aLastYear As Integer,
+                                                         ByVal aBoundaryMonth As Integer,
+                                                         ByVal aBoundaryDay As Integer,
+                                                         ByVal aEndMonth As Integer,
                                                          ByVal aEndDay As Integer) As atcTimeseriesGroup
         Dim lArgs As New atcDataAttributes
         lArgs.SetValue("Timeseries", aTimeseriesGroup)
