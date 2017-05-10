@@ -362,7 +362,7 @@ Public Class frmHspfSimulationManager
                     End With
                     If lTransferWDMName.Length > 0 Then
                         'Change Connections To Use Transfer WDM
-                        ConnectionsToTransferWDM(lTransferWDMName, lUCIs)   'what if transfer wdm is already used here?
+                        ConnectionsToTransferWDM(lTransferWDMName, lUCIs)
                         'Remove unused WDMs from Files Blocks
                         RemoveUnusedWDMs(lUCIs)
                         'Add transfer WDM to Files Blocks

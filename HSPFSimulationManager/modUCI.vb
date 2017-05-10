@@ -214,21 +214,23 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
                             'now see if this wdm/dsn combination shows up as input to the target uci
                             For Each lTConn As HspfConnection In lTargetUCI.Connections
                                 Dim lInputVol As String = lTConn.Source.VolName
-                                If lInputVol.StartsWith("WDM") Then
-                                    If lInputVol = "WDM" Then
-                                        lInputVol = "WDM1"
-                                    End If
-                                    'translate wdm id into file name
-                                    lInputWDMFileName = lTargetWDMs.ItemByKey(lInputVol)
-                                    lInputDsn = lTConn.Source.VolId
-                                    'do the check to see if these match
-                                    If lInputDsn = lOutputDsn Then
-                                        If lInputWDMFileName = lOutputWDMFileName Then
-                                            'we have a match!
-                                            If lUsesTransfer.Length = 0 Then
-                                                lUsesTransfer = lInputWDMFileName
-                                            ElseIf lUsesTransfer <> lInputWDMFileName
-                                                lUsesTransfer = "MULTIPLE"
+                                If Not lInputVol.StartsWith("WDMT") Then
+                                    If lInputVol.StartsWith("WDM") Then
+                                        If lInputVol = "WDM" Then
+                                            lInputVol = "WDM1"
+                                        End If
+                                        'translate wdm id into file name
+                                        lInputWDMFileName = lTargetWDMs.ItemByKey(lInputVol)
+                                        lInputDsn = lTConn.Source.VolId
+                                        'do the check to see if these match
+                                        If lInputDsn = lOutputDsn Then
+                                            If lInputWDMFileName = lOutputWDMFileName Then
+                                                'we have a match!
+                                                If lUsesTransfer.Length = 0 Then
+                                                    lUsesTransfer = lInputWDMFileName
+                                                ElseIf lUsesTransfer <> lInputWDMFileName
+                                                    lUsesTransfer = "MULTIPLE"
+                                                End If
                                             End If
                                         End If
                                     End If
@@ -261,7 +263,15 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
             For Each lSourceUCI As HspfUci In aUCIs
                 If lSourceUCI.Name <> lTargetUCI.Name Then
                     Dim lConnections As New atcCollection
-                    lConnections = FindConnections(lSourceUCI, lTargetUCI, lTransferWDM)
+                    'Do a check on just these 2 UCIs to see if they already use this transfer WDM
+                    Dim lUcis As New atcCollection
+                    lUcis.Add(lSourceUCI)
+                    lUcis.Add(lTargetUCI)
+                    Dim lTrans As String = UsesTransfer(lUcis)
+                    If Not lTrans.ToLower = aTransferWDMName.ToLower Then
+                        'they don't use the transfer wdm yet, so update them
+                        lConnections = FindConnections(lSourceUCI, lTargetUCI, lTransferWDM)
+                    End If
                 End If
             Next
         Next
