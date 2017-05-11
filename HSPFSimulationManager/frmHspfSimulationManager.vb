@@ -269,6 +269,16 @@ Public Class frmHspfSimulationManager
         Me.Enabled = False
         Me.Cursor = Cursors.WaitCursor
         Dim lReport As String = g_AppNameLong & " Connection Report" & vbCrLf
+
+        Dim lUCIs As New atcCollection
+        For Each lIcon As clsIcon In SchematicDiagram.AllIcons
+            If lIcon.Scenario IsNot Nothing Then
+                lUCIs.Add(lIcon.UciFile)
+            End If
+        Next
+        Dim lTransferWDM As String = UsesTransfer(lUCIs)
+        lReport &= vbCrLf & "Transfer WDM Used: " & lTransferWDM & vbCrLf
+
         Dim lIconIndex As Integer = 0
         Dim lSeparatorLine As New String("_", 80)
         For Each lIcon As clsIcon In SchematicDiagram.AllIcons

@@ -451,73 +451,90 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
 
     Public Sub AddTransferWDMtoFilesBlock(ByVal aTransferWDMName As String, ByVal aUCIs As atcCollection)
         For Each lUCI As HspfUci In aUCIs
-            'figure out the next free WDM position (wdm1, wdm2, wdm3 or wdm4)
-            Dim lWDMinUse(4) As Boolean
+
+            Dim lNextWDM As String = ""
             Dim lWDMUnit As Integer = 0
-            lWDMinUse(1) = False
-            lWDMinUse(2) = False
-            lWDMinUse(3) = False
-            lWDMinUse(4) = False
+
+            'see if this transfer WDM is already in the files block
+            Dim lInFilesBlock As Boolean = False
             For lIndex As Integer = 1 To lUCI.FilesBlock.Count
                 Dim lFile As HspfFile = lUCI.FilesBlock.Value(lIndex)
-                Dim lFileTyp As String = lFile.Typ
-                If lFileTyp.StartsWith("WDM") Then
-                    If lFileTyp = "WDM" Then
-                        lFileTyp = "WDM1"
-                    End If
-                    If lFileTyp = "WDM1" Then
-                        lWDMinUse(1) = True
-                        lWDMUnit = lFile.Unit
-                    End If
-                    If lFileTyp = "WDM2" Then
-                        lWDMinUse(2) = True
-                        lWDMUnit = lFile.Unit
-                    End If
-                    If lFileTyp = "WDM3" Then
-                        lWDMinUse(3) = True
-                        lWDMUnit = lFile.Unit
-                    End If
-                    If lFileTyp = "WDM4" Then
-                        lWDMinUse(4) = True
-                        lWDMUnit = lFile.Unit
-                    End If
+                If Trim(RelativeFilename(lFile.Name, PathNameOnly(lUCI.Name))).ToLower = Trim(RelativeFilename(aTransferWDMName, PathNameOnly(lUCI.Name))).ToLower Then
+                    lInFilesBlock = True
+                    lNextWDM = lFile.Typ
+                    lWDMUnit = lFile.Unit
                 End If
             Next
-            Dim lNextWDM As String = ""
-            If Not lWDMinUse(1) Then
-                lNextWDM = "WDM1"
-            ElseIf Not lWDMinUse(2) Then
-                lNextWDM = "WDM2"
-            ElseIf Not lWDMinUse(3) Then
-                lNextWDM = "WDM3"
-            ElseIf Not lWDMinUse(4) Then
-                lNextWDM = "WDM4"
-            End If
-            If lNextWDM.Length = 0 Then
-                'problem, no place to put another wdm file
-            End If
 
-            'figure out what unit number to use
-            Dim lFoundUnit As Boolean = True
-            Do Until Not lFoundUnit
-                lFoundUnit = False
-                lWDMUnit += 1
-                'is this unit in use?
+            If Not lInFilesBlock Then
+                'figure out the next free WDM position (wdm1, wdm2, wdm3 or wdm4)
+                Dim lWDMinUse(4) As Boolean
+
+                lWDMinUse(1) = False
+                lWDMinUse(2) = False
+                lWDMinUse(3) = False
+                lWDMinUse(4) = False
                 For lIndex As Integer = 1 To lUCI.FilesBlock.Count
                     Dim lFile As HspfFile = lUCI.FilesBlock.Value(lIndex)
-                    If lFile.Unit = lWDMUnit Then
-                        lFoundUnit = True
+                    Dim lFileTyp As String = lFile.Typ
+                    If lFileTyp.StartsWith("WDM") Then
+                        If lFileTyp = "WDM" Then
+                            lFileTyp = "WDM1"
+                        End If
+                        If lFileTyp = "WDM1" Then
+                            lWDMinUse(1) = True
+                            lWDMUnit = lFile.Unit
+                        End If
+                        If lFileTyp = "WDM2" Then
+                            lWDMinUse(2) = True
+                            lWDMUnit = lFile.Unit
+                        End If
+                        If lFileTyp = "WDM3" Then
+                            lWDMinUse(3) = True
+                            lWDMUnit = lFile.Unit
+                        End If
+                        If lFileTyp = "WDM4" Then
+                            lWDMinUse(4) = True
+                            lWDMUnit = lFile.Unit
+                        End If
                     End If
                 Next
-            Loop
 
-            If lWDMUnit > 0 Then
-                'add this line to the files block
-                Dim lNewFile As New HspfFile
-                lNewFile.Name = aTransferWDMName
-                lNewFile.Typ = lNextWDM
-                lNewFile.Unit = lWDMUnit
-                lUCI.FilesBlock.Add(lNewFile)
+                If Not lWDMinUse(1) Then
+                    lNextWDM = "WDM1"
+                ElseIf Not lWDMinUse(2) Then
+                    lNextWDM = "WDM2"
+                ElseIf Not lWDMinUse(3) Then
+                    lNextWDM = "WDM3"
+                ElseIf Not lWDMinUse(4) Then
+                    lNextWDM = "WDM4"
+                End If
+                If lNextWDM.Length = 0 Then
+                    'problem, no place to put another wdm file
+                End If
+
+                'figure out what unit number to use
+                Dim lFoundUnit As Boolean = True
+                Do Until Not lFoundUnit
+                    lFoundUnit = False
+                    lWDMUnit += 1
+                    'is this unit in use?
+                    For lIndex As Integer = 1 To lUCI.FilesBlock.Count
+                        Dim lFile As HspfFile = lUCI.FilesBlock.Value(lIndex)
+                        If lFile.Unit = lWDMUnit Then
+                            lFoundUnit = True
+                        End If
+                    Next
+                Loop
+
+                If lWDMUnit > 0 Then
+                    'add this line to the files block
+                    Dim lNewFile As New HspfFile
+                    lNewFile.Name = aTransferWDMName
+                    lNewFile.Typ = lNextWDM
+                    lNewFile.Unit = lWDMUnit
+                    lUCI.FilesBlock.Add(lNewFile)
+                End If
             End If
 
             'now change every occurance of 'WDMT' to lNextWDM
