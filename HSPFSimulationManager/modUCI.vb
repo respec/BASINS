@@ -392,6 +392,9 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
             Dim lDatasets As atcTimeseriesGroup = aTargetSource.DataSets
             While lDatasets.Keys.Contains(lNewDsn)
                 lNewDsn += 1
+                If lNewDsn > 9999 Then
+                    lNewDsn = 1
+                End If
             End While
             aSourceDataSet.Attributes.SetValue("Id", lNewDsn)
         End If

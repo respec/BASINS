@@ -87,6 +87,12 @@
     <Compile Include="ctlSchematic.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="frmAbout.designer.vb">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAbout.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmHspfSimulationManager.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -138,6 +144,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ctlSchematic.resx">
       <DependentUpon>ctlSchematic.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAbout.resx">
+      <DependentUpon>frmAbout.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmHspfSimulationManager.resx">
       <DependentUpon>frmHspfSimulationManager.vb</DependentUpon>

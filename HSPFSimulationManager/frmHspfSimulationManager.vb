@@ -17,6 +17,8 @@ Public Class frmHspfSimulationManager
 
     Private Sub frmHspfSimulationManager_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         pSpecFileName = GetSetting(g_AppNameShort, "Defaults", "FileName", pSpecFileName)
+        g_ProgramDir = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar
+        ShowHelp(g_ProgramDir & "HSPFSimulationManager.chm")
         If FileExists(pSpecFileName) Then
             OpenFile(pSpecFileName)
         Else
@@ -353,7 +355,9 @@ Public Class frmHspfSimulationManager
                 'these models are not connected
             ElseIf lTransferWDM = "MULTIPLE" Then
                 If Logger.Msg("These UCIs are connected through multiple transfer WDM files." & vbCrLf & vbCrLf &
-                           "Do you want to modify them to use a single transfer WDM file?", MsgBoxStyle.YesNo, "Use Transfer WDM?") = MsgBoxResult.Yes Then
+                           "Do you want to modify them to use a single transfer WDM file?" & vbCrLf & vbCrLf &
+                           "(Clicking 'Yes' will overwrite these UCI files.  Be sure to save a backup copy before clicking 'Yes'.)",
+                              MsgBoxStyle.YesNo, "Use Common Transfer WDM?") = MsgBoxResult.Yes Then
                     'prompt for name of transfer wdm
                     Dim lTransferWDMName As String = ""
                     Dim lFileDialog As New Windows.Forms.OpenFileDialog()
@@ -387,4 +391,18 @@ Public Class frmHspfSimulationManager
         End If
     End Sub
 
+    Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
+        Dim lAbout As New frmAbout
+        lAbout.Show()
+    End Sub
+
+    Private Sub DocumentationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DocumentationToolStripMenuItem.Click
+        ShowHelp("Cover.html")
+    End Sub
+
+    Private Sub frm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("Cover.html")
+        End If
+    End Sub
 End Class
