@@ -124,7 +124,7 @@ Friend Class frmAbout
         Me.lblMapWindowURL.Size = New System.Drawing.Size(186, 13)
         Me.lblMapWindowURL.TabIndex = 6
         Me.lblMapWindowURL.TabStop = True
-        Me.lblMapWindowURL.Text = "http://www.MapWindow.org/"
+        Me.lblMapWindowURL.Text = "http://www.mapwindow.org/"
         Me.lblMapWindowURL.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'btnOk
@@ -222,8 +222,7 @@ Friend Class frmAbout
         Me.lblProgramURL.Size = New System.Drawing.Size(432, 13)
         Me.lblProgramURL.TabIndex = 2
         Me.lblProgramURL.TabStop = True
-        Me.lblProgramURL.Text = "http://www2.epa.gov/exposure-assessment-models/basins-user-information-and-guidan" &
-    "ce"
+        Me.lblProgramURL.Text = "http://www2.epa.gov/exposure-assessment-models/basins-user-information-and-guidance"
         Me.lblProgramURL.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'grpATC

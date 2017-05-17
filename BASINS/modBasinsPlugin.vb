@@ -30,7 +30,7 @@ Public Module modBasinsPlugin
     Public Const g_AppNameRegistry As String = "USGS-SW" 'For preferences in registry
     Friend Const g_AppNameShort As String = "SW Toolbox"
     Friend Const g_AppNameLong As String = "USGS SW Toolbox"
-    Friend Const g_URL_Home As String = "http://water.usgs.gov/software/lists/surface_water/"
+    Friend Const g_URL_Home As String = "https://water.usgs.gov/osw/swtoolbox/"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-SW/register.html"
 #Else
     Public Const g_AppNameRegistry As String = "BASINS" 'For preferences in registry
