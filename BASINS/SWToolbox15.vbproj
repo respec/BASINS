@@ -213,6 +213,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcD4EMLauncher\atcD4EMLauncher15.vbproj">
+      <Project>{6cde2fe3-deba-46ba-b395-8f71f87159b0}</Project>
+      <Name>atcD4EMLauncher15</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>BASINS-MapWinUtility15</Name>

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUtility15", "atcUtility\atcUtility15.vbproj", "{67027820-9036-481E-80F6-077E5085F59D}"
 EndProject
@@ -98,7 +98,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcWCS15", "atcWCS\atcWCS15
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesScript15", "atcTimeseriesScript\atcTimeseriesScript15.vbproj", "{40DE1F29-3531-4BC2-9D7E-324DC92689DF}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-MapWinUtility15", "..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility15.vbproj", "{33E88992-742F-4D13-823F-35D6A07B1AA1}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-MapWinUtility15", "MapWinUtility\BASINS-MapWinUtility15.vbproj", "{33E88992-742F-4D13-823F-35D6A07B1AA1}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcProjector15", "atcProjector\atcProjector15.vbproj", "{863771D3-EA5B-45D2-8416-B75E9ADA8D7B}"
 EndProject
@@ -120,7 +120,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcWdmVb15", "atcWdmVb\atcW
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGisUtilities15", "atcGisUtilities\atcGisUtilities15.vbproj", "{E5D23BF6-95FE-4DDF-A1FF-3E0A7F5DCF5F}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMDataManager15", "..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager15.vbproj", "{59E61F35-B014-4D34-8277-63FF6BE40DD6}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMDataManager15", "D4EMDataManager\BASINS-D4EMDataManager15.vbproj", "{59E61F35-B014-4D34-8277-63FF6BE40DD6}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcBatchProcessing15", "atcBatchProcessing\atcBatchProcessing15.vbproj", "{7E95FCAA-7B7C-4585-8EE2-58DB97ED9110}"
 EndProject
@@ -137,6 +137,8 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcStatistics15", "atcStatistics\atcStatistics15.vbproj", "{855B6C7C-513A-4F2F-905C-F92BF7936689}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcIDF15", "atcIntegratedDesignFlow\atcIDF15.vbproj", "{EDB3CF95-E4DD-4D02-97E8-CD3D12CC5F86}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcD4EMLauncher15", "atcD4EMLauncher\atcD4EMLauncher15.vbproj", "{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1143,8 +1145,8 @@ Global
 		{35A06BB5-F3B6-4E13-99C1-96F2A3D10258}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{35A06BB5-F3B6-4E13-99C1-96F2A3D10258}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{35A06BB5-F3B6-4E13-99C1-96F2A3D10258}.Debug|x64.Build.0 = Debug|Any CPU
-		{35A06BB5-F3B6-4E13-99C1-96F2A3D10258}.Debug|x86.ActiveCfg = Debug|x86
-		{35A06BB5-F3B6-4E13-99C1-96F2A3D10258}.Debug|x86.Build.0 = Debug|x86
+		{35A06BB5-F3B6-4E13-99C1-96F2A3D10258}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{35A06BB5-F3B6-4E13-99C1-96F2A3D10258}.Debug|x86.Build.0 = Debug|Any CPU
 		{35A06BB5-F3B6-4E13-99C1-96F2A3D10258}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35A06BB5-F3B6-4E13-99C1-96F2A3D10258}.Release|Any CPU.Build.0 = Release|Any CPU
 		{35A06BB5-F3B6-4E13-99C1-96F2A3D10258}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
@@ -1185,6 +1187,22 @@ Global
 		{EDB3CF95-E4DD-4D02-97E8-CD3D12CC5F86}.Release|x64.Build.0 = Release|x64
 		{EDB3CF95-E4DD-4D02-97E8-CD3D12CC5F86}.Release|x86.ActiveCfg = Release|x86
 		{EDB3CF95-E4DD-4D02-97E8-CD3D12CC5F86}.Release|x86.Build.0 = Release|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|x64.Build.0 = Debug|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|x86.ActiveCfg = Debug|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Debug|x86.Build.0 = Debug|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|Mixed Platforms.Build.0 = Release|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|x64.ActiveCfg = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|x64.Build.0 = Release|Any CPU
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|x86.ActiveCfg = Release|x86
+		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
