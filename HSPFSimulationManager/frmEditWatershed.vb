@@ -93,6 +93,31 @@ Public Class frmEditWatershed
         pIcon = Me.ModelIcon 'Apply changes to icon
         Schematic.AllIcons.Add(pIcon)
         Schematic.BuildTree(Schematic.AllIcons)
+
+        'do connection check to see if this newly added UCI is connected to the downstream UCI
+        Dim lUCIs As New atcCollection
+        lUCIs.Add(pIcon.UciFile)
+        Dim lDownIcon As clsIcon = Schematic.AllIcons.FindOrAddIcon(cboDownstream.SelectedItem.Trim)
+        If lDownIcon IsNot Nothing Then
+            lUCIs.Add(lDownIcon.UciFile)
+        End If
+        If lUCIs.Count = 2 Then
+            'return blank if models are not connected
+            'return name of transfer wdm if models are connected using a single transfer wdm
+            'return 'MULTIPLE' if models are connected but connections use multiple wdms 
+            Dim lTransferWDM As String = UsesTransfer(lUCIs)
+            If lTransferWDM.Length = 0 Then
+                'these models are not connected, ask about connecting them
+                If Logger.Msg("This UCI has no connection to a downstream UCI." & vbCrLf & vbCrLf &
+                           "Do you want to modify this UCI and the downstream UCI so that they connect?" & vbCrLf & vbCrLf &
+                           "(Clicking 'Yes' will overwrite these UCI files.  Be sure to save a backup copy before clicking 'Yes'.)",
+                              MsgBoxStyle.YesNo, "Add Connection?") = MsgBoxResult.Yes Then
+                    'new form here for entering reach IDs and transfer WDM name
+
+                End If
+            End If
+        End If
+
         Me.Close()
     End Sub
 
