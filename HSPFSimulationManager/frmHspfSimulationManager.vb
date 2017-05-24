@@ -376,15 +376,19 @@ Public Class frmHspfSimulationManager
                     End With
                     If lTransferWDMName.Length > 0 Then
                         'Change Connections To Use Transfer WDM
+                        Me.Cursor = Cursors.WaitCursor
                         ConnectionsToTransferWDM(lTransferWDMName, lUCIs)
                         'Remove unused WDMs from Files Blocks
                         RemoveUnusedWDMs(lUCIs)
-                        'Add transfer WDM to Files Blocks
-                        AddTransferWDMtoFilesBlock(lTransferWDMName, lUCIs)
+                        For Each lUCI As HspfUci In lUCIs
+                            'Add transfer WDM to Files Blocks
+                            AddTransferWDMtoFilesBlock(lUCI, lTransferWDMName)
+                        Next
                         For Each lUCI As HspfUci In lUCIs
                             FileCopy(lUCI.Name, lUCI.Name & "Save")
                             lUCI.Save()
                         Next
+                        Me.Cursor = Cursors.Default
                     End If
                 End If
             End If
