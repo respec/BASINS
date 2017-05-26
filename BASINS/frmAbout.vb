@@ -10,7 +10,7 @@ Friend Class frmAbout
         InitializeComponent()
 
         'Add any initialization after the InitializeComponent() call
-
+        Me.Width = Me.Width + 20
     End Sub
 
     'Form overrides dispose to clean up the component list.
