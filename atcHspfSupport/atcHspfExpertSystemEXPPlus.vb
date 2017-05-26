@@ -1,11 +1,6 @@
 Imports atcUtility
 Imports atcData
-Imports atcGraph
-Imports ZedGraph
-'Imports atcList
 Imports MapWinUtility
-Imports System
-Imports MapWinUtility.Strings
 
 
 Public Class atcExpertSystem
