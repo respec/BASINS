@@ -452,105 +452,326 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         Next
     End Sub
 
-    Public Sub AddTransferWDMtoFilesBlock(ByVal aTransferWDMName As String, ByVal aUCIs As atcCollection)
-        For Each lUCI As HspfUci In aUCIs
+    Public Function AddTransferWDMtoFilesBlock(ByVal aUCI As HspfUci, ByVal aTransferWDMName As String) As String
+        'figure out the next free WDM position (wdm1, wdm2, wdm3 or wdm4)
+        'returns which position used (wdm1, wdm2, wdm3 or wdm4)
+        Dim lNextWdm As String = ""
+        Dim lWDMUnit As Integer = 0
 
-            Dim lNextWDM As String = ""
-            Dim lWDMUnit As Integer = 0
+        'see if this transfer WDM is already in the files block
+        Dim lInFilesBlock As Boolean = False
+        For lIndex As Integer = 1 To aUCI.FilesBlock.Count
+            Dim lFile As HspfFile = aUCI.FilesBlock.Value(lIndex)
+            If Trim(RelativeFilename(lFile.Name, PathNameOnly(aUCI.Name))).ToLower = Trim(RelativeFilename(aTransferWDMName, PathNameOnly(aUCI.Name))).ToLower Then
+                lInFilesBlock = True
+                lNextWdm = lFile.Typ
+                lWDMUnit = lFile.Unit
+            End If
+        Next
 
-            'see if this transfer WDM is already in the files block
-            Dim lInFilesBlock As Boolean = False
-            For lIndex As Integer = 1 To lUCI.FilesBlock.Count
-                Dim lFile As HspfFile = lUCI.FilesBlock.Value(lIndex)
-                If Trim(RelativeFilename(lFile.Name, PathNameOnly(lUCI.Name))).ToLower = Trim(RelativeFilename(aTransferWDMName, PathNameOnly(lUCI.Name))).ToLower Then
-                    lInFilesBlock = True
-                    lNextWDM = lFile.Typ
-                    lWDMUnit = lFile.Unit
+        If Not lInFilesBlock Then
+            'figure out the next free WDM position (wdm1, wdm2, wdm3 or wdm4)
+            Dim lWDMinUse(4) As Boolean
+
+            lWDMinUse(1) = False
+            lWDMinUse(2) = False
+            lWDMinUse(3) = False
+            lWDMinUse(4) = False
+            For lIndex As Integer = 1 To aUCI.FilesBlock.Count
+                Dim lFile As HspfFile = aUCI.FilesBlock.Value(lIndex)
+                Dim lFileTyp As String = lFile.Typ
+                If lFileTyp.StartsWith("WDM") Then
+                    If lFileTyp = "WDM" Then
+                        lFileTyp = "WDM1"
+                    End If
+                    If lFileTyp = "WDM1" Then
+                        lWDMinUse(1) = True
+                        lWDMUnit = lFile.Unit
+                    End If
+                    If lFileTyp = "WDM2" Then
+                        lWDMinUse(2) = True
+                        lWDMUnit = lFile.Unit
+                    End If
+                    If lFileTyp = "WDM3" Then
+                        lWDMinUse(3) = True
+                        lWDMUnit = lFile.Unit
+                    End If
+                    If lFileTyp = "WDM4" Then
+                        lWDMinUse(4) = True
+                        lWDMUnit = lFile.Unit
+                    End If
                 End If
             Next
 
-            If Not lInFilesBlock Then
-                'figure out the next free WDM position (wdm1, wdm2, wdm3 or wdm4)
-                Dim lWDMinUse(4) As Boolean
-
-                lWDMinUse(1) = False
-                lWDMinUse(2) = False
-                lWDMinUse(3) = False
-                lWDMinUse(4) = False
-                For lIndex As Integer = 1 To lUCI.FilesBlock.Count
-                    Dim lFile As HspfFile = lUCI.FilesBlock.Value(lIndex)
-                    Dim lFileTyp As String = lFile.Typ
-                    If lFileTyp.StartsWith("WDM") Then
-                        If lFileTyp = "WDM" Then
-                            lFileTyp = "WDM1"
-                        End If
-                        If lFileTyp = "WDM1" Then
-                            lWDMinUse(1) = True
-                            lWDMUnit = lFile.Unit
-                        End If
-                        If lFileTyp = "WDM2" Then
-                            lWDMinUse(2) = True
-                            lWDMUnit = lFile.Unit
-                        End If
-                        If lFileTyp = "WDM3" Then
-                            lWDMinUse(3) = True
-                            lWDMUnit = lFile.Unit
-                        End If
-                        If lFileTyp = "WDM4" Then
-                            lWDMinUse(4) = True
-                            lWDMUnit = lFile.Unit
-                        End If
-                    End If
-                Next
-
-                If Not lWDMinUse(1) Then
-                    lNextWDM = "WDM1"
-                ElseIf Not lWDMinUse(2) Then
-                    lNextWDM = "WDM2"
-                ElseIf Not lWDMinUse(3) Then
-                    lNextWDM = "WDM3"
-                ElseIf Not lWDMinUse(4) Then
-                    lNextWDM = "WDM4"
-                End If
-                If lNextWDM.Length = 0 Then
-                    'problem, no place to put another wdm file
-                End If
-
-                'figure out what unit number to use
-                Dim lFoundUnit As Boolean = True
-                Do Until Not lFoundUnit
-                    lFoundUnit = False
-                    lWDMUnit += 1
-                    'is this unit in use?
-                    For lIndex As Integer = 1 To lUCI.FilesBlock.Count
-                        Dim lFile As HspfFile = lUCI.FilesBlock.Value(lIndex)
-                        If lFile.Unit = lWDMUnit Then
-                            lFoundUnit = True
-                        End If
-                    Next
-                Loop
-
-                If lWDMUnit > 0 Then
-                    'add this line to the files block
-                    Dim lNewFile As New HspfFile
-                    lNewFile.Name = aTransferWDMName
-                    lNewFile.Typ = lNextWDM
-                    lNewFile.Unit = lWDMUnit
-                    lUCI.FilesBlock.Add(lNewFile)
-                End If
+            If Not lWDMinUse(1) Then
+                lNextWdm = "WDM1"
+            ElseIf Not lWDMinUse(2) Then
+                lNextWdm = "WDM2"
+            ElseIf Not lWDMinUse(3) Then
+                lNextWdm = "WDM3"
+            ElseIf Not lWDMinUse(4) Then
+                lNextWdm = "WDM4"
+            End If
+            If lNextWdm.Length = 0 Then
+                'problem, no place to put another wdm file
             End If
 
-            'now change every occurance of 'WDMT' to lNextWDM
-            For Each lConn As HspfConnection In lUCI.Connections
-                If lConn.Target.VolName = "WDMT" Then
-                    lConn.Target.VolName = lNextWDM
-                End If
-                If lConn.Source.VolName = "WDMT" Then
-                    lConn.Source.VolName = lNextWDM
-                End If
-            Next
+            'figure out what unit number to use
+            Dim lFoundUnit As Boolean = True
+            Do Until Not lFoundUnit
+                lFoundUnit = False
+                lWDMUnit += 1
+                'is this unit in use?
+                For lIndex As Integer = 1 To aUCI.FilesBlock.Count
+                    Dim lFile As HspfFile = aUCI.FilesBlock.Value(lIndex)
+                    If lFile.Unit = lWDMUnit Then
+                        lFoundUnit = True
+                    End If
+                Next
+            Loop
 
+            If lWDMUnit > 0 Then
+                'add this line to the files block
+                Dim lNewFile As New HspfFile
+                lNewFile.Name = aTransferWDMName
+                lNewFile.Typ = lNextWdm
+                lNewFile.Unit = lWDMUnit
+                aUCI.FilesBlock.Add(lNewFile)
+            End If
+        End If
+
+        'now change every occurance of 'WDMT' to lNextWDM
+        For Each lConn As HspfConnection In aUCI.Connections
+            If lConn.Target.VolName = "WDMT" Then
+                lConn.Target.VolName = lNextWdm
+            End If
+            If lConn.Source.VolName = "WDMT" Then
+                lConn.Source.VolName = lNextWdm
+            End If
         Next
+
+        Return lNextWdm
+    End Function
+
+    Public Sub AddReachConnections(ByVal aTransferWDMName As String, ByVal aUpstreamUCI As HspfUci, ByVal aUpstreamID As Integer, ByVal aDownstreamUCI As HspfUci, ByVal aDownstreamID As Integer)
+        'get list of connections we'l need to add
+        Dim lReachConns As atcCollection = ReachConnections(aUpstreamUCI, aUpstreamID, aDownstreamUCI, aDownstreamID)
+
+        'create transfer wdm if it does not already exist
+        Dim lTransferWDM As atcWDM.atcDataSourceWDM
+        lTransferWDM = atcDataManager.DataSourceBySpecification(IO.Path.GetFullPath(aTransferWDMName))
+        If lTransferWDM Is Nothing Then 'need to open it here
+            lTransferWDM = New atcWDM.atcDataSourceWDM
+            If Not lTransferWDM.Open(aTransferWDMName) Then
+                lTransferWDM = Nothing
+            End If
+        End If
+
+        'add Transfer WDM to files blocks
+        Dim lUpWdmID As String = AddTransferWDMtoFilesBlock(aUpstreamUCI, aTransferWDMName)
+        Dim lDownWdmID As String = AddTransferWDMtoFilesBlock(aDownstreamUCI, aTransferWDMName)
+
+        Dim lDownOper As HspfOperation = aDownstreamUCI.OpnBlks("RCHRES").OperFromID(aDownstreamID)
+
+        For Each lReachConn As String In lReachConns
+            '"ROVOL IVOL 1 1"
+            Dim lTargetMem As String = MapWinUtility.Strings.StrSplit(lReachConn, " ", """")
+            Dim lSourceMem As String = MapWinUtility.Strings.StrSplit(lReachConn, " ", """")
+            Dim lSub1 As Integer = MapWinUtility.Strings.StrSplit(lReachConn, " ", """")
+            Dim lSub2 As Integer = lReachConn
+            Dim lWDMId As Integer = Int(Mid(lUpWdmID, 4, 1))
+
+            'add target data set 
+            Dim lNewDsn As Integer = 1000
+            Dim lDsnExists As Boolean = lTransferWDM.DataSets.Keys.Contains(lNewDsn)
+            If lDsnExists Then
+                Dim lDatasets As atcTimeseriesGroup = lTransferWDM.DataSets
+                While lDatasets.Keys.Contains(lNewDsn)
+                    lNewDsn += 1
+                End While
+            End If
+            Dim lScenario As String = IO.Path.GetFileNameWithoutExtension(aUpstreamUCI.Name)
+            Dim lGenericTs As New atcData.atcTimeseries(Nothing)
+            With lGenericTs.Attributes
+                .SetValue("ID", lNewDsn)
+                .SetValue("Scenario", lScenario.ToUpper)
+                .SetValue("Constituent", lTargetMem)
+                .SetValue("Location", "RCH" & CStr(aUpstreamID))
+                .SetValue("TU", 3)  'assume hourly for now
+                .SetValue("TS", 1)
+                .SetValue("TSTYPE", lTargetMem)
+                .SetValue("Data Source", lTransferWDM.Specification)
+            End With
+            Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
+            lGenericTs.Dates = lTsDate
+            Dim lAddedDsn As Boolean = lTransferWDM.AddDataset(lGenericTs, 0)
+
+            'add ext target
+            aUpstreamUCI.AddExtTarget("RCHRES", aUpstreamID, "ROFLOW", lTargetMem, lSub1, lSub2, 1.0#, "    ",
+                                      lUpWdmID, lNewDsn, lTargetMem, 1, "ENGL", "AGGR", "REPL")
+
+            'add ext source
+            Dim lConn As New HspfConnection
+            lConn.Uci = aDownstreamUCI
+            lConn.Typ = 1
+            lConn.Source.VolName = lDownWdmID
+            lConn.Source.VolId = lNewDsn
+            lConn.Source.Member = lTargetMem
+            lConn.Source.MemSub1 = 0
+            lConn.Ssystem = "ENGL"
+            lConn.Sgapstrg = "    "
+            lConn.MFact = 1.0
+            lConn.Tran = "SAME"
+            lConn.Target.VolName = "RCHRES"
+            lConn.Target.VolId = aDownstreamID
+            lConn.Target.Group = "INFLOW"
+            lConn.Target.Member = lSourceMem
+            lConn.Target.MemSub1 = lSub1
+            lConn.Target.MemSub2 = lSub2
+            aDownstreamUCI.Connections.Add(lConn)
+            lDownOper.Sources.Add(lConn)
+        Next
+
     End Sub
+
+    Private Function ReachConnections(ByVal aUpstreamUCI As HspfUci, ByVal aUpstreamID As Integer, ByVal aDownstreamUCI As HspfUci, ByVal aDownstreamID As Integer) As atcCollection
+        Dim lConnections As New atcCollection
+
+        Dim lUpOper As HspfOperation = Nothing
+        Dim lDownOper As HspfOperation = Nothing
+        If aUpstreamUCI.OperationExists("RCHRES", aUpstreamID) Then
+            lUpOper = aUpstreamUCI.OpnBlks("RCHRES").OperFromID(aUpstreamID)
+        End If
+        If aDownstreamUCI.OperationExists("RCHRES", aDownstreamID) Then
+            lDownOper = aDownstreamUCI.OpnBlks("RCHRES").OperFromID(aDownstreamID)
+        End If
+
+        Dim lNExits As Integer = 1   'note, if there are multiple exits, we will need to know which is the main outflow that continues downsteram
+        Dim lNCats As Integer = 0
+        Dim lNCons As Integer = 0
+        Dim lNGQuals As Integer = 0
+        Dim lUpTable As HspfTable = Nothing
+        Dim lDownTable As HspfTable = Nothing
+        If lUpOper IsNot Nothing And lDownOper IsNot Nothing Then
+            If lUpOper.TableExists("ACTIVITY") And lDownOper.TableExists("ACTIVITY") Then
+                lUpTable = lUpOper.Tables.Item("ACTIVITY")
+                lDownTable = lDownOper.Tables.Item("ACTIVITY")
+                If lUpOper.TableExists("GEN-INFO") Then
+                    lNExits = lUpOper.Tables.Item("GEN-INFO").ParmValue("NEXITS")
+                End If
+                If aUpstreamUCI.CategoryBlock IsNot Nothing Then
+                    lNCats = aUpstreamUCI.CategoryBlock.Categories.Count
+                End If
+
+                'section hydr
+                If lUpTable.Parms("HYDRFG").Value = 1 And lDownTable.Parms("HYDRFG").Value = 1 Then
+                    If lNCats = 0 Then
+                        'need to connect ROVOL to IVOL
+                        lConnections.Add("ROVOL IVOL 1 1")
+                    Else
+                        For lIndex As Integer = 1 To lNCats
+                            lConnections.Add("CROVOL CIVOL " & lIndex.ToString & " 1")
+                        Next
+                    End If
+                End If
+
+                'section cons
+                If lUpTable.Parms("CONSFG").Value = 1 And lDownTable.Parms("CONSFG").Value = 1 Then
+                    If lUpOper.TableExists("NCONS") Then
+                        lNCons = lUpOper.Tables.Item("NCONS").ParmValue("NCONS")
+                    End If
+                    For lIndex As Integer = 1 To lNCons
+                        lConnections.Add("ROCON ICON " & lIndex.ToString & " 1")
+                    Next
+                End If
+
+                'section htrch
+                If lUpTable.Parms("HTFG").Value = 1 And lDownTable.Parms("HTFG").Value = 1 Then
+                    lConnections.Add("ROHEAT IHEAT 1 1")
+                End If
+
+                'section sedtran
+                If lUpTable.Parms("SEDFG").Value = 1 And lDownTable.Parms("SEDFG").Value = 1 Then
+                    lConnections.Add("ROSED ISED 1 1")
+                    lConnections.Add("ROSED ISED 2 1")
+                    lConnections.Add("ROSED ISED 3 1")
+                End If
+
+                'section gqual
+                If lUpTable.Parms("GQALFG").Value = 1 And lDownTable.Parms("GQALFG").Value = 1 Then
+                    If lUpOper.TableExists("GQ-GENDATA") Then
+                        lNGQuals = lUpOper.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
+                    End If
+                    For lQIndex As Integer = 1 To lNGQuals
+                        lConnections.Add("RODQAL IDQAL " & lQIndex.ToString & " 1")
+                        If lUpTable.Parms("SEDFG").Value = 1 And lUpOper.Tables.Item("GQ-GENDATA").ParmValue("SDFG") = 1 Then
+                            lConnections.Add("ROSQAL ISQAL 1 " & lQIndex.ToString)
+                            lConnections.Add("ROSQAL ISQAL 2 " & lQIndex.ToString)
+                            lConnections.Add("ROSQAL ISQAL 3 " & lQIndex.ToString)
+                        End If
+                    Next
+                End If
+
+                'section oxrx
+                If lUpTable.Parms("OXFG").Value = 1 And lDownTable.Parms("OXFG").Value = 1 Then
+                    lConnections.Add("OXCF1 OXIF 1 1")
+                    lConnections.Add("OXCF1 OXIF 2 1")
+                End If
+
+                'section nutrx
+                If lUpTable.Parms("NUTFG").Value = 1 And lDownTable.Parms("NUTFG").Value = 1 Then
+                    lConnections.Add("NUCF1 NUIF1 1 1")
+                    lConnections.Add("NUCF1 NUIF1 2 1")
+                    lConnections.Add("NUCF1 NUIF1 3 1")
+                    lConnections.Add("NUCF1 NUIF1 4 1")
+                    lConnections.Add("NUCF2 NUIF2 1 1")
+                    lConnections.Add("NUCF2 NUIF2 2 1")
+                    lConnections.Add("NUCF2 NUIF2 3 1")
+                    lConnections.Add("NUCF2 NUIF2 1 2")
+                    lConnections.Add("NUCF2 NUIF2 2 2")
+                    lConnections.Add("NUCF2 NUIF2 3 2")
+                End If
+
+                'section plank
+                If lUpTable.Parms("PLKFG").Value = 1 And lDownTable.Parms("PLKFG").Value = 1 Then
+                    lConnections.Add("PKCF1 PKIF 1 1")
+                    lConnections.Add("PKCF1 PKIF 2 1")
+                    lConnections.Add("PKCF1 PKIF 3 1")
+                    lConnections.Add("PKCF1 PKIF 4 1")
+                    lConnections.Add("PKCF1 PKIF 5 1")
+                End If
+
+                'section phcarb
+                If (lUpTable.Parms("PHFG").Value = 1 Or lUpTable.Parms("PHFG").Value = 3) And
+                    (lDownTable.Parms("PHFG").Value = 1 Or lDownTable.Parms("PHFG").Value = 3) Then
+                    lConnections.Add("PHCF1 PHIF 1 1")
+                    lConnections.Add("PHCF1 PHIF 2 1")
+                End If
+
+                Dim lAcidph As Boolean = False
+                'check to see if acidph is available
+                For lIndex As Integer = 0 To aUpstreamUCI.Msg.BlockDefs("RCHRES").SectionDefs.Count - 1
+                    If aUpstreamUCI.Msg.BlockDefs("RCHRES").SectionDefs(lIndex).Name = "ACIDPH" Then
+                        lAcidph = True
+                    End If
+                Next
+                If lAcidph Then
+                    'section acidph
+                    If (lUpTable.Parms("PHFG").Value = 2 Or lUpTable.Parms("PHFG").Value = 3) And
+                        (lDownTable.Parms("PHFG").Value = 2 Or lDownTable.Parms("PHFG").Value = 3) Then
+                        lConnections.Add("ACFLX1 ACINFL 1 1")
+                        lConnections.Add("ACFLX1 ACINFL 2 1")
+                        lConnections.Add("ACFLX1 ACINFL 3 1")
+                        lConnections.Add("ACFLX1 ACINFL 4 1")
+                        lConnections.Add("ACFLX1 ACINFL 5 1")
+                        lConnections.Add("ACFLX1 ACINFL 6 1")
+                        lConnections.Add("ACFLX1 ACINFL 7 1")
+                    End If
+                End If
+            End If
+        End If
+
+        Return lConnections
+    End Function
 
 End Module
