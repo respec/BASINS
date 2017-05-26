@@ -363,7 +363,7 @@ Friend Class frmAbout
             'lblProgramURL.Left = Me.Width - lblProgramURL.Width - 20
 
             Try
-                lblPluginVersion.Text = " Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
+                lblPluginVersion.Text = " Build Date: May 26, 2017" ' & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
             Catch
             End Try
             Try
