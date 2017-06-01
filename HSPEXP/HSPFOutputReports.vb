@@ -119,7 +119,7 @@ Module HSPFOutputReports
                 EDateJ = StartUp.DateTimePicker2.Value.ToOADate() + 1
 
                 If pSensitivity Then
-                    SensitivityAnalysis(pBaseName, pTestPath, SDateJ, EDateJ)
+                    SensitivityAnalysis(pHSPFExe, pBaseName, pTestPath, SDateJ, EDateJ)
                 End If
 
                 If pRunUci = True Then

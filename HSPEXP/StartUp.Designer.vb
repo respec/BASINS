@@ -278,12 +278,11 @@ Partial Class StartUp
         'chkHydrologySensitivity
         '
         Me.chkHydrologySensitivity.AutoSize = True
-        Me.chkHydrologySensitivity.Enabled = False
         Me.chkHydrologySensitivity.Location = New System.Drawing.Point(6, 19)
         Me.chkHydrologySensitivity.Name = "chkHydrologySensitivity"
-        Me.chkHydrologySensitivity.Size = New System.Drawing.Size(164, 17)
+        Me.chkHydrologySensitivity.Size = New System.Drawing.Size(114, 17)
         Me.chkHydrologySensitivity.TabIndex = 7
-        Me.chkHydrologySensitivity.Text = "Hydrology Sensitivity Analysis"
+        Me.chkHydrologySensitivity.Text = "Sensitivity Analysis"
         Me.ttHSPEXP.SetToolTip(Me.chkHydrologySensitivity, "Under development.")
         Me.chkHydrologySensitivity.UseVisualStyleBackColor = True
         '
