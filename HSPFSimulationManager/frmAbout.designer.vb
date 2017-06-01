@@ -47,7 +47,7 @@ Partial Class frmAbout
         Me.lblVersion.Name = "lblVersion"
         Me.lblVersion.Size = New System.Drawing.Size(103, 13)
         Me.lblVersion.TabIndex = 21
-        Me.lblVersion.Text = "Release 2017-05-12"
+        Me.lblVersion.Text = "Release 2017-06-01"
         '
         'pictureLogo
         '
