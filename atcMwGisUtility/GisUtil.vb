@@ -474,7 +474,7 @@ Public Class GisUtil
         lSf.StartEditingTable()
         'TODO: error handling
         Dim lBsuc As Boolean = lSf.EditInsertField(lField, aFieldAfter)
-        lSf.StopEditingTable()
+        lSf.StopEditingTable(True)
 
         Return lSf.NumFields - 1
     End Function
@@ -497,7 +497,7 @@ Public Class GisUtil
             lSf.StartEditingTable()
             'TODO: error handling
             RemoveField = lSf.EditDeleteField(aFieldIndex)
-            lSf.StopEditingTable()
+            lSf.StopEditingTable(True)
         Else
             RemoveField = False
         End If
@@ -977,7 +977,7 @@ Public Class GisUtil
                     'problem setting value
                     Logger.Dbg("problem setting value to " & aValue)
                 End If
-                lRetc = lSf.StopEditingTable()
+                lRetc = lSf.StopEditingTable(True)
             End If
         End If
     End Sub
@@ -1002,7 +1002,7 @@ Public Class GisUtil
     Public Shared Sub StopSetFeatureValue(ByVal aLayerIndex As Integer)
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         Dim lRetc As Boolean
-        lRetc = lSf.StopEditingTable()
+        lRetc = lSf.StopEditingTable(True)
     End Sub
 
     Public Shared Function NumSelectedFeatures(ByVal aLayerIndex As Integer) As Integer
@@ -5065,7 +5065,7 @@ Public Class GisUtil
             lFieldIndex = lSf.NumFields
             Dim lBsuc As Boolean = lSf.EditInsertField(lField, lFieldIndex)
             lXField = lFieldIndex
-            lSf.StopEditingTable()
+            lSf.StopEditingTable(True)
         End If
 
         Dim lYField As Integer = -1
@@ -5083,7 +5083,7 @@ Public Class GisUtil
             lFieldIndex = lSf.NumFields
             Dim lBsuc As Boolean = lSf.EditInsertField(lField, lFieldIndex)
             lYField = lFieldIndex
-            lSf.StopEditingTable()
+            lSf.StopEditingTable(True)
         End If
 
         Dim lPt As New MapWinGIS.Point
@@ -5093,7 +5093,7 @@ Public Class GisUtil
             lSf.EditCellValue(lXField, lShapeIndex, lPt.x)
             lSf.EditCellValue(lYField, lShapeIndex, lPt.y)
         Next
-        lSf.StopEditingTable()
+        lSf.StopEditingTable(True)
     End Sub
 
     Public Shared Sub LineCentroid(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, ByRef aCentroidX As Double, ByRef aCentroidY As Double)
