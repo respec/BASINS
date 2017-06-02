@@ -2,6 +2,7 @@
 Imports MapWinUtility
 Imports atcUCI
 Imports atcData
+Imports System.IO
 
 Public Class HydrologySensitivityStats
     Public SiteName As String
@@ -47,6 +48,18 @@ Public Class SensitivityStats
     Public TwoPercentLow As Double
 End Class
 
+Public Class ModelParameter
+    Public ParmID As Integer
+    Public ParmOperation As String
+    Public ParmOperationNumber As Integer
+    Public ParmLandUseName As String = ""
+    Public ParmTable As String
+    Public ParmName As String
+    Public ParmLow As Double = -1.0E-30
+    Public ParmHigh As Double = 1.0E+30
+End Class
+
+
 Public Module ModSensitivityAnalysis
     Sub SensitivityAnalysis(ByVal aHSPFEXE As String, ByVal pBaseName As String, ByVal pTestPath As String,
                             aSDateJ As Double, aEDateJ As Double)
@@ -58,9 +71,9 @@ Public Module ModSensitivityAnalysis
         Dim lUci As New atcUCI.HspfUci
         Dim SaveUCIFiles As Boolean = True
         Dim uciName As String
-        uciName = pBaseName & "_2.uci"
-        IO.File.Copy(pBaseName & ".uci", uciName, True)
-        lUci.ReadUci(lMsg, uciName, -1, False, pBaseName & ".ech") ' Reading the temp uci file with _2
+        uciName = pBaseName & "_UA.uci"
+        IO.File.Copy(pBaseName & ".uci", uciName, True) 'Saving the original file with _UA at the end
+        lUci.ReadUci(lMsg, uciName, -1, False, pBaseName & ".ech") ' Reading the temp uci file with _UA
 
         Dim lStats As New Generic.List(Of SensitivityStats)
         Dim YearsofSimulation As Single
@@ -69,16 +82,17 @@ Public Module ModSensitivityAnalysis
         'Generate a default Parameter Sensitivity Table file if it does not exist already
         Dim lSensitiveParameterListFilesIsAvailable As Boolean = False
         Dim lSensitivitySpecificationFile As String = "SensitiveParametersList.csv"
-        Dim SensitivityOutputFile = IO.File.CreateText("SensitivityOutput.csv")
+        Dim SensitivityOutputFile As StreamWriter = File.CreateText("SensitivityOutput.csv")
         SensitivityOutputFile.WriteLine("SimID, DSNID, Sum, 10%High, 25%High, 50%High, 50%Low, 25%Low, 10%Low, 5%Low, 2%Low")
+
 
         Dim NumberOfOutputDSN As Integer = 0
 
         If Not IO.File.Exists(lSensitivitySpecificationFile) Then
-            Dim SensitivityParameterFile = IO.File.CreateText("SensitiveParametersList.csv")
-            Dim TextToAddForSensitivityFile As String = "***Generic Parameter List For Sensitivity Analysis And Output DSN from the UCI file"
+            Dim SensitivityParameterFile As StreamWriter = IO.File.CreateText("SensitiveParametersList.csv")
+            Dim TextToAddForSensitivityFile As String = "***Generic Parameter List For Sensitivity/Uncertainty Analysis And Output DSN from the UCI file"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "***Following Output IDs are the first two ID read from the EXT TARGET block of the UCI file, you can add more"
+            TextToAddForSensitivityFile = "***Following Output IDs are the first two ID read from the EXT TARGET block of the UCI file. You can add more if you want to."
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
 
             TextToAddForSensitivityFile = "DSN,"
@@ -94,133 +108,121 @@ Public Module ModSensitivityAnalysis
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
             TextToAddForSensitivityFile = "***The operation number, land use, tied with next, and multiplier can be left blank"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "OPERATION, OPERATION NUMBER, LANDUSE, TABLE, PARM, TIED WITH NEXT?, LOWMULTIPLIER, HIGHMULTIPLIER, LOWERLIMIT, UPPERLIMIT"
+            TextToAddForSensitivityFile = "Parameter,OPERATION, OPERATION NUMBER, LANDUSE, TABLE, PARM, LOWERLIMIT, UPPERLIMIT"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "PERLND, , , PWAT-PARM2, LZSN, , 0.9, 1.1"
+            TextToAddForSensitivityFile = "1,PERLND, , , PWAT-PARM2, LZSN,3,8"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "PERLND, , , PWAT-PARM2, INFILT, , 0.9, 1.1"
+            TextToAddForSensitivityFile = "2,PERLND, , , PWAT-PARM2, INFILT,0.01,0.5"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
+            TextToAddForSensitivityFile = "***Following lines list the multiplication factor for each parameter for each simulation."
+            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
+            TextToAddForSensitivityFile = "Simulation ID,Parameter1,Parameter2,,,,,"
+            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
+            TextToAddForSensitivityFile = "1,0.9,1,"
+            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
+            TextToAddForSensitivityFile = "2,1.1,1,"
+            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
+            TextToAddForSensitivityFile = "3,1,0.9,"
+            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
+            TextToAddForSensitivityFile = "4,1,1.1,"
+            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
+
+
             MsgBox("A default list of Sensitive parameters was created as SensitiveParameterList.csv. 
                       You can edit this file and add more parameters.", vbOKOnly, "Default List of Sensitive Parameters")
             SensitivityParameterFile.Close()
         End If
 
         'The file listing the sensitive parameters and the output DSN already exists.
-        Dim lSensitivityRecordsNew As New ArrayList
-        lSensitivityRecordsNew = ReadCSVFile(lSensitivitySpecificationFile)
+        Dim lSpecificationFileRecordsNew As New ArrayList
+        lSpecificationFileRecordsNew = ReadCSVFile(lSensitivitySpecificationFile) 'Reading the UA specification file 
 
         Dim listOfOutputDSN As New atcCollection
-        NumberOfOutputDSN = lSensitivityRecordsNew(0).length - 2
+        Dim lcsvRecordIndex As Integer = 0
+        Dim lcsvlinerecord() As String = lSpecificationFileRecordsNew(lcsvRecordIndex)
+        NumberOfOutputDSN = lcsvlinerecord.Length - 2
         For i = 1 To NumberOfOutputDSN
-            listOfOutputDSN.Add(lSensitivityRecordsNew(0)(i))
+            If lcsvlinerecord(i) = "" Then
+                NumberOfOutputDSN = i - 1
+                Exit For
+            Else
+                listOfOutputDSN.Add(lcsvlinerecord(i))
+            End If
+
         Next
 
-        Dim lcsvRecordIndex As Integer = 1
-        Dim MultiplicationFactor As Double = 0
+
+
 
         Dim loutputLine As String = ""
         loutputLine = ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath,
                                  aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN)
 
         SensitivityOutputFile.Write(loutputLine)
+        'SensitivityOutputFile.Close()
 
-        Dim ParameterDetailText As String = "SIMID, OPERATION, TABLE, OPERATIONNUMBER," &
-                                                "PARMATERNAME, MONTH/TYPE, PARAMETERVALUE" & vbCrLf
+        Dim ListOfParameters As New List(Of ModelParameter)
+        lcsvRecordIndex += 1
+        lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
+        Do Until lcsvlinerecord(0) = "Simulation ID"
+            'Going through the CSV file and getting the list of parameters.
+            Dim NewParameter As New ModelParameter
+            With NewParameter
+                .ParmID = lcsvlinerecord(0)
+                .ParmOperation = lcsvlinerecord(1)
+                If Not lcsvlinerecord(2) = "" Then
+                    .ParmOperationNumber = CInt(lcsvlinerecord(2))
+                End If
+                If Not lcsvlinerecord(3) = "" Then
+                    .ParmLandUseName = lcsvlinerecord(3)
+                End If
 
-        Dim lParameterDetails() As String
-        Dim LowMultiplier As Double = 0.0
-        Dim HighMultiplier As Double = 0.0
-        Dim TiedWithNext As String = ""
-        Dim ParameterOperation As String = ""
-        Dim OperationNumber As String = ""
-        Dim LanduseName As String = ""
-        Dim TableName As String = ""
-        Dim ParameterName As String = ""
-        Dim LowerLimit As Double = -1.0E+30
-        Dim UpperLimit As Double = 1.0E+30
+                .ParmTable = lcsvlinerecord(4)
+                .ParmName = lcsvlinerecord(5)
+                If lcsvlinerecord.Length > 6 Then
+                    .ParmLow = CDbl(lcsvlinerecord(6))
+                    .ParmHigh = CDbl(lcsvlinerecord(7))
+                End If
+
+            End With
+
+            ListOfParameters.Add(NewParameter)
+            lcsvRecordIndex += 1
+            lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
+        Loop
+
+        Dim MultiplicationFactor As Double = 0
 
         Do
-            'Start going through the CSV file
-            lParameterDetails = lSensitivityRecordsNew(lcsvRecordIndex)
-            LowMultiplier = Convert.ChangeType(lParameterDetails(6), TypeCode.Double)
-            HighMultiplier = Convert.ChangeType(lParameterDetails(7), TypeCode.Double)
-
-            Dim TiedWithNextLoop As Boolean = False
-
-            For LowHigh As Integer = 0 To 1
-
-                IO.File.Copy(uciName, "Run" & "_" & uciName, True) 'Saving original uci file as temp uci file
-
-                lUci.ReadUci(lMsg, "Run" & "_" & uciName, -1, False, pBaseName & ".ech") ' Reading the temp uci file
-
-                If LowHigh = 0 Then
-                    MultiplicationFactor = LowMultiplier
-                ElseIf LowHigh = 1 Then
-                    MultiplicationFactor = HighMultiplier
-                End If
-                Do
-                    ParameterOperation = lParameterDetails(0)
-                    OperationNumber = lParameterDetails(1)
-                    LanduseName = lParameterDetails(2)
-                    TableName = lParameterDetails(3)
-                    ParameterName = lParameterDetails(4)
-                    LowerLimit = -1.0E+30
-                    UpperLimit = 1.0E+30
-                    If lParameterDetails.Length > 8 Then
-                        LowerLimit = Convert.ChangeType(lParameterDetails(8), TypeCode.Double)
-                        UpperLimit = Convert.ChangeType(lParameterDetails(9), TypeCode.Double)
-
-                    End If
-
-                    lUci = ChangeUCIParameterAndSave(lUci, ParameterOperation, OperationNumber, LanduseName,
-                                                     TableName, ParameterName, LowerLimit, UpperLimit, MultiplicationFactor)
-
-                    TiedWithNext = lParameterDetails(5)
-                    Dim CountofTiedWithNext As Integer = 0
-                    If TiedWithNext.ToLower.Contains("yes") Then
-                        TiedWithNextLoop = True
-                        lcsvRecordIndex += 1
-                        lParameterDetails = lSensitivityRecordsNew(lcsvRecordIndex)
-                        CountofTiedWithNext += 1
-                    Else
-                        TiedWithNextLoop = False
-                        lcsvRecordIndex = lcsvRecordIndex - CountofTiedWithNext
-                        lParameterDetails = lSensitivityRecordsNew(lcsvRecordIndex)
-                    End If
-
-                Loop While TiedWithNextLoop
-                SimID += 1
-                'If SimID = 4 Then Stop
-                If SaveUCIFiles Then
-                    IO.File.Copy("Run" & "_" & uciName, SimID & uciName, True)
-                End If
-
-
-                loutputLine = ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath,
-                                 aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN)
-                'lUci = Nothing
-                SensitivityOutputFile.Write(loutputLine)
-
-            Next
+            Dim ParameterSequence As Integer = 1
             lcsvRecordIndex += 1
-        Loop While lcsvRecordIndex < lSensitivityRecordsNew.Count
+            lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
+            SimID = lcsvlinerecord(0)
+            For Each Parm As ModelParameter In ListOfParameters
+                MultiplicationFactor = lcsvlinerecord(Parm.ParmID)
+
+                With Parm
+                    lUci = ChangeUCIParameterAndSave(lUci, .ParmOperation, .ParmOperationNumber, .ParmLandUseName,
+                                                     .ParmTable, .ParmName, .ParmLow, .ParmHigh, MultiplicationFactor)
+
+                End With
+                ParameterSequence += 1
+            Next
+
+
+            loutputLine = ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath,
+                                 aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN)
+            'lUci = Nothing
+            SensitivityOutputFile.Write(loutputLine)
+
+            If SaveUCIFiles Then
+                IO.File.Copy(uciName, SimID & uciName, True)
+            End If
+
+
+        Loop While lcsvRecordIndex < lSpecificationFileRecordsNew.Count - 1
 
         SensitivityOutputFile.Close()
-
-        'Dim Sensitivity(100, 4) As Object
-
-        'Dim dateTimeOfUciFile As String = System.IO.File.GetLastWriteTime(pBaseName & ".uci")
-        'dateTimeOfUciFile = FormatDateTime(dateTimeOfUciFile, DateFormat.LongDate)
-        'System.IO.File.Copy(pBaseName & ".uci", pBaseName & dateTimeOfUciFile & ".uci", True)
-        ''Save the original copy of the uci file before altering
-
-        'If lExitCode = -1 Then
-        '    MsgBox("The original uci file could not run. Program will exit")
-        'End If
-
-
-        'IO.File.WriteAllText(pBaseName & "_ParameterDetails.txt", ParameterDetails)
-
 
     End Sub
     Private Function ReadCSVFile(aSensitivitySpecificationFile As String)
@@ -236,7 +238,7 @@ Public Module ModSensitivityAnalysis
                     Try
                         If (MyReader.PeekChars(10000).Contains("***") Or
                                     Trim(MyReader.PeekChars(10000)) = "" Or
-                                    Trim(MyReader.PeekChars(10000).ToLower.Contains("operation")) Or
+                                    Trim(MyReader.PeekChars(10000).ToLower.StartsWith("parameter")) Or
                                     Trim(MyReader.PeekChars(10000).ToLower.StartsWith(","))) Then
                             CurrentRow = MyReader.ReadFields
                         Else
