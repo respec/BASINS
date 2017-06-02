@@ -782,7 +782,9 @@ ProjectIt:
     ''' <returns>list of 8-digit HUCs as List of strings</returns>
     Public Shared Function HUC8List(ByVal aHUC As String) As Generic.List(Of String)
         Dim lHUCS As New Generic.List(Of String)
-        Dim lDBFfilename As String = FindFile("Please locate the 8-digit HUC DBF", "huc250d3.dbf")
+        'Dim lDBFfilename As String = FindFile("Please locate the 8-digit HUC DBF", "huc250d3.dbf")
+        Dim lHUC8sFilename As String = Region.NationalHUC8shapefilename
+        Dim lDBFfilename As String = FilenameSetExt(lHUC8sFilename, ".dbf")
         If Not IO.File.Exists(lDBFfilename) Then
             Throw New ApplicationException("HUC DBF not found")
         Else

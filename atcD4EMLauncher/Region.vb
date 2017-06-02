@@ -272,7 +272,11 @@ NextShape:
     Public Shared Property NationalHUC8shapefilename() As String
         Get
             If pNationalHUC8shapefilename Is Nothing Then
-                pNationalHUC8shapefilename = atcUtility.FindFile(Nothing, "\basins\data\national\huc250d3.shp")
+                If FileExists("\basins\data\national\cat.shp") Then
+                    pNationalHUC8shapefilename = atcUtility.FindFile(Nothing, "\basins\data\national\cat.shp")
+                Else
+                    pNationalHUC8shapefilename = atcUtility.FindFile(Nothing, "\basins\data\national\huc250d3.shp")
+                End If
             End If
             Return pNationalHUC8shapefilename
         End Get
