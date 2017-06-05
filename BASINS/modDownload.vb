@@ -639,12 +639,54 @@ StartOver:
                         End If
                     Next
                     If lHUC8BoundaryOnly Then
-                        If Logger.Msg("One (or more) of the core data sets is not available for download." & vbCr & "Do you want to build a project using only the HUC8 boundary?", MsgBoxStyle.OkCancel, "New Project") = MsgBoxResult.Cancel Then
+                        If Logger.Msg("One (or more) of the core data sets is not available for download." & vbCr & "Do you want to build a project using only the HUC8 boundary?", MsgBoxStyle.OkCancel, "New Project") = MsgBoxResult.Ok Then
+                            'save the HUC8s as a new shapefile
+                            Dim lHUC8ShapefileName As String = GisUtil.LayerFileName("Cataloging Units")
+                            Dim lNewShapefileName As String = lNewDataDir & FilenameNoPath(lHUC8ShapefileName)
+                            GisUtil.SaveSelectedFeatures(lHUC8ShapefileName, lNewShapefileName, False)
+                            'change projection
+                            Dim lInputProjection As String = GisUtil.ShapefileProjectionString(GisUtil.CurrentLayer)
+                            Dim lOutputProjection As String = CleanUpUserProjString(IO.File.ReadAllText(lNewDataDir & "prj.proj"))
+                            Dim lHUC8Sf As New MapWinGIS.Shapefile
+                            If lHUC8Sf.Open(lNewShapefileName) Then
+                                If lInputProjection <> lOutputProjection Then
+                                    If Not MapWinGeoProc.SpatialReference.ProjectShapefile(lInputProjection, lOutputProjection, lHUC8Sf) Then
+                                        Logger.Msg("Problem projecting the HUC8 shapefile.", "Projection Problem")
+                                    End If
+                                End If
+                                lHUC8Sf.Close()
+                            End If
+                            'what if multiple are selected
+                            'what if a county was selected
+                            'should this be a subroutine?
+                            'put default files in project
+                            Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar)
+                            If Not IO.Directory.Exists(lNationalDir) Then
+                                lNationalDir = IO.Path.Combine(lDataPath, "national" & g_PathChar)
+                            End If
+                            If IO.Directory.Exists(lNationalDir) Then
+                                CopyFromIfNeeded("sic.dbf", lNationalDir, lNewDataDir)
+                                CopyFromIfNeeded("storetag.dbf", lNationalDir, lNewDataDir)
+                                CopyFromIfNeeded("wqcriter.dbf", lNationalDir, lNewDataDir)
+                                CopyFromIfNeeded("wqobs_prm.dbf", lNationalDir, lNewDataDir)
+                            End If
+                            g_Project.ProjectProjection = lOutputProjection
+                            'save the new project with just this layer
+                            ClearLayers()
+                            AddAllShapesInDir(lNewDataDir, lNewDataDir)
+                            g_MapWin.PreviewMap.GetPictureFromMap()
+                            g_Project.Save(lProjectFileName)
+                            g_Project.Modified = True
+                            g_Project.Save(lProjectFileName)
+                            g_Project.Modified = False
+                        Else
                             lHUC8BoundaryOnly = False
                         End If
                     End If
-                    'download and project core data
-                    CreateNewProjectAndDownloadCoreData(aRegion, lDataPath, lNewDataDir, lProjectFileName,,, lHUC8BoundaryOnly)
+                    If Not lHUC8BoundaryOnly Then
+                        'download and project core data
+                        CreateNewProjectAndDownloadCoreData(aRegion, lDataPath, lNewDataDir, lProjectFileName)
+                    End If
                 End If
                 Return lProjectFileName
             End If
@@ -668,111 +710,101 @@ StartOver:
                                                    ByVal aNewDataDir As String,
                                                    ByVal aProjectFileName As String,
                                                    Optional ByVal aExistingMapWindowProject As Boolean = False,
-                                                   Optional ByVal aCacheFolder As String = "",
-                                                   Optional ByVal aHUC8BoundaryOnly As Boolean = False)
+                                                   Optional ByVal aCacheFolder As String = "")
 
-        If aHUC8BoundaryOnly Then
-            Logger.Dbg("core data not available, project created with only HUC8 boundaries")
-            ClearLayers()
-            g_MapWin.PreviewMap.GetPictureFromMap()
-            g_Project.Save(aProjectFileName)
-            g_Project.Modified = True
-            g_Project.Save(aProjectFileName)
-            g_Project.Modified = False
-        Else
-            'the usual case, download the core data sets
-            Dim lQuery As String
-            Dim lProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
-            Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar)
-            If Not IO.Directory.Exists(lNationalDir) Then
-                lNationalDir = IO.Path.Combine(aDataPath, "national" & g_PathChar)
-            End If
-            If IO.Directory.Exists(lNationalDir) Then
-                CopyFromIfNeeded("sic.dbf", lNationalDir, aNewDataDir)
-                CopyFromIfNeeded("storetag.dbf", lNationalDir, aNewDataDir)
-                CopyFromIfNeeded("wqcriter.dbf", lNationalDir, aNewDataDir)
-                CopyFromIfNeeded("wqobs_prm.dbf", lNationalDir, aNewDataDir)
-            End If
+        'the usual case, download the core data sets
+        Dim lQuery As String
+        Dim lProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
+        Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar)
+        If Not IO.Directory.Exists(lNationalDir) Then
+            lNationalDir = IO.Path.Combine(aDataPath, "national" & g_PathChar)
+        End If
+        If IO.Directory.Exists(lNationalDir) Then
+            CopyFromIfNeeded("sic.dbf", lNationalDir, aNewDataDir)
+            CopyFromIfNeeded("storetag.dbf", lNationalDir, aNewDataDir)
+            CopyFromIfNeeded("wqcriter.dbf", lNationalDir, aNewDataDir)
+            CopyFromIfNeeded("wqobs_prm.dbf", lNationalDir, aNewDataDir)
+        End If
 
-            Dim lCacheFolder As String = g_CacheDir
-            If aCacheFolder.Length > 0 Then
-                lCacheFolder = aCacheFolder
-            End If
+        Dim lCacheFolder As String = g_CacheDir
+        If aCacheFolder.Length > 0 Then
+            lCacheFolder = aCacheFolder
+        End If
 
-            Dim lBasinsDataTypes As String = "<DataType>core31</DataType>"
-            Select Case g_AppNameShort
-                Case "SW Toolbox", "GW Toolbox"
-                    lBasinsDataTypes &= "<DataType>nhd</DataType>"
-            End Select
+        Dim lBasinsDataTypes As String = "<DataType>core31</DataType>"
+        Select Case g_AppNameShort
+            Case "SW Toolbox", "GW Toolbox"
+                lBasinsDataTypes &= "<DataType>nhd</DataType>"
+        End Select
 
-            lQuery = "<function name='GetBASINS'>" _
-                   & "<arguments>" _
-                   & lBasinsDataTypes _
-                   & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
-                   & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
-                   & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
-                   & aRegion _
-                   & "<clip>False</clip>" _
-                   & "<merge>True</merge>" _
-                   & "<joinattributes>true</joinattributes>" _
-                   & "</arguments>" _
-                   & "</function>"
+        lQuery = "<function name='GetBASINS'>" _
+                  & "<arguments>" _
+                  & lBasinsDataTypes _
+                  & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
+                  & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
+                  & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
+                  & aRegion _
+                  & "<clip>False</clip>" _
+                  & "<merge>True</merge>" _
+                  & "<joinattributes>true</joinattributes>" _
+                  & "</arguments>" _
+                  & "</function>"
 
-            Logger.Status("Building new project")
-            Using lLevel As New ProgressLevel()
-                Dim lResult As String = atcD4EMLauncher.Execute(lQuery)
-                'Logger.Msg(lResult, "Result of Query from DataManager")
+        Logger.Status("Building new project")
+        Using lLevel As New ProgressLevel()
+            Dim lResult As String = atcD4EMLauncher.Execute(lQuery)
+            'Logger.Msg(lResult, "Result of Query from DataManager")
 
-                Dim lDisplayMessageBoxes As Boolean = Logger.DisplayMessageBoxes
+            Dim lDisplayMessageBoxes As Boolean = Logger.DisplayMessageBoxes
 
-                If lResult IsNot Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
-                    If Not aExistingMapWindowProject Then
-                        'regular case, not coming from existing mapwindow project
-                        ClearLayers()
-                        If Not (g_Project.Save(aProjectFileName)) Then
-                            Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save1Failed:" & g_MapWin.LastError)
-                        End If
-                    Else
-                        'open existing mapwindow project again
-                        g_Project.Load(aProjectFileName)
-                        Dim lProjectDir As String = PathNameOnly(aProjectFileName)
-                        Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
-                        TryDeleteShapefile(lNewShapeName)
+            If lResult IsNot Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
+                If Not aExistingMapWindowProject Then
+                    'regular case, not coming from existing mapwindow project
+                    ClearLayers()
+                    If Not (g_Project.Save(aProjectFileName)) Then
+                        Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save1Failed:" & g_MapWin.LastError)
                     End If
-                    g_Project.Modified = True
+                Else
+                    'open existing mapwindow project again
+                    g_Project.Load(aProjectFileName)
+                    Dim lProjectDir As String = PathNameOnly(aProjectFileName)
+                    Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
+                    TryDeleteShapefile(lNewShapeName)
+                End If
+                g_Project.Modified = True
 
-                    Logger.DisplayMessageBoxes = False
-                    ProcessDownloadResults(lResult)
-                    Logger.DisplayMessageBoxes = lDisplayMessageBoxes
+                Logger.DisplayMessageBoxes = False
+                ProcessDownloadResults(lResult)
+                Logger.DisplayMessageBoxes = lDisplayMessageBoxes
 
-                    AddAllShapesInDir(aNewDataDir, aNewDataDir)
+                AddAllShapesInDir(aNewDataDir, aNewDataDir)
 
-                    Try 'If we retrieved the more detailed NHD, hide the rougher RF1
-                        If lBasinsDataTypes.ToLowerInvariant().Contains(">nhd<") Then
-                            atcMwGisUtility.GisUtil.LayerVisible("Reach File, V1") = False
-                        End If
-                    Catch 'Don't worry if we could not do this, it was not critical.
-                    End Try
-
-                    g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
-                    If Not aExistingMapWindowProject Then
-                        'regular case, not coming from existing mapwindow project
-                        'set mapwindow project projection to projection of first layer
-                        g_Project.ProjectProjection = lProjection
-
-                        Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Tiled Map")
-                        If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
-
-                        If Not (g_Project.Save(aProjectFileName)) Then
-                            Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
-                        End If
+                Try 'If we retrieved the more detailed NHD, hide the rougher RF1
+                    If lBasinsDataTypes.ToLowerInvariant().Contains(">nhd<") Then
+                        atcMwGisUtility.GisUtil.LayerVisible("Reach File, V1") = False
                     End If
+                Catch 'Don't worry if we could not do this, it was not critical.
+                End Try
 
-                    'Get additional layers as desired by variants
-                    lQuery = ""
-                    Select Case g_AppNameShort
-                        Case "SW Toolbox"
-                            lQuery = "<function name='GetNWISStations'><arguments>" _
+                g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
+                If Not aExistingMapWindowProject Then
+                    'regular case, not coming from existing mapwindow project
+                    'set mapwindow project projection to projection of first layer
+                    g_Project.ProjectProjection = lProjection
+
+                    Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Tiled Map")
+                    If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
+
+                    If Not (g_Project.Save(aProjectFileName)) Then
+                        Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
+                    End If
+                End If
+
+                'Get additional layers as desired by variants
+                lQuery = ""
+                Select Case g_AppNameShort
+                    Case "SW Toolbox"
+                        lQuery = "<function name='GetNWISStations'><arguments>" _
                            & "<DataType>discharge</DataType>" _
                            & "<MinCount>10</MinCount>" _
                            & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
@@ -781,12 +813,12 @@ StartOver:
                            & aRegion _
                            & "<clip>False</clip> <merge>False</merge>" _
                            & "</arguments></function>"
-                        Case "GW Toolbox"
-                            'Dim lRegion As D4EMDataManager.Region 'Use the view extents to include some stations in a buffer outside the original region
-                            'With g_MapWin.View.Extents
-                            '    lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)
-                            'End With
-                            lQuery = "<function name='GetNWISStations'><arguments>" _
+                    Case "GW Toolbox"
+                        'Dim lRegion As D4EMDataManager.Region 'Use the view extents to include some stations in a buffer outside the original region
+                        'With g_MapWin.View.Extents
+                        '    lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)
+                        'End With
+                        lQuery = "<function name='GetNWISStations'><arguments>" _
                            & "<DataType>gw_daily</DataType>" _
                            & "<DataType>gw_periodic</DataType>" _
                            & "<DataType>discharge</DataType>" _
@@ -797,22 +829,22 @@ StartOver:
                            & aRegion _
                            & "<clip>False</clip> <merge>False</merge>" _
                            & "</arguments></function>"
-                    End Select
-                    If lQuery.Length > 0 Then
-                        lResult = atcD4EMLauncher.Execute(lQuery)
-                        If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
-                            Logger.DisplayMessageBoxes = False
-                            ProcessDownloadResults(lResult)
-                            Logger.DisplayMessageBoxes = lDisplayMessageBoxes
-                            'Save again after successfully adding more layers
-                            If Not aExistingMapWindowProject AndAlso Not (g_Project.Save(aProjectFileName)) Then
-                                Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save3Failed:" & g_MapWin.LastError)
-                            End If
+                End Select
+                If lQuery.Length > 0 Then
+                    lResult = atcD4EMLauncher.Execute(lQuery)
+                    If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
+                        Logger.DisplayMessageBoxes = False
+                        ProcessDownloadResults(lResult)
+                        Logger.DisplayMessageBoxes = lDisplayMessageBoxes
+                        'Save again after successfully adding more layers
+                        If Not aExistingMapWindowProject AndAlso Not (g_Project.Save(aProjectFileName)) Then
+                            Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save3Failed:" & g_MapWin.LastError)
                         End If
                     End If
                 End If
-            End Using
-        End If
+            End If
+        End Using
+
         Logger.Status("")
     End Sub
 
