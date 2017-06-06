@@ -227,6 +227,7 @@ Public Module ModSensitivityAnalysis
             SimID = lcsvlinerecord(0)
 
             IO.File.Copy(uciName, SimID & uciName, True)
+            lUci = New HspfUci
             lUci.ReadUci(lMsg, SimID & uciName, -1, False, pBaseName & ".ech")
 
             For Each Parm As ModelParameter In ListOfParameters
