@@ -422,6 +422,10 @@ This message box will not be shown again for." & aBalanceType)
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = "(%)" : .FieldName(lField) = "Reach Trapping"
 
                     For Each lID As HspfOperation In lRchresOperations
+                        If Not lID.TableExists("ACTIVITY") Then
+                            MsgBox("The ACTIVITY Table for the RCHRES " & lID.Id & " is not available. HSPEXP+ will quit.", vbOK, "ACTIVITY TABLE missing")
+                            Return Nothing
+                        End If
                         If lID.Tables("ACTIVITY").Parms("SEDFG").Value = 1 Then
 
                             Dim lPointTons As Double = 0.0
@@ -618,6 +622,10 @@ This message box will not be shown again for." & aBalanceType)
 
                     For Each lID As HspfOperation In lRchresOperations
                         If lID.Tables("ACTIVITY").Parms("NUTFG").Value = 1 Then
+                            If Not lID.TableExists("ACTIVITY") Then
+                                MsgBox("The ACTIVITY Table for the RCHRES " & lID.Id & " is not available. HSPEXP+ will quit.", vbOK, "ACTIVITY TABLE missing")
+                                Return Nothing
+                            End If
 
                             Dim lPointlbs As Double = 0.0
                             .CurrentRecord += 1
@@ -980,6 +988,10 @@ This message box will not be shown again for." & aBalanceType)
 
 
                     For Each lID As HspfOperation In lRchresOperations
+                        If Not lID.TableExists("ACTIVITY") Then
+                            MsgBox("The ACTIVITY Table for the RCHRES " & lID.Id & " is not available. HSPEXP+ will quit.", vbOK, "ACTIVITY TABLE missing")
+                            Return Nothing
+                        End If
                         If lID.Tables("ACTIVITY").Parms("NUTFG").Value = 1 Then
                             'If lID.Id = 815 Then Stop
 
