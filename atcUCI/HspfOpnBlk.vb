@@ -108,6 +108,7 @@ Public Class HspfOpnBlk
             Dim lSRec As Integer
 
             lKeyword = aBlockDef.TableDefs(lTableIndex).Name
+
             StartingRecordOfOperationTable(aBlockDef.Name, lKeyword, lSRec, lOccurCount)
             If lSRec > 0 Then 'does it exist 
                 lExistFlag = 1 'yes
@@ -147,7 +148,12 @@ Public Class HspfOpnBlk
                             lOperLastString = lString(lStringIndex).Substring(5, 5).Trim()
                         End If
                         If lOperLastString.Length > 0 Then
-                            lOperLast = CInt(lOperLastString)
+                            Try
+                                lOperLast = CInt(lOperLastString)
+                            Catch ex As Exception
+                                Logger.Msg("Trouble reading line number " & lSRec & " from the UCI file.", MsgBoxStyle.Critical, "UCI Reading Issue")
+                            End Try
+
                         Else
                             lOperLast = lOperFirst
                             'check to see if this record could have been combined with the next record
