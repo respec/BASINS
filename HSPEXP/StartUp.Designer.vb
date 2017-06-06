@@ -40,11 +40,8 @@ Partial Class StartUp
         Me.chkBODBalance = New System.Windows.Forms.CheckBox()
         Me.chkTotalPhosphorus = New System.Windows.Forms.CheckBox()
         Me.chkTotalNitrogen = New System.Windows.Forms.CheckBox()
-        Me.chkExpertStats = New System.Windows.Forms.CheckBox()
         Me.chkAdditionalgraphs = New System.Windows.Forms.CheckBox()
         Me.btn_help = New System.Windows.Forms.Button()
-        Me.chkHydrologySensitivity = New System.Windows.Forms.CheckBox()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.cmbUCIPath = New System.Windows.Forms.ComboBox()
         Me.DateTimePicker1 = New System.Windows.Forms.DateTimePicker()
@@ -55,7 +52,8 @@ Partial Class StartUp
         Me.Plotting = New System.Windows.Forms.GroupBox()
         Me.chkReganGraphs = New System.Windows.Forms.CheckBox()
         Me.ttHSPEXP = New System.Windows.Forms.ToolTip(Me.components)
-        Me.GroupBox1.SuspendLayout()
+        Me.chkExpertStats = New System.Windows.Forms.CheckBox()
+        Me.chkHydrologySensitivity = New System.Windows.Forms.CheckBox()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.Plotting.SuspendLayout()
@@ -239,19 +237,6 @@ Partial Class StartUp
         Me.chkTotalNitrogen.Text = "Total Nitrogen"
         Me.chkTotalNitrogen.UseVisualStyleBackColor = True
         '
-        'chkExpertStats
-        '
-        Me.chkExpertStats.AutoSize = True
-        Me.chkExpertStats.Enabled = False
-        Me.chkExpertStats.Location = New System.Drawing.Point(6, 42)
-        Me.chkExpertStats.Name = "chkExpertStats"
-        Me.chkExpertStats.Size = New System.Drawing.Size(275, 17)
-        Me.chkExpertStats.TabIndex = 8
-        Me.chkExpertStats.Text = "Generate Hydrology Calibration Statistics and Graphs"
-        Me.ttHSPEXP.SetToolTip(Me.chkExpertStats, "Make sure that the basins specification file (EXS) file is available for the cali" &
-        "bration location in the project folder.")
-        Me.chkExpertStats.UseVisualStyleBackColor = True
-        '
         'chkAdditionalgraphs
         '
         Me.chkAdditionalgraphs.AutoSize = True
@@ -274,29 +259,6 @@ Partial Class StartUp
         Me.btn_help.TabIndex = 0
         Me.btn_help.Text = "Help"
         Me.btn_help.UseVisualStyleBackColor = True
-        '
-        'chkHydrologySensitivity
-        '
-        Me.chkHydrologySensitivity.AutoSize = True
-        Me.chkHydrologySensitivity.Location = New System.Drawing.Point(6, 19)
-        Me.chkHydrologySensitivity.Name = "chkHydrologySensitivity"
-        Me.chkHydrologySensitivity.Size = New System.Drawing.Size(114, 17)
-        Me.chkHydrologySensitivity.TabIndex = 7
-        Me.chkHydrologySensitivity.Text = "Sensitivity Analysis"
-        Me.ttHSPEXP.SetToolTip(Me.chkHydrologySensitivity, "Under development.")
-        Me.chkHydrologySensitivity.UseVisualStyleBackColor = True
-        '
-        'GroupBox1
-        '
-        Me.GroupBox1.Controls.Add(Me.chkHydrologySensitivity)
-        Me.GroupBox1.Controls.Add(Me.chkExpertStats)
-        Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(18, 189)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(442, 68)
-        Me.GroupBox1.TabIndex = 8
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Hydrology Calibration"
         '
         'GroupBox2
         '
@@ -407,6 +369,30 @@ Partial Class StartUp
         "onthly, or shorter intervals.")
         Me.chkReganGraphs.UseVisualStyleBackColor = True
         '
+        'chkExpertStats
+        '
+        Me.chkExpertStats.AutoSize = True
+        Me.chkExpertStats.Enabled = False
+        Me.chkExpertStats.Location = New System.Drawing.Point(24, 232)
+        Me.chkExpertStats.Name = "chkExpertStats"
+        Me.chkExpertStats.Size = New System.Drawing.Size(275, 17)
+        Me.chkExpertStats.TabIndex = 8
+        Me.chkExpertStats.Text = "Generate Hydrology Calibration Statistics and Graphs"
+        Me.ttHSPEXP.SetToolTip(Me.chkExpertStats, "Make sure that the basins specification file (EXS) file is available for the cali" &
+        "bration location in the project folder.")
+        Me.chkExpertStats.UseVisualStyleBackColor = True
+        '
+        'chkHydrologySensitivity
+        '
+        Me.chkHydrologySensitivity.AutoSize = True
+        Me.chkHydrologySensitivity.Location = New System.Drawing.Point(24, 200)
+        Me.chkHydrologySensitivity.Name = "chkHydrologySensitivity"
+        Me.chkHydrologySensitivity.Size = New System.Drawing.Size(173, 17)
+        Me.chkHydrologySensitivity.TabIndex = 7
+        Me.chkHydrologySensitivity.Text = "Sensitivity/Uncertainty Analysis"
+        Me.ttHSPEXP.SetToolTip(Me.chkHydrologySensitivity, "Under development.")
+        Me.chkHydrologySensitivity.UseVisualStyleBackColor = True
+        '
         'StartUp
         '
         Me.AcceptButton = Me.cmdStart
@@ -414,6 +400,8 @@ Partial Class StartUp
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
         Me.ClientSize = New System.Drawing.Size(493, 618)
+        Me.Controls.Add(Me.chkHydrologySensitivity)
+        Me.Controls.Add(Me.chkExpertStats)
         Me.Controls.Add(Me.Plotting)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.cmbUCIPath)
@@ -422,7 +410,6 @@ Partial Class StartUp
         Me.Controls.Add(Me.lblOutReach2)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.pnlHighlight)
-        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.btn_help)
         Me.Controls.Add(Me.chkRunHSPF)
         Me.Controls.Add(Me.chkAreaReports)
@@ -437,8 +424,6 @@ Partial Class StartUp
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "HSPEXP+ "
         Me.TransparencyKey = System.Drawing.SystemColors.ActiveBorder
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
@@ -461,15 +446,12 @@ Partial Class StartUp
     Friend WithEvents pnlHighlight As System.Windows.Forms.Panel
     Friend WithEvents chkWaterBalance As System.Windows.Forms.CheckBox
     Friend WithEvents chkSedimentBalance As System.Windows.Forms.CheckBox
-    Friend WithEvents chkExpertStats As System.Windows.Forms.CheckBox
     Friend WithEvents chkTotalNitrogen As System.Windows.Forms.CheckBox
     Friend WithEvents chkTotalPhosphorus As System.Windows.Forms.CheckBox
     Friend WithEvents chkBODBalance As System.Windows.Forms.CheckBox
     Friend WithEvents chkFecalColiform As System.Windows.Forms.CheckBox
     Friend WithEvents chkAdditionalgraphs As System.Windows.Forms.CheckBox
     Friend WithEvents btn_help As System.Windows.Forms.Button
-    Friend WithEvents chkHydrologySensitivity As System.Windows.Forms.CheckBox
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
     Friend WithEvents cmbUCIPath As System.Windows.Forms.ComboBox
     Friend WithEvents DateTimePicker1 As System.Windows.Forms.DateTimePicker
@@ -480,4 +462,6 @@ Partial Class StartUp
     Friend WithEvents Plotting As GroupBox
     Friend WithEvents chkReganGraphs As CheckBox
     Friend WithEvents ttHSPEXP As ToolTip
+    Friend WithEvents chkExpertStats As CheckBox
+    Friend WithEvents chkHydrologySensitivity As CheckBox
 End Class

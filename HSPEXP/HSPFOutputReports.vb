@@ -120,6 +120,10 @@ Module HSPFOutputReports
 
                 If pSensitivity Then
                     SensitivityAnalysis(pHSPFExe, pBaseName, pTestPath, SDateJ, EDateJ)
+                    Logger.Msg("Sensitivity/Uncertainty Analysis Complete", vbOKOnly)
+                    OpenFile(pTestPath)
+                    End
+
                 End If
 
                 If pRunUci = True Then

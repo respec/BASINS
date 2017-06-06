@@ -171,6 +171,45 @@ Public Class StartUp
     End Sub
 
     Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkHydrologySensitivity.CheckedChanged
+        If chkHydrologySensitivity.Checked = True Then
+            chkRunHSPF.Enabled = False
+            chkRunHSPF.Checked = False
+            chkAreaReports.Enabled = False
+            chkAreaReports.Checked = False
+            chkExpertStats.Enabled = False
+            chkExpertStats.Checked = False
+            chkReganGraphs.Checked = False
+            chkReganGraphs.Enabled = False
+            chkAdditionalgraphs.Enabled = False
+            chkAdditionalgraphs.Checked = False
+            chkBODBalance.Enabled = False
+            chkBODBalance.Checked = False
+            chkFecalColiform.Checked = False
+            chkFecalColiform.Enabled = False
+            chkTotalNitrogen.Enabled = False
+            chkTotalNitrogen.Checked = False
+            chkTotalPhosphorus.Enabled = False
+            chkTotalPhosphorus.Checked = False
+            chkWaterBalance.Checked = False
+            chkWaterBalance.Enabled = False
+            chkSedimentBalance.Checked = False
+            chkSedimentBalance.Enabled = False
+
+        Else
+            chkRunHSPF.Enabled = True
+            chkAreaReports.Enabled = True
+            chkExpertStats.Enabled = True
+            chkReganGraphs.Enabled = True
+            chkAdditionalgraphs.Enabled = True
+            chkBODBalance.Enabled = True
+            chkFecalColiform.Enabled = True
+            chkTotalNitrogen.Enabled = True
+            chkTotalPhosphorus.Enabled = True
+            chkWaterBalance.Enabled = True
+            chkSedimentBalance.Enabled = True
+        End If
+
+
 
     End Sub
 
