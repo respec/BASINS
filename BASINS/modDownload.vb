@@ -2132,10 +2132,12 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
         For Each lNode As Xml.XmlNode In lNodeList
             Dim lHUC8 As String = lNode.InnerText
             lHUC8s.Add(lHUC8)
-            If Not CheckAddress(lBaseURL & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
-                'problem, this file does not exist
-                'just build project using selected HUC8s without any core data
-                lHUC8BoundaryOnly = True
+            If Not lHUC8BoundaryOnly Then
+                If Not CheckAddress(lBaseURL & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
+                    'problem, this file does not exist
+                    'just build project using selected HUC8s without any core data
+                    lHUC8BoundaryOnly = True
+                End If
             End If
         Next
         If lHUC8BoundaryOnly Then
@@ -2143,6 +2145,19 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
                 'save the HUC8s as a new shapefile
                 Dim lHUC8ShapefileName As String = GisUtil.LayerFileName("Cataloging Units")
                 Dim lNewShapefileName As String = aNewDataDir & FilenameNoPath(lHUC8ShapefileName)
+                Dim lLayerIndex As Integer = GisUtil.LayerIndex("Cataloging Units")
+                If GisUtil.NumSelectedFeatures(lLayerIndex) = 0 Then
+                    'are any features selected in this cat shapefile?  it could be the another layer that was selected
+                    'select the lhuc8 features
+                    If GisUtil.IsField(lLayerIndex, "CU") Then
+                        Dim lFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, "CU")
+                        For i As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+                            If lHUC8s.Contains(GisUtil.FieldValue(lLayerIndex, i, lFieldIndex)) Then
+                                GisUtil.SetSelectedFeature(lLayerIndex, i)
+                            End If
+                        Next
+                    End If
+                End If
                 GisUtil.SaveSelectedFeatures(lHUC8ShapefileName, lNewShapefileName, False)
                 'change projection
                 Dim lInputProjection As String = GisUtil.ShapefileProjectionString(GisUtil.CurrentLayer)
@@ -2156,9 +2171,6 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
                     End If
                     lHUC8Sf.Close()
                 End If
-
-                'what if multiple are selected
-                'what if a county was selected
 
                 'put default files in project
                 Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar)
