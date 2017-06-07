@@ -212,7 +212,7 @@ Module HSPFOutputReports
 
                 pListModelParameters = False
                 If pListModelParameters Then
-                    ListReachParametersForAllUCIFiles(loutfoldername)
+                    ListReachParametersForAllUCIFiles(pTestPath)
                     'modListUCIParameters.ListReachParameters(aHspfUci, loutfoldername)
                 End If
 

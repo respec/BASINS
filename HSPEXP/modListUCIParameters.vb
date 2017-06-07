@@ -116,7 +116,7 @@ Public Module modListUCIParameters
     End Sub
 
     Sub ListReachParametersForAllUCIFiles(ByVal lFolderName As String)
-        lFolderName = "C:\Dropbox (RESPEC)\Basins\data\DO_TMDL_Research\UCI_Files\CTWM_UCIs"
+        'lFolderName = "C:\Dev\Upatoi_FortBenning\FB_Model_Ext_2012"
         Dim lUCIFileNames As New NameValueCollection
         AddFilesInDir(lUCIFileNames, lFolderName, False, "*.uci")
         Dim pUci As atcUCI.HspfUci

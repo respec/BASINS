@@ -169,6 +169,7 @@ Public Module ModSensitivityAnalysis
 
 
         Dim loutputLine As String = ""
+        ChDriveDir(PathNameOnly(pHSPFExe))
         loutputLine = ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath,
                                  aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN)
 
@@ -226,9 +227,9 @@ Public Module ModSensitivityAnalysis
             lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
             SimID = lcsvlinerecord(0)
 
-            IO.File.Copy(uciName, SimID & uciName, True)
+            IO.File.Copy(Path.Combine(pTestPath, uciName), Path.Combine(pTestPath, SimID & uciName), True)
             lUci = New HspfUci
-            lUci.ReadUci(lMsg, SimID & uciName, -1, False, pBaseName & ".ech")
+            lUci.ReadUci(lMsg, Path.Combine(pTestPath, SimID & uciName), -1, False, Path.Combine(pTestPath, pBaseName & ".ech"))
 
             For Each Parm As ModelParameter In ListOfParameters
                 Try
@@ -333,11 +334,18 @@ Public Module ModSensitivityAnalysis
                         Case "SOLR"
                             MetSegRec = 5
                     End Select
-                    lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP _
+                    Try
+                        lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP _
                                                                                              * aMultiplicationFactor, 3)
 
-                    lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR _
+                        lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR _
                                                                                              * aMultiplicationFactor, 3)
+                    Catch ex As Exception
+                        Logger.Msg("Could not find the Table " & aTableName &
+                                   " Parameter " & aParameterName & " for " & lMetSeg.Name, MsgBoxStyle.Critical)
+                        End
+
+                    End Try
 
                 Next
 
@@ -345,13 +353,23 @@ Public Module ModSensitivityAnalysis
                 For Each lOper As HspfOperation In aUCI.OpnBlks(aParameterOperation).Ids
                     If aLandUsename = "" OrElse lOper.Description = aLandUsename Then
                         For Mon = 0 To 11
-                            lOper.Tables(aTableName).Parms(Mon).Value = SignificantDigits(lOper.Tables(aTableName).Parms(Mon).Value _
+                            Try
+                                lOper.Tables(aTableName).Parms(Mon).Value = SignificantDigits(lOper.Tables(aTableName).Parms(Mon).Value _
                                                                                                       * aMultiplicationFactor, 2)
-                            If (lOper.Tables(aTableName).Parms(Mon).Value < aLowerLimit) Then
-                                lOper.Tables(aTableName).Parms(Mon).Value = aLowerLimit
-                            ElseIf (lOper.Tables(aTableName).Parms(Mon).Value > aUpperLimit) Then
-                                lOper.Tables(aTableName).Parms(Mon).Value = aUpperLimit
-                            End If
+                                If (lOper.Tables(aTableName).Parms(Mon).Value < aLowerLimit) Then
+                                    lOper.Tables(aTableName).Parms(Mon).Value = aLowerLimit
+                                ElseIf (lOper.Tables(aTableName).Parms(Mon).Value > aUpperLimit) Then
+                                    lOper.Tables(aTableName).Parms(Mon).Value = aUpperLimit
+                                End If
+
+                            Catch ex As Exception
+                                Logger.Msg("Could not find the Table " & aTableName &
+                                   " Parameter " & aParameterName & " for " & lOper.Id, MsgBoxStyle.Critical)
+
+                                End
+                            End Try
+
+
                             'ParameterDetailText &= SimID & "," & ParameterOperation & "," & TableName & "," & lOper.Id & "," &
                             '                ParameterName & "," & Mon & "," & lOper.Tables(TableName).Parms(Mon).Value & vbCrLf
 
@@ -396,13 +414,20 @@ Public Module ModSensitivityAnalysis
 
             Case Else
                 For Each lOper As HspfOperation In aUCI.OpnBlks(aParameterOperation).Ids
-                    lOper.Tables(aTableName).ParmValue(aParameterName) =
+                    Try
+                        lOper.Tables(aTableName).ParmValue(aParameterName) =
                                             SignificantDigits(lOper.Tables(aTableName).ParmValue(aParameterName) * aMultiplicationFactor, 3)
-                    If (lOper.Tables(aTableName).ParmValue(aParameterName) < aLowerLimit) Then
-                        lOper.Tables(aTableName).ParmValue(aParameterName) = aLowerLimit
-                    ElseIf (lOper.Tables(aTableName).ParmValue(aParameterName) > aUpperLimit) Then
-                        lOper.Tables(aTableName).ParmValue(aParameterName) = aUpperLimit
-                    End If
+                        If (lOper.Tables(aTableName).ParmValue(aParameterName) < aLowerLimit) Then
+                            lOper.Tables(aTableName).ParmValue(aParameterName) = aLowerLimit
+                        ElseIf (lOper.Tables(aTableName).ParmValue(aParameterName) > aUpperLimit) Then
+                            lOper.Tables(aTableName).ParmValue(aParameterName) = aUpperLimit
+                        End If
+                    Catch ex As Exception
+                        Logger.Msg("Could not find the Table " & aTableName &
+                                   " Parameter " & aParameterName & " for " & lOper.Id, MsgBoxStyle.Critical)
+                        End
+                    End Try
+
                     'ParameterDetailText &= SimID & "," & ParameterOperation & "," & TableName & "," & lOper.Id & "," &
                     '                                                                ParameterName & ",," &
                     '                                                                lOper.Tables(TableName).ParmValue(ParameterName) & vbCrLf
