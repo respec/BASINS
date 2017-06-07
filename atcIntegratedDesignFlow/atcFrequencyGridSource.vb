@@ -233,7 +233,7 @@ Public Class atcFrequencyGridSource
                 Select Case aColumn
                     Case 0 : Return "Data Set"
                     Case 1 : Return "Probability"
-                    Case 2 : Return "Return Period"
+                    Case 2 : Return "Recurrence Interval" '"Return Period"
                     Case Else : Return NdaysAt(aColumn)
                 End Select
             Else

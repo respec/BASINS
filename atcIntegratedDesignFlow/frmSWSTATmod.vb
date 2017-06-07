@@ -1432,7 +1432,7 @@ Public Class frmSWSTATmod
         Me.tabOutlier.Name = "tabOutlier"
         Me.tabOutlier.Size = New System.Drawing.Size(464, 519)
         Me.tabOutlier.TabIndex = 4
-        Me.tabOutlier.Text = "Outlier Test"
+        Me.tabOutlier.Text = "Group Outlier Test"
         Me.tabOutlier.UseVisualStyleBackColor = True
         '
         'btnOutliers
@@ -4315,7 +4315,7 @@ Public Class frmSWSTATmod
 
     Private Sub btnOutliers_Click(sender As Object, e As EventArgs) Handles btnOutliers.Click
         If pDataGroup.Count < 5 Then
-            Logger.Msg("Need to have at least 5 stations to perform the outlier test.", MsgBoxStyle.Exclamation, "Outliers Test")
+            Logger.Msg("Need to have at least 5 stations to perform the outlier test.", MsgBoxStyle.Exclamation, "Group Outlier Test")
             Exit Sub
         End If
         Dim lOTStatName As String = "7Low10"
@@ -4374,10 +4374,10 @@ Public Class frmSWSTATmod
         End With
         If lTestInputsMissingInSelected Then
             Logger.Msg("Some selected stations are excluded due to missing latitude, longitude, drainage area, or 7Q10 statistics.",
-                       MsgBoxStyle.Information, "Outliers Test")
+                       MsgBoxStyle.Information, "Group Outlier Test")
         End If
         If lNewGroup.Count < 5 Then
-            Logger.Msg("Need to select at least 5 stations to perform the outlier test.", MsgBoxStyle.Information, "Outliers Test")
+            Logger.Msg("Need to select at least 5 stations to perform the outlier test.", MsgBoxStyle.Information, "Group Outlier Test")
             Exit Sub
         End If
         'Do the outliers test
