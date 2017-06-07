@@ -886,8 +886,8 @@ Public Class DFLOWCalcs
                 lHFlow = lNH / lHFlow
                 If UBound(lTS) > 0 Then lHFlowAdj = lHFlow * ((1.0 * lNH) / (1.0 * UBound(lTS)))
             End If
-            'Dim lHM As Double = lHydrologicTS2.Attributes.GetValue("Harmonic Mean")
-            'Dim lHMAdj As Double = lHydrologicTS2.Attributes.GetValue("Harmonic Mean Adj")
+            'Dim lHM As Double = lTimeSeries.Attributes.GetValue("Harmonic Mean")
+            'Dim lHMAdj As Double = lTimeSeries.Attributes.GetValue("Harmonic Mean Adj")
 
             ' ===== Calculate percentiles
             Dim lNMiss As Integer = 0
@@ -896,6 +896,7 @@ Public Class DFLOWCalcs
             Dim lNExcB As Integer = 0
             Dim lNExcBQ As Integer = 0
             Dim lNExcHF As Integer = 0
+            Dim lNExcHFAdj As Integer = 0
             For lI = 0 To UBound(lTS) - 1
                 If Double.IsNaN(lTS(lI)) Then
                     lNMiss = lNMiss + 1
@@ -914,6 +915,9 @@ Public Class DFLOWCalcs
                     End If
                     If lTS(lI) < lHFlow Then
                         lNExcHF = lNExcHF + 1
+                    End If
+                    If lTS(lI) < lHFlowAdj Then
+                        lNExcHFAdj = lNExcHFAdj + 1
                     End If
                 End If
             Next
@@ -999,7 +1003,10 @@ Public Class DFLOWCalcs
             lPct = lNExcHF / (UBound(lTS) - lNMiss)
             ladsResults.CellValue(lItemIdx + 1, 15) = Format(lPct, "percent")
             ladsResults.Alignment(lItemIdx + 1, 15) = atcControls.atcAlignment.HAlignDecimal
-            lHydrologicTS.Attributes.SetValue(lHMeanKey, lHydrologicTS.Attributes.GetValue("Harmonic Mean") & vbTab & Format(lPct, "percent") & vbTab & "N/A")
+            lHydrologicTS.Attributes.SetValue(lHMeanKey, lTimeSeries.Attributes.GetValue("Harmonic Mean") & vbTab & Format(lPct, "percent") & vbTab & "N/A")
+            Dim lHMeanAdjKey As String = "NONBIOFLOW-Harmonic Mean Adj"
+            Dim lPctAdj As Double = lNExcHFAdj / (UBound(lTS) - lNMiss)
+            lHydrologicTS.Attributes.SetValue(lHMeanAdjKey, lTimeSeries.Attributes.GetValue("Harmonic Mean Adj") & vbTab & Format(lPctAdj, "percent") & vbTab & "N/A")
 
             If lAddSeason Then
                 ladsResults.CellValue(lItemIdx + 1, 16) = lHydrologicTS.Attributes.GetValue("seasonname")

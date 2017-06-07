@@ -1918,6 +1918,7 @@ Public Module modUtil
                 .CellColor(lRow, 3) = Drawing.Color.LightGray
 
                 Dim lHMeanrecord As atcDefinedValue = Nothing
+                Dim lHMeanAdjrecord As atcDefinedValue = Nothing
                 For Each lAtt As atcDefinedValue In lTs.Attributes
                     If lAtt.Value Is Nothing Then Continue For
 
@@ -1925,7 +1926,9 @@ Public Module modUtil
                     If lAttName.StartsWith("NONBIOFLOW-") Then
                         lArr = lAtt.Value.ToString().Split(vbTab)
                         If lArr.Length <> 3 Then Continue For
-                        If lAttName.Contains("Harmonic") Then
+                        If lAttName.Contains("Harmonic Mean Adj") Then
+                            lHMeanAdjrecord = lAtt 'lAttName.Substring("NONBIOFLOW-".Length) & vbTab & lAtt.Value
+                        ElseIf lAttName.Contains("Harmonic Mean") Then
                             lHMeanrecord = lAtt 'lAttName.Substring("NONBIOFLOW-".Length) & vbTab & lAtt.Value
                         Else
                             lRow = .Rows
@@ -1945,6 +1948,19 @@ Public Module modUtil
                     lArr = lHMeanrecord.Value.ToString().Split(vbTab)
                     lRow = .Rows
                     .CellValue(lRow, 0) = lHMeanrecord.Definition.Name.Substring("NONBIOFLOW-".Length)
+                    Dim lfval As Double
+                    If Double.TryParse(lArr(0), lfval) Then
+                        .CellValue(lRow, 1) = DoubleToString(lfval,,,,, 5)
+                    Else
+                        .CellValue(lRow, 1) = "N/A"
+                    End If
+                    .CellValue(lRow, 2) = lArr(1)
+                    .CellValue(lRow, 3) = lArr(2)
+                End If
+                If lHMeanAdjrecord IsNot Nothing Then
+                    lArr = lHMeanAdjrecord.Value.ToString().Split(vbTab)
+                    lRow = .Rows
+                    .CellValue(lRow, 0) = "Harmonic Mean, Adjusted" 'lHMeanAdjrecord.Definition.Name.Substring("NONBIOFLOW-".Length)
                     Dim lfval As Double
                     If Double.TryParse(lArr(0), lfval) Then
                         .CellValue(lRow, 1) = DoubleToString(lfval,,,,, 5)
