@@ -1647,7 +1647,8 @@ Public Class frmSWSTATmod
             .IncludeSeconds = False
         End With
 
-        If GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "High") = "High" Then
+        Dim lhighlowsetting As String = GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "none")
+        If lhighlowsetting = "High" Then
             radioHigh.Checked = True
         Else
             radioLow.Checked = True
