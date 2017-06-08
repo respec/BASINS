@@ -1028,9 +1028,9 @@ Public Module modStat
 
         Dim lDateYMD(5) As Integer
         J2Date(aTS.Attributes.GetValue("start date"), lDateYMD)
-        lStartYMD = lDateYMD(0) & "/" & DoubleToString(lDateYMD(1) * 1.0, 2, "##").PadLeft(2) & "/" & DoubleToString(lDateYMD(2) * 1.0, 2, "##").PadLeft(2)
+        lStartYMD = lDateYMD(0) & "/" & DoubleToString(lDateYMD(1) * 1.0, 2, "00").PadLeft(2) & "/" & DoubleToString(lDateYMD(2) * 1.0, 2, "00").PadLeft(2)
         J2Date(aTS.Attributes.GetValue("end date"), lDateYMD)
-        lEndYMD = lDateYMD(0) & "/" & DoubleToString(lDateYMD(1) * 1.0, 2, "##").PadLeft(2) & "/" & DoubleToString(lDateYMD(2) * 1.0, 2, "##").PadLeft(2)
+        lEndYMD = lDateYMD(0) & "/" & DoubleToString(lDateYMD(1) * 1.0, 2, "00").PadLeft(2) & "/" & DoubleToString(lDateYMD(2) * 1.0, 2, "00").PadLeft(2)
 
         Dim lSeasonDay As New atcSeasonsMonthDay
         Dim lSplit As atcTimeseriesGroup = lSeasonDay.Split(aTS, Nothing)
