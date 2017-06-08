@@ -479,6 +479,7 @@ Public Class atcFrequencyGridSource
                         Else
                             lRept.Append(SWStatDisclaimer) 'Add Message Here
                             lRept.AppendLine()
+                            lRept.AppendLine("-----------------------SWToolbox Version 1.0------------------------")
                             lRept.AppendLine("Program SWStat         U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
                             lRept.AppendLine("Ver. 5.0      Log-Pearson & Pearson Type III Statistics   Run Date / Time")
                             lRept.AppendLine("11/24/2015           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))

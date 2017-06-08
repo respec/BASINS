@@ -1591,7 +1591,7 @@ Public Module modUtil
         Public i_SeasonEndDate As String = "" 'could be anything user like to use such as 31-Mar
         Public i_SeasonStartYear As Integer
         Public i_SeasonEndYear As Integer
-        Public i_Version As String = "4.x"
+        Public i_Version As String = "4.1"
         Public i_BuildDate As String = ""
         Public i_YearsIncluded As Integer = 0
         Public i_DataGroup As atcTimeseriesGroup = Nothing
@@ -1608,9 +1608,9 @@ Public Module modUtil
                 Dim lfldpf As String = ":"
                 Dim lHeader As String = "***DFLOW CALCULATION REPORT***" & vbCrLf & vbCrLf
 
-                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Version) & lfldpf & vbTab & i_Version & vbCrLf
-                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_BuildDate) & lfldpf & vbTab & i_BuildDate & vbCrLf
-                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_RunDateTime) & lfldpf & vbTab & i_RunDateTime & vbCrLf
+                'lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Version) & lfldpf & vbTab & i_Version & vbCrLf
+                'lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_BuildDate) & lfldpf & vbTab & i_BuildDate & vbCrLf
+                'lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_RunDateTime) & lfldpf & vbTab & i_RunDateTime & vbCrLf
 
                 'lRept.Append(DFLOWDisclaimer) 'Add Message Here
                 'lRept.AppendLine()
@@ -1626,9 +1626,10 @@ Public Module modUtil
 
                 lHeader &= DFLOWDisclaimer 'Add Message Here
                 lHeader &= vbCrLf
-                lHeader &= "Program SWToolbox         U.S. GEOLOGICAL SURVEY             " 'Seq " & lPageCount.ToString.PadLeft(5, "0"))
-                lHeader &= "Ver. 1.0                 DFLOW (version " & i_Version & ")        Run Date / Time"
-                lHeader &= i_BuildDate & "           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt")
+                lHeader &= "Program SWToolbox         U.S. GEOLOGICAL SURVEY             Version 1.0" & vbCrLf
+                lHeader &= "Analysis: DFLOW (version " & i_Version & ")" & vbCrLf
+                lHeader &= "Run Date and Time: " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt")
+                'lHeader &= i_BuildDate & "           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt")
                 lHeader &= vbCrLf
                 lHeader &= vbCrLf
                 lHeader &= vbFormFeed
