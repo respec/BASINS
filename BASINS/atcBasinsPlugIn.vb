@@ -110,6 +110,11 @@ Public Class atcBasinsPlugIn
             Case "SW Toolbox"
                 lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\USGSToolbox.chm")
                 BasinsDataPath = "USGS-SW\data\"
+                With atcUtility.HelpSubstitutions
+                    .Add("BASINS Details", "SW Toolbox Details")
+                    .Add("Welcome to BASINS 4.5 Window", "Welcome to SW Toolbox Window")
+                    .Add("Build BASINS Project", "Build New Project")
+                End With
 
             Case "GW Toolbox"
                 lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\GWToolbox.chm")
@@ -119,7 +124,6 @@ Public Class atcBasinsPlugIn
                     .Add("Welcome to BASINS 4.5 Window", "Welcome to GW Toolbox Window")
                     .Add("Build BASINS Project", "Build New Project")
                 End With
-
 
             Case Else ' BASINS 
                 lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.5.chm")
