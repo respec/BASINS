@@ -80,7 +80,7 @@ Public Module modUtil
                 .Add("Original ID")
                 .Add("KENTAU")
                 .Add("KENPLV")
-                .Add("KENSLPL")
+                .Add("KENSLP")
                 .Add("From")
                 .Add("To")
                 .Add("Count")

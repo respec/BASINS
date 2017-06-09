@@ -162,7 +162,7 @@ Public Class clsSWSTATPlugin
             .Add("Location") '.Add("STAID")
             .Add("KENTAU")
             .Add("KENPLV")
-            .Add("KENSLPL")
+            .Add("KENSLP")
             .Add("From")
             .Add("To")
             .Add("Count")

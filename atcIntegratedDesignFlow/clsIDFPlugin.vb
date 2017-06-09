@@ -98,7 +98,7 @@ Public Class clsIDFPlugin
             .Add("STANAM")
             .Add("KENTAU")
             .Add("KENPLV")
-            .Add("KENSLPL")
+            .Add("KENSLP")
             .Add("From")
             .Add("To")
             .Add("Count")

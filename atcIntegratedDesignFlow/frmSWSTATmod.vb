@@ -3035,6 +3035,7 @@ Public Class frmSWSTATmod
                             '.SetValueIfMissing("SpearmanTest", RunSpearmanTest(lTS))
                         End With
                     Next
+
                     Dim lList As New atcList.atcListForm
                     With lList
                         With .DateFormat
@@ -3043,8 +3044,10 @@ Public Class frmSWSTATmod
                             .IncludeMinutes = False
                             .IncludeMonths = False
                         End With
+
                         .Text = "Trend of " & HighOrLowString() & " Annual Time Series and Statistics"
                         AddSeasonNameIfNeeded(pTrendAttributes, lRankedAnnual)
+                        .HAlignment = atcControls.atcAlignment.HAlignLeft
                         .Initialize(lRankedAnnual, pTrendAttributes, False)
                         .SwapRowsColumns = True
                         .Icon = Me.Icon
