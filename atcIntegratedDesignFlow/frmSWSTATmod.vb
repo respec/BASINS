@@ -3104,6 +3104,10 @@ Public Class frmSWSTATmod
                                         .SetValueIfMissing(lTestName, "FLAG")
                                     ElseIf lTestResult = "FALSE" Then
                                         .SetValueIfMissing(lTestName, "PASS")
+                                    ElseIf Not String.IsNullOrEmpty(lTestResult) AndAlso lTestResult.StartsWith("No R") Then
+                                        Logger.Msg(lTestResult, MsgBoxStyle.Information, "R Screening Test Cancelled")
+                                        Me.Cursor = System.Windows.Forms.Cursors.Default
+                                        Exit Sub
                                     Else
                                         .SetValueIfMissing(lTestName, lTestResult)
                                     End If

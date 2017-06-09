@@ -6,7 +6,8 @@ Module modR
     Public Sub Main()
         If My.Application.CommandLineArgs.Count > 1 Then
             Try
-                Dim lEngine As REngine = GetEngine()
+                Dim lMsg As String = ""
+                Dim lEngine As REngine = GetEngine(lMsg)
                 If lEngine IsNot Nothing Then
                     Dim lResult As String() = {"No Result"}
                     Dim lResultFilename As String = My.Application.CommandLineArgs(0)
@@ -15,7 +16,7 @@ Module modR
                             If IO.File.Exists(lArg) Then
                                 lResult = lEngine.Evaluate(System.IO.File.ReadAllText(lArg)).AsCharacter().ToArray()
                             Else
-                                MsgBox("R file not found" & vbCrLf & lArg, MsgBoxStyle.Critical, "Run R")
+                                MsgBox("R script file not found" & vbCrLf & lArg, MsgBoxStyle.Critical, "Run R")
                             End If
                         End If
                     Next
@@ -32,6 +33,13 @@ Module modR
                     'Dim lResult As String() = lEngine.Evaluate("InputYears").AsCharacter().ToArray()
                     IO.File.WriteAllLines(lResultFilename, lResult)
                     'MsgBox(String.Join(Environment.NewLine, lResult), MsgBoxStyle.OkOnly, "Result")
+                ElseIf lEngine Is Nothing OrElse Not String.IsNullOrEmpty(lMsg) Then
+                    Dim lResult As String() = {"No R"}
+                    If Not String.IsNullOrEmpty(lMsg) Then
+                        lResult(0) = lMsg
+                    End If
+                    Dim lResultFilename As String = My.Application.CommandLineArgs(0)
+                    IO.File.WriteAllLines(lResultFilename, lResult)
                 End If
             Catch ex As Exception
                 MsgBox(ex.ToString, MsgBoxStyle.Critical, "Error running R")
@@ -39,7 +47,7 @@ Module modR
         End If
     End Sub
 
-    Public Function GetEngine() As REngine
+    Public Function GetEngine(ByRef aMsg As String) As REngine
         If pEngine Is Nothing Then
 TryGetInstance:
             Try
@@ -51,9 +59,12 @@ TryGetInstance:
                         If MsgBox("Retry after installing R, or Cancel", MsgBoxStyle.RetryCancel) = MsgBoxResult.Retry Then
                             GoTo TryGetInstance
                         End If
+                    Else
+                        aMsg = "No R: not installed"
                     End If
                 Else
                     MsgBox(ex.Message, MsgBoxStyle.Critical, "Could not start R engine")
+                    aMsg = "No R: couldnot start"
                 End If
             End Try
         End If

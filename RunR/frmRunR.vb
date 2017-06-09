@@ -6,7 +6,8 @@ Public Class frmRunR
 
     Private Sub btnRun_Click(sender As Object, e As EventArgs) Handles btnRun.Click
         Try
-            Dim lEngine As REngine = GetEngine()
+            Dim lMsg As String = ""
+            Dim lEngine As REngine = GetEngine(lMsg)
             If lEngine IsNot Nothing Then
                 lEngine.Evaluate(txtR.Text)
                 SetIntegerVectorFromString(lEngine, "InputYears", txtYears.Text)
