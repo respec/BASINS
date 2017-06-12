@@ -263,6 +263,8 @@ Public Class atcListForm
     Private pDisplayAttributes As Generic.List(Of String)
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
+    Public HAlignment As atcControls.atcAlignment = atcControls.atcAlignment.HAlignRight
+
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
                           Optional ByVal aDisplayAttributes As Generic.List(Of String) = Nothing, _
                           Optional ByVal aShowValues As Boolean = True, _
@@ -349,11 +351,27 @@ Public Class atcListForm
         pSwapperSource.SwapRowsColumns = mnuAttributeColumns.Checked
 
         agdMain.Initialize(pSwapperSource)
+        If HAlignment = atcControls.atcAlignment.HAlignLeft Then
+            'ToDo: figure out how to set cell value to be left justified
+            'SetAlignment()
+        End If
         'TODO: could SizeAllColumnsToContents return total width?
         agdMain.SizeAllColumnsToContents()
 
         SizeToGrid()
         agdMain.Refresh()
+    End Sub
+
+    Private Sub SetAlignment()
+        If pSwapperSource IsNot Nothing Then
+            With pSwapperSource
+                For lrow As Integer = 0 To .Rows - 1
+                    For lcol As Integer = 1 To .Columns - 1
+                        .Alignment(lrow, lcol) = HAlignment
+                    Next
+                Next
+            End With
+        End If
     End Sub
 
     Private Function GetIndex(ByVal aName As String) As Integer

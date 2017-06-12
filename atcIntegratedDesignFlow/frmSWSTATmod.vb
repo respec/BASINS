@@ -1432,7 +1432,7 @@ Public Class frmSWSTATmod
         Me.tabOutlier.Name = "tabOutlier"
         Me.tabOutlier.Size = New System.Drawing.Size(464, 519)
         Me.tabOutlier.TabIndex = 4
-        Me.tabOutlier.Text = "Outlier Test"
+        Me.tabOutlier.Text = "Group Outlier Test"
         Me.tabOutlier.UseVisualStyleBackColor = True
         '
         'btnOutliers
@@ -1647,7 +1647,8 @@ Public Class frmSWSTATmod
             .IncludeSeconds = False
         End With
 
-        If GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "High") = "High" Then
+        Dim lhighlowsetting As String = GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "none")
+        If lhighlowsetting = "High" Then
             radioHigh.Checked = True
         Else
             radioLow.Checked = True
@@ -3034,6 +3035,7 @@ Public Class frmSWSTATmod
                             '.SetValueIfMissing("SpearmanTest", RunSpearmanTest(lTS))
                         End With
                     Next
+
                     Dim lList As New atcList.atcListForm
                     With lList
                         With .DateFormat
@@ -3042,8 +3044,10 @@ Public Class frmSWSTATmod
                             .IncludeMinutes = False
                             .IncludeMonths = False
                         End With
+
                         .Text = "Trend of " & HighOrLowString() & " Annual Time Series and Statistics"
                         AddSeasonNameIfNeeded(pTrendAttributes, lRankedAnnual)
+                        .HAlignment = atcControls.atcAlignment.HAlignLeft
                         .Initialize(lRankedAnnual, pTrendAttributes, False)
                         .SwapRowsColumns = True
                         .Icon = Me.Icon
@@ -3100,6 +3104,10 @@ Public Class frmSWSTATmod
                                         .SetValueIfMissing(lTestName, "FLAG")
                                     ElseIf lTestResult = "FALSE" Then
                                         .SetValueIfMissing(lTestName, "PASS")
+                                    ElseIf Not String.IsNullOrEmpty(lTestResult) AndAlso lTestResult.StartsWith("No R") Then
+                                        Logger.Msg(lTestResult, MsgBoxStyle.Information, "R Screening Test Cancelled")
+                                        Me.Cursor = System.Windows.Forms.Cursors.Default
+                                        Exit Sub
                                     Else
                                         .SetValueIfMissing(lTestName, lTestResult)
                                     End If
@@ -4314,7 +4322,7 @@ Public Class frmSWSTATmod
 
     Private Sub btnOutliers_Click(sender As Object, e As EventArgs) Handles btnOutliers.Click
         If pDataGroup.Count < 5 Then
-            Logger.Msg("Need to have at least 5 stations to perform the outlier test.", MsgBoxStyle.Exclamation, "Outliers Test")
+            Logger.Msg("Need to have at least 5 stations to perform the outlier test.", MsgBoxStyle.Exclamation, "Group Outlier Test")
             Exit Sub
         End If
         Dim lOTStatName As String = "7Low10"
@@ -4373,10 +4381,10 @@ Public Class frmSWSTATmod
         End With
         If lTestInputsMissingInSelected Then
             Logger.Msg("Some selected stations are excluded due to missing latitude, longitude, drainage area, or 7Q10 statistics.",
-                       MsgBoxStyle.Information, "Outliers Test")
+                       MsgBoxStyle.Information, "Group Outlier Test")
         End If
         If lNewGroup.Count < 5 Then
-            Logger.Msg("Need to select at least 5 stations to perform the outlier test.", MsgBoxStyle.Information, "Outliers Test")
+            Logger.Msg("Need to select at least 5 stations to perform the outlier test.", MsgBoxStyle.Information, "Group Outlier Test")
             Exit Sub
         End If
         'Do the outliers test
