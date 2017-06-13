@@ -20,6 +20,7 @@ Public Class atcTimeseriesGridSource
     Private pCantFit As String = "#"
     Private pSignificantDigits As Integer = 5
     Private pValueAttributeDefs As Generic.List(Of Generic.List(Of atcAttributeDefinition))
+    Private pHeaders As Generic.List(Of String)
 
     Public AttributeValuesEditable As Boolean = False
 
@@ -29,14 +30,19 @@ Public Class atcTimeseriesGridSource
         Me.New(aDataGroup, aDisplayAttributes, aDisplayValues, False)
     End Sub
 
-    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, _
-            ByVal aDisplayAttributes As Generic.List(Of String), _
-            ByVal aDisplayValues As Boolean, _
-            ByVal aFilterNoData As Boolean)
+    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup,
+            ByVal aDisplayAttributes As Generic.List(Of String),
+            ByVal aDisplayValues As Boolean,
+            ByVal aFilterNoData As Boolean,
+            Optional aHeaders As Generic.List(Of String) = Nothing)
         pTimeseriesGroup = aDataGroup
         pDisplayAttributes = aDisplayAttributes
         pDisplayValues = aDisplayValues
         pFilterNoData = aFilterNoData
+        pHeaders = aHeaders
+        If pHeaders Is Nothing Then
+            pHeaders = New Generic.List(Of String)()
+        End If
         RefreshAllDates()
     End Sub
 
@@ -112,10 +118,14 @@ Public Class atcTimeseriesGridSource
 
     Overrides Property Rows() As Integer
         Get
+            Dim lAddRow As Integer = 0
+            If pHeaders.Count > 0 Then
+                lAddRow = 1
+            End If
             If pAllDates Is Nothing Then
-                Return pDisplayAttributes.Count
+                Return pDisplayAttributes.Count + lAddRow
             Else
-                Return pDisplayAttributes.Count + pAllDates.numValues
+                Return pDisplayAttributes.Count + pAllDates.numValues + lAddRow
             End If
         End Get
         Set(ByVal Value As Integer)
@@ -124,10 +134,14 @@ Public Class atcTimeseriesGridSource
 
     Public Overrides Property FixedRows() As Integer
         Get
+            Dim lAddRow As Integer = 0
+            If pHeaders.Count > 0 Then
+                lAddRow = 1
+            End If
             If AttributeValuesEditable Then
-                Return 0
+                Return 0 + lAddRow
             Else
-                Return pDisplayAttributes.Count
+                Return pDisplayAttributes.Count + lAddRow
             End If
         End Get
         Set(ByVal value As Integer)
@@ -230,7 +244,15 @@ Public Class atcTimeseriesGridSource
                     If aRow < lAttributeRows Then
                         Return pDisplayAttributes(aRow)
                     ElseIf Not pAllDates Is Nothing Then
-                        Return pDateFormat.JDateToString(pAllDates.Value(aRow - lAttributeRows + 1))
+                        If pHeaders.Count > 0 Then
+                            If aRow = lAttributeRows Then
+                                Return pHeaders.Item(0)
+                            Else
+                                Return pDateFormat.JDateToString(pAllDates.Value(aRow - lAttributeRows - 1 + 1))
+                            End If
+                        Else
+                            Return pDateFormat.JDateToString(pAllDates.Value(aRow - lAttributeRows + 1))
+                        End If
                     Else
                         Return ""
                     End If
@@ -243,7 +265,15 @@ Public Class atcTimeseriesGridSource
                         If aRow < lAttributeRows Then
                             If lIsValue Then
                                 Return lTs.Attributes.GetFormattedValue(pDisplayAttributes(aRow))
-                            ElseIf aRow = lAttributeRows - 1 Then
+                            ElseIf pHeaders.Count = 0 AndAlso aRow = lAttributeRows - 1 Then
+                                Return lValueAttDef.Name
+                            Else
+                                Return ""
+                            End If
+                        ElseIf pHeaders.Count > 0 And aRow = lAttributeRows Then
+                            If lIsValue Then
+                                Return lTs.Attributes.GetValue("Constituent", "Value")
+                            ElseIf lValueAttDef IsNot Nothing Then
                                 Return lValueAttDef.Name
                             Else
                                 Return ""
@@ -251,7 +281,11 @@ Public Class atcTimeseriesGridSource
                         ElseIf Not pAllDates Is Nothing Then
                             Try
                                 If lTs.Dates IsNot Nothing Then
-                                    Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
+                                    Dim lDateIndex As Integer = aRow - lAttributeRows + 1
+                                    If pHeaders.Count > 0 Then
+                                        lDateIndex -= 1
+                                    End If
+                                    Dim lDateDisplayed As Double = pAllDates.Value(lDateIndex)
                                     Dim lIndex As Integer = Array.BinarySearch(lTs.Dates.Values, lDateDisplayed)
                                     If lIsValue Then
                                         Dim lMaxWidth As Integer = pMaxWidth
@@ -288,7 +322,7 @@ Public Class atcTimeseriesGridSource
                                             Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
                                         End If
                                     Else
-                                        If lTs.ValueAttributesExist(lIndex) Then
+                                        If lIndex >= 0 AndAlso lTs.ValueAttributesExist(lIndex) Then
                                             Return lTs.ValueAttributes(lIndex).GetFormattedValue(lValueAttDef.Name)
                                         Else
                                             Return Nothing

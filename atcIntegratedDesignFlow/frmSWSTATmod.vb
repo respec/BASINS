@@ -2264,8 +2264,11 @@ Public Class frmSWSTATmod
                                                                  aBoundaryMonth:=pYearStartMonth, aBoundaryDay:=pYearStartDay,
                                                                  aEndMonth:=pYearEndMonth, aEndDay:=pYearEndDay)
                 If lRankedAnnual.Count > 0 Then
+                    Dim lHeaders As New Generic.List(Of String)()
+                    lHeaders.Add("Year")
                     For Each lTS As atcTimeseries In lRankedAnnual
                         lTS.Attributes.SetValue("Units", "Common")
+                        lHeaders.Add(lTS.Attributes.GetValue("Constituent", "Value"))
                     Next
 
                     Dim lList As New atcList.atcListForm
@@ -2278,8 +2281,7 @@ Public Class frmSWSTATmod
                         End With
                         .Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
                         AddSeasonNameIfNeeded(pNDayAttributes, lRankedAnnual)
-
-                        .Initialize(lRankedAnnual.Clone, pNDayAttributes, True, , )
+                        .Initialize(lRankedAnnual.Clone, pNDayAttributes, True,,, lHeaders)
                         .DisplayValueAttributes = True
                         .Icon = Me.Icon
                     End With
