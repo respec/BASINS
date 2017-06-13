@@ -210,7 +210,7 @@ Module HSPFOutputReports
                 File.Copy(pTestPath & pBaseName & ".uci", loutfoldername & pBaseName & ".uci", overwrite:=True)
                 'A folder name is given that has the basename and the time when the run was made.
 
-                pListModelParameters = False
+                pListModelParameters = True
                 If pListModelParameters Then
                     ListReachParametersForAllUCIFiles(pTestPath)
                     'modListUCIParameters.ListReachParameters(aHspfUci, loutfoldername)

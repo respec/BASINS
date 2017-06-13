@@ -97,7 +97,7 @@ Public Module ModSensitivityAnalysis
         Dim lParameterListFilesIsAvailable As Boolean = False
         Dim lSpecificationFile As String = "SensitiveParametersList.csv"
         Dim lOutputFile As StreamWriter = File.CreateText("SensitivityOutput.csv")
-        lOutputFile.WriteLine("SimID, DSNID, Sum, AnnualSum, Mean, GeometricMean, 10%High, 25%High, 50%High, 50%Low, 25%Low, 10%Low, 5%Low, 2%Low")
+        lOutputFile.WriteLine("SimID,DSNID,Sum,AnnualSum,Mean,GeometricMean,10%High,25%High,50%High,50%Low,25%Low,10%Low,5%Low,2%Low")
 
 
         Dim NumberOfOutputDSN As Integer = 0
@@ -122,11 +122,11 @@ Public Module ModSensitivityAnalysis
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
             TextToAddForSensitivityFile = "***The operation number, land use, tied with next, and multiplier can be left blank"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "Parameter,OPERATION, OPERATION NUMBER, LANDUSE, TABLE, PARM, OCCURENCE, LOWERLIMIT, UPPERLIMIT"
+            TextToAddForSensitivityFile = "Parameter,OPERATION,OPERATION NUMBER,LANDUSE,TABLE,PARM,OCCURENCE,LOWERLIMIT,UPPERLIMIT"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "1,PERLND, , , PWAT-PARM2, LZSN, , 3,8"
+            TextToAddForSensitivityFile = "1,PERLND,,,PWAT-PARM2,LZSN,,3,8"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "2,PERLND, , , PWAT-PARM2, INFILT, , 0.01,0.5"
+            TextToAddForSensitivityFile = "2,PERLND,,,PWAT-PARM2,INFILT,,0.01,0.5"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
             TextToAddForSensitivityFile = "***Following lines list the multiplication factor for each parameter for each simulation."
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
@@ -248,7 +248,7 @@ Public Module ModSensitivityAnalysis
 
             Next
 
-            loutputLine = ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath,
+            loutputLine = ModelRunandReportAnswers(SimID, lUci, SimID & uciName, lExitCode, pBaseName, pTestPath,
                                  aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN)
             'lUci = Nothing
             lOutputFile.Write(loutputLine)
