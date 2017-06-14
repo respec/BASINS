@@ -105,6 +105,7 @@ Public Class clsIDFPlugin
             .Add("Not Used")
             .Add("Min")
             .Add("Max")
+            .Add("Constituent")
         End With
         Return lTrendAttributes
     End Function

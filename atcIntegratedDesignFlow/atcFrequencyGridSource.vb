@@ -113,7 +113,8 @@ Public Class atcFrequencyGridSource
             For Each lNYears As Double In aNyears
                 lKey = Format(lNYears, lKeyFmt)
                 If Not pRecurrence.ContainsKey(lKey) Then
-                    pRecurrence.Add(lKey, Format(lNYears, "0"))
+                    'pRecurrence.Add(lKey, Format(lNYears, "0"))
+                    pRecurrence.Add(lKey, lNYears)
                 End If
             Next
         End If
