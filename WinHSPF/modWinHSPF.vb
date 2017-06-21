@@ -59,11 +59,11 @@ Public Module WinHSPF
         End If
 
         'set WinHSPF manual location
-        pWinHSPFManualName = lBasinsBinLoc & "\..\..\..\docs\WinHSPF30.chm"
+        pWinHSPFManualName = lBasinsBinLoc & "\..\..\..\docs\WinHSPF31.chm"
         If Not FileExists(pWinHSPFManualName) Then
-            pWinHSPFManualName = lBasinsFolder & "\docs\WinHSPF30.chm"
+            pWinHSPFManualName = lBasinsFolder & "\docs\WinHSPF31.chm"
             If Not FileExists(pWinHSPFManualName) Then
-                pWinHSPFManualName = FindFile("Please locate WinHSPF30.chm", "WinHSPF30.chm")
+                pWinHSPFManualName = FindFile("Please locate WinHSPF31.chm", "WinHSPF31.chm")
             End If
         End If
         ShowHelp(pWinHSPFManualName)
@@ -84,9 +84,9 @@ Public Module WinHSPF
 
         'get starter uci ready
         Dim lStarterUciName As String = "starter.uci"
-        Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\WinHSPF30\bin\starter\" & lStarterUciName
+        Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\WinHSPF31\bin\starter\" & lStarterUciName
         If Not FileExists(lStarterPath) Then
-            lStarterPath = lBasinsFolder & "\models\WinHSPF30\bin\starter\" & lStarterUciName
+            lStarterPath = lBasinsFolder & "\models\WinHSPF31\bin\starter\" & lStarterUciName
             If Not FileExists(lStarterPath) Then
                 lStarterPath = FindFile("Please locate " & lStarterUciName, lStarterUciName)
             End If

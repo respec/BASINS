@@ -46,7 +46,7 @@ Public Class frmAgPrac
             lFreeFile = FreeFile()
 
             Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
-            lTname = lBasinsFolder & "\models\WinHSPF30\bin\starter" & "\" & "agpractice.txt"
+            lTname = lBasinsFolder & "\models\WinHSPF31\bin\starter" & "\" & "agpractice.txt"
             FileOpen(lFreeFile, lTname, OpenMode.Input)
             pcount = 0
 
