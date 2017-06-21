@@ -515,22 +515,28 @@ This message box will not be shown again for." & aBalanceType)
 
                             Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
                             Dim lDiversion As Double = 0.0
-                            If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            Else
-                                Dim lExitNumber As Integer = 0
-                                FindDownStreamExitNumber(aUci, lID, lExitNumber)
-                                If lExitNumber = 0 Then
+                            Try
+                                If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
+                                    Logger.Dbg(lID.Id)
                                     lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
                                 Else
-                                    Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "OSED-TOT-EXIT" & lExitNumber)(0)
-                                    lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual"))
-                                    lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                    lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                                    Dim lExitNumber As Integer = 0
+                                    FindDownStreamExitNumber(aUci, lID, lExitNumber)
+                                    If lExitNumber = 0 Then
+                                        lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                                    Else
+                                        Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "OSED-TOT-EXIT" & lExitNumber)(0)
+                                        lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual"))
+                                        lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
+                                        lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                                    End If
+
                                 End If
+                            Catch ex As Exception
+                                Logger.Msg("Trouble reading the parameters of RCHRES " & lID.Id & ". Constituent Reports will not be generated.", MsgBoxStyle.Critical, "RCHRES Parameter Issue.")
+                                Return Nothing
 
-                            End If
-
+                            End Try
 
                             With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointTons, lGENERLoad, 0.0, -lDepScour, lTotalInflow, lUpstreamIn,
                                                          lDiversion, aSDateJ, aEDateJ)
@@ -746,22 +752,28 @@ This message box will not be shown again for." & aBalanceType)
                             Dim lDepScour As Double = lOutflow - lTotalInflow
                             Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
                             Dim lDiversion As Double = 0.0
-                            If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            Else
-                                Dim lNumberOfExits As Integer = 0
-                                FindDownStreamExitNumber(aUci, lID, lNumberOfExits)
-                                If lNumberOfExits = 0 Then
+                            Try
+
+                                If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
                                     lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
                                 Else
-                                    Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "N-TOT-OUT-EXIT" & lNumberOfExits)(0)
-                                    lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual")) 'Diversion is a type of loss so it is calculated as -ve
-                                    lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                    lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                                    Dim lNumberOfExits As Integer = 0
+                                    FindDownStreamExitNumber(aUci, lID, lNumberOfExits)
+                                    If lNumberOfExits = 0 Then
+                                        lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                                    Else
+                                        Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "N-TOT-OUT-EXIT" & lNumberOfExits)(0)
+                                        lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual")) 'Diversion is a type of loss so it is calculated as -ve
+                                        lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
+                                        lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                                    End If
+
                                 End If
+                            Catch ex As Exception
+                                Logger.Msg("Trouble reading the parameters of RCHRES " & lID.Id & ". Constituent Reports will not be generated.", MsgBoxStyle.Critical, "RCHRES Parameter Issue.")
+                                Return Nothing
 
-                            End If
-
+                            End Try
 
 
                             With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON, lPointlbs, lGENERLoad, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn,
@@ -1113,21 +1125,26 @@ This message box will not be shown again for." & aBalanceType)
                             'Following few lines calculate diversion if happening in the stream.
                             Dim lDiversion As Double = 0.0
                             Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
-                            If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
-                                lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
-                            Else
-                                Dim lExitNumber As Integer = 0
-                                FindDownStreamExitNumber(aUci, lID, lExitNumber)
-                                If lExitNumber = 0 Then
+                            Try
+                                If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
                                     lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
                                 Else
-                                    Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "P-TOT-OUT-EXIT" & lExitNumber)(0)
-                                    lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual"))
-                                    lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
-                                    lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                                    Dim lExitNumber As Integer = 0
+                                    FindDownStreamExitNumber(aUci, lID, lExitNumber)
+                                    If lExitNumber = 0 Then
+                                        lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                                    Else
+                                        Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "P-TOT-OUT-EXIT" & lExitNumber)(0)
+                                        lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual"))
+                                        lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
+                                        lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
+                                    End If
                                 End If
-                            End If
+                            Catch ex As Exception
+                                Logger.Msg("Trouble reading the parameters of RCHRES " & lID.Id & ". Constituent Reports will not be generated.", MsgBoxStyle.Critical, "RCHRES Parameter Issue.")
+                                Return Nothing
 
+                            End Try
 
                             Dim lDepScour As Double = lOutflow - lTotalInflow - lDiversion
                             With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVOP, lPointlbs, lGENERLoad, lTotalAtmDep,

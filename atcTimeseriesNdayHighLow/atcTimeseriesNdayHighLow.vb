@@ -418,7 +418,7 @@ Public Class atcTimeseriesNdayHighLow
                     End If
                     If KENSLPLattribute Is Nothing Then
                         KENSLPLattribute = New atcAttributeDefinition
-                        KENSLPLattribute.Name = "KENSLPL"
+                        KENSLPLattribute.Name = "KENSLP"
                         KENSLPLattribute.TypeString = "Double"
                         KENSLPLattribute.ID = 285
                         KENSLPLattribute.CopiesInherit = False

@@ -1591,7 +1591,7 @@ Public Module modUtil
         Public i_SeasonEndDate As String = "" 'could be anything user like to use such as 31-Mar
         Public i_SeasonStartYear As Integer
         Public i_SeasonEndYear As Integer
-        Public i_Version As String = "4.x"
+        Public i_Version As String = "4.1"
         Public i_BuildDate As String = ""
         Public i_YearsIncluded As Integer = 0
         Public i_DataGroup As atcTimeseriesGroup = Nothing
@@ -1608,9 +1608,9 @@ Public Module modUtil
                 Dim lfldpf As String = ":"
                 Dim lHeader As String = "***DFLOW CALCULATION REPORT***" & vbCrLf & vbCrLf
 
-                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Version) & lfldpf & vbTab & i_Version & vbCrLf
-                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_BuildDate) & lfldpf & vbTab & i_BuildDate & vbCrLf
-                lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_RunDateTime) & lfldpf & vbTab & i_RunDateTime & vbCrLf
+                'lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_Version) & lfldpf & vbTab & i_Version & vbCrLf
+                'lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_BuildDate) & lfldpf & vbTab & i_BuildDate & vbCrLf
+                'lHeader &= DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_RunDateTime) & lfldpf & vbTab & i_RunDateTime & vbCrLf
 
                 'lRept.Append(DFLOWDisclaimer) 'Add Message Here
                 'lRept.AppendLine()
@@ -1626,9 +1626,10 @@ Public Module modUtil
 
                 lHeader &= DFLOWDisclaimer 'Add Message Here
                 lHeader &= vbCrLf
-                lHeader &= "Program SWToolbox         U.S. GEOLOGICAL SURVEY             " 'Seq " & lPageCount.ToString.PadLeft(5, "0"))
-                lHeader &= "Ver. 1.0                 DFLOW (version " & i_Version & ")        Run Date / Time"
-                lHeader &= i_BuildDate & "           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt")
+                lHeader &= "Program SWToolbox         U.S. GEOLOGICAL SURVEY             Version 1.0" & vbCrLf
+                lHeader &= "Analysis: DFLOW (version " & i_Version & ")" & vbCrLf
+                lHeader &= "Run Date and Time: " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt")
+                'lHeader &= i_BuildDate & "           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt")
                 lHeader &= vbCrLf
                 lHeader &= vbCrLf
                 lHeader &= vbFormFeed
@@ -1918,6 +1919,7 @@ Public Module modUtil
                 .CellColor(lRow, 3) = Drawing.Color.LightGray
 
                 Dim lHMeanrecord As atcDefinedValue = Nothing
+                Dim lHMeanAdjrecord As atcDefinedValue = Nothing
                 For Each lAtt As atcDefinedValue In lTs.Attributes
                     If lAtt.Value Is Nothing Then Continue For
 
@@ -1925,7 +1927,9 @@ Public Module modUtil
                     If lAttName.StartsWith("NONBIOFLOW-") Then
                         lArr = lAtt.Value.ToString().Split(vbTab)
                         If lArr.Length <> 3 Then Continue For
-                        If lAttName.Contains("Harmonic") Then
+                        If lAttName.Contains("Harmonic Mean Adj") Then
+                            lHMeanAdjrecord = lAtt 'lAttName.Substring("NONBIOFLOW-".Length) & vbTab & lAtt.Value
+                        ElseIf lAttName.Contains("Harmonic Mean") Then
                             lHMeanrecord = lAtt 'lAttName.Substring("NONBIOFLOW-".Length) & vbTab & lAtt.Value
                         Else
                             lRow = .Rows
@@ -1945,6 +1949,19 @@ Public Module modUtil
                     lArr = lHMeanrecord.Value.ToString().Split(vbTab)
                     lRow = .Rows
                     .CellValue(lRow, 0) = lHMeanrecord.Definition.Name.Substring("NONBIOFLOW-".Length)
+                    Dim lfval As Double
+                    If Double.TryParse(lArr(0), lfval) Then
+                        .CellValue(lRow, 1) = DoubleToString(lfval,,,,, 5)
+                    Else
+                        .CellValue(lRow, 1) = "N/A"
+                    End If
+                    .CellValue(lRow, 2) = lArr(1)
+                    .CellValue(lRow, 3) = lArr(2)
+                End If
+                If lHMeanAdjrecord IsNot Nothing Then
+                    lArr = lHMeanAdjrecord.Value.ToString().Split(vbTab)
+                    lRow = .Rows
+                    .CellValue(lRow, 0) = "Harmonic Mean, Adjusted" 'lHMeanAdjrecord.Definition.Name.Substring("NONBIOFLOW-".Length)
                     Dim lfval As Double
                     If Double.TryParse(lArr(0), lfval) Then
                         .CellValue(lRow, 1) = DoubleToString(lfval,,,,, 5)

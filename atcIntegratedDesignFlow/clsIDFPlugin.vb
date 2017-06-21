@@ -98,13 +98,14 @@ Public Class clsIDFPlugin
             .Add("STANAM")
             .Add("KENTAU")
             .Add("KENPLV")
-            .Add("KENSLPL")
+            .Add("KENSLP")
             .Add("From")
             .Add("To")
             .Add("Count")
             .Add("Not Used")
             .Add("Min")
             .Add("Max")
+            .Add("Constituent")
         End With
         Return lTrendAttributes
     End Function

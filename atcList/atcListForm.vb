@@ -262,12 +262,16 @@ Public Class atcListForm
     Private pSource As atcTimeseriesGridSource
     Private pDisplayAttributes As Generic.List(Of String)
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
+    Private pHeaders As Generic.List(Of String)
 
-    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
-                          Optional ByVal aDisplayAttributes As Generic.List(Of String) = Nothing, _
-                          Optional ByVal aShowValues As Boolean = True, _
-                          Optional ByVal aFilterNoData As Boolean = False, _
-                          Optional ByVal aShowForm As Boolean = True)
+    Public HAlignment As atcControls.atcAlignment = atcControls.atcAlignment.HAlignRight
+
+    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing,
+                          Optional ByVal aDisplayAttributes As Generic.List(Of String) = Nothing,
+                          Optional ByVal aShowValues As Boolean = True,
+                          Optional ByVal aFilterNoData As Boolean = False,
+                          Optional ByVal aShowForm As Boolean = True,
+                          Optional ByVal aHeaders As Generic.List(Of String) = Nothing)
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcTimeseriesGroup
         Else
@@ -278,6 +282,11 @@ Public Class atcListForm
             pDisplayAttributes = atcDataManager.DisplayAttributes
         Else
             pDisplayAttributes = aDisplayAttributes
+        End If
+
+        pHeaders = aHeaders
+        If pHeaders Is Nothing Then
+            pHeaders = New Generic.List(Of String)()
         End If
 
         If aShowForm Then
@@ -335,9 +344,10 @@ Public Class atcListForm
 
     Private Sub PopulateGrid()
         'with timeseries data, a list of attributes and options define a timeseries grid source
-        pSource = New atcTimeseriesGridSource(pDataGroup, pDisplayAttributes, _
-                                              mnuViewValues.Checked, _
-                                              mnuFilterNoData.Checked)
+        pSource = New atcTimeseriesGridSource(pDataGroup, pDisplayAttributes,
+                                              mnuViewValues.Checked,
+                                              mnuFilterNoData.Checked,
+                                              pHeaders)
         pSource.AttributeValuesEditable = mnuEditAtrributeValues.Checked
         pSource.DisplayValueAttributes = mnuViewValueAttributes.Checked
         With pSource
@@ -349,11 +359,27 @@ Public Class atcListForm
         pSwapperSource.SwapRowsColumns = mnuAttributeColumns.Checked
 
         agdMain.Initialize(pSwapperSource)
+        If HAlignment = atcControls.atcAlignment.HAlignLeft Then
+            'ToDo: figure out how to set cell value to be left justified
+            'SetAlignment()
+        End If
         'TODO: could SizeAllColumnsToContents return total width?
         agdMain.SizeAllColumnsToContents()
 
         SizeToGrid()
         agdMain.Refresh()
+    End Sub
+
+    Private Sub SetAlignment()
+        If pSwapperSource IsNot Nothing Then
+            With pSwapperSource
+                For lrow As Integer = 0 To .Rows - 1
+                    For lcol As Integer = 1 To .Columns - 1
+                        .Alignment(lrow, lcol) = HAlignment
+                    Next
+                Next
+            End With
+        End If
     End Sub
 
     Private Function GetIndex(ByVal aName As String) As Integer

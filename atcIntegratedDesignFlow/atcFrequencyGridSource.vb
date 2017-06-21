@@ -113,7 +113,8 @@ Public Class atcFrequencyGridSource
             For Each lNYears As Double In aNyears
                 lKey = Format(lNYears, lKeyFmt)
                 If Not pRecurrence.ContainsKey(lKey) Then
-                    pRecurrence.Add(lKey, Format(lNYears, "0"))
+                    'pRecurrence.Add(lKey, Format(lNYears, "0"))
+                    pRecurrence.Add(lKey, lNYears)
                 End If
             Next
         End If
@@ -233,8 +234,8 @@ Public Class atcFrequencyGridSource
                 Select Case aColumn
                     Case 0 : Return "Data Set"
                     Case 1 : Return "Probability"
-                    Case 2 : Return "Return Period"
-                    Case Else : Return NdaysAt(aColumn)
+                    Case 2 : Return "Recurrence Interval" '"Return Period"
+                    Case Else : Return NdaysAt(aColumn) & "-day"
                 End Select
             Else
                 Select Case aColumn
@@ -479,6 +480,7 @@ Public Class atcFrequencyGridSource
                         Else
                             lRept.Append(SWStatDisclaimer) 'Add Message Here
                             lRept.AppendLine()
+                            lRept.AppendLine("-----------------------SWToolbox Version 1.0------------------------")
                             lRept.AppendLine("Program SWStat         U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
                             lRept.AppendLine("Ver. 5.0      Log-Pearson & Pearson Type III Statistics   Run Date / Time")
                             lRept.AppendLine("11/24/2015           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))

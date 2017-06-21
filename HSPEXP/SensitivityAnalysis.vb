@@ -97,7 +97,7 @@ Public Module ModSensitivityAnalysis
         Dim lParameterListFilesIsAvailable As Boolean = False
         Dim lSpecificationFile As String = "SensitiveParametersList.csv"
         Dim lOutputFile As StreamWriter = File.CreateText("SensitivityOutput.csv")
-        lOutputFile.WriteLine("SimID, DSNID, Sum, AnnualSum, Mean, GeometricMean, 10%High, 25%High, 50%High, 50%Low, 25%Low, 10%Low, 5%Low, 2%Low")
+        lOutputFile.WriteLine("SimID,DSNID,Sum,AnnualSum,Mean,GeometricMean,10%High,25%High,50%High,50%Low,25%Low,10%Low,5%Low,2%Low")
 
 
         Dim NumberOfOutputDSN As Integer = 0
@@ -122,11 +122,11 @@ Public Module ModSensitivityAnalysis
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
             TextToAddForSensitivityFile = "***The operation number, land use, tied with next, and multiplier can be left blank"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "Parameter,OPERATION, OPERATION NUMBER, LANDUSE, TABLE, PARM, OCCURENCE, LOWERLIMIT, UPPERLIMIT"
+            TextToAddForSensitivityFile = "Parameter,OPERATION,OPERATION NUMBER,LANDUSE,TABLE,PARM,OCCURENCE,LOWERLIMIT,UPPERLIMIT"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "1,PERLND, , , PWAT-PARM2, LZSN, , 3,8"
+            TextToAddForSensitivityFile = "1,PERLND,,,PWAT-PARM2,LZSN,,3,8"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "2,PERLND, , , PWAT-PARM2, INFILT, , 0.01,0.5"
+            TextToAddForSensitivityFile = "2,PERLND,,,PWAT-PARM2,INFILT,,0.01,0.5"
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
             TextToAddForSensitivityFile = "***Following lines list the multiplication factor for each parameter for each simulation."
             SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
@@ -169,6 +169,7 @@ Public Module ModSensitivityAnalysis
 
 
         Dim loutputLine As String = ""
+        ChDriveDir(PathNameOnly(pHSPFExe))
         loutputLine = ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath,
                                  aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN)
 
@@ -226,8 +227,9 @@ Public Module ModSensitivityAnalysis
             lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
             SimID = lcsvlinerecord(0)
 
-            IO.File.Copy(uciName, SimID & uciName, True)
-            lUci.ReadUci(lMsg, SimID & uciName, -1, False, pBaseName & ".ech")
+            IO.File.Copy(Path.Combine(pTestPath, uciName), Path.Combine(pTestPath, SimID & uciName), True)
+            lUci = New HspfUci
+            lUci.ReadUci(lMsg, Path.Combine(pTestPath, SimID & uciName), -1, False, Path.Combine(pTestPath, pBaseName & ".ech"))
 
             For Each Parm As ModelParameter In ListOfParameters
                 Try
@@ -246,7 +248,7 @@ Public Module ModSensitivityAnalysis
 
             Next
 
-            loutputLine = ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath,
+            loutputLine = ModelRunandReportAnswers(SimID, lUci, SimID & uciName, lExitCode, pBaseName, pTestPath,
                                  aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN)
             'lUci = Nothing
             lOutputFile.Write(loutputLine)
@@ -332,11 +334,18 @@ Public Module ModSensitivityAnalysis
                         Case "SOLR"
                             MetSegRec = 5
                     End Select
-                    lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP _
+                    Try
+                        lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP _
                                                                                              * aMultiplicationFactor, 3)
 
-                    lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR _
+                        lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR _
                                                                                              * aMultiplicationFactor, 3)
+                    Catch ex As Exception
+                        Logger.Msg("Could not find the Table " & aTableName &
+                                   " Parameter " & aParameterName & " for " & lMetSeg.Name, MsgBoxStyle.Critical)
+                        End
+
+                    End Try
 
                 Next
 
@@ -344,13 +353,23 @@ Public Module ModSensitivityAnalysis
                 For Each lOper As HspfOperation In aUCI.OpnBlks(aParameterOperation).Ids
                     If aLandUsename = "" OrElse lOper.Description = aLandUsename Then
                         For Mon = 0 To 11
-                            lOper.Tables(aTableName).Parms(Mon).Value = SignificantDigits(lOper.Tables(aTableName).Parms(Mon).Value _
+                            Try
+                                lOper.Tables(aTableName).Parms(Mon).Value = SignificantDigits(lOper.Tables(aTableName).Parms(Mon).Value _
                                                                                                       * aMultiplicationFactor, 2)
-                            If (lOper.Tables(aTableName).Parms(Mon).Value < aLowerLimit) Then
-                                lOper.Tables(aTableName).Parms(Mon).Value = aLowerLimit
-                            ElseIf (lOper.Tables(aTableName).Parms(Mon).Value > aUpperLimit) Then
-                                lOper.Tables(aTableName).Parms(Mon).Value = aUpperLimit
-                            End If
+                                If (lOper.Tables(aTableName).Parms(Mon).Value < aLowerLimit) Then
+                                    lOper.Tables(aTableName).Parms(Mon).Value = aLowerLimit
+                                ElseIf (lOper.Tables(aTableName).Parms(Mon).Value > aUpperLimit) Then
+                                    lOper.Tables(aTableName).Parms(Mon).Value = aUpperLimit
+                                End If
+
+                            Catch ex As Exception
+                                Logger.Msg("Could not find the Table " & aTableName &
+                                   " Parameter " & aParameterName & " for " & lOper.Id, MsgBoxStyle.Critical)
+
+                                End
+                            End Try
+
+
                             'ParameterDetailText &= SimID & "," & ParameterOperation & "," & TableName & "," & lOper.Id & "," &
                             '                ParameterName & "," & Mon & "," & lOper.Tables(TableName).Parms(Mon).Value & vbCrLf
 
@@ -395,13 +414,20 @@ Public Module ModSensitivityAnalysis
 
             Case Else
                 For Each lOper As HspfOperation In aUCI.OpnBlks(aParameterOperation).Ids
-                    lOper.Tables(aTableName).ParmValue(aParameterName) =
+                    Try
+                        lOper.Tables(aTableName).ParmValue(aParameterName) =
                                             SignificantDigits(lOper.Tables(aTableName).ParmValue(aParameterName) * aMultiplicationFactor, 3)
-                    If (lOper.Tables(aTableName).ParmValue(aParameterName) < aLowerLimit) Then
-                        lOper.Tables(aTableName).ParmValue(aParameterName) = aLowerLimit
-                    ElseIf (lOper.Tables(aTableName).ParmValue(aParameterName) > aUpperLimit) Then
-                        lOper.Tables(aTableName).ParmValue(aParameterName) = aUpperLimit
-                    End If
+                        If (lOper.Tables(aTableName).ParmValue(aParameterName) < aLowerLimit) Then
+                            lOper.Tables(aTableName).ParmValue(aParameterName) = aLowerLimit
+                        ElseIf (lOper.Tables(aTableName).ParmValue(aParameterName) > aUpperLimit) Then
+                            lOper.Tables(aTableName).ParmValue(aParameterName) = aUpperLimit
+                        End If
+                    Catch ex As Exception
+                        Logger.Msg("Could not find the Table " & aTableName &
+                                   " Parameter " & aParameterName & " for " & lOper.Id, MsgBoxStyle.Critical)
+                        End
+                    End Try
+
                     'ParameterDetailText &= SimID & "," & ParameterOperation & "," & TableName & "," & lOper.Id & "," &
                     '                                                                ParameterName & ",," &
                     '                                                                lOper.Tables(TableName).ParmValue(ParameterName) & vbCrLf

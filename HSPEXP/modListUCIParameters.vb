@@ -27,13 +27,87 @@ Public Module modListUCIParameters
         Next
 
         ParameterList.WriteLine("Number Of Reaches in the UCI File = " & NumberOfReaches)
-        ParameterList.WriteLine("OperationType, OperationID, TableName, PrameterName, ParameterValue")
+        ParameterList.WriteLine("OperationType, OperationID, OperationCaption, TableName, TableOccurrence, PrameterName, ParameterValue")
 
         For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
             If lOperation.Name = "RCHRES" Then
                 For Each lTable As HspfTable In lOperation.Tables
                     For Each lparm As HspfParm In lTable.Parms
-                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " & lTable.Name & ", " & lparm.Name & ", " & lparm.Value)
+                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " & lOperation.Caption & ", " & lTable.Name & ", " &
+                                                lTable.OccurIndex & ", " & lparm.Name & ", " & lparm.Value)
+                    Next
+                Next
+            End If
+        Next
+
+        ParameterList.Close()
+
+
+    End Sub
+    Sub ListPERLNDParameters(ByVal aHSPFUCI As HspfUci, ByVal lOutputFolder As String)
+        pPERLND = New atcCollection
+        pIMPLND = New atcCollection
+        pRCHRES = New atcCollection
+        Dim s As String = ""
+        Dim ModelName As String = IO.Path.GetFileNameWithoutExtension(aHSPFUCI.Name)
+        Dim ParameterList As System.IO.StreamWriter
+        Dim NumberOfPERLNDOperations As Integer = 0
+        ParameterList = My.Computer.FileSystem.OpenTextFileWriter(lOutputFolder & "\" & ModelName & "_PERLND_ParameterList.txt", False)
+        ParameterList.WriteLine("Parameter list for " & ModelName)
+
+        For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
+            If lOperation.Name = "PERLND" AndAlso Not pRCHRES.Contains(lOperation.Id) Then
+                pRCHRES.Add(lOperation.Id)
+                NumberOfPERLNDOperations += 1
+            End If
+        Next
+
+        ParameterList.WriteLine("Number Of PERLND Operations in the UCI File = " & NumberOfPERLNDOperations)
+        ParameterList.WriteLine("OperationType, OperationID, Operationcaption, TableName, Table Occurrence Index, ParameterName, ParameterValue")
+
+        For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
+            If lOperation.Name = "PERLND" Then
+                For Each lTable As HspfTable In lOperation.Tables
+                    For Each lparm As HspfParm In lTable.Parms
+                        'If lTable.OccurIndex > 1 Then Stop
+                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " & lOperation.Caption & ", " &
+                                                lTable.Name & "," & lTable.OccurIndex & ", " & lparm.Name & ", " & lparm.Value)
+                    Next
+                Next
+            End If
+        Next
+
+        ParameterList.Close()
+
+
+    End Sub
+    Sub ListIMPLNDParameters(ByVal aHSPFUCI As HspfUci, ByVal lOutputFolder As String)
+        pPERLND = New atcCollection
+        pIMPLND = New atcCollection
+        pRCHRES = New atcCollection
+        Dim s As String = ""
+        Dim ModelName As String = IO.Path.GetFileNameWithoutExtension(aHSPFUCI.Name)
+        Dim ParameterList As System.IO.StreamWriter
+        Dim NumberOfReaches As Integer = 0
+        ParameterList = My.Computer.FileSystem.OpenTextFileWriter(lOutputFolder & "\" & ModelName & "_IMPLND_ParameterList.txt", False)
+        ParameterList.WriteLine("Parameter list for " & ModelName)
+
+        For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
+            If lOperation.Name = "IMPLND" AndAlso Not pRCHRES.Contains(lOperation.Id) Then
+                pRCHRES.Add(lOperation.Id)
+                NumberOfReaches += 1
+            End If
+        Next
+
+        ParameterList.WriteLine("Number Of IMPLND Operations in the UCI File = " & NumberOfReaches)
+        ParameterList.WriteLine("OperationType, OperationID, Operationcaption, TableName, Table Occurrence Index, ParameterName, ParameterValue")
+
+        For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
+            If lOperation.Name = "IMPLND" Then
+                For Each lTable As HspfTable In lOperation.Tables
+                    For Each lparm As HspfParm In lTable.Parms
+                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " & lOperation.Caption &
+                                                ", " & lTable.Name & "," & lTable.OccurIndex & ", " & lparm.Name & ", " & lparm.Value)
                     Next
                 Next
             End If
@@ -45,7 +119,7 @@ Public Module modListUCIParameters
     End Sub
 
     Sub ListReachParametersForAllUCIFiles(ByVal lFolderName As String)
-        lFolderName = "C:\Dropbox (RESPEC)\Basins\data\DO_TMDL_Research\UCI_Files\AR_OK_UCI"
+        'lFolderName = "C:\Dev\Upatoi_FortBenning\FB_Model_Ext_2012"
         Dim lUCIFileNames As New NameValueCollection
         AddFilesInDir(lUCIFileNames, lFolderName, False, "*.uci")
         Dim pUci As atcUCI.HspfUci
@@ -62,6 +136,8 @@ Public Module modListUCIParameters
             End Try
 
             ListReachParameters(pUci, lFolderName)
+            ListPERLNDParameters(pUci, lFolderName)
+            ListIMPLNDParameters(pUci, lFolderName)
 
         Next
 
