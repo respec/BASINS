@@ -126,6 +126,14 @@ Module HSPFOutputReports
 
                 End If
 
+                pListModelParameters = True
+                If pListModelParameters Then
+                    ListReachParametersForAllUCIFiles(pTestPath)
+                    'modListUCIParameters.ListReachParameters(aHspfUci, loutfoldername)
+                End If
+
+
+
                 If pRunUci = True Then
                     Logger.Status(Now & " Running HSPF Simulation of " & pBaseName & ".uci", True)
                     Dim lExitCode As Integer
@@ -210,11 +218,7 @@ Module HSPFOutputReports
                 File.Copy(pTestPath & pBaseName & ".uci", loutfoldername & pBaseName & ".uci", overwrite:=True)
                 'A folder name is given that has the basename and the time when the run was made.
 
-                pListModelParameters = True
-                If pListModelParameters Then
-                    ListReachParametersForAllUCIFiles(pTestPath)
-                    'modListUCIParameters.ListReachParameters(aHspfUci, loutfoldername)
-                End If
+
 
                 If StartUp.chkAdditionalgraphs.Checked Then
                     Try

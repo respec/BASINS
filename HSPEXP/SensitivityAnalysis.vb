@@ -40,6 +40,7 @@ Public Class TimeSeriesStats
     Public AnnualSum As Double
     Public Mean As Double
     Public GeometricMean As String
+    Public AvAnnPeak As Double
     Public TenPercentHigh As Double
     Public TwentyFivePercentHigh As Double
     Public FiftyPercentHigh As Double
@@ -97,7 +98,7 @@ Public Module ModSensitivityAnalysis
         Dim lParameterListFilesIsAvailable As Boolean = False
         Dim lSpecificationFile As String = "SensitiveParametersList.csv"
         Dim lOutputFile As StreamWriter = File.CreateText("SensitivityOutput.csv")
-        lOutputFile.WriteLine("SimID,DSNID,Sum,AnnualSum,Mean,GeometricMean,10%High,25%High,50%High,50%Low,25%Low,10%Low,5%Low,2%Low")
+        lOutputFile.WriteLine("SimID,DSNID,Sum,AnnualSum,Mean,GeometricMean,Av.AnnualPeak,10%High,25%High,50%High,50%Low,25%Low,10%Low,5%Low,2%Low")
 
 
         Dim NumberOfOutputDSN As Integer = 0
@@ -503,14 +504,16 @@ Public Module ModSensitivityAnalysis
             End If
 
             Dim lNewStatDataset As New TimeSeriesStats
-
+            Dim AnnSimulatedTS As atcTimeseries = Aggregate(SimulatedTS, atcTimeUnit.TUYear, 1, atcTran.TranMax)
             With lNewStatDataset
+
                 .SimID = SimID
                 .DSNID = WDMDataset
                 .OverallSum = SimulatedTS.Attributes.GetDefinedValue("Sum").Value
                 .AnnualSum = SimulatedTS.Attributes.GetDefinedValue("SumAnnual").Value
                 .Mean = SimulatedTS.Attributes.GetDefinedValue("Mean").Value
                 .GeometricMean = "Not Calculated"
+                .AvAnnPeak = AnnSimulatedTS.Attributes.GetDefinedValue("Mean").Value
                 .TenPercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum90").Value
                 .TwentyFivePercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum75").Value
                 .FiftyPercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
@@ -523,6 +526,7 @@ Public Module ModSensitivityAnalysis
                     ", " & FormatNumber(.AnnualSum, 3,, TriState.False, False) &
                     ", " & FormatNumber(.Mean, 3,, TriState.False, False) &
                     ", " & .GeometricMean &
+                    ", " & FormatNumber(.AvAnnPeak, 3,, TriState.False, False) &
                     ", " & FormatNumber(.TenPercentHigh, 3,, TriState.False, False) &
                     ", " & FormatNumber(.TwentyFivePercentHigh, 3,, TriState.False, False) &
                     ", " & FormatNumber(.FiftyPercentHigh, 3,, TriState.False, False) &
