@@ -88,6 +88,8 @@ Partial Class frmDownload
         Me.grpNWISStations = New System.Windows.Forms.GroupBox()
         Me.chkCacheOnly = New System.Windows.Forms.CheckBox()
         Me.grpNLDAS = New System.Windows.Forms.GroupBox()
+        Me.lblTimeZone = New System.Windows.Forms.Label()
+        Me.txtTimeZone = New System.Windows.Forms.TextBox()
         Me.grpNWISStations_GW = New System.Windows.Forms.GroupBox()
         Me.lblMinCount = New System.Windows.Forms.Label()
         Me.grpNWIS_GW = New System.Windows.Forms.GroupBox()
@@ -98,8 +100,11 @@ Partial Class frmDownload
         Me.panelNWISnoStations_GW = New System.Windows.Forms.Panel()
         Me.lblNWISnoStations_GW = New System.Windows.Forms.Label()
         Me.grpNCDC = New System.Windows.Forms.GroupBox()
-        Me.txtTimeZone = New System.Windows.Forms.TextBox()
-        Me.lblTimeZone = New System.Windows.Forms.Label()
+        Me.grpNHDplus2 = New System.Windows.Forms.GroupBox()
+        Me.chkNHDplus2_hydrography = New System.Windows.Forms.CheckBox()
+        Me.chkNHDplus2_elev_cm = New System.Windows.Forms.CheckBox()
+        Me.chkNHDplus2_All = New System.Windows.Forms.CheckBox()
+        Me.chkNHDplus2_Catchment = New System.Windows.Forms.CheckBox()
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.panelNWISnoStations.SuspendLayout()
@@ -112,6 +117,7 @@ Partial Class frmDownload
         Me.grpNWIS_GW.SuspendLayout()
         Me.panelNWISnoStations_GW.SuspendLayout()
         Me.grpNCDC.SuspendLayout()
+        Me.grpNHDplus2.SuspendLayout()
         Me.SuspendLayout()
         '
         'grpBASINS
@@ -259,7 +265,7 @@ Partial Class frmDownload
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISIdaDischarge)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDailyGW)
         Me.grpNWIS.Controls.Add(Me.panelNWISnoStations)
-        Me.grpNWIS.Location = New System.Drawing.Point(11, 380)
+        Me.grpNWIS.Location = New System.Drawing.Point(11, 406)
         Me.grpNWIS.Name = "grpNWIS"
         Me.grpNWIS.Size = New System.Drawing.Size(466, 65)
         Me.grpNWIS.TabIndex = 26
@@ -357,7 +363,7 @@ Partial Class frmDownload
         'btnHelp
         '
         Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.Location = New System.Drawing.Point(272, 702)
+        Me.btnHelp.Location = New System.Drawing.Point(272, 723)
         Me.btnHelp.Name = "btnHelp"
         Me.btnHelp.Size = New System.Drawing.Size(59, 23)
         Me.btnHelp.TabIndex = 46
@@ -377,7 +383,7 @@ Partial Class frmDownload
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2001_Canopy)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2001_Impervious)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2001_LandCover)
-        Me.grpUSGS_Seamless.Location = New System.Drawing.Point(11, 451)
+        Me.grpUSGS_Seamless.Location = New System.Drawing.Point(12, 477)
         Me.grpUSGS_Seamless.Name = "grpUSGS_Seamless"
         Me.grpUSGS_Seamless.Size = New System.Drawing.Size(466, 67)
         Me.grpUSGS_Seamless.TabIndex = 30
@@ -475,16 +481,16 @@ Partial Class frmDownload
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_Catchment)
         Me.grpNHDplus.Location = New System.Drawing.Point(11, 256)
         Me.grpNHDplus.Name = "grpNHDplus"
-        Me.grpNHDplus.Size = New System.Drawing.Size(466, 67)
+        Me.grpNHDplus.Size = New System.Drawing.Size(466, 45)
         Me.grpNHDplus.TabIndex = 12
         Me.grpNHDplus.TabStop = False
-        Me.grpNHDplus.Text = "National Hydrography Dataset Plus"
+        Me.grpNHDplus.Text = "National Hydrography Dataset Plus v1.0"
         Me.grpNHDplus.Visible = False
         '
         'chkNHDplus_hydrography
         '
         Me.chkNHDplus_hydrography.AutoSize = True
-        Me.chkNHDplus_hydrography.Location = New System.Drawing.Point(205, 42)
+        Me.chkNHDplus_hydrography.Location = New System.Drawing.Point(326, 19)
         Me.chkNHDplus_hydrography.Name = "chkNHDplus_hydrography"
         Me.chkNHDplus_hydrography.Size = New System.Drawing.Size(86, 17)
         Me.chkNHDplus_hydrography.TabIndex = 18
@@ -495,7 +501,7 @@ Partial Class frmDownload
         'chkNHDplus_elev_cm
         '
         Me.chkNHDplus_elev_cm.AutoSize = True
-        Me.chkNHDplus_elev_cm.Location = New System.Drawing.Point(6, 42)
+        Me.chkNHDplus_elev_cm.Location = New System.Drawing.Point(73, 19)
         Me.chkNHDplus_elev_cm.Name = "chkNHDplus_elev_cm"
         Me.chkNHDplus_elev_cm.Size = New System.Drawing.Size(92, 17)
         Me.chkNHDplus_elev_cm.TabIndex = 14
@@ -571,7 +577,7 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(17, 706)
+        Me.chkClip.Location = New System.Drawing.Point(17, 727)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 44
@@ -583,7 +589,7 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(222, 692)
+        Me.chkMerge.Location = New System.Drawing.Point(222, 713)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 43
@@ -697,7 +703,7 @@ Partial Class frmDownload
         '
         Me.chkGetNewest.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkGetNewest.AutoSize = True
-        Me.chkGetNewest.Location = New System.Drawing.Point(123, 706)
+        Me.chkGetNewest.Location = New System.Drawing.Point(123, 727)
         Me.chkGetNewest.Name = "chkGetNewest"
         Me.chkGetNewest.Size = New System.Drawing.Size(82, 17)
         Me.chkGetNewest.TabIndex = 49
@@ -730,7 +736,7 @@ Partial Class frmDownload
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(402, 702)
+        Me.btnDownload.Location = New System.Drawing.Point(402, 723)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 48
@@ -761,7 +767,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(337, 702)
+        Me.btnCancel.Location = New System.Drawing.Point(337, 723)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(59, 23)
         Me.btnCancel.TabIndex = 47
@@ -774,7 +780,7 @@ Partial Class frmDownload
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Results)
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Stations)
-        Me.grpSTORET.Location = New System.Drawing.Point(11, 524)
+        Me.grpSTORET.Location = New System.Drawing.Point(11, 550)
         Me.grpSTORET.Name = "grpSTORET"
         Me.grpSTORET.Size = New System.Drawing.Size(466, 42)
         Me.grpSTORET.TabIndex = 36
@@ -812,7 +818,7 @@ Partial Class frmDownload
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_qw)
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_measurement)
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_discharge)
-        Me.grpNWISStations.Location = New System.Drawing.Point(11, 329)
+        Me.grpNWISStations.Location = New System.Drawing.Point(11, 358)
         Me.grpNWISStations.Name = "grpNWISStations"
         Me.grpNWISStations.Size = New System.Drawing.Size(466, 42)
         Me.grpNWISStations.TabIndex = 21
@@ -824,7 +830,7 @@ Partial Class frmDownload
         '
         Me.chkCacheOnly.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkCacheOnly.AutoSize = True
-        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 706)
+        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 727)
         Me.chkCacheOnly.Name = "chkCacheOnly"
         Me.chkCacheOnly.Size = New System.Drawing.Size(81, 17)
         Me.chkCacheOnly.TabIndex = 45
@@ -840,13 +846,32 @@ Partial Class frmDownload
         Me.grpNLDAS.Controls.Add(Me.txtTimeZone)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASParameter)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASGrid)
-        Me.grpNLDAS.Location = New System.Drawing.Point(11, 572)
+        Me.grpNLDAS.Location = New System.Drawing.Point(11, 598)
         Me.grpNLDAS.Name = "grpNLDAS"
         Me.grpNLDAS.Size = New System.Drawing.Size(466, 60)
         Me.grpNLDAS.TabIndex = 39
         Me.grpNLDAS.TabStop = False
         Me.grpNLDAS.Text = "North American Land Data Assimilation System"
         Me.grpNLDAS.Visible = False
+        '
+        'lblTimeZone
+        '
+        Me.lblTimeZone.AutoSize = True
+        Me.lblTimeZone.Enabled = False
+        Me.lblTimeZone.Location = New System.Drawing.Point(129, 37)
+        Me.lblTimeZone.Name = "lblTimeZone"
+        Me.lblTimeZone.Size = New System.Drawing.Size(155, 13)
+        Me.lblTimeZone.TabIndex = 44
+        Me.lblTimeZone.Text = "Project Time Zone - UTC minus"
+        '
+        'txtTimeZone
+        '
+        Me.txtTimeZone.Enabled = False
+        Me.txtTimeZone.Location = New System.Drawing.Point(290, 34)
+        Me.txtTimeZone.Name = "txtTimeZone"
+        Me.txtTimeZone.Size = New System.Drawing.Size(39, 20)
+        Me.txtTimeZone.TabIndex = 43
+        Me.txtTimeZone.Text = "0"
         '
         'grpNWISStations_GW
         '
@@ -962,7 +987,7 @@ Partial Class frmDownload
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNCDC.Controls.Add(Me.chkNCDC_MetStations)
         Me.grpNCDC.Controls.Add(Me.chkNCDC_MetData)
-        Me.grpNCDC.Location = New System.Drawing.Point(12, 638)
+        Me.grpNCDC.Location = New System.Drawing.Point(12, 664)
         Me.grpNCDC.Name = "grpNCDC"
         Me.grpNCDC.Size = New System.Drawing.Size(466, 44)
         Me.grpNCDC.TabIndex = 50
@@ -970,24 +995,63 @@ Partial Class frmDownload
         Me.grpNCDC.Text = "National Climatic Data Center"
         Me.grpNCDC.Visible = False
         '
-        'txtTimeZone
+        'grpNHDplus2
         '
-        Me.txtTimeZone.Enabled = False
-        Me.txtTimeZone.Location = New System.Drawing.Point(290, 34)
-        Me.txtTimeZone.Name = "txtTimeZone"
-        Me.txtTimeZone.Size = New System.Drawing.Size(39, 20)
-        Me.txtTimeZone.TabIndex = 43
-        Me.txtTimeZone.Text = "0"
+        Me.grpNHDplus2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpNHDplus2.Controls.Add(Me.chkNHDplus2_hydrography)
+        Me.grpNHDplus2.Controls.Add(Me.chkNHDplus2_elev_cm)
+        Me.grpNHDplus2.Controls.Add(Me.chkNHDplus2_All)
+        Me.grpNHDplus2.Controls.Add(Me.chkNHDplus2_Catchment)
+        Me.grpNHDplus2.Location = New System.Drawing.Point(11, 307)
+        Me.grpNHDplus2.Name = "grpNHDplus2"
+        Me.grpNHDplus2.Size = New System.Drawing.Size(466, 45)
+        Me.grpNHDplus2.TabIndex = 51
+        Me.grpNHDplus2.TabStop = False
+        Me.grpNHDplus2.Text = "National Hydrography Dataset Plus v2.1"
+        Me.grpNHDplus2.Visible = False
         '
-        'lblTimeZone
+        'chkNHDplus2_hydrography
         '
-        Me.lblTimeZone.AutoSize = True
-        Me.lblTimeZone.Enabled = False
-        Me.lblTimeZone.Location = New System.Drawing.Point(129, 37)
-        Me.lblTimeZone.Name = "lblTimeZone"
-        Me.lblTimeZone.Size = New System.Drawing.Size(155, 13)
-        Me.lblTimeZone.TabIndex = 44
-        Me.lblTimeZone.Text = "Project Time Zone - UTC minus"
+        Me.chkNHDplus2_hydrography.AutoSize = True
+        Me.chkNHDplus2_hydrography.Location = New System.Drawing.Point(326, 19)
+        Me.chkNHDplus2_hydrography.Name = "chkNHDplus2_hydrography"
+        Me.chkNHDplus2_hydrography.Size = New System.Drawing.Size(86, 17)
+        Me.chkNHDplus2_hydrography.TabIndex = 18
+        Me.chkNHDplus2_hydrography.Text = "Hydrography"
+        Me.ToolTip1.SetToolTip(Me.chkNHDplus2_hydrography, "NHDArea, NHDFlowline, NHDLine, NHDPoint, NHDWaterbody")
+        Me.chkNHDplus2_hydrography.UseVisualStyleBackColor = True
+        '
+        'chkNHDplus2_elev_cm
+        '
+        Me.chkNHDplus2_elev_cm.AutoSize = True
+        Me.chkNHDplus2_elev_cm.Location = New System.Drawing.Point(73, 19)
+        Me.chkNHDplus2_elev_cm.Name = "chkNHDplus2_elev_cm"
+        Me.chkNHDplus2_elev_cm.Size = New System.Drawing.Size(92, 17)
+        Me.chkNHDplus2_elev_cm.TabIndex = 14
+        Me.chkNHDplus2_elev_cm.Text = "Elevation Grid"
+        Me.ToolTip1.SetToolTip(Me.chkNHDplus2_elev_cm, "elev_cm grid")
+        Me.chkNHDplus2_elev_cm.UseVisualStyleBackColor = True
+        '
+        'chkNHDplus2_All
+        '
+        Me.chkNHDplus2_All.AutoSize = True
+        Me.chkNHDplus2_All.Location = New System.Drawing.Point(6, 19)
+        Me.chkNHDplus2_All.Name = "chkNHDplus2_All"
+        Me.chkNHDplus2_All.Size = New System.Drawing.Size(37, 17)
+        Me.chkNHDplus2_All.TabIndex = 13
+        Me.chkNHDplus2_All.Text = "All"
+        Me.chkNHDplus2_All.UseVisualStyleBackColor = True
+        '
+        'chkNHDplus2_Catchment
+        '
+        Me.chkNHDplus2_Catchment.AutoSize = True
+        Me.chkNHDplus2_Catchment.Location = New System.Drawing.Point(205, 19)
+        Me.chkNHDplus2_Catchment.Name = "chkNHDplus2_Catchment"
+        Me.chkNHDplus2_Catchment.Size = New System.Drawing.Size(82, 17)
+        Me.chkNHDplus2_Catchment.TabIndex = 17
+        Me.chkNHDplus2_Catchment.Text = "Catchments"
+        Me.chkNHDplus2_Catchment.UseVisualStyleBackColor = True
         '
         'frmDownload
         '
@@ -995,7 +1059,8 @@ Partial Class frmDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(490, 737)
+        Me.ClientSize = New System.Drawing.Size(490, 758)
+        Me.Controls.Add(Me.grpNHDplus2)
         Me.Controls.Add(Me.grpNCDC)
         Me.Controls.Add(Me.chkGetNewest)
         Me.Controls.Add(Me.grpNWISStations_GW)
@@ -1045,6 +1110,8 @@ Partial Class frmDownload
         Me.panelNWISnoStations_GW.PerformLayout()
         Me.grpNCDC.ResumeLayout(False)
         Me.grpNCDC.PerformLayout()
+        Me.grpNHDplus2.ResumeLayout(False)
+        Me.grpNHDplus2.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1125,4 +1192,9 @@ Partial Class frmDownload
     Friend WithEvents chkNCDC_MetStations As Windows.Forms.CheckBox
     Friend WithEvents lblTimeZone As Windows.Forms.Label
     Friend WithEvents txtTimeZone As Windows.Forms.TextBox
+    Friend WithEvents grpNHDplus2 As Windows.Forms.GroupBox
+    Friend WithEvents chkNHDplus2_hydrography As Windows.Forms.CheckBox
+    Friend WithEvents chkNHDplus2_elev_cm As Windows.Forms.CheckBox
+    Friend WithEvents chkNHDplus2_All As Windows.Forms.CheckBox
+    Friend WithEvents chkNHDplus2_Catchment As Windows.Forms.CheckBox
 End Class

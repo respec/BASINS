@@ -157,6 +157,7 @@ Public Class frmDownload
             lGroups.Add(grpBASINS)
             'lGroups.Add(grpNCDC)
             lGroups.Add(grpNHDplus)
+            lGroups.Add(grpNHDplus2)
             lGroups.Add(grpNWISStations)
             lGroups.Add(grpNWIS)
             lGroups.Add(grpUSGS_Seamless)
