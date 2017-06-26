@@ -1484,9 +1484,13 @@ Public Class GisUtil
                             If lColElev > -1 AndAlso lColElev < lElevEndingCol And _
                                lRowElev > -1 AndAlso lRowElev < lElevEndingRow Then
                                 lElevValue = lElevGrid.Value(lColElev, lRowElev)
-                                'store weighted average mean elevation
-                                aMeanElevGridPoly(lGridValue, lInsideId) = (lElevValue + (aMeanElevGridPoly(lGridValue, lInsideId) * lCountMeanElevLS(lGridValue, lInsideId))) / (lCountMeanElevLS(lGridValue, lInsideId) + 1)
-                                lCountMeanElevLS(lGridValue, lInsideId) += 1
+                                If lElevValue < 0 Then
+                                    'don't allow negative elevations
+                                Else
+                                    'store weighted average mean elevation
+                                    aMeanElevGridPoly(lGridValue, lInsideId) = (lElevValue + (aMeanElevGridPoly(lGridValue, lInsideId) * lCountMeanElevLS(lGridValue, lInsideId))) / (lCountMeanElevLS(lGridValue, lInsideId) + 1)
+                                    lCountMeanElevLS(lGridValue, lInsideId) += 1
+                                End If
                             End If
                         End If
                     End If

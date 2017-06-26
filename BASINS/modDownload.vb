@@ -2111,9 +2111,11 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
 
     Public Function CheckAddress(ByVal URL As String) As Boolean
         Try
+            Logger.Dbg("CheckAddress " & URL)
             Dim request As WebRequest = WebRequest.Create(URL)
             Dim response As WebResponse = request.GetResponse()
         Catch ex As Exception
+            Logger.Dbg("CheckAddress Failed " & ex.ToString)
             Return False
         End Try
         Return True
