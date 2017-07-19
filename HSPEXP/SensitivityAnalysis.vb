@@ -66,7 +66,7 @@ End Class
 
 Public Module ModSensitivityAnalysis
     Sub SensitivityAnalysis(ByVal aHSPFEXE As String, ByVal pBaseName As String, ByVal pTestPath As String,
-                            aSDateJ As Double, aEDateJ As Double)
+                            aSDateJ As Double, aEDateJ As Double, ByVal aHSPFEchofilename As String)
 
         Dim lMsg As New atcUCI.HspfMsg
         lMsg.Open("hspfmsg.wdm") 'Need to figure out why we need this.
@@ -172,7 +172,8 @@ Public Module ModSensitivityAnalysis
         Dim loutputLine As String = ""
         ChDriveDir(PathNameOnly(pHSPFExe))
         loutputLine = ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath,
-                                 aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN)
+                                 aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN, aHSPFEchofilename)
+
 
         lOutputFile.Write(loutputLine)
         'SensitivityOutputFile.Close()
@@ -250,7 +251,7 @@ Public Module ModSensitivityAnalysis
             Next
 
             loutputLine = ModelRunandReportAnswers(SimID, lUci, SimID & uciName, lExitCode, pBaseName, pTestPath,
-                                 aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN)
+                                 aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN, aHSPFEchofilename)
             'lUci = Nothing
             lOutputFile.Write(loutputLine)
 
@@ -453,94 +454,121 @@ Public Module ModSensitivityAnalysis
                                  ByVal aEDateJ As Double,
                                  ByVal YearsofSimulation As Single,
                                  ByRef lStats As List(Of TimeSeriesStats),
-                                              ByVal aOutputDSN As atcCollection)
+                                 ByVal aOutputDSN As atcCollection,
+                                 ByRef aHSPFEchofileName As String)
 
         lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & uciName) 'Run HSPF program
-        If lExitCode = -1 Then
-            Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
+        'If lExitCode = -1 Then
+        '    Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
+        '    End
+        'End If
+
+        Dim HSPFRan As Boolean = False
+        Dim lRunMade As String
+        Dim echoFileInfo As System.IO.FileInfo
+        If IO.File.Exists(aHSPFEchofileName) Then
+            echoFileInfo = New System.IO.FileInfo(aHSPFEchofileName)
+            lRunMade = echoFileInfo.LastWriteTime.ToString
+            Using echoFileReader As StreamReader = File.OpenText(aHSPFEchofileName)
+                While Not echoFileReader.EndOfStream
+                    Dim nextLine As String = echoFileReader.ReadLine()
+                    If Not nextLine.ToUpper.Contains("END OF JOB") Then
+                        HSPFRan = False
+                    Else
+                        HSPFRan = True
+                    End If
+                End While
+            End Using
+        Else
+            Logger.Msg("The ECHO file is not available for this model. Please check if model ran successfully last time", vbCritical)
             End
-
-
         End If
 
-        Dim lWdmFileName As String = pBaseName & ".wdm"
-        Dim lOutWDMFileName As String = pBaseName & "_UA.wdm"
-
-        Dim lWdmDataSource As atcWDM.atcDataSourceWDM
-        Dim lWdmDataSource2 As atcWDM.atcDataSourceWDM
-
-
-        If atcDataManager.DataSources.Contains(pTestPath & lWdmFileName) Then
-            atcDataManager.RemoveDataSource(pTestPath & lWdmFileName)
-        End If
-        If atcDataManager.DataSources.Contains(pTestPath & lOutWDMFileName) Then
-            atcDataManager.RemoveDataSource(pTestPath & lOutWDMFileName)
-        End If
-
-        atcDataManager.OpenDataSource(pTestPath & lWdmFileName)
-        lWdmDataSource = atcDataManager.DataSourceBySpecification(pTestPath & lWdmFileName)
-        atcDataManager.OpenDataSource(pTestPath & lOutWDMFileName)
-        lWdmDataSource2 = atcDataManager.DataSourceBySpecification(pTestPath & lOutWDMFileName)
-
-
-        If lWdmDataSource2 Is Nothing Then
-            lWdmDataSource2 = New atcWDM.atcDataSourceWDM
-            lWdmDataSource2.Open(pTestPath & lOutWDMFileName)
-        End If
-
-
-
-        Dim lYearlyAttributes As New atcDataAttributes
         Dim lOutputline As String = ""
-        Dim DatasetID As Integer = lWdmDataSource2.DataSets.Count
-        For Each WDMDataset As Integer In aOutputDSN
-            Dim SimulatedTS As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(WDMDataset), aSDateJ, aEDateJ, Nothing)
-            DatasetID += 1
-            If DatasetID < 10000 Then
-                SimulatedTS.Attributes.SetValue("ID", DatasetID)
-                SimulatedTS.Attributes.SetValue("Scenario", "SIMID" & SimID)
 
-                lWdmDataSource2.AddDataset(SimulatedTS)
+        If HSPFRan Then
+            Dim lWdmFileName As String = pBaseName & ".wdm"
+            Dim lOutWDMFileName As String = pBaseName & "_UA.wdm"
+
+            Dim lWdmDataSource As atcWDM.atcDataSourceWDM
+            Dim lWdmDataSource2 As atcWDM.atcDataSourceWDM
+
+            If atcDataManager.DataSources.Contains(pTestPath & lWdmFileName) Then
+                atcDataManager.RemoveDataSource(pTestPath & lWdmFileName)
+            End If
+            If atcDataManager.DataSources.Contains(pTestPath & lOutWDMFileName) Then
+                atcDataManager.RemoveDataSource(pTestPath & lOutWDMFileName)
             End If
 
-            Dim lNewStatDataset As New TimeSeriesStats
-            Dim AnnSimulatedTS As atcTimeseries = Aggregate(SimulatedTS, atcTimeUnit.TUYear, 1, atcTran.TranMax)
-            With lNewStatDataset
+            atcDataManager.OpenDataSource(pTestPath & lWdmFileName)
+            lWdmDataSource = atcDataManager.DataSourceBySpecification(pTestPath & lWdmFileName)
+            atcDataManager.OpenDataSource(pTestPath & lOutWDMFileName)
+            lWdmDataSource2 = atcDataManager.DataSourceBySpecification(pTestPath & lOutWDMFileName)
 
-                .SimID = SimID
-                .DSNID = WDMDataset
-                .OverallSum = SimulatedTS.Attributes.GetDefinedValue("Sum").Value
-                .AnnualSum = SimulatedTS.Attributes.GetDefinedValue("SumAnnual").Value
-                .Mean = SimulatedTS.Attributes.GetDefinedValue("Mean").Value
-                .GeometricMean = "Not Calculated"
-                .AvAnnPeak = AnnSimulatedTS.Attributes.GetDefinedValue("Mean").Value
-                .TenPercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum90").Value
-                .TwentyFivePercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum75").Value
-                .FiftyPercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
-                .FiftyPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
-                .TwentyFivePercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum25").Value
-                .TenPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum10").Value
-                .FivePercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum05").Value
-                .TwoPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum02").Value
-                lOutputline &= .SimID & ", " & .DSNID & ", " & FormatNumber(.OverallSum, 3,, TriState.False, False) &
-                    ", " & FormatNumber(.AnnualSum, 3,, TriState.False, False) &
-                    ", " & FormatNumber(.Mean, 3,, TriState.False, False) &
-                    ", " & .GeometricMean &
-                    ", " & FormatNumber(.AvAnnPeak, 3,, TriState.False, False) &
-                    ", " & FormatNumber(.TenPercentHigh, 3,, TriState.False, False) &
-                    ", " & FormatNumber(.TwentyFivePercentHigh, 3,, TriState.False, False) &
-                    ", " & FormatNumber(.FiftyPercentHigh, 3,, TriState.False, False) &
-                    ", " & FormatNumber(.FiftyPercentLow, 3,, TriState.False, False) &
-                    ", " & FormatNumber(.TwentyFivePercentLow, 3,, TriState.False, False) &
-                    ", " & FormatNumber(.TenPercentLow, 3,, TriState.False, False) & ", " &
-                    FormatNumber(.FivePercentLow, 3,, TriState.False, False) & ", " &
-                    FormatNumber(.TwoPercentLow, 3,, TriState.False, False) & vbCrLf
-            End With
-        Next
-        lWdmDataSource.Clear()
-        lWdmDataSource2.Clear()
 
+            If lWdmDataSource2 Is Nothing Then
+                lWdmDataSource2 = New atcWDM.atcDataSourceWDM
+                lWdmDataSource2.Open(pTestPath & lOutWDMFileName)
+            End If
+
+            Dim lYearlyAttributes As New atcDataAttributes
+
+            Dim DatasetID As Integer = lWdmDataSource2.DataSets.Count
+            For Each WDMDataset As Integer In aOutputDSN
+                Dim SimulatedTS As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(WDMDataset), aSDateJ, aEDateJ, Nothing)
+                DatasetID += 1
+                If DatasetID < 10000 Then
+                    SimulatedTS.Attributes.SetValue("ID", DatasetID)
+                    SimulatedTS.Attributes.SetValue("Scenario", "SIMID" & SimID)
+
+                    lWdmDataSource2.AddDataset(SimulatedTS)
+                End If
+
+                Dim lNewStatDataset As New TimeSeriesStats
+                Dim AnnSimulatedTS As atcTimeseries = Aggregate(SimulatedTS, atcTimeUnit.TUYear, 1, atcTran.TranMax)
+                With lNewStatDataset
+
+                    .SimID = SimID
+                    .DSNID = WDMDataset
+                    .OverallSum = SimulatedTS.Attributes.GetDefinedValue("Sum").Value
+                    .AnnualSum = SimulatedTS.Attributes.GetDefinedValue("SumAnnual").Value
+                    .Mean = SimulatedTS.Attributes.GetDefinedValue("Mean").Value
+                    .GeometricMean = "Not Calculated"
+                    .AvAnnPeak = AnnSimulatedTS.Attributes.GetDefinedValue("Mean").Value
+                    .TenPercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum90").Value
+                    .TwentyFivePercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum75").Value
+                    .FiftyPercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
+                    .FiftyPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
+                    .TwentyFivePercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum25").Value
+                    .TenPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum10").Value
+                    .FivePercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum05").Value
+                    .TwoPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum02").Value
+                    lOutputline &= .SimID & ", " & .DSNID & ", " & FormatNumber(.OverallSum, 3,, TriState.False, False) &
+                        ", " & FormatNumber(.AnnualSum, 3,, TriState.False, False) &
+                        ", " & FormatNumber(.Mean, 3,, TriState.False, False) &
+                        ", " & .GeometricMean &
+                        ", " & FormatNumber(.AvAnnPeak, 3,, TriState.False, False) &
+                        ", " & FormatNumber(.TenPercentHigh, 3,, TriState.False, False) &
+                        ", " & FormatNumber(.TwentyFivePercentHigh, 3,, TriState.False, False) &
+                        ", " & FormatNumber(.FiftyPercentHigh, 3,, TriState.False, False) &
+                        ", " & FormatNumber(.FiftyPercentLow, 3,, TriState.False, False) &
+                        ", " & FormatNumber(.TwentyFivePercentLow, 3,, TriState.False, False) &
+                        ", " & FormatNumber(.TenPercentLow, 3,, TriState.False, False) & ", " &
+                        FormatNumber(.FivePercentLow, 3,, TriState.False, False) & ", " &
+                        FormatNumber(.TwoPercentLow, 3,, TriState.False, False) & vbCrLf
+                End With
+            Next
+            lWdmDataSource.Clear()
+            lWdmDataSource2.Clear()
+        Else
+
+            lOutputline = SimID & ", This simulation didn't compelete successfully"
+
+        End If
+
+        Logger.Status("Number of simulations complete: " & SimID)
         Return lOutputline
+
 
     End Function
     Private Function Observed()

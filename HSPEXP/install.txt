@@ -1,3 +1,9 @@
+Dated: 7/19/2017
+HSPEXP+1.40beta1
+Features:
+1. HSPEXP+ doesn't report the output when runs do not complete.
+2. HSPEXP+ may also display number of simulations complete.
+
 Dated: 6/1/2017
 HSPEXP+1.40beta
 Features:
