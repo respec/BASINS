@@ -1036,9 +1036,11 @@ Public Module modBaseflowUtil
 
         Dim lReportGroupsAvailable As Boolean = False
         Dim lReportFileSuffix As String = ""
+        Dim lReportBy As String = ""
         If args IsNot Nothing Then
             lReportGroupsAvailable = args.GetValue("ReportGroupsAvailable", False)
             lReportFileSuffix = args.GetValue("ReportFileSuffix", "")
+            lReportBy = args.GetValue("ReportBy", "Calendar")
         End If
 
         Dim lTsGroupPart As atcCollection = Nothing
@@ -1062,27 +1064,27 @@ Public Module modBaseflowUtil
             lEnd = args.GetValue("AnalysisEnd", -99)
             lDA = args.GetValue("Drainage Area", -99)
         Else
-            lTsGroupPart = ConstructReportTsGroup(aTs, BFMethods.PART, lStart, lEnd, lDA)
-            lTsGroupFixed = ConstructReportTsGroup(aTs, BFMethods.HySEPFixed, lStart, lEnd, lDA)
-            lTsGroupLocMin = ConstructReportTsGroup(aTs, BFMethods.HySEPLocMin, lStart, lEnd, lDA)
-            lTsGroupSlide = ConstructReportTsGroup(aTs, BFMethods.HySEPSlide, lStart, lEnd, lDA)
-            lTsGroupBFIStandard = ConstructReportTsGroup(aTs, BFMethods.BFIStandard, lStart, lEnd, lDA)
-            lTsGroupBFIModified = ConstructReportTsGroup(aTs, BFMethods.BFIModified, lStart, lEnd, lDA)
-            lTsGroupBFLOW = ConstructReportTsGroup(aTs, BFMethods.BFLOW, lStart, lEnd, lDA)
-            lTsGroupTwoPRDF = ConstructReportTsGroup(aTs, BFMethods.TwoPRDF, lStart, lEnd, lDA)
+            lTsGroupPart = ConstructReportTsGroup(aTs, BFMethods.PART, lStart, lEnd, lDA, lReportBy)
+            lTsGroupFixed = ConstructReportTsGroup(aTs, BFMethods.HySEPFixed, lStart, lEnd, lDA, lReportBy)
+            lTsGroupLocMin = ConstructReportTsGroup(aTs, BFMethods.HySEPLocMin, lStart, lEnd, lDA, lReportBy)
+            lTsGroupSlide = ConstructReportTsGroup(aTs, BFMethods.HySEPSlide, lStart, lEnd, lDA, lReportBy)
+            lTsGroupBFIStandard = ConstructReportTsGroup(aTs, BFMethods.BFIStandard, lStart, lEnd, lDA, lReportBy)
+            lTsGroupBFIModified = ConstructReportTsGroup(aTs, BFMethods.BFIModified, lStart, lEnd, lDA, lReportBy)
+            lTsGroupBFLOW = ConstructReportTsGroup(aTs, BFMethods.BFLOW, lStart, lEnd, lDA, lReportBy)
+            lTsGroupTwoPRDF = ConstructReportTsGroup(aTs, BFMethods.TwoPRDF, lStart, lEnd, lDA, lReportBy)
         End If
 
         If (lStart < 0 AndAlso lEnd < 0) OrElse lDA <= 0 Then Exit Sub
 
         If Not lReportGroupsAvailable Then
-            If lTsGroupPart Is Nothing Then lTsGroupPart = ConstructReportTsGroup(aTs, BFMethods.PART, lStart, lEnd, lDA)
-            If lTsGroupFixed Is Nothing Then lTsGroupFixed = ConstructReportTsGroup(aTs, BFMethods.HySEPFixed, lStart, lEnd, lDA)
-            If lTsGroupLocMin Is Nothing Then lTsGroupLocMin = ConstructReportTsGroup(aTs, BFMethods.HySEPLocMin, lStart, lEnd, lDA)
-            If lTsGroupSlide Is Nothing Then lTsGroupSlide = ConstructReportTsGroup(aTs, BFMethods.HySEPSlide, lStart, lEnd, lDA)
-            If lTsGroupBFIStandard Is Nothing Then lTsGroupBFIStandard = ConstructReportTsGroup(aTs, BFMethods.BFIStandard, lStart, lEnd, lDA)
-            If lTsGroupBFIModified Is Nothing Then lTsGroupBFIModified = ConstructReportTsGroup(aTs, BFMethods.BFIModified, lStart, lEnd, lDA)
-            If lTsGroupBFLOW Is Nothing Then lTsGroupBFLOW = ConstructReportTsGroup(aTs, BFMethods.BFLOW, lStart, lEnd, lDA)
-            If lTsGroupTwoPRDF Is Nothing Then lTsGroupTwoPRDF = ConstructReportTsGroup(aTs, BFMethods.TwoPRDF, lStart, lEnd, lDA)
+            If lTsGroupPart Is Nothing Then lTsGroupPart = ConstructReportTsGroup(aTs, BFMethods.PART, lStart, lEnd, lDA, lReportBy)
+            If lTsGroupFixed Is Nothing Then lTsGroupFixed = ConstructReportTsGroup(aTs, BFMethods.HySEPFixed, lStart, lEnd, lDA, lReportBy)
+            If lTsGroupLocMin Is Nothing Then lTsGroupLocMin = ConstructReportTsGroup(aTs, BFMethods.HySEPLocMin, lStart, lEnd, lDA, lReportBy)
+            If lTsGroupSlide Is Nothing Then lTsGroupSlide = ConstructReportTsGroup(aTs, BFMethods.HySEPSlide, lStart, lEnd, lDA, lReportBy)
+            If lTsGroupBFIStandard Is Nothing Then lTsGroupBFIStandard = ConstructReportTsGroup(aTs, BFMethods.BFIStandard, lStart, lEnd, lDA, lReportBy)
+            If lTsGroupBFIModified Is Nothing Then lTsGroupBFIModified = ConstructReportTsGroup(aTs, BFMethods.BFIModified, lStart, lEnd, lDA, lReportBy)
+            If lTsGroupBFLOW Is Nothing Then lTsGroupBFLOW = ConstructReportTsGroup(aTs, BFMethods.BFLOW, lStart, lEnd, lDA, lReportBy)
+            If lTsGroupTwoPRDF Is Nothing Then lTsGroupTwoPRDF = ConstructReportTsGroup(aTs, BFMethods.TwoPRDF, lStart, lEnd, lDA, lReportBy)
         End If
 
         Dim lConversionFactor As Double = pUADepth / lDA
@@ -1105,7 +1107,14 @@ Public Module modBaseflowUtil
         Dim lTsFlowYearlySum As atcTimeseries = Nothing
         Dim lTsFlowYearlyDepth As atcTimeseries = Nothing
         If lTsFlowDaily.numValues > JulianYear Then
-            lTsFlowDailyBnd = SubsetByDateBoundary(lTsFlowDaily, 1, 1, Nothing)
+            If Not String.IsNullOrEmpty(lReportBy) AndAlso lReportBy.ToLower() = "water" Then
+                lTsFlowDailyBnd = SubsetByDateBoundary(lTsFlowDaily, 10, 1, Nothing)
+                lTsFlowMonthly = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+                lTsFlowMonthlySum = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+                lTsFlowMonthlyDepth = lTsFlowMonthlySum * lConversionFactor
+            Else
+                lTsFlowDailyBnd = SubsetByDateBoundary(lTsFlowDaily, 1, 1, Nothing)
+            End If
             If lTsFlowDailyBnd IsNot Nothing AndAlso lTsFlowDailyBnd.Values IsNot Nothing Then
                 lTsFlowYearly = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
                 lTsFlowYearlySum = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
@@ -1115,6 +1124,10 @@ Public Module modBaseflowUtil
 
         Dim lTsGroupStreamFlow As New atcCollection
         With lTsGroupStreamFlow
+            If Not String.IsNullOrEmpty(lReportBy) AndAlso lReportBy.ToLower() = "water" Then
+                lTsFlowDaily = SubsetByDateBoundary(lTsFlowDaily, 10, 1, Nothing)
+                lTsFlowDailyDepth = lTsFlowDaily * lConversionFactor
+            End If
             .Add("RateDaily", lTsFlowDaily)
             .Add("DepthDaily", lTsFlowDailyDepth)
             .Add("RateMonthly", lTsFlowMonthly)
@@ -1334,7 +1347,11 @@ Public Module modBaseflowUtil
         lTableHeader.CurrentRecord = 3
         lTableHeader.Value(1) = "Year"
         lSW = New IO.StreamWriter(lFileYearlySum, False)
-        lTitleLine1 = "Groundwater Toolbox annual output for hydrograph separation (calendar year January 1-December 31)"
+        If Not String.IsNullOrEmpty(lReportBy) AndAlso lReportBy.ToLower() = "water" Then
+            lTitleLine1 = "Groundwater Toolbox annual output for hydrograph separation (water year October 1-September 30)"
+        Else
+            lTitleLine1 = "Groundwater Toolbox annual output for hydrograph separation (calendar year January 1-December 31)"
+        End If
         lTitleLine4 = "(CFS: average flow for the year (cubic feet per second); IN: flow per drainage area (inches); BFP: Base-Flow Percentage (ratio of base-flow to streamflow multiplied by 100)"
         lSW.WriteLine(lTitleLine1) : lSW.WriteLine(lTitleLine2) : lSW.WriteLine(lTitleLine3) : lSW.WriteLine(lTitleLine4)
         If Not String.IsNullOrEmpty(lParameterNotes) Then
@@ -2193,7 +2210,8 @@ Public Module modBaseflowUtil
     Private Function ConstructReportTsGroup(ByVal aTs As atcTimeseries, ByVal aMethod As BFMethods,
                                             Optional ByRef aStart As Double = 0.0,
                                             Optional ByRef aEnd As Double = 0.0,
-                                            Optional ByRef aDA As Double = 0.0) As atcCollection
+                                            Optional ByRef aDA As Double = 0.0,
+                                            Optional ByVal aReportBy As String = "Calendar") As atcCollection
 
         'use a new ts group to hold the final ts for report
 
@@ -2238,7 +2256,16 @@ Public Module modBaseflowUtil
                 Dim lTsBFToReportPartYearlySum As atcTimeseries = Nothing
                 Dim lTsBFToReportPartYearlyDepth As atcTimeseries = Nothing
                 If lNumOfDays > JulianYear Then
-                    lTsBFToReportPartDailyBnd = SubsetByDateBoundary(lTsBFToReportPartDaily, 1, 1, Nothing)
+                    If Not String.IsNullOrEmpty(aReportBy) AndAlso aReportBy.ToLower() = "water" Then
+                        lTsBFToReportPartDailyBnd = SubsetByDateBoundary(lTsBFToReportPartDaily, 10, 1, Nothing)
+                        lTsBFToReportPartMonthly = SubsetByDateBoundary(lTsBFToReportPartMonthly, 10, 1, Nothing)
+                        lTsBFToReportPartMonthlyDepth = SubsetByDateBoundary(lTsBFToReportPartMonthlyDepth, 10, 1, Nothing)
+                    Else
+                        lTsBFToReportPartDailyBnd = SubsetByDateBoundary(lTsBFToReportPartDaily, 1, 1, Nothing)
+                        'don't touch monthly if not report by water year
+                        'lTsBFToReportPartMonthly = SubsetByDateBoundary(lTsBFToReportPartMonthly, 1, 1, Nothing)
+                        'lTsBFToReportPartMonthlyDepth = SubsetByDateBoundary(lTsBFToReportPartMonthlyDepth, 1, 1, Nothing)
+                    End If
                     If lTsBFToReportPartDailyBnd IsNot Nothing AndAlso lTsBFToReportPartDailyBnd.Values IsNot Nothing Then
                         lTsBFToReportPartYearly = Aggregate(lTsBFToReportPartDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
                         lTsBFToReportPartYearlySum = Aggregate(lTsBFToReportPartDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
@@ -2253,7 +2280,11 @@ Public Module modBaseflowUtil
                 'lTsBFToReportPartYearly.Attributes.SetValue(lReportColumnAttributeName, "RateYearly")
                 'lTsBFToReportPartYearlyDepth.Attributes.SetValue(lReportColumnAttributeName, "DepthYearly")
                 With lTsGroupToReport
-                    .Add("RateDaily", lTsBFToReportPartDaily)
+                    If Not String.IsNullOrEmpty(aReportBy) AndAlso aReportBy.ToLower() = "water" AndAlso lNumOfDays > JulianYear Then
+                        .Add("RateDaily", lTsBFToReportPartDailyBnd)
+                    Else
+                        .Add("RateDaily", lTsBFToReportPartDaily)
+                    End If
                     .Add("DepthDaily", lTsBFToReportPartDailyDepth)
                     .Add("RateMonthly", lTsBFToReportPartMonthly)
                     .Add("DepthMonthly", lTsBFToReportPartMonthlyDepth)
@@ -2283,21 +2314,26 @@ Public Module modBaseflowUtil
                 Dim lNumOfDays As Integer = lTsDaily.numValues
                 Dim lTsDailyBnd As atcTimeseries = Nothing 'SubsetByDateBoundary(lTsDaily, 1, 1, Nothing)
                 If lNumOfDays > JulianYear Then
-                    lTsDailyBnd = SubsetByDateBoundary(lTsDaily, 1, 1, Nothing)
+                    If Not String.IsNullOrEmpty(aReportBy) AndAlso aReportBy.ToLower() = "water" Then
+                        lTsDailyBnd = SubsetByDateBoundary(lTsDaily, 10, 1, Nothing)
+                    Else
+                        'lTsDailyBnd = SubsetByDateBoundary(lTsDaily, 1, 1, Nothing)
+                        lTsDailyBnd = lTsDaily
+                    End If
                 End If
 
                 If lDA > 0 Then
                     lConversionFactor = pUADepth / lDA
-                    lTsDailyDepth = lTsDaily * lConversionFactor
-                    lTsMon = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
-                    lTsMonSum = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+                    lTsDailyDepth = lTsDailyBnd * lConversionFactor
+                    lTsMon = Aggregate(lTsDailyBnd, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+                    lTsMonSum = Aggregate(lTsDailyBnd, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                     lTsMonDepth = lTsMonSum * lConversionFactor
 
                     'Adjust for partial months based on the beginning and end of daily time series for HySEP methods
                     If aMethod = BFMethods.HySEPFixed OrElse aMethod = BFMethods.HySEPLocMin OrElse aMethod = BFMethods.HySEPSlide Then
                         If lTsMon IsNot Nothing AndAlso lTsMon.Values IsNot Nothing AndAlso lTsMon.numValues > 0 Then
                             Dim lDailyDate(5) As Integer
-                            J2Date(lTsDaily.Dates.Value(0), lDailyDate)
+                            J2Date(lTsDailyBnd.Dates.Value(0), lDailyDate)
                             If lDailyDate(2) <> 1 Then
                                 lTsMon.Value(1) = -99.99
                                 lTsMonDepth.Value(1) = -99.99
@@ -2339,8 +2375,8 @@ Public Module modBaseflowUtil
                         End If
                     End If
                 Else
-                    lTsMon = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
-                    lTsMonSum = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+                    lTsMon = Aggregate(lTsDailyBnd, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+                    lTsMonSum = Aggregate(lTsDailyBnd, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                     lTsMonDepth = lTsMonSum.Clone()
                     For I As Integer = 1 To lTsMonDepth.numValues
                         lTsMonDepth.Value(I) = -99
@@ -2379,8 +2415,8 @@ Public Module modBaseflowUtil
 
                 'Process HySep method's monthly values to set incomplete months value to -99.99
                 If aMethod = BFMethods.HySEPFixed OrElse aMethod = BFMethods.HySEPLocMin OrElse aMethod = BFMethods.HySEPSlide OrElse aMethod = BFMethods.BFIModified OrElse aMethod = BFMethods.BFIStandard Then
-                    Dim lAnalysisStart As Double = lTsDaily.Attributes.GetValue("AnalysisStart", -99)
-                    Dim lAnalysisEnd As Double = lTsDaily.Attributes.GetValue("AnalysisEnd", -99)
+                    Dim lAnalysisStart As Double = lTsDailyBnd.Attributes.GetValue("AnalysisStart", -99)
+                    Dim lAnalysisEnd As Double = lTsDailyBnd.Attributes.GetValue("AnalysisEnd", -99)
                     If lAnalysisStart > 0 AndAlso lAnalysisEnd > 0 AndAlso lAnalysisEnd > lAnalysisStart Then
                         Dim lDateStart(5) As Integer
                         Dim lDateEnd(5) As Integer

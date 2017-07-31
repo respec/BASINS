@@ -309,6 +309,11 @@ Public Class frmUSGSBaseflow
             If pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue(BFInputNames.BFIRecessConst, lK1Day) '"BFIK1Day"
             End If
+            Dim lYearBasis As String = BFInputNames.ReportbyCY '"Calendar"
+            If rdoBFIReportbyWaterYear.Checked Then
+                lYearBasis = BFInputNames.ReportbyWY '"Water"
+            End If
+            Args.SetValue(BFInputNames.Reportby, lYearBasis) '"Reportby"
             If pMethods.Contains(BFMethods.BFIStandard) OrElse pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue(BFInputNames.BFINDayScreen, lNDay) '"BFINDay"
                 'Args.SetValue(BFInputNames.BFIUseSymbol, (chkBFISymbols.Checked)) '"BFIUseSymbol"
