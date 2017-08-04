@@ -202,7 +202,7 @@ Public Module modBaseflowUtil
     ''' </summary>
     ''' <param name="aTsFlowFullRange">The streamflow record at full date range for the batch analysis</param>
     ''' <param name="aBFReportGroup">The atcAttributes that holds all base-flow resulting time series from all methods</param>
-    Public Sub AdjustDatesOfReportingTimeseries(ByVal aTsFlowFullRange As atcTimeseries, ByVal aBFReportGroup As atcDataAttributes)
+    Public Sub AdjustDatesOfReportingTimeseries(ByRef aTsFlowFullRange As atcTimeseries, ByVal aBFReportGroup As atcDataAttributes)
         Dim lTsGroupPart As atcCollection = aBFReportGroup.GetValue("GroupPart", Nothing)
         Dim lTsGroupFixed As atcCollection = aBFReportGroup.GetValue("GroupFixed", Nothing)
         Dim lTsGroupLocMin As atcCollection = aBFReportGroup.GetValue("GroupLocMin", Nothing)
@@ -214,6 +214,7 @@ Public Module modBaseflowUtil
         'lStart = lBFReportGroup.GetValue("AnalysisStart", -99)
         'lEnd = lBFReportGroup.GetValue("AnalysisEnd", -99)
         'lDA = lBFReportGroup.GetValue("Drainage Area", -99)
+        Dim lReporBy As String = aBFReportGroup.GetValue(BFInputNames.Reportby, "Calendar")
 
         'Monthly Template
         'Dim lTsFlowMonthly As atcTimeseries = Aggregate(lTsFlowFullRange, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
@@ -224,18 +225,22 @@ Public Module modBaseflowUtil
         'Dim lTsFlowYearlyDepth As atcTimeseries = Nothing
         'Yearly Template
         If aTsFlowFullRange.numValues > JulianYear Then
-            lTsFlowDailyBnd = SubsetByDateBoundary(aTsFlowFullRange, 1, 1, Nothing)
+            If lReporBy.ToLower() = "water" Then
+                lTsFlowDailyBnd = SubsetByDateBoundary(aTsFlowFullRange, 10, 1, Nothing)
+            Else
+                lTsFlowDailyBnd = SubsetByDateBoundary(aTsFlowFullRange, 1, 1, Nothing)
+            End If
             If lTsFlowDailyBnd Is Nothing OrElse lTsFlowDailyBnd.Values Is Nothing Then Exit Sub
             lTsFlowYearly = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
             If lTsFlowYearly Is Nothing Then Exit Sub
-            If lTsGroupPart IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupPart)
-            If lTsGroupFixed IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupFixed)
-            If lTsGroupLocMin IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupLocMin)
-            If lTsGroupSlide IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupSlide)
-            If lTsGroupBFIStandard IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupBFIStandard)
-            If lTsGroupBFIModified IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupBFIModified)
-            If lTsGroupBFLOW IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupBFLOW)
-            If lTsGroupTwoPRDF IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupTwoPRDF)
+            If lTsGroupPart IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupPart, lReporBy)
+            If lTsGroupFixed IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupFixed, lReporBy)
+            If lTsGroupLocMin IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupLocMin, lReporBy)
+            If lTsGroupSlide IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupSlide, lReporBy)
+            If lTsGroupBFIStandard IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupBFIStandard, lReporBy)
+            If lTsGroupBFIModified IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupBFIModified, lReporBy)
+            If lTsGroupBFLOW IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupBFLOW, lReporBy)
+            If lTsGroupTwoPRDF IsNot Nothing Then AdjustYearlyBFTserDates(lTsFlowYearly, lTsGroupTwoPRDF, lReporBy)
         End If
     End Sub
 
@@ -245,15 +250,33 @@ Public Module modBaseflowUtil
     ''' </summary>
     ''' <param name="aTsFlowYearly"></param>
     ''' <param name="aBFTserGroup"></param>
-    Private Sub AdjustYearlyBFTserDates(ByVal aTsFlowYearly As atcTimeseries, ByVal aBFTserGroup As atcCollection)
+    Private Sub AdjustYearlyBFTserDates(ByVal aTsFlowYearly As atcTimeseries, ByVal aBFTserGroup As atcCollection,
+                                        Optional aReportBy As String = "calendar")
         Dim lCommonStart As Double
         Dim lCommonEnd As Double
         If aBFTserGroup IsNot Nothing AndAlso aBFTserGroup.Count > 0 Then
+            If aBFTserGroup.IndexFromKey("RateYearly") >= 0 AndAlso aBFTserGroup.IndexFromKey("DepthYearly") >= 0 Then
+                If aReportBy.ToLower() = "water" Then
+                    Dim ldailyBF As atcTimeseries = aBFTserGroup.ItemByKey("RateDaily")
+                    Dim ldailyBFWateryear As atcTimeseries = SubsetByDateBoundary(ldailyBF, 10, 1, Nothing)
+                    aBFTserGroup.RemoveByKey("RateYearly")
+                    Dim lTsRateYearly = Aggregate(ldailyBFWateryear, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                    aBFTserGroup.Add("RateYearly", lTsRateYearly)
+                    aBFTserGroup.RemoveByKey("DepthYearly")
+                    Dim lTsDepthYearly = Aggregate(ldailyBFWateryear, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                    Dim lconversion_factor = pUADepth / aTsFlowYearly.Attributes.GetValue("Drainage Area", 1.0)
+                    lTsDepthYearly = lTsDepthYearly * lconversion_factor
+                    aBFTserGroup.Add("DepthYearly", lTsDepthYearly)
+                End If
+            Else
+                Exit Sub
+            End If
             For I As Integer = 0 To aBFTserGroup.Count - 1
                 Dim lTs As atcTimeseries = aBFTserGroup.ItemByIndex(I)
                 If lTs IsNot Nothing AndAlso lTs.Attributes.GetValue("tu") = atcTimeUnit.TUYear Then
                     lCommonStart = aTsFlowYearly.Attributes.GetValue("SJDay")
                     lCommonEnd = aTsFlowYearly.Attributes.GetValue("EJDay")
+
                     If lTs.Attributes.GetValue("SJDay") > lCommonStart Then
                         Dim lTsNewBFYearly As atcTimeseries = NewTimeseries(lCommonStart, lCommonEnd, atcTimeUnit.TUYear, 1, , -99)
                         aBFTserGroup.ItemByIndex(I) = MergeBaseflowTimeseries(lTsNewBFYearly, lTs, False, True)
@@ -466,6 +489,7 @@ Public Module modBaseflowUtil
                 Dim lDF2PMethod = aArgs.GetValue(BFInputNames.TwoParamEstMethod, clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE)
                 .SetValue(BFInputNames.TwoParamEstMethod, lDF2PMethod)
             End If
+            .SetValue(BFInputNames.Reportby, aArgs.GetValue(BFInputNames.Reportby, BFInputNames.ReportbyCY))
         End With
 
         Dim lTsFlowFullRange As atcTimeseries = Nothing
@@ -537,13 +561,13 @@ Public Module modBaseflowUtil
                 End If
                 lNewBFTserGroup.Add(lTs)
                 If lTsFlowFullRange IsNot Nothing Then
-                    Dim lTsBFP As atcTimeseries = lTs / lTsFlowFullRange * 100
+                    Dim lTsBFP As atcTimeseries = CalculateBFP_RO("bfp", lTsFlowFullRange, lTs) 'lTs / lTsFlowFullRange * 100
                     With lTsBFP.Attributes
                         .SetValue("Constituent", "BFPct_Part")
                         .SetValue("Method", BFMethods.PART)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
-                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    Dim lTsRO As atcTimeseries = CalculateBFP_RO("ro", lTsFlowFullRange, lTs) 'lTsFlowFullRange - lTs
                     With lTsRO.Attributes
                         .SetValue("Constituent", "RO_Part")
                         .SetValue("Method", BFMethods.PART)
@@ -569,13 +593,13 @@ Public Module modBaseflowUtil
                 End If
                 lNewBFTserGroup.Add(lTs)
                 If lTsFlowFullRange IsNot Nothing Then
-                    Dim lTsBFP As atcTimeseries = lTs / lTsFlowFullRange * 100
+                    Dim lTsBFP As atcTimeseries = CalculateBFP_RO("bfp", lTsFlowFullRange, lTs) 'lTs / lTsFlowFullRange * 100
                     With lTsBFP.Attributes
                         .SetValue("Constituent", "BFPct_HySEPFixed")
                         .SetValue("Method", BFMethods.HySEPFixed)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
-                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    Dim lTsRO As atcTimeseries = CalculateBFP_RO("ro", lTsFlowFullRange, lTs) 'lTsFlowFullRange - lTs
                     With lTsRO.Attributes
                         .SetValue("Constituent", "RO_HySEPFixed")
                         .SetValue("Method", BFMethods.HySEPFixed)
@@ -601,13 +625,13 @@ Public Module modBaseflowUtil
                 End If
                 lNewBFTserGroup.Add(lTs)
                 If lTsFlowFullRange IsNot Nothing Then
-                    Dim lTsBFP As atcTimeseries = lTs / lTsFlowFullRange * 100
+                    Dim lTsBFP As atcTimeseries = CalculateBFP_RO("bfp", lTsFlowFullRange, lTs) 'lTs / lTsFlowFullRange * 100
                     With lTsBFP.Attributes
                         .SetValue("Constituent", "BFPct_HySEPLocMin")
                         .SetValue("Method", BFMethods.HySEPLocMin)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
-                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    Dim lTsRO As atcTimeseries = CalculateBFP_RO("ro", lTsFlowFullRange, lTs) 'lTsFlowFullRange - lTs
                     With lTsRO.Attributes
                         .SetValue("Constituent", "RO_HySEPLocMin")
                         .SetValue("Method", BFMethods.HySEPLocMin)
@@ -633,13 +657,13 @@ Public Module modBaseflowUtil
                 End If
                 lNewBFTserGroup.Add(lTs)
                 If lTsFlowFullRange IsNot Nothing Then
-                    Dim lTsBFP As atcTimeseries = lTs / lTsFlowFullRange * 100
+                    Dim lTsBFP As atcTimeseries = CalculateBFP_RO("bfp", lTsFlowFullRange, lTs) 'lTs / lTsFlowFullRange * 100
                     With lTsBFP.Attributes
                         .SetValue("Constituent", "BFPct_HySEPSlide")
                         .SetValue("Method", BFMethods.HySEPSlide)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
-                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    Dim lTsRO As atcTimeseries = CalculateBFP_RO("ro", lTsFlowFullRange, lTs) 'lTsFlowFullRange - lTs
                     With lTsRO.Attributes
                         .SetValue("Constituent", "RO_HySEPSlide")
                         .SetValue("Method", BFMethods.HySEPSlide)
@@ -664,13 +688,51 @@ Public Module modBaseflowUtil
                 End If
                 lNewBFTserGroup.Add(lTs)
                 If lTsFlowFullRange IsNot Nothing Then
-                    Dim lTsBFP As atcTimeseries = lTs / lTsFlowFullRange * 100
+                    'Dim lTsFlowSameSpan As atcTimeseries = Nothing
+                    'If lTsFlowFullRange.numValues > lTs.numValues Then
+                    '    lTsFlowSameSpan = SubsetByDate(lTsFlowFullRange, lTs.Dates.Value(0), lTs.Dates.Value(lTs.numValues), Nothing)
+                    'End If
+                    'Dim lTsBFP As atcTimeseries = Nothing
+                    'If lTsFlowSameSpan IsNot Nothing Then
+                    '    Dim lTsBFPSameSpan As atcTimeseries = lTs / lTsFlowSameSpan * 100
+                    '    lTsBFP = lTsFlowFullRange.Clone()
+                    '    For I As Integer = 0 To lTsBFP.numValues
+                    '        lTsBFP.Value(I) = Double.NaN
+                    '    Next
+                    '    'back fill to full date range
+                    '    Dim lStartIndex As Integer = Array.IndexOf(lTsBFP.Dates.Values, lTs.Dates.Value(0))
+                    '    Dim lEndIndex As Integer = Array.IndexOf(lTsBFP.Dates.Values, lTs.Dates.Value(lTs.Dates.numValues - 1))
+                    '    For J As Integer = lStartIndex To lEndIndex
+                    '        lTsBFP.Value(lStartIndex + 1) = lTsBFPSameSpan.Value(J - lStartIndex + 1)
+                    '    Next
+                    'Else
+                    '    lTsBFP = lTs / lTsFlowFullRange * 100
+                    'End If
+
+                    Dim lTsBFP As atcTimeseries = CalculateBFP_RO("bfp", lTsFlowFullRange, lTs)
                     With lTsBFP.Attributes
                         .SetValue("Constituent", "BFPct_BFIStandard")
                         .SetValue("Method", BFMethods.BFIStandard)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
-                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    'Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    'Dim lTsRO As atcTimeseries = Nothing
+                    'If lTsFlowSameSpan IsNot Nothing Then
+                    '    Dim lTsROSameSpan As atcTimeseries = lTsFlowSameSpan - lTs
+                    '    'back fill to full date range
+                    '    lTsRO = lTsFlowFullRange.Clone()
+                    '    For I As Integer = 0 To lTsRO.numValues
+                    '        lTsRO.Value(I) = Double.NaN
+                    '    Next
+                    '    Dim lStartIndex As Integer = Array.IndexOf(lTsRO.Dates.Values, lTs.Dates.Value(0))
+                    '    Dim lEndIndex As Integer = Array.IndexOf(lTsRO.Dates.Values, lTs.Dates.Value(lTs.Dates.numValues - 1))
+                    '    For J As Integer = lStartIndex To lEndIndex
+                    '        lTsRO.Value(lStartIndex + 1) = lTsROSameSpan.Value(J - lStartIndex + 1)
+                    '    Next
+                    'Else
+                    '    lTsRO = lTsFlowFullRange - lTs
+                    'End If
+                    Dim lTsRO As atcTimeseries = CalculateBFP_RO("ro", lTsFlowFullRange, lTs)
                     With lTsRO.Attributes
                         .SetValue("Constituent", "RO_BFIStandard")
                         .SetValue("Method", BFMethods.BFIStandard)
@@ -695,13 +757,14 @@ Public Module modBaseflowUtil
                 End If
                 lNewBFTserGroup.Add(lTs)
                 If lTsFlowFullRange IsNot Nothing Then
-                    Dim lTsBFP As atcTimeseries = lTs / lTsFlowFullRange * 100
+                    Dim lTsBFP As atcTimeseries = CalculateBFP_RO("bfp", lTsFlowFullRange, lTs)
                     With lTsBFP.Attributes
                         .SetValue("Constituent", "BFPct_BFIModified")
                         .SetValue("Method", BFMethods.BFIModified)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
-                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+
+                    Dim lTsRO As atcTimeseries = CalculateBFP_RO("ro", lTsFlowFullRange, lTs)
                     With lTsRO.Attributes
                         .SetValue("Constituent", "RO_BFIModified")
                         .SetValue("Method", BFMethods.BFIModified)
@@ -727,13 +790,13 @@ Public Module modBaseflowUtil
                 End If
                 lNewBFTserGroup.Add(lTs)
                 If lTsFlowFullRange IsNot Nothing Then
-                    Dim lTsBFP As atcTimeseries = lTs / lTsFlowFullRange * 100
+                    Dim lTsBFP As atcTimeseries = CalculateBFP_RO("bfp", lTsFlowFullRange, lTs) 'lTs / lTsFlowFullRange * 100
                     With lTsBFP.Attributes
                         .SetValue("Constituent", "BFPct_BFLOW")
                         .SetValue("Method", BFMethods.BFLOW)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
-                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    Dim lTsRO As atcTimeseries = CalculateBFP_RO("ro", lTsFlowFullRange, lTs) 'lTsFlowFullRange - lTs
                     With lTsRO.Attributes
                         .SetValue("Constituent", "RO_BFLOW")
                         .SetValue("Method", BFMethods.BFLOW)
@@ -759,13 +822,13 @@ Public Module modBaseflowUtil
                 End If
                 lNewBFTserGroup.Add(lTs)
                 If lTsFlowFullRange IsNot Nothing Then
-                    Dim lTsBFP As atcTimeseries = lTs / lTsFlowFullRange * 100
+                    Dim lTsBFP As atcTimeseries = CalculateBFP_RO("bfp", lTsFlowFullRange, lTs) 'lTs / lTsFlowFullRange * 100
                     With lTsBFP.Attributes
                         .SetValue("Constituent", "BFPct_TwoPRDF")
                         .SetValue("Method", BFMethods.TwoPRDF)
                     End With
                     lNewBFTserGroup.Add(lTsBFP)
-                    Dim lTsRO As atcTimeseries = lTsFlowFullRange - lTs
+                    Dim lTsRO As atcTimeseries = CalculateBFP_RO("ro", lTsFlowFullRange, lTs) 'lTsFlowFullRange - lTs
                     With lTsRO.Attributes
                         .SetValue("Constituent", "RO_TwoPRDF")
                         .SetValue("Method", BFMethods.TwoPRDF)
@@ -810,6 +873,50 @@ Public Module modBaseflowUtil
 
         Logger.Status("Hide")
     End Sub '}
+
+    ''' <summary>
+    ''' A convenient function for calculating BFP and RO from streamflow and base-flow
+    ''' </summary>
+    ''' <param name="aOpn">type of operation, either 'bfp' (base-flow %) or 'ro' (runoff)</param>
+    ''' <param name="aTsFlowFullRange">streamflow of full date range</param>
+    ''' <param name="aTs">base-flow timeseries as estimated by a method</param>
+    ''' <returns></returns>
+    Private Function CalculateBFP_RO(ByVal aOpn As String, ByVal aTsFlowFullRange As atcTimeseries, ByVal aTs As atcTimeseries) As atcTimeseries
+        If aTsFlowFullRange Is Nothing OrElse aTs Is Nothing Then
+            Return Nothing
+        End If
+        Dim lTsFlowSameSpan As atcTimeseries = Nothing
+        If aTsFlowFullRange.numValues > aTs.numValues Then
+            lTsFlowSameSpan = SubsetByDate(aTsFlowFullRange, aTs.Dates.Value(0), aTs.Dates.Value(aTs.numValues), Nothing)
+        End If
+        Dim lTsResult As atcTimeseries = Nothing
+        If lTsFlowSameSpan IsNot Nothing Then
+            Dim lTsResultSameSpan As atcTimeseries = Nothing
+            If aOpn = "bfp" Then
+                lTsResultSameSpan = aTs / lTsFlowSameSpan * 100
+            ElseIf aOpn = "ro" Then
+                lTsResultSameSpan = lTsFlowSameSpan - aTs
+            End If
+            lTsResult = aTsFlowFullRange.Clone()
+            For I As Integer = 0 To lTsResult.numValues
+                lTsResult.Value(I) = Double.NaN
+            Next
+            'back fill to full date range
+            Dim lStartIndex As Integer = Array.IndexOf(lTsResult.Dates.Values, aTs.Dates.Value(0))
+            Dim lEndIndex As Integer = Array.IndexOf(lTsResult.Dates.Values, aTs.Dates.Value(aTs.Dates.numValues - 1))
+            For J As Integer = lStartIndex To lEndIndex
+                lTsResult.Value(lStartIndex + 1) = lTsResultSameSpan.Value(J - lStartIndex + 1)
+            Next
+        Else
+            'the streamflow and baseflow time series are of equal length
+            If aOpn = "bfp" Then
+                lTsResult = aTs / aTsFlowFullRange * 100
+            ElseIf aOpn = "ro" Then
+                lTsResult = aTsFlowFullRange - aTs
+            End If
+        End If
+        Return lTsResult
+    End Function
 
     '{
     ''' <summary>
@@ -1343,9 +1450,15 @@ Public Module modBaseflowUtil
                                           lTsGroupBFIModified,
                                           lTsGroupBFLOW,
                                           lTsGroupTwoPRDF,
-                                          "Yearly")
+                                          "Yearly",
+                                          lReportBy)
         lTableHeader.CurrentRecord = 3
         lTableHeader.Value(1) = "Year"
+        If Not String.IsNullOrEmpty(lReportBy) AndAlso lReportBy.ToLower() = "water" Then
+            lTableHeader.Value(2) = "Water Year"
+        Else
+            lTableHeader.Value(2) = "Calendar Year"
+        End If
         lSW = New IO.StreamWriter(lFileYearlySum, False)
         If Not String.IsNullOrEmpty(lReportBy) AndAlso lReportBy.ToLower() = "water" Then
             lTitleLine1 = "Groundwater Toolbox annual output for hydrograph separation (water year October 1-September 30)"
@@ -1841,7 +1954,8 @@ Public Module modBaseflowUtil
                                  ByVal aTsGroupBFIModified As atcCollection,
                                  ByVal aTsGroupBFLOW As atcCollection,
                                  ByVal aTsGroupTwoPRDF As atcCollection,
-                                 ByVal ATStep As String) As atcTableDelimited
+                                 ByVal ATStep As String,
+                                 Optional aReportBy As String = "calendar") As atcTableDelimited
         'set up table
         Dim lNumColumnsPerMethod As Integer = 6
         Dim lNumColumns As Integer = 4 + MethodsLastDone.Count * lNumColumnsPerMethod
@@ -1867,11 +1981,30 @@ Public Module modBaseflowUtil
             lFlowStartDate = lTsFlow.Dates.Value(0)
             lFlowEndDate = lTsFlow.Dates.Value(lTsFlow.numValues)
         End If
+        Dim lDA As Double = lTsFlow.Attributes.GetValue("Drainage Area", -1.0)
         If aTsGroupBFIStandard.Count > 0 Then
-            AdjustDates(aTsGroupBFIStandard, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate)
+            AdjustDates(aTsGroupBFIStandard, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate, lDA)
         End If
         If aTsGroupBFIModified.Count > 0 Then
-            AdjustDates(aTsGroupBFIModified, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate)
+            AdjustDates(aTsGroupBFIModified, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate, lDA)
+        End If
+        If aTsGroupPart.Count > 0 Then
+            AdjustDates(aTsGroupPart, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate, lDA)
+        End If
+        If aTsGroupFixed.Count > 0 Then
+            AdjustDates(aTsGroupFixed, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate, lDA)
+        End If
+        If aTsGroupSlide.Count > 0 Then
+            AdjustDates(aTsGroupSlide, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate, lDA)
+        End If
+        If aTsGroupLocMin.Count > 0 Then
+            AdjustDates(aTsGroupLocMin, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate, lDA)
+        End If
+        If aTsGroupBFLOW.Count > 0 Then
+            AdjustDates(aTsGroupBFLOW, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate, lDA)
+        End If
+        If aTsGroupTwoPRDF.Count > 0 Then
+            AdjustDates(aTsGroupTwoPRDF, lTsFlow, ATStep, lFlowStartDate, lFlowEndDate, lDA)
         End If
         If lTsFlow Is Nothing Then
             Return lTableBody
@@ -1896,7 +2029,12 @@ Public Module modBaseflowUtil
                 Select Case ATStep
                     Case "Daily" : .Value(2) = lDate(0) & "-" & lDate(1).ToString.PadLeft(2, "0") & "-" & lDate(2).ToString.PadLeft(2, "0")
                     Case "Monthly" : .Value(2) = lDate(1).ToString.PadLeft(2, "0") & "-" & lDate(0)
-                    Case "Yearly" : .Value(2) = lDate(0)
+                    Case "Yearly"
+                        If Not String.IsNullOrEmpty(aReportBy) AndAlso aReportBy.ToLower() = "water" Then
+                            .Value(2) = lDate(0) + 1
+                        Else
+                            .Value(2) = lDate(0)
+                        End If
                     Case Else : .Value(2) = lDate(0) & "-" & lDate(1) & "-" & lDate(2)
                 End Select
 
@@ -2166,14 +2304,35 @@ Public Module modBaseflowUtil
     ''' <param name="aFlowStartDate">Start date of the streamflow Tser</param>
     ''' <param name="aFlowEndDate">End date of the streamflow Tser</param>
     ''' <remarks></remarks>
-    Private Sub AdjustDates(ByRef aTsGroupPerMethod As atcCollection, ByVal aTsFlow As atcTimeseries, ByVal aTStep As String, ByVal aFlowStartDate As Double, ByVal aFlowEndDate As Double)
+    Private Sub AdjustDates(ByRef aTsGroupPerMethod As atcCollection, ByVal aTsFlow As atcTimeseries, ByVal aTStep As String, ByVal aFlowStartDate As Double, ByVal aFlowEndDate As Double, ByVal aDA As Double)
         Dim lTsBFTemp As atcTimeseries = aTsGroupPerMethod.ItemByKey("Rate" & aTStep)
         Dim lTsBFDepthTemp As atcTimeseries = aTsGroupPerMethod.ItemByKey("Depth" & aTStep)
         If lTsBFTemp IsNot Nothing AndAlso (lTsBFTemp.Dates.Value(0) <> aFlowStartDate OrElse lTsBFTemp.Dates.Value(lTsBFTemp.numValues) <> aFlowEndDate) Then
-            aTsGroupPerMethod.ItemByKey("Rate" & aTStep) = SubsetByDate(lTsBFTemp, aFlowStartDate, aFlowEndDate, Nothing)
+            If aTStep.ToLower() = "yearly" Then
+                Dim lTsDaily As atcTimeseries = aTsGroupPerMethod.ItemByKey("RateDaily")
+                Dim lTsDailySubset As atcTimeseries = SubsetByDate(lTsDaily, aFlowStartDate, aFlowEndDate, Nothing)
+                aTsGroupPerMethod.ItemByKey("Rate" & aTStep) = Aggregate(lTsDailySubset, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                Dim lTsDailySubsetSumDiv As atcTimeseries = Aggregate(lTsDailySubset, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                Dim lCF As Double = 1.0
+                If aDA > 0 Then
+                    lCF = pUADepth / aDA
+                Else
+                    aDA = lTsDaily.Attributes.GetValue("Drainage Area", -1.0)
+                    If aDA > 0 Then
+                        lCF = pUADepth / aDA
+                    Else
+                        lCF = 1.0
+                    End If
+                End If
+                aTsGroupPerMethod.ItemByKey("Depth" & aTStep) = lTsDailySubsetSumDiv * lCF
+                lTsDailySubset.Clear()
+                lTsDailySubset = Nothing
+            Else
+                aTsGroupPerMethod.ItemByKey("Rate" & aTStep) = SubsetByDate(lTsBFTemp, aFlowStartDate, aFlowEndDate, Nothing)
+                aTsGroupPerMethod.ItemByKey("Depth" & aTStep) = SubsetByDate(lTsBFDepthTemp, aFlowStartDate, aFlowEndDate, Nothing)
+            End If
         End If
         If lTsBFDepthTemp IsNot Nothing AndAlso (lTsBFDepthTemp.Dates.Value(0) <> aFlowStartDate OrElse lTsBFDepthTemp.Dates.Value(lTsBFDepthTemp.numValues) <> aFlowEndDate) Then
-            aTsGroupPerMethod.ItemByKey("Depth" & aTStep) = SubsetByDate(lTsBFDepthTemp, aFlowStartDate, aFlowEndDate, Nothing)
         End If
         'If lTsBFTemp.Dates.Value(0) <> aFlowStartDate OrElse lTsBFTemp.Dates.Value(lTsBFTemp.numValues) <> aFlowEndDate Then
         '    Dim lTsG As New atcTimeseriesGroup()

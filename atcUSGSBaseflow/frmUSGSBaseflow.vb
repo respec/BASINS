@@ -1547,4 +1547,9 @@ Public Class frmUSGSBaseflow
             pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
         End If
     End Sub
+
+    Private Sub rdoReportby_CheckedChanged(sender As Object, e As EventArgs) Handles rdoBFIReportbyCalendarYear.CheckedChanged,
+                                                                                     rdoBFIReportbyWaterYear.CheckedChanged
+        pDidBFSeparation = False
+    End Sub
 End Class
