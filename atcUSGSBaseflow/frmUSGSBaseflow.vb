@@ -395,6 +395,15 @@ Public Class frmUSGSBaseflow
         If IsDateValid(lArr) Then
             If pAnalysisOverCommonDuration Then
                 pCommonStart = Date2J(lYear, lMonth, lDay)
+                If lMonth = 10 And lDay = 1 Then
+                    If Not rdoBFIReportbyWaterYear.Checked Then
+                        Dim lAskUser As String =
+            Logger.MsgCustomOwned("Report by water year?", "Start Date", Me, New String() {"Yes", "No"})
+                        If lAskUser = "Yes" Then
+                            rdoBFIReportbyWaterYear.Checked = True
+                        End If
+                    End If
+                End If
             End If
         Else
             Return -99.0
