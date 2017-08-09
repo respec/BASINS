@@ -1,3 +1,22 @@
+Dated 7/24/2017
+HSPEXP+1.40beta3
+Features:
+1. Outputs are now in 4 decimal places.
+2. 99.9 and 98 percentile values were missing and have been added.
+
+Dated 7/22/2017
+HSPEXP+1.40beta2
+Features:
+1. Exceedance levels are also output.
+2. A bug was fixed for when a simulation doesn't complete, no output is reported.
+
+
+Dated: 7/19/2017
+HSPEXP+1.40beta1
+Features:
+1. HSPEXP+ doesn't report the output when runs do not complete.
+2. HSPEXP+ may also display number of simulations complete.
+
 Dated: 6/1/2017
 HSPEXP+1.40beta
 Features:

@@ -309,6 +309,11 @@ Public Class frmUSGSBaseflow
             If pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue(BFInputNames.BFIRecessConst, lK1Day) '"BFIK1Day"
             End If
+            Dim lYearBasis As String = BFInputNames.ReportbyCY '"Calendar"
+            If rdoBFIReportbyWaterYear.Checked Then
+                lYearBasis = BFInputNames.ReportbyWY '"Water"
+            End If
+            Args.SetValue(BFInputNames.Reportby, lYearBasis) '"Reportby"
             If pMethods.Contains(BFMethods.BFIStandard) OrElse pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue(BFInputNames.BFINDayScreen, lNDay) '"BFINDay"
                 'Args.SetValue(BFInputNames.BFIUseSymbol, (chkBFISymbols.Checked)) '"BFIUseSymbol"
@@ -390,6 +395,15 @@ Public Class frmUSGSBaseflow
         If IsDateValid(lArr) Then
             If pAnalysisOverCommonDuration Then
                 pCommonStart = Date2J(lYear, lMonth, lDay)
+                If lMonth = 10 And lDay = 1 Then
+                    If Not rdoBFIReportbyWaterYear.Checked Then
+                        Dim lAskUser As String =
+            Logger.MsgCustomOwned("Report by water year?", "Start Date", Me, New String() {"Yes", "No"})
+                        If lAskUser = "Yes" Then
+                            rdoBFIReportbyWaterYear.Checked = True
+                        End If
+                    End If
+                End If
             End If
         Else
             Return -99.0
@@ -1541,5 +1555,10 @@ Public Class frmUSGSBaseflow
             txtDFParamBFImax.Enabled = False
             pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
         End If
+    End Sub
+
+    Private Sub rdoReportby_CheckedChanged(sender As Object, e As EventArgs) Handles rdoBFIReportbyCalendarYear.CheckedChanged,
+                                                                                     rdoBFIReportbyWaterYear.CheckedChanged
+        pDidBFSeparation = False
     End Sub
 End Class

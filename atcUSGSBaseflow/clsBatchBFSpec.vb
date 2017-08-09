@@ -10,9 +10,11 @@ Public Class BFBatchInputNames
     'Public Shared ENDDATE As String = "EndDate"
     Public Shared BFMethod As String = "BFMethod"
     'Public Shared BFMethods As String = "BFMethods"
-    'Public Shared ReportBy As String = "ReportBy"
+    Public Shared ReportBy As String = "ReportBy"
     Public Shared ReportByCY As String = "CY"
     Public Shared ReportByWY As String = "WY"
+    Public Shared ReportByCalendar As String = "Calendar"
+    Public Shared ReportByWater As String = "Water"
     'Public Shared BFI_NDayScreen As String = "BFI_NDayScreen"
     'Public Shared BFI_TurnPtFrac As String = "BFI_TurnPtFrac"
     'Public Shared BFI_RecessConst As String = "BFI_RecessConst"
@@ -333,6 +335,13 @@ Public Class clsBatchBFSpec
                 ElseIf lReportBySpec = BFBatchInputNames.ReportByCY Then
                     GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.BFIReportby, atcTimeseriesBaseflow.BFInputNames.BFIReportbyCY)
                 End If
+            Case atcTimeseriesBaseflow.BFInputNames.Reportby.ToLower
+                Dim lReportBySpec As String = lArr(1).Trim().ToUpper()
+                If lReportBySpec = BFBatchInputNames.ReportByWater.ToUpper() Then
+                    GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.Reportby, atcTimeseriesBaseflow.BFInputNames.ReportbyWY)
+                ElseIf lReportBySpec = BFBatchInputNames.ReportByCalendar.ToUpper() Then
+                    GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.Reportby, atcTimeseriesBaseflow.BFInputNames.ReportbyCY)
+                End If
             Case Else
                 GlobalSettings.Add(lArr(0), lArr(1))
         End Select
@@ -466,6 +475,17 @@ Public Class clsBatchBFSpec
                 ElseIf lReportBySpec = BFBatchInputNames.ReportByCY Then
                     For Each lStation As clsBatchUnitStation In lListBatchUnits
                         lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.BFIReportby, atcTimeseriesBaseflow.BFInputNames.BFIReportbyCY)
+                    Next
+                End If
+            Case atcTimeseriesBaseflow.BFInputNames.Reportby.ToLower
+                Dim lReportBySpec As String = lArr(1).Trim().ToUpper()
+                If lReportBySpec = BFBatchInputNames.ReportByWater.ToUpper() Then
+                    For Each lStation As clsBatchUnitStation In lListBatchUnits
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.Reportby, atcTimeseriesBaseflow.BFInputNames.ReportbyWY)
+                    Next
+                ElseIf lReportBySpec = BFBatchInputNames.ReportByCalendar.ToUpper() Then
+                    For Each lStation As clsBatchUnitStation In lListBatchUnits
+                        lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.Reportby, atcTimeseriesBaseflow.BFInputNames.ReportbyCY)
                     Next
                 End If
             Case atcTimeseriesBaseflow.BFInputNames.BFINDayScreen.ToLower
@@ -990,6 +1010,7 @@ Public Class clsBatchBFSpec
                                 .SetValue("ReportGroupsAvailable", True)
                                 .SetValue("ReportFileSuffix", "fullspan")
                                 .SetValue("ForFullSpan", True)
+                                .SetValue(BFBatchInputNames.ReportBy, lStation.BFInputs.GetValue(BFBatchInputNames.ReportBy, "calendar"))
 
                                 'passing in parameter information for common ascii report generation
                                 .SetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods, lMethods)

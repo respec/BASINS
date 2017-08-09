@@ -17,6 +17,9 @@ Public Class BFInputNames
     Public Shared BFIReportby As String = "BFI_Reportby"
     Public Shared BFIReportbyCY As String = "Calendar"
     Public Shared BFIReportbyWY As String = "Water"
+    Public Shared Reportby As String = "Reportby"
+    Public Shared ReportbyCY As String = "Calendar"
+    Public Shared ReportbyWY As String = "Water"
     Public Shared BFLOWFilter As String = "BFLOWFilter"
     Public Shared TwoPRDFRC As String = "TwoPRDF_RC"
     Public Shared TwoPRDFBFImax As String = "TwoPRDF_BFImax"
@@ -497,6 +500,7 @@ Public Class atcTimeseriesBaseflow
         Dim lDFRC As Double = Double.NaN
         Dim lDFBFImax As Double = Double.NaN
         Dim lTwoDFParamEstMethod As clsBaseflow2PRDF.ETWOPARAMESTIMATION = clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE
+        Dim lReportBy As String = "Calendar"
 
         Dim lAttributeDef As atcAttributeDefinition = Nothing
 
@@ -517,6 +521,7 @@ Public Class atcTimeseriesBaseflow
             lMethod = aArgs.GetValue("Method")
             lMethods = aArgs.GetValue(BFInputNames.BFMethods)
             lDrainageArea = aArgs.GetValue(BFInputNames.DrainageArea)
+            lReportBy = aArgs.GetValue(BFInputNames.Reportby)
             'If lMethods.Contains(BFMethods.HySEPFixed) OrElse _
             '   lMethods.Contains(BFMethods.HySEPLocMin) OrElse _
             '   lMethods.Contains(BFMethods.HySEPSlide) OrElse _
@@ -633,6 +638,7 @@ Public Class atcTimeseriesBaseflow
                 Else
                     .UnitFlag = 2
                 End If
+                .ReportBy = lReportBy
             End With
             lBFDatagroup = ClsBaseFlow.DoBaseFlowSeparation()
             If lBFDatagroup IsNot Nothing AndAlso lBFDatagroup.Count > 0 Then

@@ -118,8 +118,18 @@ Module HSPFOutputReports
                 SDateJ = StartUp.DateTimePicker1.Value.ToOADate()
                 EDateJ = StartUp.DateTimePicker2.Value.ToOADate() + 1
 
+                Dim lEchoFileisinFilesBlock As Boolean = False
+                Dim lHspfEchoFileName As String = pTestPath & "hspfecho.out" 'Get the default name of echo file
+                Dim echoFileInfo As System.IO.FileInfo
+                For i As Integer = 0 To aHspfUci.FilesBlock.Count
+                    If aHspfUci.FilesBlock.Value(i).Typ = "MESSU" Then
+                        lHspfEchoFileName = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir()) 'Update echo file name if it is referenced in the Files block
+                        Exit For
+                    End If
+                Next
+
                 If pSensitivity Then
-                    SensitivityAnalysis(pHSPFExe, pBaseName, pTestPath, SDateJ, EDateJ)
+                    SensitivityAnalysis(pHSPFExe, pBaseName, pTestPath, SDateJ, EDateJ, lHspfEchoFileName)
                     Logger.Msg("Sensitivity/Uncertainty Analysis Complete", vbOKOnly)
                     OpenFile(pTestPath)
                     End
@@ -157,36 +167,14 @@ Module HSPFOutputReports
                 Dim lStr As String = ""
                 Dim lRunMade As String = ""
 
-                Dim lEchoFileisinFilesBlock As Boolean = False
-                Dim lHspfEchoFileName As String = ""
-                Dim echoFileInfo As System.IO.FileInfo
-                For i As Integer = 0 To aHspfUci.FilesBlock.Count
-                    If aHspfUci.FilesBlock.Value(i).Typ = "MESSU" Then
-                        lHspfEchoFileName = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir()) 'Should check if the echo file is present
-                        If IO.File.Exists(lHspfEchoFileName) Then
-                            echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
-                            lRunMade = echoFileInfo.LastWriteTime.ToString
-                            lEchoFileisinFilesBlock = True
-                        Else
-                            Logger.Msg("The ECHO file is not available for this model. Please check if model ran successfully last time", vbCritical)
-                            End
-                            Return
-                        End If
-                        Exit For
-                    End If
-                Next
-                If Not lEchoFileisinFilesBlock Then
-                    lHspfEchoFileName = pTestPath & "hspfecho.out"
-                    If IO.File.Exists(lHspfEchoFileName) Then
-                        echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
-                        lRunMade = echoFileInfo.LastWriteTime.ToString
-                        lEchoFileisinFilesBlock = True
-                    Else
-                        Logger.Msg("The ECHO file is not available for this model. Please check if model ran successfully last time", vbCritical)
-                        Return
-                    End If
+                If IO.File.Exists(lHspfEchoFileName) Then
+                    echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
+                    lRunMade = echoFileInfo.LastWriteTime.ToString
+                Else
+                    Logger.Msg("The ECHO file is not available for this model. Please check if model ran successfully last time", vbCritical)
+                    End
+                    Return
                 End If
-
 
 
                 Dim HSPFRan As Boolean = False
