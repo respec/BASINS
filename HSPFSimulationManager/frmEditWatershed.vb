@@ -97,8 +97,11 @@ Public Class frmEditWatershed
         'do connection check to see if this newly added UCI is connected to the downstream UCI
         Dim lUCIs As New atcCollection
         lUCIs.Add(pIcon.UciFile)
-        Dim lDownIcon As clsIcon = Schematic.AllIcons.FindOrAddIcon(cboDownstream.SelectedItem.Trim)
-        If lDownIcon IsNot Nothing Then
+        Dim lDownIcon As clsIcon = Nothing
+        If cboDownstream.SelectedItem.Trim <> "None" Then
+            lDownIcon = Schematic.AllIcons.FindOrAddIcon(cboDownstream.SelectedItem.Trim)
+        End If
+        If lDownIcon IsNot Nothing AndAlso lDownIcon.UciFile IsNot Nothing Then
             lUCIs.Add(lDownIcon.UciFile)
         End If
         If lUCIs.Count = 2 Then
