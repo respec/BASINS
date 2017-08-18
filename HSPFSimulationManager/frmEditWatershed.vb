@@ -86,6 +86,7 @@ Public Class frmEditWatershed
     End Sub
 
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
+        Logger.Dbg("frmEditWatershed_clicked_ok")
         Try
             Schematic.AllIcons.Remove(pIcon)
         Catch
@@ -93,6 +94,7 @@ Public Class frmEditWatershed
         pIcon = Me.ModelIcon 'Apply changes to icon
         Schematic.AllIcons.Add(pIcon)
         Schematic.BuildTree(Schematic.AllIcons)
+        Logger.Dbg("finished BuildTree after frmEditWatershed_clicked_ok")
 
         'do connection check to see if this newly added UCI is connected to the downstream UCI
         Dim lUCIs As New atcCollection
@@ -103,21 +105,26 @@ Public Class frmEditWatershed
         End If
         If lDownIcon IsNot Nothing AndAlso lDownIcon.UciFile IsNot Nothing Then
             lUCIs.Add(lDownIcon.UciFile)
+            Logger.Dbg("frmEditWatershed_clicked_ok added icon: " & lDownIcon.UciFileName)
+            Logger.Dbg("frmEditWatershed_clicked_ok added icon name: " & lDownIcon.UciFile.Name)
         End If
         If lUCIs.Count = 2 Then
             'return blank if models are not connected
             'return name of transfer wdm if models are connected using a single transfer wdm
             'return 'MULTIPLE' if models are connected but connections use multiple wdms 
             Dim lTransferWDM As String = UsesTransfer(lUCIs)
+            Logger.Dbg("frmEditWatershed_clicked_ok transfer wdm: " & lTransferWDM)
             If lTransferWDM.Length = 0 Then
                 'these models are not connected, ask about connecting them
                 If Logger.Msg("This UCI has no connection to a downstream UCI." & vbCrLf & vbCrLf &
                            "Do you want to modify this UCI and the downstream UCI so that they connect?",
                               MsgBoxStyle.YesNo, "Add Connection?") = MsgBoxResult.Yes Then
                     'new form here for entering reach IDs and transfer WDM name
+                    Logger.Dbg("frmEditWatershed_clicked_ok about to show AddConnectionForm")
                     Dim lAddConnectionForm As New frmAddConnection
                     lAddConnectionForm.SetUCIs(pIcon.UciFile, lDownIcon.UciFile)
                     lAddConnectionForm.ShowDialog()
+                    Logger.Dbg("frmEditWatershed_clicked_ok finished AddConnectionForm")
                 End If
             End If
         End If
@@ -138,6 +145,7 @@ Public Class frmEditWatershed
     Private Sub btnAddScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAddScenario.Click
         Dim lFileName As String = String.Empty
         If frmHspfSimulationManager.BrowseOpen("Open UCI File", "UCI Files|*.uci|All Files|*.*", ".uci", Me, lFileName) Then
+            'do more checking here?
             AddNewScenario(lFileName)
         End If
     End Sub
@@ -164,6 +172,7 @@ Public Class frmEditWatershed
         Me.Enabled = False
         Me.Cursor = Cursors.WaitCursor
         Dim lReport As String = g_AppNameLong & " Connection Report" & vbCrLf & vbCrLf & txtName.Text & ": "
+        Logger.Dbg("frmEditWatershed_ConnectionReport starting")
         If lstScenarios.SelectedItem Is Nothing Then
             lReport &= "No Scenario"
         Else
@@ -171,6 +180,7 @@ Public Class frmEditWatershed
             Dim lNewDownstreamIcon As clsIcon = CurrentlySelectedDownstreamIcon()
 
             Dim lUciFileName As String = lstScenarios.SelectedItem.UciFileName
+            Logger.Dbg("frmEditWatershed_ConnectionReport  lUciFileName: " & lUciFileName)
 
             Dim lUpstreamUCI As atcUCI.HspfUci = Nothing
             If lUciFileName.ToLower.Equals(pIcon.UciFileName.ToLower) Then
@@ -190,6 +200,9 @@ Public Class frmEditWatershed
                 Else
                     lReport &= "To: " & lNewDownstreamIcon.WatershedName & ", " & lNewDownstreamIcon.Scenario.ScenarioName & vbCrLf & vbCrLf
 
+                    Logger.Dbg("frmEditWatershed_ConnectionReport  about to write: ")
+                    Logger.Dbg("frmEditWatershed_ConnectionReport  about to write: upstream: " & lUpstreamUCI.Name)
+                    Logger.Dbg("frmEditWatershed_ConnectionReport  about to write: upstream: " & lDownstreamUCI.Name)
                     lReport &= ConnectionReport(lUpstreamUCI, lDownstreamUCI)
                 End If
             End If
@@ -204,6 +217,7 @@ Public Class frmEditWatershed
         End If
         Me.Cursor = Cursors.Default
         Me.Enabled = True
+        Logger.Dbg("frmEditWatershed_ConnectionReport finished")
     End Sub
 
     Private Sub AddNewScenario(aUciFileName As String)

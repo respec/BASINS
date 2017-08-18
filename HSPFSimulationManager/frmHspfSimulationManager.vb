@@ -178,6 +178,7 @@ Public Class frmHspfSimulationManager
     End Sub
 
     Private Sub AddWatershedToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddWatershedToolStripMenuItem.Click
+        Logger.Dbg("AddWatershedToolStripMenuItem_Click")
         Dim lWatershedForm As New frmEditWatershed
         lWatershedForm.Schematic = SchematicDiagram
         Dim lWatershedName As String = "New Watershed"
@@ -197,10 +198,13 @@ Public Class frmHspfSimulationManager
             lWatershedForm.ModelIcon.Left = (SchematicDiagram.Width - SchematicDiagram.IconWidth) / 2 + lRandom.Next(SchematicDiagram.Width / 3)
             lWatershedForm.ModelIcon.Top = (SchematicDiagram.Height - SchematicDiagram.IconHeight) / 2 + lRandom.Next(SchematicDiagram.Height / 3)
         End If
+        Logger.Dbg("AddWatershedToolStripMenuItem_Click:About to show dialog")
         lWatershedForm.ShowDialog(Me)
+        Logger.Dbg("AddWatershedToolStripMenuItem_Click:After show dialog")
 
         'also do transfer wdm check here
         TransferWDMCheck()
+        Logger.Dbg("Finished AddWatershedToolStripMenuItem_Click")
 
     End Sub
 
@@ -271,14 +275,21 @@ Public Class frmHspfSimulationManager
         Me.Enabled = False
         Me.Cursor = Cursors.WaitCursor
         Dim lReport As String = g_AppNameLong & " Connection Report" & vbCrLf
+        Logger.Dbg("Beginning Connection Report")
 
         Dim lUCIs As New atcCollection
         For Each lIcon As clsIcon In SchematicDiagram.AllIcons
             If lIcon.Scenario IsNot Nothing Then
-                lUCIs.Add(lIcon.UciFile)
+                If lIcon.UciFile IsNot Nothing Then
+                    Logger.Dbg("Connection Report:Adding UCI:" & lIcon.UciFileName)
+                    lUCIs.Add(lIcon.UciFile)
+                    Logger.Dbg("Connection Report:Added UCI:" & lIcon.UciFile.Name)
+                End If
             End If
         Next
+        Logger.Dbg("Connection Report:Finished Adding UCIs")
         Dim lTransferWDM As String = UsesTransfer(lUCIs)
+        Logger.Dbg("Connection Report:Transfer WDM:" & lTransferWDM)
         lReport &= vbCrLf & "Transfer WDM Used: " & lTransferWDM & vbCrLf
 
         Dim lIconIndex As Integer = 0
@@ -293,16 +304,21 @@ Public Class frmHspfSimulationManager
                 Dim lUpstreamUCI As atcUCI.HspfUci = lIcon.UciFile
                 Dim lDownstreamIcon As clsIcon = lIcon.DownstreamIcon
                 If lUpstreamUCI Is Nothing Then
+                    Logger.Dbg("Connection Report:Upstream UCI file not found: " & lIcon.UciFileName)
                     lReport &= "UCI file not found: " & lIcon.UciFileName & vbCrLf
                 ElseIf lDownstreamIcon Is Nothing Then
+                    Logger.Dbg("Connection Report:No downstream watershed specified")
                     lReport &= "No downstream watershed specified" & vbCrLf
                 Else
                     Dim lDownstreamUCI As atcUCI.HspfUci = lDownstreamIcon.UciFile
                     If lDownstreamUCI Is Nothing Then
+                        Logger.Dbg("Connection Report:Downstream UCI file not found: " & lDownstreamIcon.UciFileName)
                         lReport &= "Downstream UCI file not found: " & lDownstreamIcon.UciFileName & vbCrLf
                     Else
                         lReport &= "To: " & lDownstreamIcon.WatershedName & ", " & lDownstreamIcon.Scenario.ScenarioName & vbCrLf & vbCrLf
+                        Logger.Dbg("Connection Report:About to create:" & lUpstreamUCI.Name & ":" & lDownstreamUCI.Name)
                         lReport &= ConnectionReport(lUpstreamUCI, lDownstreamUCI)
+                        Logger.Dbg("Connection Report:Created report for:" & lUpstreamUCI.Name & ":" & lDownstreamUCI.Name)
                         'lReport &= "Upstream UCI file: " & vbCrLf & lIcon.UciFileName & vbCrLf & vbCrLf & "Downstream UCI file:" & vbCrLf & lDownstreamIcon.UciFileName & vbCrLf & vbCrLf
                         'Dim lConnCheck As List(Of String) = modUCI.ConnectionSummary(lUpstreamUCI, lDownstreamUCI)
                         'If lConnCheck Is Nothing OrElse lConnCheck.Count = 0 Then
@@ -332,7 +348,9 @@ Public Class frmHspfSimulationManager
             lText.Icon = Me.Icon
             lText.Text = g_AppNameLong & " Connection Report"
             lText.txtMain.Text = lReport
+            Logger.Dbg("Connection Report:Ready to Show")
             lText.Show()
+            Logger.Dbg("Connection Report:Finished Showing")
         End If
         Me.Cursor = Cursors.Default
         Me.Enabled = True
@@ -340,17 +358,23 @@ Public Class frmHspfSimulationManager
 
     Private Sub TransferWDMCheck()
         'do check to see if these UCIs share a common transfer wdm
+        Logger.Dbg("In TransferWDMCheck")
+
         Dim lUCIs As New atcCollection
         For Each lIcon As clsIcon In SchematicDiagram.AllIcons
             If lIcon.Scenario IsNot Nothing Then
+                Logger.Dbg("TransferWDMCheck:Adding UCI:" & lIcon.UciFileName)
                 lUCIs.Add(lIcon.UciFile)
+                Logger.Dbg("TransferWDMCheck:Added UCI:" & lIcon.UciFile.Name)
             End If
         Next
+        Logger.Dbg("TransferWDMCheck:Finished Adding UCIs")
         If lUCIs.Count > 1 Then
             'return blank if models are not connected
             'return name of transfer wdm if models are connected using a single transfer wdm
             'return 'MULTIPLE' if models are connected but connections use multiple wdms 
             Dim lTransferWDM As String = UsesTransfer(lUCIs)
+            Logger.Dbg("TransferWDMCheck:Transfer WDM:" & lTransferWDM)
             If lTransferWDM.Length = 0 Then
                 'these models are not connected
             ElseIf lTransferWDM = "MULTIPLE" Then
@@ -374,17 +398,26 @@ Public Class frmHspfSimulationManager
                             lTransferWDMName = .FileName
                         End If
                     End With
+                    Logger.Dbg("TransferWDMCheck:After File Dialog:" & lTransferWDMName)
                     If lTransferWDMName.Length > 0 Then
                         'Change Connections To Use Transfer WDM
+                        Logger.Dbg("TransferWDMCheck:Transfer WDM Set:" & lTransferWDMName)
                         Me.Cursor = Cursors.WaitCursor
+                        Logger.Dbg("TransferWDMCheck:Transfer WDM:About to call ConnectionsToTransferWDM")
                         ConnectionsToTransferWDM(lTransferWDMName, lUCIs)
+                        Logger.Dbg("TransferWDMCheck:Transfer WDM:Finished ConnectionsToTransferWDM")
                         'Remove unused WDMs from Files Blocks
+                        Logger.Dbg("TransferWDMCheck:Transfer WDM:About to call RemoveUnusedWDMs")
                         RemoveUnusedWDMs(lUCIs)
+                        Logger.Dbg("TransferWDMCheck:Transfer WDM:Finished RemoveUnusedWDMs")
                         For Each lUCI As HspfUci In lUCIs
                             'Add transfer WDM to Files Blocks
+                            Logger.Dbg("TransferWDMCheck:Transfer WDM:About to call AddTransferWDMtoFilesBlock")
                             AddTransferWDMtoFilesBlock(lUCI, lTransferWDMName)
+                            Logger.Dbg("TransferWDMCheck:Transfer WDM:Finished AddTransferWDMtoFilesBlock")
                         Next
                         For Each lUCI As HspfUci In lUCIs
+                            Logger.Dbg("TransferWDMCheck:About to Save UCI " & lUCI.Name)
                             FileCopy(lUCI.Name, lUCI.Name & "Save")
                             lUCI.Save()
                         Next
