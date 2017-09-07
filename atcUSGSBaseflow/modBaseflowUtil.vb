@@ -1213,12 +1213,20 @@ Public Module modBaseflowUtil
         Dim lTsFlowYearly As atcTimeseries = Nothing
         Dim lTsFlowYearlySum As atcTimeseries = Nothing
         Dim lTsFlowYearlyDepth As atcTimeseries = Nothing
-        If lTsFlowDaily.numValues > JulianYear Then
+        If lTsFlowDaily.numValues >= 365 Then
             If Not String.IsNullOrEmpty(lReportBy) AndAlso lReportBy.ToLower() = "water" Then
                 lTsFlowDailyBnd = SubsetByDateBoundary(lTsFlowDaily, 10, 1, Nothing)
-                lTsFlowMonthly = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
-                lTsFlowMonthlySum = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
-                lTsFlowMonthlyDepth = lTsFlowMonthlySum * lConversionFactor
+                If lTsFlowDailyBnd.Values IsNot Nothing Then
+                    ' here test if user tries to force water year bound on one exact calendar year
+                    lTsFlowMonthly = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+                    lTsFlowMonthlySum = Aggregate(lTsFlowDailyBnd, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+                    lTsFlowMonthlyDepth = lTsFlowMonthlySum * lConversionFactor
+                Else
+                    ' cannot report a calendar year dataset in water year
+                    ' don't try to re-calculate monthly sum and depth here
+                    ' try to use the monthly values over original period of record
+                    ' Exit Sub
+                End If
             Else
                 lTsFlowDailyBnd = SubsetByDateBoundary(lTsFlowDaily, 1, 1, Nothing)
             End If
@@ -1231,12 +1239,22 @@ Public Module modBaseflowUtil
 
         Dim lTsGroupStreamFlow As New atcCollection
         With lTsGroupStreamFlow
-            If Not String.IsNullOrEmpty(lReportBy) AndAlso lReportBy.ToLower() = "water" Then
-                lTsFlowDaily = SubsetByDateBoundary(lTsFlowDaily, 10, 1, Nothing)
-                lTsFlowDailyDepth = lTsFlowDaily * lConversionFactor
+            'If Not String.IsNullOrEmpty(lReportBy) AndAlso lReportBy.ToLower() = "water" Then
+            '    lTsFlowDaily = SubsetByDateBoundary(lTsFlowDaily, 10, 1, Nothing)
+            '    If lTsFlowDaily.Values IsNot Nothing Then
+            '        lTsFlowDailyDepth = lTsFlowDaily * lConversionFactor
+            '    Else
+            '        lTsFlowDailyDepth = Nothing
+            '    End If
+            'End If
+            If lTsFlowDailyBnd IsNot Nothing AndAlso lTsFlowDailyBnd.Values IsNot Nothing Then
+                .Add("RateDaily", lTsFlowDailyBnd)
+                lTsFlowDailyDepth = lTsFlowDailyBnd * lConversionFactor
+                .Add("DepthDaily", lTsFlowDailyDepth)
+            Else
+                .Add("RateDaily", lTsFlowDaily)
+                .Add("DepthDaily", lTsFlowDailyDepth)
             End If
-            .Add("RateDaily", lTsFlowDaily)
-            .Add("DepthDaily", lTsFlowDailyDepth)
             .Add("RateMonthly", lTsFlowMonthly)
             .Add("DepthMonthly", lTsFlowMonthlyDepth)
             .Add("RateYearly", lTsFlowYearly)
@@ -1980,6 +1998,8 @@ Public Module modBaseflowUtil
         If lTsFlow IsNot Nothing Then
             lFlowStartDate = lTsFlow.Dates.Value(0)
             lFlowEndDate = lTsFlow.Dates.Value(lTsFlow.numValues)
+        Else
+            Return lTableBody
         End If
         Dim lDA As Double = lTsFlow.Attributes.GetValue("Drainage Area", -1.0)
         If aTsGroupBFIStandard.Count > 0 Then
