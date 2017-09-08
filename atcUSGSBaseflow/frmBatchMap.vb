@@ -506,6 +506,17 @@ Public Class frmBatchMap
             End Select
         End If
 
+        If aArgs.ContainsAttribute(BFInputNames.FullSpanDuration) Then
+            Dim lDoDuration As Boolean = aArgs.GetValue(BFInputNames.FullSpanDuration, False)
+            If lDoDuration Then
+                lText.AppendLine(BFInputNames.FullSpanDuration & vbTab & "YES")
+            Else
+                lText.AppendLine(BFInputNames.FullSpanDuration & vbTab & "NO")
+            End If
+        Else
+            lText.AppendLine(BFInputNames.FullSpanDuration & vbTab & "NO")
+        End If
+
         Dim lDFBeta As Double = 0.925
         If aArgs.ContainsAttribute(BFInputNames.BFLOWFilter) Then
             lDFBeta = aArgs.GetValue(BFInputNames.BFLOWFilter)
