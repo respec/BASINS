@@ -2495,13 +2495,15 @@ Public Module modBaseflowUtil
                 Dim lTsYearDepth As atcTimeseries = Nothing
                 Dim lNumOfDays As Integer = lTsDaily.numValues
                 Dim lTsDailyBnd As atcTimeseries = Nothing 'SubsetByDateBoundary(lTsDaily, 1, 1, Nothing)
-                If lNumOfDays > JulianYear Then
+                If lNumOfDays >= 365 Then
                     If Not String.IsNullOrEmpty(aReportBy) AndAlso aReportBy.ToLower() = "water" Then
                         lTsDailyBnd = SubsetByDateBoundary(lTsDaily, 10, 1, Nothing)
                     Else
                         'lTsDailyBnd = SubsetByDateBoundary(lTsDaily, 1, 1, Nothing)
                         lTsDailyBnd = lTsDaily
                     End If
+                Else
+                    lTsDailyBnd = lTsDaily
                 End If
 
                 If lDA > 0 Then
@@ -2531,7 +2533,7 @@ Public Module modBaseflowUtil
                         End If
                     End If
 
-                    If lNumOfDays > JulianYear Then
+                    If lNumOfDays >= 365 Then
                         If lTsDailyBnd IsNot Nothing AndAlso lTsDailyBnd.Values IsNot Nothing Then
                             For I As Integer = 1 To lTsDailyBnd.numValues
                                 If lTsDailyBnd.Value(I) < 0 Then
@@ -2564,7 +2566,7 @@ Public Module modBaseflowUtil
                         lTsMonDepth.Value(I) = -99
                     Next
 
-                    If lNumOfDays > JulianYear Then
+                    If lNumOfDays >= 365 Then
                         If lTsDailyBnd IsNot Nothing AndAlso lTsDailyBnd.Values IsNot Nothing Then
                             For I As Integer = 1 To lTsDailyBnd.numValues
                                 If lTsDailyBnd.Value(I) < 0 Then
