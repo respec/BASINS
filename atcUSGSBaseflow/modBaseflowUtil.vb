@@ -490,6 +490,7 @@ Public Module modBaseflowUtil
                 .SetValue(BFInputNames.TwoParamEstMethod, lDF2PMethod)
             End If
             .SetValue(BFInputNames.Reportby, aArgs.GetValue(BFInputNames.Reportby, BFInputNames.ReportbyCY))
+            .SetValue(BFInputNames.FullSpanDuration, aArgs.GetValue(BFInputNames.FullSpanDuration, False))
         End With
 
         Dim lTsFlowFullRange As atcTimeseries = Nothing
@@ -1494,8 +1495,10 @@ Public Module modBaseflowUtil
         lSW.Close()
         lSW = Nothing
 
-        If args IsNot Nothing AndAlso args.GetValue("ForFullSpan", False) Then
-            'Should not write a Duration.csv file for the fullspan time period for the hydrograph-separation techniques. 
+        If args IsNot Nothing AndAlso args.GetValue(BFInputNames.FullSpanDuration, False) Then
+            'new behavior: if continuous full time span dataset or if user chooses to do it, then allow it
+        Else
+            'new behavior above
             'It is fine to keep the Duration.csv files for the individual periods (chunks) of the record, however.
             'this change only applies to dataset that has gaps
             Exit Sub

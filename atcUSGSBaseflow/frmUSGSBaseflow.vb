@@ -344,6 +344,7 @@ Public Class frmUSGSBaseflow
                 Args.SetValue(BFInputNames.TwoPRDFBFImax, lDFBFImax)
                 Args.SetValue(BFInputNames.TwoParamEstMethod, pTwoParamEstimationMethod)
             End If
+            Args.SetValue(BFInputNames.FullSpanDuration, rdoDurationYes.Checked)
         End If
         Return lErrMsg
     End Function
