@@ -152,6 +152,19 @@ Public Class frmUSGSBaseflow
 
         txtOutputDir.Text = pOutputDir
         txtOutputRootName.Text = OutputFilenameRoot
+
+        If pDataGroup(0).Attributes.GetValue("Count Missing") > 0 Then
+            rdoDurationNo.Checked = True
+            txtDurationNote.Text = "(analysis dates contain gaps)"
+        Else
+            rdoDurationYes.Checked = True
+            txtDurationNote.Text = ""
+        End If
+
+        Dim loc As String = pDataGroup(0).Attributes.GetValue("Location", "")
+        Dim lname As String = pDataGroup(0).Attributes.GetValue("StaNam", "")
+        Dim ldesc As String = pDataGroup(0).Attributes.GetValue("Description", "")
+        txtNotes.Text = "Dataset:" & vbCrLf & loc & ", " & lname & vbCrLf & ldesc
     End Sub
 
     Public Function AskUser(ByVal aName As String,
@@ -1472,9 +1485,28 @@ Public Class frmUSGSBaseflow
     End Sub
 
     Private Sub txtAny_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
-            Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged,
-            txtN.TextChanged, txtF.TextChanged, txtK.TextChanged, txtOutputDir.TextChanged, txtOutputRootName.TextChanged
+            Handles txtDrainageArea.TextChanged, txtN.TextChanged, txtF.TextChanged, txtK.TextChanged,
+            txtOutputDir.TextChanged, txtOutputRootName.TextChanged
         pDidBFSeparation = False
+    End Sub
+
+    Private Sub txtAnalysisDatesChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtStartDateUser.TextChanged, txtEndDateUser.TextChanged
+        pDidBFSeparation = False
+        Dim lstart As DateTime
+        Dim lend As DateTime
+        If DateTime.TryParse(txtStartDateUser.Text, lstart) AndAlso DateTime.TryParse(txtEndDateUser.Text, lend) Then
+            Dim ltser As atcTimeseries = SubsetByDate(pDataGroup(0), Date2J(lstart.Year, lstart.Month, lstart.Day),
+                                                      Date2J(lend.Year, lend.Month, lend.Day, 24, 0, 0), Nothing)
+            If ltser.Attributes.GetValue("Count Missing") > 0 Then
+                rdoDurationNo.Checked = True
+                txtDurationNote.Text = "(analysis dates contain gaps)"
+            Else
+                rdoDurationYes.Checked = True
+                txtDurationNote.Text = ""
+            End If
+            ltser.Clear()
+            ltser = Nothing
+        End If
     End Sub
 
     Private Sub btnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSave.Click
