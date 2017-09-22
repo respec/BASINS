@@ -76,13 +76,27 @@ Public Class frmFilterData
             If DataGroup Is Nothing OrElse DataGroup.Count = 0 Then
                 Return ""
             Else
-                If aIncludeAllTimeseries Then
+                If aIncludeAllTimeseries AndAlso DataGroup.Count > 1 Then
                     lbl = "All Timeseries "
                 Else
-                    lbl = DataGroup(0).Attributes.GetValue("Location") & "...(" & DataGroup.Count & ") "
+                    Dim locs As String = ""
+                    For Each lTs As atcTimeseries In DataGroup
+                        If Not lTs.Attributes.ContainsAttribute("Location") Then
+                            locs = ""
+                            Exit For
+                        Else
+                            locs &= lTs.Attributes.GetValue("Location") & ","
+                        End If
+                    Next
+                    If String.IsNullOrEmpty(locs) Then
+                        lbl = DataGroup.Count.ToString() & " datasets"
+                    Else
+                        lbl = locs
+                    End If
+                    'lbl = DataGroup(0).Attributes.GetValue("Location") & "...(" & DataGroup.Count & ") "
                 End If
             End If
-            lbl &= MathOpn & " "
+            lbl &= " " & MathOpn & " "
             If Not Double.IsNaN(Constant) Then
                 lbl &= Constant
             Else
@@ -217,7 +231,10 @@ Public Class frmFilterData
     Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
         Try
             Dim lWasModified As Boolean = False
-            Dim lModifiedGroup As atcTimeseriesGroup = pSelectedGroup.Clone
+            Dim lModifiedGroup As New atcTimeseriesGroup()
+            For Each lTs As atcTimeseries In pSelectedGroup
+                lModifiedGroup.Add(lTs.Clone())
+            Next
 
             If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
                 'Note that ChangeTo uses the atcTimeseriesGroup already inside atcSelectedDates,
@@ -521,7 +538,7 @@ Public Class frmFilterData
         End With
 
         clbTimeseries.Items.Clear()
-        clbTimeseries.Items.Add("All Timeseries")
+        'clbTimeseries.Items.Add("All Timeseries")
         Dim lAttribs As New ArrayList()
         For Each lTs As atcTimeseries In pSelectedGroup
             clbTimeseries.Items.Add(TserLbl(lTs))
@@ -529,7 +546,15 @@ Public Class frmFilterData
                 For Each lDef As atcDefinedValue In .Attributes
                     If lDef.Definition.IsNumeric Then
                         If Not lAttribs.Contains(lDef.Definition.Name) Then
-                            lAttribs.Add(lDef.Definition.Name)
+                            If lDef.Definition.Name.ToLower() = "id" Then
+                            ElseIf lDef.Definition.Name.ToLower().Contains("lat") Then
+                            ElseIf lDef.Definition.Name.ToLower().Contains("long") Then
+                            ElseIf lDef.Definition.Name.ToLower().Contains("date") Then
+                            ElseIf lDef.Definition.Name.ToLower().Contains("time") Then
+                            ElseIf lDef.Definition.Name.ToLower().Contains("last") Then
+                            Else
+                                lAttribs.Add(lDef.Definition.Name)
+                            End If
                         End If
                     End If
                 Next
@@ -643,31 +668,37 @@ Public Class frmFilterData
         chkEvents.Checked = IsNumeric(txtValueMaximum.Text) OrElse IsNumeric(txtValueMinimum.Text)
     End Sub
 
+    Private Function GetSelectedMathDatasets() As atcTimeseriesGroup
+        Dim lselected As New atcTimeseriesGroup()
+        For Each lCheckedItem As String In clbTimeseries.CheckedItems
+            Dim loc As String = lCheckedItem.Substring(0, lCheckedItem.IndexOf(","))
+            Dim lDatagroup As atcTimeseriesGroup = pSelectedGroup.FindData("Location", loc)
+            If lDatagroup IsNot Nothing AndAlso lDatagroup.Count > 0 Then
+                lselected.Add(lDatagroup(0))
+            End If
+        Next
+        Return lselected
+    End Function
+
     Private Sub btnAddMathOp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddMathOp.Click
         If pMathOpns Is Nothing Then
             pMathOpns = New Generic.List(Of MathOpn)
         End If
         Dim lNewOpn As New MathOpn()
-        If clbTimeseries.CheckedIndices.Contains(0) Then
-            lNewOpn.DataGroup = pSelectedGroup
-        Else
-            lNewOpn.DataGroup = New atcTimeseriesGroup()
-            For Each lCheckedItem As String In clbTimeseries.CheckedItems
-                Dim loc As String = lCheckedItem.Substring(0, lCheckedItem.IndexOf(","))
-                Dim lDatagroup As atcTimeseriesGroup = pSelectedGroup.FindData("Location", loc)
-                If lDatagroup IsNot Nothing AndAlso lDatagroup.Count > 0 Then
-                    lNewOpn.DataGroup.Add(lDatagroup(0))
-                End If
-            Next
-        End If
-        If lNewOpn.DataGroup Is Nothing OrElse lNewOpn.DataGroup.Count = 0 Then
-            Exit Sub
-        End If
-
         If cboMathOp.SelectedItem Is Nothing Then
             Exit Sub
         End If
         lNewOpn.MathOpn = cboMathOp.SelectedItem
+
+        'If clbTimeseries.CheckedIndices.Contains(0) Then
+        '    lNewOpn.DataGroup = pSelectedGroup
+        'Else
+        lNewOpn.DataGroup = GetSelectedMathDatasets()
+        'End If
+
+        If lNewOpn.DataGroup Is Nothing OrElse lNewOpn.DataGroup.Count = 0 Then
+            Exit Sub
+        End If
 
         If cboConstant.SelectedItem IsNot Nothing Then
             lNewOpn.AttributeName = cboConstant.SelectedItem
