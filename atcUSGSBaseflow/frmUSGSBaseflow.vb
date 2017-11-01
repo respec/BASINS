@@ -152,6 +152,19 @@ Public Class frmUSGSBaseflow
 
         txtOutputDir.Text = pOutputDir
         txtOutputRootName.Text = OutputFilenameRoot
+
+        If pDataGroup(0).Attributes.GetValue("Count Missing") > 0 Then
+            rdoDurationNo.Checked = True
+            txtDurationNote.Text = "(analysis dates contain gaps)"
+        Else
+            rdoDurationYes.Checked = True
+            txtDurationNote.Text = ""
+        End If
+
+        Dim loc As String = pDataGroup(0).Attributes.GetValue("Location", "")
+        Dim lname As String = pDataGroup(0).Attributes.GetValue("StaNam", "")
+        Dim ldesc As String = pDataGroup(0).Attributes.GetValue("Description", "")
+        txtNotes.Text = "Dataset:" & vbCrLf & loc & ", " & lname & vbCrLf & ldesc
     End Sub
 
     Public Function AskUser(ByVal aName As String,
@@ -309,6 +322,11 @@ Public Class frmUSGSBaseflow
             If pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue(BFInputNames.BFIRecessConst, lK1Day) '"BFIK1Day"
             End If
+            Dim lYearBasis As String = BFInputNames.ReportbyCY '"Calendar"
+            If rdoBFIReportbyWaterYear.Checked Then
+                lYearBasis = BFInputNames.ReportbyWY '"Water"
+            End If
+            Args.SetValue(BFInputNames.Reportby, lYearBasis) '"Reportby"
             If pMethods.Contains(BFMethods.BFIStandard) OrElse pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue(BFInputNames.BFINDayScreen, lNDay) '"BFINDay"
                 'Args.SetValue(BFInputNames.BFIUseSymbol, (chkBFISymbols.Checked)) '"BFIUseSymbol"
@@ -326,6 +344,7 @@ Public Class frmUSGSBaseflow
                 Args.SetValue(BFInputNames.TwoPRDFBFImax, lDFBFImax)
                 Args.SetValue(BFInputNames.TwoParamEstMethod, pTwoParamEstimationMethod)
             End If
+            Args.SetValue(BFInputNames.FullSpanDuration, rdoDurationYes.Checked)
         End If
         Return lErrMsg
     End Function
@@ -390,6 +409,15 @@ Public Class frmUSGSBaseflow
         If IsDateValid(lArr) Then
             If pAnalysisOverCommonDuration Then
                 pCommonStart = Date2J(lYear, lMonth, lDay)
+                If lMonth = 10 And lDay = 1 Then
+                    If Not rdoBFIReportbyWaterYear.Checked Then
+                        Dim lAskUser As String =
+            Logger.MsgCustomOwned("Report by water year?", "Start Date", Me, New String() {"Yes", "No"})
+                        If lAskUser = "Yes" Then
+                            rdoBFIReportbyWaterYear.Checked = True
+                        End If
+                    End If
+                End If
             End If
         Else
             Return -99.0
@@ -1458,9 +1486,28 @@ Public Class frmUSGSBaseflow
     End Sub
 
     Private Sub txtAny_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
-            Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged,
-            txtN.TextChanged, txtF.TextChanged, txtK.TextChanged, txtOutputDir.TextChanged, txtOutputRootName.TextChanged
+            Handles txtDrainageArea.TextChanged, txtN.TextChanged, txtF.TextChanged, txtK.TextChanged,
+            txtOutputDir.TextChanged, txtOutputRootName.TextChanged
         pDidBFSeparation = False
+    End Sub
+
+    Private Sub txtAnalysisDatesChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtStartDateUser.TextChanged, txtEndDateUser.TextChanged
+        pDidBFSeparation = False
+        Dim lstart As DateTime
+        Dim lend As DateTime
+        If DateTime.TryParse(txtStartDateUser.Text, lstart) AndAlso DateTime.TryParse(txtEndDateUser.Text, lend) Then
+            Dim ltser As atcTimeseries = SubsetByDate(pDataGroup(0), Date2J(lstart.Year, lstart.Month, lstart.Day),
+                                                      Date2J(lend.Year, lend.Month, lend.Day, 24, 0, 0), Nothing)
+            If ltser.Attributes.GetValue("Count Missing") > 0 Then
+                rdoDurationNo.Checked = True
+                txtDurationNote.Text = "(analysis dates contain gaps)"
+            Else
+                rdoDurationYes.Checked = True
+                txtDurationNote.Text = ""
+            End If
+            ltser.Clear()
+            ltser = Nothing
+        End If
     End Sub
 
     Private Sub btnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSave.Click
@@ -1541,5 +1588,10 @@ Public Class frmUSGSBaseflow
             txtDFParamBFImax.Enabled = False
             pTwoParamEstimationMethod = clsBaseflow2PRDF.ETWOPARAMESTIMATION.ECKHARDT
         End If
+    End Sub
+
+    Private Sub rdoReportby_CheckedChanged(sender As Object, e As EventArgs) Handles rdoBFIReportbyCalendarYear.CheckedChanged,
+                                                                                     rdoBFIReportbyWaterYear.CheckedChanged
+        pDidBFSeparation = False
     End Sub
 End Class

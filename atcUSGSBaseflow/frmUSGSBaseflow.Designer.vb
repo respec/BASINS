@@ -74,24 +74,30 @@ Partial Class frmUSGSBaseflow
         Me.gbGraph = New System.Windows.Forms.GroupBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.gbBFI = New System.Windows.Forms.GroupBox()
-        Me.rdoBFIReportbyWaterYear = New System.Windows.Forms.RadioButton()
-        Me.rdoBFIReportbyCalendarYear = New System.Windows.Forms.RadioButton()
-        Me.Label2 = New System.Windows.Forms.Label()
         Me.txtK = New System.Windows.Forms.TextBox()
         Me.txtF = New System.Windows.Forms.TextBox()
         Me.txtN = New System.Windows.Forms.TextBox()
         Me.lblK = New System.Windows.Forms.Label()
         Me.lblF = New System.Windows.Forms.Label()
         Me.lblN = New System.Windows.Forms.Label()
+        Me.rdoBFIReportbyWaterYear = New System.Windows.Forms.RadioButton()
+        Me.rdoBFIReportbyCalendarYear = New System.Windows.Forms.RadioButton()
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.gbDFParam = New System.Windows.Forms.GroupBox()
+        Me.txt2PDefaultNotice = New System.Windows.Forms.TextBox()
+        Me.rdo2PDefault = New System.Windows.Forms.RadioButton()
+        Me.rdo2PSpecify = New System.Windows.Forms.RadioButton()
+        Me.lblTwoParam = New System.Windows.Forms.Label()
         Me.lblBFImax = New System.Windows.Forms.Label()
         Me.txtDFParamBeta = New System.Windows.Forms.TextBox()
         Me.lblBeta = New System.Windows.Forms.Label()
         Me.lblRC = New System.Windows.Forms.Label()
-        Me.lblTwoParam = New System.Windows.Forms.Label()
-        Me.rdo2PSpecify = New System.Windows.Forms.RadioButton()
-        Me.rdo2PDefault = New System.Windows.Forms.RadioButton()
-        Me.txt2PDefaultNotice = New System.Windows.Forms.TextBox()
+        Me.gbduration = New System.Windows.Forms.GroupBox()
+        Me.rdoDurationYes = New System.Windows.Forms.RadioButton()
+        Me.rdoDurationNo = New System.Windows.Forms.RadioButton()
+        Me.gbNotes = New System.Windows.Forms.GroupBox()
+        Me.txtDurationNote = New System.Windows.Forms.TextBox()
+        Me.txtNotes = New System.Windows.Forms.TextBox()
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.gbTextOutput.SuspendLayout()
@@ -99,6 +105,8 @@ Partial Class frmUSGSBaseflow
         Me.gbGraph.SuspendLayout()
         Me.gbBFI.SuspendLayout()
         Me.gbDFParam.SuspendLayout()
+        Me.gbduration.SuspendLayout()
+        Me.gbNotes.SuspendLayout()
         Me.SuspendLayout()
         '
         'txtDrainageArea
@@ -144,7 +152,7 @@ Partial Class frmUSGSBaseflow
         Me.gbDates.Controls.Add(Me.txtDataStart)
         Me.gbDates.Controls.Add(Me.lblDataEnd)
         Me.gbDates.Controls.Add(Me.lblDataStart)
-        Me.gbDates.Location = New System.Drawing.Point(12, 315)
+        Me.gbDates.Location = New System.Drawing.Point(12, 363)
         Me.gbDates.Name = "gbDates"
         Me.gbDates.Size = New System.Drawing.Size(375, 114)
         Me.gbDates.TabIndex = 7
@@ -395,7 +403,7 @@ Partial Class frmUSGSBaseflow
         Me.gbTextOutput.Controls.Add(Me.lblOutputDir)
         Me.gbTextOutput.Controls.Add(Me.txtOutputRootName)
         Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
-        Me.gbTextOutput.Location = New System.Drawing.Point(12, 435)
+        Me.gbTextOutput.Location = New System.Drawing.Point(12, 483)
         Me.gbTextOutput.Name = "gbTextOutput"
         Me.gbTextOutput.Size = New System.Drawing.Size(375, 111)
         Me.gbTextOutput.TabIndex = 11
@@ -500,7 +508,7 @@ Partial Class frmUSGSBaseflow
         Me.gbBFMethods.Controls.Add(Me.chkMethodHySEPFixed)
         Me.gbBFMethods.Location = New System.Drawing.Point(12, 30)
         Me.gbBFMethods.Name = "gbBFMethods"
-        Me.gbBFMethods.Size = New System.Drawing.Size(112, 279)
+        Me.gbBFMethods.Size = New System.Drawing.Size(112, 327)
         Me.gbBFMethods.TabIndex = 0
         Me.gbBFMethods.TabStop = False
         Me.gbBFMethods.Text = "Select Method(s)"
@@ -553,9 +561,9 @@ Partial Class frmUSGSBaseflow
         Me.gbGraph.Controls.Add(Me.btnGraphCDist)
         Me.gbGraph.Controls.Add(Me.btnGraphTimeseries)
         Me.gbGraph.Controls.Add(Me.btnGraphDuration)
-        Me.gbGraph.Location = New System.Drawing.Point(12, 552)
+        Me.gbGraph.Location = New System.Drawing.Point(12, 600)
         Me.gbGraph.Name = "gbGraph"
-        Me.gbGraph.Size = New System.Drawing.Size(375, 90)
+        Me.gbGraph.Size = New System.Drawing.Size(375, 77)
         Me.gbGraph.TabIndex = 16
         Me.gbGraph.TabStop = False
         Me.gbGraph.Text = "Display Graph"
@@ -573,58 +581,24 @@ Partial Class frmUSGSBaseflow
         '
         Me.gbBFI.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.gbBFI.Controls.Add(Me.rdoBFIReportbyWaterYear)
-        Me.gbBFI.Controls.Add(Me.rdoBFIReportbyCalendarYear)
-        Me.gbBFI.Controls.Add(Me.Label2)
         Me.gbBFI.Controls.Add(Me.txtK)
         Me.gbBFI.Controls.Add(Me.txtF)
         Me.gbBFI.Controls.Add(Me.txtN)
         Me.gbBFI.Controls.Add(Me.lblK)
         Me.gbBFI.Controls.Add(Me.lblF)
         Me.gbBFI.Controls.Add(Me.lblN)
-        Me.gbBFI.Location = New System.Drawing.Point(130, 61)
+        Me.gbBFI.Location = New System.Drawing.Point(131, 132)
         Me.gbBFI.Name = "gbBFI"
-        Me.gbBFI.Size = New System.Drawing.Size(254, 114)
+        Me.gbBFI.Size = New System.Drawing.Size(254, 91)
         Me.gbBFI.TabIndex = 30
         Me.gbBFI.TabStop = False
         Me.gbBFI.Text = "BFI Parameters"
-        '
-        'rdoBFIReportbyWaterYear
-        '
-        Me.rdoBFIReportbyWaterYear.AutoSize = True
-        Me.rdoBFIReportbyWaterYear.Location = New System.Drawing.Point(169, 16)
-        Me.rdoBFIReportbyWaterYear.Name = "rdoBFIReportbyWaterYear"
-        Me.rdoBFIReportbyWaterYear.Size = New System.Drawing.Size(79, 17)
-        Me.rdoBFIReportbyWaterYear.TabIndex = 11
-        Me.rdoBFIReportbyWaterYear.Text = "Water Year"
-        Me.rdoBFIReportbyWaterYear.UseVisualStyleBackColor = True
-        '
-        'rdoBFIReportbyCalendarYear
-        '
-        Me.rdoBFIReportbyCalendarYear.AutoSize = True
-        Me.rdoBFIReportbyCalendarYear.Checked = True
-        Me.rdoBFIReportbyCalendarYear.Location = New System.Drawing.Point(71, 16)
-        Me.rdoBFIReportbyCalendarYear.Name = "rdoBFIReportbyCalendarYear"
-        Me.rdoBFIReportbyCalendarYear.Size = New System.Drawing.Size(92, 17)
-        Me.rdoBFIReportbyCalendarYear.TabIndex = 10
-        Me.rdoBFIReportbyCalendarYear.TabStop = True
-        Me.rdoBFIReportbyCalendarYear.Text = "Calendar Year"
-        Me.rdoBFIReportbyCalendarYear.UseVisualStyleBackColor = True
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(6, 16)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(56, 13)
-        Me.Label2.TabIndex = 9
-        Me.Label2.Text = "Report by:"
         '
         'txtK
         '
         Me.txtK.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtK.Location = New System.Drawing.Point(170, 86)
+        Me.txtK.Location = New System.Drawing.Point(170, 66)
         Me.txtK.Name = "txtK"
         Me.txtK.Size = New System.Drawing.Size(79, 20)
         Me.txtK.TabIndex = 5
@@ -635,7 +609,7 @@ Partial Class frmUSGSBaseflow
         '
         Me.txtF.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtF.Location = New System.Drawing.Point(170, 62)
+        Me.txtF.Location = New System.Drawing.Point(170, 42)
         Me.txtF.Name = "txtF"
         Me.txtF.Size = New System.Drawing.Size(79, 20)
         Me.txtF.TabIndex = 4
@@ -646,7 +620,7 @@ Partial Class frmUSGSBaseflow
         '
         Me.txtN.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtN.Location = New System.Drawing.Point(170, 37)
+        Me.txtN.Location = New System.Drawing.Point(170, 17)
         Me.txtN.Name = "txtN"
         Me.txtN.Size = New System.Drawing.Size(79, 20)
         Me.txtN.TabIndex = 3
@@ -656,7 +630,7 @@ Partial Class frmUSGSBaseflow
         'lblK
         '
         Me.lblK.AutoSize = True
-        Me.lblK.Location = New System.Drawing.Point(33, 89)
+        Me.lblK.Location = New System.Drawing.Point(33, 69)
         Me.lblK.Name = "lblK"
         Me.lblK.Size = New System.Drawing.Size(131, 13)
         Me.lblK.TabIndex = 2
@@ -665,7 +639,7 @@ Partial Class frmUSGSBaseflow
         'lblF
         '
         Me.lblF.AutoSize = True
-        Me.lblF.Location = New System.Drawing.Point(24, 64)
+        Me.lblF.Location = New System.Drawing.Point(24, 44)
         Me.lblF.Name = "lblF"
         Me.lblF.Size = New System.Drawing.Size(139, 13)
         Me.lblF.TabIndex = 1
@@ -674,11 +648,42 @@ Partial Class frmUSGSBaseflow
         'lblN
         '
         Me.lblN.AutoSize = True
-        Me.lblN.Location = New System.Drawing.Point(37, 40)
+        Me.lblN.Location = New System.Drawing.Point(37, 20)
         Me.lblN.Name = "lblN"
         Me.lblN.Size = New System.Drawing.Size(126, 13)
         Me.lblN.TabIndex = 0
         Me.lblN.Text = "Partition Length (N, days)"
+        '
+        'rdoBFIReportbyWaterYear
+        '
+        Me.rdoBFIReportbyWaterYear.AutoSize = True
+        Me.rdoBFIReportbyWaterYear.Location = New System.Drawing.Point(299, 63)
+        Me.rdoBFIReportbyWaterYear.Name = "rdoBFIReportbyWaterYear"
+        Me.rdoBFIReportbyWaterYear.Size = New System.Drawing.Size(79, 17)
+        Me.rdoBFIReportbyWaterYear.TabIndex = 11
+        Me.rdoBFIReportbyWaterYear.Text = "Water Year"
+        Me.rdoBFIReportbyWaterYear.UseVisualStyleBackColor = True
+        '
+        'rdoBFIReportbyCalendarYear
+        '
+        Me.rdoBFIReportbyCalendarYear.AutoSize = True
+        Me.rdoBFIReportbyCalendarYear.Checked = True
+        Me.rdoBFIReportbyCalendarYear.Location = New System.Drawing.Point(201, 63)
+        Me.rdoBFIReportbyCalendarYear.Name = "rdoBFIReportbyCalendarYear"
+        Me.rdoBFIReportbyCalendarYear.Size = New System.Drawing.Size(92, 17)
+        Me.rdoBFIReportbyCalendarYear.TabIndex = 10
+        Me.rdoBFIReportbyCalendarYear.TabStop = True
+        Me.rdoBFIReportbyCalendarYear.Text = "Calendar Year"
+        Me.rdoBFIReportbyCalendarYear.UseVisualStyleBackColor = True
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(130, 65)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(56, 13)
+        Me.Label2.TabIndex = 9
+        Me.Label2.Text = "Report by:"
         '
         'gbDFParam
         '
@@ -694,12 +699,58 @@ Partial Class frmUSGSBaseflow
         Me.gbDFParam.Controls.Add(Me.lblBeta)
         Me.gbDFParam.Controls.Add(Me.txtDFParamRC)
         Me.gbDFParam.Controls.Add(Me.lblRC)
-        Me.gbDFParam.Location = New System.Drawing.Point(130, 181)
+        Me.gbDFParam.Location = New System.Drawing.Point(131, 229)
         Me.gbDFParam.Name = "gbDFParam"
         Me.gbDFParam.Size = New System.Drawing.Size(254, 128)
         Me.gbDFParam.TabIndex = 31
         Me.gbDFParam.TabStop = False
         Me.gbDFParam.Text = "Digital Filter (DF) Parameters"
+        '
+        'txt2PDefaultNotice
+        '
+        Me.txt2PDefaultNotice.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txt2PDefaultNotice.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txt2PDefaultNotice.Location = New System.Drawing.Point(6, 61)
+        Me.txt2PDefaultNotice.Multiline = True
+        Me.txt2PDefaultNotice.Name = "txt2PDefaultNotice"
+        Me.txt2PDefaultNotice.ReadOnly = True
+        Me.txt2PDefaultNotice.Size = New System.Drawing.Size(242, 61)
+        Me.txt2PDefaultNotice.TabIndex = 15
+        Me.txt2PDefaultNotice.Text = "Recession Constant (a) and BFImax are calculated by the program"
+        Me.txt2PDefaultNotice.Visible = False
+        '
+        'rdo2PDefault
+        '
+        Me.rdo2PDefault.AutoSize = True
+        Me.rdo2PDefault.Location = New System.Drawing.Point(160, 38)
+        Me.rdo2PDefault.Name = "rdo2PDefault"
+        Me.rdo2PDefault.Size = New System.Drawing.Size(59, 17)
+        Me.rdo2PDefault.TabIndex = 14
+        Me.rdo2PDefault.Text = "Default"
+        Me.rdo2PDefault.UseVisualStyleBackColor = True
+        '
+        'rdo2PSpecify
+        '
+        Me.rdo2PSpecify.AutoSize = True
+        Me.rdo2PSpecify.Checked = True
+        Me.rdo2PSpecify.Location = New System.Drawing.Point(94, 38)
+        Me.rdo2PSpecify.Name = "rdo2PSpecify"
+        Me.rdo2PSpecify.Size = New System.Drawing.Size(60, 17)
+        Me.rdo2PSpecify.TabIndex = 13
+        Me.rdo2PSpecify.TabStop = True
+        Me.rdo2PSpecify.Text = "Specify"
+        Me.rdo2PSpecify.UseVisualStyleBackColor = True
+        '
+        'lblTwoParam
+        '
+        Me.lblTwoParam.AutoSize = True
+        Me.lblTwoParam.Location = New System.Drawing.Point(6, 40)
+        Me.lblTwoParam.Name = "lblTwoParam"
+        Me.lblTwoParam.Size = New System.Drawing.Size(82, 13)
+        Me.lblTwoParam.TabIndex = 12
+        Me.lblTwoParam.Text = "Two Parameter:"
         '
         'lblBFImax
         '
@@ -739,58 +790,87 @@ Partial Class frmUSGSBaseflow
         Me.lblRC.TabIndex = 7
         Me.lblRC.Text = "Recession Constant (a)"
         '
-        'lblTwoParam
+        'gbduration
         '
-        Me.lblTwoParam.AutoSize = True
-        Me.lblTwoParam.Location = New System.Drawing.Point(6, 40)
-        Me.lblTwoParam.Name = "lblTwoParam"
-        Me.lblTwoParam.Size = New System.Drawing.Size(82, 13)
-        Me.lblTwoParam.TabIndex = 12
-        Me.lblTwoParam.Text = "Two Parameter:"
+        Me.gbduration.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbduration.Controls.Add(Me.txtDurationNote)
+        Me.gbduration.Controls.Add(Me.rdoDurationNo)
+        Me.gbduration.Controls.Add(Me.rdoDurationYes)
+        Me.gbduration.Location = New System.Drawing.Point(133, 86)
+        Me.gbduration.Name = "gbduration"
+        Me.gbduration.Size = New System.Drawing.Size(254, 40)
+        Me.gbduration.TabIndex = 32
+        Me.gbduration.TabStop = False
+        Me.gbduration.Text = "Write flow duration curve for full span result:"
         '
-        'rdo2PSpecify
+        'rdoDurationYes
         '
-        Me.rdo2PSpecify.AutoSize = True
-        Me.rdo2PSpecify.Checked = True
-        Me.rdo2PSpecify.Location = New System.Drawing.Point(94, 38)
-        Me.rdo2PSpecify.Name = "rdo2PSpecify"
-        Me.rdo2PSpecify.Size = New System.Drawing.Size(60, 17)
-        Me.rdo2PSpecify.TabIndex = 13
-        Me.rdo2PSpecify.TabStop = True
-        Me.rdo2PSpecify.Text = "Specify"
-        Me.rdo2PSpecify.UseVisualStyleBackColor = True
+        Me.rdoDurationYes.AutoSize = True
+        Me.rdoDurationYes.Location = New System.Drawing.Point(9, 19)
+        Me.rdoDurationYes.Name = "rdoDurationYes"
+        Me.rdoDurationYes.Size = New System.Drawing.Size(43, 17)
+        Me.rdoDurationYes.TabIndex = 0
+        Me.rdoDurationYes.TabStop = True
+        Me.rdoDurationYes.Text = "Yes"
+        Me.rdoDurationYes.UseVisualStyleBackColor = True
         '
-        'rdo2PDefault
+        'rdoDurationNo
         '
-        Me.rdo2PDefault.AutoSize = True
-        Me.rdo2PDefault.Location = New System.Drawing.Point(160, 38)
-        Me.rdo2PDefault.Name = "rdo2PDefault"
-        Me.rdo2PDefault.Size = New System.Drawing.Size(59, 17)
-        Me.rdo2PDefault.TabIndex = 14
-        Me.rdo2PDefault.Text = "Default"
-        Me.rdo2PDefault.UseVisualStyleBackColor = True
+        Me.rdoDurationNo.AutoSize = True
+        Me.rdoDurationNo.Location = New System.Drawing.Point(58, 19)
+        Me.rdoDurationNo.Name = "rdoDurationNo"
+        Me.rdoDurationNo.Size = New System.Drawing.Size(39, 17)
+        Me.rdoDurationNo.TabIndex = 1
+        Me.rdoDurationNo.TabStop = True
+        Me.rdoDurationNo.Text = "No"
+        Me.rdoDurationNo.UseVisualStyleBackColor = True
         '
-        'txt2PDefaultNotice
+        'gbNotes
         '
-        Me.txt2PDefaultNotice.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.gbNotes.Controls.Add(Me.txtNotes)
+        Me.gbNotes.Location = New System.Drawing.Point(12, 683)
+        Me.gbNotes.Name = "gbNotes"
+        Me.gbNotes.Size = New System.Drawing.Size(375, 73)
+        Me.gbNotes.TabIndex = 33
+        Me.gbNotes.TabStop = False
+        Me.gbNotes.Text = "Notes"
+        '
+        'txtDurationNote
+        '
+        Me.txtDurationNote.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDurationNote.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.txtDurationNote.Location = New System.Drawing.Point(104, 19)
+        Me.txtDurationNote.Name = "txtDurationNote"
+        Me.txtDurationNote.ReadOnly = True
+        Me.txtDurationNote.Size = New System.Drawing.Size(144, 13)
+        Me.txtDurationNote.TabIndex = 2
+        '
+        'txtNotes
+        '
+        Me.txtNotes.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txt2PDefaultNotice.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txt2PDefaultNotice.Location = New System.Drawing.Point(6, 61)
-        Me.txt2PDefaultNotice.Multiline = True
-        Me.txt2PDefaultNotice.Name = "txt2PDefaultNotice"
-        Me.txt2PDefaultNotice.ReadOnly = True
-        Me.txt2PDefaultNotice.Size = New System.Drawing.Size(242, 61)
-        Me.txt2PDefaultNotice.TabIndex = 15
-        Me.txt2PDefaultNotice.Text = "Recession Constant (a) and BFImax are calculated by the program"
-        Me.txt2PDefaultNotice.Visible = False
+        Me.txtNotes.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.txtNotes.Location = New System.Drawing.Point(6, 19)
+        Me.txtNotes.Multiline = True
+        Me.txtNotes.Name = "txtNotes"
+        Me.txtNotes.ReadOnly = True
+        Me.txtNotes.Size = New System.Drawing.Size(363, 48)
+        Me.txtNotes.TabIndex = 0
         '
         'frmUSGSBaseflow
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(399, 654)
+        Me.ClientSize = New System.Drawing.Size(399, 768)
+        Me.Controls.Add(Me.gbNotes)
+        Me.Controls.Add(Me.gbduration)
+        Me.Controls.Add(Me.rdoBFIReportbyWaterYear)
+        Me.Controls.Add(Me.rdoBFIReportbyCalendarYear)
         Me.Controls.Add(Me.gbDFParam)
+        Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.gbBFI)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.lblDrainageAreaUnits)
@@ -818,6 +898,10 @@ Partial Class frmUSGSBaseflow
         Me.gbBFI.PerformLayout()
         Me.gbDFParam.ResumeLayout(False)
         Me.gbDFParam.PerformLayout()
+        Me.gbduration.ResumeLayout(False)
+        Me.gbduration.PerformLayout()
+        Me.gbNotes.ResumeLayout(False)
+        Me.gbNotes.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -890,4 +974,10 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents rdo2PSpecify As Windows.Forms.RadioButton
     Friend WithEvents lblTwoParam As Windows.Forms.Label
     Friend WithEvents txt2PDefaultNotice As Windows.Forms.TextBox
+    Friend WithEvents gbduration As Windows.Forms.GroupBox
+    Friend WithEvents rdoDurationNo As Windows.Forms.RadioButton
+    Friend WithEvents rdoDurationYes As Windows.Forms.RadioButton
+    Friend WithEvents gbNotes As Windows.Forms.GroupBox
+    Friend WithEvents txtDurationNote As Windows.Forms.TextBox
+    Friend WithEvents txtNotes As Windows.Forms.TextBox
 End Class

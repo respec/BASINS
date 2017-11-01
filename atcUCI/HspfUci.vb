@@ -2533,11 +2533,13 @@ x:
         Do Until lDone
             GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
             lInit = 0
+            'If lBuff.Contains("0.00       0.00      0.00      0.00") Then Stop
             If lBuff Is Nothing Then
                 lDone = True
             ElseIf (Not lBuff.Contains("***") AndAlso lBuff.Substring(2, 6) = "FTABLE") Then 'this is a new FTABLE
                 'Anurag Added the condition to check for the strings for FTABLE only if does not have ***
-                If Not IsNumeric(lBuff.Substring(11, 4)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                If Not IsNumeric(lBuff.Substring(11, 4)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                 Dim lId As Integer = CShort(lBuff.Substring(11, 4))
                 'find which operation this ftable is associated with
                 Dim lOperation As HspfOperation = Nothing
@@ -2555,14 +2557,16 @@ x:
                     With lOperation.FTable
                         Dim lString As String = lBuff.Substring(0, 5)
                         If lString.Trim.Length > 0 Then
-                            If Not IsNumeric(lString) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                            If Not IsNumeric(lString) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                             .Nrows = CInt(lString)
                         Else
                             .Nrows = 0
                         End If
                         lString = lBuff.Substring(5, 5)
                         If lString.Trim.Length > 0 Then
-                            If Not IsNumeric(lString) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                            If Not IsNumeric(lString) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                             .Ncols = CInt(lString)
                         Else
                             .Ncols = 0
@@ -2588,60 +2592,73 @@ x:
                                     .Comment &= vbCrLf & lBuff 'So if there are additional comments on the FTABLE, they get added to the depth area volume line
                                 End If
                             ElseIf .ExtendedFlag = False Then 'this is a regular record
-                                If Not IsNumeric(Left(lBuff, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                If Not IsNumeric(Left(lBuff, 10)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                 .Depth(lRow) = CDbl(Left(lBuff, 10))
                                 .DepthAsRead(lRow) = Left(lBuff, 10)
-                                If Not IsNumeric(Mid(lBuff, 11, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                If Not IsNumeric(Mid(lBuff, 11, 10)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                 .Area(lRow) = CDbl(Mid(lBuff, 11, 10))
                                 .AreaAsRead(lRow) = Mid(lBuff, 11, 10)
-                                If Not IsNumeric(Mid(lBuff, 21, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                If Not IsNumeric(Mid(lBuff, 21, 10)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                 .Volume(lRow) = CDbl(Mid(lBuff, 21, 10))
                                 .VolumeAsRead(lRow) = Mid(lBuff, 21, 10)
                                 Dim lExit As Integer = .Ncols - 3
                                 If lExit > 0 Then
-                                    If Not IsNumeric(Mid(lBuff, 31, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                    If Not IsNumeric(Mid(lBuff, 31, 10)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                     .Outflow1(lRow) = CDbl(Mid(lBuff, 31, 10))
                                     .Outflow1AsRead(lRow) = Mid(lBuff, 31, 10)
                                 End If
                                 If lExit > 1 Then
-                                    If Not IsNumeric(Mid(lBuff, 41, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                    If Not IsNumeric(Mid(lBuff, 41, 10)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                     .Outflow2(lRow) = CDbl(Mid(lBuff, 41, 10))
                                     .Outflow2AsRead(lRow) = Mid(lBuff, 41, 10)
                                 End If
                                 If lExit > 2 Then
-                                    If Not IsNumeric(Mid(lBuff, 51, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                    If Not IsNumeric(Mid(lBuff, 51, 10)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                     .Outflow3(lRow) = CDbl(Mid(lBuff, 51, 10))
                                     .Outflow3AsRead(lRow) = Mid(lBuff, 51, 10)
                                 End If
                                 If lExit > 3 Then
-                                    If Not IsNumeric(Mid(lBuff, 61, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                    If Not IsNumeric(Mid(lBuff, 61, 10)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                     .Outflow4(lRow) = CDbl(Mid(lBuff, 61, 10))
                                     .Outflow4AsRead(lRow) = Mid(lBuff, 61, 10)
                                 End If
                                 If lExit > 4 Then
-                                    If Not IsNumeric(Mid(lBuff, 71, 10)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                    If Not IsNumeric(Mid(lBuff, 71, 10)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                     .Outflow5(lRow) = CDbl(Mid(lBuff, 71, 10))
                                     .Outflow5AsRead(lRow) = Mid(lBuff, 71, 10)
                                 End If
                                 lRow += 1
                             ElseIf .ExtendedFlag Then  'this is the extended format ftable
-                                If Not IsNumeric(Left(lBuff, 15)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                If Not IsNumeric(Left(lBuff, 15)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                 .Depth(lRow) = CDbl(Left(lBuff, 15))
                                 .DepthAsRead(lRow) = Left(lBuff, 15)
-                                If Not IsNumeric(Mid(lBuff, 16, 15)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                If Not IsNumeric(Mid(lBuff, 16, 15)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                 .Area(lRow) = CDbl(Mid(lBuff, 16, 15))
                                 .AreaAsRead(lRow) = Mid(lBuff, 16, 15)
-                                If Not IsNumeric(Mid(lBuff, 31, 15)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                If Not IsNumeric(Mid(lBuff, 31, 15)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                 .Volume(lRow) = CDbl(Mid(lBuff, 31, 15))
                                 .VolumeAsRead(lRow) = Mid(lBuff, 31, 15)
                                 Dim lExit As Integer = .Ncols - 3
                                 If lExit > 0 Then
-                                    If Not IsNumeric(Mid(lBuff, 46, 15)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                    If Not IsNumeric(Mid(lBuff, 46, 15)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                     .Outflow1(lRow) = CDbl(Mid(lBuff, 46, 15))
                                     .Outflow1AsRead(lRow) = Mid(lBuff, 46, 15)
                                 End If
                                 If lExit > 1 Then
-                                    If Not IsNumeric(Mid(lBuff, 61, 15)) Then Logger.Msg("Invalid FTABLE entry:" & vbCrLf & lBuff, "Error in ProcessFTables")
+                                    If Not IsNumeric(Mid(lBuff, 61, 15)) Then Logger.Msg("Invalid FTABLE entry" & vbCrLf & lBuff & vbCrLf &
+                                                                         "at line:" & lReturnKey + 1, "Error in ProcessFTables")
                                     .Outflow2(lRow) = CDbl(Mid(lBuff, 61, 15))
                                     .Outflow2AsRead(lRow) = Mid(lBuff, 61, 15)
                                 End If
