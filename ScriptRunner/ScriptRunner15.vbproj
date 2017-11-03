@@ -55,6 +55,10 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="atcManDelin, Version=3.1.1.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Plugins\BASINS\atcManDelin.dll</HintPath>
+    </Reference>
     <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
@@ -90,14 +94,10 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddFieldToDBF.vb" />
     <Compile Include="catGraph.vb" />
-    <Compile Include="CheckDBF.vb" />
     <Compile Include="clsGenScnGraphSpec.vb" />
     <Compile Include="clsScriptPlugin.vb" />
     <Compile Include="BASINSProjectSummary.vb" />
-    <Compile Include="ConstituentBalance.vb" />
-    <Compile Include="DBF_ChangeField.vb" />
     <Compile Include="DisaggPrecipMPCA.vb" />
     <Compile Include="FillMissingMPCAPrecip2.vb" />
     <Compile Include="frmSelectScript.Designer.vb">
@@ -110,9 +110,6 @@
     <Compile Include="GraphGenScn.vb" />
     <Compile Include="HeadwaterCheck.vb" />
     <Compile Include="ImportPCStoWDM.vb" />
-    <Compile Include="JimShape.vb" />
-    <Compile Include="MapWinUtility_Strings.vb" />
-    <Compile Include="modStringTest.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -128,9 +125,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ProjectShapefile.vb" />
+    <Compile Include="PopulateStreamAttributes.vb" />
     <Compile Include="ScriptDriver.vb" />
-    <Compile Include="SplitShapefileByField.vb" />
     <Compile Include="SummarizeTimeseries.vb" />
     <Compile Include="UpdatePointsFromData.vb" />
     <Compile Include="WdmCreateFromGrids.vb" />
