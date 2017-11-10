@@ -64,14 +64,43 @@ Public Class atcDataSourceTimeseriesHSF5
                 If lTsName.StartsWith("TS") Then
                     lTsNames.Add(lTsName)
                     Dim lTsGrpId As H5GroupId = H5G.open(lGrpId, lTsName)
+
+                    Dim lData As New atcTimeseries(Me)
+
                     Dim lTsAtCnt As Integer = H5A.getNumberOfAttributes(lTsGrpId)
                     Debug.Print("Attribute Count " & lTsAtCnt & " for " & lTsName)
+
+                    For lAtIndex As Integer = 0 To lTsAtCnt - 1
+                        Dim lAt As H5AttributeId = H5A.openIndex(lTsGrpId, lAtIndex)
+                        Dim lAtInfo = H5A.getInfo(lAt)
+                        Dim lAtSize As Integer = lAtInfo.dataSize
+                        Dim lAtTypeId As H5DataTypeId = H5A.getType(lAt)
+                        Dim lAtType As H5T.H5Type = H5T.getClass(lAtTypeId)
+                        Debug.Print("  Name,Size,Type " & H5A.getName(lAt) & ":" & lAtSize & ":" & lAtType)
+                        Select Case lAtType
+                            Case H5T.H5TClass.STRING
+                                Dim lAtValue(lAtSize - 1) As Byte
+                                H5A.read(Of Byte)(lAt, lAtTypeId, New H5Array(Of Byte)(lAtValue))
+                                Dim lAtString As String = System.Text.Encoding.ASCII.GetString(lAtValue)
+                                Debug.Print("  Length,Value " & lAtValue.Length & ":'" & lAtString.Substring(0, lAtSize) & "'")
+                            Case H5T.H5TClass.FLOAT
+                                Dim lAtValue(0) As Double
+                                H5A.read(Of Double)(lAt, lAtTypeId, New H5Array(Of Double)(lAtValue))
+                                Debug.Print("  Length,Value " & lAtValue.Length & ":'" & lAtValue(0).ToString & "'")
+                            Case H5T.H5TClass.INTEGER
+                                Dim lAtvalue(0) As Integer
+                                H5A.read(Of Integer)(lAt, lAtTypeId, New H5Array(Of Integer)(lAtvalue))
+                                Debug.Print("  Length,Value " & lAtvalue.Length & ":'" & lAtvalue(0).ToString & "'")
+                            Case Else
+                                Debug.Print("  Unknown Type")
+                        End Select
+                    Next
+                    lData.Attributes.Add("Name", lTsName)
+
                     lCnt = H5G.getNumObjects(lTsGrpId)
                     Dim lDateGrpId As H5DataSetId = H5D.open(lTsGrpId, "index")
                     Debug.Print(lDateGrpId.Id)
 
-                    Dim lData As New atcTimeseries(Me)
-                    lData.Attributes.Add("Name", lTsName)
                     Me.DataSets.Add(lData)
                 End If
             Next
