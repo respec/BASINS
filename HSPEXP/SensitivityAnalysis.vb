@@ -4,36 +4,8 @@ Imports atcUCI
 Imports atcData
 Imports System.IO
 
-Public Class HydrologySensitivityStats
-    Public SiteName As String
-    Public Scenario As String
-    Public SimID As Integer
-    Public AverageAnnualcfs As Double
-    Public AnnualPeakFlow As Double
-    Public AverageAnnual As Double
-    Public TenPercentHigh As Double
-    Public TwentyFivePercentHigh As Double
-    Public FiftyPercentHigh As Double
-    Public FiftyPercentLow As Double
-    Public TwentyFivePercentLow As Double
-    Public TenPercentLow As Double
-    Public FivePercentLow As Double
-    Public TwoPercentLow As Double
-    Public ErrorAverageAnnualcfs As Double
-    Public ErrorAnnualPeakFlow As Double
-    Public ErrorAverageAnnual As Double
-    Public ErrorTenPercentHigh As Double
-    Public ErrorTwentyFivePercentHigh As Double
-    Public ErrorFiftyPercentHigh As Double
-    Public ErrorFiftyPercentLow As Double
-    Public ErrorTwentyFivePercentLow As Double
-    Public ErrorTenPercentLow As Double
-    Public ErrorFivePercentLow As Double
-    Public ErrorTwoPercentLow As Double
-
-End Class
-
 Public Class TimeSeriesStats
+    'These statistics are calculated for each individual time series for each individual run
     Public SimID As Integer
     Public DSNID As Integer
     Public OverallSum As Double
@@ -69,19 +41,21 @@ Public Class TimeSeriesStats
 End Class
 
 Public Class ModelParameter
+    'This class manages the property of each individual parameter
     Public ParmID As Integer = 0
-    Public ParmOperation As String = ""
+    Public ParmOperationType As String = ""
     Public ParmOperationNumber As Integer = 0
-    Public ParmLandUseName As String = ""
+    Public ParmOperationName As String = ""
     Public ParmTable As String = ""
     Public ParmName As String = ""
+    Public ParmMultFactor As Integer = 0
     Public ParmLow As Double = -1.0E-30
     Public ParmHigh As Double = 1.0E+30
-    Public ParmOccurence As Integer = 1
+    Public ParmOccurence As Integer = 0
 End Class
 
 
-Public Module ModSensitivityAnalysis
+Public Module MultiSimAnalysis
     Sub SensitivityAnalysis(ByVal aHSPFEXE As String, ByVal pBaseName As String, ByVal pTestPath As String,
                             aSDateJ As Double, aEDateJ As Double, ByVal aHSPFEchofilename As String)
 
@@ -90,15 +64,15 @@ Public Module ModSensitivityAnalysis
         Dim lExitCode As Integer
         Dim SimID As Integer = 0
         Dim lUci As New atcUCI.HspfUci
-        Dim SaveUCIFiles As Boolean = True
+        Dim DeleteUCIFiles As Integer = 0
         Dim uciName As String
-        uciName = pBaseName & "_UA.uci"
-        IO.File.Copy(pBaseName & ".uci", uciName, True) 'Saving the original file with _UA at the end
-        lUci.ReadUci(lMsg, uciName, -1, False, pBaseName & ".ech") ' Reading the temp uci file with _UA
+        uciName = "MultiSim.uci"
+        IO.File.Copy(pBaseName & ".uci", uciName, True) 'Saving the original file with MultiSim.uci name
+        lUci.ReadUci(lMsg, uciName, -1, False, pBaseName & ".ech") ' Reading the temp uci file
         lUci.GlobalBlock.RunFg = 1
         lUci.Save()
 
-        Dim loutWDMFileName As String = Path.Combine(pTestPath, pBaseName & "_UA.wdm")
+        Dim loutWDMFileName As String = Path.Combine(pTestPath, "MultiSim.wdm")
         If File.Exists(loutWDMFileName) Then
             Try
                 File.Delete(loutWDMFileName)
@@ -113,55 +87,57 @@ Public Module ModSensitivityAnalysis
 
         'Generate a default Parameter Sensitivity Table file if it does not exist already
         Dim lParameterListFilesIsAvailable As Boolean = False
-        Dim lSpecificationFile As String = "SensitiveParametersList.csv"
-        Dim lOutputFile As StreamWriter = File.CreateText("SensitivityOutput.csv")
+        Dim lSpecificationFile As String = "MultiSimSpecFile.csv"
+        Dim lOutputFile As StreamWriter = File.CreateText("MultiSimOutput.csv")
         lOutputFile.WriteLine("SimID,DSNID,Sum,AnnualSum,Mean,GeometricMean,Av.AnnualPeak,10%High,25%High,50%High,50%Low,25%Low,10%Low,5%Low,2%Low,99.9%,99%,98%,95%,90%,80%,70%,60%,50%,40%,30%,20%,10%,5%,2%,1%,0.1%")
 
 
         Dim NumberOfOutputDSN As Integer = 0
 
         If Not IO.File.Exists(lSpecificationFile) Then
-            Dim SensitivityParameterFile As StreamWriter = IO.File.CreateText("SensitiveParametersList.csv")
-            Dim TextToAddForSensitivityFile As String = "***Generic Parameter List For Sensitivity/Uncertainty Analysis And Output DSN from the UCI file"
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "***Following Output IDs are the first two ID read from the EXT TARGET block of the UCI file. You can add more if you want to."
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
+            Dim SensitivityParameterFile As StreamWriter = IO.File.CreateText("MultiSimSpecFile.csv")
+            Dim TextToAddForMultiSimFile As String = "***Generic Parameter List For Sensitivity/Uncertainty Analysis And Output DSN from the UCI file"
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "***Following Output IDs are the first two ID read from the EXT TARGET block of the UCI file. You can add more if you want to."
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
 
-            TextToAddForSensitivityFile = "DSN,"
+            TextToAddForMultiSimFile = "DSN,"
             For Each lEXTTARGET As HspfConnection In lUci.Connections
 
                 If lEXTTARGET.Target.VolName.Contains("WDM") AndAlso NumberOfOutputDSN <= 2 Then
                     NumberOfOutputDSN += 1
-                    TextToAddForSensitivityFile &= lEXTTARGET.Target.VolId & ","
+                    TextToAddForMultiSimFile &= lEXTTARGET.Target.VolId & ","
 
                 End If
             Next
 
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "***The operation number, land use, tied with next, and multiplier can be left blank"
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "Parameter,OPERATION,OPERATION NUMBER,LANDUSE,TABLE,PARM,OCCURENCE,LOWERLIMIT,UPPERLIMIT"
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "1,PERLND,,,PWAT-PARM2,LZSN,,3,8"
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "2,PERLND,,,PWAT-PARM2,INFILT,,0.01,0.5"
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "***Following lines list the multiplication factor for each parameter for each simulation."
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "Simulation ID,Parameter1,Parameter2,,,,,"
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "1,0.9,1,"
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "2,1.1,1,"
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "3,1,0.9,"
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
-            TextToAddForSensitivityFile = "4,1,1.1,"
-            SensitivityParameterFile.WriteLine(TextToAddForSensitivityFile)
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = """***The operation number, land use, tied with next, and multiplier can be left blank"""
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "PARMID,OPN_TYPE,TABLE_NAME,PARM_NAME,OCCURENCE,MULT_FACTOR?,OPN_NUMBER_NAME,LOWERLIMIT,UPPERLIMIT"
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "1,PERLND,PWAT-PARM2,LZSN,,1,,3,8"
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "2,PERLND,PWAT-PARM2,INFILT,,1,,0.01,0.5"
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "Delete intermediate UCI files?, 0"
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "***Following lines list the multiplication factor for each parameter for each simulation."
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "Simulation ID,Parameter1,Parameter2,,,,,"
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "1,0.9,,"
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "2,1.1,,"
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "3,,0.9,"
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            TextToAddForMultiSimFile = "4,,1.1,"
+            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
 
 
-            MsgBox("A default list of Sensitive parameters was created as SensitiveParameterList.csv. 
-                      You can edit this file and add more parameters.", vbOKOnly, "Default List of Sensitive Parameters")
+            MsgBox("A default list of Sensitive parameters was created as MultiSimSpecFile.csv. Additionally two output DSN from the EXT TARGETS blocks were selected for analyzing outputs.
+You can edit this specification file and add more parameters and outputs.", vbOKOnly, "Default List of Outputs & Parameters")
             SensitivityParameterFile.Close()
         End If
 
@@ -175,10 +151,12 @@ Public Module ModSensitivityAnalysis
         NumberOfOutputDSN = lcsvlinerecord.Length - 1
         For i = 1 To NumberOfOutputDSN
             If lcsvlinerecord(i) = "" Then
-                NumberOfOutputDSN = i - 1 'Should edit the code so that it add DSN only if they are integers
+                NumberOfOutputDSN = i - 1
                 Exit For
             Else
-                listOfOutputDSN.Add(lcsvlinerecord(i))
+
+                listOfOutputDSN.Add(Int(lcsvlinerecord(i)))
+                'If DSN is not an integer, it will cause an error here. Need to figure out the best way to handle it.
             End If
 
         Next
@@ -191,33 +169,47 @@ Public Module ModSensitivityAnalysis
         Dim ListOfParameters As New List(Of ModelParameter)
         lcsvRecordIndex += 1
         lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
-        Do Until lcsvlinerecord(0) = "Simulation ID"
+        Do Until lcsvlinerecord(0) = "Simulation ID" Or lcsvlinerecord(0).ToLower.Contains("delete")
             'Going through the CSV file and getting the list of parameters.
             Dim NewParameter As New ModelParameter
             With NewParameter
-                .ParmID = Trim(lcsvlinerecord(0)) 'Need to figure out better error messages if the values are not correct.
+                .ParmID = Trim(Int(lcsvlinerecord(0))) 'Need to figure out better error messages if the values are not correct.
 
                 If Not Trim(lcsvlinerecord(1)).Length = 0 Then
-                    .ParmOperation = Trim(lcsvlinerecord(1))
+                    .ParmOperationType = Trim(lcsvlinerecord(1))
                 End If
 
-                If Not Trim(lcsvlinerecord(2)).Length = 0 Then
-                    .ParmOperationNumber = CInt(Trim(lcsvlinerecord(2)))
+                .ParmTable = Trim(lcsvlinerecord(2))
+
+                If lcsvlinerecord.Length > 3 AndAlso Not Trim(lcsvlinerecord(3)).Length = 0 Then
+                    .ParmName = Trim(lcsvlinerecord(3))
                 End If
 
-                If Not Trim(lcsvlinerecord(3)).Length = 0 Then
-                    .ParmLandUseName = Trim(lcsvlinerecord(3))
+
+                If lcsvlinerecord.Length > 4 AndAlso Not Trim(lcsvlinerecord(4)).Length = 0 Then
+                    .ParmOccurence = CInt(Trim(lcsvlinerecord(4)))
                 End If
 
-                .ParmTable = lcsvlinerecord(4)
+                If lcsvlinerecord.Length > 5 AndAlso Not Trim(lcsvlinerecord(6)).Length = 0 Then
+                    .ParmMultFactor = CInt(Trim(lcsvlinerecord(5)))
+                Else
+                    .ParmMultFactor = 0
+                End If
+                'Assume that the fixed value for parameters will be provided for a MultiSim analysis for each individual simulation.
 
-                If lcsvlinerecord.Length > 5 AndAlso Not Trim(lcsvlinerecord(5)).Length = 0 Then
-                    .ParmName = Trim(lcsvlinerecord(5))
+                If .ParmTable.Contains("MON-") Then .ParmMultFactor = 1 'If a monthly table is provided, a multiplication factor has to be provided.
+
+                If Not Trim(lcsvlinerecord(6)).Length = 0 Then
+                    Try
+                        .ParmOperationNumber = CInt(Trim(lcsvlinerecord(6)))
+                        .ParmOperationName = ""
+                    Catch ex As Exception
+                        .ParmOperationName = Trim(lcsvlinerecord(6))
+                        .ParmOperationNumber = 0
+                    End Try
+
                 End If
 
-                If lcsvlinerecord.Length > 6 AndAlso Not Trim(lcsvlinerecord(6)).Length = 0 Then
-                    .ParmOccurence = CInt(Trim(lcsvlinerecord(6)))
-                End If
 
                 If lcsvlinerecord.Length > 7 AndAlso Not Trim(lcsvlinerecord(7)).Length = 0 AndAlso Not Trim(lcsvlinerecord(8)).Length = 0 Then
                     .ParmLow = CDbl(Trim(lcsvlinerecord(7)))
@@ -231,10 +223,13 @@ Public Module ModSensitivityAnalysis
             lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
         Loop
 
-        Dim MultiplicationFactor As Double = 0
-
         Do
+            lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
+            If lcsvlinerecord(0).ToLower.Contains("delete") Then
+                DeleteUCIFiles = CInt(Trim(lcsvlinerecord(1)))
+                lcsvRecordIndex += 1
 
+            End If
             lcsvRecordIndex += 1
             lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
             SimID = lcsvlinerecord(0)
@@ -243,17 +238,21 @@ Public Module ModSensitivityAnalysis
             lUci = New HspfUci
             lUci.ReadUci(lMsg, Path.Combine(pTestPath, SimID & uciName), -1, False, Path.Combine(pTestPath, pBaseName & ".ech"))
 
+            Dim MFactorOrParmValue As Double = 0.0
+
             For Each Parm As ModelParameter In ListOfParameters
+
                 Try
-                    MultiplicationFactor = lcsvlinerecord(Parm.ParmID)
+                    MFactorOrParmValue = lcsvlinerecord(Parm.ParmID)
                 Catch
-                    MultiplicationFactor = 1.0
+                    MFactorOrParmValue = Double.NaN
                 End Try
 
-                If MultiplicationFactor <> 1.0 Then
+
+                If Not (Double.IsNaN(MFactorOrParmValue) Or (Parm.ParmMultFactor = 0 AndAlso MFactorOrParmValue = 1.0)) Then
                     With Parm
-                        ChangeUCIParameterAndSave(lUci, .ParmOperation, .ParmOperationNumber, .ParmLandUseName,
-                                                         .ParmTable, .ParmName, .ParmOccurence, .ParmLow, .ParmHigh, MultiplicationFactor)
+                        ChangeUCIParameterAndSave(lUci, .ParmOperationType, .ParmOperationNumber, .ParmOperationName,
+                                                         .ParmTable, .ParmName, .ParmOccurence, .ParmLow, .ParmHigh, .ParmMultFactor, MFactorOrParmValue)
 
                     End With
                 End If
@@ -262,17 +261,12 @@ Public Module ModSensitivityAnalysis
 
             loutputLine = ModelRunandReportAnswers(SimID, lUci, SimID & uciName, lExitCode, pBaseName, pTestPath,
                                  aSDateJ, aEDateJ, YearsofSimulation, lStats, listOfOutputDSN, aHSPFEchofilename)
-            'lUci = Nothing
-
 
             lOutputFile.Write(loutputLine)
 
-
-            If Not SaveUCIFiles Then
+            If DeleteUCIFiles = 1 Then
                 File.Delete(SimID & uciName)
             End If
-
-
 
         Loop While lcsvRecordIndex < lSpecificationFileRecordsNew.Count - 1
 
@@ -293,6 +287,7 @@ Public Module ModSensitivityAnalysis
                         If (MyReader.PeekChars(10000).Contains("***") Or
                                     Trim(MyReader.PeekChars(10000)) = "" Or
                                     Trim(MyReader.PeekChars(10000).ToLower.StartsWith("parameter")) Or
+                                    Trim(MyReader.PeekChars(10000).ToLower.StartsWith("parmid")) Or
                                     Trim(MyReader.PeekChars(10000).ToLower.StartsWith(","))) Then
                             CurrentRow = MyReader.ReadFields
                         Else
@@ -328,16 +323,44 @@ Public Module ModSensitivityAnalysis
 
     Private Sub ChangeUCIParameterAndSave(ByRef aUCI As atcUCI.HspfUci,
                                                ByVal aParameterOperation As String,
-                                               ByVal aOperationNumber As String,
-                                               ByVal aLandUsename As String,
+                                               ByVal aOperationNumber As Integer,
+                                               ByVal aOperationName As String,
                                                ByVal aTableName As String,
                                                ByVal aParameterName As String,
                                                ByVal aParameterOccurrence As Integer,
                                                ByVal aLowerLimit As Double,
                                                ByVal aUpperLimit As Double,
-                                               ByVal aMultiplicationFactor As Double
+                                               ByVal aParmAbsolute As Int16,
+                                               ByVal aMFactorOrParmValue As Double
                                                )
         Select Case True
+            Case aTableName.Contains("MASS-LINK")
+                Dim lMassLinkID As Integer
+                lMassLinkID = aParameterOccurrence
+                Dim lMassLinkParts(7) As String
+                If aOperationName.Length > 0 Then
+                    lMassLinkParts = aOperationName.Split(":")
+                    ReDim Preserve lMassLinkParts(7)
+
+                End If
+
+                For Each lMasslink As HspfMassLink In aUCI.MassLinks
+
+                    If lMasslink.MassLinkId = lMassLinkID AndAlso
+                        (lMasslink.Source.Group = lMassLinkParts(0) Or IsNothing(lMassLinkParts(0))) AndAlso
+                        (lMasslink.Source.Member = lMassLinkParts(1) Or IsNothing(lMassLinkParts(1))) AndAlso
+                        (lMasslink.Source.MemSub1 = lMassLinkParts(2) Or IsNothing(lMassLinkParts(2))) AndAlso
+                        (lMasslink.Source.MemSub2 = lMassLinkParts(3) Or IsNothing(lMassLinkParts(3))) AndAlso
+                        (lMasslink.Target.Group = lMassLinkParts(4) Or IsNothing(lMassLinkParts(4))) AndAlso
+                        (lMasslink.Target.Member = lMassLinkParts(5) Or IsNothing(lMassLinkParts(5))) AndAlso
+                        (lMasslink.Target.MemSub1 = lMassLinkParts(6) Or IsNothing(lMassLinkParts(6))) AndAlso
+                        (lMasslink.Target.MemSub2 = lMassLinkParts(7) Or IsNothing(lMassLinkParts(7))) Then
+
+
+                        lMasslink.MFact = HspfTable.NumFmtRE(lMasslink.MFact * aMFactorOrParmValue, 5)
+                    End If
+                Next
+
             Case aTableName.Contains("EXTNL")
                 Dim MetSegRec As Integer
                 For Each lMetSeg As HspfMetSeg In aUCI.MetSegs
@@ -348,104 +371,74 @@ Public Module ModSensitivityAnalysis
                             MetSegRec = 2
                         Case "SOLR"
                             MetSegRec = 5
+                        Case ""
+
                     End Select
                     Try
-                        lMetSeg.MetSegRecs(MetSegRec).MFactP = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactP _
-                                                                                             * aMultiplicationFactor, 3)
+                        If aParmAbsolute = 0 Then
+                            lMetSeg.MetSegRecs(MetSegRec).MFactP = HspfTable.NumFmtRE(lMetSeg.MetSegRecs(MetSegRec).MFactP * aMFactorOrParmValue, 5)
 
-                        lMetSeg.MetSegRecs(MetSegRec).MFactR = SignificantDigits(lMetSeg.MetSegRecs(MetSegRec).MFactR _
-                                                                                             * aMultiplicationFactor, 3)
+                            lMetSeg.MetSegRecs(MetSegRec).MFactR = HspfTable.NumFmtRE(lMetSeg.MetSegRecs(MetSegRec).MFactR * aMFactorOrParmValue, 5)
+                        Else
+                            lMetSeg.MetSegRecs(MetSegRec).MFactP = HspfTable.NumFmtRE(aMFactorOrParmValue, 3)
+
+                            lMetSeg.MetSegRecs(MetSegRec).MFactR = HspfTable.NumFmtRE(aMFactorOrParmValue, 3)
+                        End If
+
                     Catch ex As Exception
                         Logger.Msg("Could not find the Table " & aTableName &
                                    " Parameter " & aParameterName & " for " & lMetSeg.Name, MsgBoxStyle.Critical)
                         End
-
                     End Try
-
-                Next
-
-            Case aTableName.Contains("MON-")
-                For Each lOper As HspfOperation In aUCI.OpnBlks(aParameterOperation).Ids
-                    If aLandUsename = "" OrElse lOper.Description = aLandUsename Then
-                        For Mon = 0 To 11
-                            Try
-                                lOper.Tables(aTableName).Parms(Mon).Value = SignificantDigits(lOper.Tables(aTableName).Parms(Mon).Value _
-                                                                                                      * aMultiplicationFactor, 2)
-                                If (lOper.Tables(aTableName).Parms(Mon).Value < aLowerLimit) Then
-                                    lOper.Tables(aTableName).Parms(Mon).Value = aLowerLimit
-                                ElseIf (lOper.Tables(aTableName).Parms(Mon).Value > aUpperLimit) Then
-                                    lOper.Tables(aTableName).Parms(Mon).Value = aUpperLimit
-                                End If
-
-                            Catch ex As Exception
-                                Logger.Msg("Could not find the Table " & aTableName &
-                                   " Parameter " & aParameterName & " for " & lOper.Id, MsgBoxStyle.Critical)
-
-                                End
-                            End Try
-
-
-                            'ParameterDetailText &= SimID & "," & ParameterOperation & "," & TableName & "," & lOper.Id & "," &
-                            '                ParameterName & "," & Mon & "," & lOper.Tables(TableName).Parms(Mon).Value & vbCrLf
-
-                        Next
-
-                    End If
-                Next
-            Case aTableName.Contains("SILT-CLAY-PM")
-                For Each lOper As HspfOperation In aUCI.OpnBlks(aParameterOperation).Ids
-                    For SedimentType As Integer = 15 To 16
-
-                        lOper.Tables(SedimentType).ParmValue(aParameterName) =
-                                        SignificantDigits(lOper.Tables(SedimentType).ParmValue(aParameterName) * aMultiplicationFactor, 3)
-                        If aParameterName = "TAUCD" Then
-                            lOper.Tables(SedimentType).ParmValue("TAUCS") =
-                                        SignificantDigits(lOper.Tables(SedimentType).ParmValue("TAUCS") * aMultiplicationFactor, 3)
-                        End If
-
-                    Next
-
-                Next
-            Case aTableName.Contains("MASS-LINK")
-                Dim lMassLinkID As Integer
-                lMassLinkID = Mid(aTableName, 10)
-
-                For Each lMasslink As HspfMassLink In aUCI.MassLinks
-                    If lMasslink.MassLinkId = lMassLinkID AndAlso lMasslink.Source.Group.Contains(aParameterName) Then
-                        lMasslink.MFact = SignificantDigits(lMasslink.MFact * aMultiplicationFactor, 3)
-                    End If
-                    'If lMassLinkID = 21 Then
-
-                    '    If lMasslink.MassLinkId = 1 AndAlso lMasslink.Source.Group.Contains("IQUAL") Then
-                    '        lMasslink.MFact = SignificantDigits(lMasslink.MFact * aMultiplicationFactor, 3)
-                    '    End If
-                    'End If
-                    'If aParameterName = "NITR" Then
-                    '    If lMasslink.MassLinkId = lMassLinkID AndAlso lMasslink.Source.Group.Contains("PHOS") Then
-                    '        lMasslink.MFact = SignificantDigits(lMasslink.MFact * aMultiplicationFactor, 3)
-                    '    End If
-                    'End If
                 Next
 
             Case Else
                 For Each lOper As HspfOperation In aUCI.OpnBlks(aParameterOperation).Ids
-                    Try
-                        lOper.Tables(aTableName).ParmValue(aParameterName) =
-                                            SignificantDigits(lOper.Tables(aTableName).ParmValue(aParameterName) * aMultiplicationFactor, 3)
-                        If (lOper.Tables(aTableName).ParmValue(aParameterName) < aLowerLimit) Then
-                            lOper.Tables(aTableName).ParmValue(aParameterName) = aLowerLimit
-                        ElseIf (lOper.Tables(aTableName).ParmValue(aParameterName) > aUpperLimit) Then
-                            lOper.Tables(aTableName).ParmValue(aParameterName) = aUpperLimit
-                        End If
-                    Catch ex As Exception
-                        Logger.Msg("Could not find the Table " & aTableName &
-                                   " Parameter " & aParameterName & " for " & lOper.Id, MsgBoxStyle.Critical)
-                        End
-                    End Try
+                    If (lOper.Id = aOperationNumber OrElse lOper.Description = aOperationName OrElse (aOperationNumber = 0 AndAlso aOperationName = "")) Then
 
-                    'ParameterDetailText &= SimID & "," & ParameterOperation & "," & TableName & "," & lOper.Id & "," &
-                    '                                                                ParameterName & ",," &
-                    '                                                                lOper.Tables(TableName).ParmValue(ParameterName) & vbCrLf
+                        Dim lTable As HspfTable
+
+                        If aParameterOccurrence = 0 Then
+                            lTable = lOper.Tables(aTableName)
+                        Else
+                            lTable = lOper.Tables(aTableName & ":" & aParameterOccurrence)
+                        End If
+                        Try
+
+                            If lTable.Name.Contains("MON-") Then
+                                For Mon = 0 To 11 'For monthly parameters, only a multiplication factor can be provided
+
+                                    lTable.Parms(Mon).Value = HspfTable.NumFmtRE(lTable.Parms(Mon).Value * aMFactorOrParmValue, 5)
+                                    If (lTable.Parms(Mon).Value < aLowerLimit) Then
+                                        lTable.Parms(Mon).Value = aLowerLimit
+                                    ElseIf (lTable.Parms(Mon).Value > aUpperLimit) Then
+                                        lTable.Parms(Mon).Value = aUpperLimit
+                                    End If
+
+
+                                Next
+
+                            Else
+                                If aParmAbsolute = 0 Then
+                                    lTable.ParmValue(aParameterName) = HspfTable.NumFmtRE(lTable.ParmValue(aParameterName) * aMFactorOrParmValue, lTable.Parms(aParameterName).Def.Length)
+                                    If (lTable.ParmValue(aParameterName) < aLowerLimit) Then
+                                        lTable.ParmValue(aParameterName) = aLowerLimit
+                                    ElseIf (lTable.ParmValue(aParameterName) > aUpperLimit) Then
+                                        lTable.ParmValue(aParameterName) = aUpperLimit
+                                    End If
+                                Else
+                                    lTable.ParmValue(aParameterName) = HspfTable.NumFmtRE(aMFactorOrParmValue, lTable.Parms(aParameterName).Def.Length)
+                                End If
+
+                            End If
+                        Catch ex As Exception
+                            Logger.Msg("Could not find the Table " & aTableName &
+                                       " Parameter " & aParameterName & " for " & lOper.Id, MsgBoxStyle.Critical)
+                            End
+                        End Try
+
+
+                    End If
                 Next
         End Select
         aUCI.GlobalBlock.RunFg = 1
